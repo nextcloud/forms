@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16">
+  <path
+     d="m 14.051685,12.468195 -1.414,1.414 -3.535987,-3.535993 -3.535,3.535993 -1.415,-1.414 3.536,-3.535989 -3.536,-3.536 1.415,-1.414 3.535,3.536 3.515987,-3.555 1.434,1.434 -3.535993,3.535 z"
+     style="fill:#f45573;fill-opacity:1;stroke:none;stroke-opacity:1" />
+  <rect
+     style="opacity:1;fill:none;fill-opacity:0.71372549;fill-rule:nonzero;stroke:#f45573;stroke-width:1.45034671;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     width="12.22084"
+     height="12.572014"
+     x="3.0173023"
+     y="2.6650629" />
+  <path
+     style="opacity:1;fill:none;fill-opacity:0.71372549;fill-rule:nonzero;stroke:#f45573;stroke-width:1.45034671;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 2.2938232,13.334937 -1.52918518,0 0,-12.57201374 12.22084498,0 0,1.17862924" />
+</svg>

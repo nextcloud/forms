@@ -1,0 +1,22 @@
+{
+	"name": "nextcloud/forms",
+	"type": "project",
+	"license": "AGPLv3",
+	"authors": [
+		{
+			"name": "Vinzenz Rosenkranz"
+		},
+		{
+			"name": "Kai Schröer"
+		},
+		{
+			"name": "René Gieling"
+		}
+	],
+	"require-dev": {
+		"christophwurst/nextcloud": "^15.0",
+		"phpunit/phpunit": "^5.4",
+		"league/factory-muffin": "^3.0",
+		"league/factory-muffin-faker": "^2.0"
+	}
+}

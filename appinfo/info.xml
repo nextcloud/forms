@@ -1,0 +1,36 @@
+﻿<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>forms</id>
+    <name>Forms</name>
+    <summary>A forms app, similar to Google Forms.</summary>
+    <description>A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public).</description>
+    <version>1.0.3</version>
+    <licence>agpl</licence>
+    <author>Vinzenz Rosenkranz</author>
+    <author>René Gieling</author>
+    <author>Kai Schröer</author>
+    <author>Natalie Gilbert</author>
+    <author>Nick Gallo</author>
+    <author>Inigo Jiron</author>
+    <author>Affan Hussain</author>
+    <author>Ajfar Huq</author>
+    <author>Tim Sattizahn</author>
+    <author>Stephan Link</author>
+    <author>Kameron Sheppard</author>
+    <documentation>
+        <admin>https://github.com/nextcloud/forms/blob/master/README.md</admin>
+    </documentation>
+    <category>tools</category>
+    <category>social</category>
+    <category>organization</category>
+    <website>https://github.com/nextcloud/forms</website>
+    <bugs>https://github.com/nextcloud/forms/issues</bugs>
+    <repository type="git">https://github.com/nextcloud/forms.git</repository>
+    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/overview.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/vote.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/edit-form.png</screenshot>
+    <dependencies>
+        <nextcloud min-version="14" max-version="16" />
+    </dependencies>
+</info>

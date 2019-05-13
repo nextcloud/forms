@@ -1,0 +1,58 @@
+sudo: false
+dist: trusty
+language: php
+
+services:
+  - mysql
+  - postgresql
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
+addons:
+  apt:
+    packages:
+    - libxml2-utils
+    
+env:
+  global:
+    - CORE_BRANCH=stable14
+    - APP_NAME=forms
+  matrix:
+    - DB=mysql
+    - DB=pgsql
+    - DB=sqlite
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_install:
+  # Install NC and app
+  - wget https://raw.githubusercontent.com/nextcloud/travis_ci/master/before_install.sh;
+  - bash ./before_install.sh $APP_NAME $CORE_BRANCH $DB
+  - cd ../server;
+  - ./occ app:enable $APP_NAME
+
+before_script:
+  - cd apps/$APP_NAME
+
+script:
+  # Check info.xml schema validity
+  - wget https://apps.nextcloud.com/schema/apps/info.xsd
+  - xmllint appinfo/info.xml --schema info.xsd --noout
+  - rm info.xsd
+  # Check PHP syntax errors
+  - find . -name \*.php -exec php -l "{}" \;
+  # Execute tests
+  - make test
+
+after_success:
+  # Generate Code Coverage
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover clover.xml
+
+after_failure:
+  - cat ../../data/nextcloud.log
