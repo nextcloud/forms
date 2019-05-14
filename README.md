@@ -1,19 +1,37 @@
 # Forms
 
-Forms allows the creation of shareable forms, with multiple question types and privacy settings. 
-**Note**: This app is tested with Apache2 webserver, MySQL database, and apt-get package manager. To use alternatives, replace the relevant commands with those of your technology.
+Forms allows the creation of shareable forms, with multiple question types and privacy settings.
+
+
+**Note**: This app is tested with Apache2 webserver, MySQL database, and apt-get package manager. To use alternatives, replace the relevant commands with those of your technology. This document assumes that a working
+NextCloud development environment has been installed. See https://docs.nextcloud.com/server/stable/developer_manual/general/devenv.html for help with this.
 
 ## Installation
 ### Download the Forms Codebase
-(Placeholder, not sure if we decided we wanted this in this version since the app is not yet on git)
+
 ```sh
 $ cd /var/www/html/nextcloud/apps
-$ svn co https://vis.cs.umd.edu/svn/projects/forms/forms
+$ git clone https://github.com/affan98/forms.git
 ```
+**Note**: This will be moved to https://github.com/nextcloud/forms.git once the app has been accepted to the NextCloud app store
 
-### Install NPM
+### Install Prerequisites and Dependencies
+#### Install NPM
 ```sh
 $ apt-get npm
+```
+
+#### Install Yarn
+```sh
+$ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+$ echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+$ apt update
+$ apt install yarn
+```
+#### Update NodeJS
+```sh
+$ npm install -g n
+$ n stable
 ```
 ### Build the App
 ```sh
@@ -28,9 +46,9 @@ $ service mysql start
 ```
 
 ### Enable the App
-- Open NextCloud in your browser of choice (Chrome)
+- Open NextCloud in your browser of choice
 - Click on the user icon in the top right of the screen, and select Apps from the drop down menu
--	Find the Forms app in the list and click enable 
+-	Find the Forms app in the list and click enable
 -	The app will now be fully functional! The forms icon will appear on the top toolbar of NextCloud after it has been enabled
 
 
@@ -64,11 +82,15 @@ The following are the most important code files for development of the Forms App
 
 -	**src/js/views/**
     -	**Create.vue**: File where survey creation page is handled
-    -	**Vote.vue**: File where voting page (responding to the survey) is handled
+
     -	**List.vue**: File where list of created surveys is handled (located on the forms app home page)
     -	**Results.vue**: File where page that displays survey results is handled
 
     -	**appinfo/routes.php**: Defines server endpoints that can be accessed by the client
 
+- **/js/vote.js**: File that contains the logic for the response page and responding to a form
 
+- **/css/vote.scss**: File that contains CSS formatting for the response page
+
+- **/templates/vote.tmpl.php**: File that contains the form template that is dynamically populated by the database
 
