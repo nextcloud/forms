@@ -23,6 +23,9 @@
 <template>
 	<div class="controls">
 		<div class="breadcrumb">
+			<button class="button btn primary"  @click="helpPage">
+				{{ "Help" }}
+			</button>
 			<div class="crumb svg crumbhome">
 				<router-link :to="{ name: 'list'}" class="icon-home">
 					Home
@@ -51,6 +54,11 @@ export default {
 	data() {
 		return {
 			imagePath: OC.imagePath('core', 'places/home.svg')
+		}
+	},
+	methods: {
+		helpPage() {
+			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
 		}
 	}
 }

@@ -9,7 +9,7 @@
 # * npm
 # * curl: used if phpunit and composer are not installed to fetch them from the web
 # * tar: for building the archive
-
+yarn_install=$(shell which yarn)
 app_name=forms
 
 project_dir=$(CURDIR)
@@ -27,7 +27,11 @@ all: dev-setup appstore
 dev-setup: clean-dev npm-init composer
 
 npm-init:
+ifeq (,$(yarn_install))
 	npm install
+else
+	yarn
+endif
 
 # a copy is fetched from the web
 .PHONY: composer

@@ -41,12 +41,8 @@ use OCP\Security\ISecureRandom;
 
 use OCA\Forms\Db\Event;
 use OCA\Forms\Db\EventMapper;
-use OCA\Forms\Db\Option;
-use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Vote;
 use OCA\Forms\Db\VoteMapper;
-use OCA\Forms\Db\Comment;
-use OCA\Forms\Db\CommentMapper;
 use OCA\Forms\Db\Notification;
 use OCA\Forms\Db\NotificationMapper;
 
@@ -62,9 +58,7 @@ class ApiController extends Controller {
 	private $groupManager;
 	private $userManager;
 	private $eventMapper;
-	private $optionMapper;
 	private $voteMapper;
-	private $commentMapper;
 	private $questionMapper;
 	private $answerMapper;
 
@@ -76,9 +70,7 @@ class ApiController extends Controller {
 	 * @param IUserManager $userManager
 	 * @param string $userId
 	 * @param EventMapper $eventMapper
-	 * @param OptionMapper $optionMapper
 	 * @param VoteMapper $voteMapper
-	 * @param CommentMapper $commentMapper
 	 * @param QuestionMapper $questionMapper
 	 * @param AnswerMapper $answerMapper
 	 */
@@ -89,9 +81,7 @@ class ApiController extends Controller {
 		IUserManager $userManager,
 		$userId,
 		EventMapper $eventMapper,
-		OptionMapper $optionMapper,
 		VoteMapper $voteMapper,
-		CommentMapper $commentMapper,
 		QuestionMapper $questionMapper,
 		AnswerMapper $answerMapper
 	) {
@@ -100,9 +90,7 @@ class ApiController extends Controller {
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
 		$this->eventMapper = $eventMapper;
-		$this->optionMapper = $optionMapper;
 		$this->voteMapper = $voteMapper;
-		$this->commentMapper = $commentMapper;
 		$this->questionMapper = $questionMapper;
 		$this->answerMapper = $answerMapper;
 	}
@@ -210,23 +198,6 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Read all options of a form based on the form id
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @param Integer $formId
-	 * @return Array
-	 */
-	public function getOptions($formId) {
-		$optionList = array();
-		$options = $this->optionMapper->findByForm($formId);
-		foreach ($options as $optionElement) {
-			$optionList[] = $optionElement->read();
-		}
-
-		return $optionList;
-	}
-
-	/**
 	 * Read all votes of a form based on the form id
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
@@ -234,6 +205,17 @@ class ApiController extends Controller {
 	 * @return Array
 	 */
 	public function getVotes($formId) {
+		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
+			$currentUser = '';
+		} else {
+			$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
+		}
+
+		$event = $this->getEvent($formId);
+
+		$accessList = $this->convertAccessList($event['access']);
+
+		if ($event['owner'] == $currentUser) {
 		$votesList = array();
 		$votes = $this->voteMapper->findByForm($formId);
 
@@ -243,24 +225,9 @@ class ApiController extends Controller {
 
 		return $votesList;
 	}
+	return NULL;
+}
 
-	/**
-	 * Read all comments of a form based on the form id
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @param Integer $formId
-	 * @return Array
-	 */
-	public function getComments($formId) {
-		$commentsList = array();
-		$comments = $this->commentMapper->findByForm($formId);
-
-		foreach ($comments as $commentElement) {
-			$commentsList[] = $commentElement->read();
-		}
-
-		return $commentsList;
-	}
 
 	/**
 	 * Read an entire form based on form id
@@ -382,7 +349,6 @@ class ApiController extends Controller {
 				'grantedAs' => $this->grantAccessAs($event, $shares),
 				'mode' => $mode,
 				'event' => $event,
-				'comments' => $this->getComments($event['id']),
 				'votes' => $this->getVotes($event['id']),
 				'shares' => $shares,
 				'options' => [
@@ -436,7 +402,6 @@ class ApiController extends Controller {
 		if ($this->userId !== $formToDelete->getOwner() && !$this->groupManager->isAdmin($this->userId)) {
 			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
 		}
-		$this->commentMapper->deleteByForm($id);
 		$this->voteMapper->deleteByForm($id);
 		// $this->notificationMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
@@ -473,8 +438,6 @@ class ApiController extends Controller {
 		$newEvent->setDescription($event['description']);
 
 		$newEvent->setIsAnonymous($event['isAnonymous']);
-		$newEvent->setFullAnonymous($event['fullAnonymous']);
-		$newEvent->setAllowMaybe($event['allowMaybe']);
 
 		if ($event['access'] === 'select') {
 			$shareAccess = '';

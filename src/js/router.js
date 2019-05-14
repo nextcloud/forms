@@ -28,7 +28,6 @@ import Router from 'vue-router'
 // Dynamic loading
 const Create = () => import('./views/Create')
 const List = () => import('./views/List')
-const Vote = () => import('./views/Vote')
 const Results = () => import('./views/Results')
 Vue.use(Router)
 
@@ -73,14 +72,6 @@ export default new Router({
 			path: '/:index(index.php/)?apps/forms/new',
 			components: {
 				default: Create
-			},
-			props: false,
-			name: 'create'
-		},
-		{
-			path: '/:index(index.php/)?apps/forms/form/:hash',
-			components: {
-				default: Vote
 			},
 			props: false,
 			name: 'create'

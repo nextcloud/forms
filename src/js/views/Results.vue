@@ -23,31 +23,39 @@
   -->
 
 <template>
-	<div id="app-content">
+	<div>
 		<div>
 			<button class="button btn primary" @click="download">
 				<span>{{ "Export to CSV" }}</span>
 			</button>
 		</div>
-		<transition-group
-			name="list"
-			tag="div"
-			class="table"
-		>
-			<resultItem
-				key="0"
-				:header="true"
-			/>
-			<li
-				is="resultItem"
-				v-for="(vote, index) in votes"
-				:key="vote.id"
-				:vote="vote"
-				@viewResults="viewFormResults(index, form.event, 'results')"
-			/>
-		</transition-group>
-		<loading-overlay v-if="loading" />
-		<modal-dialog />
+		<h1>
+			{{ "Statistics"  }}
+		</h1>
+		<div v-for="sum in stats" :key="sum">
+			{{ sum }}
+		</div>
+		<div id="app-content">
+			<transition-group
+				name="list"
+				tag="div"
+				class="table"
+			>
+				<resultItem
+					key="0"
+					:header="true"
+				/>
+				<li
+					is="resultItem"
+					v-for="(vote, index) in votes"
+					:key="vote.id"
+					:vote="vote"
+					@viewResults="viewFormResults(index, form.event, 'results')"
+				/>
+			</transition-group>
+			<loading-overlay v-if="loading" />
+			<modal-dialog />
+		</div>
 	</div>
 </template>
 
@@ -68,6 +76,7 @@ export default {
 		return {
 			loading: true,
 			votes: []
+
 		}
 	},
 
@@ -81,7 +90,12 @@ export default {
 			this.loading = true
 			this.$http.get(OC.generateUrl('apps/forms/get/votes/' + this.$route.params.hash))
 				.then((response) => {
-					this.votes = response.data
+					if (response.data == null) {
+						this.votes = null
+						OC.Notification.showTemporary('Access Denied')
+					} else {
+						this.votes = response.data
+					}
 					this.loading = false
 				}, (error) => {
 					/* eslint-disable-next-line no-console */
@@ -98,16 +112,57 @@ export default {
 			})
 		},
 		download() {
-			this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
-			var element = document.createElement('a')
-			element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(this.votes)))
-			element.setAttribute('download', 'NextCloud Forms CSV' + '.csv')
 
-			element.style.display = 'none'
-			document.body.appendChild(element)
+			this.loading = true
+			this.$http.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
+				.then((response) => {
+					this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
+					var element = document.createElement('a')
+					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(this.votes)))
+					element.setAttribute('download', response.data.title + '.csv')
 
-			element.click()
-			document.body.removeChild(element)
+					element.style.display = 'none'
+					document.body.appendChild(element)
+					element.click()
+					document.body.removeChild(element)
+					this.loading = false
+				}, (error) => {
+					/* eslint-disable-next-line no-console */
+					console.log(error.response)
+					this.loading = false
+				})
+		}
+	},
+	computed: {
+		stats() {
+
+			if (this.votes != null) {
+				var uniqueAns = []
+				var uniqueQs = []
+				var ansToQ = new Map()
+				for (let i = 0; i < this.votes.length; i++) {
+					if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
+						if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
+							uniqueAns.push(this.votes[i].voteAnswer)
+							ansToQ.set(this.votes[i].voteAnswer, this.votes[i].voteOptionId)
+						}
+						if (uniqueQs.includes(this.votes[i].voteOptionId) === false) {
+							uniqueQs.push(this.votes[i].voteOptionId)
+						}
+					}
+				}
+				var sums = []
+				for (let i = 0; i < uniqueAns.length; i++) {
+					sums[i] = 0
+				}
+				for (let i = 0; i < this.votes.length; i++) {
+					sums[uniqueAns.indexOf(this.votes[i].voteAnswer)]++
+				}
+				for (let i = 0; i < sums.length; i++) {
+					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
+				}
+			}
+			return sums.sort()
 		}
 	}
 }

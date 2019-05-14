@@ -71,7 +71,7 @@
 			<div>
 				<img class="icontwo">
 			</div>
-			<div v-if="votedBycurrentUser" class="symbol icon-voted" />
+			<div class="symbol icon-voted" />
 			<a :href="voteUrl" class="wrapper group-1-1">
 				<div class="name">
 					{{ form.event.title }}
@@ -173,19 +173,11 @@ export default {
 				return t('forms', 'never')
 			}
 		},
-		participants() {
-			return this.form.votes.map(item => item.userId)
-				.filter((value, index, self) => self.indexOf(value) === index)
-		},
-		countvotes() {
-			return this.participants.length
-		},
+
 		countShares() {
 			return this.form.shares.length
 		},
-		votedBycurrentUser() {
-			return this.participants.indexOf(OC.getCurrentUser().uid) > -1
-		},
+
 		voteUrl() {
 			return OC.generateUrl('apps/forms/form/') + this.form.event.hash
 		}

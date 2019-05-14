@@ -129,10 +129,6 @@
 					<input v-show="form.event.isAnonymous" id="trueAnonymous" v-model="form.event.fullAnonymous"
 						:disabled="protect" type="checkbox" class="checkbox"
 					>
-					<label v-show="form.event.isAnonymous" class="title" for="trueAnonymous">
-						{{ t('forms', 'Hide user names for admin') }}
-					</label>
-
 					<input id="expiration" v-model="form.event.expiration" :disabled="protect"
 						type="checkbox" class="checkbox"
 					>
@@ -255,7 +251,8 @@ export default {
 			options: [
 				{ text: 'Radio Buttons', value: 'radiogroup' },
 				{ text: 'Checkboxes', value: 'checkbox' },
-				{ text: 'Write In', value: 'text' },
+				{ text: 'Short Response', value: 'text' },
+				{ text: 'Long Response', value: 'comment' },
 				{ text: 'Drop Down', value: 'dropdown' }
 			]
 		}
@@ -285,7 +282,7 @@ export default {
 			} else if (this.form.mode === 'edit') {
 				return t('forms', 'Update form')
 			} else {
-				return t('forms', 'Create new form')
+				return t('forms', 'Done')
 			}
 		},
 
@@ -412,7 +409,7 @@ export default {
 			} else if (!this.uniqueName) {
 				OC.Notification.showTemporary(t('forms', 'Cannot have the same question!'))
 			} else {
-				if (this.newQuizQuestion !== null & this.newQuizQuestion !== '') {
+				if (this.newQuizQuestion !== null & this.newQuizQuestion !== '' & (/\S/.test(this.newQuizQuestion))) {
 					this.form.options.formQuizQuestions.push({
 						id: this.nextQuizQuestionId++,
 						text: this.newQuizQuestion,
@@ -443,7 +440,7 @@ export default {
 			if (!this.uniqueAnsName) {
 				OC.Notification.showTemporary(t('forms', 'Two answers cannot be the same!'))
 			} else {
-				if (item.newQuizAnswer !== null & item.newQuizAnswer !== '') {
+				if (item.newQuizAnswer !== null & item.newQuizAnswer !== '' & (/\S/.test(item.newQuizAnswer))) {
 					item.formQuizAnswers.push({
 						id: item.nextQuizAnswerId,
 						text: item.newQuizAnswer
@@ -461,7 +458,7 @@ export default {
 		allHaveAns() {
 			this.haveAns = true
 			this.form.options.formQuizQuestions.forEach(q => {
-				if (q.type !== 'text' && q.answers.length === 0) {
+				if (q.type !== 'text' && q.type !== 'comment' && q.answers.length === 0) {
 					this.haveAns = false
 				}
 			})
@@ -472,13 +469,15 @@ export default {
 			if (mode !== '') {
 				this.form.mode = mode
 			}
-			if (this.form.event.title.length === 0) {
+			if (this.form.event.title.length === 0 | !(/\S/.test(this.form.event.title))) {
 				this.titleEmpty = true
 				OC.Notification.showTemporary(t('forms', 'Title must not be empty!'))
 			} else if (this.form.options.formQuizQuestions.length === 0) {
 				OC.Notification.showTemporary(t('forms', 'Must have at least one question!'))
 			} else if (!this.haveAns) {
 				OC.Notification.showTemporary(t('forms', 'All questions need answers!'))
+			} else if (this.form.event.expiration & this.form.event.expirationDate === '') {
+				OC.Notification.showTemporary(t('forms', 'Need to pick an expiration date!'))
 			} else {
 				this.writingForm = true
 				this.titleEmpty = false

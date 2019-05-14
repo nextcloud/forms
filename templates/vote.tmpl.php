@@ -41,6 +41,10 @@
 	$access = $form->getAccess();
 ?>
 
+<?php if ($form->getIsAnonymous()):?>
+*NOTE: This form is anonymous
+<?php endif?>
+
 <div id="surveyContainer"
 	form="<?php echo htmlentities(json_encode($form->read()))?>"
 	questions="<?php echo htmlentities(json_encode($questions))?>"

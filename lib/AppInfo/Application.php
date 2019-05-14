@@ -25,7 +25,6 @@ namespace OCA\Forms\AppInfo;
 
 use OCA\Forms\Controller\PageController;
 use OCA\Forms\Controller\ApiController;
-use OCA\Forms\Db\CommentMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\EventMapper;
 use OCA\Forms\Db\NotificationMapper;

@@ -23,7 +23,7 @@
 	<li>
 		<div>{{ question.text }}</div>
 		<div>
-			<input v-show="question.type != 'text'" style="height:30px;" v-model="newQuizAnswer"
+			<input v-show="(question.type != 'text') && (question.type != 'comment')" style="height:30px;" v-model="newQuizAnswer"
 				:placeholder=" t('forms', 'Add Answer')"
 				@keyup.enter="emitNewAnswer(question)"
 			>

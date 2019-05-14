@@ -31,7 +31,6 @@
 				</span>
 			</router-link>
 		</controls>
-
 		<div v-if="noForms" class="">
 			<div class="icon-forms" />
 			<h2> {{ t('No existing forms.') }} </h2>
@@ -39,7 +38,6 @@
 				<span>{{ t('forms', 'Click here to add a form') }}</span>
 			</router-link>
 		</div>
-
 		<transition-group
 			v-if="!noForms"
 			name="list"
@@ -102,7 +100,9 @@ export default {
 					this.loading = false
 				})
 		},
-
+		helpPage() {
+			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
+		},
 		viewFormResults(index, event, name) {
 			this.$router.push({
 				name: name,

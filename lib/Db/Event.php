@@ -44,10 +44,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setHash(string $value)
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(integer $value)
- * @method integer getFullAnonymous()
- * @method void setFullAnonymous(integer $value)
- * @method integer getAllowMaybe()
- * @method void setAllowMaybe(integer $value)
  */
 class Event extends Model {
 	protected $title;
@@ -66,8 +62,6 @@ class Event extends Model {
 	 */
 	public function __construct() {
 		$this->addType('isAnonymous', 'integer');
-		$this->addType('fullAnonymous', 'integer');
-		$this->addType('allowMaybe', 'integer');
 	}
 
 	public function read() {
@@ -96,8 +90,6 @@ class Event extends Model {
 			'expired' => $expired,
 			'expirationDate' => $this->getExpire(),
 			'isAnonymous' => $this->getIsAnonymous(),
-			'fullAnonymous' => $this->getFullAnonymous(),
-			'allowMaybe' => $this->getAllowMaybe()
 		];
 	}
 }

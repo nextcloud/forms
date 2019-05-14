@@ -27,14 +27,10 @@
 
 namespace OCA\Forms\Controller;
 
-use OCA\Forms\Db\Comment;
-use OCA\Forms\Db\CommentMapper;
 use OCA\Forms\Db\Event;
 use OCA\Forms\Db\EventMapper;
 use OCA\Forms\Db\Notification;
 use OCA\Forms\Db\NotificationMapper;
-// use OCA\Forms\Db\Option;
-// use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Vote;
 use OCA\Forms\Db\VoteMapper;
 
@@ -68,10 +64,8 @@ class PageController extends Controller {
 
 	private $userId;
 	private $config;
-	private $commentMapper;
 	private $eventMapper;
 	private $notificationMapper;
-	// private $optionMapper;
 	private $voteMapper;
 
 	private $questionMapper;
@@ -99,8 +93,6 @@ class PageController extends Controller {
 	 * @param IFactory $transFactory
 	 * @param IURLGenerator $urlGenerator
 	 * @param string $userId
-	 * @param CommentMapper $commentMapper
-	 * @param OptionMapper $optionMapper
 	 * @param EventMapper $eventMapper
 	 *
 	 * @param QuestionMapper $questionMapper
@@ -122,8 +114,6 @@ class PageController extends Controller {
 		IFactory $transFactory,
 		IURLGenerator $urlGenerator,
 		$userId,
-		CommentMapper $commentMapper,
-		// OptionMapper $optionMapper,
 		EventMapper $eventMapper,
 
 		QuestionMapper $questionMapper,
@@ -144,8 +134,6 @@ class PageController extends Controller {
 		$this->transFactory = $transFactory;
 		$this->urlGenerator = $urlGenerator;
 		$this->userId = $userId;
-		$this->commentMapper = $commentMapper;
-		// $this->optionMapper = $optionMapper;
 		$this->eventMapper = $eventMapper;
 
 		$this->questionMapper = $questionMapper;
@@ -358,9 +346,7 @@ class PageController extends Controller {
 		}
 		$form = new Event();
 		$form->setId($formId);
-		$this->commentMapper->deleteByForm($formId);
 		$this->voteMapper->deleteByForm($formId);
-		// $this->optionMapper->deleteByForm($formId);
 		$this->eventMapper->delete($form);
 		$url = $this->urlGenerator->linkToRoute('forms.page.index');
 		return new RedirectResponse($url);
@@ -379,69 +365,48 @@ class PageController extends Controller {
 	 * @return RedirectResponse
 	 */
 	public function insertVote($id, $userId, $answers, $questions) {
+
 		$form = $this->eventMapper->find($id);
 		$count_answers = count($answers);
 		$count = 1;
+		$anonID = "anon-user-".  hash('md5', (time() + rand()));
+
 		for ($i = 0; $i < $count_answers; $i++) {
 			if($questions[$i]['type'] == "checkbox"){
 				foreach (($answers[$questions[$i]['text']]) as $value) {
 					$vote = new Vote();
 					$vote->setFormId($id);
-					$vote->setUserId($userId);
+					if($form->getIsAnonymous()){
+						$vote->setUserId($anonID);
+
+					}else{
+						$vote->setUserId($userId);
+					}
 					$vote->setVoteOptionText(htmlspecialchars($questions[$i]['text']));
 					$vote->setVoteAnswer($value);
 					$vote->setVoteOptionId($count);
+					$vote->setVoteOptionType($questions[$i]['type']);
 					$this->voteMapper->insert($vote);
 				}
 				$count++;
 			} else {
 				$vote = new Vote();
 				$vote->setFormId($id);
-				$vote->setUserId($userId);
+				if($form->getIsAnonymous()){
+						$vote->setUserId($anonID);
+				}else{
+						$vote->setUserId($userId);
+				}
 				$vote->setVoteOptionText(htmlspecialchars($questions[$i]['text']));
 				$vote->setVoteAnswer($answers[$questions[$i]['text']]);
 				$vote->setVoteOptionId($count++);
+				$vote->setVoteOptionType($questions[$i]['type']);
 				$this->voteMapper->insert($vote);
 			}
 		}
-
 		$hash = $form->getHash();
 		$url = $this->urlGenerator->linkToRoute('forms.page.goto_form', ['hash' => $hash]);
 		return new RedirectResponse($url);
-	}
-
-
-	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @PublicPage
-	 * @param int $formId
-	 * @param string $userId
-	 * @param string $commentBox
-	 * @return JSONResponse
-	 */
-	public function insertComment($formId, $userId, $commentBox) {
-		$comment = new Comment();
-		$comment->setFormId($formId);
-		$comment->setUserId($userId);
-		$comment->setComment($commentBox);
-		$comment->setDt(date('Y-m-d H:i:s'));
-		$this->commentMapper->insert($comment);
-		$this->sendNotifications($formId, $userId);
-		$timeStamp = time();
-		$displayName = $userId;
-		$user = $this->userMgr->get($userId);
-		if ($user !== null) {
-			$displayName = $user->getDisplayName();
-		}
-		return new JSONResponse(array(
-			'userId' => $userId,
-			'displayName' => $displayName,
-			'timeStamp' => $timeStamp * 100,
-			'date' => date('Y-m-d H:i:s', $timeStamp),
-			'relativeNow' => $this->trans->t('just now'),
-			'comment' => $commentBox
-		));
 	}
 
 	/**

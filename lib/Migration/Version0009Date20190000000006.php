@@ -37,7 +37,7 @@ use OCP\Migration\IOutput;
  * Installation class for the forms app.
  * Initial db creation
  */
-class Version0009Date20190000000005 extends SimpleMigrationStep {
+class Version0009Date20190000000006 extends SimpleMigrationStep {
 
 	/** @var IDBConnection */
 	protected $connection;
@@ -181,6 +181,10 @@ class Version0009Date20190000000005 extends SimpleMigrationStep {
 			$table->addColumn('vote_answer', Type::STRING, [
 				'notnull' => false,
 				'length' => 4096,
+			]);
+			$table->addColumn('vote_option_type', Type::STRING, [
+				'notnull' => false,
+				'length' => 256,
 			]);
 			$table->setPrimaryKey(['id']);
 		}

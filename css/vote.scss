@@ -4,17 +4,29 @@
 	margin-top: 20px;
 }
 
+.sv-q-description{
+    font-size: 420px;
+}
+
+.sv_container{
+    h3 {
+        width: 400px;
+        font-size: 30px;
+    }
+}
+
 .sv_qstn .sq-root {
     border: 1px solid gray;
     border-left: 4px solid #18a689;
     border-radius: 5px;
     padding: 20px;
+    width: 400px;
     margin-bottom: 30px;
 		font-size: 18px;
 }
 
 .sq-title {
-    font-size: 22px;
+    font-size: 20px;
     margin-left: 20px;
 }
 

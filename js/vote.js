@@ -17,11 +17,13 @@ function sendDataToServer(survey) {
 }
 
 function cssUpdate(survey, options){
+	console.log(options.cssClasses)
 	var classes = options.cssClasses
 	classes.root = 'sq-root'
 	classes.title = 'sq-title'
 	classes.item = 'sq-item'
 	classes.label = 'sq-label'
+	classes.description = 'sv-q-description'
 
 	if (options.question.isRequired) {
 		classes.title = 'sq-title sq-title-required'

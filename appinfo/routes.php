@@ -32,7 +32,6 @@ return [
 
 		['name' => 'page#delete_form', 'url' => '/delete', 'verb' => 'POST'],
 		['name' => 'page#insert_vote', 'url' => '/insert/vote', 'verb' => 'POST'],
-		['name' => 'page#insert_comment', 'url' => '/insert/comment', 'verb' => 'POST'],
 		['name' => 'page#search', 'url' => '/search', 'verb' => 'POST'],
 		['name' => 'page#get_display_name', 'url' => '/get/displayname', 'verb' => 'POST'],
 
@@ -40,7 +39,6 @@ return [
 		['name' => 'api#get_form', 'url' => '/get/form/{formIdOrHash}', 'verb' => 'GET'],
 		['name' => 'api#get_options', 'url' => '/get/options/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_votes', 'url' => '/get/votes/{formId}', 'verb' => 'GET'],
-		['name' => 'api#get_comments', 'url' => '/get/comments/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_shares', 'url' => '/get/shares/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_event', 'url' => '/get/event/{formId}', 'verb' => 'GET'],
 		['name' => 'api#remove_form', 'url' => '/remove/form', 'verb' => 'POST'],

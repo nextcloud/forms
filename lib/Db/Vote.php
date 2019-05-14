@@ -38,6 +38,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setVoteOptionText(string $value)
  * @method string getVoteAnswer()
  * @method void setVoteAnswer(string $value)
+ * @method string getVoteOptionType()
+ * @method void setVoteOptionType(string $value)
  */
 class Vote extends Model {
 	protected $formId;
@@ -45,6 +47,7 @@ class Vote extends Model {
 	protected $voteOptionId;
 	protected $voteOptionText;
 	protected $voteAnswer;
+	protected $voteOptionType;
 
 	/**
 	 * Options constructor.
@@ -60,7 +63,8 @@ class Vote extends Model {
 			'userId' => $this->getUserId(),
 			'voteOptionId' => $this->getVoteOptionId(),
 			'voteOptionText' => htmlspecialchars_decode($this->getVoteOptionText()),
-			'voteAnswer' => $this->getVoteAnswer()
+			'voteAnswer' => $this->getVoteAnswer(),
+			'voteOptionType' => $this->getVoteOptionType()
 		];
 	}
 
