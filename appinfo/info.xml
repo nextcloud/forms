@@ -19,17 +19,18 @@
     <author>Stephan Link</author>
     <author>Kameron Sheppard</author>
     <documentation>
-        <admin>https://github.com/nextcloud/forms/blob/master/README.md</admin>
+        <admin>https://github.com/affan98/forms/blob/master/README.md</admin>
     </documentation>
     <category>tools</category>
     <category>social</category>
     <category>organization</category>
-    <website>https://github.com/nextcloud/forms</website>
-    <bugs>https://github.com/nextcloud/forms/issues</bugs>
-    <repository type="git">https://github.com/nextcloud/forms.git</repository>
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/overview.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/vote.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/edit-form.png</screenshot>
+    <website>https://github.com/affan98/forms</website>
+    <bugs>https://github.com/affan98/forms/issues</bugs>
+    <repository type="git">https://github.com/affan98/forms</repository>
+    <screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/Create.PNG</screenshot>
+	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/List.PNG</screenshot>
+	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/Vote.PNG</screenshot>
+	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/Results.PNG</screenshot>
     <dependencies>
         <nextcloud min-version="14" max-version="16" />
     </dependencies>
