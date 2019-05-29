@@ -27,10 +27,10 @@
     <website>https://github.com/affan98/forms</website>
     <bugs>https://github.com/affan98/forms/issues</bugs>
     <repository type="git">https://github.com/affan98/forms</repository>
-    <screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/Create.PNG</screenshot>
-	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/List.PNG</screenshot>
-	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/Vote.PNG</screenshot>
-	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/Screesnhots/Results.PNG</screenshot>
+    <screenshot>https://raw.githubusercontent.com/affan98/forms/master/screenshots/Create.PNG</screenshot>
+	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/screenshots/List.PNG</screenshot>
+	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/screenshots/Vote.PNG</screenshot>
+	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/screenshots/Results.PNG</screenshot>
     <dependencies>
         <nextcloud min-version="14" max-version="16" />
     </dependencies>
