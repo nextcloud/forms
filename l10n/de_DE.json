@@ -1,5 +1,5 @@
 { "translations": {
-    "Do you really want to delete this new form?" : "Möchtest Du das neue Formular wirklich löschen?",
+    "Do you really want to delete this new form?" : "Wollen Sie das neue Formular wirklich löschen?",
     "Forms" : "Formulare",
     "Forms App - New Activity" : "Formulare App - Neue Aktivität",
     "{user} participated in the form \"{title}\"" : "{user} füllte das Formular \"{title}\" aus. ",
@@ -20,7 +20,7 @@
     "Expires" : "Läuft ab",
     "Public access" : "Öffentlicher Zugriff",
     "Only shared" : "Nur geteilt",
-    "Registered users only" : "Nur registrierte Benutzer",
+    "Registered users only" : "Nur für registrierte Benutzer",
     "Hidden form" : "Verstecktes Formular",
     "Text form" : "Textformular",
     "never" : "nie",
@@ -32,9 +32,9 @@
     "Description" : "Beschreibung",
     "Make a Form" : "Formular erstellen",
     "Add Question" : "Frage hinzufügen",
-    "You are editing in admin mode" : "Du bearbeitest im Administratorenmouds",
+    "You are editing in admin mode" : "Sie bearbeiten im Administratorenmodus",
     "Configuration" : "Konfiguration",
-    "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Die Konfiguration ist gesperrt. Änderungen können zu unerwünschtem Verhalten führen, Du kannst die Konfiguration trotzdem entsperren. ",
+    "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Die Konfiguration ist gesperrt. Das Ändern von Optionen kann zu unerwünschtem Verhalten führen, Sie können die Konfiguration trotzdem entsperren. ",
     "Unlock configuration " : "Konfiguration entsperren",
     "Form configurations" : "Formulareinstellungen",
     "Name of user or group" : "Name des Benutzers oder der Gruppe",
@@ -57,7 +57,7 @@
     "New" : "Neu",
     "Click here to add a form" : "Hier Klicken um ein Formular hinzuzufügen",
     "Delete form" : "Formular löschen",
-    "Do you want to delete \"%n\"?" : "Möchtest Du \"%n\" löschen?",
+    "Do you want to delete \"%n\"?" : "Möchten Sie \"%n\" löschen?",
     "No, keep form." : "Nein, Formular behalten.",
     "Yes, delete form." : "Ja, Formular löschen.",
     "Form \"%n\" deleted" : "Formular \"%n\" gelöscht",
@@ -65,8 +65,8 @@
     "Form Expired" : "Formular abgelaufen",
     "This Form has expired and is no longer taking answers." : "Dieses Formular ist abgelaufen und es können keine weiteren Antworten eingegeben werden.",
     "Access denied" : "Zugriff verboten",
-    "You are not allowed to view this form or the form does not exist." : "Du bist nicht berechtigt, dieses Formular zu sehen, oder dieses Formular existiert nicht.",
-    "You are not allowed to edit this form or the form does not exist." : "Du bist nicht berechtigt, dieses Formular zu bearbeiten, oder dieses Formular existiert nicht.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Du bist nicht berechtigt, dieses Formular zu löschen, oder dieses Formular existiert nicht."
+    "You are not allowed to view this form or the form does not exist." : "Sie sind nicht berechtigt, dieses Formular zu sehen, oder dieses Formular existiert nicht.",
+    "You are not allowed to edit this form or the form does not exist." : "Sie sind nicht berechtigt, dieses Formular zu bearbeiten, oder dieses Formular existiert nicht.",
+    "You are either not allowed to delete this form or it doesn't exist." : "Sie sind nicht berechtigt, dieses Formular zu löschen, oder dieses Formular existiert nicht."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
