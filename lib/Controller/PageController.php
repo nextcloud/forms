@@ -284,6 +284,7 @@ class PageController extends Controller {
 		}
 
 		if ($this->hasUserAccess($form)) {
+			$renderAs = $this->userId !== null ? 'user' : 'public';
 			return new TemplateResponse('forms', 'vote.tmpl', [
 				'form' => $form,
 				'questions' => $this->getQuestions($form->getId()),
@@ -294,7 +295,7 @@ class PageController extends Controller {
 				'userMgr' => $this->userMgr,
 				'urlGenerator' => $this->urlGenerator,
 				'avatarManager' => $this->avatarManager
-			]);
+			], $renderAs);
 		} else {
 			User::checkLoggedIn();
 			return new TemplateResponse('forms', 'no.acc.tmpl', []);
