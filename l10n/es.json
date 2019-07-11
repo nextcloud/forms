@@ -65,6 +65,8 @@
     "Form Expired" : "Formulario expirado",
     "This Form has expired and is no longer taking answers." : "Este formulario ha expirado y ya no acepta respuestas.",
     "Access denied" : "Acceso denegado",
-    "You are not allowed to view this form or the form does not exist." : "No tienes permito para ver este formulario o el formulario no existe."
+    "You are not allowed to view this form or the form does not exist." : "No tienes permiso para ver este formulario o el formulario no existe.",
+    "You are not allowed to edit this form or the form does not exist." : "No tienes permiso para editar este formulario o el formulario no existe.",
+    "You are either not allowed to delete this form or it doesn't exist." : "O no tienes permiso para eliminar este formulario o el formulario no existe."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
