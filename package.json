@@ -76,7 +76,7 @@
 		"nextcloud-vue": "^0.9.0",
 		"stylelint-scss": "^3.5.4",
 		"v-click-outside": "^2.0.2",
-		"v-tooltip": "^2.0.0-rc.33",
+		"v-tooltip": "^3.0.0-alpha.11",
 		"vue": "^2.6.8",
 		"vue-click-outside": "^1.0.7",
 		"vue-clipboard2": "^0.3.0",
