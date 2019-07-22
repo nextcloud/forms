@@ -32,6 +32,6 @@
 	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/screenshots/Vote.PNG</screenshot>
 	<screenshot>https://raw.githubusercontent.com/affan98/forms/master/screenshots/Results.PNG</screenshot>
     <dependencies>
-        <nextcloud min-version="14" max-version="16" />
+        <nextcloud min-version="14" max-version="18" />
     </dependencies>
 </info>
