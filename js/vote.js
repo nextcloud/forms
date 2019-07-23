@@ -39,7 +39,8 @@ $(document).ready(function () {
 	questions = JSON.parse(questionJSON)
 
 	var surveyJSON = { 
-		title: form.title + ': ' + form.description, 
+		title: form.title,
+		description: form.description, 
 		questions: []
 	};
 
