@@ -285,17 +285,21 @@ class PageController extends Controller {
 
 		if ($this->hasUserAccess($form)) {
 			$renderAs = $this->userId !== null ? 'user' : 'public';
-			return new TemplateResponse('forms', 'vote.tmpl', [
-				'form' => $form,
-				'questions' => $this->getQuestions($form->getId()),
-				'votes' => $votes,
-				'participant' => $participants,
-				'notification' => $notification,
-				'userId' => $this->userId,
-				'userMgr' => $this->userMgr,
-				'urlGenerator' => $this->urlGenerator,
-				'avatarManager' => $this->avatarManager
+			$res = new TemplateResponse('forms', 'vote.tmpl', [
+					'form' => $form,
+					'questions' => $this->getQuestions($form->getId()),
+					'votes' => $votes,
+					'participant' => $participants,
+					'notification' => $notification,
+					'userId' => $this->userId,
+					'userMgr' => $this->userMgr,
+					'urlGenerator' => $this->urlGenerator,
+					'avatarManager' => $this->avatarManager
 			], $renderAs);
+			$csp = new ContentSecurityPolicy();
+			$csp->allowEvalScript(true);
+			$res->setContentSecurityPolicy($csp);
+			return $res;
 		} else {
 			User::checkLoggedIn();
 			return new TemplateResponse('forms', 'no.acc.tmpl', []);
