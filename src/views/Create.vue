@@ -126,6 +126,13 @@
 						{{ t('forms', 'Anonymous form') }}
 					</label>
 
+					<input id="unique" v-model="form.event.unique" :disabled="form.event.access !== 'registered' || form.event.isAnonymous"
+						type="checkbox" class="checkbox"
+					>
+					<label for="unique" class="title">
+						<span>{{ t('forms', 'Only allow one submission per user') }}</span>
+					</label>
+
 					<input v-show="form.event.isAnonymous" id="trueAnonymous" v-model="form.event.fullAnonymous"
 						:disabled="protect" type="checkbox" class="checkbox"
 					>
@@ -217,6 +224,7 @@ export default {
 					description: '',
 					created: '',
 					access: 'public',
+					unique: false,
 					expiration: false,
 					expirationDate: '',
 					expired: false,
