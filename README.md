@@ -11,9 +11,8 @@ NextCloud development environment has been installed. See https://docs.nextcloud
 
 ```sh
 $ cd /var/www/html/nextcloud/apps
-$ git clone https://github.com/affan98/forms.git
+$ git clone https://github.com/nextcloud/forms.git
 ```
-**Note**: This will be moved to https://github.com/nextcloud/forms.git once the app has been accepted to the NextCloud app store
 
 ### Install Prerequisites and Dependencies
 #### Install NPM
