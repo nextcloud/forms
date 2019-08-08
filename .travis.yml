@@ -7,18 +7,19 @@ services:
   - postgresql
 
 php:
-  - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 addons:
+  postgresql: 9.5
   apt:
     packages:
     - libxml2-utils
     
 env:
   global:
-    - CORE_BRANCH=stable14
+    - CORE_BRANCH=master
     - APP_NAME=forms
   matrix:
     - DB=mysql
