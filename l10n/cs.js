@@ -33,6 +33,7 @@ OC.L10N.register(
     "Add Question" : "Přidat otázku",
     "You are editing in admin mode" : "Upravujete v režimu správy",
     "Configuration" : "Nastavení",
+    "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Nastavení je uzamčeno. Změna voleb může vést k nechtěnému chování, ale i tak je možné je odemknout.",
     "Unlock configuration " : "Odemknout nastavení",
     "Form configurations" : "Nastavení formuláře",
     "Name of user or group" : "Jméno uživatele nebo název skupiny",
@@ -45,6 +46,7 @@ OC.L10N.register(
     "Select a question type!" : "Vyberte typ otázky!",
     "Cannot have the same question!" : "Není možné mít stejný dotaz!",
     "Two answers cannot be the same!" : "Dvě odpovědi nemohou být stejné!",
+    "Title must not be empty!" : "Název nemůže být prázdný!",
     "Must have at least one question!" : "Je třeba, aby zde byla alespoň jedna otázka!",
     "All questions need answers!" : "Je třeba zodpovědět všechny dotazy!",
     "Need to pick an expiration date!" : "Je třeba vybrat datum skončení platnosti!",
@@ -60,6 +62,10 @@ OC.L10N.register(
     "Form \"%n\" deleted" : "Formulář „%n“ smazán",
     "Error while deleting Form \"%n\"" : "Chyba při mazání formuláře „%n“",
     "Form Expired" : "Platnost formuláře skončila",
-    "Access denied" : "Přístup zamítnut"
+    "This Form has expired and is no longer taking answers." : "Tento formulář je po platnosti a nadále není možné na něj odpovídat.",
+    "Access denied" : "Přístup zamítnut",
+    "You are not allowed to view this form or the form does not exist." : "Nemáte oprávnění k zobrazení tohoto formuláře nebo formulář neexistuje.",
+    "You are not allowed to edit this form or the form does not exist." : "Nemáte oprávnění k úpravě tohoto formuláře nebo formulář neexistuje.",
+    "You are either not allowed to delete this form or it doesn't exist." : "Nemáte oprávnění ke smazání tohoto formuláře nebo formulář neexistuje."
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");
