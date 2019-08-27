@@ -33,6 +33,11 @@
 		</div>
 		<div class="wrapper group-2">
 			<div class="wrapper-group-2-5">
+				<div class="edit">
+					{{ t('forms',"Edit Form") }}
+				</div>
+			</div>
+			<div class="wrapper-group-2-5">
 				<div class="deletetwo">
 					{{ t('forms',"Delete Form") }}
 				</div>
@@ -210,6 +215,10 @@ export default {
 			this.$emit('deleteForm')
 		},
 
+		editForm() {
+			this.$emit('editForm')
+		},
+
 		viewResults() {
 			this.$emit('viewResults')
 		}
@@ -323,6 +332,11 @@ $mediabreak-3: $group-1-width + $owner-width + max($group-2-1-width, $group-2-2-
 }
 
 .deletetwo {
+  width: 60px;
+	padding-right: 15px;
+}
+
+.edit {
   width: 60px;
 	padding-right: 15px;
 }
