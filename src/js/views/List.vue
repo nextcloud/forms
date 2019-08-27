@@ -54,6 +54,7 @@
 				:key="form.id"
 				:form="form"
 				@deleteForm="removeForm(index, form.event)"
+				@editForm="editForm(index, form.event)"
 				@viewResults="viewFormResults(index, form.event, 'results')"
 			/>
 		</transition-group>
@@ -66,14 +67,11 @@
 // import moment from 'moment'
 // import lodash from 'lodash'
 import formListItem from '../components/formListItem'
-
 export default {
 	name: 'List',
-
 	components: {
 		formListItem
 	},
-
 	data() {
 		return {
 			noForms: false,
@@ -81,12 +79,10 @@ export default {
 			forms: []
 		}
 	},
-
 	created() {
 		this.indexPage = OC.generateUrl('apps/forms/')
 		this.loadForms()
 	},
-
 	methods: {
 		loadForms() {
 			this.loading = true
@@ -105,6 +101,14 @@ export default {
 		},
 		viewFormResults(index, event, name) {
 			this.$router.push({
+				name: name,
+				params: {
+					hash: event.id
+				}
+			})
+		},
+		editForm(index, event, name) {
+			this.$http.post(OC.generateUrl('apps/forms/edit')({
 				name: name,
 				params: {
 					hash: event.id
@@ -133,13 +137,11 @@ export default {
 			}
 			this.$modal.show(params)
 		}
-
 	}
 }
 </script>
 
 <style lang="scss">
-
 .table {
 	width: 100%;
 	margin-top: 45px;
@@ -148,7 +150,6 @@ export default {
 	flex-grow: 1;
 	flex-wrap: nowrap;
 }
-
 #emptycontent {
 	.icon-forms {
 		background-color: black;
@@ -156,5 +157,4 @@ export default {
 		mask: url('./img/app.svg') no-repeat 50% 50%;
 	}
 }
-
 </style>
