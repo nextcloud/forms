@@ -87,6 +87,9 @@
 			</a>
 		</div>
 		<div class="wrapper group-2">
+			<div class="wrapper group-2-10">
+				<a class="icon icon-rename svg edit-form" @click="editForm" />
+			</div>
 			<div class="wrapper group-2-8">
 				<a class="icon icon-delete svg delete-form" @click="deleteForm" />
 			</div>
