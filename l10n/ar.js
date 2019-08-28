@@ -5,6 +5,7 @@ OC.L10N.register(
     "Title" : "العنوان",
     "Access" : "النفاذ",
     "Owner" : "المالك",
+    "Error, while copying link to clipboard" : "خطأ أثناء نسخ الرابط إلى الحافظة",
     "Add Answer" : "إضافة إجابة",
     "Share with" : "شارك مع",
     "Description" : "الوصف",
