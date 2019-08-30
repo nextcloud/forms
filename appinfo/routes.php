@@ -42,7 +42,7 @@ return [
 		['name' => 'api#get_votes', 'url' => '/get/votes/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_shares', 'url' => '/get/shares/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_event', 'url' => '/get/event/{formId}', 'verb' => 'GET'],
-		['name' => 'api#remove_form', 'url' => '/remove/form', 'verb' => 'POST'],
+		['name' => 'api#remove_form', 'url' => '/forms/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#get_forms', 'url' => '/get/forms', 'verb' => 'GET'],
 
 		['name' => 'system#get_site_users_and_groups', 'url' => '/get/siteusers', 'verb' => 'POST'],

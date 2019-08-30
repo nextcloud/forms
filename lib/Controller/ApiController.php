@@ -397,8 +397,12 @@ class ApiController extends Controller {
 	 * @param int $formId
 	 * @return DataResponse
 	 */
-	public function removeForm($id) {
-		$formToDelete = $this->eventMapper->find($id);
+	public function removeForm(int $id) {
+		try {
+			$formToDelete = $this->eventMapper->find($id);
+		} catch (DoesNotExistException $e) {
+			return new Http\JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
 		if ($this->userId !== $formToDelete->getOwner() && !$this->groupManager->isAdmin($this->userId)) {
 			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
 		}
