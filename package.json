@@ -59,8 +59,8 @@
 	"main": "src/js/main.js",
 	"scripts": {
 		"dev": "webpack --config webpack.dev.js",
-		"watch": "webpack --progress --watch --config webpack.dev.js",
-		"build": "webpack --progress --hide-modules --config webpack.prod.js",
+		"watch": "webpack --progress --watch --config src/webpack.dev.js",
+		"build": "webpack --progress --hide-modules --config src/webpack.prod.js",
 		"lint": "eslint --ext .js,.vue src",
 		"lint:fix": "eslint --ext .js,.vue src --fix",
 		"test": "jest",
