@@ -35,7 +35,7 @@ class VoteMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_votes', VoteMapper::class);
+		parent::__construct($db, 'forms_votes', Vote::class);
 	}
 
 	/**
