@@ -228,7 +228,6 @@ export default {
 					formQuizQuestions: []
 				}
 			},
-			system: [],
 			lang: '',
 			locale: '',
 			placeholder: '',
@@ -333,7 +332,6 @@ export default {
 
 	created() {
 		this.indexPage = OC.generateUrl('apps/forms/')
-		this.getSystemValues()
 		this.lang = OC.getLanguage()
 		try {
 			this.locale = OC.getLocale()
@@ -368,17 +366,6 @@ export default {
 
 		switchSidebar() {
 			this.sidebar = !this.sidebar
-		},
-
-		getSystemValues() {
-			this.$http.get(OC.generateUrl('apps/forms/get/system'))
-				.then((response) => {
-					this.system = response.data.system
-				}, (error) => {
-					this.form.event.hash = ''
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-				})
 		},
 
 		addShare(item) {

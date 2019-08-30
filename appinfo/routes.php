@@ -45,6 +45,5 @@ return [
 		['name' => 'api#get_forms', 'url' => '/get/forms', 'verb' => 'GET'],
 
 		['name' => 'system#get_site_users_and_groups', 'url' => '/get/siteusers', 'verb' => 'POST'],
-		['name' => 'system#get_system', 'url' => '/get/system', 'verb' => 'GET']
 	]
 ];
