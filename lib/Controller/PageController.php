@@ -570,4 +570,14 @@ class PageController extends Controller {
 		Util::writeLog('forms', $this->userId, Util::ERROR);
 		return false;
 	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 * @param int $id
+	 * @return TemplateResponse
+	 */
+	public function getResult(int $id): TemplateResponse {
+		return new TemplateResponse('forms', 'forms.tmpl');
+	}
 }
