@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
@@ -45,7 +46,7 @@ use OCP\AppFramework\Db\Entity;
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(integer $value)
  */
-class Event extends Model {
+class Event extends Entity {
 	protected $title;
 	protected $description;
 	protected $owner;

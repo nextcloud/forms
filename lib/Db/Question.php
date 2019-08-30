@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
  *
@@ -35,7 +36,7 @@ use OCP\AppFramework\Db\Entity;
  * @method integer getTimestamp()
  * @method void setTimestamp(integer $value)
  */
-class Question extends Model {
+class Question extends Entity {
 	protected $formId;
 	protected $formQuestionType;
 	protected $formQuestionText;
@@ -49,7 +50,7 @@ class Question extends Model {
 		$this->addType('timestamp', 'integer');
 	}
 
-	public function read() {
+	public function read(): array {
 		return [
 			'id' => $this->getId(),
 			'formId' => $this->getFormId(),

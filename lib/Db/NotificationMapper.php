@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
@@ -31,7 +32,7 @@ use OCP\AppFramework\Db\QBMapper;
 class NotificationMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_notif', '\OCA\Forms\Db\Notification');
+		parent::__construct($db, 'forms_notif', Notification::class);
 	}
 
 	/**
@@ -41,7 +42,7 @@ class NotificationMapper extends QBMapper {
 	 * @return Notification[]
 	 */
 
-	 public function findAllByForm($formId) {
+	 public function findAllByForm(int $formId): array {
 		 $qb = $this->db->getQueryBuilder();
 
 		  $qb->select('*')
@@ -59,9 +60,9 @@ class NotificationMapper extends QBMapper {
 	 * @param string $userId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
-	 * @return Notification
+	 * @return Notification[]
 	 */
-	public function findByUserAndForm($formId, $userId) {
+	public function findByUserAndForm(int $formId, string $userId): array {
 		$qb = $this->db->getQueryBuilder();
 
 		 $qb->select('*')
@@ -79,7 +80,7 @@ class NotificationMapper extends QBMapper {
 	/**
 	 * @param int $formId
 	 */
-	 public function deleteByForm($formId) {
+	 public function deleteByForm(int $formId): void {
  		$qb = $this->db->getQueryBuilder();
 
  		$qb->delete($this->getTableName())

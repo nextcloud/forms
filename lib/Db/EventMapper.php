@@ -35,7 +35,7 @@ class EventMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_events', '\OCA\Forms\Db\Event');
+		parent::__construct($db, 'forms_events', Event::class);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class EventMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Event
 	 */
-	public function find($id) {
+	public function find(int $id): Event {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
@@ -62,7 +62,7 @@ class EventMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Event
 	 */
-	public function findByHash($hash) {
+	public function findByHash(string $hash): Event {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
@@ -78,7 +78,7 @@ class EventMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @return Event[]
 	 */
-	public function findAll() {
+	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
