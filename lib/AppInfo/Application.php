@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
@@ -23,14 +24,10 @@
 
 namespace OCA\Forms\AppInfo;
 
-use OCA\Forms\Controller\PageController;
-use OCA\Forms\Controller\ApiController;
-use OCA\Forms\Db\OptionMapper;
-use OCA\Forms\Db\EventMapper;
-use OCA\Forms\Db\NotificationMapper;
-use OCA\Forms\Db\VoteMapper;
 use OCP\AppFramework\App;
-use OCP\IContainer;
+use OCP\IL10N;
+use OCP\INavigationManager;
+use OCP\IURLGenerator;
 
 class Application extends App {
 
@@ -45,11 +42,11 @@ class Application extends App {
 	/**
 	 * Register navigation entry for main navigation.
 	 */
-	public function registerNavigationEntry() {
+	public function registerNavigationEntry(): void {
 		$container = $this->getContainer();
-		$container->query('OCP\INavigationManager')->add(function() use ($container) {
-			$urlGenerator = $container->query('OCP\IURLGenerator');
-			$l10n = $container->query('OCP\IL10N');
+		$container->query(INavigationManager::class)->add(function() use ($container) {
+			$urlGenerator = $container->query(IURLGenerator::class);
+			$l10n = $container->query(IL10N::class);
 			return [
 				'id' => 'forms',
 				'order' => 77,

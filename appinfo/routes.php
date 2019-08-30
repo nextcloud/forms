@@ -29,6 +29,7 @@ return [
 		['name' => 'page#create_form', 'url' => '/new', 'verb' => 'GET'],
 		['name' => 'page#edit_form', 'url' => '/edit/{hash}', 'verb' => 'GET'],
 		['name' => 'page#clone_form', 'url' => '/clone/{hash}', 'verb' => 'GET'],
+		['name' => 'page#getResult', 'url' => '/results/{id}', 'verb' => 'GET'],
 
 		['name' => 'page#delete_form', 'url' => '/delete', 'verb' => 'POST'],
 		['name' => 'page#insert_vote', 'url' => '/insert/vote', 'verb' => 'POST'],
