@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
  *
@@ -35,7 +37,7 @@ class AnswerMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_answers', '\OCA\Forms\Db\Answer');
+		parent::__construct($db, 'forms_answers', Answer::class);
 	}
 
 	// TODO: Change below functions to search by form and question id
@@ -47,7 +49,7 @@ class AnswerMapper extends QBMapper {
 	 * @return Answer[]
 	 */
 
-	public function findByForm($formId, $questionId) {
+	public function findByForm(int $formId, int $questionId): array {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
@@ -66,7 +68,7 @@ class AnswerMapper extends QBMapper {
 	 * @param int $formId
 	 * @param int $questionId
 	 */
-	public function deleteByFormAndQuestion($formId, $questionId) {
+	public function deleteByFormAndQuestion(int $formId, int $questionId): void {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->delete($this->getTableName())
@@ -83,7 +85,7 @@ class AnswerMapper extends QBMapper {
 	/**
 	 * @param int $formId
 	 */
-	public function deleteByForm($formId) {
+	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->delete($this->getTableName())

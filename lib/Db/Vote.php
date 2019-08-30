@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
@@ -41,7 +43,7 @@ use OCP\AppFramework\Db\Entity;
  * @method string getVoteOptionType()
  * @method void setVoteOptionType(string $value)
  */
-class Vote extends Model {
+class Vote extends Entity {
 	protected $formId;
 	protected $userId;
 	protected $voteOptionId;
@@ -57,7 +59,7 @@ class Vote extends Model {
 		$this->addType('voteOptionId', 'integer');
 	}
 
-	public function read() {
+	public function read(): array {
 		return [
 			'id' => $this->getId(),
 			'userId' => $this->getUserId(),

@@ -35,7 +35,7 @@ class VoteMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_votes', '\OCA\Forms\Db\Vote');
+		parent::__construct($db, 'forms_votes', VoteMapper::class);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class VoteMapper extends QBMapper {
 	 * @return Comment[]
 	 */
 
-	public function findByForm($formId) {
+	public function findByForm(int $formId): array {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
@@ -59,9 +59,9 @@ class VoteMapper extends QBMapper {
 	/**
 	 * @param int $formId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @return Array
+	 * @return array
 	 */
-	public function findParticipantsByForm($formId, $limit = null, $offset = null) {
+	public function findParticipantsByForm(int $formId, $limit = null, $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('user_id')
@@ -77,7 +77,7 @@ class VoteMapper extends QBMapper {
 	 * @param int $formId
 	 * @param string $userId
 	 */
-	 public function deleteByFormAndUser($formId, $userId) {
+	 public function deleteByFormAndUser(int $formId, string $userId): void {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->delete($this->getTableName())
@@ -94,7 +94,7 @@ class VoteMapper extends QBMapper {
 	/**
 	* @param int $formId
 	*/
-	public function deleteByForm($formId) {
+	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->delete($this->getTableName())

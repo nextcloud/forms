@@ -35,7 +35,7 @@ class QuestionMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_questions', '\OCA\Forms\Db\Question');
+		parent::__construct($db, 'forms_questions', Question::class);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class QuestionMapper extends QBMapper {
 	 * @return Option[]
 	 */
 
-	public function findByForm($formId) {
+	public function findByForm(int $formId): array {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
@@ -59,7 +59,7 @@ class QuestionMapper extends QBMapper {
 	/**
 	 * @param int $formId
 	 */
-	public function deleteByForm($formId) {
+	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 
         $qb->delete($this->getTableName())

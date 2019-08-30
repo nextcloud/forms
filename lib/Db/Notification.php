@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
@@ -32,7 +33,7 @@ use OCP\AppFramework\Db\Entity;
  * @method integer getFormId()
  * @method void setFormId(integer $value)
  */
-class Notification extends Model {
+class Notification extends Entity {
 	protected $userId;
 	protected $formId;
 
