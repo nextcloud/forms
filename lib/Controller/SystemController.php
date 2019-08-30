@@ -35,8 +35,6 @@ use OCP\IRequest;
 
 class SystemController extends Controller {
 
-	private $systemConfig;
-
 	/**
 	 * PageController constructor.
 	 * @param String $appName
@@ -53,21 +51,8 @@ class SystemController extends Controller {
 		IRequest $request
 	) {
 		parent::__construct($appName, $request);
-		$this->systemConfig = $systemConfig;
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
-	}
-
-	/**
-	 * Get the endor  name of the installation ('ownCloud' or 'Nextcloud')
-	 * @NoAdminRequired
-	 * @return String
-	 */
-	private function getVendor() {
-		require \OC::$SERVERROOT . '/version.php';
-
-		/** @var string $vendor */
-		return (string) $vendor;
 	}
 
 	/**
@@ -115,23 +100,6 @@ class SystemController extends Controller {
 		}
 
 		$data['siteusers'] = $list;
-		return new DataResponse($data, Http::STATUS_OK);
-	}
-
-	/**
-	 * Get some system informations
-	 * @NoAdminRequired
-	 * @return DataResponse
-	 */
-	public function getSystem() {
-		$userId = \OC::$server->getUserSession()->getUser()->getUID();
-		$data['system'] = [
-			'versionArray' => \OCP\Util::getVersion(),
-			'version' => implode('.', \OCP\Util::getVersion()),
-			'vendor' => $this->getVendor(),
-			'language' => $this->systemConfig->getUserValue($userId, 'core', 'lang')
-		];
-
 		return new DataResponse($data, Http::STATUS_OK);
 	}
 }
