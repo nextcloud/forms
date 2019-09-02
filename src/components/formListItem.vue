@@ -90,7 +90,7 @@
 			</div>
 			<div class="list-results wrapper">
 				<button class="button btn primary" @click="viewResults">
-					<span>{{ "View Results" }}</span>
+					<span>{{ t('forms', 'View Results') }}</span>
 				</button>
 			</div>
 
