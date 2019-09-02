@@ -1,10 +1,10 @@
-/*jshint esversion: 6*/
-const path = require('path');
-const { VueLoaderPlugin } = require('vue-loader');
+/** jshint esversion: 6 */
+const path = require('path')
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
 	entry: {
-		'forms' : path.join(__dirname, 'main.js'),
+		'forms': path.join(__dirname, 'main.js')
 	},
 	output: {
 		path: path.resolve(__dirname, '../js'),
@@ -43,7 +43,7 @@ module.exports = {
 				options: {
 					name: '[name].[ext]?[hash]'
 				}
-			},
+			}
 		]
 	},
 	plugins: [new VueLoaderPlugin()],
@@ -53,4 +53,4 @@ module.exports = {
 		},
 		extensions: ['*', '.js', '.vue', '.json']
 	}
-};
+}
