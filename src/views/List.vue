@@ -63,9 +63,9 @@
 </template>
 
 <script>
-// import moment from 'moment'
-// import lodash from 'lodash'
+
 import formListItem from '../components/formListItem'
+import axios from 'nextcloud-axios'
 
 export default {
 	name: 'List',
@@ -119,7 +119,7 @@ export default {
 				buttonConfirmText: t('forms', 'Yes, delete form.'),
 				onConfirm: () => {
 					// this.deleteForm(index, event)
-					this.$http.post(OC.generateUrl('apps/forms/remove/form'), event)
+					axios.delete(OC.generateUrl('apps/forms/forms/{id}', {id: event.id}))
 						.then((response) => {
 							this.forms.splice(index, 1)
 							OC.Notification.showTemporary(t('forms', 'Form "%n" deleted', 1, event.title))
