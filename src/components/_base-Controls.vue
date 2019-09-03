@@ -23,7 +23,7 @@
 <template>
 	<div class="controls">
 		<div class="breadcrumb">
-			<button class="button btn primary"  @click="helpPage">
+			<button class="button btn primary" @click="helpPage">
 				{{ "Help" }}
 			</button>
 			<div class="crumb svg crumbhome">

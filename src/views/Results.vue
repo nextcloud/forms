@@ -29,9 +29,7 @@
 				<span>{{ "Export to CSV" }}</span>
 			</button>
 		</div>
-		<h1>
-			{{ "Statistics"  }}
-		</h1>
+		<h1>{{ "Statistics" }}</h1>
 		<div v-for="sum in stats" :key="sum">
 			{{ sum }}
 		</div>
@@ -77,6 +75,39 @@ export default {
 			loading: true,
 			votes: []
 
+		}
+	},
+
+	computed: {
+		stats() {
+
+			if (this.votes != null) {
+				var uniqueAns = []
+				var uniqueQs = []
+				var ansToQ = new Map()
+				for (let i = 0; i < this.votes.length; i++) {
+					if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
+						if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
+							uniqueAns.push(this.votes[i].voteAnswer)
+							ansToQ.set(this.votes[i].voteAnswer, this.votes[i].voteOptionId)
+						}
+						if (uniqueQs.includes(this.votes[i].voteOptionId) === false) {
+							uniqueQs.push(this.votes[i].voteOptionId)
+						}
+					}
+				}
+				var sums = []
+				for (let i = 0; i < uniqueAns.length; i++) {
+					sums[i] = 0
+				}
+				for (let i = 0; i < this.votes.length; i++) {
+					sums[uniqueAns.indexOf(this.votes[i].voteAnswer)]++
+				}
+				for (let i = 0; i < sums.length; i++) {
+					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
+				}
+			}
+			return sums.sort()
 		}
 	},
 
@@ -131,38 +162,6 @@ export default {
 					console.log(error.response)
 					this.loading = false
 				})
-		}
-	},
-	computed: {
-		stats() {
-
-			if (this.votes != null) {
-				var uniqueAns = []
-				var uniqueQs = []
-				var ansToQ = new Map()
-				for (let i = 0; i < this.votes.length; i++) {
-					if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
-						if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
-							uniqueAns.push(this.votes[i].voteAnswer)
-							ansToQ.set(this.votes[i].voteAnswer, this.votes[i].voteOptionId)
-						}
-						if (uniqueQs.includes(this.votes[i].voteOptionId) === false) {
-							uniqueQs.push(this.votes[i].voteOptionId)
-						}
-					}
-				}
-				var sums = []
-				for (let i = 0; i < uniqueAns.length; i++) {
-					sums[i] = 0
-				}
-				for (let i = 0; i < this.votes.length; i++) {
-					sums[uniqueAns.indexOf(this.votes[i].voteAnswer)]++
-				}
-				for (let i = 0; i < sums.length; i++) {
-					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
-				}
-			}
-			return sums.sort()
 		}
 	}
 }

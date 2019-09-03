@@ -23,7 +23,7 @@
 	<li>
 		<div>{{ question.text }}</div>
 		<div>
-			<input v-show="(question.type != 'text') && (question.type != 'comment')" style="height:30px;" v-model="newQuizAnswer"
+			<input v-show="(question.type != 'text') && (question.type != 'comment')" v-model="newQuizAnswer" style="height:30px;"
 				:placeholder=" t('forms', 'Add Answer')"
 				@keyup.enter="emitNewAnswer(question)"
 			>
@@ -40,8 +40,7 @@
 					:option="ans"
 					@remove="emitRemoveAnswer(question, index)"
 					@delete="question.answers.splice(index, 1)"
-				>
-				</li>
+				/>
 			</transitionGroup>
 		</div>
 		<div>
