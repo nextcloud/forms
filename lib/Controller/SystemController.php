@@ -35,19 +35,10 @@ use OCP\IRequest;
 
 class SystemController extends Controller {
 
-	/**
-	 * PageController constructor.
-	 * @param String $appName
-	 * @param IConfig $systemConfig
-	 * @param IRequest $request
-	 * @param IGroupManager $groupManager
-	 * @param IUserManager $userManager
-	 */
 	public function __construct(
-		$appName,
+		string $appName,
 		IGroupManager $groupManager,
 		IUserManager $userManager,
-		IConfig $systemConfig,
 		IRequest $request
 	) {
 		parent::__construct($appName, $request);
