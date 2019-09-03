@@ -9,7 +9,6 @@
 # * npm
 # * curl: used if phpunit and composer are not installed to fetch them from the web
 # * tar: for building the archive
-yarn_install=$(shell which yarn)
 app_name=forms
 
 project_dir=$(CURDIR)
@@ -21,17 +20,7 @@ appstore_package_name=$(appstore_build_dir)/$(app_name)
 nc_cert_dir=$(HOME)/.nextcloud/certificates
 composer=$(shell which composer 2> /dev/null)
 
-all: dev-setup appstore
-
-# Dev environment setup
-dev-setup: clean-dev npm-init composer
-
-npm-init:
-ifeq (,$(yarn_install))
-	npm install
-else
-	yarn
-endif
+all: dev-setup lint build-js-production test
 
 # a copy is fetched from the web
 .PHONY: composer
@@ -48,28 +37,51 @@ else
 	composer update --prefer-dist
 endif
 
-# Lint
+# Dev env management
+dev-setup: clean clean-dev composer npm-init
+
+npm-init:
+	npm install
+
+npm-update:
+	npm update
+
+# Building
+build-js:
+	npm run dev
+
+build-js-production:
+	npm run build
+
+watch-js:
+	npm run watch
+
+# Linting
 lint:
 	npm run lint
 
 lint-fix:
 	npm run lint:fix
 
-# Removes the appstore build and compiled js files
+# Style linting
+stylelint:
+	npm run stylelint
+
+stylelint-fix:
+	npm run stylelint:fix
+
+# Cleaning
 .PHONY: clean
 clean:
 	rm -rf $(build_dir)
+	rm -rf js/chunks
 	rm -f js/forms.js
 	rm -f js/forms.js.map
 
-clean-dev: clean
+clean-dev:
 	rm -rf node_modules
-	rm -rf ./vendor
+	rm -rf vendor
 
-# Build js
-# Installs and updates the composer dependencies. If composer is not installed
-build-js-production:
-		npm run build
 
 # Builds the source package for the app store, ignores php and js tests
 .PHONY: appstore

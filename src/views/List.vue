@@ -90,7 +90,7 @@ export default {
 	methods: {
 		loadForms() {
 			this.loading = true
-			this.$http.get(OC.generateUrl('apps/forms/get/forms'))
+			axios.get(OC.generateUrl('apps/forms/get/forms'))
 				.then((response) => {
 					this.forms = response.data
 					this.loading = false

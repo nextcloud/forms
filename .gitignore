@@ -5,6 +5,7 @@
 build/
 css/*.map
 js/*forms.*
+js/chunks/
 js/*.svg
 nbproject/
 node_modules/
@@ -19,3 +20,4 @@ yarn-error.log
 *.sln
 *.suo
 .svn
+vendor/

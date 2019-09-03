@@ -32,14 +32,14 @@ export default {
 }
 </script>
 
-<style  lang="scss">
+<style lang="scss">
 #app-forms {
 	width: 100%;
 	display: flex;
 }
 
 #app-content {
-    width: 100%;
-    display: flex;
+	width: 100%;
+	display: flex;
 }
 </style>

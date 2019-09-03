@@ -62,6 +62,7 @@
 // import lodash from 'lodash'
 import resultItem from '../components/resultItem'
 import json2csvParser from 'json2csv'
+import axios from 'nextcloud-axios'
 
 export default {
 	name: 'Results',
@@ -119,7 +120,7 @@ export default {
 	methods: {
 		loadForms() {
 			this.loading = true
-			this.$http.get(OC.generateUrl('apps/forms/get/votes/' + this.$route.params.hash))
+			axios.get(OC.generateUrl('apps/forms/get/votes/' + this.$route.params.hash))
 				.then((response) => {
 					if (response.data == null) {
 						this.votes = null
@@ -145,7 +146,7 @@ export default {
 		download() {
 
 			this.loading = true
-			this.$http.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
+			axios.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
 				.then((response) => {
 					this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
 					var element = document.createElement('a')
