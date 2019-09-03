@@ -59,7 +59,7 @@
 						<option value="" disabled>
 							Select
 						</option>
-						<option v-for="option in options" v-bind:key="option.value" v-bind:value="option.value">
+						<option v-for="option in options" :key="option.value" :value="option.value">
 							{{ option.text }}
 						</option>
 					</select>
@@ -84,11 +84,10 @@
 						:key="question.id"
 						:question="question"
 						:type="question.type"
-						v-on:add-answer="addAnswer"
-						v-on:remove-answer="removeAnswer"
+						:add-answer="addAnswer"
+						:remove-answer="removeAnswer"
 						@remove="form.options.formQuizQuestions.splice(index, 1)"
-					>
-					</li>
+					/>
 				</transitionGroup>
 			</div>
 		</div>
