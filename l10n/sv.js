@@ -20,6 +20,7 @@ OC.L10N.register(
     "Owner" : "Ägare",
     "Created" : "Skapat",
     "Expires" : "Upphör",
+    "View Results" : "Visa resultat",
     "Public access" : "Publik åtkomst",
     "Only shared" : "Endast delad",
     "Registered users only" : "Endast registrerade användare",

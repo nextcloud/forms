@@ -20,6 +20,7 @@ OC.L10N.register(
     "Owner" : "Właściciel",
     "Created" : "Utworzono",
     "Expires" : "Wygasa",
+    "View Results" : "Pokaż wyniki",
     "Public access" : "Dostęp publiczny",
     "Only shared" : "Tylko udostępnione",
     "Registered users only" : "Tylko dla zarejestrowanych użytkowników",
