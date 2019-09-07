@@ -20,6 +20,7 @@ OC.L10N.register(
     "Owner" : "Eigenaar",
     "Created" : "Gemaakt",
     "Expires" : "Verloopt",
+    "View Results" : "Toon resultaten",
     "Public access" : "Openbare toegang",
     "Only shared" : "Alleen gedeeld",
     "Registered users only" : "Alleen geregistreerde gebruikers",
