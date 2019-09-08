@@ -65,7 +65,7 @@
     "Error while deleting Form \"%n\"" : "Fehler beim Löschen des Formulars \"%n\"",
     "Form Expired" : "Formular abgelaufen",
     "This Form has expired and is no longer taking answers." : "Dieses Formular ist abgelaufen und es können keine weiteren Antworten eingegeben werden.",
-    "Access denied" : "Zugriff verboten",
+    "Access denied" : "Zugriff verweigert",
     "You are not allowed to view this form or the form does not exist." : "Sie sind nicht berechtigt, dieses Formular zu sehen, oder dieses Formular existiert nicht.",
     "You are not allowed to edit this form or the form does not exist." : "Sie sind nicht berechtigt, dieses Formular zu bearbeiten, oder dieses Formular existiert nicht.",
     "You are either not allowed to delete this form or it doesn't exist." : "Sie sind nicht berechtigt, dieses Formular zu löschen, oder dieses Formular existiert nicht."
