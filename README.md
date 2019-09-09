@@ -6,59 +6,44 @@ Forms allows the creation of shareable forms, with multiple question types and p
 **Note**: This app is tested with Apache2 webserver, MySQL database, and apt-get package manager. To use alternatives, replace the relevant commands with those of your technology. This document assumes that a working
 NextCloud development environment has been installed. See https://docs.nextcloud.com/server/stable/developer_manual/general/devenv.html for help with this.
 
-## Installation
-### Download the Forms Codebase
+## Build the app
 
-```sh
-$ cd /var/www/html/nextcloud/apps
-$ git clone https://github.com/nextcloud/forms.git
-```
+``` bash
+# set up and build for production
+make
 
-### Install Prerequisites and Dependencies
-#### Install NPM
-```sh
-$ apt-get npm
-```
+# install dependencies
+make dev-setup
 
-#### Install Yarn
-```sh
-$ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-$ echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-$ apt update
-$ apt install yarn
+# build for dev and watch changes
+make watch-js
+
+# build for dev
+make build-js
+
+# build for production with minification
+make build-js-production
+
 ```
-#### Update NodeJS
-```sh
-$ npm install -g n
-$ n stable
+## Running tests
+You can use the provided Makefile to run all tests by using:
+
+_ps: only works if you're using php locally and have forms installed info your apps default folder_
+
 ```
-### Build the App
-```sh
-$ cd /var/www/html/nextcloud/apps/forms
-$ make all
+make test
 ```
 
-### Start Webserver / Database
-```sh
-$ service apache2 start
-$ service mysql start
-```
+## :v: Code of conduct
 
-### Enable the App
-- Open NextCloud in your browser of choice
-- Click on the user icon in the top right of the screen, and select Apps from the drop down menu
--	Find the Forms app in the list and click enable
--	The app will now be fully functional! The forms icon will appear on the top toolbar of NextCloud after it has been enabled
+The Nextcloud community has core values that are shared between all members during conferences,
+hackweeks and on all interactions in online platforms including [Github](https://github.com/nextcloud) and [Forums](https://help.nextcloud.com).
+If you contribute, participate or interact with this community, please respect [our shared values](https://nextcloud.com/code-of-conduct/). :relieved:
 
+## :heart: How to create a pull request
 
-### To Rebuild
-```
-$ cd /var/www/html/nextcloud/apps/forms
-$ npm run build
-$ service Apache2 restart
-$ service mysql restart
-```
-Refresh the page in your browser to reflect the changes.
+This guide will help you get started: 
+- :dancer: :smile: [Opening a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request) 
 
 ## Code Overview
 The following are the most important code files for development of the Forms App.
