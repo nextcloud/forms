@@ -16,7 +16,7 @@ h1 {
 }
 
 #controls {
-    // adopted from NC13 for compatibily with OC10 and NC11-NC12
+	// adopted from NC13 for compatibily with OC10 and NC11-NC12
 	width: 100%;
 	position: relative;
 	top: 4px;
@@ -33,10 +33,9 @@ h1 {
 			flex-shrink: 0;
 		}
 	}
-
 }
 
-input[type="text"] {
+input[type='text'] {
 	display: block;
 	width: 100%;
 }

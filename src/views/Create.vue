@@ -187,6 +187,7 @@
 <script>
 import moment from 'moment'
 import QuizFormItem from '../components/quizFormItem'
+import axios from 'nextcloud-axios'
 
 export default {
 	name: 'Create',
@@ -469,7 +470,7 @@ export default {
 				this.titleEmpty = false
 				// this.form.event.expirationDate = moment(this.form.event.expirationDate).utc()
 
-				this.$http.post(OC.generateUrl('apps/forms/write/form'), this.form)
+				axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
 					.then((response) => {
 						this.form.mode = 'edit'
 						this.form.event.hash = response.data.hash
@@ -490,7 +491,7 @@ export default {
 
 		loadForm(hash) {
 			this.loadingForm = true
-			this.$http.get(OC.generateUrl('apps/forms/get/form/' + hash))
+			axios.get(OC.generateUrl('apps/forms/get/form/' + hash))
 				.then((response) => {
 					this.form = response.data
 					if (this.form.event.expirationDate !== null) {

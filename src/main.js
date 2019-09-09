@@ -23,9 +23,7 @@
 
 import Vue from 'vue'
 import router from './router'
-import axios from 'nextcloud-axios'
 import App from './App.vue'
-import vClickOutside from 'v-click-outside'
 import VueClipboard from 'vue-clipboard2'
 
 import { DatetimePicker, PopoverMenu, Tooltip } from 'nextcloud-vue'
@@ -38,8 +36,6 @@ import SideBarClose from './components/sideBarClose'
 import ShareDiv from './components/shareDiv'
 import LoadingOverlay from './components/_base-LoadingOverlay'
 
-Vue.config.debug = true
-Vue.config.devTools = true
 Vue.component('Controls', Controls)
 Vue.component('PopoverMenu', PopoverMenu)
 Vue.component('DatePicker', DatetimePicker)
@@ -51,13 +47,11 @@ Vue.component('LoadingOverlay', LoadingOverlay)
 
 Vue.directive('tooltip', Tooltip)
 
-Vue.use(vClickOutside)
 Vue.use(VueClipboard)
 Vue.use(Modal)
 
 Vue.prototype.t = t
 Vue.prototype.n = n
-Vue.prototype.$http = axios
 Vue.prototype.OC = OC
 Vue.prototype.OCA = OCA
 
