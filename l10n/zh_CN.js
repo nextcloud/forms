@@ -20,7 +20,6 @@ OC.L10N.register(
     "Owner" : "所有者",
     "Created" : "已创建",
     "Expires" : "过期",
-    "View Results" : "查看结果",
     "Public access" : "公开访问",
     "Only shared" : "只共享给特定用户或分组",
     "Registered users only" : "只允许注册用户",
