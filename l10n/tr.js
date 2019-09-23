@@ -20,6 +20,7 @@ OC.L10N.register(
     "Owner" : "Sahip",
     "Created" : "Oluşturulma",
     "Expires" : "Sona erme",
+    "View results" : "Sonuçları görüntüle",
     "Public access" : "Herkese açık erişim",
     "Only shared" : "Yalnız paylaşılanlar",
     "Registered users only" : "Yalnız kayıtlı kullanıcılar",
