@@ -17,6 +17,7 @@ OC.L10N.register(
     "Owner" : "Vlastník",
     "Created" : "Vytvořeno",
     "Expires" : "Platnost končí",
+    "View results" : "Zobrazit výsledky",
     "Public access" : "Veřejný přístup",
     "Only shared" : "Pouze sdílené",
     "Registered users only" : "Pouze registrovaní uživatelé",
