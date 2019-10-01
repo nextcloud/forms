@@ -20,6 +20,7 @@ OC.L10N.register(
     "Owner" : "Propietari",
     "Created" : "Creat",
     "Expires" : "Venç",
+    "View results" : "Mostra els resultats",
     "Public access" : "Accés públic",
     "Only shared" : "Només compartit",
     "Registered users only" : "Només usuaris registrats",
