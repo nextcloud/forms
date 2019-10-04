@@ -20,6 +20,7 @@ OC.L10N.register(
     "Owner" : "Власник",
     "Created" : "Направљен",
     "Expires" : "Истиче",
+    "View results" : "Види резултате",
     "Public access" : "Јавни приступ",
     "Only shared" : "Само дељено",
     "Registered users only" : "Само регистровани корисници",
