@@ -45,6 +45,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setHash(string $value)
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(integer $value)
+ * @method integer getUnique()
+ * @method void setUnique(boolean $value)
  */
 class Event extends Entity {
 	protected $title;
@@ -57,6 +59,7 @@ class Event extends Entity {
 	protected $isAnonymous;
 	protected $fullAnonymous;
 	protected $allowMaybe;
+	protected $unique;
 
 	/**
 	 * Event constructor.
@@ -91,6 +94,7 @@ class Event extends Entity {
 			'expired' => $expired,
 			'expirationDate' => $this->getExpire(),
 			'isAnonymous' => $this->getIsAnonymous(),
+			'unique' => $this->getUnique()
 		];
 	}
 }

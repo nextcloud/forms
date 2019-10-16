@@ -527,6 +527,13 @@ class PageController extends Controller {
 			return false;
 		}
 		if ($access === 'registered') {
+			if ($form->getUnique()) {
+				$participants = $this->voteMapper->findParticipantsByForm($form->getId());
+				foreach($participants as $participant) {
+					// Don't allow access if user has already taken part
+					if ($participant->getUserId() === $this->userId) return false;
+				}
+			}
 			return true;
 		}
 		if ($owner === $this->userId) {
