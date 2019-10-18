@@ -40,6 +40,7 @@ OC.L10N.register(
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "La configuration est verrouillée. Changer les options peut entraîner un comportement indésirable, mais vous pouvez quand même la déverrouiller.",
     "Unlock configuration " : "Déverrouiller la configuration",
     "Form configurations" : "Paramètres du formulaire",
+    "Only allow one submission per user" : "Autoriser un seul envoi par utilisateur",
     "Name of user or group" : "Nom d'utilisateur ou de groupe",
     "Create new form" : "Créer un nouveau formulaire",
     "Writing form" : "Rédiger le formulaire",

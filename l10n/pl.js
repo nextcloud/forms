@@ -40,6 +40,7 @@ OC.L10N.register(
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Konfiguracja jest zablokowana. Zmiana opcji może spowodować niepożądane efekty. Możesz ją odblokować.",
     "Unlock configuration " : "Odblokuj konfigurację",
     "Form configurations" : "Ustawienia formularza",
+    "Only allow one submission per user" : "Zezwól tylko na jedno przysłanie na użytkownika",
     "Name of user or group" : "Nazwa użytkownika lub grupy",
     "Create new form" : "Utwórz nowy formularz",
     "Writing form" : "Pisanie formularza",

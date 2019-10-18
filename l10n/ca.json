@@ -38,6 +38,7 @@
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "La configuració està blocada. Canviar opcions ara podria esdevenir en comportaments no desitjats, però ho podeu desblocar de totes maneres.",
     "Unlock configuration " : "Desbloca configuració",
     "Form configurations" : "Configuracions del formulari",
+    "Only allow one submission per user" : "Admet només una presentació per usuari.",
     "Name of user or group" : "Nom de l'usuari o del grup",
     "Create new form" : "Crea un nou formulari",
     "Writing form" : "S'està desant el formulari",

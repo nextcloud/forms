@@ -38,6 +38,7 @@
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "La configuración está bloqueada. Cambiar las opciones puede resultar en comportamiento indeseado, pero aun así puedes desbloquearla.",
     "Unlock configuration " : "Desbloquear configuración",
     "Form configurations" : "Configuraciones de formulario",
+    "Only allow one submission per user" : "Sólo se permite un envío por usuario",
     "Name of user or group" : "Nombre del usuario o grupo",
     "Create new form" : "Crear formulario nuevo",
     "Writing form" : "Escribiendo formulario",
