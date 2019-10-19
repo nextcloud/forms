@@ -40,6 +40,7 @@ OC.L10N.register(
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Inställningarna är låsta. Att ändra variabler kan resultera i oväntade beteenden. Men du kan låsa upp inställningarna ändå.",
     "Unlock configuration " : "Lås upp inställningar",
     "Form configurations" : "Formulär-inställningar",
+    "Only allow one submission per user" : "Tillåt endast ett svar per användare",
     "Name of user or group" : "Användar- eller grupp-namn",
     "Create new form" : "Skapa nytt formulär",
     "Writing form" : "Skriver formuläret",
