@@ -27,7 +27,7 @@ OC.L10N.register(
     "Hidden form" : "Niewidoczny formularz",
     "Text form" : "Formularz tekstowy",
     "never" : "nigdy",
-    "Link copied to clipboard" : "Link skopiowany do schowka",
+    "Link copied to clipboard" : "Link został skopiowany do schowka",
     "Error, while copying link to clipboard" : "Błąd podczas kopiowania linku do schowka",
     "Add Answer" : "Dodaj odpowiedź",
     "Share with" : "Udostępnij dla",
