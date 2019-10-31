@@ -40,6 +40,7 @@ OC.L10N.register(
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Configuratie is beschermd. Wijzigen van de opties kan leiden tot ongewenst gedrag, maar je kunt de configuratie hoe dan ook vrijgeven.",
     "Unlock configuration " : "Vrijgeven configuratie",
     "Form configurations" : "Formulierconfiguratie",
+    "Only allow one submission per user" : "Sta slechts één inzending per gebruiker toe",
     "Name of user or group" : "Naam van gebruiker of groep",
     "Create new form" : "Creëren nieuw formulier",
     "Writing form" : "Wegschrijven formulier",
