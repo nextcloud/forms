@@ -4,6 +4,8 @@ OC.L10N.register(
     "Do you really want to delete this new form?" : "Ali ste prepričani, da želite izbrisati ta vprašalnik?",
     "Forms" : "Vprašalniki",
     "Expired" : "Poteklo",
+    "Usernames hidden to Owner" : "Uporabniška imena so skrita tudi lastniku",
+    "Usernames visible to Owner" : "Uporabniška imena so vidna lastniku",
     "Group" : "Skupina",
     "Title" : "Naslov",
     "Access" : "Dostop",
