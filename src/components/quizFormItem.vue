@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import TextFormItem from '../components/textFormItem'
+import TextFormItem from './textFormItem.vue'
 export default {
 	components: {
 		TextFormItem
