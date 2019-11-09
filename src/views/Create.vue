@@ -193,7 +193,7 @@
 
 <script>
 import moment from 'moment'
-import QuizFormItem from '../components/quizFormItem'
+import QuizFormItem from '../components/quizFormItem.vue'
 import axios from 'nextcloud-axios'
 
 export default {
