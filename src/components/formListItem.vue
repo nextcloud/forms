@@ -89,9 +89,7 @@
 				<a class="icon icon-clippy svg delete-form" @click="copyLink" />
 			</div>
 			<div class="list-results wrapper">
-				<button class="button btn primary" @click="viewResults">
-					<span>{{ t('forms', 'View results') }}</span>
-				</button>
+				<a class="icon icon-toggle svg delete-form" @click="viewResults" />
 			</div>
 
 			<div class="wrapper group-2-1">
