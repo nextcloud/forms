@@ -3,8 +3,10 @@ OC.L10N.register(
     {
     "Do you really want to delete this new form?" : "Opravdu chcete tento nový formulář smazat?",
     "Forms" : "Formuláře",
+    "{user} participated in the form \"{title}\"" : "{user} se zúčastnil(a) ve formuláři „{title}“",
     "Go to form" : "Přejít na formulář",
     "A forms app, similar to Google Forms." : "Aplikace pro formuláře, podobné jako Google Forms.",
+    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Aplikace formuláře, podobné Google Forms s možností omezovat přístup (jen pro členy, určité skupiny/uživatele a veřejně).",
     "Expired" : "Platnost skončila",
     "Expires %n" : "Platnost skončí %n",
     "Expires never" : "Platí napořád",
