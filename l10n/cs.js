@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Do you really want to delete this new form?" : "Opravdu chcete tento nový formulář smazat?",
     "Forms" : "Formuláře",
+    "Forms App - New Activity" : "Aplikace formuláře – nová aktivita",
     "{user} participated in the form \"{title}\"" : "{user} se zúčastnil(a) ve formuláři „{title}“",
     "Go to form" : "Přejít na formulář",
     "A forms app, similar to Google Forms." : "Aplikace pro formuláře, podobné jako Google Forms.",
@@ -39,6 +40,7 @@ OC.L10N.register(
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Nastavení je uzamčeno. Změna voleb může vést k nechtěnému chování, ale i tak je možné je odemknout.",
     "Unlock configuration " : "Odemknout nastavení",
     "Form configurations" : "Nastavení formuláře",
+    "Only allow one submission per user" : "Každému z uživatelů povolit pouze jednou přispět",
     "Name of user or group" : "Jméno uživatele nebo název skupiny",
     "Create new form" : "Vytvořit nový formulář",
     "Writing form" : "Formulář se zapisuje",
