@@ -68,7 +68,7 @@ OC.L10N.register(
     "Error while deleting Form \"%n\"" : "Chyba při mazání formuláře „%n“",
     "Form Expired" : "Platnost formuláře skončila",
     "This Form has expired and is no longer taking answers." : "Tento formulář je po platnosti a nadále není možné na něj odpovídat.",
-    "Access denied" : "Přístup zamítnut",
+    "Access denied" : "Přístup odepřen",
     "You are not allowed to view this form or the form does not exist." : "Nemáte oprávnění k zobrazení tohoto formuláře nebo formulář neexistuje.",
     "You are not allowed to edit this form or the form does not exist." : "Nemáte oprávnění k úpravě tohoto formuláře nebo formulář neexistuje.",
     "You are either not allowed to delete this form or it doesn't exist." : "Nemáte oprávnění ke smazání tohoto formuláře nebo formulář neexistuje."
