@@ -40,6 +40,7 @@ OC.L10N.register(
     "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "Подешавања су закључана. Промена ставки може да заврши са нежељеним понашањем, али свеједно је можете откључати.",
     "Unlock configuration " : "Откључај подешавања",
     "Form configurations" : "Подешавања упитника",
+    "Only allow one submission per user" : "Дозволи само једно рађење упитника по кориснику",
     "Name of user or group" : "Име корисника или групе",
     "Create new form" : "Направи нови упитник",
     "Writing form" : "Писање упитника",
