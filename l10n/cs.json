@@ -65,7 +65,7 @@
     "Form \"%n\" deleted" : "Formulář „%n“ smazán",
     "Error while deleting Form \"%n\"" : "Chyba při mazání formuláře „%n“",
     "Form Expired" : "Platnost formuláře skončila",
-    "This Form has expired and is no longer taking answers." : "Tento formulář je po platnosti a nadále není možné na něj odpovídat.",
+    "This Form has expired and is no longer taking answers." : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat.",
     "Access denied" : "Přístup odepřen",
     "You are not allowed to view this form or the form does not exist." : "Nemáte oprávnění k zobrazení tohoto formuláře nebo formulář neexistuje.",
     "You are not allowed to edit this form or the form does not exist." : "Nemáte oprávnění k úpravě tohoto formuláře nebo formulář neexistuje.",
