@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Do you really want to delete this new form?" : "Σίγουρα θέλετε να διαγράψετε τη φόρμα?",
     "Forms" : "Φόρμες",
     "Expired" : "Έληξε",
     "Group" : "Ομάδα",
