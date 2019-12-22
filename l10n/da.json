@@ -1,0 +1,28 @@
+{ "translations": {
+    "Expired" : "Udløbet",
+    "Expires %n" : "Udløber %n",
+    "Expires never" : "Udløber aldrig",
+    "Group" : "Gruppe",
+    "Title" : "Titel",
+    "Access" : "Adgang",
+    "Owner" : "Ejer",
+    "Created" : "Oprettet",
+    "Expires" : "Udløber",
+    "Public access" : "Offentligt tilgængelig",
+    "Only shared" : "Kun delt",
+    "Registered users only" : "Kun registrerede brugere",
+    "never" : "aldrig",
+    "Link copied to clipboard" : "Link kopieret til udklipsholder",
+    "Share with" : "Del med",
+    "Description" : "Beskrivelse",
+    "Configuration" : "sætning",
+    "Done" : "Færdig",
+    "Expiration date" : "Udløbsdato",
+    "Click to add a date" : "Klik for at tilføje en dato",
+    "Title must not be empty!" : "Overskriften må ikke være tom!",
+    "%n successfully saved" : "%n blev gemt",
+    "Clone of %n" : "Klon af %n",
+    "New" : "Ny",
+    "Access denied" : "Adgang nægtet"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

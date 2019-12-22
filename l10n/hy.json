@@ -1,0 +1,11 @@
+{ "translations": {
+    "Group" : "Խումբ",
+    "Title" : "Վերնագիր",
+    "Owner" : "Owner",
+    "never" : "երբեք",
+    "Description" : "Նկարագրություն",
+    "Done" : "Done",
+    "Expiration date" : "Վավերականության ժամկետ",
+    "New" : "Նոր"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

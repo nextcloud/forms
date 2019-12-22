@@ -1,0 +1,12 @@
+{ "translations": {
+    "Group" : "Бүлэг",
+    "Title" : "Цол/Албан тушаал",
+    "Owner" : "Эзэмшигч",
+    "Created" : "Үүсгэсэн",
+    "Public access" : "Нийтийн хандах эрх",
+    "never" : "хэзээ ч үгүй",
+    "Description" : "Тодорхойлолт",
+    "Done" : "Хийсэн",
+    "New" : "Шинэ"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

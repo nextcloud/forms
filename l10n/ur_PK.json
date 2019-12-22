@@ -1,0 +1,10 @@
+{ "translations": {
+    "Group" : "Group",
+    "Title" : "عنوان",
+    "Owner" : "Owner",
+    "never" : "never",
+    "Description" : "تصریح",
+    "Done" : "Done",
+    "Expiration date" : "تاریخ معیاد"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
