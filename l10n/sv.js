@@ -12,7 +12,7 @@ OC.L10N.register(
     "Expires %n" : "Upphör %n",
     "Expires never" : "Upphör aldrig",
     "Anonymous form" : "Anonymt formulär",
-    "Usernames hidden to Owner" : "Användarnamn ej synliga för ägaren",
+    "Usernames hidden to Owner" : "Användarnamn dolda för ägaren",
     "Usernames visible to Owner" : "Användarnamn synliga för ägaren",
     "Group" : "Grupp",
     "Title" : "Rubrik",
