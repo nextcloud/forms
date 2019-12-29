@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Do you really want to delete this new form?" : "Σίγουρα θέλετε να διαγράψετε τη φόρμα?",
     "Forms" : "Φόρμες",
+    "A forms app, similar to Google Forms." : "Εφαρμογή φορμών, παρόμεια με τις Φόρμες Google.",
     "Expired" : "Έληξε",
     "Expires %n" : "Λήγει στις %n",
     "Expires never" : "Δεν λήγει ποτέ",
