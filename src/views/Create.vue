@@ -84,8 +84,8 @@
 						:key="question.id"
 						:question="question"
 						:type="question.type"
-						:add-answer="addAnswer"
-						:remove-answer="removeAnswer"
+						@add-answer="addAnswer"
+						@remove-answer="removeAnswer"
 						@remove="form.options.formQuizQuestions.splice(index, 1)"
 					/>
 				</transitionGroup>
