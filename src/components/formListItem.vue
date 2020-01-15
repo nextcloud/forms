@@ -84,14 +84,21 @@
 		<div class="wrapper group-2">
 			<div class="wrapper group-2-8">
 				<a class="icon icon-delete svg delete-form" @click="deleteForm" />
+				<span class="hidden-visually">
+					{{ t('forms', 'Delete form') }}
+				</span>
 			</div>
 			<div class="wrapper group-2-9">
 				<a class="icon icon-clippy svg delete-form" @click="copyLink" />
+				<span class="hidden-visually">
+					{{ t('forms', 'Copy link') }}
+				</span>
 			</div>
 			<div class="list-results wrapper">
-				<button class="button btn primary" @click="viewResults">
-					<span>{{ t('forms', 'View results') }}</span>
-				</button>
+				<a class="icon icon-toggle svg delete-form" @click="viewResults" />
+				<span class="hidden-visually">
+					{{ t('forms', 'View results') }}
+				</span>
 			</div>
 
 			<div class="wrapper group-2-1">
