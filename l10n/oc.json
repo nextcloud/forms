@@ -1,0 +1,11 @@
+{ "translations": {
+    "Group" : "Grop",
+    "Title" : "Títol",
+    "Owner" : "Owner",
+    "never" : "pas jamai",
+    "Description" : "Descripcion",
+    "Done" : "Done",
+    "Expiration date" : "Data d'expiracion",
+    "New" : "Novèl"
+},"pluralForm" :"nplurals=2; plural=(n > 1);"
+}

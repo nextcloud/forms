@@ -7,9 +7,10 @@ services:
   - postgresql
 
 php:
-  - 7.1
   - 7.2
   - 7.3
+  # https://travis-ci.community/t/some-extensions-are-missing-in-php-7-4-0-zip-gmp-sodium/6320/8
+  # - 7.4
 
 addons:
   postgresql: 9.5

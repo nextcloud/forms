@@ -29,12 +29,12 @@ import VueClipboard from 'vue-clipboard2'
 import { DatetimePicker, PopoverMenu, Tooltip } from 'nextcloud-vue'
 
 import Modal from './plugins/plugin.js'
-import Controls from './components/_base-Controls'
-import UserDiv from './components/_base-UserDiv'
-import SideBar from './components/_base-SideBar'
-import SideBarClose from './components/sideBarClose'
-import ShareDiv from './components/shareDiv'
-import LoadingOverlay from './components/_base-LoadingOverlay'
+import Controls from './components/_base-Controls.vue'
+import UserDiv from './components/_base-UserDiv.vue'
+import SideBar from './components/_base-SideBar.vue'
+import SideBarClose from './components/sideBarClose.vue'
+import ShareDiv from './components/shareDiv.vue'
+import LoadingOverlay from './components/_base-LoadingOverlay.vue'
 
 Vue.component('Controls', Controls)
 Vue.component('PopoverMenu', PopoverMenu)

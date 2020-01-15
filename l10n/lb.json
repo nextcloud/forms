@@ -1,0 +1,11 @@
+{ "translations": {
+    "Group" : "Grupp",
+    "Title" : "Titel",
+    "Owner" : "Owner",
+    "never" : "Ni",
+    "Description" : "Beschreiwung",
+    "Done" : "Done",
+    "Expiration date" : "Verfallsdatum",
+    "New" : "Nei"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

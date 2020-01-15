@@ -1,0 +1,14 @@
+{ "translations": {
+    "Group" : "Grupo",
+    "Title" : "Título",
+    "Owner" : "Dueño",
+    "Created" : "Creado",
+    "Public access" : "Acceso público",
+    "never" : "nunca",
+    "Description" : "Descripción",
+    "Configuration" : "Configuración",
+    "Done" : "Hecho",
+    "Expiration date" : "Fecha de expiración",
+    "New" : "Nuevo"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

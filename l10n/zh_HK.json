@@ -1,0 +1,11 @@
+{ "translations": {
+    "Group" : "群組",
+    "Title" : "標題",
+    "Owner" : "Owner",
+    "never" : "永不",
+    "Description" : "描述",
+    "Done" : "Done",
+    "Expiration date" : "分享期限",
+    "New" : "新增"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

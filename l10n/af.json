@@ -1,0 +1,13 @@
+{ "translations": {
+    "Group" : "Groep",
+    "Title" : "Titel",
+    "Owner" : "Eienaar",
+    "Created" : "Geskep",
+    "Public access" : "Openbare toegang",
+    "never" : "nooit",
+    "Description" : "Beskrywing",
+    "Done" : "Gereed",
+    "Expiration date" : "Vervaldatum",
+    "New" : "Nuut"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

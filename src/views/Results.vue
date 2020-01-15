@@ -60,7 +60,7 @@
 <script>
 // import moment from 'moment'
 // import lodash from 'lodash'
-import resultItem from '../components/resultItem'
+import resultItem from '../components/resultItem.vue'
 import json2csvParser from 'json2csv'
 import axios from 'nextcloud-axios'
 

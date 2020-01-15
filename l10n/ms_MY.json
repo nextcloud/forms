@@ -1,0 +1,10 @@
+{ "translations": {
+    "Group" : "Group",
+    "Title" : "Judul",
+    "Owner" : "Owner",
+    "never" : "jangan",
+    "Description" : "Keterangan",
+    "Done" : "Done",
+    "New" : "Baru"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

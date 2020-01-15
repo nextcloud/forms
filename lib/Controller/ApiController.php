@@ -442,6 +442,7 @@ class ApiController extends Controller {
 		$newEvent->setDescription($event['description']);
 
 		$newEvent->setIsAnonymous($event['isAnonymous']);
+		$newEvent->setUnique($event['unique']);
 
 		if ($event['access'] === 'select') {
 			$shareAccess = '';

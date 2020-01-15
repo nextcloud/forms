@@ -1,0 +1,13 @@
+{ "translations": {
+    "Group" : "Grup",
+    "Title" : "Judul",
+    "Owner" : "Owner",
+    "Created" : "Dibuat",
+    "never" : "tidak pernah.",
+    "Description" : "Deskrisi",
+    "Configuration" : "Konfigurasi",
+    "Done" : "Selesai",
+    "Expiration date" : "Tanggal kadaluarsa",
+    "New" : "Baru"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

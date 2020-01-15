@@ -35,6 +35,10 @@ OC.L10N.register(
     "Unlock configuration " : "Desbloquear o acesso à configuração",
     "Form configurations" : "Parâmetros dos formulários",
     "Name of user or group" : "Nome do utilizador ou grupo",
-    "Create new form" : "Criar novo formulário"
+    "Create new form" : "Criar novo formulário",
+    "Done" : "Concluído",
+    "Expiration date" : "Data de expiração",
+    "New" : "Novo",
+    "Access denied" : "Acesso proibido"
 },
 "nplurals=2; plural=(n != 1);");

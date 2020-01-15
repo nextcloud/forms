@@ -34,17 +34,17 @@
 		<div class="wrapper group-2">
 			<div class="wrapper-group-2-5">
 				<div class="deletetwo">
-					{{ t('forms',"Delete Form") }}
+					{{ t('forms',"Delete form") }}
 				</div>
 			</div>
 			<div class="wrapper-group-2-5">
 				<div class="copyL">
-					{{ t('forms', "Copy Link") }}
+					{{ t('forms', "Copy link") }}
 				</div>
 			</div>
 			<div class="wrapper-group-2-5">
 				<div class="result">
-					{{ t('forms', "View Results") }}
+					{{ t('forms', "View results") }}
 				</div>
 			</div>
 			<div class="wrapper group-2-1">
@@ -90,7 +90,7 @@
 			</div>
 			<div class="list-results wrapper">
 				<button class="button btn primary" @click="viewResults">
-					<span>{{ t('forms', 'View Results') }}</span>
+					<span>{{ t('forms', 'View results') }}</span>
 				</button>
 			</div>
 

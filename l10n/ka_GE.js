@@ -1,0 +1,24 @@
+OC.L10N.register(
+    "forms",
+    {
+    "Expired" : "გაუქმდა",
+    "Expires never" : "არასდროს უქმდება",
+    "Usernames hidden to Owner" : "მომხმარებლის სახელები მფლობელისთვის დამალულია",
+    "Usernames visible to Owner" : "მომხმარებლის სახელები მფლობელისთვის ხილვადია",
+    "Group" : "ჯგუფი",
+    "Title" : "სათაური",
+    "Access" : "წვდომა",
+    "Owner" : "მფლობელი",
+    "Created" : "შექმნილია",
+    "Expires" : "უქმდება",
+    "Public access" : "ღია წვდომა",
+    "Registered users only" : "მხოლოდ რეგისტრირებული მომხმარებლები",
+    "never" : "არასდროს",
+    "Description" : "აღწერილობა",
+    "Configuration" : "კონფიგურაცია",
+    "Done" : "დასრულებულია",
+    "Expiration date" : "გაუქმების თარიღი",
+    "New" : "ახალი",
+    "Access denied" : "წვდომა არაა დაშვებული"
+},
+"nplurals=2; plural=(n!=1);");

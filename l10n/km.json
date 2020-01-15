@@ -1,0 +1,12 @@
+{ "translations": {
+    "Group" : "Group",
+    "Title" : "ចំណងជើង",
+    "Owner" : "Owner",
+    "never" : "មិនដែរ",
+    "Description" : "ការ​អធិប្បាយ",
+    "Configuration" : "ការ​កំណត់​សណ្ឋាន",
+    "Done" : "Done",
+    "Expiration date" : "ពេល​ផុត​កំណត់",
+    "New" : "ថ្មី"
+},"pluralForm" :"nplurals=1; plural=0;"
+}
