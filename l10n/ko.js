@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "Owner",
     "Created" : "생성됨",
     "Expires" : "끝나는 시간",
+    "Copy link" : "링크 복사",
     "Public access" : "공개 접근",
     "Registered users only" : "등록된 사용자만",
     "never" : "하지 않음",

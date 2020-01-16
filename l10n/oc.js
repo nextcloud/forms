@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Grop",
     "Title" : "Títol",
     "Owner" : "Owner",
+    "Copy link" : "Copiar lo ligam",
     "never" : "pas jamai",
     "Description" : "Descripcion",
     "Done" : "Done",

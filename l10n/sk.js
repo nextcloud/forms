@@ -7,6 +7,7 @@ OC.L10N.register(
     "Owner" : "Majiteľ",
     "Created" : "Vytvorené",
     "Expires" : "Vyprší",
+    "Copy link" : "Kopíruj odkaz",
     "Public access" : "Verejný prístup",
     "Registered users only" : "Len zaregistrovaní používatelia",
     "never" : "nikdy",

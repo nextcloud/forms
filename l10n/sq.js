@@ -5,6 +5,7 @@ OC.L10N.register(
     "Title" : "Titulli",
     "Owner" : "Zotëruesi",
     "Created" : "U krijua",
+    "Copy link" : "Kopjo linkun",
     "Public access" : "Akses publik",
     "never" : "asnjëherë",
     "Description" : "Përshkrim",

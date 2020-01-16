@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "בעלות",
     "Created" : "מועד היצירה",
     "Expires" : "תפוגה",
+    "Copy link" : "העתקת קישור",
     "Public access" : "גישה ציבורית",
     "Registered users only" : "משתמשים רשומים בלבד",
     "never" : "מעולם לא",

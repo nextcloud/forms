@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Qrup",
     "Title" : "Başlıq",
     "Owner" : "Owner",
+    "Copy link" : "linki nüsxələ",
     "never" : "heç vaxt",
     "Description" : "Açıqlanma",
     "Configuration" : "Konfiqurasiya",

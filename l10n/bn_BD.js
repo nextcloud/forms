@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "গোষ্ঠীসমূহ",
     "Title" : "শিরোনাম",
     "Owner" : "Owner",
+    "Copy link" : "লিঙ্ক কপি করো",
     "never" : "কখনোই নয়",
     "Description" : "বিবরণ",
     "Configuration" : "কনফিগারেসন",

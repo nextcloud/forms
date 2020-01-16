@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "Eier",
     "Created" : "Opprettet",
     "Expires" : "Utløper",
+    "Copy link" : "Kopier lenke",
     "Public access" : "Offentlig tilgang",
     "Registered users only" : "Kun for registrerte brukere",
     "never" : "aldri",

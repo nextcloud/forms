@@ -12,6 +12,7 @@ OC.L10N.register(
     "Owner" : "Eigandi",
     "Created" : "Búið til þann",
     "Expires" : "Rennur út",
+    "Copy link" : "Afrita tengil",
     "Public access" : "Opinber aðgangur",
     "Only shared" : "Einungis deildar",
     "Registered users only" : "Aðeins skráðir notendur",

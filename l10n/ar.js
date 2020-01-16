@@ -5,6 +5,7 @@ OC.L10N.register(
     "Title" : "العنوان",
     "Access" : "النفاذ",
     "Owner" : "المالك",
+    "Copy link" : "انسخ الرابط",
     "Public access" : "النفاذ إليه مُصرّح للعامة",
     "never" : "بتاتاً",
     "Error, while copying link to clipboard" : "خطأ أثناء نسخ الرابط إلى الحافظة",

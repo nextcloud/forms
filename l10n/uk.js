@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Група",
     "Title" : "Назва",
     "Owner" : "Власник",
+    "Copy link" : "Скопіювати посилання",
     "Public access" : "Публічний доступ",
     "never" : "ніколи",
     "Description" : "Опис",

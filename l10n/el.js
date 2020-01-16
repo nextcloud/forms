@@ -15,6 +15,8 @@ OC.L10N.register(
     "Owner" : "Ιδιοκτήτης",
     "Created" : "Δημιουργήθηκε",
     "Expires" : "Λήγει",
+    "Delete form" : "Διαγραφή φόρμας",
+    "Copy link" : "Αντιγραφή συνδέσμου",
     "Public access" : "Δημόσια πρόσβαση",
     "Only shared" : "Μόνο κοινόχρηστα",
     "Registered users only" : "Μόνο εγγεγραμμένοι χρήστες",
@@ -38,7 +40,6 @@ OC.L10N.register(
     "Need to pick an expiration date!" : "Πρέπει να επιλεγεί μια ημερομηνία λήξης!",
     "%n successfully saved" : "Επιτυχής αποθήκευση %n",
     "New" : "Νέα",
-    "Delete form" : "Διαγραφή φόρμας",
     "Do you want to delete \"%n\"?" : "Θέλετε να διαγράψετε \"%n\"?",
     "Form Expired" : "Η φόρμα έληξε",
     "Access denied" : "Δεν επιτρέπεται η πρόσβαση"

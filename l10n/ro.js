@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Grup",
     "Title" : "Titlu",
     "Owner" : "Proprietar",
+    "Copy link" : "Copiză link",
     "Public access" : "Access public",
     "never" : "niciodată",
     "Description" : "Descriere",

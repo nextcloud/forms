@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "Omanik",
     "Created" : "Loodud",
     "Expires" : "Aegub",
+    "Copy link" : "Kopeeri link",
     "Public access" : "Avalik ligipääs",
     "Registered users only" : "Ainult registreerunud kasutajad",
     "never" : "mitte kunagi",

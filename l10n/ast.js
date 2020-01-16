@@ -5,6 +5,7 @@ OC.L10N.register(
     "Title" : "Títulu",
     "Owner" : "Owner",
     "Created" : "Creóse",
+    "Copy link" : "Copiar enllaz",
     "Public access" : "Accesu públicu",
     "never" : "never",
     "Description" : "Descripción",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Gruppo",
     "Title" : "Titulo",
     "Owner" : "Owner",
+    "Copy link" : "Copiar ligamine",
     "Public access" : "Accesso public",
     "never" : "nunquam",
     "Description" : "Description",

@@ -6,6 +6,7 @@ OC.L10N.register(
     "Owner" : "Īpašnieks",
     "Created" : "Izveidots",
     "Expires" : "Beidzas",
+    "Copy link" : "Kopēt saiti",
     "Public access" : "Publiska piekļuve",
     "never" : "nekad",
     "Description" : "Apraksts",

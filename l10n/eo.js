@@ -12,6 +12,7 @@ OC.L10N.register(
     "Owner" : "Posedanto",
     "Created" : "Kreita",
     "Expires" : "Senvalidiĝo",
+    "Copy link" : "Kopii ligilon",
     "Public access" : "Publika aliro",
     "Only shared" : "Kunkavigita kun...",
     "Registered users only" : "Nur registritaj uzantoj",

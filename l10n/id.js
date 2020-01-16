@@ -5,6 +5,7 @@ OC.L10N.register(
     "Title" : "Judul",
     "Owner" : "Owner",
     "Created" : "Dibuat",
+    "Copy link" : "Salin tautan",
     "never" : "tidak pernah.",
     "Description" : "Deskrisi",
     "Configuration" : "Konfigurasi",

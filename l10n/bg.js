@@ -5,6 +5,7 @@ OC.L10N.register(
     "Title" : "Име",
     "Owner" : "Създател",
     "Created" : "Създаден",
+    "Copy link" : "Копирай връзката",
     "Public access" : "Публичен достъп",
     "never" : "никога",
     "Share with" : "Сподели с",

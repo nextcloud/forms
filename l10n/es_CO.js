@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "Dueño",
     "Created" : "Creado",
     "Expires" : "Expira",
+    "Copy link" : "Copiar liga",
     "Public access" : "Acceso público",
     "Registered users only" : "Solo usuarios registrados",
     "never" : "nunca",

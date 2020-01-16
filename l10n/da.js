@@ -10,6 +10,7 @@ OC.L10N.register(
     "Owner" : "Ejer",
     "Created" : "Oprettet",
     "Expires" : "Udløber",
+    "Copy link" : "Kopier link",
     "Public access" : "Offentligt tilgængelig",
     "Only shared" : "Kun delt",
     "Registered users only" : "Kun registrerede brugere",

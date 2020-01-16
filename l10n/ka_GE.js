@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "მფლობელი",
     "Created" : "შექმნილია",
     "Expires" : "უქმდება",
+    "Copy link" : "ბმულის კოპირება",
     "Public access" : "ღია წვდომა",
     "Registered users only" : "მხოლოდ რეგისტრირებული მომხმარებლები",
     "never" : "არასდროს",

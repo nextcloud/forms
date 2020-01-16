@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Група",
     "Title" : "Наслов",
     "Owner" : "Сопственик",
+    "Copy link" : "Копирај линк",
     "never" : "никогаш",
     "Description" : "Опис",
     "Configuration" : "Конфигурација",

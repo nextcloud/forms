@@ -4,6 +4,7 @@ OC.L10N.register(
     "Group" : "Grŵp",
     "Title" : "Teitl",
     "Owner" : "Owner",
+    "Copy link" : "Copïo dolen",
     "Public access" : "Mynediad cyhoeddus",
     "never" : "byth",
     "Description" : "Disgrifiad",

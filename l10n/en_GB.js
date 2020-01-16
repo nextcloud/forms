@@ -11,6 +11,7 @@ OC.L10N.register(
     "Owner" : "Owner",
     "Created" : "Created",
     "Expires" : "Expires",
+    "Copy link" : "Copy link",
     "Public access" : "Public access",
     "Registered users only" : "Registered users only",
     "never" : "never",
