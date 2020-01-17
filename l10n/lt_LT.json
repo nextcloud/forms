@@ -42,13 +42,19 @@
     "Must have at least one question!" : "Privalo būti bent vienas klausimas!",
     "Need to pick an expiration date!" : "Reikia pasirinkti galiojimo pabaigos datą!",
     "%n successfully saved" : "%n sėkmingai įrašyta",
+    "Error on saving form, see console" : "Klaida įrašant formą, žiūrėkite pultą",
     "Clone of %n" : "%n dublikatas",
     "New" : "Nauja",
+    "Click here to add a form" : "Spustelėkite čia, norėdami pridėti formą",
     "Do you want to delete \"%n\"?" : "Ar norite ištrinti \"%n\"?",
     "No, keep form." : "Ne, palikti anketą.",
     "Yes, delete form." : "Taip, ištrinti anketą.",
     "Form \"%n\" deleted" : "Anketa \"%n\" ištrinta",
+    "Error while deleting Form \"%n\"" : "Klaida ištrinant formą \"%n\"",
     "Form Expired" : "Anketa nebegalioja",
-    "Access denied" : "Prieiga negalima"
+    "Access denied" : "Prieiga negalima",
+    "You are not allowed to view this form or the form does not exist." : "Jums neleidžiama peržiūrėti šios formos arba formos nėra.",
+    "You are not allowed to edit this form or the form does not exist." : "Jums neleidžiama taisyti šią formą arba formos nėra.",
+    "You are either not allowed to delete this form or it doesn't exist." : "Jums neleidžiama ištrinti šios formos arba formos nėra."
 },"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
 }
