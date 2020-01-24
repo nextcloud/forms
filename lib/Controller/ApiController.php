@@ -200,7 +200,6 @@ class ApiController extends Controller {
 	/**
 	 * Read all votes of a form based on the form id
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param Integer $formId
 	 * @return Array
 	 */
@@ -232,7 +231,6 @@ class ApiController extends Controller {
 	/**
 	 * Read an entire form based on form id
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param Integer $formId
 	 * @return Array
 	 */
@@ -252,7 +250,6 @@ class ApiController extends Controller {
 	/**
 	 * Read all shares (users and groups with access) of a form based on the form id
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param Integer $formId
 	 * @return Array
 	 */
@@ -310,7 +307,6 @@ class ApiController extends Controller {
 	/**
 	 * Read an entire form based on the form id or hash
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param String $formIdOrHash form id or hash
 	 * @return Array
 	 */
@@ -365,7 +361,6 @@ class ApiController extends Controller {
 	/**
 	 * Get all forms
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @return DataResponse
 	 */
 
