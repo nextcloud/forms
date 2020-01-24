@@ -155,7 +155,6 @@ class PageController extends Controller {
 
 	/**
 	* @NoAdminRequired
-	* @NoCSRFRequired
 	*/
 	public function createForm() {
 		return new TemplateResponse('forms', 'forms.tmpl',
@@ -164,7 +163,6 @@ class PageController extends Controller {
 
 	/**
 	* @NoAdminRequired
-	* @NoCSRFRequired
 	*/
 	public function cloneForm() {
 		return new TemplateResponse('forms', 'forms.tmpl',
@@ -173,7 +171,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param string $hash
 	 * @return TemplateResponse
 	 */
@@ -340,7 +337,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param int $formId
 	 * @return TemplateResponse|RedirectResponse
 	 */
@@ -359,7 +355,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @PublicPage
 	 * @param int $formId
 	 * @param string $userId
@@ -416,7 +411,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param string $searchTerm
 	 * @param string $groups
 	 * @param string $users
@@ -428,7 +422,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param string $searchTerm
 	 * @param string $groups
 	 * @return array
@@ -454,7 +447,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param string $searchTerm
 	 * @param string $users
 	 * @return array
@@ -488,7 +480,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param string $username
 	 * @return string
 	 */
@@ -580,7 +571,6 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 * @param int $id
 	 * @return TemplateResponse
 	 */
