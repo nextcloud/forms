@@ -47,7 +47,7 @@ OC.L10N.register(
     "Create new form" : "Utwórz nowy formularz",
     "Writing form" : "Pisanie formularza",
     "Update form" : "Aktualizacja formularza",
-    "Done" : "Ukończono",
+    "Done" : "Gotowe",
     "Expiration date" : "Data wygaśnięcia",
     "Click to add a date" : "Kliknij, aby dodać datę",
     "Select a question type!" : "Wybierz rodzaj pytania!",
