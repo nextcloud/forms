@@ -57,7 +57,7 @@
     "Need to pick an expiration date!" : "需要选择过期日期！",
     "%n successfully saved" : "%n保存成功",
     "Error on saving form, see console" : "保存表单出错，请查看控制台",
-    "Clone of %n" : "%n的克隆",
+    "Clone of %n" : "%n 的克隆",
     "New" : "新建",
     "Click here to add a form" : "点击这里以添加一个表单",
     "Do you want to delete \"%n\"?" : "您确定要删除 \"%n\"吗？",
