@@ -1,7 +1,7 @@
 OC.L10N.register(
     "forms",
     {
-    "Do you really want to delete this new form?" : "Wollen Sie das neue Formular wirklich löschen?",
+    "Do you really want to delete this new form?" : "Möchten Sie das neue Formular wirklich löschen?",
     "Forms" : "Formulare",
     "Forms App - New Activity" : "Formulare App - Neue Aktivität",
     "{user} participated in the form \"{title}\"" : "{user} füllte das Formular \"{title}\" aus. ",
