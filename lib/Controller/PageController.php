@@ -271,8 +271,7 @@ class PageController extends Controller {
 		}
 
 		$votes = $this->voteMapper->findByForm($form->getId());
-		$participants = $this->voteMapper->findParticipantsByForm($form->getId());
-		$questions = $this->questionMapper->findByForm($form->getId());
+		$participants = $this->voteMapper->findParticipantsByForm($form->getId());		
 
 		try {
 			$notification = $this->notificationMapper->findByUserAndForm($form->getId(), $this->userId);
