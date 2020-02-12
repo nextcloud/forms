@@ -274,7 +274,11 @@ class PageController extends Controller {
 		$participants = $this->voteMapper->findParticipantsByForm($form->getId());		
 
 		try {
-			$notification = $this->notificationMapper->findByUserAndForm($form->getId(), $this->userId);
+			if($this->userId === null) {
+				$notification = $this->notificationMapper->findByUserAndForm($form->getId(), '');
+			} else {
+				$notification = $this->notificationMapper->findByUserAndForm($form->getId(), $this->userId);
+			}
 		} catch (DoesNotExistException $e) {
 			$notification = null;
 		}
@@ -394,6 +398,9 @@ class PageController extends Controller {
 				if($form->getIsAnonymous()){
 						$vote->setUserId($anonID);
 				}else{
+						if ($userId === '') {
+							$userId = $this->request->getRemoteAddress();
+						}
 						$vote->setUserId($userId);
 				}
 				$vote->setVoteOptionText(htmlspecialchars($questions[$i]['text']));
