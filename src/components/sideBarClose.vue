@@ -22,24 +22,26 @@
 
 <template>
 	<div class="close flex-row">
-		<a id="closeDetails" :title="closeDetailLabel" :alt="closeDetailLabelAlt"
-			class="close icon-close has-tooltip-bottom" href="#" @:click="hideSidebar"
+		<a :alt="closeDetailLabelAlt" :title="closeDetailLabel"
+		   @:click="hideSidebar"
+		   class="close icon-close has-tooltip-bottom" href="#"
+		   id="closeDetails"
 		/>
 	</div>
 </template>
 
 <script>
-export default {
-	data() {
-		return {
-			closeDetailLabel: t('Close details'),
-			closeDetailLabelAlt: t('Close')
-		}
-	},
-	methods: {
-		hideSidebar() {
-			OC.Apps.hideAppSidebar()
+	export default {
+		data() {
+			return {
+				closeDetailLabel: t('Close details'),
+				closeDetailLabelAlt: t('Close')
+			}
+		},
+		methods: {
+			hideSidebar() {
+				OC.Apps.hideAppSidebar()
+			}
 		}
 	}
-}
 </script>

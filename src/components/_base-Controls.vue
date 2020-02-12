@@ -23,92 +23,94 @@
 <template>
 	<div class="controls">
 		<div class="breadcrumb">
-			<button class="button btn primary" @click="helpPage">
-				{{ "Help" }}
+			<button @click="helpPage" class="button btn primary">
+				{{ 'Help' }}
 			</button>
 			<div class="crumb svg crumbhome">
 				<router-link :to="{ name: 'list'}" class="icon-home">
 					Home
 				</router-link>
 			</div>
-			<div v-show="intitle ===''" class="crumb svg last">
-				<span v-text="intitle" />
+			<div class="crumb svg last" v-show="intitle ===''">
+				<span v-text="intitle"/>
 			</div>
 			<div class="action">
-				<slot />
+				<slot/>
 			</div>
 		</div>
-		<slot name="after" class="after" />
+		<slot class="after" name="after"/>
 	</div>
 </template>
 
 <script>
-export default {
+	export default {
 
-	props: {
-		intitle: {
-			type: String,
-			default: undefined
-		}
-	},
-	data() {
-		return {
-			imagePath: OC.imagePath('core', 'places/home.svg')
-		}
-	},
-	methods: {
-		helpPage() {
-			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
+		props: {
+			intitle: {
+				type: String,
+				default: undefined
+			}
+		},
+		data() {
+			return {
+				imagePath: OC.imagePath('core', 'places/home.svg')
+			}
+		},
+		methods: {
+			helpPage() {
+				window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
+			}
 		}
 	}
-}
 </script>
 
 <style lang="scss">
 
-.controls {
-    display: flex;
-	position: fixed;
-    border-bottom: 1px solid var(--color-border);
-    background: var(--color-main-background);
-    width: 100%;
-    height: 45px;
-    z-index: 1001;
-
-	.action {
-		order: 999;
-	}
-
-	.button, button {
-		box-sizing: border-box;
-		display: inline-block;
+	.controls {
 		display: flex;
-		height: 36px;
-		padding: 9px;
-		align-items: center;
-		justify-content: center;
-		margin-left: 7px;
-		&.symbol {
-			width: 36px;
+		position: fixed;
+		border-bottom: 1px solid var(--color-border);
+		background: var(--color-main-background);
+		width: 100%;
+		height: 45px;
+		z-index: 1001;
+
+		.action {
+			order: 999;
 		}
-		&.primary {
-			background: var(--color-primary);
-			color: var(--color-primary-text);
+
+		.button, button {
+			box-sizing: border-box;
+			display: inline-block;
+			display: flex;
+			height: 36px;
+			padding: 9px;
+			align-items: center;
+			justify-content: center;
+			margin-left: 7px;
+
+			&.symbol {
+				width: 36px;
+			}
+
+			&.primary {
+				background: var(--color-primary);
+				color: var(--color-primary-text);
+			}
+		}
+
+		.breadcrumb {
+			flex-grow: 1;
+			overflow: hidden;
+			min-width: 35px;
+			// div.crumb:last-child {
+			//     flex-shrink: 1;
+			//     overflow: hidden;
+			//     > span {
+			//         flex-shrink: 1;
+			//         text-overflow: ellipsis;
+			//     }
+			// }
 		}
 	}
-
-    .breadcrumb {
-		flex-grow: 1;
-        overflow: hidden;
-        min-width: 35px;
-        // div.crumb:last-child {
-        //     flex-shrink: 1;
-        //     overflow: hidden;
-        //     > span {
-        //         flex-shrink: 1;
-        //         text-overflow: ellipsis;
-        //     }
-        // }
-    }
-}
 </style>

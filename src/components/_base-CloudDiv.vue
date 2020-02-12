@@ -23,50 +23,51 @@
 /* global Vue, oc_userconfig */
 <template>
 	<div class="cloud">
-		<span v-if="options.expired" class="expired">
+		<span class="expired" v-if="options.expired">
 			{{ t('forms', 'Expired') }}
 		</span>
-		<span v-if="options.expiration" class="open">
+		<span class="open" v-if="options.expiration">
 			{{ t('forms', 'Expires %n', 1, expirationdate) }}
 		</span>
-		<span v-else class="open">
+		<span class="open" v-else>
 			{{ t('forms', 'Expires never') }}
 		</span>
 
 		<span class="information">
 			{{ options.access }}
 		</span>
-		<span v-if="options.isAnonymous" class="information">
+		<span class="information" v-if="options.isAnonymous">
 			{{ t('forms', 'Anonymous form') }}
 		</span>
-		<span v-if="options.fullAnonymous" class="information">
+		<span class="information" v-if="options.fullAnonymous">
 			{{ t('forms', 'Usernames hidden to Owner') }}
 		</span>
-		<span v-if="options.isAnonymous & !options.fullAnonymous" class="information">
+		<span class="information"
+			  v-if="options.isAnonymous & !options.fullAnonymous">
 			{{ t('forms', 'Usernames visible to Owner') }}
 		</span>
 	</div>
 </template>
 
 <script>
-import moment from 'moment'
+	import moment from 'moment'
 
-export default {
-	props: {
-		options: {
-			type: Object,
-			default: undefined
-		}
+	export default {
+		props: {
+			options: {
+				type: Object,
+				default: undefined
+			}
 
-	},
+		},
 
-	computed: {
-		expirationdate() {
-			var date = moment(this.options.expirationDate, moment.localeData().longDateFormat('L')).fromNow()
-			return date
+		computed: {
+			expirationdate() {
+				var date = moment(this.options.expirationDate, moment.localeData().longDateFormat('L')).fromNow()
+				return date
+			}
 		}
 	}
-}
 </script>
 
 <style scoped>

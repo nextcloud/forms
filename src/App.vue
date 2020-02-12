@@ -22,24 +22,24 @@
 
 <template>
 	<div id="app-forms">
-		<router-view />
+		<router-view/>
 	</div>
 </template>
 
 <script>
-export default {
-	name: 'App'
-}
+	export default {
+		name: 'App'
+	}
 </script>
 
 <style lang="scss">
-#app-forms {
-	width: 100%;
-	display: flex;
-}
+	#app-forms {
+		width: 100%;
+		display: flex;
+	}
 
-#app-content {
-	width: 100%;
-	display: flex;
-}
+	#app-content {
+		width: 100%;
+		display: flex;
+	}
 </style>

@@ -14,4 +14,4 @@ tools:
 build:
   tests:
     override:
-      -  jshint-run --config js/.jshintrc
+      - jshint-run --config js/.jshintrc

@@ -25,136 +25,136 @@
 	<div id="app-content">
 		<controls>
 			<router-link :to="{ name: 'create'}" class="button">
-				<span class="symbol icon-add" />
+				<span class="symbol icon-add"/>
 				<span class="hidden-visually">
 					{{ t('forms', 'New') }}
 				</span>
 			</router-link>
 		</controls>
-		<div v-if="noForms" class="">
-			<div class="icon-forms" />
+		<div class="" v-if="noForms">
+			<div class="icon-forms"/>
 			<h2> {{ t('No existing forms.') }} </h2>
 			<router-link :to="{ name: 'create'}" class="button new">
 				<span>{{ t('forms', 'Click here to add a form') }}</span>
 			</router-link>
 		</div>
 		<transition-group
-			v-if="!noForms"
+			class="table"
 			name="list"
 			tag="div"
-			class="table"
+			v-if="!noForms"
 		>
 			<form-list-item
-				key="0"
 				:header="true"
+				key="0"
 			/>
 			<li
-				is="form-list-item"
-				v-for="(form, index) in forms"
-				:key="form.id"
 				:form="form"
+				:key="form.id"
 				@deleteForm="removeForm(index, form.event)"
 				@viewResults="viewFormResults(index, form.event, 'results')"
+				is="form-list-item"
+				v-for="(form, index) in forms"
 			/>
 		</transition-group>
-		<loading-overlay v-if="loading" />
-		<modal-dialog />
+		<loading-overlay v-if="loading"/>
+		<modal-dialog/>
 	</div>
 </template>
 
 <script>
 
-import formListItem from '../components/formListItem.vue'
-import axios from 'nextcloud-axios'
+	import formListItem from '../components/formListItem.vue'
+	import axios from 'nextcloud-axios'
 
-export default {
-	name: 'List',
+	export default {
+		name: 'List',
 
-	components: {
-		formListItem
-	},
-
-	data() {
-		return {
-			noForms: false,
-			loading: true,
-			forms: []
-		}
-	},
-
-	created() {
-		this.indexPage = OC.generateUrl('apps/forms/')
-		this.loadForms()
-	},
-
-	methods: {
-		loadForms() {
-			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/forms'))
-				.then((response) => {
-					this.forms = response.data
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.loading = false
-				})
+		components: {
+			formListItem
 		},
-		helpPage() {
-			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
-		},
-		viewFormResults(index, event, name) {
-			this.$router.push({
-				name: name,
-				params: {
-					hash: event.id
-				}
-			})
-		},
-		removeForm(index, event) {
-			const params = {
-				title: t('forms', 'Delete form'),
-				text: t('forms', 'Do you want to delete "%n"?', 1, event.title),
-				buttonHideText: t('forms', 'No, keep form.'),
-				buttonConfirmText: t('forms', 'Yes, delete form.'),
-				onConfirm: () => {
-					// this.deleteForm(index, event)
-					axios.delete(OC.generateUrl('apps/forms/forms/{id}', { id: event.id }))
-						.then((response) => {
-							this.forms.splice(index, 1)
-							OC.Notification.showTemporary(t('forms', 'Form "%n" deleted', 1, event.title))
-						}, (error) => {
-							OC.Notification.showTemporary(t('forms', 'Error while deleting Form "%n"', 1, event.title))
-							/* eslint-disable-next-line no-console */
-							console.log(error.response)
-						}
-						)
-				}
+
+		data() {
+			return {
+				noForms: false,
+				loading: true,
+				forms: []
 			}
-			this.$modal.show(params)
-		}
+		},
 
+		created() {
+			this.indexPage = OC.generateUrl('apps/forms/')
+			this.loadForms()
+		},
+
+		methods: {
+			loadForms() {
+				this.loading = true
+				axios.get(OC.generateUrl('apps/forms/get/forms'))
+					.then((response) => {
+						this.forms = response.data
+						this.loading = false
+					}, (error) => {
+						/* eslint-disable-next-line no-console */
+						console.log(error.response)
+						this.loading = false
+					})
+			},
+			helpPage() {
+				window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
+			},
+			viewFormResults(index, event, name) {
+				this.$router.push({
+					name: name,
+					params: {
+						hash: event.id
+					}
+				})
+			},
+			removeForm(index, event) {
+				const params = {
+					title: t('forms', 'Delete form'),
+					text: t('forms', 'Do you want to delete "%n"?', 1, event.title),
+					buttonHideText: t('forms', 'No, keep form.'),
+					buttonConfirmText: t('forms', 'Yes, delete form.'),
+					onConfirm: () => {
+						// this.deleteForm(index, event)
+						axios.delete(OC.generateUrl('apps/forms/forms/{id}', { id: event.id }))
+							.then((response) => {
+									this.forms.splice(index, 1)
+									OC.Notification.showTemporary(t('forms', 'Form "%n" deleted', 1, event.title))
+								}, (error) => {
+									OC.Notification.showTemporary(t('forms', 'Error while deleting Form "%n"', 1, event.title))
+									/* eslint-disable-next-line no-console */
+									console.log(error.response)
+								}
+							)
+					}
+				}
+				this.$modal.show(params)
+			}
+
+		}
 	}
-}
 </script>
 
 <style lang="scss">
 
-.table {
-	width: 100%;
-	margin-top: 45px;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-wrap: nowrap;
-}
-
-#emptycontent {
-	.icon-forms {
-		background-color: black;
-		-webkit-mask: url('./img/app.svg') no-repeat 50% 50%;
-		mask: url('./img/app.svg') no-repeat 50% 50%;
+	.table {
+		width: 100%;
+		margin-top: 45px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		flex-wrap: nowrap;
 	}
-}
+
+	#emptycontent {
+		.icon-forms {
+			background-color: black;
+			-webkit-mask: url('./img/app.svg') no-repeat 50% 50%;
+			mask: url('./img/app.svg') no-repeat 50% 50%;
+		}
+	}
 
 </style>

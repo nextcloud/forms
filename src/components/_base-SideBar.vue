@@ -22,18 +22,19 @@
 
 <template>
 	<div class="forms-sidebar">
-		<slot />
+		<slot/>
 	</div>
 </template>
 
 <style lang="scss">
-.forms-sidebar {
-    min-width: 300px;
-    border-left: 1px solid var(--color-border);
-    z-index: 500;
-    > ul,
-    > div {
-        padding: 8px;
-    }
-}
+	.forms-sidebar {
+		min-width: 300px;
+		border-left: 1px solid var(--color-border);
+		z-index: 500;
+
+		> ul,
+		> div {
+			padding: 8px;
+		}
+	}
 </style>

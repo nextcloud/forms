@@ -24,20 +24,21 @@
 	<li>
 		<div>{{ option.text }}</div>
 		<div>
-			<a class="icon icon-delete svg delete-form" @click="$emit('remove')" />
+			<a @click="$emit('remove')"
+			   class="icon icon-delete svg delete-form"/>
 		</div>
 	</li>
 </template>
 
 <script>
-export default {
-	props: {
-		option: {
-			type: Object,
-			default: undefined
-		}
+	export default {
+		props: {
+			option: {
+				type: Object,
+				default: undefined
+			}
 
+		}
 	}
-}
 
 </script>

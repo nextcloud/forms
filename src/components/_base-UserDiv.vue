@@ -23,107 +23,108 @@
 /* global Vue, oc_userconfig */
 <template>
 	<div :class="type" class="user-row">
-		<div v-if="description" class="description">
+		<div class="description" v-if="description">
 			{{ description }}
 		</div>
-		<Avatar :user="userId" :display-name="computedDisplayName" :is-no-user="isNoUser" />
-		<div v-if="!hideNames" class="user-name">
+		<Avatar :display-name="computedDisplayName" :is-no-user="isNoUser"
+				:user="userId"/>
+		<div class="user-name" v-if="!hideNames">
 			{{ computedDisplayName }}
 		</div>
 	</div>
 </template>
 
 <script>
-import { Avatar } from 'nextcloud-vue'
+	import { Avatar } from 'nextcloud-vue'
 
-export default {
-	components: {
-		Avatar
-	},
-	props: {
-		hideNames: {
-			type: Boolean,
-			default: false
+	export default {
+		components: {
+			Avatar
 		},
-		userId: {
-			type: String,
-			default: undefined
-		},
-		displayName: {
-			type: String,
-			default: ''
-		},
-		size: {
-			type: Number,
-			default: 32
-		},
-		type: {
-			type: String,
-			default: 'user'
-		},
-		description: {
-			type: String,
-			default: ''
-		}
+		props: {
+			hideNames: {
+				type: Boolean,
+				default: false
+			},
+			userId: {
+				type: String,
+				default: undefined
+			},
+			displayName: {
+				type: String,
+				default: ''
+			},
+			size: {
+				type: Number,
+				default: 32
+			},
+			type: {
+				type: String,
+				default: 'user'
+			},
+			description: {
+				type: String,
+				default: ''
+			}
 
-	},
-
-	data() {
-		return {
-			nothidden: false
-		}
-	},
-
-	computed: {
-		isNoUser() {
-			return this.type !== 'user'
 		},
-		computedDisplayName() {
-			var value = this.displayName
 
-			if (this.userId === OC.getCurrentUser().uid) {
-				value = OC.getCurrentUser().displayName
-			} else {
-				if (!this.displayName) {
-					value = this.userId
+		data() {
+			return {
+				nothidden: false
+			}
+		},
+
+		computed: {
+			isNoUser() {
+				return this.type !== 'user'
+			},
+			computedDisplayName() {
+				var value = this.displayName
+
+				if (this.userId === OC.getCurrentUser().uid) {
+					value = OC.getCurrentUser().displayName
+				} else {
+					if (!this.displayName) {
+						value = this.userId
+					}
 				}
+				if (this.type === 'group') {
+					value = value + ' (' + t('forms', 'Group') + ')'
+				}
+				return value
 			}
-			if (this.type === 'group') {
-				value = value + ' (' + t('forms', 'Group') + ')'
-			}
-			return value
-		}
 
+		}
 	}
-}
 </script>
 
 <style lang="scss">
-.user-row {
-    display: flex;
-    flex-grow: 0;
-    align-items: center;
-    margin-left: 0;
-    margin-top: 0;
+	.user-row {
+		display: flex;
+		flex-grow: 0;
+		align-items: center;
+		margin-left: 0;
+		margin-top: 0;
 
-    > div {
-        margin: 2px 4px;
-    }
+		> div {
+			margin: 2px 4px;
+		}
 
-    .description {
-        opacity: 0.7;
-        flex-grow: 0;
-    }
+		.description {
+			opacity: 0.7;
+			flex-grow: 0;
+		}
 
-    .avatar {
-        height: 32px;
-        width: 32px;
-        flex-grow: 0;
-    }
+		.avatar {
+			height: 32px;
+			width: 32px;
+			flex-grow: 0;
+		}
 
-    .user-name {
-        opacity: 0.5;
-        flex-grow: 1;
-    }
-}
+		.user-name {
+			opacity: 0.5;
+			flex-grow: 1;
+		}
+	}
 </style>

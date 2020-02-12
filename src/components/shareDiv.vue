@@ -24,39 +24,43 @@
 	<div>
 		<h2> {{ t('forms', 'Share with') }}</h2>
 
-		<Multiselect id="ajax"
-			v-model="shares"
-			:options="users"
-			:multiple="true"
-			:user-select="true"
-			:tag-width="80"
-			:clear-on-select="false"
-			:preserve-search="true"
-			:options-limit="20"
-			:loading="isLoading"
-			:internal-search="false"
-			:searchable="true"
-			:preselect-first="true"
-			:placeholder="placeholder"
-			label="displayName"
-			track-by="user"
-			@search-change="loadUsersAsync"
-			@close="updateShares"
+		<Multiselect :clear-on-select="false"
+					 :internal-search="false"
+					 :loading="isLoading"
+					 :multiple="true"
+					 :options="users"
+					 :options-limit="20"
+					 :placeholder="placeholder"
+					 :preselect-first="true"
+					 :preserve-search="true"
+					 :searchable="true"
+					 :tag-width="80"
+					 :user-select="true"
+					 @close="updateShares"
+					 @search-change="loadUsersAsync"
+					 id="ajax"
+					 label="displayName"
+					 track-by="user"
+					 v-model="shares"
 		>
 			<template slot="selection" slot-scope="{ values, search, isOpen }">
-				<span v-if="values.length &amp;&amp; !isOpen" class="multiselect__single">
+				<span class="multiselect__single"
+					  v-if="values.length &amp;&amp; !isOpen">
 					{{ values.length }} users selected
 				</span>
 			</template>
 		</Multiselect>
 
-		<TransitionGroup :css="false" tag="ul" class="shared-list">
-			<li v-for="(item, index) in sortedShares" :key="item.displayName" :data-index="index">
-				<UserDiv :user-id="item.user" :display-name="item.displayName" :type="item.type"
-					:hide-names="hideNames"
+		<TransitionGroup :css="false" class="shared-list" tag="ul">
+			<li :data-index="index" :key="item.displayName"
+				v-for="(item, index) in sortedShares">
+				<UserDiv :display-name="item.displayName" :hide-names="hideNames"
+						 :type="item.type"
+						 :user-id="item.user"
 				/>
 				<div class="options">
-					<a class="icon icon-delete svg delete-form" @click="removeShare(index, item)" />
+					<a @click="removeShare(index, item)"
+					   class="icon icon-delete svg delete-form"/>
 				</div>
 			</li>
 		</TransitionGroup>
@@ -64,88 +68,88 @@
 </template>
 
 <script>
-import { Multiselect } from 'nextcloud-vue'
-import axios from 'nextcloud-axios'
+	import { Multiselect } from 'nextcloud-vue'
+	import axios from 'nextcloud-axios'
 
-export default {
-	components: {
-		Multiselect
-	},
-
-	props: {
-		placeholder: {
-			type: String,
-			default: ''
+	export default {
+		components: {
+			Multiselect
 		},
 
-		activeShares: {
-			type: Array,
-			default: function() {
-				return []
+		props: {
+			placeholder: {
+				type: String,
+				default: ''
+			},
+
+			activeShares: {
+				type: Array,
+				default: function() {
+					return []
+				}
+			},
+
+			hideNames: {
+				type: Boolean,
+				default: false
 			}
 		},
 
-		hideNames: {
-			type: Boolean,
-			default: false
-		}
-	},
-
-	data() {
-		return {
-			shares: [],
-			users: [],
-			isLoading: false,
-			siteUsersListOptions: {
-				getUsers: true,
-				getGroups: true,
-				query: ''
+		data() {
+			return {
+				shares: [],
+				users: [],
+				isLoading: false,
+				siteUsersListOptions: {
+					getUsers: true,
+					getGroups: true,
+					query: ''
+				}
 			}
-		}
-	},
-
-	computed: {
-		sortedShares() {
-			return this.shares.slice(0).sort(this.sortByDisplayname)
-		}
-	},
-
-	watch: {
-		activeShares(value) {
-			this.shares = value.slice(0)
-		}
-	},
-
-	methods: {
-		removeShare(index, item) {
-			this.$emit('remove-share', item)
 		},
 
-		updateShares() {
-			this.$emit('update-shares', this.shares)
+		computed: {
+			sortedShares() {
+				return this.shares.slice(0).sort(this.sortByDisplayname)
+			}
 		},
 
-		loadUsersAsync(query) {
-			this.isLoading = false
-			this.siteUsersListOptions.query = query
-			axios.post(OC.generateUrl('apps/forms/get/siteusers'), this.siteUsersListOptions)
-				.then((response) => {
-					this.users = response.data.siteusers
-					this.isLoading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-				})
+		watch: {
+			activeShares(value) {
+				this.shares = value.slice(0)
+			}
 		},
 
-		sortByDisplayname(a, b) {
-			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
-			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
-			return 0
+		methods: {
+			removeShare(index, item) {
+				this.$emit('remove-share', item)
+			},
+
+			updateShares() {
+				this.$emit('update-shares', this.shares)
+			},
+
+			loadUsersAsync(query) {
+				this.isLoading = false
+				this.siteUsersListOptions.query = query
+				axios.post(OC.generateUrl('apps/forms/get/siteusers'), this.siteUsersListOptions)
+					.then((response) => {
+						this.users = response.data.siteusers
+						this.isLoading = false
+					}, (error) => {
+						/* eslint-disable-next-line no-console */
+						console.log(error.response)
+					})
+			},
+
+			sortByDisplayname(a, b) {
+				if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
+				if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
+				return 0
+			}
+
 		}
-
 	}
-}
 </script>
 
 <style lang="scss">

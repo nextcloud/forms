@@ -12,6 +12,7 @@ $user-column-width: 265px;
 	border-left: 1px solid var(--color-border);
 	transition: margin-right 300ms;
 	z-index: 500;
+
 	> div,
 	> ul {
 		padding: 8px;
@@ -20,13 +21,16 @@ $user-column-width: 265px;
 
 .authorRow {
 	align-items: center;
+
 	.author {
 		margin-left: 8px;
 		opacity: 0.5;
 		flex-grow: 1;
+
 		&.external {
 			margin-right: 33px;
 			opacity: 1;
+
 			> input {
 				width: 100%;
 			}
@@ -36,6 +40,7 @@ $user-column-width: 265px;
 
 .detailsView {
 	z-index: 1000 !important;
+
 	.close.flex-row {
 		justify-content: flex-end;
 		margin: 8px 8px 0 0;
@@ -74,17 +79,21 @@ $user-column-width: 265px;
 				text-shadow: 1px 1px var(--color-box-shadow);
 				background-color: var(--color-loading-light);
 			}
+
 			.open {
 				background-color: $fg-yes;
 			}
+
 			.expired {
 				background-color: $fg-no;
 			}
+
 			.information {
 				background-color: $bg-information;
 			}
 		}
 	}
+
 	#expired_info {
 		margin: 0 15px;
 	}
@@ -138,12 +147,14 @@ $user-column-width: 265px;
 				flex: 1 1 0;
 				z-index: 100;
 			}
+
 			a,
 			.app-navigation-entry-deleted {
 				padding-left: 44px !important;
 			}
 		}
 	}
+
 	#configurationsTabView {
 		.configBox {
 			padding: 8px 8px;
@@ -160,16 +171,19 @@ $user-column-width: 265px;
 			input.hasDatepicker {
 				margin-left: 17px;
 			}
+
 			&.oneline {
 				width: 100%;
 			}
 		}
 	}
+
 	#commentsTabView {
 		.newCommentForm div.message:empty:before {
 			content: attr(data-placeholder);
 			color: grey;
 		}
+
 		#commentBox {
 			border: 1px solid var(--color-border-dark);
 			border-radius: var(--border-radius);
@@ -177,6 +191,7 @@ $user-column-width: 265px;
 			margin: 3px 3px 3px 40px;
 			cursor: text;
 		}
+
 		.comment {
 			margin-bottom: 30px;
 

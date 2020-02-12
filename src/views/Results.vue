@@ -25,166 +25,166 @@
 <template>
 	<div>
 		<div>
-			<button class="button btn primary" @click="download">
-				<span>{{ "Export to CSV" }}</span>
+			<button @click="download" class="button btn primary">
+				<span>{{ 'Export to CSV' }}</span>
 			</button>
 		</div>
-		<h1>{{ "Statistics" }}</h1>
-		<div v-for="sum in stats" :key="sum">
+		<h1>{{ 'Statistics' }}</h1>
+		<div :key="sum" v-for="sum in stats">
 			{{ sum }}
 		</div>
 		<div id="app-content">
 			<transition-group
+				class="table"
 				name="list"
 				tag="div"
-				class="table"
 			>
 				<resultItem
-					key="0"
 					:header="true"
+					key="0"
 				/>
 				<li
-					is="resultItem"
-					v-for="(vote, index) in votes"
 					:key="vote.id"
 					:vote="vote"
 					@viewResults="viewFormResults(index, form.event, 'results')"
+					is="resultItem"
+					v-for="(vote, index) in votes"
 				/>
 			</transition-group>
-			<loading-overlay v-if="loading" />
-			<modal-dialog />
+			<loading-overlay v-if="loading"/>
+			<modal-dialog/>
 		</div>
 	</div>
 </template>
 
 <script>
-// import moment from 'moment'
-// import lodash from 'lodash'
-import resultItem from '../components/resultItem.vue'
-import json2csvParser from 'json2csv'
-import axios from 'nextcloud-axios'
+	// import moment from 'moment'
+	// import lodash from 'lodash'
+	import resultItem from '../components/resultItem.vue'
+	import json2csvParser from 'json2csv'
+	import axios from 'nextcloud-axios'
 
-export default {
-	name: 'Results',
+	export default {
+		name: 'Results',
 
-	components: {
-		resultItem
-	},
+		components: {
+			resultItem
+		},
 
-	data() {
-		return {
-			loading: true,
-			votes: []
+		data() {
+			return {
+				loading: true,
+				votes: []
 
-		}
-	},
-
-	computed: {
-		stats() {
-
-			if (this.votes != null) {
-				var uniqueAns = []
-				var uniqueQs = []
-				var ansToQ = new Map()
-				for (let i = 0; i < this.votes.length; i++) {
-					if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
-						if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
-							uniqueAns.push(this.votes[i].voteAnswer)
-							ansToQ.set(this.votes[i].voteAnswer, this.votes[i].voteOptionId)
-						}
-						if (uniqueQs.includes(this.votes[i].voteOptionId) === false) {
-							uniqueQs.push(this.votes[i].voteOptionId)
-						}
-					}
-				}
-				var sums = []
-				for (let i = 0; i < uniqueAns.length; i++) {
-					sums[i] = 0
-				}
-				for (let i = 0; i < this.votes.length; i++) {
-					sums[uniqueAns.indexOf(this.votes[i].voteAnswer)]++
-				}
-				for (let i = 0; i < sums.length; i++) {
-					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
-				}
 			}
-			return sums.sort()
-		}
-	},
+		},
 
-	created() {
-		this.indexPage = OC.generateUrl('apps/forms/')
-		this.loadForms()
-	},
+		computed: {
+			stats() {
 
-	methods: {
-		loadForms() {
-			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/votes/' + this.$route.params.hash))
-				.then((response) => {
-					if (response.data == null) {
-						this.votes = null
-						OC.Notification.showTemporary('Access Denied')
-					} else {
-						this.votes = response.data
+				if (this.votes != null) {
+					var uniqueAns = []
+					var uniqueQs = []
+					var ansToQ = new Map()
+					for (let i = 0; i < this.votes.length; i++) {
+						if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
+							if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
+								uniqueAns.push(this.votes[i].voteAnswer)
+								ansToQ.set(this.votes[i].voteAnswer, this.votes[i].voteOptionId)
+							}
+							if (uniqueQs.includes(this.votes[i].voteOptionId) === false) {
+								uniqueQs.push(this.votes[i].voteOptionId)
+							}
+						}
 					}
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.loading = false
-				})
-		},
-		viewFormResults(index, event, name) {
-			this.$router.push({
-				name: name,
-				params: {
-					hash: event.id
+					var sums = []
+					for (let i = 0; i < uniqueAns.length; i++) {
+						sums[i] = 0
+					}
+					for (let i = 0; i < this.votes.length; i++) {
+						sums[uniqueAns.indexOf(this.votes[i].voteAnswer)]++
+					}
+					for (let i = 0; i < sums.length; i++) {
+						sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
+					}
 				}
-			})
+				return sums.sort()
+			}
 		},
-		download() {
 
-			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
-				.then((response) => {
-					this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
-					var element = document.createElement('a')
-					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(this.votes)))
-					element.setAttribute('download', response.data.title + '.csv')
+		created() {
+			this.indexPage = OC.generateUrl('apps/forms/')
+			this.loadForms()
+		},
 
-					element.style.display = 'none'
-					document.body.appendChild(element)
-					element.click()
-					document.body.removeChild(element)
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.loading = false
+		methods: {
+			loadForms() {
+				this.loading = true
+				axios.get(OC.generateUrl('apps/forms/get/votes/' + this.$route.params.hash))
+					.then((response) => {
+						if (response.data == null) {
+							this.votes = null
+							OC.Notification.showTemporary('Access Denied')
+						} else {
+							this.votes = response.data
+						}
+						this.loading = false
+					}, (error) => {
+						/* eslint-disable-next-line no-console */
+						console.log(error.response)
+						this.loading = false
+					})
+			},
+			viewFormResults(index, event, name) {
+				this.$router.push({
+					name: name,
+					params: {
+						hash: event.id
+					}
 				})
+			},
+			download() {
+
+				this.loading = true
+				axios.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
+					.then((response) => {
+						this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
+						var element = document.createElement('a')
+						element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(this.votes)))
+						element.setAttribute('download', response.data.title + '.csv')
+
+						element.style.display = 'none'
+						document.body.appendChild(element)
+						element.click()
+						document.body.removeChild(element)
+						this.loading = false
+					}, (error) => {
+						/* eslint-disable-next-line no-console */
+						console.log(error.response)
+						this.loading = false
+					})
+			}
 		}
 	}
-}
 </script>
 
 <style lang="scss">
 
-.table {
-	width: 100%;
-	margin-top: 45px;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-wrap: nowrap;
-}
-
-#emptycontent {
-	.icon-forms {
-		background-color: black;
-		-webkit-mask: url('./img/app.svg') no-repeat 50% 50%;
-		mask: url('./img/app.svg') no-repeat 50% 50%;
+	.table {
+		width: 100%;
+		margin-top: 45px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		flex-wrap: nowrap;
 	}
-}
+
+	#emptycontent {
+		.icon-forms {
+			background-color: black;
+			-webkit-mask: url('./img/app.svg') no-repeat 50% 50%;
+			mask: url('./img/app.svg') no-repeat 50% 50%;
+		}
+	}
 
 </style>

@@ -24,29 +24,29 @@
 	<li>
 		<div>{{ option.timestamp | localFullDate }}</div>
 		<div>
-			<a class="icon-delete" @click="$emit('remove')" />
+			<a @click="$emit('remove')" class="icon-delete"/>
 		</div>
 	</li>
 </template>
 
 <script>
-import moment from 'moment'
+	import moment from 'moment'
 
-export default {
-	filters: {
-		localFullDate(timestamp) {
-			if (!timestamp) return ''
-			if (!moment(timestamp).isValid()) return 'Invalid Date'
-			if (timestamp < 999999999999) timestamp = timestamp * 1000
-			return moment(timestamp).format('llll')
-		}
-	},
-	props: {
-		option: {
-			type: Object,
-			default: undefined
-		}
+	export default {
+		filters: {
+			localFullDate(timestamp) {
+				if (!timestamp) return ''
+				if (!moment(timestamp).isValid()) return 'Invalid Date'
+				if (timestamp < 999999999999) timestamp = timestamp * 1000
+				return moment(timestamp).format('llll')
+			}
+		},
+		props: {
+			option: {
+				type: Object,
+				default: undefined
+			}
 
+		}
 	}
-}
 </script>

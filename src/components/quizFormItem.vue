@@ -23,63 +23,67 @@
 	<li>
 		<div>{{ question.text }}</div>
 		<div>
-			<input v-show="(question.type != 'text') && (question.type != 'comment')" v-model="newQuizAnswer" style="height:30px;"
+			<input
 				:placeholder=" t('forms', 'Add Answer')"
-				@keyup.enter="emitNewAnswer(question)"
+				@keyup.enter="emitNewAnswer(question)" style="height:30px;"
+				v-model="newQuizAnswer"
+				v-show="(question.type != 'text') && (question.type != 'comment')"
 			>
 			<transitionGroup
+				class="form-table"
 				id="form-list"
 				name="list"
 				tag="ul"
-				class="form-table"
 			>
-				<li
-					is="text-form-item"
-					v-for="(ans, index) in formQuizAnswers"
-					:key="ans.id"
-					:option="ans"
-					@remove="emitRemoveAnswer(question, index)"
-					@delete="question.answers.splice(index, 1)"
-				/>
-			</transitionGroup>
-		</div>
-		<div>
-			<a class="icon icon-delete svg delete-form" @click="$emit('remove'), $emit('delete')" />
-		</div>
+	<li
+		:key="ans.id"
+		:option="ans"
+		@delete="question.answers.splice(index, 1)"
+		@remove="emitRemoveAnswer(question, index)"
+		is="text-form-item"
+		v-for="(ans, index) in formQuizAnswers"
+	/>
+	</transitionGroup>
+	</div>
+	<div>
+		<a @click="$emit('remove'), $emit('delete')"
+		   class="icon icon-delete svg delete-form"/>
+	</div>
 	</li>
 </template>
 
 <script>
-import TextFormItem from './textFormItem.vue'
-export default {
-	components: {
-		TextFormItem
-	},
-	props: {
-		question: {
-			type: Object,
-			default: undefined,
-			answers: []
-		}
-	},
-	data() {
-		return {
-			formQuizAnswers: [],
-			nextQuizAnswerId: 1,
-			newQuizAnswer: '',
-			type: ''
-		}
-	},
+	import TextFormItem from './textFormItem.vue'
 
-	methods: {
-		emitNewAnswer(question) {
-			this.$emit('add-answer', this, question)
+	export default {
+		components: {
+			TextFormItem
+		},
+		props: {
+			question: {
+				type: Object,
+				default: undefined,
+				answers: []
+			}
+		},
+		data() {
+			return {
+				formQuizAnswers: [],
+				nextQuizAnswerId: 1,
+				newQuizAnswer: '',
+				type: ''
+			}
 		},
 
-		emitRemoveAnswer(question, id) {
-			this.$emit('remove-answer', this, question, id)
+		methods: {
+			emitNewAnswer(question) {
+				this.$emit('add-answer', this, question)
+			},
+
+			emitRemoveAnswer(question, id) {
+				this.$emit('remove-answer', this, question, id)
+			}
 		}
 	}
-}
 
 </script>
