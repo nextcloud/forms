@@ -46,7 +46,7 @@ use OCP\AppFramework\Db\Entity;
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(integer $value)
  * @method integer getUnique()
- * @method void setUnique(boolean $value)
+ * @method void setUnique(integer $value)
  */
 class Event extends Entity {
 	protected $title;
@@ -66,6 +66,7 @@ class Event extends Entity {
 	 */
 	public function __construct() {
 		$this->addType('isAnonymous', 'integer');
+		$this->addType('unique', 'integer');
 	}
 
 	public function read() {
