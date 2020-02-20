@@ -26,9 +26,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 // Dynamic loading
-const Create = () => import('./views/Create')
-const List = () => import('./views/List')
-const Results = () => import('./views/Results')
+const Create = () => import('./views/Create.vue')
+const List = () => import('./views/List.vue')
+const Results = () => import('./views/Results.vue')
 Vue.use(Router)
 
 export default new Router({
