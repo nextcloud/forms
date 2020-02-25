@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from '@nextcloud/moment'
 
 export default {
 	props: {

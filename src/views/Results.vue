@@ -62,7 +62,7 @@
 // import lodash from 'lodash'
 import resultItem from '../components/resultItem.vue'
 import json2csvParser from 'json2csv'
-import axios from 'nextcloud-axios'
+import axios from '@nextcloud/axios'
 
 export default {
 	name: 'Results',

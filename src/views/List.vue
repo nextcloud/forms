@@ -65,7 +65,7 @@
 <script>
 
 import formListItem from '../components/formListItem.vue'
-import axios from 'nextcloud-axios'
+import axios from '@nextcloud/axios'
 
 export default {
 	name: 'List',

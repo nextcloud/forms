@@ -26,7 +26,7 @@ import router from './router'
 import App from './App.vue'
 import VueClipboard from 'vue-clipboard2'
 
-import { DatetimePicker, PopoverMenu, Tooltip } from 'nextcloud-vue'
+import { DatetimePicker, PopoverMenu, Tooltip } from '@nextcloud/vue'
 
 import Modal from './plugins/plugin.js'
 import Controls from './components/_base-Controls.vue'

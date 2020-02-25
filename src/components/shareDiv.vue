@@ -64,8 +64,8 @@
 </template>
 
 <script>
-import { Multiselect } from 'nextcloud-vue'
-import axios from 'nextcloud-axios'
+import { Multiselect } from '@nextcloud/vue'
+import axios from '@nextcloud/axios'
 
 export default {
 	components: {
