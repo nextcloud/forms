@@ -12,6 +12,7 @@ const Modal = {
 		this.EventBus = new Vue()
 
 		// making our modal component global
+		// eslint-disable-next-line vue/match-component-file-name
 		Vue.component('ModalDialog', ModalDialog)
 
 		// exposing global $modal object with method show()
