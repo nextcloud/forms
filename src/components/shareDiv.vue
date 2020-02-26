@@ -41,8 +41,7 @@
 			label="displayName"
 			track-by="user"
 			@search-change="loadUsersAsync"
-			@close="updateShares"
-		>
+			@close="updateShares">
 			<template slot="selection" slot-scope="{ values, search, isOpen }">
 				<span v-if="values.length &amp;&amp; !isOpen" class="multiselect__single">
 					{{ values.length }} users selected
@@ -52,9 +51,10 @@
 
 		<TransitionGroup :css="false" tag="ul" class="shared-list">
 			<li v-for="(item, index) in sortedShares" :key="item.displayName" :data-index="index">
-				<UserDiv :user-id="item.user" :display-name="item.displayName" :type="item.type"
-					:hide-names="hideNames"
-				/>
+				<UserDiv :user-id="item.user"
+					:display-name="item.displayName"
+					:type="item.type"
+					:hide-names="hideNames" />
 				<div class="options">
 					<a class="icon icon-delete svg delete-form" @click="removeShare(index, item)" />
 				</div>
@@ -69,26 +69,26 @@ import axios from '@nextcloud/axios'
 
 export default {
 	components: {
-		Multiselect
+		Multiselect,
 	},
 
 	props: {
 		placeholder: {
 			type: String,
-			default: ''
+			default: '',
 		},
 
 		activeShares: {
 			type: Array,
 			default: function() {
 				return []
-			}
+			},
 		},
 
 		hideNames: {
 			type: Boolean,
-			default: false
-		}
+			default: false,
+		},
 	},
 
 	data() {
@@ -99,21 +99,21 @@ export default {
 			siteUsersListOptions: {
 				getUsers: true,
 				getGroups: true,
-				query: ''
-			}
+				query: '',
+			},
 		}
 	},
 
 	computed: {
 		sortedShares() {
 			return this.shares.slice(0).sort(this.sortByDisplayname)
-		}
+		},
 	},
 
 	watch: {
 		activeShares(value) {
 			this.shares = value.slice(0)
-		}
+		},
 	},
 
 	methods: {
@@ -142,9 +142,9 @@ export default {
 			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
 			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
 			return 0
-		}
+		},
 
-	}
+	},
 }
 </script>
 

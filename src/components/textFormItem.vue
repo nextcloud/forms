@@ -34,10 +34,10 @@ export default {
 	props: {
 		option: {
 			type: Object,
-			default: undefined
-		}
+			default: undefined,
+		},
 
-	}
+	},
 }
 
 </script>

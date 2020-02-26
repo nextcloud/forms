@@ -70,5 +70,5 @@ __webpack_public_path__ = OC.linkTo('forms', 'js/')
 new Vue({
 	el: '#app-forms',
 	router: router,
-	render: h => h(App)
+	render: h => h(App),
 })

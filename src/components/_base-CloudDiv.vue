@@ -55,17 +55,17 @@ export default {
 	props: {
 		options: {
 			type: Object,
-			default: undefined
-		}
+			default: undefined,
+		},
 
 	},
 
 	computed: {
 		expirationdate() {
-			var date = moment(this.options.expirationDate, moment.localeData().longDateFormat('L')).fromNow()
+			const date = moment(this.options.expirationDate, moment.localeData().longDateFormat('L')).fromNow()
 			return date
-		}
-	}
+		},
+	},
 }
 </script>
 

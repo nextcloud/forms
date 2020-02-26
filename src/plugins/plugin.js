@@ -22,9 +22,9 @@ const Modal = {
 				// if we use this.$modal.show(params) inside our original Vue instance
 				// we will emit 'show' event with parameters 'params'
 				Modal.EventBus.$emit('show', params)
-			}
+			},
 		}
-	}
+	},
 }
 
 export default Modal

@@ -78,22 +78,22 @@ export default {
 	props: {
 		header: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		form: {
 			type: Object,
-			default: undefined
+			default: undefined,
 		},
 		vote: {
 			type: Object,
-			default: undefined
-		}
+			default: undefined,
+		},
 	},
 
 	data() {
 		return {
 			openedMenu: false,
-			hostName: this.$route.query.page
+			hostName: this.$route.query.page,
 		}
 	},
 
@@ -109,8 +109,8 @@ export default {
 		},
 		questionNum() {
 			return this.vote.voteOptionId
-		}
-	}
+		},
+	},
 }
 </script>
 <style lang="scss">

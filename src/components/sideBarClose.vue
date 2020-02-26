@@ -22,9 +22,12 @@
 
 <template>
 	<div class="close flex-row">
-		<a id="closeDetails" :title="closeDetailLabel" :alt="closeDetailLabelAlt"
-			class="close icon-close has-tooltip-bottom" href="#" @:click="hideSidebar"
-		/>
+		<a id="closeDetails"
+			:title="closeDetailLabel"
+			:alt="closeDetailLabelAlt"
+			class="close icon-close has-tooltip-bottom"
+			href="#"
+			@:click="hideSidebar" />
 	</div>
 </template>
 
@@ -33,13 +36,13 @@ export default {
 	data() {
 		return {
 			closeDetailLabel: t('Close details'),
-			closeDetailLabelAlt: t('Close')
+			closeDetailLabelAlt: t('Close'),
 		}
 	},
 	methods: {
 		hideSidebar() {
 			OC.Apps.hideAppSidebar()
-		}
-	}
+		},
+	},
 }
 </script>

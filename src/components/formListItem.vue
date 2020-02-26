@@ -128,18 +128,18 @@ export default {
 	props: {
 		header: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		form: {
 			type: Object,
-			default: undefined
-		}
+			default: undefined,
+		},
 	},
 
 	data() {
 		return {
 			openedMenu: false,
-			hostName: this.$route.query.page
+			hostName: this.$route.query.page,
 		}
 
 	},
@@ -187,7 +187,7 @@ export default {
 
 		voteUrl() {
 			return OC.generateUrl('apps/forms/form/') + this.form.event.hash
-		}
+		},
 
 	},
 
@@ -219,8 +219,8 @@ export default {
 
 		viewResults() {
 			this.$emit('viewResults')
-		}
-	}
+		},
+	},
 }
 </script>
 <style lang="scss">

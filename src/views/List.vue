@@ -42,20 +42,17 @@
 			v-if="!noForms"
 			name="list"
 			tag="div"
-			class="table"
-		>
+			class="table">
 			<form-list-item
 				key="0"
-				:header="true"
-			/>
+				:header="true" />
 			<li
 				is="form-list-item"
 				v-for="(form, index) in forms"
 				:key="form.id"
 				:form="form"
 				@deleteForm="removeForm(index, form.event)"
-				@viewResults="viewFormResults(index, form.event, 'results')"
-			/>
+				@viewResults="viewFormResults(index, form.event, 'results')" />
 		</transition-group>
 		<loading-overlay v-if="loading" />
 		<modal-dialog />
@@ -71,14 +68,14 @@ export default {
 	name: 'List',
 
 	components: {
-		formListItem
+		formListItem,
 	},
 
 	data() {
 		return {
 			noForms: false,
 			loading: true,
-			forms: []
+			forms: [],
 		}
 	},
 
@@ -107,8 +104,8 @@ export default {
 			this.$router.push({
 				name: name,
 				params: {
-					hash: event.id
-				}
+					hash: event.id,
+				},
 			})
 		},
 		removeForm(index, event) {
@@ -129,12 +126,12 @@ export default {
 							console.log(error.response)
 						}
 						)
-				}
+				},
 			}
 			this.$modal.show(params)
-		}
+		},
 
-	}
+	},
 }
 </script>
 
