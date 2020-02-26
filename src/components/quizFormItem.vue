@@ -22,12 +22,17 @@
 <template>
 	<li>
 		<div>{{ question.text }}</div>
-		<div>
+		<div id="add-option">
 			<input v-show="(question.type != 'text') && (question.type != 'comment')"
 				v-model="newQuizAnswer"
-				style="height:30px;"
 				:placeholder=" t('forms', 'Add Answer')"
 				@keyup.enter="emitNewAnswer(question)">
+			<button
+				v-show="(question.type != 'text') && (question.type != 'comment')"
+				class="symbol icon-add"
+				@click="emitNewAnswer(question)" />
+		</div>
+		<div>
 			<transitionGroup
 				id="form-list"
 				name="list"
@@ -82,3 +87,18 @@ export default {
 }
 
 </script>
+
+<style lang="scss">
+
+#add-option {
+	> input {
+		height:30px;
+	}
+	> button {
+		height: 30px;
+		width: 30px;
+		margin-top: 6px;
+	}
+}
+
+</style>

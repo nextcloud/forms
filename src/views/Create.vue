@@ -663,8 +663,7 @@ textarea {
         align-items: baseline;
         padding-left: 8px;
         padding-right: 8px;
-        line-height: 24px;
-        min-height: 24px;
+        min-height: 30px;
         border-bottom: 1px solid var(--color-border);
         overflow: hidden;
         white-space: nowrap;
