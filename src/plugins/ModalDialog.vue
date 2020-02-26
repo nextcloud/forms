@@ -24,6 +24,7 @@
 import Modal from './plugin.js'
 
 export default {
+	name: 'ModalDialog',
 	data() {
 		return {
 			visible: false,

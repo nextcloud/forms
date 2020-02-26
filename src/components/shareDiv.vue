@@ -65,11 +65,13 @@
 
 <script>
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import UserDiv from './_base-UserDiv'
 import axios from '@nextcloud/axios'
 
 export default {
 	components: {
 		Multiselect,
+		UserDiv,
 	},
 
 	props: {

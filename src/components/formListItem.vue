@@ -107,7 +107,7 @@
 				</div>
 			</div>
 			<div class="owner">
-				<user-div :user-id="form.event.owner" :display-name="form.event.ownerDisplayName" />
+				<UserDiv :user-id="form.event.owner" :display-name="form.event.ownerDisplayName" />
 			</div>
 			<div class="wrapper group-2-2">
 				<div class="created ">
@@ -123,8 +123,12 @@
 
 <script>
 import moment from '@nextcloud/moment'
+import UserDiv from '../components/_base-UserDiv'
 
 export default {
+	components: {
+		UserDiv,
+	},
 	props: {
 		header: {
 			type: Boolean,

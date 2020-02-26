@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import TextFormItem from './textFormItem.vue'
+import TextFormItem from './textFormItem'
 export default {
 	components: {
 		TextFormItem,

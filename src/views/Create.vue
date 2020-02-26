@@ -27,7 +27,7 @@
 
 <template>
 	<div id="app-content">
-		<controls :intitle="title">
+		<Controls :intitle="title">
 			<template slot="after">
 				<button :disabled="writingForm" class="button btn primary" @click="writeForm(form.mode)">
 					<span>{{ saveButtonTitle }}</span>
@@ -35,7 +35,7 @@
 				</button>
 				<button class="button symbol icon-settings" @click="switchSidebar" />
 			</template>
-		</controls>
+		</Controls>
 
 		<div class="workbench">
 			<div>
@@ -48,7 +48,7 @@
 					type="text">
 
 				<label>{{ t('forms', 'Description') }}</label>
-				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; 	width: 100%;" />
+				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; width: 100%;" />
 			</div>
 
 			<div>
@@ -90,7 +90,7 @@
 			</div>
 		</div>
 
-		<side-bar v-if="sidebar">
+		<SideBar v-if="sidebar">
 			<div v-if="adminMode" class="warning">
 				{{ t('forms', 'You are editing in admin mode') }}
 			</div>
@@ -149,7 +149,7 @@
 						{{ t('forms', 'Expires') }}
 					</label>
 
-					<DatePicker v-show="form.event.expiration"
+					<DatetimePicker v-show="form.event.expiration"
 						v-model="form.event.expirationDate"
 						v-bind="expirationDatePicker"
 						:disabled="protect"
@@ -194,26 +194,39 @@
 				</div>
 			</div>
 
-			<share-div	v-show="form.event.access === 'select'"
+			<ShareDiv v-show="form.event.access === 'select'"
 				:active-shares="form.shares"
 				:placeholder="t('forms', 'Name of user or group')"
 				:hide-names="true"
 				@update-shares="updateShares"
 				@remove-share="removeShare" />
-		</side-bar>
-		<loading-overlay v-if="loadingForm" />
+		</SideBar>
+		<LoadingOverlay v-if="loadingForm" />
 	</div>
 </template>
 
 <script>
-import moment from '@nextcloud/moment'
-import QuizFormItem from '../components/quizFormItem.vue'
 import axios from '@nextcloud/axios'
+import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
+import moment from '@nextcloud/moment'
+
+import Controls from '../components/_base-Controls'
+import LoadingOverlay from '../components/_base-LoadingOverlay'
+import QuizFormItem from '../components/quizFormItem'
+import ShareDiv from '../components/shareDiv'
+import SideBar from '../components/_base-SideBar'
+import UserDiv from '../components/_base-UserDiv'
 
 export default {
 	name: 'Create',
 	components: {
+		Controls,
+		DatetimePicker,
+		LoadingOverlay,
 		QuizFormItem,
+		ShareDiv,
+		SideBar,
+		UserDiv,
 	},
 
 	data() {

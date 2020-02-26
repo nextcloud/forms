@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 // we need our modal component
-import ModalDialog from './modalDialog.vue'
+import ModalDialog from './ModalDialog'
 
 const Modal = {
 	// every plugin for Vue.js needs install method
@@ -12,7 +12,7 @@ const Modal = {
 		this.EventBus = new Vue()
 
 		// making our modal component global
-		Vue.component('modal-dialog', ModalDialog)
+		Vue.component('ModalDialog', ModalDialog)
 
 		// exposing global $modal object with method show()
 		// method show() takes object params as argument
