@@ -107,7 +107,7 @@
 				</div>
 			</div>
 			<div class="owner">
-				<user-div :user-id="form.event.owner" :display-name="form.event.ownerDisplayName" />
+				<UserDiv :user-id="form.event.owner" :display-name="form.event.ownerDisplayName" />
 			</div>
 			<div class="wrapper group-2-2">
 				<div class="created ">
@@ -122,24 +122,28 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from '@nextcloud/moment'
+import UserDiv from '../components/_base-UserDiv'
 
 export default {
+	components: {
+		UserDiv,
+	},
 	props: {
 		header: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		form: {
 			type: Object,
-			default: undefined
-		}
+			default: undefined,
+		},
 	},
 
 	data() {
 		return {
 			openedMenu: false,
-			hostName: this.$route.query.page
+			hostName: this.$route.query.page,
 		}
 
 	},
@@ -187,7 +191,7 @@ export default {
 
 		voteUrl() {
 			return OC.generateUrl('apps/forms/form/') + this.form.event.hash
-		}
+		},
 
 	},
 
@@ -219,8 +223,8 @@ export default {
 
 		viewResults() {
 			this.$emit('viewResults')
-		}
-	}
+		},
+	},
 }
 </script>
 <style lang="scss">

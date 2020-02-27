@@ -37,55 +37,53 @@
 			<transition-group
 				name="list"
 				tag="div"
-				class="table"
-			>
-				<resultItem
+				class="table">
+				<ResultItem
 					key="0"
-					:header="true"
-				/>
+					:header="true" />
 				<li
 					is="resultItem"
 					v-for="(vote, index) in votes"
 					:key="vote.id"
 					:vote="vote"
-					@viewResults="viewFormResults(index, form.event, 'results')"
-				/>
+					@viewResults="viewFormResults(index, form.event, 'results')" />
 			</transition-group>
-			<loading-overlay v-if="loading" />
+			<LoadingOverlay v-if="loading" />
 			<modal-dialog />
 		</div>
 	</div>
 </template>
 
 <script>
-// import moment from 'moment'
-// import lodash from 'lodash'
-import resultItem from '../components/resultItem.vue'
+import ResultItem from '../components/resultItem'
 import json2csvParser from 'json2csv'
-import axios from 'nextcloud-axios'
+import axios from '@nextcloud/axios'
+import LoadingOverlay from '../components/_base-LoadingOverlay'
 
 export default {
 	name: 'Results',
 
 	components: {
-		resultItem
+		ResultItem,
+		LoadingOverlay,
 	},
 
 	data() {
 		return {
 			loading: true,
-			votes: []
+			votes: [],
 
 		}
 	},
 
 	computed: {
 		stats() {
+			const sums = []
 
 			if (this.votes != null) {
-				var uniqueAns = []
-				var uniqueQs = []
-				var ansToQ = new Map()
+				const uniqueAns = []
+				const uniqueQs = []
+				const ansToQ = new Map()
 				for (let i = 0; i < this.votes.length; i++) {
 					if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
 						if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
@@ -97,7 +95,6 @@ export default {
 						}
 					}
 				}
-				var sums = []
 				for (let i = 0; i < uniqueAns.length; i++) {
 					sums[i] = 0
 				}
@@ -108,8 +105,9 @@ export default {
 					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
 				}
 			}
+
 			return sums.sort()
-		}
+		},
 	},
 
 	created() {
@@ -139,8 +137,8 @@ export default {
 			this.$router.push({
 				name: name,
 				params: {
-					hash: event.id
-				}
+					hash: event.id,
+				},
 			})
 		},
 		download() {
@@ -149,7 +147,7 @@ export default {
 			axios.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
 				.then((response) => {
 					this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
-					var element = document.createElement('a')
+					const element = document.createElement('a')
 					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(this.votes)))
 					element.setAttribute('download', response.data.title + '.csv')
 
@@ -163,8 +161,8 @@ export default {
 					console.log(error.response)
 					this.loading = false
 				})
-		}
-	}
+		},
+	},
 }
 </script>
 

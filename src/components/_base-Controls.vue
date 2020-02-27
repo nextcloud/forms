@@ -48,19 +48,19 @@ export default {
 	props: {
 		intitle: {
 			type: String,
-			default: undefined
-		}
+			default: undefined,
+		},
 	},
 	data() {
 		return {
-			imagePath: OC.imagePath('core', 'places/home.svg')
+			imagePath: OC.imagePath('core', 'places/home.svg'),
 		}
 	},
 	methods: {
 		helpPage() {
 			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
-		}
-	}
+		},
+	},
 }
 </script>
 

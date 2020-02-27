@@ -34,43 +34,43 @@
 </template>
 
 <script>
-import { Avatar } from 'nextcloud-vue'
+import Avatar from '@nextcloud/vue/dist/Components/Avatar'
 
 export default {
 	components: {
-		Avatar
+		Avatar,
 	},
 	props: {
 		hideNames: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		userId: {
 			type: String,
-			default: undefined
+			default: undefined,
 		},
 		displayName: {
 			type: String,
-			default: ''
+			default: '',
 		},
 		size: {
 			type: Number,
-			default: 32
+			default: 32,
 		},
 		type: {
 			type: String,
-			default: 'user'
+			default: 'user',
 		},
 		description: {
 			type: String,
-			default: ''
-		}
+			default: '',
+		},
 
 	},
 
 	data() {
 		return {
-			nothidden: false
+			nothidden: false,
 		}
 	},
 
@@ -79,7 +79,7 @@ export default {
 			return this.type !== 'user'
 		},
 		computedDisplayName() {
-			var value = this.displayName
+			let value = this.displayName
 
 			if (this.userId === OC.getCurrentUser().uid) {
 				value = OC.getCurrentUser().displayName
@@ -92,9 +92,9 @@ export default {
 				value = value + ' (' + t('forms', 'Group') + ')'
 			}
 			return value
-		}
+		},
 
-	}
+	},
 }
 </script>
 

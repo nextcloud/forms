@@ -23,24 +23,23 @@
 	<li>
 		<div>{{ question.text }}</div>
 		<div>
-			<input v-show="(question.type != 'text') && (question.type != 'comment')" v-model="newQuizAnswer" style="height:30px;"
+			<input v-show="(question.type != 'text') && (question.type != 'comment')"
+				v-model="newQuizAnswer"
+				style="height:30px;"
 				:placeholder=" t('forms', 'Add Answer')"
-				@keyup.enter="emitNewAnswer(question)"
-			>
+				@keyup.enter="emitNewAnswer(question)">
 			<transitionGroup
 				id="form-list"
 				name="list"
 				tag="ul"
-				class="form-table"
-			>
+				class="form-table">
 				<li
 					is="text-form-item"
 					v-for="(ans, index) in formQuizAnswers"
 					:key="ans.id"
 					:option="ans"
 					@remove="emitRemoveAnswer(question, index)"
-					@delete="question.answers.splice(index, 1)"
-				/>
+					@delete="question.answers.splice(index, 1)" />
 			</transitionGroup>
 		</div>
 		<div>
@@ -50,24 +49,24 @@
 </template>
 
 <script>
-import TextFormItem from './textFormItem.vue'
+import TextFormItem from './textFormItem'
 export default {
 	components: {
-		TextFormItem
+		TextFormItem,
 	},
 	props: {
 		question: {
 			type: Object,
 			default: undefined,
-			answers: []
-		}
+			answers: [],
+		},
 	},
 	data() {
 		return {
 			formQuizAnswers: [],
 			nextQuizAnswerId: 1,
 			newQuizAnswer: '',
-			type: ''
+			type: '',
 		}
 	},
 
@@ -78,8 +77,8 @@ export default {
 
 		emitRemoveAnswer(question, id) {
 			this.$emit('remove-answer', this, question, id)
-		}
-	}
+		},
+	},
 }
 
 </script>

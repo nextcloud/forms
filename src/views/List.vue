@@ -23,14 +23,14 @@
 
 <template>
 	<div id="app-content">
-		<controls>
+		<Controls>
 			<router-link :to="{ name: 'create'}" class="button">
 				<span class="symbol icon-add" />
 				<span class="hidden-visually">
 					{{ t('forms', 'New') }}
 				</span>
 			</router-link>
-		</controls>
+		</Controls>
 		<div v-if="noForms" class="">
 			<div class="icon-forms" />
 			<h2> {{ t('No existing forms.') }} </h2>
@@ -42,43 +42,44 @@
 			v-if="!noForms"
 			name="list"
 			tag="div"
-			class="table"
-		>
-			<form-list-item
+			class="table">
+			<FormListItem
 				key="0"
-				:header="true"
-			/>
+				:header="true" />
 			<li
 				is="form-list-item"
 				v-for="(form, index) in forms"
 				:key="form.id"
 				:form="form"
 				@deleteForm="removeForm(index, form.event)"
-				@viewResults="viewFormResults(index, form.event, 'results')"
-			/>
+				@viewResults="viewFormResults(index, form.event, 'results')" />
 		</transition-group>
-		<loading-overlay v-if="loading" />
+		<LoadingOverlay v-if="loading" />
 		<modal-dialog />
 	</div>
 </template>
 
 <script>
 
-import formListItem from '../components/formListItem.vue'
-import axios from 'nextcloud-axios'
+import FormListItem from '../components/formListItem'
+import Controls from '../components/_base-Controls'
+import axios from '@nextcloud/axios'
+import LoadingOverlay from '../components/_base-LoadingOverlay'
 
 export default {
 	name: 'List',
 
 	components: {
-		formListItem
+		Controls,
+		FormListItem,
+		LoadingOverlay,
 	},
 
 	data() {
 		return {
 			noForms: false,
 			loading: true,
-			forms: []
+			forms: [],
 		}
 	},
 
@@ -107,8 +108,8 @@ export default {
 			this.$router.push({
 				name: name,
 				params: {
-					hash: event.id
-				}
+					hash: event.id,
+				},
 			})
 		},
 		removeForm(index, event) {
@@ -129,12 +130,12 @@ export default {
 							console.log(error.response)
 						}
 						)
-				}
+				},
 			}
 			this.$modal.show(params)
-		}
+		},
 
-	}
+	},
 }
 </script>
 

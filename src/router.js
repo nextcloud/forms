@@ -26,9 +26,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 // Dynamic loading
-const Create = () => import('./views/Create.vue')
-const List = () => import('./views/List.vue')
-const Results = () => import('./views/Results.vue')
+const Create = () => import('./views/Create')
+const List = () => import('./views/List')
+const Results = () => import('./views/Results')
 Vue.use(Router)
 
 export default new Router({
@@ -39,42 +39,42 @@ export default new Router({
 		{
 			path: '/:index(index.php/)?apps/forms/',
 			components: {
-				default: List
+				default: List,
 			},
 			props: false,
-			name: 'list'
+			name: 'list',
 		},
 		{
 			path: '/:index(index.php/)?apps/forms/edit/:hash',
 			components: {
-				default: Create
+				default: Create,
 			},
 			props: true,
-			name: 'edit'
+			name: 'edit',
 		},
 		{
 			path: '/:index(index.php/)?apps/forms/results/:hash',
 			components: {
-				default: Results
+				default: Results,
 			},
 			props: false,
-			name: 'results'
+			name: 'results',
 		},
 		{
 			path: '/:index(index.php/)?apps/forms/clone/:hash',
 			components: {
-				default: Create
+				default: Create,
 			},
 			props: true,
-			name: 'clone'
+			name: 'clone',
 		},
 		{
 			path: '/:index(index.php/)?apps/forms/new',
 			components: {
-				default: Create
+				default: Create,
 			},
 			props: false,
-			name: 'create'
-		}
-	]
+			name: 'create',
+		},
+	],
 })

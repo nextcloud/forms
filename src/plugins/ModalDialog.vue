@@ -24,6 +24,7 @@
 import Modal from './plugin.js'
 
 export default {
+	name: 'ModalDialog',
 	data() {
 		return {
 			visible: false,
@@ -31,7 +32,7 @@ export default {
 			text: '',
 			buttonHideText: 'Close',
 			buttonConfirmText: 'OK',
-			onConfirm: {}
+			onConfirm: {},
 		}
 	},
 	beforeMount() {
@@ -66,8 +67,8 @@ export default {
 			this.buttonConfirmText = params.buttonConfirmText
 			// setting callback function
 			this.onConfirm = params.onConfirm
-		}
-	}
+		},
+	},
 }
 
 </script>

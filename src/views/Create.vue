@@ -27,7 +27,7 @@
 
 <template>
 	<div id="app-content">
-		<controls :intitle="title">
+		<Controls :intitle="title">
 			<template slot="after">
 				<button :disabled="writingForm" class="button btn primary" @click="writeForm(form.mode)">
 					<span>{{ saveButtonTitle }}</span>
@@ -35,19 +35,20 @@
 				</button>
 				<button class="button symbol icon-settings" @click="switchSidebar" />
 			</template>
-		</controls>
+		</Controls>
 
 		<div class="workbench">
 			<div>
 				<h2>{{ t('forms', 'Form description') }}</h2>
 
 				<label>{{ t('forms', 'Title') }}</label>
-				<input id="formTitle" v-model="form.event.title" :class="{ error: titleEmpty }"
-					type="text"
-				>
+				<input id="formTitle"
+					v-model="form.event.title"
+					:class="{ error: titleEmpty }"
+					type="text">
 
 				<label>{{ t('forms', 'Description') }}</label>
-				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; 	width: 100%;" />
+				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; width: 100%;" />
 			</div>
 
 			<div>
@@ -65,8 +66,7 @@
 					</select>
 					<input v-model="newQuizQuestion" :placeholder=" t('forms', 'Add Question') " @keyup.enter="addQuestion()">
 					<button id="questButton"
-						@click="addQuestion()"
-					>
+						@click="addQuestion()">
 						{{ t('forms', 'Add Question') }}
 					</button>
 				</div>
@@ -76,8 +76,7 @@
 					id="form-list"
 					name="list"
 					tag="ul"
-					class="form-table"
-				>
+					class="form-table">
 					<li
 						is="quiz-form-item"
 						v-for="(question, index) in form.options.formQuizQuestions"
@@ -86,13 +85,12 @@
 						:type="question.type"
 						@add-answer="addAnswer"
 						@remove-answer="removeAnswer"
-						@remove="form.options.formQuizQuestions.splice(index, 1)"
-					/>
+						@remove="form.options.formQuizQuestions.splice(index, 1)" />
 				</transitionGroup>
 			</div>
 		</div>
 
-		<side-bar v-if="sidebar">
+		<SideBar v-if="sidebar">
 			<div v-if="adminMode" class="warning">
 				{{ t('forms', 'You are editing in admin mode') }}
 			</div>
@@ -118,60 +116,77 @@
 						{{ t('forms', 'Form configurations') }}
 					</label>
 
-					<input id="anonymous" v-model="form.event.isAnonymous" :disabled="protect"
-						type="checkbox" class="checkbox"
-					>
+					<input id="anonymous"
+						v-model="form.event.isAnonymous"
+						:disabled="protect"
+						type="checkbox"
+						class="checkbox">
 					<label for="anonymous" class="title">
 						{{ t('forms', 'Anonymous form') }}
 					</label>
 
-					<input id="unique" v-model="form.event.unique" :disabled="form.event.access !== 'registered' || form.event.isAnonymous"
-						type="checkbox" class="checkbox"
-					>
+					<input id="unique"
+						v-model="form.event.unique"
+						:disabled="form.event.access !== 'registered' || form.event.isAnonymous"
+						type="checkbox"
+						class="checkbox">
 					<label for="unique" class="title">
 						<span>{{ t('forms', 'Only allow one submission per user') }}</span>
 					</label>
 
-					<input v-show="form.event.isAnonymous" id="trueAnonymous" v-model="form.event.fullAnonymous"
-						:disabled="protect" type="checkbox" class="checkbox"
-					>
-					<input id="expiration" v-model="form.event.expiration" :disabled="protect"
-						type="checkbox" class="checkbox"
-					>
+					<input v-show="form.event.isAnonymous"
+						id="trueAnonymous"
+						v-model="form.event.fullAnonymous"
+						:disabled="protect"
+						type="checkbox"
+						class="checkbox">
+					<input id="expiration"
+						v-model="form.event.expiration"
+						:disabled="protect"
+						type="checkbox"
+						class="checkbox">
 					<label class="title" for="expiration">
 						{{ t('forms', 'Expires') }}
 					</label>
 
-					<DatePicker v-show="form.event.expiration"
+					<DatetimePicker v-show="form.event.expiration"
 						v-model="form.event.expirationDate"
 						v-bind="expirationDatePicker"
 						:disabled="protect"
 						:time-picker-options="{ start: '00:00', step: '00:05', end: '23:55' }"
-						style="width:170px"
-					/>
+						style="width:170px" />
 				</div>
 
 				<div class="configBox">
 					<label class="title icon-user">
 						{{ t('forms', 'Access') }}
 					</label>
-					<input id="private" v-model="form.event.access" :disabled="protect"
-						type="radio" value="registered" class="radio"
-					>
+					<input id="private"
+						v-model="form.event.access"
+						:disabled="protect"
+						type="radio"
+						value="registered"
+						class="radio">
 					<label for="private" class="title">
 						<div class="title icon-group" />
 						<span>{{ t('forms', 'Registered users only') }}</span>
 					</label>
-					<input id="public" v-model="form.event.access" :disabled="protect"
-						type="radio" value="public" class="radio"
-					>
+					<input id="public"
+						v-model="form.event.access"
+						:disabled="protect"
+						type="radio"
+						value="public"
+						class="radio">
 					<label for="public" class="title">
 						<div class="title icon-link" />
 						<span>{{ t('forms', 'Public access') }}</span>
 					</label>
-					<input id="select" v-model="form.event.access" :disabled="protect"
-						type="radio" value="select" class="radio"
-					>
+					<input id="select"
+						v-model="form.event.access"
+						:disabled="protect"
+						type="radio"
+						value="select"
+						class="radio">
 					<label for="select" class="title">
 						<div class="title icon-shared" />
 						<span>{{ t('forms', 'Only shared') }}</span>
@@ -179,27 +194,39 @@
 				</div>
 			</div>
 
-			<share-div	v-show="form.event.access === 'select'"
+			<ShareDiv v-show="form.event.access === 'select'"
 				:active-shares="form.shares"
 				:placeholder="t('forms', 'Name of user or group')"
 				:hide-names="true"
 				@update-shares="updateShares"
-				@remove-share="removeShare"
-			/>
-		</side-bar>
-		<loading-overlay v-if="loadingForm" />
+				@remove-share="removeShare" />
+		</SideBar>
+		<LoadingOverlay v-if="loadingForm" />
 	</div>
 </template>
 
 <script>
-import moment from 'moment'
-import QuizFormItem from '../components/quizFormItem.vue'
-import axios from 'nextcloud-axios'
+import axios from '@nextcloud/axios'
+import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
+import moment from '@nextcloud/moment'
+
+import Controls from '../components/_base-Controls'
+import LoadingOverlay from '../components/_base-LoadingOverlay'
+import QuizFormItem from '../components/quizFormItem'
+import ShareDiv from '../components/shareDiv'
+import SideBar from '../components/_base-SideBar'
+import UserDiv from '../components/_base-UserDiv'
 
 export default {
 	name: 'Create',
 	components: {
-		QuizFormItem
+		Controls,
+		DatetimePicker,
+		LoadingOverlay,
+		QuizFormItem,
+		ShareDiv,
+		SideBar,
+		UserDiv,
 	},
 
 	data() {
@@ -207,7 +234,7 @@ export default {
 			move: {
 				step: 1,
 				unit: 'week',
-				units: ['minute', 'hour', 'day', 'week', 'month', 'year']
+				units: ['minute', 'hour', 'day', 'week', 'month', 'year'],
 			},
 			form: {
 				mode: 'create',
@@ -230,11 +257,11 @@ export default {
 					expired: false,
 					isAnonymous: false,
 					fullAnonymous: false,
-					owner: undefined
+					owner: undefined,
 				},
 				options: {
-					formQuizQuestions: []
-				}
+					formQuizQuestions: [],
+				},
 			},
 			lang: '',
 			locale: '',
@@ -260,8 +287,8 @@ export default {
 				{ text: 'Checkboxes', value: 'checkbox' },
 				{ text: 'Short Response', value: 'text' },
 				{ text: 'Long Response', value: 'comment' },
-				{ text: 'Drop Down', value: 'dropdown' }
-			]
+				{ text: 'Drop Down', value: 'dropdown' },
+			],
 		}
 	},
 
@@ -308,8 +335,8 @@ export default {
 				timePickerOptions: {
 					start: '00:00',
 					step: '00:30',
-					end: '23:30'
-				}
+					end: '23:30',
+				},
 			}
 		},
 
@@ -324,10 +351,10 @@ export default {
 				timePickerOptions: {
 					start: '00:00',
 					step: '00:30',
-					end: '23:30'
-				}
+					end: '23:30',
+				},
 			}
-		}
+		},
 
 	},
 
@@ -335,7 +362,7 @@ export default {
 		title() {
 			// only used when the title changes after page load
 			document.title = t('forms', 'Forms') + ' - ' + this.title
-		}
+		},
 	},
 
 	created() {
@@ -409,7 +436,7 @@ export default {
 						id: this.nextQuizQuestionId++,
 						text: this.newQuizQuestion,
 						type: this.selected,
-						answers: []
+						answers: [],
 					})
 				}
 				this.newQuizQuestion = ''
@@ -438,11 +465,11 @@ export default {
 				if (item.newQuizAnswer !== null & item.newQuizAnswer !== '' & (/\S/.test(item.newQuizAnswer))) {
 					item.formQuizAnswers.push({
 						id: item.nextQuizAnswerId,
-						text: item.newQuizAnswer
+						text: item.newQuizAnswer,
 					})
 					question.answers.push({
 						id: item.nextQuizAnswerId,
-						text: item.newQuizAnswer
+						text: item.newQuizAnswer,
 					})
 					item.nextQuizAnswerId++
 				}
@@ -530,8 +557,8 @@ export default {
 					this.form.event.hash = ''
 					this.loadingForm = false
 				})
-		}
-	}
+		},
+	},
 }
 </script>
 

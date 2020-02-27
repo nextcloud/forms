@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from '@nextcloud/moment'
 
 export default {
 	filters: {
@@ -39,14 +39,14 @@ export default {
 			if (!moment(timestamp).isValid()) return 'Invalid Date'
 			if (timestamp < 999999999999) timestamp = timestamp * 1000
 			return moment(timestamp).format('llll')
-		}
+		},
 	},
 	props: {
 		option: {
 			type: Object,
-			default: undefined
-		}
+			default: undefined,
+		},
 
-	}
+	},
 }
 </script>
