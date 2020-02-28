@@ -31,29 +31,13 @@ use OCP\IURLGenerator;
 
 class Application extends App {
 
+	const APP_ID = 'forms';
+
 	/**
 	 * Application constructor.
 	 * @param array $urlParams
 	 */
 	public function __construct(array $urlParams = []) {
-		parent::__construct('forms', $urlParams);
-	}
-
-	/**
-	 * Register navigation entry for main navigation.
-	 */
-	public function registerNavigationEntry(): void {
-		$container = $this->getContainer();
-		$container->query(INavigationManager::class)->add(function() use ($container) {
-			$urlGenerator = $container->query(IURLGenerator::class);
-			$l10n = $container->query(IL10N::class);
-			return [
-				'id' => 'forms',
-				'order' => 77,
-				'href' => $urlGenerator->linkToRoute('forms.page.index'),
-				'icon' => $urlGenerator->imagePath('forms', 'app.svg'),
-				'name' => $l10n->t('Forms')
-			];
-		});
+		parent::__construct(self::APP_ID, $urlParams);
 	}
 }
