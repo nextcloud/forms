@@ -1,4 +1,7 @@
-# Forms
+# Nextcloud Forms
+![Downloads](https://img.shields.io/github/downloads/nextcloud/forms/total.svg?style=flat-square)
+[![Code coverage](https://img.shields.io/codecov/c/github/nextcloud/forms.svg?style=flat-square)](https://codecov.io/gh/nextcloud/forms/)
+[![Dependabot status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg?longCache=true&style=flat-square&logo=dependabot)](https://dependabot.com)
 
 Forms allows the creation of shareable forms, with multiple question types and privacy settings.
 
