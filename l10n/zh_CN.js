@@ -2,10 +2,10 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "您确定要删除这个新表单吗？",
-    "Forms" : "表单",
     "Forms App - New Activity" : "表单应用 - 新的动态",
     "{user} participated in the form \"{title}\"" : "{user} 参与了表单 \"{title}\"",
     "Go to form" : "前往表单",
+    "Forms" : "表单",
     "A forms app, similar to Google Forms." : "一个表单应用，类似于谷歌表单。",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "一个表单应用，类似于谷歌表单，可以限制访问（成员，特定的分组/用户，和公开）",
     "Expired" : "已过期",

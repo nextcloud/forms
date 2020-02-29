@@ -1,9 +1,9 @@
 { "translations": {
     "Do you really want to delete this new form?" : "この新しいフォームを本当に削除しますか？",
-    "Forms" : "フォーム",
     "Forms App - New Activity" : "フォームアプリ - 新機能",
     "{user} participated in the form \"{title}\"" : "{user} は、フォーム \"{title}\" に参加しました",
     "Go to form" : "フォームへ移動",
+    "Forms" : "フォーム",
     "A forms app, similar to Google Forms." : "Googleフォームに似たフォームアプリ。",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Googleフォームに似たフォームアプリ。アクセスを制限することができます（メンバー、特定のグループ/ユーザー、および一般）。",
     "Expired" : "有効期限切れ",

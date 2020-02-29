@@ -1,9 +1,9 @@
 { "translations": {
     "Do you really want to delete this new form?" : "آیا واقعاً می خواهید این فرم جدید را حذف کنید؟",
-    "Forms" : "فرم‌ها",
     "Forms App - New Activity" : "فرم های برنامه - فعالیت جدید",
     "{user} participated in the form \"{title}\"" : "{user }در فرم \"{عنوان}\" شرکت کرد",
     "Go to form" : "برو به فرم",
+    "Forms" : "فرم‌ها",
     "A forms app, similar to Google Forms." : "یک برنامه فرم ، شبیه به فرم های Google.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "یک برنامه فرم ، شبیه به فرم های Google با امکان محدود کردن دسترسی (اعضا ، گروه ها / کاربران خاص و عمومی).",
     "Expired" : "منقضی شده",

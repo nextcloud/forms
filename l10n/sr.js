@@ -2,10 +2,10 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "Да ли стварно желите да обришете овај упитник?",
-    "Forms" : "Упитници",
     "Forms App - New Activity" : "Апликација Упитник - Нова Активност",
     "{user} participated in the form \"{title}\"" : "{user} је учествовао на упитнику \"{title}\"",
     "Go to form" : "Иди на упитник",
+    "Forms" : "Упитници",
     "A forms app, similar to Google Forms." : "Апликација упитника, слична као Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Апликација упитника, слична као Google Forms са могућношћу ограничавања приступа (члановима, одређеним групама, јавно).",
     "Expired" : "Истекао",

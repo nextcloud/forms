@@ -2,10 +2,10 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "Ar tikrai norite ištrinti šią naują anketą?",
-    "Forms" : "Anketos",
     "Forms App - New Activity" : "Anketų programėlė - Nauja veikla",
     "{user} participated in the form \"{title}\"" : "{user} dalyvavo anketoje, pavadinimu \"{title}\"",
     "Go to form" : "Pereiti į anketą",
+    "Forms" : "Anketos",
     "A forms app, similar to Google Forms." : "Anketų programėlė, panaši į Google formas.",
     "Expired" : "Nebegalioja",
     "Expires %n" : "Baigia galioti %n",

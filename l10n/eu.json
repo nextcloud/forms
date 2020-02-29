@@ -1,9 +1,9 @@
 { "translations": {
     "Do you really want to delete this new form?" : "Ziur zaude inprimaki berri hau ezabatu nahi duzula?",
-    "Forms" : "Inprimakiak",
     "Forms App - New Activity" : "Inprimakiak aplikazioa - Jarduera berria",
     "{user} participated in the form \"{title}\"" : "{user}(e)k parte hartzen du \"{title}\" inprimakian",
     "Go to form" : "Joan inprimakira",
+    "Forms" : "Inprimakiak",
     "A forms app, similar to Google Forms." : "Google Inprimakiak-en antzerako formulario aplikazioa.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Google Inprimakiak-en antzerako inprimaki aplikazioa. Sarbidea mugatzeko aukera ematen du: partaideak, zenbait talde/erabiltzaile, eta publikoa.",
     "Expired" : "Iraungita",

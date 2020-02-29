@@ -2,10 +2,10 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "Biztosan törölni ezt az új űrlapot?",
-    "Forms" : "Űrlapok",
     "Forms App - New Activity" : "Űrlap app - Új aktivitás",
     "{user} participated in the form \"{title}\"" : "{user} csatlakozott az űrlaphoz \"{title}\"",
     "Go to form" : "Ugrás az űrlaphoz",
+    "Forms" : "Űrlapok",
     "A forms app, similar to Google Forms." : "Az űrlapok alkalmazás hasonlít a Google űrlapokhoz.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Az űrlap alkalmazás hasonlóan a Google űrlapokhoz letetőséget nyújt hozzáférés korlátozására (tagok, bizonyos csoport/felhasználó és nyilvános).",
     "Expired" : "Lejárt",

@@ -1,9 +1,9 @@
 { "translations": {
     "Do you really want to delete this new form?" : "Quer realmente excluir este novo formulário?",
-    "Forms" : "Formulários",
     "Forms App - New Activity" : "Aplicativo de Formulários - Nova Atividade",
     "{user} participated in the form \"{title}\"" : "{user} participou no formulário \"{title}\"",
     "Go to form" : "Ir para o formulário",
+    "Forms" : "Formulários",
     "A forms app, similar to Google Forms." : "Um aplicativo de formulários, parecido com o Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Um aplicativo de formulários, parecido com Google Forms com a possibilidade de restrição de acesso (membros, certos grupos/usuários, e público).",
     "Expired" : "Expirado",

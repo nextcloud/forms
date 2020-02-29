@@ -1,9 +1,9 @@
 { "translations": {
     "Do you really want to delete this new form?" : "Действительно удалить эту форму?",
-    "Forms" : "Формы",
     "Forms App - New Activity" : "Приложение формы — новые события",
     "{user} participated in the form \"{title}\"" : "{user} принял(а) участие в форме «{title}»",
     "Go to form" : "Перейти к форме",
+    "Forms" : "Формы",
     "A forms app, similar to Google Forms." : "Приложени форм, похожее на Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Приложение форм, похожее на Google Forms с возможностью ограничения доступа.",
     "Expired" : "Закончилась",
