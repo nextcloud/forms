@@ -15,7 +15,7 @@
 	],
 	"require-dev": {
 		"christophwurst/nextcloud": "^16.0",
-		"phpunit/phpunit": "^8"
+		"phpunit/phpunit": "^9"
 	},
 	"scripts": {
 		"lint": "find . -name \\*.php -not -path './vendor/*' -exec php -l \"{}\" \\;"
