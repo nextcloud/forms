@@ -20,22 +20,22 @@
   -
   -->
 <template>
-	<li>
-		<div>{{ question.text }}</div>
-		<div id="add-option">
-			<input v-show="(question.type != 'text') && (question.type != 'comment')"
+	<li class="questionList">
+		<div id="text">
+			{{ question.text }}
+		</div>
+		<div v-show="(question.type != 'text') && (question.type != 'comment')"
+			id="add-option">
+			<input
 				v-model="newQuizAnswer"
 				:placeholder=" t('forms', 'Add Answer')"
 				@keyup.enter="emitNewAnswer(question)">
-			<button
-				v-show="(question.type != 'text') && (question.type != 'comment')"
-				class="symbol icon-add"
+			<button class="symbol icon-add"
 				@click="emitNewAnswer(question)" />
 		</div>
-		<div>
+		<div id="optionList">
 			<transitionGroup
-				id="form-list"
-				name="list"
+				name="optionList"
 				tag="ul"
 				class="form-table">
 				<li
@@ -48,7 +48,7 @@
 			</transitionGroup>
 		</div>
 		<div>
-			<a class="icon icon-delete svg delete-form" @click="$emit('remove'), $emit('delete')" />
+			<a class="icon icon-delete svg delete-icon" @click="$emit('remove'), $emit('delete')" />
 		</div>
 	</li>
 </template>
@@ -90,14 +90,48 @@ export default {
 
 <style lang="scss">
 
-#add-option {
-	> input {
-		height:30px;
+.questionList {
+	min-height: 40px;
+	flex-grow: 0;
+
+	#text {
+		margin: 8px;
+		width: 20%;
+		max-width: 300px;
+		display: block;
 	}
-	> button {
-		height: 30px;
-		width: 30px;
-		margin-top: 6px;
+
+	#add-option {
+		width: 25%;
+		max-width: 300px;
+		margin-right: 15px;
+
+		> input {
+			height:30px;
+			width: 150px;
+			flex-grow: 1;
+		}
+		> button {
+			height: 30px;
+			width: 30px;
+			margin-top: 6px;
+		}
+	}
+
+	#optionList {
+		width: 30%;
+
+		> ul {
+			width: 95%;
+
+			> li {
+				border-bottom: 0px;
+			}
+		}
+	}
+
+	.delete-icon {
+		padding-right: 40px;
 	}
 }
 

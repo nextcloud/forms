@@ -38,11 +38,11 @@
 		</Controls>
 
 		<div class="workbench">
-			<div>
+			<div id="description">
 				<h2>{{ t('forms', 'Form description') }}</h2>
 
 				<label>{{ t('forms', 'Title') }}</label>
-				<input id="formTitle"
+				<input
 					v-model="form.event.title"
 					:class="{ error: titleEmpty }"
 					type="text">
@@ -51,7 +51,7 @@
 				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; width: 100%;" />
 			</div>
 
-			<div>
+			<div id="questions">
 				<h2>{{ t('forms', 'Make a Form') }}</h2>
 				<div v-show="form.event.type === 'quizForm'" id="quiz-form-selector-text">
 					<!--shows inputs for question types: drop down box to select the type, text box for question, and button to add-->
@@ -64,7 +64,10 @@
 							{{ option.text }}
 						</option>
 					</select>
-					<input v-model="newQuizQuestion" :placeholder=" t('forms', 'Add Question') " @keyup.enter="addQuestion()">
+					<input id="add-question"
+						v-model="newQuizQuestion"
+						:placeholder=" t('forms', 'Add Question') "
+						@keyup.enter="addQuestion()">
 					<button id="questButton"
 						@click="addQuestion()">
 						{{ t('forms', 'Add Question') }}
@@ -73,8 +76,7 @@
 				<!--Transition group to list the already added questions (in the form of quizFormItems)-->
 				<transitionGroup
 					v-show="form.mode == 'create'"
-					id="form-list"
-					name="list"
+					name="questionList"
 					tag="ul"
 					class="form-table">
 					<li
@@ -594,12 +596,24 @@ input[type="text"] {
 
     > div {
         min-width: 245px;
-        max-width: 540px;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
         padding: 8px;
     }
+
+	#description {
+		width: 35%;
+		max-width: 540px;
+	}
+
+	#questions {
+		max-width: 65%;
+
+		#add-question {
+			width: 250px;
+		}
+	}
 }
 
 .forms-sidebar {

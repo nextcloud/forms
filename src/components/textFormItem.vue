@@ -24,7 +24,7 @@
 	<li>
 		<div>{{ option.text }}</div>
 		<div>
-			<a class="icon icon-delete svg delete-form" @click="$emit('remove')" />
+			<a class="icon icon-delete svg delete-icon" @click="$emit('remove')" />
 		</div>
 	</li>
 </template>
