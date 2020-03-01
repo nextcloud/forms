@@ -55,10 +55,10 @@
 				<h2>{{ t('forms', 'Make a Form') }}</h2>
 				<div v-show="form.event.type === 'quizForm'" id="quiz-form-selector-text">
 					<!--shows inputs for question types: drop down box to select the type, text box for question, and button to add-->
-					<label for="ans-type">Answer Type: </label>
+					<label for="ans-type">{{ t('forms', 'Answer Type:') }}</label>
 					<select v-model="selected">
 						<option value="" disabled>
-							Select
+							{{ t('forms', 'Select') }}
 						</option>
 						<option v-for="option in options" :key="option.value" :value="option.value">
 							{{ option.text }}
@@ -283,11 +283,11 @@ export default {
 			uniqueAns: false,
 			haveAns: false,
 			options: [
-				{ text: 'Radio Buttons', value: 'radiogroup' },
-				{ text: 'Checkboxes', value: 'checkbox' },
-				{ text: 'Short Response', value: 'text' },
-				{ text: 'Long Response', value: 'comment' },
-				{ text: 'Drop Down', value: 'dropdown' },
+				{ text: t('forms', 'Radio Buttons'), value: 'radiogroup' },
+				{ text: t('forms', 'Checkboxes'), value: 'checkbox' },
+				{ text: t('forms', 'Short Response'), value: 'text' },
+				{ text: t('forms', 'Long Response'), value: 'comment' },
+				{ text: t('forms', 'Drop Down'), value: 'dropdown' },
 			],
 		}
 	},
