@@ -47,8 +47,8 @@
 					@delete="question.answers.splice(index, 1)" />
 			</transitionGroup>
 		</div>
-		<div>
-			<a class="icon icon-delete svg delete-icon" @click="$emit('remove'), $emit('delete')" />
+		<div class="delete-icon">
+			<a class="icon icon-delete svg" @click="$emit('remove'), $emit('delete')" />
 		</div>
 	</li>
 </template>
@@ -126,13 +126,35 @@ export default {
 
 			> li {
 				border-bottom: 0px;
+
+				.delete-icon  {
+					width: 16px;
+					padding-right: 0px;
+
+					> a {
+						display:none;
+					}
+				}
+			}
+
+			> li:hover .delete-icon > a {
+				display: block;
 			}
 		}
 	}
 
 	.delete-icon {
-		padding-right: 40px;
+		display: block;
+		width: 30px;
+
+		> a {
+			display: none;
+		}
 	}
+}
+
+.questionList:hover .delete-icon > a {
+	display:block;
 }
 
 </style>
