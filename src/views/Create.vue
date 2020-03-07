@@ -48,7 +48,7 @@
 					type="text">
 
 				<label>{{ t('forms', 'Description') }}</label>
-				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; width: 100%;" />
+				<textarea id="formDescArea" v-model="form.event.description" />
 			</div>
 
 			<div id="questions">
@@ -605,6 +605,11 @@ input[type="text"] {
 	#description {
 		width: 35%;
 		max-width: 540px;
+
+		#formDescArea {
+			resize: vertical;
+			width: 100%;
+		}
 	}
 
 	#questions {
