@@ -76,7 +76,7 @@
 				<!--Transition group to list the already added questions (in the form of quizFormItems)-->
 				<transitionGroup
 					v-show="form.mode == 'create'"
-					name="questionList"
+					name="transitionList"
 					tag="ul"
 					class="form-table">
 					<li
@@ -655,17 +655,17 @@ textarea {
 }
 
 /* Transitions for inserting and removing list items */
-.list-enter-active,
-.list-leave-active {
+.transitionList-enter-active,
+.transitionList-leave-active {
     transition: all 0.5s ease;
 }
 
-.list-enter,
-.list-leave-to {
+.transitionList-enter,
+.transitionList-leave-to {
     opacity: 0;
 }
 
-.list-move {
+.transitionList-move {
     transition: transform 0.5s;
 }
 /*  */

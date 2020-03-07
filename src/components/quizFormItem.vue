@@ -35,7 +35,7 @@
 		</div>
 		<div id="optionList">
 			<transitionGroup
-				name="optionList"
+				name="transitionList"
 				tag="ul"
 				class="form-table">
 				<li

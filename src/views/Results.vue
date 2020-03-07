@@ -35,7 +35,7 @@
 		</div>
 		<div id="app-content">
 			<transition-group
-				name="list"
+				name="transitionList"
 				tag="div"
 				class="table">
 				<ResultItem

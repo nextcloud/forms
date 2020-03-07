@@ -40,7 +40,7 @@
 		</div>
 		<transition-group
 			v-if="!noForms"
-			name="list"
+			name="transitionList"
 			tag="div"
 			class="table">
 			<FormListItem
