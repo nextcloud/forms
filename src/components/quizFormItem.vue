@@ -97,8 +97,6 @@ export default {
 	#text {
 		margin: 8px;
 		width: 20%;
-		max-width: 300px;
-		display: block;
 	}
 
 	#add-option {
@@ -120,12 +118,17 @@ export default {
 
 	#optionList {
 		width: 30%;
+		display: block;
+		flex-grow: 0;
 
 		> ul {
 			width: 95%;
 
 			> li {
 				border-bottom: 0px;
+				margin-top: 8px;
+				margin-bottom: 8px;
+				min-height: 25px;
 
 				.delete-icon  {
 					width: 16px;
