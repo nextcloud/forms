@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2020-03-09
+### Changed
+- New and updated translations
+- Updated javascript dependencies
+- Github actions
+- Better CI flow
+- Moved to @nextcloud packages
+
+### Fixed
+- Perform proper CSRF checks on some endpoints
+- Database issues resolved
+
+
 ## [0.10.2] - 2019-03-13
 
   - #532 - cannot share form (only share option)
