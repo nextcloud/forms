@@ -45,10 +45,13 @@
 				<input
 					v-model="form.event.title"
 					:class="{ error: titleEmpty }"
-					type="text">
+					type="text"
+					maxlength="128">
 
 				<label>{{ t('forms', 'Description') }}</label>
-				<textarea id="formDescArea" v-model="form.event.description" />
+				<textarea id="formDescArea"
+					v-model="form.event.description"
+					maxlength="1024" />
 			</div>
 
 			<div id="questions">
