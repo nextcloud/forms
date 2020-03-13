@@ -48,7 +48,10 @@
 			</transitionGroup>
 		</div>
 		<div class="delete-icon">
-			<a class="icon icon-delete svg" @click="$emit('remove'), $emit('delete')" />
+			<a class="icon icon-delete svg"
+				tabindex="0"
+				@click="$emit('remove'), $emit('delete')"
+				@keyup.enter="$emit('remove'), $emit('delete')" />
 		</div>
 	</li>
 </template>
@@ -133,15 +136,11 @@ export default {
 				.delete-icon  {
 					width: 16px;
 					padding-right: 0px;
-
+					display: block;
 					> a {
-						display:none;
+						display: block;
 					}
 				}
-			}
-
-			> li:hover .delete-icon > a {
-				display: block;
 			}
 		}
 	}
@@ -149,15 +148,43 @@ export default {
 	.delete-icon {
 		display: block;
 		width: 30px;
-
 		> a {
-			display: none;
+			display:block;
 		}
 	}
 }
 
-.questionList:hover .delete-icon > a {
-	display:block;
+// Show Recyclebin, usable for mouse and keyboard
+.questionList .delete-icon {
+	> a {
+		background-image: none;
+	}
+}
+.questionList:focus-within, .questionList:hover {
+	.delete-icon {
+		> a {
+			background-image: var(--icon-delete-000);
+		}
+		> a:focus, a:hover {
+			background-image: var(--icon-delete-e9322d);
+		}
+	}
+	#optionList >ul>li .delete-icon {
+		> a {
+			background-image: none;
+		}
+		> a:focus, a:hover {
+			background-image: var(--icon-delete-e9322d);
+		}
+	}
+	#optionList >ul>li:hover .delete-icon {
+		> a {
+			background-image: var(--icon-delete-000);
+		}
+		> a:focus, a:hover {
+			background-image: var(--icon-delete-e9322d);
+		}
+	}
 }
 
 </style>

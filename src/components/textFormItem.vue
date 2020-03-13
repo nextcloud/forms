@@ -24,7 +24,10 @@
 	<li>
 		<div>{{ option.text }}</div>
 		<div class="delete-icon">
-			<a class="icon icon-delete svg" @click="$emit('remove')" />
+			<a class="icon icon-delete svg"
+				tabindex="0"
+				@click="$emit('remove')"
+				@keyup.enter="$emit('remove')" />
 		</div>
 	</li>
 </template>
