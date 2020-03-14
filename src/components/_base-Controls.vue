@@ -58,7 +58,7 @@ export default {
 	},
 	methods: {
 		helpPage() {
-			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
+			window.open('https://github.com/nextcloud/forms/blob/master/Forms_Support.md')
 		},
 	},
 }

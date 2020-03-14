@@ -302,6 +302,11 @@ class PageController extends Controller {
 		}
 	}
 
+	/**
+	 * @NoAdminRequired
+	 * @param int $formId
+	 * @return array
+	 */
 	public function getQuestions($formId) {
 		$questionList = array();
 		try{
@@ -319,6 +324,12 @@ class PageController extends Controller {
 		}
 	}
 
+	/**
+	 * @NoAdminRequired
+	 * @param int $formId
+	 * @param int $questionId
+	 * @return array
+	 */
 	public function getAnswers($formId, $questionId) {
 		$answerList = array();
 		try{

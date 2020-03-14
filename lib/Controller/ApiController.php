@@ -491,7 +491,6 @@ class ApiController extends Controller {
 		}
 
 		// Update options
-		$qId = 1;
 		foreach($options['formQuizQuestions'] as $questionElement){
 			$newQuestion = new Question();
 
