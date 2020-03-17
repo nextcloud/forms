@@ -20,32 +20,34 @@
   -
   -->
 <template>
-	<li class="questionList">
-		<div id="text">
-			{{ question.text }}
-		</div>
-		<div v-show="(question.type != 'text') && (question.type != 'comment')"
-			id="add-option">
-			<input
-				v-model="newQuizAnswer"
-				:placeholder=" t('forms', 'Add Answer')"
-				@keyup.enter="emitNewAnswer(question)">
-			<button class="symbol icon-add"
-				@click="emitNewAnswer(question)" />
-		</div>
-		<div id="optionList">
-			<transitionGroup
-				name="transitionList"
-				tag="ul"
-				class="form-table">
-				<li
-					is="text-form-item"
-					v-for="(ans, index) in formQuizAnswers"
-					:key="ans.id"
-					:option="ans"
-					@remove="emitRemoveAnswer(question, index)"
-					@delete="question.answers.splice(index, 1)" />
-			</transitionGroup>
+	<li id="questionList">
+		<div id="questionListData">
+			<div id="text">
+				{{ question.text }}
+			</div>
+			<div v-show="(question.type != 'text') && (question.type != 'comment')"
+				id="add-option">
+				<input
+					v-model="newQuizAnswer"
+					:placeholder=" t('forms', 'Add Answer')"
+					@keyup.enter="emitNewAnswer(question)">
+				<button class="symbol icon-add"
+					@click="emitNewAnswer(question)" />
+			</div>
+			<div id="optionList">
+				<transitionGroup
+					name="transitionList"
+					tag="ul"
+					class="form-table">
+					<li
+						is="text-form-item"
+						v-for="(ans, index) in formQuizAnswers"
+						:key="ans.id"
+						:option="ans"
+						@remove="emitRemoveAnswer(question, index)"
+						@delete="question.answers.splice(index, 1)" />
+				</transitionGroup>
+			</div>
 		</div>
 		<div class="delete-icon">
 			<a class="icon icon-delete svg"
@@ -92,40 +94,62 @@ export default {
 </script>
 
 <style lang="scss">
+$wrap-width: 1100px;
 
-.questionList {
+#questionList {
 	min-height: 40px;
-	flex-grow: 0;
+
+	#questionListData{
+		display: flex;
+	}
+
+	@media all and (max-width: $wrap-width) {
+		#questionListData {
+			flex-direction: column;
+			#text {
+				width: 100%;
+			}
+			#add-option {
+				width: 100%;
+			}
+			#optionList {
+				width: 100%;
+			}
+		}
+	}
 
 	#text {
 		margin: 8px;
-		width: 20%;
+		margin-right: 15px;
+		width: 35%;
+		flex-grow: 1;
 	}
 
 	#add-option {
-		width: 25%;
+		margin-right: 5px;
+		width: 30%;
 		max-width: 300px;
-		margin-right: 15px;
+		display: flex;
+		align-items: flex-start;
 
 		> input {
 			height:30px;
-			width: 150px;
+			width: 200px;
+			margin-top: 5px;
 			flex-grow: 1;
 		}
 		> button {
 			height: 30px;
 			width: 30px;
-			margin-top: 6px;
+			margin-top: 7px;
 		}
 	}
 
 	#optionList {
-		width: 30%;
+		width: 35%;
 		display: block;
-		flex-grow: 0;
 
 		> ul {
-			width: 95%;
 
 			> li {
 				border-bottom: 0px;
@@ -155,12 +179,12 @@ export default {
 }
 
 // Show Recyclebin, usable for mouse and keyboard
-.questionList .delete-icon {
+#questionList .delete-icon {
 	> a {
 		background-image: none;
 	}
 }
-.questionList:focus-within, .questionList:hover {
+#questionList:focus-within, #questionList:hover {
 	.delete-icon {
 		> a {
 			background-image: var(--icon-delete-000);

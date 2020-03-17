@@ -568,6 +568,8 @@ export default {
 </script>
 
 <style lang="scss">
+$wrap-width: 1100px;
+
 #app-content {
     input.hasTimepicker {
         width: 75px;
@@ -594,7 +596,6 @@ input[type="text"] {
     margin-top: 45px;
     display: flex;
     flex-grow: 1;
-    flex-wrap: wrap;
     overflow-x: hidden;
 
     > div {
@@ -606,8 +607,8 @@ input[type="text"] {
     }
 
 	#description {
-		width: 35%;
-		max-width: 540px;
+		width: 540px;
+		flex-grow: 0;
 
 		#formDescArea {
 			resize: vertical;
@@ -616,17 +617,27 @@ input[type="text"] {
 	}
 
 	#questions {
-		max-width: 65%;
 
 		#add-question {
 			width: 250px;
+		}
+	}
+
+	@media all and (max-width: $wrap-width) {
+		flex-wrap: wrap;
+
+		#description {
+			width: 100%;
+		}
+		#questions {
+			width: 100%;
 		}
 	}
 }
 
 .forms-sidebar {
     margin-top: 45px;
-    width: 25%;
+    width: 20%;
 
     .configBox {
         display: flex;
