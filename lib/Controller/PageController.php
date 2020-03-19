@@ -27,43 +27,30 @@
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Db\Event;
 use OCA\Forms\Db\EventMapper;
-use OCA\Forms\Db\Notification;
-use OCA\Forms\Db\NotificationMapper;
 use OCA\Forms\Db\Vote;
 use OCA\Forms\Db\VoteMapper;
 
-use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
-use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
-use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IAvatarManager;
-use OCP\IConfig;
 use OCP\IGroupManager;
-use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IURLGenerator;
-use OCP\IUser;
 use OCP\IUserManager;
-use OCP\L10N\IFactory;
-use OCP\Mail\IMailer;
-use OCP\Security\ISecureRandom;
 use OCP\User; //To do: replace according to API
 use OCP\Util;
 
 class PageController extends Controller {
 
 	private $userId;
-	private $config;
 	private $eventMapper;
 	private $notificationMapper;
 	private $voteMapper;
@@ -73,75 +60,29 @@ class PageController extends Controller {
 
 	private $urlGenerator;
 	private $userMgr;
-	private $avatarManager;
-	private $logger;
-	private $trans;
-	private $transFactory;
 	private $groupManager;
-	private $mailer;
 
-	/**
-	 * PageController constructor.
-	 * @param string $appName
-	 * @param IRequest $request
-	 * @param IConfig $config
-	 * @param IUserManager $userMgr
-	 * @param IGroupManager $groupManager
-	 * @param IAvatarManager $avatarManager
-	 * @param ILogger $logger
-	 * @param IL10N $trans
-	 * @param IFactory $transFactory
-	 * @param IURLGenerator $urlGenerator
-	 * @param string $userId
-	 * @param EventMapper $eventMapper
-	 *
-	 * @param QuestionMapper $questionMapper
-	 * @param AnswerMapper $answerMapper
-	 *
-	 * @param NotificationMapper $notificationMapper
-	 * @param VoteMapper $VoteMapper
-	 * @param IMailer $mailer
-	 */
 	public function __construct(
-		$appName,
 		IRequest $request,
-		IConfig $config,
 		IUserManager $userMgr,
 		IGroupManager $groupManager,
-		IAvatarManager $avatarManager,
-		ILogger $logger,
-		IL10N $trans,
-		IFactory $transFactory,
 		IURLGenerator $urlGenerator,
 		$userId,
 		EventMapper $eventMapper,
-
 		QuestionMapper $questionMapper,
 		AnswerMapper $answerMapper,
-
-		NotificationMapper $notificationMapper,
-		VoteMapper $VoteMapper,
-		IMailer $mailer
+		VoteMapper $VoteMapper
 	) {
-		parent::__construct($appName, $request);
-		$this->request = $request;
-		$this->config = $config;
+		parent::__construct(Application::APP_ID, $request);
 		$this->userMgr = $userMgr;
 		$this->groupManager = $groupManager;
-		$this->avatarManager = $avatarManager;
-		$this->logger = $logger;
-		$this->trans = $trans;
-		$this->transFactory = $transFactory;
 		$this->urlGenerator = $urlGenerator;
 		$this->userId = $userId;
 		$this->eventMapper = $eventMapper;
 
 		$this->questionMapper = $questionMapper;
 		$this->answerMapper = $answerMapper;
-
-		$this->notificationMapper = $notificationMapper;
 		$this->voteMapper = $VoteMapper;
-		$this->mailer = $mailer;
 	}
 
 	/**
@@ -182,71 +123,6 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @param int $formId
-	 * @param string $from
-	 */
-	private function sendNotifications($formId, $from) {
-		$form = $this->eventMapper->find($formId);
-		$notifications = $this->notificationMapper->findAllByForm($formId);
-		foreach ($notifications as $notification) {
-			if ($from === $notification->getUserId()) {
-				continue;
-			}
-			$recUser = $this->userMgr->get($notification->getUserId());
-			if (!$recUser instanceof IUser) {
-				continue;
-			}
-			$email = \OC::$server->getConfig()->getUserValue($notification->getUserId(), 'settings', 'email');
-			if ($email === null || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-				continue;
-			}
-			$url = $this->urlGenerator->getAbsoluteURL(
-				$this->urlGenerator->linkToRoute('forms.page.goto_form',
-					array('hash' => $form->getHash()))
-			);
-
-			$sendUser = $this->userMgr->get($from);
-			$sender = $from;
-			if ($sendUser instanceof IUser) {
-				$sender = $sendUser->getDisplayName();
-			}
-
-			$lang = $this->config->getUserValue($notification->getUserId(), 'core', 'lang');
-			$trans = $this->transFactory->get('forms', $lang);
-			$emailTemplate = $this->mailer->createEMailTemplate('forms.Notification', [
-				'user' => $sender,
-				'title' => $form->getTitle(),
-				'link' => $url,
-			]);
-			$emailTemplate->setSubject($trans->t('Forms App - New Activity'));
-			$emailTemplate->addHeader();
-			$emailTemplate->addHeading($trans->t('Forms App - New Activity'), false);
-
-			$emailTemplate->addBodyText(str_replace(
-				['{user}', '{title}'],
-				[$sender, $form->getTitle()],
-				$trans->t('{user} participated in the form "{title}"')
-			));
-
-			$emailTemplate->addBodyButton(
-				htmlspecialchars($trans->t('Go to form')),
-				$url,
-				false
-			);
-
-			$emailTemplate->addFooter();
-			try {
-				$message = $this->mailer->createMessage();
-				$message->setTo([$email => $recUser->getDisplayName()]);
-				$message->useTemplate($emailTemplate);
-				$this->mailer->send($message);
-			} catch (\Exception $e) {
-				$this->logger->logException($e, ['app' => 'forms']);
-			}
-		}
-	}
-
-	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 * @PublicPage
@@ -270,27 +146,11 @@ class PageController extends Controller {
 			return new TemplateResponse('forms', 'expired.tmpl');
 		}
 
-		$votes = $this->voteMapper->findByForm($form->getId());
-		$participants = $this->voteMapper->findParticipantsByForm($form->getId());		
-
-		try {
-			$notification = $this->notificationMapper->findByUserAndForm($form->getId(), $this->userId);
-		} catch (DoesNotExistException $e) {
-			$notification = null;
-		}
-
 		if ($this->hasUserAccess($form)) {
 			$renderAs = $this->userId !== null ? 'user' : 'public';
 			$res = new TemplateResponse('forms', 'vote.tmpl', [
 					'form' => $form,
 					'questions' => $this->getQuestions($form->getId()),
-					'votes' => $votes,
-					'participant' => $participants,
-					'notification' => $notification,
-					'userId' => $this->userId,
-					'userMgr' => $this->userMgr,
-					'urlGenerator' => $this->urlGenerator,
-					'avatarManager' => $this->avatarManager
 			], $renderAs);
 			$csp = new ContentSecurityPolicy();
 			$csp->allowEvalScript(true);
