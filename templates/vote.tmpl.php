@@ -21,18 +21,13 @@
 	 *
 	 */
 
-	use OCP\User; //To do: replace according to API
 	use OCP\Util;
-	use OCP\Template;
 
 	Util::addStyle('forms', 'vote');
 
 	Util::addScript('forms', 'vote');
 	Util::addScript('forms', 'survey.jquery.min');
 
-	$userId = $_['userId'];
-	/** @var \OCP\IUserManager $userMgr */
-	$userMgr = $_['userMgr'];
 	/** @var \OCA\Forms\Db\Event $form */
 	$form = $_['form'];
 	/** @var OCA\Forms\Db\Question[] $questions */
