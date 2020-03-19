@@ -41,6 +41,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
 use OCP\IURLGenerator;
@@ -52,7 +53,6 @@ class PageController extends Controller {
 
 	private $userId;
 	private $eventMapper;
-	private $notificationMapper;
 	private $voteMapper;
 
 	private $questionMapper;
@@ -89,7 +89,7 @@ class PageController extends Controller {
 	* @NoAdminRequired
 	* @NoCSRFRequired
 	*/
-	public function index() {
+	public function index(): TemplateResponse {
 		return new TemplateResponse('forms', 'forms.tmpl',
 		['urlGenerator' => $this->urlGenerator]);
 	}
@@ -97,7 +97,7 @@ class PageController extends Controller {
 	/**
 	* @NoAdminRequired
 	*/
-	public function createForm() {
+	public function createForm(): TemplateResponse {
 		return new TemplateResponse('forms', 'forms.tmpl',
 		['urlGenerator' => $this->urlGenerator]);
 	}
@@ -105,7 +105,7 @@ class PageController extends Controller {
 	/**
 	* @NoAdminRequired
 	*/
-	public function cloneForm() {
+	public function cloneForm(): TemplateResponse {
 		return new TemplateResponse('forms', 'forms.tmpl',
 		['urlGenerator' => $this->urlGenerator]);
 	}
@@ -115,7 +115,7 @@ class PageController extends Controller {
 	 * @param string $hash
 	 * @return TemplateResponse
 	 */
-	public function editForm($hash) {
+	public function editForm($hash): TemplateResponse {
 		return new TemplateResponse('forms', 'forms.tmpl', [
 			'urlGenerator' => $this->urlGenerator,
  			'hash' => $hash
@@ -129,7 +129,7 @@ class PageController extends Controller {
 	 * @param string $hash
 	 * @return TemplateResponse
 	 */
-	public function gotoForm($hash) {
+	public function gotoForm($hash): ?TemplateResponse {
 		try {
 			$form = $this->eventMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
@@ -156,19 +156,17 @@ class PageController extends Controller {
 			$csp->allowEvalScript(true);
 			$res->setContentSecurityPolicy($csp);
 			return $res;
-		} else {
-			User::checkLoggedIn();
-			return new TemplateResponse('forms', 'no.acc.tmpl', []);
 		}
+
+		User::checkLoggedIn();
+		return new TemplateResponse('forms', 'no.acc.tmpl', []);
 	}
 
 	/**
 	 * @NoAdminRequired
-	 * @param int $formId
-	 * @return array
 	 */
-	public function getQuestions($formId) {
-		$questionList = array();
+	public function getQuestions(int $formId): array {
+		$questionList = [];
 		try{
 			$questions = $this->questionMapper->findByForm($formId);
 			foreach ($questions as $questionElement) {
@@ -176,22 +174,19 @@ class PageController extends Controller {
 				$temp['answers'] = $this->getAnswers($formId, $temp['id']);
 				$questionList[] =  $temp;
 			}
-
 		} catch (DoesNotExistException $e) {
 			//handle silently
-		}finally{
-			return $questionList;
 		}
+
+		return $questionList;
 	}
 
 	/**
 	 * @NoAdminRequired
-	 * @param int $formId
-	 * @param int $questionId
-	 * @return array
 	 */
-	public function getAnswers($formId, $questionId) {
-		$answerList = array();
+	public function getAnswers(int $formId, int $questionId): array {
+		$answerList = [];
+
 		try{
 			$answers = $this->answerMapper->findByForm($formId, $questionId);
 			foreach ($answers as $answerElement) {
@@ -200,9 +195,9 @@ class PageController extends Controller {
 
 		} catch (DoesNotExistException $e) {
 			//handle silently
-		}finally{
-			return $answerList;
 		}
+
+		return $answerList;
 	}
 
 	/**
@@ -242,7 +237,7 @@ class PageController extends Controller {
 		$anonID = "anon-user-".  hash('md5', (time() + rand()));
 
 		for ($i = 0; $i < $count_answers; $i++) {
-			if($questions[$i]['type'] == "checkbox"){
+			if($questions[$i]['type'] === "checkbox"){
 				foreach (($answers[$questions[$i]['text']]) as $value) {
 					$vote = new Vote();
 					$vote->setFormId($id);
@@ -299,8 +294,8 @@ class PageController extends Controller {
 	public function searchForGroups($searchTerm, $groups) {
 		$selectedGroups = json_decode($groups);
 		$groups = $this->groupManager->search($searchTerm);
-		$gids = array();
-		$sgids = array();
+		$gids = [];
+		$sgids = [];
 		foreach ($selectedGroups as $sg) {
 			$sgids[] = str_replace('group_', '', $sg);
 		}
@@ -308,7 +303,7 @@ class PageController extends Controller {
 			$gids[] = $g->getGID();
 		}
 		$diffGids = array_diff($gids, $sgids);
-		$gids = array();
+		$gids = [];
 		foreach ($diffGids as $g) {
 			$gids[] = ['gid' => $g, 'isGroup' => true];
 		}
@@ -325,8 +320,8 @@ class PageController extends Controller {
 		$selectedUsers = json_decode($users);
 		Util::writeLog('forms', print_r($selectedUsers, true), Util::ERROR);
 		$userNames = $this->userMgr->searchDisplayName($searchTerm);
-		$users = array();
-		$sUsers = array();
+		$users = [];
+		$sUsers = [];
 		foreach ($selectedUsers as $su) {
 			$sUsers[] = str_replace('user_', '', $su);
 		}
@@ -340,7 +335,7 @@ class PageController extends Controller {
 				}
 			}
 			if (!$allreadyAdded) {
-				$users[] = array('uid' => $u->getUID(), 'displayName' => $u->getDisplayName(), 'isGroup' => false);
+				$users[] = ['uid' => $u->getUID(), 'displayName' => $u->getDisplayName(), 'isGroup' => false];
 			} else {
 				continue;
 			}
@@ -349,25 +344,11 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @param string $username
-	 * @return string
-	 */
-	public function getDisplayName($username) {
-		return $this->userMgr->get($username)->getDisplayName();
-	}
-
-	/**
 	 * @return \OCP\IGroup[]
 	 */
 	private function getGroups() {
-		if (class_exists('\OC_Group')) {
-			// Nextcloud <= 11, ownCloud
-			return \OC_Group::getUserGroups($this->userId);
-		}
-		// Nextcloud >= 12
 		$groups = $this->groupManager->getUserGroups(\OC::$server->getUserSession()->getUser());
-		return array_map(function($group) {
+		return array_map(function(IGroup $group) {
 			return $group->getGID();
 		}, $groups);
 	}
@@ -420,22 +401,6 @@ class PageController extends Controller {
 				}
 			}
 		}
-		return false;
-	}
-	/**
-	 * Check if user is owner of this form
-	 *
-	 * @param Event $form
-	 * @return bool
-	 */
-
-	private function userIsOwner($form) {
-		$owner = $form->getOwner();
-
-		if ($owner === $this->userId) {
-			return true;
-		}
-		Util::writeLog('forms', $this->userId, Util::ERROR);
 		return false;
 	}
 
