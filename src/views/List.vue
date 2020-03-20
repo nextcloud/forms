@@ -22,15 +22,7 @@
   -->
 
 <template>
-	<div id="app-content">
-		<Controls>
-			<router-link :to="{ name: 'create'}" class="button">
-				<span class="symbol icon-add" />
-				<span class="hidden-visually">
-					{{ t('forms', 'New') }}
-				</span>
-			</router-link>
-		</Controls>
+	<AppContent>
 		<div v-if="noForms" class="">
 			<div class="icon-forms" />
 			<h2> {{ t('No existing forms.') }} </h2>
@@ -56,54 +48,69 @@
 		</transition-group>
 		<LoadingOverlay v-if="loading" />
 		<modal-dialog />
-	</div>
+	</AppContent>
 </template>
 
 <script>
+import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
+
+import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 
 import FormListItem from '../components/formListItem'
-import Controls from '../components/_base-Controls'
-import axios from '@nextcloud/axios'
-import LoadingOverlay from '../components/_base-LoadingOverlay'
+import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
 	name: 'List',
 
 	components: {
-		Controls,
+		AppContent,
 		FormListItem,
-		LoadingOverlay,
 	},
+
+	mixins: [ViewsMixin],
 
 	data() {
 		return {
-			noForms: false,
 			loading: true,
 			forms: [],
 		}
 	},
 
-	created() {
-		this.indexPage = OC.generateUrl('apps/forms/')
+	computed: {
+		noForms() {
+			return this.forms && this.forms.length > 0
+		},
+	},
+
+	beforeMount() {
 		this.loadForms()
 	},
 
 	methods: {
-		loadForms() {
+		/**
+		 * Initial forms load
+		 */
+		async loadForms() {
 			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/forms'))
-				.then((response) => {
-					this.forms = response.data
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.loading = false
-				})
+			try {
+				const response = await axios.get(OC.generateUrl('apps/forms/get/forms'))
+				this.forms = response.data
+			} catch (error) {
+				showError(t('forms', 'An error occured while loading the forms list'))
+				console.error(error)
+			} finally {
+				this.loading = false
+			}
 		},
+
+		/**
+		 * Open the help page
+		 */
 		helpPage() {
-			window.open('https://github.com/affan98/forms/blob/master/Forms_Support.md')
+			window.open('https://github.com/nextcloud/forms/blob/master/Forms_Support.md')
 		},
+
 		viewFormResults(index, event, name) {
 			this.$router.push({
 				name: name,

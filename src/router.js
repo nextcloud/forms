@@ -1,4 +1,3 @@
-/* jshint esversion: 6 */
 /**
  * @copyright Copyright (c) 2018 Julius Härtl <jus@bitgrid.net>
  * @copyright Copyright (c) 2018 John Molakvoæ <skjnldsv@protonmail.com>
@@ -22,59 +21,56 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 import Vue from 'vue'
 import Router from 'vue-router'
+import { generateUrl } from '@nextcloud/router'
 
-// Dynamic loading
-const Create = () => import('./views/Create')
-const List = () => import('./views/List')
-const Results = () => import('./views/Results')
+import Create from './views/Create'
+import Results from './views/Results'
+
 Vue.use(Router)
 
 export default new Router({
 	mode: 'history',
-	base: OC.generateUrl(''),
+
+	// if index.php is in the url AND we got this far, then it's working:
+	// let's keep using index.php in the url
+	base: generateUrl('/apps/forms', ''),
 	linkActiveClass: 'active',
+
 	routes: [
 		{
-			path: '/:index(index.php/)?apps/forms/',
-			components: {
-				default: List,
-			},
-			props: false,
-			name: 'list',
+			path: '/',
+			name: 'root',
 		},
 		{
-			path: '/:index(index.php/)?apps/forms/edit/:hash',
-			components: {
-				default: Create,
-			},
-			props: true,
-			name: 'edit',
-		},
-		{
-			path: '/:index(index.php/)?apps/forms/results/:hash',
-			components: {
-				default: Results,
-			},
-			props: false,
-			name: 'results',
-		},
-		{
-			path: '/:index(index.php/)?apps/forms/clone/:hash',
-			components: {
-				default: Create,
-			},
-			props: true,
-			name: 'clone',
-		},
-		{
-			path: '/:index(index.php/)?apps/forms/new',
-			components: {
-				default: Create,
-			},
-			props: false,
+			path: '/new',
+			component: Create,
 			name: 'create',
+		},
+		{
+			path: '/:hash',
+			name: 'fill',
+			props: true,
+		},
+		{
+			path: '/:hash/edit',
+			component: Create,
+			name: 'edit',
+			props: true,
+		},
+		{
+			path: '/:hash/results',
+			component: Results,
+			name: 'results',
+			props: true,
+		},
+		{
+			path: '/:hash/clone',
+			component: Create,
+			name: 'clone',
+			props: true,
 		},
 	],
 })

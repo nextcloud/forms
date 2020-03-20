@@ -26,7 +26,7 @@
   -->
 
 <template>
-	<div id="app-content">
+	<AppContent>
 		<Controls :intitle="title">
 			<template slot="after">
 				<button :disabled="writingForm" class="button btn primary" @click="writeForm(form.mode)">
@@ -202,13 +202,15 @@
 				@remove-share="removeShare" />
 		</SideBar>
 		<LoadingOverlay v-if="loadingForm" />
-	</div>
+	</AppContent>
 </template>
 
 <script>
 import axios from '@nextcloud/axios'
-import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
+
+import AppContent from '@nextcloud/vue/dist/Components/AppContent'
+import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 
 import Controls from '../components/_base-Controls'
 import LoadingOverlay from '../components/_base-LoadingOverlay'
@@ -217,9 +219,12 @@ import ShareDiv from '../components/shareDiv'
 import SideBar from '../components/_base-SideBar'
 import UserDiv from '../components/_base-UserDiv'
 
+import ViewsMixin from '../mixins/ViewsMixin'
+
 export default {
 	name: 'Create',
 	components: {
+		AppContent,
 		Controls,
 		DatetimePicker,
 		LoadingOverlay,
@@ -228,6 +233,8 @@ export default {
 		SideBar,
 		UserDiv,
 	},
+
+	mixins: [ViewsMixin],
 
 	data() {
 		return {

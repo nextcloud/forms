@@ -1,4 +1,3 @@
-/* jshint esversion: 6 */
 /**
  * @copyright Copyright (c) 2018 René Gieling <github@dartcafe.de>
  *
@@ -23,7 +22,7 @@
 
 import Vue from 'vue'
 import router from './router'
-import App from './App'
+import Forms from './Forms'
 
 import VueClipboard from 'vue-clipboard2'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
@@ -51,7 +50,7 @@ __webpack_public_path__ = OC.linkTo('forms', 'js/')
 
 /* eslint-disable-next-line no-new */
 new Vue({
-	el: '#app-forms',
+	el: '#content',
 	router: router,
-	render: h => h(App),
+	render: h => h(Forms),
 })

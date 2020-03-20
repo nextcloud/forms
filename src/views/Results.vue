@@ -23,7 +23,7 @@
   -->
 
 <template>
-	<div>
+	<AppContent>
 		<div>
 			<button class="button btn primary" @click="download">
 				<span>{{ "Export to CSV" }}</span>
@@ -51,7 +51,7 @@
 			<LoadingOverlay v-if="loading" />
 			<modal-dialog />
 		</div>
-	</div>
+	</AppContent>
 </template>
 
 <script>
@@ -59,14 +59,19 @@ import ResultItem from '../components/resultItem'
 import json2csvParser from 'json2csv'
 import axios from '@nextcloud/axios'
 import LoadingOverlay from '../components/_base-LoadingOverlay'
+import ViewsMixin from '../mixins/ViewsMixin'
 
+import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 export default {
 	name: 'Results',
 
 	components: {
+		AppContent,
 		ResultItem,
 		LoadingOverlay,
 	},
+
+	mixins: [ViewsMixin],
 
 	data() {
 		return {

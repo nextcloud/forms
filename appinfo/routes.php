@@ -24,12 +24,14 @@
 return [
 	'routes' => [
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-		['name' => 'page#goto_form', 'url' => '/form/{hash}', 'verb' => 'GET'],
 
-		['name' => 'page#create_form', 'url' => '/new', 'verb' => 'GET'],
-		['name' => 'page#edit_form', 'url' => '/edit/{hash}', 'verb' => 'GET'],
-		['name' => 'page#clone_form', 'url' => '/clone/{hash}', 'verb' => 'GET'],
-		['name' => 'page#getResult', 'url' => '/results/{id}', 'verb' => 'GET'],
+		// Before /{hash} to avoid conflict
+		['name' => 'page#createForm', 'url' => '/new', 'verb' => 'GET'],
+		['name' => 'page#editForm', 'url' => '/{hash}/edit/', 'verb' => 'GET'],
+		['name' => 'page#cloneForm', 'url' => '/{hash}/clone/', 'verb' => 'GET'],
+		['name' => 'page#getResult', 'url' => '/{hash}/results/', 'verb' => 'GET'],
+
+		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
 
 		['name' => 'page#delete_form', 'url' => '/delete', 'verb' => 'POST'],
 		['name' => 'page#insert_vote', 'url' => '/insert/vote', 'verb' => 'POST'],
