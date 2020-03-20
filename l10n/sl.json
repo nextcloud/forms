@@ -1,8 +1,5 @@
 { "translations": {
     "Do you really want to delete this new form?" : "Ali ste prepričani, da želite izbrisati ta vprašalnik?",
-    "Forms App - New Activity" : "Vprašalniki – nova dejavnost",
-    "{user} participated in the form \"{title}\"" : "{user} sodeluje pri izpolnjevanju vprašalnika »{title}«",
-    "Go to form" : "Skoči na vprašalnik",
     "Forms" : "Vprašalniki",
     "A forms app, similar to Google Forms." : "Program Vprašalniki, zasnovan podobno kot Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Program Vprašalniki, zasnovan podobno kot Google Forms z možnostjo omejevanja dostopa (člani, skupine ali uporabniki, javnost).",

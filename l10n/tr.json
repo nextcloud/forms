@@ -1,8 +1,5 @@
 { "translations": {
     "Do you really want to delete this new form?" : "Bu formu silmek istediğinize emin misiniz?",
-    "Forms App - New Activity" : "Formlar Uygulaması - Yeni İşlem",
-    "{user} participated in the form \"{title}\"" : "{user} \"{title}\" formuna katkıda bulundu",
-    "Go to form" : "Forma git",
     "Forms" : "Formlar",
     "A forms app, similar to Google Forms." : "Google forms benzeri bir form uygulaması.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Erişim kısıtlama özelliği ile (üyelere, belirli gruplara ya da kullanıcılara ya da herkese açık) Google forms benzeri bir form uygulaması.",

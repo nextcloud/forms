@@ -2,8 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "Haluatko varmasti poistaa tämän uuden lomakkeen?",
-    "{user} participated in the form \"{title}\"" : "{user} täytti lomakkeen \"{title}\"",
-    "Go to form" : "Siirry lomakkeelle",
     "Forms" : "Lomakkeet",
     "A forms app, similar to Google Forms." : "Lomakesovellus Google Formsin tyyliin.",
     "Expired" : "Vanhentunut",

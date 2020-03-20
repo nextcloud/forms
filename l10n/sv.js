@@ -2,9 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "Vill du ta bort det nya formuläret?",
-    "Forms App - New Activity" : "Formulär-appen - Ny aktivitet",
-    "{user} participated in the form \"{title}\"" : "{user} deltog i undersökning genom formuläret \"{title}\"",
-    "Go to form" : "Gå till formuläret",
     "Forms" : "Formulär",
     "A forms app, similar to Google Forms." : "En formulär-app, liknande Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "En formulär-app, liknande Google Forms med möjlighet att begränsa åtkomst (medlemmar, grupper/användare och publik).",

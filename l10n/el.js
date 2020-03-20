@@ -2,9 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Do you really want to delete this new form?" : "Σίγουρα θέλετε να διαγράψετε τη φόρμα?",
-    "Forms App - New Activity" : "Εφαρμογή Φορμών - Νέα Δραστηριότητα",
-    "{user} participated in the form \"{title}\"" : "Ο {user} συμμετέχει στην φόρμα \"{title}\"",
-    "Go to form" : "Μετάβαση στη φόρμα",
     "Forms" : "Φόρμες",
     "A forms app, similar to Google Forms." : "Εφαρμογή φορμών, παρόμεια με τις Φόρμες Google.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Εφαρμογή φορμών, όπως τις Φόρμες Googlw με δυνατότητα περιορισμού πρόσβασης σε (μέλη, ορισμένες ομάδες / χρήστες και δημόσια).",
