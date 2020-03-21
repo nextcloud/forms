@@ -20,37 +20,45 @@
  *
  */
 
+import { generateFilePath } from '@nextcloud/router'
+import { getRequestToken } from '@nextcloud/auth'
+import { translate, translatePlural } from '@nextcloud/l10n'
 import Vue from 'vue'
-import router from './router'
-import Forms from './Forms'
 
-import VueClipboard from 'vue-clipboard2'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
 
+import router from './router'
+import Forms from './Forms'
 import Modal from './plugins/plugin.js'
 
+// TODO: not use global registration
 Vue.directive('tooltip', Tooltip)
 
-Vue.use(VueClipboard)
 Vue.use(Modal)
 
-Vue.prototype.t = t
-Vue.prototype.n = n
+Vue.prototype.t = translate
+Vue.prototype.n = translatePlural
+
+// TODO: see if necessary
 Vue.prototype.OC = OC
 Vue.prototype.OCA = OCA
 
 // CSP config for webpack dynamic chunk loading
 // eslint-disable-next-line
-__webpack_nonce__ = btoa(OC.requestToken)
+__webpack_nonce__ = btoa(getRequestToken())
 
 // Correct the root of the app for chunk loading
 // OC.linkTo matches the apps folders
+// OC.generateUrl ensure the index.php (or not)
+// We do not want the index.php since we're loading files
 // eslint-disable-next-line
-__webpack_public_path__ = OC.linkTo('forms', 'js/')
+__webpack_public_path__ = generateFilePath('forms', '', 'js/')
 
 /* eslint-disable-next-line no-new */
 new Vue({
 	el: '#content',
-	router: router,
+	// eslint-disable-next-line vue/match-component-file-name
+	name: 'FormsRoot',
+	router,
 	render: h => h(Forms),
 })

@@ -25,5 +25,10 @@ export default {
 			type: String,
 			default: null,
 		},
+		form: {
+			type: Object,
+			// TODO: use default Form object ?
+			default: {},
+		},
 	},
 }

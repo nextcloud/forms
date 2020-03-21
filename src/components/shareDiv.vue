@@ -65,6 +65,7 @@
 
 <script>
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+// TODO: replace with same design as core sharing
 import UserDiv from './_base-UserDiv'
 import axios from '@nextcloud/axios'
 

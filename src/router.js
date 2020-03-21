@@ -28,6 +28,7 @@ import { generateUrl } from '@nextcloud/router'
 
 import Create from './views/Create'
 import Results from './views/Results'
+import Sidebar from './views/Sidebar'
 
 Vue.use(Router)
 
@@ -46,7 +47,10 @@ export default new Router({
 		},
 		{
 			path: '/new',
-			component: Create,
+			components: {
+				default: Create,
+				sidebar: Sidebar,
+			},
 			name: 'create',
 		},
 		{
@@ -56,7 +60,10 @@ export default new Router({
 		},
 		{
 			path: '/:hash/edit',
-			component: Create,
+			components: {
+				default: Create,
+				sidebar: Sidebar,
+			},
 			name: 'edit',
 			props: true,
 		},
@@ -68,7 +75,10 @@ export default new Router({
 		},
 		{
 			path: '/:hash/clone',
-			component: Create,
+			components: {
+				default: Create,
+				sidebar: Sidebar,
+			},
 			name: 'clone',
 			props: true,
 		},

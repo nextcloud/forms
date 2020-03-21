@@ -29,7 +29,7 @@
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<AppContent v-if="loading || noForms || !hash">
+		<AppContent v-if="loading || noForms || (!hash && $route.name !== 'create')">
 			<EmptyContent v-if="loading" icon="icon-loading">
 				{{ t('forms', 'Loading forms …') }}
 			</EmptyContent>
@@ -48,7 +48,10 @@
 		</AppContent>
 
 		<!-- No errors show router content -->
-		<router-view v-else />
+		<template v-else>
+			<router-view :form="selectedForm" />
+			<router-view :form="selectedForm" name="sidebar" />
+		</template>
 	</Content>
 </template>
 
@@ -96,6 +99,11 @@ export default {
 
 		hash() {
 			return this.$route.params.hash
+		},
+
+		selectedForm() {
+			// TODO: replace with form.hash
+			return this.forms.find(form => form.event.hash === this.hash)
 		},
 	},
 
