@@ -514,4 +514,30 @@ class ApiController extends Controller {
 		), Http::STATUS_OK);
 
 	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function newForm(): Http\JSONResponse {
+		$event = new Event();
+
+		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
+		$event->setOwner($currentUser);
+		$event->setCreated(date('Y-m-d H:i:s'));
+		$event->setHash(\OC::$server->getSecureRandom()->generate(
+			16,
+			ISecureRandom::CHAR_HUMAN_READABLE
+		));
+		$event->setTitle('New form');
+		$event->setDescription('');
+
+		$this->eventMapper->insert($event);
+
+
+
+		return new Http\JSONResponse([
+			'id' => $event->getId(),
+			'hash' => $event->getHash(),
+		]);
+	}
 }
