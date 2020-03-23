@@ -225,7 +225,6 @@ class PageController extends Controller {
 	 * @param string $userId
 	 * @param string $answers
 	 * @param string $options question id
-	 * @param bool $receiveNotifications
 	 * @param bool $changed
 	 * @return RedirectResponse
 	 */

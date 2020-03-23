@@ -43,8 +43,6 @@ use OCA\Forms\Db\Event;
 use OCA\Forms\Db\EventMapper;
 use OCA\Forms\Db\Vote;
 use OCA\Forms\Db\VoteMapper;
-use OCA\Forms\Db\Notification;
-use OCA\Forms\Db\NotificationMapper;
 
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -402,7 +400,6 @@ class ApiController extends Controller {
 			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
 		}
 		$this->voteMapper->deleteByForm($id);
-		// $this->notificationMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
 		$this->answerMapper->deleteByForm($id);
 		$this->eventMapper->delete($formToDelete);
