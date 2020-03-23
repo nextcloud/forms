@@ -45,6 +45,8 @@ return [
 		['name' => 'api#remove_form', 'url' => '/forms/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#get_forms', 'url' => '/get/forms', 'verb' => 'GET'],
 
+		['name' => 'api#newForm', 'url' => 'api/v1/form', 'verb' => 'POST'],
+
 		['name' => 'system#get_site_users_and_groups', 'url' => '/get/siteusers', 'verb' => 'POST'],
 	]
 ];
