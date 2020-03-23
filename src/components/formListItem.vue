@@ -163,16 +163,6 @@ export default {
 			}
 		},
 
-		formType() {
-			if (this.form.event.type === 'textForm') {
-				// TRANSLATORS This means that this is the type of the form. Another type is a 'date form'.
-				return t('forms', 'Text form')
-			} else {
-				// TRANSLATORS This means that this is the type of the form. Another type is a 'text form'.
-				return t('forms', 'Text form')
-			}
-		},
-
 		timeSpanCreated() {
 			return moment(this.form.event.created, 'YYYY-MM-DD HH:mm')
 		},

@@ -23,6 +23,8 @@
 import { generateFilePath } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
 import { translate, translatePlural } from '@nextcloud/l10n'
+import '@nextcloud/dialogs/styles/toast.scss'
+
 import Vue from 'vue'
 
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'

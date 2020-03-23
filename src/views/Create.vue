@@ -27,16 +27,6 @@
 
 <template>
 	<AppContent>
-		<Controls :intitle="title">
-			<template slot="after">
-				<button :disabled="writingForm" class="button btn primary" @click="debounceWriteForm">
-					<span>{{ saveButtonTitle }}</span>
-					<span v-if="writingForm" class="icon-loading-small" />
-				</button>
-				<button class="button symbol icon-settings" @click="switchSidebar" />
-			</template>
-		</Controls>
-
 		<div class="workbench">
 			<div>
 				<h2>{{ t('forms', 'Form description') }}</h2>
@@ -53,7 +43,7 @@
 
 			<div>
 				<h2>{{ t('forms', 'Make a Form') }}</h2>
-				<div v-show="form.event.type === 'quizForm'" id="quiz-form-selector-text">
+				<div id="quiz-form-selector-text">
 					<!--shows inputs for question types: drop down box to select the type, text box for question, and button to add-->
 					<label for="ans-type">Answer Type: </label>
 					<select v-model="selected">
@@ -64,7 +54,7 @@
 							{{ option.text }}
 						</option>
 					</select>
-					<input v-model="newQuizQuestion" :placeholder=" t('forms', 'Add Question') " @keyup.enter="addQuestion()">
+					<input v-model="newQuizQuestion" :placeholder="t('forms', 'Add Question')" @keyup.enter="addQuestion()">
 					<button id="questButton"
 						@click="addQuestion()">
 						{{ t('forms', 'Add Question') }}
@@ -72,7 +62,6 @@
 				</div>
 				<!--Transition group to list the already added questions (in the form of quizFormItems)-->
 				<transitionGroup
-					v-show="form.mode == 'create'"
 					id="form-list"
 					name="list"
 					tag="ul"
@@ -100,7 +89,6 @@ import debounce from 'debounce'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 
-import Controls from '../components/_base-Controls'
 import QuizFormItem from '../components/quizFormItem'
 
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -109,7 +97,6 @@ export default {
 	name: 'Create',
 	components: {
 		AppContent,
-		Controls,
 		QuizFormItem,
 	},
 
