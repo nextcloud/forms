@@ -25,7 +25,10 @@
 	<Content app-name="forms">
 		<AppNavigation>
 			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
-			<AppNavigationForm v-for="form in formattedForms" :key="form.id" :form="form" />
+			<AppNavigationForm v-for="form in formattedForms"
+				:key="form.id"
+				:form="form"
+				@delete="onDeleteForm" />
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
@@ -57,6 +60,7 @@
 
 <script>
 import { showError } from '@nextcloud/dialogs'
+import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
@@ -118,7 +122,7 @@ export default {
 		async loadForms() {
 			this.loading = true
 			try {
-				const response = await axios.get(OC.generateUrl('apps/forms/get/forms'))
+				const response = await axios.get(generateUrl('apps/forms/get/forms'))
 				this.forms = response.data
 			} catch (error) {
 				showError(t('forms', 'An error occured while loading the forms list'))
@@ -131,8 +135,27 @@ export default {
 		/**
 		 *
 		 */
-		onNewForm() {
-			this.$router.push({ name: 'create' })
+		async onNewForm() {
+			try {
+				// Request a new empty form
+				const response = await axios.post(generateUrl('/apps/forms/api/v1/form'))
+				const newForm = response.data
+				this.forms.push(newForm)
+				this.$router.push({ name: 'edit', params: { hash: newForm.event.hash } })
+			} catch (error) {
+				showError(t('forms', 'Unable to create a new form'))
+				console.error(error)
+			}
+		},
+
+		/**
+		 * Remove form from forms list after successful server deletion request
+		 *
+		 * @param {Number} id the form id
+		 */
+		async onDeleteForm(id) {
+			const formIndex = this.forms.findIndex(form => form.id === id)
+			this.forms.splice(formIndex, 1)
 		},
 	},
 }

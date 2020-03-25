@@ -16,29 +16,38 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/**
- * Format a form object prior to forms v2.0
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @param {Object} form the form raw object
- * @returns {Object} properly formatted form object
  */
-const formatForm = function(form) {
-	// clone form
-	const newForm = Object.assign({}, form, form.event)
 
-	// migrate object architecture
-	Object.assign(newForm, {
-		questions: form.options && form.options.formQuizQuestions,
-	})
+export default class {
 
-	// cleanup
-	delete newForm.options
-	delete newForm.event
+	#data
 
-	return newForm
+	/**
+	 * Construct the form
+	 * @param {Object} data the form data
+	 */
+	constructor(data) {
+		// Id check
+		if (!('id' in data && typeof data.id === 'number')) {
+			throw new Error('A new form must at least contain a valid id')
+		}
+
+		// Hash check
+		if (!('hash' in data && typeof data.id === 'string')) {
+			throw new Error('A new form must at least contain a valid hash')
+		}
+
+		this.#data = data
+	}
+
+	get id() {
+		return this.#data.id
+	}
+
+	get hash() {
+		return this.#data.hash
+	}
+
 }
-
-export { formatForm }

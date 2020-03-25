@@ -21,7 +21,7 @@
  -->
 
 <template>
-	<AppSidebar :title="form.event.title" class="forms-sidebar">
+	<AppSidebar :title="form.event.title">
 		<div class="configBox ">
 			<label class="title icon-settings">
 				{{ t('forms', 'Form configurations') }}
@@ -209,27 +209,22 @@ export default {
 
 <style lang="scss" scoped>
 
-.forms-sidebar {
-	margin-top: 45px;
-	width: 25%;
-
-	.configBox {
+.configBox {
+	display: flex;
+	flex-direction: column;
+	padding: 8px;
+	& > * {
+		padding-left: 21px;
+	}
+	& > .title {
 		display: flex;
-		flex-direction: column;
-		padding: 8px;
-		& > * {
-			padding-left: 21px;
-		}
-		& > .title {
-			display: flex;
-			background-position: 0 2px;
-			padding-left: 24px;
-			opacity: 0.7;
-			font-weight: bold;
-			margin-bottom: 4px;
-			& > span {
-				padding-left: 4px;
-			}
+		background-position: 0 2px;
+		padding-left: 24px;
+		opacity: 0.7;
+		font-weight: bold;
+		margin-bottom: 4px;
+		& > span {
+			padding-left: 4px;
 		}
 	}
 }

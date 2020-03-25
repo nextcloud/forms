@@ -23,24 +23,25 @@
 <template>
 	<AppNavigationItem
 		:exact="true"
+		:icon="loading ? 'icon-loading-small' : ''"
 		:title="form.title"
 		:to="{ name: 'edit', params: { hash: form.hash } }">
 		<AppNavigationIconBullet slot="icon" :color="bulletColor" />
-		<template #actions>
+		<template v-if="!loading" #actions>
 			<ActionRouter :close-after-click="true"
 				:exact="true"
 				icon="icon-checkmark"
 				:to="{ name: 'results', params: { hash: form.hash } }">
 				{{ t('forms', 'Show results') }}
 			</ActionRouter>
-			<ActionRouter :close-after-click="true"
+			<!-- <ActionRouter :close-after-click="true"
 				:exact="true"
 				icon="icon-clone"
 				:to="{ name: 'clone', params: { hash: form.hash } }">
 				{{ t('forms', 'Clone form') }}
-			</ActionRouter>
+			</ActionRouter> -->
 			<ActionSeparator />
-			<ActionButton :close-after-click="true" icon="icon-delete" @click="deleteForm">
+			<ActionButton :close-after-click="true" icon="icon-delete" @click="onDeleteForm">
 				{{ t('forms', 'Delete form') }}
 			</ActionButton>
 		</template>
@@ -48,6 +49,9 @@
 </template>
 
 <script>
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { generateUrl } from '@nextcloud/router'
+import axios from '@nextcloud/axios'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import AppNavigationIconBullet from '@nextcloud/vue/dist/Components/AppNavigationIconBullet'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
@@ -72,6 +76,12 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			loading: false,
+		}
+	},
+
 	computed: {
 		/**
 		 * Map form state to bullet color
@@ -88,9 +98,25 @@ export default {
 	},
 
 	methods: {
-		async deleteForm() {
+		async onDeleteForm() {
+			if (!confirm(t('forms', 'Are you sure you want to delete the form “{title}”', { title: this.form.title }))) {
+				return
+			}
 
+			// All good, let's delete
+			this.loading = true
+			try {
+				await axios.delete(generateUrl('/apps/forms/api/v1/form/{id}', { id: this.form.id }))
+				this.$emit('delete', this.form.id)
+				showSuccess(t('forms', 'Deleted form “{title}”', { title: this.form.title }))
+			} catch (error) {
+				showError(t('forms', 'Error while deleting form “{title}”', { title: this.form.title }))
+				console.error(error.response)
+			} finally {
+				this.loading = false
+			}
 		},
+
 	},
 
 }

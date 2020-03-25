@@ -2,6 +2,7 @@
  * @copyright Copyright (c) 2018 René Gieling <github@dartcafe.de>
  *
  * @author René Gieling <github@dartcafe.de>
+ * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *

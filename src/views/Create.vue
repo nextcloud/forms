@@ -269,8 +269,6 @@ export default {
 			if (this.form.event.title.length === 0 | !(/\S/.test(this.form.event.title))) {
 				this.titleEmpty = true
 				showError(t('forms', 'Title must not be empty!'), { duration: 3000 })
-			} else if (this.form.options.formQuizQuestions.length === 0) {
-				showError(t('forms', 'Must have at least one question!'), { duration: 3000 })
 			} else if (!this.haveAns) {
 				showError(t('forms', 'All questions need answers!'), { duration: 3000 })
 			} else if (this.form.event.expiration & this.form.event.expirationDate === '') {
@@ -323,7 +321,6 @@ input[type="text"] {
 }
 
 .workbench {
-	margin-top: 45px;
 	display: flex;
 	flex-grow: 1;
 	flex-wrap: wrap;
