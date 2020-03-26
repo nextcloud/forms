@@ -22,15 +22,23 @@
 
 <template>
 	<AppNavigationItem
+		ref="navigationItem"
 		:exact="true"
 		:icon="loading ? 'icon-loading-small' : ''"
 		:title="form.title"
 		:to="{ name: 'edit', params: { hash: form.hash } }">
 		<AppNavigationIconBullet slot="icon" :color="bulletColor" />
 		<template v-if="!loading" #actions>
+			<ActionLink
+				:href="formLink"
+				:icon="copied && copySuccess ? 'icon-checkmark-color' : 'icon-clippy'"
+				target="_blank"
+				@click.stop.prevent="copyLink">
+				{{ clipboardTooltip }}
+			</ActionLink>
 			<ActionRouter :close-after-click="true"
 				:exact="true"
-				icon="icon-checkmark"
+				icon="icon-forms"
 				:to="{ name: 'results', params: { hash: form.hash } }">
 				{{ t('forms', 'Show results') }}
 			</ActionRouter>
@@ -49,14 +57,19 @@
 </template>
 
 <script>
-import { showError, showSuccess } from '@nextcloud/dialogs'
 import { generateUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
-import AppNavigationIconBullet from '@nextcloud/vue/dist/Components/AppNavigationIconBullet'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import ActionRouter from '@nextcloud/vue/dist/Components/ActionRouter'
 import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
+import AppNavigationIconBullet from '@nextcloud/vue/dist/Components/AppNavigationIconBullet'
+import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
+import axios from '@nextcloud/axios'
+import Vue from 'vue'
+import VueClipboard from 'vue-clipboard2'
+
+Vue.use(VueClipboard)
 
 export default {
 	name: 'AppNavigationForm',
@@ -65,6 +78,7 @@ export default {
 		AppNavigationItem,
 		AppNavigationIconBullet,
 		ActionButton,
+		ActionLink,
 		ActionRouter,
 		ActionSeparator,
 	},
@@ -78,6 +92,8 @@ export default {
 
 	data() {
 		return {
+			copySuccess: true,
+			copied: false,
 			loading: false,
 		}
 	},
@@ -94,6 +110,27 @@ export default {
 				return style.getPropertyValue('--color-error').slice(-6)
 			}
 			return style.getPropertyValue('--color-success').slice(-6)
+		},
+
+		/**
+		 * Return the form share link
+		 * @returns {string}
+		 */
+		formLink() {
+			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+		},
+
+		/**
+		 * Clipboard v-tooltip message
+		 * @returns {string}
+		 */
+		clipboardTooltip() {
+			if (this.copied) {
+				return this.copySuccess
+					? t('forms', 'Form link copied')
+					: t('forms', 'Cannot copy, please copy the link manually')
+			}
+			return t('forms', 'Copy to clipboard')
 		},
 	},
 
@@ -114,6 +151,25 @@ export default {
 				console.error(error.response)
 			} finally {
 				this.loading = false
+			}
+		},
+
+		async copyLink() {
+			try {
+				await this.$copyText(this.formLink)
+				// make sure the menu stays open despite the click outside
+				this.$refs.navigationItem.menuOpened = true
+				this.copySuccess = true
+				this.copied = true
+			} catch (error) {
+				this.copySuccess = false
+				this.copied = true
+				console.error(error)
+			} finally {
+				setTimeout(() => {
+					this.copySuccess = false
+					this.copied = false
+				}, 4000)
 			}
 		},
 

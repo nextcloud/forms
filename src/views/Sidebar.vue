@@ -220,8 +220,6 @@ export default {
 		display: flex;
 		background-position: 0 2px;
 		padding-left: 24px;
-		opacity: 0.7;
-		font-weight: bold;
 		margin-bottom: 4px;
 		& > span {
 			padding-left: 4px;
