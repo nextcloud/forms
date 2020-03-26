@@ -7,6 +7,7 @@
  * @author Inigo Jiron <ijiron@terpmail.umd.edu>
  * @author Natalie Gilbert
  * @author Affan Hussain
+ * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -86,40 +87,63 @@ class PageController extends Controller {
 	}
 
 	/**
-	* @NoAdminRequired
-	* @NoCSRFRequired
-	*/
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @return TemplateResponse
+	 */
 	public function index(): TemplateResponse {
-		return new TemplateResponse('forms', 'forms.tmpl',
-		['urlGenerator' => $this->urlGenerator]);
-	}
-
-	/**
-	* @NoAdminRequired
-	*/
-	public function createForm(): TemplateResponse {
-		return new TemplateResponse('forms', 'forms.tmpl',
-		['urlGenerator' => $this->urlGenerator]);
-	}
-
-	/**
-	* @NoAdminRequired
-	*/
-	public function cloneForm(): TemplateResponse {
-		return new TemplateResponse('forms', 'forms.tmpl',
-		['urlGenerator' => $this->urlGenerator]);
+		Util::addScript($this->appName, 'forms');
+		Util::addStyle($this->appName, 'icons');
+		return new TemplateResponse($this->appName, 'main');
 	}
 
 	/**
 	 * @NoAdminRequired
-	 * @param string $hash
+	 * @NoCSRFRequired
+	 *
 	 * @return TemplateResponse
 	 */
-	public function editForm($hash): TemplateResponse {
-		return new TemplateResponse('forms', 'forms.tmpl', [
-			'urlGenerator' => $this->urlGenerator,
- 			'hash' => $hash
-		]);
+	public function createForm(): TemplateResponse {
+		Util::addScript($this->appName, 'forms');
+		Util::addStyle($this->appName, 'icons');
+		return new TemplateResponse($this->appName, 'main');
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @return TemplateResponse
+	 */
+	public function cloneForm(): TemplateResponse {
+		Util::addScript($this->appName, 'forms');
+		Util::addStyle($this->appName, 'icons');
+		return new TemplateResponse($this->appName, 'main');
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @return TemplateResponse
+	 */
+	public function editForm(): TemplateResponse {
+		Util::addScript($this->appName, 'forms');
+		Util::addStyle($this->appName, 'icons');
+		return new TemplateResponse($this->appName, 'main');
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @return TemplateResponse
+	 */
+	public function getResult(): TemplateResponse {
+		Util::addScript($this->appName, 'forms');
+		Util::addStyle($this->appName, 'icons');
+		return new TemplateResponse($this->appName, 'main');
 	}
 
 	/**
@@ -401,14 +425,5 @@ class PageController extends Controller {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @param int $id
-	 * @return TemplateResponse
-	 */
-	public function getResult(int $id): TemplateResponse {
-		return new TemplateResponse('forms', 'forms.tmpl');
 	}
 }

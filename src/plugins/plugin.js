@@ -1,4 +1,3 @@
-/* jshint esversion: 6 */
 // we need our modal component
 import ModalDialog from './ModalDialog'
 

@@ -1,7 +1,7 @@
 <!--
-  - @copyright Copyright (c) 2018 René Gieling <github@dartcafe.de>
+  - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
   -
-  - @author René Gieling <github@dartcafe.de>
+  - @author John Molakvoæ <skjnldsv@protonmail.com>
   -
   - @license GNU AGPL version 3 or any later version
   -
@@ -12,28 +12,40 @@
   -
   - This program is distributed in the hope that it will be useful,
   - but WITHOUT ANY WARRANTY; without even the implied warranty of
-  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   - GNU Affero General Public License for more details.
   -
   - You should have received a copy of the GNU Affero General Public License
-  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  - along with this program. If not, see <http://www.gnu.org/licenses/>.
   -
   -->
 
 <template>
-	<div class="forms-sidebar">
-		<slot />
+	<div class="emptycontent" role="note">
+		<div :class="icon" role="img" />
+		<h2><slot /></h2>
+		<p v-show="$slots.desc">
+			<slot name="desc" />
+		</p>
 	</div>
 </template>
 
-<style lang="scss">
-.forms-sidebar {
-    min-width: 300px;
-    border-left: 1px solid var(--color-border);
-    z-index: 500;
-    > ul,
-    > div {
-        padding: 8px;
-    }
+<script>
+export default {
+	name: 'EmptyContent',
+
+	props: {
+		icon: {
+			type: String,
+			default: 'icon-forms',
+		},
+	},
 }
+</script>
+
+<style lang="scss">
+.emptycontent {
+	margin-top: 20vh;
+}
+
 </style>

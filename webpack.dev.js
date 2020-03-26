@@ -7,7 +7,7 @@ module.exports = merge(common, {
 	devServer: {
 		historyApiFallback: true,
 		noInfo: true,
-		overlay: true
+		overlay: true,
 	},
-	devtool: 'source-map'
+	devtool: 'source-map',
 })

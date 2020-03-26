@@ -389,8 +389,9 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * @param int $formId
 	 * @return DataResponse
+	 * TODO: use hash instead of id ?
 	 */
-	public function removeForm(int $id) {
+	public function deleteForm(int $id) {
 		try {
 			$formToDelete = $this->eventMapper->find($id);
 		} catch (DoesNotExistException $e) {
@@ -533,11 +534,6 @@ class ApiController extends Controller {
 
 		$this->eventMapper->insert($event);
 
-
-
-		return new Http\JSONResponse([
-			'id' => $event->getId(),
-			'hash' => $event->getHash(),
-		]);
+		return new Http\JSONResponse($this->getForm($event->getHash()));
 	}
 }

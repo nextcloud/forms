@@ -26,17 +26,7 @@
   -->
 
 <template>
-	<div id="app-content">
-		<Controls :intitle="title">
-			<template slot="after">
-				<button :disabled="writingForm" class="button btn primary" @click="writeForm(form.mode)">
-					<span>{{ saveButtonTitle }}</span>
-					<span v-if="writingForm" class="icon-loading-small" />
-				</button>
-				<button class="button symbol icon-settings" @click="switchSidebar" />
-			</template>
-		</Controls>
-
+	<AppContent>
 		<div class="workbench">
 			<div>
 				<h2>{{ t('forms', 'Form description') }}</h2>
@@ -53,7 +43,7 @@
 
 			<div>
 				<h2>{{ t('forms', 'Make a Form') }}</h2>
-				<div v-show="form.event.type === 'quizForm'" id="quiz-form-selector-text">
+				<div id="quiz-form-selector-text">
 					<!--shows inputs for question types: drop down box to select the type, text box for question, and button to add-->
 					<label for="ans-type">Answer Type: </label>
 					<select v-model="selected">
@@ -64,7 +54,7 @@
 							{{ option.text }}
 						</option>
 					</select>
-					<input v-model="newQuizQuestion" :placeholder=" t('forms', 'Add Question') " @keyup.enter="addQuestion()">
+					<input v-model="newQuizQuestion" :placeholder="t('forms', 'Add Question')" @keyup.enter="addQuestion()">
 					<button id="questButton"
 						@click="addQuestion()">
 						{{ t('forms', 'Add Question') }}
@@ -72,7 +62,6 @@
 				</div>
 				<!--Transition group to list the already added questions (in the form of quizFormItems)-->
 				<transitionGroup
-					v-show="form.mode == 'create'"
 					id="form-list"
 					name="list"
 					tag="ul"
@@ -89,195 +78,40 @@
 				</transitionGroup>
 			</div>
 		</div>
-
-		<SideBar v-if="sidebar">
-			<div v-if="adminMode" class="warning">
-				{{ t('forms', 'You are editing in admin mode') }}
-			</div>
-			<UserDiv :user-id="form.event.owner" :description="t('forms', 'Owner')" />
-
-			<ul class="tabHeaders">
-				<li class="tabHeader selected" data-tabid="configurationsTabView" data-tabindex="0">
-					<a href="#">
-						{{ t('forms', 'Configuration') }}
-					</a>
-				</li>
-			</ul>
-
-			<div v-if="protect">
-				<span>{{ t('forms', 'Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway.') }}</span>
-				<button @click="protect=false">
-					{{ t('forms', 'Unlock configuration ') }}
-				</button>
-			</div>
-			<div id="configurationsTabView" class="tab">
-				<div class="configBox ">
-					<label class="title icon-settings">
-						{{ t('forms', 'Form configurations') }}
-					</label>
-
-					<input id="anonymous"
-						v-model="form.event.isAnonymous"
-						:disabled="protect"
-						type="checkbox"
-						class="checkbox">
-					<label for="anonymous" class="title">
-						{{ t('forms', 'Anonymous form') }}
-					</label>
-
-					<input id="unique"
-						v-model="form.event.unique"
-						:disabled="form.event.access !== 'registered' || form.event.isAnonymous"
-						type="checkbox"
-						class="checkbox">
-					<label for="unique" class="title">
-						<span>{{ t('forms', 'Only allow one submission per user') }}</span>
-					</label>
-
-					<input v-show="form.event.isAnonymous"
-						id="trueAnonymous"
-						v-model="form.event.fullAnonymous"
-						:disabled="protect"
-						type="checkbox"
-						class="checkbox">
-					<input id="expiration"
-						v-model="form.event.expiration"
-						:disabled="protect"
-						type="checkbox"
-						class="checkbox">
-					<label class="title" for="expiration">
-						{{ t('forms', 'Expires') }}
-					</label>
-
-					<DatetimePicker v-show="form.event.expiration"
-						v-model="form.event.expirationDate"
-						v-bind="expirationDatePicker"
-						:disabled="protect"
-						:time-picker-options="{ start: '00:00', step: '00:05', end: '23:55' }"
-						style="width:170px" />
-				</div>
-
-				<div class="configBox">
-					<label class="title icon-user">
-						{{ t('forms', 'Access') }}
-					</label>
-					<input id="private"
-						v-model="form.event.access"
-						:disabled="protect"
-						type="radio"
-						value="registered"
-						class="radio">
-					<label for="private" class="title">
-						<div class="title icon-group" />
-						<span>{{ t('forms', 'Registered users only') }}</span>
-					</label>
-					<input id="public"
-						v-model="form.event.access"
-						:disabled="protect"
-						type="radio"
-						value="public"
-						class="radio">
-					<label for="public" class="title">
-						<div class="title icon-link" />
-						<span>{{ t('forms', 'Public access') }}</span>
-					</label>
-					<input id="select"
-						v-model="form.event.access"
-						:disabled="protect"
-						type="radio"
-						value="select"
-						class="radio">
-					<label for="select" class="title">
-						<div class="title icon-shared" />
-						<span>{{ t('forms', 'Only shared') }}</span>
-					</label>
-				</div>
-			</div>
-
-			<ShareDiv v-show="form.event.access === 'select'"
-				:active-shares="form.shares"
-				:placeholder="t('forms', 'Name of user or group')"
-				:hide-names="true"
-				@update-shares="updateShares"
-				@remove-share="removeShare" />
-		</SideBar>
-		<LoadingOverlay v-if="loadingForm" />
-	</div>
+	</AppContent>
 </template>
 
 <script>
 import axios from '@nextcloud/axios'
-import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
+import debounce from 'debounce'
 
-import Controls from '../components/_base-Controls'
-import LoadingOverlay from '../components/_base-LoadingOverlay'
+import AppContent from '@nextcloud/vue/dist/Components/AppContent'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+
 import QuizFormItem from '../components/quizFormItem'
-import ShareDiv from '../components/shareDiv'
-import SideBar from '../components/_base-SideBar'
-import UserDiv from '../components/_base-UserDiv'
+
+import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
 	name: 'Create',
 	components: {
-		Controls,
-		DatetimePicker,
-		LoadingOverlay,
+		AppContent,
 		QuizFormItem,
-		ShareDiv,
-		SideBar,
-		UserDiv,
 	},
+
+	mixins: [ViewsMixin],
 
 	data() {
 		return {
-			move: {
-				step: 1,
-				unit: 'week',
-				units: ['minute', 'hour', 'day', 'week', 'month', 'year'],
-			},
-			form: {
-				mode: 'create',
-				votes: [],
-				shares: [],
-				grantedAs: 'owner',
-				id: 0,
-				result: 'new',
-				event: {
-					id: 0,
-					hash: '',
-					type: 'quizForm',
-					title: '',
-					description: '',
-					created: '',
-					access: 'public',
-					unique: false,
-					expiration: false,
-					expirationDate: '',
-					expired: false,
-					isAnonymous: false,
-					fullAnonymous: false,
-					owner: undefined,
-				},
-				options: {
-					formQuizQuestions: [],
-				},
-			},
-			lang: '',
-			locale: '',
 			placeholder: '',
 			newQuizAnswer: '',
 			newQuizQuestion: '',
 			nextQuizAnswerId: 1,
 			nextQuizQuestionId: 1,
-			protect: false,
 			writingForm: false,
 			loadingForm: true,
-			sidebar: false,
 			titleEmpty: false,
-			indexPage: '',
-			longDateFormat: '',
-			dateTimeFormat: '',
 			selected: '',
 			uniqueName: false,
 			uniqueAns: false,
@@ -293,10 +127,6 @@ export default {
 	},
 
 	computed: {
-		adminMode() {
-			return (this.form.event.owner !== OC.getCurrentUser().uid && OC.isUserAdmin())
-		},
-
 		langShort() {
 			return this.lang.split('-')[0]
 		},
@@ -324,38 +154,6 @@ export default {
 			return moment.localeData(moment.locale(this.locale))
 		},
 
-		expirationDatePicker() {
-			return {
-				editable: true,
-				minuteStep: 1,
-				type: 'datetime',
-				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
-				lang: this.lang.split('-')[0],
-				placeholder: t('forms', 'Expiration date'),
-				timePickerOptions: {
-					start: '00:00',
-					step: '00:30',
-					end: '23:30',
-				},
-			}
-		},
-
-		optionDatePicker() {
-			return {
-				editable: false,
-				minuteStep: 1,
-				type: 'datetime',
-				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
-				lang: this.lang.split('-')[0],
-				placeholder: t('forms', 'Click to add a date'),
-				timePickerOptions: {
-					start: '00:00',
-					step: '00:30',
-					end: '23:30',
-				},
-			}
-		},
-
 	},
 
 	watch: {
@@ -363,37 +161,25 @@ export default {
 			// only used when the title changes after page load
 			document.title = t('forms', 'Forms') + ' - ' + this.title
 		},
+
+		form: {
+			deep: true,
+			handler: function() {
+				this.debounceWriteForm()
+			},
+		},
 	},
 
 	created() {
-		this.indexPage = OC.generateUrl('apps/forms/')
-		this.lang = OC.getLanguage()
-		try {
-			this.locale = OC.getLocale()
-		} catch (e) {
-			if (e instanceof TypeError) {
-				this.locale = this.lang
-			} else {
-				/* eslint-disable-next-line no-console */
-				console.log(e)
-			}
-		}
-		moment.locale(this.locale)
-		this.longDateFormat = moment.localeData().longDateFormat('L')
-		this.dateTimeFormat = moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT')
-
 		if (this.$route.name === 'create') {
+			// TODO: manage this from Forms.vue, request a new form to the server
 			this.form.event.owner = OC.getCurrentUser().uid
 			this.loadingForm = false
 		} else if (this.$route.name === 'edit') {
-			this.loadForm(this.$route.params.hash)
-			this.protect = true
+			// TODO: fetch & update form?
 			this.form.mode = 'edit'
 		} else if (this.$route.name === 'clone') {
-			this.loadForm(this.$route.params.hash)
-		}
-		if (window.innerWidth > 1024) {
-			this.sidebar = true
+			// TODO: CLONE
 		}
 	},
 
@@ -401,18 +187,6 @@ export default {
 
 		switchSidebar() {
 			this.sidebar = !this.sidebar
-		},
-
-		addShare(item) {
-			this.form.shares.push(item)
-		},
-
-		updateShares(share) {
-			this.form.shares = share.slice(0)
-		},
-
-		removeShare(item) {
-			this.form.shares.splice(this.form.shares.indexOf(item), 1)
 		},
 
 		checkNames() {
@@ -427,9 +201,9 @@ export default {
 		addQuestion() {
 			this.checkNames()
 			if (this.selected === '') {
-				OC.Notification.showTemporary(t('forms', 'Select a question type!'))
+				showError(t('forms', 'Select a question type!'), { duration: 3000 })
 			} else if (!this.uniqueName) {
-				OC.Notification.showTemporary(t('forms', 'Cannot have the same question!'))
+				showError(t('forms', 'Cannot have the same question!'))
 			} else {
 				if (this.newQuizQuestion !== null & this.newQuizQuestion !== '' & (/\S/.test(this.newQuizQuestion))) {
 					this.form.options.formQuizQuestions.push({
@@ -460,7 +234,7 @@ export default {
 		addAnswer(item, question) {
 			this.checkAnsNames(item, question)
 			if (!this.uniqueAnsName) {
-				OC.Notification.showTemporary(t('forms', 'Two answers cannot be the same!'))
+				showError(t('forms', 'Two answers cannot be the same!'), { duration: 3000 })
 			} else {
 				if (item.newQuizAnswer !== null & item.newQuizAnswer !== '' & (/\S/.test(item.newQuizAnswer))) {
 					item.formQuizAnswers.push({
@@ -486,24 +260,22 @@ export default {
 			})
 		},
 
-		writeForm(mode) {
+		debounceWriteForm: debounce(function() {
+			this.writeForm()
+		}, 200),
+
+		writeForm() {
 			this.allHaveAns()
-			if (mode !== '') {
-				this.form.mode = mode
-			}
 			if (this.form.event.title.length === 0 | !(/\S/.test(this.form.event.title))) {
 				this.titleEmpty = true
-				OC.Notification.showTemporary(t('forms', 'Title must not be empty!'))
-			} else if (this.form.options.formQuizQuestions.length === 0) {
-				OC.Notification.showTemporary(t('forms', 'Must have at least one question!'))
+				showError(t('forms', 'Title must not be empty!'), { duration: 3000 })
 			} else if (!this.haveAns) {
-				OC.Notification.showTemporary(t('forms', 'All questions need answers!'))
+				showError(t('forms', 'All questions need answers!'), { duration: 3000 })
 			} else if (this.form.event.expiration & this.form.event.expirationDate === '') {
-				OC.Notification.showTemporary(t('forms', 'Need to pick an expiration date!'))
+				showError(t('forms', 'Need to pick an expiration date!'), { duration: 3000 })
 			} else {
 				this.writingForm = true
 				this.titleEmpty = false
-				// this.form.event.expirationDate = moment(this.form.event.expirationDate).utc()
 
 				axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
 					.then((response) => {
@@ -511,52 +283,15 @@ export default {
 						this.form.event.hash = response.data.hash
 						this.form.event.id = response.data.id
 						this.writingForm = false
-						OC.Notification.showTemporary(t('forms', '%n successfully saved', 1, this.form.event.title))
-						// window.location.href = OC.generateUrl('apps/forms/edit/' + this.form.event.hash)
-						this.$router.push('/apps/forms/')
+						showSuccess(t('forms', '%n successfully saved', 1, this.form.event.title), { duration: 3000 })
 					}, (error) => {
 						this.form.event.hash = ''
 						this.writingForm = false
-						OC.Notification.showTemporary(t('forms', 'Error on saving form, see console'))
+						showError(t('forms', 'Error on saving form, see console'))
 						/* eslint-disable-next-line no-console */
 						console.log(error.response)
 					})
 			}
-		},
-
-		loadForm(hash) {
-			this.loadingForm = true
-			axios.get(OC.generateUrl('apps/forms/get/form/' + hash))
-				.then((response) => {
-					this.form = response.data
-					if (this.form.event.expirationDate !== null) {
-						this.form.event.expirationDate = new Date(moment.utc(this.form.event.expirationDate))
-					} else {
-						this.form.event.expirationDate = ''
-					}
-
-					if (this.$route.name === 'clone') {
-						this.form.event.owner = OC.getCurrentUser().uid
-						this.form.event.title = t('forms', 'Clone of %n', 1, this.form.event.title)
-						this.form.event.id = 0
-						this.form.id = 0
-						this.form.event.hash = ''
-						this.form.grantedAs = 'owner'
-						this.form.result = 'new'
-						this.form.mode = 'create'
-						this.form.votes = []
-					}
-
-					this.loadingForm = false
-					this.newQuizAnswer = ''
-					this.newQuizQuestion = ''
-
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.form.event.hash = ''
-					this.loadingForm = false
-				})
 		},
 	},
 }
@@ -564,148 +299,114 @@ export default {
 
 <style lang="scss">
 #app-content {
-    input.hasTimepicker {
-        width: 75px;
-    }
+	input.hasTimepicker {
+		width: 75px;
+	}
 }
 
 .warning {
-    color: var(--color-error);
-    font-weight: bold;
+	color: var(--color-error);
+	font-weight: bold;
 }
 
 .forms-content {
-    display: flex;
-    padding-top: 45px;
-    flex-grow: 1;
+	display: flex;
+	padding-top: 45px;
+	flex-grow: 1;
 }
 
 input[type="text"] {
-    display: block;
-    width: 100%;
+	display: block;
+	width: 100%;
 }
 
 .workbench {
-    margin-top: 45px;
-    display: flex;
-    flex-grow: 1;
-    flex-wrap: wrap;
-    overflow-x: hidden;
+	display: flex;
+	flex-grow: 1;
+	flex-wrap: wrap;
+	overflow-x: hidden;
 
-    > div {
-        min-width: 245px;
-        max-width: 540px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        padding: 8px;
-    }
-}
-
-.forms-sidebar {
-    margin-top: 45px;
-    width: 25%;
-
-    .configBox {
-        display: flex;
-        flex-direction: column;
-        padding: 8px;
-        & > * {
-            padding-left: 21px;
-        }
-        & > .title {
-			display: flex;
-            background-position: 0 2px;
-            padding-left: 24px;
-            opacity: 0.7;
-            font-weight: bold;
-            margin-bottom: 4px;
-			& > span {
-				padding-left: 4px;
-			}
-        }
-    }
-}
-
-input,
-textarea {
-    &.error {
-        border: 2px solid var(--color-error);
-        box-shadow: 1px 0 var(--border-radius) var(--color-box-shadow);
-    }
+	> div {
+		min-width: 245px;
+		max-width: 540px;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		padding: 8px;
+	}
 }
 
 /* Transitions for inserting and removing list items */
 .list-enter-active,
 .list-leave-active {
-    transition: all 0.5s ease;
+	transition: all 0.5s ease;
 }
 
 .list-enter,
 .list-leave-to {
-    opacity: 0;
+	opacity: 0;
 }
 
 .list-move {
-    transition: transform 0.5s;
+	transition: transform 0.5s;
 }
 /*  */
 
 #form-item-selector-text {
-    > input {
-        width: 100%;
-    }
+	> input {
+		width: 100%;
+	}
 }
 
 .form-table {
-    > li {
-        display: flex;
-        align-items: baseline;
-        padding-left: 8px;
-        padding-right: 8px;
-        line-height: 24px;
-        min-height: 24px;
-        border-bottom: 1px solid var(--color-border);
-        overflow: hidden;
-        white-space: nowrap;
+	> li {
+		display: flex;
+		align-items: baseline;
+		padding-left: 8px;
+		padding-right: 8px;
+		line-height: 24px;
+		min-height: 24px;
+		border-bottom: 1px solid var(--color-border);
+		overflow: hidden;
+		white-space: nowrap;
 
-        &:active,
-        &:hover {
-            transition: var(--background-dark) 0.3s ease;
-            background-color: var(--color-background-dark); //$hover-color;
+		&:active,
+		&:hover {
+			transition: var(--background-dark) 0.3s ease;
+			background-color: var(--color-background-dark); //$hover-color;
 
-        }
+		}
 
-        > div {
-            display: flex;
-            flex-grow: 1;
-            font-size: 1.2em;
-            opacity: 0.7;
-            white-space: normal;
-            padding-right: 4px;
-            &.avatar {
-                flex-grow: 0;
-            }
-        }
+		> div {
+			display: flex;
+			flex-grow: 1;
+			font-size: 1.2em;
+			opacity: 0.7;
+			white-space: normal;
+			padding-right: 4px;
+			&.avatar {
+				flex-grow: 0;
+			}
+		}
 
-        > div:nth-last-child(1) {
-            justify-content: center;
-            flex-grow: 0;
-            flex-shrink: 0;
-        }
-    }
+		> div:nth-last-child(1) {
+			justify-content: center;
+			flex-grow: 0;
+			flex-shrink: 0;
+		}
+	}
 }
 
 button {
-    &.button-inline {
-        border: 0;
-        background-color: transparent;
-    }
+	&.button-inline {
+		border: 0;
+		background-color: transparent;
+	}
 }
 
 .tab {
-    display: flex;
-    flex-wrap: wrap;
+	display: flex;
+	flex-wrap: wrap;
 }
 .selectUnit {
 	display: flex;
