@@ -20,34 +20,29 @@
  *
  */
 
-export default class {
-
-	#data
-
-	/**
-	 * Construct the form
-	 * @param {Object} data the form data
-	 */
-	constructor(data) {
-		// Id check
-		if (!('id' in data && typeof data.id === 'number')) {
-			throw new Error('A new form must at least contain a valid id')
-		}
-
-		// Hash check
-		if (!('hash' in data && typeof data.id === 'string')) {
-			throw new Error('A new form must at least contain a valid hash')
-		}
-
-		this.#data = data
-	}
-
-	get id() {
-		return this.#data.id
-	}
-
-	get hash() {
-		return this.#data.hash
-	}
-
-}
+export default [
+	{
+		label: t('forms', 'Multiple choice'),
+		value: 'radiogroup',
+		icon: 'icon-forms',
+	},
+	{
+		label: t('forms', 'Checkboxes'),
+		value: 'checkbox',
+		icon: 'icon-answer-checkbox',
+	},
+	{
+		label: t('forms', 'Short answer'),
+		value: 'text',
+		icon: 'icon-answer-short',
+	},
+	{
+		label: t('forms', 'Long text'),
+		value: 'comment',
+		icon: 'icon-answer-long',
+	},
+	// {
+	// label: 'Drop Down',
+	// value: 'dropdown',
+	// },
+]

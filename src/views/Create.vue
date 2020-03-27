@@ -47,6 +47,7 @@
 				:minlength="0"
 				:placeholder="t('forms', 'Title')"
 				:required="true"
+				autofocus
 				type="text">
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
@@ -58,6 +59,17 @@
 		</header>
 
 		<section>
+			<!-- Add new questions toolbar -->
+			<!-- <div class="question-toolbar" role="toolbar">
+				<button v-for="type in answerTypes"
+					:key="type.label"
+					class="question-toolbar__question"
+					@click="addQuestion">
+					<span class="question-toolbar__icon" :class="type.icon" />
+					{{ type.label }}
+				</button>
+			</div> -->
+
 			<div id="quiz-form-selector-text">
 				<!--shows inputs for question types: drop down box to select the type, text box for question, and button to add-->
 				<label for="ans-type">Answer Type: </label>
@@ -79,8 +91,20 @@
 					{{ t('forms', 'Add Question') }}
 				</button>
 			</div>
-			<!--Transition group to list the already added questions (in the form of quizFormItems)-->
+
+			<!-- No questions -->
+			<EmptyContent v-if="form.questions.length === 0">
+				{{ t('forms', 'This form does not have any questions') }}
+				<template #desc>
+					<button class="primary" @click="openQuestionMenu">
+						{{ t('forms', 'Add a new one') }}
+					</button>
+				</template>
+			</EmptyContent>
+
+			<!-- Questions list -->
 			<transitionGroup
+				v-else
 				id="form-list"
 				name="list"
 				tag="ul"
@@ -103,11 +127,15 @@ import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import { emit } from '@nextcloud/event-bus'
+import { showError } from '@nextcloud/dialogs'
 import debounce from 'debounce'
 
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import Actions from '@nextcloud/vue/dist/Components/Actions'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
-import { showError, showSuccess } from '@nextcloud/dialogs'
 
+import answerTypes from '../models/AnswerTypes'
+import EmptyContent from '../components/EmptyContent'
 import QuizFormItem from '../components/quizFormItem'
 import TopBar from '../components/TopBar'
 
@@ -116,7 +144,10 @@ import ViewsMixin from '../mixins/ViewsMixin'
 export default {
 	name: 'Create',
 	components: {
+		ActionButton,
+		Actions,
 		AppContent,
+		EmptyContent,
 		QuizFormItem,
 		TopBar,
 	},
@@ -143,14 +174,11 @@ export default {
 				{ text: 'Long Response', value: 'comment' },
 				{ text: 'Drop Down', value: 'dropdown' },
 			],
+			answerTypes,
 		}
 	},
 
 	computed: {
-		langShort() {
-			return this.lang.split('-')[0]
-		},
-
 		title() {
 			if (this.form.form.title === '') {
 				return t('forms', 'Create new form')
@@ -169,11 +197,6 @@ export default {
 				return t('forms', 'Done')
 			}
 		},
-
-		localeData() {
-			return moment.localeData(moment.locale(this.locale))
-		},
-
 	},
 
 	watch: {
@@ -191,12 +214,7 @@ export default {
 	},
 
 	created() {
-		if (this.$route.name === 'create') {
-			// TODO: manage this from Forms.vue, request a new form to the server
-			this.form.form.owner = OC.getCurrentUser().uid
-			this.loadingForm = false
-		} else if (this.$route.name === 'edit') {
-			// TODO: fetch & update form?
+		if (this.$route.name === 'edit') {
 			this.form.mode = 'edit'
 		} else if (this.$route.name === 'clone') {
 			// TODO: CLONE
@@ -343,6 +361,13 @@ export default {
 		toggleSidebar() {
 			emit('toggleSidebar')
 		},
+
+		/**
+		 * Add question methods
+		 */
+		openQuestionMenu() {
+			this.$refs.questionMenu.opened = true
+		},
 	},
 }
 </script>
@@ -379,6 +404,10 @@ export default {
 			padding-left: 2px; // align with title (compensate font size diff)
 			resize: none
 		}
+	}
+
+	section {
+		position: relative;
 	}
 }
 
