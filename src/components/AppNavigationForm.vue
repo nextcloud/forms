@@ -136,7 +136,7 @@ export default {
 
 	methods: {
 		async onDeleteForm() {
-			if (!confirm(t('forms', 'Are you sure you want to delete the form “{title}”', { title: this.form.title }))) {
+			if (!confirm(t('forms', 'Are you sure you want to delete the form “{title}”?', { title: this.form.title }))) {
 				return
 			}
 
