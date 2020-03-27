@@ -27,6 +27,18 @@
 
 <template>
 	<AppContent>
+		<!-- Show results & sidebar button -->
+		<TopBar>
+			<button class="primary" @click="showResults">
+				<span class="icon-forms-white" role="img" />
+				{{ t('forms', 'Show results') }}
+			</button>
+			<button v-tooltip="t('forms', 'Toggle settings')" @click="toggleSidebar">
+				<span class="icon-settings" role="img" />
+			</button>
+		</TopBar>
+
+		<!-- Forms title & description-->
 		<header>
 			<label class="hidden-visually" for="form-title">{{ t('forms', 'Title') }}</label>
 			<input
@@ -90,12 +102,14 @@
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
+import { emit } from '@nextcloud/event-bus'
 import debounce from 'debounce'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 
 import QuizFormItem from '../components/quizFormItem'
+import TopBar from '../components/TopBar'
 
 import ViewsMixin from '../mixins/ViewsMixin'
 
@@ -104,6 +118,7 @@ export default {
 	components: {
 		AppContent,
 		QuizFormItem,
+		TopBar,
 	},
 
 	mixins: [ViewsMixin],
@@ -312,6 +327,21 @@ export default {
 						console.log(error.response)
 					})
 			}
+		},
+
+		/**
+		 * Topbar methods
+		 */
+		showResults() {
+			this.$router.push({
+				name: 'results',
+				params: {
+					hash: this.form.event.hash,
+				},
+			})
+		},
+		toggleSidebar() {
+			emit('toggleSidebar')
 		},
 	},
 }
