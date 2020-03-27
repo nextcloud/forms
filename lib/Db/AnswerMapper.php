@@ -95,4 +95,27 @@ class AnswerMapper extends QBMapper {
 
 	   $qb->execute();
 	}
+
+	public function findById(int $answerId): Answer {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($answerId))
+			);
+
+		return $this->findEntity($qb);
+	}
+
+	public function deleteByQuestion(int $questionId): void {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->delete($this->getTableName())
+			->where(
+				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
+			);
+
+		$qb->execute();
+	}
 }

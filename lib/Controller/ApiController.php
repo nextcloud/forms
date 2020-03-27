@@ -32,8 +32,10 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\IMapperException;
 
 use OCP\IGroupManager;
+use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -41,7 +43,6 @@ use OCP\Security\ISecureRandom;
 
 use OCA\Forms\Db\Event;
 use OCA\Forms\Db\EventMapper;
-use OCA\Forms\Db\Vote;
 use OCA\Forms\Db\VoteMapper;
 
 use OCA\Forms\Db\Question;
@@ -49,7 +50,7 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 
-
+use OCP\Util;
 
 class ApiController extends Controller {
 
@@ -59,6 +60,12 @@ class ApiController extends Controller {
 	private $voteMapper;
 	private $questionMapper;
 	private $answerMapper;
+
+	/** @var ILogger */
+	private $logger;
+
+	/** @var string */
+	private $userId;
 
 	/**
 	 * PageController constructor.
@@ -81,7 +88,8 @@ class ApiController extends Controller {
 		EventMapper $eventMapper,
 		VoteMapper $voteMapper,
 		QuestionMapper $questionMapper,
-		AnswerMapper $answerMapper
+		AnswerMapper $answerMapper,
+		ILogger $logger
 	) {
 		parent::__construct($appName, $request);
 		$this->userId = $userId;
@@ -91,6 +99,7 @@ class ApiController extends Controller {
 		$this->voteMapper = $voteMapper;
 		$this->questionMapper = $questionMapper;
 		$this->answerMapper = $answerMapper;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -472,7 +481,6 @@ class ApiController extends Controller {
 			$newEvent->setHash($oldForm->getHash());
 			$newEvent->setId($oldForm->getId());
 			$this->eventMapper->update($newEvent);
-			$this->questionMapper->deleteByForm($newEvent->getId());
 
 		} elseif ($mode === 'create') {
 			// Create new form
@@ -486,27 +494,6 @@ class ApiController extends Controller {
 				ISecureRandom::CHAR_UPPER
 			));
 			$newEvent = $this->eventMapper->insert($newEvent);
-		}
-
-		// Update options
-		foreach($options['formQuizQuestions'] as $questionElement){
-			$newQuestion = new Question();
-
-			$newQuestion->setFormId($newEvent->getId());
-			$newQuestion->setFormQuestionType($questionElement['type']);
-			$newQuestion->setFormQuestionText(trim(htmlspecialchars($questionElement['text'])));
-
-			$newQuestion = $this->questionMapper->insert($newQuestion);
-
-			foreach($questionElement['answers'] as $answer){
-				$newAnswer = new Answer();
-
-				$newAnswer->setFormId($newEvent->getId());
-				$newAnswer->setQuestionId($newQuestion->getId());
-				$newAnswer->setText($answer['text']);
-
-				$newAnswer = $this->answerMapper->insert($newAnswer);
-			}
 		}
 
 		return new DataResponse(array(
@@ -531,9 +518,136 @@ class ApiController extends Controller {
 		));
 		$event->setTitle('New form');
 		$event->setDescription('');
+		$event->setAccess('public');
 
 		$this->eventMapper->insert($event);
 
 		return new Http\JSONResponse($this->getForm($event->getHash()));
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function newQuestion(int $formId, string $type, string $text): Http\JSONResponse {
+		$this->logger->debug('Adding new question: formId: {formId}, type: {type}, text: {text}', [
+			'formId' => $formId,
+			'type' => $type,
+			'text' => $text,
+		]);
+
+		try {
+			$form = $this->eventMapper->find($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwner() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		$question = new Question();
+
+		$question->setFormId($formId);
+		$question->setFormQuestionType($type);
+		$question->setFormQuestionText($text);
+
+		$question = $this->questionMapper->insert($question);
+
+		return new Http\JSONResponse($question->getId());
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function deleteQuestion(int $id): Http\JSONResponse {
+		$this->logger->debug('Delete question: {id}', [
+			'id' => $id,
+		]);
+
+		try {
+			$question = $this->questionMapper->findById($id);
+			$form = $this->eventMapper->find($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question of this answer');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwner() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		$this->answerMapper->deleteByQuestion($id);
+		$this->questionMapper->delete($question);
+
+		return new Http\JSONResponse($id);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function newAnswer(int $formId, int $questionId, string $text): Http\JSONResponse {
+		$this->logger->debug('Adding new answer: formId: {formId}, questoinId: {questionId}, text: {text}', [
+			'formId' => $formId,
+			'questionId' => $questionId,
+			'text' => $text,
+		]);
+
+		try {
+			$form = $this->eventMapper->find($formId);
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question so answer can\'t be added');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwner() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		if ($question->getFormId() !== $formId) {
+			$this->logger->debug('This question is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		$answer = new Answer();
+
+		$answer->setFormId($formId);
+		$answer->setQuestionId($questionId);
+		$answer->setText($text);
+
+		$answer = $this->answerMapper->insert($answer);
+
+		return new Http\JSONResponse($answer->getId());
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function deleteAnswer(int $id): Http\JSONResponse {
+		$this->logger->debug('Deleting answer: {id}', [
+			'id' => $id
+		]);
+
+		try {
+			$answer = $this->answerMapper->findById($id);
+			$form = $this->eventMapper->find($answer->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or answer');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwner() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		$this->answerMapper->delete($answer);
+
+		//TODO useful response
+		return new Http\JSONResponse($id);
 	}
 }

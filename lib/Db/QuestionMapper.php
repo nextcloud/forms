@@ -30,10 +30,6 @@ use OCP\AppFramework\Db\QBMapper;
 
 class QuestionMapper extends QBMapper {
 
-	/**
-	 * TextMapper constructor.
-	 * @param IDBConnection $db
-	 */
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'forms_questions', Question::class);
 	}
@@ -47,13 +43,13 @@ class QuestionMapper extends QBMapper {
 	public function findByForm(int $formId): array {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->select('*')
-           ->from($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-           );
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+			);
 
-        return $this->findEntities($qb);
+		return $this->findEntities($qb);
 	}
 
 	/**
@@ -62,12 +58,24 @@ class QuestionMapper extends QBMapper {
 	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->delete($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-           );
+		$qb->delete($this->getTableName())
+			->where(
+				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+			);
 
-	   $qb->execute();
+		$qb->execute();
+	}
+
+	public function findById(int $questionId): Question {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($questionId))
+			);
+
+		return $this->findEntity($qb);
 	}
 
 }

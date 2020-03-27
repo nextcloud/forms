@@ -66,15 +66,14 @@
 					name="list"
 					tag="ul"
 					class="form-table">
-					<li
-						is="quiz-form-item"
+					<QuizFormItem
 						v-for="(question, index) in form.options.formQuizQuestions"
 						:key="question.id"
 						:question="question"
 						:type="question.type"
 						@add-answer="addAnswer"
-						@remove-answer="removeAnswer"
-						@remove="form.options.formQuizQuestions.splice(index, 1)" />
+						@remove-answer="deleteAnswer"
+						@deleteQuestion="deleteQuestion(question, index)" />
 				</transitionGroup>
 			</div>
 		</div>
@@ -82,6 +81,7 @@
 </template>
 
 <script>
+import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import debounce from 'debounce'
@@ -198,7 +198,7 @@ export default {
 			})
 		},
 
-		addQuestion() {
+		async addQuestion() {
 			this.checkNames()
 			if (this.selected === '') {
 				showError(t('forms', 'Select a question type!'), { duration: 3000 })
@@ -206,8 +206,11 @@ export default {
 				showError(t('forms', 'Cannot have the same question!'))
 			} else {
 				if (this.newQuizQuestion !== null & this.newQuizQuestion !== '' & (/\S/.test(this.newQuizQuestion))) {
+					const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), { formId: this.form.id, type: this.selected, text: this.newQuizQuestion })
+					const questionId = response.data
+
 					this.form.options.formQuizQuestions.push({
-						id: this.nextQuizQuestionId++,
+						id: questionId,
 						text: this.newQuizQuestion,
 						type: this.selected,
 						answers: [],
@@ -215,6 +218,12 @@ export default {
 				}
 				this.newQuizQuestion = ''
 			}
+		},
+
+		async deleteQuestion(question, index) {
+			await axios.delete(generateUrl('/apps/forms/api/v1/question/{id}', { id: question.id }))
+			// TODO catch Error
+			this.form.options.formQuizQuestions.splice(index, 1)
 		},
 
 		checkAnsNames(item, question) {
@@ -226,29 +235,28 @@ export default {
 			})
 		},
 
-		removeAnswer(item, question, index) {
-			item.formQuizAnswers.splice(index, 1)
-			question.answers.splice(index, 1)
-		},
-
-		addAnswer(item, question) {
+		async addAnswer(item, question) {
 			this.checkAnsNames(item, question)
 			if (!this.uniqueAnsName) {
 				showError(t('forms', 'Two answers cannot be the same!'), { duration: 3000 })
 			} else {
 				if (item.newQuizAnswer !== null & item.newQuizAnswer !== '' & (/\S/.test(item.newQuizAnswer))) {
-					item.formQuizAnswers.push({
-						id: item.nextQuizAnswerId,
-						text: item.newQuizAnswer,
-					})
+					const response = await axios.post(generateUrl('/apps/forms/api/v1/answer/'), { formId: this.form.id, questionId: question.id, text: item.newQuizAnswer })
+					const answerId = response.data
+
 					question.answers.push({
-						id: item.nextQuizAnswerId,
+						id: answerId,
 						text: item.newQuizAnswer,
 					})
-					item.nextQuizAnswerId++
 				}
 				item.newQuizAnswer = ''
 			}
+		},
+
+		async deleteAnswer(question, answer, index) {
+			await axios.delete(generateUrl('/apps/forms/api/v1/answer/{id}', { id: answer.id }))
+			// TODO catch errors
+			question.answers.splice(index, 1)
 		},
 
 		allHaveAns() {
