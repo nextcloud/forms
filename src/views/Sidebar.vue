@@ -21,7 +21,7 @@
  -->
 
 <template>
-	<AppSidebar :title="form.form.title">
+	<AppSidebar v-show="opened" :title="form.form.title" @close="onClose">
 		<div class="configBox ">
 			<label class="title icon-settings">
 				{{ t('forms', 'Form configurations') }}
@@ -109,6 +109,7 @@
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 import ShareDiv from '../components/shareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -125,6 +126,7 @@ export default {
 
 	data() {
 		return {
+			opened: true,
 			lang: '',
 			locale: '',
 			longDateFormat: '',
@@ -182,6 +184,13 @@ export default {
 		moment.locale(this.locale)
 		this.longDateFormat = moment.localeData().longDateFormat('L')
 		this.dateTimeFormat = moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT')
+
+		// Watch for Sidebar toggle
+		subscribe('toggleSidebar', this.onToggle)
+	},
+
+	beforeDestroy() {
+		unsubscribe('toggleSidebar')
 	},
 
 	methods: {
@@ -195,6 +204,16 @@ export default {
 
 		removeShare(item) {
 			this.form.shares.splice(this.form.shares.indexOf(item), 1)
+		},
+
+		/**
+		 * Sidebar state methods
+		 */
+		onClose() {
+			this.opened = false
+		},
+		onToggle() {
+			this.opened = !this.opened
 		},
 	},
 }
