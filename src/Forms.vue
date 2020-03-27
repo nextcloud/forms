@@ -125,7 +125,7 @@ export default {
 				const response = await axios.get(generateUrl('apps/forms/get/forms'))
 				this.forms = response.data
 			} catch (error) {
-				showError(t('forms', 'An error occured while loading the forms list'))
+				showError(t('forms', 'An error occurred while loading the forms list'))
 				console.error(error)
 			} finally {
 				this.loading = false
