@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16">
+  <path style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000;text-transform:none;text-orientation:mixed;white-space:normal;shape-padding:0;isolation:auto;mix-blend-mode:normal;solid-color:#000;solid-opacity:1" d="M2.43 2a.43.43 0 00-.43.43V4.3l.86.86V2.86h8.73l.86-.86H2.43zM14 5.86l-.86.86v6.42H2.86v-2.6L2 9.68v3.9a.43.43 0 00.43.42h11.14a.43.43 0 00.43-.43v-7.7z" color="#000" font-weight="400" font-family="sans-serif" overflow="visible" paint-order="markers fill stroke"/>
+  <path d="M6.09 12.5L1.14 7.55l1.41-1.41L6.1 9.67l6.34-6.38 1.44 1.43z"/>
+</svg>

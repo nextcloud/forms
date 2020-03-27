@@ -46,6 +46,9 @@ export default {
 <style lang="scss">
 .emptycontent {
 	margin-top: 20vh;
+	button {
+		margin: 3px;
+	}
 }
 
 </style>
