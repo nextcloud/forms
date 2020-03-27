@@ -6,7 +6,6 @@ OC.L10N.register(
     "Owner" : "Owner",
     "never" : "jangan",
     "Description" : "Keterangan",
-    "Done" : "Done",
-    "New" : "Baru"
+    "Done" : "Done"
 },
 "nplurals=1; plural=0;");

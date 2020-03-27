@@ -9,9 +9,7 @@ OC.L10N.register(
     "Public access" : "Acceso público",
     "never" : "nunca",
     "Description" : "Descripción",
-    "Configuration" : "Configuración",
     "Done" : "Hecho",
-    "Expiration date" : "Fecha de expiración",
-    "New" : "Nuevo"
+    "Expiration date" : "Fecha de expiración"
 },
 "nplurals=2; plural=(n != 1);");

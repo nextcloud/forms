@@ -7,8 +7,6 @@ OC.L10N.register(
     "Copy link" : "linki nüsxələ",
     "never" : "heç vaxt",
     "Description" : "Açıqlanma",
-    "Configuration" : "Konfiqurasiya",
-    "Done" : "Done",
-    "New" : "Yeni"
+    "Done" : "Done"
 },
 "nplurals=2; plural=(n != 1);");

@@ -16,10 +16,8 @@ OC.L10N.register(
     "Registered users only" : "Registered users only",
     "never" : "never",
     "Description" : "Description",
-    "Configuration" : "Configuration",
     "Done" : "Done",
     "Expiration date" : "Expiration date",
-    "New" : "New",
     "Access denied" : "Access denied"
 },
 "nplurals=2; plural=(n != 1);");

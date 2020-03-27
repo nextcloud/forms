@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Copiar al portapapeles",
     "Expired" : "Expirado",
     "Expires never" : "Nunca expira",
     "Usernames hidden to Owner" : "Nombres de usuario ocultos para el Dueño",
@@ -16,10 +17,8 @@ OC.L10N.register(
     "Registered users only" : "Solo usuarios registrados",
     "never" : "nunca",
     "Description" : "Descripción",
-    "Configuration" : "Configuración",
     "Done" : "Terminado",
     "Expiration date" : "Fecha de expiración",
-    "New" : "Nuevo",
     "Access denied" : "Acceso denegado"
 },
 "nplurals=2; plural=(n != 1);");

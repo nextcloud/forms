@@ -6,9 +6,7 @@ OC.L10N.register(
     "Owner" : "Owner",
     "never" : "කවදාවත්",
     "Description" : "විස්තරය",
-    "Configuration" : "වින්‍යාසය",
     "Done" : "Done",
-    "Expiration date" : "කල් ඉකුත් විමේ දිනය",
-    "New" : "නව"
+    "Expiration date" : "කල් ඉකුත් විමේ දිනය"
 },
 "nplurals=2; plural=(n != 1);");

@@ -9,9 +9,7 @@ OC.L10N.register(
     "Public access" : "Akses publik",
     "never" : "asnjëherë",
     "Description" : "Përshkrim",
-    "Configuration" : "Formësim",
     "Done" : "U krye",
-    "Expiration date" : "Datë skadimi",
-    "New" : "I ri"
+    "Expiration date" : "Datë skadimi"
 },
 "nplurals=2; plural=(n != 1);");

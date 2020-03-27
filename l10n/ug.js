@@ -6,8 +6,6 @@ OC.L10N.register(
     "Owner" : "Owner",
     "never" : "ھەرگىز",
     "Description" : "چۈشەندۈرۈش",
-    "Configuration" : "سەپلىمە",
-    "Done" : "Done",
-    "New" : "يېڭى"
+    "Done" : "Done"
 },
 "nplurals=1; plural=0;");

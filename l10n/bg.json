@@ -8,9 +8,7 @@
     "never" : "никога",
     "Share with" : "Сподели с",
     "Description" : "Описание",
-    "Configuration" : "Настройки",
     "Done" : "Готово",
-    "Expiration date" : "Валидност",
-    "New" : "Нов"
+    "Expiration date" : "Валидност"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

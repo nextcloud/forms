@@ -10,7 +10,6 @@ OC.L10N.register(
     "never" : "nooit",
     "Description" : "Beskrywing",
     "Done" : "Gereed",
-    "Expiration date" : "Vervaldatum",
-    "New" : "Nuut"
+    "Expiration date" : "Vervaldatum"
 },
 "nplurals=2; plural=(n != 1);");

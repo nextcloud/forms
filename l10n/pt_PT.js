@@ -1,7 +1,6 @@
 OC.L10N.register(
     "forms",
     {
-    "Do you really want to delete this new form?" : "Quer mesmo eliminar este novo formulário?",
     "Forms" : "Formulários",
     "Expired" : "Expirado",
     "Expires %n" : "Expira a %n",
@@ -20,7 +19,6 @@ OC.L10N.register(
     "Only shared" : "Apenas partilhado",
     "Registered users only" : "Apenas para utilizadores registados",
     "Hidden form" : "Formulário invisível",
-    "Text form" : "Campo de texto",
     "never" : "nunca",
     "Link copied to clipboard" : "Ligação copiada para a área de transferência",
     "Error, while copying link to clipboard" : "Erro quando tentava copiar a ligação para a área de transferência",
@@ -30,16 +28,11 @@ OC.L10N.register(
     "Description" : "Descrição",
     "Make a Form" : "Criar um formulário",
     "Add Question" : "Adicionar Questão",
-    "You are editing in admin mode" : "Está a editar em modo administração",
-    "Configuration" : "Configuração",
-    "Configuration is locked. Changing options may result in unwanted behaviour, but you can unlock it anyway." : "A alteração da configuração está bloqueada. Modificar parâmetros pode resultar num comportamento diferente do esperado, mas se o desejar, pode avançar.",
-    "Unlock configuration " : "Desbloquear o acesso à configuração",
-    "Form configurations" : "Parâmetros dos formulários",
-    "Name of user or group" : "Nome do utilizador ou grupo",
     "Create new form" : "Criar novo formulário",
     "Done" : "Concluído",
+    "Form configurations" : "Parâmetros dos formulários",
+    "Name of user or group" : "Nome do utilizador ou grupo",
     "Expiration date" : "Data de expiração",
-    "New" : "Novo",
     "Access denied" : "Acesso proibido"
 },
 "nplurals=2; plural=(n != 1);");

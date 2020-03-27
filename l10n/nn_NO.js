@@ -7,9 +7,7 @@ OC.L10N.register(
     "Created" : "Lagd",
     "never" : "aldri",
     "Description" : "Skildring",
-    "Configuration" : "Innstillingar",
     "Done" : "Ferdig",
-    "Expiration date" : "Utløpsdato",
-    "New" : "Ny"
+    "Expiration date" : "Utløpsdato"
 },
 "nplurals=2; plural=(n != 1);");

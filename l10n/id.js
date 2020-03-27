@@ -8,9 +8,7 @@ OC.L10N.register(
     "Copy link" : "Salin tautan",
     "never" : "tidak pernah.",
     "Description" : "Deskrisi",
-    "Configuration" : "Konfigurasi",
     "Done" : "Selesai",
-    "Expiration date" : "Tanggal kadaluarsa",
-    "New" : "Baru"
+    "Expiration date" : "Tanggal kadaluarsa"
 },
 "nplurals=1; plural=0;");

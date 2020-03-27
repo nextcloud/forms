@@ -16,10 +16,8 @@ OC.L10N.register(
     "Registered users only" : "მხოლოდ რეგისტრირებული მომხმარებლები",
     "never" : "არასდროს",
     "Description" : "აღწერილობა",
-    "Configuration" : "კონფიგურაცია",
     "Done" : "დასრულებულია",
     "Expiration date" : "გაუქმების თარიღი",
-    "New" : "ახალი",
     "Access denied" : "წვდომა არაა დაშვებული"
 },
 "nplurals=2; plural=(n!=1);");

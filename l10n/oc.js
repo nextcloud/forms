@@ -8,7 +8,6 @@ OC.L10N.register(
     "never" : "pas jamai",
     "Description" : "Descripcion",
     "Done" : "Done",
-    "Expiration date" : "Data d'expiracion",
-    "New" : "Novèl"
+    "Expiration date" : "Data d'expiracion"
 },
 "nplurals=2; plural=(n > 1);");

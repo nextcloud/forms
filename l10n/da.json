@@ -16,14 +16,11 @@
     "Link copied to clipboard" : "Link kopieret til udklipsholder",
     "Share with" : "Del med",
     "Description" : "Beskrivelse",
-    "Configuration" : "sætning",
     "Done" : "Færdig",
-    "Expiration date" : "Udløbsdato",
-    "Click to add a date" : "Klik for at tilføje en dato",
     "Title must not be empty!" : "Overskriften må ikke være tom!",
     "%n successfully saved" : "%n blev gemt",
-    "Clone of %n" : "Klon af %n",
-    "New" : "Ny",
+    "Expiration date" : "Udløbsdato",
+    "Click to add a date" : "Klik for at tilføje en dato",
     "Access denied" : "Adgang nægtet"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -1,4 +1,5 @@
 { "translations": {
+    "Copy to clipboard" : "Copiar al cartafueyu",
     "Group" : "Group",
     "Title" : "Títulu",
     "Owner" : "Owner",
@@ -7,9 +8,7 @@
     "Public access" : "Accesu públicu",
     "never" : "never",
     "Description" : "Descripción",
-    "Configuration" : "Configuración",
     "Done" : "Fecho",
-    "Expiration date" : "Data de caducidá",
-    "New" : "Nuevu"
+    "Expiration date" : "Data de caducidá"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

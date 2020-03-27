@@ -7,9 +7,7 @@ OC.L10N.register(
     "Copy link" : "লিঙ্ক কপি করো",
     "never" : "কখনোই নয়",
     "Description" : "বিবরণ",
-    "Configuration" : "কনফিগারেসন",
     "Done" : "Done",
-    "Expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ",
-    "New" : "নতুন"
+    "Expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ"
 },
 "nplurals=2; plural=(n != 1);");

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Copiar al cartafueyu",
     "Group" : "Group",
     "Title" : "Títulu",
     "Owner" : "Owner",
@@ -9,9 +10,7 @@ OC.L10N.register(
     "Public access" : "Accesu públicu",
     "never" : "never",
     "Description" : "Descripción",
-    "Configuration" : "Configuración",
     "Done" : "Fecho",
-    "Expiration date" : "Data de caducidá",
-    "New" : "Nuevu"
+    "Expiration date" : "Data de caducidá"
 },
 "nplurals=2; plural=(n != 1);");

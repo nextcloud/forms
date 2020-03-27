@@ -16,10 +16,8 @@ OC.L10N.register(
     "Registered users only" : "Ainult registreerunud kasutajad",
     "never" : "mitte kunagi",
     "Description" : "Kirjeldus",
-    "Configuration" : "Seadistamine",
     "Done" : "Valmis",
     "Expiration date" : "Aegumise kuupäev",
-    "New" : "Uus",
     "Access denied" : "Ligipääs keelatud"
 },
 "nplurals=2; plural=(n != 1);");

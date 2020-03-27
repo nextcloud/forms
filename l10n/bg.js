@@ -10,9 +10,7 @@ OC.L10N.register(
     "never" : "никога",
     "Share with" : "Сподели с",
     "Description" : "Описание",
-    "Configuration" : "Настройки",
     "Done" : "Готово",
-    "Expiration date" : "Валидност",
-    "New" : "Нов"
+    "Expiration date" : "Валидност"
 },
 "nplurals=2; plural=(n != 1);");

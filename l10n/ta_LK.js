@@ -6,9 +6,7 @@ OC.L10N.register(
     "Owner" : "Owner",
     "never" : "ஒருபோதும்",
     "Description" : "விவரிப்பு",
-    "Configuration" : "தகவமைப்பு",
     "Done" : "Done",
-    "Expiration date" : "காலவதியாகும் திகதி",
-    "New" : "புதிய"
+    "Expiration date" : "காலவதியாகும் திகதி"
 },
 "nplurals=2; plural=(n != 1);");

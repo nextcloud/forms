@@ -6,9 +6,7 @@ OC.L10N.register(
     "Owner" : "Owner",
     "never" : "មិនដែរ",
     "Description" : "ការ​អធិប្បាយ",
-    "Configuration" : "ការ​កំណត់​សណ្ឋាន",
     "Done" : "Done",
-    "Expiration date" : "ពេល​ផុត​កំណត់",
-    "New" : "ថ្មី"
+    "Expiration date" : "ពេល​ផុត​កំណត់"
 },
 "nplurals=1; plural=0;");

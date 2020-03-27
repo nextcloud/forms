@@ -8,7 +8,6 @@ OC.L10N.register(
     "Public access" : "Нийтийн хандах эрх",
     "never" : "хэзээ ч үгүй",
     "Description" : "Тодорхойлолт",
-    "Done" : "Хийсэн",
-    "New" : "Шинэ"
+    "Done" : "Хийсэн"
 },
 "nplurals=2; plural=(n != 1);");

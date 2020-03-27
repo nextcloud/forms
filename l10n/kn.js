@@ -6,7 +6,6 @@ OC.L10N.register(
     "Owner" : "Owner",
     "never" : "﻿ಎಂದಿಗೂ",
     "Done" : "Done",
-    "Expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕ",
-    "New" : "﻿ಹೊಸ"
+    "Expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕ"
 },
 "nplurals=2; plural=(n > 1);");

@@ -8,7 +8,6 @@ OC.L10N.register(
     "never" : "Ni",
     "Description" : "Beschreiwung",
     "Done" : "Done",
-    "Expiration date" : "Verfallsdatum",
-    "New" : "Nei"
+    "Expiration date" : "Verfallsdatum"
 },
 "nplurals=2; plural=(n != 1);");

@@ -8,7 +8,6 @@ OC.L10N.register(
     "never" : "永不",
     "Description" : "描述",
     "Done" : "Done",
-    "Expiration date" : "分享期限",
-    "New" : "新增"
+    "Expiration date" : "分享期限"
 },
 "nplurals=1; plural=0;");
