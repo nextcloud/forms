@@ -33,17 +33,16 @@
 				name="list"
 				tag="ul"
 				class="form-table">
-				<li
-					is="text-form-item"
-					v-for="(ans, index) in formQuizAnswers"
-					:key="ans.id"
-					:option="ans"
-					@remove="emitRemoveAnswer(question, index)"
+				<TextFormItem
+					v-for="(answer, index) in answers"
+					:key="answer.id"
+					:option="answer"
+					@remove="emitRemoveAnswer(question, answer, index)"
 					@delete="question.answers.splice(index, 1)" />
 			</transitionGroup>
 		</div>
 		<div>
-			<a class="icon icon-delete svg delete-form" @click="$emit('remove'), $emit('delete')" />
+			<a class="icon icon-delete svg delete-form" @click="$emit('deleteQuestion')" />
 		</div>
 	</li>
 </template>
@@ -58,16 +57,20 @@ export default {
 		question: {
 			type: Object,
 			default: undefined,
-			answers: [],
 		},
 	},
 	data() {
 		return {
-			formQuizAnswers: [],
 			nextQuizAnswerId: 1,
 			newQuizAnswer: '',
 			type: '',
 		}
+	},
+
+	computed: {
+		answers() {
+			return this.question.answers || []
+		},
 	},
 
 	methods: {
@@ -75,8 +78,8 @@ export default {
 			this.$emit('add-answer', this, question)
 		},
 
-		emitRemoveAnswer(question, id) {
-			this.$emit('remove-answer', this, question, id)
+		emitRemoveAnswer(question, answer, index) {
+			this.$emit('remove-answer', question, answer, index)
 		},
 	},
 }
