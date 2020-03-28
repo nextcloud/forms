@@ -5,6 +5,7 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Googleフォームに似たフォームアプリ。",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Googleフォームに似たフォームアプリ。アクセスを制限することができます（メンバー、特定のグループ/ユーザー、および一般）。",
     "Delete form" : "フォームを削除",
+    "Copy to clipboard" : "クリップボードにコピー",
     "Expired" : "有効期限切れ",
     "Expires %n" : " %nに期限が切れます",
     "Expires never" : "有効期限なし",

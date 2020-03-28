@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Skopírovať do schránky",
     "Group" : "Skupina",
     "Title" : "Názov",
     "Access" : "Prístup",

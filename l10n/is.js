@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Afrita á klippispjald",
     "Expired" : "Útrunnið",
     "Expires %n" : "Gildir til %n",
     "Expires never" : "Rennur aldrei út",

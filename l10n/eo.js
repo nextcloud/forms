@@ -1,6 +1,8 @@
 OC.L10N.register(
     "forms",
     {
+    "Cannot copy, please copy the link manually" : "Ne eblis kopii la ligilon; kopiu ĝin permane.",
+    "Copy to clipboard" : "Kopii tondejen",
     "Expired" : "Senvalidiĝis",
     "Expires %n" : "Senvalidiĝos je %n",
     "Expires never" : "Neniam senvalidiĝos",

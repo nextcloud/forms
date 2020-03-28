@@ -5,6 +5,8 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Εφαρμογή φορμών, παρόμεια με τις Φόρμες Google.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Εφαρμογή φορμών, όπως τις Φόρμες Googlw με δυνατότητα περιορισμού πρόσβασης σε (μέλη, ορισμένες ομάδες / χρήστες και δημόσια).",
     "Delete form" : "Διαγραφή φόρμας",
+    "Cannot copy, please copy the link manually" : "Δεν μπορεί να αντιγραφή, παρακαλώ αντιγράψτε χειροκίνητα",
+    "Copy to clipboard" : "Αντιγραφή στο πρόχειρο",
     "Expired" : "Έληξε",
     "Expires %n" : "Λήγει στις %n",
     "Expires never" : "Δεν λήγει ποτέ",

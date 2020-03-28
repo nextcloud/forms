@@ -5,6 +5,7 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Una aplicació de formularis, semblant a Google Forms",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Una aplicació de formularis, semblant a Google Forms amb la possibilitat de controlar l'accés (membres, certs grups/usuaris, i públic)",
     "Delete form" : "Suprimeix el formulari",
+    "Copy to clipboard" : "Copia-ho al porta-papers",
     "Expired" : "Caducat",
     "Expires %n" : "Venç %n",
     "Expires never" : "Mai venç",

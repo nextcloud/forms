@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "კოპირება ბუფერში",
     "Expired" : "გაუქმდა",
     "Expires never" : "არასდროს უქმდება",
     "Usernames hidden to Owner" : "მომხმარებლის სახელები მფლობელისთვის დამალულია",

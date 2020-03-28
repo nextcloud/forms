@@ -4,6 +4,7 @@ OC.L10N.register(
     "Forms" : "Lomakkeet",
     "A forms app, similar to Google Forms." : "Lomakesovellus Google Formsin tyyliin.",
     "Delete form" : "Poista lomake",
+    "Copy to clipboard" : "Kopioi leikepöydälle",
     "Expired" : "Vanhentunut",
     "Expires %n" : "Vanhenee %n",
     "Expires never" : "Ei vanhene koskaan",

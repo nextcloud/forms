@@ -5,6 +5,8 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Aplikacija za upravljanje obrascima, nalik aplikaciji Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Aplikacija za upravljanje obrascima, nalik aplikaciji Google Forms s mogućnošću ograničavanja pristupa (članovi, određene grupe/korisnici, javno).",
     "Delete form" : "Izbriši obrazac",
+    "Cannot copy, please copy the link manually" : "Kopiranje nije moguće, ručno kopirajte poveznicu",
+    "Copy to clipboard" : "Kopiraj u međuspremnik",
     "Expired" : "Istekao",
     "Expires %n" : "Istječe %n",
     "Expires never" : "Istječe nikada",

@@ -5,6 +5,8 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "一个表单应用，类似于谷歌表单。",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "一个表单应用，类似于谷歌表单，可以限制访问（成员，特定的分组/用户，和公开）",
     "Delete form" : "删除表单",
+    "Cannot copy, please copy the link manually" : "无法复制，请手动复制链接",
+    "Copy to clipboard" : "复制到剪贴板",
     "Expired" : "已过期",
     "Expires %n" : "使 %n 过期",
     "Expires never" : "从不过期",

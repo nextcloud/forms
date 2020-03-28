@@ -5,6 +5,7 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Az űrlapok alkalmazás hasonlít a Google űrlapokhoz.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Az űrlap alkalmazás hasonlóan a Google űrlapokhoz letetőséget nyújt hozzáférés korlátozására (tagok, bizonyos csoport/felhasználó és nyilvános).",
     "Delete form" : "Űrlap törlése",
+    "Copy to clipboard" : "Másolás vágólapra",
     "Expired" : "Lejárt",
     "Expires %n" : "Lejár: %n",
     "Expires never" : "Sosem jár le",

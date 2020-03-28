@@ -5,6 +5,8 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Program Vprašalniki, zasnovan podobno kot Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Program Vprašalniki, zasnovan podobno kot Google Forms z možnostjo omejevanja dostopa (člani, skupine ali uporabniki, javnost).",
     "Delete form" : "Izbriši vprašalnik",
+    "Cannot copy, please copy the link manually" : "Povezave ni mogoče kopirati. Storite to ročno.",
+    "Copy to clipboard" : "Kopiraj v odložišče",
     "Expired" : "Poteklo",
     "Expires %n" : "Poteče %n",
     "Expires never" : "Ne poteče",

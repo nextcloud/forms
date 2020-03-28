@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Kopier til udklipsholder",
     "Expired" : "Udløbet",
     "Expires %n" : "Udløber %n",
     "Expires never" : "Udløber aldrig",

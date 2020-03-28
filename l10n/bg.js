@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Копирай",
     "Group" : "Група",
     "Title" : "Име",
     "Owner" : "Създател",

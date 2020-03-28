@@ -3,6 +3,8 @@
     "A forms app, similar to Google Forms." : "Unha aplicación de formularios, semellante ao Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Unha aplicación de formularios, semellante ao Google Forms, coa posibilidade de restrinxir o acceso (membros, determinados grupos/usuarios, agochados e públicos).",
     "Delete form" : "Eliminar formulario",
+    "Cannot copy, please copy the link manually" : "Non foi posíbel copiala. Copie a ligazón manualmente",
+    "Copy to clipboard" : "Copiar no portapapeis.",
     "Expired" : "Caducado",
     "Expires %n" : "Caduca o %n",
     "Expires never" : "Non caduca nunca",

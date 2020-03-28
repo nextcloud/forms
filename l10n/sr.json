@@ -3,6 +3,8 @@
     "A forms app, similar to Google Forms." : "Апликација упитника, слична као Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Апликација упитника, слична као Google Forms са могућношћу ограничавања приступа (члановима, одређеним групама, јавно).",
     "Delete form" : "Обриши упитник",
+    "Cannot copy, please copy the link manually" : "Не могу да копирам, копирајте везу ручно",
+    "Copy to clipboard" : "Копирај у оставу",
     "Expired" : "Истекао",
     "Expires %n" : "Истиче %n",
     "Expires never" : "Никад не истиче",

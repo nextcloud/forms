@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Copiar al portapapeles",
     "Group" : "Grupo",
     "Title" : "Título",
     "Owner" : "Dueño",

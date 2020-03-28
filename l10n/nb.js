@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Kopiert til utklippstavlen",
     "Expired" : "Utløpt",
     "Expires never" : "Utløper ikke",
     "Usernames hidden to Owner" : "Brukernavn skjult for eieren",

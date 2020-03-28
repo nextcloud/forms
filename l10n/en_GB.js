@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Copy to clipboard",
     "Expired" : "Expired",
     "Expires never" : "Expires never",
     "Usernames hidden to Owner" : "Usernames hidden to Owner",

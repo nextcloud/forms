@@ -3,6 +3,8 @@
     "A forms app, similar to Google Forms." : "Google forms benzeri bir form uygulaması.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Erişim kısıtlama özelliği ile (üyelere, belirli gruplara ya da kullanıcılara ya da herkese açık) Google forms benzeri bir form uygulaması.",
     "Delete form" : "Formu sil",
+    "Cannot copy, please copy the link manually" : "Kopyalanamadı. Lütfen bağlantıyı el ile kopyalayın",
+    "Copy to clipboard" : "Panoya kopyala",
     "Expired" : "Süresi dolmuş",
     "Expires %n" : "Süresi %n zamanında dolacak",
     "Expires never" : "Süresi dolmaz",

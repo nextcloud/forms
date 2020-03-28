@@ -5,6 +5,8 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Una app de formularios, similar a Google Forms",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Una app de formularios, similar a Google Forms con la posibilidad de restringir el acceso (miembros, ciertos grupos/usuarios o público).",
     "Delete form" : "Eliminar formulario",
+    "Cannot copy, please copy the link manually" : "No se ha podido copiar, por favor, copia el enlace manualmente",
+    "Copy to clipboard" : "Copiar al portapapeles",
     "Expired" : "Expirado",
     "Expires %n" : "Expira el %n",
     "Expires never" : "No expira nunca",

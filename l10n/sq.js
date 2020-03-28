@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy to clipboard" : "Kopjo në dërrasë ",
     "Group" : "Grup",
     "Title" : "Titulli",
     "Owner" : "Zotëruesi",

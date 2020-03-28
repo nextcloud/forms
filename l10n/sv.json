@@ -3,6 +3,8 @@
     "A forms app, similar to Google Forms." : "En formulär-app, liknande Google Forms.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "En formulär-app, liknande Google Forms med möjlighet att begränsa åtkomst (medlemmar, grupper/användare och publik).",
     "Delete form" : "Ta bort formuläret",
+    "Cannot copy, please copy the link manually" : "Kan inte kopiera, länken måste kopieras manuellt",
+    "Copy to clipboard" : "Kopiera till urklipp",
     "Expired" : "Utgånget",
     "Expires %n" : "Upphör %n",
     "Expires never" : "Upphör aldrig",
