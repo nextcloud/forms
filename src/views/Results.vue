@@ -60,6 +60,7 @@ import json2csvParser from 'json2csv'
 import axios from '@nextcloud/axios'
 import LoadingOverlay from '../components/_base-LoadingOverlay'
 import ViewsMixin from '../mixins/ViewsMixin'
+import { generateUrl } from '@nextcloud/router'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 export default {
@@ -123,7 +124,7 @@ export default {
 	methods: {
 		loadForms() {
 			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/votes/' + this.$route.params.hash))
+			axios.get(generateUrl('apps/forms/api/v1/submissions/{hash}', { hash: this.$route.params.hash }))
 				.then((response) => {
 					if (response.data == null) {
 						this.votes = null

@@ -41,9 +41,8 @@ class VoteMapper extends QBMapper {
 	/**
 	 * @param int $formId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @return Comment[]
+	 * @return Vote[]
 	 */
-
 	public function findByForm(int $formId): array {
 		$qb = $this->db->getQueryBuilder();
 
@@ -55,7 +54,7 @@ class VoteMapper extends QBMapper {
 
         return $this->findEntities($qb);
 	}
-	
+
 	/**
 	 * @param int $formId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found

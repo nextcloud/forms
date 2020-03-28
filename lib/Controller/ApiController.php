@@ -205,37 +205,6 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Read all votes of a form based on the form id
-	 * @NoAdminRequired
-	 * @param Integer $formId
-	 * @return Array
-	 */
-	public function getVotes($formId) {
-		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
-			$currentUser = '';
-		} else {
-			$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-		}
-
-		$event = $this->getEvent($formId);
-
-		$accessList = $this->convertAccessList($event['access']);
-
-		if ($event['owner'] == $currentUser) {
-		$votesList = array();
-		$votes = $this->voteMapper->findByForm($formId);
-
-		foreach ($votes as $voteElement) {
-			$votesList[] = $voteElement->read();
-		}
-
-		return $votesList;
-	}
-	return NULL;
-}
-
-
-	/**
 	 * Read an entire form based on form id
 	 * @NoAdminRequired
 	 * @param Integer $formId
@@ -352,7 +321,6 @@ class ApiController extends Controller {
 				'grantedAs' => $this->grantAccessAs($event, $shares),
 				'mode' => $mode,
 				'event' => $event,
-				'votes' => $this->getVotes($event['id']),
 				'shares' => $shares,
 				'options' => [
 					'formQuizQuestions' => $this->getQuestions($event['id'])
@@ -649,5 +617,29 @@ class ApiController extends Controller {
 
 		//TODO useful response
 		return new Http\JSONResponse($id);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function getSubmissions(string $hash): Http\JSONResponse {
+		try {
+			$form = $this->eventMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwner() !== $this->userId) {
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		$votes = $this->voteMapper->findByForm($form->getId());
+
+		$result = [];
+		foreach ($votes as $vote) {
+			$result[] = $vote->read();
+		}
+
+		return new Http\JSONResponse($result);
 	}
 }
