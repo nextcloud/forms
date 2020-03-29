@@ -28,6 +28,7 @@
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\AppInfo\Application;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
@@ -53,8 +54,6 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 
-use OCP\Util;
-
 class ApiController extends Controller {
 
 	private $groupManager;
@@ -71,21 +70,7 @@ class ApiController extends Controller {
 	/** @var string */
 	private $userId;
 
-	/**
-	 * PageController constructor.
-	 * @param string $appName
-	 * @param IGroupManager $groupManager
-	 * @param IRequest $request
-	 * @param IUserManager $userManager
-	 * @param string $userId
-	 * @param FormMapper $formMapper
-	 * @param SubmissionMapper $submissionMapper
-	 * @param AnswerMapper $answerMapper
-	 * @param QuestionMapper $questionMapper
-	 * @param OptionMapper $optionMapper
-	 */
 	public function __construct(
-		$appName,
 		IGroupManager $groupManager,
 		IRequest $request,
 		IUserManager $userManager,
@@ -97,7 +82,7 @@ class ApiController extends Controller {
 		OptionMapper $optionMapper,
 		ILogger $logger
 	) {
-		parent::__construct($appName, $request);
+		parent::__construct(Application::APP_ID, $request);
 		$this->userId = $userId;
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
@@ -339,31 +324,23 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Get all forms
 	 * @NoAdminRequired
-	 * @return DataResponse
 	 */
-
 	public function getForms() {
-		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
-			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
+		$forms = $this->formMapper->findAllByOwnerId($this->userId);
+
+		$result = [];
+		foreach ($forms as $form) {
+			$result[] = [
+				'id' => $form->getId(),
+				'form' => $form->read(),
+				'mode' => 'edit',
+				'shares' => $this->getShares($form->getId()),
+				'questions' => $this->getQuestions($form->getId())
+			];
 		}
 
-		try {
-			$forms = $this->formMapper->findAll();
-		} catch (DoesNotExistException $e) {
-			return new DataResponse($e, Http::STATUS_NOT_FOUND);
-		}
-
-		$formsList = array();
-		foreach ($forms as $formElement) {
-			$form = $this->getFullForm($formElement->id);
-			//if ($form['grantedAs'] !== 'none') {
-				$formsList[] = $form;
-			//}
-		}
-
-		return new DataResponse($formsList, Http::STATUS_OK);
+		return new DataResponse($result);
 	}
 
 	/**

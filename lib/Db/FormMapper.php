@@ -4,7 +4,7 @@
  *
  * @author Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  * @author René Gieling <github@dartcafe.de>
-*
+ *
  * @license GNU AGPL version 3 or any later version
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -32,6 +32,7 @@ class FormMapper extends QBMapper {
 
 	/**
 	 * FormMapper constructor.
+	 * 
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
@@ -40,15 +41,15 @@ class FormMapper extends QBMapper {
 
 	/**
 	 * @param Integer $id
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Form
+	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 */
 	public function find(int $id): Form {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
-			->from($this->tableName)
+			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
 			);
@@ -58,15 +59,15 @@ class FormMapper extends QBMapper {
 
 	/**
 	 * @param String $hash
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Form
+	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 */
 	public function findByHash(string $hash): Form {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
-			->from($this->tableName)
+			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('hash', $qb->createNamedParameter($hash, IQueryBuilder::PARAM_STR))
 			);
@@ -75,14 +76,28 @@ class FormMapper extends QBMapper {
 	}
 
 	/**
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @return Form[]
 	 */
 	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
-			->from($this->tableName);
+			->from($this->getTableName());
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @return Form[]
+	 */
+	public function findAllByOwnerId(string $ownerId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('owner_id', $qb->createNamedParameter($ownerId))
+			);
 
 		return $this->findEntities($qb);
 	}

@@ -42,8 +42,8 @@ return [
 		['name' => 'api#get_options', 'url' => '/get/options/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_shares', 'url' => '/get/shares/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_form', 'url' => '/get/form/{formId}', 'verb' => 'GET'],
-		['name' => 'api#get_forms', 'url' => '/get/forms', 'verb' => 'GET'],
 
+		['name' => 'api#getForms', 'url' => 'api/v1/forms', 'verb' => 'GET'],
 		['name' => 'api#newForm', 'url' => 'api/v1/form', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => 'api/v1/form/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#updateQuestion', 'url' => 'api/v1/question/update/', 'verb' => 'POST'],
