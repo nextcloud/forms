@@ -24,21 +24,20 @@
 		<div>{{ question.text }}</div>
 		<div>
 			<input v-show="(question.type != 'text') && (question.type != 'comment')"
-				v-model="newQuizAnswer"
+				v-model="newOption"
 				style="height:30px;"
-				:placeholder=" t('forms', 'Add Answer')"
-				@keyup.enter="emitNewAnswer(question)">
+				:placeholder=" t('forms', 'Add Option')"
+				@keyup.enter="emitNewOption(question)">
 			<transitionGroup
 				id="form-list"
 				name="list"
 				tag="ul"
 				class="form-table">
 				<TextFormItem
-					v-for="(answer, index) in answers"
-					:key="answer.id"
-					:option="answer"
-					@remove="emitRemoveAnswer(question, answer, index)"
-					@delete="question.answers.splice(index, 1)" />
+					v-for="(opt, index) in options"
+					:key="opt.id"
+					:option="opt"
+					@remove="emitRemoveOption(question, opt, index)" />
 			</transitionGroup>
 		</div>
 		<div>
@@ -61,25 +60,25 @@ export default {
 	},
 	data() {
 		return {
-			nextQuizAnswerId: 1,
-			newQuizAnswer: '',
+			nextOptionId: 1,
+			newOption: '',
 			type: '',
 		}
 	},
 
 	computed: {
-		answers() {
-			return this.question.answers || []
+		options() {
+			return this.question.options || []
 		},
 	},
 
 	methods: {
-		emitNewAnswer(question) {
-			this.$emit('add-answer', this, question)
+		emitNewOption(question) {
+			this.$emit('addOption', this, question)
 		},
 
-		emitRemoveAnswer(question, answer, index) {
-			this.$emit('remove-answer', question, answer, index)
+		emitRemoveOption(question, option, index) {
+			this.$emit('deleteOption', question, option, index)
 		},
 	},
 }

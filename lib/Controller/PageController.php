@@ -29,12 +29,14 @@
 namespace OCA\Forms\Controller;
 
 use OCA\Forms\AppInfo\Application;
-use OCA\Forms\Db\Event;
-use OCA\Forms\Db\EventMapper;
-use OCA\Forms\Db\Vote;
-use OCA\Forms\Db\VoteMapper;
-
+use OCA\Forms\Db\Form;
+use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Submission;
+use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
+
+use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
 
 use OCP\AppFramework\Controller;
@@ -53,11 +55,12 @@ use OCP\Util;
 class PageController extends Controller {
 
 	private $userId;
-	private $eventMapper;
-	private $voteMapper;
+	private $formMapper;
+	private $submissionMapper;
+	private $answerMapper;
 
 	private $questionMapper;
-	private $answerMapper;
+	private $optionMapper;
 
 	private $urlGenerator;
 	private $userMgr;
@@ -69,21 +72,24 @@ class PageController extends Controller {
 		IGroupManager $groupManager,
 		IURLGenerator $urlGenerator,
 		$userId,
-		EventMapper $eventMapper,
+		FormMapper $formMapper,
+
 		QuestionMapper $questionMapper,
-		AnswerMapper $answerMapper,
-		VoteMapper $VoteMapper
+		OptionMapper $optionMapper,
+		SubmissionMapper $SubmissionMapper,
+		AnswerMapper $AnswerMapper
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->userMgr = $userMgr;
 		$this->groupManager = $groupManager;
 		$this->urlGenerator = $urlGenerator;
 		$this->userId = $userId;
-		$this->eventMapper = $eventMapper;
+		$this->formMapper = $formMapper;
 
 		$this->questionMapper = $questionMapper;
-		$this->answerMapper = $answerMapper;
-		$this->voteMapper = $VoteMapper;
+		$this->optionMapper = $optionMapper;
+		$this->submissionMapper = $SubmissionMapper;
+		$this->answerMapper = $AnswerMapper;
 	}
 
 	/**
@@ -155,15 +161,15 @@ class PageController extends Controller {
 	 */
 	public function gotoForm($hash): ?TemplateResponse {
 		try {
-			$form = $this->eventMapper->findByHash($hash);
+			$form = $this->formMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
 			return new TemplateResponse('forms', 'no.acc.tmpl', []);
 		}
 
-		if ($form->getExpire() === null) {
+		if ($form->getExpirationDate() === null) {
 			$expired = false;
 		} else {
-			$expired = time() > strtotime($form->getExpire());
+			$expired = time() > strtotime($form->getExpirationDate());
 		}
 
 		if ($expired) {
@@ -172,7 +178,7 @@ class PageController extends Controller {
 
 		if ($this->hasUserAccess($form)) {
 			$renderAs = $this->userId !== null ? 'user' : 'public';
-			$res = new TemplateResponse('forms', 'vote.tmpl', [
+			$res = new TemplateResponse('forms', 'submit.tmpl', [
 					'form' => $form,
 					'questions' => $this->getQuestions($form->getId()),
 			], $renderAs);
@@ -192,11 +198,11 @@ class PageController extends Controller {
 	public function getQuestions(int $formId): array {
 		$questionList = [];
 		try{
-			$questions = $this->questionMapper->findByForm($formId);
-			foreach ($questions as $questionElement) {
-				$temp = $questionElement->read();
-				$temp['answers'] = $this->getAnswers($formId, $temp['id']);
-				$questionList[] =  $temp;
+			$questionEntities = $this->questionMapper->findByForm($formId);
+			foreach ($questionEntities as $questionEntity) {
+				$question = $questionEntity->read();
+				$question['options'] = $this->getOptions($question['id']);
+				$questionList[] =  $question;
 			}
 		} catch (DoesNotExistException $e) {
 			//handle silently
@@ -208,20 +214,20 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function getAnswers(int $formId, int $questionId): array {
-		$answerList = [];
+	public function getOptions(int $questionId): array {
+		$optionList = [];
 
 		try{
-			$answers = $this->answerMapper->findByForm($formId, $questionId);
-			foreach ($answers as $answerElement) {
-				$answerList[] = $answerElement->read();
+			$optionEntities = $this->optionMapper->findByQuestion($questionId);
+			foreach ($optionEntities as $optionEntity) {
+				$optionList[] = $optionEntity->read();
 			}
 
 		} catch (DoesNotExistException $e) {
 			//handle silently
 		}
 
-		return $answerList;
+		return $optionList;
 	}
 
 	/**
@@ -230,14 +236,14 @@ class PageController extends Controller {
 	 * @return TemplateResponse|RedirectResponse
 	 */
 	public function deleteForm($formId) {
-		$formToDelete = $this->eventMapper->find($formId);
-		if ($this->userId !== $formToDelete->getOwner() && !$this->groupManager->isAdmin($this->userId)) {
+		$formToDelete = $this->formMapper->find($formId);
+		if ($this->userId !== $formToDelete->getOwnerId() && !$this->groupManager->isAdmin($this->userId)) {
 			return new TemplateResponse('forms', 'no.delete.tmpl');
 		}
-		$form = new Event();
+		$form = new Form();
 		$form->setId($formId);
-		$this->voteMapper->deleteByForm($formId);
-		$this->eventMapper->delete($form);
+		$this->submissionMapper->deleteByForm($formId);
+		$this->formMapper->delete($form);
 		$url = $this->urlGenerator->linkToRoute('forms.page.index');
 		return new RedirectResponse($url);
 	}
@@ -247,51 +253,47 @@ class PageController extends Controller {
 	 * @PublicPage
 	 * @param int $formId
 	 * @param string $userId
-	 * @param string $answers
-	 * @param string $options question id
-	 * @param bool $changed
+	 * @param array $answers
+	 * @param array $questions
 	 * @return RedirectResponse
 	 */
-	public function insertVote($id, $userId, $answers, $questions) {
+	public function insertSubmission($id, $userId, $answers, $questions) {
 
-		$form = $this->eventMapper->find($id);
-		$count_answers = count($answers);
-		$count = 1;
+		$form = $this->formMapper->find($id);
 		$anonID = "anon-user-".  hash('md5', (time() + rand()));
 
-		for ($i = 0; $i < $count_answers; $i++) {
-			if($questions[$i]['type'] === "checkbox"){
-				foreach (($answers[$questions[$i]['text']]) as $value) {
-					$vote = new Vote();
-					$vote->setFormId($id);
-					if($form->getIsAnonymous()){
-						$vote->setUserId($anonID);
+		//Insert Submission
+		$submission = new Submission();
+		$submission->setFormId($id);
+		if($form->getIsAnonymous()){
+			$submission->setUserId($anonID);
 
-					}else{
-						$vote->setUserId($userId);
-					}
-					$vote->setVoteOptionText(htmlspecialchars($questions[$i]['text']));
-					$vote->setVoteAnswer($value);
-					$vote->setVoteOptionId($count);
-					$vote->setVoteOptionType($questions[$i]['type']);
-					$this->voteMapper->insert($vote);
+		}else{
+			$submission->setUserId($userId);
+		}
+		$submission->setTimestamp(date('Y-m-d H:i:s'));
+		$this->submissionMapper->insert($submission);
+		$submissionId = $submission->getId();
+
+		//Insert Answers
+		foreach($questions as $question) {
+			if($question['type'] === "checkbox"){
+				foreach(($answers[$question['text']]) as $ansText) {
+					$answer = new Answer();
+					$answer->setSubmissionId($submissionId);
+					$answer->setQuestionId($question['id']);
+					$answer->setText($ansText);
+					$this->answerMapper->insert($answer);
 				}
-				$count++;
 			} else {
-				$vote = new Vote();
-				$vote->setFormId($id);
-				if($form->getIsAnonymous()){
-						$vote->setUserId($anonID);
-				}else{
-						$vote->setUserId($userId);
-				}
-				$vote->setVoteOptionText(htmlspecialchars($questions[$i]['text']));
-				$vote->setVoteAnswer($answers[$questions[$i]['text']]);
-				$vote->setVoteOptionId($count++);
-				$vote->setVoteOptionType($questions[$i]['type']);
-				$this->voteMapper->insert($vote);
+				$answer = new Answer();
+				$answer->setSubmissionId($submissionId);
+				$answer->setQuestionId($question['id']);
+				$answer->setText($answers[$question['text']]);
+				$this->answerMapper->insert($answer);
 			}
 		}
+
 		$hash = $form->getHash();
 		$url = $this->urlGenerator->linkToRoute('forms.page.goto_form', ['hash' => $hash]);
 		return new RedirectResponse($url);
@@ -379,12 +381,12 @@ class PageController extends Controller {
 	/**
 	 * Check if user has access to this form
 	 *
-	 * @param Event $form
+	 * @param Form $form
 	 * @return bool
 	 */
 	private function hasUserAccess($form) {
 		$access = $form->getAccess();
-		$owner = $form->getOwner();
+		$ownerId = $form->getOwnerId();
 		if ($access === 'public' || $access === 'hidden') {
 			return true;
 		}
@@ -392,8 +394,8 @@ class PageController extends Controller {
 			return false;
 		}
 		if ($access === 'registered') {
-			if ($form->getUnique()) {
-				$participants = $this->voteMapper->findParticipantsByForm($form->getId());
+			if ($form->getSubmitOnce()) {
+				$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
 				foreach($participants as $participant) {
 					// Don't allow access if user has already taken part
 					if ($participant->getUserId() === $this->userId) return false;
@@ -401,7 +403,7 @@ class PageController extends Controller {
 			}
 			return true;
 		}
-		if ($owner === $this->userId) {
+		if ($ownerId === $this->userId) {
 			return true;
 		}
 		Util::writeLog('forms', $this->userId, Util::ERROR);

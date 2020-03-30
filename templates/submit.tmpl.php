@@ -23,12 +23,12 @@
 
 	use OCP\Util;
 
-	Util::addStyle('forms', 'vote');
+	Util::addStyle('forms', 'submit');
 
-	Util::addScript('forms', 'vote');
+	Util::addScript('forms', 'submit');
 	Util::addScript('forms', 'survey.jquery.min');
 
-	/** @var \OCA\Forms\Db\Event $form */
+	/** @var \OCA\Forms\Db\Form $form */
 	$form = $_['form'];
 	/** @var OCA\Forms\Db\Question[] $questions */
 	$questions = $_['questions'];

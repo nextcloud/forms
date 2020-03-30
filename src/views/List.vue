@@ -43,8 +43,8 @@
 				v-for="(form, index) in forms"
 				:key="form.id"
 				:form="form"
-				@deleteForm="removeForm(index, form.event)"
-				@viewResults="viewFormResults(index, form.event, 'results')" />
+				@deleteForm="removeForm(index, form.form)"
+				@viewResults="viewFormResults(index, form.form, 'results')" />
 		</transition-group>
 		<LoadingOverlay v-if="loading" />
 		<modal-dialog />
@@ -110,29 +110,28 @@ export default {
 		helpPage() {
 			window.open('https://github.com/nextcloud/forms/blob/master/Forms_Support.md')
 		},
-
-		viewFormResults(index, event, name) {
+		viewFormResults(index, form, name) {
 			this.$router.push({
 				name: name,
 				params: {
-					hash: event.id,
+					hash: form.id,
 				},
 			})
 		},
-		removeForm(index, event) {
+		removeForm(index, form) {
 			const params = {
 				title: t('forms', 'Delete form'),
-				text: t('forms', 'Do you want to delete "%n"?', 1, event.title),
+				text: t('forms', 'Do you want to delete "%n"?', 1, form.title),
 				buttonHideText: t('forms', 'No, keep form.'),
 				buttonConfirmText: t('forms', 'Yes, delete form.'),
 				onConfirm: () => {
-					// this.deleteForm(index, event)
-					axios.delete(OC.generateUrl('apps/forms/forms/{id}', { id: event.id }))
+					// this.deleteForm(index, form)
+					axios.delete(OC.generateUrl('apps/forms/forms/{id}', { id: form.id }))
 						.then((response) => {
 							this.forms.splice(index, 1)
-							OC.Notification.showTemporary(t('forms', 'Form "%n" deleted', 1, event.title))
+							OC.Notification.showTemporary(t('forms', 'Form "%n" deleted', 1, form.title))
 						}, (error) => {
-							OC.Notification.showTemporary(t('forms', 'Error while deleting Form "%n"', 1, event.title))
+							OC.Notification.showTemporary(t('forms', 'Error while deleting Form "%n"', 1, form.title))
 							/* eslint-disable-next-line no-console */
 							console.log(error.response)
 						}

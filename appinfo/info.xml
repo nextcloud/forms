@@ -5,7 +5,7 @@
     <name>Forms</name>
     <summary>A forms app, similar to Google Forms.</summary>
     <description>A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public).</description>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
     <licence>agpl</licence>
     <author>Vinzenz Rosenkranz</author>
     <author>René Gieling</author>

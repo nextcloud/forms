@@ -27,17 +27,10 @@
  */
 const formatForm = function(form) {
 	// clone form
-	const newForm = Object.assign({}, form, form.event)
-
-	// migrate object architecture
-	Object.assign(newForm, {
-		questions: form.options && form.options.formQuizQuestions,
-	})
+	const newForm = Object.assign({}, form, form.form)
 
 	// cleanup
-	delete newForm.options
 	delete newForm.event
-
 	return newForm
 }
 

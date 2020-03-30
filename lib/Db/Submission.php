@@ -2,12 +2,10 @@
 declare(strict_types=1);
 
 /**
- * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
+ * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
- * @author Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
- * @author Kai Schröer <git@schroeer.co>
- * @author René Gieling <github@dartcafe.de>
-*
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ *
  * @license GNU AGPL version 3 or any later version
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -34,39 +32,27 @@ use OCP\AppFramework\Db\Entity;
  * @method void setFormId(integer $value)
  * @method string getUserId()
  * @method void setUserId(string $value)
- * @method integer getVoteOptionId()
- * @method void setVoteOptionId(integer $value)
- * @method string getVoteOptionText()
- * @method void setVoteOptionText(string $value)
- * @method string getVoteAnswer()
- * @method void setVoteAnswer(string $value)
- * @method string getVoteOptionType()
- * @method void setVoteOptionType(string $value)
+ * @method string getTimestamp()
+ * @method void setTimestamp(string $value)
  */
-class Vote extends Entity {
+class Submission extends Entity {
 	protected $formId;
 	protected $userId;
-	protected $voteOptionId;
-	protected $voteOptionText;
-	protected $voteAnswer;
-	protected $voteOptionType;
+	protected $timestamp;
 
 	/**
-	 * Options constructor.
+	 * Submission constructor.
 	 */
 	public function __construct() {
 		$this->addType('formId', 'integer');
-		$this->addType('voteOptionId', 'integer');
 	}
 
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
+			'formId' => $this->getFormId(),
 			'userId' => $this->getUserId(),
-			'voteOptionId' => $this->getVoteOptionId(),
-			'voteOptionText' => htmlspecialchars_decode($this->getVoteOptionText()),
-			'voteAnswer' => $this->getVoteAnswer(),
-			'voteOptionType' => $this->getVoteOptionType()
+			'timestamp' => $this->getTimestamp(),
 		];
 	}
 

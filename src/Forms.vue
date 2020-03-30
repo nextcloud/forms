@@ -107,7 +107,7 @@ export default {
 
 		selectedForm() {
 			// TODO: replace with form.hash
-			return this.forms.find(form => form.event.hash === this.hash)
+			return this.forms.find(form => form.form.hash === this.hash)
 		},
 	},
 
@@ -141,7 +141,7 @@ export default {
 				const response = await axios.post(generateUrl('/apps/forms/api/v1/form'))
 				const newForm = response.data
 				this.forms.push(newForm)
-				this.$router.push({ name: 'edit', params: { hash: newForm.event.hash } })
+				this.$router.push({ name: 'edit', params: { hash: newForm.form.hash } })
 			} catch (error) {
 				showError(t('forms', 'Unable to create a new form'))
 				console.error(error)

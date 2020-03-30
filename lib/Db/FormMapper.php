@@ -28,63 +28,63 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
-class EventMapper extends QBMapper {
+class FormMapper extends QBMapper {
 
 	/**
-	 * EventMapper constructor.
+	 * FormMapper constructor.
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_events', Event::class);
+		parent::__construct($db, 'forms_v2_forms', Form::class);
 	}
 
 	/**
 	 * @param Integer $id
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
-	 * @return Event
+	 * @return Form
 	 */
-	public function find(int $id): Event {
+	public function find(int $id): Form {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->select('*')
-           ->from($this->getTableName())
-           ->where(
-               $qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
-           );
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			);
 
-        return $this->findEntity($qb);
+		return $this->findEntity($qb);
 	}
 
 	/**
 	 * @param String $hash
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
-	 * @return Event
+	 * @return Form
 	 */
-	public function findByHash(string $hash): Event {
+	public function findByHash(string $hash): Form {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->select('*')
-           ->from($this->getTableName())
-           ->where(
-               $qb->expr()->eq('hash', $qb->createNamedParameter($hash, IQueryBuilder::PARAM_STR))
-           );
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('hash', $qb->createNamedParameter($hash, IQueryBuilder::PARAM_STR))
+			);
 
-        return $this->findEntity($qb);
+		return $this->findEntity($qb);
 	}
 
 	/**
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @return Event[]
+	 * @return Form[]
 	 */
 	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->select('*')
-           ->from($this->getTableName());
+		$qb->select('*')
+			->from($this->tableName);
 
-        return $this->findEntities($qb);
+		return $this->findEntities($qb);
 	}
 
 }

@@ -8,7 +8,7 @@ function sendDataToServer(survey) {
 		form.userId = 'anon_' + Date.now() + '_' + Math.floor(Math.random() * 10000)
 	}
 	form.questions = questions;
-	$.post(OC.generateUrl('apps/forms/insert/vote'), form)
+	$.post(OC.generateUrl('apps/forms/insert/submission'), form)
 	.then((response) => {
 	}, (error) => {
 		/* eslint-disable-next-line no-console */
@@ -34,7 +34,7 @@ function cssUpdate(survey, options){
 $(document).ready(function () {
 	var formJSON = $('#surveyContainer').attr('form')
 	var questionJSON = $('#surveyContainer').attr('questions')
-	
+
 	form = JSON.parse(formJSON)
 	questions = JSON.parse(questionJSON)
 
@@ -45,11 +45,11 @@ $(document).ready(function () {
 	};
 
 	questions.forEach(q => {
-		var ans = []
-		q.answers.forEach(a => {
-			ans.push(a.text);
+		var qChoices = []
+		q.options.forEach(o => {
+			qChoices.push(o.text);
 		});
-		surveyJSON.questions.push({type: q.type, name: q.text, choices: ans, isRequired: 'true'});
+		surveyJSON.questions.push({type: q.type, name: q.text, choices: qChoices, isRequired: 'true'});
 	});
 
 	$('#surveyContainer').Survey({

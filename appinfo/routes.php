@@ -33,23 +33,23 @@ return [
 
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
 
-		['name' => 'page#insert_vote', 'url' => '/insert/vote', 'verb' => 'POST'],
+		['name' => 'page#insert_submission', 'url' => '/insert/submission', 'verb' => 'POST'],
 		['name' => 'page#search', 'url' => '/search', 'verb' => 'POST'],
 		['name' => 'page#get_display_name', 'url' => '/get/displayname', 'verb' => 'POST'],
 
 		['name' => 'api#write_form', 'url' => '/write/form', 'verb' => 'POST'],
-		['name' => 'api#get_form', 'url' => '/get/form/{formIdOrHash}', 'verb' => 'GET'],
+		['name' => 'api#get_full_form', 'url' => '/get/fullform/{formIdOrHash}', 'verb' => 'GET'],
 		['name' => 'api#get_options', 'url' => '/get/options/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_shares', 'url' => '/get/shares/{formId}', 'verb' => 'GET'],
-		['name' => 'api#get_event', 'url' => '/get/event/{formId}', 'verb' => 'GET'],
+		['name' => 'api#get_form', 'url' => '/get/form/{formId}', 'verb' => 'GET'],
 		['name' => 'api#get_forms', 'url' => '/get/forms', 'verb' => 'GET'],
 
 		['name' => 'api#newForm', 'url' => 'api/v1/form', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => 'api/v1/form/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#newQuestion', 'url' => 'api/v1/question/', 'verb' => 'POST'],
 		['name' => 'api#deleteQuestion', 'url' => 'api/v1/question/{id}', 'verb' => 'DELETE'],
-		['name' => 'api#newAnswer', 'url' => 'api/v1/answer/', 'verb' => 'POST'],
-		['name' => 'api#deleteAnswer', 'url' => 'api/v1/answer/{id}', 'verb' => 'DELETE'],
+		['name' => 'api#newOption', 'url' => 'api/v1/option/', 'verb' => 'POST'],
+		['name' => 'api#deleteOption', 'url' => 'api/v1/option/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#getSubmissions', 'url' => 'api/v1/submissions/{hash}', 'verb' => 'GET'],
 
 		['name' => 'system#get_site_users_and_groups', 'url' => '/get/siteusers', 'verb' => 'POST'],
