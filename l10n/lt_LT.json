@@ -1,6 +1,8 @@
 { "translations": {
     "Forms" : "Anketos",
     "A forms app, similar to Google Forms." : "Anketų programėlė, panaši į Google formas.",
+    "New form" : "Nauja anketa",
+    "Loading forms …" : "Įkeliamos formos…",
     "Delete form" : "Ištrinti anketą",
     "Cannot copy, please copy the link manually" : "Nepavyksta nukopijuoti, nukopijuokite nuorodą rankiniu būdu",
     "Copy to clipboard" : "Kopijuoti į iškarpinę",
