@@ -16,33 +16,39 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import Question from '../components/Questions/Question'
 
-export default [
-	{
-		label: t('forms', 'Multiple choice'),
-		value: 'radiogroup',
-		icon: 'icon-answer-multiple',
+export default {
+	inheritAttrs: false,
+	props: {
+		title: {
+			type: String,
+			required: true,
+		},
+		values: {
+			type: Array,
+			required: true,
+		},
 	},
-	{
-		label: t('forms', 'Checkboxes'),
-		value: 'checkbox',
-		icon: 'icon-answer-checkbox',
+
+	components: {
+		Question,
 	},
-	{
-		label: t('forms', 'Short answer'),
-		value: 'text',
-		icon: 'icon-answer-short',
+
+	data() {
+		return {
+			edit: false,
+		}
 	},
-	{
-		label: t('forms', 'Long text'),
-		value: 'comment',
-		icon: 'icon-answer-long',
+
+	methods: {
+		onTitleChange(title) {
+			this.$emit('update:title', title)
+		},
+		onValuesChange(values) {
+			this.$emit('update:values', values)
+		},
 	},
-	// {
-	// label: 'Drop Down',
-	// value: 'dropdown',
-	// },
-]
+}

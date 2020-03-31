@@ -1,0 +1,144 @@
+<!--
+  - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
+  -
+  - @author John Molakvoæ <skjnldsv@protonmail.com>
+  -
+  - @license GNU AGPL version 3 or any later version
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -
+  -->
+
+<template>
+	<li v-click-outside="disableEdit"
+		:class="{ 'question--edit': edit }"
+		class="question"
+		@click="enableEdit">
+		<!-- TODO: implement arrow key mapping to reorder question -->
+		<div class="question__drag-handle icon-drag-handle"
+			:aria-label="t('forms', 'Drag to re-order the questions')" />
+		<input v-if="edit"
+			:value="title"
+			class="question__title"
+			type="text"
+			minlength="1"
+			maxlength="256"
+			@input="onInput">
+		<h3 v-else class="question__title" v-text="title" />
+		<slot />
+	</li>
+</template>
+
+<script>
+import { directive as ClickOutside } from 'v-click-outside'
+
+export default {
+	name: 'Question',
+
+	directives: {
+		ClickOutside,
+	},
+
+	props: {
+		title: {
+			type: String,
+			required: true,
+		},
+		edit: {
+			type: Boolean,
+			required: true,
+		},
+	},
+
+	methods: {
+		onInput({ target }) {
+			this.$emit('update:title', target.value)
+		},
+
+		/**
+		 * Enable the edit mode
+		 */
+		enableEdit() {
+			this.$emit('update:edit', true)
+		},
+
+		/**
+		 * Disable the edit mode
+		 */
+		disableEdit() {
+			this.$emit('update:edit', false)
+		},
+	},
+}
+</script>
+
+<style lang="scss">
+.question {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	justify-content: stretch;
+	margin-bottom: 22px;
+	padding-left: 44px;
+	user-select: none;
+	background-color: var(--color-main-background);
+
+	> * {
+		cursor: pointer;
+	}
+
+	&__drag-handle {
+		position: absolute;
+		left: 0;
+		width: 44px;
+		height: 100%;
+		cursor: grab;
+		&:active {
+			cursor: grabbing;
+		}
+	}
+
+	&__title,
+	&__content {
+		flex: 1 1 100%;
+		max-width: 100%;
+		margin: 20px;
+		padding: 0;
+	}
+
+	// Using type to have a higher order than the input styling of server
+	&__title,
+	&__title[type=text] {
+		flex: 1 1 100%;
+		width: auto;
+		max-width: calc(100% - 44px);
+		min-height: 22px;
+		margin: 20px;
+		margin-bottom: 0;
+		padding: 0;
+		padding-bottom: 6px;
+		color: var(--color-text-light);
+		border: 0;
+		border-radius: 0;
+		font-size: 16px;
+		line-height: 22px;
+	}
+
+	&__title[type=text] {
+		border-bottom: 1px dotted var(--color-border-dark);
+	}
+}
+
+</style>
