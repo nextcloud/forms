@@ -58,7 +58,6 @@
 				v-model="form.form.expirationDate"
 				v-bind="expirationDatePicker"
 
-				:time-picker-options="{ start: '00:00', step: '00:05', end: '23:55' }"
 				style="width:170px" />
 		</div>
 
@@ -140,13 +139,15 @@ export default {
 				editable: true,
 				minuteStep: 1,
 				type: 'datetime',
+				valueType: 'YYYY-MM-DD HH:mm:ss',
+				defaultValue: moment(),
 				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
-				lang: this.lang.split('-')[0],
+				lang: moment.localeData()['_config'],
 				placeholder: t('forms', 'Expiration date'),
 				timePickerOptions: {
 					start: '00:00',
-					step: '00:30',
-					end: '23:30',
+					step: '00:15',
+					end: '23:45',
 				},
 			}
 		},
