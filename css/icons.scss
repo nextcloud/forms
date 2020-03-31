@@ -5,6 +5,7 @@
 @include icon-black-white('answer-short', 'forms', 1);
 @include icon-black-white('answer-long', 'forms', 1);
 @include icon-black-white('answer-checkbox', 'forms', 1);
+@include icon-black-white('answer-multiple', 'forms', 1);
 
 .icon-yes {
 	@include icon-color('checkmark', 'actions', $color-success, 1, true);

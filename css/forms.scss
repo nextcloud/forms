@@ -20,4 +20,11 @@
  *
  */
 
-@import 'icons'
+// Various variables used by this app
+:root {
+	--header-height: $header-height;
+	--top-bar-height: 60px;
+}
+
+@import 'variables';
+@import 'icons';

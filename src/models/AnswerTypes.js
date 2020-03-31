@@ -24,7 +24,7 @@ export default [
 	{
 		label: t('forms', 'Multiple choice'),
 		value: 'radiogroup',
-		icon: 'icon-forms',
+		icon: 'icon-answer-multiple',
 	},
 	{
 		label: t('forms', 'Checkboxes'),

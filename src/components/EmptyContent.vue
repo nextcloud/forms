@@ -21,9 +21,11 @@
   -->
 
 <template>
-	<div class="emptycontent" role="note">
-		<div :class="icon" role="img" />
-		<h2><slot /></h2>
+	<div class="empty-content" role="note">
+		<div class="empty-content__icon" :class="icon" role="img" />
+		<h2 class="empty-content__title">
+			<slot />
+		</h2>
 		<p v-show="$slots.desc">
 			<slot name="desc" />
 		</p>
@@ -44,10 +46,24 @@ export default {
 </script>
 
 <style lang="scss">
-.emptycontent {
+.empty-content {
 	margin-top: 20vh;
-	button {
-		margin: 3px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	&__icon {
+		width: 64px;
+		height: 64px;
+		margin: 0 auto 15px;
+		opacity: .4;
+		background-size: 64px;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+
+	&__title {
+		margin-bottom: 10px;
 	}
 }
 

@@ -35,15 +35,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$top-bar-height: 60px;
+
 .top-bar {
-	position: absolute;
+	position: sticky;
 	z-index: 10;
-	top: 0;
-	right: 0;
+	top: var(--header-height);
 	display: flex;
 	align-items: center;
+	align-self: flex-end;
 	justify-content: flex-end;
-	height: 60px;
+	height: var(--top-bar-height);
+	margin-top: calc(var(--top-bar-height) * -1);
 	padding: 0 6px;
 
 	button {
@@ -51,8 +54,8 @@ export default {
 		&:not(.primary) {
 			width: 44px;
 			height: 44px;
-			background-color: transparent;
 			border: none;
+			background-color: transparent;
 			&:hover, a:active, a:focus {
 				background-color: var(--color-background-darker);
 			}

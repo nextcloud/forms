@@ -3,6 +3,7 @@
   -
   - @author René Gieling <github@dartcafe.de>
   - @author Nick Gallo
+  - @author John Molakvoæ <skjnldsv@protonmail.com>
   -
   - @license GNU AGPL version 3 or any later version
   -
@@ -48,7 +49,8 @@
 				:placeholder="t('forms', 'Title')"
 				:required="true"
 				autofocus
-				type="text">
+				type="text"
+				@click="selectIfUnchanged">
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
 				id="form-desc"
@@ -60,18 +62,23 @@
 
 		<section>
 			<!-- Add new questions toolbar -->
-			<!-- <div class="question-toolbar" role="toolbar">
-				<button v-for="type in answerTypes"
-					:key="type.label"
-					class="question-toolbar__question"
-					@click="addQuestion">
-					<span class="question-toolbar__icon" :class="type.icon" />
-					{{ type.label }}
-				</button>
-			</div> -->
+			<div class="question-toolbar" role="toolbar">
+				<Actions ref="questionMenu"
+					v-tooltip="t('forms', 'Add a question to this form')"
+					:aria-label="t('forms', 'Add a question to this form')"
+					:open.sync="questionMenuOpened"
+					default-icon="icon-add-white">
+					<ActionButton v-for="type in answerTypes"
+						:key="type.label"
+						class="question-toolbar__question"
+						:icon="type.icon"
+						@click="addQuestion">
+						{{ type.label }}
+					</ActionButton>
+				</Actions>
+			</div>
 
-			<div id="quiz-form-selector-text">
-				<!--shows inputs for question types: drop down box to select the type, text box for question, and button to add-->
+			<!-- <div id="quiz-form-selector-text">
 				<label for="ans-type">Answer Type: </label>
 				<select v-model="selected">
 					<option value="" disabled>
@@ -90,13 +97,14 @@
 					@click="addQuestion()">
 					{{ t('forms', 'Add Question') }}
 				</button>
-			</div>
+			</div> -->
 
 			<!-- No questions -->
 			<EmptyContent v-if="form.questions.length === 0">
 				{{ t('forms', 'This form does not have any questions') }}
 				<template #desc>
-					<button class="primary" @click="openQuestionMenu">
+					<button class="empty-content__button primary" @click="openQuestionMenu">
+						<span class="icon-add-white" />
 						{{ t('forms', 'Add a new one') }}
 					</button>
 				</template>
@@ -123,11 +131,9 @@
 </template>
 
 <script>
-import { generateUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
 import { emit } from '@nextcloud/event-bus'
 import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
@@ -138,7 +144,6 @@ import answerTypes from '../models/AnswerTypes'
 import EmptyContent from '../components/EmptyContent'
 import QuizFormItem from '../components/quizFormItem'
 import TopBar from '../components/TopBar'
-
 import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
@@ -156,6 +161,7 @@ export default {
 
 	data() {
 		return {
+			questionMenuOpened: false,
 			placeholder: '',
 			newOption: '',
 			newQuestion: '',
@@ -167,13 +173,6 @@ export default {
 			uniqueQuestionText: false,
 			uniqueOptionText: false,
 			allHaveOpt: false,
-			questionTypes: [
-				{ text: 'Radio Buttons', value: 'radiogroup' },
-				{ text: 'Checkboxes', value: 'checkbox' },
-				{ text: 'Short Response', value: 'text' },
-				{ text: 'Long Response', value: 'comment' },
-				{ text: 'Drop Down', value: 'dropdown' },
-			],
 			answerTypes,
 		}
 	},
@@ -197,6 +196,7 @@ export default {
 				return t('forms', 'Done')
 			}
 		},
+
 	},
 
 	watch: {
@@ -252,10 +252,10 @@ export default {
 						order: respData.order,
 						text: this.newQuestion,
 						type: this.selected,
-						options: [],
+						answers: [],
 					})
 				}
-				this.newQuestion = ''
+				this.newQuizQuestion = ''
 			}
 		},
 
@@ -366,7 +366,21 @@ export default {
 		 * Add question methods
 		 */
 		openQuestionMenu() {
-			this.$refs.questionMenu.opened = true
+			// TODO: fix the vue components to allow external click triggers without
+			// conflicting with the click outside directive
+			setTimeout(() => {
+				this.questionMenuOpened = true
+			}, 100)
+		},
+
+		/**
+		 * Select the text in the input if it is still set to 'New form'
+		 * @param {Event} e the click event
+		 */
+		selectIfUnchanged(e) {
+			if (e.target && e.target.value === t('forms', 'New form')) {
+				e.target.select()
+			}
 		},
 	},
 }
@@ -375,14 +389,16 @@ export default {
 <style lang="scss">
 #app-content {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
+	flex-direction: column;
+
 	header,
 	section {
 		width: 100%;
 		max-width: 900px;
 	}
 
+	// Title & description header
 	header {
 		display: flex;
 		flex-direction: column;
@@ -391,9 +407,9 @@ export default {
 		#form-title,
 		#form-desc {
 			width: 100%;
-			border: none;
 			margin: 10px; // aerate the header
 			padding: 0; // makes alignment and desc height calc easier
+			border: none;
 		}
 		#form-title {
 			font-size: 2em;
@@ -402,19 +418,56 @@ export default {
 			min-height: 60px;
 			max-height: 200px;
 			padding-left: 2px; // align with title (compensate font size diff)
-			resize: none
+			resize: none;
 		}
 	}
 
+	.empty-content__button {
+		margin: 5px;
+		> span {
+			margin-right: 5px;
+			cursor: pointer;
+			opacity: 1;
+		}
+	}
+
+	// Questions container
 	section {
 		position: relative;
+		display: flex;
+		flex-direction: column;
+		min-height: 200vh;
+
+		.question-toolbar {
+			position: sticky;
+			z-index: 50;
+			top: var(--header-height);
+			display: flex;
+			align-items: center;
+			align-self: flex-end;
+			width: 44px;
+			height: var(--top-bar-height);
+			// make sure this doesn't take any space and appear floating
+			margin-top: -44px;
+			.icon-add-white {
+				opacity: 1;
+				border-radius: 50%;
+				// TODO: standardize on components
+				background-color: var(--color-primary-element);
+				&:hover,
+				&:focus,
+				&:active {
+					background-color: var(--color-primary-element-light) !important;
+				}
+			}
+		}
 	}
 }
 
 /* Transitions for inserting and removing list items */
 .list-enter-active,
 .list-leave-active {
-	transition: all 0.5s ease;
+	transition: all .5s ease;
 }
 
 .list-enter,
@@ -423,9 +476,8 @@ export default {
 }
 
 .list-move {
-	transition: transform 0.5s;
+	transition: transform .5s;
 }
-/*  */
 
 #form-item-selector-text {
 	> input {
@@ -436,38 +488,37 @@ export default {
 .form-table {
 	> li {
 		display: flex;
-		align-items: baseline;
-		padding-left: 8px;
-		padding-right: 8px;
-		line-height: 24px;
-		min-height: 24px;
-		border-bottom: 1px solid var(--color-border);
 		overflow: hidden;
+		align-items: baseline;
+		min-height: 24px;
+		padding-right: 8px;
+		padding-left: 8px;
 		white-space: nowrap;
+		border-bottom: 1px solid var(--color-border);
+		line-height: 24px;
 
 		&:active,
 		&:hover {
-			transition: var(--background-dark) 0.3s ease;
+			transition: var(--background-dark) .3s ease;
 			background-color: var(--color-background-dark); //$hover-color;
-
 		}
 
 		> div {
 			display: flex;
 			flex-grow: 1;
-			font-size: 1.2em;
-			opacity: 0.7;
-			white-space: normal;
 			padding-right: 4px;
+			white-space: normal;
+			opacity: .7;
+			font-size: 1.2em;
 			&.avatar {
 				flex-grow: 0;
 			}
 		}
 
 		> div:nth-last-child(1) {
-			justify-content: center;
 			flex-grow: 0;
 			flex-shrink: 0;
+			justify-content: center;
 		}
 	}
 }
@@ -493,13 +544,14 @@ button {
 }
 
 #shiftDates {
-	background-repeat: no-repeat;
-	background-position: 10px center;
 	min-width: 16px;
 	min-height: 16px;
+	margin: 0;
 	padding: 10px;
 	padding-left: 34px;
 	text-align: left;
-	margin: 0;
+	background-repeat: no-repeat;
+	background-position: 10px center;
 }
+
 </style>
