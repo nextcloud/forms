@@ -222,6 +222,19 @@ class ApiController extends Controller {
 		$data = array();
 		try {
 			$data = $this->formMapper->find($formId)->read();
+
+			//Add some computed data
+			if (!strpos('|public|hidden|registered', $data['access'])) {
+				$data['access'] = 'select';
+			}
+			if ($data['expirationDate'] === date('Y-m-d H:i:s', null)) {
+				$data['expired'] = false;
+				$data['expires'] = false;
+			} else {
+				$data['expired'] = time() > strtotime($data['expirationDate']);
+				$data['expires'] = true;
+			}
+
 		} catch (DoesNotExistException $e) {
 			// return silently
 		} finally {
@@ -434,7 +447,7 @@ class ApiController extends Controller {
 		if ($form['expires']) {
 			$newForm->setExpirationDate(date('Y-m-d H:i:s', strtotime($form['expirationDate'])));
 		} else {
-			$newForm->setExpirationDate(null);
+			$newForm->setExpirationDate(date('Y-m-d H:i:s', null));
 		}
 
 		if ($mode === 'edit') {
@@ -483,6 +496,7 @@ class ApiController extends Controller {
 		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
 		$form->setOwnerId($currentUser);
 		$form->setCreated(date('Y-m-d H:i:s'));
+		$form->setExpirationDate(date('Y-m-d H:i:s', null));
 		$form->setHash(\OC::$server->getSecureRandom()->generate(
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE

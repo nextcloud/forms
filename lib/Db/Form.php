@@ -69,18 +69,6 @@ class Form extends Entity {
 	}
 
 	public function read() {
-		$accessType = $this->getAccess();
-		if (!strpos('|public|hidden|registered', $accessType)) {
-			$accessType = 'select';
-		}
-		if ($this->getExpirationDate() === null) {
-			$expired = false;
-			$expires = false;
-		} else {
-			$expired = time() > strtotime($this->getExpirationDate());
-			$expires = true;
-		}
-
 		return [
 			'id' => $this->getId(),
 			'hash' => $this->getHash(),
@@ -89,9 +77,7 @@ class Form extends Entity {
 			'ownerId' => $this->getOwnerId(),
 			'ownerDisplayName' => \OC_User::getDisplayName($this->getOwnerId()),
 			'created' => $this->getCreated(),
-			'access' => $accessType,
-			'expires' => $expires,
-			'expired' => $expired,
+			'access' => $this->getAccess(),
 			'expirationDate' => $this->getExpirationDate(),
 			'isAnonymous' => $this->getIsAnonymous(),
 			'submitOnce' => $this->getSubmitOnce()

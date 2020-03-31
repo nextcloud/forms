@@ -206,7 +206,12 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 			$qb_fetch->select('id', 'hash', 'title', 'description', 'owner', 'created', 'access', 'expire', 'is_anonymous', 'unique')
 				->from('forms_events');
 			$cursor = $qb_fetch->execute();
-			while( $event = $cursor->fetch() ){ 
+			while( $event = $cursor->fetch() ){
+				//Adapt expiration dates to new usage of (date('Y-m-d H:i:s', null))
+				if ($event['expire'] === null) {
+					$event['expire'] === date('Y-m-d H:i:s', null);
+				}
+
 				$qb_restore->insert('forms_v2_forms')
 					->values([
 						'hash' => $qb_restore->createNamedParameter($event['hash'], IQueryBuilder::PARAM_STR),

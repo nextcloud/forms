@@ -166,7 +166,7 @@ class PageController extends Controller {
 			return new TemplateResponse('forms', 'no.acc.tmpl', []);
 		}
 
-		if ($form->getExpirationDate() === null) {
+		if ($form->getExpirationDate() === date('Y-m-d H:i:s', null)) {
 			$expired = false;
 		} else {
 			$expired = time() > strtotime($form->getExpirationDate());
