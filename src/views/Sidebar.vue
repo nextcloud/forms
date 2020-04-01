@@ -55,10 +55,10 @@
 			</label>
 
 			<DatetimePicker v-show="form.form.expires"
+				id="expirationDatePicker"
 				v-model="form.form.expirationDate"
 				v-bind="expirationDatePicker"
-
-				style="width:170px" />
+				@change="checkExpired" />
 		</div>
 
 		<div class="configBox">
@@ -198,6 +198,9 @@ export default {
 		removeShare(item) {
 			this.form.shares.splice(this.form.shares.indexOf(item), 1)
 		},
+		checkExpired() {
+			this.form.form.expired = moment() > moment(this.form.form.expirationDate)
+		},
 	},
 }
 </script>
@@ -228,5 +231,9 @@ textarea {
 		border: 2px solid var(--color-error);
 		box-shadow: 1px 0 var(--border-radius) var(--color-box-shadow);
 	}
+}
+
+#expirationDatePicker {
+	width: 170px;
 }
 </style>
