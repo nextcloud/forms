@@ -531,6 +531,38 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * @param int $id QuestionId of question to update
+	 * @param array $keyvalues Array of key=>value pairs to update.
+	 */
+	public function updateQuestion(int $id, array $keyvalues): Http\JSONResponse {
+		$this->logger->debug('Updating question: questionId: {id}, values: {keyvalues}', [
+			'id' => $id,
+			'keyvalues' => $keyvalues
+		]);
+
+		try {
+			$question = $this->questionMapper->findById($id);
+			$form = $this->formMapper->find($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question or form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		$question = Question::fromParams($keyvalues);
+		$question->setId($id);
+
+		$this->questionMapper->update($question);
+
+		return new Http\JSONResponse($question->getId());
+	}
+
+	/**
+	 * @NoAdminRequired
 	 */
 	public function deleteQuestion(int $id): Http\JSONResponse {
 		$this->logger->debug('Delete question: {id}', [

@@ -277,20 +277,23 @@ class PageController extends Controller {
 
 		//Insert Answers
 		foreach($questions as $question) {
-			if($question['type'] === "checkbox"){
-				foreach(($answers[$question['text']]) as $ansText) {
+			// If question is answered, the questionText exists as key in $answers. Does not exist, when a (non-mandatory) question was not answered.
+			if (array_key_exists($question['text'], $answers)) {
+				if($question['type'] === "checkbox"){
+					foreach(($answers[$question['text']]) as $ansText) {
+						$answer = new Answer();
+						$answer->setSubmissionId($submissionId);
+						$answer->setQuestionId($question['id']);
+						$answer->setText($ansText);
+						$this->answerMapper->insert($answer);
+					}
+				} else {
 					$answer = new Answer();
 					$answer->setSubmissionId($submissionId);
 					$answer->setQuestionId($question['id']);
-					$answer->setText($ansText);
+					$answer->setText($answers[$question['text']]);
 					$this->answerMapper->insert($answer);
 				}
-			} else {
-				$answer = new Answer();
-				$answer->setSubmissionId($submissionId);
-				$answer->setQuestionId($question['id']);
-				$answer->setText($answers[$question['text']]);
-				$this->answerMapper->insert($answer);
 			}
 		}
 
