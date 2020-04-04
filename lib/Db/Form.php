@@ -29,44 +29,43 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @method string getHash()
+ * @method void setHash(string $value)
  * @method string getTitle()
  * @method void setTitle(string $value)
  * @method string getDescription()
  * @method void setDescription(string $value)
- * @method string getOwner()
- * @method void setOwner(string $value)
- * @method string getCreated()
- * @method void setCreated(string $value)
+ * @method string getOwnerId()
+ * @method void setOwnerId(string $value)
  * @method string getAccess()
  * @method void setAccess(string $value)
- * @method string getExpire()
- * @method void setExpire(string $value)
- * @method string getHash()
- * @method void setHash(string $value)
+ * @method string getCreated()
+ * @method void setCreated(string $value)
+ * @method string getExpirationDate()
+ * @method void setExpirationDate(string $value)
  * @method integer getIsAnonymous()
- * @method void setIsAnonymous(integer $value)
- * @method integer getUnique()
- * @method void setUnique(integer $value)
+ * @method void setIsAnonymous(bool $value)
+ * @method integer getSubmitOnce()
+ * @method void setSubmitOnce(bool $value)
  */
-class Event extends Entity {
+class Form extends Entity {
+
+	protected $hash;
 	protected $title;
 	protected $description;
-	protected $owner;
-	protected $created;
+	protected $ownerId;
 	protected $access;
-	protected $expire;
-	protected $hash;
+	protected $created;
+	protected $expirationDate;
 	protected $isAnonymous;
-	protected $fullAnonymous;
-	protected $allowMaybe;
-	protected $unique;
+	protected $submitOnce;
 
 	/**
-	 * Event constructor.
+	 * Form constructor.
 	 */
 	public function __construct() {
-		$this->addType('isAnonymous', 'integer');
-		$this->addType('unique', 'integer');
+		$this->addType('isAnonymous', 'bool');
+		$this->addType('submitOnce', 'bool');
 	}
 
 	public function read() {
@@ -74,12 +73,12 @@ class Event extends Entity {
 		if (!strpos('|public|hidden|registered', $accessType)) {
 			$accessType = 'select';
 		}
-		if ($this->getExpire() === null) {
+		if ($this->getExpirationDate() === null) {
 			$expired = false;
-			$expiration = false;
+			$expires = false;
 		} else {
-			$expired = time() > strtotime($this->getExpire());
-			$expiration = true;
+			$expired = time() > strtotime($this->getExpirationDate());
+			$expires = true;
 		}
 
 		return [
@@ -87,15 +86,15 @@ class Event extends Entity {
 			'hash' => $this->getHash(),
 			'title' => $this->getTitle(),
 			'description' => $this->getDescription(),
-			'owner' => $this->getOwner(),
-			'ownerDisplayName' => \OC_User::getDisplayName($this->getOwner()),
+			'ownerId' => $this->getOwnerId(),
+			'ownerDisplayName' => \OC_User::getDisplayName($this->getOwnerId()),
 			'created' => $this->getCreated(),
 			'access' => $accessType,
-			'expiration' => $expiration,
+			'expires' => $expires,
 			'expired' => $expired,
-			'expirationDate' => $this->getExpire(),
+			'expirationDate' => $this->getExpirationDate(),
 			'isAnonymous' => $this->getIsAnonymous(),
-			'unique' => $this->getUnique()
+			'submitOnce' => $this->getSubmitOnce()
 		];
 	}
 }

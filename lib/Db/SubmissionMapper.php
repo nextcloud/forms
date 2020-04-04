@@ -1,10 +1,9 @@
 <?php
 /**
- * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
+ * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
- * @author Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
- * @author René Gieling <github@dartcafe.de>
-*
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ *
  * @license GNU AGPL version 3 or any later version
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -28,31 +27,38 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
-class VoteMapper extends QBMapper {
+use OCA\Forms\Db\AnswerMapper;
+
+class SubmissionMapper extends QBMapper {
+
+	private $answerMapper;
 
 	/**
-	 * VoteMapper constructor.
+	 * SubmissionMapper constructor.
 	 * @param IDBConnection $db
+	 * @param AnswerMapper $answerMapper
 	 */
-	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_votes', Vote::class);
+	public function __construct(IDBConnection $db, AnswerMapper $answerMapper) {
+		parent::__construct($db, 'forms_v2_submissions', Submission::class);
+
+		$this->answerMapper = $answerMapper;
 	}
 
 	/**
 	 * @param int $formId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @return Vote[]
+	 * @return Submission[]
 	 */
 	public function findByForm(int $formId): array {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->select('*')
-           ->from($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-           );
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+			);
 
-        return $this->findEntities($qb);
+		return $this->findEntities($qb);
 	}
 
 	/**
@@ -63,31 +69,13 @@ class VoteMapper extends QBMapper {
 	public function findParticipantsByForm(int $formId, $limit = null, $offset = null): array {
 		$qb = $this->db->getQueryBuilder();
 
-        $qb->select('user_id')
-           ->from($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-           );
+		$qb->select('user_id')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+			);
 
-        return $this->findEntities($qb);
-	}
-
-	/**
-	 * @param int $formId
-	 * @param string $userId
-	 */
-	 public function deleteByFormAndUser(int $formId, string $userId): void {
-		$qb = $this->db->getQueryBuilder();
-
-        $qb->delete($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-           )
-           ->andWhere(
-               $qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
-           );
-
-	   $qb->execute();
+		return $this->findEntities($qb);
 	}
 
 	/**
@@ -96,6 +84,13 @@ class VoteMapper extends QBMapper {
 	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 
+		// First delete corresponding answers.
+		$submissionEntities = $this->findByForm($formId);
+		foreach ($submissionEntities as $submissionEntity) {
+			$this->answerMapper->deleteBySubmission($submissionEntity->id);
+		}
+
+		//Delete Submissions
 		$qb->delete($this->getTableName())
 		->where(
 			$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))

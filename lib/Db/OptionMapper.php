@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
  *
@@ -28,64 +30,52 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
-use OCA\Forms\Db\OptionMapper;
+class OptionMapper extends QBMapper {
 
-class QuestionMapper extends QBMapper {
-
-	private $optionMapper;
-
-	public function __construct(IDBConnection $db, OptionMapper $optionMapper) {
-		parent::__construct($db, 'forms_v2_questions', Question::class);
-
-		$this->optionMapper = $optionMapper;
+	/**
+	 * OptionMapper constructor.
+	 * @param IDBConnection $db
+	 */
+	public function __construct(IDBConnection $db) {
+		parent::__construct($db, 'forms_v2_options', Option::class);
 	}
 
 	/**
-	 * @param int $formId
+	 * @param int $questionId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @return Question[]
+	 * @return Option[]
 	 */
 
-	public function findByForm(int $formId): array {
+	public function findByQuestion(int $questionId): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
 			->from($this->getTableName())
 			->where(
-				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
 			);
 
 		return $this->findEntities($qb);
 	}
 
-	/**
-	 * @param int $formId
-	 */
-	public function deleteByForm(int $formId): void {
+	public function deleteByQuestion(int $questionId): void {
 		$qb = $this->db->getQueryBuilder();
 
-		// First delete corresponding options.
-		$questionEntities = $this->findByForm($formId);
-		foreach ($questionEntities as $questionEntity) {
-			$this->optionMapper->deleteByQuestion($questionEntity->id);
-		}
-
-		// Delete Questions
 		$qb->delete($this->getTableName())
 			->where(
-				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-			);
+				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
+		);
 
 		$qb->execute();
 	}
 
-	public function findById(int $questionId): Question {
+	public function findById(int $optionId): Option {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
 			->from($this->getTableName())
 			->where(
-				$qb->expr()->eq('id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT))
+				$qb->expr()->eq('id', $qb->createNamedParameter($optionId))
 			);
 
 		return $this->findEntity($qb);

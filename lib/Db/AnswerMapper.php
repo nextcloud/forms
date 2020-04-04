@@ -1,12 +1,9 @@
 <?php
-declare(strict_types=1);
-
 /**
- * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
+ * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
- * @author Inigo Jiron <ijiron@terpmail.umd.edu>
- * @author Natalie Gilbert <ngilb634@umd.edu>
- *
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+*
  * @license GNU AGPL version 3 or any later version
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -33,89 +30,43 @@ use OCP\AppFramework\Db\QBMapper;
 class AnswerMapper extends QBMapper {
 
 	/**
-	 * TextMapper constructor.
+	 * AnswerMapper constructor.
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'forms_answers', Answer::class);
+		parent::__construct($db, 'forms_v2_answers', Answer::class);
 	}
 
-	// TODO: Change below functions to search by form and question id
-
 	/**
-	 * @param int $formId
-	 * @param int $questionId
+	 * @param int $submissionId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @return Answer[]
 	 */
 
-	public function findByForm(int $formId, int $questionId): array {
-		$qb = $this->db->getQueryBuilder();
-
-        $qb->select('*')
-           ->from($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-		   )
-		   ->andWhere(
-			   $qb->expr()->eq('question_id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT))
-		   );
-
-        return $this->findEntities($qb);
-	}
-
-	/**
-	 * @param int $formId
-	 * @param int $questionId
-	 */
-	public function deleteByFormAndQuestion(int $formId, int $questionId): void {
-		$qb = $this->db->getQueryBuilder();
-
-        $qb->delete($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-		   )
-		   ->andWhere(
-			$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT))
-		);
-
-	   $qb->execute();
-	}
-
-	/**
-	 * @param int $formId
-	 */
-	public function deleteByForm(int $formId): void {
-		$qb = $this->db->getQueryBuilder();
-
-        $qb->delete($this->getTableName())
-           ->where(
-               $qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-		   );
-
-	   $qb->execute();
-	}
-
-	public function findById(int $answerId): Answer {
+	public function findBySubmission(int $submissionId): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
 			->from($this->getTableName())
 			->where(
-				$qb->expr()->eq('id', $qb->createNamedParameter($answerId))
+				$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT))
 			);
 
-		return $this->findEntity($qb);
+		return $this->findEntities($qb);
 	}
 
-	public function deleteByQuestion(int $questionId): void {
+	/**
+	* @param int $submissionId
+	*/
+	public function deleteBySubmission(int $submissionId): void {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->delete($this->getTableName())
-			->where(
-				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
-			);
+		->where(
+			$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT))
+		);
 
 		$qb->execute();
 	}
+
 }

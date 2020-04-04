@@ -29,39 +29,34 @@ use OCP\AppFramework\Db\Entity;
 /**
  * @method integer getFormId()
  * @method void setFormId(integer $value)
- * @method string getFormQuestionType()
- * @method void setFormQuestionType(string $value)
- * @method string getFormQuestionText()
- * @method void setFormQuestionText(string $value)
- * @method integer getTimestamp()
- * @method void setTimestamp(integer $value)
+ * @method string getType()
+ * @method void setType(string $value)
+ * @method string getText()
+ * @method void setText(string $value)
  */
 class Question extends Entity {
 	protected $formId;
-	protected $formQuestionType;
-	protected $formQuestionText;
-	protected $timestamp;
+	protected $type;
+	protected $mandatory;
+	protected $text;
 
 	/**
 	 * Question constructor.
 	 */
 	public function __construct() {
 		$this->addType('formId', 'integer');
-		$this->addType('timestamp', 'integer');
+		$this->addType('type', 'string');
+		$this->addType('mandatory', 'bool');
+		$this->addType('text', 'string');
 	}
 
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
 			'formId' => $this->getFormId(),
-			'type' => htmlspecialchars_decode($this->getFormQuestionType()),
-			'text' => htmlspecialchars_decode($this->getFormQuestionText()),
-			'timestamp' => $this->getTimestamp()
+			'type' => htmlspecialchars_decode($this->getType()),
+			'mandatory' => $this->getMandatory(),
+			'text' => htmlspecialchars_decode($this->getText()),
 		];
 	}
-
-
-
-
-
 }

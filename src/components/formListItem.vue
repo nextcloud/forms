@@ -72,12 +72,12 @@
 				<img class="icontwo">
 			</div>
 			<div class="symbol icon-voted" />
-			<a :href="voteUrl" class="wrapper group-1-1">
+			<a :href="submitUrl" class="wrapper group-1-1">
 				<div class="name">
-					{{ form.event.title }}
+					{{ form.form.title }}
 				</div>
 				<div class="description">
-					{{ form.event.description }}
+					{{ form.form.description }}
 				</div>
 			</a>
 		</div>
@@ -102,18 +102,18 @@
 			</div>
 
 			<div class="wrapper group-2-1">
-				<div v-tooltip="accessType" class="thumbnail access" :class="form.event.access">
+				<div v-tooltip="accessType" class="thumbnail access" :class="form.form.access">
 					{{ accessType }}
 				</div>
 			</div>
 			<div class="owner">
-				<UserDiv :user-id="form.event.owner" :display-name="form.event.ownerDisplayName" />
+				<UserDiv :user-id="form.form.ownerId" :display-name="form.form.ownerDisplayName" />
 			</div>
 			<div class="wrapper group-2-2">
 				<div class="created ">
 					{{ timeSpanCreated }}
 				</div>
-				<div class="expiry" :class="{ expired : form.event.expired }">
+				<div class="expiry" :class="{ expired : form.form.expired }">
 					{{ timeSpanExpiration }}
 				</div>
 			</div>
@@ -150,13 +150,13 @@ export default {
 
 	computed: {
 		accessType() {
-			if (this.form.event.access === 'public') {
+			if (this.form.form.access === 'public') {
 				return t('forms', 'Public access')
-			} else if (this.form.event.access === 'select') {
+			} else if (this.form.form.access === 'select') {
 				return t('forms', 'Only shared')
-			} else if (this.form.event.access === 'registered') {
+			} else if (this.form.form.access === 'registered') {
 				return t('forms', 'Registered users only')
-			} else if (this.form.event.access === 'hidden') {
+			} else if (this.form.form.access === 'hidden') {
 				return t('forms', 'Hidden form')
 			} else {
 				return ''
@@ -164,12 +164,12 @@ export default {
 		},
 
 		timeSpanCreated() {
-			return moment(this.form.event.created, 'YYYY-MM-DD HH:mm')
+			return moment(this.form.form.created, 'YYYY-MM-DD HH:mm')
 		},
 
 		timeSpanExpiration() {
-			if (this.form.event.expiration) {
-				return moment(this.form.event.expirationDate)
+			if (this.form.form.expires) {
+				return moment(this.form.form.expirationDate)
 			} else {
 				return t('forms', 'never')
 			}
@@ -179,8 +179,8 @@ export default {
 			return this.form.shares.length
 		},
 
-		voteUrl() {
-			return OC.generateUrl('apps/forms/form/') + this.form.event.hash
+		submitUrl() {
+			return OC.generateUrl('apps/forms/form/') + this.form.form.hash
 		},
 
 	},
@@ -196,7 +196,7 @@ export default {
 
 		copyLink() {
 			// this.$emit('copyLink')
-			this.$copyText(window.location.origin + this.voteUrl).then(
+			this.$copyText(window.location.origin + this.submitUrl).then(
 				function(e) {
 					OC.Notification.showTemporary(t('forms', 'Link copied to clipboard'))
 				},
@@ -217,6 +217,7 @@ export default {
 	},
 }
 </script>
+
 <style lang="scss">
 $row-padding: 15px;
 $table-padding: 4px;
@@ -293,8 +294,6 @@ $mediabreak-3: $group-1-width + $owner-width + max($group-2-1-width, $group-2-2-
 	align-items: center;
 	position: relative;
 	flex-grow: 0;
-	div {
-	}
 }
 
 .name {

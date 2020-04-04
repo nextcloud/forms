@@ -23,7 +23,9 @@ class Version010102Date20200323120846 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		$schema->dropTable('forms_notif');
+		if ($schema->hasTable('forms_notif')) {
+			$schema->dropTable('forms_notif');
+		}
 
 		return $schema;
 	}

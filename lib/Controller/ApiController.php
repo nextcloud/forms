@@ -41,14 +41,17 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Security\ISecureRandom;
 
-use OCA\Forms\Db\Event;
-use OCA\Forms\Db\EventMapper;
-use OCA\Forms\Db\VoteMapper;
+use OCA\Forms\Db\Form;
+use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Submission;
+use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\Answer;
+use OCA\Forms\Db\AnswerMapper;
 
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
-use OCA\Forms\Db\Answer;
-use OCA\Forms\Db\AnswerMapper;
+use OCA\Forms\Db\Option;
+use OCA\Forms\Db\OptionMapper;
 
 use OCP\Util;
 
@@ -56,10 +59,11 @@ class ApiController extends Controller {
 
 	private $groupManager;
 	private $userManager;
-	private $eventMapper;
-	private $voteMapper;
-	private $questionMapper;
+	private $formMapper;
+	private $submissionMapper;
 	private $answerMapper;
+	private $questionMapper;
+	private $optionMapper;
 
 	/** @var ILogger */
 	private $logger;
@@ -74,10 +78,11 @@ class ApiController extends Controller {
 	 * @param IRequest $request
 	 * @param IUserManager $userManager
 	 * @param string $userId
-	 * @param EventMapper $eventMapper
-	 * @param VoteMapper $voteMapper
-	 * @param QuestionMapper $questionMapper
+	 * @param FormMapper $formMapper
+	 * @param SubmissionMapper $submissionMapper
 	 * @param AnswerMapper $answerMapper
+	 * @param QuestionMapper $questionMapper
+	 * @param OptionMapper $optionMapper
 	 */
 	public function __construct(
 		$appName,
@@ -85,20 +90,22 @@ class ApiController extends Controller {
 		IRequest $request,
 		IUserManager $userManager,
 		$userId,
-		EventMapper $eventMapper,
-		VoteMapper $voteMapper,
-		QuestionMapper $questionMapper,
+		FormMapper $formMapper,
+		SubmissionMapper $submissionMapper,
 		AnswerMapper $answerMapper,
+		QuestionMapper $questionMapper,
+		OptionMapper $optionMapper,
 		ILogger $logger
 	) {
 		parent::__construct($appName, $request);
 		$this->userId = $userId;
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
-		$this->eventMapper = $eventMapper;
-		$this->voteMapper = $voteMapper;
-		$this->questionMapper = $questionMapper;
+		$this->formMapper = $formMapper;
+		$this->submissionMapper = $submissionMapper;
 		$this->answerMapper = $answerMapper;
+		$this->questionMapper = $questionMapper;
+		$this->optionMapper = $optionMapper;
 		$this->logger = $logger;
 	}
 
@@ -108,8 +115,8 @@ class ApiController extends Controller {
 	 * @param string $item
 	 * @return Array
 	 */
-	private function convertAccessList($item) {
-		$split = array();
+	private function convertAccessList($item) : array {
+		$split = [];
 		if (strpos($item, 'user_') === 0) {
 			$user = $this->userManager->get(substr($item, 5));
 			$split = [
@@ -172,11 +179,11 @@ class ApiController extends Controller {
 
 	/**
 	 * Set the access right of the current user for the form
-	 * @param Array $event
+	 * @param Array $form
 	 * @param Array $shares
 	 * @return String
 	 */
-	private function grantAccessAs($event, $shares) {
+	private function grantAccessAs($form, $shares) {
 		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
 			$currentUser = '';
 		} else {
@@ -185,13 +192,13 @@ class ApiController extends Controller {
 
 		$grantAccessAs = 'none';
 
-		if ($event['owner'] === $currentUser) {
+		if ($form['ownerId'] === $currentUser) {
 			$grantAccessAs = 'owner';
-		} elseif ($event['access'] === 'public') {
+		} elseif ($form['access'] === 'public') {
 			$grantAccessAs = 'public';
-		} elseif ($event['access'] === 'registered' && \OC::$server->getUserSession()->getUser() instanceof IUser) {
+		} elseif ($form['access'] === 'registered' && \OC::$server->getUserSession()->getUser() instanceof IUser) {
 			$grantAccessAs = 'registered';
-		} elseif ($event['access'] === 'hidden' && ($event['owner'] === \OC::$server->getUserSession()->getUser())) {
+		} elseif ($form['access'] === 'hidden' && ($form['ownerId'] === \OC::$server->getUserSession()->getUser())) {
 			$grantAccessAs = 'hidden';
 		} elseif ($this->checkUserAccess($shares)) {
 			$grantAccessAs = 'userInvitation';
@@ -210,11 +217,11 @@ class ApiController extends Controller {
 	 * @param Integer $formId
 	 * @return Array
 	 */
-	public function getEvent($formId) {
+	public function getForm($formId) {
 
 		$data = array();
 		try {
-			$data = $this->eventMapper->find($formId)->read();
+			$data = $this->formMapper->find($formId)->read();
 		} catch (DoesNotExistException $e) {
 			// return silently
 		} finally {
@@ -234,7 +241,7 @@ class ApiController extends Controller {
 		$accessList = array();
 
 		try {
-			$form = $this->eventMapper->find($formId);
+			$form = $this->formMapper->find($formId);
 			if (!strpos('|public|hidden|registered', $form->getAccess())) {
 				$accessList = explode(';', $form->getAccess());
 				$accessList = array_filter($accessList);
@@ -248,14 +255,14 @@ class ApiController extends Controller {
 
 	}
 
-	public function getQuestions($formId) {
-		$questionList = array();
+	public function getQuestions($formId) : array {
+		$questionList = [];
 		try{
-			$questions = $this->questionMapper->findByForm($formId);
-			foreach ($questions as $questionElement) {
-				$temp = $questionElement->read();
-				$temp['answers'] = $this->getAnswers($formId, $temp['id']);
-				$questionList[] =  $temp;
+			$questionEntities = $this->questionMapper->findByForm($formId);
+			foreach ($questionEntities as $questionEntity) {
+				$question = $questionEntity->read();
+				$question['options'] = $this->getOptions($question['id']);
+				$questionList[] =  $question;
 			}
 
 		} catch (DoesNotExistException $e) {
@@ -265,18 +272,18 @@ class ApiController extends Controller {
 		}
 	}
 
-	public function getAnswers($formId, $questionId) {
-		$answerList = array();
+	public function getOptions($questionId) : array {
+		$optionList = [];
 		try{
-			$answers = $this->answerMapper->findByForm($formId, $questionId);
-			foreach ($answers as $answerElement) {
-				$answerList[] = $answerElement->read();
+			$optionEntities = $this->optionMapper->findByQuestion($questionId);
+			foreach ($optionEntities as $optionEntity) {
+				$optionList[] = $optionEntity->read();
 			}
 
 		} catch (DoesNotExistException $e) {
 			//handle silently
 		}finally{
-			return $answerList;
+			return $optionList;
 		}
 	}
 
@@ -286,7 +293,7 @@ class ApiController extends Controller {
 	 * @param String $formIdOrHash form id or hash
 	 * @return Array
 	 */
-	public function getForm($formIdOrHash) {
+	public function getFullForm($formIdOrHash) {
 
 		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
 			$currentUser = '';
@@ -299,32 +306,30 @@ class ApiController extends Controller {
 		try {
 
 			if (is_numeric($formIdOrHash)) {
-				$formId = $this->eventMapper->find(intval($formIdOrHash))->id;
+				$formId = $this->formMapper->find(intval($formIdOrHash))->id;
 				$result = 'foundById';
 			} else {
-				$formId = $this->eventMapper->findByHash($formIdOrHash)->id;
+				$formId = $this->formMapper->findByHash($formIdOrHash)->id;
 				$result = 'foundByHash';
 			}
 
-			$event = $this->getEvent($formId);
-			$shares = $this->getShares($event['id']);
+			$form = $this->getForm($formId);
+			$shares = $this->getShares($form['id']);
 
-			if ($event['owner'] !== $currentUser && !$this->groupManager->isAdmin($currentUser)) {
+			if ($form['ownerId'] !== $currentUser && !$this->groupManager->isAdmin($currentUser)) {
 				$mode = 'create';
 			} else {
 				$mode = 'edit';
 			}
 
 			$data = [
-				'id' => $event['id'],
+				'id' => $form['id'],
 				'result' => $result,
-				'grantedAs' => $this->grantAccessAs($event, $shares),
+				'grantedAs' => $this->grantAccessAs($form, $shares),
 				'mode' => $mode,
-				'event' => $event,
+				'form' => $form,
 				'shares' => $shares,
-				'options' => [
-					'formQuizQuestions' => $this->getQuestions($event['id'])
-				]
+				'questions' => $this->getQuestions($form['id']),
 			];
 		} catch (DoesNotExistException $e) {
 				$data['form'] = ['result' => 'notFound'];
@@ -345,21 +350,20 @@ class ApiController extends Controller {
 		}
 
 		try {
-			$events = $this->eventMapper->findAll();
+			$forms = $this->formMapper->findAll();
 		} catch (DoesNotExistException $e) {
 			return new DataResponse($e, Http::STATUS_NOT_FOUND);
 		}
 
-		$eventsList = array();
-
-		foreach ($events as $eventElement) {
-			$event = $this->getForm($eventElement->id);
-			//if ($event['grantedAs'] !== 'none') {
-				$eventsList[] = $event;
+		$formsList = array();
+		foreach ($forms as $formElement) {
+			$form = $this->getFullForm($formElement->id);
+			//if ($form['grantedAs'] !== 'none') {
+				$formsList[] = $form;
 			//}
 		}
 
-		return new DataResponse($eventsList, Http::STATUS_OK);
+		return new DataResponse($formsList, Http::STATUS_OK);
 	}
 
 	/**
@@ -370,17 +374,16 @@ class ApiController extends Controller {
 	 */
 	public function deleteForm(int $id) {
 		try {
-			$formToDelete = $this->eventMapper->find($id);
+			$formToDelete = $this->formMapper->find($id);
 		} catch (DoesNotExistException $e) {
 			return new Http\JSONResponse([], Http::STATUS_NOT_FOUND);
 		}
-		if ($this->userId !== $formToDelete->getOwner() && !$this->groupManager->isAdmin($this->userId)) {
+		if ($this->userId !== $formToDelete->getOwnerId() && !$this->groupManager->isAdmin($this->userId)) {
 			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
 		}
-		$this->voteMapper->deleteByForm($id);
+		$this->submissionMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
-		$this->answerMapper->deleteByForm($id);
-		$this->eventMapper->delete($formToDelete);
+		$this->formMapper->delete($formToDelete);
 		return new DataResponse(array(
 			'id' => $id,
 			'action' => 'deleted'
@@ -391,30 +394,30 @@ class ApiController extends Controller {
 	/**
 	 * Write form (create/update)
 	 * @NoAdminRequired
-	 * @param Array $event
+	 * @param Array $form
 	 * @param Array $options
 	 * @param Array  $shares
 	 * @param String $mode
 	 * @return DataResponse
 	 */
-	public function writeForm($event, $options, $shares, $mode) {
+	public function writeForm($form, $questions, $shares, $mode) {
 		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
 			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
 		} else {
 			$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-			$AdminAccess = $this->groupManager->isAdmin($currentUser);
+			$adminAccess = $this->groupManager->isAdmin($currentUser);
 		}
 
-		$newEvent = new Event();
+		$newForm = new Form();
 
 		// Set the configuration options entered by the user
-		$newEvent->setTitle($event['title']);
-		$newEvent->setDescription($event['description']);
+		$newForm->setTitle($form['title']);
+		$newForm->setDescription($form['description']);
 
-		$newEvent->setIsAnonymous($event['isAnonymous']);
-		$newEvent->setUnique($event['unique']);
+		$newForm->setIsAnonymous($form['isAnonymous']);
+		$newForm->setSubmitOnce($form['submitOnce']);
 
-		if ($event['access'] === 'select') {
+		if ($form['access'] === 'select') {
 			$shareAccess = '';
 			foreach ($shares as $shareElement) {
 				if ($shareElement['type'] === 'user') {
@@ -423,50 +426,50 @@ class ApiController extends Controller {
 					$shareAccess = $shareAccess . 'group_' . $shareElement['id'] . ';';
 				}
 			}
-			$newEvent->setAccess(rtrim($shareAccess, ';'));
+			$newForm->setAccess(rtrim($shareAccess, ';'));
 		} else {
-			$newEvent->setAccess($event['access']);
+			$newForm->setAccess($form['access']);
 		}
 
-		if ($event['expiration']) {
-			$newEvent->setExpire(date('Y-m-d H:i:s', strtotime($event['expirationDate'])));
+		if ($form['expires']) {
+			$newForm->setExpirationDate(date('Y-m-d H:i:s', strtotime($form['expirationDate'])));
 		} else {
-			$newEvent->setExpire(null);
+			$newForm->setExpirationDate(null);
 		}
 
 		if ($mode === 'edit') {
 			// Edit existing form
-			$oldForm = $this->eventMapper->findByHash($event['hash']);
+			$oldForm = $this->formMapper->findByHash($form['hash']);
 
 			// Check if current user is allowed to edit existing form
-			if ($oldForm->getOwner() !== $currentUser && !$AdminAccess) {
+			if ($oldForm->getOwnerId() !== $currentUser && !$adminAccess) {
 				// If current user is not owner of existing form deny access
 				return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
 			}
 
 			// else take owner, hash and id of existing form
-			$newEvent->setOwner($oldForm->getOwner());
-			$newEvent->setHash($oldForm->getHash());
-			$newEvent->setId($oldForm->getId());
-			$this->eventMapper->update($newEvent);
+			$newForm->setOwnerId($oldForm->getOwnerId());
+			$newForm->setHash($oldForm->getHash());
+			$newForm->setId($oldForm->getId());
+			$this->formMapper->update($newForm);
 
 		} elseif ($mode === 'create') {
 			// Create new form
 			// Define current user as owner, set new creation date and create a new hash
-			$newEvent->setOwner($currentUser);
-			$newEvent->setCreated(date('Y-m-d H:i:s'));
-			$newEvent->setHash(\OC::$server->getSecureRandom()->generate(
+			$newForm->setOwnerId($currentUser);
+			$newForm->setCreated(date('Y-m-d H:i:s'));
+			$newForm->setHash(\OC::$server->getSecureRandom()->generate(
 				16,
 				ISecureRandom::CHAR_DIGITS .
 				ISecureRandom::CHAR_LOWER .
 				ISecureRandom::CHAR_UPPER
 			));
-			$newEvent = $this->eventMapper->insert($newEvent);
+			$newForm = $this->formMapper->insert($newForm);
 		}
 
 		return new DataResponse(array(
-			'id' => $newEvent->getId(),
-			'hash' => $newEvent->getHash()
+			'id' => $newForm->getId(),
+			'hash' => $newForm->getHash()
 		), Http::STATUS_OK);
 
 	}
@@ -475,22 +478,22 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function newForm(): Http\JSONResponse {
-		$event = new Event();
+		$form = new Form();
 
 		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-		$event->setOwner($currentUser);
-		$event->setCreated(date('Y-m-d H:i:s'));
-		$event->setHash(\OC::$server->getSecureRandom()->generate(
+		$form->setOwnerId($currentUser);
+		$form->setCreated(date('Y-m-d H:i:s'));
+		$form->setHash(\OC::$server->getSecureRandom()->generate(
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE
 		));
-		$event->setTitle('New form');
-		$event->setDescription('');
-		$event->setAccess('public');
+		$form->setTitle('New form');
+		$form->setDescription('');
+		$form->setAccess('public');
 
-		$this->eventMapper->insert($event);
+		$this->formMapper->insert($form);
 
-		return new Http\JSONResponse($this->getForm($event->getHash()));
+		return new Http\JSONResponse($this->getFullForm($form->getHash()));
 	}
 
 	/**
@@ -504,13 +507,13 @@ class ApiController extends Controller {
 		]);
 
 		try {
-			$form = $this->eventMapper->find($formId);
+			$form = $this->formMapper->find($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwner() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->userId) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -518,8 +521,8 @@ class ApiController extends Controller {
 		$question = new Question();
 
 		$question->setFormId($formId);
-		$question->setFormQuestionType($type);
-		$question->setFormQuestionText($text);
+		$question->setType($type);
+		$question->setText($text);
 
 		$question = $this->questionMapper->insert($question);
 
@@ -536,18 +539,18 @@ class ApiController extends Controller {
 
 		try {
 			$question = $this->questionMapper->findById($id);
-			$form = $this->eventMapper->find($question->getFormId());
+			$form = $this->formMapper->find($question->getFormId());
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question of this answer');
+			$this->logger->debug('Could not find form or question');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwner() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->userId) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$this->answerMapper->deleteByQuestion($id);
+		$this->optionMapper->deleteByQuestion($id);
 		$this->questionMapper->delete($question);
 
 		return new Http\JSONResponse($id);
@@ -556,64 +559,64 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function newAnswer(int $formId, int $questionId, string $text): Http\JSONResponse {
-		$this->logger->debug('Adding new answer: formId: {formId}, questoinId: {questionId}, text: {text}', [
+	public function newOption(int $formId, int $questionId, string $text): Http\JSONResponse {
+		$this->logger->debug('Adding new option: formId: {formId}, questionId: {questionId}, text: {text}', [
 			'formId' => $formId,
 			'questionId' => $questionId,
 			'text' => $text,
 		]);
 
 		try {
-			$form = $this->eventMapper->find($formId);
+			$form = $this->formMapper->find($formId);
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question so answer can\'t be added');
+			$this->logger->debug('Could not find form or question so option can\'t be added');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwner() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->userId) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
 		if ($question->getFormId() !== $formId) {
-			$this->logger->debug('This question is not owned by the current user');
+			$this->logger->debug('This question is not part of the current form');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$answer = new Answer();
+		$option = new Option();
 
-		$answer->setFormId($formId);
-		$answer->setQuestionId($questionId);
-		$answer->setText($text);
+		$option->setQuestionId($questionId);
+		$option->setText($text);
 
-		$answer = $this->answerMapper->insert($answer);
+		$option = $this->optionMapper->insert($option);
 
-		return new Http\JSONResponse($answer->getId());
+		return new Http\JSONResponse($option->getId());
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function deleteAnswer(int $id): Http\JSONResponse {
-		$this->logger->debug('Deleting answer: {id}', [
+	public function deleteOption(int $id): Http\JSONResponse {
+		$this->logger->debug('Deleting option: {id}', [
 			'id' => $id
 		]);
 
 		try {
-			$answer = $this->answerMapper->findById($id);
-			$form = $this->eventMapper->find($answer->getFormId());
+			$option = $this->optionMapper->findById($id);
+			$question = $this->questionMapper->findById($option->getQuestionId());
+			$form = $this->formMapper->find($question->getFormId());
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or answer');
+			$this->logger->debug('Could not find form or option');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwner() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->userId) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$this->answerMapper->delete($answer);
+		$this->optionMapper->delete($option);
 
 		//TODO useful response
 		return new Http\JSONResponse($id);
@@ -624,20 +627,30 @@ class ApiController extends Controller {
 	 */
 	public function getSubmissions(string $hash): Http\JSONResponse {
 		try {
-			$form = $this->eventMapper->findByHash($hash);
+			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwner() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->userId) {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$votes = $this->voteMapper->findByForm($form->getId());
-
 		$result = [];
-		foreach ($votes as $vote) {
-			$result[] = $vote->read();
+		$submissionList = $this->submissionMapper->findByForm($form->getId());
+		foreach ($submissionList as $submissionEntity) {
+			$answerList = $this->answerMapper->findBySubmission($submissionEntity->id);
+			foreach ($answerList as $answerEntity) {
+				$answer = $answerEntity->read();
+				//Temporary Adapt Data to be usable by old Results-View
+				$answer['userId'] = $submissionEntity->getUserId();
+
+				$question = $this->questionMapper->findById($answer['questionId']);
+				$answer['questionText'] = $question->getText();
+				$answer['questionType'] = $question->getType();
+
+				$result[] = $answer;
+			}
 		}
 
 		return new Http\JSONResponse($result);

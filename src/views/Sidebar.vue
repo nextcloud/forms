@@ -21,47 +21,41 @@
  -->
 
 <template>
-	<AppSidebar :title="form.event.title">
+	<AppSidebar :title="form.form.title">
 		<div class="configBox ">
 			<label class="title icon-settings">
 				{{ t('forms', 'Form configurations') }}
 			</label>
 
-			<input id="anonymous"
-				v-model="form.event.isAnonymous"
+			<input id="isAnonymous"
+				v-model="form.form.isAnonymous"
 
 				type="checkbox"
 				class="checkbox">
-			<label for="anonymous" class="title">
+			<label for="isAnonymous" class="title">
 				{{ t('forms', 'Anonymous form') }}
 			</label>
 
-			<input id="unique"
-				v-model="form.event.unique"
-				:disabled="form.event.access !== 'registered' || form.event.isAnonymous"
+			<input id="submitOnce"
+				v-model="form.form.submitOnce"
+				:disabled="form.form.access !== 'registered' || form.form.isAnonymous"
 				type="checkbox"
 				class="checkbox">
-			<label for="unique" class="title">
+			<label for="submitOnce" class="title">
 				<span>{{ t('forms', 'Only allow one submission per user') }}</span>
 			</label>
 
-			<input v-show="form.event.isAnonymous"
-				id="trueAnonymous"
-				v-model="form.event.fullAnonymous"
+			<input id="expires"
+				v-model="form.form.expires"
 
 				type="checkbox"
 				class="checkbox">
-			<input id="expiration"
-				v-model="form.event.expiration"
-
-				type="checkbox"
-				class="checkbox">
-			<label class="title" for="expiration">
+			<label class="title" for="expires">
 				{{ t('forms', 'Expires') }}
 			</label>
 
-			<DatetimePicker v-show="form.event.expiration"
-				v-model="form.event.expirationDate"
+			<DatetimePicker v-show="form.form.expires"
+				v-model="form.form.expirationDate"
 				v-bind="expirationDatePicker"
 
 				:time-picker-options="{ start: '00:00', step: '00:05', end: '23:55' }"
@@ -73,7 +67,7 @@
 				{{ t('forms', 'Access') }}
 			</label>
 			<input id="private"
-				v-model="form.event.access"
+				v-model="form.form.access"
 
 				type="radio"
 				value="registered"
@@ -83,7 +77,7 @@
 				<span>{{ t('forms', 'Registered users only') }}</span>
 			</label>
 			<input id="public"
-				v-model="form.event.access"
+				v-model="form.form.access"
 
 				type="radio"
 				value="public"
@@ -93,7 +87,7 @@
 				<span>{{ t('forms', 'Public access') }}</span>
 			</label>
 			<input id="select"
-				v-model="form.event.access"
+				v-model="form.form.access"
 
 				type="radio"
 				value="select"
@@ -104,7 +98,7 @@
 			</label>
 		</div>
 
-		<ShareDiv v-show="form.event.access === 'select'"
+		<ShareDiv v-show="form.form.access === 'select'"
 			:active-shares="form.shares"
 			:placeholder="t('forms', 'Name of user or group')"
 			:hide-names="true"

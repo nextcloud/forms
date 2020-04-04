@@ -1,0 +1,352 @@
+<?php
+/**
+ * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ *
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ *
+ * @license GNU AGPL version 3 or any later version
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+namespace OCA\Forms\Migration;
+
+use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Types\Type;
+use OCP\DB\ISchemaWrapper;
+use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\IConfig;
+use OCP\IDBConnection;
+use OCP\Migration\SimpleMigrationStep;
+use OCP\Migration\IOutput;
+
+/**
+ * Installation class for the forms app.
+ * Initial db creation
+ */
+class Version010200Date2020323141300 extends SimpleMigrationStep {
+
+	/** @var IDBConnection */
+	protected $connection;
+
+	/** @var IConfig */
+	protected $config;
+
+	/**
+	 * @param IDBConnection $connection
+	 * @param IConfig $config
+	 */
+	public function __construct(IDBConnection $connection, IConfig $config) {
+		$this->connection = $connection;
+		$this->config = $config;
+	}
+
+	/**
+	 * @param IOutput $output
+	 * @param \Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
+	 * @param array $options
+	 * @return null|ISchemaWrapper
+	 * @since 13.0.0
+	 */
+	public function changeSchema(IOutput $output, \Closure $schemaClosure, array $options) {
+		/** @var ISchemaWrapper $schema */
+		$schema = $schemaClosure();
+
+		if (!$schema->hasTable('forms_v2_forms')) {
+			$table = $schema->createTable('forms_v2_forms');
+			$table->addColumn('id', Type::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('hash', Type::STRING, [
+				'notnull' => true,
+				'length' => 64,
+			]);
+			$table->addColumn('title', Type::STRING, [
+				'notnull' => true,
+				'length' => 256,
+			]);
+			$table->addColumn('description', Type::STRING, [
+				'notnull' => false,
+				'length' => 2048,
+			]);
+			$table->addColumn('owner_id', Type::STRING, [
+				'notnull' => true,
+				'length' => 64,
+			]);
+			$table->addColumn('access', Type::STRING, [
+				'notnull' => false,
+				'length' => 1024,
+			]);
+			$table->addColumn('created', Type::DATETIME, [
+				'notnull' => false,
+			]);
+			$table->addColumn('expiration_date', Type::DATETIME, [
+				'notnull' => false,
+			]);
+			$table->addColumn('is_anonymous', Type::BOOLEAN, [
+				'notnull' => true,
+				'default' => 0,
+			]);
+			$table->addColumn('submit_once', Type::BOOLEAN, [
+				'notnull' => true,
+				'default' => 0,
+			]);
+			$table->setPrimaryKey(['id']);
+		}
+
+		if (!$schema->hasTable('forms_v2_questions')) {
+			$table = $schema->createTable('forms_v2_questions');
+			$table->addColumn('id', Type::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('form_id', Type::INTEGER, [
+				'notnull' => true,
+			]);
+			$table->addColumn('type', Type::STRING, [
+				'notnull' => true,
+				'length' => 256,
+			]);
+			$table->addColumn('mandatory', Type::BOOLEAN, [
+				'notnull' => true,
+				'default' => 1,
+			]);
+			$table->addColumn('text', Type::STRING, [
+				'notnull' => true,
+				'length' => 2048,
+			]);
+			$table->setPrimaryKey(['id']);
+		}
+
+		if (!$schema->hasTable('forms_v2_options')) {
+			$table = $schema->createTable('forms_v2_options');
+			$table->addColumn('id', Type::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('question_id', Type::INTEGER, [
+				'notnull' => true,
+			]);
+			$table->addColumn('text', Type::STRING, [
+				'notnull' => true,
+				'length' => 1024,
+			]);
+			$table->setPrimaryKey(['id']);
+		}
+
+		if (!$schema->hasTable('forms_v2_submissions')) {
+			$table = $schema->createTable('forms_v2_submissions');
+			$table->addColumn('id', Type::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('form_id', Type::INTEGER, [
+				'notnull' => true,
+			]);
+			$table->addColumn('user_id', Type::STRING, [
+				'notnull' => true,
+				'length' => 64,
+			]);
+			$table->addColumn('timestamp', Type::DATETIME, [
+				'notnull' => false,
+			]);
+			$table->setPrimaryKey(['id']);
+		}
+
+		if (!$schema->hasTable('forms_v2_answers')) {
+			$table = $schema->createTable('forms_v2_answers');
+			$table->addColumn('id', Type::INTEGER, [
+				'autoincrement' => true,
+				'notnull' => true,
+			]);
+			$table->addColumn('submission_id', Type::INTEGER, [
+				'notnull' => true,
+			]);
+			$table->addColumn('question_id', Type::INTEGER, [
+				'notnull' => true,
+			]);
+			$table->addColumn('text', Type::STRING, [
+				'notnull' => true,
+				'length' => 2048,
+			]);
+			$table->setPrimaryKey(['id']);
+		}
+
+		return $schema;
+	}
+
+	public function postSchemaChange(IOutput $output, \Closure $schemaClosure, array $options) {
+		/** @var ISchemaWrapper $schema */
+		$schema = $schemaClosure();
+
+		// if Database exists.
+		if( $schema->hasTable('forms_events') ){
+			$id_mapping = [];
+			$id_mapping['events'] = []; // Maps oldevent-id => newevent-id
+			$id_mapping['questions'] = []; // Maps oldquestion-id => newquestion-id
+
+			//Fetch & Restore Events
+			$qb_fetch = $this->connection->getQueryBuilder();
+			$qb_restore = $this->connection->getQueryBuilder();
+
+			$qb_fetch->select('id', 'hash', 'title', 'description', 'owner', 'created', 'access', 'expire', 'is_anonymous', 'unique')
+				->from('forms_events');
+			$cursor = $qb_fetch->execute();
+			while( $event = $cursor->fetch() ){ 
+				$qb_restore->insert('forms_v2_forms')
+					->values([
+						'hash' => $qb_restore->createNamedParameter($event['hash'], IQueryBuilder::PARAM_STR),
+						'title' => $qb_restore->createNamedParameter($event['title'], IQueryBuilder::PARAM_STR),
+						'description' => $qb_restore->createNamedParameter($event['description'], IQueryBuilder::PARAM_STR),
+						'owner_id' => $qb_restore->createNamedParameter($event['owner'], IQueryBuilder::PARAM_STR),
+						'access' => $qb_restore->createNamedParameter($event['access'], IQueryBuilder::PARAM_STR),
+						'created' => $qb_restore->createNamedParameter($event['created'], IQueryBuilder::PARAM_STR),
+						'expiration_date' => $qb_restore->createNamedParameter($event['expire'], IQueryBuilder::PARAM_STR),
+						'is_anonymous' => $qb_restore->createNamedParameter($event['is_anonymous'], IQueryBuilder::PARAM_BOOL),
+						'submit_once' => $qb_restore->createNamedParameter($event['unique'], IQueryBuilder::PARAM_BOOL)
+					]);
+				$qb_restore->execute();
+				$id_mapping['events'][$event['id']] = $qb_restore->getLastInsertId(); //Store new form-id to connect questions to new form.
+			}
+			$cursor->closeCursor();
+
+			//Fetch & restore Questions
+			$qb_fetch = $this->connection->getQueryBuilder();
+			$qb_restore = $this->connection->getQueryBuilder();
+
+			$qb_fetch->select('id', 'form_id', 'form_question_type', 'form_question_text')
+				->from('forms_questions');
+			$cursor = $qb_fetch->execute();
+			while( $question = $cursor->fetch() ){
+				//In case the old Question would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
+				if(strlen($question['form_question_text']) > 2048) {
+					$output->warning("Question-text is too long for new Database: '" . $question['form_question_text'] . "'");
+					$question['form_question_text'] = substr($question['form_question_text'], 0, 2048);
+				}
+
+				$qb_restore->insert('forms_v2_questions')
+				->values([
+					'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']], IQueryBuilder::PARAM_INT),
+					'type' => $qb_restore->createNamedParameter($question['form_question_type'], IQueryBuilder::PARAM_STR),
+					'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
+				]);
+				$qb_restore->execute();
+				$id_mapping['questions'][$question['id']] = $qb_restore->getLastInsertId(); //Store new question-id to connect options to new question.
+			}
+			$cursor->closeCursor();
+
+			//Fetch all Answers and restore to Options
+			$qb_fetch = $this->connection->getQueryBuilder();
+			$qb_restore = $this->connection->getQueryBuilder();
+
+			$qb_fetch->select('question_id', 'text')
+				->from('forms_answers');
+			$cursor = $qb_fetch->execute();
+			while( $answer = $cursor->fetch() ){
+				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
+				if(strlen($answer['text']) > 1024) {
+					$output->warning("Option-text is too long for new Database: '" . $answer['text'] . "'");
+					$answer['text'] = substr($answer['text'], 0, 1024);
+				}
+
+				$qb_restore->insert('forms_v2_options')
+					->values([
+						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$answer['question_id']], IQueryBuilder::PARAM_INT),
+						'text' => $qb_restore->createNamedParameter($answer['text'], IQueryBuilder::PARAM_STR)
+					]);
+				$qb_restore->execute();
+			}
+			$cursor->closeCursor();
+
+			/* Fetch old id_structure of event-ids and question-ids
+			 * This is necessary to restore the $oldQuestionId, as the vote_option_ids do not use the true question_ids
+			 */
+			$event_structure = [];
+			$qb_fetch = $this->connection->getQueryBuilder();
+			$qb_fetch->select('id')
+				->from('forms_events');
+			$cursor = $qb_fetch->execute();
+			while( $tmp = $cursor->fetch() ){
+				$event_structure[$tmp['id']] = $tmp;
+			}
+			$cursor->closeCursor();
+
+			foreach ($event_structure as $eventkey => $event) {
+				$event_structure[$eventkey]['questions'] = [];
+				$qb_fetch = $this->connection->getQueryBuilder();
+				$qb_fetch->select('id', 'form_question_text')
+					->from('forms_questions')
+					->where($qb_fetch->expr()->eq('form_id', $qb_fetch->createNamedParameter($event['id'], IQueryBuilder::PARAM_INT)));
+				$cursor = $qb_fetch->execute();
+				while( $tmp = $cursor->fetch() ) {
+					$event_structure[$event['id']]['questions'][] = $tmp;
+				}
+				$cursor->closeCursor();
+			}
+
+			//Fetch Votes and restore to Submissions & Answers
+			$qb_fetch = $this->connection->getQueryBuilder();
+			$qb_restore = $this->connection->getQueryBuilder();
+			//initialize $last_vote
+			$last_vote = [];
+			$last_vote['form_id'] = 0;
+			$last_vote['user_id'] = '';
+			$last_vote['vote_option_id'] = 0;
+
+			$qb_fetch->select('id', 'form_id', 'user_id', 'vote_option_id', 'vote_option_text', 'vote_answer')
+				->from('forms_votes');
+			$cursor = $qb_fetch->execute();
+			while( $vote = $cursor->fetch() ){ 
+				//If the form changed, if the user changed or if vote_option_id became smaller than last one, then a new submission is interpreted.
+				if ( ($vote['form_id'] != $last_vote['form_id']) || ($vote['user_id'] != $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
+					$qb_restore->insert('forms_v2_submissions')
+						->values([
+							'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$vote['form_id']], IQueryBuilder::PARAM_INT),
+							'user_id' => $qb_restore->createNamedParameter($vote['user_id'], IQueryBuilder::PARAM_STR),
+							'timestamp' => $qb_restore->createNamedParameter(date('Y-m-d H:i:s'), IQueryBuilder::PARAM_STR) //Information not available. Just using Migration-Timestamp.
+						]);
+					$qb_restore->execute();
+					$id_mapping['currentSubmission'] = $qb_restore->getLastInsertId(); //Store submission-id to connect answers to submission.
+				}
+				$last_vote = $vote;
+				
+				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
+				if(strlen($vote['vote_answer']) > 2048) {
+					$output->warning("Answer-text is too long for new Database: '" . $vote['vote_answer'] . "'");
+					$vote['vote_answer'] = substr($vote['vote_answer'], 0, 2048);
+				}
+
+				/* Due to the unconventional storing fo vote_option_ids, the vote_option_id needs to get mapped onto old question-id and from there to new question-id.
+				 * vote_option_ids count from 1 to x for the questions of a form. So the question at point [$vote[vote_option_id] - 1] within the id-structure is the corresponding question.
+				 */
+				$oldQuestionId = $event_structure[$vote['form_id']]['questions'][$vote['vote_option_id']-1]['id'];
+				//Just throw an Error, if aboves QuestionId-Mapping went wrong. Double-Checked by Question-Text.
+				if ($event_structure[$vote['form_id']]['questions'][$vote['vote_option_id']-1]['form_question_text'] != $vote['vote_option_text']) {
+					$output->warning("Some Question-Mapping went wrong within Submission-Mapping to new Database. On 'vote_id': " . $vote['id'] . " - 'vote_option_text': '" . $vote['vote_option_text'] . "'");
+				}
+
+				$qb_restore->insert('forms_v2_answers')
+					->values([
+						'submission_id' => $qb_restore->createNamedParameter($id_mapping['currentSubmission'], IQueryBuilder::PARAM_INT),
+						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$oldQuestionId], IQueryBuilder::PARAM_STR),
+						'text' => $qb_restore->createNamedParameter($vote['vote_answer'], IQueryBuilder::PARAM_STR)
+					]);
+				$qb_restore->execute();
+			}
+		}
+	}
+}

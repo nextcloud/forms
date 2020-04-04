@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 /**
- * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
  *
- * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Inigo Jiron <ijiron@terpmail.umd.edu>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -28,33 +28,31 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getSubmissionId()
- * @method void setSubmissionId(integer $value)
  * @method integer getQuestionId()
  * @method void setQuestionId(integer $value)
  * @method string getText()
  * @method void setText(string $value)
  */
-class Answer extends Entity {
-	protected $submissionId;
+class Option extends Entity {
+
+	/** @var int */
 	protected $questionId;
+	/** @var string */
 	protected $text;
 
 	/**
-	 * Answer constructor.
+	 * Option constructor.
 	 */
 	public function __construct() {
-		$this->addType('submissionId', 'integer');
 		$this->addType('questionId', 'integer');
+		$this->addType('text', 'string');
 	}
 
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
-			'submissionId' => $this->getSubmissionId(),
 			'questionId' => $this->getQuestionId(),
 			'text' => htmlspecialchars_decode($this->getText()),
 		];
 	}
-
 }

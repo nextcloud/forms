@@ -66,7 +66,7 @@
 		</div>
 		<div class="wrapper group-2">
 			<div class="ans">
-				{{ answers }}
+				{{ answerText }}
 			</div>
 		</div>
 	</div>
@@ -83,7 +83,7 @@ export default {
 			type: Object,
 			default: undefined,
 		},
-		vote: {
+		answer: {
 			type: Object,
 			default: undefined,
 		},
@@ -98,16 +98,16 @@ export default {
 
 	computed: {
 		participants() {
-			return this.vote.userId
+			return this.answer.userId
 		},
 		questionText() {
-			return this.vote.voteOptionText
+			return this.answer.questionText
 		},
-		answers() {
-			return this.vote.voteAnswer
+		answerText() {
+			return this.answer.text
 		},
 		questionNum() {
-			return this.vote.voteOptionId
+			return this.answer.questionId
 		},
 	},
 }

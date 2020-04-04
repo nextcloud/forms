@@ -43,10 +43,10 @@
 					:header="true" />
 				<li
 					is="resultItem"
-					v-for="(vote, index) in votes"
-					:key="vote.id"
-					:vote="vote"
-					@viewResults="viewFormResults(index, form.event, 'results')" />
+					v-for="(answer, index) in answers"
+					:key="answer.id"
+					:answer="answer"
+					@viewResults="viewFormResults(index, form.form, 'results')" />
 			</transition-group>
 			<LoadingOverlay v-if="loading" />
 			<modal-dialog />
@@ -77,7 +77,7 @@ export default {
 	data() {
 		return {
 			loading: true,
-			votes: [],
+			answers: [],
 
 		}
 	},
@@ -86,29 +86,29 @@ export default {
 		stats() {
 			const sums = []
 
-			if (this.votes != null) {
+			if (this.answers != null) {
 				const uniqueAns = []
 				const uniqueQs = []
 				const ansToQ = new Map()
-				for (let i = 0; i < this.votes.length; i++) {
-					if (this.votes[i].voteOptionType === 'radiogroup' || this.votes[i].voteOptionType === 'dropdown') {
-						if (uniqueAns.includes(this.votes[i].voteAnswer) === false) {
-							uniqueAns.push(this.votes[i].voteAnswer)
-							ansToQ.set(this.votes[i].voteAnswer, this.votes[i].voteOptionId)
+				for (let i = 0; i < this.answers.length; i++) {
+					if (this.answers[i].questionType === 'radiogroup' || this.answers[i].questionType === 'dropdown') {
+						if (uniqueAns.includes(this.answers[i].text) === false) {
+							uniqueAns.push(this.answers[i].text)
+							ansToQ.set(this.answers[i].text, this.answers[i].questionId)
 						}
-						if (uniqueQs.includes(this.votes[i].voteOptionId) === false) {
-							uniqueQs.push(this.votes[i].voteOptionId)
+						if (uniqueQs.includes(this.answers[i].questionId) === false) {
+							uniqueQs.push(this.answers[i].questionId)
 						}
 					}
 				}
 				for (let i = 0; i < uniqueAns.length; i++) {
 					sums[i] = 0
 				}
-				for (let i = 0; i < this.votes.length; i++) {
-					sums[uniqueAns.indexOf(this.votes[i].voteAnswer)]++
+				for (let i = 0; i < this.answers.length; i++) {
+					sums[uniqueAns.indexOf(this.answers[i].text)]++
 				}
 				for (let i = 0; i < sums.length; i++) {
-					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.votes.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
+					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.answers.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
 				}
 			}
 
@@ -127,10 +127,10 @@ export default {
 			axios.get(generateUrl('apps/forms/api/v1/submissions/{hash}', { hash: this.$route.params.hash }))
 				.then((response) => {
 					if (response.data == null) {
-						this.votes = null
+						this.answers = null
 						OC.Notification.showTemporary('Access Denied')
 					} else {
-						this.votes = response.data
+						this.answers = response.data
 					}
 					this.loading = false
 				}, (error) => {
@@ -139,22 +139,31 @@ export default {
 					this.loading = false
 				})
 		},
-		viewFormResults(index, event, name) {
+		viewFormResults(index, form, name) {
 			this.$router.push({
 				name: name,
 				params: {
-					hash: event.id,
+					hash: form.id,
 				},
 			})
 		},
 		download() {
 
 			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/event/' + this.$route.params.hash))
+			axios.get(OC.generateUrl('apps/forms/get/form/' + this.$route.params.hash))
 				.then((response) => {
-					this.json2csvParser = ['userId', 'voteOptionId', 'voteOptionText', 'voteAnswer']
+					this.json2csvParser = ['userId', 'questionId', 'questionText', 'Answer'] // TODO Is this one necessary??
+					const formattedAns = []
+					this.answers.forEach(ans => {
+						formattedAns.push({
+							userId: ans['userId'],
+							questionId: ans['questionId'],
+							questionText: ans['questionText'],
+							answer: ans['text'],
+						})
+					})
 					const element = document.createElement('a')
-					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(this.votes)))
+					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(formattedAns)))
 					element.setAttribute('download', response.data.title + '.csv')
 
 					element.style.display = 'none'

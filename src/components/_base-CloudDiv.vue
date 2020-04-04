@@ -26,8 +26,8 @@
 		<span v-if="options.expired" class="expired">
 			{{ t('forms', 'Expired') }}
 		</span>
-		<span v-if="options.expiration" class="open">
-			{{ t('forms', 'Expires %n', 1, expirationdate) }}
+		<span v-if="options.expires" class="open">
+			{{ t('forms', 'Expires %n', 1, expirationDate) }}
 		</span>
 		<span v-else class="open">
 			{{ t('forms', 'Expires never') }}
@@ -38,12 +38,6 @@
 		</span>
 		<span v-if="options.isAnonymous" class="information">
 			{{ t('forms', 'Anonymous form') }}
-		</span>
-		<span v-if="options.fullAnonymous" class="information">
-			{{ t('forms', 'Usernames hidden to Owner') }}
-		</span>
-		<span v-if="options.isAnonymous & !options.fullAnonymous" class="information">
-			{{ t('forms', 'Usernames visible to Owner') }}
 		</span>
 	</div>
 </template>
@@ -61,7 +55,7 @@ export default {
 	},
 
 	computed: {
-		expirationdate() {
+		expirationDate() {
 			const date = moment(this.options.expirationDate, moment.localeData().longDateFormat('L')).fromNow()
 			return date
 		},

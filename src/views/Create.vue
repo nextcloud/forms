@@ -33,12 +33,12 @@
 
 				<label>{{ t('forms', 'Title') }}</label>
 				<input id="formTitle"
-					v-model="form.event.title"
+					v-model="form.form.title"
 					:class="{ error: titleEmpty }"
 					type="text">
 
 				<label>{{ t('forms', 'Description') }}</label>
-				<textarea id="formDesc" v-model="form.event.description" style="resize: vertical; width: 100%;" />
+				<textarea id="formDesc" v-model="form.form.description" style="resize: vertical; width: 100%;" />
 			</div>
 
 			<div>
@@ -50,11 +50,15 @@
 						<option value="" disabled>
 							Select
 						</option>
-						<option v-for="option in options" :key="option.value" :value="option.value">
-							{{ option.text }}
+						<option v-for="type in questionTypes" :key="type.value" :value="type.value">
+							{{ type.text }}
 						</option>
 					</select>
-					<input v-model="newQuizQuestion" :placeholder="t('forms', 'Add Question')" @keyup.enter="addQuestion()">
+					<input
+						v-model="newQuestion"
+						:placeholder=" t('forms', 'Add Question') "
+						maxlength="2048"
+						@keyup.enter="addQuestion()">
 					<button id="questButton"
 						@click="addQuestion()">
 						{{ t('forms', 'Add Question') }}
@@ -67,12 +71,12 @@
 					tag="ul"
 					class="form-table">
 					<QuizFormItem
-						v-for="(question, index) in form.options.formQuizQuestions"
+						v-for="(question, index) in form.questions"
 						:key="question.id"
 						:question="question"
 						:type="question.type"
-						@add-answer="addAnswer"
-						@remove-answer="deleteAnswer"
+						@addOption="addOption"
+						@deleteOption="deleteOption"
 						@deleteQuestion="deleteQuestion(question, index)" />
 				</transitionGroup>
 			</div>
@@ -105,18 +109,18 @@ export default {
 	data() {
 		return {
 			placeholder: '',
-			newQuizAnswer: '',
-			newQuizQuestion: '',
-			nextQuizAnswerId: 1,
-			nextQuizQuestionId: 1,
+			newOption: '',
+			newQuestion: '',
+			nextOptionId: 1,
+			nextQuestionId: 1,
 			writingForm: false,
 			loadingForm: true,
 			titleEmpty: false,
 			selected: '',
-			uniqueName: false,
-			uniqueAns: false,
-			haveAns: false,
-			options: [
+			uniqueQuestionText: false,
+			uniqueOptionText: false,
+			allHaveOpt: false,
+			questionTypes: [
 				{ text: 'Radio Buttons', value: 'radiogroup' },
 				{ text: 'Checkboxes', value: 'checkbox' },
 				{ text: 'Short Response', value: 'text' },
@@ -132,10 +136,10 @@ export default {
 		},
 
 		title() {
-			if (this.form.event.title === '') {
+			if (this.form.form.title === '') {
 				return t('forms', 'Create new form')
 			} else {
-				return this.form.event.title
+				return this.form.form.title
 
 			}
 		},
@@ -173,7 +177,7 @@ export default {
 	created() {
 		if (this.$route.name === 'create') {
 			// TODO: manage this from Forms.vue, request a new form to the server
-			this.form.event.owner = OC.getCurrentUser().uid
+			this.form.form.owner = OC.getCurrentUser().uid
 			this.loadingForm = false
 		} else if (this.$route.name === 'edit') {
 			// TODO: fetch & update form?
@@ -189,81 +193,81 @@ export default {
 			this.sidebar = !this.sidebar
 		},
 
-		checkNames() {
-			this.uniqueName = true
-			this.form.options.formQuizQuestions.forEach(q => {
-				if (q.text === this.newQuizQuestion) {
-					this.uniqueName = false
+		checkQuestionText() {
+			this.uniqueQuestionText = true
+			this.form.questions.forEach(q => {
+				if (q.text === this.newQuestion) {
+					this.uniqueQuestionText = false
 				}
 			})
 		},
 
 		async addQuestion() {
-			this.checkNames()
+			this.checkQuestionText()
 			if (this.selected === '') {
 				showError(t('forms', 'Select a question type!'), { duration: 3000 })
-			} else if (!this.uniqueName) {
+			} else if (!this.uniqueQuestionText) {
 				showError(t('forms', 'Cannot have the same question!'))
 			} else {
-				if (this.newQuizQuestion !== null & this.newQuizQuestion !== '' & (/\S/.test(this.newQuizQuestion))) {
-					const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), { formId: this.form.id, type: this.selected, text: this.newQuizQuestion })
+				if (this.newQuestion !== null & this.newQuestion !== '' & (/\S/.test(this.newQuestion))) {
+					const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), { formId: this.form.id, type: this.selected, text: this.newQuestion })
 					const questionId = response.data
 
-					this.form.options.formQuizQuestions.push({
+					this.form.questions.push({
 						id: questionId,
-						text: this.newQuizQuestion,
+						text: this.newQuestion,
 						type: this.selected,
-						answers: [],
+						options: [],
 					})
 				}
-				this.newQuizQuestion = ''
+				this.newQuestion = ''
 			}
 		},
 
 		async deleteQuestion(question, index) {
 			await axios.delete(generateUrl('/apps/forms/api/v1/question/{id}', { id: question.id }))
 			// TODO catch Error
-			this.form.options.formQuizQuestions.splice(index, 1)
+			this.form.questions.splice(index, 1)
 		},
 
-		checkAnsNames(item, question) {
-			this.uniqueAnsName = true
-			question.answers.forEach(q => {
-				if (q.text === item.newQuizAnswer) {
-					this.uniqueAnsName = false
+		checkOptionText(item, question) {
+			this.uniqueOptionText = true
+			question.options.forEach(o => {
+				if (o.text === item.newOption) {
+					this.uniqueOptionText = false
 				}
 			})
 		},
 
-		async addAnswer(item, question) {
-			this.checkAnsNames(item, question)
-			if (!this.uniqueAnsName) {
-				showError(t('forms', 'Two answers cannot be the same!'), { duration: 3000 })
+		async addOption(item, question) {
+			this.checkOptionText(item, question)
+			if (!this.uniqueOptionText) {
+				showError(t('forms', 'Two options cannot be the same!'), { duration: 3000 })
 			} else {
-				if (item.newQuizAnswer !== null & item.newQuizAnswer !== '' & (/\S/.test(item.newQuizAnswer))) {
-					const response = await axios.post(generateUrl('/apps/forms/api/v1/answer/'), { formId: this.form.id, questionId: question.id, text: item.newQuizAnswer })
-					const answerId = response.data
+				if (item.newOption !== null & item.newOption !== '' & (/\S/.test(item.newOption))) {
+					const response = await axios.post(generateUrl('/apps/forms/api/v1/option/'), { formId: this.form.id, questionId: question.id, text: item.newOption })
+					const optionId = response.data
 
-					question.answers.push({
-						id: answerId,
-						text: item.newQuizAnswer,
+					question.options.push({
+						id: optionId,
+						text: item.newOption,
 					})
 				}
-				item.newQuizAnswer = ''
+				item.newOption = ''
 			}
 		},
 
-		async deleteAnswer(question, answer, index) {
-			await axios.delete(generateUrl('/apps/forms/api/v1/answer/{id}', { id: answer.id }))
+		async deleteOption(question, option, index) {
+			await axios.delete(generateUrl('/apps/forms/api/v1/option/{id}', { id: option.id }))
 			// TODO catch errors
-			question.answers.splice(index, 1)
+			question.options.splice(index, 1)
 		},
 
-		allHaveAns() {
-			this.haveAns = true
-			this.form.options.formQuizQuestions.forEach(q => {
-				if (q.type !== 'text' && q.type !== 'comment' && q.answers.length === 0) {
-					this.haveAns = false
+		checkAllHaveOpt() {
+			this.allHaveOpt = true
+			this.form.questions.forEach(q => {
+				if (q.type !== 'text' && q.type !== 'comment' && q.options.length === 0) {
+					this.allHaveOpt = false
 				}
 			})
 		},
@@ -273,13 +277,13 @@ export default {
 		}, 200),
 
 		writeForm() {
-			this.allHaveAns()
-			if (this.form.event.title.length === 0 | !(/\S/.test(this.form.event.title))) {
+			this.checkAllHaveOpt()
+			if (this.form.form.title.length === 0 | !(/\S/.test(this.form.form.title))) {
 				this.titleEmpty = true
 				showError(t('forms', 'Title must not be empty!'), { duration: 3000 })
-			} else if (!this.haveAns) {
+			} else if (!this.allHaveOpt) {
 				showError(t('forms', 'All questions need answers!'), { duration: 3000 })
-			} else if (this.form.event.expiration & this.form.event.expirationDate === '') {
+			} else if (this.form.form.expires & this.form.form.expirationDate === '') {
 				showError(t('forms', 'Need to pick an expiration date!'), { duration: 3000 })
 			} else {
 				this.writingForm = true
@@ -288,12 +292,12 @@ export default {
 				axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
 					.then((response) => {
 						this.form.mode = 'edit'
-						this.form.event.hash = response.data.hash
-						this.form.event.id = response.data.id
+						this.form.form.hash = response.data.hash
+						this.form.form.id = response.data.id
 						this.writingForm = false
-						showSuccess(t('forms', '%n successfully saved', 1, this.form.event.title), { duration: 3000 })
+						showSuccess(t('forms', '%n successfully saved', 1, this.form.form.title), { duration: 3000 })
 					}, (error) => {
-						this.form.event.hash = ''
+						this.form.form.hash = ''
 						this.writingForm = false
 						showError(t('forms', 'Error on saving form, see console'))
 						/* eslint-disable-next-line no-console */
