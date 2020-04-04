@@ -128,7 +128,7 @@
 					@deleteQuestion="deleteQuestion(question, index)" />
 			</transitionGroup> -->
 
-			<draggable v-model="questions"
+			<Draggable v-model="questions"
 				:animation="200"
 				tag="ul"
 				@start="dragging = true"
@@ -137,17 +137,18 @@
 					v-for="question in questions"
 					:key="question.id"
 					v-bind.sync="question" />
-			</draggable>
+			</Draggable>
 		</section>
 	</AppContent>
 </template>
 
 <script>
 import { emit } from '@nextcloud/event-bus'
-import { showError } from '@nextcloud/dialogs'
+import { generateUrl } from '@nextcloud/router'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
-import draggable from 'vuedraggable'
+import Draggable from 'vuedraggable'
 
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
@@ -155,24 +156,26 @@ import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 
 import answerTypes from '../models/AnswerTypes'
 import EmptyContent from '../components/EmptyContent'
-import QuizFormItem from '../components/quizFormItem'
 import Question from '../components/Questions/Question'
-import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionLong from '../components/Questions/QuestionLong'
+import QuestionShort from '../components/Questions/QuestionShort'
+import QuestionMultiple from '../components/Questions/QuestionMultiple'
+import QuizFormItem from '../components/quizFormItem'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
 	name: 'Create',
 	components: {
-		draggable,
 		ActionButton,
 		Actions,
 		AppContent,
-		Question,
-		QuestionShort,
-		QuestionLong,
+		Draggable,
 		EmptyContent,
+		Question,
+		QuestionLong,
+		QuestionShort,
+		QuestionMultiple,
 		QuizFormItem,
 		TopBar,
 	},
@@ -206,6 +209,12 @@ export default {
 					type: QuestionLong,
 					title: 'Your latest best memory ?',
 					values: ['One day I was at the beach.\nIt was fun. The sun was shinning.\nThe water was warm'],
+				},
+				{
+					id: 3,
+					type: QuestionMultiple,
+					title: 'Choose an answer ?',
+					values: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
 				},
 			],
 			dragging: false,
@@ -454,12 +463,12 @@ export default {
 			font-size: 2em;
 		}
 		#form-desc {
+			// make sure height calculations are correct
+			box-sizing: content-box !important;
 			min-height: 60px;
 			max-height: 200px;
 			padding-left: 2px; // align with title (compensate font size diff)
 			resize: none;
-			// make sure height calculations are correct
-			box-sizing: content-box !important;
 		}
 	}
 

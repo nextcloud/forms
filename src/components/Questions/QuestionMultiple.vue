@@ -22,19 +22,35 @@
 
 <template>
 	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
-		<div class="question__content">
-			
-		</div>
+		<ul class="question__content">
+			<template v-for="(answer, index) in values">
+				<li :key="index">
+					<input :id="id"
+						ref="checkbox"
+						:value="false"
+						type="checkbox"
+						class="checkbox question__content-checkbox">
+					<label ref="label" :for="id" class="question__content-label">{{ answer }}</label>
+				</li>
+			</template>
+		</ul>
 	</Question>
 </template>
 
 <script>
 import QuestionMixin from '../../mixins/QuestionMixin'
+import GenRandomId from '../../utils/GenRandomId'
 
 export default {
 	name: 'QuestionMultiple',
 
 	mixins: [QuestionMixin],
+
+	data() {
+		return {
+			id: GenRandomId(),
+		}
+	},
 
 	methods: {
 		onInput() {

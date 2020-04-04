@@ -25,13 +25,13 @@
 		<div class="question__content">
 			<!-- TODO: properly choose max length -->
 			<input ref="input"
-				:value="values[0]"
 				:aria-label="t('forms', 'A short answer for the question “{title}”', { title })"
 				:placeholder="t('forms', 'Short answer text')"
-				minlength="1"
-				maxlength="256"
-				class="question__input"
 				:readonly="edit"
+				:value="values[0]"
+				class="question__input"
+				maxlength="256"
+				minlength="1"
 				type="text"
 				@input="onInput">
 		</div>

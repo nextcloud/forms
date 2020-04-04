@@ -25,12 +25,13 @@
 		<div class="question__content">
 			<!-- TODO: properly choose max length -->
 			<textarea ref="textarea"
-				:value="values[0]"
 				:aria-label="t('forms', 'A long answer for the question “{title}”', { title })"
 				:placeholder="t('forms', 'Long answer text')"
-				minlength="1"
-				maxlength="1024"
+				:readonly="edit"
+				:value="values[0]"
 				class="question__text"
+				maxlength="1024"
+				minlength="1"
 				@input="onInput"
 				@keydown="autoSizeText" />
 		</div>
