@@ -1,0 +1,70 @@
+<!--
+  - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
+  -
+  - @author John Molakvoæ <skjnldsv@protonmail.com>
+  -
+  - @license GNU AGPL version 3 or any later version
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -
+  -->
+
+<template>
+	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
+		<div class="question__content">
+			<!-- TODO: properly choose max length -->
+			<input ref="input"
+				:value="values[0]"
+				:aria-label="t('forms', 'A short answer for the question “{title}”', { title })"
+				:placeholder="t('forms', 'Short answer text')"
+				minlength="1"
+				maxlength="256"
+				class="question__input"
+				:readonly="edit"
+				type="text"
+				@input="onInput">
+		</div>
+	</Question>
+</template>
+
+<script>
+import QuestionMixin from '../../mixins/QuestionMixin'
+
+export default {
+	name: 'QuestionShort',
+
+	mixins: [QuestionMixin],
+
+	methods: {
+		onInput() {
+			const input = this.$refs.input
+			this.$emit('update:values', [input.value])
+		},
+	},
+}
+</script>
+
+<style lang="scss">
+// Using type to have a higher order than the input styling of server
+.question__input[type=text] {
+	width: 100%;
+	min-height: 44px;
+	margin: 0;
+	padding: 6px 0;
+	border: 0;
+	border-bottom: 1px dotted var(--color-border-dark);
+	border-radius: 0;
+}
+
+</style>

@@ -57,6 +57,7 @@
 				ref="description"
 				v-model="form.form.description"
 				:placeholder="t('forms', 'Description')"
+				@change="autoSizeDescription"
 				@keydown="autoSizeDescription" />
 		</header>
 
@@ -111,7 +112,7 @@
 			</EmptyContent>
 
 			<!-- Questions list -->
-			<transitionGroup
+			<!-- <transitionGroup
 				v-else
 				id="form-list"
 				name="list"
@@ -125,7 +126,18 @@
 					@addOption="addOption"
 					@deleteOption="deleteOption"
 					@deleteQuestion="deleteQuestion(question, index)" />
-			</transitionGroup>
+			</transitionGroup> -->
+
+			<draggable v-model="questions"
+				:animation="200"
+				tag="ul"
+				@start="dragging = true"
+				@end="dragging = false">
+				<Questions :is="question.type"
+					v-for="question in questions"
+					:key="question.id"
+					v-bind.sync="question" />
+			</draggable>
 		</section>
 	</AppContent>
 </template>
@@ -135,6 +147,7 @@ import { emit } from '@nextcloud/event-bus'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
+import draggable from 'vuedraggable'
 
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
@@ -143,15 +156,22 @@ import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import answerTypes from '../models/AnswerTypes'
 import EmptyContent from '../components/EmptyContent'
 import QuizFormItem from '../components/quizFormItem'
+import Question from '../components/Questions/Question'
+import QuestionShort from '../components/Questions/QuestionShort'
+import QuestionLong from '../components/Questions/QuestionLong'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
 	name: 'Create',
 	components: {
+		draggable,
 		ActionButton,
 		Actions,
 		AppContent,
+		Question,
+		QuestionShort,
+		QuestionLong,
 		EmptyContent,
 		QuizFormItem,
 		TopBar,
@@ -174,6 +194,21 @@ export default {
 			uniqueOptionText: false,
 			allHaveOpt: false,
 			answerTypes,
+			questions: [
+				{
+					id: 1,
+					type: QuestionShort,
+					title: 'How old are you ?',
+					values: ['I\'m 48 years old'],
+				},
+				{
+					id: 2,
+					type: QuestionLong,
+					title: 'Your latest best memory ?',
+					values: ['One day I was at the beach.\nIt was fun. The sun was shinning.\nThe water was warm'],
+				},
+			],
+			dragging: false,
 		}
 	},
 
@@ -219,6 +254,10 @@ export default {
 		} else if (this.$route.name === 'clone') {
 			// TODO: CLONE
 		}
+	},
+
+	mounted() {
+		this.autoSizeDescription()
 	},
 
 	methods: {
@@ -419,6 +458,8 @@ export default {
 			max-height: 200px;
 			padding-left: 2px; // align with title (compensate font size diff)
 			resize: none;
+			// make sure height calculations are correct
+			box-sizing: content-box !important;
 		}
 	}
 
@@ -436,7 +477,7 @@ export default {
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		min-height: 200vh;
+		margin-bottom: 250px;
 
 		.question-toolbar {
 			position: sticky;
