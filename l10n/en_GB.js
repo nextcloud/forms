@@ -4,8 +4,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Copy to clipboard",
     "Expired" : "Expired",
     "Expires never" : "Expires never",
-    "Usernames hidden to Owner" : "Usernames hidden to Owner",
-    "Usernames visible to Owner" : "Usernames visible to Owner",
     "Group" : "Group",
     "Title" : "Title",
     "Access" : "Access",

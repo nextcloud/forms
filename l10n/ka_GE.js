@@ -4,8 +4,6 @@ OC.L10N.register(
     "Copy to clipboard" : "კოპირება ბუფერში",
     "Expired" : "გაუქმდა",
     "Expires never" : "არასდროს უქმდება",
-    "Usernames hidden to Owner" : "მომხმარებლის სახელები მფლობელისთვის დამალულია",
-    "Usernames visible to Owner" : "მომხმარებლის სახელები მფლობელისთვის ხილვადია",
     "Group" : "ჯგუფი",
     "Title" : "სათაური",
     "Access" : "წვდომა",

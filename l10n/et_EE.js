@@ -3,8 +3,6 @@ OC.L10N.register(
     {
     "Expired" : "Aegunud",
     "Expires never" : "Ei aegu kunagi",
-    "Usernames hidden to Owner" : "Kasutajanimed omaniku eest peidetud",
-    "Usernames visible to Owner" : "Kasutajanimed omanikule nähtavad",
     "Group" : "Grupp",
     "Title" : "Pealkiri",
     "Access" : "Ligipääs",

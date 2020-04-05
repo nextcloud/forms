@@ -4,8 +4,6 @@ OC.L10N.register(
     "Copy to clipboard" : "클립보드로 복사",
     "Expired" : "만료됨",
     "Expires never" : "만료되지 않음",
-    "Usernames hidden to Owner" : "소유자에게 사용자 이름 숨기기",
-    "Usernames visible to Owner" : "소유자에게 사용자 이름 보이기",
     "Group" : "그룹",
     "Title" : "직위",
     "Access" : "접근 권한",

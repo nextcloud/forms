@@ -4,8 +4,6 @@ OC.L10N.register(
     "Copy to clipboard" : "העתקה ללוח הגזירים",
     "Expired" : "פג",
     "Expires never" : "לעולם לא יפוג",
-    "Usernames hidden to Owner" : "שמות המשתמשים נסתרים בפני הבעלים",
-    "Usernames visible to Owner" : "שמות המשתמשים גלויים לבעלים",
     "Group" : "קבוצה",
     "Title" : "תפקיד",
     "Access" : "גישה",

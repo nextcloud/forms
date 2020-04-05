@@ -6,8 +6,6 @@ OC.L10N.register(
     "Expired" : "Senvalidiĝis",
     "Expires %n" : "Senvalidiĝos je %n",
     "Expires never" : "Neniam senvalidiĝos",
-    "Usernames hidden to Owner" : "Uzantnomoj kaŝitaj al posedanto",
-    "Usernames visible to Owner" : "Uzantnomoj montritaj al posedanto",
     "Group" : "Grupo",
     "Title" : "Titolo",
     "Access" : "Aliro",

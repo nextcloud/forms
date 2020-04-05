@@ -4,8 +4,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Kopiert til utklippstavlen",
     "Expired" : "Utløpt",
     "Expires never" : "Utløper ikke",
-    "Usernames hidden to Owner" : "Brukernavn skjult for eieren",
-    "Usernames visible to Owner" : "Brukernavn synlige for eieren",
     "Group" : "Gruppe",
     "Title" : "Tittel",
     "Access" : "Tilgang",

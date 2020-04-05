@@ -10,7 +10,6 @@ OC.L10N.register(
     "Public access" : "النفاذ إليه مُصرّح للعامة",
     "never" : "بتاتاً",
     "Error, while copying link to clipboard" : "خطأ أثناء نسخ الرابط إلى الحافظة",
-    "Add Answer" : "إضافة إجابة",
     "Share with" : "شارك مع",
     "Description" : "الوصف",
     "Add Question" : "إضافة سؤال",
