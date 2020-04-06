@@ -5,6 +5,7 @@ OC.L10N.register(
     "A forms app, similar to Google Forms." : "Google Inprimakiak-en antzerako formulario aplikazioa.",
     "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Google Inprimakiak-en antzerako inprimaki aplikazioa. Sarbidea mugatzeko aukera ematen du: partaideak, zenbait talde/erabiltzaile, eta publikoa.",
     "Delete form" : "Ezabatu inprimakia",
+    "Cannot copy, please copy the link manually" : "Ezin izan da kopiatu. Kopiatu esteka eskuz",
     "Copy to clipboard" : "Kopiatu arbelera",
     "Expired" : "Iraungita",
     "Expires %n" : " Iraungitze data%n",
