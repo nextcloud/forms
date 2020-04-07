@@ -34,7 +34,9 @@
 				<span class="icon-forms-white" role="img" />
 				{{ t('forms', 'Show results') }}
 			</button>
-			<button v-tooltip="t('forms', 'Toggle settings')" @click="toggleSidebar">
+			<button v-tooltip="t('forms', 'Toggle settings')"
+				:aria-label="t('forms', 'Toggle settings')"
+				@click="toggleSidebar">
 				<span class="icon-settings" role="img" />
 			</button>
 		</TopBar>

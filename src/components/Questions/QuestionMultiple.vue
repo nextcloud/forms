@@ -24,15 +24,43 @@
 	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
 		<ul class="question__content">
 			<template v-for="(answer, index) in values">
-				<li :key="index">
-					<input :id="id"
+				<li :key="index" class="question__item">
+					<input :id="`${id}-check-${index}`"
 						ref="checkbox"
-						:value="false"
+						:checked="false"
+						:readonly="true"
 						type="checkbox"
-						class="checkbox question__content-checkbox">
-					<label ref="label" :for="id" class="question__content-label">{{ answer }}</label>
+						class="checkbox question__checkbox">
+					<label v-if="!edit"
+						ref="label"
+						:for="`${id}-check-${index}`"
+						class="question__label">{{ answer }}</label>
+					<!-- TODO: properly choose max length -->
+					<input v-else
+						ref="input"
+						:aria-label="t('forms', 'An answer for checkbox {index}', { index: index + 1 })"
+						:placeholder="t('forms', 'Answer for checkbox {index}', { index: index + 1 })"
+						:value="answer"
+						class="question__input"
+						maxlength="256"
+						minlength="1"
+						type="text"
+						@input="onInput(index)"
+						@keydown.enter.prevent="addNewEntry"
+						@keydown.delete="deleteEntry($event, index)">
 				</li>
 			</template>
+			<li v-if="edit && !isLastEmpty" class="question__item">
+				<!-- TODO: properly choose max length -->
+				<input
+					:aria-label="t('forms', 'Add a new checkbox')"
+					:placeholder="t('forms', 'Add a new checkbox')"
+					class="question__input"
+					maxlength="256"
+					minlength="1"
+					type="text"
+					@click="addNewEntry">
+			</li>
 		</ul>
 	</Question>
 </template>
@@ -52,16 +80,100 @@ export default {
 		}
 	},
 
+	computed: {
+		isLastEmpty() {
+			const value = this.values[this.values.length - 1]
+			return value && value.trim().length === 0
+		},
+	},
+
+	watch: {
+		edit(edit) {
+			if (!edit) {
+				// Filter and update questions
+				this.$emit('update:values', this.values.filter(answer => !!answer))
+			}
+		},
+	},
+
 	methods: {
-		onInput() {
-			const input = this.$refs.input
-			this.$emit('update:values', [input.value])
+		onInput(index) {
+			// Update values
+			const input = this.$refs.input[index]
+			const values = this.values.slice()
+			values[index] = input.value
+
+			// Update question
+			this.$emit('update:values', values)
+		},
+
+		addNewEntry() {
+			// Add entry
+			const values = this.values.slice()
+			values.push('')
+
+			// Update question
+			this.$emit('update:values', values)
+
+			this.$nextTick(() => {
+				this.focusIndex(values.length - 1)
+			})
+		},
+
+		deleteEntry(e, index) {
+			const input = this.$refs.input[index]
+
+			if (input.value.length === 0) {
+				// Dismiss delete action
+				e.preventDefault()
+
+				// Remove entry
+				const values = this.values.slice()
+				values.splice(index, 1)
+
+				// Update question
+				this.$emit('update:values', values)
+
+				this.$nextTick(() => {
+					 this.focusNext(index)
+				})
+			}
+		},
+
+		/**
+		 * Focus the input matching the index
+		 *
+		 * @param {Number} index the value index
+		 */
+		focusIndex(index) {
+			const input = this.$refs.input[index]
+			if (input) {
+				 input.focus()
+			}
 		},
 	},
 }
 </script>
 
 <style lang="scss">
+.question__content {
+	display: flex;
+	flex-direction: column;
+}
+
+.question__item {
+	display: inline-flex;
+	align-items: center;
+	height: 44px;
+
+	.question__label {
+		flex: 1 1 100%;
+		&::before {
+			margin: 14px !important;
+		}
+	}
+}
+
 // Using type to have a higher order than the input styling of server
 .question__input[type=text] {
 	width: 100%;
