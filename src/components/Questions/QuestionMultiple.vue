@@ -48,6 +48,13 @@
 						@input="onInput(index)"
 						@keydown.enter.prevent="addNewEntry"
 						@keydown.delete="deleteEntry($event, index)">
+
+					<!-- Delete answer -->
+					<Actions v-if="edit">
+						<ActionButton icon="icon-close" @click="deleteEntry($event, index)">
+							{{ t('forms', 'Delete answer') }}
+						</ActionButton>
+					</Actions>
 				</li>
 			</template>
 			<li v-if="edit && !isLastEmpty" class="question__item">
@@ -66,11 +73,19 @@
 </template>
 
 <script>
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+
 import QuestionMixin from '../../mixins/QuestionMixin'
 import GenRandomId from '../../utils/GenRandomId'
 
 export default {
 	name: 'QuestionMultiple',
+
+	components: {
+		Actions,
+		ActionButton,
+	},
 
 	mixins: [QuestionMixin],
 
