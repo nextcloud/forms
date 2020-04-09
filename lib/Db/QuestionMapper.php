@@ -46,7 +46,7 @@ class QuestionMapper extends QBMapper {
 	 * @return Question[]
 	 */
 
-	public function findByForm(int $formId): array {
+	public function findByForm(int $formId, bool $loadDeleted = false): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
@@ -54,6 +54,16 @@ class QuestionMapper extends QBMapper {
 			->where(
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
 			);
+
+		if (!$loadDeleted) {
+			// Don't load questions, that are marked as deleted (marked by order==0).
+			$qb->andWhere(
+				$qb->expr()->neq('order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT))
+			);
+		}
+
+		// Sort Questions by order
+		$qb->orderBy('order');
 
 		return $this->findEntities($qb);
 	}
@@ -65,7 +75,7 @@ class QuestionMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 
 		// First delete corresponding options.
-		$questionEntities = $this->findByForm($formId);
+		$questionEntities = $this->findByForm($formId, true); // findByForm - loadDeleted=true
 		foreach ($questionEntities as $questionEntity) {
 			$this->optionMapper->deleteByQuestion($questionEntity->id);
 		}

@@ -47,6 +47,7 @@ return [
 		['name' => 'api#newForm', 'url' => 'api/v1/form', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => 'api/v1/form/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#updateQuestion', 'url' => 'api/v1/question/update/', 'verb' => 'POST'],
+		['name' => 'api#reorderQuestions', 'url' => 'api/v1/question/reorder/', 'verb' => 'POST'],
 		['name' => 'api#newQuestion', 'url' => 'api/v1/question/', 'verb' => 'POST'],
 		['name' => 'api#deleteQuestion', 'url' => 'api/v1/question/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#newOption', 'url' => 'api/v1/option/', 'verb' => 'POST'],
