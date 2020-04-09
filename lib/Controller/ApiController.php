@@ -95,108 +95,6 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Transforms a string with user and group names to an array
-	 * of nextcloud users and groups
-	 * @param string $item
-	 * @return Array
-	 */
-	private function convertAccessList($item) : array {
-		$split = [];
-		if (strpos($item, 'user_') === 0) {
-			$user = $this->userManager->get(substr($item, 5));
-			$split = [
-				'id' => $user->getUID(),
-				'user' => $user->getUID(),
-				'type' => 'user',
-				'desc' => 'user',
-				'icon' => 'icon-user',
-				'displayName' => $user->getDisplayName(),
-				'avatarURL' => '',
-				'lastLogin' => $user->getLastLogin(),
-				'cloudId' => $user->getCloudId()
-			];
-		} elseif (strpos($item, 'group_') === 0) {
-			$group = substr($item, 6);
-			$group = $this->groupManager->get($group);
-			$split = [
-				'id' => $group->getGID(),
-				'user' => $group->getGID(),
-				'type' => 'group',
-				'desc' => 'group',
-				'icon' => 'icon-group',
-				'displayName' => $group->getDisplayName(),
-				'avatarURL' => '',
-			];
-		}
-
-		return($split);
-	}
-
-	/**
-	 * Check if current user is in the access list
-	 * @param Array $accessList
-	 * @return Boolean
-	 */
-	private function checkUserAccess($accessList) {
-		foreach ($accessList as $accessItem ) {
-			if ($accessItem['type'] === 'user' && $accessItem['id'] === \OC::$server->getUserSession()->getUser()->getUID()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check If current user is member of a group in the access list
-	 * @param Array $accessList
-	 * @return Boolean
-	 */
-	private function checkGroupAccess($accessList) {
-		foreach ($accessList as $accessItem ) {
-			if ($accessItem['type'] === 'group' && $this->groupManager->isInGroup(\OC::$server->getUserSession()->getUser()->getUID(),$accessItem['id'])) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Set the access right of the current user for the form
-	 * @param Array $form
-	 * @param Array $shares
-	 * @return String
-	 */
-	private function grantAccessAs($form, $shares) {
-		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
-			$currentUser = '';
-		} else {
-			$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-		}
-
-		$grantAccessAs = 'none';
-
-		if ($form['ownerId'] === $currentUser) {
-			$grantAccessAs = 'owner';
-		} elseif ($form['access'] === 'public') {
-			$grantAccessAs = 'public';
-		} elseif ($form['access'] === 'registered' && \OC::$server->getUserSession()->getUser() instanceof IUser) {
-			$grantAccessAs = 'registered';
-		} elseif ($form['access'] === 'hidden' && ($form['ownerId'] === \OC::$server->getUserSession()->getUser())) {
-			$grantAccessAs = 'hidden';
-		} elseif ($this->checkUserAccess($shares)) {
-			$grantAccessAs = 'userInvitation';
-		} elseif ($this->checkGroupAccess($shares)) {
-			$grantAccessAs = 'groupInvitation';
-		} elseif ($this->groupManager->isAdmin($currentUser)) {
-			$grantAccessAs = 'admin';
-		}
-
-		return $grantAccessAs;
-	}
-
-	/**
 	 * Read an entire form based on form id
 	 * @NoAdminRequired
 	 * @param Integer $formId
@@ -211,31 +109,6 @@ class ApiController extends Controller {
 			// return silently
 		} finally {
 			return $data;
-		}
-
-	}
-
-	/**
-	 * Read all shares (users and groups with access) of a form based on the form id
-	 * @NoAdminRequired
-	 * @param Integer $formId
-	 * @return Array
-	 */
-	public function getShares($formId) {
-
-		$accessList = array();
-
-		try {
-			$form = $this->formMapper->find($formId);
-			if (!strpos('|public|hidden|registered', $form->getAccess())) {
-				$accessList = explode(';', $form->getAccess());
-				$accessList = array_filter($accessList);
-				$accessList = array_map(array($this, 'convertAccessList'), $accessList);
-			}
-		} catch (DoesNotExistException $e) {
-			// return silently
-		} finally {
-			return $accessList;
 		}
 
 	}
@@ -310,10 +183,8 @@ class ApiController extends Controller {
 			$data = [
 				'id' => $form['id'],
 				'result' => $result,
-				'grantedAs' => $this->grantAccessAs($form, $shares),
 				'mode' => $mode,
 				'form' => $form,
-				'shares' => $shares,
 				'questions' => $this->getQuestions($form['id']),
 			];
 		} catch (DoesNotExistException $e) {
@@ -335,7 +206,6 @@ class ApiController extends Controller {
 				'id' => $form->getId(),
 				'form' => $form->read(),
 				'mode' => 'edit',
-				'shares' => $this->getShares($form->getId()),
 				'questions' => $this->getQuestions($form->getId())
 			];
 		}
@@ -394,19 +264,12 @@ class ApiController extends Controller {
 		$newForm->setIsAnonymous($form['isAnonymous']);
 		$newForm->setSubmitOnce($form['submitOnce']);
 
-		if ($form['access'] === 'select') {
-			$shareAccess = '';
-			foreach ($shares as $shareElement) {
-				if ($shareElement['type'] === 'user') {
-					$shareAccess = $shareAccess . 'user_' . $shareElement['id'] . ';';
-				} elseif ($shareElement['type'] === 'group') {
-					$shareAccess = $shareAccess . 'group_' . $shareElement['id'] . ';';
-				}
-			}
-			$newForm->setAccess(rtrim($shareAccess, ';'));
-		} else {
-			$newForm->setAccess($form['access']);
+		// Only write Users/Groups-Arrays if necessary.
+		if($form['access']['type'] !== 'selected') {
+			unset($form['access']['users']);
+			unset($form['access']['groups']);
 		}
+		$newForm->setAccess($form['access']);
 
 		if ($form['expires']) {
 			$newForm->setExpirationDate(date('Y-m-d H:i:s', strtotime($form['expirationDate'])));
@@ -466,7 +329,9 @@ class ApiController extends Controller {
 		));
 		$form->setTitle('New form');
 		$form->setDescription('');
-		$form->setAccess('public');
+		$form->setAccess([
+			'type' => 'public'
+		]);
 
 		$this->formMapper->insert($form);
 

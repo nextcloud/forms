@@ -66,7 +66,7 @@ class SubmissionMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @return array
 	 */
-	public function findParticipantsByForm(int $formId, $limit = null, $offset = null): array {
+	public function findParticipantsByForm(int $formId): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('user_id')
@@ -75,7 +75,14 @@ class SubmissionMapper extends QBMapper {
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
 			);
 
-		return $this->findEntities($qb);
+		$submissionEntities = $this->findEntities($qb);
+
+		// From array of submissionEntities produce array of userIds.
+		$userIds = array_map(function($submissionEntity) {
+			return $submissionEntity->getUserId();
+		}, $submissionEntities);
+
+		return $userIds;
 	}
 
 	/**

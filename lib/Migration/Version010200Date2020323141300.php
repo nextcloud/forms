@@ -87,9 +87,8 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				'notnull' => true,
 				'length' => 64,
 			]);
-			$table->addColumn('access', Type::STRING, [
+			$table->addColumn('access_json', Type::JSON, [
 				'notnull' => false,
-				'length' => 1024,
 			]);
 			$table->addColumn('created', Type::DATETIME, [
 				'notnull' => false,
@@ -212,13 +211,15 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				->from('forms_events');
 			$cursor = $qb_fetch->execute();
 			while( $event = $cursor->fetch() ){ 
+				$newAccessJSON = $this->convertAccessList($event['access']);
+
 				$qb_restore->insert('forms_v2_forms')
 					->values([
 						'hash' => $qb_restore->createNamedParameter($event['hash'], IQueryBuilder::PARAM_STR),
 						'title' => $qb_restore->createNamedParameter($event['title'], IQueryBuilder::PARAM_STR),
 						'description' => $qb_restore->createNamedParameter($event['description'], IQueryBuilder::PARAM_STR),
 						'owner_id' => $qb_restore->createNamedParameter($event['owner'], IQueryBuilder::PARAM_STR),
-						'access' => $qb_restore->createNamedParameter($event['access'], IQueryBuilder::PARAM_STR),
+						'access_json' => $qb_restore->createNamedParameter($newAccessJSON, IQueryBuilder::PARAM_STR),
 						'created' => $qb_restore->createNamedParameter($event['created'], IQueryBuilder::PARAM_STR),
 						'expiration_date' => $qb_restore->createNamedParameter($event['expire'], IQueryBuilder::PARAM_STR),
 						'is_anonymous' => $qb_restore->createNamedParameter($event['is_anonymous'], IQueryBuilder::PARAM_BOOL),
@@ -357,5 +358,35 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				$qb_restore->execute();
 			}
 		}
+	}
+
+	/**
+	 * Convert old Access-String into JSON of new Access-Structure.
+	 * @param $accessString Old access-String
+	 */
+	private function convertAccessList($accessString) : string {
+		$accessArray = [];
+
+		if ($accessString === 'public' || $accessString === 'registered') {
+			// Store type and return with empty users/groups.
+			$accessArray['type'] = $accessString;
+			return json_encode($accessArray);
+		}
+
+		// Access 'selected'
+		$accessArray['type'] = 'selected';
+		$accessArray['users'] = [];
+		$accessArray['groups'] = [];
+
+		$stringExplode = explode(';', $accessString);
+		foreach($stringExplode as $string) {
+			if (strpos($string, 'user_') === 0) {
+				$accessArray['users'][] = substr($string, 5);
+			} elseif (strpos($string, 'group_') === 0) {
+				$accessArray['groups'][] = substr($string, 6);
+			}
+		}
+
+		return json_encode($accessArray);
 	}
 }

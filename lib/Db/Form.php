@@ -37,8 +37,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setDescription(string $value)
  * @method string getOwnerId()
  * @method void setOwnerId(string $value)
- * @method string getAccess()
- * @method void setAccess(string $value)
+ * @method array getAccess()
+ * @method void setAccess(array $value)
  * @method string getCreated()
  * @method void setCreated(string $value)
  * @method string getExpirationDate()
@@ -54,7 +54,7 @@ class Form extends Entity {
 	protected $title;
 	protected $description;
 	protected $ownerId;
-	protected $access;
+	protected $accessJson;
 	protected $created;
 	protected $expirationDate;
 	protected $isAnonymous;
@@ -68,11 +68,22 @@ class Form extends Entity {
 		$this->addType('submitOnce', 'bool');
 	}
 
+	/**
+	 * JSON-Decoding of access-column.
+	 */
+	public function getAccess(): array {
+		return json_decode($this->getAccessJson(), true); // assoc=true, => Convert to associative Array
+	}
+
+	/**
+	 * JSON-Encoding of access-column.
+	 */
+	public function setAccess(array $access) {
+		$this->setAccessJson(json_encode($access));
+	}
+
 	public function read() {
-		$accessType = $this->getAccess();
-		if (!strpos('|public|hidden|registered', $accessType)) {
-			$accessType = 'select';
-		}
+
 		if ($this->getExpirationDate() === null) {
 			$expired = false;
 			$expires = false;
@@ -89,7 +100,7 @@ class Form extends Entity {
 			'ownerId' => $this->getOwnerId(),
 			'ownerDisplayName' => \OC_User::getDisplayName($this->getOwnerId()),
 			'created' => $this->getCreated(),
-			'access' => $accessType,
+			'access' => $this->getAccess(),
 			'expires' => $expires,
 			'expired' => $expired,
 			'expirationDate' => $this->getExpirationDate(),
