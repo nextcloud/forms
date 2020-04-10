@@ -43,6 +43,13 @@ class Question extends Entity {
 	protected $mandatory;
 	protected $text;
 
+	const TYPES = [
+		'short',
+		'long',
+		'multiple',
+		'multiple_unique'
+	];
+
 	public function __construct() {
 		$this->addType('formId', 'integer');
 		$this->addType('order', 'integer');

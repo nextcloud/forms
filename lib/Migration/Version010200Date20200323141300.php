@@ -39,13 +39,22 @@ use \DateTime;
  * Installation class for the forms app.
  * Initial db creation
  */
-class Version010200Date2020323141300 extends SimpleMigrationStep {
+class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 	/** @var IDBConnection */
 	protected $connection;
 
 	/** @var IConfig */
 	protected $config;
+
+	/** Map of questionTypes to change */
+	private $questionTypeMap = [
+		'radiogroup' => 'multiple_unique',
+		'checkbox' => 'multiple',
+		'text' => 'short',
+		'comment' => 'long',
+		'dropdown' => 'multiple_unique'
+	];
 
 	/**
 	 * @param IDBConnection $connection
@@ -257,7 +266,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				->values([
 					'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['newId'], IQueryBuilder::PARAM_INT),
 					'order' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['nextQuestionOrder']++, IQueryBuilder::PARAM_INT),
-					'type' => $qb_restore->createNamedParameter($question['form_question_type'], IQueryBuilder::PARAM_STR),
+					'type' => $qb_restore->createNamedParameter($this->questionTypeMap[$question['form_question_type']], IQueryBuilder::PARAM_STR),
 					'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
 				]);
 				$qb_restore->execute();
