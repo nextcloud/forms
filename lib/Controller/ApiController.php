@@ -256,11 +256,16 @@ class ApiController extends Controller {
 			'text' => $text,
 		]);
 
+		if (array_search($type, Question::TYPES) === false) {
+			$this->logger->debug('Invalid type');
+			return new Http\JSONResponse(['message' => 'Invalid type'], Http::STATUS_BAD_REQUEST);
+		}
+		
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
