@@ -24,7 +24,6 @@ OC.L10N.register(
     "Done" : "Farita",
     "Title must not be empty!" : "La titolo ne povas malpleni!",
     "%n successfully saved" : "%n sukcese konservita",
-    "Do you want to delete \"%n\"?" : "Ĉu vi volas forigi „%n“?",
     "Name of user or group" : "Nomo de uzanto aŭ grupo",
     "Expiration date" : "Limdato",
     "Click to add a date" : "Alklaku por aldoni daton",

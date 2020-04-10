@@ -24,7 +24,6 @@ OC.L10N.register(
     "Done" : "Lokið",
     "Title must not be empty!" : "Titill getur ekki verið auður!",
     "%n successfully saved" : "Tókst að vista %n",
-    "Do you want to delete \"%n\"?" : "Viltu eyða \"%n\"?",
     "Name of user or group" : "Nafn notanda eða hóps",
     "Expiration date" : "Gildir til",
     "Click to add a date" : "Smelltu til að bæta við dagsetningu",
