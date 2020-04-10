@@ -39,7 +39,7 @@ use \DateTime;
  * Installation class for the forms app.
  * Initial db creation
  */
-class Version010200Date2020323141300 extends SimpleMigrationStep {
+class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 	/** @var IDBConnection */
 	protected $connection;

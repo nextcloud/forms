@@ -27,9 +27,9 @@ return [
 
 		// Before /{hash} to avoid conflict
 		['name' => 'page#createForm', 'url' => '/new', 'verb' => 'GET'],
-		['name' => 'page#editForm', 'url' => '/{hash}/edit/', 'verb' => 'GET'],
-		['name' => 'page#cloneForm', 'url' => '/{hash}/clone/', 'verb' => 'GET'],
-		['name' => 'page#getResult', 'url' => '/{hash}/results/', 'verb' => 'GET'],
+		['name' => 'page#editForm', 'url' => '/{hash}/edit', 'verb' => 'GET'],
+		['name' => 'page#cloneForm', 'url' => '/{hash}/clone', 'verb' => 'GET'],
+		['name' => 'page#getResult', 'url' => '/{hash}/results', 'verb' => 'GET'],
 
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
 		['name' => 'page#insert_submission', 'url' => '/insert/submission', 'verb' => 'POST'],
@@ -39,11 +39,11 @@ return [
 		['name' => 'api#getForm', 'url' => 'api/v1/form/{id}', 'verb' => 'GET'],
 		['name' => 'api#updateForm', 'url' => 'api/v1/form/update/', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => 'api/v1/form/{id}', 'verb' => 'DELETE'],
-		['name' => 'api#updateQuestion', 'url' => 'api/v1/question/update/', 'verb' => 'POST'],
-		['name' => 'api#reorderQuestions', 'url' => 'api/v1/question/reorder/', 'verb' => 'POST'],
-		['name' => 'api#newQuestion', 'url' => 'api/v1/question/', 'verb' => 'POST'],
+		['name' => 'api#updateQuestion', 'url' => 'api/v1/question/update', 'verb' => 'POST'],
+		['name' => 'api#reorderQuestions', 'url' => 'api/v1/question/reorder', 'verb' => 'POST'],
+		['name' => 'api#newQuestion', 'url' => 'api/v1/question', 'verb' => 'POST'],
 		['name' => 'api#deleteQuestion', 'url' => 'api/v1/question/{id}', 'verb' => 'DELETE'],
-		['name' => 'api#newOption', 'url' => 'api/v1/option/', 'verb' => 'POST'],
+		['name' => 'api#newOption', 'url' => 'api/v1/option', 'verb' => 'POST'],
 		['name' => 'api#deleteOption', 'url' => 'api/v1/option/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#getSubmissions', 'url' => 'api/v1/submissions/{hash}', 'verb' => 'GET'],
 
