@@ -495,19 +495,124 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
+		// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
+		$questions = $this->questionMapper->findByForm($formId);
+		$lastQuestion = array_pop($questions);
+		if ($lastQuestion) {
+			$questionOrder = $lastQuestion->getOrder() + 1;
+		} else {
+			$questionOrder = 1;
+		}
+
 		$question = new Question();
 
 		$question->setFormId($formId);
+		$question->setOrder($questionOrder);
 		$question->setType($type);
 		$question->setText($text);
 
 		$question = $this->questionMapper->insert($question);
 
-		return new Http\JSONResponse($question->getId());
+		$response = [
+			'id' => $question->getId(),
+			'order' => $question->getOrder()
+		];
+
+		return new Http\JSONResponse($response);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 * Updates the Order of all Questions of a Form.
+	 * @param int $formId Id of the form to reorder
+	 * @param int $newOrder Array of Question-Ids in new order.
+	 */
+	public function reorderQuestions(int $formId, array $newOrder): Http\JSONResponse {
+		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
+			'formId' => $formId,
+			'newOrder' => $newOrder
+		]);
+
+		try {
+			$form = $this->formMapper->find($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Check if array contains duplicates
+		if ( array_unique($newOrder) !== $newOrder ) {
+			$this->logger->debug('The given Array contains duplicates.');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		// Check if all questions are given in Array.
+		$questions = $this->questionMapper->findByForm($formId);
+		if ( sizeof($questions) !== sizeof($newOrder) ) {
+			$this->logger->debug('The length of the given array does not match the number of stored questions');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		$questions = []; // Clear Array of Entities
+		$response = []; // Array of ['questionId' => ['order' => newOrder]]
+
+		// Store array of Question-Entities and check the Questions FormId & old Order.
+		foreach($newOrder as $arrayKey => $questionId) {
+
+			try {
+				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find question. Id:{id}', [
+					'id' => $questionId
+				]);
+				return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			}
+
+			// Abort if a question is not part of the Form.
+			if ($questions[$arrayKey]->getFormId() !== $formId) {
+				$this->logger->debug('This Question is not part of the given Form: questionId: {questionId}', [
+					'questionId' => $questionId
+				]);
+				return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			}
+
+			// Abort if a question is already marked as deleted (order==0)
+			$oldOrder = $questions[$arrayKey]->getOrder();
+			if ( $oldOrder === 0) {
+				$this->logger->debug('This Question has already been marked as deleted: Id: {id}', [
+					'id' => $questions[$arrayKey]->getId()
+				]);
+				return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			}
+
+			// Only set order, if it changed.
+			if ($oldOrder !== $arrayKey + 1) {
+				// Set Order. ArrayKey counts from zero, order counts from 1.
+				$questions[$arrayKey]->setOrder($arrayKey + 1);
+			}
+		}
+
+		// Write to Database
+		foreach($questions as $question) {
+			$this->questionMapper->update($question);
+
+			$response[$question->getId()] = [
+				'order' => $question->getOrder()
+			];
+		}
+
+		return new Http\JSONResponse($response);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * Writes the given key-value pairs into Database.
+	 * Key 'order' should only be changed by reorderQuestions() and is not allowed here.
 	 * @param int $id QuestionId of question to update
 	 * @param array $keyvalues Array of key=>value pairs to update.
 	 */
@@ -530,6 +635,11 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
+		if (array_key_exists('order', $keyvalues)) {
+			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
 		$question = Question::fromParams($keyvalues);
 		$question->setId($id);
 
@@ -542,7 +652,7 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function deleteQuestion(int $id): Http\JSONResponse {
-		$this->logger->debug('Delete question: {id}', [
+		$this->logger->debug('Mark question as deleted: {id}', [
 			'id' => $id,
 		]);
 
@@ -559,8 +669,22 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$this->optionMapper->deleteByQuestion($id);
-		$this->questionMapper->delete($question);
+		// Store Order of deleted Question
+		$deletedOrder = $question->getOrder();
+
+		// Mark question as deleted
+		$question->setOrder(0);
+		$this->questionMapper->update($question);
+
+		// Update all question-order > deleted order.
+		$formQuestions = $this->questionMapper->findByForm($form->getId());
+		foreach ($formQuestions as $question) {
+			$questionOrder = $question->getOrder();
+			if ( $questionOrder > $deletedOrder ) {
+				$question->setOrder($questionOrder - 1);
+				$this->questionMapper->update($question);
+			}
+		}
 
 		return new Http\JSONResponse($id);
 	}

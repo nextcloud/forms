@@ -29,6 +29,8 @@ use OCP\AppFramework\Db\Entity;
 /**
  * @method integer getFormId()
  * @method void setFormId(integer $value)
+ * @method integer getOrder()
+ * @method void setOrder(integer $value)
  * @method string getType()
  * @method void setType(string $value)
  * @method string getText()
@@ -36,15 +38,14 @@ use OCP\AppFramework\Db\Entity;
  */
 class Question extends Entity {
 	protected $formId;
+	protected $order;
 	protected $type;
 	protected $mandatory;
 	protected $text;
 
-	/**
-	 * Question constructor.
-	 */
 	public function __construct() {
 		$this->addType('formId', 'integer');
+		$this->addType('order', 'integer');
 		$this->addType('type', 'string');
 		$this->addType('mandatory', 'bool');
 		$this->addType('text', 'string');
@@ -54,6 +55,7 @@ class Question extends Entity {
 		return [
 			'id' => $this->getId(),
 			'formId' => $this->getFormId(),
+			'order' => $this->getOrder(),
 			'type' => htmlspecialchars_decode($this->getType()),
 			'mandatory' => $this->getMandatory(),
 			'text' => htmlspecialchars_decode($this->getText()),

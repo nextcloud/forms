@@ -211,10 +211,11 @@ export default {
 			} else {
 				if (this.newQuestion !== null & this.newQuestion !== '' & (/\S/.test(this.newQuestion))) {
 					const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), { formId: this.form.id, type: this.selected, text: this.newQuestion })
-					const questionId = response.data
+					const respData = response.data
 
 					this.form.questions.push({
-						id: questionId,
+						id: respData.id,
+						order: respData.order,
 						text: this.newQuestion,
 						type: this.selected,
 						options: [],

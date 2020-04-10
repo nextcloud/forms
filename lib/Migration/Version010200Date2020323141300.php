@@ -117,6 +117,10 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 			$table->addColumn('form_id', Type::INTEGER, [
 				'notnull' => true,
 			]);
+			$table->addColumn('order', Type::INTEGER, [
+				'notnull' => true,
+				'default' => 1,
+			]);
 			$table->addColumn('type', Type::STRING, [
 				'notnull' => true,
 				'length' => 256,
@@ -196,8 +200,9 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 		// if Database exists.
 		if( $schema->hasTable('forms_events') ){
 			$id_mapping = [];
-			$id_mapping['events'] = []; // Maps oldevent-id => newevent-id
-			$id_mapping['questions'] = []; // Maps oldquestion-id => newquestion-id
+			$id_mapping['events'] = []; // Maps oldevent-id => ['newId' => newevent-id, 'nextQuestionOrder' => integer]
+			$id_mapping['questions'] = []; // Maps oldquestion-id => ['newId' => newquestion-id]
+			$id_mapping['currentSubmission'] = 0;
 
 			//Fetch & Restore Events
 			$qb_fetch = $this->connection->getQueryBuilder();
@@ -220,7 +225,10 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 						'submit_once' => $qb_restore->createNamedParameter($event['unique'], IQueryBuilder::PARAM_BOOL)
 					]);
 				$qb_restore->execute();
-				$id_mapping['events'][$event['id']] = $qb_restore->getLastInsertId(); //Store new form-id to connect questions to new form.
+				$id_mapping['events'][$event['id']] = [
+					'newId' => $qb_restore->getLastInsertId(), //Store new form-id to connect questions to new form.
+					'nextQuestionOrder' => 1 //Prepare for sorting questions
+				];
 			}
 			$cursor->closeCursor();
 
@@ -240,12 +248,13 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 
 				$qb_restore->insert('forms_v2_questions')
 				->values([
-					'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']], IQueryBuilder::PARAM_INT),
+					'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['newId'], IQueryBuilder::PARAM_INT),
+					'order' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['nextQuestionOrder']++, IQueryBuilder::PARAM_INT),
 					'type' => $qb_restore->createNamedParameter($question['form_question_type'], IQueryBuilder::PARAM_STR),
 					'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
 				]);
 				$qb_restore->execute();
-				$id_mapping['questions'][$question['id']] = $qb_restore->getLastInsertId(); //Store new question-id to connect options to new question.
+				$id_mapping['questions'][$question['id']]['newId'] = $qb_restore->getLastInsertId(); //Store new question-id to connect options to new question.
 			}
 			$cursor->closeCursor();
 
@@ -265,7 +274,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 
 				$qb_restore->insert('forms_v2_options')
 					->values([
-						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$answer['question_id']], IQueryBuilder::PARAM_INT),
+						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$answer['question_id']]['newId'], IQueryBuilder::PARAM_INT),
 						'text' => $qb_restore->createNamedParameter($answer['text'], IQueryBuilder::PARAM_STR)
 					]);
 				$qb_restore->execute();
@@ -315,7 +324,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				if ( ($vote['form_id'] != $last_vote['form_id']) || ($vote['user_id'] != $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
 					$qb_restore->insert('forms_v2_submissions')
 						->values([
-							'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$vote['form_id']], IQueryBuilder::PARAM_INT),
+							'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$vote['form_id']]['newId'], IQueryBuilder::PARAM_INT),
 							'user_id' => $qb_restore->createNamedParameter($vote['user_id'], IQueryBuilder::PARAM_STR),
 							'timestamp' => $qb_restore->createNamedParameter(date('Y-m-d H:i:s'), IQueryBuilder::PARAM_STR) //Information not available. Just using Migration-Timestamp.
 						]);
@@ -342,7 +351,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				$qb_restore->insert('forms_v2_answers')
 					->values([
 						'submission_id' => $qb_restore->createNamedParameter($id_mapping['currentSubmission'], IQueryBuilder::PARAM_INT),
-						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$oldQuestionId], IQueryBuilder::PARAM_STR),
+						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$oldQuestionId]['newId'], IQueryBuilder::PARAM_STR),
 						'text' => $qb_restore->createNamedParameter($vote['vote_answer'], IQueryBuilder::PARAM_STR)
 					]);
 				$qb_restore->execute();
