@@ -23,12 +23,36 @@ import Question from '../components/Questions/Question'
 export default {
 	inheritAttrs: false,
 	props: {
+		/**
+		 * The question title
+		 */
 		title: {
 			type: String,
 			required: true,
 		},
+
+		/**
+		 * The question list of answers
+		 */
 		values: {
 			type: Array,
+			required: true,
+		},
+
+		/**
+		 * Answer type model object
+		 */
+		model: {
+			type: Object,
+			required: true,
+		},
+
+		/**
+		 * The questions index starting at 1
+		 * Used for aria descriptions
+		 */
+		index: {
+			type: Number,
 			required: true,
 		},
 	},
@@ -39,14 +63,26 @@ export default {
 
 	data() {
 		return {
-			edit: false,
+			// Do we display this question in edit or fill mode
+			edit: true,
 		}
 	},
 
 	methods: {
+		/**
+		 * Forward the title change to the parent
+		 *
+		 * @param {string} title the title
+		 */
 		onTitleChange(title) {
 			this.$emit('update:title', title)
 		},
+
+		/**
+		 * Forward the answer(s) change to the parent
+		 *
+		 * @param {Array} values the array of answers
+		 */
 		onValuesChange(values) {
 			this.$emit('update:values', values)
 		},

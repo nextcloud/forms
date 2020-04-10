@@ -23,12 +23,15 @@
 <template>
 	<li v-click-outside="disableEdit"
 		:class="{ 'question--edit': edit }"
+		:aria-label="t('forms', 'Question number {index}', {index})"
 		class="question"
 		@click="enableEdit">
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div class="question__drag-handle icon-drag-handle"
 			:aria-label="t('forms', 'Drag to re-order the questions')" />
 		<input v-if="edit"
+			:placeholder="t('forms', 'Enter a title for this question')"
+			:aria-label="t('forms', 'The title of the question number {index}', {index})"
 			:value="title"
 			class="question__title"
 			type="text"
@@ -51,6 +54,10 @@ export default {
 	},
 
 	props: {
+		index: {
+			type: Number,
+			required: true,
+		},
 		title: {
 			type: String,
 			required: true,

@@ -21,25 +21,36 @@
   -->
 
 <template>
-	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
+	<Question :index="index"
+		:title="title"
+		:edit="edit"
+		@update:title="onTitleChange">
 		<ul class="question__content">
 			<template v-for="(answer, index) in values">
 				<li :key="index" class="question__item">
-					<input :id="`${id}-check-${index}`"
+					<!-- Answer radio/checkbox + label -->
+					<!-- TODO: migrate to radio/checkbox component once ready -->
+					<input :id="`${id}-answer-${index}`"
 						ref="checkbox"
 						:checked="false"
 						:readonly="true"
-						type="checkbox"
-						class="checkbox question__checkbox">
+						:name="`${id}-answer`"
+						:type="isUnique ? 'radio' : 'checkbox'"
+						:class="{
+							'radio question__radio': isUnique,
+							'checkbox question__checkbox': !isUnique,
+						}">
 					<label v-if="!edit"
 						ref="label"
-						:for="`${id}-check-${index}`"
+						:for="`${id}-answer-${index}`"
 						class="question__label">{{ answer }}</label>
+
+					<!-- Answer text input -->
 					<!-- TODO: properly choose max length -->
 					<input v-else
 						ref="input"
-						:aria-label="t('forms', 'An answer for checkbox {index}', { index: index + 1 })"
-						:placeholder="t('forms', 'Answer for checkbox {index}', { index: index + 1 })"
+						:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
+						:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 						:value="answer"
 						class="question__input"
 						maxlength="256"
@@ -60,8 +71,8 @@
 			<li v-if="edit && !isLastEmpty" class="question__item">
 				<!-- TODO: properly choose max length -->
 				<input
-					:aria-label="t('forms', 'Add a new checkbox')"
-					:placeholder="t('forms', 'Add a new checkbox')"
+					:aria-label="t('forms', 'Add a new answer')"
+					:placeholder="t('forms', 'Add a new answer')"
 					class="question__input"
 					maxlength="256"
 					minlength="1"
@@ -99,6 +110,10 @@ export default {
 		isLastEmpty() {
 			const value = this.values[this.values.length - 1]
 			return value && value.trim().length === 0
+		},
+
+		isUnique() {
+			return this.model.unique === true
 		},
 	},
 
@@ -186,6 +201,11 @@ export default {
 		&::before {
 			margin: 14px !important;
 		}
+	}
+
+	// make sure to respect readonly on radio/checkbox
+	input[readonly] {
+		pointer-events: none;
 	}
 }
 

@@ -20,29 +20,35 @@
  *
  */
 
-export default [
-	{
+import QuestionLong from '../components/Questions/QuestionLong'
+import QuestionShort from '../components/Questions/QuestionShort'
+import QuestionMultiple from '../components/Questions/QuestionMultiple'
+
+export default {
+
+	multiple_unique: {
 		label: t('forms', 'Multiple choice'),
-		value: 'radiogroup',
 		icon: 'icon-answer-multiple',
+		component: QuestionMultiple,
+		unique: true,
 	},
-	{
+
+	multiple: {
 		label: t('forms', 'Checkboxes'),
-		value: 'checkbox',
 		icon: 'icon-answer-checkbox',
+		component: QuestionMultiple,
 	},
-	{
+
+	short: {
 		label: t('forms', 'Short answer'),
-		value: 'text',
 		icon: 'icon-answer-short',
+		component: QuestionShort,
 	},
-	{
+
+	long: {
 		label: t('forms', 'Long text'),
-		value: 'comment',
 		icon: 'icon-answer-long',
+		component: QuestionLong,
 	},
-	// {
-	// label: 'Drop Down',
-	// value: 'dropdown',
-	// },
-]
+
+}

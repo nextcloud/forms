@@ -63,7 +63,7 @@
 				@keydown="autoSizeDescription" />
 		</header>
 
-		<section>
+		<form @submit.prevent="onSubmit">
 			<!-- Add new questions toolbar -->
 			<div class="question-toolbar" role="toolbar">
 				<Actions ref="questionMenu"
@@ -71,36 +71,15 @@
 					:aria-label="t('forms', 'Add a question to this form')"
 					:open.sync="questionMenuOpened"
 					default-icon="icon-add-white">
-					<ActionButton v-for="type in answerTypes"
-						:key="type.label"
+					<ActionButton v-for="(answer, type) in answerTypes"
+						:key="answer.label"
 						class="question-toolbar__question"
-						:icon="type.icon"
-						@click="addQuestion">
-						{{ type.label }}
+						:icon="answer.icon"
+						@click="addQuestion(type)">
+						{{ answer.label }}
 					</ActionButton>
 				</Actions>
 			</div>
-
-			<!-- <div id="quiz-form-selector-text">
-				<label for="ans-type">Answer Type: </label>
-				<select v-model="selected">
-					<option value="" disabled>
-						Select
-					</option>
-					<option v-for="type in questionTypes" :key="type.value" :value="type.value">
-						{{ type.text }}
-					</option>
-				</select>
-				<input
-					v-model="newQuestion"
-					:placeholder=" t('forms', 'Add Question') "
-					maxlength="2048"
-					@keyup.enter="addQuestion()">
-				<button id="questButton"
-					@click="addQuestion()">
-					{{ t('forms', 'Add Question') }}
-				</button>
-			</div> -->
 
 			<!-- No questions -->
 			<EmptyContent v-if="form.questions.length === 0">
@@ -135,12 +114,14 @@
 				tag="ul"
 				@start="dragging = true"
 				@end="dragging = false">
-				<Questions :is="question.type"
-					v-for="question in questions"
+				<Questions :is="answerTypes[question.type].component"
+					v-for="(question, index) in questions"
 					:key="question.id"
+					:model="answerTypes[question.type]"
+					:index="index + 1"
 					v-bind.sync="question" />
 			</Draggable>
-		</section>
+		</form>
 	</AppContent>
 </template>
 
@@ -166,6 +147,8 @@ import QuizFormItem from '../components/quizFormItem'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
+window.axios = axios
+
 export default {
 	name: 'Create',
 	components: {
@@ -187,34 +170,29 @@ export default {
 	data() {
 		return {
 			questionMenuOpened: false,
-			placeholder: '',
-			newOption: '',
-			newQuestion: '',
-			nextOptionId: 1,
-			nextQuestionId: 1,
-			writingForm: false,
-			loadingForm: true,
-			selected: '',
-			uniqueQuestionText: false,
-			uniqueOptionText: false,
-			allHaveOpt: false,
 			answerTypes,
 			questions: [
 				{
 					id: 1,
-					type: QuestionShort,
+					type: 'short',
 					title: 'How old are you ?',
 					values: ['I\'m 48 years old'],
 				},
 				{
 					id: 2,
-					type: QuestionLong,
+					type: 'long',
 					title: 'Your latest best memory ?',
 					values: ['One day I was at the beach.\nIt was fun. The sun was shinning.\nThe water was warm'],
 				},
 				{
 					id: 3,
-					type: QuestionMultiple,
+					type: 'multiple',
+					title: 'Choose an answer ?',
+					values: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+				},
+				{
+					id: 4,
+					type: 'multiple_unique',
 					title: 'Choose an answer ?',
 					values: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
 				},
@@ -272,41 +250,27 @@ export default {
 	},
 
 	methods: {
-
-		switchSidebar() {
-			this.sidebar = !this.sidebar
+		onSubmit(e) {
+			console.info(e)
 		},
 
-		checkQuestionText() {
-			this.uniqueQuestionText = true
-			this.form.questions.forEach(q => {
-				if (q.text === this.newQuestion) {
-					this.uniqueQuestionText = false
-				}
+		async addQuestion(type) {
+			const text = t('forms', 'New question')
+
+			const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), {
+				formId: this.form.id,
+				type,
+				text,
 			})
-		},
+			const respData = response.data
 
-		async addQuestion() {
-			this.checkQuestionText()
-			if (this.selected === '') {
-				showError(t('forms', 'Select a question type!'), { duration: 3000 })
-			} else if (!this.uniqueQuestionText) {
-				showError(t('forms', 'Cannot have the same question!'))
-			} else {
-				if (this.newQuestion !== null & this.newQuestion !== '' & (/\S/.test(this.newQuestion))) {
-					const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), { formId: this.form.id, type: this.selected, text: this.newQuestion })
-					const respData = response.data
-
-					this.form.questions.push({
-						id: respData.id,
-						order: respData.order,
-						text: this.newQuestion,
-						type: this.selected,
-						answers: [],
-					})
-				}
-				this.newQuizQuestion = ''
-			}
+			this.form.questions.push({
+				id: respData.id,
+				order: respData.order,
+				text: this.newQuestion,
+				type: this.selected,
+				answers: [],
+			})
 		},
 
 		async deleteQuestion(question, index) {
@@ -443,7 +407,7 @@ export default {
 	flex-direction: column;
 
 	header,
-	section {
+	form {
 		width: 100%;
 		max-width: 900px;
 	}
@@ -484,7 +448,7 @@ export default {
 	}
 
 	// Questions container
-	section {
+	form {
 		position: relative;
 		display: flex;
 		flex-direction: column;

@@ -21,7 +21,10 @@
   -->
 
 <template>
-	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
+	<Question :index="index"
+		:title="title"
+		:edit.sync="edit"
+		@update:title="onTitleChange">
 		<div class="question__content">
 			<!-- TODO: properly choose max length -->
 			<input ref="input"
