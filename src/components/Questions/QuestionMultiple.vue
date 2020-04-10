@@ -21,25 +21,38 @@
   -->
 
 <template>
-	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
-		<ul class="question__content">
-			<template v-for="(answer, index) in values">
+	<Question
+		v-bind.sync="$attrs"
+		:title="title"
+		:edit.sync="edit"
+		@update:title="onTitleChange">
+		<ul class="question__content" :role="isUnique ? 'radiogroup' : ''">
+			<template v-for="(answer, index) in options">
 				<li :key="index" class="question__item">
-					<input :id="`${id}-check-${index}`"
+					<!-- Answer radio/checkbox + label -->
+					<!-- TODO: migrate to radio/checkbox component once ready -->
+					<input :id="`${id}-answer-${index}`"
 						ref="checkbox"
-						:checked="false"
+						:aria-checked="isChecked(index)"
+						:checked="isChecked(index)"
+						:class="{
+							'radio question__radio': isUnique,
+							'checkbox question__checkbox': !isUnique,
+						}"
+						:name="`${id}-answer`"
 						:readonly="true"
-						type="checkbox"
-						class="checkbox question__checkbox">
+						:type="isUnique ? 'radio' : 'checkbox'">
 					<label v-if="!edit"
 						ref="label"
-						:for="`${id}-check-${index}`"
+						:for="`${id}-answer-${index}`"
 						class="question__label">{{ answer }}</label>
+
+					<!-- Answer text input edit -->
 					<!-- TODO: properly choose max length -->
 					<input v-else
 						ref="input"
-						:aria-label="t('forms', 'An answer for checkbox {index}', { index: index + 1 })"
-						:placeholder="t('forms', 'Answer for checkbox {index}', { index: index + 1 })"
+						:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
+						:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 						:value="answer"
 						class="question__input"
 						maxlength="256"
@@ -60,8 +73,8 @@
 			<li v-if="edit && !isLastEmpty" class="question__item">
 				<!-- TODO: properly choose max length -->
 				<input
-					:aria-label="t('forms', 'Add a new checkbox')"
-					:placeholder="t('forms', 'Add a new checkbox')"
+					:aria-label="t('forms', 'Add a new answer')"
+					:placeholder="t('forms', 'Add a new answer')"
 					class="question__input"
 					maxlength="256"
 					minlength="1"
@@ -79,6 +92,9 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import QuestionMixin from '../../mixins/QuestionMixin'
 import GenRandomId from '../../utils/GenRandomId'
 
+// Implementations docs
+// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html
+// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/checkbox/checkbox-2.html
 export default {
 	name: 'QuestionMultiple',
 
@@ -100,6 +116,10 @@ export default {
 			const value = this.values[this.values.length - 1]
 			return value && value.trim().length === 0
 		},
+
+		isUnique() {
+			return this.model.unique === true
+		},
 	},
 
 	watch: {
@@ -112,6 +132,25 @@ export default {
 	},
 
 	methods: {
+
+		/**
+		 * Is the provided index checked
+		 * @param {number} index the option index
+		 * @returns {boolean}
+		 */
+		isChecked(index) {
+			// TODO implement based on answers
+			return false
+		},
+
+		/**
+		 * Update the values
+		 * @param {Array} values values to change
+		 */
+		updateValues(values) {
+			this.$emit('update:values', this.isUnique ? [values[0]] : values)
+		},
+
 		onInput(index) {
 			// Update values
 			const input = this.$refs.input[index]
@@ -119,7 +158,7 @@ export default {
 			values[index] = input.value
 
 			// Update question
-			this.$emit('update:values', values)
+			this.updateValues(values)
 		},
 
 		addNewEntry() {
@@ -128,7 +167,7 @@ export default {
 			values.push('')
 
 			// Update question
-			this.$emit('update:values', values)
+			this.updateValues(values)
 
 			this.$nextTick(() => {
 				this.focusIndex(values.length - 1)
@@ -147,7 +186,7 @@ export default {
 				values.splice(index, 1)
 
 				// Update question
-				this.$emit('update:values', values)
+				this.updateValues(values)
 
 				this.$nextTick(() => {
 					 this.focusNext(index)
@@ -186,6 +225,11 @@ export default {
 		&::before {
 			margin: 14px !important;
 		}
+	}
+
+	// make sure to respect readonly on radio/checkbox
+	input[readonly] {
+		pointer-events: none;
 	}
 }
 

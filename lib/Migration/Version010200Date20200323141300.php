@@ -107,6 +107,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('expires_timestamp', Type::INTEGER, [
 				'notnull' => false,
+				'default' => 0,
 				'comment' => 'unix-timestamp',
 			]);
 			$table->addColumn('is_anonymous', Type::BOOLEAN, [
@@ -140,7 +141,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('mandatory', Type::BOOLEAN, [
 				'notnull' => true,
-				'default' => 1,
+				'default' => 0,
 			]);
 			$table->addColumn('text', Type::STRING, [
 				'notnull' => true,

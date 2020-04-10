@@ -20,29 +20,42 @@
  *
  */
 
-export default [
-	{
-		label: t('forms', 'Multiple choice'),
-		value: 'radiogroup',
+import QuestionLong from '../components/Questions/QuestionLong'
+import QuestionShort from '../components/Questions/QuestionShort'
+import QuestionMultiple from '../components/Questions/QuestionMultiple'
+
+/**
+ * @typedef {Object} AnswerTypes
+ * @property {string} multiple_unique
+ * @property {string} multiple
+ * @property {string} short
+ * @property {string} long
+ */
+export default {
+
+	multiple_unique: {
+		component: QuestionMultiple,
 		icon: 'icon-answer-multiple',
+		label: t('forms', 'Multiple choice'),
+		unique: true,
 	},
-	{
-		label: t('forms', 'Checkboxes'),
-		value: 'checkbox',
+
+	multiple: {
+		component: QuestionMultiple,
 		icon: 'icon-answer-checkbox',
+		label: t('forms', 'Checkboxes'),
 	},
-	{
-		label: t('forms', 'Short answer'),
-		value: 'text',
+
+	short: {
+		component: QuestionShort,
 		icon: 'icon-answer-short',
+		label: t('forms', 'Short answer'),
 	},
-	{
-		label: t('forms', 'Long text'),
-		value: 'comment',
+
+	long: {
+		component: QuestionLong,
 		icon: 'icon-answer-long',
+		label: t('forms', 'Long text'),
 	},
-	// {
-	// label: 'Drop Down',
-	// value: 'dropdown',
-	// },
-]
+
+}

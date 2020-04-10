@@ -27,7 +27,13 @@
   -->
 
 <template>
-	<AppContent>
+	<AppContent v-if="loadingForm">
+		<EmptyContent icon="icon-loading">
+			{{ t('forms', 'Loading form “{title}”', { title: form.title }) }}
+		</EmptyContent>
+	</AppContent>
+
+	<AppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
 			<button class="primary" @click="showResults">
@@ -46,7 +52,7 @@
 			<label class="hidden-visually" for="form-title">{{ t('forms', 'Title') }}</label>
 			<input
 				id="form-title"
-				v-model="form.form.title"
+				v-model="form.title"
 				:minlength="0"
 				:placeholder="t('forms', 'Title')"
 				:required="true"
@@ -57,7 +63,7 @@
 			<textarea
 				id="form-desc"
 				ref="description"
-				v-model="form.form.description"
+				v-model="form.description"
 				:placeholder="t('forms', 'Description')"
 				@change="autoSizeDescription"
 				@keydown="autoSizeDescription" />
@@ -70,40 +76,20 @@
 					v-tooltip="t('forms', 'Add a question to this form')"
 					:aria-label="t('forms', 'Add a question to this form')"
 					:open.sync="questionMenuOpened"
-					default-icon="icon-add-white">
-					<ActionButton v-for="type in answerTypes"
-						:key="type.label"
+					:default-icon="loadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
+					<ActionButton v-for="(answer, type) in answerTypes"
+						:key="answer.label"
+						:disabled="loadingQuestions"
+						:icon="answer.icon"
 						class="question-toolbar__question"
-						:icon="type.icon"
-						@click="addQuestion">
-						{{ type.label }}
+						@click="addQuestion(type)">
+						{{ answer.label }}
 					</ActionButton>
 				</Actions>
 			</div>
 
-			<!-- <div id="quiz-form-selector-text">
-				<label for="ans-type">Answer Type: </label>
-				<select v-model="selected">
-					<option value="" disabled>
-						Select
-					</option>
-					<option v-for="type in questionTypes" :key="type.value" :value="type.value">
-						{{ type.text }}
-					</option>
-				</select>
-				<input
-					v-model="newQuestion"
-					:placeholder=" t('forms', 'Add Question') "
-					maxlength="2048"
-					@keyup.enter="addQuestion()">
-				<button id="questButton"
-					@click="addQuestion()">
-					{{ t('forms', 'Add Question') }}
-				</button>
-			</div> -->
-
 			<!-- No questions -->
-			<EmptyContent v-if="form.questions.length === 0">
+			<EmptyContent v-if="hasQuestions">
 				{{ t('forms', 'This form does not have any questions') }}
 				<template #desc>
 					<button class="empty-content__button primary" @click="openQuestionMenu">
@@ -129,17 +115,21 @@
 					@deleteOption="deleteOption"
 					@deleteQuestion="deleteQuestion(question, index)" />
 			</transitionGroup> -->
-
-			<Draggable v-model="questions"
-				:animation="200"
-				tag="ul"
-				@start="dragging = true"
-				@end="dragging = false">
-				<Questions :is="question.type"
-					v-for="question in questions"
-					:key="question.id"
-					v-bind.sync="question" />
-			</Draggable>
+			<form @submit.prevent="onSubmit">
+				<Draggable v-model="questions"
+					:animation="200"
+					tag="ul"
+					@start="dragging = true"
+					@end="dragging = false">
+					<Questions :is="answerTypes[question.type].component"
+						v-for="(question, index) in questions"
+						:key="question.id"
+						:model="answerTypes[question.type]"
+						:index="index + 1"
+						v-bind.sync="question"
+						@delete="deleteQuestion" />
+				</Draggable>
+			</form>
 		</section>
 	</AppContent>
 </template>
@@ -166,6 +156,8 @@ import QuizFormItem from '../components/quizFormItem'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
+window.axios = axios
+
 export default {
 	name: 'Create',
 	components: {
@@ -187,36 +179,32 @@ export default {
 	data() {
 		return {
 			questionMenuOpened: false,
-			placeholder: '',
-			newOption: '',
-			newQuestion: '',
-			nextOptionId: 1,
-			nextQuestionId: 1,
-			writingForm: false,
-			loadingForm: true,
-			selected: '',
-			uniqueQuestionText: false,
-			uniqueOptionText: false,
-			allHaveOpt: false,
 			answerTypes,
+			loadingForm: true,
+			loadingQuestions: false,
+			errorForm: false,
 			questions: [
 				{
 					id: 1,
-					type: QuestionShort,
+					type: 'short',
 					title: 'How old are you ?',
-					values: ['I\'m 48 years old'],
 				},
 				{
 					id: 2,
-					type: QuestionLong,
+					type: 'long',
 					title: 'Your latest best memory ?',
-					values: ['One day I was at the beach.\nIt was fun. The sun was shinning.\nThe water was warm'],
 				},
 				{
 					id: 3,
-					type: QuestionMultiple,
+					type: 'multiple',
 					title: 'Choose an answer ?',
-					values: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+					options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+				},
+				{
+					id: 4,
+					type: 'multiple_unique',
+					title: 'Choose an answer ?',
+					options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
 				},
 			],
 			dragging: false,
@@ -225,32 +213,18 @@ export default {
 
 	computed: {
 		title() {
-			if (this.form.form.title === '') {
+			if (this.form.title === '') {
 				return t('forms', 'Create new form')
 			} else {
-				return this.form.form.title
-
+				return this.form.title
 			}
 		},
-
-		saveButtonTitle() {
-			if (this.writingForm) {
-				return t('forms', 'Writing form')
-			} else if (this.form.mode === 'edit') {
-				return t('forms', 'Update form')
-			} else {
-				return t('forms', 'Done')
-			}
+		hasQuestions() {
+			return this.form.questions && this.form.questions.length === 0
 		},
-
 	},
 
 	watch: {
-		title() {
-			// only used when the title changes after page load
-			document.title = t('forms', 'Forms') + ' - ' + this.title
-		},
-
 		form: {
 			deep: true,
 			handler: function() {
@@ -259,53 +233,68 @@ export default {
 		},
 	},
 
-	created() {
-		if (this.$route.name === 'edit') {
-			this.form.mode = 'edit'
-		} else if (this.$route.name === 'clone') {
-			// TODO: CLONE
-		}
+	beforeMount() {
+		this.fetchFullForm(this.form.id)
 	},
 
-	mounted() {
+	updated() {
 		this.autoSizeDescription()
 	},
 
 	methods: {
+		/**
+		 * Fetch the full form data and update parent
+		 *
+		 * @param {number} id the unique form hash
+		 */
+		async fetchFullForm(id) {
+			this.loadingForm = true
+			console.debug('Loading form', id)
 
-		switchSidebar() {
-			this.sidebar = !this.sidebar
+			try {
+				const form = await axios.get(generateUrl('/apps/forms/api/v1/form/{id}', { id }))
+				this.$emit('update:form', form.data)
+			} catch (error) {
+				console.error(error)
+				this.errorForm = true
+			} finally {
+				this.loadingForm = false
+			}
 		},
 
-		checkQuestionText() {
-			this.uniqueQuestionText = true
-			this.form.questions.forEach(q => {
-				if (q.text === this.newQuestion) {
-					this.uniqueQuestionText = false
-				}
-			})
+		onSubmit() {
+			this.saveForm()
 		},
 
-		async addQuestion() {
-			this.checkQuestionText()
-			if (this.selected === '') {
-				showError(t('forms', 'Select a question type!'), { duration: 3000 })
-			} else if (!this.uniqueQuestionText) {
-				showError(t('forms', 'Cannot have the same question!'))
-			} else {
-				if (this.newQuestion !== null & this.newQuestion !== '' & (/\S/.test(this.newQuestion))) {
-					const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), { formId: this.form.id, type: this.selected, text: this.newQuestion })
-					const respData = response.data
+		/**
+		 * Add a new question to the current form
+		 *
+		 * @param {string} type the question type, see AnswerTypes
+		 */
+		async addQuestion(type) {
+			const text = t('forms', 'New question')
+			this.loadingQuestions = true
 
-					this.form.questions.push({
-						id: respData.id,
-						order: respData.order,
-						text: this.newQuestion,
-						type: this.selected,
-						answers: [],
-					})
-				}
-				this.newQuizQuestion = ''
+			try {
+				const response = await axios.post(generateUrl('/apps/forms/api/v1/question'), {
+					formId: this.form.id,
+					type,
+					text,
+				})
+				const question = response.data
+
+				// Add newly created question
+				this.form.questions.push(Object.assign({
+					text,
+					type,
+					answers: [],
+				}, question))
+
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while adding the new question'))
+			} finally {
+				this.loadingQuestions = false
 			}
 		},
 
@@ -315,31 +304,14 @@ export default {
 			this.form.questions.splice(index, 1)
 		},
 
-		checkOptionText(item, question) {
-			this.uniqueOptionText = true
-			question.options.forEach(o => {
-				if (o.text === item.newOption) {
-					this.uniqueOptionText = false
-				}
-			})
-		},
-
 		async addOption(item, question) {
-			this.checkOptionText(item, question)
-			if (!this.uniqueOptionText) {
-				showError(t('forms', 'Two options cannot be the same!'), { duration: 3000 })
-			} else {
-				if (item.newOption !== null & item.newOption !== '' & (/\S/.test(item.newOption))) {
-					const response = await axios.post(generateUrl('/apps/forms/api/v1/option/'), { formId: this.form.id, questionId: question.id, text: item.newOption })
-					const optionId = response.data
+			const response = await axios.post(generateUrl('/apps/forms/api/v1/option/'), { formId: this.form.id, questionId: question.id, text: item.newOption })
+			const optionId = response.data
 
-					question.options.push({
-						id: optionId,
-						text: item.newOption,
-					})
-				}
-				item.newOption = ''
-			}
+			question.options.push({
+				id: optionId,
+				text: item.newOption,
+			})
 		},
 
 		async deleteOption(question, option, index) {
@@ -348,52 +320,25 @@ export default {
 			question.options.splice(index, 1)
 		},
 
-		checkAllHaveOpt() {
-			this.allHaveOpt = true
-			this.form.questions.forEach(q => {
-				if (q.type !== 'text' && q.type !== 'comment' && q.options.length === 0) {
-					this.allHaveOpt = false
-				}
-			})
-		},
-
 		autoSizeDescription() {
 			const textarea = this.$refs.description
-			textarea.style.cssText = 'height:auto; padding:0'
-			textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
+			if (textarea) {
+				textarea.style.cssText = 'height:auto; padding:0'
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
+			}
 		},
 
-		debounceWriteForm: debounce(function() {
-			this.writeForm()
+		debounceSaveForm: debounce(function() {
+			this.saveForm()
 		}, 200),
 
-		writeForm() {
-			this.checkAllHaveOpt()
-			if (this.form.form.title.length === 0 | !(/\S/.test(this.form.form.title))) {
-				this.titleEmpty = true
-				showError(t('forms', 'Title must not be empty!'), { duration: 3000 })
-			} else if (!this.allHaveOpt) {
-				showError(t('forms', 'All questions need answers!'), { duration: 3000 })
-			} else if (this.form.form.expires & this.form.form.expirationDate === '') {
-				showError(t('forms', 'Need to pick an expiration date!'), { duration: 3000 })
-			} else {
-				this.writingForm = true
-				this.titleEmpty = false
-
-				axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
-					.then((response) => {
-						this.form.mode = 'edit'
-						this.form.form.hash = response.data.hash
-						this.form.form.id = response.data.id
-						this.writingForm = false
-						showSuccess(t('forms', '%n successfully saved', 1, this.form.form.title), { duration: 3000 })
-					}, (error) => {
-						this.form.form.hash = ''
-						this.writingForm = false
-						showError(t('forms', 'Error on saving form, see console'))
-						/* eslint-disable-next-line no-console */
-						console.log(error.response)
-					})
+		async saveForm() {
+			try {
+				await axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
+				showSuccess(t('forms', '%n successfully saved', 1, this.form.title), { duration: 3000 })
+			} catch (error) {
+				showError(t('forms', 'Error on saving form, see console'))
+				console.error(error)
 			}
 		},
 
@@ -437,7 +382,7 @@ export default {
 </script>
 
 <style lang="scss">
-#app-content {
+.app-content {
 	display: flex;
 	align-items: center;
 	flex-direction: column;

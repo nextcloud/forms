@@ -27,7 +27,7 @@
  */
 const formatForm = function(form) {
 	// clone form
-	const newForm = Object.assign({}, form, form.form)
+	const newForm = Object.assign({}, form)
 
 	// cleanup
 	delete newForm.event

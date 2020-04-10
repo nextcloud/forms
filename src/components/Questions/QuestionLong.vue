@@ -21,7 +21,11 @@
   -->
 
 <template>
-	<Question :title="title" :edit.sync="edit" @update:title="onTitleChange">
+	<Question
+		v-bind.sync="$attrs"
+		:title="title"
+		:edit.sync="edit"
+		@update:title="onTitleChange">
 		<div class="question__content">
 			<!-- TODO: properly choose max length -->
 			<textarea ref="textarea"

@@ -23,25 +23,43 @@
 <template>
 	<li v-click-outside="disableEdit"
 		:class="{ 'question--edit': edit }"
+		:aria-label="t('forms', 'Question number {index}', {index})"
 		class="question"
 		@click="enableEdit">
+		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div class="question__drag-handle icon-drag-handle"
 			:aria-label="t('forms', 'Drag to re-order the questions')" />
-		<input v-if="edit"
-			:value="title"
-			class="question__title"
-			type="text"
-			minlength="1"
-			maxlength="256"
-			@input="onInput">
-		<h3 v-else class="question__title" v-text="title" />
+
+		<!-- Header -->
+		<div class="question__header">
+			<input v-if="edit"
+				:placeholder="t('forms', 'Enter a title for this question')"
+				:aria-label="t('forms', 'The title of the question number {index}', {index})"
+				:value="title"
+				class="question__header-title"
+				type="text"
+				minlength="1"
+				maxlength="256"
+				required
+				@input="onInput">
+			<h3 v-else class="question__header-title" v-text="title" />
+			<Actions class="question__header-menu" :force-menu="true">
+				<ActionButton icon="icon-delete" @click="onDelete">
+					{{ t('forms', 'Delete question') }}
+				</ActionButton>
+			</Actions>
+		</div>
+
+		<!-- Question content -->
 		<slot />
 	</li>
 </template>
 
 <script>
 import { directive as ClickOutside } from 'v-click-outside'
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 
 export default {
 	name: 'Question',
@@ -50,7 +68,20 @@ export default {
 		ClickOutside,
 	},
 
+	components: {
+		Actions,
+		ActionButton,
+	},
+
 	props: {
+		id: {
+			type: Number,
+			required: true,
+		},
+		index: {
+			type: Number,
+			required: true,
+		},
 		title: {
 			type: String,
 			required: true,
@@ -79,11 +110,18 @@ export default {
 		disableEdit() {
 			this.$emit('update:edit', false)
 		},
+
+		/**
+		 * Delete this question
+		 */
+		onDelete() {
+			this.$emit('delete', this.id)
+		},
 	},
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .question {
 	position: relative;
 	display: flex;
@@ -92,6 +130,8 @@ export default {
 	justify-content: stretch;
 	margin-bottom: 22px;
 	padding-left: 44px;
+	// room for the new question menu
+	padding-right: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
 
@@ -118,26 +158,41 @@ export default {
 		padding: 0;
 	}
 
-	// Using type to have a higher order than the input styling of server
-	&__title,
-	&__title[type=text] {
+	&__header {
+		display: flex;
+		align-items: center;
 		flex: 1 1 100%;
+		justify-content: space-between;
 		width: auto;
-		max-width: calc(100% - 44px);
-		min-height: 22px;
 		margin: 20px;
 		margin-bottom: 0;
-		padding: 0;
-		padding-bottom: 6px;
-		color: var(--color-text-light);
-		border: 0;
-		border-radius: 0;
-		font-size: 16px;
-		line-height: 22px;
-	}
 
-	&__title[type=text] {
-		border-bottom: 1px dotted var(--color-border-dark);
+		// Using type to have a higher order than the input styling of server
+		&-title,
+		&-title[type=text] {
+			flex: 1 1 100%;
+			min-height: 22px;
+			margin: 0;
+			padding: 0;
+			padding-bottom: 6px;
+			color: var(--color-text-light);
+			border: 0;
+			border-bottom: 1px dotted transparent;
+			border-radius: 0;
+			font-size: 16px;
+			line-height: 22px;
+		}
+
+		&-title[type=text] {
+			border-bottom-color: var(--color-border-dark);
+		}
+
+		&-menu.action-item {
+			position: sticky;
+			top: var(--header-height);
+			// above other actions
+			z-index: 50;
+		}
 	}
 }
 

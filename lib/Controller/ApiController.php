@@ -95,7 +95,7 @@ class ApiController extends Controller {
 
 		} catch (DoesNotExistException $e) {
 			//handle silently
-		}finally{
+		} finally {
 			return $optionList;
 		}
 	}
@@ -119,6 +119,7 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Read Form-List only with necessary information for Listing.
 	 */
 	public function getForms(): Http\JSONResponse {
@@ -150,7 +151,7 @@ class ApiController extends Controller {
 		}
 
 		$result = $form->read();
-		$result['questions'] = getQuestions();
+		$result['questions'] = $this->getQuestions($id);
 
 		return new Http\JSONResponse($result);
 	}
@@ -241,7 +242,7 @@ class ApiController extends Controller {
 		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
 		$this->submissionMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
-		$this->formMapper->delete($formToDelete);
+		$this->formMapper->delete($form);
 
 		return new Http\JSONResponse($id);
 	}
@@ -291,10 +292,8 @@ class ApiController extends Controller {
 
 		$question = $this->questionMapper->insert($question);
 
-		$response = [
-			'id' => $question->getId(),
-			'order' => $question->getOrder()
-		];
+		$response = $question->read();
+		$response['options'] = [];
 
 		return new Http\JSONResponse($response);
 	}

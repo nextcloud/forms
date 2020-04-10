@@ -23,12 +23,37 @@ import Question from '../components/Questions/Question'
 export default {
 	inheritAttrs: false,
 	props: {
+		/**
+		 * The question title
+		 */
 		title: {
 			type: String,
 			required: true,
 		},
+
+		/**
+		 * The user answers
+		 */
 		values: {
 			type: Array,
+			default() {
+				return []
+			},
+		},
+
+		/**
+		 * The question list of answers
+		 */
+		options: {
+			type: Array,
+			required: true,
+		},
+
+		/**
+		 * Answer type model object
+		 */
+		model: {
+			type: Object,
 			required: true,
 		},
 	},
@@ -39,14 +64,26 @@ export default {
 
 	data() {
 		return {
+			// Do we display this question in edit or fill mode
 			edit: false,
 		}
 	},
 
 	methods: {
+		/**
+		 * Forward the title change to the parent
+		 *
+		 * @param {string} title the title
+		 */
 		onTitleChange(title) {
 			this.$emit('update:title', title)
 		},
+
+		/**
+		 * Forward the answer(s) change to the parent
+		 *
+		 * @param {Array} values the array of answers
+		 */
 		onValuesChange(values) {
 			this.$emit('update:values', values)
 		},
