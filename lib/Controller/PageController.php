@@ -172,10 +172,10 @@ class PageController extends Controller {
 			return new TemplateResponse('forms', 'no.acc.tmpl', []);
 		}
 
-		if ($form->getExpirationDate() === null) {
+		if ($form->getExpiresTimestamp() === 0) {
 			$expired = false;
 		} else {
-			$expired = time() > strtotime($form->getExpirationDate());
+			$expired = time() > $form->getExpiresTimestamp();
 		}
 
 		if ($expired) {
@@ -277,7 +277,7 @@ class PageController extends Controller {
 		}else{
 			$submission->setUserId($userId);
 		}
-		$submission->setTimestamp(date('Y-m-d H:i:s'));
+		$submission->setTimestamp(time());
 		$this->submissionMapper->insert($submission);
 		$submissionId = $submission->getId();
 

@@ -55,11 +55,9 @@
 			</label>
 
 			<DatetimePicker v-show="form.form.expires"
-				v-model="form.form.expirationDate"
-				v-bind="expirationDatePicker"
-
-				:time-picker-options="{ start: '00:00', step: '00:05', end: '23:55' }"
-				style="width:170px" />
+				id="expiresDatetimePicker"
+				v-model="form.form.expiresTimestamp"
+				v-bind="expirationDatePicker" />
 		</div>
 
 		<div class="configBox">
@@ -140,13 +138,14 @@ export default {
 				editable: true,
 				minuteStep: 1,
 				type: 'datetime',
+				valueType: 'X', // unix-timestamp
 				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
 				lang: this.lang.split('-')[0],
 				placeholder: t('forms', 'Expiration date'),
 				timePickerOptions: {
 					start: '00:00',
-					step: '00:30',
-					end: '23:30',
+					step: '00:15',
+					end: '23:45',
 				},
 			}
 		},
@@ -227,5 +226,9 @@ textarea {
 		border: 2px solid var(--color-error);
 		box-shadow: 1px 0 var(--border-radius) var(--color-box-shadow);
 	}
+}
+
+#expiresDatetimePicker {
+	width: 170px;
 }
 </style>
