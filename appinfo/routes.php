@@ -34,7 +34,6 @@ return [
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
 
 		['name' => 'page#insert_submission', 'url' => '/insert/submission', 'verb' => 'POST'],
-		['name' => 'page#search', 'url' => '/search', 'verb' => 'POST'],
 		['name' => 'page#get_display_name', 'url' => '/get/displayname', 'verb' => 'POST'],
 
 		['name' => 'api#write_form', 'url' => '/write/form', 'verb' => 'POST'],

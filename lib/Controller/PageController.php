@@ -47,6 +47,7 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
+use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\User; //To do: replace according to API
@@ -66,6 +67,9 @@ class PageController extends Controller {
 	private $userMgr;
 	private $groupManager;
 
+	/** @var ILogger */
+	private $logger;
+
 	public function __construct(
 		IRequest $request,
 		IUserManager $userMgr,
@@ -77,7 +81,8 @@ class PageController extends Controller {
 		QuestionMapper $questionMapper,
 		OptionMapper $optionMapper,
 		SubmissionMapper $SubmissionMapper,
-		AnswerMapper $AnswerMapper
+		AnswerMapper $AnswerMapper,
+		ILogger $logger
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->userMgr = $userMgr;
@@ -90,6 +95,7 @@ class PageController extends Controller {
 		$this->optionMapper = $optionMapper;
 		$this->submissionMapper = $SubmissionMapper;
 		$this->answerMapper = $AnswerMapper;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -304,131 +310,55 @@ class PageController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @param string $searchTerm
-	 * @param string $groups
-	 * @param string $users
-	 * @return array
-	 */
-	public function search($searchTerm, $groups, $users) {
-		return array_merge($this->searchForGroups($searchTerm, $groups), $this->searchForUsers($searchTerm, $users));
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @param string $searchTerm
-	 * @param string $groups
-	 * @return array
-	 */
-	public function searchForGroups($searchTerm, $groups) {
-		$selectedGroups = json_decode($groups);
-		$groups = $this->groupManager->search($searchTerm);
-		$gids = [];
-		$sgids = [];
-		foreach ($selectedGroups as $sg) {
-			$sgids[] = str_replace('group_', '', $sg);
-		}
-		foreach ($groups as $g) {
-			$gids[] = $g->getGID();
-		}
-		$diffGids = array_diff($gids, $sgids);
-		$gids = [];
-		foreach ($diffGids as $g) {
-			$gids[] = ['gid' => $g, 'isGroup' => true];
-		}
-		return $gids;
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @param string $searchTerm
-	 * @param string $users
-	 * @return array
-	 */
-	public function searchForUsers($searchTerm, $users) {
-		$selectedUsers = json_decode($users);
-		Util::writeLog('forms', print_r($selectedUsers, true), Util::ERROR);
-		$userNames = $this->userMgr->searchDisplayName($searchTerm);
-		$users = [];
-		$sUsers = [];
-		foreach ($selectedUsers as $su) {
-			$sUsers[] = str_replace('user_', '', $su);
-		}
-		foreach ($userNames as $u) {
-			$allreadyAdded = false;
-			foreach ($sUsers as &$su) {
-				if ($su === $u->getUID()) {
-					unset($su);
-					$allreadyAdded = true;
-					break;
-				}
-			}
-			if (!$allreadyAdded) {
-				$users[] = ['uid' => $u->getUID(), 'displayName' => $u->getDisplayName(), 'isGroup' => false];
-			} else {
-				continue;
-			}
-		}
-		return $users;
-	}
-
-	/**
-	 * @return \OCP\IGroup[]
-	 */
-	private function getGroups() {
-		$groups = $this->groupManager->getUserGroups(\OC::$server->getUserSession()->getUser());
-		return array_map(function(IGroup $group) {
-			return $group->getGID();
-		}, $groups);
-	}
-
-	/**
 	 * Check if user has access to this form
-	 *
-	 * @param Form $form
-	 * @return bool
 	 */
-	private function hasUserAccess($form) {
+	private function hasUserAccess(Form $form): bool {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
-		if ($access === 'public' || $access === 'hidden') {
+		
+		if ($access['type'] === 'public') {
 			return true;
 		}
+		
+		// Refuse access, if not public and no user logged in.
 		if ($this->userId === null) {
 			return false;
 		}
-		if ($access === 'registered') {
-			if ($form->getSubmitOnce()) {
-				$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
-				foreach($participants as $participant) {
-					// Don't allow access if user has already taken part
-					if ($participant->getUserId() === $this->userId) return false;
-				}
-			}
-			return true;
-		}
+
+		// Always grant access to owner.
 		if ($ownerId === $this->userId) {
 			return true;
 		}
-		Util::writeLog('forms', $this->userId, Util::ERROR);
-		$userGroups = $this->getGroups();
-		$arr = explode(';', $access);
-		foreach ($arr as $item) {
-			if (strpos($item, 'group_') === 0) {
-				$grp = substr($item, 6);
-				foreach ($userGroups as $userGroup) {
-					if ($userGroup === $grp) {
-						return true;
-					}
-				}
-			} else {
-				if (strpos($item, 'user_') === 0) {
-					$usr = substr($item, 5);
-					if ($usr === $this->userId) {
-						return true;
-					}
+
+		// Refuse access, if SubmitOnce is set and user already has taken part.
+		if ($form->getSubmitOnce()) {
+			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
+			foreach($participants as $participant) {
+				if ($participant === $this->userId) {
+					return false;
 				}
 			}
 		}
+
+		// Now all remaining users are allowed, if access-type 'registered'.
+		if ($access['type'] === 'registered') {
+			return true;
+		}
+
+		// Selected Access remains.
+		// Grant Access, if user is in users-Array.
+		if (in_array($this->userId, $access['users'])) {
+			return true;
+		}
+
+		// Check if access granted by group.
+		foreach ($access['groups'] as $group) {
+			if( $this->groupManager->isInGroup($this->userId, $group) ) {
+				return true;
+			}
+		}
+
+		// None of the possible access-options matched.
 		return false;
 	}
 }

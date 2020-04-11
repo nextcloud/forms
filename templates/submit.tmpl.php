@@ -33,7 +33,6 @@
 	/** @var OCA\Forms\Db\Question[] $questions */
 	$questions = $_['questions'];
 
-	$access = $form->getAccess();
 ?>
 
 <?php if ($form->getIsAnonymous()):?>

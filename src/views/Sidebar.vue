@@ -38,7 +38,7 @@
 
 			<input id="submitOnce"
 				v-model="form.form.submitOnce"
-				:disabled="form.form.access !== 'registered' || form.form.isAnonymous"
+				:disabled="form.form.access.type === 'public' || form.form.isAnonymous"
 				type="checkbox"
 				class="checkbox">
 			<label for="submitOnce" class="title">
@@ -66,19 +66,19 @@
 			<label class="title icon-user">
 				{{ t('forms', 'Access') }}
 			</label>
-			<input id="private"
-				v-model="form.form.access"
 
+			<input id="registered"
+				v-model="form.form.access.type"
 				type="radio"
 				value="registered"
 				class="radio">
-			<label for="private" class="title">
+			<label for="registered" class="title">
 				<div class="title icon-group" />
 				<span>{{ t('forms', 'Registered users only') }}</span>
 			</label>
-			<input id="public"
-				v-model="form.form.access"
 
+			<input id="public"
+				v-model="form.form.access.type"
 				type="radio"
 				value="public"
 				class="radio">
@@ -86,19 +86,19 @@
 				<div class="title icon-link" />
 				<span>{{ t('forms', 'Public access') }}</span>
 			</label>
-			<input id="select"
-				v-model="form.form.access"
 
+			<input id="selected"
+				v-model="form.form.access.type"
 				type="radio"
-				value="select"
+				value="selected"
 				class="radio">
-			<label for="select" class="title">
+			<label for="selected" class="title">
 				<div class="title icon-shared" />
 				<span>{{ t('forms', 'Only shared') }}</span>
 			</label>
 		</div>
 
-		<ShareDiv v-show="form.form.access === 'select'"
+		<ShareDiv v-show="form.form.access.type === 'selected'"
 			:active-shares="form.shares"
 			:placeholder="t('forms', 'Name of user or group')"
 			:hide-names="true"
