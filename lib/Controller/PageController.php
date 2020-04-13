@@ -8,6 +8,7 @@
  * @author Natalie Gilbert
  * @author Affan Hussain
  * @author John Molakvoæ <skjnldsv@protonmail.com>
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -236,23 +237,6 @@ class PageController extends Controller {
 		return $optionList;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 * @param int $formId
-	 * @return TemplateResponse|RedirectResponse
-	 */
-	public function deleteForm($formId) {
-		$formToDelete = $this->formMapper->find($formId);
-		if ($this->userId !== $formToDelete->getOwnerId() && !$this->groupManager->isAdmin($this->userId)) {
-			return new TemplateResponse('forms', 'no.delete.tmpl');
-		}
-		$form = new Form();
-		$form->setId($formId);
-		$this->submissionMapper->deleteByForm($formId);
-		$this->formMapper->delete($form);
-		$url = $this->urlGenerator->linkToRoute('forms.page.index');
-		return new RedirectResponse($url);
-	}
 
 	/**
 	 * @NoAdminRequired
@@ -265,7 +249,7 @@ class PageController extends Controller {
 	 */
 	public function insertSubmission($id, $userId, $answers, $questions) {
 
-		$form = $this->formMapper->find($id);
+		$form = $this->formMapper->findById($id);
 		$anonID = "anon-user-".  hash('md5', (time() + rand()));
 
 		//Insert Submission

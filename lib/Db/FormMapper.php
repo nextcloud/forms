@@ -45,7 +45,7 @@ class FormMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 */
-	public function find(int $id): Form {
+	public function findById(int $id): Form {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')

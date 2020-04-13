@@ -36,14 +36,10 @@ return [
 		['name' => 'page#insert_submission', 'url' => '/insert/submission', 'verb' => 'POST'],
 		['name' => 'page#get_display_name', 'url' => '/get/displayname', 'verb' => 'POST'],
 
-		['name' => 'api#write_form', 'url' => '/write/form', 'verb' => 'POST'],
-		['name' => 'api#get_full_form', 'url' => '/get/fullform/{formIdOrHash}', 'verb' => 'GET'],
-		['name' => 'api#get_options', 'url' => '/get/options/{formId}', 'verb' => 'GET'],
-		['name' => 'api#get_shares', 'url' => '/get/shares/{formId}', 'verb' => 'GET'],
-		['name' => 'api#get_form', 'url' => '/get/form/{formId}', 'verb' => 'GET'],
-
 		['name' => 'api#getForms', 'url' => 'api/v1/forms', 'verb' => 'GET'],
 		['name' => 'api#newForm', 'url' => 'api/v1/form', 'verb' => 'POST'],
+		['name' => 'api#getForm', 'url' => 'api/v1/form/{id}', 'verb' => 'GET'],
+		['name' => 'api#updateForm', 'url' => 'api/v1/form/update/', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => 'api/v1/form/{id}', 'verb' => 'DELETE'],
 		['name' => 'api#updateQuestion', 'url' => 'api/v1/question/update/', 'verb' => 'POST'],
 		['name' => 'api#reorderQuestions', 'url' => 'api/v1/question/reorder/', 'verb' => 'POST'],

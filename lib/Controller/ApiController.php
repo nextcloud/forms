@@ -8,6 +8,7 @@
  * @author Natalie Gilbert <ngilb634@umd.edu>
  * @author Inigo Jiron
  * @author Affan Hussain
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -35,11 +36,9 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 
-use OCP\IGroupManager;
 use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
-use OCP\IUserManager;
 use OCP\Security\ISecureRandom;
 
 use OCA\Forms\Db\Form;
@@ -56,8 +55,6 @@ use OCA\Forms\Db\OptionMapper;
 
 class ApiController extends Controller {
 
-	private $groupManager;
-	private $userManager;
 	private $formMapper;
 	private $submissionMapper;
 	private $answerMapper;
@@ -71,9 +68,7 @@ class ApiController extends Controller {
 	private $userId;
 
 	public function __construct(
-		IGroupManager $groupManager,
 		IRequest $request,
-		IUserManager $userManager,
 		$userId,
 		FormMapper $formMapper,
 		SubmissionMapper $submissionMapper,
@@ -84,8 +79,6 @@ class ApiController extends Controller {
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->userId = $userId;
-		$this->groupManager = $groupManager;
-		$this->userManager = $userManager;
 		$this->formMapper = $formMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->answerMapper = $answerMapper;
@@ -95,25 +88,24 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Read an entire form based on form id
 	 * @NoAdminRequired
-	 * @param Integer $formId
-	 * @return Array
+	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 */
-	public function getForm($formId) {
-
-		$data = array();
+	public function getForm(int $id): Http\JSONResponse {
 		try {
-			$data = $this->formMapper->find($formId)->read();
-		} catch (DoesNotExistException $e) {
-			// return silently
-		} finally {
-			return $data;
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
+		$result = $form->read();
+		$result['questions'] = getQuestions();
+
+		return new Http\JSONResponse($result);
 	}
 
-	public function getQuestions($formId) : array {
+	private function getQuestions(int $formId): array {
 		$questionList = [];
 		try{
 			$questionEntities = $this->questionMapper->findByForm($formId);
@@ -130,7 +122,7 @@ class ApiController extends Controller {
 		}
 	}
 
-	public function getOptions($questionId) : array {
+	private function getOptions(int $questionId): array {
 		$optionList = [];
 		try{
 			$optionEntities = $this->optionMapper->findByQuestion($questionId);
@@ -146,176 +138,90 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Read an entire form based on the form id or hash
 	 * @NoAdminRequired
-	 * @param String $formIdOrHash form id or hash
-	 * @return Array
+	 * Read Form-List only with necessary information for Listing.
 	 */
-	public function getFullForm($formIdOrHash) {
-
-		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
-			$currentUser = '';
-		} else {
-			$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-		}
-
-		$data = array();
-
-		try {
-
-			if (is_numeric($formIdOrHash)) {
-				$formId = $this->formMapper->find(intval($formIdOrHash))->id;
-				$result = 'foundById';
-			} else {
-				$formId = $this->formMapper->findByHash($formIdOrHash)->id;
-				$result = 'foundByHash';
-			}
-
-			$form = $this->getForm($formId);
-			$shares = $this->getShares($form['id']);
-
-			if ($form['ownerId'] !== $currentUser && !$this->groupManager->isAdmin($currentUser)) {
-				$mode = 'create';
-			} else {
-				$mode = 'edit';
-			}
-
-			$data = [
-				'id' => $form['id'],
-				'result' => $result,
-				'mode' => $mode,
-				'form' => $form,
-				'questions' => $this->getQuestions($form['id']),
-			];
-		} catch (DoesNotExistException $e) {
-				$data['form'] = ['result' => 'notFound'];
-		} finally {
-			return $data;
-		}
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function getForms() {
+	public function getForms(): Http\JSONResponse {
 		$forms = $this->formMapper->findAllByOwnerId($this->userId);
 
 		$result = [];
 		foreach ($forms as $form) {
 			$result[] = [
 				'id' => $form->getId(),
-				'form' => $form->read(),
-				'mode' => 'edit',
-				'questions' => $this->getQuestions($form->getId())
+				'hash' => $form->getHash(),
+				'title' => $form->getTitle(),
+				'expired' => $form->getExpired(),
 			];
 		}
 
-		return new DataResponse($result);
+		return new Http\JSONResponse($result);
 	}
 
 	/**
 	 * @NoAdminRequired
-	 * @param int $formId
-	 * @return DataResponse
-	 * TODO: use hash instead of id ?
 	 */
-	public function deleteForm(int $id) {
+	public function deleteForm(int $id): Http\JSONResponse {
+		$this->logger->debug('Delete Form: {id}', [
+			'id' => $id,
+		]);
+
 		try {
-			$formToDelete = $this->formMapper->find($id);
-		} catch (DoesNotExistException $e) {
-			return new Http\JSONResponse([], Http::STATUS_NOT_FOUND);
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
-		if ($this->userId !== $formToDelete->getOwnerId() && !$this->groupManager->isAdmin($this->userId)) {
-			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
+
+		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
 		$this->submissionMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
 		$this->formMapper->delete($formToDelete);
-		return new DataResponse(array(
-			'id' => $id,
-			'action' => 'deleted'
-		), Http::STATUS_OK);
+
+		return new Http\JSONResponse($id);
 	}
 
-
 	/**
-	 * Write form (create/update)
 	 * @NoAdminRequired
-	 * @param Array $form
-	 * @param Array $options
-	 * @param Array  $shares
-	 * @param String $mode
-	 * @return DataResponse
+	 * Writes the given key-value pairs into Database.
+	 * @param int $id FormId of form to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 */
-	public function writeForm($form, $questions, $shares, $mode) {
-		if (!\OC::$server->getUserSession()->getUser() instanceof IUser) {
-			return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
-		} else {
-			$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-			$adminAccess = $this->groupManager->isAdmin($currentUser);
+	public function updateForm(int $id, array $keyValuePairs): Http\JSONResponse {
+		$this->logger->debug('Updating form: FormId: {id}, values: {keyValuePairs}', [
+			'id' => $id,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		$newForm = new Form();
-
-		// Set the configuration options entered by the user
-		$newForm->setTitle($form['title']);
-		$newForm->setDescription($form['description']);
-
-		$newForm->setIsAnonymous($form['isAnonymous']);
-		$newForm->setSubmitOnce($form['submitOnce']);
-
-		// Only write Users/Groups-Arrays if necessary.
-		if($form['access']['type'] !== 'selected') {
-			unset($form['access']['users']);
-			unset($form['access']['groups']);
-		}
-		$newForm->setAccess($form['access']);
-
-		if ($form['expires']) {
-			$newForm->setExpiresTimestamp($form['expiresTimestamp']);
-		} else {
-			$newForm->setExpiresTimestamp(0);
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		if ($mode === 'edit') {
-			// Edit existing form
-			$oldForm = $this->formMapper->findByHash($form['hash']);
+		// Create FormEntity with given Params & Id.
+		$form = Form::fromParams($keyValuePairs);
+		$form->setId($id);
 
-			// Check if current user is allowed to edit existing form
-			if ($oldForm->getOwnerId() !== $currentUser && !$adminAccess) {
-				// If current user is not owner of existing form deny access
-				return new DataResponse(null, Http::STATUS_UNAUTHORIZED);
-			}
+		// Update changed Columns in Db.
+		$this->formMapper->update($form);
 
-			// else take owner, hash and id of existing form
-			$newForm->setOwnerId($oldForm->getOwnerId());
-			$newForm->setHash($oldForm->getHash());
-			$newForm->setId($oldForm->getId());
-			$this->formMapper->update($newForm);
-
-		} elseif ($mode === 'create') {
-			// Create new form
-			// Define current user as owner, set new creation date and create a new hash
-			$newForm->setOwnerId($currentUser);
-			$newForm->setCreated(time());
-			$newForm->setHash(\OC::$server->getSecureRandom()->generate(
-				16,
-				ISecureRandom::CHAR_DIGITS .
-				ISecureRandom::CHAR_LOWER .
-				ISecureRandom::CHAR_UPPER
-			));
-			$newForm = $this->formMapper->insert($newForm);
-		}
-
-		return new DataResponse(array(
-			'id' => $newForm->getId(),
-			'hash' => $newForm->getHash()
-		), Http::STATUS_OK);
-
+		return new Http\JSONResponse($form->getId());
 	}
 
 	/**
 	 * @NoAdminRequired
+	 * Create a new Form and return the Form to edit.
 	 */
 	public function newForm(): Http\JSONResponse {
 		$form = new Form();
@@ -335,7 +241,11 @@ class ApiController extends Controller {
 
 		$this->formMapper->insert($form);
 
-		return new Http\JSONResponse($this->getFullForm($form->getHash()));
+		// Return like getForm(), just without loading Questions (as there are none).
+		$result = $form->read();
+		$result['questions'] = [];
+
+		return new Http\JSONResponse($result);
 	}
 
 	/**
@@ -349,7 +259,7 @@ class ApiController extends Controller {
 		]);
 
 		try {
-			$form = $this->formMapper->find($formId);
+			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -399,7 +309,7 @@ class ApiController extends Controller {
 		]);
 
 		try {
-			$form = $this->formMapper->find($formId);
+			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -479,17 +389,17 @@ class ApiController extends Controller {
 	 * Writes the given key-value pairs into Database.
 	 * Key 'order' should only be changed by reorderQuestions() and is not allowed here.
 	 * @param int $id QuestionId of question to update
-	 * @param array $keyvalues Array of key=>value pairs to update.
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 */
-	public function updateQuestion(int $id, array $keyvalues): Http\JSONResponse {
-		$this->logger->debug('Updating question: questionId: {id}, values: {keyvalues}', [
+	public function updateQuestion(int $id, array $keyValuePairs): Http\JSONResponse {
+		$this->logger->debug('Updating question: questionId: {id}, values: {keyValuePairs}', [
 			'id' => $id,
-			'keyvalues' => $keyvalues
+			'keyValuePairs' => $keyValuePairs
 		]);
 
 		try {
 			$question = $this->questionMapper->findById($id);
-			$form = $this->formMapper->find($question->getFormId());
+			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find question or form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -500,14 +410,16 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		if (array_key_exists('order', $keyvalues)) {
+		if (array_key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$question = Question::fromParams($keyvalues);
+		// Create QuestionEntity with given Params & Id.
+		$question = Question::fromParams($keyValuePairs);
 		$question->setId($id);
 
+		// Update changed Columns in Db.
 		$this->questionMapper->update($question);
 
 		return new Http\JSONResponse($question->getId());
@@ -523,7 +435,7 @@ class ApiController extends Controller {
 
 		try {
 			$question = $this->questionMapper->findById($id);
-			$form = $this->formMapper->find($question->getFormId());
+			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -565,7 +477,7 @@ class ApiController extends Controller {
 		]);
 
 		try {
-			$form = $this->formMapper->find($formId);
+			$form = $this->formMapper->findById($formId);
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question so option can\'t be added');
@@ -603,7 +515,7 @@ class ApiController extends Controller {
 		try {
 			$option = $this->optionMapper->findById($id);
 			$question = $this->questionMapper->findById($option->getQuestionId());
-			$form = $this->formMapper->find($question->getFormId());
+			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or option');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -627,10 +539,12 @@ class ApiController extends Controller {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
