@@ -105,6 +105,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				'default' => 0,
 			]);
 			$table->setPrimaryKey(['id']);
+			$table->addUniqueIndex(['hash'], 'uniqueHash');
 		}
 
 		if (!$schema->hasTable('forms_v2_questions')) {
