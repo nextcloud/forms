@@ -32,9 +32,7 @@ return [
 		['name' => 'page#getResult', 'url' => '/{hash}/results/', 'verb' => 'GET'],
 
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
-
 		['name' => 'page#insert_submission', 'url' => '/insert/submission', 'verb' => 'POST'],
-		['name' => 'page#get_display_name', 'url' => '/get/displayname', 'verb' => 'POST'],
 
 		['name' => 'api#getForms', 'url' => 'api/v1/forms', 'verb' => 'GET'],
 		['name' => 'api#newForm', 'url' => 'api/v1/form', 'verb' => 'POST'],
