@@ -164,7 +164,7 @@ class ApiController extends Controller {
 
 		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
 		$form->setOwnerId($currentUser);
-		$form->setCreated(date('Y-m-d H:i:s'));
+		$form->setCreated(time());
 		$form->setHash(\OC::$server->getSecureRandom()->generate(
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE
