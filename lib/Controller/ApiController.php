@@ -32,7 +32,6 @@ namespace OCA\Forms\Controller;
 use OCA\Forms\AppInfo\Application;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
-use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 
@@ -43,15 +42,14 @@ use OCP\Security\ISecureRandom;
 
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Submission;
-use OCA\Forms\Db\SubmissionMapper;
-use OCA\Forms\Db\Answer;
-use OCA\Forms\Db\AnswerMapper;
-
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
+use OCA\Forms\Db\Submission;
+use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\Answer;
+use OCA\Forms\Db\AnswerMapper;
 
 class ApiController extends Controller {
 
@@ -87,22 +85,19 @@ class ApiController extends Controller {
 		$this->logger = $logger;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
-	 */
-	public function getForm(int $id): Http\JSONResponse {
-		try {
-			$form = $this->formMapper->findById($id);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+	private function getOptions(int $questionId): array {
+		$optionList = [];
+		try{
+			$optionEntities = $this->optionMapper->findByQuestion($questionId);
+			foreach ($optionEntities as $optionEntity) {
+				$optionList[] = $optionEntity->read();
+			}
+
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		}finally{
+			return $optionList;
 		}
-
-		$result = $form->read();
-		$result['questions'] = getQuestions();
-
-		return new Http\JSONResponse($result);
 	}
 
 	private function getQuestions(int $formId): array {
@@ -119,21 +114,6 @@ class ApiController extends Controller {
 			//handle silently
 		}finally{
 			return $questionList;
-		}
-	}
-
-	private function getOptions(int $questionId): array {
-		$optionList = [];
-		try{
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		}finally{
-			return $optionList;
 		}
 	}
 
@@ -159,12 +139,9 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 */
-	public function deleteForm(int $id): Http\JSONResponse {
-		$this->logger->debug('Delete Form: {id}', [
-			'id' => $id,
-		]);
-
+	public function getForm(int $id): Http\JSONResponse {
 		try {
 			$form = $this->formMapper->findById($id);
 		} catch (IMapperException $e) {
@@ -172,17 +149,39 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
-			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
-		}
+		$result = $form->read();
+		$result['questions'] = getQuestions();
 
-		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
-		$this->submissionMapper->deleteByForm($id);
-		$this->questionMapper->deleteByForm($id);
-		$this->formMapper->delete($formToDelete);
+		return new Http\JSONResponse($result);
+	}
 
-		return new Http\JSONResponse($id);
+	/**
+	 * @NoAdminRequired
+	 * Create a new Form and return the Form to edit.
+	 */
+	public function newForm(): Http\JSONResponse {
+		$form = new Form();
+
+		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
+		$form->setOwnerId($currentUser);
+		$form->setCreated(date('Y-m-d H:i:s'));
+		$form->setHash(\OC::$server->getSecureRandom()->generate(
+			16,
+			ISecureRandom::CHAR_HUMAN_READABLE
+		));
+		$form->setTitle('New form');
+		$form->setDescription('');
+		$form->setAccess([
+			'type' => 'public'
+		]);
+
+		$this->formMapper->insert($form);
+
+		// Return like getForm(), just without loading Questions (as there are none).
+		$result = $form->read();
+		$result['questions'] = [];
+
+		return new Http\JSONResponse($result);
 	}
 
 	/**
@@ -221,31 +220,30 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * Create a new Form and return the Form to edit.
 	 */
-	public function newForm(): Http\JSONResponse {
-		$form = new Form();
-
-		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-		$form->setOwnerId($currentUser);
-		$form->setCreated(time());
-		$form->setHash(\OC::$server->getSecureRandom()->generate(
-			16,
-			ISecureRandom::CHAR_HUMAN_READABLE
-		));
-		$form->setTitle('New form');
-		$form->setDescription('');
-		$form->setAccess([
-			'type' => 'public'
+	public function deleteForm(int $id): Http\JSONResponse {
+		$this->logger->debug('Delete Form: {id}', [
+			'id' => $id,
 		]);
 
-		$this->formMapper->insert($form);
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
 
-		// Return like getForm(), just without loading Questions (as there are none).
-		$result = $form->read();
-		$result['questions'] = [];
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
 
-		return new Http\JSONResponse($result);
+		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
+		$this->submissionMapper->deleteByForm($id);
+		$this->questionMapper->deleteByForm($id);
+		$this->formMapper->delete($formToDelete);
+
+		return new Http\JSONResponse($id);
 	}
 
 	/**
