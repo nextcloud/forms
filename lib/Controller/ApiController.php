@@ -272,9 +272,9 @@ class ApiController extends Controller {
 		$newForm->setAccess($form['access']);
 
 		if ($form['expires']) {
-			$newForm->setExpirationDate(date('Y-m-d H:i:s', strtotime($form['expirationDate'])));
+			$newForm->setExpiresTimestamp($form['expiresTimestamp']);
 		} else {
-			$newForm->setExpirationDate(null);
+			$newForm->setExpiresTimestamp(0);
 		}
 
 		if ($mode === 'edit') {
@@ -297,7 +297,7 @@ class ApiController extends Controller {
 			// Create new form
 			// Define current user as owner, set new creation date and create a new hash
 			$newForm->setOwnerId($currentUser);
-			$newForm->setCreated(date('Y-m-d H:i:s'));
+			$newForm->setCreated(time());
 			$newForm->setHash(\OC::$server->getSecureRandom()->generate(
 				16,
 				ISecureRandom::CHAR_DIGITS .
@@ -322,7 +322,7 @@ class ApiController extends Controller {
 
 		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
 		$form->setOwnerId($currentUser);
-		$form->setCreated(date('Y-m-d H:i:s'));
+		$form->setCreated(time());
 		$form->setHash(\OC::$server->getSecureRandom()->generate(
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE

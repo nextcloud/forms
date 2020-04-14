@@ -39,10 +39,10 @@ use OCP\AppFramework\Db\Entity;
  * @method void setOwnerId(string $value)
  * @method array getAccess()
  * @method void setAccess(array $value)
- * @method string getCreated()
- * @method void setCreated(string $value)
- * @method string getExpirationDate()
- * @method void setExpirationDate(string $value)
+ * @method integer getCreated()
+ * @method void setCreated(integer $value)
+ * @method integer getExpiresTimestamp()
+ * @method void setExpiresTimestamp(integer $value)
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(bool $value)
  * @method integer getSubmitOnce()
@@ -56,7 +56,7 @@ class Form extends Entity {
 	protected $ownerId;
 	protected $accessJson;
 	protected $created;
-	protected $expirationDate;
+	protected $expiresTimestamp;
 	protected $isAnonymous;
 	protected $submitOnce;
 
@@ -64,34 +64,38 @@ class Form extends Entity {
 	 * Form constructor.
 	 */
 	public function __construct() {
+		$this->addType('created', 'integer');
+		$this->addType('expiresTimestamp', 'integer');
 		$this->addType('isAnonymous', 'bool');
 		$this->addType('submitOnce', 'bool');
 	}
 
-	/**
-	 * JSON-Decoding of access-column.
-	 */
+	// JSON-Decoding of access-column.
 	public function getAccess(): array {
 		return json_decode($this->getAccessJson(), true); // assoc=true, => Convert to associative Array
 	}
 
-	/**
-	 * JSON-Encoding of access-column.
-	 */
+	// JSON-Encoding of access-column.
 	public function setAccess(array $access) {
 		$this->setAccessJson(json_encode($access));
 	}
 
-	public function read() {
+	// Get virtual column expires. Set should only be done by setExpiresTimestamp().
+	public function getExpires(): bool {
+		return (bool) $this->getExpiresTimestamp();
+	}
 
-		if ($this->getExpirationDate() === null) {
-			$expired = false;
-			$expires = false;
-		} else {
-			$expired = time() > strtotime($this->getExpirationDate());
-			$expires = true;
+	// Get virtual column expired. Set should only be done by setExpiresTimestamp().
+	public function getExpired(): bool {
+		if ($this->getExpires()) {
+			return time() > $this->getExpiresTimestamp();
 		}
+		// else - does not expire
+		return false;
+	}
 
+	// Read full form
+	public function read() {
 		return [
 			'id' => $this->getId(),
 			'hash' => $this->getHash(),
@@ -101,9 +105,9 @@ class Form extends Entity {
 			'ownerDisplayName' => \OC_User::getDisplayName($this->getOwnerId()),
 			'created' => $this->getCreated(),
 			'access' => $this->getAccess(),
-			'expires' => $expires,
-			'expired' => $expired,
-			'expirationDate' => $this->getExpirationDate(),
+			'expires' => $this->getExpires(),
+			'expired' => $this->getExpired(),
+			'expiresTimestamp' => $this->getExpiresTimestamp(),
 			'isAnonymous' => $this->getIsAnonymous(),
 			'submitOnce' => $this->getSubmitOnce()
 		];
