@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Cannot copy, please copy the link manually" : "Nedarí sa skopírovať, skopírujte prosím ručne.",
     "Copy to clipboard" : "Skopírovať do schránky",
     "Group" : "Skupina",
     "Title" : "Názov",
