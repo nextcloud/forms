@@ -63,18 +63,19 @@
 				@keydown="autoSizeDescription" />
 		</header>
 
-		<form @submit.prevent="onSubmit">
+		<section>
 			<!-- Add new questions toolbar -->
 			<div class="question-toolbar" role="toolbar">
 				<Actions ref="questionMenu"
 					v-tooltip="t('forms', 'Add a question to this form')"
 					:aria-label="t('forms', 'Add a question to this form')"
 					:open.sync="questionMenuOpened"
-					default-icon="icon-add-white">
+					:default-icon="loadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
 					<ActionButton v-for="(answer, type) in answerTypes"
 						:key="answer.label"
-						class="question-toolbar__question"
+						:disabled="loadingQuestions"
 						:icon="answer.icon"
+						class="question-toolbar__question"
 						@click="addQuestion(type)">
 						{{ answer.label }}
 					</ActionButton>
@@ -108,20 +109,21 @@
 					@deleteOption="deleteOption"
 					@deleteQuestion="deleteQuestion(question, index)" />
 			</transitionGroup> -->
-
-			<Draggable v-model="questions"
-				:animation="200"
-				tag="ul"
-				@start="dragging = true"
-				@end="dragging = false">
-				<Questions :is="answerTypes[question.type].component"
-					v-for="(question, index) in questions"
-					:key="question.id"
-					:model="answerTypes[question.type]"
-					:index="index + 1"
-					v-bind.sync="question" />
-			</Draggable>
-		</form>
+			<form @submit.prevent="onSubmit">
+				<Draggable v-model="questions"
+					:animation="200"
+					tag="ul"
+					@start="dragging = true"
+					@end="dragging = false">
+					<Questions :is="answerTypes[question.type].component"
+						v-for="(question, index) in questions"
+						:key="question.id"
+						:model="answerTypes[question.type]"
+						:index="index + 1"
+						v-bind.sync="question" />
+				</Draggable>
+			</form>
+		</section>
 	</AppContent>
 </template>
 
@@ -171,30 +173,30 @@ export default {
 		return {
 			questionMenuOpened: false,
 			answerTypes,
+			loadingForm: false,
+			loadingQuestions: false,
 			questions: [
 				{
 					id: 1,
 					type: 'short',
 					title: 'How old are you ?',
-					values: ['I\'m 48 years old'],
 				},
 				{
 					id: 2,
 					type: 'long',
 					title: 'Your latest best memory ?',
-					values: ['One day I was at the beach.\nIt was fun. The sun was shinning.\nThe water was warm'],
 				},
 				{
 					id: 3,
 					type: 'multiple',
 					title: 'Choose an answer ?',
-					values: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+					options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
 				},
 				{
 					id: 4,
 					type: 'multiple_unique',
 					title: 'Choose an answer ?',
-					values: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
+					options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
 				},
 			],
 			dragging: false,
@@ -224,11 +226,6 @@ export default {
 	},
 
 	watch: {
-		title() {
-			// only used when the title changes after page load
-			document.title = t('forms', 'Forms') + ' - ' + this.title
-		},
-
 		form: {
 			deep: true,
 			handler: function() {
@@ -250,27 +247,40 @@ export default {
 	},
 
 	methods: {
-		onSubmit(e) {
-			console.info(e)
+		onSubmit() {
+			this.saveForm()
 		},
 
+		/**
+		 * Add a new question to the current form
+		 *
+		 * @param {string} type the question type, see AnswerTypes
+		 */
 		async addQuestion(type) {
 			const text = t('forms', 'New question')
+			this.loadingQuestions = true
 
-			const response = await axios.post(generateUrl('/apps/forms/api/v1/question/'), {
-				formId: this.form.id,
-				type,
-				text,
-			})
-			const respData = response.data
+			try {
+				const response = await axios.post(generateUrl('/apps/forms/api/v1/question'), {
+					formId: this.form.id,
+					type,
+					text,
+				})
+				const question = response.data
 
-			this.form.questions.push({
-				id: respData.id,
-				order: respData.order,
-				text: this.newQuestion,
-				type: this.selected,
-				answers: [],
-			})
+				// Add newly created question
+				this.form.questions.push(Object.assign({
+					text,
+					type,
+					answers: [],
+				}, question))
+
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while adding the new question'))
+			} finally {
+				this.loadingQuestions = false
+			}
 		},
 
 		async deleteQuestion(question, index) {
@@ -279,31 +289,14 @@ export default {
 			this.form.questions.splice(index, 1)
 		},
 
-		checkOptionText(item, question) {
-			this.uniqueOptionText = true
-			question.options.forEach(o => {
-				if (o.text === item.newOption) {
-					this.uniqueOptionText = false
-				}
-			})
-		},
-
 		async addOption(item, question) {
-			this.checkOptionText(item, question)
-			if (!this.uniqueOptionText) {
-				showError(t('forms', 'Two options cannot be the same!'), { duration: 3000 })
-			} else {
-				if (item.newOption !== null & item.newOption !== '' & (/\S/.test(item.newOption))) {
-					const response = await axios.post(generateUrl('/apps/forms/api/v1/option/'), { formId: this.form.id, questionId: question.id, text: item.newOption })
-					const optionId = response.data
+			const response = await axios.post(generateUrl('/apps/forms/api/v1/option/'), { formId: this.form.id, questionId: question.id, text: item.newOption })
+			const optionId = response.data
 
-					question.options.push({
-						id: optionId,
-						text: item.newOption,
-					})
-				}
-				item.newOption = ''
-			}
+			question.options.push({
+				id: optionId,
+				text: item.newOption,
+			})
 		},
 
 		async deleteOption(question, option, index) {
@@ -327,33 +320,28 @@ export default {
 			textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
 		},
 
-		debounceWriteForm: debounce(function() {
-			this.writeForm()
+		debounceSaveForm: debounce(function() {
+			this.saveForm()
 		}, 200),
 
-		writeForm() {
+		saveForm() {
 			this.checkAllHaveOpt()
 			if (this.form.form.title.length === 0 | !(/\S/.test(this.form.form.title))) {
-				this.titleEmpty = true
 				showError(t('forms', 'Title must not be empty!'), { duration: 3000 })
 			} else if (!this.allHaveOpt) {
 				showError(t('forms', 'All questions need answers!'), { duration: 3000 })
 			} else if (this.form.form.expires & this.form.form.expirationDate === '') {
 				showError(t('forms', 'Need to pick an expiration date!'), { duration: 3000 })
 			} else {
-				this.writingForm = true
-				this.titleEmpty = false
 
 				axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
 					.then((response) => {
 						this.form.mode = 'edit'
 						this.form.form.hash = response.data.hash
 						this.form.form.id = response.data.id
-						this.writingForm = false
 						showSuccess(t('forms', '%n successfully saved', 1, this.form.form.title), { duration: 3000 })
 					}, (error) => {
 						this.form.form.hash = ''
-						this.writingForm = false
 						showError(t('forms', 'Error on saving form, see console'))
 						/* eslint-disable-next-line no-console */
 						console.log(error.response)
@@ -407,7 +395,7 @@ export default {
 	flex-direction: column;
 
 	header,
-	form {
+	section {
 		width: 100%;
 		max-width: 900px;
 	}
@@ -448,7 +436,7 @@ export default {
 	}
 
 	// Questions container
-	form {
+	section {
 		position: relative;
 		display: flex;
 		flex-direction: column;

@@ -95,7 +95,7 @@ class ApiController extends Controller {
 
 		} catch (DoesNotExistException $e) {
 			//handle silently
-		}finally{
+		} finally {
 			return $optionList;
 		}
 	}
@@ -289,11 +289,18 @@ class ApiController extends Controller {
 		$question->setType($type);
 		$question->setText($text);
 
+		// Not mandatory by default
+		$question->setMandatory(false);
+
 		$question = $this->questionMapper->insert($question);
 
 		$response = [
 			'id' => $question->getId(),
-			'order' => $question->getOrder()
+			'formId' => $formId,
+			'order' => $questionOrder,
+			'type' => $type,
+			'mandatory' => false,
+			'text' => $text
 		];
 
 		return new Http\JSONResponse($response);

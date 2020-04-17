@@ -32,18 +32,20 @@ export default {
 		},
 
 		/**
-		 * The question list of answers
+		 * The user answers
 		 */
 		values: {
 			type: Array,
-			required: true,
+			default() {
+				return []
+			},
 		},
 
 		/**
-		 * Answer type model object
+		 * The question list of answers
 		 */
-		model: {
-			type: Object,
+		options: {
+			type: Array,
 			required: true,
 		},
 
@@ -55,6 +57,14 @@ export default {
 			type: Number,
 			required: true,
 		},
+
+		/**
+		 * Answer type model object
+		 */
+		model: {
+			type: Object,
+			required: true,
+		},
 	},
 
 	components: {
@@ -64,7 +74,7 @@ export default {
 	data() {
 		return {
 			// Do we display this question in edit or fill mode
-			edit: true,
+			edit: false,
 		}
 	},
 

@@ -23,29 +23,30 @@
 <template>
 	<Question :index="index"
 		:title="title"
-		:edit="edit"
+		:edit.sync="edit"
 		@update:title="onTitleChange">
-		<ul class="question__content">
-			<template v-for="(answer, index) in values">
+		<ul class="question__content" :role="isUnique ? 'radiogroup' : ''">
+			<template v-for="(answer, index) in options">
 				<li :key="index" class="question__item">
 					<!-- Answer radio/checkbox + label -->
 					<!-- TODO: migrate to radio/checkbox component once ready -->
 					<input :id="`${id}-answer-${index}`"
 						ref="checkbox"
-						:checked="false"
-						:readonly="true"
-						:name="`${id}-answer`"
-						:type="isUnique ? 'radio' : 'checkbox'"
+						:aria-checked="isChecked(index)"
+						:checked="isChecked(index)"
 						:class="{
 							'radio question__radio': isUnique,
 							'checkbox question__checkbox': !isUnique,
-						}">
+						}"
+						:name="`${id}-answer`"
+						:readonly="true"
+						:type="isUnique ? 'radio' : 'checkbox'">
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${index}`"
 						class="question__label">{{ answer }}</label>
 
-					<!-- Answer text input -->
+					<!-- Answer text input edit -->
 					<!-- TODO: properly choose max length -->
 					<input v-else
 						ref="input"
@@ -90,6 +91,9 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import QuestionMixin from '../../mixins/QuestionMixin'
 import GenRandomId from '../../utils/GenRandomId'
 
+// Implementations docs
+// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html
+// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/checkbox/checkbox-2.html
 export default {
 	name: 'QuestionMultiple',
 
@@ -127,6 +131,25 @@ export default {
 	},
 
 	methods: {
+
+		/**
+		 * Is the provided index checked
+		 * @param {number} index the option index
+		 * @returns {boolean}
+		 */
+		isChecked(index) {
+			// TODO implement based on answers
+			return false
+		},
+
+		/**
+		 * Update the values
+		 * @param {Array} values values to change
+		 */
+		updateValues(values) {
+			this.$emit('update:values', this.isUnique ? [values[0]] : values)
+		},
+
 		onInput(index) {
 			// Update values
 			const input = this.$refs.input[index]
@@ -134,7 +157,7 @@ export default {
 			values[index] = input.value
 
 			// Update question
-			this.$emit('update:values', values)
+			this.updateValues(values)
 		},
 
 		addNewEntry() {
@@ -143,7 +166,7 @@ export default {
 			values.push('')
 
 			// Update question
-			this.$emit('update:values', values)
+			this.updateValues(values)
 
 			this.$nextTick(() => {
 				this.focusIndex(values.length - 1)
@@ -162,7 +185,7 @@ export default {
 				values.splice(index, 1)
 
 				// Update question
-				this.$emit('update:values', values)
+				this.updateValues(values)
 
 				this.$nextTick(() => {
 					 this.focusNext(index)

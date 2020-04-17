@@ -37,6 +37,7 @@
 			type="text"
 			minlength="1"
 			maxlength="256"
+			required
 			@input="onInput">
 		<h3 v-else class="question__title" v-text="title" />
 		<slot />

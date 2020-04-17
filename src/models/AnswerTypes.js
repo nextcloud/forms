@@ -24,31 +24,38 @@ import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionMultiple from '../components/Questions/QuestionMultiple'
 
+/**
+ * @typedef {Object} AnswerTypes
+ * @property {string} multiple_unique
+ * @property {string} multiple
+ * @property {string} short
+ * @property {string} long
+ */
 export default {
 
 	multiple_unique: {
-		label: t('forms', 'Multiple choice'),
-		icon: 'icon-answer-multiple',
 		component: QuestionMultiple,
+		icon: 'icon-answer-multiple',
+		label: t('forms', 'Multiple choice'),
 		unique: true,
 	},
 
 	multiple: {
-		label: t('forms', 'Checkboxes'),
-		icon: 'icon-answer-checkbox',
 		component: QuestionMultiple,
+		icon: 'icon-answer-checkbox',
+		label: t('forms', 'Checkboxes'),
 	},
 
 	short: {
-		label: t('forms', 'Short answer'),
-		icon: 'icon-answer-short',
 		component: QuestionShort,
+		icon: 'icon-answer-short',
+		label: t('forms', 'Short answer'),
 	},
 
 	long: {
-		label: t('forms', 'Long text'),
-		icon: 'icon-answer-long',
 		component: QuestionLong,
+		icon: 'icon-answer-long',
+		label: t('forms', 'Long text'),
 	},
 
 }
