@@ -255,7 +255,7 @@ export default {
 				const form = await axios.get(generateUrl('/apps/forms/api/v1/form/{id}', { id }))
 				this.$emit('update:form', form.data)
 			} catch (error) {
-				console.error(error);
+				console.error(error)
 				this.errorForm = true
 			} finally {
 				this.loadingForm = false

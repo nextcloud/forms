@@ -45,7 +45,9 @@
 				@input="onInput">
 			<h3 v-else class="question__header-title" v-text="title" />
 			<Actions class="question__header-menu" :force-menu="true">
-				<ActionButton icon="icon-delete" @click="onDelete">{{ t('forms', 'Delete question') }}</ActionButton>
+				<ActionButton icon="icon-delete" @click="onDelete">
+					{{ t('forms', 'Delete question') }}
+				</ActionButton>
 			</Actions>
 		</div>
 

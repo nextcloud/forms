@@ -242,7 +242,7 @@ class ApiController extends Controller {
 		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
 		$this->submissionMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
-		$this->formMapper->delete($formToDelete);
+		$this->formMapper->delete($form);
 
 		return new Http\JSONResponse($id);
 	}
@@ -290,19 +290,10 @@ class ApiController extends Controller {
 		$question->setType($type);
 		$question->setText($text);
 
-		// Not mandatory by default
-		$question->setMandatory(false);
-
 		$question = $this->questionMapper->insert($question);
 
-		$response = [
-			'id' => $question->getId(),
-			'formId' => $formId,
-			'order' => $questionOrder,
-			'type' => $type,
-			'mandatory' => false,
-			'text' => $text
-		];
+		$response = $question->read();
+		$response['options'] = [];
 
 		return new Http\JSONResponse($response);
 	}
