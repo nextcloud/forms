@@ -52,7 +52,7 @@
 
 		<!-- No errors show router content -->
 		<template v-else>
-			<router-view :form="selectedForm" />
+			<router-view :form.sync="selectedForm" />
 			<router-view :form="selectedForm" name="sidebar" />
 		</template>
 	</Content>
@@ -105,9 +105,16 @@ export default {
 			return this.$route.params.hash
 		},
 
-		selectedForm() {
-			// TODO: replace with form.hash
-			return this.forms.find(form => form.form.hash === this.hash)
+		selectedForm: {
+			get() {
+				return this.forms.find(form => form.hash === this.hash)
+			},
+			set(form) {
+				const index = this.forms.findIndex(search => search.hash === this.hash)
+				if (index > -1) {
+					this.$set(this.forms, index, form)
+				}
+			},
 		},
 	},
 
@@ -141,7 +148,7 @@ export default {
 				const response = await axios.post(generateUrl('/apps/forms/api/v1/form'))
 				const newForm = response.data
 				this.forms.push(newForm)
-				this.$router.push({ name: 'edit', params: { hash: newForm.form.hash } })
+				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
 			} catch (error) {
 				showError(t('forms', 'Unable to create a new form'))
 				console.error(error)

@@ -21,7 +21,8 @@
   -->
 
 <template>
-	<Question :index="index"
+	<Question
+		v-bind.sync="$attrs"
 		:title="title"
 		:edit.sync="edit"
 		@update:title="onTitleChange">

@@ -50,15 +50,6 @@ export default {
 		},
 
 		/**
-		 * The questions index starting at 1
-		 * Used for aria descriptions
-		 */
-		index: {
-			type: Number,
-			required: true,
-		},
-
-		/**
 		 * Answer type model object
 		 */
 		model: {

@@ -21,14 +21,14 @@
  -->
 
 <template>
-	<AppSidebar v-show="opened" :title="form.form.title" @close="onClose">
+	<AppSidebar v-show="opened" :title="form.title" @close="onClose">
 		<div class="configBox ">
 			<label class="title icon-settings">
 				{{ t('forms', 'Form configurations') }}
 			</label>
 
 			<input id="isAnonymous"
-				v-model="form.form.isAnonymous"
+				v-model="form.isAnonymous"
 
 				type="checkbox"
 				class="checkbox">
@@ -37,8 +37,8 @@
 			</label>
 
 			<input id="submitOnce"
-				v-model="form.form.submitOnce"
-				:disabled="form.form.access.type === 'public' || form.form.isAnonymous"
+				v-model="form.submitOnce"
+				:disabled="form.access.type === 'public' || form.isAnonymous"
 				type="checkbox"
 				class="checkbox">
 			<label for="submitOnce" class="title">
@@ -46,7 +46,7 @@
 			</label>
 
 			<input id="expires"
-				v-model="form.form.expires"
+				v-model="form.expires"
 
 				type="checkbox"
 				class="checkbox">
@@ -54,9 +54,9 @@
 				{{ t('forms', 'Expires') }}
 			</label>
 
-			<DatetimePicker v-show="form.form.expires"
+			<DatetimePicker v-show="form.expires"
 				id="expiresDatetimePicker"
-				v-model="form.form.expiresTimestamp"
+				v-model="form.expiresTimestamp"
 				v-bind="expirationDatePicker" />
 		</div>
 
@@ -66,7 +66,7 @@
 			</label>
 
 			<input id="registered"
-				v-model="form.form.access.type"
+				v-model="form.access.type"
 				type="radio"
 				value="registered"
 				class="radio">
@@ -76,7 +76,7 @@
 			</label>
 
 			<input id="public"
-				v-model="form.form.access.type"
+				v-model="form.access.type"
 				type="radio"
 				value="public"
 				class="radio">
@@ -86,7 +86,7 @@
 			</label>
 
 			<input id="selected"
-				v-model="form.form.access.type"
+				v-model="form.access.type"
 				type="radio"
 				value="selected"
 				class="radio">
@@ -96,7 +96,7 @@
 			</label>
 		</div>
 
-		<ShareDiv v-show="form.form.access.type === 'selected'"
+		<ShareDiv v-show="form.access.type === 'selected'"
 			:active-shares="form.shares"
 			:placeholder="t('forms', 'Name of user or group')"
 			:hide-names="true"

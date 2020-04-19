@@ -27,7 +27,13 @@
   -->
 
 <template>
-	<AppContent>
+	<AppContent v-if="loadingForm">
+		<EmptyContent icon="icon-loading">
+			{{ t('forms', 'Loading form “{title}”', { title: form.title }) }}
+		</EmptyContent>
+	</AppContent>
+
+	<AppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
 			<button class="primary" @click="showResults">
@@ -46,7 +52,7 @@
 			<label class="hidden-visually" for="form-title">{{ t('forms', 'Title') }}</label>
 			<input
 				id="form-title"
-				v-model="form.form.title"
+				v-model="form.title"
 				:minlength="0"
 				:placeholder="t('forms', 'Title')"
 				:required="true"
@@ -57,7 +63,7 @@
 			<textarea
 				id="form-desc"
 				ref="description"
-				v-model="form.form.description"
+				v-model="form.description"
 				:placeholder="t('forms', 'Description')"
 				@change="autoSizeDescription"
 				@keydown="autoSizeDescription" />
@@ -83,7 +89,7 @@
 			</div>
 
 			<!-- No questions -->
-			<EmptyContent v-if="form.questions.length === 0">
+			<EmptyContent v-if="hasQuestions">
 				{{ t('forms', 'This form does not have any questions') }}
 				<template #desc>
 					<button class="empty-content__button primary" @click="openQuestionMenu">
@@ -120,7 +126,8 @@
 						:key="question.id"
 						:model="answerTypes[question.type]"
 						:index="index + 1"
-						v-bind.sync="question" />
+						v-bind.sync="question"
+						@delete="deleteQuestion" />
 				</Draggable>
 			</form>
 		</section>
@@ -173,8 +180,9 @@ export default {
 		return {
 			questionMenuOpened: false,
 			answerTypes,
-			loadingForm: false,
+			loadingForm: true,
 			loadingQuestions: false,
+			errorForm: false,
 			questions: [
 				{
 					id: 1,
@@ -205,24 +213,15 @@ export default {
 
 	computed: {
 		title() {
-			if (this.form.form.title === '') {
+			if (this.form.title === '') {
 				return t('forms', 'Create new form')
 			} else {
-				return this.form.form.title
-
+				return this.form.title
 			}
 		},
-
-		saveButtonTitle() {
-			if (this.writingForm) {
-				return t('forms', 'Writing form')
-			} else if (this.form.mode === 'edit') {
-				return t('forms', 'Update form')
-			} else {
-				return t('forms', 'Done')
-			}
+		hasQuestions() {
+			return this.form.questions && this.form.questions.length === 0
 		},
-
 	},
 
 	watch: {
@@ -234,19 +233,35 @@ export default {
 		},
 	},
 
-	created() {
-		if (this.$route.name === 'edit') {
-			this.form.mode = 'edit'
-		} else if (this.$route.name === 'clone') {
-			// TODO: CLONE
-		}
+	beforeMount() {
+		this.fetchFullForm(this.form.id)
 	},
 
-	mounted() {
+	updated() {
 		this.autoSizeDescription()
 	},
 
 	methods: {
+		/**
+		 * Fetch the full form data and update parent
+		 *
+		 * @param {number} id the unique form hash
+		 */
+		async fetchFullForm(id) {
+			this.loadingForm = true
+			console.debug('Loading form', id)
+
+			try {
+				const form = await axios.get(generateUrl('/apps/forms/api/v1/form/{id}', { id }))
+				this.$emit('update:form', form.data)
+			} catch (error) {
+				console.error(error);
+				this.errorForm = true
+			} finally {
+				this.loadingForm = false
+			}
+		},
+
 		onSubmit() {
 			this.saveForm()
 		},
@@ -305,47 +320,25 @@ export default {
 			question.options.splice(index, 1)
 		},
 
-		checkAllHaveOpt() {
-			this.allHaveOpt = true
-			this.form.questions.forEach(q => {
-				if (q.type !== 'text' && q.type !== 'comment' && q.options.length === 0) {
-					this.allHaveOpt = false
-				}
-			})
-		},
-
 		autoSizeDescription() {
 			const textarea = this.$refs.description
-			textarea.style.cssText = 'height:auto; padding:0'
-			textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
+			if (textarea) {
+				textarea.style.cssText = 'height:auto; padding:0'
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
+			}
 		},
 
 		debounceSaveForm: debounce(function() {
 			this.saveForm()
 		}, 200),
 
-		saveForm() {
-			this.checkAllHaveOpt()
-			if (this.form.form.title.length === 0 | !(/\S/.test(this.form.form.title))) {
-				showError(t('forms', 'Title must not be empty!'), { duration: 3000 })
-			} else if (!this.allHaveOpt) {
-				showError(t('forms', 'All questions need answers!'), { duration: 3000 })
-			} else if (this.form.form.expires & this.form.form.expirationDate === '') {
-				showError(t('forms', 'Need to pick an expiration date!'), { duration: 3000 })
-			} else {
-
-				axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
-					.then((response) => {
-						this.form.mode = 'edit'
-						this.form.form.hash = response.data.hash
-						this.form.form.id = response.data.id
-						showSuccess(t('forms', '%n successfully saved', 1, this.form.form.title), { duration: 3000 })
-					}, (error) => {
-						this.form.form.hash = ''
-						showError(t('forms', 'Error on saving form, see console'))
-						/* eslint-disable-next-line no-console */
-						console.log(error.response)
-					})
+		async saveForm() {
+			try {
+				await axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
+				showSuccess(t('forms', '%n successfully saved', 1, this.form.title), { duration: 3000 })
+			} catch (error) {
+				showError(t('forms', 'Error on saving form, see console'))
+				console.error(error)
 			}
 		},
 
@@ -389,7 +382,7 @@ export default {
 </script>
 
 <style lang="scss">
-#app-content {
+.app-content {
 	display: flex;
 	align-items: center;
 	flex-direction: column;

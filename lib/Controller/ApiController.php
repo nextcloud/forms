@@ -119,6 +119,7 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Read Form-List only with necessary information for Listing.
 	 */
 	public function getForms(): Http\JSONResponse {
@@ -150,7 +151,7 @@ class ApiController extends Controller {
 		}
 
 		$result = $form->read();
-		$result['questions'] = getQuestions();
+		$result['questions'] = $this->getQuestions($id);
 
 		return new Http\JSONResponse($result);
 	}
