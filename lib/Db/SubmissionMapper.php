@@ -57,7 +57,9 @@ class SubmissionMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-			);
+			)
+			//Newest submissions first
+			->orderBy('timestamp', 'DESC');
 
 		return $this->findEntities($qb);
 	}

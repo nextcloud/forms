@@ -556,6 +556,25 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	private function getAnswers(int $submissionId): array {
+		try {
+			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
+		} catch (DoesNotExistException $e) {
+			//Just ignore, if no Data. Returns empty Answers-Array
+		}
+
+		// Load Answer-Data
+		$answers = [];
+		foreach ($answerEntities as $answerEntity) {
+			$answers[] = $answerEntity->read();
+		}
+
+		return $answers;
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function getSubmissions(string $hash): Http\JSONResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
@@ -569,24 +588,39 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$result = [];
-		$submissionList = $this->submissionMapper->findByForm($form->getId());
-		foreach ($submissionList as $submissionEntity) {
-			$answerList = $this->answerMapper->findBySubmission($submissionEntity->id);
-			foreach ($answerList as $answerEntity) {
-				$answer = $answerEntity->read();
-				//Temporary Adapt Data to be usable by old Results-View
-				$answer['userId'] = $submissionEntity->getUserId();
-
-				$question = $this->questionMapper->findById($answer['questionId']);
-				$answer['questionText'] = $question->getText();
-				$answer['questionType'] = $question->getType();
-
-				$result[] = $answer;
-			}
+		try {
+			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
+		} catch (DoesNotExistException $e) {
+			//Just ignore, if no Data. Returns empty Submissions-Array
 		}
 
-		return new Http\JSONResponse($result);
+		$submissions = [];
+		foreach ($submissionEntities as $submissionEntity) {
+			// Load Submission-Data & corresponding Answers
+			$submission = $submissionEntity->read();
+			$submission['answers'] = $this->getAnswers($submission['id']);
+
+			// Add to returned List of Submissions
+			$submissions[] = $submission;
+		}
+
+		// Load question-texts, including deleted ones.
+		try {
+			$questionEntities = $this->questionMapper->findByForm($form->getId());
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		}
+		$questions = [];
+		foreach ($questionEntities as $questionEntity) {
+			$questions[] = $questionEntity->read();
+		}
+
+		$response = [
+			'submissions' => $submissions,
+			'questions' => $questions,
+		];
+
+		return new Http\JSONResponse($response);
 	}
 
 	/**

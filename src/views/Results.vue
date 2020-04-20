@@ -39,9 +39,9 @@
 
 		<header v-if="!noSubmissions">
 			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
-			<div v-for="sum in stats" :key="sum">
+			<!-- <div v-for="sum in stats" :key="sum">
 				{{ sum }}
-			</div>
+			</div> -->
 		</header>
 
 		<!-- No submissions -->
@@ -56,11 +56,13 @@
 		</section>
 
 		<section v-else>
-			<button id="exportButton" class="primary" @click="download">
-				<span class="icon-download-white" role="img" />
-				{{ t('forms', 'Export to CSV') }}
-			</button>
-			<transition-group
+			<Submission
+				v-for="submission in submissions"
+				:key="submission.id"
+				:submission="submission"
+				:questions="questions" />
+
+			<!-- <transition-group
 				name="list"
 				tag="div"
 				class="table">
@@ -68,10 +70,10 @@
 					key="0"
 					:header="true" />
 				<ResultItem
-					v-for="answer in answers"
-					:key="answer.id"
-					:answer="answer" />
-			</transition-group>
+					v-for="submission in submissions"
+					:key="submission.id"
+					:answer="submission.answers[0]" />
+			</transition-group> -->
 		</section>
 	</AppContent>
 </template>
@@ -81,10 +83,11 @@ import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
-import json2csvParser from 'json2csv'
+// import json2csvParser from 'json2csv'
 
 import EmptyContent from '../components/EmptyContent'
-import ResultItem from '../components/resultItem'
+// import ResultItem from '../components/resultItem'
+import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
@@ -94,7 +97,7 @@ export default {
 	components: {
 		AppContent,
 		EmptyContent,
-		ResultItem,
+		Submission,
 		TopBar,
 	},
 
@@ -103,45 +106,14 @@ export default {
 	data() {
 		return {
 			loadingResults: true,
-			answers: [],
+			submissions: [],
+			questions: [],
 		}
 	},
 
 	computed: {
-		stats() {
-			const sums = []
-
-			if (this.answers != null) {
-				const uniqueAns = []
-				const uniqueQs = []
-				const ansToQ = new Map()
-				for (let i = 0; i < this.answers.length; i++) {
-					if (this.answers[i].questionType === 'radiogroup' || this.answers[i].questionType === 'dropdown') {
-						if (uniqueAns.includes(this.answers[i].text) === false) {
-							uniqueAns.push(this.answers[i].text)
-							ansToQ.set(this.answers[i].text, this.answers[i].questionId)
-						}
-						if (uniqueQs.includes(this.answers[i].questionId) === false) {
-							uniqueQs.push(this.answers[i].questionId)
-						}
-					}
-				}
-				for (let i = 0; i < uniqueAns.length; i++) {
-					sums[i] = 0
-				}
-				for (let i = 0; i < this.answers.length; i++) {
-					sums[uniqueAns.indexOf(this.answers[i].text)]++
-				}
-				for (let i = 0; i < sums.length; i++) {
-					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.answers.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
-				}
-			}
-
-			return sums.sort()
-		},
-
 		noSubmissions() {
-			return this.answers && this.answers.length === 0
+			return this.submissions && this.submissions.length === 0
 		},
 	},
 
@@ -150,7 +122,6 @@ export default {
 	},
 
 	methods: {
-
 		showEdit() {
 			this.$router.push({
 				name: 'edit',
@@ -168,8 +139,9 @@ export default {
 				const response = await axios.get(generateUrl('/apps/forms/api/v1/submissions/{hash}', {
 					hash: this.form.hash,
 				}))
-				this.answers = response.data
-				console.debug(this.answers)
+				this.submissions = response.data.submissions
+				this.questions = response.data.questions
+				console.debug(this.submissions)
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while loading results'))
@@ -178,9 +150,9 @@ export default {
 			}
 		},
 
-		download() {
+/* 		download() {
 			this.loading = true
-			axios.get(generateUrl('apps/forms/get/form/' + this.$route.params.hash))
+			axios.get(OC.generateUrl('apps/forms/get/form/' + this.$route.params.hash))
 				.then((response) => {
 					this.json2csvParser = ['userId', 'questionId', 'questionText', 'Answer'] // TODO Is this one necessary??
 					const formattedAns = []
@@ -202,26 +174,11 @@ export default {
 					document.body.removeChild(element)
 					this.loading = false
 				}, (error) => {
-					/* eslint-disable-next-line no-console */
+					/* eslint-disable-next-line no-console *
 					console.log(error.response)
 					this.loading = false
 				})
-		},
+		}, */
 	},
 }
 </script>
-
-<style lang="scss" scoped>
-.table {
-	width: 100%;
-	margin-top: 45px;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-wrap: nowrap;
-}
-
-#exportButton {
-	width: max-content;
-}
-</style>
