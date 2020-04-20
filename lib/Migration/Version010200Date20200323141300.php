@@ -105,7 +105,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'notnull' => false,
 				'comment' => 'unix-timestamp',
 			]);
-			$table->addColumn('expires_timestamp', Type::INTEGER, [
+			$table->addColumn('expires', Type::INTEGER, [
 				'notnull' => false,
 				'default' => 0,
 				'comment' => 'unix-timestamp',
@@ -237,7 +237,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 						'owner_id' => $qb_restore->createNamedParameter($event['owner'], IQueryBuilder::PARAM_STR),
 						'access_json' => $qb_restore->createNamedParameter($newAccessJSON, IQueryBuilder::PARAM_STR),
 						'created' => $qb_restore->createNamedParameter($this->convertDateTime($event['created']), IQueryBuilder::PARAM_INT),
-						'expires_timestamp' => $qb_restore->createNamedParameter($this->convertDateTime($event['expire']), IQueryBuilder::PARAM_INT),
+						'expires' => $qb_restore->createNamedParameter($this->convertDateTime($event['expire']), IQueryBuilder::PARAM_INT),
 						'is_anonymous' => $qb_restore->createNamedParameter($event['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 						'submit_once' => $qb_restore->createNamedParameter($event['unique'], IQueryBuilder::PARAM_BOOL)
 					]);

@@ -26,7 +26,7 @@ export default {
 		/**
 		 * The question title
 		 */
-		title: {
+		text: {
 			type: String,
 			required: true,
 		},
@@ -73,10 +73,10 @@ export default {
 		/**
 		 * Forward the title change to the parent
 		 *
-		 * @param {string} title the title
+		 * @param {string} text the title
 		 */
-		onTitleChange(title) {
-			this.$emit('update:title', title)
+		onTitleChange(text) {
+			this.$emit('update:text', text)
 		},
 
 		/**
@@ -86,6 +86,13 @@ export default {
 		 */
 		onValuesChange(values) {
 			this.$emit('update:values', values)
+		},
+
+		/**
+		 * Delete this question
+		 */
+		onDelete() {
+			this.$emit('delete')
 		},
 	},
 }

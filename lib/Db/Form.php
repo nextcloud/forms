@@ -41,8 +41,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setAccess(array $value)
  * @method integer getCreated()
  * @method void setCreated(integer $value)
- * @method integer getExpiresTimestamp()
- * @method void setExpiresTimestamp(integer $value)
+ * @method integer getExpires()
+ * @method void setExpires(integer $value)
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(bool $value)
  * @method integer getSubmitOnce()
@@ -56,7 +56,7 @@ class Form extends Entity {
 	protected $ownerId;
 	protected $accessJson;
 	protected $created;
-	protected $expiresTimestamp;
+	protected $expires;
 	protected $isAnonymous;
 	protected $submitOnce;
 
@@ -65,7 +65,7 @@ class Form extends Entity {
 	 */
 	public function __construct() {
 		$this->addType('created', 'integer');
-		$this->addType('expiresTimestamp', 'integer');
+		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'bool');
 		$this->addType('submitOnce', 'bool');
 	}
@@ -80,20 +80,6 @@ class Form extends Entity {
 		$this->setAccessJson(json_encode($access));
 	}
 
-	// Get virtual column expires. Set should only be done by setExpiresTimestamp().
-	public function getExpires(): bool {
-		return (bool) $this->getExpiresTimestamp();
-	}
-
-	// Get virtual column expired. Set should only be done by setExpiresTimestamp().
-	public function getExpired(): bool {
-		if ($this->getExpires()) {
-			return time() > $this->getExpiresTimestamp();
-		}
-		// else - does not expire
-		return false;
-	}
-
 	// Read full form
 	public function read() {
 		return [
@@ -102,12 +88,9 @@ class Form extends Entity {
 			'title' => $this->getTitle(),
 			'description' => $this->getDescription(),
 			'ownerId' => $this->getOwnerId(),
-			'ownerDisplayName' => \OC_User::getDisplayName($this->getOwnerId()),
 			'created' => $this->getCreated(),
 			'access' => $this->getAccess(),
 			'expires' => $this->getExpires(),
-			'expired' => $this->getExpired(),
-			'expiresTimestamp' => $this->getExpiresTimestamp(),
 			'isAnonymous' => $this->getIsAnonymous(),
 			'submitOnce' => $this->getSubmitOnce()
 		];

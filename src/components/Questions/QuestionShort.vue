@@ -23,13 +23,14 @@
 <template>
 	<Question
 		v-bind.sync="$attrs"
-		:title="title"
+		:text="text"
 		:edit.sync="edit"
-		@update:title="onTitleChange">
+		@delete="onDelete"
+		@update:text="onTitleChange">
 		<div class="question__content">
 			<!-- TODO: properly choose max length -->
 			<input ref="input"
-				:aria-label="t('forms', 'A short answer for the question “{title}”', { title })"
+				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
 				:placeholder="t('forms', 'Short answer text')"
 				:readonly="edit"
 				:value="values[0]"

@@ -46,7 +46,7 @@
 			</label>
 
 			<input id="expires"
-				v-model="form.expires"
+				v-model="formExpires"
 
 				type="checkbox"
 				class="checkbox">
@@ -54,9 +54,9 @@
 				{{ t('forms', 'Expires') }}
 			</label>
 
-			<DatetimePicker v-show="form.expires"
+			<DatetimePicker v-show="formExpires"
 				id="expiresDatetimePicker"
-				v-model="form.expiresTimestamp"
+				v-model="form.expires"
 				v-bind="expirationDatePicker" />
 		</div>
 
@@ -131,6 +131,7 @@ export default {
 			locale: '',
 			longDateFormat: '',
 			dateTimeFormat: '',
+			formExpires: false,
 		}
 	},
 
@@ -151,21 +152,17 @@ export default {
 				},
 			}
 		},
+	},
 
-		optionDatePicker() {
-			return {
-				editable: false,
-				minuteStep: 1,
-				type: 'datetime',
-				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
-				lang: this.lang.split('-')[0],
-				placeholder: t('forms', 'Click to add a date'),
-				timePickerOptions: {
-					start: '00:00',
-					step: '00:30',
-					end: '23:30',
-				},
-			}
+	watch: {
+		formExpires: {
+			handler: function() {
+				if (!this.formExpires) {
+					this.form.expires = 0
+				} else {
+					this.form.expires = moment().unix() + 3600 // Expires in one hour.
+				}
+			},
 		},
 	},
 
@@ -184,6 +181,13 @@ export default {
 		moment.locale(this.locale)
 		this.longDateFormat = moment.localeData().longDateFormat('L')
 		this.dateTimeFormat = moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT')
+
+		// Compute current formExpires for checkbox
+		if (this.form.expires) {
+			this.formExpires = true
+		} else {
+			this.formExpires = false
+		}
 
 		// Watch for Sidebar toggle
 		subscribe('toggleSidebar', this.onToggle)
