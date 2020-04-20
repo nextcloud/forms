@@ -131,7 +131,7 @@ class ApiController extends Controller {
 				'id' => $form->getId(),
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
-				'expired' => $form->getExpired(),
+				'expires' => $form->getExpires(),
 			];
 		}
 

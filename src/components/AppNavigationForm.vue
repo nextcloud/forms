@@ -66,6 +66,7 @@ import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
 import AppNavigationIconBullet from '@nextcloud/vue/dist/Components/AppNavigationIconBullet'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
 
@@ -106,7 +107,7 @@ export default {
 		 */
 		bulletColor() {
 			const style = getComputedStyle(document.body)
-			if (this.form.expired) {
+			if (this.form.expires && moment().unix() > this.form.expires) {
 				return style.getPropertyValue('--color-error').slice(-6)
 			}
 			return style.getPropertyValue('--color-success').slice(-6)
