@@ -58,6 +58,7 @@
 				:required="true"
 				autofocus
 				type="text"
+				@change="onTitleChange"
 				@click="selectIfUnchanged">
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
@@ -65,7 +66,7 @@
 				ref="description"
 				v-model="form.description"
 				:placeholder="t('forms', 'Description')"
-				@change="autoSizeDescription"
+				@change="onDescChange"
 				@keydown="autoSizeDescription" />
 		</header>
 
@@ -229,6 +230,38 @@ export default {
 		},
 
 		/**
+		 * Save form on submit
+		 */
+		onSubmit: debounce(function() {
+			this.saveForm()
+		}, 200),
+
+		async saveFormProperty(key) {
+			try {
+				// TODO: add loading status feedback ?
+				await axios.post(OC.generateUrl('/apps/forms/api/v1/question/update'), {
+					id: this.form.id,
+					keyValuePairs: {
+						[key]: this.form[key],
+					},
+				})
+			} catch (error) {
+				showError(t('forms', 'Error while saving form'))
+				console.error(error)
+			}
+		},
+
+		/**
+		 * Title & description save methods
+		 */
+		onTitleChange: debounce(function() {
+			this.saveFormProperty('title')
+		}, 200),
+		onDescChange: debounce(function() {
+			this.saveFormProperty('description')
+		}, 200),
+
+		/**
 		 * Add a new question to the current form
 		 *
 		 * @param {string} type the question type, see AnswerTypes
@@ -287,48 +320,38 @@ export default {
 			}
 		},
 
-		async addOption(item, question) {
-			const response = await axios.post(generateUrl('/apps/forms/api/v1/option/'), { formId: this.form.id, questionId: question.id, text: item.newOption })
-			const optionId = response.data
-
-			question.options.push({
-				id: optionId,
-				text: item.newOption,
-			})
-		},
-
-		async deleteOption(question, option, index) {
-			await axios.delete(generateUrl('/apps/forms/api/v1/option/{id}', { id: option.id }))
-			// TODO catch errors
-			question.options.splice(index, 1)
-		},
-
 		/**
-		 * Auto adjust the description height based on lines number
+		 * Reorder questions on dragEnd
 		 */
-		autoSizeDescription() {
-			const textarea = this.$refs.description
-			if (textarea) {
-				textarea.style.cssText = 'height:auto; padding:0'
-				textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
-			}
-		},
+		async onQuestionOrderChange() {
+			this.isLoadingQuestions = true
+			const newOrder = this.form.questions.map(question => question.id)
 
-		/**
-		 * Save form on submit
-		 */
-		onSubmit: debounce(function() {
-			this.saveForm()
-		}, 200),
-
-		async saveForm() {
 			try {
-				// TODO: add loading status feedback ?
-				await axios.post(OC.generateUrl('/apps/forms/api/v1/question/update'), this.form)
+				await axios.post(OC.generateUrl('/apps/forms/api/v1/question/reorder'), {
+					formId: this.form.id,
+					newOrder,
+				})
 			} catch (error) {
 				showError(t('forms', 'Error while saving form'))
 				console.error(error)
+			} finally {
+				this.isLoadingQuestions = false
 			}
+		},
+
+		/**
+		 * Add question methods
+		 */
+		openQuestionMenu() {
+			// TODO: fix the vue components to allow external click triggers without
+			// conflicting with the click outside directive
+			setTimeout(() => {
+				this.questionMenuOpened = true
+				this.$nextTick(() => {
+					this.$refs.questionMenu.focusFirstAction()
+				})
+			}, 10)
 		},
 
 		/**
@@ -347,20 +370,6 @@ export default {
 		},
 
 		/**
-		 * Add question methods
-		 */
-		openQuestionMenu() {
-			// TODO: fix the vue components to allow external click triggers without
-			// conflicting with the click outside directive
-			setTimeout(() => {
-				this.questionMenuOpened = true
-				this.$nextTick(() => {
-					this.$refs.questionMenu.focusFirstAction()
-				})
-			}, 10)
-		},
-
-		/**
 		 * Select the text in the input if it is still set to 'New form'
 		 * @param {Event} e the click event
 		 */
@@ -371,23 +380,13 @@ export default {
 		},
 
 		/**
-		 * Reorder questions on dragEnd
+		 * Auto adjust the description height based on lines number
 		 */
-		async onQuestionOrderChange() {
-			this.isLoadingQuestions = true
-			const newOrder = this.form.questions.map(question => question.id)
-			console.info(newOrder);
-
-			try {
-				await axios.post(OC.generateUrl('/apps/forms/api/v1/question/reorder'), {
-					formId: this.form.id,
-					newOrder,
-				})
-			} catch (error) {
-				showError(t('forms', 'Error while saving form'))
-				console.error(error)
-			} finally {
-				this.isLoadingQuestions = false
+		autoSizeDescription() {
+			const textarea = this.$refs.description
+			if (textarea) {
+				textarea.style.cssText = 'height:auto; padding:0'
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
 			}
 		},
 	},
