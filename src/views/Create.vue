@@ -237,21 +237,6 @@ export default {
 			this.saveForm()
 		}, 200),
 
-		async saveFormProperty(key) {
-			try {
-				// TODO: add loading status feedback ?
-				await axios.post(generateUrl('/apps/forms/api/v1/form/update'), {
-					id: this.form.id,
-					keyValuePairs: {
-						[key]: this.form[key],
-					},
-				})
-			} catch (error) {
-				showError(t('forms', 'Error while saving form'))
-				console.error(error)
-			}
-		},
-
 		/**
 		 * Title & description save methods
 		 */

@@ -31,7 +31,8 @@
 				v-model="form.isAnonymous"
 
 				type="checkbox"
-				class="checkbox">
+				class="checkbox"
+				@change="onAnonChange">
 			<label for="isAnonymous" class="title">
 				{{ t('forms', 'Anonymous form') }}
 			</label>
@@ -40,7 +41,8 @@
 				v-model="form.submitOnce"
 				:disabled="form.access.type === 'public' || form.isAnonymous"
 				type="checkbox"
-				class="checkbox">
+				class="checkbox"
+				@change="onSubmOnceChange">
 			<label for="submitOnce" class="title">
 				<span>{{ t('forms', 'Only allow one submission per user') }}</span>
 			</label>
@@ -57,7 +59,8 @@
 			<DatetimePicker v-show="formExpires"
 				id="expiresDatetimePicker"
 				v-model="form.expires"
-				v-bind="expirationDatePicker" />
+				v-bind="expirationDatePicker"
+				@change="onExpiresChange" />
 		</div>
 
 		<div class="configBox">
@@ -69,7 +72,8 @@
 				v-model="form.access.type"
 				type="radio"
 				value="registered"
-				class="radio">
+				class="radio"
+				@change="onAccessChange">
 			<label for="registered" class="title">
 				<div class="title icon-group" />
 				<span>{{ t('forms', 'Registered users only') }}</span>
@@ -79,7 +83,8 @@
 				v-model="form.access.type"
 				type="radio"
 				value="public"
-				class="radio">
+				class="radio"
+				@change="onAccessChange">
 			<label for="public" class="title">
 				<div class="title icon-link" />
 				<span>{{ t('forms', 'Public access') }}</span>
@@ -89,7 +94,8 @@
 				v-model="form.access.type"
 				type="radio"
 				value="selected"
-				class="radio">
+				class="radio"
+				@change="onAccessChange">
 			<label for="selected" class="title">
 				<div class="title icon-shared" />
 				<span>{{ t('forms', 'Only shared') }}</span>
@@ -159,6 +165,7 @@ export default {
 			handler: function() {
 				if (!this.formExpires) {
 					this.form.expires = 0
+					this.onExpiresChange()
 				} else {
 					this.form.expires = moment().unix() + 3600 // Expires in one hour.
 				}
@@ -218,6 +225,22 @@ export default {
 		},
 		onToggle() {
 			this.opened = !this.opened
+		},
+
+		/**
+		 * Save Form-Properties
+		 */
+		onAnonChange() {
+			this.saveFormProperty('isAnonymous')
+		},
+		onSubmOnceChange() {
+			this.saveFormProperty('submitOnce')
+		},
+		onAccessChange() {
+			this.saveFormProperty('access')
+		},
+		onExpiresChange() {
+			this.saveFormProperty('expires')
 		},
 	},
 }
