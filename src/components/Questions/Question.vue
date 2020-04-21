@@ -36,14 +36,14 @@
 			<input v-if="edit"
 				:placeholder="t('forms', 'Enter a title for this question')"
 				:aria-label="t('forms', 'The title of the question number {index}', {index})"
-				:value="title"
+				:value="text"
 				class="question__header-title"
 				type="text"
 				minlength="1"
 				maxlength="256"
 				required
 				@input="onInput">
-			<h3 v-else class="question__header-title" v-text="title" />
+			<h3 v-else class="question__header-title" v-text="text" />
 			<Actions class="question__header-menu" :force-menu="true">
 				<ActionButton icon="icon-delete" @click="onDelete">
 					{{ t('forms', 'Delete question') }}
@@ -82,7 +82,7 @@ export default {
 			type: Number,
 			required: true,
 		},
-		title: {
+		text: {
 			type: String,
 			required: true,
 		},
@@ -94,7 +94,7 @@ export default {
 
 	methods: {
 		onInput({ target }) {
-			this.$emit('update:title', target.value)
+			this.$emit('update:text', target.value)
 		},
 
 		/**
@@ -115,7 +115,7 @@ export default {
 		 * Delete this question
 		 */
 		onDelete() {
-			this.$emit('delete', this.id)
+			this.$emit('delete')
 		},
 	},
 }

@@ -23,9 +23,10 @@
 <template>
 	<Question
 		v-bind.sync="$attrs"
-		:title="title"
+		:text="text"
 		:edit.sync="edit"
-		@update:title="onTitleChange">
+		@delete="onDelete"
+		@update:text="onTitleChange">
 		<ul class="question__content" :role="isUnique ? 'radiogroup' : ''">
 			<template v-for="(answer, index) in options">
 				<li :key="index" class="question__item">
@@ -45,7 +46,7 @@
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${index}`"
-						class="question__label">{{ answer }}</label>
+						class="question__label">{{ answer.text }}</label>
 
 					<!-- Answer text input edit -->
 					<!-- TODO: properly choose max length -->
@@ -53,7 +54,7 @@
 						ref="input"
 						:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
 						:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
-						:value="answer"
+						:value="answer.text"
 						class="question__input"
 						maxlength="256"
 						minlength="1"

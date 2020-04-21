@@ -100,34 +100,19 @@
 			</EmptyContent>
 
 			<!-- Questions list -->
-			<!-- <transitionGroup
-				v-else
-				id="form-list"
-				name="list"
-				tag="ul"
-				class="form-table">
-				<QuizFormItem
-					v-for="(question, index) in form.questions"
-					:key="question.id"
-					:question="question"
-					:type="question.type"
-					@addOption="addOption"
-					@deleteOption="deleteOption"
-					@deleteQuestion="deleteQuestion(question, index)" />
-			</transitionGroup> -->
 			<form @submit.prevent="onSubmit">
-				<Draggable v-model="questions"
+				<Draggable v-model="form.questions"
 					:animation="200"
 					tag="ul"
 					@start="dragging = true"
 					@end="dragging = false">
 					<Questions :is="answerTypes[question.type].component"
-						v-for="(question, index) in questions"
+						v-for="(question, index) in form.questions"
 						:key="question.id"
 						:model="answerTypes[question.type]"
 						:index="index + 1"
 						v-bind.sync="question"
-						@delete="deleteQuestion" />
+						@delete="deleteQuestion(question)" />
 				</Draggable>
 			</form>
 		</section>
@@ -183,30 +168,6 @@ export default {
 			loadingForm: true,
 			loadingQuestions: false,
 			errorForm: false,
-			questions: [
-				{
-					id: 1,
-					type: 'short',
-					title: 'How old are you ?',
-				},
-				{
-					id: 2,
-					type: 'long',
-					title: 'Your latest best memory ?',
-				},
-				{
-					id: 3,
-					type: 'multiple',
-					title: 'Choose an answer ?',
-					options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
-				},
-				{
-					id: 4,
-					type: 'multiple_unique',
-					title: 'Choose an answer ?',
-					options: ['Answer 1', 'Answer 2', 'Answer 3', 'Answer 4'],
-				},
-			],
 			dragging: false,
 		}
 	},
@@ -227,8 +188,12 @@ export default {
 	watch: {
 		form: {
 			deep: true,
-			handler: function() {
-				this.debounceWriteForm()
+			handler: function(newForm, oldForm) {
+				if (newForm.hash === oldForm.hash) {
+					this.debounceSaveForm()
+				} else {
+					this.fetchFullForm(newForm.id)
+				}
 			},
 		},
 	},
@@ -262,7 +227,7 @@ export default {
 			}
 		},
 
-		onSubmit() {
+		onSubmit(e) {
 			this.saveForm()
 		},
 
@@ -298,10 +263,26 @@ export default {
 			}
 		},
 
-		async deleteQuestion(question, index) {
-			await axios.delete(generateUrl('/apps/forms/api/v1/question/{id}', { id: question.id }))
-			// TODO catch Error
-			this.form.questions.splice(index, 1)
+		/**
+		 * Delete a question
+		 * @param {Object} question the question to delete
+		 * @param {number} question.id the question id to delete
+		 */
+		async deleteQuestion(question) {
+			console.info(question)
+			const id = question.id
+			this.loadingQuestions = true
+
+			try {
+				await axios.delete(generateUrl('/apps/forms/api/v1/question/{id}', { id }))
+				const index = this.form.questions.findIndex(search => search.id === id)
+				this.form.questions.splice(index, 1)
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while removing the question'))
+			} finally {
+				this.loadingQuestions = false
+			}
 		},
 
 		async addOption(item, question) {
@@ -320,6 +301,9 @@ export default {
 			question.options.splice(index, 1)
 		},
 
+		/**
+		 * Auto adjust the description height based on lines number
+		 */
 		autoSizeDescription() {
 			const textarea = this.$refs.description
 			if (textarea) {
@@ -328,14 +312,17 @@ export default {
 			}
 		},
 
+		/**
+		 * Forms saving handlers
+		 */
 		debounceSaveForm: debounce(function() {
 			this.saveForm()
 		}, 200),
 
 		async saveForm() {
 			try {
-				await axios.post(OC.generateUrl('apps/forms/write/form'), this.form)
-				showSuccess(t('forms', '%n successfully saved', 1, this.form.title), { duration: 3000 })
+				// TODO: add loading status feedback ?
+				await axios.post(OC.generateUrl('/apps/forms/write/form'), this.form)
 			} catch (error) {
 				showError(t('forms', 'Error on saving form, see console'))
 				console.error(error)
@@ -365,7 +352,10 @@ export default {
 			// conflicting with the click outside directive
 			setTimeout(() => {
 				this.questionMenuOpened = true
-			}, 100)
+				this.$nextTick(() => {
+					this.$refs.questionMenu.focusFirstAction()
+				})
+			}, 10)
 		},
 
 		/**
@@ -437,7 +427,8 @@ export default {
 
 		.question-toolbar {
 			position: sticky;
-			z-index: 50;
+			// Above other menus
+			z-index: 55;
 			top: var(--header-height);
 			display: flex;
 			align-items: center;
@@ -446,6 +437,7 @@ export default {
 			height: var(--top-bar-height);
 			// make sure this doesn't take any space and appear floating
 			margin-top: -44px;
+
 			.icon-add-white {
 				opacity: 1;
 				border-radius: 50%;
