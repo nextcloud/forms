@@ -240,7 +240,7 @@ export default {
 		async saveFormProperty(key) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(OC.generateUrl('/apps/forms/api/v1/question/update'), {
+				await axios.post(generateUrl('/apps/forms/api/v1/form/update'), {
 					id: this.form.id,
 					keyValuePairs: {
 						[key]: this.form[key],
@@ -329,7 +329,7 @@ export default {
 			const newOrder = this.form.questions.map(question => question.id)
 
 			try {
-				await axios.post(OC.generateUrl('/apps/forms/api/v1/question/reorder'), {
+				await axios.post(generateUrl('/apps/forms/api/v1/question/reorder'), {
 					formId: this.form.id,
 					newOrder,
 				})
