@@ -109,9 +109,10 @@
 					@change="onQuestionOrderChange"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<Questions ref="questions"
+					<Questions
 						:is="answerTypes[question.type].component"
 						v-for="(question, index) in form.questions"
+						ref="questions"
 						:key="question.id"
 						:model="answerTypes[question.type]"
 						:index="index + 1"
@@ -126,7 +127,7 @@
 <script>
 import { emit } from '@nextcloud/event-bus'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
@@ -394,7 +395,7 @@ export default {
 </script>
 
 <style lang="scss">
-.app-content {
+#app-content {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
@@ -475,94 +476,94 @@ export default {
 	}
 }
 
-// /* Transitions for inserting and removing list items */
-// .list-enter-active,
-// .list-leave-active {
-// 	transition: all .5s ease;
-// }
+/* Transitions for inserting and removing list items */
+/*.list-enter-active,
+.list-leave-active {
+	transition: all .5s ease;
+}
 
-// .list-enter,
-// .list-leave-to {
-// 	opacity: 0;
-// }
+.list-enter,
+.list-leave-to {
+	opacity: 0;
+}
 
-// .list-move {
-// 	transition: transform .5s;
-// }
+.list-move {
+	transition: transform .5s;
+}
 
-// #form-item-selector-text {
-// 	> input {
-// 		width: 100%;
-// 	}
-// }
+#form-item-selector-text {
+	> input {
+		width: 100%;
+	}
+}
 
-// .form-table {
-// 	> li {
-// 		display: flex;
-// 		overflow: hidden;
-// 		align-items: baseline;
-// 		min-height: 24px;
-// 		padding-right: 8px;
-// 		padding-left: 8px;
-// 		white-space: nowrap;
-// 		border-bottom: 1px solid var(--color-border);
-// 		line-height: 24px;
+.form-table {
+	> li {
+		display: flex;
+		overflow: hidden;
+		align-items: baseline;
+		min-height: 24px;
+		padding-right: 8px;
+		padding-left: 8px;
+		white-space: nowrap;
+		border-bottom: 1px solid var(--color-border);
+		line-height: 24px;
 
-// 		&:active,
-// 		&:hover {
-// 			transition: var(--background-dark) .3s ease;
-// 			background-color: var(--color-background-dark); //$hover-color;
-// 		}
+		&:active,
+		&:hover {
+			transition: var(--background-dark) .3s ease;
+			background-color: var(--color-background-dark); //$hover-color;
+		}
 
-// 		> div {
-// 			display: flex;
-// 			flex-grow: 1;
-// 			padding-right: 4px;
-// 			white-space: normal;
-// 			opacity: .7;
-// 			font-size: 1.2em;
-// 			&.avatar {
-// 				flex-grow: 0;
-// 			}
-// 		}
+		> div {
+			display: flex;
+			flex-grow: 1;
+			padding-right: 4px;
+			white-space: normal;
+			opacity: .7;
+			font-size: 1.2em;
+			&.avatar {
+				flex-grow: 0;
+			}
+		}
 
-// 		> div:nth-last-child(1) {
-// 			flex-grow: 0;
-// 			flex-shrink: 0;
-// 			justify-content: center;
-// 		}
-// 	}
-// }
+		> div:nth-last-child(1) {
+			flex-grow: 0;
+			flex-shrink: 0;
+			justify-content: center;
+		}
+	}
+}
 
-// button {
-// 	&.button-inline {
-// 		border: 0;
-// 		background-color: transparent;
-// 	}
-// }
+button {
+	&.button-inline {
+		border: 0;
+		background-color: transparent;
+	}
+}
 
-// .tab {
-// 	display: flex;
-// 	flex-wrap: wrap;
-// }
-// .selectUnit {
-// 	display: flex;
-// 	align-items: center;
-// 	flex-wrap: nowrap;
-// 	> label {
-// 		padding-right: 4px;
-// 	}
-// }
+.tab {
+	display: flex;
+	flex-wrap: wrap;
+}
+.selectUnit {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	> label {
+		padding-right: 4px;
+	}
+}
 
-// #shiftDates {
-// 	min-width: 16px;
-// 	min-height: 16px;
-// 	margin: 0;
-// 	padding: 10px;
-// 	padding-left: 34px;
-// 	text-align: left;
-// 	background-repeat: no-repeat;
-// 	background-position: 10px center;
-// }
+#shiftDates {
+	min-width: 16px;
+	min-height: 16px;
+	margin: 0;
+	padding: 10px;
+	padding-left: 34px;
+	text-align: left;
+	background-repeat: no-repeat;
+	background-position: 10px center;
+} */
 
 </style>
