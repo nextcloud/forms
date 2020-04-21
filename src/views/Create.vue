@@ -337,7 +337,7 @@ export default {
 			this.$router.push({
 				name: 'results',
 				params: {
-					hash: this.form.event.hash,
+					hash: this.form.hash,
 				},
 			})
 		},
