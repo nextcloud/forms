@@ -302,7 +302,7 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * Updates the Order of all Questions of a Form.
 	 * @param int $formId Id of the form to reorder
-	 * @param int $newOrder Array of Question-Ids in new order.
+	 * @param int[] $newOrder Array of Question-Ids in new order.
 	 */
 	public function reorderQuestions(int $formId, array $newOrder): Http\JSONResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
