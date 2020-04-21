@@ -27,7 +27,7 @@
   -->
 
 <template>
-	<AppContent v-if="loadingForm">
+	<AppContent v-if="isLoadingForm">
 		<EmptyContent icon="icon-loading">
 			{{ t('forms', 'Loading form “{title}”', { title: form.title }) }}
 		</EmptyContent>
@@ -76,10 +76,11 @@
 					v-tooltip="t('forms', 'Add a question to this form')"
 					:aria-label="t('forms', 'Add a question to this form')"
 					:open.sync="questionMenuOpened"
-					:default-icon="loadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
+					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
 					<ActionButton v-for="(answer, type) in answerTypes"
 						:key="answer.label"
-						:disabled="loadingQuestions"
+						:close-after-click="true"
+						:disabled="isLoadingQuestions"
 						:icon="answer.icon"
 						class="question-toolbar__question"
 						@click="addQuestion(type)">
@@ -104,9 +105,10 @@
 				<Draggable v-model="form.questions"
 					:animation="200"
 					tag="ul"
-					@start="dragging = true"
-					@end="dragging = false">
-					<Questions :is="answerTypes[question.type].component"
+					@start="isDragging = true"
+					@end="isDragging = false">
+					<Questions ref="questions"
+						:is="answerTypes[question.type].component"
 						v-for="(question, index) in form.questions"
 						:key="question.id"
 						:model="answerTypes[question.type]"
@@ -165,10 +167,13 @@ export default {
 		return {
 			questionMenuOpened: false,
 			answerTypes,
-			loadingForm: true,
-			loadingQuestions: false,
+
+			// Various states
+			isLoadingForm: true,
+			isLoadingQuestions: false,
 			errorForm: false,
-			dragging: false,
+
+			isDragging: false,
 		}
 	},
 
@@ -186,15 +191,10 @@ export default {
 	},
 
 	watch: {
-		form: {
-			deep: true,
-			handler: function(newForm, oldForm) {
-				if (newForm.hash === oldForm.hash) {
-					this.debounceSaveForm()
-				} else {
-					this.fetchFullForm(newForm.id)
-				}
-			},
+		// Fetch full form on change
+		hash() {
+			// TODO: cancel previous request if not done
+			this.fetchFullForm(this.form.id)
 		},
 	},
 
@@ -213,7 +213,7 @@ export default {
 		 * @param {number} id the unique form hash
 		 */
 		async fetchFullForm(id) {
-			this.loadingForm = true
+			this.isLoadingForm = true
 			console.debug('Loading form', id)
 
 			try {
@@ -223,12 +223,8 @@ export default {
 				console.error(error)
 				this.errorForm = true
 			} finally {
-				this.loadingForm = false
+				this.isLoadingForm = false
 			}
-		},
-
-		onSubmit(e) {
-			this.saveForm()
 		},
 
 		/**
@@ -238,7 +234,7 @@ export default {
 		 */
 		async addQuestion(type) {
 			const text = t('forms', 'New question')
-			this.loadingQuestions = true
+			this.isLoadingQuestions = true
 
 			try {
 				const response = await axios.post(generateUrl('/apps/forms/api/v1/question'), {
@@ -255,23 +251,28 @@ export default {
 					answers: [],
 				}, question))
 
+				// Focus newly added question
+				this.$nextTick(() => {
+					const lastQuestion = this.$refs.questions[this.$refs.questions.length - 1]
+					lastQuestion.focus()
+				})
+
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while adding the new question'))
 			} finally {
-				this.loadingQuestions = false
+				this.isLoadingQuestions = false
 			}
 		},
 
 		/**
 		 * Delete a question
+		 *
 		 * @param {Object} question the question to delete
 		 * @param {number} question.id the question id to delete
 		 */
-		async deleteQuestion(question) {
-			console.info(question)
-			const id = question.id
-			this.loadingQuestions = true
+		async deleteQuestion({ id }) {
+			this.isLoadingQuestions = true
 
 			try {
 				await axios.delete(generateUrl('/apps/forms/api/v1/question/{id}', { id }))
@@ -281,7 +282,7 @@ export default {
 				console.error(error)
 				showError(t('forms', 'There was an error while removing the question'))
 			} finally {
-				this.loadingQuestions = false
+				this.isLoadingQuestions = false
 			}
 		},
 
@@ -313,16 +314,16 @@ export default {
 		},
 
 		/**
-		 * Forms saving handlers
+		 * Save form on submit
 		 */
-		debounceSaveForm: debounce(function() {
+		onSubmit: debounce(function() {
 			this.saveForm()
 		}, 200),
 
 		async saveForm() {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(OC.generateUrl('/apps/forms/write/form'), this.form)
+				await axios.post(OC.generateUrl('/apps/forms/update/form'), this.form)
 			} catch (error) {
 				showError(t('forms', 'Error on saving form, see console'))
 				console.error(error)

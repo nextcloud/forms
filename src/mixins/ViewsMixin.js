@@ -21,6 +21,10 @@
 
 export default {
 	props: {
+		hash: {
+			type: String,
+			default: '',
+		},
 		form: {
 			type: Object,
 			required: true,
