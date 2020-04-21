@@ -94,5 +94,19 @@ export default {
 		onDelete() {
 			this.$emit('delete')
 		},
+
+		/**
+		 * Focus the first focusable element
+		 */
+		focus() {
+			this.edit = true
+			this.$el.scrollIntoView({ behavior: 'smooth' })
+			this.$nextTick(() => {
+				const title = this.$el.querySelector('.question__header-title')
+				if (title) {
+					title.select()
+				}
+			})
+		},
 	},
 }

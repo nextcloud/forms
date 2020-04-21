@@ -25,7 +25,7 @@
 	<Content app-name="forms">
 		<AppNavigation>
 			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
-			<AppNavigationForm v-for="form in formattedForms"
+			<AppNavigationForm v-for="form in forms"
 				:key="form.id"
 				:form="form"
 				@delete="onDeleteForm" />
@@ -71,8 +71,6 @@ import Content from '@nextcloud/vue/dist/Components/Content'
 import AppNavigationForm from './components/AppNavigationForm'
 import EmptyContent from './components/EmptyContent'
 
-import { formatForm } from './utils/FormsUtils'
-
 export default {
 	name: 'Forms',
 
@@ -95,10 +93,6 @@ export default {
 	computed: {
 		noForms() {
 			return this.forms && this.forms.length === 0
-		},
-
-		formattedForms() {
-			return this.forms.map(formatForm)
 		},
 
 		hash() {
