@@ -62,11 +62,15 @@ export default {
 		/**
 		 * Option changed, processing the data
 		 */
-		onInput() {
+		async onInput() {
 			const answer = Object.assign({}, this.answer)
 			answer.text = this.$refs.input.value
 
-			this.updateAnswer(answer)
+			if (answer.local) {
+				await this.createAnswer(answer)
+			} else {
+				this.updateAnswer(answer)
+			}
 
 			// Update question
 			this.$emit('update:answer', answer)
@@ -86,8 +90,7 @@ export default {
 		 * @param {Event} e the event
 		 */
 		async deleteEntry(e) {
-			console.info(e)
-			if (e && this.$refs.input.value.length !== 0) {
+			if (e.type !== 'click' && this.$refs.input.value.length !== 0) {
 				return
 			}
 
@@ -109,12 +112,35 @@ export default {
 		},
 
 		/**
+		 * Create an unsynced answer to the server
+		 *
+		 * @param {Object} answer the answer to sync
+		 */
+		createAnswer: pDebounce(async function(answer) {
+			try {
+				const response = await axios.post(generateUrl('/apps/forms/api/v1/option'), {
+					questionId: answer.question_id,
+					text: answer.text,
+				})
+
+				// Was synced once, this is now up to date with the server
+				delete answer.local
+				answer.id = response.data.id
+				console.debug('Created answer', answer)
+			} catch (error) {
+				showError(t('forms', 'Error while saving the answer'))
+				console.error(error)
+			}
+		}, 100),
+
+		/**
 		 * Save to the server, only do it after 500ms
 		 * of no change
+		 *
+		 * @param {Object} answer the answer to sync
 		 */
 		updateAnswer: pDebounce(async function(answer) {
 			try {
-				// TODO: add loading status feedback ?
 				await axios.post(generateUrl('/apps/forms/api/v1/option/update'), {
 					id: this.answer.id,
 					keyValuePairs: {

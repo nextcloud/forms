@@ -473,16 +473,15 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function newOption(int $formId, int $questionId, string $text): Http\JSONResponse {
-		$this->logger->debug('Adding new option: formId: {formId}, questionId: {questionId}, text: {text}', [
-			'formId' => $formId,
+	public function newOption(int $questionId, string $text): Http\JSONResponse {
+		$this->logger->debug('Adding new option: questionId: {questionId}, text: {text}', [
 			'questionId' => $questionId,
 			'text' => $text,
 		]);
 
 		try {
-			$form = $this->formMapper->findById($formId);
 			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question so option can\'t be added');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -493,11 +492,6 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		if ($question->getFormId() !== $formId) {
-			$this->logger->debug('This question is not part of the current form');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
-		}
-
 		$option = new Option();
 
 		$option->setQuestionId($questionId);
@@ -505,7 +499,9 @@ class ApiController extends Controller {
 
 		$option = $this->optionMapper->insert($option);
 
-		return new Http\JSONResponse($option->getId());
+		return new Http\JSONResponse([
+			'id' => $option->getId()
+		]);
 	}
 
 	/**
