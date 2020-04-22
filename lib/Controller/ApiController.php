@@ -510,6 +510,43 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * Writes the given key-value pairs into Database.
+
+	 * @param int $id OptionId of question to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 */
+	public function updateOption(int $id, array $keyValuePairs): Http\JSONResponse {
+		$this->logger->debug('Updating option: option: {id}, values: {keyValuePairs}', [
+			'id' => $id,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$option = $this->optionMapper->findById($id);
+			$question = $this->questionMapper->findById($option->getQuestionId());
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find option, question or form');
+			return new Http\JSONResponse(['message' => 'Could not find option, question or form'], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Create QuestionEntity with given Params & Id.
+		$option = Option::fromParams($keyValuePairs);
+		$option->setId($id);
+
+		// Update changed Columns in Db.
+		$this->optionMapper->update($option);
+
+		return new Http\JSONResponse($option->getId());
+	}
+
+	/**
+	 * @NoAdminRequired
 	 */
 	public function deleteOption(int $id): Http\JSONResponse {
 		$this->logger->debug('Deleting option: {id}', [
@@ -532,7 +569,6 @@ class ApiController extends Controller {
 
 		$this->optionMapper->delete($option);
 
-		//TODO useful response
 		return new Http\JSONResponse($id);
 	}
 

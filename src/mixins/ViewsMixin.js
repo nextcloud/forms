@@ -39,7 +39,7 @@ export default {
 		async saveFormProperty(key) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(generateUrl('/apps/forms/api/v1/form/update/'), {
+				await axios.post(generateUrl('/apps/forms/api/v1/form/update'), {
 					id: this.form.id,
 					keyValuePairs: {
 						[key]: this.form[key],

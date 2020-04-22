@@ -22,6 +22,7 @@
 
 <template>
 	<Question
+		:id="id"
 		v-bind.sync="$attrs"
 		:text="text"
 		:edit.sync="edit"
@@ -29,13 +30,13 @@
 		@update:text="onTitleChange">
 		<ul class="question__content" :role="isUnique ? 'radiogroup' : ''">
 			<template v-for="(answer, index) in options">
-				<li :key="index" class="question__item">
+				<li v-if="!edit" :key="answer.id" class="question__item">
 					<!-- Answer radio/checkbox + label -->
-					<!-- TODO: migrate to radio/checkbox component once ready -->
-					<input :id="`${id}-answer-${index}`"
+					<!-- TODO: migrate to radio/checkbox component once available -->
+					<input :id="`${id}-answer-${answer.id}`"
 						ref="checkbox"
-						:aria-checked="isChecked(index)"
-						:checked="isChecked(index)"
+						:aria-checked="isChecked(answer.id)"
+						:checked="isChecked(answer.id)"
 						:class="{
 							'radio question__radio': isUnique,
 							'checkbox question__checkbox': !isUnique,
@@ -45,33 +46,23 @@
 						:type="isUnique ? 'radio' : 'checkbox'">
 					<label v-if="!edit"
 						ref="label"
-						:for="`${id}-answer-${index}`"
+						:for="`${id}-answer-${answer.id}`"
 						class="question__label">{{ answer.text }}</label>
-
-					<!-- Answer text input edit -->
-					<!-- TODO: properly choose max length -->
-					<input v-else
-						ref="input"
-						:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
-						:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
-						:value="answer.text"
-						class="question__input"
-						maxlength="256"
-						minlength="1"
-						type="text"
-						@input="onInput(index)"
-						@keydown.enter.prevent="addNewEntry"
-						@keydown.delete="deleteEntry($event, index)">
-
-					<!-- Delete answer -->
-					<Actions v-if="edit">
-						<ActionButton icon="icon-close" @click="deleteEntry($event, index)">
-							{{ t('forms', 'Delete answer') }}
-						</ActionButton>
-					</Actions>
 				</li>
+
+				<!-- Answer text input edit -->
+				<AnswerInput v-else
+					:key="answer.id"
+					ref="input"
+					:answer="answer"
+					:index="index"
+					@add="addNewEntry"
+					@delete="deleteAnswer"
+					@update:answer="updateAnswer"
+					@restore="restoreAnswer" />
 			</template>
-			<li v-if="edit && !isLastEmpty" class="question__item">
+
+			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
 				<!-- TODO: properly choose max length -->
 				<input
 					:aria-label="t('forms', 'Add a new answer')"
@@ -87,9 +78,7 @@
 </template>
 
 <script>
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-
+import AnswerInput from './AnswerInput'
 import QuestionMixin from '../../mixins/QuestionMixin'
 import GenRandomId from '../../utils/GenRandomId'
 
@@ -100,34 +89,38 @@ export default {
 	name: 'QuestionMultiple',
 
 	components: {
-		Actions,
-		ActionButton,
+		AnswerInput,
 	},
 
 	mixins: [QuestionMixin],
 
-	data() {
-		return {
-			id: GenRandomId(),
-		}
+	props: {
+		id: {
+			type: Number,
+			required: true,
+		},
 	},
 
 	computed: {
 		isLastEmpty() {
-			const value = this.values[this.values.length - 1]
-			return value && value.trim().length === 0
+			const value = this.options[this.options.length - 1]
+			return value?.text?.trim().length === 0
 		},
 
 		isUnique() {
 			return this.model.unique === true
+		},
+
+		hasNoAnswer() {
+			return this.options.length === 0
 		},
 	},
 
 	watch: {
 		edit(edit) {
 			if (!edit) {
-				// Filter and update questions
-				this.$emit('update:values', this.values.filter(answer => !!answer))
+				// Filter out empty options and update question
+				this.$emit('update:options', this.options.filter(answer => !!answer.text))
 			}
 		},
 	},
@@ -145,54 +138,79 @@ export default {
 		},
 
 		/**
-		 * Update the values
-		 * @param {Array} values values to change
+		 * Update the options
+		 * @param {Array} options options to change
 		 */
-		updateValues(values) {
-			this.$emit('update:values', this.isUnique ? [values[0]] : values)
+		updateOptions(options) {
+			this.$emit('update:options', options)
 		},
 
-		onInput(index) {
-			// Update values
-			const input = this.$refs.input[index]
-			const values = this.values.slice()
-			values[index] = input.value
+		/**
+		 * Update an existing answer locally
+		 *
+		 * @param {Object} answer the answer to update
+		 */
+		updateAnswer(answer) {
+			const options = this.options.slice()
+			const answerIndex = options.findIndex(option => option.id === answer.id)
+			options[answerIndex] = answer
 
-			// Update question
-			this.updateValues(values)
+			this.updateOptions(options)
 		},
 
+		/**
+		 * Add a new empty answer locally
+		 */
 		addNewEntry() {
-			// Add entry
-			const values = this.values.slice()
-			values.push('')
+			// Add local entry
+			const options = this.options.slice()
+			options.push({
+				id: GenRandomId(),
+				question_id: this.id,
+				text: '',
+				local: true,
+			})
 
 			// Update question
-			this.updateValues(values)
+			this.updateOptions(options)
 
 			this.$nextTick(() => {
-				this.focusIndex(values.length - 1)
+				this.focusIndex(options.length - 1)
 			})
 		},
 
-		deleteEntry(e, index) {
-			const input = this.$refs.input[index]
+		/**
+		 * Restore an answer locally
+		 *
+		 * @param {Object} answer the answer
+		 * @param {number} index the answer index in this.options
+		 */
+		restoreAnswer(answer, index) {
+			const options = this.options.slice()
+			options.splice(index, 0, answer)
 
-			if (input.value.length === 0) {
-				// Dismiss delete action
-				e.preventDefault()
+			this.updateOptions(options)
+			this.focusIndex(index)
+		},
 
-				// Remove entry
-				const values = this.values.slice()
-				values.splice(index, 1)
+		/**
+		 * Delete an answer locally
+		 *
+		 * @param {number} id the answer is
+		 * @param {number} index the answer index in this.options
+		 */
+		deleteAnswer(id, index) {
+			// Remove entry
+			const options = this.options.slice()
+			const optionIndex = options.findIndex(option => option.id === id)
+			options.splice(optionIndex, 1)
 
-				// Update question
-				this.updateValues(values)
+			// Update question
+			this.updateOptions(options)
 
-				this.$nextTick(() => {
-					 this.focusNext(index)
-				})
-			}
+			this.$nextTick(() => {
+				this.focusIndex(index + 1)
+			})
 		},
 
 		/**
@@ -201,9 +219,10 @@ export default {
 		 * @param {Number} index the value index
 		 */
 		focusIndex(index) {
-			const input = this.$refs.input[index]
-			if (input) {
-				 input.focus()
+			const inputs = this.$refs.input
+			if (inputs && inputs[index]) {
+				const input = inputs[index]
+				input.focus()
 			}
 		},
 	},
