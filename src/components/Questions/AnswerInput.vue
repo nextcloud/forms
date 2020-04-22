@@ -1,0 +1,182 @@
+<template>
+	<li class="question__item">
+		<!-- TODO: properly choose max length -->
+		<input
+			ref="input"
+			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
+			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
+			:value="answer.text"
+			class="question__input"
+			maxlength="256"
+			minlength="1"
+			type="text"
+			@input="onInput"
+			@keydown.delete="deleteEntry"
+			@keydown.enter.prevent="addNewEntry">
+
+		<!-- Delete answer -->
+		<Actions>
+			<ActionButton icon="icon-close" @click="deleteEntry">
+				{{ t('forms', 'Delete answer') }}
+			</ActionButton>
+		</Actions>
+	</li>
+</template>
+
+<script>
+import { showError } from '@nextcloud/dialogs'
+import { generateUrl } from '@nextcloud/router'
+import axios from '@nextcloud/axios'
+import pDebounce from 'p-debounce'
+import PQueue from 'p-queue'
+
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+
+export default {
+	name: 'AnswerInput',
+
+	components: {
+		Actions,
+		ActionButton,
+	},
+
+	props: {
+		answer: {
+			type: Object,
+			required: true,
+		},
+		index: {
+			type: Number,
+			required: true,
+		},
+	},
+
+	data() {
+		return {
+			queue: new PQueue({ concurrency: 1 }),
+		}
+	},
+
+	methods: {
+		/**
+		 * Focus the input
+		 */
+		focus() {
+			this.$refs.input.focus()
+		},
+
+		/**
+		 * Option changed, processing the data
+		 */
+		async onInput() {
+			// clone answer
+			const answer = Object.assign({}, this.answer)
+			answer.text = this.$refs.input.value
+
+			if (this.answer.local) {
+
+				// Dispatched for creation. Marked as synced
+				this.answer.local = false
+				const newAnswer = await this.debounceCreateAnswer(answer)
+				this.$emit('update:answer', answer.id, newAnswer)
+			} else {
+				this.debounceUpdateAnswer(answer)
+				this.$emit('update:answer', answer.id, answer)
+			}
+		},
+
+		/**
+		 * Request a new answer
+		 */
+		addNewEntry() {
+			this.$emit('add')
+		},
+
+		/**
+		 * Emit a delete request for this answer
+		 * when pressing the delete key on an empty input
+		 *
+		 * @param {Event} e the event
+		 */
+		async deleteEntry(e) {
+			if (e.type !== 'click' && this.$refs.input.value.length !== 0) {
+				return
+			}
+
+			// Dismiss delete key action
+			e.preventDefault()
+			const answer = Object.assign({}, this.answer)
+			const index = this.index
+
+			if (!answer.local) {
+				// let's not await, deleting in background
+				axios.delete(generateUrl('/apps/forms/api/v1/option/{id}', { id: this.answer.id }))
+					.catch(error => {
+						showError(t('forms', 'There was an issue deleting this option'))
+						console.error(error)
+						// restore option
+						this.$emit('restore', answer, index)
+					})
+			}
+
+			this.$emit('delete', answer.id, index)
+		},
+
+		/**
+		 * Create an unsynced answer to the server
+		 *
+		 * @param {Object} answer the answer to sync
+		 * @returns {Object} answer
+		 */
+		async createAnswer(answer) {
+			try {
+				const response = await axios.post(generateUrl('/apps/forms/api/v1/option'), {
+					questionId: answer.question_id,
+					text: answer.text,
+				})
+
+				// Was synced once, this is now up to date with the server
+				delete answer.local
+				return Object.assign({}, answer, response.data)
+			} catch (error) {
+				showError(t('forms', 'Error while saving the answer'))
+				console.error(error)
+			}
+
+			return answer
+		},
+		debounceCreateAnswer: pDebounce(function(answer) {
+			return this.queue.add(() => this.createAnswer(answer))
+		}, 100),
+
+		/**
+		 * Save to the server, only do it after 500ms
+		 * of no change
+		 *
+		 * @param {Object} answer the answer to sync
+		 */
+		async updateAnswer(answer) {
+			try {
+				await axios.post(generateUrl('/apps/forms/api/v1/option/update'), {
+					id: this.answer.id,
+					keyValuePairs: {
+						text: answer.text,
+					},
+				})
+				console.debug('Updated answer', answer)
+			} catch (error) {
+				showError(t('forms', 'Error while saving the answer'))
+				console.error(error)
+			}
+		},
+		debounceUpdateAnswer: pDebounce(function(answer) {
+			return this.queue.add(() => this.updateAnswer(answer))
+		}, 500),
+	},
+}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

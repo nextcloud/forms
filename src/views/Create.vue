@@ -58,16 +58,17 @@
 				:required="true"
 				autofocus
 				type="text"
-				@change="onTitleChange"
-				@click="selectIfUnchanged">
+				@click="selectIfUnchanged"
+				@keyup="onTitleChange">
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
 				id="form-desc"
 				ref="description"
 				v-model="form.description"
 				:placeholder="t('forms', 'Description')"
-				@change="onDescChange"
-				@keydown="autoSizeDescription" />
+				@change="autoSizeDescription"
+				@keydown="autoSizeDescription"
+				@keyup="onDescChange" />
 		</header>
 
 		<section>
@@ -102,24 +103,22 @@
 			</EmptyContent>
 
 			<!-- Questions list -->
-			<form @submit.prevent="onSubmit">
-				<Draggable v-model="form.questions"
-					:animation="200"
-					tag="ul"
-					@change="onQuestionOrderChange"
-					@start="isDragging = true"
-					@end="isDragging = false">
-					<Questions
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in form.questions"
-						ref="questions"
-						:key="question.id"
-						:model="answerTypes[question.type]"
-						:index="index + 1"
-						v-bind.sync="question"
-						@delete="deleteQuestion(question)" />
-				</Draggable>
-			</form>
+			<Draggable v-model="form.questions"
+				:animation="200"
+				tag="ul"
+				@change="onQuestionOrderChange"
+				@start="isDragging = true"
+				@end="isDragging = false">
+				<Questions
+					:is="answerTypes[question.type].component"
+					v-for="(question, index) in form.questions"
+					ref="questions"
+					:key="question.id"
+					:model="answerTypes[question.type]"
+					:index="index + 1"
+					v-bind.sync="question"
+					@delete="deleteQuestion(question)" />
+			</Draggable>
 		</section>
 	</AppContent>
 </template>
@@ -229,13 +228,6 @@ export default {
 				this.isLoadingForm = false
 			}
 		},
-
-		/**
-		 * Save form on submit
-		 */
-		onSubmit: debounce(function() {
-			this.saveForm()
-		}, 200),
 
 		/**
 		 * Title & description save methods
@@ -380,7 +372,9 @@ export default {
 </script>
 
 <style lang="scss">
-#app-content {
+// Replace with new vue components release
+#app-content,
+#app-content-vue {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
@@ -460,95 +454,4 @@ export default {
 		}
 	}
 }
-
-/* Transitions for inserting and removing list items */
-/*.list-enter-active,
-.list-leave-active {
-	transition: all .5s ease;
-}
-
-.list-enter,
-.list-leave-to {
-	opacity: 0;
-}
-
-.list-move {
-	transition: transform .5s;
-}
-
-#form-item-selector-text {
-	> input {
-		width: 100%;
-	}
-}
-
-.form-table {
-	> li {
-		display: flex;
-		overflow: hidden;
-		align-items: baseline;
-		min-height: 24px;
-		padding-right: 8px;
-		padding-left: 8px;
-		white-space: nowrap;
-		border-bottom: 1px solid var(--color-border);
-		line-height: 24px;
-
-		&:active,
-		&:hover {
-			transition: var(--background-dark) .3s ease;
-			background-color: var(--color-background-dark); //$hover-color;
-		}
-
-		> div {
-			display: flex;
-			flex-grow: 1;
-			padding-right: 4px;
-			white-space: normal;
-			opacity: .7;
-			font-size: 1.2em;
-			&.avatar {
-				flex-grow: 0;
-			}
-		}
-
-		> div:nth-last-child(1) {
-			flex-grow: 0;
-			flex-shrink: 0;
-			justify-content: center;
-		}
-	}
-}
-
-button {
-	&.button-inline {
-		border: 0;
-		background-color: transparent;
-	}
-}
-
-.tab {
-	display: flex;
-	flex-wrap: wrap;
-}
-.selectUnit {
-	display: flex;
-	align-items: center;
-	flex-wrap: nowrap;
-	> label {
-		padding-right: 4px;
-	}
-}
-
-#shiftDates {
-	min-width: 16px;
-	min-height: 16px;
-	margin: 0;
-	padding: 10px;
-	padding-left: 34px;
-	text-align: left;
-	background-repeat: no-repeat;
-	background-position: 10px center;
-} */
-
 </style>

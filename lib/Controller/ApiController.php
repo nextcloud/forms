@@ -473,16 +473,15 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function newOption(int $formId, int $questionId, string $text): Http\JSONResponse {
-		$this->logger->debug('Adding new option: formId: {formId}, questionId: {questionId}, text: {text}', [
-			'formId' => $formId,
+	public function newOption(int $questionId, string $text): Http\JSONResponse {
+		$this->logger->debug('Adding new option: questionId: {questionId}, text: {text}', [
 			'questionId' => $questionId,
 			'text' => $text,
 		]);
 
 		try {
-			$form = $this->formMapper->findById($formId);
 			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question so option can\'t be added');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -493,17 +492,51 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		if ($question->getFormId() !== $formId) {
-			$this->logger->debug('This question is not part of the current form');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
-		}
-
 		$option = new Option();
 
 		$option->setQuestionId($questionId);
 		$option->setText($text);
 
 		$option = $this->optionMapper->insert($option);
+
+		return new Http\JSONResponse([
+			'id' => $option->getId()
+		]);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * Writes the given key-value pairs into Database.
+
+	 * @param int $id OptionId of option to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 */
+	public function updateOption(int $id, array $keyValuePairs): Http\JSONResponse {
+		$this->logger->debug('Updating option: option: {id}, values: {keyValuePairs}', [
+			'id' => $id,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$option = $this->optionMapper->findById($id);
+			$question = $this->questionMapper->findById($option->getQuestionId());
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find option, question or form');
+			return new Http\JSONResponse(['message' => 'Could not find option, question or form'], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Create OptionEntity with given Params & Id.
+		$option = Option::fromParams($keyValuePairs);
+		$option->setId($id);
+
+		// Update changed Columns in Db.
+		$this->optionMapper->update($option);
 
 		return new Http\JSONResponse($option->getId());
 	}
@@ -532,7 +565,6 @@ class ApiController extends Controller {
 
 		$this->optionMapper->delete($option);
 
-		//TODO useful response
 		return new Http\JSONResponse($id);
 	}
 
