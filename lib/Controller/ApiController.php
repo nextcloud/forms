@@ -508,7 +508,7 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * Writes the given key-value pairs into Database.
 
-	 * @param int $id OptionId of question to update
+	 * @param int $id OptionId of option to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 */
 	public function updateOption(int $id, array $keyValuePairs): Http\JSONResponse {
@@ -531,7 +531,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		// Create QuestionEntity with given Params & Id.
+		// Create OptionEntity with given Params & Id.
 		$option = Option::fromParams($keyValuePairs);
 		$option->setId($id);
 
