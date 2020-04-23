@@ -160,7 +160,7 @@ export default {
 	&__content {
 		flex: 1 1 100%;
 		max-width: 100%;
-		margin: 20px;
+		margin-bottom: 20px;
 		padding: 0;
 	}
 
@@ -170,8 +170,7 @@ export default {
 		flex: 1 1 100%;
 		justify-content: space-between;
 		width: auto;
-		margin: 20px;
-		margin-bottom: 0;
+		margin-top: 20px;
 
 		// Using type to have a higher order than the input styling of server
 		&-title,
