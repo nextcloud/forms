@@ -36,8 +36,8 @@
 	<AppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
-			<button class="primary" @click="showResults">
-				<span class="icon-forms-white" role="img" />
+			<button @click="showResults">
+				<span class="icon-forms" role="img" />
 				{{ t('forms', 'Show results') }}
 			</button>
 			<button v-tooltip="t('forms', 'Toggle settings')"
