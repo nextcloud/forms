@@ -24,31 +24,31 @@
 
 <template>
 	<AppContent>
-		<div>
+		<div class="section">
+			<h2>{{ t('forms', 'Results of {title}', { title: form.title }) }}</h2>
 			<button class="button btn primary" @click="download">
-				<span>{{ "Export to CSV" }}</span>
+				{{ t('forms', 'Export to CSV') }}
 			</button>
-		</div>
-		<h1>{{ "Statistics" }}</h1>
-		<div v-for="sum in stats" :key="sum">
-			{{ sum }}
-		</div>
-		<div id="app-content" :class="{'icon-loading': loading}">
-			<transition-group
-				name="list"
-				tag="div"
-				class="table">
-				<ResultItem
-					key="0"
-					:header="true" />
-				<li
-					is="resultItem"
-					v-for="(answer, index) in answers"
-					:key="answer.id"
-					:answer="answer"
-					@viewResults="viewFormResults(index, form.form, 'results')" />
-			</transition-group>
-			<modal-dialog />
+			<div v-for="sum in stats" :key="sum">
+				{{ sum }}
+			</div>
+			<div id="app-content" :class="{'icon-loading': loading}">
+				<transition-group
+					name="list"
+					tag="div"
+					class="table">
+					<ResultItem
+						key="0"
+						:header="true" />
+					<li
+						is="resultItem"
+						v-for="(answer, index) in answers"
+						:key="answer.id"
+						:answer="answer"
+						@viewResults="viewFormResults(index, form.form, 'results')" />
+				</transition-group>
+				<modal-dialog />
+			</div>
 		</div>
 	</AppContent>
 </template>
