@@ -91,17 +91,6 @@
 				</Actions>
 			</div>
 
-			<!-- No questions -->
-			<EmptyContent v-if="hasQuestions">
-				{{ t('forms', 'This form does not have any questions') }}
-				<template #desc>
-					<button class="empty-content__button primary" @click="openQuestionMenu">
-						<span class="icon-add-white" />
-						{{ t('forms', 'Add a new one') }}
-					</button>
-				</template>
-			</EmptyContent>
-
 			<!-- Questions list -->
 			<Draggable v-model="form.questions"
 				:animation="200"
