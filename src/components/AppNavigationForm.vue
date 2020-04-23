@@ -131,7 +131,7 @@ export default {
 					? t('forms', 'Form link copied')
 					: t('forms', 'Cannot copy, please copy the link manually')
 			}
-			return t('forms', 'Copy to clipboard')
+			return t('forms', 'Copy share link')
 		},
 	},
 
