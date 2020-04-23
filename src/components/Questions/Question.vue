@@ -142,7 +142,15 @@ export default {
 		left: 0;
 		width: 44px;
 		height: 100%;
+		opacity: .5;
+
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
+
 		cursor: grab;
+
 		&:active {
 			cursor: grabbing;
 		}
