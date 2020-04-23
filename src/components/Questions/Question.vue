@@ -130,8 +130,6 @@ export default {
 	justify-content: stretch;
 	margin-bottom: 22px;
 	padding-left: 44px;
-	// room for the new question menu
-	padding-right: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
 

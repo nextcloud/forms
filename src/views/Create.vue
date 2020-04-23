@@ -423,7 +423,7 @@ export default {
 			top: var(--header-height);
 			display: flex;
 			align-items: center;
-			align-self: flex-end;
+			left: 44px;
 			width: 44px;
 			height: var(--top-bar-height);
 			// make sure this doesn't take any space and appear floating
