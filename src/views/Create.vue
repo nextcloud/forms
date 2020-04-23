@@ -371,7 +371,7 @@ export default {
 	header,
 	section {
 		width: 100%;
-		max-width: 900px;
+		max-width: 650px;
 	}
 
 	// Title & description header
