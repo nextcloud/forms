@@ -25,7 +25,7 @@
 <template>
 	<AppContent v-if="loadingResults">
 		<EmptyContent icon="icon-loading">
-			{{ t('forms', 'Loading results') }}
+			{{ t('forms', 'Loading responses …') }}
 		</EmptyContent>
 	</AppContent>
 
@@ -38,7 +38,7 @@
 		</TopBar>
 
 		<header v-if="!noSubmissions">
-			<h2>{{ t('forms', 'Results of {title}', { title: form.title }) }}</h2>
+			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
 			<div v-for="sum in stats" :key="sum">
 				{{ sum }}
 			</div>
@@ -46,8 +46,11 @@
 
 		<!-- No submissions -->
 		<section v-if="noSubmissions">
-			<EmptyContent>
-				{{ t('forms', 'There are no submissions to this form.') }}
+			<EmptyContent icon="icon-comment">
+				{{ t('forms', 'No responses yet') }}
+				<template #desc>
+					{{ t('forms', 'Results of submitted forms will show up here') }}
+				</template>
 				<!-- Button to copy Share-Link? -->
 			</EmptyContent>
 		</section>

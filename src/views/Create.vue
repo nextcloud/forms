@@ -37,8 +37,8 @@
 		<!-- Show results & sidebar button -->
 		<TopBar>
 			<button @click="showResults">
-				<span class="icon-forms" role="img" />
-				{{ t('forms', 'Show results') }}
+				<span class="icon-comment" role="img" />
+				{{ t('forms', 'Responses') }}
 			</button>
 			<button v-tooltip="t('forms', 'Toggle settings')"
 				:aria-label="t('forms', 'Toggle settings')"
