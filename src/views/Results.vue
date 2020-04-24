@@ -23,59 +23,85 @@
   -->
 
 <template>
-	<AppContent>
-		<div class="section">
-			<h2>{{ t('forms', 'Results of {title}', { title: form.title }) }}</h2>
-			<button class="button btn primary" @click="download">
-				{{ t('forms', 'Export to CSV') }}
+	<AppContent v-if="loadingResults">
+		<EmptyContent icon="icon-loading">
+			{{ t('forms', 'Loading results') }}
+		</EmptyContent>
+	</AppContent>
+
+	<AppContent v-else>
+		<TopBar>
+			<button @click="showEdit">
+				<span class="icon-forms" role="img" />
+				{{ t('forms', 'Back to form') }}
 			</button>
+		</TopBar>
+
+		<header v-if="!noSubmissions">
+			<h2>{{ t('forms', 'Results of {title}', { title: form.title }) }}</h2>
 			<div v-for="sum in stats" :key="sum">
 				{{ sum }}
 			</div>
-			<div id="app-content" :class="{'icon-loading': loading}">
-				<transition-group
-					name="list"
-					tag="div"
-					class="table">
-					<ResultItem
-						key="0"
-						:header="true" />
-					<li
-						is="resultItem"
-						v-for="(answer, index) in answers"
-						:key="answer.id"
-						:answer="answer"
-						@viewResults="viewFormResults(index, form.form, 'results')" />
-				</transition-group>
-				<modal-dialog />
-			</div>
-		</div>
+		</header>
+
+		<!-- No submissions -->
+		<section v-if="noSubmissions">
+			<EmptyContent>
+				{{ t('forms', 'There are no submissions to this form.') }}
+				<!-- Button to copy Share-Link? -->
+			</EmptyContent>
+		</section>
+
+		<section v-else>
+			<button id="exportButton" class="primary" @click="download">
+				<span class="icon-download-white" role="img" />
+				{{ t('forms', 'Export to CSV') }}
+			</button>
+			<transition-group
+				name="list"
+				tag="div"
+				class="table">
+				<ResultItem
+					key="0"
+					:header="true" />
+				<ResultItem
+					v-for="answer in answers"
+					:key="answer.id"
+					:answer="answer" />
+			</transition-group>
+		</section>
 	</AppContent>
 </template>
 
 <script>
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import AppContent from '@nextcloud/vue/dist/Components/AppContent'
+import axios from '@nextcloud/axios'
+
+import EmptyContent from '../components/EmptyContent'
+import TopBar from '../components/TopBar'
+import ViewsMixin from '../mixins/ViewsMixin'
+
 import ResultItem from '../components/resultItem'
 import json2csvParser from 'json2csv'
-import axios from '@nextcloud/axios'
-import ViewsMixin from '../mixins/ViewsMixin'
-import { generateUrl } from '@nextcloud/router'
 
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 export default {
 	name: 'Results',
 
 	components: {
 		AppContent,
+		EmptyContent,
 		ResultItem,
+		TopBar,
 	},
 
 	mixins: [ViewsMixin],
 
 	data() {
 		return {
-			loading: true,
+			loadingResults: true,
 			answers: [],
-
 		}
 	},
 
@@ -111,41 +137,46 @@ export default {
 
 			return sums.sort()
 		},
+
+		noSubmissions() {
+			return this.answers && this.answers.length === 0
+		},
 	},
 
-	created() {
-		this.indexPage = OC.generateUrl('apps/forms/')
-		this.loadForms()
+	beforeMount() {
+		this.loadFormResults()
 	},
 
 	methods: {
-		loadForms() {
-			this.loading = true
-			axios.get(generateUrl('apps/forms/api/v1/submissions/{hash}', { hash: this.$route.params.hash }))
-				.then((response) => {
-					if (response.data == null) {
-						this.answers = null
-						OC.Notification.showTemporary('Access Denied')
-					} else {
-						this.answers = response.data
-					}
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.loading = false
-				})
-		},
-		viewFormResults(index, form, name) {
+
+		showEdit() {
 			this.$router.push({
-				name: name,
+				name: 'edit',
 				params: {
-					hash: form.id,
+					hash: this.form.hash,
 				},
 			})
 		},
-		download() {
 
+		async loadFormResults() {
+			this.loadingResults = true
+			console.debug('Loading Results')
+
+			try {
+				const response = await axios.get(generateUrl('/apps/forms/api/v1/submissions/{hash}', {
+					hash: this.form.hash,
+				}))
+				this.answers = response.data
+				console.debug(this.answers)
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while loading results'))
+			} finally {
+				this.loadingResults = false
+			}
+		},
+
+		download() {
 			this.loading = true
 			axios.get(OC.generateUrl('apps/forms/get/form/' + this.$route.params.hash))
 				.then((response) => {
@@ -178,8 +209,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-
+<style lang="scss" scoped>
 .table {
 	width: 100%;
 	margin-top: 45px;
@@ -189,12 +219,7 @@ export default {
 	flex-wrap: nowrap;
 }
 
-#emptycontent {
-	.icon-forms {
-		background-color: black;
-		-webkit-mask: url('./img/app.svg') no-repeat 50% 50%;
-		mask: url('./img/app.svg') no-repeat 50% 50%;
-	}
+#exportButton {
+	width: max-content;
 }
-
 </style>
