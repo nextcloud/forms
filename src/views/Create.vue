@@ -383,19 +383,21 @@ export default {
 		#form-title,
 		#form-desc {
 			width: 100%;
-			margin: 10px; // aerate the header
-			padding: 0; // makes alignment and desc height calc easier
+			margin: 16px 0; // aerate the header
+			padding: 0 16px;
 			border: none;
 		}
 		#form-title {
 			font-size: 2em;
+			padding-left: 14px; // align with description (compensate font size diff)
+			overflow-x: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 		#form-desc {
-			// make sure height calculations are correct
-			box-sizing: content-box !important;
 			min-height: 60px;
 			max-height: 200px;
-			padding-left: 2px; // align with title (compensate font size diff)
+			margin-top: 0;
 			resize: none;
 		}
 	}
