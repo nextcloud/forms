@@ -95,6 +95,7 @@
 			<Draggable v-model="form.questions"
 				:animation="200"
 				tag="ul"
+				handle=".question__drag-handle"
 				@change="onQuestionOrderChange"
 				@start="isDragging = true"
 				@end="isDragging = false">
