@@ -29,7 +29,7 @@
 <template>
 	<AppContent v-if="isLoadingForm">
 		<EmptyContent icon="icon-loading">
-			{{ t('forms', 'Loading form {title} …', { title: form.title }) }}
+			{{ t('forms', 'Loading {title} …', { title: form.title }) }}
 		</EmptyContent>
 	</AppContent>
 
