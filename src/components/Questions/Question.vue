@@ -210,6 +210,7 @@ export default {
 			border-bottom: 1px dotted transparent;
 			border-radius: 0;
 			font-size: 16px;
+			font-weight: bold;
 			line-height: 22px;
 		}
 

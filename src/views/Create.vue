@@ -389,6 +389,7 @@ export default {
 		}
 		#form-title {
 			font-size: 2em;
+			font-weight: bold;
 			padding-left: 14px; // align with description (compensate font size diff)
 			overflow-x: hidden;
 			text-overflow: ellipsis;
