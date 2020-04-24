@@ -132,7 +132,7 @@ export default {
 
 	data() {
 		return {
-			opened: true,
+			opened: false,
 			lang: '',
 			locale: '',
 			longDateFormat: '',
