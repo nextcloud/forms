@@ -46,7 +46,12 @@
 			</EmptyContent>
 
 			<EmptyContent v-else>
-				{{ t('forms', 'Please select a form') }}
+				{{ t('forms', 'Select a form or create a new one') }}
+				<template #desc>
+					<button class="primary" @click="onNewForm">
+						{{ t('forms', 'Create new form') }}
+					</button>
+				</template>
 			</EmptyContent>
 		</AppContent>
 
