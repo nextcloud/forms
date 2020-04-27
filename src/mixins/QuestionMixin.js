@@ -23,6 +23,7 @@ import Question from '../components/Questions/Question'
 export default {
 	inheritAttrs: false,
 	props: {
+
 		/**
 		 * The question title
 		 */

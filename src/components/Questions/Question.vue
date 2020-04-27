@@ -42,7 +42,8 @@
 				minlength="1"
 				maxlength="256"
 				required
-				@input="onInput">
+				@input="onInput"
+				@keyup="onTitleChange">
 			<h3 v-else class="question__header-title" v-text="text" />
 			<Actions class="question__header-menu" :force-menu="true">
 				<ActionButton icon="icon-delete" @click="onDelete">
@@ -57,7 +58,12 @@
 </template>
 
 <script>
+import axios from '@nextcloud/axios'
+import debounce from 'debounce'
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
 import { directive as ClickOutside } from 'v-click-outside'
+
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 
@@ -116,6 +122,25 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		onTitleChange: debounce(function() {
+			this.saveQuestionProperty('text')
+		}, 200),
+
+		async saveQuestionProperty(key) {
+			try {
+				// TODO: add loading status feedback ?
+				await axios.post(generateUrl('/apps/forms/api/v1/question/update'), {
+					id: this.id,
+					keyValuePairs: {
+						[key]: this[key],
+					},
+				})
+			} catch (error) {
+				showError(t('forms', 'Error while saving question'))
+				console.error(error)
+			}
 		},
 	},
 }
