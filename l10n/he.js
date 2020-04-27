@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Cannot copy, please copy the link manually" : "לא ניתן להעתיק, נא להעתיק את הקישור ידנית",
     "Copy to clipboard" : "העתקה ללוח הגזירים",
     "Expired" : "פג",
     "Expires never" : "לעולם לא יפוג",
