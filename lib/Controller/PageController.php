@@ -107,7 +107,7 @@ class PageController extends Controller {
 	 */
 	public function index(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'icons');
+		Util::addStyle($this->appName, 'forms');
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -119,7 +119,7 @@ class PageController extends Controller {
 	 */
 	public function createForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'icons');
+		Util::addStyle($this->appName, 'forms');
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -131,7 +131,7 @@ class PageController extends Controller {
 	 */
 	public function cloneForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'icons');
+		Util::addStyle($this->appName, 'forms');
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -143,7 +143,7 @@ class PageController extends Controller {
 	 */
 	public function editForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'icons');
+		Util::addStyle($this->appName, 'forms');
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -155,7 +155,7 @@ class PageController extends Controller {
 	 */
 	public function getResult(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'icons');
+		Util::addStyle($this->appName, 'forms');
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -173,13 +173,8 @@ class PageController extends Controller {
 			return new TemplateResponse('forms', 'no.acc.tmpl', []);
 		}
 
-		if ($form->getExpiresTimestamp() === 0) {
-			$expired = false;
-		} else {
-			$expired = time() > $form->getExpiresTimestamp();
-		}
-
-		if ($expired) {
+		// If form expired, return Expired-Template
+		if ( ($form->getExpires() !== 0) && (time() > $form->getExpires()) ) {
 			return new TemplateResponse('forms', 'expired.tmpl');
 		}
 

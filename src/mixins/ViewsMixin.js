@@ -19,16 +19,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
+
 export default {
 	props: {
 		hash: {
 			type: String,
-			default: null,
+			default: '',
 		},
 		form: {
 			type: Object,
-			// TODO: use default Form object ?
-			default: {},
+			required: true,
+		},
+	},
+
+	methods: {
+		async saveFormProperty(key) {
+			try {
+				// TODO: add loading status feedback ?
+				await axios.post(generateUrl('/apps/forms/api/v1/form/update'), {
+					id: this.form.id,
+					keyValuePairs: {
+						[key]: this.form[key],
+					},
+				})
+			} catch (error) {
+				showError(t('forms', 'Error while saving form'))
+				console.error(error)
+			}
 		},
 	},
 }

@@ -39,13 +39,22 @@ use \DateTime;
  * Installation class for the forms app.
  * Initial db creation
  */
-class Version010200Date2020323141300 extends SimpleMigrationStep {
+class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 	/** @var IDBConnection */
 	protected $connection;
 
 	/** @var IConfig */
 	protected $config;
+
+	/** Map of questionTypes to change */
+	private $questionTypeMap = [
+		'radiogroup' => 'multiple_unique',
+		'checkbox' => 'multiple',
+		'text' => 'short',
+		'comment' => 'long',
+		'dropdown' => 'multiple_unique'
+	];
 
 	/**
 	 * @param IDBConnection $connection
@@ -96,8 +105,9 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				'notnull' => false,
 				'comment' => 'unix-timestamp',
 			]);
-			$table->addColumn('expires_timestamp', Type::INTEGER, [
+			$table->addColumn('expires', Type::INTEGER, [
 				'notnull' => false,
+				'default' => 0,
 				'comment' => 'unix-timestamp',
 			]);
 			$table->addColumn('is_anonymous', Type::BOOLEAN, [
@@ -131,7 +141,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('mandatory', Type::BOOLEAN, [
 				'notnull' => true,
-				'default' => 1,
+				'default' => 0,
 			]);
 			$table->addColumn('text', Type::STRING, [
 				'notnull' => true,
@@ -227,7 +237,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 						'owner_id' => $qb_restore->createNamedParameter($event['owner'], IQueryBuilder::PARAM_STR),
 						'access_json' => $qb_restore->createNamedParameter($newAccessJSON, IQueryBuilder::PARAM_STR),
 						'created' => $qb_restore->createNamedParameter($this->convertDateTime($event['created']), IQueryBuilder::PARAM_INT),
-						'expires_timestamp' => $qb_restore->createNamedParameter($this->convertDateTime($event['expire']), IQueryBuilder::PARAM_INT),
+						'expires' => $qb_restore->createNamedParameter($this->convertDateTime($event['expire']), IQueryBuilder::PARAM_INT),
 						'is_anonymous' => $qb_restore->createNamedParameter($event['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 						'submit_once' => $qb_restore->createNamedParameter($event['unique'], IQueryBuilder::PARAM_BOOL)
 					]);
@@ -257,7 +267,7 @@ class Version010200Date2020323141300 extends SimpleMigrationStep {
 				->values([
 					'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['newId'], IQueryBuilder::PARAM_INT),
 					'order' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['nextQuestionOrder']++, IQueryBuilder::PARAM_INT),
-					'type' => $qb_restore->createNamedParameter($question['form_question_type'], IQueryBuilder::PARAM_STR),
+					'type' => $qb_restore->createNamedParameter($this->questionTypeMap[$question['form_question_type']], IQueryBuilder::PARAM_STR),
 					'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
 				]);
 				$qb_restore->execute();

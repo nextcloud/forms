@@ -56,7 +56,7 @@ export default new Router({
 		{
 			path: '/:hash',
 			name: 'fill',
-			props: true,
+			props: { default: true },
 		},
 		{
 			path: '/:hash/edit',
@@ -65,13 +65,13 @@ export default new Router({
 				sidebar: Sidebar,
 			},
 			name: 'edit',
-			props: true,
+			props: { default: true },
 		},
 		{
 			path: '/:hash/results',
 			component: Results,
 			name: 'results',
-			props: true,
+			props: { default: true },
 		},
 		{
 			path: '/:hash/clone',
@@ -80,7 +80,7 @@ export default new Router({
 				sidebar: Sidebar,
 			},
 			name: 'clone',
-			props: true,
+			props: { default: true },
 		},
 	],
 })

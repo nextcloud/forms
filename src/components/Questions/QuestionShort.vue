@@ -21,50 +21,55 @@
   -->
 
 <template>
-	<div class="empty-content" role="note">
-		<div class="empty-content__icon" :class="icon" role="img" />
-		<h2 class="empty-content__title">
-			<slot />
-		</h2>
-		<p v-show="$slots.desc">
-			<slot name="desc" />
-		</p>
-	</div>
+	<Question
+		v-bind.sync="$attrs"
+		:text="text"
+		:edit.sync="edit"
+		@delete="onDelete"
+		@update:text="onTitleChange">
+		<div class="question__content">
+			<!-- TODO: properly choose max length -->
+			<input ref="input"
+				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
+				:placeholder="t('forms', 'Short answer text')"
+				:readonly="edit"
+				:value="values[0]"
+				class="question__input"
+				maxlength="256"
+				minlength="1"
+				type="text"
+				@input="onInput">
+		</div>
+	</Question>
 </template>
 
 <script>
-export default {
-	name: 'EmptyContent',
+import QuestionMixin from '../../mixins/QuestionMixin'
 
-	props: {
-		icon: {
-			type: String,
-			default: 'icon-forms',
+export default {
+	name: 'QuestionShort',
+
+	mixins: [QuestionMixin],
+
+	methods: {
+		onInput() {
+			const input = this.$refs.input
+			this.$emit('update:values', [input.value])
 		},
 	},
 }
 </script>
 
 <style lang="scss">
-.empty-content {
-	margin-top: 20vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-
-	&__icon {
-		width: 64px;
-		height: 64px;
-		margin: 0 auto 15px;
-		opacity: .4;
-		background-size: 64px;
-		background-repeat: no-repeat;
-		background-position: center;
-	}
-
-	&__title {
-		margin-bottom: 10px;
-	}
+// Using type to have a higher order than the input styling of server
+.question__input[type=text] {
+	width: 100%;
+	min-height: 44px;
+	margin: 0;
+	padding: 6px 0;
+	border: 0;
+	border-bottom: 1px dotted var(--color-border-dark);
+	border-radius: 0;
 }
 
 </style>

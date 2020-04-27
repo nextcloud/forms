@@ -25,7 +25,7 @@
 	<Content app-name="forms">
 		<AppNavigation>
 			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
-			<AppNavigationForm v-for="form in formattedForms"
+			<AppNavigationForm v-for="form in forms"
 				:key="form.id"
 				:form="form"
 				@delete="onDeleteForm" />
@@ -52,7 +52,7 @@
 
 		<!-- No errors show router content -->
 		<template v-else>
-			<router-view :form="selectedForm" />
+			<router-view :form.sync="selectedForm" />
 			<router-view :form="selectedForm" name="sidebar" />
 		</template>
 	</Content>
@@ -70,8 +70,6 @@ import Content from '@nextcloud/vue/dist/Components/Content'
 
 import AppNavigationForm from './components/AppNavigationForm'
 import EmptyContent from './components/EmptyContent'
-
-import { formatForm } from './utils/FormsUtils'
 
 export default {
 	name: 'Forms',
@@ -97,17 +95,20 @@ export default {
 			return this.forms && this.forms.length === 0
 		},
 
-		formattedForms() {
-			return this.forms.map(formatForm)
-		},
-
 		hash() {
 			return this.$route.params.hash
 		},
 
-		selectedForm() {
-			// TODO: replace with form.hash
-			return this.forms.find(form => form.form.hash === this.hash)
+		selectedForm: {
+			get() {
+				return this.forms.find(form => form.hash === this.hash)
+			},
+			set(form) {
+				const index = this.forms.findIndex(search => search.hash === this.hash)
+				if (index > -1) {
+					this.$set(this.forms, index, form)
+				}
+			},
 		},
 	},
 
@@ -141,7 +142,7 @@ export default {
 				const response = await axios.post(generateUrl('/apps/forms/api/v1/form'))
 				const newForm = response.data
 				this.forms.push(newForm)
-				this.$router.push({ name: 'edit', params: { hash: newForm.form.hash } })
+				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
 			} catch (error) {
 				showError(t('forms', 'Unable to create a new form'))
 				console.error(error)

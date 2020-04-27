@@ -95,7 +95,7 @@ class ApiController extends Controller {
 
 		} catch (DoesNotExistException $e) {
 			//handle silently
-		}finally{
+		} finally {
 			return $optionList;
 		}
 	}
@@ -119,6 +119,7 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Read Form-List only with necessary information for Listing.
 	 */
 	public function getForms(): Http\JSONResponse {
@@ -130,7 +131,7 @@ class ApiController extends Controller {
 				'id' => $form->getId(),
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
-				'expired' => $form->getExpired(),
+				'expires' => $form->getExpires(),
 			];
 		}
 
@@ -150,7 +151,7 @@ class ApiController extends Controller {
 		}
 
 		$result = $form->read();
-		$result['questions'] = getQuestions();
+		$result['questions'] = $this->getQuestions($id);
 
 		return new Http\JSONResponse($result);
 	}
@@ -186,7 +187,9 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Writes the given key-value pairs into Database.
+	 *
 	 * @param int $id FormId of form to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 */
@@ -241,7 +244,7 @@ class ApiController extends Controller {
 		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
 		$this->submissionMapper->deleteByForm($id);
 		$this->questionMapper->deleteByForm($id);
-		$this->formMapper->delete($formToDelete);
+		$this->formMapper->delete($form);
 
 		return new Http\JSONResponse($id);
 	}
@@ -256,11 +259,16 @@ class ApiController extends Controller {
 			'text' => $text,
 		]);
 
+		if (array_search($type, Question::TYPES) === false) {
+			$this->logger->debug('Invalid type');
+			return new Http\JSONResponse(['message' => 'Invalid type'], Http::STATUS_BAD_REQUEST);
+		}
+		
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -286,10 +294,8 @@ class ApiController extends Controller {
 
 		$question = $this->questionMapper->insert($question);
 
-		$response = [
-			'id' => $question->getId(),
-			'order' => $question->getOrder()
-		];
+		$response = $question->read();
+		$response['options'] = [];
 
 		return new Http\JSONResponse($response);
 	}
@@ -298,7 +304,7 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * Updates the Order of all Questions of a Form.
 	 * @param int $formId Id of the form to reorder
-	 * @param int $newOrder Array of Question-Ids in new order.
+	 * @param int[] $newOrder Array of Question-Ids in new order.
 	 */
 	public function reorderQuestions(int $formId, array $newOrder): Http\JSONResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
@@ -467,16 +473,15 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function newOption(int $formId, int $questionId, string $text): Http\JSONResponse {
-		$this->logger->debug('Adding new option: formId: {formId}, questionId: {questionId}, text: {text}', [
-			'formId' => $formId,
+	public function newOption(int $questionId, string $text): Http\JSONResponse {
+		$this->logger->debug('Adding new option: questionId: {questionId}, text: {text}', [
 			'questionId' => $questionId,
 			'text' => $text,
 		]);
 
 		try {
-			$form = $this->formMapper->findById($formId);
 			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question so option can\'t be added');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
@@ -487,17 +492,51 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		if ($question->getFormId() !== $formId) {
-			$this->logger->debug('This question is not part of the current form');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
-		}
-
 		$option = new Option();
 
 		$option->setQuestionId($questionId);
 		$option->setText($text);
 
 		$option = $this->optionMapper->insert($option);
+
+		return new Http\JSONResponse([
+			'id' => $option->getId()
+		]);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * Writes the given key-value pairs into Database.
+
+	 * @param int $id OptionId of option to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 */
+	public function updateOption(int $id, array $keyValuePairs): Http\JSONResponse {
+		$this->logger->debug('Updating option: option: {id}, values: {keyValuePairs}', [
+			'id' => $id,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$option = $this->optionMapper->findById($id);
+			$question = $this->questionMapper->findById($option->getQuestionId());
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find option, question or form');
+			return new Http\JSONResponse(['message' => 'Could not find option, question or form'], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Create OptionEntity with given Params & Id.
+		$option = Option::fromParams($keyValuePairs);
+		$option->setId($id);
+
+		// Update changed Columns in Db.
+		$this->optionMapper->update($option);
 
 		return new Http\JSONResponse($option->getId());
 	}
@@ -526,7 +565,6 @@ class ApiController extends Controller {
 
 		$this->optionMapper->delete($option);
 
-		//TODO useful response
 		return new Http\JSONResponse($id);
 	}
 

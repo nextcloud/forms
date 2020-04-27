@@ -1,3 +1,4 @@
+
 /**
  * @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
  *
@@ -12,26 +13,19 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/**
- * Format a form object prior to forms v2.0
  *
- * @param {Object} form the form raw object
- * @returns {Object} properly formatted form object
  */
-const formatForm = function(form) {
-	// clone form
-	const newForm = Object.assign({}, form, form.form)
 
-	// cleanup
-	delete newForm.event
-	return newForm
+const GenRandomId = (length) => {
+	return Math.random()
+		.toString(36)
+		.replace(/[^a-z]+/g, '')
+		.substr(0, length || 5)
 }
 
-export { formatForm }
+export default GenRandomId

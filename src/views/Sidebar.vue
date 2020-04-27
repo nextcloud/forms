@@ -21,32 +21,34 @@
  -->
 
 <template>
-	<AppSidebar :title="form.form.title">
+	<AppSidebar v-show="opened" :title="form.title" @close="onClose">
 		<div class="configBox ">
 			<label class="title icon-settings">
 				{{ t('forms', 'Form configurations') }}
 			</label>
 
 			<input id="isAnonymous"
-				v-model="form.form.isAnonymous"
+				v-model="form.isAnonymous"
 
 				type="checkbox"
-				class="checkbox">
+				class="checkbox"
+				@change="onAnonChange">
 			<label for="isAnonymous" class="title">
 				{{ t('forms', 'Anonymous form') }}
 			</label>
 
 			<input id="submitOnce"
-				v-model="form.form.submitOnce"
-				:disabled="form.form.access.type === 'public' || form.form.isAnonymous"
+				v-model="form.submitOnce"
+				:disabled="form.access.type === 'public' || form.isAnonymous"
 				type="checkbox"
-				class="checkbox">
+				class="checkbox"
+				@change="onSubmOnceChange">
 			<label for="submitOnce" class="title">
 				<span>{{ t('forms', 'Only allow one submission per user') }}</span>
 			</label>
 
 			<input id="expires"
-				v-model="form.form.expires"
+				v-model="formExpires"
 
 				type="checkbox"
 				class="checkbox">
@@ -54,10 +56,11 @@
 				{{ t('forms', 'Expires') }}
 			</label>
 
-			<DatetimePicker v-show="form.form.expires"
+			<DatetimePicker v-show="formExpires"
 				id="expiresDatetimePicker"
-				v-model="form.form.expiresTimestamp"
-				v-bind="expirationDatePicker" />
+				v-model="form.expires"
+				v-bind="expirationDatePicker"
+				@change="onExpiresChange" />
 		</div>
 
 		<div class="configBox">
@@ -66,37 +69,40 @@
 			</label>
 
 			<input id="registered"
-				v-model="form.form.access.type"
+				v-model="form.access.type"
 				type="radio"
 				value="registered"
-				class="radio">
+				class="radio"
+				@change="onAccessChange">
 			<label for="registered" class="title">
 				<div class="title icon-group" />
 				<span>{{ t('forms', 'Registered users only') }}</span>
 			</label>
 
 			<input id="public"
-				v-model="form.form.access.type"
+				v-model="form.access.type"
 				type="radio"
 				value="public"
-				class="radio">
+				class="radio"
+				@change="onAccessChange">
 			<label for="public" class="title">
 				<div class="title icon-link" />
 				<span>{{ t('forms', 'Public access') }}</span>
 			</label>
 
 			<input id="selected"
-				v-model="form.form.access.type"
+				v-model="form.access.type"
 				type="radio"
 				value="selected"
-				class="radio">
+				class="radio"
+				@change="onAccessChange">
 			<label for="selected" class="title">
 				<div class="title icon-shared" />
 				<span>{{ t('forms', 'Only shared') }}</span>
 			</label>
 		</div>
 
-		<ShareDiv v-show="form.form.access.type === 'selected'"
+		<ShareDiv v-show="form.access.type === 'selected'"
 			:active-shares="form.shares"
 			:placeholder="t('forms', 'Name of user or group')"
 			:hide-names="true"
@@ -109,6 +115,7 @@
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 
 import ShareDiv from '../components/shareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -125,10 +132,12 @@ export default {
 
 	data() {
 		return {
+			opened: true,
 			lang: '',
 			locale: '',
 			longDateFormat: '',
 			dateTimeFormat: '',
+			formExpires: false,
 		}
 	},
 
@@ -149,21 +158,18 @@ export default {
 				},
 			}
 		},
+	},
 
-		optionDatePicker() {
-			return {
-				editable: false,
-				minuteStep: 1,
-				type: 'datetime',
-				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
-				lang: this.lang.split('-')[0],
-				placeholder: t('forms', 'Click to add a date'),
-				timePickerOptions: {
-					start: '00:00',
-					step: '00:30',
-					end: '23:30',
-				},
-			}
+	watch: {
+		formExpires: {
+			handler: function() {
+				if (!this.formExpires) {
+					this.form.expires = 0
+					this.onExpiresChange()
+				} else {
+					this.form.expires = moment().unix() + 3600 // Expires in one hour.
+				}
+			},
 		},
 	},
 
@@ -182,6 +188,20 @@ export default {
 		moment.locale(this.locale)
 		this.longDateFormat = moment.localeData().longDateFormat('L')
 		this.dateTimeFormat = moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT')
+
+		// Compute current formExpires for checkbox
+		if (this.form.expires) {
+			this.formExpires = true
+		} else {
+			this.formExpires = false
+		}
+
+		// Watch for Sidebar toggle
+		subscribe('toggleSidebar', this.onToggle)
+	},
+
+	beforeDestroy() {
+		unsubscribe('toggleSidebar')
 	},
 
 	methods: {
@@ -195,6 +215,32 @@ export default {
 
 		removeShare(item) {
 			this.form.shares.splice(this.form.shares.indexOf(item), 1)
+		},
+
+		/**
+		 * Sidebar state methods
+		 */
+		onClose() {
+			this.opened = false
+		},
+		onToggle() {
+			this.opened = !this.opened
+		},
+
+		/**
+		 * Save Form-Properties
+		 */
+		onAnonChange() {
+			this.saveFormProperty('isAnonymous')
+		},
+		onSubmOnceChange() {
+			this.saveFormProperty('submitOnce')
+		},
+		onAccessChange() {
+			this.saveFormProperty('access')
+		},
+		onExpiresChange() {
+			this.saveFormProperty('expires')
 		},
 	},
 }

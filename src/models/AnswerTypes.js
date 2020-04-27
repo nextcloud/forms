@@ -20,34 +20,42 @@
  *
  */
 
-export default class {
+import QuestionLong from '../components/Questions/QuestionLong'
+import QuestionShort from '../components/Questions/QuestionShort'
+import QuestionMultiple from '../components/Questions/QuestionMultiple'
 
-	#data
+/**
+ * @typedef {Object} AnswerTypes
+ * @property {string} multiple_unique
+ * @property {string} multiple
+ * @property {string} short
+ * @property {string} long
+ */
+export default {
 
-	/**
-	 * Construct the form
-	 * @param {Object} data the form data
-	 */
-	constructor(data) {
-		// Id check
-		if (!('id' in data && typeof data.id === 'number')) {
-			throw new Error('A new form must at least contain a valid id')
-		}
+	multiple_unique: {
+		component: QuestionMultiple,
+		icon: 'icon-answer-multiple',
+		label: t('forms', 'Multiple choice'),
+		unique: true,
+	},
 
-		// Hash check
-		if (!('hash' in data && typeof data.id === 'string')) {
-			throw new Error('A new form must at least contain a valid hash')
-		}
+	multiple: {
+		component: QuestionMultiple,
+		icon: 'icon-answer-checkbox',
+		label: t('forms', 'Checkboxes'),
+	},
 
-		this.#data = data
-	}
+	short: {
+		component: QuestionShort,
+		icon: 'icon-answer-short',
+		label: t('forms', 'Short answer'),
+	},
 
-	get id() {
-		return this.#data.id
-	}
-
-	get hash() {
-		return this.#data.hash
-	}
+	long: {
+		component: QuestionLong,
+		icon: 'icon-answer-long',
+		label: t('forms', 'Long text'),
+	},
 
 }
