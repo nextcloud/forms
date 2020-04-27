@@ -38,9 +38,9 @@
 			</ActionLink>
 			<ActionRouter :close-after-click="true"
 				:exact="true"
-				icon="icon-forms"
+				icon="icon-comment"
 				:to="{ name: 'results', params: { hash: form.hash } }">
-				{{ t('forms', 'Show results') }}
+				{{ t('forms', 'Responses') }}
 			</ActionRouter>
 			<!-- <ActionRouter :close-after-click="true"
 				:exact="true"
@@ -131,7 +131,7 @@ export default {
 					? t('forms', 'Form link copied')
 					: t('forms', 'Cannot copy, please copy the link manually')
 			}
-			return t('forms', 'Copy to clipboard')
+			return t('forms', 'Copy share link')
 		},
 	},
 

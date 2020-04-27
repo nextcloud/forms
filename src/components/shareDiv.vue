@@ -21,9 +21,7 @@
   -->
 
 <template>
-	<div>
-		<h2> {{ t('forms', 'Share with') }}</h2>
-
+	<div class="sharing">
 		<Multiselect id="ajax"
 			v-model="shares"
 			:options="users"
@@ -151,7 +149,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+	.sharing {
+		margin: 8px 8px 8px 36px;
+	}
+
 	.shared-list {
 		display: flex;
 		flex-wrap: wrap;

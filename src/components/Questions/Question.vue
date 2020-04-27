@@ -155,8 +155,6 @@ export default {
 	justify-content: stretch;
 	margin-bottom: 22px;
 	padding-left: 44px;
-	// room for the new question menu
-	padding-right: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
 
@@ -169,7 +167,15 @@ export default {
 		left: 0;
 		width: 44px;
 		height: 100%;
+		opacity: .5;
+
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
+
 		cursor: grab;
+
 		&:active {
 			cursor: grabbing;
 		}
@@ -179,7 +185,7 @@ export default {
 	&__content {
 		flex: 1 1 100%;
 		max-width: 100%;
-		margin: 20px;
+		margin-bottom: 20px;
 		padding: 0;
 	}
 
@@ -189,8 +195,7 @@ export default {
 		flex: 1 1 100%;
 		justify-content: space-between;
 		width: auto;
-		margin: 20px;
-		margin-bottom: 0;
+		margin-top: 20px;
 
 		// Using type to have a higher order than the input styling of server
 		&-title,
@@ -205,6 +210,7 @@ export default {
 			border-bottom: 1px dotted transparent;
 			border-radius: 0;
 			font-size: 16px;
+			font-weight: bold;
 			line-height: 22px;
 		}
 
