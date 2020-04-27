@@ -264,7 +264,7 @@ class PageController extends Controller {
 		foreach($questions as $question) {
 			// If question is answered, the questionText exists as key in $answers. Does not exist, when a (non-mandatory) question was not answered.
 			if (array_key_exists($question['text'], $answers)) {
-				if($question['type'] === "checkbox"){
+				if($question['type'] === "multiple"){
 					foreach(($answers[$question['text']]) as $ansText) {
 						$answer = new Answer();
 						$answer->setSubmissionId($submissionId);

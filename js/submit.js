@@ -34,6 +34,12 @@ function cssUpdate(survey, options){
 $(document).ready(function () {
 	var formJSON = $('#surveyContainer').attr('form')
 	var questionJSON = $('#surveyContainer').attr('questions')
+	const questionTypeMap = {
+		multiple_unique: 'radiogroup',
+		multiple: 'checkbox',
+		short: 'text',
+		long: 'comment',
+	}
 
 	form = JSON.parse(formJSON)
 	questions = JSON.parse(questionJSON)
@@ -49,7 +55,7 @@ $(document).ready(function () {
 		q.options.forEach(o => {
 			qChoices.push(o.text);
 		});
-		surveyJSON.questions.push({type: q.type, name: q.text, choices: qChoices, isRequired: 'true'});
+		surveyJSON.questions.push({type: questionTypeMap[q.type], name: q.text, choices: qChoices, isRequired: 'true'});
 	});
 
 	$('#surveyContainer').Survey({
