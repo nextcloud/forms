@@ -29,21 +29,21 @@
 <template>
 	<AppContent v-if="isLoadingForm">
 		<EmptyContent icon="icon-loading">
-			{{ t('forms', 'Loading form “{title}”', { title: form.title }) }}
+			{{ t('forms', 'Loading {title} …', { title: form.title }) }}
 		</EmptyContent>
 	</AppContent>
 
 	<AppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
-			<button class="primary" @click="showResults">
-				<span class="icon-forms-white" role="img" />
-				{{ t('forms', 'Show results') }}
+			<button @click="showResults">
+				<span class="icon-comment" role="img" />
+				{{ t('forms', 'Responses') }}
 			</button>
 			<button v-tooltip="t('forms', 'Toggle settings')"
 				:aria-label="t('forms', 'Toggle settings')"
 				@click="toggleSidebar">
-				<span class="icon-settings" role="img" />
+				<span class="icon-menu-sidebar" role="img" />
 			</button>
 		</TopBar>
 
@@ -91,21 +91,11 @@
 				</Actions>
 			</div>
 
-			<!-- No questions -->
-			<EmptyContent v-if="hasQuestions">
-				{{ t('forms', 'This form does not have any questions') }}
-				<template #desc>
-					<button class="empty-content__button primary" @click="openQuestionMenu">
-						<span class="icon-add-white" />
-						{{ t('forms', 'Add a new one') }}
-					</button>
-				</template>
-			</EmptyContent>
-
 			<!-- Questions list -->
 			<Draggable v-model="form.questions"
 				:animation="200"
 				tag="ul"
+				handle=".question__drag-handle"
 				@change="onQuestionOrderChange"
 				@start="isDragging = true"
 				@end="isDragging = false">
@@ -382,7 +372,7 @@ export default {
 	header,
 	section {
 		width: 100%;
-		max-width: 900px;
+		max-width: 750px;
 	}
 
 	// Title & description header
@@ -394,19 +384,22 @@ export default {
 		#form-title,
 		#form-desc {
 			width: 100%;
-			margin: 10px; // aerate the header
-			padding: 0; // makes alignment and desc height calc easier
+			margin: 16px 0; // aerate the header
+			padding: 0 16px;
 			border: none;
 		}
 		#form-title {
 			font-size: 2em;
+			font-weight: bold;
+			padding-left: 14px; // align with description (compensate font size diff)
+			overflow-x: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 		#form-desc {
-			// make sure height calculations are correct
-			box-sizing: content-box !important;
 			min-height: 60px;
 			max-height: 200px;
-			padding-left: 2px; // align with title (compensate font size diff)
+			margin-top: 0;
 			resize: none;
 		}
 	}
@@ -434,7 +427,7 @@ export default {
 			top: var(--header-height);
 			display: flex;
 			align-items: center;
-			align-self: flex-end;
+			align-self: flex-start;
 			width: 44px;
 			height: var(--top-bar-height);
 			// make sure this doesn't take any space and appear floating

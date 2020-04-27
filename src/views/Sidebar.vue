@@ -22,92 +22,94 @@
 
 <template>
 	<AppSidebar v-show="opened" :title="form.title" @close="onClose">
-		<div class="configBox ">
-			<label class="title icon-settings">
-				{{ t('forms', 'Form configurations') }}
-			</label>
+		<h3>{{ t('forms', 'Settings') }}</h3>
+		<ul>
+			<li>
+				<input id="isAnonymous"
+					v-model="form.isAnonymous"
 
-			<input id="isAnonymous"
-				v-model="form.isAnonymous"
+					type="checkbox"
+					class="checkbox"
+					@change="onAnonChange">
+				<label for="isAnonymous">
+					{{ t('forms', 'Anonymous responses') }}
+				</label>
+			</li>
+			<li>
+				<input id="submitOnce"
+					v-model="form.submitOnce"
+					:disabled="form.access.type === 'public' || form.isAnonymous"
+					type="checkbox"
+					class="checkbox"
+					@change="onSubmOnceChange">
+				<label for="submitOnce">
+					{{ t('forms', 'Only allow one response per user') }}
+				</label>
+			</li>
+			<li>
+				<input id="expires"
+					v-model="formExpires"
+					type="checkbox"
+					class="checkbox">
+				<label for="expires">
+					{{ t('forms', 'Set expiration date') }}
+				</label>
+				<DatetimePicker v-show="formExpires"
+					id="expiresDatetimePicker"
+					v-model="form.expires"
+					v-bind="expirationDatePicker"
+					@change="onExpiresChange" />
+			</li>
+		</ul>
 
-				type="checkbox"
-				class="checkbox"
-				@change="onAnonChange">
-			<label for="isAnonymous" class="title">
-				{{ t('forms', 'Anonymous form') }}
-			</label>
-
-			<input id="submitOnce"
-				v-model="form.submitOnce"
-				:disabled="form.access.type === 'public' || form.isAnonymous"
-				type="checkbox"
-				class="checkbox"
-				@change="onSubmOnceChange">
-			<label for="submitOnce" class="title">
-				<span>{{ t('forms', 'Only allow one submission per user') }}</span>
-			</label>
-
-			<input id="expires"
-				v-model="formExpires"
-
-				type="checkbox"
-				class="checkbox">
-			<label class="title" for="expires">
-				{{ t('forms', 'Expires') }}
-			</label>
-
-			<DatetimePicker v-show="formExpires"
-				id="expiresDatetimePicker"
-				v-model="form.expires"
-				v-bind="expirationDatePicker"
-				@change="onExpiresChange" />
-		</div>
-
-		<div class="configBox">
-			<label class="title icon-user">
-				{{ t('forms', 'Access') }}
-			</label>
-
-			<input id="registered"
-				v-model="form.access.type"
-				type="radio"
-				value="registered"
-				class="radio"
-				@change="onAccessChange">
-			<label for="registered" class="title">
-				<div class="title icon-group" />
-				<span>{{ t('forms', 'Registered users only') }}</span>
-			</label>
-
-			<input id="public"
-				v-model="form.access.type"
-				type="radio"
-				value="public"
-				class="radio"
-				@change="onAccessChange">
-			<label for="public" class="title">
-				<div class="title icon-link" />
-				<span>{{ t('forms', 'Public access') }}</span>
-			</label>
-
-			<input id="selected"
-				v-model="form.access.type"
-				type="radio"
-				value="selected"
-				class="radio"
-				@change="onAccessChange">
-			<label for="selected" class="title">
-				<div class="title icon-shared" />
-				<span>{{ t('forms', 'Only shared') }}</span>
-			</label>
-		</div>
-
-		<ShareDiv v-show="form.access.type === 'selected'"
-			:active-shares="form.shares"
-			:placeholder="t('forms', 'Name of user or group')"
-			:hide-names="true"
-			@update-shares="updateShares"
-			@remove-share="removeShare" />
+		<h3>{{ t('forms', 'Sharing') }}</h3>
+		<ul>
+			<li>
+				<input id="registered"
+					v-model="form.access.type"
+					type="radio"
+					value="registered"
+					class="radio"
+					@change="onAccessChange">
+				<label for="registered">
+					<span class="icon-group">
+						{{ t('forms', 'Show to all users of this instance') }}
+					</span>
+				</label>
+			</li>
+			<li>
+				<input id="public"
+					v-model="form.access.type"
+					type="radio"
+					value="public"
+					class="radio"
+					@change="onAccessChange">
+				<label for="public">
+					<span class="icon-link">
+						{{ t('forms', 'Share link') }}
+					</span>
+				</label>
+			</li>
+			<li>
+				<input id="selected"
+					v-model="form.access.type"
+					type="radio"
+					value="selected"
+					class="radio"
+					@change="onAccessChange">
+				<label for="selected">
+					<span class="icon-shared">
+						{{ t('forms', 'Choose users to share with') }}
+					</span>
+				</label>
+				<ShareDiv v-show="form.access.type === 'selected'"
+					:active-shares="form.shares"
+					:placeholder="t('forms', 'Name of user or group')"
+					:hide-names="true"
+					@update-shares="updateShares"
+					@remove-share="removeShare" />
+			</li>
+		</ul>
 	</AppSidebar>
 </template>
 
@@ -132,7 +134,7 @@ export default {
 
 	data() {
 		return {
-			opened: true,
+			opened: false,
 			lang: '',
 			locale: '',
 			longDateFormat: '',
@@ -247,21 +249,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h3 {
+	margin-left: 8px;
+	margin-bottom: 8px;
+}
 
-.configBox {
-	display: flex;
-	flex-direction: column;
-	padding: 8px;
-	& > * {
-		padding-left: 21px;
-	}
-	& > .title {
-		display: flex;
-		background-position: 0 2px;
-		padding-left: 24px;
-		margin-bottom: 4px;
-		& > span {
-			padding-left: 4px;
+ul {
+	margin-bottom: 24px;
+
+	label {
+		padding: 8px;
+		display: block;
+
+		span[class^="icon-"],
+		span[class*=" icon-"] {
+			background-position: 4px;
+			padding-left: 24px;
 		}
 	}
 }
@@ -275,6 +278,7 @@ textarea {
 }
 
 #expiresDatetimePicker {
-	width: 170px;
+	left: 36px;
+	width: calc(100% - 44px);
 }
 </style>

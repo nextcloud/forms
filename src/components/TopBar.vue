@@ -51,7 +51,7 @@ $top-bar-height: 60px;
 
 	button {
 		cursor: pointer;
-		&:not(.primary) {
+		&:not(:first-child) {
 			width: 44px;
 			height: 44px;
 			border: none;
