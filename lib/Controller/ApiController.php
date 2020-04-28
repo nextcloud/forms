@@ -38,6 +38,7 @@ use OCP\AppFramework\Db\IMapperException;
 use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
+use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 
 use OCA\Forms\Db\Form;
@@ -62,12 +63,13 @@ class ApiController extends Controller {
 	/** @var ILogger */
 	private $logger;
 
-	/** @var string */
-	private $userId;
+	/** @var IUserSession */
+	private $userSession;
 
 	public function __construct(
 		IRequest $request,
-		$userId,
+		$userId, // TODO remove & replace with userSession below.
+		IUserSession $userSession,
 		FormMapper $formMapper,
 		SubmissionMapper $submissionMapper,
 		AnswerMapper $answerMapper,
@@ -77,6 +79,7 @@ class ApiController extends Controller {
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->userId = $userId;
+		$this->userSession = $userSession;
 		$this->formMapper = $formMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->answerMapper = $answerMapper;
@@ -602,5 +605,85 @@ class ApiController extends Controller {
 		}
 
 		return new Http\JSONResponse($result);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @PublicPage
+	 * 
+	 * Process a new submission
+	 * @param int $formId
+	 * @param array $answers [question_id => arrayOfString]
+	 */
+	public function insertSubmission(int $formId, array $answers) {
+		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}', [
+			'formId' => $formId,
+			'answers' => $answers,
+		]);
+
+		try {
+			$form = $this->formMapper->findById($formId);
+			$questions = $this->getQuestions($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
+		}
+
+		$user = $this->userSession->getUser();
+		// TODO check again hasUserAccess?!
+
+		// Create Submission
+		$submission = new Submission();
+		$submission->setFormId($formId);
+		$submission->setTimestamp(time());
+
+		// If not logged in or anonymous use anonID
+		if (!$user || $form->getIsAnonymous()){
+			$anonID = "anon-user-".  hash('md5', (time() + rand()));
+			$submission->setUserId($anonID);
+		} else {
+			$submission->setUserId($user->getUID());
+		}
+
+		// Insert new submission
+		$this->submissionMapper->insert($submission);
+		$submissionId = $submission->getId();
+
+		// Process Answers
+		foreach($answers as $questionId => $answerArray) {
+			// Search corresponding Question, skip processing if not found
+			$questionIndex = array_search($questionId, array_column($questions, 'id'));
+			if ($questionIndex === false) {
+				continue;
+			} else {
+				$question = $questions[$questionIndex];
+			}
+
+			foreach($answerArray as $answer) {
+				if($question['type'] === 'multiple' || $question['type'] === 'multiple_unique') {
+					// Search corresponding option, skip processing if not found
+					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
+					if($optionIndex === false) {
+						continue;
+					} else {
+						$option = $question['options'][$optionIndex];
+					}
+
+					// Load option-text
+					$answerText = $option['text'];
+
+				} else {
+					$answerText = $answer; // Not a multiple-question, answerText is given answer
+				}
+
+				$answerEntity = new Answer();
+				$answerEntity->setSubmissionId($submissionId);
+				$answerEntity->setQuestionId($question['id']);
+				$answerEntity->setText($answerText);
+				$this->answerMapper->insert($answerEntity);
+			}
+		}
+
+		return new Http\JSONResponse([]);
 	}
 }

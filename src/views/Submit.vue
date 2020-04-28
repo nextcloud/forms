@@ -44,9 +44,14 @@
 						:read-only="true"
 						:model="answerTypes[question.type]"
 						:index="index + 1"
-						v-bind="question" />
+						v-bind="question"
+						:values.sync="answers[question.id]" />
 				</ul>
-				<input class="primary" type="submit" :value="t('forms', 'Submit')" :aria-label="t('forms', 'Submit form')">
+				<input class="primary"
+					type="submit"
+					:value="t('forms', 'Submit')"
+					:disabled="loading"
+					:aria-label="t('forms', 'Submit form')">
 			</form>
 		</AppContent>
 	</Content>
@@ -54,11 +59,13 @@
 
 <script>
 import { loadState } from '@nextcloud/initial-state'
-
-import answerTypes from '../models/AnswerTypes'
-
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import Content from '@nextcloud/vue/dist/Components/Content'
+
+import answerTypes from '../models/AnswerTypes'
 
 import Question from '../components/Questions/Question'
 import QuestionLong from '../components/Questions/QuestionLong'
@@ -81,6 +88,9 @@ export default {
 		return {
 			form: loadState('forms', 'form'),
 			answerTypes,
+			answers: {},
+			loading: false,
+			success: false,
 		}
 	},
 
@@ -102,8 +112,24 @@ export default {
 	},
 
 	methods: {
-		onSubmit(e) {
-			console.info(e)
+		/**
+		 * Submit the form after the browser validated it 🚀
+		 */
+		async onSubmit() {
+			this.loading = true
+
+			try {
+				await axios.post(generateUrl('/apps/forms/api/v1/submissions/insert'), {
+					formId: this.form.id,
+					answers: this.answers,
+				})
+				this.success = true
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error submitting the form'))
+			} finally {
+				this.loading = false
+			}
 		},
 	},
 

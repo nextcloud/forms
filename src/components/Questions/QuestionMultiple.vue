@@ -43,7 +43,8 @@
 						}"
 						:name="`${id}-answer`"
 						:required="true /* TODO: implement required option */"
-						:type="isUnique ? 'radio' : 'checkbox'">
+						:type="isUnique ? 'radio' : 'checkbox'"
+						@change="onChange($event, answer.id)">
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${answer.id}`"
@@ -126,6 +127,26 @@ export default {
 	},
 
 	methods: {
+		onChange(event, answerId) {
+			const isChecked = event.target.checked === true
+			let values = this.values.slice()
+
+			// Radio
+			if (this.isUnique) {
+				this.$emit('update:values', [answerId])
+				return
+			}
+
+			// Checkbox
+			if (isChecked) {
+				values.push(answerId)
+			} else {
+				values = values.filter(id => id !== answerId)
+			}
+
+			// Emit values and remove duplicates
+			this.$emit('update:values', [...new Set(values)])
+		},
 
 		/**
 		 * Is the provided index checked

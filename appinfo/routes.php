@@ -32,7 +32,6 @@ return [
 		['name' => 'page#getResult', 'url' => '/{hash}/results', 'verb' => 'GET'],
 
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
-		['name' => 'page#insert_submission', 'url' => '/insert/submission', 'verb' => 'POST'],
 
 		// Forms
 		['name' => 'api#getForms', 'url' => '/api/v1/forms', 'verb' => 'GET'],
@@ -53,6 +52,7 @@ return [
 		['name' => 'api#deleteOption', 'url' => '/api/v1/option/{id}', 'verb' => 'DELETE'],
 
 		['name' => 'api#getSubmissions', 'url' => '/api/v1/submissions/{hash}', 'verb' => 'GET'],
+		['name' => 'api#insertSubmission', 'url' => '/api/v1/submissions/insert', 'verb' => 'POST'],
 
 		['name' => 'system#get_site_users_and_groups', 'url' => '/get/siteusers', 'verb' => 'POST'],
 	]

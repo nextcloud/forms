@@ -29,19 +29,16 @@
 
 namespace OCA\Forms\Controller;
 
+use Exception;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Submission;
-use OCA\Forms\Db\SubmissionMapper;
-use OCA\Forms\Db\Answer;
-use OCA\Forms\Db\AnswerMapper;
-
-use OCA\Forms\Db\OptionMapper;
+use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Option;
+use OCA\Forms\Db\OptionMapper;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IGroupManager;
 use OCP\IRequest;
@@ -57,12 +54,6 @@ class PageController extends Controller {
 	/** @var FormMapper */
 	private $formMapper;
 
-	/** @var SubmissionMapper */
-	private $submissionMapper;
-	
-	/** @var AnswerMapper */
-	private $answerMapper;
-		
 	/** @var IURLGenerator */
 	private $urlGenerator;
 	
@@ -82,8 +73,6 @@ class PageController extends Controller {
 								FormMapper $formMapper,
 								QuestionMapper $questionMapper,
 								OptionMapper $optionMapper,
-								SubmissionMapper $SubmissionMapper,
-								AnswerMapper $AnswerMapper,
 								IUserSession $userSession,
 								IInitialStateService $initialStateService) {
 		parent::__construct($appName, $request);
@@ -94,8 +83,6 @@ class PageController extends Controller {
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
-		$this->submissionMapper = $SubmissionMapper;
-		$this->answerMapper = $AnswerMapper;
 		$this->userSession = $userSession;
 		$this->initialStateService = $initialStateService;
 	}
@@ -235,62 +222,6 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'submit');
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->getForm($form->getId()));
 		return new TemplateResponse($this->appName, 'main', [], $renderAs);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @PublicPage
-	 * 
-	 * Process a new submission
-	 * @param int $formId
-	 * @param string $userId
-	 * @param array $answers
-	 * @param array $questions
-	 * @return RedirectResponse
-	 */
-	public function insertSubmission(int $id, string $userId, array $answers, array $questions) {
-
-		$form = $this->formMapper->findById($id);
-		$anonID = "anon-user-".  hash('md5', (time() + rand()));
-
-		// Insert Submission
-		$submission = new Submission();
-		$submission->setFormId($id);
-		if ($form->getIsAnonymous()){
-			$submission->setUserId($anonID);
-
-		} else {
-			$submission->setUserId($userId);
-		}
-		$submission->setTimestamp(time());
-		$this->submissionMapper->insert($submission);
-		$submissionId = $submission->getId();
-
-		//Insert Answers
-		foreach($questions as $question) {
-			// If question is answered, the questionText exists as key in $answers. Does not exist, when a (non-mandatory) question was not answered.
-			if (array_key_exists($question['text'], $answers)) {
-				if($question['type'] === "checkbox"){
-					foreach(($answers[$question['text']]) as $ansText) {
-						$answer = new Answer();
-						$answer->setSubmissionId($submissionId);
-						$answer->setQuestionId($question['id']);
-						$answer->setText($ansText);
-						$this->answerMapper->insert($answer);
-					}
-				} else {
-					$answer = new Answer();
-					$answer->setSubmissionId($submissionId);
-					$answer->setQuestionId($question['id']);
-					$answer->setText($answers[$question['text']]);
-					$this->answerMapper->insert($answer);
-				}
-			}
-		}
-
-		$hash = $form->getHash();
-		$url = $this->urlGenerator->linkToRoute('forms.page.goto_form', ['hash' => $hash]);
-		return new RedirectResponse($url);
 	}
 
 	/**
