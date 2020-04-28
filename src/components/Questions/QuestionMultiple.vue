@@ -42,7 +42,7 @@
 							'checkbox question__checkbox': !isUnique,
 						}"
 						:name="`${id}-answer`"
-						:required="true /* TODO: implement required option */"
+						:required="isRequired(answer.id)"
 						:type="isUnique ? 'radio' : 'checkbox'"
 						@change="onChange($event, answer.id)">
 					<label v-if="!edit"
@@ -115,6 +115,10 @@ export default {
 		hasNoAnswer() {
 			return this.options.length === 0
 		},
+
+		areNoneChecked() {
+			return this.values.length === 0
+		},
 	},
 
 	watch: {
@@ -149,13 +153,28 @@ export default {
 		},
 
 		/**
-		 * Is the provided index checked
-		 * @param {number} index the option index
+		 * Is the provided answer checked ?
+		 * @param {number} id the answer id
 		 * @returns {boolean}
 		 */
-		isChecked(index) {
-			// TODO implement based on answers
-			return false
+		isChecked(id) {
+			return this.values.indexOf(id) > -1
+		},
+
+		/**
+		 * Is the provided answer required ?
+		 * This is needed for checkboxes as html5
+		 * doesn't allow to require at least ONE checked.
+		 * So we require the one that are checked or all
+		 * if none are checked yet.
+		 * @param {number} id the answer id
+		 * @returns {boolean}
+		 */
+		isRequired(id) {
+			if (this.isUnique) {
+				return true
+			}
+			return this.areNoneChecked || this.isChecked(id)
 		},
 
 		/**
