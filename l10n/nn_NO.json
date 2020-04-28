@@ -1,11 +1,7 @@
 { "translations": {
     "Group" : "Gruppe",
     "Title" : "Tittel",
-    "Owner" : "Owner",
-    "Created" : "Lagd",
-    "never" : "aldri",
     "Description" : "Skildring",
-    "Done" : "Ferdig",
     "Expiration date" : "Utløpsdato"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

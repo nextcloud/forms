@@ -1,10 +1,7 @@
 { "translations": {
     "Group" : "Group",
     "Title" : "ចំណងជើង",
-    "Owner" : "Owner",
-    "never" : "មិនដែរ",
     "Description" : "ការ​អធិប្បាយ",
-    "Done" : "Done",
     "Expiration date" : "ពេល​ផុត​កំណត់"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

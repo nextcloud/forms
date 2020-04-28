@@ -1,14 +1,7 @@
 { "translations": {
-    "Copy to clipboard" : "Copiar al portapapeles",
     "Group" : "Grupo",
     "Title" : "Título",
-    "Owner" : "Dueño",
-    "Created" : "Creado",
-    "Copy link" : "Copiar enlace",
-    "Public access" : "Acceso público",
-    "never" : "nunca",
     "Description" : "Descripción",
-    "Done" : "Hecho",
     "Expiration date" : "Fecha de expiración"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
