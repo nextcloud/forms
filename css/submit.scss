@@ -1,73 +1,68 @@
 .app-forms {
 	margin: auto;
-	width: 50%;
-	margin-top: 20px;
+	width: 700px;
+	max-width: 90vw;
+	margin-top: 32px;
 }
 
-.sv-q-description {
-	font-size: 420px;
-}
-
-/* hotfixcss
- setting the width to 70% so it takes a more reasonable place for long titles
- line height to 1 so the lines don't overlap
- adding a margin-bottom for confort
-*/
 .sv_container {
 	h3 {
-		width: 70%;
-		line-height: 1;
-		margin-bottom: 5%;
-		font-size: 30px;
+		font-size: 30px !important;
+		font-weight: bold !important;
+		line-height: 1.3;
+		margin-bottom: 32px;
+
+		+ h5 {
+			font-size: 16px;
+		}
 	}
 }
 
-
-/* hotfixcss
-changing to color so it matches the header
-setting the width to 70% to match the previous fix
-setting a more confortable margin-bottom
-*/
-.sv_qstn .sq-root {
-	border: 1px solid gray;
-	border-left: 4px solid #0082c9;
-	border-radius: 5px;
-	padding: 20px;
-	width: 70%;
-	margin-bottom: 6%;
-	font-size: 18px;
+.sv_qstn {
+	margin-top: 80px;
+	overflow: hidden;
+	line-height: 1.3;
 }
 
+.sv_qstn .sq-root {
+	font-size: 16px;
+}
 
-/* hotfixcss
-adding a margin
-*/
+input.sq-root[type='text'],
+textarea.sq-root {
+	width: 100%;
+	margin: 0;
+}
+
 .sq-title {
 	font-size: 20px;
-	margin-left: 20px;
-	margin-bottom: 2%;
+	font-weight: bold;
+	margin-bottom: 8px;
 }
 
-.sq-title-required {
-	color: black;
+.sv_q_erbox {
+	font-size: 16px;
+	padding: 8px 0;
+	color: var(--color-error);
 }
 
 /* hotfixcss
 display fex and align items center so the radio button is aligned with the text
 */
 .sq-label {
-	margin-left: 30px;
 	display: flex;
 	align-items: center;
-}
-
-.sq-item:nth-child(1) {
-	margin-bottom: 5px;
 }
 
 /* hotfixcss
 adding the checkbox text's class to add a comfort margin
 */
+.sv_q_radiogroup_control_item ~ span span,
 .sv_q_checkbox_control_label {
-	margin-left: 1%;
+	margin-left: 8px;
+}
+
+.sv_nav {
+	margin-top: 80px;
+	margin-bottom: 160px;
 }
