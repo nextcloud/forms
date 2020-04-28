@@ -28,13 +28,13 @@
 				<h3 id="form-title">
 					{{ form.title }}
 				</h3>
-				<p id="form-desc">
+				<p v-if="!loading && !success" id="form-desc">
 					{{ form.description }}
 				</p>
 			</header>
 
 			<!-- Questions list -->
-			<form @submit.prevent="onSubmit">
+			<form v-if="!loading && !success" @submit.prevent="onSubmit">
 				<ul>
 					<Questions
 						:is="answerTypes[question.type].component"
@@ -53,6 +53,14 @@
 					:disabled="loading"
 					:aria-label="t('forms', 'Submit form')">
 			</form>
+
+			<EmptyContent v-else-if="loading" icon="icon-loading">
+				{{ t('forms', 'Submitting form …') }}
+			</EmptyContent>
+
+			<EmptyContent v-else-if="success" icon="icon-checkmark">
+				{{ t('forms', 'Thank you for completing the survey!') }}
+			</EmptyContent>
 		</AppContent>
 	</Content>
 </template>
@@ -67,6 +75,7 @@ import Content from '@nextcloud/vue/dist/Components/Content'
 
 import answerTypes from '../models/AnswerTypes'
 
+import EmptyContent from '../components/EmptyContent'
 import Question from '../components/Questions/Question'
 import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionShort from '../components/Questions/QuestionShort'
@@ -78,6 +87,7 @@ export default {
 	components: {
 		AppContent,
 		Content,
+		EmptyContent,
 		Question,
 		QuestionLong,
 		QuestionShort,
