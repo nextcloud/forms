@@ -49,12 +49,12 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<label class="hidden-visually" for="form-title">{{ t('forms', 'Title') }}</label>
+			<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
 			<input
 				id="form-title"
 				v-model="form.title"
 				:minlength="0"
-				:placeholder="t('forms', 'Title')"
+				:placeholder="t('forms', 'Form title')"
 				:required="true"
 				autofocus
 				type="text"
@@ -338,11 +338,11 @@ export default {
 		},
 
 		/**
-		 * Select the text in the input if it is still set to 'New form'
+		 * Select the text in the input if it is still set to 'Form title'
 		 * @param {Event} e the click event
 		 */
 		selectIfUnchanged(e) {
-			if (e.target && e.target.value === t('forms', 'New form')) {
+			if (e.target && e.target.value === t('forms', 'Form title')) {
 				e.target.select()
 			}
 		},
