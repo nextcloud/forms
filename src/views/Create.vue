@@ -429,6 +429,8 @@ export default {
 			align-items: center;
 			align-self: flex-start;
 			width: 44px;
+			// To not overlap navigation toggle
+			margin-left: 44px;
 			height: var(--top-bar-height);
 			// make sure this doesn't take any space and appear floating
 			margin-top: -44px;
