@@ -29,7 +29,7 @@
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div class="question__drag-handle icon-drag-handle"
-			:aria-label="t('forms', 'Drag to re-order the questions')" />
+			:aria-label="t('forms', 'Drag to reorder the questions')" />
 
 		<!-- Header -->
 		<div class="question__header">
