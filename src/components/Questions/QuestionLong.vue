@@ -31,7 +31,7 @@
 			<!-- TODO: properly choose max length -->
 			<textarea ref="textarea"
 				:aria-label="t('forms', 'A long answer for the question “{text}”', { text })"
-				:placeholder="t('forms', 'Long answer text')"
+				:placeholder="t('forms', 'People can enter a long answer')"
 				:required="true /* TODO: implement required option */"
 				:value="values[0]"
 				class="question__text"
