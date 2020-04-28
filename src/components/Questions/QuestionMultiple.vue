@@ -28,7 +28,7 @@
 		:edit.sync="edit"
 		@delete="onDelete"
 		@update:text="onTitleChange">
-		<ul class="question__content" :role="isUnique ? 'radiogroup' : ''">
+		<ul class="question__content">
 			<template v-for="(answer, index) in options">
 				<li v-if="!edit" :key="answer.id" class="question__item">
 					<!-- Answer radio/checkbox + label -->
@@ -42,8 +42,9 @@
 							'checkbox question__checkbox': !isUnique,
 						}"
 						:name="`${id}-answer`"
-						:readonly="true"
-						:type="isUnique ? 'radio' : 'checkbox'">
+						:required="isRequired(answer.id)"
+						:type="isUnique ? 'radio' : 'checkbox'"
+						@change="onChange($event, answer.id)">
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${answer.id}`"
@@ -114,6 +115,10 @@ export default {
 		hasNoAnswer() {
 			return this.options.length === 0
 		},
+
+		areNoneChecked() {
+			return this.values.length === 0
+		},
 	},
 
 	watch: {
@@ -126,15 +131,50 @@ export default {
 	},
 
 	methods: {
+		onChange(event, answerId) {
+			const isChecked = event.target.checked === true
+			let values = this.values.slice()
+
+			// Radio
+			if (this.isUnique) {
+				this.$emit('update:values', [answerId])
+				return
+			}
+
+			// Checkbox
+			if (isChecked) {
+				values.push(answerId)
+			} else {
+				values = values.filter(id => id !== answerId)
+			}
+
+			// Emit values and remove duplicates
+			this.$emit('update:values', [...new Set(values)])
+		},
 
 		/**
-		 * Is the provided index checked
-		 * @param {number} index the option index
+		 * Is the provided answer checked ?
+		 * @param {number} id the answer id
 		 * @returns {boolean}
 		 */
-		isChecked(index) {
-			// TODO implement based on answers
-			return false
+		isChecked(id) {
+			return this.values.indexOf(id) > -1
+		},
+
+		/**
+		 * Is the provided answer required ?
+		 * This is needed for checkboxes as html5
+		 * doesn't allow to require at least ONE checked.
+		 * So we require the one that are checked or all
+		 * if none are checked yet.
+		 * @param {number} id the answer id
+		 * @returns {boolean}
+		 */
+		isRequired(id) {
+			if (this.isUnique) {
+				return true
+			}
+			return this.areNoneChecked || this.isChecked(id)
 		},
 
 		/**
@@ -230,13 +270,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .question__content {
 	display: flex;
 	flex-direction: column;
 }
 
 .question__item {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	height: 44px;
@@ -246,11 +287,6 @@ export default {
 		&::before {
 			margin: 14px !important;
 		}
-	}
-
-	// make sure to respect readonly on radio/checkbox
-	input[readonly] {
-		pointer-events: none;
 	}
 }
 
@@ -263,6 +299,14 @@ export default {
 	border: 0;
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
+}
+
+input.question__radio,
+input.question__checkbox {
+	z-index: -1;
+	// make sure browser warnings are properly
+	// displayed at the correct location
+	left: 22px;
 }
 
 </style>

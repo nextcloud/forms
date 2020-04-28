@@ -28,7 +28,8 @@
 		@click="enableEdit">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
-		<div class="question__drag-handle icon-drag-handle"
+		<div v-if="!readOnly"
+			class="question__drag-handle icon-drag-handle"
 			:aria-label="t('forms', 'Drag to reorder the questions')" />
 
 		<!-- Header -->
@@ -45,7 +46,7 @@
 				@input="onInput"
 				@keyup="onTitleChange">
 			<h3 v-else class="question__header-title" v-text="text" />
-			<Actions class="question__header-menu" :force-menu="true">
+			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
 				<ActionButton icon="icon-delete" @click="onDelete">
 					{{ t('forms', 'Delete question') }}
 				</ActionButton>
@@ -96,6 +97,10 @@ export default {
 			type: Boolean,
 			required: true,
 		},
+		readOnly: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	methods: {
@@ -107,14 +112,18 @@ export default {
 		 * Enable the edit mode
 		 */
 		enableEdit() {
-			this.$emit('update:edit', true)
+			if (!this.readOnly) {
+				this.$emit('update:edit', true)
+			}
 		},
 
 		/**
 		 * Disable the edit mode
 		 */
 		disableEdit() {
-			this.$emit('update:edit', false)
+			if (!this.readOnly) {
+				this.$emit('update:edit', false)
+			}
 		},
 
 		/**

@@ -38,12 +38,16 @@ export default {
 		icon: 'icon-answer-multiple',
 		label: t('forms', 'Multiple choice'),
 		unique: true,
+		// Define conditions where this questions is not ok
+		validate: question => question.options.length > 0,
 	},
 
 	multiple: {
 		component: QuestionMultiple,
 		icon: 'icon-answer-checkbox',
 		label: t('forms', 'Checkboxes'),
+		// Define conditions where this questions is not ok
+		validate: question => question.options.length > 0,
 	},
 
 	short: {

@@ -29,92 +29,78 @@
 
 namespace OCA\Forms\Controller;
 
-use OCA\Forms\AppInfo\Application;
-use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http;
-use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\IMapperException;
-
-use OCP\ILogger;
-use OCP\IRequest;
-use OCP\IUser;
-use OCP\Security\ISecureRandom;
-
-use OCA\Forms\Db\Form;
-use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Question;
-use OCA\Forms\Db\QuestionMapper;
-use OCA\Forms\Db\Option;
-use OCA\Forms\Db\OptionMapper;
-use OCA\Forms\Db\Submission;
-use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
+use OCA\Forms\Db\Form;
+use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
+use OCA\Forms\Db\OptionMapper;
+use OCA\Forms\Db\Question;
+use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Submission;
+use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Service\FormsService;
+
+use OCP\AppFramework\Controller;
+use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
+use OCP\ILogger;
+use OCP\IRequest;
+use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
 
 class ApiController extends Controller {
 
-	private $formMapper;
+	protected $appName;
+
+	/** @var SubmissionMapper */
 	private $submissionMapper;
-	private $answerMapper;
+
+	/** @var FormMapper */
+	private $formMapper;
+
+	/** @var QuestionMapper */
 	private $questionMapper;
+
+	/** @var OptionMapper */
 	private $optionMapper;
+
+	/** @var AnswerMapper */
+	private $answerMapper;
 
 	/** @var ILogger */
 	private $logger;
 
-	/** @var string */
-	private $userId;
+	/** @var IUserSession */
+	private $userSession;
+	
+	/** @var FormsService */
+	private $formsService;
 
-	public function __construct(
-		IRequest $request,
-		$userId,
-		FormMapper $formMapper,
-		SubmissionMapper $submissionMapper,
-		AnswerMapper $answerMapper,
-		QuestionMapper $questionMapper,
-		OptionMapper $optionMapper,
-		ILogger $logger
-	) {
-		parent::__construct(Application::APP_ID, $request);
+	public function __construct(string $appName,
+								IRequest $request,
+								$userId, // TODO remove & replace with userSession below.
+								IUserSession $userSession,
+								FormMapper $formMapper,
+								SubmissionMapper $submissionMapper,
+								AnswerMapper $answerMapper,
+								QuestionMapper $questionMapper,
+								OptionMapper $optionMapper,
+								ILogger $logger,
+								FormsService $formsService) {
+		parent::__construct($appName, $request);
+		$this->appName = $appName;
 		$this->userId = $userId;
+		$this->userSession = $userSession;
 		$this->formMapper = $formMapper;
+		$this->questionMapper = $questionMapper;
+		$this->optionMapper = $optionMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->answerMapper = $answerMapper;
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
 		$this->logger = $logger;
-	}
-
-	private function getOptions(int $questionId): array {
-		$optionList = [];
-		try{
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		} finally {
-			return $optionList;
-		}
-	}
-
-	private function getQuestions(int $formId): array {
-		$questionList = [];
-		try{
-			$questionEntities = $this->questionMapper->findByForm($formId);
-			foreach ($questionEntities as $questionEntity) {
-				$question = $questionEntity->read();
-				$question['options'] = $this->getOptions($question['id']);
-				$questionList[] =  $question;
-			}
-
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		}finally{
-			return $questionList;
-		}
+		$this->formsService = $formsService;
 	}
 
 	/**
@@ -140,20 +126,19 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 * 
+	 * 
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 */
 	public function getForm(int $id): Http\JSONResponse {
 		try {
-			$form = $this->formMapper->findById($id);
+			$results = $this->formsService->getForm($id);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		$result = $form->read();
-		$result['questions'] = $this->getQuestions($id);
-
-		return new Http\JSONResponse($result);
+		return new Http\JSONResponse($results);
 	}
 
 	/**
@@ -602,5 +587,85 @@ class ApiController extends Controller {
 		}
 
 		return new Http\JSONResponse($result);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @PublicPage
+	 * 
+	 * Process a new submission
+	 * @param int $formId
+	 * @param array $answers [question_id => arrayOfString]
+	 */
+	public function insertSubmission(int $formId, array $answers) {
+		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}', [
+			'formId' => $formId,
+			'answers' => $answers,
+		]);
+
+		try {
+			$form = $this->formMapper->findById($formId);
+			$questions = $this->formsService->getQuestions($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
+		}
+
+		$user = $this->userSession->getUser();
+		// TODO check again hasUserAccess?!
+
+		// Create Submission
+		$submission = new Submission();
+		$submission->setFormId($formId);
+		$submission->setTimestamp(time());
+
+		// If not logged in or anonymous use anonID
+		if (!$user || $form->getIsAnonymous()){
+			$anonID = "anon-user-".  hash('md5', (time() + rand()));
+			$submission->setUserId($anonID);
+		} else {
+			$submission->setUserId($user->getUID());
+		}
+
+		// Insert new submission
+		$this->submissionMapper->insert($submission);
+		$submissionId = $submission->getId();
+
+		// Process Answers
+		foreach($answers as $questionId => $answerArray) {
+			// Search corresponding Question, skip processing if not found
+			$questionIndex = array_search($questionId, array_column($questions, 'id'));
+			if ($questionIndex === false) {
+				continue;
+			} else {
+				$question = $questions[$questionIndex];
+			}
+
+			foreach($answerArray as $answer) {
+				if($question['type'] === 'multiple' || $question['type'] === 'multiple_unique') {
+					// Search corresponding option, skip processing if not found
+					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
+					if($optionIndex === false) {
+						continue;
+					} else {
+						$option = $question['options'][$optionIndex];
+					}
+
+					// Load option-text
+					$answerText = $option['text'];
+
+				} else {
+					$answerText = $answer; // Not a multiple-question, answerText is given answer
+				}
+
+				$answerEntity = new Answer();
+				$answerEntity->setSubmissionId($submissionId);
+				$answerEntity->setQuestionId($question['id']);
+				$answerEntity->setText($answerText);
+				$this->answerMapper->insert($answerEntity);
+			}
+		}
+
+		return new Http\JSONResponse([]);
 	}
 }

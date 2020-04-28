@@ -29,74 +29,65 @@
 
 namespace OCA\Forms\Controller;
 
-use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Submission;
-use OCA\Forms\Db\SubmissionMapper;
-use OCA\Forms\Db\Answer;
-use OCA\Forms\Db\AnswerMapper;
-
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Http\ContentSecurityPolicy;
-use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IGroup;
 use OCP\IGroupManager;
+use OCP\IInitialStateService;
 use OCP\IRequest;
-use OCP\ILogger;
 use OCP\IURLGenerator;
-use OCP\IUserManager;
-use OCP\User; //To do: replace according to API
+use OCP\IUserSession;
 use OCP\Util;
 
 class PageController extends Controller {
 
-	private $userId;
+	protected $appName;
+
+	/** @var FormMapper */
 	private $formMapper;
-	private $submissionMapper;
-	private $answerMapper;
 
-	private $questionMapper;
-	private $optionMapper;
-
+	/** @var IURLGenerator */
 	private $urlGenerator;
-	private $userMgr;
+	
+	/** @var IGroupManager */
 	private $groupManager;
+	
+	/** @var IUserSession */
+	private $userSession;
+	
+	/** @var IInitialStateService */
+	private $initialStateService;
+	
+	/** @var FormsService */
+	private $formService;
 
-	/** @var ILogger */
-	private $logger;
+	public function __construct(string $appName,
+								IRequest $request,
+								IGroupManager $groupManager,
+								IURLGenerator $urlGenerator,
+								FormMapper $formMapper,
+								QuestionMapper $questionMapper,
+								OptionMapper $optionMapper,
+								IUserSession $userSession,
+								IInitialStateService $initialStateService,
+								FormsService $formsService) {
+		parent::__construct($appName, $request);
 
-	public function __construct(
-		IRequest $request,
-		IUserManager $userMgr,
-		IGroupManager $groupManager,
-		IURLGenerator $urlGenerator,
-		$userId,
-		FormMapper $formMapper,
-
-		QuestionMapper $questionMapper,
-		OptionMapper $optionMapper,
-		SubmissionMapper $SubmissionMapper,
-		AnswerMapper $AnswerMapper,
-		ILogger $logger
-	) {
-		parent::__construct(Application::APP_ID, $request);
-		$this->userMgr = $userMgr;
 		$this->groupManager = $groupManager;
 		$this->urlGenerator = $urlGenerator;
-		$this->userId = $userId;
+		$this->appName = $appName;
 		$this->formMapper = $formMapper;
-
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
-		$this->submissionMapper = $SubmissionMapper;
-		$this->answerMapper = $AnswerMapper;
-		$this->logger = $logger;
+		$this->userSession = $userSession;
+		$this->initialStateService = $initialStateService;
+		$this->formsService = $formsService;
 	}
 
 	/**
@@ -126,6 +117,8 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
+	 * 
+	 * TODO: Implement cloning
 	 *
 	 * @return TemplateResponse
 	 */
@@ -167,145 +160,57 @@ class PageController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function gotoForm($hash): ?TemplateResponse {
+		// Inject style on all templates
+		Util::addStyle($this->appName, 'forms');
+
+		// TODO: check if already submitted
+
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
-			return new TemplateResponse('forms', 'no.acc.tmpl', []);
+			return new TemplateResponse('forms', 'notfound');
 		}
 
-		// If form expired, return Expired-Template
-		if ( ($form->getExpires() !== 0) && (time() > $form->getExpires()) ) {
-			return new TemplateResponse('forms', 'expired.tmpl');
+		// Does the user have permissions to display
+		if (!$this->hasUserAccess($form)) {
+			return new TemplateResponse('forms', 'notfound');
 		}
 
-		if ($this->hasUserAccess($form)) {
-			$renderAs = $this->userId !== null ? 'user' : 'public';
-			$res = new TemplateResponse('forms', 'submit.tmpl', [
-					'form' => $form,
-					'questions' => $this->getQuestions($form->getId()),
-			], $renderAs);
-			$csp = new ContentSecurityPolicy();
-			$csp->allowEvalScript(true);
-			$res->setContentSecurityPolicy($csp);
-			return $res;
+		// Has form expired
+		if ($form->getExpires() !== 0 && time() > $form->getExpires()) {
+			return new TemplateResponse('forms', 'expired');
 		}
 
-		User::checkLoggedIn();
-		return new TemplateResponse('forms', 'no.acc.tmpl', []);
-	}
+		$renderAs = $this->userSession->isLoggedIn() ? 'user' : 'public';
 
-	/**
-	 * @NoAdminRequired
-	 */
-	public function getQuestions(int $formId): array {
-		$questionList = [];
-		try{
-			$questionEntities = $this->questionMapper->findByForm($formId);
-			foreach ($questionEntities as $questionEntity) {
-				$question = $questionEntity->read();
-				$question['options'] = $this->getOptions($question['id']);
-				$questionList[] =  $question;
-			}
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		}
-
-		return $questionList;
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function getOptions(int $questionId): array {
-		$optionList = [];
-
-		try{
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		}
-
-		return $optionList;
-	}
-
-
-	/**
-	 * @NoAdminRequired
-	 * @PublicPage
-	 * @param int $formId
-	 * @param string $userId
-	 * @param array $answers
-	 * @param array $questions
-	 * @return RedirectResponse
-	 */
-	public function insertSubmission($id, $userId, $answers, $questions) {
-
-		$form = $this->formMapper->findById($id);
-		$anonID = "anon-user-".  hash('md5', (time() + rand()));
-
-		//Insert Submission
-		$submission = new Submission();
-		$submission->setFormId($id);
-		if($form->getIsAnonymous()){
-			$submission->setUserId($anonID);
-
-		}else{
-			$submission->setUserId($userId);
-		}
-		$submission->setTimestamp(time());
-		$this->submissionMapper->insert($submission);
-		$submissionId = $submission->getId();
-
-		//Insert Answers
-		foreach($questions as $question) {
-			// If question is answered, the questionText exists as key in $answers. Does not exist, when a (non-mandatory) question was not answered.
-			if (array_key_exists($question['text'], $answers)) {
-				if($question['type'] === "checkbox"){
-					foreach(($answers[$question['text']]) as $ansText) {
-						$answer = new Answer();
-						$answer->setSubmissionId($submissionId);
-						$answer->setQuestionId($question['id']);
-						$answer->setText($ansText);
-						$this->answerMapper->insert($answer);
-					}
-				} else {
-					$answer = new Answer();
-					$answer->setSubmissionId($submissionId);
-					$answer->setQuestionId($question['id']);
-					$answer->setText($answers[$question['text']]);
-					$this->answerMapper->insert($answer);
-				}
-			}
-		}
-
-		$hash = $form->getHash();
-		$url = $this->urlGenerator->linkToRoute('forms.page.goto_form', ['hash' => $hash]);
-		return new RedirectResponse($url);
+		Util::addScript($this->appName, 'submit');
+		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getForm($form->getId()));
+		return new TemplateResponse($this->appName, 'main', [], $renderAs);
 	}
 
 	/**
 	 * @NoAdminRequired
 	 * Check if user has access to this form
+	 * 
+	 * @param Form $form
+	 * @return boolean
 	 */
 	private function hasUserAccess(Form $form): bool {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
-		
+		$user = $this->userSession->getUser();
+
 		if ($access['type'] === 'public') {
 			return true;
 		}
 		
 		// Refuse access, if not public and no user logged in.
-		if ($this->userId === null) {
+		if (!$user) {
 			return false;
 		}
 
 		// Always grant access to owner.
-		if ($ownerId === $this->userId) {
+		if ($ownerId === $user->getUID()) {
 			return true;
 		}
 
@@ -313,7 +218,7 @@ class PageController extends Controller {
 		if ($form->getSubmitOnce()) {
 			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
 			foreach($participants as $participant) {
-				if ($participant === $this->userId) {
+				if ($participant === $user->getUID()) {
 					return false;
 				}
 			}
@@ -326,13 +231,13 @@ class PageController extends Controller {
 
 		// Selected Access remains.
 		// Grant Access, if user is in users-Array.
-		if (in_array($this->userId, $access['users'])) {
+		if (in_array($user->getUID(), $access['users'])) {
 			return true;
 		}
 
 		// Check if access granted by group.
 		foreach ($access['groups'] as $group) {
-			if( $this->groupManager->isInGroup($this->userId, $group) ) {
+			if( $this->groupManager->isInGroup($user->getUID(), $group) ) {
 				return true;
 			}
 		}

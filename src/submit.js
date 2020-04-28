@@ -1,7 +1,6 @@
 /**
- * @copyright Copyright (c) 2018 René Gieling <github@dartcafe.de>
+ * @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
  *
- * @author René Gieling <github@dartcafe.de>
  * @author John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -21,46 +20,17 @@
  *
  */
 
-import { generateFilePath } from '@nextcloud/router'
-import { getRequestToken } from '@nextcloud/auth'
 import { translate, translatePlural } from '@nextcloud/l10n'
-import '@nextcloud/dialogs/styles/toast.scss'
-
 import Vue from 'vue'
 
-import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
-
-import router from './router'
-import Forms from './Forms'
-import Modal from './plugins/plugin.js'
-
-// TODO: not use global registration
-Vue.directive('tooltip', Tooltip)
-
-Vue.use(Modal)
+import Fill from './views/Submit'
 
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
-// TODO: see if necessary
-Vue.prototype.OC = OC
-Vue.prototype.OCA = OCA
-
-// CSP config for webpack dynamic chunk loading
-// eslint-disable-next-line
-__webpack_nonce__ = btoa(getRequestToken())
-
-// Correct the root of the app for chunk loading
-// OC.linkTo matches the apps folders
-// OC.generateUrl ensure the index.php (or not)
-// We do not want the index.php since we're loading files
-// eslint-disable-next-line
-__webpack_public_path__ = generateFilePath('forms', '', 'js/')
-
 export default new Vue({
 	el: '#content',
 	// eslint-disable-next-line vue/match-component-file-name
-	name: 'FormsRoot',
-	router,
-	render: h => h(Forms),
+	name: 'FormsSubmitRoot',
+	render: h => h(Fill),
 })
