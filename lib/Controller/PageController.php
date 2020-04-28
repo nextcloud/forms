@@ -56,6 +56,7 @@ use OCP\Util;
 
 class PageController extends Controller {
 
+	protected $appName;
 	private $userId;
 	private $formMapper;
 	private $submissionMapper;
@@ -71,24 +72,23 @@ class PageController extends Controller {
 	/** @var ILogger */
 	private $logger;
 
-	public function __construct(
-		IRequest $request,
-		IUserManager $userMgr,
-		IGroupManager $groupManager,
-		IURLGenerator $urlGenerator,
-		$userId,
-		FormMapper $formMapper,
-
-		QuestionMapper $questionMapper,
-		OptionMapper $optionMapper,
-		SubmissionMapper $SubmissionMapper,
-		AnswerMapper $AnswerMapper,
-		ILogger $logger
-	) {
+	public function __construct(string $appName,
+								IRequest $request,
+								IUserManager $userMgr,
+								IGroupManager $groupManager,
+								IURLGenerator $urlGenerator,
+								FormMapper $formMapper,
+								$userId,
+								QuestionMapper $questionMapper,
+								OptionMapper $optionMapper,
+								SubmissionMapper $SubmissionMapper,
+								AnswerMapper $AnswerMapper,
+								ILogger $logger) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->userMgr = $userMgr;
 		$this->groupManager = $groupManager;
 		$this->urlGenerator = $urlGenerator;
+		$this->appName = $appName;
 		$this->userId = $userId;
 		$this->formMapper = $formMapper;
 
@@ -167,31 +167,29 @@ class PageController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function gotoForm($hash): ?TemplateResponse {
+		// Inject style on all templates
+		Util::addStyle($this->appName, 'forms');
+
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
-			return new TemplateResponse('forms', 'no.acc.tmpl', []);
+			return new TemplateResponse('forms', 'notfound');
 		}
 
-		// If form expired, return Expired-Template
-		if ( ($form->getExpires() !== 0) && (time() > $form->getExpires()) ) {
-			return new TemplateResponse('forms', 'expired.tmpl');
-		}
-
+		// Does the user have permissions to display
 		if ($this->hasUserAccess($form)) {
-			$renderAs = $this->userId !== null ? 'user' : 'public';
-			$res = new TemplateResponse('forms', 'submit.tmpl', [
-					'form' => $form,
-					'questions' => $this->getQuestions($form->getId()),
-			], $renderAs);
-			$csp = new ContentSecurityPolicy();
-			$csp->allowEvalScript(true);
-			$res->setContentSecurityPolicy($csp);
-			return $res;
+			return new TemplateResponse('forms', 'notfound');
 		}
 
-		User::checkLoggedIn();
-		return new TemplateResponse('forms', 'no.acc.tmpl', []);
+		// Has form expired
+		if ($form->getExpires() !== 0 && time() > $form->getExpires()) {
+			return new TemplateResponse('forms', 'expired');
+		}
+
+		$renderAs = is_null($this->userId) ? 'user' : 'public';
+
+		Util::addScript($this->appName, 'submit');
+		return new TemplateResponse($this->appName, 'main', [], $renderAs);
 	}
 
 	/**

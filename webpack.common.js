@@ -1,14 +1,23 @@
 const path = require('path')
-const { VueLoaderPlugin } = require('vue-loader')
+const webpack = require('webpack')
+
 const StyleLintPlugin = require('stylelint-webpack-plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
+const appName = process.env.npm_package_name
+const appVersion = process.env.npm_package_version
+console.info('Building', appName, appVersion, '\n')
 
 module.exports = {
-	entry: path.join(__dirname, 'src', 'main.js'),
+	entry: {
+		forms: path.resolve(path.join('src', 'main.js')),
+		submit: path.resolve(path.join('src', 'submit.js')),
+	},
 	output: {
-		path: path.resolve(__dirname, './js'),
+		path: path.resolve('./js'),
 		publicPath: '/js/',
-		filename: 'forms.js',
-		chunkFilename: 'chunks/[name].js',
+		filename: `[name].js`,
+		chunkFilename: `${appName}.[name].js?v=[contenthash]`,
 	},
 	module: {
 		rules: [
@@ -36,18 +45,14 @@ module.exports = {
 				loader: 'babel-loader',
 				exclude: /node_modules/,
 			},
-			{
-				test: /\.(png|jpg|gif|svg)$/,
-				loader: 'url-loader',
-				options: {
-					limit: 8192,
-				},
-			},
 		],
 	},
 	plugins: [
 		new VueLoaderPlugin(),
 		new StyleLintPlugin(),
+		// Make appName & appVersion available as a constant
+		new webpack.DefinePlugin({ appName }),
+		new webpack.DefinePlugin({ appVersion }),
 	],
 	resolve: {
 		extensions: ['*', '.js', '.vue'],
