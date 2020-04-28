@@ -384,13 +384,13 @@ export default {
 		#form-title,
 		#form-desc {
 			width: 100%;
-			margin: 16px 0; // aerate the header
 			padding: 0 16px;
 			border: none;
 		}
 		#form-title {
 			font-size: 2em;
 			font-weight: bold;
+			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
 			overflow-x: hidden;
 			text-overflow: ellipsis;
@@ -399,7 +399,6 @@ export default {
 		#form-desc {
 			min-height: 60px;
 			max-height: 200px;
-			margin-top: 0;
 			resize: none;
 		}
 	}
@@ -432,8 +431,6 @@ export default {
 			// To not overlap navigation toggle
 			margin-left: 44px;
 			height: var(--top-bar-height);
-			// make sure this doesn't take any space and appear floating
-			margin-top: -44px;
 
 			.icon-add-white {
 				opacity: 1;
