@@ -398,7 +398,6 @@ export default {
 		}
 		#form-desc {
 			min-height: 60px;
-			max-height: 200px;
 			resize: none;
 		}
 	}
