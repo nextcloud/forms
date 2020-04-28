@@ -47,6 +47,7 @@ use OCP\IGroupManager;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\IUserSession;
+use OCP\IInitialStateService;
 use OCP\Util;
 
 class PageController extends Controller {
@@ -70,6 +71,9 @@ class PageController extends Controller {
 	
 	/** @var IUserSession */
 	private $userSession;
+	
+	/** @var IInitialStateService */
+	private $initialStateService;
 
 	public function __construct(string $appName,
 								IRequest $request,
@@ -80,7 +84,8 @@ class PageController extends Controller {
 								OptionMapper $optionMapper,
 								SubmissionMapper $SubmissionMapper,
 								AnswerMapper $AnswerMapper,
-								IUserSession $userSession) {
+								IUserSession $userSession,
+								IInitialStateService $initialStateService) {
 		parent::__construct($appName, $request);
 
 		$this->groupManager = $groupManager;
@@ -92,6 +97,7 @@ class PageController extends Controller {
 		$this->submissionMapper = $SubmissionMapper;
 		$this->answerMapper = $AnswerMapper;
 		$this->userSession = $userSession;
+		$this->initialStateService = $initialStateService;
 	}
 
 	/**
@@ -156,6 +162,45 @@ class PageController extends Controller {
 		return new TemplateResponse($this->appName, 'main');
 	}
 
+	private function getOptions(int $questionId): array {
+		$optionList = [];
+		try{
+			$optionEntities = $this->optionMapper->findByQuestion($questionId);
+			foreach ($optionEntities as $optionEntity) {
+				$optionList[] = $optionEntity->read();
+			}
+
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		} finally {
+			return $optionList;
+		}
+	}
+
+	private function getQuestions(int $formId): array {
+		$questionList = [];
+		try{
+			$questionEntities = $this->questionMapper->findByForm($formId);
+			foreach ($questionEntities as $questionEntity) {
+				$question = $questionEntity->read();
+				$question['options'] = $this->getOptions($question['id']);
+				$questionList[] =  $question;
+			}
+
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		}finally{
+			return $questionList;
+		}
+	}
+
+	private function getForm(int $id): array {
+		$form = $this->formMapper->findById($id);
+		$result = $form->read();
+		$result['questions'] = $this->getQuestions($id);
+		return $result;
+	}
+
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
@@ -176,7 +221,7 @@ class PageController extends Controller {
 		}
 
 		// Does the user have permissions to display
-		if ($this->hasUserAccess($form)) {
+		if (!$this->hasUserAccess($form)) {
 			return new TemplateResponse('forms', 'notfound');
 		}
 
@@ -188,6 +233,7 @@ class PageController extends Controller {
 		$renderAs = $this->userSession->isLoggedIn() ? 'user' : 'public';
 
 		Util::addScript($this->appName, 'submit');
+		$this->initialStateService->provideInitialState($this->appName, 'form', $this->getForm($form->getId()));
 		return new TemplateResponse($this->appName, 'main', [], $renderAs);
 	}
 

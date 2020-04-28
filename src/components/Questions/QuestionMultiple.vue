@@ -28,7 +28,7 @@
 		:edit.sync="edit"
 		@delete="onDelete"
 		@update:text="onTitleChange">
-		<ul class="question__content" :role="isUnique ? 'radiogroup' : ''">
+		<ul class="question__content">
 			<template v-for="(answer, index) in options">
 				<li v-if="!edit" :key="answer.id" class="question__item">
 					<!-- Answer radio/checkbox + label -->
@@ -42,7 +42,7 @@
 							'checkbox question__checkbox': !isUnique,
 						}"
 						:name="`${id}-answer`"
-						:readonly="true"
+						:required="true /* TODO: implement required option */"
 						:type="isUnique ? 'radio' : 'checkbox'">
 					<label v-if="!edit"
 						ref="label"
@@ -230,13 +230,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .question__content {
 	display: flex;
 	flex-direction: column;
 }
 
 .question__item {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	height: 44px;
@@ -246,11 +247,6 @@ export default {
 		&::before {
 			margin: 14px !important;
 		}
-	}
-
-	// make sure to respect readonly on radio/checkbox
-	input[readonly] {
-		pointer-events: none;
 	}
 }
 
@@ -263,6 +259,14 @@ export default {
 	border: 0;
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
+}
+
+input.question__radio,
+input.question__checkbox {
+	z-index: -1;
+	// make sure browser warnings are properly
+	// displayed at the correct location
+	left: 22px;
 }
 
 </style>

@@ -32,7 +32,7 @@
 			<textarea ref="textarea"
 				:aria-label="t('forms', 'A long answer for the question “{text}”', { text })"
 				:placeholder="t('forms', 'Long answer text')"
-				:readonly="edit"
+				:required="true /* TODO: implement required option */"
 				:value="values[0]"
 				class="question__text"
 				maxlength="1024"
