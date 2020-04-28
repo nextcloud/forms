@@ -29,22 +29,20 @@
 
 namespace OCA\Forms\Controller;
 
-use Exception;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Question;
-use OCA\Forms\Db\QuestionMapper;
-use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
+use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IGroupManager;
+use OCP\IInitialStateService;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\IUserSession;
-use OCP\IInitialStateService;
 use OCP\Util;
 
 class PageController extends Controller {
@@ -65,6 +63,9 @@ class PageController extends Controller {
 	
 	/** @var IInitialStateService */
 	private $initialStateService;
+	
+	/** @var FormsService */
+	private $formService;
 
 	public function __construct(string $appName,
 								IRequest $request,
@@ -74,7 +75,8 @@ class PageController extends Controller {
 								QuestionMapper $questionMapper,
 								OptionMapper $optionMapper,
 								IUserSession $userSession,
-								IInitialStateService $initialStateService) {
+								IInitialStateService $initialStateService,
+								FormsService $formsService) {
 		parent::__construct($appName, $request);
 
 		$this->groupManager = $groupManager;
@@ -85,6 +87,7 @@ class PageController extends Controller {
 		$this->optionMapper = $optionMapper;
 		$this->userSession = $userSession;
 		$this->initialStateService = $initialStateService;
+		$this->formsService = $formsService;
 	}
 
 	/**
@@ -149,45 +152,6 @@ class PageController extends Controller {
 		return new TemplateResponse($this->appName, 'main');
 	}
 
-	private function getOptions(int $questionId): array {
-		$optionList = [];
-		try{
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		} finally {
-			return $optionList;
-		}
-	}
-
-	private function getQuestions(int $formId): array {
-		$questionList = [];
-		try{
-			$questionEntities = $this->questionMapper->findByForm($formId);
-			foreach ($questionEntities as $questionEntity) {
-				$question = $questionEntity->read();
-				$question['options'] = $this->getOptions($question['id']);
-				$questionList[] =  $question;
-			}
-
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		}finally{
-			return $questionList;
-		}
-	}
-
-	private function getForm(int $id): array {
-		$form = $this->formMapper->findById($id);
-		$result = $form->read();
-		$result['questions'] = $this->getQuestions($id);
-		return $result;
-	}
-
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
@@ -220,7 +184,7 @@ class PageController extends Controller {
 		$renderAs = $this->userSession->isLoggedIn() ? 'user' : 'public';
 
 		Util::addScript($this->appName, 'submit');
-		$this->initialStateService->provideInitialState($this->appName, 'form', $this->getForm($form->getId()));
+		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getForm($form->getId()));
 		return new TemplateResponse($this->appName, 'main', [], $renderAs);
 	}
 
