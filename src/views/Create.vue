@@ -20,10 +20,6 @@
   - You should have received a copy of the GNU Affero General Public License
   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -
-  -
-  - UPDATE: Adds Quiz option and takes the input:
-  - is yet to store input of quizzes and cannot represtent them
-  - requires quizFormItem.vue (should be added to svn)
   -->
 
 <template>
@@ -129,9 +125,8 @@ import answerTypes from '../models/AnswerTypes'
 import EmptyContent from '../components/EmptyContent'
 import Question from '../components/Questions/Question'
 import QuestionLong from '../components/Questions/QuestionLong'
-import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionMultiple from '../components/Questions/QuestionMultiple'
-import QuizFormItem from '../components/quizFormItem'
+import QuestionShort from '../components/Questions/QuestionShort'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
@@ -149,7 +144,6 @@ export default {
 		QuestionLong,
 		QuestionShort,
 		QuestionMultiple,
-		QuizFormItem,
 		TopBar,
 	},
 

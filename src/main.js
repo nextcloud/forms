@@ -32,19 +32,11 @@ import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
 
 import router from './router'
 import Forms from './Forms'
-import Modal from './plugins/plugin.js'
 
-// TODO: not use global registration
 Vue.directive('tooltip', Tooltip)
-
-Vue.use(Modal)
 
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
-
-// TODO: see if necessary
-Vue.prototype.OC = OC
-Vue.prototype.OCA = OCA
 
 // CSP config for webpack dynamic chunk loading
 // eslint-disable-next-line

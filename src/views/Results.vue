@@ -81,13 +81,12 @@ import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
+import json2csvParser from 'json2csv'
 
 import EmptyContent from '../components/EmptyContent'
+import ResultItem from '../components/resultItem'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
-
-import ResultItem from '../components/resultItem'
-import json2csvParser from 'json2csv'
 
 export default {
 	name: 'Results',
@@ -181,7 +180,7 @@ export default {
 
 		download() {
 			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/form/' + this.$route.params.hash))
+			axios.get(generateUrl('apps/forms/get/form/' + this.$route.params.hash))
 				.then((response) => {
 					this.json2csvParser = ['userId', 'questionId', 'questionText', 'Answer'] // TODO Is this one necessary??
 					const formattedAns = []
