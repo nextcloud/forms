@@ -26,9 +26,10 @@
 
 namespace OCA\Forms\Db;
 
+use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\Db\DoesNotExistException;
 
 class QuestionMapper extends QBMapper {
 	private $optionMapper;
@@ -41,7 +42,7 @@ class QuestionMapper extends QBMapper {
 
 	/**
 	 * @param int $formId
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws DoesNotExistException if not found
 	 * @return Question[]
 	 */
 

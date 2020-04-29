@@ -25,9 +25,10 @@
 
 namespace OCA\Forms\Db;
 
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\QBMapper;
 
 class SubmissionMapper extends QBMapper {
 	private $answerMapper;
@@ -45,7 +46,7 @@ class SubmissionMapper extends QBMapper {
 
 	/**
 	 * @param int $formId
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws DoesNotExistException if not found
 	 * @return Submission[]
 	 */
 	public function findByForm(int $formId): array {
@@ -62,7 +63,7 @@ class SubmissionMapper extends QBMapper {
 
 	/**
 	 * @param int $formId
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws DoesNotExistException if not found
 	 * @return array
 	 */
 	public function findParticipantsByForm(int $formId): array {
