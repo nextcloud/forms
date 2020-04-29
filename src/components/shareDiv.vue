@@ -62,10 +62,12 @@
 </template>
 
 <script>
+import { generateUrl } from '@nextcloud/router'
+import axios from '@nextcloud/axios'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+
 // TODO: replace with same design as core sharing
 import UserDiv from './_base-UserDiv'
-import axios from '@nextcloud/axios'
 
 export default {
 	components: {
@@ -129,7 +131,7 @@ export default {
 		loadUsersAsync(query) {
 			this.isLoading = false
 			this.siteUsersListOptions.query = query
-			axios.post(OC.generateUrl('apps/forms/get/siteusers'), this.siteUsersListOptions)
+			axios.post(generateUrl('apps/forms/get/siteusers'), this.siteUsersListOptions)
 				.then((response) => {
 					this.users = response.data.siteusers
 					this.isLoading = false

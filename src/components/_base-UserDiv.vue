@@ -35,6 +35,7 @@
 
 <script>
 import Avatar from '@nextcloud/vue/dist/Components/Avatar'
+import { getCurrentUser } from '@nextcloud/auth'
 
 export default {
 	components: {
@@ -81,8 +82,8 @@ export default {
 		computedDisplayName() {
 			let value = this.displayName
 
-			if (this.userId === OC.getCurrentUser().uid) {
-				value = OC.getCurrentUser().displayName
+			if (this.userId === getCurrentUser().uid) {
+				value = getCurrentUser().displayName
 			} else {
 				if (!this.displayName) {
 					value = this.userId

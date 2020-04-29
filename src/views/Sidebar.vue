@@ -118,6 +118,7 @@ import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { getLocale, getLanguage } from '@nextcloud/l10n'
 
 import ShareDiv from '../components/shareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -176,9 +177,9 @@ export default {
 	},
 
 	created() {
-		this.lang = OC.getLanguage()
+		this.lang = getLanguage()
 		try {
-			this.locale = OC.getLocale()
+			this.locale = getLocale()
 		} catch (e) {
 			if (e instanceof TypeError) {
 				this.locale = this.lang

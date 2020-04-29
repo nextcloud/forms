@@ -46,19 +46,6 @@ export default new Router({
 			name: 'root',
 		},
 		{
-			path: '/new',
-			components: {
-				default: Create,
-				sidebar: Sidebar,
-			},
-			name: 'create',
-		},
-		{
-			path: '/:hash',
-			name: 'fill',
-			props: { default: true },
-		},
-		{
 			path: '/:hash/edit',
 			components: {
 				default: Create,
@@ -71,15 +58,6 @@ export default new Router({
 			path: '/:hash/results',
 			component: Results,
 			name: 'results',
-			props: { default: true },
-		},
-		{
-			path: '/:hash/clone',
-			components: {
-				default: Create,
-				sidebar: Sidebar,
-			},
-			name: 'clone',
 			props: { default: true },
 		},
 	],
