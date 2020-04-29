@@ -36,7 +36,7 @@
 		<div class="question__header">
 			<input v-if="edit"
 				:placeholder="t('forms', 'Enter a title for this question')"
-				:aria-label="t('forms', 'The title of the question number {index}', {index})"
+				:aria-label="t('forms', 'Title of question number {index}', {index})"
 				:value="text"
 				class="question__header-title"
 				type="text"
@@ -162,7 +162,7 @@ export default {
 	align-items: stretch;
 	flex-direction: column;
 	justify-content: stretch;
-	margin-bottom: 22px;
+	margin: 80px 0;
 	padding-left: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
@@ -194,7 +194,6 @@ export default {
 	&__content {
 		flex: 1 1 100%;
 		max-width: 100%;
-		margin-bottom: 20px;
 		padding: 0;
 	}
 
@@ -204,7 +203,6 @@ export default {
 		flex: 1 1 100%;
 		justify-content: space-between;
 		width: auto;
-		margin-top: 20px;
 
 		// Using type to have a higher order than the input styling of server
 		&-title,

@@ -49,12 +49,12 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<label class="hidden-visually" for="form-title">{{ t('forms', 'Title') }}</label>
+			<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
 			<input
 				id="form-title"
 				v-model="form.title"
 				:minlength="0"
-				:placeholder="t('forms', 'Title')"
+				:placeholder="t('forms', 'Form title')"
 				:required="true"
 				autofocus
 				type="text"
@@ -338,11 +338,11 @@ export default {
 		},
 
 		/**
-		 * Select the text in the input if it is still set to 'New form'
+		 * Select the text in the input if it is still set to 'Form title'
 		 * @param {Event} e the click event
 		 */
 		selectIfUnchanged(e) {
-			if (e.target && e.target.value === t('forms', 'New form')) {
+			if (e.target && e.target.value === t('forms', 'Form title')) {
 				e.target.select()
 			}
 		},
@@ -384,22 +384,20 @@ export default {
 		#form-title,
 		#form-desc {
 			width: 100%;
-			margin: 16px 0; // aerate the header
 			padding: 0 16px;
 			border: none;
 		}
 		#form-title {
 			font-size: 2em;
 			font-weight: bold;
+			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
-			overflow-x: hidden;
+			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
 		#form-desc {
 			min-height: 60px;
-			max-height: 200px;
-			margin-top: 0;
 			resize: none;
 		}
 	}
@@ -429,9 +427,9 @@ export default {
 			align-items: center;
 			align-self: flex-start;
 			width: 44px;
+			// To not overlap navigation toggle
+			margin-left: 44px;
 			height: var(--top-bar-height);
-			// make sure this doesn't take any space and appear floating
-			margin-top: -44px;
 
 			.icon-add-white {
 				opacity: 1;
