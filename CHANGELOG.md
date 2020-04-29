@@ -1,5 +1,20 @@
 # Changelog
-All notable changes to this project will be documented in this file.
+
+## [v2.0.0-beta1](https://github.com/nextcloud/forms/tree/v2.0.0-beta1) (2020-04-29)
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v1.1.1...v2.0.0-beta1)
+
+### Implemented enhancements:
+- New creation UI with direct preview
+- New voting UI
+- Editing existing forms is now possible
+- Removed dropdown question
+- Added navigation
+- Removed breadcrumbs
+
+### Fixed bugs:
+- Lots of bug fixed. The list is too complex
+
 
 ## [1.1.1] - 2020-03-09
 ### Changed
