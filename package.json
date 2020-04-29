@@ -2,50 +2,6 @@
 	"name": "forms",
 	"description": "Forms app for nextcloud",
 	"version": "2.0.0-beta1",
-	"authors": [
-		{
-			"name": "Vinzenz Rosenkranz",
-			"email": "vinzenz.rosenkranz@gmail.com",
-			"role": "Polls App Developer"
-		},
-		{
-			"name": "Rene Gieling",
-			"email": "github@dartcafe.de",
-			"role": "Polls App Developer"
-		},
-		{
-			"name": "Natalie Gilbert",
-			"role": "Forms Team Lead/Back End Developer"
-		},
-		{
-			"name": "Inigo Jiron",
-			"role": "Back End Developer/Database Specialist"
-		},
-		{
-			"name": "Affan Hussain",
-			"role": "Forms Technical Lead"
-		},
-		{
-			"name": "Nick Gallo",
-			"role": "Front End Developer"
-		},
-		{
-			"name": "Ajfar Huq",
-			"role": "Front End Developer"
-		},
-		{
-			"name": "Tim Sattizahn",
-			"role": "Forms QA Lead"
-		},
-		{
-			"name": "Stephan Link",
-			"role": "Quality Assurance"
-		},
-		{
-			"name": "Kameron Sheppard",
-			"role": "Quality Assurance"
-		}
-	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/nextcloud/forms.git"
