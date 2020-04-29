@@ -25,9 +25,9 @@
 		<AppContent>
 			<!-- Forms title & description-->
 			<header>
-				<h3 id="form-title">
+				<h2 id="form-title">
 					{{ form.title }}
-				</h3>
+				</h2>
 				<p v-if="!loading && !success" id="form-desc">
 					{{ form.description }}
 				</p>
@@ -59,7 +59,7 @@
 			</EmptyContent>
 
 			<EmptyContent v-else-if="success" icon="icon-checkmark">
-				{{ t('forms', 'Thank you for completing the survey!') }}
+				{{ t('forms', 'Thank you for completing the form!') }}
 			</EmptyContent>
 		</AppContent>
 	</Content>
@@ -153,6 +153,11 @@ export default {
 	align-items: center;
 	flex-direction: column;
 
+	// Force hide navigation toggle as there is no navigation
+	::v-deep #app-navigation-toggle {
+		display: none !important;
+	}
+
 	header,
 	form {
 		width: 100%;
@@ -163,18 +168,18 @@ export default {
 
 	// Title & description header
 	header {
-		margin: 44px;
+		margin-top: 44px;
 
 		#form-title,
 		#form-desc {
 			width: 100%;
-			margin: 16px 0; // aerate the header
 			padding: 0 16px;
 			border: none;
 		}
 		#form-title {
 			font-size: 2em;
 			font-weight: bold;
+			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -182,16 +187,26 @@ export default {
 		}
 		#form-desc {
 			min-height: 60px;
-			max-height: 200px;
-			margin-top: 0;
 			resize: none;
 		}
 	}
 
 	form {
+		.question {
+			// Less padding needed as submit view does not have drag handles
+			padding-left: 16px;
+			::v-deep &__content {
+				// Left-align multiple choice and checkboxes with question text
+				// Only in submit view
+				// TODO: use variables
+				margin-left: -14px;
+			}
+		}
+
 		input[type=submit] {
 			align-self: flex-end;
 			margin: 5px;
+			margin-bottom: 160px;
 			padding: 10px 20px;
 		}
 	}

@@ -284,6 +284,8 @@ export default {
 
 	.question__label {
 		flex: 1 1 100%;
+		// Overwrite guest page core styles
+		text-align: left !important;
 		&::before {
 			margin: 14px !important;
 		}

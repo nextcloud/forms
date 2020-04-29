@@ -392,7 +392,7 @@ export default {
 			font-weight: bold;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
-			overflow-x: hidden;
+			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
