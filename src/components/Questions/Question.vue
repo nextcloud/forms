@@ -182,7 +182,6 @@ export default {
 		&:focus {
 			opacity: 1;
 		}
-
 		cursor: grab;
 
 		&:active {
