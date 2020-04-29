@@ -54,12 +54,11 @@ class FormsService {
 
 	public function getOptions(int $questionId): array {
 		$optionList = [];
-		try{
+		try {
 			$optionEntities = $this->optionMapper->findByQuestion($questionId);
 			foreach ($optionEntities as $optionEntity) {
 				$optionList[] = $optionEntity->read();
 			}
-
 		} catch (DoesNotExistException $e) {
 			//handle silently
 		} finally {
@@ -69,17 +68,16 @@ class FormsService {
 
 	public function getQuestions(int $formId): array {
 		$questionList = [];
-		try{
+		try {
 			$questionEntities = $this->questionMapper->findByForm($formId);
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
 				$question['options'] = $this->getOptions($question['id']);
 				$questionList[] =  $question;
 			}
-
 		} catch (DoesNotExistException $e) {
 			//handle silently
-		}finally{
+		} finally {
 			return $questionList;
 		}
 	}
@@ -98,5 +96,4 @@ class FormsService {
 
 		return $result;
 	}
-
 }

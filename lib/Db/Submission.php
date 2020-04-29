@@ -59,5 +59,4 @@ class Submission extends Entity {
 			'timestamp' => $this->getTimestamp(),
 		];
 	}
-
 }

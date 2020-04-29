@@ -48,7 +48,7 @@ class Question extends Entity {
 	protected $mandatory;
 	protected $text;
 
-	const TYPES = [
+	public const TYPES = [
 		'short',
 		'long',
 		'multiple',

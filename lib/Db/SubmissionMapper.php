@@ -29,10 +29,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
-use OCA\Forms\Db\AnswerMapper;
-
 class SubmissionMapper extends QBMapper {
-
 	private $answerMapper;
 
 	/**
@@ -80,7 +77,7 @@ class SubmissionMapper extends QBMapper {
 		$submissionEntities = $this->findEntities($qb);
 
 		// From array of submissionEntities produce array of userIds.
-		$userIds = array_map(function($submissionEntity) {
+		$userIds = array_map(function ($submissionEntity) {
 			return $submissionEntity->getUserId();
 		}, $submissionEntities);
 
@@ -88,8 +85,8 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	* @param int $formId
-	*/
+	 * @param int $formId
+	 */
 	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 

@@ -58,8 +58,8 @@ class AnswerMapper extends QBMapper {
 	}
 
 	/**
-	* @param int $submissionId
-	*/
+	 * @param int $submissionId
+	 */
 	public function deleteBySubmission(int $submissionId): void {
 		$qb = $this->db->getQueryBuilder();
 
@@ -70,5 +70,4 @@ class AnswerMapper extends QBMapper {
 
 		$qb->execute();
 	}
-
 }

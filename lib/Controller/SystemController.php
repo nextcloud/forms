@@ -29,13 +29,10 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 
 use OCP\IGroupManager;
-use OCP\IUser;
 use OCP\IUserManager;
-use OCP\IConfig;
 use OCP\IRequest;
 
 class SystemController extends Controller {
-
 	public function __construct(
 		string $appName,
 		IGroupManager $groupManager,
@@ -52,9 +49,9 @@ class SystemController extends Controller {
 	 * @NoAdminRequired
 	 * @return DataResponse
 	 */
-	public function getSiteUsersAndGroups($query = '', $getGroups = true, $getUsers = true, $skipGroups = array(), $skipUsers = array()) {
-		$list = array();
-		$data = array();
+	public function getSiteUsersAndGroups($query = '', $getGroups = true, $getUsers = true, $skipGroups = [], $skipUsers = []) {
+		$list = [];
+		$data = [];
 		if ($getGroups) {
 			$groups = $this->groupManager->search($query);
 			foreach ($groups as $group) {

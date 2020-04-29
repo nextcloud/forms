@@ -26,7 +26,6 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Db;
 
-use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
@@ -80,5 +79,4 @@ class OptionMapper extends QBMapper {
 
 		return $this->findEntity($qb);
 	}
-
 }

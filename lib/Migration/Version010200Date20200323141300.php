@@ -24,8 +24,6 @@
 
 namespace OCA\Forms\Migration;
 
-use Doctrine\DBAL\Exception\TableNotFoundException;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -214,7 +212,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 
 		// if Database exists.
-		if( $schema->hasTable('forms_events') ){
+		if ($schema->hasTable('forms_events')) {
 			$id_mapping = [];
 			$id_mapping['events'] = []; // Maps oldevent-id => ['newId' => newevent-id, 'nextQuestionOrder' => integer]
 			$id_mapping['questions'] = []; // Maps oldquestion-id => ['newId' => newquestion-id]
@@ -227,7 +225,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$qb_fetch->select('id', 'hash', 'title', 'description', 'owner', 'created', 'access', 'expire', 'is_anonymous', 'unique')
 				->from('forms_events');
 			$cursor = $qb_fetch->execute();
-			while( $event = $cursor->fetch() ){ 
+			while ($event = $cursor->fetch()) {
 				$newAccessJSON = $this->convertAccessList($event['access']);
 
 				$qb_restore->insert('forms_v2_forms')
@@ -257,9 +255,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$qb_fetch->select('id', 'form_id', 'form_question_type', 'form_question_text')
 				->from('forms_questions');
 			$cursor = $qb_fetch->execute();
-			while( $question = $cursor->fetch() ){
+			while ($question = $cursor->fetch()) {
 				//In case the old Question would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if(strlen($question['form_question_text']) > 2048) {
+				if (strlen($question['form_question_text']) > 2048) {
 					$output->warning("Question-text is too long for new Database: '" . $question['form_question_text'] . "'");
 					$question['form_question_text'] = substr($question['form_question_text'], 0, 2048);
 				}
@@ -283,9 +281,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$qb_fetch->select('question_id', 'text')
 				->from('forms_answers');
 			$cursor = $qb_fetch->execute();
-			while( $answer = $cursor->fetch() ){
+			while ($answer = $cursor->fetch()) {
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if(strlen($answer['text']) > 1024) {
+				if (strlen($answer['text']) > 1024) {
 					$output->warning("Option-text is too long for new Database: '" . $answer['text'] . "'");
 					$answer['text'] = substr($answer['text'], 0, 1024);
 				}
@@ -307,7 +305,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$qb_fetch->select('id')
 				->from('forms_events');
 			$cursor = $qb_fetch->execute();
-			while( $tmp = $cursor->fetch() ){
+			while ($tmp = $cursor->fetch()) {
 				$event_structure[$tmp['id']] = $tmp;
 			}
 			$cursor->closeCursor();
@@ -319,7 +317,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 					->from('forms_questions')
 					->where($qb_fetch->expr()->eq('form_id', $qb_fetch->createNamedParameter($event['id'], IQueryBuilder::PARAM_INT)));
 				$cursor = $qb_fetch->execute();
-				while( $tmp = $cursor->fetch() ) {
+				while ($tmp = $cursor->fetch()) {
 					$event_structure[$event['id']]['questions'][] = $tmp;
 				}
 				$cursor->closeCursor();
@@ -337,9 +335,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$qb_fetch->select('id', 'form_id', 'user_id', 'vote_option_id', 'vote_option_text', 'vote_answer')
 				->from('forms_votes');
 			$cursor = $qb_fetch->execute();
-			while( $vote = $cursor->fetch() ){ 
+			while ($vote = $cursor->fetch()) {
 				//If the form changed, if the user changed or if vote_option_id became smaller than last one, then a new submission is interpreted.
-				if ( ($vote['form_id'] != $last_vote['form_id']) || ($vote['user_id'] != $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
+				if (($vote['form_id'] != $last_vote['form_id']) || ($vote['user_id'] != $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
 					$qb_restore->insert('forms_v2_submissions')
 						->values([
 							'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$vote['form_id']]['newId'], IQueryBuilder::PARAM_INT),
@@ -352,7 +350,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				$last_vote = $vote;
 				
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if(strlen($vote['vote_answer']) > 2048) {
+				if (strlen($vote['vote_answer']) > 2048) {
 					$output->warning("Answer-text is too long for new Database: '" . $vote['vote_answer'] . "'");
 					$vote['vote_answer'] = substr($vote['vote_answer'], 0, 2048);
 				}
@@ -396,7 +394,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 		$accessArray['groups'] = [];
 
 		$stringExplode = explode(';', $accessString);
-		foreach($stringExplode as $string) {
+		foreach ($stringExplode as $string) {
 			if (strpos($string, 'user_') === 0) {
 				$accessArray['users'][] = substr($string, 5);
 			} elseif (strpos($string, 'group_') === 0) {

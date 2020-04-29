@@ -28,13 +28,9 @@ declare(strict_types=1);
 namespace OCA\Forms\AppInfo;
 
 use OCP\AppFramework\App;
-use OCP\IL10N;
-use OCP\INavigationManager;
-use OCP\IURLGenerator;
 
 class Application extends App {
-
-	const APP_ID = 'forms';
+	public const APP_ID = 'forms';
 
 	/**
 	 * Application constructor.

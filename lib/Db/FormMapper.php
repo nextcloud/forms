@@ -33,7 +33,7 @@ class FormMapper extends QBMapper {
 
 	/**
 	 * FormMapper constructor.
-	 * 
+	 *
 	 * @param IDBConnection $db
 	 */
 	public function __construct(IDBConnection $db) {
@@ -102,5 +102,4 @@ class FormMapper extends QBMapper {
 
 		return $this->findEntities($qb);
 	}
-
 }

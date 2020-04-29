@@ -50,7 +50,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setSubmitOnce(bool $value)
  */
 class Form extends Entity {
-
 	protected $hash;
 	protected $title;
 	protected $description;

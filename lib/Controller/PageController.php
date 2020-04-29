@@ -44,7 +44,6 @@ use OCP\IUserSession;
 use OCP\Util;
 
 class PageController extends Controller {
-
 	protected $appName;
 
 	/** @var FormMapper */
@@ -115,7 +114,7 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
-	 * 
+	 *
 	 * TODO: Implement cloning
 	 *
 	 * @return TemplateResponse
@@ -189,7 +188,7 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * Check if user has access to this form
-	 * 
+	 *
 	 * @param Form $form
 	 * @return boolean
 	 */
@@ -215,7 +214,7 @@ class PageController extends Controller {
 		// Refuse access, if SubmitOnce is set and user already has taken part.
 		if ($form->getSubmitOnce()) {
 			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
-			foreach($participants as $participant) {
+			foreach ($participants as $participant) {
 				if ($participant === $user->getUID()) {
 					return false;
 				}
@@ -235,7 +234,7 @@ class PageController extends Controller {
 
 		// Check if access granted by group.
 		foreach ($access['groups'] as $group) {
-			if( $this->groupManager->isInGroup($user->getUID(), $group) ) {
+			if ($this->groupManager->isInGroup($user->getUID(), $group)) {
 				return true;
 			}
 		}

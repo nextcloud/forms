@@ -59,5 +59,4 @@ class Answer extends Entity {
 			'text' => htmlspecialchars_decode($this->getText()),
 		];
 	}
-
 }

@@ -30,10 +30,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
-use OCA\Forms\Db\OptionMapper;
-
 class QuestionMapper extends QBMapper {
-
 	private $optionMapper;
 
 	public function __construct(IDBConnection $db, OptionMapper $optionMapper) {
@@ -102,5 +99,4 @@ class QuestionMapper extends QBMapper {
 
 		return $this->findEntity($qb);
 	}
-
 }
