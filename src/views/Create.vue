@@ -71,9 +71,9 @@
 			<!-- Add new questions toolbar -->
 			<div class="question-toolbar" role="toolbar">
 				<Actions ref="questionMenu"
-					v-tooltip="t('forms', 'Add a question to this form')"
-					:aria-label="t('forms', 'Add a question to this form')"
 					:open.sync="questionMenuOpened"
+					:menu-title="t('forms', 'Add a question')"
+					:primary="true"
 					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
 					<ActionButton v-for="(answer, type) in answerTypes"
 						:key="answer.label"
@@ -427,14 +427,6 @@ export default {
 
 			.icon-add-white {
 				opacity: 1;
-				border-radius: 50%;
-				// TODO: standardize on components
-				background-color: var(--color-primary-element);
-				&:hover,
-				&:focus,
-				&:active {
-					background-color: var(--color-primary-element-light) !important;
-				}
 			}
 		}
 	}
