@@ -14,13 +14,13 @@ OC.L10N.register(
     "Group" : "Grupė",
     "Title" : "Pavadinimas",
     "Description" : "Aprašas",
+    "Settings" : "Nustatymai",
+    "Set expiration date" : "Nustatyti galiojimo pabaigos datą",
+    "Sharing" : "Bendrinimas",
+    "Share link" : "Bendrinimo nuoroda",
     "Name of user or group" : "Naudotojo vardas arba grupės pavadinimas",
     "Expiration date" : "Galiojimo pabaigos data",
-    "Form Expired" : "Anketa nebegalioja",
-    "This Form has expired and is no longer taking answers." : "Ši anketa nebegalioja ir daugiau nebepriima atsakymų.",
-    "Access denied" : "Prieiga negalima",
-    "You are not allowed to view this form or the form does not exist." : "Jums neleidžiama peržiūrėti šios anketos arba anketos nėra.",
-    "You are not allowed to edit this form or the form does not exist." : "Jums neleidžiama taisyti šią anketą arba anketos nėra.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Jums neleidžiama ištrinti šios anketos arba anketos nėra."
+    "Submit" : "Pateikti",
+    "Form Expired" : "Anketa nebegalioja"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

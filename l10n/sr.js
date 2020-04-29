@@ -20,13 +20,13 @@ OC.L10N.register(
     "Add Option" : "Додај опцију",
     "Title" : "Наслов",
     "Description" : "Опис",
+    "Settings" : "Поставке",
+    "Set expiration date" : "Постави датум истека",
+    "Sharing" : "Дељење",
+    "Share link" : "Веза дељења",
     "Name of user or group" : "Име корисника или групе",
     "Expiration date" : "Датум истека",
-    "Form Expired" : "Упитник је истекао",
-    "This Form has expired and is no longer taking answers." : "Овај упитник је истекао и не можете да одговарате на њега.",
-    "Access denied" : "Забрањен приступ",
-    "You are not allowed to view this form or the form does not exist." : "Није Вам дозвољено да видите овај упитник или упитник не постоји.",
-    "You are not allowed to edit this form or the form does not exist." : "Није Вам дозвољено да измените овај упитник или упитник не постоји.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Није Вам дозвољено да обришете овај упитник или упитник не постоји."
+    "Submit" : "Пошаљи",
+    "Form Expired" : "Упитник је истекао"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

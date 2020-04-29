@@ -4,7 +4,10 @@ OC.L10N.register(
     "Group" : "Gruppe",
     "Title" : "Titel",
     "Description" : "Beskrivelse",
-    "Expiration date" : "Udløbsdato",
-    "Access denied" : "Adgang nægtet"
+    "Settings" : "Indstillinger",
+    "Set expiration date" : "Angiv udløbsdato",
+    "Sharing" : "Deling",
+    "Share link" : "Del link",
+    "Expiration date" : "Udløbsdato"
 },
 "nplurals=2; plural=(n != 1);");

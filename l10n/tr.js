@@ -20,13 +20,13 @@ OC.L10N.register(
     "Add Option" : "Seçenek Ekle",
     "Title" : "Başlık",
     "Description" : "Açıklama",
+    "Settings" : "Ayarlar",
+    "Set expiration date" : "Son kullanma tarihini ayarla",
+    "Sharing" : "Paylaşım",
+    "Share link" : "Bağlantıyı paylaş",
     "Name of user or group" : "Kullanıcı ya da grup adı",
     "Expiration date" : "Son kullanma tarihi",
-    "Form Expired" : "Formun Süresi Geçmiş",
-    "This Form has expired and is no longer taking answers." : "Bu formun kullanma süresi geçmiş olduğundan doldurulamaz.",
-    "Access denied" : "Erişim reddedildi",
-    "You are not allowed to view this form or the form does not exist." : "Bu formu görüntüleme izniniz yok ya da form bulunamadı.",
-    "You are not allowed to edit this form or the form does not exist." : "Bu formu düzenleme izniniz yok ya da form bulunamadı.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Bu formu silme izniniz yok ya da form bulunamadı."
+    "Submit" : "Gönder",
+    "Form Expired" : "Formun Süresi Geçmiş"
 },
 "nplurals=2; plural=(n > 1);");

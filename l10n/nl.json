@@ -18,13 +18,13 @@
     "Add Option" : "Toevoegen optie",
     "Title" : "Titel",
     "Description" : "Beschrijving",
+    "Settings" : "Instellingen",
+    "Set expiration date" : "Stel vervaldatum in",
+    "Sharing" : "Delen",
+    "Share link" : "Delen link",
     "Name of user or group" : "Naam van gebruiker of groep",
     "Expiration date" : "Vervaldatum",
-    "Form Expired" : "Formulier verlopen",
-    "This Form has expired and is no longer taking answers." : "Dit formulier is verlopen en accepteert geen antwoorden meer.",
-    "Access denied" : "Toegang geweigerd",
-    "You are not allowed to view this form or the form does not exist." : "Je bent niet gemachtigd om dit formulier te zien of het formulier bestaat niet.",
-    "You are not allowed to edit this form or the form does not exist." : "Je bent niet gemachtigd om dit formulier te bewerken of het formulier bestaat niet.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Je mag dit formulier niet verwijderen of het formulier bestaat niet."
+    "Submit" : "Verwerken",
+    "Form Expired" : "Formulier verlopen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

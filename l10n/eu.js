@@ -20,13 +20,13 @@ OC.L10N.register(
     "Add Option" : "Gehitu aukera",
     "Title" : "Izenburua",
     "Description" : "Deskribapena",
+    "Settings" : "Ezarpenak",
+    "Set expiration date" : "Ezarri iraungitze-data",
+    "Sharing" : "Partekatzea",
+    "Share link" : "Partekatu esteka",
     "Name of user or group" : "Erabiltzailearen edo taldearen izena",
     "Expiration date" : "Iraungitze-data",
-    "Form Expired" : "Iraungitako inprimakia",
-    "This Form has expired and is no longer taking answers." : "Inprimaki hau iraungi da eta eta jada ez du erantzunik hartzen.",
-    "Access denied" : "Sarbidea ukatua",
-    "You are not allowed to view this form or the form does not exist." : "Ez duzu inprimaki hau ikusteko baimenik edo inprimakia ez da existitzen.",
-    "You are not allowed to edit this form or the form does not exist." : "Ez duzu inprimaki hau editatzeko baimenik edo inprimakia ez da existitzen.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Ez duzu inprimaki hau ezabatzeko baimenik edo inprimakia ez da existitzen."
+    "Submit" : "Bidali",
+    "Form Expired" : "Iraungitako inprimakia"
 },
 "nplurals=2; plural=(n != 1);");

@@ -6,8 +6,11 @@ OC.L10N.register(
     "Group" : "Grupo",
     "Title" : "Título",
     "Description" : "Descrição",
+    "Settings" : "Configurações",
+    "Set expiration date" : "Definir a data de expiração",
+    "Sharing" : "Partilha",
+    "Share link" : "Share link",
     "Name of user or group" : "Nome do utilizador ou grupo",
-    "Expiration date" : "Data de expiração",
-    "Access denied" : "Acesso proibido"
+    "Expiration date" : "Data de expiração"
 },
 "nplurals=2; plural=(n != 1);");

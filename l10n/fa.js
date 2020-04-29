@@ -10,13 +10,13 @@ OC.L10N.register(
     "Group" : "گروه",
     "Title" : "عنوان",
     "Description" : "توضیحات",
+    "Settings" : "تنظیمات",
+    "Set expiration date" : "تنظیم تاریخ انقضا",
+    "Sharing" : "اشتراک گذاری",
+    "Share link" : "لینک را به اشتراک بگذارید",
     "Name of user or group" : "نام کاربر یا گروه",
     "Expiration date" : "تاریخ انقضا",
-    "Form Expired" : "فرم منقضی شده است",
-    "This Form has expired and is no longer taking answers." : "این فرم منقضی شده است و دیگر جواب نمی گیرید.",
-    "Access denied" : "دسترسی رد شد",
-    "You are not allowed to view this form or the form does not exist." : "شما مجاز به مشاهده این فرم نیستید یا فرم موجود نیست.",
-    "You are not allowed to edit this form or the form does not exist." : "شما مجاز به ویرایش این فرم نیستید یا فرم موجود نیست.",
-    "You are either not allowed to delete this form or it doesn't exist." : "شما مجاز به حذف این فرم نیستید یا وجود ندارد."
+    "Submit" : "ارسال",
+    "Form Expired" : "فرم منقضی شده است"
 },
 "nplurals=2; plural=(n > 1);");

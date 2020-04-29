@@ -10,13 +10,13 @@ OC.L10N.register(
     "Group" : "Skupina",
     "Title" : "Naslov",
     "Description" : "Opis",
+    "Settings" : "Nastavitve",
+    "Set expiration date" : "Nastavi datum preteka",
+    "Sharing" : "Souporaba",
+    "Share link" : "Povezava za souporabo",
     "Name of user or group" : "Ime uporabnika oziroma skupine",
     "Expiration date" : "Datum preteka",
-    "Form Expired" : "Vprašalnik je potekel",
-    "This Form has expired and is no longer taking answers." : "Čas za izpolnjevanje vprašalnika je poteke in ni več mogoče dodajati novih odzivov.",
-    "Access denied" : "Dostop je zavrnjen",
-    "You are not allowed to view this form or the form does not exist." : "Za ogled tega vprašalnika ni ustreznih dovoljen, ali pa ta ne obstaja.",
-    "You are not allowed to edit this form or the form does not exist." : "Za urejanje tega vprašalnika ni ustreznih dovoljen, ali pa ta ne obstaja.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Za brisanje tega vprašalnika ni ustreznih dovoljen, ali pa ta ne obstaja."
+    "Submit" : "Pošlji",
+    "Form Expired" : "Vprašalnik je potekel"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

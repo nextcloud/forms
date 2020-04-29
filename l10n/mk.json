@@ -3,6 +3,11 @@
     "Group" : "Група",
     "Title" : "Наслов",
     "Description" : "Опис",
-    "Expiration date" : "Рок на траење"
+    "Settings" : "Параметри",
+    "Set expiration date" : "Постави рок на траење",
+    "Sharing" : "Споделување",
+    "Share link" : "Сподели линк",
+    "Expiration date" : "Рок на траење",
+    "Submit" : "Испрати"
 },"pluralForm" :"nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;"
 }

@@ -5,7 +5,10 @@ OC.L10N.register(
     "Group" : "קבוצה",
     "Title" : "תפקיד",
     "Description" : "תיאור",
-    "Expiration date" : "תאריך תפוגה",
-    "Access denied" : "הגישה נדחתה"
+    "Settings" : "הגדרות",
+    "Set expiration date" : "הגדרת תאריך תפוגה",
+    "Sharing" : "שיתוף",
+    "Share link" : "קישור שיתוף",
+    "Expiration date" : "תאריך תפוגה"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;");

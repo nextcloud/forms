@@ -4,7 +4,10 @@ OC.L10N.register(
     "Group" : "Grupp",
     "Title" : "Pealkiri",
     "Description" : "Kirjeldus",
-    "Expiration date" : "Aegumise kuupäev",
-    "Access denied" : "Ligipääs keelatud"
+    "Settings" : "Seaded",
+    "Set expiration date" : "Määra aegumise kuupäev",
+    "Sharing" : "Jagamine",
+    "Share link" : "Jaga link",
+    "Expiration date" : "Aegumise kuupäev"
 },
 "nplurals=2; plural=(n != 1);");

@@ -18,13 +18,13 @@
     "Add Option" : "Добавить вариант",
     "Title" : "Заголовок",
     "Description" : "Описание",
+    "Settings" : "Настройки",
+    "Set expiration date" : "Установить срок действия",
+    "Sharing" : "Параметры публикации",
+    "Share link" : "Предоставление общего доступа по ссылке",
     "Name of user or group" : "Имя пользователя или группы",
     "Expiration date" : "Дата окончания",
-    "Form Expired" : "Форма закончилась",
-    "This Form has expired and is no longer taking answers." : "Эта форма закончилась и ответы больше не принимаются.",
-    "Access denied" : "Доступ запрещён",
-    "You are not allowed to view this form or the form does not exist." : "Просмотр этой формы запрещён либо эта форма не существует.",
-    "You are not allowed to edit this form or the form does not exist." : "Редактирование этой формы запрещёно либо эта форма не существует.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Удаление этой формы запрещёно либо эта форма не существует."
+    "Submit" : "Создать",
+    "Form Expired" : "Форма закончилась"
 },"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"
 }

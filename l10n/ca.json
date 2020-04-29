@@ -7,13 +7,12 @@
     "Group" : "Grup",
     "Title" : "Títol",
     "Description" : "Descripció",
+    "Settings" : "Paràmetres",
+    "Set expiration date" : "Establiu una data de caducitat",
+    "Sharing" : "Compartició",
+    "Share link" : "Enllaç de compartició",
     "Name of user or group" : "Nom de l'usuari o del grup",
     "Expiration date" : "Data de venciment",
-    "Form Expired" : "Formulari vençut",
-    "This Form has expired and is no longer taking answers." : "Aquest formulari ha vençut i ja no està recollint respostes.",
-    "Access denied" : "Accés denegat",
-    "You are not allowed to view this form or the form does not exist." : "No teniu permís per veure aquest formulari o potser el formulari ja no existeix.",
-    "You are not allowed to edit this form or the form does not exist." : "No teniu permís per editar aquest formulari o potser el formulari ja no existeix.",
-    "You are either not allowed to delete this form or it doesn't exist." : "No teniu permís per esborrar aquest formulari o potser el formulari ja no existeix."
+    "Form Expired" : "Formulari vençut"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

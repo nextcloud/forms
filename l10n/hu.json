@@ -7,13 +7,13 @@
     "Group" : "Csoport",
     "Title" : "Cím",
     "Description" : "Leírás",
+    "Settings" : "Beállítások",
+    "Set expiration date" : "Lejárati idő beállítása",
+    "Sharing" : "Megosztás",
+    "Share link" : "Hivatkozás megosztása",
     "Name of user or group" : "Felhasználó vagy csoport neve",
     "Expiration date" : "Lejárati idő",
-    "Form Expired" : "Űrlap lejárt",
-    "This Form has expired and is no longer taking answers." : "Ez az űrlap lejárt és többé nem lehet kitölteni.",
-    "Access denied" : "Hozzáférés megtagadva",
-    "You are not allowed to view this form or the form does not exist." : "Nem vagy jogosult az űrlap megtekintésére, vagy az nem létezik.",
-    "You are not allowed to edit this form or the form does not exist." : "Nem vagy jogosult az űrlap szerkesztésére, vagy az nem létezik.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Nem vagy jogosult az űrlap törlésére, vagy az nem létezik."
+    "Submit" : "Beküldés",
+    "Form Expired" : "Űrlap lejárt"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

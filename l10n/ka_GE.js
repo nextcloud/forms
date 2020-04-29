@@ -4,7 +4,11 @@ OC.L10N.register(
     "Group" : "ჯგუფი",
     "Title" : "სათაური",
     "Description" : "აღწერილობა",
+    "Settings" : "პარამეტრები",
+    "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
+    "Sharing" : "გაზიარება",
+    "Share link" : "ბმულის გაზიარება",
     "Expiration date" : "გაუქმების თარიღი",
-    "Access denied" : "წვდომა არაა დაშვებული"
+    "Submit" : "გაგზავნა"
 },
 "nplurals=2; plural=(n!=1);");

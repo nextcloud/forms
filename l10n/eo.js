@@ -5,8 +5,12 @@ OC.L10N.register(
     "Group" : "Grupo",
     "Title" : "Titolo",
     "Description" : "Priskribo",
+    "Settings" : "Agordoj",
+    "Set expiration date" : "Uzi limdaton",
+    "Sharing" : "Kunhavigo",
+    "Share link" : "Kunhavigi ligilon",
     "Name of user or group" : "Nomo de uzanto aŭ grupo",
     "Expiration date" : "Limdato",
-    "Access denied" : "Aliro malpermesata"
+    "Submit" : "Sendi"
 },
 "nplurals=2; plural=(n != 1);");

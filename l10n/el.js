@@ -20,13 +20,13 @@ OC.L10N.register(
     "Add Option" : "Προσθήκη Επιλογής",
     "Title" : "Τίτλος",
     "Description" : "Περιγραφή",
+    "Settings" : "Ρυθμίσεις",
+    "Set expiration date" : "Ορισμός ημερομηνίας λήξης",
+    "Sharing" : "Διαμοιρασμός",
+    "Share link" : "Διαμοιρασμός συνδέσμου",
     "Name of user or group" : "Όνομα του χρήστη ή της ομάδας",
     "Expiration date" : "Ημερομηνία λήξης",
-    "Form Expired" : "Η φόρμα έληξε",
-    "This Form has expired and is no longer taking answers." : "Η Φόρμα έληξε και δεν δέχεται πλέον απαντήσεις.",
-    "Access denied" : "Δεν επιτρέπεται η πρόσβαση",
-    "You are not allowed to view this form or the form does not exist." : "Δεν επιτρέπεται να δείτε την φόρμα ή δεν υπάρχει.",
-    "You are not allowed to edit this form or the form does not exist." : "Δεν επιτρέπεται να επεξεργαστείτε την φόρμα ή δεν υπάρχει.",
-    "You are either not allowed to delete this form or it doesn't exist." : "Δεν επιτρέπεται να διαγράψετε την φόρμα ή δεν υπάρχει."
+    "Submit" : "Υποβολή",
+    "Form Expired" : "Η φόρμα έληξε"
 },
 "nplurals=2; plural=(n != 1);");

@@ -1,0 +1,9 @@
+{ "translations": {
+    "Group" : "Qrup",
+    "Title" : "Başlıq",
+    "Description" : "Açıqlanma",
+    "Settings" : "Quraşdırmalar",
+    "Sharing" : "Paylaşılır",
+    "Share link" : "Linki yayımla"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

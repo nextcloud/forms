@@ -2,6 +2,9 @@
     "Group" : "Խումբ",
     "Title" : "Վերնագիր",
     "Description" : "Նկարագրություն",
+    "Settings" : "կարգավորումներ",
+    "Set expiration date" : "Սահմանել վավերականության ժամկետ",
+    "Share link" : "Կիսվել հղմամբ",
     "Expiration date" : "Վավերականության ժամկետ"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
