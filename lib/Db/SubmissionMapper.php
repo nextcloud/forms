@@ -2,35 +2,35 @@
 /**
  * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
+ * @author affan98 <affan98@gmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Affero General Public License as
- *  published by the Free Software Foundation, either version 3 of the
- *  License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
 namespace OCA\Forms\Db;
 
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\QBMapper;
-
-use OCA\Forms\Db\AnswerMapper;
 
 class SubmissionMapper extends QBMapper {
-
 	private $answerMapper;
 
 	/**
@@ -46,7 +46,7 @@ class SubmissionMapper extends QBMapper {
 
 	/**
 	 * @param int $formId
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws DoesNotExistException if not found
 	 * @return Submission[]
 	 */
 	public function findByForm(int $formId): array {
@@ -63,7 +63,7 @@ class SubmissionMapper extends QBMapper {
 
 	/**
 	 * @param int $formId
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws DoesNotExistException if not found
 	 * @return array
 	 */
 	public function findParticipantsByForm(int $formId): array {
@@ -78,7 +78,7 @@ class SubmissionMapper extends QBMapper {
 		$submissionEntities = $this->findEntities($qb);
 
 		// From array of submissionEntities produce array of userIds.
-		$userIds = array_map(function($submissionEntity) {
+		$userIds = array_map(function ($submissionEntity) {
 			return $submissionEntity->getUserId();
 		}, $submissionEntities);
 
@@ -86,8 +86,8 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	* @param int $formId
-	*/
+	 * @param int $formId
+	 */
 	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 

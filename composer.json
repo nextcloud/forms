@@ -2,22 +2,18 @@
 	"name": "nextcloud/forms",
 	"type": "project",
 	"license": "AGPLv3",
-	"authors": [
-		{
-			"name": "Vinzenz Rosenkranz"
-		},
-		{
-			"name": "Kai Schröer"
-		},
-		{
-			"name": "René Gieling"
-		}
-	],
 	"require-dev": {
-		"christophwurst/nextcloud": "^16.0",
-		"phpunit/phpunit": "^8"
-	},
-	"scripts": {
-		"lint": "find . -name \\*.php -not -path './vendor/*' -exec php -l \"{}\" \\;"
-	}
+		"christophwurst/nextcloud": "^17.0",
+		"phpunit/phpunit": "^8",
+        "nextcloud/coding-standard": "^0.3.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": true
+    },
+    "scripts": {
+        "lint": "find . -name \\*.php -not -path './vendor/*' -exec php -l \"{}\" \\;",
+        "cs:check": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix"
+    }
 }

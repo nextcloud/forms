@@ -2,28 +2,26 @@
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
- * @author Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
- * @author René Gieling <github@dartcafe.de>
- * @author Inigo Jiron <ijiron@terpmail.umd.edu>
- * @author Natalie Gilbert
- * @author Affan Hussain
- * @author John Molakvoæ <skjnldsv@protonmail.com>
+ * @author affan98 <affan98@gmail.com>
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Marcel Klehr <mklehr@gmx.net>
+ * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Affero General Public License as
- *  published by the Free Software Foundation, either version 3 of the
- *  License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -46,7 +44,6 @@ use OCP\IUserSession;
 use OCP\Util;
 
 class PageController extends Controller {
-
 	protected $appName;
 
 	/** @var FormMapper */
@@ -117,7 +114,7 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
-	 * 
+	 *
 	 * TODO: Implement cloning
 	 *
 	 * @return TemplateResponse
@@ -191,7 +188,7 @@ class PageController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * Check if user has access to this form
-	 * 
+	 *
 	 * @param Form $form
 	 * @return boolean
 	 */
@@ -217,7 +214,7 @@ class PageController extends Controller {
 		// Refuse access, if SubmitOnce is set and user already has taken part.
 		if ($form->getSubmitOnce()) {
 			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
-			foreach($participants as $participant) {
+			foreach ($participants as $participant) {
 				if ($participant === $user->getUID()) {
 					return false;
 				}
@@ -237,7 +234,7 @@ class PageController extends Controller {
 
 		// Check if access granted by group.
 		foreach ($access['groups'] as $group) {
-			if( $this->groupManager->isInGroup($user->getUID(), $group) ) {
+			if ($this->groupManager->isInGroup($user->getUID(), $group)) {
 				return true;
 			}
 		}

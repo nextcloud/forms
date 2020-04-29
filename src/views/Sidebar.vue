@@ -262,8 +262,8 @@ ul {
 		padding: 8px;
 		display: block;
 
-		span[class^="icon-"],
-		span[class*=" icon-"] {
+		span[class^='icon-'],
+		span[class*=' icon-'] {
 			background-position: 4px;
 			padding-left: 24px;
 		}

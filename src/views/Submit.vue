@@ -154,6 +154,7 @@ export default {
 	flex-direction: column;
 
 	// Force hide navigation toggle as there is no navigation
+	// stylelint-disable-next-line selector-pseudo-element-no-unknown
 	::v-deep #app-navigation-toggle {
 		display: none !important;
 	}
@@ -195,6 +196,7 @@ export default {
 		.question {
 			// Less padding needed as submit view does not have drag handles
 			padding-left: 16px;
+			// stylelint-disable-next-line selector-pseudo-element-no-unknown
 			::v-deep &__content {
 				// Left-align multiple choice and checkboxes with question text
 				// Only in submit view

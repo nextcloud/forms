@@ -1,29 +1,26 @@
 <?php
-
-
 /**
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
- * @author René Gieling <github@dartcafe.de>
- * @author Natalie Gilbert <ngilb634@umd.edu>
- * @author Inigo Jiron
- * @author Affan Hussain
+ * @author affan98 <affan98@gmail.com>
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Affero General Public License as
- *  published by the Free Software Foundation, either version 3 of the
- *  License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -50,7 +47,6 @@ use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 
 class ApiController extends Controller {
-
 	protected $appName;
 
 	/** @var SubmissionMapper */
@@ -126,8 +122,8 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * 
-	 * 
+	 *
+	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 */
 	public function getForm(int $id): Http\JSONResponse {
@@ -310,14 +306,14 @@ class ApiController extends Controller {
 		}
 
 		// Check if array contains duplicates
-		if ( array_unique($newOrder) !== $newOrder ) {
+		if (array_unique($newOrder) !== $newOrder) {
 			$this->logger->debug('The given Array contains duplicates.');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
 		// Check if all questions are given in Array.
 		$questions = $this->questionMapper->findByForm($formId);
-		if ( sizeof($questions) !== sizeof($newOrder) ) {
+		if (sizeof($questions) !== sizeof($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored questions');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
@@ -326,8 +322,7 @@ class ApiController extends Controller {
 		$response = []; // Array of ['questionId' => ['order' => newOrder]]
 
 		// Store array of Question-Entities and check the Questions FormId & old Order.
-		foreach($newOrder as $arrayKey => $questionId) {
-
+		foreach ($newOrder as $arrayKey => $questionId) {
 			try {
 				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
 			} catch (IMapperException $e) {
@@ -347,7 +342,7 @@ class ApiController extends Controller {
 
 			// Abort if a question is already marked as deleted (order==0)
 			$oldOrder = $questions[$arrayKey]->getOrder();
-			if ( $oldOrder === 0) {
+			if ($oldOrder === 0) {
 				$this->logger->debug('This Question has already been marked as deleted: Id: {id}', [
 					'id' => $questions[$arrayKey]->getId()
 				]);
@@ -362,7 +357,7 @@ class ApiController extends Controller {
 		}
 
 		// Write to Database
-		foreach($questions as $question) {
+		foreach ($questions as $question) {
 			$this->questionMapper->update($question);
 
 			$response[$question->getId()] = [
@@ -446,7 +441,7 @@ class ApiController extends Controller {
 		$formQuestions = $this->questionMapper->findByForm($form->getId());
 		foreach ($formQuestions as $question) {
 			$questionOrder = $question->getOrder();
-			if ( $questionOrder > $deletedOrder ) {
+			if ($questionOrder > $deletedOrder) {
 				$question->setOrder($questionOrder - 1);
 				$this->questionMapper->update($question);
 			}
@@ -492,7 +487,7 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * Writes the given key-value pairs into Database.
-
+	 *
 	 * @param int $id OptionId of option to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 */
@@ -592,7 +587,7 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * @PublicPage
-	 * 
+	 *
 	 * Process a new submission
 	 * @param int $formId
 	 * @param array $answers [question_id => arrayOfString]
@@ -620,7 +615,7 @@ class ApiController extends Controller {
 		$submission->setTimestamp(time());
 
 		// If not logged in or anonymous use anonID
-		if (!$user || $form->getIsAnonymous()){
+		if (!$user || $form->getIsAnonymous()) {
 			$anonID = "anon-user-".  hash('md5', (time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
@@ -632,7 +627,7 @@ class ApiController extends Controller {
 		$submissionId = $submission->getId();
 
 		// Process Answers
-		foreach($answers as $questionId => $answerArray) {
+		foreach ($answers as $questionId => $answerArray) {
 			// Search corresponding Question, skip processing if not found
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
 			if ($questionIndex === false) {
@@ -641,11 +636,11 @@ class ApiController extends Controller {
 				$question = $questions[$questionIndex];
 			}
 
-			foreach($answerArray as $answer) {
-				if($question['type'] === 'multiple' || $question['type'] === 'multiple_unique') {
+			foreach ($answerArray as $answer) {
+				if ($question['type'] === 'multiple' || $question['type'] === 'multiple_unique') {
 					// Search corresponding option, skip processing if not found
 					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
-					if($optionIndex === false) {
+					if ($optionIndex === false) {
 						continue;
 					} else {
 						$option = $question['options'][$optionIndex];
@@ -653,7 +648,6 @@ class ApiController extends Controller {
 
 					// Load option-text
 					$answerText = $option['text'];
-
 				} else {
 					$answerText = $answer; // Not a multiple-question, answerText is given answer
 				}

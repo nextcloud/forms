@@ -2,50 +2,6 @@
 	"name": "forms",
 	"description": "Forms app for nextcloud",
 	"version": "2.0.0-beta1",
-	"authors": [
-		{
-			"name": "Vinzenz Rosenkranz",
-			"email": "vinzenz.rosenkranz@gmail.com",
-			"role": "Polls App Developer"
-		},
-		{
-			"name": "Rene Gieling",
-			"email": "github@dartcafe.de",
-			"role": "Polls App Developer"
-		},
-		{
-			"name": "Natalie Gilbert",
-			"role": "Forms Team Lead/Back End Developer"
-		},
-		{
-			"name": "Inigo Jiron",
-			"role": "Back End Developer/Database Specialist"
-		},
-		{
-			"name": "Affan Hussain",
-			"role": "Forms Technical Lead"
-		},
-		{
-			"name": "Nick Gallo",
-			"role": "Front End Developer"
-		},
-		{
-			"name": "Ajfar Huq",
-			"role": "Front End Developer"
-		},
-		{
-			"name": "Tim Sattizahn",
-			"role": "Forms QA Lead"
-		},
-		{
-			"name": "Stephan Link",
-			"role": "Quality Assurance"
-		},
-		{
-			"name": "Kameron Sheppard",
-			"role": "Quality Assurance"
-		}
-	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/nextcloud/forms.git"
@@ -62,10 +18,8 @@
 		"watch": "NODE_ENV=development webpack --progress --watch --config webpack.dev.js",
 		"lint": "eslint --ext .js,.vue src",
 		"lint:fix": "eslint --ext .js,.vue src --fix",
-		"stylelint": "stylelint src",
-		"stylelint:fix": "stylelint src --fix",
-		"test": "jest",
-		"test:coverage": "jest --coverage"
+		"stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
+		"stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
 	},
 	"dependencies": {
 		"@nextcloud/auth": "^1.2.3",
@@ -118,10 +72,10 @@
 		"file-loader": "^6.0.0",
 		"node-sass": "^4.14.0",
 		"sass-loader": "^8.0.2",
-		"stylelint": "^8.4.0",
-		"stylelint-config-recommended-scss": "^3.3.0",
-		"stylelint-scss": "^3.17.1",
-		"stylelint-webpack-plugin": "^0.10.5",
+		"stylelint": "^13.3.3",
+		"stylelint-config-recommended-scss": "^4.2.0",
+		"stylelint-scss": "^3.17.0",
+		"stylelint-webpack-plugin": "^1.2.3",
 		"url-loader": "^4.1.0",
 		"vue-loader": "^15.9.1",
 		"vue-style-loader": "^4.1.1",

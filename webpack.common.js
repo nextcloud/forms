@@ -49,7 +49,9 @@ module.exports = {
 	},
 	plugins: [
 		new VueLoaderPlugin(),
-		new StyleLintPlugin(),
+		new StyleLintPlugin({
+			files: ['**/*.vue'],
+		}),
 		// Make appName & appVersion available as a constant
 		new webpack.DefinePlugin({ appName }),
 		new webpack.DefinePlugin({ appVersion }),
