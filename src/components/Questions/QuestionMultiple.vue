@@ -22,13 +22,14 @@
 
 <template>
 	<Question
-		:id="id"
 		v-bind.sync="$attrs"
 		:text="text"
+		:mandatory="mandatory"
 		:edit.sync="edit"
 		:max-question-length="maxStringLengths.questionText"
-		@delete="onDelete"
-		@update:text="onTitleChange">
+		@update:text="onTitleChange"
+		@update:mandatory="onMandatoryChange"
+		@delete="onDelete">
 		<ul class="question__content">
 			<template v-for="(answer, index) in options">
 				<li v-if="!edit" :key="answer.id" class="question__item">
@@ -95,13 +96,6 @@ export default {
 	},
 
 	mixins: [QuestionMixin],
-
-	props: {
-		id: {
-			type: Number,
-			required: true,
-		},
-	},
 
 	computed: {
 		isLastEmpty() {
@@ -172,10 +166,18 @@ export default {
 		 * @returns {boolean}
 		 */
 		isRequired(id) {
+			// false, if question not mandatory
+			if (!this.mandatory) {
+				return false
+			}
+
+			// true for Radiobuttons
 			if (this.isUnique) {
 				return true
 			}
-			return this.areNoneChecked || this.isChecked(id)
+
+			// For checkboxes, only required if no other is checked
+			return this.areNoneChecked
 		},
 
 		/**

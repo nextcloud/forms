@@ -43,10 +43,13 @@
 				minlength="1"
 				:maxlength="maxQuestionLength"
 				required
-				@input="onInput"
-				@keyup="onTitleChange">
-			<h3 v-else class="question__header-title" v-text="text" />
+				@input="onTitleChange">
+			<h3 v-else class="question__header-title" v-text="computedText" />
 			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
+				<ActionCheckbox :checked="mandatory"
+					@update:checked="onMandatoryChange">
+					{{ t('forms', 'Mandatory') }}
+				</ActionCheckbox>
 				<ActionButton icon="icon-delete" @click="onDelete">
 					{{ t('forms', 'Delete question') }}
 				</ActionButton>
@@ -59,14 +62,10 @@
 </template>
 
 <script>
-import axios from '@nextcloud/axios'
-import debounce from 'debounce'
-import { generateUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
 import { directive as ClickOutside } from 'v-click-outside'
-
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
 
 export default {
 	name: 'Question',
@@ -78,19 +77,20 @@ export default {
 	components: {
 		Actions,
 		ActionButton,
+		ActionCheckbox,
 	},
 
 	props: {
-		id: {
-			type: Number,
-			required: true,
-		},
 		index: {
 			type: Number,
 			required: true,
 		},
 		text: {
 			type: String,
+			required: true,
+		},
+		mandatory: {
+			type: Boolean,
 			required: true,
 		},
 		edit: {
@@ -107,9 +107,26 @@ export default {
 		},
 	},
 
+	computed: {
+		/**
+		 * Extend text with asterisk if question is mandatory
+		 * @returns {Boolean}
+		 */
+		computedText() {
+			if (this.mandatory) {
+				return this.text + ' *'
+			}
+			return this.text
+		},
+	},
+
 	methods: {
-		onInput({ target }) {
+		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
+		},
+
+		onMandatoryChange(mandatory) {
+			this.$emit('update:mandatory', mandatory)
 		},
 
 		/**
@@ -135,25 +152,6 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
-		},
-
-		onTitleChange: debounce(function() {
-			this.saveQuestionProperty('text')
-		}, 200),
-
-		async saveQuestionProperty(key) {
-			try {
-				// TODO: add loading status feedback ?
-				await axios.post(generateUrl('/apps/forms/api/v1/question/update'), {
-					id: this.id,
-					keyValuePairs: {
-						[key]: this[key],
-					},
-				})
-			} catch (error) {
-				showError(t('forms', 'Error while saving question'))
-				console.error(error)
-			}
 		},
 	},
 }

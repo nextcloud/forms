@@ -24,16 +24,18 @@
 	<Question
 		v-bind.sync="$attrs"
 		:text="text"
+		:mandatory="mandatory"
 		:edit.sync="edit"
 		:max-question-length="maxStringLengths.questionText"
-		@delete="onDelete"
-		@update:text="onTitleChange">
+		@update:text="onTitleChange"
+		@update:mandatory="onMandatoryChange"
+		@delete="onDelete">
 		<div class="question__content">
 			<!-- TODO: properly choose max length -->
 			<input ref="input"
 				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
 				:placeholder="t('forms', 'Short answer text')"
-				:required="true /* TODO: implement required option */"
+				:required="mandatory"
 				:value="values[0]"
 				class="question__input"
 				:maxlength="maxStringLengths.answerText"

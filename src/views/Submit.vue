@@ -28,8 +28,12 @@
 				<h2 id="form-title">
 					{{ form.title }}
 				</h2>
-				<p v-if="!loading && !success" id="form-desc">
+				<p v-if="!loading && !success" class="form-desc">
 					{{ form.description }}
+				</p>
+				<!-- Only visible if at least one question is marked as mandatory-->
+				<p v-if="mandatoryUsed" class="form-desc">
+					* {{ t('forms', 'Mandatory fields') }}
 				</p>
 			</header>
 
@@ -121,6 +125,16 @@ export default {
 				return true
 			})
 		},
+
+		/**
+		 * Check if at least one question is mandatory
+		 * @returns {Boolean}
+		 */
+		mandatoryUsed() {
+			return this.form.questions.reduce(
+				(isUsed, question) => isUsed || question.mandatory
+				, false)
+		},
 	},
 
 	methods: {
@@ -170,9 +184,10 @@ export default {
 	// Title & description header
 	header {
 		margin-top: 44px;
+		margin-bottom: 24px;
 
 		#form-title,
-		#form-desc {
+		.form-desc {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
@@ -186,8 +201,8 @@ export default {
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
-		#form-desc {
-			min-height: 60px;
+		.form-desc {
+			padding-bottom: 20px;
 			resize: none;
 		}
 	}
