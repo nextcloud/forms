@@ -39,9 +39,10 @@
 
 		<header v-if="!noSubmissions">
 			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
-			<!-- <div v-for="sum in stats" :key="sum">
-				{{ sum }}
-			</div> -->
+			<button id="exportButton" @click="download">
+				<span class="icon-download" role="img" />
+				{{ t('forms', 'Export to CSV') }}
+			</button>
 		</header>
 
 		<!-- No submissions -->
@@ -62,32 +63,19 @@
 				:submission="submission"
 				:questions="questions"
 				@delete="deleteSubmission(submission.id)" />
-
-			<!-- <transition-group
-				name="list"
-				tag="div"
-				class="table">
-				<ResultItem
-					key="0"
-					:header="true" />
-				<ResultItem
-					v-for="submission in submissions"
-					:key="submission.id"
-					:answer="submission.answers[0]" />
-			</transition-group> -->
 		</section>
 	</AppContent>
 </template>
 
 <script>
 import { generateUrl } from '@nextcloud/router'
+import { Parser } from 'json2csv'
 import { showError } from '@nextcloud/dialogs'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
-// import json2csvParser from 'json2csv'
+import moment from '@nextcloud/moment'
 
 import EmptyContent from '../components/EmptyContent'
-// import ResultItem from '../components/resultItem'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -166,35 +154,41 @@ export default {
 			}
 		},
 
-		/* download() {
-			this.loading = true
-			axios.get(OC.generateUrl('apps/forms/get/form/' + this.$route.params.hash))
-				.then((response) => {
-					this.json2csvParser = ['userId', 'questionId', 'questionText', 'Answer'] // TODO Is this one necessary??
-					const formattedAns = []
-					this.answers.forEach(ans => {
-						formattedAns.push({
-							userId: ans['userId'],
-							questionId: ans['questionId'],
-							questionText: ans['questionText'],
-							answer: ans['text'],
-						})
-					})
-					const element = document.createElement('a')
-					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(formattedAns)))
-					element.setAttribute('download', response.data.title + '.csv')
+		download() {
+			this.loadingResults = true
 
-					element.style.display = 'none'
-					document.body.appendChild(element)
-					element.click()
-					document.body.removeChild(element)
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console *
-					console.log(error.response)
-					this.loading = false
+			const parser = new Parser({
+				delimiter: ',',
+			})
+
+			const formattedSubmissions = []
+			this.submissions.forEach(submission => {
+				const formattedSubmission = {
+					userId: submission.userId,
+					timestamp: moment(submission.timestamp, 'X').format('L LT'),
+				}
+
+				submission.answers.forEach(answer => {
+					const questionText = this.questions.find(question => question.id === answer.questionId).text
+					if (questionText in formattedSubmission) {
+						formattedSubmission[questionText] = formattedSubmission[questionText].concat('; ').concat(answer.text)
+					} else {
+						formattedSubmission[questionText] = answer.text
+					}
 				})
-		}, */
+				formattedSubmissions.push(formattedSubmission)
+			})
+
+			const element = document.createElement('a')
+			element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(parser.parse(formattedSubmissions)))
+			element.setAttribute('download', this.form.title + '.csv')
+			element.style.display = 'none'
+			document.body.appendChild(element)
+			element.click()
+			document.body.removeChild(element)
+
+			this.loadingResults = false
+		},
 	},
 }
 </script>
