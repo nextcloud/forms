@@ -60,7 +60,8 @@
 				v-for="submission in submissions"
 				:key="submission.id"
 				:submission="submission"
-				:questions="questions" />
+				:questions="questions"
+				@delete="deleteSubmission(submission.id)" />
 
 			<!-- <transition-group
 				name="list"
@@ -145,6 +146,21 @@ export default {
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while loading results'))
+			} finally {
+				this.loadingResults = false
+			}
+		},
+
+		async deleteSubmission(id) {
+			this.loadingResults = true
+
+			try {
+				await axios.delete(generateUrl('/apps/forms/api/v1/submission/{id}', { id }))
+				const index = this.submissions.findIndex(search => search.id === id)
+				this.submissions.splice(index, 1)
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while removing the submission'))
 			} finally {
 				this.loadingResults = false
 			}

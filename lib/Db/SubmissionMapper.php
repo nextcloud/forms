@@ -65,6 +65,24 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
+	 * @param Integer $id
+	 * @return Submission
+	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 */
+	public function findById(int $id): Submission {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			);
+
+		return $this->findEntity($qb);
+	}
+
+	/**
 	 * @param int $formId
 	 * @throws DoesNotExistException if not found
 	 * @return array

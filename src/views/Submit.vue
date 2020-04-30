@@ -131,7 +131,7 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(generateUrl('/apps/forms/api/v1/submissions/insert'), {
+				await axios.post(generateUrl('/apps/forms/api/v1/submission/insert'), {
 					formId: this.form.id,
 					answers: this.answers,
 				})

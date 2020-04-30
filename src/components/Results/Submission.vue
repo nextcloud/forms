@@ -22,9 +22,16 @@
 
 <template>
 	<div class="table submission section">
-		<h3 class="submission-title">
-			Response by {{ userDisplayName }}
-		</h3>
+		<div class="submission-head">
+			<h3 class="submission-title">
+				Response by {{ userDisplayName }}
+			</h3>
+			<Actions class="submission-menu" :force-menu="true">
+				<ActionButton icon="icon-delete" @click="onDelete">
+					{{ t('forms', 'Delete submission') }}
+				</ActionButton>
+			</Actions>
+		</div>
 		<p class="submission-date">
 			{{ submissionDateTime }}
 		</p>
@@ -39,13 +46,18 @@
 </template>
 
 <script>
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import moment from '@nextcloud/moment'
+
 import Answer from './Answer'
 
 export default {
 	name: 'Submission',
 
 	components: {
+		Actions,
+		ActionButton,
 		Answer,
 	},
 
@@ -72,6 +84,10 @@ export default {
 	methods: {
 		questionToAnswer(questionId) {
 			return this.questions.find(question => question.id === questionId)
+		},
+
+		onDelete() {
+			this.$emit('delete')
 		},
 	},
 }
