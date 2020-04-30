@@ -21,15 +21,13 @@
   -->
 
 <template>
-	<div class="table submission">
-		<div id="submission-head">
-			<div id="submission-title">
-				Submission by {{ userDisplayName }}
-			</div>
-			<div id="submission-date">
-				{{ submissionDateTime }}
-			</div>
-		</div>
+	<div class="table submission section">
+		<h3 class="submission-title">
+			Response by {{ userDisplayName }}
+		</h3>
+		<p class="submission-date">
+			{{ submissionDateTime }}
+		</p>
 		<table class="answer">
 			<Answer
 				v-for="answer in submission.answers"
@@ -80,40 +78,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.submission {
-	margin: 15px 0px;
-	width: 100%;
+.section {
+	padding-left: 16px;
+	padding-right: 16px;
 
-	border: 1px;
-	border-color: var(--color-border);
-	border-style: solid;
+	h3 {
+		font-weight: bold;
+	}
 
-	line-break: normal;
-
-	// div {
-	// 	min-height: 30px;
-	// }
-
-	#submission-head {
-		background-color: var(--color-background-dark);
-		display: flex;
-
-		#submission-title {
-			font-size: 1.2em;
-			display: flex;
-			align-self: baseline;
-			flex: 1 1 100%;
-		}
-
-		#submission-date {
-			align-self: baseline;
-			color: var(--color-text-lighter);
-			display: block ruby;
-			margin-left: 20px;
-			margin-right: 10px;
-			float: right;
-
-		}
+	.submission-date {
+		color: var(--color-text-lighter);
+		margin-bottom: 12px;
 	}
 
 	.answer {

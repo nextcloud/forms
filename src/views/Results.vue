@@ -150,7 +150,7 @@ export default {
 			}
 		},
 
-/* 		download() {
+		/* download() {
 			this.loading = true
 			axios.get(OC.generateUrl('apps/forms/get/form/' + this.$route.params.hash))
 				.then((response) => {
