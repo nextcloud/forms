@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Hópur",
-    "Title" : "Titill",
     "Description" : "Lýsing",
     "Settings" : "Stillingar",
     "Set expiration date" : "Setja gildistíma",

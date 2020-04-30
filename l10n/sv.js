@@ -8,7 +8,6 @@ OC.L10N.register(
     "Delete form" : "Ta bort formuläret",
     "Cannot copy, please copy the link manually" : "Kan inte kopiera, länken måste kopieras manuellt",
     "Group" : "Grupp",
-    "Title" : "Rubrik",
     "Description" : "Beskrivning",
     "Settings" : "Inställnigar",
     "Set expiration date" : "Välj utgångsdatum",

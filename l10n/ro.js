@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grup",
-    "Title" : "Titlu",
     "Description" : "Descriere",
     "Settings" : "Setări",
     "Set expiration date" : "Specifică data expirării",

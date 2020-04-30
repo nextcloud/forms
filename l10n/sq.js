@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grup",
-    "Title" : "Titulli",
     "Description" : "Përshkrim",
     "Settings" : "Rregullimet",
     "Set expiration date" : "Caktoni datë skadimi",

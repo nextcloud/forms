@@ -7,7 +7,6 @@ OC.L10N.register(
     "Create new form" : "Crea un nou formulari",
     "Delete form" : "Suprimeix el formulari",
     "Group" : "Grup",
-    "Title" : "Títol",
     "Description" : "Descripció",
     "Settings" : "Paràmetres",
     "Set expiration date" : "Establiu una data de caducitat",
@@ -15,6 +14,7 @@ OC.L10N.register(
     "Share link" : "Enllaç de compartició",
     "Name of user or group" : "Nom de l'usuari o del grup",
     "Expiration date" : "Data de venciment",
+    "Submit" : "Envia",
     "Form Expired" : "Formulari vençut"
 },
 "nplurals=2; plural=(n != 1);");

@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Group",
-    "Title" : "عنوان",
     "Description" : "تصریح",
     "Settings" : "سیٹینگز",
     "Set expiration date" : "تاریخ معیاد سیٹ کریں",

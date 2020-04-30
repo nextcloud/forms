@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "গোষ্ঠীসমূহ",
-    "Title" : "শিরোনাম",
     "Description" : "বিবরণ",
     "Settings" : "সেটিংস",
     "Set expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ নির্ধারণ করুন",

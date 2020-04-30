@@ -8,7 +8,6 @@ OC.L10N.register(
     "Delete form" : "フォームを削除",
     "Cannot copy, please copy the link manually" : "コピーできませんでした。手動でリンクをコピーしてください。",
     "Group" : "グループ",
-    "Title" : "Title",
     "Description" : "説明",
     "Settings" : "設定",
     "Set expiration date" : "有効期限を設定",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Share link" : "URLで共有",
     "Name of user or group" : "ユーザまたはグループの名前",
     "Expiration date" : "有効期限",
+    "Submit" : "送信",
     "Form Expired" : "フォームの有効期限切れ"
 },
 "nplurals=1; plural=0;");

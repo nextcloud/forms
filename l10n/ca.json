@@ -5,7 +5,6 @@
     "Create new form" : "Crea un nou formulari",
     "Delete form" : "Suprimeix el formulari",
     "Group" : "Grup",
-    "Title" : "Títol",
     "Description" : "Descripció",
     "Settings" : "Paràmetres",
     "Set expiration date" : "Establiu una data de caducitat",
@@ -13,6 +12,7 @@
     "Share link" : "Enllaç de compartició",
     "Name of user or group" : "Nom de l'usuari o del grup",
     "Expiration date" : "Data de venciment",
+    "Submit" : "Envia",
     "Form Expired" : "Formulari vençut"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

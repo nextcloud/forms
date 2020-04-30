@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grup",
-    "Title" : "Judul",
     "Description" : "Deskrisi",
     "Settings" : "Setelan",
     "Set expiration date" : "Atur tanggal kedaluwarsa",

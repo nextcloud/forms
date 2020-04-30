@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Group",
-    "Title" : "ចំណងជើង",
     "Description" : "ការ​អធិប្បាយ",
     "Settings" : "ការកំណត់",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",

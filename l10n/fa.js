@@ -8,7 +8,6 @@ OC.L10N.register(
     "Delete form" : "حذف فرم",
     "Cannot copy, please copy the link manually" : "کپی کردن امکان پذیر نیست ، لطفا پیوند را به صورت دستی کپی کنید",
     "Group" : "گروه",
-    "Title" : "عنوان",
     "Description" : "توضیحات",
     "Settings" : "تنظیمات",
     "Set expiration date" : "تنظیم تاریخ انقضا",

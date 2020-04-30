@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Խումբ",
-    "Title" : "Վերնագիր",
     "Description" : "Նկարագրություն",
     "Settings" : "կարգավորումներ",
     "Set expiration date" : "Սահմանել վավերականության ժամկետ",

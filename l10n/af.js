@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Groep",
-    "Title" : "Titel",
     "Description" : "Beskrywing",
     "Settings" : "Instellings",
     "Set expiration date" : "Stel vervaldatum",

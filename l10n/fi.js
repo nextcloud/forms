@@ -6,7 +6,6 @@ OC.L10N.register(
     "Create new form" : "Luo uusi lomake",
     "Delete form" : "Poista lomake",
     "Group" : "Ryhmä",
-    "Title" : "Otsikko",
     "Description" : "Kuvaus",
     "Settings" : "Asetukset",
     "Set expiration date" : "Aseta vanhenemispäivä",

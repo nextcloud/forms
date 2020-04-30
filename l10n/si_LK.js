@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Group",
-    "Title" : "මාතෘකාව",
     "Description" : "විස්තරය",
     "Settings" : "සැකසුම්",
     "Set expiration date" : "කල් ඉකුත් විමේ දිනය දමන්න",

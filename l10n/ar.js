@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "الفريق",
-    "Title" : "العنوان",
     "Description" : "الوصف",
     "Settings" : "الإعدادات",
     "Set expiration date" : "تعيين تاريخ إنتهاء الصلاحية",

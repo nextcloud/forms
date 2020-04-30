@@ -8,7 +8,6 @@ OC.L10N.register(
     "Delete form" : "删除表单",
     "Cannot copy, please copy the link manually" : "无法复制，请手动复制链接",
     "Group" : "分组",
-    "Title" : "标题",
     "Description" : "描述",
     "Settings" : "设置",
     "Set expiration date" : "设置过期日期",

@@ -7,7 +7,6 @@ OC.L10N.register(
     "Create new form" : "建立新表單",
     "Delete form" : "刪除表單",
     "Group" : "群組",
-    "Title" : "標題",
     "Description" : "描述",
     "Settings" : "設定",
     "Set expiration date" : "設定到期日",
@@ -15,6 +14,7 @@ OC.L10N.register(
     "Share link" : "分享連結",
     "Name of user or group" : "使用者或群組名稱",
     "Expiration date" : "到期日",
+    "Submit" : "送出",
     "Form Expired" : "表單已過期"
 },
 "nplurals=1; plural=0;");

@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "Cannot copy, please copy the link manually" : "Ne eblis kopii la ligilon; kopiu ĝin permane.",
     "Group" : "Grupo",
-    "Title" : "Titolo",
     "Description" : "Priskribo",
     "Settings" : "Agordoj",
     "Set expiration date" : "Uzi limdaton",

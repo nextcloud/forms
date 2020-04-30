@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Група",
-    "Title" : "Назва",
     "Description" : "Опис",
     "Settings" : "Налаштування",
     "Set expiration date" : "Встановити термін дії",

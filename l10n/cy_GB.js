@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grŵp",
-    "Title" : "Teitl",
     "Description" : "Disgrifiad",
     "Settings" : "Gosodiadau",
     "Set expiration date" : "Gosod dyddiad dod i ben",

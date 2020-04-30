@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grupp",
-    "Title" : "Pealkiri",
     "Description" : "Kirjeldus",
     "Settings" : "Seaded",
     "Set expiration date" : "Määra aegumise kuupäev",

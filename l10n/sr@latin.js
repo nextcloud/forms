@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Group",
-    "Title" : "Naslov",
     "Description" : "Opis",
     "Settings" : "Поставке",
     "Set expiration date" : "Postavi datum isteka",

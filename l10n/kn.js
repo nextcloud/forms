@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "﻿ಗುಂಪು",
-    "Title" : "ಶೀರ್ಷಿಕೆ",
     "Settings" : "ಆಯ್ಕೆ",
     "Set expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕವನ್ನು ನಿರ್ದರಿಸಿ",
     "Sharing" : "﻿ಹಂಚಿಕೆ",

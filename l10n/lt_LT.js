@@ -12,7 +12,6 @@ OC.L10N.register(
     "Are you sure you want to delete the form “{title}”?" : "Ar tikrai norite ištrinti anketą, pavadinimu \"{title}\"?",
     "Error while deleting form “{title}”" : "Klaida ištrinant formą \"{title}\"",
     "Group" : "Grupė",
-    "Title" : "Pavadinimas",
     "Description" : "Aprašas",
     "Settings" : "Nustatymai",
     "Set expiration date" : "Nustatyti galiojimo pabaigos datą",

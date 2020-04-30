@@ -8,7 +8,6 @@ OC.L10N.register(
     "Delete form" : "Izbriši vprašalnik",
     "Cannot copy, please copy the link manually" : "Povezave ni mogoče kopirati. Storite to ročno.",
     "Group" : "Skupina",
-    "Title" : "Naslov",
     "Description" : "Opis",
     "Settings" : "Nastavitve",
     "Set expiration date" : "Nastavi datum preteka",

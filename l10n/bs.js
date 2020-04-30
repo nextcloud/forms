@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grupa",
-    "Title" : "Naslov",
     "Description" : "Opis",
     "Settings" : "Podešavanje",
     "Set expiration date" : "Postavite datum isteka",

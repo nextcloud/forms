@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Grupa",
-    "Title" : "Amats",
     "Description" : "Apraksts",
     "Settings" : "Iestatījumi",
     "Set expiration date" : "Uzstādīt beigu termiņu",

@@ -7,7 +7,6 @@ OC.L10N.register(
     "Create new form" : "Új űrlap készítése",
     "Delete form" : "Űrlap törlése",
     "Group" : "Csoport",
-    "Title" : "Cím",
     "Description" : "Leírás",
     "Settings" : "Beállítások",
     "Set expiration date" : "Lejárati idő beállítása",

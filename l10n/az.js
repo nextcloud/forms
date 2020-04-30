@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "Qrup",
-    "Title" : "Başlıq",
     "Description" : "Açıqlanma",
     "Settings" : "Quraşdırmalar",
     "Sharing" : "Paylaşılır",

@@ -2,7 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Group" : "กลุ่ม",
-    "Title" : "ชื่อเรื่อง",
     "Description" : "รายละเอียด",
     "Settings" : "ตั้งค่า",
     "Set expiration date" : "กำหนดวันที่หมดอายุ",
