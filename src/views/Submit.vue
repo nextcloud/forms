@@ -146,8 +146,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-// Replace with new vue components release
-#app-content,
 #app-content-vue {
 	display: flex;
 	align-items: center;
