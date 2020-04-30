@@ -39,10 +39,14 @@
 
 		<header v-if="!noSubmissions">
 			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
-			<button id="exportButton" @click="download">
-				<span class="icon-download" role="img" />
-				{{ t('forms', 'Export to CSV') }}
-			</button>
+			<Actions class="submission-menu" :force-menu="true">
+				<ActionButton icon="icon-download" @click="download">
+					{{ t('forms', 'Export to CSV') }}
+				</ActionButton>
+				<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
+					{{ t('forms', 'Delete all Submissions') }}
+				</ActionButton>
+			</Actions>
 		</header>
 
 		<!-- No submissions -->
@@ -71,6 +75,8 @@
 import { generateUrl } from '@nextcloud/router'
 import { Parser } from 'json2csv'
 import { showError } from '@nextcloud/dialogs'
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
@@ -84,6 +90,8 @@ export default {
 	name: 'Results',
 
 	components: {
+		Actions,
+		ActionButton,
 		AppContent,
 		EmptyContent,
 		Submission,
@@ -149,6 +157,23 @@ export default {
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while removing the submission'))
+			} finally {
+				this.loadingResults = false
+			}
+		},
+
+		async deleteAllSubmissions() {
+			if (!confirm(t('forms', 'Are you sure you want to delete all submissions from this form?'))) {
+				return
+			}
+
+			this.loadingResults = true
+			try {
+				await axios.delete(generateUrl('/apps/forms/api/v1/submissions/{formId}', { formId: this.form.id }))
+				this.submissions = []
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while removing the submissions'))
 			} finally {
 				this.loadingResults = false
 			}

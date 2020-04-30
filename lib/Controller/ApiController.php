@@ -741,4 +741,30 @@ class ApiController extends Controller {
 
 		return new Http\JSONResponse($id);
 	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function deleteAllSubmissions(int $formId): Http\JSONResponse {
+		$this->logger->debug('Delete all submissions to form: {formId}', [
+			'formId' => $formId,
+		]);
+
+		try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Delete all submissions (incl. Answers)
+		$this->submissionMapper->deleteByForm($formId);
+
+		return new Http\JSONResponse($id);
+	}
 }
