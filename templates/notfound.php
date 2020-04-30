@@ -25,5 +25,5 @@
 <div id="emptycontent" class="">
 	<div class="icon-forms"></div>
 	<h2><?php p($l->t('Form not found')); ?></h2>
-	<p><?php p($l->t('This form does not exists')); ?></p>
+	<p><?php p($l->t('This form does not exist')); ?></p>
 </div>
