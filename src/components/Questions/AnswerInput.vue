@@ -79,6 +79,10 @@ export default {
 				// Dispatched for creation. Marked as synced
 				this.answer.local = false
 				const newAnswer = await this.debounceCreateAnswer(answer)
+
+				// Forward changes, but use current answer.text to avoid erasing
+				// any in-between changes while creating the answer
+				Object.assign(newAnswer, { text: this.$refs.input.value })
 				this.$emit('update:answer', answer.id, newAnswer)
 			} else {
 				this.debounceUpdateAnswer(answer)
