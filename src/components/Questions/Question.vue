@@ -162,7 +162,7 @@ export default {
 	align-items: stretch;
 	flex-direction: column;
 	justify-content: stretch;
-	margin: 80px 0;
+	margin-bottom: 80px;
 	padding-left: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
