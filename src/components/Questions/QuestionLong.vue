@@ -85,12 +85,12 @@ export default {
 	min-width: 100%;
 	max-width: 100%;
 	min-height: 44px;
-	max-height: 10rem;
 	margin: 0;
 	padding: 6px 0;
 	border: 0;
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
+	resize: none;
 }
 
 </style>
