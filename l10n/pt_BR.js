@@ -37,7 +37,6 @@ OC.L10N.register(
     "Loading {title} …" : "Carregando {title}…",
     "Toggle settings" : "Alternar configurações",
     "Description" : "Descrição",
-    "Add a question to this form" : "Adicionar uma pergunta neste formulário",
     "New question" : "Nova pergunta",
     "There was an error while adding the new question" : "Houve um erro ao adicionar a nova pergunta",
     "There was an error while removing the question" : "Houve um erro ao excluir a pergunta",
@@ -69,7 +68,6 @@ OC.L10N.register(
     "Long text" : "Texto longo",
     "Form Expired" : "Formulário Expirado",
     "This Form has expired and is no longer taking answers" : "Este Formulário expirou e não aceita mais respostas",
-    "Form not found" : "Formulário não encontrado",
-    "This form does not exists" : "Este formulário não existe"
+    "Form not found" : "Formulário não encontrado"
 },
 "nplurals=2; plural=(n > 1);");

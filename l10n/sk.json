@@ -26,16 +26,19 @@
     "Question number {index}" : "Otázka číslo {index}",
     "Drag to reorder the questions" : "Potiahnutím zmeníte poradie otázok",
     "Enter a title for this question" : "Zadajte nadpis pre túto otázku",
+    "Title of question number {index}" : "Názov otázky číslo {index}",
     "Delete question" : "Odstrániť otázku",
     "Error while saving question" : "Pri ukladaní otázky sa vyskytla chyba",
     "A long answer for the question “{text}”" : "Dlhá odpoveď na otázku „{text}“",
+    "People can enter a long answer" : "Ľudia môžu zadať dlhú odpoveď",
     "Add a new answer" : "Pridať novú odpoveď",
     "A short answer for the question “{text}”" : "Krátka odpoveď na otázku „{text}“",
+    "People can enter a short answer" : "Ľudia môžu zadať krátku odpoveď",
     "Group" : "Skupina",
     "Loading {title} …" : "Načítava sa {title}…",
     "Toggle settings" : "Prepnúť nastavenia",
+    "Form title" : "Názov formulára",
     "Description" : "Popis",
-    "Add a question to this form" : "Pridať otázku do tohto formulára",
     "New question" : "Nová otázka",
     "There was an error while adding the new question" : "Pri pridávaní novej otázky sa vyskytla chyba",
     "There was an error while removing the question" : "Pri odstraňovaní otázky sa vyskytla chyba",
@@ -60,6 +63,7 @@
     "Submit" : "Odoslať",
     "Submit form" : "Odoslať formulár",
     "Submitting form …" : "Formulár sa odosiela…",
+    "Thank you for completing the form!" : "Ďakujeme za vyplnenie formulára!",
     "There was an error submitting the form" : "Pri odosielaní formulára sa vyskytla chyba",
     "Multiple choice" : "Viacero možností",
     "Checkboxes" : "Zaškrtávacie políčka",
@@ -67,7 +71,6 @@
     "Long text" : "Dlhý text",
     "Form Expired" : "Platnosť formulára skončila",
     "This Form has expired and is no longer taking answers" : "Platnosť tohto formulára vypršala a preto neprijíma odpovede",
-    "Form not found" : "Formulár nebol nájdený",
-    "This form does not exists" : "Tento formulár neexistuje"
+    "Form not found" : "Formulár nebol nájdený"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);"
 }

@@ -36,7 +36,6 @@ OC.L10N.register(
     "Loading {title} …" : "Lade {title}…",
     "Toggle settings" : "Einstellungen umschalten",
     "Description" : "Beschreibung",
-    "Add a question to this form" : "Dem Formular eine Frage hinzufügen",
     "New question" : "Neue Frage",
     "There was an error while adding the new question" : "Es gab einen Fehler beim Hinzufügen der neuen Frage",
     "There was an error while removing the question" : "Es gab einen Fehler beim Löschen der Frage",
