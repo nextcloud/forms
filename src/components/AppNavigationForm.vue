@@ -24,10 +24,9 @@
 	<AppNavigationItem
 		ref="navigationItem"
 		:exact="true"
-		:icon="loading ? 'icon-loading-small' : ''"
+		:icon="icon"
 		:title="form.title"
 		:to="{ name: 'edit', params: { hash: form.hash } }">
-		<AppNavigationIconBullet slot="icon" :color="bulletColor" />
 		<template v-if="!loading" #actions>
 			<ActionLink
 				:href="formLink"
@@ -63,7 +62,6 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import ActionRouter from '@nextcloud/vue/dist/Components/ActionRouter'
 import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
-import AppNavigationIconBullet from '@nextcloud/vue/dist/Components/AppNavigationIconBullet'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
@@ -77,7 +75,6 @@ export default {
 
 	components: {
 		AppNavigationItem,
-		AppNavigationIconBullet,
 		ActionButton,
 		ActionLink,
 		ActionRouter,
@@ -111,6 +108,20 @@ export default {
 				return style.getPropertyValue('--color-error').slice(-6)
 			}
 			return style.getPropertyValue('--color-success').slice(-6)
+		},
+
+		icon() {
+			if (this.loading) {
+				return 'icon-loading-small'
+			}
+			if (this.isExpired) {
+				return 'icon-checkmark'
+			}
+			return 'icon-forms'
+		},
+
+		isExpired() {
+			return this.form.expires && moment().unix() > this.form.expires
 		},
 
 		/**

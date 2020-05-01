@@ -55,6 +55,7 @@ module.exports = {
 		// Make appName & appVersion available as a constant
 		new webpack.DefinePlugin({ appName }),
 		new webpack.DefinePlugin({ appVersion }),
+		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 	],
 	resolve: {
 		extensions: ['*', '.js', '.vue'],
