@@ -31,7 +31,7 @@
 			<!-- TODO: properly choose max length -->
 			<textarea ref="textarea"
 				:aria-label="t('forms', 'A long answer for the question “{text}”', { text })"
-				:placeholder="t('forms', 'People can enter a long answer')"
+				:placeholder="t('forms', 'Long answer text')"
 				:required="true /* TODO: implement required option */"
 				:value="values[0]"
 				class="question__text"
@@ -85,12 +85,12 @@ export default {
 	min-width: 100%;
 	max-width: 100%;
 	min-height: 44px;
-	max-height: 10rem;
 	margin: 0;
 	padding: 6px 0;
 	border: 0;
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
+	resize: none;
 }
 
 </style>
