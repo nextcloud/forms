@@ -31,7 +31,7 @@
 			<!-- TODO: properly choose max length -->
 			<input ref="input"
 				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
-				:placeholder="t('forms', 'People can enter a short answer')"
+				:placeholder="t('forms', 'Short answer text')"
 				:required="true /* TODO: implement required option */"
 				:value="values[0]"
 				class="question__input"
