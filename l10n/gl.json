@@ -30,15 +30,16 @@
     "Delete question" : "Eliminar a pregunta",
     "Error while saving question" : "Produciuse un erro ao gardar a pregunta",
     "A long answer for the question “{text}”" : "Unha resposta longa para a pregunta «{text}»",
-    "People can enter a long answer" : "A xente pode introducir unha resposta longa",
+    "Long answer text" : "Texto da resposta longa",
     "Add a new answer" : "Engadir unha nova resposta",
     "A short answer for the question “{text}”" : "Unha resposta ciurta para a pregunta «{text}»",
-    "People can enter a short answer" : "A xente pode introducir unha resposta curta",
+    "Short answer text" : "Texto da resposta curta",
     "Group" : "Grupo",
     "Loading {title} …" : "Cargando {title}…",
     "Toggle settings" : "Cambiar os axustes",
     "Form title" : "Título do formulario",
     "Description" : "Descrición",
+    "Add a question" : "Engadir unha pregunta",
     "New question" : "Pregunta nova",
     "There was an error while adding the new question" : "Produciuse un erro ao engadir a pregunta nova",
     "There was an error while removing the question" : "Produciuse un erro ao retirar a pregunta",
@@ -71,6 +72,7 @@
     "Long text" : "Texto longo",
     "Form Expired" : "Formulario caducado",
     "This Form has expired and is no longer taking answers" : "Este formulario caducou e xa non admite respostas",
-    "Form not found" : "Non se atopou o formulario"
+    "Form not found" : "Non se atopou o formulario",
+    "This form does not exist" : "Este formulario non existe"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

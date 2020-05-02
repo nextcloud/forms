@@ -32,15 +32,16 @@ OC.L10N.register(
     "Delete question" : "Usuń pytanie",
     "Error while saving question" : "Błąd podczas zapisywania pytania",
     "A long answer for the question “{text}”" : "Długa odpowiedź na pytanie “{text}”",
-    "People can enter a long answer" : "Ludzie mogą napisać długą odpowiedź",
+    "Long answer text" : "Długi tekst odpowiedzi",
     "Add a new answer" : "Dodaj nową odpowiedź",
     "A short answer for the question “{text}”" : "Krótka odpowiedź na pytanie “{text}”",
-    "People can enter a short answer" : "Ludzie mogą napisać krótką odpowiedź",
+    "Short answer text" : "Krótki tekst odpowiedzi",
     "Group" : "Grupa",
     "Loading {title} …" : "Ładowanie {title}…",
     "Toggle settings" : "Przełącz ustawienia",
     "Form title" : "Tytuł formularza",
     "Description" : "Opis",
+    "Add a question" : "Dodaj pytanie",
     "New question" : "Nowe pytanie",
     "There was an error while adding the new question" : "Wystąpił błąd podczas dodawania nowego pytania",
     "There was an error while removing the question" : "Wystąpił błąd podczas usuwania pytania",
@@ -73,6 +74,7 @@ OC.L10N.register(
     "Long text" : "Długi tekst",
     "Form Expired" : "Formularz wygasł.",
     "This Form has expired and is no longer taking answers" : "Nie są już przyjmowane odpowiedzi, ponieważ ten formularz wygasł.",
-    "Form not found" : "Nie znaleziono formularza"
+    "Form not found" : "Nie znaleziono formularza",
+    "This form does not exist" : "Ten formularz nie istnieje"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

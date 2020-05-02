@@ -32,15 +32,14 @@ OC.L10N.register(
     "Delete question" : "Eliminar pregunta",
     "Error while saving question" : "Error al guardar pregunta",
     "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{text}\"",
-    "People can enter a long answer" : "Quien responde puede introducir una respuesta larga",
     "Add a new answer" : "Añadir una respuesta nueva",
     "A short answer for the question “{text}”" : "Una respuesta corta para la pregunta \"{index}\"",
-    "People can enter a short answer" : "Quien responde puede introducir una respuesta corta",
     "Group" : "Grupo",
     "Loading {title} …" : "Cargando {title}…",
     "Toggle settings" : "Marcar/desmarcar configuraciones",
     "Form title" : "Título del formulario",
     "Description" : "Descripción",
+    "Add a question" : "Añadir una pregunta",
     "New question" : "Pregunta nueva",
     "There was an error while adding the new question" : "Ha habido un error al añadir la pregunta nueva",
     "There was an error while removing the question" : "Ha habido un error al eliminar la pregunta",
@@ -73,6 +72,7 @@ OC.L10N.register(
     "Long text" : "Texto largo",
     "Form Expired" : "Formulario expirado",
     "This Form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no acepta respuestas",
-    "Form not found" : "Formulario no encontrado"
+    "Form not found" : "Formulario no encontrado",
+    "This form does not exist" : "Este formulario no existe"
 },
 "nplurals=2; plural=(n != 1);");

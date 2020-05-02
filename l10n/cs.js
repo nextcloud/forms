@@ -32,15 +32,14 @@ OC.L10N.register(
     "Delete question" : "Smazat otázku",
     "Error while saving question" : "Chyba při ukládání otázky",
     "A long answer for the question “{text}”" : "Dlouhá odpověď na otázku „{text}“",
-    "People can enter a long answer" : "Lidé mohou zadat dlouhou odpověď",
     "Add a new answer" : "Přidat novou odpověď",
     "A short answer for the question “{text}”" : "Krátká odpověď na otázku „{text}“",
-    "People can enter a short answer" : "Lidé mohou zadat krátkou odpověď",
     "Group" : "Group",
     "Loading {title} …" : "Načítání {title} …",
     "Toggle settings" : "Přepnout nastavení",
     "Form title" : "Nadpis formuláře",
     "Description" : "Popis",
+    "Add a question" : "Přidat otázku",
     "New question" : "Nová otázka",
     "There was an error while adding the new question" : "Při přidávání nové otázky došlo k chybě",
     "There was an error while removing the question" : "Při odebírání otázky došlo k chybě",
@@ -73,6 +72,7 @@ OC.L10N.register(
     "Long text" : "Dlouhý text",
     "Form Expired" : "Platnost formuláře skončila",
     "This Form has expired and is no longer taking answers" : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat",
-    "Form not found" : "Formulář nenalezen"
+    "Form not found" : "Formulář nenalezen",
+    "This form does not exist" : "Tento formulář neexistuje"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

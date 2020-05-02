@@ -30,15 +30,14 @@
     "Delete question" : "Soruyu sil",
     "Error while saving question" : "Soru silinirken sorun çıktı",
     "A long answer for the question “{text}”" : "“{text}” sorusu için uzun bir yanıt",
-    "People can enter a long answer" : "Kişiler uzun bir yanıt yazabilir",
     "Add a new answer" : "Yeni bir yanıt ekle",
     "A short answer for the question “{text}”" : "“{text}” sorusu için kısa bir yanıt",
-    "People can enter a short answer" : "Kişiler kısa bir yanıt yazabilir",
     "Group" : "Grup",
     "Loading {title} …" : "{title} yükleniyor…",
     "Toggle settings" : "Ayarları değiştir",
     "Form title" : "Form başlığı",
     "Description" : "Açıklama",
+    "Add a question" : "Bir soru ekle",
     "New question" : "Yeni soru",
     "There was an error while adding the new question" : "Yeni soru eklenirken bir sorun çıktı",
     "There was an error while removing the question" : "Soru silinirken bir sorun çıktı",
@@ -71,6 +70,7 @@
     "Long text" : "Uzun metin",
     "Form Expired" : "Formun Süresi Geçmiş",
     "This Form has expired and is no longer taking answers" : "Bu formun kullanma süresi geçmiş olduğundan doldurulamaz",
-    "Form not found" : "Form bulunamadı"
+    "Form not found" : "Form bulunamadı",
+    "This form does not exist" : "Bu form bulunamadı"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }
