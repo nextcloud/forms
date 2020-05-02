@@ -39,14 +39,19 @@
 
 		<header v-if="!noSubmissions">
 			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
-			<Actions class="submission-menu" :force-menu="true">
-				<ActionButton icon="icon-download" @click="download">
+			<div>
+				<button id="exportButton" @click="download">
+					<span class="icon-download" role="img" />
 					{{ t('forms', 'Export to CSV') }}
-				</ActionButton>
-				<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
-					{{ t('forms', 'Delete all Submissions') }}
-				</ActionButton>
-			</Actions>
+				</button>
+				<Actions class="results-menu"
+					:aria-label="t('forms', 'Options')"
+					:force-menu="true">
+					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
+						{{ t('forms', 'Delete all responses') }}
+					</ActionButton>
+				</Actions>
+			</div>
 		</header>
 
 		<!-- No submissions -->
@@ -217,3 +222,21 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+h2 {
+	font-size: 2em;
+	font-weight: bold;
+	margin-top: 32px;
+	padding-left: 14px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#exportButton {
+	width: max-content;
+	padding: 13px 16px;
+	margin-left: 16px;
+}
+</style>

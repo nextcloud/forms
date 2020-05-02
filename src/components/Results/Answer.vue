@@ -21,14 +21,12 @@
   -->
 
 <template>
-	<tr class="answer">
-		<td class="question-text">
+	<div class="answer">
+		<h4 class="question-text">
 			{{ question.text }}
-		</td>
-		<td id="text">
-			{{ answer.text }}
-		</td>
-	</tr>
+		</h4>
+		<p>{{ answer.text }}</p>
+	</div>
 </template>
 
 <script>
@@ -50,12 +48,11 @@ export default {
 
 <style lang="scss" scoped>
 .answer {
-	white-space: initial;
+	margin-bottom: 4px;
+	width: 100%;
 
 	.question-text {
-		min-width: 20%;
-		max-width: 40%;
-		padding-right: 15px;
+		font-weight: bold;
 	}
 }
 

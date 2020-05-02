@@ -21,27 +21,26 @@
   -->
 
 <template>
-	<div class="table submission section">
+	<div class="section submission">
 		<div class="submission-head">
-			<h3 class="submission-title">
-				Response by {{ userDisplayName }}
+			<h3>
+				{{ t('forms', 'Response by {userDisplayName}', { userDisplayName }) }}
 			</h3>
 			<Actions class="submission-menu" :force-menu="true">
 				<ActionButton icon="icon-delete" @click="onDelete">
-					{{ t('forms', 'Delete submission') }}
+					{{ t('forms', 'Delete this response') }}
 				</ActionButton>
 			</Actions>
 		</div>
 		<p class="submission-date">
 			{{ submissionDateTime }}
 		</p>
-		<table class="answer">
-			<Answer
-				v-for="answer in submission.answers"
-				:key="answer.id"
-				:answer="answer"
-				:question="questionToAnswer(answer.questionId)" />
-		</table>
+
+		<Answer
+			v-for="answer in squashedAnswers"
+			:key="answer.questionId"
+			:answer="answer"
+			:question="questionToAnswer(answer.questionId)" />
 	</div>
 </template>
 
@@ -79,6 +78,20 @@ export default {
 		submissionDateTime() {
 			return moment(this.submission.timestamp, 'X').format('LLLL')
 		},
+		squashedAnswers() {
+			const squashedArray = []
+
+			this.submission.answers.forEach(answer => {
+				const index = squashedArray.findIndex(ansSq => ansSq.questionId === answer.questionId)
+				if (index > -1) {
+					squashedArray[index].text = squashedArray[index].text.concat('; ' + answer.text)
+				} else {
+					squashedArray.push(answer)
+				}
+			})
+
+			return squashedArray
+		},
 	},
 
 	methods: {
@@ -94,21 +107,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.section {
+.submission {
 	padding-left: 16px;
 	padding-right: 16px;
 
-	h3 {
-		font-weight: bold;
+	&-head {
+		display: flex;
+		align-items: flex-end;
+
+		h3 {
+			font-weight: bold;
+		}
+
+		&-menu {
+			display: inline-block;
+		}
 	}
 
-	.submission-date {
+	&-date {
 		color: var(--color-text-lighter);
 		margin-bottom: 12px;
-	}
-
-	.answer {
-		width: 100%;
 	}
 }
 </style>

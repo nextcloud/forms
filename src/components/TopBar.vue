@@ -51,7 +51,10 @@ $top-bar-height: 60px;
 
 	button {
 		cursor: pointer;
-		&:not(:first-child) {
+		min-height: 44px;
+		margin: 8px;
+
+		&.button-small {
 			width: 44px;
 			height: 44px;
 			border: none;

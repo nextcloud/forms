@@ -38,6 +38,7 @@
 			</button>
 			<button v-tooltip="t('forms', 'Toggle settings')"
 				:aria-label="t('forms', 'Toggle settings')"
+				class="button-small"
 				@click="toggleSidebar">
 				<span class="icon-menu-sidebar" role="img" />
 			</button>
