@@ -194,7 +194,7 @@ export default {
 			const formattedSubmissions = []
 			this.submissions.forEach(submission => {
 				const formattedSubmission = {
-					userId: submission.userId,
+					userDisplayName: submission.userDisplayName,
 					timestamp: moment(submission.timestamp, 'X').format('L LT'),
 				}
 

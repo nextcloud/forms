@@ -24,7 +24,7 @@
 	<div class="section submission">
 		<div class="submission-head">
 			<h3>
-				{{ t('forms', 'Response by {userDisplayName}', { userDisplayName }) }}
+				{{ t('forms', 'Response by {userDisplayName}', { userDisplayName: submission.userDisplayName }) }}
 			</h3>
 			<Actions class="submission-menu" :force-menu="true">
 				<ActionButton icon="icon-delete" @click="onDelete">
@@ -72,9 +72,6 @@ export default {
 	},
 
 	computed: {
-		userDisplayName() {
-			return this.submission.userId
-		},
 		submissionDateTime() {
 			return moment(this.submission.timestamp, 'X').format('LLLL')
 		},
