@@ -21,7 +21,10 @@
  -->
 
 <template>
-	<AppSidebar v-show="opened" :title="form.title" @close="onClose">
+	<AppSidebar v-if="form"
+		v-show="opened"
+		:title="form.title"
+		@close="onClose">
 		<h3>{{ t('forms', 'Settings') }}</h3>
 		<ul>
 			<li>
@@ -38,7 +41,7 @@
 			<li>
 				<input id="submitOnce"
 					v-model="form.submitOnce"
-					:disabled="form.access.type === 'public' || form.isAnonymous"
+					:disabled="isPublic || form.isAnonymous"
 					type="checkbox"
 					class="checkbox"
 					@change="onSubmOnceChange">
@@ -56,8 +59,15 @@
 				</label>
 				<DatetimePicker v-show="formExpires"
 					id="expiresDatetimePicker"
-					v-model="form.expires"
-					v-bind="expirationDatePicker"
+					:clearable="false"
+					:disabled-date="notBeforeToday"
+					:disabled-time="notBeforeNow"
+					:format="format"
+					:minute-step="5"
+					:placeholder="t('forms', 'Expiration date')"
+					:show-second="false"
+					:value="expirationDate"
+					type="datetime"
 					@change="onExpiresChange" />
 			</li>
 		</ul>
@@ -118,7 +128,7 @@ import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { getLocale, getLanguage } from '@nextcloud/l10n'
+import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 
 import ShareDiv from '../components/shareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -136,69 +146,75 @@ export default {
 	data() {
 		return {
 			opened: false,
-			lang: '',
-			locale: '',
-			longDateFormat: '',
-			dateTimeFormat: '',
-			formExpires: false,
+			lang: {
+				days: getDayNamesShort(),
+				months: getMonthNamesShort(),
+				placeholder: {
+					date: t('forms', 'Select expiration date'),
+				},
+			},
+			locale: 'en',
+			format: {
+				stringify: this.stringify,
+				parse: this.parse,
+			},
 		}
 	},
 
 	computed: {
-		expirationDatePicker() {
-			return {
-				editable: true,
-				minuteStep: 1,
-				type: 'datetime',
-				valueType: 'X', // unix-timestamp
-				format: moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT'),
-				lang: this.lang.split('-')[0],
-				placeholder: t('forms', 'Expiration date'),
-				timePickerOptions: {
-					start: '00:00',
-					step: '00:15',
-					end: '23:45',
-				},
-			}
-		},
-	},
-
-	watch: {
 		formExpires: {
-			handler: function() {
-				if (!this.formExpires) {
-					this.form.expires = 0
-					this.onExpiresChange()
-				} else {
+			get() {
+				return this.form.expires !== 0
+			},
+			set(checked) {
+				if (checked) {
 					this.form.expires = moment().unix() + 3600 // Expires in one hour.
+				} else {
+					this.form.expires = 0
 				}
+				this.saveFormProperty('expires')
 			},
 		},
+		isPublic() {
+			return this.form?.access?.type === 'public'
+		},
+
+		expirationDate() {
+			return moment(this.form.expires, 'X').toDate()
+		},
+
+		isExpired() {
+			return this.form.expires && moment().unix() > this.form.expires
+		},
 	},
 
-	created() {
-		this.lang = getLanguage()
+	async created() {
+		// Load the locale
+		// convert format like en_GB to en-gb for `moment.js`
+		let locale = getLocale().replace('_', '-').toLowerCase()
 		try {
-			this.locale = getLocale()
+			// default load e.g. fr-fr
+			await import(/* webpackChunkName: 'moment' */'moment/locale/' + locale)
+			this.locale = locale
 		} catch (e) {
-			if (e instanceof TypeError) {
-				this.locale = this.lang
-			} else {
-				/* eslint-disable-next-line no-console */
-				console.log(e)
+			try {
+				// failure: fallback to fr
+				locale = locale.split('-')[0]
+				await import(/* webpackChunkName: 'moment' */'moment/locale/' + locale)
+			} catch (e) {
+				// failure, fallback to english
+				console.debug('Fallback to locale', 'en')
+				locale = 'en'
 			}
+		} finally {
+			// force locale change to update
+			// the component once done loading
+			this.locale = locale
+			console.debug('Locale used', locale)
 		}
-		moment.locale(this.locale)
-		this.longDateFormat = moment.localeData().longDateFormat('L')
-		this.dateTimeFormat = moment.localeData().longDateFormat('L') + ' ' + moment.localeData().longDateFormat('LT')
+	},
 
-		// Compute current formExpires for checkbox
-		if (this.form.expires) {
-			this.formExpires = true
-		} else {
-			this.formExpires = false
-		}
-
+	beforeMount() {
 		// Watch for Sidebar toggle
 		subscribe('toggleSidebar', this.onToggle)
 	},
@@ -242,8 +258,55 @@ export default {
 		onAccessChange() {
 			this.saveFormProperty('access')
 		},
-		onExpiresChange() {
+
+		/**
+		 * On date picker change
+		 * @param {Date} datetime the expiration Date
+		 */
+		onExpiresChange(datetime) {
+			this.form.expires = parseInt(moment(datetime).format('X'))
 			this.saveFormProperty('expires')
+		},
+
+		/**
+		 * Datepicker timestamp to string
+		 * @param {Date} datetime the datepicker Date
+		 * @returns {string}
+		 */
+		stringify(datetime) {
+			const date = moment(datetime).locale(this.locale).format('LLL')
+
+			if (this.isExpired) {
+				return t('forms', 'Expired on {date}', { date })
+			}
+			return t('forms', 'Expires on {date}', { date })
+		},
+
+		/**
+		 * Form expires timestamp to Date form the datepicker
+		 * @param {number} value the expires timestamp
+		 * @returns {Date}
+		 */
+		parse(value) {
+			return moment(value, 'X').toDate()
+		},
+
+		/**
+		 * Prevent selecting a day before today
+		 * @param {Date} datetime the datepicker Date
+		 * @returns {boolean}
+		 */
+		notBeforeToday(datetime) {
+			return datetime < moment().add(-1, 'day').toDate()
+		},
+
+		/**
+		 * Prevent selecting a time before the current one + 1hour
+		 * @param {Date} datetime the datepicker Date
+		 * @returns {boolean}
+		 */
+		notBeforeNow(datetime) {
+			return datetime < moment().add(1, 'hour').toDate()
 		},
 	},
 }
