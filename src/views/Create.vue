@@ -68,25 +68,6 @@
 		</header>
 
 		<section>
-			<!-- Add new questions toolbar -->
-			<div class="question-toolbar" role="toolbar">
-				<Actions ref="questionMenu"
-					:open.sync="questionMenuOpened"
-					:menu-title="t('forms', 'Add a question')"
-					:primary="true"
-					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
-					<ActionButton v-for="(answer, type) in answerTypes"
-						:key="answer.label"
-						:close-after-click="true"
-						:disabled="isLoadingQuestions"
-						:icon="answer.icon"
-						class="question-toolbar__question"
-						@click="addQuestion(type)">
-						{{ answer.label }}
-					</ActionButton>
-				</Actions>
-			</div>
-
 			<!-- Questions list -->
 			<Draggable v-model="form.questions"
 				:animation="200"
@@ -105,6 +86,25 @@
 					v-bind.sync="question"
 					@delete="deleteQuestion(question)" />
 			</Draggable>
+
+			<!-- Add new questions toolbar -->
+			<div class="question-toolbar" role="toolbar">
+				<Actions ref="questionMenu"
+					:open.sync="questionMenuOpened"
+					:menu-title="t('forms', 'Add a question')"
+					:primary="true"
+					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
+					<ActionButton v-for="(answer, type) in answerTypes"
+						:key="answer.label"
+						:close-after-click="true"
+						:disabled="isLoadingQuestions"
+						:icon="answer.icon"
+						class="question-toolbar__question"
+						@click="addQuestion(type)">
+						{{ answer.label }}
+					</ActionButton>
+				</Actions>
+			</div>
 		</section>
 	</AppContent>
 </template>
@@ -414,14 +414,14 @@ export default {
 			position: sticky;
 			// Above other menus
 			z-index: 55;
-			top: var(--header-height);
+			bottom: 0px;
+			padding-bottom: 16px;
 			display: flex;
 			align-items: center;
 			align-self: flex-start;
-			width: 44px;
-			// To not overlap navigation toggle
-			margin-left: 44px;
-			height: var(--top-bar-height);
+
+			// To align with Drag-Handle
+			margin-left: 16px;
 
 			.icon-add-white {
 				opacity: 1;
