@@ -64,6 +64,18 @@ class PageController extends Controller {
 	/** @var FormsService */
 	private $formService;
 
+	/** @var Array
+	 *
+	 * Maximum String lengths, the database is set to store.
+	 */
+	private $maxStringLengths = [
+		'formTitle' => 256,
+		'formDescription' => 2048,
+		'questionText' => 2048,
+		'optionText' => 1024,
+		'answerText' => 2048,
+	];
+
 	public function __construct(string $appName,
 								IRequest $request,
 								IGroupManager $groupManager,
@@ -96,6 +108,7 @@ class PageController extends Controller {
 	public function index(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -108,6 +121,7 @@ class PageController extends Controller {
 	public function createForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -122,6 +136,7 @@ class PageController extends Controller {
 	public function cloneForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -134,6 +149,7 @@ class PageController extends Controller {
 	public function editForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main');
 	}
 
@@ -182,6 +198,7 @@ class PageController extends Controller {
 
 		Util::addScript($this->appName, 'submit');
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getForm($form->getId()));
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main', [], $renderAs);
 	}
 

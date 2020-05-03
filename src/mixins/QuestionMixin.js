@@ -57,6 +57,14 @@ export default {
 			type: Object,
 			required: true,
 		},
+
+		/**
+		 * Database-Restrictions
+		 */
+		maxStringLengths: {
+			type: Object,
+			required: true,
+		},
 	},
 
 	components: {

@@ -50,6 +50,7 @@
 				id="form-title"
 				v-model="form.title"
 				:minlength="0"
+				:maxlength="maxStringLengths.formTitle"
 				:placeholder="t('forms', 'Form title')"
 				:required="true"
 				autofocus
@@ -61,6 +62,7 @@
 				id="form-desc"
 				ref="description"
 				v-model="form.description"
+				:maxlength="maxStringLengths.formDescription"
 				:placeholder="t('forms', 'Description')"
 				@change="autoSizeDescription"
 				@keydown="autoSizeDescription"
@@ -102,6 +104,7 @@
 					:key="question.id"
 					:model="answerTypes[question.type]"
 					:index="index + 1"
+					:max-string-lengths="maxStringLengths"
 					v-bind.sync="question"
 					@delete="deleteQuestion(question)" />
 			</Draggable>
@@ -112,6 +115,7 @@
 <script>
 import { emit } from '@nextcloud/event-bus'
 import { generateUrl } from '@nextcloud/router'
+import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
@@ -151,6 +155,8 @@ export default {
 
 	data() {
 		return {
+			maxStringLengths: loadState('forms', 'maxStringLengths'),
+
 			questionMenuOpened: false,
 			answerTypes,
 
