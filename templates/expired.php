@@ -24,6 +24,6 @@
 ?>
 <div id="emptycontent" class="">
 	<div class="icon-forms"></div>
-	<h2><?php p($l->t('Form Expired')); ?></h2>
-	<p><?php p($l->t('This Form has expired and is no longer taking answers')); ?></p>
+	<h2><?php p($l->t('Form expired')); ?></h2>
+	<p><?php p($l->t('This form has expired and is no longer taking answers')); ?></p>
 </div>
