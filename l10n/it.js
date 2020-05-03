@@ -28,6 +28,7 @@ OC.L10N.register(
     "Question number {index}" : "Domanda numero {index}",
     "Drag to reorder the questions" : "Trascina per riordinare le domande",
     "Enter a title for this question" : "Digita un titolo per questa domanda",
+    "Title of question number {index}" : "Titolo della domanda numero {index}",
     "Delete question" : "Elimina domanda",
     "Error while saving question" : "Errore durante il salvataggio della domanda",
     "A long answer for the question “{text}”" : "Una risposta lunga per la domanda “{text}”",
@@ -38,7 +39,9 @@ OC.L10N.register(
     "Group" : "Gruppo",
     "Loading {title} …" : "Caricamento {title}…",
     "Toggle settings" : "Commuta le impostazioni",
+    "Form title" : "Titolo del modulo",
     "Description" : "Descrizione",
+    "Add a question" : "Aggiungi una domanda",
     "New question" : "Nuova domanda",
     "There was an error while adding the new question" : "Si è verificato un errore durante l'aggiunta della nuova domanda",
     "There was an error while removing the question" : "Si è verificato un errore durante la rimozione della domanda",
@@ -63,6 +66,7 @@ OC.L10N.register(
     "Submit" : "Invia",
     "Submit form" : "Invia modulo",
     "Submitting form …" : "Invio del modulo…",
+    "Thank you for completing the form!" : "Grazie per aver completato il modulo!",
     "There was an error submitting the form" : "Si è verificato un errore durante l'invio del modulo",
     "Multiple choice" : "Scelta multipla",
     "Checkboxes" : "Caselle di selezione",
@@ -70,6 +74,7 @@ OC.L10N.register(
     "Long text" : "Testo lungo",
     "Form Expired" : "Modulo scaduto",
     "This Form has expired and is no longer taking answers" : "Questo modulo è scaduto e non accetta più risposte",
-    "Form not found" : "Modulo non trovato"
+    "Form not found" : "Modulo non trovato",
+    "This form does not exist" : "Questo modulo non esiste"
 },
 "nplurals=2; plural=(n != 1);");
