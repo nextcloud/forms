@@ -5,9 +5,9 @@ OC.L10N.register(
     "Description" : "Beskrivelse",
     "Settings" : "Indstillinger",
     "Set expiration date" : "Angiv udløbsdato",
+    "Expiration date" : "Udløbsdato",
     "Sharing" : "Deling",
     "Share link" : "Del link",
-    "Expiration date" : "Udløbsdato",
     "Submit" : "Tilføj"
 },
 "nplurals=2; plural=(n != 1);");

@@ -55,12 +55,12 @@
     "Anonymous responses" : "Anonym odpovídá",
     "Only allow one response per user" : "Každému z uživatelů umožnit odpovědět pouze jednou",
     "Set expiration date" : "Nastavit datum skončení platnosti",
+    "Expiration date" : "Datum skončení platnosti",
     "Sharing" : "Sdílení",
     "Show to all users of this instance" : "Zobrazit všechny uživatele na této instanci",
     "Share link" : "Odkaz na sdílení",
     "Choose users to share with" : "Zvolte uživatele, kterým nasdílet",
     "Name of user or group" : "Jméno uživatele nebo název skupiny",
-    "Expiration date" : "Datum skončení platnosti",
     "Submit" : "Odeslat",
     "Submit form" : "Odeslat formulář",
     "Submitting form …" : "Odesílání formuláře …",
@@ -70,8 +70,6 @@
     "Checkboxes" : "Zatržítka",
     "Short answer" : "Krátká odpověď",
     "Long text" : "Dlouhý text",
-    "Form Expired" : "Platnost formuláře skončila",
-    "This Form has expired and is no longer taking answers" : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat",
     "Form not found" : "Formulář nenalezen",
     "This form does not exist" : "Tento formulář neexistuje"
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"

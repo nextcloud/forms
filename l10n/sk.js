@@ -56,12 +56,12 @@ OC.L10N.register(
     "Anonymous responses" : "Anonymné odpovede",
     "Only allow one response per user" : "Povoliť iba jednu odpoveď na používateľa",
     "Set expiration date" : "Nastaviť dátum expirácie",
+    "Expiration date" : "Dátum expirácie",
     "Sharing" : "Sprístupnenie",
     "Show to all users of this instance" : "Zobraziť všetkým používateľom tejto inštancie",
     "Share link" : "Sprístupniť odkaz",
     "Choose users to share with" : "Vyberte používateľov, s ktorými chcete zdieľať",
     "Name of user or group" : "Meno používateľa alebo názov skupiny",
-    "Expiration date" : "Dátum expirácie",
     "Submit" : "Odoslať",
     "Submit form" : "Odoslať formulár",
     "Submitting form …" : "Formulár sa odosiela…",
@@ -71,8 +71,6 @@ OC.L10N.register(
     "Checkboxes" : "Zaškrtávacie políčka",
     "Short answer" : "Stručná odpoveď",
     "Long text" : "Dlhý text",
-    "Form Expired" : "Platnosť formulára skončila",
-    "This Form has expired and is no longer taking answers" : "Platnosť tohto formulára vypršala a preto neprijíma odpovede",
     "Form not found" : "Formulár nebol nájdený"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

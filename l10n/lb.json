@@ -3,8 +3,8 @@
     "Description" : "Beschreiwung",
     "Settings" : "Astellungen",
     "Set expiration date" : "Verfallsdatum setzen",
+    "Expiration date" : "Verfallsdatum",
     "Sharing" : "Gedeelt",
-    "Share link" : "Link deelen",
-    "Expiration date" : "Verfallsdatum"
+    "Share link" : "Link deelen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

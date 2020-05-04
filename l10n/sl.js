@@ -11,11 +11,10 @@ OC.L10N.register(
     "Description" : "Opis",
     "Settings" : "Nastavitve",
     "Set expiration date" : "Nastavi datum preteka",
+    "Expiration date" : "Datum preteka",
     "Sharing" : "Souporaba",
     "Share link" : "Povezava za souporabo",
     "Name of user or group" : "Ime uporabnika oziroma skupine",
-    "Expiration date" : "Datum preteka",
-    "Submit" : "Pošlji",
-    "Form Expired" : "Vprašalnik je potekel"
+    "Submit" : "Pošlji"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

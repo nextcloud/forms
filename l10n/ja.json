@@ -9,11 +9,10 @@
     "Description" : "説明",
     "Settings" : "設定",
     "Set expiration date" : "有効期限を設定",
+    "Expiration date" : "有効期限",
     "Sharing" : "共有中",
     "Share link" : "URLで共有",
     "Name of user or group" : "ユーザまたはグループの名前",
-    "Expiration date" : "有効期限",
-    "Submit" : "送信",
-    "Form Expired" : "フォームの有効期限切れ"
+    "Submit" : "送信"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

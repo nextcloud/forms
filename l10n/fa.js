@@ -11,11 +11,10 @@ OC.L10N.register(
     "Description" : "توضیحات",
     "Settings" : "تنظیمات",
     "Set expiration date" : "تنظیم تاریخ انقضا",
+    "Expiration date" : "تاریخ انقضا",
     "Sharing" : "اشتراک گذاری",
     "Share link" : "لینک را به اشتراک بگذارید",
     "Name of user or group" : "نام کاربر یا گروه",
-    "Expiration date" : "تاریخ انقضا",
-    "Submit" : "ارسال",
-    "Form Expired" : "فرم منقضی شده است"
+    "Submit" : "ارسال"
 },
 "nplurals=2; plural=(n > 1);");

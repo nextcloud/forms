@@ -5,8 +5,8 @@ OC.L10N.register(
     "Description" : "Deskrisi",
     "Settings" : "Setelan",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
+    "Expiration date" : "Tanggal kadaluarsa",
     "Sharing" : "Berbagi",
-    "Share link" : "Bagikan tautan",
-    "Expiration date" : "Tanggal kadaluarsa"
+    "Share link" : "Bagikan tautan"
 },
 "nplurals=1; plural=0;");

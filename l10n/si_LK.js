@@ -5,8 +5,8 @@ OC.L10N.register(
     "Description" : "විස්තරය",
     "Settings" : "සැකසුම්",
     "Set expiration date" : "කල් ඉකුත් විමේ දිනය දමන්න",
+    "Expiration date" : "කල් ඉකුත් විමේ දිනය",
     "Sharing" : "හුවමාරු කිරීම",
-    "Share link" : "Share link",
-    "Expiration date" : "කල් ඉකුත් විමේ දිනය"
+    "Share link" : "Share link"
 },
 "nplurals=2; plural=(n != 1);");

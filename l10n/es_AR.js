@@ -5,9 +5,9 @@ OC.L10N.register(
     "Description" : "Descripción",
     "Settings" : "Ajustes",
     "Set expiration date" : "Establecer fecha de caducidad",
+    "Expiration date" : "Fecha de expiración",
     "Sharing" : "Compartiendo",
     "Share link" : "Compartir enlace",
-    "Expiration date" : "Fecha de expiración",
     "Submit" : "Enviar"
 },
 "nplurals=2; plural=(n != 1);");

@@ -11,11 +11,10 @@ OC.L10N.register(
     "Description" : "Beskrivning",
     "Settings" : "Inställnigar",
     "Set expiration date" : "Välj utgångsdatum",
+    "Expiration date" : "Utgångsdatum",
     "Sharing" : "Delning",
     "Share link" : "Dela länk",
     "Name of user or group" : "Användar- eller grupp-namn",
-    "Expiration date" : "Utgångsdatum",
-    "Submit" : "Verkställ",
-    "Form Expired" : "formuläret är utgånget"
+    "Submit" : "Verkställ"
 },
 "nplurals=2; plural=(n != 1);");

@@ -10,11 +10,10 @@ OC.L10N.register(
     "Description" : "Descripció",
     "Settings" : "Paràmetres",
     "Set expiration date" : "Establiu una data de caducitat",
+    "Expiration date" : "Data de venciment",
     "Sharing" : "Compartició",
     "Share link" : "Enllaç de compartició",
     "Name of user or group" : "Nom de l'usuari o del grup",
-    "Expiration date" : "Data de venciment",
-    "Submit" : "Envia",
-    "Form Expired" : "Formulari vençut"
+    "Submit" : "Envia"
 },
 "nplurals=2; plural=(n != 1);");

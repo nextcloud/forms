@@ -9,11 +9,10 @@ OC.L10N.register(
     "Description" : "Kuvaus",
     "Settings" : "Asetukset",
     "Set expiration date" : "Aseta vanhenemispäivä",
+    "Expiration date" : "Vanhenemispäivä",
     "Sharing" : "Jakaminen",
     "Share link" : "Jaa linkki",
     "Name of user or group" : "Käyttäjän tai ryhmän nimi",
-    "Expiration date" : "Vanhenemispäivä",
-    "Submit" : "Lähetä",
-    "Form Expired" : "Lomake vanhentui"
+    "Submit" : "Lähetä"
 },
 "nplurals=2; plural=(n != 1);");

@@ -10,11 +10,10 @@ OC.L10N.register(
     "Description" : "Leírás",
     "Settings" : "Beállítások",
     "Set expiration date" : "Lejárati idő beállítása",
+    "Expiration date" : "Lejárati idő",
     "Sharing" : "Megosztás",
     "Share link" : "Hivatkozás megosztása",
     "Name of user or group" : "Felhasználó vagy csoport neve",
-    "Expiration date" : "Lejárati idő",
-    "Submit" : "Beküldés",
-    "Form Expired" : "Űrlap lejárt"
+    "Submit" : "Beküldés"
 },
 "nplurals=2; plural=(n != 1);");

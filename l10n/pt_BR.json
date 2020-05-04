@@ -55,12 +55,12 @@
     "Anonymous responses" : "Resposta anônima",
     "Only allow one response per user" : "Somente uma resposta por usuário é permitida",
     "Set expiration date" : "Definir data de vencimento",
+    "Expiration date" : "Data de expiração",
     "Sharing" : "Compartilhando",
     "Show to all users of this instance" : "Mostrar a todos os usuários desta instância",
     "Share link" : "Link de compartilhamento",
     "Choose users to share with" : "Escolher os usuários com quem compartilhar",
     "Name of user or group" : "Nome do usuário ou grupo",
-    "Expiration date" : "Data de expiração",
     "Submit" : "Enviar",
     "Submit form" : "Enviar formulário",
     "Submitting form …" : "Enviando formulário...",
@@ -70,8 +70,6 @@
     "Checkboxes" : "Caixas de seleção",
     "Short answer" : "Resposta curta",
     "Long text" : "Texto longo",
-    "Form Expired" : "Formulário Expirado",
-    "This Form has expired and is no longer taking answers" : "Este Formulário expirou e não aceita mais respostas",
     "Form not found" : "Formulário não encontrado",
     "This form does not exist" : "Este formulário não existe"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"

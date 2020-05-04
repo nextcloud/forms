@@ -19,11 +19,10 @@ OC.L10N.register(
     "Description" : "Deskribapena",
     "Settings" : "Ezarpenak",
     "Set expiration date" : "Ezarri iraungitze-data",
+    "Expiration date" : "Iraungitze-data",
     "Sharing" : "Partekatzea",
     "Share link" : "Partekatu esteka",
     "Name of user or group" : "Erabiltzailearen edo taldearen izena",
-    "Expiration date" : "Iraungitze-data",
-    "Submit" : "Bidali",
-    "Form Expired" : "Iraungitako inprimakia"
+    "Submit" : "Bidali"
 },
 "nplurals=2; plural=(n != 1);");

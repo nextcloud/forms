@@ -5,7 +5,7 @@ OC.L10N.register(
     "Description" : "تصریح",
     "Settings" : "سیٹینگز",
     "Set expiration date" : "تاریخ معیاد سیٹ کریں",
-    "Share link" : "اشتراک لنک",
-    "Expiration date" : "تاریخ معیاد"
+    "Expiration date" : "تاریخ معیاد",
+    "Share link" : "اشتراک لنک"
 },
 "nplurals=2; plural=(n != 1);");

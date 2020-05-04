@@ -3,7 +3,7 @@ OC.L10N.register(
     {
     "Settings" : "سمونې",
     "Set expiration date" : "د پای نېټه ټاکل",
-    "Share link" : "د شرېکېدو لېنک",
-    "Expiration date" : "د پای نېټه"
+    "Expiration date" : "د پای نېټه",
+    "Share link" : "د شرېکېدو لېنک"
 },
 "nplurals=2; plural=(n != 1);");

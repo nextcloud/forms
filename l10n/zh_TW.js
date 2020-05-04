@@ -10,11 +10,10 @@ OC.L10N.register(
     "Description" : "描述",
     "Settings" : "設定",
     "Set expiration date" : "設定到期日",
+    "Expiration date" : "到期日",
     "Sharing" : "分享",
     "Share link" : "分享連結",
     "Name of user or group" : "使用者或群組名稱",
-    "Expiration date" : "到期日",
-    "Submit" : "送出",
-    "Form Expired" : "表單已過期"
+    "Submit" : "送出"
 },
 "nplurals=1; plural=0;");

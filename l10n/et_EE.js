@@ -5,8 +5,8 @@ OC.L10N.register(
     "Description" : "Kirjeldus",
     "Settings" : "Seaded",
     "Set expiration date" : "Määra aegumise kuupäev",
+    "Expiration date" : "Aegumise kuupäev",
     "Sharing" : "Jagamine",
-    "Share link" : "Jaga link",
-    "Expiration date" : "Aegumise kuupäev"
+    "Share link" : "Jaga link"
 },
 "nplurals=2; plural=(n != 1);");

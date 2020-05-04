@@ -5,9 +5,9 @@ OC.L10N.register(
     "Description" : "Description",
     "Settings" : "Settings",
     "Set expiration date" : "Set expiration date",
+    "Expiration date" : "Expiration date",
     "Sharing" : "Sharing",
     "Share link" : "Share link",
-    "Expiration date" : "Expiration date",
     "Submit" : "Submit"
 },
 "nplurals=2; plural=(n != 1);");

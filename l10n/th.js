@@ -5,8 +5,8 @@ OC.L10N.register(
     "Description" : "รายละเอียด",
     "Settings" : "ตั้งค่า",
     "Set expiration date" : "กำหนดวันที่หมดอายุ",
+    "Expiration date" : "วันที่หมดอายุ",
     "Sharing" : "แชร์ข้อมูล",
-    "Share link" : "แชร์ลิงค์",
-    "Expiration date" : "วันที่หมดอายุ"
+    "Share link" : "แชร์ลิงค์"
 },
 "nplurals=1; plural=0;");

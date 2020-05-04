@@ -5,10 +5,10 @@ OC.L10N.register(
     "Description" : "Lýsing",
     "Settings" : "Stillingar",
     "Set expiration date" : "Setja gildistíma",
+    "Expiration date" : "Gildir til",
     "Sharing" : "Deiling",
     "Share link" : "Deila tengli",
     "Name of user or group" : "Nafn notanda eða hóps",
-    "Expiration date" : "Gildir til",
     "Submit" : "Senda inn"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

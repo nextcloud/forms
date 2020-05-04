@@ -5,9 +5,9 @@ OC.L10N.register(
     "Description" : "აღწერილობა",
     "Settings" : "პარამეტრები",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
+    "Expiration date" : "გაუქმების თარიღი",
     "Sharing" : "გაზიარება",
     "Share link" : "ბმულის გაზიარება",
-    "Expiration date" : "გაუქმების თარიღი",
     "Submit" : "გაგზავნა"
 },
 "nplurals=2; plural=(n!=1);");

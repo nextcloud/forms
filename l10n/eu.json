@@ -17,11 +17,10 @@
     "Description" : "Deskribapena",
     "Settings" : "Ezarpenak",
     "Set expiration date" : "Ezarri iraungitze-data",
+    "Expiration date" : "Iraungitze-data",
     "Sharing" : "Partekatzea",
     "Share link" : "Partekatu esteka",
     "Name of user or group" : "Erabiltzailearen edo taldearen izena",
-    "Expiration date" : "Iraungitze-data",
-    "Submit" : "Bidali",
-    "Form Expired" : "Iraungitako inprimakia"
+    "Submit" : "Bidali"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -28,14 +28,13 @@ OC.L10N.register(
     "Export to CSV" : "Eksportuoti į CSV",
     "Settings" : "Nustatymai",
     "Set expiration date" : "Nustatyti galiojimo pabaigos datą",
+    "Expiration date" : "Galiojimo pabaigos data",
     "Sharing" : "Bendrinimas",
     "Share link" : "Bendrinimo nuoroda",
     "Name of user or group" : "Naudotojo vardas arba grupės pavadinimas",
-    "Expiration date" : "Galiojimo pabaigos data",
     "Submit" : "Pateikti",
     "Submit form" : "Pateikti anketą",
     "Submitting form …" : "Anketa pateikiama…",
-    "Form Expired" : "Anketa nebegalioja",
     "Form not found" : "Anketa nerasta"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

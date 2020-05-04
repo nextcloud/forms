@@ -5,7 +5,7 @@ OC.L10N.register(
     "Description" : "Beskrywing",
     "Settings" : "Instellings",
     "Set expiration date" : "Stel vervaldatum",
-    "Share link" : "Deelskakel",
-    "Expiration date" : "Vervaldatum"
+    "Expiration date" : "Vervaldatum",
+    "Share link" : "Deelskakel"
 },
 "nplurals=2; plural=(n != 1);");

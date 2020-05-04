@@ -55,12 +55,12 @@
     "Anonymous responses" : "Анонимные ответы",
     "Only allow one response per user" : "Разрешить только один ответ на пользователя",
     "Set expiration date" : "Установить срок действия",
+    "Expiration date" : "Дата окончания",
     "Sharing" : "Параметры публикации",
     "Show to all users of this instance" : "Показать всем пользователям этого образца",
     "Share link" : "Предоставление общего доступа по ссылке",
     "Choose users to share with" : "Выберите пользователей для приглашения",
     "Name of user or group" : "Имя пользователя или группы",
-    "Expiration date" : "Дата окончания",
     "Submit" : "Создать",
     "Submit form" : "Сохранить форму",
     "Submitting form …" : "Сохранение формы...",
@@ -70,8 +70,6 @@
     "Checkboxes" : "Несколько из списка",
     "Short answer" : "Короткий ответ",
     "Long text" : "Длинный ответ",
-    "Form Expired" : "Опрос закончился",
-    "This Form has expired and is no longer taking answers" : "Срок действия этой формы истек, и ответы больше не принимаются.",
     "Form not found" : "Форма не найдена",
     "This form does not exist" : "Эта форма не существует"
 },"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"

@@ -19,11 +19,10 @@ OC.L10N.register(
     "Description" : "Περιγραφή",
     "Settings" : "Ρυθμίσεις",
     "Set expiration date" : "Ορισμός ημερομηνίας λήξης",
+    "Expiration date" : "Ημερομηνία λήξης",
     "Sharing" : "Διαμοιρασμός",
     "Share link" : "Διαμοιρασμός συνδέσμου",
     "Name of user or group" : "Όνομα του χρήστη ή της ομάδας",
-    "Expiration date" : "Ημερομηνία λήξης",
-    "Submit" : "Υποβολή",
-    "Form Expired" : "Η φόρμα έληξε"
+    "Submit" : "Υποβολή"
 },
 "nplurals=2; plural=(n != 1);");
