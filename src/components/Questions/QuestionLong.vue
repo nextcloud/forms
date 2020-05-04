@@ -25,6 +25,7 @@
 		v-bind.sync="$attrs"
 		:text="text"
 		:edit.sync="edit"
+		:max-question-length="maxStringLengths.questionText"
 		@delete="onDelete"
 		@update:text="onTitleChange">
 		<div class="question__content">
@@ -35,7 +36,7 @@
 				:required="true /* TODO: implement required option */"
 				:value="values[0]"
 				class="question__text"
-				maxlength="1024"
+				:maxlength="maxStringLengths.answerText"
 				minlength="1"
 				@input="onInput"
 				@keydown="autoSizeText" />

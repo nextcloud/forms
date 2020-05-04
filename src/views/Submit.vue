@@ -44,6 +44,7 @@
 						:read-only="true"
 						:model="answerTypes[question.type]"
 						:index="index + 1"
+						:max-string-lengths="maxStringLengths"
 						v-bind="question"
 						:values.sync="answers[question.id]" />
 				</ul>
@@ -97,6 +98,7 @@ export default {
 	data() {
 		return {
 			form: loadState('forms', 'form'),
+			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			answerTypes,
 			answers: {},
 			loading: false,

@@ -26,6 +26,7 @@
 		v-bind.sync="$attrs"
 		:text="text"
 		:edit.sync="edit"
+		:max-question-length="maxStringLengths.questionText"
 		@delete="onDelete"
 		@update:text="onTitleChange">
 		<ul class="question__content">
@@ -57,6 +58,7 @@
 					ref="input"
 					:answer="answer"
 					:index="index"
+					:max-option-length="maxStringLengths.optionText"
 					@add="addNewEntry"
 					@delete="deleteAnswer"
 					@update:answer="updateAnswer"
@@ -64,12 +66,11 @@
 			</template>
 
 			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
-				<!-- TODO: properly choose max length -->
 				<input
 					:aria-label="t('forms', 'Add a new answer')"
 					:placeholder="t('forms', 'Add a new answer')"
 					class="question__input"
-					maxlength="256"
+					:maxlength="maxStringLengths.optionText"
 					minlength="1"
 					type="text"
 					@click="addNewEntry">

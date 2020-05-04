@@ -7,7 +7,7 @@
 			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 			:value="answer.text"
 			class="question__input"
-			maxlength="256"
+			:maxlength="maxOptionLength"
 			minlength="1"
 			type="text"
 			@input="onInput"
@@ -47,6 +47,10 @@ export default {
 			required: true,
 		},
 		index: {
+			type: Number,
+			required: true,
+		},
+		maxOptionLength: {
 			type: Number,
 			required: true,
 		},

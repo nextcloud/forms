@@ -41,7 +41,7 @@
 				class="question__header-title"
 				type="text"
 				minlength="1"
-				maxlength="256"
+				:maxlength="maxQuestionLength"
 				required
 				@input="onInput"
 				@keyup="onTitleChange">
@@ -100,6 +100,10 @@ export default {
 		readOnly: {
 			type: Boolean,
 			default: false,
+		},
+		maxQuestionLength: {
+			type: Number,
+			required: true,
 		},
 	},
 
