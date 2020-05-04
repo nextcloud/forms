@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
  *
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license GNU AGPL version 3 or any later version

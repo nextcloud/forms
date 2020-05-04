@@ -128,13 +128,18 @@ class ApiController extends Controller {
 	 */
 	public function getForm(int $id): Http\JSONResponse {
 		try {
-			$results = $this->formsService->getForm($id);
+			$form = $this->formsService->getForm($id);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
+	
+		if (!$this->formsService->hasUserAccess($id)) {
+			$this->logger->debug('User has no permissions to get this form');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
 
-		return new Http\JSONResponse($results);
+		return new Http\JSONResponse($form);
 	}
 
 	/**
@@ -297,7 +302,7 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -307,15 +312,15 @@ class ApiController extends Controller {
 
 		// Check if array contains duplicates
 		if (array_unique($newOrder) !== $newOrder) {
-			$this->logger->debug('The given Array contains duplicates.');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			$this->logger->debug('The given Array contains duplicates');
+			return new Http\JSONResponse(['message' => 'The given Array contains duplicates'], Http::STATUS_BAD_REQUEST);
 		}
 
 		// Check if all questions are given in Array.
 		$questions = $this->questionMapper->findByForm($formId);
 		if (sizeof($questions) !== sizeof($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored questions');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'The length of the given array does not match the number of stored questions'], Http::STATUS_BAD_REQUEST);
 		}
 
 		$questions = []; // Clear Array of Entities
@@ -385,8 +390,8 @@ class ApiController extends Controller {
 			$question = $this->questionMapper->findById($id);
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find question or form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			$this->logger->debug('Could not find form or question');
+			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -396,7 +401,7 @@ class ApiController extends Controller {
 
 		if (array_key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			return new Http\JSONResponse(['message' => 'Please use reorderQuestions() to change order'], Http::STATUS_FORBIDDEN);
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -422,7 +427,7 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -463,8 +468,8 @@ class ApiController extends Controller {
 			$question = $this->questionMapper->findById($questionId);
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question so option can\'t be added');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			$this->logger->debug('Could not find form or question');
+			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -535,7 +540,7 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or option');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'Could not find form or option'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -556,7 +561,7 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($form->getOwnerId() !== $this->userId) {
@@ -592,7 +597,7 @@ class ApiController extends Controller {
 	 * @param int $formId
 	 * @param array $answers [question_id => arrayOfString]
 	 */
-	public function insertSubmission(int $formId, array $answers) {
+	public function insertSubmission(int $formId, array $answers): Http\JSONResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}', [
 			'formId' => $formId,
 			'answers' => $answers,
@@ -606,13 +611,16 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
-		$user = $this->userSession->getUser();
-		// TODO check again hasUserAccess?!
+		// Does the user have permissions to display
+		if (!$this->formsService->canSubmit($form->getId())) {
+			return new Http\JSONResponse(['message' => 'Already submitted'], Http::STATUS_FORBIDDEN);
+		}
 
 		// Create Submission
 		$submission = new Submission();
 		$submission->setFormId($formId);
 		$submission->setTimestamp(time());
+		$user = $this->userSession->getUser();
 
 		// If not logged in or anonymous use anonID
 		if (!$user || $form->getIsAnonymous()) {
