@@ -61,6 +61,9 @@
     "Share link" : "Udostępnij link",
     "Choose users to share with" : "Wybierz użytkowników do udostępniania",
     "Name of user or group" : "Nazwa użytkownika lub grupy",
+    "Select expiration date" : "Wybierz datę ważności",
+    "Expired on {date}" : "Wygasł {date}",
+    "Expires on {date}" : "Wygasa {date}",
     "Submit" : "Prześlij",
     "Submit form" : "Prześlij formularz",
     "Submitting form …" : "Przesyłanie formularza…",
@@ -70,6 +73,8 @@
     "Checkboxes" : "Pola wyboru",
     "Short answer" : "Krótka odpowiedź",
     "Long text" : "Długi tekst",
+    "Form expired" : "Formularz wygasł",
+    "This form has expired and is no longer taking answers" : "Nie są już przyjmowane odpowiedzi, ponieważ ten formularz wygasł.",
     "Form not found" : "Nie znaleziono formularza",
     "This form does not exist" : "Ten formularz nie istnieje"
 },"pluralForm" :"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"

@@ -63,6 +63,9 @@ OC.L10N.register(
     "Share link" : "Bağlantıyı paylaş",
     "Choose users to share with" : "Paylaşılacak kullanıcıları seçin",
     "Name of user or group" : "Kullanıcı ya da grup adı",
+    "Select expiration date" : "Son kullanma tarihini seçin",
+    "Expired on {date}" : "{date} tarihinde sona erdi",
+    "Expires on {date}" : "{date} tarihinde sonra erecek",
     "Submit" : "Gönder",
     "Submit form" : "Formu gönder",
     "Submitting form …" : "Form gönderiliyor …",
@@ -72,6 +75,8 @@ OC.L10N.register(
     "Checkboxes" : "İşaret kutuları",
     "Short answer" : "Kısa metin",
     "Long text" : "Uzun metin",
+    "Form expired" : "Formun süresi geçmiş",
+    "This form has expired and is no longer taking answers" : "Bu formun kullanma süresi geçmiş olduğundan doldurulamaz",
     "Form not found" : "Form bulunamadı",
     "This form does not exist" : "Bu form bulunamadı"
 },

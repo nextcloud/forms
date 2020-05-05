@@ -63,6 +63,9 @@ OC.L10N.register(
     "Share link" : "Odkaz na sdílení",
     "Choose users to share with" : "Zvolte uživatele, kterým nasdílet",
     "Name of user or group" : "Jméno uživatele nebo název skupiny",
+    "Select expiration date" : "Vyberte datum skončení platnosti",
+    "Expired on {date}" : "Platnost skončila {date}",
+    "Expires on {date}" : "Platnost skončí {date}",
     "Submit" : "Odeslat",
     "Submit form" : "Odeslat formulář",
     "Submitting form …" : "Odesílání formuláře …",
@@ -72,6 +75,8 @@ OC.L10N.register(
     "Checkboxes" : "Zatržítka",
     "Short answer" : "Krátká odpověď",
     "Long text" : "Dlouhý text",
+    "Form expired" : "Platnost formuláře skončila",
+    "This form has expired and is no longer taking answers" : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat",
     "Form not found" : "Formulář nenalezen",
     "This form does not exist" : "Tento formulář neexistuje"
 },

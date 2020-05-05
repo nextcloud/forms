@@ -63,6 +63,9 @@ OC.L10N.register(
     "Share link" : "Compartir ligazón",
     "Choose users to share with" : "Escolle ros usuarios cos que compartir",
     "Name of user or group" : "Nome de usuario ou grupo",
+    "Select expiration date" : "Seleccionar a data de caducidade:",
+    "Expired on {date}" : "Caducou o {date}",
+    "Expires on {date}" : "Caduca o {date}",
     "Submit" : "Enviar",
     "Submit form" : "Enviar o formulario",
     "Submitting form …" : "Enviando o formulario…",
@@ -72,6 +75,8 @@ OC.L10N.register(
     "Checkboxes" : "Caixas de verificación",
     "Short answer" : "Resposta curta",
     "Long text" : "Texto longo",
+    "Form expired" : "Formulario caducado",
+    "This form has expired and is no longer taking answers" : "Este formulario caducou e xa non admite respostas",
     "Form not found" : "Non se atopou o formulario",
     "This form does not exist" : "Este formulario non existe"
 },

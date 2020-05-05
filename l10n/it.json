@@ -61,6 +61,9 @@
     "Share link" : "Condividi collegamento",
     "Choose users to share with" : "Scegli gli utenti con cui condividere",
     "Name of user or group" : "Nome dell'utente o del gruppo",
+    "Select expiration date" : "Seleziona la data di scadenza",
+    "Expired on {date}" : "Scaduto il {date}",
+    "Expires on {date}" : "Scade il {date}",
     "Submit" : "Invia",
     "Submit form" : "Invia modulo",
     "Submitting form …" : "Invio del modulo…",
@@ -70,6 +73,8 @@
     "Checkboxes" : "Caselle di selezione",
     "Short answer" : "Risposta breve",
     "Long text" : "Testo lungo",
+    "Form expired" : "Modulo scaduto",
+    "This form has expired and is no longer taking answers" : "Questo modulo è scaduto e non accetta più risposte",
     "Form not found" : "Modulo non trovato",
     "This form does not exist" : "Questo modulo non esiste"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

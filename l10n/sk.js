@@ -41,6 +41,7 @@ OC.L10N.register(
     "Toggle settings" : "Prepnúť nastavenia",
     "Form title" : "Názov formulára",
     "Description" : "Popis",
+    "Add a question" : "Pridať otázku",
     "New question" : "Nová otázka",
     "There was an error while adding the new question" : "Pri pridávaní novej otázky sa vyskytla chyba",
     "There was an error while removing the question" : "Pri odstraňovaní otázky sa vyskytla chyba",
@@ -62,6 +63,9 @@ OC.L10N.register(
     "Share link" : "Sprístupniť odkaz",
     "Choose users to share with" : "Vyberte používateľov, s ktorými chcete zdieľať",
     "Name of user or group" : "Meno používateľa alebo názov skupiny",
+    "Select expiration date" : "Vybrať dátum ukončenia platnosti",
+    "Expired on {date}" : "Platnosť vypršala {date}",
+    "Expires on {date}" : "Platnosť vyprší {date}",
     "Submit" : "Odoslať",
     "Submit form" : "Odoslať formulár",
     "Submitting form …" : "Formulár sa odosiela…",
@@ -71,6 +75,9 @@ OC.L10N.register(
     "Checkboxes" : "Zaškrtávacie políčka",
     "Short answer" : "Stručná odpoveď",
     "Long text" : "Dlhý text",
-    "Form not found" : "Formulár nebol nájdený"
+    "Form expired" : "Platnosť formulára vypršala",
+    "This form has expired and is no longer taking answers" : "Platnosť tohto formulára vypršala, už sa nedá odpovedať",
+    "Form not found" : "Formulár nebol nájdený",
+    "This form does not exist" : "Tento formulár neexistuje"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");
