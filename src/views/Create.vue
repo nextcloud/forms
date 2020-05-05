@@ -60,14 +60,18 @@
 				@keyup="onTitleChange">
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
-				id="form-desc"
 				ref="description"
 				v-model="form.description"
+				class="form-desc"
 				:maxlength="maxStringLengths.formDescription"
 				:placeholder="t('forms', 'Description')"
 				@change="autoSizeDescription"
 				@keydown="autoSizeDescription"
 				@keyup="onDescChange" />
+			<!-- Only visible if at least one question is marked as mandatory-->
+			<p v-if="mandatoryUsed" class="form-desc info-mandatory">
+				* {{ t('forms', 'Mandatory questions') }}
+			</p>
 		</header>
 
 		<section>
@@ -180,6 +184,16 @@ export default {
 		},
 		hasQuestions() {
 			return this.form.questions && this.form.questions.length === 0
+		},
+
+		/**
+		 * Check if at least one question is mandatory
+		 * @returns {Boolean}
+		 */
+		mandatoryUsed() {
+			return this.form.questions.reduce(
+				(isUsed, question) => isUsed || question.mandatory
+				, false)
 		},
 	},
 
@@ -378,10 +392,11 @@ export default {
 	header {
 		display: flex;
 		flex-direction: column;
-		margin: 44px;
+		margin-top: 44px;
+		margin-bottom: 24px;
 
 		#form-title,
-		#form-desc {
+		.form-desc {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
@@ -395,9 +410,13 @@ export default {
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
-		#form-desc {
-			min-height: 60px;
+		.form-desc {
+			padding-bottom: 20px;
 			resize: none;
+		}
+
+		.info-mandatory {
+			color: var(--color-text-maxcontrast);
 		}
 	}
 

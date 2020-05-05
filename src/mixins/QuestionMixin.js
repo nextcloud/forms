@@ -18,6 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import { debounce } from 'debounce'
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
+
 import Question from '../components/Questions/Question'
 
 export default {
@@ -25,10 +30,26 @@ export default {
 	props: {
 
 		/**
+		 * Question-Id
+		 */
+		id: {
+			type: Number,
+			required: true,
+		},
+
+		/**
 		 * The question title
 		 */
 		text: {
 			type: String,
+			required: true,
+		},
+
+		/**
+		 * Mandatory-Setting
+		 */
+		mandatory: {
+			type: Boolean,
 			required: true,
 		},
 
@@ -80,13 +101,24 @@ export default {
 
 	methods: {
 		/**
-		 * Forward the title change to the parent
+		 * Forward the title change to the parent and store to db
 		 *
 		 * @param {string} text the title
 		 */
-		onTitleChange(text) {
+		onTitleChange: debounce(function(text) {
 			this.$emit('update:text', text)
-		},
+			this.saveQuestionProperty('text', text)
+		}, 200),
+
+		/**
+		 * Forward the mandatory change to the parent and store to db
+		 *
+		 * @param {Boolean} mandatoryValue new mandatory Value
+		 */
+		onMandatoryChange: debounce(function(mandatoryValue) {
+			this.$emit('update:mandatory', mandatoryValue)
+			this.saveQuestionProperty('mandatory', mandatoryValue)
+		}, 200),
 
 		/**
 		 * Forward the answer(s) change to the parent
@@ -116,6 +148,21 @@ export default {
 					title.select()
 				}
 			})
+		},
+
+		async saveQuestionProperty(key, value) {
+			try {
+				// TODO: add loading status feedback ?
+				await axios.post(generateUrl('/apps/forms/api/v1/question/update'), {
+					id: this.id,
+					keyValuePairs: {
+						[key]: value,
+					},
+				})
+			} catch (error) {
+				showError(t('forms', 'Error while saving question'))
+				console.error(error)
+			}
 		},
 	},
 }
