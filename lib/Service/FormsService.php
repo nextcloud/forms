@@ -29,8 +29,12 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\IGroup;
 use OCP\IGroupManager;
+use OCP\IUser;
+use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Share\IShare;
 
 /**
  * Trait for getting forms information in a service
@@ -51,6 +55,9 @@ class FormsService {
 	
 	/** @var IGroupManager */
 	private $groupManager;
+	
+	/** @var IUserManager */
+	private $userManager;
 
 	/** @var IUserSession */
 	private $userSession;
@@ -60,12 +67,14 @@ class FormsService {
 								OptionMapper $optionMapper,
 								SubmissionMapper $submissionMapper,
 								IGroupManager $groupManager,
+								IUserManager $userManager,
 								IUserSession $userSession) {
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->groupManager = $groupManager;
+		$this->userManager = $userManager;
 		$this->userSession = $userSession;
 	}
 
@@ -111,6 +120,15 @@ class FormsService {
 		$form = $this->formMapper->findById($id);
 		$result = $form->read();
 		$result['questions'] = $this->getQuestions($id);
+
+		// Set proper user/groups properties
+		
+		// Make sure we have the bare minimum
+		$result['access'] = array_merge(['users' => [], 'groups' => []], $result['access']);
+
+		// Properly format users & groups
+		$result['access']['users'] = array_map([$this, 'formatUsers'], $result['access']['users']);
+		$result['access']['groups'] = array_map([$this, 'formatGroups'], $result['access']['groups']);
 
 		return $result;
 	}
@@ -204,5 +222,41 @@ class FormsService {
 
 		// None of the possible access-options matched.
 		return false;
+	}
+
+	/**
+	 * Format users access
+	 *
+	 * @param string $userId
+	 * @return array
+	 */
+	private function formatUsers(string $userId): array {
+		$user  = $this->userManager->get($userId);
+		if ($user instanceof IUser) {
+			return [
+				'id' => $userId,
+				'displayName' => $user->getDisplayName(),
+				'shareType' => IShare::TYPE_USER
+			];
+		}
+		return [];
+	}
+
+	/**
+	 * Format groups access
+	 *
+	 * @param string $groupId
+	 * @return array
+	 */
+	private function formatGroups(string $groupId): array {
+		$group  = $this->groupManager->get($groupId);
+		if ($group instanceof IGroup) {
+			return [
+				'id' => $groupId,
+				'displayName' => $group->getDisplayName(),
+				'shareType' => IShare::TYPE_GROUP
+			];
+		}
+		return [];
 	}
 }

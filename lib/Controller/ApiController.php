@@ -26,6 +26,7 @@
 
 namespace OCA\Forms\Controller;
 
+use Exception;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -127,6 +128,7 @@ class ApiController extends Controller {
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
 				'expires' => $form->getExpires(),
+				'partial' => true
 			];
 		}
 
@@ -208,6 +210,21 @@ class ApiController extends Controller {
 		if ($form->getOwnerId() !== $this->userId) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Make sure we only store id
+		try {
+			if ($keyValuePairs['access']) {
+				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
+					return $user['id'];
+				}, $keyValuePairs['access']['users']);
+				$keyValuePairs['access']['groups'] = array_map(function (array $group): string {
+					return $group['id'];
+				}, $keyValuePairs['access']['groups']);
+			}
+		} catch (Exception $e) {
+			$this->logger->debug('Malformed access');
+			return new Http\JSONResponse(['message' => 'Malformed access'], Http::STATUS_BAD_REQUEST);
 		}
 
 		// Create FormEntity with given Params & Id.

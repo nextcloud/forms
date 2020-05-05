@@ -58,7 +58,9 @@
 		<!-- No errors show router content -->
 		<template v-else>
 			<router-view :form.sync="selectedForm" />
-			<router-view :form="selectedForm" name="sidebar" />
+			<router-view v-if="!selectedForm.partial"
+				:form="selectedForm"
+				name="sidebar" />
 		</template>
 	</Content>
 </template>

@@ -23,38 +23,35 @@
 <template>
 	<div class="sharing">
 		<Multiselect id="ajax"
-			v-model="shares"
-			:options="users"
-			:multiple="true"
-			:user-select="true"
-			:tag-width="80"
 			:clear-on-select="false"
-			:preserve-search="true"
-			:options-limit="20"
-			:loading="isLoading"
+			:hide-selected="true"
 			:internal-search="false"
-			:searchable="true"
+			:loading="loading"
+			:multiple="true"
+			:options="options"
+			:placeholder="t('forms', 'User or group name …')"
 			:preselect-first="true"
-			:placeholder="placeholder"
+			:preserve-search="true"
+			:searchable="true"
+			:user-select="true"
 			label="displayName"
-			track-by="user"
-			@search-change="loadUsersAsync"
-			@close="updateShares">
-			<template slot="selection" slot-scope="{ values, search, isOpen }">
-				<span v-if="values.length &amp;&amp; !isOpen" class="multiselect__single">
-					{{ values.length }} users selected
-				</span>
+			track-by="id"
+			@search-change="asyncFind"
+			@select="addShare">
+			<template #noOptions>
+				{{ t('forms', 'No recommendations. Start typing.') }}
+			</template>
+			<template #noResult>
+				{{ noResultText }}
 			</template>
 		</Multiselect>
 
 		<TransitionGroup :css="false" tag="ul" class="shared-list">
-			<li v-for="(item, index) in sortedShares" :key="item.displayName" :data-index="index">
-				<UserDiv :user-id="item.user"
-					:display-name="item.displayName"
-					:type="item.type"
-					:hide-names="hideNames" />
+			<!-- TODO: Iterate two times, will be cleaner, one for users, one for groups -->
+			<li v-for="(item, index) in sortedShares" :key="item.id + '-' + item.shareType" :data-index="index">
+				<UserDiv v-bind="item" />
 				<div class="options">
-					<a class="icon icon-delete svg delete-form" @click="removeShare(index, item)" />
+					<a class="icon icon-delete svg delete-form" @click="removeShare(item)" />
 				</div>
 			</li>
 		</TransitionGroup>
@@ -62,12 +59,15 @@
 </template>
 
 <script>
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
+import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
+import debounce from 'debounce'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import ShareTypes from '../mixins/ShareTypes'
 
 // TODO: replace with same design as core sharing
-import UserDiv from './_base-UserDiv'
+import UserDiv from './UserDiv'
 
 export default {
 	components: {
@@ -75,76 +75,297 @@ export default {
 		UserDiv,
 	},
 
+	mixins: [ShareTypes],
+
 	props: {
-		placeholder: {
-			type: String,
-			default: '',
-		},
-
-		activeShares: {
+		groupShares: {
 			type: Array,
-			default: function() {
-				return []
-			},
+			default: () => ([]),
 		},
-
-		hideNames: {
-			type: Boolean,
-			default: false,
+		userShares: {
+			type: Array,
+			default: () => ([]),
 		},
 	},
 
 	data() {
 		return {
-			shares: [],
-			users: [],
-			isLoading: false,
-			siteUsersListOptions: {
-				getUsers: true,
-				getGroups: true,
-				query: '',
-			},
+			query: '',
+			loading: false,
+
+			// TODO: have a global mixin for this, shared with server?
+			minSearchStringLength: parseInt(OC.config['sharing.minSearchStringLength'], 10) || 0,
+			maxAutocompleteResults: parseInt(OC.config['sharing.maxAutocompleteResults'], 10) || 200,
+
+			// Search data
+			recommendations: [],
+			suggestions: [],
 		}
 	},
 
 	computed: {
 		sortedShares() {
-			return this.shares.slice(0).sort(this.sortByDisplayname)
+			return [...this.userShares, ...this.groupShares].slice()
+				.sort(this.sortByDisplayname)
+		},
+
+		/**
+		 * Is the search valid ?
+		 * @returns {boolean}
+		 */
+		isValidQuery() {
+			return this.query && this.query.trim() !== '' && this.query.length > this.minSearchStringLength
+		},
+
+		/**
+		 * Multiseelct options. Recommendations by default,
+		 * direct search when search query is valid.
+		 * @returns {Array}
+		 */
+		options() {
+			if (this.isValidQuery) {
+				return this.suggestions
+			}
+			return this.recommendations
+		},
+
+		noResultText() {
+			if (this.loading) {
+				return t('forms', 'Searching …')
+			}
+			return t('forms', 'No elements found.')
 		},
 	},
 
-	watch: {
-		activeShares(value) {
-			this.shares = value.slice(0)
-		},
+	mounted() {
+		this.getRecommendations()
 	},
 
 	methods: {
-		removeShare(index, item) {
-			this.$emit('remove-share', item)
+		removeShare(item) {
+			// Filter out the removed item
+			const users = this.userShares.filter(user => !(user.id === item.id && !item.isGroup))
+			const groups = this.groupShares.filter(group => !(group.id === item.id && item.isGroup))
+			this.$emit('update:shares', { users, groups })
 		},
 
-		updateShares() {
-			this.$emit('update-shares', this.shares)
-		},
+		/**
+		 * Add a new share and dispatch the change to the parent
+		 * @param {Object} share the new share
+		 */
+		addShare(share) {
+			const users = this.userShares.slice()
+			const groups = this.groupShares.slice()
+			const newShare = {
+				id: share.shareWith,
+				displayName: share.displayName,
+				shareType: share.shareType,
+			}
 
-		loadUsersAsync(query) {
-			this.isLoading = false
-			this.siteUsersListOptions.query = query
-			axios.post(generateUrl('apps/forms/get/siteusers'), this.siteUsersListOptions)
-				.then((response) => {
-					this.users = response.data.siteusers
-					this.isLoading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-				})
+			if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_USER) {
+				users.push(newShare)
+			} else if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) {
+				groups.push(newShare)
+			}
+
+			console.debug('Adding new share', share, users, groups)
+			this.$emit('update:shares', { users, groups })
 		},
 
 		sortByDisplayname(a, b) {
 			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
 			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
 			return 0
+		},
+
+		async asyncFind(query, id) {
+			// save current query to check if we display
+			// recommendations or search results
+			this.query = query.trim()
+			if (this.isValidQuery) {
+				// start loading now to have proper ux feedback
+				// during the debounce
+				this.loading = true
+				await this.debounceGetSuggestions(query)
+			}
+		},
+
+		/**
+		 * Get suggestions
+		 *
+		 * @param {string} search the search query
+		 */
+		async getSuggestions(search) {
+			this.loading = true
+
+			const shareType = [
+				this.SHARE_TYPES.SHARE_TYPE_USER,
+				this.SHARE_TYPES.SHARE_TYPE_GROUP,
+			]
+
+			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1') + 'sharees', {
+				params: {
+					format: 'json',
+					itemType: 'file',
+					search,
+					perPage: this.maxAutocompleteResults,
+					shareType,
+				},
+			})
+
+			if (request.data.ocs.meta.statuscode !== 100) {
+				console.error('Error fetching suggestions', request)
+				return
+			}
+
+			const data = request.data.ocs.data
+			const exact = request.data.ocs.data.exact
+			data.exact = [] // removing exact from general results
+
+			// flatten array of arrays
+			const rawExactSuggestions = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
+			const rawSuggestions = Object.values(data).reduce((arr, elem) => arr.concat(elem), [])
+
+			// remove invalid data and format to user-select layout
+			const exactSuggestions = this.filterOutExistingShares(rawExactSuggestions)
+				.map(share => this.formatForMultiselect(share))
+				// sort by type so we can get user&groups first...
+				.sort((a, b) => a.shareType - b.shareType)
+			const suggestions = this.filterOutExistingShares(rawSuggestions)
+				.map(share => this.formatForMultiselect(share))
+				// sort by type so we can get user&groups first...
+				.sort((a, b) => a.shareType - b.shareType)
+
+			this.suggestions = exactSuggestions.concat(suggestions)
+
+			this.loading = false
+			console.info('suggestions', this.suggestions)
+		},
+
+		/**
+		 * Debounce getSuggestions
+		 *
+		 * @param {...*} args the arguments
+		 */
+		debounceGetSuggestions: debounce(function(...args) {
+			this.getSuggestions(...args)
+		}, 300),
+
+		/**
+		 * Get the sharing recommendations
+		 */
+		async getRecommendations() {
+			this.loading = true
+
+			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1') + 'sharees_recommended', {
+				params: {
+					format: 'json',
+					itemType: 'file',
+				},
+			})
+
+			if (request.data.ocs.meta.statuscode !== 100) {
+				console.error('Error fetching recommendations', request)
+				return
+			}
+
+			const exact = request.data.ocs.data.exact
+
+			// flatten array of arrays
+			const rawRecommendations = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
+
+			// remove invalid data and format to user-select layout
+			this.recommendations = this.filterOutExistingShares(rawRecommendations)
+				.map(share => this.formatForMultiselect(share))
+
+			this.loading = false
+			console.info('recommendations', this.recommendations)
+		},
+
+		/**
+		 * Filter out existing shares from
+		 * the provided shares search results
+		 *
+		 * @param {Object[]} shares the array of shares object
+		 * @returns {Object[]}
+		 */
+		filterOutExistingShares(shares) {
+			return shares.reduce((arr, share) => {
+				// only check proper objects
+				if (typeof share !== 'object') {
+					return arr
+				}
+
+				try {
+					// filter out current user
+					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
+						&& share.value.shareWith === getCurrentUser().uid) {
+						return arr
+					}
+
+					// Filter out existing shares
+					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER) {
+						if (this.userShares.find(user => user.id === share.value.shareWith)) {
+							return arr
+						}
+					} else if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) {
+						if (this.groupShares.find(group => group.id === share.value.shareWith)) {
+							return arr
+						}
+					}
+
+					// ALL GOOD
+					// let's add the suggestion
+					arr.push(share)
+				} catch {
+					return arr
+				}
+				return arr
+			}, [])
+		},
+
+		/**
+		 * Format shares for the multiselect options
+		 * @param {Object} result select entry item
+		 * @returns {Object}
+		 */
+		formatForMultiselect(result) {
+			return {
+				shareWith: result.value.shareWith,
+				shareType: result.value.shareType,
+				user: result.uuid || result.value.shareWith,
+				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
+				displayName: result.name || result.label,
+				icon: this.shareTypeToIcon(result.value.shareType),
+			}
+		},
+
+		/**
+		 * Get the icon based on the share type
+		 * @param {number} type the share type
+		 * @returns {string} the icon class
+		 */
+		shareTypeToIcon(type) {
+			switch (type) {
+			case this.SHARE_TYPES.SHARE_TYPE_GUEST:
+				// default is a user, other icons are here to differenciate
+				// themselves from it, so let's not display the user icon
+				// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
+				// case this.SHARE_TYPES.SHARE_TYPE_USER:
+				return 'icon-user'
+			case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
+			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+				return 'icon-group'
+			case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
+				return 'icon-mail'
+			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+				return 'icon-circle'
+			case this.SHARE_TYPES.SHARE_TYPE_ROOM:
+				return 'icon-room'
+
+			default:
+				return ''
+			}
 		},
 
 	},
