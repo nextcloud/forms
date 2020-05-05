@@ -611,7 +611,17 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
-		// Does the user have permissions to display
+		// Does the user have access to the form
+		if (!$this->formsService->hasUserAccess($form->getId())) {
+			return new Http\JSONResponse(['message' => 'Not allowed to access this form'], Http::STATUS_FORBIDDEN);
+		}
+
+		// Not allowed if form expired
+		if ($form->getExpires() > time()) {
+			return new Http\JSONResponse(['message' => 'This form is no longer taking answers'], Http::STATUS_FORBIDDEN);
+		}
+
+		// Does the user have permissions to submit
 		if (!$this->formsService->canSubmit($form->getId())) {
 			return new Http\JSONResponse(['message' => 'Already submitted'], Http::STATUS_FORBIDDEN);
 		}
