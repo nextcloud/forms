@@ -39,8 +39,18 @@
 
 		<header v-if="!noSubmissions">
 			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
-			<div v-for="sum in stats" :key="sum">
-				{{ sum }}
+			<div>
+				<button id="exportButton" @click="download">
+					<span class="icon-download" role="img" />
+					{{ t('forms', 'Export to CSV') }}
+				</button>
+				<Actions class="results-menu"
+					:aria-label="t('forms', 'Options')"
+					:force-menu="true">
+					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
+						{{ t('forms', 'Delete all responses') }}
+					</ActionButton>
+				</Actions>
 			</div>
 		</header>
 
@@ -56,35 +66,28 @@
 		</section>
 
 		<section v-else>
-			<button id="exportButton" class="primary" @click="download">
-				<span class="icon-download-white" role="img" />
-				{{ t('forms', 'Export to CSV') }}
-			</button>
-			<transition-group
-				name="list"
-				tag="div"
-				class="table">
-				<ResultItem
-					key="0"
-					:header="true" />
-				<ResultItem
-					v-for="answer in answers"
-					:key="answer.id"
-					:answer="answer" />
-			</transition-group>
+			<Submission
+				v-for="submission in submissions"
+				:key="submission.id"
+				:submission="submission"
+				:questions="questions"
+				@delete="deleteSubmission(submission.id)" />
 		</section>
 	</AppContent>
 </template>
 
 <script>
 import { generateUrl } from '@nextcloud/router'
+import { Parser } from 'json2csv'
 import { showError } from '@nextcloud/dialogs'
+import Actions from '@nextcloud/vue/dist/Components/Actions'
+import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
-import json2csvParser from 'json2csv'
+import moment from '@nextcloud/moment'
 
 import EmptyContent from '../components/EmptyContent'
-import ResultItem from '../components/resultItem'
+import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 
@@ -92,9 +95,11 @@ export default {
 	name: 'Results',
 
 	components: {
+		Actions,
+		ActionButton,
 		AppContent,
 		EmptyContent,
-		ResultItem,
+		Submission,
 		TopBar,
 	},
 
@@ -103,45 +108,14 @@ export default {
 	data() {
 		return {
 			loadingResults: true,
-			answers: [],
+			submissions: [],
+			questions: [],
 		}
 	},
 
 	computed: {
-		stats() {
-			const sums = []
-
-			if (this.answers != null) {
-				const uniqueAns = []
-				const uniqueQs = []
-				const ansToQ = new Map()
-				for (let i = 0; i < this.answers.length; i++) {
-					if (this.answers[i].questionType === 'radiogroup' || this.answers[i].questionType === 'dropdown') {
-						if (uniqueAns.includes(this.answers[i].text) === false) {
-							uniqueAns.push(this.answers[i].text)
-							ansToQ.set(this.answers[i].text, this.answers[i].questionId)
-						}
-						if (uniqueQs.includes(this.answers[i].questionId) === false) {
-							uniqueQs.push(this.answers[i].questionId)
-						}
-					}
-				}
-				for (let i = 0; i < uniqueAns.length; i++) {
-					sums[i] = 0
-				}
-				for (let i = 0; i < this.answers.length; i++) {
-					sums[uniqueAns.indexOf(this.answers[i].text)]++
-				}
-				for (let i = 0; i < sums.length; i++) {
-					sums[i] = 'Question ' + ansToQ.get(uniqueAns[i]) + ':  ' + (sums[i] / ((this.answers.length / uniqueQs.length)) * 100).toFixed(2) + '%' + ' of respondents voted for answer choice: ' + uniqueAns[i]
-				}
-			}
-
-			return sums.sort()
-		},
-
 		noSubmissions() {
-			return this.answers && this.answers.length === 0
+			return this.submissions && this.submissions.length === 0
 		},
 	},
 
@@ -150,7 +124,6 @@ export default {
 	},
 
 	methods: {
-
 		showEdit() {
 			this.$router.push({
 				name: 'edit',
@@ -168,8 +141,9 @@ export default {
 				const response = await axios.get(generateUrl('/apps/forms/api/v1/submissions/{hash}', {
 					hash: this.form.hash,
 				}))
-				this.answers = response.data
-				console.debug(this.answers)
+				this.submissions = response.data.submissions
+				this.questions = response.data.questions
+				console.debug(this.submissions)
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while loading results'))
@@ -178,50 +152,91 @@ export default {
 			}
 		},
 
-		download() {
-			this.loading = true
-			axios.get(generateUrl('apps/forms/get/form/' + this.$route.params.hash))
-				.then((response) => {
-					this.json2csvParser = ['userId', 'questionId', 'questionText', 'Answer'] // TODO Is this one necessary??
-					const formattedAns = []
-					this.answers.forEach(ans => {
-						formattedAns.push({
-							userId: ans['userId'],
-							questionId: ans['questionId'],
-							questionText: ans['questionText'],
-							answer: ans['text'],
-						})
-					})
-					const element = document.createElement('a')
-					element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(json2csvParser.parse(formattedAns)))
-					element.setAttribute('download', response.data.title + '.csv')
+		async deleteSubmission(id) {
+			this.loadingResults = true
 
-					element.style.display = 'none'
-					document.body.appendChild(element)
-					element.click()
-					document.body.removeChild(element)
-					this.loading = false
-				}, (error) => {
-					/* eslint-disable-next-line no-console */
-					console.log(error.response)
-					this.loading = false
+			try {
+				await axios.delete(generateUrl('/apps/forms/api/v1/submission/{id}', { id }))
+				const index = this.submissions.findIndex(search => search.id === id)
+				this.submissions.splice(index, 1)
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while removing the submission'))
+			} finally {
+				this.loadingResults = false
+			}
+		},
+
+		async deleteAllSubmissions() {
+			if (!confirm(t('forms', 'Are you sure you want to delete all submissions from this form?'))) {
+				return
+			}
+
+			this.loadingResults = true
+			try {
+				await axios.delete(generateUrl('/apps/forms/api/v1/submissions/{formId}', { formId: this.form.id }))
+				this.submissions = []
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while removing the submissions'))
+			} finally {
+				this.loadingResults = false
+			}
+		},
+
+		download() {
+			this.loadingResults = true
+
+			const parser = new Parser({
+				delimiter: ',',
+			})
+
+			const formattedSubmissions = []
+			this.submissions.forEach(submission => {
+				const formattedSubmission = {
+					userDisplayName: submission.userDisplayName,
+					timestamp: moment(submission.timestamp, 'X').format('L LT'),
+				}
+
+				submission.answers.forEach(answer => {
+					const questionText = this.questions.find(question => question.id === answer.questionId).text
+					if (questionText in formattedSubmission) {
+						formattedSubmission[questionText] = formattedSubmission[questionText].concat('; ').concat(answer.text)
+					} else {
+						formattedSubmission[questionText] = answer.text
+					}
 				})
+				formattedSubmissions.push(formattedSubmission)
+			})
+
+			const element = document.createElement('a')
+			element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(parser.parse(formattedSubmissions)))
+			element.setAttribute('download', this.form.title + '.csv')
+			element.style.display = 'none'
+			document.body.appendChild(element)
+			element.click()
+			document.body.removeChild(element)
+
+			this.loadingResults = false
 		},
 	},
 }
 </script>
 
 <style lang="scss" scoped>
-.table {
-	width: 100%;
-	margin-top: 45px;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-wrap: nowrap;
+h2 {
+	font-size: 2em;
+	font-weight: bold;
+	margin-top: 32px;
+	padding-left: 14px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #exportButton {
 	width: max-content;
+	padding: 13px 16px;
+	margin-left: 16px;
 }
 </style>

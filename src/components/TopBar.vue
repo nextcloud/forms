@@ -51,7 +51,15 @@ $top-bar-height: 60px;
 
 	button {
 		cursor: pointer;
-		&:not(:first-child) {
+		min-height: 44px;
+
+		// Fix button having too little spacing left and right of text
+		&:not(.button-small) {
+			padding-left: 16px;
+			padding-right: 16px;
+		}
+
+		&.button-small {
 			width: 44px;
 			height: 44px;
 			border: none;

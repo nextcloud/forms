@@ -42,8 +42,11 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
 use OCP\ILogger;
+use OCP\IL10N;
 use OCP\IRequest;
+use OCP\IUser;
 use OCP\IUserSession;
+use OCP\IUserManager;
 use OCP\Security\ISecureRandom;
 
 class ApiController extends Controller {
@@ -67,9 +70,15 @@ class ApiController extends Controller {
 	/** @var ILogger */
 	private $logger;
 
+	/** @var IL10N */
+	private $l10n;
+
 	/** @var IUserSession */
 	private $userSession;
-	
+
+	/** @var IUserManager */
+	private $userManager;
+
 	/** @var FormsService */
 	private $formsService;
 
@@ -77,17 +86,20 @@ class ApiController extends Controller {
 								IRequest $request,
 								$userId, // TODO remove & replace with userSession below.
 								IUserSession $userSession,
+								IUserManager $userManager,
 								FormMapper $formMapper,
 								SubmissionMapper $submissionMapper,
 								AnswerMapper $answerMapper,
 								QuestionMapper $questionMapper,
 								OptionMapper $optionMapper,
 								ILogger $logger,
+								IL10N $l10n,
 								FormsService $formsService) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->userId = $userId;
 		$this->userSession = $userSession;
+		$this->userManager = $userManager;
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
@@ -96,6 +108,7 @@ class ApiController extends Controller {
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
 		$this->logger = $logger;
+		$this->l10n = $l10n;
 		$this->formsService = $formsService;
 	}
 
@@ -556,6 +569,25 @@ class ApiController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
+	private function getAnswers(int $submissionId): array {
+		try {
+			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
+		} catch (DoesNotExistException $e) {
+			//Just ignore, if no Data. Returns empty Answers-Array
+		}
+
+		// Load Answer-Data
+		$answers = [];
+		foreach ($answerEntities as $answerEntity) {
+			$answers[] = $answerEntity->read();
+		}
+
+		return $answers;
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
 	public function getSubmissions(string $hash): Http\JSONResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
@@ -569,24 +601,54 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
 
-		$result = [];
-		$submissionList = $this->submissionMapper->findByForm($form->getId());
-		foreach ($submissionList as $submissionEntity) {
-			$answerList = $this->answerMapper->findBySubmission($submissionEntity->id);
-			foreach ($answerList as $answerEntity) {
-				$answer = $answerEntity->read();
-				//Temporary Adapt Data to be usable by old Results-View
-				$answer['userId'] = $submissionEntity->getUserId();
-
-				$question = $this->questionMapper->findById($answer['questionId']);
-				$answer['questionText'] = $question->getText();
-				$answer['questionType'] = $question->getType();
-
-				$result[] = $answer;
-			}
+		try {
+			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
+		} catch (DoesNotExistException $e) {
+			//Just ignore, if no Data. Returns empty Submissions-Array
 		}
 
-		return new Http\JSONResponse($result);
+		$submissions = [];
+		foreach ($submissionEntities as $submissionEntity) {
+			// Load Submission-Data & corresponding Answers
+			$submission = $submissionEntity->read();
+			$submission['answers'] = $this->getAnswers($submission['id']);
+
+			// Append Display Name
+			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
+				// Anonymous User
+				$submission['userDisplayName'] = $this->l10n->t('anonymous user');
+			} else {
+				$userEntity = $this->userManager->get($submission['userId']);
+
+				if ($userEntity instanceof IUser) {
+					$submission['userDisplayName'] = $userEntity->getDisplayName();
+				} else {
+					// Fallback, should not occur regularly.
+					$submission['userDisplayName'] = $submission['userId'];
+				}
+			}
+
+			// Add to returned List of Submissions
+			$submissions[] = $submission;
+		}
+
+		// Load question-texts, including deleted ones.
+		try {
+			$questionEntities = $this->questionMapper->findByForm($form->getId());
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		}
+		$questions = [];
+		foreach ($questionEntities as $questionEntity) {
+			$questions[] = $questionEntity->read();
+		}
+
+		$response = [
+			'submissions' => $submissions,
+			'questions' => $questions,
+		];
+
+		return new Http\JSONResponse($response);
 	}
 
 	/**
@@ -679,5 +741,58 @@ class ApiController extends Controller {
 		}
 
 		return new Http\JSONResponse([]);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function deleteSubmission(int $id): Http\JSONResponse {
+		$this->logger->debug('Delete Submission: {id}', [
+			'id' => $id,
+		]);
+
+		try {
+			$submission = $this->submissionMapper->findById($id);
+			$form = $this->formMapper->findById($submission->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or submission');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Delete submission (incl. Answers)
+		$this->submissionMapper->delete($submission);
+
+		return new Http\JSONResponse($id);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function deleteAllSubmissions(int $formId): Http\JSONResponse {
+		$this->logger->debug('Delete all submissions to form: {formId}', [
+			'formId' => $formId,
+		]);
+
+		try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+		}
+
+		if ($form->getOwnerId() !== $this->userId) {
+			$this->logger->debug('This form is not owned by the current user');
+			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+		}
+
+		// Delete all submissions (incl. Answers)
+		$this->submissionMapper->deleteByForm($formId);
+
+		return new Http\JSONResponse($id);
 	}
 }

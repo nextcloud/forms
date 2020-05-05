@@ -54,8 +54,12 @@ return [
 		['name' => 'api#updateOption', 'url' => '/api/v1/option/update', 'verb' => 'POST'],
 		['name' => 'api#deleteOption', 'url' => '/api/v1/option/{id}', 'verb' => 'DELETE'],
 
+		// Submissions
 		['name' => 'api#getSubmissions', 'url' => '/api/v1/submissions/{hash}', 'verb' => 'GET'],
-		['name' => 'api#insertSubmission', 'url' => '/api/v1/submissions/insert', 'verb' => 'POST'],
+		['name' => 'api#deleteAllSubmissions', 'url' => '/api/v1/submissions/{formId}', 'verb' => 'DELETE'],
+
+		['name' => 'api#insertSubmission', 'url' => '/api/v1/submission/insert', 'verb' => 'POST'],
+		['name' => 'api#deleteSubmission', 'url' => '/api/v1/submission/{id}', 'verb' => 'DELETE'],
 
 		['name' => 'system#get_site_users_and_groups', 'url' => '/get/siteusers', 'verb' => 'POST'],
 	]
