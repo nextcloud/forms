@@ -48,7 +48,7 @@ export default {
 
 <style lang="scss" scoped>
 .answer {
-	margin-bottom: 4px;
+	margin-top: 12px;
 	width: 100%;
 
 	.question-text {

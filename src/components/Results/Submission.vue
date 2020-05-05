@@ -123,7 +123,7 @@ export default {
 
 	&-date {
 		color: var(--color-text-lighter);
-		margin-bottom: 12px;
+		margin-top: -8px;
 	}
 }
 </style>
