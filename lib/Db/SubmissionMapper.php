@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @author affan98 <affan98@gmail.com>
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *

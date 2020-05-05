@@ -5,7 +5,6 @@
  * @author affan98 <affan98@gmail.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
- * @author Marcel Klehr <mklehr@gmx.net>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -185,7 +184,12 @@ class PageController extends Controller {
 		}
 
 		// Does the user have permissions to display
-		if (!$this->hasUserAccess($form)) {
+		if (!$this->formsService->canSubmit($form->getId())) {
+			return new TemplateResponse('forms', 'nosubmit');
+		}
+
+		// Does the user have permissions to display
+		if (!$this->formsService->hasUserAccess($form->getId())) {
 			return new TemplateResponse('forms', 'notfound');
 		}
 
@@ -197,66 +201,8 @@ class PageController extends Controller {
 		$renderAs = $this->userSession->isLoggedIn() ? 'user' : 'public';
 
 		Util::addScript($this->appName, 'submit');
-		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getForm($form->getId()));
+		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main', [], $renderAs);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * Check if user has access to this form
-	 *
-	 * @param Form $form
-	 * @return boolean
-	 */
-	private function hasUserAccess(Form $form): bool {
-		$access = $form->getAccess();
-		$ownerId = $form->getOwnerId();
-		$user = $this->userSession->getUser();
-
-		if ($access['type'] === 'public') {
-			return true;
-		}
-		
-		// Refuse access, if not public and no user logged in.
-		if (!$user) {
-			return false;
-		}
-
-		// Always grant access to owner.
-		if ($ownerId === $user->getUID()) {
-			return true;
-		}
-
-		// Refuse access, if SubmitOnce is set and user already has taken part.
-		if ($form->getSubmitOnce()) {
-			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
-			foreach ($participants as $participant) {
-				if ($participant === $user->getUID()) {
-					return false;
-				}
-			}
-		}
-
-		// Now all remaining users are allowed, if access-type 'registered'.
-		if ($access['type'] === 'registered') {
-			return true;
-		}
-
-		// Selected Access remains.
-		// Grant Access, if user is in users-Array.
-		if (in_array($user->getUID(), $access['users'])) {
-			return true;
-		}
-
-		// Check if access granted by group.
-		foreach ($access['groups'] as $group) {
-			if ($this->groupManager->isInGroup($user->getUID(), $group)) {
-				return true;
-			}
-		}
-
-		// None of the possible access-options matched.
-		return false;
 	}
 }

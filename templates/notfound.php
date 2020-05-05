@@ -1,8 +1,9 @@
 <?php
 /**
- * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
+ * @copyright Copyright (c) 2020 John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  *
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
+ * @author rakekniven <mark.ziegler@rakekniven.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,6 +23,7 @@
  */
 
 ?>
+
 <div id="emptycontent" class="">
 	<div class="icon-forms"></div>
 	<h2><?php p($l->t('Form not found')); ?></h2>

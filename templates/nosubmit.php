@@ -3,7 +3,6 @@
  * @copyright Copyright (c) 2020 John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  *
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
- * @author rakekniven <mark.ziegler@rakekniven.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,7 +24,6 @@
 ?>
 
 <div id="emptycontent" class="">
-	<div class="icon-forms"></div>
-	<h2><?php p($l->t('Form expired')); ?></h2>
-	<p><?php p($l->t('This form has expired and is no longer taking answers')); ?></p>
+	<div class="icon-checkmark"></div>
+	<h2><?php p($l->t('Thank you for completing the form!')); ?></h2>
 </div>
