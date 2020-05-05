@@ -28,17 +28,19 @@ namespace OCA\Forms\Controller;
 
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\OptionMapper;
-use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Service\FormsService;
 
+use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Http\Template\PublicTemplateResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IGroupManager;
 use OCP\IInitialStateService;
+use OCP\IL10N;
 use OCP\IRequest;
-use OCP\IURLGenerator;
+use OCP\IUser;
+use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Util;
 
@@ -47,22 +49,28 @@ class PageController extends Controller {
 
 	/** @var FormMapper */
 	private $formMapper;
+	
+	/** @var FormsService */
+	private $formsService;
 
-	/** @var IURLGenerator */
-	private $urlGenerator;
+	/** @var IAccountManager */
+	protected $accountManager;
 	
 	/** @var IGroupManager */
 	private $groupManager;
 	
+	/** @var IInitialStateService */
+	private $initialStateService;
+
+	/** @var IL10N */
+	private $l10n;
+	
+	/** @var IUserManager */
+	private $userManager;
+	
 	/** @var IUserSession */
 	private $userSession;
 	
-	/** @var IInitialStateService */
-	private $initialStateService;
-	
-	/** @var FormsService */
-	private $formService;
-
 	/** @var Array
 	 *
 	 * Maximum String lengths, the database is set to store.
@@ -77,25 +85,27 @@ class PageController extends Controller {
 
 	public function __construct(string $appName,
 								IRequest $request,
-								IGroupManager $groupManager,
-								IURLGenerator $urlGenerator,
 								FormMapper $formMapper,
-								QuestionMapper $questionMapper,
-								OptionMapper $optionMapper,
-								IUserSession $userSession,
+								FormsService $formsService,
+								IAccountManager $accountManager,
+								IGroupManager $groupManager,
 								IInitialStateService $initialStateService,
-								FormsService $formsService) {
+								IL10N $l10n,
+								IUserManager $userManager,
+								IUserSession $userSession) {
 		parent::__construct($appName, $request);
 
-		$this->groupManager = $groupManager;
-		$this->urlGenerator = $urlGenerator;
 		$this->appName = $appName;
+
 		$this->formMapper = $formMapper;
-		$this->questionMapper = $questionMapper;
-		$this->optionMapper = $optionMapper;
-		$this->userSession = $userSession;
-		$this->initialStateService = $initialStateService;
 		$this->formsService = $formsService;
+
+		$this->accountManager = $accountManager;
+		$this->groupManager = $groupManager;
+		$this->initialStateService = $initialStateService;
+		$this->l10n = $l10n;
+		$this->userManager = $userManager;
+		$this->userSession = $userSession;
 	}
 
 	/**
@@ -198,11 +208,29 @@ class PageController extends Controller {
 			return new TemplateResponse('forms', 'expired');
 		}
 
-		$renderAs = $this->userSession->isLoggedIn() ? 'user' : 'public';
-
 		Util::addScript($this->appName, 'submit');
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, 'main', [], $renderAs);
+
+		if (!$this->userSession->isLoggedIn()) {
+			Util::addStyle($this->appName, 'public');
+			$response = new PublicTemplateResponse($this->appName, 'main');
+			$response->setHeaderTitle($form->getTitle());
+
+			// Get owner and check display name privacy settings
+			$owner = $this->userManager->get($form->getOwnerId());
+			if ($owner instanceof IUser) {
+				$ownerAccount = $this->accountManager->getAccount($owner);
+
+				$ownerName = $ownerAccount->getProperty(IAccountManager::PROPERTY_DISPLAYNAME);
+				if ($ownerName->getScope() === IAccountManager::VISIBILITY_PUBLIC) {
+					$response->setHeaderDetails($this->l10n->t('Shared by %s', [$ownerName->getValue()]));
+				}
+			}
+
+			return $response;
+		}
+
+		return new TemplateResponse($this->appName, 'main');
 	}
 }
