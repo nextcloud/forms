@@ -8,6 +8,7 @@ OC.L10N.register(
     "Delete form" : "刪除表單",
     "Group" : "群組",
     "Description" : "描述",
+    "Options" : "設定",
     "Settings" : "設定",
     "Set expiration date" : "設定到期日",
     "Expiration date" : "到期日",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "Неможе да се копира, копирајте го линкот рачно",
     "Group" : "Група",
     "Description" : "Опис",
+    "Options" : "Опции",
     "Settings" : "Параметри",
     "Set expiration date" : "Постави рок на траење",
     "Expiration date" : "Рок на траење",

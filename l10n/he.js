@@ -4,6 +4,7 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "לא ניתן להעתיק, נא להעתיק את הקישור ידנית",
     "Group" : "קבוצה",
     "Description" : "תיאור",
+    "Options" : "אפשרויות",
     "Settings" : "הגדרות",
     "Set expiration date" : "הגדרת תאריך תפוגה",
     "Expiration date" : "תאריך תפוגה",

@@ -17,6 +17,7 @@ OC.L10N.register(
     "Error while deleting form “{title}”" : "Грешка приликом брисања упитника „{title}“",
     "Group" : "Група",
     "Description" : "Опис",
+    "Options" : "Опције",
     "Settings" : "Поставке",
     "Set expiration date" : "Постави датум истека",
     "Expiration date" : "Датум истека",

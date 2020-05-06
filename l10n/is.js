@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Group" : "Hópur",
     "Description" : "Lýsing",
+    "Options" : "Valkostir",
     "Settings" : "Stillingar",
     "Set expiration date" : "Setja gildistíma",
     "Expiration date" : "Gildir til",

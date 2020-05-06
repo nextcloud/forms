@@ -9,6 +9,7 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "کپی کردن امکان پذیر نیست ، لطفا پیوند را به صورت دستی کپی کنید",
     "Group" : "گروه",
     "Description" : "توضیحات",
+    "Options" : "گزینه ها",
     "Settings" : "تنظیمات",
     "Set expiration date" : "تنظیم تاریخ انقضا",
     "Expiration date" : "تاریخ انقضا",

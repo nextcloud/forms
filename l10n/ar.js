@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Group" : "الفريق",
     "Description" : "الوصف",
+    "Options" : "الخيارات",
     "Settings" : "الإعدادات",
     "Set expiration date" : "تعيين تاريخ إنتهاء الصلاحية",
     "Expiration date" : "تاريخ إنتهاء الصلاحية",

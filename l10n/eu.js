@@ -17,6 +17,7 @@ OC.L10N.register(
     "Error while deleting form “{title}”" : "Errore bat gertatu da «{title}» inprimakia ezabatzerakoan",
     "Group" : "Taldea",
     "Description" : "Deskribapena",
+    "Options" : "Aukerak",
     "Settings" : "Ezarpenak",
     "Set expiration date" : "Ezarri iraungitze-data",
     "Expiration date" : "Iraungitze-data",
