@@ -35,7 +35,7 @@
 			:searchable="true"
 			:user-select="true"
 			label="displayName"
-			track-by="id"
+			track-by="shareWith"
 			@search-change="asyncFind"
 			@select="addShare">
 			<template #noOptions>
@@ -48,7 +48,7 @@
 
 		<TransitionGroup :css="false" tag="ul" class="shared-list">
 			<!-- TODO: Iterate two times, will be cleaner, one for users, one for groups -->
-			<li v-for="(item, index) in sortedShares" :key="item.id + '-' + item.shareType" :data-index="index">
+			<li v-for="(item, index) in sortedShares" :key="item.shareWith + '-' + item.shareType" :data-index="index">
 				<UserDiv v-bind="item" />
 				<div class="options">
 					<a class="icon icon-delete svg delete-form" @click="removeShare(item)" />
@@ -120,13 +120,17 @@ export default {
 		/**
 		 * Multiseelct options. Recommendations by default,
 		 * direct search when search query is valid.
+		 * Filter out existing shares
 		 * @returns {Array}
 		 */
 		options() {
+			const shares = [...this.userShares, ...this.groupShares]
 			if (this.isValidQuery) {
-				return this.suggestions
+				// Filter out existing shares
+				return this.suggestions.filter(item => !shares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
 			}
-			return this.recommendations
+			// Filter out existing shares
+			return this.recommendations.filter(item => !shares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
 		},
 
 		noResultText() {
@@ -144,8 +148,8 @@ export default {
 	methods: {
 		removeShare(item) {
 			// Filter out the removed item
-			const users = this.userShares.filter(user => !(user.id === item.id && !item.isGroup))
-			const groups = this.groupShares.filter(group => !(group.id === item.id && item.isGroup))
+			const users = this.userShares.filter(user => !(user.shareWith === item.shareWith && item.shareType === this.SHARE_TYPES.SHARE_TYPE_USER))
+			const groups = this.groupShares.filter(group => !(group.shareWith === item.shareWith && item.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP))
 			this.$emit('update:shares', { users, groups })
 		},
 
@@ -157,10 +161,12 @@ export default {
 			const users = this.userShares.slice()
 			const groups = this.groupShares.slice()
 			const newShare = {
-				id: share.shareWith,
+				shareWith: share.shareWith,
 				displayName: share.displayName,
 				shareType: share.shareType,
 			}
+
+			// TODO: detect if already present
 
 			if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_USER) {
 				users.push(newShare)
@@ -178,7 +184,7 @@ export default {
 			return 0
 		},
 
-		async asyncFind(query, id) {
+		async asyncFind(query) {
 			// save current query to check if we display
 			// recommendations or search results
 			this.query = query.trim()
@@ -227,11 +233,11 @@ export default {
 			const rawSuggestions = Object.values(data).reduce((arr, elem) => arr.concat(elem), [])
 
 			// remove invalid data and format to user-select layout
-			const exactSuggestions = this.filterOutExistingShares(rawExactSuggestions)
+			const exactSuggestions = this.filterOutUnwantedShares(rawExactSuggestions)
 				.map(share => this.formatForMultiselect(share))
 				// sort by type so we can get user&groups first...
 				.sort((a, b) => a.shareType - b.shareType)
-			const suggestions = this.filterOutExistingShares(rawSuggestions)
+			const suggestions = this.filterOutUnwantedShares(rawSuggestions)
 				.map(share => this.formatForMultiselect(share))
 				// sort by type so we can get user&groups first...
 				.sort((a, b) => a.shareType - b.shareType)
@@ -275,7 +281,7 @@ export default {
 			const rawRecommendations = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])
 
 			// remove invalid data and format to user-select layout
-			this.recommendations = this.filterOutExistingShares(rawRecommendations)
+			this.recommendations = this.filterOutUnwantedShares(rawRecommendations)
 				.map(share => this.formatForMultiselect(share))
 
 			this.loading = false
@@ -283,13 +289,12 @@ export default {
 		},
 
 		/**
-		 * Filter out existing shares from
-		 * the provided shares search results
+		 * Filter out unwated shares
 		 *
 		 * @param {Object[]} shares the array of shares object
 		 * @returns {Object[]}
 		 */
-		filterOutExistingShares(shares) {
+		filterOutUnwantedShares(shares) {
 			return shares.reduce((arr, share) => {
 				// only check proper objects
 				if (typeof share !== 'object') {
@@ -301,17 +306,6 @@ export default {
 					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
 						&& share.value.shareWith === getCurrentUser().uid) {
 						return arr
-					}
-
-					// Filter out existing shares
-					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER) {
-						if (this.userShares.find(user => user.id === share.value.shareWith)) {
-							return arr
-						}
-					} else if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) {
-						if (this.groupShares.find(group => group.id === share.value.shareWith)) {
-							return arr
-						}
 					}
 
 					// ALL GOOD
@@ -337,6 +331,8 @@ export default {
 				isNoUser: result.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
 				displayName: result.name || result.label,
 				icon: this.shareTypeToIcon(result.value.shareType),
+				// Vue unique binding to render within Multiselect's AvatarSelectOption
+				key: result.uuid || result.value.shareWith + '-' + result.value.shareType + '-' + result.name || result.label,
 			}
 		},
 

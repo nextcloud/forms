@@ -128,7 +128,7 @@ import moment from '@nextcloud/moment'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 
-import ShareDiv from '../components/shareDiv'
+import ShareDiv from '../components/ShareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {

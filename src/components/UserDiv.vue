@@ -22,7 +22,7 @@
 
 <template>
 	<div class="user-row">
-		<Avatar :user="id" :display-name="computedDisplayName" :is-no-user="isNoUser" />
+		<Avatar :user="shareWith" :display-name="computedDisplayName" :is-no-user="isNoUser" />
 	</div>
 </template>
 
@@ -37,7 +37,7 @@ export default {
 	mixins: [ShareTypes],
 
 	props: {
-		id: {
+		shareWith: {
 			type: String,
 			required: true,
 		},

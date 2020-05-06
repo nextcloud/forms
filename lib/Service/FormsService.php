@@ -234,7 +234,7 @@ class FormsService {
 		$user  = $this->userManager->get($userId);
 		if ($user instanceof IUser) {
 			return [
-				'id' => $userId,
+				'shareWith' => $userId,
 				'displayName' => $user->getDisplayName(),
 				'shareType' => IShare::TYPE_USER
 			];
@@ -252,7 +252,7 @@ class FormsService {
 		$group  = $this->groupManager->get($groupId);
 		if ($group instanceof IGroup) {
 			return [
-				'id' => $groupId,
+				'shareWith' => $groupId,
 				'displayName' => $group->getDisplayName(),
 				'shareType' => IShare::TYPE_GROUP
 			];

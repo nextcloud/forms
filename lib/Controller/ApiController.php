@@ -216,10 +216,10 @@ class ApiController extends Controller {
 		try {
 			if ($keyValuePairs['access']) {
 				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
-					return $user['id'];
+					return $user['shareWith'];
 				}, $keyValuePairs['access']['users']);
 				$keyValuePairs['access']['groups'] = array_map(function (array $group): string {
-					return $group['id'];
+					return $group['shareWith'];
 				}, $keyValuePairs['access']['groups']);
 			}
 		} catch (Exception $e) {
