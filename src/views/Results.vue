@@ -161,14 +161,14 @@ export default {
 				this.submissions.splice(index, 1)
 			} catch (error) {
 				console.error(error)
-				showError(t('forms', 'There was an error while removing the submission'))
+				showError(t('forms', 'There was an error while removing this response'))
 			} finally {
 				this.loadingResults = false
 			}
 		},
 
 		async deleteAllSubmissions() {
-			if (!confirm(t('forms', 'Are you sure you want to delete all submissions from this form?'))) {
+			if (!confirm(t('forms', 'Are you sure you want to delete all responses of this form?'))) {
 				return
 			}
 
@@ -178,7 +178,7 @@ export default {
 				this.submissions = []
 			} catch (error) {
 				console.error(error)
-				showError(t('forms', 'There was an error while removing the submissions'))
+				showError(t('forms', 'There was an error while removing responses'))
 			} finally {
 				this.loadingResults = false
 			}
