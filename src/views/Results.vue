@@ -61,7 +61,11 @@
 				<template #desc>
 					{{ t('forms', 'Results of submitted forms will show up here') }}
 				</template>
-				<!-- Button to copy Share-Link? -->
+				<template #action>
+					<button class="primary" @click="copyShareLink">
+						{{ t('forms', 'Copy share link') }}
+					</button>
+				</template>
 			</EmptyContent>
 		</section>
 
@@ -79,17 +83,21 @@
 <script>
 import { generateUrl } from '@nextcloud/router'
 import { Parser } from 'json2csv'
-import { showError } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
+import Clipboard from 'v-clipboard'
 import moment from '@nextcloud/moment'
+import Vue from 'vue'
 
 import EmptyContent from '../components/EmptyContent'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
+
+Vue.use(Clipboard)
 
 export default {
 	name: 'Results',
@@ -131,6 +139,15 @@ export default {
 					hash: this.form.hash,
 				},
 			})
+		},
+
+		copyShareLink() {
+			const $formLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+			if (this.$clipboard($formLink)) {
+				showSuccess(t('forms', 'Form link copied'))
+			} else {
+				showError(t('forms', 'Cannot copy, please copy the link manually'))
+			}
 		},
 
 		async loadFormResults() {

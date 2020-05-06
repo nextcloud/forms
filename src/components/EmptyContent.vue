@@ -26,9 +26,12 @@
 		<h2 class="empty-content__title">
 			<slot />
 		</h2>
-		<p v-show="$slots.desc">
+		<p v-show="$slots.desc" class="empty-content__desc">
 			<slot name="desc" />
 		</p>
+		<div v-show="$slots.action" class="empty-content__action">
+			<slot name="action" />
+		</div>
 	</div>
 </template>
 
@@ -63,7 +66,11 @@ export default {
 	}
 
 	&__title {
-		margin-bottom: 10px;
+		margin-bottom: 8px;
+	}
+
+	&__desc {
+		margin-bottom: 16px;
 	}
 }
 
