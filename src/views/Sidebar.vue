@@ -21,7 +21,7 @@
  -->
 
 <template>
-	<AppSidebar v-if="form"
+	<AppSidebar
 		v-show="opened"
 		:title="form.title"
 		@close="onClose">
@@ -44,7 +44,7 @@
 					:disabled="isPublic || form.isAnonymous"
 					type="checkbox"
 					class="checkbox"
-					@change="onSubmOnceChange">
+					@change="onSubmitOnceChange">
 				<label for="submitOnce">
 					{{ t('forms', 'Only allow one response per user') }}
 				</label>
@@ -113,11 +113,9 @@
 					</span>
 				</label>
 				<ShareDiv v-show="form.access.type === 'selected'"
-					:active-shares="form.shares"
-					:placeholder="t('forms', 'Name of user or group')"
-					:hide-names="true"
-					@update-shares="updateShares"
-					@remove-share="removeShare" />
+					:user-shares="userShares"
+					:group-shares="groupShares"
+					@update:shares="onSharingChange" />
 			</li>
 		</ul>
 	</AppSidebar>
@@ -130,7 +128,7 @@ import moment from '@nextcloud/moment'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 
-import ShareDiv from '../components/shareDiv'
+import ShareDiv from '../components/ShareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
@@ -182,9 +180,15 @@ export default {
 		expirationDate() {
 			return moment(this.form.expires, 'X').toDate()
 		},
-
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
+		},
+
+		userShares() {
+			return [...this.form?.access?.users || []]
+		},
+		groupShares() {
+			return [...this.form?.access?.groups || []]
 		},
 	},
 
@@ -224,18 +228,6 @@ export default {
 	},
 
 	methods: {
-		addShare(item) {
-			this.form.shares.push(item)
-		},
-
-		updateShares(share) {
-			this.form.shares = share.slice(0)
-		},
-
-		removeShare(item) {
-			this.form.shares.splice(this.form.shares.indexOf(item), 1)
-		},
-
 		/**
 		 * Sidebar state methods
 		 */
@@ -252,11 +244,16 @@ export default {
 		onAnonChange() {
 			this.saveFormProperty('isAnonymous')
 		},
-		onSubmOnceChange() {
+		onSubmitOnceChange() {
 			this.saveFormProperty('submitOnce')
 		},
 		onAccessChange() {
 			this.saveFormProperty('access')
+		},
+		onSharingChange({ groups, users }) {
+			this.$set(this.form.access, 'groups', groups)
+			this.$set(this.form.access, 'users', users)
+			this.onAccessChange()
 		},
 
 		/**

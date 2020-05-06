@@ -20,79 +20,47 @@
   -
   -->
 
-/* global Vue, oc_userconfig */
 <template>
-	<div :class="type" class="user-row">
-		<div v-if="description" class="description">
-			{{ description }}
-		</div>
-		<Avatar :user="userId" :display-name="computedDisplayName" :is-no-user="isNoUser" />
-		<div v-if="!hideNames" class="user-name">
-			{{ computedDisplayName }}
-		</div>
+	<div class="user-row">
+		<Avatar :user="shareWith" :display-name="computedDisplayName" :is-no-user="isNoUser" />
 	</div>
 </template>
 
 <script>
 import Avatar from '@nextcloud/vue/dist/Components/Avatar'
-import { getCurrentUser } from '@nextcloud/auth'
+import ShareTypes from '../mixins/ShareTypes'
 
 export default {
 	components: {
 		Avatar,
 	},
+	mixins: [ShareTypes],
+
 	props: {
-		hideNames: {
-			type: Boolean,
-			default: false,
-		},
-		userId: {
+		shareWith: {
 			type: String,
-			default: undefined,
+			required: true,
 		},
 		displayName: {
 			type: String,
-			default: '',
+			required: true,
 		},
-		size: {
+		shareType: {
 			type: Number,
-			default: 32,
-		},
-		type: {
-			type: String,
-			default: 'user',
-		},
-		description: {
-			type: String,
-			default: '',
+			required: true,
 		},
 
-	},
-
-	data() {
-		return {
-			nothidden: false,
-		}
 	},
 
 	computed: {
 		isNoUser() {
-			return this.type !== 'user'
+			return this.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
 		},
 		computedDisplayName() {
-			let value = this.displayName
-
-			if (this.userId === getCurrentUser().uid) {
-				value = getCurrentUser().displayName
-			} else {
-				if (!this.displayName) {
-					value = this.userId
-				}
+			if (this.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) {
+				return `${this.displayName} (${t('forms', 'Group')})`
 			}
-			if (this.type === 'group') {
-				value = value + ' (' + t('forms', 'Group') + ')'
-			}
-			return value
+			return this.displayName
 		},
 
 	},
