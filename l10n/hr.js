@@ -15,14 +15,17 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "Kopiranje nije moguće, ručno kopirajte poveznicu",
     "Are you sure you want to delete the form “{title}”?" : "Jeste li sigurni da želite izbrisati obrazac „{title}”?",
     "Error while deleting form “{title}”" : "Pogreška pri brisanju obrasca „{title}”",
+    "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",
+    "Searching …" : "Traženje…",
+    "No elements found." : "Elementi nisu pronađeni.",
     "Group" : "Grupa",
     "Description" : "Opis",
+    "Options" : "Mogućnosti",
     "Settings" : "Postavke",
     "Set expiration date" : "Postavi datum isteka",
     "Expiration date" : "Datum isteka",
     "Sharing" : "Dijeljenje",
     "Share link" : "Dijeli poveznicu",
-    "Name of user or group" : "Ime korisnika ili grupe",
     "Submit" : "Šalji"
 },
 "nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;");

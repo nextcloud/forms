@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Cannot copy, please copy the link manually" : "לא ניתן להעתיק, נא להעתיק את הקישור ידנית",
+    "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
+    "Searching …" : "מתבצע חיפוש…",
+    "No elements found." : "לא נמצאו רכיבים.",
     "Group" : "קבוצה",
     "Description" : "תיאור",
     "Options" : "אפשרויות",

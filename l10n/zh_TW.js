@@ -14,7 +14,6 @@ OC.L10N.register(
     "Expiration date" : "到期日",
     "Sharing" : "分享",
     "Share link" : "分享連結",
-    "Name of user or group" : "使用者或群組名稱",
     "Submit" : "送出"
 },
 "nplurals=1; plural=0;");

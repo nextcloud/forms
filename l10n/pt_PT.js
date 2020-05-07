@@ -10,7 +10,6 @@ OC.L10N.register(
     "Expiration date" : "Data de expiração",
     "Sharing" : "Partilha",
     "Share link" : "Share link",
-    "Name of user or group" : "Nome do utilizador ou grupo",
     "Submit" : "Submeter"
 },
 "nplurals=2; plural=(n != 1);");

@@ -14,7 +14,6 @@ OC.L10N.register(
     "Expiration date" : "Lejárati idő",
     "Sharing" : "Megosztás",
     "Share link" : "Hivatkozás megosztása",
-    "Name of user or group" : "Felhasználó vagy csoport neve",
     "Submit" : "Beküldés"
 },
 "nplurals=2; plural=(n != 1);");

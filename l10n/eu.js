@@ -15,6 +15,9 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "Ezin izan da kopiatu. Kopiatu esteka eskuz",
     "Are you sure you want to delete the form “{title}”?" : "Ziur zaude «{title}» inprimakia ezabatu nahi duzula?",
     "Error while deleting form “{title}”" : "Errore bat gertatu da «{title}» inprimakia ezabatzerakoan",
+    "No recommendations. Start typing." : "Gomendiorik ez. Hasi idazten.",
+    "Searching …" : "Bilatzen…",
+    "No elements found." : "Ez da elementurik aurkitu.",
     "Group" : "Taldea",
     "Description" : "Deskribapena",
     "Options" : "Aukerak",
@@ -23,7 +26,6 @@ OC.L10N.register(
     "Expiration date" : "Iraungitze-data",
     "Sharing" : "Partekatzea",
     "Share link" : "Partekatu esteka",
-    "Name of user or group" : "Erabiltzailearen edo taldearen izena",
     "Submit" : "Bidali"
 },
 "nplurals=2; plural=(n != 1);");
