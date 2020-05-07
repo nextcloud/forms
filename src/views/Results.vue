@@ -39,8 +39,8 @@
 
 		<header v-if="!noSubmissions">
 			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
-			<div>
-				<button id="exportButton" @click="download">
+			<div class="response_actions">
+				<button class="response_actions__export" @click="download">
 					<span class="icon-download" role="img" />
 					{{ t('forms', 'Export to CSV') }}
 				</button>
@@ -234,9 +234,13 @@ h2 {
 	white-space: nowrap;
 }
 
-#exportButton {
-	width: max-content;
-	padding: 13px 16px;
-	margin-left: 16px;
+.response_actions {
+	display: flex;
+	align-items: center;
+
+	&__export {
+		width: max-content;
+		margin-left: 16px;
+	}
 }
 </style>
