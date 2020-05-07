@@ -38,15 +38,36 @@
 		</TopBar>
 
 		<header v-if="!noSubmissions">
-			<h2>{{ t('forms', 'Responses for {title}', { title: formTitle }) }}</h2>
-			<div class="response_actions">
-				<button class="response_actions__export" @click="download">
-					<span class="icon-download" role="img" />
-					{{ t('forms', 'Export to CSV') }}
-				</button>
+			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
+			<div class="response-actions">
+				<div class="response-actions__radio">
+					<input id="show-summary--true"
+						v-model="showSummary"
+						type="radio"
+						:value="true"
+						class="hidden">
+					<label for="show-summary--true"
+						class="response-actions__radio__item"
+						:class="{ 'response-actions__radio__item--active': showSummary }">
+						{{ t('forms', 'Summary') }}
+					</label>
+					<input id="show-summary--false"
+						v-model="showSummary"
+						type="radio"
+						:value="false"
+						class="hidden">
+					<label for="show-summary--false"
+						class="response-actions__radio__item"
+						:class="{ 'response-actions__radio__item--active': !showSummary }">
+						{{ t('forms', 'Responses') }}
+					</label>
+				</div>
 				<Actions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
+					<ActionButton icon="icon-download" @click="download">
+						{{ t('forms', 'Export to CSV') }}
+					</ActionButton>
 					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
 						{{ t('forms', 'Delete all responses') }}
 					</ActionButton>
@@ -69,7 +90,11 @@
 			</EmptyContent>
 		</section>
 
-		<section v-else>
+		<section v-if="!noSubmissions && showSummary">
+			SUMMARY-CONTENT
+		</section>
+
+		<section v-if="!noSubmissions && !showSummary">
 			<Submission
 				v-for="submission in form.submissions"
 				:key="submission.id"
@@ -117,6 +142,7 @@ export default {
 	data() {
 		return {
 			loadingResults: true,
+			showSummary: true,
 		}
 	},
 
@@ -273,13 +299,25 @@ h2 {
 	white-space: nowrap;
 }
 
-.response_actions {
+.response-actions {
 	display: flex;
 	align-items: center;
+	padding-left: 14px;
 
-	&__export {
-		width: max-content;
-		margin-left: 16px;
+	&__radio {
+		margin-right: 8px;
+
+		&__item {
+			border-radius: 2px;
+			padding: 8px 16px;
+			font-weight: bold;
+			background-color: var(--color-background-dark);
+
+			&--active {
+				background-color: var(--color-primary);
+				color: var(--color-primary-text)
+			}
+		}
 	}
 }
 </style>
