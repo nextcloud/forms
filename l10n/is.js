@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Searching …" : "Leita …",
     "Group" : "Hópur",
     "Description" : "Lýsing",
     "Options" : "Valkostir",

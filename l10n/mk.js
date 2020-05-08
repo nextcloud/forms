@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Cannot copy, please copy the link manually" : "Неможе да се копира, копирајте го линкот рачно",
+    "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
+    "Searching …" : "Пребарување ...",
+    "No elements found." : "Нема пронајдено елементи.",
     "Group" : "Група",
     "Description" : "Опис",
     "Options" : "Опции",
