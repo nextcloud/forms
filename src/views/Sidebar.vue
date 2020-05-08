@@ -25,6 +25,14 @@
 		v-show="opened"
 		:title="form.title"
 		@close="onClose">
+		<template #secondary-actions>
+			<ActionLink icon="icon-clippy"
+				:href="shareLink"
+				@click.stop.prevent="copyShareLink">
+				{{ t('forms', 'Copy share link') }}
+			</ActionLink>
+		</template>
+
 		<h3>{{ t('forms', 'Settings') }}</h3>
 		<ul>
 			<li>
@@ -122,11 +130,14 @@
 </template>
 
 <script>
+import { generateUrl } from '@nextcloud/router'
+import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 
 import ShareDiv from '../components/ShareDiv'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -135,6 +146,7 @@ export default {
 	name: 'Sidebar',
 
 	components: {
+		ActionLink,
 		AppSidebar,
 		DatetimePicker,
 		ShareDiv,
@@ -160,6 +172,10 @@ export default {
 	},
 
 	computed: {
+		shareLink() {
+			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+		},
+
 		formExpires: {
 			get() {
 				return this.form.expires !== 0
@@ -304,6 +320,14 @@ export default {
 		 */
 		notBeforeNow(datetime) {
 			return datetime < moment().add(1, 'hour').toDate()
+		},
+
+		copyShareLink() {
+			if (this.$clipboard(this.shareLink)) {
+				showSuccess(t('forms', 'Form link copied'))
+			} else {
+				showError(t('forms', 'Cannot copy, please copy the link manually'))
+			}
 		},
 	},
 }

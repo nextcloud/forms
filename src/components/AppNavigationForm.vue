@@ -64,11 +64,11 @@ import ActionRouter from '@nextcloud/vue/dist/Components/ActionRouter'
 import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import axios from '@nextcloud/axios'
+import Clipboard from 'v-clipboard'
 import moment from '@nextcloud/moment'
 import Vue from 'vue'
-import VueClipboard from 'vue-clipboard2'
 
-Vue.use(VueClipboard)
+Vue.use(Clipboard)
 
 export default {
 	name: 'AppNavigationForm',
@@ -166,22 +166,18 @@ export default {
 		},
 
 		async copyLink() {
-			try {
-				await this.$copyText(this.formLink)
-				// make sure the menu stays open despite the click outside
-				this.$refs.navigationItem.menuOpened = true
+			if (this.$clipboard(this.formLink)) {
 				this.copySuccess = true
 				this.copied = true
-			} catch (error) {
+			} else {
 				this.copySuccess = false
 				this.copied = true
-				console.error(error)
-			} finally {
-				setTimeout(() => {
-					this.copySuccess = false
-					this.copied = false
-				}, 4000)
+				console.debug('Not possible to copy share link')
 			}
+			setTimeout(() => {
+				this.copySuccess = false
+				this.copied = false
+			}, 4000)
 		},
 
 	},

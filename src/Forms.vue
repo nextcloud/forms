@@ -38,7 +38,7 @@
 			</EmptyContent>
 			<EmptyContent v-else-if="noForms">
 				{{ t('forms', 'No forms created yet') }}
-				<template #desc>
+				<template #action>
 					<button class="primary" @click="onNewForm">
 						{{ t('forms', 'Create a form') }}
 					</button>
@@ -47,7 +47,7 @@
 
 			<EmptyContent v-else>
 				{{ t('forms', 'Select a form or create a new one') }}
-				<template #desc>
+				<template #action>
 					<button class="primary" @click="onNewForm">
 						{{ t('forms', 'Create new form') }}
 					</button>
