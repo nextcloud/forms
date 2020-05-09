@@ -96,6 +96,7 @@ import EmptyContent from '../components/EmptyContent'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
+import WindowTitleMixin from '../mixins/WindowTitleMixin'
 
 Vue.use(Clipboard)
 
@@ -111,7 +112,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [ViewsMixin, WindowTitleMixin],
 
 	data() {
 		return {
@@ -129,6 +130,7 @@ export default {
 
 	beforeMount() {
 		this.loadFormResults()
+		this.setWindowTitle(this.form.title)
 	},
 
 	methods: {

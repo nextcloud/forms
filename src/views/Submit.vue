@@ -85,6 +85,7 @@ import Question from '../components/Questions/Question'
 import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionMultiple from '../components/Questions/QuestionMultiple'
+import WindowTitleMixin from '../mixins/WindowTitleMixin'
 
 export default {
 	name: 'Submit',
@@ -98,6 +99,8 @@ export default {
 		QuestionShort,
 		QuestionMultiple,
 	},
+
+	mixins: [WindowTitleMixin],
 
 	data() {
 		return {
@@ -135,6 +138,10 @@ export default {
 				(isUsed, question) => isUsed || question.mandatory
 				, false)
 		},
+	},
+
+	beforeMount() {
+		this.setWindowTitle(this.form.title)
 	},
 
 	methods: {
