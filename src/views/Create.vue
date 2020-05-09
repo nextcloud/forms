@@ -47,6 +47,7 @@
 			<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
 			<input
 				id="form-title"
+				ref="title"
 				v-model="form.title"
 				:minlength="0"
 				:maxlength="maxStringLengths.formTitle"
@@ -229,7 +230,19 @@ export default {
 				this.errorForm = true
 			} finally {
 				this.isLoadingForm = false
+				if (this.form.title === '') {
+					this.focusTitle()
+				}
 			}
+		},
+
+		/**
+		 * Focus title after form load
+		 */
+		focusTitle() {
+			this.$nextTick(() => {
+				this.$refs.title.focus()
+			})
 		},
 
 		/**
