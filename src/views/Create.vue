@@ -136,6 +136,7 @@ import QuestionMultiple from '../components/Questions/QuestionMultiple'
 import QuestionShort from '../components/Questions/QuestionShort'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
+import WindowTitleMixin from '../mixins/WindowTitleMixin'
 
 window.axios = axios
 
@@ -154,7 +155,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [ViewsMixin, WindowTitleMixin],
 
 	data() {
 		return {
@@ -201,10 +202,16 @@ export default {
 			// TODO: cancel previous request if not done
 			this.fetchFullForm(this.form.id)
 		},
+
+		// Update Window-Title on title change
+		'form.title': function() {
+			this.setWindowTitle(this.form.title)
+		},
 	},
 
 	beforeMount() {
 		this.fetchFullForm(this.form.id)
+		this.setWindowTitle(this.form.title)
 	},
 
 	updated() {
