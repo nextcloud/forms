@@ -65,6 +65,9 @@ OC.L10N.register(
     "Show to all users of this instance" : "Toon alle gebruikers op deze server",
     "Share link" : "Delen link",
     "Choose users to share with" : "Kies gebruikers om mee te delen",
+    "Select expiration date" : "Selecteer vervaldatum",
+    "Expired on {date}" : "Vervallen op {date}",
+    "Expires on {date}" : "Vervalt op {date}",
     "Submit" : "Verwerken",
     "Submit form" : "Insturen formulier",
     "Submitting form …" : "Insturen formulier …",
@@ -75,6 +78,8 @@ OC.L10N.register(
     "Checkboxes" : "Aanvinkvakjes",
     "Short answer" : "Kort antwoord",
     "Long text" : "Lange tekst",
+    "Form expired" : "Formulier verlopen",
+    "This form has expired and is no longer taking answers" : "Dit formulier is verlopen en accepteert geen antwoorden meer.",
     "Form not found" : "Formulier niet gevonden",
     "This form does not exist" : "Dit formulier bestaat niet"
 },
