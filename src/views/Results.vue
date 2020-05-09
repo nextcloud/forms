@@ -134,7 +134,7 @@ export default {
 			if (this.form.title) {
 				return this.form.title
 			}
-			return 'New form'
+			return t('forms', 'New form')
 		},
 	},
 
