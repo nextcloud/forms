@@ -633,7 +633,7 @@ class ApiController extends Controller {
 			// Append Display Name
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
-				$submission['userDisplayName'] = $this->l10n->t('anonymous user');
+				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);
 
