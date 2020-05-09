@@ -215,13 +215,6 @@ export default {
 		.question {
 			// Less padding needed as submit view does not have drag handles
 			padding-left: 16px;
-			// stylelint-disable-next-line selector-pseudo-element-no-unknown
-			::v-deep ul.question__content {
-				// Left-align multiple choice and checkboxes with question text
-				// Only in submit view
-				// TODO: use variables
-				margin-left: -14px;
-			}
 		}
 
 		input[type=submit] {

@@ -283,14 +283,16 @@ export default {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
-	height: 44px;
+	min-height: 44px;
 
 	.question__label {
 		flex: 1 1 100%;
 		// Overwrite guest page core styles
 		text-align: left !important;
+		padding: 11px 0 11px 30px;
 		&::before {
-			margin: 14px !important;
+			margin-left: -30px !important;
+			margin-right: 14px !important;
 		}
 	}
 }
