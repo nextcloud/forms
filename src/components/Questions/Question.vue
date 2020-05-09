@@ -34,8 +34,8 @@
 
 		<!-- Header -->
 		<div class="question__header">
-			<input v-if="edit"
-				:placeholder="t('forms', 'Enter a title for this question')"
+			<input v-if="edit || !text"
+				:placeholder="t('forms', 'Question title')"
 				:aria-label="t('forms', 'Title of question number {index}', {index})"
 				:value="text"
 				class="question__header-title"
