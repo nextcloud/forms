@@ -33,12 +33,12 @@
 		<TopBar>
 			<button @click="showEdit">
 				<span class="icon-forms" role="img" />
-				{{ t('forms', 'Back to form') }}
+				{{ t('forms', 'Back to questions') }}
 			</button>
 		</TopBar>
 
 		<header v-if="!noSubmissions">
-			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
+			<h2>{{ t('forms', 'Responses for {title}', { title: formTitle }) }}</h2>
 			<div class="response_actions">
 				<button class="response_actions__export" @click="download">
 					<span class="icon-download" role="img" />
@@ -126,6 +126,17 @@ export default {
 		noSubmissions() {
 			return this.submissions && this.submissions.length === 0
 		},
+
+		/**
+		 * Return form title, or placeholder if not set
+		 * @returns {string}
+		 */
+		formTitle() {
+			if (this.form.title) {
+				return this.form.title
+			}
+			return t('forms', 'New form')
+		},
 	},
 
 	beforeMount() {
@@ -187,7 +198,7 @@ export default {
 		},
 
 		async deleteAllSubmissions() {
-			if (!confirm(t('forms', 'Are you sure you want to delete all responses of this form?'))) {
+			if (!confirm(t('forms', 'Are you sure you want to delete all responses of {title}?', { title: this.formTitle }))) {
 				return
 			}
 
@@ -230,7 +241,7 @@ export default {
 
 			const element = document.createElement('a')
 			element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(parser.parse(formattedSubmissions)))
-			element.setAttribute('download', this.form.title + '.csv')
+			element.setAttribute('download', this.formTitle + '.csv')
 			element.style.display = 'none'
 			document.body.appendChild(element)
 			element.click()

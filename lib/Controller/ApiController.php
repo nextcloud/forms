@@ -148,7 +148,7 @@ class ApiController extends Controller {
 			$this->logger->debug('Could not find form');
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
-	
+
 		if (!$this->formsService->hasUserAccess($id)) {
 			$this->logger->debug('User has no permissions to get this form');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
@@ -171,7 +171,7 @@ class ApiController extends Controller {
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE
 		));
-		$form->setTitle('New form');
+		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
 			'type' => 'public'
@@ -279,7 +279,7 @@ class ApiController extends Controller {
 			$this->logger->debug('Invalid type');
 			return new Http\JSONResponse(['message' => 'Invalid type'], Http::STATUS_BAD_REQUEST);
 		}
-		
+
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
@@ -633,7 +633,7 @@ class ApiController extends Controller {
 			// Append Display Name
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
-				$submission['userDisplayName'] = $this->l10n->t('anonymous user');
+				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);
 

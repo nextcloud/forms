@@ -268,7 +268,7 @@ export default {
 		 * @param {string} type the question type, see AnswerTypes
 		 */
 		async addQuestion(type) {
-			const text = t('forms', 'New question')
+			const text = ''
 			this.isLoadingQuestions = true
 
 			try {

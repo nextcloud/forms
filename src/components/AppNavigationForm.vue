@@ -25,7 +25,7 @@
 		ref="navigationItem"
 		:exact="true"
 		:icon="icon"
-		:title="form.title"
+		:title="formTitle"
 		:to="{ name: 'edit', params: { hash: form.hash } }">
 		<template v-if="!loading" #actions>
 			<ActionLink
@@ -125,6 +125,17 @@ export default {
 		},
 
 		/**
+		 * Return form title, or placeholder if not set
+		 * @returns {string}
+		 */
+		formTitle() {
+			if (this.form.title) {
+				return this.form.title
+			}
+			return t('forms', 'New form')
+		},
+
+		/**
 		 * Return the form share link
 		 * @returns {string}
 		 */
@@ -148,7 +159,7 @@ export default {
 
 	methods: {
 		async onDeleteForm() {
-			if (!confirm(t('forms', 'Are you sure you want to delete the form “{title}”?', { title: this.form.title }))) {
+			if (!confirm(t('forms', 'Are you sure you want to delete {title}?', { title: this.formTitle }))) {
 				return
 			}
 
@@ -158,7 +169,7 @@ export default {
 				await axios.delete(generateUrl('/apps/forms/api/v1/form/{id}', { id: this.form.id }))
 				this.$emit('delete', this.form.id)
 			} catch (error) {
-				showError(t('forms', 'Error while deleting form “{title}”', { title: this.form.title }))
+				showError(t('forms', 'Error while deleting {title}', { title: this.formTitle }))
 				console.error(error.response)
 			} finally {
 				this.loading = false

@@ -26,7 +26,7 @@
 			<!-- Forms title & description-->
 			<header>
 				<h2 id="form-title">
-					{{ form.title }}
+					{{ formTitle }}
 				</h2>
 				<p v-if="!loading && !success" class="form-desc">
 					{{ form.description }}
@@ -114,6 +114,17 @@ export default {
 	},
 
 	computed: {
+		/**
+		 * Return form title, or placeholder if not set
+		 * @returns {string}
+		 */
+		formTitle() {
+			if (this.form.title) {
+				return this.form.title
+			}
+			return t('forms', 'New form')
+		},
+
 		validQuestions() {
 			return this.form.questions.filter(question => {
 				// All questions must have a valid title
