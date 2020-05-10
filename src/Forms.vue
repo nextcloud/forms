@@ -32,7 +32,7 @@
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<AppContent v-if="loading || noForms || (!hash && $route.name !== 'create')">
+		<AppContent v-if="loading || noForms || (!routeHash && $route.name !== 'create')">
 			<EmptyContent v-if="loading" icon="icon-loading">
 				{{ t('forms', 'Loading forms …') }}
 			</EmptyContent>
@@ -102,16 +102,16 @@ export default {
 			return this.forms && this.forms.length === 0
 		},
 
-		hash() {
+		routeHash() {
 			return this.$route.params.hash
 		},
 
 		selectedForm: {
 			get() {
-				return this.forms.find(form => form.hash === this.hash)
+				return this.forms.find(form => form.hash === this.routeHash)
 			},
 			set(form) {
-				const index = this.forms.findIndex(search => search.hash === this.hash)
+				const index = this.forms.findIndex(search => search.hash === this.routeHash)
 				if (index > -1) {
 					this.$set(this.forms, index, form)
 				}
@@ -163,7 +163,14 @@ export default {
 		 */
 		async onDeleteForm(id) {
 			const formIndex = this.forms.findIndex(form => form.id === id)
+			const deletedHash = this.forms[formIndex].hash
+
 			this.forms.splice(formIndex, 1)
+
+			// Redirect if current form has been deleted
+			if (deletedHash === this.routeHash) {
+				this.$router.push({ name: 'root' })
+			}
 		},
 	},
 }
