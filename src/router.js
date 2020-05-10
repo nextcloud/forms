@@ -58,7 +58,7 @@ export default new Router({
 			path: '/:hash/results',
 			component: Results,
 			name: 'results',
-			props: { default: true },
+			props: true,
 		},
 	],
 })
