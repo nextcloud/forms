@@ -171,6 +171,7 @@ class PageController extends Controller {
 	public function getResult(): TemplateResponse {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, 'main');
 	}
 
