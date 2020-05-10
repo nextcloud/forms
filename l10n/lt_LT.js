@@ -1,7 +1,6 @@
 OC.L10N.register(
     "forms",
     {
-    "anonymous user" : "anoniminis naudotojas",
     "Shared by %s" : "Bendrina %s",
     "Forms" : "Anketos",
     "A forms app, similar to Google Forms." : "Anketų programėlė, panaši į Google formas.",
@@ -16,8 +15,6 @@ OC.L10N.register(
     "Form link copied" : "Anketos nuoroda nukopijuota",
     "Cannot copy, please copy the link manually" : "Nepavyksta nukopijuoti, nukopijuokite nuorodą rankiniu būdu",
     "Copy share link" : "Kopijuoti bendrinimo nuorodą",
-    "Are you sure you want to delete the form “{title}”?" : "Ar tikrai norite ištrinti anketą, pavadinimu \"{title}\"?",
-    "Error while deleting form “{title}”" : "Klaida ištrinant formą \"{title}\"",
     "Delete answer" : "Ištrinti atsakymą",
     "Mandatory" : "Privalomas",
     "Delete question" : "Ištrinti klausimą",
@@ -31,9 +28,7 @@ OC.L10N.register(
     "Description" : "Aprašas",
     "Mandatory questions" : "Privalomi klausimai",
     "Add a question" : "Pridėti klausimą",
-    "New question" : "Naujas klausimas",
     "Error while saving form" : "Klaida įrašant anketą",
-    "Back to form" : "Atgal į anketą",
     "Export to CSV" : "Eksportuoti į CSV",
     "Options" : "Parinktys",
     "Settings" : "Nustatymai",

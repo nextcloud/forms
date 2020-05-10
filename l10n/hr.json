@@ -11,8 +11,6 @@
     "Delete form" : "Izbriši obrazac",
     "Form link copied" : "Poveznica na obrazac je kopirana",
     "Cannot copy, please copy the link manually" : "Kopiranje nije moguće, ručno kopirajte poveznicu",
-    "Are you sure you want to delete the form “{title}”?" : "Jeste li sigurni da želite izbrisati obrazac „{title}”?",
-    "Error while deleting form “{title}”" : "Pogreška pri brisanju obrasca „{title}”",
     "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",
     "Searching …" : "Traženje…",
     "No elements found." : "Elementi nisu pronađeni.",
