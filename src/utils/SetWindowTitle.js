@@ -19,14 +19,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default {
-	methods: {
-		setWindowTitle(formTitle) {
-			if (formTitle === '') {
-				window.document.title = t('forms', 'Forms') + ' - ' + OC.theme.title
-			} else {
-				window.document.title = formTitle + ' - ' + t('forms', 'Forms') + ' - ' + OC.theme.title
-			}
-		},
-	},
+/**
+ * Set the Window-Title to current FormTitle including suffix.
+ *
+ * @param {String} formTitle Title of current form to set on window.
+ */
+const SetWindowTitle = function(formTitle) {
+	if (formTitle === '') {
+		window.document.title = t('forms', 'Forms') + ' - ' + OC.theme.title
+	} else {
+		window.document.title = formTitle + ' - ' + t('forms', 'Forms') + ' - ' + OC.theme.title
+	}
 }
+
+export default SetWindowTitle
