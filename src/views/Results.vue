@@ -139,6 +139,13 @@ export default {
 		},
 	},
 
+	watch: {
+		// Reload results, when form changes
+		hash() {
+			this.loadFormResults()
+		},
+	},
+
 	beforeMount() {
 		this.loadFormResults()
 		SetWindowTitle(this.formTitle)
