@@ -23,10 +23,9 @@
 <template>
 	<AppNavigationItem
 		ref="navigationItem"
-		:exact="true"
 		:icon="icon"
 		:title="formTitle"
-		:to="{ name: 'edit', params: { hash: form.hash } }"
+		:to="{ name: 'formRoot', params: { hash: form.hash } }"
 		@click="mobileCloseNavigation">
 		<template v-if="!loading" #actions>
 			<ActionLink
