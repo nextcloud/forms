@@ -78,7 +78,12 @@ class FormsService {
 		$this->userSession = $userSession;
 	}
 
-
+	/**
+	 * Load options corresponding to question
+	 *
+	 * @param integer $questionId
+	 * @return array
+	 */
 	public function getOptions(int $questionId): array {
 		$optionList = [];
 		try {
@@ -93,10 +98,17 @@ class FormsService {
 		}
 	}
 
-	public function getQuestions(int $formId): array {
+	/**
+	 * Load questions corresponding to form
+	 *
+	 * @param integer $formId
+	 * @param bool $loadDeleted Specifies, whether to load questions, that were marked as deleted.
+	 * @return array
+	 */
+	public function getQuestions(int $formId, bool $loadDeleted = false): array {
 		$questionList = [];
 		try {
-			$questionEntities = $this->questionMapper->findByForm($formId);
+			$questionEntities = $this->questionMapper->findByForm($formId, $loadDeleted);
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
 				$question['options'] = $this->getOptions($question['id']);

@@ -650,15 +650,7 @@ class ApiController extends Controller {
 		}
 
 		// Load question-texts, including deleted ones.
-		try {
-			$questionEntities = $this->questionMapper->findByForm($form->getId());
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		}
-		$questions = [];
-		foreach ($questionEntities as $questionEntity) {
-			$questions[] = $questionEntity->read();
-		}
+		$questions = $this->formsService->getQuestions($form->getId(), true);
 
 		$response = [
 			'submissions' => $submissions,
