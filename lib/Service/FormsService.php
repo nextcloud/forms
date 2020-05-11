@@ -78,7 +78,12 @@ class FormsService {
 		$this->userSession = $userSession;
 	}
 
-
+	/**
+	 * Load options corresponding to question
+	 *
+	 * @param integer $questionId
+	 * @return array
+	 */
 	public function getOptions(int $questionId): array {
 		$optionList = [];
 		try {
@@ -93,6 +98,12 @@ class FormsService {
 		}
 	}
 
+	/**
+	 * Load questions corresponding to form
+	 *
+	 * @param integer $formId
+	 * @return array
+	 */
 	public function getQuestions(int $formId): array {
 		$questionList = [];
 		try {
