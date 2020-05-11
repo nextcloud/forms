@@ -54,6 +54,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	text-align: center;
 
 	&__icon {
 		width: 64px;

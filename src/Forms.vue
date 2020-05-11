@@ -28,6 +28,7 @@
 			<AppNavigationForm v-for="form in forms"
 				:key="form.id"
 				:form="form"
+				@mobile-close-navigation="mobileCloseNavigation"
 				@delete="onDeleteForm" />
 		</AppNavigation>
 
@@ -66,6 +67,7 @@
 </template>
 
 <script>
+import { emit } from '@nextcloud/event-bus'
 import { showError } from '@nextcloud/dialogs'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
@@ -74,6 +76,7 @@ import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Content from '@nextcloud/vue/dist/Components/Content'
+import isMobile from '@nextcloud/vue/src/mixins/isMobile'
 
 import AppNavigationForm from './components/AppNavigationForm'
 import EmptyContent from './components/EmptyContent'
@@ -89,6 +92,8 @@ export default {
 		Content,
 		EmptyContent,
 	},
+
+	mixins: [isMobile],
 
 	data() {
 		return {
@@ -125,6 +130,15 @@ export default {
 
 	methods: {
 		/**
+		 * Closes the App-Navigation on mobile-devices
+		 */
+		mobileCloseNavigation() {
+			if (this.isMobile) {
+				emit('toggle-navigation', { open: false })
+			}
+		},
+
+		/**
 		 * Initial forms load
 		 */
 		async loadForms() {
@@ -150,6 +164,7 @@ export default {
 				const newForm = response.data
 				this.forms.push(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
+				this.mobileCloseNavigation()
 			} catch (error) {
 				showError(t('forms', 'Unable to create a new form'))
 				console.error(error)
