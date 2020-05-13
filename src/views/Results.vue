@@ -232,13 +232,14 @@ export default {
 					timestamp: moment(submission.timestamp, 'X').format('L LT'),
 				}
 
-				submission.answers.forEach(answer => {
-					const questionText = this.form.questions.find(question => question.id === answer.questionId).text
-					if (questionText in formattedSubmission) {
-						formattedSubmission[questionText] = formattedSubmission[questionText].concat('; ').concat(answer.text)
-					} else {
-						formattedSubmission[questionText] = answer.text
+				this.form.questions.forEach(question => {
+					const questionText = question.text
+					const answers = submission.answers.filter(answer => answer.questionId === question.id)
+					if (!answers.length) {
+						return // no answers, go to next question
 					}
+					const squashedAnswers = answers.map(answer => answer.text).join('; ')
+					formattedSubmission[questionText] = squashedAnswers
 				})
 				formattedSubmissions.push(formattedSubmission)
 			})
