@@ -27,6 +27,7 @@
 		:mandatory="mandatory"
 		:edit.sync="edit"
 		:max-question-length="maxStringLengths.questionText"
+		:title-placeholder="answerType.titlePlaceholder"
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
@@ -104,7 +105,7 @@ export default {
 		},
 
 		isUnique() {
-			return this.model.unique === true
+			return this.answerType.unique === true
 		},
 
 		hasNoAnswer() {

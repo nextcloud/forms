@@ -35,7 +35,7 @@
 		<!-- Header -->
 		<div class="question__header">
 			<input v-if="edit || !text"
-				:placeholder="t('forms', 'Question title')"
+				:placeholder="titlePlaceholder"
 				:aria-label="t('forms', 'Title of question number {index}', {index})"
 				:value="text"
 				class="question__header-title"
@@ -86,6 +86,10 @@ export default {
 			required: true,
 		},
 		text: {
+			type: String,
+			required: true,
+		},
+		titlePlaceholder: {
 			type: String,
 			required: true,
 		},

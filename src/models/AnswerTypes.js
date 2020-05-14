@@ -37,6 +37,7 @@ export default {
 		component: QuestionMultiple,
 		icon: 'icon-answer-multiple',
 		label: t('forms', 'Multiple choice'),
+		titlePlaceholder: t('forms', 'MultiUniqueTitlePlaceholder'),
 		unique: true,
 		// Define conditions where this questions is not ok
 		validate: question => question.options.length > 0,
@@ -46,6 +47,7 @@ export default {
 		component: QuestionMultiple,
 		icon: 'icon-answer-checkbox',
 		label: t('forms', 'Checkboxes'),
+		titlePlaceholder: t('forms', 'MultiTitlePlaceholder'),
 		// Define conditions where this questions is not ok
 		validate: question => question.options.length > 0,
 	},
@@ -54,12 +56,14 @@ export default {
 		component: QuestionShort,
 		icon: 'icon-answer-short',
 		label: t('forms', 'Short answer'),
+		titlePlaceholder: t('forms', 'ShortTitlePlaceholder'),
 	},
 
 	long: {
 		component: QuestionLong,
 		icon: 'icon-answer-long',
 		label: t('forms', 'Long text'),
+		titlePlaceholder: t('forms', 'LongTitlePlaceholder'),
 	},
 
 }

@@ -27,6 +27,7 @@
 		:mandatory="mandatory"
 		:edit.sync="edit"
 		:max-question-length="maxStringLengths.questionText"
+		:title-placeholder="answerType.titlePlaceholder"
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">

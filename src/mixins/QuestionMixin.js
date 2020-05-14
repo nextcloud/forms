@@ -74,7 +74,7 @@ export default {
 		/**
 		 * Answer type model object
 		 */
-		model: {
+		answerType: {
 			type: Object,
 			required: true,
 		},
