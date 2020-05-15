@@ -31,7 +31,6 @@
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
 		<div class="question__content">
-			<!-- TODO: properly choose max length -->
 			<input ref="input"
 				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
 				:placeholder="t('forms', 'Short answer text')"

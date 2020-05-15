@@ -186,20 +186,18 @@ class PageController extends Controller {
 		// Inject style on all templates
 		Util::addStyle($this->appName, 'forms');
 
-		// TODO: check if already submitted
-
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
 			return new TemplateResponse('forms', 'notfound');
 		}
 
-		// Does the user have permissions to display
+		// Does the user have permissions to submit (resp. submitOnce)
 		if (!$this->formsService->canSubmit($form->getId())) {
 			return new TemplateResponse('forms', 'nosubmit');
 		}
 
-		// Does the user have permissions to display
+		// Does the user have access to form
 		if (!$this->formsService->hasUserAccess($form->getId())) {
 			return new TemplateResponse('forms', 'notfound');
 		}
