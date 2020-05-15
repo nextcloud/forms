@@ -56,14 +56,20 @@ export default {
 		component: QuestionShort,
 		icon: 'icon-answer-short',
 		label: t('forms', 'Short answer'),
+
 		titlePlaceholder: t('forms', 'ShortTitlePlaceholder'),
+		submitPlaceholder: t('forms', 'Enter a short answer'),
+		createPlaceholder: t('forms', 'People can enter a short answer'),
 	},
 
 	long: {
 		component: QuestionLong,
 		icon: 'icon-answer-long',
 		label: t('forms', 'Long text'),
+
 		titlePlaceholder: t('forms', 'LongTitlePlaceholder'),
+		submitPlaceholder: t('forms', 'Enter a long text'),
+		createPlaceholder: t('forms', 'People can enter a long text'),
 	},
 
 }

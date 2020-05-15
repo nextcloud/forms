@@ -80,6 +80,14 @@ export default {
 		},
 
 		/**
+		 * Submission or Edit-Mode
+		 */
+		readOnly: {
+			type: Boolean,
+			default: false,
+		},
+
+		/**
 		 * Database-Restrictions
 		 */
 		maxStringLengths: {

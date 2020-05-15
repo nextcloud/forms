@@ -26,6 +26,7 @@
 		:text="text"
 		:mandatory="mandatory"
 		:edit.sync="edit"
+		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
 		:title-placeholder="answerType.titlePlaceholder"
 		@update:text="onTitleChange"
@@ -35,7 +36,8 @@
 			<!-- TODO: properly choose max length -->
 			<input ref="input"
 				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
-				:placeholder="t('forms', 'Short answer text')"
+				:placeholder="submissionInputPlaceholder"
+				:disabled="!readOnly"
 				:required="mandatory"
 				:value="values[0]"
 				class="question__input"
@@ -54,6 +56,15 @@ export default {
 	name: 'QuestionShort',
 
 	mixins: [QuestionMixin],
+
+	computed: {
+		submissionInputPlaceholder() {
+			if (this.readOnly) {
+				return this.answerType.submitPlaceholder
+			}
+			return this.answerType.createPlaceholder
+		},
+	},
 
 	methods: {
 		onInput() {
@@ -74,6 +85,12 @@ export default {
 	border: 0;
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
+
+	&:disabled {
+		// Just overrides Server CSS-Styling for disabled inputs. -> Not Good??
+		background-color: var(--color-main-background);
+		color: var(--color-main-text);
+	}
 }
 
 </style>
