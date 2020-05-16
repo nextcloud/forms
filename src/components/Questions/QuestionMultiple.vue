@@ -73,7 +73,8 @@
 					:maxlength="maxStringLengths.optionText"
 					minlength="1"
 					type="text"
-					@click="addNewEntry">
+					@click="addNewEntry"
+					@focus="addNewEntry">
 			</li>
 		</ul>
 	</Question>
@@ -218,6 +219,9 @@ export default {
 		 * Add a new empty answer locally
 		 */
 		addNewEntry() {
+			// If entering from non-edit-mode (possible by click), activate edit-mode
+			this.edit = true
+
 			// Add local entry
 			const options = this.options.slice()
 			options.push({
@@ -255,22 +259,28 @@ export default {
 		 * @param {number} id the options id
 		 */
 		deleteOption(id) {
-			// Remove entry
 			const options = this.options.slice()
 			const optionIndex = options.findIndex(option => option.id === id)
-			const option = Object.assign({}, this.options[optionIndex])
 
-			// delete locally
-			options.splice(optionIndex, 1)
+			if (options.length === 1) {
+				// Clear Text, but don't remove. Will be removed, when leaving edit-mode
+				options[0].text = ''
+			} else {
+				// Remove entry
+				const option = Object.assign({}, this.options[optionIndex])
 
-			// delete from Db
-			this.deleteOptionFromDatabase(option)
+				// delete locally
+				options.splice(optionIndex, 1)
+
+				// delete from Db
+				this.deleteOptionFromDatabase(option)
+			}
 
 			// Update question
 			this.updateOptions(options)
 
 			this.$nextTick(() => {
-				this.focusIndex(optionIndex)
+				this.focusIndex(optionIndex - 1)
 			})
 		},
 
