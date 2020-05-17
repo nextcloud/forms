@@ -126,7 +126,7 @@ export default {
 		validQuestions() {
 			return this.form.questions.filter(question => {
 				// All questions must have a valid title
-				if (question.text && question.text.trim() === '') {
+				if (question.text?.trim() === '') {
 					return false
 				}
 
