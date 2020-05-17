@@ -59,6 +59,11 @@ export default {
 	data() {
 		return {
 			queue: new PQueue({ concurrency: 1 }),
+
+			// As data instead of Method, to have a separate debounce per AnswerInput
+			debounceUpdateAnswer: pDebounce(function(answer) {
+				return this.queue.add(() => this.updateAnswer(answer))
+			}, 500),
 		}
 	},
 
@@ -179,9 +184,6 @@ export default {
 				console.error(error)
 			}
 		},
-		debounceUpdateAnswer: pDebounce(function(answer) {
-			return this.queue.add(() => this.updateAnswer(answer))
-		}, 500),
 	},
 }
 </script>
