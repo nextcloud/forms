@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Searching …" : "Пошук...",
     "Group" : "Група",
     "Description" : "Опис",
     "Settings" : "Налаштування",
