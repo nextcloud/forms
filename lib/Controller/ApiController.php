@@ -307,6 +307,7 @@ class ApiController extends Controller {
 		$question->setOrder($questionOrder);
 		$question->setType($type);
 		$question->setText($text);
+		$question->setMandatory(false);
 
 		$question = $this->questionMapper->insert($question);
 
