@@ -148,7 +148,7 @@ export default {
 				// Request a new empty form
 				const response = await axios.post(generateUrl('/apps/forms/api/v1/form'))
 				const newForm = response.data
-				this.forms.push(newForm)
+				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
 			} catch (error) {
 				showError(t('forms', 'Unable to create a new form'))
