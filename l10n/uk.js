@@ -1,6 +1,10 @@
 OC.L10N.register(
     "forms",
     {
+    "Anonymous response" : "Анонімна відповідь",
+    "Shared by %s" : "Поділилися %s",
+    "Forms" : "Форми",
+    "Loading forms …" : "Завантаження форм...",
     "Searching …" : "Пошук...",
     "Group" : "Група",
     "Description" : "Опис",
