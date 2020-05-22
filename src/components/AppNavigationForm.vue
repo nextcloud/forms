@@ -26,7 +26,8 @@
 		:exact="true"
 		:icon="icon"
 		:title="formTitle"
-		:to="{ name: 'edit', params: { hash: form.hash } }">
+		:to="{ name: 'edit', params: { hash: form.hash } }"
+		@click="mobileCloseNavigation">
 		<template v-if="!loading" #actions>
 			<ActionLink
 				:href="formLink"
@@ -38,7 +39,8 @@
 			<ActionRouter :close-after-click="true"
 				:exact="true"
 				icon="icon-comment"
-				:to="{ name: 'results', params: { hash: form.hash } }">
+				:to="{ name: 'results', params: { hash: form.hash } }"
+				@click="mobileCloseNavigation">
 				{{ t('forms', 'Responses') }}
 			</ActionRouter>
 			<!-- <ActionRouter :close-after-click="true"
@@ -158,6 +160,13 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * Closes the App-Navigation on mobile-devices
+		 */
+		mobileCloseNavigation() {
+			this.$emit('mobile-close-navigation')
+		},
+
 		async onDeleteForm() {
 			if (!confirm(t('forms', 'Are you sure you want to delete {title}?', { title: this.formTitle }))) {
 				return
