@@ -84,7 +84,9 @@ class FormMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
-			->from($this->getTableName());
+			->from($this->getTableName())
+			//Newest forms first
+			->orderBy('created', 'DESC');
 
 		return $this->findEntities($qb);
 	}
@@ -99,7 +101,9 @@ class FormMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('owner_id', $qb->createNamedParameter($ownerId))
-			);
+			)
+			//Newest forms first
+			->orderBy('created', 'DESC');
 
 		return $this->findEntities($qb);
 	}
