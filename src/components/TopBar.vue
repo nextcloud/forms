@@ -39,7 +39,7 @@ $top-bar-height: 60px;
 
 .top-bar {
 	position: sticky;
-	z-index: 10;
+	z-index: 100;
 	top: var(--header-height);
 	display: flex;
 	align-items: center;
