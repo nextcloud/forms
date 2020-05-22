@@ -214,7 +214,7 @@ class ApiController extends Controller {
 
 		// Make sure we only store id
 		try {
-			if ($keyValuePairs['access']) {
+			if (array_key_exists('access', $keyValuePairs)) {
 				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
 					return $user['shareWith'];
 				}, $keyValuePairs['access']['users']);
