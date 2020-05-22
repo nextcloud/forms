@@ -1,6 +1,5 @@
 <template>
 	<li class="question__item">
-		<!-- TODO: properly choose max length -->
 		<input
 			ref="input"
 			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
