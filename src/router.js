@@ -46,6 +46,12 @@ export default new Router({
 			name: 'root',
 		},
 		{
+			path: '/:hash',
+			redirect: { name: 'edit' },
+			name: 'formRoot',
+			props: true,
+		},
+		{
 			path: '/:hash/edit',
 			components: {
 				default: Create,
