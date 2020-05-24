@@ -25,7 +25,7 @@
 		<AppContent>
 			<!-- Forms title & description-->
 			<header>
-				<h2 id="form-title">
+				<h2 class="form-title">
 					{{ formTitle }}
 				</h2>
 				<p v-if="!loading && !success" class="form-desc">
@@ -202,15 +202,17 @@ export default {
 		margin-top: 44px;
 		margin-bottom: 24px;
 
-		#form-title,
+		.form-title,
 		.form-desc {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
 		}
-		#form-title {
-			font-size: 2em;
+		.form-title {
+			font-size: 28px;
 			font-weight: bold;
+			color: var(--color-main-text);
+			min-height: 36px;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
 			overflow: hidden;
@@ -218,6 +220,7 @@ export default {
 			white-space: nowrap;
 		}
 		.form-desc {
+			font-size: 100%;
 			padding-bottom: 20px;
 			resize: none;
 		}

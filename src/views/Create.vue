@@ -44,19 +44,22 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
-			<input
-				id="form-title"
-				ref="title"
-				v-model="form.title"
-				:minlength="0"
-				:maxlength="maxStringLengths.formTitle"
-				:placeholder="t('forms', 'Form title')"
-				:required="true"
-				autofocus
-				type="text"
-				@click="selectIfUnchanged"
-				@keyup="onTitleChange">
+			<h2>
+				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
+				<input
+					id="form-title"
+					ref="title"
+					v-model="form.title"
+					class="form-title"
+					:minlength="0"
+					:maxlength="maxStringLengths.formTitle"
+					:placeholder="t('forms', 'Form title')"
+					:required="true"
+					autofocus
+					type="text"
+					@click="selectIfUnchanged"
+					@keyup="onTitleChange">
+			</h2>
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
 				ref="description"
@@ -417,22 +420,30 @@ export default {
 		margin-top: 44px;
 		margin-bottom: 24px;
 
-		#form-title,
+		h2 {
+			margin-bottom: 0; // because the input field has enough padding
+		}
+
+		.form-title,
 		.form-desc {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
 		}
-		#form-title {
-			font-size: 2em;
+		.form-title {
+			font-size: 28px;
 			font-weight: bold;
+			color: var(--color-main-text);
+			min-height: 36px;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
+			padding-bottom: 6px; // align with h2 of .form-title on submit page
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
 		.form-desc {
+			font-size: 100%;
 			padding-bottom: 20px;
 			resize: none;
 		}
