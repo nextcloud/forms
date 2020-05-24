@@ -49,6 +49,7 @@
 				id="form-title"
 				ref="title"
 				v-model="form.title"
+				class="form-title"
 				:minlength="0"
 				:maxlength="maxStringLengths.formTitle"
 				:placeholder="t('forms', 'Form title')"
@@ -417,15 +418,17 @@ export default {
 		margin-top: 44px;
 		margin-bottom: 24px;
 
-		#form-title,
+		.form-title,
 		.form-desc {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
 		}
-		#form-title {
+		.form-title {
 			font-size: 2em;
 			font-weight: bold;
+			color: var(--color-main-text);
+			min-height: 36px;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
 			overflow: hidden;
@@ -433,6 +436,7 @@ export default {
 			white-space: nowrap;
 		}
 		.form-desc {
+			font-size: 100%;
 			padding-bottom: 20px;
 			resize: none;
 		}
