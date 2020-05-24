@@ -178,14 +178,14 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-#app-content-vue {
+.app-content {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
 
 	// Force hide navigation toggle as there is no navigation
 	// stylelint-disable-next-line selector-pseudo-element-no-unknown
-	::v-deep #app-navigation-toggle {
+	::v-deep .app-navigation-toggle {
 		display: none !important;
 	}
 

@@ -399,7 +399,7 @@ export default {
 </script>
 
 <style lang="scss">
-#app-content-vue {
+.app-content {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
