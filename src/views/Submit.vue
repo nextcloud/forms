@@ -209,7 +209,7 @@ export default {
 			border: none;
 		}
 		.form-title {
-			font-size: 2em;
+			font-size: 28px;
 			font-weight: bold;
 			color: var(--color-main-text);
 			min-height: 36px;

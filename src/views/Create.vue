@@ -44,20 +44,22 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
-			<input
-				id="form-title"
-				ref="title"
-				v-model="form.title"
-				class="form-title"
-				:minlength="0"
-				:maxlength="maxStringLengths.formTitle"
-				:placeholder="t('forms', 'Form title')"
-				:required="true"
-				autofocus
-				type="text"
-				@click="selectIfUnchanged"
-				@keyup="onTitleChange">
+			<h2>
+				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
+				<input
+					id="form-title"
+					ref="title"
+					v-model="form.title"
+					class="form-title"
+					:minlength="0"
+					:maxlength="maxStringLengths.formTitle"
+					:placeholder="t('forms', 'Form title')"
+					:required="true"
+					autofocus
+					type="text"
+					@click="selectIfUnchanged"
+					@keyup="onTitleChange">
+			</h2>
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea
 				ref="description"
@@ -418,6 +420,10 @@ export default {
 		margin-top: 44px;
 		margin-bottom: 24px;
 
+		h2 {
+			margin-bottom: 0; // because the input field has enough padding
+		}
+
 		.form-title,
 		.form-desc {
 			width: 100%;
@@ -425,7 +431,7 @@ export default {
 			border: none;
 		}
 		.form-title {
-			font-size: 2em;
+			font-size: 28px;
 			font-weight: bold;
 			color: var(--color-main-text);
 			min-height: 36px;
