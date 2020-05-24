@@ -431,6 +431,7 @@ export default {
 			min-height: 36px;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
+			padding-bottom: 6px; // align with h2 of .form-title on submit page
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
