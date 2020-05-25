@@ -71,7 +71,7 @@
 				@keydown="autoSizeDescription"
 				@keyup="onDescChange" />
 			<!-- Only visible if at least one question is marked as mandatory-->
-			<p v-if="mandatoryUsed" class="form-desc info-mandatory">
+			<p v-if="mandatoryUsed" class="info-mandatory">
 				* {{ t('forms', 'Mandatory questions') }}
 			</p>
 		</header>
@@ -425,7 +425,8 @@ export default {
 		}
 
 		.form-title,
-		.form-desc {
+		.form-desc,
+		.info-mandatory {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
@@ -449,6 +450,9 @@ export default {
 		}
 
 		.info-mandatory {
+			font-size: 100%;
+			padding-bottom: 20px;
+			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
 	}
