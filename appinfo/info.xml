@@ -3,14 +3,20 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>forms</id>
     <name>Forms</name>
-    <summary>A forms app, similar to Google Forms.</summary>
-    <description>A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public).</description>
+    <summary>📝 Simple surveys and questionnaires, self-hosted</summary>
+    <description><![CDATA[**Simple surveys and questionnaires, self-hosted!**
+
+- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
+- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.
+- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
+    ]]></description>
     <version>2.0.0-beta2</version>
     <licence>agpl</licence>
 
     <author>Affan Hussain</author>
     <author>Ajfar Huq</author>
     <author>Inigo Jiron</author>
+    <author>Jan C. Borchardt</author>
     <author>John Molakvoæ</author>
     <author>Jonas Rittershofer</author>
     <author>Kai Schröer</author>
@@ -33,10 +39,8 @@
         <admin>https://github.com/nextcloud/forms/blob/master/README.md</admin>
     </documentation>
 
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/Create.PNG</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/List.PNG</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/Vote.PNG</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/Results.PNG</screenshot>
+    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms1.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms2.png</screenshot>
 
     <dependencies>
         <nextcloud min-version="17" max-version="20" />

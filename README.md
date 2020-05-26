@@ -1,83 +1,40 @@
 # Nextcloud Forms
+
 ![Downloads](https://img.shields.io/github/downloads/nextcloud/forms/total.svg?style=flat-square)
 [![Code coverage](https://img.shields.io/codecov/c/github/nextcloud/forms.svg?style=flat-square)](https://codecov.io/gh/nextcloud/forms/)
 [![Dependabot status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg?longCache=true&style=flat-square&logo=dependabot)](https://dependabot.com)
+[![Start contributing](https://img.shields.io/github/issues/nextcloud/forms/good%20first%20issue?color=7057ff&label=Contribute)](https://github.com/nextcloud/forms/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22good+first+issue%22)
 
-Forms allows the creation of shareable forms, with multiple question types and privacy settings.
+**📝 Simple surveys and questionnaires, self-hosted**
+
+![](img/screenshots/forms1.png)
+
+- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
+- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.
+- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 
 
-**Note**: This app is tested with Apache2 webserver, MySQL database, and apt-get package manager. To use alternatives, replace the relevant commands with those of your technology. This document assumes that a working
-NextCloud development environment has been installed. See https://docs.nextcloud.com/server/stable/developer_manual/general/devenv.html for help with this.
+## 🏗 Development setup
 
-## Build the app
+1. ☁ Clone this app into the `apps` folder of your Nextcloud: `git clone https://github.com/nextcloud/forms.git`
+2. 👩‍💻 In the folder of the app, run the command `npm ci && npm run dev` to install dependencies and build the Javascript.
+3. ✅ Enable the app through the app management of your Nextcloud
+4. 🎉 Partytime! Help fix [some issues](https://github.com/nextcloud/forms/issues) and [review pull requests](https://github.com/nextcloud/forms/pulls) 👍
 
-``` bash
-# set up and build for production
-make
 
-# install dependencies
-make dev-setup
+### 🧙 Advanced development stuff
 
-# build for dev and watch changes
-make watch-js
+To build the Javascript whenever you make changes, you can also use `npm run build`. Or `npm run watch` to automatically rebuild on every file save.
 
-# build for dev
-make build-js
+You run all tests by using `make test`.
 
-# build for production with minification
-make build-js-production
 
-```
-## Running tests
-You can use the provided Makefile to run all tests by using:
+## ♥ How to create a pull request
 
-_ps: only works if you're using php locally and have forms installed info your apps default folder_
+This guide will help you get started:
+- 💃 [Opening a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request)
 
-```
-make test
-```
 
-## :v: Code of conduct
+## ✌ Code of conduct
 
-The Nextcloud community has core values that are shared between all members during conferences,
-hackweeks and on all interactions in online platforms including [Github](https://github.com/nextcloud) and [Forums](https://help.nextcloud.com).
-If you contribute, participate or interact with this community, please respect [our shared values](https://nextcloud.com/code-of-conduct/). :relieved:
-
-## :heart: How to create a pull request
-
-This guide will help you get started: 
-- :dancer: :smile: [Opening a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request) 
-
-## Code Overview
-The following are the most important code files for development of the Forms App.
-**Note**: all paths are relative to nextcloud/apps/forms/
-
--	**lib/Controller/apiController.php**: The main API of the application. The functions defined in this file are called from http requests, and interface with the database
-
--	**lib/Controller/pageController.php**: Passes objects between screens
-
--	**lib/Db/**: All the files where database entities are defined and SQL queries are written. Mapper files define functions that retrieve data from the database
-
--	**src/js/**
-	- **Main.js**: where Vue app is created
-    - **App.vue**: The root component for the vue app
-    - **Router.js**: Defines URLs that can be navigated to from the Vue app
-
--	**src/js/components/**
-    - **formsListItem.vue**: Defines the list items (created surveys) within the forms app home page
-    - **quizFormItem.vue**: Questions (for any survey) are defined as a quizFormItem here
-
--	**src/js/views/**
-    -	**Create.vue**: File where survey creation page is handled
-
-    -	**List.vue**: File where list of created surveys is handled (located on the forms app home page)
-    -	**Results.vue**: File where page that displays survey results is handled
-
-    -	**appinfo/routes.php**: Defines server endpoints that can be accessed by the client
-
-- **/js/vote.js**: File that contains the logic for the response page and responding to a form
-
-- **/css/vote.scss**: File that contains CSS formatting for the response page
-
-- **/templates/vote.tmpl.php**: File that contains the form template that is dynamically populated by the database
-
+The Nextcloud community has core values that are shared between all members during conferences, hackweeks and on all interactions in online platforms including [Github](https://github.com/nextcloud) and [forums](https://help.nextcloud.com). If you contribute, participate or interact with this community, please respect [our shared values](https://nextcloud.com/code-of-conduct/). 😌
