@@ -40,7 +40,8 @@
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
 				type="text"
-				@input="onInput">
+				@input="onInput"
+				@keydown.enter.exact.prevent="onKeydownEnter">
 		</div>
 	</Question>
 </template>

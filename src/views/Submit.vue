@@ -38,7 +38,9 @@
 			</header>
 
 			<!-- Questions list -->
-			<form v-if="!loading && !success" @submit.prevent="onSubmit">
+			<form v-if="!loading && !success"
+				ref="form"
+				@submit.prevent="onSubmit">
 				<ul>
 					<Questions
 						:is="answerTypes[question.type].component"
@@ -50,9 +52,12 @@
 						:index="index + 1"
 						:max-string-lengths="maxStringLengths"
 						v-bind="question"
-						:values.sync="answers[question.id]" />
+						:values.sync="answers[question.id]"
+						@keydown.enter="onKeydownEnter"
+						@keydown.ctrl.enter="onKeydownCtrlEnter" />
 				</ul>
-				<input class="primary"
+				<input ref="submitButton"
+					class="primary"
 					type="submit"
 					:value="t('forms', 'Submit')"
 					:disabled="loading"
@@ -154,6 +159,27 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * On Enter, focus next form-element
+		 * Last form element is the submit button, the form submits on enter then
+		 * @param {Object} event The fired event.
+		 */
+		onKeydownEnter(event) {
+			const formInputs = Array.from(this.$refs.form)
+			const sourceInputIndex = formInputs.findIndex(input => input === event.originalTarget)
+			// Focus next form element
+			formInputs[sourceInputIndex + 1].focus()
+		},
+
+		/**
+		 * Ctrl+Enter typically fires submit on forms.
+		 * Some inputs do automatically, while some need explicit handling
+		 */
+		onKeydownCtrlEnter() {
+			// Using button-click event to not bypass validity-checks and use our specified behaviour
+			this.$refs.submitButton.click()
+		},
+
 		/**
 		 * Submit the form after the browser validated it 🚀
 		 */
