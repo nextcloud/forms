@@ -46,6 +46,10 @@
 				required
 				@input="onTitleChange">
 			<h3 v-else class="question__header-title" v-text="computedText" />
+			<div v-if="!edit && !questionValid"
+				v-tooltip.auto="warningInvalid"
+				class="question__header-warning icon-error-color"
+				tabindex="0" />
 			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
 				<ActionCheckbox :checked="mandatory"
 					@update:checked="onMandatoryChange">
@@ -114,6 +118,14 @@ export default {
 			type: Number,
 			required: true,
 		},
+		contentValid: {
+			type: Boolean,
+			default: true,
+		},
+		warningInvalid: {
+			type: String,
+			default: t('forms', 'This question needs a title!'),
+		},
 	},
 
 	computed: {
@@ -126,6 +138,14 @@ export default {
 				return this.text + ' *'
 			}
 			return this.text
+		},
+
+		/**
+		 * Question valid, if text not empty and content valid
+		 * @returns {Boolean} true if question valid
+		 */
+		questionValid() {
+			return this.text && this.contentValid
 		},
 	},
 
@@ -238,6 +258,10 @@ export default {
 
 		&-title[type=text] {
 			border-bottom-color: var(--color-border-dark);
+		}
+
+		&-warning {
+			padding: 22px;
 		}
 
 		&-menu.action-item {

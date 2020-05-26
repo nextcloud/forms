@@ -43,6 +43,7 @@ export default {
 	 * @prop titlePlaceholder The placeholder users see as empty question-title in edit-mode
 	 * @prop createPlaceholder *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field
 	 * @prop submitPlaceholder *optional* The placeholder that is visible in submit-mode, to indicate a form input-field
+	 * @prop warningInvalid The warning users see in edit mode, if the question is invalid.
 	 */
 
 	multiple_unique: {
@@ -52,6 +53,7 @@ export default {
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Multiple choice question title'),
+		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
 
 		// Using the same vue-component as multiple, this specifies that the component renders as multiple_unique.
 		unique: true,
@@ -64,6 +66,7 @@ export default {
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
+		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
 	},
 
 	short: {
@@ -74,6 +77,7 @@ export default {
 		titlePlaceholder: t('forms', 'Short answer question title'),
 		createPlaceholder: t('forms', 'People can enter a short answer'),
 		submitPlaceholder: t('forms', 'Enter a short answer'),
+		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
 	long: {
@@ -84,6 +88,7 @@ export default {
 		titlePlaceholder: t('forms', 'Long text question title'),
 		createPlaceholder: t('forms', 'People can enter a long text'),
 		submitPlaceholder: t('forms', 'Enter a long text'),
+		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
 }
