@@ -46,7 +46,7 @@
 		<navigation>
 			<name>Forms</name>
 			<route>forms.page.index</route>
-			<icon>app.svg</icon>
+			<icon>forms.svg</icon>
 			<order>77</order>
 		</navigation>
 	</navigations>
