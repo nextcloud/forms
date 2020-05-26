@@ -70,6 +70,7 @@
 					:clearable="false"
 					:disabled-date="notBeforeToday"
 					:disabled-time="notBeforeNow"
+					:editable="false"
 					:format="format"
 					:minute-step="5"
 					:placeholder="t('forms', 'Expiration date')"
