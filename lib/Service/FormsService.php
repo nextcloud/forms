@@ -31,6 +31,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\IGroup;
 use OCP\IGroupManager;
+use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -62,13 +63,17 @@ class FormsService {
 	/** @var IUserSession */
 	private $userSession;
 
+	/** @var ILogger */
+	private $logger;
+
 	public function __construct(FormMapper $formMapper,
 								QuestionMapper $questionMapper,
 								OptionMapper $optionMapper,
 								SubmissionMapper $submissionMapper,
 								IGroupManager $groupManager,
 								IUserManager $userManager,
-								IUserSession $userSession) {
+								IUserSession $userSession,
+								ILogger $logger) {
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
@@ -76,6 +81,7 @@ class FormsService {
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
 		$this->userSession = $userSession;
+		$this->logger = $logger;
 	}
 
 

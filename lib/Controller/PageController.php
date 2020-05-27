@@ -38,6 +38,7 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IGroupManager;
 use OCP\IInitialStateService;
 use OCP\IL10N;
+use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -64,13 +65,16 @@ class PageController extends Controller {
 
 	/** @var IL10N */
 	private $l10n;
-	
+
+	/** @var ILogger */
+	private $logger;
+
 	/** @var IUserManager */
 	private $userManager;
 	
 	/** @var IUserSession */
 	private $userSession;
-	
+
 	/** @var Array
 	 *
 	 * Maximum String lengths, the database is set to store.
@@ -91,6 +95,7 @@ class PageController extends Controller {
 								IGroupManager $groupManager,
 								IInitialStateService $initialStateService,
 								IL10N $l10n,
+								ILogger $logger,
 								IUserManager $userManager,
 								IUserSession $userSession) {
 		parent::__construct($appName, $request);
@@ -104,6 +109,7 @@ class PageController extends Controller {
 		$this->groupManager = $groupManager;
 		$this->initialStateService = $initialStateService;
 		$this->l10n = $l10n;
+		$this->logger = $logger;
 		$this->userManager = $userManager;
 		$this->userSession = $userSession;
 	}
