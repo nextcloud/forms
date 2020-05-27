@@ -811,6 +811,6 @@ class ApiController extends Controller {
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
 
-		return new Http\JSONResponse($id);
+		return new Http\JSONResponse($formId);
 	}
 }
