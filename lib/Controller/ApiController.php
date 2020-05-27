@@ -74,8 +74,8 @@ class ApiController extends Controller {
 	/** @var IL10N */
 	private $l10n;
 
-	/** @var IUserSession */
-	private $userSession;
+	/** @var IUser */
+	private $currentUser;
 
 	/** @var IUserManager */
 	private $userManager;
@@ -85,7 +85,6 @@ class ApiController extends Controller {
 
 	public function __construct(string $appName,
 								IRequest $request,
-								$userId, // TODO remove & replace with userSession below.
 								IUserSession $userSession,
 								IUserManager $userManager,
 								FormMapper $formMapper,
@@ -98,8 +97,6 @@ class ApiController extends Controller {
 								FormsService $formsService) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
-		$this->userId = $userId;
-		$this->userSession = $userSession;
 		$this->userManager = $userManager;
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
@@ -111,6 +108,8 @@ class ApiController extends Controller {
 		$this->logger = $logger;
 		$this->l10n = $l10n;
 		$this->formsService = $formsService;
+
+		$this->currentUser = $userSession->getUser();
 	}
 
 	/**
@@ -119,7 +118,7 @@ class ApiController extends Controller {
 	 * Read Form-List only with necessary information for Listing.
 	 */
 	public function getForms(): Http\JSONResponse {
-		$forms = $this->formMapper->findAllByOwnerId($this->userId);
+		$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
 
 		$result = [];
 		foreach ($forms as $form) {
@@ -164,8 +163,7 @@ class ApiController extends Controller {
 	public function newForm(): Http\JSONResponse {
 		$form = new Form();
 
-		$currentUser = \OC::$server->getUserSession()->getUser()->getUID();
-		$form->setOwnerId($currentUser);
+		$form->setOwnerId($this->currentUser->getUID());
 		$form->setCreated(time());
 		$form->setHash(\OC::$server->getSecureRandom()->generate(
 			16,
@@ -207,7 +205,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -252,7 +250,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -287,7 +285,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -336,7 +334,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -425,7 +423,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -461,7 +459,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -503,7 +501,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -542,7 +540,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find option, question or form'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -574,7 +572,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form or option'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -614,7 +612,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -710,14 +708,13 @@ class ApiController extends Controller {
 		$submission = new Submission();
 		$submission->setFormId($formId);
 		$submission->setTimestamp(time());
-		$user = $this->userSession->getUser();
 
 		// If not logged in or anonymous use anonID
-		if (!$user || $form->getIsAnonymous()) {
+		if (!$this->currentUser || $form->getIsAnonymous()) {
 			$anonID = "anon-user-".  hash('md5', (time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
-			$submission->setUserId($user->getUID());
+			$submission->setUserId($this->currentUser->getUID());
 		}
 
 		// Insert new submission
@@ -777,7 +774,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}
@@ -803,7 +800,7 @@ class ApiController extends Controller {
 			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($form->getOwnerId() !== $this->userId) {
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
 		}

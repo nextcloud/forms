@@ -60,8 +60,8 @@ class FormsService {
 	/** @var IUserManager */
 	private $userManager;
 
-	/** @var IUserSession */
-	private $userSession;
+	/** @var IUser */
+	private $currentUser;
 
 	/** @var ILogger */
 	private $logger;
@@ -80,8 +80,9 @@ class FormsService {
 		$this->submissionMapper = $submissionMapper;
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
-		$this->userSession = $userSession;
 		$this->logger = $logger;
+
+		$this->currentUser = $userSession->getUser();
 	}
 
 
@@ -162,7 +163,6 @@ class FormsService {
 	public function canSubmit($formId) {
 		$form = $this->formMapper->findById($formId);
 		$access = $form->getAccess();
-		$user = $this->userSession->getUser();
 
 		// We cannot control how many time users can submit in public mode
 		if ($access['type'] === 'public') {
@@ -173,7 +173,7 @@ class FormsService {
 		if ($form->getSubmitOnce()) {
 			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
 			foreach ($participants as $participant) {
-				if ($participant === $user->getUID()) {
+				if ($participant === $this->currentUser->getUID()) {
 					return false;
 				}
 			}
@@ -192,19 +192,18 @@ class FormsService {
 		$form = $this->formMapper->findById($formId);
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
-		$user = $this->userSession->getUser();
 
 		if ($access['type'] === 'public') {
 			return true;
 		}
 		
 		// Refuse access, if not public and no user logged in.
-		if (!$user) {
+		if (!$this->currentUser) {
 			return false;
 		}
 
 		// Always grant access to owner.
-		if ($ownerId === $user->getUID()) {
+		if ($ownerId === $this->currentUser->getUID()) {
 			return true;
 		}
 
@@ -215,13 +214,13 @@ class FormsService {
 
 		// Selected Access remains.
 		// Grant Access, if user is in users-Array.
-		if (in_array($user->getUID(), $access['users'])) {
+		if (in_array($this->currentUser->getUID(), $access['users'])) {
 			return true;
 		}
 
 		// Check if access granted by group.
 		foreach ($access['groups'] as $group) {
-			if ($this->groupManager->isInGroup($user->getUID(), $group)) {
+			if ($this->groupManager->isInGroup($this->currentUser->getUID(), $group)) {
 				return true;
 			}
 		}
