@@ -1,7 +1,5 @@
 { "translations": {
     "Forms" : "フォーム",
-    "A forms app, similar to Google Forms." : "Googleフォームに似たフォームアプリ。",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Googleフォームに似たフォームアプリ。アクセスを制限することができます（メンバー、特定のグループ/ユーザー、および一般）。",
     "Create new form" : "新規フォームを作成",
     "Delete form" : "フォームを削除",
     "Cannot copy, please copy the link manually" : "コピーできませんでした。手動でリンクをコピーしてください。",

@@ -4,8 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "תגובה אלמונית",
     "Shared by %s" : "שותף על ידי %s",
     "Forms" : "טפסים",
-    "A forms app, similar to Google Forms." : "יישומון טפסים, בדומה ל־Google Forms.",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "יישומון טפסים, דומה ל־Google Forms עם אפשרות להגבלת גישה (חברים, קבוצות/משתמשים מסוימים, הסתרה או חשיפה).",
     "New form" : "טופס חדש",
     "Loading forms …" : "הטפסים נטענים…",
     "No forms created yet" : "לא נוצרו עדיין טפסים",

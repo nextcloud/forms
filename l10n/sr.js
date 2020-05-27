@@ -2,8 +2,6 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Упитници",
-    "A forms app, similar to Google Forms." : "Апликација упитника, слична као Google Forms.",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Апликација упитника, слична као Google Forms са могућношћу ограничавања приступа (члановима, одређеним групама, јавно).",
     "New form" : "Нови упитник",
     "Loading forms …" : "Учитавам упитнике…",
     "Create new form" : "Направи нови упитник",

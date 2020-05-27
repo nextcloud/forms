@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "Shared by %s" : "Bendrina %s",
     "Forms" : "Anketos",
-    "A forms app, similar to Google Forms." : "Anketų programėlė, panaši į Google formas.",
     "New form" : "Nauja anketa",
     "Loading forms …" : "Įkeliamos anketos…",
     "Create a form" : "Sukurti anketą",

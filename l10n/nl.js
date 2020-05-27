@@ -4,8 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "Anoniem antwoord",
     "Shared by %s" : "Gedeeld door %s",
     "Forms" : "Formulieren",
-    "A forms app, similar to Google Forms." : "Een formulieren app, net als Google Forms.",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Een formulierenapp, zoals Google Forms met de mogelijkheid om toegang te beperken (leden, bepaalde groepen/gebruikers, verborgen en openbaar).",
     "New form" : "Nieuw formulier",
     "Loading forms …" : "Formulieren laden ...",
     "No forms created yet" : "Nog geen formulieren gecreëerd",

@@ -4,8 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "Anonymná odpoveď",
     "Shared by %s" : "Zdieľané %s",
     "Forms" : "Formuláre",
-    "A forms app, similar to Google Forms." : "Aplikácia Formuláre podobná formulárom Google.",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Aplikácia Formuláre podobná formulárom Google s možnosťou obmedzenia prístupu (členov, určitých skupín/používateľov a verejnostii).",
     "New form" : "Nový formulár",
     "Loading forms …" : "Načítavanie formulárov…",
     "No forms created yet" : "Zatiaľ nebol vytvorený žiadny formulár",

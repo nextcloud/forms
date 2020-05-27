@@ -1,7 +1,5 @@
 { "translations": {
     "Forms" : "表单",
-    "A forms app, similar to Google Forms." : "一个表单应用，类似于谷歌表单。",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "一个表单应用，类似于谷歌表单，可以限制访问（成员，特定的分组/用户，和公开）",
     "New form" : "新表格",
     "Loading forms …" : "正在加载表格",
     "No forms created yet" : "尚未发现表格",

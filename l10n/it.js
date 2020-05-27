@@ -4,8 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "Risposta anonima",
     "Shared by %s" : "Condiviso da %s",
     "Forms" : "Moduli",
-    "A forms app, similar to Google Forms." : "Un'applicazione di moduli, simile a Google Forms.",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Un'applicazione di moduli, simile a Google Forms con la possibilità di limitare l'accesso (membri, determinati gruppi/utenti, e pubblico).",
     "New form" : "Nuovo modulo",
     "Loading forms …" : "Caricamento moduli…",
     "No forms created yet" : "Ancora nessun modulo creato",

@@ -4,8 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "Respuesta anónima",
     "Shared by %s" : "Compartido por %s ",
     "Forms" : "Formularios",
-    "A forms app, similar to Google Forms." : "Aplicación de formularios, similar a Formularios de Google",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Aplicación de formularios, similar a Formularios de Google con la posibilidad de restringir el acceso (miembros, grupos/usuarios específicos, y publico)",
     "New form" : "Nuevo formulario",
     "Loading forms …" : "Cargando formulario ...",
     "No forms created yet" : "Aún no se han creado formularios",

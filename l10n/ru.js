@@ -4,8 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "Анонимный ответ",
     "Shared by %s" : "Опубликовано пользователем %s",
     "Forms" : "Формы",
-    "A forms app, similar to Google Forms." : "Приложени форм, похожее на Google Forms.",
-    "A forms app, similar to Google Forms with the possibility to restrict access (members, certain groups/users, and public)." : "Приложение форм, похожее на Google Forms с возможностью ограничения доступа.",
     "New form" : "Новая форма",
     "Loading forms …" : "Загрузка форм ...",
     "No forms created yet" : "Нет созданных форм",
