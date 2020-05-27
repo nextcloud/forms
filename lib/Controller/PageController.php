@@ -46,6 +46,11 @@ use OCP\IUserSession;
 use OCP\Util;
 
 class PageController extends Controller {
+	private const TEMPLATE_EXPIRED = 'expired';
+	private const TEMPLATE_MAIN = 'main';
+	private const TEMPLATE_NOSUBMIT = 'nosubmit';
+	private const TEMPLATE_NOTFOUND = 'notfound';
+
 	protected $appName;
 
 	/** @var FormMapper */
@@ -124,7 +129,7 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, 'main');
+		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 
 	/**
@@ -137,7 +142,7 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, 'main');
+		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 
 	/**
@@ -152,7 +157,7 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, 'main');
+		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 
 	/**
@@ -165,7 +170,7 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, 'main');
+		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 
 	/**
@@ -178,7 +183,7 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms');
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, 'main');
+		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 
 	/**
@@ -195,47 +200,65 @@ class PageController extends Controller {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
-			return new TemplateResponse('forms', 'notfound');
-		}
-
-		// Does the user have permissions to submit (resp. submitOnce)
-		if (!$this->formsService->canSubmit($form->getId())) {
-			return new TemplateResponse('forms', 'nosubmit');
+			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
 		}
 
 		// Does the user have access to form
 		if (!$this->formsService->hasUserAccess($form->getId())) {
-			return new TemplateResponse('forms', 'notfound');
+			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
+		}
+
+		// Does the user have permissions to submit (resp. submitOnce)
+		if (!$this->formsService->canSubmit($form->getId())) {
+			return $this->provideTemplate(self::TEMPLATE_NOSUBMIT, $form);
 		}
 
 		// Has form expired
 		if ($form->getExpires() !== 0 && time() > $form->getExpires()) {
-			return new TemplateResponse('forms', 'expired');
+			return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);
 		}
 
+		// Main Template to fill the form
 		Util::addScript($this->appName, 'submit');
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
+		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
+	}
 
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 * @PublicPage
+	 * @param string $template
+	 * @param Form $form Necessary to set header on public forms, not necessary for 'notfound'-template
+	 * @return TemplateResponse
+	 */
+	public function provideTemplate(string $template, Form $form = null): ?TemplateResponse {
+		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {
 			Util::addStyle($this->appName, 'public');
-			$response = new PublicTemplateResponse($this->appName, 'main');
-			$response->setHeaderTitle($form->getTitle());
+			$response = new PublicTemplateResponse($this->appName, $template);
 
-			// Get owner and check display name privacy settings
-			$owner = $this->userManager->get($form->getOwnerId());
-			if ($owner instanceof IUser) {
-				$ownerAccount = $this->accountManager->getAccount($owner);
+			// Set Header
+			$response->setHeaderTitle($this->l10n->t('Forms'));
+			if ($template !== self::TEMPLATE_NOTFOUND) {
+				$response->setHeaderTitle($form->getTitle());
 
-				$ownerName = $ownerAccount->getProperty(IAccountManager::PROPERTY_DISPLAYNAME);
-				if ($ownerName->getScope() === IAccountManager::VISIBILITY_PUBLIC) {
-					$response->setHeaderDetails($this->l10n->t('Shared by %s', [$ownerName->getValue()]));
+				// Get owner and check display name privacy settings
+				$owner = $this->userManager->get($form->getOwnerId());
+				if ($owner instanceof IUser) {
+					$ownerAccount = $this->accountManager->getAccount($owner);
+
+					$ownerName = $ownerAccount->getProperty(IAccountManager::PROPERTY_DISPLAYNAME);
+					if ($ownerName->getScope() === IAccountManager::VISIBILITY_PUBLIC) {
+						$response->setHeaderDetails($this->l10n->t('Shared by %s', [$ownerName->getValue()]));
+					}
 				}
 			}
 
 			return $response;
 		}
 
-		return new TemplateResponse($this->appName, 'main');
+		return new TemplateResponse($this->appName, $template);
 	}
 }
