@@ -30,6 +30,7 @@
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div v-if="!readOnly"
 			class="question__drag-handle icon-drag-handle"
+			:class="{'question__drag-handle--shiftup': shiftDragHandle}"
 			:aria-label="t('forms', 'Drag to reorder the questions')" />
 
 		<!-- Header -->
@@ -96,6 +97,10 @@ export default {
 		mandatory: {
 			type: Boolean,
 			required: true,
+		},
+		shiftDragHandle: {
+			type: Boolean,
+			default: false,
 		},
 		edit: {
 			type: Boolean,
@@ -183,6 +188,11 @@ export default {
 		width: 44px;
 		height: 100%;
 		opacity: .5;
+
+		// Avoid moving drag-handle due to newAnswer-input on multiple-Questions
+		&--shiftup {
+			height: calc(100% - 44px);
+		}
 
 		&:hover,
 		&:focus {

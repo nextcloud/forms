@@ -29,6 +29,7 @@
 		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
 		:title-placeholder="answerType.titlePlaceholder"
+		:shift-drag-handle="shiftDragHandle"
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
@@ -62,6 +63,7 @@
 					ref="input"
 					:answer="answer"
 					:index="index"
+					:is-unique="isUnique"
 					:max-option-length="maxStringLengths.optionText"
 					@add="addNewEntry"
 					@delete="deleteOption"
@@ -69,6 +71,7 @@
 			</template>
 
 			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
+				<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
 				<input
 					:aria-label="t('forms', 'Add a new answer')"
 					:placeholder="t('forms', 'Add a new answer')"
@@ -120,6 +123,10 @@ export default {
 
 		areNoneChecked() {
 			return this.values.length === 0
+		},
+
+		shiftDragHandle() {
+			return this.edit && this.options.length !== 0 && !this.isLastEmpty
 		},
 	},
 
@@ -333,15 +340,51 @@ export default {
 .question__item {
 	position: relative;
 	display: inline-flex;
-	align-items: center;
 	min-height: 44px;
+
+	// Taking styles from server radio-input items
+	&__pseudoInput {
+		flex-shrink: 0;
+		display: inline-block;
+		height: 16px;
+		width: 16px !important;
+		vertical-align: middle;
+		margin: 0 14px 0px 0px;
+		border: 1px solid #878787;
+		border-radius: 1px;
+		// Adjust position manually to match pseudo-input and proper position to text
+		position: relative;
+		top: 10px;
+
+		// Show round for Pseudo-Radio-Button
+		&--unique {
+			border-radius: 50%;
+		}
+
+		&:hover {
+			border-color: var(--color-primary-element);
+		}
+	}
 
 	.question__label {
 		flex: 1 1 100%;
 		// Overwrite guest page core styles
 		text-align: left !important;
-		padding: 11px 0 11px 30px;
+		// Some rounding issues lead to this strange number, so label and answerInput show up a the same position, working on different browsers.
+		padding: 6.5px 0 0 30px;
+		line-height: 22px;
+		min-height: 34px;
+		height: min-content;
+		position: relative;
+
 		&::before {
+			box-sizing: border-box;
+			// Adjust position manually for proper position to text
+			position: absolute;
+			top: 10px;
+			width: 16px;
+			height: 16px;
+			margin-bottom: 0;
 			margin-left: -30px !important;
 			margin-right: 14px !important;
 		}
@@ -351,12 +394,15 @@ export default {
 // Using type to have a higher order than the input styling of server
 .question__input[type=text] {
 	width: 100%;
-	min-height: 44px;
+	// Height 34px + 1px Border
+	min-height: 35px;
 	margin: 0;
-	padding: 6px 0;
+	padding: 0 0;
 	border: 0;
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
+	font-size: 14px;
+	position: relative;
 }
 
 input.question__radio,
@@ -364,7 +410,8 @@ input.question__checkbox {
 	z-index: -1;
 	// make sure browser warnings are properly
 	// displayed at the correct location
-	left: 22px;
+	left: 0px;
+	width: 16px;
 }
 
 </style>

@@ -1,5 +1,6 @@
 <template>
 	<li class="question__item">
+		<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
 		<input
 			ref="input"
 			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
@@ -47,6 +48,10 @@ export default {
 		},
 		index: {
 			type: Number,
+			required: true,
+		},
+		isUnique: {
+			type: Boolean,
 			required: true,
 		},
 		maxOptionLength: {
@@ -173,3 +178,50 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+.question__item {
+	position: relative;
+	display: inline-flex;
+	min-height: 44px;
+
+	// Taking styles from server radio-input items
+	&__pseudoInput {
+		flex-shrink: 0;
+		display: inline-block;
+		height: 16px;
+		width: 16px !important;
+		vertical-align: middle;
+		margin: 0 14px 0px 0px;
+		border: 1px solid #878787;
+		border-radius: 1px;
+		// Adjust position manually to match input-checkbox
+		position: relative;
+		top: 10px;
+
+		// Show round for Pseudo-Radio-Button
+		&--unique {
+			border-radius: 50%;
+		}
+
+		&:hover {
+			border-color: var(--color-primary-element);
+		}
+	}
+}
+
+// Using type to have a higher order than the input styling of server
+.question__input[type=text] {
+	width: 100%;
+	// Height 34px + 1px Border
+	min-height: 35px;
+	margin: 0;
+	padding: 0 0;
+	border: 0;
+	border-bottom: 1px dotted var(--color-border-dark);
+	border-radius: 0;
+	font-size: 14px;
+	position: relative;
+}
+
+</style>

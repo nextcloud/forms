@@ -75,7 +75,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 // Using type to have a higher order than the input styling of server
 .question__input[type=text] {
 	width: 100%;
