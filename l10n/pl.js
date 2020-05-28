@@ -4,6 +4,8 @@ OC.L10N.register(
     "Anonymous response" : "Anonimowa odpowiedź",
     "Shared by %s" : "Udostępnione przez %s",
     "Forms" : "Formularze",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Proste sondaże i ankiety, z własnym hostingiem",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Proste sondaże i ankiety, z własnym hostingiem!**\n\n- **📝 Prosta konstrukcja:** Bez masy opcji, tylko niezbędne. Oczywiście działa dobrze na urządzeniach mobilnych.\n- **💾 Eksportuj wyniki:** Wyniki można wyeksportować jako CSV w tym samym formacie, co formularze Google.\n- **🙋 Zaangażuj się!** Mamy zaplanowanych wiele rzeczy, takich jak więcej typów pytań, współpraca przy formularzach, [i wiele innych](https://github.com/nextcloud/forms/milestones)!",
     "New form" : "Nowy formularz",
     "Loading forms …" : "Ładowanie formularza…",
     "No forms created yet" : "Nie utworzono jeszcze formularzy",

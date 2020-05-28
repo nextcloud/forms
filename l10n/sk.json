@@ -2,6 +2,8 @@
     "Anonymous response" : "Anonymná odpoveď",
     "Shared by %s" : "Zdieľané %s",
     "Forms" : "Formuláre",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Jednoduché prieskumy a dotazníky, uložené u vás",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Jednoduché prieskumy a dotazníky, uložené u vás!**\n\n- **📝 Jednoduché vytváranie: ** Žiadne množstvo možností, iba podstatné. Samozrejme, dobre funguje na mobile.\n- **💾 Export výsledkov: ** Výsledky je možné exportovať do súboru CSV v rovnakom formáte, aký používajú formuláre od Googlu.\n- **🙋 Zapojte sa! ** Plánujeme veľa vecí, ako viac typov otázok, spolupráca na formulároch, [a oveľa viac](https://github.com/nextcloud/forms/milestones)!",
     "New form" : "Nový formulár",
     "Loading forms …" : "Načítavanie formulárov…",
     "No forms created yet" : "Zatiaľ nebol vytvorený žiadny formulár",

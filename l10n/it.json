@@ -2,6 +2,8 @@
     "Anonymous response" : "Risposta anonima",
     "Shared by %s" : "Condiviso da %s",
     "Forms" : "Moduli",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Sondaggi e questionari semplici, autonomi",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Sondaggi e questionari semplici, autonomi!**\n\n- **📝 Disegno semplice:** senza eccessi di opzioni, solo gli elementi essenziali. Funziona bene sul cellulare, ovviamente.\n- **💾 Esporta risultati:** i risultati possono essere esportati come CSV nello stesso formato utilizzato da Google Forms.\n- **🙋 Fatti coinvolgere!** abbiamo pianificato molte altre cose come più tipi di domande, collaborazione su moduli, [e molto altro](https://github.com/nextcloud/forms/milestones)!",
     "New form" : "Nuovo modulo",
     "Loading forms …" : "Caricamento moduli…",
     "No forms created yet" : "Ancora nessun modulo creato",
