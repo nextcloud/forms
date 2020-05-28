@@ -7,7 +7,7 @@
 
 **📝 Simple surveys and questionnaires, self-hosted**
 
-![](img/screenshots/forms1.png)
+![](screenshots/forms1.png)
 
 - **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
 - **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.
