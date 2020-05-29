@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Group" : "Grup",
     "Description" : "Deskrisi",
+    "Options" : "Pilihan",
     "Settings" : "Setelan",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
     "Expiration date" : "Tanggal kadaluarsa",

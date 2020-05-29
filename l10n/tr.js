@@ -4,6 +4,8 @@ OC.L10N.register(
     "Anonymous response" : "Anonim yanıt",
     "Shared by %s" : "%s tarafından paylaşıldı",
     "Forms" : "Formlar",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Basit anket ve sınavlar, yerel barındırılır",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Basit anket ve sınavlar, yerel barındırılır!**\n\n- **📝 Basit tasarım:** Tonla özellik yerine yalnız gerekli şeyler. Tabi ki mobil aygıtlarda da sorunsuz çalışır.\n- **💾 Sonuçları dışa aktarma:** Sonuçlar Google Forms ile aynı biçimi kullanan CSV dosyası olarak dışa aktarılabilir.\n- **🙋 Katkıda bulunun!** Daha çok soru türü, formlar üzerinde işbirliği [gibi pek çok özellik](https://github.com/nextcloud/forms/milestones) eklemeyi planlıyoruz!",
     "New form" : "Yeni form",
     "Loading forms …" : "Formlar yükleniyor …",
     "No forms created yet" : "Henüz bir form oluşturulmamış",

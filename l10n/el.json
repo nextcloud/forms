@@ -2,6 +2,8 @@
     "Anonymous response" : "Ανώνυμη απάντηση",
     "Shared by %s" : "Διαμοιράστηκε από %s",
     "Forms" : "Φόρμες",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Απλές αυτόνομες έρευνες και ερωτηματολόγια",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Απλές αυτόνομες έρευνες και ερωτηματολόγια!**\n\n- **📝 Απλός Σχεδιασμός:** Χωρίς περιττές ρυθμίσεις, μόνο τα απαραίτητα. Πλήρη συμβατότητα με φορητές συσκευές.\n- **💾 Εξαγωγή αποτελεσμάτων:** Τα αποτελέσματα μπορούν να εξαχθούν ως CSV όπως την μορφή που χρησιμοποιεί το Google Forms.\n- **🙋 Συμμετέχετε!** Έχουμε προγραμματίσει πολλά πράγματα, όπως περισσότερους τύπους ερωτήσεων, συνεργασία σε φόρμες, [και πολλά περισσότερα](https://github.com/nextcloud/forms/milestones)!",
     "New form" : "Νέα φόρμα",
     "Loading forms …" : "Φόρτωση φορμών ...",
     "No forms created yet" : "Δεν δημιουργήθηκαν φόρμες ακόμα",
