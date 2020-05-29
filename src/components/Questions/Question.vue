@@ -36,6 +36,7 @@
 		<!-- Header -->
 		<div class="question__header">
 			<input v-if="edit || !text"
+				ref="titleInput"
 				:placeholder="titlePlaceholder"
 				:aria-label="t('forms', 'Title of question number {index}', {index})"
 				:value="text"
@@ -45,7 +46,11 @@
 				:maxlength="maxQuestionLength"
 				required
 				@input="onTitleChange">
-			<h3 v-else class="question__header-title" v-text="computedText" />
+			<h3 v-else
+				class="question__header-title"
+				:tabindex="computedTitleTabIndex"
+				@focus="onTitleFocus"
+				v-text="computedText" />
 			<div v-if="!edit && !questionValid"
 				v-tooltip.auto="warningInvalid"
 				class="question__header-warning icon-error-color"
@@ -147,6 +152,17 @@ export default {
 		questionValid() {
 			return this.text && this.contentValid
 		},
+
+		/**
+		 * Only allow tabbing the title when necessary for edit.
+		 * @returns {Number}
+		 */
+		computedTitleTabIndex() {
+			if (!this.readOnly) {
+				return 0
+			}
+			return -1
+		},
 	},
 
 	methods: {
@@ -156,6 +172,18 @@ export default {
 
 		onMandatoryChange(mandatory) {
 			this.$emit('update:mandatory', mandatory)
+		},
+
+		/**
+		 * Allow edit-navigation through Tab-Key
+		 */
+		onTitleFocus() {
+			if (!this.readOnly) {
+				this.enableEdit()
+				this.$nextTick(() => {
+					this.$refs.titleInput.focus()
+				})
+			}
 		},
 
 		/**
