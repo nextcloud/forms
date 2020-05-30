@@ -103,7 +103,7 @@
 					:open.sync="questionMenuOpened"
 					:menu-title="t('forms', 'Add a question')"
 					:primary="true"
-					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-white'">
+					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-primary'">
 					<ActionButton v-for="(answer, type) in answerTypes"
 						:key="answer.label"
 						:close-after-click="true"

@@ -49,3 +49,10 @@
 .icon-maybe {
 	@include icon-color('maybe-vote-variant', 'forms', $color-warning);
 }
+
+.icon-add-primary::before {
+	content: '';
+	background-image: url(icon-color-path('add', 'actions', $color-primary-text, 1, true));
+	width: 16px;
+	height: 16px;
+}
