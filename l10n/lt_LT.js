@@ -28,6 +28,7 @@ OC.L10N.register(
     "Mandatory questions" : "Privalomi klausimai",
     "Add a question" : "Pridėti klausimą",
     "Error while saving form" : "Klaida įrašant anketą",
+    "Back to questions" : "Atgal į klausimus",
     "Export to CSV" : "Eksportuoti į CSV",
     "Options" : "Parinktys",
     "Settings" : "Nustatymai",
