@@ -41,7 +41,7 @@
 		"v-click-outside": "^3.0.1",
 		"v-clipboard": "^2.2.3",
 		"vue": "^2.6.11",
-		"vue-router": "^3.2.0",
+		"vue-router": "^3.3.2",
 		"vuedraggable": "^2.23.2"
 	},
 	"browserslist": [
