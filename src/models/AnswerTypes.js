@@ -32,24 +32,38 @@ import QuestionMultiple from '../components/Questions/QuestionMultiple'
  * @property {string} long
  */
 export default {
+	/**
+	 * Specifying Question-Models in a common place
+	 * Further type-specific parameters are possible.
+	 * @prop component The vue-component this answer-type relies on
+	 * @prop icon The icon corresponding to this answer-type
+	 * @prop label The answer-type label, that users will see as answer-type.
+	 * @prop validate *optional* Define conditions where this question is not ok
+	 *
+	 * @prop titlePlaceholder The placeholder users see as empty question-title in edit-mode
+	 * @prop createPlaceholder *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field
+	 * @prop submitPlaceholder *optional* The placeholder that is visible in submit-mode, to indicate a form input-field
+	 */
 
 	multiple_unique: {
 		component: QuestionMultiple,
 		icon: 'icon-answer-multiple',
 		label: t('forms', 'Multiple choice'),
-		titlePlaceholder: t('forms', 'Multiple choice question title'),
-		unique: true,
-		// Define conditions where this questions is not ok
 		validate: question => question.options.length > 0,
+
+		titlePlaceholder: t('forms', 'Multiple choice question title'),
+
+		// Using the same vue-component as multiple, this specifies that the component renders as multiple_unique.
+		unique: true,
 	},
 
 	multiple: {
 		component: QuestionMultiple,
 		icon: 'icon-answer-checkbox',
 		label: t('forms', 'Checkboxes'),
-		titlePlaceholder: t('forms', 'Checkbox question title'),
-		// Define conditions where this questions is not ok
 		validate: question => question.options.length > 0,
+
+		titlePlaceholder: t('forms', 'Checkbox question title'),
 	},
 
 	short: {
@@ -58,8 +72,8 @@ export default {
 		label: t('forms', 'Short answer'),
 
 		titlePlaceholder: t('forms', 'Short answer question title'),
-		submitPlaceholder: t('forms', 'Enter a short answer'),
 		createPlaceholder: t('forms', 'People can enter a short answer'),
+		submitPlaceholder: t('forms', 'Enter a short answer'),
 	},
 
 	long: {
@@ -68,8 +82,8 @@ export default {
 		label: t('forms', 'Long text'),
 
 		titlePlaceholder: t('forms', 'Long text question title'),
-		submitPlaceholder: t('forms', 'Enter a long text'),
 		createPlaceholder: t('forms', 'People can enter a long text'),
+		submitPlaceholder: t('forms', 'Enter a long text'),
 	},
 
 }
