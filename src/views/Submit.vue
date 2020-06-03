@@ -28,11 +28,11 @@
 				<h2 class="form-title">
 					{{ formTitle }}
 				</h2>
-				<p v-if="!loading && !success" class="form-desc">
-					{{ form.description }}
-				</p>
+				<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
+				<!-- eslint-disable-next-line -->
+				<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
 				<!-- Only visible if at least one question is marked as mandatory-->
-				<p v-if="mandatoryUsed && !loading && !success" class="form-desc info-mandatory">
+				<p v-if="mandatoryUsed && !loading && !success" class="info-mandatory">
 					* {{ t('forms', 'Mandatory questions') }}
 				</p>
 			</header>
@@ -203,7 +203,8 @@ export default {
 		margin-bottom: 24px;
 
 		.form-title,
-		.form-desc {
+		.form-desc,
+		.info-mandatory {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
@@ -221,11 +222,16 @@ export default {
 		}
 		.form-desc {
 			font-size: 100%;
+			line-height: 150%;
 			padding-bottom: 20px;
 			resize: none;
+			white-space: pre-line;
 		}
 
 		.info-mandatory {
+			font-size: 100%;
+			padding-bottom: 20px;
+			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
 	}
