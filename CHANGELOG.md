@@ -1,5 +1,66 @@
 # Changelog
 
+## v2.0.0-beta.3 - 2020-06-04
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta2...v2.0.0-beta.3)
+
+### Enhancements
+- Sort Navigation newest forms first
+  [\#402](https://github.com/nextcloud/forms/pull/402) ([jotoeri](https://github.com/jotoeri))
+- Focus title after form load
+  [\#369](https://github.com/nextcloud/forms/pull/369) ([jancborchardt](https://github.com/jancborchardt))
+
+### Fixed
+- Use icon-add in primary-text color
+  [\#429](https://github.com/nextcloud/forms/pull/429) ([jotoeri](https://github.com/jotoeri))
+- Fix linebreak in description
+  [\#424](https://github.com/nextcloud/forms/pull/424) ([jotoeri](https://github.com/jotoeri))
+- Fix Screenshot directory
+  [\#421](https://github.com/nextcloud/forms/pull/421) ([jotoeri](https://github.com/jotoeri))
+- Fix variable-typo
+  [\#418](https://github.com/nextcloud/forms/pull/418) ([jotoeri](https://github.com/jotoeri))
+- Fix expiration editable
+  [\#414](https://github.com/nextcloud/forms/pull/414) ([jotoeri](https://github.com/jotoeri))
+- Adjust cut descenders on formtitle
+  [\#410](https://github.com/nextcloud/forms/pull/410) ([jotoeri](https://github.com/jotoeri))
+- Prevent question menu icon and menu itself overlapping top right actions
+  [\#404](https://github.com/nextcloud/forms/pull/404) ([jancborchardt](https://github.com/jancborchardt))
+- Fix remove empty questions on submit
+  [\#397](https://github.com/nextcloud/forms/pull/397) ([jotoeri](https://github.com/jotoeri))
+- Fix saving options on fast proceed
+  [\#396](https://github.com/nextcloud/forms/pull/396) ([jotoeri](https://github.com/jotoeri))
+- Use cancelable request
+  [\#393](https://github.com/nextcloud/forms/pull/393) ([jotoeri](https://github.com/jotoeri))
+- Fix key-exists error
+  [\#392](https://github.com/nextcloud/forms/pull/392) ([jotoeri](https://github.com/jotoeri))
+- Fix newQuestions console error mandatory null
+  [\#387](https://github.com/nextcloud/forms/pull/387) ([jotoeri](https://github.com/jotoeri))
+- Use proper exit code for composer lint
+  [\#384](https://github.com/nextcloud/forms/pull/384) ([MorrisJobke](https://github.com/MorrisJobke))
+- Close navigation on mobile on new form
+  [\#380](https://github.com/nextcloud/forms/pull/380) ([jotoeri](https://github.com/jotoeri))
+- Fix Navigation active on results
+  [\#379](https://github.com/nextcloud/forms/pull/379) ([jotoeri](https://github.com/jotoeri))
+- Fix redirects
+  [\#377](https://github.com/nextcloud/forms/pull/377) ([jotoeri](https://github.com/jotoeri))
+- Fix Results initalState missing
+  [\#376](https://github.com/nextcloud/forms/pull/376) ([jotoeri](https://github.com/jotoeri))
+- Correct fix window title
+  [\#375](https://github.com/nextcloud/forms/pull/375) ([jotoeri](https://github.com/jotoeri))
+- Set max-version to 20 for new development version of Nextcloud
+  [\#370](https://github.com/nextcloud/forms/pull/370) ([jancborchardt](https://github.com/jancborchardt))
+- Update window title
+  [\#368](https://github.com/nextcloud/forms/pull/368) ([jotoeri](https://github.com/jotoeri))
+- Do not prefill form or question title for less confusion
+  [\#367](https://github.com/nextcloud/forms/pull/367) ([jancborchardt](https://github.com/jancborchardt))
+- Fix overlapping text of long answers
+  [\#366](https://github.com/nextcloud/forms/pull/366) ([jancborchardt](https://github.com/jancborchardt))
+- Include more sharing links
+  [\#363](https://github.com/nextcloud/forms/pull/363) ([jotoeri](https://github.com/jotoeri))
+- Fix export-button
+  [\#362](https://github.com/nextcloud/forms/pull/362) ([jotoeri](https://github.com/jotoeri))
+- Fix Error-Messages
+  [\#360](https://github.com/nextcloud/forms/pull/360) ([jotoeri](https://github.com/jotoeri))
+
 ## v2.0.0-beta2 - 2020-05-06
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta1...v2.0.0-beta2)
 
