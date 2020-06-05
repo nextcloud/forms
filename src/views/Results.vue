@@ -161,13 +161,15 @@ export default {
 			})
 		},
 
-		copyShareLink() {
+		copyShareLink(event) {
 			const $formLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
 			if (this.$clipboard($formLink)) {
 				showSuccess(t('forms', 'Form link copied'))
 			} else {
 				showError(t('forms', 'Cannot copy, please copy the link manually'))
 			}
+			// Set back focus as clipboard removes focus
+			event.target.focus()
 		},
 
 		async loadFormResults() {
