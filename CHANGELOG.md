@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.0.0-beta.4 - 2020-06-09
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.3...v2.0.0-beta.4)
+
+### Fixed
+- Keep focus when copy Share-Link
+  [\#428](https://github.com/nextcloud/forms/pull/428) ([jotoeri](https://github.com/jotoeri))
+- Avoid Submit on Enter
+  [\#413](https://github.com/nextcloud/forms/pull/413) ([jotoeri](https://github.com/jotoeri))
+- Delete empty options from Db
+  [\#388](https://github.com/nextcloud/forms/pull/388) ([jotoeri](https://github.com/jotoeri))
+
 ## v2.0.0-beta.3 - 2020-06-04
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta2...v2.0.0-beta.3)
 
