@@ -35,10 +35,10 @@
 		</p>
 
 		<Answer
-			v-for="answer in squashedAnswers"
-			:key="answer.questionId"
-			:answer="answer"
-			:question="questionToAnswer(answer.questionId)" />
+			v-for="question in answeredQuestions"
+			:key="question.id"
+			:answer-text="question.squashedAnswers"
+			:question-text="question.text" />
 	</div>
 </template>
 
@@ -70,30 +70,37 @@ export default {
 	},
 
 	computed: {
+		// Format submission-timestamp to DateTime
 		submissionDateTime() {
 			return moment(this.submission.timestamp, 'X').format('LLLL')
 		},
-		squashedAnswers() {
-			const squashedArray = []
 
-			this.submission.answers.forEach(answer => {
-				const index = squashedArray.findIndex(ansSq => ansSq.questionId === answer.questionId)
-				if (index > -1) {
-					squashedArray[index].text = squashedArray[index].text.concat('; ' + answer.text)
-				} else {
-					squashedArray.push(answer)
+		/**
+		 * Join answered Questions with corresponding answers.
+		 * Multiple answers to a question are squashed into one string.
+		 * @returns {Array}
+		 */
+		answeredQuestions() {
+			const answeredQuestionsArray = []
+
+			this.questions.forEach(question => {
+				const answers = this.submission.answers.filter(answer => answer.questionId === question.id)
+				if (!answers.length) {
+					return // no answers, go to next question
 				}
-			})
+				const squashedAnswers = answers.map(answer => answer.text).join('; ')
 
-			return squashedArray
+				answeredQuestionsArray.push({
+					'id': question.id,
+					'text': question.text,
+					'squashedAnswers': squashedAnswers,
+				})
+			})
+			return answeredQuestionsArray
 		},
 	},
 
 	methods: {
-		questionToAnswer(questionId) {
-			return this.questions.find(question => question.id === questionId)
-		},
-
 		onDelete() {
 			this.$emit('delete')
 		},
