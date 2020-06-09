@@ -40,7 +40,8 @@
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
 				@input="onInput"
-				@keydown="autoSizeText" />
+				@keypress="autoSizeText"
+				@keydown.ctrl.enter="onKeydownCtrlEnter" />
 		</div>
 	</Question>
 </template>
@@ -73,6 +74,9 @@ export default {
 			const textarea = this.$refs.textarea
 			textarea.style.cssText = 'height:auto; padding:0'
 			textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
+		},
+		onKeydownCtrlEnter(event) {
+			this.$emit('keydown', event)
 		},
 	},
 }

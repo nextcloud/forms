@@ -46,7 +46,8 @@
 						:name="`${id}-answer`"
 						:required="isRequired(answer.id)"
 						:type="isUnique ? 'radio' : 'checkbox'"
-						@change="onChange($event, answer.id)">
+						@change="onChange($event, answer.id)"
+						@keydown.enter.exact.prevent="onKeydownEnter">
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${answer.id}`"
