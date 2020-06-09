@@ -25,7 +25,9 @@
 		:class="{ 'question--edit': edit }"
 		:aria-label="t('forms', 'Question number {index}', {index})"
 		class="question"
-		@click="enableEdit">
+		@click="enableEdit"
+		@focusin="onFocusIn"
+		@focusout="onFocusOut">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div v-if="!readOnly"
@@ -183,6 +185,22 @@ export default {
 				this.$nextTick(() => {
 					this.$refs.titleInput.focus()
 				})
+			}
+		},
+
+		/**
+		 * Enable & disable resp. edit, if focus jumps to next question (e.g. by tab-navigation)
+		 * @param {Object} event The triggered focusIn/focusOut event
+		 */
+		onFocusIn(event) {
+			if (event.target.closest('.question') !== event.relatedTarget?.closest('.question')) {
+				this.enableEdit()
+			}
+		},
+
+		onFocusOut(event) {
+			if (event.target.closest('.question') !== event.relatedTarget?.closest('.question')) {
+				this.disableEdit()
 			}
 		},
 
