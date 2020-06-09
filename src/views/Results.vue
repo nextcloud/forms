@@ -71,10 +71,10 @@
 
 		<section v-else>
 			<Submission
-				v-for="submission in submissions"
+				v-for="submission in form.submissions"
 				:key="submission.id"
 				:submission="submission"
-				:questions="questions"
+				:questions="form.questions"
 				@delete="deleteSubmission(submission.id)" />
 		</section>
 	</AppContent>
@@ -117,14 +117,12 @@ export default {
 	data() {
 		return {
 			loadingResults: true,
-			submissions: [],
-			questions: [],
 		}
 	},
 
 	computed: {
 		noSubmissions() {
-			return this.submissions && this.submissions.length === 0
+			return this.form.submissions?.length === 0
 		},
 
 		/**
@@ -161,13 +159,15 @@ export default {
 			})
 		},
 
-		copyShareLink() {
+		copyShareLink(event) {
 			const $formLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
 			if (this.$clipboard($formLink)) {
 				showSuccess(t('forms', 'Form link copied'))
 			} else {
 				showError(t('forms', 'Cannot copy, please copy the link manually'))
 			}
+			// Set back focus as clipboard removes focus
+			event.target.focus()
 		},
 
 		async loadFormResults() {
@@ -178,9 +178,8 @@ export default {
 				const response = await axios.get(generateUrl('/apps/forms/api/v1/submissions/{hash}', {
 					hash: this.form.hash,
 				}))
-				this.submissions = response.data.submissions
-				this.questions = response.data.questions
-				console.debug(this.submissions)
+				this.form.submissions = response.data.submissions
+				this.form.questions = response.data.questions
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while loading results'))
@@ -194,8 +193,8 @@ export default {
 
 			try {
 				await axios.delete(generateUrl('/apps/forms/api/v1/submission/{id}', { id }))
-				const index = this.submissions.findIndex(search => search.id === id)
-				this.submissions.splice(index, 1)
+				const index = this.form.submissions.findIndex(search => search.id === id)
+				this.form.submissions.splice(index, 1)
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while removing this response'))
@@ -212,7 +211,7 @@ export default {
 			this.loadingResults = true
 			try {
 				await axios.delete(generateUrl('/apps/forms/api/v1/submissions/{formId}', { formId: this.form.id }))
-				this.submissions = []
+				this.form.submissions = []
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while removing responses'))
@@ -229,19 +228,20 @@ export default {
 			})
 
 			const formattedSubmissions = []
-			this.submissions.forEach(submission => {
+			this.form.submissions.forEach(submission => {
 				const formattedSubmission = {
 					userDisplayName: submission.userDisplayName,
 					timestamp: moment(submission.timestamp, 'X').format('L LT'),
 				}
 
-				submission.answers.forEach(answer => {
-					const questionText = this.questions.find(question => question.id === answer.questionId).text
-					if (questionText in formattedSubmission) {
-						formattedSubmission[questionText] = formattedSubmission[questionText].concat('; ').concat(answer.text)
-					} else {
-						formattedSubmission[questionText] = answer.text
+				this.form.questions.forEach(question => {
+					const questionText = question.text
+					const answers = submission.answers.filter(answer => answer.questionId === question.id)
+					if (!answers.length) {
+						return // no answers, go to next question
 					}
+					const squashedAnswers = answers.map(answer => answer.text).join('; ')
+					formattedSubmission[questionText] = squashedAnswers
 				})
 				formattedSubmissions.push(formattedSubmission)
 			})

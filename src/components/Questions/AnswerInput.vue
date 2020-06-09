@@ -118,21 +118,8 @@ export default {
 
 			// Dismiss delete key action
 			e.preventDefault()
-			const answer = Object.assign({}, this.answer)
-			const index = this.index
 
-			if (!answer.local) {
-				// let's not await, deleting in background
-				axios.delete(generateUrl('/apps/forms/api/v1/option/{id}', { id: this.answer.id }))
-					.catch(error => {
-						showError(t('forms', 'There was an issue deleting this option'))
-						console.error(error)
-						// restore option
-						this.$emit('restore', answer, index)
-					})
-			}
-
-			this.$emit('delete', answer.id, index)
+			this.$emit('delete', this.answer.id)
 		},
 
 		/**

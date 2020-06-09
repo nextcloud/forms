@@ -46,7 +46,8 @@
 						:name="`${id}-answer`"
 						:required="isRequired(answer.id)"
 						:type="isUnique ? 'radio' : 'checkbox'"
-						@change="onChange($event, answer.id)">
+						@change="onChange($event, answer.id)"
+						@keydown.enter.exact.prevent="onKeydownEnter">
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${answer.id}`"
@@ -61,9 +62,8 @@
 					:index="index"
 					:max-option-length="maxStringLengths.optionText"
 					@add="addNewEntry"
-					@delete="deleteAnswer"
-					@update:answer="updateAnswer"
-					@restore="restoreAnswer" />
+					@delete="deleteOption"
+					@update:answer="updateAnswer" />
 			</template>
 
 			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
@@ -81,6 +81,10 @@
 </template>
 
 <script>
+import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
+
 import AnswerInput from './AnswerInput'
 import QuestionMixin from '../../mixins/QuestionMixin'
 import GenRandomId from '../../utils/GenRandomId'
@@ -118,9 +122,18 @@ export default {
 
 	watch: {
 		edit(edit) {
+			// When leaving edit mode, filter and delete empty options
 			if (!edit) {
-				// Filter out empty options and update question
-				this.$emit('update:options', this.options.filter(answer => !!answer.text))
+				const options = this.options.filter(option => {
+					if (!option.text) {
+						this.deleteOptionFromDatabase(option)
+						return false
+					}
+					return true
+				})
+
+				// update parent
+				this.updateOptions(options)
 			}
 		},
 	},
@@ -224,37 +237,63 @@ export default {
 		},
 
 		/**
-		 * Restore an answer locally
+		 * Restore an option locally
 		 *
-		 * @param {Object} answer the answer
-		 * @param {number} index the answer index in this.options
+		 * @param {Object} option the option
+		 * @param {number} index the options index in this.options
 		 */
-		restoreAnswer(answer, index) {
+		restoreOption(option, index) {
 			const options = this.options.slice()
-			options.splice(index, 0, answer)
+			options.splice(index, 0, option)
 
 			this.updateOptions(options)
 			this.focusIndex(index)
 		},
 
 		/**
-		 * Delete an answer locally
+		 * Delete an option
 		 *
-		 * @param {number} id the answer is
-		 * @param {number} index the answer index in this.options
+		 * @param {number} id the options id
 		 */
-		deleteAnswer(id, index) {
+		deleteOption(id) {
 			// Remove entry
 			const options = this.options.slice()
 			const optionIndex = options.findIndex(option => option.id === id)
+			const option = Object.assign({}, this.options[optionIndex])
+
+			// delete locally
 			options.splice(optionIndex, 1)
+
+			// delete from Db
+			this.deleteOptionFromDatabase(option)
 
 			// Update question
 			this.updateOptions(options)
 
 			this.$nextTick(() => {
-				this.focusIndex(index + 1)
+				this.focusIndex(optionIndex)
 			})
+		},
+
+		/**
+		 * Delete the option from Db in background.
+		 * Restore option if delete not possible
+		 *
+		 * @param {Object} option The option to delete
+		 */
+		deleteOptionFromDatabase(option) {
+			const optionIndex = this.options.findIndex(opt => opt.id === option.id)
+
+			if (!option.local) {
+				// let's not await, deleting in background
+				axios.delete(generateUrl('/apps/forms/api/v1/option/{id}', { id: option.id }))
+					.catch(error => {
+						showError(t('forms', 'There was an issue deleting this option'))
+						console.error(error)
+						// restore option
+						this.restoreOption(option, optionIndex)
+					})
+			}
 		},
 
 		/**

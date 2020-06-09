@@ -323,12 +323,14 @@ export default {
 			return datetime < moment().add(1, 'hour').toDate()
 		},
 
-		copyShareLink() {
+		copyShareLink(event) {
 			if (this.$clipboard(this.shareLink)) {
 				showSuccess(t('forms', 'Form link copied'))
 			} else {
 				showError(t('forms', 'Cannot copy, please copy the link manually'))
 			}
+			// Set back focus as clipboard removes focus
+			event.target.focus()
 		},
 	},
 }

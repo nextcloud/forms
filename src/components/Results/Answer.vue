@@ -23,9 +23,9 @@
 <template>
 	<div class="answer">
 		<h4 class="question-text">
-			{{ question.text }}
+			{{ questionText }}
 		</h4>
-		<p>{{ answer.text }}</p>
+		<p>{{ answerText }}</p>
 	</div>
 </template>
 
@@ -34,12 +34,12 @@ export default {
 	name: 'Answer',
 
 	props: {
-		answer: {
-			type: Object,
+		answerText: {
+			type: String,
 			required: true,
 		},
-		question: {
-			type: Object,
+		questionText: {
+			type: String,
 			required: true,
 		},
 	},

@@ -137,6 +137,15 @@ export default {
 		},
 
 		/**
+		 * Don't automatically submit form on Enter, parent will handle that
+		 * To be called with prevent: @keydown.enter.prevent="onKeydownEnter"
+		 * @param {Object} event The fired event
+		 */
+		onKeydownEnter(event) {
+			this.$emit('keydown', event)
+		},
+
+		/**
 		 * Focus the first focusable element
 		 */
 		focus() {

@@ -184,7 +184,7 @@ export default {
 			}
 		},
 
-		async copyLink() {
+		async copyLink(event) {
 			if (this.$clipboard(this.formLink)) {
 				this.copySuccess = true
 				this.copied = true
@@ -193,6 +193,9 @@ export default {
 				this.copied = true
 				console.debug('Not possible to copy share link')
 			}
+			// Set back focus as clipboard removes focus
+			event.target.focus()
+
 			setTimeout(() => {
 				this.copySuccess = false
 				this.copied = false
