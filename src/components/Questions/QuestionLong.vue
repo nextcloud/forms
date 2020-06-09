@@ -26,14 +26,17 @@
 		:text="text"
 		:mandatory="mandatory"
 		:edit.sync="edit"
+		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
+		:title-placeholder="answerType.titlePlaceholder"
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
 		<div class="question__content">
 			<textarea ref="textarea"
 				:aria-label="t('forms', 'A long answer for the question “{text}”', { text })"
-				:placeholder="t('forms', 'Long answer text')"
+				:placeholder="submissionInputPlaceholder"
+				:disabled="!readOnly"
 				:required="mandatory"
 				:value="values[0]"
 				class="question__text"
@@ -58,6 +61,15 @@ export default {
 		return {
 			height: 1,
 		}
+	},
+
+	computed: {
+		submissionInputPlaceholder() {
+			if (this.readOnly) {
+				return this.answerType.submitPlaceholder
+			}
+			return this.answerType.createPlaceholder
+		},
 	},
 
 	mounted() {
@@ -97,6 +109,12 @@ export default {
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
 	resize: none;
+
+	&:disabled {
+		// Just overrides Server CSS-Styling for disabled inputs. -> Not Good??
+		background-color: var(--color-main-background);
+		color: var(--color-main-text);
+	}
 }
 
 </style>

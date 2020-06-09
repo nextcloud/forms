@@ -48,7 +48,7 @@
 						ref="questions"
 						:key="question.id"
 						:read-only="true"
-						:model="answerTypes[question.type]"
+						:answer-type="answerTypes[question.type]"
 						:index="index + 1"
 						:max-string-lengths="maxStringLengths"
 						v-bind="question"

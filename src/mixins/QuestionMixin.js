@@ -74,9 +74,17 @@ export default {
 		/**
 		 * Answer type model object
 		 */
-		model: {
+		answerType: {
 			type: Object,
 			required: true,
+		},
+
+		/**
+		 * Submission or Edit-Mode
+		 */
+		readOnly: {
+			type: Boolean,
+			default: false,
 		},
 
 		/**
