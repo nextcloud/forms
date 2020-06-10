@@ -94,8 +94,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-// Using type to have a higher order than the input styling of server
+<style lang="scss" scoped>
 .question__text {
 	// make sure height calculations are correct
 	box-sizing: content-box !important;
@@ -109,6 +108,7 @@ export default {
 	border-bottom: 1px dotted var(--color-border-dark);
 	border-radius: 0;
 	resize: none;
+	font-size: 14px;
 
 	&:disabled {
 		// Just overrides Server CSS-Styling for disabled inputs. -> Not Good??
