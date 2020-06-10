@@ -16,7 +16,6 @@ OC.L10N.register(
     "Answer number {index}" : "응답 번호 {index}",
     "Delete answer" : "답변 지우기",
     "Error while saving the answer" : "응답 저장 실패",
-    "Question title" : "질문 제목",
     "Delete question" : "질문 삭제",
     "Delete this response" : "이 응답 지우기",
     "Searching …" : "검색 ...",
