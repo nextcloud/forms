@@ -174,6 +174,7 @@ class ApiController extends Controller {
 		$form->setAccess([
 			'type' => 'public'
 		]);
+		$form->setSubmitOnce(true);
 
 		$this->formMapper->insert($form);
 

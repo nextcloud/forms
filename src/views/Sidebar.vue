@@ -48,13 +48,13 @@
 			</li>
 			<li>
 				<input id="submitOnce"
-					v-model="form.submitOnce"
+					v-model="submitMultiple"
 					:disabled="isPublic || form.isAnonymous"
 					type="checkbox"
 					class="checkbox"
 					@change="onSubmitOnceChange">
 				<label for="submitOnce">
-					{{ t('forms', 'Only allow one response per user') }}
+					{{ t('forms', 'Allow multiple responses per person') }}
 				</label>
 			</li>
 			<li>
@@ -175,6 +175,19 @@ export default {
 	computed: {
 		shareLink() {
 			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+		},
+
+		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.
+		submitMultiple: {
+			get() {
+				if (this.form.access.type === 'public' || this.form.isAnonymous) {
+					return true
+				}
+				return !this.form.submitOnce
+			},
+			set(submitMultiple) {
+				this.form.submitOnce = !submitMultiple
+			},
 		},
 
 		formExpires: {
