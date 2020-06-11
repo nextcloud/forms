@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Névtelen válasz",
-    "Shared by %s" : "%s által megosztva",
     "Forms" : "Űrlapok",
+    "Shared by %s" : "%s által megosztva",
     "New form" : "Új űrlap",
     "Loading forms …" : "Űrlapok betöltése",
     "Create new form" : "Új űrlap készítése",

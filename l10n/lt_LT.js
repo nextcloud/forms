@@ -1,8 +1,8 @@
 OC.L10N.register(
     "forms",
     {
-    "Shared by %s" : "Bendrina %s",
     "Forms" : "Anketos",
+    "Shared by %s" : "Bendrina %s",
     "New form" : "Nauja anketa",
     "Loading forms …" : "Įkeliamos anketos…",
     "Create a form" : "Sukurti anketą",

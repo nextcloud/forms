@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Resposta anònima",
-    "Shared by %s" : "Compartit per %s",
     "Forms" : "Formularis",
+    "Shared by %s" : "Compartit per %s",
     "New form" : "Nou formulari",
     "Loading forms …" : "Carregant formularis …",
     "No forms created yet" : "No hi ha formularis creats encara",

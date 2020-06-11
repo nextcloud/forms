@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Erantzun anonimoa",
-    "Shared by %s" : "%s(e)k partekatua",
     "Forms" : "Inprimakiak",
+    "Shared by %s" : "%s(e)k partekatua",
     "New form" : "Inprimaki berria",
     "Loading forms …" : "Inprimakiak kargatzen...",
     "No forms created yet" : "Ez da inprimakirik sortu oraindik",

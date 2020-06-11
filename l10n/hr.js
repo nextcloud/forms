@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anoniman odgovor",
-    "Shared by %s" : "Dijeli %s",
     "Forms" : "Obrasci",
+    "Shared by %s" : "Dijeli %s",
     "New form" : "Novi obrazac",
     "Loading forms …" : "Učitavanje obrazaca…",
     "No forms created yet" : "Nema stvorenih obrazaca",

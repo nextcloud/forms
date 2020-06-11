@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Анонимный ответ",
-    "Shared by %s" : "Опубликовано пользователем %s",
     "Forms" : "Формы",
+    "Shared by %s" : "Опубликовано пользователем %s",
     "New form" : "Новая форма",
     "Loading forms …" : "Загрузка форм ...",
     "No forms created yet" : "Нет созданных форм",
@@ -81,6 +81,7 @@ OC.L10N.register(
     "Multiple choice" : "Один из списка",
     "Checkboxes" : "Несколько из списка",
     "Short answer" : "Короткий ответ",
+    "People can enter a short answer" : "Люди могут написать короткий ответ",
     "Long text" : "Длинный ответ",
     "Form expired" : "Опрос завершён",
     "This form has expired and is no longer taking answers" : "Срок действия этой формы завершён и ответы больше не принимаются.",

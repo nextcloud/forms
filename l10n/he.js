@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "תגובה אלמונית",
-    "Shared by %s" : "שותף על ידי %s",
     "Forms" : "טפסים",
+    "Shared by %s" : "שותף על ידי %s",
     "New form" : "טופס חדש",
     "Loading forms …" : "הטפסים נטענים…",
     "No forms created yet" : "לא נוצרו עדיין טפסים",

@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Respuesta anónima",
-    "Shared by %s" : "Compartido por %s",
     "Forms" : "Formularios",
+    "Shared by %s" : "Compartido por %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Encuestas y cuestionarios sencillos, autoalojados.",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Encuestas y cuestionarios sencillos, autoalojados.**\n\n- **📝 Diseño simple:** Sin una masa de opciones, solo las esenciales. Por supuesto, funciona bien en móviles.\n- **💾 Exportación de resultados:** Los resultados se pueden exportar como CSV en el mismo formato usado por los Formularios de Google.\n- **🙋 ¡Involúcrate!** Tenemos un montón de cosas preparadas como más tipos de cuestión, colaboración en los cuestionarios [y mucho más](https://github.com/nextcloud/forms/milestones).",
     "New form" : "Nuevo formulario",
@@ -83,6 +83,7 @@ OC.L10N.register(
     "Multiple choice" : "Elección múltiple",
     "Checkboxes" : "Casillas de verificación",
     "Short answer" : "Respuesta corta",
+    "People can enter a short answer" : "Quien responde puede introducir una respuesta corta",
     "Long text" : "Texto largo",
     "Form expired" : "Formulario expirado",
     "This form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no acepta respuestas",
