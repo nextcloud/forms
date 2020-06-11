@@ -248,7 +248,7 @@ export default {
 
 			const element = document.createElement('a')
 			element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(parser.parse(formattedSubmissions)))
-			element.setAttribute('download', this.formTitle + '.csv')
+			element.setAttribute('download', this.formTitle + ' (' + t('forms', 'responses') + ').csv')
 			element.style.display = 'none'
 			document.body.appendChild(element)
 			element.click()
