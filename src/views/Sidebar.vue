@@ -25,13 +25,10 @@
 		v-show="opened"
 		:title="form.title"
 		@close="onClose">
-		<template #secondary-actions>
-			<ActionLink icon="icon-clippy"
-				:href="shareLink"
-				@click.stop.prevent="copyShareLink">
-				{{ t('forms', 'Copy share link') }}
-			</ActionLink>
-		</template>
+		<button class="copyShareLink" @click="copyShareLink">
+			<span class="icon-clippy" role="img" />
+			{{ t('forms', 'Copy share link') }}
+		</button>
 
 		<h3>{{ t('forms', 'Sharing') }}</h3>
 		<ul>
@@ -44,7 +41,7 @@
 					@change="onAccessChange">
 				<label for="public">
 					<span class="icon-public">
-						{{ t('forms', 'Share link') }}
+						{{ t('forms', 'Share via link') }}
 					</span>
 				</label>
 			</li>
@@ -85,7 +82,6 @@
 			<li>
 				<input id="isAnonymous"
 					v-model="form.isAnonymous"
-
 					type="checkbox"
 					class="checkbox"
 					@change="onAnonChange">
@@ -135,7 +131,6 @@ import { generateUrl } from '@nextcloud/router'
 import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
@@ -147,7 +142,6 @@ export default {
 	name: 'Sidebar',
 
 	components: {
-		ActionLink,
 		AppSidebar,
 		DatetimePicker,
 		ShareDiv,
@@ -350,7 +344,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.copyShareLink {
+	margin: 8px;
+}
+
 h3 {
+	font-weight: bold;
 	margin-left: 8px;
 	margin-bottom: 8px;
 }
