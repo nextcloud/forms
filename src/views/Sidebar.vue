@@ -33,6 +33,53 @@
 			</ActionLink>
 		</template>
 
+		<h3>{{ t('forms', 'Sharing') }}</h3>
+		<ul>
+			<li>
+				<input id="public"
+					v-model="form.access.type"
+					type="radio"
+					value="public"
+					class="radio"
+					@change="onAccessChange">
+				<label for="public">
+					<span class="icon-public">
+						{{ t('forms', 'Share link') }}
+					</span>
+				</label>
+			</li>
+			<li>
+				<input id="registered"
+					v-model="form.access.type"
+					type="radio"
+					value="registered"
+					class="radio"
+					@change="onAccessChange">
+				<label for="registered">
+					<span class="icon-group">
+						{{ t('forms', 'Show to all users of this instance') }}
+					</span>
+				</label>
+			</li>
+			<li>
+				<input id="selected"
+					v-model="form.access.type"
+					type="radio"
+					value="selected"
+					class="radio"
+					@change="onAccessChange">
+				<label for="selected">
+					<span class="icon-shared">
+						{{ t('forms', 'Choose users to share with') }}
+					</span>
+				</label>
+				<ShareDiv v-show="form.access.type === 'selected'"
+					:user-shares="userShares"
+					:group-shares="groupShares"
+					@update:shares="onSharingChange" />
+			</li>
+		</ul>
+
 		<h3>{{ t('forms', 'Settings') }}</h3>
 		<ul>
 			<li>
@@ -78,53 +125,6 @@
 					:value="expirationDate"
 					type="datetime"
 					@change="onExpiresChange" />
-			</li>
-		</ul>
-
-		<h3>{{ t('forms', 'Sharing') }}</h3>
-		<ul>
-			<li>
-				<input id="registered"
-					v-model="form.access.type"
-					type="radio"
-					value="registered"
-					class="radio"
-					@change="onAccessChange">
-				<label for="registered">
-					<span class="icon-group">
-						{{ t('forms', 'Show to all users of this instance') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="public"
-					v-model="form.access.type"
-					type="radio"
-					value="public"
-					class="radio"
-					@change="onAccessChange">
-				<label for="public">
-					<span class="icon-link">
-						{{ t('forms', 'Share link') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="selected"
-					v-model="form.access.type"
-					type="radio"
-					value="selected"
-					class="radio"
-					@change="onAccessChange">
-				<label for="selected">
-					<span class="icon-shared">
-						{{ t('forms', 'Choose users to share with') }}
-					</span>
-				</label>
-				<ShareDiv v-show="form.access.type === 'selected'"
-					:user-shares="userShares"
-					:group-shares="groupShares"
-					@update:shares="onSharingChange" />
 			</li>
 		</ul>
 	</AppSidebar>
