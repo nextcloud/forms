@@ -1,7 +1,7 @@
-﻿# **NextCloud Forms: Support**
+﻿# **Nextcloud Forms: Support**
 
 ## **Forms Homepage**
-- The Forms homepage lists all Public and Registered Users only forms that have been created on the NextCloud instance, as well as all Shared Only forms that have been shared with the current user. This page acts as a portal to all of the functionality of the app.
+- The Forms homepage lists all Public and Registered Users only forms that have been created on the Nextcloud instance, as well as all Shared Only forms that have been shared with the current user. This page acts as a portal to all of the functionality of the app.
 
 
 ![
