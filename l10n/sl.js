@@ -56,8 +56,6 @@ OC.L10N.register(
     "Anonymous responses" : "Anonimni odzivi",
     "Set expiration date" : "Nastavi datum preteka",
     "Expiration date" : "Datum preteka",
-    "Sharing" : "Souporaba",
-    "Share link" : "Povezava za souporabo",
     "Submit" : "Pošlji",
     "Submit form" : "Objavi obrazec",
     "Submitting form …" : "Poteka objavljanje obrazca ...",

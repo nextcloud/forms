@@ -1,9 +1,0 @@
-{ "translations": {
-    "Group" : "Бүлэг",
-    "Description" : "Тодорхойлолт",
-    "Settings" : "Тохиргоо",
-    "Sharing" : "Түгээх",
-    "Share link" : "Холбоос хуваалцах",
-    "Submit" : "мэдэгдэх"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}

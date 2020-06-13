@@ -15,8 +15,6 @@ OC.L10N.register(
     "Settings" : "Beállítások",
     "Set expiration date" : "Lejárati idő beállítása",
     "Expiration date" : "Lejárati idő",
-    "Sharing" : "Megosztás",
-    "Share link" : "Hivatkozás megosztása",
     "Submit" : "Beküldés"
 },
 "nplurals=2; plural=(n != 1);");

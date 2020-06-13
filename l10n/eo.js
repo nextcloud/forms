@@ -9,8 +9,6 @@ OC.L10N.register(
     "Settings" : "Agordoj",
     "Set expiration date" : "Uzi limdaton",
     "Expiration date" : "Limdato",
-    "Sharing" : "Kunhavigo",
-    "Share link" : "Kunhavigi ligilon",
     "Submit" : "Sendi"
 },
 "nplurals=2; plural=(n != 1);");

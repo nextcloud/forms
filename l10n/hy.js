@@ -5,7 +5,6 @@ OC.L10N.register(
     "Description" : "Նկարագրություն",
     "Settings" : "կարգավորումներ",
     "Set expiration date" : "Սահմանել վավերականության ժամկետ",
-    "Expiration date" : "Վավերականության ժամկետ",
-    "Share link" : "Կիսվել հղմամբ"
+    "Expiration date" : "Վավերականության ժամկետ"
 },
 "nplurals=2; plural=(n != 1);");

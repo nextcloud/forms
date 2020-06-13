@@ -14,8 +14,6 @@ OC.L10N.register(
     "Settings" : "Inställnigar",
     "Set expiration date" : "Välj utgångsdatum",
     "Expiration date" : "Utgångsdatum",
-    "Sharing" : "Delning",
-    "Share link" : "Dela länk",
     "Submit" : "Verkställ"
 },
 "nplurals=2; plural=(n != 1);");

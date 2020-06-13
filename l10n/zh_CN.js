@@ -25,8 +25,6 @@ OC.L10N.register(
     "Settings" : "设置",
     "Set expiration date" : "设置过期日期",
     "Expiration date" : "过期日期",
-    "Sharing" : "正在共享",
-    "Share link" : "共享链接",
     "Submit" : "提交",
     "Submit form" : "提交表格",
     "Multiple choice" : "多选",

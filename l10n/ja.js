@@ -14,8 +14,6 @@ OC.L10N.register(
     "Settings" : "設定",
     "Set expiration date" : "有効期限を設定",
     "Expiration date" : "有効期限",
-    "Sharing" : "共有中",
-    "Share link" : "URLで共有",
     "Submit" : "送信"
 },
 "nplurals=1; plural=0;");

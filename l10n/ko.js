@@ -26,8 +26,6 @@ OC.L10N.register(
     "Settings" : "설정",
     "Set expiration date" : "만료기한 설정",
     "Expiration date" : "만료 일자",
-    "Sharing" : "공유",
-    "Share link" : "링크 공유",
     "Select expiration date" : "만료일자를 고르시오.",
     "Submit" : "제출",
     "Thank you for completing the form!" : "양식을 작성해주셔서 감사합니다!",

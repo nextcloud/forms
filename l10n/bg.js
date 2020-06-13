@@ -7,8 +7,6 @@ OC.L10N.register(
     "Settings" : "Настройки",
     "Set expiration date" : "Срок на валидност",
     "Expiration date" : "Валидност",
-    "Sharing" : "Споделяне",
-    "Share link" : "Връзка за споделяне",
     "Submit" : "Изпращане"
 },
 "nplurals=2; plural=(n != 1);");

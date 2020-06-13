@@ -12,8 +12,6 @@ OC.L10N.register(
     "Settings" : "Asetukset",
     "Set expiration date" : "Aseta vanhenemispäivä",
     "Expiration date" : "Vanhenemispäivä",
-    "Sharing" : "Jakaminen",
-    "Share link" : "Jaa linkki",
     "Submit" : "Lähetä"
 },
 "nplurals=2; plural=(n != 1);");

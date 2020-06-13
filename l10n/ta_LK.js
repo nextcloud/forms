@@ -5,7 +5,6 @@ OC.L10N.register(
     "Description" : "விவரிப்பு",
     "Settings" : "அமைப்புகள்",
     "Set expiration date" : "காலாவதி தேதியை குறிப்பிடுக",
-    "Expiration date" : "காலவதியாகும் திகதி",
-    "Share link" : "Share link"
+    "Expiration date" : "காலவதியாகும் திகதி"
 },
 "nplurals=2; plural=(n != 1);");

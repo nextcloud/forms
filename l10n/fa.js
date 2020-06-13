@@ -14,8 +14,6 @@ OC.L10N.register(
     "Settings" : "تنظیمات",
     "Set expiration date" : "تنظیم تاریخ انقضا",
     "Expiration date" : "تاریخ انقضا",
-    "Sharing" : "اشتراک گذاری",
-    "Share link" : "لینک را به اشتراک بگذارید",
     "Submit" : "ارسال"
 },
 "nplurals=2; plural=(n > 1);");
