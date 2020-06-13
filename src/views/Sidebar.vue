@@ -23,22 +23,64 @@
 <template>
 	<AppSidebar
 		v-show="opened"
-		:title="form.title"
+		:title="t('forms', 'Share form')"
 		@close="onClose">
-		<template #secondary-actions>
-			<ActionLink icon="icon-clippy"
-				:href="shareLink"
-				@click.stop.prevent="copyShareLink">
-				{{ t('forms', 'Copy share link') }}
-			</ActionLink>
-		</template>
+		<button class="copyShareLink" @click="copyShareLink">
+			<span class="icon-clippy" role="img" />
+			{{ t('forms', 'Copy share link') }}
+		</button>
+
+		<ul>
+			<li>
+				<input id="public"
+					v-model="form.access.type"
+					type="radio"
+					value="public"
+					class="radio"
+					@change="onAccessChange">
+				<label for="public">
+					<span class="icon-public">
+						{{ t('forms', 'Share via link') }}
+					</span>
+				</label>
+			</li>
+			<li>
+				<input id="registered"
+					v-model="form.access.type"
+					type="radio"
+					value="registered"
+					class="radio"
+					@change="onAccessChange">
+				<label for="registered">
+					<span class="icon-group">
+						{{ t('forms', 'Show to all users of this instance') }}
+					</span>
+				</label>
+			</li>
+			<li>
+				<input id="selected"
+					v-model="form.access.type"
+					type="radio"
+					value="selected"
+					class="radio"
+					@change="onAccessChange">
+				<label for="selected">
+					<span class="icon-shared">
+						{{ t('forms', 'Choose users to share with') }}
+					</span>
+				</label>
+				<ShareDiv v-show="form.access.type === 'selected'"
+					:user-shares="userShares"
+					:group-shares="groupShares"
+					@update:shares="onSharingChange" />
+			</li>
+		</ul>
 
 		<h3>{{ t('forms', 'Settings') }}</h3>
 		<ul>
 			<li>
 				<input id="isAnonymous"
 					v-model="form.isAnonymous"
-
 					type="checkbox"
 					class="checkbox"
 					@change="onAnonChange">
@@ -48,13 +90,13 @@
 			</li>
 			<li>
 				<input id="submitOnce"
-					v-model="form.submitOnce"
+					v-model="submitMultiple"
 					:disabled="isPublic || form.isAnonymous"
 					type="checkbox"
 					class="checkbox"
 					@change="onSubmitOnceChange">
 				<label for="submitOnce">
-					{{ t('forms', 'Only allow one response per user') }}
+					{{ t('forms', 'Allow multiple responses per person') }}
 				</label>
 			</li>
 			<li>
@@ -80,53 +122,6 @@
 					@change="onExpiresChange" />
 			</li>
 		</ul>
-
-		<h3>{{ t('forms', 'Sharing') }}</h3>
-		<ul>
-			<li>
-				<input id="registered"
-					v-model="form.access.type"
-					type="radio"
-					value="registered"
-					class="radio"
-					@change="onAccessChange">
-				<label for="registered">
-					<span class="icon-group">
-						{{ t('forms', 'Show to all users of this instance') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="public"
-					v-model="form.access.type"
-					type="radio"
-					value="public"
-					class="radio"
-					@change="onAccessChange">
-				<label for="public">
-					<span class="icon-link">
-						{{ t('forms', 'Share link') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="selected"
-					v-model="form.access.type"
-					type="radio"
-					value="selected"
-					class="radio"
-					@change="onAccessChange">
-				<label for="selected">
-					<span class="icon-shared">
-						{{ t('forms', 'Choose users to share with') }}
-					</span>
-				</label>
-				<ShareDiv v-show="form.access.type === 'selected'"
-					:user-shares="userShares"
-					:group-shares="groupShares"
-					@update:shares="onSharingChange" />
-			</li>
-		</ul>
 	</AppSidebar>
 </template>
 
@@ -135,7 +130,6 @@ import { generateUrl } from '@nextcloud/router'
 import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
@@ -147,7 +141,6 @@ export default {
 	name: 'Sidebar',
 
 	components: {
-		ActionLink,
 		AppSidebar,
 		DatetimePicker,
 		ShareDiv,
@@ -175,6 +168,19 @@ export default {
 	computed: {
 		shareLink() {
 			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+		},
+
+		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.
+		submitMultiple: {
+			get() {
+				if (this.form.access.type === 'public' || this.form.isAnonymous) {
+					return true
+				}
+				return !this.form.submitOnce
+			},
+			set(submitMultiple) {
+				this.form.submitOnce = !submitMultiple
+			},
 		},
 
 		formExpires: {
@@ -337,7 +343,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.copyShareLink {
+	margin: 8px;
+}
+
 h3 {
+	font-weight: bold;
 	margin-left: 8px;
 	margin-bottom: 8px;
 }
