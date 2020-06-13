@@ -23,14 +23,13 @@
 <template>
 	<AppSidebar
 		v-show="opened"
-		:title="form.title"
+		:title="t('forms', 'Share form')"
 		@close="onClose">
 		<button class="copyShareLink" @click="copyShareLink">
 			<span class="icon-clippy" role="img" />
 			{{ t('forms', 'Copy share link') }}
 		</button>
 
-		<h3>{{ t('forms', 'Sharing') }}</h3>
 		<ul>
 			<li>
 				<input id="public"
