@@ -38,7 +38,10 @@
 		</TopBar>
 
 		<header v-if="!noSubmissions">
-			<h2>{{ t('forms', 'Responses for {title}', { title: form.title }) }}</h2>
+			<h2>{{ formTitle }}</h2>
+			<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
+
+			<!-- View switcher between Summary and Responses -->
 			<div class="response-actions">
 				<div class="response-actions__radio">
 					<input id="show-summary--true"
@@ -62,6 +65,8 @@
 						{{ t('forms', 'Responses') }}
 					</label>
 				</div>
+
+				<!-- Action menu for CSV export and deletion -->
 				<Actions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
@@ -90,10 +95,16 @@
 			</EmptyContent>
 		</section>
 
+		<!-- Summary view for visualization -->
 		<section v-if="!noSubmissions && showSummary">
-			SUMMARY-CONTENT
+			<Summary
+				v-for="question in form.questions"
+				:key="question.id"
+				:question="question"
+				:submissions="form.submissions" />
 		</section>
 
+		<!-- Responses view for individual responses -->
 		<section v-if="!noSubmissions && !showSummary">
 			<Submission
 				v-for="submission in form.submissions"
@@ -118,6 +129,7 @@ import moment from '@nextcloud/moment'
 import Vue from 'vue'
 
 import EmptyContent from '../components/EmptyContent'
+import Summary from '../components/Results/Summary'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -133,6 +145,7 @@ export default {
 		ActionButton,
 		AppContent,
 		EmptyContent,
+		Summary,
 		Submission,
 		TopBar,
 	},
@@ -289,33 +302,52 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-h2 {
-	font-size: 2em;
-	font-weight: bold;
-	margin-top: 32px;
-	padding-left: 14px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
+.app-content header {
+	h2 {
+		font-size: 2em;
+		font-weight: bold;
+		margin-top: 32px;
+		padding-left: 14px;
+		padding-bottom: 8px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-.response-actions {
-	display: flex;
-	align-items: center;
-	padding-left: 14px;
+	p {
+		padding-left: 14px;
+	}
 
-	&__radio {
-		margin-right: 8px;
+	.response-actions {
+		display: flex;
+		align-items: center;
+		padding-left: 14px;
 
-		&__item {
-			border-radius: 2px;
-			padding: 8px 16px;
-			font-weight: bold;
-			background-color: var(--color-background-dark);
+		&__radio {
+			margin-right: 8px;
 
-			&--active {
-				background-color: var(--color-primary);
-				color: var(--color-primary-text)
+			&__item {
+				border-radius: var(--border-radius-pill);
+				padding: 8px 16px;
+				font-weight: bold;
+				background-color: var(--color-background-dark);
+
+				&:first-of-type {
+					border-top-right-radius: 0;
+					border-bottom-right-radius: 0;
+					padding-right: 8px;
+				}
+
+				&:last-of-type {
+					border-top-left-radius: 0;
+					border-bottom-left-radius: 0;
+					padding-left: 8px;
+				}
+
+				&--active {
+					background-color: var(--color-primary);
+					color: var(--color-primary-text)
+				}
 			}
 		}
 	}
