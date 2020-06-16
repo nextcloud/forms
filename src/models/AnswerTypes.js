@@ -20,14 +20,16 @@
  *
  */
 
-import QuestionLong from '../components/Questions/QuestionLong'
-import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionMultiple from '../components/Questions/QuestionMultiple'
+import QuestionDropdown from '../components/Questions/QuestionDropdown'
+import QuestionShort from '../components/Questions/QuestionShort'
+import QuestionLong from '../components/Questions/QuestionLong'
 
 /**
  * @typedef {Object} AnswerTypes
- * @property {string} multiple_unique
  * @property {string} multiple
+ * @property {string} multiple_unique
+ * @property {string} dropdown
  * @property {string} short
  * @property {string} long
  */
@@ -46,6 +48,16 @@ export default {
 	 * @prop warningInvalid The warning users see in edit mode, if the question is invalid.
 	 */
 
+	multiple: {
+		component: QuestionMultiple,
+		icon: 'icon-answer-checkbox',
+		label: t('forms', 'Checkboxes'),
+		validate: question => question.options.length > 0,
+
+		titlePlaceholder: t('forms', 'Checkbox question title'),
+		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+	},
+
 	multiple_unique: {
 		component: QuestionMultiple,
 		icon: 'icon-answer-multiple',
@@ -59,13 +71,15 @@ export default {
 		unique: true,
 	},
 
-	multiple: {
-		component: QuestionMultiple,
-		icon: 'icon-answer-checkbox',
-		label: t('forms', 'Checkboxes'),
+	dropdown: {
+		component: QuestionDropdown,
+		icon: 'icon-triangle-s',
+		label: t('forms', 'Dropdown'),
 		validate: question => question.options.length > 0,
 
-		titlePlaceholder: t('forms', 'Checkbox question title'),
+		titlePlaceholder: t('forms', 'Dropdown question title'),
+		createPlaceholder: t('forms', 'People can pick one option'),
+		submitPlaceholder: t('forms', 'Pick an option'),
 		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
 	},
 

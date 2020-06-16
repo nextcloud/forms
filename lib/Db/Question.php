@@ -52,7 +52,8 @@ class Question extends Entity {
 		'short',
 		'long',
 		'multiple',
-		'multiple_unique'
+		'multiple_unique',
+		'dropdown'
 	];
 
 	public function __construct() {
