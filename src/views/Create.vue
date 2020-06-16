@@ -72,7 +72,7 @@
 				@keyup="onDescChange" />
 			<!-- Only visible if at least one question is marked as mandatory-->
 			<p v-if="mandatoryUsed" class="info-mandatory">
-				* {{ t('forms', 'Mandatory questions') }}
+				* {{ t('forms', 'Required questions') }}
 			</p>
 		</header>
 
