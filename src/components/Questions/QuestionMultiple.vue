@@ -37,7 +37,10 @@
 		@delete="onDelete">
 		<ul class="question__content">
 			<template v-for="(answer, index) in options">
-				<li v-if="!edit" :key="answer.id" class="question__item">
+				<li v-if="!edit"
+					:key="answer.id"
+					class="question__item"
+					:class="{'question__item--last': (index === options.length-1),}">
 					<!-- Answer radio/checkbox + label -->
 					<!-- TODO: migrate to radio/checkbox component once available -->
 					<input :id="`${id}-answer-${answer.id}`"
@@ -74,7 +77,7 @@
 
 			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
 				<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
-				<input
+				<input ref="inputNewAnswer"
 					:aria-label="t('forms', 'Add a new answer')"
 					:placeholder="t('forms', 'Add a new answer')"
 					class="question__input"
@@ -150,6 +153,15 @@ export default {
 
 				// update parent
 				this.updateOptions(options)
+			} else {
+				// If edit becomes true by tabbing to last element, focus newAnswer-input
+				if (document.activeElement?.parentNode?.classList.contains('question__item--last')) {
+					this.$nextTick(() => {
+						if (this.$refs.inputNewAnswer) {
+							this.$refs.inputNewAnswer.focus()
+						}
+					})
+				}
 			}
 		},
 	},
