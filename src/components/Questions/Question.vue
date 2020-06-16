@@ -53,7 +53,7 @@
 			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
 				<ActionCheckbox :checked="mandatory"
 					@update:checked="onMandatoryChange">
-					{{ t('forms', 'Mandatory') }}
+					{{ t('forms', 'Required') }}
 				</ActionCheckbox>
 				<ActionButton icon="icon-delete" @click="onDelete">
 					{{ t('forms', 'Delete question') }}

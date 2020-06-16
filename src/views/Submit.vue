@@ -33,7 +33,7 @@
 				<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
 				<!-- Only visible if at least one question is marked as mandatory-->
 				<p v-if="mandatoryUsed && !loading && !success" class="info-mandatory">
-					* {{ t('forms', 'Mandatory questions') }}
+					* {{ t('forms', 'Required questions') }}
 				</p>
 			</header>
 
