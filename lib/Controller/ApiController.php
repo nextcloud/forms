@@ -687,8 +687,8 @@ class ApiController extends Controller {
 			return new Http\JSONResponse(['message' => 'Not allowed to access this form'], Http::STATUS_FORBIDDEN);
 		}
 
-		// Not allowed if form expired
-		if ($form->getExpires() > time()) {
+		// Not allowed if form expired. Expires is '0' if the form does not expire.
+		if ($form->getExpires() && $form->getExpires() < time()) {
 			return new Http\JSONResponse(['message' => 'This form is no longer taking answers'], Http::STATUS_FORBIDDEN);
 		}
 
