@@ -5,6 +5,7 @@ OC.L10N.register(
     "Create new form" : "Skapa nytt formulär",
     "Delete form" : "Ta bort formuläret",
     "Cannot copy, please copy the link manually" : "Kan inte kopiera, länken måste kopieras manuellt",
+    "Required" : "Krävs",
     "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
     "Searching …" : "Söker ...",
     "No elements found." : "Inga element hittades.",

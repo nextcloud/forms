@@ -5,6 +5,7 @@ OC.L10N.register(
     "Forms" : "Форми",
     "Shared by %s" : "Поділилися %s",
     "Loading forms …" : "Завантаження форм...",
+    "Required" : "Вимагається",
     "Searching …" : "Пошук...",
     "Group" : "Група",
     "Description" : "Опис",

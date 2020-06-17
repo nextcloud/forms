@@ -16,6 +16,7 @@ OC.L10N.register(
     "Form link copied" : "已复制表格连接",
     "Cannot copy, please copy the link manually" : "无法复制，请手动复制链接",
     "Copy share link" : "复制共享链接",
+    "Required" : "必填",
     "No recommendations. Start typing." : "没有推荐。开始输入。",
     "Searching …" : "正在搜索 ...",
     "No elements found." : "未发现元素。",

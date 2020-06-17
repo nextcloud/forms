@@ -11,6 +11,7 @@ OC.L10N.register(
     "Delete form" : "Обриши упитник",
     "Form link copied" : "Веза ка упитнику копирана",
     "Cannot copy, please copy the link manually" : "Не могу да копирам, копирајте везу ручно",
+    "Required" : "Обавезно",
     "No recommendations. Start typing." : "Нема препорука. Започните куцање.",
     "Searching …" : "Тражим…",
     "No elements found." : "Нема нађених елемената.",

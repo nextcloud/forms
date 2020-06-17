@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "Bắt buộc",
     "Group" : "N",
     "Description" : "Mô tả",
     "Settings" : "Thiết lập",

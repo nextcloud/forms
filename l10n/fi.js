@@ -4,6 +4,7 @@ OC.L10N.register(
     "Forms" : "Lomakkeet",
     "Create new form" : "Luo uusi lomake",
     "Delete form" : "Poista lomake",
+    "Required" : "Vaadittu",
     "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
     "Searching …" : "Haetaan…",
     "Group" : "Ryhmä",

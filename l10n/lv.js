@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "Nepieciešams",
     "Group" : "Grupa",
     "Description" : "Apraksts",
     "Settings" : "Iestatījumi",

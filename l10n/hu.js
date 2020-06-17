@@ -8,6 +8,7 @@ OC.L10N.register(
     "Loading forms …" : "Űrlapok betöltése",
     "Create new form" : "Új űrlap készítése",
     "Delete form" : "Űrlap törlése",
+    "Required" : "Szükséges",
     "Searching …" : "Keresés ...",
     "Group" : "Csoport",
     "Description" : "Leírás",

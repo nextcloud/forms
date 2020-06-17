@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "þetta þarf",
     "Searching …" : "Leita …",
     "Group" : "Hópur",
     "Description" : "Lýsing",
