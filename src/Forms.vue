@@ -25,11 +25,13 @@
 	<Content app-name="forms">
 		<AppNavigation>
 			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
-			<AppNavigationForm v-for="form in forms"
-				:key="form.id"
-				:form="form"
-				@mobile-close-navigation="mobileCloseNavigation"
-				@delete="onDeleteForm" />
+			<template #list>
+				<AppNavigationForm v-for="form in forms"
+					:key="form.id"
+					:form="form"
+					@mobile-close-navigation="mobileCloseNavigation"
+					@delete="onDeleteForm" />
+			</template>
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
