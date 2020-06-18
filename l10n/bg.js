@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "Препоръчително",
     "Searching …" : "Търсене ...",
     "Group" : "Група",
     "Description" : "Описание",

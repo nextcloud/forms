@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "Angen",
     "Group" : "Grŵp",
     "Description" : "Disgrifiad",
     "Settings" : "Gosodiadau",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "E domosdoshme",
     "Group" : "Grup",
     "Description" : "Përshkrim",
     "Settings" : "Rregullimet",

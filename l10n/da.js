@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "Krævet",
     "Searching …" : "Søger ...",
     "Group" : "Gruppe",
     "Description" : "Beskrivelse",

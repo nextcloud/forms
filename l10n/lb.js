@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "Noutwendeg",
     "Group" : "Grupp",
     "Description" : "Beschreiwung",
     "Settings" : "Astellungen",

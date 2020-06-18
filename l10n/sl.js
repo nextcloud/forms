@@ -24,6 +24,7 @@ OC.L10N.register(
     "Question number {index}" : "Vprašanje številka {index}",
     "Drag to reorder the questions" : "Potegnite vprašanja in jih preuredite",
     "Title of question number {index}" : "Naslov vprašanja številka {index}",
+    "Required" : "Zahtevano",
     "Delete question" : "Izbriši vprašanje",
     "A long answer for the question “{text}”" : "Dolg odgovor na vprašanje »{text}«",
     "Add a new answer" : "Dodaj nov odgovor",

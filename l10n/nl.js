@@ -29,6 +29,7 @@ OC.L10N.register(
     "Question number {index}" : "Vraag nummer {index}",
     "Drag to reorder the questions" : "Sleep om de antwoordvolgorde te wijzigen",
     "Title of question number {index}" : "Titel van vraag nummer {index}",
+    "Required" : "Vereist",
     "Delete question" : "Verwijder vraag",
     "A long answer for the question “{text}”" : "Een lang antwoord voor vraag “{text}”",
     "Add a new answer" : "Voeg een nieuw antwoord toe",

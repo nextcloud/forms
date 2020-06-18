@@ -29,6 +29,7 @@ OC.L10N.register(
     "Question number {index}" : "{index} numaralı soru",
     "Drag to reorder the questions" : "Soru sıralamasını sürükleyerek değiştirebilirsiniz",
     "Title of question number {index}" : "{index} numaralı sorunun başlığı",
+    "Required" : "Zorunlu",
     "Delete question" : "Soruyu sil",
     "This question needs a title!" : "Bu sorunun bir başlığı olmalıdır!",
     "A long answer for the question “{text}”" : "“{text}” sorusu için uzun bir yanıt",

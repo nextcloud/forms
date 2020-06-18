@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Forms" : "Formulários",
     "Create new form" : "Criar novo formulário",
+    "Required" : "Obrigatório",
     "Group" : "Grupo",
     "Description" : "Descrição",
     "Settings" : "Configurações",

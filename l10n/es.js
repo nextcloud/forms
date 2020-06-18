@@ -29,6 +29,7 @@ OC.L10N.register(
     "Question number {index}" : "Pregunta número {index}",
     "Drag to reorder the questions" : "Pulsa y arrastra para reordenar las preguntas",
     "Title of question number {index}" : "Título de la pregunta número {index}",
+    "Required" : "Requerido",
     "Delete question" : "Eliminar pregunta",
     "This question needs a title!" : "Esta pregunta necesita un título",
     "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{text}\"",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Required" : "სავალდებულო",
     "Group" : "ჯგუფი",
     "Description" : "აღწერილობა",
     "Settings" : "პარამეტრები",

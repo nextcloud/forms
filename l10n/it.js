@@ -46,6 +46,7 @@ OC.L10N.register(
     "Toggle settings" : "Commuta le impostazioni",
     "Form title" : "Titolo del modulo",
     "Description" : "Descrizione",
+    "Required questions" : "Domande richieste",
     "Add a question" : "Aggiungi una domanda",
     "There was an error while adding the new question" : "Si è verificato un errore durante l'aggiunta della nuova domanda",
     "There was an error while removing the question" : "Si è verificato un errore durante la rimozione della domanda",

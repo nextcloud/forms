@@ -46,6 +46,7 @@ OC.L10N.register(
     "Toggle settings" : "Przełącz ustawienia",
     "Form title" : "Tytuł formularza",
     "Description" : "Opis",
+    "Required questions" : "Wymagane pytania",
     "Add a question" : "Dodaj pytanie",
     "There was an error while adding the new question" : "Wystąpił błąd podczas dodawania nowego pytania",
     "There was an error while removing the question" : "Wystąpił błąd podczas usuwania pytania",
