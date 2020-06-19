@@ -46,6 +46,7 @@ OC.L10N.register(
     "Toggle settings" : "Ayarları değiştir",
     "Form title" : "Form başlığı",
     "Description" : "Açıklama",
+    "Required questions" : "Zorunlu sorular",
     "Add a question" : "Bir soru ekle",
     "There was an error while adding the new question" : "Yeni soru eklenirken bir sorun çıktı",
     "There was an error while removing the question" : "Soru silinirken bir sorun çıktı",
