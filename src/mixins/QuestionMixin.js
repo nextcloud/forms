@@ -181,5 +181,25 @@ export default {
 				console.error(error)
 			}
 		},
+
+		/**
+		 * Enable the edit mode
+		 */
+		enableEdit() {
+			console.debug('enableEdit')
+			if (!this.readOnly) {
+				this.edit = true
+			}
+		},
+
+		/**
+		 * Disable the edit mode
+		 */
+		disableEdit() {
+			console.debug('disableEdit')
+			if (!this.readOnly) {
+				this.edit = false
+			}
+		},
 	},
 }

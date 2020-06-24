@@ -39,8 +39,7 @@
 			<template v-for="(answer, index) in options">
 				<li v-if="!edit"
 					:key="answer.id"
-					class="question__item"
-					:class="{'question__item--last': (index === options.length-1),}">
+					class="question__item">
 					<!-- Answer radio/checkbox + label -->
 					<!-- TODO: migrate to radio/checkbox component once available -->
 					<input :id="`${id}-answer-${answer.id}`"
@@ -55,7 +54,8 @@
 						:required="isRequired(answer.id)"
 						:type="isUnique ? 'radio' : 'checkbox'"
 						@change="onChange($event, answer.id)"
-						@keydown.enter.exact.prevent="onKeydownEnter">
+						@keydown.enter.exact.prevent="onKeydownEnter"
+						@focus="onFocusRadioInput">
 					<label v-if="!edit"
 						ref="label"
 						:for="`${id}-answer-${answer.id}`"
@@ -153,15 +153,6 @@ export default {
 
 				// update parent
 				this.updateOptions(options)
-			} else {
-				// If edit becomes true by tabbing to last element, focus newAnswer-input
-				if (document.activeElement?.parentNode?.classList.contains('question__item--last')) {
-					this.$nextTick(() => {
-						if (this.$refs.inputNewAnswer) {
-							this.$refs.inputNewAnswer.focus()
-						}
-					})
-				}
 			}
 		},
 	},
@@ -186,6 +177,20 @@ export default {
 
 			// Emit values and remove duplicates
 			this.$emit('update:values', [...new Set(values)])
+		},
+
+		/**
+		 * If the focus gets onto one of the radio/checkbox inputs and readOnly is false, activate Edit and focus inputNewAnswer
+		 * Necessary for Tab-Navigation on editing forms.
+		 */
+		onFocusRadioInput() {
+			console.debug('Inputfocus!')
+			if (!this.readOnly) {
+				this.enableEdit()
+				this.$nextTick(() => {
+					this.$refs.inputNewAnswer.focus()
+				})
+			}
 		},
 
 		/**

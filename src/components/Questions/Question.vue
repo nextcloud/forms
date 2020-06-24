@@ -25,9 +25,7 @@
 		:class="{ 'question--edit': edit }"
 		:aria-label="t('forms', 'Question number {index}', {index})"
 		class="question"
-		@click="enableEdit"
-		@focusin="onFocusIn"
-		@focusout="onFocusOut">
+		@click="enableEdit">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div v-if="!readOnly"
@@ -47,7 +45,8 @@
 				minlength="1"
 				:maxlength="maxQuestionLength"
 				required
-				@input="onTitleChange">
+				@input="onTitleChange"
+				@keydown.shift.tab.capture="nextDisableEdit">
 			<h3 v-else
 				class="question__header-title"
 				:tabindex="computedTitleTabIndex"
@@ -180,27 +179,14 @@ export default {
 		 * Allow edit-navigation through Tab-Key
 		 */
 		onTitleFocus() {
+			console.debug('On Title focus', this.$refs)
 			if (!this.readOnly) {
 				this.enableEdit()
+				console.debug('Store NextTick')
 				this.$nextTick(() => {
+					console.debug('NextTick!')
 					this.$refs.titleInput.focus()
 				})
-			}
-		},
-
-		/**
-		 * Enable & disable resp. edit, if focus jumps to next question (e.g. by tab-navigation)
-		 * @param {Object} event The triggered focusIn/focusOut event
-		 */
-		onFocusIn(event) {
-			if (event.target.closest('.question') !== event.relatedTarget?.closest('.question')) {
-				this.enableEdit()
-			}
-		},
-
-		onFocusOut(event) {
-			if (event.target.closest('.question') !== event.relatedTarget?.closest('.question')) {
-				this.disableEdit()
 			}
 		},
 
@@ -208,6 +194,7 @@ export default {
 		 * Enable the edit mode
 		 */
 		enableEdit() {
+			console.debug('enableEdit')
 			if (!this.readOnly) {
 				this.$emit('update:edit', true)
 			}
@@ -217,9 +204,22 @@ export default {
 		 * Disable the edit mode
 		 */
 		disableEdit() {
+			console.debug('disableEdit')
 			if (!this.readOnly) {
 				this.$emit('update:edit', false)
 			}
+		},
+
+		nextDisableEdit(event) {
+			console.debug('nextDisable')
+			console.debug(event)
+			// event.preventDefault()
+			// this.disableEdit()
+			this.$nextTick(() => {
+				console.debug('Later!')
+			})
+			console.debug('trigger')
+			// this.disableEdit()
 		},
 
 		/**
