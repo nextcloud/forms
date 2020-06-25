@@ -359,4 +359,11 @@ export default {
 	font-size: 14px;
 	position: relative;
 }
+
+// Fix display of select dropdown and adjust to Forms text
+select.question__content {
+	height: 44px;
+	padding: 12px 0 12px 12px;
+	font-size: 14px;
+}
 </style>
