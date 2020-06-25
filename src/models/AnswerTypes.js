@@ -73,7 +73,7 @@ export default {
 
 	dropdown: {
 		component: QuestionDropdown,
-		icon: 'icon-triangle-s',
+		icon: 'icon-answer-dropdown',
 		label: t('forms', 'Dropdown'),
 		validate: question => question.options.length > 0,
 
