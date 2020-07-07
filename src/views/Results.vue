@@ -38,15 +38,41 @@
 		</TopBar>
 
 		<header v-if="!noSubmissions">
-			<h2>{{ t('forms', 'Responses for {title}', { title: formTitle }) }}</h2>
-			<div class="response_actions">
-				<button class="response_actions__export" @click="download">
-					<span class="icon-download" role="img" />
-					{{ t('forms', 'Export to CSV') }}
-				</button>
+			<h2>{{ formTitle }}</h2>
+			<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
+
+			<!-- View switcher between Summary and Responses -->
+			<div class="response-actions">
+				<div class="response-actions__radio">
+					<input id="show-summary--true"
+						v-model="showSummary"
+						type="radio"
+						:value="true"
+						class="hidden">
+					<label for="show-summary--true"
+						class="response-actions__radio__item"
+						:class="{ 'response-actions__radio__item--active': showSummary }">
+						{{ t('forms', 'Summary') }}
+					</label>
+					<input id="show-summary--false"
+						v-model="showSummary"
+						type="radio"
+						:value="false"
+						class="hidden">
+					<label for="show-summary--false"
+						class="response-actions__radio__item"
+						:class="{ 'response-actions__radio__item--active': !showSummary }">
+						{{ t('forms', 'Responses') }}
+					</label>
+				</div>
+
+				<!-- Action menu for CSV export and deletion -->
 				<Actions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
+					<ActionButton icon="icon-download" @click="download">
+						{{ t('forms', 'Export to CSV') }}
+					</ActionButton>
 					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
 						{{ t('forms', 'Delete all responses') }}
 					</ActionButton>
@@ -69,7 +95,17 @@
 			</EmptyContent>
 		</section>
 
-		<section v-else>
+		<!-- Summary view for visualization -->
+		<section v-if="!noSubmissions && showSummary">
+			<Summary
+				v-for="question in form.questions"
+				:key="question.id"
+				:question="question"
+				:submissions="form.submissions" />
+		</section>
+
+		<!-- Responses view for individual responses -->
+		<section v-if="!noSubmissions && !showSummary">
 			<Submission
 				v-for="submission in form.submissions"
 				:key="submission.id"
@@ -93,6 +129,7 @@ import moment from '@nextcloud/moment'
 import Vue from 'vue'
 
 import EmptyContent from '../components/EmptyContent'
+import Summary from '../components/Results/Summary'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
@@ -108,6 +145,7 @@ export default {
 		ActionButton,
 		AppContent,
 		EmptyContent,
+		Summary,
 		Submission,
 		TopBar,
 	},
@@ -117,6 +155,7 @@ export default {
 	data() {
 		return {
 			loadingResults: true,
+			showSummary: true,
 		}
 	},
 
@@ -263,23 +302,54 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-h2 {
-	font-size: 2em;
-	font-weight: bold;
-	margin-top: 32px;
-	padding-left: 14px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
+.app-content header {
+	h2 {
+		font-size: 2em;
+		font-weight: bold;
+		margin-top: 32px;
+		padding-left: 14px;
+		padding-bottom: 8px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-.response_actions {
-	display: flex;
-	align-items: center;
+	p {
+		padding-left: 14px;
+	}
 
-	&__export {
-		width: max-content;
-		margin-left: 16px;
+	.response-actions {
+		display: flex;
+		align-items: center;
+		padding-left: 14px;
+
+		&__radio {
+			margin-right: 8px;
+
+			&__item {
+				border-radius: var(--border-radius-pill);
+				padding: 8px 16px;
+				font-weight: bold;
+				background-color: var(--color-background-dark);
+
+				&:first-of-type {
+					border-top-right-radius: 0;
+					border-bottom-right-radius: 0;
+					padding-right: 8px;
+				}
+
+				&:last-of-type {
+					border-top-left-radius: 0;
+					border-bottom-left-radius: 0;
+					padding-left: 8px;
+				}
+
+				&--active {
+					background-color: var(--color-primary);
+					color: var(--color-primary-text)
+				}
+			}
+		}
 	}
 }
 </style>
