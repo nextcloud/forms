@@ -172,17 +172,19 @@ export default {
 
 		async loadFormResults() {
 			this.loadingResults = true
-			console.debug('Loading Results')
+			console.debug('Loading results for form', this.form.hash)
 
 			try {
 				const response = await axios.get(generateUrl('/apps/forms/api/v1/submissions/{hash}', {
 					hash: this.form.hash,
 				}))
-				this.form.submissions = response.data.submissions
-				this.form.questions = response.data.questions
+
+				// Append questions & submissions
+				this.$set(this.form, 'submissions', response.data.submissions)
+				this.$set(this.form, 'questions', response.data.questions)
 			} catch (error) {
 				console.error(error)
-				showError(t('forms', 'There was an error while loading results'))
+				showError(t('forms', 'There was an error while loading the results'))
 			} finally {
 				this.loadingResults = false
 			}
