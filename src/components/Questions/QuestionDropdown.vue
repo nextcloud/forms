@@ -35,50 +35,38 @@
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
-		<ul class="question__content">
-			<template v-for="(answer, index) in options">
-				<li v-if="!edit"
-					:key="answer.id"
-					class="question__item"
-					:class="{'question__item--last': (index === options.length-1),}">
-					<!-- Answer radio/checkbox + label -->
-					<!-- TODO: migrate to radio/checkbox component once available -->
-					<input :id="`${id}-answer-${answer.id}`"
-						ref="checkbox"
-						:aria-checked="isChecked(answer.id)"
-						:checked="isChecked(answer.id)"
-						:class="{
-							'radio question__radio': isUnique,
-							'checkbox question__checkbox': !isUnique,
-						}"
-						:name="`${id}-answer`"
-						:required="isRequired(answer.id)"
-						:type="isUnique ? 'radio' : 'checkbox'"
-						@change="onChange($event, answer.id)"
-						@keydown.enter.exact.prevent="onKeydownEnter">
-					<label v-if="!edit"
-						ref="label"
-						:for="`${id}-answer-${answer.id}`"
-						class="question__label">{{ answer.text }}</label>
-				</li>
+		<select v-if="!edit"
+			:id="text"
+			:name="text"
+			:multiple="isMultiple"
+			:required="mandatory"
+			class="question__content">
+			<option value="">
+				{{ selectOptionPlaceholder }}
+			</option>
+			<option v-for="answer in options"
+				:key="answer.id"
+				:value="answer.id">
+				{{ answer.text }}
+			</option>
+		</select>
 
-				<!-- Answer text input edit -->
-				<AnswerInput v-else
-					:key="index /* using index to keep the same vnode after new answer creation */"
-					ref="input"
-					:answer="answer"
-					:index="index"
-					:is-unique="isUnique"
-					:is-dropdown="false"
-					:max-option-length="maxStringLengths.optionText"
-					@add="addNewEntry"
-					@delete="deleteOption"
-					@update:answer="updateAnswer" />
-			</template>
+		<ol v-if="edit" class="question__content">
+			<!-- Answer text input edit -->
+			<AnswerInput v-for="(answer, index) in options"
+				:key="index /* using index to keep the same vnode after new answer creation */"
+				ref="input"
+				:answer="answer"
+				:index="index"
+				:is-unique="!isMultiple"
+				:is-dropdown="true"
+				:max-option-length="maxStringLengths.optionText"
+				@add="addNewEntry"
+				@delete="deleteOption"
+				@update:answer="updateAnswer" />
 
-			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
-				<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
-				<input ref="inputNewAnswer"
+			<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
+				<input
 					:aria-label="t('forms', 'Add a new answer')"
 					:placeholder="t('forms', 'Add a new answer')"
 					class="question__input"
@@ -88,7 +76,7 @@
 					@click="addNewEntry"
 					@focus="addNewEntry">
 			</li>
-		</ul>
+		</ol>
 	</Question>
 </template>
 
@@ -101,11 +89,8 @@ import AnswerInput from './AnswerInput'
 import QuestionMixin from '../../mixins/QuestionMixin'
 import GenRandomId from '../../utils/GenRandomId'
 
-// Implementations docs
-// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html
-// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/checkbox/checkbox-2.html
 export default {
-	name: 'QuestionMultiple',
+	name: 'QuestionDropdown',
 
 	components: {
 		AnswerInput,
@@ -114,6 +99,13 @@ export default {
 	mixins: [QuestionMixin],
 
 	computed: {
+		selectOptionPlaceholder() {
+			if (this.readOnly) {
+				return this.answerType.submitPlaceholder
+			}
+			return this.answerType.createPlaceholder
+		},
+
 		contentValid() {
 			return this.answerType.validate(this)
 		},
@@ -123,8 +115,9 @@ export default {
 			return value?.text?.trim().length === 0
 		},
 
-		isUnique() {
-			return this.answerType.unique === true
+		isMultiple() {
+			// This can be extended if we want to include support for <select multiple>
+			return false
 		},
 
 		hasNoAnswer() {
@@ -154,15 +147,6 @@ export default {
 
 				// update parent
 				this.updateOptions(options)
-			} else {
-				// If edit becomes true by tabbing to last element, focus newAnswer-input
-				if (document.activeElement?.parentNode?.classList.contains('question__item--last')) {
-					this.$nextTick(() => {
-						if (this.$refs.inputNewAnswer) {
-							this.$refs.inputNewAnswer.focus()
-						}
-					})
-				}
 			}
 		},
 	},
@@ -172,13 +156,13 @@ export default {
 			const isChecked = event.target.checked === true
 			let values = this.values.slice()
 
-			// Radio
-			if (this.isUnique) {
+			// Simple select
+			if (!this.isMultiple) {
 				this.$emit('update:values', [answerId])
 				return
 			}
 
-			// Checkbox
+			// Select with multiple
 			if (isChecked) {
 				values.push(answerId)
 			} else {
@@ -213,8 +197,8 @@ export default {
 				return false
 			}
 
-			// true for Radiobuttons
-			if (this.isUnique) {
+			// true for simple select
+			if (!this.isMultiple) {
 				return true
 			}
 
@@ -360,54 +344,6 @@ export default {
 	position: relative;
 	display: inline-flex;
 	min-height: 44px;
-
-	// Taking styles from server radio-input items
-	&__pseudoInput {
-		flex-shrink: 0;
-		display: inline-block;
-		height: 16px;
-		width: 16px !important;
-		vertical-align: middle;
-		margin: 0 14px 0px 0px;
-		border: 1px solid #878787;
-		border-radius: 1px;
-		// Adjust position manually to match pseudo-input and proper position to text
-		position: relative;
-		top: 10px;
-
-		// Show round for Pseudo-Radio-Button
-		&--unique {
-			border-radius: 50%;
-		}
-
-		&:hover {
-			border-color: var(--color-primary-element);
-		}
-	}
-
-	.question__label {
-		flex: 1 1 100%;
-		// Overwrite guest page core styles
-		text-align: left !important;
-		// Some rounding issues lead to this strange number, so label and answerInput show up a the same position, working on different browsers.
-		padding: 6.5px 0 0 30px;
-		line-height: 22px;
-		min-height: 34px;
-		height: min-content;
-		position: relative;
-
-		&::before {
-			box-sizing: border-box;
-			// Adjust position manually for proper position to text
-			position: absolute;
-			top: 10px;
-			width: 16px;
-			height: 16px;
-			margin-bottom: 0;
-			margin-left: -30px !important;
-			margin-right: 14px !important;
-		}
-	}
 }
 
 // Using type to have a higher order than the input styling of server
@@ -424,13 +360,10 @@ export default {
 	position: relative;
 }
 
-input.question__radio,
-input.question__checkbox {
-	z-index: -1;
-	// make sure browser warnings are properly
-	// displayed at the correct location
-	left: 0px;
-	width: 16px;
+// Fix display of select dropdown and adjust to Forms text
+select.question__content {
+	height: 44px;
+	padding: 12px 0 12px 12px;
+	font-size: 14px;
 }
-
 </style>

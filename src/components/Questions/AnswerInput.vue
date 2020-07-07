@@ -1,6 +1,10 @@
 <template>
 	<li class="question__item">
-		<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
+		<div class="question__item__pseudoInput"
+			:class="{
+				'question__item__pseudoInput--unique':isUnique,
+				'question__item__pseudoInput--dropdown':isDropdown
+			}" />
 		<input
 			ref="input"
 			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
@@ -51,6 +55,10 @@ export default {
 			required: true,
 		},
 		isUnique: {
+			type: Boolean,
+			required: true,
+		},
+		isDropdown: {
 			type: Boolean,
 			required: true,
 		},
@@ -202,6 +210,11 @@ export default {
 		// Show round for Pseudo-Radio-Button
 		&--unique {
 			border-radius: 50%;
+		}
+
+		// Do not show pseudo-icon for dropdowns
+		&--dropdown {
+			display: none;
 		}
 
 		&:hover {
