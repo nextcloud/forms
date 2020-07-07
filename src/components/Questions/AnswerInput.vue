@@ -15,7 +15,7 @@
 			@keydown.enter.prevent="addNewEntry">
 
 		<!-- Delete answer -->
-		<Actions>
+		<Actions @keydown.tab.exact.prevent="onActionsTab">
 			<ActionButton icon="icon-close" @click="deleteEntry">
 				{{ t('forms', 'Delete answer') }}
 			</ActionButton>
@@ -77,6 +77,11 @@ export default {
 		 */
 		focus() {
 			this.$refs.input.focus()
+		},
+
+		onActionsTab(event) {
+			console.debug('keydownTab')
+			// this.$emit('focus-next', event.target)
 		},
 
 		/**

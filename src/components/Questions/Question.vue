@@ -46,7 +46,7 @@
 				:maxlength="maxQuestionLength"
 				required
 				@input="onTitleChange"
-				@keydown.shift.tab.capture="nextDisableEdit">
+				@keydown.shift.tab.prevent="onTitleShiftTab">
 			<h3 v-else
 				class="question__header-title"
 				:tabindex="computedTitleTabIndex"
@@ -56,7 +56,10 @@
 				v-tooltip.auto="warningInvalid"
 				class="question__header-warning icon-error-color"
 				tabindex="0" />
-			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
+			<Actions v-if="!readOnly"
+				class="question__header-menu"
+				:force-menu="true"
+				@keydown.tab.exact.prevent="onActionsTab">
 				<ActionCheckbox :checked="mandatory"
 					@update:checked="onMandatoryChange">
 					{{ t('forms', 'Required') }}
@@ -167,6 +170,16 @@ export default {
 	},
 
 	methods: {
+		onTitleShiftTab(event) {
+			console.debug('this', event.target)
+			this.$emit('focus-prev', event.target)
+			this.disableEdit()
+		},
+		onActionsTab(event) {
+			console.debug('actionsTab', event)
+			this.$emit('focus-next', event.target)
+		},
+
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
 		},
@@ -179,12 +192,9 @@ export default {
 		 * Allow edit-navigation through Tab-Key
 		 */
 		onTitleFocus() {
-			console.debug('On Title focus', this.$refs)
 			if (!this.readOnly) {
 				this.enableEdit()
-				console.debug('Store NextTick')
 				this.$nextTick(() => {
-					console.debug('NextTick!')
 					this.$refs.titleInput.focus()
 				})
 			}
@@ -208,18 +218,6 @@ export default {
 			if (!this.readOnly) {
 				this.$emit('update:edit', false)
 			}
-		},
-
-		nextDisableEdit(event) {
-			console.debug('nextDisable')
-			console.debug(event)
-			// event.preventDefault()
-			// this.disableEdit()
-			this.$nextTick(() => {
-				console.debug('Later!')
-			})
-			console.debug('trigger')
-			// this.disableEdit()
 		},
 
 		/**

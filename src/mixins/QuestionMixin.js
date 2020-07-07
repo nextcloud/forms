@@ -22,6 +22,7 @@ import { debounce } from 'debounce'
 import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import tabbable from 'tabbable'
 
 import Question from '../components/Questions/Question'
 
@@ -200,6 +201,23 @@ export default {
 			if (!this.readOnly) {
 				this.edit = false
 			}
+		},
+
+		onFocusPrev(elem) {
+			console.debug('TabPrev Mixin', elem)
+			this.$emit('focus-prev', elem)
+		},
+		onFocusNext(elem) {
+			console.debug('TabNext', elem)
+			this.$emit('focus-next', elem)
+		},
+		FocusNextOutside(elem) {
+			console.debug('focusnextoutside', elem)
+			this.$emit('focus-next', elem)
+			this.disableEdit()
+		},
+		onKeydownTab(event) {
+			console.debug('keydownTab')
 		},
 	},
 }

@@ -32,7 +32,10 @@
 		:warning-invalid="answerType.warningInvalid"
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
-		@delete="onDelete">
+		@delete="onDelete"
+		@focus-prev="onFocusPrev"
+		@focus-next="FocusNextOutside"
+		@keydown.tab.exact="onKeydownTab">
 		<div class="question__content">
 			<input ref="input"
 				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"

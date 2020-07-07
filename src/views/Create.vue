@@ -94,7 +94,9 @@
 					:index="index + 1"
 					:max-string-lengths="maxStringLengths"
 					v-bind.sync="question"
-					@delete="deleteQuestion(question)" />
+					@delete="deleteQuestion(question)"
+					@focus-prev="onFocusPrev"
+					@focus-next="onFocusNext" />
 			</Draggable>
 
 			<!-- Add new questions toolbar -->
@@ -126,6 +128,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
+import tabbable from 'tabbable'
 import Draggable from 'vuedraggable'
 
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
@@ -230,6 +233,22 @@ export default {
 	},
 
 	methods: {
+		onFocusPrev(elem) {
+			console.debug('Create tabPrev', elem)
+			const tabelements = tabbable(this.$el)
+			console.debug(tabelements)
+			const ind = tabelements.findIndex(tabbableElement => tabbableElement === elem)
+			console.debug(tabelements[ind - 1])
+			tabelements[ind - 1].focus()
+		},
+		onFocusNext(elem) {
+			console.debug('Create tabNext', elem)
+			const tabelements = tabbable(this.$el)
+			console.debug(tabelements)
+			const ind = tabelements.findIndex(tabbableElement => tabbableElement === elem)
+			console.debug(tabelements[ind + 1])
+			tabelements[ind + 1].focus()
+		},
 		/**
 		 * Fetch the full form data and update parent
 		 *

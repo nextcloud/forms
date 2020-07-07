@@ -34,7 +34,9 @@
 		:shift-drag-handle="shiftDragHandle"
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
-		@delete="onDelete">
+		@delete="onDelete"
+		@focus-prev="onFocusPrev"
+		@focus-next="onFocusNext">
 		<ul class="question__content">
 			<template v-for="(answer, index) in options">
 				<li v-if="!edit"
@@ -72,7 +74,8 @@
 					:max-option-length="maxStringLengths.optionText"
 					@add="addNewEntry"
 					@delete="deleteOption"
-					@update:answer="updateAnswer" />
+					@update:answer="updateAnswer"
+					@focus-next="onFocusNext" />
 			</template>
 
 			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
