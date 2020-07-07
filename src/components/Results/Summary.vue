@@ -121,10 +121,7 @@ export default {
 
 			// Sort options by response count
 			questionOptionsStats.sort((object1, object2) => {
-				if (object1.count === object2.count) {
-					return 0
-				}
-				return object1.count < object2.count ? 1 : -1
+				return object2.count - object1.count
 			})
 
 			// Fill percentage values
