@@ -5,6 +5,7 @@ OC.L10N.register(
     "Searching …" : "Søger ...",
     "Group" : "Gruppe",
     "Description" : "Beskrivelse",
+    "Summary" : "Oversigt",
     "Settings" : "Indstillinger",
     "Set expiration date" : "Angiv udløbsdato",
     "Expiration date" : "Udløbsdato",

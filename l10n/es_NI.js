@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "Requerido",
     "Group" : "Grupo",
     "Description" : "Descripción",
+    "Summary" : "Resumen",
     "Settings" : "Configuraciones ",
     "Set expiration date" : "Establecer fecha de expiración",
     "Expiration date" : "Fecha de expiración",

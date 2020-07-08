@@ -11,6 +11,7 @@ OC.L10N.register(
     "No elements found." : "Inga element hittades.",
     "Group" : "Grupp",
     "Description" : "Beskrivning",
+    "Summary" : "Sammanfattning",
     "Options" : "Alternativ",
     "Settings" : "Inställnigar",
     "Set expiration date" : "Välj utgångsdatum",

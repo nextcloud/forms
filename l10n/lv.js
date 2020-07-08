@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "Nepieciešams",
     "Group" : "Grupa",
     "Description" : "Apraksts",
+    "Summary" : "Kopsavilkums",
     "Settings" : "Iestatījumi",
     "Set expiration date" : "Uzstādīt beigu termiņu",
     "Expiration date" : "Termiņa datums",

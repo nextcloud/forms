@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "Nødvendig",
     "Group" : "Gruppe",
     "Description" : "Skildring",
+    "Summary" : "Oppsumering",
     "Settings" : "Instillingar",
     "Set expiration date" : "Set utløpsdato",
     "Expiration date" : "Utløpsdato"

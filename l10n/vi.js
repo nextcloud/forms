@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "Bắt buộc",
     "Group" : "N",
     "Description" : "Mô tả",
+    "Summary" : "tóm tắt",
     "Settings" : "Thiết lập",
     "Set expiration date" : "Đặt ngày hết hạn",
     "Expiration date" : "Ngày kết thúc",

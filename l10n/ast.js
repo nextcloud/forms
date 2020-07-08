@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "Riquíu",
     "Group" : "Group",
     "Description" : "Descripción",
+    "Summary" : "Sumariu",
     "Settings" : "Settings",
     "Set expiration date" : "Afitar la data de caducidá",
     "Expiration date" : "Data de caducidá",

@@ -5,6 +5,7 @@ OC.L10N.register(
     "Searching …" : "Leita …",
     "Group" : "Hópur",
     "Description" : "Lýsing",
+    "Summary" : "Samantekt",
     "Options" : "Valkostir",
     "Settings" : "Stillingar",
     "Set expiration date" : "Setja gildistíma",

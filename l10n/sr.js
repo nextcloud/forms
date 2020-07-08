@@ -17,6 +17,7 @@ OC.L10N.register(
     "No elements found." : "Нема нађених елемената.",
     "Group" : "Група",
     "Description" : "Опис",
+    "Summary" : "Сумарно",
     "Options" : "Опције",
     "Settings" : "Поставке",
     "Set expiration date" : "Постави датум истека",

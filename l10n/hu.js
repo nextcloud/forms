@@ -12,6 +12,7 @@ OC.L10N.register(
     "Searching …" : "Keresés ...",
     "Group" : "Csoport",
     "Description" : "Leírás",
+    "Summary" : "Összefoglalás",
     "Options" : "Beállítások",
     "Settings" : "Beállítások",
     "Set expiration date" : "Lejárati idő beállítása",

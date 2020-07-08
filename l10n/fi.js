@@ -9,6 +9,7 @@ OC.L10N.register(
     "Searching …" : "Haetaan…",
     "Group" : "Ryhmä",
     "Description" : "Kuvaus",
+    "Summary" : "Yhteenveto",
     "Options" : "Valinnat",
     "Settings" : "Asetukset",
     "Set expiration date" : "Aseta vanhenemispäivä",

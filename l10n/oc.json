@@ -1,8 +1,0 @@
-{ "translations": {
-    "Group" : "Grop",
-    "Description" : "Descripcion",
-    "Settings" : "Paramètres",
-    "Set expiration date" : "Especificar una data d'expiracion",
-    "Expiration date" : "Data d'expiracion"
-},"pluralForm" :"nplurals=2; plural=(n > 1);"
-}

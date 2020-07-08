@@ -11,6 +11,7 @@ OC.L10N.register(
     "No elements found." : "要素が見つかりませんでした。",
     "Group" : "グループ",
     "Description" : "説明",
+    "Summary" : "要約",
     "Options" : "オプション",
     "Settings" : "設定",
     "Set expiration date" : "有効期限を設定",

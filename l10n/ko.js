@@ -32,8 +32,8 @@ OC.L10N.register(
     "Thank you for completing the form!" : "양식을 작성해주셔서 감사합니다!",
     "There was an error submitting the form" : "양식 제출 실패",
     "Error while saving question" : "질문 저장 실패",
-    "Multiple choice" : "다지선다형",
     "Checkboxes" : "체크박스형",
+    "Multiple choice" : "다지선다형",
     "Short answer" : "단답형",
     "Form expired" : "만료된 양식",
     "This form does not exist" : "존재하지 않는 양식"

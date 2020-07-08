@@ -1,8 +1,0 @@
-{ "translations": {
-    "Group" : "Խումբ",
-    "Description" : "Նկարագրություն",
-    "Settings" : "կարգավորումներ",
-    "Set expiration date" : "Սահմանել վավերականության ժամկետ",
-    "Expiration date" : "Վավերականության ժամկետ"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}
