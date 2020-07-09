@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "E domosdoshme",
     "Group" : "Grup",
     "Description" : "Përshkrim",
+    "Summary" : "Përmbledhje",
     "Settings" : "Rregullimet",
     "Set expiration date" : "Caktoni datë skadimi",
     "Expiration date" : "Datë skadimi",

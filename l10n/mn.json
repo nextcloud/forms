@@ -1,0 +1,9 @@
+{ "translations": {
+    "Required" : "Шаардлагатай",
+    "Group" : "Бүлэг",
+    "Description" : "Тодорхойлолт",
+    "Summary" : "Хураангуй",
+    "Settings" : "Тохиргоо",
+    "Submit" : "мэдэгдэх"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

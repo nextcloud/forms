@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "必填",
     "Group" : "群組",
     "Description" : "描述",
+    "Summary" : "摘要",
     "Options" : "設定",
     "Settings" : "設定",
     "Set expiration date" : "設定到期日",

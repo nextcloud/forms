@@ -5,6 +5,7 @@ OC.L10N.register(
     "Required" : "مطلوب",
     "Group" : "الفريق",
     "Description" : "الوصف",
+    "Summary" : "المُلخَّص",
     "Options" : "الخيارات",
     "Settings" : "الإعدادات",
     "Set expiration date" : "تعيين تاريخ إنتهاء الصلاحية",

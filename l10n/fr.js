@@ -53,6 +53,7 @@ OC.L10N.register(
     "Error while saving form" : "Erreur lors de la sauvegarde du formulaire",
     "Loading responses …" : "Chargement des réponses ...",
     "Back to questions" : "Retour aux questions",
+    "Summary" : "Résumé",
     "Options" : "Choix",
     "Export to CSV" : "Exporter au format CSV",
     "Delete all responses" : "Supprimer toutes les réponses",

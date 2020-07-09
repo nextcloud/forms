@@ -11,6 +11,7 @@ OC.L10N.register(
     "No elements found." : "عنصری یافت نشد",
     "Group" : "گروه",
     "Description" : "توضیحات",
+    "Summary" : "خلاصه",
     "Options" : "گزینه ها",
     "Settings" : "تنظیمات",
     "Set expiration date" : "تنظیم تاریخ انقضا",

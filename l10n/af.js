@@ -4,6 +4,7 @@ OC.L10N.register(
     "Required" : "Vereis",
     "Group" : "Groep",
     "Description" : "Beskrywing",
+    "Summary" : "Opsomming",
     "Settings" : "Instellings",
     "Set expiration date" : "Stel vervaldatum",
     "Expiration date" : "Vervaldatum"

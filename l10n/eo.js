@@ -7,6 +7,7 @@ OC.L10N.register(
     "No elements found." : "Nenio trovita.",
     "Group" : "Grupo",
     "Description" : "Priskribo",
+    "Summary" : "Resumo",
     "Settings" : "Agordoj",
     "Set expiration date" : "Uzi limdaton",
     "Expiration date" : "Limdato",

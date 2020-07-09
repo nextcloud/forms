@@ -49,6 +49,7 @@ OC.L10N.register(
     "Error while saving form" : "Pogreška pri spremanju obrasca",
     "Loading responses …" : "Učitavanje odgovora…",
     "Back to questions" : "Natrag na pitanja",
+    "Summary" : "Sažetak",
     "Options" : "Mogućnosti",
     "Export to CSV" : "Izvezi u CSV",
     "Delete all responses" : "Izbriši sve odgovore",

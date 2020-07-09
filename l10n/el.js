@@ -53,6 +53,7 @@ OC.L10N.register(
     "Error while saving form" : "Σφάλμα κατά την αποθήκευση της φόρμας",
     "Loading responses …" : "Φόρτωση απαντήσεων ...",
     "Back to questions" : "Επιστροφή στις ερωτήσεις",
+    "Summary" : "Σύνοψη",
     "Options" : "Επιλογές",
     "Export to CSV" : "Εξαγωγή σε CSV",
     "Delete all responses" : "Διαγραφή απαντήσεων",

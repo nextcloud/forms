@@ -6,6 +6,7 @@ OC.L10N.register(
     "Searching …" : "Otsin ...",
     "Group" : "Grupp",
     "Description" : "Kirjeldus",
+    "Summary" : "Kokkuvõte",
     "Settings" : "Seaded",
     "Set expiration date" : "Määra aegumise kuupäev",
     "Expiration date" : "Aegumise kuupäev"

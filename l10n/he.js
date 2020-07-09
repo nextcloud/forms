@@ -49,6 +49,7 @@ OC.L10N.register(
     "Error while saving form" : "שגיאה בעת שמירת טופס",
     "Loading responses …" : "התגובות נטענות…",
     "Back to questions" : "חזרה לשאלות",
+    "Summary" : "תקציר",
     "Options" : "אפשרויות",
     "Export to CSV" : "ייצוא ל־CSV",
     "Delete all responses" : "מחיקת כל התגובות",

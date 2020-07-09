@@ -5,6 +5,7 @@ OC.L10N.register(
     "Searching …" : "Търсене ...",
     "Group" : "Група",
     "Description" : "Описание",
+    "Summary" : "Резюме",
     "Settings" : "Настройки",
     "Set expiration date" : "Срок на валидност",
     "Expiration date" : "Валидност",
