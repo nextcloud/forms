@@ -56,6 +56,7 @@ class Question extends Entity {
 		'dropdown',
 		'date',
 		'datetime',
+		'email',
 	];
 
 	public function __construct() {
