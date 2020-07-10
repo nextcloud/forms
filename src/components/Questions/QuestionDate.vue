@@ -78,7 +78,7 @@ export default {
 
 <style lang="scss" scoped>
 // Using type to have a higher order than the input styling of server
-.question__input[type=text] {
+.question__input[type=date] {
 	width: 100%;
 	min-height: 44px;
 	margin: 0;
