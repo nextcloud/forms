@@ -89,6 +89,8 @@ OC.L10N.register(
     "This question needs a title and at least one answer!" : "Questa domanda richiede un titolo e almeno un risposta!",
     "Multiple choice" : "Scelta multipla",
     "Multiple choice question title" : "Titolo della domanda a scelta multipla",
+    "Dropdown" : "Discesa",
+    "Dropdown question title" : "Titolo della domanda a discesa",
     "People can pick one option" : "Le persone possono scegliere un'opzione",
     "Pick an option" : "Scegli un'opzione",
     "Short answer" : "Risposta breve",
