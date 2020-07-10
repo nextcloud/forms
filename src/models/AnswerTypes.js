@@ -26,6 +26,7 @@ import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionDate from '../components/Questions/QuestionDate'
 import QuestionDatetime from '../components/Questions/QuestionDatetime'
+import QuestionEmail from '../components/Questions/QuestionEmail'
 
 /**
  * @typedef {Object} AnswerTypes
@@ -126,6 +127,17 @@ export default {
 		titlePlaceholder: t('forms', 'Datetime question title'),
 		createPlaceholder: t('forms', ''),
 		submitPlaceholder: t('forms', 'Enter a date'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	email: {
+		component: QuestionEmail,
+		icon: 'icon-answer-email',
+		label: t('forms', 'Email'),
+
+		titlePlaceholder: t('forms', 'Email question title'),
+		createPlaceholder: t('forms', ''),
+		submitPlaceholder: t('forms', 'Enter an email'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 }
