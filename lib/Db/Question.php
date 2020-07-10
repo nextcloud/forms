@@ -53,7 +53,11 @@ class Question extends Entity {
 		'long',
 		'multiple',
 		'multiple_unique',
-		'dropdown'
+		'dropdown',
+		'date',
+		'datetime',
+		'email',
+		'tel',
 	];
 
 	public function __construct() {

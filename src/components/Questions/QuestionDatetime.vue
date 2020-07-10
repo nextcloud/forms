@@ -35,7 +35,7 @@
 		@delete="onDelete">
 		<div class="question__content">
 			<input ref="input"
-				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
+				:aria-label="t('forms', 'A answer for the question “{text}”', { text })"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:required="mandatory"
@@ -43,7 +43,7 @@
 				class="question__input"
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
-				v-bind:type="type"
+				type="datetime-local"
 				@input="onInput"
 				@keydown.enter.exact.prevent="onKeydownEnter">
 		</div>
@@ -51,36 +51,16 @@
 </template>
 
 <script>
-import QuestionMixin from '../../mixins/QuestionMixin'
+import QuestionShort from './QuestionShort'
 
 export default {
-	name: 'QuestionShort',
+	name: 'QuestionDatetime',
 
-	mixins: [QuestionMixin],
+	mixins: [QuestionShort],
 
 	data() {
 		return {
-			type: 'text',
-		}
-	},
-
-	computed: {
-		submissionInputPlaceholder() {
-			if (this.readOnly) {
-				return this.answerType.submitPlaceholder
-			}
-			return this.answerType.createPlaceholder
-		},
-	},
-
-	methods: {
-		onInput() {
-			const input = this.$refs.input
-			this.$emit('update:values', [input.value])
-		},
-
-		getType() {
-			return 'text'
+			type: 'datetime-local',
 		}
 	},
 }
@@ -88,7 +68,7 @@ export default {
 
 <style lang="scss" scoped>
 // Using type to have a higher order than the input styling of server
-.question__input {
+.question__input[type=datetime-local] {
 	width: 100%;
 	min-height: 44px;
 	margin: 0;
