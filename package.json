@@ -42,7 +42,7 @@
 		"v-clipboard": "^2.2.3",
 		"vue": "^2.6.11",
 		"vue-router": "^3.3.4",
-		"vuedraggable": "^2.23.2"
+		"vuedraggable": "^2.24.0"
 	},
 	"browserslist": [
 		"extends @nextcloud/browserslist-config"
