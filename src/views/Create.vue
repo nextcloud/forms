@@ -215,7 +215,7 @@ export default {
 		},
 
 		// Update Window-Title on title change
-		'form.title': function() {
+		'form.title'() {
 			SetWindowTitle(this.formTitle)
 		},
 	},
