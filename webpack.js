@@ -12,7 +12,4 @@ const config = {
 	],
 }
 
-if (process.env.NODE_ENV === 'production') {
-	module.exports = merge(config, webpackConfig.prod)
-}
-module.exports = merge(config, webpackConfig.dev)
+module.exports = merge(config, webpackConfig)
