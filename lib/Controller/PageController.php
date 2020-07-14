@@ -126,61 +126,7 @@ class PageController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function index(): TemplateResponse {
-		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'forms');
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
-	 * @return TemplateResponse
-	 */
-	public function createForm(): TemplateResponse {
-		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'forms');
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
-	 * TODO: Implement cloning
-	 *
-	 * @return TemplateResponse
-	 */
-	public function cloneForm(): TemplateResponse {
-		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'forms');
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
-	 * @return TemplateResponse
-	 */
-	public function editForm(): TemplateResponse {
-		Util::addScript($this->appName, 'forms');
-		Util::addStyle($this->appName, 'forms');
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
-		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
-	 * @return TemplateResponse
-	 */
-	public function getResult(): TemplateResponse {
-		Util::addScript($this->appName, 'forms');
+		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
@@ -219,7 +165,7 @@ class PageController extends Controller {
 		}
 
 		// Main Template to fill the form
-		Util::addScript($this->appName, 'submit');
+		Util::addScript($this->appName, 'forms-submit');
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
