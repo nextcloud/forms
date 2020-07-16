@@ -91,7 +91,7 @@ OC.L10N.register(
     "Multiple choice question title" : "Titel der Frage mit Mehrfachauswahl",
     "Dropdown" : "Aufklappmenü",
     "Dropdown question title" : "Titel der Frage im Aufklappmenü",
-    "People can pick one option" : "Benutzer können eine Option wählen",
+    "People can pick one option" : "Teilnehmer können eine Option wählen",
     "Pick an option" : "Wählen Sie eine Option",
     "Short answer" : "Kurze Antwort",
     "Short answer question title" : "Titel der Frage mit kurzer Antwort",
