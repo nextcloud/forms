@@ -57,6 +57,7 @@ class Question extends Entity {
 		'date',
 		'datetime',
 		'email',
+		'tel',
 	];
 
 	public function __construct() {

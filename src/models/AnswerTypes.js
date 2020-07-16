@@ -27,6 +27,7 @@ import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionDate from '../components/Questions/QuestionDate'
 import QuestionDatetime from '../components/Questions/QuestionDatetime'
 import QuestionEmail from '../components/Questions/QuestionEmail'
+import QuestionTel from '../components/Questions/QuestionTel'
 
 /**
  * @typedef {Object} AnswerTypes
@@ -138,6 +139,17 @@ export default {
 		titlePlaceholder: t('forms', 'Email question title'),
 		createPlaceholder: t('forms', ''),
 		submitPlaceholder: t('forms', 'Enter an email'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	tel: {
+		component: QuestionTel,
+		icon: 'icon-answer-tel',
+		label: t('forms', 'Phone number'),
+
+		titlePlaceholder: t('forms', 'Phone number question title'),
+		createPlaceholder: t('forms', ''),
+		submitPlaceholder: t('forms', 'Enter a phone number'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 }
