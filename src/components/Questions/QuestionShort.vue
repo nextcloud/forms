@@ -43,7 +43,7 @@
 				class="question__input"
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
-				type="text"
+				v-bind:type="type"
 				@input="onInput"
 				@keydown.enter.exact.prevent="onKeydownEnter">
 		</div>
@@ -57,6 +57,12 @@ export default {
 	name: 'QuestionShort',
 
 	mixins: [QuestionMixin],
+
+	data() {
+		return {
+			type: 'text',
+		}
+	},
 
 	computed: {
 		submissionInputPlaceholder() {
@@ -72,13 +78,17 @@ export default {
 			const input = this.$refs.input
 			this.$emit('update:values', [input.value])
 		},
+
+		getType() {
+			return 'text'
+		}
 	},
 }
 </script>
 
 <style lang="scss" scoped>
 // Using type to have a higher order than the input styling of server
-.question__input[type=text] {
+.question__input {
 	width: 100%;
 	min-height: 44px;
 	margin: 0;
