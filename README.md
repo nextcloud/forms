@@ -7,10 +7,18 @@
 
 **📝 Simple surveys and questionnaires, self-hosted**
 
+### Straightforward form creation
 ![](screenshots/forms1.png)
 
+### Simple sharing and responding
+![](screenshots/forms2.png)
+
+### Response visualization and exporting
+![](screenshots/forms3.png)
+
 - **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
-- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.
+- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.
+- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 
 
