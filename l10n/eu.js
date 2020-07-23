@@ -4,7 +4,6 @@ OC.L10N.register(
     "Anonymous response" : "Erantzun anonimoa",
     "Forms" : "Inprimakiak",
     "Shared by %s" : "%s(e)k partekatua",
-    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **💾 Export results:** Results can be exported as CSV in the same format used by Google Forms.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Inkesta eta galdetegi sinpleak, norberak ostatatuta!**\n\n- **📝 Diseinu sinplea:** Ez aukera gehiegi, oinarrizkoak bakarrik. Mugikorrean ondo dabil, noski.\n- **💾 Esportatu emaitzak:** Emaitzak CSV formatuan esportatu daitezke, Google Forms-ek egiten duen bezala.\n- **🙋 Engaia zaitez!** Hamaika plan dauzkagu, galdera mota gehiago, inprimakietan lankidetza, [eta askoz ere gehiago](https://github.com/nextcloud/forms/milestones)!",
     "New form" : "Inprimaki berria",
     "Loading forms …" : "Inprimakiak kargatzen...",
     "No forms created yet" : "Ez da inprimakirik sortu oraindik",
