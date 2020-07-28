@@ -1,7 +1,15 @@
 # Changelog
 
+## [2.0.0 - 2020-07-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-rc.1...v2.0.0)
+
+### Fixed
+- Fix dropdown submission insert
+  [\#520](https://github.com/nextcloud/forms/pull/520) ([skjnldsv](https://github.com/skjnldsv))
+
 ## v2.0.0-rc.1 - 2020-07-24
-[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.4...2.0.0-rc.1)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.4...v2.0.0-rc.1)
 
 ### Enhancements
 - Add screenshot of response visualization, adjust readme
