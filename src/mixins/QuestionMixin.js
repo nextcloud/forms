@@ -48,7 +48,7 @@ export default {
 		/**
 		 * Mandatory-Setting
 		 */
-		mandatory: {
+		isMandatory: {
 			type: Boolean,
 			required: true,
 		},
