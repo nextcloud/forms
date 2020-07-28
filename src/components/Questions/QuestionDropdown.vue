@@ -40,13 +40,15 @@
 			:name="text"
 			:multiple="isMultiple"
 			:required="mandatory"
-			class="question__content">
+			class="question__content"
+			@change="onChange">
 			<option value="">
 				{{ selectOptionPlaceholder }}
 			</option>
 			<option v-for="answer in options"
 				:key="answer.id"
-				:value="answer.id">
+				:value="answer.id"
+				:selected="isChecked(answer.id)">
 				{{ answer.text }}
 			</option>
 		</select>
@@ -152,25 +154,20 @@ export default {
 	},
 
 	methods: {
-		onChange(event, answerId) {
-			const isChecked = event.target.checked === true
-			let values = this.values.slice()
+		onChange(event) {
+			// Get all selected options
+			const answerIds = [...event.target.options]
+				.filter(option => option.selected)
+				.map(option => parseInt(option.value, 10))
 
 			// Simple select
 			if (!this.isMultiple) {
-				this.$emit('update:values', [answerId])
+				this.$emit('update:values', [answerIds[0]])
 				return
 			}
 
-			// Select with multiple
-			if (isChecked) {
-				values.push(answerId)
-			} else {
-				values = values.filter(id => id !== answerId)
-			}
-
 			// Emit values and remove duplicates
-			this.$emit('update:values', [...new Set(values)])
+			this.$emit('update:values', [...new Set(answerIds)])
 		},
 
 		/**

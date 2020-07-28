@@ -167,6 +167,7 @@ export default {
 		onKeydownEnter(event) {
 			const formInputs = Array.from(this.$refs.form)
 			const sourceInputIndex = formInputs.findIndex(input => input === event.originalTarget)
+
 			// Focus next form element
 			formInputs[sourceInputIndex + 1].focus()
 		},
