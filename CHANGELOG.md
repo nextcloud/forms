@@ -1,6 +1,14 @@
 # Changelog
 
-## [2.0.0 - 2020-07-28
+## v2.0.1 - 2020-07-29
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0...v2.0.1)
+
+### Fixed
+- Fix substring utf8
+  [\#528](https://github.com/nextcloud/forms/pull/528) ([jotoeri](https://github.com/jotoeri))
+
+## v2.0.0 - 2020-07-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-rc.1...v2.0.0)
 
