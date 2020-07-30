@@ -86,10 +86,10 @@ class PageController extends Controller {
 	 */
 	private $maxStringLengths = [
 		'formTitle' => 256,
-		'formDescription' => 2048,
+		'formDescription' => 8192,
 		'questionText' => 2048,
 		'optionText' => 1024,
-		'answerText' => 2048,
+		'answerText' => 4096,
 	];
 
 	public function __construct(string $appName,
