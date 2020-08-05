@@ -88,7 +88,7 @@ OC.L10N.register(
     "Checkbox question title" : "Titel der Frage mit Kontrollkästchen",
     "This question needs a title and at least one answer!" : "Diese Frage braucht einen Titel und mindestens eine Antwort!",
     "Multiple choice" : "Einfachauswahl",
-    "Multiple choice question title" : "Titel der Frage mit Mehrfachauswahl",
+    "Multiple choice question title" : "Titel der Frage für Einfachauswahl",
     "Dropdown" : "Aufklappmenü",
     "Dropdown question title" : "Titel der Frage im Aufklappmenü",
     "People can pick one option" : "Teilnehmer können eine Option wählen",
