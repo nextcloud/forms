@@ -43,7 +43,7 @@
 				class="question__input"
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
-				v-bind:type="type"
+				type="text"
 				@input="onInput"
 				@keydown.enter.exact.prevent="onKeydownEnter">
 		</div>
@@ -57,12 +57,6 @@ export default {
 	name: 'QuestionShort',
 
 	mixins: [QuestionMixin],
-
-	data() {
-		return {
-			type: 'text',
-		}
-	},
 
 	computed: {
 		submissionInputPlaceholder() {
