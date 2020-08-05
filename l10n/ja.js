@@ -1,10 +1,22 @@
 OC.L10N.register(
     "forms",
     {
+    "Anonymous response" : "匿名の回答",
     "Forms" : "フォーム",
+    "Shared by %s" : "%sによって共有された",
+    "New form" : "新しいフォーム",
+    "Loading forms …" : "フォームを読み込み中…",
+    "No forms created yet" : "まだフォームが作成されていません",
+    "Create a form" : "フォームの作成",
+    "Select a form or create a new one" : "フォームを選択するか、新しく作成します",
     "Create new form" : "新規フォームを作成",
+    "An error occurred while loading the forms list" : "フォームリストの読み込み中にエラーが発生しました",
+    "Unable to create a new form" : "新しいフォームを作成することはできません",
+    "Responses" : "回答",
+    "Clone form" : "フォームを複製",
     "Delete form" : "フォームを削除",
     "Cannot copy, please copy the link manually" : "コピーできませんでした。手動でリンクをコピーしてください。",
+    "Are you sure you want to delete {title}?" : "本当に [title] を削除してもよろしいですか?",
     "Required" : "必須",
     "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",
     "Searching …" : "検索しています…",
@@ -16,6 +28,7 @@ OC.L10N.register(
     "Settings" : "設定",
     "Set expiration date" : "有効期限を設定",
     "Expiration date" : "有効期限",
-    "Submit" : "送信"
+    "Submit" : "送信",
+    "Checkboxes" : "チェックボックス"
 },
 "nplurals=1; plural=0;");

@@ -1,5 +1,72 @@
 # Changelog
 
+## v2.0.2 - 2020-07-30
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.1...v2.0.2)
+
+### Fixed
+- Increase description and long-text max length
+  [\#533](https://github.com/nextcloud/forms/pull/533) ([jotoeri](https://github.com/jotoeri))
+
+## v2.0.1 - 2020-07-29
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0...v2.0.1)
+
+### Fixed
+- Fix substring utf8
+  [\#528](https://github.com/nextcloud/forms/pull/528) ([jotoeri](https://github.com/jotoeri))
+
+## v2.0.0 - 2020-07-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-rc.1...v2.0.0)
+
+### Fixed
+- Fix dropdown submission insert
+  [\#520](https://github.com/nextcloud/forms/pull/520) ([skjnldsv](https://github.com/skjnldsv))
+
+## v2.0.0-rc.1 - 2020-07-24
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.4...v2.0.0-rc.1)
+
+### Enhancements
+- Add screenshot of response visualization, adjust readme
+  [\#513](https://github.com/nextcloud/forms/pull/513) ([jancborchardt](https://github.com/jancborchardt))
+- Move to webpack vue global config & clean routes
+  [\#508](https://github.com/nextcloud/forms/pull/508) ([skjnldsv](https://github.com/skjnldsv))
+- Include version on feature-request template
+  [\#478](https://github.com/nextcloud/forms/pull/478) ([jotoeri](https://github.com/jotoeri))
+- Change 'Mandatory' to simpler 'Required'
+  [\#464](https://github.com/nextcloud/forms/pull/464) ([jancborchardt](https://github.com/jancborchardt))
+- Dropdown question type, ref \#340
+  [\#461](https://github.com/nextcloud/forms/pull/461) ([jancborchardt](https://github.com/jancborchardt))
+- Add summary response visualization, fix \#314
+  [\#460](https://github.com/nextcloud/forms/pull/460) ([jancborchardt](https://github.com/jancborchardt))
+- Add '\(responses\)' to export file name
+  [\#450](https://github.com/nextcloud/forms/pull/450) ([jancborchardt](https://github.com/jancborchardt))
+- Enh/invalid warning
+  [\#415](https://github.com/nextcloud/forms/pull/415) ([jotoeri](https://github.com/jotoeri))
+- Show MultipleInput icons in Edit-Mode
+  [\#409](https://github.com/nextcloud/forms/pull/409) ([jotoeri](https://github.com/jotoeri))
+- Put AppNavigationItems into proper Container
+  [\#406](https://github.com/nextcloud/forms/pull/406) ([jotoeri](https://github.com/jotoeri))
+- Question-specific placeholders
+  [\#389](https://github.com/nextcloud/forms/pull/389) ([jotoeri](https://github.com/jotoeri))
+
+### Fixed
+- Fix questions & submissions assignment
+  [\#485](https://github.com/nextcloud/forms/pull/485) ([skjnldsv](https://github.com/skjnldsv))
+- Revert "Allow navigation through edit via Tab-Key"
+  [\#484](https://github.com/nextcloud/forms/pull/484) ([skjnldsv](https://github.com/skjnldsv))
+- Fix submitting form with expiration-date.
+  [\#469](https://github.com/nextcloud/forms/pull/469) ([jotoeri](https://github.com/jotoeri))
+- Invert submitOnce on UI
+  [\#452](https://github.com/nextcloud/forms/pull/452) ([jotoeri](https://github.com/jotoeri))
+- Allow navigation through edit via Tab-Key
+  [\#427](https://github.com/nextcloud/forms/pull/427) ([jotoeri](https://github.com/jotoeri))
+- Fix public template header
+  [\#420](https://github.com/nextcloud/forms/pull/420) ([jotoeri](https://github.com/jotoeri))
+- Fix some small MultipleInput issues
+  [\#394](https://github.com/nextcloud/forms/pull/394) ([jotoeri](https://github.com/jotoeri))
+
 ## v2.0.0-beta.4 - 2020-06-09
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.3...v2.0.0-beta.4)
 

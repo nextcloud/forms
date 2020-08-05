@@ -91,7 +91,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('description', Type::STRING, [
 				'notnull' => false,
-				'length' => 2048,
+				'length' => 8192,
 			]);
 			$table->addColumn('owner_id', Type::STRING, [
 				'notnull' => true,
@@ -199,7 +199,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('text', Type::STRING, [
 				'notnull' => true,
-				'length' => 2048,
+				'length' => 4096,
 			]);
 			$table->setPrimaryKey(['id']);
 		}
@@ -259,7 +259,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				//In case the old Question would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
 				if (strlen($question['form_question_text']) > 2048) {
 					$output->warning("Question-text is too long for new Database: '" . $question['form_question_text'] . "'");
-					$question['form_question_text'] = substr($question['form_question_text'], 0, 2048);
+					$question['form_question_text'] = mb_substr($question['form_question_text'], 0, 2048);
 				}
 
 				$qb_restore->insert('forms_v2_questions')
@@ -285,7 +285,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
 				if (strlen($answer['text']) > 1024) {
 					$output->warning("Option-text is too long for new Database: '" . $answer['text'] . "'");
-					$answer['text'] = substr($answer['text'], 0, 1024);
+					$answer['text'] = mb_substr($answer['text'], 0, 1024);
 				}
 
 				$qb_restore->insert('forms_v2_options')
@@ -350,9 +350,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				$last_vote = $vote;
 				
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if (strlen($vote['vote_answer']) > 2048) {
+				if (strlen($vote['vote_answer']) > 4096) {
 					$output->warning("Answer-text is too long for new Database: '" . $vote['vote_answer'] . "'");
-					$vote['vote_answer'] = substr($vote['vote_answer'], 0, 2048);
+					$vote['vote_answer'] = mb_substr($vote['vote_answer'], 0, 4096);
 				}
 
 				/* Due to the unconventional storing fo vote_option_ids, the vote_option_id needs to get mapped onto old question-id and from there to new question-id.

@@ -91,9 +91,9 @@ export default {
 				const squashedAnswers = answers.map(answer => answer.text).join('; ')
 
 				answeredQuestionsArray.push({
-					'id': question.id,
-					'text': question.text,
-					'squashedAnswers': squashedAnswers,
+					id: question.id,
+					text: question.text,
+					squashedAnswers,
 				})
 			})
 			return answeredQuestionsArray

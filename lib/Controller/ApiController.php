@@ -40,14 +40,15 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
-use OCP\ILogger;
 use OCP\IL10N;
+use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
-use OCP\IUserSession;
 use OCP\IUserManager;
+use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 
 class ApiController extends Controller {
@@ -725,7 +726,11 @@ class ApiController extends Controller {
 			}
 
 			foreach ($answerArray as $answer) {
-				if ($question['type'] === 'multiple' || $question['type'] === 'multiple_unique') {
+				// Are we using answer ids as values
+				if ($question['type'] === 'multiple'
+					|| $question['type'] === 'multiple_unique'
+					|| $question['type'] === 'dropdown') {
+
 					// Search corresponding option, skip processing if not found
 					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 					if ($optionIndex === false) {

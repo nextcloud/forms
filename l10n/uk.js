@@ -10,6 +10,7 @@ OC.L10N.register(
     "Group" : "Група",
     "Description" : "Опис",
     "Summary" : "Загалом",
+    "Options" : "Параметри",
     "Settings" : "Налаштування",
     "Set expiration date" : "Встановити термін дії",
     "Expiration date" : "Термін дії",

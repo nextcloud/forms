@@ -1,16 +1,24 @@
 OC.L10N.register(
     "forms",
     {
+    "Anonymous response" : "Анонимни одговор",
     "Forms" : "Упитници",
+    "Shared by %s" : "Поделио %s",
     "New form" : "Нови упитник",
     "Loading forms …" : "Учитавам упитнике…",
+    "No forms created yet" : "Још нема направљених упитника",
+    "Create a form" : "Направи упитник",
+    "Select a form or create a new one" : "Одаберите упитник или направите нови",
     "Create new form" : "Направи нови упитник",
     "An error occurred while loading the forms list" : "Догодила се грешка приликом учитавања списка упитника",
     "Unable to create a new form" : "Не могу да направим нови упитник",
+    "Responses" : "Одговори",
     "Clone form" : "Клонирај упитник",
     "Delete form" : "Обриши упитник",
     "Form link copied" : "Веза ка упитнику копирана",
     "Cannot copy, please copy the link manually" : "Не могу да копирам, копирајте везу ручно",
+    "Copy share link" : "Копирај везу дељења",
+    "Are you sure you want to delete {title}?" : "Да ли сте сигурни да желите да обришете {title}?",
     "Required" : "Обавезно",
     "No recommendations. Start typing." : "Нема препорука. Започните куцање.",
     "Searching …" : "Тражим…",
@@ -22,6 +30,7 @@ OC.L10N.register(
     "Settings" : "Поставке",
     "Set expiration date" : "Постави датум истека",
     "Expiration date" : "Датум истека",
-    "Submit" : "Пошаљи"
+    "Submit" : "Пошаљи",
+    "Checkboxes" : "Кућице за штиклирање"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

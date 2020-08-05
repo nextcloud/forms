@@ -109,9 +109,9 @@ export default {
 					const optionsStatIndex = questionOptionsStats.findIndex(option => option.text === answer.text)
 					if (optionsStatIndex < 0) {
 						questionOptionsStats.push({
-							'text': answer.text,
-							'count': 1,
-							'percentage': 0,
+							text: answer.text,
+							count: 1,
+							percentage: 0,
 						})
 					} else {
 						questionOptionsStats[optionsStatIndex].count++
