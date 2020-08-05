@@ -1,7 +1,7 @@
 <!--
   - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
   -
-  - @author John Molakvoæ <skjnldsv@protonmail.com>
+  - @author Simon Vieille <contact@deblan.fr>
   -
   - @license GNU AGPL version 3 or any later version
   -
@@ -33,55 +33,37 @@
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
-		<div class="question__content">
-			<input ref="input"
-				:aria-label="t('forms', 'A answer for the question “{text}”', { text })"
-				:placeholder="submissionInputPlaceholder"
-				:disabled="!readOnly"
-				:required="mandatory"
-				:value="values[0]"
-				class="question__input"
-				:maxlength="maxStringLengths.answerText"
-				minlength="1"
-				type="datetime-local"
-				@input="onInput"
-				@keydown.enter.exact.prevent="onKeydownEnter">
+		<div v-if="readOnly" class="question__content">
+			<DatetimePicker
+				v-model="time"
+				type="datetime" />
 		</div>
 	</Question>
 </template>
 
 <script>
 import QuestionShort from './QuestionShort'
+import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 
 export default {
 	name: 'QuestionDatetime',
+
+	components: {
+		DatetimePicker,
+	},
 
 	mixins: [QuestionShort],
 
 	data() {
 		return {
-			type: 'datetime-local',
+			time: null,
+		}
+	},
+
+	watch: {
+		time(value) {
+			this.$emit('update:values', [value])
 		}
 	},
 }
 </script>
-
-<style lang="scss" scoped>
-// Using type to have a higher order than the input styling of server
-.question__input[type=datetime-local] {
-	width: 100%;
-	min-height: 44px;
-	margin: 0;
-	padding: 6px 0;
-	border: 0;
-	border-bottom: 1px dotted var(--color-border-dark);
-	border-radius: 0;
-
-	&:disabled {
-		// Just overrides Server CSS-Styling for disabled inputs. -> Not Good??
-		background-color: var(--color-main-background);
-		color: var(--color-main-text);
-	}
-}
-
-</style>

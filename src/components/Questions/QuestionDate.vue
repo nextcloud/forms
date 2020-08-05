@@ -20,17 +20,48 @@
   -
   -->
 
+<template>
+	<Question
+		v-bind.sync="$attrs"
+		:text="text"
+		:mandatory="mandatory"
+		:edit.sync="edit"
+		:read-only="readOnly"
+		:max-question-length="maxStringLengths.questionText"
+		:title-placeholder="answerType.titlePlaceholder"
+		:warning-invalid="answerType.warningInvalid"
+		@update:text="onTitleChange"
+		@update:mandatory="onMandatoryChange"
+		@delete="onDelete">
+		<div v-if="readOnly" class="question__content">
+			<DatetimePicker
+				v-model="time" />
+		</div>
+	</Question>
+</template>
+
 <script>
 import QuestionShort from './QuestionShort'
+import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 
 export default {
 	name: 'QuestionDate',
+
+	components: {
+		DatetimePicker,
+	},
 
 	mixins: [QuestionShort],
 
 	data() {
 		return {
-			type: 'date',
+			time: null,
+		}
+	},
+
+	watch: {
+		time(value) {
+			this.$emit('update:values', [value])
 		}
 	},
 }
