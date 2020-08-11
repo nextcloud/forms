@@ -77,7 +77,7 @@
 
 <script>
 import { loadState } from '@nextcloud/initial-state'
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
@@ -188,7 +188,7 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(generateUrl('/apps/forms/api/v1/submission/insert'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'submission/insert', {
 					formId: this.form.id,
 					answers: this.answers,
 				})

@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { generateUrl } from '@nextcloud/router'
+import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
@@ -174,7 +174,7 @@ export default {
 			// All good, let's delete
 			this.loading = true
 			try {
-				await axios.delete(generateUrl('/apps/forms/api/v1/form/{id}', { id: this.form.id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `form/${this.form.id}`)
 				this.$emit('delete', this.form.id)
 			} catch (error) {
 				showError(t('forms', 'Error while deleting {title}', { title: this.formTitle }))

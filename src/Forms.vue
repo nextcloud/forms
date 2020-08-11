@@ -71,7 +71,7 @@
 <script>
 import { emit } from '@nextcloud/event-bus'
 import { showError } from '@nextcloud/dialogs'
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
@@ -146,7 +146,7 @@ export default {
 		async loadForms() {
 			this.loading = true
 			try {
-				const response = await axios.get(generateUrl('apps/forms/api/v1/forms'))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + 'forms')
 				this.forms = response.data
 			} catch (error) {
 				showError(t('forms', 'An error occurred while loading the forms list'))
@@ -162,7 +162,7 @@ export default {
 		async onNewForm() {
 			try {
 				// Request a new empty form
-				const response = await axios.post(generateUrl('/apps/forms/api/v1/form'))
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'form')
 				const newForm = response.data
 				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })

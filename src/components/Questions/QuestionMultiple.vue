@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
@@ -312,7 +312,7 @@ export default {
 
 			if (!option.local) {
 				// let's not await, deleting in background
-				axios.delete(generateUrl('/apps/forms/api/v1/option/{id}', { id: option.id }))
+				axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `option/${option.id}`)
 					.catch(error => {
 						showError(t('forms', 'There was an issue deleting this option'))
 						console.error(error)

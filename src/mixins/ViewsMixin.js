@@ -19,7 +19,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
@@ -39,7 +39,7 @@ export default {
 		async saveFormProperty(key) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(generateUrl('/apps/forms/api/v1/form/update'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'form/update', {
 					id: this.form.id,
 					keyValuePairs: {
 						[key]: this.form[key],
