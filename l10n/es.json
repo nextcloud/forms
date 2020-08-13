@@ -74,8 +74,8 @@
     "Set expiration date" : "Fijar fecha de caducidad",
     "Expiration date" : "Fecha de expiración",
     "Select expiration date" : "Selecciona fecha de expiración",
-    "Expired on {date}" : "Expirado el {date}",
-    "Expires on {date}" : "Expira el {date}",
+    "Expired on {date}" : "Caducado el {date}",
+    "Expires on {date}" : "Caduca el {date}",
     "Submit" : "Enviar",
     "Submit form" : "Enviar formulario",
     "Submitting form …" : "Enviando formulario…",
@@ -99,8 +99,8 @@
     "Long text question title" : "Título de pregunta de respuesta extensa",
     "People can enter a long text" : "Quien responde puede introducir una respuesta extensa",
     "Enter a long text" : "Introduzca una respuesta extensa",
-    "Form expired" : "Formulario expirado",
-    "This form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no acepta respuestas",
+    "Form expired" : "Formulario caducado",
+    "This form has expired and is no longer taking answers" : "Este formulario ha caducado y ya no acepta respuestas",
     "Form not found" : "Formulario no encontrado",
     "This form does not exist" : "Este formulario no existe"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
