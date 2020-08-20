@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.0.3 - 2020-08-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.2...v2.0.3)
+
+### Merged
+- Translations update
+- Dependencies update
+
 ## v2.0.2 - 2020-07-30
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.1...v2.0.2)
