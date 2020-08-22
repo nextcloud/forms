@@ -40,7 +40,7 @@
 		"regenerator-runtime": "^0.13.7",
 		"v-click-outside": "^3.0.1",
 		"v-clipboard": "^2.2.3",
-		"vue": "^2.6.11",
+		"vue": "^2.6.12",
 		"vue-router": "^3.4.3",
 		"vuedraggable": "^2.24.0"
 	},
@@ -80,7 +80,7 @@
 		"url-loader": "^4.1.0",
 		"vue-loader": "^15.9.3",
 		"vue-style-loader": "^4.1.1",
-		"vue-template-compiler": "^2.6.11",
+		"vue-template-compiler": "^2.6.12",
 		"webpack": "^4.44.1",
 		"webpack-cli": "^3.3.12",
 		"webpack-merge": "^5.1.2"
