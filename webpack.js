@@ -7,6 +7,14 @@ const config = {
 	entry: {
 		submit: path.resolve(path.join('src', 'submit.js')),
 	},
+	module: {
+		rules: [
+			{
+				test: /\.svg$/,
+				use: 'url-loader',
+			},
+		],
+	},
 	plugins: [
 		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 	],
