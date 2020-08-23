@@ -85,7 +85,7 @@ OC.L10N.register(
     "There was an error submitting the form" : "Produciuse un erro no envío do formulario",
     "Error while saving question" : "Produciuse un erro ao gardar a pregunta",
     "Checkboxes" : "Caixas de verificación",
-    "Checkbox question title" : "Título da pregunta da caixa de verificación",
+    "Checkbox question title" : "Título da pregunta da caixa de selección",
     "This question needs a title and at least one answer!" : "Esta pregunta necesita un título e polo menos unha resposta.",
     "Multiple choice" : "Escolla múltiple",
     "Multiple choice question title" : "Título da pregunta de escolla múltiple",
