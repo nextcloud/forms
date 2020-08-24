@@ -121,7 +121,7 @@
 
 <script>
 import { emit } from '@nextcloud/event-bus'
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
@@ -252,7 +252,7 @@ export default {
 			this.cancelFetchFullForm = cancel
 
 			try {
-				const form = await request(generateUrl('/apps/forms/api/v1/form/{id}', { id }))
+				const form = await request(generateOcsUrl('apps/forms/api/v1', 2) + `form/${id}`)
 				this.$emit('update:form', form.data)
 				this.isLoadingForm = false
 			} catch (error) {
@@ -299,7 +299,7 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				const response = await axios.post(generateUrl('/apps/forms/api/v1/question'), {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'question', {
 					formId: this.form.id,
 					type,
 					text,
@@ -337,7 +337,7 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				await axios.delete(generateUrl('/apps/forms/api/v1/question/{id}', { id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `question/${id}`)
 				const index = this.form.questions.findIndex(search => search.id === id)
 				this.form.questions.splice(index, 1)
 			} catch (error) {
@@ -356,7 +356,7 @@ export default {
 			const newOrder = this.form.questions.map(question => question.id)
 
 			try {
-				await axios.post(generateUrl('/apps/forms/api/v1/question/reorder'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'question/reorder', {
 					formId: this.form.id,
 					newOrder,
 				})

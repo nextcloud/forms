@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { generateUrl } from '@nextcloud/router'
+import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import { Parser } from 'json2csv'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
@@ -214,9 +214,7 @@ export default {
 			console.debug('Loading results for form', this.form.hash)
 
 			try {
-				const response = await axios.get(generateUrl('/apps/forms/api/v1/submissions/{hash}', {
-					hash: this.form.hash,
-				}))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + `submissions/${this.form.hash}`)
 
 				// Append questions & submissions
 				this.$set(this.form, 'submissions', response.data.submissions)
@@ -233,7 +231,7 @@ export default {
 			this.loadingResults = true
 
 			try {
-				await axios.delete(generateUrl('/apps/forms/api/v1/submission/{id}', { id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `submission/${id}`)
 				const index = this.form.submissions.findIndex(search => search.id === id)
 				this.form.submissions.splice(index, 1)
 			} catch (error) {
@@ -251,7 +249,7 @@ export default {
 
 			this.loadingResults = true
 			try {
-				await axios.delete(generateUrl('/apps/forms/api/v1/submissions/{formId}', { formId: this.form.id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `submissions/${this.form.id}`)
 				this.form.submissions = []
 			} catch (error) {
 				console.error(error)

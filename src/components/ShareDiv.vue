@@ -209,7 +209,7 @@ export default {
 				this.SHARE_TYPES.SHARE_TYPE_GROUP,
 			]
 
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1') + 'sharees', {
+			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1', 2) + 'sharees', {
 				params: {
 					format: 'json',
 					itemType: 'file',
@@ -218,11 +218,6 @@ export default {
 					shareType,
 				},
 			})
-
-			if (request.data.ocs.meta.statuscode !== 100) {
-				console.error('Error fetching suggestions', request)
-				return
-			}
 
 			const data = request.data.ocs.data
 			const exact = request.data.ocs.data.exact
@@ -263,17 +258,12 @@ export default {
 		async getRecommendations() {
 			this.loading = true
 
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1') + 'sharees_recommended', {
+			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1', 2) + 'sharees_recommended', {
 				params: {
 					format: 'json',
 					itemType: 'file',
 				},
 			})
-
-			if (request.data.ocs.meta.statuscode !== 100) {
-				console.error('Error fetching recommendations', request)
-				return
-			}
 
 			const exact = request.data.ocs.data.exact
 

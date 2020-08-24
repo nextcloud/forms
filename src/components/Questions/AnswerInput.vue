@@ -29,7 +29,7 @@
 
 <script>
 import { showError } from '@nextcloud/dialogs'
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import pDebounce from 'p-debounce'
 import PQueue from 'p-queue'
@@ -143,7 +143,7 @@ export default {
 		 */
 		async createAnswer(answer) {
 			try {
-				const response = await axios.post(generateUrl('/apps/forms/api/v1/option'), {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'option', {
 					questionId: answer.question_id,
 					text: answer.text,
 				})
@@ -171,7 +171,7 @@ export default {
 		 */
 		async updateAnswer(answer) {
 			try {
-				await axios.post(generateUrl('/apps/forms/api/v1/option/update'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'option/update', {
 					id: this.answer.id,
 					keyValuePairs: {
 						text: answer.text,

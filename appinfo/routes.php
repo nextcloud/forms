@@ -35,7 +35,8 @@ return [
 		['name' => 'page#index', 'url' => '/{hash}/results', 'verb' => 'GET', 'postfix' => 'results'],
 
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
-
+	],
+	'ocs' => [
 		// Forms
 		['name' => 'api#getForms', 'url' => '/api/v1/forms', 'verb' => 'GET'],
 		['name' => 'api#newForm', 'url' => '/api/v1/form', 'verb' => 'POST'],

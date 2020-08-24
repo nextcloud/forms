@@ -19,7 +19,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { debounce } from 'debounce'
-import { generateUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
@@ -170,7 +170,7 @@ export default {
 		async saveQuestionProperty(key, value) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(generateUrl('/apps/forms/api/v1/question/update'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'question/update', {
 					id: this.id,
 					keyValuePairs: {
 						[key]: value,

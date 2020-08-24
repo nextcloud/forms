@@ -42,7 +42,9 @@ use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
-use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IRequest;
@@ -84,6 +86,9 @@ class ApiController extends Controller {
 	/** @var FormsService */
 	private $formsService;
 
+	/** @var ISecureRandom */
+	private $secureRandom;
+
 	public function __construct(string $appName,
 								IRequest $request,
 								IUserSession $userSession,
@@ -95,7 +100,8 @@ class ApiController extends Controller {
 								OptionMapper $optionMapper,
 								ILogger $logger,
 								IL10N $l10n,
-								FormsService $formsService) {
+								FormsService $formsService,
+								ISecureRandom $secureRandom) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->userManager = $userManager;
@@ -109,6 +115,7 @@ class ApiController extends Controller {
 		$this->logger = $logger;
 		$this->l10n = $l10n;
 		$this->formsService = $formsService;
+		$this->secureRandom = $secureRandom;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -118,7 +125,7 @@ class ApiController extends Controller {
 	 *
 	 * Read Form-List only with necessary information for Listing.
 	 */
-	public function getForms(): Http\JSONResponse {
+	public function getForms(): DataResponse {
 		$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
 
 		$result = [];
@@ -132,44 +139,51 @@ class ApiController extends Controller {
 			];
 		}
 
-		return new Http\JSONResponse($result);
+		return new DataResponse($result);
 	}
 
 	/**
 	 * @NoAdminRequired
 	 *
-	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
+	 *
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function getForm(int $id): Http\JSONResponse {
+	public function getForm(int $id): DataResponse {
 		try {
 			$form = $this->formsService->getForm($id);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if (!$this->formsService->hasUserAccess($id)) {
 			$this->logger->debug('User has no permissions to get this form');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
-		return new Http\JSONResponse($form);
+		return new DataResponse($form);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Create a new Form and return the Form to edit.
+	 *
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function newForm(): Http\JSONResponse {
+	public function newForm(): DataResponse {
 		$form = new Form();
 
 		$form->setOwnerId($this->currentUser->getUID());
 		$form->setCreated(time());
-		$form->setHash(\OC::$server->getSecureRandom()->generate(
+		$form->setHash($this->secureRandom->generate(
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE
 		));
+
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
@@ -183,7 +197,7 @@ class ApiController extends Controller {
 		$result = $form->read();
 		$result['questions'] = [];
 
-		return new Http\JSONResponse($result);
+		return new DataResponse($result);
 	}
 
 	/**
@@ -193,8 +207,10 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id FormId of form to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function updateForm(int $id, array $keyValuePairs): Http\JSONResponse {
+	public function updateForm(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: FormId: {id}, values: {keyValuePairs}', [
 			'id' => $id,
 			'keyValuePairs' => $keyValuePairs
@@ -204,12 +220,12 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($id);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Make sure we only store id
@@ -224,7 +240,7 @@ class ApiController extends Controller {
 			}
 		} catch (Exception $e) {
 			$this->logger->debug('Malformed access');
-			return new Http\JSONResponse(['message' => 'Malformed access'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Malformed access');
 		}
 
 		// Create FormEntity with given Params & Id.
@@ -234,13 +250,19 @@ class ApiController extends Controller {
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
 
-		return new Http\JSONResponse($form->getId());
+		return new DataResponse($form->getId());
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Delete a form
+	 *
+	 * @param int $id the form id
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function deleteForm(int $id): Http\JSONResponse {
+	public function deleteForm(int $id): DataResponse {
 		$this->logger->debug('Delete Form: {id}', [
 			'id' => $id,
 		]);
@@ -249,12 +271,12 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($id);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
@@ -262,13 +284,21 @@ class ApiController extends Controller {
 		$this->questionMapper->deleteByForm($id);
 		$this->formMapper->delete($form);
 
-		return new Http\JSONResponse($id);
+		return new DataResponse($id);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Add a new question
+	 *
+	 * @param int $formId the form id
+	 * @param string $type the new question type
+	 * @param string $text the new question title
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function newQuestion(int $formId, string $type, string $text): Http\JSONResponse {
+	public function newQuestion(int $formId, string $type, string $text = ''): DataResponse {
 		$this->logger->debug('Adding new question: formId: {formId}, type: {type}, text: {text}', [
 			'formId' => $formId,
 			'type' => $type,
@@ -277,19 +307,19 @@ class ApiController extends Controller {
 
 		if (array_search($type, Question::TYPES) === false) {
 			$this->logger->debug('Invalid type');
-			return new Http\JSONResponse(['message' => 'Invalid type'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Invalid type');
 		}
 
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
@@ -314,16 +344,20 @@ class ApiController extends Controller {
 		$response = $question->read();
 		$response['options'] = [];
 
-		return new Http\JSONResponse($response);
+		return new DataResponse($response);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Updates the Order of all Questions of a Form.
+	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param int[] $newOrder Array of Question-Ids in new order.
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function reorderQuestions(int $formId, array $newOrder): Http\JSONResponse {
+	public function reorderQuestions(int $formId, array $newOrder): DataResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
 			'formId' => $formId,
 			'newOrder' => $newOrder
@@ -333,25 +367,25 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Check if array contains duplicates
 		if (array_unique($newOrder) !== $newOrder) {
 			$this->logger->debug('The given Array contains duplicates');
-			return new Http\JSONResponse(['message' => 'The given Array contains duplicates'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('The given Array contains duplicates');
 		}
 
 		// Check if all questions are given in Array.
 		$questions = $this->questionMapper->findByForm($formId);
 		if (sizeof($questions) !== sizeof($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored questions');
-			return new Http\JSONResponse(['message' => 'The length of the given array does not match the number of stored questions'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('The length of the given array does not match the number of stored questions');
 		}
 
 		$questions = []; // Clear Array of Entities
@@ -365,7 +399,7 @@ class ApiController extends Controller {
 				$this->logger->debug('Could not find question. Id:{id}', [
 					'id' => $questionId
 				]);
-				return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+				throw new OCSBadRequestException();
 			}
 
 			// Abort if a question is not part of the Form.
@@ -373,7 +407,7 @@ class ApiController extends Controller {
 				$this->logger->debug('This Question is not part of the given Form: questionId: {questionId}', [
 					'questionId' => $questionId
 				]);
-				return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+				throw new OCSBadRequestException();
 			}
 
 			// Abort if a question is already marked as deleted (order==0)
@@ -382,7 +416,7 @@ class ApiController extends Controller {
 				$this->logger->debug('This Question has already been marked as deleted: Id: {id}', [
 					'id' => $questions[$arrayKey]->getId()
 				]);
-				return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+				throw new OCSBadRequestException();
 			}
 
 			// Only set order, if it changed.
@@ -401,17 +435,21 @@ class ApiController extends Controller {
 			];
 		}
 
-		return new Http\JSONResponse($response);
+		return new DataResponse($response);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Writes the given key-value pairs into Database.
 	 * Key 'order' should only be changed by reorderQuestions() and is not allowed here.
+	 *
 	 * @param int $id QuestionId of question to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function updateQuestion(int $id, array $keyValuePairs): Http\JSONResponse {
+	public function updateQuestion(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating question: questionId: {id}, values: {keyValuePairs}', [
 			'id' => $id,
 			'keyValuePairs' => $keyValuePairs
@@ -422,17 +460,17 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question');
-			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Could not find form or question');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		if (array_key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
-			return new Http\JSONResponse(['message' => 'Please use reorderQuestions() to change order'], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -442,13 +480,19 @@ class ApiController extends Controller {
 		// Update changed Columns in Db.
 		$this->questionMapper->update($question);
 
-		return new Http\JSONResponse($question->getId());
+		return new DataResponse($question->getId());
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Delete a question
+	 *
+	 * @param int $id the question id
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function deleteQuestion(int $id): Http\JSONResponse {
+	public function deleteQuestion(int $id): DataResponse {
 		$this->logger->debug('Mark question as deleted: {id}', [
 			'id' => $id,
 		]);
@@ -458,12 +502,12 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question');
-			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Could not find form or question');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Store Order of deleted Question
@@ -483,13 +527,20 @@ class ApiController extends Controller {
 			}
 		}
 
-		return new Http\JSONResponse($id);
+		return new DataResponse($id);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Add a new option to a question
+	 *
+	 * @param int $questionId the question id
+	 * @param string $text the new option text
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function newOption(int $questionId, string $text): Http\JSONResponse {
+	public function newOption(int $questionId, string $text): DataResponse {
 		$this->logger->debug('Adding new option: questionId: {questionId}, text: {text}', [
 			'questionId' => $questionId,
 			'text' => $text,
@@ -500,12 +551,12 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question');
-			return new Http\JSONResponse(['message' => 'Could not find form or question'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Could not find form or question');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		$option = new Option();
@@ -515,19 +566,22 @@ class ApiController extends Controller {
 
 		$option = $this->optionMapper->insert($option);
 
-		return new Http\JSONResponse([
+		return new DataResponse([
 			'id' => $option->getId()
 		]);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * Writes the given key-value pairs into Database.
 	 *
 	 * @param int $id OptionId of option to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function updateOption(int $id, array $keyValuePairs): Http\JSONResponse {
+	public function updateOption(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating option: option: {id}, values: {keyValuePairs}', [
 			'id' => $id,
 			'keyValuePairs' => $keyValuePairs
@@ -539,12 +593,12 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find option, question or form');
-			return new Http\JSONResponse(['message' => 'Could not find option, question or form'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Could not find option, question or form');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Create OptionEntity with given Params & Id.
@@ -554,13 +608,19 @@ class ApiController extends Controller {
 		// Update changed Columns in Db.
 		$this->optionMapper->update($option);
 
-		return new Http\JSONResponse($option->getId());
+		return new DataResponse($option->getId());
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Delete an option
+	 *
+	 * @param int $id the option id
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function deleteOption(int $id): Http\JSONResponse {
+	public function deleteOption(int $id): DataResponse {
 		$this->logger->debug('Deleting option: {id}', [
 			'id' => $id
 		]);
@@ -571,21 +631,27 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or option');
-			return new Http\JSONResponse(['message' => 'Could not find form or option'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException('Could not find form or option');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		$this->optionMapper->delete($option);
 
-		return new Http\JSONResponse($id);
+		return new DataResponse($id);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Get all the answers of a given submission
+	 *
+	 * @param int $submissionId the submission id
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
 	private function getAnswers(int $submissionId): array {
 		try {
@@ -605,24 +671,30 @@ class ApiController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Get all the submissions of a given form
+	 *
+	 * @param string $hash the form hash
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function getSubmissions(string $hash): Http\JSONResponse {
+	public function getSubmissions(string $hash): DataResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
 		} catch (DoesNotExistException $e) {
-			//Just ignore, if no Data. Returns empty Submissions-Array
+			// Just ignore, if no Data. Returns empty Submissions-Array
 		}
 
 		$submissions = [];
@@ -658,7 +730,7 @@ class ApiController extends Controller {
 			'questions' => $questions,
 		];
 
-		return new Http\JSONResponse($response);
+		return new DataResponse($response);
 	}
 
 	/**
@@ -666,10 +738,13 @@ class ApiController extends Controller {
 	 * @PublicPage
 	 *
 	 * Process a new submission
-	 * @param int $formId
+	 *
+	 * @param int $formId the form id
 	 * @param array $answers [question_id => arrayOfString]
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function insertSubmission(int $formId, array $answers): Http\JSONResponse {
+	public function insertSubmission(int $formId, array $answers): DataResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}', [
 			'formId' => $formId,
 			'answers' => $answers,
@@ -680,22 +755,22 @@ class ApiController extends Controller {
 			$questions = $this->formsService->getQuestions($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse(['message' => 'Could not find form'], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		// Does the user have access to the form
 		if (!$this->formsService->hasUserAccess($form->getId())) {
-			return new Http\JSONResponse(['message' => 'Not allowed to access this form'], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException('Not allowed to access this form');
 		}
 
 		// Not allowed if form expired. Expires is '0' if the form does not expire.
 		if ($form->getExpires() && $form->getExpires() < time()) {
-			return new Http\JSONResponse(['message' => 'This form is no longer taking answers'], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException('This form is no longer taking answers');
 		}
 
 		// Does the user have permissions to submit
 		if (!$this->formsService->canSubmit($form->getId())) {
-			return new Http\JSONResponse(['message' => 'Already submitted'], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException('Already submitted');
 		}
 
 		// Create Submission
@@ -753,13 +828,19 @@ class ApiController extends Controller {
 			}
 		}
 
-		return new Http\JSONResponse([]);
+		return new DataResponse();
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Delete a specific submission
+	 *
+	 * @param int $id the submission id
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function deleteSubmission(int $id): Http\JSONResponse {
+	public function deleteSubmission(int $id): DataResponse {
 		$this->logger->debug('Delete Submission: {id}', [
 			'id' => $id,
 		]);
@@ -769,24 +850,30 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($submission->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or submission');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->delete($submission);
 
-		return new Http\JSONResponse($id);
+		return new DataResponse($id);
 	}
 
 	/**
 	 * @NoAdminRequired
+	 *
+	 * Delete all submissions of a specified form
+	 *
+	 * @param int $formId the form id
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
 	 */
-	public function deleteAllSubmissions(int $formId): Http\JSONResponse {
+	public function deleteAllSubmissions(int $formId): DataResponse {
 		$this->logger->debug('Delete all submissions to form: {formId}', [
 			'formId' => $formId,
 		]);
@@ -795,17 +882,17 @@ class ApiController extends Controller {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			return new Http\JSONResponse([], Http::STATUS_BAD_REQUEST);
+			throw new OCSBadRequestException();
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			return new Http\JSONResponse([], Http::STATUS_FORBIDDEN);
+			throw new OCSForbiddenException();
 		}
 
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
 
-		return new Http\JSONResponse($formId);
+		return new DataResponse($formId);
 	}
 }
