@@ -1,5 +1,16 @@
 # Changelog
 
+## [v2.0.4](https://github.com/nextcloud/forms/tree/v2.0.4) (2020-09-01)
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.3...v2.0.4)
+
+### Merged
+- NC 20 compatibility
+- Move to OCS API
+  [\#556](https://github.com/nextcloud/forms/pull/556) ([skjnldsv](https://github.com/skjnldsv))
+- Translations update
+- Dependencies update
+
 ## v2.0.3 - 2020-08-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.2...v2.0.3)
