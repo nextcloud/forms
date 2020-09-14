@@ -8,6 +8,7 @@ OC.L10N.register(
     "Settings" : "Innstillinger",
     "Set expiration date" : "Sett utløpsdato",
     "Expiration date" : "Utløpsdato",
-    "Submit" : "Send inn"
+    "Submit" : "Send inn",
+    "Checkboxes" : "Avkrysningsruter"
 },
 "nplurals=2; plural=(n != 1);");
