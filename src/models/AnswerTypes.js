@@ -24,6 +24,8 @@ import QuestionMultiple from '../components/Questions/QuestionMultiple'
 import QuestionDropdown from '../components/Questions/QuestionDropdown'
 import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionLong from '../components/Questions/QuestionLong'
+import QuestionDate from '../components/Questions/QuestionDate'
+import QuestionDatetime from '../components/Questions/QuestionDatetime'
 
 /**
  * @typedef {Object} AnswerTypes
@@ -105,4 +107,25 @@ export default {
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
+	date: {
+		component: QuestionDate,
+		icon: 'icon-answer-date',
+		label: t('forms', 'Date'),
+
+		titlePlaceholder: t('forms', 'Date question title'),
+		createPlaceholder: t('forms', ''),
+		submitPlaceholder: t('forms', 'Enter a date'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	datetime: {
+		component: QuestionDatetime,
+		icon: 'icon-answer-datetime',
+		label: t('forms', 'Datetime'),
+
+		titlePlaceholder: t('forms', 'Datetime question title'),
+		createPlaceholder: t('forms', ''),
+		submitPlaceholder: t('forms', 'Enter a date'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
 }
