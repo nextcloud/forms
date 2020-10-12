@@ -70,10 +70,8 @@
 				@change="autoSizeDescription"
 				@keydown="autoSizeDescription"
 				@keyup="onDescChange" />
-			<!-- Only visible if at least one question is marked as mandatory-->
-			<p v-if="mandatoryUsed" class="info-mandatory">
-				* {{ t('forms', 'Required questions') }}
-			</p>
+			<!-- Generate form information message-->
+			<p class="info-message" v-text="infoMessage" />
 		</header>
 
 		<section>
@@ -197,14 +195,21 @@ export default {
 			return this.form.questions && this.form.questions.length === 0
 		},
 
-		/**
-		 * Check if at least one question is mandatory
-		 * @returns {Boolean}
-		 */
-		mandatoryUsed() {
-			return this.form.questions.reduce(
-				(isUsed, question) => isUsed || question.mandatory
-				, false)
+		isMandatoryUsed() {
+			return this.form.questions.reduce((isUsed, question) => isUsed || question.mandatory, false)
+		},
+
+		infoMessage() {
+			let message = ''
+			if (this.form.isAnonymous) {
+				message += t('forms', 'Responses are anonymous.')
+			} else {
+				message += t('forms', 'Responses are connected to your Nextcloud account.')
+			}
+			if (this.isMandatoryUsed) {
+				message += ' ' + t('forms', ' An asterisk (*) indicates mandatory questions.')
+			}
+			return message
 		},
 	},
 
@@ -446,7 +451,7 @@ export default {
 
 		.form-title,
 		.form-desc,
-		.info-mandatory {
+		.info-message {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
@@ -470,7 +475,7 @@ export default {
 			resize: none;
 		}
 
-		.info-mandatory {
+		.info-message {
 			font-size: 100%;
 			padding-bottom: 20px;
 			resize: none;
