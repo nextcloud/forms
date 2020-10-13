@@ -31,10 +31,8 @@
 				<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 				<!-- eslint-disable-next-line -->
 				<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
-				<!-- Only visible if at least one question is marked as mandatory-->
-				<p v-if="mandatoryUsed && !loading && !success" class="info-mandatory">
-					* {{ t('forms', 'Required questions') }}
-				</p>
+				<!-- Generate form information message-->
+				<p class="info-message" v-text="infoMessage" />
 			</header>
 
 			<!-- Questions list -->
@@ -143,14 +141,21 @@ export default {
 			})
 		},
 
-		/**
-		 * Check if at least one question is mandatory
-		 * @returns {Boolean}
-		 */
-		mandatoryUsed() {
-			return this.form.questions.reduce(
-				(isUsed, question) => isUsed || question.mandatory
-				, false)
+		isMandatoryUsed() {
+			return this.form.questions.reduce((isUsed, question) => isUsed || question.mandatory, false)
+		},
+
+		infoMessage() {
+			let message = ''
+			if (this.form.isAnonymous) {
+				message += t('forms', 'Responses are anonymous.')
+			} else {
+				message += t('forms', 'Responses are connected to your Nextcloud account.')
+			}
+			if (this.isMandatoryUsed) {
+				message += ' ' + t('forms', ' An asterisk (*) indicates mandatory questions.')
+			}
+			return message
 		},
 	},
 
@@ -231,7 +236,7 @@ export default {
 
 		.form-title,
 		.form-desc,
-		.info-mandatory {
+		.info-message {
 			width: 100%;
 			padding: 0 16px;
 			border: none;
@@ -255,7 +260,7 @@ export default {
 			white-space: pre-line;
 		}
 
-		.info-mandatory {
+		.info-message {
 			font-size: 100%;
 			padding-bottom: 20px;
 			resize: none;
