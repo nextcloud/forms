@@ -47,7 +47,6 @@ OC.L10N.register(
     "Toggle settings" : "Εναλλαγή ρυθμίσεων",
     "Form title" : "Τίτλος φόρμας",
     "Description" : "Περιγραφή",
-    "Required questions" : "Απαιτούνται ερωτήσεις",
     "Add a question" : "Προσθήκη ερώτησης",
     "There was an error while adding the new question" : "Σφάλμα κατά την προσθήκη νέας ερώτησης",
     "There was an error while removing the question" : "Σφάλμα κατά την αφαίρεση ερώτησης",

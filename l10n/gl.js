@@ -47,7 +47,6 @@ OC.L10N.register(
     "Toggle settings" : "Cambiar os axustes",
     "Form title" : "Título do formulario",
     "Description" : "Descrición",
-    "Required questions" : "Preguntas obrigatorias",
     "Add a question" : "Engadir unha pregunta",
     "There was an error while adding the new question" : "Produciuse un erro ao engadir a pregunta nova",
     "There was an error while removing the question" : "Produciuse un erro ao retirar a pregunta",

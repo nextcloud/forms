@@ -47,7 +47,6 @@ OC.L10N.register(
     "Toggle settings" : "Prepnúť nastavenia",
     "Form title" : "Názov formulára",
     "Description" : "Popis",
-    "Required questions" : "Povinné otázky",
     "Add a question" : "Pridať otázku",
     "There was an error while adding the new question" : "Pri pridávaní novej otázky sa vyskytla chyba",
     "There was an error while removing the question" : "Pri odstraňovaní otázky sa vyskytla chyba",

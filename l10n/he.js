@@ -46,7 +46,6 @@ OC.L10N.register(
     "Toggle settings" : "החלפת מצב הגדרות",
     "Form title" : "כותרת טופס",
     "Description" : "תיאור",
-    "Required questions" : "שאלות נדרשות",
     "Add a question" : "הוספת שאלה",
     "There was an error while adding the new question" : "אירעה שגיאה בעת הוספת השאלה החדשה",
     "There was an error while removing the question" : "אירעה שגיאה בעת הסרת השאלה",

@@ -44,7 +44,6 @@ OC.L10N.register(
     "Toggle settings" : "Asetukset päälle/pois",
     "Form title" : "Lomakkeen otsikko",
     "Description" : "Kuvaus",
-    "Required questions" : "Vaaditut kysymykset",
     "Add a question" : "Lisää kysymys",
     "There was an error while adding the new question" : "Uutta kysymystä lisättäessä tapahtui virhe",
     "There was an error while removing the question" : "Kysymystä poistaessa tapahtui virhe",

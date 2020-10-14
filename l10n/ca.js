@@ -47,7 +47,6 @@ OC.L10N.register(
     "Toggle settings" : "Canviar configuració",
     "Form title" : "Títol del formulari",
     "Description" : "Descripció",
-    "Required questions" : "Preguntes necessàries",
     "Add a question" : "Afegir una pregunta",
     "There was an error while adding the new question" : "Hi ha hagut un error en afegir la nova pregunta",
     "There was an error while removing the question" : "Hi ha hagut un error en eliminar la pregunta",

@@ -47,7 +47,6 @@ OC.L10N.register(
     "Toggle settings" : "Txandakatu ezarpenak",
     "Form title" : "Inprimakiaren izenburua",
     "Description" : "Deskripzioa",
-    "Required questions" : "Beharrezko galderak",
     "Add a question" : "Gehitu galdera bat",
     "There was an error while adding the new question" : "Errore bat gertatu da galdera berria gehitzean",
     "There was an error while removing the question" : "Errore bat gertatu da galdera kentzean",

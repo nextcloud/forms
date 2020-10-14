@@ -46,7 +46,6 @@ OC.L10N.register(
     "Toggle settings" : "Preklopi nastavitve",
     "Form title" : "Naslov vprašalnika",
     "Description" : "Opis",
-    "Required questions" : "Zahtevana vprašanja",
     "Add a question" : "Dodaj vprašanje",
     "There was an error while adding the new question" : "Prišlo je do napake med dodajanjem novega vprašanja",
     "There was an error while removing the question" : "Prišlo je do napake med odstranjevanjem vprašanja",

@@ -41,7 +41,6 @@ OC.L10N.register(
     "Loading {title} …" : "Läser in {title} …",
     "Form title" : "Rubrik",
     "Description" : "Beskrivning",
-    "Required questions" : "Kräver svar",
     "Add a question" : "Lägg till en fråga",
     "Error while saving form" : "Kunde inte spara formuläret",
     "{amount} responses" : "{amount} svar",

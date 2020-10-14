@@ -47,7 +47,6 @@ OC.L10N.register(
     "Toggle settings" : "Uklj./isklj. postavke",
     "Form title" : "Naslov obrasca",
     "Description" : "Opis",
-    "Required questions" : "Obavezna pitanja",
     "Add a question" : "Dodaj pitanje",
     "There was an error while adding the new question" : "Došlo je do pogreške pri dodavanju novog pitanja",
     "There was an error while removing the question" : "Došlo je do pogreške pri uklanjanju pitanja",

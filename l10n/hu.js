@@ -24,7 +24,6 @@ OC.L10N.register(
     "Loading {title} …" : "{title} betöltése…",
     "Form title" : "Űrlap címe",
     "Description" : "Leírás",
-    "Required questions" : "Kötelező kérdés",
     "Add a question" : "Kérdés hozzáadása",
     "There was an error while adding the new question" : "Hiba történt a kérdés hozzáadása közben",
     "There was an error while removing the question" : "Hiba történt a kérdés eltávolítása közben",
