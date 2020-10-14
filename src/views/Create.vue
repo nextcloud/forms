@@ -207,7 +207,7 @@ export default {
 				message += t('forms', 'Responses are connected to your Nextcloud account.')
 			}
 			if (this.isMandatoryUsed) {
-				message += ' ' + t('forms', ' An asterisk (*) indicates mandatory questions.')
+				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 			return message
 		},
