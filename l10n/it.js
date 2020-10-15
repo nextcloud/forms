@@ -48,6 +48,8 @@ OC.L10N.register(
     "Form title" : "Titolo del modulo",
     "Description" : "Descrizione",
     "Add a question" : "Aggiungi una domanda",
+    "Responses are anonymous." : "Le risposte sono anonime.",
+    "Responses are connected to your Nextcloud account." : "Le risposte sono collegate al tuo account Nextcloud.",
     "There was an error while adding the new question" : "Si è verificato un errore durante l'aggiunta della nuova domanda",
     "There was an error while removing the question" : "Si è verificato un errore durante la rimozione della domanda",
     "Error while saving form" : "Errore durante il salvataggio del modulo",

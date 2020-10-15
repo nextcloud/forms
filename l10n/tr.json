@@ -46,6 +46,8 @@
     "Form title" : "Form başlığı",
     "Description" : "Açıklama",
     "Add a question" : "Bir soru ekle",
+    "Responses are anonymous." : "Yanıtlar anonim.",
+    "Responses are connected to your Nextcloud account." : "Yanıtlar Nextcloud hesabınız ile ilişkilendirildi.",
     "There was an error while adding the new question" : "Yeni soru eklenirken bir sorun çıktı",
     "There was an error while removing the question" : "Soru silinirken bir sorun çıktı",
     "Error while saving form" : "Form kaydedilirken sorun çıktı",

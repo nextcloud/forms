@@ -48,6 +48,8 @@ OC.L10N.register(
     "Form title" : "Título do formulario",
     "Description" : "Descrición",
     "Add a question" : "Engadir unha pregunta",
+    "Responses are anonymous." : "As respostas son anónimas.",
+    "Responses are connected to your Nextcloud account." : "As respostas están conectadas á súa conta de Nextcloud.",
     "There was an error while adding the new question" : "Produciuse un erro ao engadir a pregunta nova",
     "There was an error while removing the question" : "Produciuse un erro ao retirar a pregunta",
     "Error while saving form" : "Produciuse un erro ao gardar o formulario",
