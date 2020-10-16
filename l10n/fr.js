@@ -49,6 +49,7 @@ OC.L10N.register(
     "Description" : "Description",
     "Add a question" : "Ajouter une question",
     "Responses are anonymous." : "Les réponses sont anonymes.",
+    "Responses are connected to your Nextcloud account." : "Les réponses sont liées à votre compte Nextcloud.",
     "There was an error while adding the new question" : "Une erreur est survenue en ajoutant la nouvelle question",
     "There was an error while removing the question" : "Une erreur est survenue pendant la suppression de la question",
     "Error while saving form" : "Erreur lors de la sauvegarde du formulaire",

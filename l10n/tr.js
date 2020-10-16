@@ -50,6 +50,7 @@ OC.L10N.register(
     "Add a question" : "Bir soru ekle",
     "Responses are anonymous." : "Yanıtlar anonim.",
     "Responses are connected to your Nextcloud account." : "Yanıtlar Nextcloud hesabınız ile ilişkilendirildi.",
+    "An asterisk (*) indicates mandatory questions." : "Yanıtlanması zorunlu sorular (*) ile vurgulanır.",
     "There was an error while adding the new question" : "Yeni soru eklenirken bir sorun çıktı",
     "There was an error while removing the question" : "Soru silinirken bir sorun çıktı",
     "Error while saving form" : "Form kaydedilirken sorun çıktı",

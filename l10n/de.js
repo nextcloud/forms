@@ -50,6 +50,7 @@ OC.L10N.register(
     "Add a question" : "Eine Frage hinzufügen",
     "Responses are anonymous." : "Antworten sind Anonym.",
     "Responses are connected to your Nextcloud account." : "Antworten sind mit Deinem Nextcloud-Konto verbunden.",
+    "An asterisk (*) indicates mandatory questions." : "Ein Sternchen (*) kennzeichnet Pflichtfragen.",
     "There was an error while adding the new question" : "Es gab einen Fehler beim Hinzufügen der neuen Frage",
     "There was an error while removing the question" : "Es gab einen Fehler beim Löschen der Frage",
     "Error while saving form" : "Fehler beim Speichern des Formulars",
