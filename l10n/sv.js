@@ -53,7 +53,7 @@ OC.L10N.register(
     "Share via link" : "Dela via länk",
     "Show to all users of this instance" : "Visa för alla användare i den här instansen",
     "Choose users to share with" : "Välj användare och grupper att dela med",
-    "Settings" : "Inställnigar",
+    "Settings" : "Inställningar",
     "Anonymous responses" : "Anonyma  svar",
     "Set expiration date" : "Välj utgångsdatum",
     "Expiration date" : "Utgångsdatum",
