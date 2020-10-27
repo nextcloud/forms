@@ -40,7 +40,7 @@ OC.L10N.register(
     "No response" : "Brak odpowiedzi",
     "User or group name …" : "Nazwa użytkownika lub grupy…",
     "No recommendations. Start typing." : "Brak rekomendacji. Możesz napisać.",
-    "Searching …" : "Wyszukiwanie...",
+    "Searching …" : "Wyszukiwanie…",
     "No elements found." : "Nie znaleziono elementów.",
     "Group" : "Grupa",
     "Loading {title} …" : "Ładowanie {title}…",
