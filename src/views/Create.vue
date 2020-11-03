@@ -91,7 +91,7 @@
 					:answer-type="answerTypes[question.type]"
 					:index="index + 1"
 					:max-string-lengths="maxStringLengths"
-					v-bind.sync="question"
+					v-bind.sync="form.questions[index]"
 					@delete="deleteQuestion(question)" />
 			</Draggable>
 
