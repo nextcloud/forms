@@ -33,15 +33,19 @@
 		@update:text="onTitleChange"
 		@update:mandatory="onMandatoryChange"
 		@delete="onDelete">
-		<div v-if="readOnly" class="question__content">
+		<div class="question__content">
 			<DatetimePicker
-				v-model="time" />
+				v-model="time"
+				:type="DatetimePickerType"
+				:show-second="false"
+				:disabled="!readOnly"
+				:placeholder="DatetimePickerPlaceholder" />
 		</div>
 	</Question>
 </template>
 
 <script>
-import QuestionShort from './QuestionShort'
+import QuestionMixin from '../../mixins/QuestionMixin'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 
 export default {
@@ -51,7 +55,7 @@ export default {
 		DatetimePicker,
 	},
 
-	mixins: [QuestionShort],
+	mixins: [QuestionMixin],
 
 	data() {
 		return {
@@ -59,10 +63,24 @@ export default {
 		}
 	},
 
+	computed: {
+		// Allow picking time or not, depending on variable in answerType.
+		DatetimePickerType() {
+			return this.answerType.time ? 'datetime' : 'date'
+		},
+
+		DatetimePickerPlaceholder() {
+			if (this.readOnly) {
+				return this.answerType.submitPlaceholder
+			}
+			return this.answerType.createPlaceholder
+		},
+	},
+
 	watch: {
 		time(value) {
 			this.$emit('update:values', [value])
-		}
+		},
 	},
 }
 </script>
