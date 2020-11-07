@@ -48,6 +48,9 @@
 import QuestionMixin from '../../mixins/QuestionMixin'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 
+import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
+import moment from '@nextcloud/moment'
+
 export default {
 	name: 'QuestionDate',
 
@@ -60,6 +63,7 @@ export default {
 	data() {
 		return {
 			time: null,
+			locale: 'en',
 		}
 	},
 
@@ -79,8 +83,37 @@ export default {
 
 	watch: {
 		time(value) {
-			this.$emit('update:values', [value])
+			console.log(value)
+			console.log(moment(value).locale('de'))
+			this.$emit('update:values', [moment(value)])
 		},
+	},
+
+	async created() {
+		// Load the locale
+		// convert format like en_GB to en-gb for `moment.js`
+		let locale = getLocale().replace('_', '-').toLowerCase()
+		console.debug(locale)
+		try {
+			// default load e.g. fr-fr
+			await import(/* webpackChunkName: 'moment' */'moment/locale/' + locale)
+			this.locale = locale
+		} catch (e) {
+			try {
+				// failure: fallback to fr
+				locale = locale.split('-')[0]
+				await import(/* webpackChunkName: 'moment' */'moment/locale/' + locale)
+			} catch (e) {
+				// failure, fallback to english
+				console.debug('Fallback to locale', 'en')
+				locale = 'en'
+			}
+		} finally {
+			// force locale change to update
+			// the component once done loading
+			this.locale = locale
+			console.debug('Locale used', locale)
+		}
 	},
 }
 </script>
