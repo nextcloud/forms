@@ -46,6 +46,16 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
 ]
 ```
 
+### List shared Forms
+Returns condensed objects of all Forms, that are shared to the authenticated user via instance ([access-type](DataStructure.md#share-types) `registered` or `selected`) and have not expired yet.
+- Endpoint: `/api/v1/shared_forms`
+- Method: `GET`
+- Parameters: None
+- Response: Array of condensed Form Objects, sorted as newest first, similar to [List owned Forms](#list-owned-forms).
+```
+See above, 'List owned forms'
+```
+
 ### Create a new Form
 - Endpoint: `/api/v1/form`
 - Method: `POST`

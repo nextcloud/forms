@@ -43,6 +43,7 @@ return [
 		['name' => 'api#cloneForm', 'url' => '/api/v1/form/clone/{id}', 'verb' => 'POST'],
 		['name' => 'api#updateForm', 'url' => '/api/v1/form/update', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => '/api/v1/form/{id}', 'verb' => 'DELETE'],
+		['name' => 'api#getSharedForms', 'url' => '/api/v1/shared_forms', 'verb' => 'GET'],
 
 		// Questions
 		['name' => 'api#newQuestion', 'url' => '/api/v1/question', 'verb' => 'POST'],
