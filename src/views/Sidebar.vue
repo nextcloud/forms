@@ -113,7 +113,7 @@
 					:disabled-date="notBeforeToday"
 					:disabled-time="notBeforeNow"
 					:editable="false"
-					:format="format"
+					:formatter="formatter"
 					:minute-step="5"
 					:placeholder="t('forms', 'Expiration date')"
 					:show-second="false"
@@ -158,7 +158,7 @@ export default {
 				},
 			},
 			locale: 'en',
-			format: {
+			formatter: {
 				stringify: this.stringify,
 				parse: this.parse,
 			},
