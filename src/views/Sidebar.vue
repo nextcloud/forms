@@ -127,7 +127,6 @@
 
 <script>
 import { generateUrl } from '@nextcloud/router'
-import { getLocale, getDayNamesShort, getMonthNamesShort } from '@nextcloud/l10n'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
@@ -151,13 +150,10 @@ export default {
 		return {
 			opened: false,
 			lang: {
-				days: getDayNamesShort(),
-				months: getMonthNamesShort(),
 				placeholder: {
 					date: t('forms', 'Select expiration date'),
 				},
 			},
-			locale: 'en',
 			formatter: {
 				stringify: this.stringify,
 				parse: this.parse,
@@ -215,32 +211,6 @@ export default {
 		},
 	},
 
-	async created() {
-		// Load the locale
-		// convert format like en_GB to en-gb for `moment.js`
-		let locale = getLocale().replace('_', '-').toLowerCase()
-		try {
-			// default load e.g. fr-fr
-			await import(/* webpackChunkName: 'moment' */'moment/locale/' + locale)
-			this.locale = locale
-		} catch (e) {
-			try {
-				// failure: fallback to fr
-				locale = locale.split('-')[0]
-				await import(/* webpackChunkName: 'moment' */'moment/locale/' + locale)
-			} catch (e) {
-				// failure, fallback to english
-				console.debug('Fallback to locale', 'en')
-				locale = 'en'
-			}
-		} finally {
-			// force locale change to update
-			// the component once done loading
-			this.locale = locale
-			console.debug('Locale used', locale)
-		}
-	},
-
 	beforeMount() {
 		// Watch for Sidebar toggle
 		subscribe('toggleSidebar', this.onToggle)
@@ -294,7 +264,7 @@ export default {
 		 * @returns {string}
 		 */
 		stringify(datetime) {
-			const date = moment(datetime).locale(this.locale).format('LLL')
+			const date = moment(datetime).format('LLL')
 
 			if (this.isExpired) {
 				return t('forms', 'Expired on {date}', { date })

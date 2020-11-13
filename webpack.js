@@ -15,9 +15,6 @@ const config = {
 			},
 		],
 	},
-	plugins: [
-		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-	],
 }
 
 module.exports = merge(config, webpackConfig)
