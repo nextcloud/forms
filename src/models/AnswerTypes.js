@@ -61,6 +61,7 @@ export default {
 	multiple_unique: {
 		component: QuestionMultiple,
 		icon: 'icon-answer-multiple',
+		// TRANSLATORS Take care, a translation by word might not match! The english called 'Multiple-Choice' only allows to select a single-option (basically single-choice)!
 		label: t('forms', 'Multiple choice'),
 		validate: question => question.options.length > 0,
 
