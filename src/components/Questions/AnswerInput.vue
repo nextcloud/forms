@@ -98,6 +98,7 @@ export default {
 			if (this.answer.local) {
 
 				// Dispatched for creation. Marked as synced
+				// eslint-disable-next-line vue/no-mutating-props
 				this.answer.local = false
 				const newAnswer = await this.debounceCreateAnswer(answer)
 
