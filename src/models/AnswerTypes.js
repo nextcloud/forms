@@ -24,6 +24,7 @@ import QuestionMultiple from '../components/Questions/QuestionMultiple'
 import QuestionDropdown from '../components/Questions/QuestionDropdown'
 import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionLong from '../components/Questions/QuestionLong'
+import QuestionDate from '../components/Questions/QuestionDate'
 
 /**
  * @typedef {Object} AnswerTypes
@@ -32,6 +33,8 @@ import QuestionLong from '../components/Questions/QuestionLong'
  * @property {string} dropdown
  * @property {string} short
  * @property {string} long
+ * @property {string} date
+ * @property {string} datetime
  */
 export default {
 	/**
@@ -106,4 +109,28 @@ export default {
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
+	date: {
+		component: QuestionDate,
+		icon: 'icon-answer-date',
+		label: t('forms', 'Date'),
+
+		titlePlaceholder: t('forms', 'Date question title'),
+		createPlaceholder: t('forms', 'People can pick a date'),
+		submitPlaceholder: t('forms', 'Pick a date'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	datetime: {
+		component: QuestionDate,
+		icon: 'icon-answer-datetime',
+		label: t('forms', 'Datetime'),
+
+		titlePlaceholder: t('forms', 'Datetime question title'),
+		createPlaceholder: t('forms', 'People can pick a date and time'),
+		submitPlaceholder: t('forms', 'Pick a date and time'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+
+		// Using the same vue-component as date, this specifies that the component renders as datetime.
+		includeTime: true,
+	},
 }
