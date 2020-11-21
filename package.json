@@ -34,7 +34,7 @@
 		"core-js": "^3.7.0",
 		"crypto-js": "^4.0.0",
 		"debounce": "^1.2.0",
-		"json2csv": "5.0.4",
+		"json2csv": "5.0.5",
 		"p-debounce": "^2.1.0",
 		"p-queue": "^6.6.2",
 		"regenerator-runtime": "^0.13.7",
