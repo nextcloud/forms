@@ -26,5 +26,14 @@
 	--top-bar-height: 60px;
 }
 
+/* Fix for action-popover alignment
+ * TODO: Can be removed, as soon as the issue is solved in server or vue-components.
+ * Ref.: https://github.com/nextcloud/nextcloud-vue/issues/1384
+ */
+body {
+	min-height: 100%;
+	height: auto;
+}
+
 @import 'variables';
 @import 'icons';
