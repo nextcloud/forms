@@ -54,6 +54,8 @@ OC.L10N.register(
     "There was an error submitting the form" : "Настана грешка при испраќање на формата",
     "Error while saving question" : "Грешка при зачувување на прашање",
     "Short answer" : "Краток одговор",
+    "Date" : "Датум",
+    "Pick a date" : "Избери датум",
     "Form expired" : "Формата е истечена",
     "This form has expired and is no longer taking answers" : "Оваа форма е истечена и повеќе неможе да се внесуваат оговари",
     "Form not found" : "Формата не е пронајдена",
