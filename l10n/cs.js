@@ -103,6 +103,8 @@ OC.L10N.register(
     "Long text question title" : "Nadpis otázky s dlouhou odpovědí",
     "People can enter a long text" : "Lidé mohou zadat dlouhý text",
     "Enter a long text" : "Zadejte dlouhý text",
+    "Date" : "Datum",
+    "Pick a date" : "Vyberte datum",
     "Form expired" : "Platnost formuláře skončila",
     "This form has expired and is no longer taking answers" : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat",
     "Form not found" : "Formulář nenalezen",
