@@ -74,7 +74,7 @@ OC.L10N.register(
     "Choose users to share with" : "Zvolte uživatele, kterým nasdílet",
     "Settings" : "Nastavení",
     "Anonymous responses" : "Anonym odpovídá",
-    "Allow multiple responses per person" : "Umožnit vícero odpovědí od jedné osoby",
+    "Allow multiple responses per person" : "Povolit vícero odpovědí od jedné osoby",
     "Set expiration date" : "Nastavit datum skončení platnosti",
     "Expiration date" : "Datum skončení platnosti",
     "Select expiration date" : "Vyberte datum skončení platnosti",
