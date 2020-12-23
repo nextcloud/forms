@@ -42,6 +42,7 @@
 				:placeholder="datetimePickerPlaceholder"
 				:show-second="false"
 				:type="datetimePickerType"
+				:input-attr="inputAttr"
 				@change="onValueChange" />
 		</div>
 	</Question>
@@ -94,6 +95,16 @@ export default {
 				return 'LLL'
 			}
 			return 'LL'
+		},
+
+		/**
+		 * All non-exposed props onto datepicker input-element.
+		 * @returns {Object}
+		 */
+		inputAttr() {
+			return {
+				required: this.mandatory,
+			}
 		},
 	},
 
