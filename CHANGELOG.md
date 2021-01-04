@@ -1,20 +1,24 @@
 # Changelog
 
-## [v2.0.5](https://github.com/nextcloud/forms/tree/v2.0.5) (2021-01-04)
+## [v2.1.0](https://github.com/nextcloud/forms/tree/v2.1.0) (2021-01-04)
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.4...v2.0.5)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.4...v2.1.0)
 
 ### Merged
-- Add Date & Datetime Component [\#672](https://github.com/nextcloud/forms/pull/672) ([jotoeri](https://github.com/jotoeri))
-- Bump eslint to 7 and associated dependencies [\#661](https://github.com/nextcloud/forms/pull/661) ([skjnldsv](https://github.com/skjnldsv))
-- Inform user if the form is anonymous [\#635](https://github.com/nextcloud/forms/pull/635) ([Nienzu](https://github.com/Nienzu))
+- Add Date & Datetime Component
+  [\#672](https://github.com/nextcloud/forms/pull/672) ([jotoeri](https://github.com/jotoeri))
+- Bump eslint to 7 and associated dependencies
+  [\#661](https://github.com/nextcloud/forms/pull/661) ([skjnldsv](https://github.com/skjnldsv))
+- Inform user if the form is anonymous
+  [\#635](https://github.com/nextcloud/forms/pull/635) ([Nienzu](https://github.com/Nienzu))
 
 ### Fixed
-- Fix datetime mandatory [\#696](https://github.com/nextcloud/forms/pull/696) ([jotoeri](https://github.com/jotoeri))
-- Fix Popover-Reference [\#695](https://github.com/nextcloud/forms/pull/695) ([jotoeri](https://github.com/jotoeri))
-- Fix time-formatting [\#671](https://github.com/nextcloud/forms/pull/671) ([jotoeri](https://github.com/jotoeri))
-- l10n: Remove the space character in Submit.vue [\#637](https://github.com/nextcloud/forms/pull/637) ([Valdnet](https://github.com/Valdnet))
-- l10n: Remove the space character in Create.vue [\#636](https://github.com/nextcloud/forms/pull/636) ([Valdnet](https://github.com/Valdnet))
+- Fix datetime mandatory
+  [\#696](https://github.com/nextcloud/forms/pull/696) ([jotoeri](https://github.com/jotoeri))
+- Fix Popover-Reference
+  [\#695](https://github.com/nextcloud/forms/pull/695) ([jotoeri](https://github.com/jotoeri))
+- Fix time-formatting
+  [\#671](https://github.com/nextcloud/forms/pull/671) ([jotoeri](https://github.com/jotoeri))
 
 ## [v2.0.4](https://github.com/nextcloud/forms/tree/v2.0.4) (2020-09-01)
 
