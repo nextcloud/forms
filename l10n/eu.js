@@ -100,6 +100,8 @@ OC.L10N.register(
     "Long text question title" : "Erantzun luzeko galderaren izenburua",
     "People can enter a long text" : "Jendeak testu luzea idatz dezake",
     "Enter a long text" : "Idatzi erantzun luzea",
+    "Date" : "Data",
+    "Pick a date" : "Aukeratu eguna",
     "Form expired" : "Galdetegia iraungita",
     "This form has expired and is no longer taking answers" : "Galdetegi hau iraungi da eta ez du erantzunik onartzen",
     "Form not found" : "Ez da galdetegia aurkitu",
