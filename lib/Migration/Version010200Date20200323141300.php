@@ -358,9 +358,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				/* Due to the unconventional storing fo vote_option_ids, the vote_option_id needs to get mapped onto old question-id and from there to new question-id.
 				 * vote_option_ids count from 1 to x for the questions of a form. So the question at point [$vote[vote_option_id] - 1] within the id-structure is the corresponding question.
 				 */
-				$oldQuestionId = $event_structure[$vote['form_id']]['questions'][$vote['vote_option_id']-1]['id'];
+				$oldQuestionId = $event_structure[$vote['form_id']]['questions'][$vote['vote_option_id'] - 1]['id'];
 				//Just throw an Error, if aboves QuestionId-Mapping went wrong. Double-Checked by Question-Text.
-				if ($event_structure[$vote['form_id']]['questions'][$vote['vote_option_id']-1]['form_question_text'] != $vote['vote_option_text']) {
+				if ($event_structure[$vote['form_id']]['questions'][$vote['vote_option_id'] - 1]['form_question_text'] != $vote['vote_option_text']) {
 					$output->warning("Some Question-Mapping went wrong within Submission-Mapping to new Database. On 'vote_id': " . $vote['id'] . " - 'vote_option_text': '" . $vote['vote_option_text'] . "'");
 				}
 

@@ -119,7 +119,7 @@ class FormsService {
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
 				$question['options'] = $this->getOptions($question['id']);
-				$questionList[] =  $question;
+				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {
 			//handle silently
@@ -248,7 +248,7 @@ class FormsService {
 	 * @return array
 	 */
 	private function formatUsers(string $userId): array {
-		$user  = $this->userManager->get($userId);
+		$user = $this->userManager->get($userId);
 		if ($user instanceof IUser) {
 			return [
 				'shareWith' => $userId,
@@ -266,7 +266,7 @@ class FormsService {
 	 * @return array
 	 */
 	private function formatGroups(string $groupId): array {
-		$group  = $this->groupManager->get($groupId);
+		$group = $this->groupManager->get($groupId);
 		if ($group instanceof IGroup) {
 			return [
 				'shareWith' => $groupId,
