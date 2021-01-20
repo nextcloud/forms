@@ -23,7 +23,7 @@
 
 namespace OCA\Forms\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types;
 use OCP\DB\ISchemaWrapper;
 use OCP\IConfig;
 use OCP\IDBConnection;
@@ -63,7 +63,7 @@ class Version0010Date20190000000007 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 
 		if ($schema->hasTable('forms_events')) {
-			$schema->getTable('forms_events')->addColumn('unique', Type::INTEGER, [
+			$schema->getTable('forms_events')->addColumn('unique', Types::INTEGER, [
 				'notnull' => false,
 				'default' => 0,
 			]);
