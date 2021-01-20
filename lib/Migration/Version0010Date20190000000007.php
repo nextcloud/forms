@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2017 René Gieling <github@dartcafe.de>
  *
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Marcel Klehr <mklehr@gmx.net>
  *
  * @license GNU AGPL version 3 or any later version
@@ -23,7 +24,7 @@
 
 namespace OCA\Forms\Migration;
 
-use Doctrine\DBAL\Types;
+use Doctrine\DBAL\Types\Types;
 use OCP\DB\ISchemaWrapper;
 use OCP\IConfig;
 use OCP\IDBConnection;
