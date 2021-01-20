@@ -6,9 +6,11 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2019 Inigo Jiron <ijiron@terpmail.umd.edu>
  *
  * @author affan98 <affan98@gmail.com>
+ * @author Jan-Christoph Borchardt <hey@jancborchardt.net>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Simon Vieille <simon@deblan.fr>
  *
  * @license GNU AGPL version 3 or any later version
  *

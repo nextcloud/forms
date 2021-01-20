@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
