@@ -30,6 +30,8 @@ namespace OCA\Forms\AppInfo;
 
 use OCP\AppFramework\App;
 
+include_once __DIR__ . '/../../vendor/autoload.php';
+
 class Application extends App {
 	public const APP_ID = 'forms';
 

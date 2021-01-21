@@ -56,6 +56,7 @@ return [
 
 		// Submissions
 		['name' => 'api#getSubmissions', 'url' => '/api/v1/submissions/{hash}', 'verb' => 'GET'],
+		['name' => 'api#exportSubmissions', 'url' => '/api/v1/submissions/export/{hash}', 'verb' => 'GET'],
 		['name' => 'api#deleteAllSubmissions', 'url' => '/api/v1/submissions/{formId}', 'verb' => 'DELETE'],
 
 		['name' => 'api#insertSubmission', 'url' => '/api/v1/submission/insert', 'verb' => 'POST'],
