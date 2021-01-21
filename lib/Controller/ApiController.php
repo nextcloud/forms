@@ -252,7 +252,20 @@ class ApiController extends Controller {
 			throw new OCSForbiddenException();
 		}
 
-		// Make sure we only store id
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow to change params id, hash, ownerId, created
+		if (key_exists('id', $keyValuePairs) || key_exists('hash', $keyValuePairs) ||
+			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs)) {
+			$this->logger->info('Not allowed to update id, hash, ownerId or created');
+			throw new OCSForbiddenException();
+		}
+
+		// Make sure we only store id of shares
 		try {
 			if (array_key_exists('access', $keyValuePairs)) {
 				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
@@ -496,7 +509,20 @@ class ApiController extends Controller {
 			throw new OCSForbiddenException();
 		}
 
-		if (array_key_exists('order', $keyValuePairs)) {
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		//Don't allow to change id or formId
+		if (key_exists('id', $keyValuePairs) || key_exists('formId', $keyValuePairs)) {
+			$this->logger->debug('Not allowed to update id or formId');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow to reorder here
+		if (key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
 			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
 		}
@@ -629,6 +655,18 @@ class ApiController extends Controller {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		//Don't allow to change id or questionId
+		if (key_exists('id', $keyValuePairs) || key_exists('questionId', $keyValuePairs)) {
+			$this->logger->debug('Not allowed to update id or questionId');
 			throw new OCSForbiddenException();
 		}
 
