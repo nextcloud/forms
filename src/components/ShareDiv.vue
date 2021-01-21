@@ -65,6 +65,7 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 import ShareTypes from '../mixins/ShareTypes'
+import OcsResponse2Data from '../utils/OcsResponse2Data'
 
 // TODO: replace with same design as core sharing
 import UserDiv from './UserDiv'
@@ -219,8 +220,8 @@ export default {
 				},
 			})
 
-			const data = request.data.ocs.data
-			const exact = request.data.ocs.data.exact
+			const data = OcsResponse2Data(request)
+			const exact = data.exact
 			data.exact = [] // removing exact from general results
 
 			// flatten array of arrays
@@ -265,7 +266,7 @@ export default {
 				},
 			})
 
-			const exact = request.data.ocs.data.exact
+			const exact = OcsResponse2Data(request).exact
 
 			// flatten array of arrays
 			const rawRecommendations = Object.values(exact).reduce((arr, elem) => arr.concat(elem), [])

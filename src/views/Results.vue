@@ -133,6 +133,7 @@ import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 import SetWindowTitle from '../utils/SetWindowTitle'
+import OcsResponse2Data from '../utils/OcsResponse2Data'
 
 Vue.use(Clipboard)
 
@@ -225,8 +226,8 @@ export default {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + `submissions/${this.form.hash}`)
 
 				// Append questions & submissions
-				this.$set(this.form, 'submissions', response.data.submissions)
-				this.$set(this.form, 'questions', response.data.questions)
+				this.$set(this.form, 'submissions', OcsResponse2Data(response).submissions)
+				this.$set(this.form, 'questions', OcsResponse2Data(response).questions)
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while loading the results'))

@@ -37,6 +37,8 @@ import PQueue from 'p-queue'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 
+import OcsResponse2Data from '../../utils/OcsResponse2Data'
+
 export default {
 	name: 'AnswerInput',
 
@@ -152,7 +154,7 @@ export default {
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
-				return Object.assign({}, answer, response.data)
+				return Object.assign({}, answer, OcsResponse2Data(response))
 			} catch (error) {
 				showError(t('forms', 'Error while saving the answer'))
 				console.error(error)
