@@ -596,9 +596,7 @@ class ApiController extends Controller {
 
 		$option = $this->optionMapper->insert($option);
 
-		return new DataResponse([
-			'id' => $option->getId()
-		]);
+		return new DataResponse($option->read());
 	}
 
 	/**

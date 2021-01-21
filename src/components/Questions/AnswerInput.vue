@@ -145,7 +145,7 @@ export default {
 		async createAnswer(answer) {
 			try {
 				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'option', {
-					questionId: answer.question_id,
+					questionId: answer.questionId,
 					text: answer.text,
 				})
 				console.debug('Created answer', answer)

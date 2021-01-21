@@ -243,7 +243,7 @@ export default {
 			const options = this.options.slice()
 			options.push({
 				id: GenRandomId(),
-				question_id: this.id,
+				questionId: this.id,
 				text: '',
 				local: true,
 			})
