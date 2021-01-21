@@ -29,7 +29,7 @@ namespace OCA\Forms\Controller;
 
 use DateTimeZone;
 use Exception;
-use League\Csv\EscapeFormula;
+
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -45,8 +45,8 @@ use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
-use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\DataDownloadResponse;
+use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\IConfig;
@@ -59,8 +59,9 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 
-use League\Csv\Writer;
+use League\Csv\EscapeFormula;
 use League\Csv\Reader;
+use League\Csv\Writer;
 
 class ApiController extends Controller {
 	protected $appName;
@@ -143,6 +144,7 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 *
 	 * Read Form-List only with necessary information for Listing.
+	 * @return DataResponse
 	 */
 	public function getForms(): DataResponse {
 		$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
@@ -166,6 +168,7 @@ class ApiController extends Controller {
 	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 *
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -190,6 +193,7 @@ class ApiController extends Controller {
 	 *
 	 * Create a new Form and return the Form to edit.
 	 *
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -226,6 +230,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id FormId of form to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -278,6 +283,7 @@ class ApiController extends Controller {
 	 * Delete a form
 	 *
 	 * @param int $id the form id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -314,6 +320,7 @@ class ApiController extends Controller {
 	 * @param int $formId the form id
 	 * @param string $type the new question type
 	 * @param string $text the new question title
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -373,6 +380,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param int[] $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -465,6 +473,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id QuestionId of question to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -508,6 +517,7 @@ class ApiController extends Controller {
 	 * Delete a question
 	 *
 	 * @param int $id the question id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -556,6 +566,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $questionId the question id
 	 * @param string $text the new option text
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -597,6 +608,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id OptionId of option to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -636,6 +648,7 @@ class ApiController extends Controller {
 	 * Delete an option
 	 *
 	 * @param int $id the option id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -669,6 +682,7 @@ class ApiController extends Controller {
 	 * Get all the answers of a given submission
 	 *
 	 * @param int $submissionId the submission id
+	 * @return array
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -694,6 +708,7 @@ class ApiController extends Controller {
 	 * Get all the submissions of a given form
 	 *
 	 * @param string $hash the form hash
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -760,6 +775,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $formId the form id
 	 * @param array $answers [question_id => arrayOfString]
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -856,6 +872,7 @@ class ApiController extends Controller {
 	 * Delete a specific submission
 	 *
 	 * @param int $id the submission id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -889,6 +906,7 @@ class ApiController extends Controller {
 	 * Delete all submissions of a specified form
 	 *
 	 * @param int $formId the form id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -922,6 +940,7 @@ class ApiController extends Controller {
 	 * Export submissions of a specified form
 	 *
 	 * @param string $hash the form hash
+	 * @return DataDownloadResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -956,7 +975,7 @@ class ApiController extends Controller {
 		$header = [];
 		$header[] = $this->l10n->t('User display name');
 		$header[] = $this->l10n->t('Timestamp');
-		foreach($questions as $question) {
+		foreach ($questions as $question) {
 			$header[] = $question->getText();
 		}
 
@@ -964,7 +983,7 @@ class ApiController extends Controller {
 		$data = [];
 
 		// Process each answers
-		foreach($submissionEntities as $submission) {
+		foreach ($submissionEntities as $submission) {
 			$row = [];
 
 			// User
@@ -979,13 +998,15 @@ class ApiController extends Controller {
 			$row[] = $this->dateTimeFormatter->formatDateTime($submission->getTimestamp(), 'full', 'full', new DateTimeZone($userTimezone), $this->l10n);
 
 			// Answers, make sure we keep the question order
-			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function(array $carry, Answer $answer) {
+			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function (array $carry, Answer $answer) {
 				$carry[$answer->getQuestionId()] = $answer->getText();
 				return $carry;
 			}, []);
 
-			foreach($questions as $question) {
-				$row[] = $answers[$question->getId()];
+			foreach ($questions as $question) {
+				$row[] = key_exists($question->getId(), $answers)
+					? $answers[$question->getId()]
+					: null;
 			}
 
 			$data[] = $row;
@@ -1017,5 +1038,5 @@ class ApiController extends Controller {
 		$csv->insertAll($records);
 
 		return $csv->getContent();
-	}	
+	}
 }
