@@ -27,7 +27,9 @@
 
 namespace OCA\Forms\Controller;
 
+use DateTimeZone;
 use Exception;
+
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -43,9 +45,12 @@ use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\IConfig;
+use OCP\IDateTimeFormatter;
 use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IRequest;
@@ -53,6 +58,10 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
+
+use League\Csv\EscapeFormula;
+use League\Csv\Reader;
+use League\Csv\Writer;
 
 class ApiController extends Controller {
 	protected $appName;
@@ -90,6 +99,12 @@ class ApiController extends Controller {
 	/** @var ISecureRandom */
 	private $secureRandom;
 
+	/** @var IDateTimeFormatter */
+	private $dateTimeFormatter;
+
+	/** @var IConfig */
+	private $config;
+
 	public function __construct(string $appName,
 								IRequest $request,
 								IUserSession $userSession,
@@ -102,7 +117,9 @@ class ApiController extends Controller {
 								ILogger $logger,
 								IL10N $l10n,
 								FormsService $formsService,
-								ISecureRandom $secureRandom) {
+								ISecureRandom $secureRandom,
+								IDateTimeFormatter $dateTimeFormatter,
+								IConfig $config) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->userManager = $userManager;
@@ -117,6 +134,8 @@ class ApiController extends Controller {
 		$this->l10n = $l10n;
 		$this->formsService = $formsService;
 		$this->secureRandom = $secureRandom;
+		$this->dateTimeFormatter = $dateTimeFormatter;
+		$this->config = $config;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -125,6 +144,7 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 *
 	 * Read Form-List only with necessary information for Listing.
+	 * @return DataResponse
 	 */
 	public function getForms(): DataResponse {
 		$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
@@ -148,6 +168,7 @@ class ApiController extends Controller {
 	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 *
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -172,6 +193,7 @@ class ApiController extends Controller {
 	 *
 	 * Create a new Form and return the Form to edit.
 	 *
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -208,6 +230,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id FormId of form to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -260,6 +283,7 @@ class ApiController extends Controller {
 	 * Delete a form
 	 *
 	 * @param int $id the form id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -296,6 +320,7 @@ class ApiController extends Controller {
 	 * @param int $formId the form id
 	 * @param string $type the new question type
 	 * @param string $text the new question title
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -355,6 +380,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param int[] $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -447,6 +473,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id QuestionId of question to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -490,6 +517,7 @@ class ApiController extends Controller {
 	 * Delete a question
 	 *
 	 * @param int $id the question id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -538,6 +566,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $questionId the question id
 	 * @param string $text the new option text
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -579,6 +608,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $id OptionId of option to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -618,6 +648,7 @@ class ApiController extends Controller {
 	 * Delete an option
 	 *
 	 * @param int $id the option id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -651,6 +682,7 @@ class ApiController extends Controller {
 	 * Get all the answers of a given submission
 	 *
 	 * @param int $submissionId the submission id
+	 * @return array
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -676,6 +708,7 @@ class ApiController extends Controller {
 	 * Get all the submissions of a given form
 	 *
 	 * @param string $hash the form hash
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -742,6 +775,7 @@ class ApiController extends Controller {
 	 *
 	 * @param int $formId the form id
 	 * @param array $answers [question_id => arrayOfString]
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -838,6 +872,7 @@ class ApiController extends Controller {
 	 * Delete a specific submission
 	 *
 	 * @param int $id the submission id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -871,6 +906,7 @@ class ApiController extends Controller {
 	 * Delete all submissions of a specified form
 	 *
 	 * @param int $formId the form id
+	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
@@ -895,5 +931,112 @@ class ApiController extends Controller {
 		$this->submissionMapper->deleteByForm($formId);
 
 		return new DataResponse($formId);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * Export submissions of a specified form
+	 *
+	 * @param string $hash the form hash
+	 * @return DataDownloadResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportSubmissions(string $hash): DataDownloadResponse {
+		$this->logger->debug('Export submissions for form: {hash}', [
+			'hash' => $hash,
+		]);
+
+		try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		try {
+			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
+		} catch (DoesNotExistException $e) {
+			// Just ignore, if no Data. Returns empty Submissions-Array
+		}
+
+		$questions = $this->questionMapper->findByForm($form->getId());
+		$defaultTimeZone = date_default_timezone_get();
+		$userTimezone = $this->config->getUserValue('core', 'timezone', $this->currentUser->getUID(), $defaultTimeZone);
+
+		// Process initial header
+		$header = [];
+		$header[] = $this->l10n->t('User display name');
+		$header[] = $this->l10n->t('Timestamp');
+		foreach ($questions as $question) {
+			$header[] = $question->getText();
+		}
+
+		// Init dataset
+		$data = [];
+
+		// Process each answers
+		foreach ($submissionEntities as $submission) {
+			$row = [];
+
+			// User
+			$user = $this->userManager->get($submission->getUserId());
+			if ($user === null) {
+				$row[] = $this->l10n->t('Anonymous user');
+			} else {
+				$row[] = $user->getDisplayName();
+			}
+			
+			// Date
+			$row[] = $this->dateTimeFormatter->formatDateTime($submission->getTimestamp(), 'full', 'full', new DateTimeZone($userTimezone), $this->l10n);
+
+			// Answers, make sure we keep the question order
+			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function (array $carry, Answer $answer) {
+				$carry[$answer->getQuestionId()] = $answer->getText();
+				return $carry;
+			}, []);
+
+			foreach ($questions as $question) {
+				$row[] = key_exists($question->getId(), $answers)
+					? $answers[$question->getId()]
+					: null;
+			}
+
+			$data[] = $row;
+		}
+
+		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').csv';
+		return new DataDownloadResponse($this->array2csv($header, $data), $fileName, 'text/csv');
+	}
+
+	/**
+	 * Convert an array to a csv string
+	 * @param array $array
+	 * @return string
+	 */
+	private function array2csv(array $header, array $records): string {
+		if (empty($header) && empty($records)) {
+			return '';
+		}
+
+		// load the CSV document from a string
+		$csv = Writer::createFromString('');
+		$csv->setOutputBOM(Reader::BOM_UTF8);
+		$csv->addFormatter(new EscapeFormula());
+
+		// insert the header
+		$csv->insertOne($header);
+
+		// insert all the records
+		$csv->insertAll($records);
+
+		return $csv->getContent();
 	}
 }

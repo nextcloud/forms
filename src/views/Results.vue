@@ -70,9 +70,9 @@
 				<Actions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
-					<ActionButton icon="icon-download" @click="download">
+					<ActionLink icon="icon-download" :href="downloadUrl">
 						{{ t('forms', 'Export to CSV') }}
-					</ActionButton>
+					</ActionLink>
 					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
 						{{ t('forms', 'Delete all responses') }}
 					</ActionButton>
@@ -118,14 +118,13 @@
 
 <script>
 import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import { Parser } from 'json2csv'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
 import Clipboard from 'v-clipboard'
-import moment from '@nextcloud/moment'
 import Vue from 'vue'
 
 import EmptyContent from '../components/EmptyContent'
@@ -143,6 +142,7 @@ export default {
 	components: {
 		Actions,
 		ActionButton,
+		ActionLink,
 		AppContent,
 		EmptyContent,
 		Summary,
@@ -173,6 +173,14 @@ export default {
 				return this.form.title
 			}
 			return t('forms', 'New form')
+		},
+
+		/**
+		 * Generate the export to csv url
+		 * @returns {string}
+		 */
+		downloadUrl() {
+			return generateOcsUrl('apps/forms/api/v1', 2) + `submissions/export/${this.form.hash}`
 		},
 	},
 
@@ -257,43 +265,6 @@ export default {
 			} finally {
 				this.loadingResults = false
 			}
-		},
-
-		download() {
-			this.loadingResults = true
-
-			const parser = new Parser({
-				delimiter: ',',
-			})
-
-			const formattedSubmissions = []
-			this.form.submissions.forEach(submission => {
-				const formattedSubmission = {
-					userDisplayName: submission.userDisplayName,
-					timestamp: moment(submission.timestamp, 'X').format('L LT'),
-				}
-
-				this.form.questions.forEach(question => {
-					const questionText = question.text
-					const answers = submission.answers.filter(answer => answer.questionId === question.id)
-					if (!answers.length) {
-						return // no answers, go to next question
-					}
-					const squashedAnswers = answers.map(answer => answer.text).join('; ')
-					formattedSubmission[questionText] = squashedAnswers
-				})
-				formattedSubmissions.push(formattedSubmission)
-			})
-
-			const element = document.createElement('a')
-			element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(parser.parse(formattedSubmissions)))
-			element.setAttribute('download', this.formTitle + ' (' + t('forms', 'responses') + ').csv')
-			element.style.display = 'none'
-			document.body.appendChild(element)
-			element.click()
-			document.body.removeChild(element)
-
-			this.loadingResults = false
 		},
 	},
 }
