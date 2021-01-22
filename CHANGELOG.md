@@ -1,6 +1,16 @@
 # Changelog
 
-## [v2.1.0](https://github.com/nextcloud/forms/tree/v2.1.0) (2021-01-04)
+## 2.2.0-beta.1 - 2021-01-22
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.1.0...v2.2.0)
+
+### Fixed
+- Add csv export and prevents CSV formula injection
+  [\#746](https://github.com/nextcloud/forms/pull/746) ([skjnldsv](https://github.com/skjnldsv))
+- Add indexes
+  [\#744](https://github.com/nextcloud/forms/pull/744) ([skjnldsv](https://github.com/skjnldsv))
+
+## 2.1.0 - 2021-01-04
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.4...v2.1.0)
 
