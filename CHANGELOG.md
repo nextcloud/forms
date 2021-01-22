@@ -10,6 +10,7 @@
 - Add indexes
   [\#744](https://github.com/nextcloud/forms/pull/744) ([skjnldsv](https://github.com/skjnldsv))
 
+
 ## 2.1.0 - 2021-01-04
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.4...v2.1.0)
@@ -30,7 +31,8 @@
 - Fix time-formatting
   [\#671](https://github.com/nextcloud/forms/pull/671) ([jotoeri](https://github.com/jotoeri))
 
-## [v2.0.4](https://github.com/nextcloud/forms/tree/v2.0.4) (2020-09-01)
+
+## v2.0.4 - 2020-09-01
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.3...v2.0.4)
 
@@ -41,6 +43,7 @@
 - Translations update
 - Dependencies update
 
+
 ## v2.0.3 - 2020-08-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.2...v2.0.3)
@@ -48,6 +51,7 @@
 ### Merged
 - Translations update
 - Dependencies update
+
 
 ## v2.0.2 - 2020-07-30
 
@@ -57,6 +61,7 @@
 - Increase description and long-text max length
   [\#533](https://github.com/nextcloud/forms/pull/533) ([jotoeri](https://github.com/jotoeri))
 
+
 ## v2.0.1 - 2020-07-29
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0...v2.0.1)
@@ -64,6 +69,7 @@
 ### Fixed
 - Fix substring utf8
   [\#528](https://github.com/nextcloud/forms/pull/528) ([jotoeri](https://github.com/jotoeri))
+
 
 ## v2.0.0 - 2020-07-28
 
@@ -73,7 +79,9 @@
 - Fix dropdown submission insert
   [\#520](https://github.com/nextcloud/forms/pull/520) ([skjnldsv](https://github.com/skjnldsv))
 
+
 ## v2.0.0-rc.1 - 2020-07-24
+
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.4...v2.0.0-rc.1)
 
 ### Enhancements
@@ -116,7 +124,9 @@
 - Fix some small MultipleInput issues
   [\#394](https://github.com/nextcloud/forms/pull/394) ([jotoeri](https://github.com/jotoeri))
 
+
 ## v2.0.0-beta.4 - 2020-06-09
+
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.3...v2.0.0-beta.4)
 
 ### Fixed
@@ -127,7 +137,9 @@
 - Delete empty options from Db
   [\#388](https://github.com/nextcloud/forms/pull/388) ([jotoeri](https://github.com/jotoeri))
 
+
 ## v2.0.0-beta.3 - 2020-06-04
+
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta2...v2.0.0-beta.3)
 
 ### Enhancements
@@ -188,7 +200,9 @@
 - Fix Error-Messages
   [\#360](https://github.com/nextcloud/forms/pull/360) ([jotoeri](https://github.com/jotoeri))
 
+
 ## v2.0.0-beta2 - 2020-05-06
+
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta1...v2.0.0-beta2)
 
 ### Enhancements
@@ -233,7 +247,9 @@
 - Fix question icons broken in dark theme
   [\#312](https://github.com/nextcloud/forms/pull/312) ([skjnldsv](https://github.com/skjnldsv))
 
+
 ## v2.0.0-beta1 - 2020-04-29
+
 [Full Changelog](https://github.com/nextcloud/forms/compare/v1.1.1...v2.0.0-beta1)
 
 ### Implemented enhancements:
