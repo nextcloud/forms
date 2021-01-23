@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonim yanıt",
+    "responses" : "yanıtlar",
     "Forms" : "Formlar",
     "Shared by %s" : "%s tarafından paylaşıldı",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Basit anket ve sınavlar, yerel barındırılır",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Bu yanıt silinirken bir sorun çıktı",
     "Are you sure you want to delete all responses of {title}?" : "Tüm {title} yanıtlarını silmek istediğinize emin misiniz?",
     "There was an error while removing responses" : "Yanıtlar silinirken bir sorun çıktı",
-    "responses" : "yanıtlar",
     "Share form" : "Formu paylaş",
     "Share via link" : "Bağlantı ile paylaş",
     "Show to all users of this instance" : "Bu kopyadaki tüm kullanıcılara görüntülensin",

@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonymt  svar",
+    "responses" : "svar",
     "Forms" : "Formulär",
     "Shared by %s" : "Delad av %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 enkla undersökningar och formulär, egenhostade",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Ett fel uppstod vid borttagande av detta svar",
     "Are you sure you want to delete all responses of {title}?" : "Är du säker på att du vill ta bort alla svar till {title}?",
     "There was an error while removing responses" : "Ett fel uppstod vid borttagande av svar",
-    "responses" : "svar",
     "Share form" : "Dela formuläret",
     "Share via link" : "Dela via länk",
     "Show to all users of this instance" : "Visa för alla användare i den här instansen",

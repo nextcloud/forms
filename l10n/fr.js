@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Réponse anonyme",
+    "responses" : "réponses",
     "Forms" : "Formulaires",
     "Shared by %s" : "Partagé par %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Sondage et questionnaire simple, auto hébergé",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Une erreur est survenue pendant la suppression de la réponse",
     "Are you sure you want to delete all responses of {title}?" : "Êtes-vous certain de vouloir supprimer toutes les réponses de {title} ?",
     "There was an error while removing responses" : "Une erreur est survenue pendant la suppression des réponses",
-    "responses" : "réponses",
     "Share form" : "Partager le formulaire",
     "Share via link" : "Partager via un lien",
     "Show to all users of this instance" : "Afficher à tous les utilisateurs de cette instance",

@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "匿名の回答",
+    "responses" : "返信",
     "Forms" : "フォーム",
     "Shared by %s" : "%sによって共有された",
     "New form" : "新しいフォーム",
@@ -51,7 +52,6 @@ OC.L10N.register(
     "Delete all responses" : "全ての返信を削除",
     "No responses yet" : "まだ返信はありません",
     "Results of submitted forms will show up here" : "送信したフォームの結果はここに表示されます",
-    "responses" : "返信",
     "Share via link" : "linkで共有",
     "Settings" : "設定",
     "Anonymous responses" : "匿名回答",

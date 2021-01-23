@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "תגובה אלמונית",
+    "responses" : "תגובות",
     "Forms" : "טפסים",
     "Shared by %s" : "שותף על ידי %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 סקריםי ושאלונים פשוטים, באירוח עצמי",
@@ -66,7 +67,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "אירעה שגיאה בהסרת התגובה הזאת",
     "Are you sure you want to delete all responses of {title}?" : "למחוק את כל התגובות על {title}?",
     "There was an error while removing responses" : "אירעה שגיאה בעת הסרת התגובות",
-    "responses" : "תגובות",
     "Share form" : "שיתוף טופס",
     "Share via link" : "שיתוף דרך קישור",
     "Show to all users of this instance" : "להציג את כל המשתמשים של העותק הזה",

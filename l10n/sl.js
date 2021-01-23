@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonimni odziv",
+    "responses" : "odzivi",
     "Forms" : "Vprašalniki",
     "Shared by %s" : "Objavo omogoča %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "Enostavni vprašalnik in ankete na domačem strežniku",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Prišlo je do napake med odstranjevanjem odziva",
     "Are you sure you want to delete all responses of {title}?" : "Ali ste prepričani, da želite izbrisati vse odzive v anketi {title}?",
     "There was an error while removing responses" : "Prišlo je do napake med odstranjevanjem odzivov",
-    "responses" : "odzivi",
     "Share form" : "Objava vprašalnika",
     "Share via link" : "Pošlji prek povezave",
     "Show to all users of this instance" : "Pokaži vsem uporabnikom tega oblaka",

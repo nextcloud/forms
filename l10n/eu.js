@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Erantzun anonimoa",
+    "responses" : "erantzunak",
     "Forms" : "Galdetegiak",
     "Shared by %s" : "%s(e)k partekatua",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Inkesta sinpleak eta galdetegiak, norberak ostatatuta",
@@ -64,7 +65,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Errore bat gertatu da erantzun hau ezabatzean",
     "Are you sure you want to delete all responses of {title}?" : "Ziur zaude {title} galderaren erantzun guztiak ezabatu nahi dituzula?",
     "There was an error while removing responses" : "Errore bat gertatu da erantzunak ezabatzean",
-    "responses" : "erantzunak",
     "Share form" : "Partekatu galdetegia",
     "Share via link" : "Partekatu esteka bidez",
     "Show to all users of this instance" : "Erakutsi instantzia honetako erabiltzaile guztiei",

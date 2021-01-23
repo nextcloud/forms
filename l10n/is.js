@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Nafnlaust svar",
+    "responses" : "svör",
     "Forms" : "Eyðuform",
     "Shared by %s" : "Deilt af %s",
     "New form" : "Nýtt eyðuform",
@@ -51,7 +52,6 @@ OC.L10N.register(
     "Delete all responses" : "Eyða öllum svörum",
     "Results of submitted forms will show up here" : "Niðurstöður innsendra eyðuforma munu birtast hér",
     "There was an error while removing responses" : "Villa kom upp við að fjarlægja svör",
-    "responses" : "svör",
     "Share form" : "Deila eyðuformi",
     "Share via link" : "Deila með tengli",
     "Choose users to share with" : "Veldu notendur til að deila með",

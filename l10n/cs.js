@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonymní odpověď",
+    "responses" : "odpovědi",
     "Forms" : "Formuláře",
     "Shared by %s" : "Sdílí %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Jednoduché průzkumy a dotazníky – hostované u vás",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Při odebírání této odpovědi došlo k chybě",
     "Are you sure you want to delete all responses of {title}?" : "Opravdu chcete smazat všechny odpovědi v {title}?",
     "There was an error while removing responses" : "Při odebírání těchto odpovědí došlo k chybě",
-    "responses" : "odpovědi",
     "Share form" : "Sdílet formulář",
     "Share via link" : "Sdílet prostřednictvím odkazu",
     "Show to all users of this instance" : "Zobrazit všechny uživatele na této instanci",

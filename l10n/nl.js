@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anoniem antwoord",
+    "responses" : "reacties",
     "Forms" : "Formulieren",
     "Shared by %s" : "Gedeeld door %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Eenvoudige enquête en vragenlijst, zelf gehost",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Er trad een fout op bij het verwijderen van deze reactie",
     "Are you sure you want to delete all responses of {title}?" : "Weet je zeker dat je alle reacties op {title} wilt verwijderen?",
     "There was an error while removing responses" : "Er trad een fout op bij het verwijderen van reacties",
-    "responses" : "reacties",
     "Share form" : "Deel formulier",
     "Share via link" : "Deel via link",
     "Show to all users of this instance" : "Toon alle gebruikers op deze server",

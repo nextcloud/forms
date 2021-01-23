@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonyymi vastaus",
+    "responses" : "vastausta",
     "Forms" : "Lomakkeet",
     "Shared by %s" : "Jakanut %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Yksinkertaisia kyselyitä omalla palvelimella",
@@ -67,7 +68,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "Tätä vastausta poistaessa tapahtui virhe",
     "Are you sure you want to delete all responses of {title}?" : "Haluatko varmasti poistaa kaikki lomakkeen {title} vastaukset?",
     "There was an error while removing responses" : "Vastauksia poistaessa tapahtui virhe",
-    "responses" : "vastausta",
     "Share form" : "Jaa lomake",
     "Share via link" : "Jaa linkin kautta",
     "Show to all users of this instance" : "Näytä kaikille tämän instanssin käyttäjille",

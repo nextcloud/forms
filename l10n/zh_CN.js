@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "匿名回应",
+    "responses" : "回应",
     "Forms" : "表单",
     "Shared by %s" : "分享者 %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 简单的自托管调查问卷",
@@ -66,7 +67,6 @@ OC.L10N.register(
     "There was an error while removing this response" : "删除这个回应时有一个错误",
     "Are you sure you want to delete all responses of {title}?" : "你确定要删除 {title} 的所有回应吗？",
     "There was an error while removing responses" : "删除多个回应时有一个错误",
-    "responses" : "回应",
     "Share form" : "分享表格",
     "Share via link" : "通过链接分享",
     "Show to all users of this instance" : "展示给该实例的所有用户",
