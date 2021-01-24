@@ -89,7 +89,8 @@
 				</template>
 				<template #action>
 					<button class="primary" @click="copyShareLink">
-						{{ t('forms', 'Copy share link') }}
+						<span class="icon-clippy-primary" role="img" />
+						{{ t('forms', 'Share link') }}
 					</button>
 				</template>
 			</EmptyContent>

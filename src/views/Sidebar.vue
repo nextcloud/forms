@@ -27,7 +27,7 @@
 		@close="onClose">
 		<button class="copyShareLink" @click="copyShareLink">
 			<span class="icon-clippy" role="img" />
-			{{ t('forms', 'Copy share link') }}
+			{{ t('forms', 'Share link') }}
 		</button>
 
 		<ul>

@@ -128,6 +128,19 @@ Returns the full-depth object of the requested form (without submissions).
 }
 ```
 
+### Clone a form
+Creates a clone of a form (without submissions).
+- Endpoint: `/api/v1/form/clone/{id}`
+- Url-Parameter:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _id_      | Integer | ID of the form to clone |
+- Method: `POST`
+- Response: Returns the full object of the new form. See [Request full data of a Form](#request-full-data-of-a-form)
+```
+See section 'Request full data of a form'.
+```
+
 ### Update form properties
 Update a single or multiple properties of a form-object. Concerns **only** the Form-Object, properties of Questions, Options and Submissions, as well as their creation or deletion, are handled separately.
 - Endpoint: `/api/v1/form/update`

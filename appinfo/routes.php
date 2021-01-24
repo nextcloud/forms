@@ -40,6 +40,7 @@ return [
 		['name' => 'api#getForms', 'url' => '/api/v1/forms', 'verb' => 'GET'],
 		['name' => 'api#newForm', 'url' => '/api/v1/form', 'verb' => 'POST'],
 		['name' => 'api#getForm', 'url' => '/api/v1/form/{id}', 'verb' => 'GET'],
+		['name' => 'api#cloneForm', 'url' => '/api/v1/form/clone/{id}', 'verb' => 'POST'],
 		['name' => 'api#updateForm', 'url' => '/api/v1/form/update', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => '/api/v1/form/{id}', 'verb' => 'DELETE'],
 

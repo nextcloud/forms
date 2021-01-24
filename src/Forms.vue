@@ -30,6 +30,7 @@
 					:key="form.id"
 					:form="form"
 					@mobile-close-navigation="mobileCloseNavigation"
+					@clone="onCloneForm"
 					@delete="onDeleteForm" />
 			</template>
 		</AppNavigation>
@@ -170,6 +171,24 @@ export default {
 				this.mobileCloseNavigation()
 			} catch (error) {
 				showError(t('forms', 'Unable to create a new form'))
+				console.error(error)
+			}
+		},
+
+		/**
+		 * Request to clone a form, store returned form and open it.
+		 *
+		 * @param {Number} id id of the form to clone
+		 */
+		async onCloneForm(id) {
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + `form/clone/${id}`)
+				const newForm = OcsResponse2Data(response)
+				this.forms.unshift(newForm)
+				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
+				this.mobileCloseNavigation()
+			} catch (error) {
+				showError(t('forms', 'Unable to copy form'))
 				console.error(error)
 			}
 		},
