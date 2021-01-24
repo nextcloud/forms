@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Resposta anônima",
+    "Anonymous user" : "Usuário anônimo",
     "responses" : "respostas",
     "Forms" : "Formulários",
     "Shared by %s" : "Compartilhado por %s",
@@ -51,7 +52,7 @@ OC.L10N.register(
     "Add a question" : "Adicionar uma pergunta",
     "Responses are anonymous." : "As respostas são anônimas.",
     "Responses are connected to your Nextcloud account." : "As respostas estão vinculadas à sua conta do Nextcloud.",
-    "An asterisk (*) indicates mandatory questions." : "Um asterisco (*) indica respostas necessárias.",
+    "An asterisk (*) indicates mandatory questions." : "Um asterisco (*) indica respostas obrigatórias.",
     "There was an error while adding the new question" : "Houve um erro ao adicionar a nova pergunta",
     "There was an error while removing the question" : "Houve um erro ao excluir a pergunta",
     "Error while saving form" : "Erro ao salvar o formulário",

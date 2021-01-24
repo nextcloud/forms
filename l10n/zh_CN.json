@@ -1,5 +1,8 @@
 { "translations": {
     "Anonymous response" : "匿名回应",
+    "User display name" : "用户展示名",
+    "Timestamp" : "时间戳",
+    "Anonymous user" : "匿名用户",
     "responses" : "回应",
     "Forms" : "表单",
     "Shared by %s" : "分享者 %s",
