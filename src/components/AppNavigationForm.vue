@@ -98,19 +98,6 @@ export default {
 	},
 
 	computed: {
-		/**
-		 * Map form state to bullet color
-		 *
-		 * @returns {string} hex color
-		 */
-		bulletColor() {
-			const style = getComputedStyle(document.body)
-			if (this.form.expires && moment().unix() > this.form.expires) {
-				return style.getPropertyValue('--color-error').slice(-6)
-			}
-			return style.getPropertyValue('--color-success').slice(-6)
-		},
-
 		icon() {
 			if (this.loading) {
 				return 'icon-loading-small'
