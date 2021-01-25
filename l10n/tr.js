@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonim yanıt",
+    "User display name" : "Görüntülenecek kullanıcı adı",
+    "Timestamp" : "Zaman damgası",
+    "Anonymous user" : "Anonim kullanıcı",
     "responses" : "yanıtlar",
     "Forms" : "Formlar",
     "Shared by %s" : "%s tarafından paylaşıldı",
