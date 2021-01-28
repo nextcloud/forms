@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anoniem antwoord",
+    "User display name" : "Weergavenaam gebruiker",
+    "Timestamp" : "Tiijdstempel",
+    "Anonymous user" : "Anonieme gebruiker",
     "responses" : "reacties",
     "Forms" : "Formulieren",
     "Shared by %s" : "Gedeeld door %s",
