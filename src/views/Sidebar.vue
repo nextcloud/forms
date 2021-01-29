@@ -163,11 +163,11 @@ export default {
 
 	computed: {
 		shareLink() {
-		  if (isPublic) {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
-		  } else {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/login?redirect_url=/apps/forms/${this.form.hash}`)
-		  }
+		    if (this.form.isPublic()) {
+				return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+		    } else {
+				return window.location.protocol + '//' + window.location.host + generateUrl(`/login?redirect_url=/apps/forms/${this.form.hash}`)
+		    }
 		},
 
 		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.
