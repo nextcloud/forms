@@ -163,7 +163,7 @@ export default {
 
 	computed: {
 		shareLink() {
-		    if (this.form.isPublic()) {
+		    if (this.isPublic) {
 				return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
 		    } else {
 				return window.location.protocol + '//' + window.location.host + generateUrl(`/login?redirect_url=/apps/forms/${this.form.hash}`)
