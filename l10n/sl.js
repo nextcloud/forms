@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonimni odziv",
+    "User display name" : "Prikazno ime uporabnika",
+    "Timestamp" : "Časovni žig",
+    "Anonymous user" : "Brezimni uporabnik",
     "responses" : "odzivi",
     "Forms" : "Vprašalniki",
     "Shared by %s" : "Objavo omogoča %s",
