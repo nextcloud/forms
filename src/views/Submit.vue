@@ -21,56 +21,54 @@
  -->
 
 <template>
-	<Content app-name="forms">
-		<AppContent>
-			<!-- Forms title & description-->
-			<header>
-				<h2 class="form-title">
-					{{ formTitle }}
-				</h2>
-				<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
-				<!-- eslint-disable-next-line -->
-				<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
-				<!-- Generate form information message-->
-				<p class="info-message" v-text="infoMessage" />
-			</header>
+	<AppContent>
+		<!-- Forms title & description-->
+		<header>
+			<h2 class="form-title">
+				{{ formTitle }}
+			</h2>
+			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
+			<!-- eslint-disable-next-line -->
+			<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
+			<!-- Generate form information message-->
+			<p class="info-message" v-text="infoMessage" />
+		</header>
 
-			<!-- Questions list -->
-			<form v-if="!loading && !success"
-				ref="form"
-				@submit.prevent="onSubmit">
-				<ul>
-					<Questions
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in validQuestions"
-						ref="questions"
-						:key="question.id"
-						:read-only="true"
-						:answer-type="answerTypes[question.type]"
-						:index="index + 1"
-						:max-string-lengths="maxStringLengths"
-						v-bind="question"
-						:values.sync="answers[question.id]"
-						@keydown.enter="onKeydownEnter"
-						@keydown.ctrl.enter="onKeydownCtrlEnter" />
-				</ul>
-				<input ref="submitButton"
-					class="primary"
-					type="submit"
-					:value="t('forms', 'Submit')"
-					:disabled="loading"
-					:aria-label="t('forms', 'Submit form')">
-			</form>
+		<!-- Questions list -->
+		<form v-if="!loading && !success"
+			ref="form"
+			@submit.prevent="onSubmit">
+			<ul>
+				<Questions
+					:is="answerTypes[question.type].component"
+					v-for="(question, index) in validQuestions"
+					ref="questions"
+					:key="question.id"
+					:read-only="true"
+					:answer-type="answerTypes[question.type]"
+					:index="index + 1"
+					:max-string-lengths="maxStringLengths"
+					v-bind="question"
+					:values.sync="answers[question.id]"
+					@keydown.enter="onKeydownEnter"
+					@keydown.ctrl.enter="onKeydownCtrlEnter" />
+			</ul>
+			<input ref="submitButton"
+				class="primary"
+				type="submit"
+				:value="t('forms', 'Submit')"
+				:disabled="loading"
+				:aria-label="t('forms', 'Submit form')">
+		</form>
 
-			<EmptyContent v-else-if="loading" icon="icon-loading">
-				{{ t('forms', 'Submitting form …') }}
-			</EmptyContent>
+		<EmptyContent v-else-if="loading" icon="icon-loading">
+			{{ t('forms', 'Submitting form …') }}
+		</EmptyContent>
 
-			<EmptyContent v-else-if="success" icon="icon-checkmark">
-				{{ t('forms', 'Thank you for completing the form!') }}
-			</EmptyContent>
-		</AppContent>
-	</Content>
+		<EmptyContent v-else-if="success" icon="icon-checkmark">
+			{{ t('forms', 'Thank you for completing the form!') }}
+		</EmptyContent>
+	</AppContent>
 </template>
 
 <script>
@@ -79,7 +77,6 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
-import Content from '@nextcloud/vue/dist/Components/Content'
 
 import answerTypes from '../models/AnswerTypes'
 
@@ -89,13 +86,13 @@ import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionShort from '../components/Questions/QuestionShort'
 import QuestionMultiple from '../components/Questions/QuestionMultiple'
 import SetWindowTitle from '../utils/SetWindowTitle'
+import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
 	name: 'Submit',
 
 	components: {
 		AppContent,
-		Content,
 		EmptyContent,
 		Question,
 		QuestionLong,
@@ -103,9 +100,10 @@ export default {
 		QuestionMultiple,
 	},
 
+	mixins: [ViewsMixin],
+
 	data() {
 		return {
-			form: loadState('forms', 'form'),
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			answerTypes,
 			answers: {},
