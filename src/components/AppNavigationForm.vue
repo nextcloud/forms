@@ -27,7 +27,7 @@
 		:title="formTitle"
 		:to="{ name: 'formRoot', params: { hash: form.hash } }"
 		@click="mobileCloseNavigation">
-		<template v-if="!loading" #actions>
+		<template v-if="!loading && !readOnly" #actions>
 			<ActionLink
 				:href="formLink"
 				:icon="copied && copySuccess ? 'icon-checkmark-color' : 'icon-clippy'"
@@ -83,6 +83,10 @@ export default {
 		form: {
 			type: Object,
 			required: true,
+		},
+		readOnly: {
+			type: Boolean,
+			default: true,
 		},
 	},
 

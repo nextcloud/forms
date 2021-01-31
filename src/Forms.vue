@@ -26,12 +26,23 @@
 		<AppNavigation>
 			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
 			<template #list>
+				<!-- Form-Owner-->
+				<AppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
 				<AppNavigationForm v-for="form in forms"
 					:key="form.id"
 					:form="form"
+					:read-only="false"
 					@mobile-close-navigation="mobileCloseNavigation"
 					@clone="onCloneForm"
 					@delete="onDeleteForm" />
+
+				<!-- Shared Forms-->
+				<AppNavigationCaption v-if="!noSharedForms" :title="t('forms', 'Shared with you')" />
+				<AppNavigationForm v-for="form in sharedForms"
+					:key="form.id"
+					:form="form"
+					:read-only="true"
+					@mobile-close-navigation="mobileCloseNavigation" />
 			</template>
 		</AppNavigation>
 
@@ -80,6 +91,7 @@ import axios from '@nextcloud/axios'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
+import AppNavigationCaption from '@nextcloud/vue/dist/Components/AppNavigationCaption'
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Content from '@nextcloud/vue/dist/Components/Content'
 import isMobile from '@nextcloud/vue/src/mixins/isMobile'
@@ -95,6 +107,7 @@ export default {
 		AppNavigationForm,
 		AppContent,
 		AppNavigation,
+		AppNavigationCaption,
 		AppNavigationNew,
 		Content,
 		EmptyContent,
@@ -107,12 +120,19 @@ export default {
 			loading: true,
 			sidebarOpened: false,
 			forms: [],
+			sharedForms: [],
 		}
 	},
 
 	computed: {
 		noForms() {
-			return this.forms && this.forms.length === 0
+			return this.noOwnedForms && this.noSharedForms
+		},
+		noOwnedForms() {
+			return this.forms?.length === 0
+		},
+		noSharedForms() {
+			return this.sharedForms?.length === 0
 		},
 
 		routeHash() {
@@ -121,12 +141,19 @@ export default {
 
 		selectedForm: {
 			get() {
-				return this.forms.find(form => form.hash === this.routeHash)
+				return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
 			},
 			set(form) {
-				const index = this.forms.findIndex(search => search.hash === this.routeHash)
+				// If a owned form
+				let index = this.forms.findIndex(search => search.hash === this.routeHash)
 				if (index > -1) {
 					this.$set(this.forms, index, form)
+					return
+				}
+				// Otherwise a shared form
+				index = this.sharedForms.findIndex(search => search.hash === this.routeHash)
+				if (index > -1) {
+					this.$set(this.sharedForms, index, form)
 				}
 			},
 		},
@@ -151,15 +178,26 @@ export default {
 		 */
 		async loadForms() {
 			this.loading = true
+
+			// Load Owned forms
 			try {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + 'forms')
 				this.forms = OcsResponse2Data(response)
 			} catch (error) {
 				showError(t('forms', 'An error occurred while loading the forms list'))
 				console.error(error)
-			} finally {
-				this.loading = false
 			}
+
+			// Load shared forms
+			try {
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + 'shared_forms')
+				this.sharedForms = OcsResponse2Data(response)
+			} catch (error) {
+				showError(t('forms', 'An error occurred while loading the forms list'))
+				console.error(error)
+			}
+
+			this.loading = false
 		},
 
 		/**
