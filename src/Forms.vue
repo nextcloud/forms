@@ -47,7 +47,7 @@
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<AppContent v-if="loading || noForms || (!routeHash && $route.name !== 'create')">
+		<AppContent v-if="loading || noForms || !routeHash || !routeAllowed">
 			<EmptyContent v-if="loading" icon="icon-loading">
 				{{ t('forms', 'Loading forms …') }}
 			</EmptyContent>
@@ -139,9 +139,30 @@ export default {
 			return this.$route.params.hash
 		},
 
+		// If the user is allowed to access this route
+		routeAllowed() {
+			// If the form is not within the owned or shared list, the user has no access on internal view.
+			if (this.routeHash && this.forms.concat(this.sharedForms).findIndex(form => form.hash === this.routeHash) < 0) {
+				console.error('Form not found for hash: ', this.routeHash)
+				return false
+			}
+
+			// For Routes edit or results, the form must be in owned forms.
+			if (this.$route.name === 'edit' || this.$route.name === 'results') {
+				if (this.forms.findIndex(form => form.hash === this.routeHash) < 0) {
+					return false
+				}
+			}
+
+			return true
+		},
+
 		selectedForm: {
 			get() {
-				return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
+				if (this.routeAllowed) {
+					return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
+				}
+				return {}
 			},
 			set(form) {
 				// If a owned form

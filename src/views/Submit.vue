@@ -40,8 +40,15 @@
 			<p class="info-message" v-text="infoMessage" />
 		</header>
 
+		<EmptyContent v-if="loading" icon="icon-loading">
+			{{ t('forms', 'Submitting form …') }}
+		</EmptyContent>
+		<EmptyContent v-else-if="success || !form.canSubmit" icon="icon-checkmark">
+			{{ t('forms', 'Thank you for completing the form!') }}
+		</EmptyContent>
+
 		<!-- Questions list -->
-		<form v-if="!loading && !success"
+		<form v-else
 			ref="form"
 			@submit.prevent="onSubmit">
 			<ul>
@@ -66,14 +73,6 @@
 				:disabled="loading"
 				:aria-label="t('forms', 'Submit form')">
 		</form>
-
-		<EmptyContent v-else-if="loading" icon="icon-loading">
-			{{ t('forms', 'Submitting form …') }}
-		</EmptyContent>
-
-		<EmptyContent v-else-if="success" icon="icon-checkmark">
-			{{ t('forms', 'Thank you for completing the form!') }}
-		</EmptyContent>
 	</AppContent>
 </template>
 
@@ -170,6 +169,7 @@ export default {
 				console.error('Hash changed on public View. Aborting.')
 				return
 			}
+			this.resetData()
 			// Fetch full form on change
 			this.fetchFullForm(this.form.id)
 			SetWindowTitle(this.formTitle)
@@ -227,6 +227,15 @@ export default {
 			} finally {
 				this.loading = false
 			}
+		},
+
+		/**
+		 * Reset View-Data
+		 */
+		resetData() {
+			this.answers = {}
+			this.loading = false
+			this.success = false
 		},
 	},
 

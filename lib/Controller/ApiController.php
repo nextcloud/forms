@@ -947,8 +947,8 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Not allowed to access this form');
 		}
 
-		// Not allowed if form expired. Expires is '0' if the form does not expire.
-		if ($form->getExpires() && $form->getExpires() < time()) {
+		// Not allowed if form has expired.
+		if ($this->formsService->hasFormExpired($form->getId())) {
 			throw new OCSForbiddenException('This form is no longer taking answers');
 		}
 

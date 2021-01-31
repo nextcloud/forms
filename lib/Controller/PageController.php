@@ -34,12 +34,15 @@ use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http\Template\PublicTemplateResponse;
+use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\AppFramework\Http\RedirectResponse;
 use OCP\IGroupManager;
 use OCP\IInitialStateService;
 use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IRequest;
+use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -74,6 +77,9 @@ class PageController extends Controller {
 	/** @var ILogger */
 	private $logger;
 
+	/** @var IUrlGenerator */
+	private $urlGenerator;
+
 	/** @var IUserManager */
 	private $userManager;
 	
@@ -101,6 +107,7 @@ class PageController extends Controller {
 								IInitialStateService $initialStateService,
 								IL10N $l10n,
 								ILogger $logger,
+								IUrlGenerator $urlGenerator,
 								IUserManager $userManager,
 								IUserSession $userSession) {
 		parent::__construct($appName, $request);
@@ -115,6 +122,7 @@ class PageController extends Controller {
 		$this->initialStateService = $initialStateService;
 		$this->l10n = $l10n;
 		$this->logger = $logger;
+		$this->urlGenerator = $urlGenerator;
 		$this->userManager = $userManager;
 		$this->userSession = $userSession;
 	}
@@ -137,9 +145,9 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 * @PublicPage
 	 * @param string $hash
-	 * @return TemplateResponse
+	 * @return RedirectResponse|TemplateResponse Redirect for logged-in users, public template otherwise.
 	 */
-	public function gotoForm($hash): ?TemplateResponse {
+	public function gotoForm(string $hash): Response {
 		// Inject style on all templates
 		Util::addStyle($this->appName, 'forms');
 
@@ -149,18 +157,21 @@ class PageController extends Controller {
 			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
 		}
 
-		// Does the user have access to form
-		if (!$this->formsService->hasUserAccess($form->getId())) {
-			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
-		}
+		// If not link-shared, redirect to internal route
+		if ($form->getAccess()['type'] !== 'public') {
+			$internalLink = $this->urlGenerator->linkToRoute('forms.page.index', ['hash' => $hash, 'action' => 'submit']);
 
-		// Does the user have permissions to submit (resp. submitOnce)
-		if (!$this->formsService->canSubmit($form->getId())) {
-			return $this->provideTemplate(self::TEMPLATE_NOSUBMIT, $form);
+			if ($this->userSession->isLoggedIn()) {
+				// Directly internal view
+				return new RedirectResponse($internalLink);
+			} else {
+				// Internal through login
+				return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', ['redirect_url' => $internalLink]));
+			}
 		}
 
 		// Has form expired
-		if ($form->getExpires() !== 0 && time() > $form->getExpires()) {
+		if ($this->formsService->hasFormExpired($form->getId())) {
 			return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);
 		}
 

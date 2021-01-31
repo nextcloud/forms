@@ -75,7 +75,8 @@ See above, 'List owned forms'
   "expires": null,
   "isAnonymous": null,
   "submitOnce": true,
-  "questions": []
+  "questions": [],
+  "canSubmit": true
 }
 ```
 
