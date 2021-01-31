@@ -29,6 +29,7 @@ import { generateUrl } from '@nextcloud/router'
 import Create from './views/Create'
 import Results from './views/Results'
 import Sidebar from './views/Sidebar'
+import Submit from './views/Submit'
 
 Vue.use(Router)
 
@@ -64,6 +65,12 @@ export default new Router({
 			path: '/:hash/results',
 			component: Results,
 			name: 'results',
+			props: true,
+		},
+		{
+			path: '/:hash/submit',
+			component: Submit,
+			name: 'submit',
 			props: true,
 		},
 	],

@@ -22,7 +22,9 @@
 
 <template>
 	<Content app-name="forms">
-		<Submit :form="form" />
+		<Submit
+			:form="form"
+			:public-view="true" />
 	</Content>
 </template>
 

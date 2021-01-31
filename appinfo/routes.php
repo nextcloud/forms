@@ -28,10 +28,9 @@ return [
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 
 		// Before /{hash} to avoid conflict
-		['name' => 'page#index', 'url' => '/new', 'verb' => 'GET', 'postfix' => 'create'],
 		['name' => 'page#index', 'url' => '/{hash}/edit', 'verb' => 'GET', 'postfix' => 'edit'],
-		['name' => 'page#index', 'url' => '/{hash}/clone', 'verb' => 'GET', 'postfix' => 'clone'],
 		['name' => 'page#index', 'url' => '/{hash}/results', 'verb' => 'GET', 'postfix' => 'results'],
+		['name' => 'page#index', 'url' => '/{hash}/submit', 'verb' => 'GET', 'postfix' => 'submit'],
 
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
 	],
