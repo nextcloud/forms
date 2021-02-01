@@ -66,7 +66,7 @@ OC.L10N.register(
     "Export to CSV" : "Eksportuj do CSV",
     "Delete all responses" : "Usuń wszystkie odpowiedzi",
     "No responses yet" : "Brak odpowiedzi",
-    "Results of submitted forms will show up here" : "Wyniki przesłanych formularzy pojawią się tutaj",
+    "Results of submitted forms will show up here" : "Wyniki wysłanych formularzy pojawią się tutaj",
     "There was an error while loading the results" : "Wystąpił błąd podczas ładowania wyników",
     "There was an error while removing this response" : "Wystąpił błąd podczas usuwania tej odpowiedzi",
     "Are you sure you want to delete all responses of {title}?" : "Czy na pewno chcesz usunąć wszystkie odpowiedzi z {title}?",
