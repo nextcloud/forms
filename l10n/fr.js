@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Réponse anonyme",
+    "User display name" : "Nom d'affichage de l'utilisateur",
+    "Timestamp" : "Horodatage",
+    "Anonymous user" : "Utilisateur anonyme",
     "responses" : "réponses",
     "Forms" : "Formulaires",
     "Shared by %s" : "Partagé par %s",
@@ -104,6 +107,7 @@ OC.L10N.register(
     "People can enter a long text" : "Les répondants peuvent saisir une réponse détaillée",
     "Enter a long text" : "Saisissez une réponse détaillée",
     "Date" : "Date",
+    "Date question title" : "Date titre de la question",
     "People can pick a date" : "Les personnes peuvent choisir une date",
     "Pick a date" : "Sélectionnez une date",
     "Datetime" : "Date et heure",
