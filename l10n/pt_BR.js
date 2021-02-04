@@ -2,6 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Resposta anônima",
+    "User display name" : "Nome de exibição do usuário ",
+    "Timestamp" : "Registro de Tempo ",
     "Anonymous user" : "Usuário anônimo",
     "responses" : "respostas",
     "Forms" : "Formulários",
