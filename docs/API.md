@@ -387,7 +387,7 @@ Get all Submissions to a Form
 }
 ```
 
-### Export Submissions to csv
+### Get Submissions as csv (Download)
 Returns all submissions to the form in form of a csv-file.
 - Endpoint: `/api/v1/submissions/export/{hash}`
 - Url-Parameter:
@@ -400,6 +400,20 @@ Returns all submissions to the form in form of a csv-file.
 "User display name",Timestamp,"Question 1","Question 2"
 jonas,"Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2",Answer
 jonas,"Friday, January 22, 2021 at 12:45:57 AM GMT+0:00","Option 3",NextAnswer
+```
+
+### Export Submissions to Cloud (Files-App)
+Creates a csv file and stores it to the cloud, resp. Files-App.
+- Endpoint: `/api/v1/submissions/export`
+- Method: `POST`
+- Parameters:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _hash_    | String  | Hash of the form to get the submissions for |
+  | _path_    | String  | Path within User-Dir, to store the file to |
+- Response: Stores the file to the given path and returns the fileName.
+```
+"data": "Form 2 (responses).csv"
 ```
 
 ### Delete Submissions

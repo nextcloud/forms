@@ -50,7 +50,9 @@ use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\Files\NotPermittedException;
 use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IRequest;
@@ -1068,5 +1070,42 @@ class ApiController extends OCSController {
 
 		$csv = $this->submissionService->getSubmissionsCsv($hash);
 		return new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv');
+	}
+
+	/**
+	 * Export Submissions to the Cloud
+	 * @param string $hash of the form
+	 * @param string $path The Cloud-Path to export to
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportSubmissionsToCloud(string $hash, string $path) {
+		$this->logger->debug('Export submissions for form: {hash} to Cloud at: /{path}', [
+			'hash' => $hash,
+			'path' => $path,
+		]);
+
+		try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		// Write file to cloud
+		try {
+			$fileName = $this->submissionService->writeCsvToCloud($hash, $path);
+		} catch (NotPermittedException $e) {
+			$this->logger->debug('Failed to export Submissions: Not allowed to write to file');
+			throw new OCSException('Not allowed to write to file.');
+		}
+
+		return new DataResponse($fileName);
 	}
 }

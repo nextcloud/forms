@@ -32,6 +32,9 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 
+use OCP\Files\File;
+use OCP\Files\IRootFolder;
+use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
@@ -57,6 +60,9 @@ class SubmissionService {
 	/** @var AnswerMapper */
 	private $answerMapper;
 
+	/** @var IRootFolder */
+	private $storage;
+
 	/** @var IConfig */
 	private $config;
 
@@ -76,6 +82,7 @@ class SubmissionService {
 								QuestionMapper $questionMapper,
 								SubmissionMapper $submissionMapper,
 								AnswerMapper $answerMapper,
+								IRootFolder $storage,
 								IConfig $config,
 								IDateTimeFormatter $dateTimeFormatter,
 								IL10N $l10n,
@@ -86,6 +93,7 @@ class SubmissionService {
 		$this->questionMapper = $questionMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->answerMapper = $answerMapper;
+		$this->storage = $storage;
 		$this->config = $config;
 		$this->dateTimeFormatter = $dateTimeFormatter;
 		$this->l10n = $l10n;
@@ -95,6 +103,40 @@ class SubmissionService {
 		$this->currentUser = $userSession->getUser();
 	}
 
+	/**
+	 * Export Submissions to Cloud-Filesystem
+	 * @param string $hash of the form
+	 * @param string $path The Cloud-Path to export to
+	 * @return string The written fileName
+	 * @throws NotPermittedException
+	 */
+	public function writeCsvToCloud(string $hash, string $path): string {
+		$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
+
+		// Get Data
+		$csvData = $this->getSubmissionsCsv($hash);
+
+		// If chosen path is a file, get folder, if file is csv, use filename.
+		if ($node instanceof File) {
+			if ($node->getExtension() === 'csv') {
+				$csvData['fileName'] = $node->getName();
+			}
+			$node = $node->getParent();
+		}
+
+		// check if file exists, create otherwise.
+		try {
+			$file = $node->get($csvData['fileName']);
+		} catch (\OCP\Files\NotFoundException $e) {
+			$node->newFile($csvData['fileName']);
+			$file = $node->get($csvData['fileName']);
+		}
+
+		// Write the data to file
+		$file->putContent($csvData['data']);
+
+		return $csvData['fileName'];
+	}
 
 	/**
 	 * Create CSV from Submissions to form
