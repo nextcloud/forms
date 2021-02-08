@@ -21,7 +21,7 @@ OC.L10N.register(
     "Responses" : "回應",
     "Clone form" : "複製表格",
     "Delete form" : "刪除表格",
-    "Form link copied" : "已複製表格鏈接",
+    "Form link copied" : "已複製表格連結",
     "Cannot copy, please copy the link manually" : "無法複製，請手動複製連結",
     "Copy share link" : "複製分享連結",
     "Are you sure you want to delete {title}?" : "您確定您想要刪除 {title} 嗎？",
