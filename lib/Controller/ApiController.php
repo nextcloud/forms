@@ -27,7 +27,6 @@
 
 namespace OCA\Forms\Controller;
 
-use DateTimeZone;
 use Exception;
 
 use OCA\Forms\Activity\ActivityManager;
@@ -43,6 +42,7 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Service\SubmissionService;
 
 use OCP\AppFramework\OCSController;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -51,8 +51,6 @@ use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
-use OCP\IConfig;
-use OCP\IDateTimeFormatter;
 use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IRequest;
@@ -60,10 +58,6 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
-
-use League\Csv\EscapeFormula;
-use League\Csv\Reader;
-use League\Csv\Writer;
 
 class ApiController extends OCSController {
 	protected $appName;
@@ -89,11 +83,8 @@ class ApiController extends OCSController {
 	/** @var FormsService */
 	private $formsService;
 
-	/** @var IConfig */
-	private $config;
-
-	/** @var IDateTimeFormatter */
-	private $dateTimeFormatter;
+	/** @var SubmissionService */
+	private $submissionService;
 
 	/** @var IL10N */
 	private $l10n;
@@ -118,8 +109,7 @@ class ApiController extends OCSController {
 								QuestionMapper $questionMapper,
 								SubmissionMapper $submissionMapper,
 								FormsService $formsService,
-								IConfig $config,
-								IDateTimeFormatter $dateTimeFormatter,
+								SubmissionService $submissionService,
 								IL10N $l10n,
 								ILogger $logger,
 								IRequest $request,
@@ -135,9 +125,8 @@ class ApiController extends OCSController {
 		$this->questionMapper = $questionMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->formsService = $formsService;
+		$this->submissionService = $submissionService;
 
-		$this->config = $config;
-		$this->dateTimeFormatter = $dateTimeFormatter;
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
@@ -1077,82 +1066,7 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		try {
-			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
-		} catch (DoesNotExistException $e) {
-			// Just ignore, if no Data. Returns empty Submissions-Array
-		}
-
-		$questions = $this->questionMapper->findByForm($form->getId());
-		$defaultTimeZone = date_default_timezone_get();
-		$userTimezone = $this->config->getUserValue('core', 'timezone', $this->currentUser->getUID(), $defaultTimeZone);
-
-		// Process initial header
-		$header = [];
-		$header[] = $this->l10n->t('User display name');
-		$header[] = $this->l10n->t('Timestamp');
-		foreach ($questions as $question) {
-			$header[] = $question->getText();
-		}
-
-		// Init dataset
-		$data = [];
-
-		// Process each answers
-		foreach ($submissionEntities as $submission) {
-			$row = [];
-
-			// User
-			$user = $this->userManager->get($submission->getUserId());
-			if ($user === null) {
-				$row[] = $this->l10n->t('Anonymous user');
-			} else {
-				$row[] = $user->getDisplayName();
-			}
-			
-			// Date
-			$row[] = $this->dateTimeFormatter->formatDateTime($submission->getTimestamp(), 'full', 'full', new DateTimeZone($userTimezone), $this->l10n);
-
-			// Answers, make sure we keep the question order
-			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function (array $carry, Answer $answer) {
-				$carry[$answer->getQuestionId()] = $answer->getText();
-				return $carry;
-			}, []);
-
-			foreach ($questions as $question) {
-				$row[] = key_exists($question->getId(), $answers)
-					? $answers[$question->getId()]
-					: null;
-			}
-
-			$data[] = $row;
-		}
-
-		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').csv';
-		return new DataDownloadResponse($this->array2csv($header, $data), $fileName, 'text/csv');
-	}
-
-	/**
-	 * Convert an array to a csv string
-	 * @param array $array
-	 * @return string
-	 */
-	private function array2csv(array $header, array $records): string {
-		if (empty($header) && empty($records)) {
-			return '';
-		}
-
-		// load the CSV document from a string
-		$csv = Writer::createFromString('');
-		$csv->setOutputBOM(Reader::BOM_UTF8);
-		$csv->addFormatter(new EscapeFormula());
-
-		// insert the header
-		$csv->insertOne($header);
-
-		// insert all the records
-		$csv->insertAll($records);
-
-		return $csv->getContent();
+		$csv = $this->submissionService->getSubmissionsCsv($hash);
+		return new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv');
 	}
 }
