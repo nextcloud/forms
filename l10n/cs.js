@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anonymní odpověď",
+    "User display name" : "Zobrazované jměno uživatele",
+    "Timestamp" : "Časové razítko",
+    "Anonymous user" : "Anonymní uživatel",
     "responses" : "odpovědi",
     "Forms" : "Formuláře",
     "Shared by %s" : "Sdílí %s",
