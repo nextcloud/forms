@@ -397,9 +397,9 @@ Returns all submissions to the form in form of a csv-file.
 - Method: `GET`
 - Response: A Data Download Response containg the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv.
 ```
-"User display name",Timestamp,"Question 1","Question 2"
-jonas,"Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2",Answer
-jonas,"Friday, January 22, 2021 at 12:45:57 AM GMT+0:00","Option 3",NextAnswer
+"User display name","Timestamp","Question 1","Question 2"
+"jonas","Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2","Answer"
+"jonas","Friday, January 22, 2021 at 12:45:57 AM GMT+0:00","Option 3","NextAnswer"
 ```
 
 ### Export Submissions to Cloud (Files-App)

@@ -42,6 +42,7 @@ use OCP\ILogger;
 use OCP\IUserManager;
 use OCP\IUserSession;
 
+use League\Csv\EncloseField;
 use League\Csv\EscapeFormula;
 use League\Csv\Reader;
 use League\Csv\Writer;
@@ -219,6 +220,7 @@ class SubmissionService {
 		$csv = Writer::createFromString('');
 		$csv->setOutputBOM(Reader::BOM_UTF8);
 		$csv->addFormatter(new EscapeFormula());
+		EncloseField::addTo($csv, "\t\x1f");
 
 		// insert the header
 		$csv->insertOne($header);
