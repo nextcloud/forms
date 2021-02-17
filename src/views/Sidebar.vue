@@ -126,9 +126,7 @@
 </template>
 
 <script>
-import { generateUrl } from '@nextcloud/router'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { showError, showSuccess } from '@nextcloud/dialogs'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
@@ -162,10 +160,6 @@ export default {
 	},
 
 	computed: {
-		shareLink() {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
-		},
-
 		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.
 		submitMultiple: {
 			get() {
@@ -297,16 +291,6 @@ export default {
 		 */
 		notBeforeNow(datetime) {
 			return datetime < moment().add(1, 'hour').toDate()
-		},
-
-		copyShareLink(event) {
-			if (this.$clipboard(this.shareLink)) {
-				showSuccess(t('forms', 'Form link copied'))
-			} else {
-				showError(t('forms', 'Cannot copy, please copy the link manually'))
-			}
-			// Set back focus as clipboard removes focus
-			event.target.focus()
 		},
 	},
 }

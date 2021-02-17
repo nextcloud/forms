@@ -32,14 +32,22 @@
 	<AppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
-			<button @click="showResults">
-				<span class="icon-comment" role="img" />
-				{{ t('forms', 'Responses') }}
-			</button>
-			<button v-tooltip="t('forms', 'Toggle settings')"
-				@click="toggleSidebar">
-				<span class="icon-menu-sidebar" role="img" />
-			</button>
+			<template #default>
+				<button @click="showResults">
+					<span class="icon-comment" role="img" />
+					{{ t('forms', 'Responses') }}
+				</button>
+				<button @click="copyShareLink">
+					<span class="icon-clippy" role="img" />
+					{{ t('forms', 'Share link') }}
+				</button>
+			</template>
+			<template #small>
+				<button v-tooltip="t('forms', 'Toggle settings')"
+					@click="toggleSidebar">
+					<span class="icon-menu-sidebar" role="img" />
+				</button>
+			</template>
 		</TopBar>
 
 		<!-- Forms title & description-->

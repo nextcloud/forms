@@ -35,6 +35,10 @@
 				<span class="icon-forms" role="img" />
 				{{ t('forms', 'Back to questions') }}
 			</button>
+			<button v-if="!noSubmissions" @click="copyShareLink">
+				<span class="icon-clippy" role="img" />
+				{{ t('forms', 'Share link') }}
+			</button>
 		</TopBar>
 
 		<header v-if="!noSubmissions">
@@ -117,15 +121,13 @@
 </template>
 
 <script>
-import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { generateOcsUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
-import Clipboard from 'v-clipboard'
-import Vue from 'vue'
 
 import EmptyContent from '../components/EmptyContent'
 import Summary from '../components/Results/Summary'
@@ -134,8 +136,6 @@ import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 import SetWindowTitle from '../utils/SetWindowTitle'
 import OcsResponse2Data from '../utils/OcsResponse2Data'
-
-Vue.use(Clipboard)
 
 export default {
 	name: 'Results',
@@ -205,17 +205,6 @@ export default {
 					hash: this.form.hash,
 				},
 			})
-		},
-
-		copyShareLink(event) {
-			const $formLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
-			if (this.$clipboard($formLink)) {
-				showSuccess(t('forms', 'Form link copied'))
-			} else {
-				showError(t('forms', 'Cannot copy, please copy the link manually'))
-			}
-			// Set back focus as clipboard removes focus
-			event.target.focus()
 		},
 
 		async loadFormResults() {
