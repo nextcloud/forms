@@ -895,7 +895,7 @@ class ApiController extends Controller {
 		}
 
 		// Delete submission (incl. Answers)
-		$this->submissionMapper->delete($submission);
+		$this->submissionMapper->deleteById($id);
 
 		return new DataResponse($id);
 	}

@@ -107,6 +107,27 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
+	 * Delete the Submission, including answers.
+	 * @param int $id of the submission to delete
+	 */
+	public function deleteById(int $id): void {
+		$qb = $this->db->getQueryBuilder();
+
+		// First delete corresponding answers.
+		$submissionEntity = $this->findById($id);
+		$this->answerMapper->deleteBySubmission($submissionEntity->getId());
+
+		//Delete Submission
+		$qb->delete($this->getTableName())
+		->where(
+			$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+		);
+
+		$qb->execute();
+	}
+
+	/**
+	 * Delete all Submissions corresponding to form, including answers.
 	 * @param int $formId
 	 */
 	public function deleteByForm(int $formId): void {
