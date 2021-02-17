@@ -42,7 +42,7 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\FormsService;
 
-use OCP\AppFramework\Controller;
+use OCP\AppFramework\OCSController;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
@@ -63,7 +63,7 @@ use League\Csv\EscapeFormula;
 use League\Csv\Reader;
 use League\Csv\Writer;
 
-class ApiController extends Controller {
+class ApiController extends OCSController {
 	protected $appName;
 
 	/** @var SubmissionMapper */

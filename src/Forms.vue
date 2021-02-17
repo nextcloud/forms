@@ -82,6 +82,7 @@ import isMobile from '@nextcloud/vue/src/mixins/isMobile'
 
 import AppNavigationForm from './components/AppNavigationForm'
 import EmptyContent from './components/EmptyContent'
+import OcsResponse2Data from './utils/OcsResponse2Data'
 
 export default {
 	name: 'Forms',
@@ -147,7 +148,7 @@ export default {
 			this.loading = true
 			try {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + 'forms')
-				this.forms = response.data
+				this.forms = OcsResponse2Data(response)
 			} catch (error) {
 				showError(t('forms', 'An error occurred while loading the forms list'))
 				console.error(error)
@@ -163,7 +164,7 @@ export default {
 			try {
 				// Request a new empty form
 				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'form')
-				const newForm = response.data
+				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
 				this.mobileCloseNavigation()

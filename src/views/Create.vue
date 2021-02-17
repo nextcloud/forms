@@ -140,6 +140,7 @@ import QuestionShort from '../components/Questions/QuestionShort'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 import SetWindowTitle from '../utils/SetWindowTitle'
+import OcsResponse2Data from '../utils/OcsResponse2Data'
 
 window.axios = axios
 
@@ -257,8 +258,8 @@ export default {
 			this.cancelFetchFullForm = cancel
 
 			try {
-				const form = await request(generateOcsUrl('apps/forms/api/v1', 2) + `form/${id}`)
-				this.$emit('update:form', form.data)
+				const response = await request(generateOcsUrl('apps/forms/api/v1', 2) + `form/${id}`)
+				this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
 			} catch (error) {
 				if (axios.isCancel(error)) {
@@ -309,7 +310,7 @@ export default {
 					type,
 					text,
 				})
-				const question = response.data
+				const question = OcsResponse2Data(response)
 
 				// Add newly created question
 				this.form.questions.push(Object.assign({
