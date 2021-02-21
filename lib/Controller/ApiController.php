@@ -30,6 +30,7 @@ namespace OCA\Forms\Controller;
 use DateTimeZone;
 use Exception;
 
+use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
@@ -67,26 +68,38 @@ use League\Csv\Writer;
 class ApiController extends OCSController {
 	protected $appName;
 
-	/** @var SubmissionMapper */
-	private $submissionMapper;
-
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var QuestionMapper */
-	private $questionMapper;
-
-	/** @var OptionMapper */
-	private $optionMapper;
+	/** @var ActivityManager */
+	private $activityManager;
 
 	/** @var AnswerMapper */
 	private $answerMapper;
 
-	/** @var ILogger */
-	private $logger;
+	/** @var FormMapper */
+	private $formMapper;
+
+	/** @var OptionMapper */
+	private $optionMapper;
+
+	/** @var QuestionMapper */
+	private $questionMapper;
+
+	/** @var SubmissionMapper */
+	private $submissionMapper;
+
+	/** @var FormsService */
+	private $formsService;
+
+	/** @var IConfig */
+	private $config;
+
+	/** @var IDateTimeFormatter */
+	private $dateTimeFormatter;
 
 	/** @var IL10N */
 	private $l10n;
+
+	/** @var ILogger */
+	private $logger;
 
 	/** @var IUser */
 	private $currentUser;
@@ -94,49 +107,41 @@ class ApiController extends OCSController {
 	/** @var IUserManager */
 	private $userManager;
 
-	/** @var FormsService */
-	private $formsService;
-
 	/** @var ISecureRandom */
 	private $secureRandom;
 
-	/** @var IDateTimeFormatter */
-	private $dateTimeFormatter;
-
-	/** @var IConfig */
-	private $config;
-
 	public function __construct(string $appName,
-								IRequest $request,
-								IUserSession $userSession,
-								IUserManager $userManager,
-								FormMapper $formMapper,
-								SubmissionMapper $submissionMapper,
+								ActivityManager $activityManager,
 								AnswerMapper $answerMapper,
-								QuestionMapper $questionMapper,
+								FormMapper $formMapper,
 								OptionMapper $optionMapper,
-								ILogger $logger,
-								IL10N $l10n,
+								QuestionMapper $questionMapper,
+								SubmissionMapper $submissionMapper,
 								FormsService $formsService,
-								ISecureRandom $secureRandom,
+								IConfig $config,
 								IDateTimeFormatter $dateTimeFormatter,
-								IConfig $config) {
+								IL10N $l10n,
+								ILogger $logger,
+								IRequest $request,
+								IUserManager $userManager,
+								IUserSession $userSession,
+								ISecureRandom $secureRandom) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
-		$this->userManager = $userManager;
-		$this->formMapper = $formMapper;
-		$this->questionMapper = $questionMapper;
-		$this->optionMapper = $optionMapper;
-		$this->submissionMapper = $submissionMapper;
+		$this->activityManager = $activityManager;
 		$this->answerMapper = $answerMapper;
-		$this->questionMapper = $questionMapper;
+		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;
-		$this->logger = $logger;
-		$this->l10n = $l10n;
+		$this->questionMapper = $questionMapper;
+		$this->submissionMapper = $submissionMapper;
 		$this->formsService = $formsService;
-		$this->secureRandom = $secureRandom;
-		$this->dateTimeFormatter = $dateTimeFormatter;
+
 		$this->config = $config;
+		$this->dateTimeFormatter = $dateTimeFormatter;
+		$this->l10n = $l10n;
+		$this->logger = $logger;
+		$this->userManager = $userManager;
+		$this->secureRandom = $secureRandom;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -333,19 +338,26 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		// Make sure we only store id of shares
-		try {
-			if (array_key_exists('access', $keyValuePairs)) {
+		// Handle access-changes
+		if (array_key_exists('access', $keyValuePairs)) {
+			// Make sure we only store id of shares
+			try {
 				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
 					return $user['shareWith'];
 				}, $keyValuePairs['access']['users']);
 				$keyValuePairs['access']['groups'] = array_map(function (array $group): string {
 					return $group['shareWith'];
 				}, $keyValuePairs['access']['groups']);
+			} catch (Exception $e) {
+				$this->logger->debug('Malformed access');
+				throw new OCSBadRequestException('Malformed access');
 			}
-		} catch (Exception $e) {
-			$this->logger->debug('Malformed access');
-			throw new OCSBadRequestException('Malformed access');
+
+			// For selected sharing, notify users (creates Activity)
+			if ($keyValuePairs['access']['type'] === 'selected') {
+				$oldAccess = $form->getAccess();
+				$this->formsService->notifyNewShares($form, $oldAccess, $keyValuePairs['access']);
+			}
 		}
 
 		// Create FormEntity with given Params & Id.
@@ -963,6 +975,9 @@ class ApiController extends OCSController {
 				$this->answerMapper->insert($answerEntity);
 			}
 		}
+
+		//Create Activity
+		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
 
 		return new DataResponse();
 	}
