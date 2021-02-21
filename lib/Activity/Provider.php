@@ -27,6 +27,7 @@ use Exception;
 
 use OCA\Forms\Db\FormMapper;
 use OCP\Activity\IEvent;
+use OCP\Activity\IEventMerger;
 use OCP\Activity\IProvider;
 use OCP\IGroupManager;
 use OCP\IL10N;
@@ -39,6 +40,9 @@ class Provider implements IProvider {
 
 	/** @var FormMapper */
 	private $formMapper;
+
+	/** @var IEventMerger */
+	private $eventMerger;
 
 	/** @var IGroupManager */
 	private $groupManager;
@@ -57,6 +61,7 @@ class Provider implements IProvider {
 
 	public function __construct(string $appName,
 								FormMapper $formMapper,
+								IEventMerger $eventMerger,
 								IGroupManager $groupManager,
 								IL10N $l10n,
 								ILogger $logger,
@@ -64,6 +69,7 @@ class Provider implements IProvider {
 								IUserManager $userManager) {
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;
+		$this->eventMerger = $eventMerger;
 		$this->groupManager = $groupManager;
 		$this->l10n = $l10n;
 		$this->logger = $logger;
@@ -91,6 +97,11 @@ class Provider implements IProvider {
 		$event->setParsedSubject($this->parseSubjectString($subjectString, $parameters));
 		$event->setRichSubject($subjectString, $parameters);
 		$event->setIcon($this->getEventIcon($event->getSubject()));
+
+		// For Subject NewShare, merge by users
+		if ($event->getSubject() === ActivityConstants::SUBJECT_NEWSUBMISSION) {
+			$event = $this->eventMerger->mergeEvents('user', $event, $previousEvent);
+		}
 
 		return $event;
 	}
