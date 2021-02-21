@@ -37,7 +37,7 @@
 					<span class="icon-comment" role="img" />
 					{{ t('forms', 'Responses') }}
 				</button>
-				<button @click="copyShareLink">
+				<button v-if="!sidebarOpened" @click="copyShareLink">
 					<span class="icon-clippy" role="img" />
 					{{ t('forms', 'Share link') }}
 				</button>
@@ -126,7 +126,6 @@
 </template>
 
 <script>
-import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
@@ -168,6 +167,13 @@ export default {
 	},
 
 	mixins: [ViewsMixin],
+
+	props: {
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
+	},
 
 	data() {
 		return {
@@ -408,7 +414,7 @@ export default {
 			})
 		},
 		toggleSidebar() {
-			emit('toggleSidebar')
+			this.$emit('update:sidebarOpened', !this.sidebarOpened)
 		},
 
 		/**

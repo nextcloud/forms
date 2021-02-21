@@ -126,7 +126,6 @@
 </template>
 
 <script>
-import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
@@ -144,9 +143,15 @@ export default {
 	},
 	mixins: [ViewsMixin],
 
+	props: {
+		opened: {
+			type: Boolean,
+			required: true,
+		},
+	},
+
 	data() {
 		return {
-			opened: false,
 			lang: {
 				placeholder: {
 					date: t('forms', 'Select expiration date'),
@@ -205,24 +210,15 @@ export default {
 		},
 	},
 
-	beforeMount() {
-		// Watch for Sidebar toggle
-		subscribe('toggleSidebar', this.onToggle)
-	},
-
-	beforeDestroy() {
-		unsubscribe('toggleSidebar')
-	},
-
 	methods: {
 		/**
 		 * Sidebar state methods
 		 */
 		onClose() {
-			this.opened = false
+			this.$emit('update:opened', false)
 		},
 		onToggle() {
-			this.opened = !this.opened
+			this.$emit('update:opened', !this.opened)
 		},
 
 		/**
