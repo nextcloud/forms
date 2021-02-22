@@ -23,93 +23,16 @@
 
 namespace OCA\Forms\Activity\Settings;
 
-use OCP\Activity\ISetting;
-use OCP\IL10N;
-
-// TODO Move to extend OCP\Activity\ActivitySettings as soon as NC19 is out of support! Further remove Stream Methods then.
-abstract class FormsActivitySettings implements ISetting {
-	protected $appName;
-
-	/** @var IL10N */
-	protected $l10n;
-
-	public function __construct(string $appName,
-								IL10N $l10n) {
-		$this->appName = $appName;
-		$this->l10n = $l10n;
+/** TODO
+ * Move to only have the new version, as soon as Forms minversion is set to NC20
+ * - Just rename FormsActivitySettings20 to FormsActivitySettings
+ * - Delete this file and FormsActivitySettingsLegacy
+ */
+$version = \OCP\Util::getVersion()[0];
+if ($version >= 20) {
+	abstract class FormsActivitySettings extends FormsActivitySettings20 {
 	}
-
-	/**
-	 * Settings Group ID
-	 * @return string
-	 */
-	public function getGroupIdentifier(): string {
-		return $this->appName;
-	}
-
-	/**
-	 * Human Readable Group Title
-	 * @return string
-	 */
-	public function getGroupName(): string {
-		return $this->l10n->t('Forms');
-	}
-
-	/**
-	 * Priority of the Setting (0-100)
-	 * Using this as Forms-Basepriority
-	 * @return int
-	 */
-	public function getPriority(): int {
-		return 60;
-	}
-
-	/**
-	 * User can change Notification
-	 * @return bool
-	 */
-	public function canChangeNotification(): bool {
-		return true;
-	}
-
-	/**
-	 * Notification enabled by default
-	 */
-	public function isDefaultEnabledNotification(): bool {
-		return true;
-	}
-
-	/**
-	 * User can change Mail
-	 * @return bool
-	 */
-	public function canChangeMail(): bool {
-		return true;
-	}
-
-	/**
-	 * Mail disabled by default
-	 * @return bool
-	 */
-	public function isDefaultEnabledMail(): bool {
-		return false;
-	}
-	
-	/**
-	 * User can change Stream
-	 * TODO REMOVE when NC19 out of support.
-	 * @return bool
-	 */
-	public function canChangeStream(): bool {
-		return true;
-	}
-
-	/**
-	 * Stream enabled by default
-	 * TODO REMOVE when NC19 out of support.
-	 * @return bool
-	 */
-	public function isDefaultEnabledStream(): bool {
-		return true;
+} else {
+	abstract class FormsActivitySettings extends FormsActivitySettingsLegacy {
 	}
 }
