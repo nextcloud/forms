@@ -7,14 +7,6 @@ const config = {
 	entry: {
 		submit: path.resolve(path.join('src', 'submit.js')),
 	},
-	module: {
-		rules: [
-			{
-				test: /\.svg$/,
-				use: 'url-loader',
-			},
-		],
-	},
 }
 
 module.exports = merge(config, webpackConfig)
