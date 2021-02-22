@@ -30,6 +30,7 @@ namespace OCA\Forms\Controller;
 use DateTimeZone;
 use Exception;
 
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -940,10 +941,7 @@ class ApiController extends OCSController {
 
 			foreach ($answerArray as $answer) {
 				// Are we using answer ids as values
-				if ($question['type'] === 'multiple'
-					|| $question['type'] === 'multiple_unique'
-					|| $question['type'] === 'dropdown') {
-
+				if (in_array($question['type'], Constants::ANSWER_PREDEFINED)) {
 					// Search corresponding option, skip processing if not found
 					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 					if ($optionIndex === false) {

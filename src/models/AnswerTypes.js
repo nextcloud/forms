@@ -38,11 +38,13 @@ import QuestionDate from '../components/Questions/QuestionDate'
  */
 export default {
 	/**
+	 * !! Keep in SYNC with lib/Constants.php for props that are necessary on php !!
 	 * Specifying Question-Models in a common place
 	 * Further type-specific parameters are possible.
 	 * @prop component The vue-component this answer-type relies on
 	 * @prop icon The icon corresponding to this answer-type
 	 * @prop label The answer-type label, that users will see as answer-type.
+	 * @prop SYNC predefined This AnswerType has/needs predefined Options.
 	 * @prop validate *optional* Define conditions where this question is not ok
 	 *
 	 * @prop titlePlaceholder The placeholder users see as empty question-title in edit-mode
@@ -55,6 +57,7 @@ export default {
 		component: QuestionMultiple,
 		icon: 'icon-answer-checkbox',
 		label: t('forms', 'Checkboxes'),
+		predefined: true,
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
@@ -66,6 +69,7 @@ export default {
 		icon: 'icon-answer-multiple',
 		// TRANSLATORS Take care, a translation by word might not match! The english called 'Multiple-Choice' only allows to select a single-option (basically single-choice)!
 		label: t('forms', 'Multiple choice'),
+		predefined: true,
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Multiple choice question title'),
@@ -79,6 +83,7 @@ export default {
 		component: QuestionDropdown,
 		icon: 'icon-answer-dropdown',
 		label: t('forms', 'Dropdown'),
+		predefined: true,
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Dropdown question title'),
@@ -91,6 +96,7 @@ export default {
 		component: QuestionShort,
 		icon: 'icon-answer-short',
 		label: t('forms', 'Short answer'),
+		predefined: false,
 
 		titlePlaceholder: t('forms', 'Short answer question title'),
 		createPlaceholder: t('forms', 'People can enter a short answer'),
@@ -102,6 +108,7 @@ export default {
 		component: QuestionLong,
 		icon: 'icon-answer-long',
 		label: t('forms', 'Long text'),
+		predefined: false,
 
 		titlePlaceholder: t('forms', 'Long text question title'),
 		createPlaceholder: t('forms', 'People can enter a long text'),
@@ -113,6 +120,7 @@ export default {
 		component: QuestionDate,
 		icon: 'icon-answer-date',
 		label: t('forms', 'Date'),
+		predefined: false,
 
 		titlePlaceholder: t('forms', 'Date question title'),
 		createPlaceholder: t('forms', 'People can pick a date'),
@@ -124,6 +132,7 @@ export default {
 		component: QuestionDate,
 		icon: 'icon-answer-datetime',
 		label: t('forms', 'Datetime'),
+		predefined: false,
 
 		titlePlaceholder: t('forms', 'Datetime question title'),
 		createPlaceholder: t('forms', 'People can pick a date and time'),
