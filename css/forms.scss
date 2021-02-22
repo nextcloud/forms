@@ -25,6 +25,13 @@
 	--top-bar-height: 60px;
 }
 
+/* Padding for Auto-Scroll if a required question is not filled.
+ * 60px matches around the height of two lines of question-text
+ */
+html {
+	scroll-padding-top: calc(var(--header-height) + 60px);
+}
+
 /* Fix for action-popover alignment
  * TODO: Can be removed, as soon as the issue is solved in server or vue-components.
  * Ref.: https://github.com/nextcloud/nextcloud-vue/issues/1384
