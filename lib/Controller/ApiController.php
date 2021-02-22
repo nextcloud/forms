@@ -226,6 +226,73 @@ class ApiController extends OCSController {
 	/**
 	 * @NoAdminRequired
 	 *
+	 * Clones a form
+	 *
+	 * @param int $id FormId of the form to clone
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function cloneForm(int $id): DataResponse {
+		$this->logger->debug('Cloning Form: {id}', [
+			'id' => $id
+		]);
+
+		try {
+			$oldForm = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		// Only allow owner to clone a form
+		if ($oldForm->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		// Read Form, set new Form specific data, extend Title.
+		$formData = $oldForm->read();
+		unset($formData['id']);
+		$formData['created'] = time();
+		$formData['hash'] = $this->secureRandom->generate(
+			16,
+			ISecureRandom::CHAR_HUMAN_READABLE
+		);
+		$formData['title'] .= ' - ' . $this->l10n->t('Copy');
+
+		$newForm = Form::fromParams($formData);
+		$this->formMapper->insert($newForm);
+
+		// Get Questions, set new formId, reinsert
+		$questions = $this->questionMapper->findByForm($oldForm->getId());
+		foreach ($questions as $oldQuestion) {
+			$questionData = $oldQuestion->read();
+
+			unset($questionData['id']);
+			$questionData['formId'] = $newForm->getId();
+			$newQuestion = Question::fromParams($questionData);
+			$this->questionMapper->insert($newQuestion);
+
+			// Get Options, set new QuestionId, reinsert
+			$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
+			foreach ($options as $oldOption) {
+				$optionData = $oldOption->read();
+
+				unset($optionData['id']);
+				$optionData['questionId'] = $newQuestion->getId();
+				$newOption = Option::fromParams($optionData);
+				$this->optionMapper->insert($newOption);
+			}
+		}
+
+		// Return just like getForm does. Returns the full form.
+		return $this->getForm($newForm->getId());
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
 	 * Writes the given key-value pairs into Database.
 	 *
 	 * @param int $id FormId of form to update
