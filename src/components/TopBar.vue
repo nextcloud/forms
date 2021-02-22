@@ -26,6 +26,9 @@
 <template>
 	<div class="top-bar" role="toolbar">
 		<slot />
+		<div class="top-bar__small">
+			<slot name="small" />
+		</div>
 	</div>
 </template>
 <script>
@@ -51,22 +54,25 @@ $top-bar-height: 60px;
 
 	button {
 		cursor: pointer;
-
-		// Fix button having too little spacing left and right of text
-		&:not(:first-child) {
-			width: 44px;
-			height: 44px;
-			border: none;
-			background-color: transparent;
-			&:hover, a:active, a:focus {
-				background-color: var(--color-background-darker);
-			}
-		}
+		margin-left: 4px;
 
 		> span {
 			cursor: pointer;
 			opacity: 1;
 			background-size: 16px;
+		}
+	}
+
+	&__small {
+		button {
+			width: 44px;
+			height: 44px;
+			margin-left: 0px;
+			border: none;
+			background-color: transparent;
+			&:hover, a:active, a:focus {
+				background-color: var(--color-background-darker);
+			}
 		}
 	}
 }

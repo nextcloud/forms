@@ -32,14 +32,22 @@
 	<AppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
-			<button @click="showResults">
-				<span class="icon-comment" role="img" />
-				{{ t('forms', 'Responses') }}
-			</button>
-			<button v-tooltip="t('forms', 'Toggle settings')"
-				@click="toggleSidebar">
-				<span class="icon-menu-sidebar" role="img" />
-			</button>
+			<template #default>
+				<button @click="showResults">
+					<span class="icon-comment" role="img" />
+					{{ t('forms', 'Responses') }}
+				</button>
+				<button v-if="!sidebarOpened" @click="copyShareLink">
+					<span class="icon-clippy" role="img" />
+					{{ t('forms', 'Share link') }}
+				</button>
+			</template>
+			<template #small>
+				<button v-tooltip="t('forms', 'Toggle settings')"
+					@click="toggleSidebar">
+					<span class="icon-menu-sidebar" role="img" />
+				</button>
+			</template>
 		</TopBar>
 
 		<!-- Forms title & description-->
@@ -118,7 +126,6 @@
 </template>
 
 <script>
-import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
@@ -160,6 +167,13 @@ export default {
 	},
 
 	mixins: [ViewsMixin],
+
+	props: {
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
+	},
 
 	data() {
 		return {
@@ -400,7 +414,7 @@ export default {
 			})
 		},
 		toggleSidebar() {
-			emit('toggleSidebar')
+			this.$emit('update:sidebarOpened', !this.sidebarOpened)
 		},
 
 		/**

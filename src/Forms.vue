@@ -61,9 +61,12 @@
 
 		<!-- No errors show router content -->
 		<template v-else>
-			<router-view :form.sync="selectedForm" />
+			<router-view
+				:form.sync="selectedForm"
+				:sidebar-opened.sync="sidebarOpened" />
 			<router-view v-if="!selectedForm.partial"
 				:form="selectedForm"
+				:opened.sync="sidebarOpened"
 				name="sidebar" />
 		</template>
 	</Content>
@@ -102,6 +105,7 @@ export default {
 	data() {
 		return {
 			loading: true,
+			sidebarOpened: true,
 			forms: [],
 		}
 	},
