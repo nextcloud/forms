@@ -37,7 +37,9 @@
 					<span class="question-summary__statistic-percentage">
 						({{ option.percentage }}%):
 					</span>
-					<span class="question-summary__statistic-text">{{ option.text }}</span>
+					<span :class="{'question-summary__statistic-text--best':option.best}">
+						{{ option.text }}
+					</span>
 				</label>
 				<meter :id="`option-${option.questionId}-${option.id}`"
 					min="0"
@@ -124,9 +126,11 @@ export default {
 				return object2.count - object1.count
 			})
 
-			// Fill percentage values
 			questionOptionsStats.forEach(questionOptionsStat => {
+				// Fill percentage values
 				questionOptionsStat.percentage = Math.round((100 * questionOptionsStat.count) / this.submissions.length)
+				// Mark all best results. First one is best for sure due to sorting
+				questionOptionsStat.best = (questionOptionsStat.count === questionOptionsStats[0].count)
 			})
 
 			return questionOptionsStats
@@ -205,7 +209,7 @@ export default {
 				cursor: default;
 			}
 
-			&:first-child .question-summary__statistic-text {
+			.question-summary__statistic-text--best {
 				font-weight: bold;
 			}
 
