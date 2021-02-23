@@ -248,15 +248,18 @@ class FormsService {
 	 * @return array
 	 */
 	private function formatUsers(string $userId): array {
+		$displayName = '';
+
 		$user = $this->userManager->get($userId);
 		if ($user instanceof IUser) {
-			return [
-				'shareWith' => $userId,
-				'displayName' => $user->getDisplayName(),
-				'shareType' => IShare::TYPE_USER
-			];
+			$displayName = $user->getDisplayName();
 		}
-		return [];
+
+		return [
+			'shareWith' => $userId,
+			'displayName' => $displayName,
+			'shareType' => IShare::TYPE_USER
+		];
 	}
 
 	/**
@@ -266,14 +269,17 @@ class FormsService {
 	 * @return array
 	 */
 	private function formatGroups(string $groupId): array {
+		$displayName = '';
+
 		$group = $this->groupManager->get($groupId);
 		if ($group instanceof IGroup) {
-			return [
-				'shareWith' => $groupId,
-				'displayName' => $group->getDisplayName(),
-				'shareType' => IShare::TYPE_GROUP
-			];
+			$displayName = $group->getDisplayName();
 		}
-		return [];
+
+		return [
+			'shareWith' => $groupId,
+			'displayName' => $displayName,
+			'shareType' => IShare::TYPE_GROUP
+		];
 	}
 }
