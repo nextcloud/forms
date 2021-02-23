@@ -105,7 +105,7 @@ export default {
 	data() {
 		return {
 			loading: true,
-			sidebarOpened: true,
+			sidebarOpened: false,
 			forms: [],
 		}
 	},
