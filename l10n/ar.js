@@ -1,7 +1,6 @@
 OC.L10N.register(
     "forms",
     {
-    "Copy share link" : "انسخ رابط المشاركة",
     "Required" : "مطلوب",
     "Group" : "الفريق",
     "Description" : "الوصف",

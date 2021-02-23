@@ -9,7 +9,6 @@ OC.L10N.register(
     "Create new form" : "새로운 양식 생성",
     "An error occurred while loading the forms list" : "양식 리스트를 가져오는데 문제가 발생하였습니다.",
     "Unable to create a new form" : "새 양식 생성할 수 없음",
-    "Clone form" : "양식 복사",
     "Delete form" : "양식 삭제",
     "Are you sure you want to delete {title}?" : "정말로 {title}을 삭제할 것입니까?",
     "Error while deleting {title}" : "{title} 삭제 실패",

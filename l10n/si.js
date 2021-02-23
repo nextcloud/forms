@@ -7,6 +7,7 @@ OC.L10N.register(
     "Group" : "සමූහය",
     "Description" : "විස්තරය",
     "Summary" : "සාරාංශය",
-    "Settings" : "සැකසුම්"
+    "Settings" : "සැකසුම්",
+    "Date" : "දිනය"
 },
 "nplurals=2; plural=(n != 1);");
