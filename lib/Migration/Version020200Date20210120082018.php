@@ -53,7 +53,6 @@ class Version020200Date20210120082018 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('forms_v2_forms')) {
 			$schema->getTable('forms_v2_forms')
-			->addIndex(['hash'], 'forms_forms_hash')
 			->addIndex(['owner_id'], 'forms_forms_owner')
 			->addIndex(['created'], 'forms_forms_created');
 		}
