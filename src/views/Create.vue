@@ -212,12 +212,17 @@ export default {
 			let message = ''
 			if (this.form.isAnonymous) {
 				message += t('forms', 'Responses are anonymous.')
-			} else {
+			}
+
+			// On Submit, this is dependent on `isLoggedIn`. Create-view is always logged in and the variable isLoggedIn does not exist.
+			if (!this.form.isAnonymous && true) {
 				message += t('forms', 'Responses are connected to your Nextcloud account.')
 			}
+
 			if (this.isMandatoryUsed) {
 				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
+
 			return message
 		},
 	},

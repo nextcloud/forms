@@ -24,7 +24,8 @@
 	<Content app-name="forms">
 		<Submit
 			:form="form"
-			:public-view="true" />
+			:public-view="true"
+			:is-logged-in="isLoggedIn" />
 	</Content>
 </template>
 
@@ -44,6 +45,7 @@ export default {
 	data() {
 		return {
 			form: loadState('forms', 'form'),
+			isLoggedIn: loadState('forms', 'isLoggedIn'),
 		}
 	},
 }
