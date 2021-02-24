@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy" : "复制",
     "Anonymous response" : "匿名回应",
     "User display name" : "用户展示名",
     "Timestamp" : "时间戳",
@@ -17,10 +18,13 @@ OC.L10N.register(
     "Create new form" : "创建新表单",
     "An error occurred while loading the forms list" : "在加载表格时发生错误",
     "Unable to create a new form" : "无法新建表格",
+    "Unable to copy form" : "无法复制表格",
     "Responses" : "回应",
+    "Copy form" : "复制表格",
     "Delete form" : "删除表单",
     "Form link copied" : "已复制表格连接",
     "Cannot copy, please copy the link manually" : "无法复制，请手动复制链接",
+    "Share link" : "共享链接",
     "Are you sure you want to delete {title}?" : "你确定要删除 {title} 吗？",
     "Error while deleting {title}" : "删除 {title} 时出错",
     "An answer for the {index} option" : " {index} 选项的一个答案",

@@ -2,6 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Anonymous response" : "Anoniminis atsakymas",
+    "Timestamp" : "Laiko žyma",
+    "Anonymous user" : "Anoniminis naudotojas",
     "Forms" : "Anketos",
     "Shared by %s" : "Bendrina %s",
     "New form" : "Nauja anketa",

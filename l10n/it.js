@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy" : "Copia",
     "Anonymous response" : "Risposta anonima",
     "User display name" : "Nome visualizzato dell'utente",
     "Timestamp" : "Marca temporale",
@@ -18,10 +19,13 @@ OC.L10N.register(
     "Create new form" : "Crea nuovo modulo",
     "An error occurred while loading the forms list" : "Si è verificato un errore durante il caricamento dell'elenco dei moduli",
     "Unable to create a new form" : "Impossibile creare un nuovo modulo",
+    "Unable to copy form" : "Impossibile copiare il modulo",
     "Responses" : "Risposte",
+    "Copy form" : "Copia modulo",
     "Delete form" : "Elimina modulo",
     "Form link copied" : "Collegamento del modulo copiato",
     "Cannot copy, please copy the link manually" : "Impossibile copiare, copia il collegamento manualmente",
+    "Share link" : "Condividi collegamento",
     "Are you sure you want to delete {title}?" : "Sei sicuro di voler eliminare {title}?",
     "Error while deleting {title}" : "Errore durante l'eliminazione di “{title}”",
     "An answer for the {index} option" : "Una risposta per l'opzione {index}",
