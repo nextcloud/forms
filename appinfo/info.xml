@@ -56,4 +56,17 @@
 			<order>77</order>
 		</navigation>
 	</navigations>
+
+	<activity>
+		<filters>
+			<filter>OCA\Forms\Activity\Filter</filter>
+		</filters>
+		<providers>
+			<provider>OCA\Forms\Activity\Provider</provider>
+		</providers>
+		<settings>
+			<setting>OCA\Forms\Activity\Settings\NewShare</setting>
+			<setting>OCA\Forms\Activity\Settings\NewSubmission</setting>
+		</settings>
+	</activity>
 </info>

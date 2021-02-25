@@ -24,6 +24,8 @@
 
 namespace OCA\Forms\Service;
 
+use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
@@ -42,6 +44,9 @@ use OCP\Share\IShare;
  * Trait for getting forms information in a service
  */
 class FormsService {
+
+	/** @var ActivityManager */
+	private $activityManager;
 	
 	/** @var FormMapper */
 	private $formMapper;
@@ -67,7 +72,8 @@ class FormsService {
 	/** @var ILogger */
 	private $logger;
 
-	public function __construct(FormMapper $formMapper,
+	public function __construct(ActivityManager $activityManager,
+								FormMapper $formMapper,
 								QuestionMapper $questionMapper,
 								OptionMapper $optionMapper,
 								SubmissionMapper $submissionMapper,
@@ -75,6 +81,7 @@ class FormsService {
 								IUserManager $userManager,
 								IUserSession $userSession,
 								ILogger $logger) {
+		$this->activityManager = $activityManager;
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
@@ -281,5 +288,24 @@ class FormsService {
 			'displayName' => $displayName,
 			'shareType' => IShare::TYPE_GROUP
 		];
+	}
+
+	/**
+	 * Compares two selected access arrays and creates activities for users.
+	 * @param Form $form Related Form
+	 * @param array $oldAccess old access-array
+	 * @param array $newAccess new access-array
+	 */
+	public function notifyNewShares(Form $form, array $oldAccess, array $newAccess) {
+		$newUsers = array_diff($newAccess['users'], $oldAccess['users']);
+		$newGroups = array_diff($newAccess['groups'], $oldAccess['groups']);
+
+		// Create Activities
+		foreach ($newUsers as $key => $newUserId) {
+			$this->activityManager->publishNewShare($form, $newUserId);
+		}
+		foreach ($newGroups as $key => $newGroupId) {
+			$this->activityManager->publishNewGroupShare($form, $newGroupId);
+		}
 	}
 }
