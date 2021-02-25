@@ -28,7 +28,7 @@
 		</p>
 
 		<!-- Answers with countable results for visualization -->
-		<ol v-if="question.type === 'multiple' || question.type === 'multiple_unique' || question.type === 'dropdown'"
+		<ol v-if="question.type.predefined"
 			class="question-summary__statistic">
 			<li v-for="option in questionOptions"
 				:key="option.id">
