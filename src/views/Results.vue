@@ -74,8 +74,11 @@
 				<Actions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
+					<ActionButton :close-after-click="true" icon="icon-folder" @click="onStoreToFiles">
+						{{ t('forms', 'Save CSV to Files') }}
+					</ActionButton>
 					<ActionLink icon="icon-download" :href="downloadUrl">
-						{{ t('forms', 'Export to CSV') }}
+						{{ t('forms', 'Download CSV') }}
 					</ActionLink>
 					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
 						{{ t('forms', 'Delete all responses') }}
@@ -123,7 +126,7 @@
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
@@ -137,6 +140,13 @@ import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
 import SetWindowTitle from '../utils/SetWindowTitle'
 import OcsResponse2Data from '../utils/OcsResponse2Data'
+
+const picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
+	.setMultiSelect(false)
+	.setModal(true)
+	.setType(1)
+	.allowDirectories()
+	.build()
 
 export default {
 	name: 'Results',
@@ -224,6 +234,24 @@ export default {
 			} finally {
 				this.loadingResults = false
 			}
+		},
+
+		// Show Filepicker, then call API to store
+		async onStoreToFiles() {
+			// picker.pick() does not reject Promise -> await would never resolve.
+			picker.pick()
+				.then(async(path) => {
+					try {
+						const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'submissions/export', {
+							hash: this.form.hash,
+							path,
+						})
+						showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+					} catch (error) {
+						console.error(error)
+						showError(t('forms', 'There was an error, while exporting to Files'))
+					}
+				})
 		},
 
 		async deleteSubmission(id) {
