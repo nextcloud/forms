@@ -29,6 +29,7 @@ use OCA\Forms\Db\FormMapper;
 use OCP\Activity\IEvent;
 use OCP\Activity\IEventMerger;
 use OCP\Activity\IProvider;
+use OCP\AppFramework\Db\IMapperException;
 use OCP\IGroupManager;
 use OCP\IL10N;
 use OCP\ILogger;
