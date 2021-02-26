@@ -25,15 +25,11 @@
 
 return [
 	'routes' => [
-		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-
-		// Before /{hash} to avoid conflict
-		['name' => 'page#index', 'url' => '/new', 'verb' => 'GET', 'postfix' => 'create'],
-		['name' => 'page#index', 'url' => '/{hash}/edit', 'verb' => 'GET', 'postfix' => 'edit'],
-		['name' => 'page#index', 'url' => '/{hash}/clone', 'verb' => 'GET', 'postfix' => 'clone'],
-		['name' => 'page#index', 'url' => '/{hash}/results', 'verb' => 'GET', 'postfix' => 'results'],
-
+		// Before /{hash}/{action} to avoid conflict
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
+
+		// As parameters have defaults, this catches all routes from '/' to '/hash/edit'
+		['name' => 'page#index', 'url' => '/{hash}/{action}', 'verb' => 'GET', 'defaults' => ['hash' => '', 'action' => '']],
 	],
 	'ocs' => [
 		// Forms
@@ -43,6 +39,7 @@ return [
 		['name' => 'api#cloneForm', 'url' => '/api/v1/form/clone/{id}', 'verb' => 'POST'],
 		['name' => 'api#updateForm', 'url' => '/api/v1/form/update', 'verb' => 'POST'],
 		['name' => 'api#deleteForm', 'url' => '/api/v1/form/{id}', 'verb' => 'DELETE'],
+		['name' => 'api#getSharedForms', 'url' => '/api/v1/shared_forms', 'verb' => 'GET'],
 
 		// Questions
 		['name' => 'api#newQuestion', 'url' => '/api/v1/question', 'verb' => 'POST'],

@@ -26,17 +26,28 @@
 		<AppNavigation>
 			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
 			<template #list>
+				<!-- Form-Owner-->
+				<AppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
 				<AppNavigationForm v-for="form in forms"
 					:key="form.id"
 					:form="form"
+					:read-only="false"
 					@mobile-close-navigation="mobileCloseNavigation"
 					@clone="onCloneForm"
 					@delete="onDeleteForm" />
+
+				<!-- Shared Forms-->
+				<AppNavigationCaption v-if="!noSharedForms" :title="t('forms', 'Shared with you')" />
+				<AppNavigationForm v-for="form in sharedForms"
+					:key="form.id"
+					:form="form"
+					:read-only="true"
+					@mobile-close-navigation="mobileCloseNavigation" />
 			</template>
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<AppContent v-if="loading || noForms || (!routeHash && $route.name !== 'create')">
+		<AppContent v-if="loading || noForms || !routeHash || !routeAllowed">
 			<EmptyContent v-if="loading" icon="icon-loading">
 				{{ t('forms', 'Loading forms …') }}
 			</EmptyContent>
@@ -80,6 +91,7 @@ import axios from '@nextcloud/axios'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
+import AppNavigationCaption from '@nextcloud/vue/dist/Components/AppNavigationCaption'
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Content from '@nextcloud/vue/dist/Components/Content'
 import isMobile from '@nextcloud/vue/src/mixins/isMobile'
@@ -95,6 +107,7 @@ export default {
 		AppNavigationForm,
 		AppContent,
 		AppNavigation,
+		AppNavigationCaption,
 		AppNavigationNew,
 		Content,
 		EmptyContent,
@@ -107,26 +120,61 @@ export default {
 			loading: true,
 			sidebarOpened: false,
 			forms: [],
+			sharedForms: [],
 		}
 	},
 
 	computed: {
 		noForms() {
-			return this.forms && this.forms.length === 0
+			return this.noOwnedForms && this.noSharedForms
+		},
+		noOwnedForms() {
+			return this.forms?.length === 0
+		},
+		noSharedForms() {
+			return this.sharedForms?.length === 0
 		},
 
 		routeHash() {
 			return this.$route.params.hash
 		},
 
+		// If the user is allowed to access this route
+		routeAllowed() {
+			// If the form is not within the owned or shared list, the user has no access on internal view.
+			if (this.routeHash && this.forms.concat(this.sharedForms).findIndex(form => form.hash === this.routeHash) < 0) {
+				console.error('Form not found for hash: ', this.routeHash)
+				return false
+			}
+
+			// For Routes edit or results, the form must be in owned forms.
+			if (this.$route.name === 'edit' || this.$route.name === 'results') {
+				if (this.forms.findIndex(form => form.hash === this.routeHash) < 0) {
+					return false
+				}
+			}
+
+			return true
+		},
+
 		selectedForm: {
 			get() {
-				return this.forms.find(form => form.hash === this.routeHash)
+				if (this.routeAllowed) {
+					return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
+				}
+				return {}
 			},
 			set(form) {
-				const index = this.forms.findIndex(search => search.hash === this.routeHash)
+				// If a owned form
+				let index = this.forms.findIndex(search => search.hash === this.routeHash)
 				if (index > -1) {
 					this.$set(this.forms, index, form)
+					return
+				}
+				// Otherwise a shared form
+				index = this.sharedForms.findIndex(search => search.hash === this.routeHash)
+				if (index > -1) {
+					this.$set(this.sharedForms, index, form)
 				}
 			},
 		},
@@ -151,15 +199,26 @@ export default {
 		 */
 		async loadForms() {
 			this.loading = true
+
+			// Load Owned forms
 			try {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + 'forms')
 				this.forms = OcsResponse2Data(response)
 			} catch (error) {
 				showError(t('forms', 'An error occurred while loading the forms list'))
 				console.error(error)
-			} finally {
-				this.loading = false
 			}
+
+			// Load shared forms
+			try {
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v1', 2) + 'shared_forms')
+				this.sharedForms = OcsResponse2Data(response)
+			} catch (error) {
+				showError(t('forms', 'An error occurred while loading the forms list'))
+				console.error(error)
+			}
+
+			this.loading = false
 		},
 
 		/**

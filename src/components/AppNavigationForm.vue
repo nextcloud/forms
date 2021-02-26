@@ -25,9 +25,12 @@
 		ref="navigationItem"
 		:icon="icon"
 		:title="formTitle"
-		:to="{ name: 'formRoot', params: { hash: form.hash } }"
+		:to="{
+			name: routerTarget,
+			params: { hash: form.hash }
+		}"
 		@click="mobileCloseNavigation">
-		<template v-if="!loading" #actions>
+		<template v-if="!loading && !readOnly" #actions>
 			<ActionLink
 				:href="formLink"
 				:icon="copied && copySuccess ? 'icon-checkmark-color' : 'icon-clippy'"
@@ -84,6 +87,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		readOnly: {
+			type: Boolean,
+			default: true,
+		},
 	},
 
 	data() {
@@ -139,6 +146,18 @@ export default {
 					: t('forms', 'Cannot copy, please copy the link manually')
 			}
 			return t('forms', 'Share link')
+		},
+
+		/**
+		 * Route to use, depending on readOnly
+		 * @returns {string} Route to 'submit' or 'formRoot'
+		 */
+		routerTarget() {
+			if (this.readOnly) {
+				return 'submit'
+			}
+
+			return 'formRoot'
 		},
 	},
 

@@ -149,7 +149,8 @@ class ApiController extends OCSController {
 	/**
 	 * @NoAdminRequired
 	 *
-	 * Read Form-List only with necessary information for Listing.
+	 * Read Form-List of owned forms
+	 * Return only with necessary information for Listing.
 	 * @return DataResponse
 	 */
 	public function getForms(): DataResponse {
@@ -157,6 +158,38 @@ class ApiController extends OCSController {
 
 		$result = [];
 		foreach ($forms as $form) {
+			$result[] = [
+				'id' => $form->getId(),
+				'hash' => $form->getHash(),
+				'title' => $form->getTitle(),
+				'expires' => $form->getExpires(),
+				'partial' => true
+			];
+		}
+
+		return new DataResponse($result);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Read List of forms shared with current user
+	 * Return only with necessary information for Listing.
+	 * @return DataResponse
+	 */
+	public function getSharedForms(): DataResponse {
+		$forms = $this->formMapper->findAll();
+
+		$result = [];
+		foreach ($forms as $form) {
+			// Don't add if user is owner, user has no access, form has expired, form is link-shared
+			if ($form->getOwnerId() === $this->currentUser->getUID()
+				|| !$this->formsService->hasUserAccess($form->getId())
+				|| $this->formsService->hasFormExpired($form->getId())
+				|| $form->getAccess()['type'] === 'public') {
+				continue;
+			}
+
 			$result[] = [
 				'id' => $form->getId(),
 				'hash' => $form->getHash(),
@@ -914,8 +947,8 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Not allowed to access this form');
 		}
 
-		// Not allowed if form expired. Expires is '0' if the form does not expire.
-		if ($form->getExpires() && $form->getExpires() < time()) {
+		// Not allowed if form has expired.
+		if ($this->formsService->hasFormExpired($form->getId())) {
 			throw new OCSForbiddenException('This form is no longer taking answers');
 		}
 

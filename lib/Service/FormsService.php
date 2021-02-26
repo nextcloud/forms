@@ -148,13 +148,14 @@ class FormsService {
 		$result['questions'] = $this->getQuestions($id);
 
 		// Set proper user/groups properties
-		
 		// Make sure we have the bare minimum
 		$result['access'] = array_merge(['users' => [], 'groups' => []], $result['access']);
-
 		// Properly format users & groups
 		$result['access']['users'] = array_map([$this, 'formatUsers'], $result['access']['users']);
 		$result['access']['groups'] = array_map([$this, 'formatGroups'], $result['access']['groups']);
+
+		// Append canSubmit, to be able to show proper EmptyContent on internal view.
+		$result['canSubmit'] = $this->canSubmit($form->getId());
 
 		return $result;
 	}
@@ -185,6 +186,11 @@ class FormsService {
 
 		// We cannot control how many time users can submit in public mode
 		if ($access['type'] === 'public') {
+			return true;
+		}
+
+		// Owner is always allowed to submit
+		if ($this->currentUser->getUID() === $form->getOwnerId()) {
 			return true;
 		}
 
@@ -246,6 +252,17 @@ class FormsService {
 
 		// None of the possible access-options matched.
 		return false;
+	}
+
+	/*
+	 * Has the form expired?
+	 *
+	 * @param int $formId The id of the form to check.
+	 * @return boolean
+	 */
+	public function hasFormExpired(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
+		return ($form->getExpires() !== 0 && $form->getExpires() < time());
 	}
 
 	/**

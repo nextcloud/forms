@@ -19,6 +19,7 @@ This document describes the Obect-Structure, that is used within the Forms App a
 | submitOnce  | Boolean         |              | If users are only allowed to submit once to the form |
 | questions   | Array of [Questions](#question) | | Array of questions belonging to the form |
 | submissions | Array of [Submissions](#submissions) | | Array of submissions belonging to the form |
+| canSubmit   | Boolean         |              | If the user can Submit to the form, i.e. calculated information out of `submitOnce` and existing submissions. |
 
 ```
 {
@@ -33,7 +34,8 @@ This document describes the Obect-Structure, that is used within the Forms App a
   "isAnonymous": false,
   "submitOnce": false,
   "questions": [],
-  "submissions": []
+  "submissions": [],
+  "canSubmit": true
 }
 ```
 
