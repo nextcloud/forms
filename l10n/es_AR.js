@@ -1,8 +1,8 @@
 OC.L10N.register(
     "forms",
     {
-    "Anonymous response" : "Respuesta anónima",
     "Forms" : "Formularios",
+    "Anonymous response" : "Respuesta anónima",
     "Shared by %s" : "Compartido por %s ",
     "New form" : "Nuevo formulario",
     "Loading forms …" : "Cargando formulario ...",

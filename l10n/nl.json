@@ -1,10 +1,10 @@
 { "translations": {
+    "Forms" : "Formulieren",
+    "Anonymous user" : "Anonieme gebruiker",
     "Anonymous response" : "Anoniem antwoord",
     "User display name" : "Weergavenaam gebruiker",
     "Timestamp" : "Tiijdstempel",
-    "Anonymous user" : "Anonieme gebruiker",
     "responses" : "reacties",
-    "Forms" : "Formulieren",
     "Shared by %s" : "Gedeeld door %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Eenvoudige enquête en vragenlijst, zelf gehost",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Eenvoudige enquêtes en vragenlijsten, zelf gehost!**\n\n- **📝 Simpel design:** Geen massa opties, alleen de essentie. Werkt natuurlijk goed op mobiel.\n- **📊 Bekijk en exporteer resultaten:** Resultaten worden gevisualiseerd en kunnen ook worden geëxporteerd als CSV in hetzelfde formaat dat wordt gebruikt door Google Formulieren.\n- **🔒 Gegevens onder uw controle!**In tegenstelling tot Google Forms, Typeform, Doodle en anderen, worden de enquêtegegevens en antwoorden op uw instantie privé gehouden.\n- **🙋 Raak betrokken!** We hebben veel dingen gepland, zoals meer vraagtypen, samenwerking aan formulieren, [en nog veel meer](https://github.com/nextcloud/forms/milestones)!",

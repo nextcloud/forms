@@ -1,12 +1,12 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "フォーム",
+    "Anonymous user" : "匿名ユーザー",
     "Anonymous response" : "匿名の回答",
     "User display name" : "ユーザー表示名",
     "Timestamp" : "タイムスタンプ",
-    "Anonymous user" : "匿名ユーザー",
     "responses" : "返信",
-    "Forms" : "フォーム",
     "Shared by %s" : "%sが共有",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 自前で作る、簡単なアンケート",
     "New form" : "新しいフォーム",

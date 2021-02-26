@@ -1,8 +1,8 @@
 { "translations": {
+    "Forms" : "Anketos",
+    "Anonymous user" : "Anoniminis naudotojas",
     "Anonymous response" : "Anoniminis atsakymas",
     "Timestamp" : "Laiko žyma",
-    "Anonymous user" : "Anoniminis naudotojas",
-    "Forms" : "Anketos",
     "Shared by %s" : "Bendrina %s",
     "New form" : "Nauja anketa",
     "Loading forms …" : "Įkeliamos anketos…",

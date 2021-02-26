@@ -1,7 +1,7 @@
 { "translations": {
+    "Forms" : "Lomakkeet",
     "Anonymous response" : "Anonyymi vastaus",
     "responses" : "vastausta",
-    "Forms" : "Lomakkeet",
     "Shared by %s" : "Jakanut %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Yksinkertaisia kyselyitä omalla palvelimella",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Yksinkertaisia kyselyitä omalla palvelimella!**\n\n- **📝 Yksinkertainen käyttöliittymä:** Ei valtavasti vaihtoehtoja, vaan pelkästään tarpeelliset. Toimii tietysti mobiililaitteilla.\n- **📊 Katso ja vie tulokset:** Tulokset visualisoidaan ja voidaan viedä yleisessä CSV muodossa.\n- **🔒 Tietosi hallinnassasi!** Toisin kuin Google Formsissa, Typeformissa, Doodlessa ja muissa kyselyn tiedot ja vastaajat pysyvät salassa Nextcloudissasi.\n- **🙋 Osallistu kehitykseen!** Meillä on paljon suunnitelmia, kuten lisää kysymystyyppejä, yhteismuokkaamista kyselyissä [ja paljon muuta](https://github.com/nextcloud/forms/milestones)!",

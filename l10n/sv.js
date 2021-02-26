@@ -1,9 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Formulär",
     "Anonymous response" : "Anonymt  svar",
     "responses" : "svar",
-    "Forms" : "Formulär",
     "Shared by %s" : "Delad av %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 enkla undersökningar och formulär, egenhostade",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Enkla undersökningar och formulär, egenhostade!**\n\n- **📝 Enkel design:** Endast det viktiga. Fungerar bra på mobiler.\n- **📊 Visa & exportera resultat:** Resultat kan visas och också exporteras som CSV i samma format som  Google Forms.\n- **🔒 Data under din kontroll!** Till skillnad från Google Forms, Typeform, Doodle och andra är formulärdata och svar endast tillgängliga i din instans.\n- **🙋 Engagera dej!** Det är mycket planerat som fler frågetyper och samarbeten kring formulär, [och mycket mer](https://github.com/nextcloud/forms/milestones)!",

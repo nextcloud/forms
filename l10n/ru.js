@@ -1,13 +1,13 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Опросы",
+    "Anonymous user" : "Анонимный пользователь",
     "Copy" : "Копировать",
     "Anonymous response" : "Анонимный ответ",
     "User display name" : "Отображаемое имя пользователя",
     "Timestamp" : "Метка времени",
-    "Anonymous user" : "Анонимный пользователь",
     "responses" : "ответ(ов)",
-    "Forms" : "Опросы",
     "Shared by %s" : "Опубликовано пользователем %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Простые опросы и анкеты, в своем облаке",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "** Простые опросы и анкеты, самостоятельно! **\n\n- ** 📝 Простой дизайн: ** Никаких лишних опций, только самое необходимое. Отлично работает на мобильных устройствах.\n- ** 📊 Просмотр и экспорт результатов: ** Результаты визуализируются, а также могут быть экспортированы в CSV в том же формате, что и в Google Forms.\n- ** 🔒 Данные под вашим контролем! ** В отличие от Google Forms, Typeform, Doodle и других, информация об опросе и ответы остаются конфиденциальными.\n- ** 🙋 Примите участие! ** У нас запланировано много вещей, например, больше типов вопросов, совместная работа над формами [и многое другое] \n(https://github.com/nextcloud/forms/milestones)!",

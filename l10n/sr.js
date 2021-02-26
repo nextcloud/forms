@@ -1,8 +1,8 @@
 OC.L10N.register(
     "forms",
     {
-    "Anonymous response" : "Анонимни одговор",
     "Forms" : "Упитници",
+    "Anonymous response" : "Анонимни одговор",
     "Shared by %s" : "Поделио %s",
     "New form" : "Нови упитник",
     "Loading forms …" : "Учитавам упитнике…",

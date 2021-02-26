@@ -1,12 +1,12 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Vprašalniki",
+    "Anonymous user" : "Brezimni uporabnik",
     "Anonymous response" : "Anonimni odziv",
     "User display name" : "Prikazno ime uporabnika",
     "Timestamp" : "Časovni žig",
-    "Anonymous user" : "Brezimni uporabnik",
     "responses" : "odzivi",
-    "Forms" : "Vprašalniki",
     "Shared by %s" : "Objavo omogoča %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "Enostavni vprašalnik in ankete na domačem strežniku",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Enostavne ankete in vprašalniki na lastnem strežniku!**\n\n- **📝 Enostavno oblikovanje:** ni neskončno veliko možnosti, so le najnujnejše in najbolj uporabne. Vmesnik je seveda prilagojen mobilnim napravam.\n- **📊 Pregled in izvoz zbranih odzivov:** Odzivi so predočeni na različne načine in jih je mogoče izvoziti tudi v zapisu CSV, zapisu, ki ga uporablja tudi program Google Forms.\n- **🔒 Podatki so pod vašim nadzorom!** Za razliko od vprašalnikov Google Forms, Typeform, Doodle in drugih so podatki in odzivi varno spravljeni na vašem strežniku.\n- **🙋 Lahko se nam pridružite!** Načrtovanih imamo mnogo posodobitev, novih možnosti od vrst vprašanj do možnosti sodelovalnega dela in še [mnogo več](https://github.com/nextcloud/forms/milestones)!",

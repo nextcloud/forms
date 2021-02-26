@@ -1,13 +1,13 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Опити",
+    "Anonymous user" : "Анонімний користувач",
     "Copy" : "Копіювати",
     "Anonymous response" : "Анонімна відповідь",
     "User display name" : "Ім'я",
     "Timestamp" : "Штамп часу",
-    "Anonymous user" : "Анонімний користувач",
     "responses" : "відповідь(ей)",
-    "Forms" : "Опити",
     "Shared by %s" : "Поділилися %s",
     "New form" : "Нове опитування",
     "Loading forms …" : "Завантаження форм...",

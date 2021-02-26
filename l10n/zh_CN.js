@@ -1,13 +1,13 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "表单",
+    "Anonymous user" : "匿名用户",
     "Copy" : "复制",
     "Anonymous response" : "匿名回应",
     "User display name" : "用户展示名",
     "Timestamp" : "时间戳",
-    "Anonymous user" : "匿名用户",
     "responses" : "回应",
-    "Forms" : "表单",
     "Shared by %s" : "分享者 %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 简单的自托管调查问卷",
     "New form" : "新表格",

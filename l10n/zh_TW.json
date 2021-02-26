@@ -1,11 +1,11 @@
 { "translations": {
+    "Forms" : "表單",
+    "Anonymous user" : "匿名使用者",
     "Copy" : "複製",
     "Anonymous response" : "匿名回應",
     "User display name" : "使用顯示名稱",
     "Timestamp" : "時間戳",
-    "Anonymous user" : "匿名使用者",
     "responses" : "回應",
-    "Forms" : "表單",
     "Shared by %s" : "由 %s 分享",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 可自架的簡易調查與問卷系統",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**可自架的簡易調查與問卷系統！**\n\n- **📝 簡潔設計：** 沒有太多選項，只有最基本的元件。當然可以在行動裝置上運作良好。\n- **📊 檢視與匯出結果：** 結果是可視化的，也可以用與 Google 表單相同的格式匯出為 CSV。\n- **🔒 您的資料，由您掌控！** 不像 Google 表單、Typeform、Doodle 或是其他服務，調查資訊與回應會保留在您的站台上不會外洩。\n- **🙋 一起參與！** 我們計畫了很多東西，像是更多的問題類型、表單協作等，[當然還有更多](https://github.com/nextcloud/forms/milestones)！",

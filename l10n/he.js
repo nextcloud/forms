@@ -1,9 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "טפסים",
     "Anonymous response" : "תגובה אלמונית",
     "responses" : "תגובות",
-    "Forms" : "טפסים",
     "Shared by %s" : "שותף על ידי %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 סקריםי ושאלונים פשוטים, באירוח עצמי",
     "New form" : "טופס חדש",

@@ -1,13 +1,13 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Moduli",
+    "Anonymous user" : "Utente anonimo",
     "Copy" : "Copia",
     "Anonymous response" : "Risposta anonima",
     "User display name" : "Nome visualizzato dell'utente",
     "Timestamp" : "Marca temporale",
-    "Anonymous user" : "Utente anonimo",
     "responses" : "risposte",
-    "Forms" : "Moduli",
     "Shared by %s" : "Condiviso da %s",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Sondaggi e questionari semplici, autonomi",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Sondaggi e questionari semplici, autonomi!**\n\n- **📝 Disegno semplice:** senza eccessi di opzioni, solo gli elementi essenziali. Funziona bene sul cellulare, ovviamente.\n- **📊 Visualizza ed esporta i risultati:** i risultati sono visualizzati e possono essere esportati come CSV nello stesso formato utilizzato da Google Forms.\n- **🔒 Dati sotto il tuo controllo!!** A differenza di Google Forms, Typeform, Doodle e altro, le informazioni dei sondaggi e le risposte sono mantenute private sulla tua istanza.\n- **🙋 Fatti coinvolgere!** abbiamo pianificato molte altre cose come più tipi di domande, collaborazione su moduli, [e molto altro](https://github.com/nextcloud/forms/milestones)!",

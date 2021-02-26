@@ -1,9 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Eyðuform",
     "Anonymous response" : "Nafnlaust svar",
     "responses" : "svör",
-    "Forms" : "Eyðuform",
     "Shared by %s" : "Deilt af %s",
     "New form" : "Nýtt eyðuform",
     "Loading forms …" : "Hleð inn eyðuformum …",
