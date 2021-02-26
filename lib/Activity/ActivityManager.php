@@ -37,7 +37,7 @@ class ActivityManager {
 	/** @var IManager */
 	private $manager;
 
-	/** @var GroupManager */
+	/** @var IGroupManager */
 	private $groupManager;
 
 	/** @var ILogger */
