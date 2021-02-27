@@ -1,9 +1,0 @@
-{ "translations": {
-    "Required" : "Noutwendeg",
-    "Group" : "Grupp",
-    "Description" : "Beschreiwung",
-    "Settings" : "Astellungen",
-    "Set expiration date" : "Verfallsdatum setzen",
-    "Expiration date" : "Verfallsdatum"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}
