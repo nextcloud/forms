@@ -77,6 +77,9 @@ class PageController extends Controller {
 	/** @var ILogger */
 	private $logger;
 
+	/** @var IRequest */
+	protected $request;
+
 	/** @var IUrlGenerator */
 	private $urlGenerator;
 
@@ -122,6 +125,7 @@ class PageController extends Controller {
 		$this->initialStateService = $initialStateService;
 		$this->l10n = $l10n;
 		$this->logger = $logger;
+		$this->request = $request;
 		$this->urlGenerator = $urlGenerator;
 		$this->userManager = $userManager;
 		$this->userSession = $userSession;
@@ -136,6 +140,7 @@ class PageController extends Controller {
 	public function index(): TemplateResponse {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
+		$this->insertHeaderOnIos();
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
@@ -177,6 +182,7 @@ class PageController extends Controller {
 
 		// Main Template to fill the form
 		Util::addScript($this->appName, 'forms-submit');
+		$this->insertHeaderOnIos();
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
@@ -218,5 +224,18 @@ class PageController extends Controller {
 		}
 
 		return new TemplateResponse($this->appName, $template);
+	}
+
+	/**
+	 * Insert the extended viewport Header on iPhones to prevent automatic zooming.
+	 */
+	public function insertHeaderOnIos() {
+		$USER_AGENT_IPHONE_SAFARI = '/^Mozilla\/5\.0 \(iPhone[^)]+\) AppleWebKit\/[0-9.]+ \(KHTML, like Gecko\) Version\/[0-9.]+ Mobile\/[0-9.A-Z]+ Safari\/[0-9.A-Z]+$/';
+		if (preg_match($USER_AGENT_IPHONE_SAFARI, $this->request->getHeader('User-Agent'))) {
+			Util::addHeader('meta', [
+				'name' => 'viewport',
+				'content' => 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
+			]);
+		}
 	}
 }
