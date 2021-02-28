@@ -289,6 +289,7 @@ class ApiController extends OCSController {
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE
 		);
+		// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 		$formData['title'] .= ' - ' . $this->l10n->t('Copy');
 
 		$newForm = Form::fromParams($formData);
@@ -880,6 +881,7 @@ class ApiController extends OCSController {
 			// Append Display Name
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
+				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
 				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);

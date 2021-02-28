@@ -53,6 +53,7 @@
 			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
 				<ActionCheckbox :checked="mandatory"
 					@update:checked="onMandatoryChange">
+					<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 					{{ t('forms', 'Required') }}
 				</ActionCheckbox>
 				<ActionButton icon="icon-delete" @click="onDelete">
