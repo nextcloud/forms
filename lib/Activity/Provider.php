@@ -186,6 +186,7 @@ class Provider implements IProvider {
 			return [
 				'type' => 'highlight',
 				'id' => $userId,
+				// TRANSLATORS Shown as a users display-name
 				'name' => $this->l10n->t('Anonymous user')
 			];
 		}

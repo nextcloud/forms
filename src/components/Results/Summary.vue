@@ -93,6 +93,7 @@ export default {
 
 			// Also record 'No response'
 			questionOptionsStats.unshift({
+				// TRANSLATORS Counts on Results-Summary, how many users did not respond to this question.
 				text: t('forms', 'No response'),
 				count: 0,
 				percentage: 0,

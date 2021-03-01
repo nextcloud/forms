@@ -85,6 +85,7 @@
 					class="checkbox"
 					@change="onAnonChange">
 				<label for="isAnonymous">
+					<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
 					{{ t('forms', 'Anonymous responses') }}
 				</label>
 			</li>

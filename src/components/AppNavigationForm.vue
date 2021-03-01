@@ -43,7 +43,7 @@
 				icon="icon-comment"
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
-				{{ t('forms', 'Responses') }}
+				{{ t('forms', 'Results') }}
 			</ActionRouter>
 			<ActionButton :close-after-click="true" icon="icon-clone" @click="onCloneForm">
 				{{ t('forms', 'Copy form') }}
@@ -145,6 +145,8 @@ export default {
 					? t('forms', 'Form link copied')
 					: t('forms', 'Cannot copy, please copy the link manually')
 			}
+
+			// TRANSLATORS Button copies the Share Link to clipboard.
 			return t('forms', 'Share link')
 		},
 

@@ -35,7 +35,8 @@
 			<template #default>
 				<button @click="showResults">
 					<span class="icon-comment" role="img" />
-					{{ t('forms', 'Responses') }}
+					<!-- TRANSLATORS Button to switch to the Result-View -->
+					{{ t('forms', 'Results') }}
 				</button>
 				<button v-if="!sidebarOpened" @click="copyShareLink">
 					<span class="icon-clippy" role="img" />

@@ -175,6 +175,7 @@ class SubmissionService {
 			// User
 			$user = $this->userManager->get($submission->getUserId());
 			if ($user === null) {
+				// TRANSLATORS Shown on export if no Display-Name is available.
 				$row[] = $this->l10n->t('Anonymous user');
 			} else {
 				$row[] = $user->getDisplayName();
@@ -198,6 +199,7 @@ class SubmissionService {
 			$data[] = $row;
 		}
 
+		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
 		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').csv';
 
 		return [
