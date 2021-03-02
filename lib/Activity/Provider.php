@@ -35,6 +35,8 @@ use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use OCP\RichObjectStrings\InvalidObjectExeption;
+use OCP\RichObjectStrings\IValidator;
 
 class Provider implements IProvider {
 	private $appName;
@@ -60,6 +62,9 @@ class Provider implements IProvider {
 	/** @var IUserManager */
 	private $userManager;
 
+	/** @var IValidator */
+	private $validator;
+
 	public function __construct(string $appName,
 								FormMapper $formMapper,
 								IEventMerger $eventMerger,
@@ -67,7 +72,8 @@ class Provider implements IProvider {
 								IL10N $l10n,
 								ILogger $logger,
 								IURLGenerator $urlGenerator,
-								IUserManager $userManager) {
+								IUserManager $userManager,
+								IValidator $validator) {
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;
 		$this->eventMerger = $eventMerger;
@@ -76,6 +82,7 @@ class Provider implements IProvider {
 		$this->logger = $logger;
 		$this->urlGenerator = $urlGenerator;
 		$this->userManager = $userManager;
+		$this->validator = $validator;
 	}
 
 	/**
@@ -246,7 +253,7 @@ class Provider implements IProvider {
 			$formTitle = $this->formMapper->findbyHash($formHash)->getTitle();
 
 			// Append hash and route
-			$formLink .= $formHash;
+			$formLink .= '/' . $formHash;
 			if ($route !== '') {
 				$formLink .= '/' . $route;
 			}
@@ -254,12 +261,23 @@ class Provider implements IProvider {
 			// Ignore if not found, just use stored title
 		}
 
-		return [
-			'type' => 'highlight',
+		$richFormTitle = [
+			'type' => 'forms-form',
 			'id' => $formHash,
 			'name' => $formTitle,
 			'link' => $formLink
 		];
+
+		// TODO Remove validation as soon as NC21 is out of support.
+		try {
+			// Validating a dummy-subject, which uses the richFormTitle.
+			$this->validator->validate('{form}', ['form' => $richFormTitle]);
+		} catch (InvalidObjectExeption $e) {
+			// In case this did not work (type does not exist for <NC21.0.1), fall back to type highlight
+			$richFormTitle['type'] = 'highlight';
+		}
+
+		return $richFormTitle;
 	}
 
 	/**
