@@ -27,6 +27,7 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Došlo k chybě při načítání seznamu formulářů",
     "Unable to create a new form" : "Nedaří se vytvořit nový formulář",
     "Unable to copy form" : "Formulář nelze zkopírovat",
+    "Results" : "Výsledky",
     "Copy form" : "Zkopírovat formulář",
     "Delete form" : "Smazat formulář",
     "Form link copied" : "Odkaz na formulář zkopírován",

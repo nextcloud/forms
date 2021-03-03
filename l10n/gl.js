@@ -27,6 +27,7 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Produciuse un erro ao cargar a lista de formularios",
     "Unable to create a new form" : "Non é posíbel crear un novo formulario",
     "Unable to copy form" : "Non é posíbel copiar o formulario",
+    "Results" : "Resultados",
     "Copy form" : "Copiar o formulario",
     "Delete form" : "Eliminar formulario",
     "Form link copied" : "Copiada a ligazón do formulario",

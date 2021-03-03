@@ -27,6 +27,7 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Er is een fout opgetreden bij het laden van de formulierenlijst",
     "Unable to create a new form" : "Kan het formulier niet aanmaken",
     "Unable to copy form" : "Kon formulier niet kopiëren",
+    "Results" : "Resultaten",
     "Copy form" : "Kopieer formulier",
     "Delete form" : "Verwijderen formulier",
     "Form link copied" : "Link naar het formulier gekopieerd",

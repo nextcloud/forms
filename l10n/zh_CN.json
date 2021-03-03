@@ -24,6 +24,7 @@
     "An error occurred while loading the forms list" : "在加载表格时发生错误",
     "Unable to create a new form" : "无法新建表格",
     "Unable to copy form" : "无法复制表格",
+    "Results" : "结果",
     "Copy form" : "复制表格",
     "Delete form" : "删除表单",
     "Form link copied" : "已复制表格连接",
