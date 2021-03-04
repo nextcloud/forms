@@ -49,6 +49,7 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           tools: phpunit
           extensions: mbstring, iconv, fileinfo, intl, sqlite, pdo_sqlite, zip, gd
+          coverage: xdebug
 
       - name: Set up PHPUnit
         working-directory: apps/${{ env.APP_NAME }}
@@ -65,17 +66,19 @@ jobs:
 
       - name: PHPUnit & coverage
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit --coverage-clover coverage.xml -c phpunit.xml
+        run: composer test:unit
 
       - name: PHPUnit integration
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+        run: composer test:integration
 
       - name: Upload coverage
-        working-directory: apps/${{ env.APP_NAME }}
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: bash <(curl -s https://codecov.io/bash)
+        uses: codecov/codecov-action@v1
+        with:
+          root_dir: apps/${{ env.APP_NAME }}
+          files: apps/${{ env.APP_NAME }}/tests/clover.unit.xml
+          fail_ci_if_error: true
+          flags: unittests
 
   mysql:
     runs-on: ubuntu-latest
@@ -141,11 +144,11 @@ jobs:
 
       - name: PHPUnit
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.xml
+        run: composer test:unit
 
       - name: PHPUnit integration
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+        run: composer test:integration
 
   pgsql:
     runs-on: ubuntu-latest
@@ -213,11 +216,11 @@ jobs:
 
       - name: PHPUnit
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.xml
+        run: composer test:unit
 
       - name: PHPUnit integration
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+        run: composer test:integration
 
   oci:
     runs-on: ubuntu-latest
@@ -278,8 +281,8 @@ jobs:
 
       - name: PHPUnit
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.xml
+        run: composer test:unit
 
       - name: PHPUnit integration
         working-directory: apps/${{ env.APP_NAME }}
-        run: ./vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+        run: composer test:integration
