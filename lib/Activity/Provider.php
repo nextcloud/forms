@@ -122,7 +122,7 @@ class Provider implements IProvider {
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 */
-	private function getSubjectString(IL10N $l10n, string $subject): string {
+	public function getSubjectString(IL10N $l10n, string $subject): string {
 		switch ($subject) {
 			case ActivityConstants::SUBJECT_NEWSHARE:
 				return $l10n->t('{user} has shared the form {formTitle} with you');
@@ -145,7 +145,7 @@ class Provider implements IProvider {
 	 * @param array $parameters Array of Rich-Parameters as created by getRichParams()
 	 * @return string
 	 */
-	private function parseSubjectString(string $subjectString, array $parameters): string {
+	public function parseSubjectString(string $subjectString, array $parameters): string {
 		$placeholders = [];
 		$replacements = [];
 		foreach ($parameters as $paramKey => $paramValue) {
@@ -161,7 +161,7 @@ class Provider implements IProvider {
 	 * @param array $params Array of stored SubjectParameters
 	 * @return array
 	 */
-	private function getRichParams(IL10N $l10n, string $subject, array $params): array {
+	public function getRichParams(IL10N $l10n, string $subject, array $params): array {
 		switch ($subject) {
 			case ActivityConstants::SUBJECT_NEWSHARE:
 				return [
@@ -189,7 +189,7 @@ class Provider implements IProvider {
 	 * @param string $userId
 	 * @return array
 	 */
-	private function getRichUser(IL10N $l10n, string $userId): array {
+	public function getRichUser(IL10N $l10n, string $userId): array {
 		// Special handling for anonyomous users
 		if (substr($userId, 0, 10) === 'anon-user-') {
 			return [
@@ -221,7 +221,7 @@ class Provider implements IProvider {
 	 * @param string $groupId
 	 * @return array
 	 */
-	private function getRichGroup(string $groupId): array {
+	public function getRichGroup(string $groupId): array {
 		// Get Displayname, if group still exists. Otherwise just show stored groupId
 		$group = $this->groupManager->get($groupId);
 		$displayName = '';
@@ -246,7 +246,7 @@ class Provider implements IProvider {
 	 * @param string $route Optional Path of specific route to append to hash-url
 	 * @return array
 	 */
-	private function getRichFormTitle(string $formTitle, string $formHash, string $route = ''): array {
+	public function getRichFormTitle(string $formTitle, string $formHash, string $route = ''): array {
 		// Base-url to Forms app. Fallback in case of MapperException.
 		$formLink = $this->urlGenerator->linkToRouteAbsolute('forms.page.index');
 
@@ -287,7 +287,7 @@ class Provider implements IProvider {
 	 * @param string $subject The events subject
 	 * @return string
 	 */
-	private function getEventIcon(string $subject): string {
+	public function getEventIcon(string $subject): string {
 		switch ($subject) {
 			case ActivityConstants::SUBJECT_NEWSHARE:
 			case ActivityConstants::SUBJECT_NEWGROUPSHARE:

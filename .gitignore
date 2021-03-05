@@ -30,3 +30,6 @@ v8-compile-cache-0/
 
 # php-cs cache
 .php_cs.cache
+
+# phpunit cache
+.phpunit.result.cache
