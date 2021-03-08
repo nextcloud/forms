@@ -71,7 +71,7 @@ OC.L10N.register(
     "Back to questions" : "Zurück zu den Fragen",
     "{amount} responses" : "{amount} Antworten",
     "Summary" : "Zusammenfassung",
-    "Responses" : "Ergebnisse",
+    "Responses" : "Antworten",
     "Options" : "Optionen",
     "Save CSV to Files" : "CSV unter Dateien speichern",
     "Download CSV" : "CSV herunterladen",
