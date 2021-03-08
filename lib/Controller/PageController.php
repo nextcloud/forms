@@ -178,6 +178,7 @@ class PageController extends Controller {
 		// Main Template to fill the form
 		Util::addScript($this->appName, 'forms-submit');
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
+		$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 	}
