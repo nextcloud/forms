@@ -1,14 +1,60 @@
 # Changelog
 
-## 2.2.0-beta.1 - 2021-01-22
+## v2.2.0 - 2021-03-09
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.1.0...v2.2.0)
 
+### Enhancements
+- Create Activities
+  [\#789](https://github.com/nextcloud/forms/pull/789) ([jotoeri](https://github.com/jotoeri))
+- Export csv to cloud
+  [\#780](https://github.com/nextcloud/forms/pull/780) ([jotoeri](https://github.com/jotoeri))
+- Show shared forms on navigation
+  [\#763](https://github.com/nextcloud/forms/pull/763) ([jotoeri](https://github.com/jotoeri))
+- Clone Forms
+  [\#756](https://github.com/nextcloud/forms/pull/756) ([jotoeri](https://github.com/jotoeri))
+- Include API Docs
+  [\#748](https://github.com/nextcloud/forms/pull/748) ([jotoeri](https://github.com/jotoeri))
+
 ### Fixed
+- Disable iPhone Auto-Zoom
+  [\#816](https://github.com/nextcloud/forms/pull/816) ([jotoeri](https://github.com/jotoeri))
+- Clarify translations
+  [\#815](https://github.com/nextcloud/forms/pull/815) ([jotoeri](https://github.com/jotoeri))
+- Fix anonymous text
+  [\#804](https://github.com/nextcloud/forms/pull/804) ([jotoeri](https://github.com/jotoeri))
+- Fix header-height for NC19
+  [\#802](https://github.com/nextcloud/forms/pull/802) ([jotoeri](https://github.com/jotoeri))
+- Manually set Types
+  [\#801](https://github.com/nextcloud/forms/pull/801) ([jotoeri](https://github.com/jotoeri))
+- Fix Sharing if deleted users are in list
+  [\#796](https://github.com/nextcloud/forms/pull/796) ([jotoeri](https://github.com/jotoeri))
+- Show all winners bold
+  [\#793](https://github.com/nextcloud/forms/pull/793) ([jotoeri](https://github.com/jotoeri))
+- Properly Scroll for required question
+  [\#792](https://github.com/nextcloud/forms/pull/792) ([jotoeri](https://github.com/jotoeri))
+- Fix toast svg
+  [\#791](https://github.com/nextcloud/forms/pull/791) ([jotoeri](https://github.com/jotoeri))
+- Properly delete Answers
+  [\#765](https://github.com/nextcloud/forms/pull/765) ([jotoeri](https://github.com/jotoeri))
+- Harden update restrictions
+  [\#750](https://github.com/nextcloud/forms/pull/750) ([jotoeri](https://github.com/jotoeri))
+- Make new option return similar to new question and form
+  [\#749](https://github.com/nextcloud/forms/pull/749) ([jotoeri](https://github.com/jotoeri))
 - Add csv export and prevents CSV formula injection
   [\#746](https://github.com/nextcloud/forms/pull/746) ([skjnldsv](https://github.com/skjnldsv))
 - Add indexes
   [\#744](https://github.com/nextcloud/forms/pull/744) ([skjnldsv](https://github.com/skjnldsv))
+
+### Merged
+- Use new RichObject
+  [\#820](https://github.com/nextcloud/forms/pull/820) ([jotoeri](https://github.com/jotoeri))
+- Introduce php-constants, use for predefined answerTypes
+  [\#795](https://github.com/nextcloud/forms/pull/795) ([jotoeri](https://github.com/jotoeri))
+- Include TopBar Share-button
+  [\#781](https://github.com/nextcloud/forms/pull/781) ([jotoeri](https://github.com/jotoeri))
+- Remove stale code
+  [\#757](https://github.com/nextcloud/forms/pull/757) ([jotoeri](https://github.com/jotoeri))
 
 
 ## 2.1.0 - 2021-01-04
