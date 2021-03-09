@@ -16,6 +16,7 @@ clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
 	rm -rf vendor
+	rm -rf js
 
 install-deps: install-composer-deps-dev install-npm-deps-dev
 
