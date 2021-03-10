@@ -341,7 +341,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$cursor = $qb_fetch->execute();
 			while ($vote = $cursor->fetch()) {
 				//If the form changed, if the user changed or if vote_option_id became smaller than last one, then a new submission is interpreted.
-				if (($vote['form_id'] != $last_vote['form_id']) || ($vote['user_id'] != $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
+				if (($vote['form_id'] !== $last_vote['form_id']) || ($vote['user_id'] !== $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
 					$qb_restore->insert('forms_v2_submissions')
 						->values([
 							'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$vote['form_id']]['newId'], IQueryBuilder::PARAM_INT),
@@ -364,7 +364,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				 */
 				$oldQuestionId = $event_structure[$vote['form_id']]['questions'][$vote['vote_option_id'] - 1]['id'];
 				//Just throw an Error, if aboves QuestionId-Mapping went wrong. Double-Checked by Question-Text.
-				if ($event_structure[$vote['form_id']]['questions'][$vote['vote_option_id'] - 1]['form_question_text'] != $vote['vote_option_text']) {
+				if ($event_structure[$vote['form_id']]['questions'][$vote['vote_option_id'] - 1]['form_question_text'] !== $vote['vote_option_text']) {
 					$output->warning("Some Question-Mapping went wrong within Submission-Mapping to new Database. On 'vote_id': " . $vote['id'] . " - 'vote_option_text': '" . $vote['vote_option_text'] . "'");
 				}
 
