@@ -28,7 +28,7 @@
 		</p>
 
 		<!-- Answers with countable results for visualization -->
-		<ol v-if="question.type.predefined"
+		<ol v-if="answerTypes[question.type].predefined"
 			class="question-summary__statistic">
 			<li v-for="option in questionOptions"
 				:key="option.id">
