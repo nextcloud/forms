@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.1 - 2021-03-10
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.0...v2.2.1)
+
+### Fixed
+
+- Fix router naming conflict
+  [\#837](https://github.com/nextcloud/forms/pull/837) ([jotoeri](https://github.com/jotoeri))
+- Fix Summary Aggregation
+  [\#835](https://github.com/nextcloud/forms/pull/835) ([jotoeri](https://github.com/jotoeri))
+
+
 ## v2.2.0 - 2021-03-09
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.1.0...v2.2.0)
