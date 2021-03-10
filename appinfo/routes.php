@@ -25,11 +25,11 @@
 
 return [
 	'routes' => [
-		// Before /{hash}/{action} to avoid conflict
+		// Before /{hash}/{view} to avoid conflict
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
 
 		// As parameters have defaults, this catches all routes from '/' to '/hash/edit'
-		['name' => 'page#index', 'url' => '/{hash}/{action}', 'verb' => 'GET', 'defaults' => ['hash' => '', 'action' => '']],
+		['name' => 'page#index', 'url' => '/{hash}/{view}', 'verb' => 'GET', 'defaults' => ['hash' => '', 'view' => '']],
 	],
 	'ocs' => [
 		// Forms
