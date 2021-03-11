@@ -105,7 +105,7 @@ OC.L10N.register(
     "Checkboxes" : "Zatržítka",
     "Checkbox question title" : "Nadpis otázky se zaškrtávací kolonkou",
     "This question needs a title and at least one answer!" : "Tato otázka potřebuje nadpis a alespoň jednu odpověď!",
-    "Multiple choice" : "Vícero možností",
+    "Multiple choice" : "Otázka s více odpověďmi",
     "Multiple choice question title" : "Nadpis otázky s vícero volbami",
     "Dropdown" : "Rozbalovací",
     "Dropdown question title" : "Nadpis rozbalovací otázky",
