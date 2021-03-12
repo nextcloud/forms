@@ -25,11 +25,12 @@
 
 return [
 	'routes' => [
-		// Before /{hash}/{view} to avoid conflict
+		// Internal views
+		['name' => 'page#views', 'url' => '/{hash}/{view}', 'verb' => 'GET'],
+		// Share-Link & public submit
 		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
-
-		// As parameters have defaults, this catches all routes from '/' to '/hash/edit'
-		['name' => 'page#index', 'url' => '/{hash}/{view}', 'verb' => 'GET', 'defaults' => ['hash' => '', 'view' => '']],
+		// App Root
+		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 	],
 	'ocs' => [
 		// Forms
