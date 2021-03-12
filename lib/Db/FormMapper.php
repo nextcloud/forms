@@ -31,14 +31,23 @@ use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
 class FormMapper extends QBMapper {
+	/** @var QuestionMapper */
+	private $questionMapper;
+
+	/** @var SubmissionMapper */
+	private $submissionMapper;
 
 	/**
 	 * FormMapper constructor.
 	 *
 	 * @param IDBConnection $db
 	 */
-	public function __construct(IDBConnection $db) {
+	public function __construct(QuestionMapper $questionMapper,
+								SubmissionMapper $submissionMapper,
+								IDBConnection $db) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
+		$this->questionMapper = $questionMapper;
+		$this->submissionMapper = $submissionMapper;
 	}
 
 	/**
@@ -106,5 +115,16 @@ class FormMapper extends QBMapper {
 			->orderBy('created', 'DESC');
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Delete a Form including connected Questions and Submissions
+	 * @param Form $form The form instance to delete
+	 */
+	public function deleteForm(Form $form): void {
+		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
+		$this->submissionMapper->deleteByForm($form->getId());
+		$this->questionMapper->deleteByForm($form->getId());
+		$this->delete($form);
 	}
 }
