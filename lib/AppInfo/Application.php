@@ -28,7 +28,10 @@ declare(strict_types=1);
 
 namespace OCA\Forms\AppInfo;
 
+use OCA\Forms\Listener\UserDeletedListener;
 use OCP\AppFramework\App;
+use OCP\EventDispatcher\IEventDispatcher;
+use OCP\User\Events\UserDeletedEvent;
 
 include_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -41,5 +44,8 @@ class Application extends App {
 	 */
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
+
+		$eventDispatcher = $this->getContainer()->query(IEventDispatcher::class);
+		$eventDispatcher->addServiceListener(UserDeletedEvent::class, UserDeletedListener::class);
 	}
 }
