@@ -1,5 +1,8 @@
 { "translations": {
     "Forms" : "Vprašalniki",
+    "{user} has shared the form {formTitle} with you" : "{user} vam omogoči dostop do obrazca {formTitle}",
+    "{user} has shared the form {formTitle} with group {group}" : "{user} omogoči dostop do obrazca {formTitle} skupini {group}",
+    "{user} answered your form {formTitle}" : "{user} izpolni obrazec {formTitle}",
     "Anonymous user" : "Brezimni uporabnik",
     "A form has been <strong>shared</strong> with you" : "V <strong>souporabi</strong> imate vprašalnik.",
     "Someone <strong>answered</strong> a form" : "Nekdo je <strong>izpolnil</strong> vprašalnik.",
