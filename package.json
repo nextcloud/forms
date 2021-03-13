@@ -33,7 +33,7 @@
 		"@nextcloud/vue": "^3.7.0",
 		"core-js": "^3.9.1",
 		"crypto-js": "^4.0.0",
-		"debounce": "^1.2.0",
+		"debounce": "^1.2.1",
 		"p-debounce": "^3.0.1",
 		"p-queue": "^6.6.2",
 		"regenerator-runtime": "^0.13.7",
