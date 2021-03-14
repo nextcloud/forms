@@ -27,6 +27,7 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Si è verificato un errore durante il caricamento dell'elenco dei moduli",
     "Unable to create a new form" : "Impossibile creare un nuovo modulo",
     "Unable to copy form" : "Impossibile copiare il modulo",
+    "Results" : "Risultati",
     "Copy form" : "Copia modulo",
     "Delete form" : "Elimina modulo",
     "Form link copied" : "Collegamento del modulo copiato",
