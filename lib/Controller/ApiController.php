@@ -240,7 +240,9 @@ class ApiController extends OCSController {
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
-			'type' => 'public'
+			'type' => 'public',
+			'users' => [],
+			'groups' => []
 		]);
 		$form->setSubmitOnce(true);
 
