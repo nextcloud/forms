@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.2 - 2021-03-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.1...v2.2.2)
+
+### Fixed
+
+- Fix Routing
+  [\#846](https://github.com/nextcloud/forms/pull/846) ([jotoeri](https://github.com/jotoeri))
+- Fix half access objects
+  [\#844](https://github.com/nextcloud/forms/pull/844) ([jotoeri](https://github.com/jotoeri))
+
+
 ## v2.2.1 - 2021-03-10
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.0...v2.2.1)
