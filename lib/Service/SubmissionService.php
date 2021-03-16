@@ -186,7 +186,14 @@ class SubmissionService {
 
 			// Answers, make sure we keep the question order
 			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function (array $carry, Answer $answer) {
-				$carry[$answer->getQuestionId()] = $answer->getText();
+				$questionId = $answer->getQuestionId();
+
+				// If key exists, insert separator
+				if (key_exists($questionId, $carry)) {
+					$carry[$questionId] .= '; ';
+				}
+				$carry[$questionId] .= $answer->getText();
+
 				return $carry;
 			}, []);
 
