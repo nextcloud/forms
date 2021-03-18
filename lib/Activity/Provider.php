@@ -35,6 +35,7 @@ use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
+use OCP\L10N\IFactory;
 use OCP\RichObjectStrings\InvalidObjectExeption;
 use OCP\RichObjectStrings\IValidator;
 
@@ -50,9 +51,6 @@ class Provider implements IProvider {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var IL10N */
-	private $l10n;
-
 	/** @var ILogger */
 	private $logger;
 
@@ -62,6 +60,9 @@ class Provider implements IProvider {
 	/** @var IUserManager */
 	private $userManager;
 
+	/** @var IFactory */
+	private $l10nFactory;
+
 	/** @var IValidator */
 	private $validator;
 
@@ -69,19 +70,19 @@ class Provider implements IProvider {
 								FormMapper $formMapper,
 								IEventMerger $eventMerger,
 								IGroupManager $groupManager,
-								IL10N $l10n,
 								ILogger $logger,
 								IURLGenerator $urlGenerator,
 								IUserManager $userManager,
+								IFactory $l10nFactory,
 								IValidator $validator) {
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;
 		$this->eventMerger = $eventMerger;
 		$this->groupManager = $groupManager;
-		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->urlGenerator = $urlGenerator;
 		$this->userManager = $userManager;
+		$this->l10nFactory = $l10nFactory;
 		$this->validator = $validator;
 	}
 
@@ -98,9 +99,10 @@ class Provider implements IProvider {
 		if ($event->getApp() !== $this->appName) {
 			throw new \InvalidArgumentException();
 		}
+		$l10n = $this->l10nFactory->get($this->appName, $language);
 
-		$subjectString = $this->getSubjectString($event->getSubject());
-		$parameters = $this->getRichParams($event->getSubject(), $event->getSubjectParameters());
+		$subjectString = $this->getSubjectString($l10n, $event->getSubject());
+		$parameters = $this->getRichParams($l10n, $event->getSubject(), $event->getSubjectParameters());
 
 		$event->setParsedSubject($this->parseSubjectString($subjectString, $parameters));
 		$event->setRichSubject($subjectString, $parameters);
@@ -120,16 +122,16 @@ class Provider implements IProvider {
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 */
-	private function getSubjectString(string $subject): string {
+	private function getSubjectString(IL10N $l10n, string $subject): string {
 		switch ($subject) {
 			case ActivityConstants::SUBJECT_NEWSHARE:
-				return $this->l10n->t('{user} has shared the form {formTitle} with you');
+				return $l10n->t('{user} has shared the form {formTitle} with you');
 
 			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
-				return $this->l10n->t('{user} has shared the form {formTitle} with group {group}');
+				return $l10n->t('{user} has shared the form {formTitle} with group {group}');
 
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
-				return $this->l10n->t('{user} answered your form {formTitle}');
+				return $l10n->t('{user} answered your form {formTitle}');
 
 			default:
 				$this->logger->warning('Some unknown activity has been found: ' . $subject);
@@ -159,22 +161,22 @@ class Provider implements IProvider {
 	 * @param array $params Array of stored SubjectParameters
 	 * @return array
 	 */
-	private function getRichParams(string $subject, array $params): array {
+	private function getRichParams(IL10N $l10n, string $subject, array $params): array {
 		switch ($subject) {
 			case ActivityConstants::SUBJECT_NEWSHARE:
 				return [
-					'user' => $this->getRichUser($params['userId']),
+					'user' => $this->getRichUser($l10n, $params['userId']),
 					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash'])
 				];
 			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
 				return [
-					'user' => $this->getRichUser($params['userId']),
+					'user' => $this->getRichUser($l10n, $params['userId']),
 					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
 					'group' => $this->getRichGroup($params['groupId'])
 				];
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
 				return [
-					'user' => $this->getRichUser($params['userId']),
+					'user' => $this->getRichUser($l10n, $params['userId']),
 					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash'], 'results')
 				];
 			default:
@@ -187,14 +189,14 @@ class Provider implements IProvider {
 	 * @param string $userId
 	 * @return array
 	 */
-	private function getRichUser(string $userId): array {
+	private function getRichUser(IL10N $l10n, string $userId): array {
 		// Special handling for anonyomous users
 		if (substr($userId, 0, 10) === 'anon-user-') {
 			return [
 				'type' => 'highlight',
 				'id' => $userId,
 				// TRANSLATORS Shown as a users display-name
-				'name' => $this->l10n->t('Anonymous user')
+				'name' => $l10n->t('Anonymous user')
 			];
 		}
 
