@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.3 - 2021-03-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.2...v2.2.3)
+
+### Fixed
+
+- Fix export multiple answers
+  [\#860](https://github.com/nextcloud/forms/pull/860) ([jotoeri](https://github.com/jotoeri))
+- Fix activity l10n
+  [\#845](https://github.com/nextcloud/forms/pull/845) ([jotoeri](https://github.com/jotoeri))
+
+
 ## v2.2.2 - 2021-03-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.1...v2.2.2)
