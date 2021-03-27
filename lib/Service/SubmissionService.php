@@ -190,9 +190,10 @@ class SubmissionService {
 
 				// If key exists, insert separator
 				if (key_exists($questionId, $carry)) {
-					$carry[$questionId] .= '; ';
+					$carry[$questionId] .= '; ' . $answer->getText();
+				} else {
+					$carry[$questionId] = $answer->getText();
 				}
-				$carry[$questionId] .= $answer->getText();
 
 				return $carry;
 			}, []);
