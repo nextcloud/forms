@@ -30,5 +30,6 @@ v8-compile-cache-0/
 # php-cs cache
 .php_cs.cache
 
-# phpunit cache
+# phpunit results
 .phpunit.result.cache
+clover.unit.xml
