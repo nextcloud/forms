@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.2.4 - 2021-03-30
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.3...v2.2.4)
+
+### Fixed
+
+- Fix export again
+  [\#871](https://github.com/nextcloud/forms/pull/871) ([jotoeri](https://github.com/jotoeri))
+
+### Merged
+
+- Bump dependencies
+  [\#872](https://github.com/nextcloud/forms/pull/872) ([skjnldsv](https://github.com/skjnldsv))
+
+
 ## v2.2.3 - 2021-03-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.2...v2.2.3)
