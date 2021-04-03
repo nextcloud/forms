@@ -114,11 +114,11 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'comment' => 'unix-timestamp',
 			]);
 			$table->addColumn('is_anonymous', self::TYPE_BOOLEAN, [
-				'notnull' => true,
+				'notnull' => false,
 				'default' => 0,
 			]);
 			$table->addColumn('submit_once', self::TYPE_BOOLEAN, [
-				'notnull' => true,
+				'notnull' => false,
 				'default' => 0,
 			]);
 			$table->setPrimaryKey(['id']);
@@ -143,7 +143,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'length' => 256,
 			]);
 			$table->addColumn('mandatory', self::TYPE_BOOLEAN, [
-				'notnull' => true,
+				'notnull' => false,
 				'default' => 0,
 			]);
 			$table->addColumn('text', self::TYPE_STRING, [
