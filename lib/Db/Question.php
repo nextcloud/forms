@@ -74,7 +74,7 @@ class Question extends Entity {
 			'formId' => $this->getFormId(),
 			'order' => $this->getOrder(),
 			'type' => htmlspecialchars_decode($this->getType()),
-			'mandatory' => $this->getMandatory(),
+			'isRequired' => $this->getMandatory(),
 			'text' => htmlspecialchars_decode($this->getText()),
 		];
 	}

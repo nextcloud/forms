@@ -24,7 +24,7 @@
 	<Question
 		v-bind.sync="$attrs"
 		:text="text"
-		:mandatory="mandatory"
+		:is-required="isRequired"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
@@ -33,13 +33,13 @@
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		@update:text="onTitleChange"
-		@update:mandatory="onMandatoryChange"
+		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<select v-if="!edit"
 			:id="text"
 			:name="text"
 			:multiple="isMultiple"
-			:required="mandatory"
+			:required="isRequired"
 			class="question__content"
 			@change="onChange">
 			<option value="">
@@ -189,8 +189,8 @@ export default {
 		 * @returns {boolean}
 		 */
 		isRequired(id) {
-			// false, if question not mandatory
-			if (!this.mandatory) {
+			// false, if question not required
+			if (!this.isRequired) {
 				return false
 			}
 

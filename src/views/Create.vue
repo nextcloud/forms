@@ -204,8 +204,8 @@ export default {
 			return this.form.questions && this.form.questions.length === 0
 		},
 
-		isMandatoryUsed() {
-			return this.form.questions.reduce((isUsed, question) => isUsed || question.mandatory, false)
+		isRequiredUsed() {
+			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
 		},
 
 		infoMessage() {
@@ -219,7 +219,7 @@ export default {
 				message += t('forms', 'Responses are connected to your Nextcloud account.')
 			}
 
-			if (this.isMandatoryUsed) {
+			if (this.isRequiredUsed) {
 				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 

@@ -46,9 +46,9 @@ export default {
 		},
 
 		/**
-		 * Mandatory-Setting
+		 * Required-Setting
 		 */
-		mandatory: {
+		isRequired: {
 			type: Boolean,
 			required: true,
 		},
@@ -119,13 +119,13 @@ export default {
 		}, 200),
 
 		/**
-		 * Forward the mandatory change to the parent and store to db
+		 * Forward the required change to the parent and store to db
 		 *
-		 * @param {Boolean} mandatoryValue new mandatory Value
+		 * @param {Boolean} isRequiredValue new mandatory Value
 		 */
-		onMandatoryChange: debounce(function(mandatoryValue) {
-			this.$emit('update:mandatory', mandatoryValue)
-			this.saveQuestionProperty('mandatory', mandatoryValue)
+		onRequiredChange: debounce(function(isRequiredValue) {
+			this.$emit('update:isRequired', isRequiredValue)
+			this.saveQuestionProperty('mandatory', isRequiredValue)
 		}, 200),
 
 		/**

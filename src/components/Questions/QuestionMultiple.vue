@@ -24,7 +24,7 @@
 	<Question
 		v-bind.sync="$attrs"
 		:text="text"
-		:mandatory="mandatory"
+		:is-required="isRequired"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
@@ -33,7 +33,7 @@
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		@update:text="onTitleChange"
-		@update:mandatory="onMandatoryChange"
+		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<ul class="question__content">
 			<template v-for="(answer, index) in options">
@@ -49,7 +49,7 @@
 							'checkbox question__checkbox': !isUnique,
 						}"
 						:name="`${id}-answer`"
-						:required="isRequired(answer.id)"
+						:required="checkRequired(answer.id)"
 						:type="isUnique ? 'radio' : 'checkbox'"
 						@change="onChange($event, answer.id)"
 						@keydown.enter.exact.prevent="onKeydownEnter">
@@ -195,9 +195,9 @@ export default {
 		 * @param {number} id the answer id
 		 * @returns {boolean}
 		 */
-		isRequired(id) {
-			// false, if question not mandatory
-			if (!this.mandatory) {
+		checkRequired(id) {
+			// false, if question not required
+			if (!this.isRequired) {
 				return false
 			}
 
