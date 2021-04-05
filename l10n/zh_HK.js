@@ -19,7 +19,7 @@ OC.L10N.register(
     "New form" : "新表格",
     "Your Forms" : "您的表格",
     "Shared with you" : "與您分享",
-    "Loading forms …" : "表格加載中 。。。",
+    "Loading forms …" : "表格加載中 ...",
     "No forms created yet" : "尚未建立表格",
     "Create a form" : "建立表格",
     "Select a form or create a new one" : "選擇表格或建立新的",
