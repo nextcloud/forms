@@ -26,40 +26,192 @@
 return [
 	'routes' => [
 		// Internal views
-		['name' => 'page#views', 'url' => '/{hash}/{view}', 'verb' => 'GET'],
+		[
+			'name' => 'page#views',
+			'url' => '/{hash}/{view}',
+			'verb' => 'GET'
+		],
 		// Share-Link & public submit
-		['name' => 'page#goto_form', 'url' => '/{hash}', 'verb' => 'GET'],
+		[
+			'name' => 'page#goto_form',
+			'url' => '/{hash}',
+			'verb' => 'GET'
+		],
 		// App Root
-		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+		[
+			'name' => 'page#index',
+			'url' => '/',
+			'verb' => 'GET'
+		],
 	],
 	'ocs' => [
+		
 		// Forms
-		['name' => 'api#getForms', 'url' => '/api/v1/forms', 'verb' => 'GET'],
-		['name' => 'api#newForm', 'url' => '/api/v1/form', 'verb' => 'POST'],
-		['name' => 'api#getForm', 'url' => '/api/v1/form/{id}', 'verb' => 'GET'],
-		['name' => 'api#cloneForm', 'url' => '/api/v1/form/clone/{id}', 'verb' => 'POST'],
-		['name' => 'api#updateForm', 'url' => '/api/v1/form/update', 'verb' => 'POST'],
-		['name' => 'api#deleteForm', 'url' => '/api/v1/form/{id}', 'verb' => 'DELETE'],
-		['name' => 'api#getSharedForms', 'url' => '/api/v1/shared_forms', 'verb' => 'GET'],
+		[
+			'name' => 'api#getForms',
+			'url' => '/api/{apiVersion}/forms',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#newForm',
+			'url' => '/api/{apiVersion}/form',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#getForm',
+			'url' => '/api/{apiVersion}/form/{id}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#cloneForm',
+			'url' => '/api/{apiVersion}/form/clone/{id}',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#updateForm',
+			'url' => '/api/{apiVersion}/form/update',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#deleteForm',
+			'url' => '/api/{apiVersion}/form/{id}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#getSharedForms',
+			'url' => '/api/{apiVersion}/shared_forms',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
 
 		// Questions
-		['name' => 'api#newQuestion', 'url' => '/api/v1/question', 'verb' => 'POST'],
-		['name' => 'api#updateQuestion', 'url' => '/api/v1/question/update', 'verb' => 'POST'],
-		['name' => 'api#reorderQuestions', 'url' => '/api/v1/question/reorder', 'verb' => 'POST'],
-		['name' => 'api#deleteQuestion', 'url' => '/api/v1/question/{id}', 'verb' => 'DELETE'],
+		[
+			'name' => 'api#newQuestion',
+			'url' => '/api/{apiVersion}/question',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#updateQuestion',
+			'url' => '/api/{apiVersion}/question/update',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#reorderQuestions',
+			'url' => '/api/{apiVersion}/question/reorder',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#deleteQuestion',
+			'url' => '/api/{apiVersion}/question/{id}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
 
-		// Answers
-		['name' => 'api#newOption', 'url' => '/api/v1/option', 'verb' => 'POST'],
-		['name' => 'api#updateOption', 'url' => '/api/v1/option/update', 'verb' => 'POST'],
-		['name' => 'api#deleteOption', 'url' => '/api/v1/option/{id}', 'verb' => 'DELETE'],
+		// Options
+		[
+			'name' => 'api#newOption',
+			'url' => '/api/{apiVersion}/option',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#updateOption',
+			'url' => '/api/{apiVersion}/option/update',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#deleteOption',
+			'url' => '/api/{apiVersion}/option/{id}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
 
 		// Submissions
-		['name' => 'api#getSubmissions', 'url' => '/api/v1/submissions/{hash}', 'verb' => 'GET'],
-		['name' => 'api#exportSubmissions', 'url' => '/api/v1/submissions/export/{hash}', 'verb' => 'GET'],
-		['name' => 'api#exportSubmissionsToCloud', 'url' => '/api/v1/submissions/export', 'verb' => 'POST'],
-		['name' => 'api#deleteAllSubmissions', 'url' => '/api/v1/submissions/{formId}', 'verb' => 'DELETE'],
-
-		['name' => 'api#insertSubmission', 'url' => '/api/v1/submission/insert', 'verb' => 'POST'],
-		['name' => 'api#deleteSubmission', 'url' => '/api/v1/submission/{id}', 'verb' => 'DELETE'],
+		[
+			'name' => 'api#getSubmissions',
+			'url' => '/api/{apiVersion}/submissions/{hash}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#exportSubmissions',
+			'url' => '/api/{apiVersion}/submissions/export/{hash}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#exportSubmissionsToCloud',
+			'url' => '/api/{apiVersion}/submissions/export',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#deleteAllSubmissions',
+			'url' => '/api/{apiVersion}/submissions/{formId}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#insertSubmission',
+			'url' => '/api/{apiVersion}/submission/insert',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#deleteSubmission',
+			'url' => '/api/{apiVersion}/submission/{id}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
 	]
 ];

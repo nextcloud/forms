@@ -121,11 +121,11 @@ export default {
 		/**
 		 * Forward the required change to the parent and store to db
 		 *
-		 * @param {Boolean} isRequiredValue new mandatory Value
+		 * @param {Boolean} isRequiredValue new isRequired Value
 		 */
 		onRequiredChange: debounce(function(isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
-			this.saveQuestionProperty('mandatory', isRequiredValue)
+			this.saveQuestionProperty('isRequired', isRequiredValue)
 		}, 200),
 
 		/**
@@ -170,7 +170,7 @@ export default {
 		async saveQuestionProperty(key, value) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'question/update', {
+				await axios.post(generateOcsUrl('apps/forms/api/v1.1', 2) + 'question/update', {
 					id: this.id,
 					keyValuePairs: {
 						[key]: value,
