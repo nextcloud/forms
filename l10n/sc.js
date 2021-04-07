@@ -40,7 +40,7 @@ OC.L10N.register(
     "Question number {index}" : "Pregonta nùmeru {index}",
     "Drag to reorder the questions" : "Traga pro ordinare is pregontas",
     "Title of question number {index}" : "Tìtulu de sa pregonta nùmeru {index}",
-    "Required" : "Rechedidu",
+    "Required" : "Rechertu",
     "Delete question" : "Cantzella pregonta",
     "This question needs a title!" : "Sa pregonta bolet unu tìtulu!",
     "Add a new answer" : "Agiunghe una risposta noa",
