@@ -20,10 +20,13 @@ This file contains the API-Documentation. For more information on the returned D
 }
 ```
 
+## Deprecation warning ⚠️
+Starting with API version 1.1, the `mandatory` property of questions is deprecated and replaced by `isRequired`. It will be removed in API version 2.
+
 ## Form Endpoints
 ### List owned Forms
 Returns condensed objects of all Forms beeing owned by the authenticated user.
-- Endpoint: `/api/v1/forms`
+- Endpoint: `/api/v1.1/forms`
 - Method: `GET`
 - Parameters: None
 - Response: Array of condensed Form Objects, sorted as newest first.
@@ -48,7 +51,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
 
 ### List shared Forms
 Returns condensed objects of all Forms, that are shared to the authenticated user via instance ([access-type](DataStructure.md#share-types) `registered` or `selected`) and have not expired yet.
-- Endpoint: `/api/v1/shared_forms`
+- Endpoint: `/api/v1.1/shared_forms`
 - Method: `GET`
 - Parameters: None
 - Response: Array of condensed Form Objects, sorted as newest first, similar to [List owned Forms](#list-owned-forms).
@@ -57,7 +60,7 @@ See above, 'List owned forms'
 ```
 
 ### Create a new Form
-- Endpoint: `/api/v1/form`
+- Endpoint: `/api/v1.1/form`
 - Method: `POST`
 - Parameters: None
 - Response: The new form object.
@@ -82,7 +85,7 @@ See above, 'List owned forms'
 
 ### Request full data of a form
 Returns the full-depth object of the requested form (without submissions).
-- Endpoint: `/api/v1/form/{id}`
+- Endpoint: `/api/v1.1/form/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -111,7 +114,8 @@ Returns the full-depth object of the requested form (without submissions).
       "formId": 3,
       "order": 1,
       "type": "dropdown",
-      "mandatory": false,
+      "mandatory": false, // deprecated, will be removed in API v2
+      "isRequired": false,
       "text": "Question 1",
       "options": [
         {
@@ -131,7 +135,8 @@ Returns the full-depth object of the requested form (without submissions).
       "formId": 3,
       "order": 2,
       "type": "short",
-      "mandatory": true,
+      "mandatory": true, // deprecated, will be removed in API v2
+      "isRequired": true,
       "text": "Question 2",
       "options": []
     }
@@ -141,7 +146,7 @@ Returns the full-depth object of the requested form (without submissions).
 
 ### Clone a form
 Creates a clone of a form (without submissions).
-- Endpoint: `/api/v1/form/clone/{id}`
+- Endpoint: `/api/v1.1/form/clone/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -154,7 +159,7 @@ See section 'Request full data of a form'.
 
 ### Update form properties
 Update a single or multiple properties of a form-object. Concerns **only** the Form-Object, properties of Questions, Options and Submissions, as well as their creation or deletion, are handled separately.
-- Endpoint: `/api/v1/form/update`
+- Endpoint: `/api/v1.1/form/update`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -168,7 +173,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
 ```
 
 ### Delete a form
-- Endpoint: `/api/v1/form/{id}`
+- Endpoint: `/api/v1.1/form/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -183,7 +188,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
 Contains only manipulative question-endpoints. To retrieve questions, request the full form data.
 
 ### Create a new question
-- Endpoint: `/api/v1/question`
+- Endpoint: `/api/v1.1/question`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Optional | Description |
@@ -198,7 +203,8 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
   "formId": 3,
   "order": 3,
   "type": "short",
-  "mandatory": false,
+  "mandatory": false, // deprecated, will be removed in API v2
+  "isRequired": false,
   "text": "",
   "options": []
 }
@@ -206,7 +212,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
 
 ### Update question properties
 Update a single or multiple properties of a question-object.
-- Endpoint: `/api/v1/question/update`
+- Endpoint: `/api/v1.1/question/update`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -221,7 +227,7 @@ Update a single or multiple properties of a question-object.
 
 ### Reorder questions
 Reorders all Questions of a single form
-- Endpoint: `/api/v1/question/reorder`
+- Endpoint: `/api/v1.1/question/reorder`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -245,7 +251,7 @@ Reorders all Questions of a single form
 ```
 
 ### Delete a question
-- Endpoint: `/api/v1/question/{id}`
+- Endpoint: `/api/v1.1/question/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -260,7 +266,7 @@ Reorders all Questions of a single form
 Contains only manipulative question-endpoints. To retrieve options, request the full form data.
 
 ### Create a new Option
-- Endpoint: `/api/v1/option`
+- Endpoint: `/api/v1.1/option`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -277,7 +283,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ```
 
 ### Update option properties
-- Endpoint: `/api/v1/option/update`
+- Endpoint: `/api/v1.1/option/update`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -291,7 +297,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ```
 
 ### Delete an option
-- Endpoint: `/api/v1/option/{id}`
+- Endpoint: `/api/v1.1/option/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -306,7 +312,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ## Submission Endpoints
 ### Get Form Submissions
 Get all Submissions to a Form
-- Endpoint: `/api/v1/submissions/{hash}`
+- Endpoint: `/api/v1.1/submissions/{hash}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -365,7 +371,8 @@ Get all Submissions to a Form
       "formId": 3,
       "order": 1,
       "type": "dropdown",
-      "mandatory": false,
+      "mandatory": false, // deprecated, will be removed in API v2
+      "isRequired": false,
       "text": "Question 1",
       "options": [
         {
@@ -390,7 +397,8 @@ Get all Submissions to a Form
       "formId": 3,
       "order": 2,
       "type": "short",
-      "mandatory": true,
+      "mandatory": true, // deprecated will be removed in API v2
+      "isRequired": true,
       "text": "Question 2",
       "options": []
     }
@@ -400,7 +408,7 @@ Get all Submissions to a Form
 
 ### Get Submissions as csv (Download)
 Returns all submissions to the form in form of a csv-file.
-- Endpoint: `/api/v1/submissions/export/{hash}`
+- Endpoint: `/api/v1.1/submissions/export/{hash}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -415,7 +423,7 @@ Returns all submissions to the form in form of a csv-file.
 
 ### Export Submissions to Cloud (Files-App)
 Creates a csv file and stores it to the cloud, resp. Files-App.
-- Endpoint: `/api/v1/submissions/export`
+- Endpoint: `/api/v1.1/submissions/export`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -429,7 +437,7 @@ Creates a csv file and stores it to the cloud, resp. Files-App.
 
 ### Delete Submissions
 Delete all Submissions to a form
-- Endpoint: `/api/v1/submissions/{formId}`
+- Endpoint: `/api/v1.1/submissions/{formId}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -442,7 +450,7 @@ Delete all Submissions to a form
 
 ### Insert a Submission
 Store Submission to Database
-- Endpoint: `/api/v1/submission/insert`
+- Endpoint: `/api/v1.1/submission/insert`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -462,7 +470,7 @@ Store Submission to Database
 - Response: **Status-Code OK**.
 
 ### Delete a single Submission
-- Endpoint: `/api/v1/submission/{id}`
+- Endpoint: `/api/v1.1/submission/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|

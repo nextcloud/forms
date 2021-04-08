@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.0 - tbd
+
+### Deprecated
+
+- Question property `mandatory` is deprecated and replaced by `isRequired`. The old property will be removed in API version 2.
+  [\#882](https://github.com/nextcloud/forms/pull/882) ([chartman123](https://github.com/Chartman123))
+
 ## v2.2.4 - 2021-03-30
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.3...v2.2.4)
