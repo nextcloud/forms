@@ -47,7 +47,7 @@ class Question extends Entity {
 	protected $formId;
 	protected $order;
 	protected $type;
-	protected $mandatory;
+	protected $isRequired;
 	protected $text;
 
 	public const TYPES = [
@@ -64,7 +64,7 @@ class Question extends Entity {
 		$this->addType('formId', 'integer');
 		$this->addType('order', 'integer');
 		$this->addType('type', 'string');
-		$this->addType('mandatory', 'bool');
+		$this->addType('isRequired', 'bool');
 		$this->addType('text', 'string');
 	}
 
@@ -74,7 +74,7 @@ class Question extends Entity {
 			'formId' => $this->getFormId(),
 			'order' => $this->getOrder(),
 			'type' => htmlspecialchars_decode($this->getType()),
-			'mandatory' => $this->getMandatory(),
+			'isRequired' => $this->getIsRequired(),
 			'text' => htmlspecialchars_decode($this->getText()),
 		];
 	}

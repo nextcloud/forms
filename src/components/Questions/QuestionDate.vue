@@ -24,14 +24,14 @@
 	<Question
 		v-bind.sync="$attrs"
 		:text="text"
-		:mandatory="mandatory"
+		:is-required="isRequired"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		@update:text="onTitleChange"
-		@update:mandatory="onMandatoryChange"
+		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<div class="question__content">
 			<DatetimePicker
@@ -103,7 +103,7 @@ export default {
 		 */
 		inputAttr() {
 			return {
-				required: this.mandatory,
+				required: this.isRequired,
 			}
 		},
 	},

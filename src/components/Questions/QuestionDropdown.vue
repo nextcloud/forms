@@ -24,7 +24,7 @@
 	<Question
 		v-bind.sync="$attrs"
 		:text="text"
-		:mandatory="mandatory"
+		:is-required="isRequired"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-question-length="maxStringLengths.questionText"
@@ -33,13 +33,13 @@
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		@update:text="onTitleChange"
-		@update:mandatory="onMandatoryChange"
+		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<select v-if="!edit"
 			:id="text"
 			:name="text"
 			:multiple="isMultiple"
-			:required="mandatory"
+			:required="isRequired"
 			class="question__content"
 			@change="onChange">
 			<option value="">
@@ -180,30 +180,6 @@ export default {
 		},
 
 		/**
-		 * Is the provided answer required ?
-		 * This is needed for checkboxes as html5
-		 * doesn't allow to require at least ONE checked.
-		 * So we require the one that are checked or all
-		 * if none are checked yet.
-		 * @param {number} id the answer id
-		 * @returns {boolean}
-		 */
-		isRequired(id) {
-			// false, if question not mandatory
-			if (!this.mandatory) {
-				return false
-			}
-
-			// true for simple select
-			if (!this.isMultiple) {
-				return true
-			}
-
-			// For checkboxes, only required if no other is checked
-			return this.areNoneChecked
-		},
-
-		/**
 		 * Update the options
 		 * @param {Array} options options to change
 		 */
@@ -305,7 +281,7 @@ export default {
 
 			if (!option.local) {
 				// let's not await, deleting in background
-				axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `option/${option.id}`)
+				axios.delete(generateOcsUrl('apps/forms/api/v1.1', 2) + `option/${option.id}`)
 					.catch(error => {
 						showError(t('forms', 'There was an issue deleting this option'))
 						console.error(error)

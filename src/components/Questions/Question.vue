@@ -51,8 +51,8 @@
 				class="question__header-warning icon-error-color"
 				tabindex="0" />
 			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
-				<ActionCheckbox :checked="mandatory"
-					@update:checked="onMandatoryChange">
+				<ActionCheckbox :checked="isRequired"
+					@update:checked="onRequiredChange">
 					<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 					{{ t('forms', 'Required') }}
 				</ActionCheckbox>
@@ -99,7 +99,7 @@ export default {
 			type: String,
 			required: true,
 		},
-		mandatory: {
+		isRequired: {
 			type: Boolean,
 			required: true,
 		},
@@ -131,11 +131,11 @@ export default {
 
 	computed: {
 		/**
-		 * Extend text with asterisk if question is mandatory
+		 * Extend text with asterisk if question is required
 		 * @returns {Boolean}
 		 */
 		computedText() {
-			if (this.mandatory) {
+			if (this.isRequired) {
 				return this.text + ' *'
 			}
 			return this.text
@@ -155,8 +155,8 @@ export default {
 			this.$emit('update:text', target.value)
 		},
 
-		onMandatoryChange(mandatory) {
-			this.$emit('update:mandatory', mandatory)
+		onRequiredChange(isRequired) {
+			this.$emit('update:isRequired', isRequired)
 		},
 
 		/**

@@ -1,7 +1,7 @@
 # Forms Data Structure
-**State: Forms v2.2.0 - 22.01.2021**
+**State: Forms v2.3.0 - 09.04.2021**
 
-This document describes the Obect-Structure, that is used within the Forms App and on Forms API. It does partially **not** equal the actual database structure behind.
+This document describes the Object-Structure, that is used within the Forms App and on Forms API v1.1. It does partially **not** equal the actual database structure behind.
 
 ## Data Structures
 ### Form
@@ -46,7 +46,8 @@ This document describes the Obect-Structure, that is used within the Forms App a
 | formId      | Integer         |              | The id of the form, the question belongs to |
 | order       | Integer         | unique within form; *not* `0` | The order of the question within that form. Value `0` indicates deleted questions within database (typ. not visible outside) |
 | type        | [Question-Type](#question-types) | | Type of the question |
-| mandatory   | Boolean         |              | If the question is mandatory to fill the form |
+| _mandatory_   | _Boolean_         |              | _deprecated: will be removed in API v2, replaced by `isRequired`_ |
+| isRequired  | Boolean         |              | If the question is required to fill the form |
 | text        | String          | max. 2048 ch. | The question-text |
 | options     | Array of [Options](#option) | | Array of options belonging to the question. Only relevant for question-type with predefined options. |
 ```
@@ -55,7 +56,8 @@ This document describes the Obect-Structure, that is used within the Forms App a
   "formId": 3,
   "order": 1,
   "type": "dropdown",
-  "mandatory": false,
+  "mandatory": false, // deprecated, will be removed in API v2
+  "isRequired": false,
   "text": "Question 1",
   "options": []
 }

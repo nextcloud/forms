@@ -204,8 +204,8 @@ export default {
 			return this.form.questions && this.form.questions.length === 0
 		},
 
-		isMandatoryUsed() {
-			return this.form.questions.reduce((isUsed, question) => isUsed || question.mandatory, false)
+		isRequiredUsed() {
+			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
 		},
 
 		infoMessage() {
@@ -219,7 +219,7 @@ export default {
 				message += t('forms', 'Responses are connected to your Nextcloud account.')
 			}
 
-			if (this.isMandatoryUsed) {
+			if (this.isRequiredUsed) {
 				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
@@ -269,7 +269,7 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'question', {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v1.1', 2) + 'question', {
 					formId: this.form.id,
 					type,
 					text,
@@ -307,7 +307,7 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v1', 2) + `question/${id}`)
+				await axios.delete(generateOcsUrl('apps/forms/api/v1.1', 2) + `question/${id}`)
 				const index = this.form.questions.findIndex(search => search.id === id)
 				this.form.questions.splice(index, 1)
 			} catch (error) {
@@ -326,7 +326,7 @@ export default {
 			const newOrder = this.form.questions.map(question => question.id)
 
 			try {
-				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'question/reorder', {
+				await axios.post(generateOcsUrl('apps/forms/api/v1.1', 2) + 'question/reorder', {
 					formId: this.form.id,
 					newOrder,
 				})

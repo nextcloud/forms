@@ -152,8 +152,8 @@ export default {
 			})
 		},
 
-		isMandatoryUsed() {
-			return this.form.questions.reduce((isUsed, question) => isUsed || question.mandatory, false)
+		isRequiredUsed() {
+			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
 		},
 
 		infoMessage() {
@@ -164,7 +164,7 @@ export default {
 			if (!this.form.isAnonymous && this.isLoggedIn) {
 				message += t('forms', 'Responses are connected to your Nextcloud account.')
 			}
-			if (this.isMandatoryUsed) {
+			if (this.isRequiredUsed) {
 				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
@@ -226,7 +226,7 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(generateOcsUrl('apps/forms/api/v1', 2) + 'submission/insert', {
+				await axios.post(generateOcsUrl('apps/forms/api/v1.1', 2) + 'submission/insert', {
 					formId: this.form.id,
 					answers: this.answers,
 				})
