@@ -180,30 +180,6 @@ export default {
 		},
 
 		/**
-		 * Is the provided answer required ?
-		 * This is needed for checkboxes as html5
-		 * doesn't allow to require at least ONE checked.
-		 * So we require the one that are checked or all
-		 * if none are checked yet.
-		 * @param {number} id the answer id
-		 * @returns {boolean}
-		 */
-		isRequired(id) {
-			// false, if question not required
-			if (!this.isRequired) {
-				return false
-			}
-
-			// true for simple select
-			if (!this.isMultiple) {
-				return true
-			}
-
-			// For checkboxes, only required if no other is checked
-			return this.areNoneChecked
-		},
-
-		/**
 		 * Update the options
 		 * @param {Array} options options to change
 		 */
