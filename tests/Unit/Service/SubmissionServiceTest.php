@@ -35,7 +35,10 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 
+use OCP\Files\File;
+use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
@@ -124,6 +127,80 @@ class FilterTest extends TestCase {
 		);
 	}
 
+	public function dataWriteCsvToCloud() {
+		return [
+			'rootFolder' => ['', Folder::class, '', 'Some nice Form Title (responses).csv', false],
+			'subFolder' => ['/folder path', Folder::class, '', 'Some nice Form Title (responses).csv', false],
+			'nonCsv-file' => ['/fileName.txt', File::class, 'txt', 'Some nice Form Title (responses).csv', false],
+			'csv-file' => ['/fileName.csv', File::class, 'csv', 'fileName.csv', true],
+		];
+	}
+
+	/**
+	 * @dataProvider dataWriteCsvToCloud
+	 *
+	 * @param string $path Selected user-path (from frontend)
+	 * @param string $pathClass Type of $path - Folder or File
+	 * @param string $pathExtension Extension of the given file within path
+	 * @param string $expectedFileName
+	 * @param bool $fileExists If the file to write into does exist already.
+	 */
+	public function testWriteCsvToCloud(string $path, string $pathClass, string $pathExtension, string $expectedFileName, bool $fileExists) {
+		// Simple default Form Data here, details are tested in testGetSubmissionsCsv
+		$dataExpectation = $this->setUpSimpleCsvTest();
+
+		$fileNode = $this->createMock(File::class);
+		$fileNode->expects($this->once())
+			->method('putContent')
+			->with($dataExpectation);
+
+		$folderNode = $this->createMock(Folder::class);
+		if ($fileExists) {
+			$folderNode->expects($this->once())
+				->method('get')
+				->with($expectedFileName)
+				->willReturn($fileNode);
+		} else {
+			$folderNode->expects($this->exactly(2))
+				->method('get')
+				->with($expectedFileName)
+				->will($this->onConsecutiveCalls(
+					$this->throwException(new NotFoundException('File not found')),
+					$fileNode
+				));
+			$folderNode->expects($this->once())
+				->method('newFile')
+				->with($expectedFileName);
+		}
+
+		if ($pathClass === File::class) {
+			$pathNode = $this->createMock(File::class);
+			$pathNode->expects($this->once())
+				->method('getExtension')
+				->willReturn($pathExtension);
+			$pathNode->expects($this->any())
+				->method('getName')
+				->willReturn($expectedFileName);
+			$pathNode->expects($this->once())
+				->method('getParent')
+				->willReturn($folderNode);
+		} elseif ($pathClass === Folder::class) {
+			$pathNode = $folderNode;
+		}
+
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($this->once())
+			->method('get')
+			->with($path)
+			->willReturn($pathNode);
+		$this->storage->expects($this->once())
+			->method('getUserFolder')
+			->with('currentUser')
+			->willReturn($userFolder);
+
+		$this->assertEquals($expectedFileName, $this->submissionService->writeCsvToCloud('abcdefg', $path));
+	}
+
 	// Data for SubmissionCsv
 	public function dataGetSubmissionsCsv() {
 		return [
@@ -203,6 +280,29 @@ class FilterTest extends TestCase {
 				"Anonymous user","01.01.01, 01:01","Q1A1"
 				'
 			],
+			'questions-not-answered' => [
+				// Questions
+				[
+					['id' => 1, 'text' => 'Question 1'],
+					['id' => 2, 'text' => 'Question 2'],
+					['id' => 3, 'text' => 'Question 3']
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'answers' => [
+							['questionId' => 2, 'text' => 'Q2A1']
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"User display name","Timestamp","Question 1","Question 2","Question 3"
+				"User 1","01.01.01, 01:01","","Q2A1",""
+				'
+			],
 			/* No submissions, but request via api */
 			'no-submission' => [
 				// Questions
@@ -246,6 +346,45 @@ class FilterTest extends TestCase {
 	 * @param string $csvText
 	 */
 	public function testGetSubmissionsCsv(array $questions, array $submissions, string $csvText) {
+		$dataExpectation = $this->setUpCsvTest($questions, $submissions, $csvText);
+
+		$this->assertEquals([
+			'fileName' => 'Some nice Form Title (responses).csv',
+			'data' => $dataExpectation,
+		], $this->submissionService->getSubmissionsCsv('abcdefg'));
+	}
+
+	/**
+	 * Setting up a very simple default CsvTest
+	 */
+	private function setUpSimpleCsvTest(): string {
+		return $this->setUpCsvTest(
+			[
+				// Single Question
+				['id' => 1, 'text' => 'Question 1']
+			],
+			[
+				//Single Submission
+				[
+					'id' => 1,
+					'userId' => 'user1',
+					'answers' => [
+						['questionId' => 1, 'text' => 'Q1A1']
+					]
+				]
+			],
+			// Expected CSV-Result
+			'
+			"User display name","Timestamp","Question 1"
+			"User 1","01.01.01, 01:01","Q1A1"
+			'
+		);
+	}
+
+	/**
+	 * Setting up all the mock-data for a full Form incl. Submissions
+	 */
+	private function setUpCsvTest(array $questions, array $submissions, string $csvText): string {
 		$form = new Form();
 		$form->setId(5);
 		$form->setHash('abcdefg');
@@ -321,9 +460,6 @@ class FilterTest extends TestCase {
 		// Prepend BOM-Sequence as Writer does and remove formatting-artefacts of dataProvider.
 		$dataExpectation = chr(239).chr(187).chr(191) . ltrim(preg_replace('/\t+/', '', $csvText));
 
-		$this->assertEquals([
-			'fileName' => 'Some nice Form Title (responses).csv',
-			'data' => $dataExpectation,
-		], $this->submissionService->getSubmissionsCsv('abcdefg'));
+		return $dataExpectation;
 	}
 };
