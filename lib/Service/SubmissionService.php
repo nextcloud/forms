@@ -26,6 +26,7 @@ namespace OCA\Forms\Service;
 
 use DateTimeZone;
 
+use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\SubmissionMapper;
@@ -239,5 +240,55 @@ class SubmissionService {
 		$csv->insertAll($records);
 
 		return $csv->getContent();
+	}
+
+	/**
+	 * Validate all answers against the questions
+	 * @param array $questions Array of the questions of the form
+	 * @param array $answers Array of the submitted answers
+	 * @return boolean If the submission is valid
+	 */
+	public function validateSubmission(array $questions, array $answers): bool {
+		
+		// Check by questions
+		foreach ($questions as $question) {
+			$questionId = $question['id'];
+			$questionAnswered = array_key_exists($questionId, $answers);
+
+			// Check if all required questions have an answer
+			if ($question['isRequired'] && (!$questionAnswered || !array_filter($answers[$questionId], 'strlen'))) {
+				return false;
+			}
+
+			// Perform further checks only for answered questions
+			// TODO Check if date questions have valid answers
+			if ($questionAnswered) {
+				// Check if non multiple questions have not more than one answer
+				if ($question['type'] !== Constants::ANSWER_TYPE_MULTIPLE && count($answers[$questionId]) > 1) {
+					return false;
+				}
+	
+				// Check if all answers are within the possible options
+				if (in_array($question['type'], Constants::ANSWER_PREDEFINED)) {
+					foreach ($answers[$questionId] as $answer) {
+						// Search corresponding option, return false if non-existent
+						if (array_search($answer, array_column($question['options'], 'id')) === false) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+
+		// Check for excess answers
+		foreach ($answers as $id => $answerArray) {
+			// Search corresponding question, return false if not found
+			$questionIndex = array_search($id, array_column($questions, 'id'));
+			if ($questionIndex === false) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
