@@ -430,10 +430,7 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
-		$this->submissionMapper->deleteByForm($id);
-		$this->questionMapper->deleteByForm($id);
-		$this->formMapper->delete($form);
+		$this->formMapper->deleteForm($form);
 
 		return new DataResponse($id);
 	}
