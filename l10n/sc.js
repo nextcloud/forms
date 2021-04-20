@@ -23,7 +23,7 @@ OC.L10N.register(
     "Select a form or create a new one" : "Seletziona unu mòdulu o crea·nde unu nou",
     "Create new form" : "Crea unu mòdulu nou",
     "An error occurred while loading the forms list" : "Ddoe at àpidu un'errore is su carrigamentu de sa lista de mòdulos",
-    "Unable to create a new form" : "No at fatu a creare unu mòdulu nou",
+    "Unable to create a new form" : "Non faghet a creare unu mòdulu nou",
     "Unable to copy form" : "No at fatu a copiare su mòdulu",
     "Results" : "Resurtados",
     "Copy form" : "Còpia mòdulu",
