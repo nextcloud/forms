@@ -462,4 +462,118 @@ class FilterTest extends TestCase {
 
 		return $dataExpectation;
 	}
+
+	// Data for validation of Submissions
+	public function dataValidateSubmission() {
+		return [
+			'required-not-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => true]
+				],
+				// Answers
+				[],
+				// Expected Result
+				false
+			],
+			'required-not-answered-string' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => true]
+				],
+				// Answers
+				[
+					'1' => ['']
+				],
+				// Expected Result
+				false
+			],
+			'more-than-allowed' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]]
+				],
+				// Answers
+				[
+					'1' => [3,5]
+				],
+				// Expected Result
+				false
+			],
+			'option-not-known' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				// Answers
+				[
+					'1' => [3,10]
+				],
+				// Expected Result
+				false
+			],
+			'question-not-known' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => false]
+				],
+				// Answers
+				[
+					'2' => ['answer']
+				],
+				// Expected Result
+				false
+			],
+			'full-good-submission' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => false],
+					['id' => 2, 'type' => 'long', 'isRequired' => true],
+					['id' => 3, 'type' => 'date', 'isRequired' => true],
+					['id' => 4, 'type' => 'datetime', 'isRequired' => false],
+					['id' => 5, 'type' => 'multiple', 'isRequired' => false, 'options' => [
+						['id' => 1],
+						['id' => 2]
+					]],
+					['id' => 6, 'type' => 'multiple_unique', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 4]
+					]],
+					['id' => 7, 'type' => 'dropdown', 'isRequired' => true, 'options' => [
+						['id' => 5],
+						['id' => 6]
+					]],
+				],
+				// Answers
+				[
+					'1' => ['answer'],
+					'2' => ['answerABitLonger'],
+					'3' => ['28. April 2021'],
+					'4' => ['20. April 2021 04:40'],
+					'5' => [1,2],
+					'6' => [4],
+					'7' => [5],
+				],
+				// Expected Result
+				true
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataValidateSubmission
+	 *
+	 * @param array $questions
+	 * @param array $answers
+	 * @param bool $expected
+	 */
+	public function testValidateSubmission(array $questions, array $answers, bool $expected) {
+		$this->assertEquals($expected, $this->submissionService->validateSubmission($questions, $answers));
+	}
 };

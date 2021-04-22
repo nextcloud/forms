@@ -973,6 +973,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Already submitted');
 		}
 
+		// Is the submission valid
+		if (!$this->submissionService->validateSubmission($questions, $answers)) {
+			throw new OCSBadRequestException('At least one submitted answer is not valid');
+		}
+
 		// Create Submission
 		$submission = new Submission();
 		$submission->setFormId($formId);
