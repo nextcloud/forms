@@ -22,10 +22,12 @@
 
 <template>
 	<div class="answer">
-		<h4 class="question-text">
+		<h4 class="answer__question-text">
 			{{ questionText }}
 		</h4>
-		<p>{{ answerText }}</p>
+		<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
+		<!-- eslint-disable-next-line -->
+		<p class="answer__text">{{ answerText }}</p>
 	</div>
 </template>
 
@@ -51,8 +53,12 @@ export default {
 	margin-top: 12px;
 	width: 100%;
 
-	.question-text {
+	&__question-text {
 		font-weight: bold;
+	}
+
+	&__text {
+		white-space: pre-line;
 	}
 }
 
