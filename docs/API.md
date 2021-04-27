@@ -108,6 +108,7 @@ Returns the full-depth object of the requested form (without submissions).
   "expires": 0,
   "isAnonymous": false,
   "submitOnce": false,
+  "canSubmit": true,
   "questions": [
     {
       "id": 1,
