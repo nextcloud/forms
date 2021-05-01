@@ -55,7 +55,7 @@ OC.L10N.register(
     "No elements found." : "Perunu elementu agatadu.",
     "Group" : "Grupu",
     "Loading {title} …" : "Carrighende {title} …",
-    "Toggle settings" : "Ativa impostatziones",
+    "Toggle settings" : "Càmbia impostatziones",
     "Form title" : "Tìtulu de su mòdulu",
     "Description" : "Descritzione",
     "Add a question" : "Agiunghe una pregonta",
