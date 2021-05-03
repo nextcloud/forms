@@ -51,44 +51,44 @@ class FormsService {
 	/** @var FormMapper */
 	private $formMapper;
 
-	/** @var QuestionMapper */
-	private $questionMapper;
-
 	/** @var OptionMapper */
 	private $optionMapper;
 
+	/** @var QuestionMapper */
+	private $questionMapper;
+
 	/** @var SubmissionMapper */
 	private $submissionMapper;
-	
+
 	/** @var IGroupManager */
 	private $groupManager;
-	
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var IUser */
-	private $currentUser;
 
 	/** @var ILogger */
 	private $logger;
 
+	/** @var IUser */
+	private $currentUser;
+
+	/** @var IUserManager */
+	private $userManager;
+
 	public function __construct(ActivityManager $activityManager,
 								FormMapper $formMapper,
-								QuestionMapper $questionMapper,
 								OptionMapper $optionMapper,
+								QuestionMapper $questionMapper,
 								SubmissionMapper $submissionMapper,
 								IGroupManager $groupManager,
+								ILogger $logger,
 								IUserManager $userManager,
-								IUserSession $userSession,
-								ILogger $logger) {
+								IUserSession $userSession) {
 		$this->activityManager = $activityManager;
 		$this->formMapper = $formMapper;
-		$this->questionMapper = $questionMapper;
 		$this->optionMapper = $optionMapper;
+		$this->questionMapper = $questionMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->groupManager = $groupManager;
-		$this->userManager = $userManager;
 		$this->logger = $logger;
+		$this->userManager = $userManager;
 
 		$this->currentUser = $userSession->getUser();
 	}

@@ -50,7 +50,7 @@ use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
-class FilterTest extends TestCase {
+class SubmissionServiceTest extends TestCase {
 
 	/** @var SubmissionService */
 	private $submissionService;
