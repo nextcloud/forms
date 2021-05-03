@@ -50,10 +50,9 @@
 
 		<!-- Text answers are simply listed for now, could be automatically grouped in the future -->
 		<ul v-else class="question-summary__text">
-			<li v-for="answer in textAnswers"
-				:key="answer.id">
-				{{ answer }}
-			</li>
+			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
+			<!-- eslint-disable-next-line -->
+			<li v-for="answer in textAnswers" :key="answer.id">{{ answer }}</li>
 		</ul>
 	</div>
 </template>
@@ -192,6 +191,7 @@ export default {
 
 		li {
 			padding: 4px 0;
+			white-space: pre-line;
 
 			&:first-child {
 				font-weight: bold;
