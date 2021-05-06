@@ -1136,7 +1136,10 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @NoAdminRequired
+	 *
 	 * Export Submissions to the Cloud
+	 *
 	 * @param string $hash of the form
 	 * @param string $path The Cloud-Path to export to
 	 * @return DataResponse
