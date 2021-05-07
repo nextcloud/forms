@@ -27,11 +27,13 @@
 		</h4>
 		<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 		<!-- eslint-disable-next-line -->
-		<p class="answer__text">{{ answerText }}</p>
+		<p class="answer__text">{{ getAnswerText }}</p>
 	</div>
 </template>
 
 <script>
+import moment from '@nextcloud/moment'
+
 export default {
 	name: 'Answer',
 
@@ -43,6 +45,23 @@ export default {
 		questionText: {
 			type: String,
 			required: true,
+		},
+		questionType: {
+			type: String,
+			required: true,
+		},
+	},
+
+	computed: {
+		// Format answerText for date/datetime answers
+		getAnswerText() {
+			if (this.questionType === 'date') {
+				return moment(this.answerText, 'x').format('LL')
+			} else if (this.questionType === 'datetime') {
+				return moment(this.answerText, 'x').format('LLL')
+			} else {
+				return this.answerText
+			}
 		},
 	},
 }

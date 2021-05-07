@@ -38,7 +38,8 @@
 			v-for="question in answeredQuestions"
 			:key="question.id"
 			:answer-text="question.squashedAnswers"
-			:question-text="question.text" />
+			:question-text="question.text"
+			:question-type="question.type" />
 	</div>
 </template>
 
@@ -93,6 +94,7 @@ export default {
 				answeredQuestionsArray.push({
 					id: question.id,
 					text: question.text,
+					type: question.type,
 					squashedAnswers,
 				})
 			})

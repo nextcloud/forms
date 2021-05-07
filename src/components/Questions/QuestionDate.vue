@@ -36,7 +36,7 @@
 		<div class="question__content">
 			<DatetimePicker
 				v-model="time"
-				value-type="format"
+				value-type="timestamp"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
