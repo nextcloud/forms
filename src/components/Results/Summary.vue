@@ -59,6 +59,7 @@
 
 <script>
 import answerTypes from '../../models/AnswerTypes'
+import moment from '@nextcloud/moment'
 
 export default {
 	name: 'Summary',
@@ -139,6 +140,7 @@ export default {
 		// For text answers like short answer and long text
 		textAnswers() {
 			const textAnswers = []
+			let answerText
 
 			// Also record 'No response'
 			let noResponseCount = 0
@@ -153,7 +155,16 @@ export default {
 
 				// Add text answers
 				answers.forEach(answer => {
-					textAnswers.push(answer.text)
+					// Format answerText for date/datetime answers
+					if (this.question.type === 'date') {
+						answerText = moment(answer.text, 'x').format('LL')
+					} else if (this.question.type === 'datetime') {
+						answerText = moment(answer.text, 'x').format('LLL')
+					} else {
+						answerText = answer.text
+					}
+
+					textAnswers.push(answerText)
 				})
 			})
 
