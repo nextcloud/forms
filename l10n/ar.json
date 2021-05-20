@@ -12,6 +12,8 @@
     "User display name" : "اسم العرض للمستخدم",
     "Timestamp" : "الطابع الزمني ",
     "responses" : "الردود ",
+    "📝 Simple surveys and questionnaires, self-hosted" : " 📝 استبيانات بسيطة، مستضافة ذاتيًا",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "** استبيانات بسيطة، مستضافة ذاتيًا! ** \n-** 📝 تصميم بسيط: ** لا يوجد خيارات متعددة كثيرة، فقط الأساسيات. يعمل بشكل جيد على الهاتف المحمول بالطبع.\n-** 📊 عرض النتائج وتصديرها: ** يتم عرض النتائج ويمكن أيضًا تصديرها كملف CSV بنفس التنسيق المستخدم بواسطة نماذج Google. \n- ** 🔒 بيانات تحت سيطرتك! ** على عكس نماذج Google و Typeform و Doodle وغيرها ، يتم الاحتفاظ بمعلومات الاستبيان والردود الخاصة على المثيل الخاص بك. -\n - ** 🙋 كن مشارك! ** لدينا الكثير من الخطط والخيارات مثل تعدد أنواع الأسئلة والتعاون في النماذج، والمزيد من ذلك] (https://github.com/nextcloud/forms/milestones)!",
     "New form" : "نموذج جديد ",
     "Your Forms" : "نماذجك ",
     "Shared with you" : "تم مشاركتها معك",
@@ -51,8 +53,9 @@
     "No recommendations. Start typing." : "لا توجد توصيات. ابدأ بالكتابة.",
     "Searching …" : "جارِ البحث…",
     "No elements found." : "لم يتم العثور على أي عناصر",
-    "Group" : "الفريق",
+    "Group" : "المجموعة",
     "Loading {title} …" : "جارِ التحميل {title} ... ",
+    "Toggle settings" : " حدد الإعدادت",
     "Form title" : "عنوان النموذج ",
     "Description" : "الوصف",
     "Add a question" : "إضافة سؤال ",
@@ -81,6 +84,7 @@
     "There was an error while removing responses" : "حدث خطأ أثناء إزالة الردود",
     "Share form" : "مشاركة النموذج ",
     "Share via link" : "المشاركة عبر الرابط",
+    "Show to all users of this instance" : "إظهار لجميع مستخدمي هذا المثيل",
     "Choose users to share with" : "اختر مستخدمين للمشاركة معهم ",
     "Settings" : "الإعدادات",
     "Anonymous responses" : "ردود مجهولة ",
