@@ -87,7 +87,7 @@ OC.L10N.register(
     "Share form" : "Udostępnij formularz",
     "Share via link" : "Udostępnij za pomocą linku",
     "Show to all users of this instance" : "Pokaż wszystkim użytkownikom tej instancji",
-    "Choose users to share with" : "Wybierz użytkowników do udostępniania",
+    "Choose users to share with" : "Wybierz użytkowników, którym chcesz udostępnić",
     "Settings" : "Ustawienia",
     "Anonymous responses" : "Anonimowe odpowiedzi",
     "Allow multiple responses per person" : "Zezwalaj na wiele odpowiedzi na osobę",
