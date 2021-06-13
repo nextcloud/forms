@@ -94,7 +94,7 @@ import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
 import AppNavigationCaption from '@nextcloud/vue/dist/Components/AppNavigationCaption'
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Content from '@nextcloud/vue/dist/Components/Content'
-import isMobile from '@nextcloud/vue/src/mixins/isMobile'
+import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
 import AppNavigationForm from './components/AppNavigationForm'
 import EmptyContent from './components/EmptyContent'
