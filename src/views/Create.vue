@@ -392,7 +392,7 @@ export default {
 </script>
 
 <style lang="scss">
-.app-content {
+.app-content .app-content-wrapper {
 	display: flex;
 	align-items: center;
 	flex-direction: column;

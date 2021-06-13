@@ -289,8 +289,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.app-content header {
+<style lang="scss">
+.app-content .app-content-wrapper header {
 	h2 {
 		font-size: 2em;
 		font-weight: bold;
