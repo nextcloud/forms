@@ -89,7 +89,7 @@ class ProviderTest extends TestCase {
 		$this->urlGenerator->expects($this->any())
 			->method('linkToRouteAbsolute')
 			->with('forms.page.index')
-			->willReturn('http://localhost/apps/forms');
+			->willReturn('http://localhost/apps/forms/');
 		$this->urlGenerator->expects($this->any())
 			->method('getAbsoluteUrl')
 			->will($this->returnCallback(function (string $path) {
@@ -424,7 +424,7 @@ class ProviderTest extends TestCase {
 			'type' => 'highlight',
 			'id' => 'abcdefg',
 			'name' => 'Some Form Title',
-			'link' => 'http://localhost/apps/forms'
+			'link' => 'http://localhost/apps/forms/'
 		], $this->provider->getRichFormTitle('Some Form Title', 'abcdefg'));
 	}
 
