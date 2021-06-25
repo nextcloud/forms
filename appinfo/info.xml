@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0"?>
-<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>forms</id>
     <name>Forms</name>
@@ -45,7 +45,7 @@
     <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
 
     <dependencies>
-        <nextcloud min-version="19" max-version="21" />
+        <nextcloud min-version="19" max-version="22" />
     </dependencies>
 
 	<navigations>
