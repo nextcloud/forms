@@ -155,7 +155,7 @@ export default {
 		submitPlaceholder: t('forms', 'Pick a time'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 
-		// Using the same vue-component as date, this specifies that the component renders as datetime.
-		includeTime: true,
+		// Using the same vue-component as date, this specifies that the component renders as time.
+		onlyTime: true,
 	},
 }

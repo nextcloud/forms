@@ -74,7 +74,13 @@ export default {
 	computed: {
 		// Allow picking time or not, depending on variable in answerType.
 		datetimePickerType() {
-			return this.answerType.includeTime ? 'datetime' : 'date'
+			if (this.answerType.includeTime) {
+				return 'datetime'
+			}
+			if (this.answerType.onlyTime) {
+				return 'time'
+			}
+			return 'date'
 		},
 
 		datetimePickerPlaceholder() {
@@ -92,6 +98,9 @@ export default {
 		getMomentFormat() {
 			if (this.datetimePickerType === 'datetime') {
 				return 'LLL'
+			}
+			if (this.datetimePickerType === 'time') {
+				return 'LT'
 			}
 			return 'LL'
 		},
