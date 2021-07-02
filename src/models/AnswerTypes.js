@@ -35,6 +35,7 @@ import QuestionDate from '../components/Questions/QuestionDate'
  * @property {string} long Long Text Answer
  * @property {string} date Date Answer
  * @property {string} datetime Date and Time Answer
+ * @property {string} time Time Answer
  */
 export default {
 	/**
@@ -137,6 +138,21 @@ export default {
 		titlePlaceholder: t('forms', 'Datetime question title'),
 		createPlaceholder: t('forms', 'People can pick a date and time'),
 		submitPlaceholder: t('forms', 'Pick a date and time'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+
+		// Using the same vue-component as date, this specifies that the component renders as datetime.
+		includeTime: true,
+	},
+
+	time: {
+		component: QuestionDate,
+		icon: 'icon-answer-time',
+		label: t('forms', 'Time'),
+		predefined: false,
+
+		titlePlaceholder: t('forms', 'Time question title'),
+		createPlaceholder: t('forms', 'People can pick a time'),
+		submitPlaceholder: t('forms', 'Pick a time'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 
 		// Using the same vue-component as date, this specifies that the component renders as datetime.
