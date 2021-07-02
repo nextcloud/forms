@@ -255,7 +255,7 @@ class Provider implements IProvider {
 			$formTitle = $this->formMapper->findbyHash($formHash)->getTitle();
 
 			// Append hash and route
-			$formLink .= '/' . $formHash;
+			$formLink .= $formHash;
 			if ($route !== '') {
 				$formLink .= '/' . $route;
 			}

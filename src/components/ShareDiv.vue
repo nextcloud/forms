@@ -210,7 +210,7 @@ export default {
 				this.SHARE_TYPES.SHARE_TYPE_GROUP,
 			]
 
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1', 2) + 'sharees', {
+			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
 				params: {
 					format: 'json',
 					itemType: 'file',
@@ -259,7 +259,7 @@ export default {
 		async getRecommendations() {
 			this.loading = true
 
-			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1', 2) + 'sharees_recommended', {
+			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees_recommended'), {
 				params: {
 					format: 'json',
 					itemType: 'file',
