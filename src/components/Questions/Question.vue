@@ -132,7 +132,8 @@ export default {
 	computed: {
 		/**
 		 * Extend text with asterisk if question is required
-		 * @returns {Boolean}
+		 *
+		 * @return {boolean}
 		 */
 		computedText() {
 			if (this.isRequired) {
@@ -143,7 +144,8 @@ export default {
 
 		/**
 		 * Question valid, if text not empty and content valid
-		 * @returns {Boolean} true if question valid
+		 *
+		 * @return {boolean} true if question valid
 		 */
 		questionValid() {
 			return this.text && this.contentValid

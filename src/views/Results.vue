@@ -178,7 +178,8 @@ export default {
 
 		/**
 		 * Return form title, or placeholder if not set
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		formTitle() {
 			if (this.form.title) {
@@ -189,7 +190,8 @@ export default {
 
 		/**
 		 * Generate the export to csv url
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		downloadUrl() {
 			return generateOcsUrl('apps/forms/api/v1.1/submissions/export/{hash}', { hash: this.form.hash })
@@ -240,7 +242,7 @@ export default {
 		async onStoreToFiles() {
 			// picker.pick() does not reject Promise -> await would never resolve.
 			picker.pick()
-				.then(async(path) => {
+				.then(async (path) => {
 					try {
 						const response = await axios.post(generateOcsUrl('apps/forms/api/v1.1/submissions/export'), {
 							hash: this.form.hash,

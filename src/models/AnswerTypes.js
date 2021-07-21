@@ -1,8 +1,6 @@
 /**
  * @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
- *
  * @author John Molakvoæ <skjnldsv@protonmail.com>
- *
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +15,6 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 import QuestionMultiple from '../components/Questions/QuestionMultiple'
@@ -27,30 +24,30 @@ import QuestionLong from '../components/Questions/QuestionLong'
 import QuestionDate from '../components/Questions/QuestionDate'
 
 /**
- * @typedef {Object} AnswerTypes
- * @property {string} multiple
- * @property {string} multiple_unique
- * @property {string} dropdown
- * @property {string} short
- * @property {string} long
- * @property {string} date
- * @property {string} datetime
+ * @typedef {object} AnswerTypes
+ * @property {string} multiple Checkbox Answer
+ * @property {string} multiple_unique Multiple-Choice Answer
+ * @property {string} dropdown Dropdown Answer
+ * @property {string} short Short Text Answer
+ * @property {string} long Long Text Answer
+ * @property {string} date Date Answer
+ * @property {string} datetime Date and Time Answer
  */
 export default {
 	/**
 	 * !! Keep in SYNC with lib/Constants.php for props that are necessary on php !!
 	 * Specifying Question-Models in a common place
 	 * Further type-specific parameters are possible.
-	 * @prop component The vue-component this answer-type relies on
-	 * @prop icon The icon corresponding to this answer-type
-	 * @prop label The answer-type label, that users will see as answer-type.
-	 * @prop SYNC predefined This AnswerType has/needs predefined Options.
-	 * @prop validate *optional* Define conditions where this question is not ok
 	 *
-	 * @prop titlePlaceholder The placeholder users see as empty question-title in edit-mode
-	 * @prop createPlaceholder *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field
-	 * @prop submitPlaceholder *optional* The placeholder that is visible in submit-mode, to indicate a form input-field
-	 * @prop warningInvalid The warning users see in edit mode, if the question is invalid.
+	 * @property {object} component The vue-component this answer-type relies on
+	 * @property {string} icon The icon corresponding to this answer-type
+	 * @property {string} label The answer-type label, that users will see as answer-type.
+	 * @property {boolean} predefined SYNC This AnswerType has/needs predefined Options.
+	 * @property {Function} validate *optional* Define conditions where this question is not ok
+	 * @property {string} titlePlaceholder The placeholder users see as empty question-title in edit-mode
+	 * @property {string} createPlaceholder *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field
+	 * @property {string} submitPlaceholder *optional* The placeholder that is visible in submit-mode, to indicate a form input-field
+	 * @property {string} warningInvalid The warning users see in edit mode, if the question is invalid.
 	 */
 
 	multiple: {

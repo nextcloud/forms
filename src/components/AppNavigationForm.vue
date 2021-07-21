@@ -118,7 +118,8 @@ export default {
 
 		/**
 		 * Return form title, or placeholder if not set
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		formTitle() {
 			if (this.form.title) {
@@ -129,7 +130,8 @@ export default {
 
 		/**
 		 * Return the form share link
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		formLink() {
 			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
@@ -137,7 +139,8 @@ export default {
 
 		/**
 		 * Clipboard v-tooltip message
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		clipboardTooltip() {
 			if (this.copied) {
@@ -152,7 +155,8 @@ export default {
 
 		/**
 		 * Route to use, depending on readOnly
-		 * @returns {string} Route to 'submit' or 'formRoot'
+		 *
+		 * @return {string} Route to 'submit' or 'formRoot'
 		 */
 		routerTarget() {
 			if (this.readOnly) {

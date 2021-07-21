@@ -112,7 +112,8 @@ export default {
 
 		/**
 		 * Is the search valid ?
-		 * @returns {boolean}
+		 *
+		 * @return {boolean}
 		 */
 		isValidQuery() {
 			return this.query && this.query.trim() !== '' && this.query.length > this.minSearchStringLength
@@ -122,7 +123,8 @@ export default {
 		 * Multiseelct options. Recommendations by default,
 		 * direct search when search query is valid.
 		 * Filter out existing shares
-		 * @returns {Array}
+		 *
+		 * @return {Array}
 		 */
 		options() {
 			const shares = [...this.userShares, ...this.groupShares]
@@ -156,7 +158,8 @@ export default {
 
 		/**
 		 * Add a new share and dispatch the change to the parent
-		 * @param {Object} share the new share
+		 *
+		 * @param {object} share the new share
 		 */
 		addShare(share) {
 			const users = this.userShares.slice()
@@ -282,8 +285,8 @@ export default {
 		/**
 		 * Filter out unwated shares
 		 *
-		 * @param {Object[]} shares the array of shares object
-		 * @returns {Object[]}
+		 * @param {object[]} shares the array of shares object
+		 * @return {object[]}
 		 */
 		filterOutUnwantedShares(shares) {
 			return shares.reduce((arr, share) => {
@@ -311,8 +314,9 @@ export default {
 
 		/**
 		 * Format shares for the multiselect options
-		 * @param {Object} result select entry item
-		 * @returns {Object}
+		 *
+		 * @param {object} result select entry item
+		 * @return {object}
 		 */
 		formatForMultiselect(result) {
 			return {
@@ -329,8 +333,9 @@ export default {
 
 		/**
 		 * Get the icon based on the share type
+		 *
 		 * @param {number} type the share type
-		 * @returns {string} the icon class
+		 * @return {string} the icon class
 		 */
 		shareTypeToIcon(type) {
 			switch (type) {

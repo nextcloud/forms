@@ -242,6 +242,7 @@ export default {
 
 		/**
 		 * On date picker change
+		 *
 		 * @param {Date} datetime the expiration Date
 		 */
 		onExpiresChange(datetime) {
@@ -251,8 +252,9 @@ export default {
 
 		/**
 		 * Datepicker timestamp to string
+		 *
 		 * @param {Date} datetime the datepicker Date
-		 * @returns {string}
+		 * @return {string}
 		 */
 		stringify(datetime) {
 			const date = moment(datetime).format('LLL')
@@ -265,8 +267,9 @@ export default {
 
 		/**
 		 * Form expires timestamp to Date form the datepicker
+		 *
 		 * @param {number} value the expires timestamp
-		 * @returns {Date}
+		 * @return {Date}
 		 */
 		parse(value) {
 			return moment(value, 'X').toDate()
@@ -274,8 +277,9 @@ export default {
 
 		/**
 		 * Prevent selecting a day before today
+		 *
 		 * @param {Date} datetime the datepicker Date
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		notBeforeToday(datetime) {
 			return datetime < moment().add(-1, 'day').toDate()
@@ -283,8 +287,9 @@ export default {
 
 		/**
 		 * Prevent selecting a time before the current one + 1hour
+		 *
 		 * @param {Date} datetime the datepicker Date
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		notBeforeNow(datetime) {
 			return datetime < moment().add(1, 'hour').toDate()

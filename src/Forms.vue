@@ -241,7 +241,7 @@ export default {
 		/**
 		 * Request to clone a form, store returned form and open it.
 		 *
-		 * @param {Number} id id of the form to clone
+		 * @param {number} id id of the form to clone
 		 */
 		async onCloneForm(id) {
 			try {
@@ -259,7 +259,7 @@ export default {
 		/**
 		 * Remove form from forms list after successful server deletion request
 		 *
-		 * @param {Number} id the form id
+		 * @param {number} id the form id
 		 */
 		async onDeleteForm(id) {
 			const formIndex = this.forms.findIndex(form => form.id === id)

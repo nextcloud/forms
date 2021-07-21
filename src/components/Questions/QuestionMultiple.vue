@@ -179,8 +179,9 @@ export default {
 
 		/**
 		 * Is the provided answer checked ?
+		 *
 		 * @param {number} id the answer id
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		isChecked(id) {
 			return this.values.indexOf(id) > -1
@@ -192,8 +193,9 @@ export default {
 		 * doesn't allow to require at least ONE checked.
 		 * So we require the one that are checked or all
 		 * if none are checked yet.
+		 *
 		 * @param {number} id the answer id
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		checkRequired(id) {
 			// false, if question not required
@@ -212,6 +214,7 @@ export default {
 
 		/**
 		 * Update the options
+		 *
 		 * @param {Array} options options to change
 		 */
 		updateOptions(options) {
@@ -222,7 +225,7 @@ export default {
 		 * Update an existing answer locally
 		 *
 		 * @param {string|number} id the answer id
-		 * @param {Object} answer the answer to update
+		 * @param {object} answer the answer to update
 		 */
 		updateAnswer(id, answer) {
 			const options = this.options.slice()
@@ -259,7 +262,7 @@ export default {
 		/**
 		 * Restore an option locally
 		 *
-		 * @param {Object} option the option
+		 * @param {object} option the option
 		 * @param {number} index the options index in this.options
 		 */
 		restoreOption(option, index) {
@@ -305,7 +308,7 @@ export default {
 		 * Delete the option from Db in background.
 		 * Restore option if delete not possible
 		 *
-		 * @param {Object} option The option to delete
+		 * @param {object} option The option to delete
 		 */
 		deleteOptionFromDatabase(option) {
 			const optionIndex = this.options.findIndex(opt => opt.id === option.id)
@@ -325,7 +328,7 @@ export default {
 		/**
 		 * Focus the input matching the index
 		 *
-		 * @param {Number} index the value index
+		 * @param {number} index the value index
 		 */
 		focusIndex(index) {
 			const inputs = this.$refs.input
