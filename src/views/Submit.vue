@@ -128,7 +128,8 @@ export default {
 	computed: {
 		/**
 		 * Return form title, or placeholder if not set
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		formTitle() {
 			if (this.form.title) {
@@ -200,7 +201,8 @@ export default {
 		/**
 		 * On Enter, focus next form-element
 		 * Last form element is the submit button, the form submits on enter then
-		 * @param {Object} event The fired event.
+		 *
+		 * @param {object} event The fired event.
 		 */
 		onKeydownEnter(event) {
 			const formInputs = Array.from(this.$refs.form)

@@ -1,8 +1,6 @@
 /**
  * @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
- *
  * @author John Molakvoæ <skjnldsv@protonmail.com>
- *
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -121,7 +119,7 @@ export default {
 		/**
 		 * Forward the required change to the parent and store to db
 		 *
-		 * @param {Boolean} isRequiredValue new isRequired Value
+		 * @param {boolean} isRequiredValue new isRequired Value
 		 */
 		onRequiredChange: debounce(function(isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
@@ -147,7 +145,8 @@ export default {
 		/**
 		 * Don't automatically submit form on Enter, parent will handle that
 		 * To be called with prevent: @keydown.enter.prevent="onKeydownEnter"
-		 * @param {Object} event The fired event
+		 *
+		 * @param {object} event The fired event
 		 */
 		onKeydownEnter(event) {
 			this.$emit('keydown', event)

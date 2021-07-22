@@ -191,7 +191,8 @@ export default {
 	computed: {
 		/**
 		 * Return form title, or placeholder if not set
-		 * @returns {string}
+		 *
+		 * @return {string}
 		 */
 		formTitle() {
 			if (this.form.title) {
@@ -300,7 +301,7 @@ export default {
 		/**
 		 * Delete a question
 		 *
-		 * @param {Object} question the question to delete
+		 * @param {object} question the question to delete
 		 * @param {number} question.id the question id to delete
 		 */
 		async deleteQuestion({ id }) {
@@ -369,6 +370,7 @@ export default {
 
 		/**
 		 * Select the text in the input if it is still set to 'Form title'
+		 *
 		 * @param {Event} e the click event
 		 */
 		selectIfUnchanged(e) {

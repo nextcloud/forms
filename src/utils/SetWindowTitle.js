@@ -1,8 +1,6 @@
 /**
  * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
- *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
- *
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +20,7 @@
 /**
  * Set the Window-Title to current FormTitle including suffix.
  *
- * @param {String} formTitle Title of current form to set on window.
+ * @param {string} formTitle Title of current form to set on window.
  */
 const SetWindowTitle = function(formTitle) {
 	if (formTitle === '') {

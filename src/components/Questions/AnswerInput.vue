@@ -141,8 +141,8 @@ export default {
 		/**
 		 * Create an unsynced answer to the server
 		 *
-		 * @param {Object} answer the answer to sync
-		 * @returns {Object} answer
+		 * @param {object} answer the answer to sync
+		 * @return {object} answer
 		 */
 		async createAnswer(answer) {
 			try {
@@ -170,7 +170,7 @@ export default {
 		 * Save to the server, only do it after 500ms
 		 * of no change
 		 *
-		 * @param {Object} answer the answer to sync
+		 * @param {object} answer the answer to sync
 		 */
 		async updateAnswer(answer) {
 			try {

@@ -1,8 +1,6 @@
 /**
  * @copyright Copyright (c) 2021 Jonas Rittershofer <jotoeri@users.noreply.github.com>
- *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
- *
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,8 +21,8 @@
  * Extract actual data from Axios OCS response
  * Just a small wrapper for nice code.
  *
- * @param {Object} response response returned by axios
- * @returns {Object} The actual data out of the ocs response
+ * @param {object} response response returned by axios
+ * @return {object} The actual data out of the ocs response
  */
 const OcsResponse2Data = function(response) {
 	return response.data.ocs.data

@@ -78,7 +78,8 @@ export default {
 		/**
 		 * Join answered Questions with corresponding answers.
 		 * Multiple answers to a question are squashed into one string.
-		 * @returns {Array}
+		 *
+		 * @return {Array}
 		 */
 		answeredQuestions() {
 			const answeredQuestionsArray = []
