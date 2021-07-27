@@ -30,12 +30,12 @@ namespace OCA\Forms\AppInfo;
 
 use OCA\Forms\Listener\UserDeletedListener;
 use OCP\AppFramework\App;
-use OCP\EventDispatcher\IEventDispatcher;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\User\Events\UserDeletedEvent;
 
-include_once __DIR__ . '/../../vendor/autoload.php';
-
-class Application extends App {
+class Application extends App implements IBootstrap {
 	public const APP_ID = 'forms';
 
 	/**
@@ -44,8 +44,24 @@ class Application extends App {
 	 */
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
+	}
 
-		$eventDispatcher = $this->getContainer()->query(IEventDispatcher::class);
-		$eventDispatcher->addServiceListener(UserDeletedEvent::class, UserDeletedListener::class);
+	/**
+	 * Registration Logic
+	 * @param IRegistrationContext $context
+	 */
+	public function register(IRegistrationContext $context): void {
+		// Register composer autoloader
+		include_once __DIR__ . '/../../vendor/autoload.php';
+
+		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
+	}
+
+	/**
+	 * Boot Logic
+	 * @param IBootContext $context
+	 */
+	public function boot(IBootContext $context): void {
+		// No boot logic here yet...
 	}
 }
