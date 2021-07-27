@@ -36,4 +36,34 @@ export default {
 			},
 		}
 	},
+
+	methods: {
+		/**
+		 * Get the icon based on the share type
+		 * Default share is a user, other icons are here to differenciate from it, so let's not display the user icon.
+		 *
+		 * @param {number} type the share type
+		 * @return {string} the icon class
+		 */
+		shareTypeToIcon(type) {
+			switch (type) {
+			case this.SHARE_TYPES.SHARE_TYPE_GUEST:
+			// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
+			// case this.SHARE_TYPES.SHARE_TYPE_USER:
+				return 'icon-user'
+			case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
+			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+				return 'icon-group'
+			case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
+				return 'icon-mail'
+			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+				return 'icon-circle'
+			case this.SHARE_TYPES.SHARE_TYPE_ROOM:
+				return 'icon-room'
+
+			default:
+				return ''
+			}
+		},
+	},
 }

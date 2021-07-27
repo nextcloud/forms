@@ -22,115 +22,32 @@
 
 <template>
 	<AppSidebar v-show="opened"
-		:title="t('forms', 'Share form')"
+		:title="t('forms', 'Form settings')"
 		@close="onClose">
-		<button class="copyShareLink" @click="copyShareLink">
-			<span class="icon-clippy" role="img" />
-			{{ t('forms', 'Share link') }}
-		</button>
+		<AppSidebarTab id="forms-sharing"
+			:order="0"
+			:name="t('forms', 'Sharing')"
+			icon="icon-share">
+			<SharingSidebarTab :form="form"
+				@update:formProp="onPropertyChange" />
+		</AppSidebarTab>
 
-		<ul>
-			<li>
-				<input id="public"
-					v-model="form.access.type"
-					type="radio"
-					value="public"
-					class="radio"
-					@change="onAccessChange">
-				<label for="public">
-					<span class="icon-public">
-						{{ t('forms', 'Share via link') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="registered"
-					v-model="form.access.type"
-					type="radio"
-					value="registered"
-					class="radio"
-					@change="onAccessChange">
-				<label for="registered">
-					<span class="icon-group">
-						{{ t('forms', 'Show to all users of this instance') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="selected"
-					v-model="form.access.type"
-					type="radio"
-					value="selected"
-					class="radio"
-					@change="onAccessChange">
-				<label for="selected">
-					<span class="icon-shared">
-						{{ t('forms', 'Choose users to share with') }}
-					</span>
-				</label>
-				<ShareDiv v-show="form.access.type === 'selected'"
-					:user-shares="userShares"
-					:group-shares="groupShares"
-					@update:shares="onSharingChange" />
-			</li>
-		</ul>
-
-		<h3>{{ t('forms', 'Settings') }}</h3>
-		<ul>
-			<li>
-				<input id="isAnonymous"
-					v-model="form.isAnonymous"
-					type="checkbox"
-					class="checkbox"
-					@change="onAnonChange">
-				<label for="isAnonymous">
-					<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
-					{{ t('forms', 'Anonymous responses') }}
-				</label>
-			</li>
-			<li>
-				<input id="submitOnce"
-					v-model="submitMultiple"
-					:disabled="isPublic || form.isAnonymous"
-					type="checkbox"
-					class="checkbox"
-					@change="onSubmitOnceChange">
-				<label for="submitOnce">
-					{{ t('forms', 'Allow multiple responses per person') }}
-				</label>
-			</li>
-			<li>
-				<input id="expires"
-					v-model="formExpires"
-					type="checkbox"
-					class="checkbox">
-				<label for="expires">
-					{{ t('forms', 'Set expiration date') }}
-				</label>
-				<DatetimePicker v-show="formExpires"
-					id="expiresDatetimePicker"
-					:clearable="false"
-					:disabled-date="notBeforeToday"
-					:disabled-time="notBeforeNow"
-					:editable="false"
-					:formatter="formatter"
-					:minute-step="5"
-					:placeholder="t('forms', 'Expiration date')"
-					:show-second="false"
-					:value="expirationDate"
-					type="datetime"
-					@change="onExpiresChange" />
-			</li>
-		</ul>
+		<AppSidebarTab id="forms-settings"
+			:order="1"
+			:name="t('forms', 'Settings')"
+			icon="icon-settings">
+			<SettingsSidebarTab :form="form"
+				@update:formProp="onPropertyChange" />
+		</AppSidebarTab>
 	</AppSidebar>
 </template>
 
 <script>
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
-import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
-import moment from '@nextcloud/moment'
+import AppSidebarTab from '@nextcloud/vue/dist/Components/AppSidebarTab'
 
-import ShareDiv from '../components/ShareDiv'
+import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
+import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
 import ViewsMixin from '../mixins/ViewsMixin'
 
 export default {
@@ -138,8 +55,9 @@ export default {
 
 	components: {
 		AppSidebar,
-		DatetimePicker,
-		ShareDiv,
+		AppSidebarTab,
+		SharingSidebarTab,
+		SettingsSidebarTab,
 	},
 	mixins: [ViewsMixin],
 
@@ -147,66 +65,6 @@ export default {
 		opened: {
 			type: Boolean,
 			required: true,
-		},
-	},
-
-	data() {
-		return {
-			lang: {
-				placeholder: {
-					date: t('forms', 'Select expiration date'),
-				},
-			},
-			formatter: {
-				stringify: this.stringify,
-				parse: this.parse,
-			},
-		}
-	},
-
-	computed: {
-		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.
-		submitMultiple: {
-			get() {
-				if (this.form.access.type === 'public' || this.form.isAnonymous) {
-					return true
-				}
-				return !this.form.submitOnce
-			},
-			set(submitMultiple) {
-				this.form.submitOnce = !submitMultiple
-			},
-		},
-
-		formExpires: {
-			get() {
-				return this.form.expires !== 0
-			},
-			set(checked) {
-				if (checked) {
-					this.form.expires = moment().unix() + 3600 // Expires in one hour.
-				} else {
-					this.form.expires = 0
-				}
-				this.saveFormProperty('expires')
-			},
-		},
-		isPublic() {
-			return this.form?.access?.type === 'public'
-		},
-
-		expirationDate() {
-			return moment(this.form.expires, 'X').toDate()
-		},
-		isExpired() {
-			return this.form.expires && moment().unix() > this.form.expires
-		},
-
-		userShares() {
-			return [...this.form?.access?.users || []]
-		},
-		groupShares() {
-			return [...this.form?.access?.groups || []]
 		},
 	},
 
@@ -223,116 +81,30 @@ export default {
 
 		/**
 		 * Save Form-Properties
-		 */
-		onAnonChange() {
-			this.saveFormProperty('isAnonymous')
-		},
-		onSubmitOnceChange() {
-			this.saveFormProperty('submitOnce')
-		},
-		onAccessChange() {
-			this.saveFormProperty('access')
-		},
-		onSharingChange({ groups, users }) {
-			this.$set(this.form.access, 'groups', groups)
-			this.$set(this.form.access, 'users', users)
-			this.onAccessChange()
-		},
-
-		/**
-		 * On date picker change
 		 *
-		 * @param {Date} datetime the expiration Date
+		 * @param {string} property The Name of the Property to update
+		 * @param {any} newVal The new Property value
 		 */
-		onExpiresChange(datetime) {
-			this.form.expires = parseInt(moment(datetime).format('X'))
-			this.saveFormProperty('expires')
-		},
-
-		/**
-		 * Datepicker timestamp to string
-		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {string}
-		 */
-		stringify(datetime) {
-			const date = moment(datetime).format('LLL')
-
-			if (this.isExpired) {
-				return t('forms', 'Expired on {date}', { date })
-			}
-			return t('forms', 'Expires on {date}', { date })
-		},
-
-		/**
-		 * Form expires timestamp to Date form the datepicker
-		 *
-		 * @param {number} value the expires timestamp
-		 * @return {Date}
-		 */
-		parse(value) {
-			return moment(value, 'X').toDate()
-		},
-
-		/**
-		 * Prevent selecting a day before today
-		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {boolean}
-		 */
-		notBeforeToday(datetime) {
-			return datetime < moment().add(-1, 'day').toDate()
-		},
-
-		/**
-		 * Prevent selecting a time before the current one + 1hour
-		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {boolean}
-		 */
-		notBeforeNow(datetime) {
-			return datetime < moment().add(1, 'hour').toDate()
+		onPropertyChange(property, newVal) {
+			this.$set(this.form, property, newVal)
+			this.saveFormProperty(property)
 		},
 	},
 }
 </script>
 
 <style lang="scss" scoped>
-.copyShareLink {
-	margin: 8px;
+.app-sidebar__tab:focus {
+	box-shadow: none;
+}
+
+.sidebar-tabs__content {
+	margin: 4px;
 }
 
 h3 {
 	font-weight: bold;
 	margin-left: 8px;
 	margin-bottom: 8px;
-}
-
-ul {
-	margin-bottom: 24px;
-
-	label {
-		padding: 8px;
-		display: block;
-
-		span[class^='icon-'],
-		span[class*=' icon-'] {
-			background-position: 4px;
-			padding-left: 24px;
-		}
-	}
-}
-
-input,
-textarea {
-	&.error {
-		border: 2px solid var(--color-error);
-		box-shadow: 1px 0 var(--border-radius) var(--color-box-shadow);
-	}
-}
-
-#expiresDatetimePicker {
-	left: 36px;
-	width: calc(100% - 44px);
 }
 </style>
