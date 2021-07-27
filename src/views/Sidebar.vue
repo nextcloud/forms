@@ -25,109 +25,119 @@
 		v-show="opened"
 		:title="t('forms', 'Share form')"
 		@close="onClose">
-		<button class="copyShareLink" @click="copyShareLink">
-			<span class="icon-clippy" role="img" />
-			{{ t('forms', 'Share link') }}
-		</button>
+		<AppSidebarTab
+			id="settings"
+			name="Settings"
+			icon="icon-settings">
+			<button class="copyShareLink" @click="copyShareLink">
+				<span class="icon-clippy" role="img" />
+				{{ t('forms', 'Share link') }}
+			</button>
 
-		<ul>
-			<li>
-				<input id="public"
-					v-model="form.access.type"
-					type="radio"
-					value="public"
-					class="radio"
-					@change="onAccessChange">
-				<label for="public">
-					<span class="icon-public">
-						{{ t('forms', 'Share via link') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="registered"
-					v-model="form.access.type"
-					type="radio"
-					value="registered"
-					class="radio"
-					@change="onAccessChange">
-				<label for="registered">
-					<span class="icon-group">
-						{{ t('forms', 'Show to all users of this instance') }}
-					</span>
-				</label>
-			</li>
-			<li>
-				<input id="selected"
-					v-model="form.access.type"
-					type="radio"
-					value="selected"
-					class="radio"
-					@change="onAccessChange">
-				<label for="selected">
-					<span class="icon-shared">
-						{{ t('forms', 'Choose users to share with') }}
-					</span>
-				</label>
-				<ShareDiv v-show="form.access.type === 'selected'"
-					:user-shares="userShares"
-					:group-shares="groupShares"
-					@update:shares="onSharingChange" />
-			</li>
-		</ul>
-
-		<h3>{{ t('forms', 'Settings') }}</h3>
-		<ul>
-			<li>
-				<input id="isAnonymous"
-					v-model="form.isAnonymous"
-					type="checkbox"
-					class="checkbox"
-					@change="onAnonChange">
-				<label for="isAnonymous">
-					<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
-					{{ t('forms', 'Anonymous responses') }}
-				</label>
-			</li>
-			<li>
-				<input id="submitOnce"
-					v-model="submitMultiple"
-					:disabled="isPublic || form.isAnonymous"
-					type="checkbox"
-					class="checkbox"
-					@change="onSubmitOnceChange">
-				<label for="submitOnce">
-					{{ t('forms', 'Allow multiple responses per person') }}
-				</label>
-			</li>
-			<li>
-				<input id="expires"
-					v-model="formExpires"
-					type="checkbox"
-					class="checkbox">
-				<label for="expires">
-					{{ t('forms', 'Set expiration date') }}
-				</label>
-				<DatetimePicker v-show="formExpires"
-					id="expiresDatetimePicker"
-					:clearable="false"
-					:disabled-date="notBeforeToday"
-					:disabled-time="notBeforeNow"
-					:editable="false"
-					:formatter="formatter"
-					:minute-step="5"
-					:placeholder="t('forms', 'Expiration date')"
-					:show-second="false"
-					:value="expirationDate"
-					type="datetime"
-					@change="onExpiresChange" />
-			</li>
-		</ul>
+			<ul>
+				<li>
+					<input id="isAnonymous"
+						v-model="form.isAnonymous"
+						type="checkbox"
+						class="checkbox"
+						@change="onAnonChange">
+					<label for="isAnonymous">
+						<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
+						{{ t('forms', 'Anonymous responses') }}
+					</label>
+				</li>
+				<li>
+					<input id="submitOnce"
+						v-model="submitMultiple"
+						:disabled="isPublic || form.isAnonymous"
+						type="checkbox"
+						class="checkbox"
+						@change="onSubmitOnceChange">
+					<label for="submitOnce">
+						{{ t('forms', 'Allow multiple responses per person') }}
+					</label>
+				</li>
+				<li>
+					<input id="expires"
+						v-model="formExpires"
+						type="checkbox"
+						class="checkbox">
+					<label for="expires">
+						{{ t('forms', 'Set expiration date') }}
+					</label>
+					<!-- <DatetimePicker v-show="formExpires"
+						id="expiresDatetimePicker"
+						:clearable="false"
+						:disabled-date="notBeforeToday"
+						:disabled-time="notBeforeNow"
+						:editable="false"
+						:formatter="formatter"
+						:minute-step="5"
+						:placeholder="t('forms', 'Expiration date')"
+						:show-second="false"
+						:value="expirationDate"
+						type="datetime"
+						@change="onExpiresChange" /> -->
+				</li>
+			</ul>
+		</AppSidebarTab>
+		<AppSidebarTab
+			id="share"
+			name="Sharing"
+			icon="icon-share">
+			Sharing Tab
+			<ul>
+				<li>
+					<input id="public"
+						v-model="form.access.type"
+						type="radio"
+						value="public"
+						class="radio"
+						@change="onAccessChange">
+					<label for="public">
+						<span class="icon-public">
+							{{ t('forms', 'Share via link') }}
+						</span>
+					</label>
+				</li>
+				<li>
+					<input id="registered"
+						v-model="form.access.type"
+						type="radio"
+						value="registered"
+						class="radio"
+						@change="onAccessChange">
+					<label for="registered">
+						<span class="icon-group">
+							{{ t('forms', 'Show to all users of this instance') }}
+						</span>
+					</label>
+				</li>
+				<li>
+					<input id="selected"
+						v-model="form.access.type"
+						type="radio"
+						value="selected"
+						class="radio"
+						@change="onAccessChange">
+					<label for="selected">
+						<span class="icon-shared">
+							{{ t('forms', 'Choose users to share with') }}
+						</span>
+					</label>
+					<ShareDiv v-show="form.access.type === 'selected'"
+						:user-shares="userShares"
+						:group-shares="groupShares"
+						@update:shares="onSharingChange" />
+				</li>
+			</ul>
+		</AppSidebarTab>
 	</AppSidebar>
 </template>
 
 <script>
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
+import AppSidebarTab from '@nextcloud/vue/dist/Components/AppSidebarTab'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
 
@@ -139,6 +149,7 @@ export default {
 
 	components: {
 		AppSidebar,
+		AppSidebarTab,
 		DatetimePicker,
 		ShareDiv,
 	},
