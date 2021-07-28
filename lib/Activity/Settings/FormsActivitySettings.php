@@ -23,16 +23,74 @@
 
 namespace OCA\Forms\Activity\Settings;
 
-/** TODO
- * Move to only have the new version, as soon as Forms minversion is set to NC20
- * - Just rename FormsActivitySettings20 to FormsActivitySettings
- * - Delete this file and FormsActivitySettingsLegacy
- */
-$version = \OCP\Util::getVersion()[0];
-if ($version >= 20) {
-	abstract class FormsActivitySettings extends FormsActivitySettings20 {
+use OCP\Activity\ActivitySettings;
+use OCP\IL10N;
+
+abstract class FormsActivitySettings extends ActivitySettings {
+	protected $appName;
+
+	/** @var IL10N */
+	protected $l10n;
+
+	public function __construct(string $appName,
+								IL10N $l10n) {
+		$this->appName = $appName;
+		$this->l10n = $l10n;
 	}
-} else {
-	abstract class FormsActivitySettings extends FormsActivitySettingsLegacy {
+
+	/**
+	 * Settings Group ID
+	 * @return string
+	 */
+	public function getGroupIdentifier(): string {
+		return $this->appName;
+	}
+
+	/**
+	 * Human Readable Group Title
+	 * @return string
+	 */
+	public function getGroupName(): string {
+		return $this->l10n->t('Forms');
+	}
+
+	/**
+	 * Priority of the Setting (0-100)
+	 * Using this as Forms-Basepriority
+	 * @return int
+	 */
+	public function getPriority(): int {
+		return 60;
+	}
+
+	/**
+	 * User can change Notification
+	 * @return bool
+	 */
+	public function canChangeNotification(): bool {
+		return true;
+	}
+
+	/**
+	 * Notification enabled by default
+	 */
+	public function isDefaultEnabledNotification(): bool {
+		return true;
+	}
+
+	/**
+	 * User can change Mail
+	 * @return bool
+	 */
+	public function canChangeMail(): bool {
+		return true;
+	}
+
+	/**
+	 * Mail disabled by default
+	 * @return bool
+	 */
+	public function isDefaultEnabledMail(): bool {
+		return false;
 	}
 }
