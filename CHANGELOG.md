@@ -1,11 +1,51 @@
 # Changelog
 
-## v2.3.0 - tbd
+## v2.3.0 - 2021-07-28
 
-### Deprecated
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.4...v2.3.0)
+
+### Deprecated ⚠️
 
 - Question property `mandatory` is deprecated and replaced by `isRequired`. The old property will be removed in API version 2.
   [\#882](https://github.com/nextcloud/forms/pull/882) ([chartman123](https://github.com/Chartman123))
+
+### Enhancements
+
+- Add server-side validation of submissions
+  [\#895](https://github.com/nextcloud/forms/pull/895) ([Chartman123](https://github.com/Chartman123))
+- Delete a deleted Users Forms
+  [\#856](https://github.com/nextcloud/forms/pull/856) ([jotoeri](https://github.com/jotoeri))
+
+### Fixed
+
+- Fix Activity Link
+  [\#976](https://github.com/nextcloud/forms/pull/976) ([jotoeri](https://github.com/jotoeri))
+- Allow non-admins to export to files
+  [\#923](https://github.com/nextcloud/forms/pull/923) ([skjnldsv](https://github.com/skjnldsv))
+- Fix result view for long text answers
+  [\#913](https://github.com/nextcloud/forms/pull/913) ([Chartman123](https://github.com/Chartman123))
+- Fix boolean columns nullable
+  [\#881](https://github.com/nextcloud/forms/pull/881) ([jotoeri](https://github.com/jotoeri))
+
+### Merged
+
+- Minversion 20
+  [\#1021](https://github.com/nextcloud/forms/pull/1021) ([jotoeri](https://github.com/jotoeri))
+- Fix phpunit typo
+  [\#1020](https://github.com/nextcloud/forms/pull/1020) ([jotoeri](https://github.com/jotoeri))
+- Update version on master
+  [\#994](https://github.com/nextcloud/forms/pull/994) ([nickvergessen](https://github.com/nickvergessen))
+- Update master target versions
+  [\#993](https://github.com/nextcloud/forms/pull/993) ([nickvergessen](https://github.com/nickvergessen))
+- Bump node and npm version in package.json
+  [\#989](https://github.com/nextcloud/forms/pull/989) ([nickvergessen](https://github.com/nickvergessen))
+- Test FormsService
+  [\#921](https://github.com/nextcloud/forms/pull/921) ([jotoeri](https://github.com/jotoeri))
+- Some more tests
+  [\#893](https://github.com/nextcloud/forms/pull/893) ([jotoeri](https://github.com/jotoeri))
+- Refactor Mandatory
+  [\#882](https://github.com/nextcloud/forms/pull/882) ([Chartman123](https://github.com/Chartman123))
+
 
 ## v2.2.4 - 2021-03-30
 
