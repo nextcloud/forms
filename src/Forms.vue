@@ -118,7 +118,7 @@ export default {
 	data() {
 		return {
 			loading: true,
-			sidebarOpened: false,
+			sidebarOpened: true,
 			forms: [],
 			sharedForms: [],
 		}
