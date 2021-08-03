@@ -34,7 +34,6 @@
 		@delete="onDelete">
 		<div class="question__content">
 			<DatetimePicker v-model="time"
-				value-type="format"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
@@ -106,6 +105,21 @@ export default {
 		},
 
 		/**
+		 * Calculating the format, that moment should use for storing the values to the Database
+		 *
+		 * @return {string}
+		 */
+		getStorageFormat() {
+			if (this.datetimePickerType === 'datetime') {
+				return 'YYYY-MM-DD HH:mm'
+			}
+			if (this.datetimePickerType === 'time') {
+				return 'HH:mm'
+			}
+			return 'YYYY-MM-DD'
+		},
+
+		/**
 		 * All non-exposed props onto datepicker input-element.
 		 *
 		 * @return {object}
@@ -119,7 +133,7 @@ export default {
 
 	methods: {
 		/**
-		 * DateTimepicker show date-text
+		 * DateTimepicker show text in picker
 		 * Format depends on component-type date/datetime
 		 *
 		 * @param {Date} date the selected datepicker Date
@@ -129,22 +143,22 @@ export default {
 			return moment(date).format(this.getMomentFormat)
 		},
 		/**
-		 * Reinterpret the stringified date
+		 * Reinterpret a stored date
 		 *
 		 * @param {string} dateString Stringified date
 		 * @return {Date}
 		 */
 		parse(dateString) {
-			return moment(dateString, this.getMomentFormat).toDate()
+			return moment(dateString, this.getStorageFormat).toDate()
 		},
 
 		/**
 		 * Store Value
 		 *
-		 * @param {string} dateString The parsed string to store
+		 * @param {Date} date The date to store
 		 */
-		onValueChange(dateString) {
-			this.$emit('update:values', [dateString])
+		onValueChange(date) {
+			this.$emit('update:values', [moment(date).format(this.getStorageFormat)])
 		},
 	},
 }
