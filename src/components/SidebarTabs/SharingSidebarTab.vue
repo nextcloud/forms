@@ -23,32 +23,9 @@
 
 <template>
 	<div>
-		<Multiselect>
-			:options="options"
-		</Multiselect>
-		<!-- <Multiselect
-			:clear-on-select="false"
-			:hide-selected="true"
-			:internal-search="false"
-			:loading="loading"
-			:multiple="true"
-			:placeholder="t('forms', 'User or group name …')"
-			:preselect-first="true"
-			:preserve-search="true"
-			:searchable="true"
-			:user-select="true"
-			label="displayName"
-			track-by="shareWith"
-			@search-change="asyncFind"
-			@select="addShare">
-			<template #noOptions>
-				{{ t('forms', 'No recommendations. Start typing.') }}
-			</template>
-			<template #noResult>
-				{{ noResultText }}
-			</template>
-		</Multiselect> -->
+		<SharingSearchDiv />
 
+		Multiselect
 		Share Link
 		Sharees
 		Project
@@ -56,12 +33,11 @@
 </template>
 
 <script>
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
-import debounce from 'debounce'
+import SharingSearchDiv from './SharingSearchDiv.vue'
 
 export default {
 	components: {
-		Multiselect
+		SharingSearchDiv,
 	},
 
 	computed: {

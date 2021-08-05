@@ -40,6 +40,14 @@
 			icon="icon-share">
 			<SharingSidebarTab />
 		</AppSidebarTab>
+
+		<AppSidebarTab
+			id="test"
+			:order="2"
+			name="test"
+			icon="icon-no">
+			<ShareDiv />
+		</AppSidebarTab>
 	</AppSidebar>
 </template>
 
@@ -51,6 +59,8 @@ import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
 import ViewsMixin from '../mixins/ViewsMixin'
 
+import ShareDiv from '../components/ShareDiv'
+
 export default {
 	name: 'Sidebar',
 
@@ -59,6 +69,7 @@ export default {
 		AppSidebarTab,
 		SharingSidebarTab,
 		SettingsSidebarTab,
+		ShareDiv,
 	},
 	mixins: [ViewsMixin],
 
