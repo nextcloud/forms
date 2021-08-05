@@ -1,6 +1,7 @@
 <!--
   - @copyright Copyright (c) 2021 Jonas Rittershofer <jotoeri@users.noreply.github.com>
   -
+  - @author John Molakvoæ <skjnldsv@protonmail.com>
   - @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
   -
   - @license GNU AGPL version 3 or any later version
@@ -56,10 +57,18 @@
 
 <script>
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import debounce from 'debounce'
 
 export default {
 	components: {
 		Multiselect
 	},
+
+	computed: {
+
+	},
+
+	methods: {
+	}
 }
 </script>
