@@ -32,10 +32,14 @@
     "Are you sure you want to delete {title}?" : "คุณแน่ใจที่จะลบ {title} หรือไม่",
     "Error while deleting {title}" : "เกิดข้อผิดพลาดขณะลบ {title}",
     "Delete answer" : "ลบคำตอบ",
+    "Error while saving the answer" : "ข้อผิดพลาดขณะบันทึกคำตอบ",
     "Required" : "จำเป็น",
     "Delete question" : "ลบคำถาม",
     "This question needs a title!" : "คำถามนี้ต้องใส่หัวข้อ!",
     "Add a new answer" : "เพิ่มคำตอบใหม่",
+    "Delete this response" : "ลบการตอบกลับนี้",
+    "No response" : "ไม่มีการตอบกลับ",
+    "User or group name …" : "ชื่อผู้ใช้หรือกลุ่ม …",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "Searching …" : "กำลังค้นหา …",
     "Group" : "กลุ่ม",
@@ -54,6 +58,17 @@
     "Submit" : "ส่ง",
     "Submit form" : "ส่งฟอร์ม",
     "There was an error submitting the form" : "เกิดข้อผิดพลาดขณะส่งฟอร์ม",
-    "Error while saving question" : "ข้อผิดพลาดขณะบันทึกคำถาม"
+    "Error while saving question" : "ข้อผิดพลาดขณะบันทึกคำถาม",
+    "Short answer" : "คำถามสั้น",
+    "Enter a short answer" : "ใส่คำถามสั้น",
+    "Enter a long text" : "ใส่ข้อความยาว",
+    "Date" : "วันที่",
+    "Pick a date" : "เลือกวันที่",
+    "Datetime" : "วันที่และเวลา",
+    "Pick a date and time" : "เลือกวันที่และเวลา",
+    "Form expired" : "ฟอร์มหมดอายุ",
+    "This form has expired and is no longer taking answers" : "ฟอร์มนี้หมดอายุแล้วและไม่รับคำตอบเพิ่มอีก",
+    "Form not found" : "ไม่พบฟอร์ม",
+    "This form does not exist" : "ไม่มีฟอร์มนี้"
 },"pluralForm" :"nplurals=1; plural=0;"
 }
