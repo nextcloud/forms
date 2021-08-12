@@ -14,6 +14,8 @@ OC.L10N.register(
     "User display name" : "Nùmene ammustradu a s'utente",
     "Timestamp" : "Marca temporale",
     "responses" : "rispostas",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Sondàgios e cuestionàrios simpres, autònomos",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Sondàgios e cuestionàrios simpres, autònomos!**\n\n- **📝 Disegnu simpre:** Chene tropu sèberos, s'essentziale isceti. Funtzionat bene cun su telefoneddu.\n- **📊 Visualiza e esporta resurtados:** Is resurtados si podent bìdere e puru esportare comente CSV in su pròpriu formadu impreadu dae Google Forms.\n- **🔒 Datos controllados!** Diversamente dae Google Forms, Typeform, Doodle e àteros, is informatziones de is sondàgios e is rispostas abarrant privadas in s'istàntzia tua.\n- **🙋 Intra•nche!** Amus pianificadu àteras cosas medas, genias de dimandas, mòdulos de collaboratzione, [e àteru](https://github.com/nextcloud/forms/milestones)!",
     "New form" : "Mòdulu nou",
     "Your Forms" : "Is mòdulos tuos",
     "Shared with you" : "Cumpartzidos cun tegus",
