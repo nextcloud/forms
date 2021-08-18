@@ -13,6 +13,7 @@
     "Timestamp" : "时间戳",
     "responses" : "回应",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 简单的自托管调查问卷",
+    "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**可自行搭建的建议问卷调查系统！**\n\n- **📝 简洁设计：** 没有复杂的选项，只有最基本的元素。与移动设备良好兼容。\n- **📊 检视并导出结果：** 结果可视化呈现，也可以使用与 Google 表单相同的格式导出。\n- **🔒 您的资料由您自己保管！** 不像 Google 表单、Typeform、Doodle 或是其它服务，统计数据和结果将会保存在您自己的实例上而不会外泄。\n- **🙋 参与进来！** 我们计划了很多功能，比如更多的问题类型、表单协作等，[当然还有很多](https://github.com/nextcloud/forms/milestones)！",
     "New form" : "新表格",
     "Your Forms" : "你的表单",
     "Shared with you" : "已共享给您",
