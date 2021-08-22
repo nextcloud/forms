@@ -83,7 +83,7 @@
     "Set expiration date" : "有効期限を設定",
     "Expiration date" : "有効期限",
     "Select expiration date" : "回答期限日の選択",
-    "Expired on {date}" : "{date} にすでに有効期限切れ",
+    "Expired on {date}" : "{date} に有効期限が切れました。",
     "Expires on {date}" : "有効期限: {date}",
     "Submitting form …" : "フォームを送信中...",
     "Thank you for completing the form!" : "回答のご協力ありがとうございました！",
