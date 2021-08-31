@@ -76,7 +76,13 @@ export default {
 	computed: {
 		// Allow picking time or not, depending on variable in answerType.
 		datetimePickerType() {
-			return this.answerType.includeTime ? 'datetime' : 'date'
+			if (this.answerType.includeTime) {
+				return 'datetime'
+			}
+			if (this.answerType.onlyTime) {
+				return 'time'
+			}
+			return 'date'
 		},
 
 		datetimePickerPlaceholder() {
@@ -95,7 +101,25 @@ export default {
 			if (this.datetimePickerType === 'datetime') {
 				return 'LLL'
 			}
+			if (this.datetimePickerType === 'time') {
+				return 'LT'
+			}
 			return 'LL'
+		},
+
+		/**
+		 * Calculating the format, that moment should use for storing the values to the Database
+		 *
+		 * @return {string}
+		 */
+		getStorageFormat() {
+			if (this.datetimePickerType === 'datetime') {
+				return 'YYYY-MM-DD HH:mm'
+			}
+			if (this.datetimePickerType === 'time') {
+				return 'HH:mm'
+			}
+			return 'YYYY-MM-DD'
 		},
 
 		/**
@@ -137,7 +161,7 @@ export default {
 		 * @param {string} dateString The parsed string to store
 		 */
 		onValueChange(dateString) {
-			this.$emit('update:values', [dateString])
+			this.$emit('update:values', [moment(this.parse(dateString)).format(this.getStorageFormat)])
 		},
 	},
 }

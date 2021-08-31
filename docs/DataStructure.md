@@ -173,3 +173,4 @@ Currently supported Question-Types are:
 | `long`          | A long text answer. Multi-line supported |
 | `date`          | Showing a dropdown calendar to select a date. |
 | `datetime`      | Showing a dropdown calendar to select a date **and** a time. |
+| `date`          | Showing a dropdown menu to select a time. |

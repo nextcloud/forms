@@ -36,6 +36,7 @@ class Constants {
 	public const ANSWER_TYPE_LONG = 'long';
 	public const ANSWER_TYPE_DATE = 'date';
 	public const ANSWER_TYPE_DATETIME = 'datetime';
+	public const ANSWER_TYPE_TIME = 'time';
 
 	// AnswerTypes, that need/have predefined Options
 	public const ANSWER_PREDEFINED = [self::ANSWER_TYPE_MULTIPLE, self::ANSWER_TYPE_MULTIPLEUNIQUE, self::ANSWER_TYPE_DROPDOWN];
