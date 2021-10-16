@@ -32,7 +32,7 @@
 		"@nextcloud/moment": "^1.1.1",
 		"@nextcloud/router": "^2.0.0",
 		"@nextcloud/vue": "^4.2.0",
-		"core-js": "^3.18.2",
+		"core-js": "^3.18.3",
 		"crypto-js": "^4.1.1",
 		"debounce": "^1.2.1",
 		"p-debounce": "^4.0.0",
