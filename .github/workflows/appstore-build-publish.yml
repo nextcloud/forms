@@ -137,6 +137,9 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
+      - name: Wait for github release
+        run: sleep 5
+
       - name: Upload app to Nextcloud appstore
         uses: R0Wi/nextcloud-appstore-push-action@v1
         with:
