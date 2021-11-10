@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.4.0](https://github.com/nextcloud/forms/tree/v2.4.0) (2021-11-10)
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.3.0...v2.4.0)
+
+**Merged pull requests:**
+
+- 2.4.0 [\#1068](https://github.com/nextcloud/forms/pull/1068) ([skjnldsv](https://github.com/skjnldsv))
+- Enable HMR [\#1024](https://github.com/nextcloud/forms/pull/1024) ([jotoeri](https://github.com/jotoeri))
+
 ## v2.3.0 - 2021-07-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.4...v2.3.0)
