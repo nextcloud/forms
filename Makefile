@@ -3,12 +3,8 @@
 app_name=forms
 project_dir=$(CURDIR)/../$(app_name)
 build_dir=$(CURDIR)/build/artifacts
-appstore_dir=$(build_dir)/appstore
 appstore_package_name=$(appstore_dir)/$(app_name)
 source_dir=$(build_dir)/source
-sign_dir=$(build_dir)/sign
-package_name=$(app_name)
-cert_dir=$(HOME)/.nextcloud/certificates
 
 all: clean install-composer-deps install-npm-deps-dev build-js-production appstore
 
@@ -47,8 +43,8 @@ watch-js:
 dev-setup: install-composer-deps-dev install-npm-deps-dev build-js
 
 appstore:
-	rm -rf $(appstore_dir)
-	mkdir -p $(appstore_dir)
+	rm -rf $(build_dir)
+	mkdir -p $(build_dir)
 	tar cvzf $(appstore_package_name).tar.gz \
 	--exclude-vcs \
 	$(project_dir)/appinfo \
