@@ -3,7 +3,7 @@
 app_name=forms
 project_dir=$(CURDIR)/../$(app_name)
 build_dir=$(CURDIR)/build/artifacts
-appstore_package_name=$(appstore_dir)/$(app_name)
+appstore_package_name=$(build_dir)/$(app_name)
 source_dir=$(build_dir)/source
 
 all: clean install-composer-deps install-npm-deps-dev build-js-production appstore
