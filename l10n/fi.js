@@ -73,6 +73,7 @@ OC.L10N.register(
     "Summary" : "Yhteenveto",
     "Responses" : "Vastaukset",
     "Options" : "Valinnat",
+    "Save CSV to Files" : "Tallenna CSV tiedostoihin",
     "Download CSV" : "Lataa CSV",
     "Delete all responses" : "Poista kaikki vastaukset",
     "No responses yet" : "Ei vielä vastauksia",
