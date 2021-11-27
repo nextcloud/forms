@@ -100,7 +100,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Vielen Dank für das Ausfüllen des Formulars!",
     "Submit" : "Übermitteln",
     "Submit form" : "Formular übermitteln",
-    "There was an error submitting the form" : "Beim Übermitteln des Formulars ist ein Fehler aufgetreten",
+    "There was an error submitting the form" : "Es ist ein Fehler beim Übermitteln des Formulars aufgetreten",
     "Error while saving question" : "Fehler beim Speichern der Frage",
     "Checkboxes" : "Kontrollkästchen",
     "Checkbox question title" : "Titel der Frage mit Kontrollkästchen",
