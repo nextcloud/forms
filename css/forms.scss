@@ -20,6 +20,9 @@
  *
  */
 
+@import 'variables';
+@import 'icons';
+
 // Various variables used by this app
 :root {
 	--top-bar-height: 60px;
@@ -40,6 +43,3 @@ body {
 	min-height: 100%;
 	height: auto;
 }
-
-@import 'variables';
-@import 'icons';
