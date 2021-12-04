@@ -142,6 +142,7 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
+import ShareLinkMixin from '../mixins/ShareLinkMixin.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
@@ -163,7 +164,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [ViewsMixin, ShareLinkMixin],
 
 	props: {
 		sidebarOpened: {

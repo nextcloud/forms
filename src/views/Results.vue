@@ -136,6 +136,7 @@ import EmptyContent from '../components/EmptyContent.vue'
 import Summary from '../components/Results/Summary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
+import ShareLinkMixin from '../mixins/ShareLinkMixin.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
@@ -162,7 +163,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [ViewsMixin, ShareLinkMixin],
 
 	data() {
 		return {
