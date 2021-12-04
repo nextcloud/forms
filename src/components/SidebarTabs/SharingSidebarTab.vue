@@ -86,6 +86,7 @@ import { Actions, ActionButton, CheckboxRadioSwitch } from '@nextcloud/vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import ShareTypes from '../../mixins/ShareTypes'
+import ShareLinkMixin from '../../mixins/ShareLinkMixin'
 
 export default {
 	components: {
@@ -96,7 +97,7 @@ export default {
 		SharingShareDiv,
 	},
 
-	mixins: [ShareTypes],
+	mixins: [ShareTypes, ShareLinkMixin],
 
 	props: {
 		form: {

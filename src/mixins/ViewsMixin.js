@@ -20,8 +20,8 @@
  *
  */
 
-import { generateUrl, generateOcsUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { generateOcsUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import Clipboard from 'v-clipboard'
 import Vue from 'vue'
@@ -119,17 +119,6 @@ export default {
 				showError(t('forms', 'Error while saving form'))
 				console.error(error)
 			}
-		},
-
-		copyShareLink(event) {
-			const $shareLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
-			if (this.$clipboard($shareLink)) {
-				showSuccess(t('forms', 'Form link copied'))
-			} else {
-				showError(t('forms', 'Cannot copy, please copy the link manually'))
-			}
-			// Set back focus as clipboard removes focus
-			event.target.focus()
 		},
 	},
 }

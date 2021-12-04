@@ -135,6 +135,7 @@ import EmptyContent from '../components/EmptyContent'
 import Summary from '../components/Results/Summary'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
+import ShareLinkMixin from '../mixins/ShareLinkMixin'
 import ViewsMixin from '../mixins/ViewsMixin'
 import SetWindowTitle from '../utils/SetWindowTitle'
 import OcsResponse2Data from '../utils/OcsResponse2Data'
@@ -160,7 +161,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [ViewsMixin, ShareLinkMixin],
 
 	data() {
 		return {
