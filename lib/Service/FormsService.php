@@ -29,6 +29,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
@@ -57,6 +58,9 @@ class FormsService {
 	/** @var QuestionMapper */
 	private $questionMapper;
 
+	/** @var ShareMapper */
+	private $shareMapper;
+
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
@@ -76,6 +80,7 @@ class FormsService {
 								FormMapper $formMapper,
 								OptionMapper $optionMapper,
 								QuestionMapper $questionMapper,
+								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
 								IGroupManager $groupManager,
 								ILogger $logger,
@@ -85,6 +90,7 @@ class FormsService {
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;
 		$this->questionMapper = $questionMapper;
+		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->groupManager = $groupManager;
 		$this->logger = $logger;
@@ -136,6 +142,28 @@ class FormsService {
 	}
 
 	/**
+	 * Load shares corresponding to form
+	 *
+	 * @param integer $formId
+	 * @return array
+	 */
+	public function getShares(int $formId): array {
+		$shareList = [];
+		try {
+			$shareEntities = $this->shareMapper->findByForm($formId);
+			foreach ($shareEntities as $shareEntity) {
+				$share = $shareEntity->read();
+				$share['displayName'] = $this->getShareDisplayName($share);
+				$shareList[] = $share;
+			}
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		} finally {
+			return $shareList;
+		}
+	}
+
+	/**
 	 * Get a form data
 	 *
 	 * @param integer $id
@@ -146,13 +174,7 @@ class FormsService {
 		$form = $this->formMapper->findById($id);
 		$result = $form->read();
 		$result['questions'] = $this->getQuestions($id);
-
-		// Set proper user/groups properties
-		// Make sure we have the bare minimum
-		$result['access'] = array_merge(['users' => [], 'groups' => []], $result['access']);
-		// Properly format users & groups
-		$result['access']['users'] = array_map([$this, 'formatUsers'], $result['access']['users']);
-		$result['access']['groups'] = array_map([$this, 'formatGroups'], $result['access']['groups']);
+		$result['shares'] = $this->getShares($id);
 
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
 		$result['canSubmit'] = $this->canSubmit($form->getId());
@@ -173,6 +195,7 @@ class FormsService {
 		// Remove sensitive data
 		unset($form['access']);
 		unset($form['ownerId']);
+		unset($form['shares']);
 
 		return $form;
 	}
@@ -184,10 +207,11 @@ class FormsService {
 		$form = $this->formMapper->findById($formId);
 		$access = $form->getAccess();
 
+		// TODO 
 		// We cannot control how many time users can submit in public mode
-		if ($access['type'] === 'public') {
-			return true;
-		}
+		// if ($access['type'] === 'public') {
+		// 	return true;
+		// }
 
 		// Owner is always allowed to submit
 		if ($this->currentUser->getUID() === $form->getOwnerId()) {
@@ -218,9 +242,7 @@ class FormsService {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
 
-		if ($access['type'] === 'public') {
-			return true;
-		}
+		// TODO check public access
 		
 		// Refuse access, if not public and no user logged in.
 		if (!$this->currentUser) {
@@ -232,25 +254,83 @@ class FormsService {
 			return true;
 		}
 
-		// Now all remaining users are allowed, if access-type 'registered'.
-		if ($access['type'] === 'registered') {
+		// Now all remaining users are allowed, if permitAll is set.
+		if ($access['permitAllUsers']) {
 			return true;
 		}
 
 		// Selected Access remains.
-		// Grant Access, if user is in users-Array.
-		if (in_array($this->currentUser->getUID(), $access['users'])) {
+		if ($this->isSharedToUser($formId)) {
 			return true;
 		}
 
-		// Check if access granted by group.
-		foreach ($access['groups'] as $group) {
-			if ($this->groupManager->isInGroup($this->currentUser->getUID(), $group)) {
-				return true;
+		// None of the possible access-options matched.
+		return false;
+	}
+
+	/**
+	 * Is the form shown on sidebar to the user.
+	 *
+	 * @param int $formId
+	 * @return bool
+	 */
+	public function isSharedFormShown(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
+		$access = $form->getAccess();
+
+		// Dont show here to owner, as its in the owned list anyways.
+		if ($form->getOwnerId() === $this->currentUser->getUID()) {
+			return false;
+		}
+
+		// Dont show expired forms.
+		if ($this->hasFormExpired($form->getId())) {
+			return false;
+		}
+
+		// Shown if permitall and showntoall are both set.
+		if ($access['permitAllUsers'] && $access['showToAllUsers']) {
+			return true;
+		}
+
+		// Shown if user in List of Shared Users/Groups
+		if ($this->isSharedToUser($formId)) {
+			return true;
+		}
+
+		// No Reason found to show form.
+		return false;
+	}
+
+	/**
+	 * Checking all selected shares
+	 *
+	 * @param $formId
+	 * @return bool
+	 */
+	public function isSharedToUser(int $formId): bool {
+		$shareEntities = $this->shareMapper->findByForm($formId);
+		foreach ($shareEntities as $shareEntity) {
+			$share = $shareEntity->read();
+
+			// Needs different handling for shareTypes
+			switch ($share['shareType']) {
+				case IShare::TYPE_USER:
+					if ($share['shareWith'] === $this->currentUser->getUID()) {
+						return true;
+					}
+					break;
+				case IShare::TYPE_GROUP:
+					if ($this->groupManager->isInGroup($this->currentUser->getUID(), $share['shareWith'])) {
+						return true;
+					}
+					break;
+				default:
+					// Return false below
 			}
 		}
 
-		// None of the possible access-options matched.
+		// No share found.
 		return false;
 	}
 
@@ -266,45 +346,32 @@ class FormsService {
 	}
 
 	/**
-	 * Format users access
+	 * Get DisplayNames to Shares
 	 *
-	 * @param string $userId
-	 * @return array
+	 * @param array $share
+	 * @return string
 	 */
-	private function formatUsers(string $userId): array {
+	public function getShareDisplayName(array $share): string {
 		$displayName = '';
 
-		$user = $this->userManager->get($userId);
-		if ($user instanceof IUser) {
-			$displayName = $user->getDisplayName();
+		switch ($share['shareType']) {
+			case IShare::TYPE_USER:
+				$user = $this->userManager->get($share['shareWith']);
+				if ($user instanceof IUser) {
+					$displayName = $user->getDisplayName();
+				}
+				break;
+			case IShare::TYPE_GROUP:
+				$group = $this->groupManager->get($share['shareWith']);
+				if ($group instanceof IGroup) {
+					$displayName = $group->getDisplayName();
+				}
+				break;
+			default:
+				// Preset Empty.
 		}
 
-		return [
-			'shareWith' => $userId,
-			'displayName' => $displayName,
-			'shareType' => IShare::TYPE_USER
-		];
-	}
-
-	/**
-	 * Format groups access
-	 *
-	 * @param string $groupId
-	 * @return array
-	 */
-	private function formatGroups(string $groupId): array {
-		$displayName = '';
-
-		$group = $this->groupManager->get($groupId);
-		if ($group instanceof IGroup) {
-			$displayName = $group->getDisplayName();
-		}
-
-		return [
-			'shareWith' => $groupId,
-			'displayName' => $displayName,
-			'shareType' => IShare::TYPE_GROUP
-		];
+		return $displayName;
 	}
 
 	/**

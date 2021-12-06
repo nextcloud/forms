@@ -173,7 +173,8 @@ class PageController extends Controller {
 		}
 
 		// If not link-shared, redirect to internal route
-		if ($form->getAccess()['type'] !== 'public') {
+		// TODO Check Public Link Sharing again
+		if (0) {
 			$internalLink = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
 
 			if ($this->userSession->isLoggedIn()) {

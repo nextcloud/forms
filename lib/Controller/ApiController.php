@@ -27,8 +27,6 @@
 
 namespace OCA\Forms\Controller;
 
-use Exception;
-
 use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
@@ -173,11 +171,8 @@ class ApiController extends OCSController {
 
 		$result = [];
 		foreach ($forms as $form) {
-			// Don't add if user is owner, user has no access, form has expired, form is link-shared
-			if ($form->getOwnerId() === $this->currentUser->getUID()
-				|| !$this->formsService->hasUserAccess($form->getId())
-				|| $this->formsService->hasFormExpired($form->getId())
-				|| $form->getAccess()['type'] === 'public') {
+			// Check if the form should be shown on sidebar
+			if (!$this->formsService->isSharedFormShown($form->getId())) {
 				continue;
 			}
 
@@ -246,9 +241,8 @@ class ApiController extends OCSController {
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
-			'type' => 'public',
-			'users' => [],
-			'groups' => []
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
 		]);
 		$form->setSubmitOnce(true);
 
@@ -257,6 +251,7 @@ class ApiController extends OCSController {
 		// Return like getForm(), just without loading Questions (as there are none).
 		$result = $form->read();
 		$result['questions'] = [];
+		$result['shares'] = [];
 
 		return new DataResponse($result);
 	}
@@ -369,28 +364,6 @@ class ApiController extends OCSController {
 			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs)) {
 			$this->logger->info('Not allowed to update id, hash, ownerId or created');
 			throw new OCSForbiddenException();
-		}
-
-		// Handle access-changes
-		if (array_key_exists('access', $keyValuePairs)) {
-			// Make sure we only store id of shares
-			try {
-				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
-					return $user['shareWith'];
-				}, $keyValuePairs['access']['users']);
-				$keyValuePairs['access']['groups'] = array_map(function (array $group): string {
-					return $group['shareWith'];
-				}, $keyValuePairs['access']['groups']);
-			} catch (Exception $e) {
-				$this->logger->debug('Malformed access');
-				throw new OCSBadRequestException('Malformed access');
-			}
-
-			// For selected sharing, notify users (creates Activity)
-			if ($keyValuePairs['access']['type'] === 'selected') {
-				$oldAccess = $form->getAccess();
-				$this->formsService->notifyNewShares($form, $oldAccess, $keyValuePairs['access']);
-			}
 		}
 
 		// Create FormEntity with given Params & Id.

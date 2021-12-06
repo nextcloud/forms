@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2021 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
@@ -21,29 +24,41 @@
  *
  */
 
-namespace OCA\Forms;
+namespace OCA\Forms\Db;
 
-use OCP\Share\IShare;
+use OCP\AppFramework\Db\Entity;
 
-class Constants {
+/**
+ * @method integer getFormId()
+ * @method void setFormId(integer $value)
+ * @method integer getShareType()
+ * @method void setShareType(integer $value)
+ * @method string getShareWith()
+ * @method void setShareWith(string $value)
+ */
+class Share extends Entity {
+	/** @var int */
+	protected $formId;
+	/** @var int */
+	protected $shareType;
+	/** @var string */
+	protected $shareWith;
+
 	/**
-	 * !! Keep in sync with src/models/AnswerTypes.js !!
+	 * Option constructor.
 	 */
+	public function __construct() {
+		$this->addType('formId', 'integer');
+		$this->addType('shareType', 'integer');
+		$this->addType('shareWith', 'string');
+	}
 
-	// Available AnswerTypes
-	public const ANSWER_TYPE_MULTIPLE = 'multiple';
-	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
-	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
-	public const ANSWER_TYPE_SHORT = 'short';
-	public const ANSWER_TYPE_LONG = 'long';
-	public const ANSWER_TYPE_DATE = 'date';
-	public const ANSWER_TYPE_DATETIME = 'datetime';
-
-	// AnswerTypes, that need/have predefined Options
-	public const ANSWER_PREDEFINED = [self::ANSWER_TYPE_MULTIPLE, self::ANSWER_TYPE_MULTIPLEUNIQUE, self::ANSWER_TYPE_DROPDOWN];
-
-	/**
-	 * !! Keep in sync with src/mixins/ShareTypes.js !!
-	 */
-	public const SHARE_TYPES_USED = [IShare::TYPE_USER, IShare::TYPE_GROUP];
+	public function read(): array {
+		return [
+			'id' => $this->getId(),
+			'formId' => $this->getFormId(),
+			'shareType' => $this->getShareType(),
+			'shareWith' => $this->getShareWith(),
+		];
+	}
 }

@@ -33,6 +33,7 @@ use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 
 use OCP\IGroup;
@@ -62,6 +63,9 @@ class FormsServiceTest extends TestCase {
 	/** @var QuestionMapper|MockObject */
 	private $questionMapper;
 
+	/** @var ShareMapper|MockObject */
+	private $shareMapper;
+
 	/** @var SubmissionMapper|MockObject */
 	private $submissionMapper;
 
@@ -80,6 +84,7 @@ class FormsServiceTest extends TestCase {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
+		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
@@ -100,6 +105,7 @@ class FormsServiceTest extends TestCase {
 			$this->formMapper,
 			$this->optionMapper,
 			$this->questionMapper,
+			$this->shareMapper,
 			$this->submissionMapper,
 			$this->groupManager,
 			$this->logger,
@@ -119,21 +125,8 @@ class FormsServiceTest extends TestCase {
 				'ownerId' => 'someUser',
 				'created' => 123456789,
 				'access' => [
-					'users' => [
-						[
-							'shareWith' => 'user1',
-							'displayName' => 'First User',
-							'shareType' => 0 // IShare::TYPE_USER
-						]
-					],
-					'groups' => [
-						[
-							'shareWith' => 'group1',
-							'displayName' => 'First Group',
-							'shareType' => 1 // IShare::TYPE_GROUP
-						]
-					],
-					'type' => 'selected'
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
 				],
 				'expires' => 0,
 				'isAnonymous' => false,
@@ -169,6 +162,14 @@ class FormsServiceTest extends TestCase {
 						'text' => 'Question 2',
 						'options' => []
 					]
+				],
+				'shares' => [
+					[
+						'id' => 1,
+						'formId' => 42,
+						'shareType' => 0,
+						'shareWith' => 'user1'
+					]
 				]
 			]]
 		];
@@ -189,9 +190,8 @@ class FormsServiceTest extends TestCase {
 		$form->setOwnerId('someUser');
 		$form->setCreated(123456789);
 		$form->setAccess([
-			'users' => ['user1'],
-			'groups' => ['group1'],
-			'type' => 'selected'
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
 		]);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
@@ -494,6 +494,7 @@ class FormsServiceTest extends TestCase {
 			$this->formMapper,
 			$this->optionMapper,
 			$this->questionMapper,
+			$this->shareMapper,
 			$this->submissionMapper,
 			$this->groupManager,
 			$this->logger,

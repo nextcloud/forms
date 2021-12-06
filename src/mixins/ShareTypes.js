@@ -34,6 +34,14 @@ export default {
 				SHARE_TYPE_REMOTE_GROUP: OC.Share.SHARE_TYPE_REMOTE_GROUP,
 				SHARE_TYPE_ROOM: OC.Share.SHARE_TYPE_ROOM,
 			},
+
+			/**
+			 * !!! Keep in Sync with lib/Constants.php !!
+			 */
+			SHARE_TYPES_USED: [
+				OC.Share.SHARE_TYPE_USER,
+				OC.Share.SHARE_TYPE_GROUP,
+			],
 		}
 	},
 
