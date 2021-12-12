@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Anketos",
+    "{user} has shared the form {formTitle} with you" : "{user} pradėjo bendrinti su jumis anketą, pavadinimu {formTitle}",
     "{user} answered your form {formTitle}" : "{user} užpildė jūsų anketą {formTitle}",
     "Anonymous user" : "Anoniminis naudotojas",
     "Someone <strong>answered</strong> a form" : "Kažkas <strong>užpildė</strong> anketą",
