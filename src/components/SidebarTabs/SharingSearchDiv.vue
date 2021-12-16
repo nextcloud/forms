@@ -27,7 +27,7 @@
 			:close-on-select="false"
 			:hide-selected="true"
 			:internal-search="false"
-			:loading="loading"
+			:loading="showLoading"
 			:options="options"
 			:placeholder="t('forms', 'Search for user or group …')"
 			:preselect-first="true"
@@ -68,6 +68,10 @@ export default {
 		currentShares: {
 			type: Array,
 			default: () => ([]),
+		},
+		isLoading: {
+			type: Boolean,
+			default: false,
 		},
 	},
 
@@ -121,6 +125,13 @@ export default {
 				return t('forms', 'Searching …')
 			}
 			return t('forms', 'No elements found.')
+		},
+
+		/**
+		 * Show Loading if loading is either set by parent or by this module (search)
+		 */
+		showLoading() {
+			return this.isLoading || this.loading
 		},
 	},
 
@@ -177,11 +188,8 @@ export default {
 		async getSuggestions(query) {
 			this.loading = true
 
-			// Types to search for
-			const shareType = [
-				this.SHARE_TYPES.SHARE_TYPE_USER,
-				this.SHARE_TYPES.SHARE_TYPE_GROUP,
-			]
+			// Search for all used share-types, except public link.
+			const shareType = this.SHARE_TYPES_USED.filter(type => type !== this.SHARE_TYPES.SHARE_TYPE_LINK)
 
 			const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
 				params: {

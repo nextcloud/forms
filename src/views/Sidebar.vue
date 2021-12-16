@@ -29,7 +29,9 @@
 			:name="t('forms', 'Sharing')"
 			icon="icon-share">
 			<SharingSidebarTab :form="form"
-				@update:formProp="onPropertyChange" />
+				@update:formProp="onPropertyChange"
+				@add-share="onAddShare"
+				@remove-share="onRemoveShare" />
 		</AppSidebarTab>
 
 		<AppSidebarTab id="forms-settings"
@@ -88,6 +90,19 @@ export default {
 		onPropertyChange(property, newVal) {
 			this.$set(this.form, property, newVal)
 			this.saveFormProperty(property)
+		},
+
+		/**
+		 * Adding/Removing Share from the reactive object. API-Request is done in sharing-tab.
+		 *
+		 * @param {object} share The respective share object
+		 */
+		onAddShare(share) {
+			this.form.shares.push(share)
+		},
+		onRemoveShare(share) {
+			const index = this.form.shares.findIndex(search => search.id === share.id)
+			this.form.shares.splice(index, 1)
 		},
 	},
 }

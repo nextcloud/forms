@@ -23,8 +23,8 @@
 
 <template>
 	<div class="sidebar-tabs__content">
-		<SharingSearchDiv
-			:current-shares="currentShares"
+		<SharingSearchDiv :current-shares="form.shares"
+			:is-loading="isLoading"
 			@add-share="addShare" />
 
 		<div class="share-div">
@@ -69,12 +69,8 @@
 		</div>
 
 		<TransitionGroup tag="ul">
-			<SharingShareDiv v-for="share in sortedUserShares"
-				:key="'userShare-' + share.shareWith"
-				:share="share"
-				@remove-share="removeShare" />
-			<SharingShareDiv v-for="share in sortedGroupShares"
-				:key="'groupShare-' + share.shareWith"
+			<SharingShareDiv v-for="share in sortedShares"
+				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
 				@remove-share="removeShare" />
 		</TransitionGroup>
@@ -83,10 +79,14 @@
 
 <script>
 import { Actions, ActionButton, CheckboxRadioSwitch } from '@nextcloud/vue'
+import { generateOcsUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import ShareTypes from '../../mixins/ShareTypes'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin'
+import OcsResponse2Data from '../../utils/OcsResponse2Data'
 
 export default {
 	components: {
@@ -106,46 +106,79 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			isLoading: false,
+		}
+	},
+
 	computed: {
-		currentShares() {
-			return [...this.form.access.users, ...this.form.access.groups]
-		},
-		sortedUserShares() {
-			return this.form.access.users.slice().sort(this.sortByDisplayname)
-		},
-		sortedGroupShares() {
-			return this.form.access.groups.slice().sort(this.sortByDisplayname)
+		sortedShares() {
+			return this.form.shares.slice().sort(this.sortByTypeDisplayname)
 		},
 	},
 
 	methods: {
-		addShare(share) {
-			const newAccess = { ...this.form.access }
+		/**
+		 * Add share
+		 *
+		 * @param {object} newShare the share object
+		 */
+		async addShare(newShare) {
+			this.isLoading = true
 
-			if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_USER) {
-				newAccess.users.push(share)
-			}
-			if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) {
-				newAccess.groups.push(share)
-			}
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2/share'), {
+					formId: this.form.id,
+					shareType: newShare.shareType,
+					shareWith: newShare.shareWith,
+				})
+				const share = OcsResponse2Data(response)
 
-			this.$emit('update:formProp', 'access', newAccess)
+				// Add new share
+				this.$emit('add-share', share)
+
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while adding the share'))
+			} finally {
+				this.isLoading = false
+			}
 		},
 
-		removeShare(share) {
-			const newAccess = { ...this.form.access }
+		/**
+		 * Remove share
+		 *
+		 * @param {object} share the share to delete
+		 */
+		async removeShare(share) {
+			this.isLoading = true
 
-			if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_USER) {
-				newAccess.users = this.form.access.users.filter(user => user !== share)
+			try {
+				await axios.delete(generateOcsUrl('apps/forms/api/v2/share/{id}', {
+					id: share.id,
+				}))
+				this.$emit('remove-share', share)
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while removing the share'))
+			} finally {
+				this.isLoading = false
 			}
-			if (share.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) {
-				newAccess.groups = this.form.access.groups.filter(group => group !== share)
-			}
-
-			this.$emit('update:formProp', 'access', newAccess)
 		},
 
-		sortByDisplayname(a, b) {
+		/**
+		 * Sort by shareType and DisplayName
+		 *
+		 * @param {object} a first share for comparison
+		 * @param {object} b second share for comparison
+		 */
+		sortByTypeDisplayname(a, b) {
+			// First return, if ShareType does not match
+			if (a.shareType < b.shareType) return -1
+			if (a.shareType > b.shareType) return 1
+
+			// Otherwise sort by displayname
 			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
 			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
 			return 0
