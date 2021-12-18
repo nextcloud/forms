@@ -25,15 +25,22 @@
 
 return [
 	'routes' => [
+		// Public Share Link
+		[
+			'name' => 'page#public_link_view',
+			'url' => '/s/{hash}',
+			'verb' => 'GET'
+
+		],
 		// Internal views
 		[
 			'name' => 'page#views',
 			'url' => '/{hash}/{view}',
 			'verb' => 'GET'
 		],
-		// Share-Link & public submit
+		// Internal Form Link
 		[
-			'name' => 'page#goto_form',
+			'name' => 'page#internal_link_view',
 			'url' => '/{hash}',
 			'verb' => 'GET'
 		],

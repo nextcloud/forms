@@ -62,12 +62,15 @@
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
+import ShareTypes from '../../mixins/ShareTypes.js'
 
 export default {
 	components: {
 		CheckboxRadioSwitch,
 		DatetimePicker,
 	},
+
+	mixins: [ShareTypes],
 
 	props: {
 		form: {
@@ -90,7 +93,7 @@ export default {
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
 		disableSubmitMultiple() {
-			return this.hasPublicLink || this.form.isAnonymous
+			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous
 		},
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {

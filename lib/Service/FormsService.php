@@ -202,10 +202,9 @@ class FormsService {
 	 */
 	public function canSubmit($formId) {
 		$form = $this->formMapper->findById($formId);
-		$access = $form->getAccess();
 
-		// We cannot control how many time users can submit in public mode
-		if ($access['type'] === 'public') {
+		// We cannot control how many time users can submit if public link / legacyLink available
+		if ($this->hasPublicLink($formId)) {
 			return true;
 		}
 
@@ -228,6 +227,30 @@ class FormsService {
 	}
 
 	/**
+	 * Searching Shares for public link
+	 *
+	 * @param integer $formId
+	 * @return boolean
+	 */
+	public function hasPublicLink($formId): bool {
+		$form = $this->formMapper->findById($formId);
+		$access = $form->getAccess();
+
+		if (isset($access['legacyLink'])) {
+			return true;
+		}
+
+		$shareEntities = $this->shareMapper->findByForm($form->getId());
+		foreach ($shareEntities as $shareEntity) {
+			if ($shareEntity->getShareType() === IShare::TYPE_LINK) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Check if user has access to this form
 	 *
 	 * @param integer $formId
@@ -238,10 +261,10 @@ class FormsService {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
 
-		if ($access['type'] === 'public') {
+		if ($this->hasPublicLink($formId)) {
 			return true;
 		}
-		
+
 		// Refuse access, if not public and no user logged in.
 		if (!$this->currentUser) {
 			return false;

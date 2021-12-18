@@ -133,6 +133,7 @@ class Version030000Date20211206213004 extends SimpleMigrationStep {
 			switch ($access['type']) {
 				case 'public':
 					$newAccess = [
+						'legacyLink' => true,
 						'permitAllUsers' => false,
 						'showToAllUsers' => false,
 					];

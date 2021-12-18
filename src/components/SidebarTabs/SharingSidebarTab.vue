@@ -35,13 +35,59 @@
 				<span>{{ t('forms', 'Only works for logged in users who can access this form') }}</span>
 			</div>
 			<Actions>
-				<ActionButton icon="icon-clippy" @click="copyShareLink">
+				<ActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
 					{{ t('forms', 'Copy to clipboard') }}
 				</ActionButton>
 			</Actions>
 		</div>
 
-		<!-- TODO Implement public share link -->
+		<!-- Public Link -->
+		<div v-if="!hasPublicLink" class="share-div share-div--link">
+			<div class="share-div__avatar icon-public-white" />
+			<span class="share-div__desc">{{ t('forms', 'Public share link') }}</span>
+			<Actions>
+				<ActionButton icon="icon-add" @click="addPublicLink">
+					{{ t('forms', 'Add public link') }}
+				</ActionButton>
+			</Actions>
+		</div>
+		<TransitionGroup v-else tag="div">
+			<div v-for="share in publicLinkShares"
+				:key="'share-' + share.shareType + '-' + share.shareWith"
+				class="share-div share-div--link">
+				<div class="share-div__avatar icon-public-white" />
+				<span class="share-div__desc">{{ t('forms', 'Public Share Link') }}</span>
+				<Actions>
+					<ActionButton icon="icon-clippy" @click="copyPublicShareLink($event, share.shareWith)">
+						{{ t('forms', 'Copy to clipboard') }}
+					</ActionButton>
+				</Actions>
+				<Actions>
+					<ActionButton icon="icon-delete" @click="removeShare(share)">
+						{{ t('forms', 'Remove link') }}
+					</ActionButton>
+					<ActionButton :close-after-click="true" icon="icon-add" @click="addPublicLink">
+						{{ t('forms', 'Add public link') }}
+					</ActionButton>
+				</Actions>
+			</div>
+		</TransitionGroup>
+
+		<!-- Legacy Info, if present -->
+		<div v-if="form.access.legacyLink" class="share-div">
+			<div class="share-div__avatar icon-public" />
+			<div class="share-div__desc share-div__desc--twoline">
+				<span>{{ t('forms', 'Legacy Link') }}</span>
+				<span>{{ t('forms', 'Form still supports old sharing-link.') }}</span>
+			</div>
+			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as public link. We recommend replacing the link with a new public link.')"
+				class="share-div__legacy-warning icon-error-color" />
+			<Actions>
+				<ActionButton icon="icon-delete" @click="removeLegacyLink">
+					{{ t('forms', 'Remove Legacy Link') }}
+				</ActionButton>
+			</Actions>
+		</div>
 
 		<!-- All users on Instance -->
 		<div class="share-div">
@@ -114,7 +160,16 @@ export default {
 
 	computed: {
 		sortedShares() {
-			return this.form.shares.slice().sort(this.sortByTypeAndDisplayname)
+			// Remove Link-Shares, which are handled separately, then sort
+			return this.form.shares
+				.filter(share => share.shareType !== this.SHARE_TYPES.SHARE_TYPE_LINK)
+				.sort(this.sortByTypeAndDisplayname)
+		},
+		hasPublicLink() {
+			return this.publicLinkShares.length !== 0
+		},
+		publicLinkShares() {
+			return this.form.shares.filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
 		},
 	},
 
@@ -141,6 +196,27 @@ export default {
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while adding the share'))
+			} finally {
+				this.isLoading = false
+			}
+		},
+
+		async addPublicLink() {
+			this.isLoading = true
+
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2/share'), {
+					formId: this.form.id,
+					shareType: this.SHARE_TYPES.SHARE_TYPE_LINK,
+				})
+				const share = OcsResponse2Data(response)
+
+				// Add new share
+				this.$emit('add-share', share)
+
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while adding the link.'))
 			} finally {
 				this.isLoading = false
 			}
@@ -194,6 +270,11 @@ export default {
 			newAccess.showToAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
+		removeLegacyLink() {
+			const newAccess = { ...this.form.access }
+			delete newAccess.legacyLink
+			this.$emit('update:formProp', 'access', newAccess)
+		},
 	},
 }
 </script>
@@ -236,6 +317,11 @@ export default {
 				color: var(--color-text-maxcontrast);
 			}
 		}
+	}
+
+	&__legacy-warning {
+		background-size: 18px;
+		margin-right: 4px;
 	}
 }
 </style>

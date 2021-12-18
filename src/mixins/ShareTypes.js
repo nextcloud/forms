@@ -41,6 +41,7 @@ export default {
 			SHARE_TYPES_USED: [
 				OC.Share.SHARE_TYPE_USER,
 				OC.Share.SHARE_TYPE_GROUP,
+				OC.Share.SHARE_TYPE_LINK,
 			],
 		}
 	},

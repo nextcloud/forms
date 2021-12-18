@@ -34,9 +34,11 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\OCSController;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\IGroup;
 use OCP\IGroupManager;
@@ -45,6 +47,8 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
+use OCP\Share\IShare;
 
 class ShareApiController extends OCSController {
 	protected $appName;
@@ -70,6 +74,9 @@ class ShareApiController extends OCSController {
 	/** @var IUser */
 	private $currentUser;
 
+	/** @var ISecureRandom */
+	private $secureRandom;
+
 	public function __construct(string $appName,
 								FormMapper $formMapper,
 								ShareMapper $shareMapper,
@@ -78,7 +85,8 @@ class ShareApiController extends OCSController {
 								ILogger $logger,
 								IRequest $request,
 								IUserManager $userManager,
-								IUserSession $userSession) {
+								IUserSession $userSession,
+								ISecureRandom $secureRandom) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;
@@ -87,6 +95,7 @@ class ShareApiController extends OCSController {
 		$this->groupManager = $groupManager;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
+		$this->secureRandom = $secureRandom;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -98,12 +107,12 @@ class ShareApiController extends OCSController {
 	 *
 	 * @param int $formId The form to share
 	 * @param int $shareType Nextcloud-ShareType
-	 * @param string $shareWith ID of user/group/... to share with
+	 * @param string $shareWith ID of user/group/... to share with. For Empty shareWith and shareType Link, this will be set as RandomID.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newShare(int $formId, int $shareType, string $shareWith): DataResponse {
+	public function newShare(int $formId, int $shareType, string $shareWith = ''): DataResponse {
 		$this->logger->debug('Adding new share: formId: {formId}, shareType: {shareType}, shareWith: {shareWith}', [
 			'formId' => $formId,
 			'shareType' => $shareType,
@@ -129,6 +138,14 @@ class ShareApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		// Create public-share hash, if necessary.
+		if ($shareType === IShare::TYPE_LINK) {
+			$shareWith = $this->secureRandom->generate(
+				24,
+				ISecureRandom::CHAR_HUMAN_READABLE
+			);
+		}
+
 		// Check for valid shareWith, needs to be done separately per shareType
 		switch ($shareType) {
 			case IShare::TYPE_USER:
@@ -145,6 +162,20 @@ class ShareApiController extends OCSController {
 				}
 				break;
 
+			case IShare::TYPE_LINK:
+				// Check if hash already exists. (Unfortunately not possible here by unique index on db.)
+				try {
+					// Try loading a share to the hash.
+					$nonex = $this->shareMapper->findPublicShareByHash($shareWith);
+
+					// If we come here, a share has been found --> The share hash already exists, thus aborting.
+					$this->logger->debug('Share Hash already exists.');
+					throw new OCSException('Share Hash exists. Please retry.');
+				} catch (DoesNotExistException $e) {
+					// Just continue, this is what we expect to happen (share hash not existing yet).
+				}
+				break;
+			
 			default:
 				// This passed the check for used shareTypes, but has not been found here.
 				$this->logger->warning('Unknown, but used shareType: {shareType}. Please file an issue on GitHub.', [ 'shareType' => $shareType ]);
