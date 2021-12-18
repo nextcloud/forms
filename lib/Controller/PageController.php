@@ -172,20 +172,18 @@ class PageController extends Controller {
 			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
 		}
 
-		// If not link-shared, redirect to internal route
-		// TODO Check Public Link Sharing again
-		if (0) {
-			$internalLink = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
-
-			if ($this->userSession->isLoggedIn()) {
-				// Directly internal view
-				return new RedirectResponse($internalLink);
-			} else {
-				// Internal through login
-				return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', ['redirect_url' => $internalLink]));
-			}
+		// If there is no logged in user, and we don't need legacyLink-Support, then on this route, login is necessary.
+		if (!$this->userSession->isLoggedIn() && !$form->getAccess()['legacyLink']) {
+			// Redirect to login
+			// TODO Change to internal submit-view again, once this is possible for forms that are not shownToAll
+			// $internalLink = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
+			$internalLink = $this->urlGenerator->linkToRoute('forms.page.goto_form', ['hash' => $hash]);
+			return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', ['redirect_url' => $internalLink]));
 		}
 
+		/**
+		 * Show the public link template (independent of logged in or not)
+		 */
 		// Has form expired
 		if ($this->formsService->hasFormExpired($form->getId())) {
 			return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);

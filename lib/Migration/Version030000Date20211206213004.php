@@ -115,6 +115,7 @@ class Version030000Date20211206213004 extends SimpleMigrationStep {
 				case 'public':
 					$qb_update_access->setParameter('id', $row['id'], IQueryBuilder::PARAM_INT)
 						->setParameter('access_json', json_encode([
+							'legacyLink' => true,
 							'permitAllUsers' => false,
 							'showToAllUsers' => false,
 						]), IQueryBuilder::PARAM_STR);

@@ -39,6 +39,20 @@
 				</ActionButton>
 			</Actions>
 		</div>
+		<div v-if="form.access.legacyLink" class="share-div">
+			<div class="share-div__avatar icon-public" />
+			<div class="share-div__desc share-div__desc--twoline">
+				<span>{{ t('forms', 'Legacy Link') }}</span>
+				<span>{{ t('forms', 'Form still supports old sharing-link.') }}</span>
+			</div>
+			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as public link. We recommend replacing the link with a new public link.')"
+				class="share-div__legacy-warning icon-error-color" />
+			<Actions>
+				<ActionButton icon="icon-delete" @click="removeLegacyLink">
+					{{ t('forms', 'Remove Legacy Link') }}
+				</ActionButton>
+			</Actions>
+		</div>
 		<!-- TODO Implement public share link -->
 		<!-- <div class="share-div share-div--link">
 			<div class="share-div__avatar icon-public-white" />
@@ -194,6 +208,11 @@ export default {
 			newAccess.showToAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
+		removeLegacyLink() {
+			const newAccess = { ...this.form.access }
+			delete newAccess.legacyLink
+			this.$emit('update:formProp', 'access', newAccess)
+		},
 	},
 }
 </script>
@@ -236,6 +255,11 @@ export default {
 				color: var(--color-text-maxcontrast);
 			}
 		}
+	}
+
+	&__legacy-warning {
+		background-size: 18px;
+		margin-right: 4px;
 	}
 }
 </style>

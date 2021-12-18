@@ -208,10 +208,10 @@ class FormsService {
 		$access = $form->getAccess();
 
 		// TODO 
-		// We cannot control how many time users can submit in public mode
-		// if ($access['type'] === 'public') {
-		// 	return true;
-		// }
+		// We cannot control how many time users can submit in public mode / legacyLink
+		if (isset($access['legacyLink'])) {
+			return true;
+		}
 
 		// Owner is always allowed to submit
 		if ($this->currentUser->getUID() === $form->getOwnerId()) {
@@ -242,8 +242,11 @@ class FormsService {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
 
-		// TODO check public access
-		
+		// TODO check public access again
+		if (isset($access['legacyLink'])) {
+			return true;
+		}
+
 		// Refuse access, if not public and no user logged in.
 		if (!$this->currentUser) {
 			return false;
