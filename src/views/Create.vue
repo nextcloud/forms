@@ -38,7 +38,7 @@
 					<!-- TRANSLATORS Button to switch to the Result-View -->
 					{{ t('forms', 'Results') }}
 				</button>
-				<button v-if="!sidebarOpened" @click="copyShareLink">
+				<button v-if="!sidebarOpened" @click="copyInternalShareLink($event, form.hash)">
 					<span class="icon-clippy" role="img" />
 					{{ t('forms', 'Share link') }}
 				</button>

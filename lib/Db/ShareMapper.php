@@ -31,6 +31,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use OCP\Share\IShare;
 
 class ShareMapper extends QBMapper {
 	/**
@@ -77,6 +78,28 @@ class ShareMapper extends QBMapper {
 			->orderBy('share_type', 'ASC'); //Already order by ShareType
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Find Public Share by Hash
+	 * @param string $hash
+	 * @return Share
+	 * @throws MultipleObjectsReturnedException if more than one result
+	 * @throws DoesNotExistException if not found
+	 */
+	public function findPublicShareByHash(string $hash): Share {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('share_type', $qb->createNamedParameter(IShare::TYPE_LINK, IQueryBuilder::PARAM_INT))
+			)
+			->andWhere(
+				$qb->expr()->eq('share_With', $qb->createNamedParameter($hash, IQueryBuilder::PARAM_STR))
+			);
+
+		return $this->findEntity($qb);
 	}
 
 	/**

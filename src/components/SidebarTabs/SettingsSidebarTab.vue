@@ -61,12 +61,15 @@
 <script>
 import { CheckboxRadioSwitch, DatetimePicker } from '@nextcloud/vue'
 import moment from '@nextcloud/moment'
+import ShareTypes from '../../mixins/ShareTypes'
 
 export default {
 	components: {
 		CheckboxRadioSwitch,
 		DatetimePicker,
 	},
+
+	mixins: [ShareTypes],
 
 	props: {
 		form: {
@@ -89,13 +92,18 @@ export default {
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
 		disableSubmitMultiple() {
-			return !(this.form.access.requireLogin || this.form.access.restrictSelected) || this.form.isAnonymous
+			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous
 		},
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {
 				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously.')
 			}
 			return ''
+		},
+		hasPublicLink() {
+			return this.form.shares.slice()
+				.filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
+				.length !== 0
 		},
 
 		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.

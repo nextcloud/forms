@@ -27,18 +27,53 @@
 			:is-loading="isLoading"
 			@add-share="addShare" />
 
+		<!-- Internal link -->
 		<div class="share-div">
 			<div class="share-div__avatar icon-public" />
 			<div class="share-div__desc share-div__desc--twoline">
-				<span>{{ t('forms', 'Internal Link') }}</span>
-				<span>{{ t('forms', 'Logged-in users with access-permission can use this link.') }}</span>
+				<span>{{ t('forms', 'Internal link') }}</span>
+				<span>{{ t('forms', 'Only works for logged in users who can access this form') }}</span>
 			</div>
 			<Actions>
-				<ActionButton icon="icon-clippy" @click="copyShareLink">
+				<ActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
 					{{ t('forms', 'Copy to clipboard') }}
 				</ActionButton>
 			</Actions>
 		</div>
+
+		<!-- Public Link -->
+		<div v-if="!hasPublicLink" class="share-div share-div--link">
+			<div class="share-div__avatar icon-public-white" />
+			<span class="share-div__desc">{{ t('forms', 'Public share link') }}</span>
+			<Actions>
+				<ActionButton icon="icon-add" @click="addPublicLink">
+					{{ t('forms', 'Add public link') }}
+				</ActionButton>
+			</Actions>
+		</div>
+		<TransitionGroup v-else tag="div">
+			<div v-for="share in publicLinkShares"
+				:key="'share-' + share.shareType + '-' + share.shareWith"
+				class="share-div share-div--link">
+				<div class="share-div__avatar icon-public-white" />
+				<span class="share-div__desc">{{ t('forms', 'Public Share Link') }}</span>
+				<Actions>
+					<ActionButton icon="icon-clippy" @click="copyPublicShareLink($event, share.shareWith)">
+						{{ t('forms', 'Copy to clipboard') }}
+					</ActionButton>
+				</Actions>
+				<Actions>
+					<ActionButton icon="icon-delete" @click="removeShare(share)">
+						{{ t('forms', 'Remove link') }}
+					</ActionButton>
+					<ActionButton :close-after-click="true" icon="icon-add" @click="addPublicLink">
+						{{ t('forms', 'Add public link') }}
+					</ActionButton>
+				</Actions>
+			</div>
+		</TransitionGroup>
+
+		<!-- Legacy Info, if present -->
 		<div v-if="form.access.legacyLink" class="share-div">
 			<div class="share-div__avatar icon-public" />
 			<div class="share-div__desc share-div__desc--twoline">
@@ -53,16 +88,8 @@
 				</ActionButton>
 			</Actions>
 		</div>
-		<!-- TODO Implement public share link -->
-		<!-- <div class="share-div share-div--link">
-			<div class="share-div__avatar icon-public-white" />
-			<span class="share-div__desc">{{ t('forms', 'Public Share Link') }}</span>
-			<Actions>
-				<ActionButton icon="icon-add" @click="copyShareLink">
-					{{ t('forms', 'Copy to clipboard') }}
-				</ActionButton>
-			</Actions>
-		</div> -->
+
+		<!-- All users on Instance -->
 		<div class="share-div">
 			<div class="share-div__avatar icon-group" />
 			<span class="share-div__desc">
@@ -82,6 +109,7 @@
 				@update:checked="onShowToAllUsersChange" />
 		</div>
 
+		<!-- Single shares -->
 		<TransitionGroup tag="ul">
 			<SharingShareDiv v-for="share in sortedShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
@@ -128,7 +156,16 @@ export default {
 
 	computed: {
 		sortedShares() {
-			return this.form.shares.slice().sort(this.sortByTypeDisplayname)
+			// Remove Link-Shares, which are handled separately, then sort
+			return this.form.shares.slice()
+				.filter(share => share.shareType !== this.SHARE_TYPES.SHARE_TYPE_LINK)
+				.sort(this.sortByTypeDisplayname)
+		},
+		hasPublicLink() {
+			return this.publicLinkShares.length !== 0
+		},
+		publicLinkShares() {
+			return this.form.shares.slice().filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
 		},
 	},
 
@@ -155,6 +192,27 @@ export default {
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while adding the share'))
+			} finally {
+				this.isLoading = false
+			}
+		},
+
+		async addPublicLink() {
+			this.isLoading = true
+
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2/share'), {
+					formId: this.form.id,
+					shareType: this.SHARE_TYPES.SHARE_TYPE_LINK,
+				})
+				const share = OcsResponse2Data(response)
+
+				// Add new share
+				this.$emit('add-share', share)
+
+			} catch (error) {
+				console.error(error)
+				showError(t('forms', 'There was an error while adding the link.'))
 			} finally {
 				this.isLoading = false
 			}

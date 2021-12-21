@@ -35,7 +35,7 @@
 				<span class="icon-forms" role="img" />
 				{{ t('forms', 'Back to questions') }}
 			</button>
-			<button v-if="!noSubmissions" @click="copyShareLink">
+			<button v-if="!noSubmissions" @click="copyInternalShareLink($event, form.hash)">
 				<span class="icon-clippy" role="img" />
 				{{ t('forms', 'Share link') }}
 			</button>
@@ -95,7 +95,7 @@
 					{{ t('forms', 'Results of submitted forms will show up here') }}
 				</template>
 				<template #action>
-					<button class="primary" @click="copyShareLink">
+					<button class="primary" @click="copyInternalShareLink($event, form.hash)">
 						<span class="icon-clippy-primary" role="img" />
 						{{ t('forms', 'Share link') }}
 					</button>

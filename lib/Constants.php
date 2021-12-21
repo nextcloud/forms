@@ -45,5 +45,5 @@ class Constants {
 	/**
 	 * !! Keep in sync with src/mixins/ShareTypes.js !!
 	 */
-	public const SHARE_TYPES_USED = [IShare::TYPE_USER, IShare::TYPE_GROUP];
+	public const SHARE_TYPES_USED = [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_LINK];
 }

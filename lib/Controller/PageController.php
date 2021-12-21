@@ -28,6 +28,7 @@ namespace OCA\Forms\Controller;
 
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\FormsService;
 
 use OCP\Accounts\IAccountManager;
@@ -58,7 +59,10 @@ class PageController extends Controller {
 
 	/** @var FormMapper */
 	private $formMapper;
-	
+
+	/** @var ShareMapper */
+	private $shareMapper;
+
 	/** @var FormsService */
 	private $formsService;
 
@@ -104,6 +108,7 @@ class PageController extends Controller {
 	public function __construct(string $appName,
 								IRequest $request,
 								FormMapper $formMapper,
+								ShareMapper $shareMapper,
 								FormsService $formsService,
 								IAccountManager $accountManager,
 								IGroupManager $groupManager,
@@ -118,6 +123,7 @@ class PageController extends Controller {
 		$this->appName = $appName;
 
 		$this->formMapper = $formMapper;
+		$this->shareMapper = $shareMapper;
 		$this->formsService = $formsService;
 
 		$this->accountManager = $accountManager;
@@ -160,30 +166,57 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 * @PublicPage
 	 * @param string $hash
-	 * @return RedirectResponse|TemplateResponse Redirect for logged-in users, public template otherwise.
+	 * @return RedirectResponse|TemplateResponse Redirect to login or internal view.
 	 */
-	public function gotoForm(string $hash): Response {
+	public function internalLinkView(string $hash): Response {
+		$internalView = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
+
+		if ($this->userSession->isLoggedIn()) {
+			// Redirect to internal Submit View
+			return new RedirectResponse($internalView);
+		}
+
+		// For legacy-support, show public template
+		if (isset($form->getAccess()['legacyLink'])) {
+			// Inject style on all templates
+			Util::addStyle($this->appName, 'forms');
+
+			// Has form expired
+			if ($this->formsService->hasFormExpired($form->getId())) {
+				return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);
+			}
+
+			// Public Template to fill the form
+			Util::addScript($this->appName, 'forms-submit');
+			$this->insertHeaderOnIos();
+			$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
+			$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
+			$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
+			return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
+		}
+
+		// Otherwise Redirect to login (& then internal view)
+		return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', ['redirect_url' => $internalView]));
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 * @PublicPage
+	 * @param string $hash Public sharing hash.
+	 * @return TemplateResponse Public template.
+	 */
+	public function publicLinkView(string $hash): Response {
 		// Inject style on all templates
 		Util::addStyle($this->appName, 'forms');
 
 		try {
-			$form = $this->formMapper->findByHash($hash);
+			$share = $this->shareMapper->findPublicShareByHash($hash);
+			$form = $this->formMapper->findById($share->getFormId());
 		} catch (DoesNotExistException $e) {
 			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
 		}
 
-		// If there is no logged in user, and we don't need legacyLink-Support, then on this route, login is necessary.
-		if (!$this->userSession->isLoggedIn() && !$form->getAccess()['legacyLink']) {
-			// Redirect to login
-			// TODO Change to internal submit-view again, once this is possible for forms that are not shownToAll
-			// $internalLink = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
-			$internalLink = $this->urlGenerator->linkToRoute('forms.page.goto_form', ['hash' => $hash]);
-			return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', ['redirect_url' => $internalLink]));
-		}
-
-		/**
-		 * Show the public link template (independent of logged in or not)
-		 */
 		// Has form expired
 		if ($this->formsService->hasFormExpired($form->getId())) {
 			return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);

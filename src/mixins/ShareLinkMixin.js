@@ -29,13 +29,34 @@ Vue.use(Clipboard)
 export default {
 	methods: {
 		/**
+		 * Copy internal share link
+		 *
+		 * @param {object} event Event of origin, calling the function
+		 * @param {string} formHash Internal form-hash for link
+		 */
+		async copyInternalShareLink(event, formHash) {
+			const shareLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${formHash}`)
+			this.copyShareLink(event, shareLink)
+		},
+		/**
+		 * Copy share link for public share
+		 *
+		 * @param {object} event Event of origin, calling the function
+		 * @param {string} publicHash Hash of public link-share
+		 */
+		async copyPublicShareLink(event, publicHash) {
+			const shareLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/s/${publicHash}`)
+			this.copyShareLink(event, shareLink)
+		},
+
+		/**
 		 * Copy the share-link to clipboard.
-		 * Where imported, this method requires the property 'form' to be set!
 		 *
 		 * @param {object} event Origin event of function call.
+		 * @param {string} shareLink Link to copy
 		 */
-		async copyShareLink(event) {
-			const shareLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+		async copyShareLink(event, shareLink) {
+			// Copy link, boolean return indicates success or fail.
 			if (this.$clipboard(shareLink)) {
 				showSuccess(t('forms', 'Form link copied'))
 			} else {
