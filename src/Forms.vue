@@ -97,6 +97,7 @@ import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
 import AppNavigationForm from './components/AppNavigationForm.vue'
 import EmptyContent from './components/EmptyContent.vue'
+import PermissionTypes from './mixins/PermissionTypes.js'
 import OcsResponse2Data from './utils/OcsResponse2Data.js'
 
 export default {
@@ -112,7 +113,7 @@ export default {
 		EmptyContent,
 	},
 
-	mixins: [isMobile],
+	mixins: [isMobile, PermissionTypes],
 
 	data() {
 		return {
@@ -140,20 +141,23 @@ export default {
 
 		// If the user is allowed to access this route
 		routeAllowed() {
-			// If the form is not within the owned or shared list, the user has no access on internal view.
-			if (this.routeHash && this.forms.concat(this.sharedForms).findIndex(form => form.hash === this.routeHash) < 0) {
-				console.error('Form not found for hash: ', this.routeHash)
+			// Not allowed, if no hash
+			if (!this.routeHash) {
 				return false
 			}
 
-			// For Routes edit or results, the form must be in owned forms.
-			if (this.$route.name === 'edit' || this.$route.name === 'results') {
-				if (this.forms.findIndex(form => form.hash === this.routeHash) < 0) {
-					return false
-				}
+			// Try to find form in owned & shared list
+			const form = [...this.forms, ...this.sharedForms]
+				.find(form => form.hash === this.routeHash)
+
+			// If no form found, load it from server. Route will be automatically re-evaluated.
+			if (form === undefined) {
+				this.fetchPartialForm(this.routeHash)
+				return false
 			}
 
-			return true
+			// Return whether route is in the permissions-list
+			return form?.permissions.includes(this.$route.name)
 		},
 
 		selectedForm: {
@@ -218,6 +222,30 @@ export default {
 			}
 
 			this.loading = false
+		},
+
+		/**
+		 * Fetch a partial form by its hash and add it to the shared forms list.
+		 *
+		 * @param {string} hash the hash of the form to load
+		 */
+		async fetchPartialForm(hash) {
+			this.loading = true
+
+			try {
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/partial_form/{hash}', { hash }))
+				const form = OcsResponse2Data(response)
+
+				// If the user has (at least) submission-permissions, add it to the shared forms
+				if (form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)) {
+					this.sharedForms.push(form)
+				}
+			} catch (error) {
+				showError(t('forms', 'Form not found'))
+				console.error(error)
+			} finally {
+				this.loading = false
+			}
 		},
 
 		/**
