@@ -152,6 +152,7 @@ class ApiController extends OCSController {
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
 				'expires' => $form->getExpires(),
+				'permissions' => $this->formsService->getPermissions($form->getId()),
 				'partial' => true
 			];
 		}
@@ -181,6 +182,7 @@ class ApiController extends OCSController {
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
 				'expires' => $form->getExpires(),
+				'permissions' => $this->formsService->getPermissions($form->getId()),
 				'partial' => true
 			];
 		}

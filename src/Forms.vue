@@ -140,28 +140,25 @@ export default {
 
 		// If the user is allowed to access this route
 		routeAllowed() {
-			// If the form is not within the owned or shared list, the user has no access on internal view.
+			// If the form is not within the owned or shared list, load it from server. Route will be automatically re-evaluated.
 			if (this.routeHash && this.forms.concat(this.sharedForms).findIndex(form => form.hash === this.routeHash) < 0) {
-				console.error('Form not found for hash: ', this.routeHash)
-				return false
-			}
-
-			// For Routes edit or results, the form must be in owned forms.
-			if (this.$route.name === 'edit' || this.$route.name === 'results') {
-				if (this.forms.findIndex(form => form.hash === this.routeHash) < 0) {
-					return false
+				try {
+//// Now needs loading a form by hash :'(
 				}
+
 			}
 
-			return true
+			// Check if route in permissions-list
+			if (this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash).permissions.includes(this.$route.name)) {
+				return true
+			}
+
+			return false
 		},
 
 		selectedForm: {
 			get() {
-				if (this.routeAllowed) {
-					return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
-				}
-				return {}
+				return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
 			},
 			set(form) {
 				// If a owned form

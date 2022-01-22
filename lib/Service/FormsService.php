@@ -25,6 +25,7 @@
 namespace OCA\Forms\Service;
 
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
@@ -176,6 +177,8 @@ class FormsService {
 		$result['questions'] = $this->getQuestions($id);
 		$result['shares'] = $this->getShares($id);
 
+		// Append permissions for current user.
+		$result['permissions'] = $this->getPermissions($id);
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
 		$result['canSubmit'] = $this->canSubmit($form->getId());
 
@@ -201,9 +204,35 @@ class FormsService {
 	}
 
 	/**
-	 * Can the user submit a form
+	 * Get current users permissions on a form
+	 *
+	 * @param integer $formId
+	 * @return array
 	 */
-	public function canSubmit($formId) {
+	public function getPermissions(int $formId): array {
+		$form = $this->formMapper->findById($formId);
+
+		// Owner is allowed to do everything
+		if ($this->currentUser && $this->currentUser->getUID() === $form->getOwnerId()) {
+			return Constants::PERMISSION_ALL;
+		}
+
+		$permissions = [];
+		// Add submit permission if user has access.
+		if ($this->hasUserAccess($formId)) {
+			$permissions[] = Constants::PERMISSION_SUBMIT;
+		}
+
+		return $permissions;
+	}
+
+	/**
+	 * Can the user submit a form
+	 *
+	 * @param integer $formId
+	 * @return boolean
+	 */
+	public function canSubmit(int $formId): bool {
 		$form = $this->formMapper->findById($formId);
 
 		// We cannot control how many time users can submit if public link / legacyLink available
@@ -235,7 +264,7 @@ class FormsService {
 	 * @param integer $formId
 	 * @return boolean
 	 */
-	public function hasPublicLink($formId): bool {
+	public function hasPublicLink(int $formId): bool {
 		$form = $this->formMapper->findById($formId);
 		$access = $form->getAccess();
 
