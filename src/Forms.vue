@@ -97,6 +97,7 @@ import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
 import AppNavigationForm from './components/AppNavigationForm'
 import EmptyContent from './components/EmptyContent'
+import PermissionTypes from './mixins/PermissionTypes'
 import OcsResponse2Data from './utils/OcsResponse2Data'
 
 export default {
@@ -112,7 +113,7 @@ export default {
 		EmptyContent,
 	},
 
-	mixins: [isMobile],
+	mixins: [isMobile, PermissionTypes],
 
 	data() {
 		return {
@@ -142,10 +143,8 @@ export default {
 		routeAllowed() {
 			// If the form is not within the owned or shared list, load it from server. Route will be automatically re-evaluated.
 			if (this.routeHash && this.forms.concat(this.sharedForms).findIndex(form => form.hash === this.routeHash) < 0) {
-				try {
-//// Now needs loading a form by hash :'(
-				}
-
+				this.fetchPartialForm(this.routeHash)
+				return false
 			}
 
 			// Check if route in permissions-list
@@ -211,6 +210,30 @@ export default {
 				this.sharedForms = OcsResponse2Data(response)
 			} catch (error) {
 				showError(t('forms', 'An error occurred while loading the forms list'))
+				console.error(error)
+			}
+
+			this.loading = false
+		},
+
+		/**
+		 * Fetch a partial form by its hash and add it to the shared forms list.
+		 *
+		 * @param {string} hash the hash of the form to load
+		 */
+		async fetchPartialForm(hash) {
+			this.loading = true
+
+			try {
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v1.1/partial_form/{hash}', { hash }))
+				const form = OcsResponse2Data(response)
+
+				// If the user has (at least) submission-permissions, add it to the shared forms
+				if (form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)) {
+					this.sharedForms.push(form)
+				}
+			} catch (error) {
+				showError(t('forms', 'Form not found.'))
 				console.error(error)
 			}
 

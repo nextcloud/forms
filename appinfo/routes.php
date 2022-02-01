@@ -103,6 +103,14 @@ return [
 			]
 		],
 		[
+			'name' => 'api#getPartialForm',
+			'url' => '/api/{apiVersion}/partial_form/{hash}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
 			'name' => 'api#getSharedForms',
 			'url' => '/api/{apiVersion}/shared_forms',
 			'verb' => 'GET',

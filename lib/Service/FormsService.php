@@ -186,6 +186,26 @@ class FormsService {
 	}
 
 	/**
+	 * Create partial form, as returned by Forms-Lists.
+	 *
+	 * @param integer $id
+	 * @return array
+	 * @throws IMapperException
+	 */
+	public function getPartialFormArray(int $id): array {
+		$form = $this->formMapper->findById($id);
+
+		return [
+			'id' => $form->getId(),
+			'hash' => $form->getHash(),
+			'title' => $form->getTitle(),
+			'expires' => $form->getExpires(),
+			'permissions' => $this->getPermissions($form->getId()),
+			'partial' => true
+		];
+	}
+
+	/**
 	 * Get a form data without sensitive informations
 	 *
 	 * @param integer $id

@@ -147,14 +147,7 @@ class ApiController extends OCSController {
 
 		$result = [];
 		foreach ($forms as $form) {
-			$result[] = [
-				'id' => $form->getId(),
-				'hash' => $form->getHash(),
-				'title' => $form->getTitle(),
-				'expires' => $form->getExpires(),
-				'permissions' => $this->formsService->getPermissions($form->getId()),
-				'partial' => true
-			];
+			$result[] = $this->formsService->getPartialFormArray($form->getId());
 		}
 
 		return new DataResponse($result);
@@ -176,18 +169,35 @@ class ApiController extends OCSController {
 			if (!$this->formsService->isSharedFormShown($form->getId())) {
 				continue;
 			}
-
-			$result[] = [
-				'id' => $form->getId(),
-				'hash' => $form->getHash(),
-				'title' => $form->getTitle(),
-				'expires' => $form->getExpires(),
-				'permissions' => $this->formsService->getPermissions($form->getId()),
-				'partial' => true
-			];
+			$result[] = $this->formsService->getPartialFormArray($form->getId());
 		}
 
 		return new DataResponse($result);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Get a partial form by its hash. Implicitely checks, if the user has access.
+	 *
+	 * @param string $hash The form hash
+	 * @return DataResponse
+	 * @throws OCSBadRequestException if forbidden or not found
+	 */
+	public function getPartialForm(string $hash): DataResponse {
+		try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->hasUserAccess($form->getId())) {
+			$this->logger->debug('User has no permissions to get this form');
+			throw new OCSForbiddenException();
+		}
+
+		return new DataResponse($this->formsService->getPartialFormArray($form->getId()));
 	}
 
 	/**
