@@ -34,8 +34,7 @@
 			{{ submissionDateTime }}
 		</p>
 
-		<Answer
-			v-for="question in answeredQuestions"
+		<Answer v-for="question in answeredQuestions"
 			:key="question.id"
 			:answer-text="question.squashedAnswers"
 			:question-text="question.text" />

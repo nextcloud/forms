@@ -21,8 +21,7 @@
   -->
 
 <template>
-	<Question
-		v-bind.sync="$attrs"
+	<Question v-bind.sync="$attrs"
 		:text="text"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -34,8 +33,7 @@
 		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<div class="question__content">
-			<DatetimePicker
-				v-model="time"
+			<DatetimePicker v-model="time"
 				value-type="format"
 				:disabled="!readOnly"
 				:formatter="formatter"

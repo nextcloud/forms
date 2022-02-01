@@ -5,8 +5,7 @@
 				'question__item__pseudoInput--unique':isUnique,
 				'question__item__pseudoInput--dropdown':isDropdown
 			}" />
-		<input
-			ref="input"
+		<input ref="input"
 			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
 			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 			:value="answer.text"

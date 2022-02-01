@@ -105,8 +105,7 @@
 
 		<!-- Summary view for visualization -->
 		<section v-if="!noSubmissions && showSummary">
-			<Summary
-				v-for="question in form.questions"
+			<Summary v-for="question in form.questions"
 				:key="question.id"
 				:question="question"
 				:submissions="form.submissions" />
@@ -114,8 +113,7 @@
 
 		<!-- Responses view for individual responses -->
 		<section v-if="!noSubmissions && !showSummary">
-			<Submission
-				v-for="submission in form.submissions"
+			<Submission v-for="submission in form.submissions"
 				:key="submission.id"
 				:submission="submission"
 				:questions="form.questions"

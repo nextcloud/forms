@@ -21,8 +21,7 @@
  -->
 
 <template>
-	<AppSidebar
-		v-show="opened"
+	<AppSidebar v-show="opened"
 		:title="t('forms', 'Share form')"
 		@close="onClose">
 		<button class="copyShareLink" @click="copyShareLink">

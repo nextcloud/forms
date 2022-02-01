@@ -21,8 +21,7 @@
   -->
 
 <template>
-	<AppNavigationItem
-		ref="navigationItem"
+	<AppNavigationItem ref="navigationItem"
 		:icon="icon"
 		:title="formTitle"
 		:to="{
@@ -31,8 +30,7 @@
 		}"
 		@click="mobileCloseNavigation">
 		<template v-if="!loading && !readOnly" #actions>
-			<ActionLink
-				:href="formLink"
+			<ActionLink :href="formLink"
 				:icon="copied && copySuccess ? 'icon-checkmark-color' : 'icon-clippy'"
 				target="_blank"
 				@click.stop.prevent="copyLink">

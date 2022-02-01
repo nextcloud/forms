@@ -21,8 +21,7 @@
   -->
 
 <template>
-	<Question
-		v-bind.sync="$attrs"
+	<Question v-bind.sync="$attrs"
 		:text="text"
 		:is-required="isRequired"
 		:edit.sync="edit"

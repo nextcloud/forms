@@ -21,8 +21,7 @@
   -->
 
 <template>
-	<Question
-		v-bind.sync="$attrs"
+	<Question v-bind.sync="$attrs"
 		:text="text"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -75,8 +74,7 @@
 
 			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
 				<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
-				<input
-					:aria-label="t('forms', 'Add a new answer')"
+				<input :aria-label="t('forms', 'Add a new answer')"
 					:placeholder="t('forms', 'Add a new answer')"
 					class="question__input"
 					:maxlength="maxStringLengths.optionText"

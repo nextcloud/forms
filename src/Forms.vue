@@ -72,8 +72,7 @@
 
 		<!-- No errors show router content -->
 		<template v-else>
-			<router-view
-				:form.sync="selectedForm"
+			<router-view :form.sync="selectedForm"
 				:sidebar-opened.sync="sidebarOpened" />
 			<router-view v-if="!selectedForm.partial"
 				:form="selectedForm"

@@ -55,8 +55,7 @@
 		<header>
 			<h2>
 				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
-				<input
-					id="form-title"
+				<input id="form-title"
 					ref="title"
 					v-model="form.title"
 					class="form-title"
@@ -70,8 +69,7 @@
 					@keyup="onTitleChange">
 			</h2>
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
-			<textarea
-				ref="description"
+			<textarea ref="description"
 				v-model="form.description"
 				class="form-desc"
 				:maxlength="maxStringLengths.formDescription"
@@ -92,8 +90,7 @@
 				@change="onQuestionOrderChange"
 				@start="isDragging = true"
 				@end="isDragging = false">
-				<Questions
-					:is="answerTypes[question.type].component"
+				<Questions :is="answerTypes[question.type].component"
 					v-for="(question, index) in form.questions"
 					ref="questions"
 					:key="question.id"
