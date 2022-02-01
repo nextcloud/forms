@@ -52,8 +52,7 @@
 			ref="form"
 			@submit.prevent="onSubmit">
 			<ul>
-				<Questions
-					:is="answerTypes[question.type].component"
+				<Questions :is="answerTypes[question.type].component"
 					v-for="(question, index) in validQuestions"
 					ref="questions"
 					:key="question.id"
