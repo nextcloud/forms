@@ -34,9 +34,11 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\OCSController;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\ILogger;
 use OCP\IRequest;
@@ -127,14 +129,28 @@ class ShareApiController extends OCSController {
 		$share->setFormId($formId);
 		$share->setShareType($shareType);
 
+		// Create public-share hash, if necessary.
 		if ($shareType === IShare::TYPE_LINK && $shareWith === '') {
-			// TODO Check if hash already exists. (Unfortunately not possible with unique index on db.)
 			$share->setShareWith($this->secureRandom->generate(
 				24,
 				ISecureRandom::CHAR_HUMAN_READABLE
 			));
 		} else {
 			$share->setShareWith($shareWith);
+		}
+
+		// For public-shares, check if hash already exists. (Unfortunately not possible here by unique index on db.)
+		if ($shareType === IShare::TYPE_LINK) {
+			try {
+				// Try loading a share to the hash.
+				$nonex = $this->shareMapper->findPublicShareByHash($share->getShareWith());
+
+				// If we come here, a share has been found --> The share hash already exists, thus aborting.
+				$this->logger->debug('Share Hash already exists.');
+				throw new OCSException('Share Hash exists. Please retry.');
+			} catch (DoesNotExistException $e) {
+				// Just continue, this is what we expect to happen (share hash not existing yet).
+			}
 		}
 
 		$share = $this->shareMapper->insert($share);
