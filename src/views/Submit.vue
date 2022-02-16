@@ -112,6 +112,10 @@ export default {
 			required: false,
 			default: true,
 		},
+		shareHash: {
+			type: String,
+			default: '',
+		},
 	},
 
 	data() {
@@ -230,6 +234,7 @@ export default {
 				await axios.post(generateOcsUrl('apps/forms/api/v1.1/submission/insert'), {
 					formId: this.form.id,
 					answers: this.answers,
+					shareHash: this.shareHash,
 				})
 				this.success = true
 			} catch (error) {

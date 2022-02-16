@@ -300,7 +300,7 @@ class FormsService {
 	}
 
 	/**
-	 * Check if user has access to this form
+	 * Check if current user has access to this form
 	 *
 	 * @param integer $formId
 	 * @return boolean
@@ -310,11 +310,7 @@ class FormsService {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
 
-		if ($this->hasPublicLink($formId)) {
-			return true;
-		}
-
-		// Refuse access, if not public and no user logged in.
+		// Refuse access, if no user logged in.
 		if (!$this->currentUser) {
 			return false;
 		}
