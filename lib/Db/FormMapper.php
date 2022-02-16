@@ -34,6 +34,9 @@ class FormMapper extends QBMapper {
 	/** @var QuestionMapper */
 	private $questionMapper;
 
+	/** @var ShareMapper */
+	private $shareMapper;
+
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
@@ -43,10 +46,12 @@ class FormMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(QuestionMapper $questionMapper,
+								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
 								IDBConnection $db) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
 		$this->questionMapper = $questionMapper;
+		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
 	}
 
@@ -118,12 +123,13 @@ class FormMapper extends QBMapper {
 	}
 
 	/**
-	 * Delete a Form including connected Questions and Submissions
+	 * Delete a Form including connected Questions, Submissions and shares.
 	 * @param Form $form The form instance to delete
 	 */
 	public function deleteForm(Form $form): void {
-		// Delete Submissions(incl. Answers), Questions(incl. Options) and Form.
+		// Delete Submissions(incl. Answers), Questions(incl. Options), Shares and Form.
 		$this->submissionMapper->deleteByForm($form->getId());
+		$this->shareMapper->deleteByForm($form->getId());
 		$this->questionMapper->deleteByForm($form->getId());
 		$this->delete($form);
 	}
