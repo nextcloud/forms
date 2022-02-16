@@ -155,6 +155,9 @@ class ShareApiController extends OCSController {
 
 		$share = $this->shareMapper->insert($share);
 
+		// Create share-notifications (activity)
+		$this->formsService->notifyNewShares($form, $share);
+
 		// Append displayName for Frontend
 		$shareData = $share->read();
 		$shareData['displayName'] = $this->formsService->getShareDisplayName($shareData);

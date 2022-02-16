@@ -30,6 +30,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -444,21 +445,20 @@ class FormsService {
 	}
 
 	/**
-	 * Compares two selected access arrays and creates activities for users.
+	 * Creates activities for sharing to users.
 	 * @param Form $form Related Form
-	 * @param array $oldAccess old access-array
-	 * @param array $newAccess new access-array
+	 * @param Share $share The new Share
 	 */
-	public function notifyNewShares(Form $form, array $oldAccess, array $newAccess) {
-		$newUsers = array_diff($newAccess['users'], $oldAccess['users']);
-		$newGroups = array_diff($newAccess['groups'], $oldAccess['groups']);
-
-		// Create Activities
-		foreach ($newUsers as $key => $newUserId) {
-			$this->activityManager->publishNewShare($form, $newUserId);
-		}
-		foreach ($newGroups as $key => $newGroupId) {
-			$this->activityManager->publishNewGroupShare($form, $newGroupId);
+	public function notifyNewShares(Form $form, Share $share): void {
+		switch ($share->getShareType()) {
+			case IShare::TYPE_USER:
+				$this->activityManager->publishNewShare($form, $share->getShareWith());
+				break;
+			case IShare::TYPE_GROUP:
+				$this->activityManager->publishNewGroupShare($form, $share->getShareWith());
+				break;
+			default:
+				// Do nothing.
 		}
 	}
 }
