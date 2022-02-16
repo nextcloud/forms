@@ -37,6 +37,7 @@ use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\FormsService;
@@ -77,6 +78,9 @@ class ApiController extends OCSController {
 	/** @var QuestionMapper */
 	private $questionMapper;
 
+	/** @var ShareMapper */
+	private $shareMapper;
+
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
@@ -107,6 +111,7 @@ class ApiController extends OCSController {
 								FormMapper $formMapper,
 								OptionMapper $optionMapper,
 								QuestionMapper $questionMapper,
+								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
 								FormsService $formsService,
 								SubmissionService $submissionService,
@@ -123,6 +128,7 @@ class ApiController extends OCSController {
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;
 		$this->questionMapper = $questionMapper;
+		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->formsService = $formsService;
 		$this->submissionService = $submissionService;
@@ -925,14 +931,16 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param array $answers [question_id => arrayOfString]
+	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function insertSubmission(int $formId, array $answers): DataResponse {
-		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}', [
+	public function insertSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
+		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
 			'answers' => $answers,
+			'shareHash' => $shareHash,
 		]);
 
 		try {
@@ -943,9 +951,25 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		// Does the user have access to the form
-		if (!$this->formsService->hasUserAccess($form->getId())) {
-			throw new OCSForbiddenException('Not allowed to access this form');
+		// Does the user have access to the form (Either by logged in user, or by providing public share-hash.)
+		try {
+			$isPublicShare = false;
+
+			// If hash given, find the corresponding share & check if hash corresponds to given formId.
+			if ($shareHash !== '') {
+				$share = $this->shareMapper->findPublicShareByHash($shareHash);
+
+				if ($share->getFormId() === $formId) {
+					$isPublicShare = true;
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			// $isPublicShare already false.
+		} finally {
+			// Now forbid, if no public share and no direct share.
+			if (!$isPublicShare && !$this->formsService->hasUserAccess($form->getId())) {
+				throw new OCSForbiddenException('Not allowed to access this form');
+			}
 		}
 
 		// Not allowed if form has expired.

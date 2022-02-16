@@ -227,6 +227,7 @@ class PageController extends Controller {
 		$this->insertHeaderOnIos();
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
+		$this->initialStateService->provideInitialState($this->appName, 'shareHash', $hash);
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 	}

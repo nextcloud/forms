@@ -24,6 +24,7 @@
 	<Content app-name="forms">
 		<Submit :form="form"
 			:public-view="true"
+			:share-hash="shareHash"
 			:is-logged-in="isLoggedIn" />
 	</Content>
 </template>
@@ -45,6 +46,7 @@ export default {
 		return {
 			form: loadState('forms', 'form'),
 			isLoggedIn: loadState('forms', 'isLoggedIn'),
+			shareHash: loadState('forms', 'shareHash'),
 		}
 	},
 }
