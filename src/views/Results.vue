@@ -35,9 +35,9 @@
 				<span class="icon-forms" role="img" />
 				{{ t('forms', 'Back to questions') }}
 			</button>
-			<button v-if="!noSubmissions" @click="copyInternalShareLink($event, form.hash)">
-				<span class="icon-clippy" role="img" />
-				{{ t('forms', 'Share link') }}
+			<button v-if="!noSubmissions" @click="onShareForm">
+				<span class="icon-share" role="img" />
+				{{ t('forms', 'Share form') }}
 			</button>
 		</TopBar>
 
@@ -95,9 +95,9 @@
 					{{ t('forms', 'Results of submitted forms will show up here') }}
 				</template>
 				<template #action>
-					<button class="primary" @click="copyInternalShareLink($event, form.hash)">
-						<span class="icon-clippy-primary" role="img" />
-						{{ t('forms', 'Share link') }}
+					<button class="primary" @click="onShareForm">
+						<span class="icon-share-primary" role="img" />
+						{{ t('forms', 'Share form') }}
 					</button>
 				</template>
 			</EmptyContent>
@@ -217,6 +217,10 @@ export default {
 					hash: this.form.hash,
 				},
 			})
+		},
+
+		onShareForm() {
+			this.$emit('open-sharing', this.form.hash)
 		},
 
 		async loadFormResults() {

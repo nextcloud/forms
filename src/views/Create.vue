@@ -38,9 +38,9 @@
 					<!-- TRANSLATORS Button to switch to the Result-View -->
 					{{ t('forms', 'Results') }}
 				</button>
-				<button v-if="!sidebarOpened" @click="copyInternalShareLink($event, form.hash)">
-					<span class="icon-clippy" role="img" />
-					{{ t('forms', 'Share link') }}
+				<button v-if="!sidebarOpened" @click="onShareForm">
+					<span class="icon-share" role="img" />
+					{{ t('forms', 'Share form') }}
 				</button>
 			</template>
 			<template #small>
@@ -257,6 +257,10 @@ export default {
 		onDescChange: debounce(function() {
 			this.saveFormProperty('description')
 		}, 200),
+
+		onShareForm() {
+			this.$emit('open-sharing', this.form.hash)
+		},
 
 		/**
 		 * Add a new question to the current form

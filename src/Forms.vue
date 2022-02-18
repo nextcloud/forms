@@ -32,6 +32,7 @@
 					:key="form.id"
 					:form="form"
 					:read-only="false"
+					@open-sharing="openSharing"
 					@mobile-close-navigation="mobileCloseNavigation"
 					@clone="onCloneForm"
 					@delete="onDeleteForm" />
@@ -73,10 +74,12 @@
 		<!-- No errors show router content -->
 		<template v-else>
 			<router-view :form.sync="selectedForm"
-				:sidebar-opened.sync="sidebarOpened" />
+				:sidebar-opened.sync="sidebarOpened"
+				@open-sharing="openSharing" />
 			<router-view v-if="!selectedForm.partial"
 				:form="selectedForm"
 				:opened.sync="sidebarOpened"
+				:active.sync="sidebarActive"
 				name="sidebar" />
 		</template>
 	</Content>
@@ -119,6 +122,7 @@ export default {
 		return {
 			loading: true,
 			sidebarOpened: false,
+			sidebarActive: 'forms-sharing',
 			forms: [],
 			sharedForms: [],
 		}
@@ -187,6 +191,19 @@ export default {
 			if (this.isMobile) {
 				emit('toggle-navigation', { open: false })
 			}
+		},
+
+		/**
+		 * Open a form and its sidebar for sharing
+		 *
+		 * @param {string} hash the hash of the form to load
+		 */
+		openSharing(hash) {
+			if (hash !== this.routeHash || this.$route.name !== 'edit') {
+				this.$router.push({ name: 'edit', params: { hash } })
+			}
+			this.sidebarActive = 'forms-sharing'
+			this.sidebarOpened = true
 		},
 
 		/**

@@ -37,8 +37,8 @@
 	@include icon-color('checkmark', 'actions', $color-success, 1, true);
 }
 
-.icon-clippy-primary {
-	@include icon-color('clippy', 'actions', $color-primary-text, 1, true);
+.icon-share-primary {
+	@include icon-color('share', 'actions', $color-primary-text, 1, true);
 }
 
 .icon-comment-yes {
