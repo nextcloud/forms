@@ -30,12 +30,9 @@
 		}"
 		@click="mobileCloseNavigation">
 		<template v-if="!loading && !readOnly" #actions>
-			<ActionLink :href="formLink"
-				:icon="copied && copySuccess ? 'icon-checkmark-color' : 'icon-clippy'"
-				target="_blank"
-				@click.stop.prevent="copyLink">
-				{{ clipboardTooltip }}
-			</ActionLink>
+			<ActionButton :close-after-click="true" icon="icon-share" @click="onShareForm">
+				{{ t('forms', 'Share form') }}
+			</ActionButton>
 			<ActionRouter :close-after-click="true"
 				:exact="true"
 				icon="icon-comment"
@@ -55,19 +52,14 @@
 </template>
 
 <script>
-import { generateUrl, generateOcsUrl } from '@nextcloud/router'
+import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import ActionRouter from '@nextcloud/vue/dist/Components/ActionRouter'
 import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import axios from '@nextcloud/axios'
-import Clipboard from 'v-clipboard'
 import moment from '@nextcloud/moment'
-import Vue from 'vue'
-
-Vue.use(Clipboard)
 
 export default {
 	name: 'AppNavigationForm',
@@ -75,7 +67,6 @@ export default {
 	components: {
 		AppNavigationItem,
 		ActionButton,
-		ActionLink,
 		ActionRouter,
 		ActionSeparator,
 	},
@@ -93,8 +84,6 @@ export default {
 
 	data() {
 		return {
-			copySuccess: true,
-			copied: false,
 			loading: false,
 		}
 	},
@@ -127,31 +116,6 @@ export default {
 		},
 
 		/**
-		 * Return the form share link
-		 *
-		 * @return {string}
-		 */
-		formLink() {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
-		},
-
-		/**
-		 * Clipboard v-tooltip message
-		 *
-		 * @return {string}
-		 */
-		clipboardTooltip() {
-			if (this.copied) {
-				return this.copySuccess
-					? t('forms', 'Form link copied')
-					: t('forms', 'Cannot copy, please copy the link manually')
-			}
-
-			// TRANSLATORS Button copies the Share Link to clipboard.
-			return t('forms', 'Share link')
-		},
-
-		/**
 		 * Route to use, depending on readOnly
 		 *
 		 * @return {string} Route to 'submit' or 'formRoot'
@@ -173,6 +137,9 @@ export default {
 			this.$emit('mobile-close-navigation')
 		},
 
+		onShareForm() {
+			this.$emit('open-sharing', this.form.hash)
+		},
 		onCloneForm() {
 			this.$emit('clone', this.form.id)
 		},
@@ -194,25 +161,6 @@ export default {
 				this.loading = false
 			}
 		},
-
-		async copyLink(event) {
-			if (this.$clipboard(this.formLink)) {
-				this.copySuccess = true
-				this.copied = true
-			} else {
-				this.copySuccess = false
-				this.copied = true
-				console.debug('Not possible to copy share link')
-			}
-			// Set back focus as clipboard removes focus
-			event.target.focus()
-
-			setTimeout(() => {
-				this.copySuccess = false
-				this.copied = false
-			}, 4000)
-		},
-
 	},
 
 }

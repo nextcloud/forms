@@ -38,9 +38,9 @@
 					<!-- TRANSLATORS Button to switch to the Result-View -->
 					{{ t('forms', 'Results') }}
 				</button>
-				<button v-if="!sidebarOpened" @click="copyShareLink">
-					<span class="icon-clippy" role="img" />
-					{{ t('forms', 'Share link') }}
+				<button v-if="!sidebarOpened" @click="onShareForm">
+					<span class="icon-share" role="img" />
+					{{ t('forms', 'Share form') }}
 				</button>
 			</template>
 			<template #small>
@@ -142,7 +142,6 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
-import ShareLinkMixin from '../mixins/ShareLinkMixin.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
@@ -164,7 +163,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin, ShareLinkMixin],
+	mixins: [ViewsMixin],
 
 	props: {
 		sidebarOpened: {
@@ -264,6 +263,10 @@ export default {
 		onDescChange: debounce(function() {
 			this.saveFormProperty('description')
 		}, 200),
+
+		onShareForm() {
+			this.$emit('open-sharing', this.form.hash)
+		},
 
 		/**
 		 * Add a new question to the current form

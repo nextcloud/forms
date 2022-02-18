@@ -35,9 +35,9 @@
 				<span class="icon-forms" role="img" />
 				{{ t('forms', 'Back to questions') }}
 			</button>
-			<button v-if="!noSubmissions" @click="copyShareLink">
-				<span class="icon-clippy" role="img" />
-				{{ t('forms', 'Share link') }}
+			<button v-if="!noSubmissions" @click="onShareForm">
+				<span class="icon-share" role="img" />
+				{{ t('forms', 'Share form') }}
 			</button>
 		</TopBar>
 
@@ -95,9 +95,9 @@
 					{{ t('forms', 'Results of submitted forms will show up here') }}
 				</template>
 				<template #action>
-					<button class="primary" @click="copyShareLink">
-						<span class="icon-clippy-primary" role="img" />
-						{{ t('forms', 'Share link') }}
+					<button class="primary" @click="onShareForm">
+						<span class="icon-share-primary" role="img" />
+						{{ t('forms', 'Share form') }}
 					</button>
 				</template>
 			</EmptyContent>
@@ -136,7 +136,6 @@ import EmptyContent from '../components/EmptyContent.vue'
 import Summary from '../components/Results/Summary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
-import ShareLinkMixin from '../mixins/ShareLinkMixin.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
@@ -163,7 +162,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin, ShareLinkMixin],
+	mixins: [ViewsMixin],
 
 	data() {
 		return {
@@ -219,6 +218,10 @@ export default {
 					hash: this.form.hash,
 				},
 			})
+		},
+
+		onShareForm() {
+			this.$emit('open-sharing', this.form.hash)
 		},
 
 		async loadFormResults() {

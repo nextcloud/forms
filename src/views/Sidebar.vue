@@ -22,8 +22,10 @@
 
 <template>
 	<AppSidebar v-show="opened"
+		:active="active"
 		:title="t('forms', 'Form settings')"
-		@close="onClose">
+		@close="onClose"
+		@update:active="onUpdateActive">
 		<AppSidebarTab id="forms-sharing"
 			:order="0"
 			:name="t('forms', 'Sharing')"
@@ -64,6 +66,10 @@ export default {
 	mixins: [ViewsMixin],
 
 	props: {
+		active: {
+			type: String,
+			default: 'forms-sharing',
+		},
 		opened: {
 			type: Boolean,
 			required: true,
@@ -79,6 +85,9 @@ export default {
 		},
 		onToggle() {
 			this.$emit('update:opened', !this.opened)
+		},
+		onUpdateActive(active) {
+			this.$emit('update:active', active)
 		},
 
 		/**
