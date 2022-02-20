@@ -35,11 +35,14 @@ use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
+use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
@@ -64,6 +67,9 @@ class ShareApiControllerTest extends TestCase {
 	/** @var IRequest|MockObject */
 	private $request;
 
+	/** @var ISecureRandom|MockObject */
+	private $secureRandom;
+
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
@@ -71,6 +77,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->logger = $this->createMock(ILogger::class);
 		$this->request = $this->createMock(IRequest::class);
 		$userSession = $this->createMock(IUserSession::class);
+		$this->secureRandom = $this->createMock(ISecureRandom::class);
 
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->any())
@@ -87,20 +94,35 @@ class ShareApiControllerTest extends TestCase {
 			$this->formsService,
 			$this->logger,
 			$this->request,
-			$userSession
+			$userSession,
+			$this->secureRandom
 		);
 	}
 
 	public function dataValidNewShare() {
 		return [
 			'newUserShare' => [
-				'shareType' => 0,
+				'shareType' => IShare::TYPE_USER,
 				'shareWith' => 'user1',
+				'expected' => [
+					'id' => 13,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'displayName' => 'user1 DisplayName'
+				]
 			],
 			'newGroupShare' => [
-				'shareType' => 1,
+				'shareType' => IShare::TYPE_GROUP,
 				'shareWith' => 'group1',
-			]
+				'expected' => [
+					'id' => 13,
+					'formId' => 5,
+					'shareType' => 1,
+					'shareWith' => 'group1',
+					'displayName' => 'group1 DisplayName'
+				]
+			],
 		];
 	}
 	/**
@@ -109,8 +131,9 @@ class ShareApiControllerTest extends TestCase {
 	 *
 	 * @param int $shareType
 	 * @param string $shareWith
+	 * @param array $expected
 	 */
-	public function testValidNewShare(int $shareType, string $shareWith) {
+	public function testValidNewShare(int $shareType, string $shareWith, array $expected) {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -137,7 +160,112 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($shareWith . ' DisplayName');
 
 		// Share Form '5' to 'user1' of share-type 'user=0'
-		$this->shareApiController->newShare(5, $shareType, $shareWith);
+		$expectedResponse = new DataResponse($expected);
+		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith));
+	}
+
+	public function dataNewLinkShare() {
+		return [
+			'newLinkShare' => [
+				'shareType' => IShare::TYPE_LINK,
+				'shareWith' => '',
+				'expected' => [
+					'id' => 13,
+					'formId' => 5,
+					'shareType' => 3,
+					'shareWith' => 'abcdefgh',
+					'displayName' => ''
+				]],
+			'newPreparedLinkShare' => [
+				'shareType' => IShare::TYPE_LINK,
+				'shareWith' => 'hijklmnop',
+				'expected' => [
+					'id' => 13,
+					'formId' => 5,
+					'shareType' => 3,
+					'shareWith' => 'hijklmnop',
+					'displayName' => ''
+				]],
+		];
+	}
+	/**
+	 * Test valid Link shares
+	 * @dataProvider dataNewLinkShare
+	 *
+	 * @param int $shareType
+	 * @param string $shareWith
+	 * @param array $expected
+	 */
+	public function testNewLinkShare(int $shareType, string $shareWith, array $expected) {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with('5')
+			->willReturn($form);
+
+		$this->secureRandom->expects($this->any())
+			->method('generate')
+			->willReturn('abcdefgh');
+
+		$share = new Share();
+		$share->setformId('5');
+		$share->setShareType($shareType);
+		if ($shareWith === '') {
+			$share->setShareWith('abcdefgh');
+		} else {
+			$share->setShareWith($shareWith);
+		}
+		$shareWithId = clone $share;
+		$shareWithId->setId(13);
+		$this->shareMapper->expects($this->once())
+			->method('insert')
+			->with($share)
+			->willReturn($shareWithId);
+
+		$this->formsService->expects($this->once())
+			->method('getShareDisplayName')
+			->with($shareWithId->read())
+			->willReturn('');
+
+		$this->shareMapper->expects($this->once())
+			->method('findPublicShareByHash')
+			->will($this->throwException(new DoesNotExistException('Not found.')));
+
+		// Share the form.
+		$expectedResponse = new DataResponse($expected);
+		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith));
+	}
+
+	/**
+	 * Test a random link hash, that is already existing.
+	 */
+	public function testExistingLinkHash() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with('5')
+			->willReturn($form);
+
+		$this->secureRandom->expects($this->any())
+			->method('generate')
+			->willReturn('abcdefgh');
+
+		$this->shareMapper->expects($this->once())
+			->method('findPublicShareByHash')
+			->with('abcdefgh')
+			->willReturn(new Share());
+
+		$this->shareMapper->expects($this->never())
+			->method('insert');
+
+		$this->expectException(OCSException::class);
+		$this->shareApiController->newShare(5, IShare::TYPE_LINK, '');
 	}
 
 	/**

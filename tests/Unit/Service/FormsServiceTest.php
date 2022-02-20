@@ -33,6 +33,7 @@ use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 
@@ -42,6 +43,7 @@ use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
@@ -168,8 +170,12 @@ class FormsServiceTest extends TestCase {
 						'id' => 1,
 						'formId' => 42,
 						'shareType' => 0,
-						'shareWith' => 'user1'
+						'shareWith' => 'currentUser',
+						'displayName' => 'Current User'
 					]
+				],
+				'permissions' => [
+					'submit'
 				]
 			]]
 		];
@@ -206,19 +212,11 @@ class FormsServiceTest extends TestCase {
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())
 			->method('getDisplayName')
-			->willReturn('First User');
-		$group = $this->createMock(IGroup::class);
-		$group->expects($this->once())
-			->method('getDisplayName')
-			->willReturn('First Group');
+			->willReturn('Current User');
 		$this->userManager->expects($this->once())
 			->method('get')
-			->with('user1')
+			->with('currentUser')
 			->willReturn($user);
-		$this->groupManager->expects($this->once())
-			->method('get')
-			->with('group1')
-			->willReturn($group);
 
 		// Questions
 		$question1 = new Question();
@@ -254,8 +252,53 @@ class FormsServiceTest extends TestCase {
 			->with(1)
 			->willReturn([$option1, $option2]);
 
+		$share = new Share();
+		$share->setId(1);
+		$share->setFormId(42);
+		$share->setShareType(0);
+		$share->setShareWith('currentUser');
+
+		$this->shareMapper->expects($this->exactly(3))
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
 		// Run the test
 		$this->assertEquals($expected, $this->formsService->getForm(42));
+	}
+
+	public function dataGetPartialForm() {
+		return [
+			'onePartialOwnedForm' => [[
+				'id' => 42,
+				'hash' => 'abcdefg',
+				'title' => 'Form 1',
+				'expires' => 0,
+				'permissions' => ['edit', 'results', 'submit'],
+				'partial' => true
+			]]
+		];
+	}
+	/**
+	 * @dataProvider dataGetPartialForm
+	 *
+	 * @param array $expected
+	 */
+	public function testGetPartialForm(array $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setHash('abcdefg');
+		$form->setTitle('Form 1');
+		$form->setOwnerId('currentUser');
+		$form->setExpires(0);
+
+		$this->formMapper->expects($this->exactly(2))
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		// Run the test
+		$this->assertEquals($expected, $this->formsService->getPartialFormArray(42));
 	}
 
 	public function dataGetPublicForm() {
@@ -271,7 +314,10 @@ class FormsServiceTest extends TestCase {
 				'isAnonymous' => false,
 				'submitOnce' => false,
 				'canSubmit' => true,
-				'questions' => []
+				'questions' => [],
+				'permissions' => [
+					'submit'
+				]
 			]]
 		];
 	}
@@ -290,9 +336,8 @@ class FormsServiceTest extends TestCase {
 		$form->setOwnerId('someUser');
 		$form->setCreated(123456789);
 		$form->setAccess([
-			'users' => ['user1'],
-			'groups' => ['group1'],
-			'type' => 'selected'
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
 		]);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
@@ -307,19 +352,11 @@ class FormsServiceTest extends TestCase {
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())
 			->method('getDisplayName')
-			->willReturn('First User');
-		$group = $this->createMock(IGroup::class);
-		$group->expects($this->once())
-			->method('getDisplayName')
-			->willReturn('First Group');
+			->willReturn('Current User');
 		$this->userManager->expects($this->once())
 			->method('get')
-			->with('user1')
+			->with('currentUser')
 			->willReturn($user);
-		$this->groupManager->expects($this->once())
-			->method('get')
-			->with('group1')
-			->willReturn($group);
 
 		// No Questions here
 		$this->questionMapper->expects($this->once())
@@ -327,66 +364,123 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([]);
 
+		// Share exists, but should not be shown in the end.
+		$share = new Share();
+		$share->setId(1);
+		$share->setFormId(42);
+		$share->setShareType(0);
+		$share->setShareWith('currentUser');
+
+		$this->shareMapper->expects($this->exactly(3))
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
 		// Run the test
 		$this->assertEquals($expected, $this->formsService->getPublicForm(42));
 	}
 
+	public function dataGetPermissions() {
+		return [
+			'ownerHasAllPermissions' => [
+				'ownerId' => 'currentUser',
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'expected' => ['edit', 'results', 'submit'],
+			],
+			'allUsersCanSubmit' => [
+				'ownerId' => 'someOtherUser',
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => false,
+				],
+				'expected' => ['submit'],
+			],
+			'noPermission' => [
+				'ownerId' => 'someOtherUser',
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'expected' => [],
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataGetPermissions
+	 *
+	 * @param string $ownerId
+	 * @param array $access
+	 * @param array $expected
+	 */
+	public function testGetPermissions(string $ownerId, array $access, array $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId($ownerId);
+		$form->setAccess($access);
+
+		$this->formMapper->expects($this->any())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([]);
+
+		$this->assertEquals($expected, $this->formsService->getPermissions(42));
+	}
+
 	public function dataCanSubmit() {
 		return [
-			'publicForm' => [
-				['type' => 'public'],
-				'someUser',
-				true,
-				['currentUser'],
-				true
-			],
 			'allowFormOwner' => [
-				['type' => 'registered'],
-				'currentUser',
-				true,
-				['currentUser'],
-				true
+				'ownerId' => 'currentUser',
+				'submitOnce' => true,
+				'participantsArray' => ['currentUser'],
+				'expected' => true
 			],
 			'submitOnceGood' => [
-				['type' => 'registered'],
-				'someUser',
-				true,
-				['notCurrentUser'],
-				true
+				'ownerId' => 'someUser',
+				'submitOnce' => true,
+				'participantsArray' => ['notCurrentUser'],
+				'expected' => true
 			],
 			'submitOnceNotGood' => [
-				['type' => 'registered'],
-				'someUser',
-				true,
-				['currentUser'],
-				false
+				'ownerId' => 'someUser',
+				'submitOnce' => true,
+				'participantsArray' => ['notCurrentUser', 'currentUser'],
+				'expected' => false
 			],
-			'simpleAllowed' => [
-				['type' => 'registered'],
-				'someUser',
-				false,
-				['currentUser'],
-				true
+			'submitMultiple' => [
+				'ownerId' => 'someUser',
+				'submitOnce' => false,
+				'participantsArray' => ['currentUser'],
+				'expected' => true
 			]
 		];
 	}
 	/**
 	 * @dataProvider dataCanSubmit
 	 *
-	 * @param array $accessArray
 	 * @param string $ownerId
 	 * @param bool $submitOnce
 	 * @param array $participantsArray
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(array $accessArray, string $ownerId, bool $submitOnce, array $participantsArray, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitOnce, array $participantsArray, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
-		$form->setAccess($accessArray);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
 		$form->setOwnerId($ownerId);
 		$form->setSubmitOnce($submitOnce);
 
-		$this->formMapper->expects($this->once())
+		$this->formMapper->expects($this->any())
 			->method('findById')
 			->with(42)
 			->willReturn($form);
@@ -399,63 +493,136 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->canSubmit(42));
 	}
 
+	/**
+	 * Test result, if hasPublicLink returns true due to public link share.
+	 */
+	public function testPublicCanSubmit() {
+		$form = new Form();
+		$form->setId(42);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+
+		$this->formMapper->expects($this->any())
+		->method('findById')
+		->with(42)
+		->willReturn($form);
+
+		$share = new Share;
+		$share->setShareType(IShare::TYPE_LINK);
+		$this->shareMapper->expects($this->once())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		// Make sure, we don't pass the PublicLinkCheck (which would then reach 'getUID')
+		$user = $this->createMock(IUser::class);
+		$user->expects($this->never())
+		->method('getUID');
+		$userSession = $this->createMock(IUserSession::class);
+		$userSession->expects($this->once())
+			->method('getUser')
+			->willReturn($user);
+
+		$formsService = new FormsService(
+			$this->activityManager,
+			$this->formMapper,
+			$this->optionMapper,
+			$this->questionMapper,
+			$this->shareMapper,
+			$this->submissionMapper,
+			$this->groupManager,
+			$this->logger,
+			$this->userManager,
+			$userSession
+		);
+
+		$this->assertEquals(true, $formsService->canSubmit(42));
+	}
+
+	public function dataHasPublicLink() {
+		return [
+			'legacyLink' => [
+				'access' => [
+					'legacyLink' => true,
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_USER,
+				'expected' => true,
+			],
+			'noPublicLink' => [
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_USER,
+				'expected' => false,
+			],
+			'hasPublicLink' => [
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => true,
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataHasPublicLink
+	 *
+	 * @param array $access
+	 * @param int $shareType The ShareType used for this test.
+	 * @param bool $expected
+	 */
+	public function testHasPublicLink(array $access, int $shareType, bool $expected) {
+		$form = new Form;
+		$form->setId(42);
+		$form->setAccess($access);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$share = new Share();
+		$share->setShareType($shareType);
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals($expected, $this->formsService->hasPublicLink(42));
+	}
+
 	public function dataHasUserAccess() {
 		return [
-			'noAccess' => [
-				[
-					'type' => 'selected',
-					'users' => [],
-					'groups' => []
-				],
-				'someOtherUser',
-				false
-			],
-			'publicForm' => [
-				[
-					'type' => 'public',
-					'users' => [],
-					'groups' => []
-				],
-				'someOtherUser',
-				true
-			],
 			'ownerhasAccess' => [
-				[
-					'type' => 'selected',
-					'users' => [],
-					'groups' => []
+				'accessArray' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
 				],
-				'currentUser',
-				true
+				'ownerId' => 'currentUser',
+				'expected' => true
 			],
-			'registeredHasAccess' => [
-				[
-					'type' => 'registered',
-					'users' => [],
-					'groups' => []
+			'allUsersPermitted' => [
+				'accessArray' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => false,
 				],
-				'someOtherUser',
-				true
+				'ownerId' => 'someOtherUser',
+				'expected' => true
 			],
-			'selectedUser' => [
-				[
-					'type' => 'selected',
-					'users' => ['user1', 'currentUser', 'user2'],
-					'groups' => []
+			'noAccess' => [
+				'accessArray' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
 				],
-				'someOtherUser',
-				true
+				'ownerId' => 'someOtherUser',
+				'expected' => false
 			],
-			'userInSelectedGroup' => [
-				[
-					'type' => 'selected',
-					'users' => [],
-					'groups' => ['currentUserGroup']
-				],
-				'someOtherUser',
-				true
-			]
-
 		];
 	}
 	/**
@@ -475,12 +642,31 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn($form);
 
-		$this->groupManager->expects($this->any())
-			->method('isInGroup')
-			->with('currentUser', 'currentUserGroup')
-			->willReturn(true);
-
 		$this->assertEquals($expected, $this->formsService->hasUserAccess(42));
+	}
+
+	public function testHasUserAccess_DirectShare() {
+		$form = new Form();
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+		$form->setOwnerId('notCurrentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$share = new Share();
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('currentUser');
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals(true, $this->formsService->hasUserAccess(42));
 	}
 
 	public function testHasUserAccess_NotLoggedIn() {
@@ -504,9 +690,8 @@ class FormsServiceTest extends TestCase {
 
 		$form = new Form();
 		$form->setAccess([
-			'type' => 'registered',
-			'users' => [],
-			'groups' => []
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
 		]);
 		$form->setOwnerId('someOtherUser');
 
@@ -516,6 +701,147 @@ class FormsServiceTest extends TestCase {
 			->willReturn($form);
 
 		$this->assertEquals(false, $formsService->hasUserAccess(42));
+	}
+
+	public function dataIsSharedFormShown() {
+		return [
+			'dontShowToOwner' => [
+				'ownerId' => 'currentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => false,
+			],
+			'expiredForm' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 1,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => false,
+			],
+			'shownToAll' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => true,
+			],
+			'sharedToUser' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_USER,
+				'expected' => true,
+			],
+			'notShown' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => false,
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataIsSharedFormShown
+	 *
+	 * @param string $ownerId
+	 * @param int $expires
+	 * @param array $access
+	 * @param int $shareType ShareType used for dummy-share here.
+	 * @param bool $expected
+	 */
+	public function testIsSharedFormShown(string $ownerId, int $expires, array $access, int $shareType, bool $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId($ownerId);
+		$form->setExpires($expires);
+		$form->setAccess($access);
+
+		$this->formMapper->expects($this->any())
+		->method('findById')
+		->with(42)
+		->willReturn($form);
+
+		$share = new Share();
+		$share->setShareType($shareType);
+		$share->setShareWith('currentUser'); // Only relevant, if $shareType is TYPE_USER, otherwise it's just some 'hash'
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals($expected, $this->formsService->isSharedFormShown(42));
+	}
+
+	public function dataIsSharedToUser() {
+		return [
+			'sharedToUser' => [
+				'shareType' => IShare::TYPE_USER,
+				'shareWith' => 'currentUser',
+				'expected' => true,
+			],
+			'sharedToOtherUser' => [
+				'shareType' => IShare::TYPE_USER,
+				'shareWith' => 'NotcurrentUser',
+				'expected' => false,
+			],
+			'sharedToGroup' => [
+				'shareType' => IShare::TYPE_GROUP,
+				'shareWith' => 'goodGroup',
+				'expected' => true,
+			],
+			'sharedToOtherGroup' => [
+				'shareType' => IShare::TYPE_GROUP,
+				'shareWith' => 'wrongGroup',
+				'expected' => false,
+			],
+			'NotSharedToUser' => [
+				'shareType' => IShare::TYPE_LINK,
+				'shareWith' => 'abcdefg',
+				'expected' => false,
+			],
+		];
+	}
+	/**
+	 * @dataProvider dataIsSharedToUser
+	 *
+	 * @param int $shareType
+	 * @param string $shareWith
+	 * @param bool $expected
+	 */
+	public function testIsSharedToUser(int $shareType, string $shareWith, bool $expected) {
+		$share = new Share();
+		$share->setShareType($shareType);
+		$share->setShareWith($shareWith);
+		$this->shareMapper->expects($this->once())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->groupManager->expects($this->any())
+			->method('isInGroup')
+			->will($this->returnValueMap([
+				['currentUser', 'goodGroup', true],
+				['currentUser', 'wrongGroup', false],
+			]));
+
+		$this->assertEquals($expected, $this->formsService->isSharedToUser(42));
 	}
 
 	public function dataHasFormExpired() {
@@ -543,92 +869,90 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->hasFormExpired(42));
 	}
 
+	public function dataGetShareDisplayName() {
+		return [
+			'userShare' => [
+				'share' => [
+					'shareType' => IShare::TYPE_USER,
+					'shareWith' => 'user1',
+				],
+				'expected' => 'user1 UserDisplayname',
+			],
+			'groupShare' => [
+				'share' => [
+					'shareType' => IShare::TYPE_GROUP,
+					'shareWith' => 'group1',
+				],
+				'expected' => 'group1 GroupDisplayname',
+			],
+			'otherShare' => [
+				'share' => [
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => 'abcdefg',
+				],
+				'expected' => '',
+			],
+		];
+	}
+	/**
+	 * @dataProvider dataGetShareDisplayName
+	 *
+	 * @param array $share
+	 * @param string $expected
+	 */
+	public function testGetShareDisplayName(array $share, string $expected) {
+		$user = $this->createMock(IUser::class);
+		$user->expects($this->any())
+			->method('getDisplayName')
+			->willReturn($share['shareWith'] . ' UserDisplayname');
+		$this->userManager->expects($this->any())
+			->method('get')
+			->with($share['shareWith'])
+			->willReturn($user);
+
+		$group = $this->createMock(IGroup::class);
+		$group->expects($this->any())
+			->method('getDisplayName')
+			->willReturn($share['shareWith'] . ' GroupDisplayname');
+		$this->groupManager->expects($this->any())
+			->method('get')
+			->with($share['shareWith'])
+			->willReturn($group);
+
+		$this->assertEquals($expected, $this->formsService->getShareDisplayName($share));
+	}
+
 	public function dataNotifyNewShares() {
 		return [
-			'newUsersGroups' => [
-				[
-					'users' => ['user1'],
-					'groups' => ['group1', 'group2']
-				],
-				[
-					'users' => ['user1', 'user2', 'user3'],
-					'groups' => ['group1', 'group2', 'group3']
-				],
-				['user2', 'user3'],
-				['group3']
+			'newUserShare' => [
+				'shareType' => IShare::TYPE_USER,
+				'shareWith' => 'someUser',
+				'expectedMethod' => 'publishNewShare',
 			],
-			'noNewShares' => [
-				[
-					'users' => ['user1'],
-					'groups' => ['group1', 'group2']
-				],
-				[
-					'users' => ['user1'],
-					'groups' => ['group1', 'group2']
-				],
-				[],
-				[]
-			],
-			'removeShares' => [
-				[
-					'users' => ['user1', 'user2', 'user3'],
-					'groups' => ['group1', 'group2', 'group3']
-				],
-				[
-					'users' => ['user1'],
-					'groups' => ['group1', 'group2']
-				],
-				[],
-				[]
-			],
-			'noSharesAtAll' => [
-				[
-					'users' => [],
-					'groups' => []
-				],
-				[
-					'users' => [],
-					'groups' => []
-				],
-				[],
-				[]
+			'newGroupShare' => [
+				'shareType' => IShare::TYPE_GROUP,
+				'shareWith' => 'someGroup',
+				'expectedMethod' => 'publishNewGroupShare',
 			]
 		];
 	}
 	/**
 	 * @dataProvider dataNotifyNewShares
 	 *
-	 * @param array $oldAccess
-	 * @param array $newAccess
-	 * @param array $diffUsers
-	 * @param array $diffGroups
+	 * @param int $shareType
+	 * @param string $shareWith
+	 * @param string $expectedMethod that will be called on activityManager.
 	 */
-	public function testNotifyNewShares(array $oldAccess, array $newAccess, array $diffUsers, array $diffGroups) {
+	public function testNotifyNewShares(int $shareType, string $shareWith, string $expectedMethod) {
 		$form = $this->createMock(Form::class);
+		$share = new Share();
+		$share->setShareType($shareType);
+		$share->setShareWith($shareWith);
 
-		$passedUserList = [];
-		$this->activityManager->expects($this->any())
-			->method('publishNewShare')
-			->will($this->returnCallback(function ($passedForm, $passedUser) use ($form, &$passedUserList) {
-				if ($passedForm === $form) {
-					// Store List of passed users
-					$passedUserList[] = $passedUser;
-				}
-			}));
-		$passedGroupList = [];
-		$this->activityManager->expects($this->any())
-			->method('publishNewGroupShare')
-			->will($this->returnCallback(function ($passedForm, $passedGroup) use ($form, &$passedGroupList) {
-				if ($passedForm === $form) {
-					// Store List of passed groups
-					$passedGroupList[] = $passedGroup;
-				}
-			}));
+		$this->activityManager->expects($this->once())
+			->method($expectedMethod)
+			->with($form, $shareWith);
 
-		$this->formsService->notifyNewShares($form, $oldAccess, $newAccess);
-
-		// Check List of called Users and Groups
-		$this->assertEquals($diffUsers, $passedUserList);
-		$this->assertEquals($diffGroups, $passedGroupList);
+		$this->formsService->notifyNewShares($form, $share);
 	}
 }
