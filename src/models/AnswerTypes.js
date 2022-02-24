@@ -100,7 +100,7 @@ export default {
 
 		titlePlaceholder: t('forms', 'Short answer question title'),
 		createPlaceholder: t('forms', 'People can enter a short answer'),
-		submitPlaceholder: t('forms', 'Enter a short answer'),
+		submitPlaceholder: t('forms', 'Enter your answer'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
@@ -112,7 +112,7 @@ export default {
 
 		titlePlaceholder: t('forms', 'Long text question title'),
 		createPlaceholder: t('forms', 'People can enter a long text'),
-		submitPlaceholder: t('forms', 'Enter a long text'),
+		submitPlaceholder: t('forms', 'Enter your answer'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
