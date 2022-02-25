@@ -62,8 +62,6 @@ OC.L10N.register(
     "There was an error submitting the form" : "เกิดข้อผิดพลาดขณะส่งฟอร์ม",
     "Error while saving question" : "ข้อผิดพลาดขณะบันทึกคำถาม",
     "Short answer" : "คำถามสั้น",
-    "Enter a short answer" : "ใส่คำถามสั้น",
-    "Enter a long text" : "ใส่ข้อความยาว",
     "Date" : "วันที่",
     "Pick a date" : "เลือกวันที่",
     "Datetime" : "วันที่และเวลา",
