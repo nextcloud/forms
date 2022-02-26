@@ -103,6 +103,7 @@ OC.L10N.register(
     "Short answer" : "Trumpas atsakymas",
     "Short answer question title" : "Trumpo atsakymo klausimo antraštė",
     "People can enter a short answer" : "Žmonės galės įvesti trumpą atsakymą",
+    "Enter your answer" : "Įveskite atsakymą",
     "Long text" : "Ilgas atsakymas",
     "Long text question title" : "Ilgo teksto klausimo antraštė",
     "People can enter a long text" : "Žmonės galės įvesti ilgą atsakymą",

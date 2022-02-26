@@ -114,6 +114,7 @@ OC.L10N.register(
     "Short answer" : "Kısa metin",
     "Short answer question title" : "Kısa yanıt sorusunun başlığı",
     "People can enter a short answer" : "Kişiler kısa bir yanıt yazabilir",
+    "Enter your answer" : "Yanıtınızı yazın",
     "Long text" : "Uzun metin",
     "Long text question title" : "Uzun yanıt sorusunun başlığı",
     "People can enter a long text" : "Kişiler uzun bir yanıt yazabilir",
