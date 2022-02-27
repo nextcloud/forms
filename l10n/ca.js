@@ -114,6 +114,7 @@ OC.L10N.register(
     "Short answer" : "Resposta curta",
     "Short answer question title" : "Títol de la pregunta de resposta curta",
     "People can enter a short answer" : "Els usuaris poden introduir una resposta curta",
+    "Enter your answer" : "Escriviu la resposta",
     "Long text" : "Text llarg",
     "Long text question title" : "Títol de la pregunta de text llarg",
     "People can enter a long text" : "Els usuaris poden introduir un text llarg",
