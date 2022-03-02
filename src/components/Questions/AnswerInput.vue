@@ -31,6 +31,7 @@ import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import pDebounce from 'p-debounce'
+// eslint-disable-next-line import/no-unresolved, node/no-missing-import
 import PQueue from 'p-queue'
 
 import Actions from '@nextcloud/vue/dist/Components/Actions'
