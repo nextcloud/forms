@@ -114,6 +114,7 @@ OC.L10N.register(
     "Short answer" : "短答案",
     "Short answer question title" : "短答案問題標題",
     "People can enter a short answer" : "人們可以輸入短答案",
+    "Enter your answer" : "輸入您的答案",
     "Long text" : "長文字",
     "Long text question title" : "長文字問題標題",
     "People can enter a long text" : "人們可以輸入長文字",
