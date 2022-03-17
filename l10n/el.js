@@ -114,6 +114,7 @@ OC.L10N.register(
     "Short answer" : "Σύντομη απάντηση",
     "Short answer question title" : "Τίτλος ερωτήματος σύντομης απάντησης",
     "People can enter a short answer" : "Οι χρήστες μπορούν να εισαγάγουν μια σύντομη απάντηση",
+    "Enter your answer" : "Εισαγάγετε την απάντησή σας",
     "Long text" : "Μεγάλο κείμενο",
     "Long text question title" : "Τίτλος ερωτήματος μακροσκελή κειμένου",
     "People can enter a long text" : "Οι χρήστες μπορούν να εισαγάγουν μακροσκελή κείμενο",
