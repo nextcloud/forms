@@ -24,7 +24,7 @@ const GenRandomId = (length) => {
 	return Math.random()
 		.toString(36)
 		.replace(/[^a-z]+/g, '')
-		.substr(0, length || 5)
+		.slice(0, length || 5)
 }
 
 export default GenRandomId
