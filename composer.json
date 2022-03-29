@@ -21,7 +21,8 @@
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.5",
 		"christophwurst/nextcloud": "^22.0",
-		"phpunit/phpunit": "^9"
+		"phpunit/phpunit": "^9",
+		"guzzlehttp/guzzle": "^7.4"
 	},
 	"require": {
 		"league/csv": "^9.7.3"

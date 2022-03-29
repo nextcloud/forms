@@ -52,9 +52,11 @@ jobs:
       - name: Set up Nextcloud
         env:
           DB_PORT: 4444
+          OC_PASS: test
         run: |
           mkdir data
           ./occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass password 
+          ./occ user:add --password-from-env --display-name="Test Displayname" test
           ./occ app:enable --force ${{ env.APP_NAME }}
           php -S localhost:8080 &
 
@@ -66,13 +68,21 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer test:integration
 
-      - name: Upload coverage
+      - name: Upload Unit coverage
         uses: codecov/codecov-action@v1
         with:
           root_dir: apps/${{ env.APP_NAME }}
           files: apps/${{ env.APP_NAME }}/tests/clover.unit.xml
           fail_ci_if_error: true
-          flags: unittests
+          flags: unit
+
+      - name: Upload Integration coverage
+        uses: codecov/codecov-action@v1
+        with:
+          root_dir: apps/${{ env.APP_NAME }}
+          files: apps/${{ env.APP_NAME }}/tests/clover.integration.xml
+          fail_ci_if_error: true
+          flags: integration
 
   mysql:
     runs-on: ubuntu-latest
@@ -124,9 +134,11 @@ jobs:
       - name: Set up Nextcloud
         env:
           DB_PORT: 4444
+          OC_PASS: test
         run: |
           mkdir data
           ./occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass password 
+          ./occ user:add --password-from-env --display-name="Test Displayname" test
           ./occ app:enable --force ${{ env.APP_NAME }}
           php -S localhost:8080 &
 
@@ -190,9 +202,11 @@ jobs:
       - name: Set up Nextcloud
         env:
           DB_PORT: 4444
+          OC_PASS: test
         run: |
           mkdir data
           ./occ maintenance:install --verbose --database=${{ matrix.databases }} --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass password 
+          ./occ user:add --password-from-env --display-name="Test Displayname" test
           ./occ app:enable --force ${{ env.APP_NAME }}
           php -S localhost:8080 &
 
@@ -221,7 +235,7 @@ jobs:
       oracle:
         image: deepdiver/docker-oracle-xe-11g # "wnameless/oracle-xe-11g-r2"
         ports:
-          - "1521:1521"
+          - 4444:1521/tcp
 
     steps:
       - name: Checkout server
@@ -249,10 +263,14 @@ jobs:
         run: composer i
 
       - name: Set up Nextcloud
+        env:
+          DB_PORT: 4444
+          OC_PASS: test
         run: |
           mkdir data
-          ./occ maintenance:install --verbose --database=oci --database-name=XE --database-host=127.0.0.1 --database-port=1521 --database-user=autotest --database-pass=owncloud --admin-user admin --admin-pass admin
+          ./occ maintenance:install --verbose --database=oci --database-name=XE --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=autotest --database-pass=owncloud --admin-user admin --admin-pass admin
           php -f index.php
+          ./occ user:add --password-from-env --display-name="Test Displayname" test
           ./occ app:enable --force ${{ env.APP_NAME }}
 
       - name: PHPUnit
