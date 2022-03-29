@@ -59,7 +59,7 @@ return [
 			'url' => '/api/{apiVersion}/forms',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -67,7 +67,7 @@ return [
 			'url' => '/api/{apiVersion}/form',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -75,7 +75,7 @@ return [
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -83,7 +83,7 @@ return [
 			'url' => '/api/{apiVersion}/form/clone/{id}',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -91,7 +91,7 @@ return [
 			'url' => '/api/{apiVersion}/form/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -99,7 +99,7 @@ return [
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -107,7 +107,7 @@ return [
 			'url' => '/api/{apiVersion}/partial_form/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -115,7 +115,7 @@ return [
 			'url' => '/api/{apiVersion}/shared_forms',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 
@@ -125,7 +125,7 @@ return [
 			'url' => '/api/{apiVersion}/question',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -133,7 +133,7 @@ return [
 			'url' => '/api/{apiVersion}/question/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -141,7 +141,7 @@ return [
 			'url' => '/api/{apiVersion}/question/reorder',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -149,7 +149,7 @@ return [
 			'url' => '/api/{apiVersion}/question/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 
@@ -159,7 +159,7 @@ return [
 			'url' => '/api/{apiVersion}/option',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -167,7 +167,7 @@ return [
 			'url' => '/api/{apiVersion}/option/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -175,7 +175,7 @@ return [
 			'url' => '/api/{apiVersion}/option/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 
@@ -203,7 +203,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -211,7 +211,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/export/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -219,7 +219,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/export',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -227,7 +227,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/{formId}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -235,7 +235,7 @@ return [
 			'url' => '/api/{apiVersion}/submission/insert',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -243,7 +243,7 @@ return [
 			'url' => '/api/{apiVersion}/submission/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v1(\.1)?'
+				'apiVersion' => 'v2'
 			]
 		],
 	]

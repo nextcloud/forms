@@ -1,7 +1,7 @@
 # Forms Data Structure
-**State: Forms v2.3.0 - 09.04.2021**
+**State: Forms v3.0.0 - 23.03.2022**
 
-This document describes the Object-Structure, that is used within the Forms App and on Forms API v1.1. It does partially **not** equal the actual database structure behind.
+This document describes the Object-Structure, that is used within the Forms App and on Forms API v2. It does partially **not** equal the actual database structure behind.
 
 ## Data Structures
 ### Form
@@ -17,9 +17,11 @@ This document describes the Object-Structure, that is used within the Forms App 
 | expires     | unix-timestamp  |              | When the form should expire. Timestamp `0` indicates _never_ |
 | isAnonymous | Boolean         |              | If Answers will be stored anonymously |
 | submitOnce  | Boolean         |              | If users are only allowed to submit once to the form |
-| questions   | Array of [Questions](#question) | | Array of questions belonging to the form |
-| submissions | Array of [Submissions](#submissions) | | Array of submissions belonging to the form |
 | canSubmit   | Boolean         |              | If the user can Submit to the form, i.e. calculated information out of `submitOnce` and existing submissions. |
+| permissions | Array of [Permissions](#permissions) | Array of permissions regarding the form |
+| questions   | Array of [Questions](#question) | | Array of questions belonging to the form |
+| shares      | Array of [Shares](#share) | | Array of shares of the form |
+| submissions | Array of [Submissions](#submission) | | Array of submissions belonging to the form |
 
 ```
 {
@@ -33,9 +35,15 @@ This document describes the Object-Structure, that is used within the Forms App 
   "expires": 0,
   "isAnonymous": false,
   "submitOnce": false,
+  "canSubmit": true,
+  "permissions": [
+    "edit",
+    "results",
+    "submit"
+  ],
   "questions": [],
   "submissions": [],
-  "canSubmit": true
+  "shares": []
 }
 ```
 
@@ -46,7 +54,6 @@ This document describes the Object-Structure, that is used within the Forms App 
 | formId      | Integer         |              | The id of the form, the question belongs to |
 | order       | Integer         | unique within form; *not* `0` | The order of the question within that form. Value `0` indicates deleted questions within database (typ. not visible outside) |
 | type        | [Question-Type](#question-types) | | Type of the question |
-| _mandatory_   | _Boolean_         |              | _deprecated: will be removed in API v2, replaced by `isRequired`_ |
 | isRequired  | Boolean         |              | If the question is required to fill the form |
 | text        | String          | max. 2048 ch. | The question-text |
 | options     | Array of [Options](#option) | | Array of options belonging to the question. Only relevant for question-type with predefined options. |
@@ -78,6 +85,16 @@ Options are predefined answer-possibilities corresponding to questions with appr
   "text": "Option 1"
 }
 ```
+
+### Share
+A share-object describes a single share of the form.
+| Property    | Type            | Restrictions | Description |
+|-------------|-----------------|--------------|-------------|
+| id          | Integer         | unique       | An instance-wide unique id of the share |
+| formId      | Integer         |              | The id of the form, the share belongs to |
+| shareType   | NC-IShareType (Int) | `IShare::TYPE_USER = 0`, `IShare::TYPE_GROUP = 1`, `IShare::TYPE_LINK = 3` | Type of the share. Thus also describes how to interpret shareWith. |
+| shareWith   | String          |              | User/Group/Hash - depending on the shareType |
+| displayName | String          |              | Display name of share-target. |
 
 ### Submission
 A submission-object describes a single submission by a user to a form.
@@ -120,44 +137,25 @@ The actual answers of users on submission.
 }
 ```
 
+## Permmissions
+Array of permissions, the user has on the form. Permissions are named by resp. routes on frontend.
+| Permission | Description |
+| -----------|-------------|
+| edit       | User is allowed to edit the form |
+| results    | User is allowed to access the form results |
+| submit     | User is allowed to submit to the form |
 
 ## Access Object
-Defines how users are allowed to access the form.
-| Property    | Type            | Description |
-|-------------|-----------------|-------------|
-| users       | Array of [userShares](#share-objects)  | Only relevant if `type=selected` |
-| groups      | Array of [groupShares](#share-objects) | Only relevant if `type=selected` |
-| type        | [ShareType](#share-types) | Share Type of the form.
+Defines some extended options of sharing / access
+| Property         | Type      | Description |
+|------------------|-----------|-------------|
+| permitAllUsers   | Boolean   | All logged in users of this instance are allowed to submit to the form |
+| showToAllUsers   | Boolean   | Only active, if permitAllUsers is true - Show the form to all users on appNavigation |
 
 ```
 {
-    "users": [],
-    "groups": [],
-    "type": "public"
-}
-```
-
-### Share Types
-Three types of sharing options are currently available, which define the access to the form. Independent of Share-Type, the form is currently only accessible via its share-link.
-| Type-ID    | Description |
-|------------|-------------|
-| `public`     | Everybody is allowed to access the form. Anonymous users can fill the form on its public page. |
-| `registered` | Only registered & logged-in users on this instance can fill the form. |
-| `selected`   | Only selected users are allowed to fill the form. Allowed users are defined in the Access-object. |
-
-### Share Objects
-Objects of userShares or groupShares.
-
-| Property    | Type            | Description |
-|-------------|-----------------|-------------|
-| shareWith   | String          | Nextcloud userId or groupId of the sharee |
-| displayName | String          | Nextcloud Display Name of the Sharee |
-| shareType   | NC-IShareType (Int) | Nextcloud `IShare`-Type. Currently `IShare::TYPE_USER = 0` and `IShare::TYPE_GROUP = 1`
-```
-{
-  "shareWith": "user1",
-  "displayName": "User No. 1",
-  "shareType": 0
+  "permitAllUsers": false,
+  "showToAllUsers": false
 }
 ```
 

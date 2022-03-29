@@ -42,10 +42,7 @@ class Capabilities implements ICapability {
 		return [
 			'forms' => [
 				'version' => $this->appManager->getAppVersion('forms'),
-				'apiVersions' => [
-					'v1',
-					'v1.1'
-				]
+				'apiVersions' => ['v2']
 			]
 		];
 	}

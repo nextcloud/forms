@@ -231,7 +231,7 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(generateOcsUrl('apps/forms/api/v1.1/submission/insert'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v2/submission/insert'), {
 					formId: this.form.id,
 					answers: this.answers,
 					shareHash: this.shareHash,

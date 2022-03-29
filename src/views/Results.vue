@@ -193,7 +193,7 @@ export default {
 		 * @return {string}
 		 */
 		downloadUrl() {
-			return generateOcsUrl('apps/forms/api/v1.1/submissions/export/{hash}', { hash: this.form.hash })
+			return generateOcsUrl('apps/forms/api/v2/submissions/export/{hash}', { hash: this.form.hash })
 		},
 	},
 
@@ -228,7 +228,7 @@ export default {
 			console.debug('Loading results for form', this.form.hash)
 
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v1.1/submissions/{hash}', { hash: this.form.hash }))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/submissions/{hash}', { hash: this.form.hash }))
 
 				// Append questions & submissions
 				this.$set(this.form, 'submissions', OcsResponse2Data(response).submissions)
@@ -247,7 +247,7 @@ export default {
 			picker.pick()
 				.then(async (path) => {
 					try {
-						const response = await axios.post(generateOcsUrl('apps/forms/api/v1.1/submissions/export'), {
+						const response = await axios.post(generateOcsUrl('apps/forms/api/v2/submissions/export'), {
 							hash: this.form.hash,
 							path,
 						})
@@ -263,7 +263,7 @@ export default {
 			this.loadingResults = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v1.1/submission/{id}', { id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v2/submission/{id}', { id }))
 				const index = this.form.submissions.findIndex(search => search.id === id)
 				this.form.submissions.splice(index, 1)
 			} catch (error) {
@@ -281,7 +281,7 @@ export default {
 
 			this.loadingResults = true
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v1.1/submissions/{formId}', { formId: this.form.id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v2/submissions/{formId}', { formId: this.form.id }))
 				this.form.submissions = []
 			} catch (error) {
 				console.error(error)

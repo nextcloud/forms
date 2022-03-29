@@ -211,6 +211,7 @@ class ApiController extends OCSController {
 	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 *
+	 * @param int $id FormId
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
@@ -226,12 +227,6 @@ class ApiController extends OCSController {
 		if (!$this->formsService->hasUserAccess($id)) {
 			$this->logger->debug('User has no permissions to get this form');
 			throw new OCSForbiddenException();
-		}
-
-		// TODO remove after removal of API v1.1
-		// Backward compatibility for mandatory
-		foreach ($form['questions'] as $index => $question) {
-			$form['questions'][$index]['mandatory'] = $question['isRequired'];
 		}
 
 		return new DataResponse($form);
@@ -266,12 +261,8 @@ class ApiController extends OCSController {
 
 		$this->formMapper->insert($form);
 
-		// Return like getForm(), just without loading Questions (as there are none).
-		$result = $form->read();
-		$result['questions'] = [];
-		$result['shares'] = [];
-
-		return new DataResponse($result);
+		// Return like getForm()
+		return $this->getForm($form->getId());
 	}
 
 	/**
@@ -484,10 +475,6 @@ class ApiController extends OCSController {
 		$response = $question->read();
 		$response['options'] = [];
 
-		// TODO remove after removal of API v1.1
-		// Backward compatibility for mandatory
-		$response['mandatory'] = $response['isRequired'];
-
 		return new DataResponse($response);
 	}
 
@@ -630,14 +617,6 @@ class ApiController extends OCSController {
 		if (key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
 			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
-		}
-
-		// TODO remove after removal of API v1.1
-		// Rename deprecated mandatory key to isRequired
-		if (key_exists('mandatory', $keyValuePairs)) {
-			$this->logger->info('Key \'mandatory\' is deprecated, please use \'isRequired\'.');
-			$keyValuePairs['isRequired'] = $keyValuePairs['mandatory'];
-			unset($keyValuePairs['mandatory']);
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -909,12 +888,6 @@ class ApiController extends OCSController {
 		// Load currently active questions
 		$questions = $this->formsService->getQuestions($form->getId());
 
-		// TODO remove after removal of API v1.1
-		// Backward compatibility for mandatory
-		foreach ($questions as $index => $question) {
-			$questions[$index]['mandatory'] = $question['isRequired'];
-		}
-		
 		$response = [
 			'submissions' => $submissions,
 			'questions' => $questions,

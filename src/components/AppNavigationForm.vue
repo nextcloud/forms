@@ -152,7 +152,7 @@ export default {
 			// All good, let's delete
 			this.loading = true
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v1.1/form/{id}', { id: this.form.id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v2/form/{id}', { id: this.form.id }))
 				this.$emit('delete', this.form.id)
 			} catch (error) {
 				showError(t('forms', 'Error while deleting {title}', { title: this.formTitle }))
