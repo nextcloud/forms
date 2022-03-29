@@ -27,6 +27,7 @@ namespace OCA\Forms\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\Types;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -42,8 +43,6 @@ class Version020300Date20210406114130 extends SimpleMigrationStep {
 		$this->connection = $connection;
 	}
 
-	private const TYPE_BOOLEAN = 'boolean';
-
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -57,7 +56,7 @@ class Version020300Date20210406114130 extends SimpleMigrationStep {
 		$table = $schema->getTable('forms_v2_questions');
 
 		if (!$table->hasColumn('is_required')) {
-			$table->addColumn('is_required', self::TYPE_BOOLEAN, [
+			$table->addColumn('is_required', Types::BOOLEAN, [
 				'notnull' => false,
 				'default' => 0,
 			]);
