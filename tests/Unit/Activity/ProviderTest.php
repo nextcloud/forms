@@ -39,7 +39,6 @@ use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
-use OCP\RichObjectStrings\InvalidObjectExeption;
 use OCP\RichObjectStrings\IValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
@@ -409,20 +408,16 @@ class ProviderTest extends TestCase {
 	/*
 	 * Basic ideal functionality tested already in testGetRichParams
 	 * Only testing special cases here
-	 * - Form not found and type invalid (is invalid for <NC21)
+	 * - Form not found
 	 */
 	public function testGetRichFormTitle() {
 		$this->formMapper->expects($this->any())
 			->method('findbyHash')
 			->with('abcdefg')
 			->will($this->throwException(new DoesNotExistException('Form not found')));
-		$this->validator->expects($this->any())
-			->method('validate')
-			->will($this->throwException(new InvalidObjectExeption()));
 
-		// Test Form not found and type invalid
 		$this->assertEquals([
-			'type' => 'highlight',
+			'type' => 'forms-form',
 			'id' => 'abcdefg',
 			'name' => 'Some Form Title',
 			'link' => 'http://localhost/apps/forms/'
