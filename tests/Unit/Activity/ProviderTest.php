@@ -77,6 +77,7 @@ class ProviderTest extends TestCase {
 	private $validator;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->eventMerger = $this->createMock(IEventMerger::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);

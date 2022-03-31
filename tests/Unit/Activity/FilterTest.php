@@ -43,6 +43,7 @@ class FilterTest extends TestCase {
 	private $urlGenerator;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->filter = new Filter('forms', $this->l10n, $this->urlGenerator);

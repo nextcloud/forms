@@ -38,6 +38,7 @@ class NewSubmissionTest extends TestCase {
 	private $newShare;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->newShare = new NewSubmission('forms', $this->l10n);
 	}

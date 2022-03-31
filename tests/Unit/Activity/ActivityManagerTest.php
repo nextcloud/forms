@@ -52,6 +52,7 @@ class ActivityManagerTest extends TestCase {
 	private $logger;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->manager = $this->createMock(IManager::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->logger = $this->createMock(ILogger::class);
