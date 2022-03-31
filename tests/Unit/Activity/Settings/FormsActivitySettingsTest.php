@@ -46,6 +46,7 @@ class FilterTest extends TestCase {
 	private $activitySettings;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->activitySettings = new SettingsTestClass('forms', $this->l10n);
 	}

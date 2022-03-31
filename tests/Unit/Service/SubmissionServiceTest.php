@@ -86,6 +86,7 @@ class SubmissionServiceTest extends TestCase {
 	private $userManager;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);

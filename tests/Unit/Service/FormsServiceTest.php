@@ -75,6 +75,7 @@ class FormsServiceTest extends TestCase {
 	private $userManager;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);

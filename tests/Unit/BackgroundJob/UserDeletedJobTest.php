@@ -44,6 +44,7 @@ class UserDeletedJobTest extends TestCase {
 	private $logger;
 
 	public function setUp(): void {
+		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$time = $this->createMock(ITimeFactory::class);
 		$this->logger = $this->createMock(ILogger::class);
