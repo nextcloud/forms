@@ -130,6 +130,7 @@ import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 
 import EmptyContent from '../components/EmptyContent'
 import Summary from '../components/Results/Summary'
@@ -225,9 +226,14 @@ export default {
 			try {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v1.1/submissions/{hash}', { hash: this.form.hash }))
 
+				let loadedSubmissions = OcsResponse2Data(response).submissions
+				const loadedQuestions = OcsResponse2Data(response).questions
+
+				loadedSubmissions = this.formatDateAnswers(loadedSubmissions, loadedQuestions)
+
 				// Append questions & submissions
-				this.$set(this.form, 'submissions', OcsResponse2Data(response).submissions)
-				this.$set(this.form, 'questions', OcsResponse2Data(response).questions)
+				this.$set(this.form, 'submissions', loadedSubmissions)
+				this.$set(this.form, 'questions', loadedQuestions)
 			} catch (error) {
 				console.error(error)
 				showError(t('forms', 'There was an error while loading the results'))
@@ -284,6 +290,60 @@ export default {
 			} finally {
 				this.loadingResults = false
 			}
+		},
+
+		/**
+		 * Calculating the format, that moment should use to localize the date/time
+		 *
+		 * @param {string} questionType string from question.type
+		 * @return {string}
+		 */
+		getMomentFormat(questionType) {
+			if (questionType === 'datetime') {
+				return 'LLL'
+			}
+			if (questionType === 'time') {
+				return 'LT'
+			}
+			return 'LL'
+		},
+
+		/**
+		 * Calculating the format, that moment should use for reading the values from the Database
+		 *
+		 * @param {string} questionType string from question.type
+		 * @return {string}
+		 */
+		getStorageFormat(questionType) {
+			if (questionType === 'datetime') {
+				return 'YYYY-MM-DD HH:mm'
+			}
+			if (questionType === 'time') {
+				return 'HH:mm'
+			}
+			return 'YYYY-MM-DD'
+		},
+
+		formatDateAnswers(submissions, questions) {
+			// Filter questions that are date/datetime/time
+			const dateQuestions = Object.fromEntries(
+				questions
+					.filter(question => question.type === 'date' | question.type === 'datetime' | question.type === 'time')
+					.map(question => [question.id, question.type])
+			)
+
+			// Go through submissions and reformat answers to date/time questions
+			submissions.forEach(submission => {
+				submission.answers.filter(answer => answer.questionId in dateQuestions)
+					.forEach(answer => {
+						const date = moment(answer.text, answerTypes[dateQuestions[answer.questionId]].storageFormat)
+						if (date.isValid()) {
+							answer.text = date.format(answerTypes[dateQuestions[answer.questionId]].momentFormat)
+						}
+					})
+			})
+
+			return submissions
 		},
 	},
 }
