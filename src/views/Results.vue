@@ -137,6 +137,7 @@ import Summary from '../components/Results/Summary'
 import Submission from '../components/Results/Submission'
 import TopBar from '../components/TopBar'
 import ViewsMixin from '../mixins/ViewsMixin'
+import answerTypes from '../models/AnswerTypes'
 import SetWindowTitle from '../utils/SetWindowTitle'
 import OcsResponse2Data from '../utils/OcsResponse2Data'
 
@@ -290,38 +291,6 @@ export default {
 			} finally {
 				this.loadingResults = false
 			}
-		},
-
-		/**
-		 * Calculating the format, that moment should use to localize the date/time
-		 *
-		 * @param {string} questionType string from question.type
-		 * @return {string}
-		 */
-		getMomentFormat(questionType) {
-			if (questionType === 'datetime') {
-				return 'LLL'
-			}
-			if (questionType === 'time') {
-				return 'LT'
-			}
-			return 'LL'
-		},
-
-		/**
-		 * Calculating the format, that moment should use for reading the values from the Database
-		 *
-		 * @param {string} questionType string from question.type
-		 * @return {string}
-		 */
-		getStorageFormat(questionType) {
-			if (questionType === 'datetime') {
-				return 'YYYY-MM-DD HH:mm'
-			}
-			if (questionType === 'time') {
-				return 'HH:mm'
-			}
-			return 'YYYY-MM-DD'
 		},
 
 		formatDateAnswers(submissions, questions) {

@@ -38,7 +38,7 @@
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
 				:show-second="false"
-				:type="datetimePickerType"
+				:type="answerType.pickerType"
 				:input-attr="inputAttr"
 				@change="onValueChange" />
 		</div>
@@ -71,52 +71,11 @@ export default {
 	},
 
 	computed: {
-		// Allow picking time or not, depending on variable in answerType.
-		datetimePickerType() {
-			if (this.answerType.includeTime) {
-				return 'datetime'
-			}
-			if (this.answerType.onlyTime) {
-				return 'time'
-			}
-			return 'date'
-		},
-
 		datetimePickerPlaceholder() {
 			if (this.readOnly) {
 				return this.answerType.submitPlaceholder
 			}
 			return this.answerType.createPlaceholder
-		},
-
-		/**
-		 * Calculating the format, that moment should use. With or without time.
-		 *
-		 * @return {string}
-		 */
-		getMomentFormat() {
-			if (this.datetimePickerType === 'datetime') {
-				return 'LLL'
-			}
-			if (this.datetimePickerType === 'time') {
-				return 'LT'
-			}
-			return 'LL'
-		},
-
-		/**
-		 * Calculating the format, that moment should use for storing the values to the Database
-		 *
-		 * @return {string}
-		 */
-		getStorageFormat() {
-			if (this.datetimePickerType === 'datetime') {
-				return 'YYYY-MM-DD HH:mm'
-			}
-			if (this.datetimePickerType === 'time') {
-				return 'HH:mm'
-			}
-			return 'YYYY-MM-DD'
 		},
 
 		/**
@@ -140,7 +99,7 @@ export default {
 		 * @return {string}
 		 */
 		stringify(date) {
-			return moment(date).format(this.getMomentFormat)
+			return moment(date).format(this.answerType.momentFormat)
 		},
 		/**
 		 * Reinterpret a stored date
@@ -149,7 +108,7 @@ export default {
 		 * @return {Date}
 		 */
 		parse(dateString) {
-			return moment(dateString, this.getStorageFormat).toDate()
+			return moment(dateString, this.answerType.storageFormat).toDate()
 		},
 
 		/**
@@ -158,7 +117,7 @@ export default {
 		 * @param {Date} date The date to store
 		 */
 		onValueChange(date) {
-			this.$emit('update:values', [moment(date).format(this.getStorageFormat)])
+			this.$emit('update:values', [moment(date).format(this.answerType.storageFormat)])
 		},
 	},
 }

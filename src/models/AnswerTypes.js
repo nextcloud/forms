@@ -127,6 +127,10 @@ export default {
 		createPlaceholder: t('forms', 'People can pick a date'),
 		submitPlaceholder: t('forms', 'Pick a date'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+
+		pickerType: 'date',
+		storageFormat: 'YYYY-MM-DD',
+		momentFormat: 'LL',
 	},
 
 	datetime: {
@@ -140,8 +144,9 @@ export default {
 		submitPlaceholder: t('forms', 'Pick a date and time'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 
-		// Using the same vue-component as date, this specifies that the component renders as datetime.
-		includeTime: true,
+		pickerType: 'datetime',
+		storageFormat: 'YYYY-MM-DD HH:mm',
+		momentFormat: 'LLL',
 	},
 
 	time: {
@@ -155,7 +160,8 @@ export default {
 		submitPlaceholder: t('forms', 'Pick a time'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 
-		// Using the same vue-component as date, this specifies that the component renders as time.
-		onlyTime: true,
+		pickerType: 'time',
+		storageFormat: 'HH:mm',
+		momentFormat: 'LT',
 	},
 }
