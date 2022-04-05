@@ -1,11 +1,10 @@
 <?php
 
 declare(strict_types=1);
-
 /**
- * @copyright Copyright (c) 2021 Christian Hartmann <chris-hartmann@gmx.de>
+ * @copyright Copyright (c) 2022 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
- * @author Christian Hartmann <chris-hartmann@gmx.de>
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license AGPL-3.0-or-later
  *
@@ -23,25 +22,17 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 namespace OCA\Forms\Migration;
 
 use Closure;
+use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
-use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
-class Version020300Date20210406114130 extends SimpleMigrationStep {
-	/** @var IDBConnection */
-	protected $connection;
-
-	/**
-	 * @param IDBConnection $connection
-	 */
-	public function __construct(IDBConnection $connection) {
-		$this->connection = $connection;
-	}
+class Version030000Date20220402100057 extends SimpleMigrationStep {
 
 	/**
 	 * @param IOutput $output
@@ -53,25 +44,22 @@ class Version020300Date20210406114130 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		$table = $schema->getTable('forms_v2_questions');
+		$update_necesssary = false;
 
-		if (!$table->hasColumn('is_required')) {
-			$table->addColumn('is_required', Types::BOOLEAN, [
-				'notnull' => false,
-				'default' => 0,
-			]);
-
-			return $schema;
+		// Change Type of Description from string to text. Necessary due to length restrictions.
+		$column = $schema->getTable('forms_v2_forms')->getColumn('description');
+		if ($column->getType() === Type::getType(Types::STRING)) {
+			$column->setType(Type::getType(Types::TEXT));
+			$update_necesssary = true;
 		}
-		
-		return null;
-	}
 
-	public function postSchemaChange(IOutput $output, \Closure $schemaClosure, array $options) {
-		$qb_update = $this->connection->getQueryBuilder();
+		// Change Type of Answer-Text from string to text. Necessary due to length restrictions.
+		$column = $schema->getTable('forms_v2_answers')->getColumn('text');
+		if ($column->getType() === Type::getType(Types::STRING)) {
+			$column->setType(Type::getType(Types::TEXT));
+			$update_necesssary = true;
+		}
 
-		$qb_update->update('forms_v2_questions')
-			->set('is_required', 'mandatory');
-		$qb_update->execute();
+		return $update_necesssary ? $schema : null;
 	}
 }

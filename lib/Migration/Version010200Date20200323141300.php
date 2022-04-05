@@ -26,6 +26,7 @@ namespace OCA\Forms\Migration;
 
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\DB\Types;
 use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\Migration\SimpleMigrationStep;
@@ -54,10 +55,8 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 		'dropdown' => 'multiple_unique'
 	];
 
-	private const TYPE_BOOLEAN = 'boolean';
-	private const TYPE_INTEGER = 'integer';
+	// Adding Type_json, that is recommended in DBAL
 	private const TYPE_JSON = 'json';
-	private const TYPE_STRING = 'string';
 
 	/**
 	 * @param IDBConnection $connection
@@ -81,43 +80,43 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 		if (!$schema->hasTable('forms_v2_forms')) {
 			$table = $schema->createTable('forms_v2_forms');
-			$table->addColumn('id', self::TYPE_INTEGER, [
+			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,
 			]);
-			$table->addColumn('hash', self::TYPE_STRING, [
+			$table->addColumn('hash', Types::STRING, [
 				'notnull' => true,
 				'length' => 64,
 			]);
-			$table->addColumn('title', self::TYPE_STRING, [
+			$table->addColumn('title', Types::STRING, [
 				'notnull' => true,
 				'length' => 256,
 			]);
-			$table->addColumn('description', self::TYPE_STRING, [
+			$table->addColumn('description', Types::STRING, [
 				'notnull' => false,
 				'length' => 8192,
 			]);
-			$table->addColumn('owner_id', self::TYPE_STRING, [
+			$table->addColumn('owner_id', Types::STRING, [
 				'notnull' => true,
 				'length' => 64,
 			]);
 			$table->addColumn('access_json', self::TYPE_JSON, [
 				'notnull' => false,
 			]);
-			$table->addColumn('created', self::TYPE_INTEGER, [
+			$table->addColumn('created', Types::INTEGER, [
 				'notnull' => false,
 				'comment' => 'unix-timestamp',
 			]);
-			$table->addColumn('expires', self::TYPE_INTEGER, [
+			$table->addColumn('expires', Types::INTEGER, [
 				'notnull' => false,
 				'default' => 0,
 				'comment' => 'unix-timestamp',
 			]);
-			$table->addColumn('is_anonymous', self::TYPE_BOOLEAN, [
+			$table->addColumn('is_anonymous', Types::BOOLEAN, [
 				'notnull' => false,
 				'default' => 0,
 			]);
-			$table->addColumn('submit_once', self::TYPE_BOOLEAN, [
+			$table->addColumn('submit_once', Types::BOOLEAN, [
 				'notnull' => false,
 				'default' => 0,
 			]);
@@ -127,26 +126,26 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 		if (!$schema->hasTable('forms_v2_questions')) {
 			$table = $schema->createTable('forms_v2_questions');
-			$table->addColumn('id', self::TYPE_INTEGER, [
+			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,
 			]);
-			$table->addColumn('form_id', self::TYPE_INTEGER, [
+			$table->addColumn('form_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
-			$table->addColumn('order', self::TYPE_INTEGER, [
+			$table->addColumn('order', Types::INTEGER, [
 				'notnull' => true,
 				'default' => 1,
 			]);
-			$table->addColumn('type', self::TYPE_STRING, [
+			$table->addColumn('type', Types::STRING, [
 				'notnull' => true,
 				'length' => 256,
 			]);
-			$table->addColumn('mandatory', self::TYPE_BOOLEAN, [
+			$table->addColumn('mandatory', Types::BOOLEAN, [
 				'notnull' => false,
 				'default' => 0,
 			]);
-			$table->addColumn('text', self::TYPE_STRING, [
+			$table->addColumn('text', Types::STRING, [
 				'notnull' => true,
 				'length' => 2048,
 			]);
@@ -155,14 +154,14 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 		if (!$schema->hasTable('forms_v2_options')) {
 			$table = $schema->createTable('forms_v2_options');
-			$table->addColumn('id', self::TYPE_INTEGER, [
+			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,
 			]);
-			$table->addColumn('question_id', self::TYPE_INTEGER, [
+			$table->addColumn('question_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
-			$table->addColumn('text', self::TYPE_STRING, [
+			$table->addColumn('text', Types::STRING, [
 				'notnull' => true,
 				'length' => 1024,
 			]);
@@ -171,18 +170,18 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 		if (!$schema->hasTable('forms_v2_submissions')) {
 			$table = $schema->createTable('forms_v2_submissions');
-			$table->addColumn('id', self::TYPE_INTEGER, [
+			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,
 			]);
-			$table->addColumn('form_id', self::TYPE_INTEGER, [
+			$table->addColumn('form_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
-			$table->addColumn('user_id', self::TYPE_STRING, [
+			$table->addColumn('user_id', Types::STRING, [
 				'notnull' => true,
 				'length' => 64,
 			]);
-			$table->addColumn('timestamp', self::TYPE_INTEGER, [
+			$table->addColumn('timestamp', Types::INTEGER, [
 				'notnull' => false,
 				'comment' => 'unix-timestamp',
 			]);
@@ -191,17 +190,17 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 		if (!$schema->hasTable('forms_v2_answers')) {
 			$table = $schema->createTable('forms_v2_answers');
-			$table->addColumn('id', self::TYPE_INTEGER, [
+			$table->addColumn('id', Types::INTEGER, [
 				'autoincrement' => true,
 				'notnull' => true,
 			]);
-			$table->addColumn('submission_id', self::TYPE_INTEGER, [
+			$table->addColumn('submission_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
-			$table->addColumn('question_id', self::TYPE_INTEGER, [
+			$table->addColumn('question_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
-			$table->addColumn('text', self::TYPE_STRING, [
+			$table->addColumn('text', Types::STRING, [
 				'notnull' => true,
 				'length' => 4096,
 			]);
