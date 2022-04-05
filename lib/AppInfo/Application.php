@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace OCA\Forms\AppInfo;
 
+use OCA\Forms\Capabilities;
 use OCA\Forms\Listener\UserDeletedListener;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -54,6 +55,7 @@ class Application extends App implements IBootstrap {
 		// Register composer autoloader
 		include_once __DIR__ . '/../../vendor/autoload.php';
 
+		$context->registerCapability(Capabilities::class);
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
 	}
 
