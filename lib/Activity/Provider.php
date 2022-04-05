@@ -36,7 +36,6 @@ use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
-use OCP\RichObjectStrings\InvalidObjectExeption;
 use OCP\RichObjectStrings\IValidator;
 
 class Provider implements IProvider {
@@ -269,15 +268,6 @@ class Provider implements IProvider {
 			'name' => $formTitle,
 			'link' => $formLink
 		];
-
-		// TODO Remove validation as soon as NC21 is out of support.
-		try {
-			// Validating a dummy-subject, which uses the richFormTitle.
-			$this->validator->validate('{form}', ['form' => $richFormTitle]);
-		} catch (InvalidObjectExeption $e) {
-			// In case this did not work (type does not exist for <NC21.0.1), fall back to type highlight
-			$richFormTitle['type'] = 'highlight';
-		}
 
 		return $richFormTitle;
 	}

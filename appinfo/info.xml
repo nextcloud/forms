@@ -1,52 +1,52 @@
 ﻿<?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <id>forms</id>
-    <name>Forms</name>
-    <summary>📝 Simple surveys and questionnaires, self-hosted</summary>
-    <description><![CDATA[**Simple surveys and questionnaires, self-hosted!**
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>forms</id>
+	<name>Forms</name>
+	<summary>📝 Simple surveys and questionnaires, self-hosted</summary>
+	<description><![CDATA[**Simple surveys and questionnaires, self-hosted!**
 
 - **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
 - **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.
 - **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
-    ]]></description>
-    <version>2.4.0</version>
-    <licence>agpl</licence>
+	]]></description>
+	<version>2.4.0</version>
+	<licence>agpl</licence>
 
-    <author>Affan Hussain</author>
-    <author>Ajfar Huq</author>
-    <author>Inigo Jiron</author>
-    <author>Jan C. Borchardt</author>
-    <author>John Molakvoæ</author>
-    <author>Jonas Rittershofer</author>
-    <author>Kai Schröer</author>
-    <author>Kameron Sheppard</author>
-    <author>Natalie Gilbert</author>
-    <author>Nick Gallo</author>
-    <author>René Gieling</author>
-    <author>Stephan Link</author>
-    <author>Tim Sattizahn</author>
-    <author>Vinzenz Rosenkranz</author>
+	<author>Affan Hussain</author>
+	<author>Ajfar Huq</author>
+	<author>Inigo Jiron</author>
+	<author>Jan C. Borchardt</author>
+	<author>John Molakvoæ</author>
+	<author>Jonas Rittershofer</author>
+	<author>Kai Schröer</author>
+	<author>Kameron Sheppard</author>
+	<author>Natalie Gilbert</author>
+	<author>Nick Gallo</author>
+	<author>René Gieling</author>
+	<author>Stephan Link</author>
+	<author>Tim Sattizahn</author>
+	<author>Vinzenz Rosenkranz</author>
 
-    <category>tools</category>
-    <category>social</category>
-    <category>organization</category>
+	<category>tools</category>
+	<category>social</category>
+	<category>organization</category>
 
-    <website>https://github.com/nextcloud/forms</website>
-    <bugs>https://github.com/nextcloud/forms/issues</bugs>
-    <repository type="git">https://github.com/nextcloud/forms</repository>
-    <documentation>
-        <admin>https://github.com/nextcloud/forms/blob/master/README.md</admin>
-    </documentation>
+	<website>https://github.com/nextcloud/forms</website>
+	<bugs>https://github.com/nextcloud/forms/issues</bugs>
+	<repository type="git">https://github.com/nextcloud/forms</repository>
+	<documentation>
+		<admin>https://github.com/nextcloud/forms/blob/master/README.md</admin>
+	</documentation>
 
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms1.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms2.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms1.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms2.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
 
-    <dependencies>
-        <nextcloud min-version="20" max-version="24" />
-    </dependencies>
+	<dependencies>
+		<nextcloud min-version="22" max-version="24" />
+	</dependencies>
 
 	<navigations>
 		<navigation>
