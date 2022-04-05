@@ -4,7 +4,7 @@
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"platform": {
-			"php": "7.2"
+			"php": "7.3"
 		}
 	},
 	"scripts": {
@@ -15,11 +15,11 @@
 		"test:integration": "phpunit -c tests/phpunit.integration.xml"
 	},
 	"require-dev": {
-        "christophwurst/nextcloud": "^20.0",
-		"nextcloud/coding-standard": "^0.5.0",
-		"phpunit/phpunit": "^8"
+		"christophwurst/nextcloud": "^22.0",
+		"nextcloud/coding-standard": "^1",
+		"phpunit/phpunit": "^9"
 	},
 	"require": {
-		"league/csv": "^9.5"
+		"league/csv": "^9.7.3"
 	}
 }

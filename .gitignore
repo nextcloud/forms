@@ -28,8 +28,9 @@ js/
 v8-compile-cache-0/
 
 # php-cs cache
-.php_cs.cache
+.php-cs-fixer.cache
 
 # phpunit results
 .phpunit.result.cache
 clover.unit.xml
+clover.integration.xml

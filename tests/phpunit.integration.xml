@@ -1,7 +1,19 @@
-<phpunit bootstrap="./bootstrap.php" colors="true">
-    <testsuites>
-        <testsuite name="integration">
-            <directory>./Integration</directory>
-        </testsuite>
-    </testsuites>
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit bootstrap="./bootstrap.php"
+		 verbose="true"
+		 colors="true">
+	<testsuite name="Forms integration tests">
+		<!-- Disabling the tests until they exist. Error otherwise.-->
+		<!-- <directory>./Integration</directory> -->
+	</testsuite>
+	<coverage>
+		<!-- filters for code coverage -->
+		<include>
+			<directory suffix=".php">../lib</directory>
+		</include>
+		<report>
+			<!-- and this is where your report will be written -->
+			<clover outputFile="./clover.integration.xml"/>
+		</report>
+	</coverage>
 </phpunit>
