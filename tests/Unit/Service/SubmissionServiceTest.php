@@ -531,6 +531,18 @@ class SubmissionServiceTest extends TestCase {
 				// Expected Result
 				false
 			],
+			'invalid-date-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'isRequired' => false]
+				],
+				// Answers
+				[
+					'1' => ['31.12.2022']
+				],
+				// Expected Result
+				false
+			],
 			'full-good-submission' => [
 				// Questions
 				[
@@ -550,16 +562,18 @@ class SubmissionServiceTest extends TestCase {
 						['id' => 5],
 						['id' => 6]
 					]],
+					['id' => 8, 'type' => 'time', 'isRequired' => false],
 				],
 				// Answers
 				[
 					'1' => ['answer'],
 					'2' => ['answerABitLonger'],
-					'3' => ['28. April 2021'],
-					'4' => ['20. April 2021 04:40'],
+					'3' => ['2021-04-28'],
+					'4' => ['2021-04-30 04:40'],
 					'5' => [1,2],
 					'6' => [4],
 					'7' => [5],
+					'8' => ['17:45']
 				],
 				// Expected Result
 				true
