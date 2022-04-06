@@ -3,8 +3,12 @@
 	"config": {
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
+		"sort-packages": true,
 		"platform": {
 			"php": "7.3"
+		},
+		"allow-plugins": {
+			"bamarni/composer-bin-plugin": true
 		}
 	},
 	"scripts": {
@@ -15,11 +19,16 @@
 		"test:integration": "phpunit -c tests/phpunit.integration.xml"
 	},
 	"require-dev": {
+		"bamarni/composer-bin-plugin": "^1.5",
 		"christophwurst/nextcloud": "^22.0",
-		"nextcloud/coding-standard": "^1",
 		"phpunit/phpunit": "^9"
 	},
 	"require": {
 		"league/csv": "^9.7.3"
+	},
+	"extra": {
+		"bamarni-bin": {
+			"forward-command": true
+		}
 	}
 }
