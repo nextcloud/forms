@@ -40,4 +40,10 @@ class Constants {
 
 	// AnswerTypes, that need/have predefined Options
 	public const ANSWER_PREDEFINED = [self::ANSWER_TYPE_MULTIPLE, self::ANSWER_TYPE_MULTIPLEUNIQUE, self::ANSWER_TYPE_DROPDOWN];
+
+	// AnswerTypes for date/time questions
+	public const ANSWER_DATETIME = [self::ANSWER_TYPE_DATE, self::ANSWER_TYPE_DATETIME, self::ANSWER_TYPE_TIME];
+
+	// Formats for AnswerTypes date/datetime/time
+	public const ANSWER_PHPDATETIME_FORMAT = [self::ANSWER_TYPE_DATE => 'Y-m-d', self::ANSWER_TYPE_DATETIME => 'Y-m-d H:i', self::ANSWER_TYPE_TIME => 'H:i'];
 }

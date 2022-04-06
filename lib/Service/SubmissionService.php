@@ -25,6 +25,7 @@
 namespace OCA\Forms\Service;
 
 use DateTimeZone;
+use DateTime;
 
 use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
@@ -261,10 +262,18 @@ class SubmissionService {
 			}
 
 			// Perform further checks only for answered questions
-			// TODO Check if date questions have valid answers
 			if ($questionAnswered) {
 				// Check if non multiple questions have not more than one answer
 				if ($question['type'] !== Constants::ANSWER_TYPE_MULTIPLE && count($answers[$questionId]) > 1) {
+					return false;
+				}
+
+				/*
+				 * Check if date questions have valid answers
+				 * $answers[$questionId][0] -> date/time questions can only have one answer
+				 */
+				if (in_array($question['type'], Constants::ANSWER_DATETIME) &&
+					!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
 					return false;
 				}
 	
@@ -290,5 +299,16 @@ class SubmissionService {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate correct date/time formats
+	 * @param string $dateStr String with date from answer
+	 * @param string $format String with the format to validate
+	 * @return boolean If the submitted date/time is valid
+	 */
+	private function validateDateTime(string $dateStr, string $format) {
+		$d = DateTime::createFromFormat($format, $dateStr);
+		return $d && $d->format($format) === $dateStr;
 	}
 }
