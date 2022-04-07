@@ -166,7 +166,7 @@ With help from many libraries and frameworks including:
 		} else {
 			$source = "<?php" . PHP_EOL . $license . PHP_EOL . $source;
 		}
-		file_put_contents($path,$source);
+		file_put_contents($path, $source);
 		echo "License updated: $path" . PHP_EOL;
 	}
 

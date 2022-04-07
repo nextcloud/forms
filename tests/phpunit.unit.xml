@@ -1,21 +1,21 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <phpunit bootstrap="./bootstrap.php"
-         verbose="true"
-         colors="true"
-         timeoutForSmallTests="900"
-         timeoutForMediumTests="900"
-         timeoutForLargeTests="900">
-	<testsuite name='Forms app tests'>
+		 verbose="true"
+		 colors="true"
+		 timeoutForSmallTests="900"
+		 timeoutForMediumTests="900"
+		 timeoutForLargeTests="900">
+	<testsuite name="Forms app tests">
 		<directory>./Unit</directory>
 	</testsuite>
-	<!-- filters for code coverage -->
-	<filter>
-		<whitelist>
+	<coverage>
+		<!-- filters for code coverage -->
+		<include>
 			<directory suffix=".php">../lib</directory>
-		</whitelist>
-	</filter>
-	<logging>
-		<!-- and this is where your report will be written -->
-		<log type="coverage-clover" target="./clover.unit.xml"/>
-	</logging>
+		</include>
+		<report>
+			<!-- and this is where your report will be written -->
+			<clover outputFile="./clover.unit.xml"/>
+		</report>
+	</coverage>
 </phpunit>

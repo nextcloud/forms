@@ -48,7 +48,9 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        run: composer i
+        # Needs to run twice currently, to install cs-bin-dependency
+        # https://github.com/bamarni/composer-bin-plugin/issues/72
+        run: composer i && composer i
 
       - name: Run coding standards check
         run: composer run cs:check || ( echo 'Please run `composer run cs:fix` to format your code' && exit 1 )

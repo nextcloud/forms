@@ -1,6 +1,7 @@
 .DS_Store
 node_modules/
 vendor/
+/vendor-bin/*/vendor
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -28,8 +29,9 @@ js/
 v8-compile-cache-0/
 
 # php-cs cache
-.php_cs.cache
+.php-cs-fixer.cache
 
 # phpunit results
 .phpunit.result.cache
 clover.unit.xml
+clover.integration.xml
