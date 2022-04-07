@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <phpunit bootstrap="./bootstrap.php"
-		 verbose="true"
-		 colors="true">
+		 colors="true"
+		 convertDeprecationsToExceptions="true"
+		 verbose="true">
 	<testsuite name="Forms integration tests">
 		<!-- Disabling the tests until they exist. Error otherwise.-->
 		<!-- <directory>./Integration</directory> -->
