@@ -1,13 +1,49 @@
 # Changelog
 
+## [v2.5.0](https://github.com/nextcloud/forms/tree/v2.5.0) (2022-04-08)
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.4.0...v2.5.0)
+
+### Enhancements
+
+- Include Capabilities Response [\#1158](https://github.com/nextcloud/forms/pull/1158) ([jotoeri](https://github.com/jotoeri))
+
+### Fixed
+
+- Rollback Capabilities
+  [\#1162](https://github.com/nextcloud/forms/pull/1162) ([jotoeri](https://github.com/jotoeri))
+- Update master php testing versions
+  [\#1161](https://github.com/nextcloud/forms/pull/1161) ([nickvergessen](https://github.com/nickvergessen))
+- Update master php testing versions
+  [\#1157](https://github.com/nextcloud/forms/pull/1157) ([nickvergessen](https://github.com/nickvergessen))
+- Fix tests
+  [\#1151](https://github.com/nextcloud/forms/pull/1151) ([jotoeri](https://github.com/jotoeri))
+- Minversion 22
+  [\#1150](https://github.com/nextcloud/forms/pull/1150) ([jotoeri](https://github.com/jotoeri))
+- Move to NC-Internal Db-Types
+  [\#1149](https://github.com/nextcloud/forms/pull/1149) ([jotoeri](https://github.com/jotoeri))
+- Replace deprecated String.prototype.substr\(\)
+  [\#1141](https://github.com/nextcloud/forms/pull/1141) ([CommanderRoot](https://github.com/CommanderRoot))
+- Improve Question Text
+  [\#1127](https://github.com/nextcloud/forms/pull/1127) ([jotoeri](https://github.com/jotoeri))
+- Fix Linting Warnings
+  [\#1082](https://github.com/nextcloud/forms/pull/1082) ([jotoeri](https://github.com/jotoeri))
+- Update version on master
+  [\#1071](https://github.com/nextcloud/forms/pull/1071) ([nickvergessen](https://github.com/nickvergessen))
+- Update master target versions
+  [\#1070](https://github.com/nextcloud/forms/pull/1070) ([nickvergessen](https://github.com/nickvergessen))
+
 ## [v2.4.0](https://github.com/nextcloud/forms/tree/v2.4.0) (2021-11-10)
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.3.0...v2.4.0)
 
-**Merged pull requests:**
 
-- 2.4.0 [\#1068](https://github.com/nextcloud/forms/pull/1068) ([skjnldsv](https://github.com/skjnldsv))
-- Enable HMR [\#1024](https://github.com/nextcloud/forms/pull/1024) ([jotoeri](https://github.com/jotoeri))
+### Enhancements
+
+- 2.4.0
+  [\#1068](https://github.com/nextcloud/forms/pull/1068) ([skjnldsv](https://github.com/skjnldsv))
+- Enable HMR
+  [\#1024](https://github.com/nextcloud/forms/pull/1024) ([jotoeri](https://github.com/jotoeri))
 
 ## v2.3.0 - 2021-07-28
 
