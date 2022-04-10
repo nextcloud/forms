@@ -20,7 +20,7 @@
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.5",
-		"christophwurst/nextcloud": "^22.0",
+		"christophwurst/nextcloud": "^23.0",
 		"phpunit/phpunit": "^9"
 	},
 	"require": {
