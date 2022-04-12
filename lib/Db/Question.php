@@ -50,17 +50,6 @@ class Question extends Entity {
 	protected $isRequired;
 	protected $text;
 
-	public const TYPES = [
-		'short',
-		'long',
-		'multiple',
-		'multiple_unique',
-		'dropdown',
-		'date',
-		'datetime',
-		'time',
-	];
-
 	public function __construct() {
 		$this->addType('formId', 'integer');
 		$this->addType('order', 'integer');
