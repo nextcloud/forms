@@ -454,7 +454,7 @@ class ApiController extends OCSController {
 			'text' => $text,
 		]);
 
-		if (array_search($type, Question::TYPES) === false) {
+		if (array_search($type, Constants::ANSWER_TYPES) === false) {
 			$this->logger->debug('Invalid type');
 			throw new OCSBadRequestException('Invalid type');
 		}
@@ -1013,7 +1013,7 @@ class ApiController extends OCSController {
 
 			foreach ($answerArray as $answer) {
 				// Are we using answer ids as values
-				if (in_array($question['type'], Constants::ANSWER_PREDEFINED)) {
+				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 					// Search corresponding option, skip processing if not found
 					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 					if ($optionIndex === false) {

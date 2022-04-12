@@ -272,13 +272,13 @@ class SubmissionService {
 				 * Check if date questions have valid answers
 				 * $answers[$questionId][0] -> date/time questions can only have one answer
 				 */
-				if (in_array($question['type'], Constants::ANSWER_DATETIME) &&
+				if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME) &&
 					!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
 					return false;
 				}
 	
 				// Check if all answers are within the possible options
-				if (in_array($question['type'], Constants::ANSWER_PREDEFINED)) {
+				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 					foreach ($answers[$questionId] as $answer) {
 						// Search corresponding option, return false if non-existent
 						if (array_search($answer, array_column($question['options'], 'id')) === false) {

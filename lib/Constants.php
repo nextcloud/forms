@@ -38,12 +38,36 @@ class Constants {
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_TIME = 'time';
 
+	// All AnswerTypes
+	public const ANSWER_TYPES = [
+		self::ANSWER_TYPE_MULTIPLE,
+		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_DROPDOWN,
+		self::ANSWER_TYPE_SHORT,
+		self::ANSWER_TYPE_LONG,
+		self::ANSWER_TYPE_DATE,
+		self::ANSWER_TYPE_DATETIME,
+		self::ANSWER_TYPE_TIME
+	];
+
 	// AnswerTypes, that need/have predefined Options
-	public const ANSWER_PREDEFINED = [self::ANSWER_TYPE_MULTIPLE, self::ANSWER_TYPE_MULTIPLEUNIQUE, self::ANSWER_TYPE_DROPDOWN];
+	public const ANSWER_TYPES_PREDEFINED = [
+		self::ANSWER_TYPE_MULTIPLE,
+		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_DROPDOWN
+	];
 
 	// AnswerTypes for date/time questions
-	public const ANSWER_DATETIME = [self::ANSWER_TYPE_DATE, self::ANSWER_TYPE_DATETIME, self::ANSWER_TYPE_TIME];
+	public const ANSWER_TYPES_DATETIME = [
+		self::ANSWER_TYPE_DATE,
+		self::ANSWER_TYPE_DATETIME,
+		self::ANSWER_TYPE_TIME
+	];
 
 	// Formats for AnswerTypes date/datetime/time
-	public const ANSWER_PHPDATETIME_FORMAT = [self::ANSWER_TYPE_DATE => 'Y-m-d', self::ANSWER_TYPE_DATETIME => 'Y-m-d H:i', self::ANSWER_TYPE_TIME => 'H:i'];
+	public const ANSWER_PHPDATETIME_FORMAT = [
+		self::ANSWER_TYPE_DATE => 'Y-m-d',
+		self::ANSWER_TYPE_DATETIME => 'Y-m-d H:i',
+		self::ANSWER_TYPE_TIME => 'H:i'
+	];
 }
