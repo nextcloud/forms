@@ -172,4 +172,5 @@ Currently supported Question-Types are:
 | `short`         | A short text answer. Single text line |
 | `long`          | A long text answer. Multi-line supported |
 | `date`          | Showing a dropdown calendar to select a date. |
-| `datetime`      | Showing a dropdown calendar to select a date **and** a time. |
+| _`datetime`_      | _deprecated: No longer available for new questions. Showing a dropdown calendar to select a date **and** a time._ |
+| `time`          | Showing a dropdown menu to select a time. |

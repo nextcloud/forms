@@ -459,6 +459,12 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid type');
 		}
 
+		// Block creation of datetime questions
+		if ($type === 'datetime') {
+			$this->logger->debug('Datetime question type no longer supported');
+			throw new OCSBadRequestException('Datetime question type no longer supported');
+		}
+
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {

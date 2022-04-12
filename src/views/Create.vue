@@ -108,7 +108,7 @@
 					:menu-title="t('forms', 'Add a question')"
 					:primary="true"
 					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-primary'">
-					<ActionButton v-for="(answer, type) in answerTypes"
+					<ActionButton v-for="(answer, type) in answerTypesFilter"
 						:key="answer.label"
 						:close-after-click="true"
 						:disabled="isLoadingQuestions"
@@ -222,6 +222,13 @@ export default {
 			}
 
 			return message
+		},
+
+		// Remove properties from answerTypes for create button
+		answerTypesFilter() {
+			// Extract property datetime from answerTypes and copy rest to filteredAnswerTypes
+			const { datetime, ...filteredAnswerTypes } = answerTypes
+			return filteredAnswerTypes
 		},
 	},
 

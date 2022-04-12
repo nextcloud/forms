@@ -34,12 +34,11 @@
 		@delete="onDelete">
 		<div class="question__content">
 			<DatetimePicker v-model="time"
-				value-type="format"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
 				:show-second="false"
-				:type="datetimePickerType"
+				:type="answerType.pickerType"
 				:input-attr="inputAttr"
 				@change="onValueChange" />
 		</div>
@@ -72,28 +71,11 @@ export default {
 	},
 
 	computed: {
-		// Allow picking time or not, depending on variable in answerType.
-		datetimePickerType() {
-			return this.answerType.includeTime ? 'datetime' : 'date'
-		},
-
 		datetimePickerPlaceholder() {
 			if (this.readOnly) {
 				return this.answerType.submitPlaceholder
 			}
 			return this.answerType.createPlaceholder
-		},
-
-		/**
-		 * Calculating the format, that moment should use. With or without time.
-		 *
-		 * @return {string}
-		 */
-		getMomentFormat() {
-			if (this.datetimePickerType === 'datetime') {
-				return 'LLL'
-			}
-			return 'LL'
 		},
 
 		/**
@@ -110,32 +92,32 @@ export default {
 
 	methods: {
 		/**
-		 * DateTimepicker show date-text
+		 * DateTimepicker show text in picker
 		 * Format depends on component-type date/datetime
 		 *
 		 * @param {Date} date the selected datepicker Date
 		 * @return {string}
 		 */
 		stringify(date) {
-			return moment(date).format(this.getMomentFormat)
+			return moment(date).format(this.answerType.momentFormat)
 		},
 		/**
-		 * Reinterpret the stringified date
+		 * Reinterpret a stored date
 		 *
 		 * @param {string} dateString Stringified date
 		 * @return {Date}
 		 */
 		parse(dateString) {
-			return moment(dateString, this.getMomentFormat).toDate()
+			return moment(dateString, this.answerType.storageFormat).toDate()
 		},
 
 		/**
 		 * Store Value
 		 *
-		 * @param {string} dateString The parsed string to store
+		 * @param {Date} date The date to store
 		 */
-		onValueChange(dateString) {
-			this.$emit('update:values', [dateString])
+		onValueChange(date) {
+			this.$emit('update:values', [moment(date).format(this.answerType.storageFormat)])
 		},
 	},
 }
