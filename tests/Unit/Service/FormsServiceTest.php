@@ -131,7 +131,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'description' => 'Description Text',
-				'ownerId' => 'someUser',
+				'ownerId' => 'currentUser',
 				'created' => 123456789,
 				'access' => [
 					'permitAllUsers' => false,
@@ -141,6 +141,7 @@ class FormsServiceTest extends TestCase {
 				'isAnonymous' => false,
 				'submitMultiple' => true,
 				'canSubmit' => true,
+				'submissionCount' => 123,
 				'questions' => [
 					[
 						'id' => 1,
@@ -179,11 +180,13 @@ class FormsServiceTest extends TestCase {
 						'id' => 1,
 						'formId' => 42,
 						'shareType' => 0,
-						'shareWith' => 'currentUser',
-						'displayName' => 'Current User'
+						'shareWith' => 'someUser',
+						'displayName' => 'Some User'
 					]
 				],
 				'permissions' => [
+					'edit',
+					'results',
 					'submit'
 				]
 			]]
@@ -202,7 +205,7 @@ class FormsServiceTest extends TestCase {
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
 		$form->setDescription('Description Text');
-		$form->setOwnerId('someUser');
+		$form->setOwnerId('currentUser');
 		$form->setCreated(123456789);
 		$form->setAccess([
 			'permitAllUsers' => false,
@@ -221,10 +224,10 @@ class FormsServiceTest extends TestCase {
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())
 			->method('getDisplayName')
-			->willReturn('Current User');
+			->willReturn('Some User');
 		$this->userManager->expects($this->once())
 			->method('get')
-			->with('currentUser')
+			->with('someUser')
 			->willReturn($user);
 
 		// Questions
@@ -267,12 +270,17 @@ class FormsServiceTest extends TestCase {
 		$share->setId(1);
 		$share->setFormId(42);
 		$share->setShareType(0);
-		$share->setShareWith('currentUser');
+		$share->setShareWith('someUser');
 
-		$this->shareMapper->expects($this->exactly(3))
+		$this->shareMapper->expects($this->any())
 			->method('findByForm')
 			->with(42)
 			->willReturn([$share]);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(42)
+			->willReturn(123);
 
 		// Run the test
 		$this->assertEquals($expected, $this->formsService->getForm(42));
@@ -286,6 +294,7 @@ class FormsServiceTest extends TestCase {
 				'title' => 'Form 1',
 				'expires' => 0,
 				'permissions' => ['edit', 'results', 'submit'],
+				'submissionCount' => 123,
 				'partial' => true
 			]]
 		];
@@ -307,6 +316,11 @@ class FormsServiceTest extends TestCase {
 			->method('findById')
 			->with(42)
 			->willReturn($form);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(42)
+			->willReturn(123);
 
 		// Run the test
 		$this->assertEquals($expected, $this->formsService->getPartialFormArray(42));

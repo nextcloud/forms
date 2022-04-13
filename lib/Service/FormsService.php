@@ -187,6 +187,11 @@ class FormsService {
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
 		$result['canSubmit'] = $this->canSubmit($form->getId());
 
+		// Append submissionCount if currentUser is owner
+		if ($this->currentUser && $form->getOwnerId() === $this->currentUser->getUID()) {
+			$result['submissionCount'] = $this->submissionMapper->countSubmissions($id);
+		}
+
 		return $result;
 	}
 
@@ -200,7 +205,7 @@ class FormsService {
 	public function getPartialFormArray(int $id): array {
 		$form = $this->formMapper->findById($id);
 
-		return [
+		$result = [
 			'id' => $form->getId(),
 			'hash' => $form->getHash(),
 			'title' => $form->getTitle(),
@@ -208,6 +213,13 @@ class FormsService {
 			'permissions' => $this->getPermissions($form->getId()),
 			'partial' => true
 		];
+
+		// Append submissionCount if currentUser is owner
+		if ($this->currentUser && $form->getOwnerId() === $this->currentUser->getUID()) {
+			$result['submissionCount'] = $this->submissionMapper->countSubmissions($id);
+		}
+
+		return $result;
 	}
 
 	/**

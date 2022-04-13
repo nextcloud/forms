@@ -107,6 +107,23 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
+	 * @throws DBException
+	 */
+	public function countSubmissions(int $formId): int {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select($qb->func()->count('*', 'num_submissions'))
+			->from($this->getTableName())
+			->where($qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)));
+
+		$result = $qb->executeQuery();
+		$row = $result->fetch();
+		$result->closeCursor();
+
+		return (int) ($row['num_submissions' ?? 0]);
+	}
+
+	/**
 	 * Delete the Submission, including answers.
 	 * @param int $id of the submission to delete
 	 */
