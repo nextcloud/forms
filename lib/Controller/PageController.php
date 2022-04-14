@@ -97,6 +97,7 @@ class PageController extends Controller {
 		'formTitle' => 256,
 		'formDescription' => 8192,
 		'questionText' => 2048,
+		'questionDescription' => 4096,
 		'optionText' => 1024,
 		'answerText' => 4096,
 	];

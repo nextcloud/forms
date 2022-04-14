@@ -147,6 +147,7 @@ class FormsServiceTest extends TestCase {
 						'type' => 'dropdown',
 						'isRequired' => false,
 						'text' => 'Question 1',
+						'description' => 'This is our first question.',
 						'options' => [
 							[
 								'id' => 1,
@@ -167,6 +168,7 @@ class FormsServiceTest extends TestCase {
 						'type' => 'short',
 						'isRequired' => true,
 						'text' => 'Question 2',
+						'description' => '',
 						'options' => []
 					]
 				]
@@ -228,6 +230,7 @@ class FormsServiceTest extends TestCase {
 		$question1->setType('dropdown');
 		$question1->setIsRequired(false);
 		$question1->setText('Question 1');
+		$question1->setDescription('This is our first question.');
 		$question2 = new Question();
 		$question2->setId(2);
 		$question2->setFormId(42);
@@ -235,6 +238,7 @@ class FormsServiceTest extends TestCase {
 		$question2->setType('short');
 		$question2->setIsRequired(true);
 		$question2->setText('Question 2');
+		$question2->setDescription('');
 		$this->questionMapper->expects($this->once())
 			->method('findByForm')
 			->with(42)

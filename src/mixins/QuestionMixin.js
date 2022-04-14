@@ -47,6 +47,14 @@ export default {
 		},
 
 		/**
+		 * Question Description
+		 */
+		description: {
+			type: String,
+			required: true,
+		},
+
+		/**
 		 * Required-Setting
 		 */
 		isRequired: {
@@ -117,6 +125,15 @@ export default {
 		onTitleChange: debounce(function(text) {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
+		}, 200),
+		/**
+		 * Forward the description change to the parent and store to db
+		 *
+		 * @param {string} description the description
+		 */
+		onDescriptionChange: debounce(function(description) {
+			this.$emit('update:description', description)
+			this.saveQuestionProperty('description', description)
 		}, 200),
 
 		/**

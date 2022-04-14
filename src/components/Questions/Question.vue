@@ -35,31 +35,47 @@
 
 		<!-- Header -->
 		<div class="question__header">
-			<input v-if="edit || !text"
-				:placeholder="titlePlaceholder"
-				:aria-label="t('forms', 'Title of question number {index}', {index})"
-				:value="text"
-				class="question__header-title"
-				type="text"
-				minlength="1"
-				:maxlength="maxQuestionLength"
-				required
-				@input="onTitleChange">
-			<h3 v-else class="question__header-title" v-text="computedText" />
-			<div v-if="!edit && !questionValid"
-				v-tooltip.auto="warningInvalid"
-				class="question__header-warning icon-error-color"
-				tabindex="0" />
-			<Actions v-if="!readOnly" class="question__header-menu" :force-menu="true">
-				<ActionCheckbox :checked="isRequired"
-					@update:checked="onRequiredChange">
-					<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
-					{{ t('forms', 'Required') }}
-				</ActionCheckbox>
-				<ActionButton icon="icon-delete" @click="onDelete">
-					{{ t('forms', 'Delete question') }}
-				</ActionButton>
-			</Actions>
+			<div class="question__header__title">
+				<input v-if="edit || !questionValid"
+					:placeholder="titlePlaceholder"
+					:aria-label="t('forms', 'Title of question number {index}', {index})"
+					:value="text"
+					class="question__header__title__text"
+					type="text"
+					minlength="1"
+					:maxlength="maxStringLengths.questionText"
+					required
+					@input="onTitleChange">
+				<h3 v-else class="question__header__title__text" v-text="computedText" />
+				<div v-if="!edit && !questionValid"
+					v-tooltip.auto="warningInvalid"
+					class="question__header__title__warning icon-error-color"
+					tabindex="0" />
+				<Actions v-if="!readOnly" class="question__header__title__menu" :force-menu="true">
+					<ActionCheckbox :checked="isRequired"
+						@update:checked="onRequiredChange">
+						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
+						{{ t('forms', 'Required') }}
+					</ActionCheckbox>
+					<ActionButton icon="icon-delete" @click="onDelete">
+						{{ t('forms', 'Delete question') }}
+					</ActionButton>
+				</Actions>
+			</div>
+			<div class="question__header__description">
+				<textarea v-if="edit || !questionValid"
+					ref="description"
+					rows="1"
+					:value="description"
+					:maxlength="maxStringLengths.questionDescription"
+					:placeholder="t('forms', 'Description')"
+					class="question__header__description__input"
+					@input="onDescriptionChange" />
+
+				<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
+				<!-- eslint-disable-next-line -->
+				<p v-else class="question__header__description__output">{{ description }}</p>
+			</div>
 		</div>
 
 		<!-- Question content -->
@@ -99,6 +115,10 @@ export default {
 			type: String,
 			required: true,
 		},
+		description: {
+			type: String,
+			required: true,
+		},
 		isRequired: {
 			type: Boolean,
 			required: true,
@@ -115,8 +135,8 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		maxQuestionLength: {
-			type: Number,
+		maxStringLengths: {
+			type: Object,
 			required: true,
 		},
 		contentValid: {
@@ -156,6 +176,10 @@ export default {
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
 		},
+		onDescriptionChange({ target }) {
+			this.autoSizeDescription()
+			this.$emit('update:description', target.value)
+		},
 
 		onRequiredChange(isRequired) {
 			this.$emit('update:isRequired', isRequired)
@@ -168,6 +192,7 @@ export default {
 			if (!this.readOnly) {
 				this.$emit('update:edit', true)
 			}
+			this.autoSizeDescription()
 		},
 
 		/**
@@ -184,6 +209,19 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		/**
+		 * Auto adjust the description height based on lines number
+		 */
+		async autoSizeDescription() {
+			this.$nextTick(() => {
+				const textarea = this.$refs.description
+				if (textarea) {
+					textarea.style.cssText = 'height:auto'
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 5}px`
+				}
+			})
 		},
 	},
 }
@@ -236,42 +274,72 @@ export default {
 	}
 
 	&__header {
-		display: flex;
+		display: block;
+		padding-bottom: 10px;
 		align-items: center;
 		flex: 1 1 100%;
 		justify-content: space-between;
 		width: auto;
 
 		// Using type to have a higher order than the input styling of server
-		&-title,
-		&-title[type=text] {
-			flex: 1 1 100%;
-			min-height: 22px;
-			margin: 0;
-			padding: 0;
-			padding-bottom: 6px;
-			color: var(--color-text-light);
-			border: 0;
-			border-bottom: 1px dotted transparent;
-			border-radius: 0;
-			font-size: 16px;
-			font-weight: bold;
-			line-height: 22px;
+		&__title {
+			display: flex;
+
+			&__text,
+			&__text[type=text] {
+				flex: 1 1 100%;
+				min-height: 22px;
+				margin: 0;
+				padding: 0;
+				padding-top: 14px;
+				color: var(--color-text-light);
+				border: 0;
+				border-bottom: 1px dotted transparent;
+				border-radius: 0;
+				font-size: 16px;
+				font-weight: bold;
+				line-height: 22px;
+			}
+
+			&__text[type=text] {
+				border-bottom-color: var(--color-border-dark);
+				margin-top: 2px;
+			}
+
+			&__warning {
+				padding: 22px;
+			}
+
+			&__menu.action-item {
+				position: sticky;
+				top: var(--header-height);
+				// above other actions
+				z-index: 50;
+			}
 		}
 
-		&-title[type=text] {
-			border-bottom-color: var(--color-border-dark);
-		}
+		&__description {
+			display: flex;
+			white-space: pre-wrap;
 
-		&-warning {
-			padding: 22px;
-		}
+			&__input {
+				margin: 0px;
+				margin-bottom: -5px;
+				min-height: 1.3em;
+				border: none;
+				resize: none;
+			}
 
-		&-menu.action-item {
-			position: sticky;
-			top: var(--header-height);
-			// above other actions
-			z-index: 50;
+			&__input,
+			&__output {
+				width: 100%;
+				font-size: 14px;
+				color: var(--color-text-maxcontrast) !important;
+				line-height: 1.3em;
+				padding: 0px;
+				z-index: inherit;
+				overflow-wrap: break-word;
+			}
 		}
 	}
 }
