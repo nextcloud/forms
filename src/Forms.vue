@@ -95,9 +95,9 @@ import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
 import Content from '@nextcloud/vue/dist/Components/Content'
 import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
-import AppNavigationForm from './components/AppNavigationForm'
-import EmptyContent from './components/EmptyContent'
-import OcsResponse2Data from './utils/OcsResponse2Data'
+import AppNavigationForm from './components/AppNavigationForm.vue'
+import EmptyContent from './components/EmptyContent.vue'
+import OcsResponse2Data from './utils/OcsResponse2Data.js'
 
 export default {
 	name: 'Forms',

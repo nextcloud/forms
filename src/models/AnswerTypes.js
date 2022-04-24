@@ -20,11 +20,11 @@
  *
  */
 
-import QuestionMultiple from '../components/Questions/QuestionMultiple'
-import QuestionDropdown from '../components/Questions/QuestionDropdown'
-import QuestionShort from '../components/Questions/QuestionShort'
-import QuestionLong from '../components/Questions/QuestionLong'
-import QuestionDate from '../components/Questions/QuestionDate'
+import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
+import QuestionShort from '../components/Questions/QuestionShort.vue'
+import QuestionLong from '../components/Questions/QuestionLong.vue'
+import QuestionDate from '../components/Questions/QuestionDate.vue'
 
 /**
  * @typedef {object} AnswerTypes

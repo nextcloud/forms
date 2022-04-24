@@ -24,7 +24,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
-import Question from '../components/Questions/Question'
+import Question from '../components/Questions/Question.vue'
 
 export default {
 	inheritAttrs: false,

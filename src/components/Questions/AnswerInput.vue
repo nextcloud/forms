@@ -37,7 +37,7 @@ import PQueue from 'p-queue'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 
-import OcsResponse2Data from '../../utils/OcsResponse2Data'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
 export default {
 	name: 'AnswerInput',

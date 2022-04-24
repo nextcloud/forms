@@ -132,14 +132,14 @@ import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
-import EmptyContent from '../components/EmptyContent'
-import Summary from '../components/Results/Summary'
-import Submission from '../components/Results/Submission'
-import TopBar from '../components/TopBar'
-import ViewsMixin from '../mixins/ViewsMixin'
-import answerTypes from '../models/AnswerTypes'
-import SetWindowTitle from '../utils/SetWindowTitle'
-import OcsResponse2Data from '../utils/OcsResponse2Data'
+import EmptyContent from '../components/EmptyContent.vue'
+import Summary from '../components/Results/Summary.vue'
+import Submission from '../components/Results/Submission.vue'
+import TopBar from '../components/TopBar.vue'
+import ViewsMixin from '../mixins/ViewsMixin.js'
+import answerTypes from '../models/AnswerTypes.js'
+import SetWindowTitle from '../utils/SetWindowTitle.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 const picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
 	.setMultiSelect(false)

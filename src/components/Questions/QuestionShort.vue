@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import QuestionMixin from '../../mixins/QuestionMixin'
+import QuestionMixin from '../../mixins/QuestionMixin.js'
 
 export default {
 	name: 'QuestionShort',

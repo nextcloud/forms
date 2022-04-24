@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import answerTypes from '../../models/AnswerTypes'
+import answerTypes from '../../models/AnswerTypes.js'
 
 export default {
 	name: 'Summary',

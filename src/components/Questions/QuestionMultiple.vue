@@ -94,9 +94,9 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
-import AnswerInput from './AnswerInput'
-import QuestionMixin from '../../mixins/QuestionMixin'
-import GenRandomId from '../../utils/GenRandomId'
+import AnswerInput from './AnswerInput.vue'
+import QuestionMixin from '../../mixins/QuestionMixin.js'
+import GenRandomId from '../../utils/GenRandomId.js'
 
 // Implementations docs
 // https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html

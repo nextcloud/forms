@@ -64,11 +64,11 @@ import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
-import ShareTypes from '../mixins/ShareTypes'
-import OcsResponse2Data from '../utils/OcsResponse2Data'
+import ShareTypes from '../mixins/ShareTypes.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 // TODO: replace with same design as core sharing
-import UserDiv from './UserDiv'
+import UserDiv from './UserDiv.vue'
 
 export default {
 	components: {
