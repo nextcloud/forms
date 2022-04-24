@@ -125,6 +125,8 @@ OC.L10N.register(
     "Datetime question title" : "Fecha y hora del título de la pregunta",
     "People can pick a date and time" : "Los usuarios pueden elegir una fecha y hora",
     "Pick a date and time" : "Elige una fecha y hora",
+    "Time" : "Fecha",
+    "Pick a time" : "Elige una hora",
     "Form expired" : "Formulario caducado",
     "This form has expired and is no longer taking answers" : "Este formulario ha caducado y ya no acepta respuestas",
     "Form not found" : "Formulario no encontrado",

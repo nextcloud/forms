@@ -123,6 +123,8 @@
     "Datetime question title" : "Vprašanje za izbor datuma in časa",
     "People can pick a date and time" : "Izbrati je treba datum in čas iz koledarja",
     "Pick a date and time" : "Izberite datum in čas ...",
+    "Time" : "Čas",
+    "Pick a time" : "Izbor časa",
     "Form expired" : "Vprašalnik je pretekel",
     "This form has expired and is no longer taking answers" : "Vprašalnik je pretekel, zato odgovorov ni mogoče več pošiljati",
     "Form not found" : "Vprašalnika ni mogoče najti",

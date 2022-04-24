@@ -126,6 +126,8 @@ OC.L10N.register(
     "Datetime question title" : "Dato og tid spørsmålstittel",
     "People can pick a date and time" : "Man kan velge dato og tid",
     "Pick a date and time" : "Velg dato og tid",
+    "Time" : "Tid",
+    "Pick a time" : "Velg et tidspunkt",
     "Form expired" : "Skjemaet har utløpt",
     "This form has expired and is no longer taking answers" : "Dette skjema har utløpt og tar ikke lenger imot besvarelser",
     "Form not found" : "Skjema ikke funnet",

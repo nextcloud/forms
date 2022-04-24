@@ -1,6 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy" : "კოპირება",
+    "Shared with you" : "გაზიარებული თქვენთან",
+    "Share link" : "ბმულის გაზიარება",
     "Required" : "სავალდებულო",
     "Group" : "ჯგუფი",
     "Description" : "აღწერილობა",
@@ -8,6 +11,8 @@ OC.L10N.register(
     "Settings" : "პარამეტრები",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
     "Expiration date" : "გაუქმების თარიღი",
-    "Submit" : "გაგზავნა"
+    "Submit" : "გაგზავნა",
+    "Date" : "თარიღი",
+    "Time" : "დრო"
 },
 "nplurals=2; plural=(n!=1);");

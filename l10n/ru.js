@@ -125,6 +125,8 @@ OC.L10N.register(
     "Datetime question title" : "Укажите заголовок",
     "People can pick a date and time" : "Можно выбрать дату и время",
     "Pick a date and time" : "Выберите время и дату",
+    "Time" : "Время",
+    "Pick a time" : "Выберите время",
     "Form expired" : "Ответы больше не принимаются",
     "This form has expired and is no longer taking answers" : "Срок действия этой формы истек и ответы больше не принимаются.",
     "Form not found" : "Форма не найдена",

@@ -1,0 +1,13 @@
+{ "translations": {
+    "Shared with you" : "Mat dir gedeelt",
+    "Share link" : "Link deelen",
+    "Required" : "Noutwendeg",
+    "Group" : "Grupp",
+    "Description" : "Beschreiwung",
+    "Settings" : "Astellungen",
+    "Set expiration date" : "Verfallsdatum setzen",
+    "Expiration date" : "Verfallsdatum",
+    "Date" : "Date",
+    "Time" : "Zäit"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

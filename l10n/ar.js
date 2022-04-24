@@ -125,6 +125,8 @@ OC.L10N.register(
     "Datetime question title" : "عنوان سؤال التاريخ والوقت ",
     "People can pick a date and time" : "يمكن للناس اختيار التاريخ والوقت ",
     "Pick a date and time" : "اختر تاريخًا ووقتًا ",
+    "Time" : "إلى وقت",
+    "Pick a time" : "اختر وقت",
     "Form expired" : "انتهت صلاحية النموذج ",
     "This form has expired and is no longer taking answers" : "انتهت صلاحية النموذج ولا يمكن استقبال إجابات ",
     "Form not found" : "تعذر العثور على النموذج ",

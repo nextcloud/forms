@@ -126,6 +126,8 @@ OC.L10N.register(
     "Datetime question title" : "Τίτλος ερώτησης ημερομηνίας και ώρας",
     "People can pick a date and time" : "Οι άνθρωποι μπορούν να επιλέξουν μια ημερομηνία και ώρα",
     "Pick a date and time" : "Επιλέξτε μια ημερομηνία και ώρα",
+    "Time" : "Ώρα",
+    "Pick a time" : "Επιλογή χρόνου",
     "Form expired" : "Η φόρμα έληξε",
     "This form has expired and is no longer taking answers" : "Η φόρμα έληξε και δεν δέχεται πλέον απαντήσεις",
     "Form not found" : "Η φόρμα δεν βρέθηκε",

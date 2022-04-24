@@ -2,9 +2,12 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "فرم‌ها",
+    "Copy" : "رونوشت",
+    "Shared with you" : "با شما به اشتراک گذاشته شده است",
     "Create new form" : "ایجاد فرم جدید",
     "Delete form" : "حذف فرم",
     "Cannot copy, please copy the link manually" : "کپی کردن امکان پذیر نیست ، لطفا پیوند را به صورت دستی کپی کنید",
+    "Share link" : "لینک را به اشتراک بگذارید",
     "Required" : "اجباری",
     "No recommendations. Start typing." : "هیچ توصیه ای نیست شروع به تایپ کنید.",
     "Searching …" : "جستجوکردن …",
@@ -16,6 +19,9 @@ OC.L10N.register(
     "Settings" : "تنظیمات",
     "Set expiration date" : "تنظیم تاریخ انقضا",
     "Expiration date" : "تاریخ انقضا",
-    "Submit" : "ارسال"
+    "Submit" : "ارسال",
+    "Checkboxes" : "جعبه علامت",
+    "Date" : "تاریخ",
+    "Time" : "زمان"
 },
 "nplurals=2; plural=(n > 1);");

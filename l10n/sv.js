@@ -122,6 +122,8 @@ OC.L10N.register(
     "Pick a date" : "Välj ett datum",
     "People can pick a date and time" : "Personer kan välja datum och tid",
     "Pick a date and time" : "Välj datum och tid",
+    "Time" : "Tid",
+    "Pick a time" : "Välj en tidpunkt",
     "Form expired" : "Formuläret har upphört att gälla",
     "This form has expired and is no longer taking answers" : "Detta formulär har upphört att gälla och tar inte längre emot svar",
     "Form not found" : "Hittade inte formuläret",

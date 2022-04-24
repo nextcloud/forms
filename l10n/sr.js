@@ -2,9 +2,11 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Упитници",
+    "Copy" : "Копија",
     "Anonymous response" : "Анонимни одговор",
     "Shared by %s" : "Поделио %s",
     "New form" : "Нови упитник",
+    "Shared with you" : "Дељено са Вама",
     "Loading forms …" : "Учитавам упитнике…",
     "No forms created yet" : "Још нема направљених упитника",
     "Create a form" : "Направи упитник",
@@ -15,6 +17,7 @@ OC.L10N.register(
     "Delete form" : "Обриши упитник",
     "Form link copied" : "Веза ка упитнику копирана",
     "Cannot copy, please copy the link manually" : "Не могу да копирам, копирајте везу ручно",
+    "Share link" : "Веза дељења",
     "Are you sure you want to delete {title}?" : "Да ли сте сигурни да желите да обришете {title}?",
     "Error while deleting {title}" : "Грешка приликом брисања {title}",
     "An answer for the {index} option" : "Одговор за избор {index}",
@@ -53,6 +56,8 @@ OC.L10N.register(
     "Submit" : "Пошаљи",
     "Checkboxes" : "Кућице за штиклирање",
     "People can pick one option" : "Људи имају један избор",
-    "Pick an option" : "Изаберите"
+    "Pick an option" : "Изаберите",
+    "Date" : "Датум",
+    "Time" : "Време"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

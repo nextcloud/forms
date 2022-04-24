@@ -125,6 +125,8 @@ OC.L10N.register(
     "Datetime question title" : "Tìtulu de sa pregonta cun data e ora",
     "People can pick a date and time" : "Sa gente podet seberare data e ora",
     "Pick a date and time" : "Sèbera data e ora",
+    "Time" : "Ora",
+    "Pick a time" : "Sèbera una ora",
     "Form expired" : "Su mòdulu est iscadidu",
     "This form has expired and is no longer taking answers" : "Custu mòdulu est iscadidu e no atzetat prus rispostas",
     "Form not found" : "Mòdulu no agatadu",

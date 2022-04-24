@@ -126,6 +126,8 @@ OC.L10N.register(
     "Datetime question title" : "Títol de la pregunta de data i hora",
     "People can pick a date and time" : "Els usuaris poden triar una data i hora",
     "Pick a date and time" : "Trieu una data i hora",
+    "Time" : "Hora",
+    "Pick a time" : "Tria una hora",
     "Form expired" : "S'ha tancat el formulari",
     "This form has expired and is no longer taking answers" : "Aquest formulari s'ha tancat i ja no admet respostes",
     "Form not found" : "No s'ha trobat el formulari",

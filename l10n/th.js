@@ -66,6 +66,7 @@ OC.L10N.register(
     "Pick a date" : "เลือกวันที่",
     "Datetime" : "วันที่และเวลา",
     "Pick a date and time" : "เลือกวันที่และเวลา",
+    "Time" : "เวลา",
     "Form expired" : "ฟอร์มหมดอายุ",
     "This form has expired and is no longer taking answers" : "ฟอร์มนี้หมดอายุแล้วและไม่รับคำตอบเพิ่มอีก",
     "Form not found" : "ไม่พบฟอร์ม",
