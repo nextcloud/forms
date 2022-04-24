@@ -30,8 +30,8 @@ import Vue from 'vue'
 
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
 
-import router from './router'
-import Forms from './Forms'
+import router from './router.js'
+import Forms from './Forms.vue'
 
 Vue.directive('tooltip', Tooltip)
 

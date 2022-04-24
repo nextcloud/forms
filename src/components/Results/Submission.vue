@@ -46,7 +46,7 @@ import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import moment from '@nextcloud/moment'
 
-import Answer from './Answer'
+import Answer from './Answer.vue'
 
 export default {
 	name: 'Submission',

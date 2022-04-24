@@ -130,8 +130,8 @@ import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 import moment from '@nextcloud/moment'
 
-import ShareDiv from '../components/ShareDiv'
-import ViewsMixin from '../mixins/ViewsMixin'
+import ShareDiv from '../components/ShareDiv.vue'
+import ViewsMixin from '../mixins/ViewsMixin.js'
 
 export default {
 	name: 'Sidebar',

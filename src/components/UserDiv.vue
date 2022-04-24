@@ -28,7 +28,7 @@
 
 <script>
 import Avatar from '@nextcloud/vue/dist/Components/Avatar'
-import ShareTypes from '../mixins/ShareTypes'
+import ShareTypes from '../mixins/ShareTypes.js'
 
 export default {
 	components: {

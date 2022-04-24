@@ -50,7 +50,7 @@
 <script>
 import moment from '@nextcloud/moment'
 
-import QuestionMixin from '../../mixins/QuestionMixin'
+import QuestionMixin from '../../mixins/QuestionMixin.js'
 import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
 
 export default {

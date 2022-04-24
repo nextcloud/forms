@@ -26,8 +26,8 @@ import axios from '@nextcloud/axios'
 import Clipboard from 'v-clipboard'
 import Vue from 'vue'
 
-import CancelableRequest from '../utils/CancelableRequest'
-import OcsResponse2Data from '../utils/OcsResponse2Data'
+import CancelableRequest from '../utils/CancelableRequest.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 Vue.use(Clipboard)
 

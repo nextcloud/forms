@@ -23,7 +23,7 @@
 import { translate, translatePlural } from '@nextcloud/l10n'
 import Vue from 'vue'
 
-import FormsSubmitRoot from './FormsSubmit'
+import FormsSubmitRoot from './FormsSubmit.vue'
 
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural

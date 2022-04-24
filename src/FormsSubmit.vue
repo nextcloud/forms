@@ -31,7 +31,7 @@
 <script>
 import { loadState } from '@nextcloud/initial-state'
 import Content from '@nextcloud/vue/dist/Components/Content'
-import Submit from './views/Submit'
+import Submit from './views/Submit.vue'
 
 export default {
 	name: 'FormsSubmit',

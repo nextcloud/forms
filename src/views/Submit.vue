@@ -82,15 +82,15 @@ import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 
-import answerTypes from '../models/AnswerTypes'
+import answerTypes from '../models/AnswerTypes.js'
 
-import EmptyContent from '../components/EmptyContent'
-import Question from '../components/Questions/Question'
-import QuestionLong from '../components/Questions/QuestionLong'
-import QuestionShort from '../components/Questions/QuestionShort'
-import QuestionMultiple from '../components/Questions/QuestionMultiple'
-import SetWindowTitle from '../utils/SetWindowTitle'
-import ViewsMixin from '../mixins/ViewsMixin'
+import EmptyContent from '../components/EmptyContent.vue'
+import Question from '../components/Questions/Question.vue'
+import QuestionLong from '../components/Questions/QuestionLong.vue'
+import QuestionShort from '../components/Questions/QuestionShort.vue'
+import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import SetWindowTitle from '../utils/SetWindowTitle.js'
+import ViewsMixin from '../mixins/ViewsMixin.js'
 
 export default {
 	name: 'Submit',

@@ -87,9 +87,9 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
-import AnswerInput from './AnswerInput'
-import QuestionMixin from '../../mixins/QuestionMixin'
-import GenRandomId from '../../utils/GenRandomId'
+import AnswerInput from './AnswerInput.vue'
+import QuestionMixin from '../../mixins/QuestionMixin.js'
+import GenRandomId from '../../utils/GenRandomId.js'
 
 export default {
 	name: 'QuestionDropdown',
