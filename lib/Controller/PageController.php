@@ -26,6 +26,7 @@
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\FormsService;
@@ -89,18 +90,6 @@ class PageController extends Controller {
 	/** @var IUserSession */
 	private $userSession;
 
-	/** @var Array
-	 *
-	 * Maximum String lengths, the database is set to store.
-	 */
-	private $maxStringLengths = [
-		'formTitle' => 256,
-		'formDescription' => 8192,
-		'questionText' => 2048,
-		'optionText' => 1024,
-		'answerText' => 4096,
-	];
-
 	public function __construct(string $appName,
 								IRequest $request,
 								FormMapper $formMapper,
@@ -141,7 +130,7 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
 		$this->insertHeaderOnIos();
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 
@@ -195,7 +184,7 @@ class PageController extends Controller {
 		$this->insertHeaderOnIos();
 		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
 		$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', $this->maxStringLengths);
+		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 	}
 

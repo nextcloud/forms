@@ -42,6 +42,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setType(string $value)
  * @method string getText()
  * @method void setText(string $value)
+ * @method string getDescription()
+ * @method void setDescription(string $value)
  */
 class Question extends Entity {
 	protected $formId;
@@ -49,6 +51,7 @@ class Question extends Entity {
 	protected $type;
 	protected $isRequired;
 	protected $text;
+	protected $description;
 
 	public function __construct() {
 		$this->addType('formId', 'integer');
@@ -56,6 +59,7 @@ class Question extends Entity {
 		$this->addType('type', 'string');
 		$this->addType('isRequired', 'bool');
 		$this->addType('text', 'string');
+		$this->addType('description', 'string');
 	}
 
 	public function read(): array {
@@ -66,6 +70,7 @@ class Question extends Entity {
 			'type' => htmlspecialchars_decode($this->getType()),
 			'isRequired' => $this->getIsRequired(),
 			'text' => htmlspecialchars_decode($this->getText()),
+			'description' => htmlspecialchars_decode($this->getDescription()),
 		];
 	}
 }

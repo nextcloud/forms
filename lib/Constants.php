@@ -25,6 +25,18 @@ namespace OCA\Forms;
 
 class Constants {
 	/**
+	 * Maximum String lengths, the database is set to store.
+	 */
+	public const MAX_STRING_LENGTHS = [
+		'formTitle' => 256,
+		'formDescription' => 8192,
+		'questionText' => 2048,
+		'questionDescription' => 4096,
+		'optionText' => 1024,
+		'answerText' => 4096,
+	];
+
+	/**
 	 * !! Keep in sync with src/models/AnswerTypes.js !!
 	 */
 

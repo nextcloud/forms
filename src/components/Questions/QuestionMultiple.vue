@@ -23,15 +23,17 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
 		:read-only="readOnly"
-		:max-question-length="maxStringLengths.questionText"
+		:max-string-lengths="maxStringLengths"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		@update:text="onTitleChange"
+		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<ul class="question__content">
