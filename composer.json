@@ -14,7 +14,7 @@
 	"scripts": {
 		"cs:fix": "php-cs-fixer fix",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
-		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+		"lint": "find . -name \\*.php -not -path './vendor*/*' -print0 | xargs -0 -n1 php -l",
 		"test:unit": "phpunit -c tests/phpunit.xml",
 		"test:integration": "phpunit -c tests/phpunit.integration.xml"
 	},
