@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Shared with you" : "Shared with you",
     "Share link" : "Podijelite vezu",
-    "Group" : "Grupa",
     "Description" : "Opis",
+    "Group" : "Grupa",
     "Settings" : "Podešavanje",
     "Set expiration date" : "Postavite datum isteka",
     "Expiration date" : "Datum isteka",

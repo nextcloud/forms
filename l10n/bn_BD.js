@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Shared with you" : "Shared with you",
     "Share link" : "লিংক ভাগাভাগি করেন",
-    "Group" : "গোষ্ঠীসমূহ",
     "Description" : "বিবরণ",
+    "Group" : "গোষ্ঠীসমূহ",
     "Settings" : "সেটিংস",
     "Set expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ নির্ধারণ করুন",
     "Expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ",

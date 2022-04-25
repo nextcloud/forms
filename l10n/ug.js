@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Shared with you" : "Shared with you",
     "Share link" : "Share link",
-    "Group" : "Group",
     "Description" : "چۈشەندۈرۈش",
+    "Group" : "Group",
     "Settings" : "تەڭشەكلەر",
     "Date" : "Date",
     "Time" : "ۋاقىت"

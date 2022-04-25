@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Shared with you" : "Shared with you",
     "Share link" : "Linki yayımla",
-    "Group" : "Qrup",
     "Description" : "Açıqlanma",
+    "Group" : "Qrup",
     "Settings" : "Quraşdırmalar",
     "Date" : "Date",
     "Time" : "Vaxt"

@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Shared with you" : "Shared with you",
     "Share link" : "Share link",
-    "Group" : "Group",
     "Description" : "ការ​អធិប្បាយ",
+    "Group" : "Group",
     "Settings" : "ការកំណត់",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
     "Expiration date" : "ពេល​ផុត​កំណត់",
