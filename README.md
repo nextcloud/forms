@@ -25,16 +25,21 @@
 ## 🏗 Development setup
 
 1. ☁ Clone this app into the `apps` folder of your Nextcloud: `git clone https://github.com/nextcloud/forms.git`
-2. 👩‍💻 In the folder of the app, run the command `npm ci && npm run dev` to install dependencies and build the Javascript.
+2. 👩‍💻 In the folder of the app, run the command `composer i && composer i && npm ci && npm run build` to install dependencies and build the Javascript.
 3. ✅ Enable the app through the app management of your Nextcloud
 4. 🎉 Partytime! Help fix [some issues](https://github.com/nextcloud/forms/issues) and [review pull requests](https://github.com/nextcloud/forms/pulls) 👍
 
 
 ### 🧙 Advanced development stuff
 
-To build the Javascript whenever you make changes, you can also use `npm run build`. Or `npm run watch` to automatically rebuild on every file save.
+To build the Javascript whenever you make changes, you can use `npm run build`. Or `npm run watch` to automatically rebuild on every file save.
 
-You run all tests by using `make test`.
+You run several tests by:
+- `npm run lint` for JavaScript linting
+- `npm run stylelint` for CSS linting
+- `composer cs:check` for the Nextcloud php coding standard
+- `composer lint` for php linting
+- `composer test:unit` and `composer test:integration` to run the php functionality tests
 
 
 ## ♥ How to create a pull request
