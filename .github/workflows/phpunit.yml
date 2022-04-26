@@ -19,6 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         php-versions: ['7.4', "8.0", "8.1"]
+        # Upload coverage only once (out of php-versions)
+        coverage-on: ['8.1']
         databases: ['sqlite']
         server-versions: ['master']
   
@@ -67,6 +69,7 @@ jobs:
         run: composer test:integration
 
       - name: Upload coverage
+        if: matrix.php-versions == matrix.coverage-on
         uses: codecov/codecov-action@v1
         with:
           root_dir: apps/${{ env.APP_NAME }}
