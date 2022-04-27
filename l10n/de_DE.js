@@ -127,7 +127,7 @@ OC.L10N.register(
     "People can pick a date and time" : "Teilnehmer können ein Datum und eine Zeit wählen",
     "Pick a date and time" : "Datum und Zeit auswählen",
     "Time" : "Zeit",
-    "Time question title" : "Zeit-Frage Titel",
+    "Time question title" : "Titel der Zeit-Abfrage",
     "People can pick a time" : "Benutzer können eine Zeit auswählen",
     "Pick a time" : "Zeit auswählen",
     "Form expired" : "Formular abgelaufen",
