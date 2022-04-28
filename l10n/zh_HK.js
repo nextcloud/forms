@@ -106,7 +106,7 @@ OC.L10N.register(
     "Checkbox question title" : "勾選框問題標題",
     "This question needs a title and at least one answer!" : "此問題需要標題與至少一個答案！",
     "Multiple choice" : "多選",
-    "Multiple choice question title" : "多選題標題",
+    "Multiple choice question title" : "選擇題標題",
     "Dropdown" : "下拉",
     "Dropdown question title" : "下拉式問題標題",
     "People can pick one option" : "人們可以選取一個選項",
