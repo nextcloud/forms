@@ -164,6 +164,24 @@ return [
 			]
 		],
 
+		// Shares
+		[
+			'name' => 'shareApi#newShare',
+			'url' => '/api/{apiVersion}/share',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2'
+			]
+		],
+		[
+			'name' => 'shareApi#deleteShare',
+			'url' => '/api/{apiVersion}/share/{id}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v2'
+			]
+		],
+
 		// Submissions
 		[
 			'name' => 'api#getSubmissions',
