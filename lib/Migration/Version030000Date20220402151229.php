@@ -61,6 +61,6 @@ class Version030000Date20220402151229 extends SimpleMigrationStep {
 			$update_necessary = true;
 		}
 
-		return $update_necesssary ? $schema : null;
+		return $update_necessary ? $schema : null;
 	}
 }
