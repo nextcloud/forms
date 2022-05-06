@@ -127,6 +127,8 @@ OC.L10N.register(
     "People can pick a date and time" : "Ľudia si môžu vybrať dátum a čas",
     "Pick a date and time" : "Vyberte dátum a čas",
     "Time" : "Čas",
+    "Time question title" : "Názov otázky pre čas",
+    "People can pick a time" : "Ľudia si môžu vybrať čas",
     "Pick a time" : "Vyberte čas",
     "Form expired" : "Platnosť formulára vypršala",
     "This form has expired and is no longer taking answers" : "Platnosť tohto formulára vypršala, už sa nedá odpovedať",
