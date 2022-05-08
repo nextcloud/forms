@@ -30,6 +30,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -61,6 +62,9 @@ class ShareApiControllerTest extends TestCase {
 	/** @var ShareMapper|MockObject */
 	private $shareMapper;
 
+	/** @var ConfigService|MockObject */
+	private $configService;
+
 	/** @var FormsService|MockObject */
 	private $formsService;
 
@@ -82,6 +86,7 @@ class ShareApiControllerTest extends TestCase {
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
+		$this->configService = $this->createMock(ConfigService::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->logger = $this->createMock(ILogger::class);
@@ -102,6 +107,7 @@ class ShareApiControllerTest extends TestCase {
 			'forms',
 			$this->formMapper,
 			$this->shareMapper,
+			$this->configService,
 			$this->formsService,
 			$this->groupManager,
 			$this->logger,
@@ -238,6 +244,10 @@ class ShareApiControllerTest extends TestCase {
 			->with($share)
 			->willReturn($shareWithId);
 
+		$this->configService->expects($this->once())
+			->method('getAllowPublicLink')
+			->willReturn(true);
+
 		$this->formsService->expects($this->once())
 			->method('getShareDisplayName')
 			->with($shareWithId->read())
@@ -255,7 +265,7 @@ class ShareApiControllerTest extends TestCase {
 	/**
 	 * Test a random link hash, that is already existing.
 	 */
-	public function testExistingLinkHash() {
+	public function testNewLinkShare_ExistingHash() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -265,6 +275,10 @@ class ShareApiControllerTest extends TestCase {
 			->with('5')
 			->willReturn($form);
 
+		$this->configService->expects($this->once())
+			->method('getAllowPublicLink')
+			->willReturn(true);
+
 		$this->secureRandom->expects($this->any())
 			->method('generate')
 			->willReturn('abcdefgh');
@@ -273,6 +287,25 @@ class ShareApiControllerTest extends TestCase {
 			->method('findPublicShareByHash')
 			->with('abcdefgh')
 			->willReturn(new Share());
+
+		$this->shareMapper->expects($this->never())
+			->method('insert');
+
+		$this->expectException(OCSException::class);
+		$this->shareApiController->newShare(5, IShare::TYPE_LINK, '');
+	}
+
+	/**
+	 * Test a random link hash, that is already existing.
+	 */
+	public function testNewLinkShare_PublicLinkNotAllowed() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->configService->expects($this->once())
+			->method('getAllowPublicLink')
+			->willReturn(false);
 
 		$this->shareMapper->expects($this->never())
 			->method('insert');
