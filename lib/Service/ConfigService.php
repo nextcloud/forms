@@ -65,6 +65,12 @@ class ConfigService {
 	/**
 	 * Load the single values, decode, have default values
 	 */
+	public function getAllowPermitAll(): bool {
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPERMITALL, "true"));
+	}
+	public function getAllowPublicLink(): bool {
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPUBLICLINK, "true"));
+	}
 	private function getUnformattedCreationAllowedGroups(): array {
 		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS, "[]"));
 	}
@@ -80,6 +86,8 @@ class ConfigService {
 	 */
 	public function getAppConfig(): array {
 		return [
+			Constants::CONFIG_KEY_ALLOWPERMITALL => $this->getAllowPermitAll(),
+			Constants::CONFIG_KEY_ALLOWPUBLICLINK => $this->getAllowPublicLink(),
 			Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS => $this->getCreationAllowedGroups(),
 			Constants::CONFIG_KEY_RESTRICTCREATION => $this->getRestrictCreation(),
 

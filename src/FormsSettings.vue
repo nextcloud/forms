@@ -21,24 +21,40 @@
   -->
 
 <template>
-	<SettingsSection :title="t('forms', 'Form creation')">
-		<CheckboxRadioSwitch ref="switchRestrictCreation"
-			:checked.sync="appConfig.restrictCreation"
-			class="forms-settings__creation__switch"
-			type="switch"
-			@update:checked="onRestrictCreationChange">
-			{{ t('forms', 'Restrict form creation to selected groups') }}
-		</CheckboxRadioSwitch>
-		<Multiselect v-model="appConfig.creationAllowedGroups"
-			:disabled="!appConfig.restrictCreation"
-			:multiple="true"
-			:options="availableGroups"
-			:placeholder="t('forms', 'Select groups')"
-			class="forms-settings__creation__multiselect"
-			label="displayName"
-			track-by="groupId"
-			@update:value="onCreationAllowedGroupsChange" />
-	</SettingsSection>
+	<div>
+		<SettingsSection :title="t('forms', 'Form creation')">
+			<CheckboxRadioSwitch ref="switchRestrictCreation"
+				:checked.sync="appConfig.restrictCreation"
+				class="forms-settings__creation__switch"
+				type="switch"
+				@update:checked="onRestrictCreationChange">
+				{{ t('forms', 'Restrict form creation to selected groups') }}
+			</CheckboxRadioSwitch>
+			<Multiselect v-model="appConfig.creationAllowedGroups"
+				:disabled="!appConfig.restrictCreation"
+				:multiple="true"
+				:options="availableGroups"
+				:placeholder="t('forms', 'Select groups')"
+				class="forms-settings__creation__multiselect"
+				label="displayName"
+				track-by="groupId"
+				@update:value="onCreationAllowedGroupsChange" />
+		</SettingsSection>
+		<SettingsSection :title="t('forms', 'Form sharing')">
+			<CheckboxRadioSwitch ref="switchAllowPublicLink"
+				:checked.sync="appConfig.allowPublicLink"
+				type="switch"
+				@update:checked="onAllowPublicLinkChange">
+				{{ t('forms', 'Allow sharing by link') }}
+			</CheckboxRadioSwitch>
+			<CheckboxRadioSwitch ref="switchAllowPermitAll"
+				:checked.sync="appConfig.allowPermitAll"
+				type="switch"
+				@update:checked="onAllowPermitAllChange">
+				{{ t('forms', 'Allow sharing to all logged in accounts') }}
+			</CheckboxRadioSwitch>
+		</SettingsSection>
+	</div>
 </template>
 
 <script>
@@ -86,6 +102,18 @@ export default {
 			const el = this.$refs.switchRestrictCreation
 			el.loading = true
 			await this.saveAppConfig('creationAllowedGroups', newVal.map(group => group.groupId))
+			el.loading = false
+		},
+		async onAllowPublicLinkChange(newVal) {
+			const el = this.$refs.switchAllowPublicLink
+			el.loading = true
+			await this.saveAppConfig('allowPublicLink', newVal)
+			el.loading = false
+		},
+		async onAllowPermitAllChange(newVal) {
+			const el = this.$refs.switchAllowPermitAll
+			el.loading = true
+			await this.saveAppConfig('allowPermitAll', newVal)
 			el.loading = false
 		},
 

@@ -31,6 +31,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\OCSController;
@@ -59,6 +60,9 @@ class ShareApiController extends OCSController {
 	/** @var ShareMapper */
 	private $shareMapper;
 
+	/** @var ConfigService */
+	private $configService;
+
 	/** @var FormsService */
 	private $formsService;
 
@@ -80,6 +84,7 @@ class ShareApiController extends OCSController {
 	public function __construct(string $appName,
 								FormMapper $formMapper,
 								ShareMapper $shareMapper,
+								ConfigService $configService,
 								FormsService $formsService,
 								IGroupManager $groupManager,
 								ILogger $logger,
@@ -91,6 +96,7 @@ class ShareApiController extends OCSController {
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;
 		$this->shareMapper = $shareMapper;
+		$this->configService = $configService;
 		$this->formsService = $formsService;
 		$this->groupManager = $groupManager;
 		$this->logger = $logger;
@@ -123,6 +129,12 @@ class ShareApiController extends OCSController {
 		if (array_search($shareType, Constants::SHARE_TYPES_USED) === false) {
 			$this->logger->debug('Invalid shareType');
 			throw new OCSBadRequestException('Invalid shareType');
+		}
+
+		// Block LinkShares if not allowed
+		if ($shareType === IShare::TYPE_LINK && !$this->configService->getAllowPublicLink()) {
+			$this->logger->debug('Link Share not allowed.');
+			throw new OCSForbiddenException('Link Share not allowed.');
 		}
 
 		try {
