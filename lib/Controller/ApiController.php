@@ -40,6 +40,7 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 
@@ -84,6 +85,9 @@ class ApiController extends OCSController {
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
+	/** @var ConfigService */
+	private $configService;
+
 	/** @var FormsService */
 	private $formsService;
 
@@ -113,6 +117,7 @@ class ApiController extends OCSController {
 								QuestionMapper $questionMapper,
 								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
+								ConfigService $configService,
 								FormsService $formsService,
 								SubmissionService $submissionService,
 								IL10N $l10n,
@@ -130,6 +135,7 @@ class ApiController extends OCSController {
 		$this->questionMapper = $questionMapper;
 		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
+		$this->configService = $configService;
 		$this->formsService = $formsService;
 		$this->submissionService = $submissionService;
 
@@ -242,15 +248,20 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException
 	 */
 	public function newForm(): DataResponse {
-		$form = new Form();
+		// Check if user is allowed
+		if (!$this->configService->canCreateForms()) {
+			$this->logger->debug('This user is not allowed to create Forms.');
+			throw new OCSForbiddenException();
+		}
 
+		// Create Form
+		$form = new Form();
 		$form->setOwnerId($this->currentUser->getUID());
 		$form->setCreated(time());
 		$form->setHash($this->secureRandom->generate(
 			16,
 			ISecureRandom::CHAR_HUMAN_READABLE
 		));
-
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
@@ -279,6 +290,12 @@ class ApiController extends OCSController {
 		$this->logger->debug('Cloning Form: {id}', [
 			'id' => $id
 		]);
+
+		// Check if user can create forms
+		if (!$this->configService->canCreateForms()) {
+			$this->logger->debug('This user is not allowed to create Forms.');
+			throw new OCSForbiddenException();
+		}
 
 		try {
 			$oldForm = $this->formMapper->findById($id);
