@@ -232,9 +232,9 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User display name","Timestamp","Question 1","Question 2"
-				"User 1","01.01.01, 01:01","Q1A1","Q2A1"
-				"User 2","01.01.01, 01:01","Q1A2","Q2A2"
+				"User id","User display name","Timestamp","Question 1","Question 2"
+				"user1","User 1","01.01.01, 01:01","Q1A1","Q2A1"
+				"user2","User 2","01.01.01, 01:01","Q1A2","Q2A2"
 				'
 			],
 			'checkbox-multi-answers' => [
@@ -256,8 +256,8 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User display name","Timestamp","Question 1"
-				"User 1","01.01.01, 01:01","Q1A1; Q1A2; Q1A3"
+				"User id","User display name","Timestamp","Question 1"
+				"user1","User 1","01.01.01, 01:01","Q1A1; Q1A2; Q1A3"
 				'
 			],
 			'anonymous-user' => [
@@ -277,8 +277,8 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User display name","Timestamp","Question 1"
-				"Anonymous user","01.01.01, 01:01","Q1A1"
+				"User id","User display name","Timestamp","Question 1"
+				"","Anonymous user","01.01.01, 01:01","Q1A1"
 				'
 			],
 			'questions-not-answered' => [
@@ -300,8 +300,8 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User display name","Timestamp","Question 1","Question 2","Question 3"
-				"User 1","01.01.01, 01:01","","Q2A1",""
+				"User id","User display name","Timestamp","Question 1","Question 2","Question 3"
+				"user1","User 1","01.01.01, 01:01","","Q2A1",""
 				'
 			],
 			/* No submissions, but request via api */
@@ -314,7 +314,7 @@ class SubmissionServiceTest extends TestCase {
 				[],
 				// Expected CSV-Result
 				'
-				"User display name","Timestamp","Question 1"
+				"User id","User display name","Timestamp","Question 1"
 				'
 			],
 			/* All Questions e.g. got deleted */
@@ -333,8 +333,8 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User display name","Timestamp"
-				"Anonymous user","01.01.01, 01:01"
+				"User id","User display name","Timestamp"
+				"","Anonymous user","01.01.01, 01:01"
 				'
 			],
 		];
@@ -376,8 +376,8 @@ class SubmissionServiceTest extends TestCase {
 			],
 			// Expected CSV-Result
 			'
-			"User display name","Timestamp","Question 1"
-			"User 1","01.01.01, 01:01","Q1A1"
+			"User id","User display name","Timestamp","Question 1"
+			"user1","User 1","01.01.01, 01:01","Q1A1"
 			'
 		);
 	}
@@ -427,6 +427,9 @@ class SubmissionServiceTest extends TestCase {
 			->willReturn('Europe/Berlin');
 
 		$user = $this->createMock(IUser::class);
+		$user->expects($this->any())
+			->method('getUID')
+			->will($this->onConsecutiveCalls('user1', 'user2'));
 		$user->expects($this->any())
 			->method('getDisplayName')
 			->will($this->onConsecutiveCalls('User 1', 'User 2'));
