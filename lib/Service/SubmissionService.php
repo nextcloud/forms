@@ -161,7 +161,7 @@ class SubmissionService {
 
 		// Process initial header
 		$header = [];
-		$header[] = $this->l10n->t('User id');
+		$header[] = $this->l10n->t('User ID');
 		$header[] = $this->l10n->t('User display name');
 		$header[] = $this->l10n->t('Timestamp');
 		foreach ($questions as $question) {

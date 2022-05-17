@@ -232,7 +232,7 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User id","User display name","Timestamp","Question 1","Question 2"
+				"User ID","User display name","Timestamp","Question 1","Question 2"
 				"user1","User 1","01.01.01, 01:01","Q1A1","Q2A1"
 				"user2","User 2","01.01.01, 01:01","Q1A2","Q2A2"
 				'
@@ -256,7 +256,7 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User id","User display name","Timestamp","Question 1"
+				"User ID","User display name","Timestamp","Question 1"
 				"user1","User 1","01.01.01, 01:01","Q1A1; Q1A2; Q1A3"
 				'
 			],
@@ -277,7 +277,7 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User id","User display name","Timestamp","Question 1"
+				"User ID","User display name","Timestamp","Question 1"
 				"","Anonymous user","01.01.01, 01:01","Q1A1"
 				'
 			],
@@ -300,7 +300,7 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User id","User display name","Timestamp","Question 1","Question 2","Question 3"
+				"User ID","User display name","Timestamp","Question 1","Question 2","Question 3"
 				"user1","User 1","01.01.01, 01:01","","Q2A1",""
 				'
 			],
@@ -314,7 +314,7 @@ class SubmissionServiceTest extends TestCase {
 				[],
 				// Expected CSV-Result
 				'
-				"User id","User display name","Timestamp","Question 1"
+				"User ID","User display name","Timestamp","Question 1"
 				'
 			],
 			/* All Questions e.g. got deleted */
@@ -333,7 +333,7 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User id","User display name","Timestamp"
+				"User ID","User display name","Timestamp"
 				"","Anonymous user","01.01.01, 01:01"
 				'
 			],
@@ -376,7 +376,7 @@ class SubmissionServiceTest extends TestCase {
 			],
 			// Expected CSV-Result
 			'
-			"User id","User display name","Timestamp","Question 1"
+			"User ID","User display name","Timestamp","Question 1"
 			"user1","User 1","01.01.01, 01:01","Q1A1"
 			'
 		);
