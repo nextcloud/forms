@@ -124,6 +124,8 @@
     "People can pick a date and time" : "Ihmiset voivat valita päivän ja ajan",
     "Pick a date and time" : "Valitse päivänmäärä ja aika",
     "Time" : "Aika",
+    "Time question title" : "Ajan kysymyksen otsikko",
+    "People can pick a time" : "Ihmiset voivat valita ajan",
     "Pick a time" : "Valitse aika",
     "Form expired" : "Lomake vanheni",
     "This form has expired and is no longer taking answers" : "Lomake vanhentui, eikä se vastaanota enää vastauksia",
