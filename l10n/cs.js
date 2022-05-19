@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopírovat",
     "Anonymous response" : "Anonymní odpověď",
     "Shared by %s" : "Sdílí %s",
+    "User ID" : "Identif. uživatele",
     "User display name" : "Zobrazované jměno uživatele",
     "Timestamp" : "Časové razítko",
     "responses" : "odpovědi",

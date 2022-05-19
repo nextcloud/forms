@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopyala",
     "Anonymous response" : "Anonim yanıt",
     "Shared by %s" : "%s tarafından paylaşıldı",
+    "User ID" : "Kullanıcı kodu",
     "User display name" : "Görüntülenecek kullanıcı adı",
     "Timestamp" : "Zaman damgası",
     "responses" : "yanıtlar",
