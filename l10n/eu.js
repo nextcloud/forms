@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopiatu",
     "Anonymous response" : "Erantzun anonimoa",
     "Shared by %s" : "%s(e)k partekatua",
+    "User ID" : "Erabiltzailearen ID",
     "User display name" : "Bistaratzeko erabiltzaile izena",
     "Timestamp" : "Denbora-marka",
     "responses" : "erantzunak",
