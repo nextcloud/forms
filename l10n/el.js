@@ -86,7 +86,7 @@ OC.L10N.register(
     "There was an error while removing responses" : "Σφάλμα κατά την αφαίρεση των απαντήσεων",
     "Share form" : "Διαμοιρασμός φόρμας",
     "Share via link" : "Διαμοιρασμός μέσω συνδέσμου",
-    "Show to all users of this instance" : "Εμφάνιση όλων των χρηστών",
+    "Show to all users of this instance" : "Εμφάνιση σε όλους τους χρήστες",
     "Choose users to share with" : "Επιλέξτε χρήστες για διαμοιρασμό",
     "Settings" : "Ρυθμίσεις",
     "Anonymous responses" : "Ανώνυμες απαντήσεις",
