@@ -11,7 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopie",
     "Anonymous response" : "Anonyme Antwort",
     "Shared by %s" : "Geteilt von %s",
-    "User ID" : "Benutzer ID",
+    "User ID" : "Benutzer-ID",
     "User display name" : "Anzeigename des Nutzers",
     "Timestamp" : "Zeitstempel",
     "responses" : "Ergebnisse",
