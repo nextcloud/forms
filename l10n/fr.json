@@ -130,5 +130,5 @@
     "This form has expired and is no longer taking answers" : "Ce formulaire a expiré et n'accepte plus les réponses",
     "Form not found" : "Formulaire non trouvé",
     "This form does not exist" : "Ce formulaire n’existe pas"
-},"pluralForm" :"nplurals=2; plural=(n > 1);"
+},"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

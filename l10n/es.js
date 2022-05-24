@@ -132,4 +132,4 @@ OC.L10N.register(
     "Form not found" : "Formulario no encontrado",
     "This form does not exist" : "Este formulario no existe"
 },
-"nplurals=2; plural=(n != 1);");
+"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
