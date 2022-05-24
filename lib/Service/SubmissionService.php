@@ -177,12 +177,21 @@ class SubmissionService {
 
 			// User
 			$user = $this->userManager->get($submission->getUserId());
+
+			// If user not found...
 			if ($user === null) {
-				// Give empty userId
-				$row[] = '';
-				// TRANSLATORS Shown on export if no Display-Name is available.
-				$row[] = $this->l10n->t('Anonymous user');
+				// ..due to anonymous user. Give empty uid, show anonymous displayName
+				if (substr($submission->getUserId(), 0, 10) === 'anon-user-') {
+					$row[] = '';
+					// TRANSLATORS Shown on export for anonymous Submissions
+					$row[] = $this->l10n->t('Anonymous user');
+				} else {
+					// ... due to other reason (like deleted user). Show uid, but no displayname
+					$row[] = $submission->getUserId();
+					$row[] = '';
+				}
 			} else {
+				// User found, so provide both, uid and DisplayName
 				$row[] = $user->getUID();
 				$row[] = $user->getDisplayName();
 			}

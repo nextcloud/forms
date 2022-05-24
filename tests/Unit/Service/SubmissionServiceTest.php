@@ -281,6 +281,27 @@ class SubmissionServiceTest extends TestCase {
 				"","Anonymous user","01.01.01, 01:01","Q1A1"
 				'
 			],
+			'deleted-user' => [
+				// Questions
+				[
+					['id' => 1, 'text' => 'Question 1']
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'deleted_userId',
+						'answers' => [
+							['questionId' => 1, 'text' => 'Q1A1'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"User ID","User display name","Timestamp","Question 1"
+				"deleted_userId","","01.01.01, 01:01","Q1A1"
+				'
+			],
 			'questions-not-answered' => [
 				// Questions
 				[
