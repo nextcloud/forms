@@ -92,7 +92,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'notnull' => true,
 				'length' => 256,
 			]);
-			$table->addColumn('description', Types::STRING, [
+			$table->addColumn('description', Types::TEXT, [
 				'notnull' => false,
 				'length' => 8192,
 			]);
@@ -200,7 +200,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$table->addColumn('question_id', Types::INTEGER, [
 				'notnull' => true,
 			]);
-			$table->addColumn('text', Types::STRING, [
+			$table->addColumn('text', Types::TEXT, [
 				'notnull' => true,
 				'length' => 4096,
 			]);
@@ -351,7 +351,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 					$id_mapping['currentSubmission'] = $qb_restore->getLastInsertId(); //Store submission-id to connect answers to submission.
 				}
 				$last_vote = $vote;
-				
+
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
 				if (strlen($vote['vote_answer']) > 4096) {
 					$output->warning("Answer-text is too long for new Database: '" . $vote['vote_answer'] . "'");
