@@ -29,7 +29,7 @@ import QuestionDate from '../components/Questions/QuestionDate.vue'
 /**
  * @typedef {object} AnswerTypes
  * @property {string} multiple Checkbox Answer
- * @property {string} multiple_unique Multiple-Choice Answer
+ * @property {string} multiple_unique Radio buttons Answer
  * @property {string} dropdown Dropdown Answer
  * @property {string} short Short Text Answer
  * @property {string} long Long Text Answer
@@ -68,12 +68,11 @@ export default {
 	multiple_unique: {
 		component: QuestionMultiple,
 		icon: 'icon-answer-multiple',
-		// TRANSLATORS Take care, a translation by word might not match! The english called 'Multiple-Choice' only allows to select a single-option (basically single-choice)!
-		label: t('forms', 'Multiple choice'),
+		label: t('forms', 'Radio buttons'),
 		predefined: true,
 		validate: question => question.options.length > 0,
 
-		titlePlaceholder: t('forms', 'Multiple choice question title'),
+		titlePlaceholder: t('forms', 'Radio buttons question title'),
 		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
 
 		// Using the same vue-component as multiple, this specifies that the component renders as multiple_unique.
