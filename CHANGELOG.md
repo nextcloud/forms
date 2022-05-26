@@ -1,5 +1,15 @@
 # Changelog
 
+## [v2.5.1](https://github.com/nextcloud/forms/tree/v2.5.1) (2022-05-26)
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.0...v2.5.1)
+
+### Fixed
+
+- Fix upgrading
+  [\#1212](https://github.com/nextcloud/forms/pull/1212) ([nickvergessen](https://github.com/nickvergessen))
+
+
 ## [v2.5.0](https://github.com/nextcloud/forms/tree/v2.5.0) (2022-04-08)
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.4.0...v2.5.0)
