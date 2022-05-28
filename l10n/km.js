@@ -5,6 +5,7 @@ OC.L10N.register(
     "Share link" : "Share link",
     "Description" : "ការ​អធិប្បាយ",
     "Group" : "Group",
+    "Options" : "ជម្រើស",
     "Settings" : "ការកំណត់",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
     "Expiration date" : "ពេល​ផុត​កំណត់",
