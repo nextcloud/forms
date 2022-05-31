@@ -25,10 +25,13 @@
 namespace OCA\Forms\Service;
 
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Share;
+use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
@@ -57,6 +60,9 @@ class FormsService {
 	/** @var QuestionMapper */
 	private $questionMapper;
 
+	/** @var ShareMapper */
+	private $shareMapper;
+
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
@@ -76,6 +82,7 @@ class FormsService {
 								FormMapper $formMapper,
 								OptionMapper $optionMapper,
 								QuestionMapper $questionMapper,
+								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
 								IGroupManager $groupManager,
 								ILogger $logger,
@@ -85,6 +92,7 @@ class FormsService {
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;
 		$this->questionMapper = $questionMapper;
+		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->groupManager = $groupManager;
 		$this->logger = $logger;
@@ -136,6 +144,25 @@ class FormsService {
 	}
 
 	/**
+	 * Load shares corresponding to form
+	 *
+	 * @param integer $formId
+	 * @return array
+	 */
+	public function getShares(int $formId): array {
+		$shareList = [];
+
+		$shareEntities = $this->shareMapper->findByForm($formId);
+		foreach ($shareEntities as $shareEntity) {
+			$share = $shareEntity->read();
+			$share['displayName'] = $this->getShareDisplayName($share);
+			$shareList[] = $share;
+		}
+
+		return $shareList;
+	}
+
+	/**
 	 * Get a form data
 	 *
 	 * @param integer $id
@@ -146,18 +173,34 @@ class FormsService {
 		$form = $this->formMapper->findById($id);
 		$result = $form->read();
 		$result['questions'] = $this->getQuestions($id);
+		$result['shares'] = $this->getShares($id);
 
-		// Set proper user/groups properties
-		// Make sure we have the bare minimum
-		$result['access'] = array_merge(['users' => [], 'groups' => []], $result['access']);
-		// Properly format users & groups
-		$result['access']['users'] = array_map([$this, 'formatUsers'], $result['access']['users']);
-		$result['access']['groups'] = array_map([$this, 'formatGroups'], $result['access']['groups']);
-
+		// Append permissions for current user.
+		$result['permissions'] = $this->getPermissions($id);
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
 		$result['canSubmit'] = $this->canSubmit($form->getId());
 
 		return $result;
+	}
+
+	/**
+	 * Create partial form, as returned by Forms-Lists.
+	 *
+	 * @param integer $id
+	 * @return array
+	 * @throws IMapperException
+	 */
+	public function getPartialFormArray(int $id): array {
+		$form = $this->formMapper->findById($id);
+
+		return [
+			'id' => $form->getId(),
+			'hash' => $form->getHash(),
+			'title' => $form->getTitle(),
+			'expires' => $form->getExpires(),
+			'permissions' => $this->getPermissions($form->getId()),
+			'partial' => true
+		];
 	}
 
 	/**
@@ -173,19 +216,45 @@ class FormsService {
 		// Remove sensitive data
 		unset($form['access']);
 		unset($form['ownerId']);
+		unset($form['shares']);
 
 		return $form;
 	}
 
 	/**
-	 * Can the user submit a form
+	 * Get current users permissions on a form
+	 *
+	 * @param integer $formId
+	 * @return array
 	 */
-	public function canSubmit($formId) {
+	public function getPermissions(int $formId): array {
 		$form = $this->formMapper->findById($formId);
-		$access = $form->getAccess();
 
-		// We cannot control how many time users can submit in public mode
-		if ($access['type'] === 'public') {
+		// Owner is allowed to do everything
+		if ($this->currentUser && $this->currentUser->getUID() === $form->getOwnerId()) {
+			return Constants::PERMISSION_ALL;
+		}
+
+		$permissions = [];
+		// Add submit permission if user has access.
+		if ($this->hasUserAccess($formId)) {
+			$permissions[] = Constants::PERMISSION_SUBMIT;
+		}
+
+		return $permissions;
+	}
+
+	/**
+	 * Can the user submit a form
+	 *
+	 * @param integer $formId
+	 * @return boolean
+	 */
+	public function canSubmit(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
+
+		// We cannot control how many time users can submit if public link / legacyLink available
+		if ($this->hasPublicLink($formId)) {
 			return true;
 		}
 
@@ -208,7 +277,31 @@ class FormsService {
 	}
 
 	/**
-	 * Check if user has access to this form
+	 * Searching Shares for public link
+	 *
+	 * @param integer $formId
+	 * @return boolean
+	 */
+	public function hasPublicLink(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
+		$access = $form->getAccess();
+
+		if (isset($access['legacyLink'])) {
+			return true;
+		}
+
+		$shareEntities = $this->shareMapper->findByForm($form->getId());
+		foreach ($shareEntities as $shareEntity) {
+			if ($shareEntity->getShareType() === IShare::TYPE_LINK) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if current user has access to this form
 	 *
 	 * @param integer $formId
 	 * @return boolean
@@ -218,11 +311,7 @@ class FormsService {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
 
-		if ($access['type'] === 'public') {
-			return true;
-		}
-		
-		// Refuse access, if not public and no user logged in.
+		// Refuse access, if no user logged in.
 		if (!$this->currentUser) {
 			return false;
 		}
@@ -232,25 +321,83 @@ class FormsService {
 			return true;
 		}
 
-		// Now all remaining users are allowed, if access-type 'registered'.
-		if ($access['type'] === 'registered') {
+		// Now all remaining users are allowed, if permitAll is set.
+		if ($access['permitAllUsers']) {
 			return true;
 		}
 
 		// Selected Access remains.
-		// Grant Access, if user is in users-Array.
-		if (in_array($this->currentUser->getUID(), $access['users'])) {
+		if ($this->isSharedToUser($formId)) {
 			return true;
 		}
 
-		// Check if access granted by group.
-		foreach ($access['groups'] as $group) {
-			if ($this->groupManager->isInGroup($this->currentUser->getUID(), $group)) {
-				return true;
+		// None of the possible access-options matched.
+		return false;
+	}
+
+	/**
+	 * Is the form shown on sidebar to the user.
+	 *
+	 * @param int $formId
+	 * @return bool
+	 */
+	public function isSharedFormShown(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
+		$access = $form->getAccess();
+
+		// Dont show here to owner, as its in the owned list anyways.
+		if ($form->getOwnerId() === $this->currentUser->getUID()) {
+			return false;
+		}
+
+		// Dont show expired forms.
+		if ($this->hasFormExpired($form->getId())) {
+			return false;
+		}
+
+		// Shown if permitall and showntoall are both set.
+		if ($access['permitAllUsers'] && $access['showToAllUsers']) {
+			return true;
+		}
+
+		// Shown if user in List of Shared Users/Groups
+		if ($this->isSharedToUser($formId)) {
+			return true;
+		}
+
+		// No Reason found to show form.
+		return false;
+	}
+
+	/**
+	 * Checking all selected shares
+	 *
+	 * @param $formId
+	 * @return bool
+	 */
+	public function isSharedToUser(int $formId): bool {
+		$shareEntities = $this->shareMapper->findByForm($formId);
+		foreach ($shareEntities as $shareEntity) {
+			$share = $shareEntity->read();
+
+			// Needs different handling for shareTypes
+			switch ($share['shareType']) {
+				case IShare::TYPE_USER:
+					if ($share['shareWith'] === $this->currentUser->getUID()) {
+						return true;
+					}
+					break;
+				case IShare::TYPE_GROUP:
+					if ($this->groupManager->isInGroup($this->currentUser->getUID(), $share['shareWith'])) {
+						return true;
+					}
+					break;
+				default:
+					// Return false below
 			}
 		}
 
-		// None of the possible access-options matched.
+		// No share found.
 		return false;
 	}
 
@@ -266,63 +413,49 @@ class FormsService {
 	}
 
 	/**
-	 * Format users access
+	 * Get DisplayNames to Shares
 	 *
-	 * @param string $userId
-	 * @return array
+	 * @param array $share
+	 * @return string
 	 */
-	private function formatUsers(string $userId): array {
+	public function getShareDisplayName(array $share): string {
 		$displayName = '';
 
-		$user = $this->userManager->get($userId);
-		if ($user instanceof IUser) {
-			$displayName = $user->getDisplayName();
+		switch ($share['shareType']) {
+			case IShare::TYPE_USER:
+				$user = $this->userManager->get($share['shareWith']);
+				if ($user instanceof IUser) {
+					$displayName = $user->getDisplayName();
+				}
+				break;
+			case IShare::TYPE_GROUP:
+				$group = $this->groupManager->get($share['shareWith']);
+				if ($group instanceof IGroup) {
+					$displayName = $group->getDisplayName();
+				}
+				break;
+			default:
+				// Preset Empty.
 		}
 
-		return [
-			'shareWith' => $userId,
-			'displayName' => $displayName,
-			'shareType' => IShare::TYPE_USER
-		];
+		return $displayName;
 	}
 
 	/**
-	 * Format groups access
-	 *
-	 * @param string $groupId
-	 * @return array
-	 */
-	private function formatGroups(string $groupId): array {
-		$displayName = '';
-
-		$group = $this->groupManager->get($groupId);
-		if ($group instanceof IGroup) {
-			$displayName = $group->getDisplayName();
-		}
-
-		return [
-			'shareWith' => $groupId,
-			'displayName' => $displayName,
-			'shareType' => IShare::TYPE_GROUP
-		];
-	}
-
-	/**
-	 * Compares two selected access arrays and creates activities for users.
+	 * Creates activities for sharing to users.
 	 * @param Form $form Related Form
-	 * @param array $oldAccess old access-array
-	 * @param array $newAccess new access-array
+	 * @param Share $share The new Share
 	 */
-	public function notifyNewShares(Form $form, array $oldAccess, array $newAccess) {
-		$newUsers = array_diff($newAccess['users'], $oldAccess['users']);
-		$newGroups = array_diff($newAccess['groups'], $oldAccess['groups']);
-
-		// Create Activities
-		foreach ($newUsers as $key => $newUserId) {
-			$this->activityManager->publishNewShare($form, $newUserId);
-		}
-		foreach ($newGroups as $key => $newGroupId) {
-			$this->activityManager->publishNewGroupShare($form, $newGroupId);
+	public function notifyNewShares(Form $form, Share $share): void {
+		switch ($share->getShareType()) {
+			case IShare::TYPE_USER:
+				$this->activityManager->publishNewShare($form, $share->getShareWith());
+				break;
+			case IShare::TYPE_GROUP:
+				$this->activityManager->publishNewGroupShare($form, $share->getShareWith());
+				break;
+			default:
+				// Do nothing.
 		}
 	}
 }

@@ -27,8 +27,6 @@
 
 namespace OCA\Forms\Controller;
 
-use Exception;
-
 use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
@@ -39,6 +37,7 @@ use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\FormsService;
@@ -79,6 +78,9 @@ class ApiController extends OCSController {
 	/** @var QuestionMapper */
 	private $questionMapper;
 
+	/** @var ShareMapper */
+	private $shareMapper;
+
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
@@ -109,6 +111,7 @@ class ApiController extends OCSController {
 								FormMapper $formMapper,
 								OptionMapper $optionMapper,
 								QuestionMapper $questionMapper,
+								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
 								FormsService $formsService,
 								SubmissionService $submissionService,
@@ -125,6 +128,7 @@ class ApiController extends OCSController {
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;
 		$this->questionMapper = $questionMapper;
+		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
 		$this->formsService = $formsService;
 		$this->submissionService = $submissionService;
@@ -149,13 +153,7 @@ class ApiController extends OCSController {
 
 		$result = [];
 		foreach ($forms as $form) {
-			$result[] = [
-				'id' => $form->getId(),
-				'hash' => $form->getHash(),
-				'title' => $form->getTitle(),
-				'expires' => $form->getExpires(),
-				'partial' => true
-			];
+			$result[] = $this->formsService->getPartialFormArray($form->getId());
 		}
 
 		return new DataResponse($result);
@@ -173,24 +171,39 @@ class ApiController extends OCSController {
 
 		$result = [];
 		foreach ($forms as $form) {
-			// Don't add if user is owner, user has no access, form has expired, form is link-shared
-			if ($form->getOwnerId() === $this->currentUser->getUID()
-				|| !$this->formsService->hasUserAccess($form->getId())
-				|| $this->formsService->hasFormExpired($form->getId())
-				|| $form->getAccess()['type'] === 'public') {
+			// Check if the form should be shown on sidebar
+			if (!$this->formsService->isSharedFormShown($form->getId())) {
 				continue;
 			}
-
-			$result[] = [
-				'id' => $form->getId(),
-				'hash' => $form->getHash(),
-				'title' => $form->getTitle(),
-				'expires' => $form->getExpires(),
-				'partial' => true
-			];
+			$result[] = $this->formsService->getPartialFormArray($form->getId());
 		}
 
 		return new DataResponse($result);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Get a partial form by its hash. Implicitely checks, if the user has access.
+	 *
+	 * @param string $hash The form hash
+	 * @return DataResponse
+	 * @throws OCSBadRequestException if forbidden or not found
+	 */
+	public function getPartialForm(string $hash): DataResponse {
+		try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->hasUserAccess($form->getId())) {
+			$this->logger->debug('User has no permissions to get this form');
+			throw new OCSForbiddenException();
+		}
+
+		return new DataResponse($this->formsService->getPartialFormArray($form->getId()));
 	}
 
 	/**
@@ -246,9 +259,8 @@ class ApiController extends OCSController {
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
-			'type' => 'public',
-			'users' => [],
-			'groups' => []
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
 		]);
 		$form->setSubmitOnce(true);
 
@@ -257,6 +269,7 @@ class ApiController extends OCSController {
 		// Return like getForm(), just without loading Questions (as there are none).
 		$result = $form->read();
 		$result['questions'] = [];
+		$result['shares'] = [];
 
 		return new DataResponse($result);
 	}
@@ -369,28 +382,6 @@ class ApiController extends OCSController {
 			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs)) {
 			$this->logger->info('Not allowed to update id, hash, ownerId or created');
 			throw new OCSForbiddenException();
-		}
-
-		// Handle access-changes
-		if (array_key_exists('access', $keyValuePairs)) {
-			// Make sure we only store id of shares
-			try {
-				$keyValuePairs['access']['users'] = array_map(function (array $user): string {
-					return $user['shareWith'];
-				}, $keyValuePairs['access']['users']);
-				$keyValuePairs['access']['groups'] = array_map(function (array $group): string {
-					return $group['shareWith'];
-				}, $keyValuePairs['access']['groups']);
-			} catch (Exception $e) {
-				$this->logger->debug('Malformed access');
-				throw new OCSBadRequestException('Malformed access');
-			}
-
-			// For selected sharing, notify users (creates Activity)
-			if ($keyValuePairs['access']['type'] === 'selected') {
-				$oldAccess = $form->getAccess();
-				$this->formsService->notifyNewShares($form, $oldAccess, $keyValuePairs['access']);
-			}
 		}
 
 		// Create FormEntity with given Params & Id.
@@ -947,14 +938,16 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param array $answers [question_id => arrayOfString]
+	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function insertSubmission(int $formId, array $answers): DataResponse {
-		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}', [
+	public function insertSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
+		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
 			'answers' => $answers,
+			'shareHash' => $shareHash,
 		]);
 
 		try {
@@ -965,9 +958,30 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		// Does the user have access to the form
-		if (!$this->formsService->hasUserAccess($form->getId())) {
-			throw new OCSForbiddenException('Not allowed to access this form');
+		// Does the user have access to the form (Either by logged in user, or by providing public share-hash.)
+		try {
+			$isPublicShare = false;
+
+			// If hash given, find the corresponding share & check if hash corresponds to given formId.
+			if ($shareHash !== '') {
+				// public by legacy Link
+				if ($form->getAccess()['legacyLink'] && $shareHash === $form->getHash()) {
+					$isPublicShare = true;
+				}
+
+				// Public link share
+				$share = $this->shareMapper->findPublicShareByHash($shareHash);
+				if ($share->getFormId() === $formId) {
+					$isPublicShare = true;
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			// $isPublicShare already false.
+		} finally {
+			// Now forbid, if no public share and no direct share.
+			if (!$isPublicShare && !$this->formsService->hasUserAccess($form->getId())) {
+				throw new OCSForbiddenException('Not allowed to access this form');
+			}
 		}
 
 		// Not allowed if form has expired.

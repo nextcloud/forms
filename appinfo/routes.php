@@ -25,15 +25,22 @@
 
 return [
 	'routes' => [
+		// Public Share Link
+		[
+			'name' => 'page#public_link_view',
+			'url' => '/s/{hash}',
+			'verb' => 'GET'
+
+		],
 		// Internal views
 		[
 			'name' => 'page#views',
 			'url' => '/{hash}/{view}',
 			'verb' => 'GET'
 		],
-		// Share-Link & public submit
+		// Internal Form Link
 		[
-			'name' => 'page#goto_form',
+			'name' => 'page#internal_link_view',
 			'url' => '/{hash}',
 			'verb' => 'GET'
 		],
@@ -93,6 +100,14 @@ return [
 			'verb' => 'DELETE',
 			'requirements' => [
 				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+		[
+			'name' => 'api#getPartialForm',
+			'url' => '/api/{apiVersion}/partial_form/{hash}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -161,6 +176,24 @@ return [
 			'verb' => 'DELETE',
 			'requirements' => [
 				'apiVersion' => 'v1(\.1)?'
+			]
+		],
+
+		// Shares
+		[
+			'name' => 'shareApi#newShare',
+			'url' => '/api/{apiVersion}/share',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2'
+			]
+		],
+		[
+			'name' => 'shareApi#deleteShare',
+			'url' => '/api/{apiVersion}/share/{id}',
+			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v2'
 			]
 		],
 

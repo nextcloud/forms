@@ -23,6 +23,8 @@
 
 namespace OCA\Forms;
 
+use OCP\Share\IShare;
+
 class Constants {
 	/**
 	 * Maximum String lengths, the database is set to store.
@@ -81,5 +83,29 @@ class Constants {
 		self::ANSWER_TYPE_DATE => 'Y-m-d',
 		self::ANSWER_TYPE_DATETIME => 'Y-m-d H:i',
 		self::ANSWER_TYPE_TIME => 'H:i'
+	];
+
+	/**
+	 * !! Keep in sync with src/mixins/ShareTypes.js !!
+	 */
+	public const SHARE_TYPES_USED = [
+		IShare::TYPE_USER,
+		IShare::TYPE_GROUP,
+		IShare::TYPE_LINK
+	];
+
+	/**
+	 * !! Keep in sync with src/mixins/PermissionTypes.js !!
+	 * Permission values equal the route names, thus making it easy on frontend to evaluate.
+	 */
+	// Define Form Permissions
+	public const PERMISSION_EDIT = 'edit';
+	public const PERMISSION_RESULTS = 'results';
+	public const PERMISSION_SUBMIT = 'submit';
+
+	public const PERMISSION_ALL = [
+		self::PERMISSION_EDIT,
+		self::PERMISSION_RESULTS,
+		self::PERMISSION_SUBMIT
 	];
 }
