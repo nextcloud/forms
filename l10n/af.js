@@ -3,14 +3,14 @@ OC.L10N.register(
     {
     "Copy" : "Kopieer",
     "Shared with you" : "Met u gedeel",
-    "Share link" : "Deel skakel",
     "Required" : "Vereis",
     "Description" : "Beskrywing",
+    "Set expiration date" : "Stel vervaldatum",
+    "Delete" : "Skrap",
     "Group" : "Groep",
+    "Internal link" : "Interne skakel",
     "Summary" : "Opsomming",
     "Settings" : "Instellings",
-    "Set expiration date" : "Stel vervaldatum",
-    "Expiration date" : "Vervaldatum",
     "Submit" : "Dien in",
     "Date" : "Datum",
     "Time" : "Tyd"

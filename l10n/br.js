@@ -3,14 +3,14 @@ OC.L10N.register(
     {
     "Copy" : "Eilañ",
     "Shared with you" : "Rannet ganeoc'h",
-    "Share link" : "Lodañ al liamm",
     "Description" : "Diskrivadur",
+    "Set expiration date" : "Lakaat un deizat termen",
     "Searching …" : "O klask ...",
+    "Delete" : "Lemel",
     "Group" : "Stollad",
     "Summary" : "Diverrañ",
+    "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
-    "Set expiration date" : "Lakaat un deizat termen",
-    "Expiration date" : "Deizad termen",
     "Submit" : "Kinnig",
     "Date" : "Deiz"
 },

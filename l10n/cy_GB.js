@@ -3,13 +3,12 @@ OC.L10N.register(
     {
     "Copy" : "Copïo",
     "Shared with you" : "Shared with you",
-    "Share link" : "Rhannu dolen",
     "Required" : "Angen",
     "Description" : "Disgrifiad",
+    "Set expiration date" : "Gosod dyddiad dod i ben",
+    "Delete" : "Dileu",
     "Group" : "Grŵp",
     "Settings" : "Gosodiadau",
-    "Set expiration date" : "Gosod dyddiad dod i ben",
-    "Expiration date" : "Dyddiad dod i ben",
     "Date" : "Date",
     "Time" : "Amser"
 },

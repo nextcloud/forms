@@ -3,14 +3,14 @@ OC.L10N.register(
     {
     "Copy" : "Copiar",
     "Shared with you" : "Compartite con te",
-    "Share link" : "Compartir ligamine",
     "Required" : "Requirite",
     "Description" : "Description",
+    "Set expiration date" : "Assignar data de expiration",
+    "Delete" : "Deler",
     "Group" : "Gruppo",
     "Summary" : "Summario",
+    "Sharing" : "Compartente",
     "Settings" : "Configurationes",
-    "Set expiration date" : "Assignar data de expiration",
-    "Expiration date" : "Data de expiration",
     "Date" : "Date",
     "Time" : "Tempore"
 },

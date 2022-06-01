@@ -3,13 +3,12 @@ OC.L10N.register(
     {
     "Copy" : "Хуулах",
     "Shared with you" : "тантай хуваалцсан",
-    "Share link" : "Холбоос хуваалцах",
     "Required" : "Шаардлагатай",
     "Description" : "Тодорхойлолт",
+    "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Group" : "Бүлэг",
     "Summary" : "Хураангуй",
     "Settings" : "Тохиргоо",
-    "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Submit" : "мэдэгдэх",
     "Date" : "Он сар өдөр",
     "Time" : "Цаг"

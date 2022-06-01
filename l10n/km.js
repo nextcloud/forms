@@ -2,13 +2,13 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
-    "Share link" : "Share link",
     "Description" : "ការ​អធិប្បាយ",
+    "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
+    "Delete" : "លុប",
     "Group" : "Group",
     "Options" : "ជម្រើស",
+    "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",
-    "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
-    "Expiration date" : "ពេល​ផុត​កំណត់",
     "Date" : "Date",
     "Time" : "ម៉ោង"
 },

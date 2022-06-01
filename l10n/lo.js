@@ -3,10 +3,12 @@ OC.L10N.register(
     {
     "Copy" : "ສຳເນົາ",
     "Shared with you" : "ແບ່ງປັບກັບທ່ານ",
-    "Share link" : "ແບ່ງປັນລິງ",
-    "Group" : "ກຸ່ມ",
-    "Settings" : "ການຕັ້ງຄ່າ",
     "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
+    "Delete" : "ລຶບ",
+    "Group" : "ກຸ່ມ",
+    "Internal link" : "ລີງພາຍໃນ",
+    "Sharing" : "ການແບ່ງປັນ",
+    "Settings" : "ການຕັ້ງຄ່າ",
     "Date" : "ວັນທີ"
 },
 "nplurals=1; plural=0;");

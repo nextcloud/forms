@@ -2,9 +2,10 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
-    "Share link" : "Share link",
     "Description" : "چۈشەندۈرۈش",
+    "Delete" : "ئۆچۈر",
     "Group" : "Group",
+    "Sharing" : "ھەمبەھىر",
     "Settings" : "تەڭشەكلەر",
     "Date" : "Date",
     "Time" : "ۋاقىت"

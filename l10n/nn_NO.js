@@ -3,14 +3,14 @@ OC.L10N.register(
     {
     "Copy" : "Kopier",
     "Shared with you" : "Shared with you",
-    "Share link" : "Del lenkje",
     "Required" : "Nødvendig",
     "Description" : "Skildring",
+    "Set expiration date" : "Set utløpsdato",
+    "Delete" : "Slett",
     "Group" : "Gruppe",
     "Summary" : "Oppsumering",
+    "Sharing" : "Deling",
     "Settings" : "Instillingar",
-    "Set expiration date" : "Set utløpsdato",
-    "Expiration date" : "Utløpsdato",
     "Date" : "Dato",
     "Time" : "Tid"
 },

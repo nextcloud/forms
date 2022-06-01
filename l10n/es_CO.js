@@ -3,14 +3,13 @@ OC.L10N.register(
     {
     "Copy" : "Copiar",
     "Shared with you" : "Compartido con usted",
-    "Share link" : "Compartir enlace",
     "Required" : "Requerido",
     "Description" : "Descripción",
+    "Set expiration date" : "Establecer fecha de expiración",
     "Group" : "Grupo",
     "Summary" : "Resumen",
+    "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
-    "Set expiration date" : "Establecer fecha de expiración",
-    "Expiration date" : "Fecha de expiración",
     "Submit" : "Enviar",
     "Date" : "Fecha",
     "Time" : "Hora"
