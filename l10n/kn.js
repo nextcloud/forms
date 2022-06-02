@@ -4,7 +4,9 @@ OC.L10N.register(
     "Copy" : "ನಕಲಿಸಿ",
     "Shared with you" : "Shared with you",
     "Set expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕವನ್ನು ನಿರ್ದರಿಸಿ",
+    "Delete" : "﻿ಅಳಿಸಿ",
     "Group" : "﻿ಗುಂಪು",
+    "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Settings" : "ಆಯ್ಕೆ",
     "Date" : "Date",
     "Time" : "ಸಮಯ"

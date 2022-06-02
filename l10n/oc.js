@@ -8,6 +8,7 @@ OC.L10N.register(
     "Searching …" : "Recèrca…",
     "Delete" : "Suprimir",
     "Group" : "Grop",
+    "Copy to clipboard" : "Copiar dins lo quichapapièrs",
     "Toggle settings" : "Bascular los paramètres",
     "Options" : "Opcions",
     "Sharing" : "Partiment",
