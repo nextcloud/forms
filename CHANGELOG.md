@@ -1,5 +1,12 @@
 # Changelog
 
+## [v3.0 0]
+### Breaking
+- Moving completely from API v1 to v2. With this, we fundamentally change the way how the forms sharing works, now much more flexible and closer to how it is done in server.
+
+### Deprecated
+
+
 ## [v2.5.0](https://github.com/nextcloud/forms/tree/v2.5.0) (2022-04-08)
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.4.0...v2.5.0)
