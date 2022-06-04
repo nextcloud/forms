@@ -144,21 +144,21 @@
         },
         {
             "name": "christophwurst/nextcloud",
-            "version": "v23.0.2",
+            "version": "v23.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ChristophWurst/nextcloud_composer.git",
-                "reference": "7f7b957934d22205aab66c568ac3029bd8f2110d"
+                "reference": "2090802b05c9f8bffb2a7c02d6172571d4f90b90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ChristophWurst/nextcloud_composer/zipball/7f7b957934d22205aab66c568ac3029bd8f2110d",
-                "reference": "7f7b957934d22205aab66c568ac3029bd8f2110d",
+                "url": "https://api.github.com/repos/ChristophWurst/nextcloud_composer/zipball/2090802b05c9f8bffb2a7c02d6172571d4f90b90",
+                "reference": "2090802b05c9f8bffb2a7c02d6172571d4f90b90",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.3 || ~8.0.0",
-                "psr/container": "^1.0",
+                "psr/container": "^1.1.1",
                 "psr/event-dispatcher": "^1.0",
                 "psr/log": "^1.1"
             },
@@ -181,9 +181,9 @@
             "description": "Composer package containing Nextcloud's public API (classes, interfaces)",
             "support": {
                 "issues": "https://github.com/ChristophWurst/nextcloud_composer/issues",
-                "source": "https://github.com/ChristophWurst/nextcloud_composer/tree/v23.0.2"
+                "source": "https://github.com/ChristophWurst/nextcloud_composer/tree/v23.0.5"
             },
-            "time": "2022-02-22T09:41:29+00:00"
+            "time": "2022-06-02T14:19:33+00:00"
         },
         {
             "name": "doctrine/instantiator",
