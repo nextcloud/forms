@@ -57,6 +57,7 @@ OC.L10N.register(
     "Group" : "グループ",
     "Internal link" : "内部リンク",
     "Copy to clipboard" : "クリップボードにコピー",
+    "Remove link" : "リンクを削除",
     "Loading {title} …" : "{title} をローディング ...",
     "Toggle settings" : "セッティングを切り替え",
     "Form title" : "フォームのタイトル",
