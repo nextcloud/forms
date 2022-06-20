@@ -216,7 +216,7 @@ export default {
 
 			} catch (error) {
 				console.error(error)
-				showError(t('forms', 'There was an error while adding the link.'))
+				showError(t('forms', 'There was an error while adding the link'))
 			} finally {
 				this.isLoading = false
 			}
