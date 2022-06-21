@@ -76,7 +76,6 @@
     "Permit access to all logged in users" : "Hozzáférés engedélyezése az összes bejelentkezett felhasználónak",
     "Show to all users on sidebar" : "Megjelenítés az oldalsávon az összes felhasználónak",
     "There was an error while adding the share" : "Hiba történt a megosztás hozzáadása során",
-    "There was an error while adding the link." : "Hiba történt a hivatkozás hozzáadása során",
     "There was an error while removing the share" : "Hiba történt a megosztás eltávolítása során",
     "Loading {title} …" : "{title} betöltése…",
     "Toggle settings" : "Beállítások átváltása",
