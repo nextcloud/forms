@@ -78,6 +78,7 @@ OC.L10N.register(
     "Permit access to all logged in users" : "Tüm oturum açmış kullanıcılar erişebilsin",
     "Show to all users on sidebar" : "Tüm kullanıcıların yan çubuğunda görüntülensin",
     "There was an error while adding the share" : "Paylaşım eklenirken bir sorun çıktı",
+    "There was an error while adding the link" : "Bağlantı eklenirken bir sorun çıktı",
     "There was an error while removing the share" : "Paylaşım kaldırılırken bir sorun çıktı",
     "Loading {title} …" : "{title} yükleniyor…",
     "Toggle settings" : "Ayarları değiştir",

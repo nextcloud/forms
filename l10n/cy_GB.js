@@ -10,6 +10,8 @@ OC.L10N.register(
     "Group" : "Grŵp",
     "Settings" : "Gosodiadau",
     "Date" : "Date",
-    "Time" : "Amser"
+    "Pick a date" : "Dewiswch ddyddiad",
+    "Time" : "Amser",
+    "Pick a time" : "Dewiswch amser"
 },
 "nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;");

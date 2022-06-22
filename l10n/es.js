@@ -78,6 +78,7 @@ OC.L10N.register(
     "Permit access to all logged in users" : "Permitir el acceso a todos los usuarios registrados",
     "Show to all users on sidebar" : "Mostrar todos los usuarios en la barra lateral",
     "There was an error while adding the share" : "Ha habido un error al añadir el compartido",
+    "There was an error while adding the link" : "Ha habido un error al añadir el enlace",
     "There was an error while removing the share" : "Ha habido un error al eliminar el compartido",
     "Loading {title} …" : "Cargando {title}…",
     "Toggle settings" : "Marcar/desmarcar configuraciones",

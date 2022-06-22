@@ -78,6 +78,7 @@ OC.L10N.register(
     "Permit access to all logged in users" : "允許所有已登入使用者存取",
     "Show to all users on sidebar" : "在側邊欄上顯示給所有使用者",
     "There was an error while adding the share" : "新增分享時發生錯誤",
+    "There was an error while adding the link" : "新增連結時發生錯誤",
     "There was an error while removing the share" : "移除分享時發生錯誤",
     "Loading {title} …" : "正在載入 {title}……",
     "Toggle settings" : "切換設定",

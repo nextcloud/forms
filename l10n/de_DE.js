@@ -78,6 +78,7 @@ OC.L10N.register(
     "Permit access to all logged in users" : "Allen angemeldeten Benutzern Zugriff erlauben",
     "Show to all users on sidebar" : "Allen Benutzern in der Seitenleiste anzeigen",
     "There was an error while adding the share" : "Fehler beim Hinzufügen der Freigabe",
+    "There was an error while adding the link" : "Fehler beim Hinzufügen des Links",
     "There was an error while removing the share" : "Fehler beim Entfernen der Freigabe",
     "Loading {title} …" : "Lade {title}…",
     "Toggle settings" : "Einstellungen umschalten",

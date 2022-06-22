@@ -78,6 +78,7 @@ OC.L10N.register(
     "Permit access to all logged in users" : "Baimendu sarbidea saioa hasitako erabiltzaile guztiei ",
     "Show to all users on sidebar" : "Erakutsi erabiltzaile guztiei alboko barran",
     "There was an error while adding the share" : "Errore bat gertatu da partekatzea gehitzean",
+    "There was an error while adding the link" : "Errore bat gertatu da esteka gehitzean",
     "There was an error while removing the share" : "Errore bat gertatu da partekatzea kentzean",
     "Loading {title} …" : "{title} kargatzen…",
     "Toggle settings" : "Txandakatu ezarpenak",
