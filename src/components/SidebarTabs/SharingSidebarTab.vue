@@ -32,7 +32,7 @@
 			<div class="share-div__avatar icon-public" />
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Internal link') }}</span>
-				<span>{{ t('forms', 'Only works for logged in users who can access this form') }}</span>
+				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
 			</div>
 			<Actions>
 				<ActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
@@ -83,7 +83,7 @@
 				<span>{{ t('forms', 'Legacy Link') }}</span>
 				<span>{{ t('forms', 'Form still supports old sharing-link.') }}</span>
 			</div>
-			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as public link. We recommend replacing the link with a new public link.')"
+			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.')"
 				class="share-div__legacy-warning icon-error-color" />
 			<Actions>
 				<ActionButton icon="icon-delete" @click="removeLegacyLink">
@@ -97,7 +97,7 @@
 			<div class="share-div">
 				<div class="share-div__avatar icon-group" />
 				<label for="share-switch__permit-all" class="share-div__desc">
-					{{ t('forms', 'Permit access to all logged in users') }}
+					{{ t('forms', 'Permit access to all logged in accounts') }}
 				</label>
 				<CheckboxRadioSwitch id="share-switch__permit-all"
 					:checked="form.access.permitAllUsers"
@@ -107,7 +107,7 @@
 			<div v-if="form.access.permitAllUsers" class="share-div share-div--indent">
 				<div class="share-div__avatar icon-forms" />
 				<label for="share-switch__show-to-all" class="share-div__desc">
-					{{ t('forms', 'Show to all users on sidebar') }}
+					{{ t('forms', 'Show to all accounts on sidebar') }}
 				</label>
 				<CheckboxRadioSwitch id="share-switch__show-to-all"
 					:checked="form.access.showToAllUsers"
