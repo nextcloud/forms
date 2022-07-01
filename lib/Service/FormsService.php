@@ -33,6 +33,7 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
+
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\IGroup;
@@ -66,6 +67,9 @@ class FormsService {
 	/** @var SubmissionMapper */
 	private $submissionMapper;
 
+	/** @var ConfigService */
+	private $configService;
+
 	/** @var IGroupManager */
 	private $groupManager;
 
@@ -84,6 +88,7 @@ class FormsService {
 								QuestionMapper $questionMapper,
 								ShareMapper $shareMapper,
 								SubmissionMapper $submissionMapper,
+								ConfigService $configService,
 								IGroupManager $groupManager,
 								ILogger $logger,
 								IUserManager $userManager,
@@ -94,6 +99,7 @@ class FormsService {
 		$this->questionMapper = $questionMapper;
 		$this->shareMapper = $shareMapper;
 		$this->submissionMapper = $submissionMapper;
+		$this->configService = $configService;
 		$this->groupManager = $groupManager;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
@@ -322,7 +328,7 @@ class FormsService {
 		}
 
 		// Now all remaining users are allowed, if permitAll is set.
-		if ($access['permitAllUsers']) {
+		if ($access['permitAllUsers'] && $this->configService->getAllowPermitAll()) {
 			return true;
 		}
 
@@ -356,7 +362,9 @@ class FormsService {
 		}
 
 		// Shown if permitall and showntoall are both set.
-		if ($access['permitAllUsers'] && $access['showToAllUsers']) {
+		if ($access['permitAllUsers'] &&
+			$access['showToAllUsers'] &&
+			$this->configService->getAllowPermitAll()) {
 			return true;
 		}
 

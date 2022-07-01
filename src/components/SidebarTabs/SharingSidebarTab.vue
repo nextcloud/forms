@@ -32,7 +32,7 @@
 			<div class="share-div__avatar icon-public" />
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Internal link') }}</span>
-				<span>{{ t('forms', 'Only works for logged in users who can access this form') }}</span>
+				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
 			</div>
 			<Actions>
 				<ActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
@@ -42,12 +42,12 @@
 		</div>
 
 		<!-- Public Link -->
-		<div v-if="!hasPublicLink" class="share-div share-div--link">
+		<div v-if="!hasPublicLink && appConfig.allowPublicLink" class="share-div share-div--link">
 			<div class="share-div__avatar icon-public-white" />
-			<span class="share-div__desc">{{ t('forms', 'Public share link') }}</span>
+			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 			<Actions>
 				<ActionButton icon="icon-add" @click="addPublicLink">
-					{{ t('forms', 'Add public link') }}
+					{{ t('forms', 'Add link') }}
 				</ActionButton>
 			</Actions>
 		</div>
@@ -56,7 +56,7 @@
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				class="share-div share-div--link">
 				<div class="share-div__avatar icon-public-white" />
-				<span class="share-div__desc">{{ t('forms', 'Public Share Link') }}</span>
+				<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 				<Actions>
 					<ActionButton icon="icon-clippy" @click="copyPublicShareLink($event, share.shareWith)">
 						{{ t('forms', 'Copy to clipboard') }}
@@ -66,8 +66,11 @@
 					<ActionButton icon="icon-delete" @click="removeShare(share)">
 						{{ t('forms', 'Remove link') }}
 					</ActionButton>
-					<ActionButton :close-after-click="true" icon="icon-add" @click="addPublicLink">
-						{{ t('forms', 'Add public link') }}
+					<ActionButton v-if="appConfig.allowPublicLink"
+						:close-after-click="true"
+						icon="icon-add"
+						@click="addPublicLink">
+						{{ t('forms', 'Add link') }}
 					</ActionButton>
 				</Actions>
 			</div>
@@ -80,7 +83,7 @@
 				<span>{{ t('forms', 'Legacy Link') }}</span>
 				<span>{{ t('forms', 'Form still supports old sharing-link.') }}</span>
 			</div>
-			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as public link. We recommend replacing the link with a new public link.')"
+			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.')"
 				class="share-div__legacy-warning icon-error-color" />
 			<Actions>
 				<ActionButton icon="icon-delete" @click="removeLegacyLink">
@@ -90,25 +93,27 @@
 		</div>
 
 		<!-- All users on Instance -->
-		<div class="share-div">
-			<div class="share-div__avatar icon-group" />
-			<label for="share-switch__permit-all" class="share-div__desc">
-				{{ t('forms', 'Permit access to all logged in users') }}
-			</label>
-			<CheckboxRadioSwitch id="share-switch__permit-all"
-				:checked="form.access.permitAllUsers"
-				type="switch"
-				@update:checked="onPermitAllUsersChange" />
-		</div>
-		<div v-if="form.access.permitAllUsers" class="share-div share-div--indent">
-			<div class="share-div__avatar icon-forms" />
-			<label for="share-switch__show-to-all" class="share-div__desc">
-				{{ t('forms', 'Show to all users on sidebar') }}
-			</label>
-			<CheckboxRadioSwitch id="share-switch__show-to-all"
-				:checked="form.access.showToAllUsers"
-				type="switch"
-				@update:checked="onShowToAllUsersChange" />
+		<div v-if="appConfig.allowPermitAll">
+			<div class="share-div">
+				<div class="share-div__avatar icon-group" />
+				<label for="share-switch__permit-all" class="share-div__desc">
+					{{ t('forms', 'Permit access to all logged in accounts') }}
+				</label>
+				<CheckboxRadioSwitch id="share-switch__permit-all"
+					:checked="form.access.permitAllUsers"
+					type="switch"
+					@update:checked="onPermitAllUsersChange" />
+			</div>
+			<div v-if="form.access.permitAllUsers" class="share-div share-div--indent">
+				<div class="share-div__avatar icon-forms" />
+				<label for="share-switch__show-to-all" class="share-div__desc">
+					{{ t('forms', 'Show to all accounts on sidebar') }}
+				</label>
+				<CheckboxRadioSwitch id="share-switch__show-to-all"
+					:checked="form.access.showToAllUsers"
+					type="switch"
+					@update:checked="onShowToAllUsersChange" />
+			</div>
 		</div>
 
 		<!-- Single shares -->
@@ -123,6 +128,7 @@
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
+import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import Actions from '@nextcloud/vue/dist/Components/Actions'
@@ -155,6 +161,7 @@ export default {
 	data() {
 		return {
 			isLoading: false,
+			appConfig: loadState(appName, 'appConfig'),
 		}
 	},
 

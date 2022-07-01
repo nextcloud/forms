@@ -30,6 +30,7 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
 use OCP\Accounts\IAccountManager;
@@ -64,15 +65,18 @@ class PageController extends Controller {
 	/** @var ShareMapper */
 	private $shareMapper;
 
+	/** @var ConfigService */
+	private $configService;
+
 	/** @var FormsService */
 	private $formsService;
 
 	/** @var IAccountManager */
 	protected $accountManager;
-	
+
 	/** @var IGroupManager */
 	private $groupManager;
-	
+
 	/** @var IInitialStateService */
 	private $initialStateService;
 
@@ -98,6 +102,7 @@ class PageController extends Controller {
 								IRequest $request,
 								FormMapper $formMapper,
 								ShareMapper $shareMapper,
+								ConfigService $configService,
 								FormsService $formsService,
 								IAccountManager $accountManager,
 								IGroupManager $groupManager,
@@ -113,6 +118,7 @@ class PageController extends Controller {
 
 		$this->formMapper = $formMapper;
 		$this->shareMapper = $shareMapper;
+		$this->configService = $configService;
 		$this->formsService = $formsService;
 
 		$this->accountManager = $accountManager;
@@ -137,6 +143,7 @@ class PageController extends Controller {
 		Util::addStyle($this->appName, 'forms');
 		$this->insertHeaderOnIos();
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
+		$this->initialStateService->provideInitialState($this->appName, 'appConfig', $this->configService->getAppConfig());
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
 	}
 

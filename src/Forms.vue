@@ -23,8 +23,11 @@
 
 <template>
 	<Content app-name="forms">
-		<AppNavigation>
-			<AppNavigationNew button-class="icon-add" :text="t('forms', 'New form')" @click="onNewForm" />
+		<AppNavigation v-if="canCreateForms || hasForms">
+			<AppNavigationNew v-if="canCreateForms"
+				button-class="icon-add"
+				:text="t('forms', 'New form')"
+				@click="onNewForm" />
 			<template #list>
 				<!-- Form-Owner-->
 				<AppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
@@ -48,13 +51,13 @@
 		</AppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<AppContent v-if="loading || noForms || !routeHash || !routeAllowed">
+		<AppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
 			<EmptyContent v-if="loading" icon="icon-loading">
 				{{ t('forms', 'Loading forms …') }}
 			</EmptyContent>
-			<EmptyContent v-else-if="noForms">
+			<EmptyContent v-else-if="!hasForms">
 				{{ t('forms', 'No forms created yet') }}
-				<template #action>
+				<template v-if="canCreateForms" #action>
 					<button class="primary" @click="onNewForm">
 						{{ t('forms', 'Create a form') }}
 					</button>
@@ -62,8 +65,9 @@
 			</EmptyContent>
 
 			<EmptyContent v-else>
-				{{ t('forms', 'Select a form or create a new one') }}
-				<template #action>
+				<span v-if="canCreateForms">{{ t('forms', 'Select a form or create a new one') }}</span>
+				<span v-else>{{ t('forms', 'Please select a form') }}</span>
+				<template v-if="canCreateForms" #action>
 					<button class="primary" @click="onNewForm">
 						{{ t('forms', 'Create new form') }}
 					</button>
@@ -87,8 +91,9 @@
 
 <script>
 import { emit } from '@nextcloud/event-bus'
-import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
+import { loadState } from '@nextcloud/initial-state'
+import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
@@ -125,12 +130,14 @@ export default {
 			sidebarActive: 'forms-sharing',
 			forms: [],
 			sharedForms: [],
+
+			canCreateForms: loadState(appName, 'appConfig').canCreateForms,
 		}
 	},
 
 	computed: {
-		noForms() {
-			return this.noOwnedForms && this.noSharedForms
+		hasForms() {
+			return !this.noOwnedForms || !this.noSharedForms
 		},
 		noOwnedForms() {
 			return this.forms?.length === 0

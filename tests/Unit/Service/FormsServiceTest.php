@@ -36,6 +36,7 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Service\ConfigService;
 
 use OCP\IGroup;
 use OCP\IGroupManager;
@@ -71,6 +72,9 @@ class FormsServiceTest extends TestCase {
 	/** @var SubmissionMapper|MockObject */
 	private $submissionMapper;
 
+	/** @var ConfigService|MockObject */
+	private $configService;
+
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
@@ -88,6 +92,7 @@ class FormsServiceTest extends TestCase {
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
+		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->logger = $this->createMock(ILogger::class);
@@ -109,6 +114,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->configService,
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
@@ -435,6 +441,10 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([]);
 
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
+
 		$this->assertEquals($expected, $this->formsService->getPermissions(42));
 	}
 
@@ -536,6 +546,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->configService,
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
@@ -646,6 +657,10 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn($form);
 
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
+
 		$this->assertEquals($expected, $this->formsService->hasUserAccess(42));
 	}
 
@@ -673,6 +688,26 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals(true, $this->formsService->hasUserAccess(42));
 	}
 
+	public function testHasUserAccess_PermitAllNotAllowed() {
+		$form = new Form();
+		$form->setAccess([
+			'permitAllUsers' => true,
+			'showToAllUsers' => true,
+		]);
+		$form->setOwnerId('notCurrentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->configService->expects($this->once())
+			->method('getAllowPermitAll')
+			->willReturn(false);
+
+		$this->assertEquals(false, $this->formsService->hasUserAccess(42));
+	}
+
 	public function testHasUserAccess_NotLoggedIn() {
 		$userSession = $this->createMock(IUserSession::class);
 		$userSession->expects($this->once())
@@ -686,6 +721,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->configService,
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
@@ -778,9 +814,13 @@ class FormsServiceTest extends TestCase {
 		$form->setAccess($access);
 
 		$this->formMapper->expects($this->any())
-		->method('findById')
-		->with(42)
-		->willReturn($form);
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
 
 		$share = new Share();
 		$share->setShareType($shareType);
@@ -791,6 +831,33 @@ class FormsServiceTest extends TestCase {
 			->willReturn([$share]);
 
 		$this->assertEquals($expected, $this->formsService->isSharedFormShown(42));
+	}
+
+	public function testIsSharedFormShown_PermitAllNotAllowed() {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('notCurrentUser');
+		$form->setExpires(false);
+		$form->setAccess([
+			'permitAllUsers' => true,
+			'showToAllUsers' => true,
+		]);
+
+		$this->formMapper->expects($this->any())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(false);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([]);
+
+		$this->assertEquals(false, $this->formsService->isSharedFormShown(42));
 	}
 
 	public function dataIsSharedToUser() {

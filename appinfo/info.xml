@@ -57,6 +57,11 @@
 		</navigation>
 	</navigations>
 
+	<settings>
+		<admin>OCA\Forms\Settings\Settings</admin>
+		<admin-section>OCA\Forms\Settings\SettingsSection</admin-section>
+	</settings>
+
 	<activity>
 		<filters>
 			<filter>OCA\Forms\Activity\Filter</filter>

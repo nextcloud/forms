@@ -25,13 +25,25 @@
 
 return [
 	'routes' => [
+		// Internal AppConfig routes
+		[
+			'name' => 'config#getAppConfig',
+			'url' => '/config',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'config#updateAppConfig',
+			'url' => '/config/update',
+			'verb' => 'POST'
+		],
+
 		// Public Share Link
 		[
 			'name' => 'page#public_link_view',
 			'url' => '/s/{hash}',
 			'verb' => 'GET'
-
 		],
+
 		// Internal views
 		[
 			'name' => 'page#views',
@@ -51,6 +63,7 @@ return [
 			'verb' => 'GET'
 		],
 	],
+
 	'ocs' => [
 		
 		// Forms
