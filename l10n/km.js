@@ -6,6 +6,7 @@ OC.L10N.register(
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
     "Delete" : "លុប",
     "Group" : "Group",
+    "Share link" : "Share link",
     "Options" : "ជម្រើស",
     "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",

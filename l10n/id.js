@@ -3,10 +3,13 @@ OC.L10N.register(
     {
     "Copy" : "Salin",
     "Shared with you" : "Shared with you",
+    "Select groups" : "Pilih grup",
     "Description" : "Deskrisi",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
     "Delete" : "Hapus",
     "Group" : "Grup",
+    "Share link" : "Bagikan tautan",
+    "Add link" : "Tambah tautan",
     "Summary" : "Kesimpulan",
     "Options" : "Pilihan",
     "Sharing" : "Berbagi",

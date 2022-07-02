@@ -6,6 +6,7 @@ OC.L10N.register(
     "Set expiration date" : "Postavite datum isteka",
     "Delete" : "Obriši",
     "Group" : "Grupa",
+    "Share link" : "Podijelite vezu",
     "Sharing" : "Dijeljenje",
     "Settings" : "Podešavanje",
     "Date" : "Date"

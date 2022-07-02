@@ -7,6 +7,7 @@ OC.L10N.register(
     "Set expiration date" : "Սահմանել վավերականության ժամկետ",
     "Delete" : "հեռացնել",
     "Group" : "Խումբ",
+    "Share link" : "Կիսվել հղմամբ",
     "Settings" : "կարգավորումներ",
     "Date" : "Date",
     "Time" : "Ժամ"

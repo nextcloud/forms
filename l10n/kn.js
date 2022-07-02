@@ -6,6 +6,7 @@ OC.L10N.register(
     "Set expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕವನ್ನು ನಿರ್ದರಿಸಿ",
     "Delete" : "﻿ಅಳಿಸಿ",
     "Group" : "﻿ಗುಂಪು",
+    "Share link" : "ಸಂಪರ್ಕ ಕೊಂಡಿಯನ್ನು  ﻿ಹಂಚಿಕೊಳ್ಳಬಹುದು",
     "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Settings" : "ಆಯ್ಕೆ",
     "Date" : "Date",

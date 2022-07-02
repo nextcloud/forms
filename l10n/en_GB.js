@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
+    "Select groups" : "Select groups",
     "Required" : "Required",
     "Description" : "Description",
     "Set expiration date" : "Set expiration date",
@@ -10,6 +11,7 @@ OC.L10N.register(
     "Delete" : "Delete",
     "Group" : "Group",
     "Copy to clipboard" : "Copy to clipboard",
+    "Share link" : "Share link",
     "Summary" : "Summary",
     "Sharing" : "Sharing",
     "Settings" : "Settings",

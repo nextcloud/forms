@@ -3,11 +3,13 @@ OC.L10N.register(
     {
     "Copy" : "Copiază",
     "Shared with you" : "Partajat cu tine",
+    "Select groups" : "Selectează grupuri ",
     "Required" : "Necesar",
     "Description" : "Descriere",
     "Set expiration date" : "Specifică data expirării",
     "Delete" : "Șterge",
     "Group" : "Grup",
+    "Add link" : "Adaugă link",
     "Summary" : "Rezumat",
     "Sharing" : "Partajare",
     "Settings" : "Setări",

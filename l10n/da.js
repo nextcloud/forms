@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopiér",
     "Shared with you" : "Shared with you",
+    "Select groups" : "Vælg grupper",
     "Required" : "Krævet",
     "Description" : "Beskrivelse",
     "Set expiration date" : "Angiv udløbsdato",
@@ -11,6 +12,7 @@ OC.L10N.register(
     "Group" : "Gruppe",
     "Internal link" : "Internt link",
     "Copy to clipboard" : "Kopier til udklipsholder",
+    "Share link" : "Del link",
     "Summary" : "Oversigt",
     "Options" : "Valgmuligheder",
     "Sharing" : "Deling",

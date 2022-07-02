@@ -8,6 +8,7 @@ OC.L10N.register(
     "Set expiration date" : "Gosod dyddiad dod i ben",
     "Delete" : "Dileu",
     "Group" : "Grŵp",
+    "Share link" : "Rhannu dolen",
     "Settings" : "Gosodiadau",
     "Date" : "Date",
     "Pick a date" : "Dewiswch ddyddiad",

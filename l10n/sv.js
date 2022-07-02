@@ -63,6 +63,7 @@ OC.L10N.register(
     "Group" : "Grupp",
     "Internal link" : "Intern länk",
     "Copy to clipboard" : "Kopiera till urklipp",
+    "Add link" : "Lägg till länk",
     "Loading {title} …" : "Läser in {title} …",
     "Toggle settings" : "Växla inställningar",
     "Form title" : "Rubrik",

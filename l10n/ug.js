@@ -5,6 +5,7 @@ OC.L10N.register(
     "Description" : "چۈشەندۈرۈش",
     "Delete" : "ئۆچۈر",
     "Group" : "Group",
+    "Share link" : "Share link",
     "Sharing" : "ھەمبەھىر",
     "Settings" : "تەڭشەكلەر",
     "Date" : "Date",

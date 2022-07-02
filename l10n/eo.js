@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopii",
     "Shared with you" : "Kunhavata kun vi",
+    "Select groups" : "Elekti grupojn",
     "Required" : "Nepra",
     "Description" : "Priskribo",
     "Set expiration date" : "Uzi limdaton",
@@ -12,6 +13,8 @@ OC.L10N.register(
     "Group" : "Grupo",
     "Internal link" : "Interna ligilo",
     "Copy to clipboard" : "Kopii tondejen",
+    "Share link" : "Kunhavigi ligilon",
+    "Add link" : "Aldoni ligilon",
     "Summary" : "Resumo",
     "Sharing" : "Kunhavigo",
     "Settings" : "Agordoj",

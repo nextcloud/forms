@@ -9,6 +9,8 @@ OC.L10N.register(
     "Delete" : "Skrap",
     "Group" : "Groep",
     "Internal link" : "Interne skakel",
+    "Share link" : "Deel skakel",
+    "Add link" : "Voeg skakel toe",
     "Summary" : "Opsomming",
     "Settings" : "Instellings",
     "Submit" : "Dien in",

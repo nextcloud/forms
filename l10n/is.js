@@ -43,6 +43,7 @@ OC.L10N.register(
     "Group" : "Hópur",
     "Internal link" : "Internal link",
     "Copy to clipboard" : "Afrita á klippispjald",
+    "Add link" : "Bæta við tengli",
     "Loading {title} …" : "Hleð inn {title} …",
     "Toggle settings" : "Víxla stillingum af/á",
     "Form title" : "Titill eyðuforms",

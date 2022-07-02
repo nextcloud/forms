@@ -7,6 +7,7 @@ OC.L10N.register(
     "Set expiration date" : "காலாவதி தேதியை குறிப்பிடுக",
     "Delete" : "நீக்குக",
     "Group" : "Group",
+    "Share link" : "Share link",
     "Settings" : "அமைப்புகள்",
     "Date" : "Date"
 },

@@ -9,6 +9,8 @@ OC.L10N.register(
     "Delete" : "Suprimir",
     "Group" : "Grop",
     "Copy to clipboard" : "Copiar dins lo quichapapièrs",
+    "Share link" : "Partejar lo ligam",
+    "Add link" : "Apondre un ligam",
     "Toggle settings" : "Bascular los paramètres",
     "Options" : "Opcions",
     "Sharing" : "Partiment",
