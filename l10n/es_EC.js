@@ -10,6 +10,7 @@ OC.L10N.register(
     "Delete" : "Borrar",
     "Group" : "Grupo",
     "Copy to clipboard" : "Copiar al portapapeles",
+    "Share link" : "Compartir liga",
     "Summary" : "Resumen",
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",

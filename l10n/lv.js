@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopēt",
     "Shared with you" : "Koplietots ar jums",
+    "Select groups" : "Izvēlieties grupas",
     "Required" : "Nepieciešams",
     "Description" : "Apraksts",
     "Set expiration date" : "Uzstādīt beigu termiņu",
@@ -11,6 +12,7 @@ OC.L10N.register(
     "Delete" : "Dzēst",
     "Group" : "Grupa",
     "Copy to clipboard" : "Kopēt starpliktuvē",
+    "Share link" : "Koplietot saiti",
     "Summary" : "Kopsavilkums",
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",

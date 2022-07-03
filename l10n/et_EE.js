@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopeeri",
     "Shared with you" : "Sinuga jagatud",
+    "Select groups" : "Vali grupid",
     "Required" : "Kohustuslik",
     "Description" : "Kirjeldus",
     "Set expiration date" : "Määra aegumise kuupäev",
@@ -11,6 +12,8 @@ OC.L10N.register(
     "Group" : "Grupp",
     "Internal link" : "Sisemine link",
     "Copy to clipboard" : "Kopeeri lõikepuhvrisse",
+    "Share link" : "Jaga link",
+    "Add link" : "Lisa link",
     "Summary" : "Kokkuvõte",
     "Sharing" : "Jagamine",
     "Settings" : "Seaded",
