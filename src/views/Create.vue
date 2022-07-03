@@ -55,27 +55,27 @@
 		<header>
 			<h2>
 				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
-				<input id="form-title"
+				<textarea id="form-title"
 					ref="title"
 					v-model="form.title"
 					class="form-title"
+					rows="1"
 					:minlength="0"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
 					:required="true"
 					autofocus
 					type="text"
-					@keyup="onTitleChange">
+					@input="onTitleChange" />
 			</h2>
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 			<textarea ref="description"
 				v-model="form.description"
 				class="form-desc"
+				rows="1"
 				:maxlength="maxStringLengths.formDescription"
 				:placeholder="t('forms', 'Description')"
-				@change="autoSizeDescription"
-				@keydown="autoSizeDescription"
-				@keyup="onDescChange" />
+				@input="onDescChange" />
 			<!-- Generate form information message-->
 			<p class="info-message" v-text="infoMessage" />
 		</header>
@@ -249,17 +249,27 @@ export default {
 	},
 
 	updated() {
+		this.autoSizeTitle()
 		this.autoSizeDescription()
 	},
 
 	methods: {
+		onTitleChange() {
+			this.autoSizeTitle()
+			this.saveTitle()
+		},
+		onDescChange() {
+			this.autoSizeDescription()
+			this.saveDescription()
+		},
+
 		/**
 		 * Title & description save methods
 		 */
-		onTitleChange: debounce(function() {
+		saveTitle: debounce(async function() {
 			this.saveFormProperty('title')
 		}, 200),
-		onDescChange: debounce(function() {
+		saveDescription: debounce(async function() {
 			this.saveFormProperty('description')
 		}, 200),
 
@@ -376,14 +386,28 @@ export default {
 		},
 
 		/**
+		 * Auto adjust the title height based on lines number
+		 */
+		async autoSizeTitle() {
+			this.$nextTick(() => {
+				const textarea = this.$refs.title
+				if (textarea) {
+					textarea.style.cssText = 'height:auto'
+					textarea.style.cssText = `height: ${textarea.scrollHeight}px`
+				}
+			})
+		},
+		/**
 		 * Auto adjust the description height based on lines number
 		 */
-		autoSizeDescription() {
-			const textarea = this.$refs.description
-			if (textarea) {
-				textarea.style.cssText = 'height:auto; padding:0'
-				textarea.style.cssText = `height: ${textarea.scrollHeight + 20}px`
-			}
+		async autoSizeDescription() {
+			this.$nextTick(() => {
+				const textarea = this.$refs.description
+				if (textarea) {
+					textarea.style.cssText = 'height:auto'
+					textarea.style.cssText = `height: ${textarea.scrollHeight}px`
+				}
+			})
 		},
 	},
 }
@@ -423,24 +447,27 @@ export default {
 			font-size: 28px;
 			font-weight: bold;
 			color: var(--color-main-text);
+			line-height: 34px;
 			min-height: 36px;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
-			padding-bottom: 6px; // align with h2 of .form-title on submit page
+			padding-bottom: 4px;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			white-space: nowrap;
+			resize: none;
 		}
 		.form-desc {
 			font-size: 100%;
 			line-height: 150%;
 			padding-bottom: 20px;
+			margin: 0px;
 			resize: none;
 		}
 
 		.info-message {
 			font-size: 100%;
 			padding-bottom: 20px;
+			margin-top: 4px;
 			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
