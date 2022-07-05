@@ -54,7 +54,7 @@ class ApiV2Test extends TestCase {
 			'created' => 12345,
 			'expires' => 0,
 			'is_anonymous' => false,
-			'submit_once' => true,
+			'submit_multiple' => false,
 			'questions' => [
 				[
 					'type' => 'short',
@@ -131,7 +131,7 @@ class ApiV2Test extends TestCase {
 			'created' => 12345,
 			'expires' => 0,
 			'is_anonymous' => false,
-			'submit_once' => true,
+			'submit_multiple' => false,
 			'questions' => [
 				[
 					'type' => 'short',
@@ -172,7 +172,7 @@ class ApiV2Test extends TestCase {
 					'created' => $qb->createNamedParameter($form['created'], IQueryBuilder::PARAM_INT),
 					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
 					'is_anonymous' => $qb->createNamedParameter($form['is_anonymous'], IQueryBuilder::PARAM_BOOL),
-					'submit_once' => $qb->createNamedParameter($form['submit_once'], IQueryBuilder::PARAM_BOOL)
+					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL)
 				]);
 			$qb->execute();
 			$formId = $qb->getLastInsertId();
@@ -418,7 +418,7 @@ class ApiV2Test extends TestCase {
 					],
 					'expires' => 0,
 					'isAnonymous' => false,
-					'submitOnce' => true,
+					'submitMultiple' => false,
 					'canSubmit' => true,
 					'permissions' => [
 						'edit',
@@ -471,7 +471,7 @@ class ApiV2Test extends TestCase {
 					],
 					'expires' => 0,
 					'isAnonymous' => false,
-					'submitOnce' => true,
+					'submitMultiple' => false,
 					'canSubmit' => true,
 					'permissions' => [
 						'edit',

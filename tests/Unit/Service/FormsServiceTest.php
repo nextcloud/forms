@@ -138,7 +138,7 @@ class FormsServiceTest extends TestCase {
 				],
 				'expires' => 0,
 				'isAnonymous' => false,
-				'submitOnce' => false,
+				'submitMultiple' => true,
 				'canSubmit' => true,
 				'questions' => [
 					[
@@ -209,7 +209,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
-		$form->setSubmitOnce(false);
+		$form->setSubmitMultiple(true);
 
 		$this->formMapper->expects($this->any())
 			->method('findById')
@@ -322,7 +322,7 @@ class FormsServiceTest extends TestCase {
 				'created' => 123456789,
 				'expires' => 0,
 				'isAnonymous' => false,
-				'submitOnce' => false,
+				'submitMultiple' => true,
 				'canSubmit' => true,
 				'questions' => [],
 				'permissions' => [
@@ -351,7 +351,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
-		$form->setSubmitOnce(false);
+		$form->setSubmitMultiple(true);
 
 		$this->formMapper->expects($this->any())
 			->method('findById')
@@ -452,25 +452,25 @@ class FormsServiceTest extends TestCase {
 		return [
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
-				'submitOnce' => true,
+				'submitMultiple' => false,
 				'participantsArray' => ['currentUser'],
 				'expected' => true
 			],
-			'submitOnceGood' => [
+			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
-				'submitOnce' => true,
+				'submitMultiple' => false,
 				'participantsArray' => ['notCurrentUser'],
 				'expected' => true
 			],
-			'submitOnceNotGood' => [
+			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
-				'submitOnce' => true,
+				'submitMultiple' => false,
 				'participantsArray' => ['notCurrentUser', 'currentUser'],
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
-				'submitOnce' => false,
+				'submitMultiple' => true,
 				'participantsArray' => ['currentUser'],
 				'expected' => true
 			]
@@ -480,11 +480,11 @@ class FormsServiceTest extends TestCase {
 	 * @dataProvider dataCanSubmit
 	 *
 	 * @param string $ownerId
-	 * @param bool $submitOnce
+	 * @param bool $submitMultiple
 	 * @param array $participantsArray
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitOnce, array $participantsArray, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, array $participantsArray, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -492,7 +492,7 @@ class FormsServiceTest extends TestCase {
 			'showToAllUsers' => false,
 		]);
 		$form->setOwnerId($ownerId);
-		$form->setSubmitOnce($submitOnce);
+		$form->setSubmitMultiple($submitMultiple);
 
 		$this->formMapper->expects($this->any())
 			->method('findById')

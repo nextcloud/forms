@@ -46,8 +46,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setExpires(integer $value)
  * @method integer getIsAnonymous()
  * @method void setIsAnonymous(bool $value)
- * @method integer getSubmitOnce()
- * @method void setSubmitOnce(bool $value)
+ * @method integer getSubmitMultiple()
+ * @method void setSubmitMultiple(bool $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -58,7 +58,7 @@ class Form extends Entity {
 	protected $created;
 	protected $expires;
 	protected $isAnonymous;
-	protected $submitOnce;
+	protected $submitMultiple;
 
 	/**
 	 * Form constructor.
@@ -67,7 +67,7 @@ class Form extends Entity {
 		$this->addType('created', 'integer');
 		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'bool');
-		$this->addType('submitOnce', 'bool');
+		$this->addType('submitMultiple', 'bool');
 	}
 
 	// JSON-Decoding of access-column.
@@ -92,7 +92,7 @@ class Form extends Entity {
 			'access' => $this->getAccess(),
 			'expires' => $this->getExpires(),
 			'isAnonymous' => $this->getIsAnonymous(),
-			'submitOnce' => $this->getSubmitOnce()
+			'submitMultiple' => $this->getSubmitMultiple()
 		];
 	}
 }

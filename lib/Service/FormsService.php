@@ -269,8 +269,8 @@ class FormsService {
 			return true;
 		}
 
-		// Refuse access, if SubmitOnce is set and user already has taken part.
-		if ($form->getSubmitOnce()) {
+		// Refuse access, if SubmitMultiple is not set and user already has taken part.
+		if (!$form->getSubmitMultiple()) {
 			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
 			foreach ($participants as $participant) {
 				if ($participant === $this->currentUser->getUID()) {
