@@ -65,7 +65,6 @@
 					:required="true"
 					autofocus
 					type="text"
-					@click="selectIfUnchanged"
 					@keyup="onTitleChange">
 			</h2>
 			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
@@ -374,17 +373,6 @@ export default {
 		},
 		toggleSidebar() {
 			this.$emit('update:sidebarOpened', !this.sidebarOpened)
-		},
-
-		/**
-		 * Select the text in the input if it is still set to 'Form title'
-		 *
-		 * @param {Event} e the click event
-		 */
-		selectIfUnchanged(e) {
-			if (e.target && e.target.value === t('forms', 'Form title')) {
-				e.target.select()
-			}
 		},
 
 		/**
