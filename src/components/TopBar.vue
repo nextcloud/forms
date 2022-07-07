@@ -55,6 +55,7 @@ $top-bar-height: 60px;
 	button {
 		cursor: pointer;
 		margin-left: 4px;
+		flex-shrink: 0;
 
 		> span {
 			cursor: pointer;

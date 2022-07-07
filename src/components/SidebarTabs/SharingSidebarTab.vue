@@ -289,7 +289,7 @@ export default {
 <style lang="scss" scoped>
 .share-div {
 	display: flex;
-	height: 44px;
+	min-height: 44px;
 	align-items: center;
 
 	&--link {
@@ -305,19 +305,20 @@ export default {
 	&__avatar {
 		height: 32px;
 		width: 32px;
+		flex-shrink: 0;
 		border-radius: 50%;
 		background-color: var(--color-background-dark);
 		background-size: 16px;
 	}
 
 	&__desc {
-		padding: 8px;
+		padding: 0px 8px;
 		flex-grow: 1;
 
 		&--twoline {
 			span {
 				display: block;
-				height: 18px;
+				min-height: 18px;
 				line-height: 1.2em;
 			}
 			:last-child {
