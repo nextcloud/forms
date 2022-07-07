@@ -284,6 +284,7 @@ export default {
 		// Using type to have a higher order than the input styling of server
 		&__title {
 			display: flex;
+			height: 44px;
 
 			&__text,
 			&__text[type=text] {

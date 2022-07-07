@@ -287,12 +287,13 @@ export default {
 			font-size: 28px;
 			font-weight: bold;
 			color: var(--color-main-text);
+			line-height: 34px;
 			min-height: 36px;
 			margin: 32px 0;
 			padding-left: 14px; // align with description (compensate font size diff)
+			padding-bottom: 4px;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			white-space: nowrap;
 		}
 		.form-desc {
 			font-size: 100%;
@@ -305,6 +306,7 @@ export default {
 		.info-message {
 			font-size: 100%;
 			padding-bottom: 20px;
+			margin-top: 4px;
 			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
