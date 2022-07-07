@@ -832,32 +832,6 @@ class ApiController extends OCSController {
 	/**
 	 * @NoAdminRequired
 	 *
-	 * Get all the answers of a given submission
-	 *
-	 * @param int $submissionId the submission id
-	 * @return array
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
-	 */
-	private function getAnswers(int $submissionId): array {
-		try {
-			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
-		} catch (DoesNotExistException $e) {
-			//Just ignore, if no Data. Returns empty Answers-Array
-		}
-
-		// Load Answer-Data
-		$answers = [];
-		foreach ($answerEntities as $answerEntity) {
-			$answers[] = $answerEntity->read();
-		}
-
-		return $answers;
-	}
-
-	/**
-	 * @NoAdminRequired
-	 *
 	 * Get all the submissions of a given form
 	 *
 	 * @param string $hash the form hash
@@ -878,40 +852,27 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		try {
-			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
-		} catch (DoesNotExistException $e) {
-			// Just ignore, if no Data. Returns empty Submissions-Array
-		}
+		// Load submissions and currently active questions
+		$submissions = $this->submissionService->getSubmissions($form->getId());
+		$questions = $this->formsService->getQuestions($form->getId());
 
-		$submissions = [];
-		foreach ($submissionEntities as $submissionEntity) {
-			// Load Submission-Data & corresponding Answers
-			$submission = $submissionEntity->read();
-			$submission['answers'] = $this->getAnswers($submission['id']);
-
-			// Append Display Name
+		// Append Display Names
+		foreach ($submissions as $key => $submission) {
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
-				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
+				$submissions[$key]['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);
 
 				if ($userEntity instanceof IUser) {
-					$submission['userDisplayName'] = $userEntity->getDisplayName();
+					$submissions[$key]['userDisplayName'] = $userEntity->getDisplayName();
 				} else {
 					// Fallback, should not occur regularly.
-					$submission['userDisplayName'] = $submission['userId'];
+					$submissions[$key]['userDisplayName'] = $submission['userId'];
 				}
 			}
-
-			// Add to returned List of Submissions
-			$submissions[] = $submission;
 		}
-
-		// Load currently active questions
-		$questions = $this->formsService->getQuestions($form->getId());
 
 		$response = [
 			'submissions' => $submissions,
