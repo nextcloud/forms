@@ -40,7 +40,7 @@
 		"regenerator-runtime": "^0.13.9",
 		"v-click-outside": "^3.2.0",
 		"v-clipboard": "^2.2.3",
-		"vue": "^2.6.14",
+		"vue": "^2.7.4",
 		"vue-router": "^3.5.4",
 		"vuedraggable": "^2.24.3"
 	},
