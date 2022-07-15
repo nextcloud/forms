@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share link" : "Partajează link-ul",
     "Add link" : "Adaugă link",
     "Summary" : "Rezumat",
+    "Options" : "Opțiuni",
     "Sharing" : "Partajare",
     "Settings" : "Setări",
     "Submit" : "Trimite",
