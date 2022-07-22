@@ -5,6 +5,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2022 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Christian Hartmann <chris-hartmann@gmx.de>
  *
  * @license AGPL-3.0-or-later
  *
@@ -26,11 +27,11 @@ namespace OCA\Forms\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
-use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
-class Version030000Date20220414203511 extends SimpleMigrationStep {
+class Version030000Date20220707130109 extends SimpleMigrationStep {
+
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -40,17 +41,14 @@ class Version030000Date20220414203511 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
-		$table = $schema->getTable('forms_v2_questions');
 
-		if (!$table->hasColumn('description')) {
-			$table->addColumn('description', Types::TEXT, [
-				'notnull' => true,
-				'length' => 4096,
-			]);
-
+		$table = $schema->getTable('forms_v2_forms');
+		
+		if ($table->hasColumn('submit_once') && $table->hasColumn('submit_multiple')) {
+			$table->dropColumn('submit_once');
 			return $schema;
 		}
-		
+
 		return null;
 	}
 }

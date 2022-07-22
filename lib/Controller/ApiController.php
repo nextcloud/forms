@@ -268,7 +268,7 @@ class ApiController extends OCSController {
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
-		$form->setSubmitOnce(true);
+		$form->setSubmitMultiple(false);
 
 		$this->formMapper->insert($form);
 

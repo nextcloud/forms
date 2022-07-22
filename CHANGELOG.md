@@ -3,6 +3,7 @@
 ## [v3.0 0]
 ### Breaking
 - Moving completely from API v1 to v2. With this, we fundamentally change the way how the forms sharing works, now much more flexible and closer to how it is done in server.
+- Also inverting SubmitOnce to SubmitMultiple with ApiV2
 
 ### Deprecated
 

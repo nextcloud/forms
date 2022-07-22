@@ -124,7 +124,7 @@ Returns the full-depth object of the requested form (without submissions).
   },
   "expires": 0,
   "isAnonymous": false,
-  "submitOnce": false,
+  "submitMultiple": true,
   "canSubmit": true,
   "permissions": [
     "edit",

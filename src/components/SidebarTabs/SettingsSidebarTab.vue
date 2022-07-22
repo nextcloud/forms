@@ -107,9 +107,9 @@ export default {
 				.length !== 0
 		},
 
-		// Inverting submitOnce for UI here. Adapt downto Db for V3, if this imposes for longterm.
+		// If disabled, submitMultiple will be casted to true
 		submitMultiple() {
-			return this.disableSubmitMultiple || !this.form.submitOnce
+			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
 
 		formExpires() {
@@ -133,8 +133,7 @@ export default {
 			this.$emit('update:formProp', 'isAnonymous', checked)
 		},
 		onSubmitMultipleChange(checked) {
-			// DB still stores submitOnce = !submitMultiple -> To be changed for Forms v3
-			this.$emit('update:formProp', 'submitOnce', !checked)
+			this.$emit('update:formProp', 'submitMultiple', checked)
 		},
 		onFormExpiresChange(checked) {
 			if (checked) {
