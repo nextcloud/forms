@@ -138,7 +138,7 @@ OC.L10N.register(
     "Short answer" : "Erantzun laburra",
     "Short answer question title" : "Erantzun laburreko galderaren izenburua",
     "People can enter a short answer" : "Jendeak erantzun laburra idatz dezake",
-    "Enter your answer" : "Sartu zure izena",
+    "Enter your answer" : "Sartu zure erantzuna",
     "Long text" : "Erantzun luzea",
     "Long text question title" : "Erantzun luzeko galderaren izenburua",
     "People can enter a long text" : "Jendeak testu luzea idatz dezake",
