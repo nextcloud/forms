@@ -75,6 +75,7 @@ OC.L10N.register(
     "Internal link" : "Interner Link",
     "Only works for logged in accounts with access rights" : "Funktioniert nur für angemeldete Konten mit Zugriffsrechten",
     "Copy to clipboard" : "In die Zwischenablage kopieren",
+    "Share link" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
     "Add link" : "Link hinzufügen",
     "Remove link" : "Link entfernen",
     "Form still supports old sharing-link." : "Das Formular unterstützt weiterhin den alten Freigabe-Link.",
