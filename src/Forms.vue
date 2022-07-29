@@ -25,9 +25,12 @@
 	<NcContent app-name="forms">
 		<NcAppNavigation v-if="canCreateForms || hasForms">
 			<NcAppNavigationNew v-if="canCreateForms"
-				button-class="icon-add"
 				:text="t('forms', 'New form')"
-				@click="onNewForm" />
+				@click="onNewForm">
+				<template #icon>
+					<IconPlus size="20" decorative />
+				</template>
+			</NcAppNavigationNew>
 			<template #list>
 				<!-- Form-Owner-->
 				<NcAppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
@@ -103,6 +106,8 @@ import NcAppNavigationNew from '@nextcloud/vue/dist/Components/NcAppNavigationNe
 import NcContent from '@nextcloud/vue/dist/Components/NcContent'
 import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
+import IconPlus from 'vue-material-design-icons/Plus'
+
 import AppNavigationForm from './components/AppNavigationForm.vue'
 import EmptyContent from './components/EmptyContent.vue'
 import PermissionTypes from './mixins/PermissionTypes.js'
@@ -115,6 +120,7 @@ export default {
 	components: {
 		AppNavigationForm,
 		EmptyContent,
+		IconPlus,
 		NcAppContent,
 		NcAppNavigation,
 		NcAppNavigationCaption,
