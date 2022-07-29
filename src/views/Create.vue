@@ -100,11 +100,12 @@
 					@delete="deleteQuestion(question)" />
 			</Draggable>
 
-			<!-- Add new questions toolbar -->
-			<div class="question-toolbar" role="toolbar">
+			<!-- Add new questions menu -->
+			<div class="question-menu">
 				<Actions ref="questionMenu"
 					:open.sync="questionMenuOpened"
 					:menu-title="t('forms', 'Add a question')"
+					:aria-label="t('forms', 'Add a question')"
 					:primary="true"
 					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-primary'">
 					<ActionButton v-for="(answer, type) in answerTypesFilter"
@@ -112,7 +113,7 @@
 						:close-after-click="true"
 						:disabled="isLoadingQuestions"
 						:icon="answer.icon"
-						class="question-toolbar__question"
+						class="question-menu__question"
 						@click="addQuestion(type)">
 						{{ answer.label }}
 					</ActionButton>
@@ -489,7 +490,7 @@ export default {
 		flex-direction: column;
 		margin-bottom: 250px;
 
-		.question-toolbar {
+		.question-menu {
 			position: sticky;
 			// Above other menus
 			z-index: 55;
