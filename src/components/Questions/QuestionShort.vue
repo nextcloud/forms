@@ -85,7 +85,7 @@ export default {
 	margin: 0;
 	padding: 6px 0;
 	border: 0;
-	border-bottom: 1px dotted var(--color-border-dark);
+	border-bottom: 1px dotted var(--color-text-maxcontrast);
 	border-radius: 0;
 
 	&:disabled {

@@ -330,7 +330,7 @@ export default {
 	margin: 0;
 	padding: 0 0;
 	border: 0;
-	border-bottom: 1px dotted var(--color-border-dark);
+	border-bottom: 1px dotted var(--color-text-maxcontrast);
 	border-radius: 0;
 	font-size: 14px;
 	position: relative;
