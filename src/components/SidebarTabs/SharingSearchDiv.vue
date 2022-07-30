@@ -56,6 +56,7 @@ import debounce from 'debounce'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
+import logger from '../../utils/Logger.js'
 
 export default {
 	components: {
@@ -210,7 +211,7 @@ export default {
 
 				this.suggestions = exactSuggestions.concat(suggestions)
 			} catch (error) {
-				console.error('Loading Suggestions failed.', error)
+				logger.error('Loading Suggestions failed.', { error })
 			} finally {
 				this.loading = false
 			}
@@ -232,7 +233,7 @@ export default {
 
 				this.recommendations = this.formatSearchResults(OcsResponse2Data(request).exact)
 			} catch (error) {
-				console.error('Fetching recommendations failed.', error)
+				logger.error('Fetching recommendations failed.', { error })
 			} finally {
 				this.loading = false
 			}

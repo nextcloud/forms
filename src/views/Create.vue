@@ -142,6 +142,7 @@ import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
+import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
@@ -308,7 +309,7 @@ export default {
 				})
 
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while adding new question', { error })
 				showError(t('forms', 'There was an error while adding the new question'))
 			} finally {
 				this.isLoadingQuestions = false
@@ -329,7 +330,7 @@ export default {
 				const index = this.form.questions.findIndex(search => search.id === id)
 				this.form.questions.splice(index, 1)
 			} catch (error) {
-				console.error(error)
+				logger.error(`Error while removing question ${id}`, { error })
 				showError(t('forms', 'There was an error while removing the question'))
 			} finally {
 				this.isLoadingQuestions = false
@@ -349,8 +350,8 @@ export default {
 					newOrder,
 				})
 			} catch (error) {
+				logger.error('Error while saving form', { error })
 				showError(t('forms', 'Error while saving form'))
-				console.error(error)
 			} finally {
 				this.isLoadingQuestions = false
 			}

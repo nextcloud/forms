@@ -66,6 +66,8 @@ import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwi
 import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 import SettingsSection from '@nextcloud/vue/dist/Components/SettingsSection'
 
+import logger from './utils/Logger.js'
+
 export default {
 	name: 'FormsSettings',
 
@@ -130,7 +132,7 @@ export default {
 					configValue,
 				})
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while saving configuration', { error })
 				showError(t('forms', 'Error while saving configuration'))
 				await this.reloadAppConfig()
 			}
@@ -144,7 +146,7 @@ export default {
 				const resp = await axios.get(generateUrl('apps/forms/config'))
 				this.appConfig = resp.data
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while reloading config', { error })
 				showError(t('forms', 'Error while reloading config'))
 			}
 		},

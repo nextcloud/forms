@@ -138,6 +138,7 @@ import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
+import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
@@ -226,7 +227,7 @@ export default {
 
 		async loadFormResults() {
 			this.loadingResults = true
-			console.debug('Loading results for form', this.form.hash)
+			logger.debug(`Loading results for form ${this.form.hash}`)
 
 			try {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/submissions/{hash}', { hash: this.form.hash }))
@@ -240,7 +241,7 @@ export default {
 				this.$set(this.form, 'submissions', loadedSubmissions)
 				this.$set(this.form, 'questions', loadedQuestions)
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while loading results', { error })
 				showError(t('forms', 'There was an error while loading the results'))
 			} finally {
 				this.loadingResults = false
@@ -259,7 +260,7 @@ export default {
 						})
 						showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
 					} catch (error) {
-						console.error(error)
+						logger.error('Error while exporting to Files', { error })
 						showError(t('forms', 'There was an error, while exporting to Files'))
 					}
 				})
@@ -273,7 +274,7 @@ export default {
 				const index = this.form.submissions.findIndex(search => search.id === id)
 				this.form.submissions.splice(index, 1)
 			} catch (error) {
-				console.error(error)
+				logger.error(`Error while removing response ${id}`, { error })
 				showError(t('forms', 'There was an error while removing this response'))
 			} finally {
 				this.loadingResults = false
@@ -290,7 +291,7 @@ export default {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2/submissions/{formId}', { formId: this.form.id }))
 				this.form.submissions = []
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while removing responses', { error })
 				showError(t('forms', 'There was an error while removing responses'))
 			} finally {
 				this.loadingResults = false
