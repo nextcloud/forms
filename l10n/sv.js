@@ -97,7 +97,7 @@ OC.L10N.register(
     "Settings" : "Inställningar",
     "Submitting form …" : "Skickar formulär ...",
     "Thank you for completing the form!" : "Tack för att du fyllde i formuläret!",
-    "Submit" : "Verkställ",
+    "Submit" : "Skicka",
     "Submit form" : "Skicka in formulär",
     "There was an error submitting the form" : "Ett fel uppstod vid inskickande av formuläret",
     "Error while saving question" : "Ett fel uppstod vid sparande av frågan",
