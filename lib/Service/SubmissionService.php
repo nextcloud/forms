@@ -40,7 +40,6 @@ use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IUserManager;
 use OCP\IUserSession;
 
@@ -48,6 +47,8 @@ use League\Csv\EncloseField;
 use League\Csv\EscapeFormula;
 use League\Csv\Reader;
 use League\Csv\Writer;
+
+use Psr\Log\LoggerInterface;
 
 class SubmissionService {
 
@@ -75,7 +76,7 @@ class SubmissionService {
 	/** @var IL10N */
 	private $l10n;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IUserManager */
@@ -89,7 +90,7 @@ class SubmissionService {
 								IConfig $config,
 								IDateTimeFormatter $dateTimeFormatter,
 								IL10N $l10n,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IUserManager $userManager,
 								IUserSession $userSession) {
 		$this->formMapper = $formMapper;

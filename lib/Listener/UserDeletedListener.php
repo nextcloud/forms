@@ -27,19 +27,20 @@ use OCA\Forms\BackgroundJob\UserDeletedJob;
 use OCP\BackgroundJob\IJobList;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
-use OCP\ILogger;
 use OCP\User\Events\UserDeletedEvent;
+
+use Psr\Log\LoggerInterface;
 
 class UserDeletedListener implements IEventListener {
 
 	/** @var IJobList */
 	private $jobList;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	public function __construct(IJobList $jobList,
-								ILogger $logger) {
+								LoggerInterface $logger) {
 		$this->jobList = $jobList;
 		$this->logger = $logger;
 	}

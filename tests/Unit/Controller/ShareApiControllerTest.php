@@ -40,7 +40,6 @@ use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\IGroup;
 use OCP\IGroupManager;
-use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -50,6 +49,8 @@ use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class ShareApiControllerTest extends TestCase {
 
@@ -71,7 +72,7 @@ class ShareApiControllerTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	/** @var IRequest|MockObject */
@@ -89,7 +90,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->request = $this->createMock(IRequest::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);

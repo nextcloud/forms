@@ -32,11 +32,12 @@ use OCP\Activity\IProvider;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\IGroupManager;
 use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
 use OCP\RichObjectStrings\IValidator;
+
+use Psr\Log\LoggerInterface;
 
 class Provider implements IProvider {
 	private $appName;
@@ -50,7 +51,7 @@ class Provider implements IProvider {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IURLGenerator */
@@ -69,7 +70,7 @@ class Provider implements IProvider {
 								FormMapper $formMapper,
 								IEventMerger $eventMerger,
 								IGroupManager $groupManager,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IURLGenerator $urlGenerator,
 								IUserManager $userManager,
 								IFactory $l10nFactory,

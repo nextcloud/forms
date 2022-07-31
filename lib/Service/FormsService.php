@@ -38,11 +38,12 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\IGroup;
 use OCP\IGroupManager;
-use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Share\IShare;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * Trait for getting forms information in a service
@@ -73,7 +74,7 @@ class FormsService {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IUser */
@@ -90,7 +91,7 @@ class FormsService {
 								SubmissionMapper $submissionMapper,
 								ConfigService $configService,
 								IGroupManager $groupManager,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IUserManager $userManager,
 								IUserSession $userSession) {
 		$this->activityManager = $activityManager;

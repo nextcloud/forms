@@ -29,9 +29,10 @@ use OCA\Forms\BackgroundJob\UserDeletedJob;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
-use OCP\ILogger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class UserDeletedJobTest extends TestCase {
 	/** @var UserDeletedJob */
@@ -40,14 +41,14 @@ class UserDeletedJobTest extends TestCase {
 	/** @var FormMapper|MockObject */
 	private $formMapper;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	public function setUp(): void {
 		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$time = $this->createMock(ITimeFactory::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userDeletedJob = new UserDeletedJob($this->formMapper, $time, $this->logger);
 	}
 

@@ -26,19 +26,20 @@ namespace OCA\Forms\BackgroundJob;
 use OCA\Forms\Db\FormMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
-use OCP\ILogger;
+
+use Psr\Log\LoggerInterface;
 
 class UserDeletedJob extends QueuedJob {
 
 	/** @var FormMapper */
 	private $formMapper;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	public function __construct(FormMapper $formMapper,
 								ITimeFactory $time,
-								ILogger $logger) {
+								LoggerInterface $logger) {
 		parent::__construct($time);
 
 		$this->formMapper = $formMapper;

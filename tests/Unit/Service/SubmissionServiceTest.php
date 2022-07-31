@@ -42,13 +42,14 @@ use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class SubmissionServiceTest extends TestCase {
 
@@ -79,7 +80,7 @@ class SubmissionServiceTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	/** @var IUserManager|MockObject */
@@ -95,7 +96,7 @@ class SubmissionServiceTest extends TestCase {
 		$this->config = $this->createMock(IConfig::class);
 		$this->dateTimeFormatter = $this->createMock(IDateTimeFormatter::class);
 		$this->l10n = $this->createMock(IL10N::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);
 

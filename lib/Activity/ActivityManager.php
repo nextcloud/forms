@@ -27,9 +27,10 @@ use OCA\Forms\Db\Form;
 
 use OCP\Activity\IManager;
 use OCP\IGroupManager;
-use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserSession;
+
+use Psr\Log\LoggerInterface;
 
 class ActivityManager {
 	protected $appName;
@@ -40,7 +41,7 @@ class ActivityManager {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IUser */
@@ -49,7 +50,7 @@ class ActivityManager {
 	public function __construct(string $appName,
 								IManager $manager,
 								IGroupManager $groupManager,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IUserSession $userSession) {
 		$this->appName = $appName;
 		$this->manager = $manager;

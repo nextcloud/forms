@@ -34,7 +34,6 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -42,6 +41,8 @@ use OCP\L10N\IFactory;
 use OCP\RichObjectStrings\IValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class ProviderTest extends TestCase {
 
@@ -60,7 +61,7 @@ class ProviderTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	/** @var IURLGenerator|MockObject */
@@ -80,7 +81,7 @@ class ProviderTest extends TestCase {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->eventMerger = $this->createMock(IEventMerger::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->l10nFactory = $this->createMock(IFactory::class);

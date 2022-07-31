@@ -43,13 +43,14 @@ use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\IGroup;
 use OCP\IGroupManager;
-use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
+
+use Psr\Log\LoggerInterface;
 
 class ShareApiController extends OCSController {
 	protected $appName;
@@ -69,7 +70,7 @@ class ShareApiController extends OCSController {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IUserManager */
@@ -87,7 +88,7 @@ class ShareApiController extends OCSController {
 								ConfigService $configService,
 								FormsService $formsService,
 								IGroupManager $groupManager,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IRequest $request,
 								IUserManager $userManager,
 								IUserSession $userSession,
