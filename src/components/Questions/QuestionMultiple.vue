@@ -97,6 +97,7 @@ import axios from '@nextcloud/axios'
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import GenRandomId from '../../utils/GenRandomId.js'
+import logger from '../../utils/Logger.js'
 
 // Implementations docs
 // https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html
@@ -317,8 +318,8 @@ export default {
 				// let's not await, deleting in background
 				axios.delete(generateOcsUrl('apps/forms/api/v2/option/{id}', { id: option.id }))
 					.catch(error => {
+						logger.error('Error while deleting an option', { error, option })
 						showError(t('forms', 'There was an issue deleting this option'))
-						console.error(error)
 						// restore option
 						this.restoreOption(option, optionIndex)
 					})

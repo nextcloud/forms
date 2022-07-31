@@ -139,6 +139,7 @@ import SharingShareDiv from './SharingShareDiv.vue'
 import ShareTypes from '../../mixins/ShareTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.js'
 
 export default {
 	components: {
@@ -201,7 +202,7 @@ export default {
 				this.$emit('add-share', share)
 
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while adding new share', { error, share: newShare })
 				showError(t('forms', 'There was an error while adding the share'))
 			} finally {
 				this.isLoading = false
@@ -222,7 +223,7 @@ export default {
 				this.$emit('add-share', share)
 
 			} catch (error) {
-				console.error(error)
+				logger.error('Error adding public link', { error })
 				showError(t('forms', 'There was an error while adding the link'))
 			} finally {
 				this.isLoading = false
@@ -243,7 +244,7 @@ export default {
 				}))
 				this.$emit('remove-share', share)
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while removing share', { error, share })
 				showError(t('forms', 'There was an error while removing the share'))
 			} finally {
 				this.isLoading = false

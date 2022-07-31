@@ -83,6 +83,7 @@ import axios from '@nextcloud/axios'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 
 import answerTypes from '../models/AnswerTypes.js'
+import logger from '../utils/Logger.js'
 
 import EmptyContent from '../components/EmptyContent.vue'
 import Question from '../components/Questions/Question.vue'
@@ -180,7 +181,7 @@ export default {
 		hash() {
 			// If public view, abort. Should normally not occur.
 			if (this.publicView) {
-				console.error('Hash changed on public View. Aborting.')
+				logger.error('Hash changed on public View. Aborting.')
 				return
 			}
 			this.resetData()
@@ -238,7 +239,7 @@ export default {
 				})
 				this.success = true
 			} catch (error) {
-				console.error(error)
+				logger.error('Error while submitting the form', { error })
 				showError(t('forms', 'There was an error submitting the form'))
 			} finally {
 				this.loading = false

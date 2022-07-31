@@ -38,6 +38,7 @@ import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.js'
 
 export default {
 	name: 'AnswerInput',
@@ -150,14 +151,14 @@ export default {
 					questionId: answer.questionId,
 					text: answer.text,
 				})
-				console.debug('Created answer', answer)
+				logger.debug('Created answer', { answer })
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
 				return Object.assign({}, answer, OcsResponse2Data(response))
 			} catch (error) {
+				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
-				console.error(error)
 			}
 
 			return answer
@@ -180,10 +181,10 @@ export default {
 						text: answer.text,
 					},
 				})
-				console.debug('Updated answer', answer)
+				logger.debug('Updated answer', { answer })
 			} catch (error) {
+				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
-				console.error(error)
 			}
 		},
 	},

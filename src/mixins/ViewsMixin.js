@@ -28,6 +28,7 @@ import Vue from 'vue'
 
 import CancelableRequest from '../utils/CancelableRequest.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import logger from '../utils/Logger.js'
 
 Vue.use(Clipboard)
 
@@ -79,7 +80,7 @@ export default {
 			this.cancelFetchFullForm('New request pending.')
 
 			// Output after cancelling previous request for logical order.
-			console.debug('Loading form', id)
+			logger.debug(`Loading form ${id}`)
 
 			// Create new cancelable get request
 			const { request, cancel } = CancelableRequest(async function(url, requestOptions) {
@@ -94,9 +95,9 @@ export default {
 				this.isLoadingForm = false
 			} catch (error) {
 				if (axios.isCancel(error)) {
-					console.debug('The request for form', id, 'has been canceled.', error)
+					logger.debug(`The request for form ${id} has been canceled`, { error })
 				} else {
-					console.error(error)
+					logger.error(`Unexpected error fetching form ${id}`, { error })
 					this.isLoadingForm = false
 				}
 			} finally {
@@ -116,8 +117,8 @@ export default {
 					},
 				})
 			} catch (error) {
+				logger.error('Error saving form property', { error })
 				showError(t('forms', 'Error while saving form'))
-				console.error(error)
 			}
 		},
 	},

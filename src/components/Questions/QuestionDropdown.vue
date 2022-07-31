@@ -90,6 +90,7 @@ import axios from '@nextcloud/axios'
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import GenRandomId from '../../utils/GenRandomId.js'
+import logger from '../../utils/Logger.js'
 
 export default {
 	name: 'QuestionDropdown',
@@ -285,8 +286,8 @@ export default {
 				// let's not await, deleting in background
 				axios.delete(generateOcsUrl('apps/forms/api/v2/option/{id}', { id: option.id }))
 					.catch(error => {
+						logger.error('Error while deleting an option', { option, error })
 						showError(t('forms', 'There was an issue deleting this option'))
-						console.error(error)
 						// restore option
 						this.restoreOption(option, optionIndex)
 					})

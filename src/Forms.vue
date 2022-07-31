@@ -107,6 +107,7 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import EmptyContent from './components/EmptyContent.vue'
 import PermissionTypes from './mixins/PermissionTypes.js'
 import OcsResponse2Data from './utils/OcsResponse2Data.js'
+import logger from './utils/Logger.js'
 
 export default {
 	name: 'Forms',
@@ -232,8 +233,8 @@ export default {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/forms'))
 				this.forms = OcsResponse2Data(response)
 			} catch (error) {
+				logger.error('Error while loading owned forms list', { error })
 				showError(t('forms', 'An error occurred while loading the forms list'))
-				console.error(error)
 			}
 
 			// Load shared forms
@@ -241,8 +242,8 @@ export default {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/shared_forms'))
 				this.sharedForms = OcsResponse2Data(response)
 			} catch (error) {
+				logger.error('Error while loading shared forms list', { error })
 				showError(t('forms', 'An error occurred while loading the forms list'))
-				console.error(error)
 			}
 
 			this.loading = false
@@ -265,8 +266,8 @@ export default {
 					this.sharedForms.push(form)
 				}
 			} catch (error) {
+				logger.error(`Form ${hash} not found`, { error })
 				showError(t('forms', 'Form not found'))
-				console.error(error)
 			} finally {
 				this.loading = false
 			}
@@ -284,8 +285,8 @@ export default {
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
 				this.mobileCloseNavigation()
 			} catch (error) {
+				logger.error('Unable to create new form', { error })
 				showError(t('forms', 'Unable to create a new form'))
-				console.error(error)
 			}
 		},
 
@@ -302,8 +303,8 @@ export default {
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
 				this.mobileCloseNavigation()
 			} catch (error) {
+				logger.error(`Unable to copy form ${id}`, { error })
 				showError(t('forms', 'Unable to copy form'))
-				console.error(error)
 			}
 		},
 

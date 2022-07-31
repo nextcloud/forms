@@ -24,6 +24,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
+import logger from '../utils/Logger.js'
 import Question from '../components/Questions/Question.vue'
 
 export default {
@@ -196,8 +197,8 @@ export default {
 					},
 				})
 			} catch (error) {
+				logger.error('Error while saving question', { error })
 				showError(t('forms', 'Error while saving question'))
-				console.error(error)
 			}
 		},
 	},

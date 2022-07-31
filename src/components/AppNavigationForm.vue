@@ -61,6 +61,8 @@ import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
+import logger from '../utils/Logger.js'
+
 export default {
 	name: 'AppNavigationForm',
 
@@ -155,8 +157,8 @@ export default {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2/form/{id}', { id: this.form.id }))
 				this.$emit('delete', this.form.id)
 			} catch (error) {
+				logger.error(`Error while deleting ${this.formTitle}`, { error: error.response })
 				showError(t('forms', 'Error while deleting {title}', { title: this.formTitle }))
-				console.error(error.response)
 			} finally {
 				this.loading = false
 			}

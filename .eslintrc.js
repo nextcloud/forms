@@ -4,5 +4,9 @@ module.exports = {
 	},
 	extends: [
 		'@nextcloud',
-	]
+	],
+	rules: {
+		// We are using the @nextcloud/logger
+		'no-console': ['error', { allow: undefined }],
+	},
 }
