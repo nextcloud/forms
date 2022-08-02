@@ -28,12 +28,13 @@ use OCA\Forms\Listener\UserDeletedListener;
 
 use OCA\Forms\BackgroundJob\UserDeletedJob;
 use OCP\BackgroundJob\IJobList;
-use OCP\ILogger;
 use OCP\IUser;
 use OCP\User\Events\UserCreatedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class UserDeletedListenerTest extends TestCase {
 	/** @var UserDeletedListener */
@@ -42,13 +43,13 @@ class UserDeletedListenerTest extends TestCase {
 	/** @var IJobList|MockObject */
 	private $jobList;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	public function setUp(): void {
 		parent::setUp();
 		$this->jobList = $this->createMock(IJobList::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userDeletedListener = new UserDeletedListener($this->jobList, $this->logger);
 	}
 

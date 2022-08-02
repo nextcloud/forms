@@ -54,12 +54,13 @@ use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\Files\NotPermittedException;
 use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
+
+use Psr\Log\LoggerInterface;
 
 class ApiController extends OCSController {
 	protected $appName;
@@ -97,7 +98,7 @@ class ApiController extends OCSController {
 	/** @var IL10N */
 	private $l10n;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IUser */
@@ -121,7 +122,7 @@ class ApiController extends OCSController {
 								FormsService $formsService,
 								SubmissionService $submissionService,
 								IL10N $l10n,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IRequest $request,
 								IUserManager $userManager,
 								IUserSession $userSession,

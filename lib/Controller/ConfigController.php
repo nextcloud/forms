@@ -31,8 +31,9 @@ use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IConfig;
-use OCP\ILogger;
 use OCP\IRequest;
+
+use Psr\Log\LoggerInterface;
 
 class ConfigController extends ApiController {
 	protected $appName;
@@ -43,13 +44,13 @@ class ConfigController extends ApiController {
 	/** @var IConfig */
 	private $config;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	public function __construct(string $appName,
 								ConfigService $configService,
 								IConfig $config,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IRequest $request) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;

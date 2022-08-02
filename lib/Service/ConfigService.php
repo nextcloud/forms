@@ -30,9 +30,10 @@ use OCA\Forms\Constants;
 use OCP\IConfig;
 use OCP\IGroup;
 use OCP\IGroupManager;
-use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserSession;
+
+use Psr\Log\LoggerInterface;
 
 class ConfigService {
 	protected $appName;
@@ -43,7 +44,7 @@ class ConfigService {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IUser */
@@ -52,7 +53,7 @@ class ConfigService {
 	public function __construct(string $appName,
 								IConfig $config,
 								IGroupManager $groupManager,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IUserSession $userSession) {
 		$this->appName = $appName;
 		$this->config = $config;

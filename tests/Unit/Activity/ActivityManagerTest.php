@@ -31,11 +31,12 @@ use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
 use OCP\IGroup;
 use OCP\IGroupManager;
-use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class ActivityManagerTest extends TestCase {
 
@@ -48,14 +49,14 @@ class ActivityManagerTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	public function setUp(): void {
 		parent::setUp();
 		$this->manager = $this->createMock(IManager::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);

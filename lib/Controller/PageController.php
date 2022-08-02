@@ -43,13 +43,14 @@ use OCP\AppFramework\Http\RedirectResponse;
 use OCP\IGroupManager;
 use OCP\IInitialStateService;
 use OCP\IL10N;
-use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Util;
+
+use Psr\Log\LoggerInterface;
 
 class PageController extends Controller {
 	private const TEMPLATE_EXPIRED = 'expired';
@@ -83,7 +84,7 @@ class PageController extends Controller {
 	/** @var IL10N */
 	private $l10n;
 
-	/** @var ILogger */
+	/** @var LoggerInterface */
 	private $logger;
 
 	/** @var IRequest */
@@ -108,7 +109,7 @@ class PageController extends Controller {
 								IGroupManager $groupManager,
 								IInitialStateService $initialStateService,
 								IL10N $l10n,
-								ILogger $logger,
+								LoggerInterface $logger,
 								IUrlGenerator $urlGenerator,
 								IUserManager $userManager,
 								IUserSession $userSession) {

@@ -29,11 +29,12 @@ use OCA\Forms\Controller\ConfigController;
 use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IConfig;
-use OCP\ILogger;
 use OCP\IRequest;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+
+use Psr\Log\LoggerInterface;
 
 class ConfigControllerTest extends TestCase {
 
@@ -46,7 +47,7 @@ class ConfigControllerTest extends TestCase {
 	/** @var IConfig|MockObject */
 	private $config;
 
-	/** @var ILogger|MockObject */
+	/** @var LoggerInterface|MockObject */
 	private $logger;
 
 	/** @var IRequest|MockObject */
@@ -57,7 +58,7 @@ class ConfigControllerTest extends TestCase {
 
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->config = $this->createMock(IConfig::class);
-		$this->logger = $this->createMock(ILogger::class);
+		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->request = $this->createMock(IRequest::class);
 
 		$this->configController = new ConfigController(
