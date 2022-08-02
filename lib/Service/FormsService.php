@@ -41,6 +41,7 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
 use Psr\Log\LoggerInterface;
@@ -83,6 +84,9 @@ class FormsService {
 	/** @var IUserManager */
 	private $userManager;
 
+	/** @var ISecureRandom */
+	private $secureRandom;
+
 	public function __construct(ActivityManager $activityManager,
 								FormMapper $formMapper,
 								OptionMapper $optionMapper,
@@ -93,7 +97,8 @@ class FormsService {
 								IGroupManager $groupManager,
 								LoggerInterface $logger,
 								IUserManager $userManager,
-								IUserSession $userSession) {
+								IUserSession $userSession,
+								ISecureRandom $secureRandom) {
 		$this->activityManager = $activityManager;
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;
@@ -104,8 +109,19 @@ class FormsService {
 		$this->groupManager = $groupManager;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
+		$this->secureRandom = $secureRandom;
 
 		$this->currentUser = $userSession->getUser();
+	}
+
+	/**
+	 * Create a new Form Hash
+	 */
+	public function generateFormHash(): string {
+		return $this->secureRandom->generate(
+			16,
+			ISecureRandom::CHAR_HUMAN_READABLE
+		);
 	}
 
 	/**

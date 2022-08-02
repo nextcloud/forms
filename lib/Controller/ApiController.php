@@ -58,7 +58,6 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-use OCP\Security\ISecureRandom;
 
 use Psr\Log\LoggerInterface;
 
@@ -107,9 +106,6 @@ class ApiController extends OCSController {
 	/** @var IUserManager */
 	private $userManager;
 
-	/** @var ISecureRandom */
-	private $secureRandom;
-
 	public function __construct(string $appName,
 								ActivityManager $activityManager,
 								AnswerMapper $answerMapper,
@@ -125,8 +121,7 @@ class ApiController extends OCSController {
 								LoggerInterface $logger,
 								IRequest $request,
 								IUserManager $userManager,
-								IUserSession $userSession,
-								ISecureRandom $secureRandom) {
+								IUserSession $userSession) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->activityManager = $activityManager;
@@ -143,7 +138,6 @@ class ApiController extends OCSController {
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
-		$this->secureRandom = $secureRandom;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -259,10 +253,7 @@ class ApiController extends OCSController {
 		$form = new Form();
 		$form->setOwnerId($this->currentUser->getUID());
 		$form->setCreated(time());
-		$form->setHash($this->secureRandom->generate(
-			16,
-			ISecureRandom::CHAR_HUMAN_READABLE
-		));
+		$form->setHash($this->formsService->generateFormHash());
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
@@ -315,10 +306,7 @@ class ApiController extends OCSController {
 		$formData = $oldForm->read();
 		unset($formData['id']);
 		$formData['created'] = time();
-		$formData['hash'] = $this->secureRandom->generate(
-			16,
-			ISecureRandom::CHAR_HUMAN_READABLE
-		);
+		$formData['hash'] = $this->formsService->generateFormHash();
 		// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 		$formData['title'] .= ' - ' . $this->l10n->t('Copy');
 

@@ -43,6 +43,7 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
@@ -85,6 +86,9 @@ class FormsServiceTest extends TestCase {
 	/** @var IUserManager|MockObject */
 	private $userManager;
 
+	/** @var ISecureRandom|MockObject */
+	private $secureRandom;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -98,6 +102,7 @@ class FormsServiceTest extends TestCase {
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
+		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);
@@ -119,8 +124,18 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession
+			$userSession,
+			$this->secureRandom
 		);
+	}
+
+	public function testGenerateFormHash() {
+		$this->secureRandom->expects($this->once())
+			->method('generate')
+			->with(16, ISecureRandom::CHAR_HUMAN_READABLE)
+			->willReturn('testHash');
+
+		$this->assertEquals('testHash', $this->formsService->generateFormHash());
 	}
 
 	public function dataGetForm() {
@@ -565,7 +580,8 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession
+			$userSession,
+			$this->secureRandom
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit(42));
@@ -740,7 +756,8 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession
+			$userSession,
+			$this->secureRandom
 		);
 
 		$form = new Form();
