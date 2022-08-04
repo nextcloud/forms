@@ -28,7 +28,7 @@
 				:text="t('forms', 'New form')"
 				@click="onNewForm">
 				<template #icon>
-					<IconPlus size="20" decorative />
+					<IconPlus :size="20" decorative />
 				</template>
 			</NcAppNavigationNew>
 			<template #list>
@@ -61,9 +61,9 @@
 			<EmptyContent v-else-if="!hasForms">
 				{{ t('forms', 'No forms created yet') }}
 				<template v-if="canCreateForms" #action>
-					<button class="primary" @click="onNewForm">
+					<NcButton type="primary" @click="onNewForm">
 						{{ t('forms', 'Create a form') }}
-					</button>
+					</NcButton>
 				</template>
 			</EmptyContent>
 
@@ -71,9 +71,9 @@
 				<span v-if="canCreateForms">{{ t('forms', 'Select a form or create a new one') }}</span>
 				<span v-else>{{ t('forms', 'Please select a form') }}</span>
 				<template v-if="canCreateForms" #action>
-					<button class="primary" @click="onNewForm">
+					<NcButton type="primary" @click="onNewForm">
 						{{ t('forms', 'Create new form') }}
-					</button>
+					</NcButton>
 				</template>
 			</EmptyContent>
 		</NcAppContent>
@@ -103,6 +103,7 @@ import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation'
 import NcAppNavigationCaption from '@nextcloud/vue/dist/Components/NcAppNavigationCaption'
 import NcAppNavigationNew from '@nextcloud/vue/dist/Components/NcAppNavigationNew'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton'
 import NcContent from '@nextcloud/vue/dist/Components/NcContent'
 import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
@@ -125,6 +126,7 @@ export default {
 		NcAppNavigation,
 		NcAppNavigationCaption,
 		NcAppNavigationNew,
+		NcButton,
 		NcContent,
 	},
 

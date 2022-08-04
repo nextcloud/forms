@@ -31,14 +31,23 @@
 
 	<NcAppContent v-else>
 		<TopBar>
-			<button @click="showEdit">
-				<span class="icon-forms" role="img" />
-				{{ t('forms', 'Back to questions') }}
-			</button>
-			<button v-if="!noSubmissions" @click="onShareForm">
-				<span class="icon-share" role="img" />
-				{{ t('forms', 'Share form') }}
-			</button>
+			<NcButton v-tooltip="t('forms', 'Back to questions')"
+				:aria-label="t('forms', 'Back to questions')"
+				type="tertiary"
+				@click="showEdit">
+				<template #icon>
+					<IconReply :size="24" />
+				</template>
+			</NcButton>
+			<NcButton v-if="!noSubmissions"
+				v-tooltip="t('forms', 'Share form')"
+				:aria-label="t('forms', 'Share form')"
+				type="tertiary"
+				@click="onShareForm">
+				<template #icon>
+					<IconShareVariant :size="20" />
+				</template>
+			</NcButton>
 		</TopBar>
 
 		<header v-if="!noSubmissions">
@@ -95,10 +104,12 @@
 					{{ t('forms', 'Results of submitted forms will show up here') }}
 				</template>
 				<template #action>
-					<button class="primary" @click="onShareForm">
-						<span class="icon-share-primary" role="img" />
+					<NcButton type="primary" @click="onShareForm">
+						<template #icon>
+							<IconShareVariant :size="20" decorative />
+						</template>
 						{{ t('forms', 'Share form') }}
-					</button>
+					</NcButton>
 				</template>
 			</EmptyContent>
 		</section>
@@ -129,8 +140,12 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
+
+import IconShareVariant from 'vue-material-design-icons/ShareVariant'
+import IconReply from 'vue-material-design-icons/Reply'
 
 import EmptyContent from '../components/EmptyContent.vue'
 import Summary from '../components/Results/Summary.vue'
@@ -154,10 +169,13 @@ export default {
 
 	components: {
 		EmptyContent,
+		IconReply,
+		IconShareVariant,
 		NcActions,
 		NcActionButton,
 		NcActionLink,
 		NcAppContent,
+		NcButton,
 		Summary,
 		Submission,
 		TopBar,

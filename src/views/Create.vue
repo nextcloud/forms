@@ -31,24 +31,25 @@
 
 	<NcAppContent v-else>
 		<!-- Show results & sidebar button -->
-		<TopBar>
-			<template #default>
-				<button @click="showResults">
-					<span class="icon-comment" role="img" />
-					<!-- TRANSLATORS Button to switch to the Result-View -->
-					{{ t('forms', 'Results') }}
-				</button>
-				<button v-if="!sidebarOpened" @click="onShareForm">
-					<span class="icon-share" role="img" />
-					{{ t('forms', 'Share form') }}
-				</button>
-			</template>
-			<template #small>
-				<button v-tooltip="t('forms', 'Toggle settings')"
-					@click="toggleSidebar">
-					<span class="icon-menu-sidebar" role="img" />
-				</button>
-			</template>
+		<TopBar :sidebar-opened="sidebarOpened"
+			@update:sidebarOpened="onSidebarChange">
+			<NcButton v-tooltip="t('forms', 'Results')"
+				:aria-label="t('forms', 'Results')"
+				type="tertiary"
+				@click="showResults">
+				<template #icon>
+					<IconMessageReplyText :size="20" />
+				</template>
+			</NcButton>
+			<NcButton v-if="!sidebarOpened"
+				v-tooltip="t('forms', 'Share form')"
+				:aria-label="t('forms', 'Share form')"
+				type="tertiary"
+				@click="onShareForm">
+				<template #icon>
+					<IconShareVariant :size="20" />
+				</template>
+			</NcButton>
 		</TopBar>
 
 		<!-- Forms title & description-->
@@ -130,10 +131,13 @@ import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
+import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton'
 
 import answerTypes from '../models/AnswerTypes.js'
 import EmptyContent from '../components/EmptyContent.vue'
@@ -154,9 +158,12 @@ export default {
 	components: {
 		Draggable,
 		EmptyContent,
+		IconMessageReplyText,
+		IconShareVariant,
 		NcActionButton,
 		NcActions,
 		NcAppContent,
+		NcButton,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -263,6 +270,9 @@ export default {
 		onDescChange() {
 			this.autoSizeDescription()
 			this.saveDescription()
+		},
+		onSidebarChange(newState) {
+			this.$emit('update:sidebarOpened', newState)
 		},
 
 		/**
@@ -383,9 +393,6 @@ export default {
 				},
 			})
 		},
-		toggleSidebar() {
-			this.$emit('update:sidebarOpened', !this.sidebarOpened)
-		},
 
 		/**
 		 * Auto adjust the title height based on lines number
@@ -472,15 +479,6 @@ export default {
 			margin-top: 4px;
 			resize: none;
 			color: var(--color-text-maxcontrast);
-		}
-	}
-
-	.empty-content__button {
-		margin: 5px;
-		> span {
-			margin-right: 5px;
-			cursor: pointer;
-			opacity: 1;
 		}
 	}
 
