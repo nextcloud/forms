@@ -35,7 +35,7 @@ OC.L10N.register(
     "Select groups" : "Gruppen auswählen",
     "Form sharing" : "Formular teilen",
     "Allow sharing by link" : "Teilen per Link zulassen",
-    "Allow sharing to all logged in accounts" : "Allen angemeldeten Konten das Teilen erlauben",
+    "Allow sharing to all logged in accounts" : "Das Teilen mit allen angemeldeten Konten erlauben",
     "Error while saving configuration" : "Fehler beim Speichern der Einstellungen",
     "Error while reloading config" : "Fehler beim Neuladen der Einstellungen",
     "Share form" : "Formular teilen",
