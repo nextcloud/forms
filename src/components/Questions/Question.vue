@@ -303,7 +303,7 @@ export default {
 			}
 
 			&__text[type=text] {
-				border-bottom-color: var(--color-border-dark);
+				border-bottom-color: var(--color-text-maxcontrast);
 				margin-top: 2px;
 			}
 
