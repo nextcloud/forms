@@ -36,23 +36,17 @@
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
-		<select v-if="!edit"
-			:id="text"
+		<Multiselect v-if="!edit"
+			v-model="selectedOption"
 			:name="text"
+			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"
 			:required="isRequired"
-			class="question__content"
-			@change="onChange">
-			<option value="">
-				{{ selectOptionPlaceholder }}
-			</option>
-			<option v-for="answer in options"
-				:key="answer.id"
-				:value="answer.id"
-				:selected="isChecked(answer.id)">
-				{{ answer.text }}
-			</option>
-		</select>
+			:options="options"
+			:searchable="false"
+			label="text"
+			track-by="id"
+			@select="onSelect" />
 
 		<ol v-if="edit" class="question__content">
 			<!-- Answer text input edit -->
@@ -86,6 +80,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
@@ -97,9 +92,16 @@ export default {
 
 	components: {
 		AnswerInput,
+		Multiselect,
 	},
 
 	mixins: [QuestionMixin],
+
+	data() {
+		return {
+			selectedOption: null,
+		}
+	},
 
 	computed: {
 		selectOptionPlaceholder() {
@@ -155,30 +157,15 @@ export default {
 	},
 
 	methods: {
-		onChange(event) {
-			// Get all selected options
-			const answerIds = [...event.target.options]
-				.filter(option => option.selected)
-				.map(option => parseInt(option.value, 10))
-
+		onSelect(option) {
 			// Simple select
 			if (!this.isMultiple) {
-				this.$emit('update:values', [answerIds[0]])
+				this.$emit('update:values', [option.id])
 				return
 			}
 
 			// Emit values and remove duplicates
-			this.$emit('update:values', [...new Set(answerIds)])
-		},
-
-		/**
-		 * Is the provided answer checked ?
-		 *
-		 * @param {number} id the answer id
-		 * @return {boolean}
-		 */
-		isChecked(id) {
-			return this.values.indexOf(id) > -1
+			this.$emit('update:values', [...new Set(option.id)])
 		},
 
 		/**
@@ -334,12 +321,5 @@ export default {
 	border-radius: 0;
 	font-size: 14px;
 	position: relative;
-}
-
-// Fix display of select dropdown and adjust to Forms text
-select.question__content {
-	height: 44px;
-	padding: 12px 0 12px 12px;
-	font-size: 14px;
 }
 </style>
