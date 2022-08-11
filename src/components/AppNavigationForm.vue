@@ -21,14 +21,22 @@
   -->
 
 <template>
-	<AppNavigationItem ref="navigationItem"
-		:icon="icon"
+	<ListItem ref="navigationItem"
 		:title="formTitle"
 		:to="{
 			name: routerTarget,
 			params: { hash: form.hash }
 		}"
+		:counter-number="form.submissionCount"
+		:active="isActive"
+		:compact="true"
 		@click="mobileCloseNavigation">
+		<template #icon>
+			<div :class="icon" />
+		</template>
+		<template v-if="hasSubtitle" #subtitle>
+			{{ formSubtitle }}
+		</template>
 		<template v-if="!loading && !readOnly" #actions>
 			<ActionButton :close-after-click="true" icon="icon-share" @click="onShareForm">
 				{{ t('forms', 'Share form') }}
@@ -48,7 +56,7 @@
 				{{ t('forms', 'Delete form') }}
 			</ActionButton>
 		</template>
-	</AppNavigationItem>
+	</ListItem>
 </template>
 
 <script>
@@ -57,7 +65,7 @@ import { showError } from '@nextcloud/dialogs'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import ActionRouter from '@nextcloud/vue/dist/Components/ActionRouter'
 import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
+import ListItem from '@nextcloud/vue/dist/Components/ListItem'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
@@ -67,7 +75,7 @@ export default {
 	name: 'AppNavigationForm',
 
 	components: {
-		AppNavigationItem,
+		ListItem,
 		ActionButton,
 		ActionRouter,
 		ActionSeparator,
@@ -101,6 +109,16 @@ export default {
 			return 'icon-forms'
 		},
 
+		/**
+		 * Check if form is current form and set active
+		 */
+		isActive() {
+			return this.form.hash === this.$route.params.hash
+		},
+
+		/**
+		 * Check if form is expired
+		 */
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
@@ -115,6 +133,27 @@ export default {
 				return this.form.title
 			}
 			return t('forms', 'New form')
+		},
+
+		/**
+		 * Return expiration details for subtitle
+		 */
+		formSubtitle() {
+			if (this.form.expires) {
+				const relativeDate = moment(this.form.expires, 'X').fromNow()
+				if (this.isExpired) {
+					return t('forms', 'Expired {relativeDate}', { relativeDate })
+				}
+				return t('forms', 'Expires {relativeDate}', { relativeDate })
+			}
+			return ''
+		},
+
+		/**
+		 * Return, if form has Subtitle
+		 */
+		hasSubtitle() {
+			return this.formSubtitle !== ''
 		},
 
 		/**
@@ -164,6 +203,11 @@ export default {
 			}
 		},
 	},
-
 }
 </script>
+
+<style lang="scss" scoped>
+.icon-forms {
+	background-size: 16px;
+}
+</style>
