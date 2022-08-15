@@ -42,6 +42,8 @@ OC.L10N.register(
     "Results" : "結果",
     "Copy form" : "複製表單",
     "Delete form" : "刪除表單",
+    "Expired {relativeDate}" : "已過期 {relativeDate}",
+    "Expires {relativeDate}" : "過期於 {relativeDate}",
     "Are you sure you want to delete {title}?" : "您確定您想要刪除 {title} 嗎？",
     "Error while deleting {title}" : "刪除 {title} 時發生錯誤",
     "An answer for the {index} option" : "{index} 選項的答案",
