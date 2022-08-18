@@ -21,24 +21,24 @@
   -->
 
 <template>
-	<Content app-name="forms">
+	<NcContent app-name="forms">
 		<Submit :form="form"
 			:public-view="true"
 			:share-hash="shareHash"
 			:is-logged-in="isLoggedIn" />
-	</Content>
+	</NcContent>
 </template>
 
 <script>
 import { loadState } from '@nextcloud/initial-state'
-import Content from '@nextcloud/vue/dist/Components/Content'
+import NcContent from '@nextcloud/vue/dist/Components/NcContent'
 import Submit from './views/Submit.vue'
 
 export default {
 	name: 'FormsSubmit',
 
 	components: {
-		Content,
+		NcContent,
 		Submit,
 	},
 

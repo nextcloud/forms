@@ -22,15 +22,15 @@
 
 <template>
 	<div>
-		<SettingsSection :title="t('forms', 'Form creation')">
-			<CheckboxRadioSwitch ref="switchRestrictCreation"
+		<NcSettingsSection :title="t('forms', 'Form creation')">
+			<NcCheckboxRadioSwitch ref="switchRestrictCreation"
 				:checked.sync="appConfig.restrictCreation"
 				class="forms-settings__creation__switch"
 				type="switch"
 				@update:checked="onRestrictCreationChange">
 				{{ t('forms', 'Restrict form creation to selected groups') }}
-			</CheckboxRadioSwitch>
-			<Multiselect v-model="appConfig.creationAllowedGroups"
+			</NcCheckboxRadioSwitch>
+			<NcMultiselect v-model="appConfig.creationAllowedGroups"
 				:disabled="!appConfig.restrictCreation"
 				:multiple="true"
 				:options="availableGroups"
@@ -39,21 +39,21 @@
 				label="displayName"
 				track-by="groupId"
 				@update:value="onCreationAllowedGroupsChange" />
-		</SettingsSection>
-		<SettingsSection :title="t('forms', 'Form sharing')">
-			<CheckboxRadioSwitch ref="switchAllowPublicLink"
+		</NcSettingsSection>
+		<NcSettingsSection :title="t('forms', 'Form sharing')">
+			<NcCheckboxRadioSwitch ref="switchAllowPublicLink"
 				:checked.sync="appConfig.allowPublicLink"
 				type="switch"
 				@update:checked="onAllowPublicLinkChange">
 				{{ t('forms', 'Allow sharing by link') }}
-			</CheckboxRadioSwitch>
-			<CheckboxRadioSwitch ref="switchAllowPermitAll"
+			</NcCheckboxRadioSwitch>
+			<NcCheckboxRadioSwitch ref="switchAllowPermitAll"
 				:checked.sync="appConfig.allowPermitAll"
 				type="switch"
 				@update:checked="onAllowPermitAllChange">
 				{{ t('forms', 'Allow sharing to all logged in accounts') }}
-			</CheckboxRadioSwitch>
-		</SettingsSection>
+			</NcCheckboxRadioSwitch>
+		</NcSettingsSection>
 	</div>
 </template>
 
@@ -62,9 +62,9 @@ import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
-import SettingsSection from '@nextcloud/vue/dist/Components/SettingsSection'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch'
+import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect'
+import NcSettingsSection from '@nextcloud/vue/dist/Components/NcSettingsSection'
 
 import logger from './utils/Logger.js'
 
@@ -72,9 +72,9 @@ export default {
 	name: 'FormsSettings',
 
 	components: {
-		CheckboxRadioSwitch,
-		Multiselect,
-		SettingsSection,
+		NcCheckboxRadioSwitch,
+		NcMultiselect,
+		NcSettingsSection,
 	},
 
 	data() {

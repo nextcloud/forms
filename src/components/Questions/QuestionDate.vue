@@ -35,7 +35,7 @@
 		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
 		<div class="question__content">
-			<DatetimePicker v-model="time"
+			<NcDatetimePicker v-model="time"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
@@ -51,13 +51,13 @@
 import moment from '@nextcloud/moment'
 
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
+import NcDatetimePicker from '@nextcloud/vue/dist/Components/NcDatetimePicker'
 
 export default {
 	name: 'QuestionDate',
 
 	components: {
-		DatetimePicker,
+		NcDatetimePicker,
 	},
 
 	mixins: [QuestionMixin],

@@ -18,11 +18,11 @@
 			@keydown.enter.prevent="addNewEntry">
 
 		<!-- Delete answer -->
-		<Actions>
-			<ActionButton icon="icon-close" @click="deleteEntry">
+		<NcActions>
+			<NcActionButton icon="icon-close" @click="deleteEntry">
 				{{ t('forms', 'Delete answer') }}
-			</ActionButton>
-		</Actions>
+			</NcActionButton>
+		</NcActions>
 	</li>
 </template>
 
@@ -34,8 +34,8 @@ import pDebounce from 'p-debounce'
 // eslint-disable-next-line import/no-unresolved, node/no-missing-import
 import PQueue from 'p-queue'
 
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
@@ -44,8 +44,8 @@ export default {
 	name: 'AnswerInput',
 
 	components: {
-		Actions,
-		ActionButton,
+		NcActions,
+		NcActionButton,
 	},
 
 	props: {

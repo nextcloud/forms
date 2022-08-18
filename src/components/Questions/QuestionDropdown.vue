@@ -36,7 +36,7 @@
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
 		@delete="onDelete">
-		<Multiselect v-if="!edit"
+		<NcMultiselect v-if="!edit"
 			v-model="selectedOption"
 			:name="text"
 			:placeholder="selectOptionPlaceholder"
@@ -80,7 +80,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
@@ -92,7 +92,7 @@ export default {
 
 	components: {
 		AnswerInput,
-		Multiselect,
+		NcMultiselect,
 	},
 
 	mixins: [QuestionMixin],

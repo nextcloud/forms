@@ -21,12 +21,12 @@
  -->
 
 <template>
-	<AppSidebar v-show="opened"
+	<NcAppSidebar v-show="opened"
 		:active="active"
 		:title="t('forms', 'Form settings')"
 		@close="onClose"
 		@update:active="onUpdateActive">
-		<AppSidebarTab id="forms-sharing"
+		<NcAppSidebarTab id="forms-sharing"
 			:order="0"
 			:name="t('forms', 'Sharing')"
 			icon="icon-share">
@@ -34,21 +34,21 @@
 				@update:formProp="onPropertyChange"
 				@add-share="onAddShare"
 				@remove-share="onRemoveShare" />
-		</AppSidebarTab>
+		</NcAppSidebarTab>
 
-		<AppSidebarTab id="forms-settings"
+		<NcAppSidebarTab id="forms-settings"
 			:order="1"
 			:name="t('forms', 'Settings')"
 			icon="icon-settings">
 			<SettingsSidebarTab :form="form"
 				@update:formProp="onPropertyChange" />
-		</AppSidebarTab>
-	</AppSidebar>
+		</NcAppSidebarTab>
+	</NcAppSidebar>
 </template>
 
 <script>
-import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
-import AppSidebarTab from '@nextcloud/vue/dist/Components/AppSidebarTab'
+import NcAppSidebar from '@nextcloud/vue/dist/Components/NcAppSidebar'
+import NcAppSidebarTab from '@nextcloud/vue/dist/Components/NcAppSidebarTab'
 
 import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
@@ -58,8 +58,8 @@ export default {
 	name: 'Sidebar',
 
 	components: {
-		AppSidebar,
-		AppSidebarTab,
+		NcAppSidebar,
+		NcAppSidebarTab,
 		SharingSidebarTab,
 		SettingsSidebarTab,
 	},

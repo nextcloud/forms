@@ -23,7 +23,7 @@
 
 <template>
 	<div>
-		<Multiselect :clear-on-select="false"
+		<NcMultiselect :clear-on-select="false"
 			:close-on-select="false"
 			:hide-selected="true"
 			:internal-search="false"
@@ -43,7 +43,7 @@
 			<template #noResult>
 				{{ noResultText }}
 			</template>
-		</Multiselect>
+		</NcMultiselect>
 	</div>
 </template>
 
@@ -51,7 +51,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect'
+import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect'
 import debounce from 'debounce'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
@@ -60,7 +60,7 @@ import logger from '../../utils/Logger.js'
 
 export default {
 	components: {
-		Multiselect,
+		NcMultiselect,
 	},
 
 	mixins: [ShareTypes],

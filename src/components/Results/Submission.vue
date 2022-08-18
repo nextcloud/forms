@@ -24,11 +24,11 @@
 	<div class="section submission">
 		<div class="submission-head">
 			<h3>{{ submission.userDisplayName }}</h3>
-			<Actions class="submission-menu" :force-menu="true">
-				<ActionButton icon="icon-delete" @click="onDelete">
+			<NcActions class="submission-menu" :force-menu="true">
+				<NcActionButton icon="icon-delete" @click="onDelete">
 					{{ t('forms', 'Delete this response') }}
-				</ActionButton>
-			</Actions>
+				</NcActionButton>
+			</NcActions>
 		</div>
 		<p class="submission-date">
 			{{ submissionDateTime }}
@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import moment from '@nextcloud/moment'
 
 import Answer from './Answer.vue'
@@ -52,9 +52,9 @@ export default {
 	name: 'Submission',
 
 	components: {
-		Actions,
-		ActionButton,
 		Answer,
+		NcActions,
+		NcActionButton,
 	},
 
 	props: {

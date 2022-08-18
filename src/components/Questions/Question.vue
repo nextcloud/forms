@@ -51,16 +51,16 @@
 					v-tooltip.auto="warningInvalid"
 					class="question__header__title__warning icon-error-color"
 					tabindex="0" />
-				<Actions v-if="!readOnly" class="question__header__title__menu" :force-menu="true">
-					<ActionCheckbox :checked="isRequired"
+				<NcActions v-if="!readOnly" class="question__header__title__menu" :force-menu="true">
+					<NcActionCheckbox :checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
-					</ActionCheckbox>
-					<ActionButton icon="icon-delete" @click="onDelete">
+					</NcActionCheckbox>
+					<NcActionButton icon="icon-delete" @click="onDelete">
 						{{ t('forms', 'Delete question') }}
-					</ActionButton>
-				</Actions>
+					</NcActionButton>
+				</NcActions>
 			</div>
 			<div class="question__header__description">
 				<textarea v-if="edit || !questionValid"
@@ -85,9 +85,9 @@
 
 <script>
 import { directive as ClickOutside } from 'v-click-outside'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ActionCheckbox from '@nextcloud/vue/dist/Components/ActionCheckbox'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox'
 
 export default {
 	name: 'Question',
@@ -97,9 +97,9 @@ export default {
 	},
 
 	components: {
-		Actions,
-		ActionButton,
-		ActionCheckbox,
+		NcActions,
+		NcActionButton,
+		NcActionCheckbox,
 	},
 
 	props: {

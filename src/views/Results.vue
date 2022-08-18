@@ -23,13 +23,13 @@
   -->
 
 <template>
-	<AppContent v-if="loadingResults">
+	<NcAppContent v-if="loadingResults">
 		<EmptyContent icon="icon-loading">
 			{{ t('forms', 'Loading responses …') }}
 		</EmptyContent>
-	</AppContent>
+	</NcAppContent>
 
-	<AppContent v-else>
+	<NcAppContent v-else>
 		<TopBar>
 			<button @click="showEdit">
 				<span class="icon-forms" role="img" />
@@ -71,19 +71,19 @@
 				</div>
 
 				<!-- Action menu for CSV export and deletion -->
-				<Actions class="results-menu"
+				<NcActions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
-					<ActionButton :close-after-click="true" icon="icon-folder" @click="onStoreToFiles">
+					<NcActionButton :close-after-click="true" icon="icon-folder" @click="onStoreToFiles">
 						{{ t('forms', 'Save CSV to Files') }}
-					</ActionButton>
-					<ActionLink icon="icon-download" :href="downloadUrl">
+					</NcActionButton>
+					<NcActionLink icon="icon-download" :href="downloadUrl">
 						{{ t('forms', 'Download CSV') }}
-					</ActionLink>
-					<ActionButton icon="icon-delete" @click="deleteAllSubmissions">
+					</NcActionLink>
+					<NcActionButton icon="icon-delete" @click="deleteAllSubmissions">
 						{{ t('forms', 'Delete all responses') }}
-					</ActionButton>
-				</Actions>
+					</NcActionButton>
+				</NcActions>
 			</div>
 		</header>
 
@@ -119,16 +119,16 @@
 				:questions="form.questions"
 				@delete="deleteSubmission(submission.id)" />
 		</section>
-	</AppContent>
+	</NcAppContent>
 </template>
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ActionLink from '@nextcloud/vue/dist/Components/ActionLink'
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
@@ -153,11 +153,11 @@ export default {
 	name: 'Results',
 
 	components: {
-		Actions,
-		ActionButton,
-		ActionLink,
-		AppContent,
 		EmptyContent,
+		NcActions,
+		NcActionButton,
+		NcActionLink,
+		NcAppContent,
 		Summary,
 		Submission,
 		TopBar,

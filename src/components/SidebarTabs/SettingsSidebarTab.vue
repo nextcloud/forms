@@ -23,26 +23,26 @@
 
 <template>
 	<div class="sidebar-tabs__content">
-		<CheckboxRadioSwitch :checked="form.isAnonymous"
+		<NcCheckboxRadioSwitch :checked="form.isAnonymous"
 			type="switch"
 			@update:checked="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
 			{{ t('forms', 'Store responses anonymously') }}
-		</CheckboxRadioSwitch>
-		<CheckboxRadioSwitch v-tooltip="disableSubmitMultipleExplanation"
+		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch v-tooltip="disableSubmitMultipleExplanation"
 			:checked="submitMultiple"
 			:disabled="disableSubmitMultiple"
 			type="switch"
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
-		</CheckboxRadioSwitch>
+		</NcCheckboxRadioSwitch>
 		<div>
-			<CheckboxRadioSwitch :checked="formExpires"
+			<NcCheckboxRadioSwitch :checked="formExpires"
 				type="switch"
 				@update:checked="onFormExpiresChange">
 				{{ t('forms', 'Set expiration date') }}
-			</CheckboxRadioSwitch>
-			<DatetimePicker v-show="formExpires"
+			</NcCheckboxRadioSwitch>
+			<NcDatetimePicker v-show="formExpires"
 				id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled-date="notBeforeToday"
@@ -59,15 +59,15 @@
 </template>
 
 <script>
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
-import DatetimePicker from '@nextcloud/vue/dist/Components/DatetimePicker'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch'
+import NcDatetimePicker from '@nextcloud/vue/dist/Components/NcDatetimePicker'
 import moment from '@nextcloud/moment'
 import ShareTypes from '../../mixins/ShareTypes.js'
 
 export default {
 	components: {
-		CheckboxRadioSwitch,
-		DatetimePicker,
+		NcCheckboxRadioSwitch,
+		NcDatetimePicker,
 	},
 
 	mixins: [ShareTypes],
