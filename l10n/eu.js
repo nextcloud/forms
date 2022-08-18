@@ -42,6 +42,8 @@ OC.L10N.register(
     "Results" : "Emaitzak",
     "Copy form" : "Kopiatu galdetegia",
     "Delete form" : "Ezabatu galdetegia",
+    "Expired {relativeDate}" : "Iraungita {relativeDate}",
+    "Expires {relativeDate}" : "Iraungitzea: {relativeDate}",
     "Are you sure you want to delete {title}?" : "Ziur zaude {title} ezabatu nahi duzula?",
     "Error while deleting {title}" : "Errorea {title} ezabatzean",
     "An answer for the {index} option" : "Erantzun bat {index} aukerarentzat",
