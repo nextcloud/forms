@@ -23,13 +23,13 @@
   -->
 
 <template>
-	<AppContent v-if="isLoadingForm">
+	<NcAppContent v-if="isLoadingForm">
 		<EmptyContent icon="icon-loading">
 			{{ t('forms', 'Loading {title} …', { title: form.title }) }}
 		</EmptyContent>
-	</AppContent>
+	</NcAppContent>
 
-	<AppContent v-else>
+	<NcAppContent v-else>
 		<!-- Show results & sidebar button -->
 		<TopBar>
 			<template #default>
@@ -102,13 +102,13 @@
 
 			<!-- Add new questions menu -->
 			<div class="question-menu">
-				<Actions ref="questionMenu"
+				<NcActions ref="questionMenu"
 					:open.sync="questionMenuOpened"
 					:menu-title="t('forms', 'Add a question')"
 					:aria-label="t('forms', 'Add a question')"
 					:primary="true"
 					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-primary'">
-					<ActionButton v-for="(answer, type) in answerTypesFilter"
+					<NcActionButton v-for="(answer, type) in answerTypesFilter"
 						:key="answer.label"
 						:close-after-click="true"
 						:disabled="isLoadingQuestions"
@@ -116,11 +116,11 @@
 						class="question-menu__question"
 						@click="addQuestion(type)">
 						{{ answer.label }}
-					</ActionButton>
-				</Actions>
+					</NcActionButton>
+				</NcActions>
 			</div>
 		</section>
-	</AppContent>
+	</NcAppContent>
 </template>
 
 <script>
@@ -131,9 +131,9 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
 
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 
 import answerTypes from '../models/AnswerTypes.js'
 import EmptyContent from '../components/EmptyContent.vue'
@@ -152,11 +152,11 @@ window.axios = axios
 export default {
 	name: 'Create',
 	components: {
-		ActionButton,
-		Actions,
-		AppContent,
 		Draggable,
 		EmptyContent,
+		NcActionButton,
+		NcActions,
+		NcAppContent,
 		Question,
 		QuestionLong,
 		QuestionShort,

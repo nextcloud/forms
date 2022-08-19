@@ -21,13 +21,13 @@
  -->
 
 <template>
-	<AppContent v-if="isLoadingForm">
+	<NcAppContent v-if="isLoadingForm">
 		<EmptyContent icon="icon-loading">
 			{{ t('forms', 'Loading {title} …', { title: form.title }) }}
 		</EmptyContent>
-	</AppContent>
+	</NcAppContent>
 
-	<AppContent v-else>
+	<NcAppContent v-else>
 		<!-- Forms title & description-->
 		<header>
 			<h2 ref="title" class="form-title">
@@ -72,7 +72,7 @@
 				:disabled="loading"
 				:aria-label="t('forms', 'Submit form')">
 		</form>
-	</AppContent>
+	</NcAppContent>
 </template>
 
 <script>
@@ -80,7 +80,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
@@ -97,8 +97,8 @@ export default {
 	name: 'Submit',
 
 	components: {
-		AppContent,
 		EmptyContent,
+		NcAppContent,
 		Question,
 		QuestionLong,
 		QuestionShort,

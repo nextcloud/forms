@@ -21,7 +21,7 @@
   -->
 
 <template>
-	<ListItem ref="navigationItem"
+	<NcListItem ref="navigationItem"
 		:title="formTitle"
 		:to="{
 			name: routerTarget,
@@ -38,34 +38,34 @@
 			{{ formSubtitle }}
 		</template>
 		<template v-if="!loading && !readOnly" #actions>
-			<ActionButton :close-after-click="true" icon="icon-share" @click="onShareForm">
+			<NcActionButton :close-after-click="true" icon="icon-share" @click="onShareForm">
 				{{ t('forms', 'Share form') }}
-			</ActionButton>
-			<ActionRouter :close-after-click="true"
+			</NcActionButton>
+			<NcActionRouter :close-after-click="true"
 				:exact="true"
 				icon="icon-comment"
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				{{ t('forms', 'Results') }}
-			</ActionRouter>
-			<ActionButton :close-after-click="true" icon="icon-clone" @click="onCloneForm">
+			</NcActionRouter>
+			<NcActionButton :close-after-click="true" icon="icon-clone" @click="onCloneForm">
 				{{ t('forms', 'Copy form') }}
-			</ActionButton>
-			<ActionSeparator />
-			<ActionButton :close-after-click="true" icon="icon-delete" @click="onDeleteForm">
+			</NcActionButton>
+			<NcActionSeparator />
+			<NcActionButton :close-after-click="true" icon="icon-delete" @click="onDeleteForm">
 				{{ t('forms', 'Delete form') }}
-			</ActionButton>
+			</NcActionButton>
 		</template>
-	</ListItem>
+	</NcListItem>
 </template>
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import ActionRouter from '@nextcloud/vue/dist/Components/ActionRouter'
-import ActionSeparator from '@nextcloud/vue/dist/Components/ActionSeparator'
-import ListItem from '@nextcloud/vue/dist/Components/ListItem'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcActionRouter from '@nextcloud/vue/dist/Components/NcActionRouter'
+import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator'
+import NcListItem from '@nextcloud/vue/dist/Components/NcListItem'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
@@ -75,10 +75,10 @@ export default {
 	name: 'AppNavigationForm',
 
 	components: {
-		ListItem,
-		ActionButton,
-		ActionRouter,
-		ActionSeparator,
+		NcActionButton,
+		NcActionRouter,
+		NcActionSeparator,
+		NcListItem,
 	},
 
 	props: {

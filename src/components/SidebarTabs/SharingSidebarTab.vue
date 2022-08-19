@@ -34,22 +34,22 @@
 				<span>{{ t('forms', 'Internal link') }}</span>
 				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
 			</div>
-			<Actions>
-				<ActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
+			<NcActions>
+				<NcActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
 					{{ t('forms', 'Copy to clipboard') }}
-				</ActionButton>
-			</Actions>
+				</NcActionButton>
+			</NcActions>
 		</div>
 
 		<!-- Public Link -->
 		<div v-if="!hasPublicLink && appConfig.allowPublicLink" class="share-div share-div--link">
 			<div class="share-div__avatar icon-public-white" />
 			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
-			<Actions>
-				<ActionButton icon="icon-add" @click="addPublicLink">
+			<NcActions>
+				<NcActionButton icon="icon-add" @click="addPublicLink">
 					{{ t('forms', 'Add link') }}
-				</ActionButton>
-			</Actions>
+				</NcActionButton>
+			</NcActions>
 		</div>
 		<TransitionGroup v-else tag="div">
 			<div v-for="share in publicLinkShares"
@@ -57,22 +57,22 @@
 				class="share-div share-div--link">
 				<div class="share-div__avatar icon-public-white" />
 				<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
-				<Actions>
-					<ActionButton icon="icon-clippy" @click="copyPublicShareLink($event, share.shareWith)">
+				<NcActions>
+					<NcActionButton icon="icon-clippy" @click="copyPublicShareLink($event, share.shareWith)">
 						{{ t('forms', 'Copy to clipboard') }}
-					</ActionButton>
-				</Actions>
-				<Actions>
-					<ActionButton icon="icon-delete" @click="removeShare(share)">
+					</NcActionButton>
+				</NcActions>
+				<NcActions>
+					<NcActionButton icon="icon-delete" @click="removeShare(share)">
 						{{ t('forms', 'Remove link') }}
-					</ActionButton>
-					<ActionButton v-if="appConfig.allowPublicLink"
+					</NcActionButton>
+					<NcActionButton v-if="appConfig.allowPublicLink"
 						:close-after-click="true"
 						icon="icon-add"
 						@click="addPublicLink">
 						{{ t('forms', 'Add link') }}
-					</ActionButton>
-				</Actions>
+					</NcActionButton>
+				</NcActions>
 			</div>
 		</TransitionGroup>
 
@@ -85,11 +85,11 @@
 			</div>
 			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.')"
 				class="share-div__legacy-warning icon-error-color" />
-			<Actions>
-				<ActionButton icon="icon-delete" @click="removeLegacyLink">
+			<NcActions>
+				<NcActionButton icon="icon-delete" @click="removeLegacyLink">
 					{{ t('forms', 'Remove Legacy Link') }}
-				</ActionButton>
-			</Actions>
+				</NcActionButton>
+			</NcActions>
 		</div>
 
 		<!-- All users on Instance -->
@@ -99,7 +99,7 @@
 				<label for="share-switch__permit-all" class="share-div__desc">
 					{{ t('forms', 'Permit access to all logged in accounts') }}
 				</label>
-				<CheckboxRadioSwitch id="share-switch__permit-all"
+				<NcCheckboxRadioSwitch id="share-switch__permit-all"
 					:checked="form.access.permitAllUsers"
 					type="switch"
 					@update:checked="onPermitAllUsersChange" />
@@ -109,7 +109,7 @@
 				<label for="share-switch__show-to-all" class="share-div__desc">
 					{{ t('forms', 'Show to all accounts on sidebar') }}
 				</label>
-				<CheckboxRadioSwitch id="share-switch__show-to-all"
+				<NcCheckboxRadioSwitch id="share-switch__show-to-all"
 					:checked="form.access.showToAllUsers"
 					type="switch"
 					@update:checked="onShowToAllUsersChange" />
@@ -131,9 +131,9 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -143,9 +143,9 @@ import logger from '../../utils/Logger.js'
 
 export default {
 	components: {
-		Actions,
-		ActionButton,
-		CheckboxRadioSwitch,
+		NcActions,
+		NcActionButton,
+		NcCheckboxRadioSwitch,
 		SharingSearchDiv,
 		SharingShareDiv,
 	},

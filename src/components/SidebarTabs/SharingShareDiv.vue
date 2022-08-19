@@ -22,32 +22,32 @@
 
 <template>
 	<li class="share-div">
-		<Avatar :user="share.shareWith"
+		<NcAvatar :user="share.shareWith"
 			:disable-menu="true"
 			:is-no-user="isNoUser" />
 		<div class="share-div__desc">
 			<span>{{ displayName }}</span>
 			<span>{{ displayNameAppendix }}</span>
 		</div>
-		<Actions class="share-div__actions">
-			<ActionButton icon="icon-close" @click="removeShare">
+		<NcActions class="share-div__actions">
+			<NcActionButton icon="icon-close" @click="removeShare">
 				{{ t('forms', 'Delete') }}
-			</ActionButton>
-		</Actions>
+			</NcActionButton>
+		</NcActions>
 	</li>
 </template>
 
 <script>
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import Avatar from '@nextcloud/vue/dist/Components/Avatar'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar'
 import ShareTypes from '../../mixins/ShareTypes.js'
 
 export default {
 	components: {
-		Actions,
-		ActionButton,
-		Avatar,
+		NcActions,
+		NcActionButton,
+		NcAvatar,
 	},
 
 	mixins: [ShareTypes],

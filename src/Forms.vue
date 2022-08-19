@@ -22,15 +22,18 @@
   -->
 
 <template>
-	<Content app-name="forms">
-		<AppNavigation v-if="canCreateForms || hasForms">
-			<AppNavigationNew v-if="canCreateForms"
-				button-class="icon-add"
+	<NcContent app-name="forms">
+		<NcAppNavigation v-if="canCreateForms || hasForms">
+			<NcAppNavigationNew v-if="canCreateForms"
 				:text="t('forms', 'New form')"
-				@click="onNewForm" />
+				@click="onNewForm">
+				<template #icon>
+					<IconPlus size="20" decorative />
+				</template>
+			</NcAppNavigationNew>
 			<template #list>
 				<!-- Form-Owner-->
-				<AppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
+				<NcAppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
 				<AppNavigationForm v-for="form in forms"
 					:key="form.id"
 					:form="form"
@@ -41,17 +44,17 @@
 					@delete="onDeleteForm" />
 
 				<!-- Shared Forms-->
-				<AppNavigationCaption v-if="!noSharedForms" :title="t('forms', 'Shared with you')" />
+				<NcAppNavigationCaption v-if="!noSharedForms" :title="t('forms', 'Shared with you')" />
 				<AppNavigationForm v-for="form in sharedForms"
 					:key="form.id"
 					:form="form"
 					:read-only="true"
 					@mobile-close-navigation="mobileCloseNavigation" />
 			</template>
-		</AppNavigation>
+		</NcAppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<AppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
+		<NcAppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
 			<EmptyContent v-if="loading" icon="icon-loading">
 				{{ t('forms', 'Loading forms …') }}
 			</EmptyContent>
@@ -73,7 +76,7 @@
 					</button>
 				</template>
 			</EmptyContent>
-		</AppContent>
+		</NcAppContent>
 
 		<!-- No errors show router content -->
 		<template v-else>
@@ -86,7 +89,7 @@
 				:active.sync="sidebarActive"
 				name="sidebar" />
 		</template>
-	</Content>
+	</NcContent>
 </template>
 
 <script>
@@ -96,12 +99,14 @@ import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
-import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
-import AppNavigationCaption from '@nextcloud/vue/dist/Components/AppNavigationCaption'
-import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
-import Content from '@nextcloud/vue/dist/Components/Content'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
+import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation'
+import NcAppNavigationCaption from '@nextcloud/vue/dist/Components/NcAppNavigationCaption'
+import NcAppNavigationNew from '@nextcloud/vue/dist/Components/NcAppNavigationNew'
+import NcContent from '@nextcloud/vue/dist/Components/NcContent'
 import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
+
+import IconPlus from 'vue-material-design-icons/Plus'
 
 import AppNavigationForm from './components/AppNavigationForm.vue'
 import EmptyContent from './components/EmptyContent.vue'
@@ -114,12 +119,13 @@ export default {
 
 	components: {
 		AppNavigationForm,
-		AppContent,
-		AppNavigation,
-		AppNavigationCaption,
-		AppNavigationNew,
-		Content,
 		EmptyContent,
+		IconPlus,
+		NcAppContent,
+		NcAppNavigation,
+		NcAppNavigationCaption,
+		NcAppNavigationNew,
+		NcContent,
 	},
 
 	mixins: [isMobile, PermissionTypes],
