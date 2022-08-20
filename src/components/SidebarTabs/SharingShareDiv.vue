@@ -30,7 +30,10 @@
 			<span>{{ displayNameAppendix }}</span>
 		</div>
 		<NcActions class="share-div__actions">
-			<NcActionButton icon="icon-close" @click="removeShare">
+			<NcActionButton @click="removeShare">
+				<template #icon>
+					<IconClose :size="20" />
+				</template>
 				{{ t('forms', 'Delete') }}
 			</NcActionButton>
 		</NcActions>
@@ -41,10 +44,13 @@
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar'
+import IconClose from 'vue-material-design-icons/Close'
+
 import ShareTypes from '../../mixins/ShareTypes.js'
 
 export default {
 	components: {
+		IconClose,
 		NcActions,
 		NcActionButton,
 		NcAvatar,

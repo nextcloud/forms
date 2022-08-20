@@ -29,13 +29,18 @@
 
 		<!-- Internal link -->
 		<div class="share-div">
-			<div class="share-div__avatar icon-public" />
+			<div class="share-div__avatar">
+				<IconLink :size="22" />
+			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Internal link') }}</span>
 				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
 			</div>
 			<NcActions>
-				<NcActionButton icon="icon-clippy" @click="copyInternalShareLink($event, form.hash)">
+				<NcActionButton @click="copyInternalShareLink($event, form.hash)">
+					<template #icon>
+						<IconCopyAll :size="20" />
+					</template>
 					{{ t('forms', 'Copy to clipboard') }}
 				</NcActionButton>
 			</NcActions>
@@ -43,10 +48,15 @@
 
 		<!-- Public Link -->
 		<div v-if="!hasPublicLink && appConfig.allowPublicLink" class="share-div share-div--link">
-			<div class="share-div__avatar icon-public-white" />
+			<div class="share-div__avatar">
+				<IconLink :size="22" />
+			</div>
 			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 			<NcActions>
-				<NcActionButton icon="icon-add" @click="addPublicLink">
+				<NcActionButton @click="addPublicLink">
+					<template #icon>
+						<IconPlus :size="20" />
+					</template>
 					{{ t('forms', 'Add link') }}
 				</NcActionButton>
 			</NcActions>
@@ -55,21 +65,31 @@
 			<div v-for="share in publicLinkShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				class="share-div share-div--link">
-				<div class="share-div__avatar icon-public-white" />
+				<div class="share-div__avatar">
+					<IconLink :size="22" />
+				</div>
 				<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 				<NcActions>
-					<NcActionButton icon="icon-clippy" @click="copyPublicShareLink($event, share.shareWith)">
+					<NcActionButton @click="copyPublicShareLink($event, share.shareWith)">
+						<template #icon>
+							<IconCopyAll :size="20" />
+						</template>
 						{{ t('forms', 'Copy to clipboard') }}
 					</NcActionButton>
 				</NcActions>
 				<NcActions>
-					<NcActionButton icon="icon-delete" @click="removeShare(share)">
+					<NcActionButton @click="removeShare(share)">
+						<template #icon>
+							<IconDelete :size="20" />
+						</template>
 						{{ t('forms', 'Remove link') }}
 					</NcActionButton>
 					<NcActionButton v-if="appConfig.allowPublicLink"
 						:close-after-click="true"
-						icon="icon-add"
 						@click="addPublicLink">
+						<template #icon>
+							<IconPlus :size="20" />
+						</template>
 						{{ t('forms', 'Add link') }}
 					</NcActionButton>
 				</NcActions>
@@ -78,15 +98,22 @@
 
 		<!-- Legacy Info, if present -->
 		<div v-if="form.access.legacyLink" class="share-div">
-			<div class="share-div__avatar icon-public" />
+			<div class="share-div__avatar">
+				<IconLink :size="22" />
+			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Legacy Link') }}</span>
 				<span>{{ t('forms', 'Form still supports old sharing-link.') }}</span>
 			</div>
 			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.')"
-				class="share-div__legacy-warning icon-error-color" />
+				class="share-div__legacy-warning">
+				<IconAlertCircleOutline :size="20" />
+			</div>
 			<NcActions>
-				<NcActionButton icon="icon-delete" @click="removeLegacyLink">
+				<NcActionButton @click="removeLegacyLink">
+					<template #icon>
+						<IconDelete :size="20" />
+					</template>
 					{{ t('forms', 'Remove Legacy Link') }}
 				</NcActionButton>
 			</NcActions>
@@ -95,7 +122,9 @@
 		<!-- All users on Instance -->
 		<div v-if="appConfig.allowPermitAll">
 			<div class="share-div">
-				<div class="share-div__avatar icon-group" />
+				<div class="share-div__avatar">
+					<IconAccountMultiple :size="20" />
+				</div>
 				<label for="share-switch__permit-all" class="share-div__desc">
 					{{ t('forms', 'Permit access to all logged in accounts') }}
 				</label>
@@ -105,7 +134,9 @@
 					@update:checked="onPermitAllUsersChange" />
 			</div>
 			<div v-if="form.access.permitAllUsers" class="share-div share-div--indent">
-				<div class="share-div__avatar icon-forms" />
+				<div class="share-div__avatar">
+					<FormsIcon :size="16" />
+				</div>
 				<label for="share-switch__show-to-all" class="share-div__desc">
 					{{ t('forms', 'Show to all accounts on sidebar') }}
 				</label>
@@ -134,6 +165,14 @@ import axios from '@nextcloud/axios'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch'
+import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple'
+import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline'
+import IconDelete from 'vue-material-design-icons/Delete'
+import IconLink from 'vue-material-design-icons/Link'
+import IconPlus from 'vue-material-design-icons/Plus'
+
+import FormsIcon from '../Icons/FormsIcon.vue'
+import IconCopyAll from '../Icons/IconCopyAll.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -143,6 +182,13 @@ import logger from '../../utils/Logger.js'
 
 export default {
 	components: {
+		FormsIcon,
+		IconAccountMultiple,
+		IconAlertCircleOutline,
+		IconCopyAll,
+		IconDelete,
+		IconLink,
+		IconPlus,
 		NcActions,
 		NcActionButton,
 		NcCheckboxRadioSwitch,
@@ -296,6 +342,7 @@ export default {
 	&--link {
 		.share-div__avatar {
 			background-color: var(--color-primary);
+			color: var(--color-primary-text);
 		}
 	}
 
@@ -306,10 +353,15 @@ export default {
 	&__avatar {
 		height: 32px;
 		width: 32px;
+		display: flex;
+		align-items: center;
 		flex-shrink: 0;
 		border-radius: 50%;
 		background-color: var(--color-background-dark);
-		background-size: 16px;
+
+		.material-design-icon {
+			margin: auto;
+		}
 	}
 
 	&__desc {
@@ -331,6 +383,7 @@ export default {
 	&__legacy-warning {
 		background-size: 18px;
 		margin-right: 4px;
+		color: var(--color-error)
 	}
 }
 </style>

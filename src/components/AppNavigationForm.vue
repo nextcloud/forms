@@ -40,21 +40,32 @@
 			{{ formSubtitle }}
 		</template>
 		<template v-if="!loading && !readOnly" #actions>
-			<NcActionButton :close-after-click="true" icon="icon-share" @click="onShareForm">
+			<NcActionButton :close-after-click="true" @click="onShareForm">
+				<template #icon>
+					<IconShareVariant :size="20" />
+				</template>
 				{{ t('forms', 'Share form') }}
 			</NcActionButton>
 			<NcActionRouter :close-after-click="true"
 				:exact="true"
-				icon="icon-comment"
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
+				<template #icon>
+					<IconMessageReplyText :size="20" />
+				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
-			<NcActionButton :close-after-click="true" icon="icon-clone" @click="onCloneForm">
+			<NcActionButton :close-after-click="true" @click="onCloneForm">
+				<template #icon>
+					<IconContentCopy :size="20" />
+				</template>
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
 			<NcActionSeparator />
-			<NcActionButton :close-after-click="true" icon="icon-delete" @click="onDeleteForm">
+			<NcActionButton :close-after-click="true" @click="onDeleteForm">
+				<template #icon>
+					<IconDelete :size="20" />
+				</template>
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
 		</template>
@@ -72,6 +83,10 @@ import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import IconCheck from 'vue-material-design-icons/Check'
+import IconContentCopy from 'vue-material-design-icons/ContentCopy'
+import IconDelete from 'vue-material-design-icons/Delete'
+import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import FormsIcon from './Icons/FormsIcon.vue'
 
@@ -83,6 +98,10 @@ export default {
 	components: {
 		FormsIcon,
 		IconCheck,
+		IconContentCopy,
+		IconDelete,
+		IconMessageReplyText,
+		IconShareVariant,
 		NcActionButton,
 		NcActionRouter,
 		NcActionSeparator,

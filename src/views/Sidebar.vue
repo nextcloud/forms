@@ -28,8 +28,10 @@
 		@update:active="onUpdateActive">
 		<NcAppSidebarTab id="forms-sharing"
 			:order="0"
-			:name="t('forms', 'Sharing')"
-			icon="icon-share">
+			:name="t('forms', 'Sharing')">
+			<template #icon>
+				<IconShareVariant :size="20" />
+			</template>
 			<SharingSidebarTab :form="form"
 				@update:formProp="onPropertyChange"
 				@add-share="onAddShare"
@@ -38,8 +40,10 @@
 
 		<NcAppSidebarTab id="forms-settings"
 			:order="1"
-			:name="t('forms', 'Settings')"
-			icon="icon-settings">
+			:name="t('forms', 'Settings')">
+			<template #icon>
+				<IconSettings :size="20" />
+			</template>
 			<SettingsSidebarTab :form="form"
 				@update:formProp="onPropertyChange" />
 		</NcAppSidebarTab>
@@ -49,6 +53,8 @@
 <script>
 import NcAppSidebar from '@nextcloud/vue/dist/Components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/dist/Components/NcAppSidebarTab'
+import IconSettings from 'vue-material-design-icons/Cog'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
@@ -58,6 +64,8 @@ export default {
 	name: 'Sidebar',
 
 	components: {
+		IconSettings,
+		IconShareVariant,
 		NcAppSidebar,
 		NcAppSidebarTab,
 		SharingSidebarTab,
