@@ -55,27 +55,36 @@
 
 		<!-- No forms & loading emptycontents -->
 		<NcAppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
-			<EmptyContent v-if="loading" icon="icon-loading">
-				{{ t('forms', 'Loading forms …') }}
-			</EmptyContent>
-			<EmptyContent v-else-if="!hasForms">
-				{{ t('forms', 'No forms created yet') }}
+			<NcEmptyContent v-if="loading"
+				:title="t('forms', 'Loading forms …')">
+				<template #icon>
+					<NcLoadingIcon :size="64" />
+				</template>
+			</NcEmptyContent>
+
+			<NcEmptyContent v-else-if="!hasForms"
+				:title="t('forms', 'No forms created yet')">
+				<template #icon>
+					<FormsIcon :size="64" />
+				</template>
 				<template v-if="canCreateForms" #action>
 					<NcButton type="primary" @click="onNewForm">
 						{{ t('forms', 'Create a form') }}
 					</NcButton>
 				</template>
-			</EmptyContent>
+			</NcEmptyContent>
 
-			<EmptyContent v-else>
-				<span v-if="canCreateForms">{{ t('forms', 'Select a form or create a new one') }}</span>
-				<span v-else>{{ t('forms', 'Please select a form') }}</span>
+			<NcEmptyContent v-else
+				:title="canCreateForms ? t('forms', 'Select a form or create a new one') : t('forms', 'Please select a form')">
+				<template #icon>
+					<FormsIcon :size="64" />
+				</template>
 				<template v-if="canCreateForms" #action>
 					<NcButton type="primary" @click="onNewForm">
 						{{ t('forms', 'Create new form') }}
 					</NcButton>
 				</template>
-			</EmptyContent>
+			</NcEmptyContent>
 		</NcAppContent>
 
 		<!-- No errors show router content -->
@@ -105,12 +114,14 @@ import NcAppNavigationCaption from '@nextcloud/vue/dist/Components/NcAppNavigati
 import NcAppNavigationNew from '@nextcloud/vue/dist/Components/NcAppNavigationNew'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton'
 import NcContent from '@nextcloud/vue/dist/Components/NcContent'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 import isMobile from '@nextcloud/vue/dist/Mixins/isMobile'
 
 import IconPlus from 'vue-material-design-icons/Plus'
 
+import FormsIcon from './components/Icons/FormsIcon.vue'
 import AppNavigationForm from './components/AppNavigationForm.vue'
-import EmptyContent from './components/EmptyContent.vue'
 import PermissionTypes from './mixins/PermissionTypes.js'
 import OcsResponse2Data from './utils/OcsResponse2Data.js'
 import logger from './utils/Logger.js'
@@ -120,7 +131,7 @@ export default {
 
 	components: {
 		AppNavigationForm,
-		EmptyContent,
+		FormsIcon,
 		IconPlus,
 		NcAppContent,
 		NcAppNavigation,
@@ -128,6 +139,8 @@ export default {
 		NcAppNavigationNew,
 		NcButton,
 		NcContent,
+		NcEmptyContent,
+		NcLoadingIcon,
 	},
 
 	mixins: [isMobile, PermissionTypes],

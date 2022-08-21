@@ -29,9 +29,11 @@
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div v-if="!readOnly"
-			class="question__drag-handle icon-drag-handle"
+			class="question__drag-handle"
 			:class="{'question__drag-handle--shiftup': shiftDragHandle}"
-			:aria-label="t('forms', 'Drag to reorder the questions')" />
+			:aria-label="t('forms', 'Drag to reorder the questions')">
+			<IconDragHorizontalVariant :size="20" />
+		</div>
 
 		<!-- Header -->
 		<div class="question__header">
@@ -49,15 +51,20 @@
 				<h3 v-else class="question__header__title__text" v-text="computedText" />
 				<div v-if="!edit && !questionValid"
 					v-tooltip.auto="warningInvalid"
-					class="question__header__title__warning icon-error-color"
-					tabindex="0" />
+					class="question__header__title__warning"
+					tabindex="0">
+					<IconAlertCircleOutline :size="20" />
+				</div>
 				<NcActions v-if="!readOnly" class="question__header__title__menu" :force-menu="true">
 					<NcActionCheckbox :checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
-					<NcActionButton icon="icon-delete" @click="onDelete">
+					<NcActionButton @click="onDelete">
+						<template #icon>
+							<IconDelete :size="20" />
+						</template>
 						{{ t('forms', 'Delete question') }}
 					</NcActionButton>
 				</NcActions>
@@ -89,6 +96,10 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox'
 
+import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline'
+import IconDelete from 'vue-material-design-icons/Delete'
+import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant'
+
 export default {
 	name: 'Question',
 
@@ -97,6 +108,9 @@ export default {
 	},
 
 	components: {
+		IconAlertCircleOutline,
+		IconDelete,
+		IconDragHorizontalVariant,
 		NcActions,
 		NcActionButton,
 		NcActionCheckbox,
@@ -308,7 +322,8 @@ export default {
 			}
 
 			&__warning {
-				padding: 22px;
+				margin: auto 4px auto 12px;
+				color: var(--color-error);
 			}
 
 			&__menu.action-item {

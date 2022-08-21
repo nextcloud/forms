@@ -24,9 +24,11 @@
 
 <template>
 	<NcAppContent v-if="isLoadingForm">
-		<EmptyContent icon="icon-loading">
-			{{ t('forms', 'Loading {title} …', { title: form.title }) }}
-		</EmptyContent>
+		<NcEmptyContent :title="t('forms', 'Loading {title} …', { title: form.title })">
+			<template #icon>
+				<NcLoadingIcon :size="64" />
+			</template>
+		</NcEmptyContent>
 	</NcAppContent>
 
 	<NcAppContent v-else>
@@ -107,8 +109,11 @@
 					:open.sync="questionMenuOpened"
 					:menu-title="t('forms', 'Add a question')"
 					:aria-label="t('forms', 'Add a question')"
-					:primary="true"
-					:default-icon="isLoadingQuestions ? 'icon-loading-small' : 'icon-add-primary'">
+					:primary="true">
+					<template #icon>
+						<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
+						<IconPlus v-else :size="20" />
+					</template>
 					<NcActionButton v-for="(answer, type) in answerTypesFilter"
 						:key="answer.label"
 						:close-after-click="true"
@@ -134,15 +139,17 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
 import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
+import IconPlus from 'vue-material-design-icons/Plus'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 
 import answerTypes from '../models/AnswerTypes.js'
-import EmptyContent from '../components/EmptyContent.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
@@ -159,13 +166,15 @@ export default {
 	name: 'Create',
 	components: {
 		Draggable,
-		EmptyContent,
 		IconMessageReplyText,
+		IconPlus,
 		IconShareVariant,
 		NcActionButton,
 		NcActions,
 		NcAppContent,
 		NcButton,
+		NcEmptyContent,
+		NcLoadingIcon,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -503,10 +512,6 @@ export default {
 
 			// To align with Drag-Handle
 			margin-left: 16px;
-
-			.icon-add-white {
-				opacity: 1;
-			}
 		}
 	}
 }
