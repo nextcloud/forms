@@ -42,6 +42,8 @@ OC.L10N.register(
     "Results" : "Eredmények",
     "Copy form" : "Űrlap másolása",
     "Delete form" : "Űrlap törlése",
+    "Expired {relativeDate}" : "Lejárt: {relativeDate}",
+    "Expires {relativeDate}" : "Lejárat: {relativeDate}",
     "Are you sure you want to delete {title}?" : "Biztos, hogy törli a(z) {title} űrlapot?",
     "Error while deleting {title}" : "Hiba a(z) {title} törlése során",
     "An answer for the {index} option" : "Válasz a(z) {index}. lehetőségre",
