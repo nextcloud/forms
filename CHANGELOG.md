@@ -1,6 +1,6 @@
 # Changelog
 
-## [v3.0 0]
+## [Unreleased] - 3.0.0 - tbd
 ### Breaking
 - Moving completely from API v1 to v2. With this, we fundamentally change the way how the forms sharing works, now much more flexible and closer to how it is done in server.
 - Also inverting SubmitOnce to SubmitMultiple with ApiV2
@@ -8,7 +8,16 @@
 ### Deprecated
 
 
-## [v2.5.0](https://github.com/nextcloud/forms/tree/v2.5.0) (2022-04-08)
+## 2.5.1 - 2022-05-26
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.0...v2.5.1)
+
+### Fixed
+
+- Fix upgrading [\#1212](https://github.com/nextcloud/forms/pull/1212) ([nickvergessen](https://github.com/nickvergessen))
+
+
+## 2.5.0 - 2022-04-08
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.4.0...v2.5.0)
 
@@ -41,10 +50,10 @@
 - Update master target versions
   [\#1070](https://github.com/nextcloud/forms/pull/1070) ([nickvergessen](https://github.com/nickvergessen))
 
-## [v2.4.0](https://github.com/nextcloud/forms/tree/v2.4.0) (2021-11-10)
+
+## 2.4.0 - 2021-11-10
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.3.0...v2.4.0)
-
 
 ### Enhancements
 
@@ -53,7 +62,8 @@
 - Enable HMR
   [\#1024](https://github.com/nextcloud/forms/pull/1024) ([jotoeri](https://github.com/jotoeri))
 
-## v2.3.0 - 2021-07-28
+
+## 2.3.0 - 2021-07-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.4...v2.3.0)
 
@@ -100,7 +110,7 @@
   [\#882](https://github.com/nextcloud/forms/pull/882) ([Chartman123](https://github.com/Chartman123))
 
 
-## v2.2.4 - 2021-03-30
+## 2.2.4 - 2021-03-30
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.3...v2.2.4)
 
@@ -115,7 +125,7 @@
   [\#872](https://github.com/nextcloud/forms/pull/872) ([skjnldsv](https://github.com/skjnldsv))
 
 
-## v2.2.3 - 2021-03-25
+## 2.2.3 - 2021-03-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.2...v2.2.3)
 
@@ -127,7 +137,7 @@
   [\#845](https://github.com/nextcloud/forms/pull/845) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.2.2 - 2021-03-15
+## 2.2.2 - 2021-03-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.1...v2.2.2)
 
@@ -139,7 +149,7 @@
   [\#844](https://github.com/nextcloud/forms/pull/844) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.2.1 - 2021-03-10
+## 2.2.1 - 2021-03-10
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.0...v2.2.1)
 
@@ -151,7 +161,7 @@
   [\#835](https://github.com/nextcloud/forms/pull/835) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.2.0 - 2021-03-09
+## 2.2.0 - 2021-03-09
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.1.0...v2.2.0)
 
@@ -229,7 +239,7 @@
   [\#671](https://github.com/nextcloud/forms/pull/671) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.0.4 - 2020-09-01
+## 2.0.4 - 2020-09-01
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.3...v2.0.4)
 
@@ -241,7 +251,7 @@
 - Dependencies update
 
 
-## v2.0.3 - 2020-08-20
+## 2.0.3 - 2020-08-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.2...v2.0.3)
 
@@ -250,7 +260,7 @@
 - Dependencies update
 
 
-## v2.0.2 - 2020-07-30
+## 2.0.2 - 2020-07-30
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.1...v2.0.2)
 
@@ -259,7 +269,7 @@
   [\#533](https://github.com/nextcloud/forms/pull/533) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.0.1 - 2020-07-29
+## 2.0.1 - 2020-07-29
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0...v2.0.1)
 
@@ -268,7 +278,7 @@
   [\#528](https://github.com/nextcloud/forms/pull/528) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.0.0 - 2020-07-28
+## 2.0.0 - 2020-07-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-rc.1...v2.0.0)
 
@@ -277,7 +287,7 @@
   [\#520](https://github.com/nextcloud/forms/pull/520) ([skjnldsv](https://github.com/skjnldsv))
 
 
-## v2.0.0-rc.1 - 2020-07-24
+## 2.0.0-rc.1 - 2020-07-24
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.4...v2.0.0-rc.1)
 
@@ -322,7 +332,7 @@
   [\#394](https://github.com/nextcloud/forms/pull/394) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.0.0-beta.4 - 2020-06-09
+## 2.0.0-beta.4 - 2020-06-09
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta.3...v2.0.0-beta.4)
 
@@ -335,7 +345,7 @@
   [\#388](https://github.com/nextcloud/forms/pull/388) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.0.0-beta.3 - 2020-06-04
+## 2.0.0-beta.3 - 2020-06-04
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta2...v2.0.0-beta.3)
 
@@ -398,7 +408,7 @@
   [\#360](https://github.com/nextcloud/forms/pull/360) ([jotoeri](https://github.com/jotoeri))
 
 
-## v2.0.0-beta2 - 2020-05-06
+## 2.0.0-beta2 - 2020-05-06
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.0.0-beta1...v2.0.0-beta2)
 
@@ -445,7 +455,7 @@
   [\#312](https://github.com/nextcloud/forms/pull/312) ([skjnldsv](https://github.com/skjnldsv))
 
 
-## v2.0.0-beta1 - 2020-04-29
+## 2.0.0-beta1 - 2020-04-29
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v1.1.1...v2.0.0-beta1)
 
