@@ -19,7 +19,10 @@
 
 		<!-- Delete answer -->
 		<NcActions>
-			<NcActionButton icon="icon-close" @click="deleteEntry">
+			<NcActionButton @click="deleteEntry">
+				<template #icon>
+					<IconClose :size="20" />
+				</template>
 				{{ t('forms', 'Delete answer') }}
 			</NcActionButton>
 		</NcActions>
@@ -36,6 +39,7 @@ import PQueue from 'p-queue'
 
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import IconClose from 'vue-material-design-icons/Close'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
@@ -44,6 +48,7 @@ export default {
 	name: 'AnswerInput',
 
 	components: {
+		IconClose,
 		NcActions,
 		NcActionButton,
 	},
