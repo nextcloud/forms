@@ -32,7 +32,9 @@
 		:compact="true"
 		@click="mobileCloseNavigation">
 		<template #icon>
-			<div :class="icon" />
+			<NcLoadingIcon v-if="loading" :size="16" />
+			<IconCheck v-else-if="isExpired" :size="16" />
+			<FormsIcon v-else :size="16" />
 		</template>
 		<template v-if="hasSubtitle" #subtitle>
 			{{ formSubtitle }}
@@ -66,8 +68,12 @@ import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/dist/Components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator'
 import NcListItem from '@nextcloud/vue/dist/Components/NcListItem'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
+import IconCheck from 'vue-material-design-icons/Check'
+
+import FormsIcon from './Icons/FormsIcon.vue'
 
 import logger from '../utils/Logger.js'
 
@@ -75,10 +81,13 @@ export default {
 	name: 'AppNavigationForm',
 
 	components: {
+		FormsIcon,
+		IconCheck,
 		NcActionButton,
 		NcActionRouter,
 		NcActionSeparator,
 		NcListItem,
+		NcLoadingIcon,
 	},
 
 	props: {
@@ -99,16 +108,6 @@ export default {
 	},
 
 	computed: {
-		icon() {
-			if (this.loading) {
-				return 'icon-loading-small'
-			}
-			if (this.isExpired) {
-				return 'icon-checkmark'
-			}
-			return 'icon-forms'
-		},
-
 		/**
 		 * Check if form is current form and set active
 		 */
@@ -205,9 +204,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="scss" scoped>
-.icon-forms {
-	background-size: 16px;
-}
-</style>
