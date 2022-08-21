@@ -26,14 +26,49 @@
 <template>
 	<div class="top-bar" role="toolbar">
 		<slot />
-		<div class="top-bar__small">
-			<slot name="small" />
-		</div>
+		<NcButton v-if="showSidebarToggle"
+			v-tooltip="t('forms', 'Toggle settings')"
+			:aria-label="t('forms', 'Toggle settings')"
+			type="tertiary"
+			@click="toggleSidebar">
+			<template #icon>
+				<IconMenuOpen :size="24"
+					:class="{ 'icon--flipped' : sidebarOpened }" />
+			</template>
+		</NcButton>
 	</div>
 </template>
+
 <script>
+import NcButton from '@nextcloud/vue/dist/Components/NcButton'
+import IconMenuOpen from 'vue-material-design-icons/MenuOpen'
+
 export default {
 	name: 'TopBar',
+
+	components: {
+		IconMenuOpen,
+		NcButton,
+	},
+
+	props: {
+		sidebarOpened: {
+			type: Boolean,
+			default: null,
+		},
+	},
+
+	computed: {
+		showSidebarToggle() {
+			return this.sidebarOpened !== null
+		},
+	},
+
+	methods: {
+		toggleSidebar() {
+			this.$emit('update:sidebarOpened', !this.sidebarOpened)
+		},
+	},
 }
 </script>
 
@@ -51,31 +86,9 @@ $top-bar-height: 60px;
 	height: var(--top-bar-height);
 	margin-top: calc(var(--top-bar-height) * -1);
 	padding: 0 6px;
-
-	button {
-		cursor: pointer;
-		margin-left: 4px;
-		flex-shrink: 0;
-
-		> span {
-			cursor: pointer;
-			opacity: 1;
-			background-size: 16px;
-		}
-	}
-
-	&__small {
-		button {
-			width: 44px;
-			height: 44px;
-			margin-left: 0px;
-			border: none;
-			background-color: transparent;
-			&:hover, a:active, a:focus {
-				background-color: var(--color-background-darker);
-			}
-		}
-	}
 }
 
+.icon--flipped {
+	transform: scaleX(-1);
+}
 </style>
