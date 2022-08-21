@@ -26,6 +26,14 @@ import QuestionShort from '../components/Questions/QuestionShort.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 
+import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline'
+import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked'
+import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline'
+import IconTextShort from 'vue-material-design-icons/TextShort'
+import IconTextLong from 'vue-material-design-icons/TextLong'
+import IconCalendar from 'vue-material-design-icons/Calendar'
+import IconClockOutline from 'vue-material-design-icons/ClockOutline'
+
 /**
  * @typedef {object} AnswerTypes
  * @property {string} multiple Checkbox Answer
@@ -56,7 +64,7 @@ export default {
 
 	multiple: {
 		component: QuestionMultiple,
-		icon: 'icon-answer-checkbox',
+		icon: IconCheckboxOutline,
 		label: t('forms', 'Checkboxes'),
 		predefined: true,
 		validate: question => question.options.length > 0,
@@ -67,7 +75,7 @@ export default {
 
 	multiple_unique: {
 		component: QuestionMultiple,
-		icon: 'icon-answer-multiple',
+		icon: IconRadioboxMarked,
 		label: t('forms', 'Radio buttons'),
 		predefined: true,
 		validate: question => question.options.length > 0,
@@ -81,7 +89,7 @@ export default {
 
 	dropdown: {
 		component: QuestionDropdown,
-		icon: 'icon-answer-dropdown',
+		icon: IconArrowDownDropCircleOutline,
 		label: t('forms', 'Dropdown'),
 		predefined: true,
 		validate: question => question.options.length > 0,
@@ -94,7 +102,7 @@ export default {
 
 	short: {
 		component: QuestionShort,
-		icon: 'icon-answer-short',
+		icon: IconTextShort,
 		label: t('forms', 'Short answer'),
 		predefined: false,
 
@@ -106,7 +114,7 @@ export default {
 
 	long: {
 		component: QuestionLong,
-		icon: 'icon-answer-long',
+		icon: IconTextLong,
 		label: t('forms', 'Long text'),
 		predefined: false,
 
@@ -118,7 +126,7 @@ export default {
 
 	date: {
 		component: QuestionDate,
-		icon: 'icon-answer-date',
+		icon: IconCalendar,
 		label: t('forms', 'Date'),
 		predefined: false,
 
@@ -134,7 +142,7 @@ export default {
 
 	datetime: {
 		component: QuestionDate,
-		icon: 'icon-answer-datetime',
+		icon: IconClockOutline,
 		label: t('forms', 'Datetime'),
 		predefined: false,
 
@@ -150,7 +158,7 @@ export default {
 
 	time: {
 		component: QuestionDate,
-		icon: 'icon-answer-time',
+		icon: IconClockOutline,
 		label: t('forms', 'Time'),
 		predefined: false,
 

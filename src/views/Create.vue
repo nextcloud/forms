@@ -112,9 +112,11 @@
 						:key="answer.label"
 						:close-after-click="true"
 						:disabled="isLoadingQuestions"
-						:icon="answer.icon"
 						class="question-menu__question"
 						@click="addQuestion(type)">
+						<template #icon>
+							<Icon :is="answer.icon" :size="20" />
+						</template>
 						{{ answer.label }}
 					</NcActionButton>
 				</NcActions>
