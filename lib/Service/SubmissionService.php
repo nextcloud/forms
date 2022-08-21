@@ -108,6 +108,48 @@ class SubmissionService {
 	}
 
 	/**
+	 * Get all the answers of a given submission
+	 *
+	 * @param int $submissionId the submission id
+	 * @return array
+	 */
+	private function getAnswers(int $submissionId): array {
+		$answerList = [];
+		try {
+			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
+			foreach ($answerEntities as $answerEntity) {
+				$answerList[] = $answerEntity->read();
+			}
+		} catch (DoesNotExistException $e) {
+			//Just ignore, if no Data. Returns empty Answers-Array
+		} finally {
+			return $answerList;
+		}
+	}
+
+	/**
+	 * Get all submissions of a form
+	 *
+	 * @param int $formId the form id
+	 * @return array
+	 */
+	public function getSubmissions(int $formId): array {
+		$submissionList = [];
+		try {
+			$submissionEntities = $this->submissionMapper->findByForm($formId);
+			foreach ($submissionEntities as $submissionEntity) {
+				$submission = $submissionEntity->read();
+				$submission['answers'] = $this->getAnswers($submission['id']);
+				$submissionList[] = $submission;
+			}
+		} catch (DoesNotExistException $e) {
+			// Just ignore, if no Data. Returns empty Submissions-Array
+		} finally {
+			return $submissionList;
+		}
+	}
+
+	/**
 	 * Export Submissions to Cloud-Filesystem
 	 * @param string $hash of the form
 	 * @param string $path The Cloud-Path to export to

@@ -129,6 +129,74 @@ class SubmissionServiceTest extends TestCase {
 		);
 	}
 
+	public function testGetSubmissions() {
+		$submission_1 = new Submission();
+		$submission_1->setId(42);
+		$submission_1->setFormId(5);
+		$submission_1->setUserId('someUser');
+		$submission_1->setTimestamp(123456);
+		$answer_1 = new Answer();
+		$answer_1->setId(35);
+		$answer_1->setSubmissionId(42);
+		$answer_1->setQuestionId(422);
+		$answer_1->setText('Just some Text');
+		$answer_2 = new Answer();
+		$answer_2->setId(36);
+		$answer_2->setSubmissionId(42);
+		$answer_2->setQuestionId(423);
+		$answer_2->setText('Just some more Text');
+
+		$submission_2 = new Submission();
+		$submission_2->setId(43);
+		$submission_2->setFormId(5);
+		$submission_2->setUserId('someOtherUser');
+		$submission_2->setTimestamp(1234);
+
+		$this->submissionMapper->expects($this->once())
+			->method('findByForm')
+			->with(5)
+			->willReturn([$submission_1, $submission_2]);
+
+		$this->answerMapper->expects($this->any())
+			->method('findBySubmission')
+			->will($this->returnValueMap([
+				[42, [$answer_1, $answer_2]],
+				[43, []]
+			]));
+
+		$expected = [
+			[
+				'id' => 42,
+				'formId' => 5,
+				'userId' => 'someUser',
+				'timestamp' => 123456,
+				'answers' => [
+					[
+						'id' => 35,
+						'submissionId' => 42,
+						'questionId' => 422,
+						'text' => 'Just some Text'
+					],
+					[
+						'id' => 36,
+						'submissionId' => 42,
+						'questionId' => 423,
+						'text' => 'Just some more Text'
+					]
+				]
+			],
+			[
+				'id' => 43,
+				'formId' => 5,
+				'userId' => 'someOtherUser',
+				'timestamp' => 1234,
+				'answers' => []
+			]
+		];
+
+		$this->assertEquals($expected, $this->submissionService->getSubmissions(5));
+	}
+
 	public function dataWriteCsvToCloud() {
 		return [
 			'rootFolder' => ['', Folder::class, '', 'Some nice Form Title (responses).csv', false],

@@ -29,6 +29,7 @@ declare(strict_types=1);
 namespace OCA\Forms\AppInfo;
 
 use OCA\Forms\Capabilities;
+use OCA\Forms\FormsMigrator;
 use OCA\Forms\Listener\UserDeletedListener;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -57,6 +58,11 @@ class Application extends App implements IBootstrap {
 
 		$context->registerCapability(Capabilities::class);
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
+
+		// TODO: drop conditional registration once server-minversion is 24
+		if (method_exists($context, 'registerUserMigrator')) {
+			$context->registerUserMigrator(FormsMigrator::class);
+		}
 	}
 
 	/**

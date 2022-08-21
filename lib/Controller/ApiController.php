@@ -58,7 +58,6 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-use OCP\Security\ISecureRandom;
 
 use Psr\Log\LoggerInterface;
 
@@ -107,9 +106,6 @@ class ApiController extends OCSController {
 	/** @var IUserManager */
 	private $userManager;
 
-	/** @var ISecureRandom */
-	private $secureRandom;
-
 	public function __construct(string $appName,
 								ActivityManager $activityManager,
 								AnswerMapper $answerMapper,
@@ -125,8 +121,7 @@ class ApiController extends OCSController {
 								LoggerInterface $logger,
 								IRequest $request,
 								IUserManager $userManager,
-								IUserSession $userSession,
-								ISecureRandom $secureRandom) {
+								IUserSession $userSession) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->activityManager = $activityManager;
@@ -143,7 +138,6 @@ class ApiController extends OCSController {
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
-		$this->secureRandom = $secureRandom;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -259,10 +253,7 @@ class ApiController extends OCSController {
 		$form = new Form();
 		$form->setOwnerId($this->currentUser->getUID());
 		$form->setCreated(time());
-		$form->setHash($this->secureRandom->generate(
-			16,
-			ISecureRandom::CHAR_HUMAN_READABLE
-		));
+		$form->setHash($this->formsService->generateFormHash());
 		$form->setTitle('');
 		$form->setDescription('');
 		$form->setAccess([
@@ -315,10 +306,7 @@ class ApiController extends OCSController {
 		$formData = $oldForm->read();
 		unset($formData['id']);
 		$formData['created'] = time();
-		$formData['hash'] = $this->secureRandom->generate(
-			16,
-			ISecureRandom::CHAR_HUMAN_READABLE
-		);
+		$formData['hash'] = $this->formsService->generateFormHash();
 		// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 		$formData['title'] .= ' - ' . $this->l10n->t('Copy');
 
@@ -832,32 +820,6 @@ class ApiController extends OCSController {
 	/**
 	 * @NoAdminRequired
 	 *
-	 * Get all the answers of a given submission
-	 *
-	 * @param int $submissionId the submission id
-	 * @return array
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
-	 */
-	private function getAnswers(int $submissionId): array {
-		try {
-			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
-		} catch (DoesNotExistException $e) {
-			//Just ignore, if no Data. Returns empty Answers-Array
-		}
-
-		// Load Answer-Data
-		$answers = [];
-		foreach ($answerEntities as $answerEntity) {
-			$answers[] = $answerEntity->read();
-		}
-
-		return $answers;
-	}
-
-	/**
-	 * @NoAdminRequired
-	 *
 	 * Get all the submissions of a given form
 	 *
 	 * @param string $hash the form hash
@@ -878,40 +840,27 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		try {
-			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
-		} catch (DoesNotExistException $e) {
-			// Just ignore, if no Data. Returns empty Submissions-Array
-		}
+		// Load submissions and currently active questions
+		$submissions = $this->submissionService->getSubmissions($form->getId());
+		$questions = $this->formsService->getQuestions($form->getId());
 
-		$submissions = [];
-		foreach ($submissionEntities as $submissionEntity) {
-			// Load Submission-Data & corresponding Answers
-			$submission = $submissionEntity->read();
-			$submission['answers'] = $this->getAnswers($submission['id']);
-
-			// Append Display Name
+		// Append Display Names
+		foreach ($submissions as $key => $submission) {
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
-				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
+				$submissions[$key]['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);
 
 				if ($userEntity instanceof IUser) {
-					$submission['userDisplayName'] = $userEntity->getDisplayName();
+					$submissions[$key]['userDisplayName'] = $userEntity->getDisplayName();
 				} else {
 					// Fallback, should not occur regularly.
-					$submission['userDisplayName'] = $submission['userId'];
+					$submissions[$key]['userDisplayName'] = $submission['userId'];
 				}
 			}
-
-			// Add to returned List of Submissions
-			$submissions[] = $submission;
 		}
-
-		// Load currently active questions
-		$questions = $this->formsService->getQuestions($form->getId());
 
 		$response = [
 			'submissions' => $submissions,
