@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Másolás",
     "Anonymous response" : "Névtelen válasz",
     "Shared by %s" : "%s által megosztva",
+    "Forms including questions and submissions" : "Kérdéseket és beküldéseket tartalmazó űrlapok.",
     "User ID" : "Felhasználóazonosító",
     "User display name" : "Felhasználó megjelenítendő neve",
     "Timestamp" : "Időbélyeg",

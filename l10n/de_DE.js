@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopie",
     "Anonymous response" : "Anonyme Antwort",
     "Shared by %s" : "Geteilt von %s",
+    "Forms including questions and submissions" : "Formulare einschließlich Fragen und Einreichungen",
     "User ID" : "Benutzer-ID",
     "User display name" : "Anzeigename des Nutzers",
     "Timestamp" : "Zeitstempel",

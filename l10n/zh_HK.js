@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "複製",
     "Anonymous response" : "匿名回應",
     "Shared by %s" : "由 %s 分享",
+    "Forms including questions and submissions" : "包括問題和提交的表格",
     "User ID" : "用戶 ID",
     "User display name" : "用戶顯示名稱",
     "Timestamp" : "時間戳",
