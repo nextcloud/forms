@@ -43,7 +43,7 @@
 		"v-clipboard": "^2.2.3",
 		"vue": "^2.7.9",
 		"vue-material-design-icons": "^5.1.2",
-		"vue-router": "^3.5.4",
+		"vue-router": "^3.6.4",
 		"vuedraggable": "^2.24.3"
 	},
 	"browserslist": [
