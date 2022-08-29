@@ -22,6 +22,7 @@ OC.L10N.register(
     "Date" : "Dato",
     "Pick a date" : "Vælg en dato",
     "Pick a date and time" : "Vælg en dato og et tidspunkt",
-    "Time" : "Tid"
+    "Time" : "Tid",
+    "Pick a time" : "Vælg et tidspunkt"
 },
 "nplurals=2; plural=(n != 1);");
