@@ -1,9 +1,7 @@
-<?php
 /**
- * @copyright Copyright (c) 2020 John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
+ * @copyright Copyright (c) 2022 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
- * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
- * @author rakekniven <mark.ziegler@rakekniven.de>
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license AGPL-3.0-or-later
  *
@@ -21,11 +19,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import { translate, translatePlural } from '@nextcloud/l10n'
+import Vue from 'vue'
 
-?>
+import FormsEmptyContent from './FormsEmptyContent.vue'
 
-<div id="emptycontent" class="">
-	<div class="icon-forms"></div>
-	<h2><?php p($l->t('Form not found')); ?></h2>
-	<p><?php p($l->t('This form does not exist')); ?></p>
-</div>
+Vue.prototype.t = translate
+Vue.prototype.n = translatePlural
+
+export default new Vue({
+	 el: '#emptycontent',
+	 // eslint-disable-next-line vue/match-component-file-name
+	 name: 'FormsEmptyContent',
+	 render: h => h(FormsEmptyContent),
+})

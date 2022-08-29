@@ -1,9 +1,8 @@
 <?php
 /**
- * @copyright Copyright (c) 2020 John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
+ * @copyright Copyright (c) 2022 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
- * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
- * @author rakekniven <mark.ziegler@rakekniven.de>
+ * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @license AGPL-3.0-or-later
  *
@@ -21,11 +20,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 ?>
 
-<div id="emptycontent" class="">
-	<div class="icon-forms"></div>
-	<h2><?php p($l->t('Form expired')); ?></h2>
-	<p><?php p($l->t('This form has expired and is no longer taking answers')); ?></p>
-</div>
+<div id="emptycontent"></div>
