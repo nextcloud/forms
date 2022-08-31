@@ -44,6 +44,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setText(string $value)
  * @method string getDescription()
  * @method void setDescription(string $value)
+ * @method array getExtraSettings()
+ * @method void setExtraSettings(array $value)
  */
 class Question extends Entity {
 	protected $formId;
@@ -52,6 +54,7 @@ class Question extends Entity {
 	protected $isRequired;
 	protected $text;
 	protected $description;
+	protected $extraSettingsJson;
 
 	public function __construct() {
 		$this->addType('formId', 'integer');
@@ -60,6 +63,15 @@ class Question extends Entity {
 		$this->addType('isRequired', 'bool');
 		$this->addType('text', 'string');
 		$this->addType('description', 'string');
+	}
+
+	public function getExtraSettings(): object {
+		return json_decode($this->getExtraSettingsJson() ?: '{}');
+	}
+
+	public function setExtraSettings(array $extraSettings) {
+		// Make sure to be an object (empty assoc. array)
+		$this->setExtraSettingsJson(json_encode($extraSettings, JSON_FORCE_OBJECT));
 	}
 
 	public function read(): array {
@@ -71,6 +83,7 @@ class Question extends Entity {
 			'isRequired' => $this->getIsRequired(),
 			'text' => htmlspecialchars_decode($this->getText()),
 			'description' => htmlspecialchars_decode($this->getDescription()),
+			'extraSettings' => $this->getExtraSettings(),
 		];
 	}
 }

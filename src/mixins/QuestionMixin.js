@@ -104,6 +104,17 @@ export default {
 			type: Object,
 			required: true,
 		},
+
+		/**
+		 * Extra settings
+		 * Currently only contains whether options should be shuffled
+		 */
+		extraSettings: {
+			type: Object,
+			default: () => {
+				return {}
+			},
+		},
 	},
 
 	components: {
@@ -115,6 +126,17 @@ export default {
 			// Do we display this question in edit or fill mode
 			edit: false,
 		}
+	},
+
+	computed: {
+		sortedOptions() {
+			// Only shuffle options if not in editing mode (and shuffling is enabled)
+			if (!this.edit && this.extraSettings?.shuffleOptions) {
+				return this.shuffleArray(this.options)
+			}
+			// Ensure order of options always is the same
+			return [...this.options].sort((a, b) => a.id - b.id)
+		},
 	},
 
 	methods: {
@@ -146,6 +168,28 @@ export default {
 			this.$emit('update:isRequired', isRequiredValue)
 			this.saveQuestionProperty('isRequired', isRequiredValue)
 		}, 200),
+
+		/**
+		 * Create mapper to forward the required change to the parent and store to db
+		 *
+		 * @param {string} parameter Name of the setting that changed
+		 * @param {any} value New value of the setting
+		 */
+		onExtraSettingsChange: debounce(function(parameter, value) {
+			const newSettings = Object.assign({}, this.extraSettings)
+			newSettings[parameter] = value
+			this.$emit('update:extraSettings', newSettings)
+			this.saveQuestionProperty('extraSettings', newSettings)
+		}, 200),
+
+		/**
+		 * Forward the required change to the parent and store to db
+		 *
+		 * @param {boolean} shuffle Should options be shuffled
+		 */
+		onShuffleOptionsChange(shuffle) {
+			return this.onExtraSettingsChange('shuffleOptions', shuffle)
+		},
 
 		/**
 		 * Forward the answer(s) change to the parent
@@ -185,6 +229,22 @@ export default {
 					title.select()
 				}
 			})
+		},
+
+		/**
+		 * Shuffle an array using Fisher-Yates
+		 *
+		 * @param {Array} input Input array to shuffle
+		 * @return {Array} Shuffled input array
+		 */
+		shuffleArray(input) {
+			const shuffled = [...input]
+			let idx = shuffled.length
+			while (--idx > 0) {
+				const rndIdx = Math.floor(Math.random() * (idx + 1));
+				[shuffled[rndIdx], shuffled[idx]] = [shuffled[idx], shuffled[rndIdx]]
+			}
+			return shuffled
 		},
 
 		async saveQuestionProperty(key, value) {

@@ -164,6 +164,7 @@ class FormsServiceTest extends TestCase {
 						'order' => 1,
 						'type' => 'dropdown',
 						'isRequired' => false,
+						'extraSettings' => (object)['shuffleOptions' => true],
 						'text' => 'Question 1',
 						'description' => 'This is our first question.',
 						'options' => [
@@ -185,6 +186,7 @@ class FormsServiceTest extends TestCase {
 						'order' => 2,
 						'type' => 'short',
 						'isRequired' => true,
+						'extraSettings' => (object)[],
 						'text' => 'Question 2',
 						'description' => '',
 						'options' => []
@@ -252,6 +254,9 @@ class FormsServiceTest extends TestCase {
 		$question1->setOrder(1);
 		$question1->setType('dropdown');
 		$question1->setIsRequired(false);
+		$question1->setExtraSettings([
+			'shuffleOptions' => true
+		]);
 		$question1->setText('Question 1');
 		$question1->setDescription('This is our first question.');
 		$question2 = new Question();
@@ -262,6 +267,7 @@ class FormsServiceTest extends TestCase {
 		$question2->setIsRequired(true);
 		$question2->setText('Question 2');
 		$question2->setDescription('');
+		$question2->setExtraSettings([]);
 		$this->questionMapper->expects($this->once())
 			->method('findByForm')
 			->with(42)

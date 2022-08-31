@@ -25,6 +25,7 @@
 		:text="text"
 		:description="description"
 		:is-required="isRequired"
+		:shuffle-options="!!extraSettings?.shuffleOptions"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-string-lengths="maxStringLengths"
@@ -35,9 +36,10 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:shuffleOptions="onShuffleOptionsChange"
 		@delete="onDelete">
 		<ul class="question__content">
-			<template v-for="(answer, index) in options">
+			<template v-for="(answer, index) in sortedOptions">
 				<li v-if="!edit" :key="answer.id" class="question__item">
 					<!-- Answer radio/checkbox + label -->
 					<!-- TODO: migrate to radio/checkbox component once available -->
