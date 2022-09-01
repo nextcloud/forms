@@ -26,6 +26,42 @@
 <template>
 	<div class="top-bar" role="toolbar">
 		<slot />
+		<NcButton v-if="canSubmit && $route.name !== 'submit'"
+			v-tooltip="t('forms', 'View form')"
+			:aria-label="t('forms', 'View form')"
+			type="tertiary"
+			@click="showSubmit">
+			<template #icon>
+				<IconEye :size="20" />
+			</template>
+		</NcButton>
+		<NcButton v-if="canEdit && $route.name !== 'edit'"
+			v-tooltip="t('forms', 'Edit form')"
+			:aria-label="t('forms', 'Edit form')"
+			type="tertiary"
+			@click="showEdit">
+			<template #icon>
+				<IconPencil :size="20" />
+			</template>
+		</NcButton>
+		<NcButton v-if="canSeeResults && $route.name !== 'results'"
+			v-tooltip="t('forms', 'Results')"
+			:aria-label="t('forms', 'Results')"
+			type="tertiary"
+			@click="showResults">
+			<template #icon>
+				<IconMessageReplyText :size="20" />
+			</template>
+		</NcButton>
+		<NcButton v-if="canShare && !sidebarOpened"
+			v-tooltip="t('forms', 'Share form')"
+			:aria-label="t('forms', 'Share form')"
+			type="tertiary"
+			@click="onShareForm">
+			<template #icon>
+				<IconShareVariant :size="20" />
+			</template>
+		</NcButton>
 		<NcButton v-if="showSidebarToggle"
 			v-tooltip="t('forms', 'Toggle settings')"
 			:aria-label="t('forms', 'Toggle settings')"
@@ -42,23 +78,51 @@
 <script>
 import NcButton from '@nextcloud/vue/dist/Components/NcButton'
 import IconMenuOpen from 'vue-material-design-icons/MenuOpen'
+import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
+import IconEye from 'vue-material-design-icons/Eye'
+import IconPencil from 'vue-material-design-icons/Pencil'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant'
+import PermissionTypes from '../mixins/PermissionTypes.js'
 
 export default {
 	name: 'TopBar',
 
 	components: {
+		IconEye,
 		IconMenuOpen,
+		IconMessageReplyText,
+		IconPencil,
+		IconShareVariant,
 		NcButton,
 	},
+
+	mixins: [PermissionTypes],
 
 	props: {
 		sidebarOpened: {
 			type: Boolean,
 			default: null,
 		},
+		permissions: {
+			type: Array,
+			default: () => [],
+		},
 	},
 
 	computed: {
+		canEdit() {
+			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+		},
+		canSubmit() {
+			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+		},
+		canSeeResults() {
+			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
+		},
+		canShare() {
+			// This probably can get a permission of itself
+			return this.canEdit || this.canSeeResults
+		},
 		showSidebarToggle() {
 			return this.sidebarOpened !== null
 		},
@@ -67,6 +131,40 @@ export default {
 	methods: {
 		toggleSidebar() {
 			this.$emit('update:sidebarOpened', !this.sidebarOpened)
+		},
+
+		/**
+		 * Router methods
+		 */
+		showEdit() {
+			this.$router.push({
+				name: 'edit',
+				params: {
+					hash: this.$route.params.hash,
+				},
+			})
+		},
+
+		showResults() {
+			this.$router.push({
+				name: 'results',
+				params: {
+					hash: this.$route.params.hash,
+				},
+			})
+		},
+
+		showSubmit() {
+			this.$router.push({
+				name: 'submit',
+				params: {
+					hash: this.$route.params.hash,
+				},
+			})
+		},
+
+		onShareForm() {
+			this.$emit('share-form')
 		},
 	},
 }

@@ -30,6 +30,8 @@
 	</NcAppContent>
 
 	<NcAppContent v-else>
+		<TopBar :permissions="form?.permissions" @share-form="onShareForm" />
+
 		<!-- Forms title & description-->
 		<header>
 			<h2 ref="title" class="form-title">
@@ -50,6 +52,13 @@
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="success || !form.canSubmit"
 			:title="t('forms', 'Thank you for completing the form!')">
+			<template #icon>
+				<IconCheck :size="64" />
+			</template>
+		</NcEmptyContent>
+		<NcEmptyContent v-else-if="isExpired"
+			:title="t('forms', 'Form expired')"
+			:description="t('forms', 'This form has expired and is no longer taking answers')">
 			<template #icon>
 				<IconCheck :size="64" />
 			</template>
@@ -88,10 +97,10 @@ import { loadState } from '@nextcloud/initial-state'
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
-
 import IconCheck from 'vue-material-design-icons/Check'
 
 import answerTypes from '../models/AnswerTypes.js'
@@ -101,6 +110,7 @@ import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import TopBar from '../components/TopBar.vue'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 
@@ -116,6 +126,7 @@ export default {
 		QuestionLong,
 		QuestionShort,
 		QuestionMultiple,
+		TopBar,
 	},
 
 	mixins: [ViewsMixin],
@@ -172,6 +183,13 @@ export default {
 
 		isRequiredUsed() {
 			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
+		},
+
+		/**
+		 * Check if form is expired
+		 */
+		isExpired() {
+			return this.form.expires && moment().unix() > this.form.expires
 		},
 
 		infoMessage() {

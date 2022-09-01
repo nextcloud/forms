@@ -32,26 +32,7 @@
 	</NcAppContent>
 
 	<NcAppContent v-else>
-		<TopBar>
-			<NcButton v-tooltip="t('forms', 'Back to questions')"
-				:aria-label="t('forms', 'Back to questions')"
-				type="tertiary"
-				@click="showEdit">
-				<template #icon>
-					<IconReply :size="24" />
-				</template>
-			</NcButton>
-			<NcButton v-if="!noSubmissions"
-				v-tooltip="t('forms', 'Share form')"
-				:aria-label="t('forms', 'Share form')"
-				type="tertiary"
-				@click="onShareForm">
-				<template #icon>
-					<IconShareVariant :size="20" />
-				</template>
-			</NcButton>
-		</TopBar>
-
+		<TopBar :permissions="form?.permissions" @share-form="onShareForm" />
 		<header v-if="!noSubmissions">
 			<h2>{{ formTitle }}</h2>
 			<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
@@ -161,7 +142,6 @@ import IconDelete from 'vue-material-design-icons/Delete'
 import IconDownload from 'vue-material-design-icons/Download'
 import IconFolder from 'vue-material-design-icons/Folder'
 import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText.vue'
-import IconReply from 'vue-material-design-icons/Reply'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import Summary from '../components/Results/Summary.vue'
@@ -188,7 +168,6 @@ export default {
 		IconDownload,
 		IconFolder,
 		IconMessageReplyText,
-		IconReply,
 		IconShareVariant,
 		NcActions,
 		NcActionButton,
@@ -251,19 +230,6 @@ export default {
 	},
 
 	methods: {
-		showEdit() {
-			this.$router.push({
-				name: 'edit',
-				params: {
-					hash: this.form.hash,
-				},
-			})
-		},
-
-		onShareForm() {
-			this.$emit('open-sharing', this.form.hash)
-		},
-
 		async loadFormResults() {
 			this.loadingResults = true
 			logger.debug(`Loading results for form ${this.form.hash}`)

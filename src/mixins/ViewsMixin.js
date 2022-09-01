@@ -59,6 +59,10 @@ export default {
 	},
 
 	methods: {
+		onShareForm() {
+			this.$emit('open-sharing', this.form.hash)
+		},
+
 		/**
 		 * Focus title after form load
 		 */

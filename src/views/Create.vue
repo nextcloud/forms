@@ -33,27 +33,10 @@
 
 	<NcAppContent v-else>
 		<!-- Show results & sidebar button -->
-		<TopBar :sidebar-opened="sidebarOpened"
-			@update:sidebarOpened="onSidebarChange">
-			<NcButton v-tooltip="t('forms', 'Results')"
-				:aria-label="t('forms', 'Results')"
-				type="tertiary"
-				@click="showResults">
-				<template #icon>
-					<IconMessageReplyText :size="20" />
-				</template>
-			</NcButton>
-			<NcButton v-if="!sidebarOpened"
-				v-tooltip="t('forms', 'Share form')"
-				:aria-label="t('forms', 'Share form')"
-				type="tertiary"
-				@click="onShareForm">
-				<template #icon>
-					<IconShareVariant :size="20" />
-				</template>
-			</NcButton>
-		</TopBar>
-
+		<TopBar :permissions="form?.permissions"
+			:sidebar-opened="sidebarOpened"
+			@update:sidebarOpened="onSidebarChange"
+			@share-form="onShareForm" />
 		<!-- Forms title & description-->
 		<header>
 			<h2>
@@ -138,14 +121,11 @@ import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
-import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
 import IconPlus from 'vue-material-design-icons/Plus'
-import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
-import NcButton from '@nextcloud/vue/dist/Components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 
@@ -166,13 +146,10 @@ export default {
 	name: 'Create',
 	components: {
 		Draggable,
-		IconMessageReplyText,
 		IconPlus,
-		IconShareVariant,
 		NcActionButton,
 		NcActions,
 		NcAppContent,
-		NcButton,
 		NcEmptyContent,
 		NcLoadingIcon,
 		Question,
@@ -296,10 +273,6 @@ export default {
 			this.saveFormProperty('description')
 		}, 200),
 
-		onShareForm() {
-			this.$emit('open-sharing', this.form.hash)
-		},
-
 		/**
 		 * Add a new question to the current form
 		 *
@@ -391,18 +364,6 @@ export default {
 					this.$refs.questionMenu.focusFirstAction()
 				})
 			}, 10)
-		},
-
-		/**
-		 * Topbar methods
-		 */
-		showResults() {
-			this.$router.push({
-				name: 'results',
-				params: {
-					hash: this.form.hash,
-				},
-			})
 		},
 
 		/**

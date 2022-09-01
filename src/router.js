@@ -48,7 +48,7 @@ export default new Router({
 		},
 		{
 			path: '/:hash',
-			redirect: { name: 'edit' },
+			redirect: { name: 'submit' },
 			name: 'formRoot',
 			props: true,
 		},
