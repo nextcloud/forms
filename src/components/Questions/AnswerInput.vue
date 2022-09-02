@@ -206,28 +206,27 @@ export default {
 	&__pseudoInput {
 		flex-shrink: 0;
 		display: inline-block;
-		height: 16px;
-		width: 16px !important;
+		height: 18px;
+		width: 18px !important;
 		vertical-align: middle;
-		margin: 0 14px 0px 0px;
-		border: 1px solid #878787;
-		border-radius: 1px;
+		margin: 7px 8px 0 1px;
+		border: 2px solid var(--color-primary-element);
+		border-radius: 2px;
 		// Adjust position manually to match input-checkbox
 		position: relative;
-		top: 10px;
+		top: 6px;
 
 		// Show round for Pseudo-Radio-Button
 		&--unique {
+			height: 20px;
+			width: 20px !important;
+			margin: 6px 8px 0 0;
 			border-radius: 50%;
 		}
 
 		// Do not show pseudo-icon for dropdowns
 		&--dropdown {
 			display: none;
-		}
-
-		&:hover {
-			border-color: var(--color-primary-element);
 		}
 	}
 }
