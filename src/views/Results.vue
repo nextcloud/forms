@@ -24,9 +24,11 @@
 
 <template>
 	<NcAppContent v-if="loadingResults">
-		<EmptyContent icon="icon-loading">
-			{{ t('forms', 'Loading responses …') }}
-		</EmptyContent>
+		<NcEmptyContent :title="t('forms', 'Loading responses …')">
+			<template #icon>
+				<NcLoadingIcon :size="64" />
+			</template>
+		</NcEmptyContent>
 	</NcAppContent>
 
 	<NcAppContent v-else>
@@ -83,13 +85,22 @@
 				<NcActions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
-					<NcActionButton :close-after-click="true" icon="icon-folder" @click="onStoreToFiles">
+					<NcActionButton :close-after-click="true" @click="onStoreToFiles">
+						<template #icon>
+							<IconFolder :size="20" />
+						</template>
 						{{ t('forms', 'Save CSV to Files') }}
 					</NcActionButton>
-					<NcActionLink icon="icon-download" :href="downloadUrl">
+					<NcActionLink :href="downloadUrl">
+						<template #icon>
+							<IconDownload :size="20" />
+						</template>
 						{{ t('forms', 'Download CSV') }}
 					</NcActionLink>
-					<NcActionButton icon="icon-delete" @click="deleteAllSubmissions">
+					<NcActionButton @click="deleteAllSubmissions">
+						<template #icon>
+							<IconDelete :size="20" />
+						</template>
 						{{ t('forms', 'Delete all responses') }}
 					</NcActionButton>
 				</NcActions>
@@ -98,10 +109,10 @@
 
 		<!-- No submissions -->
 		<section v-if="noSubmissions">
-			<EmptyContent icon="icon-comment">
-				{{ t('forms', 'No responses yet') }}
-				<template #desc>
-					{{ t('forms', 'Results of submitted forms will show up here') }}
+			<NcEmptyContent :title="t('forms', 'No responses yet')"
+				:description="t('forms', 'Results of submitted forms will show up here')">
+				<template #icon>
+					<IconMessageReplyText :size="64" />
 				</template>
 				<template #action>
 					<NcButton type="primary" @click="onShareForm">
@@ -111,7 +122,7 @@
 						{{ t('forms', 'Share form') }}
 					</NcButton>
 				</template>
-			</EmptyContent>
+			</NcEmptyContent>
 		</section>
 
 		<!-- Summary view for visualization -->
@@ -141,13 +152,18 @@ import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
-import IconShareVariant from 'vue-material-design-icons/ShareVariant'
+import IconDelete from 'vue-material-design-icons/Delete'
+import IconDownload from 'vue-material-design-icons/Download'
+import IconFolder from 'vue-material-design-icons/Folder'
+import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText.vue'
 import IconReply from 'vue-material-design-icons/Reply'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
-import EmptyContent from '../components/EmptyContent.vue'
 import Summary from '../components/Results/Summary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
@@ -168,7 +184,10 @@ export default {
 	name: 'Results',
 
 	components: {
-		EmptyContent,
+		IconDelete,
+		IconDownload,
+		IconFolder,
+		IconMessageReplyText,
 		IconReply,
 		IconShareVariant,
 		NcActions,
@@ -176,6 +195,8 @@ export default {
 		NcActionLink,
 		NcAppContent,
 		NcButton,
+		NcEmptyContent,
+		NcLoadingIcon,
 		Summary,
 		Submission,
 		TopBar,

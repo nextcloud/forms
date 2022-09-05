@@ -25,7 +25,10 @@
 		<div class="submission-head">
 			<h3>{{ submission.userDisplayName }}</h3>
 			<NcActions class="submission-menu" :force-menu="true">
-				<NcActionButton icon="icon-delete" @click="onDelete">
+				<NcActionButton @click="onDelete">
+					<template #icon>
+						<IconDelete :size="20" />
+					</template>
 					{{ t('forms', 'Delete this response') }}
 				</NcActionButton>
 			</NcActions>
@@ -45,6 +48,7 @@
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import moment from '@nextcloud/moment'
+import IconDelete from 'vue-material-design-icons/Delete'
 
 import Answer from './Answer.vue'
 
@@ -53,6 +57,7 @@ export default {
 
 	components: {
 		Answer,
+		IconDelete,
 		NcActions,
 		NcActionButton,
 	},

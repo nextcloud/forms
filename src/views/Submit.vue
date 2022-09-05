@@ -22,9 +22,11 @@
 
 <template>
 	<NcAppContent v-if="isLoadingForm">
-		<EmptyContent icon="icon-loading">
-			{{ t('forms', 'Loading {title} …', { title: form.title }) }}
-		</EmptyContent>
+		<NcEmptyContent :title="t('forms', 'Loading {title} …', { title: form.title })">
+			<template #icon>
+				<NcLoadingIcon :size="64" />
+			</template>
+		</NcEmptyContent>
 	</NcAppContent>
 
 	<NcAppContent v-else>
@@ -40,12 +42,18 @@
 			<p class="info-message" v-text="infoMessage" />
 		</header>
 
-		<EmptyContent v-if="loading" icon="icon-loading">
-			{{ t('forms', 'Submitting form …') }}
-		</EmptyContent>
-		<EmptyContent v-else-if="success || !form.canSubmit" icon="icon-checkmark">
-			{{ t('forms', 'Thank you for completing the form!') }}
-		</EmptyContent>
+		<NcEmptyContent v-if="loading"
+			:title="t('forms', 'Submitting form …')">
+			<template #icon>
+				<NcLoadingIcon :size="64" />
+			</template>
+		</NcEmptyContent>
+		<NcEmptyContent v-else-if="success || !form.canSubmit"
+			:title="t('forms', 'Thank you for completing the form!')">
+			<template #icon>
+				<IconCheck :size="64" />
+			</template>
+		</NcEmptyContent>
 
 		<!-- Questions list -->
 		<form v-else
@@ -81,11 +89,14 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
+
+import IconCheck from 'vue-material-design-icons/Check'
 
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
 
-import EmptyContent from '../components/EmptyContent.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
@@ -97,8 +108,10 @@ export default {
 	name: 'Submit',
 
 	components: {
-		EmptyContent,
+		IconCheck,
 		NcAppContent,
+		NcEmptyContent,
+		NcLoadingIcon,
 		Question,
 		QuestionLong,
 		QuestionShort,
