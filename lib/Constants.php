@@ -122,4 +122,11 @@ class Constants {
 		self::PERMISSION_RESULTS,
 		self::PERMISSION_SUBMIT
 	];
+
+	/**
+	 * !! Keep in sync with src/FormsEmptyContent.vue !!
+	 * InitialStates for emptyContent to render as...
+	 */
+	public const EMPTY_NOTFOUND = 'notfound';
+	public const EMPTY_EXPIRED = 'expired';
 }

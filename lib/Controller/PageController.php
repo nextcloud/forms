@@ -53,10 +53,8 @@ use OCP\Util;
 use Psr\Log\LoggerInterface;
 
 class PageController extends Controller {
-	private const TEMPLATE_EXPIRED = 'expired';
+	private const TEMPLATE_EMPTYCONTENT = 'emptyContent';
 	private const TEMPLATE_MAIN = 'main';
-	private const TEMPLATE_NOSUBMIT = 'nosubmit';
-	private const TEMPLATE_NOTFOUND = 'notfound';
 
 	protected $appName;
 
@@ -177,7 +175,7 @@ class PageController extends Controller {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (DoesNotExistException $e) {
-			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
+			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
 		}
 		if (isset($form->getAccess()['legacyLink'])) {
 			// Inject style on all templates
@@ -185,7 +183,7 @@ class PageController extends Controller {
 
 			// Has form expired
 			if ($this->formsService->hasFormExpired($form->getId())) {
-				return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);
+				return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
 			}
 
 			// Public Template to fill the form
@@ -217,12 +215,12 @@ class PageController extends Controller {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
 			$form = $this->formMapper->findById($share->getFormId());
 		} catch (DoesNotExistException $e) {
-			return $this->provideTemplate(self::TEMPLATE_NOTFOUND);
+			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
 		}
 
 		// Has form expired
 		if ($this->formsService->hasFormExpired($form->getId())) {
-			return $this->provideTemplate(self::TEMPLATE_EXPIRED, $form);
+			return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
 		}
 
 		// Main Template to fill the form
@@ -233,6 +231,12 @@ class PageController extends Controller {
 		$this->initialStateService->provideInitialState($this->appName, 'shareHash', $hash);
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
+	}
+
+	public function provideEmptyContent(string $renderAs, Form $form = null): ?TemplateResponse {
+		Util::addScript($this->appName, 'forms-emptyContent');
+		$this->initialStateService->provideInitialState($this->appName, 'renderAs', $renderAs);
+		return $this->provideTemplate(self::TEMPLATE_EMPTYCONTENT, $form);
 	}
 
 	/**
@@ -251,7 +255,7 @@ class PageController extends Controller {
 
 			// Set Header
 			$response->setHeaderTitle($this->l10n->t('Forms'));
-			if ($template !== self::TEMPLATE_NOTFOUND) {
+			if ($form !== null) {
 				$response->setHeaderTitle($form->getTitle());
 
 				// Get owner and check display name privacy settings
