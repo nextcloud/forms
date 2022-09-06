@@ -40,6 +40,15 @@
 			{{ formSubtitle }}
 		</template>
 		<template v-if="!loading && !readOnly" #actions>
+			<NcActionRouter :close-after-click="true"
+				:exact="true"
+				:to="{ name: 'edit', params: { hash: form.hash } }"
+				@click="mobileCloseNavigation">
+				<template #icon>
+					<IconPencil :size="20" />
+				</template>
+				{{ t('forms', 'Edit form') }}
+			</NcActionRouter>
 			<NcActionButton :close-after-click="true" @click="onShareForm">
 				<template #icon>
 					<IconShareVariant :size="20" />
@@ -85,6 +94,7 @@ import moment from '@nextcloud/moment'
 import IconCheck from 'vue-material-design-icons/Check'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy'
 import IconDelete from 'vue-material-design-icons/Delete'
+import IconPencil from 'vue-material-design-icons/Pencil'
 import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
@@ -100,6 +110,7 @@ export default {
 		IconCheck,
 		IconContentCopy,
 		IconDelete,
+		IconPencil,
 		IconMessageReplyText,
 		IconShareVariant,
 		NcActionButton,
