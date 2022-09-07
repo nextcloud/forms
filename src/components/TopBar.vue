@@ -181,8 +181,8 @@ $top-bar-height: 60px;
 	align-items: center;
 	align-self: flex-end;
 	justify-content: flex-end;
-	height: var(--top-bar-height);
-	margin-top: calc(var(--top-bar-height) * -1);
+	height: $top-bar-height;
+	margin-top: calc($top-bar-height * -1);
 	padding: 0 6px;
 }
 

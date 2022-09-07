@@ -259,10 +259,12 @@ export default {
 
 	&__drag-handle {
 		position: absolute;
+		display: flex;
 		left: 0;
 		width: 44px;
 		height: 100%;
 		opacity: .5;
+		cursor: grab;
 
 		// Avoid moving drag-handle due to newAnswer-input on multiple-Questions
 		&--shiftup {
@@ -273,10 +275,13 @@ export default {
 		&:focus {
 			opacity: 1;
 		}
-		cursor: grab;
 
 		&:active {
 			cursor: grabbing;
+		}
+
+		> * {
+			cursor: grab;
 		}
 	}
 
