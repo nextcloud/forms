@@ -30,6 +30,9 @@ OC.L10N.register(
     "Form not found" : "Формулярът не е намерен",
     "Unable to create a new form" : "Неуспешно създаване на формуляр",
     "Unable to copy form" : "Неуспешно копиране на формуляр",
+    "This form does not exist" : "Тази формуляр не съществува",
+    "Form expired" : "Формулярът е изтекъл",
+    "This form has expired and is no longer taking answers" : "Този формуляр вече е изтекъл и не приема отговори",
     "Form creation" : "Създаване на формуляр",
     "Restrict form creation to selected groups" : "Ограничаване на създаването на формуляр до избрани групи",
     "Select groups" : "Избери Групи",
@@ -99,7 +102,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Възникна грешка при премахването на въпроса",
     "Error while saving form" : "Грешка при записване на формуляра",
     "Loading responses …" : "Зареждане на отговори …",
-    "Back to questions" : "Обратно към въпросите",
     "{amount} responses" : "{amount} отговори",
     "Summary" : "Резюме",
     "Responses" : "Отговори",
@@ -153,9 +155,6 @@ OC.L10N.register(
     "Time" : "Час",
     "Time question title" : "Час на заглавие на въпроса",
     "People can pick a time" : "Хората могат да избират час",
-    "Pick a time" : "Изберете час",
-    "Form expired" : "Формулярът е изтекъл",
-    "This form has expired and is no longer taking answers" : "Този формуляр вече е изтекъл и не приема отговори",
-    "This form does not exist" : "Тази формуляр не съществува"
+    "Pick a time" : "Изберете час"
 },
 "nplurals=2; plural=(n != 1);");

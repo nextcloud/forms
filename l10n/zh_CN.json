@@ -26,6 +26,9 @@
     "Form not found" : "未找到表单",
     "Unable to create a new form" : "无法新建表单",
     "Unable to copy form" : "无法复制表单",
+    "This form does not exist" : "该表单不存在",
+    "Form expired" : "表单已过期",
+    "This form has expired and is no longer taking answers" : "此表单已过期，不再接受答案。",
     "Select groups" : "选择分组",
     "Share form" : "分享表单",
     "Results" : "结果",
@@ -75,7 +78,6 @@
     "There was an error while removing the question" : "删除新问题时有一个错误",
     "Error while saving form" : "保存表单时出错",
     "Loading responses …" : "正在加载回应 ......",
-    "Back to questions" : "返回问题列表",
     "{amount} responses" : "{amount} 个回应",
     "Summary" : "概况",
     "Responses" : "全部回应",
@@ -123,9 +125,6 @@
     "People can pick a date and time" : "人们可以挑选一个日期和时间",
     "Pick a date and time" : "挑选一个日期和时间",
     "Time" : "时间",
-    "Pick a time" : "选择一个时间",
-    "Form expired" : "表单已过期",
-    "This form has expired and is no longer taking answers" : "此表单已过期，不再接受答案。",
-    "This form does not exist" : "该表单不存在"
+    "Pick a time" : "选择一个时间"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

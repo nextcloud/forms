@@ -31,6 +31,9 @@ OC.L10N.register(
     "Form not found" : "找不到表格",
     "Unable to create a new form" : "無法建立新表格",
     "Unable to copy form" : "無法複製表格",
+    "This form does not exist" : "此表格不存在",
+    "Form expired" : "表格已過期",
+    "This form has expired and is no longer taking answers" : "此表格已過期，不再接受回應",
     "Form creation" : "表格建立",
     "Restrict form creation to selected groups" : "將表格創建限制為選定的群組",
     "Select groups" : "選擇群組",
@@ -102,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "移除問題時發生錯誤",
     "Error while saving form" : "儲存表格時發生錯誤",
     "Loading responses …" : "正在載入回應……",
-    "Back to questions" : "回到問題",
     "{amount} responses" : "{amount} 則回應",
     "Summary" : "摘要",
     "Responses" : "回應",
@@ -156,9 +158,6 @@ OC.L10N.register(
     "Time" : "時間",
     "Time question title" : "時間問題標題",
     "People can pick a time" : "可以挑選時間",
-    "Pick a time" : "挑選時間",
-    "Form expired" : "表格已過期",
-    "This form has expired and is no longer taking answers" : "此表格已過期，不再接受回應",
-    "This form does not exist" : "此表格不存在"
+    "Pick a time" : "挑選時間"
 },
 "nplurals=1; plural=0;");

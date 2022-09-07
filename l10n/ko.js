@@ -11,6 +11,8 @@ OC.L10N.register(
     "Create new form" : "새로운 양식 생성",
     "An error occurred while loading the forms list" : "양식 리스트를 가져오는데 문제가 발생하였습니다.",
     "Unable to create a new form" : "새 양식 생성할 수 없음",
+    "This form does not exist" : "존재하지 않는 양식",
+    "Form expired" : "만료된 양식",
     "Select groups" : "그룹 선택",
     "Delete form" : "양식 삭제",
     "Are you sure you want to delete {title}?" : "정말로 {title}을 삭제할 것입니까?",
@@ -46,8 +48,6 @@ OC.L10N.register(
     "Date" : "날짜",
     "Pick a date" : "날짜 선택",
     "Time" : "시간",
-    "Pick a time" : "시간 선택",
-    "Form expired" : "만료된 양식",
-    "This form does not exist" : "존재하지 않는 양식"
+    "Pick a time" : "시간 선택"
 },
 "nplurals=1; plural=0;");

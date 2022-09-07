@@ -31,6 +31,9 @@ OC.L10N.register(
     "Form not found" : "Formular nicht gefunden",
     "Unable to create a new form" : "Neues Formular konnte nicht erstellt werden",
     "Unable to copy form" : "Formular konnte nicht kopiert werden",
+    "This form does not exist" : "Dieses Formular existiert nicht",
+    "Form expired" : "Formular abgelaufen",
+    "This form has expired and is no longer taking answers" : "Dieses Formular ist abgelaufen und kann nicht mehr ausgefüllt werden",
     "Form creation" : "Formularerstellung",
     "Restrict form creation to selected groups" : "Formularerstellung auf gewählte Gruppen beschränken",
     "Select groups" : "Gruppen auswählen",
@@ -101,7 +104,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Es gab einen Fehler beim Löschen der Frage",
     "Error while saving form" : "Fehler beim Speichern des Formulars",
     "Loading responses …" : "Antworten laden …",
-    "Back to questions" : "Zurück zu den Fragen",
     "{amount} responses" : "{amount} Antworten",
     "Summary" : "Zusammenfassung",
     "Responses" : "Antworten",
@@ -155,9 +157,6 @@ OC.L10N.register(
     "Time" : "Zeit",
     "Time question title" : "Titel der Zeit-Frage",
     "People can pick a time" : "Benutzer können eine Zeit auswählen",
-    "Pick a time" : "Wähle eine Zeit aus",
-    "Form expired" : "Formular abgelaufen",
-    "This form has expired and is no longer taking answers" : "Dieses Formular ist abgelaufen und kann nicht mehr ausgefüllt werden",
-    "This form does not exist" : "Dieses Formular existiert nicht"
+    "Pick a time" : "Wähle eine Zeit aus"
 },
 "nplurals=2; plural=(n != 1);");

@@ -29,6 +29,9 @@ OC.L10N.register(
     "Form not found" : "Η φόρμα δεν βρέθηκε",
     "Unable to create a new form" : "Αδυναμία δημιουργίας νέας φόρμας",
     "Unable to copy form" : "Αδυναμία αντιγραφής της φόρμας",
+    "This form does not exist" : "Η φόρμα δεν υπάρχει",
+    "Form expired" : "Η φόρμα έληξε",
+    "This form has expired and is no longer taking answers" : "Η φόρμα έληξε και δεν δέχεται πλέον απαντήσεις",
     "Select groups" : "Επιλέξτε ομάδες",
     "Share form" : "Διαμοιρασμός φόρμας",
     "Results" : "Αποτελέσματα",
@@ -78,7 +81,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Σφάλμα κατά την αφαίρεση ερώτησης",
     "Error while saving form" : "Σφάλμα κατά την αποθήκευση της φόρμας",
     "Loading responses …" : "Φόρτωση απαντήσεων ...",
-    "Back to questions" : "Επιστροφή στις ερωτήσεις",
     "{amount} responses" : "{amount} απαντήσεις",
     "Summary" : "Σύνοψη",
     "Responses" : "Απαντήσεις",
@@ -127,9 +129,6 @@ OC.L10N.register(
     "People can pick a date and time" : "Οι άνθρωποι μπορούν να επιλέξουν μια ημερομηνία και ώρα",
     "Pick a date and time" : "Επιλέξτε μια ημερομηνία και ώρα",
     "Time" : "Ώρα",
-    "Pick a time" : "Επιλογή χρόνου",
-    "Form expired" : "Η φόρμα έληξε",
-    "This form has expired and is no longer taking answers" : "Η φόρμα έληξε και δεν δέχεται πλέον απαντήσεις",
-    "This form does not exist" : "Η φόρμα δεν υπάρχει"
+    "Pick a time" : "Επιλογή χρόνου"
 },
 "nplurals=2; plural=(n != 1);");

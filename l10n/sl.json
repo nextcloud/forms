@@ -26,6 +26,9 @@
     "Form not found" : "Vprašalnika ni mogoče najti",
     "Unable to create a new form" : "Novega vprašalnika ni mogoče ustvariti",
     "Unable to copy form" : "Vprašalnika ni mogoče kopirati",
+    "This form does not exist" : "Ta vprašalnik ne obstaja",
+    "Form expired" : "Vprašalnik je pretekel",
+    "This form has expired and is no longer taking answers" : "Vprašalnik je pretekel, zato odgovorov ni mogoče več pošiljati",
     "Select groups" : "Izbor skupin",
     "Share form" : "Objava vprašalnika",
     "Results" : "Zadetki",
@@ -74,7 +77,6 @@
     "There was an error while removing the question" : "Prišlo je do napake med odstranjevanjem vprašanja",
     "Error while saving form" : "Prišlo je do napake med shranjevanjem vprašalnika",
     "Loading responses …" : "Poteka nalaganje odzivov ...",
-    "Back to questions" : "Nazaj na vprašanja",
     "{amount} responses" : "Število odzivov: {amount}",
     "Summary" : "Povzetek",
     "Responses" : "Odzivi",
@@ -122,9 +124,6 @@
     "People can pick a date and time" : "Izbrati je treba datum in čas iz koledarja",
     "Pick a date and time" : "Izberite datum in čas ...",
     "Time" : "Čas",
-    "Pick a time" : "Izbor časa",
-    "Form expired" : "Vprašalnik je pretekel",
-    "This form has expired and is no longer taking answers" : "Vprašalnik je pretekel, zato odgovorov ni mogoče več pošiljati",
-    "This form does not exist" : "Ta vprašalnik ne obstaja"
+    "Pick a time" : "Izbor časa"
 },"pluralForm" :"nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);"
 }

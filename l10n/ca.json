@@ -26,6 +26,9 @@
     "Form not found" : "No s'ha trobat el formulari",
     "Unable to create a new form" : "No s'ha pogut crear un formulari nou",
     "Unable to copy form" : "No s'ha pogut copiar el formulari",
+    "This form does not exist" : "Aquest formulari no existeix",
+    "Form expired" : "S'ha tancat el formulari",
+    "This form has expired and is no longer taking answers" : "Aquest formulari s'ha tancat i ja no admet respostes",
     "Select groups" : "Selecciona els grups",
     "Share form" : "Comparteix el formulari",
     "Results" : "Resultats",
@@ -74,7 +77,6 @@
     "There was an error while removing the question" : "S'ha produït un error en suprimir la pregunta",
     "Error while saving form" : "S'ha produït un error en desar el formulari",
     "Loading responses …" : "S'estan carregant les respostes...",
-    "Back to questions" : "Torna a les preguntes",
     "{amount} responses" : "{amount} respostes",
     "Summary" : "Resum",
     "Responses" : "Respostes",
@@ -123,9 +125,6 @@
     "People can pick a date and time" : "Els usuaris poden triar una data i hora",
     "Pick a date and time" : "Trieu una data i hora",
     "Time" : "Hora",
-    "Pick a time" : "Tria una hora",
-    "Form expired" : "S'ha tancat el formulari",
-    "This form has expired and is no longer taking answers" : "Aquest formulari s'ha tancat i ja no admet respostes",
-    "This form does not exist" : "Aquest formulari no existeix"
+    "Pick a time" : "Tria una hora"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

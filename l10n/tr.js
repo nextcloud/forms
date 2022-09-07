@@ -31,6 +31,9 @@ OC.L10N.register(
     "Form not found" : "Form bulunamadı",
     "Unable to create a new form" : "Yeni bir form oluşturulamadı",
     "Unable to copy form" : "Form kopyalanamadı",
+    "This form does not exist" : "Bu form bulunamadı",
+    "Form expired" : "Formun geçerlilik süresi dolmuş",
+    "This form has expired and is no longer taking answers" : "Bu formun geçerlilik süresi dolmuş olduğundan doldurulamaz",
     "Form creation" : "Form oluşturma",
     "Restrict form creation to selected groups" : "Form oluşturma seçilmiş gruplarla kısıtlansın",
     "Select groups" : "Grupları seçin",
@@ -102,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Soru silinirken bir sorun çıktı",
     "Error while saving form" : "Form kaydedilirken sorun çıktı",
     "Loading responses …" : "Yanıtlar yükleniyor…",
-    "Back to questions" : "Sorulara geri dön",
     "{amount} responses" : "{amount} yanıt",
     "Summary" : "Özet",
     "Responses" : "Yanıtlar",
@@ -156,9 +158,6 @@ OC.L10N.register(
     "Time" : "Saat",
     "Time question title" : "Saat sorusunun başlığı",
     "People can pick a time" : "Kişi bir saat seçebilir",
-    "Pick a time" : "Bir saat seçin",
-    "Form expired" : "Formun geçerlilik süresi dolmuş",
-    "This form has expired and is no longer taking answers" : "Bu formun geçerlilik süresi dolmuş olduğundan doldurulamaz",
-    "This form does not exist" : "Bu form bulunamadı"
+    "Pick a time" : "Bir saat seçin"
 },
 "nplurals=2; plural=(n > 1);");

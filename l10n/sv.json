@@ -26,6 +26,9 @@
     "Form not found" : "Hittade inte formuläret",
     "Unable to create a new form" : "Kunde inte skapa ett nytt formulär",
     "Unable to copy form" : "Går ej att kopiera formulär",
+    "This form does not exist" : "Detta formulär finns inte",
+    "Form expired" : "Formuläret har upphört att gälla",
+    "This form has expired and is no longer taking answers" : "Detta formulär har upphört att gälla och tar inte längre emot svar",
     "Select groups" : "Välj grupper",
     "Share form" : "Dela formuläret",
     "Results" : "Resultat",
@@ -75,7 +78,6 @@
     "There was an error while removing the question" : "Ett fel uppstod vid borttagande av frågan",
     "Error while saving form" : "Kunde inte spara formuläret",
     "Loading responses …" : "Hämtar svar ...",
-    "Back to questions" : "Tillbaka till frågor",
     "{amount} responses" : "{amount} svar",
     "Summary" : "Sammanfattning",
     "Responses" : "Svar",
@@ -120,9 +122,6 @@
     "People can pick a date and time" : "Personer kan välja datum och tid",
     "Pick a date and time" : "Välj datum och tid",
     "Time" : "Tid",
-    "Pick a time" : "Välj en tidpunkt",
-    "Form expired" : "Formuläret har upphört att gälla",
-    "This form has expired and is no longer taking answers" : "Detta formulär har upphört att gälla och tar inte längre emot svar",
-    "This form does not exist" : "Detta formulär finns inte"
+    "Pick a time" : "Välj en tidpunkt"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

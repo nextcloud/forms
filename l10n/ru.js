@@ -30,6 +30,9 @@ OC.L10N.register(
     "Form not found" : "Форма не найдена",
     "Unable to create a new form" : "Невозможно создать новую форму",
     "Unable to copy form" : "Невозможно скопировать форму",
+    "This form does not exist" : "Такой формы не существует",
+    "Form expired" : "Ответы больше не принимаются",
+    "This form has expired and is no longer taking answers" : "Срок действия этой формы истек и ответы больше не принимаются.",
     "Form creation" : "Создание формы",
     "Select groups" : "Выберите группы",
     "Form sharing" : "Распространение формы",
@@ -86,7 +89,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Произошла ошибка при удалении вопроса",
     "Error while saving form" : "Ошибка при сохранении формы",
     "Loading responses …" : "Загрузка ответов...",
-    "Back to questions" : "Вернуться к вопросам",
     "{amount} responses" : "{amount} ответов",
     "Summary" : "Всего",
     "Responses" : "Ответы",
@@ -137,9 +139,6 @@ OC.L10N.register(
     "Pick a date and time" : "Выберите время и дату",
     "Time" : "Время",
     "People can pick a time" : "Можно выбрать время",
-    "Pick a time" : "Выберите время",
-    "Form expired" : "Ответы больше не принимаются",
-    "This form has expired and is no longer taking answers" : "Срок действия этой формы истек и ответы больше не принимаются.",
-    "This form does not exist" : "Такой формы не существует"
+    "Pick a time" : "Выберите время"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

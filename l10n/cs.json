@@ -29,6 +29,9 @@
     "Form not found" : "Formulář nenalezen",
     "Unable to create a new form" : "Nedaří se vytvořit nový formulář",
     "Unable to copy form" : "Formulář nelze zkopírovat",
+    "This form does not exist" : "Tento formulář neexistuje",
+    "Form expired" : "Platnost formuláře skončila",
+    "This form has expired and is no longer taking answers" : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat",
     "Form creation" : "Vytvoření formuláře",
     "Restrict form creation to selected groups" : "Umožnit vytváření formulářů pouze vybraným skupinám",
     "Select groups" : "Vybrat skupiny",
@@ -100,7 +103,6 @@
     "There was an error while removing the question" : "Při odebírání otázky došlo k chybě",
     "Error while saving form" : "Chyba při ukládání formuláře",
     "Loading responses …" : "Načítání odpovědí…",
-    "Back to questions" : "Zpět k otázkám",
     "{amount} responses" : "{amount} odpovědí",
     "Summary" : "Souhrn",
     "Responses" : "Odpovědi",
@@ -154,9 +156,6 @@
     "Time" : "Čas",
     "Time question title" : "Nadpis dotazu na čas",
     "People can pick a time" : "Lidé si mohou vybrat čas",
-    "Pick a time" : "Vyberte čas",
-    "Form expired" : "Platnost formuláře skončila",
-    "This form has expired and is no longer taking answers" : "Platnost tohoto formuláře skončila a už není možné do něj odpovídat",
-    "This form does not exist" : "Tento formulář neexistuje"
+    "Pick a time" : "Vyberte čas"
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }

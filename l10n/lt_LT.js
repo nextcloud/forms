@@ -23,6 +23,9 @@ OC.L10N.register(
     "Form not found" : "Anketa nerasta",
     "Unable to create a new form" : "Nepavyko sukurti naujos anketos",
     "Unable to copy form" : "Nepavyko nukopijuoti anketos",
+    "This form does not exist" : "Šios anketos nėra",
+    "Form expired" : "Anketa nebegalioja",
+    "This form has expired and is no longer taking answers" : "Ši anketa nebegalioja ir daugiau nebepriima atsakymų",
     "Select groups" : "Pasirinkti grupes",
     "Share form" : "Bendrinti anketą",
     "Results" : "Rezultatai",
@@ -69,7 +72,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Šalinant klausimą, įvyko klaida",
     "Error while saving form" : "Klaida įrašant anketą",
     "Loading responses …" : "Įkeliami atsakymai…",
-    "Back to questions" : "Atgal į klausimus",
     "{amount} responses" : "Atsakymų: {amount}",
     "Summary" : "Santrauka",
     "Responses" : "Atsakymai",
@@ -115,9 +117,6 @@ OC.L10N.register(
     "People can pick a date and time" : "Žmonės galės pasirinkti datą ir laiką",
     "Pick a date and time" : "Pasirinkite datą ir laiką",
     "Time" : "Laikas",
-    "Pick a time" : "Pasirinkite laiką",
-    "Form expired" : "Anketa nebegalioja",
-    "This form has expired and is no longer taking answers" : "Ši anketa nebegalioja ir daugiau nebepriima atsakymų",
-    "This form does not exist" : "Šios anketos nėra"
+    "Pick a time" : "Pasirinkite laiką"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

@@ -31,6 +31,9 @@ OC.L10N.register(
     "Form not found" : "Ez da galdetegia aurkitu",
     "Unable to create a new form" : "Ezin izan da galdetegi berri bat sortu",
     "Unable to copy form" : "Ezin da galdetegia kopiatu",
+    "This form does not exist" : "Galdetegi hau ez da existitzen",
+    "Form expired" : "Galdetegia iraungita",
+    "This form has expired and is no longer taking answers" : "Galdetegi hau iraungi da eta ez du erantzunik onartzen",
     "Form creation" : "Inprimakiaren sortzea",
     "Restrict form creation to selected groups" : "Mugatu inprimakiak sortzea hautatutako taldeei",
     "Select groups" : "Hautatu taldeak",
@@ -102,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Errore bat gertatu da galdera kentzean",
     "Error while saving form" : "Errorea galdetegia gordetzean",
     "Loading responses …" : "Erantzunak kargatzen...",
-    "Back to questions" : "Itzuli galderetara",
     "{amount} responses" : "{amount} erantzun",
     "Summary" : "Laburpena",
     "Responses" : "Erantzunak",
@@ -156,9 +158,6 @@ OC.L10N.register(
     "Time" : "Noiz",
     "Time question title" : "Denbora galderaren izenburua",
     "People can pick a time" : "Jendeak noiz aukera dezake",
-    "Pick a time" : "Aukeratu noiz",
-    "Form expired" : "Galdetegia iraungita",
-    "This form has expired and is no longer taking answers" : "Galdetegi hau iraungi da eta ez du erantzunik onartzen",
-    "This form does not exist" : "Galdetegi hau ez da existitzen"
+    "Pick a time" : "Aukeratu noiz"
 },
 "nplurals=2; plural=(n != 1);");

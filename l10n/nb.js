@@ -28,6 +28,9 @@ OC.L10N.register(
     "Form not found" : "Skjema ikke funnet",
     "Unable to create a new form" : "Kan ikke lage nytt skjema",
     "Unable to copy form" : "Kan ikke kopiere skjema",
+    "This form does not exist" : "Dette skjemaet eksisterer ikke",
+    "Form expired" : "Skjemaet har utløpt",
+    "This form has expired and is no longer taking answers" : "Dette skjema har utløpt og tar ikke lenger imot besvarelser",
     "Select groups" : "Velg grupper",
     "Share form" : "Del skjema",
     "Results" : "Resultater",
@@ -76,7 +79,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Det oppsto en feil ved fjerning av spørsmålet",
     "Error while saving form" : "Feil ved lagring av skjema",
     "Loading responses …" : "Laster besvarelser ...",
-    "Back to questions" : "Tilbake til spørsmål",
     "{amount} responses" : "{amount} besvarelser",
     "Summary" : "Oppsummering",
     "Responses" : "Besvarelser",
@@ -125,9 +127,6 @@ OC.L10N.register(
     "People can pick a date and time" : "Man kan velge dato og tid",
     "Pick a date and time" : "Velg dato og tid",
     "Time" : "Tid",
-    "Pick a time" : "Velg et tidspunkt",
-    "Form expired" : "Skjemaet har utløpt",
-    "This form has expired and is no longer taking answers" : "Dette skjema har utløpt og tar ikke lenger imot besvarelser",
-    "This form does not exist" : "Dette skjemaet eksisterer ikke"
+    "Pick a time" : "Velg et tidspunkt"
 },
 "nplurals=2; plural=(n != 1);");

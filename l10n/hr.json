@@ -26,6 +26,9 @@
     "Form not found" : "Obrazac nije pronađen",
     "Unable to create a new form" : "Nije moguće stvoriti novi obrazac",
     "Unable to copy form" : "Kopiranje obrasca nije moguće",
+    "This form does not exist" : "Ovaj obrazac ne postoji",
+    "Form expired" : "Obrazac je istekao",
+    "This form has expired and is no longer taking answers" : "Ovaj je obrazac istekao i nije moguće unositi odgovore",
     "Select groups" : "Označi grupe",
     "Share form" : "Dijeli obrazac",
     "Results" : "Rezultati",
@@ -74,7 +77,6 @@
     "There was an error while removing the question" : "Došlo je do pogreške pri uklanjanju pitanja",
     "Error while saving form" : "Pogreška pri spremanju obrasca",
     "Loading responses …" : "Učitavanje odgovora…",
-    "Back to questions" : "Natrag na pitanja",
     "{amount} responses" : "{amount} odgovora",
     "Summary" : "Sažetak",
     "Responses" : "Odgovori",
@@ -122,9 +124,6 @@
     "People can pick a date and time" : "Sudionici mogu odabrati datum i vrijeme",
     "Pick a date and time" : "Odaberite datum i vrijeme",
     "Time" : "Vrijeme",
-    "Pick a time" : "Odaberi vrijeme",
-    "Form expired" : "Obrazac je istekao",
-    "This form has expired and is no longer taking answers" : "Ovaj je obrazac istekao i nije moguće unositi odgovore",
-    "This form does not exist" : "Ovaj obrazac ne postoji"
+    "Pick a time" : "Odaberi vrijeme"
 },"pluralForm" :"nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;"
 }

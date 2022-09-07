@@ -15,6 +15,9 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Ocurrió un error mientras se cargaba la lista de formularios",
     "Form not found" : "Formulario no encontrado",
     "Unable to create a new form" : "No es posible crear un nuevo formulario",
+    "This form does not exist" : "Este formulario no existe",
+    "Form expired" : "El formulario ha expirado",
+    "This form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no recibe respuestas",
     "Select groups" : "Seleccionar grupos",
     "Delete form" : "Borrar formulario",
     "Are you sure you want to delete {title}?" : "Esta seguro que desea borrar {título}?",
@@ -50,7 +53,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Hubo un error mientras se eliminaba la pregunta",
     "Error while saving form" : "Error mientras se guardaba el formulario",
     "Loading responses …" : "Cargando respuestas",
-    "Back to questions" : "Volver a las preguntas",
     "Summary" : "Resumen",
     "Responses" : "Respuestas",
     "Options" : "Opciones",
@@ -74,9 +76,6 @@ OC.L10N.register(
     "Short answer" : "Respuesta breve",
     "Long text" : "Texto largo",
     "Date" : "Fecha",
-    "Time" : "Hora",
-    "Form expired" : "El formulario ha expirado",
-    "This form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no recibe respuestas",
-    "This form does not exist" : "Este formulario no existe"
+    "Time" : "Hora"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

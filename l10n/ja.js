@@ -22,6 +22,9 @@ OC.L10N.register(
     "Form not found" : "フォームがありません",
     "Unable to create a new form" : "新しいフォームを作成することはできません",
     "Unable to copy form" : "フォームをコピーできません",
+    "This form does not exist" : "このフォームは存在しません",
+    "Form expired" : "フォームの有効期限切れ",
+    "This form has expired and is no longer taking answers" : "このフォームは期限が切れており、もう回答を取得しません",
     "Select groups" : "グループを選択",
     "Share form" : "フォームを共有",
     "Results" : "結果",
@@ -72,7 +75,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "設問の削除中にエラーが発生しました",
     "Error while saving form" : "フォームの保存中にエラー発生",
     "Loading responses …" : "回答をロード中 ...",
-    "Back to questions" : "質問に戻る",
     "{amount} responses" : "{amount} 個の返信",
     "Summary" : "要約",
     "Responses" : "回答",
@@ -118,9 +120,6 @@ OC.L10N.register(
     "People can pick a date and time" : "回答者は日付と時刻を選択可能",
     "Pick a date and time" : "日時を選択",
     "Time" : "時間",
-    "Pick a time" : "時間を指定",
-    "Form expired" : "フォームの有効期限切れ",
-    "This form has expired and is no longer taking answers" : "このフォームは期限が切れており、もう回答を取得しません",
-    "This form does not exist" : "このフォームは存在しません"
+    "Pick a time" : "時間を指定"
 },
 "nplurals=1; plural=0;");

@@ -29,6 +29,9 @@ OC.L10N.register(
     "Form not found" : "Modulo non trovato",
     "Unable to create a new form" : "Impossibile creare un nuovo modulo",
     "Unable to copy form" : "Impossibile copiare il modulo",
+    "This form does not exist" : "Questo modulo non esiste",
+    "Form expired" : "Modulo scaduto",
+    "This form has expired and is no longer taking answers" : "Questo modulo è scaduto e non accetta più risposte",
     "Select groups" : "Seleziona gruppi",
     "Share form" : "Condividi modulo",
     "Results" : "Risultati",
@@ -78,7 +81,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Si è verificato un errore durante la rimozione della domanda",
     "Error while saving form" : "Errore durante il salvataggio del modulo",
     "Loading responses …" : "Caricamento risposte…",
-    "Back to questions" : "Torna alle domande",
     "{amount} responses" : "{amount} risposte",
     "Summary" : "Riepilogo",
     "Responses" : "Risposte",
@@ -127,9 +129,6 @@ OC.L10N.register(
     "People can pick a date and time" : "Le persone possono scegliere una data e un orario",
     "Pick a date and time" : "Scegli una data e un orario",
     "Time" : "Ora",
-    "Pick a time" : "Scegli un orario",
-    "Form expired" : "Modulo scaduto",
-    "This form has expired and is no longer taking answers" : "Questo modulo è scaduto e non accetta più risposte",
-    "This form does not exist" : "Questo modulo non esiste"
+    "Pick a time" : "Scegli un orario"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

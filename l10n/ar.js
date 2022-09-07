@@ -28,6 +28,9 @@ OC.L10N.register(
     "Form not found" : "تعذر العثور على النموذج ",
     "Unable to create a new form" : "تعذر إنشاء نموذج جديد ",
     "Unable to copy form" : "تعذر نسخ النموذج ",
+    "This form does not exist" : "هذا النموذج غير موجود ",
+    "Form expired" : "انتهت صلاحية النموذج ",
+    "This form has expired and is no longer taking answers" : "انتهت صلاحية النموذج ولا يمكن استقبال إجابات ",
     "Select groups" : "إختر مجموعة",
     "Share form" : "مشاركة النموذج ",
     "Results" : "النتائج ",
@@ -76,7 +79,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "حدث خطأ أثناء إزالة السؤال ",
     "Error while saving form" : "حدث خطأ أثناء حفظ النموذج ",
     "Loading responses …" : "جارِ تحميل الردود ",
-    "Back to questions" : "العودة إلى الأسئلة ",
     "{amount} responses" : "{amount} الردود ",
     "Summary" : "المُلخَّص",
     "Responses" : "الردود",
@@ -124,9 +126,6 @@ OC.L10N.register(
     "People can pick a date and time" : "يمكن للناس اختيار التاريخ والوقت ",
     "Pick a date and time" : "اختر تاريخًا ووقتًا ",
     "Time" : "إلى وقت",
-    "Pick a time" : "اختر وقت",
-    "Form expired" : "انتهت صلاحية النموذج ",
-    "This form has expired and is no longer taking answers" : "انتهت صلاحية النموذج ولا يمكن استقبال إجابات ",
-    "This form does not exist" : "هذا النموذج غير موجود "
+    "Pick a time" : "اختر وقت"
 },
 "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");

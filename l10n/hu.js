@@ -31,6 +31,9 @@ OC.L10N.register(
     "Form not found" : "Az űrlap nem található",
     "Unable to create a new form" : "Az új űrlap létrehozása sikertelen",
     "Unable to copy form" : "Az űrlap másolása sikertelen",
+    "This form does not exist" : "Ez az űrlap nem létezik",
+    "Form expired" : "Az űrlap lejárt",
+    "This form has expired and is no longer taking answers" : "Ez az űrlap lejárt és többé nem lehet kitölteni",
     "Form creation" : "Űrlap létrehozása",
     "Restrict form creation to selected groups" : "Az űrlaplétrehozás bizonyos csoportokra korlátozása",
     "Select groups" : "Csoportok kiválasztása",
@@ -102,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Hiba történt a kérdés eltávolítása során",
     "Error while saving form" : "Hiba az űrlap mentésekor",
     "Loading responses …" : "Válaszok betöltése…",
-    "Back to questions" : "Vissza a kérdésekhez",
     "{amount} responses" : "{amount} válasz",
     "Summary" : "Összefoglalás",
     "Responses" : "Válaszok",
@@ -156,9 +158,6 @@ OC.L10N.register(
     "Time" : "Idő",
     "Time question title" : "Időt váró kérdés címe",
     "People can pick a time" : "Az emberek választhatnak időt",
-    "Pick a time" : "Válasszon egy időt",
-    "Form expired" : "Az űrlap lejárt",
-    "This form has expired and is no longer taking answers" : "Ez az űrlap lejárt és többé nem lehet kitölteni",
-    "This form does not exist" : "Ez az űrlap nem létezik"
+    "Pick a time" : "Válasszon egy időt"
 },
 "nplurals=2; plural=(n != 1);");

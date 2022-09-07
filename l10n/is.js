@@ -16,6 +16,9 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Villa átti sér stað við að hlaða inn lista yfir eyðuform",
     "Form not found" : "Eyðuform fannst ekki",
     "Unable to create a new form" : "Gat ekki búið til nýtt eyðuform",
+    "This form does not exist" : "Þetta eyðuform er ekki til",
+    "Form expired" : "Eyðuform er útrunnið",
+    "This form has expired and is no longer taking answers" : "Þetta eyðuform er útrunnið og tekur því ekki lengur við svörum",
     "Select groups" : "Veldu hópa",
     "Share form" : "Deila eyðuformi",
     "Delete form" : "Eyða eyðuformi",
@@ -52,7 +55,6 @@ OC.L10N.register(
     "Add a question" : "Bæta við spurningu",
     "Error while saving form" : "Villa við að vista eyðuform",
     "Loading responses …" : "Hleð inn svörum …",
-    "Back to questions" : "Aftur spurningar",
     "{amount} responses" : "{amount} svör",
     "Summary" : "Samantekt",
     "Responses" : "Svör",
@@ -82,9 +84,6 @@ OC.L10N.register(
     "Date" : "Dagsetning",
     "Pick a date" : "Veldu dagsetningu",
     "Time" : "Tími",
-    "Pick a time" : "Veldu tíma",
-    "Form expired" : "Eyðuform er útrunnið",
-    "This form has expired and is no longer taking answers" : "Þetta eyðuform er útrunnið og tekur því ekki lengur við svörum",
-    "This form does not exist" : "Þetta eyðuform er ekki til"
+    "Pick a time" : "Veldu tíma"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

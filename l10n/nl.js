@@ -29,6 +29,9 @@ OC.L10N.register(
     "Form not found" : "Formulier niet gevonden",
     "Unable to create a new form" : "Kan het formulier niet aanmaken",
     "Unable to copy form" : "Kon formulier niet kopiëren",
+    "This form does not exist" : "Dit formulier bestaat niet",
+    "Form expired" : "Formulier verlopen",
+    "This form has expired and is no longer taking answers" : "Dit formulier is verlopen en accepteert geen antwoorden meer.",
     "Select groups" : "Selecteer groepen",
     "Share form" : "Deel formulier",
     "Results" : "Resultaten",
@@ -78,7 +81,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Er trad een fout op bij het verwijderen van de vraag",
     "Error while saving form" : "Fout bij opslaan formulier",
     "Loading responses …" : "Laden reacties ...",
-    "Back to questions" : "Terug naar vragen",
     "{amount} responses" : "{amount} reacties",
     "Summary" : "Samenvatting",
     "Responses" : "Antwoorden",
@@ -128,9 +130,6 @@ OC.L10N.register(
     "Time" : "Tijd",
     "Time question title" : "Tijdvraag titel",
     "People can pick a time" : "Mensen kunnen een tijdstip kiezen",
-    "Pick a time" : "Kies een tijd",
-    "Form expired" : "Formulier verlopen",
-    "This form has expired and is no longer taking answers" : "Dit formulier is verlopen en accepteert geen antwoorden meer.",
-    "This form does not exist" : "Dit formulier bestaat niet"
+    "Pick a time" : "Kies een tijd"
 },
 "nplurals=2; plural=(n != 1);");

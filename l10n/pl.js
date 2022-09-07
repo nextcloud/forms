@@ -31,6 +31,9 @@ OC.L10N.register(
     "Form not found" : "Nie znaleziono formularza",
     "Unable to create a new form" : "Nie można utworzyć nowego formularza",
     "Unable to copy form" : "Nie można skopiować formularza",
+    "This form does not exist" : "Ten formularz nie istnieje",
+    "Form expired" : "Formularz wygasł",
+    "This form has expired and is no longer taking answers" : "Nie są już przyjmowane odpowiedzi, ponieważ ten formularz wygasł.",
     "Form creation" : "Tworzenie formularzy",
     "Restrict form creation to selected groups" : "Ogranicz tworzenie formularzy dla wybranych grup",
     "Select groups" : "Wybierz grupy",
@@ -102,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Wystąpił błąd podczas usuwania pytania",
     "Error while saving form" : "Błąd podczas zapisywania formularza",
     "Loading responses …" : "Wczytywanie odpowiedzi…",
-    "Back to questions" : "Powrót do pytań",
     "{amount} responses" : "{amount} odpowiedzi",
     "Summary" : "Podsumowanie",
     "Responses" : "Odpowiedzi",
@@ -156,9 +158,6 @@ OC.L10N.register(
     "Time" : "Czas",
     "Time question title" : "Tytuł pytania o czas",
     "People can pick a time" : "Ludzie mogą wybrać czas",
-    "Pick a time" : "Wybierz czas",
-    "Form expired" : "Formularz wygasł",
-    "This form has expired and is no longer taking answers" : "Nie są już przyjmowane odpowiedzi, ponieważ ten formularz wygasł.",
-    "This form does not exist" : "Ten formularz nie istnieje"
+    "Pick a time" : "Wybierz czas"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

@@ -26,6 +26,9 @@
     "Form not found" : "Mòdulu no agatadu",
     "Unable to create a new form" : "Non faghet a creare unu mòdulu nou",
     "Unable to copy form" : "No at fatu a copiare su mòdulu",
+    "This form does not exist" : "Custu mòdulu no esistit",
+    "Form expired" : "Su mòdulu est iscadidu",
+    "This form has expired and is no longer taking answers" : "Custu mòdulu est iscadidu e no atzetat prus rispostas",
     "Select groups" : "Seletziona grupos",
     "Share form" : "Cumpartzi mòdulu",
     "Results" : "Resurtados",
@@ -74,7 +77,6 @@
     "There was an error while removing the question" : "Ddoe at àpidu un'errore boghende·nche sa pregonta",
     "Error while saving form" : "Errore sarvende su mòdulu",
     "Loading responses …" : "Carrighende is rispostas ...",
-    "Back to questions" : "Torra a is pregontas",
     "{amount} responses" : "{amount} rispostas",
     "Summary" : "Resumu",
     "Responses" : "Rispostas",
@@ -122,9 +124,6 @@
     "People can pick a date and time" : "Sa gente podet seberare data e ora",
     "Pick a date and time" : "Sèbera data e ora",
     "Time" : "Ora",
-    "Pick a time" : "Sèbera una ora",
-    "Form expired" : "Su mòdulu est iscadidu",
-    "This form has expired and is no longer taking answers" : "Custu mòdulu est iscadidu e no atzetat prus rispostas",
-    "This form does not exist" : "Custu mòdulu no esistit"
+    "Pick a time" : "Sèbera una ora"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

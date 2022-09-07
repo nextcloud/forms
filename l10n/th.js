@@ -26,6 +26,9 @@ OC.L10N.register(
     "Form not found" : "ไม่พบฟอร์ม",
     "Unable to create a new form" : "ไม่สามารถสร้างฟอร์มใหม่",
     "Unable to copy form" : "ไม่สามารถคัดลอกฟอร์ม",
+    "This form does not exist" : "ไม่มีฟอร์มนี้",
+    "Form expired" : "ฟอร์มหมดอายุ",
+    "This form has expired and is no longer taking answers" : "ฟอร์มนี้หมดอายุแล้วและไม่รับคำตอบเพิ่มอีก",
     "Select groups" : "เลือกกลุ่ม",
     "Results" : "ผลลัพธ์",
     "Copy form" : "คัดลอกฟอร์ม",
@@ -68,9 +71,6 @@ OC.L10N.register(
     "Pick a date" : "เลือกวันที่",
     "Datetime" : "วันที่และเวลา",
     "Pick a date and time" : "เลือกวันที่และเวลา",
-    "Time" : "เวลา",
-    "Form expired" : "ฟอร์มหมดอายุ",
-    "This form has expired and is no longer taking answers" : "ฟอร์มนี้หมดอายุแล้วและไม่รับคำตอบเพิ่มอีก",
-    "This form does not exist" : "ไม่มีฟอร์มนี้"
+    "Time" : "เวลา"
 },
 "nplurals=1; plural=0;");

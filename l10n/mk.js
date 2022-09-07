@@ -18,6 +18,9 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Грешка при вчитување на листата со форми",
     "Form not found" : "Формата не е пронајдена",
     "Unable to create a new form" : "Неможе да се креира нова форма",
+    "This form does not exist" : "Оваа форма не постои",
+    "Form expired" : "Формата е истечена",
+    "This form has expired and is no longer taking answers" : "Оваа форма е истечена и повеќе неможе да се внесуваат оговари",
     "Select groups" : "Одбери групи",
     "Share form" : "Сподели форма",
     "Delete form" : "Избриши форма",
@@ -64,7 +67,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Настана грешка при бришење на прашање",
     "Error while saving form" : "Грешка при зачувување на форма",
     "Loading responses …" : "Вчитување на одговори ...",
-    "Back to questions" : "Назад до прашањата",
     "{amount} responses" : "{amount} одговори",
     "Summary" : "Резиме",
     "Responses" : "Одговори",
@@ -108,9 +110,6 @@ OC.L10N.register(
     "People can pick a date and time" : "Учесниците можат да изберат датум и време",
     "Pick a date and time" : "Изберете датум и време",
     "Time" : "Време",
-    "Pick a time" : "Избери време",
-    "Form expired" : "Формата е истечена",
-    "This form has expired and is no longer taking answers" : "Оваа форма е истечена и повеќе неможе да се внесуваат оговари",
-    "This form does not exist" : "Оваа форма не постои"
+    "Pick a time" : "Избери време"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

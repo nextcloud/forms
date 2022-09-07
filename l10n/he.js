@@ -17,6 +17,9 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "אירעה שגיאה בעת טעינת רשימת הטפסים",
     "Form not found" : "הטופס לא נמצא",
     "Unable to create a new form" : "לא ניתן ליצור טופס חדש",
+    "This form does not exist" : "טופס זה אינו קיים",
+    "Form expired" : "תוקף הטופס פג",
+    "This form has expired and is no longer taking answers" : "תוקפו של טופס זה פג ולא ניתן לענות עליו עוד",
     "Select groups" : "בחירת קבוצות",
     "Share form" : "שיתוף טופס",
     "Delete form" : "מחיקת טופס",
@@ -63,7 +66,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "אירעה שגיאה בעת הסרת השאלה",
     "Error while saving form" : "שגיאה בעת שמירת טופס",
     "Loading responses …" : "התגובות נטענות…",
-    "Back to questions" : "חזרה לשאלות",
     "{amount} responses" : "{amount} תגובות",
     "Summary" : "תקציר",
     "Responses" : "תגובות",
@@ -105,9 +107,6 @@ OC.L10N.register(
     "People can pick a date and time" : "אנשים יכולים לבחור תאריך ושעה",
     "Pick a date and time" : "נא לבחור תאריך ושעה",
     "Time" : "זמן",
-    "Pick a time" : "בחר זמן",
-    "Form expired" : "תוקף הטופס פג",
-    "This form has expired and is no longer taking answers" : "תוקפו של טופס זה פג ולא ניתן לענות עליו עוד",
-    "This form does not exist" : "טופס זה אינו קיים"
+    "Pick a time" : "בחר זמן"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;");

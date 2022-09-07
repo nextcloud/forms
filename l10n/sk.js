@@ -30,6 +30,9 @@ OC.L10N.register(
     "Form not found" : "Formulár nebol nájdený",
     "Unable to create a new form" : "Nepodarilo sa vytvoriť nový formulár",
     "Unable to copy form" : "Nemôžem kopírovať formulár",
+    "This form does not exist" : "Tento formulár neexistuje",
+    "Form expired" : "Platnosť formulára vypršala",
+    "This form has expired and is no longer taking answers" : "Platnosť tohto formulára vypršala, už sa nedá odpovedať",
     "Select groups" : "Vybrať skupinu",
     "Share form" : "Sprístupniť formulár",
     "Results" : "Výsledky",
@@ -79,7 +82,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Pri odstraňovaní otázky sa vyskytla chyba",
     "Error while saving form" : "Pri ukladaní formulára sa vyskytla chyba",
     "Loading responses …" : "Načítavajú sa odpovede...",
-    "Back to questions" : "Späť na otázky",
     "{amount} responses" : "{amount} odpovedí",
     "Summary" : "Súhrn",
     "Responses" : "Odpovede",
@@ -130,9 +132,6 @@ OC.L10N.register(
     "Time" : "Čas",
     "Time question title" : "Názov otázky pre čas",
     "People can pick a time" : "Ľudia si môžu vybrať čas",
-    "Pick a time" : "Vyberte čas",
-    "Form expired" : "Platnosť formulára vypršala",
-    "This form has expired and is no longer taking answers" : "Platnosť tohto formulára vypršala, už sa nedá odpovedať",
-    "This form does not exist" : "Tento formulár neexistuje"
+    "Pick a time" : "Vyberte čas"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

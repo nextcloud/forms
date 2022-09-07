@@ -29,6 +29,9 @@ OC.L10N.register(
     "Form not found" : "Lomaketta ei löytynyt",
     "Unable to create a new form" : "Uuden lomakkeen luominen ei onnistunut",
     "Unable to copy form" : "Lomakkeen kopioiminen ei onnistu",
+    "This form does not exist" : "Tätä lomaketta ei ole olemassa",
+    "Form expired" : "Lomake vanheni",
+    "This form has expired and is no longer taking answers" : "Lomake vanhentui, eikä se vastaanota enää vastauksia",
     "Form creation" : "Lomakkeen luonti",
     "Restrict form creation to selected groups" : "Rajoita lomakkeen luonti valituille ryhmille",
     "Select groups" : "Valitse ryhmät",
@@ -87,7 +90,6 @@ OC.L10N.register(
     "There was an error while removing the question" : "Kysymystä poistaessa tapahtui virhe",
     "Error while saving form" : "Virhe lomaketta tallennettaessa",
     "Loading responses …" : "Ladataan vastauksia…",
-    "Back to questions" : "Takaisin kysymyksiin",
     "{amount} responses" : "{amount} vastausta",
     "Summary" : "Yhteenveto",
     "Responses" : "Vastaukset",
@@ -138,9 +140,6 @@ OC.L10N.register(
     "Time" : "Aika",
     "Time question title" : "Ajan kysymyksen otsikko",
     "People can pick a time" : "Ihmiset voivat valita ajan",
-    "Pick a time" : "Valitse aika",
-    "Form expired" : "Lomake vanheni",
-    "This form has expired and is no longer taking answers" : "Lomake vanhentui, eikä se vastaanota enää vastauksia",
-    "This form does not exist" : "Tätä lomaketta ei ole olemassa"
+    "Pick a time" : "Valitse aika"
 },
 "nplurals=2; plural=(n != 1);");
