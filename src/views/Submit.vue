@@ -30,7 +30,9 @@
 	</NcAppContent>
 
 	<NcAppContent v-else>
-		<TopBar :permissions="form?.permissions" @share-form="onShareForm" />
+		<TopBar v-if="!publicView"
+			:permissions="form?.permissions"
+			@share-form="onShareForm" />
 
 		<!-- Forms title & description-->
 		<header>

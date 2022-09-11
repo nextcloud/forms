@@ -53,7 +53,6 @@ use OCP\Util;
 use Psr\Log\LoggerInterface;
 
 class PageController extends Controller {
-	private const TEMPLATE_EMPTYCONTENT = 'emptyContent';
 	private const TEMPLATE_MAIN = 'main';
 
 	protected $appName;
@@ -236,7 +235,7 @@ class PageController extends Controller {
 	public function provideEmptyContent(string $renderAs, Form $form = null): ?TemplateResponse {
 		Util::addScript($this->appName, 'forms-emptyContent');
 		$this->initialStateService->provideInitialState($this->appName, 'renderAs', $renderAs);
-		return $this->provideTemplate(self::TEMPLATE_EMPTYCONTENT, $form);
+		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 	}
 
 	/**
@@ -264,7 +263,7 @@ class PageController extends Controller {
 					$ownerAccount = $this->accountManager->getAccount($owner);
 
 					$ownerName = $ownerAccount->getProperty(IAccountManager::PROPERTY_DISPLAYNAME);
-					if ($ownerName->getScope() === IAccountManager::VISIBILITY_PUBLIC) {
+					if ($ownerName->getScope() !== IAccountManager::SCOPE_PRIVATE) {
 						$response->setHeaderDetails($this->l10n->t('Shared by %s', [$ownerName->getValue()]));
 					}
 				}

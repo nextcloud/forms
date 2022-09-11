@@ -82,6 +82,5 @@ export default {
 .forms-emptycontent {
 	flex-basis: 100vw;
 	flex-direction: column;
-	min-height: calc(100vh - 65px - 50px);
 }
 </style>

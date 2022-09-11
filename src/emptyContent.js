@@ -28,7 +28,7 @@ Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
 export default new Vue({
-	 el: '#emptycontent',
+	 el: '#content',
 	 // eslint-disable-next-line vue/match-component-file-name
 	 name: 'FormsEmptyContent',
 	 render: h => h(FormsEmptyContent),
