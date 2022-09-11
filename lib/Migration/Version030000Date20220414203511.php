@@ -44,7 +44,7 @@ class Version030000Date20220414203511 extends SimpleMigrationStep {
 
 		if (!$table->hasColumn('description')) {
 			$table->addColumn('description', Types::TEXT, [
-				'notnull' => true,
+				'notnull' => false,
 				'length' => 4096,
 			]);
 
