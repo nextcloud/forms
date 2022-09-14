@@ -33,6 +33,7 @@ OC.L10N.register(
     "Form expired" : "Η φόρμα έληξε",
     "This form has expired and is no longer taking answers" : "Η φόρμα έληξε και δεν δέχεται πλέον απαντήσεις",
     "Select groups" : "Επιλέξτε ομάδες",
+    "Edit form" : "Επεξεργασία φόρμας",
     "Share form" : "Διαμοιρασμός φόρμας",
     "Results" : "Αποτελέσματα",
     "Copy form" : "Αντιγραφή φόρμας",
@@ -56,6 +57,7 @@ OC.L10N.register(
     "A short answer for the question “{text}”" : "Σύντομη απάντηση στην ερώτηση “{text}”",
     "Delete this response" : "Διαγραφή απάντησης",
     "No response" : "Καμία απάντηση",
+    "Store responses anonymously" : "Αποθηκεύστε τις απαντήσεις ανώνυμα",
     "Allow multiple responses per person" : "Να επιτρέπονται πολλές απαντήσεις ανά χρήστη",
     "Set expiration date" : "Ορισμός ημερομηνίας λήξης",
     "Expired on {date}" : "Έληξε στις {date}",
@@ -70,6 +72,11 @@ OC.L10N.register(
     "Copy to clipboard" : "Αντιγραφή στο πρόχειρο",
     "Share link" : "Διαμοιρασμός συνδέσμου",
     "Add link" : "Προσθήκη συνδέσμου",
+    "Remove link" : "Αφαίρεση συνδέσμου",
+    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Για συμβατότητα με την παλιά Κοινή Χρήση, ο εσωτερικός σύνδεσμος εξακολουθεί να μπορεί να χρησιμοποιηθεί. Συνιστούμε να αντικαταστήσετε τον σύνδεσμο με έναν νέου τύπου.",
+    "Remove Legacy Link" : "Αφαίρεση του συνδέσμου παλαιού τύπου",
+    "Show to all accounts on sidebar" : "Εμφάνιση σε όλους τους λογαριασμούς στην πλαϊνή γραμμή",
+    "View form" : "Προβολή φόρμας",
     "Toggle settings" : "Εναλλαγή ρυθμίσεων",
     "Loading {title} …" : "Φόρτωση {title} …",
     "Form title" : "Τίτλος φόρμας",
@@ -96,6 +103,7 @@ OC.L10N.register(
     "There was an error while removing this response" : "Σφάλμα κατά την αφαίρεση απάντησης",
     "Are you sure you want to delete all responses of {title}?" : "Θέλετε σίγουρα να διαγράψετε όλες τις απαντήσεις του {title};",
     "There was an error while removing responses" : "Σφάλμα κατά την αφαίρεση των απαντήσεων",
+    "Form settings" : "Ρυθμίσεις φόρμας",
     "Sharing" : "Διαμοιρασμός",
     "Settings" : "Ρυθμίσεις",
     "Submitting form …" : "Υποβολή φόρμας ...",
@@ -129,6 +137,6 @@ OC.L10N.register(
     "People can pick a date and time" : "Οι άνθρωποι μπορούν να επιλέξουν μια ημερομηνία και ώρα",
     "Pick a date and time" : "Επιλέξτε μια ημερομηνία και ώρα",
     "Time" : "Ώρα",
-    "Pick a time" : "Επιλογή χρόνου"
+    "Pick a time" : "Επιλέξτε μια ώρα"
 },
 "nplurals=2; plural=(n != 1);");
