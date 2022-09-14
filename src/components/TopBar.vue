@@ -171,19 +171,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$top-bar-height: 60px;
-
 .top-bar {
-	position: sticky;
+	top: 0;
 	z-index: 100;
-	top: var(--header-height);
 	display: flex;
+	position: sticky;
 	align-items: center;
 	align-self: flex-end;
 	justify-content: flex-end;
-	height: $top-bar-height;
-	margin-top: calc($top-bar-height * -1);
-	padding: 0 6px;
+	padding: calc(var(--default-grid-baseline, 4px) * 2);
 }
 
 .icon--flipped {
