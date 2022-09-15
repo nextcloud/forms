@@ -43,7 +43,6 @@
 			:multiple="isMultiple"
 			:required="isRequired"
 			:options="options"
-			:searchable="false"
 			label="text"
 			track-by="id"
 			@select="onSelect" />
