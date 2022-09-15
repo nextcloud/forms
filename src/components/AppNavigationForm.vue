@@ -60,7 +60,7 @@
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
-					<IconMessageReplyText :size="20" />
+					<IconPoll :size="20" />
 				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
@@ -95,7 +95,7 @@ import IconCheck from 'vue-material-design-icons/Check'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy'
 import IconDelete from 'vue-material-design-icons/Delete'
 import IconPencil from 'vue-material-design-icons/Pencil'
-import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
+import IconPoll from 'vue-material-design-icons/Poll'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import FormsIcon from './Icons/FormsIcon.vue'
@@ -111,7 +111,7 @@ export default {
 		IconContentCopy,
 		IconDelete,
 		IconPencil,
-		IconMessageReplyText,
+		IconPoll,
 		IconShareVariant,
 		NcActionButton,
 		NcActionRouter,
