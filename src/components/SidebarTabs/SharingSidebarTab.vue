@@ -27,25 +27,6 @@
 			:show-loading="isLoading"
 			@add-share="addShare" />
 
-		<!-- Internal link -->
-		<div class="share-div">
-			<div class="share-div__avatar">
-				<IconLinkVariant :size="22" />
-			</div>
-			<div class="share-div__desc share-div__desc--twoline">
-				<span>{{ t('forms', 'Internal link') }}</span>
-				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
-			</div>
-			<NcActions>
-				<NcActionButton @click="copyInternalShareLink($event, form.hash)">
-					<template #icon>
-						<IconCopyAll :size="20" />
-					</template>
-					{{ t('forms', 'Copy to clipboard') }}
-				</NcActionButton>
-			</NcActions>
-		</div>
-
 		<!-- Public Link -->
 		<div v-if="!hasPublicLink && appConfig.allowPublicLink" class="share-div share-div--link">
 			<div class="share-div__avatar">
@@ -115,6 +96,25 @@
 						<IconDelete :size="20" />
 					</template>
 					{{ t('forms', 'Remove Legacy Link') }}
+				</NcActionButton>
+			</NcActions>
+		</div>
+
+		<!-- Internal link -->
+		<div class="share-div">
+			<div class="share-div__avatar">
+				<IconLinkVariant :size="20" />
+			</div>
+			<div class="share-div__desc share-div__desc--twoline">
+				<span>{{ t('forms', 'Internal link') }}</span>
+				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
+			</div>
+			<NcActions>
+				<NcActionButton @click="copyInternalShareLink($event, form.hash)">
+					<template #icon>
+						<IconCopyAll :size="20" />
+					</template>
+					{{ t('forms', 'Copy to clipboard') }}
 				</NcActionButton>
 			</NcActions>
 		</div>
