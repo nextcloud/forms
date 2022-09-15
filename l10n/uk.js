@@ -17,6 +17,7 @@ OC.L10N.register(
     "Required" : "Вимагається",
     "Description" : "Опис",
     "Set expiration date" : "Встановити термін дії",
+    "No recommendations. Start typing." : "Немає рекомендацій. Почніть друкувати.",
     "Searching …" : "Пошук...",
     "Delete" : "Вилучити",
     "Group" : "Група",
