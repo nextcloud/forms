@@ -30,7 +30,7 @@
 		<!-- Internal link -->
 		<div class="share-div">
 			<div class="share-div__avatar">
-				<IconLink :size="22" />
+				<IconLinkVariant :size="22" />
 			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Internal link') }}</span>
@@ -49,7 +49,7 @@
 		<!-- Public Link -->
 		<div v-if="!hasPublicLink && appConfig.allowPublicLink" class="share-div share-div--link">
 			<div class="share-div__avatar">
-				<IconLink :size="22" />
+				<IconLinkVariant :size="22" />
 			</div>
 			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 			<NcActions>
@@ -66,7 +66,7 @@
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				class="share-div share-div--link">
 				<div class="share-div__avatar">
-					<IconLink :size="22" />
+					<IconLinkVariant :size="22" />
 				</div>
 				<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 				<NcActions>
@@ -99,7 +99,7 @@
 		<!-- Legacy Info, if present -->
 		<div v-if="form.access.legacyLink" class="share-div">
 			<div class="share-div__avatar">
-				<IconLink :size="22" />
+				<IconLinkVariant :size="22" />
 			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Legacy Link') }}</span>
@@ -168,7 +168,7 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadi
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline'
 import IconDelete from 'vue-material-design-icons/Delete'
-import IconLink from 'vue-material-design-icons/Link'
+import IconLinkVariant from 'vue-material-design-icons/LinkVariant'
 import IconPlus from 'vue-material-design-icons/Plus'
 
 import FormsIcon from '../Icons/FormsIcon.vue'
@@ -187,7 +187,7 @@ export default {
 		IconAlertCircleOutline,
 		IconCopyAll,
 		IconDelete,
-		IconLink,
+		IconLinkVariant,
 		IconPlus,
 		NcActions,
 		NcActionButton,

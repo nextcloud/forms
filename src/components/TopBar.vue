@@ -50,7 +50,7 @@
 			type="tertiary"
 			@click="showResults">
 			<template #icon>
-				<IconMessageReplyText :size="20" />
+				<IconPoll :size="20" />
 			</template>
 		</NcButton>
 		<NcButton v-if="canShare && !sidebarOpened"
@@ -77,10 +77,10 @@
 
 <script>
 import NcButton from '@nextcloud/vue/dist/Components/NcButton'
-import IconMenuOpen from 'vue-material-design-icons/MenuOpen'
-import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText'
 import IconEye from 'vue-material-design-icons/Eye'
+import IconMenuOpen from 'vue-material-design-icons/MenuOpen'
 import IconPencil from 'vue-material-design-icons/Pencil'
+import IconPoll from 'vue-material-design-icons/Poll'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 
@@ -90,8 +90,8 @@ export default {
 	components: {
 		IconEye,
 		IconMenuOpen,
-		IconMessageReplyText,
 		IconPencil,
+		IconPoll,
 		IconShareVariant,
 		NcButton,
 	},
