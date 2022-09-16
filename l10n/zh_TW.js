@@ -139,7 +139,7 @@ OC.L10N.register(
     "Radio buttons" : "單選鈕",
     "Radio buttons question title" : "單選鈕問題標題",
     "Dropdown" : "下拉式選單",
-    "Dropdown question title" : "下拉式式選單標題",
+    "Dropdown question title" : "下拉式選單標題",
     "People can pick one option" : "使人可以選擇一個選項",
     "Pick an option" : "選取一個選項",
     "Short answer" : "短文字簡答",
