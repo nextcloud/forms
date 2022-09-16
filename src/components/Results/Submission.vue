@@ -115,7 +115,7 @@ export default {
 
 <style lang="scss" scoped>
 .submission {
-	padding-left: 16px;
+	padding-left: 44px;
 	padding-right: 16px;
 
 	&-head {

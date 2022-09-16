@@ -411,6 +411,7 @@ export default {
 		display: flex;
 		flex-direction: column;
 		margin-bottom: 24px;
+		margin-left: 56px;
 
 		h2 {
 			margin-bottom: 0; // because the input field has enough padding
