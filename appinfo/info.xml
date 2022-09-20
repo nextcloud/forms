@@ -16,6 +16,7 @@
 
 	<author>Affan Hussain</author>
 	<author>Ajfar Huq</author>
+	<author>Christian Hartmann</author>
 	<author>Inigo Jiron</author>
 	<author>Jan C. Borchardt</author>
 	<author>John Molakvoæ</author>
@@ -45,7 +46,7 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
 
 	<dependencies>
-		<nextcloud min-version="22" max-version="25" />
+		<nextcloud min-version="25" max-version="25" />
 	</dependencies>
 
 	<navigations>

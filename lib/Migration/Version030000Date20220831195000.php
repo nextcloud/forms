@@ -29,10 +29,6 @@ use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version030000Date20220831195000 extends SimpleMigrationStep {
-
-	// Types::JSON is only available starting with NC24, we still support NC22
-	private const TYPE_JSON = 'json';
-
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -45,7 +41,7 @@ class Version030000Date20220831195000 extends SimpleMigrationStep {
 		$table = $schema->getTable('forms_v2_questions');
 
 		if (!$table->hasColumn('extra_settings_json')) {
-			$table->addColumn('extra_settings_json', self::TYPE_JSON, [
+			$table->addColumn('extra_settings_json', Types::JSON, [
 				'notnull' => false,
 			]);
 
