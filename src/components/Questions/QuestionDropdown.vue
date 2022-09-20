@@ -25,6 +25,7 @@
 		:text="text"
 		:description="description"
 		:is-required="isRequired"
+		:shuffle-options="!!extraSettings?.shuffleOptions"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-string-lengths="maxStringLengths"
@@ -35,6 +36,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:shuffleOptions="onShuffleOptionsChange"
 		@delete="onDelete">
 		<NcMultiselect v-if="!edit"
 			v-model="selectedOption"
@@ -42,7 +44,7 @@
 			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"
 			:required="isRequired"
-			:options="options"
+			:options="sortedOptions"
 			label="text"
 			track-by="id"
 			@select="onSelect" />
