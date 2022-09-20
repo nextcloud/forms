@@ -21,7 +21,7 @@
   -->
 
 <template>
-	<NcListItem ref="navigationItem"
+	<NcAppNavigationItem ref="navigationItem"
 		:title="formTitle"
 		:to="{
 			name: routerTarget,
@@ -78,7 +78,7 @@
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
 		</template>
-	</NcListItem>
+	</NcAppNavigationItem>
 </template>
 
 <script>
@@ -87,7 +87,7 @@ import { showError } from '@nextcloud/dialogs'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/dist/Components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator'
-import NcListItem from '@nextcloud/vue/dist/Components/NcListItem'
+import NcAppNavigationItem from '@nextcloud/vue/dist/Components/NcAppNavigationItem'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
@@ -116,7 +116,7 @@ export default {
 		NcActionButton,
 		NcActionRouter,
 		NcActionSeparator,
-		NcListItem,
+		NcAppNavigationItem,
 		NcLoadingIcon,
 	},
 
