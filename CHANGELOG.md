@@ -1,11 +1,54 @@
 # Changelog
 
-## [Unreleased] - 3.0.0 - tbd
-### Breaking
+## 3.0.0-beta.1 - 2022-09-21
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.1...v3.0.0-beta.1)
+
+### Breaking ⚠️
 - Moving completely from API v1 to v2. With this, we fundamentally change the way how the forms sharing works, now much more flexible and closer to how it is done in server.
 - Also inverting SubmitOnce to SubmitMultiple with ApiV2
 
-### Deprecated
+### Enhancements
+
+- Make dropdown searchable [\#1342](https://github.com/nextcloud/forms/pull/1342) ([Chartman123](https://github.com/Chartman123))
+- Add UI to preview and fill out own forms [\#1320](https://github.com/nextcloud/forms/pull/1320) ([susnux](https://github.com/susnux))
+- More Icons! [\#1305](https://github.com/nextcloud/forms/pull/1305) ([jotoeri](https://github.com/jotoeri))
+- Move Question Icons to Material Design [\#1304](https://github.com/nextcloud/forms/pull/1304) ([jotoeri](https://github.com/jotoeri))
+- Update Forms Icon and create Component [\#1303](https://github.com/nextcloud/forms/pull/1303) ([jotoeri](https://github.com/jotoeri))
+- Use `@nextcloud/logger` for frontend logging [\#1274](https://github.com/nextcloud/forms/pull/1274) ([susnux](https://github.com/susnux))
+- Feature: Allow shuffling of answer options | Sort options [\#1271](https://github.com/nextcloud/forms/pull/1271) ([susnux](https://github.com/susnux))
+- User migration [\#1243](https://github.com/nextcloud/forms/pull/1243) ([jotoeri](https://github.com/jotoeri))
+- Restrict Form Creation & Sharing Settings [\#1199](https://github.com/nextcloud/forms/pull/1199) ([jotoeri](https://github.com/jotoeri))
+- New Sharing [\#1087](https://github.com/nextcloud/forms/pull/1087) ([jotoeri](https://github.com/jotoeri))
+
+### Fixed
+
+- Fix migration 20220414 not working on SQLite [\#1334](https://github.com/nextcloud/forms/pull/1334) ([susnux](https://github.com/susnux))
+- Fix Add Question a11y [\#1269](https://github.com/nextcloud/forms/pull/1269) ([jotoeri](https://github.com/jotoeri))
+- Fix sharing icons [\#1242](https://github.com/nextcloud/forms/pull/1242) ([jotoeri](https://github.com/jotoeri))
+- Fix titles [\#1239](https://github.com/nextcloud/forms/pull/1239) ([jotoeri](https://github.com/jotoeri))
+- Fix upgrading [\#1212](https://github.com/nextcloud/forms/pull/1212) ([nickvergessen](https://github.com/nickvergessen))
+
+### Merged
+
+- minversion 25 [\#1348](https://github.com/nextcloud/forms/pull/1348) ([Chartman123](https://github.com/Chartman123))
+- Adjust design based on Design Review [\#1344](https://github.com/nextcloud/forms/pull/1344) ([Chartman123](https://github.com/Chartman123))
+- Adjust styling for NC25 & Update `@nextcloud/vue` [\#1338](https://github.com/nextcloud/forms/pull/1338) ([susnux](https://github.com/susnux))
+- Fixing several small things [\#1335](https://github.com/nextcloud/forms/pull/1335) ([jotoeri](https://github.com/jotoeri))
+- Empty Content to Vue [\#1321](https://github.com/nextcloud/forms/pull/1321) ([jotoeri](https://github.com/jotoeri))
+- Move to NcEmptyContent and even more icons [\#1308](https://github.com/nextcloud/forms/pull/1308) ([jotoeri](https://github.com/jotoeri))
+- Make CHANGELOG.md parseable by the appstore [\#1306](https://github.com/nextcloud/forms/pull/1306) ([Chartman123](https://github.com/Chartman123))
+- Update Marcos Email [\#1285](https://github.com/nextcloud/forms/pull/1285) ([jotoeri](https://github.com/jotoeri))
+- Use MutliSelect for dropdown questions [\#1283](https://github.com/nextcloud/forms/pull/1283) ([Chartman123](https://github.com/Chartman123))
+- Move to button component & first material icons [\#1281](https://github.com/nextcloud/forms/pull/1281) ([jotoeri](https://github.com/jotoeri))
+- Move to Psr\Log\LoggerInterface [\#1275](https://github.com/nextcloud/forms/pull/1275) ([Chartman123](https://github.com/Chartman123))
+- Set border color to maxcontrast [\#1270](https://github.com/nextcloud/forms/pull/1270) ([Chartman123](https://github.com/Chartman123))
+- Invert submitOnce [\#1252](https://github.com/nextcloud/forms/pull/1252) ([jotoeri](https://github.com/jotoeri))
+- Removed trailing dot [\#1228](https://github.com/nextcloud/forms/pull/1228) ([rakekniven](https://github.com/rakekniven))
+- Rename Radio buttons [\#1215](https://github.com/nextcloud/forms/pull/1215) ([jotoeri](https://github.com/jotoeri))
+- l10n: Change to uppercase [\#1205](https://github.com/nextcloud/forms/pull/1205) ([Valdnet](https://github.com/Valdnet))
+- Rework Navigation [\#1168](https://github.com/nextcloud/forms/pull/1168) ([Chartman123](https://github.com/Chartman123))
+- API v2 [\#1126](https://github.com/nextcloud/forms/pull/1126) ([jotoeri](https://github.com/jotoeri))
 
 
 ## 2.5.1 - 2022-05-26
