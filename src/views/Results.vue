@@ -93,7 +93,7 @@
 			<NcEmptyContent :title="t('forms', 'No responses yet')"
 				:description="t('forms', 'Results of submitted forms will show up here')">
 				<template #icon>
-					<IconMessageReplyText :size="64" />
+					<IconPoll :size="64" />
 				</template>
 				<template #action>
 					<NcButton type="primary" @click="onShareForm">
@@ -141,7 +141,7 @@ import moment from '@nextcloud/moment'
 import IconDelete from 'vue-material-design-icons/Delete'
 import IconDownload from 'vue-material-design-icons/Download'
 import IconFolder from 'vue-material-design-icons/Folder'
-import IconMessageReplyText from 'vue-material-design-icons/MessageReplyText.vue'
+import IconPoll from 'vue-material-design-icons/Poll.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant'
 
 import Summary from '../components/Results/Summary.vue'
@@ -167,7 +167,7 @@ export default {
 		IconDelete,
 		IconDownload,
 		IconFolder,
-		IconMessageReplyText,
+		IconPoll,
 		IconShareVariant,
 		NcActions,
 		NcActionButton,

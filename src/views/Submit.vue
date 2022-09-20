@@ -348,7 +348,7 @@ export default {
 	form {
 		.question {
 			// Less padding needed as submit view does not have drag handles
-			padding-left: 16px;
+			padding-left: 44px;
 		}
 
 		input[type=submit] {

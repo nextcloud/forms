@@ -169,7 +169,7 @@ export default {
 
 <style lang="scss" scoped>
 .question-summary {
-	padding-left: 16px;
+	padding-left: 44px;
 	padding-right: 16px;
 
 	h3 {
