@@ -410,7 +410,6 @@ export default {
 	header {
 		display: flex;
 		flex-direction: column;
-		margin-top: 44px;
 		margin-bottom: 24px;
 
 		h2 {
