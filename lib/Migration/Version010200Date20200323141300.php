@@ -55,9 +55,6 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 		'dropdown' => 'multiple_unique'
 	];
 
-	// Adding Type_json, that is recommended in DBAL
-	private const TYPE_JSON = 'json';
-
 	/**
 	 * @param IDBConnection $connection
 	 * @param IConfig $config
@@ -100,7 +97,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'notnull' => true,
 				'length' => 64,
 			]);
-			$table->addColumn('access_json', self::TYPE_JSON, [
+			$table->addColumn('access_json', Types::JSON, [
 				'notnull' => false,
 			]);
 			$table->addColumn('created', Types::INTEGER, [

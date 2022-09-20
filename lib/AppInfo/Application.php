@@ -58,11 +58,7 @@ class Application extends App implements IBootstrap {
 
 		$context->registerCapability(Capabilities::class);
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
-
-		// TODO: drop conditional registration once server-minversion is 24
-		if (method_exists($context, 'registerUserMigrator')) {
-			$context->registerUserMigrator(FormsMigrator::class);
-		}
+		$context->registerUserMigrator(FormsMigrator::class);
 	}
 
 	/**
