@@ -59,6 +59,12 @@
 					</NcActionLink>
 				</NcActions>
 				<NcActions>
+					<NcActionButton @click="copyEmbeddingCode(share.shareWith)">
+						<template #icon>
+							<IconCodeBrackets :size="20" />
+						</template>
+						{{ t('forms', 'Copy embedding code') }}
+					</NcActionButton>
 					<NcActionButton @click="removeShare(share)">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -169,6 +175,7 @@ import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple.vue'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
+import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconLinkVariant from 'vue-material-design-icons/LinkVariant.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
@@ -187,6 +194,7 @@ export default {
 		FormsIcon,
 		IconAccountMultiple,
 		IconAlertCircleOutline,
+		IconCodeBrackets,
 		IconCopyAll,
 		IconDelete,
 		IconLinkVariant,

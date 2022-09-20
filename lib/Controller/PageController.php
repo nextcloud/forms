@@ -36,6 +36,7 @@ use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\Template\PublicTemplateResponse;
@@ -217,7 +218,6 @@ class PageController extends Controller {
 					}
 				}
 			}
-
 			return $response;
 		}
 
@@ -238,5 +238,32 @@ class PageController extends Controller {
 				'content' => 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
 			]);
 		}
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @PublicPage
+	 * @NoCSRFRequired
+	 *
+	 * @param string $hash
+	 * @return Response
+	 */
+	public function embeddedFormView(string $hash): Response {
+		Util::addStyle($this->appName, 'embedded');
+		$response = $this->publicLinkView($hash)->renderAs(TemplateResponse::RENDER_AS_BASE);
+		
+		$this->initialState->provideInitialState('isEmbedded', true);
+		
+		return $this->setEmbeddedCSP($response);
+	}
+
+	protected function setEmbeddedCSP(TemplateResponse $response) {
+		$policy = new ContentSecurityPolicy();
+		$policy->addAllowedFrameAncestorDomain('*');
+
+		$response->addHeader('X-Frame-Options', 'ALLOW');
+		$response->setContentSecurityPolicy($policy);
+
+		return $response;
 	}
 }

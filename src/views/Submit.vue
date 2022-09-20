@@ -569,7 +569,7 @@ export default {
 	align-items: center;
 	flex-direction: column;
 
-	&--public {
+	&--public:not(.app-forms-embedded *) {
 		// Compensate top-padding for missing topbar
 		padding-block-start: 50px;
 	}

@@ -21,7 +21,7 @@
   -->
 
 <template>
-	<NcContent app-name="forms">
+	<NcContent app-name="forms" :class="{'app-forms-embedded': isEmbedded}">
 		<Submit :form="form"
 			:public-view="true"
 			:share-hash="shareHash"
@@ -46,6 +46,7 @@ export default {
 		return {
 			form: loadState('forms', 'form'),
 			isLoggedIn: loadState('forms', 'isLoggedIn'),
+			isEmbedded: loadState('forms', 'isEmbedded', false),
 			shareHash: loadState('forms', 'shareHash'),
 		}
 	},
