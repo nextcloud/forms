@@ -471,8 +471,8 @@ export default {
 			align-items: center;
 			align-self: flex-start;
 
-			// To align with Drag-Handle
-			margin-left: 16px;
+			// To align with text
+			margin-left: 44px;
 		}
 	}
 }
