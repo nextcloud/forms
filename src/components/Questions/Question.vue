@@ -335,11 +335,6 @@ export default {
 				line-height: 22px;
 			}
 
-			&__text[type=text] {
-				border-bottom-color: var(--color-text-maxcontrast);
-				margin-top: 2px;
-			}
-
 			&__warning {
 				margin: auto 4px auto 12px;
 				color: var(--color-error);

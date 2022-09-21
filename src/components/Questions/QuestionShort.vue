@@ -82,17 +82,6 @@ export default {
 .question__input[type=text] {
 	width: 100%;
 	min-height: 44px;
-	margin: 0;
-	padding: 6px 0;
-	border: 0;
-	border-bottom: 1px dotted var(--color-text-maxcontrast);
-	border-radius: 0;
-
-	&:disabled {
-		// Just overrides Server CSS-Styling for disabled inputs. -> Not Good??
-		background-color: var(--color-main-background);
-		color: var(--color-main-text);
-	}
 }
 
 </style>
