@@ -59,6 +59,7 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Przeciągnij, aby zmienić kolejność pytań",
     "Title of question number {index}" : "Tytuł pytania numer {index}",
     "Required" : "Wymagany",
+    "Shuffle options" : "Opcje losowe",
     "Delete question" : "Usuń pytanie",
     "Description" : "Opis",
     "This question needs a title!" : "To pytanie wymaga tytułu!",

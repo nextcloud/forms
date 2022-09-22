@@ -59,6 +59,7 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Pořadí otázek změníte přetažením",
     "Title of question number {index}" : "Nadpis otázky číslo {index}",
     "Required" : "Vyžadováno",
+    "Shuffle options" : "Zamíchat možnosti",
     "Delete question" : "Smazat otázku",
     "Description" : "Popis",
     "This question needs a title!" : "Tato otázka potřebuje nadpis!",

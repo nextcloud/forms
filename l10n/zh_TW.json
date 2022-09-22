@@ -57,6 +57,7 @@
     "Drag to reorder the questions" : "拖曳以重新排序問題",
     "Title of question number {index}" : "問題編號 {index} 的標題",
     "Required" : "必填",
+    "Shuffle options" : "隨機排序選項",
     "Delete question" : "刪除問題",
     "Description" : "描述",
     "This question needs a title!" : "此問題需要標題！",
