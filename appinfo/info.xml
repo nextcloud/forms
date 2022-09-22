@@ -46,7 +46,7 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
 
 	<dependencies>
-		<nextcloud min-version="25" max-version="25" />
+		<nextcloud min-version="25" max-version="26" />
 	</dependencies>
 
 	<navigations>
