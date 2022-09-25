@@ -55,7 +55,11 @@
 					tabindex="0">
 					<IconAlertCircleOutline :size="20" />
 				</div>
-				<NcActions v-if="!readOnly" class="question__header__title__menu" :force-menu="true">
+				<NcActions v-if="!readOnly"
+					:id="actionsId"
+					:container="'#' + actionsId"
+					:force-menu="true"
+					class="question__header__title__menu">
 					<NcActionCheckbox :checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -192,6 +196,10 @@ export default {
 		 */
 		questionValid() {
 			return this.text && this.contentValid
+		},
+
+		actionsId() {
+			return 'q' + this.index + '_actions'
 		},
 	},
 
