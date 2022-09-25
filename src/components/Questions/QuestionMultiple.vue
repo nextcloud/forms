@@ -38,56 +38,50 @@
 		@update:isRequired="onRequiredChange"
 		@update:shuffleOptions="onShuffleOptionsChange"
 		@delete="onDelete">
-		<ul class="question__content">
-			<template v-for="(answer, index) in sortedOptions">
-				<li v-if="!edit" :key="answer.id" class="question__item">
-					<!-- Answer radio/checkbox + label -->
-					<!-- TODO: migrate to radio/checkbox component once available -->
-					<input :id="`${id}-answer-${answer.id}`"
-						ref="checkbox"
-						:aria-checked="isChecked(answer.id)"
-						:checked="isChecked(answer.id)"
-						:class="{
-							'radio question__radio': isUnique,
-							'checkbox question__checkbox': !isUnique,
-						}"
-						:name="`${id}-answer`"
-						:required="checkRequired(answer.id)"
-						:type="isUnique ? 'radio' : 'checkbox'"
-						@change="onChange($event, answer.id)"
-						@keydown.enter.exact.prevent="onKeydownEnter">
-					<label v-if="!edit"
-						ref="label"
-						:for="`${id}-answer-${answer.id}`"
-						class="question__label">{{ answer.text }}</label>
+		<template v-if="!edit">
+			<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
+				:key="answer.id"
+				:checked.sync="questionValues"
+				:value="answer.id.toString()"
+				:name="`${id}-answer`"
+				:type="isUnique ? 'radio' : 'checkbox'"
+				:required="checkRequired(answer.id)"
+				@update:checked="onChange"
+				@keydown.enter.exact.prevent="onKeydownEnter">
+				{{ answer.text }}
+			</NcCheckboxRadioSwitch>
+		</template>
+
+		<template v-else>
+			<ul class="question__content">
+				<template v-for="(answer, index) in sortedOptions">
+					<!-- Answer text input edit -->
+					<AnswerInput v-if="edit"
+						:key="index /* using index to keep the same vnode after new answer creation */"
+						ref="input"
+						:answer="answer"
+						:index="index"
+						:is-unique="isUnique"
+						:is-dropdown="false"
+						:max-option-length="maxStringLengths.optionText"
+						@add="addNewEntry"
+						@delete="deleteOption"
+						@update:answer="updateAnswer" />
+				</template>
+
+				<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
+					<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
+					<input :aria-label="t('forms', 'Add a new answer')"
+						:placeholder="t('forms', 'Add a new answer')"
+						class="question__input"
+						:maxlength="maxStringLengths.optionText"
+						minlength="1"
+						type="text"
+						@click="addNewEntry"
+						@focus="addNewEntry">
 				</li>
-
-				<!-- Answer text input edit -->
-				<AnswerInput v-else
-					:key="index /* using index to keep the same vnode after new answer creation */"
-					ref="input"
-					:answer="answer"
-					:index="index"
-					:is-unique="isUnique"
-					:is-dropdown="false"
-					:max-option-length="maxStringLengths.optionText"
-					@add="addNewEntry"
-					@delete="deleteOption"
-					@update:answer="updateAnswer" />
-			</template>
-
-			<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
-				<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
-				<input :aria-label="t('forms', 'Add a new answer')"
-					:placeholder="t('forms', 'Add a new answer')"
-					class="question__input"
-					:maxlength="maxStringLengths.optionText"
-					minlength="1"
-					type="text"
-					@click="addNewEntry"
-					@focus="addNewEntry">
-			</li>
-		</ul>
+			</ul>
+		</template>
 	</Question>
 </template>
 
@@ -95,23 +89,28 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
 
-// Implementations docs
-// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html
-// https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/checkbox/checkbox-2.html
 export default {
 	name: 'QuestionMultiple',
 
 	components: {
 		AnswerInput,
+		NcCheckboxRadioSwitch,
 	},
 
 	mixins: [QuestionMixin],
+
+	data() {
+		return {
+			questionValues: this.values,
+		}
+	},
 
 	computed: {
 		contentValid() {
@@ -159,35 +158,20 @@ export default {
 	},
 
 	methods: {
-		onChange(event, answerId) {
-			const isChecked = event.target.checked === true
-			let values = this.values.slice()
+		onChange() {
+			// Checkbox: convert to array of Numbers
+			if (!this.isUnique) {
+				const arrOfNum = []
 
-			// Radio
-			if (this.isUnique) {
-				this.$emit('update:values', [answerId])
+				this.questionValues.forEach(str => {
+					arrOfNum.push(Number(str))
+				})
+				this.$emit('update:values', arrOfNum)
 				return
 			}
 
-			// Checkbox
-			if (isChecked) {
-				values.push(answerId)
-			} else {
-				values = values.filter(id => id !== answerId)
-			}
-
-			// Emit values and remove duplicates
-			this.$emit('update:values', [...new Set(values)])
-		},
-
-		/**
-		 * Is the provided answer checked ?
-		 *
-		 * @param {number} id the answer id
-		 * @return {boolean}
-		 */
-		isChecked(id) {
-			return this.values.indexOf(id) > -1
+			// Radio: create array
+			this.$emit('update:values', [this.questionValues])
 		},
 
 		/**
@@ -359,23 +343,22 @@ export default {
 	&__pseudoInput {
 		flex-shrink: 0;
 		display: inline-block;
-		height: 16px;
-		width: 16px !important;
+		height: 18px;
+		width: 18px !important;
 		vertical-align: middle;
-		margin: 0 14px 0px 0px;
-		border: 1px solid #878787;
-		border-radius: 1px;
-		// Adjust position manually to match pseudo-input and proper position to text
+		margin: 7px 8px 0 1px;
+		border: 2px solid var(--color-primary-element);
+		border-radius: 2px;
+		// Adjust position manually to match input-checkbox
 		position: relative;
-		top: 10px;
+		top: 6px;
 
 		// Show round for Pseudo-Radio-Button
 		&--unique {
+			height: 20px;
+			width: 20px !important;
+			margin: 6px 8px 0 0;
 			border-radius: 50%;
-		}
-
-		&:hover {
-			border-color: var(--color-primary-element);
 		}
 	}
 
@@ -416,15 +399,6 @@ export default {
 	border-radius: 0;
 	font-size: 14px;
 	position: relative;
-}
-
-input.question__radio,
-input.question__checkbox {
-	z-index: -1;
-	// make sure browser warnings are properly
-	// displayed at the correct location
-	left: 0px;
-	width: 16px;
 }
 
 </style>
