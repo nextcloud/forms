@@ -20,8 +20,6 @@
  *
  */
 
-@import 'variables';
-
 /* Padding for Auto-Scroll if a required question is not filled.
  * 60px matches around the height of two lines of question-text
  */
