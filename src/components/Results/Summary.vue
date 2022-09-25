@@ -232,12 +232,14 @@ export default {
 
 				// The pseudo-classes of -moz and -webkit have to stay separated even with SCSS, otherwise they don’t work
 				&::-webkit-meter-optimum-value {
-					background: linear-gradient(40deg, var(--color-primary-element) 0%, var(--color-primary-element-light) 100%);
+					// TODO switch to old gradient if it becomes available in server
+					background: var(--gradient-primary-background);
 					border-radius: var(--border-radius);
 				}
 
 				&::-moz-meter-bar {
-					background: linear-gradient(40deg, var(--color-primary-element) 0%, var(--color-primary-element-light) 100%);
+					// TODO switch to old gradient if it becomes available in server
+					background: var(--gradient-primary-background);
 					border-radius: var(--border-radius);
 				}
 			}
