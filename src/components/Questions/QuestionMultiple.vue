@@ -70,7 +70,9 @@
 				</template>
 
 				<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
-					<div class="question__item__pseudoInput" :class="{'question__item__pseudoInput--unique':isUnique}" />
+					<div :is="pseudoIcon"
+						v-if="!isDropdown"
+						class="question__item__pseudoInput" />
 					<input :aria-label="t('forms', 'Add a new answer')"
 						:placeholder="t('forms', 'Add a new answer')"
 						class="question__input"
@@ -90,6 +92,8 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch'
+import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
@@ -101,6 +105,8 @@ export default {
 
 	components: {
 		AnswerInput,
+		IconCheckboxBlankOutline,
+		IconRadioboxBlank,
 		NcCheckboxRadioSwitch,
 	},
 
@@ -136,6 +142,9 @@ export default {
 
 		shiftDragHandle() {
 			return this.edit && this.options.length !== 0 && !this.isLastEmpty
+		},
+		pseudoIcon() {
+			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
 	},
 
@@ -339,27 +348,19 @@ export default {
 	display: inline-flex;
 	min-height: 44px;
 
-	// Taking styles from server radio-input items
 	&__pseudoInput {
-		flex-shrink: 0;
-		display: inline-block;
-		height: 18px;
-		width: 18px !important;
-		vertical-align: middle;
-		margin: 7px 8px 0 1px;
-		border: 2px solid var(--color-primary-element);
-		border-radius: 2px;
-		// Adjust position manually to match input-checkbox
-		position: relative;
-		top: 6px;
+		color: var(--color-primary-element);
+		margin-left: -2px;
+		z-index: 1;
+	}
 
-		// Show round for Pseudo-Radio-Button
-		&--unique {
-			height: 20px;
-			width: 20px !important;
-			margin: 6px 8px 0 0;
-			border-radius: 50%;
-		}
+	.question__input {
+		width: 100%;
+		position: relative;
+		left: -30px;
+		top: 1px;
+		margin-right: 14px !important;
+		padding-left: 32px !important;
 	}
 
 	.question__label {
@@ -386,11 +387,4 @@ export default {
 		}
 	}
 }
-
-// Using type to have a higher order than the input styling of server
-.question__input[type=text] {
-	width: 100%;
-	position: relative;
-}
-
 </style>

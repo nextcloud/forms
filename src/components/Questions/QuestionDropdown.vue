@@ -308,11 +308,11 @@ export default {
 	position: relative;
 	display: inline-flex;
 	min-height: 44px;
-}
 
-// Using type to have a higher order than the input styling of server
-.question__input[type=text] {
-	width: 100%;
-	position: relative;
+	.question__input {
+		width: 100%;
+		position: relative;
+		margin-right: 46px !important;
+	}
 }
 </style>
