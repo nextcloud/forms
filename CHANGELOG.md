@@ -1,10 +1,30 @@
 # Changelog
 
+## 3.0.0-beta.2 - 2022-09-26
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.0-beta.1...v3.0.0-beta.2)
+
+### Fixed
+
+- Fix upgrading [\#1361](https://github.com/nextcloud/forms/pull/1361) ([jotoeri](https://github.com/jotoeri))
+- Remove css variables [\#1360](https://github.com/nextcloud/forms/pull/1360) ([jotoeri](https://github.com/jotoeri))
+- Fix Actions Container [\#1359](https://github.com/nextcloud/forms/pull/1359) ([jotoeri](https://github.com/jotoeri))
+
+### Merged
+
+- Use `--gradient-primary-background` for summary [\#1356](https://github.com/nextcloud/forms/pull/1356) ([Chartman123](https://github.com/Chartman123))
+- Adjust testing matrix for Nextcloud 25 on master [\#1354](https://github.com/nextcloud/forms/pull/1354) ([nickvergessen](https://github.com/nickvergessen))
+- Remove unneeded css [\#1352](https://github.com/nextcloud/forms/pull/1352) ([Chartman123](https://github.com/Chartman123))
+- Fix alignment of "Add question" button [\#1351](https://github.com/nextcloud/forms/pull/1351) ([Chartman123](https://github.com/Chartman123))
+- Use NcCheckboxRadioSwitch for QuestionMultiple [\#1322](https://github.com/nextcloud/forms/pull/1322) ([Chartman123](https://github.com/Chartman123))
+
+
 ## 3.0.0-beta.1 - 2022-09-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.1...v3.0.0-beta.1)
 
 ### Breaking ⚠️
+
 - Moving completely from API v1 to v2. With this, we fundamentally change the way how the forms sharing works, now much more flexible and closer to how it is done in server.
 - Also inverting SubmitOnce to SubmitMultiple with ApiV2
 
