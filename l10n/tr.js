@@ -59,6 +59,7 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Soru sıralamasını sürükleyerek değiştirebilirsiniz",
     "Title of question number {index}" : "{index} numaralı sorunun başlığı",
     "Required" : "Zorunlu",
+    "Shuffle options" : "Karıştırma seçenekleri",
     "Delete question" : "Soruyu sil",
     "Description" : "Açıklama",
     "This question needs a title!" : "Bu sorunun bir başlığı olmalıdır!",
