@@ -42,7 +42,7 @@
 					:placeholder="titlePlaceholder"
 					:aria-label="t('forms', 'Title of question number {index}', {index})"
 					:value="text"
-					class="question__header__title__text"
+					class="question__header__title__text question__header__title__text__input"
 					type="text"
 					minlength="1"
 					:maxlength="maxStringLengths.questionText"
@@ -78,7 +78,7 @@
 					</NcActionButton>
 				</NcActions>
 			</div>
-			<div class="question__header__description">
+			<div v-if="hasDescription || edit || !questionValid" class="question__header__description">
 				<textarea v-if="edit || !questionValid"
 					ref="description"
 					rows="1"
@@ -201,6 +201,10 @@ export default {
 		actionsId() {
 			return 'q' + this.index + '_actions'
 		},
+
+		hasDescription() {
+			return this.description !== ''
+		},
 	},
 
 	methods: {
@@ -316,31 +320,28 @@ export default {
 
 	&__header {
 		display: block;
-		padding-bottom: 10px;
+		padding-bottom: 8px;
 		align-items: center;
 		flex: 1 1 100%;
 		justify-content: space-between;
 		width: auto;
 
-		// Using type to have a higher order than the input styling of server
 		&__title {
 			display: flex;
 			height: 44px;
 
-			&__text,
-			&__text[type=text] {
+			&__text {
 				flex: 1 1 100%;
-				min-height: 22px;
-				margin: 0;
-				padding: 0;
-				padding-top: 14px;
-				color: var(--color-text-light);
-				border: 0;
-				border-bottom: 1px dotted transparent;
-				border-radius: 0;
-				font-size: 16px;
+				font-size: 16px !important;
 				font-weight: bold;
-				line-height: 22px;
+				margin: auto !important;
+
+				&__input {
+					position: relative;
+					left: -10px;
+					margin-right: -8px !important;
+					padding-left: 8px !important;
+				}
 			}
 
 			&__warning {
@@ -359,6 +360,8 @@ export default {
 		&__description {
 			display: flex;
 			white-space: pre-wrap;
+			margin-top: 4px;
+			margin-bottom: 4px;
 
 			&__input {
 				margin: 0px;

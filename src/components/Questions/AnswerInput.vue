@@ -1,15 +1,14 @@
 <template>
 	<li class="question__item">
-		<div class="question__item__pseudoInput"
-			:class="{
-				'question__item__pseudoInput--unique':isUnique,
-				'question__item__pseudoInput--dropdown':isDropdown
-			}" />
+		<div :is="pseudoIcon"
+			v-if="!isDropdown"
+			class="question__item__pseudoInput" />
 		<input ref="input"
 			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
 			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 			:value="answer.text"
 			class="question__input"
+			:class="{ 'question__input--shifted' : !isDropdown }"
 			:maxlength="maxOptionLength"
 			minlength="1"
 			type="text"
@@ -40,6 +39,8 @@ import PQueue from 'p-queue'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import IconClose from 'vue-material-design-icons/Close'
+import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
@@ -49,6 +50,8 @@ export default {
 
 	components: {
 		IconClose,
+		IconCheckboxBlankOutline,
+		IconRadioboxBlank,
 		NcActions,
 		NcActionButton,
 	},
@@ -85,6 +88,12 @@ export default {
 				return this.queue.add(() => this.updateAnswer(answer))
 			}, 500),
 		}
+	},
+
+	computed: {
+		pseudoIcon() {
+			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
+		},
 	},
 
 	methods: {
@@ -202,39 +211,23 @@ export default {
 	display: inline-flex;
 	min-height: 44px;
 
-	// Taking styles from server radio-input items
 	&__pseudoInput {
-		flex-shrink: 0;
-		display: inline-block;
-		height: 18px;
-		width: 18px !important;
-		vertical-align: middle;
-		margin: 7px 8px 0 1px;
-		border: 2px solid var(--color-primary-element);
-		border-radius: 2px;
-		// Adjust position manually to match input-checkbox
+		color: var(--color-primary-element);
+		margin-left: -2px;
+		z-index: 1;
+	}
+
+	.question__input {
+		width: 100%;
 		position: relative;
-		top: 6px;
+		margin-right: 2px !important;
 
-		// Show round for Pseudo-Radio-Button
-		&--unique {
-			height: 20px;
-			width: 20px !important;
-			margin: 6px 8px 0 0;
-			border-radius: 50%;
-		}
-
-		// Do not show pseudo-icon for dropdowns
-		&--dropdown {
-			display: none;
+		&--shifted {
+			left: -30px;
+			top: 1px;
+			margin-right: -30px !important;
+			padding-left: 32px !important;
 		}
 	}
 }
-
-// Using type to have a higher order than the input styling of server
-.question__input[type=text] {
-	width: 100%;
-	position: relative;
-}
-
 </style>
