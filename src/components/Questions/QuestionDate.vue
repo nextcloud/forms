@@ -127,7 +127,10 @@ export default {
 
 <style lang="scss" scoped>
 .mx-datepicker {
-	// Enlarging a bit (originally 210px) to have enough space for placeholder
-	width: 250px;
+	width: 300px;
+
+	:deep(.mx-input) {
+		height: 44px !important;
+	}
 }
 </style>
