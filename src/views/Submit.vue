@@ -29,7 +29,7 @@
 		</NcEmptyContent>
 	</NcAppContent>
 
-	<NcAppContent v-else>
+	<NcAppContent v-else :class="{'app-content--public': publicView}">
 		<TopBar v-if="!publicView"
 			:permissions="form?.permissions"
 			@share-form="onShareForm" />
@@ -297,6 +297,11 @@ export default {
 	align-items: center;
 	flex-direction: column;
 
+	&--public {
+		// Compensate top-padding for missing topbar
+		padding-top: 50px;
+	}
+
 	header,
 	form {
 		width: 100%;
@@ -308,6 +313,7 @@ export default {
 	// Title & description header
 	header {
 		margin-bottom: 24px;
+		margin-left: 56px;
 
 		.form-title,
 		.form-desc,
