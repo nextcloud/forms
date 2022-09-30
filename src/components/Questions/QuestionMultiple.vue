@@ -70,9 +70,7 @@
 				</template>
 
 				<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
-					<div :is="pseudoIcon"
-						v-if="!isDropdown"
-						class="question__item__pseudoInput" />
+					<div :is="pseudoIcon" class="question__item__pseudoInput" />
 					<input :aria-label="t('forms', 'Add a new answer')"
 						:placeholder="t('forms', 'Add a new answer')"
 						class="question__input"
