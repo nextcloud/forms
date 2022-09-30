@@ -45,10 +45,10 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/dist/Components/NcActions'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import moment from '@nextcloud/moment'
-import IconDelete from 'vue-material-design-icons/Delete'
+import IconDelete from 'vue-material-design-icons/Delete.vue'
 
 import Answer from './Answer.vue'
 

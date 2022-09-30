@@ -26,13 +26,13 @@ import QuestionShort from '../components/Questions/QuestionShort.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 
-import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline'
-import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked'
-import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline'
-import IconTextShort from 'vue-material-design-icons/TextShort'
-import IconTextLong from 'vue-material-design-icons/TextLong'
-import IconCalendar from 'vue-material-design-icons/Calendar'
-import IconClockOutline from 'vue-material-design-icons/ClockOutline'
+import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
+import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
+import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
+import IconTextShort from 'vue-material-design-icons/TextShort.vue'
+import IconTextLong from 'vue-material-design-icons/TextLong.vue'
+import IconCalendar from 'vue-material-design-icons/Calendar.vue'
+import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
 
 /**
  * @typedef {object} AnswerTypes

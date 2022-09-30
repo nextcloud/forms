@@ -61,7 +61,7 @@
 import answerTypes from '../../models/AnswerTypes.js'
 
 export default {
-	name: 'Summary',
+	name: 'ResultsSummary',
 
 	props: {
 		submissions: {

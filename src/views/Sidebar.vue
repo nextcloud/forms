@@ -51,10 +51,10 @@
 </template>
 
 <script>
-import NcAppSidebar from '@nextcloud/vue/dist/Components/NcAppSidebar'
-import NcAppSidebarTab from '@nextcloud/vue/dist/Components/NcAppSidebarTab'
-import IconSettings from 'vue-material-design-icons/Cog'
-import IconShareVariant from 'vue-material-design-icons/ShareVariant'
+import NcAppSidebar from '@nextcloud/vue/dist/Components/NcAppSidebar.js'
+import NcAppSidebarTab from '@nextcloud/vue/dist/Components/NcAppSidebarTab.js'
+import IconSettings from 'vue-material-design-icons/Cog.vue'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 
 import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
