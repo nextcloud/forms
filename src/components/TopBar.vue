@@ -76,12 +76,12 @@
 </template>
 
 <script>
-import NcButton from '@nextcloud/vue/dist/Components/NcButton'
-import IconEye from 'vue-material-design-icons/Eye'
-import IconMenuOpen from 'vue-material-design-icons/MenuOpen'
-import IconPencil from 'vue-material-design-icons/Pencil'
-import IconPoll from 'vue-material-design-icons/Poll'
-import IconShareVariant from 'vue-material-design-icons/ShareVariant'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import IconEye from 'vue-material-design-icons/Eye.vue'
+import IconMenuOpen from 'vue-material-design-icons/MenuOpen.vue'
+import IconPencil from 'vue-material-design-icons/Pencil.vue'
+import IconPoll from 'vue-material-design-icons/Poll.vue'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 
 export default {

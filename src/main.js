@@ -28,7 +28,7 @@ import '@nextcloud/dialogs/styles/toast.scss'
 
 import Vue from 'vue'
 
-import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
+import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip.js'
 
 import router from './router.js'
 import Forms from './Forms.vue'

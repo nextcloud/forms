@@ -108,7 +108,7 @@
 
 		<!-- Summary view for visualization -->
 		<section v-if="!noSubmissions && showSummary">
-			<Summary v-for="question in form.questions"
+			<ResultsSummary v-for="question in form.questions"
 				:key="question.id"
 				:question="question"
 				:submissions="form.submissions" />
@@ -128,23 +128,23 @@
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
-import NcActions from '@nextcloud/vue/dist/Components/NcActions'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
-import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink'
-import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
-import NcButton from '@nextcloud/vue/dist/Components/NcButton'
-import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent'
-import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
-import IconDelete from 'vue-material-design-icons/Delete'
-import IconDownload from 'vue-material-design-icons/Download'
-import IconFolder from 'vue-material-design-icons/Folder'
+import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDownload from 'vue-material-design-icons/Download.vue'
+import IconFolder from 'vue-material-design-icons/Folder.vue'
 import IconPoll from 'vue-material-design-icons/Poll.vue'
-import IconShareVariant from 'vue-material-design-icons/ShareVariant'
+import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 
-import Summary from '../components/Results/Summary.vue'
+import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
@@ -176,7 +176,7 @@ export default {
 		NcButton,
 		NcEmptyContent,
 		NcLoadingIcon,
-		Summary,
+		ResultsSummary,
 		Submission,
 		TopBar,
 	},

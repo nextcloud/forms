@@ -41,10 +41,10 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/dist/Components/NcActions'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
-import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar'
-import IconClose from 'vue-material-design-icons/Close'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar.js'
+import IconClose from 'vue-material-design-icons/Close.vue'
 
 import ShareTypes from '../../mixins/ShareTypes.js'
 

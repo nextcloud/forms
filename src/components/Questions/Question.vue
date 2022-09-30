@@ -101,13 +101,13 @@
 
 <script>
 import { directive as ClickOutside } from 'v-click-outside'
-import NcActions from '@nextcloud/vue/dist/Components/NcActions'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
-import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 
-import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline'
-import IconDelete from 'vue-material-design-icons/Delete'
-import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant'
+import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
+import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 
 export default {
 	name: 'Question',

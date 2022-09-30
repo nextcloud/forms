@@ -31,7 +31,7 @@
 
 <script>
 import { loadState } from '@nextcloud/initial-state'
-import NcContent from '@nextcloud/vue/dist/Components/NcContent'
+import NcContent from '@nextcloud/vue/dist/Components/NcContent.js'
 import Submit from './views/Submit.vue'
 
 export default {
