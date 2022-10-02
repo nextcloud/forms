@@ -30,7 +30,7 @@
 		:counter-number="form.submissionCount"
 		:active="isActive"
 		:compact="true"
-		:actionsAriaLabel="t('forms', 'Form actions')"
+		:actions-aria-label="t('forms', 'Form actions')"
 		@click="mobileCloseNavigation">
 		<template #icon>
 			<NcLoadingIcon v-if="loading" :size="16" />
