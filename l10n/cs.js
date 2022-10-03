@@ -42,6 +42,7 @@ OC.L10N.register(
     "Allow sharing to all logged in accounts" : "Umožnit sdílením všem přihlášeným účtům",
     "Error while saving configuration" : "Chyba při ukládání nastavení",
     "Error while reloading config" : "Chyba při znovunačítání nastavení",
+    "Form actions" : "Akce formuláře",
     "Edit form" : "Upravit formulář",
     "Share form" : "Sdílet formulář",
     "Results" : "Výsledky",

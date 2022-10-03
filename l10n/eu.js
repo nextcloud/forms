@@ -42,6 +42,7 @@ OC.L10N.register(
     "Allow sharing to all logged in accounts" : "Baimendu saioa hasitako kontu guztiekin partekatzea",
     "Error while saving configuration" : "Errore bat gertatu da konfigurazioa gordetzean",
     "Error while reloading config" : "Errore bat gertatu da konfigurazioa berriro kargatzean",
+    "Form actions" : "Galdetegi ekintzak",
     "Edit form" : "Editatu formularioa",
     "Share form" : "Partekatu galdetegia",
     "Results" : "Emaitzak",
