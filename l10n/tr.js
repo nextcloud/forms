@@ -42,6 +42,7 @@ OC.L10N.register(
     "Allow sharing to all logged in accounts" : "Tüm oturum açmış hesaplarla paylaşabilsin",
     "Error while saving configuration" : "Yapılandırma kaydedilirken sorun çıktı",
     "Error while reloading config" : "Yapılandırma yeniden yüklenirken sorun çıktı",
+    "Form actions" : "Form işlemleri",
     "Edit form" : "Formu düzenle",
     "Share form" : "Formu paylaş",
     "Results" : "Sonuçlar",
