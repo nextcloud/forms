@@ -42,6 +42,7 @@ OC.L10N.register(
     "Allow sharing to all logged in accounts" : "Разрешаване на споделяне с всички вписани профили",
     "Error while saving configuration" : "Грешка при запазване на конфигурацията",
     "Error while reloading config" : "Грешка при презареждане на конфигурацията",
+    "Form actions" : "Действия на формуляр",
     "Edit form" : "Редактиране на формуляр",
     "Share form" : "Споделене на формуляр",
     "Results" : "Резултати",
