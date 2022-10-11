@@ -11,8 +11,12 @@
 - **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 	]]></description>
-	<version>3.0.0-beta.2</version>
+
 	<licence>agpl</licence>
+	<version>3.0.0</version>
+	<dependencies>
+		<nextcloud min-version="25" max-version="25" />
+	</dependencies>
 
 	<author>Affan Hussain</author>
 	<author>Ajfar Huq</author>
@@ -44,10 +48,6 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms1.png</screenshot>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms2.png</screenshot>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
-
-	<dependencies>
-		<nextcloud min-version="25" max-version="25" />
-	</dependencies>
 
 	<navigations>
 		<navigation>
