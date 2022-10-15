@@ -25,41 +25,50 @@
   -->
 <template>
 	<div class="top-bar" role="toolbar">
-		<slot />
-		<NcButton v-if="canSubmit && $route.name !== 'submit'"
-			v-tooltip="t('forms', 'View form')"
-			:aria-label="t('forms', 'View form')"
-			type="tertiary"
-			@click="showSubmit">
-			<template #icon>
-				<IconEye :size="20" />
-			</template>
-		</NcButton>
-		<NcButton v-if="canEdit && $route.name !== 'edit'"
-			v-tooltip="t('forms', 'Edit form')"
-			:aria-label="t('forms', 'Edit form')"
-			type="tertiary"
-			@click="showEdit">
-			<template #icon>
-				<IconPencil :size="20" />
-			</template>
-		</NcButton>
-		<NcButton v-if="canSeeResults && $route.name !== 'results'"
-			v-tooltip="t('forms', 'Results')"
-			:aria-label="t('forms', 'Results')"
-			type="tertiary"
-			@click="showResults">
-			<template #icon>
-				<IconPoll :size="20" />
-			</template>
-		</NcButton>
+		<div v-if="!canOnlySubmit" class="top-bar__view-select">
+			<NcButton v-if="canSubmit"
+				:aria-label="isMobile ? t('forms', 'View form') : null"
+				:type="$route.name === 'submit' ? 'secondary' : 'tertiary'"
+				@click="showSubmit">
+				<template #icon>
+					<IconEye :size="20" />
+				</template>
+				<template v-if="!isMobile">
+					{{ t('forms', 'View') }}
+				</template>
+			</NcButton>
+			<NcButton v-if="canEdit"
+				:aria-label="isMobile ? t('forms', 'Edit form') : null"
+				:type="$route.name === 'edit' ? 'secondary' : 'tertiary'"
+				@click="showEdit">
+				<template #icon>
+					<IconPencil :size="20" />
+				</template>
+				<template v-if="!isMobile">
+					{{ t('forms', 'Edit') }}
+				</template>
+			</NcButton>
+			<NcButton v-if="canSeeResults"
+				:aria-label="isMobile ? t('forms', 'Show results') : null"
+				:type="$route.name === 'results' ? 'secondary' : 'tertiary'"
+				@click="showResults">
+				<template #icon>
+					<IconPoll :size="20" />
+				</template>
+				<template v-if="!isMobile">
+					{{ t('forms', 'Results') }}
+				</template>
+			</NcButton>
+		</div>
 		<NcButton v-if="canShare && !sidebarOpened"
-			v-tooltip="t('forms', 'Share form')"
-			:aria-label="t('forms', 'Share form')"
+			:aria-label="isMobile ? t('forms', 'Share form') : null"
 			type="tertiary"
 			@click="onShareForm">
 			<template #icon>
 				<IconShareVariant :size="20" />
+			</template>
+			<template v-if="!isMobile">
+				{{ t('forms', 'Share') }}
 			</template>
 		</NcButton>
 		<NcButton v-if="showSidebarToggle"
@@ -77,6 +86,7 @@
 
 <script>
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import isMobile from '@nextcloud/vue/dist/Mixins/isMobile.js'
 import IconEye from 'vue-material-design-icons/Eye.vue'
 import IconMenuOpen from 'vue-material-design-icons/MenuOpen.vue'
 import IconPencil from 'vue-material-design-icons/Pencil.vue'
@@ -96,7 +106,7 @@ export default {
 		NcButton,
 	},
 
-	mixins: [PermissionTypes],
+	mixins: [isMobile, PermissionTypes],
 
 	props: {
 		sidebarOpened: {
@@ -123,8 +133,11 @@ export default {
 			// This probably can get a permission of itself
 			return this.canEdit || this.canSeeResults
 		},
+		canOnlySubmit() {
+			return this.permissions.length === 1 && this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+		},
 		showSidebarToggle() {
-			return this.sidebarOpened !== null
+			return this.canEdit && this.sidebarOpened !== null
 		},
 	},
 
@@ -137,30 +150,36 @@ export default {
 		 * Router methods
 		 */
 		showEdit() {
-			this.$router.push({
-				name: 'edit',
-				params: {
-					hash: this.$route.params.hash,
-				},
-			})
+			if (this.$route.name !== 'edit') {
+				this.$router.push({
+					name: 'edit',
+					params: {
+						hash: this.$route.params.hash,
+					},
+				})
+			}
 		},
 
 		showResults() {
-			this.$router.push({
-				name: 'results',
-				params: {
-					hash: this.$route.params.hash,
-				},
-			})
+			if (this.$route.name !== 'results') {
+				this.$router.push({
+					name: 'results',
+					params: {
+						hash: this.$route.params.hash,
+					},
+				})
+			}
 		},
 
 		showSubmit() {
-			this.$router.push({
-				name: 'submit',
-				params: {
-					hash: this.$route.params.hash,
-				},
-			})
+			if (this.$route.name !== 'submit') {
+				this.$router.push({
+					name: 'submit',
+					params: {
+						hash: this.$route.params.hash,
+					},
+				})
+			}
 		},
 
 		onShareForm() {
@@ -180,6 +199,17 @@ export default {
 	align-self: flex-end;
 	justify-content: flex-end;
 	padding: calc(var(--default-grid-baseline, 4px) * 2);
+
+	&__view-select {
+		display: flex;
+		height: 44px;
+		align-items: center;
+		align-self: flex-end;
+		justify-content: flex-end;
+		background: var(--color-main-background);
+		border: 2px solid var(--color-border);
+		border-radius: var(--border-radius-pill);
+	}
 }
 
 .icon--flipped {

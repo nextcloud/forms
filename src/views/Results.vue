@@ -32,7 +32,10 @@
 	</NcAppContent>
 
 	<NcAppContent v-else>
-		<TopBar :permissions="form?.permissions" @share-form="onShareForm" />
+		<TopBar :permissions="form?.permissions"
+			:sidebar-opened="sidebarOpened"
+			@update:sidebarOpened="onSidebarChange"
+			@share-form="onShareForm" />
 		<header v-if="!noSubmissions">
 			<h2>{{ formTitle }}</h2>
 			<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>

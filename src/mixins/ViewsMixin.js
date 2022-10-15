@@ -46,6 +46,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
 	},
 
 	data() {
@@ -61,6 +65,10 @@ export default {
 	methods: {
 		onShareForm() {
 			this.$emit('open-sharing', this.form.hash)
+		},
+
+		onSidebarChange(newState) {
+			this.$emit('update:sidebarOpened', newState)
 		},
 
 		/**
