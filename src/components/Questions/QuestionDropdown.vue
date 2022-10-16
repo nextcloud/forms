@@ -157,6 +157,14 @@ export default {
 		},
 	},
 
+	mounted() {
+		// Init selected options from values prop
+		if (this.values) {
+			const selected = this.values.map(id => this.options.find(option => option.id === id))
+			this.selectedOption = this.isMultiple ? selected : selected[0]
+		}
+	},
+
 	methods: {
 		onSelect(option) {
 			// Simple select
