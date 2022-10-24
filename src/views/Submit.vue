@@ -20,7 +20,7 @@
  -
  -->
 
-<template>
+ <template>
 	<NcAppContent v-if="isLoadingForm">
 		<NcEmptyContent :title="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
@@ -96,18 +96,16 @@
 
 <script>
 import { loadState } from '@nextcloud/initial-state'
-import { generateOcsUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
+import { generateOcsUrl, generateRemoteUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import IconCheck from 'vue-material-design-icons/Check.vue'
-
+import { showSuccess, showError } from '@nextcloud/dialogs'
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
-
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
@@ -259,17 +257,62 @@ export default {
 		},
 
 		/**
+		 *  save Submission to Files 💾
+		 */
+		async onStoreToFiles() {
+			const path = '/forms'
+			const user = OC.getCurrentUser().uid
+			const parser = new DOMParser()
+			const url = generateRemoteUrl(`dav/files/${user}/`)
+			axios({
+				method: 'PROPFIND',
+				url,
+
+			}).then(async (response) => {
+				const xmlDoc = parser.parseFromString(response.data, 'text/xml')
+				const files = xmlDoc.getElementsByTagName('d:href')
+				let isFormsFolder = false
+				for (let i = 0; i < files.length; i++) {
+					const filesNames = files[i].innerHTML.split('/')
+					filesNames.pop()
+					const folder = filesNames.pop()
+					if (folder === 'forms') {
+						isFormsFolder = true
+						break
+					}
+				} if (isFormsFolder) {
+					await axios.post(generateOcsUrl('apps/forms/api/v2/submissions/export'), {
+						hash: this.form.hash,
+						path,
+					})
+					showSuccess(t('forms', 'Succesfully saved to Files'))
+				} else {
+					const formsUrl = generateRemoteUrl(`dav/files/${user}/forms/`)
+					axios({
+						method: 'MKCOL',
+						url: formsUrl,
+					}).then(async (response) => {
+						await axios.post(generateOcsUrl('apps/forms/api/v2/submissions/export'), {
+							hash: this.form.hash,
+							path,
+						})
+						showSuccess(t('forms', 'Succesfully saved to Files'))
+					})
+				}
+			})
+		},
+		/**
 		 * Submit the form after the browser validated it 🚀
 		 */
 		async onSubmit() {
 			this.loading = true
-
 			try {
 				await axios.post(generateOcsUrl('apps/forms/api/v2/submission/insert'), {
 					formId: this.form.id,
 					answers: this.answers,
 					shareHash: this.shareHash,
 				})
+				await this.onStoreToFiles()
 				this.success = true
 			} catch (error) {
 				logger.error('Error while submitting the form', { error })
