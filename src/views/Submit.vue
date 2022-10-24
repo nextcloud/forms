@@ -20,7 +20,7 @@
  -
  -->
 
- <template>
+<template>
 	<NcAppContent v-if="isLoadingForm">
 		<NcEmptyContent :title="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
