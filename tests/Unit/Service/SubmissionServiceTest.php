@@ -492,7 +492,7 @@ class SubmissionServiceTest extends TestCase {
 		date_default_timezone_set('Europe/Berlin');
 		$this->config->expects($this->once())
 			->method('getUserValue')
-			->with('core', 'timezone', 'currentUser', 'Europe/Berlin')
+			->with('currentUser', 'core', 'timezone', 'Europe/Berlin')
 			->willReturn('Europe/Berlin');
 
 		$user = $this->createMock(IUser::class);
