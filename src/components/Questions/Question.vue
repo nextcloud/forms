@@ -328,11 +328,12 @@ export default {
 
 		&__title {
 			display: flex;
-			height: 44px;
+			min-height: 44px;
 
 			&__text {
 				flex: 1 1 100%;
 				font-size: 16px !important;
+				padding: 10px 0px;
 				font-weight: bold;
 				margin: auto !important;
 
