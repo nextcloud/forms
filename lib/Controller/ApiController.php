@@ -482,7 +482,7 @@ class ApiController extends OCSController {
 		$question->setText($text);
 		$question->setDescription('');
 		$question->setIsRequired(false);
-		$question->setExtraSettings([]);
+		$question->setExtraSettings((object)[]);
 
 		$question = $this->questionMapper->insert($question);
 

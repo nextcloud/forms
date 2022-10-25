@@ -44,8 +44,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setText(string $value)
  * @method string getDescription()
  * @method void setDescription(string $value)
- * @method array getExtraSettings()
- * @method void setExtraSettings(array $value)
+ * @method object getExtraSettings()
+ * @method void setExtraSettings(object $value)
  */
 class Question extends Entity {
 	protected $formId;
@@ -69,8 +69,11 @@ class Question extends Entity {
 		return json_decode($this->getExtraSettingsJson() ?: '{}');
 	}
 
-	public function setExtraSettings(array $extraSettings) {
-		// Make sure to be an object (empty assoc. array)
+	/**
+	 * @param object|array $extraSettings
+	 */
+	public function setExtraSettings($extraSettings) {
+		// TODO: When the php requirement is >= 8.0 change parameter typing to `object|array` to allow assoc. arrays from `Question::fromParams`
 		$this->setExtraSettingsJson(json_encode($extraSettings, JSON_FORCE_OBJECT));
 	}
 
