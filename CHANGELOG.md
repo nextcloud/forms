@@ -1,17 +1,27 @@
 # Changelog
 
+## 3.0.1 - 2022-10-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.0...v3.0.1)
+
+### Fixed
+- Fix `setExtraSettings` to accept same type as `getExtraSettings` [\#1391](https://github.com/nextcloud/forms/pull/1391) ([susnux](https://github.com/susnux))
+- Use user's timezone for timestamps in CSV export [\#1389](https://github.com/nextcloud/forms/pull/1389) ([Chartman123](https://github.com/Chartman123))
+
+### Merged
+- Fix CI runs for postgres [\#1388](https://github.com/nextcloud/forms/pull/1388) ([Chartman123](https://github.com/Chartman123))
+
+
 ## 3.0.0 - 2022-10-13
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.1...v3.0.0)
 
 ### Breaking ⚠️
-
 - Moving completely from API v1 to v2. With this, we fundamentally change the way how the forms sharing works, now much more flexible and closer to how it is done in server.
 - Also inverting SubmitOnce to SubmitMultiple with ApiV2
 - The question Type `datetime` has been replaced by `date` and `time` question types. Existing questions remain usable, but no `datetime` questions can be created anymore.
 
 ### Enhancements
-
 - Use NcCheckboxRadioSwitch for QuestionMultiple [\#1322](https://github.com/nextcloud/forms/pull/1322) ([Chartman123](https://github.com/Chartman123))
 - Make dropdown searchable [\#1342](https://github.com/nextcloud/forms/pull/1342) ([Chartman123](https://github.com/Chartman123))
 - Add UI to preview and fill out own forms [\#1320](https://github.com/nextcloud/forms/pull/1320) ([susnux](https://github.com/susnux))
@@ -29,7 +39,6 @@
 - Make date/time answers consistent [\#1001](https://github.com/nextcloud/forms/pull/1001) ([Chartman123](https://github.com/Chartman123))
 
 ### Fixed
-
 - Remove isDropdown condition [\#1368](https://github.com/nextcloud/forms/pull/1368) ([Chartman123](https://github.com/Chartman123))
 - Fix public View [\#1365](https://github.com/nextcloud/forms/pull/1365) ([jotoeri](https://github.com/jotoeri))
 - Adjust look of long text questions [\#1364](https://github.com/nextcloud/forms/pull/1364) ([Chartman123](https://github.com/Chartman123))
@@ -47,7 +56,6 @@
 - Fix titles [\#1239](https://github.com/nextcloud/forms/pull/1239) ([jotoeri](https://github.com/jotoeri))
 
 ### Merged
-
 - Fix lint warning [\#1371](https://github.com/nextcloud/forms/pull/1371) ([Chartman123](https://github.com/Chartman123))
 - Fix aria warning [\#1370](https://github.com/nextcloud/forms/pull/1370) ([jotoeri](https://github.com/jotoeri))
 - Fix question movement [\#1362](https://github.com/nextcloud/forms/pull/1362) ([jotoeri](https://github.com/jotoeri))
@@ -78,7 +86,6 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.0...v2.5.1)
 
 ### Fixed
-
 - Fix upgrading [\#1212](https://github.com/nextcloud/forms/pull/1212) ([nickvergessen](https://github.com/nickvergessen))
 
 
@@ -87,11 +94,9 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.4.0...v2.5.0)
 
 ### Enhancements
-
 - Include Capabilities Response [\#1158](https://github.com/nextcloud/forms/pull/1158) ([jotoeri](https://github.com/jotoeri))
 
 ### Fixed
-
 - Rollback Capabilities
   [\#1162](https://github.com/nextcloud/forms/pull/1162) ([jotoeri](https://github.com/jotoeri))
 - Update master php testing versions
@@ -121,7 +126,6 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.3.0...v2.4.0)
 
 ### Enhancements
-
 - 2.4.0
   [\#1068](https://github.com/nextcloud/forms/pull/1068) ([skjnldsv](https://github.com/skjnldsv))
 - Enable HMR
@@ -133,19 +137,16 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.4...v2.3.0)
 
 ### Deprecated ⚠️
-
 - Question property `mandatory` is deprecated and replaced by `isRequired`. The old property will be removed in API version 2.
   [\#882](https://github.com/nextcloud/forms/pull/882) ([chartman123](https://github.com/Chartman123))
 
 ### Enhancements
-
 - Add server-side validation of submissions
   [\#895](https://github.com/nextcloud/forms/pull/895) ([Chartman123](https://github.com/Chartman123))
 - Delete a deleted Users Forms
   [\#856](https://github.com/nextcloud/forms/pull/856) ([jotoeri](https://github.com/jotoeri))
 
 ### Fixed
-
 - Fix Activity Link
   [\#976](https://github.com/nextcloud/forms/pull/976) ([jotoeri](https://github.com/jotoeri))
 - Allow non-admins to export to files
@@ -156,7 +157,6 @@
   [\#881](https://github.com/nextcloud/forms/pull/881) ([jotoeri](https://github.com/jotoeri))
 
 ### Merged
-
 - Minversion 20
   [\#1021](https://github.com/nextcloud/forms/pull/1021) ([jotoeri](https://github.com/jotoeri))
 - Fix phpunit typo
@@ -180,12 +180,10 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.3...v2.2.4)
 
 ### Fixed
-
 - Fix export again
   [\#871](https://github.com/nextcloud/forms/pull/871) ([jotoeri](https://github.com/jotoeri))
 
 ### Merged
-
 - Bump dependencies
   [\#872](https://github.com/nextcloud/forms/pull/872) ([skjnldsv](https://github.com/skjnldsv))
 
@@ -195,7 +193,6 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.2...v2.2.3)
 
 ### Fixed
-
 - Fix export multiple answers
   [\#860](https://github.com/nextcloud/forms/pull/860) ([jotoeri](https://github.com/jotoeri))
 - Fix activity l10n
@@ -207,7 +204,6 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.1...v2.2.2)
 
 ### Fixed
-
 - Fix Routing
   [\#846](https://github.com/nextcloud/forms/pull/846) ([jotoeri](https://github.com/jotoeri))
 - Fix half access objects
@@ -219,7 +215,6 @@
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.2.0...v2.2.1)
 
 ### Fixed
-
 - Fix router naming conflict
   [\#837](https://github.com/nextcloud/forms/pull/837) ([jotoeri](https://github.com/jotoeri))
 - Fix Summary Aggregation
