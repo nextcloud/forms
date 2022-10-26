@@ -196,18 +196,6 @@ export default {
 		noSubmissions() {
 			return this.form.submissions?.length === 0
 		},
-
-		/**
-		 * Return form title, or placeholder if not set
-		 *
-		 * @return {string}
-		 */
-		formTitle() {
-			if (this.form.title) {
-				return this.form.title
-			}
-			return t('forms', 'New form')
-		},
 	},
 
 	watch: {

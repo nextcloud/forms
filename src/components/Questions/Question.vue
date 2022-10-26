@@ -79,18 +79,15 @@
 				</NcActions>
 			</div>
 			<div v-if="hasDescription || edit || !questionValid" class="question__header__description">
-				<textarea v-if="edit || !questionValid"
-					ref="description"
-					rows="1"
+				<NcRichContenteditable v-if="edit || !questionValid"
+					:multiline="true"
 					:value="description"
-					:maxlength="maxStringLengths.questionDescription"
 					:placeholder="t('forms', 'Description')"
+					:maxlength="maxStringLengths.questionDescription"
 					class="question__header__description__input"
-					@input="onDescriptionChange" />
-
-				<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
-				<!-- eslint-disable-next-line -->
-				<p v-else class="question__header__description__output">{{ description }}</p>
+					@update:value="onDescriptionChange" />
+				<!-- eslint-disable-next-line vue/no-v-html -->
+				<p v-else class="question__header__description__output" v-html="computedDescription" />
 			</div>
 		</div>
 
@@ -101,9 +98,11 @@
 
 <script>
 import { directive as ClickOutside } from 'v-click-outside'
+
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
+import NcRichContenteditable from '@nextcloud/vue/dist/Components/NcRichContenteditable.js'
 
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
@@ -123,7 +122,10 @@ export default {
 		NcActions,
 		NcActionButton,
 		NcActionCheckbox,
+		NcRichContenteditable,
 	},
+
+	inject: ['$markdownit'],
 
 	props: {
 		index: {
@@ -189,6 +191,10 @@ export default {
 			return this.text
 		},
 
+		computedDescription() {
+			return this.$markdownit.renderInline(this.description)
+		},
+
 		/**
 		 * Question valid, if text not empty and content valid
 		 *
@@ -212,9 +218,8 @@ export default {
 			this.$emit('update:text', target.value)
 		},
 
-		onDescriptionChange({ target }) {
-			this.autoSizeDescription()
-			this.$emit('update:description', target.value)
+		onDescriptionChange(value) {
+			this.$emit('update:description', value)
 		},
 
 		onRequiredChange(isRequired) {
@@ -232,7 +237,6 @@ export default {
 			if (!this.readOnly) {
 				this.$emit('update:edit', true)
 			}
-			this.autoSizeDescription()
 		},
 
 		/**
@@ -249,19 +253,6 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
-		},
-
-		/**
-		 * Auto adjust the description height based on lines number
-		 */
-		async autoSizeDescription() {
-			this.$nextTick(() => {
-				const textarea = this.$refs.description
-				if (textarea) {
-					textarea.style.cssText = 'height:auto'
-					textarea.style.cssText = `height: ${textarea.scrollHeight + 5}px`
-				}
-			})
 		},
 	},
 }
@@ -339,9 +330,9 @@ export default {
 
 				&__input {
 					position: relative;
-					left: -10px;
-					margin-right: -8px !important;
-					padding-left: 8px !important;
+					left: -12px;
+					margin-right: -12px !important;
+					padding-left: 10px !important;
 				}
 			}
 
@@ -360,27 +351,27 @@ export default {
 
 		&__description {
 			display: flex;
-			white-space: pre-wrap;
-			margin-top: 4px;
-			margin-bottom: 4px;
 
 			&__input {
 				margin: 0px;
-				margin-bottom: -5px;
 				min-height: 1.3em;
-				border: none;
-				resize: none;
+				border-width: 2px;
+				position: relative;
+				left: -12px;
+				padding: 4px 10px;
 			}
 
 			&__input,
 			&__output {
-				width: 100%;
 				font-size: 14px;
 				color: var(--color-text-maxcontrast) !important;
 				line-height: 1.3em;
-				padding: 0px;
 				z-index: inherit;
 				overflow-wrap: break-word;
+				width: calc(100% - 32px); // match with other inputs
+			}
+			&__output {
+				padding: 6px 0; //compensate border
 			}
 		}
 	}
