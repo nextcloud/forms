@@ -42,6 +42,7 @@ OC.L10N.register(
     "Allow sharing to all logged in accounts" : "Zezwalaj na udostępnianie wszystkim zalogowanym kontom",
     "Error while saving configuration" : "Błąd podczas zapisywania konfiguracji",
     "Error while reloading config" : "Błąd podczas ponownego ładowania konfiguracji",
+    "Form actions" : "Akcje formularza",
     "Edit form" : "Edytuj formularz",
     "Share form" : "Udostępnij formularz",
     "Results" : "Wyniki",
