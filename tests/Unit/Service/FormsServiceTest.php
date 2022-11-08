@@ -40,8 +40,12 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCP\Files\Folder;
+use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\IGroup;
 use OCP\IGroupManager;
+use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -93,6 +97,12 @@ class FormsServiceTest extends TestCase {
 	/** @var CirclesService|MockObject */
 	private $circlesService;
 
+	/** @var IRootFolder|MockObject */
+	private $storage;
+
+	/** @var IL10N|MockObject */
+	private $l10n;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -118,6 +128,15 @@ class FormsServiceTest extends TestCase {
 			->method('getUser')
 			->willReturn($user);
 
+		$this->storage = $this->createMock(IRootFolder::class);
+
+		$this->l10n = $this->createMock(IL10N::class);
+		$this->l10n->expects($this->any())
+			->method('t')
+			->will($this->returnCallback(function (string $identity) {
+				return $identity;
+			}));
+
 		$this->formsService = new FormsService(
 			$userSession,
 			$this->activityManager,
@@ -131,7 +150,9 @@ class FormsServiceTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
-			$this->circlesService
+			$this->circlesService,
+			$this->storage,
+			$this->l10n
 		);
 	}
 
@@ -212,7 +233,9 @@ class FormsServiceTest extends TestCase {
 						'displayName' => 'Some User'
 					]
 				],
-				'submissionMessage' => '',
+				'submissionMessage' => null,
+				'fileId' => null,
+				'fileFormat' => null,
 				'permissions' => Constants::PERMISSION_ALL
 			]]
 		];
@@ -419,7 +442,7 @@ class FormsServiceTest extends TestCase {
 				'permissions' => [
 					'submit'
 				],
-				'submissionMessage' => '',
+				'submissionMessage' => null,
 			]]
 		];
 	}
@@ -590,7 +613,9 @@ class FormsServiceTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
-			$this->circlesService
+			$this->circlesService,
+			$this->storage,
+			$this->l10n
 		);
 
 		$form = new Form();
@@ -827,7 +852,9 @@ class FormsServiceTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
-			$this->circlesService
+			$this->circlesService,
+			$this->storage,
+			$this->l10n
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -987,7 +1014,9 @@ class FormsServiceTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
-			$this->circlesService
+			$this->circlesService,
+			$this->storage,
+			$this->l10n
 		);
 
 		$form = new Form();
@@ -1404,13 +1433,15 @@ class FormsServiceTest extends TestCase {
 				$this->userManager,
 				$this->secureRandom,
 				$this->circlesService,
+				$this->storage,
+				$this->l10n
 			])
 			->getMock();
 
 		$form = Form::fromParams(['id' => 42, 'ownerId' => $owner]);
 
 		$formsService->method('getShares')->willReturn($shares);
-		
+
 		$this->activityManager->expects($this->once())
 			->method('publishNewSubmission')
 			->with($form, $submitter);
@@ -1540,5 +1571,39 @@ class FormsServiceTest extends TestCase {
 				'expected' => false
 			]
 		];
+	}
+
+	public function testGetFilePathThrowsAnException() {
+		$form = new Form();
+		$form->setFileId(100);
+		$form->setOwnerId('user1');
+
+		$folder = $this->createMock(Folder::class);
+		$folder->expects($this->once())
+			->method('getById')
+			->with(100)
+			->willReturn([]);
+
+		$this->storage->expects($this->once())
+			->method('getUserFolder')
+			->with('user1')
+			->willReturn($folder);
+
+		$this->expectException(NotFoundException::class);
+		$this->formsService->getFilePath($form);
+	}
+
+	public function testGetFileNameThrowsAnExceptionForInvalidFormat() {
+		$form = new Form();
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->formsService->getFileName($form, 'dummy');
+	}
+
+	public function testGetFileName() {
+		$form = new Form();
+		$form->setTitle('Form 1');
+
+		$this->assertSame('Form 1 (responses).xlsx', $this->formsService->getFileName($form, 'xlsx'));
 	}
 }

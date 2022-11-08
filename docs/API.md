@@ -28,9 +28,16 @@ This file contains the API-Documentation. For more information on the returned D
 - Completely new way of handling access & shares.
 
 ### Other API changes
-- In API version 2.1 the endpoint `/api/v2.1/share/update` was added to update a Share
-- In API version 2.2 the endpoint `/api/v2.2/form/transfer` was added to transfer ownership of a form
+- In API version 2.4 the following endpoints were introduced:
+  - `POST /api/2.4/form/link/{fileFormat}` to link form to a file
+  - `POST /api/2.4/form/unlink` to unlink form from a file
+- In API version 2.4 the following endpoints were changed:
+  - `GET /api/v2.4/submissions/export/{hash}` was extended with optional parameter `fileFormat` to export submissions in different formats
+  - `GET /api/v2.4/submissions/export` was extended with optional parameter `fileFormat` to export submissions to cloud in different formats
+  - `GET /api/v2.4/form/{id}` was extended with optional parameters `fileFormat`, `fileId`, `filePath` to link form to a file
 - In API version 2.3 the endpoint `/api/v2.3/question/clone` was added to clone a question
+- In API version 2.2 the endpoint `/api/v2.2/form/transfer` was added to transfer ownership of a form
+- In API version 2.1 the endpoint `/api/v2.1/share/update` was added to update a Share
 
 ## Form Endpoints
 ### List owned Forms
@@ -111,7 +118,7 @@ See next section, 'Request full data of a form'
 
 ### Request full data of a form
 Returns the full-depth object of the requested form (without submissions).
-- Endpoint: `/api/v2.2/form/{id}`
+- Endpoint: `/api/v2.4/form/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -132,6 +139,9 @@ Returns the full-depth object of the requested form (without submissions).
     "showToAllUsers": false
   },
   "expires": 0,
+  "fileFormat": "csv",
+  "fileId": 157,
+  "filePath": "foo/bar",
   "isAnonymous": false,
   "submitMultiple": true,
   "showExpiration": false,
@@ -250,6 +260,37 @@ Transfer the ownership of a form to another user
 "data": 3
 ```
 
+### Link a form to a file
+- Endpoint: `/api/v2.4/form/link/{fileFormat}`
+- Url-Parameter:
+  | Parameter    | Type    | Description  |
+  |--------------|---------|--------------|
+  | _fileFormat_ | String  | csv|ods|xlsx |
+- Method: `POST`
+- Parameters:
+  | Parameter | Type    | Description                                |
+  |-----------|---------|--------------------------------------------|
+  | _hash_    | String  | Hash of the form to update                 |
+  | _path_    | String  | Path within User-Dir, to store the file to |
+- Response: The new question object.
+```
+"data": {
+  "fileFormat": "csv",
+  "fileId": 157,
+  "filePath": "foo/bar",
+  "fileName": "Form 1 (responses).csv"
+}
+```
+
+### Unlink file from form
+- Endpoint: `/api/v2.4/form/unlink`
+- Method: `POST`
+- Parameters:
+  | Parameter | Type    | Description                |
+  |-----------|---------|----------------------------|
+  | _hash_    | String  | Hash of the form to update |
+- Response: **Status-Code OK**
+
 ## Question Endpoints
 Contains only manipulative question-endpoints. To retrieve questions, request the full form data.
 
@@ -262,7 +303,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
   | _formId_  | Integer |          | ID of the form, the new question will belong to |
   | _type_    | [QuestionType](DataStructure.md#question-types) |  | The question-type of the new question |
   | _text_    | String  | yes      | *Optional* The text of the new question. |
-- Response: The new question object. 
+- Response: The new question object.
 ```
 "data": {
   "id": 3,
@@ -434,7 +475,7 @@ Update a single or all properties of an option-object
   |------------------|----------|-------------|
   | _id_             | Integer  | ID of the share to update |
   | *keyValuePairs*¹ | Array    | Array of key-value pairs to update |
-  
+
   ¹Currently only the _permissions_ can be updated.
 - Method: `PATCH`
 - *Method: `POST` deprecated*
@@ -542,13 +583,14 @@ Get all Submissions to a Form
 
 ### Get Submissions as csv (Download)
 Returns all submissions to the form in form of a csv-file.
-- Endpoint: `/api/v2.2/submissions/export/{hash}`
+- Endpoint: `/api/v2.4/submissions/export/{hash}`
 - Url-Parameter:
-  | Parameter | Type    | Description |
-  |-----------|---------|-------------|
-  | _hash_    | String  | Hash of the form to get the submissions for |
+  | Parameter    | Type    | Description |
+  |--------------|---------|-------------|
+  | _hash_       | String  | Hash of the form to get the submissions for |
+  | _fileFormat_ | String  | csv|ods|xlsx |
 - Method: `GET`
-- Response: A Data Download Response containg the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv.
+- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv.
 ```
 "User display name","Timestamp","Question 1","Question 2"
 "jonas","Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2","Answer"
@@ -557,13 +599,14 @@ Returns all submissions to the form in form of a csv-file.
 
 ### Export Submissions to Cloud (Files-App)
 Creates a csv file and stores it to the cloud, resp. Files-App.
-- Endpoint: `/api/v2.2/submissions/export`
+- Endpoint: `/api/v2.4/submissions/export`
 - Method: `POST`
 - Parameters:
-  | Parameter | Type    | Description |
-  |-----------|---------|-------------|
-  | _hash_    | String  | Hash of the form to get the submissions for |
-  | _path_    | String  | Path within User-Dir, to store the file to |
+  | Parameter    | Type    | Description |
+  |--------------|---------|-------------|
+  | _hash_       | String  | Hash of the form to get the submissions for |
+  | _path_       | String  | Path within User-Dir, to store the file to |
+  | _fileFormat_ | String  | csv|ods|xlsx |
 - Response: Stores the file to the given path and returns the fileName.
 ```
 "data": "Form 2 (responses).csv"
@@ -592,7 +635,7 @@ Store Submission to Database
   | _formId_  | Integer | ID of the form to submit into |
   | _answers_ | Array   | Array of Answers |
   | _shareHash_ | String | optional, only neccessary for submissions to a public share link |
-  
+
   The Array of Answers has the following structure:
   - QuestionID as key
   - An **array** of values as value --> Even for short Text Answers, wrapped into Array.

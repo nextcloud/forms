@@ -201,7 +201,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with($form)
@@ -259,7 +259,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with($form)
@@ -274,7 +274,7 @@ class ApiControllerTest extends TestCase {
 			->method('getQuestions')
 			->with(1)
 			->willReturn($questions);
-	
+
 		$this->assertEquals(new DataResponse($expected), $this->apiController->getSubmissions('hash'));
 	}
 
@@ -284,7 +284,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willThrowException($exception);
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->apiController->exportSubmissions('hash');
 	}
 
@@ -298,7 +298,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with($form)
@@ -318,19 +318,54 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with($form)
 			->willReturn(true);
 
-		$csv = ['data' => '__data__', 'fileName' => 'some.csv'];
+		$csv = 'foo,bar';
 		$this->submissionService->expects($this->once())
-			->method('getSubmissionsCsv')
-			->with('hash')
+			->method('getSubmissionsData')
+			->with($form, 'csv')
 			->willReturn($csv);
 
-		$this->assertEquals(new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv'), $this->apiController->exportSubmissions('hash'));
+		$fileName = 'foo.csv';
+		$this->formsService->expects($this->once())
+			->method('getFileName')
+			->with($form, 'csv')
+			->willReturn($fileName);
+
+		$this->assertEquals(new DataDownloadResponse($csv, $fileName, 'text/csv'), $this->apiController->exportSubmissions('hash'));
+	}
+
+	public function testExportSubmissionsToCloud_invalidForm() {
+		$exception = $this->createMock(MapperException::class);
+		$this->formMapper->expects($this->once())
+			->method('findByHash')
+			->with('hash')
+			->willThrowException($exception);
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->exportSubmissionsToCloud('hash', '');
+	}
+
+	public function testUnlinkFile() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('currentUser');
+		$form->setFileId(100);
+		$form->setFileFormat('csv');
+
+		$this->formMapper->expects($this->once())
+			->method('findByHash')
+			->with('hash')
+			->willReturn($form);
+
+		$this->apiController->unlinkFile('hash');
+
+		$this->assertNull($form->getFileId());
+		$this->assertNull($form->getFileFormat());
 	}
 
 	public function testCreateNewForm_notAllowed() {
@@ -344,7 +379,7 @@ class ApiControllerTest extends TestCase {
 
 	public function dataTestCreateNewForm() {
 		return [
-			"forms" => ['expectedForm' => [
+			'forms' => ['expectedForm' => [
 				'id' => 7,
 				'hash' => 'formHash',
 				'title' => '',
@@ -359,7 +394,9 @@ class ApiControllerTest extends TestCase {
 				'submitMultiple' => false,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
-				'submissionMessage' => '',
+				'submissionMessage' => null,
+				'fileId' => null,
+				'fileFormat' => null,
 			]]
 		];
 	}
@@ -586,6 +623,10 @@ class ApiControllerTest extends TestCase {
 	public function testInsertSubmission_answers() {
 		$form = new Form();
 		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('99');
+		$form->setFileId(100);
+		$form->setFileFormat('xlsx');
 
 		$questions = [
 			[
@@ -676,6 +717,14 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('notifyNewSubmission')
 			->with($form, 'currentUser');
+
+		$this->formsService->expects($this->once())
+			->method('getFilePath')
+			->willReturn('foo/bar');
+
+		$this->submissionService->expects($this->once())
+			->method('writeFileToCloud')
+			->with($form, 'foo/bar', 'xlsx', '99');
 
 		$this->apiController->insertSubmission(1, $answers, '');
 	}

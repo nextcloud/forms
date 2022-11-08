@@ -50,6 +50,7 @@ jobs:
           php-version: 8.2
           coverage: none
           ini-file: development
+          extensions: gd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

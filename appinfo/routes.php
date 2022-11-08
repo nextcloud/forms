@@ -99,7 +99,7 @@ return [
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -304,7 +304,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/export/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -312,7 +312,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/export',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -339,5 +339,23 @@ return [
 				'apiVersion' => 'v2(\.[1-3])?'
 			]
 		],
+		// Submissions linking with file in cloud
+		[
+			'name' => 'api#linkFile',
+			'url' => '/api/{apiVersion}/form/link/{fileFormat}',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.4',
+				'fileFormat' => 'csv|ods|xlsx'
+			]
+		],
+		[
+			'name' => 'api#unlinkFile',
+			'url' => '/api/{apiVersion}/form/unlink',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.4',
+			]
+		]
 	]
 ];
