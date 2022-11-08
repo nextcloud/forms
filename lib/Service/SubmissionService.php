@@ -183,6 +183,54 @@ class SubmissionService {
 
 		return $csvData['fileName'];
 	}
+	/**
+	 * Export Submissions to Cloud-Filesystem
+	 * @param string $ownerId of the form creator
+	 * @param string $hash of the form
+	 * @param string $path The Cloud-Path to export to
+	 * @return string The written fileName
+	 * @throws NotPermittedException
+	 */
+	public function updateOnSave(string $hash, string $path, string $ownerId): string {
+		$node = $this->storage->getUserFolder($ownerId)->get($path);
+
+		// Get Data
+		$csvData = $this->getSubmissionsCsv($hash);
+
+		// If chosen path is a file, get folder, if file is csv, use filename.
+		if ($node instanceof File) {
+			if ($node->getExtension() === 'csv') {
+				$csvData['fileName'] = $node->getName();
+			}
+			$node = $node->getParent();
+		}
+
+		// check if file exists, create otherwise.
+		try {
+			$file = $node->get($csvData['fileName']);
+		} catch (\OCP\Files\NotFoundException $e) {
+			$node->newFile($csvData['fileName']);
+			$file = $node->get($csvData['fileName']);
+		}
+
+		// Write the data to file
+		$file->putContent($csvData['data']);
+
+		return $csvData['fileName'];
+	}
+	/**
+	 * Get the File ID
+	 * @param string $path The Cloud-Path to the file
+	 * @return string The File ID
+	 * 
+	 */
+	public function getFileId(string $path): string {
+		$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
+
+		$fileId=$node->getId();
+
+		return $fileId;
+	}
 
 	/**
 	 * Create CSV from Submissions to form
@@ -200,8 +248,14 @@ class SubmissionService {
 
 		$questions = $this->questionMapper->findByForm($form->getId());
 		$defaultTimeZone = date_default_timezone_get();
-		$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
 
+		if($this->currentUser==null){
+			$userTimezone = $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
+		}
+		else{
+			$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
+
+		}
 		// Process initial header
 		$header = [];
 		$header[] = $this->l10n->t('User ID');

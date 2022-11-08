@@ -236,6 +236,30 @@ return [
 			]
 		],
 		[
+			'name' => 'api#linkFile',
+			'url' => '/api/{apiVersion}/submissions/link',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2'
+			]
+		],
+		[
+			'name' => 'api#getFileID',
+			'url' => '/api/{apiVersion}/submissions/fileId/{hash}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v3'
+			]
+		],
+		[
+			'name' => 'api#unlinkFile',
+			'url' => '/api/{apiVersion}/submissions/unlink',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v3'
+			]
+		],
+		[
 			'name' => 'api#deleteAllSubmissions',
 			'url' => '/api/{apiVersion}/submissions/{formId}',
 			'verb' => 'DELETE',

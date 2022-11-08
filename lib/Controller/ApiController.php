@@ -105,7 +105,7 @@ class ApiController extends OCSController {
 
 	/** @var IUserManager */
 	private $userManager;
-
+	
 	public function __construct(string $appName,
 								ActivityManager $activityManager,
 								AnswerMapper $answerMapper,
@@ -134,7 +134,7 @@ class ApiController extends OCSController {
 		$this->configService = $configService;
 		$this->formsService = $formsService;
 		$this->submissionService = $submissionService;
-
+		
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
@@ -348,7 +348,7 @@ class ApiController extends OCSController {
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @throws OCSForbiddenException 
 	 */
 	public function updateForm(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: FormId: {id}, values: {keyValuePairs}', [
@@ -992,9 +992,17 @@ class ApiController extends OCSController {
 			}
 		}
 
+
 		//Create Activity
 		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
 
+		$filePath = $form->getFilePath();
+		$hash = $form->getHash();
+		$ownerId = $form->getOwnerId();
+
+		if($form->getFileId() !=null){
+			$this->submissionService->updateOnSave($hash, $filePath,$ownerId );
+		}
 		return new DataResponse();
 	}
 
@@ -1135,5 +1143,58 @@ class ApiController extends OCSController {
 		}
 
 		return new DataResponse($fileName);
+	}
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Return File ID
+	 *
+	 * @param string $hash of the form
+	 * @return DataResponse
+	 */
+	public function getFileID(string $hash): DataResponse{
+		$form = $this->formMapper->findByHash($hash);
+		$fileID =$form->getFileId();
+		return new DataResponse($fileID);
+	}
+
+	public function unlinkFile(string $hash): DataResponse{
+		$form = $this->formMapper->findByHash($hash);
+		$form->setFileId(null);
+		$this->formMapper->update($form);
+		return new DataResponse($hash);
+	}
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Export Submissions to the Cloud and Link the FileId to the foem
+	 *
+	 * @param string $hash of the form
+	 * @param string $path The Cloud-Path to export to
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function linkFile(string $hash, string $path) :DataResponse{
+		$this->logger->debug('Linking file for form: {hash} to Cloud at: /{path}', [
+			'hash' => $hash,
+			'path' => $path,
+		]);
+		try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+				$this->exportSubmissionsToCloud($hash,$path);
+				$fileId= $this->submissionService->getFileId($path);
+				$form->setFileId($fileId); 
+				$form->setFilePath($path);
+				$this->formMapper->update($form);
+				return new DataResponse($fileId);
 	}
 }
