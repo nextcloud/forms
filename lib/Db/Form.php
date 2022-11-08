@@ -38,6 +38,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setDescription(string $value)
  * @method string getOwnerId()
  * @method void setOwnerId(string $value)
+ * @method string getFileId()
+ * @method void setFileId(string $value)
  * @method array getAccess()
  * @method void setAccess(array $value)
  * @method integer getCreated()
@@ -59,6 +61,7 @@ class Form extends Entity {
 	protected $expires;
 	protected $isAnonymous;
 	protected $submitMultiple;
+	protected $fileId;
 
 	/**
 	 * Form constructor.
@@ -88,6 +91,7 @@ class Form extends Entity {
 			'title' => $this->getTitle(),
 			'description' => $this->getDescription(),
 			'ownerId' => $this->getOwnerId(),
+			'fileId' => $this->getFileId(),
 			'created' => $this->getCreated(),
 			'access' => $this->getAccess(),
 			'expires' => $this->getExpires(),

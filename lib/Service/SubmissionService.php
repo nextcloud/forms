@@ -183,6 +183,19 @@ class SubmissionService {
 
 		return $csvData['fileName'];
 	}
+	/**
+	 * Get the File ID
+	 * @param string $path The Cloud-Path to the file
+	 * @return string The File ID
+	 * 
+	 */
+	public function getFileId(string $path): string {
+		$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
+
+		$fileId=$node->getId();
+
+		return $fileId;
+	}
 
 	/**
 	 * Create CSV from Submissions to form
