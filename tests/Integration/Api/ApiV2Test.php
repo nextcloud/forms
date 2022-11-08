@@ -28,7 +28,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 use OCA\Forms\Constants;
-
 use OCA\Forms\Db\FormMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use Test\TestCase;
@@ -68,6 +67,8 @@ class ApiV2Test extends TestCase {
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'submission_message' => 'Back to website',
+				'file_id' => null,
+				'file_format' => null,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -171,6 +172,8 @@ class ApiV2Test extends TestCase {
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'submission_message' => '',
+				'file_id' => null,
+				'file_format' => null,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -190,7 +193,45 @@ class ApiV2Test extends TestCase {
 					],
 				],
 				'submissions' => []
-			]
+			],
+			[
+				'hash' => 'third',
+				'title' => 'Title of a third Form',
+				'description' => '',
+				'owner_id' => 'test',
+				'access_json' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true
+				],
+				'created' => 12345,
+				'expires' => 0,
+				'is_anonymous' => false,
+				'submit_multiple' => false,
+				'show_expiration' => false,
+				'last_updated' => 123456789,
+				'submission_message' => '',
+				'file_id' => 12,
+				'file_format' => 'csv',
+				'questions' => [
+					[
+						'type' => 'short',
+						'text' => 'Third Question?',
+						'description' => '',
+						'isRequired' => false,
+						'name' => '',
+						'order' => 1,
+						'options' => [],
+						'extraSettings' => []
+					],
+				],
+				'shares' => [
+					[
+						'shareType' => 0,
+						'shareWith' => 'user2',
+					],
+				],
+				'submissions' => []
+			],
 		];
 	}
 
@@ -234,6 +275,8 @@ class ApiV2Test extends TestCase {
 					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
 					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
 					'submission_message' => $qb->createNamedParameter($form['submission_message'], IQueryBuilder::PARAM_STR),
+					'file_id' => $qb->createNamedParameter($form['file_id'], IQueryBuilder::PARAM_INT),
+					'file_format' => $qb->createNamedParameter($form['file_format'], IQueryBuilder::PARAM_STR),
 				]);
 			$qb->executeStatement();
 			$formId = $qb->getLastInsertId();
@@ -379,15 +422,26 @@ class ApiV2Test extends TestCase {
 	public function dataGetForms() {
 		return [
 			'getTestforms' => [
-				'expected' => [[
-					'hash' => 'abcdefg',
-					'title' => 'Title of a Form',
-					'expires' => 0,
-					'lastUpdated' => 123456789,
-					'permissions' => Constants::PERMISSION_ALL,
-					'partial' => true,
-					'submissionCount' => 3
-				]]
+				'expected' => [
+					[
+						'hash' => 'abcdefg',
+						'title' => 'Title of a Form',
+						'expires' => 0,
+						'lastUpdated' => 123456789,
+						'permissions' => Constants::PERMISSION_ALL,
+						'partial' => true,
+						'submissionCount' => 3,
+					],
+					[
+						'hash' => 'third',
+						'title' => 'Title of a third Form',
+						'expires' => 0,
+						'lastUpdated' => 123456789,
+						'permissions' => Constants::PERMISSION_ALL,
+						'partial' => true,
+						'submissionCount' => 0,
+					]
+				]
 			]
 		];
 	}
@@ -409,16 +463,18 @@ class ApiV2Test extends TestCase {
 	public function dataGetSharedForms() {
 		return [
 			'getTestforms' => [
-				'expected' => [[
-					'hash' => 'abcdefghij',
-					'title' => 'Title of a second Form',
-					'expires' => 0,
-					'lastUpdated' => 123456789,
-					'permissions' => [
-						'submit'
+				'expected' => [
+					[
+						'hash' => 'abcdefghij',
+						'title' => 'Title of a second Form',
+						'expires' => 0,
+						'lastUpdated' => 123456789,
+						'permissions' => [
+							'submit'
+						],
+						'partial' => true
 					],
-					'partial' => true
-				]]
+				]
 			]
 		];
 	}
@@ -491,7 +547,9 @@ class ApiV2Test extends TestCase {
 					'questions' => [],
 					'shares' => [],
 					'submissionCount' => 0,
-					'submissionMessage' => ''
+					'submissionMessage' => null,
+					'fileId' => null,
+					'fileFormat' => null,
 				]
 			]
 		];
@@ -593,7 +651,9 @@ class ApiV2Test extends TestCase {
 							'displayName' => ''
 						],
 					],
-					'submissionCount' => 3
+					'submissionCount' => 3,
+					'fileId' => null,
+					'fileFormat' => null,
 				]
 			]
 		];
@@ -1248,11 +1308,12 @@ class ApiV2Test extends TestCase {
 	public function dataExportSubmissions() {
 		return [
 			'exportSubmissions' => [
-				'expected' => '
+				'expected' => <<<'CSV'
 					"User ID","User display name","Timestamp","First Question?","Second Question?"
-					"user1","User No. 1","1970-01-02T10:17:36+00:00","This is a short answer.","Option 1"
+					"","Anonymous user","1970-01-01T00:20:34+00:00","",""
 					"","Anonymous user","1970-01-01T03:25:45+00:00","This is another short answer.","Option 2"
-					"","Anonymous user","1970-01-01T00:20:34+00:00","",""'
+					"user1","User No. 1","1970-01-02T10:17:36+00:00","This is a short answer.","Option 1"
+CSV
 			]
 		];
 	}
@@ -1262,7 +1323,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testExportSubmissions(string $expected) {
-		$resp = $this->http->request('GET', "api/v2.1/submissions/export/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v2.4/submissions/export/{$this->testForms[0]['hash']}");
 		$data = substr($resp->getBody()->getContents(), 3); // Some strange Character removed at the beginning
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1273,8 +1334,34 @@ class ApiV2Test extends TestCase {
 		$this->assertEquals($arr_txt_expected, $arr_txt_data);
 	}
 
+	public function testLinkFile() {
+		$resp = $this->http->request('POST', 'api/v2.4/form/link/csv', [
+			'json' => [
+				'hash' => $this->testForms[0]['hash'],
+				'path' => ''
+			]]
+		);
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals('csv', $data['fileFormat']);
+	}
+
+	public function testUnlinkFile() {
+		$resp = $this->http->request('POST', 'api/v2.4/form/unlink', [
+			'json' => [
+				'hash' => $this->testForms[2]['hash'],
+				'path' => ''
+			]]
+		);
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($this->testForms[2]['hash'], $data);
+	}
+
 	public function testExportToCloud() {
-		$resp = $this->http->request('POST', 'api/v2.2/submissions/export', [
+		$resp = $this->http->request('POST', 'api/v2.4/submissions/export', [
 			'json' => [
 				'hash' => $this->testForms[0]['hash'],
 				'path' => ''

@@ -33,6 +33,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 
 use OCP\Files\File;
@@ -41,6 +42,7 @@ use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IL10N;
+use OCP\ITempManager;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -85,6 +87,12 @@ class SubmissionServiceTest extends TestCase {
 	/** @var IMailer|MockObject */
 	private $mailer;
 
+	/** @var ITempManager|MockObject */
+	private $tempManager;
+
+	/** @var FormsService|MockObject */
+	private $formsService;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -98,6 +106,7 @@ class SubmissionServiceTest extends TestCase {
 		$this->mailer = $this->getMockBuilder(IMailer::class)->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);
+		$this->tempManager = $this->createMock(ITempManager::class);
 
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->any())
@@ -113,6 +122,8 @@ class SubmissionServiceTest extends TestCase {
 				return $identity;
 			}));
 
+		$this->formsService = $this->createMock(FormsService::class);
+
 		$this->submissionService = new SubmissionService(
 			$this->formMapper,
 			$this->questionMapper,
@@ -124,7 +135,9 @@ class SubmissionServiceTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$userSession,
-			$this->mailer
+			$this->mailer,
+			$this->tempManager,
+			$this->formsService
 		);
 	}
 
@@ -231,18 +244,17 @@ class SubmissionServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->submissionService->getSubmissions(5));
 	}
 
-	public function dataWriteCsvToCloud() {
+	public function dataWriteFileToCloud() {
 		return [
-			'rootFolder' => ['Some nice Form Title', '', Folder::class, '', 'Some nice Form Title (responses).csv', false],
-			'subFolder' => ['Some nice Form Title', '/folder path', Folder::class, '', 'Some nice Form Title (responses).csv', false],
-			'nonCsv-file' => ['Some nice Form Title', '/fileName.txt', File::class, 'txt', 'Some nice Form Title (responses).csv', false],
+			'rootFolder' => ['Some nice Form Title', '', Folder::class, 'csv', 'Some nice Form Title (responses).csv', false],
+			'subFolder' => ['Some nice Form Title', '/folder path', Folder::class, 'csv', 'Some nice Form Title (responses).csv', false],
 			'csv-file' => ['Some nice Form Title', '/fileName.csv', File::class, 'csv', 'fileName.csv', true],
-			'invalidFormTitle' => ['Form 1 / 2', '', Folder::class, '', 'Form 1 - 2 (responses).csv', false],
+			'invalidFormTitle' => ['Form 1 / 2', '', Folder::class, 'csv', 'Form 1 - 2 (responses).csv', false],
 		];
 	}
 
 	/**
-	 * @dataProvider dataWriteCsvToCloud
+	 * @dataProvider dataWriteFileToCloud
 	 *
 	 * @param string $formTitle Given form title
 	 * @param string $path Selected user-path (from frontend)
@@ -251,7 +263,7 @@ class SubmissionServiceTest extends TestCase {
 	 * @param string $expectedFileName
 	 * @param bool $fileExists If the file to write into does exist already.
 	 */
-	public function testWriteCsvToCloud(string $formTitle, string $path, string $pathClass, string $pathExtension, string $expectedFileName, bool $fileExists) {
+	public function testWriteFileToCloud(string $formTitle, string $path, string $pathClass, string $pathExtension, string $expectedFileName, bool $fileExists) {
 		// Simple default Form Data here, details are tested in testGetSubmissionsCsv
 		$dataExpectation = $this->setUpSimpleCsvTest($formTitle);
 
@@ -259,6 +271,10 @@ class SubmissionServiceTest extends TestCase {
 		$fileNode->expects($this->once())
 			->method('putContent')
 			->with($dataExpectation);
+
+		$fileNode->expects($this->once())
+			->method('getContent')
+			->willReturn('');
 
 		$folderNode = $this->createMock(Folder::class);
 		if ($fileExists) {
@@ -304,11 +320,29 @@ class SubmissionServiceTest extends TestCase {
 			->with('currentUser')
 			->willReturn($userFolder);
 
-		$this->assertEquals($expectedFileName, $this->submissionService->writeCsvToCloud('abcdefg', $path));
+		$this->tempManager->expects($this->once())
+			->method('getTemporaryFile')
+			->willReturn('/tmp/abcdefg.csv');
+
+		$form = $this->formMapper->findByHash('abcdefg');
+
+		$this->formsService->expects($this->once())
+			->method('getFileName')
+			->with($form, $pathExtension)
+			->willReturn($expectedFileName);
+
+		$this->submissionService->writeFileToCloud($form, $path, 'csv');
+	}
+
+	public function testWriteFileToCloudThrowsExceptionOnInvalidFormat() {
+		$form = $this->formMapper->findByHash('abcdefg');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->submissionService->writeFileToCloud($form, '', 'invalid');
 	}
 
 	// Data for SubmissionCsv
-	public function dataGetSubmissionsCsv() {
+	public function dataGetSubmissionsData() {
 		return [
 			'two-basic-submissions' => [
 				// Questions
@@ -340,8 +374,8 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp","Question 1","Question 2"
-				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
-				"user2","User 2","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
+				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
+				"user2","User 2","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
 				'
 			],
 			'checkbox-multi-answers' => [
@@ -451,19 +485,28 @@ class SubmissionServiceTest extends TestCase {
 		];
 	}
 	/**
-	 * @dataProvider dataGetSubmissionsCsv
+	 * @dataProvider dataGetSubmissionsData
 	 *
 	 * @param array $questions
 	 * @param array $submissions
 	 * @param string $csvText
 	 */
-	public function testGetSubmissionsCsv(array $questions, array $submissions, string $csvText) {
+	public function testGetSubmissionsData(array $questions, array $submissions, string $csvText) {
 		$dataExpectation = $this->setUpCsvTest($questions, $submissions, $csvText, 'Some nice Form Title');
+		$form = $this->formMapper->findByHash('abcdefg');
 
-		$this->assertEquals([
-			'fileName' => 'Some nice Form Title (responses).csv',
-			'data' => $dataExpectation,
-		], $this->submissionService->getSubmissionsCsv('abcdefg'));
+		$this->tempManager->expects($this->once())
+			->method('getTemporaryFile')
+			->willReturn('/tmp/abcdefg.csv');
+
+		$this->assertEquals($dataExpectation, $this->submissionService->getSubmissionsData($form, 'csv'));
+	}
+
+	public function testGetSubmissionsDataThrowsExceptionOnInvalidFormat() {
+		$form = $this->formMapper->findByHash('abcdefg');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->submissionService->getSubmissionsData($form, 'invalid');
 	}
 
 	/**

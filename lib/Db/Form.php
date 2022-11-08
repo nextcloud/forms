@@ -38,6 +38,10 @@ use OCP\AppFramework\Db\Entity;
  * @method void setDescription(string $value)
  * @method string getOwnerId()
  * @method void setOwnerId(string $value)
+ * @method int|null getFileId()
+ * @method void setFileId(int|null $value)
+ * @method string|null getFileFormat()
+ * @method void setFileFormat(string|null $value)
  * @method array getAccess()
  * @method void setAccess(array $value)
  * @method integer getCreated()
@@ -60,6 +64,8 @@ class Form extends Entity {
 	protected $title;
 	protected $description;
 	protected $ownerId;
+	protected $fileId;
+	protected $fileFormat;
 	protected $accessJson;
 	protected $created;
 	protected $expires;
@@ -99,6 +105,8 @@ class Form extends Entity {
 			'title' => (string)$this->getTitle(),
 			'description' => (string)$this->getDescription(),
 			'ownerId' => $this->getOwnerId(),
+			'fileId' => $this->getFileId(),
+			'fileFormat' => $this->getFileFormat(),
 			'created' => $this->getCreated(),
 			'access' => $this->getAccess(),
 			'expires' => (int)$this->getExpires(),

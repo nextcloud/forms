@@ -48,12 +48,10 @@ use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
-use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\Files\NotFoundException;
-use OCP\Files\NotPermittedException;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IUser;
@@ -378,7 +376,7 @@ class ApiController extends OCSController {
 		}
 
 		$user = $this->userManager->get($uid);
-		if($user == null) {
+		if ($user == null) {
 			$this->logger->debug('Could not find new form owner');
 			throw new OCSBadRequestException('Could not find new form owner');
 		}
@@ -393,7 +391,7 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
-		
+
 		return new DataResponse($form->getOwnerId());
 	}
 
@@ -1106,6 +1104,18 @@ class ApiController extends OCSController {
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
 
+		if ($form->getFileId() !== null) {
+			try {
+				$filePath = $this->formsService->getFilePath($form);
+				$fileFormat = $form->getFileFormat();
+				$ownerId = $form->getOwnerId();
+
+				$this->submissionService->writeFileToCloud($form, $filePath, $fileFormat, $ownerId);
+			} catch (NotFoundException $e) {
+				$this->logger->notice('Form {formId} linked to a file that doesn\'t exist anymore', ['formId' => $formId]);
+			}
+		}
+
 		return new DataResponse();
 	}
 
@@ -1190,11 +1200,12 @@ class ApiController extends OCSController {
 	 * Export submissions of a specified form
 	 *
 	 * @param string $hash the form hash
+	 * @param string $fileFormat File format used for export
 	 * @return DataDownloadResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function exportSubmissions(string $hash): DataDownloadResponse {
+	public function exportSubmissions(string $hash, string $fileFormat = Constants::DEFAULT_FILE_FORMAT): DataDownloadResponse {
 		$this->logger->debug('Export submissions for form: {hash}', [
 			'hash' => $hash,
 		]);
@@ -1203,7 +1214,7 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			throw new OCSNotFoundException();
 		}
 
 		if (!$this->formsService->canSeeResults($form)) {
@@ -1211,8 +1222,10 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		$csv = $this->submissionService->getSubmissionsCsv($hash);
-		return new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv');
+		$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
+		$fileName = $this->formsService->getFileName($form, $fileFormat);
+
+		return new DataDownloadResponse($submissionsData, $fileName, Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat]);
 	}
 
 	/**
@@ -1223,21 +1236,17 @@ class ApiController extends OCSController {
 	 *
 	 * @param string $hash of the form
 	 * @param string $path The Cloud-Path to export to
+	 * @param string $fileFormat File format used for export
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function exportSubmissionsToCloud(string $hash, string $path) {
-		$this->logger->debug('Export submissions for form: {hash} to Cloud at: /{path}', [
-			'hash' => $hash,
-			'path' => $path,
-		]);
-
+	public function exportSubmissionsToCloud(string $hash, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			throw new OCSNotFoundException();
 		}
 
 		if (!$this->formsService->canSeeResults($form)) {
@@ -1245,14 +1254,86 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		// Write file to cloud
+		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
+
+		return new DataResponse($file->getName());
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * @param string $hash of the form
+	 */
+	public function unlinkFile(string $hash): DataResponse {
 		try {
-			$fileName = $this->submissionService->writeCsvToCloud($hash, $path);
-		} catch (NotPermittedException $e) {
-			$this->logger->debug('Failed to export Submissions: Not allowed to write to file');
-			throw new OCSException('Not allowed to write to file.');
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSNotFoundException();
 		}
 
-		return new DataResponse($fileName);
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if (!$form->getFileId()) {
+			$this->logger->debug('Form not linked to file');
+			throw new OCSBadRequestException();
+		}
+
+		$form->setFileId(null);
+		$form->setFileFormat(null);
+
+		$this->formMapper->update($form);
+
+		return new DataResponse($hash);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Export Submissions to the Cloud and Link the FileId to the form
+	 *
+	 * @param string $hash of the form
+	 * @param string $path The Cloud-Path to export to
+	 * @param string $fileFormat File format used for export
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function linkFile(string $hash, string $path, string $fileFormat): DataResponse {
+		$this->logger->debug('Linking form {hash} to file at /{path} in format {fileFormat}', [
+			'hash' => $hash,
+			'path' => $path,
+			'fileFormat' => $fileFormat,
+		]);
+
+		try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSNotFoundException();
+		}
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
+
+		$form->setFileId($file->getId());
+		$form->setFileFormat($fileFormat);
+
+		$this->formMapper->update($form);
+
+		$filePath = $this->formsService->getFilePath($form);
+
+		return new DataResponse([
+			'fileId' => $file->getId(),
+			'fileFormat' => $fileFormat,
+			'fileName' => $file->getName(),
+			'filePath' => $filePath,
+		]);
 	}
 }

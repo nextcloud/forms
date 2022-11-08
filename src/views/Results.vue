@@ -24,6 +24,13 @@
 
 <template>
 	<NcAppContent>
+		<NcDialog :open.sync="showLinkedFileNotAvailableDialog"
+			:name="t('forms', 'Linked file not available')"
+			:message="t('forms', 'Linked file is not available, would you like to link a new file?')"
+			:buttons="linkedFileNotAvailableButtons"
+			size="normal"
+			:can-close="false" />
+
 		<TopBar :permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@update:sidebarOpened="onSidebarChange"
@@ -47,12 +54,28 @@
 				<IconPoll :size="64" />
 			</template>
 			<template #action>
-				<NcButton type="primary" @click="onShareForm">
-					<template #icon>
-						<IconShareVariant :size="20" decorative />
-					</template>
-					{{ t('forms', 'Share form') }}
-				</NcButton>
+				<div class="response-actions">
+					<NcButton type="primary" @click="onShareForm">
+						<template #icon>
+							<IconShareVariant :size="20" decorative />
+						</template>
+						{{ t('forms', 'Share form') }}
+					</NcButton>
+
+					<NcButton v-if="!form.fileId" type="tertiary-no-background" @click="onLinkFile">
+						<template #icon>
+							<IconLink :size="20" />
+						</template>
+						{{ t('forms', 'Create spreadsheet') }}
+					</NcButton>
+
+					<NcButton v-if="form.fileId" :href="fileUrl" type="tertiary-no-background">
+						<template #icon>
+							<IconTable :size="20" />
+						</template>
+						{{ t('forms', 'Open spreadsheet') }}
+					</NcButton>
+				</div>
 			</template>
 		</NcEmptyContent>
 
@@ -89,28 +112,98 @@
 						</label>
 					</div>
 
-					<!-- Action menu for CSV export and deletion -->
+					<NcButton v-if="form.fileId" :href="fileUrl" type="tertiary-no-background">
+						<template #icon>
+							<IconTable :size="20" />
+						</template>
+						{{ t('forms', 'Open spreadsheet') }}
+					</NcButton>
+
+					<NcActions v-else type="tertiary-no-background" :force-name="true">
+						<NcActionButton @click="onLinkFile">
+							<template #icon>
+								<IconLink :size="20" />
+							</template>
+							{{ t('forms', 'Create spreadsheet') }}
+						</NcActionButton>
+					</NcActions>
+
+					<!-- Action menu for cloud export and deletion -->
 					<NcActions class="results-menu"
 						:aria-label="t('forms', 'Options')"
-						:force-menu="true">
-						<NcActionButton :close-after-click="true" @click="onStoreToFiles">
-							<template #icon>
-								<IconFolder :size="20" />
+						:force-menu="true"
+						@close="hideSubActions">
+						<template v-if="!isDownloadActionOpened">
+							<template v-if="form.fileId">
+								<NcActionButton :close-after-click="true" @click="onReExport">
+									<template #icon>
+										<IconRefresh :size="20" />
+									</template>
+									{{ t('forms', 'Re-export spreadsheet') }}
+								</NcActionButton>
+
+								<NcActionButton :close-after-click="true" @click="onUnlinkFile">
+									<template #icon>
+										<IconLinkVariantOff :size="20" />
+									</template>
+									{{ t('forms', 'Unlink spreadsheet') }}
+								</NcActionButton>
+
+								<NcActionSeparator />
 							</template>
-							{{ t('forms', 'Save CSV to Files') }}
-						</NcActionButton>
-						<NcActionButton @click="onDownloadCsv">
-							<template #icon>
-								<IconDownload :size="20" />
-							</template>
-							{{ t('forms', 'Download CSV') }}
-						</NcActionButton>
-						<NcActionButton v-if="canDeleteSubmissions" @click="deleteAllSubmissions">
-							<template #icon>
-								<IconDelete :size="20" />
-							</template>
-							{{ t('forms', 'Delete all responses') }}
-						</NcActionButton>
+
+							<NcActionButton :close-after-click="true" @click="onStoreToFiles">
+								<template #icon>
+									<IconFolder :size="20" />
+								</template>
+								{{ t('forms', 'Save copy to Files') }}
+							</NcActionButton>
+
+							<NcActionButton :close-after-click="false" @click="isDownloadActionOpened = true">
+								<template #icon>
+									<IconDownload :size="20" />
+								</template>
+								{{ t('forms', 'Download') }}
+							</NcActionButton>
+
+							<NcActionButton v-if="canDeleteSubmissions" @click="deleteAllSubmissions">
+								<template #icon>
+									<IconDelete :size="20" />
+								</template>
+								{{ t('forms', 'Delete all responses') }}
+							</NcActionButton>
+						</template>
+
+						<template v-if="isDownloadActionOpened">
+							<NcActionButton :close-after-click="false" @click="hideSubActions">
+								<template #icon>
+									<IconChevronLeft :title="t('mail', 'Download')"
+										:size="20" />
+								</template>
+								{{ t('forms', 'Download') }}
+							</NcActionButton>
+
+							<NcActionButton :close-after-click="true" @click="onDownloadFile('csv')">
+								<template #icon>
+									<IconFileDelimited :size="20" />
+								</template>
+								CSV
+							</NcActionButton>
+
+							<NcActionButton :close-after-click="true" @click="onDownloadFile('ods')">
+								<template #icon>
+									<IconTable :size="20" />
+								</template>
+								ODS
+							</NcActionButton>
+
+							<NcActionButton :close-after-click="true" @click="onDownloadFile('xlsx')">
+								<template #icon>
+									<IconFileExcel :size="20" />
+								</template>
+								XSLX
+							</NcActionButton>
+						</template>
 					</NcActions>
 				</div>
 			</header>
@@ -140,22 +233,35 @@
 import { getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
-import { generateOcsUrl } from '@nextcloud/router'
-import { basename } from 'path'
+import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator.js'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 
+import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDownload from 'vue-material-design-icons/Download.vue'
+import IconFileDelimited from 'vue-material-design-icons/FileDelimited.vue'
+import IconFileDelimitedSvg from '@mdi/svg/svg/file-delimited.svg?raw'
+import IconFileExcel from 'vue-material-design-icons/FileExcel.vue'
+import IconFileExcelSvg from '@mdi/svg/svg/file-excel.svg?raw'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
+import IconLink from 'vue-material-design-icons/Link.vue'
+import IconLinkSvg from '@mdi/svg/svg/link.svg?raw'
+import IconLinkVariantOff from 'vue-material-design-icons/LinkVariantOff.vue'
+import IconLinkVariantOffSvg from '@mdi/svg/svg/link-variant-off.svg?raw'
 import IconPoll from 'vue-material-design-icons/Poll.vue'
+import IconRefresh from 'vue-material-design-icons/Refresh.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
+import IconTable from 'vue-material-design-icons/Table.vue'
+import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
 
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
@@ -167,19 +273,31 @@ import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 
+const SUPPORTED_FILE_FORMATS = { ods: IconTableSvg, csv: IconFileDelimitedSvg, xlsx: IconFileExcelSvg }
+let fileFormat = 'csv'
+
 export default {
 	name: 'Results',
 
 	components: {
+		IconChevronLeft,
 		IconDelete,
 		IconDownload,
+		IconFileDelimited,
+		IconFileExcel,
 		IconFolder,
+		IconLink,
+		IconLinkVariantOff,
 		IconPoll,
+		IconRefresh,
 		IconShareVariant,
-		NcActions,
+		IconTable,
 		NcActionButton,
+		NcActionSeparator,
+		NcActions,
 		NcAppContent,
 		NcButton,
+		NcDialog,
 		NcEmptyContent,
 		NcLoadingIcon,
 		ResultsSummary,
@@ -191,9 +309,25 @@ export default {
 
 	data() {
 		return {
+			isDownloadActionOpened: false,
 			loadingResults: true,
-			showSummary: true,
 			picker: null,
+			showSummary: true,
+			showLinkedFileNotAvailableDialog: false,
+			linkedFileNotAvailableButtons: [
+				{
+					label: t('forms', 'Unlink spreadsheet'),
+					icon: IconLinkVariantOffSvg,
+					type: 'error',
+					callback: () => { this.onUnlinkFile() },
+				},
+				{
+					label: t('forms', 'Create spreadsheet'),
+					icon: IconLinkSvg,
+					type: 'primary',
+					callback: () => { this.onLinkFile() },
+				},
+			],
 		}
 	},
 
@@ -205,21 +339,44 @@ export default {
 		noSubmissions() {
 			return this.form.submissions?.length === 0
 		},
+
+		/**
+		 * Generate link to linked file
+		 *
+		 * @return {string}
+		 */
+		fileUrl() {
+			if (this.form.fileId) {
+				return generateUrl('/f/{fileId}', { fileId: this.form.fileId })
+			}
+			return window.location.href
+		},
 	},
 
 	watch: {
 		// Reload results, when form changes
-		hash() {
+		async hash() {
 			this.loadFormResults()
+			await this.fetchLinkedFileInfo()
 		},
 	},
 
-	beforeMount() {
+	async beforeMount() {
 		this.loadFormResults()
+		await this.fetchLinkedFileInfo()
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
+		async onUnlinkFile() {
+			await axios.post(generateOcsUrl('apps/forms/api/v2.4/form/unlink'), {
+				hash: this.form.hash,
+			})
+
+			this.form.fileFormat = null
+			this.form.fileId = null
+			this.form.filePath = null
+		},
 		async loadFormResults() {
 			this.loadingResults = true
 			logger.debug(`Loading results for form ${this.form.hash}`)
@@ -243,56 +400,78 @@ export default {
 			}
 		},
 
-		async onDownloadCsv() {
-			const exportUrl = generateOcsUrl('apps/forms/api/v2.2/submissions/export/{hash}', { hash: this.form.hash }) + '?requesttoken=' + encodeURIComponent(getRequestToken())
+		async onDownloadFile(fileFormat) {
+			const exportUrl = generateOcsUrl('apps/forms/api/v2.4/submissions/export/{hash}', { hash: this.form.hash })
+				+ '?requesttoken=' + encodeURIComponent(getRequestToken())
+				+ '&fileFormat=' + fileFormat
 			window.open(exportUrl, '_self')
 		},
 
-		// Show Filepicker, then call API to store
-		async onStoreToFiles() {
-			if (this.picker === null) {
-				this.picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
-					.setMultiSelect(false)
-					.setButtonFactory((selectedNodes, currentPath) => {
-						const path = basename(currentPath)
-						return [{
-							label: selectedNodes.length > 0
-								? t('forms', 'Save as {filename}', { filename: selectedNodes[0].basename })
-								: (path === ''
-									? t('forms', 'Save to home') // TRANSLATORS: Export the file to the home path
-									: t('forms', 'Save to {path}', { path })
-								),
-							type: 'primary',
-							callback: (selectedNodes) => this.exportResultsToFile(selectedNodes[0]?.path),
-						}]
-					})
-					.allowDirectories()
-					.build()
-			}
-
+		async onLinkFile() {
 			try {
-				await this.picker.pick()
+				await this.getPicker().pick()
+					.then(async (path) => {
+						try {
+							const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/form/link/{fileFormat}', { fileFormat }), {
+								hash: this.form.hash,
+								path,
+							})
+							const responseData = OcsResponse2Data(response)
+
+							this.form.fileFormat = responseData.fileFormat
+							this.form.fileId = responseData.fileId
+							this.form.filePath = responseData.filePath
+
+							showSuccess(t('forms', 'File {file} successfully linked', { file: responseData.fileName }))
+						} catch (error) {
+							logger.error('Error while exporting to Files and linking', { error })
+							showError(t('forms', 'There was an error while linking the file'))
+						}
+					})
 			} catch (error) {
 				// User aborted
 				logger.debug('No file selected', { error })
 			}
 		},
 
-		/**
-		 * Export results to file or directory
-		 * @param {string|undefined} path Absolut path where to export the results
-		 */
-		async exportResultsToFile(path) {
-			if (!path) {
-				showError(t('forms', 'No target selected'))
+		// Show Filepicker, then call API to store
+		async onStoreToFiles() {
+			try {
+				await this.getPicker().pick()
+					.then(async (path) => {
+						try {
+							const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/submissions/export'), { hash: this.form.hash, path, fileFormat })
+							showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+						} catch (error) {
+							logger.error('Error while exporting to Files', { error })
+							showError(t('forms', 'There was an error while exporting to Files'))
+						}
+					})
+			} catch (error) {
+				// User aborted
+				logger.debug('No file selected', { error })
+			}
+		},
+
+		async fetchLinkedFileInfo() {
+			const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id: this.form.id }))
+			const form = OcsResponse2Data(response)
+			this.$set(this.form, 'fileFormat', form.fileFormat)
+			this.$set(this.form, 'fileId', form.fileId)
+			this.$set(this.form, 'filePath', form.filePath)
+			this.showLinkedFileNotAvailableDialog = form.fileId && !form.filePath
+		},
+
+		async onReExport() {
+			if (!this.form.fileId) {
+				// Theoretically this will never fire
+				showError(t('forms', 'File is not linked'))
 				return
 			}
-
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/submissions/export'), {
-					hash: this.form.hash,
-					path,
-				})
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/submissions/export'),
+					{ hash: this.form.hash, path: this.form.filePath, fileFormat: this.form.fileFormat },
+				)
 				showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
 			} catch (error) {
 				logger.error('Error while exporting to Files', { error })
@@ -355,6 +534,70 @@ export default {
 			})
 
 			return submissions
+		},
+
+		hideSubActions() {
+			// close event is fired too early, which lead to showing main menu for few ms, so we need to wait a bit
+			setTimeout(() => {
+				this.isDownloadActionOpened = false
+			}, 100)
+		},
+
+		getPicker() {
+			if (this.picker !== null) {
+				return this.picker
+			}
+
+			this.picker = getFilePickerBuilder(t('forms', 'Choose spreadsheet location'))
+				.setMultiSelect(false)
+				.allowDirectories()
+				.setButtonFactory((selectedNodes, currentPath, currentView) => {
+					if (selectedNodes.length === 1) {
+						const extension = selectedNodes[0].extension.slice(1).toLowerCase()
+						if (SUPPORTED_FILE_FORMATS[extension]) {
+							return [{
+								label: t('forms', 'Select {file}', { file: selectedNodes[0].basename }),
+								icon: SUPPORTED_FILE_FORMATS[extension],
+								callback() {
+									fileFormat = extension
+								},
+								type: 'primary',
+							}]
+						}
+
+						return []
+					}
+
+					return [
+						{
+							label: t('forms', 'Create XLSX'),
+							icon: IconFileExcelSvg,
+							callback() {
+								fileFormat = 'xlsx'
+							},
+							type: 'secondary',
+						},
+						{
+							label: t('forms', 'Create CSV'),
+							icon: IconFileDelimitedSvg,
+							callback() {
+								fileFormat = 'csv'
+							},
+							type: 'secondary',
+						},
+						{
+							label: t('forms', 'Create ODS'),
+							icon: IconTableSvg,
+							callback() {
+								fileFormat = 'ods'
+							},
+							type: 'primary',
+						},
+					]
+				})
+				.build()
+
+			return this.picker
 		},
 	},
 }
