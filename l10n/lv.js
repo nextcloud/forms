@@ -13,6 +13,7 @@ OC.L10N.register(
     "Group" : "Grupa",
     "Share link" : "Koplietot saiti",
     "Copy to clipboard" : "Kopēt starpliktuvē",
+    "Remove link" : "Noņemt saiti",
     "Summary" : "Kopsavilkums",
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",
