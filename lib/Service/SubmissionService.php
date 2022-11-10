@@ -222,12 +222,12 @@ class SubmissionService {
 	 * Get the File ID
 	 * @param string $path The Cloud-Path to the file
 	 * @return string The File ID
-	 * 
+	 *
 	 */
 	public function getFileId(string $path): string {
 		$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
 
-		$fileId=$node->getId();
+		$fileId = $node->getId();
 
 		return $fileId;
 	}
@@ -249,12 +249,10 @@ class SubmissionService {
 		$questions = $this->questionMapper->findByForm($form->getId());
 		$defaultTimeZone = date_default_timezone_get();
 
-		if($this->currentUser==null){
+		if ($this->currentUser == null) {
 			$userTimezone = $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
-		}
-		else{
+		} else {
 			$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
-
 		}
 		// Process initial header
 		$header = [];

@@ -248,7 +248,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/fileId/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v3'
+				'apiVersion' => 'v2'
 			]
 		],
 		[
@@ -256,7 +256,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/unlink',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v3'
+				'apiVersion' => 'v2'
 			]
 		],
 		[

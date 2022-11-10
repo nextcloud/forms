@@ -61,11 +61,29 @@
 						{{ t('forms', 'Responses') }}
 					</label>
 				</div>
+				<NcButton v-if="isLinked" :href="fileUrl" type="tertiary-no-background">
+					<template #icon>
+						<IconTable :size="20" />
+					</template>
+					{{ t('forms', 'Open spreadsheet') }}
+				</NcButton>
+				<NcButton v-else type="tertiary-no-background" @click="onLinkFile">
+					<template #icon>
+						<IconTable :size="20" />
+					</template>
+					{{ t('forms', 'Create spreadsheet') }}
+				</NcButton>
 
 				<!-- Action menu for CSV export and deletion -->
 				<NcActions class="results-menu"
 					:aria-label="t('forms', 'Options')"
 					:force-menu="true">
+					<NcActionButton :disabled="!isLinked" @click="unlinkFile">
+						<template #icon>
+							<IconLinkVariantOff :size="20" />
+						</template>
+						{{ t('forms', 'Unlink spreadsheet') }}
+					</NcActionButton>
 					<NcActionButton :close-after-click="true" @click="onStoreToFiles">
 						<template #icon>
 							<IconFolder :size="20" />
@@ -78,26 +96,6 @@
 						</template>
 						{{ t('forms', 'Download CSV') }}
 					</NcActionLink>
-					<NcActionLink :href="fileUrl" v-if="isLinked">
-						<template #icon>
-							<IconFolderOpenVariant :size="20" />
-
-						</template>
-						{{ t('forms', 'Open spreadSheet') }}
-					</NcActionLink>
-					<NcActionButton v-else @click="onLinkFile">
-						<template #icon>
-							<IconLinkVariant :size="20" />
-
-						</template>
-						{{ t('forms', 'Link to a spreadsheet') }}
-					</NcActionButton>
-					<NcActionButton :disabled="!isLinked" @click="unlinkFile">
-						<template #icon>
-							<IconLinkVariantOff :size="20" />
-						</template>
-						{{ t('forms', 'Unlink the spreadsheet') }}
-					</NcActionButton>
 					<NcActionButton @click="deleteAllSubmissions">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -151,6 +149,7 @@ import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
+
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
@@ -163,11 +162,8 @@ import IconDownload from 'vue-material-design-icons/Download.vue'
 import IconFolder from 'vue-material-design-icons/Folder.vue'
 import IconPoll from 'vue-material-design-icons/Poll.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
-import IconLinkVariant from 'vue-material-design-icons/LinkVariant.vue'
+import IconTable from 'vue-material-design-icons/Table.vue'
 import IconLinkVariantOff from 'vue-material-design-icons/LinkVariantOff.vue'
-
-import IconFolderOpenVariant from 'vue-material-design-icons/FolderOpen.vue'
-
 
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
@@ -188,15 +184,13 @@ const picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
 export default {
 	name: 'Results',
 
-
 	components: {
 		IconDelete,
 		IconDownload,
 		IconFolder,
 		IconPoll,
 		IconShareVariant,
-		IconLinkVariant,
-		IconFolderOpenVariant,
+		IconTable,
 		IconLinkVariantOff,
 		NcActions,
 		NcActionButton,
@@ -217,7 +211,7 @@ export default {
 			loadingResults: true,
 			showSummary: true,
 			isLinked: false,
-			fileID: ''
+			fileID: '',
 		}
 	},
 
@@ -252,8 +246,8 @@ export default {
 		 * @return {string}
 		 */
 		fileUrl() {
-			if(!!this.fileID){
-				return generateUrl(`/f/${this.fileID.data.ocs.data}`)
+			if (this.fileID != null) {
+				return generateUrl(`/f/${this.fileID?.data?.ocs?.data}`)
 			}
 			return window.location.href
 		},
@@ -270,19 +264,19 @@ export default {
 		this.loadFormResults()
 		SetWindowTitle(this.formTitle)
 		this.isLinked = await this.isFileLinked()
-		this.fileID = await axios.get(generateOcsUrl(`apps/forms/api/v3/submissions/fileId/${this.form.hash}`));
+		this.fileID = await axios.get(generateOcsUrl(`apps/forms/api/v2/submissions/fileId/${this.form.hash}`))
 	},
 
 	methods: {
-		async unlinkFile(){
-			await axios.post(generateOcsUrl('apps/forms/api/v3/submissions/unlink'),{
-				hash: this.form.hash
+		async unlinkFile() {
+			await axios.post(generateOcsUrl('apps/forms/api/v2/submissions/unlink'), {
+				hash: this.form.hash,
 			})
 			this.isLinked = await this.isFileLinked()
 		},
-		async isFileLinked(){
-			const fileId = await axios.get(generateOcsUrl(`apps/forms/api/v3/submissions/fileId/${this.form.hash}`))
-			return !!fileId.data.ocs.data;
+		async isFileLinked() {
+			const fileId = await axios.get(generateOcsUrl(`apps/forms/api/v2/submissions/fileId/${this.form.hash}`))
+			return fileId?.data?.ocs?.data != null
 		},
 		async loadFormResults() {
 			this.loadingResults = true
@@ -308,23 +302,23 @@ export default {
 		},
 
 		async onLinkFile() {
-			if(!this.isLinked) {
+			if (!this.isLinked) {
 				picker.pick()
 					.then(async (path) => {
 						try {
 							 await axios.post(generateOcsUrl('apps/forms/api/v2/submissions/link'), {
 								 hash: this.form.hash,
-								 path
+								 path,
 							})
-							this.isLinked = true;
-							this.fileID =  await axios.get(generateOcsUrl(`apps/forms/api/v3/submissions/fileId/${this.form.hash}`));
+							this.isLinked = true
+							this.fileID = await axios.get(generateOcsUrl(`apps/forms/api/v2/submissions/fileId/${this.form.hash}`))
 							showSuccess(t('forms', 'File successfully linked'))
 						} catch (error) {
 							logger.error('Error while exporting to Files and linking', { error })
 							showError(t('forms', 'There was an error, while Linking the File'))
 						}
 					})
-			}else{
+			} else {
 				// Theoretically this will never fire
 				showSuccess(t('forms', 'File is already linked'))
 			}

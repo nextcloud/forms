@@ -348,7 +348,7 @@ class ApiController extends OCSController {
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException 
+	 * @throws OCSForbiddenException
 	 */
 	public function updateForm(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: FormId: {id}, values: {keyValuePairs}', [
@@ -1000,8 +1000,8 @@ class ApiController extends OCSController {
 		$hash = $form->getHash();
 		$ownerId = $form->getOwnerId();
 
-		if($form->getFileId() !=null){
-			$this->submissionService->updateOnSave($hash, $filePath,$ownerId );
+		if ($form->getFileId() != null) {
+			$this->submissionService->updateOnSave($hash, $filePath, $ownerId);
 		}
 		return new DataResponse();
 	}
@@ -1152,13 +1152,13 @@ class ApiController extends OCSController {
 	 * @param string $hash of the form
 	 * @return DataResponse
 	 */
-	public function getFileID(string $hash): DataResponse{
+	public function getFileID(string $hash): DataResponse {
 		$form = $this->formMapper->findByHash($hash);
-		$fileID =$form->getFileId();
+		$fileID = $form->getFileId();
 		return new DataResponse($fileID);
 	}
 
-	public function unlinkFile(string $hash): DataResponse{
+	public function unlinkFile(string $hash): DataResponse {
 		$form = $this->formMapper->findByHash($hash);
 		$form->setFileId(null);
 		$this->formMapper->update($form);
@@ -1175,7 +1175,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function linkFile(string $hash, string $path) :DataResponse{
+	public function linkFile(string $hash, string $path) :DataResponse {
 		$this->logger->debug('Linking file for form: {hash} to Cloud at: /{path}', [
 			'hash' => $hash,
 			'path' => $path,
@@ -1190,11 +1190,11 @@ class ApiController extends OCSController {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
-				$this->exportSubmissionsToCloud($hash,$path);
-				$fileId= $this->submissionService->getFileId($path);
-				$form->setFileId($fileId); 
-				$form->setFilePath($path);
-				$this->formMapper->update($form);
-				return new DataResponse($fileId);
+		$this->exportSubmissionsToCloud($hash, $path);
+		$fileId = $this->submissionService->getFileId($path);
+		$form->setFileId($fileId);
+		$form->setFilePath($path);
+		$this->formMapper->update($form);
+		return new DataResponse($fileId);
 	}
 }

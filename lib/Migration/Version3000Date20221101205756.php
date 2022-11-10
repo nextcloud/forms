@@ -52,6 +52,7 @@ class Version3000Date20221101205756 extends SimpleMigrationStep {
 		$table->addColumn('file_id', Types::STRING, [
 			'notnull' => false,
 			'default' => null,
+			'length' => 64,
 		]);
 
 		$table->addColumn('file_path', Types::STRING, [
@@ -59,8 +60,5 @@ class Version3000Date20221101205756 extends SimpleMigrationStep {
 			'default' => null,
 		]);
 		return $schema;
-		
 	}
-
-
 }
