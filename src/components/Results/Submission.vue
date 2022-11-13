@@ -27,6 +27,18 @@
 				{{ submission.userDisplayName }}
 			</h3>
 			<NcActions class="submission-menu" :force-menu="true">
+				<NcActionButton :close-after-click="true" @click="onStoreToFiles">
+					<template #icon>
+						<IconFolder :size="20" />
+					</template>
+					{{ t('forms', 'Save CSV to Files') }}
+				</NcActionButton>
+				<NcActionLink :href="responseDownload">
+					<template #icon>
+						<IconDownload :size="20" />
+					</template>
+					{{ t('forms', 'Download this response') }}
+				</NcActionLink>
 				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>
 						<IconDelete :size="20" />
@@ -49,10 +61,24 @@
 <script>
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
 import moment from '@nextcloud/moment'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDownload from 'vue-material-design-icons/Download.vue'
+import IconFolder from 'vue-material-design-icons/Folder.vue'
+import { generateOcsUrl } from '@nextcloud/router'
+import axios from '@nextcloud/axios'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.js'
+import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 
 import Answer from './Answer.vue'
+
+const picker = getFilePickerBuilder(t('forms', 'Save submission to Files'))
+	.setMultiSelect(false)
+	.setType(1)
+	.allowDirectories()
+	.build()
 
 export default {
 	name: 'Submission',
@@ -60,8 +86,11 @@ export default {
 	components: {
 		Answer,
 		IconDelete,
+		IconDownload,
+		IconFolder,
 		NcActions,
 		NcActionButton,
+		NcActionLink,
 	},
 
 	props: {
@@ -80,6 +109,10 @@ export default {
 	},
 
 	computed: {
+		responseDownload() {
+			return generateOcsUrl('apps/forms/api/v2.2/submissions/exportSubmission/{submissionId}', { submissionId: this.submission.id })
+		},
+
 		// Format submission-timestamp to DateTime
 		submissionDateTime() {
 			return moment(this.submission.timestamp, 'X').format('LLLL')
@@ -112,6 +145,22 @@ export default {
 	},
 
 	methods: {
+		async onStoreToFiles() {
+			// picker.pick() does not reject Promise -> await would never resolve.
+			picker.pick()
+				.then(async (path) => {
+					try {
+						const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/submissions/exportSubmission'), {
+							submissionId: this.submission.id,
+							path,
+						})
+						showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+					} catch (error) {
+						logger.error('Error while exporting to Files', { error })
+						showError(t('forms', 'There was an error, while exporting to Files'))
+					}
+				})
+		},
 		onDelete() {
 			this.$emit('delete')
 		},

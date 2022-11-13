@@ -292,11 +292,43 @@ return [
 			]
 		],
 		[
+			'name' => 'api#exportQuestion',
+			'url' => '/api/{apiVersion}/submissions/exportQuestion/{questionId}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
+			]
+		],
+		[
+			'name' => 'api#exportSubmission',
+			'url' => '/api/{apiVersion}/submissions/exportSubmission/{submissionId}',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
+			]
+		],
+		[
 			'name' => 'api#exportSubmissionsToCloud',
 			'url' => '/api/{apiVersion}/submissions/export',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-2])?'
+			]
+		],
+		[
+			'name' => 'api#exportQuestionToCLoud',
+			'url' => '/api/{apiVersion}/submissions/exportQuestion',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
+			]
+		],
+		[
+			'name' => 'api#exportSubmissionToCloud',
+			'url' => '/api/{apiVersion}/submissions/exportSubmission',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
 			]
 		],
 		[

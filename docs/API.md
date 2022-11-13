@@ -525,6 +525,33 @@ Returns all submissions to the form in form of a csv-file.
 "jonas","Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2","Answer"
 "jonas","Friday, January 22, 2021 at 12:45:57 AM GMT+0:00","Option 3","NextAnswer"
 ```
+### Get a single Submission as csv (Download)
+Returns one submission in form of a csv-file.
+- Endpoint: `/api/v2.2/submissions//exportSubmission/{submissionId}`
+- Url-Parameter:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _submissionId_ | Integer  | Id of the submission |
+- Method: `GET`
+- Response: A Data Download Response containg the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv.
+```
+"User display name","Timestamp","Question 1","Question 2"
+"jonas","Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2","Answer"
+```
+### Get a single Question as csv (Download)
+Returns one question in form of a csv-file.
+- Endpoint: `/api/v2.2/submissions//exportQuestion/{questionId}`
+- Url-Parameter:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _questionId_ | Integer  | Id of the question |
+- Method: `GET`
+- Response: A Data Download Response containg the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv.
+```
+"User display name","Timestamp","Question 1"
+"jonas","Friday, January 22, 2021 at 12:47:29 AM GMT+0:00","Option 2"
+"jonas","Friday, January 22, 2021 at 12:45:57 AM GMT+0:00","Option 3"
+```
 
 ### Export Submissions to Cloud (Files-App)
 Creates a csv file and stores it to the cloud, resp. Files-App.
@@ -534,6 +561,32 @@ Creates a csv file and stores it to the cloud, resp. Files-App.
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
   | _hash_    | String  | Hash of the form to get the submissions for |
+  | _path_    | String  | Path within User-Dir, to store the file to |
+- Response: Stores the file to the given path and returns the fileName.
+```
+"data": "Form 2 (responses).csv"
+```
+### Export Submission to Cloud (Files-App)
+Creates a csv file of one submission and stores it to the cloud, resp. Files-App.
+- Endpoint: `/api/v2.2/submissions/exportSubmission`
+- Method: `POST`
+- Parameters:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _submissionId_ | Integer  | Id of the submission |
+  | _path_    | String  | Path within User-Dir, to store the file to |
+- Response: Stores the file to the given path and returns the fileName.
+```
+"data": "Form 2 (responses).csv"
+```
+### Export Question to Cloud (Files-App)
+Creates a csv file of one question answers and stores it to the cloud, resp. Files-App.
+- Endpoint: `/api/v2.2/submissions/exportQuestion`
+- Method: `POST`
+- Parameters:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _questionId_ | Integer  | Id of the question |
   | _path_    | String  | Path within User-Dir, to store the file to |
 - Response: Stores the file to the given path and returns the fileName.
 ```

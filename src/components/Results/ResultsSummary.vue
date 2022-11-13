@@ -22,9 +22,26 @@
 
 <template>
 	<div class="section question-summary">
-		<h3 dir="auto">
-			{{ question.text }}
-		</h3>
+		<div class="question-actions">
+			<h3 dir="auto">
+				{{ question.text }}
+			</h3>
+			<NcActions :aria-label="t('forms', 'Options')" :force-menu="true">
+				<NcActionButton :close-after-click="true" @click="onStoreToFiles">
+					<template #icon>
+						<IconFolder :size="20" />
+					</template>
+					{{ t('forms', 'Save CSV to Files') }}
+				</NcActionButton>
+				<NcActionLink :href="questionDownload">
+					<template #icon>
+						<IconDownload :size="20" />
+					</template>
+					{{ t('forms', 'Download question CSV') }}
+				</NcActionLink>
+			</NcActions>
+		</div>
+
 		<p class="question-summary__detail">
 			{{ answerTypes[question.type].label }}
 		</p>
@@ -61,10 +78,33 @@
 
 <script>
 import answerTypes from '../../models/AnswerTypes.js'
+import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import IconDownload from 'vue-material-design-icons/Download.vue'
+import IconFolder from 'vue-material-design-icons/Folder.vue'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
+import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
+import { generateOcsUrl } from '@nextcloud/router'
+import axios from '@nextcloud/axios'
+import logger from '../../utils/Logger.js'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+
+export const picker = getFilePickerBuilder(t('forms', 'Save question to Files'))
+	.setMultiSelect(false)
+	.setType(1)
+	.allowDirectories()
+	.build()
 
 export default {
 	name: 'ResultsSummary',
 
+	components: {
+		IconDownload,
+		IconFolder,
+		NcActionButton,
+		NcActionLink,
+		NcActions,
+	},
 	props: {
 		submissions: {
 			type: Array,
@@ -178,11 +218,36 @@ export default {
 
 			return textAnswers
 		},
+		questionDownload() {
+			return generateOcsUrl('apps/forms/api/v2.2/submissions/exportQuestion/{questionId}', { questionId: this.question.id })
+		},
+	},
+	methods: {
+		async onStoreToFiles() {
+			// picker.pick() does not reject Promise -> await would never resolve.
+			picker.pick()
+				.then(async (path) => {
+					try {
+						const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/submissions/exportQuestion'), {
+							questionId: this.question.id,
+							path,
+						})
+						showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+					} catch (error) {
+						logger.error('Error while exporting to Files', { error })
+						showError(t('forms', 'There was an error, while exporting to Files'))
+					}
+				})
+		},
 	},
 }
 </script>
 
 <style lang="scss" scoped>
+.question-actions {
+		display: flex;
+		align-items: center;
+}
 .question-summary {
 	padding-inline: 44px 16px;
 

@@ -1096,7 +1096,72 @@ class ApiController extends OCSController {
 		$csv = $this->submissionService->getSubmissionsCsv($hash);
 		return new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv');
 	}
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * Export submissions of a specified Question
+	 *
+	 * @param int $questionId of the question
+	 * @return DataDownloadResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportQuestion(int $questionId): DataDownloadResponse {
+		$this->logger->debug('Export submissions for Question: {questionId}', [
+			'questionId' => $questionId,
+		]);
 
+		try {
+			$question = $this->questionMapper->findById($questionId);
+			$formId = $question->getFormId();
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->canSeeResults($form)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
+			throw new OCSForbiddenException();
+		}
+
+		$csv = $this->submissionService->getQuestionCsv($formId, $questionId);
+		return new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv');
+	}
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * Export a single submission
+	 *
+	 * @param int $submissionId of the submission
+	 * @return DataDownloadResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportSubmission(int $submissionId): DataDownloadResponse {
+		$this->logger->debug('Export submission: {submissionId}', [
+			'submissionId' => $submissionId,
+		]);
+
+		try {
+			$submission = $this->submissionMapper->findById($submissionId);
+			$formId = $submission->getFormId();
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find submission');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->canSeeResults($form)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
+			throw new OCSForbiddenException();
+		}
+
+		$csv = $this->submissionService->getSubmissionCsv($formId, $submissionId);
+		return new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv');
+	}
 	/**
 	 * @CORS
 	 * @NoAdminRequired
@@ -1129,9 +1194,97 @@ class ApiController extends OCSController {
 
 		// Write file to cloud
 		try {
-			$fileName = $this->submissionService->writeCsvToCloud($hash, $path);
+			$csvData = $this->submissionService->getSubmissionsCsv($hash);
+			$fileName = $this->submissionService->writeCsvToCloud($csvData, $path);
 		} catch (NotPermittedException $e) {
 			$this->logger->debug('Failed to export Submissions: Not allowed to write to file');
+			throw new OCSException('Not allowed to write to file.');
+		}
+
+		return new DataResponse($fileName);
+	}
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Export Submission to the Cloud
+	 *
+	 * @param int $submissionId of the submission
+	 * @param string $path The Cloud-Path to export to
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportSubmissionToCloud(int $submissionId, string $path) {
+		$this->logger->debug('Export submission: {submissionId} to Cloud at: /{path}', [
+			'$submissionId' => $submissionId,
+			'path' => $path,
+		]);
+
+		try {
+			$submission = $this->submissionMapper->findById($submissionId);
+			$formId = $submission->getFormId();
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find submission');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->canSeeResults($form)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
+			throw new OCSForbiddenException();
+		}
+
+		// Write file to cloud
+		try {
+			$csvData = $this->submissionService->getSubmissionCsv($formId, $submissionId);
+			$fileName = $this->submissionService->writeCsvToCloud($csvData, $path);
+		} catch (NotPermittedException $e) {
+			$this->logger->debug('Failed to export Submission: Not allowed to write to file');
+			throw new OCSException('Not allowed to write to file.');
+		}
+
+		return new DataResponse($fileName);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Export Question to the Cloud
+	 *
+	 * @param int $questionId of the question
+	 * @param string $path The Cloud-Path to export to
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportQuestionToCLoud(int $questionId, string $path) {
+		$this->logger->debug('Export question : {questionId} to Cloud at: /{path}', [
+			'questionId' => $questionId,
+			'path' => $path,
+		]);
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+			$formId = $question->getFormId();
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find submission');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->canSeeResults($form)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
+			throw new OCSForbiddenException();
+		}
+
+		// Write file to cloud
+		try {
+			$csvData = $this->submissionService->getQuestionCsv($formId, $questionId);
+			$fileName = $this->submissionService->writeCsvToCloud($csvData, $path);
+		} catch (NotPermittedException $e) {
+			$this->logger->debug('Failed to export Question: Not allowed to write to file');
 			throw new OCSException('Not allowed to write to file.');
 		}
 
