@@ -185,6 +185,28 @@ class ApiController extends OCSController {
 	/**
 	 * @NoAdminRequired
 	 *
+	 * Read List of forms shared with current user
+	 * Return only with necessary information and editing enabled for Listing.
+	 * @return DataResponse
+	 */
+	public function getCollaborationForms(): DataResponse {
+		$forms = $this->formMapper->findAll();
+
+		$result = [];
+		foreach ($forms as $form) {
+			// Check if the form should be shown on sidebar
+			if (!$this->formsService->isSharedCollaborationFormShown($form->getId())) {
+				continue;
+			}
+			$result[] = $this->formsService->getPartialFormArray($form->getId());
+		}
+
+		return new DataResponse($result);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
 	 * Get a partial form by its hash. Implicitely checks, if the user has access.
 	 *
 	 * @param string $hash The form hash
@@ -363,7 +385,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($form->getId())) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
@@ -460,7 +482,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($form->getId())) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
@@ -610,7 +632,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Could not find form or question');
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($form->getId())) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
@@ -716,7 +738,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Could not find form or question');
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($form->getId())) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
@@ -757,7 +779,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Could not find option, question or form');
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($form->getId())) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
@@ -836,7 +858,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($form->getId())) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}

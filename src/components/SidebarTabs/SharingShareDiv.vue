@@ -30,11 +30,17 @@
 			<span>{{ displayNameAppendix }}</span>
 		</div>
 		<NcActions class="share-div__actions">
+			<NcActionRadio name="shareType" :checked="true" @update:checked="setResponder">
+				{{ t('forms', 'Responder') }}
+			</NcActionRadio>
+			<NcActionRadio name="shareType" @update:checked="setEditor">
+				{{ t('forms', 'Editor') }}
+			</NcActionRadio>
 			<NcActionButton @click="removeShare">
 				<template #icon>
 					<IconClose :size="20" />
 				</template>
-				{{ t('forms', 'Delete') }}
+				{{ t('forms', 'Unshare') }}
 			</NcActionButton>
 		</NcActions>
 	</li>
@@ -44,6 +50,7 @@
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar.js'
+import NcActionRadio from '@nextcloud/vue/dist/Components/NcActionRadio.js'
 import IconClose from 'vue-material-design-icons/Close.vue'
 
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -53,6 +60,7 @@ export default {
 		IconClose,
 		NcActions,
 		NcActionButton,
+		NcActionRadio,
 		NcAvatar,
 	},
 
@@ -81,6 +89,13 @@ export default {
 		removeShare() {
 			this.$emit('remove-share', this.share)
 		},
+		setResponder() {
+			this.$emit('set-responder', this.share)
+		},
+		setEditor() {
+			this.$emit('set-editor', this.share)
+		},
+
 	},
 
 }

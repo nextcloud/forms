@@ -271,10 +271,21 @@ class FormsService {
 		}
 
 		$permissions = [];
+
+		if ($this->isSharedToUserForCollaboration($formId)) {
+			$permissions[] = Constants::PERMISSION_EDIT;
+			$permissions[] = Constants::PERMISSION_RESULTS;
+			$permissions[] = Constants::PERMISSION_SUBMIT;
+		
+			return $permissions;
+		}
+		
 		// Add submit permission if user has access.
 		if ($this->hasUserAccess($formId)) {
 			$permissions[] = Constants::PERMISSION_SUBMIT;
 		}
+
+	
 
 		return $permissions;
 	}
@@ -365,6 +376,9 @@ class FormsService {
 		if ($this->isSharedToUser($formId)) {
 			return true;
 		}
+		if ($this->isSharedToUserForCollaboration($formId)) {
+			return true;
+		}
 
 		// None of the possible access-options matched.
 		return false;
@@ -382,6 +396,10 @@ class FormsService {
 
 		// Dont show here to owner, as its in the owned list anyways.
 		if ($form->getOwnerId() === $this->currentUser->getUID()) {
+			return false;
+		}
+		//don't show forms share for collaboration
+		if ($this->isSharedCollaborationFormShown($formId)) {
 			return false;
 		}
 
@@ -405,7 +423,55 @@ class FormsService {
 		// No Reason found to show form.
 		return false;
 	}
+	/**
+	 * Is the form shown on sidebar for collaboration to the user.
+	 *
+	 * @param int $formId
+	 * @return bool
+	 */
+	public function isSharedCollaborationFormShown(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
 
+		// Dont show here to owner, as its in the owned list anyways.
+		if ($form->getOwnerId() === $this->currentUser->getUID()) {
+			return false;
+		}
+
+		// Dont show expired forms.
+		if ($this->hasFormExpired($form->getId())) {
+			return false;
+		}
+
+		// Shown if user in List of Shared Users/Groups
+		if ($this->isSharedToUserForCollaboration($formId)) {
+			return true;
+		}
+
+		// No Reason found to show form.
+		return false;
+	}
+
+	/**
+	 * Is user allowed to edit a form and its components.
+	 *
+	 * @param int $formId
+	 * @return bool
+	 */
+	public function isAllowedToEdit(int $formId): bool {
+		$form = $this->formMapper->findById($formId);
+
+		// Form owner can edit it.
+		if ($form->getOwnerId() === $this->currentUser->getUID()) {
+			return true;
+		}
+		// A collaborator can also edit and its components
+		if ($this->isSharedToUserForCollaboration($formId)) {
+			return true;
+		}
+
+		// No Reason found to allwow form edit.
+		return false;
+	}
 	/**
 	 * Checking all selected shares
 	 *
@@ -420,7 +486,7 @@ class FormsService {
 			// Needs different handling for shareTypes
 			switch ($share['shareType']) {
 				case IShare::TYPE_USER:
-					if ($share['shareWith'] === $this->currentUser->getUID()) {
+					if ($share['shareWith'] === $this->currentUser->getUID() && !$share['isEditor']) {
 						return true;
 					}
 					break;
@@ -436,6 +502,44 @@ class FormsService {
 
 		// No share found.
 		return false;
+	}
+	/**
+	 * Checking all selected shares
+	 *
+	 * @param $formId
+	 * @return bool
+	 */
+	public function isSharedToUserForCollaboration(int $formId): bool {
+		$shareEntities = $this->shareMapper->findByForm($formId);
+		foreach ($shareEntities as $shareEntity) {
+			$share = $shareEntity->read();
+			// if share type is user and the form is share to current user with editor privileges return true
+			if ($share['isEditor'] && $share['shareType'] === IShare::TYPE_USER && $share['shareWith'] === $this->currentUser->getUID()) {
+				return true;
+			}
+		}
+		// No share found.
+		return false;
+	}
+
+	/**
+	 * get Share id from form id and user id
+	 *
+	 * @param $formId
+	 * @param $uid id of the user
+	 * @return int
+	 */
+	public function getShareByFromIdAndUserid(int $formId, string $uid): int {
+		$shareEntities = $this->shareMapper->findByForm($formId);
+		foreach ($shareEntities as $shareEntity) {
+			$share = $shareEntity->read();
+			// if share type is user and the form is share to current user return the share id
+			if ($share['shareType'] === IShare::TYPE_USER && $share['shareWith'] === $uid) {
+				return $share['id'];
+			}
+		}
+		// No share found.
+		return -1;
 	}
 
 	/*

@@ -152,7 +152,9 @@
 			<SharingShareDiv v-for="share in sortedShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
-				@remove-share="removeShare" />
+				@remove-share="removeShare"
+				@set-responder="setResponder"
+				@set-editor="setEditor" />
 		</TransitionGroup>
 	</div>
 </template>
@@ -294,6 +296,41 @@ export default {
 				showError(t('forms', 'There was an error while removing the share'))
 			} finally {
 				this.isLoading = false
+			}
+		},
+		/**
+		 *
+		 * set as Responder
+		 *
+		 * @param {object} share the share of the user to set as responder
+		 */
+		async setResponder(share) {
+			try {
+				await axios.post(generateOcsUrl('apps/forms/api/v2/share/toggleEditor'), {
+					formId: this.form.id,
+					isEditor: false,
+					uid: share.shareWith,
+				})
+			} catch (error) {
+				logger.error('Error while setting share as responder', { error, share })
+				showError(t('forms', 'There while setting share as responder'))
+			}
+		},
+		/**
+		 * set as Responder
+		 *
+		 * @param {object} share the share of the user to set as an editor
+		 */
+		async setEditor(share) {
+			try {
+				await axios.post(generateOcsUrl('apps/forms/api/v2/share/toggleEditor'), {
+					formId: this.form.id,
+					isEditor: true,
+					uid: share.shareWith,
+				})
+			} catch (error) {
+				logger.error('Error while setting share as responder', { error, share })
+				showError(t('forms', 'There while setting share as responder'))
 			}
 		},
 

@@ -131,6 +131,14 @@ return [
 				'apiVersion' => 'v2'
 			]
 		],
+		[
+			'name' => 'api#getCollaborationForms',
+			'url' => '/api/{apiVersion}/collaboration_forms',
+			'verb' => 'GET',
+			'requirements' => [
+				'apiVersion' => 'v2'
+			]
+		],
 
 		// Questions
 		[
@@ -205,6 +213,14 @@ return [
 			'name' => 'shareApi#deleteShare',
 			'url' => '/api/{apiVersion}/share/{id}',
 			'verb' => 'DELETE',
+			'requirements' => [
+				'apiVersion' => 'v2'
+			]
+		],
+		[
+			'name' => 'shareApi#toggleEditor',
+			'url' => '/api/{apiVersion}/share/toggleEditor',
+			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2'
 			]

@@ -35,6 +35,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setShareType(integer $value)
  * @method string getShareWith()
  * @method void setShareWith(string $value)
+ * @method string getIsEditor()
+ * @method void setIsEditor(bool $value)
  */
 class Share extends Entity {
 	/** @var int */
@@ -43,6 +45,8 @@ class Share extends Entity {
 	protected $shareType;
 	/** @var string */
 	protected $shareWith;
+	/** @var bool */
+	protected $isEditor;
 
 	/**
 	 * Option constructor.
@@ -51,6 +55,7 @@ class Share extends Entity {
 		$this->addType('formId', 'integer');
 		$this->addType('shareType', 'integer');
 		$this->addType('shareWith', 'string');
+		$this->addType('isEditor', 'bool');
 	}
 
 	public function read(): array {
@@ -59,6 +64,7 @@ class Share extends Entity {
 			'formId' => $this->getFormId(),
 			'shareType' => $this->getShareType(),
 			'shareWith' => $this->getShareWith(),
+			'isEditor' => $this->getIsEditor(),
 		];
 	}
 }

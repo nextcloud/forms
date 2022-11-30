@@ -146,7 +146,7 @@ class ShareApiController extends OCSController {
 		}
 
 		// Check for permission to share form
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+		if (!$this->formsService->isAllowedToEdit($formId)) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
 		}
@@ -243,5 +243,57 @@ class ShareApiController extends OCSController {
 		$this->shareMapper->deleteById($id);
 
 		return new DataResponse($id);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * toggle editor role in shares
+	 *
+	 * @param int $id of the share to update
+	 * @param bool $isEditor state of the editor role
+	 * @param bool $uid id of the shared with user
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function toggleEditor(int $formId, bool $isEditor, string $uid): DataResponse {
+		$this->logger->debug('updating editor role in share: {id} to {isEditor} for user: {uid}', [
+			'id' => $id,
+			'isEditor' => $isEditor,
+			'uid' => $uid
+		]);
+		$shareId = $this->formsService->getShareByFromIdAndUserid($formId, $uid);
+		if ($shareId < 0) {
+			$shareData = $this->newShare($formId, IShare::TYPE_USER, $uid);
+			if ($isEditor) {
+				$share = Share::fromParams($shareData);
+				$share->setIsEditor($isEditor);
+				$this->shareMapper->update($share);
+			}
+			return new DataResponse($share->getId());
+		} else {
+			try {
+				$share = $this->shareMapper->findById($shareId);
+				$form = $this->formMapper->findById($formId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find share', ['exception' => $e]);
+				throw new OCSBadRequestException('Could not find share');
+			}
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($share->getIsEditor() !== $isEditor) {
+			$share->setIsEditor($isEditor);
+			$this->shareMapper->update($share);
+			return new DataResponse($share->getId());
+		}
+		$this->logger->debug('Share is already in the required state.');
+
+		return new DataResponse($share->getId());
 	}
 }
