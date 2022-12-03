@@ -49,6 +49,7 @@
 					:key="form.id"
 					:form="form"
 					:read-only="true"
+					@open-sharing="openSharing"
 					@mobile-close-navigation="mobileCloseNavigation" />
 			</template>
 		</NcAppNavigation>
@@ -92,9 +93,9 @@
 			<router-view :form.sync="selectedForm"
 				:sidebar-opened.sync="sidebarOpened"
 				@open-sharing="openSharing" />
-			<router-view v-if="!selectedForm.partial"
+			<router-view v-if="!selectedForm.partial && canEdit"
 				:form="selectedForm"
-				:opened.sync="sidebarOpened"
+				:sidebar-opened.sync="sidebarOpened"
 				:active.sync="sidebarActive"
 				name="sidebar" />
 		</template>
@@ -158,6 +159,9 @@ export default {
 	},
 
 	computed: {
+		canEdit() {
+			return this.selectedForm.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+		},
 		hasForms() {
 			return !this.noOwnedForms || !this.noSharedForms
 		},
@@ -236,7 +240,7 @@ export default {
 		 * @param {string} hash the hash of the form to load
 		 */
 		openSharing(hash) {
-			if (hash !== this.routeHash || this.$route.name !== 'edit') {
+			if (hash !== this.routeHash) {
 				this.$router.push({ name: 'edit', params: { hash } })
 			}
 			this.sidebarActive = 'forms-sharing'

@@ -161,13 +161,6 @@ export default {
 
 	mixins: [ViewsMixin],
 
-	props: {
-		sidebarOpened: {
-			type: Boolean,
-			required: true,
-		},
-	},
-
 	data() {
 		return {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
@@ -258,9 +251,6 @@ export default {
 		onDescChange() {
 			this.autoSizeDescription()
 			this.saveDescription()
-		},
-		onSidebarChange(newState) {
-			this.$emit('update:sidebarOpened', newState)
 		},
 
 		/**

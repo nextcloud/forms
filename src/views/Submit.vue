@@ -32,6 +32,8 @@
 	<NcAppContent v-else :class="{'app-content--public': publicView}">
 		<TopBar v-if="!publicView"
 			:permissions="form?.permissions"
+			:sidebar-opened="sidebarOpened"
+			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 
 		<!-- Forms title & description-->

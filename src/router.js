@@ -63,15 +63,21 @@ export default new Router({
 		},
 		{
 			path: '/:hash/results',
-			component: Results,
+			components: {
+				default: Results,
+				sidebar: Sidebar,
+			},
 			name: 'results',
-			props: true,
+			props: { default: true },
 		},
 		{
 			path: '/:hash/submit',
-			component: Submit,
+			components: {
+				default: Submit,
+				sidebar: Sidebar,
+			},
 			name: 'submit',
-			props: true,
+			props: { default: true },
 		},
 	],
 })
