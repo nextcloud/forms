@@ -10,6 +10,8 @@ OC.L10N.register(
     "Delete" : "Устгах",
     "Group" : "Бүлэг",
     "Share link" : "Холбоос хуваалцах",
+    "Edit" : "засварлах",
+    "Share" : "Түгээх",
     "Summary" : "Хураангуй",
     "Sharing" : "Түгээх",
     "Settings" : "Тохиргоо",

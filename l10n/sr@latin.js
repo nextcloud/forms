@@ -8,6 +8,8 @@ OC.L10N.register(
     "Delete" : "Obriši",
     "Group" : "Group",
     "Share link" : "Podeli vezu",
+    "Edit" : "Izmeni",
+    "Share" : "Podeli",
     "Sharing" : "Deljenje",
     "Settings" : "Поставке",
     "Date" : "Date"

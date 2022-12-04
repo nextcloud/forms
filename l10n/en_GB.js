@@ -98,6 +98,8 @@ OC.L10N.register(
     "There was an error while adding the link" : "There was an error while adding the link",
     "There was an error while removing the share" : "There was an error while removing the share",
     "View form" : "View form",
+    "View" : "View",
+    "Edit" : "Edit",
     "Toggle settings" : "Toggle settings",
     "Loading {title} …" : "Loading {title} …",
     "Form title" : "Form title",

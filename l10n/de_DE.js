@@ -98,6 +98,8 @@ OC.L10N.register(
     "There was an error while adding the link" : "Fehler beim Hinzufügen des Links",
     "There was an error while removing the share" : "Fehler beim Entfernen der Freigabe",
     "View form" : "Formular ansehen",
+    "View" : "Ansehen",
+    "Show results" : "Ergebnisse anzeigen",
     "Toggle settings" : "Einstellungen umschalten",
     "Loading {title} …" : "Lade {title}…",
     "Form title" : "Formulartitel",

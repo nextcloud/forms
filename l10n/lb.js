@@ -9,6 +9,8 @@ OC.L10N.register(
     "Delete" : "Läschen",
     "Group" : "Grupp",
     "Share link" : "Link deelen",
+    "Edit" : "Änneren",
+    "Share" : "Deelen",
     "Sharing" : "Gedeelt",
     "Settings" : "Astellungen",
     "Date" : "Date",

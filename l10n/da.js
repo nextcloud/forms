@@ -17,6 +17,7 @@ OC.L10N.register(
     "Share link" : "Del link",
     "Copy to clipboard" : "Kopier til udklipsholder",
     "Internal link" : "Internt link",
+    "View" : "Vis",
     "Summary" : "Oversigt",
     "Options" : "Valgmuligheder",
     "Delete all responses" : "Slet alle svar",

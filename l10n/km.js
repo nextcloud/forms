@@ -7,6 +7,8 @@ OC.L10N.register(
     "Delete" : "លុប",
     "Group" : "Group",
     "Share link" : "Share link",
+    "Edit" : "កែប្រែ",
+    "Share" : "ចែក​រំលែក",
     "Options" : "ជម្រើស",
     "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",

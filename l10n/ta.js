@@ -8,6 +8,8 @@ OC.L10N.register(
     "Delete" : "நீக்குக",
     "Group" : "Group",
     "Share link" : "Share link",
+    "Edit" : "தொகுக்க",
+    "Share" : "பகிர்வு",
     "Settings" : "அமைப்புகள்",
     "Date" : "Date"
 },

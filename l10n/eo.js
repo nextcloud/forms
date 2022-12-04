@@ -15,6 +15,8 @@ OC.L10N.register(
     "Add link" : "Aldoni ligilon",
     "Copy to clipboard" : "Kopii tondejen",
     "Internal link" : "Interna ligilo",
+    "View" : "Vidi",
+    "Edit" : "Modifi",
     "Summary" : "Resumo",
     "Sharing" : "Kunhavigo",
     "Settings" : "Agordoj",

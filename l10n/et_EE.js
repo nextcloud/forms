@@ -14,6 +14,8 @@ OC.L10N.register(
     "Add link" : "Lisa link",
     "Copy to clipboard" : "Kopeeri lõikepuhvrisse",
     "Internal link" : "Sisemine link",
+    "Edit" : "Redigeeri",
+    "Share" : "Jaga",
     "Summary" : "Kokkuvõte",
     "Sharing" : "Jagamine",
     "Settings" : "Seaded",

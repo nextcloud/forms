@@ -46,6 +46,8 @@ OC.L10N.register(
     "Group" : "Grupo",
     "Share link" : "Compartir enlace",
     "Copy to clipboard" : "Copiar al portapapeles",
+    "View" : "Ver",
+    "Edit" : "Editar",
     "Loading {title} …" : "Cargando {título}",
     "Form title" : "Título del formulario",
     "Add a question" : "Agregar una pregunta",

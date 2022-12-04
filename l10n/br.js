@@ -11,6 +11,7 @@ OC.L10N.register(
     "Group" : "Stollad",
     "Share link" : "Lodañ al liamm",
     "Add link" : "Ouzhpnna ul liamm",
+    "View" : "Gwell",
     "Summary" : "Diverrañ",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",

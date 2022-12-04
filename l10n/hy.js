@@ -8,6 +8,8 @@ OC.L10N.register(
     "Delete" : "հեռացնել",
     "Group" : "Խումբ",
     "Share link" : "Կիսվել հղմամբ",
+    "Edit" : "մշակել",
+    "Share" : "Կիսվել",
     "Settings" : "կարգավորումներ",
     "Date" : "Date",
     "Time" : "Ժամ"

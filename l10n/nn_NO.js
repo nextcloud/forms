@@ -10,6 +10,8 @@ OC.L10N.register(
     "Delete" : "Slett",
     "Group" : "Gruppe",
     "Share link" : "Del lenkje",
+    "Edit" : "Rediger",
+    "Share" : "Del",
     "Summary" : "Oppsumering",
     "Sharing" : "Deling",
     "Settings" : "Instillingar",

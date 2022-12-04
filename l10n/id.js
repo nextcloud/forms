@@ -10,6 +10,8 @@ OC.L10N.register(
     "Group" : "Grup",
     "Share link" : "Bagikan tautan",
     "Add link" : "Tambah tautan",
+    "Edit" : "Sunting",
+    "Share" : "Bagikan",
     "Summary" : "Kesimpulan",
     "Options" : "Pilihan",
     "Sharing" : "Berbagi",

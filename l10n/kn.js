@@ -7,6 +7,8 @@ OC.L10N.register(
     "Delete" : "﻿ಅಳಿಸಿ",
     "Group" : "﻿ಗುಂಪು",
     "Share link" : "ಸಂಪರ್ಕ ಕೊಂಡಿಯನ್ನು  ﻿ಹಂಚಿಕೊಳ್ಳಬಹುದು",
+    "Edit" : "ಸಂಪಾದಿಸು",
+    "Share" : "﻿ಹಂಚಿಕೊಳ್ಳಿ",
     "Sharing" : "﻿ಹಂಚಿಕೆ",
     "Settings" : "ಆಯ್ಕೆ",
     "Date" : "Date",

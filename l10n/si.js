@@ -6,6 +6,8 @@ OC.L10N.register(
     "responses" : "ප්‍රතිචාර",
     "Description" : "විස්තරය",
     "Group" : "සමූහය",
+    "Edit" : "සංස්කරණය",
+    "Share" : "බෙදාගන්න",
     "Summary" : "සාරාංශය",
     "Responses" : "ප්‍රතිචාර",
     "Settings" : "සැකසුම්",

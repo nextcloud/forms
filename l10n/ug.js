@@ -6,6 +6,8 @@ OC.L10N.register(
     "Delete" : "ئۆچۈر",
     "Group" : "Group",
     "Share link" : "Share link",
+    "Edit" : "تەھرىر",
+    "Share" : "ھەمبەھىر",
     "Sharing" : "ھەمبەھىر",
     "Settings" : "تەڭشەكلەر",
     "Date" : "Date",
