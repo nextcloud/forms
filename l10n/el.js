@@ -80,6 +80,7 @@ OC.L10N.register(
     "View" : "Προβολή",
     "Edit" : "Επεξεργασία",
     "Show results" : "Εμφάνιση αποτελεσμάτων",
+    "Share" : "Διαμοιρασμός",
     "Toggle settings" : "Εναλλαγή ρυθμίσεων",
     "Loading {title} …" : "Φόρτωση {title} …",
     "Form title" : "Τίτλος φόρμας",

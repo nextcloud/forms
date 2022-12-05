@@ -100,6 +100,7 @@ OC.L10N.register(
     "View form" : "View form",
     "View" : "View",
     "Edit" : "Edit",
+    "Share" : "Share",
     "Toggle settings" : "Toggle settings",
     "Loading {title} …" : "Loading {title} …",
     "Form title" : "Form title",

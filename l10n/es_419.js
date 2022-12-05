@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share link" : "Compartir liga",
     "Copy to clipboard" : "Copiar al portapapeles",
     "Edit" : "Editar",
+    "Share" : "Compartir",
     "Summary" : "Resumen",
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",

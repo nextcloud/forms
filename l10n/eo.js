@@ -17,6 +17,7 @@ OC.L10N.register(
     "Internal link" : "Interna ligilo",
     "View" : "Vidi",
     "Edit" : "Modifi",
+    "Share" : "Kunhavigi",
     "Summary" : "Resumo",
     "Sharing" : "Kunhavigo",
     "Settings" : "Agordoj",

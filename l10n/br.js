@@ -12,6 +12,8 @@ OC.L10N.register(
     "Share link" : "Lodañ al liamm",
     "Add link" : "Ouzhpnna ul liamm",
     "View" : "Gwell",
+    "Edit" : "Cheñch",
+    "Share" : "Rannan",
     "Summary" : "Diverrañ",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",

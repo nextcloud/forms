@@ -101,6 +101,7 @@ OC.L10N.register(
     "View" : "Ver",
     "Edit" : "Editar",
     "Show results" : "Mostrar resultados",
+    "Share" : "Compartir",
     "Toggle settings" : "Marcar/desmarcar configuraciones",
     "Loading {title} …" : "Cargando {title}…",
     "Form title" : "Título del formulario",

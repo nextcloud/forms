@@ -8,6 +8,8 @@ OC.L10N.register(
     "Delete" : "মুছে",
     "Group" : "গোষ্ঠীসমূহ",
     "Share link" : "লিংক ভাগাভাগি করেন",
+    "Edit" : "সম্পাদনা",
+    "Share" : "ভাগাভাগি কর",
     "Sharing" : "ভাগাভাগিরত",
     "Settings" : "সেটিংস",
     "Date" : "Date",

@@ -18,6 +18,8 @@ OC.L10N.register(
     "Copy to clipboard" : "Kopier til udklipsholder",
     "Internal link" : "Internt link",
     "View" : "Vis",
+    "Edit" : "Redigér",
+    "Share" : "Del",
     "Summary" : "Oversigt",
     "Options" : "Valgmuligheder",
     "Delete all responses" : "Slet alle svar",

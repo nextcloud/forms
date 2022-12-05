@@ -7,6 +7,8 @@ OC.L10N.register(
     "Delete" : "Sil",
     "Group" : "Qrup",
     "Share link" : "Linki yayımla",
+    "Edit" : "Dəyişiklik et",
+    "Share" : "Paylaş",
     "Sharing" : "Paylaşılır",
     "Settings" : "Quraşdırmalar",
     "Date" : "Date",

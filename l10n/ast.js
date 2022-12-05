@@ -11,6 +11,8 @@ OC.L10N.register(
     "Group" : "Group",
     "Share link" : "Share link",
     "Copy to clipboard" : "Copiar al cartafueyu",
+    "Edit" : "Editar",
+    "Share" : "Share",
     "Summary" : "Sumariu",
     "Sharing" : "Compartiendo",
     "Settings" : "Settings",

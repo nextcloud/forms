@@ -9,6 +9,8 @@ OC.L10N.register(
     "Delete" : "Dileu",
     "Group" : "Grŵp",
     "Share link" : "Rhannu dolen",
+    "Edit" : "Golygu",
+    "Share" : "Rhannu",
     "Settings" : "Gosodiadau",
     "Date" : "Date",
     "Pick a date" : "Dewiswch ddyddiad",
