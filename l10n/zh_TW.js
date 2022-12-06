@@ -100,6 +100,7 @@ OC.L10N.register(
     "View form" : "檢視表單",
     "View" : "檢視",
     "Edit" : "編輯",
+    "Show results" : "顯示結果",
     "Share" : "分享",
     "Toggle settings" : "切換設定",
     "Loading {title} …" : "正在載入 {title}……",
