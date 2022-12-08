@@ -100,6 +100,7 @@ OC.L10N.register(
     "View form" : "Преглед на формуляра",
     "View" : "Изглед",
     "Edit" : "Редактиране",
+    "Show results" : "Показване на резултати",
     "Share" : "Споделяне",
     "Toggle settings" : "Превключване на настройките",
     "Loading {title} …" : "Зареждане на {title} ...",
