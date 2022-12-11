@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "Requerido",
     "Description" : "Descripción",
     "Set expiration date" : "Establece la fecha de expiración",
+    "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
     "Delete" : "Eliminar",
     "Group" : "Grupo",
     "Share link" : "Compartir liga",
