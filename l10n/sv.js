@@ -68,6 +68,7 @@ OC.L10N.register(
     "Share link" : "Delningslänk",
     "Add link" : "Lägg till länk",
     "Copy to clipboard" : "Kopiera till urklipp",
+    "Remove link" : "Ta bort länk",
     "Internal link" : "Intern länk",
     "View" : "Visa",
     "Edit" : "Ändra",
