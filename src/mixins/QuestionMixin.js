@@ -202,6 +202,7 @@ export default {
 		commonListeners() {
 			return {
 				delete: this.onDelete,
+				duplicate: this.onDuplicate,
 				'update:text': this.onTitleChange,
 				'update:description': this.onDescriptionChange,
 				'update:isRequired': this.onRequiredChange,
@@ -288,6 +289,13 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		/**
+		 * Duplicate this question.
+		 */
+		onDuplicate() {
+			this.$emit('duplicate')
 		},
 
 		/**

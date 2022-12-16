@@ -717,6 +717,60 @@ class ApiController extends OCSController {
 	 * @CORS
 	 * @NoAdminRequired
 	 *
+	 * Duplicate a question
+	 *
+	 * @param int $id the question id
+	 * @return DataResponse
+	 * @throws OCSBadRequestException|OCSForbiddenException
+	 */
+	public function duplicateQuestion(int $id): DataResponse {
+		$this->logger->debug('Question to be duplicated: {id}', [
+			'id' => $id
+		]);
+
+		try {
+			$sourceQuestion = $this->questionMapper->findById($id);
+			$sourceOptions = $this->optionMapper->findByQuestion($id);
+			$form = $this->formMapper->findById($sourceQuestion->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question');
+			throw new OCSBadRequestException('Could not find form or question');
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		$allQuestions = $this->questionMapper->findByForm($form->getId());
+
+		$questionData = $sourceQuestion->read();
+		unset($questionData['id']);
+		$questionData["order"] = end($allQuestions)->getOrder() + 1;
+
+		$newQuestion = Question::fromParams($questionData);
+		$this->questionMapper->insert($newQuestion);
+
+		$response = $newQuestion->read();
+		$response['options'] = [];
+
+		foreach ($sourceOptions as $sourceOption) {
+			$optionData = $sourceOption->read();
+
+			unset($optionData['id']);
+			$optionData['questionId'] = $newQuestion->getId();
+			$newOption = Option::fromParams($optionData);
+			$insertedOption = $this->optionMapper->insert($newOption);
+
+			$response['options'][] = $insertedOption->read();
+		}
+
+		return new DataResponse($response);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
 	 * Add a new option to a question
 	 *
 	 * @param int $questionId the question id

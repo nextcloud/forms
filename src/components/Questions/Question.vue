@@ -100,6 +100,12 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
+					<NcActionButton @click="onDuplicate">
+						<template #icon>
+							<IconContentDuplicate :size="20" />
+						</template>
+						{{ t('forms', 'Copy question') }}
+					</NcActionButton>
 					<NcActionButton @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -140,6 +146,7 @@ import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
+import IconContentDuplicate from 'vue-material-design-icons/ContentDuplicate.vue'
 
 export default {
 	name: 'Question',
@@ -148,6 +155,7 @@ export default {
 		IconAlertCircleOutline,
 		IconArrowDown,
 		IconArrowUp,
+		IconContentDuplicate,
 		IconDelete,
 		IconDragHorizontalVariant,
 		IconIdentifier,
@@ -304,6 +312,13 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		/**
+		 * Duplicate this question
+		 */
+		onDuplicate() {
+			this.$emit('duplicate')
 		},
 	},
 }

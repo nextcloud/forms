@@ -930,6 +930,31 @@ class ApiV2Test extends TestCase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
+	public function dataDuplicateQuestion() {
+		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+		array_splice($fullFormExpected['questions'][1]['options'], 0, 1);
+
+		return [
+			'duplicateQuestion' => [
+				'fullFormExpected' => $fullFormExpected
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataDuplicateQuestion
+	 * @param array $fullFormExpected
+	 */
+	public function testDuplicateQuestion(array $fullFormExpected) {
+		$resp = $this->http->request('POST', "api/v2/question/{$this->testForms[0]['questions'][0]['id']}");
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($this->testForms[0]['questions'][count($this->testForms[0]['questions'])]['id'], $data);
+
+		$this->testGetFullForm($fullFormExpected);
+	}
+
 	public function dataCreateNewOption() {
 		return [
 			'newOption' => [

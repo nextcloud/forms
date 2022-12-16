@@ -211,6 +211,14 @@ return [
 				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
+		[
+			'name' => 'api#duplicateQuestion',
+			'url' => '/api/{apiVersion}/question/clone/{id}',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.1'
+			]
+		],
 
 		// Options
 		[
