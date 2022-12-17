@@ -92,6 +92,13 @@ export default {
 		},
 	},
 
+	mounted() {
+		// Init time from values prop
+		if (this.values) {
+			this.time = this.parse(this.values[0])
+		}
+	},
+
 	methods: {
 		/**
 		 * DateTimepicker show text in picker
