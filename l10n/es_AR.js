@@ -48,6 +48,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Copiar al portapapeles",
     "View" : "Ver",
     "Edit" : "Editar",
+    "Share" : "Compartir",
     "Loading {title} …" : "Cargando {título}",
     "Form title" : "Título del formulario",
     "Add a question" : "Agregar una pregunta",
