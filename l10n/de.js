@@ -80,6 +80,7 @@ OC.L10N.register(
     "No elements found." : "Keine Elemente gefunden.",
     "Delete" : "Löschen",
     "Group" : "Gruppe",
+    "Share link" : "Link teilen",
     "Add link" : "Link hinzufügen",
     "Copy to clipboard" : "In die Zwischenablage kopieren",
     "Remove link" : "Link entfernen",
