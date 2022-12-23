@@ -42,12 +42,12 @@
 	<bugs>https://github.com/nextcloud/forms/issues</bugs>
 	<repository type="git">https://github.com/nextcloud/forms</repository>
 	<documentation>
-		<admin>https://github.com/nextcloud/forms/blob/master/README.md</admin>
+		<admin>https://github.com/nextcloud/forms/blob/main/README.md</admin>
 	</documentation>
 
-	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms1.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms2.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/master/screenshots/forms3.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms1.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms2.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms3.png</screenshot>
 
 	<navigations>
 		<navigation>
