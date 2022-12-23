@@ -143,6 +143,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Read Form-List of owned forms
@@ -161,6 +162,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Read List of forms shared with current user
@@ -183,6 +185,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Get a partial form by its hash. Implicitely checks, if the user has access.
@@ -208,6 +211,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
@@ -234,6 +238,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Create a new Form and return the Form to edit.
@@ -269,6 +274,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Clones a form
@@ -340,6 +346,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Writes the given key-value pairs into Database.
@@ -392,6 +399,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Delete a form
@@ -424,6 +432,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Add a new question
@@ -493,6 +502,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Updates the Order of all Questions of a Form.
@@ -585,6 +595,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Writes the given key-value pairs into Database.
@@ -644,6 +655,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Delete a question
@@ -692,6 +704,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Add a new option to a question
@@ -732,6 +745,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Writes the given key-value pairs into Database.
@@ -785,6 +799,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Delete an option
@@ -819,6 +834,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Get all the submissions of a given form
@@ -872,6 +888,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 * @PublicPage
 	 *
@@ -999,6 +1016,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Delete a specific submission
@@ -1033,6 +1051,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Delete all submissions of a specified form
@@ -1066,6 +1085,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 *
@@ -1098,6 +1118,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Export Submissions to the Cloud

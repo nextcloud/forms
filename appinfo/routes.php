@@ -65,7 +65,17 @@ return [
 	],
 
 	'ocs' => [
-		
+		// CORS Preflight
+		[
+			'name' => 'api#preflightedCors',
+			'url' => '/api/{apiVersion}/{path}',
+			'verb' => 'OPTIONS',
+			'requirements' => [
+				'path' => '.+',
+				'apiVersion' => 'v2'
+			]
+		],
+
 		// Forms
 		[
 			'name' => 'api#getForms',
