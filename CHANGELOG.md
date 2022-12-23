@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.2 - 2022-12-23
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.1...v3.0.2)
+
+### Fixed
+- Fix question header title for extra long text [\#1393](https://github.com/nextcloud/forms/pull/1393) ([susnux](https://github.com/susnux))
+- make forms OCS API CORS compatible [\#1139](https://github.com/nextcloud/forms/pull/1139) ([everlanes](https://github.com/everlanes))
+- Init all answers from props [\#1383](https://github.com/nextcloud/forms/pull/1383) ([susnux](https://github.com/susnux))
+- More usable and accessible navigation between View/Edit/Results [\#1381](https://github.com/nextcloud/forms/pull/1381) ([jancborchardt](https://github.com/jancborchardt))
+
+
 ## 3.0.1 - 2022-10-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.0...v3.0.1)
