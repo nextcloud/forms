@@ -28,14 +28,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -95,7 +95,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.1']
         databases: ['mysql']
         server-versions: ['stable25', 'master']
   
@@ -103,7 +103,7 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:10.5
+        image: mariadb:10.6
         ports:
           - 4444:3306/tcp
         env:
@@ -112,14 +112,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -161,7 +161,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.1']
         databases: ['pgsql']
         server-versions: ['master']
   
@@ -180,14 +180,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -229,7 +229,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.1']
         databases: ['oci']
         server-versions: ['master']
 
@@ -243,14 +243,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: apps/${{ env.APP_NAME }}
 

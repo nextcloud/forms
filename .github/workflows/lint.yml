@@ -13,12 +13,12 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ["7.3", "7.4", "8.0", "8.1"]
+        php-versions: ["7.4", "8.0", "8.1"]
 
-    name: php${{ matrix.php-versions }}
+    name: php-lint (${{ matrix.php-versions }})
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up php ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
@@ -34,12 +34,12 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ["7.4"]
+        php-versions: ["8.1"]
 
-    name: cs php${{ matrix.php-versions }}
+    name: php-cs
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up php
         uses: shivammathur/setup-php@v2
@@ -61,15 +61,15 @@ jobs:
     name: eslint node
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version-file: 'package.json'
 
-      - name: Set up npm7
-        run: npm i -g npm@7
+      - name: Set up npm
+        run: npm i -g npm
 
       - name: Install dependencies
         run: npm ci
@@ -83,15 +83,15 @@ jobs:
     name: stylelint node
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version-file: 'package.json'
 
-      - name: Set up npm7
-        run: npm i -g npm@7
+      - name: Set up npm
+        run: npm i -g npm
 
       - name: Install dependencies
         run: npm ci
