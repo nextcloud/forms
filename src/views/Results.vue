@@ -75,12 +75,12 @@
 						</template>
 						{{ t('forms', 'Save CSV to Files') }}
 					</NcActionButton>
-					<NcActionLink :href="downloadUrl">
+					<NcActionButton @click="onDownloadCsv">
 						<template #icon>
 							<IconDownload :size="20" />
 						</template>
 						{{ t('forms', 'Download CSV') }}
-					</NcActionLink>
+					</NcActionButton>
 					<NcActionButton @click="deleteAllSubmissions">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -130,10 +130,10 @@
 
 <script>
 import { generateOcsUrl } from '@nextcloud/router'
+import { getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
-import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
@@ -174,7 +174,6 @@ export default {
 		IconShareVariant,
 		NcActions,
 		NcActionButton,
-		NcActionLink,
 		NcAppContent,
 		NcButton,
 		NcEmptyContent,
@@ -208,15 +207,6 @@ export default {
 				return this.form.title
 			}
 			return t('forms', 'New form')
-		},
-
-		/**
-		 * Generate the export to csv url
-		 *
-		 * @return {string}
-		 */
-		downloadUrl() {
-			return generateOcsUrl('apps/forms/api/v2/submissions/export/{hash}', { hash: this.form.hash })
 		},
 	},
 
@@ -254,6 +244,11 @@ export default {
 			} finally {
 				this.loadingResults = false
 			}
+		},
+
+		async onDownloadCsv() {
+			const exportUrl = generateOcsUrl('apps/forms/api/v2/submissions/export/{hash}', { hash: this.form.hash }) + '?requesttoken=' + encodeURIComponent(getRequestToken())
+			window.open(exportUrl, '_self')
 		},
 
 		// Show Filepicker, then call API to store

@@ -1087,7 +1087,6 @@ class ApiController extends OCSController {
 	/**
 	 * @CORS
 	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 *
 	 * Export submissions of a specified form
 	 *
