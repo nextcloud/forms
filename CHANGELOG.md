@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.3 - 2022-12-30
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.2...v3.0.3)
+
+### Fixed
+- Fix export [\#1433](https://github.com/nextcloud/forms/pull/1433) ([jotoeri](https://github.com/jotoeri))
+
+
 ## 3.0.2 - 2022-12-23
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.1...v3.0.2)
