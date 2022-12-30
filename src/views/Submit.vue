@@ -44,8 +44,14 @@
 			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 			<!-- eslint-disable-next-line -->
 			<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
+			<!-- Show expiration message-->
+			<p v-if="form.expires && form.showExpiration" class="info-message">
+				{{ expirationMessage }}
+			</p>
 			<!-- Generate form information message-->
-			<p v-if="infoMessage" class="info-message" v-text="infoMessage" />
+			<p v-if="infoMessage" class="info-message">
+				{{ infoMessage }}
+			</p>
 		</header>
 
 		<NcEmptyContent v-if="loading"
@@ -209,6 +215,14 @@ export default {
 			}
 
 			return message
+		},
+
+		expirationMessage() {
+			const relativeDate = moment(this.form.expires, 'X').fromNow()
+			if (this.isExpired) {
+				return t('forms', 'Expired {relativeDate}.', { relativeDate })
+			}
+			return t('forms', 'Expires {relativeDate}.', { relativeDate })
 		},
 	},
 
