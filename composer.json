@@ -25,7 +25,7 @@
 		"guzzlehttp/guzzle": "^7.4"
 	},
 	"require": {
-		"league/csv": "^9.7.3"
+		"league/csv": "^9.8.0"
 	},
 	"extra": {
 		"bamarni-bin": {
