@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9563c392642fa9c2e946115d564418ca",
+    "content-hash": "5322f67f0188b021e94a930a0f811d79",
     "packages": [
         {
             "name": "league/csv",
@@ -151,20 +151,20 @@
         },
         {
             "name": "christophwurst/nextcloud",
-            "version": "v23.0.5",
+            "version": "v24.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ChristophWurst/nextcloud_composer.git",
-                "reference": "2090802b05c9f8bffb2a7c02d6172571d4f90b90"
+                "reference": "f032acdff1502a7323f95a6524d163290f43b446"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ChristophWurst/nextcloud_composer/zipball/2090802b05c9f8bffb2a7c02d6172571d4f90b90",
-                "reference": "2090802b05c9f8bffb2a7c02d6172571d4f90b90",
+                "url": "https://api.github.com/repos/ChristophWurst/nextcloud_composer/zipball/f032acdff1502a7323f95a6524d163290f43b446",
+                "reference": "f032acdff1502a7323f95a6524d163290f43b446",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.3 || ~8.0.0",
+                "php": "^7.4 || ~8.0 || ~8.1",
                 "psr/container": "^1.1.1",
                 "psr/event-dispatcher": "^1.0",
                 "psr/log": "^1.1"
@@ -172,7 +172,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "23.0.0-dev"
+                    "dev-master": "24.0.0-dev"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -188,9 +188,10 @@
             "description": "Composer package containing Nextcloud's public API (classes, interfaces)",
             "support": {
                 "issues": "https://github.com/ChristophWurst/nextcloud_composer/issues",
-                "source": "https://github.com/ChristophWurst/nextcloud_composer/tree/v23.0.5"
+                "source": "https://github.com/ChristophWurst/nextcloud_composer/tree/v24.0.1"
             },
-            "time": "2022-06-02T14:19:33+00:00"
+            "abandoned": "nextcloud/ocp",
+            "time": "2022-06-02T14:16:47+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -1241,20 +1242,20 @@
         },
         {
             "name": "psr/container",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/container.git",
-                "reference": "8622567409010282b7aeebe4bb841fe98b58dcaf"
+                "reference": "513e0666f7216c7459170d56df27dfcefe1689ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/container/zipball/8622567409010282b7aeebe4bb841fe98b58dcaf",
-                "reference": "8622567409010282b7aeebe4bb841fe98b58dcaf",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/513e0666f7216c7459170d56df27dfcefe1689ea",
+                "reference": "513e0666f7216c7459170d56df27dfcefe1689ea",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.0"
+                "php": ">=7.4.0"
             },
             "type": "library",
             "autoload": {
@@ -1283,9 +1284,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-fig/container/issues",
-                "source": "https://github.com/php-fig/container/tree/1.1.1"
+                "source": "https://github.com/php-fig/container/tree/1.1.2"
             },
-            "time": "2021-03-05T17:36:06+00:00"
+            "time": "2021-11-05T16:50:12+00:00"
         },
         {
             "name": "psr/event-dispatcher",
