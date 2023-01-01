@@ -36,14 +36,13 @@
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
-		<div>
-			<NcCheckboxRadioSwitch :checked="formExpires"
-				type="switch"
-				@update:checked="onFormExpiresChange">
-				{{ t('forms', 'Set expiration date') }}
-			</NcCheckboxRadioSwitch>
-			<NcDatetimePicker v-show="formExpires"
-				id="expiresDatetimePicker"
+		<NcCheckboxRadioSwitch :checked="formExpires"
+			type="switch"
+			@update:checked="onFormExpiresChange">
+			{{ t('forms', 'Set expiration date') }}
+		</NcCheckboxRadioSwitch>
+		<div v-show="formExpires" class="settings-div--indent">
+			<NcDatetimePicker id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled-date="notBeforeToday"
 				:disabled-time="notBeforeNow"
@@ -54,6 +53,11 @@
 				:value="expirationDate"
 				type="datetime"
 				@change="onExpirationDateChange" />
+			<NcCheckboxRadioSwitch :checked="form.showExpiration"
+				type="switch"
+				@update:checked="onShowExpirationChange">
+				{{ t('forms', 'Show expiration date on form') }}
+			</NcCheckboxRadioSwitch>
 		</div>
 	</div>
 </template>
@@ -142,6 +146,9 @@ export default {
 				this.$emit('update:formProp', 'expires', 0)
 			}
 		},
+		onShowExpirationChange(checked) {
+			this.$emit('update:formProp', 'showExpiration', checked)
+		},
 
 		/**
 		 * On date picker change
@@ -202,7 +209,10 @@ export default {
 
 <style lang="scss" scoped>
 #expiresDatetimePicker {
-	left: 36px;
 	width: calc(100% - 44px);
+}
+
+.settings-div--indent {
+	margin-left: 40px;
 }
 </style>
