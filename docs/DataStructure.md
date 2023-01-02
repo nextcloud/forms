@@ -17,6 +17,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | expires     | unix-timestamp  |              | When the form should expire. Timestamp `0` indicates _never_ |
 | isAnonymous | Boolean         |              | If Answers will be stored anonymously |
 | submitMultiple  | Boolean     |              | If users are allowed to submit multiple times to the form |
+| showExpiration | Boolean      |              | If the expiration date will be shown on the form |
 | canSubmit   | Boolean         |              | If the user can Submit to the form, i.e. calculated information out of `submitMultiple` and existing submissions. |
 | permissions | Array of [Permissions](#permissions) | Array of permissions regarding the form |
 | questions   | Array of [Questions](#question) | | Array of questions belonging to the form |
@@ -35,6 +36,7 @@ This document describes the Object-Structure, that is used within the Forms App 
   "expires": 0,
   "isAnonymous": false,
   "submitMultiple": true,
+  "showExpiration": false,
   "canSubmit": true,
   "permissions": [
     "edit",
