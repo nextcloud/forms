@@ -198,7 +198,7 @@ class FormsMigrator implements IMigrator {
 				$form->setExpires($formData['expires']);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
-		
+
 				$this->formMapper->insert($form);
 
 				$questionIdMap = [];
@@ -210,6 +210,7 @@ class FormsMigrator implements IMigrator {
 					$question->setIsRequired($questionData['isRequired']);
 					$question->setText($questionData['text']);
 					$question->setDescription($questionData['description']);
+					$question->setExtraSettings($questionData['extraSettings']);
 
 					$this->questionMapper->insert($question);
 
