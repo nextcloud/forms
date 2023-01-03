@@ -45,7 +45,7 @@
 			<!-- eslint-disable-next-line -->
 			<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
 			<!-- Generate form information message-->
-			<p class="info-message" v-text="infoMessage" />
+			<p v-if="infoMessage" class="info-message" v-text="infoMessage" />
 		</header>
 
 		<NcEmptyContent v-if="loading"
