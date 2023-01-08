@@ -1,8 +1,11 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Formularis",
     "Copy" : "Copiar",
     "Shared with you" : "Partejat amb vos",
+    "Loading forms …" : "Cargament del formulari...",
+    "No forms created yet" : "Cap de formulari pas encara creat",
     "Description" : "Descripcion",
     "Set expiration date" : "Especificar una data d'expiracion",
     "Searching …" : "Recèrca…",
