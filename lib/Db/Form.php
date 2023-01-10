@@ -89,15 +89,15 @@ class Form extends Entity {
 		return [
 			'id' => $this->getId(),
 			'hash' => $this->getHash(),
-			'title' => $this->getTitle(),
-			'description' => $this->getDescription(),
+			'title' => (string)$this->getTitle(),
+			'description' => (string)$this->getDescription(),
 			'ownerId' => $this->getOwnerId(),
 			'created' => $this->getCreated(),
 			'access' => $this->getAccess(),
-			'expires' => $this->getExpires(),
-			'isAnonymous' => $this->getIsAnonymous(),
-			'submitMultiple' => $this->getSubmitMultiple(),
-			'showExpiration' => $this->getShowExpiration()
+			'expires' => (int)$this->getExpires(),
+			'isAnonymous' => (bool)$this->getIsAnonymous(),
+			'submitMultiple' => (bool)$this->getSubmitMultiple(),
+			'showExpiration' => (bool)$this->getShowExpiration()
 		];
 	}
 }

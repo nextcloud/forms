@@ -56,7 +56,7 @@ class Answer extends Entity {
 			'id' => $this->getId(),
 			'submissionId' => $this->getSubmissionId(),
 			'questionId' => $this->getQuestionId(),
-			'text' => htmlspecialchars_decode($this->getText()),
+			'text' => (string)$this->getText(),
 		];
 	}
 }

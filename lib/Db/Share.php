@@ -57,7 +57,7 @@ class Share extends Entity {
 		return [
 			'id' => $this->getId(),
 			'formId' => $this->getFormId(),
-			'shareType' => $this->getShareType(),
+			'shareType' => (int)$this->getShareType(),
 			'shareWith' => $this->getShareWith(),
 		];
 	}

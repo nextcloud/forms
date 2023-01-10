@@ -4,8 +4,7 @@
 		 convertDeprecationsToExceptions="true"
 		 verbose="true">
 	<testsuite name="Forms integration tests">
-		<!-- Disabling the tests until they exist. Error otherwise.-->
-		<!-- <directory>./Integration</directory> -->
+		<directory>./Integration</directory>
 	</testsuite>
 	<coverage>
 		<!-- filters for code coverage -->

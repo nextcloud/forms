@@ -41,117 +41,146 @@ class ApiV2Test extends TestCase {
 	private $formMapper;
 
 	/** @var Array */
-	private $testForms = [
-		[
-			'hash' => 'abcdefg',
-			'title' => 'Title of a Form',
-			'description' => 'Just a simple form.',
-			'owner_id' => 'test',
-			'access_json' => [
-				'permitAllUsers' => false,
-				'showToAllUsers' => false
-			],
-			'created' => 12345,
-			'expires' => 0,
-			'is_anonymous' => false,
-			'submit_multiple' => false,
-			'show_expiration' => false,
-			'questions' => [
-				[
-					'type' => 'short',
-					'text' => 'First Question?',
-					'isRequired' => true,
-					'order' => 1,
-					'options' => []
+	private $testForms;
+
+	/**
+	 * Store Test Forms Array.
+	 * Necessary as function due to object type-casting.
+	 */
+	private function setTestForms() {
+		$this->testForms = [
+			[
+				'hash' => 'abcdefg',
+				'title' => 'Title of a Form',
+				'description' => 'Just a simple form.',
+				'owner_id' => 'test',
+				'access_json' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false
 				],
-				[
-					'type' => 'multiple_unique',
-					'text' => 'Second Question?',
-					'isRequired' => false,
-					'order' => 2,
-					'options' => [
-						[
-							'text' => 'Option 1'
+				'created' => 12345,
+				'expires' => 0,
+				'is_anonymous' => false,
+				'submit_multiple' => false,
+				'show_expiration' => false,
+				'questions' => [
+					[
+						'type' => 'short',
+						'text' => 'First Question?',
+						'description' => 'Please answer this.',
+						'isRequired' => true,
+						'order' => 1,
+						'options' => [],
+						'extraSettings' => (object)[]
+					],
+					[
+						'type' => 'multiple_unique',
+						'text' => 'Second Question?',
+						'description' => '',
+						'isRequired' => false,
+						'order' => 2,
+						'options' => [
+							[
+								'text' => 'Option 1'
+							],
+							[
+								'text' => 'Option 2'
+							],
+							[
+								'text' => ''
+							]
 						],
-						[
-							'text' => 'Option 2'
+						'extraSettings' => (object)[
+							'shuffleOptions' => true
+						]
+					]
+				],
+				'shares' => [
+					[
+						'shareType' => 0,
+						'shareWith' => 'user1',
+					],
+					[
+						'shareType' => 3,
+						'shareWith' => 'shareHash',
+					],
+				],
+				'submissions' => [
+					[
+						'userId' => 'user1',
+						'timestamp' => 123456,
+						'answers' => [
+							[
+								'questionIndex' => 0,
+								'text' => 'This is a short answer.'
+							],
+							[
+								'questionIndex' => 1,
+								'text' => 'Option 1'
+							]
+						]
+					],
+					[
+						'userId' => 'user2',
+						'timestamp' => 12345,
+						'answers' => [
+							[
+								'questionIndex' => 0,
+								'text' => 'This is another short answer.'
+							],
+							[
+								'questionIndex' => 1,
+								'text' => 'Option 2'
+							]
+						]
+					],
+					[
+						'userId' => 'user3',
+						'timestamp' => 1234,
+						'answers' => [
+							[
+								'questionIndex' => 0,
+								'text' => ''
+							]
 						]
 					]
 				]
 			],
-			'shares' => [
-				[
-					'shareType' => 0,
-					'shareWith' => 'user1',
+			[
+				'hash' => 'abcdefghij',
+				'title' => 'Title of a second Form',
+				'description' => '',
+				'owner_id' => 'someUser',
+				'access_json' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true
 				],
-				[
-					'shareType' => 3,
-					'shareWith' => 'shareHash',
+				'created' => 12345,
+				'expires' => 0,
+				'is_anonymous' => false,
+				'submit_multiple' => false,
+				'show_expiration' => false,
+				'questions' => [
+					[
+						'type' => 'short',
+						'text' => 'Third Question?',
+						'description' => '',
+						'isRequired' => false,
+						'order' => 1,
+						'options' => [],
+						'extraSettings' => (object)[]
+					],
 				],
-			],
-			'submissions' => [
-				[
-					'userId' => 'user1',
-					'timestamp' => 123456,
-					'answers' => [
-						[
-							'questionIndex' => 0,
-							'text' => 'This is a short answer.'
-						],
-						[
-							'questionIndex' => 1,
-							'text' => 'Option 1'
-						]
-					]
+				'shares' => [
+					[
+						'shareType' => 0,
+						'shareWith' => 'user2',
+					],
 				],
-				[
-					'userId' => 'user2',
-					'timestamp' => 12345,
-					'answers' => [
-						[
-							'questionIndex' => 0,
-							'text' => 'This is another short answer.'
-						],
-						[
-							'questionIndex' => 1,
-							'text' => 'Option 2'
-						]
-					]
-				]
+				'submissions' => []
 			]
-		],
-		[
-			'hash' => 'abcdefghij',
-			'title' => 'Title of a second Form',
-			'description' => '',
-			'owner_id' => 'someUser',
-			'access_json' => [
-				'permitAllUsers' => true,
-				'showToAllUsers' => true
-			],
-			'created' => 12345,
-			'expires' => 0,
-			'is_anonymous' => false,
-			'submit_multiple' => false,
-			'show_expiration' => false,
-			'questions' => [
-				[
-					'type' => 'short',
-					'text' => 'Third Question?',
-					'isRequired' => false,
-					'order' => 1,
-					'options' => []
-				],
-			],
-			'shares' => [
-				[
-					'shareType' => 0,
-					'shareWith' => 'user2',
-				],
-			],
-			'submissions' => []
-		]
-	];
+		];
+	}
 
 	/**
 	 * Set up test environment.
@@ -159,6 +188,7 @@ class ApiV2Test extends TestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
+		$this->setTestForms();
 
 		$qb = TestCase::$realDatabase->getQueryBuilder();
 
@@ -189,7 +219,9 @@ class ApiV2Test extends TestCase {
 						'order' => $qb->createNamedParameter($question['order'], IQueryBuilder::PARAM_INT),
 						'type' => $qb->createNamedParameter($question['type'], IQueryBuilder::PARAM_STR),
 						'is_required' => $qb->createNamedParameter($question['isRequired'], IQueryBuilder::PARAM_BOOL),
-						'text' => $qb->createNamedParameter($question['text'], IQueryBuilder::PARAM_STR)
+						'text' => $qb->createNamedParameter($question['text'], IQueryBuilder::PARAM_STR),
+						'description' => $qb->createNamedParameter($question['description'], IQueryBuilder::PARAM_STR),
+						'extra_settings_json' => $qb->createNamedParameter(json_encode($question['extraSettings']), IQueryBuilder::PARAM_STR),
 					]);
 				$qb->execute();
 				$questionId = $qb->getLastInsertId();
@@ -326,7 +358,8 @@ class ApiV2Test extends TestCase {
 						'results',
 						'submit'
 					],
-					'partial' => true
+					'partial' => true,
+					'submissionCount' => 3
 				]]
 			]
 		];
@@ -431,6 +464,7 @@ class ApiV2Test extends TestCase {
 					],
 					'questions' => [],
 					'shares' => [],
+					'submissionCount' => 0,
 				]
 			]
 		];
@@ -489,7 +523,9 @@ class ApiV2Test extends TestCase {
 							'text' => 'First Question?',
 							'isRequired' => true,
 							'order' => 1,
-							'options' => []
+							'options' => [],
+							'description' => 'Please answer this.',
+							'extraSettings' => []
 						],
 						[
 							'type' => 'multiple_unique',
@@ -502,7 +538,14 @@ class ApiV2Test extends TestCase {
 								],
 								[
 									'text' => 'Option 2'
+								],
+								[
+									'text' => ''
 								]
+							],
+							'description' => '',
+							'extraSettings' => [
+								'shuffleOptions' => true,
 							]
 						]
 					],
@@ -510,7 +553,7 @@ class ApiV2Test extends TestCase {
 						[
 							'shareType' => 0,
 							'shareWith' => 'user1',
-							'displayName' => ''
+							'displayName' => 'User No. 1'
 						],
 						[
 							'shareType' => 3,
@@ -518,6 +561,7 @@ class ApiV2Test extends TestCase {
 							'displayName' => ''
 						],
 					],
+					'submissionCount' => 3
 				]
 			]
 		];
@@ -559,6 +603,7 @@ class ApiV2Test extends TestCase {
 		// Compared to full form expected, update changed properties
 		$fullFormExpected['title'] = 'Title of a Form - Copy';
 		$fullFormExpected['shares'] = [];
+		$fullFormExpected['submissionCount'] = 0;
 		// Compared to full form expected, unset unpredictable properties. These will be checked logically.
 		unset($fullFormExpected['id']);
 		unset($fullFormExpected['hash']);
@@ -682,7 +727,21 @@ class ApiV2Test extends TestCase {
 					'type' => 'short',
 					'isRequired' => false,
 					'text' => 'Already some Question?',
-					'options' => []
+					'options' => [],
+					'description' => '',
+					'extraSettings' => [],
+				]
+			],
+			'emptyQuestion' => [
+				'expected' => [
+					// 'formId' => 3, // Checked during test
+					// 'order' => 3, // Checked during test
+					'type' => 'short',
+					'isRequired' => false,
+					'text' => '',
+					'options' => [],
+					'description' => '',
+					'extraSettings' => [],
 				]
 			]
 		];
@@ -697,7 +756,7 @@ class ApiV2Test extends TestCase {
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'type' => 'short',
-				'text' => 'Already some Question?'
+				'text' => $expected['text']
 			]
 		]);
 		$data = $this->OcsResponse2Data($resp);
@@ -984,7 +1043,7 @@ class ApiV2Test extends TestCase {
 						[
 							// 'formId' => Checked dynamically
 							'userId' => 'user1',
-							'userDisplayName' => 'user1',
+							'userDisplayName' => 'User No. 1',
 							'timestamp' => 123456,
 							'answers' => [
 								[
@@ -1014,6 +1073,19 @@ class ApiV2Test extends TestCase {
 									// 'submissionId' => Checked dynamically
 									// 'questionId' => Checked dynamically
 									'text' => 'Option 2'
+								]
+							]
+						],
+						[
+							// 'formId' => Checked dynamically
+							'userId' => 'user3',
+							'userDisplayName' => 'user3',
+							'timestamp' => 1234,
+							'answers' => [
+								[
+									// 'submissionId' => Checked dynamically
+									// 'questionId' => Checked dynamically
+									'text' => ''
 								]
 							]
 						]
@@ -1068,9 +1140,10 @@ class ApiV2Test extends TestCase {
 		return [
 			'exportSubmissions' => [
 				'expected' => '
-					"User display name","Timestamp","First Question?","Second Question?"
-					"user1","Friday, January 2, 1970 at 10:17:36 AM GMT+0:00","This is a short answer.","Option 1"
-					"user2","Thursday, January 1, 1970 at 3:25:45 AM GMT+0:00","This is another short answer.","Option 2"'
+					"User ID","User display name","Timestamp","First Question?","Second Question?"
+					"user1","User No. 1","Friday, January 2, 1970 at 10:17:36 AM GMT+0:00","This is a short answer.","Option 1"
+					"","Anonymous user","Thursday, January 1, 1970 at 3:25:45 AM GMT+0:00","This is another short answer.","Option 2"
+					"","Anonymous user","Thursday, January 1, 1970 at 12:20:34 AM GMT+0:00","",""'
 			]
 		];
 	}

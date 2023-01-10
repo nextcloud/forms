@@ -54,7 +54,8 @@ class OptionMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
-			);
+			)
+			->orderBy('id');
 
 		return $this->findEntities($qb);
 	}
