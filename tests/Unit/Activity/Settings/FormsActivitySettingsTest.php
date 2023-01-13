@@ -38,7 +38,7 @@ class SettingsTestClass extends FormsActivitySettings {
 	}
 }
 
-class FilterTest extends TestCase {
+class FormsActivitySettingsTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
