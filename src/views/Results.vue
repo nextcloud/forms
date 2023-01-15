@@ -327,20 +327,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.app-content header {
-	h2 {
-		font-size: 2em;
-		font-weight: bold;
-		margin-top: 32px;
-		padding-left: 14px;
-		padding-bottom: 8px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+.app-content {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+
+	header,
+	section {
+		width: 100%;
+		max-width: 750px;
 	}
 
-	p {
-		padding-left: 14px;
+	// Title & description header
+	header {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 24px;
+		margin-left: 56px;
+
+		h2 {
+			margin-bottom: 0; // because the input field has enough padding
+			font-size: 28px;
+			font-weight: bold;
+			margin-top: 32px;
+			padding-left: 14px;
+			padding-bottom: 8px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		p {
+			padding-left: 14px;
+		}
 	}
 
 	.response-actions {
