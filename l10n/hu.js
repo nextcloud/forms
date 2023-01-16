@@ -100,6 +100,7 @@ OC.L10N.register(
     "View form" : "Űrlap megtekintése",
     "View" : "Megtekintés",
     "Edit" : "Szerkesztés",
+    "Show results" : "Találatok megjelenítése",
     "Share" : "Megosztás",
     "Toggle settings" : "Beállítások átváltása",
     "Loading {title} …" : "{title} betöltése…",
