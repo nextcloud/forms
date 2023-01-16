@@ -62,8 +62,14 @@
 				:maxlength="maxStringLengths.formDescription"
 				:placeholder="t('forms', 'Description')"
 				@input="onDescChange" />
+			<!-- Show expiration message-->
+			<p v-if="form.expires && form.showExpiration" class="info-message">
+				{{ expirationMessage }}
+			</p>
 			<!-- Generate form information message-->
-			<p class="info-message" v-text="infoMessage" />
+			<p v-if="infoMessage" class="info-message">
+				{{ infoMessage }}
+			</p>
 		</header>
 
 		<section>
@@ -119,6 +125,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
 
@@ -211,6 +218,14 @@ export default {
 			}
 
 			return message
+		},
+
+		expirationMessage() {
+			const relativeDate = moment(this.form.expires, 'X').fromNow()
+			if (this.isExpired) {
+				return t('forms', 'Expired {relativeDate}.', { relativeDate })
+			}
+			return t('forms', 'Expires {relativeDate}.', { relativeDate })
 		},
 
 		// Remove properties from answerTypes for create button

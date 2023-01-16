@@ -155,6 +155,7 @@ class FormsServiceTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'showExpiration' => false,
 				'canSubmit' => true,
 				'submissionCount' => 123,
 				'questions' => [
@@ -231,6 +232,7 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setShowExpiration(false);
 
 		$this->formMapper->expects($this->any())
 			->method('findById')
@@ -359,6 +361,7 @@ class FormsServiceTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'showExpiration' => false,
 				'canSubmit' => true,
 				'questions' => [],
 				'permissions' => [
@@ -388,6 +391,7 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setShowExpiration(false);
 
 		$this->formMapper->expects($this->any())
 			->method('findById')
