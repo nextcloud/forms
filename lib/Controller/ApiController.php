@@ -924,7 +924,7 @@ class ApiController extends OCSController {
 			// If hash given, find the corresponding share & check if hash corresponds to given formId.
 			if ($shareHash !== '') {
 				// public by legacy Link
-				if ($form->getAccess()['legacyLink'] && $shareHash === $form->getHash()) {
+				if (isset($form->getAccess()['legacyLink']) && $shareHash === $form->getHash()) {
 					$isPublicShare = true;
 				}
 
