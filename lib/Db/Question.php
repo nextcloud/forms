@@ -81,11 +81,11 @@ class Question extends Entity {
 		return [
 			'id' => $this->getId(),
 			'formId' => $this->getFormId(),
-			'order' => $this->getOrder(),
-			'type' => htmlspecialchars_decode($this->getType()),
-			'isRequired' => $this->getIsRequired(),
-			'text' => htmlspecialchars_decode($this->getText()),
-			'description' => htmlspecialchars_decode($this->getDescription()),
+			'order' => (int)$this->getOrder(),
+			'type' => $this->getType(),
+			'isRequired' => (bool)$this->getIsRequired(),
+			'text' => (string)$this->getText(),
+			'description' => (string)$this->getDescription(),
 			'extraSettings' => $this->getExtraSettings(),
 		];
 	}

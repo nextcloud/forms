@@ -53,7 +53,7 @@ class Option extends Entity {
 		return [
 			'id' => $this->getId(),
 			'questionId' => $this->getQuestionId(),
-			'text' => htmlspecialchars_decode($this->getText()),
+			'text' => (string)$this->getText(),
 		];
 	}
 }

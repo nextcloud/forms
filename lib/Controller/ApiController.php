@@ -267,6 +267,8 @@ class ApiController extends OCSController {
 		]);
 		$form->setSubmitMultiple(false);
 		$form->setShowExpiration(false);
+		$form->setExpires(0);
+		$form->setIsAnonymous(false);
 
 		$this->formMapper->insert($form);
 

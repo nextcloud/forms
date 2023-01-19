@@ -72,7 +72,7 @@ class Version030000Date20211206213004 extends SimpleMigrationStep {
 			'notnull' => true,
 		]);
 		$table->addColumn('share_type', Types::SMALLINT, [
-			'notnull' => true,
+			'notnull' => false,
 		]);
 		$table->addColumn('share_with', Types::STRING, [
 			'length' => 256,

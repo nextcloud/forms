@@ -86,7 +86,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'length' => 64,
 			]);
 			$table->addColumn('title', Types::STRING, [
-				'notnull' => true,
+				'notnull' => false,
 				'length' => 256,
 			]);
 			$table->addColumn('description', Types::TEXT, [
@@ -131,7 +131,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->addColumn('order', Types::INTEGER, [
-				'notnull' => true,
+				'notnull' => false,
 				'default' => 1,
 			]);
 			$table->addColumn('type', Types::STRING, [
@@ -143,7 +143,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'default' => 0,
 			]);
 			$table->addColumn('text', Types::STRING, [
-				'notnull' => true,
+				'notnull' => false,
 				'length' => 2048,
 			]);
 			$table->setPrimaryKey(['id']);
@@ -159,7 +159,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->addColumn('text', Types::STRING, [
-				'notnull' => true,
+				'notnull' => false,
 				'length' => 1024,
 			]);
 			$table->setPrimaryKey(['id']);
@@ -198,7 +198,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->addColumn('text', Types::TEXT, [
-				'notnull' => true,
+				'notnull' => false,
 				'length' => 4096,
 			]);
 			$table->setPrimaryKey(['id']);
