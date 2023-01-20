@@ -71,6 +71,7 @@
     "Store responses anonymously" : "Gem svar anonymt",
     "Allow multiple responses per person" : "Tillad flere svar pr. person",
     "Set expiration date" : "Angiv udløbsdato",
+    "Show expiration date on form" : "Vis udløbsdato på formularen",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Dette kan ikke kontrolleres, hvis formularen har et offentligt link eller gemmer svar anonymt.",
     "Expired on {date}" : "Udløb den {date}",
     "Expires on {date}" : "Udløber på {date}",
@@ -107,6 +108,8 @@
     "Responses are anonymous." : "Svarene er anonyme.",
     "Responses are connected to your Nextcloud account." : "Svar er knyttet til din Nextcloud-konto.",
     "An asterisk (*) indicates mandatory questions." : "En stjerne (*) angiver obligatoriske spørgsmål.",
+    "Expired {relativeDate}." : "Udløbet {relativeDate}.",
+    "Expires {relativeDate}." : "Udløber {relativeDate}.",
     "There was an error while adding the new question" : "Der opstod en fejl under tilføjelse af det nye spørgsmål",
     "There was an error while removing the question" : "Der opstod en fejl under fjernelse af spørgsmålet",
     "Error while saving form" : "Fejl under lagring af formularen",
@@ -162,7 +165,7 @@
     "People can pick a date and time" : "Brugere kan vælge en dato og et tidspunkt",
     "Pick a date and time" : "Vælg en dato og et tidspunkt",
     "Time" : "Tid",
-    "Time question title" : "Tid - spørgsmålets titel",
+    "Time question title" : "Tid - spørgsmåls titel",
     "People can pick a time" : "Brugere kan vælge et tidspunkt",
     "Pick a time" : "Vælg et tidspunkt"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
