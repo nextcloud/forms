@@ -203,8 +203,8 @@ class FormsService {
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
 		$result['canSubmit'] = $this->canSubmit($form->getId());
 
-		// Append submissionCount if currentUser is owner
-		if ($this->currentUser && $form->getOwnerId() === $this->currentUser->getUID()) {
+		// Append submissionCount if currentUser has permissions to see results
+		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
 			$result['submissionCount'] = $this->submissionMapper->countSubmissions($id);
 		}
 
@@ -230,8 +230,8 @@ class FormsService {
 			'partial' => true
 		];
 
-		// Append submissionCount if currentUser is owner
-		if ($this->currentUser && $form->getOwnerId() === $this->currentUser->getUID()) {
+		// Append submissionCount if currentUser has permissions to see results
+		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
 			$result['submissionCount'] = $this->submissionMapper->countSubmissions($id);
 		}
 
@@ -271,12 +271,30 @@ class FormsService {
 		}
 
 		$permissions = [];
-		// Add submit permission if user has access.
-		if ($this->hasUserAccess($formId)) {
-			$permissions[] = Constants::PERMISSION_SUBMIT;
+		$shares = $this->getSharesWithUser($formId, $this->currentUser->getUID());
+		foreach ($shares as $share) {
+			$permissions = array_merge($permissions, $share->getPermissions());
 		}
 
-		return $permissions;
+		// Fall back to submit permission if access is granted to all users
+		if (count($permissions) === 0) {
+			$access = $form->getAccess();
+			if ($access['permitAllUsers'] && $this->configService->getAllowPermitAll()) {
+				$permissions = [Constants::PERMISSION_SUBMIT];
+			}
+		}
+
+		return array_values(array_unique($permissions));
+	}
+
+	/**
+	 * Can the current user see results of a form
+	 *
+	 * @param int $formId
+	 * @return boolean
+	 */
+	public function canSeeResults(int $formId): bool {
+		return in_array(Constants::PERMISSION_RESULTS, $this->getPermissions($formId));
 	}
 
 	/**
@@ -409,33 +427,12 @@ class FormsService {
 	/**
 	 * Checking all selected shares
 	 *
-	 * @param $formId
+	 * @param int $formId
 	 * @return bool
 	 */
 	public function isSharedToUser(int $formId): bool {
-		$shareEntities = $this->shareMapper->findByForm($formId);
-		foreach ($shareEntities as $shareEntity) {
-			$share = $shareEntity->read();
-
-			// Needs different handling for shareTypes
-			switch ($share['shareType']) {
-				case IShare::TYPE_USER:
-					if ($share['shareWith'] === $this->currentUser->getUID()) {
-						return true;
-					}
-					break;
-				case IShare::TYPE_GROUP:
-					if ($this->groupManager->isInGroup($this->currentUser->getUID(), $share['shareWith'])) {
-						return true;
-					}
-					break;
-				default:
-					// Return false below
-			}
-		}
-
-		// No share found.
-		return false;
+		$shareEntities = $this->getSharesWithUser($formId, $this->currentUser->getUID());
+		return count($shareEntities) > 0;
 	}
 
 	/*
@@ -494,5 +491,36 @@ class FormsService {
 			default:
 				// Do nothing.
 		}
+	}
+
+	/**
+	 * Return shares of a form shared with given user
+	 *
+	 * @param int $formId The form to query shares for
+	 * @param string $userId The user to check if shared with
+	 * @return array
+	 */
+	protected function getSharesWithUser(int $formId, string $userId): array {
+		$shareEntities = $this->shareMapper->findByForm($formId);
+
+		return array_filter($shareEntities, function ($shareEntity) use ($userId) {
+			$share = $shareEntity->read();
+
+			// Needs different handling for shareTypes
+			switch ($share['shareType']) {
+				case IShare::TYPE_USER:
+					if ($share['shareWith'] === $userId) {
+						return true;
+					}
+					break;
+				case IShare::TYPE_GROUP:
+					if ($this->groupManager->isInGroup($userId, $share['shareWith'])) {
+						return true;
+					}
+					break;
+				default:
+					return false;
+			}
+		});
 	}
 }
