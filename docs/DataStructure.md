@@ -139,7 +139,7 @@ The actual answers of users on submission.
 }
 ```
 
-## Permmissions
+## Permissions
 Array of permissions, the user has on the form. Permissions are named by resp. routes on frontend.
 | Permission | Description |
 | -----------|-------------|

@@ -27,6 +27,7 @@ namespace OCA\Forms\Tests\Unit\Service;
 use OCA\Forms\Service\FormsService;
 
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Option;
@@ -199,6 +200,7 @@ class FormsServiceTest extends TestCase {
 						'formId' => 42,
 						'shareType' => 0,
 						'shareWith' => 'someUser',
+						'permissions' => [Constants::PERMISSION_SUBMIT],
 						'displayName' => 'Some User'
 					]
 				],
@@ -294,6 +296,7 @@ class FormsServiceTest extends TestCase {
 		$share->setFormId(42);
 		$share->setShareType(0);
 		$share->setShareWith('someUser');
+		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
 
 		$this->shareMapper->expects($this->any())
 			->method('findByForm')
@@ -334,6 +337,58 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 		$form->setOwnerId('currentUser');
 		$form->setExpires(0);
+
+		$this->formMapper->expects($this->exactly(2))
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(42)
+			->willReturn(123);
+
+		// Run the test
+		$this->assertEquals($expected, $this->formsService->getPartialFormArray(42));
+	}
+
+	public function dataGetPartialFormShared() {
+		return [
+			'onePartialOwnedForm' => [[
+				'id' => 42,
+				'hash' => 'abcdefg',
+				'title' => 'Form 1',
+				'expires' => 0,
+				'permissions' => ['results', 'submit'],
+				'submissionCount' => 123,
+				'partial' => true
+			]]
+		];
+	}
+	/**
+	 * Make sure shared users with results permission also receive the submission count
+	 * @dataProvider dataGetPartialFormShared
+	 *
+	 * @param array $expected
+	 */
+	public function testGetPartialFormShared(array $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setHash('abcdefg');
+		$form->setTitle('Form 1');
+		$form->setOwnerId('otherUser');
+		$form->setExpires(0);
+
+		$share = new Share();
+		$share->setFormId(42);
+		$share->setPermissions([Constants::PERMISSION_RESULTS, Constants::PERMISSION_SUBMIT]);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('currentUser');
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
 
 		$this->formMapper->expects($this->exactly(2))
 			->method('findById')
@@ -438,6 +493,7 @@ class FormsServiceTest extends TestCase {
 					'permitAllUsers' => false,
 					'showToAllUsers' => false,
 				],
+				'shares' => [],
 				'expected' => ['edit', 'results', 'submit'],
 			],
 			'allUsersCanSubmit' => [
@@ -446,6 +502,7 @@ class FormsServiceTest extends TestCase {
 					'permitAllUsers' => true,
 					'showToAllUsers' => false,
 				],
+				'shares' => [],
 				'expected' => ['submit'],
 			],
 			'noPermission' => [
@@ -454,7 +511,31 @@ class FormsServiceTest extends TestCase {
 					'permitAllUsers' => false,
 					'showToAllUsers' => false,
 				],
+				'shares' => [],
 				'expected' => [],
+			],
+			'submitByShare' => [
+				'ownerId' => 'someOtherUser',
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shares' => [[
+					'permissions' => ['submit']
+				]],
+				'expected' => ['submit'],
+			],
+			'submitResultsByShare' => [
+				'ownerId' => 'someOtherUser',
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shares' => [
+					['permissions' => ['submit']],
+					['permissions' => ['submit', 'results']]
+				],
+				'expected' => ['submit', 'results'],
 			]
 		];
 	}
@@ -465,7 +546,7 @@ class FormsServiceTest extends TestCase {
 	 * @param array $access
 	 * @param array $expected
 	 */
-	public function testGetPermissions(string $ownerId, array $access, array $expected) {
+	public function testGetPermissions(string $ownerId, array $access, array $shares, array $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setOwnerId($ownerId);
@@ -476,16 +557,100 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn($form);
 
+		$sharesEntities = [];
+		$shareId = 0;
+		foreach ($shares as $share) {
+			$shareEntity = new Share();
+			$shareEntity->setId($shareId++);
+			$shareEntity->setFormId(42);
+			$shareEntity->setShareType(IShare::TYPE_USER);
+			$shareEntity->setShareWith('currentUser');
+			$shareEntity->setPermissions($share['permissions']);
+			$sharesEntities[] = $shareEntity;
+		}
+
 		$this->shareMapper->expects($this->any())
 			->method('findByForm')
 			->with(42)
-			->willReturn([]);
+			->willReturn($sharesEntities);
 
 		$this->configService->expects($this->any())
 			->method('getAllowPermitAll')
 			->willReturn(true);
 
 		$this->assertEquals($expected, $this->formsService->getPermissions(42));
+	}
+
+	public function dataCanSeeResults() {
+		return [
+			'allowFormOwner' => [
+				'ownerId' => 'currentUser',
+				'sharesArray' => [],
+				'expected' => true
+			],
+			'allowShared' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [[
+					'with' => 'currentUser',
+					'type' => 0,
+					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS],
+				]],
+				'expected' => true
+			],
+			'disallowNotowned' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [],
+				'expected' => false
+			],
+			'allowNotShared' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [[
+					'with' => 'currentUser',
+					'type' => 0,
+					'permissions' => [Constants::PERMISSION_SUBMIT],
+				]],
+				'expected' => false
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataCanSeeResults
+	 *
+	 * @param string $ownerId
+	 * @param array $sharesArray
+	 * @param bool $expected
+	 */
+	public function testCanSeeResults(string $ownerId, array $sharesArray, bool $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId($ownerId);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+		
+		$this->formMapper->expects($this->any())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$shares = [];
+		foreach ($sharesArray as $id => $share) {
+			$shareEntity = new Share();
+			$shareEntity->setId($id);
+			$shareEntity->setFormId(42);
+			$shareEntity->setShareType($share['type']);
+			$shareEntity->setShareWith($share['with']);
+			$shareEntity->setPermissions($share['permissions']);
+			$shares[] = $shareEntity;
+		}
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn($shares);
+
+		$this->assertEquals($expected, $this->formsService->canSeeResults(42));
 	}
 
 	public function dataCanSubmit() {
