@@ -108,6 +108,7 @@ class ShareApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Add a new share
@@ -213,6 +214,7 @@ class ShareApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Delete a share
