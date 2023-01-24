@@ -115,11 +115,13 @@ class Constants {
 	// Define Form Permissions
 	public const PERMISSION_EDIT = 'edit';
 	public const PERMISSION_RESULTS = 'results';
+	public const PERMISSION_RESULTS_DELETE = 'results_delete';
 	public const PERMISSION_SUBMIT = 'submit';
 
 	public const PERMISSION_ALL = [
 		self::PERMISSION_EDIT,
 		self::PERMISSION_RESULTS,
+		self::PERMISSION_RESULTS_DELETE,
 		self::PERMISSION_SUBMIT
 	];
 

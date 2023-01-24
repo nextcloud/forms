@@ -141,11 +141,12 @@ The actual answers of users on submission.
 
 ## Permissions
 Array of permissions, the user has on the form. Permissions are named by resp. routes on frontend.
-| Permission | Description |
-| -----------|-------------|
-| edit       | User is allowed to edit the form |
-| results    | User is allowed to access the form results |
-| submit     | User is allowed to submit to the form |
+| Permission     | Description |
+| ---------------|-------------|
+| edit           | User is allowed to edit the form |
+| results        | User is allowed to access the form results |
+| results_delete | User is allowed to delete form submissions |
+| submit         | User is allowed to submit to the form |
 
 ## Access Object
 Defines some extended options of sharing / access

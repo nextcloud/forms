@@ -25,7 +25,7 @@
 		<div class="submission-head">
 			<h3>{{ submission.userDisplayName }}</h3>
 			<NcActions class="submission-menu" :force-menu="true">
-				<NcActionButton @click="onDelete">
+				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>
 						<IconDelete :size="20" />
 					</template>
@@ -69,6 +69,10 @@ export default {
 		},
 		questions: {
 			type: Array,
+			required: true,
+		},
+		canDeleteSubmission: {
+			type: Boolean,
 			required: true,
 		},
 	},

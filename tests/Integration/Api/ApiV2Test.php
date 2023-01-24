@@ -24,7 +24,7 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Integration\Api;
 
-use OCA\Forms\Db\Form;
+use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -356,11 +356,7 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefg',
 					'title' => 'Title of a Form',
 					'expires' => 0,
-					'permissions' => [
-						'edit',
-						'results',
-						'submit'
-					],
+					'permissions' => Constants::PERMISSION_ALL,
 					'partial' => true,
 					'submissionCount' => 3
 				]]
@@ -460,11 +456,7 @@ class ApiV2Test extends TestCase {
 					'submitMultiple' => false,
 					'showExpiration' => false,
 					'canSubmit' => true,
-					'permissions' => [
-						'edit',
-						'results',
-						'submit'
-					],
+					'permissions' => Constants::PERMISSION_ALL,
 					'questions' => [],
 					'shares' => [],
 					'submissionCount' => 0,
@@ -515,11 +507,7 @@ class ApiV2Test extends TestCase {
 					'submitMultiple' => false,
 					'showExpiration' => false,
 					'canSubmit' => true,
-					'permissions' => [
-						'edit',
-						'results',
-						'submit'
-					],
+					'permissions' => Constants::PERMISSION_ALL,
 					'questions' => [
 						[
 							'type' => 'short',

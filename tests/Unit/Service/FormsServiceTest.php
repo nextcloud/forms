@@ -204,11 +204,7 @@ class FormsServiceTest extends TestCase {
 						'displayName' => 'Some User'
 					]
 				],
-				'permissions' => [
-					'edit',
-					'results',
-					'submit'
-				]
+				'permissions' => Constants::PERMISSION_ALL
 			]]
 		];
 	}
@@ -319,7 +315,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
-				'permissions' => ['edit', 'results', 'submit'],
+				'permissions' => Constants::PERMISSION_ALL,
 				'submissionCount' => 123,
 				'partial' => true
 			]]
@@ -494,7 +490,7 @@ class FormsServiceTest extends TestCase {
 					'showToAllUsers' => false,
 				],
 				'shares' => [],
-				'expected' => ['edit', 'results', 'submit'],
+				'expected' => Constants::PERMISSION_ALL,
 			],
 			'allUsersCanSubmit' => [
 				'ownerId' => 'someOtherUser',
