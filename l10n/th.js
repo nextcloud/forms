@@ -22,7 +22,7 @@ OC.L10N.register(
     "Create a form" : "สร้างฟอร์มใหม่",
     "Select a form or create a new one" : "เลือกฟอร์มหรือสร้างฟอร์มใหม่",
     "Create new form" : "สร้างฟอร์มใหม่",
-    "An error occurred while loading the forms list" : "เกิดข้อผิดพลาดขณะโหลดรายชื่อฟอร์ม",
+    "An error occurred while loading the forms list" : "เกิดข้อผิดพลาดขณะโหลดรายการฟอร์ม",
     "Form not found" : "ไม่พบฟอร์ม",
     "Unable to create a new form" : "ไม่สามารถสร้างฟอร์มใหม่",
     "Unable to copy form" : "ไม่สามารถคัดลอกฟอร์ม",
