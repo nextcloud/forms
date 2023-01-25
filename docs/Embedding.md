@@ -19,6 +19,54 @@ Using the copy-embedding-code button on the *sharing sidebar* will automatically
 ```
 The size parameters are based on our default forms styling.
 
+## window message events 
+The embedded view provides a `MessageEvent` to communicate its size with its parent window.
+This is done as accessing the document within an `iframe` is not possible if not on the same domain.
+
+### Auto resizing the `iframe`
+
+The emitted message on the embedded view looks like this:
+```json
+{
+	"type": "resize-iframe",
+	"payload": {
+		"width": 750,
+		"height": 900,
+	},
+}
+```
+
+To receive this information on your parent site:
+```js
+window.addEventListener("message", (event) => {
+	if (event.origin !== "http://your-nextcloud-server.com") {
+		return;
+	}
+
+	if (event.data.type !== "resize-iframe") {
+		return;
+	}
+
+	const { width, height } = event.data.payload;
+
+	iframe.width = width;
+	iframe.height = height;
+}, false);
+```
+
+### Form submitted
+When the form is submitted a message event like this is emitted:
+
+The emitted message on the embedded view looks like this:
+```json
+{
+	"type": "form-saved",
+	"payload": {
+		"id": 1234,
+	},
+}
+```
+
 ## Custom styling
 To apply custom styles on the embedded forms the [Custom CSS App](https://apps.nextcloud.com/apps/theming_customcss) can be used.
 
