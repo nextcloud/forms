@@ -43,74 +43,29 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
-
 use Psr\Log\LoggerInterface;
 
 /**
  * Trait for getting forms information in a service
  */
 class FormsService {
+	private ?IUser $currentUser;
 
-	/** @var ActivityManager */
-	private $activityManager;
-	
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var OptionMapper */
-	private $optionMapper;
-
-	/** @var QuestionMapper */
-	private $questionMapper;
-
-	/** @var ShareMapper */
-	private $shareMapper;
-
-	/** @var SubmissionMapper */
-	private $submissionMapper;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IUser */
-	private $currentUser;
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var ISecureRandom */
-	private $secureRandom;
-
-	public function __construct(ActivityManager $activityManager,
-		FormMapper $formMapper,
-		OptionMapper $optionMapper,
-		QuestionMapper $questionMapper,
-		ShareMapper $shareMapper,
-		SubmissionMapper $submissionMapper,
-		ConfigService $configService,
-		IGroupManager $groupManager,
-		LoggerInterface $logger,
-		IUserManager $userManager,
+	public function __construct(
 		IUserSession $userSession,
-		ISecureRandom $secureRandom) {
-		$this->activityManager = $activityManager;
-		$this->formMapper = $formMapper;
-		$this->optionMapper = $optionMapper;
-		$this->questionMapper = $questionMapper;
-		$this->shareMapper = $shareMapper;
-		$this->submissionMapper = $submissionMapper;
-		$this->configService = $configService;
-		$this->groupManager = $groupManager;
-		$this->logger = $logger;
-		$this->userManager = $userManager;
-		$this->secureRandom = $secureRandom;
-
+		private ActivityManager $activityManager,
+		private FormMapper $formMapper,
+		private OptionMapper $optionMapper,
+		private QuestionMapper $questionMapper,
+		private ShareMapper $shareMapper,
+		private SubmissionMapper $submissionMapper,
+		private ConfigService $configService,
+		private IGroupManager $groupManager,
+		private LoggerInterface $logger,
+		private IUserManager $userManager,
+		private ISecureRandom $secureRandom,
+		private CirclesService $circlesService,
+	) {
 		$this->currentUser = $userSession->getUser();
 	}
 
@@ -462,6 +417,12 @@ class FormsService {
 					$displayName = $group->getDisplayName();
 				}
 				break;
+			case IShare::TYPE_CIRCLE:
+				$circle = $this->circlesService->getCircle($share['shareWith']);
+				if (!is_null($circle)) {
+					$displayName = $circle->getDisplayName();
+				}
+				break;
 			default:
 				// Preset Empty.
 		}
@@ -481,6 +442,9 @@ class FormsService {
 				break;
 			case IShare::TYPE_GROUP:
 				$this->activityManager->publishNewGroupShare($form, $share->getShareWith());
+				break;
+			case IShare::TYPE_CIRCLE:
+				$this->activityManager->publishNewCircleShare($form, $share->getShareWith());
 				break;
 			default:
 				// Do nothing.
@@ -528,6 +492,11 @@ class FormsService {
 					break;
 				case IShare::TYPE_GROUP:
 					if ($this->groupManager->isInGroup($userId, $share['shareWith'])) {
+						return true;
+					}
+					break;
+				case IShare::TYPE_CIRCLE:
+					if ($this->circlesService->isUserInCircle($share['shareWith'], $userId)) {
 						return true;
 					}
 					break;

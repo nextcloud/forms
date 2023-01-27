@@ -26,6 +26,7 @@ namespace OCA\Forms\Activity;
 use Exception;
 
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Service\CirclesService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IEventMerger;
 use OCP\Activity\IProvider;
@@ -36,54 +37,21 @@ use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
 use OCP\RichObjectStrings\IValidator;
-
 use Psr\Log\LoggerInterface;
 
 class Provider implements IProvider {
-	private $appName;
-
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var IEventMerger */
-	private $eventMerger;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var IFactory */
-	private $l10nFactory;
-
-	/** @var IValidator */
-	private $validator;
-
-	public function __construct(string $appName,
-		FormMapper $formMapper,
-		IEventMerger $eventMerger,
-		IGroupManager $groupManager,
-		LoggerInterface $logger,
-		IURLGenerator $urlGenerator,
-		IUserManager $userManager,
-		IFactory $l10nFactory,
-		IValidator $validator) {
-		$this->appName = $appName;
-		$this->formMapper = $formMapper;
-		$this->eventMerger = $eventMerger;
-		$this->groupManager = $groupManager;
-		$this->logger = $logger;
-		$this->urlGenerator = $urlGenerator;
-		$this->userManager = $userManager;
-		$this->l10nFactory = $l10nFactory;
-		$this->validator = $validator;
+	public function __construct(
+		protected string $appName,
+		private FormMapper $formMapper,
+		private IEventMerger $eventMerger,
+		private IGroupManager $groupManager,
+		private LoggerInterface $logger,
+		private IURLGenerator $urlGenerator,
+		private IUserManager $userManager,
+		private IFactory $l10nFactory,
+		private IValidator $validator,
+		private CirclesService $circlesService,
+	) {
 	}
 
 	/**
@@ -130,6 +98,9 @@ class Provider implements IProvider {
 			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
 				return $l10n->t('{user} has shared the form {formTitle} with group {group}');
 
+			case ActivityConstants::SUBJECT_NEWCIRCLESHARE:
+				return $l10n->t('{user} has shared the form {formTitle} with circle {circle}');
+
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
 				return $l10n->t('{user} answered your form {formTitle}');
 
@@ -173,6 +144,12 @@ class Provider implements IProvider {
 					'user' => $this->getRichUser($l10n, $params['userId']),
 					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
 					'group' => $this->getRichGroup($params['groupId'])
+				];
+			case ActivityConstants::SUBJECT_NEWCIRCLESHARE:
+				return [
+					'user' => $this->getRichUser($l10n, $params['userId']),
+					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
+					'circle' => $this->getRichCircle($params['circleId'])
 				];
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
 				return [
@@ -235,6 +212,30 @@ class Provider implements IProvider {
 			'type' => 'user-group',
 			'id' => $groupId,
 			'name' => $displayName
+		];
+	}
+
+	/**
+	 * Turn a circleId into a rich-circle array.
+	 *
+	 * @param string $groupId
+	 * @return array
+	 */
+	public function getRichCircle(string $circleId): array {
+		$displayName = $circleId;
+		$link = '';
+
+		$circle = $this->circlesService->getCircle($circleId);
+		if (!is_null($circle)) {
+			$displayName = $circle->getDisplayName();
+			$link = $circle->getUrl();
+		}
+
+		return [
+			'type' => 'circle',
+			'id' => $circleId,
+			'name' => $displayName,
+			'link' => $link,
 		];
 	}
 

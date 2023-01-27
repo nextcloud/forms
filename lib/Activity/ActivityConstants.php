@@ -55,6 +55,15 @@ class ActivityConstants {
 	public const SUBJECT_NEWGROUPSHARE = 'newgroupshare';
 
 	/**
+	 * Somebody shared a form to a selected circle
+	 * Needs Params:
+	 * "user": The userId of the user who shared.
+	 * 'circleId': The circleId, that was shared to.
+	 * "formTitle": The hash of the shared form.
+	 * "formHash": The hash of the shared form
+	 */
+	public const SUBJECT_NEWCIRCLESHARE = 'newcircleshare';
+	/**
 	 * Somebody submitted an answer to a form
 	 * Needs Params:
 	 * "user": The userId of the user who submitted. Can also be our 'anon-user-', which will be handled separately.

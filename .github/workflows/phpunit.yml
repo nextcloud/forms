@@ -34,6 +34,13 @@ jobs:
           ref: ${{ matrix.server-versions }}
           submodules: true
 
+      - name: Checkout circles dependency
+        uses: actions/checkout@v3
+        with:
+          repository: nextcloud/circles
+          ref: ${{ matrix.server-versions }}
+          path: apps/circles
+
       - name: Checkout app
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
         with:
@@ -119,6 +126,13 @@ jobs:
           ref: ${{ matrix.server-versions }}
           submodules: true
 
+      - name: Checkout circles dependency
+        uses: actions/checkout@v3
+        with:
+          repository: nextcloud/circles
+          ref: ${{ matrix.server-versions }}
+          path: apps/circles
+
       - name: Checkout app
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
         with:
@@ -187,6 +201,13 @@ jobs:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
+
+      - name: Checkout circles dependency
+        uses: actions/checkout@v3
+        with:
+          repository: nextcloud/circles
+          ref: ${{ matrix.server-versions }}
+          path: apps/circles
 
       - name: Checkout app
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
@@ -266,6 +287,13 @@ jobs:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
+
+      - name: Checkout circles dependency
+        uses: actions/checkout@v3
+        with:
+          repository: nextcloud/circles
+          ref: ${{ matrix.server-versions }}
+          path: apps/circles
 
       - name: Checkout app
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608

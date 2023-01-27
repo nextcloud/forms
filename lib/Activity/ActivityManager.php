@@ -25,6 +25,7 @@ namespace OCA\Forms\Activity;
 
 use OCA\Forms\Db\Form;
 
+use OCA\Forms\Service\CirclesService;
 use OCP\Activity\IManager;
 use OCP\IGroupManager;
 use OCP\IUser;
@@ -34,29 +35,17 @@ use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
 class ActivityManager {
-	protected $appName;
-
-	/** @var IManager */
-	private $manager;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var LoggerInterface */
-	private $logger;
-
 	/** @var IUser */
 	private $currentUser;
 
-	public function __construct(string $appName,
-		IManager $manager,
-		IGroupManager $groupManager,
-		LoggerInterface $logger,
-		IUserSession $userSession) {
-		$this->appName = $appName;
-		$this->manager = $manager;
-		$this->groupManager = $groupManager;
-		$this->logger = $logger;
+	public function __construct(
+		protected string $appName,
+		private IManager $manager,
+		private IGroupManager $groupManager,
+		private LoggerInterface $logger,
+		private IUserSession $userSession,
+		private CirclesService $circlesService,
+	) {
 		$this->currentUser = $userSession->getUser();
 	}
 
@@ -98,6 +87,33 @@ class ActivityManager {
 				->setSubject(ActivityConstants::SUBJECT_NEWGROUPSHARE, [
 					'userId' => $this->currentUser->getUID(),
 					'groupId' => $groupId,
+					'formTitle' => $form->getTitle(),
+					'formHash' => $form->getHash()
+				])
+				->setObject('form', $form->getId());
+
+			$this->manager->publish($event);
+		}
+	}
+
+	/**
+	 * Publish a new-CircleShare Activity to each affected user
+	 *
+	 * @param Form $form The shared form
+	 * @param string $circleId Circle the form has been shared to
+	 */
+	public function publishNewCircleShare(Form $form, string $circleId) {
+		$users = $this->circlesService->getCircleUsers($circleId);
+
+		foreach ($users as $user) {
+			$event = $this->manager->generateEvent();
+			$event->setApp($this->appName)
+				->setType(ActivityConstants::TYPE_NEWSHARE)
+				->setAffectedUser($user)
+				->setAuthor($this->currentUser->getUID())
+				->setSubject(ActivityConstants::SUBJECT_NEWCIRCLESHARE, [
+					'userId' => $this->currentUser->getUID(),
+					'circleId' => $circleId,
 					'formTitle' => $form->getTitle(),
 					'formHash' => $form->getHash()
 				])
