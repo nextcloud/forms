@@ -1,0 +1,13 @@
+{
+	"globals": {
+		"appName": true
+	},
+	"extends": [
+		"@nextcloud"
+	],
+	"rules": {
+		// We are using the @nextcloud/logger
+		"no-console": "error",
+		"import/no-unresolved": ["error", { "ignore": ["\\?raw"] }]
+	}
+}

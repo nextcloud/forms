@@ -24,6 +24,7 @@ cypress/snapshots
 
 # Compiled files
 js/
+css/forms-style.css
 
 # Compile-Cache
 v8-compile-cache-0/

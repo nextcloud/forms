@@ -25,6 +25,9 @@ import Vue from 'vue'
 
 import FormsSubmitRoot from './FormsSubmit.vue'
 
+// eslint-disable-next-line import/no-unresolved, n/no-missing-import
+import 'vite/modulepreload-polyfill'
+
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
