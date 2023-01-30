@@ -25,7 +25,6 @@
 		:text="text"
 		:description="description"
 		:is-required="isRequired"
-		:shuffle-options="!!extraSettings?.shuffleOptions"
 		:edit.sync="edit"
 		:read-only="readOnly"
 		:max-string-lengths="maxStringLengths"
@@ -36,8 +35,13 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
-		@update:shuffleOptions="onShuffleOptionsChange"
 		@delete="onDelete">
+		<template #actions>
+			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
+				@update:checked="onShuffleOptionsChange">
+				{{ t('forms', 'Shuffle options') }}
+			</NcActionCheckbox>
+		</template>
 		<template v-if="!edit">
 			<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
 				:key="answer.id"
@@ -89,6 +93,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
@@ -105,6 +110,7 @@ export default {
 		AnswerInput,
 		IconCheckboxBlankOutline,
 		IconRadioboxBlank,
+		NcActionCheckbox,
 		NcCheckboxRadioSwitch,
 	},
 

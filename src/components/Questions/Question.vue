@@ -65,11 +65,7 @@
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
-					<NcActionCheckbox v-if="shuffleOptions !== undefined"
-						:checked="shuffleOptions"
-						@update:checked="onShuffleOptionsChange">
-						{{ t('forms', 'Shuffle options') }}
-					</NcActionCheckbox>
+					<slot name="actions" />
 					<NcActionButton @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -150,10 +146,6 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		shuffleOptions: {
-			type: Boolean,
-			default: undefined,
-		},
 		edit: {
 			type: Boolean,
 			required: true,
@@ -219,10 +211,6 @@ export default {
 
 		onRequiredChange(isRequired) {
 			this.$emit('update:isRequired', isRequired)
-		},
-
-		onShuffleOptionsChange(shuffleOptions) {
-			this.$emit('update:shuffleOptions', shuffleOptions)
 		},
 
 		/**
