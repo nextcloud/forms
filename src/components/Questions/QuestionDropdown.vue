@@ -42,16 +42,16 @@
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
 		</template>
-		<NcMultiselect v-if="!edit"
+		<NcSelect v-if="!edit"
 			v-model="selectedOption"
 			:name="text"
 			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"
 			:required="isRequired"
 			:options="sortedOptions"
+			:searchable="false"
 			label="text"
-			track-by="id"
-			@select="onSelect" />
+			@input="onInput" />
 
 		<ol v-if="edit" class="question__content">
 			<!-- Answer text input edit -->
@@ -87,7 +87,7 @@ import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
-import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
@@ -100,7 +100,7 @@ export default {
 	components: {
 		AnswerInput,
 		NcActionCheckbox,
-		NcMultiselect,
+		NcSelect,
 	},
 
 	mixins: [QuestionMixin],
@@ -173,15 +173,14 @@ export default {
 	},
 
 	methods: {
-		onSelect(option) {
-			// Simple select
-			if (!this.isMultiple) {
-				this.$emit('update:values', [option.id])
+		onInput(option) {
+			if (Array.isArray(option)) {
+				this.$emit('update:values', [...new Set(option.map((opt) => opt.id))])
 				return
 			}
 
-			// Emit values and remove duplicates
-			this.$emit('update:values', [...new Set(option.id)])
+			// Simple select
+			this.$emit('update:values', option ? [option.id] : [])
 		},
 
 		/**
