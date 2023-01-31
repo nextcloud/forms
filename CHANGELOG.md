@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.0.4 - 2023-01-31
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.3...v3.0.4)
+
+### Enhancements
+- Show relative expiration date inside form [\#1432](https://github.com/nextcloud/forms/pull/1432) ([Chartman123](https://github.com/Chartman123))
+
+### Fixed
+- Fix insert [\#1465](https://github.com/nextcloud/forms/pull/1465) ([jotoeri](https://github.com/jotoeri))
+- Fix cors on ShareApi [\#1463](https://github.com/nextcloud/forms/pull/1463) ([jotoeri](https://github.com/jotoeri))
+- Fix public insert [\#1456](https://github.com/nextcloud/forms/pull/1456) ([jotoeri](https://github.com/jotoeri))
+- Import form question extra settings [\#1440](https://github.com/nextcloud/forms/pull/1440) ([Copephobia](https://github.com/Copephobia))
+
+### Merged
+- Show info message only if available [\#1441](https://github.com/nextcloud/forms/pull/1441) ([susnux](https://github.com/susnux))
+- Update phpunit.yml to work with current Server master [\#1460](https://github.com/nextcloud/forms/pull/1460) ([Chartman123](https://github.com/Chartman123))
+- Enable PHPUnit integration tests and fix them [\#1449](https://github.com/nextcloud/forms/pull/1449) ([Chartman123](https://github.com/Chartman123))
+- Scope SCSS in Create.vue and adjust Results.vue [\#1447](https://github.com/nextcloud/forms/pull/1447) ([Chartman123](https://github.com/Chartman123))
+- Fix Typo [\#1450](https://github.com/nextcloud/forms/pull/1450) ([jotoeri](https://github.com/jotoeri))
+
+
 ## 3.0.3 - 2022-12-30
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.2...v3.0.3)
