@@ -38,7 +38,7 @@
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 		<!-- Forms title & description-->
-		<header>
+		<header v-click-outside="disableEdit" @click="enableEdit">
 			<h2>
 				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
 				<textarea id="form-title"
@@ -49,19 +49,23 @@
 					:minlength="0"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
+					:readonly="!isEditing"
 					:required="true"
 					autofocus
-					type="text"
 					@input="onTitleChange" />
 			</h2>
-			<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
-			<textarea ref="description"
-				v-model="form.description"
-				class="form-desc"
-				rows="1"
-				:maxlength="maxStringLengths.formDescription"
-				:placeholder="t('forms', 'Description')"
-				@input="onDescChange" />
+			<template v-if="isEditing">
+				<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
+				<NcRichContenteditable id="form-desc"
+					class="form-desc form-desc__input"
+					:value="form.description"
+					:multiline="true"
+					:placeholder="t('forms', 'Description')"
+					:maxlength="maxStringLengths.formDescription"
+					@update:value="updateDescription" />
+			</template>
+			<!-- eslint-disable-next-line vue/no-v-html -->
+			<div v-else class="form-desc" v-html="formDescription" />
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}
@@ -121,6 +125,7 @@
 </template>
 
 <script>
+import { directive as ClickOutside } from 'v-click-outside'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
@@ -134,6 +139,7 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import NcRichContenteditable from '@nextcloud/vue/dist/Components/NcRichContenteditable.js'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
 import answerTypes from '../models/AnswerTypes.js'
@@ -159,6 +165,7 @@ export default {
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
+		NcRichContenteditable,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -166,36 +173,33 @@ export default {
 		TopBar,
 	},
 
+	directives: {
+		ClickOutside,
+	},
+
 	mixins: [ViewsMixin],
 
 	data() {
 		return {
-			maxStringLengths: loadState('forms', 'maxStringLengths'),
-
-			questionMenuOpened: false,
 			answerTypes,
+			edit: false,
 
 			// Various states
 			isLoadingQuestions: false,
 			isDragging: false,
+
+			maxStringLengths: loadState('forms', 'maxStringLengths'),
+			questionMenuOpened: false,
 		}
 	},
 
 	computed: {
-		/**
-		 * Return form title, or placeholder if not set
-		 *
-		 * @return {string}
-		 */
-		formTitle() {
-			if (this.form.title) {
-				return this.form.title
-			}
-			return t('forms', 'New form')
-		},
-
 		hasQuestions() {
 			return this.form.questions && this.form.questions.length === 0
+		},
+
+		isEditing() {
+			return this.edit || !this.form.title
 		},
 
 		isRequiredUsed() {
@@ -255,7 +259,6 @@ export default {
 
 	updated() {
 		this.autoSizeTitle()
-		this.autoSizeDescription()
 	},
 
 	methods: {
@@ -263,8 +266,23 @@ export default {
 			this.autoSizeTitle()
 			this.saveTitle()
 		},
-		onDescChange() {
-			this.autoSizeDescription()
+
+		disableEdit() {
+			this.edit = false
+		},
+
+		enableEdit() {
+			this.edit = true
+		},
+
+		/**
+		 * Update the description
+		 *
+		 * @param {string} value New description
+		 */
+		updateDescription(value = '') {
+			// We need this for nextcloud/nextcloud-vue#3669
+			this.form.description = value.trimEnd()
 			this.saveDescription()
 		},
 
@@ -379,19 +397,8 @@ export default {
 				const textarea = this.$refs.title
 				if (textarea) {
 					textarea.style.cssText = 'height:auto'
-					textarea.style.cssText = `height: ${textarea.scrollHeight}px`
-				}
-			})
-		},
-		/**
-		 * Auto adjust the description height based on lines number
-		 */
-		async autoSizeDescription() {
-			this.$nextTick(() => {
-				const textarea = this.$refs.description
-				if (textarea) {
-					textarea.style.cssText = 'height:auto'
-					textarea.style.cssText = `height: ${textarea.scrollHeight}px`
+					// include 2px border
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
 				}
 			})
 		},
@@ -418,41 +425,45 @@ export default {
 		margin-bottom: 24px;
 		margin-left: 56px;
 
-		h2 {
-			margin-bottom: 0; // because the input field has enough padding
-		}
-
-		.form-title,
-		.form-desc,
-		.info-message {
-			width: 100%;
-			padding: 0 16px;
-			border: none;
-		}
 		.form-title {
 			font-size: 28px;
 			font-weight: bold;
-			color: var(--color-main-text);
 			line-height: 34px;
+			color: var(--color-main-text);
 			min-height: 36px;
-			margin: 32px 0;
-			padding-left: 14px; // align with description (compensate font size diff)
-			padding-bottom: 4px;
+			padding: 0 14px; // same as submit but 2px borders
+			margin: 30px 0 14px; // same as on submit but minus padding-top description and borders
+			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			overflow: hidden;
 			text-overflow: ellipsis;
 			resize: none;
+
+			&:read-only {
+				border-color: transparent;
+			}
 		}
-		.form-desc {
+
+		.form-desc,
+		.info-message {
 			font-size: 100%;
-			line-height: 150%;
-			padding-bottom: 20px;
+			min-height: unset;
+			padding: 0px 16px 20px;
+			width: calc(100% - 56px);
+		}
+
+		.form-desc {
+			color: var(--color-text-maxcontrast);
+			line-height: 1.5em;
+			min-height: calc(25px + 1.5em); // one line
+			padding-top: 5px; // spacing border<>text
 			margin: 0px;
-			resize: none;
+
+			&__input {
+				padding: 3px 14px 18px; // 2px smaller because of border
+			}
 		}
 
 		.info-message {
-			font-size: 100%;
-			padding-bottom: 20px;
 			margin-top: 4px;
 			resize: none;
 			color: var(--color-text-maxcontrast);

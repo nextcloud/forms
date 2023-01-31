@@ -41,9 +41,8 @@
 			<h2 ref="title" class="form-title">
 				{{ formTitle }}
 			</h2>
-			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
-			<!-- eslint-disable-next-line -->
-			<p v-if="!loading && !success" class="form-desc">{{ form.description }}</p>
+			<!-- eslint-disable-next-line vue/no-v-html -->
+			<div v-if="!loading && !success && !!formDescription" class="form-desc" v-html="formDescription" />
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}
@@ -164,18 +163,6 @@ export default {
 	},
 
 	computed: {
-		/**
-		 * Return form title, or placeholder if not set
-		 *
-		 * @return {string}
-		 */
-		formTitle() {
-			if (this.form.title) {
-				return this.form.title
-			}
-			return t('forms', 'New form')
-		},
-
 		validQuestions() {
 			return this.form.questions.filter(question => {
 				// All questions must have a valid title
@@ -334,8 +321,9 @@ export default {
 		.form-title,
 		.form-desc,
 		.info-message {
-			width: 100%;
-			padding: 0 16px;
+			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
+			font-size: 100%;
+			padding: 0px 16px;
 			border: none;
 		}
 		.form-title {
@@ -345,21 +333,19 @@ export default {
 			line-height: 34px;
 			min-height: 36px;
 			margin: 32px 0;
-			padding-left: 14px; // align with description (compensate font size diff)
 			padding-bottom: 4px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
 		.form-desc {
-			font-size: 100%;
-			line-height: 150%;
+			line-height: 1.5em;
 			padding-bottom: 20px;
 			resize: none;
-			white-space: pre-line;
+			min-height: calc(20px + 1.5em); // one line
+			color: var(--color-text-maxcontrast);
 		}
 
 		.info-message {
-			font-size: 100%;
 			padding-bottom: 20px;
 			margin-top: 4px;
 			resize: none;

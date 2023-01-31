@@ -24,6 +24,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import Clipboard from 'v-clipboard'
+import MarkdownIt from 'markdown-it'
 import Vue from 'vue'
 
 import CancelableRequest from '../utils/CancelableRequest.js'
@@ -33,6 +34,12 @@ import logger from '../utils/Logger.js'
 Vue.use(Clipboard)
 
 export default {
+	provide() {
+		return {
+			$markdownit: this.markdownit,
+		}
+	},
+
 	props: {
 		hash: {
 			type: String,
@@ -59,7 +66,28 @@ export default {
 
 			// storage for axios cancel function
 			cancelFetchFullForm: () => {},
+
+			// markdown renderer for descriptions
+			markdownit: new MarkdownIt({ breaks: true }),
 		}
+	},
+
+	computed: {
+		/**
+		 * Return form title, or placeholder if not set
+		 *
+		 * @return {string}
+		 */
+		formTitle() {
+			if (this.form.title) {
+				return this.form.title
+			}
+			return t('forms', 'New form')
+		},
+
+		formDescription() {
+			return this.markdownit.render(this.form.description) || this.form.description
+		},
 	},
 
 	methods: {
