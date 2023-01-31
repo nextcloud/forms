@@ -206,6 +206,13 @@ export default {
 			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
 		},
 
+		/**
+		 * Check if form is expired
+		 */
+		isExpired() {
+			return this.form.expires && moment().unix() > this.form.expires
+		},
+
 		infoMessage() {
 			let message = ''
 			if (this.form.isAnonymous) {
