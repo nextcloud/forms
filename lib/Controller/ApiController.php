@@ -855,8 +855,8 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
+		if (!$this->formsService->canSeeResults($form->id)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
 			throw new OCSForbiddenException();
 		}
 
@@ -1111,8 +1111,8 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
+		if (!$this->formsService->canSeeResults($form->id)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
 			throw new OCSForbiddenException();
 		}
 
@@ -1145,8 +1145,8 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
+		if (!$this->formsService->canSeeResults($form->id)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
 			throw new OCSForbiddenException();
 		}
 

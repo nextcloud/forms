@@ -350,11 +350,12 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 - Endpoint: `/api/v2/share`
 - Method: `POST`
 - Parameters:
-  | Parameter   | Type    | Description |
-  |-------------|---------|-------------|
-  | _formId_    | Integer | Id of the form to share |
-  | _shareType_ | String  | NC-shareType, out of the used shareTypes. |
-  | _shareWith_ | String  | User/Group for the share. Not used for link-shares. |
+  | Parameter    | Type     | Description |
+  |--------------|----------|-------------|
+  | _formId_     | Integer  | Id of the form to share |
+  | _shareType_  | String   | NC-shareType, out of the used shareTypes. |
+  | _shareWith_  | String   | User/Group for the share. Not used for link-shares. |
+  | _permissions_ | String[] | Permissions of the sharees, see [DataStructure](DataStructure.md#Permissions). |
 - Response: **Status-Code OK**, as well as the new share object.
 ```
 "data": {
@@ -362,6 +363,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
   "formId": 3,
   "shareType": 0,
   "shareWith": "user3",
+  "permissions": ["submit"],
   "displayName": "User 3 Displayname"
 }
 ```
@@ -378,6 +380,19 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 "data": 5
 ```
 
+### Update a Share permissions
+- Endpoint: `/api/v2.1/share/update`
+- Url-Parameter:
+  | Parameter        | Type     | Description |
+  |------------------|----------|-------------|
+  | _id_             | Integer  | ID of the share to update |
+  | *keyValuePairs*¹ | Array    | Array of key-value pairs to update |
+  ¹Currently only the _permissions_ can be updated.
+- Method: `POST`
+- Response: **Status-Code OK**, as well as the id of the share object.
+```
+"data": 5
+```
 
 ## Submission Endpoints
 ### Get Form Submissions

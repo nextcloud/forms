@@ -24,7 +24,7 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Integration\Api;
 
-use OCA\Forms\Db\Form;
+use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -99,10 +99,12 @@ class ApiV2Test extends TestCase {
 					[
 						'shareType' => 0,
 						'shareWith' => 'user1',
+						'permissions' => ['submit', 'results'],
 					],
 					[
 						'shareType' => 3,
 						'shareWith' => 'shareHash',
+						'permissions' => ['submit'],
 					],
 				],
 				'submissions' => [
@@ -245,7 +247,8 @@ class ApiV2Test extends TestCase {
 					->values([
 						'form_id' => $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT),
 						'share_type' => $qb->createNamedParameter($share['shareType'], IQueryBuilder::PARAM_STR),
-						'share_with' => $qb->createNamedParameter($share['shareWith'], IQueryBuilder::PARAM_STR)
+						'share_with' => $qb->createNamedParameter($share['shareWith'], IQueryBuilder::PARAM_STR),
+						'permissions_json' => $qb->createNamedParameter(json_encode($share['permissions'] ?? null), IQueryBuilder::PARAM_STR),
 					]);
 				$qb->execute();
 				$this->testForms[$index]['shares'][$sIndex]['id'] = $qb->getLastInsertId();
@@ -353,11 +356,7 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefg',
 					'title' => 'Title of a Form',
 					'expires' => 0,
-					'permissions' => [
-						'edit',
-						'results',
-						'submit'
-					],
+					'permissions' => Constants::PERMISSION_ALL,
 					'partial' => true,
 					'submissionCount' => 3
 				]]
@@ -457,11 +456,7 @@ class ApiV2Test extends TestCase {
 					'submitMultiple' => false,
 					'showExpiration' => false,
 					'canSubmit' => true,
-					'permissions' => [
-						'edit',
-						'results',
-						'submit'
-					],
+					'permissions' => Constants::PERMISSION_ALL,
 					'questions' => [],
 					'shares' => [],
 					'submissionCount' => 0,
@@ -512,11 +507,7 @@ class ApiV2Test extends TestCase {
 					'submitMultiple' => false,
 					'showExpiration' => false,
 					'canSubmit' => true,
-					'permissions' => [
-						'edit',
-						'results',
-						'submit'
-					],
+					'permissions' => Constants::PERMISSION_ALL,
 					'questions' => [
 						[
 							'type' => 'short',
@@ -553,11 +544,13 @@ class ApiV2Test extends TestCase {
 						[
 							'shareType' => 0,
 							'shareWith' => 'user1',
+							'permissions' => ['submit', 'results'],
 							'displayName' => 'User No. 1'
 						],
 						[
 							'shareType' => 3,
 							'shareWith' => 'shareHash',
+							'permissions' => ['submit'],
 							'displayName' => ''
 						],
 					],
@@ -980,6 +973,7 @@ class ApiV2Test extends TestCase {
 					// 'formId' => Checked dynamically
 					'shareType' => 0,
 					'shareWith' => 'test',
+					'permissions' => ['submit'],
 					'displayName' => 'Test Displayname'
 				]
 			]
@@ -995,7 +989,8 @@ class ApiV2Test extends TestCase {
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'shareType' => 0,
-				'shareWith' => 'test'
+				'shareWith' => 'test',
+				'permissions' => ['submit']
 			]
 		]);
 		$data = $this->OcsResponse2Data($resp);
@@ -1008,6 +1003,38 @@ class ApiV2Test extends TestCase {
 		unset($data['formId']);
 		unset($data['id']);
 		$this->assertEquals($expected, $data);
+	}
+
+	public function dataUpdateShare() {
+		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+		$fullFormExpected['shares'][0]['permissions'] = [ Constants::PERMISSION_SUBMIT ];
+
+		return [
+			'deleteShare' => [
+				'fullFormExpected' => $fullFormExpected
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataUpdateShare
+	 *
+	 * @param array $fullFormExpected
+	 */
+	public function testUpdateShare(array $fullFormExpected) {
+		$resp = $this->http->request('POST', 'api/v2.1/share/update', [
+			'json' => [
+				'id' => $this->testForms[0]['shares'][0]['id'],
+				'keyValuePairs' => [
+					'permissions' => [ Constants::PERMISSION_SUBMIT ],
+				],
+			],
+		]);
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
+
+		$this->testGetFullForm($fullFormExpected);
 	}
 
 	public function dataDeleteShare() {
