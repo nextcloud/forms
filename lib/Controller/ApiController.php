@@ -892,6 +892,7 @@ class ApiController extends OCSController {
 
 	/**
 	 * @CORS
+	 * @PublicCORSFix
 	 * @NoAdminRequired
 	 * @PublicPage
 	 *

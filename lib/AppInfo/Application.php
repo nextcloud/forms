@@ -31,6 +31,7 @@ namespace OCA\Forms\AppInfo;
 use OCA\Forms\Capabilities;
 use OCA\Forms\FormsMigrator;
 use OCA\Forms\Listener\UserDeletedListener;
+use OCA\Forms\Middleware\PublicCorsMiddleware;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -59,6 +60,7 @@ class Application extends App implements IBootstrap {
 		$context->registerCapability(Capabilities::class);
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerUserMigrator(FormsMigrator::class);
+		$context->registerMiddleware(PublicCorsMiddleware::class);
 	}
 
 	/**
