@@ -38,6 +38,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Нема препорука. Започните куцање.",
     "Searching …" : "Тражим…",
     "No elements found." : "Нема нађених елемената.",
+    "Permissions" : "Дозволе",
     "Delete" : "Избриши",
     "Group" : "Група",
     "Share link" : "Веза дељења",

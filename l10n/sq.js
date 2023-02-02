@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "E domosdoshme",
     "Description" : "Përshkrim",
     "Set expiration date" : "Caktoni datë skadimi",
+    "Permissions" : "Lejet",
     "Delete" : "Fshij",
     "Group" : "Grup",
     "Share link" : "Lidhje ndarjeje",

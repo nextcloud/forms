@@ -66,6 +66,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Δεν υπάρχουν συστάσεις. Αρχίστε να πληκτρολογείτε.",
     "Searching …" : "Αναζήτηση ...",
     "No elements found." : "Δεν βρέθηκαν στοιχεία.",
+    "Permissions" : "Δικαιώματα",
     "Delete" : "Διαγραφή",
     "Group" : "Ομάδα",
     "Share link" : "Διαμοιρασμός συνδέσμου",

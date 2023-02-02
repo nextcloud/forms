@@ -13,6 +13,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "هیچ توصیه ای نیست شروع به تایپ کنید.",
     "Searching …" : "جستجوکردن …",
     "No elements found." : "عنصری یافت نشد",
+    "Permissions" : "مجوزها",
     "Delete" : "حذف",
     "Group" : "گروه",
     "Share link" : "لینک را به اشتراک بگذارید",

@@ -62,6 +62,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Ingen anbefalinger. Start å skrive.",
     "Searching …" : "Søker ...",
     "No elements found." : "Ingen elementer funnet.",
+    "Permissions" : "Rettigheter",
     "Delete" : "Slett",
     "Group" : "Gruppe",
     "Share link" : "Del lenke",

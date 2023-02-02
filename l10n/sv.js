@@ -63,6 +63,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
     "Searching …" : "Söker ...",
     "No elements found." : "Inga element hittades.",
+    "Permissions" : "Behörigheter",
     "Delete" : "Radera",
     "Group" : "Grupp",
     "Share link" : "Delningslänk",

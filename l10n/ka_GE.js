@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "სავალდებულო",
     "Description" : "აღწერილობა",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
+    "Permissions" : "უფლებები",
     "Delete" : "წაშლა",
     "Group" : "ჯგუფი",
     "Share link" : "ბმულის გაზიარება",

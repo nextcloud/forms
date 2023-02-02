@@ -43,6 +43,7 @@ OC.L10N.register(
     "Expired on {date}" : "Rann út {date}",
     "Expires on {date}" : "Rennur út {date}",
     "Searching …" : "Leita …",
+    "Permissions" : "Heimildir",
     "Delete" : "Eyða",
     "Group" : "Hópur",
     "Share link" : "Deila tengli",
