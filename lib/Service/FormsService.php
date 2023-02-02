@@ -226,6 +226,7 @@ class FormsService {
 			'hash' => $form->getHash(),
 			'title' => $form->getTitle(),
 			'expires' => $form->getExpires(),
+			'lastUpdated' => $form->getLastUpdated(),
 			'permissions' => $this->getPermissions($form->getId()),
 			'partial' => true
 		];
@@ -526,5 +527,16 @@ class FormsService {
 					return false;
 			}
 		});
+	}
+
+	/**
+	 * Update lastUpdated timestamp for the given form
+	 *
+	 * @param int $formId The form to update
+	 */
+	public function setLastUpdatedTimestamp(int $formId): void {
+		$form = $this->formMapper->findById($formId);
+		$form->setLastUpdated(time());
+		$this->formMapper->update($form);
 	}
 }

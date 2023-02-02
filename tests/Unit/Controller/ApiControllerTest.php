@@ -22,6 +22,27 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+namespace OCA\Forms\Controller;
+
+/**
+ * mock time() function used in controllers
+ * @param int|false|null $expected the value that should be returned when called
+ */
+function time($expected = null) {
+	static $value;
+	if ($expected === false) {
+		$value = null;
+	} elseif (!is_null($expected)) {
+		$value = $expected;
+	}
+	// Return real time if no mocked value is set
+	if (is_null($value)) {
+		return \time();
+	}
+	return $value;
+}
+
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Forms\Activity\ActivityManager;
@@ -328,7 +349,8 @@ class ApiControllerTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => false,
-				'showExpiration' => false
+				'showExpiration' => false,
+				'lastUpdated' => 123456789
 			]]
 		];
 	}
@@ -357,6 +379,8 @@ class ApiControllerTest extends TestCase {
 			 	$this->userManager,
 			 	$this->createUserSession()
 			 ])->getMock();
+		// Set the time that should be set for `lastUpdated`
+		\OCA\Forms\Controller\time(123456789);
 
 		$this->configService->expects($this->once())
 			->method('canCreateForms')

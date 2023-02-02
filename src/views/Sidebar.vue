@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { emit } from '@nextcloud/event-bus'
 import NcAppSidebar from '@nextcloud/vue/dist/Components/NcAppSidebar.js'
 import NcAppSidebarTab from '@nextcloud/vue/dist/Components/NcAppSidebarTab.js'
 import IconSettings from 'vue-material-design-icons/Cog.vue'
@@ -114,14 +115,17 @@ export default {
 		 */
 		onAddShare(share) {
 			this.form.shares.push(share)
+			emit('forms:last-updated:set', this.form.id)
 		},
 		onRemoveShare(share) {
 			const index = this.form.shares.findIndex(search => search.id === share.id)
 			this.form.shares.splice(index, 1)
+			emit('forms:last-updated:set', this.form.id)
 		},
 		onUpdateShare(share) {
 			const index = this.form.shares.findIndex(search => search.id === share.id)
 			this.form.shares.splice(index, 1, share)
+			emit('forms:last-updated:set', this.form.id)
 		},
 	},
 }

@@ -129,6 +129,7 @@ import { directive as ClickOutside } from 'v-click-outside'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import debounce from 'debounce'
@@ -342,6 +343,8 @@ export default {
 					lastQuestion.focus()
 				})
 
+				emit('forms:last-updated:set', this.form.id)
+
 			} catch (error) {
 				logger.error('Error while adding new question', { error })
 				showError(t('forms', 'There was an error while adding the new question'))
@@ -363,6 +366,7 @@ export default {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2/question/{id}', { id }))
 				const index = this.form.questions.findIndex(search => search.id === id)
 				this.form.questions.splice(index, 1)
+				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error(`Error while removing question ${id}`, { error })
 				showError(t('forms', 'There was an error while removing the question'))
@@ -383,6 +387,7 @@ export default {
 					formId: this.form.id,
 					newOrder,
 				})
+				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while saving form', { error })
 				showError(t('forms', 'Error while saving form'))

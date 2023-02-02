@@ -20,8 +20,9 @@
  *
  */
 import { debounce } from 'debounce'
-import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
+import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 
 import logger from '../utils/Logger.js'
@@ -256,6 +257,7 @@ export default {
 						[key]: value,
 					},
 				})
+				emit('forms:last-updated:set', this.$attrs.formId)
 			} catch (error) {
 				logger.error('Error while saving question', { error })
 				showError(t('forms', 'Error while saving question'))

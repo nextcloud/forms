@@ -105,6 +105,7 @@
 import { loadState } from '@nextcloud/initial-state'
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
@@ -274,6 +275,7 @@ export default {
 					shareHash: this.shareHash,
 				})
 				this.success = true
+				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while submitting the form', { error })
 				showError(t('forms', 'There was an error submitting the form'))
