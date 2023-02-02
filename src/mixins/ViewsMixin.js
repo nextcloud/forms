@@ -23,15 +23,11 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import Clipboard from 'v-clipboard'
 import MarkdownIt from 'markdown-it'
-import Vue from 'vue'
 
 import CancelableRequest from '../utils/CancelableRequest.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import logger from '../utils/Logger.js'
-
-Vue.use(Clipboard)
 
 export default {
 	provide() {
