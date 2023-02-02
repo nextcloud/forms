@@ -62,6 +62,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
     "Searching …" : "Chirchende ...",
     "No elements found." : "Perunu elementu agatadu.",
+    "Permissions" : "Permissos",
     "Delete" : "Cantzella",
     "Group" : "Grupu",
     "Share link" : "Cumpartzi ligòngiu",

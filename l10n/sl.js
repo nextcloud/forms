@@ -66,6 +66,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Ni priporočil; začnite vpisovati",
     "Searching …" : "Poteka iskanje ...",
     "No elements found." : "Ni najdenih predmetov",
+    "Permissions" : "Dovoljenja",
     "Delete" : "Izbriši",
     "Group" : "Skupina",
     "Share link" : "Omogoči souporabo s povezavo",

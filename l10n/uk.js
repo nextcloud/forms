@@ -20,6 +20,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Немає рекомендацій. Почніть друкувати.",
     "Searching …" : "Пошук...",
     "No elements found." : "Елементи не знайдено.",
+    "Permissions" : "Дозволи ",
     "Delete" : "Вилучити",
     "Group" : "Група",
     "Share link" : "Поділитися посиланням",

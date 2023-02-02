@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "Requerido",
     "Description" : "Descripción",
     "Set expiration date" : "Establecer fecha de expiración",
+    "Permissions" : "Permisos",
     "Delete" : "Borrar",
     "Group" : "Grupo",
     "Share link" : "Compartir enlace",

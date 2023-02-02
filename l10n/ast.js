@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "Riquíu",
     "Description" : "Descripción",
     "Set expiration date" : "Afitar la data de caducidá",
+    "Permissions" : "Permisos",
     "Delete" : "Desaniciar",
     "Group" : "Group",
     "Share link" : "Share link",

@@ -9,6 +9,7 @@ OC.L10N.register(
     "Set expiration date" : "Uzstādīt beigu termiņu",
     "Searching …" : "Meklē...",
     "No elements found." : "Elementi netika atrasti.",
+    "Permissions" : "Atļaujas",
     "Delete" : "Dzēst",
     "Group" : "Grupa",
     "Share link" : "Koplietot saiti",

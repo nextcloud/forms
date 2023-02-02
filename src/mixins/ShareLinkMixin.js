@@ -21,10 +21,6 @@
  */
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import Clipboard from 'v-clipboard'
-import Vue from 'vue'
-
-Vue.use(Clipboard)
 
 export default {
 	methods: {
@@ -57,9 +53,10 @@ export default {
 		 */
 		async copyLink(event, link) {
 			// Copy link, boolean return indicates success or fail.
-			if (this.$clipboard(link)) {
+			try {
+				await navigator.clipboard.writeText(link)
 				showSuccess(t('forms', 'Form link copied'))
-			} else {
+			} catch (error) {
 				showError(t('forms', 'Cannot copy, please copy the link manually'))
 			}
 			// Set back focus as clipboard removes focus

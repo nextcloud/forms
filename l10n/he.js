@@ -49,6 +49,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
     "Searching …" : "מתבצע חיפוש…",
     "No elements found." : "לא נמצאו רכיבים.",
+    "Permissions" : "הרשאות",
     "Delete" : "מחיקה",
     "Group" : "קבוצה",
     "Share link" : "קישור שיתוף",

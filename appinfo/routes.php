@@ -72,7 +72,7 @@ return [
 			'verb' => 'OPTIONS',
 			'requirements' => [
 				'path' => '.+',
-				'apiVersion' => 'v2'
+				'apiVersion' => 'v2(\.1)?'
 			]
 		],
 
@@ -217,6 +217,14 @@ return [
 			'verb' => 'DELETE',
 			'requirements' => [
 				'apiVersion' => 'v2'
+			]
+		],
+		[
+			'name' => 'shareApi#updateShare',
+			'url' => '/api/{apiVersion}/share/update',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.1'
 			]
 		],
 

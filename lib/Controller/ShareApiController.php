@@ -120,11 +120,12 @@ class ShareApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newShare(int $formId, int $shareType, string $shareWith = ''): DataResponse {
-		$this->logger->debug('Adding new share: formId: {formId}, shareType: {shareType}, shareWith: {shareWith}', [
+	public function newShare(int $formId, int $shareType, string $shareWith = '', array $permissions = [Constants::PERMISSION_SUBMIT]): DataResponse {
+		$this->logger->debug('Adding new share: formId: {formId}, shareType: {shareType}, shareWith: {shareWith}, permissions: {permissions}', [
 			'formId' => $formId,
 			'shareType' => $shareType,
 			'shareWith' => $shareWith,
+			'permissions' => $permissions,
 		]);
 
 		// Only accept usable shareTypes
@@ -150,6 +151,10 @@ class ShareApiController extends OCSController {
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
 			throw new OCSForbiddenException();
+		}
+
+		if (!$this->validatePermissions($permissions, $shareType)) {
+			throw new OCSBadRequestException('Invalid permission given');
 		}
 
 		// Create public-share hash, if necessary.
@@ -200,6 +205,7 @@ class ShareApiController extends OCSController {
 		$share->setFormId($formId);
 		$share->setShareType($shareType);
 		$share->setShareWith($shareWith);
+		$share->setPermissions($permissions);
 
 		$share = $this->shareMapper->insert($share);
 
@@ -245,5 +251,96 @@ class ShareApiController extends OCSController {
 		$this->shareMapper->deleteById($id);
 
 		return new DataResponse($id);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Update permissions of a share
+	 *
+	 * @param int $id of the share to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function updateShare(int $id, array $keyValuePairs): DataResponse {
+		$this->logger->debug('Updating share: {id}, permissions: {permissions}', [
+			'id' => $id,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$share = $this->shareMapper->findById($id);
+			$form = $this->formMapper->findById($share->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find share', ['exception' => $e]);
+			throw new OCSBadRequestException('Could not find share');
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		//Don't allow to change other properties than permissions
+		if (count($keyValuePairs) > 1 || !key_exists('permissions', $keyValuePairs)) {
+			$this->logger->debug('Not allowed to update other properties than permissions');
+			throw new OCSForbiddenException();
+		}
+
+		if (!$this->validatePermissions($keyValuePairs['permissions'], $share->getShareType())) {
+			throw new OCSBadRequestException('Invalid permission given');
+		}
+
+		$share->setPermissions($keyValuePairs['permissions']);
+		$share = $this->shareMapper->update($share);
+
+		return new DataResponse($share->getId());
+	}
+
+	/**
+	 * Validate user given permission array
+	 *
+	 * @param array $permissions User given permissions
+	 * @return array Sanitized array of permissions
+	 * @throws OCSBadRequestException If invalid permission was given
+	 */
+	protected function validatePermissions(array $permissions, int $shareType): bool {
+		if (count($permissions) === 0) {
+			return false;
+		}
+
+		$sanitizedPermissions = array_intersect(Constants::PERMISSION_ALL, $permissions);
+		if (count($sanitizedPermissions) < count($permissions)) {
+			$this->logger->debug('Invalid permission given', ['invalid_permissions' => array_diff($permissions, $sanitizedPermissions)]);
+			return false;
+		}
+
+		if (!in_array(Constants::PERMISSION_SUBMIT, $sanitizedPermissions)) {
+			$this->logger->debug('Submit permission must always be granted');
+			return false;
+		}
+
+		// Make sure only users can have special permissions
+		if (count($sanitizedPermissions) > 1) {
+			switch ($shareType) {
+				case IShare::TYPE_USER:
+				case IShare::TYPE_GROUP:
+				case IShare::TYPE_CIRCLE:
+					break;
+				default:
+					// e.g. link shares ...
+					return false;
+			}
+		}
+		return true;
 	}
 }

@@ -81,7 +81,7 @@
 						</template>
 						{{ t('forms', 'Download CSV') }}
 					</NcActionButton>
-					<NcActionButton @click="deleteAllSubmissions">
+					<NcActionButton v-if="canDeleteSubmissions" @click="deleteAllSubmissions">
 						<template #icon>
 							<IconDelete :size="20" />
 						</template>
@@ -123,6 +123,7 @@
 				:key="submission.id"
 				:submission="submission"
 				:questions="form.questions"
+				:can-delete-submission="canDeleteSubmissions"
 				@delete="deleteSubmission(submission.id)" />
 		</section>
 	</NcAppContent>
@@ -155,6 +156,7 @@ import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import PermissionTypes from '../mixins/PermissionTypes.js'
 
 const picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
 	.setMultiSelect(false)
@@ -183,7 +185,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [PermissionTypes, ViewsMixin],
 
 	data() {
 		return {
@@ -193,20 +195,12 @@ export default {
 	},
 
 	computed: {
-		noSubmissions() {
-			return this.form.submissions?.length === 0
+		canDeleteSubmissions() {
+			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE)
 		},
 
-		/**
-		 * Return form title, or placeholder if not set
-		 *
-		 * @return {string}
-		 */
-		formTitle() {
-			if (this.form.title) {
-				return this.form.title
-			}
-			return t('forms', 'New form')
+		noSubmissions() {
+			return this.form.submissions?.length === 0
 		},
 	},
 

@@ -57,6 +57,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",
     "Searching …" : "検索しています…",
     "No elements found." : "要素が見つかりませんでした。",
+    "Permissions" : "アクセス権限",
     "Delete" : "削除",
     "Group" : "グループ",
     "Share link" : "リンクを共有",

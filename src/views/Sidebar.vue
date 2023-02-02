@@ -35,7 +35,8 @@
 			<SharingSidebarTab :form="form"
 				@update:formProp="onPropertyChange"
 				@add-share="onAddShare"
-				@remove-share="onRemoveShare" />
+				@remove-share="onRemoveShare"
+				@update-share="onUpdateShare" />
 		</NcAppSidebarTab>
 
 		<NcAppSidebarTab id="forms-settings"
@@ -117,6 +118,10 @@ export default {
 		onRemoveShare(share) {
 			const index = this.form.shares.findIndex(search => search.id === share.id)
 			this.form.shares.splice(index, 1)
+		},
+		onUpdateShare(share) {
+			const index = this.form.shares.findIndex(search => search.id === share.id)
+			this.form.shares.splice(index, 1, share)
 		},
 	},
 }

@@ -152,7 +152,8 @@
 			<SharingShareDiv v-for="share in sortedShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
-				@remove-share="removeShare" />
+				@remove-share="removeShare"
+				@update:share="updateShare" />
 		</TransitionGroup>
 	</div>
 </template>
@@ -271,6 +272,34 @@ export default {
 			} catch (error) {
 				logger.error('Error adding public link', { error })
 				showError(t('forms', 'There was an error while adding the link'))
+			} finally {
+				this.isLoading = false
+			}
+		},
+
+		/**
+		 * Update share
+		 *
+		 * @param {object} updatedShare the updated object
+		 */
+		async updateShare(updatedShare) {
+			this.isLoading = true
+
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/share/update'), {
+					id: updatedShare.id,
+					keyValuePairs: {
+						permissions: updatedShare.permissions,
+					},
+				})
+				const share = Object.assign(updatedShare, { id: OcsResponse2Data(response) })
+
+				// Add new share
+				this.$emit('update-share', share)
+
+			} catch (error) {
+				logger.error('Error while updating share', { error, share: updatedShare })
+				showError(t('forms', 'There was an error while updating the share'))
 			} finally {
 				this.isLoading = false
 			}

@@ -24,6 +24,7 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Controller;
 
+use OCA\Forms\Constants;
 use OCA\Forms\Controller\ShareApiController;
 
 use OCA\Forms\Db\Form;
@@ -34,6 +35,7 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
@@ -51,6 +53,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 use Psr\Log\LoggerInterface;
+use Throwable;
+
+interface MapperException extends Throwable, IMapperException {
+};
 
 class ShareApiControllerTest extends TestCase {
 
@@ -124,22 +130,26 @@ class ShareApiControllerTest extends TestCase {
 			'newUserShare' => [
 				'shareType' => IShare::TYPE_USER,
 				'shareWith' => 'user1',
+				'permissions' => [Constants::PERMISSION_SUBMIT],
 				'expected' => [
 					'id' => 13,
 					'formId' => 5,
 					'shareType' => 0,
 					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT],
 					'displayName' => 'user1 DisplayName'
 				]
 			],
 			'newGroupShare' => [
 				'shareType' => IShare::TYPE_GROUP,
 				'shareWith' => 'group1',
+				'permissions' => [Constants::PERMISSION_RESULTS, Constants::PERMISSION_SUBMIT],
 				'expected' => [
 					'id' => 13,
 					'formId' => 5,
 					'shareType' => 1,
 					'shareWith' => 'group1',
+					'permissions' => [Constants::PERMISSION_RESULTS, Constants::PERMISSION_SUBMIT],
 					'displayName' => 'group1 DisplayName'
 				]
 			],
@@ -153,7 +163,7 @@ class ShareApiControllerTest extends TestCase {
 	 * @param string $shareWith
 	 * @param array $expected
 	 */
-	public function testValidNewShare(int $shareType, string $shareWith, array $expected) {
+	public function testValidNewShare(int $shareType, string $shareWith, array $permissions, array $expected) {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -174,9 +184,10 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($this->createMock(IGroup::class));
 
 		$share = new Share();
-		$share->setformId('5');
+		$share->setFormId(5);
 		$share->setShareType($shareType);
 		$share->setShareWith($shareWith);
+		$share->setPermissions($permissions);
 		$shareWithId = clone $share;
 		$shareWithId->setId(13);
 		$this->shareMapper->expects($this->once())
@@ -191,7 +202,7 @@ class ShareApiControllerTest extends TestCase {
 
 		// Share Form '5' to 'user1' of share-type 'user=0'
 		$expectedResponse = new DataResponse($expected);
-		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith));
+		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
 	}
 
 	public function dataNewLinkShare() {
@@ -199,13 +210,25 @@ class ShareApiControllerTest extends TestCase {
 			'newLinkShare' => [
 				'shareType' => IShare::TYPE_LINK,
 				'shareWith' => '',
+				'permissions' => [Constants::PERMISSION_SUBMIT],
+				'exception' => null,
 				'expected' => [
 					'id' => 13,
 					'formId' => 5,
 					'shareType' => 3,
 					'shareWith' => 'abcdefgh',
+					'permissions' => [Constants::PERMISSION_SUBMIT],
 					'displayName' => ''
-				]],
+				]
+			],
+			'invalid-permissions' => [
+				'shareType' => IShare::TYPE_LINK,
+				'shareWith' => '',
+				// Creating a new share must fail as PERMISSION_RESULTS is not allowed for link shares
+				'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS],
+				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException',
+				'expected' => []
+			]
 		];
 	}
 	/**
@@ -216,7 +239,7 @@ class ShareApiControllerTest extends TestCase {
 	 * @param string $shareWith
 	 * @param array $expected
 	 */
-	public function testNewLinkShare(int $shareType, string $shareWith, array $expected) {
+	public function testNewLinkShare(int $shareType, string $shareWith, array $permissions, ?string $exception, array $expected) {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -231,7 +254,8 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn('abcdefgh');
 
 		$share = new Share();
-		$share->setformId('5');
+		$share->setFormId(5);
+		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
 		$share->setShareType($shareType);
 		if ($shareWith === '') {
 			$share->setShareWith('abcdefgh');
@@ -240,27 +264,32 @@ class ShareApiControllerTest extends TestCase {
 		}
 		$shareWithId = clone $share;
 		$shareWithId->setId(13);
-		$this->shareMapper->expects($this->once())
+		$this->shareMapper->expects($exception === null ? $this->once() : $this->any())
 			->method('insert')
 			->with($share)
 			->willReturn($shareWithId);
 
-		$this->configService->expects($this->once())
+		$this->configService->expects($exception === null ? $this->once() : $this->any())
 			->method('getAllowPublicLink')
 			->willReturn(true);
 
-		$this->formsService->expects($this->once())
+		$this->formsService->expects($exception === null ? $this->once() : $this->any())
 			->method('getShareDisplayName')
 			->with($shareWithId->read())
 			->willReturn('');
 
-		$this->shareMapper->expects($this->once())
+		$this->shareMapper->expects($exception === null ? $this->once() : $this->any())
 			->method('findPublicShareByHash')
 			->will($this->throwException(new DoesNotExistException('Not found.')));
 
-		// Share the form.
-		$expectedResponse = new DataResponse($expected);
-		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith));
+		if ($exception === null) {
+			// Share the form.
+			$expectedResponse = new DataResponse($expected);
+			$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
+		} else {
+			$this->expectException($exception);
+			$this->shareApiController->newShare(5, $shareType, $shareWith, $permissions);
+		}
 	}
 
 	/**
@@ -468,5 +497,205 @@ class ShareApiControllerTest extends TestCase {
 
 		$this->expectException(OCSForbiddenException::class);
 		$this->shareApiController->deleteShare(8);
+	}
+
+	public function dataUpdateShare() {
+		return [
+			'valid-permissions' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => [Constants::PERMISSION_RESULTS, Constants::PERMISSION_SUBMIT]
+				],
+				'expected' => 1,
+				'exception' => null
+			],
+			'no-permission' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => []
+				],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+			],
+			'invalid-permission' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => ['invalid']
+				],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+			],
+			'invalid-share-type-permission' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => 'somehash',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'currentUser',
+				// PERMISSION_RESULTS is not allowed for TYPE_LINK
+				'keyValuePairs' => [
+					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS]
+				],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+			],
+			'form-not-owned' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => 'somehash',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'otherUser',
+				'keyValuePairs' => ['permissions' => [Constants::PERMISSION_SUBMIT]],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSForbiddenException'
+			],
+			'empty-key-value-pairs' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => 'somehash',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'otherUser',
+				'keyValuePairs' => [],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSForbiddenException'
+			],
+			'invalid-key-value-pairs' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => 'somehash',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'otherUser',
+				'keyValuePairs' => ['formId' => 6],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSForbiddenException'
+			],
+		];
+	}
+	/**
+	 * Test update a share
+	 * @dataProvider dataUpdateShare
+	 */
+	public function testUpdateShare(array $share, string $formOwner, array $keyValuePairs, ?int $expected, ?string $exception) {
+		$form = new Form();
+		$form->setId($share['formId']);
+		$form->setOwnerId($formOwner);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($share['formId'])
+			->willReturn($form);
+
+		$this->userManager->expects($this->any())
+			->method('get')
+			->with('otherUser')
+			->willReturn($this->createMock(IUser::class));
+
+		$shareEntity = new Share();
+		$shareEntity->setId($share['id']);
+		$shareEntity->setFormId($share['formId']);
+		$shareEntity->setShareType($share['shareType']);
+		$shareEntity->setShareWith($share['shareWith']);
+		$shareEntity->setPermissions($share['permissions']);
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with($share['id'])
+			->willReturn($shareEntity);
+
+		$this->shareMapper->expects($exception === null ? $this->once() : $this->any())
+			->method('update')
+			->with($shareEntity)
+			->willReturnCallback(function ($arg) {
+				return $arg;
+			});
+
+		if ($exception === null) {
+			$expectedResponse = new DataResponse($expected);
+			$this->assertEquals($expectedResponse, $this->shareApiController->updateShare($share['id'], $keyValuePairs));
+		} else {
+			$this->expectException($exception);
+			$this->shareApiController->updateShare($share['id'], $keyValuePairs);
+		}
+	}
+
+	/**
+	 * Test update a share
+	 * @dataProvider dataUpdateShare
+	 */
+	public function testUpdateShare_NotExistingShare() {
+		$exception = $this->createMock(MapperException::class);
+		
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(1337)
+			->will($this->throwException($exception));
+
+		$this->logger->expects($this->exactly(2))
+			->method('debug');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->shareApiController->updateShare(1337, [Constants::PERMISSION_SUBMIT]);
+	}
+
+	/**
+	 * Test update a share
+	 * @dataProvider dataUpdateShare
+	 */
+	public function testUpdateShare_NotExistingForm() {
+		$exception = $this->createMock(MapperException::class);
+		
+		$share = new Share();
+		$share->setId(1337);
+		$share->setFormId(7331);
+		$share->setShareType(3);
+		$share->setShareWith('hash');
+		$share->setPermissions([]);
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(1337)
+			->willReturn($share);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(7331)
+			->willThrowException($exception);
+
+		$this->logger->expects($this->exactly(2))
+			->method('debug');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->shareApiController->updateShare(1337, [Constants::PERMISSION_SUBMIT]);
 	}
 }

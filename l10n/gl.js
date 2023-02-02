@@ -63,6 +63,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",
     "Searching …" : "Buscando…",
     "No elements found." : "Non se atoparon elementos.",
+    "Permissions" : "Permisos",
     "Delete" : "Eliminar",
     "Group" : "Grupo",
     "Share link" : "Compartir ligazón",

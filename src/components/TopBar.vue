@@ -131,7 +131,7 @@ export default {
 		},
 		canShare() {
 			// This probably can get a permission of itself
-			return this.canEdit || this.canSeeResults
+			return this.canEdit
 		},
 		canOnlySubmit() {
 			return this.permissions.length === 1 && this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)

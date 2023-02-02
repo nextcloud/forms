@@ -62,6 +62,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "لا توجد توصيات. ابدأ بالكتابة.",
     "Searching …" : "جارِ البحث…",
     "No elements found." : "لم يتم العثور على أي عناصر",
+    "Permissions" : "التصريحات",
     "Delete" : "إزالة",
     "Group" : "المجموعة",
     "Share link" : "مشاركة الرابط",

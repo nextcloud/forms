@@ -73,6 +73,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Рекомендации отсутствуют, начните вводить символы",
     "Searching …" : "Поиск…",
     "No elements found." : "Ничего не найдено.",
+    "Permissions" : "Права",
     "Delete" : "Удалить",
     "Group" : "Группа",
     "Share link" : "Поделиться ссылкой",
