@@ -88,6 +88,7 @@
     "Responses are anonymous." : "Atsakymai yra anoniminiai.",
     "Responses are connected to your Nextcloud account." : "Atsakymai yra susieti su jūsų Nextcloud paskyra.",
     "An asterisk (*) indicates mandatory questions." : "Privalomi klausimai yra pažymėti žvaigždute (*).",
+    "Expired {relativeDate}." : "Nustojo galioti {relativeDate}.",
     "Expires {relativeDate}." : "Galioja iki {relativeDate}.",
     "There was an error while adding the new question" : "Pridedant naują klausimą, įvyko klaida",
     "There was an error while removing the question" : "Šalinant klausimą, įvyko klaida",
