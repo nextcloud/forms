@@ -229,14 +229,14 @@ export default {
 		/**
 		 * Create mapper to forward the required change to the parent and store to db
 		 *
-		 * @param {string} parameter Name of the setting that changed
-		 * @param {any} value New value of the setting
+		 * Either an object containing the *changed* settings.
+		 *
+		 * @param {object} newSettings changed settings
 		 */
-		onExtraSettingsChange: debounce(function(parameter, value) {
-			const newSettings = Object.assign({}, this.extraSettings)
-			newSettings[parameter] = value
-			this.$emit('update:extraSettings', newSettings)
-			this.saveQuestionProperty('extraSettings', newSettings)
+		onExtraSettingsChange: debounce(function(newSettings) {
+			const newExtraSettings = { ...this.extraSettings, ...newSettings }
+			this.$emit('update:extraSettings', newExtraSettings)
+			this.saveQuestionProperty('extraSettings', newExtraSettings)
 		}, 200),
 
 		/**
@@ -255,7 +255,7 @@ export default {
 		 * @param {boolean} shuffle Should options be shuffled
 		 */
 		onShuffleOptionsChange(shuffle) {
-			return this.onExtraSettingsChange('shuffleOptions', shuffle)
+			return this.onExtraSettingsChange({ shuffleOptions: shuffle })
 		},
 
 		/**
