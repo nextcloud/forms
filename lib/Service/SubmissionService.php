@@ -48,7 +48,7 @@ use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-
+use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 
 class SubmissionService {
@@ -83,6 +83,9 @@ class SubmissionService {
 	/** @var IUser */
 	private $currentUser;
 
+	/** @var IMailer */
+	private $mailer;
+
 	public function __construct(FormMapper $formMapper,
 		QuestionMapper $questionMapper,
 		SubmissionMapper $submissionMapper,
@@ -92,7 +95,8 @@ class SubmissionService {
 		IL10N $l10n,
 		LoggerInterface $logger,
 		IUserManager $userManager,
-		IUserSession $userSession) {
+		IUserSession $userSession,
+		IMailer $mailer) {
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->submissionMapper = $submissionMapper;
@@ -102,6 +106,7 @@ class SubmissionService {
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
+		$this->mailer = $mailer;
 
 		$this->currentUser = $userSession->getUser();
 	}
@@ -342,6 +347,11 @@ class SubmissionService {
 						}
 					}
 				}
+
+				// Handle custom validation of short answers
+				if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
+					return false;
+				}
 			}
 		}
 
@@ -366,5 +376,40 @@ class SubmissionService {
 	private function validateDateTime(string $dateStr, string $format) {
 		$d = DateTime::createFromFormat($format, $dateStr);
 		return $d && $d->format($format) === $dateStr;
+	}
+
+	/**
+	 * Validate short question answers if special validation types are set
+	 */
+	private function validateShortQuestion(array $question, string $data): bool {
+		if (!isset($question['extraSettings']) || !isset($question['extraSettings']['validationType'])) {
+			// No type defined, so fallback to 'text' => no special handling
+			return true;
+		}
+
+		switch ($question['extraSettings']['validationType']) {
+			case 'email':
+				return $this->mailer->validateMailAddress($data);
+			case 'number':
+				return is_numeric($data);
+			case 'phone':
+				// some special characters are used (depending on the locale)
+				$sanitized = str_replace([' ', '(', ')', '.', '/', '-', 'x'], '', $data);
+				// allow leading + for international numbers
+				if (str_starts_with($sanitized, '+')) {
+					$sanitized = substr($sanitized, 1);
+				}
+				return preg_match('/^[0-9]{3,}$/', $sanitized) === 1;
+			case 'regex':
+				// empty regex matches everything
+				if (!isset($question['extraSettings']['validationRegex'])) {
+					return true;
+				}
+				return preg_match($question['extraSettings']['validationRegex'], $data) === 1;
+			default:
+				$this->logger->error('Invalid input type for question detected, please report this issue!', ['validationType' => $question['extraSettings']['validationType']]);
+				// The result is just a non-validated text on the results, but not a fully declined submission. So no need to throw but simply return false here.
+				return false;
+		}
 	}
 }

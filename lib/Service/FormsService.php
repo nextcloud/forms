@@ -516,4 +516,86 @@ class FormsService {
 		$form->setLastUpdated(time());
 		$this->formMapper->update($form);
 	}
+
+	/*
+	 * Validates the extraSettings
+	 *
+	 * @param array $extraSettings input extra settings
+	 * @param string $questionType the question type
+	 * @return bool if the settings are valid
+	 */
+	public function areExtraSettingsValid(array $extraSettings, string $questionType) {
+		if (count($extraSettings) === 0) {
+			return true;
+		}
+
+		// Ensure only allowed keys are set
+		switch ($questionType) {
+			case Constants::ANSWER_TYPE_DROPDOWN:
+				$allowed = Constants::EXTRA_SETTINGS_DROPDOWN;
+				break;
+			case Constants::ANSWER_TYPE_MULTIPLE:
+			case Constants::ANSWER_TYPE_MULTIPLEUNIQUE:
+				$allowed = Constants::EXTRA_SETTINGS_MULTIPLE;
+				break;
+			case Constants::ANSWER_TYPE_SHORT:
+				$allowed = Constants::EXTRA_SETTINGS_SHORT;
+				break;
+			default:
+				$allowed = [];
+		}
+		// Number of keys in extraSettings but not in allowed (but not the other way round)
+		$diff = array_diff(array_keys($extraSettings), $allowed);
+		if (count($diff) > 0) {
+			return false;
+		}
+
+		// Special handling of short input for validation
+		if ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
+			// Ensure input validation type is known
+			if (!in_array($extraSettings['validationType'], Constants::SHORT_INPUT_TYPES)) {
+				return false;
+			}
+
+			// For custom validation we need to sanitize the regex
+			if ($extraSettings['validationType'] === 'regex') {
+				// regex is required for "custom" input validation type
+				if (!isset($extraSettings['validationRegex'])) {
+					return false;
+				}
+
+				// regex option must be a string
+				if (!is_string($extraSettings['validationRegex'])) {
+					return false;
+				}
+
+				// empty regex matches every thing, this happens also when a new question is created
+				if (strlen($extraSettings['validationRegex']) === 0) {
+					return true;
+				}
+
+				// general pattern of a valid regex
+				$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
+				// pattern to look for unescaped slashes
+				$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\\\]))(\\\\\\\\)*\\//';
+
+				$matches = [];
+				// only pattern with delimiters and supported modifiers (by PHP *and* JS)
+				if (@preg_match($VALID_REGEX, $extraSettings['validationRegex'], $matches) !== 1) {
+					return false;
+				}
+
+				// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
+				if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
+					return false;
+				}
+
+				// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
+				if (@preg_match($extraSettings['validationRegex'], 'some string') === false) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }

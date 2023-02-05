@@ -41,9 +41,9 @@
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
 				@input="onInput"
 				@keydown.enter.exact.prevent="onKeydownEnter">
-			<NcActions v-if="edit"
+			<NcActions v-if="!readOnly"
 				:id="validationTypeMenuId"
-				:aria-label="t('forms', 'Input types')"
+				:aria-label="t('forms', 'Input types (currently: {type})', { type: validationObject.label })"
 				:container="`#${validationTypeMenuId}`"
 				:open.sync="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
@@ -101,12 +101,12 @@ export default {
 	data() {
 		return {
 			validationTypes,
-			typeMenuOpen: false,
+			isValidationTypeMenuOpen: false,
 		}
 	},
 	computed: {
 		submissionInputPlaceholder() {
-			if (this.edit) {
+			if (!this.readOnly) {
 				return this.validationObject.createPlaceholder || this.answerType.createPlaceholder
 			}
 			return this.validationObject.submitPlaceholder || this.answerType.submitPlaceholder
@@ -170,7 +170,7 @@ export default {
 				this.onExtraSettingsChange({ validationType, validationRegex: this.validationRegex })
 			} else {
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
-				this.typeMenuOpen = false
+				this.isValidationTypeMenuOpen = false
 				this.onExtraSettingsChange({ validationType: validationType === 'text' ? undefined : validationType })
 			}
 		},
@@ -211,7 +211,7 @@ export default {
 		 */
 		onSubmitRegex(event) {
 			if (this.onInputRegex(event)) {
-				this.typeMenuOpen = false
+				this.isValidationTypeMenuOpen = false
 			}
 		},
 	},
