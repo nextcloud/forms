@@ -577,6 +577,92 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->getPermissions(42));
 	}
 
+	public function dataGetPermissions_anonymous(): array {
+		return [
+			'no-permission' => [
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shares' => [],
+				'expected' => [],
+			],
+			'submit-permission' => [
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => false,
+				],
+				'shares' => [[
+					'permissions' => ['submit']
+				]],
+				'expected' => ['submit'],
+			]
+		];
+	}
+
+	/**
+	 * Check `getPermissions` as anonymous user
+	 *
+	 * @param array $access access on form
+	 * @param array $shares permissions of shares
+	 * @param array $expected Expected permissions
+	 * @dataProvider dataGetPermissions_anonymous
+	 */
+	public function testGetPermissions_anonymous(array $access, array $shares, array $expected): void {
+		$userSession = $this->createMock(IUserSession::class);
+		$userSession->expects($this->once())
+			->method('getUser')
+			->willReturn(null);
+
+		$formsService = new FormsService(
+			$this->activityManager,
+			$this->formMapper,
+			$this->optionMapper,
+			$this->questionMapper,
+			$this->shareMapper,
+			$this->submissionMapper,
+			$this->configService,
+			$this->groupManager,
+			$this->logger,
+			$this->userManager,
+			$userSession,
+			$this->secureRandom
+		);
+
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('owner');
+		$form->setAccess($access);
+
+		$this->formMapper->expects($this->any())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$sharesEntities = [];
+		$shareId = 0;
+		foreach ($shares as $share) {
+			$shareEntity = new Share();
+			$shareEntity->setId($shareId++);
+			$shareEntity->setFormId(42);
+			$shareEntity->setShareType(IShare::TYPE_LINK);
+			$shareEntity->setShareWith('somehash');
+			$shareEntity->setPermissions($share['permissions']);
+			$sharesEntities[] = $shareEntity;
+		}
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn($sharesEntities);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
+
+		$this->assertEquals($expected, $formsService->getPermissions(42));
+	}
+
 	public function dataCanSeeResults() {
 		return [
 			'allowFormOwner' => [

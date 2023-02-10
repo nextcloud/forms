@@ -271,9 +271,11 @@ class FormsService {
 		}
 
 		$permissions = [];
-		$shares = $this->getSharesWithUser($formId, $this->currentUser->getUID());
-		foreach ($shares as $share) {
-			$permissions = array_merge($permissions, $share->getPermissions());
+		if ($this->currentUser) {
+			$shares = $this->getSharesWithUser($formId, $this->currentUser->getUID());
+			foreach ($shares as $share) {
+				$permissions = array_merge($permissions, $share->getPermissions());
+			}
 		}
 
 		// Fall back to submit permission if access is granted to all users
