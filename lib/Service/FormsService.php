@@ -265,8 +265,12 @@ class FormsService {
 	public function getPermissions(int $formId): array {
 		$form = $this->formMapper->findById($formId);
 
+		if (!$this->currentUser) {
+			return [];
+		}
+
 		// Owner is allowed to do everything
-		if ($this->currentUser && $this->currentUser->getUID() === $form->getOwnerId()) {
+		if ($this->currentUser->getUID() === $form->getOwnerId()) {
 			return Constants::PERMISSION_ALL;
 		}
 
