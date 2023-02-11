@@ -109,16 +109,16 @@ class ActivityManager {
 	/**
 	 * Publish a new-Submission Activity
 	 * @param Form $form The affected Form
-	 * @param string $submittorId ID of the User who submitted the form. Can also be our 'anon-user-'-ID
+	 * @param string $submitterID ID of the User who submitted the form. Can also be our 'anon-user-'-ID
 	 */
-	public function publishNewSubmission(Form $form, string $submittorId) {
+	public function publishNewSubmission(Form $form, string $submitterID) {
 		$event = $this->manager->generateEvent();
 		$event->setApp($this->appName)
 			->setType(ActivityConstants::TYPE_NEWSUBMISSION)
 			->setAffectedUser($form->getOwnerId())
-			->setAuthor($submittorId)
+			->setAuthor($submitterID)
 			->setSubject(ActivityConstants::SUBJECT_NEWSUBMISSION, [
-				'userId' => $submittorId,
+				'userId' => $submitterID,
 				'formTitle' => $form->getTitle(),
 				'formHash' => $form->getHash()
 			])
