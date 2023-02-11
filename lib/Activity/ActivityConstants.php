@@ -29,6 +29,7 @@ class ActivityConstants {
 	 */
 	public const TYPE_NEWSHARE = 'forms_newshare';
 	public const TYPE_NEWSUBMISSION = 'forms_newsubmission';
+	public const TYPE_NEWSHAREDSUBMISSION = 'forms_newsharedsubmission';
 
 	/*****
 	 * Subjects are internal 'types', that get interpreted by our own Provider.

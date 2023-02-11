@@ -488,6 +488,25 @@ class FormsService {
 	}
 
 	/**
+	 * Creates activities for new submissions on a form
+	 *
+	 * @param Form $form Related Form
+	 * @param string $submitter The ID of the user who submitted the form. Can also be our 'anon-user-'-ID
+	 */
+	public function notifyNewSubmission(Form $form, string $submitter): void {
+		$shares = $this->getShares($form->getId());
+		$this->activityManager->publishNewSubmission($form, $submitter);
+
+		foreach ($shares as $share) {
+			if (!in_array(Constants::PERMISSION_RESULTS, $share['permissions'])) {
+				continue;
+			}
+
+			$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submitter);
+		}
+	}
+
+	/**
 	 * Return shares of a form shared with given user
 	 *
 	 * @param int $formId The form to query shares for

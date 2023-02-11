@@ -29,6 +29,7 @@ use OCP\Activity\IManager;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserSession;
+use OCP\Share\IShare;
 
 use Psr\Log\LoggerInterface;
 
@@ -125,5 +126,42 @@ class ActivityManager {
 			->setObject('form', $form->getId());
 
 		$this->manager->publish($event);
+	}
+
+	/**
+	 * Publish a new-Submission Activity for shared forms
+	 *
+	 * @param Form $form The affected Form
+	 * @param string $submitterID ID of the User who submitted the form. Can also be our 'anon-user-'-ID
+	 */
+	public function publishNewSharedSubmission(Form $form, int $shareType, string $shareWith, string $submitterID) {
+		$users = [];
+		switch ($shareType) {
+			case IShare::TYPE_USER:
+				$users[] = $shareWith;
+				break;
+			case IShare::TYPE_GROUP:
+				$group = $this->groupManager->get($shareWith);
+				if ($group !== null) {
+					$users = array_map(fn (IUser $user) => $user->getUID(), $group->getUsers());
+				}
+				break;
+		}
+
+		foreach ($users as $userId) {
+			$event = $this->manager->generateEvent();
+			$event->setApp($this->appName)
+				->setType(ActivityConstants::TYPE_NEWSHAREDSUBMISSION)
+				->setAffectedUser($userId)
+				->setAuthor($submitterID)
+				->setSubject(ActivityConstants::SUBJECT_NEWSUBMISSION, [
+					'userId' => $submitterID,
+					'formTitle' => $form->getTitle(),
+					'formHash' => $form->getHash()
+				])
+				->setObject('form', $form->getId());
+
+			$this->manager->publish($event);
+		}
 	}
 }

@@ -75,6 +75,7 @@
 		<settings>
 			<setting>OCA\Forms\Activity\Settings\NewShare</setting>
 			<setting>OCA\Forms\Activity\Settings\NewSubmission</setting>
+			<setting>OCA\Forms\Activity\Settings\NewSharedSubmission</setting>
 		</settings>
 	</activity>
 </info>
