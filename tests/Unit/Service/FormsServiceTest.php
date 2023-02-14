@@ -577,6 +577,38 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->getPermissions(42));
 	}
 
+	// No currentUser on public views.
+	public function testGetPermissions_NotLoggedIn() {
+		$userSession = $this->createMock(IUserSession::class);
+		$userSession->expects($this->once())
+			->method('getUser')
+			->willReturn(null);
+
+		$formsService = new FormsService(
+			$this->activityManager,
+			$this->formMapper,
+			$this->optionMapper,
+			$this->questionMapper,
+			$this->shareMapper,
+			$this->submissionMapper,
+			$this->configService,
+			$this->groupManager,
+			$this->logger,
+			$this->userManager,
+			$userSession,
+			$this->secureRandom
+		);
+
+		$form = new Form();
+		$form->setId(42);
+		$this->formMapper->expects($this->any())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->assertEquals([], $formsService->getPermissions(42));
+	}
+
 	public function dataCanSeeResults() {
 		return [
 			'allowFormOwner' => [
