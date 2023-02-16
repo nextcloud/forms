@@ -49,12 +49,12 @@
 					:minlength="0"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
-					:readonly="!isEditing"
+					:readonly="!edit"
 					:required="true"
 					autofocus
 					@input="onTitleChange" />
 			</h2>
-			<template v-if="isEditing">
+			<template v-if="edit">
 				<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
 				<NcRichContenteditable id="form-desc"
 					class="form-desc form-desc__input"
@@ -198,10 +198,6 @@ export default {
 			return this.form.questions && this.form.questions.length === 0
 		},
 
-		isEditing() {
-			return this.edit || !this.form.title
-		},
-
 		isRequiredUsed() {
 			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
 		},
@@ -251,6 +247,7 @@ export default {
 		// Fetch full form on change
 		hash() {
 			this.fetchFullForm(this.form.id)
+			this.initEdit()
 		},
 
 		// Update Window-Title on title change
@@ -262,6 +259,7 @@ export default {
 	beforeMount() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
+		this.initEdit()
 	},
 
 	updated() {
@@ -275,11 +273,22 @@ export default {
 		},
 
 		disableEdit() {
-			this.edit = false
+			// Keep edit if no title set
+			if (this.form.title) {
+				this.edit = false
+			}
 		},
 
 		enableEdit() {
 			this.edit = true
+		},
+
+		initEdit() {
+			if (this.form.title) {
+				this.edit = false
+			} else {
+				this.edit = true
+			}
 		},
 
 		/**
