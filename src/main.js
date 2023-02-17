@@ -24,7 +24,7 @@
 import { generateFilePath } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
 import { translate, translatePlural } from '@nextcloud/l10n'
-import '@nextcloud/dialogs/styles/toast.scss'
+import '@nextcloud/dialogs/dist/index.css'
 
 import Vue from 'vue'
 
