@@ -13,12 +13,12 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ["7.3", "7.4", "8.0", "8.1"]
+        php-versions: ["7.4", "8.0", "8.1"]
 
     name: php${{ matrix.php-versions }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up php ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
@@ -39,12 +39,13 @@ jobs:
     name: cs php${{ matrix.php-versions }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up php
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
+          tools: composer:v1
           coverage: none
 
       - name: Install dependencies
@@ -61,7 +62,7 @@ jobs:
     name: eslint node
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up node
         uses: actions/setup-node@v2
@@ -83,7 +84,7 @@ jobs:
     name: stylelint node
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up node
         uses: actions/setup-node@v2

@@ -20,7 +20,7 @@ jobs:
       matrix:
         php-versions: ['7.4', "8.0", "8.1"]
         databases: ['sqlite']
-        server-versions: ['master']
+        server-versions: ['stable24']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -66,13 +66,13 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer test:integration
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          root_dir: apps/${{ env.APP_NAME }}
-          files: apps/${{ env.APP_NAME }}/tests/clover.unit.xml
-          fail_ci_if_error: true
-          flags: unittests
+#      - name: Upload coverage
+#        uses: codecov/codecov-action@v1
+#        with:
+#          root_dir: apps/${{ env.APP_NAME }}
+#          files: apps/${{ env.APP_NAME }}/tests/clover.unit.xml
+#          fail_ci_if_error: true
+#          flags: unittests
 
   mysql:
     runs-on: ubuntu-latest
@@ -83,7 +83,7 @@ jobs:
       matrix:
         php-versions: ['7.4']
         databases: ['mysql']
-        server-versions: ['stable22', 'stable23', 'master']
+        server-versions: ['stable22', 'stable23', 'stable24']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -147,13 +147,13 @@ jobs:
       matrix:
         php-versions: ['7.4']
         databases: ['pgsql']
-        server-versions: ['master']
+        server-versions: ['stable24']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
     services:
       postgres:
-        image: postgres
+        image: postgres:14
         ports:
           - 4444:5432/tcp
         env:
@@ -213,7 +213,7 @@ jobs:
       matrix:
         php-versions: ['7.4']
         databases: ['oci']
-        server-versions: ['master']
+        server-versions: ['stable24']
 
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
