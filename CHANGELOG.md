@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.2 - 2023-02-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.1...v2.5.2)
+
+### Merged
+- Dependency updates
+
+
 ## [v2.5.1](https://github.com/nextcloud/forms/tree/v2.5.1) (2022-05-26)
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v2.5.0...v2.5.1)
