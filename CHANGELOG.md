@@ -1,5 +1,27 @@
 # Changelog
 
+## 3.1.0 - 2023-02-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.4...v3.1.0)
+
+### Enhancements
+- Allow formatting question and form descriptions using markdown [\#1394](https://github.com/nextcloud/forms/pull/1394) ([susnux](https://github.com/susnux))
+- Add Nextcloud 26 support [\#1489](https://github.com/nextcloud/forms/pull/1489) ([susnux](https://github.com/susnux))
+- Add test for method `newForm` of `ApiController` [\#1480](https://github.com/nextcloud/forms/pull/1480) ([susnux](https://github.com/susnux))
+- Drop `v-clipboard` in favor of native browser API [\#1478](https://github.com/nextcloud/forms/pull/1478) ([susnux](https://github.com/susnux))
+- Allow sharees to see results | Implement `PERMISSION_RESULTS` [\#1461](https://github.com/nextcloud/forms/pull/1461) ([susnux](https://github.com/susnux))
+- feat: Add slot for additional actions to the question component [\#1470](https://github.com/nextcloud/forms/pull/1470) ([susnux](https://github.com/susnux))
+
+### Fixed
+- Fix Create edit mode [\#1498](https://github.com/nextcloud/forms/pull/1498) ([jotoeri](https://github.com/jotoeri))
+- Fix public view [\#1492](https://github.com/nextcloud/forms/pull/1492) ([jotoeri](https://github.com/jotoeri))
+- Fix some small `SubmissionService` issues [\#1490](https://github.com/nextcloud/forms/pull/1490) ([susnux](https://github.com/susnux))
+- Add missing computed property to edit view [\#1473](https://github.com/nextcloud/forms/pull/1473) ([Chartman123](https://github.com/Chartman123))
+
+### Merged
+- Add shareHash parameter [\#1476](https://github.com/nextcloud/forms/pull/1476) ([Chartman123](https://github.com/Chartman123))
+
+
 ## 3.0.4 - 2023-01-31
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.3...v3.0.4)
