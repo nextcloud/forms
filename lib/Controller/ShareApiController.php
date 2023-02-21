@@ -211,6 +211,8 @@ class ShareApiController extends OCSController {
 
 		// Create share-notifications (activity)
 		$this->formsService->notifyNewShares($form, $share);
+		
+		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		// Append displayName for Frontend
 		$shareData = $share->read();
@@ -249,6 +251,8 @@ class ShareApiController extends OCSController {
 		}
 
 		$this->shareMapper->deleteById($id);
+
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
 		return new DataResponse($id);
 	}
@@ -302,6 +306,8 @@ class ShareApiController extends OCSController {
 
 		$share->setPermissions($keyValuePairs['permissions']);
 		$share = $this->shareMapper->update($share);
+
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
 		return new DataResponse($share->getId());
 	}

@@ -63,6 +63,7 @@ class ApiV2Test extends TestCase {
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'show_expiration' => false,
+				'last_updated' => 123456789,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -162,6 +163,7 @@ class ApiV2Test extends TestCase {
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'show_expiration' => false,
+				'last_updated' => 123456789,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -207,7 +209,8 @@ class ApiV2Test extends TestCase {
 					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
 					'is_anonymous' => $qb->createNamedParameter($form['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL),
-					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL)
+					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
+					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
 				]);
 			$qb->execute();
 			$formId = $qb->getLastInsertId();
@@ -356,6 +359,7 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefg',
 					'title' => 'Title of a Form',
 					'expires' => 0,
+					'lastUpdated' => 123456789,
 					'permissions' => Constants::PERMISSION_ALL,
 					'partial' => true,
 					'submissionCount' => 3
@@ -385,6 +389,7 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefghij',
 					'title' => 'Title of a second Form',
 					'expires' => 0,
+					'lastUpdated' => 123456789,
 					'permissions' => [
 						'submit'
 					],
@@ -415,6 +420,7 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefghij',
 					'title' => 'Title of a second Form',
 					'expires' => 0,
+					'lastUpdated' => 123456789,
 					'permissions' => [
 						'submit'
 					],
@@ -446,7 +452,7 @@ class ApiV2Test extends TestCase {
 					'title' => '',
 					'description' => '',
 					'ownerId' => 'test',
-					// 'created' => Hard to check exactly.
+					// 'created' => time() can not be checked exactly
 					'access' => [
 						'permitAllUsers' => false,
 						'showToAllUsers' => false
@@ -455,6 +461,7 @@ class ApiV2Test extends TestCase {
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'showExpiration' => false,
+					// 'lastUpdated' => time() can not be checked exactly
 					'canSubmit' => true,
 					'permissions' => Constants::PERMISSION_ALL,
 					'questions' => [],
@@ -482,8 +489,11 @@ class ApiV2Test extends TestCase {
 		$this->assertMatchesRegularExpression('/^[a-zA-Z0-9]{16}$/', $data['hash']);
 		unset($data['hash']);
 		// Check general behaviour of created (Created in the last 10 seconds)
-		$this->assertTrue(time() - $data['created'] < 10);
+		$this->assertEqualsWithDelta(time(), $data['created'], 10);
 		unset($data['created']);
+		// Check general behaviour of lastUpdated (Last update in the last 10 seconds)
+		$this->assertEqualsWithDelta(time(), $data['lastUpdated'], 10);
+		unset($data['lastUpdated']);
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
@@ -506,6 +516,7 @@ class ApiV2Test extends TestCase {
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'showExpiration' => false,
+					'lastUpdated' => 123456789,
 					'canSubmit' => true,
 					'permissions' => Constants::PERMISSION_ALL,
 					'questions' => [
@@ -587,6 +598,11 @@ class ApiV2Test extends TestCase {
 		}
 		unset($data['id']);
 
+		// Allow a 10 second diff for lastUpdated between expectation and data
+		$this->assertEqualsWithDelta($expected['lastUpdated'], $data['lastUpdated'], 10);
+		unset($data['lastUpdated']);
+		unset($expected['lastUpdated']);
+
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
 	}
@@ -601,6 +617,7 @@ class ApiV2Test extends TestCase {
 		unset($fullFormExpected['id']);
 		unset($fullFormExpected['hash']);
 		unset($fullFormExpected['created']);
+		unset($fullFormExpected['lastUpdated']);
 		foreach ($fullFormExpected['questions'] as $qIndex => $question) {
 			unset($fullFormExpected['questions'][$qIndex]['formId']);
 		}
@@ -650,6 +667,9 @@ class ApiV2Test extends TestCase {
 		// Check general behaviour of created (Created in the last 10 seconds)
 		$this->assertTrue(time() - $data['created'] < 10);
 		unset($data['created']);
+		// Check general behaviour of lastUpdated (Last update in the last 10 seconds)
+		$this->assertTrue(time() - $data['lastUpdated'] < 10);
+		unset($data['lastUpdated']);
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
@@ -690,6 +710,8 @@ class ApiV2Test extends TestCase {
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['id'], $data);
+
+		$expected['lastUpdated'] = time();
 
 		// Check if form equals updated form.
 		$this->testGetFullForm($expected);
@@ -799,6 +821,8 @@ class ApiV2Test extends TestCase {
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['questions'][0]['id'], $data);
 
+		$fullFormExpected['lastUpdated'] = time();
+
 		// Check if form equals updated form.
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -842,6 +866,8 @@ class ApiV2Test extends TestCase {
 			$this->testForms[0]['questions'][1]['id'] => [ 'order' => 1 ]
 		], $data);
 
+		$fullFormExpected['lastUpdated'] = time();
+
 		// Check if form equals updated form.
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -868,6 +894,8 @@ class ApiV2Test extends TestCase {
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['questions'][0]['id'], $data);
+
+		$fullFormExpected['lastUpdated'] = time();
 
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -937,6 +965,8 @@ class ApiV2Test extends TestCase {
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['questions'][1]['options'][0]['id'], $data);
 
+		$fullFormExpected['lastUpdated'] = time();
+
 		// Check if form equals updated form.
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -962,6 +992,8 @@ class ApiV2Test extends TestCase {
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['questions'][1]['options'][0]['id'], $data);
+
+		$fullFormExpected['lastUpdated'] = time();
 
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -1034,6 +1066,8 @@ class ApiV2Test extends TestCase {
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
 
+		$fullFormExpected['lastUpdated'] = time();
+
 		$this->testGetFullForm($fullFormExpected);
 	}
 
@@ -1058,6 +1092,8 @@ class ApiV2Test extends TestCase {
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
+
+		$fullFormExpected['lastUpdated'] = time();
 
 		$this->testGetFullForm($fullFormExpected);
 	}

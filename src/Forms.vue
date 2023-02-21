@@ -103,11 +103,12 @@
 </template>
 
 <script>
-import { emit } from '@nextcloud/event-bus'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation.js'
@@ -222,6 +223,14 @@ export default {
 
 	beforeMount() {
 		this.loadForms()
+	},
+
+	mounted() {
+		subscribe('forms:last-updated:set', (id) => this.onLastUpdatedByEventBus(id))
+	},
+
+	unmounted() {
+		unsubscribe('forms:last-updated:set', (id) => this.onLastUpdatedByEventBus(id))
 	},
 
 	methods: {
@@ -347,6 +356,23 @@ export default {
 			// Redirect if current form has been deleted
 			if (deletedHash === this.routeHash) {
 				this.$router.push({ name: 'root' })
+			}
+		},
+
+		/**
+		 * Update last updated timestamp in given form
+		 *
+		 * @param {number} id the form id
+		 */
+		onLastUpdatedByEventBus(id) {
+			const formIndex = this.forms.findIndex(form => form.id === id)
+			if (formIndex !== -1) {
+				this.forms[formIndex].lastUpdated = moment().unix()
+				this.forms.sort((b, a) => a.lastUpdated - b.lastUpdated)
+			} else {
+				const sharedFormIndex = this.sharedForms.findIndex(form => form.id === id)
+				this.sharedForms[sharedFormIndex].lastUpdated = moment().unix()
+				this.sharedForms.sort((a, b) => a.lastUpdated - b.lastUpdated)
 			}
 		},
 	},

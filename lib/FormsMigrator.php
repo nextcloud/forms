@@ -199,6 +199,7 @@ class FormsMigrator implements IMigrator {
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
 				$form->setShowExpiration($formData['showExpiration']);
+				$form->setLastUpdated($formData['lastUpdated']);
 
 				$this->formMapper->insert($form);
 

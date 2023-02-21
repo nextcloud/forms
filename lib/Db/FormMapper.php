@@ -99,8 +99,9 @@ class FormMapper extends QBMapper {
 
 		$qb->select('*')
 			->from($this->getTableName())
-			//Newest forms first
-			->orderBy('created', 'DESC');
+			//Last updated forms first, then newest forms first
+			->addOrderBy('last_updated', 'DESC')
+			->addOrderBy('created', 'DESC');
 
 		return $this->findEntities($qb);
 	}
@@ -116,8 +117,9 @@ class FormMapper extends QBMapper {
 			->where(
 				$qb->expr()->eq('owner_id', $qb->createNamedParameter($ownerId))
 			)
-			//Newest forms first
-			->orderBy('created', 'DESC');
+			//Last updated forms first, then newest forms first
+			->addOrderBy('last_updated', 'DESC')
+			->addOrderBy('created', 'DESC');
 
 		return $this->findEntities($qb);
 	}
