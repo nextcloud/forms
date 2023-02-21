@@ -40,7 +40,6 @@ use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
-use OCP\IDateTimeFormatter;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -74,9 +73,6 @@ class SubmissionServiceTest extends TestCase {
 	/** @var IConfig|MockObject */
 	private $config;
 
-	/** @var IDateTimeFormatter|MockObject */
-	private $dateTimeFormatter;
-
 	/** @var IL10N|MockObject */
 	private $l10n;
 
@@ -94,7 +90,6 @@ class SubmissionServiceTest extends TestCase {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->storage = $this->createMock(IRootFolder::class);
 		$this->config = $this->createMock(IConfig::class);
-		$this->dateTimeFormatter = $this->createMock(IDateTimeFormatter::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
@@ -121,7 +116,6 @@ class SubmissionServiceTest extends TestCase {
 			$this->answerMapper,
 			$this->storage,
 			$this->config,
-			$this->dateTimeFormatter,
 			$this->l10n,
 			$this->logger,
 			$this->userManager,
@@ -285,6 +279,7 @@ class SubmissionServiceTest extends TestCase {
 					[
 						'id' => 1,
 						'userId' => 'user1',
+						'timestamp' => 123456789,
 						'answers' => [
 							['questionId' => 1, 'text' => 'Q1A1'],
 							['questionId' => 2, 'text' => 'Q2A1']
@@ -293,6 +288,7 @@ class SubmissionServiceTest extends TestCase {
 					[
 						'id' => 2,
 						'userId' => 'user2',
+						'timestamp' => 123456789,
 						'answers' => [
 							['questionId' => 1, 'text' => 'Q1A2'],
 							['questionId' => 2, 'text' => 'Q2A2']
@@ -302,8 +298,8 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp","Question 1","Question 2"
-				"user1","User 1","01.01.01, 01:01","Q1A1","Q2A1"
-				"user2","User 2","01.01.01, 01:01","Q1A2","Q2A2"
+				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
+				"user2","User 2","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
 				'
 			],
 			'checkbox-multi-answers' => [
@@ -316,6 +312,7 @@ class SubmissionServiceTest extends TestCase {
 					[
 						'id' => 1,
 						'userId' => 'user1',
+						'timestamp' => 123456789,
 						'answers' => [
 							['questionId' => 1, 'text' => 'Q1A1'],
 							['questionId' => 1, 'text' => 'Q1A2'],
@@ -326,7 +323,7 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp","Question 1"
-				"user1","User 1","01.01.01, 01:01","Q1A1; Q1A2; Q1A3"
+				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1; Q1A2; Q1A3"
 				'
 			],
 			'anonymous-user' => [
@@ -339,6 +336,7 @@ class SubmissionServiceTest extends TestCase {
 					[
 						'id' => 1,
 						'userId' => 'anon-user-xyz',
+						'timestamp' => 123456789,
 						'answers' => [
 							['questionId' => 1, 'text' => 'Q1A1'],
 						]
@@ -347,7 +345,7 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp","Question 1"
-				"","Anonymous user","01.01.01, 01:01","Q1A1"
+				"","Anonymous user","1973-11-29T22:33:09+01:00","Q1A1"
 				'
 			],
 			'questions-not-answered' => [
@@ -362,6 +360,7 @@ class SubmissionServiceTest extends TestCase {
 					[
 						'id' => 1,
 						'userId' => 'user1',
+						'timestamp' => 123456789,
 						'answers' => [
 							['questionId' => 2, 'text' => 'Q2A1']
 						]
@@ -370,7 +369,7 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp","Question 1","Question 2","Question 3"
-				"user1","User 1","01.01.01, 01:01","","Q2A1",""
+				"user1","User 1","1973-11-29T22:33:09+01:00","","Q2A1",""
 				'
 			],
 			/* No submissions, but request via api */
@@ -395,6 +394,7 @@ class SubmissionServiceTest extends TestCase {
 					[
 						'id' => 1,
 						'userId' => 'anon-user-xyz',
+						'timestamp' => 123456789,
 						'answers' => [
 							['questionId' => 1, 'text' => 'Q1A1'],
 						]
@@ -403,7 +403,7 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp"
-				"","Anonymous user","01.01.01, 01:01"
+				"","Anonymous user","1973-11-29T22:33:09+01:00"
 				'
 			],
 		];
@@ -438,6 +438,7 @@ class SubmissionServiceTest extends TestCase {
 				[
 					'id' => 1,
 					'userId' => 'user1',
+					'timestamp' => 123456789,
 					'answers' => [
 						['questionId' => 1, 'text' => 'Q1A1']
 					]
@@ -446,7 +447,7 @@ class SubmissionServiceTest extends TestCase {
 			// Expected CSV-Result
 			'
 			"User ID","User display name","Timestamp","Question 1"
-			"user1","User 1","01.01.01, 01:01","Q1A1"
+			"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1"
 			'
 		);
 	}
@@ -509,11 +510,6 @@ class SubmissionServiceTest extends TestCase {
 				['user2', $user],
 				['unknown', null]
 			]));
-
-		// Just using any timestamp here
-		$this->dateTimeFormatter->expects($this->any())
-			->method('formatDateTime')
-			->willReturn('01.01.01, 01:01');
 
 		$this->answerMapper->expects($this->any())
 		->method('findBySubmission')
