@@ -26,6 +26,7 @@ OC.L10N.register(
     "Share link" : "Поділитися посиланням",
     "Add link" : "Додати посиланя",
     "Copy to clipboard" : "Скопіювати в буфер обміну ",
+    "Remove link" : "Вилучити посилання",
     "Internal link" : "Внутрішнє посилання",
     "View form" : "Переглянути форму",
     "View" : "Перегляд",
