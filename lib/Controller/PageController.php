@@ -142,7 +142,10 @@ class PageController extends Controller {
 		$this->insertHeaderOnIos();
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		$this->initialStateService->provideInitialState($this->appName, 'appConfig', $this->configService->getAppConfig());
-		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN);
+		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
+			'id-app-content' => '#app-content-vue',
+			'id-app-navigation' => '#app-navigation-vue',
+		]);
 	}
 
 	/**
@@ -229,7 +232,7 @@ class PageController extends Controller {
 		$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialStateService->provideInitialState($this->appName, 'shareHash', $hash);
 		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
-		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
+		return $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
 	}
 
 	public function provideEmptyContent(string $renderAs, Form $form = null): ?TemplateResponse {
@@ -246,11 +249,14 @@ class PageController extends Controller {
 	 * @param Form $form Necessary to set header on public forms, not necessary for 'notfound'-template
 	 * @return TemplateResponse
 	 */
-	public function provideTemplate(string $template, Form $form = null): ?TemplateResponse {
+	public function provideTemplate(string $template, Form $form = null, array $options = []): ?TemplateResponse {
 		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {
 			Util::addStyle($this->appName, 'public');
-			$response = new PublicTemplateResponse($this->appName, $template);
+			$response = new PublicTemplateResponse($this->appName, $template, array_merge([
+				'id-app-content' => '#app-content-vue',
+				'id-app-navigation' => null,
+			], $options));
 
 			// Set Header
 			$response->setHeaderTitle($this->l10n->t('Forms'));
@@ -272,7 +278,10 @@ class PageController extends Controller {
 			return $response;
 		}
 
-		return new TemplateResponse($this->appName, $template);
+		return new TemplateResponse($this->appName, $template, array_merge([
+			'id-app-content' => '#app-content-vue',
+			'id-app-navigation' => '#app-navigation-vue',
+		], $options));
 	}
 
 	/**
