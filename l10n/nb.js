@@ -71,7 +71,7 @@ OC.L10N.register(
     "View" : "Vis",
     "Edit" : "Rediger",
     "Share" : "Del",
-    "Toggle settings" : "Veksle innstillinger",
+    "Toggle settings" : "Innstillinger av/på",
     "Loading {title} …" : "Laster {title} ...",
     "Form title" : "Skjematittel",
     "Add a question" : "Legg til et spørsmål",
