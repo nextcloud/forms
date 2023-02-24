@@ -157,6 +157,7 @@ class FormsServiceTest extends TestCase {
 				'isAnonymous' => false,
 				'submitMultiple' => true,
 				'showExpiration' => false,
+				'lastUpdated' => 123456789,
 				'canSubmit' => true,
 				'submissionCount' => 123,
 				'questions' => [
@@ -231,6 +232,7 @@ class FormsServiceTest extends TestCase {
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
 		$form->setShowExpiration(false);
+		$form->setLastUpdated(123456789);
 
 		$this->formMapper->expects($this->any())
 			->method('findById')
@@ -315,6 +317,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
+				'lastUpdated' => 123456789,
 				'permissions' => Constants::PERMISSION_ALL,
 				'submissionCount' => 123,
 				'partial' => true
@@ -333,6 +336,7 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 		$form->setOwnerId('currentUser');
 		$form->setExpires(0);
+		$form->setLastUpdated(123456789);
 
 		$this->formMapper->expects($this->exactly(2))
 			->method('findById')
@@ -355,6 +359,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
+				'lastUpdated' => 123456789,
 				'permissions' => ['results', 'submit'],
 				'submissionCount' => 123,
 				'partial' => true
@@ -374,6 +379,7 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 		$form->setOwnerId('otherUser');
 		$form->setExpires(0);
+		$form->setLastUpdated(123456789);
 
 		$share = new Share();
 		$share->setFormId(42);
@@ -410,6 +416,7 @@ class FormsServiceTest extends TestCase {
 				'description' => 'Description Text',
 				'created' => 123456789,
 				'expires' => 0,
+				'lastUpdated' => 123456789,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
 				'showExpiration' => false,
@@ -440,6 +447,7 @@ class FormsServiceTest extends TestCase {
 			'showToAllUsers' => false,
 		]);
 		$form->setExpires(0);
+		$form->setLastUpdated(123456789);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
 		$form->setShowExpiration(false);
@@ -575,6 +583,38 @@ class FormsServiceTest extends TestCase {
 			->willReturn(true);
 
 		$this->assertEquals($expected, $this->formsService->getPermissions(42));
+	}
+
+	// No currentUser on public views.
+	public function testGetPermissions_NotLoggedIn() {
+		$userSession = $this->createMock(IUserSession::class);
+		$userSession->expects($this->once())
+			->method('getUser')
+			->willReturn(null);
+
+		$formsService = new FormsService(
+			$this->activityManager,
+			$this->formMapper,
+			$this->optionMapper,
+			$this->questionMapper,
+			$this->shareMapper,
+			$this->submissionMapper,
+			$this->configService,
+			$this->groupManager,
+			$this->logger,
+			$this->userManager,
+			$userSession,
+			$this->secureRandom
+		);
+
+		$form = new Form();
+		$form->setId(42);
+		$this->formMapper->expects($this->any())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		$this->assertEquals([], $formsService->getPermissions(42));
 	}
 
 	public function dataCanSeeResults() {

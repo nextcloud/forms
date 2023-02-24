@@ -90,8 +90,9 @@
 </template>
 
 <script>
-import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
+import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
@@ -219,6 +220,7 @@ export default {
 		 */
 		updateOptions(options) {
 			this.$emit('update:options', options)
+			emit('forms:last-updated:set', this.$attrs.formId)
 		},
 
 		/**

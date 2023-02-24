@@ -22,6 +22,7 @@
 
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
 import axios from '@nextcloud/axios'
 import MarkdownIt from 'markdown-it'
 
@@ -152,6 +153,7 @@ export default {
 						[key]: this.form[key],
 					},
 				})
+				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error saving form property', { error })
 				showError(t('forms', 'Error while saving form'))

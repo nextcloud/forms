@@ -22,6 +22,27 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+namespace OCA\Forms\Controller;
+
+/**
+ * mock time() function used in controllers
+ * @param int|false|null $expected the value that should be returned when called
+ */
+function time($expected = null) {
+	static $value;
+	if ($expected === false) {
+		$value = null;
+	} elseif (!is_null($expected)) {
+		$value = $expected;
+	}
+	// Return real time if no mocked value is set
+	if (is_null($value)) {
+		return \time();
+	}
+	return $value;
+}
+
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Forms\Activity\ActivityManager;
@@ -36,6 +57,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCA\Forms\Tests\Unit\MockedMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -79,6 +101,8 @@ class ApiControllerTest extends TestCase {
 	private $request;
 	/** @var IUserManager|MockObject */
 	private $userManager;
+	/** @var IL10N|MockObject */
+	private $l10n;
 
 	public function setUp(): void {
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -94,22 +118,12 @@ class ApiControllerTest extends TestCase {
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
 		$this->userManager = $this->createMock(IUserManager::class);
-		$userSession = $this->createMock(IUserSession::class);
-		/** @var IL10N|MockObject */
-		$l10n = $this->createMock(IL10N::class);
-		$l10n->expects($this->any())
+		$this->l10n = $this->createMock(IL10N::class);
+		$this->l10n->expects($this->any())
 			->method('t')
 			->willReturnCallback(function ($v) {
 				return $v;
 			});
-
-		$user = $this->createMock(IUser::class);
-		$user->expects($this->any())
-			->method('getUID')
-			->willReturn('currentUser');
-		$userSession->expects($this->once())
-			->method('getUser')
-			->willReturn($user);
 
 		$this->apiController = new ApiController(
 			'forms',
@@ -123,12 +137,49 @@ class ApiControllerTest extends TestCase {
 			$this->configService,
 			$this->formsService,
 			$this->submissionService,
-			$l10n,
+			$this->l10n,
 			$this->logger,
 			$this->request,
 			$this->userManager,
-			$userSession
+			$this->createUserSession()
 		);
+	}
+
+	/**
+	 * Helper factory to prevent duplicated code
+	 */
+	protected function createUserSession() {
+		$userSession = $this->createMock(IUserSession::class);
+		$user = $this->createMock(IUser::class);
+		$user->expects($this->any())
+			->method('getUID')
+			->willReturn('currentUser');
+		$userSession->expects($this->once())
+			->method('getUser')
+			->willReturn($user);
+		return $userSession;
+	}
+
+	/**
+	 * Factory to create a validator used to compare forms passed as parameters
+	 * Required as the timestamps might differ
+	 */
+	public static function createFormValidator(array $expected) {
+		return function ($form) use ($expected): bool {
+			self::assertInstanceOf(Form::class, $form);
+			$read = $form->read();
+			unset($read['created']);
+			self::assertEquals($expected, $read);
+			return true;
+		};
+	}
+
+	/**
+	 * Helper function to throw exceptions
+	 * Required as PHP 7 does not allow throwing in expressions (e.g. `fn(): foo => throw ...`)
+	 */
+	public function throwMockedException(string $class) {
+		throw $this->createMock($class);
 	}
 
 	public function testGetSubmissions_invalidForm() {
@@ -281,5 +332,225 @@ class ApiControllerTest extends TestCase {
 			->willReturn($csv);
 
 		$this->assertEquals(new DataDownloadResponse($csv['data'], $csv['fileName'], 'text/csv'), $this->apiController->exportSubmissions('hash'));
+	}
+
+	public function testCreateNewForm_notAllowed() {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->newForm();
+	}
+
+	public function dataTestCreateNewForm() {
+		return [
+			"forms" => ['expectedForm' => [
+				'id' => 7,
+				'hash' => 'formHash',
+				'title' => '',
+				'description' => '',
+				'ownerId' => 'currentUser',
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'expires' => 0,
+				'isAnonymous' => false,
+				'submitMultiple' => false,
+				'showExpiration' => false,
+				'lastUpdated' => 123456789
+			]]
+		];
+	}
+	/**
+	 * @dataProvider dataTestCreateNewForm()
+	 */
+	public function testCreateNewForm($expectedForm) {
+		// Create a partial mock, as we only test newForm and not getForm
+		/** @var ApiController|MockObject */
+		$apiController = $this->getMockBuilder(ApiController::class)
+			 ->onlyMethods(['getForm'])
+			 ->setConstructorArgs(['forms',
+			 	$this->activityManager,
+			 	$this->answerMapper,
+			 	$this->formMapper,
+			 	$this->optionMapper,
+			 	$this->questionMapper,
+			 	$this->shareMapper,
+			 	$this->submissionMapper,
+			 	$this->configService,
+			 	$this->formsService,
+			 	$this->submissionService,
+			 	$this->l10n,
+			 	$this->logger,
+			 	$this->request,
+			 	$this->userManager,
+			 	$this->createUserSession()
+			 ])->getMock();
+		// Set the time that should be set for `lastUpdated`
+		\OCA\Forms\Controller\time(123456789);
+
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('generateFormHash')
+			->willReturn('formHash');
+		$expected = $expectedForm;
+		$expected['id'] = null;
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(self::createFormValidator($expected)))
+			->willReturnCallback(function ($form) {
+				$form->setId(7);
+				return $form;
+			});
+		$apiController->expects($this->once())
+			->method('getForm')
+			->with(7)
+			->willReturn(new DataResponse('succeeded'));
+		$this->assertEquals(new DataResponse('succeeded'), $apiController->newForm());
+	}
+
+	public function dataCloneForm_exceptions() {
+		return [
+			'disabled' => [
+				'canCreate' => false,
+				'callback' => fn ($id): Form => new Form(),
+				'exception' => OCSForbiddenException::class
+			],
+			'not found' => [
+				'canCreate' => true,
+				'callback' => fn ($id): Form => $this->throwMockedException(MockedMapperException::class),
+				'exception' => OCSBadRequestException::class
+			],
+			'not owned' => [
+				'canCreate' => true,
+				'callback' => function ($id): Form {
+					$form = new Form();
+					$form->setId($id);
+					$form->setOwnerId('otherUser');
+					return $form;
+				},
+				'exception' => OCSForbiddenException::class
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataCloneForm_exceptions()
+	 */
+	public function testCloneForm_exceptions(bool $canCreate, $callback, string $exception) {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn($canCreate);
+		$this->formMapper->expects($canCreate ? $this->once() : $this->never())
+			->method('findById')
+			->with(7)
+			->willReturnCallback($callback);
+		$this->expectException($exception);
+		$this->apiController->cloneForm(7);
+	}
+
+	public function dataCloneForm() {
+		return [
+			'works' => [
+				'old' => [
+					'id' => 7,
+					'title' => '',
+					'hash' => 'old hash',
+					'created' => null,
+					'access' => [
+						'permitAllUsers' => false,
+						'showToAllUsers' => false,
+					],
+					'ownerId' => 'currentUser',
+					'description' => '',
+					'expires' => 0,
+					'isAnonymous' => false,
+					'submitMultiple' => false,
+					'showExpiration' => false
+				],
+				'new' => [
+					'id' => 14,
+					'title' => ' - Copy',
+					'hash' => 'new hash',
+					'access' => [
+						'permitAllUsers' => false,
+						'showToAllUsers' => false,
+					],
+					'ownerId' => 'currentUser',
+					'description' => '',
+					'expires' => 0,
+					'isAnonymous' => false,
+					'submitMultiple' => false,
+					'showExpiration' => false
+				]
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataCloneForm()
+	 */
+	public function testCloneForm($old, $new) {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(true);
+
+		$oldForm = Form::fromParams($old);
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(7)
+			->willReturn($oldForm);
+
+		$this->formsService->expects($this->once())
+			->method('generateFormHash')
+			->willReturn('new hash');
+
+		$read = $oldForm->read();
+		unset($read['id']);
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(function ($form) {
+				self::assertInstanceOf(Form::class, $form);
+				self::assertNull($form->getId());
+				self::assertEquals($form->getHash(), 'new hash');
+				$form->setId(14);
+				return true;
+			}));
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with(7)
+			->willReturn([]);
+
+		/** @var ApiController|MockObject */
+		$apiController = $this->getMockBuilder(ApiController::class)
+			->onlyMethods(['getForm'])
+			->setConstructorArgs(['forms',
+				$this->activityManager,
+				$this->answerMapper,
+				$this->formMapper,
+				$this->optionMapper,
+				$this->questionMapper,
+				$this->shareMapper,
+				$this->submissionMapper,
+				$this->configService,
+				$this->formsService,
+				$this->submissionService,
+				$this->l10n,
+				$this->logger,
+				$this->request,
+				$this->userManager,
+				$this->createUserSession()
+			])
+			->getMock();
+
+		$apiController->expects($this->once())
+			->method('getForm')
+			->with(14)
+			->willReturn(new DataResponse('success'));
+		$this->assertEquals(new DataResponse('success'), $apiController->cloneForm(7));
 	}
 }

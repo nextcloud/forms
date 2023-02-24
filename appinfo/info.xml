@@ -9,13 +9,14 @@
 - **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
 - **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.
 - **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
+- **🧑‍💻 Connect to your software:** Easily integrate Forms into your service with our full-fledged [REST-API](https://github.com/nextcloud/forms/blob/main/docs/API.md).
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 	]]></description>
 
 	<licence>agpl</licence>
-	<version>3.0.4</version>
+	<version>3.1.0</version>
 	<dependencies>
-		<nextcloud min-version="25" max-version="25" />
+		<nextcloud min-version="25" max-version="26" />
 	</dependencies>
 
 	<author>Affan Hussain</author>

@@ -133,6 +133,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
@@ -270,6 +271,7 @@ export default {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2/submission/{id}', { id }))
 				const index = this.form.submissions.findIndex(search => search.id === id)
 				this.form.submissions.splice(index, 1)
+				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error(`Error while removing response ${id}`, { error })
 				showError(t('forms', 'There was an error while removing this response'))
@@ -287,6 +289,7 @@ export default {
 			try {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2/submissions/{formId}', { formId: this.form.id }))
 				this.form.submissions = []
+				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while removing responses', { error })
 				showError(t('forms', 'There was an error while removing responses'))

@@ -269,6 +269,7 @@ class ApiController extends OCSController {
 		$form->setShowExpiration(false);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
+		$form->setLastUpdated(time());
 
 		$this->formMapper->insert($form);
 
@@ -315,6 +316,7 @@ class ApiController extends OCSController {
 		$formData = $oldForm->read();
 		unset($formData['id']);
 		$formData['created'] = time();
+		$formData['lastUpdated'] = time();
 		$formData['hash'] = $this->formsService->generateFormHash();
 		// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 		$formData['title'] .= ' - ' . $this->l10n->t('Copy');
@@ -384,9 +386,10 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		// Don't allow to change params id, hash, ownerId, created
+		// Don't allow to change params id, hash, ownerId, created, lastUpdated
 		if (key_exists('id', $keyValuePairs) || key_exists('hash', $keyValuePairs) ||
-			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs)) {
+			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs) ||
+			key_exists('lastUpdated', $keyValuePairs)) {
 			$this->logger->info('Not allowed to update id, hash, ownerId or created');
 			throw new OCSForbiddenException();
 		}
@@ -397,6 +400,7 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
+		$this->formsService->setLastUpdatedTimestamp($id);
 
 		return new DataResponse($form->getId());
 	}
@@ -501,6 +505,8 @@ class ApiController extends OCSController {
 		$response = $question->read();
 		$response['options'] = [];
 
+		$this->formsService->setLastUpdatedTimestamp($formId);
+
 		return new DataResponse($response);
 	}
 
@@ -594,6 +600,8 @@ class ApiController extends OCSController {
 			];
 		}
 
+		$this->formsService->setLastUpdatedTimestamp($formId);
+
 		return new DataResponse($response);
 	}
 
@@ -654,6 +662,8 @@ class ApiController extends OCSController {
 		// Update changed Columns in Db.
 		$this->questionMapper->update($question);
 
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
+
 		return new DataResponse($question->getId());
 	}
 
@@ -703,6 +713,8 @@ class ApiController extends OCSController {
 			}
 		}
 
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
+
 		return new DataResponse($id);
 	}
 
@@ -743,6 +755,8 @@ class ApiController extends OCSController {
 		$option->setText($text);
 
 		$option = $this->optionMapper->insert($option);
+
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
 		return new DataResponse($option->read());
 	}
@@ -798,6 +812,8 @@ class ApiController extends OCSController {
 		// Update changed Columns in Db.
 		$this->optionMapper->update($option);
 
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
+
 		return new DataResponse($option->getId());
 	}
 
@@ -832,6 +848,8 @@ class ApiController extends OCSController {
 		}
 
 		$this->optionMapper->delete($option);
+
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
 		return new DataResponse($id);
 	}
@@ -1013,6 +1031,8 @@ class ApiController extends OCSController {
 			}
 		}
 
+		$this->formsService->setLastUpdatedTimestamp($formId);
+
 		//Create Activity
 		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
 
@@ -1051,6 +1071,8 @@ class ApiController extends OCSController {
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->deleteById($id);
 
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
+
 		return new DataResponse($id);
 	}
 
@@ -1084,6 +1106,8 @@ class ApiController extends OCSController {
 
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
+
+		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		return new DataResponse($formId);
 	}

@@ -34,12 +34,14 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
+use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 
@@ -81,6 +83,9 @@ class SubmissionService {
 
 	/** @var IUserManager */
 	private $userManager;
+
+	/** @var IUser */
+	private $currentUser;
 
 	public function __construct(FormMapper $formMapper,
 								QuestionMapper $questionMapper,
@@ -287,7 +292,7 @@ class SubmissionService {
 		// insert all the records
 		$csv->insertAll($records);
 
-		return $csv->getContent();
+		return $csv->toString();
 	}
 
 	/**

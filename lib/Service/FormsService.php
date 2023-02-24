@@ -226,6 +226,7 @@ class FormsService {
 			'hash' => $form->getHash(),
 			'title' => $form->getTitle(),
 			'expires' => $form->getExpires(),
+			'lastUpdated' => $form->getLastUpdated(),
 			'permissions' => $this->getPermissions($form->getId()),
 			'partial' => true
 		];
@@ -265,8 +266,12 @@ class FormsService {
 	public function getPermissions(int $formId): array {
 		$form = $this->formMapper->findById($formId);
 
+		if (!$this->currentUser) {
+			return [];
+		}
+
 		// Owner is allowed to do everything
-		if ($this->currentUser && $this->currentUser->getUID() === $form->getOwnerId()) {
+		if ($this->currentUser->getUID() === $form->getOwnerId()) {
 			return Constants::PERMISSION_ALL;
 		}
 
@@ -522,5 +527,16 @@ class FormsService {
 					return false;
 			}
 		});
+	}
+
+	/**
+	 * Update lastUpdated timestamp for the given form
+	 *
+	 * @param int $formId The form to update
+	 */
+	public function setLastUpdatedTimestamp(int $formId): void {
+		$form = $this->formMapper->findById($formId);
+		$form->setLastUpdated(time());
+		$this->formMapper->update($form);
 	}
 }

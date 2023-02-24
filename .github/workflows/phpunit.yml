@@ -18,7 +18,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ["8.0", "8.1"]
+        php-versions: ["8.0", "8.1", "8.2"]
         # Upload coverage only once (out of php-versions)
         coverage-on: ['8.1']
         databases: ['sqlite']
@@ -77,19 +77,19 @@ jobs:
 
       - name: Upload Unit coverage
         if: matrix.php-versions == matrix.coverage-on
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
-          root_dir: apps/${{ env.APP_NAME }}
-          files: apps/${{ env.APP_NAME }}/tests/clover.unit.xml
+          root_dir: ./apps/${{ env.APP_NAME }}
+          files: ./apps/${{ env.APP_NAME }}/tests/clover.unit.xml
           fail_ci_if_error: true
           flags: unit
 
       - name: Upload Integration coverage
         if: matrix.php-versions == matrix.coverage-on
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
-          root_dir: apps/${{ env.APP_NAME }}
-          files: apps/${{ env.APP_NAME }}/tests/clover.integration.xml
+          root_dir: ./apps/${{ env.APP_NAME }}
+          files: ./apps/${{ env.APP_NAME }}/tests/clover.integration.xml
           fail_ci_if_error: true
           flags: integration
 
