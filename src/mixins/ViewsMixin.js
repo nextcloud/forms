@@ -127,7 +127,7 @@ export default {
 			this.cancelFetchFullForm = cancel
 
 			try {
-				const response = await request(generateOcsUrl('apps/forms/api/v2/form/{id}', { id }))
+				const response = await request(generateOcsUrl('apps/forms/api/v2.1/form/{id}', { id }))
 				this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
 			} catch (error) {
@@ -147,7 +147,7 @@ export default {
 		async saveFormProperty(key) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.post(generateOcsUrl('apps/forms/api/v2/form/update'), {
+				await axios.post(generateOcsUrl('apps/forms/api/v2.1/form/update'), {
 					id: this.form.id,
 					keyValuePairs: {
 						[key]: this.form[key],
