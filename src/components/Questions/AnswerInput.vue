@@ -16,6 +16,13 @@
 			@keydown.delete="deleteEntry"
 			@keydown.enter.prevent="addNewEntry">
 
+		<!-- check to new propierty open -->
+		<input v-if="!isDropdown"
+			   ref="isopen"
+			   :checked="answer.isOpen"
+			   type="checkbox"
+			   @change="onInput">
+
 		<!-- Delete answer -->
 		<NcActions>
 			<NcActionButton @click="deleteEntry">
@@ -69,6 +76,12 @@ export default {
 			type: Boolean,
 			required: true,
 		},
+		// new propierty to open question type
+		isOpen: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
 		isDropdown: {
 			type: Boolean,
 			required: true,
@@ -112,6 +125,11 @@ export default {
 			const answer = Object.assign({}, this.answer)
 			answer.text = this.$refs.input.value
 
+			// Only add propierty open if this question isn´t Dropdown type
+			if (!this.isDropdown) {
+				answer.isOpen = this.$refs.isopen.checked
+			}
+
 			if (this.answer.local) {
 
 				// Dispatched for creation. Marked as synced
@@ -123,6 +141,10 @@ export default {
 				// any in-between changes while creating the answer
 				Object.assign(newAnswer, { text: this.$refs.input.value })
 				this.$emit('update:answer', answer.id, newAnswer)
+				// Emit event to save
+				if (!this.isDropdown) {
+					this.$emit('update:isOpen', answer.id, answer.isOpen)
+				}
 			} else {
 				this.debounceUpdateAnswer(answer)
 				this.$emit('update:answer', answer.id, answer)
@@ -161,11 +183,16 @@ export default {
 		 */
 		async createAnswer(answer) {
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/option'), {
+				const data = {
 					questionId: answer.questionId,
 					text: answer.text,
-				})
+				}
 				logger.debug('Created answer', { answer })
+				// Add propierty to save
+				if (!this.isDropdown) {
+					data.isOpen = answer.isOpen
+				}
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/option'), data)
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
@@ -189,11 +216,15 @@ export default {
 		 */
 		async updateAnswer(answer) {
 			try {
+				const data = {
+					text: answer.text,
+				}
+				if (!this.isDropdown) {
+					data.isOpen = answer.isOpen
+				}
 				await axios.post(generateOcsUrl('apps/forms/api/v2.1/option/update'), {
 					id: this.answer.id,
-					keyValuePairs: {
-						text: answer.text,
-					},
+					keyValuePairs: data,
 				})
 				logger.debug('Updated answer', { answer })
 			} catch (error) {

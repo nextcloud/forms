@@ -29,13 +29,18 @@
 		</NcEmptyContent>
 	</NcAppContent>
 
-	<NcAppContent v-else :class="{'app-content--public': publicView}">
+	<NcAppContent v-else
+		  :class="{'app-content--public': publicView}"
+		  :style="'background-color:'+form.color">
 		<TopBar v-if="!publicView"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
-
+		<img v-if="form.img !== ''"
+			 alt="Imagen de cabecera"
+			 :src="form.img+'/preview'"
+			 class="img-header">
 		<!-- Forms title & description-->
 		<header>
 			<h2 ref="title" class="form-title">
@@ -313,6 +318,11 @@ export default {
 		max-width: 750px;
 		display: flex;
 		flex-direction: column;
+	}
+	.img-header {
+		width: 100%;
+		max-height: 300px;
+		max-width: 750px;
 	}
 
 	// Title & description header

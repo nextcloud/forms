@@ -23,6 +23,7 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:img="img"
 		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -35,6 +36,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:img="onImgChange"
 		@delete="onDelete">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
@@ -43,17 +45,45 @@
 			</NcActionCheckbox>
 		</template>
 		<template v-if="!edit">
-			<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
-				:key="answer.id"
-				:checked.sync="questionValues"
-				:value="answer.id.toString()"
-				:name="`${id}-answer`"
-				:type="isUnique ? 'radio' : 'checkbox'"
-				:required="checkRequired(answer.id)"
-				@update:checked="onChange"
-				@keydown.enter.exact.prevent="onKeydownEnter">
-				{{ answer.text }}
-			</NcCheckboxRadioSwitch>
+			<div v-for="(answer) in sortedOptions" >
+				<NcCheckboxRadioSwitch
+					:key="answer.id"
+					:checked.sync="questionValues"
+					:value="answer.id.toString()"
+					:name="`${id}-answer`"
+					:type="isUnique ? 'radio' : 'checkbox'"
+					:required="checkRequired(answer.id)"
+					@update:checked="onChange"
+					@keydown.enter.exact.prevent="onKeydownEnter">
+					{{ answer.text }}
+				</NcCheckboxRadioSwitch>
+				<!-- Only not edit and open -->
+				<input v-if="answer.isOpen === true"
+					   :id="`${id}-answer-${answer.id}`"
+					   :ref="`${id}-answer-${answer.id}`"
+					   :aria-checked="isChecked(answer.id)"
+					   :checked="isChecked(answer.id)"
+					   :class="{
+								'radio question__radio': isUnique,
+								'checkbox question__checkbox': !isUnique,
+							}"
+					   :name="`${id}-answer`"
+					   :required="checkRequired(answer.id)"
+					   :type="isUnique ? 'radio' : 'checkbox'"
+					   @keydown.enter.exact.prevent="onKeydownEnter">
+				<label v-if="answer.isOpen === true"
+					   ref="label"
+					   :for="`${id}-answer-${answer.id}`"
+					   class="question__label">{{ answer.text }}
+					<input :id="`${id}-answer-${answer.id}-text`"
+						   ref="input-text"
+						   :name="`${id}-answer-text`"
+						   :required="checkRequired(answer.id)"
+						   type="text"
+						   class="question__input open"
+						   @change="onChangeInput($event, answer.id)">
+				</label>
+			</div>
 		</template>
 
 		<template v-else>
@@ -186,6 +216,15 @@ export default {
 
 			// Radio: create array
 			this.$emit('update:values', [this.questionValues])
+		},
+
+		onChangeInput(event, answerId) {
+			const inputValue = event.target.value
+			const values = this.values.slice()
+			const data = { id: answerId, value: inputValue }
+			values.push(data)
+			// Emit values and remove duplicates
+			this.$emit('update:values', [...new Set(values)])
 		},
 
 		/**
@@ -392,5 +431,10 @@ export default {
 			margin-right: 14px !important;
 		}
 	}
+}
+
+.open {
+	width: 75%;
+	margin-top: -7px;
 }
 </style>

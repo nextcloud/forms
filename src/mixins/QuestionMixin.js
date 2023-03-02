@@ -49,6 +49,14 @@ export default {
 		},
 
 		/**
+		 * The question img (common propierty)
+		 */
+		img: {
+			type: String || Boolean,
+			required: false,
+		},
+
+		/**
 		 * Question Description
 		 */
 		description: {
@@ -168,6 +176,16 @@ export default {
 		onRequiredChange: debounce(function(isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
 			this.saveQuestionProperty('isRequired', isRequiredValue)
+		}, 200),
+
+		/**
+		 * Forward the required change to the parent and store to db
+		 *
+		 * @param {string} img url share img
+		 */
+		onImgChange: debounce(function(img) {
+			this.$emit('update:img', img)
+			this.saveQuestionProperty('img', img)
 		}, 200),
 
 		/**

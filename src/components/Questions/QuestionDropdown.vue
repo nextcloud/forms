@@ -23,6 +23,7 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:img="img"
 		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -35,6 +36,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:img="onImgChange"
 		@delete="onDelete">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"

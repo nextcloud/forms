@@ -31,7 +31,8 @@
 		</NcEmptyContent>
 	</NcAppContent>
 
-	<NcAppContent v-else>
+	<NcAppContent v-else
+		:style="'background-color:'+formColor">
 		<!-- Show results & sidebar button -->
 		<TopBar :permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
@@ -39,6 +40,48 @@
 			@share-form="onShareForm" />
 		<!-- Forms title & description-->
 		<header v-click-outside="disableEdit" @click="enableEdit">
+			<!-- Add colorpicker component -->
+			<div class="container-fluid">
+				<ColorPicker v-model="color"
+							 @input="onColorChange">
+					<button class="button btn-primary">
+						Color de Fondo
+					</button>
+				</ColorPicker>
+			</div>
+			<div class="container-fluid">
+				<label class="hidden-visually"
+					   for="form-img">
+					{{ t('forms', 'Form title') }}
+				</label>
+				<input id="form-img"
+					   ref="img"
+					   v-model="img"
+					   placeholder="Url para imagen de cabecera http://"
+					   class="form-title"
+					   type="text"
+					   @change="onImgChange">
+				<button @click="showModal">
+					Abrir Imágenes
+				</button>
+				<Modal v-if="modal"
+					   size="large"
+					   container="app-content"
+					   @close="closeModal">
+					<div class="modal__content">
+						<iframe :src="currentUrl"
+								width="100%"
+								height="100%"
+								frameborder="0" />
+					</div>
+				</Modal>
+			</div>
+			<div class="container-fluid">
+				<img v-if="formImg !== ''"
+					 alt="Imagen de cabecera"
+					 :src="formImg"
+					 class="img-header">
+			</div>
 			<h2>
 				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
 				<textarea id="form-title"
@@ -153,6 +196,11 @@ import ViewsMixin from '../mixins/ViewsMixin.js'
 import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+// Color picker and image modal dependence
+import ColorPicker from '@nextcloud/vue/dist/Components/ColorPicker'
+import Modal from '@nextcloud/vue/dist/Components/Modal'
+import Clipboard from 'v-clipboard'
+import Vue from 'vue'
 
 window.axios = axios
 
@@ -172,6 +220,8 @@ export default {
 		QuestionShort,
 		QuestionMultiple,
 		TopBar,
+		ColorPicker,
+		Modal,
 	},
 
 	directives: {
@@ -188,6 +238,11 @@ export default {
 			// Various states
 			isLoadingQuestions: false,
 			isDragging: false,
+			// Propierties to image and color
+			img: false,
+			color: '#ffffff',
+			modal: false,
+			currentUrl: '',
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
@@ -195,6 +250,14 @@ export default {
 	},
 
 	computed: {
+		// Default value to color
+		formColor() {
+			return (this.form.color) ? this.form.color : '#ffffff'
+		},
+		// Default value to img
+		formImg() {
+			return (this.form.img) ? this.form.img + '/preview' : ''
+		},
 		hasQuestions() {
 			return this.form.questions && this.form.questions.length === 0
 		},
@@ -255,6 +318,17 @@ export default {
 		'form.title'() {
 			SetWindowTitle(this.formTitle)
 		},
+
+		'form.color'() {
+			this.color = this.form.color
+		},
+		'form.img'() {
+			this.img = this.form.img
+		},
+	},
+
+	created() {
+		this.currentUrl = 'https://' + window.location.host + '/apps/files/'
 	},
 
 	beforeMount() {
@@ -268,6 +342,14 @@ export default {
 	},
 
 	methods: {
+		// Methods to modal show
+		showModal() {
+			this.modal = true
+		},
+		closeModal() {
+			this.modal = false
+		},
+
 		onTitleChange() {
 			this.autoSizeTitle()
 			this.saveTitle()
@@ -311,6 +393,16 @@ export default {
 		}, 200),
 		saveDescription: debounce(async function() {
 			this.saveFormProperty('description')
+		}, 200),
+
+		// Event to save new data
+		onColorChange: debounce(async function() {
+			this.form.color = this.color
+			this.saveFormProperty('color')
+		}, 200),
+		onImgChange: debounce(async function() {
+			this.form.img = this.img
+			this.saveFormProperty('img')
 		}, 200),
 
 		/**
@@ -498,6 +590,11 @@ export default {
 		flex-direction: column;
 		margin-bottom: 250px;
 
+		.img-header {
+			width: 100%;
+			max-height: 300px;
+		}
+
 		.question-menu {
 			position: sticky;
 			// Above other menus
@@ -511,6 +608,11 @@ export default {
 			// To align with text
 			margin-left: 44px;
 		}
+	}
+
+	.modal__content{
+		width: 800px;
+		height: 600px;
 	}
 }
 </style>
