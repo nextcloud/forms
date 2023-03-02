@@ -14,7 +14,7 @@
 	]]></description>
 
 	<licence>agpl</licence>
-	<version>3.1.0</version>
+	<version>3.1.1</version>
 	<dependencies>
 		<nextcloud min-version="25" max-version="26" />
 	</dependencies>
