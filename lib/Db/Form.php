@@ -52,6 +52,11 @@ use OCP\AppFramework\Db\Entity;
  * @method void setShowExpiration(bool $value)
  * @method integer getLastUpdated()
  * @method void setLastUpdated(integer $value)
+ *  * New propierties
+ * @method string getColor()
+ * @method void setColor(string $value)
+ * @method string getImg()
+ * @method void setImge(string $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -65,6 +70,8 @@ class Form extends Entity {
 	protected $submitMultiple;
 	protected $showExpiration;
 	protected $lastUpdated;
+	protected $color;
+	protected $img;
 
 	/**
 	 * Form constructor.
@@ -76,6 +83,8 @@ class Form extends Entity {
 		$this->addType('submitMultiple', 'bool');
 		$this->addType('showExpiration', 'bool');
 		$this->addType('lastUpdated', 'integer');
+		$this->addType('color', 'string');
+		$this->addType('img', 'string');
 	}
 
 	// JSON-Decoding of access-column.
@@ -102,7 +111,9 @@ class Form extends Entity {
 			'isAnonymous' => (bool)$this->getIsAnonymous(),
 			'submitMultiple' => (bool)$this->getSubmitMultiple(),
 			'showExpiration' => (bool)$this->getShowExpiration(),
-			'lastUpdated' => (int)$this->getLastUpdated()
+			'lastUpdated' => (int)$this->getLastUpdated(),
+			'color' => $this->getColor(),
+			'img' => $this->getImg(),
 		];
 	}
 }

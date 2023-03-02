@@ -234,7 +234,7 @@ class SubmissionService {
 				$row[] = $user->getUID();
 				$row[] = $user->getDisplayName();
 			}
-			
+
 			// Date
 			$row[] = $this->dateTimeFormatter->formatDateTime($submission->getTimestamp(), 'full', 'full', new DateTimeZone($userTimezone), $this->l10n);
 
@@ -269,7 +269,7 @@ class SubmissionService {
 			'data' => $this->array2csv($header, $data),
 		];
 	}
-	
+
 	/**
 	 * Convert an array to a csv string
 	 * @param array $array
@@ -302,7 +302,7 @@ class SubmissionService {
 	 * @return boolean If the submission is valid
 	 */
 	public function validateSubmission(array $questions, array $answers): bool {
-		
+
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -328,15 +328,22 @@ class SubmissionService {
 					!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
 					return false;
 				}
-	
+
 				// Check if all answers are within the possible options
 				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 					foreach ($answers[$questionId] as $answer) {
-						// Search corresponding option, return false if non-existent
-						if (array_search($answer, array_column($question['options'], 'id')) === false) {
-							return false;
+						// Add multiple values save
+						if(is_array($answer)){
+							// Search corresponding option, return false if non-existent
+							if (array_search($answer['id'], array_column($question['options'], 'id')) === false) {
+								return false;
+							}
+						}else{
+							// Search corresponding option, return false if non-existent
+							if (array_search($answer, array_column($question['options'], 'id')) === false) {
+								return false;
+							}
 						}
-					}
 				}
 			}
 		}

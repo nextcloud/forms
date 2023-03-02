@@ -33,6 +33,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setQuestionId(integer $value)
  * @method string getText()
  * @method void setText(string $value)
+ * @method string getIsOpen()
+ * @method void setIsOpen(integer $value)
  */
 class Option extends Entity {
 
@@ -40,6 +42,8 @@ class Option extends Entity {
 	protected $questionId;
 	/** @var string */
 	protected $text;
+	/** @var integer */
+	protected $isOpen;
 
 	/**
 	 * Option constructor.
@@ -47,6 +51,7 @@ class Option extends Entity {
 	public function __construct() {
 		$this->addType('questionId', 'integer');
 		$this->addType('text', 'string');
+		$this->addType('isOpen', 'bool');
 	}
 
 	public function read(): array {
@@ -54,6 +59,7 @@ class Option extends Entity {
 			'id' => $this->getId(),
 			'questionId' => $this->getQuestionId(),
 			'text' => (string)$this->getText(),
+			'isOpen' => $this->getIsOpen()
 		];
 	}
 }

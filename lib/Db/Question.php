@@ -46,6 +46,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setDescription(string $value)
  * @method object getExtraSettings()
  * @method void setExtraSettings(object $value)
+ * @method string getImg()
+ * @method void setImge(string $value)
  */
 class Question extends Entity {
 	protected $formId;
@@ -54,6 +56,7 @@ class Question extends Entity {
 	protected $isRequired;
 	protected $text;
 	protected $description;
+	protected $img;
 	protected $extraSettingsJson;
 
 	public function __construct() {
@@ -63,6 +66,7 @@ class Question extends Entity {
 		$this->addType('isRequired', 'bool');
 		$this->addType('text', 'string');
 		$this->addType('description', 'string');
+		$this->addType('img', 'string');
 	}
 
 	public function getExtraSettings(): object {
@@ -87,6 +91,7 @@ class Question extends Entity {
 			'text' => (string)$this->getText(),
 			'description' => (string)$this->getDescription(),
 			'extraSettings' => $this->getExtraSettings(),
+			'img' => $this->getImg(),
 		];
 	}
 }
