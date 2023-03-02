@@ -264,7 +264,7 @@ export default {
 
 			// Load Owned forms
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/forms'))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.1/forms'))
 				this.forms = OcsResponse2Data(response)
 			} catch (error) {
 				logger.error('Error while loading owned forms list', { error })
@@ -273,7 +273,7 @@ export default {
 
 			// Load shared forms
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/shared_forms'))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.1/shared_forms'))
 				this.sharedForms = OcsResponse2Data(response)
 			} catch (error) {
 				logger.error('Error while loading shared forms list', { error })
@@ -292,7 +292,7 @@ export default {
 			this.loading = true
 
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2/partial_form/{hash}', { hash }))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.1/partial_form/{hash}', { hash }))
 				const form = OcsResponse2Data(response)
 
 				// If the user has (at least) submission-permissions, add it to the shared forms
@@ -313,7 +313,7 @@ export default {
 		async onNewForm() {
 			try {
 				// Request a new empty form
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2/form'))
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/form'))
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
@@ -331,7 +331,7 @@ export default {
 		 */
 		async onCloneForm(id) {
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2/form/clone/{id}', { id }))
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/form/clone/{id}', { id }))
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })

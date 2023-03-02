@@ -373,7 +373,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetForms(array $expected): void {
-		$resp = $this->http->request('GET', 'api/v2/forms');
+		$resp = $this->http->request('GET', 'api/v2.1/forms');
 
 		$data = $this->OcsResponse2Data($resp);
 		$data = $this->arrayUnsetId($data);
@@ -404,7 +404,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetSharedForms(array $expected): void {
-		$resp = $this->http->request('GET', 'api/v2/shared_forms');
+		$resp = $this->http->request('GET', 'api/v2.1/shared_forms');
 
 		$data = $this->OcsResponse2Data($resp);
 		$data = $this->arrayUnsetId($data);
@@ -435,7 +435,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetPartialForm(array $expected): void {
-		$resp = $this->http->request('GET', "api/v2/partial_form/{$this->testForms[1]['hash']}");
+		$resp = $this->http->request('GET', "api/v2.1/partial_form/{$this->testForms[1]['hash']}");
 
 		$data = $this->OcsResponse2Data($resp);
 		unset($data['id']);
@@ -477,7 +477,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetNewForm(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2/form');
+		$resp = $this->http->request('POST', 'api/v2.1/form');
 		$data = $this->OcsResponse2Data($resp);
 
 		// Store for deletion on tearDown
@@ -576,7 +576,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetFullForm(array $expected): void {
-		$resp = $this->http->request('GET', "api/v2/form/{$this->testForms[0]['id']}");
+		$resp = $this->http->request('GET', "api/v2.1/form/{$this->testForms[0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		// Cannot control ids, but check general consistency.
@@ -634,7 +634,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testCloneForm(array $expected): void {
-		$resp = $this->http->request('POST', "api/v2/form/clone/{$this->testForms[0]['id']}");
+		$resp = $this->http->request('POST', "api/v2.1/form/clone/{$this->testForms[0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		// Store for deletion on tearDown
@@ -694,7 +694,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testUpdateFormProperties(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2/form/update', [
+		$resp = $this->http->request('POST', 'api/v2.1/form/update', [
 			'json' => [
 				'id' => $this->testForms[0]['id'],
 				'keyValuePairs' => [
@@ -718,7 +718,7 @@ class ApiV2Test extends TestCase {
 	}
 
 	public function testDeleteForm() {
-		$resp = $this->http->request('DELETE', "api/v2/form/{$this->testForms[0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v2.1/form/{$this->testForms[0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -726,7 +726,7 @@ class ApiV2Test extends TestCase {
 
 		// Check if not existent anymore.
 		try {
-			$this->http->request('GET', "api/v2/form/{$this->testForms[0]['id']}");
+			$this->http->request('GET', "api/v2.1/form/{$this->testForms[0]['id']}");
 		} catch (ClientException $e) {
 			$resp = $e->getResponse();
 		}
@@ -767,7 +767,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testCreateNewQuestion(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2/question', [
+		$resp = $this->http->request('POST', 'api/v2.1/question', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'type' => 'short',
@@ -807,7 +807,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateQuestionProperties(array $fullFormExpected): void {
-		$resp = $this->http->request('POST', 'api/v2/question/update', [
+		$resp = $this->http->request('POST', 'api/v2.1/question/update', [
 			'json' => [
 				'id' => $this->testForms[0]['questions'][0]['id'],
 				'keyValuePairs' => [
@@ -849,7 +849,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testReorderQuestions(array $fullFormExpected): void {
-		$resp = $this->http->request('POST', 'api/v2/question/reorder', [
+		$resp = $this->http->request('POST', 'api/v2.1/question/reorder', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'newOrder' => [
@@ -889,7 +889,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testDeleteQuestion(array $fullFormExpected) {
-		$resp = $this->http->request('DELETE', "api/v2/question/{$this->testForms[0]['questions'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v2.1/question/{$this->testForms[0]['questions'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -916,7 +916,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testCreateNewOption(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2/option', [
+		$resp = $this->http->request('POST', 'api/v2.1/option', [
 			'json' => [
 				'questionId' => $this->testForms[0]['questions'][1]['id'],
 				'text' => 'A new Option.'
@@ -952,7 +952,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateOptionProperties(array $fullFormExpected): void {
-		$resp = $this->http->request('POST', 'api/v2/option/update', [
+		$resp = $this->http->request('POST', 'api/v2.1/option/update', [
 			'json' => [
 				'id' => $this->testForms[0]['questions'][1]['options'][0]['id'],
 				'keyValuePairs' => [
@@ -987,7 +987,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testDeleteOption(array $fullFormExpected) {
-		$resp = $this->http->request('DELETE', "api/v2/option/{$this->testForms[0]['questions'][1]['options'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v2.1/option/{$this->testForms[0]['questions'][1]['options'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1017,7 +1017,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testAddShare(array $expected) {
-		$resp = $this->http->request('POST', 'api/v2/share', [
+		$resp = $this->http->request('POST', 'api/v2.1/share', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'shareType' => 0,
@@ -1087,7 +1087,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testDeleteShare(array $fullFormExpected) {
-		$resp = $this->http->request('DELETE', "api/v2/share/{$this->testForms[0]['shares'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v2.1/share/{$this->testForms[0]['shares'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1164,7 +1164,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetSubmissions(array $expected) {
-		$resp = $this->http->request('GET', "api/v2/submissions/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v2.1/submissions/{$this->testForms[0]['hash']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		// Cannot control ids, but check general consistency.
@@ -1216,7 +1216,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testExportSubmissions(string $expected) {
-		$resp = $this->http->request('GET', "api/v2/submissions/export/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v2.1/submissions/export/{$this->testForms[0]['hash']}");
 		$data = substr($resp->getBody()->getContents(), 3); // Some strange Character removed at the beginning
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1228,7 +1228,7 @@ class ApiV2Test extends TestCase {
 	}
 
 	public function testExportToCloud() {
-		$resp = $this->http->request('POST', 'api/v2/submissions/export', [
+		$resp = $this->http->request('POST', 'api/v2.1/submissions/export', [
 			'json' => [
 				'hash' => $this->testForms[0]['hash'],
 				'path' => ''
@@ -1256,7 +1256,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $submissionsExpected
 	 */
 	public function testDeleteSubmissions(array $submissionsExpected) {
-		$resp = $this->http->request('DELETE', "api/v2/submissions/{$this->testForms[0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v2.1/submissions/{$this->testForms[0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1283,7 +1283,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $submissionsExpected
 	 */
 	public function testInsertSubmission(array $submissionsExpected) {
-		$resp = $this->http->request('POST', 'api/v2/submission/insert', [
+		$resp = $this->http->request('POST', 'api/v2.1/submission/insert', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'answers' => [
@@ -1299,7 +1299,7 @@ class ApiV2Test extends TestCase {
 		$this->assertEquals(200, $resp->getStatusCode());
 
 		// Check stored submissions
-		$resp = $this->http->request('GET', "api/v2/submissions/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v2.1/submissions/{$this->testForms[0]['hash']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		// Store for deletion
@@ -1349,7 +1349,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $submissionsExpected
 	 */
 	public function testDeleteSingleSubmission(array $submissionsExpected) {
-		$resp = $this->http->request('DELETE', "api/v2/submission/{$this->testForms[0]['submissions'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v2.1/submission/{$this->testForms[0]['submissions'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
