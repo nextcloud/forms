@@ -44,6 +44,7 @@ OC.L10N.register(
     "Share link" : "Веза дељења",
     "Add link" : "Додај везу",
     "Copy to clipboard" : "Копирај у оставу",
+    "Remove link" : "Уклони линк",
     "Internal link" : "Интерна веза",
     "Show to all accounts on sidebar" : "Прикажи свим налозима у бочној траци",
     "View" : "Погледај",
