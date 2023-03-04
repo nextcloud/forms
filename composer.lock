@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06f57b98f77dd1ab15c28c9c6211b0f4",
+    "content-hash": "16eb0d3fc3f2e5293da55cba45f8b9c0",
     "packages": [
         {
             "name": "league/csv",
@@ -611,16 +611,16 @@
         },
         {
             "name": "nextcloud/ocp",
-            "version": "v24.0.1",
+            "version": "v25.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "f032acdff1502a7323f95a6524d163290f43b446"
+                "reference": "4f1eec84860621a1ce9a812e15bbf9a4f055cd3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/f032acdff1502a7323f95a6524d163290f43b446",
-                "reference": "f032acdff1502a7323f95a6524d163290f43b446",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/4f1eec84860621a1ce9a812e15bbf9a4f055cd3b",
+                "reference": "4f1eec84860621a1ce9a812e15bbf9a4f055cd3b",
                 "shasum": ""
             },
             "require": {
@@ -632,7 +632,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "24.0.0-dev"
+                    "dev-master": "26.0.0-dev"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -647,9 +647,10 @@
             ],
             "description": "Composer package containing Nextcloud's public API (classes, interfaces)",
             "support": {
-                "source": "https://github.com/nextcloud-deps/ocp/tree/v24.0.1"
+                "issues": "https://github.com/nextcloud-deps/ocp/issues",
+                "source": "https://github.com/nextcloud-deps/ocp/tree/v25.0.4"
             },
-            "time": "2022-06-02T14:16:47+00:00"
+            "time": "2023-03-03T14:24:08+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -1240,20 +1241,20 @@
         },
         {
             "name": "psr/container",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/container.git",
-                "reference": "8622567409010282b7aeebe4bb841fe98b58dcaf"
+                "reference": "513e0666f7216c7459170d56df27dfcefe1689ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/container/zipball/8622567409010282b7aeebe4bb841fe98b58dcaf",
-                "reference": "8622567409010282b7aeebe4bb841fe98b58dcaf",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/513e0666f7216c7459170d56df27dfcefe1689ea",
+                "reference": "513e0666f7216c7459170d56df27dfcefe1689ea",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.0"
+                "php": ">=7.4.0"
             },
             "type": "library",
             "autoload": {
@@ -1282,9 +1283,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-fig/container/issues",
-                "source": "https://github.com/php-fig/container/tree/1.1.1"
+                "source": "https://github.com/php-fig/container/tree/1.1.2"
             },
-            "time": "2021-03-05T17:36:06+00:00"
+            "time": "2021-11-05T16:50:12+00:00"
         },
         {
             "name": "psr/event-dispatcher",
