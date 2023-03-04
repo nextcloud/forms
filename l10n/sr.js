@@ -16,6 +16,7 @@ OC.L10N.register(
     "An error occurred while loading the forms list" : "Догодила се грешка приликом учитавања списка упитника",
     "Unable to create a new form" : "Не могу да направим нови упитник",
     "Select groups" : "Изаберите групе",
+    "Results" : "Резултати",
     "Delete form" : "Обриши упитник",
     "Are you sure you want to delete {title}?" : "Да ли сте сигурни да желите да обришете {title}?",
     "Error while deleting {title}" : "Грешка приликом брисања {title}",
