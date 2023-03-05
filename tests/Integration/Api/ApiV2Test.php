@@ -1204,9 +1204,9 @@ class ApiV2Test extends TestCase {
 			'exportSubmissions' => [
 				'expected' => '
 					"User ID","User display name","Timestamp","First Question?","Second Question?"
-					"user1","User No. 1","Friday, January 2, 1970 at 10:17:36 AM GMT+0:00","This is a short answer.","Option 1"
-					"","Anonymous user","Thursday, January 1, 1970 at 3:25:45 AM GMT+0:00","This is another short answer.","Option 2"
-					"","Anonymous user","Thursday, January 1, 1970 at 12:20:34 AM GMT+0:00","",""'
+					"user1","User No. 1","1970-01-02T10:17:36+00:00","This is a short answer.","Option 1"
+					"","Anonymous user","1970-01-01T03:25:45+00:00","This is another short answer.","Option 2"
+					"","Anonymous user","1970-01-01T00:20:34+00:00","",""'
 			]
 		];
 	}
