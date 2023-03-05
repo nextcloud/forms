@@ -23,27 +23,20 @@
 
 <template>
 	<div>
-		<NcMultiselect :clear-on-select="false"
+		<NcSelect :clear-search-on-select="false"
 			:close-on-select="false"
-			:hide-selected="true"
-			:internal-search="false"
 			:loading="showLoadingCircle"
+			:get-option-key="(option) => option.key"
 			:options="options"
 			:placeholder="t('forms', 'Search for user or group …')"
-			:preselect-first="true"
-			:searchable="true"
 			:user-select="true"
 			label="displayName"
-			track-by="key"
-			@search-change="asyncSearch"
-			@select="addShare">
-			<template #noOptions>
-				{{ t('forms', 'No recommendations. Start typing.') }}
-			</template>
-			<template #noResult>
+			@search="asyncSearch"
+			@input="addShare">
+			<template #no-options>
 				{{ noResultText }}
 			</template>
-		</NcMultiselect>
+		</NcSelect>
 	</div>
 </template>
 
@@ -51,7 +44,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
-import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import debounce from 'debounce'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
@@ -60,7 +53,7 @@ import logger from '../../utils/Logger.js'
 
 export default {
 	components: {
-		NcMultiselect,
+		NcSelect,
 	},
 
 	mixins: [ShareTypes],
@@ -122,8 +115,8 @@ export default {
 		 * @return {string}
 		 */
 		noResultText() {
-			if (this.loading) {
-				return t('forms', 'Searching …')
+			if (!this.query) {
+				return t('forms', 'No recommendations. Start typing.')
 			}
 			return t('forms', 'No elements found.')
 		},
@@ -308,7 +301,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.multiselect {
+	.select {
 		margin-bottom: 8px !important;
 		width: 100%;
 	}
