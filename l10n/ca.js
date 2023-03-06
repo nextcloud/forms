@@ -77,7 +77,6 @@ OC.L10N.register(
     "Expires on {date}" : "Es tancarà el {data}",
     "Search for user or group …" : "Cerca usuari o grup …",
     "No recommendations. Start typing." : "No hi ha cap recomanació. Comenceu a escriure.",
-    "Searching …" : "Cercant …",
     "No elements found." : "No s'ha trobat cap element.",
     "Permissions" : "Permisos",
     "Delete" : "Suprimeix",

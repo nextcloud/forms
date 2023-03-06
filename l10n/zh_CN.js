@@ -77,7 +77,6 @@ OC.L10N.register(
     "Expires on {date}" : " {date} 到期",
     "Search for user or group …" : "搜索用户或分组 ...",
     "No recommendations. Start typing." : "没有推荐。开始输入。",
-    "Searching …" : "正在搜索 ...",
     "No elements found." : "未发现元素。",
     "Permissions" : "权限",
     "Delete" : "删除",

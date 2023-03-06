@@ -40,7 +40,6 @@ OC.L10N.register(
     "Expired on {date}" : "Expirado el {día}",
     "Expires on {date}" : "Expira el {día}",
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
-    "Searching …" : "Buscando ...",
     "No elements found." : "No se encontraron elementos",
     "Permissions" : "Permisos",
     "Delete" : "Eliminar",

@@ -59,7 +59,6 @@ OC.L10N.register(
     "Expired on {date}" : "Isteklo {date}",
     "Expires on {date}" : "Istječe {date}",
     "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",
-    "Searching …" : "Traženje…",
     "No elements found." : "Elementi nisu pronađeni.",
     "Permissions" : "Dopuštenja",
     "Delete" : "Izbriši",

@@ -78,7 +78,6 @@ OC.L10N.register(
     "Expires on {date}" : "{date} datan iraungitzen da",
     "Search for user or group …" : "Bilatu erabiltzaile edo taldez ...",
     "No recommendations. Start typing." : "Gomendiorik ez. Hasi idazten.",
-    "Searching …" : "Bilatzen…",
     "No elements found." : "Ez da elementurik aurkitu.",
     "Permissions" : "Baimenak",
     "View responses" : "Ikusi erantzunak",

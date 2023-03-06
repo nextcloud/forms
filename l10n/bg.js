@@ -79,7 +79,6 @@ OC.L10N.register(
     "Expires on {date}" : "Изтича на {date}",
     "Search for user or group …" : "Търсене на потребител или група ...",
     "No recommendations. Start typing." : "Няма препоръки. Започнете да пишете.",
-    "Searching …" : "Търсене ...",
     "No elements found." : "Няма намерен елемент.",
     "Permissions" : "Права",
     "View responses" : "Преглед на отговорите",

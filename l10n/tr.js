@@ -79,7 +79,6 @@ OC.L10N.register(
     "Expires on {date}" : "Geçerlilik süresi {date} tarihinde dolacak",
     "Search for user or group …" : "Kullanıcı ya da grup arama…",
     "No recommendations. Start typing." : "Herhangi bir öneri yok. Yazmaya başlayın.",
-    "Searching …" : "Aranıyor…",
     "No elements found." : "Herhangi bir bileşen bulunamadı.",
     "Permissions" : "İzinler",
     "View responses" : "Yanıtları görüntüle",

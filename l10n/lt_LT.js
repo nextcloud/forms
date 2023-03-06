@@ -65,7 +65,6 @@ OC.L10N.register(
     "Expires on {date}" : "Galioja iki {date}",
     "Search for user or group …" : "Ieškoti naudotojo ar grupės…",
     "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",
-    "Searching …" : "Ieškoma…",
     "No elements found." : "Nerasta jokių elementų.",
     "Permissions" : "Leidimai",
     "Delete" : "Ištrinti",

@@ -48,7 +48,6 @@ OC.L10N.register(
     "Expired on {date}" : "หมดอายุเมื่อ {date}",
     "Expires on {date}" : "หมดอายุตอน {date}",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
-    "Searching …" : "กำลังค้นหา …",
     "Delete" : "ลบ",
     "Group" : "กลุ่ม",
     "Share link" : "แชร์ลิงก์",

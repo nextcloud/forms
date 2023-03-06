@@ -79,7 +79,6 @@ OC.L10N.register(
     "Expires on {date}" : "Expirera le {date}",
     "Search for user or group …" : "Rechercher un utilisateur ou un groupe…",
     "No recommendations. Start typing." : "Aucune recommandation. Commencez à écrire.",
-    "Searching …" : "Recherche…",
     "No elements found." : "Aucun élément trouvé.",
     "Permissions" : "Autorisations",
     "View responses" : "Voir les réponses",

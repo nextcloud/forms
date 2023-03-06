@@ -37,7 +37,6 @@ OC.L10N.register(
     "Delete this response" : "Обриши овај одговор",
     "Set expiration date" : "Постави датум истека",
     "No recommendations. Start typing." : "Нема препорука. Започните куцање.",
-    "Searching …" : "Тражим…",
     "No elements found." : "Нема нађених елемената.",
     "Permissions" : "Дозволе",
     "Delete" : "Избриши",

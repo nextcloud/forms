@@ -59,7 +59,6 @@ OC.L10N.register(
     "Expired on {date}" : "Utløp {date}",
     "Expires on {date}" : "Utløper {date}",
     "No recommendations. Start typing." : "Ingen anbefalinger. Start å skrive.",
-    "Searching …" : "Søker ...",
     "No elements found." : "Ingen elementer funnet.",
     "Permissions" : "Rettigheter",
     "Delete" : "Slett",

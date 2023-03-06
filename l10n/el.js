@@ -63,7 +63,6 @@ OC.L10N.register(
     "Expires on {date}" : "Λήγει στις {date}",
     "Search for user or group …" : "Αναζήτηση για χρήστη ή ομάδα…",
     "No recommendations. Start typing." : "Δεν υπάρχουν συστάσεις. Αρχίστε να πληκτρολογείτε.",
-    "Searching …" : "Αναζήτηση ...",
     "No elements found." : "Δεν βρέθηκαν στοιχεία.",
     "Permissions" : "Δικαιώματα",
     "Delete" : "Διαγραφή",

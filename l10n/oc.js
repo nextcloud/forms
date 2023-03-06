@@ -8,7 +8,6 @@ OC.L10N.register(
     "No forms created yet" : "Cap de formulari pas encara creat",
     "Description" : "Descripcion",
     "Set expiration date" : "Especificar una data d'expiracion",
-    "Searching …" : "Recèrca…",
     "Delete" : "Suprimir",
     "Group" : "Grop",
     "Share link" : "Partejar lo ligam",

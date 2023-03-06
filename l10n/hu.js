@@ -78,7 +78,6 @@ OC.L10N.register(
     "Expires on {date}" : "Lejárat: {date}",
     "Search for user or group …" : "Felhasználó vagy csoport keresése…",
     "No recommendations. Start typing." : "Nincs javaslat. Kezdjen gépelni.",
-    "Searching …" : "Keresés…",
     "No elements found." : "Nem található elem.",
     "Permissions" : "Jogosultságok",
     "View responses" : "Válaszok megtekintése",

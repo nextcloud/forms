@@ -59,7 +59,6 @@ OC.L10N.register(
     "Expired on {date}" : "Iscadidu su {date}",
     "Expires on {date}" : "Iscadit su {date}",
     "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
-    "Searching …" : "Chirchende ...",
     "No elements found." : "Perunu elementu agatadu.",
     "Permissions" : "Permissos",
     "Delete" : "Cantzella",

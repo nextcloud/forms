@@ -61,7 +61,6 @@ OC.L10N.register(
     "Expires on {date}" : "Vervalt op {date}",
     "Search for user or group …" : "Zoeken naar gebruiker of groep ...",
     "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",
-    "Searching …" : "Zoeken ...",
     "No elements found." : "Geen elementen gevonden.",
     "Permissions" : "Rechten",
     "Delete" : "Verwijder",

@@ -11,7 +11,6 @@ OC.L10N.register(
     "Description" : "توضیحات",
     "Set expiration date" : "تنظیم تاریخ انقضا",
     "No recommendations. Start typing." : "هیچ توصیه ای نیست شروع به تایپ کنید.",
-    "Searching …" : "جستجوکردن …",
     "No elements found." : "عنصری یافت نشد",
     "Permissions" : "مجوزها",
     "Delete" : "حذف",

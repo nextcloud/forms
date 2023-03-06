@@ -70,7 +70,6 @@ OC.L10N.register(
     "Expires on {date}" : "Завершится {date}",
     "Search for user or group …" : "Поиск пользователя или группы…",
     "No recommendations. Start typing." : "Рекомендации отсутствуют, начните вводить символы",
-    "Searching …" : "Поиск…",
     "No elements found." : "Ничего не найдено.",
     "Permissions" : "Права",
     "Delete" : "Удалить",

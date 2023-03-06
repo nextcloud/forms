@@ -42,7 +42,6 @@ OC.L10N.register(
     "Set expiration date" : "Setja gildistíma",
     "Expired on {date}" : "Rann út {date}",
     "Expires on {date}" : "Rennur út {date}",
-    "Searching …" : "Leita …",
     "Permissions" : "Heimildir",
     "Delete" : "Eyða",
     "Group" : "Hópur",

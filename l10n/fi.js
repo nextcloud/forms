@@ -72,7 +72,6 @@ OC.L10N.register(
     "Expires on {date}" : "Vanhenee {date}",
     "Search for user or group …" : "Etsi käyttäjää tai ryhmää…",
     "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
-    "Searching …" : "Haetaan…",
     "No elements found." : "Elementtejä ei löytynyt.",
     "Permissions" : "Oikeudet",
     "View responses" : "Näytä vastaukset",

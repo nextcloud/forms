@@ -28,7 +28,6 @@ OC.L10N.register(
     "Set expiration date" : "만료기한 설정",
     "Search for user or group …" : "사용자나 그룹 검색...",
     "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",
-    "Searching …" : "검색 ...",
     "Permissions" : "권한",
     "Delete" : "삭제",
     "Group" : "그룹",

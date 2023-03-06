@@ -78,7 +78,6 @@ OC.L10N.register(
     "Expires on {date}" : "Preteče na {date}",
     "Search for user or group …" : "Poišči uporabnika ali skupino ...",
     "No recommendations. Start typing." : "Ni priporočil; začnite vpisovati",
-    "Searching …" : "Poteka iskanje ...",
     "No elements found." : "Ni najdenih predmetov",
     "Permissions" : "Dovoljenja",
     "View responses" : "Pregled odzivov",

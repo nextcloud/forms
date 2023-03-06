@@ -7,7 +7,6 @@ OC.L10N.register(
     "Required" : "Bắt buộc",
     "Description" : "Mô tả",
     "Set expiration date" : "Đặt ngày hết hạn",
-    "Searching …" : "Đang tìm kiếm ...",
     "Delete" : "Xóa",
     "Group" : "N",
     "Share link" : "Chia sẻ liên kết",

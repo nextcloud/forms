@@ -79,7 +79,6 @@ OC.L10N.register(
     "Expires on {date}" : "Expires on {date}",
     "Search for user or group …" : "Search for user or group …",
     "No recommendations. Start typing." : "No recommendations. Start typing.",
-    "Searching …" : "Searching …",
     "No elements found." : "No elements found.",
     "Permissions" : "Permissions",
     "View responses" : "View responses",

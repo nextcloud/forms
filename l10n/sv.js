@@ -60,7 +60,6 @@ OC.L10N.register(
     "Expires on {date}" : "Slutar gälla {date}",
     "Search for user or group …" : "Sök efter användare eller grupp ...",
     "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
-    "Searching …" : "Söker ...",
     "No elements found." : "Inga element hittades.",
     "Permissions" : "Behörigheter",
     "Delete" : "Radera",

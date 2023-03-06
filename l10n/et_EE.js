@@ -7,7 +7,6 @@ OC.L10N.register(
     "Required" : "Kohustuslik",
     "Description" : "Kirjeldus",
     "Set expiration date" : "Määra aegumise kuupäev",
-    "Searching …" : "Otsin ...",
     "Delete" : "Kustuta",
     "Group" : "Grupp",
     "Share link" : "Jaga link",

@@ -79,7 +79,6 @@ OC.L10N.register(
     "Expires on {date}" : "Platnost skončí {date}",
     "Search for user or group …" : "Hledat skupinu nebo uživatele…",
     "No recommendations. Start typing." : "Žádná doporučení. Pište",
-    "Searching …" : "Hledání…",
     "No elements found." : "Nenalezeny žádné prvky.",
     "Permissions" : "Oprávnění",
     "View responses" : "Zobrazit odpovědi",
