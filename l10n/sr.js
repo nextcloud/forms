@@ -70,6 +70,8 @@ OC.L10N.register(
     "People can pick one option" : "Људи имају један избор",
     "Pick an option" : "Изаберите",
     "Date" : "Датум",
-    "Time" : "Време"
+    "Pick a date" : "Изаберите датум",
+    "Time" : "Време",
+    "Pick a time" : "Изаберите време"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");
