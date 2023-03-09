@@ -67,8 +67,10 @@
     "Checkboxes" : "Кућице за штиклирање",
     "People can pick one option" : "Људи имају један избор",
     "Pick an option" : "Изаберите",
+    "Long text" : "Дугачак текст",
     "Date" : "Датум",
     "Pick a date" : "Изаберите датум",
+    "Pick a date and time" : "Изаберите датум и време",
     "Time" : "Време",
     "Pick a time" : "Изаберите време"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"

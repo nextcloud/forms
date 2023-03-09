@@ -69,8 +69,10 @@ OC.L10N.register(
     "Checkboxes" : "Кућице за штиклирање",
     "People can pick one option" : "Људи имају један избор",
     "Pick an option" : "Изаберите",
+    "Long text" : "Дугачак текст",
     "Date" : "Датум",
     "Pick a date" : "Изаберите датум",
+    "Pick a date and time" : "Изаберите датум и време",
     "Time" : "Време",
     "Pick a time" : "Изаберите време"
 },
