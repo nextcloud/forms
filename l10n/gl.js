@@ -67,6 +67,7 @@ OC.L10N.register(
     "Share link" : "Compartir ligazón",
     "Add link" : "Engadir a ligazón",
     "Copy to clipboard" : "Copiar no portapapeis.",
+    "Remove link" : "Eliminar enlace",
     "Internal link" : "Ligazón interna",
     "View" : "Ver",
     "Edit" : "Editar",

@@ -67,6 +67,7 @@ OC.L10N.register(
     "Add link" : "إضافة رابط",
     "Copy to clipboard" : "نسخ الرابط",
     "Internal link" : "الرابط الداخلي",
+    "There was an error while adding the link" : "حدث خطأ أثناء إضافة الرابط",
     "View" : "عرض",
     "Edit" : "تعديل",
     "Share" : "مشاركة",
