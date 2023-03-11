@@ -40,7 +40,7 @@ OC.L10N.register(
     "Form sharing" : "Partage de formulaire",
     "Allow sharing by link" : "Autoriser le partage par lien",
     "Allow sharing to all logged in accounts" : "Autoriser le partage à tous les comptes connectés",
-    "Error while saving configuration" : "Erreur lors de la sauvegarde de la configuration",
+    "Error while saving configuration" : "Erreur lors de l'enregistrement de la configuration",
     "Error while reloading config" : "Erreur lors du rechargement de la configuration",
     "Form actions" : "Actions du formulaire",
     "Edit form" : "Modifier le formulaire",
