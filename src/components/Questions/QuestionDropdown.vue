@@ -23,6 +23,7 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:name="name"
 		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -35,6 +36,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:name="onNameChange"
 		@delete="onDelete">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
@@ -44,7 +46,7 @@
 		</template>
 		<NcSelect v-if="!edit"
 			v-model="selectedOption"
-			:name="text"
+			:name="name || undefined"
 			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"
 			:required="isRequired"

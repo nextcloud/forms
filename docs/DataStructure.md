@@ -58,6 +58,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | type        | [Question-Type](#question-types) | | Type of the question |
 | isRequired  | Boolean         |              | If the question is required to fill the form |
 | text        | String          | max. 2048 ch. | The question-text |
+| name        | String          |              | Technical identifier of the question, e.g. used as HTML name attribute |
 | options     | Array of [Options](#option) | | Array of options belonging to the question. Only relevant for question-type with predefined options. |
 ```
 {
@@ -65,9 +66,9 @@ This document describes the Object-Structure, that is used within the Forms App 
   "formId": 3,
   "order": 1,
   "type": "dropdown",
-  "mandatory": false, // deprecated, will be removed in API v2
   "isRequired": false,
   "text": "Question 1",
+  "name": "firstname",
   "options": []
 }
 ```
