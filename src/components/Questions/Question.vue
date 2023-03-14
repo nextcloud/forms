@@ -78,7 +78,7 @@
 				<NcRichContenteditable v-if="edit || !questionValid"
 					:multiline="true"
 					:value="description"
-					:placeholder="t('forms', 'Description')"
+					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.questionDescription"
 					class="question__header__description__input"
 					@update:value="onDescriptionChange" />

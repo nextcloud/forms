@@ -62,7 +62,7 @@
 					class="form-desc form-desc__input"
 					:value="form.description"
 					:multiline="true"
-					:placeholder="t('forms', 'Description')"
+					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.formDescription"
 					@update:value="updateDescription" />
 			</template>
