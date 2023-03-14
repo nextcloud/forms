@@ -90,60 +90,28 @@
 
 				<!-- View switcher between Summary and Responses -->
 				<div class="response-actions">
-					<div class="response-actions__radio">
-						<input id="show-summary--true"
-							v-model="showSummary"
-							type="radio"
-							:value="true"
-							class="hidden">
-						<label for="show-summary--true"
-							class="response-actions__radio__item"
-							:class="{ 'response-actions__radio__item--active': showSummary }">
-							{{ t('forms', 'Summary') }}
-						</label>
-						<input id="show-summary--false"
-							v-model="showSummary"
-							type="radio"
-							:value="false"
-							class="hidden">
-						<label for="show-summary--false"
-							class="response-actions__radio__item"
-							:class="{ 'response-actions__radio__item--active': !showSummary }">
-							{{ t('forms', 'Responses') }}
-						</label>
-					</div>
-
-					<template v-if="canEditForm">
-						<NcButton v-if="form.fileId" :href="fileUrl" type="tertiary-no-background">
-							<template #icon>
-								<IconTable :size="20" />
-							</template>
-							{{ t('forms', 'Open spreadsheet') }}
-						</NcButton>
-
-						<NcActions v-else type="tertiary-no-background" :force-name="true">
-							<NcActionButton @click="onLinkFile">
-								<template #icon>
-									<IconLink :size="20" />
-								</template>
-								{{ t('forms', 'Create spreadsheet') }}
-							</NcActionButton>
-						</NcActions>
-					</template>
+					<PillMenu :options="responseViews" :active.sync="activeResponseView" class="response-actions__toggle" />
 
 					<!-- Action menu for cloud export and deletion -->
 					<NcActions :aria-label="t('forms', 'Options')"
-						:force-menu="true"
+						force-name
+						:inline="isMobile ? 0 : 1"
 						@blur="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
 							<template v-if="canEditForm && form.fileId">
-								<NcActionButton :close-after-click="true" @click="onReExport">
+								<NcActionButton :href="fileUrl" type="tertiary-no-background">
+									<template #icon>
+										<IconTable :size="20" />
+									</template>
+									{{ t('forms', 'Open spreadsheet') }}
+								</NcActionButton>
+								<NcActionButton close-after-click @click="onReExport">
 									<template #icon>
 										<IconRefresh :size="20" />
 									</template>
 									{{ t('forms', 'Re-export spreadsheet') }}
 								</NcActionButton>
-								<NcActionButton :close-after-click="true" @click="onUnlinkFile">
+								<NcActionButton close-after-click @click="onUnlinkFile">
 									<template #icon>
 										<IconLinkVariantOff :size="20" />
 									</template>
@@ -151,7 +119,13 @@
 								</NcActionButton>
 								<NcActionSeparator />
 							</template>
-							<NcActionButton :close-after-click="true" @click="onStoreToFiles">
+							<NcActionButton v-else-if="canEditForm" @click="onLinkFile">
+								<template #icon>
+									<IconLink :size="20" />
+								</template>
+								{{ t('forms', 'Create spreadsheet') }}
+							</NcActionButton>
+							<NcActionButton close-after-click @click="onStoreToFiles">
 								<template #icon>
 									<IconFolder :size="20" />
 								</template>
@@ -167,7 +141,7 @@
 							</NcActionButton>
 
 							<NcActionButton v-if="canDeleteSubmissions"
-								:close-after-click="true"
+								close-after-click
 								@click="deleteAllSubmissions">
 								<template #icon>
 									<IconDelete :size="20" />
@@ -185,19 +159,19 @@
 								{{ t('forms', 'Download') }}
 							</NcActionButton>
 							<NcActionSeparator />
-							<NcActionButton :close-after-click="true" @click="onDownloadFile('csv')">
+							<NcActionButton close-after-click @click="onDownloadFile('csv')">
 								<template #icon>
 									<IconFileDelimited :size="20" />
 								</template>
 								CSV
 							</NcActionButton>
-							<NcActionButton :close-after-click="true" @click="onDownloadFile('ods')">
+							<NcActionButton close-after-click @click="onDownloadFile('ods')">
 								<template #icon>
 									<IconTable :size="20" />
 								</template>
 								ODS
 							</NcActionButton>
-							<NcActionButton :close-after-click="true" @click="onDownloadFile('xlsx')">
+							<NcActionButton close-after-click @click="onDownloadFile('xlsx')">
 								<template #icon>
 									<IconFileExcel :size="20" />
 								</template>
@@ -240,16 +214,18 @@ import { getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
+import { useIsSmallMobile } from '@nextcloud/vue/dist/Composables/useIsMobile.js'
+
+import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator.js'
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 
 import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
@@ -281,9 +257,21 @@ import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import PermissionTypes from '../mixins/PermissionTypes.js'
+import PillMenu from '../components/PillMenu.vue'
 
 const SUPPORTED_FILE_FORMATS = { ods: IconTableSvg, csv: IconFileDelimitedSvg, xlsx: IconFileExcelSvg }
 let fileFormat = 'csv'
+
+const responseViews = [
+	{
+		title: t('forms', 'Summary'),
+		id: 'summary',
+	},
+	{
+		title: t('forms', 'Responses'),
+		id: 'responses',
+	},
+]
 
 export default {
 	name: 'Results',
@@ -309,6 +297,7 @@ export default {
 		NcDialog,
 		NcEmptyContent,
 		NcLoadingIcon,
+		PillMenu,
 		ResultsSummary,
 		Submission,
 		TopBar,
@@ -316,14 +305,13 @@ export default {
 
 	mixins: [PermissionTypes, ViewsMixin],
 
-	data() {
+	setup() {
 		return {
-			isDownloadActionOpened: false,
-			loadingResults: true,
-			picker: null,
-			showSummary: true,
-			showConfirmDeleteDialog: false,
-			showLinkedFileNotAvailableDialog: false,
+			isMobile: useIsSmallMobile(),
+
+			// non reactive props
+			responseViews,
+
 			linkedFileNotAvailableButtons: [
 				{
 					label: t('forms', 'Unlink spreadsheet'),
@@ -352,6 +340,20 @@ export default {
 					callback: () => { this.deleteAllSubmissionsConfirmed() },
 				},
 			],
+		}
+	},
+
+	data() {
+		return {
+			activeResponseView: responseViews[0],
+
+			isDownloadActionOpened: false,
+			loadingResults: true,
+
+			picker: null,
+			showSummary: true,
+			showConfirmDeleteDialog: false,
+			showLinkedFileNotAvailableDialog: false,
 		}
 	},
 
@@ -671,36 +673,13 @@ export default {
 
 	.response-actions {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
-		padding-inline-start: 14px;
+		margin-top: 8px;
+		padding-left: calc(14px - var(--border-radius-pill));
 
-		&__radio {
-			margin-inline-end: 8px;
-
-			&__item {
-				border-radius: var(--border-radius-pill);
-				padding-block: 8px;
-				padding-inline: 16px;
-				font-weight: bold;
-				background-color: var(--color-background-dark);
-
-				&:first-of-type {
-					border-start-end-radius: 0;
-					border-end-end-radius: 0;
-					padding-inline-end: 8px;
-				}
-
-				&:last-of-type {
-					border-start-start-radius: 0;
-					border-end-start-radius: 0;
-					padding-inline-start: 8px;
-				}
-
-				&--active {
-					background-color: var(--color-primary);
-					color: var(--color-primary-text)
-				}
-			}
+		&__toggle {
+			margin-right: 1em;
 		}
 	}
 }
