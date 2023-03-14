@@ -373,6 +373,10 @@ export default {
 				font-weight: bold;
 				background-color: var(--color-background-dark);
 
+				&:hover {
+					background-color: var(--color-background-hover);
+				}
+
 				&:first-of-type {
 					border-top-right-radius: 0;
 					border-bottom-right-radius: 0;
@@ -387,7 +391,11 @@ export default {
 
 				&--active {
 					background-color: var(--color-primary);
-					color: var(--color-primary-text)
+					color: var(--color-primary-text);
+
+					&:hover {
+						background-color: var(--color-primary-hover);
+					}
 				}
 			}
 		}
