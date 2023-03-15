@@ -2,13 +2,13 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
-    "Description" : "Opis",
     "Set expiration date" : "Postavite datum isteka",
     "Delete" : "Obriši",
     "Group" : "Grupa",
     "Share link" : "Podijelite vezu",
     "Edit" : "Izmjeni",
     "Share" : "Podjeli",
+    "Description" : "Opis",
     "Sharing" : "Dijeljenje",
     "Settings" : "Podešavanje",
     "Date" : "Date"
