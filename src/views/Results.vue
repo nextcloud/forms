@@ -44,23 +44,33 @@
 			<div class="response-actions">
 				<div class="response-actions__radio">
 					<input id="show-summary--true"
-						v-model="showSummary"
+						v-model="viewMode"
+						value="summary"
 						type="radio"
-						:value="true"
 						class="hidden">
 					<label for="show-summary--true"
 						class="response-actions__radio__item"
-						:class="{ 'response-actions__radio__item--active': showSummary }">
+						:class="{ 'response-actions__radio__item--active': viewMode === 'summary' }">
 						{{ t('forms', 'Summary') }}
 					</label>
-					<input id="show-summary--false"
-						v-model="showSummary"
+					<input id="show-list"
+						v-model="viewMode"
+						value="list"
 						type="radio"
-						:value="false"
+						class="hidden">
+					<label for="show-list"
+						class="response-actions__radio__item"
+						:class="{ 'response-actions__radio__item--active': viewMode === 'list' }">
+						{{ t('forms', 'List') }}
+					</label>
+					<input id="show-summary--false"
+						v-model="viewMode"
+						value="items"
+						type="radio"
 						class="hidden">
 					<label for="show-summary--false"
 						class="response-actions__radio__item"
-						:class="{ 'response-actions__radio__item--active': !showSummary }">
+						:class="{ 'response-actions__radio__item--active': viewMode === 'items' }">
 						{{ t('forms', 'Responses') }}
 					</label>
 				</div>
@@ -110,15 +120,27 @@
 		</section>
 
 		<!-- Summary view for visualization -->
-		<section v-if="!noSubmissions && showSummary">
+		<section v-else-if="viewMode === 'summary'">
 			<ResultsSummary v-for="question in form.questions"
 				:key="question.id"
 				:question="question"
 				:submissions="form.submissions" />
 		</section>
 
+		<!-- Responses view for individual responses using list style -->
+		<section v-else-if="viewMode === 'list'">
+			<ul>
+				<SubmissionItem v-for="submission in form.submissions"
+					:key="submission.id"
+					:submission="submission"
+					:questions="form.questions"
+					:can-delete-submission="canDeleteSubmissions"
+					@delete="deleteSubmission(submission.id)" />
+			</ul>
+		</section>
+
 		<!-- Responses view for individual responses -->
-		<section v-if="!noSubmissions && !showSummary">
+		<section v-else>
 			<Submission v-for="submission in form.submissions"
 				:key="submission.id"
 				:submission="submission"
@@ -151,6 +173,7 @@ import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
+import SubmissionItem from '../components/Results/SubmissionItem.vue'
 import TopBar from '../components/TopBar.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
@@ -183,6 +206,7 @@ export default {
 		NcLoadingIcon,
 		ResultsSummary,
 		Submission,
+		SubmissionItem,
 		TopBar,
 	},
 
@@ -191,7 +215,7 @@ export default {
 	data() {
 		return {
 			loadingResults: true,
-			showSummary: true,
+			viewMode: 'summary',
 		}
 	},
 
@@ -368,20 +392,17 @@ export default {
 			margin-right: 8px;
 
 			&__item {
-				border-radius: var(--border-radius-pill);
 				padding: 8px 16px;
 				font-weight: bold;
 				background-color: var(--color-background-dark);
 
 				&:first-of-type {
-					border-top-right-radius: 0;
-					border-bottom-right-radius: 0;
+					border-radius: var(--border-radius-pill) 0 0 var(--border-radius-pill);
 					padding-right: 8px;
 				}
 
 				&:last-of-type {
-					border-top-left-radius: 0;
-					border-bottom-left-radius: 0;
+					border-radius: 0 var(--border-radius-pill) var(--border-radius-pill) 0;
 					padding-left: 8px;
 				}
 
