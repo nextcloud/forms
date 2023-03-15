@@ -42,28 +42,26 @@
 
 			<!-- View switcher between Summary and Responses -->
 			<div class="response-actions">
-				<div class="response-actions__radio">
-					<input id="show-summary--true"
-						v-model="showSummary"
-						type="radio"
-						:value="true"
-						class="hidden">
+				<fieldset class="response-actions__radio" aria-label="Switch the submissions view">
 					<label for="show-summary--true"
 						class="response-actions__radio__item"
 						:class="{ 'response-actions__radio__item--active': showSummary }">
+						<input id="show-summary--true"
+							v-model="showSummary"
+							type="radio"
+							:value="true">
 						{{ t('forms', 'Summary') }}
 					</label>
-					<input id="show-summary--false"
-						v-model="showSummary"
-						type="radio"
-						:value="false"
-						class="hidden">
 					<label for="show-summary--false"
 						class="response-actions__radio__item"
 						:class="{ 'response-actions__radio__item--active': !showSummary }">
+						<input id="show-summary--false"
+							v-model="showSummary"
+							type="radio"
+							:value="false">
 						{{ t('forms', 'Responses') }}
 					</label>
-				</div>
+				</fieldset>
 
 				<!-- Action menu for CSV export and deletion -->
 				<NcActions class="results-menu"
@@ -367,14 +365,24 @@ export default {
 		&__radio {
 			margin-right: 8px;
 
+			input[type=radio] {
+				position: absolute;
+				width: 1px;
+				overflow: hidden;
+				clip: rect(1px, 1px, 1px, 1px);
+			}
+
 			&__item {
 				border-radius: var(--border-radius-pill);
 				padding: 8px 16px;
 				font-weight: bold;
 				background-color: var(--color-background-dark);
 
-				&:hover {
+				&:hover,&:focus-within {
 					background-color: var(--color-background-hover);
+				}
+				&:focus-within {
+					outline: 2px solid var(--color-main-text);
 				}
 
 				&:first-of-type {
@@ -393,7 +401,7 @@ export default {
 					background-color: var(--color-primary);
 					color: var(--color-primary-text);
 
-					&:hover {
+					&:hover,&:focus-within {
 						background-color: var(--color-primary-hover);
 					}
 				}
