@@ -59,6 +59,7 @@
     "Title of question number {index}" : "Заглавие на въпрос номер {index}",
     "Required" : "Препоръчително",
     "Delete question" : "Изтриване на въпрос",
+    "Description (formatting using Markdown is supported)" : "Описание (поддържа се форматиране чрез Markdown)",
     "This question needs a title!" : "Този въпрос се нуждае от заглавие!",
     "Shuffle options" : "Опции за разбъркване",
     "Add a new answer" : "Добавяне на нов отговор",

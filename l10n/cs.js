@@ -61,6 +61,7 @@ OC.L10N.register(
     "Title of question number {index}" : "Nadpis otázky číslo {index}",
     "Required" : "Vyžadováno",
     "Delete question" : "Smazat otázku",
+    "Description (formatting using Markdown is supported)" : "Popis (je podporováno formátování pomocí Markdown)",
     "This question needs a title!" : "Tato otázka potřebuje nadpis!",
     "Shuffle options" : "Zamíchat možnosti",
     "Add a new answer" : "Přidat novou odpověď",

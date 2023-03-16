@@ -59,6 +59,7 @@
     "Title of question number {index}" : "Title of question number {index}",
     "Required" : "Required",
     "Delete question" : "Delete question",
+    "Description (formatting using Markdown is supported)" : "Description (formatting using Markdown is supported)",
     "This question needs a title!" : "This question needs a title!",
     "Shuffle options" : "Shuffle options",
     "Add a new answer" : "Add a new answer",
