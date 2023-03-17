@@ -1,7 +1,7 @@
 {
 	"name": "forms",
 	"description": "Forms app for nextcloud",
-	"version": "3.1.0",
+	"version": "3.2.0",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/nextcloud/forms.git"
@@ -32,7 +32,7 @@
 		"@nextcloud/logger": "^2.5.0",
 		"@nextcloud/moment": "^1.2.1",
 		"@nextcloud/router": "^2.0.1",
-		"@nextcloud/vue": "^7.7.2",
+		"@nextcloud/vue": "^7.8.0",
 		"core-js": "^3.29.0",
 		"crypto-js": "^4.1.1",
 		"debounce": "^1.2.1",

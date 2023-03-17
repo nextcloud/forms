@@ -39,7 +39,6 @@ use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
-use OCP\IDateTimeFormatter;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -93,7 +92,6 @@ class SubmissionService {
 								AnswerMapper $answerMapper,
 								IRootFolder $storage,
 								IConfig $config,
-								IDateTimeFormatter $dateTimeFormatter,
 								IL10N $l10n,
 								LoggerInterface $logger,
 								IUserManager $userManager,
@@ -104,7 +102,6 @@ class SubmissionService {
 		$this->answerMapper = $answerMapper;
 		$this->storage = $storage;
 		$this->config = $config;
-		$this->dateTimeFormatter = $dateTimeFormatter;
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->userManager = $userManager;
@@ -236,7 +233,7 @@ class SubmissionService {
 			}
 
 			// Date
-			$row[] = $this->dateTimeFormatter->formatDateTime($submission->getTimestamp(), 'full', 'full', new DateTimeZone($userTimezone), $this->l10n);
+			$row[] = date_format(date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone)), 'c');
 
 			// Answers, make sure we keep the question order
 			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function (array $carry, Answer $answer) {

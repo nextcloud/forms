@@ -14,6 +14,7 @@
     "An error occurred while loading the forms list" : "Догодила се грешка приликом учитавања списка упитника",
     "Unable to create a new form" : "Не могу да направим нови упитник",
     "Select groups" : "Изаберите групе",
+    "Results" : "Резултати",
     "Delete form" : "Обриши упитник",
     "Are you sure you want to delete {title}?" : "Да ли сте сигурни да желите да обришете {title}?",
     "Error while deleting {title}" : "Грешка приликом брисања {title}",
@@ -26,7 +27,6 @@
     "Title of question number {index}" : "Наслов питања {index}",
     "Required" : "Обавезно",
     "Delete question" : "Обриши питање",
-    "Description" : "Опис",
     "This question needs a title!" : "Питање мора да има наслов!",
     "Add a new answer" : "Додајте нови одговор",
     "There was an issue deleting this option" : "Десила се грешка приликом брисања овог избора",
@@ -34,7 +34,6 @@
     "Delete this response" : "Обриши овај одговор",
     "Set expiration date" : "Постави датум истека",
     "No recommendations. Start typing." : "Нема препорука. Започните куцање.",
-    "Searching …" : "Тражим…",
     "No elements found." : "Нема нађених елемената.",
     "Permissions" : "Дозволе",
     "Delete" : "Избриши",
@@ -42,6 +41,7 @@
     "Share link" : "Веза дељења",
     "Add link" : "Додај везу",
     "Copy to clipboard" : "Копирај у оставу",
+    "Remove link" : "Уклони линк",
     "Internal link" : "Интерна веза",
     "Show to all accounts on sidebar" : "Прикажи свим налозима у бочној траци",
     "View" : "Погледај",
@@ -51,6 +51,7 @@
     "Toggle settings" : "Укључи/искључи поставке",
     "Loading {title} …" : "Учитавам {title}…",
     "Form title" : "Наслов упитника",
+    "Description" : "Опис",
     "Add a question" : "Додај питање",
     "Responses are anonymous." : "Одговори су анонимни.",
     "Responses are connected to your Nextcloud account." : "Одговори су повезани са Вашим Некстклауд налогом.",
@@ -66,7 +67,11 @@
     "Checkboxes" : "Кућице за штиклирање",
     "People can pick one option" : "Људи имају један избор",
     "Pick an option" : "Изаберите",
+    "Long text" : "Дугачак текст",
     "Date" : "Датум",
-    "Time" : "Време"
+    "Pick a date" : "Изаберите датум",
+    "Pick a date and time" : "Изаберите датум и време",
+    "Time" : "Време",
+    "Pick a time" : "Изаберите време"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
 }

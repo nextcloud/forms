@@ -3,13 +3,13 @@ OC.L10N.register(
     {
     "Copy" : "Kopija",
     "Shared with you" : "Shared with you",
-    "Description" : "Opis",
     "Set expiration date" : "Postavi datum isteka",
     "Delete" : "Obriši",
     "Group" : "Group",
     "Share link" : "Podeli vezu",
     "Edit" : "Izmeni",
     "Share" : "Podeli",
+    "Description" : "Opis",
     "Sharing" : "Deljenje",
     "Settings" : "Поставке",
     "Date" : "Date"

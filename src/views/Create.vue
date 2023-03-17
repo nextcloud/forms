@@ -98,17 +98,19 @@
 					@input="onTitleChange" />
 			</h2>
 			<template v-if="edit">
-				<label class="hidden-visually" for="form-desc">{{ t('forms', 'Description') }}</label>
+				<label class="hidden-visually" for="form-desc">
+					{{ t('forms', 'Description') }}
+				</label>
 				<NcRichContenteditable id="form-desc"
 					class="form-desc form-desc__input"
 					:value="form.description"
 					:multiline="true"
-					:placeholder="t('forms', 'Description')"
+					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.formDescription"
 					@update:value="updateDescription" />
 			</template>
 			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div v-else class="form-desc" v-html="formDescription" />
+			<div v-else class="form-desc form-desc__output" v-html="formDescription" />
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}
@@ -520,6 +522,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../scssmixins/markdownOutput';
+
 .app-content {
 	display: flex;
 	align-items: center;
@@ -573,6 +577,11 @@ export default {
 
 			&__input {
 				padding: 3px 14px 18px; // 2px smaller because of border
+			}
+
+			// Styling for rendered Output
+			&__output {
+				@include markdown-output;
 			}
 		}
 

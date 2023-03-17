@@ -30,15 +30,14 @@
 				@update:checked="onRestrictCreationChange">
 				{{ t('forms', 'Restrict form creation to selected groups') }}
 			</NcCheckboxRadioSwitch>
-			<NcMultiselect v-model="appConfig.creationAllowedGroups"
+			<NcSelect v-model="appConfig.creationAllowedGroups"
 				:disabled="!appConfig.restrictCreation"
 				:multiple="true"
 				:options="availableGroups"
 				:placeholder="t('forms', 'Select groups')"
 				class="forms-settings__creation__multiselect"
 				label="displayName"
-				track-by="groupId"
-				@update:value="onCreationAllowedGroupsChange" />
+				@input="onCreationAllowedGroupsChange" />
 		</NcSettingsSection>
 		<NcSettingsSection :title="t('forms', 'Form sharing')">
 			<NcCheckboxRadioSwitch ref="switchAllowPublicLink"
@@ -63,7 +62,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcSettingsSection from '@nextcloud/vue/dist/Components/NcSettingsSection.js'
 
 import logger from './utils/Logger.js'
@@ -73,7 +72,7 @@ export default {
 
 	components: {
 		NcCheckboxRadioSwitch,
-		NcMultiselect,
+		NcSelect,
 		NcSettingsSection,
 	},
 

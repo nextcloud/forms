@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.2.0 - 2023-03-06
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.1.0...3.2.0)
+
+### Enhancements
+- Make timestamp in csv export ISO 8601 compliant [\#1531](https://github.com/nextcloud/forms/pull/1531) ([Chartman123](https://github.com/Chartman123))
+- Add lastUpdated property to Form [\#1479](https://github.com/nextcloud/forms/pull/1479) ([Chartman123](https://github.com/Chartman123))
+
+### Fixed
+- Fix paragraph rendering [\#1542](https://github.com/nextcloud/forms/pull/1542) ([jotoeri](https://github.com/jotoeri))
+- Move API to v2.1 [\#1539](https://github.com/nextcloud/forms/pull/1539) ([Chartman123](https://github.com/Chartman123))
+- Make skip to content buttons work [\#1530](https://github.com/nextcloud/forms/pull/1530) ([susnux](https://github.com/susnux))
+
+### Merged
+- Replace deprecated NcMultiselect with recommended NcSelect [\#1471](https://github.com/nextcloud/forms/pull/1471) ([susnux](https://github.com/susnux))
+- Added test for `cloneForm` in `ApiController` [\#1488](https://github.com/nextcloud/forms/pull/1488) ([susnux](https://github.com/susnux))
+- Add information about API to appinfo [\#1529](https://github.com/nextcloud/forms/pull/1529) ([susnux](https://github.com/susnux))
+
+
 ## 3.1.0 - 2023-02-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.0.4...v3.1.0)

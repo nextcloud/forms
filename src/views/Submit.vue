@@ -302,6 +302,8 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import '../scssmixins/markdownOutput';
+
 .app-content {
 	display: flex;
 	align-items: center;
@@ -355,6 +357,8 @@ export default {
 			resize: none;
 			min-height: calc(20px + 1.5em); // one line
 			color: var(--color-text-maxcontrast);
+
+			@include markdown-output;
 		}
 
 		.info-message {

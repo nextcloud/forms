@@ -94,12 +94,12 @@
 				<NcRichContenteditable v-if="edit || !questionValid"
 					:multiline="true"
 					:value="description"
-					:placeholder="t('forms', 'Description')"
+					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.questionDescription"
 					class="question__header__description__input"
 					@update:value="onDescriptionChange" />
 				<!-- eslint-disable-next-line vue/no-v-html -->
-				<p v-else class="question__header__description__output" v-html="computedDescription" />
+				<div v-else class="question__header__description__output" v-html="computedDescription" />
 			</div>
 		</div>
 
@@ -206,7 +206,7 @@ export default {
 		},
 
 		computedDescription() {
-			return this.$markdownit.renderInline(this.description)
+			return this.$markdownit.render(this.description)
 		},
 
 		/**
@@ -276,6 +276,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../scssmixins/markdownOutput';
+
 .question {
 	position: relative;
 	display: flex;
@@ -376,7 +378,7 @@ export default {
 
 			&__input {
 				margin: 0px;
-				min-height: 1.3em;
+				min-height: 1.5em;
 				border-width: 2px;
 				position: relative;
 				left: -12px;
@@ -387,13 +389,14 @@ export default {
 			&__output {
 				font-size: 14px;
 				color: var(--color-text-maxcontrast) !important;
-				line-height: 1.3em;
+				line-height: 1.5em;
 				z-index: inherit;
 				overflow-wrap: break-word;
 				width: calc(100% - 32px); // match with other inputs
 			}
 			&__output {
 				padding: 6px 0; //compensate border
+				@include markdown-output; // Styling for rendered Output
 			}
 		}
 	}
