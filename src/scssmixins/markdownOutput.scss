@@ -22,7 +22,7 @@
 
 @mixin markdown-output {
 	::v-deep {
-		p:not(:first-child) {
+		>:not(:first-child) {
 			margin-top: 1.5em;
 		}
 	}
