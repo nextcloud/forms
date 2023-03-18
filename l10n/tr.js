@@ -61,6 +61,7 @@ OC.L10N.register(
     "Title of question number {index}" : "{index} numaralı sorunun başlığı",
     "Required" : "Zorunlu",
     "Delete question" : "Soruyu sil",
+    "Description (formatting using Markdown is supported)" : "Açıklama (Markdown ile biçimlendirilebilir)",
     "This question needs a title!" : "Bu sorunun bir başlığı olmalıdır!",
     "Shuffle options" : "Karıştırma seçenekleri",
     "Add a new answer" : "Yeni bir yanıt ekle",
