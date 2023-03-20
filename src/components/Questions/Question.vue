@@ -59,6 +59,7 @@
 					:id="actionsId"
 					:container="'#' + actionsId"
 					:force-menu="true"
+					placement="bottom-end"
 					class="question__header__title__menu">
 					<NcActionCheckbox :checked="isRequired"
 						@update:checked="onRequiredChange">
