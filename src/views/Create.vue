@@ -46,7 +46,6 @@
 					v-model="form.title"
 					class="form-title"
 					rows="1"
-					:minlength="0"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
 					:readonly="!edit"
@@ -58,13 +57,14 @@
 				<label class="hidden-visually" for="form-desc">
 					{{ t('forms', 'Description') }}
 				</label>
-				<NcRichContenteditable id="form-desc"
+				<textarea id="form-desc"
+					ref="description"
 					class="form-desc form-desc__input"
+					rows="1"
 					:value="form.description"
-					:multiline="true"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.formDescription"
-					@update:value="updateDescription" />
+					@input="updateDescription" />
 			</template>
 			<!-- eslint-disable-next-line vue/no-v-html -->
 			<div v-else class="form-desc form-desc__output" v-html="formDescription" />
@@ -142,7 +142,6 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
-import NcRichContenteditable from '@nextcloud/vue/dist/Components/NcRichContenteditable.js'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
 import answerTypes from '../models/AnswerTypes.js'
@@ -168,7 +167,6 @@ export default {
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
-		NcRichContenteditable,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -257,21 +255,25 @@ export default {
 		'form.title'() {
 			SetWindowTitle(this.formTitle)
 		},
+
+		// resize description if form is loaded
+		isLoadingForm(value) {
+			if (!value && this.edit) {
+				this.resizeTitle()
+				this.resizeDescription()
+			}
+		},
 	},
 
-	beforeMount() {
+	mounted() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
 		this.initEdit()
 	},
 
-	updated() {
-		this.autoSizeTitle()
-	},
-
 	methods: {
 		onTitleChange() {
-			this.autoSizeTitle()
+			this.resizeTitle()
 			this.saveTitle()
 		},
 
@@ -284,6 +286,7 @@ export default {
 
 		enableEdit() {
 			this.edit = true
+			this.resizeDescription()
 		},
 
 		initEdit() {
@@ -295,13 +298,38 @@ export default {
 		},
 
 		/**
+		 * Auto adjust the title height based its scroll height
+		 */
+		resizeTitle() {
+			this.$nextTick(() => {
+				const textarea = this.$refs.title
+				textarea.style.cssText = 'height:auto'
+				// include 2px border
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+			})
+		},
+
+		/**
+		 * Auto adjust the description height based on its scroll height
+		 */
+		resizeDescription() {
+			// nextTick to ensure textarea is attached to DOM
+			this.$nextTick(() => {
+				const textarea = this.$refs.description
+				textarea.style.cssText = 'height:auto'
+				// include 2px border
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+			})
+		},
+
+		/**
 		 * Update the description
 		 *
-		 * @param {string} value New description
+		 * @param {InputEvent} ev The input event of the textarea
 		 */
-		updateDescription(value = '') {
-			// We need this for nextcloud/nextcloud-vue#3669
-			this.form.description = value.trimEnd()
+		updateDescription({ target }) {
+			this.form.description = target.value
+			this.resizeDescription()
 			this.saveDescription()
 		},
 
@@ -411,20 +439,6 @@ export default {
 				})
 			}, 10)
 		},
-
-		/**
-		 * Auto adjust the title height based on lines number
-		 */
-		async autoSizeTitle() {
-			this.$nextTick(() => {
-				const textarea = this.$refs.title
-				if (textarea) {
-					textarea.style.cssText = 'height:auto'
-					// include 2px border
-					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
-				}
-			})
-		},
 	},
 }
 </script>
@@ -485,6 +499,7 @@ export default {
 
 			&__input {
 				padding: 3px 14px 18px; // 2px smaller because of border
+				resize: none;
 			}
 
 			// Styling for rendered Output
