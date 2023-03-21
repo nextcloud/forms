@@ -31,6 +31,9 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 
+/**
+ * @extends QBMapper<Option>
+ */
 class OptionMapper extends QBMapper {
 
 	/**

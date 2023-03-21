@@ -40,6 +40,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setOrder(integer $value)
  * @method string getType()
  * @method void setType(string $value)
+ * @method bool getIsRequired()
+ * @method void setIsRequired(bool $value)
  * @method string getText()
  * @method void setText(string $value)
  * @method string getDescription()

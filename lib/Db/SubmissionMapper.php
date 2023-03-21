@@ -31,6 +31,9 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/**
+ * @extends QBMapper<Submission>
+ */
 class SubmissionMapper extends QBMapper {
 	private $answerMapper;
 

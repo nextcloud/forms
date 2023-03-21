@@ -31,6 +31,9 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\DoesNotExistException;
 
+/**
+ * @extends QBMapper<Question>
+ */
 class QuestionMapper extends QBMapper {
 	private $optionMapper;
 

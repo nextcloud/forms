@@ -30,6 +30,9 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
+/**
+ * @extends QBMapper<Form>
+ */
 class FormMapper extends QBMapper {
 	/** @var QuestionMapper */
 	private $questionMapper;

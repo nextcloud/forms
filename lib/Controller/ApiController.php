@@ -517,7 +517,7 @@ class ApiController extends OCSController {
 	 * Updates the Order of all Questions of a Form.
 	 *
 	 * @param int $formId Id of the form to reorder
-	 * @param int[] $newOrder Array of Question-Ids in new order.
+	 * @param Array<int, int> $newOrder Array of Question-Ids in new order.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException

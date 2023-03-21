@@ -33,6 +33,9 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Share\IShare;
 
+/**
+ * @extends QBMapper<Share>
+ */
 class ShareMapper extends QBMapper {
 	/**
 	 * ShareMapper constructor.

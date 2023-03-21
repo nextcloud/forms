@@ -207,6 +207,7 @@ class ShareApiController extends OCSController {
 		$share->setShareWith($shareWith);
 		$share->setPermissions($permissions);
 
+		/** @var Share */
 		$share = $this->shareMapper->insert($share);
 
 		// Create share-notifications (activity)
