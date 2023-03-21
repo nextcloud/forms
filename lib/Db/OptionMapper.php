@@ -68,7 +68,7 @@ class OptionMapper extends QBMapper {
 				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
 		);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 	public function findById(int $optionId): Option {

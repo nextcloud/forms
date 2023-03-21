@@ -65,7 +65,7 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	 * @param Integer $id
+	 * @param int $id
 	 * @return Submission
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
@@ -107,7 +107,7 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	 * @throws DBException
+	 * @throws \Exception
 	 */
 	public function countSubmissions(int $formId): int {
 		$qb = $this->db->getQueryBuilder();
@@ -140,7 +140,7 @@ class SubmissionMapper extends QBMapper {
 			$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
 		);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 	/**
@@ -162,6 +162,6 @@ class SubmissionMapper extends QBMapper {
 			$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
 		);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 }

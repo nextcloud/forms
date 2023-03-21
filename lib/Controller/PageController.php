@@ -40,8 +40,7 @@ use OCP\AppFramework\Http\Template\PublicTemplateResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\RedirectResponse;
-use OCP\IGroupManager;
-use OCP\IInitialStateService;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IURLGenerator;
@@ -72,11 +71,8 @@ class PageController extends Controller {
 	/** @var IAccountManager */
 	protected $accountManager;
 
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var IInitialStateService */
-	private $initialStateService;
+	/** @var IInitialState */
+	private $initialState;
 
 	/** @var IL10N */
 	private $l10n;
@@ -103,8 +99,7 @@ class PageController extends Controller {
 								ConfigService $configService,
 								FormsService $formsService,
 								IAccountManager $accountManager,
-								IGroupManager $groupManager,
-								IInitialStateService $initialStateService,
+								IInitialState $initialState,
 								IL10N $l10n,
 								LoggerInterface $logger,
 								IUrlGenerator $urlGenerator,
@@ -120,8 +115,7 @@ class PageController extends Controller {
 		$this->formsService = $formsService;
 
 		$this->accountManager = $accountManager;
-		$this->groupManager = $groupManager;
-		$this->initialStateService = $initialStateService;
+		$this->initialState = $initialState;
 		$this->l10n = $l10n;
 		$this->logger = $logger;
 		$this->request = $request;
@@ -140,8 +134,8 @@ class PageController extends Controller {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
 		$this->insertHeaderOnIos();
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
-		$this->initialStateService->provideInitialState($this->appName, 'appConfig', $this->configService->getAppConfig());
+		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
+		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
 			'id-app-content' => '#app-content-vue',
 			'id-app-navigation' => '#app-navigation-vue',
@@ -191,10 +185,10 @@ class PageController extends Controller {
 			// Public Template to fill the form
 			Util::addScript($this->appName, 'forms-submit');
 			$this->insertHeaderOnIos();
-			$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
-			$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
-			$this->initialStateService->provideInitialState($this->appName, 'shareHash', $hash);
-			$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
+			$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form->getId()));
+			$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
+			$this->initialState->provideInitialState('shareHash', $hash);
+			$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
 			return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 		}
 
@@ -228,16 +222,16 @@ class PageController extends Controller {
 		// Main Template to fill the form
 		Util::addScript($this->appName, 'forms-submit');
 		$this->insertHeaderOnIos();
-		$this->initialStateService->provideInitialState($this->appName, 'form', $this->formsService->getPublicForm($form->getId()));
-		$this->initialStateService->provideInitialState($this->appName, 'isLoggedIn', $this->userSession->isLoggedIn());
-		$this->initialStateService->provideInitialState($this->appName, 'shareHash', $hash);
-		$this->initialStateService->provideInitialState($this->appName, 'maxStringLengths', Constants::MAX_STRING_LENGTHS);
+		$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form->getId()));
+		$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
+		$this->initialState->provideInitialState('shareHash', $hash);
+		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
 	}
 
-	public function provideEmptyContent(string $renderAs, Form $form = null): ?TemplateResponse {
+	public function provideEmptyContent(string $renderAs, Form $form = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-emptyContent');
-		$this->initialStateService->provideInitialState($this->appName, 'renderAs', $renderAs);
+		$this->initialState->provideInitialState('renderAs', $renderAs);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 	}
 
@@ -249,7 +243,7 @@ class PageController extends Controller {
 	 * @param Form $form Necessary to set header on public forms, not necessary for 'notfound'-template
 	 * @return TemplateResponse
 	 */
-	public function provideTemplate(string $template, Form $form = null, array $options = []): ?TemplateResponse {
+	public function provideTemplate(string $template, Form $form = null, array $options = []): TemplateResponse {
 		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {
 			Util::addStyle($this->appName, 'public');
@@ -287,7 +281,7 @@ class PageController extends Controller {
 	/**
 	 * Insert the extended viewport Header on iPhones to prevent automatic zooming.
 	 */
-	public function insertHeaderOnIos() {
+	public function insertHeaderOnIos(): void {
 		$USER_AGENT_IPHONE_SAFARI = '/^Mozilla\/5\.0 \(iPhone[^)]+\) AppleWebKit\/[0-9.]+ \(KHTML, like Gecko\) Version\/[0-9.]+ Mobile\/[0-9.A-Z]+ Safari\/[0-9.A-Z]+$/';
 		if (preg_match($USER_AGENT_IPHONE_SAFARI, $this->request->getHeader('User-Agent'))) {
 			Util::addHeader('meta', [
