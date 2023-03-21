@@ -40,6 +40,7 @@ You run several tests by:
 - `composer cs:check` for the Nextcloud php coding standard
 - `composer lint` for php linting
 - `composer test:unit` and `composer test:integration` to run the php functionality tests
+- `composer psalm` for static code analysis
 
 
 ## ♥ How to create a pull request
