@@ -230,10 +230,12 @@ export default {
 
 	mounted() {
 		subscribe('forms:last-updated:set', (id) => this.onLastUpdatedByEventBus(id))
+		subscribe('forms:ownership-transfered', (id) => this.onDeleteForm(id))
 	},
 
 	unmounted() {
 		unsubscribe('forms:last-updated:set', (id) => this.onLastUpdatedByEventBus(id))
+		unsubscribe('forms:ownership-transfered', (id) => this.onDeleteForm(id))
 	},
 
 	methods: {

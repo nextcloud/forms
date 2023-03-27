@@ -128,6 +128,14 @@ return [
 			]
 		],
 		[
+			'name' => 'api#transferOwner',
+			'url' => '/api/{apiVersion}/form/transfer',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
+			]
+		],
+		[
 			'name' => 'api#deleteForm',
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'DELETE',

@@ -88,6 +88,8 @@
 				{{ t('forms', 'Message to show after a user submitted the form. Please note that the message will not be translated!') }}
 			</div>
 		</div>
+
+		<TransferOwnership :form="form" />
 	</div>
 </template>
 
@@ -96,6 +98,7 @@ import moment from '@nextcloud/moment'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcDateTimePicker from '@nextcloud/vue/dist/Components/NcDateTimePicker.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
+import TransferOwnership from './TransferOwnership.vue'
 
 import { directive as ClickOutside } from 'v-click-outside'
 import { loadState } from '@nextcloud/initial-state'
@@ -104,6 +107,7 @@ export default {
 	components: {
 		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
+		TransferOwnership,
 	},
 
 	directives: {
@@ -286,6 +290,11 @@ export default {
 	margin-inline-start: 40px;
 }
 
+.sidebar-tabs__content {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
 .submission-message {
 	&__description {
 		color: var(--color-text-maxcontrast);

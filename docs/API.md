@@ -221,6 +221,20 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
 ```
 "data": 3
 ```
+### Transfer form ownership
+Transfer the ownership of a form to another user
+- Endpoint: `/api/v2.2/form/transfer`
+- Method: `POST`
+- Parameters:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _formId_      | Integer | ID of the form to tranfer |
+  | _uid_ | Integer | ID of the new form owner |
+- Restrictions: The initiator must be the current form owner.
+- Response: **Status-Code OK**, as well as the id of the new owner.
+```
+"data": "user1"
+```
 
 ### Delete a form
 - Endpoint: `/api/v2.2/form/{id}`
