@@ -199,10 +199,8 @@ import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 // Color picker and image modal dependence
-import ColorPicker from '@nextcloud/vue/dist/Components/ColorPicker'
-import Modal from '@nextcloud/vue/dist/Components/Modal'
-import Clipboard from 'v-clipboard'
-import Vue from 'vue'
+import ColorPicker from '@nextcloud/vue/dist/Components/NcColorPicker.js'
+import Modal from '@nextcloud/vue/dist/Components/NcModal.js'
 
 window.axios = axios
 
