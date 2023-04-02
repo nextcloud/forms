@@ -71,9 +71,6 @@ class SubmissionService {
 	/** @var IConfig */
 	private $config;
 
-	/** @var IDateTimeFormatter */
-	private $dateTimeFormatter;
-
 	/** @var IL10N */
 	private $l10n;
 
@@ -159,6 +156,7 @@ class SubmissionService {
 	 * @throws NotPermittedException
 	 */
 	public function writeCsvToCloud(string $hash, string $path): string {
+		/** @var \OCP\Files\Folder|\OCP\Files\File $node */
 		$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
 
 		// Get Data
@@ -169,14 +167,17 @@ class SubmissionService {
 			if ($node->getExtension() === 'csv') {
 				$csvData['fileName'] = $node->getName();
 			}
+			/** @var \OCP\Files\Folder $node */
 			$node = $node->getParent();
 		}
 
 		// check if file exists, create otherwise.
 		try {
+			/** @var \OCP\Files\File $file */
 			$file = $node->get($csvData['fileName']);
 		} catch (\OCP\Files\NotFoundException $e) {
 			$node->newFile($csvData['fileName']);
+			/** @var \OCP\Files\File $file */
 			$file = $node->get($csvData['fileName']);
 		}
 

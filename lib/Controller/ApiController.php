@@ -517,7 +517,7 @@ class ApiController extends OCSController {
 	 * Updates the Order of all Questions of a Form.
 	 *
 	 * @param int $formId Id of the form to reorder
-	 * @param int[] $newOrder Array of Question-Ids in new order.
+	 * @param Array<int, int> $newOrder Array of Question-Ids in new order.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
@@ -986,7 +986,7 @@ class ApiController extends OCSController {
 
 		// If not logged in or anonymous use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = "anon-user-".  hash('md5', (time() + rand()));
+			$anonID = "anon-user-".  hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());

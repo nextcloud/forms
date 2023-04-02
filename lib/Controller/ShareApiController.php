@@ -207,6 +207,7 @@ class ShareApiController extends OCSController {
 		$share->setShareWith($shareWith);
 		$share->setPermissions($permissions);
 
+		/** @var Share */
 		$share = $this->shareMapper->insert($share);
 
 		// Create share-notifications (activity)
@@ -316,7 +317,7 @@ class ShareApiController extends OCSController {
 	 * Validate user given permission array
 	 *
 	 * @param array $permissions User given permissions
-	 * @return array Sanitized array of permissions
+	 * @return bool True if permissions are valid, False otherwise
 	 * @throws OCSBadRequestException If invalid permission was given
 	 */
 	protected function validatePermissions(array $permissions, int $shareType): bool {

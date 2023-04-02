@@ -30,6 +30,9 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 
+/**
+ * @extends QBMapper<Form>
+ */
 class FormMapper extends QBMapper {
 	/** @var QuestionMapper */
 	private $questionMapper;
@@ -56,7 +59,7 @@ class FormMapper extends QBMapper {
 	}
 
 	/**
-	 * @param Integer $id
+	 * @param int $id
 	 * @return Form
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
@@ -74,7 +77,7 @@ class FormMapper extends QBMapper {
 	}
 
 	/**
-	 * @param String $hash
+	 * @param string $hash
 	 * @return Form
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found

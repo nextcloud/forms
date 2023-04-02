@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.8.0@9cf4f60a333f779ad3bc704a555920e81d4fdcda">
+  <file src="lib/Activity/Provider.php">
+    <InvalidCatch>
+      <code><![CDATA[try {
+			// Overwrite formTitle if form is found (i.e. still exists).
+			$formTitle = $this->formMapper->findbyHash($formHash)->getTitle();
+
+			// Append hash and route
+			$formLink .= $formHash;
+			if ($route !== '') {
+				$formLink .= '/' . $route;
+			}
+		} catch (IMapperException $e) {
+			// Ignore if not found, just use stored title
+		}]]></code>
+    </InvalidCatch>
+  </file>
+  <file src="lib/AppInfo/Application.php">
+    <InvalidArgument>
+      <code>UserDeletedListener::class</code>
+    </InvalidArgument>
+  </file>
+  <file src="lib/Controller/ApiController.php">
+    <InvalidCatch>
+      <code><![CDATA[try {
+				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find question. Id:{id}', [
+					'id' => $questionId
+				]);
+				throw new OCSBadRequestException();
+			}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findByHash($hash);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($formId);
+			$questions = $this->formsService->getQuestions($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$form = $this->formsService->getForm($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$oldForm = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}]]></code>
+      <code><![CDATA[try {
+			$option = $this->optionMapper->findById($id);
+			$question = $this->questionMapper->findById($option->getQuestionId());
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or option');
+			throw new OCSBadRequestException('Could not find form or option');
+		}]]></code>
+      <code><![CDATA[try {
+			$option = $this->optionMapper->findById($id);
+			$question = $this->questionMapper->findById($option->getQuestionId());
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find option, question or form');
+			throw new OCSBadRequestException('Could not find option, question or form');
+		}]]></code>
+      <code><![CDATA[try {
+			$question = $this->questionMapper->findById($id);
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question');
+			throw new OCSBadRequestException('Could not find form or question');
+		}]]></code>
+      <code><![CDATA[try {
+			$question = $this->questionMapper->findById($id);
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question');
+			throw new OCSBadRequestException('Could not find form or question');
+		}]]></code>
+      <code><![CDATA[try {
+			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question');
+			throw new OCSBadRequestException('Could not find form or question');
+		}]]></code>
+      <code><![CDATA[try {
+			$submission = $this->submissionMapper->findById($id);
+			$form = $this->formMapper->findById($submission->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or submission');
+			throw new OCSBadRequestException();
+		}]]></code>
+    </InvalidCatch>
+  </file>
+  <file src="lib/Controller/ShareApiController.php">
+    <InvalidCatch>
+      <code><![CDATA[try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form', ['exception' => $e]);
+			throw new OCSBadRequestException('Could not find form');
+		}]]></code>
+      <code><![CDATA[try {
+			$share = $this->shareMapper->findById($id);
+			$form = $this->formMapper->findById($share->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find share', ['exception' => $e]);
+			throw new OCSBadRequestException('Could not find share');
+		}]]></code>
+      <code><![CDATA[try {
+			$share = $this->shareMapper->findById($id);
+			$form = $this->formMapper->findById($share->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find share', ['exception' => $e]);
+			throw new OCSBadRequestException('Could not find share');
+		}]]></code>
+    </InvalidCatch>
+  </file>
+  <file src="lib/Db/Form.php">
+    <UndefinedMagicMethod>
+      <code>getAccessJson</code>
+      <code>setAccessJson</code>
+    </UndefinedMagicMethod>
+  </file>
+  <file src="lib/Db/Question.php">
+    <UndefinedMagicMethod>
+      <code>getExtraSettingsJson</code>
+      <code>setExtraSettingsJson</code>
+    </UndefinedMagicMethod>
+  </file>
+  <file src="lib/Db/Share.php">
+    <UndefinedMagicMethod>
+      <code>getPermissionsJson</code>
+      <code>setPermissionsJson</code>
+    </UndefinedMagicMethod>
+  </file>
+  <file src="lib/FormsMigrator.php">
+    <UndefinedClass>
+      <code>OutputInterface</code>
+      <code>OutputInterface</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Middleware/PublicCorsMiddleware.php">
+    <NoInterfaceProperties>
+      <code><![CDATA[$this->request->server]]></code>
+    </NoInterfaceProperties>
+    <UndefinedClass>
+      <code>SecurityException</code>
+      <code>SecurityException</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass>
+      <code>SecurityException</code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="lib/Migration/Version020300Date20210403214012.php">
+    <InvalidOperand>
+      <code>$result</code>
+      <code><![CDATA[$this->ensureColumnIsNullable($schema, 'forms_v2_questions', 'mandatory')]]></code>
+    </InvalidOperand>
+  </file>
+  <file src="lib/Migration/Version030000Date20220402100057.php">
+    <UndefinedClass>
+      <code>Type</code>
+    </UndefinedClass>
+  </file>
+  <file src="lib/Migration/Version030100Date20230115214242.php">
+    <InvalidOperand>
+      <code>$result</code>
+      <code><![CDATA[$this->ensureColumnIsNullable($schema, 'forms_v2_options', 'text')]]></code>
+      <code><![CDATA[$this->ensureColumnIsNullable($schema, 'forms_v2_questions', 'order')]]></code>
+      <code><![CDATA[$this->ensureColumnIsNullable($schema, 'forms_v2_questions', 'text')]]></code>
+      <code><![CDATA[$this->ensureColumnIsNullable($schema, 'forms_v2_shares', 'share_type')]]></code>
+    </InvalidOperand>
+  </file>
+  <file src="lib/Service/FormsService.php">
+    <InvalidThrow>
+      <code>IMapperException</code>
+      <code>IMapperException</code>
+      <code>IMapperException</code>
+    </InvalidThrow>
+  </file>
+  <file src="lib/Service/SubmissionService.php">
+    <MissingDependency>
+      <code><![CDATA[$this->storage]]></code>
+      <code>IRootFolder</code>
+      <code>IRootFolder</code>
+    </MissingDependency>
+  </file>
+</files>

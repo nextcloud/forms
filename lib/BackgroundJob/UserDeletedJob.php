@@ -46,8 +46,11 @@ class UserDeletedJob extends QueuedJob {
 		$this->logger = $logger;
 	}
 
-	public function run($arguments) {
-		$ownerId = $arguments['owner_id'];
+	/**
+	 * @param array $argument
+	 */
+	public function run($argument): void {
+		$ownerId = $argument['owner_id'];
 		$this->logger->info('Deleting forms for deleted user {user}', [
 			'user' => $ownerId
 		]);

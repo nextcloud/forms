@@ -16,13 +16,15 @@
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"lint": "find . -name \\*.php -not -path './vendor*/*' -print0 | xargs -0 -n1 php -l",
 		"test:unit": "phpunit -c tests/phpunit.xml",
-		"test:integration": "phpunit -c tests/phpunit.integration.xml"
+		"test:integration": "phpunit -c tests/phpunit.integration.xml",
+		"psalm": "psalm.phar"
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.5",
+		"guzzlehttp/guzzle": "^7.4",
 		"nextcloud/ocp": "^25.0.4",
 		"phpunit/phpunit": "^9",
-		"guzzlehttp/guzzle": "^7.4"
+		"psalm/phar": "^5.8"
 	},
 	"require": {
 		"league/csv": "^9.8.0"

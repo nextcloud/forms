@@ -27,8 +27,8 @@ namespace OCA\Forms\Settings;
 
 use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\IGroupManager;
-use OCP\IInitialStateService;
 use OCP\Settings\ISettings;
 use OCP\Util;
 
@@ -41,17 +41,17 @@ class Settings implements ISettings {
 	/** @var IGroupManager */
 	private $groupManager;
 
-	/** @var IInitialStateService */
-	private $initialStateService;
+	/** @var IInitialState */
+	private $initialState;
 
 	public function __construct(string $appName,
 								ConfigService $configService,
 								IGroupManager $groupManager,
-								IInitialStateService $initialStateService) {
+								IInitialState $initialState) {
 		$this->appName = $appName;
 		$this->configService = $configService;
 		$this->groupManager = $groupManager;
-		$this->initialStateService = $initialStateService;
+		$this->initialState = $initialState;
 	}
 
 	/**
@@ -73,8 +73,8 @@ class Settings implements ISettings {
 
 	public function getForm(): TemplateResponse {
 		Util::addScript($this->appName, 'forms-settings');
-		$this->initialStateService->provideInitialState($this->appName, 'availableGroups', $this->getAvailableGroups());
-		$this->initialStateService->provideInitialState($this->appName, 'appConfig', $this->configService->getAppConfig());
+		$this->initialState->provideInitialState('availableGroups', $this->getAvailableGroups());
+		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
 
 		return new TemplateResponse($this->appName, 'settings');
 	}
