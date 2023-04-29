@@ -470,8 +470,9 @@ export default {
 			line-height: 34px;
 			color: var(--color-main-text);
 			min-height: 36px;
-			padding: 0 14px; // same as submit but 2px borders
-			margin: 30px 0 14px; // same as on submit but minus padding-top description and borders
+			// padding and margin should be aligned with the submit view (but keep the 2px border in mind)
+			padding: 4px 14px;
+			margin: 22px 0 14px;
 			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -479,6 +480,9 @@ export default {
 
 			&:read-only {
 				border-color: transparent;
+			}
+			&::placeholder {
+				font-size: 28px;
 			}
 		}
 
