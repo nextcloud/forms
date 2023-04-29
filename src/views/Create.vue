@@ -281,12 +281,14 @@ export default {
 			// Keep edit if no title set
 			if (this.form.title) {
 				this.edit = false
+				this.$refs.title.style.height = 'auto'
 			}
 		},
 
 		enableEdit() {
 			this.edit = true
 			this.resizeDescription()
+			this.resizeTitle()
 		},
 
 		initEdit() {
@@ -497,7 +499,7 @@ export default {
 		.form-desc {
 			color: var(--color-text-maxcontrast);
 			line-height: 1.5em;
-			min-height: calc(25px + 1.5em); // one line
+			min-height: 48px; // one line (25px padding + 1.5em text height), CSS calc will round incorrectly to hardcoded
 			padding-top: 5px; // spacing border<>text
 			margin: 0px;
 

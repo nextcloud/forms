@@ -210,7 +210,10 @@ export default {
 			}
 		},
 	},
-
+	// Ensure description is sized correctly on initial render
+	mounted() {
+		this.$nextTick(() => this.resizeDescription())
+	},
 	methods: {
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)

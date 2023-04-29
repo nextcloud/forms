@@ -21,6 +21,8 @@
  */
 
 @mixin markdown-output {
+	overflow-wrap: break-word;
+
 	::v-deep {
 		>:not(:first-child) {
 			margin-top: 1.5em;
