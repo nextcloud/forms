@@ -132,6 +132,8 @@ OC.L10N.register(
     "People can pick a date and time" : "Le persone possono scegliere una data e un orario",
     "Pick a date and time" : "Scegli una data e un orario",
     "Time" : "Ora",
+    "Time question title" : "Titolo della domanda sul tempo",
+    "People can pick a time" : "Le persone possono scegliere un orario",
     "Pick a time" : "Scegli un orario"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
