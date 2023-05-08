@@ -14,6 +14,7 @@ OC.L10N.register(
     "Loading forms …" : "Завантаження форм...",
     "Select groups" : "Виберіть групи",
     "Edit form" : "Редагувати форму",
+    "Results" : "Результат",
     "Required" : "Вимагається",
     "Set expiration date" : "Встановити термін дії",
     "No recommendations. Start typing." : "Немає рекомендацій. Почніть друкувати.",
