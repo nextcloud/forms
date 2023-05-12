@@ -1,22 +1,14 @@
 { "translations": {
-    "Copy" : "Copiar",
-    "Shared with you" : "Shared with you",
-    "Select groups" : "Esbillar grupos",
-    "Required" : "Riquíu",
-    "Set expiration date" : "Afitar la data de caducidá",
     "Permissions" : "Permisos",
-    "Delete" : "Desaniciar",
-    "Group" : "Group",
-    "Share link" : "Share link",
-    "Copy to clipboard" : "Copiar al cartafueyu",
-    "Edit" : "Editar",
-    "Share" : "Share",
     "Description" : "Descripción",
-    "Summary" : "Sumariu",
-    "Sharing" : "Compartiendo",
-    "Settings" : "Settings",
-    "Submit" : "Unviar",
-    "Date" : "Date",
-    "Time" : "Hora"
+    "There was an error while adding the new question" : "hebo un error mentanto s'amestaba la entruga nueva",
+    "There was an error while removing the question" : "Hebo un error mentanto se quitaba la entruga",
+    "Summary" : "Resume",
+    "There was an error while loading the results" : "hebo un error mentanto se guardaben los resultaos",
+    "There was an error while removing this response" : "Hebo un error mentanto se quitaba esta rempuesta",
+    "There was an error while removing responses" : "Hebo un error mentanto se quitaben les rempuestes",
+    "Settings" : "Configuración",
+    "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
+    "Date" : "Data"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
