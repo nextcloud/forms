@@ -231,8 +231,12 @@ export default {
 		resizeDescription() {
 			// next tick ensures that the textarea is attached to DOM
 			this.$nextTick(() => {
-				const rows = this.$refs.description.value.split('\n').length
-				this.$refs.description.setAttribute('rows', rows)
+				const textarea = this.$refs.description
+				if (textarea) {
+					textarea.style.cssText = 'height: 0'
+					// include 2px border
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+				}
 			})
 		},
 

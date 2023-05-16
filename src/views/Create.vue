@@ -305,7 +305,7 @@ export default {
 		resizeTitle() {
 			this.$nextTick(() => {
 				const textarea = this.$refs.title
-				textarea.style.cssText = 'height:auto'
+				textarea.style.cssText = 'height: 0'
 				// include 2px border
 				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
 			})
@@ -318,7 +318,7 @@ export default {
 			// nextTick to ensure textarea is attached to DOM
 			this.$nextTick(() => {
 				const textarea = this.$refs.description
-				textarea.style.cssText = 'height:auto'
+				textarea.style.cssText = 'height: 0'
 				// include 2px border
 				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
 			})
