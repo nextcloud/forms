@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "This form does not exist" : "Esti formulariu nun esiste",
     "Permissions" : "Permisos",
+    "Delete" : "Desaniciar",
     "Loading {title} …" : "Cargando «{title}»…",
     "Description" : "Descripción",
     "Responses are anonymous." : "Les rempuestes son anónimes.",
@@ -13,6 +14,7 @@ OC.L10N.register(
     "There was an error while loading the results" : "hebo un error mentanto se guardaben los resultaos",
     "There was an error while removing this response" : "Hebo un error mentanto se quitaba esta rempuesta",
     "There was an error while removing responses" : "Hebo un error mentanto se quitaben les rempuestes",
+    "Sharing" : "Comparticiñon",
     "Settings" : "Configuración",
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
     "Date" : "Data"
