@@ -498,8 +498,8 @@ export default {
 
 		.form-desc {
 			color: var(--color-text-maxcontrast);
-			line-height: 1.5em;
-			min-height: 48px; // one line (25px padding + 1.5em text height), CSS calc will round incorrectly to hardcoded
+			line-height: 22px;
+			min-height: 47px; // one line (25px padding + 22px text height)
 			padding-top: 5px; // spacing border<>text
 			margin: 0px;
 
