@@ -76,13 +76,13 @@
 				</NcActions>
 			</div>
 			<div v-if="hasDescription || edit || !questionValid" class="question__header__description">
-				<NcRichContenteditable v-if="edit || !questionValid"
-					:multiline="true"
+				<textarea v-if="edit || !questionValid"
+					ref="description"
 					:value="description"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.questionDescription"
 					class="question__header__description__input"
-					@update:value="onDescriptionChange" />
+					@input="onDescriptionChange" />
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<div v-else class="question__header__description__output" v-html="computedDescription" />
 			</div>
@@ -99,7 +99,6 @@ import { directive as ClickOutside } from 'v-click-outside'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
-import NcRichContenteditable from '@nextcloud/vue/dist/Components/NcRichContenteditable.js'
 
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
@@ -119,7 +118,6 @@ export default {
 		NcActions,
 		NcActionButton,
 		NcActionCheckbox,
-		NcRichContenteditable,
 	},
 
 	inject: ['$markdownit'],
@@ -205,18 +203,41 @@ export default {
 			return this.description !== ''
 		},
 	},
-
+	watch: {
+		edit(newEdit) {
+			if (newEdit || !this.questionValid) {
+				this.resizeDescription()
+			}
+		},
+	},
+	// Ensure description is sized correctly on initial render
+	mounted() {
+		this.$nextTick(() => this.resizeDescription())
+	},
 	methods: {
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
 		},
 
-		onDescriptionChange(value) {
-			this.$emit('update:description', value)
+		onDescriptionChange({ target }) {
+			this.resizeDescription()
+			this.$emit('update:description', target.value)
 		},
 
 		onRequiredChange(isRequired) {
 			this.$emit('update:isRequired', isRequired)
+		},
+
+		resizeDescription() {
+			// next tick ensures that the textarea is attached to DOM
+			this.$nextTick(() => {
+				const textarea = this.$refs.description
+				if (textarea) {
+					textarea.style.cssText = 'height: 0'
+					// include 2px border
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+				}
+			})
 		},
 
 		/**
@@ -350,6 +371,7 @@ export default {
 				position: relative;
 				left: -12px;
 				padding: 4px 10px;
+				resize: none;
 			}
 
 			&__input,

@@ -342,10 +342,10 @@ export default {
 			text-overflow: ellipsis;
 		}
 		.form-desc {
-			line-height: 1.5em;
+			line-height: 22px;
 			padding-bottom: 20px;
 			resize: none;
-			min-height: calc(20px + 1.5em); // one line
+			min-height: 42px;
 			color: var(--color-text-maxcontrast);
 
 			@include markdown-output;

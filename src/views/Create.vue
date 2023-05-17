@@ -46,7 +46,6 @@
 					v-model="form.title"
 					class="form-title"
 					rows="1"
-					:minlength="0"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
 					:readonly="!edit"
@@ -58,13 +57,14 @@
 				<label class="hidden-visually" for="form-desc">
 					{{ t('forms', 'Description') }}
 				</label>
-				<NcRichContenteditable id="form-desc"
+				<textarea id="form-desc"
+					ref="description"
 					class="form-desc form-desc__input"
+					rows="1"
 					:value="form.description"
-					:multiline="true"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.formDescription"
-					@update:value="updateDescription" />
+					@input="updateDescription" />
 			</template>
 			<!-- eslint-disable-next-line vue/no-v-html -->
 			<div v-else class="form-desc form-desc__output" v-html="formDescription" />
@@ -142,7 +142,6 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
-import NcRichContenteditable from '@nextcloud/vue/dist/Components/NcRichContenteditable.js'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
 import answerTypes from '../models/AnswerTypes.js'
@@ -168,7 +167,6 @@ export default {
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
-		NcRichContenteditable,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -257,21 +255,25 @@ export default {
 		'form.title'() {
 			SetWindowTitle(this.formTitle)
 		},
+
+		// resize description if form is loaded
+		isLoadingForm(value) {
+			if (!value && this.edit) {
+				this.resizeTitle()
+				this.resizeDescription()
+			}
+		},
 	},
 
-	beforeMount() {
+	mounted() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
 		this.initEdit()
 	},
 
-	updated() {
-		this.autoSizeTitle()
-	},
-
 	methods: {
 		onTitleChange() {
-			this.autoSizeTitle()
+			this.resizeTitle()
 			this.saveTitle()
 		},
 
@@ -279,11 +281,14 @@ export default {
 			// Keep edit if no title set
 			if (this.form.title) {
 				this.edit = false
+				this.$refs.title.style.height = 'auto'
 			}
 		},
 
 		enableEdit() {
 			this.edit = true
+			this.resizeDescription()
+			this.resizeTitle()
 		},
 
 		initEdit() {
@@ -295,13 +300,38 @@ export default {
 		},
 
 		/**
+		 * Auto adjust the title height based its scroll height
+		 */
+		resizeTitle() {
+			this.$nextTick(() => {
+				const textarea = this.$refs.title
+				textarea.style.cssText = 'height: 0'
+				// include 2px border
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+			})
+		},
+
+		/**
+		 * Auto adjust the description height based on its scroll height
+		 */
+		resizeDescription() {
+			// nextTick to ensure textarea is attached to DOM
+			this.$nextTick(() => {
+				const textarea = this.$refs.description
+				textarea.style.cssText = 'height: 0'
+				// include 2px border
+				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+			})
+		},
+
+		/**
 		 * Update the description
 		 *
-		 * @param {string} value New description
+		 * @param {InputEvent} ev The input event of the textarea
 		 */
-		updateDescription(value = '') {
-			// We need this for nextcloud/nextcloud-vue#3669
-			this.form.description = value.trimEnd()
+		updateDescription({ target }) {
+			this.form.description = target.value
+			this.resizeDescription()
 			this.saveDescription()
 		},
 
@@ -411,20 +441,6 @@ export default {
 				})
 			}, 10)
 		},
-
-		/**
-		 * Auto adjust the title height based on lines number
-		 */
-		async autoSizeTitle() {
-			this.$nextTick(() => {
-				const textarea = this.$refs.title
-				if (textarea) {
-					textarea.style.cssText = 'height:auto'
-					// include 2px border
-					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
-				}
-			})
-		},
 	},
 }
 </script>
@@ -456,8 +472,9 @@ export default {
 			line-height: 34px;
 			color: var(--color-main-text);
 			min-height: 36px;
-			padding: 0 14px; // same as submit but 2px borders
-			margin: 30px 0 14px; // same as on submit but minus padding-top description and borders
+			// padding and margin should be aligned with the submit view (but keep the 2px border in mind)
+			padding: 4px 14px;
+			margin: 22px 0 14px;
 			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -465,6 +482,9 @@ export default {
 
 			&:read-only {
 				border-color: transparent;
+			}
+			&::placeholder {
+				font-size: 28px;
 			}
 		}
 
@@ -478,13 +498,14 @@ export default {
 
 		.form-desc {
 			color: var(--color-text-maxcontrast);
-			line-height: 1.5em;
-			min-height: calc(25px + 1.5em); // one line
+			line-height: 22px;
+			min-height: 47px; // one line (25px padding + 22px text height)
 			padding-top: 5px; // spacing border<>text
 			margin: 0px;
 
 			&__input {
 				padding: 3px 14px 18px; // 2px smaller because of border
+				resize: none;
 			}
 
 			// Styling for rendered Output

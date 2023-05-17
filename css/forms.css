@@ -27,6 +27,15 @@ html {
 	scroll-padding-top: calc(var(--header-height) + 60px);
 }
 
+/* Fix for placeholder styling
+ * TODO: Can be removed, as soon as it is fixed in server
+ * Ref.: https://github.com/nextcloud/server/pull/37522
+ */
+::placeholder {
+	color: var(--color-text-maxcontrast);
+	font-size: var(--default-font-size);
+}
+
 /* Fix for action-popover alignment
  * TODO: Can be removed, as soon as the issue is solved in server or vue-components.
  * Ref.: https://github.com/nextcloud/nextcloud-vue/issues/1384
