@@ -16,7 +16,7 @@
 	<licence>agpl</licence>
 	<version>3.2.0</version>
 	<dependencies>
-		<nextcloud min-version="25" max-version="26" />
+		<nextcloud min-version="25" max-version="27" />
 	</dependencies>
 
 	<author>Affan Hussain</author>
