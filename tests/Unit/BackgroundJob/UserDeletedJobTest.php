@@ -30,9 +30,9 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class UserDeletedJobTest extends TestCase {
 	/** @var UserDeletedJob */

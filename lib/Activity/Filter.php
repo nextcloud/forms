@@ -37,8 +37,8 @@ class Filter implements IFilter {
 	private $urlGenerator;
 
 	public function __construct(string $appName,
-								IL10N $l10n,
-								IURLGenerator $urlGenerator) {
+		IL10N $l10n,
+		IURLGenerator $urlGenerator) {
 		$this->appName = $appName;
 		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;

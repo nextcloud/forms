@@ -84,14 +84,14 @@ class FormsMigrator implements IMigrator {
 	private const PATH_MYAPP_FILE = FormsMigrator::PATH_ROOT . 'forms.json';
 
 	public function __construct(AnswerMapper $answerMapper,
-								FormMapper $formMapper,
-								OptionMapper $optionMapper,
-								QuestionMapper $questionMapper,
-								SubmissionMapper $submissionMapper,
-								FormsService $formsService,
-								SubmissionService $submissionService,
-								IL10N $l10n,
-								IUserManager $userManager) {
+		FormMapper $formMapper,
+		OptionMapper $optionMapper,
+		QuestionMapper $questionMapper,
+		SubmissionMapper $submissionMapper,
+		FormsService $formsService,
+		SubmissionService $submissionService,
+		IL10N $l10n,
+		IUserManager $userManager) {
 		$this->answerMapper = $answerMapper;
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;

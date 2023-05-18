@@ -48,10 +48,10 @@ class ActivityManager {
 	private $currentUser;
 
 	public function __construct(string $appName,
-								IManager $manager,
-								IGroupManager $groupManager,
-								LoggerInterface $logger,
-								IUserSession $userSession) {
+		IManager $manager,
+		IGroupManager $groupManager,
+		LoggerInterface $logger,
+		IUserSession $userSession) {
 		$this->appName = $appName;
 		$this->manager = $manager;
 		$this->groupManager = $groupManager;

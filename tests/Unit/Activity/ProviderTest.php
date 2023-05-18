@@ -40,9 +40,9 @@ use OCP\IUserManager;
 use OCP\L10N\IFactory;
 use OCP\RichObjectStrings\IValidator;
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class ProviderTest extends TestCase {
 

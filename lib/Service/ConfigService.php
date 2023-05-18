@@ -51,10 +51,10 @@ class ConfigService {
 	private $currentUser;
 
 	public function __construct(string $appName,
-								IConfig $config,
-								IGroupManager $groupManager,
-								LoggerInterface $logger,
-								IUserSession $userSession) {
+		IConfig $config,
+		IGroupManager $groupManager,
+		LoggerInterface $logger,
+		IUserSession $userSession) {
 		$this->appName = $appName;
 		$this->config = $config;
 		$this->groupManager = $groupManager;

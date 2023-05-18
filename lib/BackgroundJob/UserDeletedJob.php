@@ -38,8 +38,8 @@ class UserDeletedJob extends QueuedJob {
 	private $logger;
 
 	public function __construct(FormMapper $formMapper,
-								ITimeFactory $time,
-								LoggerInterface $logger) {
+		ITimeFactory $time,
+		LoggerInterface $logger) {
 		parent::__construct($time);
 
 		$this->formMapper = $formMapper;

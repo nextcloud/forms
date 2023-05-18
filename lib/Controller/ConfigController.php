@@ -48,10 +48,10 @@ class ConfigController extends ApiController {
 	private $logger;
 
 	public function __construct(string $appName,
-								ConfigService $configService,
-								IConfig $config,
-								LoggerInterface $logger,
-								IRequest $request) {
+		ConfigService $configService,
+		IConfig $config,
+		LoggerInterface $logger,
+		IRequest $request) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->configService = $configService;

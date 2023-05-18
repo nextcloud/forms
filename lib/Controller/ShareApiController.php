@@ -34,13 +34,13 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
-use OCP\AppFramework\OCSController;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCSController;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
@@ -83,16 +83,16 @@ class ShareApiController extends OCSController {
 	private $secureRandom;
 
 	public function __construct(string $appName,
-								FormMapper $formMapper,
-								ShareMapper $shareMapper,
-								ConfigService $configService,
-								FormsService $formsService,
-								IGroupManager $groupManager,
-								LoggerInterface $logger,
-								IRequest $request,
-								IUserManager $userManager,
-								IUserSession $userSession,
-								ISecureRandom $secureRandom) {
+		FormMapper $formMapper,
+		ShareMapper $shareMapper,
+		ConfigService $configService,
+		FormsService $formsService,
+		IGroupManager $groupManager,
+		LoggerInterface $logger,
+		IRequest $request,
+		IUserManager $userManager,
+		IUserSession $userSession,
+		ISecureRandom $secureRandom) {
 		parent::__construct($appName, $request);
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;

@@ -88,17 +88,17 @@ class FormsService {
 	private $secureRandom;
 
 	public function __construct(ActivityManager $activityManager,
-								FormMapper $formMapper,
-								OptionMapper $optionMapper,
-								QuestionMapper $questionMapper,
-								ShareMapper $shareMapper,
-								SubmissionMapper $submissionMapper,
-								ConfigService $configService,
-								IGroupManager $groupManager,
-								LoggerInterface $logger,
-								IUserManager $userManager,
-								IUserSession $userSession,
-								ISecureRandom $secureRandom) {
+		FormMapper $formMapper,
+		OptionMapper $optionMapper,
+		QuestionMapper $questionMapper,
+		ShareMapper $shareMapper,
+		SubmissionMapper $submissionMapper,
+		ConfigService $configService,
+		IGroupManager $groupManager,
+		LoggerInterface $logger,
+		IUserManager $userManager,
+		IUserSession $userSession,
+		ISecureRandom $secureRandom) {
 		$this->activityManager = $activityManager;
 		$this->formMapper = $formMapper;
 		$this->optionMapper = $optionMapper;

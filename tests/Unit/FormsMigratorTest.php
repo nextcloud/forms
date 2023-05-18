@@ -24,18 +24,18 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit;
 
-use OCA\Forms\FormsMigrator;
+use OCA\Forms\Db\AnswerMapper;
 
 // use OCA\Forms\Db\Answer;
-use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-// use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
-// use OCA\Forms\Db\Question;
+// use OCA\Forms\Db\Option;
 use OCA\Forms\Db\QuestionMapper;
-// use OCA\Forms\Db\Submission;
+// use OCA\Forms\Db\Question;
 use OCA\Forms\Db\SubmissionMapper;
+// use OCA\Forms\Db\Submission;
+use OCA\Forms\FormsMigrator;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCP\IL10N;
@@ -43,9 +43,9 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
-use Symfony\Component\Console\Output\OutputInterface;
-
 use PHPUnit\Framework\MockObject\MockObject;
+
+use Symfony\Component\Console\Output\OutputInterface;
 use Test\TestCase;
 
 class FormsMigratorTest extends TestCase {

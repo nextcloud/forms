@@ -24,17 +24,17 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Listener;
 
-use OCA\Forms\Listener\UserDeletedListener;
-
 use OCA\Forms\BackgroundJob\UserDeletedJob;
+
+use OCA\Forms\Listener\UserDeletedListener;
 use OCP\BackgroundJob\IJobList;
 use OCP\IUser;
 use OCP\User\Events\UserCreatedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class UserDeletedListenerTest extends TestCase {
 	/** @var UserDeletedListener */

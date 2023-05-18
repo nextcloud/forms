@@ -45,9 +45,9 @@ class Settings implements ISettings {
 	private $initialState;
 
 	public function __construct(string $appName,
-								ConfigService $configService,
-								IGroupManager $groupManager,
-								IInitialState $initialState) {
+		ConfigService $configService,
+		IGroupManager $groupManager,
+		IInitialState $initialState) {
 		$this->appName = $appName;
 		$this->configService = $configService;
 		$this->groupManager = $groupManager;

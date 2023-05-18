@@ -69,7 +69,7 @@ class OptionMapper extends QBMapper {
 		$qb->delete($this->getTableName())
 			->where(
 				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
-		);
+			);
 
 		$qb->executeStatement();
 	}

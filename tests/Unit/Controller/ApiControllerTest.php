@@ -69,9 +69,9 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class ApiControllerTest extends TestCase {
 	private ApiController $apiController;
