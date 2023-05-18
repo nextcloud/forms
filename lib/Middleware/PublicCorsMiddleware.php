@@ -31,8 +31,8 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Middleware;
 use OCP\AppFramework\Utility\IControllerMethodReflector;
-use OCP\IUserSession;
 use OCP\IRequest;
+use OCP\IUserSession;
 
 class PublicCorsMiddleware extends Middleware {
 	/** @var IRequest  */
@@ -48,8 +48,8 @@ class PublicCorsMiddleware extends Middleware {
 	 * @param IUserSession $session
 	 */
 	public function __construct(IRequest $request,
-								IControllerMethodReflector $reflector,
-								IUserSession $userSession) {
+		IControllerMethodReflector $reflector,
+		IUserSession $userSession) {
 		$this->request = $request;
 		$this->reflector = $reflector;
 		$this->userSession = $userSession;

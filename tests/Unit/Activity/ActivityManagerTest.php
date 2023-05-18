@@ -34,9 +34,9 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class ActivityManagerTest extends TestCase {
 

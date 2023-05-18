@@ -33,7 +33,7 @@ abstract class FormsActivitySettings extends ActivitySettings {
 	protected $l10n;
 
 	public function __construct(string $appName,
-								IL10N $l10n) {
+		IL10N $l10n) {
 		$this->appName = $appName;
 		$this->l10n = $l10n;
 	}

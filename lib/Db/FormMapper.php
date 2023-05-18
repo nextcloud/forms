@@ -26,9 +26,9 @@
 
 namespace OCA\Forms\Db;
 
+use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\QBMapper;
 
 /**
  * @extends QBMapper<Form>
@@ -49,9 +49,9 @@ class FormMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(QuestionMapper $questionMapper,
-								ShareMapper $shareMapper,
-								SubmissionMapper $submissionMapper,
-								IDBConnection $db) {
+		ShareMapper $shareMapper,
+		SubmissionMapper $submissionMapper,
+		IDBConnection $db) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
 		$this->questionMapper = $questionMapper;
 		$this->shareMapper = $shareMapper;

@@ -32,9 +32,9 @@ use OCP\IConfig;
 use OCP\IRequest;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class ConfigControllerTest extends TestCase {
 

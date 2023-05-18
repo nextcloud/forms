@@ -67,14 +67,14 @@ class Provider implements IProvider {
 	private $validator;
 
 	public function __construct(string $appName,
-								FormMapper $formMapper,
-								IEventMerger $eventMerger,
-								IGroupManager $groupManager,
-								LoggerInterface $logger,
-								IURLGenerator $urlGenerator,
-								IUserManager $userManager,
-								IFactory $l10nFactory,
-								IValidator $validator) {
+		FormMapper $formMapper,
+		IEventMerger $eventMerger,
+		IGroupManager $groupManager,
+		LoggerInterface $logger,
+		IURLGenerator $urlGenerator,
+		IUserManager $userManager,
+		IFactory $l10nFactory,
+		IValidator $validator) {
 		$this->appName = $appName;
 		$this->formMapper = $formMapper;
 		$this->eventMerger = $eventMerger;

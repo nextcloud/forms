@@ -43,7 +43,7 @@ class UserDeletedListener implements IEventListener {
 	private $logger;
 
 	public function __construct(IJobList $jobList,
-								LoggerInterface $logger) {
+		LoggerInterface $logger) {
 		$this->jobList = $jobList;
 		$this->logger = $logger;
 	}

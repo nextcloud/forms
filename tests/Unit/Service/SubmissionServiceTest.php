@@ -24,9 +24,8 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Service;
 
-use OCA\Forms\Service\SubmissionService;
-
 use OCA\Forms\Db\Answer;
+
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -34,6 +33,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Service\SubmissionService;
 
 use OCP\Files\File;
 use OCP\Files\Folder;
@@ -46,9 +46,9 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class SubmissionServiceTest extends TestCase {
 

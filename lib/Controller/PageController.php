@@ -36,10 +36,10 @@ use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Http\Template\PublicTemplateResponse;
-use OCP\AppFramework\Http\Response;
-use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\RedirectResponse;
+use OCP\AppFramework\Http\Response;
+use OCP\AppFramework\Http\Template\PublicTemplateResponse;
+use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -93,18 +93,18 @@ class PageController extends Controller {
 	private $userSession;
 
 	public function __construct(string $appName,
-								IRequest $request,
-								FormMapper $formMapper,
-								ShareMapper $shareMapper,
-								ConfigService $configService,
-								FormsService $formsService,
-								IAccountManager $accountManager,
-								IInitialState $initialState,
-								IL10N $l10n,
-								LoggerInterface $logger,
-								IUrlGenerator $urlGenerator,
-								IUserManager $userManager,
-								IUserSession $userSession) {
+		IRequest $request,
+		FormMapper $formMapper,
+		ShareMapper $shareMapper,
+		ConfigService $configService,
+		FormsService $formsService,
+		IAccountManager $accountManager,
+		IInitialState $initialState,
+		IL10N $l10n,
+		LoggerInterface $logger,
+		IUrlGenerator $urlGenerator,
+		IUserManager $userManager,
+		IUserSession $userSession) {
 		parent::__construct($appName, $request);
 
 		$this->appName = $appName;

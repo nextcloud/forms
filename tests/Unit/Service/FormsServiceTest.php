@@ -24,9 +24,8 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Service;
 
-use OCA\Forms\Service\FormsService;
-
 use OCA\Forms\Activity\ActivityManager;
+
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -38,6 +37,7 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
+use OCA\Forms\Service\FormsService;
 
 use OCP\IGroup;
 use OCP\IGroupManager;
@@ -48,9 +48,9 @@ use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Test\TestCase;
-
 use Psr\Log\LoggerInterface;
+
+use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
 

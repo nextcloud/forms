@@ -24,15 +24,15 @@
 
 namespace OCA\Forms\Migration;
 
+use \DateTime;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
 use OCP\IConfig;
 use OCP\IDBConnection;
-use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
 
-use \DateTime;
+use OCP\Migration\SimpleMigrationStep;
 
 /**
  * Installation class for the forms app.
