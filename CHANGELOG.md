@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.3.0 - 2023-05-22
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.2.0...3.3.0)
+
+### Enhancements
+- Improve and unify Markdown output style [\#1575](https://github.com/nextcloud/forms/pull/1575) ([susnux](https://github.com/susnux))
+
+### Fixed
+- fix(markdown): Add margin for all new paragraphs [\#1568](https://github.com/nextcloud/forms/pull/1568) ([susnux](https://github.com/susnux))
+- Place actions popover so it does not overflow the page [\#1554](https://github.com/nextcloud/forms/pull/1554) ([susnux](https://github.com/susnux))
+- fix: Replace `NcRichContenteditable` with `textarea` [\#1574](https://github.com/nextcloud/forms/pull/1574) ([susnux](https://github.com/susnux))
+
+### Merged
+- Prepare for NC27 [\#1625](https://github.com/nextcloud/forms/pull/1625) ([Chartman123](https://github.com/Chartman123))
+- Replace deprecated code and fix issues found by static code analysis [\#1577](https://github.com/nextcloud/forms/pull/1577) ([susnux](https://github.com/susnux))
+
+
 ## 3.2.0 - 2023-03-06
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.1.0...3.2.0)
