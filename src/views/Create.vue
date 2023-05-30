@@ -218,7 +218,7 @@ export default {
 
 			// On Submit, this is dependent on `isLoggedIn`. Create-view is always logged in and the variable isLoggedIn does not exist.
 			if (!this.form.isAnonymous && true) {
-				message += t('forms', 'Responses are connected to your Nextcloud account.')
+				message += t('forms', 'Responses are connected to your account.')
 			}
 
 			if (this.isRequiredUsed) {
