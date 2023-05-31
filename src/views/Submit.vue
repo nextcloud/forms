@@ -196,7 +196,7 @@ export default {
 				message += t('forms', 'Responses are anonymous.')
 			}
 			if (!this.form.isAnonymous && this.isLoggedIn) {
-				message += t('forms', 'Responses are connected to your Nextcloud account.')
+				message += t('forms', 'Responses are connected to your account.')
 			}
 			if (this.isRequiredUsed) {
 				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
