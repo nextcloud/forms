@@ -62,7 +62,6 @@ OC.L10N.register(
     "Description" : "Опис",
     "Add a question" : "Додади прашање",
     "Responses are anonymous." : "Одговорите се анонимни.",
-    "Responses are connected to your Nextcloud account." : "Одговорите се поврзани со вашата сметка.",
     "An asterisk (*) indicates mandatory questions." : "Прашањата со ѕвездичка (*) се задолжителни.",
     "There was an error while adding the new question" : "Настана грешка при додавање на на ново прашање",
     "There was an error while removing the question" : "Настана грешка при бришење на прашање",

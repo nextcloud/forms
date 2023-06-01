@@ -72,7 +72,6 @@ OC.L10N.register(
     "Description" : "説明",
     "Add a question" : "質問を追加",
     "Responses are anonymous." : "回答者が匿名です",
-    "Responses are connected to your Nextcloud account." : "あなたの Nextcloud アカウントに回答を紐づけます",
     "An asterisk (*) indicates mandatory questions." : "アスタリスク(*)は必須回答の設問です",
     "There was an error while adding the new question" : "設問の追加中にエラーが発生しました",
     "There was an error while removing the question" : "設問の削除中にエラーが発生しました",

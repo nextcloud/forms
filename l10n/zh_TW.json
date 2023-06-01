@@ -109,7 +109,6 @@
     "Description" : "描述",
     "Add a question" : "新增問題",
     "Responses are anonymous." : "回應是匿名的。",
-    "Responses are connected to your Nextcloud account." : "作答回應已連結您的 Nextcloud 帳號。",
     "An asterisk (*) indicates mandatory questions." : "星號 (*) 表示為必填問題。",
     "Expired {relativeDate}." : "過期於 {relativeDate}。",
     "Expires {relativeDate}." : "過期於 {relativeDate}。",

@@ -109,7 +109,6 @@
     "Description" : "Описание",
     "Add a question" : "Добавяне на въпрос",
     "Responses are anonymous." : "Отговорите са анонимни.",
-    "Responses are connected to your Nextcloud account." : "Отговорите са свързани с вашия Nextcloud профил.",
     "An asterisk (*) indicates mandatory questions." : "Звездичка (*) означава задължителни въпроси.",
     "Expired {relativeDate}." : "Изтекъл /срок на валидност/ {relativeDate}.",
     "Expires {relativeDate}." : "Изтичане на /срок на валидност/ {relativeDate}.",

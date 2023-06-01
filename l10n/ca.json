@@ -109,7 +109,6 @@
     "Description" : "Descripció",
     "Add a question" : "Afegeix una pregunta",
     "Responses are anonymous." : "Les respostes són anònimes.",
-    "Responses are connected to your Nextcloud account." : "Les respostes estan connectades al vostre compte del Nextcloud.",
     "An asterisk (*) indicates mandatory questions." : "Un asterisc (*) indica les preguntes obligatòries.",
     "Expired {relativeDate}." : "Caducat {relativeDate}",
     "Expires {relativeDate}." : "Caduca {relativeDate}",

@@ -109,7 +109,6 @@
     "Description" : "Beskrivelse",
     "Add a question" : "Tilføj et spørgsmål",
     "Responses are anonymous." : "Svarene er anonyme.",
-    "Responses are connected to your Nextcloud account." : "Svar er knyttet til din Nextcloud-konto.",
     "An asterisk (*) indicates mandatory questions." : "En stjerne (*) angiver obligatoriske spørgsmål.",
     "Expired {relativeDate}." : "Udløbet {relativeDate}.",
     "Expires {relativeDate}." : "Udløber {relativeDate}.",

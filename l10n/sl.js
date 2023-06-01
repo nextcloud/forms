@@ -102,7 +102,6 @@ OC.L10N.register(
     "Description" : "Opis",
     "Add a question" : "Dodaj vprašanje",
     "Responses are anonymous." : "Odzivi so anonimni.",
-    "Responses are connected to your Nextcloud account." : "Odzivi so povezani z uporabljenim računom Nextcloud.",
     "An asterisk (*) indicates mandatory questions." : "Zvezdica ( * ) določa obvezna vprašanja.",
     "Expired {relativeDate}." : "Pretečno {relativeDate}",
     "Expires {relativeDate}." : "Preteče {relativeDate}",

@@ -111,7 +111,6 @@ OC.L10N.register(
     "Description" : "Açıklama",
     "Add a question" : "Bir soru ekle",
     "Responses are anonymous." : "Yanıtlar anonim.",
-    "Responses are connected to your Nextcloud account." : "Yanıtlar Nextcloud hesabınız ile ilişkilendirildi.",
     "An asterisk (*) indicates mandatory questions." : "Yanıtlanması zorunlu sorular (*) ile vurgulanır.",
     "Expired {relativeDate}." : "{relativeDate} tarihinde geçerlilik süresi dolmuş.",
     "Expires {relativeDate}." : "{relativeDate} tarihinde geçerlilik süresi dolacak.",

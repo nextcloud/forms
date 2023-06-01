@@ -77,7 +77,6 @@ OC.L10N.register(
     "Description" : "Beskrivning",
     "Add a question" : "Lägg till en fråga",
     "Responses are anonymous." : "Svar är anonyma.",
-    "Responses are connected to your Nextcloud account." : "Svar kopplas till ditt Nextcloud-konto.",
     "An asterisk (*) indicates mandatory questions." : "En asterisk (*) indikerar obligatoriska frågor.",
     "There was an error while adding the new question" : "Ett fel uppstod vid sparande av den nya frågan",
     "There was an error while removing the question" : "Ett fel uppstod vid borttagande av frågan",

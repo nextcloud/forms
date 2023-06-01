@@ -104,7 +104,6 @@
     "Description" : "Popis",
     "Add a question" : "Pridať otázku",
     "Responses are anonymous." : "Odpovede sú anonymné.",
-    "Responses are connected to your Nextcloud account." : "Odpovede sú spojené s vašim NextCloud účtom.",
     "An asterisk (*) indicates mandatory questions." : "Hviezdička (*) označuje povinné otázky.",
     "There was an error while adding the new question" : "Pri pridávaní novej otázky sa vyskytla chyba",
     "There was an error while removing the question" : "Pri odstraňovaní otázky sa vyskytla chyba",

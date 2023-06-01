@@ -76,7 +76,6 @@
     "Description" : "Beschrijving",
     "Add a question" : "Voeg een vraag toe",
     "Responses are anonymous." : "Antwoorden zijn anoniem.",
-    "Responses are connected to your Nextcloud account." : "Antwoorden zijn gekoppeld aan je Nextcloud-account",
     "An asterisk (*) indicates mandatory questions." : "Een sterretje (*) betekent verplichte vragen.",
     "There was an error while adding the new question" : "Er trad een fout op bij het toevoegen van de nieuwe vraag",
     "There was an error while removing the question" : "Er trad een fout op bij het verwijderen van de vraag",

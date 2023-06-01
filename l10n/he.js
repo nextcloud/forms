@@ -63,7 +63,6 @@ OC.L10N.register(
     "Description" : "תיאור",
     "Add a question" : "הוספת שאלה",
     "Responses are anonymous." : "התגובות אלמוניות.",
-    "Responses are connected to your Nextcloud account." : "התגובות מחוברות לחשבון ה־Nextcloud שלך.",
     "An asterisk (*) indicates mandatory questions." : "כוכבית (*) מציינת שאלות חובה.",
     "There was an error while adding the new question" : "אירעה שגיאה בעת הוספת השאלה החדשה",
     "There was an error while removing the question" : "אירעה שגיאה בעת הסרת השאלה",

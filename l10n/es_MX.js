@@ -107,7 +107,6 @@ OC.L10N.register(
     "Description" : "Descripción",
     "Add a question" : "Añadir una pregunta",
     "Responses are anonymous." : "Las respuestas son anónimas",
-    "Responses are connected to your Nextcloud account." : "Las respuestas están conectadas a su cuenta Nextcloud.",
     "An asterisk (*) indicates mandatory questions." : "Un asterisco (*) indica preguntas obligatorias.",
     "Expired {relativeDate}." : "Expirado {relativeDate}.",
     "Expires {relativeDate}." : "Expira en {relativeDate}.",

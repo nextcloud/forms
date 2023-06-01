@@ -97,7 +97,6 @@ OC.L10N.register(
     "Description" : "Kuvaus",
     "Add a question" : "Lisää kysymys",
     "Responses are anonymous." : "Vastaukset ovat nimettömiä",
-    "Responses are connected to your Nextcloud account." : "Vastaukset on yhdistetty Nextcloud-tiliisi.",
     "An asterisk (*) indicates mandatory questions." : "Pakolliset kysymykset on merkattu asteriskilla (*).",
     "Expired {relativeDate}." : "Vanheni {relativeDate}.",
     "Expires {relativeDate}." : "Vanhenee {relativeDate}.",

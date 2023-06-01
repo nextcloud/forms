@@ -111,7 +111,6 @@ OC.L10N.register(
     "Description" : "Popis",
     "Add a question" : "Přidat otázku",
     "Responses are anonymous." : "Odpovědi jsou anonymní.",
-    "Responses are connected to your Nextcloud account." : "Odpovědi jsou spojené s vaším Nextcloud účtem.",
     "An asterisk (*) indicates mandatory questions." : "Hvězdička (*) označuje otázky, na které je nutné odpovědět.",
     "Expired {relativeDate}." : "Platnost skončila {relativeDate}.",
     "Expires {relativeDate}." : "Platnost skončí {relativeDate}.",

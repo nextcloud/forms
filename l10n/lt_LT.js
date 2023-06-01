@@ -87,7 +87,6 @@ OC.L10N.register(
     "Description" : "Aprašas",
     "Add a question" : "Pridėti klausimą",
     "Responses are anonymous." : "Atsakymai yra anoniminiai.",
-    "Responses are connected to your Nextcloud account." : "Atsakymai yra susieti su jūsų Nextcloud paskyra.",
     "An asterisk (*) indicates mandatory questions." : "Privalomi klausimai yra pažymėti žvaigždute (*).",
     "Expired {relativeDate}." : "Nustojo galioti {relativeDate}.",
     "Expires {relativeDate}." : "Galioja iki {relativeDate}.",

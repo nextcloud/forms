@@ -75,7 +75,6 @@ OC.L10N.register(
     "Description" : "Descritzione",
     "Add a question" : "Agiunghe una pregonta",
     "Responses are anonymous." : "Is rispostas sunt anònimas.",
-    "Responses are connected to your Nextcloud account." : "Is rispostas sunt connètidas a su contu tuo de Nextcloud.",
     "An asterisk (*) indicates mandatory questions." : "Un'asteriscu (*) inditat is pregontas obligatòrias.",
     "There was an error while adding the new question" : "Ddoe at àpidu un'errore agiunghende sa pregonta noa",
     "There was an error while removing the question" : "Ddoe at àpidu un'errore boghende·nche sa pregonta",

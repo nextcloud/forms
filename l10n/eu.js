@@ -109,7 +109,6 @@ OC.L10N.register(
     "Description" : "Deskripzioa",
     "Add a question" : "Gehitu galdera bat",
     "Responses are anonymous." : "Erantzunak anonimoak dira",
-    "Responses are connected to your Nextcloud account." : "Erantzunak zure Nextcloud kontuari lotzen zaizkio.",
     "An asterisk (*) indicates mandatory questions." : "Asteriskoak (*) nahitaezko galdera dela adierazten du.",
     "Expired {relativeDate}." : "Iraungita {relativeDate}.",
     "Expires {relativeDate}." : "Iraungitze-data {relativeDate}.",

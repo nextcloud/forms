@@ -111,7 +111,6 @@ OC.L10N.register(
     "Description" : "描述",
     "Add a question" : "新增問題",
     "Responses are anonymous." : "回應是匿名的。",
-    "Responses are connected to your Nextcloud account." : "回應已連線到您的 Nextcloud 帳號。",
     "An asterisk (*) indicates mandatory questions." : "星號（*）表示為必填問題。",
     "Expired {relativeDate}." : "已過期 {relativeDate}.",
     "Expires {relativeDate}." : "過期於 {relativeDate}。",

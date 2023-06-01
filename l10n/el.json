@@ -90,7 +90,6 @@
     "Description" : "Περιγραφή",
     "Add a question" : "Προσθήκη ερώτησης",
     "Responses are anonymous." : "Οι απαντήσεις είναι ανώνυμες.",
-    "Responses are connected to your Nextcloud account." : "Οι απαντήσεις συνδέονται στον λογαριασμό σας στο Nextcloud.",
     "An asterisk (*) indicates mandatory questions." : "Ένας αστερίσκος (*) υποδεικνύει τις υποχρεωτικές ερωτήσεις.",
     "There was an error while adding the new question" : "Σφάλμα κατά την προσθήκη νέας ερώτησης",
     "There was an error while removing the question" : "Σφάλμα κατά την αφαίρεση ερώτησης",

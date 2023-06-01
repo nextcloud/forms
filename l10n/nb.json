@@ -73,7 +73,6 @@
     "Description" : "Beskrivelse",
     "Add a question" : "Legg til et spørsmål",
     "Responses are anonymous." : "Besvarelser er anonyme.",
-    "Responses are connected to your Nextcloud account." : "Besvarelser er koblet til din Nextcloud-konto.",
     "An asterisk (*) indicates mandatory questions." : "En stjerne (*) indikerer obligatorisk spørsmål.",
     "There was an error while adding the new question" : "Det oppsto en feil når det nye spørsmålet ble lagt til",
     "There was an error while removing the question" : "Det oppsto en feil ved fjerning av spørsmålet",

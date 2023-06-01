@@ -105,7 +105,6 @@ OC.L10N.register(
     "Description" : "描述",
     "Add a question" : "添加一个新问题",
     "Responses are anonymous." : "所有回应均为匿名",
-    "Responses are connected to your Nextcloud account." : "回应已关联到您的Nextcloud账号",
     "An asterisk (*) indicates mandatory questions." : "“*”表示必填项。",
     "There was an error while adding the new question" : "添加新问题时有一个错误",
     "There was an error while removing the question" : "删除新问题时有一个错误",

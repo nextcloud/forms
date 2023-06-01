@@ -76,7 +76,6 @@ OC.L10N.register(
     "Description" : "الوصف",
     "Add a question" : "إضافة سؤال ",
     "Responses are anonymous." : "الردود مجهولة ",
-    "Responses are connected to your Nextcloud account." : "الردود مربوطة بحسابك على نكست كلاود",
     "An asterisk (*) indicates mandatory questions." : "تشير علامة النجمة (*) إلى الأسئلة الإزامية.",
     "There was an error while adding the new question" : "حدث خطأ أثناء إضافة سؤال جديد ",
     "There was an error while removing the question" : "حدث خطأ أثناء إزالة السؤال ",
