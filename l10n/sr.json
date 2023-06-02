@@ -109,6 +109,7 @@
     "Description" : "Опис",
     "Add a question" : "Додај питање",
     "Responses are anonymous." : "Одговори су анонимни.",
+    "Responses are connected to your account." : "Одговори су везани за ваш налог.",
     "An asterisk (*) indicates mandatory questions." : "Звездица (*) означава обавезна питања.",
     "Expired {relativeDate}." : "Истекао {relativeDate}.",
     "Expires {relativeDate}." : "Истиче {relativeDate}.",
