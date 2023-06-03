@@ -60,6 +60,7 @@ OC.L10N.register(
     "Title of question number {index}" : "第 {index} 个问题的标题",
     "Required" : "必填",
     "Delete question" : "删除问题",
+    "Description (formatting using Markdown is supported)" : "描述（支持使用Markdown格式化）",
     "This question needs a title!" : "你需要为此问题设置一个标题！",
     "Shuffle options" : "随机排列选项",
     "Add a new answer" : "添加新的答复",
