@@ -34,7 +34,33 @@
 			:aria-label="t('forms', 'Drag to reorder the questions')">
 			<IconDragHorizontalVariant :size="20" />
 		</div>
-
+		<NcModal v-if="isModalOpen"
+			size="normal"
+			title="Add multiple options"
+			:out-transition="true"
+			:has-next="false"
+			:has-previous="false"
+			@close="closeModal">
+			<div class="modal__content">
+				<h1>Add multiple options {{ isModalOpen }}</h1>
+				<textarea ref="input"
+					v-model="inputedOptions"
+					:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
+					:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
+					class="question__input"
+					type="text" />
+				<div class="options">
+					<div v-for="(option, i) in multipleOptions" :key="i" class="single_option">
+						<p>{{ option }}</p>
+					</div>
+				</div>
+				<div>
+					<NcButton @click="onMultipleOptions">
+						Add options
+					</NcButton>
+				</div>
+			</div>
+		</NcModal>
 		<!-- Header -->
 		<div class="question__header">
 			<div class="question__header__title">
@@ -67,6 +93,13 @@
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
 					<slot name="actions" />
+					<NcActionButton
+						@click="openModal">
+						<template #icon>
+							<IconContentPaste :size="20" />
+						</template>
+						{{ t('forms', 'Multiple Options') }}
+					</NcActionButton>
 					<NcActionButton @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -99,9 +132,13 @@ import { directive as ClickOutside } from 'v-click-outside'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
+import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import { showError } from '@nextcloud/dialogs'
 
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 
 export default {
@@ -115,9 +152,12 @@ export default {
 		IconAlertCircleOutline,
 		IconDelete,
 		IconDragHorizontalVariant,
+		IconContentPaste,
 		NcActions,
 		NcActionButton,
 		NcActionCheckbox,
+		NcModal,
+		NcButton,
 	},
 
 	inject: ['$markdownit'],
@@ -169,6 +209,13 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			isModalOpen: false,
+			inputedOptions: '',
+		}
+	},
+
 	computed: {
 		/**
 		 * Extend text with asterisk if question is required
@@ -202,6 +249,10 @@ export default {
 		hasDescription() {
 			return this.description !== ''
 		},
+		multipleOptions() {
+			const allOptions = this.inputedOptions.split(/\r?\n/g)
+			return allOptions.filter(answer => { return answer.trim().length > 0 })
+		},
 	},
 	watch: {
 		edit(newEdit) {
@@ -215,6 +266,30 @@ export default {
 		this.$nextTick(() => this.resizeDescription())
 	},
 	methods: {
+		closeModal() {
+			this.isModalOpen = false
+		},
+
+		openModal() {
+			this.isModalOpen = true
+		},
+
+		onMultipleOptions() {
+			this.isModalOpen = false
+			this.$nextTick(() => {
+				this.$emit('update:edit', true)
+				if (this.multipleOptions.length > 1) {
+				// extract all options entries to parent
+					this.$emit('multiple-answers', this.multipleOptions)
+					this.inputedOptions = ''
+					return
+				}
+				// in case of only one option, just show an error message because it is probably missuse of the feature
+				showError(t('forms', 'Options should seperated by new line!'))
+			})
+
+		},
+
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
 		},
@@ -389,6 +464,27 @@ export default {
 			}
 		}
 	}
+}
+.modal__content {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+	}
+.options{
+  display: flex !important;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10px;
+  justify-content: flex-start;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 5px 0px;
+}
+.single_option{
+ width: max-content;
+ padding: 5px;
+ margin: 5px;
+ border: 1px solid var(--color-primary);
 }
 
 </style>

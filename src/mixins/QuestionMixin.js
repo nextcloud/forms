@@ -24,6 +24,7 @@ import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
+import GenRandomId from '../utils/GenRandomId.js'
 
 import logger from '../utils/Logger.js'
 import Question from '../components/Questions/Question.vue'
@@ -262,6 +263,33 @@ export default {
 				logger.error('Error while saving question', { error })
 				showError(t('forms', 'Error while saving question'))
 			}
+		},
+		async handleMultipleOptions(answers) {
+			this.edit = true
+			const options = this.options.slice()
+			for (let i = 0; i < answers.length; i++) {
+				options.push({
+					id: GenRandomId(),
+					questionId: this.id,
+					text: answers[i],
+					local: false,
+				})
+
+				await axios.post(generateOcsUrl('apps/forms/api/v2/option'), {
+					questionId: this.id,
+					text: answers[i],
+				})
+			}
+			options.push({
+				id: GenRandomId(),
+				questionId: this.id,
+				text: '',
+				local: true,
+			})
+			this.updateOptions(options)
+			this.$nextTick(() => {
+				this.focusIndex(options.length - 1)
+			})
 		},
 	},
 }

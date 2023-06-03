@@ -35,6 +35,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@multiple-answers="handleMultipleOptions"
 		@delete="onDelete">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
