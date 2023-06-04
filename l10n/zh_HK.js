@@ -139,7 +139,7 @@ OC.L10N.register(
     "Settings" : "設定",
     "Submitting form …" : "正在遞交表格……",
     "Thank you for completing the form!" : "感謝您填寫表格！",
-    "Submit" : "送出",
+    "Submit" : "遞交",
     "Submit form" : "遞交表格",
     "There was an error submitting the form" : "遞交表格時發生錯誤",
     "Error while saving question" : "儲存問題時發生錯誤",
