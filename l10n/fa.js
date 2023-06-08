@@ -24,6 +24,7 @@ OC.L10N.register(
     "Internal link" : "پیوند داخلی",
     "Edit" : "ویرایش",
     "Share" : "هم‌رسانی",
+    "Toggle settings" : "تعویض تنظیمات",
     "Form title" : "عنوان فرم",
     "Description" : "توضیحات",
     "Add a question" : "پرسشی اضافه کنید",
