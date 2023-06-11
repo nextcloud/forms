@@ -244,9 +244,14 @@ jobs:
 
     services:
       oracle:
-        image: deepdiver/docker-oracle-xe-11g # "wnameless/oracle-xe-11g-r2"
+        image: ghcr.io/gvenzl/oracle-xe:11
         ports:
           - 4444:1521/tcp
+        # Provide passwords and other environment variables to container
+        env:
+          ORACLE_RANDOM_PASSWORD: true
+          APP_USER: autotest
+          APP_USER_PASSWORD: owncloud
 
     steps:
       - name: Checkout server
