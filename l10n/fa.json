@@ -1,31 +1,87 @@
 { "translations": {
     "Forms" : "فرم‌ها",
+    "{user} has shared the form {formTitle} with you" : "{user} فرم {formTitle} را با شما هم‌رسانی کرده است",
+    "{user} has shared the form {formTitle} with group {group}" : "{user} فرم {formTitle} را با گروه {group} هم‌رسانی کرده است",
+    "{user} answered your form {formTitle}" : "{user} به فرم {formTitle} شما پاسخ داد",
     "Anonymous user" : "کاربر ناشناس",
+    "A form has been <strong>shared</strong> with you" : "فرمی با شما <strong>هم‌رسانی</strong> شده است",
+    "Someone <strong>answered</strong> a form" : "فردی به یک فرم <strong>پاسخ داد</strong>",
     "Copy" : "رونوشت",
     "Anonymous response" : "پاسخ ناشناس",
+    "Shared by %s" : "هم‌رسانی شده با %s",
+    "Forms including questions and submissions" : "فرم‌ها شامل پرسش‌ها و پاسخ‌ها می‌شوند",
+    "User ID" : "شناسه کاربر",
+    "User display name" : "نام ظاهری کاربر",
     "Timestamp" : "مهر زمان",
     "responses" : "پاسخ‌ها",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 پرسش‌نامه و نظرسنجی ساده و خودمیزبان",
+    "New form" : "فرم جدید",
+    "Your Forms" : "فرم‌های شما",
     "Shared with you" : "با شما به اشتراک گذاشته شده است",
+    "Loading forms …" : "در حال بارکردن فرم‌ها...",
+    "No forms created yet" : "فرمی تاکنون ساخته نشده",
+    "Create a form" : "فرمی بسازید",
+    "Select a form or create a new one" : "فرمی را انتخاب کرده و یا یکی بسازید",
+    "Please select a form" : "لطفا فرمی را انتخاب کنید",
     "Create new form" : "ایجاد فرم جدید",
+    "An error occurred while loading the forms list" : "خطایی حین بارکردن فهرست فرم‌ها بروز کرد",
+    "Form not found" : "فرم پیدا نشد",
+    "Unable to create a new form" : "ناتوانی در ایجاد یک فرم جدید",
+    "Unable to copy form" : "ناتوانی در رونوشت گرفتن از فرم",
+    "This form does not exist" : "این فرم وجود ندارد",
+    "Form expired" : "فرم منقضی شده است",
+    "This form has expired and is no longer taking answers" : "این فرم منقضی شده و دیگر پاسخی دریافت نمی‌کند",
+    "Form creation" : "ساخت فرم",
+    "Restrict form creation to selected groups" : "محدودسازی ساخت فرم به گروه‌های انتخاب شده",
     "Select groups" : "انتخاب گروه‌ها",
+    "Form sharing" : "هم‌رسانی فرم",
+    "Allow sharing by link" : "اجازه دادن برای هم‌رسانی با پیوند",
+    "Allow sharing to all logged in accounts" : "اجازه دادن برای هم‌رسانی با حساب‌های وارد شده",
+    "Form actions" : "کنش‌های فرم",
+    "Edit form" : "ویرایش فرم",
+    "Share form" : "هم‌رسانی فرم",
+    "Results" : "نتایج",
+    "Copy form" : "رونوشت از فرم",
     "Delete form" : "حذف فرم",
+    "Expired {relativeDate}" : "{relativeDate} منقضی شد",
+    "Expires {relativeDate}" : "{relativeDate} منقضی می‌شود",
+    "An answer for the {index} option" : "پاسخی برای گزینه {index}",
+    "Answer number {index}" : "پاسخ شماره {index}",
+    "Delete answer" : "حذف پاسخ",
+    "Error while saving the answer" : "بروز خطا حین ذخیره پاسخ",
     "Required" : "اجباری",
+    "Delete question" : "حذف پرسش",
+    "Shuffle options" : "در هم ریختن گزینه‌ها",
+    "Add a new answer" : "پاسخ جدیدی بدهید",
+    "No response" : "بدون پاسخ",
+    "Delete this response" : "حذف این پاسخ",
+    "Store responses anonymously" : "ذخیره پاسخ‌ها به صورت ناشناس",
+    "Allow multiple responses per person" : "مجاز بودن فرستادن چند پاسخ توسط یک فرد",
     "Set expiration date" : "تنظیم تاریخ انقضا",
-    "No recommendations. Start typing." : "هیچ توصیه ای نیست شروع به تایپ کنید.",
-    "No elements found." : "عنصری یافت نشد",
+    "No recommendations. Start typing." : "هیچ توصیه‌ای وجود ندارد. شروع به نوشتن کنید.",
+    "No elements found." : "عنصری یافت نشد.",
     "Permissions" : "مجوزها",
+    "View responses" : "نمایش پاسخ‌ها",
     "Delete" : "حذف",
     "Group" : "گروه",
-    "Share link" : "لینک را به اشتراک بگذارید",
-    "Add link" : "افزودن لینک",
+    "Share link" : "هم‌رسانی پیوند",
+    "Add link" : "افزودن پیوند",
     "Copy to clipboard" : "کپی کردن به حافظه موقت",
+    "Remove link" : "حذف پیوند",
+    "Legacy Link" : "پیوند قدیمی",
     "Internal link" : "پیوند داخلی",
+    "View form" : "نمایش فرم",
+    "View" : "نمایش",
     "Edit" : "ویرایش",
+    "Show results" : "نمایش نتایج",
     "Share" : "هم‌رسانی",
     "Toggle settings" : "تعویض تنظیمات",
     "Form title" : "عنوان فرم",
     "Description" : "توضیحات",
     "Add a question" : "پرسشی اضافه کنید",
+    "Responses are anonymous." : "پاسخ‌ها ناشناس هستند.",
+    "Responses are connected to your account." : "پاسخ‌ها به حساب شما متصل هستند.",
+    "An asterisk (*) indicates mandatory questions." : "ستاره (*) نشان‌دهندهٔ اجباری بودن پاسخ است.",
     "Summary" : "چکیده",
     "Responses" : "پاسخ‌ها",
     "Options" : "گزینه‌ها",
@@ -33,7 +89,10 @@
     "Download CSV" : "بارگیری CSV",
     "Sharing" : "هم‌رسانی",
     "Settings" : "تنظیمات",
+    "Submitting form …" : "در حال فرستادن فرم...",
+    "Thank you for completing the form!" : "سپاس از شما برای تکمیل فرم!",
     "Submit" : "ارسال",
+    "Submit form" : "ارسال فرم",
     "Cannot copy, please copy the link manually" : "کپی کردن امکان پذیر نیست ، لطفا پیوند را به صورت دستی کپی کنید",
     "Checkboxes" : "جعبه علامت",
     "This question needs a title and at least one answer!" : "پرسش نایزمند یک عنوان و حداقل یک پاسخ است!",

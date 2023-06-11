@@ -111,6 +111,7 @@ OC.L10N.register(
     "Description" : "Leírás",
     "Add a question" : "Kérdés hozzáadása",
     "Responses are anonymous." : "A válaszok névtelenek.",
+    "Responses are connected to your account." : "A válaszok a fiókjához kapcsolódnak.",
     "An asterisk (*) indicates mandatory questions." : "A csillag (*) kötelező kérdéseket jelöl.",
     "Expired {relativeDate}." : "Lejárt ekkor: {relativeDate}.",
     "Expires {relativeDate}." : "Lejár ekkor: {relativeDate}.",
