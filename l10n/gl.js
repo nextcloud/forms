@@ -87,7 +87,7 @@ OC.L10N.register(
     "Share link" : "Compartir ligazón",
     "Add link" : "Engadir a ligazón",
     "Copy to clipboard" : "Copiar no portapapeis.",
-    "Remove link" : "Eliminar enlace",
+    "Remove link" : "Retirar ligazón",
     "Legacy Link" : "Ligazón de estilo antigo",
     "Form still supports old sharing-link." : "O formulario aínda admite as ligazóns de compartir antigas",
     "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Por compatibilidade con como se compartía antes, a ligazón interna aínda se pode usar como ligazón de compartir. Recomendamos substituír a ligazón pola ligazón de compartir nova.",
