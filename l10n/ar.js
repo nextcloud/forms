@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "نسخ",
     "Anonymous response" : "رد مجهول ",
     "Shared by %s" : "تمت مشاركته مِن قبل %s",
+    "User ID" : "رمز المستخدم",
     "User display name" : "اسم العرض للمستخدم",
     "Timestamp" : "الطابع الزمني ",
     "responses" : "الردود ",
