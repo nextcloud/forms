@@ -111,7 +111,7 @@ OC.L10N.register(
     "Description" : "Beschreibung",
     "Add a question" : "Eine Frage hinzufügen",
     "Responses are anonymous." : "Antworten sind anonym.",
-    "Responses are connected to your account." : "Antworten sind mit Ihrem Konto verknüpft.",
+    "Responses are connected to your account." : "Antworten sind mit Ihrem Konto verbunden.",
     "An asterisk (*) indicates mandatory questions." : "Ein Sternchen (*) kennzeichnet Pflichtfragen.",
     "Expired {relativeDate}." : "Abgelaufen {relativeDate}.",
     "Expires {relativeDate}." : "Läuft ab {relativeDate}.",
