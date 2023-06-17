@@ -22,7 +22,7 @@
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.5",
 		"guzzlehttp/guzzle": "^7.4",
-		"nextcloud/ocp": "^25.0.4",
+		"nextcloud/ocp": "^27.0.0",
 		"phpunit/phpunit": "^9",
 		"psalm/phar": "^5.8"
 	},
