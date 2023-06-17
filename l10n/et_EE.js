@@ -6,6 +6,7 @@ OC.L10N.register(
     "Select groups" : "Vali grupid",
     "Required" : "Kohustuslik",
     "Set expiration date" : "Määra aegumise kuupäev",
+    "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Delete" : "Kustuta",
     "Group" : "Grupp",
     "Share link" : "Jaga link",
@@ -18,6 +19,7 @@ OC.L10N.register(
     "Summary" : "Kokkuvõte",
     "Sharing" : "Jagamine",
     "Settings" : "Seaded",
+    "Submit" : "Saada",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "Date" : "Kuupäev",
     "Time" : "Aeg"
