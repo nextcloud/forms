@@ -1,63 +1,63 @@
 {
-	"name": "forms",
-	"description": "Forms app for nextcloud",
-	"version": "3.3.0",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/nextcloud/forms.git"
-	},
-	"bugs": {
-		"url": "https://github.com/nextcloud/forms/issues"
-	},
-	"homepage": "https://github.com/nextcloud/forms#readme",
-	"license": "AGPL-3.0",
-	"private": true,
-	"scripts": {
-		"build": "NODE_ENV=production webpack --progress --config webpack.js",
-		"dev": "NODE_ENV=development webpack --progress --config webpack.js",
-		"watch": "NODE_ENV=development webpack --progress --watch --config webpack.js",
-		"serve": "NODE_ENV=development webpack serve --progress --config webpack.js",
-		"lint": "eslint --ext .js,.vue src",
-		"lint:fix": "eslint --ext .js,.vue src --fix",
-		"stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
-		"stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
-	},
-	"dependencies": {
-		"@nextcloud/auth": "^2.1.0",
-		"@nextcloud/axios": "^2.3.0",
-		"@nextcloud/dialogs": "^4.0.1",
-		"@nextcloud/event-bus": "^3.1.0",
-		"@nextcloud/initial-state": "^2.0.0",
-		"@nextcloud/l10n": "^2.1.0",
-		"@nextcloud/logger": "^2.5.0",
-		"@nextcloud/moment": "^1.2.1",
-		"@nextcloud/router": "^2.1.2",
-		"@nextcloud/vue": "^7.12.0",
-		"core-js": "^3.31.0",
-		"crypto-js": "^4.1.1",
-		"debounce": "^1.2.1",
-		"markdown-it": "^13.0.1",
-		"p-debounce": "^4.0.0",
-		"p-queue": "^7.3.4",
-		"regenerator-runtime": "^0.13.11",
-		"v-click-outside": "^3.2.0",
-		"vue": "^2.7.14",
-		"vue-material-design-icons": "^5.2.0",
-		"vue-router": "^3.6.5",
-		"vuedraggable": "^2.24.3"
-	},
-	"browserslist": [
-		"extends @nextcloud/browserslist-config"
-	],
-	"engines": {
-		"node": "^16.0.0",
-		"npm": "^7.0.0 || ^8.0.0"
-	},
-	"devDependencies": {
-		"@nextcloud/babel-config": "^1.0.0",
-		"@nextcloud/browserslist-config": "^2.3.0",
-		"@nextcloud/eslint-config": "^8.2.1",
-		"@nextcloud/stylelint-config": "^2.3.0",
-		"@nextcloud/webpack-vue-config": "^5.5.1"
-	}
+  "name": "forms",
+  "description": "Forms app for nextcloud",
+  "version": "3.3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nextcloud/forms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nextcloud/forms/issues"
+  },
+  "homepage": "https://github.com/nextcloud/forms#readme",
+  "license": "AGPL-3.0",
+  "private": true,
+  "scripts": {
+    "build": "NODE_ENV=production webpack --progress --config webpack.js",
+    "dev": "NODE_ENV=development webpack --progress --config webpack.js",
+    "watch": "NODE_ENV=development webpack --progress --watch --config webpack.js",
+    "serve": "NODE_ENV=development webpack serve --progress --config webpack.js",
+    "lint": "eslint --ext .js,.vue src",
+    "lint:fix": "eslint --ext .js,.vue src --fix",
+    "stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
+    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
+  },
+  "dependencies": {
+    "@nextcloud/auth": "^2.1.0",
+    "@nextcloud/axios": "^2.3.0",
+    "@nextcloud/dialogs": "^4.0.1",
+    "@nextcloud/event-bus": "^3.1.0",
+    "@nextcloud/initial-state": "^2.0.0",
+    "@nextcloud/l10n": "^2.1.0",
+    "@nextcloud/logger": "^2.5.0",
+    "@nextcloud/moment": "^1.2.1",
+    "@nextcloud/router": "^2.1.2",
+    "@nextcloud/vue": "^7.12.0",
+    "core-js": "^3.31.0",
+    "crypto-js": "^4.1.1",
+    "debounce": "^1.2.1",
+    "markdown-it": "^13.0.1",
+    "p-debounce": "^4.0.0",
+    "p-queue": "^7.3.4",
+    "regenerator-runtime": "^0.13.11",
+    "v-click-outside": "^3.2.0",
+    "vue": "^2.7.14",
+    "vue-material-design-icons": "^5.2.0",
+    "vue-router": "^3.6.5",
+    "vuedraggable": "^2.24.3"
+  },
+  "browserslist": [
+    "extends @nextcloud/browserslist-config"
+  ],
+  "engines": {
+    "node": "^20.0.0",
+    "npm": "^9.0.0"
+  },
+  "devDependencies": {
+    "@nextcloud/babel-config": "^1.0.0",
+    "@nextcloud/browserslist-config": "^2.3.0",
+    "@nextcloud/eslint-config": "^8.2.1",
+    "@nextcloud/stylelint-config": "^2.3.0",
+    "@nextcloud/webpack-vue-config": "^5.5.1"
+  }
 }
