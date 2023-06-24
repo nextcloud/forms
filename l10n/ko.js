@@ -49,7 +49,7 @@ OC.L10N.register(
     "Submit" : "제출",
     "There was an error submitting the form" : "양식 제출 실패",
     "Error while saving question" : "질문 저장 실패",
-    "Cannot copy, please copy the link manually" : "복사할 수 없습니다, 링크를 수동으로 복사하세요",
+    "Cannot copy, please copy the link manually" : "복사할 수 없습니다, 링크를 수동으로 복사하세요.",
     "Checkboxes" : "체크박스형",
     "Short answer" : "단답형",
     "Date" : "날짜",
