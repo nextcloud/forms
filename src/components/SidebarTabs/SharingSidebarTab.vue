@@ -51,12 +51,12 @@
 				</div>
 				<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 				<NcActions>
-					<NcActionButton @click="copyPublicShareLink($event, share.shareWith)">
+					<NcActionLink :href="getPublicShareLink(share.shareWith)" @click.prevent="copyLink($event, getPublicShareLink(share.shareWith))">
 						<template #icon>
 							<IconCopyAll :size="20" />
 						</template>
 						{{ t('forms', 'Copy to clipboard') }}
-					</NcActionButton>
+					</NcActionLink>
 				</NcActions>
 				<NcActions>
 					<NcActionButton @click="removeShare(share)">
@@ -110,12 +110,12 @@
 				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
 			</div>
 			<NcActions>
-				<NcActionButton @click="copyInternalShareLink($event, form.hash)">
+				<NcActionLink :href="getInternalShareLink(form.hash)" @click.prevent="copyLink($event, getInternalShareLink(form.hash))">
 					<template #icon>
 						<IconCopyAll :size="20" />
 					</template>
 					{{ t('forms', 'Copy to clipboard') }}
-				</NcActionButton>
+				</NcActionLink>
 			</NcActions>
 		</div>
 
@@ -165,6 +165,7 @@ import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple.vue'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
@@ -192,6 +193,7 @@ export default {
 		IconPlus,
 		NcActions,
 		NcActionButton,
+		NcActionLink,
 		NcCheckboxRadioSwitch,
 		SharingSearchDiv,
 		SharingShareDiv,

@@ -25,24 +25,23 @@ import { showError, showSuccess } from '@nextcloud/dialogs'
 export default {
 	methods: {
 		/**
-		 * Copy internal share link
+		 * Get the internal link for sharing the form
 		 *
-		 * @param {object} event Event of origin, calling the function
-		 * @param {string} formHash Internal form-hash for link
+		 * @param {string} formHash Internal form hash
+		 * @return {string} link
 		 */
-		async copyInternalShareLink(event, formHash) {
-			const shareLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${formHash}`)
-			this.copyLink(event, shareLink)
+		getInternalShareLink(formHash) {
+			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
 		},
+
 		/**
-		 * Copy share link for public share
+		 * Get the publish share link for a given share
 		 *
-		 * @param {object} event Event of origin, calling the function
-		 * @param {string} publicHash Hash of public link-share
+		 * @param {string} publicHash The share hash
+		 * @return {string} link
 		 */
-		async copyPublicShareLink(event, publicHash) {
-			const shareLink = window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/s/${publicHash}`)
-			this.copyLink(event, shareLink)
+		getPublicShareLink(publicHash) {
+			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/s/${publicHash}`)
 		},
 
 		/**
