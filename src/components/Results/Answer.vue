@@ -50,7 +50,7 @@ export default {
 
 <style lang="scss" scoped>
 .answer {
-	margin-top: 12px;
+	margin-block-start: 12px;
 	width: 100%;
 
 	&__question-text {

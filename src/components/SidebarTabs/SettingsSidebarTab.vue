@@ -213,6 +213,6 @@ export default {
 }
 
 .settings-div--indent {
-	margin-left: 40px;
+	margin-inline-start: 40px;
 }
 </style>

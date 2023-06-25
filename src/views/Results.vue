@@ -339,50 +339,51 @@ export default {
 	header {
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 24px;
-		margin-left: 56px;
+		margin-block-end: 24px;
+		margin-inline-start: 56px;
 
 		h2 {
-			margin-bottom: 0; // because the input field has enough padding
+			margin-block-end: 0; // because the input field has enough padding
 			font-size: 28px;
 			font-weight: bold;
-			margin-top: 32px;
-			padding-left: 14px;
-			padding-bottom: 8px;
+			margin-block-start: 32px;
+			padding-inline-start: 14px;
+			padding-block-end: 8px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
 
 		p {
-			padding-left: 14px;
+			padding-inline-start: 14px;
 		}
 	}
 
 	.response-actions {
 		display: flex;
 		align-items: center;
-		padding-left: 14px;
+		padding-inline-start: 14px;
 
 		&__radio {
-			margin-right: 8px;
+			margin-inline-end: 8px;
 
 			&__item {
 				border-radius: var(--border-radius-pill);
-				padding: 8px 16px;
+				padding-block: 8px;
+				padding-inline: 16px;
 				font-weight: bold;
 				background-color: var(--color-background-dark);
 
 				&:first-of-type {
-					border-top-right-radius: 0;
-					border-bottom-right-radius: 0;
-					padding-right: 8px;
+					border-start-end-radius: 0;
+					border-end-end-radius: 0;
+					padding-inline-end: 8px;
 				}
 
 				&:last-of-type {
-					border-top-left-radius: 0;
-					border-bottom-left-radius: 0;
-					padding-left: 8px;
+					border-start-start-radius: 0;
+					border-end-start-radius: 0;
+					padding-inline-start: 8px;
 				}
 
 				&--active {

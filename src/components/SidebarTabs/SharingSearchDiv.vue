@@ -302,7 +302,7 @@ export default {
 
 <style lang="scss" scoped>
 	.select {
-		margin-bottom: 8px !important;
+		margin-block-end: 8px !important;
 		width: 100%;
 	}
 </style>

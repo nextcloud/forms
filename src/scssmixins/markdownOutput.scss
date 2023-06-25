@@ -25,12 +25,12 @@
 
 	::v-deep {
 		>:not(:first-child) {
-			margin-top: 1.5em;
+			margin-block-start: 1.5em;
 		}
 
 		blockquote {
-			padding-left: 1em;
-			border-left: 4px solid var(--color-primary-element);
+			padding-inline-start: 1em;
+			border-inline-start: 4px solid var(--color-primary-element);
 			color: var(--color-text-maxcontrast);
 		}
 
@@ -38,18 +38,20 @@
 			white-space: pre-wrap;
 			background-color: var(--color-background-dark);
 			border-radius: var(--border-radius);
-			padding: 1em 1.3em;
+			padding-block: 1em;
+			padding-inline: 1.3em;
 		}
 
 		p code {
 			background-color: var(--color-background-dark);
 			border-radius: var(--border-radius);
-			padding: .1em .3em;
+			padding-block: .1em;
+			padding-inline: .3em;
 		}
 
 		ul, ol {
-			padding-left: 10px;
-			margin-left: 10px;
+			padding-inline-start: 10px;
+			margin-inline-start: 10px;
 		}
 
 		ul {

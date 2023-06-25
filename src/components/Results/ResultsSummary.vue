@@ -169,8 +169,7 @@ export default {
 
 <style lang="scss" scoped>
 .question-summary {
-	padding-left: 44px;
-	padding-right: 16px;
+	padding-inline: 44px 16px;
 
 	h3 {
 		font-weight: bold;
@@ -178,19 +177,20 @@ export default {
 
 	&__detail {
 		color: var(--color-text-lighter);
-		margin-top: -8px;
+		margin-block-start: -8px;
 	}
 
 	&__text,
 	&__statistic {
-		margin-top: 8px;
+		margin-block-start: 8px;
 	}
 
 	&__text {
 		list-style-type: initial;
 
 		li {
-			padding: 4px 0;
+			padding-block: 4px;
+			padding-inline: 0;
 			white-space: pre-line;
 
 			&:first-child {
@@ -204,7 +204,8 @@ export default {
 
 		li {
 			position: relative;
-			padding: 8px 0;
+			padding-block: 8px;
+			padding-inline: 0;
 
 			label {
 				cursor: default;
@@ -221,7 +222,7 @@ export default {
 			meter {
 				display: block;
 				width: 100%;
-				margin-top: 4px;
+				margin-block-start: 4px;
 				background: var(--color-background-dark);
 				height: calc(var(--border-radius) * 2);
 				border-radius: var(--border-radius);
