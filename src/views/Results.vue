@@ -37,7 +37,9 @@
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 		<header v-if="!noSubmissions">
-			<h2>{{ formTitle }}</h2>
+			<h2 dir="auto">
+				{{ formTitle }}
+			</h2>
 			<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
 
 			<!-- View switcher between Summary and Responses -->

@@ -23,7 +23,9 @@
 <template>
 	<div class="section submission">
 		<div class="submission-head">
-			<h3>{{ submission.userDisplayName }}</h3>
+			<h3 dir="auto">
+				{{ submission.userDisplayName }}
+			</h3>
 			<NcActions class="submission-menu" :force-menu="true">
 				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>

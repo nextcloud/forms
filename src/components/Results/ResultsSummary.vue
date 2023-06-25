@@ -22,7 +22,9 @@
 
 <template>
 	<div class="section question-summary">
-		<h3>{{ question.text }}</h3>
+		<h3 dir="auto">
+			{{ question.text }}
+		</h3>
 		<p class="question-summary__detail">
 			{{ answerTypes[question.type].label }}
 		</p>
@@ -52,7 +54,7 @@
 		<ul v-else class="question-summary__text">
 			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 			<!-- eslint-disable-next-line -->
-			<li v-for="answer in textAnswers" :key="answer.id">{{ answer }}</li>
+			<li v-for="answer in textAnswers" :key="answer.id" dir="auto">{{ answer }}</li>
 		</ul>
 	</div>
 </template>

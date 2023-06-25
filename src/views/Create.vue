@@ -46,6 +46,7 @@
 					v-model="form.title"
 					class="form-title"
 					rows="1"
+					dir="auto"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
 					:readonly="!edit"
@@ -61,13 +62,18 @@
 					ref="description"
 					class="form-desc form-desc__input"
 					rows="1"
+					dir="auto"
 					:value="form.description"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.formDescription"
 					@input="updateDescription" />
 			</template>
-			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div v-else class="form-desc form-desc__output" v-html="formDescription" />
+			<!-- eslint-disable vue/no-v-html -->
+			<div v-else
+				class="form-desc form-desc__output"
+				dir="auto"
+				v-html="formDescription" />
+			<!-- eslint-enable vue/no-v-html -->
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}

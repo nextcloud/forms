@@ -44,6 +44,7 @@
 					:value="text"
 					class="question__header__title__text question__header__title__text__input"
 					type="text"
+					dir="auto"
 					minlength="1"
 					:maxlength="maxStringLengths.questionText"
 					required
@@ -51,7 +52,9 @@
 				<h3 v-else
 					:id="titleId"
 					class="question__header__title__text"
-					v-text="computedText" />
+					dir="auto">
+					{{ computedText }}
+				</h3>
 				<div v-if="!edit && !questionValid"
 					v-tooltip.auto="warningInvalid"
 					class="question__header__title__warning"
@@ -87,6 +90,7 @@
 			<div v-if="hasDescription || edit || !questionValid" class="question__header__description">
 				<textarea v-if="edit || !questionValid"
 					ref="description"
+					dir="auto"
 					:value="description"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.questionDescription"

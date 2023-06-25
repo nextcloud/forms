@@ -38,11 +38,15 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<h2 ref="title" class="form-title">
+			<h2 ref="title" class="form-title" dir="auto">
 				{{ formTitle }}
 			</h2>
-			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div v-if="!loading && !success && !!formDescription" class="form-desc" v-html="formDescription" />
+			<!-- eslint-disable vue/no-v-html -->
+			<div v-if="!loading && !success && !!formDescription"
+				class="form-desc"
+				dir="auto"
+				v-html="formDescription" />
+			<!-- eslint-enable vue/no-v-html -->
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}

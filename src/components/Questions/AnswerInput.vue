@@ -12,6 +12,7 @@
 			:maxlength="maxOptionLength"
 			minlength="1"
 			type="text"
+			dir="auto"
 			@input="onInput"
 			@keydown.delete="deleteEntry"
 			@keydown.enter.prevent="addNewEntry">
