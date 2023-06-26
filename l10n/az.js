@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy" : "Kopyala",
     "Shared with you" : "Shared with you",
     "Select groups" : "Qrupları seç",
     "Delete" : "Sil",
