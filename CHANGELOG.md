@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.3.1 - 2023-06-23
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.3.0...3.3.1)
+
+### Fixed
+- Allow to right click share-link buttons to copy link manually [\#1653](https://github.com/nextcloud/forms/pull/1653) ([susnux](https://github.com/susnux))
+
+### Merged
+- Drop 'Nextcloud' from connected responses string [\#1635](https://github.com/nextcloud/forms/pull/1635) ([Chartman123](https://github.com/Chartman123))
+- Translations update
+- Dependencies update
+
 ## 3.3.0 - 2023-05-22
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.2.0...3.3.0)
