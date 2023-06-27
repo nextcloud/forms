@@ -23,6 +23,7 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:name="name"
 		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -33,6 +34,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:name="onNameChange"
 		@delete="onDelete">
 		<div class="question__content">
 			<NcDatetimePicker v-model="time"
@@ -88,6 +90,7 @@ export default {
 		inputAttr() {
 			return {
 				required: this.isRequired,
+				name: this.name || undefined,
 			}
 		},
 	},

@@ -140,6 +140,7 @@ Returns the full-depth object of the requested form (without submissions).
       "type": "dropdown",
       "isRequired": false,
       "text": "Question 1",
+      "name": "something",
       "options": [
         {
           "id": 1,
@@ -160,6 +161,7 @@ Returns the full-depth object of the requested form (without submissions).
       "type": "short",
       "isRequired": true,
       "text": "Question 2",
+      "name": "something_other",
       "options": []
     }
   ],
@@ -242,6 +244,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
   "order": 3,
   "type": "short",
   "isRequired": false,
+  "name": "",
   "text": "",
   "options": []
 }

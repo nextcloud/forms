@@ -48,7 +48,10 @@
 					:maxlength="maxStringLengths.questionText"
 					required
 					@input="onTitleChange">
-				<h3 v-else class="question__header__title__text" v-text="computedText" />
+				<h3 v-else
+					:id="titleId"
+					class="question__header__title__text"
+					v-text="computedText" />
 				<div v-if="!edit && !questionValid"
 					v-tooltip.auto="warningInvalid"
 					class="question__header__title__warning"
@@ -67,6 +70,12 @@
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
 					<slot name="actions" />
+					<NcActionInput :value="name" :label="t('forms', 'Technical name of the question')" @input="onNameChange">
+						<template #icon>
+							<IconIdentifier :size="20" />
+						</template>
+						{{ t('forms', 'Technical name') }}
+					</NcActionInput>
 					<NcActionButton @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -99,10 +108,12 @@ import { directive as ClickOutside } from 'v-click-outside'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
+import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
 
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
+import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
 
 export default {
 	name: 'Question',
@@ -115,9 +126,11 @@ export default {
 		IconAlertCircleOutline,
 		IconDelete,
 		IconDragHorizontalVariant,
+		IconIdentifier,
 		NcActions,
 		NcActionButton,
 		NcActionCheckbox,
+		NcActionInput,
 	},
 
 	inject: ['$markdownit'],
@@ -159,6 +172,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		name: {
+			type: String,
+			default: '',
+		},
 		contentValid: {
 			type: Boolean,
 			default: true,
@@ -199,6 +216,10 @@ export default {
 			return 'q' + this.index + '_actions'
 		},
 
+		titleId() {
+			return 'q' + this.index + '_title'
+		},
+
 		hasDescription() {
 			return this.description !== ''
 		},
@@ -222,6 +243,10 @@ export default {
 		onDescriptionChange({ target }) {
 			this.resizeDescription()
 			this.$emit('update:description', target.value)
+		},
+
+		onNameChange({ target }) {
+			this.$emit('update:name', target.value)
 		},
 
 		onRequiredChange(isRequired) {

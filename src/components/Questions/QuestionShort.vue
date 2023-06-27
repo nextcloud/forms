@@ -23,6 +23,7 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:name="name"
 		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -33,6 +34,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:name="onNameChange"
 		@delete="onDelete">
 		<div class="question__content">
 			<input ref="input"
@@ -44,6 +46,7 @@
 				class="question__input"
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
+				:name="name || undefined"
 				type="text"
 				@input="onInput"
 				@keydown.enter.exact.prevent="onKeydownEnter">

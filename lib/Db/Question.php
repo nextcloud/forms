@@ -46,6 +46,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setText(string $value)
  * @method string getDescription()
  * @method void setDescription(string $value)
+ * @method string getName()
+ * @method void setName(string $value)
  * @method object getExtraSettings()
  * @method void setExtraSettings(object $value)
  */
@@ -55,6 +57,7 @@ class Question extends Entity {
 	protected $type;
 	protected $isRequired;
 	protected $text;
+	protected $name;
 	protected $description;
 	protected $extraSettingsJson;
 
@@ -65,6 +68,7 @@ class Question extends Entity {
 		$this->addType('isRequired', 'bool');
 		$this->addType('text', 'string');
 		$this->addType('description', 'string');
+		$this->addType('name', 'string');
 	}
 
 	public function getExtraSettings(): object {
@@ -87,6 +91,7 @@ class Question extends Entity {
 			'type' => $this->getType(),
 			'isRequired' => (bool)$this->getIsRequired(),
 			'text' => (string)$this->getText(),
+			'name' => (string)$this->getName(),
 			'description' => (string)$this->getDescription(),
 			'extraSettings' => $this->getExtraSettings(),
 		];

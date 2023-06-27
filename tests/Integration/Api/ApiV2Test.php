@@ -70,6 +70,7 @@ class ApiV2Test extends TestCase {
 						'text' => 'First Question?',
 						'description' => 'Please answer this.',
 						'isRequired' => true,
+						'name' => '',
 						'order' => 1,
 						'options' => [],
 						'extraSettings' => (object)[]
@@ -79,6 +80,7 @@ class ApiV2Test extends TestCase {
 						'text' => 'Second Question?',
 						'description' => '',
 						'isRequired' => false,
+						'name' => 'city',
 						'order' => 2,
 						'options' => [
 							[
@@ -170,6 +172,7 @@ class ApiV2Test extends TestCase {
 						'text' => 'Third Question?',
 						'description' => '',
 						'isRequired' => false,
+						'name' => '',
 						'order' => 1,
 						'options' => [],
 						'extraSettings' => (object)[]
@@ -225,6 +228,7 @@ class ApiV2Test extends TestCase {
 						'type' => $qb->createNamedParameter($question['type'], IQueryBuilder::PARAM_STR),
 						'is_required' => $qb->createNamedParameter($question['isRequired'], IQueryBuilder::PARAM_BOOL),
 						'text' => $qb->createNamedParameter($question['text'], IQueryBuilder::PARAM_STR),
+						'name' => $qb->createNamedParameter($question['name'], IQueryBuilder::PARAM_STR),
 						'description' => $qb->createNamedParameter($question['description'], IQueryBuilder::PARAM_STR),
 						'extra_settings_json' => $qb->createNamedParameter(json_encode($question['extraSettings']), IQueryBuilder::PARAM_STR),
 					]);
@@ -524,6 +528,7 @@ class ApiV2Test extends TestCase {
 							'type' => 'short',
 							'text' => 'First Question?',
 							'isRequired' => true,
+							'name' => '',
 							'order' => 1,
 							'options' => [],
 							'description' => 'Please answer this.',
@@ -533,6 +538,7 @@ class ApiV2Test extends TestCase {
 							'type' => 'multiple_unique',
 							'text' => 'Second Question?',
 							'isRequired' => false,
+							'name' => 'city',
 							'order' => 2,
 							'options' => [
 								[
@@ -742,6 +748,7 @@ class ApiV2Test extends TestCase {
 					'type' => 'short',
 					'isRequired' => false,
 					'text' => 'Already some Question?',
+					'name' => '',
 					'options' => [],
 					'description' => '',
 					'extraSettings' => [],
@@ -754,6 +761,7 @@ class ApiV2Test extends TestCase {
 					'type' => 'short',
 					'isRequired' => false,
 					'text' => '',
+					'name' => '',
 					'options' => [],
 					'description' => '',
 					'extraSettings' => [],

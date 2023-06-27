@@ -65,6 +65,14 @@ export default {
 		},
 
 		/**
+		 * Technical name
+		 */
+		name: {
+			type: String,
+			default: '',
+		},
+
+		/**
 		 * The user answers
 		 */
 		values: {
@@ -181,6 +189,16 @@ export default {
 			newSettings[parameter] = value
 			this.$emit('update:extraSettings', newSettings)
 			this.saveQuestionProperty('extraSettings', newSettings)
+		}, 200),
+
+		/**
+		 * Forward the technical-name change to the parent and store to db
+		 *
+		 * @param {string} name The new technical name of the input
+		 */
+		onNameChange: debounce(function(name) {
+			this.$emit('update:name', name)
+			this.saveQuestionProperty('name', name)
 		}, 200),
 
 		/**

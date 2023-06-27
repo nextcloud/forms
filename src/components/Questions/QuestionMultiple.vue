@@ -23,6 +23,7 @@
 <template>
 	<Question v-bind.sync="$attrs"
 		:text="text"
+		:name="name"
 		:description="description"
 		:is-required="isRequired"
 		:edit.sync="edit"
@@ -35,6 +36,7 @@
 		@update:text="onTitleChange"
 		@update:description="onDescriptionChange"
 		@update:isRequired="onRequiredChange"
+		@update:name="onNameChange"
 		@delete="onDelete">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
@@ -43,17 +45,19 @@
 			</NcActionCheckbox>
 		</template>
 		<template v-if="!edit">
-			<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
-				:key="answer.id"
-				:checked.sync="questionValues"
-				:value="answer.id.toString()"
-				:name="`${id}-answer`"
-				:type="isUnique ? 'radio' : 'checkbox'"
-				:required="checkRequired(answer.id)"
-				@update:checked="onChange"
-				@keydown.enter.exact.prevent="onKeydownEnter">
-				{{ answer.text }}
-			</NcCheckboxRadioSwitch>
+			<fieldset :name="name || undefined" :aria-labelledby="titleId">
+				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
+					:key="answer.id"
+					:checked.sync="questionValues"
+					:value="answer.id.toString()"
+					:name="`${id}-answer`"
+					:type="isUnique ? 'radio' : 'checkbox'"
+					:required="checkRequired(answer.id)"
+					@update:checked="onChange"
+					@keydown.enter.exact.prevent="onKeydownEnter">
+					{{ answer.text }}
+				</NcCheckboxRadioSwitch>
+			</fieldset>
 		</template>
 
 		<template v-else>
@@ -148,8 +152,13 @@ export default {
 		shiftDragHandle() {
 			return this.edit && this.options.length !== 0 && !this.isLastEmpty
 		},
+
 		pseudoIcon() {
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
+		},
+
+		titleId() {
+			return `q${this.$attrs.index}_title`
 		},
 	},
 
