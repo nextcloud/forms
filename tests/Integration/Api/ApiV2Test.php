@@ -64,6 +64,7 @@ class ApiV2Test extends TestCase {
 				'submit_multiple' => false,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
+				'submission_message' => 'Back to website',
 				'questions' => [
 					[
 						'type' => 'short',
@@ -166,6 +167,7 @@ class ApiV2Test extends TestCase {
 				'submit_multiple' => false,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
+				'submission_message' => '',
 				'questions' => [
 					[
 						'type' => 'short',
@@ -214,6 +216,7 @@ class ApiV2Test extends TestCase {
 					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL),
 					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
 					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
+					'submission_message' => $qb->createNamedParameter($form['submission_message'], IQueryBuilder::PARAM_STR),
 				]);
 			$qb->executeStatement();
 			$formId = $qb->getLastInsertId();
@@ -471,6 +474,7 @@ class ApiV2Test extends TestCase {
 					'questions' => [],
 					'shares' => [],
 					'submissionCount' => 0,
+					'submissionMessage' => ''
 				]
 			]
 		];
@@ -523,6 +527,7 @@ class ApiV2Test extends TestCase {
 					'lastUpdated' => 123456789,
 					'canSubmit' => true,
 					'permissions' => Constants::PERMISSION_ALL,
+					'submissionMessage' => 'Back to website',
 					'questions' => [
 						[
 							'type' => 'short',

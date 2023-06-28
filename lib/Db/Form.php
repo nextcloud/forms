@@ -52,6 +52,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setShowExpiration(bool $value)
  * @method integer getLastUpdated()
  * @method void setLastUpdated(integer $value)
+ * @method ?string getSubmissionMessage()
+ * @method void setSubmissionMessage(?string $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -64,6 +66,7 @@ class Form extends Entity {
 	protected $isAnonymous;
 	protected $submitMultiple;
 	protected $showExpiration;
+	protected $submissionMessage;
 	protected $lastUpdated;
 
 	/**
@@ -102,7 +105,8 @@ class Form extends Entity {
 			'isAnonymous' => (bool)$this->getIsAnonymous(),
 			'submitMultiple' => (bool)$this->getSubmitMultiple(),
 			'showExpiration' => (bool)$this->getShowExpiration(),
-			'lastUpdated' => (int)$this->getLastUpdated()
+			'lastUpdated' => (int)$this->getLastUpdated(),
+			'submissionMessage' => $this->getSubmissionMessage(),
 		];
 	}
 }

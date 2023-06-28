@@ -64,9 +64,14 @@
 			</template>
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="success || !form.canSubmit"
-			:title="t('forms', 'Thank you for completing the form!')">
+			:title="t('forms', 'Thank you for completing the form!')"
+			:description="form.submissionMessage">
 			<template #icon>
 				<IconCheck :size="64" />
+			</template>
+			<template v-if="submissionMessageHTML" #description>
+				<!-- eslint-disable-next-line vue/no-v-html -->
+				<p class="submission-message" v-html="submissionMessageHTML" />
 			</template>
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="isExpired"
@@ -235,6 +240,16 @@ export default {
 			}
 
 			return message
+		},
+
+		/**
+		 * Rendered HTML of the custom submission message
+		 */
+		submissionMessageHTML() {
+			if (this.form.submissionMessage && (this.success || !this.form.canSubmit)) {
+				return this.markdownit.render(this.form.submissionMessage)
+			}
+			return ''
 		},
 
 		expirationMessage() {
@@ -422,6 +437,11 @@ export default {
 			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
+	}
+
+	.submission-message {
+		@include markdown-output;
+		text-align: center;
 	}
 
 	form {

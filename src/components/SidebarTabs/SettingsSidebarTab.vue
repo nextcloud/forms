@@ -59,6 +59,35 @@
 				{{ t('forms', 'Show expiration date on form') }}
 			</NcCheckboxRadioSwitch>
 		</div>
+		<NcCheckboxRadioSwitch :checked="hasCustomSubmissionMessage"
+			type="switch"
+			@update:checked="onUpdateHasCustomSubmissionMessage">
+			{{ t('forms', 'Custom submission message') }}
+		</NcCheckboxRadioSwitch>
+		<div v-show="hasCustomSubmissionMessage"
+			class="settings-div--indent submission-message"
+			:tabindex="editMessage ? undefined : '0'"
+			@focus="editMessage = true">
+			<textarea v-if="editMessage || !form.submissionMessage"
+				v-click-outside="() => { editMessage = false }"
+				aria-describedby="forms-submission-message-description"
+				:aria-label="t('forms', 'Custom submission message')"
+				:value="form.submissionMessage"
+				:maxlength="maxStringLengths.submissionMessage"
+				:placeholder="t('forms', 'Message to show after a user submitted the form (formatting using Markdown is supported)')"
+				class="submission-message__input"
+				@blur="editMessage = false"
+				@change="onSubmissionMessageChange" />
+			<!-- eslint-disable vue/no-v-html -->
+			<div v-else
+				:aria-label="t('forms', 'Custom submission message')"
+				class="submission-message__output"
+				v-html="submissionMessageHTML" />
+			<!-- eslint-enable vue/no-v-html -->
+			<div id="forms-submission-message-description" class="submission-message__description">
+				{{ t('forms', 'Message to show after a user submitted the form. Please note that the message will not be translated!') }}
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -68,13 +97,22 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadi
 import NcDatetimePicker from '@nextcloud/vue/dist/Components/NcDatetimePicker.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
 
+import { directive as ClickOutside } from 'v-click-outside'
+import { loadState } from '@nextcloud/initial-state'
+
 export default {
 	components: {
 		NcCheckboxRadioSwitch,
 		NcDatetimePicker,
 	},
 
+	directives: {
+		ClickOutside,
+	},
+
 	mixins: [ShareTypes],
+
+	inject: ['$markdownit'],
 
 	props: {
 		form: {
@@ -89,10 +127,20 @@ export default {
 				stringify: this.stringifyDate,
 				parse: this.parseTimestampToDate,
 			},
+			maxStringLengths: loadState('forms', 'maxStringLengths'),
+			/** If custom submission message is shown as input or rendered markdown */
+			editMessage: false,
 		}
 	},
 
 	computed: {
+		/**
+		 * If the form has a custom submission message or the user wants to add one (settings switch)
+		 */
+		hasCustomSubmissionMessage() {
+			return this.form?.submissionMessage !== undefined && this.form?.submissionMessage !== null
+		},
+
 		/**
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
@@ -124,6 +172,12 @@ export default {
 		},
 		expirationDate() {
 			return moment(this.form.expires, 'X').toDate()
+		},
+		/**
+		 * The submission message rendered as HTML
+		 */
+		submissionMessageHTML() {
+			return this.$markdownit.render(this.form.submissionMessage || '')
 		},
 	},
 
@@ -157,6 +211,22 @@ export default {
 		 */
 		onExpirationDateChange(datetime) {
 			this.$emit('update:formProp', 'expires', parseInt(moment(datetime).format('X')))
+		},
+
+		onSubmissionMessageChange({ target }) {
+			this.$emit('update:formProp', 'submissionMessage', target.value)
+		},
+
+		/**
+		 * Enable or disable the whole custom submission message
+		 * Disabled means the value is set to null.
+		 */
+		onUpdateHasCustomSubmissionMessage() {
+			if (this.hasCustomSubmissionMessage) {
+				this.$emit('update:formProp', 'submissionMessage', null)
+			} else {
+				this.$emit('update:formProp', 'submissionMessage', '')
+			}
 		},
 
 		/**
@@ -214,5 +284,33 @@ export default {
 
 .settings-div--indent {
 	margin-inline-start: 40px;
+}
+
+.submission-message {
+	&__description {
+		color: var(--color-text-maxcontrast);
+		font-size: 13px;
+	}
+
+	&__input, &__output {
+		width: 100%;
+		min-height: 100px;
+		line-height: 24px;
+	}
+
+	&__output {
+		@import '../../scssmixins/markdownOutput';
+
+		padding: 12px;
+		margin-block: 3px;
+		border: 2px solid var(--color-border-maxcontrast);
+		border-radius: var(--border-radius-large);
+
+		&:hover {
+			border-color: var(--color-primary-element);
+		}
+
+		@include markdown-output;
+	}
 }
 </style>

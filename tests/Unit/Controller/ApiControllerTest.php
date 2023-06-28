@@ -354,7 +354,8 @@ class ApiControllerTest extends TestCase {
 				'isAnonymous' => false,
 				'submitMultiple' => false,
 				'showExpiration' => false,
-				'lastUpdated' => 123456789
+				'lastUpdated' => 123456789,
+				'submissionMessage' => '',
 			]]
 		];
 	}
