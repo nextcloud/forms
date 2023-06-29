@@ -60,6 +60,8 @@ OC.L10N.register(
     "Drag to reorder the questions" : "اسحب لإعادة ترتيب الأسئلة ",
     "Title of question number {index}" : "رقم عنوان السؤال {index}",
     "Required" : "مطلوب",
+    "Technical name of the question" : "الاسم الفني للسؤال",
+    "Technical name" : "الاسم الفني",
     "Delete question" : "حذف السؤال ",
     "Description (formatting using Markdown is supported)" : "الوصف ( صيغة ماركداون مدعومة أيضاً)",
     "This question needs a title!" : "هذا السؤال بحاجه إلى عنوان!",

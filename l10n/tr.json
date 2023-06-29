@@ -58,6 +58,8 @@
     "Drag to reorder the questions" : "Soru sıralamasını sürükleyerek değiştirebilirsiniz",
     "Title of question number {index}" : "{index} numaralı sorunun başlığı",
     "Required" : "Zorunlu",
+    "Technical name of the question" : "Sorunun teknik adı",
+    "Technical name" : "Teknik ad",
     "Delete question" : "Soruyu sil",
     "Description (formatting using Markdown is supported)" : "Açıklama (Markdown ile biçimlendirilebilir)",
     "This question needs a title!" : "Bu sorunun bir başlığı olmalıdır!",

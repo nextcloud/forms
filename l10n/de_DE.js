@@ -60,6 +60,8 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Ziehen Sie, um die Fragen umzusortieren",
     "Title of question number {index}" : "Titel der Fragenummer {index}",
     "Required" : "Erforderlich",
+    "Technical name of the question" : "Technischer Name der Frage",
+    "Technical name" : "Technischer Name",
     "Delete question" : "Frage löschen",
     "Description (formatting using Markdown is supported)" : "Beschreibung (Formatierung mit Markdown wird unterstützt)",
     "This question needs a title!" : "Diese Frage braucht einen Titel!",

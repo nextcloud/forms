@@ -60,6 +60,8 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Pořadí otázek změníte přetažením",
     "Title of question number {index}" : "Nadpis otázky číslo {index}",
     "Required" : "Vyžadováno",
+    "Technical name of the question" : "Technický název otázky",
+    "Technical name" : "Technický název",
     "Delete question" : "Smazat otázku",
     "Description (formatting using Markdown is supported)" : "Popis (je podporováno formátování pomocí Markdown)",
     "This question needs a title!" : "Tato otázka potřebuje nadpis!",

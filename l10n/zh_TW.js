@@ -60,6 +60,8 @@ OC.L10N.register(
     "Drag to reorder the questions" : "拖曳以重新排序問題",
     "Title of question number {index}" : "問題編號 {index} 的標題",
     "Required" : "必填",
+    "Technical name of the question" : "問題的技術性名稱",
+    "Technical name" : "技術性名稱",
     "Delete question" : "刪除問題",
     "Description (formatting using Markdown is supported)" : "描述（支援使用 Markdown 格式化）",
     "This question needs a title!" : "此問題需要標題！",
