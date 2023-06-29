@@ -193,25 +193,27 @@ class SubmissionServiceTest extends TestCase {
 
 	public function dataWriteCsvToCloud() {
 		return [
-			'rootFolder' => ['', Folder::class, '', 'Some nice Form Title (responses).csv', false],
-			'subFolder' => ['/folder path', Folder::class, '', 'Some nice Form Title (responses).csv', false],
-			'nonCsv-file' => ['/fileName.txt', File::class, 'txt', 'Some nice Form Title (responses).csv', false],
-			'csv-file' => ['/fileName.csv', File::class, 'csv', 'fileName.csv', true],
+			'rootFolder' => ['Some nice Form Title', '', Folder::class, '', 'Some nice Form Title (responses).csv', false],
+			'subFolder' => ['Some nice Form Title', '/folder path', Folder::class, '', 'Some nice Form Title (responses).csv', false],
+			'nonCsv-file' => ['Some nice Form Title', '/fileName.txt', File::class, 'txt', 'Some nice Form Title (responses).csv', false],
+			'csv-file' => ['Some nice Form Title', '/fileName.csv', File::class, 'csv', 'fileName.csv', true],
+			'invalidFormTitle' => ['Form 1 / 2', '', Folder::class, '', 'Form 1 - 2 (responses).csv', false],
 		];
 	}
 
 	/**
 	 * @dataProvider dataWriteCsvToCloud
 	 *
+	 * @param string $formTitle Given form title
 	 * @param string $path Selected user-path (from frontend)
 	 * @param string $pathClass Type of $path - Folder or File
 	 * @param string $pathExtension Extension of the given file within path
 	 * @param string $expectedFileName
 	 * @param bool $fileExists If the file to write into does exist already.
 	 */
-	public function testWriteCsvToCloud(string $path, string $pathClass, string $pathExtension, string $expectedFileName, bool $fileExists) {
+	public function testWriteCsvToCloud(string $formTitle, string $path, string $pathClass, string $pathExtension, string $expectedFileName, bool $fileExists) {
 		// Simple default Form Data here, details are tested in testGetSubmissionsCsv
-		$dataExpectation = $this->setUpSimpleCsvTest();
+		$dataExpectation = $this->setUpSimpleCsvTest($formTitle);
 
 		$fileNode = $this->createMock(File::class);
 		$fileNode->expects($this->once())
@@ -416,7 +418,7 @@ class SubmissionServiceTest extends TestCase {
 	 * @param string $csvText
 	 */
 	public function testGetSubmissionsCsv(array $questions, array $submissions, string $csvText) {
-		$dataExpectation = $this->setUpCsvTest($questions, $submissions, $csvText);
+		$dataExpectation = $this->setUpCsvTest($questions, $submissions, $csvText, 'Some nice Form Title');
 
 		$this->assertEquals([
 			'fileName' => 'Some nice Form Title (responses).csv',
@@ -427,7 +429,7 @@ class SubmissionServiceTest extends TestCase {
 	/**
 	 * Setting up a very simple default CsvTest
 	 */
-	private function setUpSimpleCsvTest(): string {
+	private function setUpSimpleCsvTest(string $formTitle = 'Some nice Form Title'): string {
 		return $this->setUpCsvTest(
 			[
 				// Single Question
@@ -448,18 +450,20 @@ class SubmissionServiceTest extends TestCase {
 			'
 			"User ID","User display name","Timestamp","Question 1"
 			"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1"
-			'
+			',
+			// Form title
+			$formTitle
 		);
 	}
 
 	/**
 	 * Setting up all the mock-data for a full Form incl. Submissions
 	 */
-	private function setUpCsvTest(array $questions, array $submissions, string $csvText): string {
+	private function setUpCsvTest(array $questions, array $submissions, string $csvText, string $formTitle): string {
 		$form = new Form();
 		$form->setId(5);
 		$form->setHash('abcdefg');
-		$form->setTitle('Some nice Form Title');
+		$form->setTitle($formTitle);
 		$this->formMapper->expects($this->any())
 			->method('findByHash')
 			->with('abcdefg')

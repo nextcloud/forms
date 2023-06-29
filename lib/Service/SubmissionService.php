@@ -261,6 +261,8 @@ class SubmissionService {
 
 		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
 		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').csv';
+		// Sanitize file name, replace all invalid characters
+		$fileName = str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
 
 		return [
 			'fileName' => $fileName,
