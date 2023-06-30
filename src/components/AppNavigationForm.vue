@@ -72,12 +72,16 @@
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
 			<NcActionSeparator />
-			<NcActionButton :close-after-click="true" @click="onDeleteForm">
+			<NcActionButton :close-after-click="true" @click="showDeleteDialog = true">
 				<template #icon>
 					<IconDelete :size="20" />
 				</template>
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
+			<NcDialog :open.sync="showDeleteDialog"
+				:name="t('forms', 'Delete form')"
+				:message="t('forms', 'Are you sure you want to delete {title}?', { title: formTitle })"
+				:buttons="buttons" />
 		</template>
 	</NcListItem>
 </template>
@@ -88,6 +92,7 @@ import { showError } from '@nextcloud/dialogs'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionRouter from '@nextcloud/vue/dist/Components/NcActionRouter.js'
 import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator.js'
+import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcListItem from '@nextcloud/vue/dist/Components/NcListItem.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import axios from '@nextcloud/axios'
@@ -98,6 +103,8 @@ import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconPencil from 'vue-material-design-icons/Pencil.vue'
 import IconPoll from 'vue-material-design-icons/Poll.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
+
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 
 import FormsIcon from './Icons/FormsIcon.vue'
 
@@ -117,6 +124,7 @@ export default {
 		NcActionButton,
 		NcActionRouter,
 		NcActionSeparator,
+		NcDialog,
 		NcListItem,
 		NcLoadingIcon,
 	},
@@ -135,6 +143,15 @@ export default {
 	data() {
 		return {
 			loading: false,
+			showDeleteDialog: false,
+			buttons: [
+				{
+					label: t('forms', 'Delete form'),
+					icon: IconDeleteSvg,
+					type: 'error',
+					callback: () => { this.onDeleteForm() },
+				},
+			],
 		}
 	},
 
@@ -216,11 +233,6 @@ export default {
 		},
 
 		async onDeleteForm() {
-			if (!confirm(t('forms', 'Are you sure you want to delete {title}?', { title: this.formTitle }))) {
-				return
-			}
-
-			// All good, let's delete
 			this.loading = true
 			try {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/form/{id}', { id: this.form.id }))
