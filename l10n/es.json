@@ -58,6 +58,8 @@
     "Drag to reorder the questions" : "Pulsa y arrastra para reordenar las preguntas",
     "Title of question number {index}" : "Título de la pregunta número {index}",
     "Required" : "Requerido",
+    "Technical name of the question" : "Nombre técnico de la pregunta",
+    "Technical name" : "Nombre técnico",
     "Delete question" : "Eliminar pregunta",
     "Description (formatting using Markdown is supported)" : "Descripción (utilizar Markdown para formatear está soportado)",
     "This question needs a title!" : "Esta pregunta necesita un título",
