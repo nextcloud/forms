@@ -302,7 +302,7 @@ export default {
 	align-items: stretch;
 	flex-direction: column;
 	justify-content: stretch;
-	margin-bottom: 80px;
+	margin-bottom: 64px;
 	padding-left: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
