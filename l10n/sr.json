@@ -58,6 +58,8 @@
     "Drag to reorder the questions" : "Превуците да преуредите питања",
     "Title of question number {index}" : "Наслов питања {index}",
     "Required" : "Обавезно",
+    "Technical name of the question" : "Техничко име питања",
+    "Technical name" : "Техничко име",
     "Delete question" : "Обриши питање",
     "Description (formatting using Markdown is supported)" : "Опис (подржава се форматирање са Markdown)",
     "This question needs a title!" : "Питање мора да има наслов!",
