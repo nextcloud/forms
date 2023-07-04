@@ -59,6 +59,7 @@ export default {
 
 	&__text {
 		white-space: pre-line;
+		margin-left: 1rem;
 	}
 }
 
