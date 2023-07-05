@@ -23,7 +23,9 @@
 <template>
 	<div class="section submission">
 		<div class="submission-head">
-			<h3>{{ submission.userDisplayName }}</h3>
+			<h3 dir="auto">
+				{{ submission.userDisplayName }}
+			</h3>
 			<NcActions class="submission-menu" :force-menu="true">
 				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>
@@ -119,8 +121,7 @@ export default {
 
 <style lang="scss" scoped>
 .submission {
-	padding-left: 44px;
-	padding-right: 16px;
+	padding-inline: 44px 16px;
 
 	&-head {
 		display: flex;
@@ -137,7 +138,7 @@ export default {
 
 	&-date {
 		color: var(--color-text-lighter);
-		margin-top: -8px;
+		margin-block-start: -8px;
 	}
 }
 </style>

@@ -378,7 +378,7 @@ export default {
 	}
 
 	&--indent {
-		margin-left: 40px;
+		margin-inline-start: 40px;
 	}
 
 	&__avatar {
@@ -413,7 +413,7 @@ export default {
 
 	&__legacy-warning {
 		background-size: 18px;
-		margin-right: 4px;
+		margin-inline-end: 4px;
 		color: var(--color-error)
 	}
 }

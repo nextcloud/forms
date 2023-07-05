@@ -365,25 +365,26 @@ export default {
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
-		margin-left: -2px;
+		margin-inline-start: -2px;
 		z-index: 1;
 	}
 
 	.question__input {
 		width: 100%;
 		position: relative;
-		left: -30px;
-		top: 1px;
-		margin-right: 14px !important;
-		padding-left: 32px !important;
+		inset-inline-start: -30px;
+		inset-block-start: 1px;
+		margin-inline-end: 14px !important;
+		padding-inline-start: 32px !important;
 	}
 
 	.question__label {
 		flex: 1 1 100%;
 		// Overwrite guest page core styles
-		text-align: left !important;
+		text-align: start !important;
 		// Some rounding issues lead to this strange number, so label and answerInput show up a the same position, working on different browsers.
-		padding: 6.5px 0 0 30px;
+		padding-block: 6.5px 0;
+		padding-inline: 30px 0;
 		line-height: 22px;
 		min-height: 34px;
 		height: min-content;
@@ -393,12 +394,11 @@ export default {
 			box-sizing: border-box;
 			// Adjust position manually for proper position to text
 			position: absolute;
-			top: 10px;
+			inset-block-start: 10px;
 			width: 16px;
 			height: 16px;
-			margin-bottom: 0;
-			margin-left: -30px !important;
-			margin-right: 14px !important;
+			margin-inline: -30px 14px !important;
+			margin-block-end: 0;
 		}
 	}
 }

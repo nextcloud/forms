@@ -329,7 +329,7 @@ export default {
 	.question__input {
 		width: 100%;
 		position: relative;
-		margin-right: 46px !important;
+		margin-inline-end: 46px !important;
 	}
 }
 </style>

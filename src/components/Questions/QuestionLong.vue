@@ -43,6 +43,7 @@
 				:disabled="!readOnly"
 				:required="isRequired"
 				:value="values[0]"
+				dir="auto"
 				class="question__text"
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"

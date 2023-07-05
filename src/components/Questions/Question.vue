@@ -44,6 +44,7 @@
 					:value="text"
 					class="question__header__title__text question__header__title__text__input"
 					type="text"
+					dir="auto"
 					minlength="1"
 					:maxlength="maxStringLengths.questionText"
 					required
@@ -51,7 +52,9 @@
 				<h3 v-else
 					:id="titleId"
 					class="question__header__title__text"
-					v-text="computedText" />
+					dir="auto">
+					{{ computedText }}
+				</h3>
 				<div v-if="!edit && !questionValid"
 					v-tooltip.auto="warningInvalid"
 					class="question__header__title__warning"
@@ -87,6 +90,7 @@
 			<div v-if="hasDescription || edit || !questionValid" class="question__header__description">
 				<textarea v-if="edit || !questionValid"
 					ref="description"
+					dir="auto"
 					:value="description"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.questionDescription"
@@ -302,8 +306,8 @@ export default {
 	align-items: stretch;
 	flex-direction: column;
 	justify-content: stretch;
-	margin-bottom: 64px;
-	padding-left: 44px;
+	margin-block-end: 64px;
+	padding-inline-start: 44px;
 	user-select: none;
 	background-color: var(--color-main-background);
 
@@ -314,7 +318,7 @@ export default {
 	&__drag-handle {
 		position: absolute;
 		display: flex;
-		left: 0;
+		inset-inline-start: 0;
 		width: 44px;
 		height: 100%;
 		opacity: .5;
@@ -348,7 +352,7 @@ export default {
 
 	&__header {
 		display: block;
-		padding-bottom: 8px;
+		padding-block-end: 8px;
 		align-items: center;
 		flex: 1 1 100%;
 		justify-content: space-between;
@@ -361,26 +365,28 @@ export default {
 			&__text {
 				flex: 1 1 100%;
 				font-size: 16px !important;
-				padding: 10px 0px;
+				padding-block: 10px;
+				padding-inline: 0px;
 				font-weight: bold;
 				margin: auto !important;
 
 				&__input {
 					position: relative;
-					left: -12px;
-					margin-right: -12px !important;
-					padding-left: 10px !important;
+					inset-inline-start: -12px;
+					margin-inline-end: -12px !important;
+					padding-inline-start: 10px !important;
 				}
 			}
 
 			&__warning {
-				margin: auto 4px auto 12px;
+				margin-block: auto;
+				margin-inline: 4px 12px;
 				color: var(--color-error);
 			}
 
 			&__menu.action-item {
 				position: sticky;
-				top: var(--header-height);
+				inset-block-start: var(--header-height);
 				// above other actions
 				z-index: 50;
 			}
@@ -394,8 +400,9 @@ export default {
 				min-height: 1.5em;
 				border-width: 2px;
 				position: relative;
-				left: -12px;
-				padding: 4px 10px;
+				inset-inline-start: -12px;
+				padding-block: 4px;
+				padding-inline: 10px;
 				resize: none;
 			}
 
@@ -406,11 +413,15 @@ export default {
 				line-height: 1.5em;
 				z-index: inherit;
 				overflow-wrap: break-word;
-				width: calc(100% - 32px); // match with other inputs
+				// match with other inputs
+				width: calc(100% - 32px);
 			}
 			&__output {
-				padding: 6px 0; //compensate border
-				@include markdown-output; // Styling for rendered Output
+				//compensate border
+				padding-block: 6px;
+				padding-inline: 0;
+				// Styling for rendered Output
+				@include markdown-output;
 			}
 		}
 	}

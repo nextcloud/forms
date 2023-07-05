@@ -12,6 +12,7 @@
 			:maxlength="maxOptionLength"
 			minlength="1"
 			type="text"
+			dir="auto"
 			@input="onInput"
 			@keydown.delete="deleteEntry"
 			@keydown.enter.prevent="addNewEntry">
@@ -213,20 +214,20 @@ export default {
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
-		margin-left: -2px;
+		margin-inline-start: -2px;
 		z-index: 1;
 	}
 
 	.question__input {
 		width: 100%;
 		position: relative;
-		margin-right: 2px !important;
+		margin-inline-end: 2px !important;
 
 		&--shifted {
-			left: -30px;
-			top: 1px;
-			margin-right: -30px !important;
-			padding-left: 32px !important;
+			inset-inline-start: -30px;
+			inset-block-start: 1px;
+			margin-inline-end: -30px !important;
+			padding-inline-start: 32px !important;
 		}
 	}
 }

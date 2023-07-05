@@ -46,6 +46,7 @@
 					v-model="form.title"
 					class="form-title"
 					rows="1"
+					dir="auto"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
 					:readonly="!edit"
@@ -61,13 +62,18 @@
 					ref="description"
 					class="form-desc form-desc__input"
 					rows="1"
+					dir="auto"
 					:value="form.description"
 					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
 					:maxlength="maxStringLengths.formDescription"
 					@input="updateDescription" />
 			</template>
-			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div v-else class="form-desc form-desc__output" v-html="formDescription" />
+			<!-- eslint-disable vue/no-v-html -->
+			<div v-else
+				class="form-desc form-desc__output"
+				dir="auto"
+				v-html="formDescription" />
+			<!-- eslint-enable vue/no-v-html -->
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}
@@ -463,8 +469,8 @@ export default {
 	header {
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 24px;
-		margin-left: 56px;
+		margin-block-end: 24px;
+		margin-inline-start: 56px;
 
 		.form-title {
 			font-size: 28px;
@@ -473,8 +479,10 @@ export default {
 			color: var(--color-main-text);
 			min-height: 36px;
 			// padding and margin should be aligned with the submit view (but keep the 2px border in mind)
-			padding: 4px 14px;
-			margin: 22px 0 14px;
+			padding-block: 4px;
+			padding-inline: 14px;
+			margin-block: 22px 14px;
+			margin-inline: 0;
 			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -492,7 +500,8 @@ export default {
 		.info-message {
 			font-size: 100%;
 			min-height: unset;
-			padding: 0px 16px 20px;
+			padding-block: 0px 20px;
+			padding-inline: 16px;
 			width: calc(100% - 56px);
 		}
 
@@ -500,11 +509,12 @@ export default {
 			color: var(--color-text-maxcontrast);
 			line-height: 22px;
 			min-height: 47px; // one line (25px padding + 22px text height)
-			padding-top: 5px; // spacing border<>text
+			padding-block-start: 5px; // spacing border<>text
 			margin: 0px;
 
 			&__input {
-				padding: 3px 14px 18px; // 2px smaller because of border
+				padding-block: 3px 18px; // 2px smaller because of border
+				padding-inline: 14px;
 				resize: none;
 			}
 
@@ -515,7 +525,7 @@ export default {
 		}
 
 		.info-message {
-			margin-top: 4px;
+			margin-block-start: 4px;
 			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
@@ -526,20 +536,20 @@ export default {
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 250px;
+		margin-block-end: 250px;
 
 		.question-menu {
 			position: sticky;
+			inset-block-end: 0px;
+			padding-block-end: 16px;
 			// Above other menus
 			z-index: 55;
-			bottom: 0px;
-			padding-bottom: 16px;
 			display: flex;
 			align-items: center;
 			align-self: flex-start;
 
 			// To align with text
-			margin-left: 44px;
+			margin-inline-start: 44px;
 		}
 	}
 }

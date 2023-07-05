@@ -38,11 +38,15 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<h2 ref="title" class="form-title">
+			<h2 ref="title" class="form-title" dir="auto">
 				{{ formTitle }}
 			</h2>
-			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div v-if="!loading && !success && !!formDescription" class="form-desc" v-html="formDescription" />
+			<!-- eslint-disable vue/no-v-html -->
+			<div v-if="!loading && !success && !!formDescription"
+				class="form-desc"
+				dir="auto"
+				v-html="formDescription" />
+			<!-- eslint-enable vue/no-v-html -->
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}
@@ -306,7 +310,7 @@ export default {
 
 	&--public {
 		// Compensate top-padding for missing topbar
-		padding-top: 50px;
+		padding-block-start: 50px;
 	}
 
 	header,
@@ -319,15 +323,16 @@ export default {
 
 	// Title & description header
 	header {
-		margin-bottom: 24px;
-		margin-left: 56px;
+		margin-block-end: 24px;
+		margin-inline-start: 56px;
 
 		.form-title,
 		.form-desc,
 		.info-message {
 			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			font-size: 100%;
-			padding: 0px 16px;
+			padding-block: 0px;
+			padding-inline: 16px;
 			border: none;
 		}
 		.form-title {
@@ -336,14 +341,15 @@ export default {
 			color: var(--color-main-text);
 			line-height: 34px;
 			min-height: 36px;
-			margin: 32px 0;
-			padding-bottom: 4px;
+			margin-block: 32px;
+			margin-inline: 0;
+			padding-block-end: 4px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
 		.form-desc {
 			line-height: 22px;
-			padding-bottom: 20px;
+			padding-block-end: 20px;
 			resize: none;
 			min-height: 42px;
 			color: var(--color-text-maxcontrast);
@@ -352,8 +358,8 @@ export default {
 		}
 
 		.info-message {
-			padding-bottom: 20px;
-			margin-top: 4px;
+			padding-block-end: 20px;
+			margin-block-start: 4px;
 			resize: none;
 			color: var(--color-text-maxcontrast);
 		}
@@ -362,14 +368,15 @@ export default {
 	form {
 		.question {
 			// Less padding needed as submit view does not have drag handles
-			padding-left: 44px;
+			padding-inline-start: 44px;
 		}
 
 		input[type=submit] {
 			align-self: flex-end;
 			margin: 5px;
-			margin-bottom: 160px;
-			padding: 10px 20px;
+			margin-block-end: 160px;
+			padding-block: 10px;
+			padding-inline: 20px;
 		}
 	}
 }

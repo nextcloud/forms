@@ -142,7 +142,7 @@ export default {
 
 h3 {
 	font-weight: bold;
-	margin-left: 8px;
-	margin-bottom: 8px;
+	margin-inline-start: 8px;
+	margin-block-end: 8px;
 }
 </style>

@@ -156,7 +156,7 @@ export default {
 <style lang="scss" scoped>
 .forms-settings {
 	&__creation__switch {
-		margin-bottom: 4px;
+		margin-block-end: 4px;
 	}
 
 	&__creation__multiselect {
