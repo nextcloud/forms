@@ -60,6 +60,8 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Перетащите, чтобы изменить порядок вопросов",
     "Title of question number {index}" : "Заголовок вопроса номер {index}",
     "Required" : "Обязательно",
+    "Technical name of the question" : "Техническое название вопроса",
+    "Technical name" : "Техническое название",
     "Delete question" : "Удалить вопрос",
     "Description (formatting using Markdown is supported)" : "Описание (поддерживается форматирование с использованием Markdown)",
     "This question needs a title!" : "Необходимо задать название вопроса.",
