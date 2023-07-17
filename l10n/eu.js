@@ -59,6 +59,8 @@ OC.L10N.register(
     "Drag to reorder the questions" : "Arrastatu galderak berrordenatzeko",
     "Title of question number {index}" : "{index}. galderaren izenburua",
     "Required" : "Beharrezkoa",
+    "Technical name of the question" : "Galderaren izen teknikoa",
+    "Technical name" : "Izen teknikoa",
     "Delete question" : "Ezabatu galdera",
     "This question needs a title!" : "Galdera honek izenburua behar du!",
     "Shuffle options" : "Ausaztu aukerak",
