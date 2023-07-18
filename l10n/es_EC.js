@@ -15,6 +15,7 @@ OC.L10N.register(
     "Share" : "Compartir",
     "Description" : "Descripción",
     "Summary" : "Resumen",
+    "Options" : "Opciones",
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Submit" : "Enviar",
