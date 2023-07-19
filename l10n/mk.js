@@ -47,6 +47,7 @@ OC.L10N.register(
     "Expires on {date}" : "Истекува на {date}",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
     "No elements found." : "Нема пронајдено елементи.",
+    "Permissions" : "Дозволи",
     "Delete" : "Избриши",
     "Group" : "Група",
     "Share link" : "Сподели линк",
