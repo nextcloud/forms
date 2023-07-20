@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Copy" : "Copiar",
+    "User ID" : "ID de usuario",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
     "Results" : "Resultados",
@@ -14,6 +15,7 @@ OC.L10N.register(
     "Group" : "Grupo",
     "Share link" : "Compartir liga",
     "Copy to clipboard" : "Copiar al portapapeles",
+    "Remove link" : "Eliminar enlace",
     "Internal link" : "Enlace interno",
     "View" : "Ver",
     "Edit" : "Editar",

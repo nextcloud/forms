@@ -59,7 +59,7 @@ OC.L10N.register(
     "Question number {index}" : "Pregunta número {index}",
     "Drag to reorder the questions" : "Arrastre para reordenar as preguntas",
     "Title of question number {index}" : "Título da pregunta número {index}",
-    "Required" : "Obrigatorio",
+    "Required" : "Precisase",
     "Technical name of the question" : "Nome técnico da pregunta",
     "Technical name" : "Denominación técnica",
     "Delete question" : "Eliminar a pregunta",
