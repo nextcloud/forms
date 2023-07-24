@@ -252,6 +252,12 @@ jobs:
           ORACLE_RANDOM_PASSWORD: true
           APP_USER: autotest
           APP_USER_PASSWORD: owncloud
+        # Provide healthcheck script options for startup
+        options: >-
+          --health-cmd healthcheck.sh
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Checkout server
