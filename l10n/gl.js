@@ -136,7 +136,7 @@ OC.L10N.register(
     "There was an error while removing this response" : "Produciuse un erro ao retirar esta resposta",
     "Are you sure you want to delete all responses of {title}?" : "Confirma que quere eliminar todas as respostas de {title}?",
     "There was an error while removing responses" : "Produciuse un erro ao retirar as respostas",
-    "Form settings" : "Configuración do formulario",
+    "Form settings" : "Axustes de Formulario",
     "Sharing" : "Compartindo",
     "Settings" : "Axustes",
     "Submitting form …" : "Enviando o formulario…",
