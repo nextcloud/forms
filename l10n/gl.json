@@ -72,7 +72,7 @@
     "Delete this response" : "Eliminar resta resposta",
     "Store responses anonymously" : "Almacenar respostas anonimamente",
     "Allow multiple responses per person" : "Permitir respostas múltiples por persoa",
-    "Set expiration date" : "Definir a data de caducidade",
+    "Set expiration date" : "Estabelecer a data de caducidade",
     "Show expiration date on form" : "Amosar a data de caducidade no formulario",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Non é posíbel controlar isto se o formulario ten unha ligazón pública ou almacena respostas anonimamente.",
     "Expired on {date}" : "Caducou o {date}",
