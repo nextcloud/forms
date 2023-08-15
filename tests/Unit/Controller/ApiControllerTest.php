@@ -357,6 +357,7 @@ class ApiControllerTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
 				'submissionMessage' => '',
@@ -470,6 +471,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false
 				],
 				'new' => [
@@ -485,6 +487,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false
 				]
 			]

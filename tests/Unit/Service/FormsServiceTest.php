@@ -161,6 +161,7 @@ class FormsServiceTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
 				'canSubmit' => true,
@@ -239,6 +240,7 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setAllowEdit(false);
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 
@@ -413,6 +415,7 @@ class FormsServiceTest extends TestCase {
 				'lastUpdated' => 123456789,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'showExpiration' => false,
 				'canSubmit' => true,
 				'questions' => [],
@@ -445,6 +448,7 @@ class FormsServiceTest extends TestCase {
 		$form->setLastUpdated(123456789);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setAllowEdit(false);
 		$form->setShowExpiration(false);
 
 		// User & Group Formatting
@@ -738,24 +742,28 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'participantsArray' => ['currentUser'],
 				'expected' => true
 			],
 			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'participantsArray' => ['notCurrentUser'],
 				'expected' => true
 			],
 			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'participantsArray' => ['notCurrentUser', 'currentUser'],
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'participantsArray' => ['currentUser'],
 				'expected' => true
 			]
@@ -766,10 +774,11 @@ class FormsServiceTest extends TestCase {
 	 *
 	 * @param string $ownerId
 	 * @param bool $submitMultiple
+	 * @param bool $allowEdit
 	 * @param array $participantsArray
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitMultiple, array $participantsArray, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $allowEdit, array $participantsArray, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -778,6 +787,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setOwnerId($ownerId);
 		$form->setSubmitMultiple($submitMultiple);
+        $form->setAllowEdit($allowEdit);
 
 		$this->submissionMapper->expects($this->any())
 			->method('findParticipantsByForm')
