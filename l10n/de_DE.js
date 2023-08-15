@@ -84,6 +84,7 @@ OC.L10N.register(
     "Delete this response" : "Diese Antwort löschen",
     "Store responses anonymously" : "Antworten anonym speichern",
     "Allow multiple responses per person" : "Erlaube mehrere Antworten pro Person",
+    "Allow editing and deleting responses per person" : "Erlaube die Antworten zu bearbeiten und zu löschen",
     "Set expiration date" : "Ablaufdatum setzen",
     "Show expiration date on form" : "Ablaufdatum auf dem Formular anzeigen",
     "Custom submission message" : "Benutzerdefinierte Übermittlungsnachricht",
