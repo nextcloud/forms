@@ -1,5 +1,8 @@
 # Changelog
 
+### Enhancements
+- TODO: allow editing and deletion of responses
+
 ## v4.0.0 - 2023-12-12
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.0...v4.0.0)

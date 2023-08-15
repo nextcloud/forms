@@ -212,6 +212,7 @@ class ApiController extends OCSController {
 			'showToAllUsers' => false,
 		]);
 		$form->setSubmitMultiple(false);
+		$form->setAllowEdit(false);
 		$form->setShowExpiration(false);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
