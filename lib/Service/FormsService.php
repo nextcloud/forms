@@ -26,6 +26,7 @@ namespace OCA\Forms\Service;
 
 use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
@@ -59,6 +60,7 @@ class FormsService {
 		private QuestionMapper $questionMapper,
 		private ShareMapper $shareMapper,
 		private SubmissionMapper $submissionMapper,
+		private AnswerMapper $answerMapper,
 		private ConfigService $configService,
 		private IGroupManager $groupManager,
 		private LoggerInterface $logger,
@@ -99,6 +101,25 @@ class FormsService {
 		}
 	}
 
+	private function getAnswers(int $formId, string $userId): array {
+
+		$submissionList = [];
+		try {
+			$submissionEntities = $this->submissionMapper->findByForm($formId);
+			foreach ($submissionEntities as $submissionEntity) {
+				$submission = $submissionEntity->read();
+				if ($submission['userId'] == $userId) {
+					$answerEntities = $this->answerMapper->findBySubmission($submission['id']);
+					return $answerEntities;
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			// Just ignore, if no Data
+		}
+
+		return array();
+	}
+
 	/**
 	 * Load questions corresponding to form
 	 *
@@ -106,12 +127,25 @@ class FormsService {
 	 * @return array
 	 */
 	public function getQuestions(int $formId): array {
+
+		$answerEntities = NULL;
+		if ($this->currentUser->getUID()) {
+			$answerEntities = $this->getAnswers($formId, $this->currentUser->getUID());
+		}
 		$questionList = [];
 		try {
 			$questionEntities = $this->questionMapper->findByForm($formId);
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
 				$question['options'] = $this->getOptions($question['id']);
+				if ($answerEntities) {
+					foreach ($answerEntities as $answerEntity) {
+						$answer = $answerEntity->read();
+						if ($answer['questionId'] == $question['id']) {
+							$question['value'] = $answer['text'];
+						}
+					}
+				}
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {
@@ -279,8 +313,8 @@ class FormsService {
 			return true;
 		}
 
-		// Refuse access, if SubmitMultiple is not set and user already has taken part.
-		if (!$form->getSubmitMultiple()) {
+		// Refuse access, if SubmitMultiple is not set and AllowEdit is not set and user already has taken part.
+		if (!$form->getSubmitMultiple() && !$form->getAllowEdit()) {
 			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
 			foreach ($participants as $participant) {
 				if ($participant === $this->currentUser->getUID()) {
