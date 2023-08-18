@@ -101,6 +101,7 @@ class FormsServiceTest extends TestCase {
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
+		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
@@ -126,6 +127,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -589,6 +591,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -832,6 +835,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -992,6 +996,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
