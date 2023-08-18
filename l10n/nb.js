@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopi",
     "Anonymous response" : "Anonymt svar",
     "Shared by %s" : "Delt av %s",
+    "User ID" : "Bruker-ID",
     "User display name" : "Brukers visningsnavn",
     "Timestamp" : "Tidsstempel",
     "responses" : "svar",
