@@ -309,7 +309,11 @@ class SubmissionService {
 			$questionAnswered = array_key_exists($questionId, $answers);
 
 			// Check if all required questions have an answer
-			if ($question['isRequired'] && (!$questionAnswered || !array_filter($answers[$questionId], 'strlen'))) {
+			if ($question['isRequired'] &&
+				(!$questionAnswered ||
+				!array_filter($answers[$questionId], 'strlen') ||
+				(!empty($question['extraSettings']->allowOtherAnswer) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
+			) {
 				return false;
 			}
 
@@ -328,9 +332,9 @@ class SubmissionService {
 					!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
 					return false;
 				}
-	
+
 				// Check if all answers are within the possible options
-				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']->allowOtherAnswer)) {
 					foreach ($answers[$questionId] as $answer) {
 						// Search corresponding option, return false if non-existent
 						if (array_search($answer, array_column($question['options'], 'id')) === false) {

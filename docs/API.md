@@ -152,7 +152,8 @@ Returns the full-depth object of the requested form (without submissions).
           "questionId": 1,
           "text": "Option 2"
         }
-      ]
+      ],
+      "extraSettings": {}
     },
     {
       "id": 2,
@@ -162,7 +163,8 @@ Returns the full-depth object of the requested form (without submissions).
       "isRequired": true,
       "text": "Question 2",
       "name": "something_other",
-      "options": []
+      "options": [],
+      "extraSettings": {}
     }
   ],
   "shares": [
@@ -247,6 +249,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
   "name": "",
   "text": "",
   "options": []
+  "extraSettings": {}
 }
 ```
 
@@ -478,7 +481,8 @@ Get all Submissions to a Form
           "questionId": 1,
           "text": "Option 3"
         }
-      ]
+      ],
+      "extraSettings": {}
     },
     {
       "id": 2,
@@ -487,7 +491,8 @@ Get all Submissions to a Form
       "type": "short",
       "isRequired": true,
       "text": "Question 2",
-      "options": []
+      "options": [],
+      "extraSettings": {}
     }
   ]
 }

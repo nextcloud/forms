@@ -24,8 +24,8 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Service;
 
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
-
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -561,6 +561,20 @@ class SubmissionServiceTest extends TestCase {
 				// Expected Result
 				false
 			],
+			'required-empty-other-answer' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => (object)['allowOtherAnswer' => true], 'options' => [
+						['id' => 3]
+					]]
+				],
+				// Answers
+				[
+					'1' => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX]
+				],
+				// Expected Result
+				false
+			],
 			'more-than-allowed' => [
 				// Questions
 				[
@@ -587,6 +601,21 @@ class SubmissionServiceTest extends TestCase {
 				// Answers
 				[
 					'1' => [3,10]
+				],
+				// Expected Result
+				false
+			],
+			'other-answer-not-allowed' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				// Answers
+				[
+					'1' => [3, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer']
 				],
 				// Expected Result
 				false
@@ -635,6 +664,9 @@ class SubmissionServiceTest extends TestCase {
 						['id' => 6]
 					]],
 					['id' => 8, 'type' => 'time', 'isRequired' => false],
+					['id' => 9, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => (object)['allowOtherAnswer' => true], 'options' => [
+						['id' => 3]
+					]],
 				],
 				// Answers
 				[
@@ -645,7 +677,8 @@ class SubmissionServiceTest extends TestCase {
 					'5' => [1,2],
 					'6' => [4],
 					'7' => [5],
-					'8' => ['17:45']
+					'8' => ['17:45'],
+					'9' => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer']
 				],
 				// Expected Result
 				true

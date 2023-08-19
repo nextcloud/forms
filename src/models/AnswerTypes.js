@@ -70,6 +70,8 @@ export default {
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
+		createPlaceholder: t('forms', 'People can submit a different answer'),
+		submitPlaceholder: t('forms', 'Enter your answer'),
 		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
 	},
 
@@ -81,6 +83,8 @@ export default {
 		validate: question => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Radio buttons question title'),
+		createPlaceholder: t('forms', 'People can submit a different answer'),
+		submitPlaceholder: t('forms', 'Enter your answer'),
 		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
 
 		// Using the same vue-component as multiple, this specifies that the component renders as multiple_unique.

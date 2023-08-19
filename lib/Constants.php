@@ -131,4 +131,9 @@ class Constants {
 	 */
 	public const EMPTY_NOTFOUND = 'notfound';
 	public const EMPTY_EXPIRED = 'expired';
+
+	/**
+	 * Constants related to extra settings for questions
+	 */
+	public const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:';
 }

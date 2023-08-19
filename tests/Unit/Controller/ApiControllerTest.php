@@ -46,6 +46,7 @@ function time($expected = null) {
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -490,6 +491,7 @@ class ApiControllerTest extends TestCase {
 			]
 		];
 	}
+
 	/**
 	 * @dataProvider dataCloneForm()
 	 */
@@ -552,5 +554,119 @@ class ApiControllerTest extends TestCase {
 			->with(14)
 			->willReturn(new DataResponse('success'));
 		$this->assertEquals(new DataResponse('success'), $apiController->cloneForm(7));
+	}
+
+	private function formAccess(bool $hasUserAccess = true, bool $hasFormExpired = false, bool $canSubmit = true) {
+		$this->formsService
+			->method('hasUserAccess')
+			->with(1)
+			->willReturn($hasUserAccess);
+
+		$this->formsService
+			->method('hasFormExpired')
+			->with(1)
+			->willReturn($hasFormExpired);
+
+		$this->formsService
+			->method('canSubmit')
+			->with(1)
+			->willReturn($canSubmit);
+	}
+
+	public function testInsertSubmission_answers() {
+		$form = new Form();
+		$form->setId(1);
+
+		$questions = [
+			[
+				'id' => 2,
+				'type' => Constants::ANSWER_TYPE_MULTIPLE,
+				'extraSettings' => (object)['allowOtherAnswer' => true],
+				'options' => [
+					['id' => 1, 'text' => 'test id 1'],
+					['id' => 2, 'text' => 'test id 2'],
+				],
+			],
+			[
+				'id' => 3,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+			],
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_MULTIPLE,
+				'options' => [
+					['id' => 3, 'text' => 'test id 3'],
+					['id' => 4, 'text' => 'test id 4'],
+				],
+			],
+		];
+
+		$answers = [
+			1 => ['3'],
+			2 => ['2', '5', Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer'],
+			3 => ['short anwer'],
+			4 => ['ignore unknown question'],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn($questions);
+
+		$this->formAccess();
+
+		$this->submissionService
+			->method('validateSubmission')
+			->willReturn(true);
+
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function ($submission) {
+				$submission->setId(12);
+				return true;
+			}));
+
+		$this->answerMapper->expects($this->exactly(4))
+			->method('insert')
+			->with($this->callback(function ($answer) {
+				if ($answer->getSubmissionId() !== 12) {
+					return false;
+				}
+
+				switch ($answer->getQuestionId()) {
+					case 1:
+						if ($answer->getText() !== 'test id 3') {
+							return false;
+						}
+						break;
+					case 2:
+						if (!in_array($answer->getText(), ['other answer', 'test id 2'])) {
+							return false;
+						}
+						break;
+					case 3:
+						if ($answer->getText() !== 'short anwer') {
+							return false;
+						}
+						break;
+				}
+
+				return true;
+			}));
+
+		$this->formsService->expects($this->once())
+			->method('setLastUpdatedTimestamp')
+			->with(1);
+
+		$this->activityManager->expects($this->once())
+			->method('publishNewSubmission')
+			->with($form, 'currentUser');
+
+		$this->apiController->insertSubmission(1, $answers, '');
 	}
 }
