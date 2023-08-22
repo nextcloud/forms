@@ -22,7 +22,7 @@
 
 <template>
 	<NcContent app-name="forms" class="forms-emptycontent">
-		<NcEmptyContent :title="currentModel.title"
+		<NcEmptyContent :name="currentModel.title"
 			:description="currentModel.description">
 			<template #icon>
 				<Icon :is="currentModel.icon" :size="64" />

@@ -24,7 +24,7 @@
 
 <template>
 	<NcAppContent v-if="isLoadingForm">
-		<NcEmptyContent :title="t('forms', 'Loading {title} …', { title: form.title })">
+		<NcEmptyContent :name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -105,7 +105,7 @@
 			<div class="question-menu">
 				<NcActions ref="questionMenu"
 					:open.sync="questionMenuOpened"
-					:menu-title="t('forms', 'Add a question')"
+					:menu-name="t('forms', 'Add a question')"
 					:aria-label="t('forms', 'Add a question')"
 					:primary="true">
 					<template #icon>

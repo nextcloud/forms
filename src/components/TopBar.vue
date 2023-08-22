@@ -198,7 +198,7 @@ export default {
 	align-items: center;
 	align-self: flex-end;
 	justify-content: flex-end;
-	padding: calc(var(--default-grid-baseline, 4px) * 2);
+	padding: var(--app-navigation-padding);
 
 	&__view-select {
 		display: flex;

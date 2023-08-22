@@ -22,7 +22,7 @@
 
 <template>
 	<NcAppContent v-if="isLoadingForm">
-		<NcEmptyContent :title="t('forms', 'Loading {title} …', { title: form.title })">
+		<NcEmptyContent :name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -58,13 +58,13 @@
 		</header>
 
 		<NcEmptyContent v-if="loading"
-			:title="t('forms', 'Submitting form …')">
+			:name="t('forms', 'Submitting form …')">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="success || !form.canSubmit"
-			:title="t('forms', 'Thank you for completing the form!')"
+			:name="t('forms', 'Thank you for completing the form!')"
 			:description="form.submissionMessage">
 			<template #icon>
 				<IconCheck :size="64" />
@@ -75,7 +75,7 @@
 			</template>
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="isExpired"
-			:title="t('forms', 'Form expired')"
+			:name="t('forms', 'Form expired')"
 			:description="t('forms', 'This form has expired and is no longer taking answers')">
 			<template #icon>
 				<IconCheck :size="64" />

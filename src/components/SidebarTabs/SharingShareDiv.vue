@@ -31,7 +31,7 @@
 			<span>{{ displayNameAppendix }}</span>
 		</div>
 		<NcActions class="share-div__actions">
-			<NcActionCaption :title="t('forms', 'Permissions')" />
+			<NcActionCaption :name="t('forms', 'Permissions')" />
 			<NcActionCheckbox :checked="canAccessResults" @update:checked="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>

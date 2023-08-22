@@ -23,7 +23,7 @@
 <template>
 	<NcAppSidebar v-show="sidebarOpened"
 		:active="active"
-		:title="t('forms', 'Form settings')"
+		:name="t('forms', 'Form settings')"
 		@close="onClose"
 		@update:active="onUpdateActive">
 		<NcAppSidebarTab id="forms-sharing"

@@ -22,7 +22,7 @@
 
 <template>
 	<div>
-		<NcSettingsSection :title="t('forms', 'Form creation')">
+		<NcSettingsSection :name="t('forms', 'Form creation')">
 			<NcCheckboxRadioSwitch ref="switchRestrictCreation"
 				:checked.sync="appConfig.restrictCreation"
 				class="forms-settings__creation__switch"
@@ -39,7 +39,7 @@
 				label="displayName"
 				@input="onCreationAllowedGroupsChange" />
 		</NcSettingsSection>
-		<NcSettingsSection :title="t('forms', 'Form sharing')">
+		<NcSettingsSection :name="t('forms', 'Form sharing')">
 			<NcCheckboxRadioSwitch ref="switchAllowPublicLink"
 				:checked.sync="appConfig.allowPublicLink"
 				type="switch"

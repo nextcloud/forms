@@ -24,7 +24,7 @@
 
 <template>
 	<NcAppContent v-if="loadingResults">
-		<NcEmptyContent :title="t('forms', 'Loading responses …')">
+		<NcEmptyContent :name="t('forms', 'Loading responses …')">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -95,7 +95,7 @@
 
 		<!-- No submissions -->
 		<section v-if="noSubmissions">
-			<NcEmptyContent :title="t('forms', 'No responses yet')"
+			<NcEmptyContent :name="t('forms', 'No responses yet')"
 				:description="t('forms', 'Results of submitted forms will show up here')">
 				<template #icon>
 					<IconPoll :size="64" />
