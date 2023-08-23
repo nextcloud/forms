@@ -103,21 +103,39 @@ class FormsService {
 
 	private function getAnswers(int $formId, string $userId): array {
 
-		$submissionList = [];
 		try {
-			$submissionEntities = $this->submissionMapper->findByForm($formId);
+			$submissionEntities = $this->submissionMapper->findByFormAndUser($formId, $userId);
+			// we will only use the first submissionEntity
 			foreach ($submissionEntities as $submissionEntity) {
+				$answerList = [];
 				$submission = $submissionEntity->read();
-				if ($submission['userId'] == $userId) {
-					$answerEntities = $this->answerMapper->findBySubmission($submission['id']);
-					return $answerEntities;
+				$answerEntities = $this->answerMapper->findBySubmission($submission['id']);
+				foreach ($answerEntities as $answerEntity) {
+					$answer = $answerEntity->read();
+					$questionId = $answer['questionId'];
+					if (!array_key_exists($questionId, $answerList)) {
+						$answerList[$questionId] = array();
+					}
+					$options = $this->getOptions($answer['questionId']);
+					if (!empty($options)) {
+						error_log(print_r($options,true));
+						// match option text to option index
+						foreach ($options as $option) {
+							if ($option['text'] == $answer['text']) {
+								$answerList[$questionId][] = $option['id'];
+							}
+						}
+					} else {
+						// copy the text
+						$answerList[$questionId][] = $answer['text'];
+					}
 				}
+				return $answerList;
 			}
 		} catch (DoesNotExistException $e) {
 			// Just ignore, if no Data
 		}
-
-		return array();
+		return [];
 	}
 
 	/**
@@ -128,24 +146,12 @@ class FormsService {
 	 */
 	public function getQuestions(int $formId): array {
 
-		$answerEntities = NULL;
-		if ($this->currentUser->getUID()) {
-			$answerEntities = $this->getAnswers($formId, $this->currentUser->getUID());
-		}
 		$questionList = [];
 		try {
 			$questionEntities = $this->questionMapper->findByForm($formId);
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
 				$question['options'] = $this->getOptions($question['id']);
-				if ($answerEntities) {
-					foreach ($answerEntities as $answerEntity) {
-						$answer = $answerEntity->read();
-						if ($answer['questionId'] == $question['id']) {
-							$question['value'] = $answer['text'];
-						}
-					}
-				}
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {
@@ -184,6 +190,11 @@ class FormsService {
 	public function getForm(Form $form): array {
 		$result = $form->read();
 		$result['questions'] = $this->getQuestions($form->getId());
+
+		if ($this->currentUser->getUID()) {
+			$result['answers'] = $this->getAnswers($form->getId(), $this->currentUser->getUID());
+		}
+
 		$result['shares'] = $this->getShares($form->getId());
 
 		// Append permissions for current user.

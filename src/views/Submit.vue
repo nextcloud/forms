@@ -228,6 +228,9 @@ export default {
 		},
 
 		validQuestions() {
+			// load answers from the server into this form
+			this.answers = this.form.answers
+
 			return this.form.questions.filter(question => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
