@@ -457,6 +457,7 @@ class ApiV2Test extends TestCase {
 			'getNewForm' => [
 				'expected' => [
 					// 'hash' => Some random, cannot be checked.
+					'showHeader' => true,
 					'title' => '',
 					'showTitle' => true,
 					'description' => '',
@@ -514,6 +515,7 @@ class ApiV2Test extends TestCase {
 			'getFullForm' => [
 				'expected' => [
 					'hash' => 'abcdefg',
+					'showHeader' => true,
 					'title' => 'Title of a Form',
 					'showTitle' => true,
 					'description' => 'Just a simple form.',

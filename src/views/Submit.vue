@@ -38,7 +38,7 @@
 			@share-form="onShareForm" />
 
 		<!-- Forms title & description-->
-		<header>
+		<header v-if="form.showHeader">
 			<h2 v-if="form.showTitle" ref="title" class="form-title" dir="auto">
 				{{ formTitle }}
 			</h2>

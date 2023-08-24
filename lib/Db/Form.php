@@ -33,6 +33,8 @@ use OCP\AppFramework\Db\Entity;
 /**
  * @method string getHash()
  * @method void setHash(string $value)
+ * @method integer getShowHeader()
+ * @method void setShowHeader(bool $value)
  * @method string getTitle()
  * @method void setTitle(string $value)
  * @method integer getShowTitle()
@@ -60,6 +62,7 @@ use OCP\AppFramework\Db\Entity;
  */
 class Form extends Entity {
 	protected $hash;
+	protected $showHeader;
 	protected $title;
 	protected $showTitle;
 	protected $description;
@@ -81,6 +84,7 @@ class Form extends Entity {
 		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'bool');
 		$this->addType('submitMultiple', 'bool');
+		$this->addType('showHeader', 'bool');
 		$this->addType('showTitle', 'bool');
 		$this->addType('showDescription', 'bool');
 		$this->addType('showExpiration', 'bool');
@@ -102,6 +106,7 @@ class Form extends Entity {
 		return [
 			'id' => $this->getId(),
 			'hash' => $this->getHash(),
+			'showHeader' => (bool)$this->getShowHeader(),
 			'title' => (string)$this->getTitle(),
 			'showTitle' => (bool)$this->getShowTitle(),
 			'description' => (string)$this->getDescription(),

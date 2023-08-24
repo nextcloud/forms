@@ -191,6 +191,7 @@ class FormsMigrator implements IMigrator {
 			foreach ($data as $formData) {
 				$form = new Form();
 				$form->setHash($this->formsService->generateFormHash());
+				$form->setShowHeader($formData['showHeader']);
 				$form->setTitle($formData['title']);
 				$form->setShowTitle($formData['showTitle']);
 				$form->setDescription($formData['description']);

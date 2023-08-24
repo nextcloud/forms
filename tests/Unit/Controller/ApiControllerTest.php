@@ -203,7 +203,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with(1)
@@ -261,7 +261,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with(1)
@@ -276,7 +276,7 @@ class ApiControllerTest extends TestCase {
 			->method('getQuestions')
 			->with(1)
 			->willReturn($questions);
-	
+
 		$this->assertEquals(new DataResponse($expected), $this->apiController->getSubmissions('hash'));
 	}
 
@@ -300,7 +300,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with(1)
@@ -320,7 +320,7 @@ class ApiControllerTest extends TestCase {
 			->method('findByHash')
 			->with('hash')
 			->willReturn($form);
-	
+
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
 			->with(1)
@@ -349,6 +349,7 @@ class ApiControllerTest extends TestCase {
 			"forms" => ['expectedForm' => [
 				'id' => 7,
 				'hash' => 'formHash',
+				'showHeader' => true,
 				'title' => '',
 				'showTitle' => true,
 				'description' => '',
@@ -461,6 +462,7 @@ class ApiControllerTest extends TestCase {
 			'works' => [
 				'old' => [
 					'id' => 7,
+					'showHeader' => true,
 					'title' => '',
 					'showTitle' => true,
 					'hash' => 'old hash',
@@ -478,7 +480,8 @@ class ApiControllerTest extends TestCase {
 					'showExpiration' => false
 				],
 				'new' => [
-					'id' => 14,
+					'id' => 14,,
+					'showHeader' => true,
 					'title' => ' - Copy',
 					'showTitle' => true,
 					'hash' => 'new hash',

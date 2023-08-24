@@ -37,20 +37,27 @@
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch :checked="form.showHeader"
+			type="switch"
+			@update:checked="onShowHeaderChange">
+			{{ t('forms', 'Show header of form') }}
+		</NcCheckboxRadioSwitch>
+		<div v-show="showHeader" class="settings-div--indent">
+			<NcCheckboxRadioSwitch :checked="form.showTitle"
+				type="switch"
+				@update:checked="onShowTitleChange">
+				{{ t('forms', 'Show title of form') }}
+			</NcCheckboxRadioSwitch>
+			<NcCheckboxRadioSwitch :checked="form.showDescription"
+				type="switch"
+				@update:checked="onShowDescriptionChange">
+				{{ t('forms', 'Show description of form') }}
+			</NcCheckboxRadioSwitch>
+		</div>
 		<NcCheckboxRadioSwitch :checked="formExpires"
 			type="switch"
 			@update:checked="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
-		</NcCheckboxRadioSwitch>
-		<NcCheckboxRadioSwitch :checked="form.showTitle"
-			type="switch"
-			@update:checked="onShowTitleChange">
-			{{ t('forms', 'Show title of form') }}
-		</NcCheckboxRadioSwitch>
-		<NcCheckboxRadioSwitch :checked="form.showDescription"
-			type="switch"
-			@update:checked="onShowDescriptionChange">
-			{{ t('forms', 'Show description of form') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires" class="settings-div--indent">
 			<NcDatetimePicker id="expiresDatetimePicker"
@@ -126,7 +133,9 @@ export default {
 		submitMultiple() {
 			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
-
+		showHeader() {
+			return this.form.showHeader
+		},
 		formExpires() {
 			return this.form.expires !== 0
 		},
@@ -156,6 +165,9 @@ export default {
 			} else {
 				this.$emit('update:formProp', 'expires', 0)
 			}
+		},
+		onShowHeaderChange(checked) {
+			this.$emit('update:formProp', 'showHeader', checked)
 		},
 		onShowTitleChange(checked) {
 			this.$emit('update:formProp', 'showTitle', checked)

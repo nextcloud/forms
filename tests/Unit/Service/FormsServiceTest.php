@@ -146,6 +146,7 @@ class FormsServiceTest extends TestCase {
 			'one-full-form' => [[
 				'id' => 42,
 				'hash' => 'abcdefg',
+				'showHeader' => true,
 				'title' => 'Form 1',
 				'showTitle' => true,
 				'description' => 'Description Text',
@@ -225,6 +226,7 @@ class FormsServiceTest extends TestCase {
 		$form = new Form();
 		$form->setId(42);
 		$form->setHash('abcdefg');
+		$form->setShowHeader(true);
 		$form->setTitle('Form 1');
 		$form->setShowTitle(true);
 		$form->setShowExpiration(true);
@@ -421,6 +423,7 @@ class FormsServiceTest extends TestCase {
 			'one-full-form' => [[
 				'id' => 42,
 				'hash' => 'abcdefg',
+				'showHeader' => true,
 				'title' => 'Form 1',
 				'showTitle' => true,
 				'description' => 'Description Text',
@@ -449,6 +452,7 @@ class FormsServiceTest extends TestCase {
 		$form = new Form();
 		$form->setId(42);
 		$form->setHash('abcdefg');
+		$form->setShowHeader(true);
 		$form->setTitle('Form 1');
 		$form->setShowTitle(true);
 		$form->setDescription('Description Text');
@@ -677,7 +681,7 @@ class FormsServiceTest extends TestCase {
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
-		
+
 		$this->formMapper->expects($this->any())
 			->method('findById')
 			->with(42)

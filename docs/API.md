@@ -114,6 +114,7 @@ Returns the full-depth object of the requested form (without submissions).
 "data": {
   "id": 3,
   "hash": "em4djk8B9BpXnkYG",
+  "showHeader": true,
   "title": "Form 1",
   "showTitle": true,
   "description": "Description Text",
@@ -392,7 +393,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
   |------------------|----------|-------------|
   | _id_             | Integer  | ID of the share to update |
   | *keyValuePairs*¹ | Array    | Array of key-value pairs to update |
-  
+
   ¹Currently only the _permissions_ can be updated.
 - Method: `POST`
 - Response: **Status-Code OK**, as well as the id of the share object.
@@ -547,7 +548,7 @@ Store Submission to Database
   | _formId_  | Integer | ID of the form to submit into |
   | _answers_ | Array   | Array of Answers |
   | _shareHash_ | String | optional, only neccessary for submissions to a public share link |
-  
+
   The Array of Answers has the following structure:
   - QuestionID as key
   - An **array** of values as value --> Even for short Text Answers, wrapped into Array.

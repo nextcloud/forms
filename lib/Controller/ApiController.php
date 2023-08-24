@@ -260,6 +260,7 @@ class ApiController extends OCSController {
 		$form->setOwnerId($this->currentUser->getUID());
 		$form->setCreated(time());
 		$form->setHash($this->formsService->generateFormHash());
+		$form->setShowHeader(true);
 		$form->setTitle('');
 		$form->setShowTitle(true);
 		$form->setDescription('');

@@ -9,6 +9,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 |-------------|-----------------|--------------|-------------|
 | id          | Integer         | unique       | An instance-wide unique id of the form |
 | hash        | 16-char String  | unique       | An instance-wide unique hash |
+| showHeader  | Boolean         |              | If true will be shown on the form |
 | title       | String          | max. 256 ch. | The form title |
 | showTitle   | Boolean         |              | If true will be shown on the form |
 | description | String          | max. 8192 ch. | The Form description |
@@ -30,6 +31,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 {
   "id": 3,
   "hash": "em4djk8B9BpXnkYG",
+  "showHeader": true,
   "title": "Form 1",
   "showTitle": true,
   "description": "Description Text",
