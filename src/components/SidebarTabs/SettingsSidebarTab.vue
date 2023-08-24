@@ -42,6 +42,11 @@
 			@update:checked="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch :checked="form.showTitle"
+			type="switch"
+			@update:checked="onShowTitleChange">
+			{{ t('forms', 'Show title of form') }}
+		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch :checked="form.showDescription"
 			type="switch"
 			@update:checked="onShowDescriptionChange">
@@ -151,6 +156,9 @@ export default {
 			} else {
 				this.$emit('update:formProp', 'expires', 0)
 			}
+		},
+		onShowTitleChange(checked) {
+			this.$emit('update:formProp', 'showTitle', checked)
 		},
 		onShowDescriptionChange(checked) {
 			this.$emit('update:formProp', 'showDescription', checked)

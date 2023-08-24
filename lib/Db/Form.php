@@ -35,6 +35,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setHash(string $value)
  * @method string getTitle()
  * @method void setTitle(string $value)
+ * @method integer getShowTitle()
+ * @method void setShowTitle(bool $value)
  * @method string getDescription()
  * @method void setDescription(string $value)
  * @method string getOwnerId()
@@ -59,6 +61,7 @@ use OCP\AppFramework\Db\Entity;
 class Form extends Entity {
 	protected $hash;
 	protected $title;
+	protected $showTitle;
 	protected $description;
 	protected $ownerId;
 	protected $accessJson;
@@ -78,6 +81,7 @@ class Form extends Entity {
 		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'bool');
 		$this->addType('submitMultiple', 'bool');
+		$this->addType('showTitle', 'bool');
 		$this->addType('showDescription', 'bool');
 		$this->addType('showExpiration', 'bool');
 		$this->addType('lastUpdated', 'integer');
@@ -99,6 +103,7 @@ class Form extends Entity {
 			'id' => $this->getId(),
 			'hash' => $this->getHash(),
 			'title' => (string)$this->getTitle(),
+			'showTitle' => (bool)$this->getShowTitle(),
 			'description' => (string)$this->getDescription(),
 			'ownerId' => $this->getOwnerId(),
 			'created' => $this->getCreated(),

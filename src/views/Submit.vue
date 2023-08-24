@@ -39,7 +39,7 @@
 
 		<!-- Forms title & description-->
 		<header>
-			<h2 ref="title" class="form-title" dir="auto">
+			<h2 v-if="form.showTitle" ref="title" class="form-title" dir="auto">
 				{{ formTitle }}
 			</h2>
 			<!-- eslint-disable vue/no-v-html -->

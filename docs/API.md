@@ -115,6 +115,7 @@ Returns the full-depth object of the requested form (without submissions).
   "id": 3,
   "hash": "em4djk8B9BpXnkYG",
   "title": "Form 1",
+  "showTitle": true,
   "description": "Description Text",
   "ownerId": "jonas",
   "created": 1611240961,
@@ -237,7 +238,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
   | _formId_  | Integer |          | ID of the form, the new question will belong to |
   | _type_    | [QuestionType](DataStructure.md#question-types) |  | The question-type of the new question |
   | _text_    | String  | yes      | *Optional* The text of the new question. |
-- Response: The new question object. 
+- Response: The new question object.
 ```
 "data": {
   "id": 3,

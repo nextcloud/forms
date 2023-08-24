@@ -192,6 +192,7 @@ class FormsMigrator implements IMigrator {
 				$form = new Form();
 				$form->setHash($this->formsService->generateFormHash());
 				$form->setTitle($formData['title']);
+				$form->setShowTitle($formData['showTitle']);
 				$form->setDescription($formData['description']);
 				$form->setOwnerId($user->getUID());
 				$form->setCreated($formData['created']);

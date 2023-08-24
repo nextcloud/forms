@@ -458,6 +458,7 @@ class ApiV2Test extends TestCase {
 				'expected' => [
 					// 'hash' => Some random, cannot be checked.
 					'title' => '',
+					'showTitle' => true,
 					'description' => '',
 					'ownerId' => 'test',
 					// 'created' => time() can not be checked exactly
@@ -514,6 +515,7 @@ class ApiV2Test extends TestCase {
 				'expected' => [
 					'hash' => 'abcdefg',
 					'title' => 'Title of a Form',
+					'showTitle' => true,
 					'description' => 'Just a simple form.',
 					'ownerId' => 'test',
 					'created' => 12345,

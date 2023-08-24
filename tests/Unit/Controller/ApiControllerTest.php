@@ -350,6 +350,7 @@ class ApiControllerTest extends TestCase {
 				'id' => 7,
 				'hash' => 'formHash',
 				'title' => '',
+				'showTitle' => true,
 				'description' => '',
 				'ownerId' => 'currentUser',
 				'access' => [
@@ -461,6 +462,7 @@ class ApiControllerTest extends TestCase {
 				'old' => [
 					'id' => 7,
 					'title' => '',
+					'showTitle' => true,
 					'hash' => 'old hash',
 					'created' => null,
 					'access' => [
@@ -478,6 +480,7 @@ class ApiControllerTest extends TestCase {
 				'new' => [
 					'id' => 14,
 					'title' => ' - Copy',
+					'showTitle' => true,
 					'hash' => 'new hash',
 					'access' => [
 						'permitAllUsers' => false,

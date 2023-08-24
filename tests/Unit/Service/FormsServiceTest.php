@@ -147,6 +147,7 @@ class FormsServiceTest extends TestCase {
 				'id' => 42,
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
+				'showTitle' => true,
 				'description' => 'Description Text',
 				'ownerId' => 'currentUser',
 				'created' => 123456789,
@@ -225,6 +226,8 @@ class FormsServiceTest extends TestCase {
 		$form->setId(42);
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
+		$form->setShowTitle(true);
+		$form->setShowExpiration(true);
 		$form->setDescription('Description Text');
 		$form->setOwnerId('currentUser');
 		$form->setCreated(123456789);
@@ -419,6 +422,7 @@ class FormsServiceTest extends TestCase {
 				'id' => 42,
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
+				'showTitle' => true,
 				'description' => 'Description Text',
 				'created' => 123456789,
 				'expires' => 0,
@@ -446,6 +450,7 @@ class FormsServiceTest extends TestCase {
 		$form->setId(42);
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
+		$form->setShowTitle(true);
 		$form->setDescription('Description Text');
 		$form->setOwnerId('someUser');
 		$form->setCreated(123456789);
