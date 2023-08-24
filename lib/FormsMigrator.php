@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2022 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Vitor Mattos <vitor@php.rio>
  *
  * @license AGPL-3.0-or-later
  *
@@ -198,6 +199,7 @@ class FormsMigrator implements IMigrator {
 				$form->setExpires($formData['expires']);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
+				$form->setShowDescription($formData['showDescription']);
 				$form->setShowExpiration($formData['showExpiration']);
 				$form->setLastUpdated($formData['lastUpdated']);
 

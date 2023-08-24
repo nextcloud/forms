@@ -5,6 +5,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2021 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Vitor Mattos <vitor@php.rio>
  *
  * @license AGPL-3.0-or-later
  *
@@ -156,6 +157,7 @@ class FormsServiceTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'showDescription' => true,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
 				'canSubmit' => true,
@@ -233,6 +235,7 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 
@@ -422,6 +425,7 @@ class FormsServiceTest extends TestCase {
 				'lastUpdated' => 123456789,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'showDescription' => true,
 				'showExpiration' => false,
 				'canSubmit' => true,
 				'questions' => [],
@@ -453,6 +457,7 @@ class FormsServiceTest extends TestCase {
 		$form->setLastUpdated(123456789);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 
 		$this->formMapper->expects($this->any())

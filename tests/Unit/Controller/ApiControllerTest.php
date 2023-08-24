@@ -5,6 +5,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2023 Ferdinand Thiessen <rpm@fthiessen.de>
  *
  * @author Ferdinand Thiessen <rpm@fthiessen.de>
+ * @author Vitor Mattos <vitor@php.rio>
  *
  * @license AGPL-3.0-or-later
  *
@@ -358,6 +359,7 @@ class ApiControllerTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => false,
+				'showDescription' => true,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789
 			]]
@@ -470,6 +472,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'showDescription' => false,
 					'showExpiration' => false
 				],
 				'new' => [
@@ -485,6 +488,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'showDescription' => false,
 					'showExpiration' => false
 				]
 			]

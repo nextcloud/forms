@@ -5,6 +5,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2022 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Vitor Mattos <vitor@php.rio>
  *
  * @license AGPL-3.0-or-later
  *
@@ -62,6 +63,7 @@ class ApiV2Test extends TestCase {
 				'expires' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
+				'show_description' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'questions' => [
@@ -164,6 +166,7 @@ class ApiV2Test extends TestCase {
 				'expires' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
+				'show_description' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'questions' => [
@@ -212,6 +215,7 @@ class ApiV2Test extends TestCase {
 					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
 					'is_anonymous' => $qb->createNamedParameter($form['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL),
+					'show_description' => $qb->createNamedParameter($form['show_description'], IQueryBuilder::PARAM_BOOL),
 					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
 					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
 				]);
@@ -464,6 +468,7 @@ class ApiV2Test extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'showDescription' => true,
 					'showExpiration' => false,
 					// 'lastUpdated' => time() can not be checked exactly
 					'canSubmit' => true,
@@ -519,6 +524,7 @@ class ApiV2Test extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'showDescription' => true,
 					'showExpiration' => false,
 					'lastUpdated' => 123456789,
 					'canSubmit' => true,

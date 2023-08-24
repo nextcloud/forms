@@ -2,6 +2,7 @@
  - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
  -
  - @author John Molakvoæ <skjnldsv@protonmail.com>
+ - @author Vitor Mattos <vitor@php.rio>
  -
  - @license AGPL-3.0-or-later
  -
@@ -42,7 +43,7 @@
 				{{ formTitle }}
 			</h2>
 			<!-- eslint-disable vue/no-v-html -->
-			<div v-if="!loading && !success && !!formDescription"
+			<div v-if="form.showDescription && !loading && !success && !!formDescription"
 				class="form-desc"
 				dir="auto"
 				v-html="formDescription" />

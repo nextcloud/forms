@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @author affan98 <affan98@gmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Vitor Mattos <vitor@php.rio>
  *
  * @license AGPL-3.0-or-later
  *
@@ -48,6 +49,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setIsAnonymous(bool $value)
  * @method integer getSubmitMultiple()
  * @method void setSubmitMultiple(bool $value)
+ * @method integer getShowDescription()
+ * @method void setShowDescription(bool $value)
  * @method integer getShowExpiration()
  * @method void setShowExpiration(bool $value)
  * @method integer getLastUpdated()
@@ -63,6 +66,7 @@ class Form extends Entity {
 	protected $expires;
 	protected $isAnonymous;
 	protected $submitMultiple;
+	protected $showDescription;
 	protected $showExpiration;
 	protected $lastUpdated;
 
@@ -74,6 +78,7 @@ class Form extends Entity {
 		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'bool');
 		$this->addType('submitMultiple', 'bool');
+		$this->addType('showDescription', 'bool');
 		$this->addType('showExpiration', 'bool');
 		$this->addType('lastUpdated', 'integer');
 	}
@@ -101,6 +106,7 @@ class Form extends Entity {
 			'expires' => (int)$this->getExpires(),
 			'isAnonymous' => (bool)$this->getIsAnonymous(),
 			'submitMultiple' => (bool)$this->getSubmitMultiple(),
+			'showDescription' => (bool)$this->getShowDescription(),
 			'showExpiration' => (bool)$this->getShowExpiration(),
 			'lastUpdated' => (int)$this->getLastUpdated()
 		];

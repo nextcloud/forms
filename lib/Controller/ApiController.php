@@ -7,6 +7,7 @@
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Vitor Mattos <vitor@php.rio>
  *
  * @license AGPL-3.0-or-later
  *
@@ -266,6 +267,7 @@ class ApiController extends OCSController {
 			'showToAllUsers' => false,
 		]);
 		$form->setSubmitMultiple(false);
+		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);

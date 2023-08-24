@@ -14,9 +14,9 @@
 	]]></description>
 
 	<licence>agpl</licence>
-	<version>3.3.1</version>
+	<version>3.4.0</version>
 	<dependencies>
-		<nextcloud min-version="25" max-version="27" />
+		<nextcloud min-version="25" max-version="28" />
 	</dependencies>
 
 	<author>Affan Hussain</author>
@@ -35,6 +35,7 @@
 	<author>Stephan Link</author>
 	<author>Tim Sattizahn</author>
 	<author>Vinzenz Rosenkranz</author>
+	<author>Vitor Mattos</author>
 
 	<category>tools</category>
 	<category>social</category>

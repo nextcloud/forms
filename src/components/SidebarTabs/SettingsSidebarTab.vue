@@ -3,6 +3,7 @@
   -
   - @author John Molakvoæ <skjnldsv@protonmail.com>
   - @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+  - @author Vitor Mattos <vitor@php.rio>
   -
   - @license AGPL-3.0-or-later
   -
@@ -40,6 +41,11 @@
 			type="switch"
 			@update:checked="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
+		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch :checked="form.showDescription"
+			type="switch"
+			@update:checked="onShowDescriptionChange">
+			{{ t('forms', 'Show description of form') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires" class="settings-div--indent">
 			<NcDatetimePicker id="expiresDatetimePicker"
@@ -145,6 +151,9 @@ export default {
 			} else {
 				this.$emit('update:formProp', 'expires', 0)
 			}
+		},
+		onShowDescriptionChange(checked) {
+			this.$emit('update:formProp', 'showDescription', checked)
 		},
 		onShowExpirationChange(checked) {
 			this.$emit('update:formProp', 'showExpiration', checked)
