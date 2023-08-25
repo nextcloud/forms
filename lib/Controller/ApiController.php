@@ -262,14 +262,12 @@ class ApiController extends OCSController {
 		$form->setHash($this->formsService->generateFormHash());
 		$form->setShowHeader(true);
 		$form->setTitle('');
-		$form->setShowTitle(true);
 		$form->setDescription('');
 		$form->setAccess([
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
 		$form->setSubmitMultiple(false);
-		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);

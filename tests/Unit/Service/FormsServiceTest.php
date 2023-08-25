@@ -148,7 +148,6 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'showHeader' => true,
 				'title' => 'Form 1',
-				'showTitle' => true,
 				'description' => 'Description Text',
 				'ownerId' => 'currentUser',
 				'created' => 123456789,
@@ -159,7 +158,6 @@ class FormsServiceTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
-				'showDescription' => true,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
 				'canSubmit' => true,
@@ -228,7 +226,6 @@ class FormsServiceTest extends TestCase {
 		$form->setHash('abcdefg');
 		$form->setShowHeader(true);
 		$form->setTitle('Form 1');
-		$form->setShowTitle(true);
 		$form->setShowExpiration(true);
 		$form->setDescription('Description Text');
 		$form->setOwnerId('currentUser');
@@ -240,7 +237,6 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
-		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 
@@ -425,14 +421,12 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'showHeader' => true,
 				'title' => 'Form 1',
-				'showTitle' => true,
 				'description' => 'Description Text',
 				'created' => 123456789,
 				'expires' => 0,
 				'lastUpdated' => 123456789,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
-				'showDescription' => true,
 				'showExpiration' => false,
 				'canSubmit' => true,
 				'questions' => [],
@@ -454,7 +448,6 @@ class FormsServiceTest extends TestCase {
 		$form->setHash('abcdefg');
 		$form->setShowHeader(true);
 		$form->setTitle('Form 1');
-		$form->setShowTitle(true);
 		$form->setDescription('Description Text');
 		$form->setOwnerId('someUser');
 		$form->setCreated(123456789);
@@ -466,7 +459,6 @@ class FormsServiceTest extends TestCase {
 		$form->setLastUpdated(123456789);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
-		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 
 		$this->formMapper->expects($this->any())

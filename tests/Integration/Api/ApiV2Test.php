@@ -52,6 +52,7 @@ class ApiV2Test extends TestCase {
 		$this->testForms = [
 			[
 				'hash' => 'abcdefg',
+				'show_header' => true,
 				'title' => 'Title of a Form',
 				'description' => 'Just a simple form.',
 				'owner_id' => 'test',
@@ -63,7 +64,6 @@ class ApiV2Test extends TestCase {
 				'expires' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
-				'show_description' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'questions' => [
@@ -155,6 +155,7 @@ class ApiV2Test extends TestCase {
 			],
 			[
 				'hash' => 'abcdefghij',
+				'show_header' => true,
 				'title' => 'Title of a second Form',
 				'description' => '',
 				'owner_id' => 'someUser',
@@ -166,7 +167,6 @@ class ApiV2Test extends TestCase {
 				'expires' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
-				'show_description' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'questions' => [
@@ -207,6 +207,7 @@ class ApiV2Test extends TestCase {
 			$qb->insert('forms_v2_forms')
 				->values([
 					'hash' => $qb->createNamedParameter($form['hash'], IQueryBuilder::PARAM_STR),
+					'show_header' => $qb->createNamedParameter($form['show_header'], IQueryBuilder::PARAM_BOOL),
 					'title' => $qb->createNamedParameter($form['title'], IQueryBuilder::PARAM_STR),
 					'description' => $qb->createNamedParameter($form['description'], IQueryBuilder::PARAM_STR),
 					'owner_id' => $qb->createNamedParameter($form['owner_id'], IQueryBuilder::PARAM_STR),
@@ -215,7 +216,6 @@ class ApiV2Test extends TestCase {
 					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
 					'is_anonymous' => $qb->createNamedParameter($form['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL),
-					'show_description' => $qb->createNamedParameter($form['show_description'], IQueryBuilder::PARAM_BOOL),
 					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
 					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
 				]);
@@ -459,7 +459,6 @@ class ApiV2Test extends TestCase {
 					// 'hash' => Some random, cannot be checked.
 					'showHeader' => true,
 					'title' => '',
-					'showTitle' => true,
 					'description' => '',
 					'ownerId' => 'test',
 					// 'created' => time() can not be checked exactly
@@ -470,7 +469,6 @@ class ApiV2Test extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
-					'showDescription' => true,
 					'showExpiration' => false,
 					// 'lastUpdated' => time() can not be checked exactly
 					'canSubmit' => true,
@@ -517,7 +515,6 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefg',
 					'showHeader' => true,
 					'title' => 'Title of a Form',
-					'showTitle' => true,
 					'description' => 'Just a simple form.',
 					'ownerId' => 'test',
 					'created' => 12345,
@@ -528,7 +525,6 @@ class ApiV2Test extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
-					'showDescription' => true,
 					'showExpiration' => false,
 					'lastUpdated' => 123456789,
 					'canSubmit' => true,

@@ -39,11 +39,11 @@
 
 		<!-- Forms title & description-->
 		<header v-if="form.showHeader">
-			<h2 v-if="form.showTitle" ref="title" class="form-title" dir="auto">
+			<h2 ref="title" class="form-title" dir="auto">
 				{{ formTitle }}
 			</h2>
 			<!-- eslint-disable vue/no-v-html -->
-			<div v-if="form.showDescription && !loading && !success && !!formDescription"
+			<div v-if="!loading && !success && !!formDescription"
 				class="form-desc"
 				dir="auto"
 				v-html="formDescription" />

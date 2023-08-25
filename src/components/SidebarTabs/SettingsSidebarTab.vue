@@ -42,18 +42,6 @@
 			@update:checked="onShowHeaderChange">
 			{{ t('forms', 'Show header of form') }}
 		</NcCheckboxRadioSwitch>
-		<div v-show="showHeader" class="settings-div--indent">
-			<NcCheckboxRadioSwitch :checked="form.showTitle"
-				type="switch"
-				@update:checked="onShowTitleChange">
-				{{ t('forms', 'Show title of form') }}
-			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch :checked="form.showDescription"
-				type="switch"
-				@update:checked="onShowDescriptionChange">
-				{{ t('forms', 'Show description of form') }}
-			</NcCheckboxRadioSwitch>
-		</div>
 		<NcCheckboxRadioSwitch :checked="formExpires"
 			type="switch"
 			@update:checked="onFormExpiresChange">
@@ -133,9 +121,6 @@ export default {
 		submitMultiple() {
 			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
-		showHeader() {
-			return this.form.showHeader
-		},
 		formExpires() {
 			return this.form.expires !== 0
 		},
@@ -168,12 +153,6 @@ export default {
 		},
 		onShowHeaderChange(checked) {
 			this.$emit('update:formProp', 'showHeader', checked)
-		},
-		onShowTitleChange(checked) {
-			this.$emit('update:formProp', 'showTitle', checked)
-		},
-		onShowDescriptionChange(checked) {
-			this.$emit('update:formProp', 'showDescription', checked)
 		},
 		onShowExpirationChange(checked) {
 			this.$emit('update:formProp', 'showExpiration', checked)

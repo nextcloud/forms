@@ -193,7 +193,6 @@ class FormsMigrator implements IMigrator {
 				$form->setHash($this->formsService->generateFormHash());
 				$form->setShowHeader($formData['showHeader']);
 				$form->setTitle($formData['title']);
-				$form->setShowTitle($formData['showTitle']);
 				$form->setDescription($formData['description']);
 				$form->setOwnerId($user->getUID());
 				$form->setCreated($formData['created']);
@@ -201,7 +200,6 @@ class FormsMigrator implements IMigrator {
 				$form->setExpires($formData['expires']);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
-				$form->setShowDescription($formData['showDescription']);
 				$form->setShowExpiration($formData['showExpiration']);
 				$form->setLastUpdated($formData['lastUpdated']);
 

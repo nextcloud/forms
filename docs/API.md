@@ -116,7 +116,6 @@ Returns the full-depth object of the requested form (without submissions).
   "hash": "em4djk8B9BpXnkYG",
   "showHeader": true,
   "title": "Form 1",
-  "showTitle": true,
   "description": "Description Text",
   "ownerId": "jonas",
   "created": 1611240961,
@@ -127,7 +126,6 @@ Returns the full-depth object of the requested form (without submissions).
   "expires": 0,
   "isAnonymous": false,
   "submitMultiple": true,
-  "showDescription": true,
   "showExpiration": false,
   "canSubmit": true,
   "permissions": [

@@ -56,20 +56,6 @@ class Version030400Date20230824191746 extends SimpleMigrationStep {
 			]);
 			$changed = true;
 		}
-		if (!$table->hasColumn('show_title')) {
-			$table->addColumn('show_title', Types::BOOLEAN, [
-				'notnull' => false,
-				'default' => 1,
-			]);
-			$changed = true;
-		}
-		if (!$table->hasColumn('show_description')) {
-			$table->addColumn('show_description', Types::BOOLEAN, [
-				'notnull' => false,
-				'default' => 1,
-			]);
-			$changed = true;
-		}
 		if ($changed) {
 			return $schema;
 		}

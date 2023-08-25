@@ -37,8 +37,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setShowHeader(bool $value)
  * @method string getTitle()
  * @method void setTitle(string $value)
- * @method integer getShowTitle()
- * @method void setShowTitle(bool $value)
  * @method string getDescription()
  * @method void setDescription(string $value)
  * @method string getOwnerId()
@@ -53,8 +51,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setIsAnonymous(bool $value)
  * @method integer getSubmitMultiple()
  * @method void setSubmitMultiple(bool $value)
- * @method integer getShowDescription()
- * @method void setShowDescription(bool $value)
  * @method integer getShowExpiration()
  * @method void setShowExpiration(bool $value)
  * @method integer getLastUpdated()
@@ -64,7 +60,6 @@ class Form extends Entity {
 	protected $hash;
 	protected $showHeader;
 	protected $title;
-	protected $showTitle;
 	protected $description;
 	protected $ownerId;
 	protected $accessJson;
@@ -72,7 +67,6 @@ class Form extends Entity {
 	protected $expires;
 	protected $isAnonymous;
 	protected $submitMultiple;
-	protected $showDescription;
 	protected $showExpiration;
 	protected $lastUpdated;
 
@@ -85,8 +79,6 @@ class Form extends Entity {
 		$this->addType('isAnonymous', 'bool');
 		$this->addType('submitMultiple', 'bool');
 		$this->addType('showHeader', 'bool');
-		$this->addType('showTitle', 'bool');
-		$this->addType('showDescription', 'bool');
 		$this->addType('showExpiration', 'bool');
 		$this->addType('lastUpdated', 'integer');
 	}
@@ -108,7 +100,6 @@ class Form extends Entity {
 			'hash' => $this->getHash(),
 			'showHeader' => (bool)$this->getShowHeader(),
 			'title' => (string)$this->getTitle(),
-			'showTitle' => (bool)$this->getShowTitle(),
 			'description' => (string)$this->getDescription(),
 			'ownerId' => $this->getOwnerId(),
 			'created' => $this->getCreated(),
@@ -116,7 +107,6 @@ class Form extends Entity {
 			'expires' => (int)$this->getExpires(),
 			'isAnonymous' => (bool)$this->getIsAnonymous(),
 			'submitMultiple' => (bool)$this->getSubmitMultiple(),
-			'showDescription' => (bool)$this->getShowDescription(),
 			'showExpiration' => (bool)$this->getShowExpiration(),
 			'lastUpdated' => (int)$this->getLastUpdated()
 		];

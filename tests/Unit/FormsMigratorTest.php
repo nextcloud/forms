@@ -115,7 +115,7 @@ class FormsMigratorTest extends TestCase {
 	public function dataExport() {
 		return [
 			'exactlyOneOfEach' => [
-				'expectedJson' => '[{"showHeader":true,"title":"Link","showTitle":true,"description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"isAnonymous":false,"submitMultiple":false,"showDescription":true,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
+				'expectedJson' => '[{"showHeader":true,"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"isAnonymous":false,"submitMultiple":false,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
 			]
 		];
 	}
@@ -141,7 +141,6 @@ class FormsMigratorTest extends TestCase {
 		$form->setHash('abcdefg');
 		$form->setShowHeader(true);
 		$form->setTitle('Link');
-		$form->setShowTitle(true);
 		$form->setDescription('');
 		$form->setOwnerId('someUser');
 		$form->setCreated(1646251830);
@@ -152,7 +151,6 @@ class FormsMigratorTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(false);
-		$form->setShowDescription(true);
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 
@@ -225,7 +223,7 @@ class FormsMigratorTest extends TestCase {
 	public function dataImport() {
 		return [
 			'exactlyOneOfEach' => [
-				'$inputJson' => '[{"showHeader":true,"title":"Link","showTitle":true,"description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"isAnonymous":false,"submitMultiple":false,"showDescription":true,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
+				'$inputJson' => '[{"showHeader":true,"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"isAnonymous":false,"submitMultiple":false,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
 			]
 		];
 	}
