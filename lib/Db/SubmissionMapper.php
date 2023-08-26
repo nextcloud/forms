@@ -123,7 +123,7 @@ class SubmissionMapper extends QBMapper {
 		$row = $result->fetch();
 		$result->closeCursor();
 
-		return (int) ($row['num_submissions' ?? 0]);
+		return (int) ($row['num_submissions'] ?? 0);
 	}
 
 	/**
