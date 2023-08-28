@@ -959,6 +959,95 @@ class ApiController extends OCSController {
 		return new DataResponse($response);
 	}
 
+
+	/**
+	 * Insert or update answers for a question
+	 *
+	 * @param int $submissionId
+	 * @param array $question
+	 * @param array $answerArray [arrayOfString]
+	 * @param bool $update
+	 */
+	private function storeAnswersForQuestion($submissionId, array $question, array $answerArray, bool $update) {
+
+		// get stored answers for this question
+		$storedAnswers = [];
+		if ($update) {
+			$storedAnswers = $this->answerMapper->findBySubmissionAndQuestion($submissionId, $question['id']);
+		}
+
+		if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+			$answerText = "";
+
+			$newAnswerTexts = array();
+
+			// We are using answer ids as values
+			// collect names of options
+			foreach ($answerArray as $answer) {
+				// Search corresponding option, skip processing if not found
+				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
+				if ($optionIndex !== false) {
+					$answerText = $question['options'][$optionIndex]['text'];
+				} elseif (!empty($question['extraSettings']->allowOtherAnswer) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
+					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
+				}
+
+				// Load option-text
+				$answerText = $option['text'];
+
+				$newAnswersText[] = $answerText;
+
+				// has this answer already been stored?
+				$foundAnswer = false;
+				foreach($storedAnswers as $storedAnswer) {
+					if ($storedAnswer->getText() == $answerText) {
+						// nothing to be changed
+						$foundAnswer = true;
+						break;
+					}
+				}
+				if (!$foundAnswer) {
+					if ($answerText === "") {
+						continue;
+					}
+
+					// need to add answer
+					$answerEntity = new Answer();
+					$answerEntity->setSubmissionId($submissionId);
+					$answerEntity->setQuestionId($question['id']);
+					$answerEntity->setText($answerText);
+					$this->answerMapper->insert($answerEntity);
+				}
+			}
+
+			// drop all answers that are not in new set of answers
+			foreach($storedAnswers as $storedAnswer) {
+				if (empty($newAnswerTexts) || !in_array($storedAnswer->getText(), $newAnswerTexts)) {
+					$this->answerMapper->delete($storedAnswer);
+				}
+			}
+		} else {
+			// just one answer
+			$answerText = $answerArray[0]; // Not a multiple-question, answerText is given answer
+
+			if (!empty($storedAnswers)) {
+				$answerEntity = $storedAnswers[0];
+				$answerEntity->setText($answerText);
+				$this->answerMapper->update($answerEntity);
+			} else {
+				if ($answerText === "") {
+					continue;
+				}
+
+				$answerEntity = new Answer();
+				$answerEntity->setSubmissionId($submissionId);
+				$answerEntity->setQuestionId($question['id']);
+				$answerEntity->setText($answerText);
+				$this->answerMapper->insert($answerEntity);
+			}
+		}
+	}
+
 	/**
 	 * Insert answers for a question
 	 *
