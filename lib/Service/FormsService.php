@@ -103,39 +103,36 @@ class FormsService {
 
 	private function getAnswers(int $formId, string $userId): array {
 
+		$submissionEntity = null;
 		try {
-			$submissionEntities = $this->submissionMapper->findByFormAndUser($formId, $userId);
-			// we will only use the first submissionEntity
-			foreach ($submissionEntities as $submissionEntity) {
-				$answerList = [];
-				$submission = $submissionEntity->read();
-				$answerEntities = $this->answerMapper->findBySubmission($submission['id']);
-				foreach ($answerEntities as $answerEntity) {
-					$answer = $answerEntity->read();
-					$questionId = $answer['questionId'];
-					if (!array_key_exists($questionId, $answerList)) {
-						$answerList[$questionId] = array();
-					}
-					$options = $this->getOptions($answer['questionId']);
-					if (!empty($options)) {
-						error_log(print_r($options,true));
-						// match option text to option index
-						foreach ($options as $option) {
-							if ($option['text'] == $answer['text']) {
-								$answerList[$questionId][] = $option['id'];
-							}
-						}
-					} else {
-						// copy the text
-						$answerList[$questionId][] = $answer['text'];
+			$submissionEntity = $this->submissionMapper->findByFormAndUser($formId, $userId);
+		} catch (DoesNotExistException $e) {
+			return [];
+		}
+
+		$answerList = [];
+		$submission = $submissionEntity->read();
+		$answerEntities = $this->answerMapper->findBySubmission($submission['id']);
+		foreach ($answerEntities as $answerEntity) {
+			$answer = $answerEntity->read();
+			$questionId = $answer['questionId'];
+			if (!array_key_exists($questionId, $answerList)) {
+				$answerList[$questionId] = array();
+			}
+			$options = $this->getOptions($answer['questionId']);
+			if (!empty($options)) {
+				// match option text to option index
+				foreach ($options as $option) {
+					if ($option['text'] == $answer['text']) {
+						$answerList[$questionId][] = $option['id'];
 					}
 				}
-				return $answerList;
+			} else {
+				// copy the text
+				$answerList[$questionId][] = $answer['text'];
 			}
-		} catch (DoesNotExistException $e) {
-			// Just ignore, if no Data
 		}
-		return [];
+		return $answerList;
 	}
 
 	/**
@@ -145,7 +142,6 @@ class FormsService {
 	 * @return array
 	 */
 	public function getQuestions(int $formId): array {
-
 		$questionList = [];
 		try {
 			$questionEntities = $this->questionMapper->findByForm($formId);

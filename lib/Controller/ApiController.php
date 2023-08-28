@@ -1066,21 +1066,23 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('At least one submitted answer is not valid');
 		}
 
-		// if edit is allowed delete existing submission of this user
+		$submission = null;
+		$insertSubmission = false;
+		// if edit is allowed get existing submission of this user
 		if ($form->getAllowEdit() && $this->currentUser) {
 			try {
-				$submissions = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
-				foreach ($submissions as $submission) {
-					$this->submissionMapper->deleteById($submission->getId());
-					$this->formsService->setLastUpdatedTimestamp($form->getId());
-				}
+				$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
 			} catch (DoesNotExistException $e) {
 				// there is no submission yet
 			}
 		}
 
-		// Create Submission
-		$submission = new Submission();
+		if ($submission == null) {
+			// Create Submission
+			$submission = new Submission();
+			$insertSubmission = true;
+		}
+
 		$submission->setFormId($formId);
 		$submission->setTimestamp(time());
 
@@ -1093,7 +1095,11 @@ class ApiController extends OCSController {
 		}
 
 		// Insert new submission
-		$this->submissionMapper->insert($submission);
+		if ($insertSubmission) {
+			$this->submissionMapper->insert($submission);
+		} else {
+			$this->submissionMapper->update($submission);
+		}
 		$submissionId = $submission->getId();
 
 		// Process Answers
