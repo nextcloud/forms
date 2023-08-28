@@ -965,33 +965,84 @@ class ApiController extends OCSController {
 	 * @param int $submissionId
 	 * @param array $question
 	 * @param array $answerArray [arrayOfString]
+	 * @param bool $updateSubmission
 	 */
-	private function storeAnswersForQuestion($submissionId, array $question, array $answerArray) {
-		foreach ($answerArray as $answer) {
-			$answerText = '';
+	private function storeAnswersForQuestion($submissionId, array $question, array $answerArray, bool $updateSubmission) {
+		// get stored answers for this question
+		$storedAnswers = [];
+		if ($updateSubmission) {
+			$storedAnswers = $this->answerMapper->findBySubmissionAndQuestion($submissionId, $questionId);
+		}
 
-			// Are we using answer ids as values
-			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+		if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+			$newAnswersText = [];
+
+			// We are using answer ids as values
+			// collect names of options
+			foreach ($answerArray as $answer) {
+				$answerText = "";
+
 				// Search corresponding option, skip processing if not found
 				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 				if ($optionIndex !== false) {
 					$answerText = $question['options'][$optionIndex]['text'];
-				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
+				} elseif (!empty($question['extraSettings']->allowOtherAnswer) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
 				}
+
+				// Load option-text
+				$answerText = $option['text'];
+
+				$newAnswersText[] = $answerText;
+
+				// has this answer already been stored?
+				$foundAnswer = false;
+				foreach($storedAnswers as $storedAnswer) {
+					if ($storedAnswer->getText() == $answerText) {
+						// nothing to be changed
+						$foundAnswer = true;
+						break;
+					}
+				}
+				if (!$foundAnswer) {
+					if ($answerText === "") {
+						continue;
+					}
+
+					// need to add answer
+					$answerEntity = new Answer();
+					$answerEntity->setSubmissionId($submissionId);
+					$answerEntity->setQuestionId($question['id']);
+					$answerEntity->setText($answerText);
+					$this->answerMapper->insert($answerEntity);
+				}
+			}
+
+			// drop all answers that are not in new set of answers
+			foreach($storedAnswers as $storedAnswer) {
+				if (empty($newAnswerTexts) || !in_array($storedAnswer->getText(), $newAnswerTexts)) {
+					$this->answerMapper->delete($storedAnswer);
+				}
+			}
+		} else {
+			// just one answer
+			$answerText = $answerArray[0]; // Not a multiple-question, answerText is given answer
+
+			if (!empty($storedAnswers)) {
+				$answerEntity = $storedAnswers[0];
+				$answerEntity->setText($answerText);
+				$this->answerMapper->update($answerEntity);
 			} else {
-				$answerText = $answer; // Not a multiple-question, answerText is given answer
-			}
+				if ($answerText === "") {
+					continue;
+				}
 
-			if ($answerText === "") {
-				continue;
+				$answerEntity = new Answer();
+				$answerEntity->setSubmissionId($submissionId);
+				$answerEntity->setQuestionId($question['id']);
+				$answerEntity->setText($answerText);
+				$this->answerMapper->insert($answerEntity);
 			}
-
-			$answerEntity = new Answer();
-			$answerEntity->setSubmissionId($submissionId);
-			$answerEntity->setQuestionId($question['id']);
-			$answerEntity->setText($answerText);
-			$this->answerMapper->insert($answerEntity);
 		}
 	}
 
@@ -1061,26 +1112,30 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Already submitted');
 		}
 
+		// drop null elements from $answers array
+		foreach ($answers as $key => $value) {
+			if ($answers[$key] == null) {
+				unset($answers[$key]);
+			}
+		}
+
 		// Is the submission valid
 		if (!$this->submissionService->validateSubmission($questions, $answers)) {
 			throw new OCSBadRequestException('At least one submitted answer is not valid');
 		}
 
 		$submission = null;
-		$insertSubmission = false;
+		$updateSubmission = false;
 		// if edit is allowed get existing submission of this user
 		if ($form->getAllowEdit() && $this->currentUser) {
 			try {
 				$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
+				$updateSubmission = true;
 			} catch (DoesNotExistException $e) {
 				// there is no submission yet
+				// Create Submission
+				$submission = new Submission();
 			}
-		}
-
-		if ($submission == null) {
-			// Create Submission
-			$submission = new Submission();
-			$insertSubmission = true;
 		}
 
 		$submission->setFormId($formId);
@@ -1094,11 +1149,11 @@ class ApiController extends OCSController {
 			$submission->setUserId($this->currentUser->getUID());
 		}
 
-		// Insert new submission
-		if ($insertSubmission) {
-			$this->submissionMapper->insert($submission);
-		} else {
+		// Update or Insert new submission
+		if ($updateSubmission) {
 			$this->submissionMapper->update($submission);
+		} else {
+			$this->submissionMapper->insert($submission);
 		}
 		$submissionId = $submission->getId();
 
@@ -1110,7 +1165,7 @@ class ApiController extends OCSController {
 				continue;
 			}
 
-			$this->storeAnswersForQuestion($submission->getId(), $questions[$questionIndex], $answerArray);
+			$this->storeAnswersForQuestion($submission->getId(), $questions[$questionIndex], $answerArray, $updateSubmission);
 		}
 
 		$this->formsService->setLastUpdatedTimestamp($formId);
