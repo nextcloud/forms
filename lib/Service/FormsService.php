@@ -101,13 +101,13 @@ class FormsService {
 		}
 	}
 
-	private function getAnswers(int $formId, string $userId): array {
+	private function getAnswers(int $formId, string $userId): array|false {
 
 		$submissionEntity = null;
 		try {
 			$submissionEntity = $this->submissionMapper->findByFormAndUser($formId, $userId);
 		} catch (DoesNotExistException $e) {
-			return [];
+			return false;
 		}
 
 		$answerList = [];
@@ -188,7 +188,11 @@ class FormsService {
 		$result['questions'] = $this->getQuestions($form->getId());
 
 		if ($this->currentUser->getUID()) {
-			$result['answers'] = $this->getAnswers($form->getId(), $this->currentUser->getUID());
+			$answers = $this->getAnswers($form->getId(), $this->currentUser->getUID());
+			if ($answers !== false) {
+				$result['answers'] = $answers;
+				$result['newSubmission'] = false;
+			}
 		}
 
 		$result['shares'] = $this->getShares($form->getId());

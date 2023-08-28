@@ -131,7 +131,13 @@ export default {
 				await this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
 				// load answers from the server into this form
-				this.answers = this.form.answers
+				if (this.form.answers) {
+					this.answers = this.form.answers
+					this.newSubmission = this.form.newSubmission
+				} else {
+					this.answers = []
+					this.newSubmission = true
+				}
 			} catch (error) {
 				if (axios.isCancel(error)) {
 					logger.debug(`The request for form ${id} has been canceled`, { error })
