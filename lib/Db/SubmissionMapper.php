@@ -75,7 +75,7 @@ class SubmissionMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 */
-	public function findByFormAndUser(int $formId, string $userId): array {
+	public function findByFormAndUser(int $formId, string $userId): Submission {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
