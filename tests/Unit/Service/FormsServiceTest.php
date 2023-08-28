@@ -28,6 +28,7 @@ use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\ActivityManager;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Option;
