@@ -128,8 +128,10 @@ export default {
 
 			try {
 				const response = await request(generateOcsUrl('apps/forms/api/v2.2/form/{id}', { id }))
-				this.$emit('update:form', OcsResponse2Data(response))
+				await this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
+				// load answers from the server into this form
+				this.answers = this.form.answers
 			} catch (error) {
 				if (axios.isCancel(error)) {
 					logger.debug(`The request for form ${id} has been canceled`, { error })
