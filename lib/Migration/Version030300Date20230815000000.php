@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /**
- * @copyright Copyright (c) 2023 Ferdinand Thiessen <rpm@fthiessen.de>
+ * @copyright Copyright (c) 2023 Timotheus Pokorra <timotheus.pokorra@solidcharity.com>
  *
- * @author Ferdinand Thiessen <rpm@fthiessen.de>
+ * @author Timotheus Pokorra <timotheus.pokorra@solidcharity.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
