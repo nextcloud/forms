@@ -1147,10 +1147,10 @@ class ApiController extends OCSController {
 			try {
 				$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
 			} catch (DoesNotExistException $e) {
-				throw new OCSBadRequestException();
+				throw new OCSBadRequestException('Cannot update a non existing submission');
 			}
 		} else {
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('Can only update if AllowEdit is set');
 		}
 
 		$submission->setTimestamp(time());
@@ -1198,6 +1198,18 @@ class ApiController extends OCSController {
 		]);
 
 		list($form, $questions) = $this->checkAndPrepareSubmission($formId, $answers, $shareHash);
+
+		// if edit is allowed then do not allow inserting another submission if one exists already
+		if ($form->getAllowEdit() && $this->currentUser) {
+			try {
+				$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
+
+				// we do not want to add another submission
+				throw new OCSForbiddenException('Do not insert another submission');
+			} catch (DoesNotExistException $e) {
+				// all is good
+			}
+		}
 
 		// Create Submission
 		$submission = new Submission();
