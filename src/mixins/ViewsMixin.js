@@ -134,9 +134,6 @@ export default {
 				if (this.form.answers) {
 					this.answers = this.form.answers
 					this.newSubmission = this.form.newSubmission
-				} else {
-					this.answers = []
-					this.newSubmission = true
 				}
 			} catch (error) {
 				if (axios.isCancel(error)) {
