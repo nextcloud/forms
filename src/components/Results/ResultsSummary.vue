@@ -92,6 +92,15 @@ export default {
 				percentage: 0,
 			}))
 
+			// Also record 'Other'
+			if (this.question.extraSettings?.allowOtherAnswer) {
+				questionOptionsStats.unshift({
+					text: t('forms', 'Other'),
+					count: 0,
+					percentage: 0,
+				})
+			}
+
 			// Also record 'No response'
 			questionOptionsStats.unshift({
 				// TRANSLATORS Counts on Results-Summary, how many users did not respond to this question.
@@ -112,11 +121,15 @@ export default {
 				answers.forEach(answer => {
 					const optionsStatIndex = questionOptionsStats.findIndex(option => option.text === answer.text)
 					if (optionsStatIndex < 0) {
-						questionOptionsStats.push({
-							text: answer.text,
-							count: 1,
-							percentage: 0,
-						})
+						if (this.question.extraSettings?.allowOtherAnswer) {
+							questionOptionsStats[1].count++
+						} else {
+							questionOptionsStats.push({
+								text: answer.text,
+								count: 1,
+								percentage: 0,
+							})
+						}
 					} else {
 						questionOptionsStats[optionsStatIndex].count++
 					}

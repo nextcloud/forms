@@ -43,6 +43,10 @@
 				@update:checked="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
+			<NcActionCheckbox :checked="extraSettings?.allowOtherAnswer"
+				@update:checked="onAllowOtherAnswerChange">
+				{{ t('forms', 'Add "other"') }}
+			</NcActionCheckbox>
 		</template>
 		<template v-if="!edit">
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
@@ -57,6 +61,22 @@
 					@keydown.enter.exact.prevent="onKeydownEnter">
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
+				<div v-if="allowOtherAnswer" class="question__other-answer">
+					<NcCheckboxRadioSwitch :checked.sync="questionValues"
+						:value="valueOtherAnswer"
+						:name="`${id}-answer`"
+						:type="isUnique ? 'radio' : 'checkbox'"
+						:required="checkRequired('other-answer')"
+						class="question__label"
+						@update:checked="onChange"
+						@keydown.enter.exact.prevent="onKeydownEnter">
+						{{ t('forms', 'Other:') }}
+					</NcCheckboxRadioSwitch>
+					<NcInputField :placeholder="placeholderOtherAnswer"
+						:required="hasRequiredOtherAnswerInput"
+						:value.sync="inputOtherAnswer"
+						class="question__input" />
+				</div>
 			</fieldset>
 		</template>
 
@@ -76,7 +96,15 @@
 						@delete="deleteOption"
 						@update:answer="updateAnswer" />
 				</template>
-
+				<li v-if="allowOtherAnswer" class="question__item">
+					<div :is="pseudoIcon" class="question__item__pseudoInput" />
+					<input :placeholder="t('forms', 'Other')"
+						class="question__input"
+						:maxlength="maxStringLengths.optionText"
+						minlength="1"
+						type="text"
+						:readonly="edit">
+				</li>
 				<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
 					<div :is="pseudoIcon" class="question__item__pseudoInput" />
 					<input :aria-label="t('forms', 'Add a new answer')"
@@ -100,6 +128,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
+import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
@@ -117,6 +146,7 @@ export default {
 		IconRadioboxBlank,
 		NcActionCheckbox,
 		NcCheckboxRadioSwitch,
+		NcInputField,
 	},
 
 	mixins: [QuestionMixin],
@@ -124,10 +154,19 @@ export default {
 	data() {
 		return {
 			questionValues: this.values,
+			inputOtherAnswer: this.valueToInputOtherAnswer(),
+			QUESTION_EXTRASETTINGS_OTHER_PREFIX: 'system-other-answer:',
 		}
 	},
 
 	computed: {
+		placeholderOtherAnswer() {
+			if (this.readOnly) {
+				return this.answerType.submitPlaceholder
+			}
+			return this.answerType.createPlaceholder
+		},
+
 		contentValid() {
 			return this.answerType.validate(this)
 		},
@@ -160,6 +199,19 @@ export default {
 		titleId() {
 			return `q${this.$attrs.index}_title`
 		},
+
+		allowOtherAnswer() {
+			return this.extraSettings?.allowOtherAnswer
+		},
+
+		valueOtherAnswer() {
+			return this.QUESTION_EXTRASETTINGS_OTHER_PREFIX + this.inputOtherAnswer
+		},
+
+		hasRequiredOtherAnswerInput() {
+			const checkedOtherAnswer = this.questionValues.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			return checkedOtherAnswer[0] !== undefined
+		},
 	},
 
 	watch: {
@@ -178,23 +230,27 @@ export default {
 				this.updateOptions(options)
 			}
 		},
+
+		inputOtherAnswer() {
+			if (this.isUnique) {
+				this.questionValues = this.valueOtherAnswer
+				this.onChange()
+				return
+			}
+
+			this.questionValues = this.questionValues.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+
+			if (this.inputOtherAnswer !== '') {
+				this.questionValues.push(this.valueOtherAnswer)
+			}
+
+			this.onChange()
+		},
 	},
 
 	methods: {
 		onChange() {
-			// Checkbox: convert to array of Numbers
-			if (!this.isUnique) {
-				const arrOfNum = []
-
-				this.questionValues.forEach(str => {
-					arrOfNum.push(Number(str))
-				})
-				this.$emit('update:values', arrOfNum)
-				return
-			}
-
-			// Radio: create array
-			this.$emit('update:values', [this.questionValues])
+			this.$emit('update:values', this.isUnique ? [this.questionValues] : this.questionValues)
 		},
 
 		/**
@@ -348,6 +404,20 @@ export default {
 				input.focus()
 			}
 		},
+
+		/**
+		 * Update status extra setting allowOtherAnswer and save on DB
+		 *
+		 * @param {boolean} allowOtherAnswer show/hide field for other answer
+		 */
+		 onAllowOtherAnswerChange(allowOtherAnswer) {
+			return this.onExtraSettingsChange('allowOtherAnswer', allowOtherAnswer)
+		},
+
+		valueToInputOtherAnswer() {
+			const otherAnswer = this.values.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			return otherAnswer[0] !== undefined ? otherAnswer[0].substring(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX.length) : ''
+		},
 	},
 }
 </script>
@@ -402,4 +472,28 @@ export default {
 		}
 	}
 }
+
+.question__other-answer {
+	display: flex;
+	gap: 4px 16px;
+	flex-wrap: wrap;
+
+	.question__label {
+		flex-basis: content;
+	}
+
+	.question__input {
+		flex: 1;
+		min-width: 260px;
+	}
+
+	.input-field__input {
+		min-height: 44px;
+	}
+}
+
+.question__other-answer:deep() .input-field__input {
+	min-height: 44px;
+}
+
 </style>

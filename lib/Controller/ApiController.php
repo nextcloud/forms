@@ -1002,25 +1002,28 @@ class ApiController extends OCSController {
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
 			if ($questionIndex === false) {
 				continue;
-			} else {
-				$question = $questions[$questionIndex];
 			}
+			
+			$question = $questions[$questionIndex];
 
 			foreach ($answerArray as $answer) {
+				$answerText = '';
+
 				// Are we using answer ids as values
 				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 					// Search corresponding option, skip processing if not found
 					$optionIndex = array_search($answer, array_column($question['options'], 'id'));
-					if ($optionIndex === false) {
-						continue;
-					} else {
-						$option = $question['options'][$optionIndex];
+					if ($optionIndex !== false) {
+						$answerText = $question['options'][$optionIndex]['text'];
+					} elseif (!empty($question['extraSettings']->allowOtherAnswer) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
+						$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
 					}
-
-					// Load option-text
-					$answerText = $option['text'];
 				} else {
 					$answerText = $answer; // Not a multiple-question, answerText is given answer
+				}
+
+				if ($answerText === "") {
+					continue;
 				}
 
 				$answerEntity = new Answer();

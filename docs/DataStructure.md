@@ -50,16 +50,17 @@ This document describes the Object-Structure, that is used within the Forms App 
 ```
 
 ### Question
-| Property    | Type            | Restrictions | Description |
-|-------------|-----------------|--------------|-------------|
-| id          | Integer         | unique       | An instance-wide unique id of the question |
-| formId      | Integer         |              | The id of the form, the question belongs to |
-| order       | Integer         | unique within form; *not* `0` | The order of the question within that form. Value `0` indicates deleted questions within database (typ. not visible outside) |
-| type        | [Question-Type](#question-types) | | Type of the question |
-| isRequired  | Boolean         |              | If the question is required to fill the form |
-| text        | String          | max. 2048 ch. | The question-text |
-| name        | String          |              | Technical identifier of the question, e.g. used as HTML name attribute |
-| options     | Array of [Options](#option) | | Array of options belonging to the question. Only relevant for question-type with predefined options. |
+| Property       | Type            | Restrictions | Description |
+|----------------|-----------------|--------------|-------------|
+| id             | Integer         | unique       | An instance-wide unique id of the question |
+| formId         | Integer         |              | The id of the form, the question belongs to |
+| order          | Integer         | unique within form; *not* `0` | The order of the question within that form. Value `0` indicates deleted questions within database (typ. not visible outside) |
+| type           | [Question-Type](#question-types) | | Type of the question |
+| isRequired     | Boolean         |              | If the question is required to fill the form |
+| text           | String          | max. 2048 ch. | The question-text |
+| name           | String          |              | Technical identifier of the question, e.g. used as HTML name attribute |
+| options        | Array of [Options](#option) | | Array of options belonging to the question. Only relevant for question-type with predefined options. |
+| extraSettings  | StdClass        |              | Additional settings for the question. For dropdown/radio/checkbox, there can be a 'shuffleOptions': true - the list of options should be shuffled. For radio/checkbox, 'allowOtherAnswer': true - allows the user to specify their own option. |
 ```
 {
   "id": 1,
@@ -69,7 +70,8 @@ This document describes the Object-Structure, that is used within the Forms App 
   "isRequired": false,
   "text": "Question 1",
   "name": "firstname",
-  "options": []
+  "options": [],
+  "extraSettings": {}
 }
 ```
 
