@@ -134,6 +134,7 @@ export default {
 				if (this.form.answers) {
 					this.answers = this.form.answers
 					this.newSubmission = this.form.newSubmission
+					this.submissionId = this.form.submissionId
 				}
 			} catch (error) {
 				if (axios.isCancel(error)) {

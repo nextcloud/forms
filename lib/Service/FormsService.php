@@ -101,18 +101,10 @@ class FormsService {
 		}
 	}
 
-	private function getAnswers(int $formId, string $userId): array|false {
-
-		$submissionEntity = null;
-		try {
-			$submissionEntity = $this->submissionMapper->findByFormAndUser($formId, $userId);
-		} catch (DoesNotExistException $e) {
-			return false;
-		}
+	private function getAnswers(int $formId, int $submissionId, string $userId): array|false {
 
 		$answerList = [];
-		$submission = $submissionEntity->read();
-		$answerEntities = $this->answerMapper->findBySubmission($submission['id']);
+		$answerEntities = $this->answerMapper->findBySubmission($submissionId);
 		foreach ($answerEntities as $answerEntity) {
 			$answer = $answerEntity->read();
 			$questionId = $answer['questionId'];
@@ -187,11 +179,19 @@ class FormsService {
 		$result = $form->read();
 		$result['questions'] = $this->getQuestions($form->getId());
 
+		// add previous submission if there is one by this user for this form
 		if ($this->currentUser->getUID()) {
-			$answers = $this->getAnswers($form->getId(), $this->currentUser->getUID());
-			if ($answers !== false) {
-				$result['answers'] = $answers;
-				$result['newSubmission'] = false;
+			$submissionEntity = null;
+			try {
+				$submissionEntity = $this->submissionMapper->findByFormAndUser($id, $this->currentUser->getUID());
+				$answers = $this->getAnswers($form->getId(), $submissionEntity->getId(), $this->currentUser->getUID());
+				if ($answers !== false) {
+					$result['answers'] = $answers;
+					$result['newSubmission'] = false;
+					$result['submissionId'] = $submissionEntity->getId();
+				}
+			} catch (DoesNotExistException $e) {
+				// do nothing
 			}
 		}
 

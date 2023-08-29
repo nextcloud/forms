@@ -105,12 +105,22 @@
 					@keydown.ctrl.enter="onKeydownCtrlEnter"
 					@update:values="(values) => onUpdate(question, values)" />
 			</ul>
-			<input ref="submitButton"
-				class="primary"
-				type="submit"
-				:value="t('forms', 'Submit')"
-				:disabled="loading"
-				:aria-label="t('forms', 'Submit form')">
+			<div class="buttons">
+				<input ref="deleteButton"
+					class="secondary"
+					type="button"
+					@click="onDeleteSubmission"
+					:value="t('forms', 'Delete')"
+					:disabled="loading"
+					:hidden="this.newSubmission"
+					:aria-label="t('forms', 'Delete form submission')">
+				<input ref="submitButton"
+					class="primary"
+					type="submit"
+					:value="t('forms', 'Submit')"
+					:disabled="loading"
+					:aria-label="t('forms', 'Submit form')">
+			</div>
 		</form>
 
 		<!-- Confirmation dialog if form is empty submitted -->
@@ -502,6 +512,28 @@ export default {
 		},
 
 		/**
+		 * Delete the submission
+		 */
+		async onDeleteSubmission() {
+			this.loading = true
+
+			try {
+				if (this.newSubmission === false) {
+					await axios.delete(generateOcsUrl('apps/forms/api/v2.1/submission/' + this.submissionId))
+				} else {
+					throw new Error('cannot delete new submission')
+				}
+				this.success = true
+				emit('forms:last-updated:set', this.form.id)
+			} catch (error) {
+				logger.error('Error while deleting the form submission', { error })
+				showError(t('forms', 'There was an error deleting the form submission'))
+			} finally {
+				this.loading = false
+			}
+		},
+
+		/**
 		 * Reset View-Data
 		 */
 		resetData() {
@@ -594,6 +626,13 @@ export default {
 			padding-inline-start: 44px;
 		}
 
+		.buttons {
+			align-self: flex-end;
+			margin: 5px;
+			margin-block-end: 160px;
+			padding-block: 10px;
+			padding-inline: 20px;
+		}
 		input[type=submit] {
 			align-self: flex-end;
 			margin: 5px;
@@ -601,6 +640,14 @@ export default {
 			padding-block: 10px;
 			padding-inline: 20px;
 		}
+		input[type=button].secondary {
+			align-self: flex-end;
+			margin: 5px;
+			margin-block-end: 160px;
+			padding-block: 10px;
+			padding-inline: 20px;
+		}
+
 	}
 }
 </style>
