@@ -791,7 +791,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setOwnerId($ownerId);
 		$form->setSubmitMultiple($submitMultiple);
-        $form->setAllowEdit($allowEdit);
+		$form->setAllowEdit($allowEdit);
 
 		$this->submissionMapper->expects($this->any())
 			->method('findParticipantsByForm')

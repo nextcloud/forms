@@ -1060,11 +1060,11 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param array $answers [question_id => arrayOfString]
-	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares. 
+	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
 	 * @return array
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
-	*/
+	 */
 	private function checkAndPrepareSubmission(int $formId, array $answers, string $shareHash = ''): array {
 		try {
 			$form = $this->formMapper->findById($formId);
