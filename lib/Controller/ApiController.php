@@ -994,10 +994,7 @@ class ApiController extends OCSController {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
 				}
 
-				// Load option-text
-				$answerText = $option['text'];
-
-				$newAnswersText[] = $answerText;
+				$newAnswerTexts[] = $answerText;
 
 				// has this answer already been stored?
 				$foundAnswer = false;
@@ -1233,9 +1230,9 @@ class ApiController extends OCSController {
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
 			if ($questionIndex === false) {
 				continue;
-			} else {
-				$question = $questions[$questionIndex];
 			}
+
+			$question = $questions[$questionIndex];
 
 			$this->storeAnswersForQuestion($submission->getId(), $question, $answerArray, false);
 		}
