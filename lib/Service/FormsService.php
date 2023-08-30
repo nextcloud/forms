@@ -101,7 +101,7 @@ class FormsService {
 		}
 	}
 
-	private function getAnswers(int $formId, int $submissionId, string $userId): array|false {
+	private function getAnswers(int $formId, int $submissionId, string $userId): array {
 
 		$answerList = [];
 		$answerEntities = $this->answerMapper->findBySubmission($submissionId);
@@ -180,7 +180,7 @@ class FormsService {
 		$result['questions'] = $this->getQuestions($form->getId());
 
 		// add previous submission if there is one by this user for this form
-		if ($this->currentUser->getUID()) {
+		if ($this->currentUser->getUID() && form->getAllowEdit()) {
 			$submissionEntity = null;
 			try {
 				$submissionEntity = $this->submissionMapper->findByFormAndUser($id, $this->currentUser->getUID());
@@ -191,6 +191,8 @@ class FormsService {
 					$result['submissionId'] = $submissionEntity->getId();
 				}
 			} catch (DoesNotExistException $e) {
+				// do nothing
+			} catch (MultipleObjectsReturnedException $e) {
 				// do nothing
 			}
 		}
