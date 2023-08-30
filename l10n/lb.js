@@ -4,6 +4,7 @@ OC.L10N.register(
     "Shared with you" : "Mat dir gedeelt",
     "Select groups" : "Wiel Gruppen äus",
     "Required" : "Noutwendeg",
+    "Other" : "Aner",
     "Set expiration date" : "Verfallsdatum setzen",
     "Delete" : "Läschen",
     "Group" : "Grupp",

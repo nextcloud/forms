@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "պատճենահանել",
     "Shared with you" : "Shared with you",
+    "Other" : "Այլ",
     "Set expiration date" : "Սահմանել վավերականության ժամկետ",
     "Delete" : "հեռացնել",
     "Group" : "Խումբ",

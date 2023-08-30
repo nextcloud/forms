@@ -38,6 +38,7 @@ OC.L10N.register(
     "Add a new answer" : "Додади нов одговор",
     "There was an issue deleting this option" : "Настана грешка при бришење на опцијата",
     "A long answer for the question “{text}”" : "Долг одговор за прашањето {index}",
+    "Other" : "Останато",
     "A short answer for the question “{text}”" : "Краток одговор за прашањето {index}",
     "No response" : "Нема одговор",
     "Delete this response" : "Избриши го одговорот",

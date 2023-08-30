@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Salin",
     "Shared with you" : "Shared with you",
     "Select groups" : "Pilih grup",
+    "Other" : "Lainnya",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
     "Delete" : "Hapus",
     "Group" : "Grup",

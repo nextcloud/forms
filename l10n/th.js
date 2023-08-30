@@ -41,6 +41,7 @@ OC.L10N.register(
     "Delete question" : "ลบคำถาม",
     "This question needs a title!" : "คำถามนี้ต้องใส่หัวข้อ!",
     "Add a new answer" : "เพิ่มคำตอบใหม่",
+    "Other" : "อื่น ๆ",
     "No response" : "ไม่มีการตอบกลับ",
     "Delete this response" : "ลบการตอบกลับนี้",
     "Set expiration date" : "กำหนดวันหมดอายุ",

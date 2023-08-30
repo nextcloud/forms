@@ -38,6 +38,7 @@ OC.L10N.register(
     "Add a new answer" : "הוספת תשובה חדשה",
     "There was an issue deleting this option" : "מחיקת האפשרות נתקלה בבעיה",
     "A long answer for the question “{text}”" : "תשובה ארוכה לשאלה „{text}”",
+    "Other" : "אחר",
     "A short answer for the question “{text}”" : "תשובה קצרה לשאלה „{text}”",
     "No response" : "אין תגובה",
     "Delete this response" : "מחיקת התגובה הזאת",

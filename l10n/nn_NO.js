@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Shared with you",
     "Select groups" : "Vel grupper",
     "Required" : "Nødvendig",
+    "Other" : "Anna",
     "Set expiration date" : "Set utløpsdato",
     "Delete" : "Slett",
     "Group" : "Gruppe",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Copïo",
     "Shared with you" : "Shared with you",
     "Required" : "Angen",
+    "Other" : "Arall",
     "Set expiration date" : "Gosod dyddiad dod i ben",
     "Delete" : "Dileu",
     "Group" : "Grŵp",

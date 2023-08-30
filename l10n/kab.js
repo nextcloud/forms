@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Nɣel",
     "Results" : "Igmaḍ",
+    "Other" : "Wayeḍ",
     "Delete" : "Kkes",
     "Group" : "Agraw",
     "Share link" : "Fren aseɣwen",

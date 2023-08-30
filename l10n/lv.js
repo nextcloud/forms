@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Koplietots ar jums",
     "Select groups" : "Izvēlieties grupas",
     "Required" : "Nepieciešams",
+    "Other" : "Cits",
     "Set expiration date" : "Uzstādīt beigu termiņu",
     "No elements found." : "Elementi netika atrasti.",
     "Permissions" : "Atļaujas",

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
+    "Other" : "மற்றவை",
     "Set expiration date" : "காலாவதி தேதியை குறிப்பிடுக",
     "Delete" : "நீக்குக",
     "Group" : "Group",

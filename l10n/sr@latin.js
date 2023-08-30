@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopija",
     "Shared with you" : "Shared with you",
+    "Other" : "Ostali",
     "Set expiration date" : "Postavi datum isteka",
     "Delete" : "Obriši",
     "Group" : "Group",

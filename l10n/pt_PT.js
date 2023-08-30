@@ -50,6 +50,7 @@ OC.L10N.register(
     "Add a new answer" : "Acrescente uma nova pergunta",
     "There was an issue deleting this option" : "Ocorreu um problema no apagar desta opção",
     "A long answer for the question “{text}”" : "Uma resposta longa para a pergunta \"{text}\"",
+    "Other" : "Outro",
     "A short answer for the question “{text}”" : "Uma resposta curta para a pergunta \"{text}\"",
     "No response" : "Nenhuma resposta",
     "Delete this response" : "Apague esta resposta",

@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Đã chia sẻ với bạn",
     "Select groups" : "Chọn nhóm",
     "Required" : "Bắt buộc",
+    "Other" : "Khác",
     "Set expiration date" : "Đặt ngày hết hạn",
     "Delete" : "Xóa",
     "Group" : "N",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "පිටපත්",
     "Anonymous response" : "නිර්නාමික ප්‍රතිචාරය",
     "responses" : "ප්‍රතිචාර",
+    "Other" : "වෙනත්",
     "Group" : "සමූහය",
     "Edit" : "සංස්කරණය",
     "Share" : "බෙදාගන්න",

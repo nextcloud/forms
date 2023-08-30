@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "E ndarë me ju",
     "Select groups" : "Përzgjidhni grupe",
     "Required" : "E domosdoshme",
+    "Other" : "Tjetër",
     "Set expiration date" : "Caktoni datë skadimi",
     "Permissions" : "Lejet",
     "Delete" : "Fshij",

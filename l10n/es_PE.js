@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
     "Required" : "Requerido",
+    "Other" : "Otro",
     "Set expiration date" : "Establecer fecha de expiración",
     "Permissions" : "Permisos",
     "Delete" : "Borrar",

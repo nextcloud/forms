@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Sinuga jagatud",
     "Select groups" : "Vali grupid",
     "Required" : "Kohustuslik",
+    "Other" : "Muu",
     "Set expiration date" : "Määra aegumise kuupäev",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Delete" : "Kustuta",

@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Kunhavata kun vi",
     "Select groups" : "Elekti grupojn",
     "Required" : "Nepra",
+    "Other" : "Alia",
     "Set expiration date" : "Uzi limdaton",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
     "No elements found." : "Nenio trovita.",

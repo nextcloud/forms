@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "Partajat cu tine",
     "Select groups" : "Selectează grupuri ",
     "Required" : "Necesar",
+    "Other" : "Altele",
     "Set expiration date" : "Specifică data expirării",
     "Delete" : "Șterge",
     "Group" : "Grup",

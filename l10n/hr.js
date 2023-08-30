@@ -50,6 +50,7 @@ OC.L10N.register(
     "Add a new answer" : "Dodaj novi odgovor",
     "There was an issue deleting this option" : "Došlo je do problema pri brisanju ove opcije",
     "A long answer for the question “{text}”" : "Dugi odgovor na pitanje „{text}“",
+    "Other" : "Drugo",
     "A short answer for the question “{text}”" : "Kratak odgovor na pitanje „{text}“",
     "No response" : "Nema odgovora",
     "Delete this response" : "Izbriši ovaj odgovor",

@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
+    "Other" : "ផ្សេងៗ",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
     "Delete" : "លុប",
     "Group" : "Group",

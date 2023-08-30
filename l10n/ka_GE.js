@@ -5,6 +5,7 @@ OC.L10N.register(
     "Shared with you" : "გაზიარებული თქვენთან",
     "Select groups" : "ჯგუფების არჩევა",
     "Required" : "სავალდებულო",
+    "Other" : "სხვა",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
     "Permissions" : "უფლებები",
     "Delete" : "წაშლა",

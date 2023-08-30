@@ -43,6 +43,7 @@
     "Add a new answer" : "回答を追加",
     "There was an issue deleting this option" : "このオプションの削除中に問題が発生しました",
     "A long answer for the question “{text}”" : "質問“{text}”の複数行回答",
+    "Other" : "その他",
     "A short answer for the question “{text}”" : "質問“{text}”の1行回答",
     "No response" : "返信なし",
     "Delete this response" : "この返信を削除",

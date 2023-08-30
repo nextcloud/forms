@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
+    "Other" : "باشقا",
     "Delete" : "ئۆچۈر",
     "Group" : "Group",
     "Share link" : "Share link",

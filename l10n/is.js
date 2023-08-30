@@ -35,6 +35,7 @@ OC.L10N.register(
     "This question needs a title!" : "Þessi spurning þarf að vera með titil!",
     "Add a new answer" : "Bæta við nýju svari",
     "A long answer for the question “{text}”" : "Langt svar við spurningunni “{text}”",
+    "Other" : "Annað",
     "A short answer for the question “{text}”" : "Stutt svar við spurningunni “{text}”",
     "No response" : "Ekkert svar",
     "Delete this response" : "Eyða þessu svari",
