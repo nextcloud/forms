@@ -180,7 +180,7 @@ class FormsService {
 		$result['questions'] = $this->getQuestions($form->getId());
 
 		// add previous submission if there is one by this user for this form
-		if ($this->currentUser->getUID() && form->getAllowEdit()) {
+		if ($this->currentUser->getUID() && $form->getAllowEdit()) {
 			$submissionEntity = null;
 			try {
 				$submissionEntity = $this->submissionMapper->findByFormAndUser($id, $this->currentUser->getUID());
