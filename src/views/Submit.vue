@@ -109,11 +109,11 @@
 				<input ref="deleteButton"
 					class="secondary"
 					type="button"
-					@click="onDeleteSubmission"
 					:value="t('forms', 'Delete')"
 					:disabled="loading"
-					:hidden="this.newSubmission"
-					:aria-label="t('forms', 'Delete form submission')">
+					:hidden="newSubmission"
+					:aria-label="t('forms', 'Delete form submission')"
+					@click="onDeleteSubmission">
 				<input ref="submitButton"
 					class="primary"
 					type="submit"
