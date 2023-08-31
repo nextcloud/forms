@@ -669,4 +669,70 @@ class ApiControllerTest extends TestCase {
 
 		$this->apiController->insertSubmission(1, $answers, '');
 	}
+
+	public function testInsertSubmission_formNotFound() {
+		$exception = $this->createMock(MapperException::class);
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willThrowException($exception);
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->insertSubmission(1, [], '');
+	}
+
+	/**
+	 * Values for the formsService mock object for the following methods: hasUserAccess, hasFormExpired, canSubmit.
+	 */
+	public function dataForCheckForbiddenException() {
+		return [
+			'user_dont_have_access_to_form' => [false, true, true],
+			'form_expired' => [true, true, true],
+			'not_allowed_to_submit' => [true, false, false],
+		];
+	}
+
+	/**
+	 * @dataProvider dataForCheckForbiddenException()
+	 */
+	public function testInsertSubmission_forbiddenException($hasUserAccess, $hasFormExpired, $canSubmit) {
+		$form = new Form();
+		$form->setId(1);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formAccess($hasUserAccess, $hasFormExpired, $canSubmit);
+
+		$this->expectException(OCSForbiddenException::class);
+
+		$this->apiController->insertSubmission(1, [], '');
+	}
+
+	public function testInsertSubmission_validateSubmission() {
+		$form = new Form();
+		$form->setId(1);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn([]);
+
+		$this->formAccess();
+
+		$this->submissionService
+			->method('validateSubmission')
+			->willReturn(false);
+
+		$this->expectException(OCSBadRequestException::class);
+
+		$this->apiController->insertSubmission(1, [], '');
+	}
+
 }
