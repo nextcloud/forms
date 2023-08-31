@@ -71,8 +71,8 @@ class Question extends Entity {
 		$this->addType('name', 'string');
 	}
 
-	public function getExtraSettings(): object {
-		return json_decode($this->getExtraSettingsJson() ?: '{}');
+	public function getExtraSettings(): array {
+		return json_decode($this->getExtraSettingsJson() ?: '{}', true); // assoc=true, => Convert to associative Array
 	}
 
 	/**
@@ -80,6 +80,14 @@ class Question extends Entity {
 	 */
 	public function setExtraSettings($extraSettings) {
 		// TODO: When the php requirement is >= 8.0 change parameter typing to `object|array` to allow assoc. arrays from `Question::fromParams`
+		
+		// Remove extraSettings that are not set
+		foreach ($extraSettings as $key => $value) {
+			if ($value === false) {
+				unset($extraSettings[$key]);
+			}
+		}
+		
 		$this->setExtraSettingsJson(json_encode($extraSettings, JSON_FORCE_OBJECT));
 	}
 

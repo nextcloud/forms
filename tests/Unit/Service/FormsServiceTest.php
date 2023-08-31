@@ -167,7 +167,7 @@ class FormsServiceTest extends TestCase {
 						'order' => 1,
 						'type' => 'dropdown',
 						'isRequired' => false,
-						'extraSettings' => (object)['shuffleOptions' => true],
+						'extraSettings' => ['shuffleOptions' => true],
 						'text' => 'Question 1',
 						'description' => 'This is our first question.',
 						'name' => '',
@@ -190,7 +190,7 @@ class FormsServiceTest extends TestCase {
 						'order' => 2,
 						'type' => 'short',
 						'isRequired' => true,
-						'extraSettings' => (object)[],
+						'extraSettings' => [],
 						'text' => 'Question 2',
 						'description' => '',
 						'name' => 'city',
@@ -258,7 +258,7 @@ class FormsServiceTest extends TestCase {
 		$question1->setOrder(1);
 		$question1->setType('dropdown');
 		$question1->setIsRequired(false);
-		$question1->setExtraSettings((object)[
+		$question1->setExtraSettings([
 			'shuffleOptions' => true
 		]);
 		$question1->setText('Question 1');
