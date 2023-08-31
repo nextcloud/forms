@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Kopyala",
     "Shared with you" : "Shared with you",
     "Select groups" : "Qrupları seç",
+    "Other" : "Digər",
     "Delete" : "Sil",
     "Group" : "Qrup",
     "Share link" : "Linki yayımla",

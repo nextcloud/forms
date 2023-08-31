@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Kopieer",
     "Shared with you" : "Met u gedeel",
     "Required" : "Vereis",
+    "Other" : "Ander",
     "Set expiration date" : "Stel vervaldatum",
     "Delete" : "Skrap",
     "Group" : "Groep",
