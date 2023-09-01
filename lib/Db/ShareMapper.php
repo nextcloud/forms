@@ -115,7 +115,7 @@ class ShareMapper extends QBMapper {
 		->where(
 			$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
 		);
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 	/**
@@ -129,6 +129,6 @@ class ShareMapper extends QBMapper {
 		->where(
 			$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
 		);
-		$qb->execute();
+		$qb->executeStatement();
 	}
 }

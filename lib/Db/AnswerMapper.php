@@ -71,6 +71,6 @@ class AnswerMapper extends QBMapper {
 			$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT))
 		);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 }

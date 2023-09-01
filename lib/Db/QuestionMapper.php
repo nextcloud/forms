@@ -89,7 +89,7 @@ class QuestionMapper extends QBMapper {
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
 			);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 	public function findById(int $questionId): Question {
