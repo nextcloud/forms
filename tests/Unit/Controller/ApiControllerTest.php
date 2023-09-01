@@ -206,7 +206,7 @@ class ApiControllerTest extends TestCase {
 	
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
-			->with(1)
+			->with($form)
 			->willReturn(false);
 
 		$this->expectException(OCSForbiddenException::class);
@@ -264,7 +264,7 @@ class ApiControllerTest extends TestCase {
 	
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
-			->with(1)
+			->with($form)
 			->willReturn(true);
 
 		$this->submissionService->expects($this->once())
@@ -303,7 +303,7 @@ class ApiControllerTest extends TestCase {
 	
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
-			->with(1)
+			->with($form)
 			->willReturn(false);
 
 		$this->expectException(OCSForbiddenException::class);
@@ -323,7 +323,7 @@ class ApiControllerTest extends TestCase {
 	
 		$this->formsService->expects(($this->once()))
 			->method('canSeeResults')
-			->with(1)
+			->with($form)
 			->willReturn(true);
 
 		$csv = ['data' => '__data__', 'fileName' => 'some.csv'];
@@ -559,17 +559,14 @@ class ApiControllerTest extends TestCase {
 	private function formAccess(bool $hasUserAccess = true, bool $hasFormExpired = false, bool $canSubmit = true) {
 		$this->formsService
 			->method('hasUserAccess')
-			->with(1)
 			->willReturn($hasUserAccess);
 
 		$this->formsService
 			->method('hasFormExpired')
-			->with(1)
 			->willReturn($hasFormExpired);
 
 		$this->formsService
 			->method('canSubmit')
-			->with(1)
 			->willReturn($canSubmit);
 	}
 

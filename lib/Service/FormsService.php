@@ -188,24 +188,23 @@ class FormsService {
 	/**
 	 * Get a form data
 	 *
-	 * @param integer $id
+	 * @param Form $form
 	 * @return array
 	 * @throws IMapperException
 	 */
-	public function getForm(int $id): array {
-		$form = $this->formMapper->findById($id);
+	public function getForm(Form $form): array {
 		$result = $form->read();
-		$result['questions'] = $this->getQuestions($id);
-		$result['shares'] = $this->getShares($id);
+		$result['questions'] = $this->getQuestions($form->getId());
+		$result['shares'] = $this->getShares($form->getId());
 
 		// Append permissions for current user.
-		$result['permissions'] = $this->getPermissions($id);
+		$result['permissions'] = $this->getPermissions($form);
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
-		$result['canSubmit'] = $this->canSubmit($form->getId());
+		$result['canSubmit'] = $this->canSubmit($form);
 
 		// Append submissionCount if currentUser has permissions to see results
 		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
-			$result['submissionCount'] = $this->submissionMapper->countSubmissions($id);
+			$result['submissionCount'] = $this->submissionMapper->countSubmissions($form->getId());
 		}
 
 		return $result;
@@ -214,26 +213,24 @@ class FormsService {
 	/**
 	 * Create partial form, as returned by Forms-Lists.
 	 *
-	 * @param integer $id
+	 * @param Form $form
 	 * @return array
 	 * @throws IMapperException
 	 */
-	public function getPartialFormArray(int $id): array {
-		$form = $this->formMapper->findById($id);
-
+	public function getPartialFormArray(Form $form): array {
 		$result = [
 			'id' => $form->getId(),
 			'hash' => $form->getHash(),
 			'title' => $form->getTitle(),
 			'expires' => $form->getExpires(),
 			'lastUpdated' => $form->getLastUpdated(),
-			'permissions' => $this->getPermissions($form->getId()),
+			'permissions' => $this->getPermissions($form),
 			'partial' => true
 		];
 
 		// Append submissionCount if currentUser has permissions to see results
 		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
-			$result['submissionCount'] = $this->submissionMapper->countSubmissions($id);
+			$result['submissionCount'] = $this->submissionMapper->countSubmissions($form->getId());
 		}
 
 		return $result;
@@ -242,30 +239,28 @@ class FormsService {
 	/**
 	 * Get a form data without sensitive informations
 	 *
-	 * @param integer $id
+	 * @param Form $form
 	 * @return array
 	 * @throws IMapperException
 	 */
-	public function getPublicForm(int $id): array {
-		$form = $this->getForm($id);
+	public function getPublicForm(Form $form): array {
+		$formData = $this->getForm($form);
 
 		// Remove sensitive data
-		unset($form['access']);
-		unset($form['ownerId']);
-		unset($form['shares']);
+		unset($formData['access']);
+		unset($formData['ownerId']);
+		unset($formData['shares']);
 
-		return $form;
+		return $formData;
 	}
 
 	/**
 	 * Get current users permissions on a form
 	 *
-	 * @param integer $formId
+	 * @param Form $form
 	 * @return array
 	 */
-	public function getPermissions(int $formId): array {
-		$form = $this->formMapper->findById($formId);
-
+	public function getPermissions(Form $form): array {
 		if (!$this->currentUser) {
 			return [];
 		}
@@ -276,7 +271,7 @@ class FormsService {
 		}
 
 		$permissions = [];
-		$shares = $this->getSharesWithUser($formId, $this->currentUser->getUID());
+		$shares = $this->getSharesWithUser($form->getId(), $this->currentUser->getUID());
 		foreach ($shares as $share) {
 			$permissions = array_merge($permissions, $share->getPermissions());
 		}
@@ -295,24 +290,22 @@ class FormsService {
 	/**
 	 * Can the current user see results of a form
 	 *
-	 * @param int $formId
+	 * @param Form $form
 	 * @return boolean
 	 */
-	public function canSeeResults(int $formId): bool {
-		return in_array(Constants::PERMISSION_RESULTS, $this->getPermissions($formId));
+	public function canSeeResults(Form $form): bool {
+		return in_array(Constants::PERMISSION_RESULTS, $this->getPermissions($form));
 	}
 
 	/**
 	 * Can the user submit a form
 	 *
-	 * @param integer $formId
+	 * @param Form $form
 	 * @return boolean
 	 */
-	public function canSubmit(int $formId): bool {
-		$form = $this->formMapper->findById($formId);
-
+	public function canSubmit(Form $form): bool {
 		// We cannot control how many time users can submit if public link / legacyLink available
-		if ($this->hasPublicLink($formId)) {
+		if ($this->hasPublicLink($form)) {
 			return true;
 		}
 
@@ -337,11 +330,10 @@ class FormsService {
 	/**
 	 * Searching Shares for public link
 	 *
-	 * @param integer $formId
+	 * @param Form $form
 	 * @return boolean
 	 */
-	public function hasPublicLink(int $formId): bool {
-		$form = $this->formMapper->findById($formId);
+	public function hasPublicLink(Form $form): bool {
 		$access = $form->getAccess();
 
 		if (isset($access['legacyLink'])) {
@@ -361,11 +353,10 @@ class FormsService {
 	/**
 	 * Check if current user has access to this form
 	 *
-	 * @param integer $formId
+	 * @param Form $form
 	 * @return boolean
 	 */
-	public function hasUserAccess(int $formId): bool {
-		$form = $this->formMapper->findById($formId);
+	public function hasUserAccess(Form $form): bool {
 		$access = $form->getAccess();
 		$ownerId = $form->getOwnerId();
 
@@ -385,7 +376,7 @@ class FormsService {
 		}
 
 		// Selected Access remains.
-		if ($this->isSharedToUser($formId)) {
+		if ($this->isSharedToUser($form->getId())) {
 			return true;
 		}
 
@@ -396,11 +387,10 @@ class FormsService {
 	/**
 	 * Is the form shown on sidebar to the user.
 	 *
-	 * @param int $formId
+	 * @param Form $form
 	 * @return bool
 	 */
-	public function isSharedFormShown(int $formId): bool {
-		$form = $this->formMapper->findById($formId);
+	public function isSharedFormShown(Form $form): bool {
 		$access = $form->getAccess();
 
 		// Dont show here to owner, as its in the owned list anyways.
@@ -409,7 +399,7 @@ class FormsService {
 		}
 
 		// Dont show expired forms.
-		if ($this->hasFormExpired($form->getId())) {
+		if ($this->hasFormExpired($form)) {
 			return false;
 		}
 
@@ -421,7 +411,7 @@ class FormsService {
 		}
 
 		// Shown if user in List of Shared Users/Groups
-		if ($this->isSharedToUser($formId)) {
+		if ($this->isSharedToUser($form->getId())) {
 			return true;
 		}
 
@@ -443,11 +433,10 @@ class FormsService {
 	/*
 	 * Has the form expired?
 	 *
-	 * @param int $formId The id of the form to check.
+	 * @param Form $form
 	 * @return boolean
 	 */
-	public function hasFormExpired(int $formId): bool {
-		$form = $this->formMapper->findById($formId);
+	public function hasFormExpired(Form $form): bool {
 		return ($form->getExpires() !== 0 && $form->getExpires() < time());
 	}
 
