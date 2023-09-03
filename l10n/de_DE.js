@@ -71,7 +71,7 @@ OC.L10N.register(
     "A long answer for the question “{text}”" : "Eine lange Antwort zu Frage „{text}“",
     "Add \"other\"" : "\"andere\" hinzufügen",
     "Other:" : "Andere:",
-    "Other" : "Sonstiges",
+    "Other" : "Andere",
     "A short answer for the question “{text}”" : "Eine kurze Antwort zu Frage „{text}“",
     "No response" : "Keine Antwort",
     "Delete this response" : "Diese Antwort löschen",
