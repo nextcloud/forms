@@ -32,14 +32,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -117,14 +117,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -186,14 +186,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           path: apps/${{ env.APP_NAME }}
 
@@ -261,14 +261,14 @@ jobs:
 
     steps:
       - name: Checkout server
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
           submodules: true
 
       - name: Checkout app
-        uses: actions/checkout@v3
+        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           path: apps/${{ env.APP_NAME }}
 
