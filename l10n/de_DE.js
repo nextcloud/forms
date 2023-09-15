@@ -69,7 +69,7 @@ OC.L10N.register(
     "Add a new answer" : "Neue Antwort hinzufügen",
     "There was an issue deleting this option" : "Es gab einen Fehler beim Löschen dieser Option",
     "A long answer for the question “{text}”" : "Eine lange Antwort zu Frage „{text}“",
-    "Add \"other\"" : "\"andere\" hinzufügen",
+    "Add \"other\"" : "\"Andere\" hinzufügen",
     "Other:" : "Andere:",
     "Other" : "Andere",
     "A short answer for the question “{text}”" : "Eine kurze Antwort zu Frage „{text}“",
