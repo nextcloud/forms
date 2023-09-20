@@ -67,6 +67,7 @@
     "Add a new answer" : "Afegeix una resposta nova",
     "There was an issue deleting this option" : "Hi ha hagut un problema en suprimir aquesta opció",
     "A long answer for the question “{text}”" : "Resposta llarga per a la pregunta «{text}»",
+    "Other" : "Altres",
     "A short answer for the question “{text}”" : "Resposta curta per a la pregunta «{text}»",
     "No response" : "Sense resposta",
     "Delete this response" : "Suprimeix aquesta resposta",
