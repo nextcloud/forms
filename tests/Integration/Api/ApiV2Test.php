@@ -215,7 +215,7 @@ class ApiV2Test extends TestCase {
 					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
 					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
 				]);
-			$qb->execute();
+			$qb->executeStatement();
 			$formId = $qb->getLastInsertId();
 			$this->testForms[$index]['id'] = $formId;
 
@@ -232,7 +232,7 @@ class ApiV2Test extends TestCase {
 						'description' => $qb->createNamedParameter($question['description'], IQueryBuilder::PARAM_STR),
 						'extra_settings_json' => $qb->createNamedParameter(json_encode($question['extraSettings']), IQueryBuilder::PARAM_STR),
 					]);
-				$qb->execute();
+				$qb->executeStatement();
 				$questionId = $qb->getLastInsertId();
 				$this->testForms[$index]['questions'][$qIndex]['id'] = $questionId;
 
@@ -243,7 +243,7 @@ class ApiV2Test extends TestCase {
 							'question_id' => $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT),
 							'text' => $qb->createNamedParameter($option['text'], IQueryBuilder::PARAM_STR)
 						]);
-					$qb->execute();
+					$qb->executeStatement();
 					$this->testForms[$index]['questions'][$qIndex]['options'][$oIndex]['id'] = $qb->getLastInsertId();
 				}
 			}
@@ -257,7 +257,7 @@ class ApiV2Test extends TestCase {
 						'share_with' => $qb->createNamedParameter($share['shareWith'], IQueryBuilder::PARAM_STR),
 						'permissions_json' => $qb->createNamedParameter(json_encode($share['permissions'] ?? null), IQueryBuilder::PARAM_STR),
 					]);
-				$qb->execute();
+				$qb->executeStatement();
 				$this->testForms[$index]['shares'][$sIndex]['id'] = $qb->getLastInsertId();
 			}
 
@@ -269,7 +269,7 @@ class ApiV2Test extends TestCase {
 						'user_id' => $qb->createNamedParameter($submission['userId'], IQueryBuilder::PARAM_STR),
 						'timestamp' => $qb->createNamedParameter($submission['timestamp'], IQueryBuilder::PARAM_INT)
 					]);
-				$qb->execute();
+				$qb->executeStatement();
 				$submissionId = $qb->getLastInsertId();
 				$this->testForms[$index]['submissions'][$suIndex]['id'] = $submissionId;
 
@@ -280,7 +280,7 @@ class ApiV2Test extends TestCase {
 							'question_id' => $qb->createNamedParameter($this->testForms[$index]['questions'][$answer['questionIndex']]['id'], IQueryBuilder::PARAM_INT),
 							'text' => $qb->createNamedParameter($answer['text'], IQueryBuilder::PARAM_STR)
 						]);
-					$qb->execute();
+					$qb->executeStatement();
 					$this->testForms[$index]['submissions'][$suIndex]['answers'][$aIndex]['id'] = $qb->getLastInsertId();
 				}
 			}
@@ -304,36 +304,36 @@ class ApiV2Test extends TestCase {
 		foreach ($this->testForms as $form) {
 			$qb->delete('forms_v2_forms')
 				->where($qb->expr()->eq('id', $qb->createNamedParameter($form['id'], IQueryBuilder::PARAM_INT)));
-			$qb->execute();
+			$qb->executeStatement();
 
 			foreach ($form['questions'] as $question) {
 				$qb->delete('forms_v2_questions')
 					->where($qb->expr()->eq('id', $qb->createNamedParameter($question['id'], IQueryBuilder::PARAM_INT)));
-				$qb->execute();
+				$qb->executeStatement();
 
 				foreach ($question['options'] as $option) {
 					$qb->delete('forms_v2_options')
 						->where($qb->expr()->eq('id', $qb->createNamedParameter($option['id'], IQueryBuilder::PARAM_INT)));
-					$qb->execute();
+					$qb->executeStatement();
 				}
 			}
 
 			foreach ($form['shares'] as $share) {
 				$qb->delete('forms_v2_shares')
 					->where($qb->expr()->eq('id', $qb->createNamedParameter($share['id'], IQueryBuilder::PARAM_INT)));
-				$qb->execute();
+				$qb->executeStatement();
 			}
 
 			if (isset($form['submissions'])) {
 				foreach ($form['submissions'] as $submission) {
 					$qb->delete('forms_v2_submissions')
 						->where($qb->expr()->eq('id', $qb->createNamedParameter($submission['id'], IQueryBuilder::PARAM_INT)));
-					$qb->execute();
+					$qb->executeStatement();
 
 					foreach ($submission['answers'] as $answer) {
 						$qb->delete('forms_v2_answers')
 							->where($qb->expr()->eq('id', $qb->createNamedParameter($answer['id'], IQueryBuilder::PARAM_INT)));
-						$qb->execute();
+						$qb->executeStatement();
 					}
 				}
 			}
