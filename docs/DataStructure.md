@@ -60,7 +60,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | text           | String          | max. 2048 ch. | The question-text |
 | name           | String          |              | Technical identifier of the question, e.g. used as HTML name attribute |
 | options        | Array of [Options](#option) | | Array of options belonging to the question. Only relevant for question-type with predefined options. |
-| extraSettings  | StdClass        |              | Additional settings for the question. For dropdown/radio/checkbox, there can be a 'shuffleOptions': true - the list of options should be shuffled. For radio/checkbox, 'allowOtherAnswer': true - allows the user to specify their own option. |
+| extraSettings  | [Extra Settings](#extra-settings)        |              | Additional settings for the question.  |
 ```
 {
   "id": 1,
@@ -178,3 +178,11 @@ Currently supported Question-Types are:
 | `date`          | Showing a dropdown calendar to select a date. |
 | _`datetime`_      | _deprecated: No longer available for new questions. Showing a dropdown calendar to select a date **and** a time._ |
 | `time`          | Showing a dropdown menu to select a time. |
+
+## Extra Settings
+Optional extra settings for some [Question Types](#question-types)
+
+| Extra Setting      | Question Type | Type   | Values | Description |
+|--------------------|---------------|--------|--------|-------------|
+| `allowOtherAnswer` | `multiple, multiple_unique` | Boolean | Allows the user to specify a custom answer |
+| `shuffleOptions`   | `dropdown, multiple, multiple_unique` | Boolean | The list of options should be shuffled |
