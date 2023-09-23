@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopioi",
     "Anonymous response" : "Anonyymi vastaus",
     "Shared by %s" : "Jakanut %s",
+    "User ID" : "Käyttäjätunniste",
     "User display name" : "Käyttäjän näyttönimi",
     "Timestamp" : "Aikaleima",
     "responses" : "vastausta",
