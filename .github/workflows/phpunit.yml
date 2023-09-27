@@ -20,13 +20,9 @@ jobs:
       matrix:
         php-versions: ["8.0", "8.1", "8.2"]
         # Upload coverage only once (out of php-versions)
-        coverage-on: ['8.1']
+        coverage-on: ['8.2']
         databases: ['sqlite']
         server-versions: ['master']
-        include:
-          - php-versions: "7.4"
-            databases: 'sqlite'
-            server-versions: 'stable25'
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -100,9 +96,9 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.2']
         databases: ['mysql']
-        server-versions: ['stable25', 'stable26', 'stable27', 'master']
+        server-versions: ['stable26', 'stable27', 'master']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -167,7 +163,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.2']
         databases: ['pgsql']
         server-versions: ['master']
   
@@ -236,7 +232,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.2']
         databases: ['oci']
         server-versions: ['master']
 
