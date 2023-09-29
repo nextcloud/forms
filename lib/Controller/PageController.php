@@ -178,14 +178,14 @@ class PageController extends Controller {
 			Util::addStyle($this->appName, 'forms');
 
 			// Has form expired
-			if ($this->formsService->hasFormExpired($form->getId())) {
+			if ($this->formsService->hasFormExpired($form)) {
 				return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
 			}
 
 			// Public Template to fill the form
 			Util::addScript($this->appName, 'forms-submit');
 			$this->insertHeaderOnIos();
-			$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form->getId()));
+			$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form));
 			$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
 			$this->initialState->provideInitialState('shareHash', $hash);
 			$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
@@ -215,14 +215,14 @@ class PageController extends Controller {
 		}
 
 		// Has form expired
-		if ($this->formsService->hasFormExpired($form->getId())) {
+		if ($this->formsService->hasFormExpired($form)) {
 			return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
 		}
 
 		// Main Template to fill the form
 		Util::addScript($this->appName, 'forms-submit');
 		$this->insertHeaderOnIos();
-		$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form->getId()));
+		$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form));
 		$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialState->provideInitialState('shareHash', $hash);
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);

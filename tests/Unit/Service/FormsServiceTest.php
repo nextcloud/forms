@@ -236,11 +236,6 @@ class FormsServiceTest extends TestCase {
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		// User & Group Formatting
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())
@@ -310,7 +305,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn(123);
 
 		// Run the test
-		$this->assertEquals($expected, $this->formsService->getForm(42));
+		$this->assertEquals($expected, $this->formsService->getForm($form));
 	}
 
 	public function dataGetPartialForm() {
@@ -341,18 +336,13 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setLastUpdated(123456789);
 
-		$this->formMapper->expects($this->exactly(2))
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$this->submissionMapper->expects($this->once())
 			->method('countSubmissions')
 			->with(42)
 			->willReturn(123);
 
 		// Run the test
-		$this->assertEquals($expected, $this->formsService->getPartialFormArray(42));
+		$this->assertEquals($expected, $this->formsService->getPartialFormArray($form));
 	}
 
 	public function dataGetPartialFormShared() {
@@ -395,18 +385,13 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([$share]);
 
-		$this->formMapper->expects($this->exactly(2))
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$this->submissionMapper->expects($this->once())
 			->method('countSubmissions')
 			->with(42)
 			->willReturn(123);
 
 		// Run the test
-		$this->assertEquals($expected, $this->formsService->getPartialFormArray(42));
+		$this->assertEquals($expected, $this->formsService->getPartialFormArray($form));
 	}
 
 	public function dataGetPublicForm() {
@@ -455,11 +440,6 @@ class FormsServiceTest extends TestCase {
 		$form->setSubmitMultiple(true);
 		$form->setShowExpiration(false);
 
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		// User & Group Formatting
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())
@@ -489,7 +469,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn([$share]);
 
 		// Run the test
-		$this->assertEquals($expected, $this->formsService->getPublicForm(42));
+		$this->assertEquals($expected, $this->formsService->getPublicForm($form));
 	}
 
 	public function dataGetPermissions() {
@@ -559,11 +539,6 @@ class FormsServiceTest extends TestCase {
 		$form->setOwnerId($ownerId);
 		$form->setAccess($access);
 
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$sharesEntities = [];
 		$shareId = 0;
 		foreach ($shares as $share) {
@@ -585,7 +560,7 @@ class FormsServiceTest extends TestCase {
 			->method('getAllowPermitAll')
 			->willReturn(true);
 
-		$this->assertEquals($expected, $this->formsService->getPermissions(42));
+		$this->assertEquals($expected, $this->formsService->getPermissions($form));
 	}
 
 	// No currentUser on public views.
@@ -612,12 +587,8 @@ class FormsServiceTest extends TestCase {
 
 		$form = new Form();
 		$form->setId(42);
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
 
-		$this->assertEquals([], $formsService->getPermissions(42));
+		$this->assertEquals([], $formsService->getPermissions($form));
 	}
 
 	public function dataCanSeeResults() {
@@ -667,11 +638,6 @@ class FormsServiceTest extends TestCase {
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
-		
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
 
 		$shares = [];
 		foreach ($sharesArray as $id => $share) {
@@ -689,7 +655,7 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn($shares);
 
-		$this->assertEquals($expected, $this->formsService->canSeeResults(42));
+		$this->assertEquals($expected, $this->formsService->canSeeResults($form));
 	}
 
 	public function dataCanSubmit() {
@@ -738,17 +704,12 @@ class FormsServiceTest extends TestCase {
 		$form->setOwnerId($ownerId);
 		$form->setSubmitMultiple($submitMultiple);
 
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$this->submissionMapper->expects($this->any())
 			->method('findParticipantsByForm')
 			->with(42)
 			->willReturn($participantsArray);
 
-		$this->assertEquals($expected, $this->formsService->canSubmit(42));
+		$this->assertEquals($expected, $this->formsService->canSubmit($form));
 	}
 
 	/**
@@ -761,11 +722,6 @@ class FormsServiceTest extends TestCase {
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
-
-		$this->formMapper->expects($this->any())
-		->method('findById')
-		->with(42)
-		->willReturn($form);
 
 		$share = new Share;
 		$share->setShareType(IShare::TYPE_LINK);
@@ -798,7 +754,7 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom
 		);
 
-		$this->assertEquals(true, $formsService->canSubmit(42));
+		$this->assertEquals(true, $formsService->canSubmit($form));
 	}
 
 	public function dataHasPublicLink() {
@@ -842,11 +798,6 @@ class FormsServiceTest extends TestCase {
 		$form->setId(42);
 		$form->setAccess($access);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$share = new Share();
 		$share->setShareType($shareType);
 		$this->shareMapper->expects($this->any())
@@ -854,7 +805,7 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([$share]);
 
-		$this->assertEquals($expected, $this->formsService->hasPublicLink(42));
+		$this->assertEquals($expected, $this->formsService->hasPublicLink($form));
 	}
 
 	public function dataHasUserAccess() {
@@ -894,33 +845,25 @@ class FormsServiceTest extends TestCase {
 	 */
 	public function testHasUserAccess(array $accessArray, string $ownerId, bool $expected) {
 		$form = new Form();
+		$form->setId(42);
 		$form->setAccess($accessArray);
 		$form->setOwnerId($ownerId);
-
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
 
 		$this->configService->expects($this->any())
 			->method('getAllowPermitAll')
 			->willReturn(true);
 
-		$this->assertEquals($expected, $this->formsService->hasUserAccess(42));
+		$this->assertEquals($expected, $this->formsService->hasUserAccess($form));
 	}
 
 	public function testHasUserAccess_DirectShare() {
 		$form = new Form();
+		$form->setId(42);
 		$form->setAccess([
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
 		$form->setOwnerId('notCurrentUser');
-
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
 
 		$share = new Share();
 		$share->setShareType(IShare::TYPE_USER);
@@ -930,27 +873,23 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([$share]);
 
-		$this->assertEquals(true, $this->formsService->hasUserAccess(42));
+		$this->assertEquals(true, $this->formsService->hasUserAccess($form));
 	}
 
 	public function testHasUserAccess_PermitAllNotAllowed() {
 		$form = new Form();
+		$form->setId(42);
 		$form->setAccess([
 			'permitAllUsers' => true,
 			'showToAllUsers' => true,
 		]);
 		$form->setOwnerId('notCurrentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$this->configService->expects($this->once())
 			->method('getAllowPermitAll')
 			->willReturn(false);
 
-		$this->assertEquals(false, $this->formsService->hasUserAccess(42));
+		$this->assertEquals(false, $this->formsService->hasUserAccess($form));
 	}
 
 	public function testHasUserAccess_NotLoggedIn() {
@@ -975,18 +914,14 @@ class FormsServiceTest extends TestCase {
 		);
 
 		$form = new Form();
+		$form->setId(42);
 		$form->setAccess([
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
 		$form->setOwnerId('someOtherUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
-		$this->assertEquals(false, $formsService->hasUserAccess(42));
+		$this->assertEquals(false, $formsService->hasUserAccess($form));
 	}
 
 	public function dataIsSharedFormShown() {
@@ -1059,11 +994,6 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires($expires);
 		$form->setAccess($access);
 
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$this->configService->expects($this->any())
 			->method('getAllowPermitAll')
 			->willReturn(true);
@@ -1076,7 +1006,7 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([$share]);
 
-		$this->assertEquals($expected, $this->formsService->isSharedFormShown(42));
+		$this->assertEquals($expected, $this->formsService->isSharedFormShown($form));
 	}
 
 	public function testIsSharedFormShown_PermitAllNotAllowed() {
@@ -1089,11 +1019,6 @@ class FormsServiceTest extends TestCase {
 			'showToAllUsers' => true,
 		]);
 
-		$this->formMapper->expects($this->any())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
 		$this->configService->expects($this->any())
 			->method('getAllowPermitAll')
 			->willReturn(false);
@@ -1103,7 +1028,7 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([]);
 
-		$this->assertEquals(false, $this->formsService->isSharedFormShown(42));
+		$this->assertEquals(false, $this->formsService->isSharedFormShown($form));
 	}
 
 	public function dataIsSharedToUser() {
@@ -1178,12 +1103,7 @@ class FormsServiceTest extends TestCase {
 		$form = new Form();
 		$form->setExpires($expires);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(42)
-			->willReturn($form);
-
-		$this->assertEquals($expected, $this->formsService->hasFormExpired(42));
+		$this->assertEquals($expected, $this->formsService->hasFormExpired($form));
 	}
 
 	public function dataGetShareDisplayName() {

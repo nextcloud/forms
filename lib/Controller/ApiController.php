@@ -155,7 +155,7 @@ class ApiController extends OCSController {
 
 		$result = [];
 		foreach ($forms as $form) {
-			$result[] = $this->formsService->getPartialFormArray($form->getId());
+			$result[] = $this->formsService->getPartialFormArray($form);
 		}
 
 		return new DataResponse($result);
@@ -175,10 +175,10 @@ class ApiController extends OCSController {
 		$result = [];
 		foreach ($forms as $form) {
 			// Check if the form should be shown on sidebar
-			if (!$this->formsService->isSharedFormShown($form->getId())) {
+			if (!$this->formsService->isSharedFormShown($form)) {
 				continue;
 			}
-			$result[] = $this->formsService->getPartialFormArray($form->getId());
+			$result[] = $this->formsService->getPartialFormArray($form);
 		}
 
 		return new DataResponse($result);
@@ -202,12 +202,12 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if (!$this->formsService->hasUserAccess($form->getId())) {
+		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
 			throw new OCSForbiddenException();
 		}
 
-		return new DataResponse($this->formsService->getPartialFormArray($form->getId()));
+		return new DataResponse($this->formsService->getPartialFormArray($form));
 	}
 
 	/**
@@ -223,18 +223,19 @@ class ApiController extends OCSController {
 	 */
 	public function getForm(int $id): DataResponse {
 		try {
-			$form = $this->formsService->getForm($id);
+			$form = $this->formMapper->findById($id);
+			$formData = $this->formsService->getForm($form);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
 			throw new OCSBadRequestException();
 		}
 
-		if (!$this->formsService->hasUserAccess($id)) {
+		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
 			throw new OCSForbiddenException();
 		}
 
-		return new DataResponse($form);
+		return new DataResponse($formData);
 	}
 
 	/**
@@ -873,7 +874,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if (!$this->formsService->canSeeResults($form->id)) {
+		if (!$this->formsService->canSeeResults($form)) {
 			$this->logger->debug('The current user has no permission to get the results for this form');
 			throw new OCSForbiddenException();
 		}
@@ -959,18 +960,18 @@ class ApiController extends OCSController {
 			// $isPublicShare already false.
 		} finally {
 			// Now forbid, if no public share and no direct share.
-			if (!$isPublicShare && !$this->formsService->hasUserAccess($form->getId())) {
+			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
 				throw new OCSForbiddenException('Not allowed to access this form');
 			}
 		}
 
 		// Not allowed if form has expired.
-		if ($this->formsService->hasFormExpired($form->getId())) {
+		if ($this->formsService->hasFormExpired($form)) {
 			throw new OCSForbiddenException('This form is no longer taking answers');
 		}
 
 		// Does the user have permissions to submit
-		if (!$this->formsService->canSubmit($form->getId())) {
+		if (!$this->formsService->canSubmit($form)) {
 			throw new OCSForbiddenException('Already submitted');
 		}
 
@@ -1138,7 +1139,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if (!$this->formsService->canSeeResults($form->id)) {
+		if (!$this->formsService->canSeeResults($form)) {
 			$this->logger->debug('The current user has no permission to get the results for this form');
 			throw new OCSForbiddenException();
 		}
@@ -1172,7 +1173,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if (!$this->formsService->canSeeResults($form->id)) {
+		if (!$this->formsService->canSeeResults($form)) {
 			$this->logger->debug('The current user has no permission to get the results for this form');
 			throw new OCSForbiddenException();
 		}
