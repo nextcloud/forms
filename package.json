@@ -36,7 +36,7 @@
     "core-js": "^3.32.2",
     "crypto-js": "^4.1.1",
     "debounce": "^1.2.1",
-    "markdown-it": "^13.0.1",
+    "markdown-it": "^13.0.2",
     "p-debounce": "^4.0.0",
     "p-queue": "^7.4.1",
     "regenerator-runtime": "^0.14.0",
