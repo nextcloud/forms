@@ -408,7 +408,6 @@ export default {
 
 			&__input,
 			&__output {
-				font-size: 14px;
 				color: var(--color-text-maxcontrast) !important;
 				line-height: 1.5em;
 				z-index: inherit;
