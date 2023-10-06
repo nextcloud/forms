@@ -116,10 +116,8 @@ export default {
 
 		/**
 		 * Extra settings
-		 * Currently only contains whether options should be shuffled
 		 */
 		extraSettings: {
-			type: Object,
 			default: () => {
 				return {}
 			},
