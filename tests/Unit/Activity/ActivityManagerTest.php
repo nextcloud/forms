@@ -33,6 +33,7 @@ use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserSession;
+use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
@@ -174,5 +175,70 @@ class ActivityManagerTest extends TestCase {
 			->with($event);
 
 		$this->activityManager->publishNewSubmission($form, $submittorId);
+	}
+
+	public function dataPublichNewSharedSubmission() {
+		return [
+			'user-share' => [
+				'shareType' => IShare::TYPE_USER,
+				'shareWith' => 'sharedUser',
+				'expected' => [['sharedUser']]
+			],
+			'group-share' => [
+				IShare::TYPE_GROUP,
+				'sharedGroup',
+				[['user1'], ['user2']],
+				['user1', 'user2'],
+			]
+		];
+	}
+
+	/**
+	 * Test notify shared results
+	 *
+	 * @dataProvider dataPublichNewSharedSubmission
+	 */
+	public function testPublishNewSharedSubmission(int $shareType, string $shareWith, array $expected, ?array $groupUsers = null) {
+		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
+		$form = new Form();
+		$form->setId(5);
+		$form->setTitle('TestForm-Title');
+		$form->setHash('abcdefg12345');
+		$form->setOwnerId('formOwner');
+		$submitterId = 'submittingUser';
+
+		if ($groupUsers === null) {
+			$this->groupManager->expects($this->never())->method('get');
+		} else {
+			$users = array_map(function ($name) {
+				$user = $this->createMock(IUser::class);
+				$user->expects($this->once())->method('getUID')->willReturn($name);
+				return $user;
+			}, $groupUsers);
+			$group = $this->createMock(IGroup::class);
+			$group->expects($this->once())->method('getUsers')->willReturn($users);
+			$this->groupManager->expects($this->once())->method('get')->willReturn($group);
+		}
+
+		$event = $this->createMock(IEvent::class);
+		$this->manager->expects($this->exactly(count($expected)))
+			->method('generateEvent')
+			->willReturn($event);
+		$event->expects($this->exactly(count($expected)))->method('setApp')->with('forms')->willReturn($event);
+		$event->expects($this->exactly(count($expected)))->method('setType')->with('forms_newsharedsubmission')->willReturn($event);
+		$event->expects($this->exactly(count($expected)))->method('setAffectedUser')->withConsecutive(...[...$expected])->willReturn($event);
+		$event->expects($this->exactly(count($expected)))->method('setAuthor')->with('submittingUser')->willReturn($event);
+		$event->expects($this->exactly(count($expected)))->method('setObject')->with('form', 5)->willReturn($event);
+		$event->expects($this->exactly(count($expected)))->method('setSubject')->with('newsubmission', [
+			'userId' => 'submittingUser',
+			'formTitle' => 'TestForm-Title',
+			'formHash' => 'abcdefg12345'
+		])->willReturn($event);
+
+		$this->manager->expects($this->exactly(count($expected)))
+			->method('publish')
+			->with($event);
+
+		$this->activityManager->publishNewSharedSubmission($form, $shareType, $shareWith, $submitterId);
 	}
 }

@@ -1192,4 +1192,87 @@ class FormsServiceTest extends TestCase {
 
 		$this->formsService->notifyNewShares($form, $share);
 	}
+
+	public function dataNotifyNewSubmission() {
+		return [
+			'no-shares' => [
+				[],
+				0
+			],
+			'one-share' => [
+				[[
+					'shareWith' => 'user',
+					'shareType' => IShare::TYPE_USER,
+					'permissions' => [ Constants::PERMISSION_RESULTS ]
+				]],
+				1
+			],
+			'one-invalid-share' => [
+				[[
+					'shareWith' => 'user',
+					'shareType' => IShare::TYPE_USER,
+					'permissions' => [ Constants::PERMISSION_SUBMIT ]
+				]],
+				0
+			],
+			'mixed-shares' => [
+				[
+					[
+						'shareWith' => 'user',
+						'shareType' => IShare::TYPE_USER,
+						'permissions' => [ Constants::PERMISSION_SUBMIT ]
+					],
+					[
+						'shareWith' => 'user2',
+						'shareType' => IShare::TYPE_USER,
+						'permissions' => [ Constants::PERMISSION_RESULTS ]
+					]],
+				1
+			],
+		];
+	}
+
+	/**
+	 * Test creating notifications for new submissions
+	 *
+	 * @dataProvider dataNotifyNewSubmission
+	 */
+	public function testNotifyNewSubmission($shares, $shareNotifications) {
+		$owner = 'ownerUser';
+		$submitter = 'someUser';
+
+		$userSession = $this->createMock(IUserSession::class);
+		$userSession->method('getUser')->willReturn(null);
+
+		$formsService = $this->getMockBuilder(FormsService::class)
+			->onlyMethods(['getShares'])
+			->setConstructorArgs([
+				$this->activityManager,
+				$this->formMapper,
+				$this->optionMapper,
+				$this->questionMapper,
+				$this->shareMapper,
+				$this->submissionMapper,
+				$this->configService,
+				$this->groupManager,
+				$this->logger,
+				$this->userManager,
+				$userSession,
+				$this->secureRandom
+			])
+			->getMock();
+
+		$form = Form::fromParams(['id' => 42, 'ownerId' => $owner]);
+
+		$formsService->method('getShares')->willReturn($shares);
+		
+		$this->activityManager->expects($this->once())
+			->method('publishNewSubmission')
+			->with($form, $submitter);
+
+		$this->activityManager->expects($this->exactly($shareNotifications))
+			->method('publishNewSharedSubmission');
+
+		$formsService->notifyNewSubmission($form, $submitter);
+	}
 }

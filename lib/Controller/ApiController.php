@@ -27,7 +27,6 @@
 
 namespace OCA\Forms\Controller;
 
-use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
@@ -62,83 +61,27 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 class ApiController extends OCSController {
-	protected $appName;
-
-	/** @var ActivityManager */
-	private $activityManager;
-
-	/** @var AnswerMapper */
-	private $answerMapper;
-
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var OptionMapper */
-	private $optionMapper;
-
-	/** @var QuestionMapper */
-	private $questionMapper;
-
-	/** @var ShareMapper */
-	private $shareMapper;
-
-	/** @var SubmissionMapper */
-	private $submissionMapper;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var FormsService */
-	private $formsService;
-
-	/** @var SubmissionService */
-	private $submissionService;
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var LoggerInterface */
-	private $logger;
-
 	/** @var IUser */
 	private $currentUser;
 
-	/** @var IUserManager */
-	private $userManager;
-
-	public function __construct(string $appName,
-		ActivityManager $activityManager,
-		AnswerMapper $answerMapper,
-		FormMapper $formMapper,
-		OptionMapper $optionMapper,
-		QuestionMapper $questionMapper,
-		ShareMapper $shareMapper,
-		SubmissionMapper $submissionMapper,
-		ConfigService $configService,
-		FormsService $formsService,
-		SubmissionService $submissionService,
-		IL10N $l10n,
-		LoggerInterface $logger,
+	public function __construct(
+		string $appName,
 		IRequest $request,
-		IUserManager $userManager,
-		IUserSession $userSession) {
+		IUserSession $userSession,
+		private AnswerMapper $answerMapper,
+		private FormMapper $formMapper,
+		private OptionMapper $optionMapper,
+		private QuestionMapper $questionMapper,
+		private ShareMapper $shareMapper,
+		private SubmissionMapper $submissionMapper,
+		private ConfigService $configService,
+		private FormsService $formsService,
+		private SubmissionService $submissionService,
+		private IL10N $l10n,
+		private LoggerInterface $logger,
+		private IUserManager $userManager,
+	) {
 		parent::__construct($appName, $request);
-		$this->appName = $appName;
-		$this->activityManager = $activityManager;
-		$this->answerMapper = $answerMapper;
-		$this->formMapper = $formMapper;
-		$this->optionMapper = $optionMapper;
-		$this->questionMapper = $questionMapper;
-		$this->shareMapper = $shareMapper;
-		$this->submissionMapper = $submissionMapper;
-		$this->configService = $configService;
-		$this->formsService = $formsService;
-		$this->submissionService = $submissionService;
-
-		$this->l10n = $l10n;
-		$this->logger = $logger;
-		$this->userManager = $userManager;
-
 		$this->currentUser = $userSession->getUser();
 	}
 
@@ -1038,7 +981,7 @@ class ApiController extends OCSController {
 		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		//Create Activity
-		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
+		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
 
 		return new DataResponse();
 	}

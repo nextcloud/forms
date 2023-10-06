@@ -45,7 +45,6 @@ function time($expected = null) {
 
 namespace OCA\Forms\Tests\Unit\Controller;
 
-use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
@@ -76,8 +75,6 @@ use Test\TestCase;
 
 class ApiControllerTest extends TestCase {
 	private ApiController $apiController;
-	/** @var ActivityManager|MockObject */
-	private $activityManager;
 	/** @var AnswerMapper|MockObject */
 	private $answerMapper;
 	/** @var FormMapper|MockObject */
@@ -106,7 +103,6 @@ class ApiControllerTest extends TestCase {
 	private $l10n;
 
 	public function setUp(): void {
-		$this->activityManager = $this->createMock(ActivityManager::class);
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
@@ -125,10 +121,10 @@ class ApiControllerTest extends TestCase {
 			->willReturnCallback(function ($v) {
 				return $v;
 			});
-
 		$this->apiController = new ApiController(
 			'forms',
-			$this->activityManager,
+			$this->request,
+			$this->createUserSession(),
 			$this->answerMapper,
 			$this->formMapper,
 			$this->optionMapper,
@@ -140,9 +136,7 @@ class ApiControllerTest extends TestCase {
 			$this->submissionService,
 			$this->l10n,
 			$this->logger,
-			$this->request,
 			$this->userManager,
-			$this->createUserSession()
 		);
 	}
 
@@ -364,6 +358,7 @@ class ApiControllerTest extends TestCase {
 			]]
 		];
 	}
+
 	/**
 	 * @dataProvider dataTestCreateNewForm()
 	 */
@@ -373,7 +368,8 @@ class ApiControllerTest extends TestCase {
 		$apiController = $this->getMockBuilder(ApiController::class)
 			 ->onlyMethods(['getForm'])
 			 ->setConstructorArgs(['forms',
-			 	$this->activityManager,
+			 	$this->request,
+			 	$this->createUserSession(),
 			 	$this->answerMapper,
 			 	$this->formMapper,
 			 	$this->optionMapper,
@@ -385,9 +381,7 @@ class ApiControllerTest extends TestCase {
 			 	$this->submissionService,
 			 	$this->l10n,
 			 	$this->logger,
-			 	$this->request,
 			 	$this->userManager,
-			 	$this->createUserSession()
 			 ])->getMock();
 		// Set the time that should be set for `lastUpdated`
 		\OCA\Forms\Controller\time(123456789);
@@ -531,7 +525,8 @@ class ApiControllerTest extends TestCase {
 		$apiController = $this->getMockBuilder(ApiController::class)
 			->onlyMethods(['getForm'])
 			->setConstructorArgs(['forms',
-				$this->activityManager,
+				$this->request,
+				$this->createUserSession(),
 				$this->answerMapper,
 				$this->formMapper,
 				$this->optionMapper,
@@ -543,9 +538,7 @@ class ApiControllerTest extends TestCase {
 				$this->submissionService,
 				$this->l10n,
 				$this->logger,
-				$this->request,
 				$this->userManager,
-				$this->createUserSession()
 			])
 			->getMock();
 
@@ -660,8 +653,8 @@ class ApiControllerTest extends TestCase {
 			->method('setLastUpdatedTimestamp')
 			->with(1);
 
-		$this->activityManager->expects($this->once())
-			->method('publishNewSubmission')
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission')
 			->with($form, 'currentUser');
 
 		$this->apiController->insertSubmission(1, $answers, '');
