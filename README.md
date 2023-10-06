@@ -1,6 +1,6 @@
 # Nextcloud Forms
 
-![Downloads](https://img.shields.io/github/downloads/nextcloud/forms/total.svg?style=flat-square)
+![Downloads](https://img.shields.io/github/downloads/nextcloud-releases/forms/total?style=flat-square)
 [![Code coverage](https://img.shields.io/codecov/c/github/nextcloud/forms.svg?style=flat-square)](https://codecov.io/gh/nextcloud/forms/)
 [![Dependabot status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg?longCache=true&style=flat-square&logo=dependabot)](https://dependabot.com)
 [![Start contributing](https://img.shields.io/github/issues/nextcloud/forms/good%20first%20issue?color=7057ff&label=Contribute)](https://github.com/nextcloud/forms/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22good+first+issue%22)
