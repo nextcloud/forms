@@ -72,7 +72,7 @@
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
-					<NcInputField :placeholder="placeholderOtherAnswer"
+					<NcInputField :label="placeholderOtherAnswer"
 						:required="hasRequiredOtherAnswerInput"
 						:value.sync="inputOtherAnswer"
 						class="question__input" />
