@@ -7,6 +7,7 @@ OC.L10N.register(
     "{user} answered your form {formTitle}" : "{user} قام بالإجابة على نموذجك {formTitle} ",
     "Anonymous user" : "مستخدم مجهول",
     "A form has been <strong>shared</strong> with you" : "نموذج  تم <strong>مشاركته</strong> معك",
+    "Someone <strong>answered</strong> a shared form" : "شخصٌ ما <strong>استجاب</strong> للنموذج المشترك",
     "Someone <strong>answered</strong> a form" : "شخص ما <strong>أجاب </strong>على نموذج ",
     "Copy" : "نسخ",
     "Anonymous response" : "رد مجهول ",

@@ -5,6 +5,7 @@
     "{user} answered your form {formTitle}" : "{user} vyplnil(a) váš formulář {formTitle}",
     "Anonymous user" : "Anonymní uživatel",
     "A form has been <strong>shared</strong> with you" : "Byl vám <strong>nasdílen</strong> formulář",
+    "Someone <strong>answered</strong> a shared form" : "Někdo <strong>odpověděl</strong> ve sdíleném formuláři",
     "Someone <strong>answered</strong> a form" : "Někdo <strong>odpovědel</strong> na formulář",
     "Copy" : "Kopírovat",
     "Anonymous response" : "Anonymní odpověď",
