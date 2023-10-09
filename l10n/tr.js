@@ -7,6 +7,7 @@ OC.L10N.register(
     "{user} answered your form {formTitle}" : "{user}, {formTitle} formunuzu doldurdu",
     "Anonymous user" : "Anonim kullanıcı",
     "A form has been <strong>shared</strong> with you" : "Sizinle bir form <strong>paylaşıldı</strong>",
+    "Someone <strong>answered</strong> a shared form" : "Biri paylaşılmış bir formu <strong>doldurdu</strong>",
     "Someone <strong>answered</strong> a form" : "Biri bir formu <strong>doldurdu</strong>",
     "Copy" : "Kopyala",
     "Anonymous response" : "Anonim yanıt",
