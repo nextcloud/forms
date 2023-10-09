@@ -2,6 +2,7 @@
  * @copyright Copyright (c) 2023 Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Michael Schmidmaier <mschmidm@users.noreply.github.com>
  *
  * @license AGPL-3.0-or-later
  *
@@ -26,6 +27,14 @@
 	::v-deep {
 		>:not(:first-child) {
 			margin-block-start: 1.5em;
+		}
+
+		h1 {
+			font-size: 28px;
+			font-weight: bold;
+			line-height: 34px;
+			margin-bottom: 12px;
+			color: var(--color-main-text);
 		}
 
 		blockquote {
