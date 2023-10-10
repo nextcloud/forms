@@ -24,10 +24,11 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Activity;
 
+use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\Provider;
-
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Service\CirclesService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IEventMerger;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -41,7 +42,6 @@ use OCP\L10N\IFactory;
 use OCP\RichObjectStrings\IValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 
 class ProviderTest extends TestCase {
@@ -76,6 +76,9 @@ class ProviderTest extends TestCase {
 	/** @var IValidator|MockObject */
 	private $validator;
 
+	/** @var CirclesService|MockObject */
+	private $circlesService;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -86,7 +89,8 @@ class ProviderTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->l10nFactory = $this->createMock(IFactory::class);
 		$this->validator = $this->createMock(IValidator::class);
-
+		$this->circlesService = $this->createMock(CirclesService::class);
+		
 		$this->urlGenerator->expects($this->any())
 			->method('linkToRouteAbsolute')
 			->with('forms.page.index')
@@ -112,7 +116,8 @@ class ProviderTest extends TestCase {
 			$this->urlGenerator,
 			$this->userManager,
 			$this->l10nFactory,
-			$this->validator);
+			$this->validator,
+			$this->circlesService);
 
 		// Only for the test, Provider creates it from Factory
 		$this->l10n = $this->createMock(IL10N::class);
@@ -205,6 +210,7 @@ class ProviderTest extends TestCase {
 		return [
 			['newshare', '{user} has shared the form {formTitle} with you'],
 			['newgroupshare', '{user} has shared the form {formTitle} with group {group}'],
+			['newcircleshare', '{user} has shared the form {formTitle} with circle {circle}'],
 			['newsubmission', '{user} answered your form {formTitle}']
 		];
 	}
@@ -280,6 +286,14 @@ class ProviderTest extends TestCase {
 			'id' => 'someGroup',
 			'name' => 'The Group'
 		];
+		// Difference only in additional Circle-Param
+		$newCircleShareResult = $newShareResult;
+		$newCircleShareResult['circle'] = [
+			'type' => 'circle',
+			'id' => 'someCircle',
+			'name' => 'The Circle',
+			'link' => 'circle/link'
+		];
 		// Difference only in different Link on formTitle
 		$newSubmissionResult = $newShareResult;
 		$newSubmissionResult['formTitle']['link'] .= '/results';
@@ -299,6 +313,13 @@ class ProviderTest extends TestCase {
 				'formHash' => 'abcdefg',
 				'groupId' => 'someGroup'],
 				$newGroupShareResult
+			],
+			['newcircleshare', [
+				'userId' => 'affectedUser',
+				'formTitle' => 'Some FormTitle',
+				'formHash' => 'abcdefg',
+				'circleId' => 'someCircle'],
+				$newCircleShareResult
 			],
 			['newsubmission', [
 				'userId' => 'affectedUser',
@@ -333,6 +354,17 @@ class ProviderTest extends TestCase {
 			->method('get')
 			->with('someGroup')
 			->willReturn($group);
+		$circle = $this->createMock(Circle::class);
+		$circle->expects($this->any())
+			->method('getDisplayName')
+			->willReturn('The Circle');
+		$circle->expects($this->any())
+			->method('getUrl')
+			->willReturn('circle/link');
+		$this->circlesService->expects($this->any())
+			->method('getCircle')
+			->with('someCircle')
+			->willReturn($circle);
 
 		$form = new Form();
 		$form->setHash('abcdefg');
@@ -404,6 +436,27 @@ class ProviderTest extends TestCase {
 			'id' => 'someDeletedGroup',
 			'name' => 'someDeletedGroup'
 		], $this->provider->getRichGroup('someDeletedGroup'));
+	}
+
+	/*
+	 * Basic ideal functionality tested already in testGetRichParams
+	 * Only testing special cases here
+	 * - Deleted Circle
+	 * - Circles disabled
+	 * In both cases `circlesService` will return `null`:
+	 */
+	public function testGetRichCircle_disabled() {
+		$this->circlesService->expects($this->once())
+			->method('getCircle')
+			->with('someCircle')
+			->willReturn(null);
+
+		$this->assertEquals([
+			'type' => 'circle',
+			'id' => 'someCircle',
+			'name' => 'someCircle',
+			'link' => ''
+		], $this->provider->getRichCircle('someCircle'));
 	}
 
 	/*

@@ -42,6 +42,7 @@ export default {
 				OC.Share.SHARE_TYPE_USER,
 				OC.Share.SHARE_TYPE_GROUP,
 				OC.Share.SHARE_TYPE_LINK,
+				OC.Share.SHARE_TYPE_CIRCLE,
 			],
 		}
 	},

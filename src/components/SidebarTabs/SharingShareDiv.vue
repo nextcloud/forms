@@ -24,6 +24,7 @@
 	<li class="share-div">
 		<NcAvatar :user="share.shareWith"
 			:disable-menu="true"
+			:display-name="displayName"
 			:is-no-user="isNoUser" />
 		<div class="share-div__desc">
 			<span>{{ displayName }}</span>
@@ -88,7 +89,14 @@ export default {
 			return !this.share.displayName ? this.share.shareWith : this.share.displayName
 		},
 		displayNameAppendix() {
-			return (this.share.shareType === this.SHARE_TYPES.SHARE_TYPE_GROUP) ? `(${t('forms', 'Group')})` : ''
+			switch (this.share.shareType) {
+			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+				return `(${t('forms', 'Group')})`
+			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+				return `(${t('forms', 'Circle')})`
+			default:
+				return ''
+			}
 		},
 	},
 

@@ -24,16 +24,17 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Controller;
 
+use OCA\Circles\Model\Circle;
 use OCA\Forms\Constants;
-use OCA\Forms\Controller\ShareApiController;
 
+use OCA\Forms\Controller\ShareApiController;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
-
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataResponse;
@@ -90,6 +91,9 @@ class ShareApiControllerTest extends TestCase {
 	/** @var ISecureRandom|MockObject */
 	private $secureRandom;
 
+	/** @var CirclesService|MockObject */
+	private $circlesService;
+
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
@@ -101,6 +105,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
+		$this->circlesService = $this->createMock(CirclesService::class);
 
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->any())
@@ -112,16 +117,17 @@ class ShareApiControllerTest extends TestCase {
 
 		$this->shareApiController = new ShareApiController(
 			'forms',
+			$this->request,
+			$userSession,
 			$this->formMapper,
 			$this->shareMapper,
 			$this->configService,
 			$this->formsService,
 			$this->groupManager,
 			$this->logger,
-			$this->request,
 			$this->userManager,
-			$userSession,
-			$this->secureRandom
+			$this->secureRandom,
+			$this->circlesService
 		);
 	}
 
@@ -153,6 +159,19 @@ class ShareApiControllerTest extends TestCase {
 					'displayName' => 'group1 DisplayName'
 				]
 			],
+			'newCircleShare' => [
+				'shareType' => IShare::TYPE_CIRCLE,
+				'shareWith' => 'circle1',
+				'permissions' => [Constants::PERMISSION_RESULTS, Constants::PERMISSION_SUBMIT],
+				'expected' => [
+					'id' => 13,
+					'formId' => 5,
+					'shareType' => 7,
+					'shareWith' => 'circle1',
+					'permissions' => [Constants::PERMISSION_RESULTS, Constants::PERMISSION_SUBMIT],
+					'displayName' => 'circle1 DisplayName'
+				]
+			],
 		];
 	}
 	/**
@@ -173,16 +192,24 @@ class ShareApiControllerTest extends TestCase {
 			->with('5')
 			->willReturn($form);
 
-		$this->userManager->expects($this->any())
+		$this->userManager->expects($shareType === IShare::TYPE_USER ? $this->once() : $this->never())
 			->method('get')
 			->with($shareWith)
 			->willReturn($this->createMock(IUser::class));
 
-		$this->groupManager->expects($this->any())
+		$this->groupManager->expects($shareType === IShare::TYPE_GROUP ? $this->once() : $this->never())
 			->method('get')
 			->with($shareWith)
 			->willReturn($this->createMock(IGroup::class));
 
+		$this->circlesService->expects($shareType === IShare::TYPE_CIRCLE ? $this->once() : $this->never())
+			->method('isCirclesEnabled')
+			->willReturn(true);
+		$this->circlesService->expects($shareType === IShare::TYPE_CIRCLE ? $this->once() : $this->never())
+			->method('getCircle')
+			->with($shareWith)
+			->willReturn($this->createMock(Circle::class));
+		
 		$share = new Share();
 		$share->setFormId(5);
 		$share->setShareType($shareType);
@@ -398,8 +425,59 @@ class ShareApiControllerTest extends TestCase {
 
 		$this->expectException(OCSBadRequestException::class);
 
-		// Share Form '5' to 'noUser' of share-type 'group=1'
+		// Share Form '5' to 'noGroup' of share-type 'group=1'
 		$this->shareApiController->newShare(5, 1, 'noGroup');
+	}
+
+	/**
+	 * Test unknown circle
+	 */
+	public function testBadCircleShare() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with('5')
+			->willReturn($form);
+
+		$this->circlesService->expects($this->once())
+			->method('isCirclesEnabled')
+			->willReturn(true);
+		$this->circlesService->expects($this->once())
+			->method('getCircle')
+			->with('noCircle')
+			->willReturn(null);
+
+		$this->expectException(OCSBadRequestException::class);
+
+		// Share Form '5' to 'noCircle'
+		$this->shareApiController->newShare(5, IShare::TYPE_CIRCLE, 'noCircle');
+	}
+
+	/**
+	 * Sharing to circle while circles are disabled
+	 */
+	public function testCirclesShare_circlesAppDisabled() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with('5')
+			->willReturn($form);
+
+		$this->circlesService->expects($this->once())
+			->method('isCirclesEnabled')
+			->willReturn(false);
+		
+
+		$this->expectException(OCSException::class);
+
+		// Share Form '5' to 'noCircle'
+		$this->shareApiController->newShare(5, IShare::TYPE_CIRCLE, 'noCircle');
 	}
 
 	/**

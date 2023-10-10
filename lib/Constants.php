@@ -105,7 +105,8 @@ class Constants {
 	public const SHARE_TYPES_USED = [
 		IShare::TYPE_USER,
 		IShare::TYPE_GROUP,
-		IShare::TYPE_LINK
+		IShare::TYPE_LINK,
+		IShare::TYPE_CIRCLE
 	];
 
 	/**

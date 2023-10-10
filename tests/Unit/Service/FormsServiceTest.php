@@ -24,6 +24,7 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Service;
 
+use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\ActivityManager;
 
 use OCA\Forms\Constants;
@@ -36,9 +37,9 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
-
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
@@ -49,7 +50,6 @@ use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
@@ -90,6 +90,9 @@ class FormsServiceTest extends TestCase {
 	/** @var ISecureRandom|MockObject */
 	private $secureRandom;
 
+	/** @var CirclesService|MockObject */
+	private $circlesService;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -104,6 +107,7 @@ class FormsServiceTest extends TestCase {
 		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
+		$this->circlesService = $this->createMock(CirclesService::class);
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);
@@ -115,6 +119,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn($user);
 
 		$this->formsService = new FormsService(
+			$userSession,
 			$this->activityManager,
 			$this->formMapper,
 			$this->optionMapper,
@@ -125,8 +130,8 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession,
-			$this->secureRandom
+			$this->secureRandom,
+			$this->circlesService
 		);
 	}
 
@@ -571,6 +576,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn(null);
 
 		$formsService = new FormsService(
+			$userSession,
 			$this->activityManager,
 			$this->formMapper,
 			$this->optionMapper,
@@ -581,8 +587,8 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession,
-			$this->secureRandom
+			$this->secureRandom,
+			$this->circlesService
 		);
 
 		$form = new Form();
@@ -740,6 +746,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn($user);
 
 		$formsService = new FormsService(
+			$userSession,
 			$this->activityManager,
 			$this->formMapper,
 			$this->optionMapper,
@@ -750,8 +757,8 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession,
-			$this->secureRandom
+			$this->secureRandom,
+			$this->circlesService
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -899,6 +906,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn(null);
 
 		$formsService = new FormsService(
+			$userSession,
 			$this->activityManager,
 			$this->formMapper,
 			$this->optionMapper,
@@ -909,8 +917,8 @@ class FormsServiceTest extends TestCase {
 			$this->groupManager,
 			$this->logger,
 			$this->userManager,
-			$userSession,
-			$this->secureRandom
+			$this->secureRandom,
+			$this->circlesService
 		);
 
 		$form = new Form();
@@ -1053,6 +1061,16 @@ class FormsServiceTest extends TestCase {
 				'shareWith' => 'wrongGroup',
 				'expected' => false,
 			],
+			'sharedToCircle' => [
+				'shareType' => IShare::TYPE_CIRCLE,
+				'shareWith' => 'goodCircle',
+				'expected' => true,
+			],
+			'sharedToOtherCircle' => [
+				'shareType' => IShare::TYPE_CIRCLE,
+				'shareWith' => 'wrongCircle',
+				'expected' => false,
+			],
 			'NotSharedToUser' => [
 				'shareType' => IShare::TYPE_LINK,
 				'shareWith' => 'abcdefg',
@@ -1076,14 +1094,37 @@ class FormsServiceTest extends TestCase {
 			->with(42)
 			->willReturn([$share]);
 
-		$this->groupManager->expects($this->any())
+		$this->groupManager->expects($shareType === IShare::TYPE_GROUP ? $this->once() : $this->never())
 			->method('isInGroup')
 			->will($this->returnValueMap([
 				['currentUser', 'goodGroup', true],
 				['currentUser', 'wrongGroup', false],
 			]));
 
+		$this->circlesService->expects($shareType === IShare::TYPE_CIRCLE ? $this->once() : $this->never())
+			->method('isUserInCircle')
+			->willReturnCallback(function ($id, $user) {
+				return $id === 'goodCircle';
+			});
+
 		$this->assertEquals($expected, $this->formsService->isSharedToUser(42));
+	}
+
+	public function testIsSharedToCircle_circlesDisabled() {
+		$this->circlesService->expects($this->once())
+			->method('isUserInCircle')
+			->with('circle1', 'currentUser')
+			->willReturn(false);
+
+		$share = new Share();
+		$share->setShareType(IShare::TYPE_CIRCLE);
+		$share->setShareWith('circle1');
+		$this->shareMapper->expects($this->once())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals(false, $this->formsService->isSharedToUser(42));
 	}
 
 	public function dataHasFormExpired() {
@@ -1122,6 +1163,13 @@ class FormsServiceTest extends TestCase {
 				],
 				'expected' => 'group1 GroupDisplayname',
 			],
+			'circleShare' => [
+				'share' => [
+					'shareType' => IShare::TYPE_CIRCLE,
+					'shareWith' => 'circle1',
+				],
+				'expected' => 'circle1 CircleDisplayname',
+			],
 			'otherShare' => [
 				'share' => [
 					'shareType' => IShare::TYPE_LINK,
@@ -1139,24 +1187,46 @@ class FormsServiceTest extends TestCase {
 	 */
 	public function testGetShareDisplayName(array $share, string $expected) {
 		$user = $this->createMock(IUser::class);
-		$user->expects($this->any())
+		$user->expects($share['shareType'] === IShare::TYPE_USER ? $this->once() : $this->never())
 			->method('getDisplayName')
 			->willReturn($share['shareWith'] . ' UserDisplayname');
-		$this->userManager->expects($this->any())
+		$this->userManager->expects($share['shareType'] === IShare::TYPE_USER ? $this->once() : $this->never())
 			->method('get')
 			->with($share['shareWith'])
 			->willReturn($user);
 
 		$group = $this->createMock(IGroup::class);
-		$group->expects($this->any())
+		$group->expects($share['shareType'] === IShare::TYPE_GROUP ? $this->once() : $this->never())
 			->method('getDisplayName')
 			->willReturn($share['shareWith'] . ' GroupDisplayname');
-		$this->groupManager->expects($this->any())
+		$this->groupManager->expects($share['shareType'] === IShare::TYPE_GROUP ? $this->once() : $this->never())
 			->method('get')
 			->with($share['shareWith'])
 			->willReturn($group);
 
+		$circle = $this->createMock(Circle::class);
+		$circle->expects($share['shareType'] === IShare::TYPE_CIRCLE ? $this->once() : $this->never())
+			->method('getDisplayName')
+			->willReturn($share['shareWith'] . ' CircleDisplayname');
+		$this->circlesService->expects($share['shareType'] === IShare::TYPE_CIRCLE ? $this->once() : $this->never())
+			->method('getCircle')
+			->with($share['shareWith'])
+			->willReturn($circle);
+
 		$this->assertEquals($expected, $this->formsService->getShareDisplayName($share));
+	}
+
+	public function testGetCircleShareDisplayName_circlesDisabled() {
+		$this->circlesService->expects($this->once())
+			->method('getCircle')
+			->willReturn(null);
+
+		$share = [
+			'shareType' => IShare::TYPE_CIRCLE,
+			'shareWith' => 'circle1',
+		];
+
+		$this->assertEquals('', $this->formsService->getShareDisplayName($share));
 	}
 
 	public function dataNotifyNewShares() {
@@ -1170,6 +1240,11 @@ class FormsServiceTest extends TestCase {
 				'shareType' => IShare::TYPE_GROUP,
 				'shareWith' => 'someGroup',
 				'expectedMethod' => 'publishNewGroupShare',
+			],
+			'newCircleShare' => [
+				'shareType' => IShare::TYPE_CIRCLE,
+				'shareWith' => 'someCircle',
+				'expectedMethod' => 'publishNewCircleShare',
 			]
 		];
 	}
@@ -1247,6 +1322,7 @@ class FormsServiceTest extends TestCase {
 		$formsService = $this->getMockBuilder(FormsService::class)
 			->onlyMethods(['getShares'])
 			->setConstructorArgs([
+				$userSession,
 				$this->activityManager,
 				$this->formMapper,
 				$this->optionMapper,
@@ -1257,8 +1333,8 @@ class FormsServiceTest extends TestCase {
 				$this->groupManager,
 				$this->logger,
 				$this->userManager,
-				$userSession,
-				$this->secureRandom
+				$this->secureRandom,
+				$this->circlesService,
 			])
 			->getMock();
 

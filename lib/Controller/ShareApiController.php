@@ -27,10 +27,10 @@ declare(strict_types=1);
 namespace OCA\Forms\Controller;
 
 use OCA\Forms\Constants;
-use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
@@ -49,61 +49,26 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
-
 use Psr\Log\LoggerInterface;
 
 class ShareApiController extends OCSController {
-	protected $appName;
+	private IUser $currentUser;
 
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var ShareMapper */
-	private $shareMapper;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var FormsService */
-	private $formsService;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IUserManager */
-	private $userManager;
-	
-	/** @var IUser */
-	private $currentUser;
-
-	/** @var ISecureRandom */
-	private $secureRandom;
-
-	public function __construct(string $appName,
-		FormMapper $formMapper,
-		ShareMapper $shareMapper,
-		ConfigService $configService,
-		FormsService $formsService,
-		IGroupManager $groupManager,
-		LoggerInterface $logger,
+	public function __construct(
+		string $appName,
 		IRequest $request,
-		IUserManager $userManager,
 		IUserSession $userSession,
-		ISecureRandom $secureRandom) {
+		private FormMapper $formMapper,
+		private ShareMapper $shareMapper,
+		private ConfigService $configService,
+		private FormsService $formsService,
+		private IGroupManager $groupManager,
+		private LoggerInterface $logger,
+		private IUserManager $userManager,
+		private ISecureRandom $secureRandom,
+		private CirclesService $circlesService,
+	) {
 		parent::__construct($appName, $request);
-		$this->appName = $appName;
-		$this->formMapper = $formMapper;
-		$this->shareMapper = $shareMapper;
-		$this->configService = $configService;
-		$this->formsService = $formsService;
-		$this->groupManager = $groupManager;
-		$this->logger = $logger;
-		$this->userManager = $userManager;
-		$this->secureRandom = $secureRandom;
-
 		$this->currentUser = $userSession->getUser();
 	}
 
@@ -194,7 +159,19 @@ class ShareApiController extends OCSController {
 					// Just continue, this is what we expect to happen (share hash not existing yet).
 				}
 				break;
-			
+
+			case IShare::TYPE_CIRCLE:
+				if (!$this->circlesService->isCirclesEnabled()) {
+					$this->logger->debug('Circles app is disabled, sharing to circles not possible.');
+					throw new OCSException('Circles app is disabled.');
+				}
+				$circle = $this->circlesService->getCircle($shareWith);
+				if (is_null($circle)) {
+					$this->logger->debug('Invalid circle to share with.');
+					throw new OCSBadRequestException('Invalid circle to share with.');
+				}
+				break;
+
 			default:
 				// This passed the check for used shareTypes, but has not been found here.
 				$this->logger->warning('Unknown, but used shareType: {shareType}. Please file an issue on GitHub.', [ 'shareType' => $shareType ]);

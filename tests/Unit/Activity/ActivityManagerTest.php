@@ -25,8 +25,8 @@ declare(strict_types=1);
 namespace OCA\Forms\Tests\Unit\Activity;
 
 use OCA\Forms\Activity\ActivityManager;
-
 use OCA\Forms\Db\Form;
+use OCA\Forms\Service\CirclesService;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
 use OCP\IGroup;
@@ -36,7 +36,6 @@ use OCP\IUserSession;
 use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 
 class ActivityManagerTest extends TestCase {
@@ -53,11 +52,15 @@ class ActivityManagerTest extends TestCase {
 	/** @var LoggerInterface|MockObject */
 	private $logger;
 
+	/** @var CirclesService|MockObject */
+	private $circlesService;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->manager = $this->createMock(IManager::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+		$this->circlesService = $this->createMock(CirclesService::class);
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);
@@ -68,7 +71,7 @@ class ActivityManagerTest extends TestCase {
 			->method('getUser')
 			->willReturn($user);
 
-		$this->activityManager = new ActivityManager('forms', $this->manager, $this->groupManager, $this->logger, $userSession);
+		$this->activityManager = new ActivityManager('forms', $this->manager, $this->groupManager, $this->logger, $userSession, $this->circlesService);
 	}
 
 	public function testPublishNewShare() {
@@ -144,6 +147,55 @@ class ActivityManagerTest extends TestCase {
 			->with($event);
 
 		$this->activityManager->publishNewGroupShare($form, $groupId);
+	}
+
+	public function testPublishNewCircleShare() {
+		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
+		$form = new Form();
+		$form->setId(5);
+		$form->setTitle('TestForm-Title');
+		$form->setHash('abcdefg12345');
+		$circleId = 'sharedCircle';
+
+		$this->circlesService->expects($this->once())
+			->method('getCircleUsers')
+			->with($circleId)
+			->willReturn(['userId', 'user1', 'user2', 'user3']);
+		$event = $this->createMock(IEvent::class);
+		$this->manager->expects($this->exactly(4))
+			->method('generateEvent')
+			->willReturn($event);
+		$event->expects($this->exactly(4))->method('setApp')->with('forms')->willReturn($event);
+		$event->expects($this->exactly(4))->method('setType')->with('forms_newshare')->willReturn($event);
+		$event->expects($this->exactly(4))->method('setAffectedUser')->withConsecutive(['userId'], ['user1'], ['user2'], ['user3'])->willReturn($event);
+		$event->expects($this->exactly(4))->method('setAuthor')->with('currentUser')->willReturn($event);
+		$event->expects($this->exactly(4))->method('setObject')->with('form', 5)->willReturn($event);
+		$event->expects($this->exactly(4))->method('setSubject')->with('newcircleshare', [
+			'userId' => 'currentUser',
+			'formTitle' => 'TestForm-Title',
+			'formHash' => 'abcdefg12345',
+			'circleId' => $circleId
+		])->willReturn($event);
+
+		$this->manager->expects($this->exactly(4))
+			->method('publish')
+			->with($event);
+
+		$this->activityManager->publishNewCircleShare($form, $circleId);
+	}
+
+	public function testPublishNewCircleShare_circlesDisabled() {
+		$form = $this->createMock(Form::class);
+		
+		$this->circlesService->expects($this->once())
+			->method('getCircleUsers')
+			->with('circle')
+			->willReturn([]);
+
+		$this->manager->expects($this->never())
+			->method('generateEvent');
+
+		$this->activityManager->publishNewCircleShare($form, 'circle');
 	}
 
 	public function testPublishNewSubmission() {
