@@ -7,6 +7,7 @@ OC.L10N.register(
     "{user} answered your form {formTitle}" : "{user} answered your form {formTitle}",
     "Anonymous user" : "Anonymous user",
     "A form has been <strong>shared</strong> with you" : "A form has been <strong>shared</strong> with you",
+    "Someone <strong>answered</strong> a shared form" : "Someone <strong>answered</strong> a shared form",
     "Someone <strong>answered</strong> a form" : "Someone <strong>answered</strong> a form",
     "Copy" : "Copy",
     "Anonymous response" : "Anonymous response",

@@ -7,6 +7,7 @@ OC.L10N.register(
     "{user} answered your form {formTitle}" : "{user} 回答了您的表格 {formTitle}",
     "Anonymous user" : "匿名用戶",
     "A form has been <strong>shared</strong> with you" : "與您<strong>分享了</strong>表格",
+    "Someone <strong>answered</strong> a shared form" : "有人<strong>回答了</strong>一份共享表格",
     "Someone <strong>answered</strong> a form" : "有人<strong>回答了</strong>表格",
     "Copy" : "複製",
     "Anonymous response" : "匿名回應",

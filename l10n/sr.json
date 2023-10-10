@@ -5,6 +5,7 @@
     "{user} answered your form {formTitle}" : "{user} је одговорио на ваш упитник {formTitle}",
     "Anonymous user" : "Анонимни корисник",
     "A form has been <strong>shared</strong> with you" : "Упитник је <strong>подељен</strong> са вама",
+    "Someone <strong>answered</strong> a shared form" : "Неко је <strong>одговорио</strong> на дељени упитник",
     "Someone <strong>answered</strong> a form" : "Неко је <strong>одговорио</strong> на упитник",
     "Copy" : "Копија",
     "Anonymous response" : "Анонимни одговор",
