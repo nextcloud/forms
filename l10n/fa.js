@@ -80,7 +80,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "This can not be controlled, if the form has a public link or stores responses anonymously.",
     "Expired on {date}" : "Expired on {date}",
     "Expires on {date}" : "Expires on {date}",
-    "Search for user or group …" : "Search for user or group …",
     "No recommendations. Start typing." : "هیچ توصیه‌ای وجود ندارد. شروع به نوشتن کنید.",
     "No elements found." : "عنصری یافت نشد.",
     "Permissions" : "مجوزها",

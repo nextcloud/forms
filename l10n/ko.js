@@ -26,7 +26,6 @@ OC.L10N.register(
     "Other" : "기타",
     "Delete this response" : "이 응답 지우기",
     "Set expiration date" : "만료기한 설정",
-    "Search for user or group …" : "사용자나 그룹 검색...",
     "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",
     "No elements found." : "요소를 찾을 수 없습니다.",
     "Permissions" : "권한",

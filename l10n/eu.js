@@ -80,7 +80,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Hau ezin da kontrolatu formularioak esteka publikoa badu edo erantzunak modu anonimoan gordetzen baditu.",
     "Expired on {date}" : "{date} datan iraungia",
     "Expires on {date}" : "{date} datan iraungitzen da",
-    "Search for user or group …" : "Bilatu erabiltzaile edo taldez ...",
     "No recommendations. Start typing." : "Gomendiorik ez. Hasi idazten.",
     "No elements found." : "Ez da elementurik aurkitu.",
     "Permissions" : "Baimenak",

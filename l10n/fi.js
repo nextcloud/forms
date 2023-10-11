@@ -75,7 +75,6 @@ OC.L10N.register(
     "Show expiration date on form" : "Aseta vanhenemispäivä lomakkeessa",
     "Expired on {date}" : "Vanheni {date}",
     "Expires on {date}" : "Vanhenee {date}",
-    "Search for user or group …" : "Etsi käyttäjää tai ryhmää…",
     "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
     "No elements found." : "Elementtejä ei löytynyt.",
     "Permissions" : "Oikeudet",

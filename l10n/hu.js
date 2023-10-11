@@ -78,7 +78,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ez nem állítható be, ha az űrlapnak nyilvános hivatkozása van, vagy ha a válaszokat névtelenül tárolja.",
     "Expired on {date}" : "Lejárat: {date}",
     "Expires on {date}" : "Lejárat: {date}",
-    "Search for user or group …" : "Felhasználó vagy csoport keresése…",
     "No recommendations. Start typing." : "Nincs javaslat. Kezdjen gépelni.",
     "No elements found." : "Nem található elem.",
     "Permissions" : "Jogosultságok",

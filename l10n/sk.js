@@ -76,7 +76,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Toto nie je možné kontrolovať, ak má formulár verejný odkaz alebo ukladá odpovede anonymne.",
     "Expired on {date}" : "Platnosť vypršala {date}",
     "Expires on {date}" : "Platnosť vyprší {date}",
-    "Search for user or group …" : "Hľadať užívateľa alebo skupinu ...",
     "No recommendations. Start typing." : "Žiadne odporúčania. Píšte.",
     "No elements found." : "Nenájdené žiadne prvky.",
     "Permissions" : "Oprávnenia",

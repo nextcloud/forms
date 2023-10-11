@@ -77,7 +77,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Detta kan inte kontrolleras om formuläret har en offentlig länk eller lagrar svar anonymt.",
     "Expired on {date}" : "Slutade gälla {date}",
     "Expires on {date}" : "Slutar gälla {date}",
-    "Search for user or group …" : "Sök efter användare eller grupp ...",
     "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
     "No elements found." : "Inga element hittades.",
     "Permissions" : "Behörigheter",

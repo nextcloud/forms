@@ -63,7 +63,6 @@ OC.L10N.register(
     "Set expiration date" : "Nustatyti galiojimo pabaigos datą",
     "Expired on {date}" : "Nustojo galioti {date}",
     "Expires on {date}" : "Galioja iki {date}",
-    "Search for user or group …" : "Ieškoti naudotojo ar grupės…",
     "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",
     "No elements found." : "Nerasta jokių elementų.",
     "Permissions" : "Leidimai",

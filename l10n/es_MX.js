@@ -76,7 +76,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Esto no se puede controlar, si el formulario tiene un enlace público o almacena las respuestas anónimamente.",
     "Expired on {date}" : "Expirado el {día}",
     "Expires on {date}" : "Expira el {día}",
-    "Search for user or group …" : "Buscar un usuario o grupo …",
     "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
     "No elements found." : "No se encontraron elementos",
     "Permissions" : "Permisos",

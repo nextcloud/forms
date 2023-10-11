@@ -80,7 +80,6 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Это нельзя контролировать, если форма имеет публичную ссылку или хранит ответы анонимно.",
     "Expired on {date}" : "Завершилась {date}",
     "Expires on {date}" : "Завершится {date}",
-    "Search for user or group …" : "Поиск пользователя или группы…",
     "No recommendations. Start typing." : "Рекомендации отсутствуют, начните вводить символы",
     "No elements found." : "Ничего не найдено.",
     "Permissions" : "Права",

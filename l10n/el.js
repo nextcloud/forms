@@ -67,7 +67,6 @@ OC.L10N.register(
     "Set expiration date" : "Ορισμός ημερομηνίας λήξης",
     "Expired on {date}" : "Έληξε στις {date}",
     "Expires on {date}" : "Λήγει στις {date}",
-    "Search for user or group …" : "Αναζήτηση για χρήστη ή ομάδα…",
     "No recommendations. Start typing." : "Δεν υπάρχουν συστάσεις. Αρχίστε να πληκτρολογείτε.",
     "No elements found." : "Δεν βρέθηκαν στοιχεία.",
     "Permissions" : "Δικαιώματα",
