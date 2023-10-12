@@ -64,6 +64,7 @@ OC.L10N.register(
     "Permissions" : "Rechten",
     "Delete" : "Verwijder",
     "Group" : "Groep",
+    "Circle" : "Kring",
     "Share link" : "Deel link",
     "Add link" : "Voeg link toe",
     "Copy to clipboard" : "Kopiëren naar het klembord",

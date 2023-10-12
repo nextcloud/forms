@@ -10,6 +10,7 @@ OC.L10N.register(
     "Permissions" : "Lejet",
     "Delete" : "Fshij",
     "Group" : "Grup",
+    "Circle" : "Rreth",
     "Share link" : "Lidhje ndarjeje",
     "Add link" : "Shto link",
     "Copy to clipboard" : "Kopjo në dërrasë ",

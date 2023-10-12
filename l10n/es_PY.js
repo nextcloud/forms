@@ -9,6 +9,7 @@ OC.L10N.register(
     "Permissions" : "Permisos",
     "Delete" : "Borrar",
     "Group" : "Grupo",
+    "Circle" : "Círculo",
     "Share link" : "Compartir liga",
     "Copy to clipboard" : "Copiar al portapapeles",
     "Edit" : "Editar",

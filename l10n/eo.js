@@ -11,6 +11,7 @@ OC.L10N.register(
     "No elements found." : "Nenio trovita.",
     "Delete" : "Forigi",
     "Group" : "Grupo",
+    "Circle" : "Rondo",
     "Share link" : "Kunhavigi ligilon",
     "Add link" : "Aldoni ligilon",
     "Copy to clipboard" : "Kopii tondejen",

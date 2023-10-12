@@ -86,6 +86,7 @@ OC.L10N.register(
     "View responses" : "نمایش پاسخ‌ها",
     "Delete" : "حذف",
     "Group" : "گروه",
+    "Circle" : "حلقه",
     "Share link" : "هم‌رسانی پیوند",
     "Add link" : "افزودن پیوند",
     "Copy to clipboard" : "کپی کردن به حافظه موقت",

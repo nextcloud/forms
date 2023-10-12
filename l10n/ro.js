@@ -9,6 +9,7 @@ OC.L10N.register(
     "Set expiration date" : "Specifică data expirării",
     "Delete" : "Șterge",
     "Group" : "Grup",
+    "Circle" : "Cerc",
     "Share link" : "Partajează link-ul",
     "Add link" : "Adaugă link",
     "Copy to clipboard" : "Copiază în clipboard",

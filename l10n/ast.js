@@ -4,6 +4,7 @@ OC.L10N.register(
     "This form does not exist" : "Esti formulariu nun esiste",
     "Permissions" : "Permisos",
     "Delete" : "Desaniciar",
+    "Circle" : "Círculu",
     "Internal link" : "Enllaz internu",
     "Loading {title} …" : "Cargando «{title}»…",
     "Description" : "Descripción",

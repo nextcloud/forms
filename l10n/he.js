@@ -51,6 +51,7 @@ OC.L10N.register(
     "Permissions" : "הרשאות",
     "Delete" : "מחיקה",
     "Group" : "קבוצה",
+    "Circle" : "מעגל",
     "Share link" : "קישור שיתוף",
     "Add link" : "הוספת קישור",
     "Copy to clipboard" : "העתקה ללוח הגזירים",

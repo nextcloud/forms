@@ -84,6 +84,7 @@ OC.L10N.register(
     "View responses" : "Перегляд відповідей",
     "Delete" : "Вилучити",
     "Group" : "Група",
+    "Circle" : "Коло",
     "Share link" : "Поділитися посиланням",
     "Add link" : "Додати посиланя",
     "Copy to clipboard" : "Копіювати до буферу обміну",

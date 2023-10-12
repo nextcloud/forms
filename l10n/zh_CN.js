@@ -88,6 +88,7 @@ OC.L10N.register(
     "View responses" : "查看回应",
     "Delete" : "删除",
     "Group" : "分组",
+    "Circle" : "圈子",
     "Share link" : "共享链接",
     "Add link" : "添加链接",
     "Copy to clipboard" : "复制到剪贴板",

@@ -86,6 +86,7 @@ OC.L10N.register(
     "View responses" : "Ikusi erantzunak",
     "Delete" : "Ezabatu",
     "Group" : "Taldea",
+    "Circle" : "Zirkulua",
     "Share link" : "Partekatu esteka",
     "Add link" : "Gehitu esteka",
     "Copy to clipboard" : "Kopiatu arbelera",

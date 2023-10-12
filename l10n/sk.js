@@ -81,6 +81,7 @@ OC.L10N.register(
     "Permissions" : "Oprávnenia",
     "Delete" : "Vymazať",
     "Group" : "Skupina",
+    "Circle" : "Kruh",
     "Share link" : "Zdieľať odkaz",
     "Add link" : "Pridať odkaz",
     "Copy to clipboard" : "Skopírovať do schránky",

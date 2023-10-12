@@ -89,6 +89,7 @@ OC.L10N.register(
     "View responses" : "Zobrazit odpovědi",
     "Delete" : "Smazat",
     "Group" : "Group",
+    "Circle" : "Okruh",
     "Share link" : "Odkaz pro sdílení",
     "Add link" : "Přidat odkaz",
     "Copy to clipboard" : "Zkopírovat do schránky",

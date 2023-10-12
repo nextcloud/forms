@@ -88,6 +88,7 @@ OC.L10N.register(
     "View responses" : "Ver respostas",
     "Delete" : "Eliminar",
     "Group" : "Grupo",
+    "Circle" : "Círculo",
     "Share link" : "Ligazón para compartir",
     "Add link" : "Engadir a ligazón",
     "Copy to clipboard" : "Copiar no portapapeis.",

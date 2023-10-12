@@ -10,6 +10,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Delete" : "Kustuta",
     "Group" : "Grupp",
+    "Circle" : "Ring",
     "Share link" : "Jaga link",
     "Add link" : "Lisa link",
     "Copy to clipboard" : "Kopeeri lõikepuhvrisse",

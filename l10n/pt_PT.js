@@ -62,6 +62,7 @@ OC.L10N.register(
     "No elements found." : "Não foram encontrados elementos.",
     "Delete" : "Apagar",
     "Group" : "Grupo",
+    "Circle" : "Círculo",
     "Share link" : "Partilhar ligação",
     "Copy to clipboard" : "Copiar para área de transferência",
     "View" : "Ver",

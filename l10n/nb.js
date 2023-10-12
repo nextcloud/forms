@@ -64,6 +64,7 @@ OC.L10N.register(
     "Permissions" : "Rettigheter",
     "Delete" : "Slett",
     "Group" : "Gruppe",
+    "Circle" : "Sirkel",
     "Share link" : "Del lenke",
     "Add link" : "Legg ved lenke",
     "Copy to clipboard" : "Kopiert til utklippstavlen",

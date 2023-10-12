@@ -87,6 +87,7 @@ OC.L10N.register(
     "View responses" : "Antworten anzeigen",
     "Delete" : "Löschen",
     "Group" : "Gruppe",
+    "Circle" : "Kreis",
     "Share link" : "Link teilen",
     "Add link" : "Link hinzufügen",
     "Copy to clipboard" : "In die Zwischenablage kopieren",

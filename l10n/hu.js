@@ -84,6 +84,7 @@ OC.L10N.register(
     "View responses" : "Válaszok megtekintése",
     "Delete" : "Törlés",
     "Group" : "Csoport",
+    "Circle" : "Kör",
     "Share link" : "Megosztási hivatkozás",
     "Add link" : "Hivatkozás hozzáadása",
     "Copy to clipboard" : "Másolás a vágólapra",

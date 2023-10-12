@@ -73,6 +73,7 @@ OC.L10N.register(
     "View responses" : "Προβολή απαντήσεων",
     "Delete" : "Διαγραφή",
     "Group" : "Ομάδα",
+    "Circle" : "Κύκλος",
     "Share link" : "Διαμοιρασμός συνδέσμου",
     "Add link" : "Προσθήκη συνδέσμου",
     "Copy to clipboard" : "Αντιγραφή στο πρόχειρο",

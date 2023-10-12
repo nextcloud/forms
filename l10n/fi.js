@@ -81,6 +81,7 @@ OC.L10N.register(
     "View responses" : "Näytä vastaukset",
     "Delete" : "Poista",
     "Group" : "Ryhmä",
+    "Circle" : "Piiri",
     "Share link" : "Jaa linkki",
     "Add link" : "Lisää linkki",
     "Copy to clipboard" : "Kopioi leikepöydälle",

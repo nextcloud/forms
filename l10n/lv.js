@@ -11,6 +11,7 @@ OC.L10N.register(
     "Permissions" : "Atļaujas",
     "Delete" : "Dzēst",
     "Group" : "Grupa",
+    "Circle" : "Loks",
     "Share link" : "Koplietot saiti",
     "Copy to clipboard" : "Kopēt starpliktuvē",
     "Remove link" : "Noņemt saiti",

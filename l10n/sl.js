@@ -82,6 +82,7 @@ OC.L10N.register(
     "View responses" : "Pregled odzivov",
     "Delete" : "Izbriši",
     "Group" : "Skupina",
+    "Circle" : "Krog",
     "Share link" : "Povezava za souporabo",
     "Add link" : "Dodaj povezavo",
     "Copy to clipboard" : "Kopiraj v odložišče",
