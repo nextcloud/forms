@@ -35,7 +35,7 @@ jobs:
           submodules: true
 
       - name: Checkout circles dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: nextcloud/circles
           ref: ${{ matrix.server-versions }}
@@ -127,7 +127,7 @@ jobs:
           submodules: true
 
       - name: Checkout circles dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: nextcloud/circles
           ref: ${{ matrix.server-versions }}
@@ -203,7 +203,7 @@ jobs:
           submodules: true
 
       - name: Checkout circles dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: nextcloud/circles
           ref: ${{ matrix.server-versions }}
@@ -289,7 +289,7 @@ jobs:
           submodules: true
 
       - name: Checkout circles dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: nextcloud/circles
           ref: ${{ matrix.server-versions }}
