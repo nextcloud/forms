@@ -24,7 +24,7 @@
 @mixin markdown-output {
 	overflow-wrap: break-word;
 
-	::v-deep {
+	:deep() {
 		>:not(:first-child) {
 			margin-block-start: 1.5em;
 		}
@@ -35,6 +35,11 @@
 			line-height: 34px;
 			margin-bottom: 12px;
 			color: var(--color-main-text);
+		}
+
+		a {
+			color: var(--color-primary-element);
+			text-decoration: underline;
 		}
 
 		blockquote {

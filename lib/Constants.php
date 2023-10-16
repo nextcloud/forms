@@ -46,6 +46,7 @@ class Constants {
 	public const MAX_STRING_LENGTHS = [
 		'formTitle' => 256,
 		'formDescription' => 8192,
+		'submissionMessage' => 2048,
 		'questionText' => 2048,
 		'questionDescription' => 4096,
 		'optionText' => 1024,

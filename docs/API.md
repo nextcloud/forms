@@ -120,6 +120,7 @@ Returns the full-depth object of the requested form (without submissions).
   "title": "Form 1",
   "description": "Description Text",
   "ownerId": "jonas",
+  "submissionMessage": "Thank **you** for submitting the form."
   "created": 1611240961,
   "access": {
     "permitAllUsers": false,

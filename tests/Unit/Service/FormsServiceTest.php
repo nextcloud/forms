@@ -212,6 +212,7 @@ class FormsServiceTest extends TestCase {
 						'displayName' => 'Some User'
 					]
 				],
+				'submissionMessage' => '',
 				'permissions' => Constants::PERMISSION_ALL
 			]]
 		];
@@ -417,7 +418,8 @@ class FormsServiceTest extends TestCase {
 				'questions' => [],
 				'permissions' => [
 					'submit'
-				]
+				],
+				'submissionMessage' => '',
 			]]
 		];
 	}

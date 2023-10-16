@@ -339,8 +339,10 @@ class ApiController extends OCSController {
 		}
 
 		// Create FormEntity with given Params & Id.
-		$form = Form::fromParams($keyValuePairs);
-		$form->setId($id);
+		foreach ($keyValuePairs as $key => $value) {
+			$method = 'set' . ucfirst($key);
+			$form->$method($value);
+		}
 
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
