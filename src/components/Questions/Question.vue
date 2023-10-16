@@ -22,17 +22,41 @@
 
 <template>
 	<li v-click-outside="disableEdit"
-		:class="{ 'question--edit': edit }"
+		:class="{
+			'question': true,
+			'question--edit': edit,
+			'question--editable': !readOnly
+		}"
 		:aria-label="t('forms', 'Question number {index}', {index})"
-		class="question"
 		@click="enableEdit">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div v-if="!readOnly"
-			class="question__drag-handle"
-			:class="{'question__drag-handle--shiftup': shiftDragHandle}"
-			:aria-label="t('forms', 'Drag to reorder the questions')">
+			:class="{
+				'question__drag-handle': true,
+				'question__drag-handle--shiftup': shiftDragHandle
+			}">
+			<NcButton ref="buttonUp"
+				:aria-label="t('forms', 'Move question up')"
+				:disabled="!canMoveUp"
+				class="question__drag-handle-button"
+				type="tertiary-no-background"
+				@click.stop="onMoveUp">
+				<template #icon>
+					<IconArrowUp :size="20" />
+				</template>
+			</NcButton>
 			<IconDragHorizontalVariant :size="20" />
+			<NcButton ref="buttonDown"
+				:aria-label="t('forms', 'Move question down')"
+				:disabled="!canMoveDown"
+				class="question__drag-handle-button"
+				type="tertiary-no-background"
+				@click.stop="onMoveDown">
+				<template #icon>
+					<IconArrowDown :size="20" />
+				</template>
+			</NcButton>
 		</div>
 
 		<!-- Header -->
@@ -113,8 +137,11 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
+import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
+import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
@@ -128,6 +155,8 @@ export default {
 
 	components: {
 		IconAlertCircleOutline,
+		IconArrowDown,
+		IconArrowUp,
 		IconDelete,
 		IconDragHorizontalVariant,
 		IconIdentifier,
@@ -135,6 +164,7 @@ export default {
 		NcActionButton,
 		NcActionCheckbox,
 		NcActionInput,
+		NcButton,
 	},
 
 	inject: ['$markdownit'],
@@ -187,6 +217,14 @@ export default {
 		warningInvalid: {
 			type: String,
 			default: t('forms', 'This question needs a title!'),
+		},
+		canMoveDown: {
+			type: Boolean,
+			default: false,
+		},
+		canMoveUp: {
+			type: Boolean,
+			default: false,
 		},
 	},
 
@@ -270,6 +308,18 @@ export default {
 		},
 
 		/**
+		 * Reorder question but keep focus on the button
+		 */
+		onMoveDown() {
+			this.$emit('move-down')
+			this.$nextTick(() => this.$refs.buttonDown.$el.focus())
+		},
+		onMoveUp() {
+			this.$emit('move-up')
+			this.$nextTick(() => this.$refs.buttonUp.$el.focus())
+		},
+
+		/**
 		 * Enable the edit mode
 		 */
 		enableEdit() {
@@ -311,6 +361,10 @@ export default {
 	user-select: none;
 	background-color: var(--color-main-background);
 
+	&--editable {
+		padding-inline-start: 56px; // add 12px for the title input box
+	}
+
 	> * {
 		cursor: pointer;
 	}
@@ -319,10 +373,18 @@ export default {
 		position: absolute;
 		display: flex;
 		inset-inline-start: 0;
+		flex-direction: column;
+		justify-content: center;
+		gap: 12px;
 		width: 44px;
 		height: 100%;
 		opacity: .5;
 		cursor: grab;
+
+		&-button {
+			position: absolute;
+			inset-block-start: -9999px;
+		}
 
 		// Avoid moving drag-handle due to newAnswer-input on multiple-Questions
 		&--shiftup {
@@ -330,8 +392,14 @@ export default {
 		}
 
 		&:hover,
-		&:focus {
+		&:focus,
+		&:focus-within {
 			opacity: 1;
+
+			.question__drag-handle-button {
+				position: initial;
+				inset-block-start: initial;
+			}
 		}
 
 		&:active {

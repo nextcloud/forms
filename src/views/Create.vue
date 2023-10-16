@@ -93,15 +93,21 @@
 				@change="onQuestionOrderChange"
 				@start="isDragging = true"
 				@end="isDragging = false">
-				<Questions :is="answerTypes[question.type].component"
-					v-for="(question, index) in form.questions"
-					ref="questions"
-					:key="question.id"
-					:answer-type="answerTypes[question.type]"
-					:index="index + 1"
-					:max-string-lengths="maxStringLengths"
-					v-bind.sync="form.questions[index]"
-					@delete="deleteQuestion(question)" />
+				<transition-group :name="isDragging ? 'no-external-transition-on-drag' : 'question-list'">
+					<component :is="answerTypes[question.type].component"
+						v-for="(question, index) in form.questions"
+						ref="questions"
+						:key="question.id"
+						:can-move-down="index < (form.questions.length - 1)"
+						:can-move-up="index > 0"
+						:answer-type="answerTypes[question.type]"
+						:index="index + 1"
+						:max-string-lengths="maxStringLengths"
+						v-bind.sync="form.questions[index]"
+						@delete="deleteQuestion(question)"
+						@move-down="onMoveDown(index)"
+						@move-up="onMoveUp(index)" />
+				</transition-group>
 			</Draggable>
 
 			<!-- Add new questions menu -->
@@ -278,6 +284,18 @@ export default {
 	},
 
 	methods: {
+		onMoveUp(index) {
+			if (index > 0) {
+				[this.form.questions[index - 1], this.form.questions[index]] = [this.form.questions[index], this.form.questions[index - 1]]
+				this.onQuestionOrderChange()
+			}
+		},
+		onMoveDown(index) {
+			// only if not the last one
+			if (index < (this.form.questions.length - 1)) {
+				this.onMoveUp(index + 1)
+			}
+		},
 		onTitleChange() {
 			this.resizeTitle()
 			this.saveTitle()
@@ -451,6 +469,12 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.question-list-move {
+	transition: all 0.2s ease;
+}
+</style>
+
 <style lang="scss" scoped>
 @import '../scssmixins/markdownOutput';
 
@@ -469,8 +493,9 @@ export default {
 	header {
 		display: flex;
 		flex-direction: column;
+		margin: 0;
 		margin-block-end: 24px;
-		margin-inline-start: 56px;
+		padding-inline-start: 40px;
 
 		.form-title {
 			font-size: 28px;
