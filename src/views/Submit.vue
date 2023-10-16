@@ -145,6 +145,32 @@ export default {
 
 	mixins: [ViewsMixin],
 
+	/*
+	 * This is used to confirm that the user wants to leave the page
+	 * if the form is unsubmitted.
+	 */
+	beforeRouteUpdate(to, from, next) {
+		// This navigation guard is called when the route parameters changed (e.g. form hash)
+		// continue with the navigation if there are no changes or the user confirms to leave the form
+		if (this.confirmLeaveForm()) {
+			next()
+		} else {
+			// Otherwise cancel the navigation
+			next(false)
+		}
+	},
+
+	beforeRouteLeave(to, from, next) {
+		// This navigation guard is called when the route changed and a new view should be shown
+		// continue with the navigation if there are no changes or the user confirms to leave the form
+		if (this.confirmLeaveForm()) {
+			next()
+		} else {
+			// Otherwise cancel the navigation
+			next(false)
+		}
+	},
+
 	props: {
 		isLoggedIn: {
 			type: Boolean,
@@ -164,6 +190,8 @@ export default {
 			answers: {},
 			loading: false,
 			success: false,
+			/** Submit state of the form, true if changes are currently submitted */
+			submitForm: false,
 		}
 	},
 
@@ -232,6 +260,13 @@ export default {
 		},
 	},
 
+	beforeDestroy() {
+		window.removeEventListener('beforeunload', this.beforeWindowUnload)
+	},
+	created() {
+		window.addEventListener('beforeunload', this.beforeWindowUnload)
+	},
+
 	beforeMount() {
 		// Public Views get their form by initial-state from parent. No fetch necessary.
 		if (this.publicView) {
@@ -266,11 +301,34 @@ export default {
 			this.$refs.submitButton.click()
 		},
 
+		/*
+		 * Methods for catching unwanted unload events
+		 */
+		beforeWindowUnload(e) {
+			if (!this.confirmLeaveForm()) {
+				// Cancel the window unload event
+				e.preventDefault()
+				e.returnValue = ''
+			}
+		},
+
+		/**
+		Check if the form contains unsaved changes, returns true if the the form can be leaved safely, false if the navigation should be canceled.
+		 */
+		confirmLeaveForm() {
+			return (
+				this.submitForm
+				|| Object.keys(this.answers).length === 0
+				|| confirm(t('forms', 'You have unsaved changes! Do you still want to leave?'))
+			)
+		},
+
 		/**
 		 * Submit the form after the browser validated it 🚀
 		 */
 		async onSubmit() {
 			this.loading = true
+			this.submitForm = true
 
 			try {
 				await axios.post(generateOcsUrl('apps/forms/api/v2.1/submission/insert'), {
@@ -295,6 +353,7 @@ export default {
 			this.answers = {}
 			this.loading = false
 			this.success = false
+			this.submitForm = false
 		},
 	},
 
