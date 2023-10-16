@@ -241,7 +241,13 @@ class ActivityManagerTest extends TestCase {
 				'sharedGroup',
 				[['user1'], ['user2']],
 				['user1', 'user2'],
-			]
+			],
+			'circle-share' => [
+				IShare::TYPE_CIRCLE,
+				'sharedCircle',
+				[['user1'], ['user2']],
+				['user1', 'user2'],
+			],
 		];
 	}
 
@@ -250,7 +256,7 @@ class ActivityManagerTest extends TestCase {
 	 *
 	 * @dataProvider dataPublichNewSharedSubmission
 	 */
-	public function testPublishNewSharedSubmission(int $shareType, string $shareWith, array $expected, ?array $groupUsers = null) {
+	public function testPublishNewSharedSubmission(int $shareType, string $shareWith, array $expected, ?array $sharedUsers = null) {
 		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
 		$form = new Form();
 		$form->setId(5);
@@ -259,14 +265,17 @@ class ActivityManagerTest extends TestCase {
 		$form->setOwnerId('formOwner');
 		$submitterId = 'submittingUser';
 
-		if ($groupUsers === null) {
-			$this->groupManager->expects($this->never())->method('get');
-		} else {
+		if ($shareType === IShare::TYPE_CIRCLE) {
+			$this->circlesService->expects($this->once())
+				->method('getCircleUsers')
+				->with('sharedCircle')
+				->willReturn($sharedUsers);
+		} elseif ($shareType === IShare::TYPE_GROUP) {
 			$users = array_map(function ($name) {
 				$user = $this->createMock(IUser::class);
 				$user->expects($this->once())->method('getUID')->willReturn($name);
 				return $user;
-			}, $groupUsers);
+			}, $sharedUsers);
 			$group = $this->createMock(IGroup::class);
 			$group->expects($this->once())->method('getUsers')->willReturn($users);
 			$this->groupManager->expects($this->once())->method('get')->willReturn($group);
