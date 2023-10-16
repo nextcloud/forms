@@ -11,6 +11,7 @@ OC.L10N.register(
     "Copy" : "Kopiëren",
     "Anonymous response" : "Anoniem antwoord",
     "Shared by %s" : "Gedeeld door %s",
+    "User ID" : "Gebruiker-ID",
     "User display name" : "Weergavenaam gebruiker",
     "Timestamp" : "Tijdstempel",
     "responses" : "reacties",
