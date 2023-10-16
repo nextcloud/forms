@@ -162,6 +162,9 @@ class ActivityManager {
 					$users = array_map(fn (IUser $user) => $user->getUID(), $group->getUsers());
 				}
 				break;
+			case IShare::TYPE_CIRCLE:
+				$users = $this->circlesService->getCircleUsers($shareWith);
+				break;
 		}
 
 		foreach ($users as $userId) {
