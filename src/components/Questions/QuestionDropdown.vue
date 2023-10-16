@@ -33,11 +33,7 @@
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
-		@update:text="onTitleChange"
-		@update:description="onDescriptionChange"
-		@update:isRequired="onRequiredChange"
-		@update:name="onNameChange"
-		@delete="onDelete">
+		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
 				@update:checked="onShuffleOptionsChange">
