@@ -19,10 +19,13 @@ This file contains the API-Documentation. For more information on the returned D
   "data": <Actual data>
 }
 ```
-## Breaking Changes on API v2
+## API changes
+### Breaking Changes on API v2
 - The `mandatory` property of questions has been removed. It is replaced by `isRequired`.
 - Completely new way of handling access & shares.
 
+### Other API changes
+- In API version 2.1 the endpoint `/api/v2.1/share/update` was added to update a Share
 
 ## Form Endpoints
 ### List owned Forms
