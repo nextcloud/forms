@@ -149,6 +149,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Хвала вам што се попунили упитник!",
     "Submit" : "Пошаљи",
     "Submit form" : "Поднеси упитник",
+    "You have unsaved changes! Do you still want to leave?" : "Имате несачуване измене! Да ли још увек желите да напустите?",
     "There was an error submitting the form" : "Дошло је до грешке током подношења упитника",
     "Error while saving question" : "Грешка током чувања питања",
     "Form link copied" : "Веза ка упитнику копирана",

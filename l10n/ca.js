@@ -143,6 +143,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Gràcies per emplenar el formulari!",
     "Submit" : "Envia",
     "Submit form" : "Envia el formulari",
+    "You have unsaved changes! Do you still want to leave?" : "Teniu canvis no desats! Encara vols marxar?",
     "There was an error submitting the form" : "S'ha produït un error en enviar el formulari",
     "Error while saving question" : "S'ha produït un error en desar la pregunta",
     "Form link copied" : "S'ha copiat l'enllaç del formulari",

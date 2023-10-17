@@ -136,6 +136,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Ďakujeme za vyplnenie formulára!",
     "Submit" : "Odoslať",
     "Submit form" : "Odoslať formulár",
+    "You have unsaved changes! Do you still want to leave?" : "Máte neuložené zmeny! Stále chcete odísť?",
     "There was an error submitting the form" : "Pri odosielaní formulára sa vyskytla chyba",
     "Error while saving question" : "Pri ukladaní otázky sa vyskytla chyba",
     "Form link copied" : "Odkaz na formulár je skopírovaný",

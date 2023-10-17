@@ -144,6 +144,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "سپاس از شما برای تکمیل فرم!",
     "Submit" : "ارسال",
     "Submit form" : "ارسال فرم",
+    "You have unsaved changes! Do you still want to leave?" : "You have unsaved changes! Do you still want to leave?",
     "There was an error submitting the form" : "There was an error submitting the form",
     "Error while saving question" : "Error while saving question",
     "Form link copied" : "Form link copied",

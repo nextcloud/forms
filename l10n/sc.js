@@ -103,6 +103,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Gràtzias pro àere cumpletadu su mòdulu!",
     "Submit" : "Imbia",
     "Submit form" : "Imbia mòdulu",
+    "You have unsaved changes! Do you still want to leave?" : "No as sarvadu is modìficas! A beru boles essire?",
     "There was an error submitting the form" : "B'at àpidu un'errore imbiende su mòdulu",
     "Error while saving question" : "Errore sarvende sa pregonta",
     "Form link copied" : "Ligòngiu de su mòdulu copiadu",

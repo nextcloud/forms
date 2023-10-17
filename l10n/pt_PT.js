@@ -100,6 +100,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Obrigado por ter preenchido o formulário!",
     "Submit" : "Submeter",
     "Submit form" : "Submeter formulário",
+    "You have unsaved changes! Do you still want to leave?" : "Existem alterações que não estão guardadas. Tem a certeza que quer sair?",
     "There was an error submitting the form" : "Ocorreu um erro ao submeter o formulário",
     "Error while saving question" : "Erro ao guardar a pergunta",
     "Form link copied" : "Ligação do formulário copiada",

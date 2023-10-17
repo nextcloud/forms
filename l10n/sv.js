@@ -141,6 +141,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Tack för att du fyllde i formuläret!",
     "Submit" : "Skicka",
     "Submit form" : "Skicka in formulär",
+    "You have unsaved changes! Do you still want to leave?" : "Du har osparade förändringar! Vill du fortfarande lämna?",
     "There was an error submitting the form" : "Ett fel uppstod vid inskickande av formuläret",
     "Error while saving question" : "Ett fel uppstod vid sparande av frågan",
     "Form link copied" : "Formulärlänken kopierad",

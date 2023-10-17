@@ -120,6 +120,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Grazie per aver completato il modulo!",
     "Submit" : "Invia",
     "Submit form" : "Invia modulo",
+    "You have unsaved changes! Do you still want to leave?" : "Hai delle modifiche non salvate! Vuoi uscire comunque?",
     "There was an error submitting the form" : "Si è verificato un errore durante l'invio del modulo",
     "Error while saving question" : "Errore durante il salvataggio della domanda",
     "Form link copied" : "Collegamento del modulo copiato",

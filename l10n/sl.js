@@ -132,6 +132,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Hvala za izpolnjevanje vprašalnika!",
     "Submit" : "Pošlji",
     "Submit form" : "Objavi obrazec",
+    "You have unsaved changes! Do you still want to leave?" : "Zaznane so neshranjene spremembe! Ali vseeno želite zapustiti stran?",
     "There was an error submitting the form" : "Prišlo je do napake med pošiljanjem vprašalnika",
     "Error while saving question" : "Prišlo je do napake med shranjevanjem vprašanja",
     "Form link copied" : "Povezava vprašalnika je kopirana",

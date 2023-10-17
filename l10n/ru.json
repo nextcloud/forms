@@ -142,6 +142,7 @@
     "Thank you for completing the form!" : "Спасибо за заполнение формы!",
     "Submit" : "Отправить ответ",
     "Submit form" : "Сохранить форму",
+    "You have unsaved changes! Do you still want to leave?" : "У вас есть несохранённые изменения! Вы всё ещё хотите уйти?",
     "There was an error submitting the form" : "При сохранении формы произошла ошибка",
     "Error while saving question" : "Ошибка при сохранении вопроса",
     "Form link copied" : "Ссылка на форму скопирована",

@@ -96,6 +96,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "回答のご協力ありがとうございました！",
     "Submit" : "送信",
     "Submit form" : "フォームを送信",
+    "You have unsaved changes! Do you still want to leave?" : "保存されていない変更があります！離れるつもりですか？",
     "There was an error submitting the form" : "フォームの送信中にエラーが発生しました",
     "Error while saving question" : "質問の保存中にエラーが発生しました",
     "Form link copied" : "フォームのリンクをコピーしました",

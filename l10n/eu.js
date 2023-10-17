@@ -144,6 +144,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Mila esker galdetegia betetzeagatik!",
     "Submit" : "Bidali",
     "Submit form" : "Bidali galdetegia",
+    "You have unsaved changes! Do you still want to leave?" : "Gorde gabeko aldaketak dauzkazu! Atera nahi duzu hala ere?",
     "There was an error submitting the form" : "Errore bat gertatu da galdetegia bidaltzean",
     "Error while saving question" : "Errorea galdera gordetzean",
     "Form link copied" : "Galdetegiaren esteka kopiatu da",

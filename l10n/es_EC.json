@@ -142,6 +142,7 @@
     "Thank you for completing the form!" : "¡Gracias por completar el formulario!",
     "Submit" : "Enviar",
     "Submit form" : "Enviar formulario",
+    "You have unsaved changes! Do you still want to leave?" : "¡Tienes cambios no guardados! ¿Aún quieres salir?",
     "There was an error submitting the form" : "Hubo un error al enviar el formulario",
     "Error while saving question" : "Error al guardar la pregunta",
     "Form link copied" : "Enlace del formulario copiado",

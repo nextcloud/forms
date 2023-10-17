@@ -141,6 +141,7 @@
     "Thank you for completing the form!" : "Tak fordi du udfyldte formularen!",
     "Submit" : "Tilføj",
     "Submit form" : "Indsend formular",
+    "You have unsaved changes! Do you still want to leave?" : "Du har ikke-gemte ændringer! Vil du stadig lukke?",
     "There was an error submitting the form" : "Der opstod en fejl under indsendelse af formularen",
     "Error while saving question" : "Der opstod en fejl under lagring af spørgsmål",
     "Form link copied" : "Formularlinket er kopieret",

@@ -146,6 +146,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "感谢您填写此表单！",
     "Submit" : "提交",
     "Submit form" : "提交表单",
+    "You have unsaved changes! Do you still want to leave?" : "你有未保存的更改！你还是想离开吗？",
     "There was an error submitting the form" : "提交表单时出错",
     "Error while saving question" : "保存此问题时出错",
     "Form link copied" : "已复制表单链接",

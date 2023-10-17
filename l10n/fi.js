@@ -132,6 +132,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Kiitos kun täytit lomakkeen!",
     "Submit" : "Lähetä",
     "Submit form" : "Lähetä lomake",
+    "You have unsaved changes! Do you still want to leave?" : "Sinulla on tallentamattomia muutoksia! Haluatko silti poistua?",
     "There was an error submitting the form" : "Lomaketta lähettäessä tapahtui virhe",
     "Error while saving question" : "Virhe kysymystä tallennettaessa",
     "Form link copied" : "Lomakkeen linkki kopioitu",

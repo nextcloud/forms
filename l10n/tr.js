@@ -149,6 +149,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Formu doldurduğunuz için teşekkürler!",
     "Submit" : "Gönder",
     "Submit form" : "Formu gönder",
+    "You have unsaved changes! Do you still want to leave?" : "Kaydedilmemiş değişiklikleriniz var. Gene de ayrılmak istiyor musunuz?",
     "There was an error submitting the form" : "Form gönderilirken bir sorun çıktı",
     "Error while saving question" : "Soru silinirken sorun çıktı",
     "Form link copied" : "Form bağlantısı kopyalandı",

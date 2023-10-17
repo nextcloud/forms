@@ -146,6 +146,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Obrigado por completar o formulário!",
     "Submit" : "Enviar",
     "Submit form" : "Enviar formulário",
+    "You have unsaved changes! Do you still want to leave?" : "Você tem alterações não salvas! Você ainda quer sair?",
     "There was an error submitting the form" : "Houve um erro ao enviar o formulário",
     "Error while saving question" : "Erro ao salvar a pergunta",
     "Form link copied" : "Link do formulário copiado",

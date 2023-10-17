@@ -149,6 +149,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Děkujeme za vyplnění formuláře!",
     "Submit" : "Odeslat",
     "Submit form" : "Odeslat formulář",
+    "You have unsaved changes! Do you still want to leave?" : "Jsou zde neuložené změny! Opravdu chcete odejít?",
     "There was an error submitting the form" : "Při odesílání formuláře došlo k chybě",
     "Error while saving question" : "Chyba při ukládání otázky",
     "Form link copied" : "Odkaz na formulář zkopírován",

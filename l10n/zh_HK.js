@@ -149,6 +149,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "感謝您填寫表格！",
     "Submit" : "遞交",
     "Submit form" : "遞交表格",
+    "You have unsaved changes! Do you still want to leave?" : "您有未保存的更改！你還要離開嗎？",
     "There was an error submitting the form" : "遞交表格時發生錯誤",
     "Error while saving question" : "儲存問題時發生錯誤",
     "Form link copied" : "已複製表格連結",

@@ -20,6 +20,7 @@ OC.L10N.register(
     "Sharing" : "Đang chia sẽ",
     "Settings" : "Thiết lập",
     "Submit" : "Gửi đi",
+    "You have unsaved changes! Do you still want to leave?" : "Bạn có các thay đổi chưa lưu! Bạn vẫn muốn rời đi?",
     "Checkboxes" : "Hộp chọn",
     "Date" : "Date",
     "Pick a date" : "Chọn ngày",

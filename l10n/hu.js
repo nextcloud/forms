@@ -142,6 +142,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Köszönöm, hogy kitöltötte az űrlapot!",
     "Submit" : "Beküldés",
     "Submit form" : "Űrlap beküldése",
+    "You have unsaved changes! Do you still want to leave?" : "Nem mentett módosításai vannak! Elhagyja az oldalt?",
     "There was an error submitting the form" : "Hiba az űrlap beküldése során",
     "Error while saving question" : "Hiba a kérdés mentése során",
     "Form link copied" : "Az űrlap hivatkozása másolva",
