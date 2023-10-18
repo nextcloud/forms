@@ -141,6 +141,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Благодарим ви, че попълнихте формуляра!",
     "Submit" : "Изпращане",
     "Submit form" : "Изпращане на формуляр",
+    "You have unsaved changes! Do you still want to leave?" : "Имате незапазени промени! Все още ли искате да напуснете?",
     "There was an error submitting the form" : "Възникна грешка при изпращането на формуляра",
     "Error while saving question" : "Грешка при записване на въпроса",
     "Form link copied" : "Връзката към формуляра е копирана",

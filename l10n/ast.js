@@ -18,6 +18,7 @@ OC.L10N.register(
     "There was an error while removing responses" : "Hebo un error mentanto se quitaben les rempuestes",
     "Sharing" : "Comparticiñon",
     "Settings" : "Configuración",
+    "Submit" : "Unviar",
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
     "Date" : "Data"
 },
