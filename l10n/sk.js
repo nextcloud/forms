@@ -66,6 +66,7 @@ OC.L10N.register(
     "Add a new answer" : "Pridať novú odpoveď",
     "There was an issue deleting this option" : "Pri odstraňovaní tejto možnosti sa vyskytol problém",
     "A long answer for the question “{text}”" : "Dlhá odpoveď na otázku „{text}“",
+    "Add \"other\"" : "Pridať \"ďalšie\"",
     "Other" : "Iné",
     "A short answer for the question “{text}”" : "Krátka odpoveď na otázku „{text}“",
     "No response" : "Žiadna odpoveď",
