@@ -75,6 +75,10 @@ export default {
 .question__input[type=text] {
 	width: 100%;
 	min-height: 44px;
-}
 
+	&:disabled {
+		width: calc(100% - 32px) !important;
+		margin-inline-start: -12px;
+	}
+}
 </style>

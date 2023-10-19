@@ -128,6 +128,10 @@ export default {
 .mx-datepicker {
 	width: 300px;
 
+	&.disabled {
+		inset-inline-start: -12px;
+	}
+
 	:deep(.mx-input) {
 		height: 44px !important;
 	}
