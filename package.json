@@ -33,7 +33,7 @@
     "@nextcloud/moment": "^1.2.1",
     "@nextcloud/router": "^2.1.2",
     "@nextcloud/vue": "^7.12.6",
-    "core-js": "^3.33.0",
+    "core-js": "^3.33.1",
     "crypto-js": "^4.1.1",
     "debounce": "^1.2.1",
     "markdown-it": "^13.0.2",
