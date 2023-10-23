@@ -644,7 +644,7 @@ class ApiControllerTest extends TestCase {
 				return true;
 			}));
 
-		$this->answerMapper->expects($this->exactly(4))
+		$this->answerMapper->expects($this->exactly(5))
 			->method('insert')
 			->with($this->callback(function ($answer) {
 				if ($answer->getSubmissionId() !== 12) {

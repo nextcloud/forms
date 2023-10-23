@@ -1414,6 +1414,7 @@ class FormsServiceTest extends TestCase {
 				$this->questionMapper,
 				$this->shareMapper,
 				$this->submissionMapper,
+				$this->answerMapper,
 				$this->configService,
 				$this->groupManager,
 				$this->logger,
