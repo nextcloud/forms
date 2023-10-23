@@ -37,6 +37,7 @@ use OCA\Forms\Db\SubmissionMapper;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
@@ -183,9 +184,9 @@ class FormsService {
 		if ($this->currentUser->getUID() && $form->getAllowEdit()) {
 			$submissionEntity = null;
 			try {
-				$submissionEntity = $this->submissionMapper->findByFormAndUser($id, $this->currentUser->getUID());
+				$submissionEntity = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
 				$answers = $this->getAnswers($form->getId(), $submissionEntity->getId(), $this->currentUser->getUID());
-				if ($answers !== false) {
+				if (!empty($answers)) {
 					$result['answers'] = $answers;
 					$result['newSubmission'] = false;
 					$result['submissionId'] = $submissionEntity->getId();

@@ -45,6 +45,7 @@ function time($expected = null) {
 
 namespace OCA\Forms\Tests\Unit\Controller;
 
+use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
@@ -79,6 +80,8 @@ use Test\TestCase;
 
 class ApiControllerTest extends TestCase {
 	private ApiController $apiController;
+	/** @var ActivityManager|MockObject */
+	private $activityManager;
 	/** @var AnswerMapper|MockObject */
 	private $answerMapper;
 	/** @var FormMapper|MockObject */
@@ -107,6 +110,7 @@ class ApiControllerTest extends TestCase {
 	private $l10n;
 
 	public function setUp(): void {
+		$this->activityManager = $this->createMock(ActivityManager::class);
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
@@ -129,6 +133,7 @@ class ApiControllerTest extends TestCase {
 			'forms',
 			$this->request,
 			$this->createUserSession(),
+			$this->activityManager,
 			$this->answerMapper,
 			$this->formMapper,
 			$this->optionMapper,
@@ -376,6 +381,7 @@ class ApiControllerTest extends TestCase {
 			 ->setConstructorArgs(['forms',
 			 	$this->request,
 			 	$this->createUserSession(),
+				$this->activityManager,
 			 	$this->answerMapper,
 			 	$this->formMapper,
 			 	$this->optionMapper,
@@ -535,6 +541,7 @@ class ApiControllerTest extends TestCase {
 			->setConstructorArgs(['forms',
 				$this->request,
 				$this->createUserSession(),
+				$this->activityManager,
 				$this->answerMapper,
 				$this->formMapper,
 				$this->optionMapper,

@@ -28,6 +28,7 @@
 namespace OCA\Forms\Controller;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -70,6 +71,7 @@ class ApiController extends OCSController {
 		string $appName,
 		IRequest $request,
 		IUserSession $userSession,
+		private ActivityManager $activityManager,
 		private AnswerMapper $answerMapper,
 		private FormMapper $formMapper,
 		private OptionMapper $optionMapper,
