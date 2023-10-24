@@ -182,14 +182,20 @@ export default {
 				.length !== 0
 		},
 
-		// If disabled, submitMultiple will be casted to true
+		// If disabled, submitMultiple will be casted to false if allowEdit is true, else casted to true
 		submitMultiple() {
+			if (this.disableSubmitMultiple && this.allowEdit) {
+				return false;
+			}
 			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
 
-		// If disabled, allowEdit will be casted to true
+		// If disabled, allowEdit will be casted to false
 		allowEdit() {
-			return this.disableAllowEdit || this.form.allowEdit
+			if (this.disableAllowEdit) {
+				return false;
+			}
+			return this.form.allowEdit
 		},
 
 		formExpires() {
