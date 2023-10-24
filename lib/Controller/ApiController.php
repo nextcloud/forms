@@ -27,8 +27,8 @@
 
 namespace OCA\Forms\Controller;
 
-use OCA\Forms\Constants;
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
