@@ -31,11 +31,7 @@
 		:max-string-lengths="maxStringLengths"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
-		@update:text="onTitleChange"
-		@update:description="onDescriptionChange"
-		@update:isRequired="onRequiredChange"
-		@update:name="onNameChange"
-		@delete="onDelete">
+		v-on="commonListeners">
 		<div class="question__content">
 			<input ref="input"
 				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"

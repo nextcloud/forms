@@ -41,6 +41,14 @@ export default {
 		},
 
 		/**
+		 * ID of the form
+		 */
+		formId: {
+			type: Number,
+			default: null,
+		},
+
+		/**
 		 * The question title
 		 */
 		text: {
@@ -88,6 +96,22 @@ export default {
 		options: {
 			type: Array,
 			required: true,
+		},
+
+		/**
+		 * Order of the question
+		 */
+		order: {
+			type: Number,
+			default: -1,
+		},
+
+		/**
+		 * Question type
+		 */
+		type: {
+			type: String,
+			default: null,
 		},
 
 		/**
@@ -143,6 +167,21 @@ export default {
 			}
 			// Ensure order of options always is the same
 			return [...this.options].sort((a, b) => a.id - b.id)
+		},
+
+		/**
+		 * Listeners for all questions to forward
+		 */
+		commonListeners() {
+			return {
+				delete: this.onDelete,
+				'update:text': this.onTitleChange,
+				'update:description': this.onDescriptionChange,
+				'update:isRequired': this.onRequiredChange,
+				'update:name': this.onNameChange,
+				'move-down': (...args) => this.$emit('move-down', ...args),
+				'move-up': (...args) => this.$emit('move-up', ...args),
+			}
 		},
 	},
 
