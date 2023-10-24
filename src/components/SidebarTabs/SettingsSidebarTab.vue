@@ -36,8 +36,10 @@
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
-		<NcCheckboxRadioSwitch :checked="allowEdit"
+		<NcCheckboxRadioSwitch v-tooltip="disableAllowEditExplanation"
+			:checked="allowEdit"
 			type="switch"
+			:disabled="disableAllowEdit"
 			@update:checked="onAllowEditChange">
 			{{ t('forms', 'Allow editing and deleting responses per person') }}
 		</NcCheckboxRadioSwitch>
@@ -154,11 +156,23 @@ export default {
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
 		disableSubmitMultiple() {
-			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous
+			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous || this.form.allowEdit
 		},
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {
-				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously.')
+				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously, or the response can be edited.')
+			}
+			return ''
+		},
+		/**
+		 * Allow Edit is disabled, if it cannot be controlled.
+		 */
+		disableAllowEdit() {
+			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous || this.form.submitMultiple
+		},
+		disableAllowEditExplanation() {
+			if (this.disableAllowEdit) {
+				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously, or multiple responses are allowed.')
 			}
 			return ''
 		},
@@ -173,8 +187,9 @@ export default {
 			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
 
+		// If disabled, allowEdit will be casted to true
 		allowEdit() {
-			return this.form.allowEdit
+			return this.disableAllowEdit || this.form.allowEdit
 		},
 
 		formExpires() {
