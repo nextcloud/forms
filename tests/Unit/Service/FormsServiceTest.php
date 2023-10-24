@@ -61,6 +61,9 @@ class FormsServiceTest extends TestCase {
 	/** @var ActivityManager|MockObject */
 	private $activityManager;
 
+	/** @var AnswerMapper|MockObject */
+	private $answerMapper;
+
 	/** @var FormMapper|MockObject */
 	private $formMapper;
 
