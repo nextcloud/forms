@@ -52,7 +52,7 @@
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
 				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
 					:key="answer.id"
-					:checked.sync="questionValues"
+					:checked.sync="values"
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
@@ -62,7 +62,7 @@
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
-					<NcCheckboxRadioSwitch :checked.sync="questionValues"
+					<NcCheckboxRadioSwitch :checked.sync="values"
 						:value="valueOtherAnswer"
 						:name="`${id}-answer`"
 						:type="isUnique ? 'radio' : 'checkbox'"
@@ -153,7 +153,7 @@ export default {
 
 	data() {
 		return {
-			questionValues: this.values,
+			// questionValues: this.values,
 			inputOtherAnswer: this.valueToInputOtherAnswer(),
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX: 'system-other-answer:',
 		}
@@ -209,7 +209,8 @@ export default {
 		},
 
 		hasRequiredOtherAnswerInput() {
-			const checkedOtherAnswer = this.questionValues.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			const checkedOtherAnswer = this.values.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			logger.debug('2')
 			return checkedOtherAnswer[0] !== undefined
 		},
 	},
@@ -232,16 +233,18 @@ export default {
 		},
 
 		inputOtherAnswer() {
-			if (this.isUnique) {
-				this.questionValues = this.valueOtherAnswer
+			/* if (this.isUnique) {
+				this.values[0] = this.valueOtherAnswer
+				logger.debug('1')
 				this.onChange()
 				return
-			}
+			} */
 
-			this.questionValues = this.questionValues.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			this.values = this.values.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			logger.debug('3')
 
 			if (this.inputOtherAnswer !== '') {
-				this.questionValues.push(this.valueOtherAnswer)
+				this.values.push(this.valueOtherAnswer)
 			}
 
 			this.onChange()
@@ -250,7 +253,7 @@ export default {
 
 	methods: {
 		onChange() {
-			this.$emit('update:values', this.isUnique ? [this.questionValues] : this.questionValues)
+			this.$emit('update:values', this.isUnique ? [this.values] : this.values)
 		},
 
 		/**

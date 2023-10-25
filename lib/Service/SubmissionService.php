@@ -314,6 +314,7 @@ class SubmissionService {
 				!array_filter($answers[$questionId], 'strlen') ||
 				(!empty($question['extraSettings']->allowOtherAnswer) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
+				$this->logger->debug('1');
 				return false;
 			}
 
@@ -334,10 +335,12 @@ class SubmissionService {
 				}
 
 				// Check if all answers are within the possible options
-				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']->allowOtherAnswer)) {
+				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
+					$this->logger->debug('2');
 					foreach ($answers[$questionId] as $answer) {
 						// Search corresponding option, return false if non-existent
 						if (array_search($answer, array_column($question['options'], 'id')) === false) {
+							$this->logger->debug('3');
 							return false;
 						}
 					}
