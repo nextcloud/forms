@@ -372,7 +372,7 @@ export default {
 			} else {
 				const sharedFormIndex = this.sharedForms.findIndex(form => form.id === id)
 				this.sharedForms[sharedFormIndex].lastUpdated = moment().unix()
-				this.sharedForms.sort((a, b) => a.lastUpdated - b.lastUpdated)
+				this.sharedForms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			}
 		},
 	},
