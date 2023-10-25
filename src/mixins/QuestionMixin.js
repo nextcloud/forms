@@ -73,6 +73,14 @@ export default {
 		},
 
 		/**
+		 * The index of the question
+		 */
+		index: {
+			type: Number,
+			required: true,
+		},
+
+		/**
 		 * Technical name
 		 */
 		name: {
@@ -160,6 +168,16 @@ export default {
 	},
 
 	computed: {
+		questionProps() {
+			const props = { ...this.$props, edit: this.edit }
+			const allowedKeys = Object.keys(Question.props)
+			Object.keys(props).forEach((key) => {
+				if (!allowedKeys.includes(key)) {
+					delete props[key]
+				}
+			})
+			return props
+		},
 		sortedOptions() {
 			// Only shuffle options if not in editing mode (and shuffling is enabled)
 			if (!this.edit && this.extraSettings?.shuffleOptions) {
@@ -179,6 +197,7 @@ export default {
 				'update:description': this.onDescriptionChange,
 				'update:isRequired': this.onRequiredChange,
 				'update:name': this.onNameChange,
+				'update:edit': () => { this.edit = !this.edit },
 				'move-down': (...args) => this.$emit('move-down', ...args),
 				'move-up': (...args) => this.$emit('move-up', ...args),
 			}
@@ -312,7 +331,7 @@ export default {
 						[key]: value,
 					},
 				})
-				emit('forms:last-updated:set', this.$attrs.formId)
+				emit('forms:last-updated:set', this.formId)
 			} catch (error) {
 				logger.error('Error while saving question', { error })
 				showError(t('forms', 'Error while saving question'))

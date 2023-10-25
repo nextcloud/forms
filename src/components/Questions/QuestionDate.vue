@@ -21,14 +21,7 @@
   -->
 
 <template>
-	<Question v-bind.sync="$attrs"
-		:text="text"
-		:name="name"
-		:description="description"
-		:is-required="isRequired"
-		:edit.sync="edit"
-		:read-only="readOnly"
-		:max-string-lengths="maxStringLengths"
+	<Question v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">

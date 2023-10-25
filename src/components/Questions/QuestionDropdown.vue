@@ -21,14 +21,7 @@
   -->
 
 <template>
-	<Question v-bind.sync="$attrs"
-		:text="text"
-		:name="name"
-		:description="description"
-		:is-required="isRequired"
-		:edit.sync="edit"
-		:read-only="readOnly"
-		:max-string-lengths="maxStringLengths"
+	<Question v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
@@ -144,10 +137,22 @@ export default {
 		},
 	},
 
-	watch: {
-		edit(edit) {
+	mounted() {
+		// Init selected options from values prop
+		if (this.values) {
+			const selected = this.values.map(id => this.options.find(option => option.id === id))
+			this.selectedOption = this.isMultiple ? selected : selected[0]
+		}
+	},
+
+	methods: {
+		/**
+		 * Handle toggling the edit mode
+		 * @param {boolean} enabled Whether the edit mode is enabled
+		 */
+		 onUpdateEdit(enabled) {
 			// When leaving edit mode, filter and delete empty options
-			if (!edit) {
+			if (!enabled) {
 				const options = this.options.filter(option => {
 					if (!option.text) {
 						this.deleteOptionFromDatabase(option)
@@ -160,17 +165,7 @@ export default {
 				this.updateOptions(options)
 			}
 		},
-	},
 
-	mounted() {
-		// Init selected options from values prop
-		if (this.values) {
-			const selected = this.values.map(id => this.options.find(option => option.id === id))
-			this.selectedOption = this.isMultiple ? selected : selected[0]
-		}
-	},
-
-	methods: {
 		onInput(option) {
 			if (Array.isArray(option)) {
 				this.$emit('update:values', [...new Set(option.map((opt) => opt.id))])
@@ -188,7 +183,7 @@ export default {
 		 */
 		updateOptions(options) {
 			this.$emit('update:options', options)
-			emit('forms:last-updated:set', this.$attrs.formId)
+			emit('forms:last-updated:set', this.formId)
 		},
 
 		/**
