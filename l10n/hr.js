@@ -42,7 +42,6 @@ OC.L10N.register(
     "Delete answer" : "Izbriši odgovor",
     "Error while saving the answer" : "Pogreška pri spremanju odgovora",
     "Question number {index}" : "Broj pitanja {index}",
-    "Drag to reorder the questions" : "Promijenite redoslijed povlačenjem pitanja",
     "Title of question number {index}" : "Broj naslova pitanja {index}",
     "Required" : "Obvezno",
     "Delete question" : "Izbriši pitanje",

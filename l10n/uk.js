@@ -57,7 +57,6 @@ OC.L10N.register(
     "Delete answer" : "Видалити варіант",
     "Error while saving the answer" : "Помилка при збереженні варіанту",
     "Question number {index}" : "Запитання номер {index}",
-    "Drag to reorder the questions" : "Потягніть, щоб змінити порядок запитань",
     "Title of question number {index}" : "Текст запитання номер {index}",
     "Required" : "Обов'язкове",
     "Delete question" : "Видалити запитання",

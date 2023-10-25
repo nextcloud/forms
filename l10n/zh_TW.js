@@ -59,7 +59,6 @@ OC.L10N.register(
     "Delete answer" : "刪除答案",
     "Error while saving the answer" : "儲存答案時發生錯誤",
     "Question number {index}" : "問題編號 {index}",
-    "Drag to reorder the questions" : "拖曳以重新排序問題",
     "Title of question number {index}" : "問題編號 {index} 的標題",
     "Required" : "必填",
     "Technical name of the question" : "問題的技術性名稱",

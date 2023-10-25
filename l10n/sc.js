@@ -42,7 +42,6 @@ OC.L10N.register(
     "Delete answer" : "Cantzella risposta",
     "Error while saving the answer" : "Errore sarvende sa risposta",
     "Question number {index}" : "Pregonta nùmeru {index}",
-    "Drag to reorder the questions" : "Traga pro ordinare is pregontas",
     "Title of question number {index}" : "Tìtulu de sa pregonta nùmeru {index}",
     "Required" : "Rechertu",
     "Delete question" : "Cantzella pregonta",

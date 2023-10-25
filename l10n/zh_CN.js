@@ -57,7 +57,6 @@ OC.L10N.register(
     "Delete answer" : "删除答复",
     "Error while saving the answer" : "保存答复时出错",
     "Question number {index}" : "第 {index} 个问题",
-    "Drag to reorder the questions" : "拖动以重新排列问题",
     "Title of question number {index}" : "第 {index} 个问题的标题",
     "Required" : "必填",
     "Technical name of the question" : "问题的术语专称",

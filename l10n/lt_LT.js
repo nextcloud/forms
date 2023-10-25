@@ -48,7 +48,6 @@ OC.L10N.register(
     "Delete answer" : "Ištrinti atsakymą",
     "Error while saving the answer" : "Klaida įrašant atsakymą",
     "Question number {index}" : "Klausimas nr. {index}",
-    "Drag to reorder the questions" : "Tempkite norėdami pertvarkyti klausimus",
     "Title of question number {index}" : "Klausimo nr. {index} antraštė",
     "Required" : "Privalomas",
     "Delete question" : "Ištrinti klausimą",

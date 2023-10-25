@@ -12,6 +12,7 @@ OC.L10N.register(
     "Circle" : "Vòng kết nối",
     "Share link" : "Chia sẻ liên kết",
     "Add link" : "Thêm đường dẫn",
+    "Copy to clipboard" : "Sao chép vào clipboard",
     "View" : "Xem",
     "Edit" : "Chỉnh sửa",
     "Share" : "Chia sẻ",

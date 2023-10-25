@@ -44,7 +44,6 @@ OC.L10N.register(
     "Delete answer" : "Verwijder antwoord",
     "Error while saving the answer" : "Fout bij opslaan antwoord",
     "Question number {index}" : "Vraag nummer {index}",
-    "Drag to reorder the questions" : "Sleep om de antwoordvolgorde te wijzigen",
     "Title of question number {index}" : "Titel van vraag nummer {index}",
     "Required" : "Vereist",
     "Delete question" : "Verwijder vraag",

@@ -56,7 +56,6 @@ OC.L10N.register(
     "Delete answer" : "Izbriši odgovor",
     "Error while saving the answer" : "Prišlo je do napake med shranjevanjem odgovora",
     "Question number {index}" : "Vprašanje številka {index}",
-    "Drag to reorder the questions" : "Potegnite vprašanja in jih preuredite",
     "Title of question number {index}" : "Naslov vprašanja številka {index}",
     "Required" : "Zahtevano",
     "Delete question" : "Izbriši vprašanje",

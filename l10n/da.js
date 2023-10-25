@@ -57,7 +57,6 @@ OC.L10N.register(
     "Delete answer" : "Slet svar",
     "Error while saving the answer" : "Der opstod en fejl under lagring af svaret",
     "Question number {index}" : "Spørgsmålsnummer {index}",
-    "Drag to reorder the questions" : "Træk for at omarrangere spørgsmålene",
     "Title of question number {index}" : "Titel på spørgsmålsnummer {index}",
     "Required" : "Påkrævet",
     "Technical name of the question" : "Spørgsmålets tekniske navn",

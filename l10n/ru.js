@@ -57,7 +57,6 @@ OC.L10N.register(
     "Delete answer" : "Удалить ответ",
     "Error while saving the answer" : "Не удалось сохранить этот ответ",
     "Question number {index}" : "Вопрос номер {index}",
-    "Drag to reorder the questions" : "Перетащите, чтобы изменить порядок вопросов",
     "Title of question number {index}" : "Заголовок вопроса номер {index}",
     "Required" : "Обязательно",
     "Technical name of the question" : "Техническое название вопроса",

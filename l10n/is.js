@@ -28,7 +28,6 @@ OC.L10N.register(
     "Delete answer" : "Eyða svari",
     "Error while saving the answer" : "Villa kom upp við að vista svarið",
     "Question number {index}" : "Spurning númer {index}",
-    "Drag to reorder the questions" : "Draga til að endurraða spurningum",
     "Title of question number {index}" : "Titill á spurningu númer {index}",
     "Required" : "þetta þarf",
     "Delete question" : "Eyða spurningu",

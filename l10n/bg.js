@@ -57,7 +57,6 @@ OC.L10N.register(
     "Delete answer" : "Изтриване на отговора",
     "Error while saving the answer" : "Грешка при записване на отговора",
     "Question number {index}" : " Номер на въпрос {index} ",
-    "Drag to reorder the questions" : "Плъзнете, за да пренаредите въпросите",
     "Title of question number {index}" : "Заглавие на въпрос номер {index}",
     "Required" : "Препоръчително",
     "Delete question" : "Изтриване на въпрос",

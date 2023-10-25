@@ -56,7 +56,6 @@ OC.L10N.register(
     "Delete answer" : "Ta bort svaret",
     "Error while saving the answer" : "Kunde inte spara svaret",
     "Question number {index}" : "Fråga {index}",
-    "Drag to reorder the questions" : "Dra och släpp för att ändra ordningen på frågorna",
     "Title of question number {index}" : "Titel för fråga {index}",
     "Required" : "Krävs",
     "Delete question" : "Ta bort frågan",

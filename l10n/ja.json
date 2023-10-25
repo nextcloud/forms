@@ -35,7 +35,6 @@
     "Delete answer" : "回答を削除",
     "Error while saving the answer" : "回答を保存中にエラーが発生しました",
     "Question number {index}" : "質問数{index}",
-    "Drag to reorder the questions" : "質問の順序を掴んで変更",
     "Title of question number {index}" : "{index} 番目の設問のタイトル",
     "Required" : "必須",
     "Delete question" : "質問の削除",

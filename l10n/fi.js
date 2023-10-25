@@ -54,7 +54,6 @@ OC.L10N.register(
     "Delete answer" : "Poista vastaus",
     "Error while saving the answer" : "Virhe vastausta tallennettaessa",
     "Question number {index}" : "Kysymys numero {index}",
-    "Drag to reorder the questions" : "Vedä järjestääksesi kysymykset uuteen järjestykseen",
     "Title of question number {index}" : "Otsikko kysymykselle numero {index}",
     "Required" : "Vaadittu",
     "Technical name of the question" : "Kysymyksen tekninen nimi",

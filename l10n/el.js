@@ -50,7 +50,6 @@ OC.L10N.register(
     "Delete answer" : "Διαγραφή απάντησης",
     "Error while saving the answer" : "Σφάλμα κατά την αποθήκευση της ερώτησης",
     "Question number {index}" : "Αριθμός ερώτησης {index}",
-    "Drag to reorder the questions" : "Σύρετε για αναδιάταξη των ερωτήσεων",
     "Title of question number {index}" : "Τίτλος αριθμού ερώτησης {index}",
     "Required" : "Απαιτείται",
     "Delete question" : "Διαγραφή ερώτησης",

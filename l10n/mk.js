@@ -30,7 +30,6 @@ OC.L10N.register(
     "Delete answer" : "Избриши одговор",
     "Error while saving the answer" : "Грешка при зачувување на одговор",
     "Question number {index}" : "Прашање број {index}",
-    "Drag to reorder the questions" : "Повлечете за го промените распоредот на прашањата",
     "Title of question number {index}" : "Наслов на прашање број {index}",
     "Required" : "Задолжително",
     "Delete question" : "Избриши прашање",

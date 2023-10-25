@@ -59,7 +59,6 @@ OC.L10N.register(
     "Delete answer" : "Yanıtı sil",
     "Error while saving the answer" : "Yanıt kaydedilirken sorun çıktı",
     "Question number {index}" : "{index} numaralı soru",
-    "Drag to reorder the questions" : "Soru sıralamasını sürükleyerek değiştirebilirsiniz",
     "Title of question number {index}" : "{index} numaralı sorunun başlığı",
     "Required" : "Zorunlu",
     "Technical name of the question" : "Sorunun teknik adı",

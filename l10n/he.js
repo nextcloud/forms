@@ -30,7 +30,6 @@ OC.L10N.register(
     "Delete answer" : "מחיקת תשובה",
     "Error while saving the answer" : "שגיאה בעת שמירת התשובה",
     "Question number {index}" : "שאלה מספר {index}",
-    "Drag to reorder the questions" : "יש לגרור כדי לסדר את השאלות מחדש",
     "Title of question number {index}" : "כותרת של שאלה מספר {index}",
     "Required" : "נדרש",
     "Delete question" : "מחיקת שאלה",

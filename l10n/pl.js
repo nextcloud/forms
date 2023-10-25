@@ -56,7 +56,6 @@ OC.L10N.register(
     "Delete answer" : "Usuń odpowiedź",
     "Error while saving the answer" : "Błąd podczas zapisywania odpowiedzi",
     "Question number {index}" : "Numer pytania {index}",
-    "Drag to reorder the questions" : "Przeciągnij, aby zmienić kolejność pytań",
     "Title of question number {index}" : "Tytuł pytania numer {index}",
     "Required" : "Wymagany",
     "Delete question" : "Usuń pytanie",

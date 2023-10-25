@@ -57,7 +57,6 @@ OC.L10N.register(
     "Delete answer" : "حذف پاسخ",
     "Error while saving the answer" : "بروز خطا حین ذخیره پاسخ",
     "Question number {index}" : "Question number {index}",
-    "Drag to reorder the questions" : "Drag to reorder the questions",
     "Title of question number {index}" : "Title of question number {index}",
     "Required" : "اجباری",
     "Technical name of the question" : "Technical name of the question",

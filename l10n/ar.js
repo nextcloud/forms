@@ -59,7 +59,6 @@ OC.L10N.register(
     "Delete answer" : "حذف الإجابة ",
     "Error while saving the answer" : "حدث خطأ أثناء حفظ الإجابة ",
     "Question number {index}" : "رقم السؤال {index}",
-    "Drag to reorder the questions" : "اسحب لإعادة ترتيب الأسئلة ",
     "Title of question number {index}" : "رقم عنوان السؤال {index}",
     "Required" : "مطلوب",
     "Technical name of the question" : "الاسم الفني للسؤال",

@@ -26,7 +26,6 @@ OC.L10N.register(
     "Delete answer" : "Borrar respuesta",
     "Error while saving the answer" : "Error mientras se guardaba la respuesta",
     "Question number {index}" : "Pregunta numero {índice}",
-    "Drag to reorder the questions" : "Arrastrar para reordenar las preguntas",
     "Title of question number {index}" : "Titulo de la pregunta numero {índice}",
     "Required" : "Requerido",
     "Delete question" : "Borrar pregunta",

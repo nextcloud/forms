@@ -58,7 +58,6 @@ OC.L10N.register(
     "Delete answer" : "Válasz törlése",
     "Error while saving the answer" : "Hiba történt a válasz mentése során",
     "Question number {index}" : "{index}. kérdés",
-    "Drag to reorder the questions" : "Rendezze a kérdéseket fogd és vidd módszerrel",
     "Title of question number {index}" : "{index}. kérdés címe",
     "Required" : "Kötelező",
     "Technical name of the question" : "A kérdés technikai neve",

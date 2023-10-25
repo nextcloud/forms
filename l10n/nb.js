@@ -43,7 +43,6 @@ OC.L10N.register(
     "Delete answer" : "Slett svar",
     "Error while saving the answer" : "Feil ved lagring av svar",
     "Question number {index}" : "Spørsmål nummer {index}",
-    "Drag to reorder the questions" : "Dra for å endre rekkefølgen på spørsmålene",
     "Title of question number {index}" : "Tittel på spørsmål nummer {index}",
     "Required" : "Påkrevd",
     "Delete question" : "Slett spørsmål",
