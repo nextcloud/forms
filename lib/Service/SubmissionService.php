@@ -302,7 +302,7 @@ class SubmissionService {
 	 * @return boolean If the submission is valid
 	 */
 	public function validateSubmission(array $questions, array $answers): bool {
-		
+
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -312,7 +312,7 @@ class SubmissionService {
 			if ($question['isRequired'] &&
 				(!$questionAnswered ||
 				!array_filter($answers[$questionId], 'strlen') ||
-				(!empty($question['extraSettings']->allowOtherAnswer) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
+				(!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
 				return false;
 			}
@@ -334,7 +334,7 @@ class SubmissionService {
 				}
 
 				// Check if all answers are within the possible options
-				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']->allowOtherAnswer)) {
+				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 					foreach ($answers[$questionId] as $answer) {
 						// Search corresponding option, return false if non-existent
 						if (array_search($answer, array_column($question['options'], 'id')) === false) {
