@@ -59,6 +59,8 @@ OC.L10N.register(
     "Delete answer" : "Antwort löschen",
     "Error while saving the answer" : "Fehler beim Speichern der Antwort",
     "Question number {index}" : "Frage Nummer {index}",
+    "Move question up" : "Frage nach oben verschieben",
+    "Move question down" : "Frage nach unten verschieben",
     "Title of question number {index}" : "Titel der Fragenummer {index}",
     "Required" : "Erforderlich",
     "Technical name of the question" : "Technischer Name der Frage",

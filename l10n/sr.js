@@ -59,6 +59,8 @@ OC.L10N.register(
     "Delete answer" : "Обриши одговор",
     "Error while saving the answer" : "Грешка приликом чувања одговора",
     "Question number {index}" : "Питање број {index}",
+    "Move question up" : "Помери питање навише",
+    "Move question down" : "Помери питање наниже",
     "Title of question number {index}" : "Наслов питања {index}",
     "Required" : "Обавезно",
     "Technical name of the question" : "Техничко име питања",

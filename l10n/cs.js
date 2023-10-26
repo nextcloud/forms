@@ -59,6 +59,8 @@ OC.L10N.register(
     "Delete answer" : "Smazat odpověď",
     "Error while saving the answer" : "Chyba při ukládání odpovědi",
     "Question number {index}" : "Otázka číslo {index}",
+    "Move question up" : "Posunout otázku nahoru",
+    "Move question down" : "Posunout otázku dolů",
     "Title of question number {index}" : "Nadpis otázky číslo {index}",
     "Required" : "Vyžadováno",
     "Technical name of the question" : "Technický název otázky",
