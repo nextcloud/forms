@@ -59,6 +59,8 @@ OC.L10N.register(
     "Delete answer" : "Yanıtı sil",
     "Error while saving the answer" : "Yanıt kaydedilirken sorun çıktı",
     "Question number {index}" : "{index} numaralı soru",
+    "Move question up" : "Soruyu yukarı taşı",
+    "Move question down" : "Soruyu aşağı taşı",
     "Title of question number {index}" : "{index} numaralı sorunun başlığı",
     "Required" : "Zorunlu",
     "Technical name of the question" : "Sorunun teknik adı",
