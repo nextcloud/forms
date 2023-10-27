@@ -48,7 +48,7 @@
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
 				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
 					:key="answer.id"
-					:checked.sync="questionValues"
+					:checked="questionValues"
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
@@ -58,7 +58,7 @@
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
-					<NcCheckboxRadioSwitch :checked.sync="questionValues"
+					<NcCheckboxRadioSwitch :checked="questionValues"
 						:value="valueOtherAnswer"
 						:name="`${id}-answer`"
 						:type="isUnique ? 'radio' : 'checkbox'"
@@ -149,20 +149,12 @@ export default {
 
 	data() {
 		return {
-			questionValues: this.values,
 			inputOtherAnswer: this.valueToInputOtherAnswer(),
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX: 'system-other-answer:',
 		}
 	},
 
 	computed: {
-		placeholderOtherAnswer() {
-			if (this.readOnly) {
-				return this.answerType.submitPlaceholder
-			}
-			return this.answerType.createPlaceholder
-		},
-
 		contentValid() {
 			return this.answerType.validate(this)
 		},
@@ -192,6 +184,17 @@ export default {
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
 
+		placeholderOtherAnswer() {
+			if (this.readOnly) {
+				return this.answerType.submitPlaceholder
+			}
+			return this.answerType.createPlaceholder
+		},
+
+		questionValues() {
+			return this.isUnique ? this.values?.[0] : this.values
+		},
+
 		titleId() {
 			return `q${this.$attrs.index}_title`
 		},
@@ -205,7 +208,7 @@ export default {
 		},
 
 		hasRequiredOtherAnswerInput() {
-			const checkedOtherAnswer = this.questionValues.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			const checkedOtherAnswer = this.values.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
 			return checkedOtherAnswer[0] !== undefined
 		},
 	},
@@ -229,24 +232,22 @@ export default {
 
 		inputOtherAnswer() {
 			if (this.isUnique) {
-				this.questionValues = this.valueOtherAnswer
-				this.onChange()
+				this.onChange(this.valueOtherAnswer)
 				return
 			}
 
-			this.questionValues = this.questionValues.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
-
+			const values = this.values.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
 			if (this.inputOtherAnswer !== '') {
-				this.questionValues.push(this.valueOtherAnswer)
+				values.push(this.valueOtherAnswer)
 			}
 
-			this.onChange()
+			this.onChange(values)
 		},
 	},
 
 	methods: {
-		onChange() {
-			this.$emit('update:values', this.isUnique ? [this.questionValues] : this.questionValues)
+		onChange(value) {
+			this.$emit('update:values', this.isUnique ? [value] : value)
 		},
 
 		/**

@@ -572,7 +572,7 @@ class ApiControllerTest extends TestCase {
 			[
 				'id' => 2,
 				'type' => Constants::ANSWER_TYPE_MULTIPLE,
-				'extraSettings' => (object)['allowOtherAnswer' => true],
+				'extraSettings' => ['allowOtherAnswer' => true],
 				'options' => [
 					['id' => 1, 'text' => 'test id 1'],
 					['id' => 2, 'text' => 'test id 2'],

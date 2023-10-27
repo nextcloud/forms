@@ -564,7 +564,7 @@ class SubmissionServiceTest extends TestCase {
 			'required-empty-other-answer' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => (object)['allowOtherAnswer' => true], 'options' => [
+					['id' => 1, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
 						['id' => 3]
 					]]
 				],
@@ -664,7 +664,7 @@ class SubmissionServiceTest extends TestCase {
 						['id' => 6]
 					]],
 					['id' => 8, 'type' => 'time', 'isRequired' => false],
-					['id' => 9, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => (object)['allowOtherAnswer' => true], 'options' => [
+					['id' => 9, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
 						['id' => 3]
 					]],
 				],
