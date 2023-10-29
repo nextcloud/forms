@@ -45,7 +45,7 @@ const CancelableRequest = function(request) {
 	const fetch = async function(url, options) {
 		return request(
 			url,
-			Object.assign({ cancelToken: source.token }, { options })
+			Object.assign({ cancelToken: source.token }, { options }),
 		)
 	}
 	return {

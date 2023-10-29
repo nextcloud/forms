@@ -305,7 +305,7 @@ export default {
 			const dateQuestions = Object.fromEntries(
 				questions
 					.filter(question => question.type === 'date' | question.type === 'datetime' | question.type === 'time')
-					.map(question => [question.id, question.type])
+					.map(question => [question.id, question.type]),
 			)
 
 			// Go through submissions and reformat answers to date/time questions
