@@ -21,19 +21,13 @@
   -->
 
 <template>
-	<Question v-bind.sync="$attrs"
-		:text="text"
-		:name="name"
-		:description="description"
-		:is-required="isRequired"
-		:edit.sync="edit"
-		:read-only="readOnly"
-		:max-string-lengths="maxStringLengths"
+	<Question v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
-		v-on="commonListeners">
+		v-on="commonListeners"
+		@update:edit="onUpdateEdit">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
 				@update:checked="onShuffleOptionsChange">
@@ -196,7 +190,7 @@ export default {
 		},
 
 		titleId() {
-			return `q${this.$attrs.index}_title`
+			return `q${this.index}_title`
 		},
 
 		allowOtherAnswer() {
@@ -214,22 +208,6 @@ export default {
 	},
 
 	watch: {
-		edit(edit) {
-			// When leaving edit mode, filter and delete empty options
-			if (!edit) {
-				const options = this.options.filter(option => {
-					if (!option.text) {
-						this.deleteOptionFromDatabase(option)
-						return false
-					}
-					return true
-				})
-
-				// update parent
-				this.updateOptions(options)
-			}
-		},
-
 		inputOtherAnswer() {
 			if (this.isUnique) {
 				this.onChange(this.valueOtherAnswer)
@@ -248,6 +226,27 @@ export default {
 	methods: {
 		onChange(value) {
 			this.$emit('update:values', this.isUnique ? [value] : value)
+		},
+
+		/**
+		 * Listen to changes of the edit mode
+		 * Used to remove empty options from the database
+		 * @param {boolean} enabled Whether edit mode is enabled
+		 */
+		onUpdateEdit(enabled) {
+			// When leaving edit mode, filter and delete empty options
+			if (!enabled) {
+				const options = this.options.filter(option => {
+					if (!option.text) {
+						this.deleteOptionFromDatabase(option)
+						return false
+					}
+					return true
+				})
+
+				// update parent
+				this.updateOptions(options)
+			}
 		},
 
 		/**
@@ -282,7 +281,7 @@ export default {
 		 */
 		updateOptions(options) {
 			this.$emit('update:options', options)
-			emit('forms:last-updated:set', this.$attrs.formId)
+			emit('forms:last-updated:set', this.formId)
 		},
 
 		/**
