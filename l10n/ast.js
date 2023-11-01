@@ -6,6 +6,8 @@ OC.L10N.register(
     "Delete" : "Desaniciar",
     "Circle" : "Círculu",
     "Internal link" : "Enllaz internu",
+    "View" : "Ver",
+    "Edit" : "Editar",
     "Loading {title} …" : "Cargando «{title}»…",
     "Description" : "Descripción",
     "Responses are anonymous." : "Les rempuestes son anónimes.",
