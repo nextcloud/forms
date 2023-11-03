@@ -70,7 +70,7 @@ OC.L10N.register(
     "A short answer for the question “{text}”" : "Krátka odpoveď na otázku „{text}“",
     "No response" : "Žiadna odpoveď",
     "Delete this response" : "Odstrániť túto odpoveď",
-    "Store responses anonymously" : "Uložiť odpovede anonymne",
+    "Store responses anonymously" : "Ukladať odpovede anonymne",
     "Allow multiple responses per person" : "Povoliť viac odpovedí na osobu",
     "Set expiration date" : "Nastaviť dátum expirácie",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Toto nie je možné kontrolovať, ak má formulár verejný odkaz alebo ukladá odpovede anonymne.",
