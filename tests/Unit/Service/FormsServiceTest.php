@@ -273,7 +273,7 @@ class FormsServiceTest extends TestCase {
 		$question2->setText('Question 2');
 		$question2->setDescription('');
 		$question2->setName('city');
-		$question2->setExtraSettings((object)[]);
+		$question2->setExtraSettings([]);
 		$this->questionMapper->expects($this->once())
 			->method('findByForm')
 			->with(42)

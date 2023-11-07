@@ -75,12 +75,7 @@ class Question extends Entity {
 		return json_decode($this->getExtraSettingsJson() ?: '{}', true); // assoc=true, => Convert to associative Array
 	}
 
-	/**
-	 * @param object|array $extraSettings
-	 */
-	public function setExtraSettings($extraSettings) {
-		// TODO: When the php requirement is >= 8.0 change parameter typing to `object|array` to allow assoc. arrays from `Question::fromParams`
-		
+	public function setExtraSettings(array $extraSettings) {
 		// Remove extraSettings that are not set
 		foreach ($extraSettings as $key => $value) {
 			if ($value === false) {
