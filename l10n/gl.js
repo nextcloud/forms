@@ -62,7 +62,7 @@ OC.L10N.register(
     "Move question up" : "Mover a pregunta cara arriba",
     "Move question down" : "Mover a pregunta cara abaixo",
     "Title of question number {index}" : "Título da pregunta número {index}",
-    "Required" : "Precisase",
+    "Required" : "Obrigatorio",
     "Technical name of the question" : "Nome técnico da pregunta",
     "Technical name" : "Denominación técnica",
     "Delete question" : "Eliminar a pregunta",
