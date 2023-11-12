@@ -26,8 +26,7 @@
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
-		v-on="commonListeners"
-		@update:edit="onUpdateEdit">
+		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
 				@update:checked="onShuffleOptionsChange">
@@ -38,7 +37,7 @@
 				{{ t('forms', 'Add "other"') }}
 			</NcActionCheckbox>
 		</template>
-		<template v-if="!edit">
+		<template v-if="readOnly">
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
 				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
 					:key="answer.id"
@@ -72,20 +71,19 @@
 
 		<template v-else>
 			<ul class="question__content">
-				<template v-for="(answer, index) in sortedOptions">
-					<!-- Answer text input edit -->
-					<AnswerInput v-if="edit"
-						:key="index /* using index to keep the same vnode after new answer creation */"
-						ref="input"
-						:answer="answer"
-						:index="index"
-						:is-unique="isUnique"
-						:is-dropdown="false"
-						:max-option-length="maxStringLengths.optionText"
-						@add="addNewEntry"
-						@delete="deleteOption"
-						@update:answer="updateAnswer" />
-				</template>
+				<!-- Answer text input edit -->
+				<AnswerInput v-for="(answer, index) in sortedOptions"
+					:key="index /* using index to keep the same vnode after new answer creation */"
+					ref="input"
+					:answer="answer"
+					:index="index"
+					:is-unique="isUnique"
+					:is-dropdown="false"
+					:max-option-length="maxStringLengths.optionText"
+					@delete="deleteOption"
+					@update:answer="updateAnswer"
+					@focus-next="focusNextInput"
+					@tabbed-out="checkValidOption" />
 				<li v-if="allowOtherAnswer" class="question__item">
 					<div :is="pseudoIcon" class="question__item__pseudoInput" />
 					<input :placeholder="t('forms', 'Other')"
@@ -93,18 +91,19 @@
 						:maxlength="maxStringLengths.optionText"
 						minlength="1"
 						type="text"
-						:readonly="edit">
+						:readonly="!readOnly">
 				</li>
-				<li v-if="(edit && !isLastEmpty) || hasNoAnswer" class="question__item">
+				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
 					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input :aria-label="t('forms', 'Add a new answer')"
+					<input ref="pseudoInput"
+						v-model="inputValue"
+						:aria-label="t('forms', 'Add a new answer')"
 						:placeholder="t('forms', 'Add a new answer')"
 						class="question__input"
 						:maxlength="maxStringLengths.optionText"
 						minlength="1"
 						type="text"
-						@click="addNewEntry"
-						@focus="addNewEntry">
+						@input="addNewEntry">
 				</li>
 			</ul>
 		</template>
@@ -145,6 +144,7 @@ export default {
 		return {
 			inputOtherAnswer: this.valueToInputOtherAnswer(),
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX: 'system-other-answer:',
+			inputValue: '',
 		}
 	},
 
@@ -171,7 +171,7 @@ export default {
 		},
 
 		shiftDragHandle() {
-			return this.edit && this.options.length !== 0 && !this.isLastEmpty
+			return !this.readonly && this.options.length !== 0 && !this.isLastEmpty
 		},
 
 		pseudoIcon() {
@@ -229,27 +229,6 @@ export default {
 		},
 
 		/**
-		 * Listen to changes of the edit mode
-		 * Used to remove empty options from the database
-		 * @param {boolean} enabled Whether edit mode is enabled
-		 */
-		onUpdateEdit(enabled) {
-			// When leaving edit mode, filter and delete empty options
-			if (!enabled) {
-				const options = this.options.filter(option => {
-					if (!option.text) {
-						this.deleteOptionFromDatabase(option)
-						return false
-					}
-					return true
-				})
-
-				// update parent
-				this.updateOptions(options)
-			}
-		},
-
-		/**
 		 * Is the provided answer required ?
 		 * This is needed for checkboxes as html5
 		 * doesn't allow to require at least ONE checked.
@@ -272,6 +251,31 @@ export default {
 
 			// For checkboxes, only required if no other is checked
 			return this.areNoneChecked
+		},
+
+		/**
+		 * Remove any empty options when leaving an option
+		 */
+		checkValidOption() {
+			// When leaving edit mode, filter and delete empty options
+			this.options.forEach(option => {
+				if (!option.text) {
+					this.deleteOption(option.id)
+				}
+			})
+		},
+
+		/**
+		 * Set focus on next AnswerInput
+		 *
+		 * @param {number} index Index of current option
+		 */
+		focusNextInput(index) {
+			if (index < this.options.length - 1) {
+				this.$refs.input[index + 1].focus()
+			} else if (!this.isLastEmpty || this.hasNoAnswer) {
+				this.$refs.pseudoInput.focus()
+			}
 		},
 
 		/**
@@ -302,23 +306,25 @@ export default {
 		 * Add a new empty answer locally
 		 */
 		addNewEntry() {
-			// If entering from non-edit-mode (possible by click), activate edit-mode
-			this.edit = true
-
 			// Add local entry
 			const options = this.options.slice()
 			options.push({
 				id: GenRandomId(),
 				questionId: this.id,
-				text: '',
+				text: this.inputValue,
 				local: true,
 			})
+
+			this.inputValue = ''
 
 			// Update question
 			this.updateOptions(options)
 
 			this.$nextTick(() => {
 				this.focusIndex(options.length - 1)
+
+				// Trigger onInput on new AnswerInput for posting the new option to the API
+				this.$refs.input[options.length - 1].onInput()
 			})
 		},
 
@@ -438,10 +444,10 @@ export default {
 	.question__input {
 		width: 100%;
 		position: relative;
-		inset-inline-start: -30px;
+		inset-inline-start: -34px;
 		inset-block-start: 1px;
-		margin-inline-end: 14px !important;
-		padding-inline-start: 32px !important;
+		margin-inline-end: 10px !important;
+		padding-inline-start: 36px !important;
 	}
 
 	.question__label {

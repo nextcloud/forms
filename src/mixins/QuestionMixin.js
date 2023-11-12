@@ -160,16 +160,9 @@ export default {
 		Question,
 	},
 
-	data() {
-		return {
-			// Do we display this question in edit or fill mode
-			edit: false,
-		}
-	},
-
 	computed: {
 		questionProps() {
-			const props = { ...this.$props, edit: this.edit }
+			const props = { ...this.$props }
 			const allowedKeys = Object.keys(Question.props)
 			Object.keys(props).forEach((key) => {
 				if (!allowedKeys.includes(key)) {
@@ -180,7 +173,7 @@ export default {
 		},
 		sortedOptions() {
 			// Only shuffle options if not in editing mode (and shuffling is enabled)
-			if (!this.edit && this.extraSettings?.shuffleOptions) {
+			if (this.readOnly && this.extraSettings?.shuffleOptions) {
 				return this.shuffleArray(this.options)
 			}
 			// Ensure order of options always is the same
@@ -197,7 +190,6 @@ export default {
 				'update:description': this.onDescriptionChange,
 				'update:isRequired': this.onRequiredChange,
 				'update:name': this.onNameChange,
-				'update:edit': () => { this.edit = !this.edit },
 				'move-down': (...args) => this.$emit('move-down', ...args),
 				'move-up': (...args) => this.$emit('move-up', ...args),
 			}
@@ -296,12 +288,11 @@ export default {
 		 * Focus the first focusable element
 		 */
 		focus() {
-			this.edit = true
 			this.$el.scrollIntoView({ behavior: 'smooth' })
 			this.$nextTick(() => {
-				const title = this.$el.querySelector('.question__header-title')
+				const title = this.$el.querySelector('.question__header__title__text__input')
 				if (title) {
-					title.select()
+					title.focus()
 				}
 			})
 		},

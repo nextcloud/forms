@@ -1,5 +1,5 @@
 <template>
-	<li class="question__item">
+	<li class="question__item" @focusout="handleTabbing">
 		<div :is="pseudoIcon"
 			v-if="!isDropdown"
 			class="question__item__pseudoInput" />
@@ -15,7 +15,7 @@
 			dir="auto"
 			@input="onInput"
 			@keydown.delete="deleteEntry"
-			@keydown.enter.prevent="addNewEntry">
+			@keydown.enter.prevent="focusNextInput">
 
 		<!-- Delete answer -->
 		<NcActions>
@@ -98,6 +98,10 @@ export default {
 	},
 
 	methods: {
+		handleTabbing() {
+			this.$emit('tabbed-out')
+		},
+
 		/**
 		 * Focus the input
 		 */
@@ -133,8 +137,8 @@ export default {
 		/**
 		 * Request a new answer
 		 */
-		addNewEntry() {
-			this.$emit('add')
+		focusNextInput() {
+			this.$emit('focus-next', this.index)
 		},
 
 		/**
@@ -221,13 +225,14 @@ export default {
 	.question__input {
 		width: 100%;
 		position: relative;
-		margin-inline-end: 2px !important;
+		inset-inline-start: -12px;
+		margin-inline-end: -12px !important;
 
 		&--shifted {
-			inset-inline-start: -30px;
+			inset-inline-start: -34px;
 			inset-block-start: 1px;
-			margin-inline-end: -30px !important;
-			padding-inline-start: 32px !important;
+			margin-inline-end: -34px !important;
+			padding-inline-start: 36px !important;
 		}
 	}
 }

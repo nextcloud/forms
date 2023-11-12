@@ -38,7 +38,7 @@
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 		<!-- Forms title & description-->
-		<header v-click-outside="disableEdit" @click="enableEdit">
+		<header>
 			<h2>
 				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
 				<textarea id="form-title"
@@ -49,31 +49,22 @@
 					dir="auto"
 					:maxlength="maxStringLengths.formTitle"
 					:placeholder="t('forms', 'Form title')"
-					:readonly="!edit"
 					:required="true"
 					autofocus
 					@input="onTitleChange" />
 			</h2>
-			<template v-if="edit">
-				<label class="hidden-visually" for="form-desc">
-					{{ t('forms', 'Description') }}
-				</label>
-				<textarea id="form-desc"
-					ref="description"
-					class="form-desc form-desc__input"
-					rows="1"
-					dir="auto"
-					:value="form.description"
-					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
-					:maxlength="maxStringLengths.formDescription"
-					@input="updateDescription" />
-			</template>
-			<!-- eslint-disable vue/no-v-html -->
-			<div v-else
-				class="form-desc form-desc__output"
+			<label class="hidden-visually" for="form-desc">
+				{{ t('forms', 'Description') }}
+			</label>
+			<textarea id="form-desc"
+				ref="description"
+				class="form-desc"
+				rows="1"
 				dir="auto"
-				v-html="formDescription" />
-			<!-- eslint-enable vue/no-v-html -->
+				:value="form.description"
+				:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
+				:maxlength="maxStringLengths.formDescription"
+				@input="updateDescription" />
 			<!-- Show expiration message-->
 			<p v-if="form.expires && form.showExpiration" class="info-message">
 				{{ expirationMessage }}
@@ -139,7 +130,6 @@
 </template>
 
 <script>
-import { directive as ClickOutside } from 'v-click-outside'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
@@ -186,16 +176,11 @@ export default {
 		TopBar,
 	},
 
-	directives: {
-		ClickOutside,
-	},
-
 	mixins: [ViewsMixin],
 
 	data() {
 		return {
 			answerTypes,
-			edit: false,
 
 			// Various states
 			isLoadingQuestions: false,
@@ -260,7 +245,6 @@ export default {
 		// Fetch full form on change
 		hash() {
 			this.fetchFullForm(this.form.id)
-			this.initEdit()
 		},
 
 		// Update Window-Title on title change
@@ -270,7 +254,7 @@ export default {
 
 		// resize description if form is loaded
 		isLoadingForm(value) {
-			if (!value && this.edit) {
+			if (!value) {
 				this.resizeTitle()
 				this.resizeDescription()
 			}
@@ -280,7 +264,6 @@ export default {
 	mounted() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
-		this.initEdit()
 	},
 
 	methods: {
@@ -299,28 +282,6 @@ export default {
 		onTitleChange() {
 			this.resizeTitle()
 			this.saveTitle()
-		},
-
-		disableEdit() {
-			// Keep edit if no title set
-			if (this.form.title) {
-				this.edit = false
-				this.$refs.title.style.height = 'auto'
-			}
-		},
-
-		enableEdit() {
-			this.edit = true
-			this.resizeDescription()
-			this.resizeTitle()
-		},
-
-		initEdit() {
-			if (this.form.title) {
-				this.edit = false
-			} else {
-				this.edit = true
-			}
 		},
 
 		/**
@@ -451,20 +412,6 @@ export default {
 				this.isLoadingQuestions = false
 			}
 		},
-
-		/**
-		 * Add question methods
-		 */
-		openQuestionMenu() {
-			// TODO: fix the vue components to allow external click triggers without
-			// conflicting with the click outside directive
-			setTimeout(() => {
-				this.questionMenuOpened = true
-				this.$nextTick(() => {
-					this.$refs.questionMenu.focusFirstAction()
-				})
-			}, 10)
-		},
 	},
 }
 </script>
@@ -495,7 +442,8 @@ export default {
 		flex-direction: column;
 		margin: 0;
 		margin-block-end: 24px;
-		padding-inline-start: 40px;
+		padding-inline-start: 32px;
+		margin-inline-end: -24px;
 
 		.form-title {
 			font-size: 28px;
@@ -505,7 +453,7 @@ export default {
 			min-height: 36px;
 			// padding and margin should be aligned with the submit view (but keep the 2px border in mind)
 			padding-block: 4px;
-			padding-inline: 14px;
+			padding-inline: 10px;
 			margin-block: 22px 14px;
 			margin-inline: 0;
 			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
@@ -513,9 +461,6 @@ export default {
 			text-overflow: ellipsis;
 			resize: none;
 
-			&:read-only {
-				border-color: transparent;
-			}
 			&::placeholder {
 				font-size: 28px;
 			}
@@ -526,7 +471,7 @@ export default {
 			font-size: 100%;
 			min-height: unset;
 			padding-block: 0px 20px;
-			padding-inline: 16px;
+			padding-inline: 12px;
 			width: calc(100% - 56px);
 		}
 
@@ -536,17 +481,9 @@ export default {
 			min-height: 47px; // one line (25px padding + 22px text height)
 			padding-block-start: 5px; // spacing border<>text
 			margin: 0px;
-
-			&__input {
-				padding-block: 3px 18px; // 2px smaller because of border
-				padding-inline: 14px;
-				resize: none;
-			}
-
-			// Styling for rendered Output
-			&__output {
-				@include markdown-output;
-			}
+			padding-block: 3px 18px; // 2px smaller because of border
+			padding-inline: 10px;
+			resize: none;
 		}
 
 		.info-message {

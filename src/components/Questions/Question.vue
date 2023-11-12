@@ -21,14 +21,11 @@
   -->
 
 <template>
-	<li v-click-outside="disableEdit"
-		:class="{
+	<li :class="{
 			'question': true,
-			'question--edit': edit,
 			'question--editable': !readOnly
 		}"
-		:aria-label="t('forms', 'Question number {index}', {index})"
-		@click="enableEdit">
+		:aria-label="t('forms', 'Question number {index}', {index})">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div v-if="!readOnly"
@@ -62,7 +59,7 @@
 		<!-- Header -->
 		<div class="question__header">
 			<div class="question__header__title">
-				<input v-if="edit || !questionValid"
+				<input v-if="!readOnly || !questionValid"
 					:placeholder="titlePlaceholder"
 					:aria-label="t('forms', 'Title of question number {index}', {index})"
 					:value="text"
@@ -79,7 +76,7 @@
 					dir="auto">
 					{{ computedText }}
 				</h3>
-				<div v-if="!edit && !questionValid"
+				<div v-if="!readOnly && !questionValid"
 					v-tooltip.auto="warningInvalid"
 					class="question__header__title__warning"
 					tabindex="0">
@@ -111,8 +108,8 @@
 					</NcActionButton>
 				</NcActions>
 			</div>
-			<div v-if="hasDescription || edit || !questionValid" class="question__header__description">
-				<textarea v-if="edit || !questionValid"
+			<div v-if="hasDescription || !readOnly || !questionValid" class="question__header__description">
+				<textarea v-if="!readOnly || !questionValid"
 					ref="description"
 					dir="auto"
 					:value="description"
@@ -131,8 +128,6 @@
 </template>
 
 <script>
-import { directive as ClickOutside } from 'v-click-outside'
-
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
@@ -148,10 +143,6 @@ import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
 
 export default {
 	name: 'Question',
-
-	directives: {
-		ClickOutside,
-	},
 
 	components: {
 		IconAlertCircleOutline,
@@ -193,10 +184,6 @@ export default {
 		shiftDragHandle: {
 			type: Boolean,
 			default: false,
-		},
-		edit: {
-			type: Boolean,
-			required: true,
 		},
 		readOnly: {
 			type: Boolean,
@@ -266,13 +253,6 @@ export default {
 			return this.description !== ''
 		},
 	},
-	watch: {
-		edit(newEdit) {
-			if (newEdit || !this.questionValid) {
-				this.resizeDescription()
-			}
-		},
-	},
 	// Ensure description is sized correctly on initial render
 	mounted() {
 		this.$nextTick(() => this.resizeDescription())
@@ -317,24 +297,6 @@ export default {
 		onMoveUp() {
 			this.$emit('move-up')
 			this.$nextTick(() => this.$refs.buttonUp.$el.focus())
-		},
-
-		/**
-		 * Enable the edit mode
-		 */
-		enableEdit() {
-			if (!this.readOnly) {
-				this.$emit('update:edit', true)
-			}
-		},
-
-		/**
-		 * Disable the edit mode
-		 */
-		disableEdit() {
-			if (!this.readOnly) {
-				this.$emit('update:edit', false)
-			}
 		},
 
 		/**
