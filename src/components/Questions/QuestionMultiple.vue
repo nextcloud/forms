@@ -41,7 +41,7 @@
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
 				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
 					:key="answer.id"
-					:checked="questionValues"
+					:checked.sync="questionValues"
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
@@ -51,7 +51,7 @@
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
-					<NcCheckboxRadioSwitch :checked="questionValues"
+					<NcCheckboxRadioSwitch :checked.sync="questionValues"
 						:value="valueOtherAnswer"
 						:name="`${id}-answer`"
 						:type="isUnique ? 'radio' : 'checkbox'"
@@ -145,6 +145,7 @@ export default {
 			inputOtherAnswer: this.valueToInputOtherAnswer(),
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX: 'system-other-answer:',
 			inputValue: '',
+			questionValues: this.values,
 		}
 	},
 
@@ -185,10 +186,6 @@ export default {
 			return this.answerType.createPlaceholder
 		},
 
-		questionValues() {
-			return this.isUnique ? this.values?.[0] : this.values
-		},
-
 		titleId() {
 			return `q${this.index}_title`
 		},
@@ -214,7 +211,7 @@ export default {
 				return
 			}
 
-			const values = this.values.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			const values = this.questionValues.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
 			if (this.inputOtherAnswer !== '') {
 				values.push(this.valueOtherAnswer)
 			}
