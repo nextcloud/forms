@@ -95,11 +95,11 @@
 					:answer-type="answerTypes[question.type]"
 					:index="index + 1"
 					:max-string-lengths="maxStringLengths"
+					:values="answers[question.id]"
 					v-bind="question"
-					:values.sync="answers[question.id]"
 					@keydown.enter="onKeydownEnter"
 					@keydown.ctrl.enter="onKeydownCtrlEnter"
-					@update:values="addFormFieldToLocalStorage(question)" />
+					@update:values="(values) => onUpdate(question, values)" />
 			</ul>
 			<input ref="submitButton"
 				class="primary"
@@ -202,13 +202,6 @@ export default {
 	},
 
 	computed: {
-		formValuesForLocalStorage() {
-			const fromLocalStorage = localStorage.getItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)
-			if (fromLocalStorage) {
-				return JSON.parse(fromLocalStorage)
-			}
-			return {}
-		},
 		validQuestions() {
 			return this.form.questions.filter(question => {
 				// All questions must have a valid title
@@ -279,7 +272,7 @@ export default {
 			this.resetData()
 			// Fetch full form on change
 			this.fetchFullForm(this.form.id)
-			this.initFromLocalHost()
+			this.initFromLocalStorage()
 			SetWindowTitle(this.formTitle)
 		},
 	},
@@ -300,15 +293,30 @@ export default {
 		}
 		SetWindowTitle(this.formTitle)
 		if (this.isLoggedIn) {
-			this.initFromLocalHost()
+			this.initFromLocalStorage()
 		}
 	},
 
 	methods: {
-		initFromLocalHost() {
-			if (localStorage.getItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)) {
-				for (const key in this.formValuesForLocalStorage) {
-					const answer = this.formValuesForLocalStorage[key]
+		/**
+		 * Load saved values for current form from LocalStorage
+		 * @return {Record<string,any>}
+		 */
+		getFormValuesFromLocalStorage() {
+			const fromLocalStorage = localStorage.getItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)
+			if (fromLocalStorage) {
+				return JSON.parse(fromLocalStorage)
+			}
+			return null
+		},
+
+		/**
+		 * Initialize answers from saved state in LocalStorage
+		 */
+		initFromLocalStorage() {
+			const savedState = this.getFormValuesFromLocalStorage()
+			if (savedState) {
+				for (const [key, answer] of Object.entries(savedState)) {
 					const answers = []
 					switch (answer?.type) {
 					case 'QuestionMultiple':
@@ -324,6 +332,44 @@ export default {
 				}
 			}
 		},
+
+		/**
+		 * Save updated answers for question to LocalStorage in case of browser crash / closes / etc
+		 * @param {*} question Question to update
+		 */
+		addFormFieldToLocalStorage(question) {
+			if (!this.isLoggedIn) {
+				return
+			}
+			// We make sure the values are updated by the `values.sync` handler
+			const state = {
+				...(this.getFormValuesFromLocalStorage() ?? {}),
+				[`${question.id}`]: {
+					value: this.answers[question.id],
+					type: answerTypes[question.type].component.name,
+				},
+			}
+			const stringified = JSON.stringify(state)
+			localStorage.setItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`, stringified)
+		},
+
+		deleteFormFieldFromLocalStorage() {
+			if (!this.isLoggedIn) {
+				return
+			}
+			localStorage.removeItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)
+		},
+
+		/**
+		 * Update answers of a give value
+		 * @param {{id: number}} question The question to answer
+		 * @param {unknown[]} values The new values
+		 */
+		 onUpdate(question, values) {
+			this.answers = { ...this.answers, [question.id]: values }
+			this.addFormFieldToLocalStorage(question)
+		},
+
 		/**
 		 * On Enter, focus next form-element
 		 * Last form element is the submit button, the form submits on enter then
@@ -345,20 +391,6 @@ export default {
 		onKeydownCtrlEnter() {
 			// Using button-click event to not bypass validity-checks and use our specified behaviour
 			this.$refs.submitButton.click()
-		},
-		addFormFieldToLocalStorage(question) {
-			if (!this.isLoggedIn) {
-				return
-			}
-			this.formValuesForLocalStorage[`${question.id}`] = { value: this.answers[question.id], type: answerTypes[question.type].component.name }
-			const parsed = JSON.stringify(this.formValuesForLocalStorage)
-			localStorage.setItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`, parsed)
-		},
-		deleteFormFieldFromLocalStorage() {
-			if (!this.isLoggedIn) {
-				return
-			}
-			localStorage.removeItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)
 		},
 
 		/*

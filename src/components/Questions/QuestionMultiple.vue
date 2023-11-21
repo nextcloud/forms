@@ -32,7 +32,7 @@
 				@update:checked="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
-			<NcActionCheckbox :checked="extraSettings?.allowOtherAnswer"
+			<NcActionCheckbox :checked="allowOtherAnswer"
 				@update:checked="onAllowOtherAnswerChange">
 				{{ t('forms', 'Add "other"') }}
 			</NcActionCheckbox>
@@ -52,7 +52,7 @@
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
 					<NcCheckboxRadioSwitch :checked="questionValues"
-						:value="valueOtherAnswer"
+						:value="otherAnswer ?? QUESTION_EXTRASETTINGS_OTHER_PREFIX"
 						:name="`${id}-answer`"
 						:type="isUnique ? 'radio' : 'checkbox'"
 						:required="checkRequired('other-answer')"
@@ -61,10 +61,10 @@
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
-					<NcInputField :label="placeholderOtherAnswer"
-						:required="hasRequiredOtherAnswerInput"
-						:value.sync="inputOtherAnswer"
-						class="question__input" />
+					<NcInputField class="question__input"
+						:label="placeholderOtherAnswer"
+						:required="otherAnswer !== undefined"
+						:value.sync="otherAnswerText" />
 				</div>
 			</fieldset>
 		</template>
@@ -96,10 +96,9 @@
 				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
 					<div :is="pseudoIcon" class="question__item__pseudoInput" />
 					<input ref="pseudoInput"
-						v-model="inputValue"
+						class="question__input"
 						:aria-label="t('forms', 'Add a new answer')"
 						:placeholder="t('forms', 'Add a new answer')"
-						class="question__input"
 						:maxlength="maxStringLengths.optionText"
 						minlength="1"
 						type="text"
@@ -126,6 +125,8 @@ import QuestionMixin from '../../mixins/QuestionMixin.js'
 import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
 
+const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
+
 export default {
 	name: 'QuestionMultiple',
 
@@ -142,9 +143,12 @@ export default {
 
 	data() {
 		return {
-			inputOtherAnswer: this.valueToInputOtherAnswer(),
-			QUESTION_EXTRASETTINGS_OTHER_PREFIX: 'system-other-answer:',
-			inputValue: '',
+			/**
+			 * This is used to cache the "other" answer, meaning if the user:
+			 * checks "other" types text, unchecks "other" and then re-check "other" the typed text is preserved
+			 */
+			cachedOtherAnswerText: '',
+			QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 		}
 	},
 
@@ -155,7 +159,7 @@ export default {
 
 		isLastEmpty() {
 			const value = this.options[this.options.length - 1]
-			return value?.text?.trim().length === 0
+			return value?.text?.trim?.().length === 0
 		},
 
 		isUnique() {
@@ -194,36 +198,63 @@ export default {
 		},
 
 		allowOtherAnswer() {
-			return this.extraSettings?.allowOtherAnswer
+			return this.extraSettings?.allowOtherAnswer ?? false
 		},
 
-		valueOtherAnswer() {
-			return this.QUESTION_EXTRASETTINGS_OTHER_PREFIX + this.inputOtherAnswer
+		/**
+		 * The full "other" answer including prefix, undefined if no "other answer"
+		 */
+		otherAnswer() {
+			return this.values.find((v) => v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX))
 		},
 
-		hasRequiredOtherAnswerInput() {
-			const checkedOtherAnswer = this.values.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
-			return checkedOtherAnswer[0] !== undefined
+		/**
+		 * The text value of the "other" answer
+		 */
+		otherAnswerText: {
+			get() {
+				return this.cachedOtherAnswerText
+			},
+			/**
+			 * Called when the value of the "other" anwer is changed input
+			 * @param {string} value the new text of the "other" answer
+			 */
+			set(value) {
+				this.cachedOtherAnswerText = value
+				// Prefix the value
+				const prefixedValue = `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${value}`
+				// emit the values and add the "other" answer
+				this.$emit(
+					'update:values',
+					this.isUnique ? [prefixedValue] : [...this.values.filter((v) => !v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX)), prefixedValue],
+				)
+			},
 		},
 	},
 
 	watch: {
-		inputOtherAnswer() {
-			if (this.isUnique) {
-				this.onChange(this.valueOtherAnswer)
-				return
-			}
-
-			const values = this.values.filter(item => !item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
-			if (this.inputOtherAnswer !== '') {
-				values.push(this.valueOtherAnswer)
-			}
-
-			this.onChange(values)
+		// Ensure that the "other" answer is reset after toggling the checkbox
+		otherAnswer() {
+			this.resetOtherAnswerText()
 		},
 	},
 
+	mounted() {
+		// Ensure the initial "other" answer is set
+		this.resetOtherAnswerText()
+	},
+
 	methods: {
+		/**
+		 * Resets the local "other" answer text to the one from the options if available
+		 */
+		resetOtherAnswerText() {
+			if (this.otherAnswer) {
+				// make sure to use cached value if empty value is passed
+				this.cachedOtherAnswerText = this.otherAnswer.slice(QUESTION_EXTRASETTINGS_OTHER_PREFIX.length) || this.cachedOtherAnswerText
+			}
+		},
+
 		onChange(value) {
 			this.$emit('update:values', this.isUnique ? [value] : value)
 		},
@@ -280,6 +311,7 @@ export default {
 
 		/**
 		 * Update the options
+		 * This will handle updating the form (emitting the changes) and update last changed property
 		 *
 		 * @param {Array} options options to change
 		 */
@@ -295,7 +327,7 @@ export default {
 		 * @param {object} answer the answer to update
 		 */
 		updateAnswer(id, answer) {
-			const options = this.options.slice()
+			const options = [...this.options]
 			const answerIndex = options.findIndex(option => option.id === id)
 			options[answerIndex] = answer
 
@@ -304,23 +336,30 @@ export default {
 
 		/**
 		 * Add a new empty answer locally
+		 * @param {InputEvent} event The input event that triggered adding a new entry
 		 */
-		addNewEntry() {
+		addNewEntry({ target }) {
 			// Add local entry
-			const options = this.options.slice()
-			options.push({
-				id: GenRandomId(),
-				questionId: this.id,
-				text: this.inputValue,
-				local: true,
-			})
+			const options = [
+				...this.options,
+				{
+					id: GenRandomId(),
+					questionId: this.id,
+					text: target?.value ?? '',
+					local: true,
+				},
+			]
 
-			this.inputValue = ''
+			// Reset the "new answer" input if needed
+			if (this.$refs.pseudoInput) {
+				this.$refs.pseudoInput.value = ''
+			}
 
-			// Update question
+			// Update questions
 			this.updateOptions(options)
 
 			this.$nextTick(() => {
+				// Set focus to the created input element
 				this.focusIndex(options.length - 1)
 
 				// Trigger onInput on new AnswerInput for posting the new option to the API
@@ -412,13 +451,8 @@ export default {
 		 *
 		 * @param {boolean} allowOtherAnswer show/hide field for other answer
 		 */
-		 onAllowOtherAnswerChange(allowOtherAnswer) {
+		onAllowOtherAnswerChange(allowOtherAnswer) {
 			return this.onExtraSettingsChange('allowOtherAnswer', allowOtherAnswer)
-		},
-
-		valueToInputOtherAnswer() {
-			const otherAnswer = this.values.filter(item => item.startsWith(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX))
-			return otherAnswer[0] !== undefined ? otherAnswer[0].substring(this.QUESTION_EXTRASETTINGS_OTHER_PREFIX.length) : ''
 		},
 	},
 }
