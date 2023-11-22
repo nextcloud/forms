@@ -7,6 +7,7 @@ OC.L10N.register(
     "Required" : "Necesar",
     "Other" : "Altele",
     "Set expiration date" : "Specifică data expirării",
+    "Permissions" : "Permisiuni",
     "Delete" : "Șterge",
     "Group" : "Grup",
     "Circle" : "Cerc",
