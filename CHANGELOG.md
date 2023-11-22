@@ -1,5 +1,55 @@
 # Changelog
 
+## 3.4.0 - 2023-11-XX
+
+### Breaking
+* Move to min-version 26 and drop PHP 7.4 [\#1727](https://github.com/nextcloud/forms/pull/1727) ([Chartman123](https://github.com/Chartman123))
+
+### Enhancements
+* Allow reordering questions using the keyboard [\#1532](https://github.com/nextcloud/forms/pull/1532) ([susnux](https://github.com/susnux))
+* Allow to share forms with Circles [\#1467](https://github.com/nextcloud/forms/pull/1467) ([susnux](https://github.com/susnux))
+* Notify users on new submissions for shared forms [\#1496](https://github.com/nextcloud/forms/pull/1496) ([susnux](https://github.com/susnux))
+* Send notification about new submissions to circle memebers [\#1746](https://github.com/nextcloud/forms/pull/1746) ([susnux](https://github.com/susnux))
+* Add technical identifiers for questions [\#1553](https://github.com/nextcloud/forms/pull/1553) ([susnux](https://github.com/susnux))
+* Add 'Other' option for radio/checkbox questions. [\#1694](https://github.com/nextcloud/forms/pull/1694) ([AIlkiv](https://github.com/AIlkiv))
+* Implement custom submission message [\#1659](https://github.com/nextcloud/forms/pull/1659) ([susnux](https://github.com/susnux))
+* Implement warning when leaving an unsubmitted form [\#1310](https://github.com/nextcloud/forms/pull/1310) ([Chartman123](https://github.com/Chartman123))
+* Remember input in LocalStorage [\#1382](https://github.com/nextcloud/forms/pull/1382) ([hamza221](https://github.com/hamza221))
+* Support RTL languages - migrate css from physical to logical positioning [\#1654](https://github.com/nextcloud/forms/pull/1654) ([susnux](https://github.com/susnux))
+
+### Fixed
+* fix: Sanitize file name when writing a CSV file [\#1660](https://github.com/nextcloud/forms/pull/1660) ([susnux](https://github.com/susnux))
+* Optimization of FormMapper::findById calls [\#1707](https://github.com/nextcloud/forms/pull/1707) ([AIlkiv](https://github.com/AIlkiv))
+* Reduce white space between questions [\#1658](https://github.com/nextcloud/forms/pull/1658) ([Chartman123](https://github.com/Chartman123))
+* fix: Fix import of debounce [\#1784](https://github.com/nextcloud/forms/pull/1784) ([susnux](https://github.com/susnux))
+* fix: Enhance extraSettings handling and fix XML output [\#1705](https://github.com/nextcloud/forms/pull/1705) ([Chartman123](https://github.com/Chartman123))
+* fix: Warning about missing label for other answer [\#1731](https://github.com/nextcloud/forms/pull/1731) ([Chartman123](https://github.com/Chartman123))
+* fix: Incorrect type for empty extraSettings in frontend [\#1730](https://github.com/nextcloud/forms/pull/1730) ([Chartman123](https://github.com/Chartman123))
+* fix(docs): Add changes of API 2.1 to the API docs [\#1745](https://github.com/nextcloud/forms/pull/1745) ([susnux](https://github.com/susnux))
+* chore: replace deprecated qb->execute() with executeStatement() [\#1706](https://github.com/nextcloud/forms/pull/1706) ([Chartman123](https://github.com/Chartman123))
+* fix: Make sure "other" answers are correctly handled [\#1764](https://github.com/nextcloud/forms/pull/1764) ([susnux](https://github.com/susnux))
+* fix(lint): add missing trailing commas [\#1770](https://github.com/nextcloud/forms/pull/1770) ([Chartman123](https://github.com/Chartman123))
+* fix: Handle questions props as props and not as attrs [\#1763](https://github.com/nextcloud/forms/pull/1763) ([susnux](https://github.com/susnux))
+* Fix inverted sorting in frontend for shared forms [\#1759](https://github.com/nextcloud/forms/pull/1759) ([Chartman123](https://github.com/Chartman123))
+* Move parameter typing for extraSettings [\#1769](https://github.com/nextcloud/forms/pull/1769) ([Chartman123](https://github.com/Chartman123))
+* fix: Make form editable with keyboard [\#1750](https://github.com/nextcloud/forms/pull/1750) ([Chartman123](https://github.com/Chartman123))
+* fix: no styling applied to h1-headings in markdown (closes #1668) [\#1743](https://github.com/nextcloud/forms/pull/1743) ([mschmidm](https://github.com/mschmidm))
+* Increase font size to default 15px [\#1738](https://github.com/nextcloud/forms/pull/1738) ([marcoambrosini](https://github.com/marcoambrosini))
+* fix(tests): Update phpunit workflow to fix OCI tests [\#1729](https://github.com/nextcloud/forms/pull/1729) ([susnux](https://github.com/susnux))
+
+### Merged
+* Replace outdated screenshots in Readme.md [\#1736](https://github.com/nextcloud/forms/pull/1736) ([Chartman123](https://github.com/Chartman123))
+* Added test for insertSubmission in ApiController [\#1704](https://github.com/nextcloud/forms/pull/1704) ([AIlkiv](https://github.com/AIlkiv))
+* Add healtcheck options to PHPUnit for OCI [\#1678](https://github.com/nextcloud/forms/pull/1678) ([Chartman123](https://github.com/Chartman123))
+* phpunit: use custom db images to fix rate limiting [\#1685](https://github.com/nextcloud/forms/pull/1685) ([Chartman123](https://github.com/Chartman123))
+* Add pr feedback action [\#1703](https://github.com/nextcloud/forms/pull/1703) ([Fenn-CS](https://github.com/Fenn-CS))
+* chore(deps): Remove `core-js` from dependencies as we no longer use it. [\#1762](https://github.com/nextcloud/forms/pull/1762) ([susnux](https://github.com/susnux))
+* Update package-lock.json [\#1661](https://github.com/nextcloud/forms/pull/1661) ([Chartman123](https://github.com/Chartman123))
+* Update composer.lock after dropping php 7.4 [\#1740](https://github.com/nextcloud/forms/pull/1740) ([Chartman123](https://github.com/Chartman123))
+* Update README.md [\#1739](https://github.com/nextcloud/forms/pull/1739) ([Chartman123](https://github.com/Chartman123))
+* Update translations
+* Update dependencies
+
 ## 3.3.1 - 2023-06-23
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.3.0...3.3.1)
