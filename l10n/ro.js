@@ -14,6 +14,7 @@ OC.L10N.register(
     "Share link" : "Partajează link-ul",
     "Add link" : "Adaugă link",
     "Copy to clipboard" : "Copiază în clipboard",
+    "Internal link" : "Link intern",
     "View" : "Vizualizare",
     "Edit" : "Editează",
     "Share" : "Partajează",
