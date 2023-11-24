@@ -80,7 +80,7 @@ OC.L10N.register(
     "Delete this response" : "Bu yanıtı sil",
     "Store responses anonymously" : "Yanıtlar anonim olarak kaydedilsin",
     "Allow multiple responses per person" : "Bir kişi birkaç kez yanıtlayabilirsin",
-    "Set expiration date" : "Son kullanma tarihini ayarla",
+    "Set expiration date" : "Geçerlilik sonu tarihini ayarla",
     "Show expiration date on form" : "Form üzerinde geçerlilik tarihi görüntülensin",
     "Custom submission message" : "Özel gönderim iletisi",
     "Message to show after a user submitted the form (formatting using Markdown is supported)" : "Bir kullanıcı formu gönderdikten sonra görüntülenecek ileti (Markdown biçimlendirmesi desteklenir)",
