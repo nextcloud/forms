@@ -41,6 +41,7 @@ OC.L10N.register(
     "Set expiration date" : "Setja gildistíma",
     "Expired on {date}" : "Rann út {date}",
     "Expires on {date}" : "Rennur út {date}",
+    "No recommendations. Start typing." : "Engar tillögur. Byrjaðu að skrifa.",
     "Permissions" : "Heimildir",
     "Delete" : "Eyða",
     "Group" : "Hópur",

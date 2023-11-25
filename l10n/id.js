@@ -6,6 +6,7 @@ OC.L10N.register(
     "Select groups" : "Pilih grup",
     "Other" : "Lainnya",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
+    "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
     "Delete" : "Hapus",
     "Group" : "Grup",
     "Share link" : "Bagikan tautan",
