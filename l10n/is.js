@@ -49,6 +49,7 @@ OC.L10N.register(
     "Share link" : "Deila tengli",
     "Add link" : "Bæta við tengli",
     "Copy to clipboard" : "Afrita á klippispjald",
+    "Remove link" : "Fjarlægja tengil",
     "Internal link" : "Internal link",
     "View" : "Skoða",
     "Edit" : "Breyta",
