@@ -33,6 +33,9 @@ use OCA\Forms\Db\FormMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use Test\TestCase;
 
+/**
+ * @group DB
+ */
 class ApiV2Test extends TestCase {
 	/** @var GuzzleHttp\Client */
 	private $http;
@@ -197,9 +200,23 @@ class ApiV2Test extends TestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
+		$userManager = \OC::$server->getUserManager();
+		$user = $userManager->get('test');
+		if ($user === null) {
+			$user = $userManager->createUser('test', 'test');
+		}
+		$user->setDisplayName('Test Displayname');
+
+		// We also have user2 and user3 but those accounts are "deleted"
+		$user = $userManager->get("user1");
+		if ($user === null) {
+			$user = $userManager->createUser("user1", "user1");
+		}
+		$user->setDisplayName("User No. 1");
+
 		$this->setTestForms();
 
-		$qb = TestCase::$realDatabase->getQueryBuilder();
+		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
 
 		// Write our test forms into db
 		foreach ($this->testForms as $index => $form) {
@@ -302,7 +319,7 @@ class ApiV2Test extends TestCase {
 
 	/** Clean up database from testforms */
 	public function tearDown(): void {
-		$qb = TestCase::$realDatabase->getQueryBuilder();
+		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
 
 		foreach ($this->testForms as $form) {
 			$qb->delete('forms_v2_forms')
