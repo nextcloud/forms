@@ -42,7 +42,7 @@
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires" class="settings-div--indent">
-			<NcDatetimePicker id="expiresDatetimePicker"
+			<NcDateTimePicker id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled-date="notBeforeToday"
 				:disabled-time="notBeforeNow"
@@ -94,7 +94,7 @@
 <script>
 import moment from '@nextcloud/moment'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcDatetimePicker from '@nextcloud/vue/dist/Components/NcDatetimePicker.js'
+import NcDateTimePicker from '@nextcloud/vue/dist/Components/NcDateTimePicker.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
 
 import { directive as ClickOutside } from 'v-click-outside'
@@ -103,7 +103,7 @@ import { loadState } from '@nextcloud/initial-state'
 export default {
 	components: {
 		NcCheckboxRadioSwitch,
-		NcDatetimePicker,
+		NcDateTimePicker,
 	},
 
 	directives: {
