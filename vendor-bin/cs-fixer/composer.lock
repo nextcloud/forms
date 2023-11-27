@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "50586a7e3d541a00e396bf7c34a7fc10",
+    "content-hash": "f2391d39f330ebebb8b0d663f5b60927",
     "packages": [
         {
             "name": "nextcloud/coding-standard",
@@ -49,16 +49,16 @@
         },
         {
             "name": "php-cs-fixer/shim",
-            "version": "v3.34.1",
+            "version": "v3.40.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/shim.git",
-                "reference": "1798523107e53d081364553cb1627a04e2063cbe"
+                "reference": "4c063eff281b1e3a73c33c0d5c39e8e2b766464e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/1798523107e53d081364553cb1627a04e2063cbe",
-                "reference": "1798523107e53d081364553cb1627a04e2063cbe",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/4c063eff281b1e3a73c33c0d5c39e8e2b766464e",
+                "reference": "4c063eff281b1e3a73c33c0d5c39e8e2b766464e",
                 "shasum": ""
             },
             "require": {
@@ -95,9 +95,9 @@
             "description": "A tool to automatically fix PHP code style",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/shim/issues",
-                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.34.1"
+                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.40.0"
             },
-            "time": "2023-10-03T23:51:46+00:00"
+            "time": "2023-11-26T09:26:25+00:00"
         }
     ],
     "packages-dev": [],
@@ -109,7 +109,7 @@
     "platform": [],
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.4"
+        "php": "8.0"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
