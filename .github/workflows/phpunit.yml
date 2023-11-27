@@ -22,7 +22,7 @@ jobs:
         # Upload coverage only once (out of php-versions)
         coverage-on: ['8.2']
         databases: ['sqlite']
-        server-versions: ['master']
+        server-versions: ['stable27']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -105,7 +105,7 @@ jobs:
       matrix:
         php-versions: ['8.2']
         databases: ['mysql']
-        server-versions: ['stable26', 'stable27', 'master']
+        server-versions: ['stable26', 'stable27']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -179,7 +179,7 @@ jobs:
       matrix:
         php-versions: ['8.2']
         databases: ['pgsql']
-        server-versions: ['master']
+        server-versions: ['stable27']
   
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
@@ -255,7 +255,7 @@ jobs:
       matrix:
         php-versions: ['8.2']
         databases: ['oci']
-        server-versions: ['master']
+        server-versions: ['stable27']
 
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
 
