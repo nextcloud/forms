@@ -1,7 +1,7 @@
 {
   "name": "forms",
   "description": "Forms app for nextcloud",
-  "version": "3.4.0",
+  "version": "4.0.0-alpha.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nextcloud/forms.git"
