@@ -1353,4 +1353,125 @@ class FormsServiceTest extends TestCase {
 
 		$formsService->notifyNewSubmission($form, $submitter);
 	}
+
+	/**
+	 * @dataProvider dataAreExtraSettingsValid
+	 *
+	 * @param array $extraSettings input settings
+	 * @param string $questionType question type
+	 * @param bool $expected expected return value
+	 *
+	 */
+	public function testAreExtraSettingsValid(array $extraSettings, string $questionType, bool $expected) {
+		$this->assertEquals($expected, $this->formsService->areExtraSettingsValid($extraSettings, $questionType));
+	}
+
+	public function dataAreExtraSettingsValid() {
+		return [
+			'empty-extra-settings' => [
+				'extraSettings' => [],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => true
+			],
+			'invalid key' => [
+				'extraSettings' => [
+					'some' => 'value'
+				],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'valid key' => [
+				'extraSettings' => [
+					'shuffleOptions' => true
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'invalid subtype' => [
+				'extraSettings' => [
+					'validationType' => 'iban',
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-custom-regex' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => '/^[a-z]{3,}/m'
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-custom-empty-regex' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => ''
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-custom-regex-modifier' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => '/^[a-z]{3,}/gm'
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-custom-regex' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => '['
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'rval' => false
+			],
+			'invalid-custom-regex-delimiters' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => '/1/2/'
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'rval' => false
+			],
+			'invalid-custom-regex-pattern' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => '/'.'[/'
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'rval' => false
+			],
+			'invalid-custom-regex-type' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+					'validationRegex' => 112
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'rval' => false
+			],
+			'invalid-custom-missing-regex' => [
+				'extraSettings' => [
+					'validationType' => 'regex',
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'rval' => false
+			],
+			'valid-dropdown-settings' => [
+				'extraSettings' => [
+					'shuffleOptions' => false,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'invalid-dropdown-settings' => [
+				'extraSettings' => [
+					'shuffleOptions' => true,
+					'someInvalidOption' => true
+				],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			]
+		];
+	}
 }

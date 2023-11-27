@@ -101,6 +101,34 @@ class Constants {
 	];
 
 	/**
+	 * !! Keep in sync with src/models/ValidationTypes.js !!
+	 */
+
+	// Allowed short input types
+	public const SHORT_INPUT_TYPES = [
+		'phone',
+		'email',
+		'regex',
+		'number'
+	];
+
+	// This are allowed extra settings
+	public const EXTRA_SETTINGS_DROPDOWN = [
+		'allowOtherAnswer',
+		'shuffleOptions',
+	];
+
+	public const EXTRA_SETTINGS_MULTIPLE = [
+		'allowOtherAnswer',
+		'shuffleOptions',
+	];
+
+	public const EXTRA_SETTINGS_SHORT = [
+		'validationType',
+		'validationRegex'
+	];
+
+	/**
 	 * !! Keep in sync with src/mixins/ShareTypes.js !!
 	 */
 	public const SHARE_TYPES_USED = [

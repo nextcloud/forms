@@ -601,6 +601,10 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
 		}
 
+		if (key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
+			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
+		}
+
 		// Create QuestionEntity with given Params & Id.
 		$question = Question::fromParams($keyValuePairs);
 		$question->setId($id);

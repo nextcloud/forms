@@ -44,7 +44,7 @@ use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-
+use OCP\Mail\IMailer;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
@@ -82,6 +82,9 @@ class SubmissionServiceTest extends TestCase {
 	/** @var IUserManager|MockObject */
 	private $userManager;
 
+	/** @var IMailer|MockObject */
+	private $mailer;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -92,6 +95,7 @@ class SubmissionServiceTest extends TestCase {
 		$this->config = $this->createMock(IConfig::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+		$this->mailer = $this->getMockBuilder(IMailer::class)->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);
 
@@ -119,7 +123,8 @@ class SubmissionServiceTest extends TestCase {
 			$this->l10n,
 			$this->logger,
 			$this->userManager,
-			$userSession
+			$userSession,
+			$this->mailer
 		);
 	}
 
@@ -632,6 +637,42 @@ class SubmissionServiceTest extends TestCase {
 				// Expected Result
 				false
 			],
+			'invalid-short-phone' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']]
+				],
+				// Answers
+				[
+					'1' => ['0800 NEXTCLOUD']
+				],
+				// Expected Result
+				false
+			],
+			'invalid-short-regex-not-matching' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{4}/']]
+				],
+				// Answers
+				[
+					'1' => ['abc']
+				],
+				// Expected Result
+				false
+			],
+			'invalid-short-number' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']]
+				],
+				// Answers
+				[
+					'1' => ['11i']
+				],
+				// Expected Result
+				false
+			],
 			'invalid-date-question' => [
 				// Questions
 				[
@@ -664,9 +705,15 @@ class SubmissionServiceTest extends TestCase {
 						['id' => 6]
 					]],
 					['id' => 8, 'type' => 'time', 'isRequired' => false],
-					['id' => 9, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+					['id' => 9, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => [
+						'allowOtherAnswer' => true,
+					], 'options' => [
 						['id' => 3]
 					]],
+					['id' => 10, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'email']],
+					['id' => 11, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']],
+					['id' => 12, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']],
+					['id' => 13, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{3}[0-9]{3}/']],
 				],
 				// Answers
 				[
@@ -678,7 +725,11 @@ class SubmissionServiceTest extends TestCase {
 					'6' => [4],
 					'7' => [5],
 					'8' => ['17:45'],
-					'9' => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer']
+					'9' => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer'],
+					'10' => ['some.name+context@example.com'],
+					'11' => ['100.45'],
+					'12' => ['+49 711 25 24 28 90'],
+					'13' => ['abc123'],
 				],
 				// Expected Result
 				true
@@ -694,6 +745,10 @@ class SubmissionServiceTest extends TestCase {
 	 * @param bool $expected
 	 */
 	public function testValidateSubmission(array $questions, array $answers, bool $expected) {
+		$this->mailer->method('validateMailAddress')->willReturnCallback(function ($mail) {
+			return $mail === 'some.name+context@example.com';
+		});
+
 		$this->assertEquals($expected, $this->submissionService->validateSubmission($questions, $answers));
 	}
 };
