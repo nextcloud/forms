@@ -57,7 +57,7 @@
 						:type="isUnique ? 'radio' : 'checkbox'"
 						:required="checkRequired('other-answer')"
 						class="question__label"
-						@update:checked="onChange"
+						@update:checked="onChangeOther"
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
@@ -257,6 +257,22 @@ export default {
 
 		onChange(value) {
 			this.$emit('update:values', this.isUnique ? [value] : value)
+		},
+
+		/**
+		 * Handle toggling the "other"-answer checkbox / radio switch
+		 * @param {string|string[]} value The new value of the answer(s)
+		 */
+		onChangeOther(value) {
+			value = [value].flat()
+			const pureValue = value.filter((v) => !v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+
+			if (value.length > pureValue.length) {
+				// make sure to add the cached test on re-enable
+				this.onChange([...pureValue, `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${this.cachedOtherAnswerText}`])
+			} else {
+				this.onChange(value)
+			}
 		},
 
 		/**
