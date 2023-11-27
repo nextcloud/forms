@@ -24,7 +24,8 @@
 
 <template>
 	<NcAppContent v-if="isLoadingForm">
-		<NcEmptyContent :name="t('forms', 'Loading {title} …', { title: form.title })">
+		<NcEmptyContent class="emtpycontent"
+			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -424,6 +425,11 @@ export default {
 
 <style lang="scss" scoped>
 @import '../scssmixins/markdownOutput';
+
+.emptycontent {
+	display: flex;
+	height: 100%;
+}
 
 .app-content {
 	display: flex;

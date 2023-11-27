@@ -82,5 +82,7 @@ export default {
 .forms-emptycontent {
 	flex-basis: 100vw;
 	flex-direction: column;
+	height: 100%;
+	display: flex;
 }
 </style>

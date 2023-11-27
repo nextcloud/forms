@@ -57,6 +57,7 @@
 		<!-- No forms & loading emptycontents -->
 		<NcAppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
 			<NcEmptyContent v-if="loading"
+				class="emptycontent"
 				:name="t('forms', 'Loading forms …')">
 				<template #icon>
 					<NcLoadingIcon :size="64" />
@@ -64,6 +65,7 @@
 			</NcEmptyContent>
 
 			<NcEmptyContent v-else-if="!hasForms"
+				class="emptycontent"
 				:name="t('forms', 'No forms created yet')">
 				<template #icon>
 					<FormsIcon :size="64" />
@@ -76,6 +78,7 @@
 			</NcEmptyContent>
 
 			<NcEmptyContent v-else
+				class="emptycontent"
 				:name="canCreateForms ? t('forms', 'Select a form or create a new one') : t('forms', 'Please select a form')">
 				<template #icon>
 					<FormsIcon :size="64" />
@@ -378,3 +381,10 @@ export default {
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+.emptycontent {
+	display: flex;
+	height: 100%;
+}
+</style>

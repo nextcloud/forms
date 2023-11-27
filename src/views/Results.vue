@@ -24,7 +24,8 @@
 
 <template>
 	<NcAppContent v-if="loadingResults">
-		<NcEmptyContent :name="t('forms', 'Loading responses …')">
+		<NcEmptyContent class="emptycontent"
+			:name="t('forms', 'Loading responses …')">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -96,6 +97,7 @@
 		<!-- No submissions -->
 		<section v-if="noSubmissions">
 			<NcEmptyContent :name="t('forms', 'No responses yet')"
+				class="emptycontent"
 				:description="t('forms', 'Results of submitted forms will show up here')">
 				<template #icon>
 					<IconPoll :size="64" />
@@ -326,6 +328,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.emptycontent {
+	display: flex;
+	height: 100%;
+}
+
 .app-content {
 	display: flex;
 	align-items: center;
