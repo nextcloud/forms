@@ -185,7 +185,7 @@ Optional extra settings for some [Question Types](#question-types)
 
 | Extra Setting      | Question Type | Type   | Values | Description |
 |--------------------|---------------|--------|--------|-------------|
-| `allowOtherAnswer` | `multiple, multiple_unique` | Boolean | Allows the user to specify a custom answer |
-| `shuffleOptions`   | `dropdown, multiple, multiple_unique` | Boolean | The list of options should be shuffled |
-| `validationType`   | `short` | null, 'phone', 'email', 'regex', 'number' | Custom validation for checking a submission |
-| `validationRegex`  | `short` | string | if `validationType` is 'regex' this defines the regular expression to apply |
+| `allowOtherAnswer` | `multiple, multiple_unique` | Boolean | `true/false` | Allows the user to specify a custom answer |
+| `shuffleOptions`   | `dropdown, multiple, multiple_unique` | Boolean | `true/false` | The list of options should be shuffled |
+| `validationType`   | `short` | string | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission |
+| `validationRegex`  | `short` | string | regular expression | if `validationType` is 'regex' this defines the regular expression to apply |
