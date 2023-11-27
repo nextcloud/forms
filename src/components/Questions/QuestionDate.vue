@@ -26,7 +26,7 @@
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<div class="question__content">
-			<NcDatetimePicker v-model="time"
+			<NcDateTimePicker v-model="time"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
@@ -42,13 +42,13 @@
 import moment from '@nextcloud/moment'
 
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import NcDatetimePicker from '@nextcloud/vue/dist/Components/NcDatetimePicker.js'
+import NcDateTimePicker from '@nextcloud/vue/dist/Components/NcDateTimePicker.js'
 
 export default {
 	name: 'QuestionDate',
 
 	components: {
-		NcDatetimePicker,
+		NcDateTimePicker,
 	},
 
 	mixins: [QuestionMixin],
