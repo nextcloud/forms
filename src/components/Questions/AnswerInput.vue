@@ -126,7 +126,7 @@ export default {
 
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while creating the answer
-				Object.assign(newAnswer, { text: this.$refs.input.value })
+				newAnswer.text = this.$refs.input.value
 				this.$emit('update:answer', answer.id, newAnswer)
 			} else {
 				this.debounceUpdateAnswer(answer)
