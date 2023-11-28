@@ -22,7 +22,7 @@
 
 <template>
 	<NcListItem ref="navigationItem"
-		:title="formTitle"
+		:name="formTitle"
 		:to="{
 			name: routerTarget,
 			params: { hash: form.hash }
@@ -37,7 +37,7 @@
 			<IconCheck v-else-if="isExpired" :size="16" />
 			<FormsIcon v-else :size="16" />
 		</template>
-		<template v-if="hasSubtitle" #subtitle>
+		<template v-if="hasSubtitle" #subname>
 			{{ formSubtitle }}
 		</template>
 		<template v-if="!loading && !readOnly" #actions>

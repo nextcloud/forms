@@ -33,7 +33,7 @@
 			</NcAppNavigationNew>
 			<template #list>
 				<!-- Form-Owner-->
-				<NcAppNavigationCaption v-if="!noOwnedForms" :title="t('forms', 'Your Forms')" />
+				<NcAppNavigationCaption v-if="!noOwnedForms" :name="t('forms', 'Your Forms')" />
 				<AppNavigationForm v-for="form in forms"
 					:key="form.id"
 					:form="form"
@@ -44,7 +44,7 @@
 					@delete="onDeleteForm" />
 
 				<!-- Shared Forms-->
-				<NcAppNavigationCaption v-if="!noSharedForms" :title="t('forms', 'Shared with you')" />
+				<NcAppNavigationCaption v-if="!noSharedForms" :name="t('forms', 'Shared with you')" />
 				<AppNavigationForm v-for="form in sharedForms"
 					:key="form.id"
 					:form="form"
@@ -57,14 +57,16 @@
 		<!-- No forms & loading emptycontents -->
 		<NcAppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
 			<NcEmptyContent v-if="loading"
-				:title="t('forms', 'Loading forms …')">
+				class="forms-emptycontent"
+				:name="t('forms', 'Loading forms …')">
 				<template #icon>
 					<NcLoadingIcon :size="64" />
 				</template>
 			</NcEmptyContent>
 
 			<NcEmptyContent v-else-if="!hasForms"
-				:title="t('forms', 'No forms created yet')">
+				class="forms-emptycontent"
+				:name="t('forms', 'No forms created yet')">
 				<template #icon>
 					<FormsIcon :size="64" />
 				</template>
@@ -76,7 +78,8 @@
 			</NcEmptyContent>
 
 			<NcEmptyContent v-else
-				:title="canCreateForms ? t('forms', 'Select a form or create a new one') : t('forms', 'Please select a form')">
+				class="forms-emptycontent"
+				:name="canCreateForms ? t('forms', 'Select a form or create a new one') : t('forms', 'Please select a form')">
 				<template #icon>
 					<FormsIcon :size="64" />
 				</template>
@@ -378,3 +381,9 @@ export default {
 	},
 }
 </script>
+
+<style scoped lang="scss">
+.forms-emptycontent {
+	height: 100%;
+}
+</style>

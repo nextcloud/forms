@@ -23,111 +23,116 @@
   -->
 
 <template>
-	<NcAppContent v-if="loadingResults">
-		<NcEmptyContent :title="t('forms', 'Loading responses …')">
-			<template #icon>
-				<NcLoadingIcon :size="64" />
-			</template>
-		</NcEmptyContent>
-	</NcAppContent>
-
-	<NcAppContent v-else>
+	<NcAppContent>
 		<TopBar :permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
-		<header v-if="!noSubmissions">
-			<h2 dir="auto">
-				{{ formTitle }}
-			</h2>
-			<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
 
-			<!-- View switcher between Summary and Responses -->
-			<div class="response-actions">
-				<div class="response-actions__radio">
-					<input id="show-summary--true"
-						v-model="showSummary"
-						type="radio"
-						:value="true"
-						class="hidden">
-					<label for="show-summary--true"
-						class="response-actions__radio__item"
-						:class="{ 'response-actions__radio__item--active': showSummary }">
-						{{ t('forms', 'Summary') }}
-					</label>
-					<input id="show-summary--false"
-						v-model="showSummary"
-						type="radio"
-						:value="false"
-						class="hidden">
-					<label for="show-summary--false"
-						class="response-actions__radio__item"
-						:class="{ 'response-actions__radio__item--active': !showSummary }">
-						{{ t('forms', 'Responses') }}
-					</label>
-				</div>
-
-				<!-- Action menu for CSV export and deletion -->
-				<NcActions class="results-menu"
-					:aria-label="t('forms', 'Options')"
-					:force-menu="true">
-					<NcActionButton :close-after-click="true" @click="onStoreToFiles">
-						<template #icon>
-							<IconFolder :size="20" />
-						</template>
-						{{ t('forms', 'Save CSV to Files') }}
-					</NcActionButton>
-					<NcActionButton @click="onDownloadCsv">
-						<template #icon>
-							<IconDownload :size="20" />
-						</template>
-						{{ t('forms', 'Download CSV') }}
-					</NcActionButton>
-					<NcActionButton v-if="canDeleteSubmissions" @click="deleteAllSubmissions">
-						<template #icon>
-							<IconDelete :size="20" />
-						</template>
-						{{ t('forms', 'Delete all responses') }}
-					</NcActionButton>
-				</NcActions>
-			</div>
-		</header>
+		<!-- Loading submissions -->
+		<NcEmptyContent v-if="loadingResults"
+			class="forms-emptycontent"
+			:name="t('forms', 'Loading responses …')">
+			<template #icon>
+				<NcLoadingIcon :size="64" />
+			</template>
+		</NcEmptyContent>
 
 		<!-- No submissions -->
-		<section v-if="noSubmissions">
-			<NcEmptyContent :title="t('forms', 'No responses yet')"
-				:description="t('forms', 'Results of submitted forms will show up here')">
-				<template #icon>
-					<IconPoll :size="64" />
-				</template>
-				<template #action>
-					<NcButton type="primary" @click="onShareForm">
-						<template #icon>
-							<IconShareVariant :size="20" decorative />
-						</template>
-						{{ t('forms', 'Share form') }}
-					</NcButton>
-				</template>
-			</NcEmptyContent>
-		</section>
+		<NcEmptyContent v-else-if="noSubmissions"
+			:name="t('forms', 'No responses yet')"
+			class="forms-emptycontent"
+			:description="t('forms', 'Results of submitted forms will show up here')">
+			<template #icon>
+				<IconPoll :size="64" />
+			</template>
+			<template #action>
+				<NcButton type="primary" @click="onShareForm">
+					<template #icon>
+						<IconShareVariant :size="20" decorative />
+					</template>
+					{{ t('forms', 'Share form') }}
+				</NcButton>
+			</template>
+		</NcEmptyContent>
 
-		<!-- Summary view for visualization -->
-		<section v-if="!noSubmissions && showSummary">
-			<ResultsSummary v-for="question in form.questions"
-				:key="question.id"
-				:question="question"
-				:submissions="form.submissions" />
-		</section>
+		<!-- Showing submissions -->
+		<template v-else>
+			<header>
+				<h2 dir="auto">
+					{{ formTitle }}
+				</h2>
+				<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
 
-		<!-- Responses view for individual responses -->
-		<section v-if="!noSubmissions && !showSummary">
-			<Submission v-for="submission in form.submissions"
-				:key="submission.id"
-				:submission="submission"
-				:questions="form.questions"
-				:can-delete-submission="canDeleteSubmissions"
-				@delete="deleteSubmission(submission.id)" />
-		</section>
+				<!-- View switcher between Summary and Responses -->
+				<div class="response-actions">
+					<div class="response-actions__radio">
+						<input id="show-summary--true"
+							v-model="showSummary"
+							type="radio"
+							:value="true"
+							class="hidden">
+						<label for="show-summary--true"
+							class="response-actions__radio__item"
+							:class="{ 'response-actions__radio__item--active': showSummary }">
+							{{ t('forms', 'Summary') }}
+						</label>
+						<input id="show-summary--false"
+							v-model="showSummary"
+							type="radio"
+							:value="false"
+							class="hidden">
+						<label for="show-summary--false"
+							class="response-actions__radio__item"
+							:class="{ 'response-actions__radio__item--active': !showSummary }">
+							{{ t('forms', 'Responses') }}
+						</label>
+					</div>
+
+					<!-- Action menu for CSV export and deletion -->
+					<NcActions class="results-menu"
+						:aria-label="t('forms', 'Options')"
+						:force-menu="true">
+						<NcActionButton :close-after-click="true" @click="onStoreToFiles">
+							<template #icon>
+								<IconFolder :size="20" />
+							</template>
+							{{ t('forms', 'Save CSV to Files') }}
+						</NcActionButton>
+						<NcActionButton @click="onDownloadCsv">
+							<template #icon>
+								<IconDownload :size="20" />
+							</template>
+							{{ t('forms', 'Download CSV') }}
+						</NcActionButton>
+						<NcActionButton v-if="canDeleteSubmissions" @click="deleteAllSubmissions">
+							<template #icon>
+								<IconDelete :size="20" />
+							</template>
+							{{ t('forms', 'Delete all responses') }}
+						</NcActionButton>
+					</NcActions>
+				</div>
+			</header>
+
+			<!-- Summary view for visualization -->
+			<section v-if="showSummary">
+				<ResultsSummary v-for="question in form.questions"
+					:key="question.id"
+					:question="question"
+					:submissions="form.submissions" />
+			</section>
+
+			<!-- Responses view for individual responses -->
+			<section v-else>
+				<Submission v-for="submission in form.submissions"
+					:key="submission.id"
+					:submission="submission"
+					:questions="form.questions"
+					:can-delete-submission="canDeleteSubmissions"
+					@delete="deleteSubmission(submission.id)" />
+			</section>
+		</template>
 	</NcAppContent>
 </template>
 
@@ -136,14 +141,14 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import axios from '@nextcloud/axios'
+import moment from '@nextcloud/moment'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
-import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
 
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDownload from 'vue-material-design-icons/Download.vue'
@@ -326,6 +331,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.forms-emptycontent {
+	height: 100%;
+}
+
 .app-content {
 	display: flex;
 	align-items: center;
