@@ -154,6 +154,22 @@ export default {
 				return {}
 			},
 		},
+
+		/**
+		 * Can question be moved up in order?
+		 */
+		canMoveUp: {
+			type: Boolean,
+			default: false,
+		},
+
+		/**
+		 * Can question be moved down in order?
+		 */
+		canMoveDown: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	components: {
