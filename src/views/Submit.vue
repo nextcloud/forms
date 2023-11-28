@@ -22,7 +22,7 @@
 
 <template>
 	<NcAppContent v-if="isLoadingForm">
-		<NcEmptyContent class="emptycontent"
+		<NcEmptyContent class="forms-emptycontent"
 			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
@@ -59,14 +59,14 @@
 		</header>
 
 		<NcEmptyContent v-if="loading"
-			class="emptycontent"
+			class="forms-emptycontent"
 			:name="t('forms', 'Submitting form …')">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="success || !form.canSubmit"
-			class="emptycontent"
+			class="forms-emptycontent"
 			:name="t('forms', 'Thank you for completing the form!')"
 			:description="form.submissionMessage">
 			<template #icon>
@@ -78,7 +78,7 @@
 			</template>
 		</NcEmptyContent>
 		<NcEmptyContent v-else-if="isExpired"
-			class="emptycontent"
+			class="forms-emptycontent"
 			:name="t('forms', 'Form expired')"
 			:description="t('forms', 'This form has expired and is no longer taking answers')">
 			<template #icon>
@@ -459,8 +459,7 @@ export default {
 <style lang="scss" scoped>
 @import '../scssmixins/markdownOutput';
 
-.emptycontent {
-	display: flex;
+.forms-emptycontent {
 	height: 100%;
 }
 .app-content {
