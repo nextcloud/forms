@@ -253,6 +253,16 @@ class FormsService {
 	}
 
 	/**
+	 * Can the current user delete results of a form
+	 *
+	 * @param Form $form
+	 * @return boolean
+	 */
+	public function canDeleteResults(Form $form): bool {
+		return in_array(Constants::PERMISSION_RESULTS_DELETE, $this->getPermissions($form));
+	}
+
+	/**
 	 * Can the user submit a form
 	 *
 	 * @param Form $form
@@ -475,7 +485,7 @@ class FormsService {
 	 *
 	 * @param int $formId The form to query shares for
 	 * @param string $userId The user to check if shared with
-	 * @return array
+	 * @return Share[]
 	 */
 	protected function getSharesWithUser(int $formId, string $userId): array {
 		$shareEntities = $this->shareMapper->findByForm($formId);
