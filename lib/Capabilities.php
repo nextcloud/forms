@@ -36,7 +36,7 @@ class Capabilities implements ICapability {
 
 	/**
 	 * Provide App Capabilities
-	 * @return array with 'appName' => [ _Properties_ ]
+	 * @inheritdoc
 	 */
 	public function getCapabilities() {
 		return [
