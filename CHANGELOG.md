@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.4.1 - 2023-11-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.0...v3.4.1)
+
+### Fixed
+- [stable3] fix(QuestionMultiple): Fix setting the `allowOtherAnswer` option [\#1801](https://github.com/nextcloud/forms/pull/1801) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+
+### Merged
+- [stable3] fix: Adjust composer scripts to work when only installing production dependencies [\#1799](https://github.com/nextcloud/forms/pull/1799) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+- [stable3] fix(tests): Adjust tests to run on stable27 max. [\#1793](https://github.com/nextcloud/forms/pull/1793) ([susnux](https://github.com/susnux))
+
+
 ## v3.4.0 - 2023-11-27
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.3.1...v3.4.0)
