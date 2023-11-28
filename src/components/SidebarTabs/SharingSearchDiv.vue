@@ -233,14 +233,19 @@ export default {
 		},
 
 		/**
+		 * A OCS Sharee response
+		 * @typedef {{label: string, shareWithDisplayNameUnique: string, value: { shareType: number, shareWith: string }, status?: unknown }} Sharee
+		 */
+
+		/**
 		 * Format search results
 		 *
-		 * @param {object[]} results Results as returned by search
-		 * @return {object[]} results as we use them on storage
+		 * @param {Record<string, Sharee>} results Results as returned by search
+		 * @return {Sharee[]} results as we use them on storage
 		 */
 		formatSearchResults(results) {
 			// flatten array of arrays
-			const flatResults = Object.values(results).reduce((arr, elem) => arr.concat(elem), [])
+			const flatResults = Object.values(results).flat()
 
 			return this.filterUnwantedShares(flatResults)
 				.map(share => this.formatForMultiselect(share))
@@ -252,36 +257,35 @@ export default {
 		 * Remove static unwanted shares from search results
 		 * Existing shares must be done dynamically to account for new shares.
 		 *
-		 * @param {object[]} shares the array of share objects
-		 * @return {object[]}
+		 * @param {Sharee[]} shares the array of share objects
+		 * @return {Sharee[]}
 		 */
 		filterUnwantedShares(shares) {
-			return shares.reduce((arr, share) => {
+			return shares.filter((share) => {
 				// only use proper objects
 				if (typeof share !== 'object') {
-					return arr
+					return false
 				}
 
 				try {
 					// filter out current user
 					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
 						&& share.value.shareWith === getCurrentUser().uid) {
-						return arr
+						return false
 					}
 
 					// All good, let's add the suggestion
-					arr.push(share)
+					return true
 				} catch {
-					return arr
+					return false
 				}
-				return arr
-			}, [])
+			})
 		},
 
 		/**
 		 * Format shares for the multiselect options
 		 *
-		 * @param {object} share Share in search formatting
+		 * @param {Sharee} share Share in search formatting
 		 * @return {object} Share in multiselect formatting
 		 */
 		formatForMultiselect(share) {
@@ -290,8 +294,10 @@ export default {
 				shareType: share.value.shareType,
 				user: share.value.shareWith,
 				isNoUser: share.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
+				id: share.value.shareWith,
 				displayName: share.label,
-				icon: this.shareTypeToIcon(share.value.shareType),
+				subname: share.shareWithDisplayNameUnique,
+				iconSvg: this.shareTypeToIcon(share.value.shareType),
 				// Vue unique binding to render within Multiselect's AvatarSelectOption
 				key: share.value.shareWith + '-' + share.value.shareType,
 			}

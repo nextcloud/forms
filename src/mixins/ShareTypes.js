@@ -19,6 +19,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+/* eslint-disable import/no-unresolved */
+import IconUserSvg from '@mdi/svg/svg/account.svg?raw'
+import IconGroupSvg from '@mdi/svg/svg/account-group.svg?raw'
+import IconMailSvg from '@mdi/svg/svg/email.svg?raw'
+import IconChatSvg from '@mdi/svg/svg/chat.svg?raw'
+import IconCircleSvg from '@mdi/svg/svg/circle-outline.svg?raw'
+/* eslint-enable import/no-unresolved */
 
 export default {
 	data() {
@@ -53,23 +60,23 @@ export default {
 		 * Default share is a user, other icons are here to differenciate from it, so let's not display the user icon.
 		 *
 		 * @param {number} type the share type
-		 * @return {string} the icon class
+		 * @return {string} the icon as raw svg
 		 */
 		shareTypeToIcon(type) {
 			switch (type) {
 			case this.SHARE_TYPES.SHARE_TYPE_GUEST:
 			// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
 			// case this.SHARE_TYPES.SHARE_TYPE_USER:
-				return 'icon-user'
+				return IconUserSvg
 			case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
 			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
-				return 'icon-group'
+				return IconGroupSvg
 			case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
-				return 'icon-mail'
+				return IconMailSvg
 			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
-				return 'icon-circle'
+				return IconCircleSvg
 			case this.SHARE_TYPES.SHARE_TYPE_ROOM:
-				return 'icon-room'
+				return IconChatSvg
 
 			default:
 				return ''
