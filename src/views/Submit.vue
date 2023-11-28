@@ -70,7 +70,7 @@
 			:name="t('forms', 'Thank you for completing the form!')"
 			:description="form.submissionMessage">
 			<template #icon>
-				<IconCheck :size="64" />
+				<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
 			</template>
 			<template v-if="submissionMessageHTML" #description>
 				<!-- eslint-disable-next-line vue/no-v-html -->
@@ -82,7 +82,7 @@
 			:name="t('forms', 'Form expired')"
 			:description="t('forms', 'This form has expired and is no longer taking answers')">
 			<template #icon>
-				<IconCheck :size="64" />
+				<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
 			</template>
 		</NcEmptyContent>
 
@@ -112,6 +112,12 @@
 				:disabled="loading"
 				:aria-label="t('forms', 'Submit form')">
 		</form>
+
+		<!-- Confirmation dialog if form is empty submitted -->
+		<NcDialog :open.sync="showConfirmEmptyModal"
+			:name="t('forms', 'Confirm submit')"
+			:message="t('forms', 'Are you sure you want to submit an empty form?')"
+			:buttons="confirmEmptyModalButtons" />
 	</NcAppContent>
 </template>
 
@@ -120,12 +126,17 @@ import { loadState } from '@nextcloud/initial-state'
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
+import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
-import IconCheck from 'vue-material-design-icons/Check.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/dist/Components/NcIconSvgWrapper.js'
+
+import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
+import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
@@ -142,10 +153,11 @@ export default {
 	name: 'Submit',
 
 	components: {
-		IconCheck,
 		NcAppContent,
+		NcDialog,
 		NcEmptyContent,
 		NcLoadingIcon,
+		NcIconSvgWrapper,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -197,15 +209,24 @@ export default {
 		return {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			answerTypes,
+			/**
+			 * Mapping of questionId => answers
+			 * @type {Record<number, string[]>}
+			 */
 			answers: {},
 			loading: false,
 			success: false,
 			/** Submit state of the form, true if changes are currently submitted */
 			submitForm: false,
+			showConfirmEmptyModal: false,
 		}
 	},
 
 	computed: {
+		IconCheckSvg() {
+			return IconCheckSvg
+		},
+
 		validQuestions() {
 			return this.form.questions.filter(question => {
 				// All questions must have a valid title
@@ -263,6 +284,22 @@ export default {
 				return t('forms', 'Expired {relativeDate}.', { relativeDate })
 			}
 			return t('forms', 'Expires {relativeDate}.', { relativeDate })
+		},
+
+		/**
+		 * Buttons for the "confirm submit empty form" dialog
+		 */
+		confirmEmptyModalButtons() {
+			return [{
+				label: t('forms', 'Abort'),
+				icon: IconCancelSvg,
+				callback: () => {},
+			}, {
+				label: t('forms', 'Submit'),
+				icon: IconCheckSvg,
+				type: 'primary',
+				callback: () => this.onConfirmedSubmit(),
+			}]
 		},
 	},
 
@@ -420,11 +457,24 @@ export default {
 		},
 
 		/**
-		 * Submit the form after the browser validated it 🚀
+		 * Submit the form after the browser validated it 🚀 or show confirmation modal if empty
 		 */
-		async onSubmit() {
+		onSubmit() {
+			// in case no answer is set or all are empty show the confirmation dialog
+			if (Object.keys(this.answers).length === 0 || Object.values(this.answers).every((answers) => answers.length === 0)) {
+				this.showConfirmEmptyModal = true
+			} else {
+				// otherwise do the real submit
+				this.onConfirmedSubmit()
+			}
+		},
+
+		/**
+		 * Handle the real submit of the form, this is only called if the form is not empty or user confirmed to submit
+		 */
+		async onConfirmedSubmit() {
+			this.showConfirmEmptyModal = false
 			this.loading = true
-			this.submitForm = true
 
 			try {
 				await axios.post(generateOcsUrl('apps/forms/api/v2.1/submission/insert'), {
@@ -432,6 +482,7 @@ export default {
 					answers: this.answers,
 					shareHash: this.shareHash,
 				})
+				this.submitForm = true
 				this.success = true
 				this.deleteFormFieldFromLocalStorage()
 				emit('forms:last-updated:set', this.form.id)
