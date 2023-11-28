@@ -53,6 +53,7 @@ use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -726,4 +727,104 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->insertSubmission(1, [], '');
 	}
 
+	public function testDeleteSubmissionNotFound() {
+		$exception = $this->createMock(MapperException::class);
+
+		$this->submissionMapper
+			->expects($this->once())
+			->method('findById')
+			->with(42)
+			->willThrowException($exception);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->deleteSubmission(42);
+	}
+
+	/**
+	 * @dataProvider dataTestDeletePermission
+	 */
+	public function testDeleteSubmissionNoPermission($submissionData, $formData) {
+		$submission = Submission::fromParams($submissionData);
+		$form = Form::fromParams($formData);
+
+		$this->submissionMapper
+			->method('findById')
+			->with(42)
+			->willReturn($submission);
+
+		$this->formMapper
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService
+			->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->deleteSubmission(42);
+	}
+
+	/**
+	 * @dataProvider dataTestDeletePermission
+	 */
+	public function testDeleteSubmission($submissionData, $formData) {
+		$submission = Submission::fromParams($submissionData);
+		$form = Form::fromParams($formData);
+
+		$this->submissionMapper
+			->method('findById')
+			->with(42)
+			->willReturn($submission);
+
+		$this->formMapper
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService
+			->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->submissionMapper
+			->expects($this->once())
+			->method('deleteById')
+			->with(42);
+
+		$this->formsService
+			->expects($this->once())
+			->method('setLastUpdatedTimestamp')
+			->with($formData['id']);
+
+		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(42));
+	}
+
+	public function dataTestDeletePermission() {
+		return [
+			[
+				[
+					'formId' => 1,
+				],
+				[
+					'id' => 1,
+					'title' => 'Name',
+					'hash' => 'hash',
+					'access' => [
+						'permitAllUsers' => false,
+						'showToAllUsers' => false,
+					],
+					'ownerId' => 'currentUser',
+					'description' => '',
+					'expires' => 0,
+					'isAnonymous' => false,
+					'submitMultiple' => false,
+					'showExpiration' => false
+				],
+			]
+		];
+	}
 }

@@ -594,6 +594,21 @@ class ShareApiControllerTest extends TestCase {
 				'expected' => 1,
 				'exception' => null
 			],
+			'valid-permissions-share-delete' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => [Constants::PERMISSION_RESULTS, Constants::PERMISSION_RESULTS_DELETE, Constants::PERMISSION_SUBMIT]
+				],
+				'expected' => 1,
+				'exception' => null
+			],
 			'no-permission' => [
 				'share' => [
 					'id' => 1,
@@ -605,6 +620,37 @@ class ShareApiControllerTest extends TestCase {
 				'formOwner' => 'currentUser',
 				'keyValuePairs' => [
 					'permissions' => []
+				],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+			],
+			'invalid-permission-missing-submit' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT],
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => [Constants::PERMISSION_RESULTS_DELETE],
+				],
+				'expected' => null,
+				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+			],
+			// PERMISSION_RESULTS_DELETE is only allowed if PERMISSION_RESULTS is set
+			'invalid-permission-missing-results' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => 0,
+					'shareWith' => 'user1',
+					'permissions' => [Constants::PERMISSION_SUBMIT],
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS_DELETE],
 				],
 				'expected' => null,
 				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'

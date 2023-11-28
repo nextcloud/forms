@@ -313,6 +313,11 @@ class ShareApiController extends OCSController {
 			return false;
 		}
 
+		if (in_array(Constants::PERMISSION_RESULTS_DELETE, $sanitizedPermissions) && !in_array(Constants::PERMISSION_RESULTS, $sanitizedPermissions)) {
+			$this->logger->debug('Permission results_delete is only allowed when permission results is also set');
+			return false;
+		}
+
 		// Make sure only users can have special permissions
 		if (count($sanitizedPermissions) > 1) {
 			switch ($shareType) {
