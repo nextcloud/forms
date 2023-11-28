@@ -468,7 +468,7 @@ export default {
 		 * @param {boolean} allowOtherAnswer show/hide field for other answer
 		 */
 		onAllowOtherAnswerChange(allowOtherAnswer) {
-			return this.onExtraSettingsChange('allowOtherAnswer', allowOtherAnswer)
+			return this.onExtraSettingsChange({ allowOtherAnswer })
 		},
 	},
 }
