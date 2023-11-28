@@ -16,6 +16,7 @@
 			"@composer bin psalm install --ansi",
 			"@composer bin cs-fixer install --ansi"
 		],
+		"bin": "echo 'bin not installed'",
 		"cs:fix": "php-cs-fixer fix",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"lint": "find . -name \\*.php -not -path './vendor*/*' -print0 | xargs -0 -n1 php -l",
