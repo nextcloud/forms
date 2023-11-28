@@ -108,6 +108,9 @@
     "People can pick a date and time" : "אנשים יכולים לבחור תאריך ושעה",
     "Pick a date and time" : "נא לבחור תאריך ושעה",
     "Time" : "זמן",
-    "Pick a time" : "בחר זמן"
+    "Pick a time" : "בחר זמן",
+    "Text" : "טקסט",
+    "Phone number" : "מספר טלפון",
+    "Email address" : "כתובת דוא״ל"
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;"
 }

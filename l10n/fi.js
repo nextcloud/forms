@@ -163,6 +163,10 @@ OC.L10N.register(
     "Time" : "Aika",
     "Time question title" : "Ajan kysymyksen otsikko",
     "People can pick a time" : "Ihmiset voivat valita ajan",
-    "Pick a time" : "Valitse aika"
+    "Pick a time" : "Valitse aika",
+    "Text" : "Teksti",
+    "Phone number" : "Puhelinnumero",
+    "Email address" : "Sähköpostiosoite",
+    "Number" : "Numero"
 },
 "nplurals=2; plural=(n != 1);");

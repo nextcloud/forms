@@ -21,6 +21,8 @@ OC.L10N.register(
     "Settings" : "პარამეტრები",
     "Submit" : "გაგზავნა",
     "Date" : "თარიღი",
-    "Time" : "დრო"
+    "Time" : "დრო",
+    "Text" : "ტექსტი",
+    "Phone number" : "ტელეფონის ნომერი"
 },
 "nplurals=2; plural=(n!=1);");

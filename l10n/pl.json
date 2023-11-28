@@ -166,6 +166,10 @@
     "Time" : "Czas",
     "Time question title" : "Tytuł pytania o czas",
     "People can pick a time" : "Ludzie mogą wybrać czas",
-    "Pick a time" : "Wybierz czas"
+    "Pick a time" : "Wybierz czas",
+    "Text" : "Tekst",
+    "Phone number" : "Numer telefonu",
+    "Email address" : "Adres e-mail",
+    "Number" : "Liczba"
 },"pluralForm" :"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"
 }

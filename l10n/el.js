@@ -148,6 +148,7 @@ OC.L10N.register(
     "Time" : "Ώρα",
     "Time question title" : "Τίτλος ερώτησης ώρας",
     "People can pick a time" : "Οι χρήστες μπορούν να επιλέξουν μια ώρα",
-    "Pick a time" : "Επιλέξτε μια ώρα"
+    "Pick a time" : "Επιλέξτε μια ώρα",
+    "Email address" : "Διεύθυνση αλληλογραφίας"
 },
 "nplurals=2; plural=(n != 1);");

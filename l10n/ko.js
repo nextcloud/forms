@@ -55,6 +55,9 @@ OC.L10N.register(
     "Date" : "날짜",
     "Pick a date" : "날짜 선택",
     "Time" : "시간",
-    "Pick a time" : "시간 선택"
+    "Pick a time" : "시간 선택",
+    "Text" : "텍스트",
+    "Phone number" : "휴대폰 번호",
+    "Email address" : "이메일 주소"
 },
 "nplurals=1; plural=0;");

@@ -186,6 +186,10 @@ OC.L10N.register(
     "Time" : "Saat",
     "Time question title" : "Saat sorusunun başlığı",
     "People can pick a time" : "İnsanlar bir saat seçebilir",
-    "Pick a time" : "Bir saat seçin"
+    "Pick a time" : "Bir saat seçin",
+    "Text" : "Metin",
+    "Phone number" : "Telefon numarası",
+    "Email address" : "E-posta adresi",
+    "Number" : "Sayı"
 },
 "nplurals=2; plural=(n > 1);");

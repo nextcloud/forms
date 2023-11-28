@@ -129,6 +129,9 @@ OC.L10N.register(
     "People can pick a date and time" : "Sudionici mogu odabrati datum i vrijeme",
     "Pick a date and time" : "Odaberite datum i vrijeme",
     "Time" : "Vrijeme",
-    "Pick a time" : "Odaberi vrijeme"
+    "Pick a time" : "Odaberi vrijeme",
+    "Text" : "Tekst",
+    "Phone number" : "Broj telefona",
+    "Email address" : "Adresa e-pošte"
 },
 "nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;");

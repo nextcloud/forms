@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share" : "ແບ່ງປັນ",
     "Sharing" : "ການແບ່ງປັນ",
     "Settings" : "ການຕັ້ງຄ່າ",
-    "Date" : "ວັນທີ"
+    "Date" : "ວັນທີ",
+    "Phone number" : "ເບີໂທລະສັບ"
 },
 "nplurals=1; plural=0;");

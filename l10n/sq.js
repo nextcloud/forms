@@ -23,6 +23,8 @@ OC.L10N.register(
     "Settings" : "Rregullimet",
     "Submit" : "Dërgo",
     "Date" : "Data",
-    "Time" : "Kohë"
+    "Time" : "Kohë",
+    "Text" : "Tekst",
+    "Phone number" : "Numri i telefonit"
 },
 "nplurals=2; plural=(n != 1);");

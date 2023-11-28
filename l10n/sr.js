@@ -186,6 +186,10 @@ OC.L10N.register(
     "Time" : "Време",
     "Time question title" : "Наслов питања времена",
     "People can pick a time" : "Људи могу да изаберу време",
-    "Pick a time" : "Изаберите време"
+    "Pick a time" : "Изаберите време",
+    "Text" : "Текст",
+    "Phone number" : "Број телефона",
+    "Email address" : "Адреса е-поште",
+    "Number" : "Број"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

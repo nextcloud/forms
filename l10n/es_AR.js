@@ -79,6 +79,7 @@ OC.L10N.register(
     "Short answer" : "Respuesta breve",
     "Long text" : "Texto largo",
     "Date" : "Fecha",
-    "Time" : "Hora"
+    "Time" : "Hora",
+    "Phone number" : "Número telefónico"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

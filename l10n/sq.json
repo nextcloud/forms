@@ -21,6 +21,8 @@
     "Settings" : "Rregullimet",
     "Submit" : "Dërgo",
     "Date" : "Data",
-    "Time" : "Kohë"
+    "Time" : "Kohë",
+    "Text" : "Tekst",
+    "Phone number" : "Numri i telefonit"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

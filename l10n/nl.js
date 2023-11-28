@@ -135,6 +135,10 @@ OC.L10N.register(
     "Time" : "Tijd",
     "Time question title" : "Tijdvraag titel",
     "People can pick a time" : "Mensen kunnen een tijdstip kiezen",
-    "Pick a time" : "Kies een tijd"
+    "Pick a time" : "Kies een tijd",
+    "Text" : "Tekst",
+    "Phone number" : "Telefoonnummer",
+    "Email address" : "E-mailadres",
+    "Number" : "Nummer"
 },
 "nplurals=2; plural=(n != 1);");

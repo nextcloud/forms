@@ -172,6 +172,10 @@ OC.L10N.register(
     "Time" : "Tid",
     "Time question title" : "Rubrik till tidsfråga",
     "People can pick a time" : "Personer kan välja en tid",
-    "Pick a time" : "Välj en tidpunkt"
+    "Pick a time" : "Välj en tidpunkt",
+    "Text" : "Text",
+    "Phone number" : "Telefonnummer",
+    "Email address" : "E-postadress",
+    "Number" : "Nummer"
 },
 "nplurals=2; plural=(n != 1);");

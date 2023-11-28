@@ -186,6 +186,9 @@ OC.L10N.register(
     "Time" : "Time",
     "Time question title" : "Time question title",
     "People can pick a time" : "People can pick a time",
-    "Pick a time" : "Pick a time"
+    "Pick a time" : "Pick a time",
+    "Phone number" : "Phone number",
+    "Email address" : "Email address",
+    "Number" : "Number"
 },
 "nplurals=2; plural=(n != 1);");

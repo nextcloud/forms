@@ -28,6 +28,9 @@ OC.L10N.register(
     "Date" : "Date",
     "Pick a date" : "Alege o dată",
     "Time" : "Timp",
-    "Pick a time" : "Alege un interval orar"
+    "Pick a time" : "Alege un interval orar",
+    "Text" : "Text",
+    "Phone number" : "Număr telefon",
+    "Email address" : "Email"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

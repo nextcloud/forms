@@ -24,6 +24,8 @@ OC.L10N.register(
     "Submit" : "Saada",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "Date" : "Kuupäev",
-    "Time" : "Aeg"
+    "Time" : "Aeg",
+    "Phone number" : "Telefoninumber",
+    "Email address" : "E-posti aadress"
 },
 "nplurals=2; plural=(n != 1);");

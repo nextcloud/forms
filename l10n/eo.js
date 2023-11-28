@@ -26,6 +26,8 @@ OC.L10N.register(
     "Submit" : "Sendi",
     "Cannot copy, please copy the link manually" : "Ne eblis kopii la ligilon; kopiu ĝin permane.",
     "Date" : "Date",
-    "Time" : "Dato"
+    "Time" : "Dato",
+    "Phone number" : "Telefonnumero",
+    "Email address" : "Retpoŝtadreso"
 },
 "nplurals=2; plural=(n != 1);");

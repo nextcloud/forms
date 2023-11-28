@@ -24,6 +24,8 @@ OC.L10N.register(
     "Date" : "Date",
     "Pick a date" : "Pilih tanggal",
     "Time" : "Waktu",
-    "Pick a time" : "Pilih waktu"
+    "Pick a time" : "Pilih waktu",
+    "Phone number" : "Nomor telefon",
+    "Email address" : "Alamat surel"
 },
 "nplurals=1; plural=0;");

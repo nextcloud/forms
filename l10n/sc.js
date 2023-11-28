@@ -129,6 +129,9 @@ OC.L10N.register(
     "People can pick a date and time" : "Sa gente podet seberare data e ora",
     "Pick a date and time" : "Sèbera data e ora",
     "Time" : "Ora",
-    "Pick a time" : "Sèbera una ora"
+    "Pick a time" : "Sèbera una ora",
+    "Text" : "Testu",
+    "Phone number" : "Nùmeru de telèfonu",
+    "Email address" : "Indiritzu de posta eletrònica"
 },
 "nplurals=2; plural=(n != 1);");

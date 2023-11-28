@@ -174,6 +174,7 @@ OC.L10N.register(
     "Time" : "Tid",
     "Time question title" : "Tid - spørgsmåls titel",
     "People can pick a time" : "Brugere kan vælge et tidspunkt",
-    "Pick a time" : "Vælg et tidspunkt"
+    "Pick a time" : "Vælg et tidspunkt",
+    "Email address" : "Email adresse"
 },
 "nplurals=2; plural=(n != 1);");

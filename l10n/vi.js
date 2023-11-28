@@ -30,6 +30,9 @@ OC.L10N.register(
     "Date" : "Date",
     "Pick a date" : "Chọn ngày",
     "Time" : "Thời gian",
-    "Pick a time" : "Chọn thời gian"
+    "Pick a time" : "Chọn thời gian",
+    "Text" : "Văn bản",
+    "Phone number" : "Số điện thoại",
+    "Email address" : "Địa chỉ thư điện tử"
 },
 "nplurals=1; plural=0;");

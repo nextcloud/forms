@@ -75,6 +75,9 @@ OC.L10N.register(
     "Pick a date" : "เลือกวันที่",
     "Datetime" : "วันที่และเวลา",
     "Pick a date and time" : "เลือกวันที่และเวลา",
-    "Time" : "เวลา"
+    "Time" : "เวลา",
+    "Text" : "ข้อความ",
+    "Phone number" : "หมายเลขโทรศัพท์",
+    "Email address" : "ที่อยู่อีเมล"
 },
 "nplurals=1; plural=0;");

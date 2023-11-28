@@ -128,6 +128,10 @@
     "People can pick a date and time" : "Man kan velge dato og tid",
     "Pick a date and time" : "Velg dato og tid",
     "Time" : "Tid",
-    "Pick a time" : "Velg et tidspunkt"
+    "Pick a time" : "Velg et tidspunkt",
+    "Text" : "Tekst",
+    "Phone number" : "Telefonnummer",
+    "Email address" : "E-post adresse",
+    "Number" : "Nummer"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

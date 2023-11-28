@@ -175,6 +175,10 @@ OC.L10N.register(
     "Time" : "Noiz",
     "Time question title" : "Denbora galderaren izenburua",
     "People can pick a time" : "Jendeak noiz aukera dezake",
-    "Pick a time" : "Aukeratu noiz"
+    "Pick a time" : "Aukeratu noiz",
+    "Text" : "Testua",
+    "Phone number" : "Telefono zenbakia",
+    "Email address" : "Helbide elektronikoa",
+    "Number" : "Zenbakia"
 },
 "nplurals=2; plural=(n != 1);");

@@ -13,6 +13,8 @@ OC.L10N.register(
     "Share" : "Bḍu",
     "Options" : "Iɣewwaṛen",
     "Sharing" : "Beṭṭu",
-    "Settings" : "Iɣewwaṛen"
+    "Settings" : "Iɣewwaṛen",
+    "Phone number" : "Uṭṭun n tiliɣri",
+    "Email address" : "Tansa imayl"
 },
 "nplurals=2; plural=(n != 1);");

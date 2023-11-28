@@ -92,6 +92,9 @@ OC.L10N.register(
     "Date" : "Dagsetning",
     "Pick a date" : "Veldu dagsetningu",
     "Time" : "Tími",
-    "Pick a time" : "Veldu tíma"
+    "Pick a time" : "Veldu tíma",
+    "Text" : "Texti",
+    "Phone number" : "Símanúmer",
+    "Email address" : "Tölvupóstfang"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

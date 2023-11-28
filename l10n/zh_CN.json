@@ -176,6 +176,9 @@
     "Time" : "时间",
     "Time question title" : "时间问题标题",
     "People can pick a time" : "这里可以选择一个时间",
-    "Pick a time" : "选择一个时间"
+    "Pick a time" : "选择一个时间",
+    "Text" : "文本 ",
+    "Phone number" : "电话号码",
+    "Email address" : "电子邮件地址"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

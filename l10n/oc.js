@@ -24,6 +24,9 @@ OC.L10N.register(
     "Date" : "Data",
     "Pick a date" : "Causir una data",
     "Time" : "Ora",
-    "Pick a time" : "Causir una ora"
+    "Pick a time" : "Causir una ora",
+    "Text" : "Tèxt",
+    "Phone number" : "Numèro de telefòn",
+    "Email address" : "Adreça mail"
 },
 "nplurals=2; plural=(n > 1);");

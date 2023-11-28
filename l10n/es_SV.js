@@ -20,6 +20,8 @@ OC.L10N.register(
     "Settings" : "Configuraciones ",
     "Submit" : "Enviar",
     "Date" : "Fecha",
-    "Time" : "Hora"
+    "Time" : "Hora",
+    "Text" : "Texto",
+    "Phone number" : "Número telefónico"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

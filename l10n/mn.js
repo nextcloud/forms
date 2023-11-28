@@ -18,6 +18,7 @@ OC.L10N.register(
     "Settings" : "Тохиргоо",
     "Submit" : "мэдэгдэх",
     "Date" : "Он сар өдөр",
-    "Time" : "Цаг"
+    "Time" : "Цаг",
+    "Phone number" : "Утасны дугаар"
 },
 "nplurals=2; plural=(n != 1);");

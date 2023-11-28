@@ -122,6 +122,9 @@ OC.L10N.register(
     "People can pick a date and time" : "回答者は日付と時刻を選択可能",
     "Pick a date and time" : "日時を選択",
     "Time" : "時間",
-    "Pick a time" : "時間を指定"
+    "Pick a time" : "時間を指定",
+    "Text" : "テキスト",
+    "Phone number" : "電話番号",
+    "Email address" : "メールアドレス"
 },
 "nplurals=1; plural=0;");

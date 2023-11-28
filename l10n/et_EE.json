@@ -22,6 +22,8 @@
     "Submit" : "Saada",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "Date" : "Kuupäev",
-    "Time" : "Aeg"
+    "Time" : "Aeg",
+    "Phone number" : "Telefoninumber",
+    "Email address" : "E-posti aadress"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

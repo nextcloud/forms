@@ -175,6 +175,9 @@ OC.L10N.register(
     "Time" : "زمان",
     "Time question title" : "Time question title",
     "People can pick a time" : "People can pick a time",
-    "Pick a time" : "Pick a time"
+    "Pick a time" : "Pick a time",
+    "Text" : "متن",
+    "Email address" : "نشانی رایانامه",
+    "Number" : "Number"
 },
 "nplurals=2; plural=(n > 1);");

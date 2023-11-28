@@ -161,6 +161,10 @@
     "Time" : "Čas",
     "Time question title" : "Vprašanje za izbor časa",
     "People can pick a time" : "Izbrati je mogoče določen čas",
-    "Pick a time" : "Izbor časa"
+    "Pick a time" : "Izbor časa",
+    "Text" : "Besedilo",
+    "Phone number" : "Telefonska številka",
+    "Email address" : "Elektronski naslov",
+    "Number" : "Številčne vrednosti"
 },"pluralForm" :"nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);"
 }

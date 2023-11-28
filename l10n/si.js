@@ -13,6 +13,7 @@ OC.L10N.register(
     "Responses" : "ප්‍රතිචාර",
     "Settings" : "සැකසුම්",
     "Date" : "දිනය",
-    "Time" : "වේලාව"
+    "Time" : "වේලාව",
+    "Phone number" : "දුරකථන අංකය"
 },
 "nplurals=2; plural=(n != 1);");

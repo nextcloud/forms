@@ -178,6 +178,10 @@ OC.L10N.register(
     "Time" : "Horário",
     "Time question title" : "Título da pergunta de horário",
     "People can pick a time" : "As pessoas podem escolher um horário",
-    "Pick a time" : "Escolha um horário"
+    "Pick a time" : "Escolha um horário",
+    "Text" : "Texto",
+    "Phone number" : "Número de telefone",
+    "Email address" : "Endereço de e-mail",
+    "Number" : "Número"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

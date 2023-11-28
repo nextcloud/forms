@@ -173,6 +173,10 @@
     "Time" : "Hora",
     "Time question title" : "Título de la pregunta de hora",
     "People can pick a time" : "Las personas pueden elegir una hora",
-    "Pick a time" : "Seleccionar una hora"
+    "Pick a time" : "Seleccionar una hora",
+    "Text" : "Texto",
+    "Phone number" : "Número telefónico",
+    "Email address" : "Dirección de correo electrónico",
+    "Number" : "Número"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

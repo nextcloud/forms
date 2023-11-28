@@ -169,6 +169,10 @@ OC.L10N.register(
     "Time" : "Čas",
     "Time question title" : "Názov otázky pre čas",
     "People can pick a time" : "Ľudia si môžu vybrať čas",
-    "Pick a time" : "Vyberte čas"
+    "Pick a time" : "Vyberte čas",
+    "Text" : "Text",
+    "Phone number" : "Telefónne číslo",
+    "Email address" : "E-mailová adresa",
+    "Number" : "Číslo"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

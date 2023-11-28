@@ -175,6 +175,7 @@ OC.L10N.register(
     "Time" : "Zeit",
     "Time question title" : "Titel der Zeit-Frage",
     "People can pick a time" : "Benutzer können eine Zeit auswählen",
-    "Pick a time" : "Wähle eine Zeit aus"
+    "Pick a time" : "Wähle eine Zeit aus",
+    "Email address" : "E-Mail-Adresse"
 },
 "nplurals=2; plural=(n != 1);");

@@ -19,6 +19,8 @@
     "Settings" : "პარამეტრები",
     "Submit" : "გაგზავნა",
     "Date" : "თარიღი",
-    "Time" : "დრო"
+    "Time" : "დრო",
+    "Text" : "ტექსტი",
+    "Phone number" : "ტელეფონის ნომერი"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

@@ -186,6 +186,10 @@ OC.L10N.register(
     "Time" : "時間",
     "Time question title" : "時間問題標題",
     "People can pick a time" : "可以挑選時間",
-    "Pick a time" : "挑選時間"
+    "Pick a time" : "挑選時間",
+    "Text" : "文本 ",
+    "Phone number" : "電話號碼",
+    "Email address" : "電郵地址",
+    "Number" : "數字"
 },
 "nplurals=1; plural=0;");

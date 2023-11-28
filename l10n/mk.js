@@ -111,6 +111,9 @@ OC.L10N.register(
     "People can pick a date and time" : "Учесниците можат да изберат датум и време",
     "Pick a date and time" : "Изберете датум и време",
     "Time" : "Време",
-    "Pick a time" : "Избери време"
+    "Pick a time" : "Избери време",
+    "Text" : "Текст",
+    "Phone number" : "Телефонски број",
+    "Email address" : "Е-пошта адреса"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

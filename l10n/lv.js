@@ -24,6 +24,8 @@ OC.L10N.register(
     "Settings" : "Iestatījumi",
     "Submit" : "Iesniegt",
     "Date" : "Datums",
-    "Time" : "Laiks"
+    "Time" : "Laiks",
+    "Text" : "Teksts",
+    "Phone number" : "Tālruņa numurs"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

@@ -16,6 +16,7 @@ OC.L10N.register(
     "Sharing" : "Compartente",
     "Settings" : "Configurationes",
     "Date" : "Date",
-    "Time" : "Tempore"
+    "Time" : "Tempore",
+    "Phone number" : "Numero de telephono"
 },
 "nplurals=2; plural=(n != 1);");
