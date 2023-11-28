@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.4.2 - 2023-11-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.1...v3.4.2)
+
+### Fixed
+- [stable3] fix: add canMoveUp/Down props to QuestionMixin [\#1807](https://github.com/nextcloud/forms/pull/1807) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+
+
 ## v3.4.1 - 2023-11-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.0...v3.4.1)
