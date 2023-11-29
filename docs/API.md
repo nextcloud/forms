@@ -20,6 +20,9 @@ This file contains the API-Documentation. For more information on the returned D
 }
 ```
 ## API changes
+### Deprecation info
+- Starting with API v2.2 all endpoints that update data will use PUT as method. POST is now deprecated and will be removed in API v3
+
 ### Breaking Changes on API v2
 - The `mandatory` property of questions has been removed. It is replaced by `isRequired`.
 - Completely new way of handling access & shares.
@@ -30,7 +33,7 @@ This file contains the API-Documentation. For more information on the returned D
 ## Form Endpoints
 ### List owned Forms
 Returns condensed objects of all Forms beeing owned by the authenticated user.
-- Endpoint: `/api/v2.1/forms`
+- Endpoint: `/api/v2.2/forms`
 - Method: `GET`
 - Parameters: None
 - Response: Array of condensed Form Objects, sorted as newest first.
@@ -65,7 +68,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
 
 ### List shared Forms
 Returns condensed objects of all Forms, that are shared & shown to the authenticated user and that have not expired yet.
-- Endpoint: `/api/v2.1/shared_forms`
+- Endpoint: `/api/v2.2/shared_forms`
 - Method: `GET`
 - Parameters: None
 - Response: Array of condensed Form Objects, sorted as newest first, similar to [List owned Forms](#list-owned-forms).
@@ -75,7 +78,7 @@ See above, 'List owned forms'
 
 ### Get a partial Form
 Returns a single partial form object, corresponding to owned/shared form-listings.
-- Endpoint: `/api/v2.1/partial_form/{hash}`
+- Endpoint: `/api/v2.2/partial_form/{hash}`
 - Method: `GET`
 - Url-Parameter:
   | Parameter | Type    | Description |
@@ -96,7 +99,7 @@ Returns a single partial form object, corresponding to owned/shared form-listing
 ```
 
 ### Create a new Form
-- Endpoint: `/api/v2.1/form`
+- Endpoint: `/api/v2.2/form`
 - Method: `POST`
 - Parameters: None
 - Response: The new form object, similar to requesting an existing form.
@@ -106,7 +109,7 @@ See next section, 'Request full data of a form'
 
 ### Request full data of a form
 Returns the full-depth object of the requested form (without submissions).
-- Endpoint: `/api/v2.1/form/{id}`
+- Endpoint: `/api/v2.2/form/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -192,7 +195,7 @@ Returns the full-depth object of the requested form (without submissions).
 
 ### Clone a form
 Creates a clone of a form (without submissions).
-- Endpoint: `/api/v2.1/form/clone/{id}`
+- Endpoint: `/api/v2.2/form/clone/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -205,8 +208,9 @@ See section 'Request full data of a form'.
 
 ### Update form properties
 Update a single or multiple properties of a form-object. Concerns **only** the Form-Object, properties of Questions, Options and Submissions, as well as their creation or deletion, are handled separately.
-- Endpoint: `/api/v2.1/form/update`
-- Method: `POST`
+- Endpoint: `/api/v2.2/form/update`
+- Method: `PATCH`
+- *Method: `POST` deprecated*
 - Parameters:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -219,7 +223,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
 ```
 
 ### Delete a form
-- Endpoint: `/api/v2.1/form/{id}`
+- Endpoint: `/api/v2.2/form/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -234,7 +238,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
 Contains only manipulative question-endpoints. To retrieve questions, request the full form data.
 
 ### Create a new question
-- Endpoint: `/api/v2.1/question`
+- Endpoint: `/api/v2.2/question`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Optional | Description |
@@ -259,8 +263,9 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
 
 ### Update question properties
 Update a single or multiple properties of a question-object.
-- Endpoint: `/api/v2.1/question/update`
-- Method: `POST`
+- Endpoint: `/api/v2.2/question/update`
+- Method: `PATCH`
+- *Method: `POST` deprecated*
 - Parameters:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -274,8 +279,9 @@ Update a single or multiple properties of a question-object.
 
 ### Reorder questions
 Reorders all Questions of a single form
-- Endpoint: `/api/v2.1/question/reorder`
-- Method: `POST`
+- Endpoint: `/api/v2.2/question/reorder`
+- Method: `PUT`
+- *Method: `POST` deprecated*
 - Parameters:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -298,7 +304,7 @@ Reorders all Questions of a single form
 ```
 
 ### Delete a question
-- Endpoint: `/api/v2.1/question/{id}`
+- Endpoint: `/api/v2.2/question/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -313,7 +319,7 @@ Reorders all Questions of a single form
 Contains only manipulative question-endpoints. To retrieve options, request the full form data.
 
 ### Create a new Option
-- Endpoint: `/api/v2.1/option`
+- Endpoint: `/api/v2.2/option`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -330,8 +336,10 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ```
 
 ### Update option properties
-- Endpoint: `/api/v2.1/option/update`
-- Method: `POST`
+Update a single or all properties of an option-object
+- Endpoint: `/api/v2.2/option/update`
+- Method: `PATCH`
+- *Method: `POST` deprecated*
 - Parameters:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -344,7 +352,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ```
 
 ### Delete an option
-- Endpoint: `/api/v2.1/option/{id}`
+- Endpoint: `/api/v2.2/option/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -357,7 +365,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 
 ## Sharing Endpoints
 ### Add a new Share
-- Endpoint: `/api/v2.1/share`
+- Endpoint: `/api/v2.2/share`
 - Method: `POST`
 - Parameters:
   | Parameter    | Type     | Description |
@@ -379,7 +387,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ```
 
 ### Delete a Share
-- Endpoint: `/api/v2.1/share/{id}`
+- Endpoint: `/api/v2.2/share/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -391,15 +399,16 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ```
 
 ### Update a Share
-- Endpoint: `/api/v2.1/share/update`
-- Url-Parameter:
+- Endpoint: `/api/v2.2/share/update`
+- Parameters:
   | Parameter        | Type     | Description |
   |------------------|----------|-------------|
   | _id_             | Integer  | ID of the share to update |
   | *keyValuePairs*¹ | Array    | Array of key-value pairs to update |
   
   ¹Currently only the _permissions_ can be updated.
-- Method: `POST`
+- Method: `PATCH`
+- *Method: `POST` deprecated*
 - Response: **Status-Code OK**, as well as the id of the share object.
 ```
 "data": 5
@@ -408,7 +417,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 ## Submission Endpoints
 ### Get Form Submissions
 Get all Submissions to a Form
-- Endpoint: `/api/v2.1/submissions/{hash}`
+- Endpoint: `/api/v2.2/submissions/{hash}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -504,7 +513,7 @@ Get all Submissions to a Form
 
 ### Get Submissions as csv (Download)
 Returns all submissions to the form in form of a csv-file.
-- Endpoint: `/api/v2.1/submissions/export/{hash}`
+- Endpoint: `/api/v2.2/submissions/export/{hash}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -519,7 +528,7 @@ Returns all submissions to the form in form of a csv-file.
 
 ### Export Submissions to Cloud (Files-App)
 Creates a csv file and stores it to the cloud, resp. Files-App.
-- Endpoint: `/api/v2.1/submissions/export`
+- Endpoint: `/api/v2.2/submissions/export`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -533,7 +542,7 @@ Creates a csv file and stores it to the cloud, resp. Files-App.
 
 ### Delete Submissions
 Delete all Submissions to a form
-- Endpoint: `/api/v2.1/submissions/{formId}`
+- Endpoint: `/api/v2.2/submissions/{formId}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
@@ -546,7 +555,7 @@ Delete all Submissions to a form
 
 ### Insert a Submission
 Store Submission to Database
-- Endpoint: `/api/v2.1/submission/insert`
+- Endpoint: `/api/v2.2/submission/insert`
 - Method: `POST`
 - Parameters:
   | Parameter | Type    | Description |
@@ -568,7 +577,7 @@ Store Submission to Database
 - Response: **Status-Code OK**.
 
 ### Delete a single Submission
-- Endpoint: `/api/v2.1/submission/{id}`
+- Endpoint: `/api/v2.2/submission/{id}`
 - Url-Parameter:
   | Parameter | Type    | Description |
   |-----------|---------|-------------|
