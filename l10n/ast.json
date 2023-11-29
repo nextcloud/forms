@@ -20,6 +20,7 @@
     "Settings" : "Configuración",
     "Submit" : "Unviar",
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
-    "Date" : "Data"
+    "Date" : "Data",
+    "Phone number" : "Númberu de teléfonu"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -47,6 +47,7 @@ OC.L10N.register(
     "Settings" : "설정",
     "Thank you for completing the form!" : "양식을 작성해주셔서 감사합니다!",
     "Submit" : "제출",
+    "Abort" : "중단",
     "There was an error submitting the form" : "양식 제출 실패",
     "Error while saving question" : "질문 저장 실패",
     "Cannot copy, please copy the link manually" : "복사할 수 없습니다, 링크를 수동으로 복사하세요.",

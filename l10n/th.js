@@ -66,6 +66,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "ขอบคุณที่ทำแบบฟอร์ม!",
     "Submit" : "ส่ง",
     "Submit form" : "ส่งฟอร์ม",
+    "Abort" : "ยกเลิก",
     "There was an error submitting the form" : "เกิดข้อผิดพลาดขณะส่งฟอร์ม",
     "Error while saving question" : "ข้อผิดพลาดขณะบันทึกคำถาม",
     "Form link copied" : "คัดลอกลิงก์ฟอร์มแล้ว",

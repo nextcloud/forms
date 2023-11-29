@@ -121,6 +121,8 @@ OC.L10N.register(
     "There was an error while removing the question" : "Es gab einen Fehler beim Löschen der Frage",
     "Error while saving form" : "Fehler beim Speichern des Formulars",
     "Loading responses …" : "Antworten laden …",
+    "No responses yet" : "Bis jetzt noch keine Antworten",
+    "Results of submitted forms will show up here" : "Die Ergebnisse von eingereichten Formularen werden hier angezeigt",
     "{amount} responses" : "{amount} Antworten",
     "Summary" : "Zusammenfassung",
     "Responses" : "Antworten",
@@ -128,8 +130,6 @@ OC.L10N.register(
     "Save CSV to Files" : "CSV unter Dateien speichern",
     "Download CSV" : "CSV herunterladen",
     "Delete all responses" : "Alle Antworten löschen",
-    "No responses yet" : "Bis jetzt noch keine Antworten",
-    "Results of submitted forms will show up here" : "Die Ergebnisse von eingereichten Formularen werden hier angezeigt",
     "There was an error while loading the results" : "Fehler beim Laden der Ergebnisse",
     "Export successful to {file}" : "Export in {file} erfolgreich",
     "There was an error, while exporting to Files" : "Beim Export in Dateien ist ein Fehler aufgetreten",
@@ -143,6 +143,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Vielen Dank für das Ausfüllen des Formulars!",
     "Submit" : "Übermitteln",
     "Submit form" : "Formular übermitteln",
+    "Abort" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
     "You have unsaved changes! Do you still want to leave?" : "Du hast noch nicht gespeicherte Änderungen! Willst du diese Seite wirklich verlassen?",
     "There was an error submitting the form" : "Es ist ein Fehler beim Übermitteln des Formulars aufgetreten",
     "Error while saving question" : "Fehler beim Speichern der Frage",
@@ -176,6 +177,8 @@ OC.L10N.register(
     "Time question title" : "Titel der Zeit-Frage",
     "People can pick a time" : "Benutzer können eine Zeit auswählen",
     "Pick a time" : "Wähle eine Zeit aus",
-    "Email address" : "E-Mail-Adresse"
+    "Text" : "Text",
+    "Email address" : "E-Mail-Adresse",
+    "Number" : "Zahl-Feld"
 },
 "nplurals=2; plural=(n != 1);");

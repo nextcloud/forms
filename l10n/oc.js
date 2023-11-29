@@ -21,6 +21,7 @@ OC.L10N.register(
     "Sharing" : "Partiment",
     "Settings" : "Paramètres",
     "Submit" : "Transmetre",
+    "Abort" : "Anullar",
     "Date" : "Data",
     "Pick a date" : "Causir una data",
     "Time" : "Ora",

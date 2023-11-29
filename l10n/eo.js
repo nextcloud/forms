@@ -27,6 +27,7 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "Ne eblis kopii la ligilon; kopiu ĝin permane.",
     "Date" : "Date",
     "Time" : "Dato",
+    "Text" : "Teksto",
     "Phone number" : "Telefonnumero",
     "Email address" : "Retpoŝtadreso"
 },

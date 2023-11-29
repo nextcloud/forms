@@ -24,6 +24,7 @@ OC.L10N.register(
     "Sharing" : "Đang chia sẽ",
     "Settings" : "Thiết lập",
     "Submit" : "Gửi đi",
+    "Abort" : "Hủy bỏ",
     "You have unsaved changes! Do you still want to leave?" : "Bạn có các thay đổi chưa lưu! Bạn vẫn muốn rời đi?",
     "Cannot copy, please copy the link manually" : "Không thể sao chép, vui lòng sao chép liên kết bằng tay",
     "Checkboxes" : "Hộp chọn",

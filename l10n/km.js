@@ -13,6 +13,7 @@ OC.L10N.register(
     "Options" : "ជម្រើស",
     "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",
+    "Abort" : "អំពី",
     "Date" : "Date",
     "Time" : "ម៉ោង"
 },

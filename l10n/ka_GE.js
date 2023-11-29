@@ -20,6 +20,7 @@ OC.L10N.register(
     "Sharing" : "გაზიარება",
     "Settings" : "პარამეტრები",
     "Submit" : "გაგზავნა",
+    "Abort" : "შეჩერება",
     "Date" : "თარიღი",
     "Time" : "დრო",
     "Text" : "ტექსტი",

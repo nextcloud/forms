@@ -22,6 +22,7 @@ OC.L10N.register(
     "Sharing" : "Ndarje",
     "Settings" : "Rregullimet",
     "Submit" : "Dërgo",
+    "Abort" : "Ndërprite",
     "Date" : "Data",
     "Time" : "Kohë",
     "Text" : "Tekst",

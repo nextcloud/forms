@@ -20,6 +20,7 @@ OC.L10N.register(
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Submit" : "Enviar",
+    "Abort" : "Abortar",
     "Date" : "Fecha",
     "Time" : "Hora",
     "Text" : "Texto",

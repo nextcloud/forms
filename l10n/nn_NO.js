@@ -17,6 +17,7 @@ OC.L10N.register(
     "Summary" : "Oppsumering",
     "Sharing" : "Deling",
     "Settings" : "Instillingar",
+    "Abort" : "Avbryt",
     "Date" : "Dato",
     "Time" : "Tid"
 },

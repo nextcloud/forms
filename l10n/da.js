@@ -120,6 +120,8 @@ OC.L10N.register(
     "There was an error while removing the question" : "Der opstod en fejl under fjernelse af spørgsmålet",
     "Error while saving form" : "Fejl under lagring af formularen",
     "Loading responses …" : "Indlæser svar...",
+    "No responses yet" : "Ingen svar endnu",
+    "Results of submitted forms will show up here" : "Resultaterne af indsendte formularer vises her",
     "{amount} responses" : "{amount} svar",
     "Summary" : "Oversigt",
     "Responses" : "Svar",
@@ -127,8 +129,6 @@ OC.L10N.register(
     "Save CSV to Files" : "Gem CSV i Filer",
     "Download CSV" : "Download CSV",
     "Delete all responses" : "Slet alle svar",
-    "No responses yet" : "Ingen svar endnu",
-    "Results of submitted forms will show up here" : "Resultaterne af indsendte formularer vises her",
     "There was an error while loading the results" : "Der opstod en fejl under indlæsning af resultaterne",
     "Export successful to {file}" : "Eksporten lykkedes til {file}",
     "There was an error, while exporting to Files" : "Der opstod en fejl under eksport til Filer",
@@ -142,6 +142,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Tak fordi du udfyldte formularen!",
     "Submit" : "Tilføj",
     "Submit form" : "Indsend formular",
+    "Abort" : "Afbryd",
     "You have unsaved changes! Do you still want to leave?" : "Du har ikke-gemte ændringer! Vil du stadig lukke?",
     "There was an error submitting the form" : "Der opstod en fejl under indsendelse af formularen",
     "Error while saving question" : "Der opstod en fejl under lagring af spørgsmål",
@@ -175,6 +176,9 @@ OC.L10N.register(
     "Time question title" : "Tid - spørgsmåls titel",
     "People can pick a time" : "Brugere kan vælge et tidspunkt",
     "Pick a time" : "Vælg et tidspunkt",
-    "Email address" : "Email adresse"
+    "Text" : "Tekst",
+    "Phone number" : "Telefonnummer",
+    "Email address" : "Email adresse",
+    "Number" : "Nummer"
 },
 "nplurals=2; plural=(n != 1);");

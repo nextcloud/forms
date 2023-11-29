@@ -12,6 +12,7 @@ OC.L10N.register(
     "Summary" : "සාරාංශය",
     "Responses" : "ප්‍රතිචාර",
     "Settings" : "සැකසුම්",
+    "Abort" : "රෝධනය",
     "Date" : "දිනය",
     "Time" : "වේලාව",
     "Phone number" : "දුරකථන අංකය"

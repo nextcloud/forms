@@ -118,6 +118,8 @@ OC.L10N.register(
     "There was an error while removing the question" : "Възникна грешка при премахването на въпроса",
     "Error while saving form" : "Грешка при записване на формуляра",
     "Loading responses …" : "Зареждане на отговори …",
+    "No responses yet" : "Все още няма отговори",
+    "Results of submitted forms will show up here" : "Резултатите от изпратените формуляри ще се покажат тук",
     "{amount} responses" : "{amount} отговори",
     "Summary" : "Резюме",
     "Responses" : "Отговори",
@@ -125,8 +127,6 @@ OC.L10N.register(
     "Save CSV to Files" : "Записване на CSV към Файлове",
     "Download CSV" : "Изтегляне на CSV",
     "Delete all responses" : "Изтриване на всички отговори",
-    "No responses yet" : "Все още няма отговори",
-    "Results of submitted forms will show up here" : "Резултатите от изпратените формуляри ще се покажат тук",
     "There was an error while loading the results" : "Възникна грешка при зареждането на резултатите",
     "Export successful to {file}" : "Успешен износ към {file}",
     "There was an error, while exporting to Files" : "Възникна грешка при изнасянето към Файлове",
@@ -172,6 +172,10 @@ OC.L10N.register(
     "Time" : "Час",
     "Time question title" : "Час на заглавие на въпроса",
     "People can pick a time" : "Хората могат да избират час",
-    "Pick a time" : "Изберете час"
+    "Pick a time" : "Изберете час",
+    "Text" : "Текст",
+    "Phone number" : "Телефонен номер",
+    "Email address" : "Имейл адрес",
+    "Number" : "Номер"
 },
 "nplurals=2; plural=(n != 1);");

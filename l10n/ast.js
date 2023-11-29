@@ -22,6 +22,7 @@ OC.L10N.register(
     "Settings" : "Configuración",
     "Submit" : "Unviar",
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
-    "Date" : "Data"
+    "Date" : "Data",
+    "Phone number" : "Númberu de teléfonu"
 },
 "nplurals=2; plural=(n != 1);");

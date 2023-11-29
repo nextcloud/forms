@@ -97,6 +97,8 @@ OC.L10N.register(
     "There was an error while removing the question" : "Σφάλμα κατά την αφαίρεση ερώτησης",
     "Error while saving form" : "Σφάλμα κατά την αποθήκευση της φόρμας",
     "Loading responses …" : "Φόρτωση απαντήσεων ...",
+    "No responses yet" : "Καμία απάντηση ακόμη",
+    "Results of submitted forms will show up here" : "Τα αποτελέσματα των φορμών θα εμφανίζονται εδώ",
     "{amount} responses" : "{amount} απαντήσεις",
     "Summary" : "Σύνοψη",
     "Responses" : "Απαντήσεις",
@@ -104,8 +106,6 @@ OC.L10N.register(
     "Save CSV to Files" : "Αποθήκευση CSV στα Αρχεία",
     "Download CSV" : "Λήψη CSV",
     "Delete all responses" : "Διαγραφή απαντήσεων",
-    "No responses yet" : "Καμία απάντηση ακόμη",
-    "Results of submitted forms will show up here" : "Τα αποτελέσματα των φορμών θα εμφανίζονται εδώ",
     "There was an error while loading the results" : "Υπήρξε σφάλμα κατά την φόρτωση των αποτελεσμάτων",
     "Export successful to {file}" : "Εξαγωγή επιτυχούς στο {file}",
     "There was an error, while exporting to Files" : "Υπήρξε σφάλμα κατά την εξαγωγή στα Αρχεία",
@@ -119,6 +119,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Σας ευχαριστούμε για την συμπλήρωση της φόρμας!",
     "Submit" : "Υποβολή",
     "Submit form" : "Υποβολή φόρμας",
+    "Abort" : "Ματαίωση",
     "There was an error submitting the form" : "Σφάλμα κατά την υποβολή της φόρμας",
     "Error while saving question" : "Σφάλμα κατά την αποθήκευση ερώτησης",
     "Form link copied" : "Ο σύνδεσμος φόρμας αντιγράφηκε",
@@ -149,6 +150,9 @@ OC.L10N.register(
     "Time question title" : "Τίτλος ερώτησης ώρας",
     "People can pick a time" : "Οι χρήστες μπορούν να επιλέξουν μια ώρα",
     "Pick a time" : "Επιλέξτε μια ώρα",
-    "Email address" : "Διεύθυνση αλληλογραφίας"
+    "Text" : "Κείμενο",
+    "Phone number" : "Αριθμός τηλεφώνου",
+    "Email address" : "Διεύθυνση αλληλογραφίας",
+    "Number" : "Αριθμός"
 },
 "nplurals=2; plural=(n != 1);");

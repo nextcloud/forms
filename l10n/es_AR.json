@@ -54,12 +54,12 @@
     "There was an error while removing the question" : "Hubo un error mientras se eliminaba la pregunta",
     "Error while saving form" : "Error mientras se guardaba el formulario",
     "Loading responses …" : "Cargando respuestas",
+    "No responses yet" : "Aún no han habido respuestas",
+    "Results of submitted forms will show up here" : "Los resultados de los formularios cargados se mostraran aquí",
     "Summary" : "Resumen",
     "Responses" : "Respuestas",
     "Options" : "Opciones",
     "Delete all responses" : "Borrar todas las respuestas",
-    "No responses yet" : "Aún no han habido respuestas",
-    "Results of submitted forms will show up here" : "Los resultados de los formularios cargados se mostraran aquí",
     "There was an error while removing this response" : "Hubo un error mientras se eliminaba esta respuesta",
     "Are you sure you want to delete all responses of {title}?" : "Estas seguro que deseas borrar todas las respuestas para {título}?",
     "There was an error while removing responses" : "Hubo un error mientras se eliminaban las respuestas",
@@ -69,6 +69,7 @@
     "Thank you for completing the form!" : "Gracias por completar el formulario!",
     "Submit" : "Enviar",
     "Submit form" : "Enviar formulario",
+    "Abort" : "Abortar",
     "There was an error submitting the form" : "Hubo un error al enviar el formulario",
     "Error while saving question" : "Hubo un error mientras se guardaba la pregunta",
     "Form link copied" : "Enlace del formulario copiado",
@@ -78,6 +79,7 @@
     "Long text" : "Texto largo",
     "Date" : "Fecha",
     "Time" : "Hora",
+    "Text" : "Texto",
     "Phone number" : "Número telefónico"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

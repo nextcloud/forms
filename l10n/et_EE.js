@@ -22,6 +22,7 @@ OC.L10N.register(
     "Sharing" : "Jagamine",
     "Settings" : "Seaded",
     "Submit" : "Saada",
+    "Abort" : "Katkesta",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "Date" : "Kuupäev",
     "Time" : "Aeg",

@@ -120,6 +120,8 @@ OC.L10N.register(
     "There was an error while removing the question" : "S'ha produït un error en suprimir la pregunta",
     "Error while saving form" : "S'ha produït un error en desar el formulari",
     "Loading responses …" : "Carregant les respostes …",
+    "No responses yet" : "Encara no hi ha respostes",
+    "Results of submitted forms will show up here" : "Els resultats dels formularis enviats es mostraran aquí",
     "{amount} responses" : "{amount} respostes",
     "Summary" : "Resum",
     "Responses" : "Respostes",
@@ -127,8 +129,6 @@ OC.L10N.register(
     "Save CSV to Files" : "Desa en format CSV a Fitxers",
     "Download CSV" : "Baixa en format CSV",
     "Delete all responses" : "Suprimeix totes les respostes",
-    "No responses yet" : "Encara no hi ha respostes",
-    "Results of submitted forms will show up here" : "Els resultats dels formularis enviats es mostraran aquí",
     "There was an error while loading the results" : "S'ha produït un error en carregar els resultats",
     "Export successful to {file}" : "S'ha exportat correctament a {file}",
     "There was an error, while exporting to Files" : "S'ha produït un error durant l'exportació a Fitxers",
@@ -142,6 +142,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Gràcies per emplenar el formulari!",
     "Submit" : "Envia",
     "Submit form" : "Envia el formulari",
+    "Abort" : "Cancel·la",
     "You have unsaved changes! Do you still want to leave?" : "Teniu canvis no desats! Encara vols marxar?",
     "There was an error submitting the form" : "S'ha produït un error en enviar el formulari",
     "Error while saving question" : "S'ha produït un error en desar la pregunta",
@@ -174,6 +175,10 @@ OC.L10N.register(
     "Time" : "Hora",
     "Time question title" : "Títol de la pregunta de temps",
     "People can pick a time" : "La gent pot triar un temps",
-    "Pick a time" : "Tria una hora"
+    "Pick a time" : "Tria una hora",
+    "Text" : "Text",
+    "Phone number" : "Telèfon",
+    "Email address" : "Adreça electrònica",
+    "Number" : "Número"
 },
 "nplurals=2; plural=(n != 1);");

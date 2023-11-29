@@ -19,6 +19,9 @@ OC.L10N.register(
     "Settings" : "Instellings",
     "Submit" : "Dien in",
     "Date" : "Datum",
-    "Time" : "Tyd"
+    "Time" : "Tyd",
+    "Text" : "Teks",
+    "Phone number" : "Foonnommer",
+    "Email address" : "E-posadres"
 },
 "nplurals=2; plural=(n != 1);");

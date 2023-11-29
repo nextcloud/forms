@@ -21,6 +21,7 @@ OC.L10N.register(
     "Options" : "Pilihan",
     "Sharing" : "Berbagi",
     "Settings" : "Setelan",
+    "Abort" : "Batal",
     "Date" : "Date",
     "Pick a date" : "Pilih tanggal",
     "Time" : "Waktu",

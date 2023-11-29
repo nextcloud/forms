@@ -13,6 +13,7 @@ OC.L10N.register(
     "Description" : "বিবরণ",
     "Sharing" : "ভাগাভাগিরত",
     "Settings" : "সেটিংস",
+    "Abort" : "বাতিল কর",
     "Date" : "Date",
     "Time" : "সময়"
 },
