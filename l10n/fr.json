@@ -74,6 +74,9 @@
     "Other:" : "Autre :",
     "Other" : "Autre",
     "A short answer for the question “{text}”" : "Une réponse courte à la question “{text}”",
+    "Input types (currently: {type})" : "Types de saisie (actuellement : {type})",
+    "Regular expression for input validation" : "Expression régulière pour validation de la saisie",
+    "Invalid regular expression" : "Expression régulière invalide",
     "No response" : "Sans réponse",
     "Delete this response" : "Supprimer cette réponse",
     "Store responses anonymously" : "Enregistrer les réponses anonymement",
@@ -151,6 +154,8 @@
     "Thank you for completing the form!" : "Merci d'avoir rempli ce formulaire!",
     "Submit" : "Envoyer",
     "Submit form" : "Envoyer le formulaire",
+    "Confirm submit" : "Confirmer la soumission",
+    "Are you sure you want to submit an empty form?" : "Êtes-vous sûr de vouloir soumettre un formulaire vide ?",
     "Abort" : "Annuler",
     "You have unsaved changes! Do you still want to leave?" : "Vous avez des modifications non enregistrées. Voulez-vous malgré tout quitter ?",
     "There was an error submitting the form" : "Une erreur est survenue lors de l'envoi du formulaire",
@@ -188,7 +193,18 @@
     "Pick a time" : "Choisissez une heure",
     "Text" : "Texte",
     "Phone number" : "Téléphone",
+    "The input is not a valid phone number" : "La saisie n'est pas un numéro de téléphone valide",
+    "People can enter a telephone number" : "Les répondants peuvent saisir un numéro de téléphone",
+    "Enter a telephone number" : "Saisissez un numéro de téléphone",
     "Email address" : "Adresse e-mail",
-    "Number" : "Nombre"
+    "The input is not a valid email address" : "La saisie n'est pas une adresse e-mail valide",
+    "People can enter an email address" : "Les répondants peuvent saisir une adresse e-mail",
+    "Enter an email address" : "Saisissez une adresse e-mail",
+    "Number" : "Nombre",
+    "The input is not a valid number" : "La saisie n'est pas un numéro valide",
+    "People can enter a number" : "Les répondants peuvent saisir un nombre",
+    "Enter a number" : "Saisissez un nombre",
+    "Custom regular expression" : "Expression régulière personnalisée",
+    "The input does not match the required pattern" : "La saisie ne correspond pas au motif exigé"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

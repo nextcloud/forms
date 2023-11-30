@@ -156,6 +156,8 @@ OC.L10N.register(
     "Thank you for completing the form!" : "感謝您填寫表單！",
     "Submit" : "送出",
     "Submit form" : "遞交表單",
+    "Confirm submit" : "確認遞交",
+    "Are you sure you want to submit an empty form?" : "您確定您想要遞交空的表單嗎？",
     "Abort" : "中斷",
     "You have unsaved changes! Do you still want to leave?" : "您有未儲存的變更！您仍然想離開嗎？",
     "There was an error submitting the form" : "遞交表單時發生錯誤",

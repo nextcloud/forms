@@ -156,6 +156,8 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Děkujeme za vyplnění formuláře!",
     "Submit" : "Odeslat",
     "Submit form" : "Odeslat formulář",
+    "Confirm submit" : "Potvrdit odeslání",
+    "Are you sure you want to submit an empty form?" : "Opravdu chcete odeslat nevyplněný formulář?",
     "Abort" : "Přerušit",
     "You have unsaved changes! Do you still want to leave?" : "Jsou zde neuložené změny! Opravdu chcete odejít?",
     "There was an error submitting the form" : "Při odesílání formuláře došlo k chybě",

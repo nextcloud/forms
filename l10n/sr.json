@@ -74,6 +74,9 @@
     "Other:" : "Остало:",
     "Other" : "Остали",
     "A short answer for the question “{text}”" : "Кратки одговор на питање „{text}”",
+    "Input types (currently: {type})" : "Типови уноса (тренутно: {type})",
+    "Regular expression for input validation" : "Регуларни израз за проверу исправности уноса",
+    "Invalid regular expression" : "Неисправан регуларни израз",
     "No response" : "Нема одговора",
     "Delete this response" : "Обриши овај одговор",
     "Store responses anonymously" : "Чувај одговоре анонимно",
@@ -151,6 +154,8 @@
     "Thank you for completing the form!" : "Хвала вам што се попунили упитник!",
     "Submit" : "Пошаљи",
     "Submit form" : "Поднеси упитник",
+    "Confirm submit" : "Потврдите предавање",
+    "Are you sure you want to submit an empty form?" : "Да ли заиста желите да предате празан формулар?",
     "Abort" : "Прекини",
     "You have unsaved changes! Do you still want to leave?" : "Имате несачуване измене! Да ли још увек желите да напустите?",
     "There was an error submitting the form" : "Дошло је до грешке током подношења упитника",
@@ -188,7 +193,18 @@
     "Pick a time" : "Изаберите време",
     "Text" : "Текст",
     "Phone number" : "Број телефона",
+    "The input is not a valid phone number" : "Унос није исправан телефонски број",
+    "People can enter a telephone number" : "Људи могу унети телефонски број",
+    "Enter a telephone number" : "Унесите телефонски број",
     "Email address" : "Адреса е-поште",
-    "Number" : "Број"
+    "The input is not a valid email address" : "Унос није исправна и-мејл адреса",
+    "People can enter an email address" : "Људи могу унети и-мејл адресу",
+    "Enter an email address" : "Унесите и-мејл адресу",
+    "Number" : "Број",
+    "The input is not a valid number" : "Унос није исправан број",
+    "People can enter a number" : "Људи могу унети број",
+    "Enter a number" : "Унесите број",
+    "Custom regular expression" : "Произвољни регуларни израз",
+    "The input does not match the required pattern" : "Унос не задовољава тражени шаблон"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
 }
