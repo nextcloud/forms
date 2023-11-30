@@ -87,35 +87,21 @@ export default {
 		/**
 		 * Similar procedures on**Change:
 		 *
-		 * - Show corresponding switch as loading
 		 * - Update value via api
-		 * - Only after everything is done (incl. possible reload on failure), unset loading.
 		 *
 		 * @param {boolean|Array} newVal The resp. new Value to store.
 		 */
 		async onRestrictCreationChange(newVal) {
-			const el = this.$refs.switchRestrictCreation
-			el.loading = true
 			await this.saveAppConfig('restrictCreation', newVal)
-			el.loading = false
 		},
 		async onCreationAllowedGroupsChange(newVal) {
-			const el = this.$refs.switchRestrictCreation
-			el.loading = true
 			await this.saveAppConfig('creationAllowedGroups', newVal.map(group => group.groupId))
-			el.loading = false
 		},
 		async onAllowPublicLinkChange(newVal) {
-			const el = this.$refs.switchAllowPublicLink
-			el.loading = true
 			await this.saveAppConfig('allowPublicLink', newVal)
-			el.loading = false
 		},
 		async onAllowPermitAllChange(newVal) {
-			const el = this.$refs.switchAllowPermitAll
-			el.loading = true
 			await this.saveAppConfig('allowPermitAll', newVal)
-			el.loading = false
 		},
 
 		/**
