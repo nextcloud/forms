@@ -154,6 +154,8 @@
     "Thank you for completing the form!" : "Grazas por completar o formulario.",
     "Submit" : "Enviar",
     "Submit form" : "Enviar o formulario",
+    "Confirm submit" : "Confirmar o envío",
+    "Are you sure you want to submit an empty form?" : "Confirma que quere enviar un formulario baleiro?",
     "Abort" : "Interromper",
     "You have unsaved changes! Do you still want to leave?" : "Ten cambios sen gardar. Está seguro de querer marchar?",
     "There was an error submitting the form" : "Produciuse un erro no envío do formulario",

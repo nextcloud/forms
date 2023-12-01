@@ -74,6 +74,9 @@
     "Other:" : "Other:",
     "Other" : "Other",
     "A short answer for the question “{text}”" : "A short answer for the question “{text}”",
+    "Input types (currently: {type})" : "Input types (currently: {type})",
+    "Regular expression for input validation" : "Regular expression for input validation",
+    "Invalid regular expression" : "Invalid regular expression",
     "No response" : "No response",
     "Delete this response" : "Delete this response",
     "Store responses anonymously" : "Store responses anonymously",
@@ -151,6 +154,8 @@
     "Thank you for completing the form!" : "Thank you for completing the form!",
     "Submit" : "Submit",
     "Submit form" : "Submit form",
+    "Confirm submit" : "Confirm submit",
+    "Are you sure you want to submit an empty form?" : "Are you sure you want to submit an empty form?",
     "Abort" : "Abort",
     "You have unsaved changes! Do you still want to leave?" : "You have unsaved changes! Do you still want to leave?",
     "There was an error submitting the form" : "There was an error submitting the form",
@@ -188,7 +193,18 @@
     "Pick a time" : "Pick a time",
     "Text" : "Text",
     "Phone number" : "Phone number",
+    "The input is not a valid phone number" : "The input is not a valid phone number",
+    "People can enter a telephone number" : "People can enter a telephone number",
+    "Enter a telephone number" : "Enter a telephone number",
     "Email address" : "Email address",
-    "Number" : "Number"
+    "The input is not a valid email address" : "The input is not a valid email address",
+    "People can enter an email address" : "People can enter an email address",
+    "Enter an email address" : "Enter an email address",
+    "Number" : "Number",
+    "The input is not a valid number" : "The input is not a valid number",
+    "People can enter a number" : "People can enter a number",
+    "Enter a number" : "Enter a number",
+    "Custom regular expression" : "Custom regular expression",
+    "The input does not match the required pattern" : "The input does not match the required pattern"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
