@@ -151,7 +151,7 @@ OC.L10N.register(
     "Settings" : "Налаштування",
     "Submitting form …" : "Відправлення форми...",
     "Thank you for completing the form!" : "Дякуємо за заповнену форму!",
-    "Submit" : "Продовжити",
+    "Submit" : "Відправити",
     "Submit form" : "Надіслати форму",
     "Abort" : "Скасування",
     "You have unsaved changes! Do you still want to leave?" : "Наявні незбережені зміни! Ви справді хочете залишити сторінку?",
