@@ -153,7 +153,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Дякуємо за заповнену форму!",
     "Submit" : "Відправити",
     "Submit form" : "Надіслати форму",
-    "Abort" : "Скасування",
+    "Abort" : "Скасувати",
     "You have unsaved changes! Do you still want to leave?" : "Наявні незбережені зміни! Ви справді хочете залишити сторінку?",
     "There was an error submitting the form" : "Виникла помилка при відправленні форми",
     "Error while saving question" : "Помилка при збереженні запитання",
@@ -189,6 +189,7 @@ OC.L10N.register(
     "People can pick a time" : "Респондент може вибрати час",
     "Pick a time" : "Вибрати час",
     "Text" : "Текст",
+    "Enter a telephone number" : "Зазначте номер телефону",
     "Email address" : "Адреса ел.пошти",
     "Number" : "Номер"
 },
