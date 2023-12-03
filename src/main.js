@@ -24,14 +24,14 @@
 import { generateFilePath } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
 import { translate, translatePlural } from '@nextcloud/l10n'
-import '@nextcloud/dialogs/dist/index.css'
-
-import Vue from 'vue'
 
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip.js'
+import Vue from 'vue'
 
 import router from './router.js'
 import Forms from './Forms.vue'
+
+import '@nextcloud/dialogs/style.css'
 
 Vue.directive('tooltip', Tooltip)
 
