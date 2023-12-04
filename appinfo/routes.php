@@ -32,12 +32,6 @@ return [
 			'url' => '/config',
 			'verb' => 'GET'
 		],
-		// TODO: Remove POST in next API release
-		[
-			'name' => 'config#updateAppConfig',
-			'url' => '/config/update',
-			'verb' => 'POST'
-		],
 		[
 			'name' => 'config#updateAppConfig',
 			'url' => '/config/update',
