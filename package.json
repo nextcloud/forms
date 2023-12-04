@@ -52,6 +52,7 @@
     "npm": "^9.0.0"
   },
   "devDependencies": {
+    "@mdi/svg": "^7.3.67",
     "@nextcloud/babel-config": "^1.0.0",
     "@nextcloud/browserslist-config": "^3.0.0",
     "@nextcloud/eslint-config": "^8.3.0",
