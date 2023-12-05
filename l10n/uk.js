@@ -2,8 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Форми",
-    "{user} has shared the form {formTitle} with you" : "{user} поділився формою {formTitle} з вами",
-    "{user} has shared the form {formTitle} with group {group}" : "{user} поділився формою {formTitle} з групою {group}",
+    "{user} has shared the form {formTitle} with you" : "{user} поділив(-ла-)ся з вами формою {formTitle}",
+    "{user} has shared the form {formTitle} with group {group}" : "{user} поділив(-ла-)ся формою {formTitle} з групою {group}",
     "{user} has shared the form {formTitle} with circle {circle}" : "{user} поділився формою {formTitle} з колом {circle}",
     "{user} answered your form {formTitle}" : "{user} заповнив вашу форму {formTitle}",
     "Anonymous user" : "Анонімний користувач",
