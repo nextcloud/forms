@@ -126,7 +126,7 @@ export default {
 		 */
 		async saveAppConfig(configKey, configValue) {
 			try {
-				await axios.post(generateUrl('apps/forms/config/update'), {
+				await axios.patch(generateUrl('apps/forms/config/update'), {
 					configKey,
 					configValue,
 				})

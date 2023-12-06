@@ -3,6 +3,7 @@
  * @copyright Copyright (c] 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
  * @author affan98 <affan98@gmail.com>
+ * @author Christian Hartmann <chris-hartmann@gmx.de>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
@@ -34,7 +35,7 @@ return [
 		[
 			'name' => 'config#updateAppConfig',
 			'url' => '/config/update',
-			'verb' => 'POST'
+			'verb' => 'PATCH'
 		],
 
 		// Public Share Link
@@ -72,7 +73,7 @@ return [
 			'verb' => 'OPTIONS',
 			'requirements' => [
 				'path' => '.+',
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 
@@ -82,7 +83,7 @@ return [
 			'url' => '/api/{apiVersion}/forms',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -90,7 +91,7 @@ return [
 			'url' => '/api/{apiVersion}/form',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -98,7 +99,7 @@ return [
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -106,15 +107,24 @@ return [
 			'url' => '/api/{apiVersion}/form/clone/{id}',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
+		// TODO: Remove POST in next API release
 		[
 			'name' => 'api#updateForm',
 			'url' => '/api/{apiVersion}/form/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
+			]
+		],
+		[
+			'name' => 'api#updateForm',
+			'url' => '/api/{apiVersion}/form/update',
+			'verb' => 'PATCH',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
 			]
 		],
 		[
@@ -122,7 +132,7 @@ return [
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -130,7 +140,7 @@ return [
 			'url' => '/api/{apiVersion}/partial_form/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -138,7 +148,7 @@ return [
 			'url' => '/api/{apiVersion}/shared_forms',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 
@@ -148,23 +158,41 @@ return [
 			'url' => '/api/{apiVersion}/question',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
+		// TODO: Remove POST in next API release
 		[
 			'name' => 'api#updateQuestion',
 			'url' => '/api/{apiVersion}/question/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
+		[
+			'name' => 'api#updateQuestion',
+			'url' => '/api/{apiVersion}/question/update',
+			'verb' => 'PATCH',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
+			]
+		],
+		// TODO: Remove POST in next API release
 		[
 			'name' => 'api#reorderQuestions',
 			'url' => '/api/{apiVersion}/question/reorder',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
+			]
+		],
+		[
+			'name' => 'api#reorderQuestions',
+			'url' => '/api/{apiVersion}/question/reorder',
+			'verb' => 'PUT',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
 			]
 		],
 		[
@@ -172,7 +200,7 @@ return [
 			'url' => '/api/{apiVersion}/question/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 
@@ -182,15 +210,24 @@ return [
 			'url' => '/api/{apiVersion}/option',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
+		// TODO: Remove POST in next API release
 		[
 			'name' => 'api#updateOption',
 			'url' => '/api/{apiVersion}/option/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
+			]
+		],
+		[
+			'name' => 'api#updateOption',
+			'url' => '/api/{apiVersion}/option/update',
+			'verb' => 'PATCH',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
 			]
 		],
 		[
@@ -198,7 +235,7 @@ return [
 			'url' => '/api/{apiVersion}/option/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 
@@ -208,7 +245,7 @@ return [
 			'url' => '/api/{apiVersion}/share',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -216,15 +253,24 @@ return [
 			'url' => '/api/{apiVersion}/share/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
+		// TODO: Remove POST in next API release
 		[
 			'name' => 'shareApi#updateShare',
 			'url' => '/api/{apiVersion}/share/update',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2.1'
+			]
+		],
+		[
+			'name' => 'shareApi#updateShare',
+			'url' => '/api/{apiVersion}/share/update',
+			'verb' => 'PATCH',
+			'requirements' => [
+				'apiVersion' => 'v2.2'
 			]
 		],
 
@@ -234,7 +280,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -242,7 +288,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/export/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -250,7 +296,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/export',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -258,7 +304,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/{formId}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -266,7 +312,7 @@ return [
 			'url' => '/api/{apiVersion}/submission/insert',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 		[
@@ -274,7 +320,7 @@ return [
 			'url' => '/api/{apiVersion}/submission/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.1)?'
+				'apiVersion' => 'v2(\.[1-2])?'
 			]
 		],
 	]
