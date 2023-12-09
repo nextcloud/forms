@@ -35,7 +35,7 @@
     "@nextcloud/vue": "^7.12.7",
     "crypto-js": "^4.2.0",
     "debounce": "^2.0.0",
-    "markdown-it": "^13.0.2",
+    "markdown-it": "^14.0.0",
     "p-debounce": "^4.0.0",
     "p-queue": "^7.4.1",
     "v-click-outside": "^3.2.0",
