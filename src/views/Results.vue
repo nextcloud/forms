@@ -168,7 +168,6 @@ import PermissionTypes from '../mixins/PermissionTypes.js'
 
 const picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
 	.setMultiSelect(false)
-	.setModal(true)
 	.setType(1)
 	.allowDirectories()
 	.build()
