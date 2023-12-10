@@ -13,6 +13,7 @@ OC.L10N.register(
     "Description" : "Açıqlanma",
     "Sharing" : "Paylaşılır",
     "Settings" : "Quraşdırmalar",
+    "Abort" : "Durdur",
     "Date" : "Date",
     "Time" : "Vaxt"
 },
