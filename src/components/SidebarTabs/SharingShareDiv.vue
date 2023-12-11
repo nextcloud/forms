@@ -35,6 +35,9 @@
 			<NcActionCheckbox :checked="canAccessResults" @update:checked="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>
+			<NcActionCheckbox :checked="canDeleteResults" :disabled="!canAccessResults" @update:checked="updatePermissionDeleteResults">
+				{{ t('forms', 'Delete responses') }}
+			</NcActionCheckbox>
 			<NcActionSeparator />
 			<NcActionButton @click="removeShare">
 				<template #icon>
@@ -82,6 +85,9 @@ export default {
 		canAccessResults() {
 			return this.share.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
 		},
+		canDeleteResults() {
+			return this.share.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE)
+		},
 		isNoUser() {
 			return this.share.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
 		},
@@ -109,7 +115,18 @@ export default {
 		 * @param {boolean} hasPermission If the results permission should be granted
 		 */
 		updatePermissionResults(hasPermission) {
+			if (hasPermission === false) {
+				// ensure to remove the delete permission if results permission is dropped
+				this.updatePermission(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE, false)
+			}
 			return this.updatePermission(this.PERMISSION_TYPES.PERMISSION_RESULTS, hasPermission)
+		},
+
+		/**
+		 * @param {boolean} hasPermission If the results_delete permission should be granted
+		 */
+		updatePermissionDeleteResults(hasPermission) {
+			return this.updatePermission(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE, hasPermission)
 		},
 
 		/**

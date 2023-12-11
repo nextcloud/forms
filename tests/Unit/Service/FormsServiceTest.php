@@ -666,6 +666,73 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->canSeeResults($form));
 	}
 
+	public function dataCanDeleteResults() {
+		return [
+			'allowFormOwner' => [
+				'ownerId' => 'currentUser',
+				'sharesArray' => [],
+				'expected' => true
+			],
+			'allowShared' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [[
+					'with' => 'currentUser',
+					'type' => 0,
+					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS, Constants::PERMISSION_RESULTS_DELETE],
+				]],
+				'expected' => true
+			],
+			'disallowNotowned' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [],
+				'expected' => false
+			],
+			'allowNotShared' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [[
+					'with' => 'currentUser',
+					'type' => 0,
+					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS],
+				]],
+				'expected' => false
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataCanDeleteResults
+	 *
+	 * @param string $ownerId
+	 * @param array $sharesArray
+	 * @param bool $expected
+	 */
+	public function testCanDeleteResults(string $ownerId, array $sharesArray, bool $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId($ownerId);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+
+		$shares = [];
+		foreach ($sharesArray as $id => $share) {
+			$shareEntity = new Share();
+			$shareEntity->setId($id);
+			$shareEntity->setFormId(42);
+			$shareEntity->setShareType($share['type']);
+			$shareEntity->setShareWith($share['with']);
+			$shareEntity->setPermissions($share['permissions']);
+			$shares[] = $shareEntity;
+		}
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn($shares);
+
+		$this->assertEquals($expected, $this->formsService->canDeleteResults($form));
+	}
+
 	public function dataCanSubmit() {
 		return [
 			'allowFormOwner' => [

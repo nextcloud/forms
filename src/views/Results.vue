@@ -275,6 +275,7 @@ export default {
 
 			try {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/submission/{id}', { id }))
+				showSuccess(t('forms', 'Submission deleted'))
 				const index = this.form.submissions.findIndex(search => search.id === id)
 				this.form.submissions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
