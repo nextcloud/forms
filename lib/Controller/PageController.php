@@ -54,74 +54,21 @@ use Psr\Log\LoggerInterface;
 class PageController extends Controller {
 	private const TEMPLATE_MAIN = 'main';
 
-	protected $appName;
-
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var ShareMapper */
-	private $shareMapper;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var FormsService */
-	private $formsService;
-
-	/** @var IAccountManager */
-	protected $accountManager;
-
-	/** @var IInitialState */
-	private $initialState;
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IRequest */
-	protected $request;
-
-	/** @var IUrlGenerator */
-	private $urlGenerator;
-
-	/** @var IUserManager */
-	private $userManager;
-	
-	/** @var IUserSession */
-	private $userSession;
-
 	public function __construct(string $appName,
 		IRequest $request,
-		FormMapper $formMapper,
-		ShareMapper $shareMapper,
-		ConfigService $configService,
-		FormsService $formsService,
-		IAccountManager $accountManager,
-		IInitialState $initialState,
-		IL10N $l10n,
-		LoggerInterface $logger,
-		IUrlGenerator $urlGenerator,
-		IUserManager $userManager,
-		IUserSession $userSession) {
+		private FormMapper $formMapper,
+		private ShareMapper $shareMapper,
+		private ConfigService $configService,
+		private FormsService $formsService,
+		private IAccountManager $accountManager,
+		private IInitialState $initialState,
+		private IL10N $l10n,
+		private LoggerInterface $logger,
+		private IUrlGenerator $urlGenerator,
+		private IUserManager $userManager,
+		private IUserSession $userSession,
+	) {
 		parent::__construct($appName, $request);
-
-		$this->appName = $appName;
-
-		$this->formMapper = $formMapper;
-		$this->shareMapper = $shareMapper;
-		$this->configService = $configService;
-		$this->formsService = $formsService;
-
-		$this->accountManager = $accountManager;
-		$this->initialState = $initialState;
-		$this->l10n = $l10n;
-		$this->logger = $logger;
-		$this->request = $request;
-		$this->urlGenerator = $urlGenerator;
-		$this->userManager = $userManager;
-		$this->userSession = $userSession;
 	}
 
 	/**
@@ -133,6 +80,7 @@ class PageController extends Controller {
 	public function index(): TemplateResponse {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
+		Util::addStyle($this->appName, 'forms-style');
 		$this->insertHeaderOnIos();
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
@@ -244,6 +192,7 @@ class PageController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function provideTemplate(string $template, Form $form = null, array $options = []): TemplateResponse {
+		Util::addStyle($this->appName, 'forms-style');
 		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {
 			Util::addStyle($this->appName, 'public');
