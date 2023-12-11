@@ -204,7 +204,7 @@ class PageController extends Controller {
 			// Set Header
 			$response->setHeaderTitle($this->l10n->t('Forms'));
 			if ($form !== null) {
-				$response->setHeaderTitle($form->getTitle());
+				$response->setHeaderTitle($this->l10n->t('Forms') . ' · ' . $form->getTitle());
 
 				// Get owner and check display name privacy settings
 				$owner = $this->userManager->get($form->getOwnerId());
