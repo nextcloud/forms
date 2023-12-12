@@ -1,5 +1,29 @@
 # Changelog
 
+## v4.0.0 - 2023-12-12
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.0...v4.0.0)
+
+### Enhancements
+- transfer ownership of a form [\#1416](https://github.com/nextcloud/forms/pull/1416) ([hamza221](https://github.com/hamza221))
+- Add Forms to header title on public link view [\#1828](https://github.com/nextcloud/forms/pull/1828) ([Chartman123](https://github.com/Chartman123))
+- Allow to set `results_delete` permission on the frontend [\#1805](https://github.com/nextcloud/forms/pull/1805) ([susnux](https://github.com/susnux))
+- use PUT/PATCH for updating and move to API v2.2 [\#1809](https://github.com/nextcloud/forms/pull/1809) ([Chartman123](https://github.com/Chartman123))
+- Show confirmation dialog before submitting an empty form [\#1803](https://github.com/nextcloud/forms/pull/1803) ([susnux](https://github.com/susnux))
+- Move away from deprecated icon classes and allow to search user by email [\#1802](https://github.com/nextcloud/forms/pull/1802) ([susnux](https://github.com/susnux))
+
+### Fixed
+- Remove deprecated setModal [\#1826](https://github.com/nextcloud/forms/pull/1826) ([hamza221](https://github.com/hamza221))
+- fix(QuestionMultiple): Fix setting the `allowOtherAnswer` option [\#1800](https://github.com/nextcloud/forms/pull/1800) ([susnux](https://github.com/susnux))
+- Fix missing column in DataStructure.md [\#1791](https://github.com/nextcloud/forms/pull/1791) ([Chartman123](https://github.com/Chartman123))
+- fix: add canMoveUp/Down props to QuestionMixin [\#1806](https://github.com/nextcloud/forms/pull/1806) ([Chartman123](https://github.com/Chartman123
+
+### Merged
+- Migrate from webpack to vite for building the frontend [\#1827](https://github.com/nextcloud/forms/pull/1827) ([susnux](https://github.com/susnux))))
+- Make components compatible to nextcloud-vue 8 [\#1696](https://github.com/nextcloud/forms/pull/1696) ([Chartman123](https://github.com/Chartman123))
+- Min server 28 [\#1796](https://github.com/nextcloud/forms/pull/1796) ([Chartman123](https://github.com/Chartman123))
+
+
 ## v3.4.0 - 2023-11-27
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.3.1...v3.4.0)

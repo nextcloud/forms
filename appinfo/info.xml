@@ -13,13 +13,14 @@
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 	]]></description>
 
-	<version>4.0.0-alpha.2</version>
+	<version>4.0.0</version>
 	<licence>agpl</licence>
 
 	<author>Affan Hussain</author>
 	<author>Ajfar Huq</author>
 	<author>Christian Hartmann</author>
 	<author>Ferdinand Thiessen</author>
+	<author>Hamza Mahjoubi</author>
 	<author>Inigo Jiron</author>
 	<author>Jan C. Borchardt</author>
 	<author>John Molakvoæ</author>
