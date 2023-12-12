@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.4.3 - 2023-12-12
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.2...v3.4.3)
+
+### Enhancements
+- [stable3] enh: Add Forms to header title on public link view [\#1829](https://github.com/nextcloud/forms/pull/1829) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+- [stable3] enh(sharing): Move away from deprecated icon classes and allow to search user by email [\#1808](https://github.com/nextcloud/forms/pull/1808) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+
+
 ## v3.4.2 - 2023-11-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.1...v3.4.2)
