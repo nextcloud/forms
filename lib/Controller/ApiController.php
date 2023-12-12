@@ -51,6 +51,7 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCSController;
+use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -349,6 +350,50 @@ class ApiController extends OCSController {
 		$this->formsService->setLastUpdatedTimestamp($id);
 
 		return new DataResponse($form->getId());
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Transfer ownership of a form to another user
+	 *
+	 * @param int $formId id of the form to update
+	 * @param string $uid id of the new owner
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function transferOwner(int $formId, string $uid): DataResponse {
+		$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
+			'formId' => $formId,
+			'uid' => $uid
+		]);
+
+		try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new NotFoundException('Could not find form');
+		}
+
+		$user = $this->userManager->get($uid);
+		if($user == null) {
+			$this->logger->debug('Could not find new form owner');
+			throw new OCSBadRequestException('Could not find new form owner');
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException('This form is not owned by the current user');
+		}
+
+		// update form owner
+		$form->setOwnerId($uid);
+
+		// Update changed Columns in Db.
+		$this->formMapper->update($form);
+		
+		return new DataResponse($form->getOwnerId());
 	}
 
 	/**
