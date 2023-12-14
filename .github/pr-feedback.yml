@@ -1,4 +1,4 @@
-ame: 'Ask for feedback on PRs'
+name: 'Ask for feedback on PRs'
 on:
   schedule:
     - cron: '30 1 * * *'
