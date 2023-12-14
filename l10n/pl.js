@@ -94,6 +94,7 @@ OC.L10N.register(
     "There was an error while adding the share" : "Wystąpił błąd podczas dodawania udostępnienia",
     "There was an error while adding the link" : "Wystąpił błąd podczas dodawania linku",
     "There was an error while removing the share" : "Wystąpił błąd podczas usuwania udostępnienia",
+    "Transfer ownership" : "Przeniesienie własności",
     "View form" : "Zobacz formularz",
     "View" : "Podgląd",
     "Edit" : "Edytuj",

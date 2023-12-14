@@ -97,6 +97,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Det uppstod ett fel när länken lades till",
     "There was an error while updating the share" : "Det uppstod ett fel när delingen skulle uppdateras",
     "There was an error while removing the share" : "Det uppstod ett fel när delningen skulle tas bort",
+    "Transfer ownership" : "Överför ägarskap",
     "View form" : "Visa formulär",
     "View" : "Visa",
     "Edit" : "Ändra",

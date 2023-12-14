@@ -100,6 +100,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Errore bat gertatu da esteka gehitzean",
     "There was an error while updating the share" : "Errorea gertatu da partekatzea eguneratzean",
     "There was an error while removing the share" : "Errore bat gertatu da partekatzea kentzean",
+    "Transfer ownership" : "Jabetzaren transferentzia",
     "View form" : "Ikusi formularioa",
     "View" : "Ikusi",
     "Edit" : "Aldatu",

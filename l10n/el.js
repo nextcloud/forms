@@ -79,6 +79,7 @@ OC.L10N.register(
     "Remove Legacy Link" : "Αφαίρεση του συνδέσμου παλαιού τύπου",
     "Internal link" : "Εσωτερικός σύνδεσμος",
     "Show to all accounts on sidebar" : "Εμφάνιση σε όλους τους λογαριασμούς στην πλαϊνή γραμμή",
+    "Transfer ownership" : "Μεταβίβαση κυριότητας",
     "View form" : "Προβολή φόρμας",
     "View" : "Προβολή",
     "Edit" : "Επεξεργασία",

@@ -114,6 +114,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Produciuse un erro ao engadir a ligazón",
     "There was an error while updating the share" : "Produciuse un erro ao actualizar a compartición",
     "There was an error while removing the share" : "Produciuse un erro ao retirar a compartición",
+    "Transfer ownership" : "Transferir a propiedade",
     "View form" : "Ver formulario",
     "View" : "Ver",
     "Edit" : "Editar",

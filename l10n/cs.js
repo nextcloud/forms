@@ -113,6 +113,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Při přidávání odkazu došlo k chybě",
     "There was an error while updating the share" : "Při aktualizování sdílení došlo k chybě",
     "There was an error while removing the share" : "Při odebírání sdílení došlo k chybě",
+    "Transfer ownership" : "Převést vlastnictví",
     "View form" : "Zobrazit formulář",
     "View" : "Zobrazit",
     "Edit" : "Upravit",

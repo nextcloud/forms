@@ -77,6 +77,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Copia negli appunti",
     "Remove link" : "Rimuovi collegamento",
     "Internal link" : "Collegamento interno ",
+    "Transfer ownership" : "Trasferisci la proprietà",
     "View form" : "Visualizza il modulo",
     "View" : "Visualizza",
     "Edit" : "Modifica",

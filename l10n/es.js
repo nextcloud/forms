@@ -110,6 +110,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Ha habido un error al añadir el enlace",
     "There was an error while updating the share" : "Ocurrió un error al actualizar el recurso compartido",
     "There was an error while removing the share" : "Ha habido un error al eliminar el compartido",
+    "Transfer ownership" : "ransferencia",
     "View form" : "Ver formulario",
     "View" : "Ver",
     "Edit" : "Editar",

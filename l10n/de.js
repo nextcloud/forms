@@ -113,6 +113,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Es ist ein Fehler beim Hinzufügen des Links aufgetreten.",
     "There was an error while updating the share" : "Fehler beim Aktualisieren der Freigabe",
     "There was an error while removing the share" : "Es ist ein Fehler beim Entfernen der Freigabe aufgetreten.",
+    "Transfer ownership" : "Besitz übertragen",
     "View form" : "Formular ansehen",
     "View" : "Ansehen",
     "Edit" : "Bearbeiten",

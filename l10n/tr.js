@@ -113,6 +113,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "Bağlantı eklenirken bir sorun çıktı",
     "There was an error while updating the share" : "Paylaşım güncellenirken bir sorun çıktı",
     "There was an error while removing the share" : "Paylaşım kaldırılırken bir sorun çıktı",
+    "Transfer ownership" : "Sahipliği aktar",
     "View form" : "Formu görüntüle",
     "View" : "Görüntüle",
     "Edit" : "Düzenle",

@@ -102,6 +102,7 @@ OC.L10N.register(
     "There was an error while adding the link" : "新建链接时发生错误",
     "There was an error while updating the share" : "更新分享时发生错误",
     "There was an error while removing the share" : "移除分享时发生错误",
+    "Transfer ownership" : "所有权转让",
     "View form" : "查看表单",
     "View" : "查看",
     "Edit" : "编辑",
