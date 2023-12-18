@@ -96,8 +96,8 @@
 						:index="index + 1"
 						:max-string-lengths="maxStringLengths"
 						v-bind.sync="form.questions[index]"
+						@clone="cloneQuestion(question)"
 						@delete="deleteQuestion(question)"
-						@duplicate="duplicateQuestion(question)"
 						@move-down="onMoveDown(index)"
 						@move-up="onMoveUp(index)" />
 				</transition-group>
@@ -395,15 +395,15 @@ export default {
 		},
 
 		/**
-		 * Duplicate a question
+		 * Clone a question
 		 *
-		 * @param {number} id the question id to duplicate in the current form
+		 * @param {number} id the question id to clone in the current form
 		 */
-		async duplicateQuestion({ id }) {
+		async cloneQuestion({ id }) {
 			this.isLoadingQuestions = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/question/clone/{id}', { id }))
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.3/question/clone/{id}', { id }))
 				const question = OcsResponse2Data(response)
 
 				this.form.questions.push(Object.assign({

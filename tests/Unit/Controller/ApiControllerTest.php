@@ -51,6 +51,7 @@ use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
+use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
@@ -59,10 +60,12 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCA\Forms\Tests\Unit\MockedMapperException;
+use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IUser;
@@ -563,6 +566,21 @@ class ApiControllerTest extends TestCase {
 		$this->formsService
 			->method('canSubmit')
 			->willReturn($canSubmit);
+	}
+
+	public function testCloneQuestion_notFound() {
+		$this->questionMapper->method('findById')->with(42)->willThrowException($this->createMock(IMapperException::class));
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->cloneQuestion(42);
+	}
+
+	public function testCloneQuestion_noPermission() {
+		$form = Form::fromParams(['ownerId' => 'otherUser']);
+		$question = Question::fromParams(['formId' => 1]);
+		$this->questionMapper->method('findById')->with(42)->willReturn($question);
+		$this->formMapper->method('findById')->with(1)->willReturn($form);
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->cloneQuestion(42);
 	}
 
 	public function testInsertSubmission_answers() {

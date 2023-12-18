@@ -50,6 +50,7 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
@@ -717,14 +718,14 @@ class ApiController extends OCSController {
 	 * @CORS
 	 * @NoAdminRequired
 	 *
-	 * Duplicate a question
+	 * Clone a question
 	 *
 	 * @param int $id the question id
 	 * @return DataResponse
 	 * @throws OCSBadRequestException|OCSForbiddenException
 	 */
-	public function duplicateQuestion(int $id): DataResponse {
-		$this->logger->debug('Question to be duplicated: {id}', [
+	public function cloneQuestion(int $id): DataResponse {
+		$this->logger->debug('Question to be cloned: {id}', [
 			'id' => $id
 		]);
 
@@ -734,7 +735,7 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findById($sourceQuestion->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or question');
-			throw new OCSBadRequestException('Could not find form or question');
+			throw new OCSNotFoundException('Could not find form or question');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {

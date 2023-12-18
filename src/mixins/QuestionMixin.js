@@ -201,8 +201,8 @@ export default {
 		 */
 		commonListeners() {
 			return {
+				clone: this.onClone,
 				delete: this.onDelete,
-				duplicate: this.onDuplicate,
 				'update:text': this.onTitleChange,
 				'update:description': this.onDescriptionChange,
 				'update:isRequired': this.onRequiredChange,
@@ -292,10 +292,10 @@ export default {
 		},
 
 		/**
-		 * Duplicate this question.
+		 * Clone this question.
 		 */
-		onDuplicate() {
-			this.$emit('duplicate')
+		onClone() {
+			this.$emit('clone')
 		},
 
 		/**

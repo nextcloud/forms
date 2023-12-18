@@ -100,9 +100,9 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton @click="onDuplicate">
+					<NcActionButton @click="onClone">
 						<template #icon>
-							<IconContentDuplicate :size="20" />
+							<IconContentCopy :size="20" />
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
@@ -143,10 +143,10 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
+import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
-import IconContentDuplicate from 'vue-material-design-icons/ContentDuplicate.vue'
 
 export default {
 	name: 'Question',
@@ -155,7 +155,7 @@ export default {
 		IconAlertCircleOutline,
 		IconArrowDown,
 		IconArrowUp,
-		IconContentDuplicate,
+		IconContentCopy,
 		IconDelete,
 		IconDragHorizontalVariant,
 		IconIdentifier,
@@ -315,10 +315,10 @@ export default {
 		},
 
 		/**
-		 * Duplicate this question
+		 * Clone this question
 		 */
-		onDuplicate() {
-			this.$emit('duplicate')
+		onClone() {
+			this.$emit('clone')
 		},
 	},
 }

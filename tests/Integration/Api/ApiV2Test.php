@@ -77,7 +77,7 @@ class ApiV2Test extends TestCase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
-						'extraSettings' => (object)[]
+						'extraSettings' => []
 					],
 					[
 						'type' => 'multiple_unique',
@@ -97,7 +97,7 @@ class ApiV2Test extends TestCase {
 								'text' => ''
 							]
 						],
-						'extraSettings' => (object)[
+						'extraSettings' => [
 							'shuffleOptions' => true
 						]
 					]
@@ -180,7 +180,7 @@ class ApiV2Test extends TestCase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
-						'extraSettings' => (object)[]
+						'extraSettings' => []
 					],
 				],
 				'shares' => [
@@ -930,29 +930,20 @@ class ApiV2Test extends TestCase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataDuplicateQuestion() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
-		array_splice($fullFormExpected['questions'][1]['options'], 0, 1);
-
-		return [
-			'duplicateQuestion' => [
-				'fullFormExpected' => $fullFormExpected
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider dataDuplicateQuestion
-	 * @param array $fullFormExpected
-	 */
-	public function testDuplicateQuestion(array $fullFormExpected) {
-		$resp = $this->http->request('POST', "api/v2/question/{$this->testForms[0]['questions'][0]['id']}");
+	public function testCloneQuestion() {
+		$resp = $this->http->request('POST', 'api/v2.3/question/clone/' . $this->testForms[0]['questions'][0]['id']);
 		$data = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $data;
 
 		$this->assertEquals(200, $resp->getStatusCode());
-		$this->assertEquals($this->testForms[0]['questions'][count($this->testForms[0]['questions'])]['id'], $data);
+		$this->assertNotEquals($data['id'], $this->testForms[0]['questions'][0]['id']);
 
-		$this->testGetFullForm($fullFormExpected);
+		$copy = $this->testForms[0]['questions'][0];
+		unset($copy['id']);
+		unset($copy['order']);
+		foreach ($copy as $key => $value) {
+			$this->assertEquals($value, $data[$key]);
+		}
 	}
 
 	public function dataCreateNewOption() {
