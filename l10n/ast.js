@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Shared with you" : "Compartióse contigo",
     "This form does not exist" : "Esti formulariu nun esiste",
     "Permissions" : "Permisos",
     "Delete" : "Desaniciar",
@@ -22,6 +23,7 @@ OC.L10N.register(
     "Settings" : "Configuración",
     "Submit" : "Unviar",
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
+    "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir",
     "Date" : "Data",
     "Phone number" : "Númberu de teléfonu"
 },
