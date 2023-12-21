@@ -713,6 +713,10 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
+		$this->submissionService
+			->method('validateSubmission')
+			->willReturn(true);
+
 		$this->formAccess($hasUserAccess, $hasFormExpired, $canSubmit);
 
 		$this->expectException(OCSForbiddenException::class);

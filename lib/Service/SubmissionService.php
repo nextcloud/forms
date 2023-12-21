@@ -37,6 +37,7 @@ use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Files\File;
@@ -151,6 +152,13 @@ class SubmissionService {
 		} finally {
 			return $submissionList;
 		}
+	}
+
+	/**
+	 * Validate the new submission is unique
+	 */
+	public function isUniqueSubmission(Submission $newSubmission): bool {
+		return $this->submissionMapper->countSubmissions($newSubmission->getFormId(), $newSubmission->getUserId()) === 1;
 	}
 
 	/**

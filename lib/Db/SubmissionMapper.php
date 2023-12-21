@@ -110,16 +110,22 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
+	 * Count submissions by form and optionally also by userId
+	 * @param int $formId ID of the form to count submissions for
+	 * @param string|null $userId optionally limit submissions to the one of that user
 	 * @throws \Exception
 	 */
-	public function countSubmissions(int $formId): int {
+	public function countSubmissions(int $formId, ?string $userId = null): int {
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select($qb->func()->count('*', 'num_submissions'))
+		$query = $qb->select($qb->func()->count('*', 'num_submissions'))
 			->from($this->getTableName())
 			->where($qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)));
+		if (!is_null($userId)) {
+			$query->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+		}
 
-		$result = $qb->executeQuery();
+		$result = $query->executeQuery();
 		$row = $result->fetch();
 		$result->closeCursor();
 

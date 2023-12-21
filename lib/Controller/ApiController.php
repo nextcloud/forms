@@ -1055,11 +1055,6 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('This form is no longer taking answers');
 		}
 
-		// Does the user have permissions to submit
-		if (!$this->formsService->canSubmit($form)) {
-			throw new OCSForbiddenException('Already submitted');
-		}
-
 		// Is the submission valid
 		if (!$this->submissionService->validateSubmission($questions, $answers)) {
 			throw new OCSBadRequestException('At least one submitted answer is not valid');
@@ -1078,9 +1073,22 @@ class ApiController extends OCSController {
 			$submission->setUserId($this->currentUser->getUID());
 		}
 
+		// Does the user have permissions to submit
+		// This is done right before insert so we minimize race conditions for submitting on unique-submission forms
+		if (!$this->formsService->canSubmit($form)) {
+			throw new OCSForbiddenException('Already submitted');
+		}
+
 		// Insert new submission
 		$this->submissionMapper->insert($submission);
 		$submissionId = $submission->getId();
+
+		// Ensure the form is unique if needed.
+		// If we can not submit anymore then the submission must be unique
+		if (!$this->formsService->canSubmit($form) && !$this->submissionService->isUniqueSubmission($submission)) {
+			$this->submissionMapper->delete($submission);
+			throw new OCSForbiddenException('Already submitted');
+		}
 
 		// Process Answers
 		foreach ($answers as $questionId => $answerArray) {
