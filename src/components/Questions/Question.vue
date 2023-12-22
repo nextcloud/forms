@@ -100,6 +100,12 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
+					<NcActionButton @click="onClone">
+						<template #icon>
+							<IconContentCopy :size="20" />
+						</template>
+						{{ t('forms', 'Copy question') }}
+					</NcActionButton>
 					<NcActionButton @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -137,6 +143,7 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
+import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
@@ -148,6 +155,7 @@ export default {
 		IconAlertCircleOutline,
 		IconArrowDown,
 		IconArrowUp,
+		IconContentCopy,
 		IconDelete,
 		IconDragHorizontalVariant,
 		IconIdentifier,
@@ -304,6 +312,13 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		/**
+		 * Clone this question
+		 */
+		onClone() {
+			this.$emit('clone')
 		},
 	},
 }

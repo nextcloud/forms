@@ -77,7 +77,7 @@ class ApiV2Test extends TestCase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
-						'extraSettings' => (object)[]
+						'extraSettings' => []
 					],
 					[
 						'type' => 'multiple_unique',
@@ -97,7 +97,7 @@ class ApiV2Test extends TestCase {
 								'text' => ''
 							]
 						],
-						'extraSettings' => (object)[
+						'extraSettings' => [
 							'shuffleOptions' => true
 						]
 					]
@@ -180,7 +180,7 @@ class ApiV2Test extends TestCase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
-						'extraSettings' => (object)[]
+						'extraSettings' => []
 					],
 				],
 				'shares' => [
@@ -928,6 +928,22 @@ class ApiV2Test extends TestCase {
 		$fullFormExpected['lastUpdated'] = time();
 
 		$this->testGetFullForm($fullFormExpected);
+	}
+
+	public function testCloneQuestion() {
+		$resp = $this->http->request('POST', 'api/v2.3/question/clone/' . $this->testForms[0]['questions'][0]['id']);
+		$data = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $data;
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertNotEquals($data['id'], $this->testForms[0]['questions'][0]['id']);
+
+		$copy = $this->testForms[0]['questions'][0];
+		unset($copy['id']);
+		unset($copy['order']);
+		foreach ($copy as $key => $value) {
+			$this->assertEquals($value, $data[$key]);
+		}
 	}
 
 	public function dataCreateNewOption() {

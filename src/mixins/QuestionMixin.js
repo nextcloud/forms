@@ -201,6 +201,7 @@ export default {
 		 */
 		commonListeners() {
 			return {
+				clone: this.onClone,
 				delete: this.onDelete,
 				'update:text': this.onTitleChange,
 				'update:description': this.onDescriptionChange,
@@ -288,6 +289,13 @@ export default {
 		 */
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		/**
+		 * Clone this question.
+		 */
+		onClone() {
+			this.$emit('clone')
 		},
 
 		/**

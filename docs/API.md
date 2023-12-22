@@ -29,6 +29,8 @@ This file contains the API-Documentation. For more information on the returned D
 
 ### Other API changes
 - In API version 2.1 the endpoint `/api/v2.1/share/update` was added to update a Share
+- In API version 2.2 the endpoint `/api/v2.2/form/transfer` was added to transfer ownership of a form
+- In API version 2.3 the endpoint `/api/v2.3/question/clone` was added to clone a question
 
 ## Form Endpoints
 ### List owned Forms
@@ -327,6 +329,19 @@ Reorders all Questions of a single form
 - Response: **Status-Code OK**, as well as the id of the deleted question.
 ```
 "data": 4
+```
+
+### Clone a question
+Creates a clone of a question with all its options.
+- Endpoint: `/api/v2.3/question/clone/{id}`
+- Url-Parameter:
+  | Parameter | Type    | Description |
+  |-----------|---------|-------------|
+  | _id_      | Integer | ID of the question to clone |
+- Method: `POST`
+- Response: Returns cloned question object with the new ID set.
+```
+See section 'Create a new question'.
 ```
 
 ## Option Endpoints

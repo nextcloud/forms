@@ -96,6 +96,7 @@
 						:index="index + 1"
 						:max-string-lengths="maxStringLengths"
 						v-bind.sync="form.questions[index]"
+						@clone="cloneQuestion(question)"
 						@delete="deleteQuestion(question)"
 						@move-down="onMoveDown(index)"
 						@move-up="onMoveUp(index)" />
@@ -388,6 +389,35 @@ export default {
 			} catch (error) {
 				logger.error(`Error while removing question ${id}`, { error })
 				showError(t('forms', 'There was an error while removing the question'))
+			} finally {
+				this.isLoadingQuestions = false
+			}
+		},
+
+		/**
+		 * Clone a question
+		 *
+		 * @param {number} id the question id to clone in the current form
+		 */
+		async cloneQuestion({ id }) {
+			this.isLoadingQuestions = true
+
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.3/question/clone/{id}', { id }))
+				const question = OcsResponse2Data(response)
+
+				this.form.questions.push(Object.assign({
+					answers: [],
+				}, question))
+
+				this.$nextTick(() => {
+					const lastQuestion = this.$refs.questions[this.$refs.questions.length - 1]
+					lastQuestion.focus()
+				})
+
+			} catch (error) {
+				logger.error(`Error while duplicating question ${id}`, { error })
+				showError('There was an error while duplicating the question')
 			} finally {
 				this.isLoadingQuestions = false
 			}
