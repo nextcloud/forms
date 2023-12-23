@@ -11,6 +11,7 @@ OC.L10N.register(
     "Edit" : "Dəyişiklik et",
     "Share" : "Paylaş",
     "Description" : "Açıqlanma",
+    "Summary" : "Xülasə",
     "Sharing" : "Paylaşılır",
     "Settings" : "Quraşdırmalar",
     "Abort" : "Durdur",
