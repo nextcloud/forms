@@ -84,7 +84,6 @@
 				</div>
 				<NcActions v-if="!readOnly"
 					:id="actionsId"
-					:container="'#' + actionsId"
 					:force-menu="true"
 					placement="bottom-end"
 					class="question__header__title__menu">
@@ -427,13 +426,6 @@ export default {
 				margin-block: auto;
 				margin-inline: 4px 12px;
 				color: var(--color-error);
-			}
-
-			&__menu.action-item {
-				position: sticky;
-				inset-block-start: var(--header-height);
-				// above other actions
-				z-index: 50;
 			}
 		}
 
