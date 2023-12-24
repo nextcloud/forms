@@ -85,6 +85,7 @@
 </template>
 
 <script>
+import logger from '../utils/Logger.js'
 import { useIsMobile } from '@nextcloud/vue'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import IconEye from 'vue-material-design-icons/Eye.vue'
@@ -162,7 +163,7 @@ export default {
 					params: {
 						hash: this.$route.params.hash,
 					},
-				})
+				}).catch((error) => logger.debug('Navigation cancelled', { error }))
 			}
 		},
 
@@ -173,7 +174,7 @@ export default {
 					params: {
 						hash: this.$route.params.hash,
 					},
-				})
+				}).catch((error) => logger.debug('Navigation cancelled', { error }))
 			}
 		},
 
@@ -184,7 +185,7 @@ export default {
 					params: {
 						hash: this.$route.params.hash,
 					},
-				})
+				}).catch((error) => logger.debug('Navigation cancelled', { error }))
 			}
 		},
 
