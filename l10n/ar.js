@@ -65,6 +65,7 @@ OC.L10N.register(
     "Required" : "مطلوب",
     "Technical name of the question" : "الاسم الفني للسؤال",
     "Technical name" : "الاسم الفني",
+    "Copy question" : "إنسَخ السؤال",
     "Delete question" : "حذف السؤال ",
     "Description (formatting using Markdown is supported)" : "الوصف ( صيغة ماركداون مدعومة أيضاً)",
     "This question needs a title!" : "هذا السؤال بحاجه إلى عنوان!",

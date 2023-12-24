@@ -65,6 +65,7 @@ OC.L10N.register(
     "Required" : "Zorunlu",
     "Technical name of the question" : "Sorunun teknik adı",
     "Technical name" : "Teknik ad",
+    "Copy question" : "Soruyu kopyala",
     "Delete question" : "Soruyu sil",
     "Description (formatting using Markdown is supported)" : "Açıklama (Markdown ile biçimlendirilebilir)",
     "This question needs a title!" : "Bu sorunun bir başlığı olmalıdır!",

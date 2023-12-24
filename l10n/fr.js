@@ -65,6 +65,7 @@ OC.L10N.register(
     "Required" : "Obligatoire",
     "Technical name of the question" : "Nom technique de la question",
     "Technical name" : "Nom technique",
+    "Copy question" : "Copier la question",
     "Delete question" : "Supprimer la question",
     "Description (formatting using Markdown is supported)" : "Description (le formatage à l'aide de Markdown est pris en charge)",
     "This question needs a title!" : "Cette question nécessite un titre !",
