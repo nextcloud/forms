@@ -99,7 +99,8 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton @click="onClone">
+					<NcActionButton :close-after-click="true"
+						@click="onClone">
 						<template #icon>
 							<IconContentCopy :size="20" />
 						</template>
