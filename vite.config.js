@@ -10,6 +10,13 @@ export default createAppConfig({
 	config: {
 		build: {
 			cssCodeSplit: false,
+			rollupOptions: {
+				output: {
+					manualChunks: {
+						vendor: ['vue', 'vue-router'],
+					},
+				},
+			},
 		},
 	},
 })
