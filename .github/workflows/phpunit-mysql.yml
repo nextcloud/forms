@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      src: ${{ steps.changes.outputs.src}}
+      src: ${{ steps.changes.outputs.src }}
 
     steps:
       - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2.11.1
@@ -47,7 +47,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.2']
+        php-versions: ['8.0', '8.1', '8.2', '8.3']
         server-versions: ['master']
         mysql-versions: ['8.1']
 
