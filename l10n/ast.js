@@ -25,6 +25,7 @@ OC.L10N.register(
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
     "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir",
     "Date" : "Data",
+    "Text" : "Testu",
     "Phone number" : "Númberu de teléfonu"
 },
 "nplurals=2; plural=(n != 1);");
