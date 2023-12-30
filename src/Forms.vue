@@ -113,6 +113,7 @@ import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 
+import { useIsMobile } from '@nextcloud/vue'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation.js'
 import NcAppNavigationCaption from '@nextcloud/vue/dist/Components/NcAppNavigationCaption.js'
@@ -121,7 +122,6 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcContent from '@nextcloud/vue/dist/Components/NcContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
-import isMobile from '@nextcloud/vue/dist/Mixins/isMobile.js'
 
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
@@ -148,7 +148,13 @@ export default {
 		NcLoadingIcon,
 	},
 
-	mixins: [isMobile, PermissionTypes],
+	mixins: [PermissionTypes],
+
+	setup() {
+		return {
+			isMobile: useIsMobile(),
+		}
+	},
 
 	data() {
 		return {
