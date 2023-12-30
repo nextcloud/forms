@@ -85,8 +85,8 @@
 </template>
 
 <script>
+import { useIsMobile } from '@nextcloud/vue'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
-import isMobile from '@nextcloud/vue/dist/Mixins/isMobile.js'
 import IconEye from 'vue-material-design-icons/Eye.vue'
 import IconMenuOpen from 'vue-material-design-icons/MenuOpen.vue'
 import IconPencil from 'vue-material-design-icons/Pencil.vue'
@@ -106,7 +106,7 @@ export default {
 		NcButton,
 	},
 
-	mixins: [isMobile, PermissionTypes],
+	mixins: [PermissionTypes],
 
 	props: {
 		sidebarOpened: {
@@ -117,6 +117,12 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+	},
+
+	setup() {
+		return {
+			isMobile: useIsMobile(),
+		}
 	},
 
 	computed: {
