@@ -143,7 +143,6 @@ import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
 
 import { useIsMobile } from '@nextcloud/vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
@@ -507,13 +506,13 @@ export default {
 		onLastUpdatedByEventBus(id) {
 			const formIndex = this.forms.findIndex((form) => form.id === id)
 			if (formIndex !== -1) {
-				this.forms[formIndex].lastUpdated = moment().unix()
+				this.forms[formIndex].lastUpdated = Math.floor(Date.now() / 1000)
 				this.forms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			} else {
 				const sharedFormIndex = this.allSharedForms.findIndex(
 					(form) => form.id === id,
 				)
-				this.allSharedForms[sharedFormIndex].lastUpdated = moment().unix()
+				this.allSharedForms[sharedFormIndex].lastUpdated = Math.floor(Date.now() / 1000)
 				this.allSharedForms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			}
 		},

@@ -259,7 +259,7 @@ export default {
 		 * Check if form is expired
 		 */
 		isExpired() {
-			return this.form.expires && moment().unix() > this.form.expires
+			return this.form.expires && Math.floor(Date.now() / 1000) > this.form.expires
 		},
 
 		/**

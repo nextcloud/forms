@@ -296,7 +296,7 @@ export default {
 		},
 
 		isExpired() {
-			return this.form.expires && moment().unix() > this.form.expires
+			return this.form.expires && Math.floor(Date.now() / 1000) > this.form.expires
 		},
 		expirationDate() {
 			return moment(this.form.expires, 'X').toDate()
