@@ -22,6 +22,7 @@ OC.L10N.register(
     "Settings" : "Setelan",
     "Abort" : "Batal",
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
+    "Checkboxes" : "Kotak centang",
     "Date" : "Date",
     "Pick a date" : "Pilih tanggal",
     "Time" : "Waktu",
