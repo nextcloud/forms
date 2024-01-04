@@ -137,10 +137,11 @@
 </template>
 
 <script>
-import { generateOcsUrl } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { generateOcsUrl } from '@nextcloud/router'
+import { basename } from 'path'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
@@ -165,12 +166,6 @@ import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import PermissionTypes from '../mixins/PermissionTypes.js'
-
-const picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
-	.setMultiSelect(false)
-	.setType(1)
-	.allowDirectories()
-	.build()
 
 export default {
 	name: 'Results',
@@ -198,6 +193,7 @@ export default {
 		return {
 			loadingResults: true,
 			showSummary: true,
+			picker: null,
 		}
 	},
 
@@ -254,20 +250,54 @@ export default {
 
 		// Show Filepicker, then call API to store
 		async onStoreToFiles() {
-			// picker.pick() does not reject Promise -> await would never resolve.
-			picker.pick()
-				.then(async (path) => {
-					try {
-						const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/submissions/export'), {
-							hash: this.form.hash,
-							path,
-						})
-						showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
-					} catch (error) {
-						logger.error('Error while exporting to Files', { error })
-						showError(t('forms', 'There was an error, while exporting to Files'))
-					}
+			if (this.picker === null) {
+				this.picker = getFilePickerBuilder(t('forms', 'Save CSV to Files'))
+					.setMultiSelect(false)
+					.setButtonFactory((selectedNodes, currentPath) => {
+						const path = basename(currentPath)
+						return [{
+							label: selectedNodes.length > 0
+								? t('forms', 'Save as {filename}', { filename: selectedNodes[0].basename })
+								: (path === ''
+									? t('forms', 'Save to home') // TRANSLATORS: Export the file to the home path
+									: t('forms', 'Save to {path}', { path })
+								),
+							type: 'primary',
+							callback: (selectedNodes) => this.exportResultsToFile(selectedNodes[0]?.path),
+						}]
+					})
+					.allowDirectories()
+					.build()
+			}
+
+			try {
+				await this.picker.pick()
+			} catch (error) {
+				// User aborted
+				logger.debug('No file selected', { error })
+			}
+		},
+
+		/**
+		 * Export results to file or directory
+		 * @param {string|undefined} path Absolut path where to export the results
+		 */
+		async exportResultsToFile(path) {
+			if (!path) {
+				showError(t('forms', 'No target selected'))
+				return
+			}
+
+			try {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/submissions/export'), {
+					hash: this.form.hash,
+					path,
 				})
+				showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+			} catch (error) {
+				logger.error('Error while exporting to Files', { error })
+				showError(t('forms', 'There was an error, while exporting to Files'))
+			}
 		},
 
 		async deleteSubmission(id) {
