@@ -963,6 +963,10 @@ class ApiController extends OCSController {
 
 
 	/**
+	 * @CORS
+	 * @PublicCORSFix
+	 * @NoAdminRequired
+	 * @PublicPage
 	 * Insert or update answers for a question
 	 *
 	 * @param int $submissionId
