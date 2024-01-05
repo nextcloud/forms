@@ -982,8 +982,8 @@ class ApiController extends OCSController {
 			$storedAnswers = $this->answerMapper->findBySubmissionAndQuestion($submissionId, $question['id']);
 		}
 
+		// Are we using answer ids as values
 		if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
-			$answerText = "";
 
 			$newAnswerTexts = array();
 
@@ -996,7 +996,7 @@ class ApiController extends OCSController {
 				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 				if ($optionIndex !== false) {
 					$answerText = $question['options'][$optionIndex]['text'];
-				} elseif (!empty($question['extraSettings']->allowOtherAnswer) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
+				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
 				}
 
