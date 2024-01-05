@@ -1238,9 +1238,7 @@ class ApiController extends OCSController {
 				continue;
 			}
 
-			$question = $questions[$questionIndex];
-
-			$this->storeAnswersForQuestion($submission->getId(), $question, $answerArray, false);
+			$this->storeAnswersForQuestion($submission->getId(), $questions[$questionIndex], $answerArray, false);
 		}
 
 		$this->formsService->setLastUpdatedTimestamp($formId);
