@@ -151,6 +151,8 @@
     "Download CSV" : "Télécharger au format CSV",
     "Delete all responses" : "Supprimer toutes les réponses",
     "There was an error while loading the results" : "Il y a eu une erreur lors du chargement des réponses",
+    "Save as {filename}" : "Sauvegarder sous le nom {filename}",
+    "Save to {path}" : "Sauvegarder dans le chemin : {path}",
     "Export successful to {file}" : "Export réussi vers {file}",
     "There was an error, while exporting to Files" : "Il y a eu une erreur lors de l'export",
     "Submission deleted" : "Soumission supprimée",
