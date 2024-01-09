@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.4.4 - 2024-01-09
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.3...v3.4.4)
+
+### Fixed
+- [stable3] fix: Prevent race condition on unique-submission forms [\#1870](https://github.com/nextcloud/forms/pull/1870) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+- [stable3] fix(Question): Do not place popover within question but on body [\#1855](https://github.com/nextcloud/forms/pull/1855) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+
+
 ## v3.4.3 - 2023-12-12
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.2...v3.4.3)
