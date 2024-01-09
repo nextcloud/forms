@@ -128,6 +128,41 @@ class SubmissionServiceTest extends TestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider dataIsUniqueSubmission
+	 */
+	public function testIsUniqueSubmission(array $submissionData, int $numberOfSubmissions, bool $expected) {
+		$this->submissionMapper->method('countSubmissions')
+			->with($submissionData['formId'], $submissionData['userId'])
+			->willReturn($numberOfSubmissions);
+
+		$submission = Submission::fromParams($submissionData);
+		$this->assertEquals($expected, $this->submissionService->isUniqueSubmission($submission));
+	}
+
+	public function dataIsUniqueSubmission() {
+		return [
+			[
+				'submissionData' => [
+					'id' => 1,
+					'userId' => 'user',
+					'formId' => 1,
+				],
+				'numberOfSubmissions' => 1,
+				'expected' => true,
+			],
+			[
+				'submissionData' => [
+					'id' => 3,
+					'userId' => 'user',
+					'formId' => 1,
+				],
+				'numberOfSubmissions' => 2,
+				'expected' => false,
+			],
+		];
+	}
+
 	public function testGetSubmissions() {
 		$submission_1 = new Submission();
 		$submission_1->setId(42);
