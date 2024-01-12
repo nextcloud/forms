@@ -14,6 +14,7 @@ OC.L10N.register(
     "Share link" : "Koplietot saiti",
     "Copy to clipboard" : "Kopēt starpliktuvē",
     "Remove link" : "Noņemt saiti",
+    "Internal link" : "Iekšējā saite",
     "View" : "Skats",
     "Edit" : "Rediģēt",
     "Share" : "Koplietot",
@@ -24,7 +25,9 @@ OC.L10N.register(
     "Submit" : "Iesniegt",
     "No elements found." : "Elementi netika atrasti.",
     "Date" : "Datums",
+    "Pick a date" : "Izvēlieties datumu",
     "Time" : "Laiks",
+    "Pick a time" : "Izvēlieties laiku",
     "Text" : "Teksts",
     "Phone number" : "Tālruņa numurs"
 },
