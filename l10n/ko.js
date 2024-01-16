@@ -60,6 +60,7 @@ OC.L10N.register(
     "Pick a time" : "시간 선택",
     "Text" : "텍스트",
     "Phone number" : "휴대폰 번호",
-    "Email address" : "이메일 주소"
+    "Email address" : "이메일 주소",
+    "Number" : "숫자"
 },
 "nplurals=1; plural=0;");
