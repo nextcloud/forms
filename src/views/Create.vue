@@ -4,6 +4,7 @@
   - @author René Gieling <github@dartcafe.de>
   - @author Nick Gallo
   - @author John Molakvoæ <skjnldsv@protonmail.com>
+  - @author Michael Schmidmaier
   -
   - @license AGPL-3.0-or-later
   -
@@ -512,7 +513,7 @@ export default {
 		}
 
 		.form-desc {
-			color: var(--color-text-maxcontrast);
+			color: var(--color-main-text);
 			line-height: 22px;
 			min-height: 47px; // one line (25px padding + 22px text height)
 			padding-block-start: 5px; // spacing border<>text
