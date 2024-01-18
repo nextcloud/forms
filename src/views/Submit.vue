@@ -2,6 +2,7 @@
  - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
  -
  - @author John Molakvoæ <skjnldsv@protonmail.com>
+ - @author Michael Schmidmaier
  -
  - @license AGPL-3.0-or-later
  -
@@ -562,7 +563,7 @@ export default {
 			padding-block-end: 20px;
 			resize: none;
 			min-height: 42px;
-			color: var(--color-text-maxcontrast);
+			color: var(--color-main-text);
 
 			@include markdown-output;
 		}
