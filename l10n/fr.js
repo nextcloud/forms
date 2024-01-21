@@ -212,7 +212,7 @@ OC.L10N.register(
     "The input is not a valid phone number" : "La saisie n'est pas un numéro de téléphone valide",
     "People can enter a telephone number" : "Les répondants peuvent saisir un numéro de téléphone",
     "Enter a telephone number" : "Saisissez un numéro de téléphone",
-    "Email address" : "Adresse e-mail",
+    "Email address" : "Adresse électronique",
     "The input is not a valid email address" : "La saisie n'est pas une adresse e-mail valide",
     "People can enter an email address" : "Les répondants peuvent saisir une adresse e-mail",
     "Enter an email address" : "Saisissez une adresse e-mail",
