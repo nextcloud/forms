@@ -17,6 +17,8 @@
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
     "watch": "vite --mode development build --watch",
+    "cypress": "cypress run --e2e",
+    "cypress:gui": "cypress open",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
@@ -54,9 +56,13 @@
   "devDependencies": {
     "@mdi/svg": "^7.4.47",
     "@nextcloud/browserslist-config": "^3.0.0",
+    "@nextcloud/cypress": "^1.0.0-beta.7",
     "@nextcloud/eslint-config": "^8.3.0",
     "@nextcloud/stylelint-config": "^2.3.1",
     "@nextcloud/vite-config": "^1.2.0",
+    "cypress": "^13.6.3",
+    "cypress-vite": "^1.5.0",
+    "eslint-plugin-cypress": "^2.15.1",
     "vite": "^5.0.12"
   }
 }
