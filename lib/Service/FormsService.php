@@ -33,11 +33,13 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
-
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\IGroup;
 use OCP\IGroupManager;
+use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -65,6 +67,8 @@ class FormsService {
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
+		private IRootFolder $storage,
+		private IL10N $l10n,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -162,6 +166,15 @@ class FormsService {
 			$result['submissionCount'] = $this->submissionMapper->countSubmissions($form->getId());
 		}
 
+		if ($result['fileId']) {
+			try {
+				$result['filePath'] = $this->getFilePath($form);
+				// If file was deleted, set filePath to null
+			} catch (NotFoundException $e) {
+				$result['filePath'] = null;
+			}
+		}
+
 		return $result;
 	}
 
@@ -205,6 +218,9 @@ class FormsService {
 		unset($formData['access']);
 		unset($formData['ownerId']);
 		unset($formData['shares']);
+		unset($formData['fileId']);
+		unset($formData['filePath']);
+		unset($formData['fileFormat']);
 
 		return $formData;
 	}
@@ -608,4 +624,36 @@ class FormsService {
 		}
 		return true;
 	}
+
+	public function getFilePath(Form $form): ?string {
+		$fileId = $form->getFileId();
+
+		if (null === $fileId) {
+			return null;
+		}
+
+		$folder = $this->storage->getUserFolder($form->getOwnerId());
+		$nodes = $folder->getById($fileId);
+
+		if (empty($nodes)) {
+			throw new NotFoundException('File not found');
+		}
+
+		$internalPath = array_shift($nodes)->getPath();
+
+		return $folder->getRelativePath($internalPath);
+	}
+
+	public function getFileName(Form $form, string $fileFormat): string {
+		if (empty(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
+			throw new \InvalidArgumentException('Invalid file format');
+		}
+
+		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
+		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').'.$fileFormat;
+
+		// Sanitize file name, replace all invalid characters
+		return str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
+	}
+
 }

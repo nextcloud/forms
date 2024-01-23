@@ -27,33 +27,36 @@ namespace OCA\Forms\Service;
 use DateTime;
 use DateTimeZone;
 
-use League\Csv\EncloseField;
-use League\Csv\EscapeFormula;
-use League\Csv\Reader;
-use League\Csv\Writer;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 
 use OCA\Forms\Db\AnswerMapper;
+use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 
 use OCP\IL10N;
+use OCP\ITempManager;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IMailer;
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+
 use Psr\Log\LoggerInterface;
 
 class SubmissionService {
-
 	/** @var FormMapper */
 	private $formMapper;
 
@@ -97,7 +100,10 @@ class SubmissionService {
 		LoggerInterface $logger,
 		IUserManager $userManager,
 		IUserSession $userSession,
-		IMailer $mailer) {
+		IMailer $mailer,
+		private ITempManager $tempManager,
+		private FormsService $formsService,
+	) {
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
 		$this->submissionMapper = $submissionMapper;
@@ -163,50 +169,79 @@ class SubmissionService {
 
 	/**
 	 * Export Submissions to Cloud-Filesystem
-	 * @param string $hash of the form
+	 *
+	 * @param Form $form the form
 	 * @param string $path The Cloud-Path to export to
-	 * @return string The written fileName
+	 * @param string $fileFormat Format to export to
+	 * @param string $ownerId of the form creator
+	 * @return File The written file
 	 * @throws NotPermittedException
 	 */
-	public function writeCsvToCloud(string $hash, string $path): string {
-		/** @var \OCP\Files\Folder|\OCP\Files\File $node */
-		$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
+	public function writeFileToCloud(Form $form, string $path, string $fileFormat, ?string $ownerId = null): File {
+		if (empty(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
+			throw new \InvalidArgumentException('Invalid file format');
+		}
 
-		// Get Data
-		$csvData = $this->getSubmissionsCsv($hash);
+		$this->logger->debug('Export submissions for form: {hash} to Cloud at: /{path} in format {fileFormat}', [
+			'hash' => $form->getHash(),
+			'path' => $path,
+			'fileFormat' => $fileFormat,
+		]);
 
-		// If chosen path is a file, get folder, if file is csv, use filename.
+		$fileName = $this->formsService->getFileName($form, $fileFormat);
+
+		/** @var \OCP\Files\Folder|File $node */
+		if ($ownerId) {
+			$node = $this->storage->getUserFolder($ownerId)->get($path);
+		} else {
+			$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
+		}
+
+		// If chosen path is a file with expected extension - overwrite it and use parent folder otherwise.
 		if ($node instanceof File) {
-			if ($node->getExtension() === 'csv') {
-				$csvData['fileName'] = $node->getName();
+			if ($node->getExtension() === $fileFormat) {
+				$fileName = $node->getName();
 			}
 			/** @var \OCP\Files\Folder $node */
 			$node = $node->getParent();
 		}
 
-		// check if file exists, create otherwise.
+		// Check if file exists, create otherwise.
 		try {
-			/** @var \OCP\Files\File $file */
-			$file = $node->get($csvData['fileName']);
+			/** @var File $file */
+			$file = $node->get($fileName);
 		} catch (\OCP\Files\NotFoundException $e) {
-			$node->newFile($csvData['fileName']);
-			/** @var \OCP\Files\File $file */
-			$file = $node->get($csvData['fileName']);
+			$node->newFile($fileName);
+			/** @var File $file */
+			$file = $node->get($fileName);
 		}
 
-		// Write the data to file
-		$file->putContent($csvData['data']);
+		// Get Data
+		$submissionsData = $this->getSubmissionsData($form, $fileFormat, $file);
 
-		return $csvData['fileName'];
+		// Write the data to file
+		try {
+			$file->putContent($submissionsData);
+		} catch (NotPermittedException $e) {
+			$this->logger->warning('Failed to export Submissions: Not allowed to write to file');
+			throw new OCSException('Not allowed to write to file.', previous: $e);
+		}
+
+		return $file;
 	}
 
 	/**
-	 * Create CSV from Submissions to form
-	 * @param string $hash Hash of the form
-	 * @return array Array with 'fileName' and 'data'
+	 * Create/update file from Submissions to form
+	 *
+	 * @param Form $form Form to export
+	 * @param string $fileFormat Format to export to
+	 * @param File|null $file File with already exported submissions to append to
+	 * @return string File content
 	 */
-	public function getSubmissionsCsv(string $hash): array {
-		$form = $this->formMapper->findByHash($hash);
+	public function getSubmissionsData(Form $form, string $fileFormat, ?File $file = null): string {
+		if (empty(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
+			throw new \InvalidArgumentException('Invalid file format');
+		}
 
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
@@ -214,9 +249,17 @@ class SubmissionService {
 			// Just ignore, if no Data. Returns empty Submissions-Array
 		}
 
+		// Oldest first
+		$submissionEntities = array_reverse($submissionEntities);
+
 		$questions = $this->questionMapper->findByForm($form->getId());
 		$defaultTimeZone = date_default_timezone_get();
-		$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
+
+		if ($this->currentUser == null) {
+			$userTimezone = $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
+		} else {
+			$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
+		}
 
 		// Process initial header
 		$header = [];
@@ -245,7 +288,7 @@ class SubmissionService {
 				$row[] = $user->getUID();
 				$row[] = $user->getDisplayName();
 			}
-			
+
 			// Date
 			$row[] = date_format(date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone)), 'c');
 
@@ -254,7 +297,7 @@ class SubmissionService {
 				$questionId = $answer->getQuestionId();
 
 				// If key exists, insert separator
-				if (key_exists($questionId, $carry)) {
+				if (array_key_exists($questionId, $carry)) {
 					$carry[$questionId] .= '; ' . $answer->getText();
 				} else {
 					$carry[$questionId] = $answer->getText();
@@ -264,48 +307,46 @@ class SubmissionService {
 			}, []);
 
 			foreach ($questions as $question) {
-				$row[] = key_exists($question->getId(), $answers)
-					? $answers[$question->getId()]
-					: null;
+				$row[] = $answers[$question->getId()] ?? null;
 			}
 
 			$data[] = $row;
 		}
 
-		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
-		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').csv';
-		// Sanitize file name, replace all invalid characters
-		$fileName = str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
-
-		return [
-			'fileName' => $fileName,
-			'data' => $this->array2csv($header, $data),
-		];
+		return $this->exportData($header, $data, $fileFormat, $file);
 	}
-	
+
 	/**
-	 * Convert an array to a csv string
-	 * @param array $array
-	 * @return string
+	 * @param array<int, string> $header
+	 * @param array<int, array<int, string>> $data
 	 */
-	private function array2csv(array $header, array $records): string {
-		if (empty($header) && empty($records)) {
-			return '';
+	private function exportData(array $header, array $data, string $fileFormat, ?File $file = null): string {
+		if ($file && $file->getContent()) {
+			$existentFile = $this->tempManager->getTemporaryFile($fileFormat);
+			file_put_contents($existentFile, $file->getContent());
+			$spreadsheet = IOFactory::load($existentFile);
+		} else {
+			$spreadsheet = new Spreadsheet();
 		}
 
-		// load the CSV document from a string
-		$csv = Writer::createFromString('');
-		$csv->setOutputBOM(Reader::BOM_UTF8);
-		$csv->addFormatter(new EscapeFormula());
-		EncloseField::addTo($csv, "\t\x1f");
+		$activeWorksheet = $spreadsheet->getSheet(0);
+		foreach ($header as $columnIndex => $value) {
+			$activeWorksheet->setCellValue([$columnIndex + 1, 1], $value);
+		}
+		foreach ($data as $rowIndex => $row) {
+			foreach ($row as $columnIndex => $value) {
+				$activeWorksheet->setCellValue([$columnIndex + 1, $rowIndex + 2], $value);
+			}
+		}
 
-		// insert the header
-		$csv->insertOne($header);
+		$exportedFile = $this->tempManager->getTemporaryFile($fileFormat);
+		$writer = IOFactory::createWriter($spreadsheet, ucfirst($fileFormat));
+		if ($writer instanceof Csv) {
+			$writer->setUseBOM(true);
+		}
+		$writer->save($exportedFile);
 
-		// insert all the records
-		$csv->insertAll($records);
-
-		return $csv->toString();
+		return file_get_contents($exportedFile);
 	}
 
 	/**
@@ -315,7 +356,6 @@ class SubmissionService {
 	 * @return boolean If the submission is valid
 	 */
 	public function validateSubmission(array $questions, array $answers): bool {
-
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];

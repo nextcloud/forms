@@ -70,6 +70,7 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none
+          extensions: gd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -114,10 +114,60 @@ class FormsMigratorTest extends TestCase {
 	public function dataExport() {
 		return [
 			'exactlyOneOfEach' => [
-				'expectedJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"isAnonymous":false,"submitMultiple":false,"showExpiration":false,"lastUpdated":123456789,"submissionMessage":"Back to website","questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
+				'expectedJson' => <<<'JSON'
+[
+  {
+    "title": "Link",
+    "description": "",
+    "fileId": null,
+    "fileFormat": null,
+    "created": 1646251830,
+    "access": {
+      "permitAllUsers": false,
+      "showToAllUsers": false
+    },
+    "expires": 0,
+    "isAnonymous": false,
+    "submitMultiple": false,
+    "showExpiration": false,
+    "lastUpdated": 123456789,
+    "submissionMessage": "Back to website",
+    "questions": [
+      {
+        "id": 14,
+        "order": 2,
+        "type": "multiple",
+        "isRequired": false,
+        "text": "checkbox",
+        "description": "huhu",
+        "extraSettings": {},
+        "options": [
+          {
+            "text": "ans1"
+          }
+        ]
+      }
+    ],
+    "submissions": [
+      {
+        "userId": "anyUser@localhost",
+        "timestamp": 1651354059,
+        "answers": [
+          {
+            "questionId": 14,
+            "text": "ans1"
+          }
+        ]
+      }
+    ]
+  }
+]
+JSON
+
 			]
 		];
 	}
+
 	/**
 	 * @dataProvider dataExport
 	 *
@@ -213,8 +263,7 @@ class FormsMigratorTest extends TestCase {
 		$exportDestination->expects($this->once())
 			->method('addFileContents')
 			->will($this->returnCallback(function ($path, $jsonData) use ($expectedJson) {
-				$this->assertEquals($expectedJson, $jsonData);
-				return;
+				$this->assertJsonStringEqualsJsonString($expectedJson, $jsonData);
 			}));
 		$this->formsMigrator->export($user, $exportDestination, $output);
 	}
