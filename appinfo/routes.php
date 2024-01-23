@@ -332,6 +332,14 @@ return [
 			]
 		],
 		[
+			'name' => 'api#updateSubmission',
+			'url' => '/api/{apiVersion}/submission/update',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2(\.1)?'
+			]
+		],
+		[
 			'name' => 'api#deleteSubmission',
 			'url' => '/api/{apiVersion}/submission/{id}',
 			'verb' => 'DELETE',

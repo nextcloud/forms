@@ -36,6 +36,13 @@
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch v-tooltip="disableAllowEditExplanation"
+			:checked="allowEdit"
+			type="switch"
+			:disabled="disableAllowEdit"
+			@update:checked="onAllowEditChange">
+			{{ t('forms', 'Allow editing and deleting responses per person') }}
+		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch :checked="formExpires"
 			type="switch"
 			@update:checked="onFormExpiresChange">
@@ -149,11 +156,23 @@ export default {
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
 		disableSubmitMultiple() {
-			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous
+			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous || this.form.allowEdit
 		},
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {
-				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously.')
+				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously, or the response can be edited.')
+			}
+			return ''
+		},
+		/**
+		 * Allow Edit is disabled, if it cannot be controlled.
+		 */
+		disableAllowEdit() {
+			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous || this.form.submitMultiple
+		},
+		disableAllowEditExplanation() {
+			if (this.disableAllowEdit) {
+				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously, or multiple responses are allowed.')
 			}
 			return ''
 		},
@@ -163,9 +182,20 @@ export default {
 				.length !== 0
 		},
 
-		// If disabled, submitMultiple will be casted to true
+		// If disabled, submitMultiple will be casted to false if allowEdit is true, else casted to true
 		submitMultiple() {
+			if (this.disableSubmitMultiple && this.allowEdit) {
+				return false
+			}
 			return this.disableSubmitMultiple || this.form.submitMultiple
+		},
+
+		// If disabled, allowEdit will be casted to false
+		allowEdit() {
+			if (this.disableAllowEdit) {
+				return false
+			}
+			return this.form.allowEdit
 		},
 
 		formExpires() {
@@ -196,6 +226,9 @@ export default {
 		},
 		onSubmitMultipleChange(checked) {
 			this.$emit('update:formProp', 'submitMultiple', checked)
+		},
+		onAllowEditChange(checked) {
+			this.$emit('update:formProp', 'allowEdit', checked)
 		},
 		onFormExpiresChange(checked) {
 			if (checked) {

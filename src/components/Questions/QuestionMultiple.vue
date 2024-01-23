@@ -242,6 +242,14 @@ export default {
 	mounted() {
 		// Ensure the initial "other" answer is set
 		this.resetOtherAnswerText()
+
+		// Init selected options from values prop
+		if (this.values) {
+			this.questionValues = []
+			this.values.forEach(i => {
+				this.questionValues.push(i.toString())
+			})
+		}
 	},
 
 	methods: {

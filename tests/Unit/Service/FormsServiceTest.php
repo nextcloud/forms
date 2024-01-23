@@ -28,6 +28,7 @@ use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\ActivityManager;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Option;
@@ -59,6 +60,9 @@ class FormsServiceTest extends TestCase {
 
 	/** @var ActivityManager|MockObject */
 	private $activityManager;
+
+	/** @var AnswerMapper|MockObject */
+	private $answerMapper;
 
 	/** @var FormMapper|MockObject */
 	private $formMapper;
@@ -101,6 +105,7 @@ class FormsServiceTest extends TestCase {
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
+		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
@@ -126,6 +131,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -161,6 +167,7 @@ class FormsServiceTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
 				'canSubmit' => true,
@@ -239,6 +246,7 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setAllowEdit(false);
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 
@@ -413,6 +421,7 @@ class FormsServiceTest extends TestCase {
 				'lastUpdated' => 123456789,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'showExpiration' => false,
 				'canSubmit' => true,
 				'questions' => [],
@@ -445,6 +454,7 @@ class FormsServiceTest extends TestCase {
 		$form->setLastUpdated(123456789);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
+		$form->setAllowEdit(false);
 		$form->setShowExpiration(false);
 
 		// User & Group Formatting
@@ -585,6 +595,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -738,24 +749,28 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'participantsArray' => ['currentUser'],
 				'expected' => true
 			],
 			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'participantsArray' => ['notCurrentUser'],
 				'expected' => true
 			],
 			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'participantsArray' => ['notCurrentUser', 'currentUser'],
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'participantsArray' => ['currentUser'],
 				'expected' => true
 			]
@@ -766,10 +781,11 @@ class FormsServiceTest extends TestCase {
 	 *
 	 * @param string $ownerId
 	 * @param bool $submitMultiple
+	 * @param bool $allowEdit
 	 * @param array $participantsArray
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitMultiple, array $participantsArray, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $allowEdit, array $participantsArray, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -778,6 +794,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setOwnerId($ownerId);
 		$form->setSubmitMultiple($submitMultiple);
+		$form->setAllowEdit($allowEdit);
 
 		$this->submissionMapper->expects($this->any())
 			->method('findParticipantsByForm')
@@ -822,6 +839,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -982,6 +1000,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->logger,
@@ -1398,6 +1417,7 @@ class FormsServiceTest extends TestCase {
 				$this->questionMapper,
 				$this->shareMapper,
 				$this->submissionMapper,
+				$this->answerMapper,
 				$this->configService,
 				$this->groupManager,
 				$this->logger,
