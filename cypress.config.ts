@@ -22,6 +22,7 @@
 import { startNextcloud, waitOnNextcloud, configureNextcloud } from '@nextcloud/cypress/docker'
 import { defineConfig } from 'cypress'
 import { readFileSync } from 'node:fs'
+import cypressSplit from 'cypress-split'
 import vitePreprocessor from 'cypress-vite'
 
 export default defineConfig({
@@ -41,6 +42,7 @@ export default defineConfig({
 	e2e: {
 		async setupNodeEvents(on, config) {
 			on('file:preprocessor', vitePreprocessor({ configFile: false }))
+			cypressSplit(on, config)
 
 			const appinfo = readFileSync('appinfo/info.xml').toString()
 			const maxVersion = appinfo.match(/<nextcloud min-version="\d+" max-version="(\d\d+)" \/>/)?.[1]
