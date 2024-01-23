@@ -4,6 +4,7 @@
  *
  * @author affan98 <affan98@gmail.com>
  * @author Christian Hartmann <chris-hartmann@gmx.de>
+ * @author Ferdinand Thiessen <opensource@fthiessen.de>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
  *
@@ -73,7 +74,7 @@ return [
 			'verb' => 'OPTIONS',
 			'requirements' => [
 				'path' => '.+',
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 
@@ -83,7 +84,7 @@ return [
 			'url' => '/api/{apiVersion}/forms',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -91,7 +92,7 @@ return [
 			'url' => '/api/{apiVersion}/form',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -107,7 +108,7 @@ return [
 			'url' => '/api/{apiVersion}/form/clone/{id}',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		// TODO: Remove POST in next API release
@@ -124,7 +125,7 @@ return [
 			'url' => '/api/{apiVersion}/form/update',
 			'verb' => 'PATCH',
 			'requirements' => [
-				'apiVersion' => 'v2\.[2-3]'
+				'apiVersion' => 'v2\.[2-4]'
 			]
 		],
 		[
@@ -132,7 +133,7 @@ return [
 			'url' => '/api/{apiVersion}/form/transfer',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2\.[2-3]'
+				'apiVersion' => 'v2\.[2-4]'
 			]
 		],
 		[
@@ -140,7 +141,7 @@ return [
 			'url' => '/api/{apiVersion}/form/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -148,7 +149,7 @@ return [
 			'url' => '/api/{apiVersion}/partial_form/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -156,7 +157,7 @@ return [
 			'url' => '/api/{apiVersion}/shared_forms',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 
@@ -166,7 +167,7 @@ return [
 			'url' => '/api/{apiVersion}/question',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		// TODO: Remove POST in next API release
@@ -183,7 +184,7 @@ return [
 			'url' => '/api/{apiVersion}/question/update',
 			'verb' => 'PATCH',
 			'requirements' => [
-				'apiVersion' => 'v2\.[2-3]'
+				'apiVersion' => 'v2\.[2-4]'
 			]
 		],
 		// TODO: Remove POST in next API release
@@ -200,7 +201,7 @@ return [
 			'url' => '/api/{apiVersion}/question/reorder',
 			'verb' => 'PUT',
 			'requirements' => [
-				'apiVersion' => 'v2\.[2-3]'
+				'apiVersion' => 'v2\.[2-4]'
 			]
 		],
 		[
@@ -208,7 +209,7 @@ return [
 			'url' => '/api/{apiVersion}/question/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -216,7 +217,7 @@ return [
 			'url' => '/api/{apiVersion}/question/clone/{id}',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2.3'
+				'apiVersion' => 'v2\.[3-4]'
 			]
 		],
 
@@ -226,7 +227,7 @@ return [
 			'url' => '/api/{apiVersion}/option',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		// TODO: Remove POST in next API release
@@ -243,7 +244,7 @@ return [
 			'url' => '/api/{apiVersion}/option/update',
 			'verb' => 'PATCH',
 			'requirements' => [
-				'apiVersion' => 'v2\.[2-3]'
+				'apiVersion' => 'v2\.[2-4]'
 			]
 		],
 		[
@@ -251,7 +252,7 @@ return [
 			'url' => '/api/{apiVersion}/option/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 
@@ -261,7 +262,7 @@ return [
 			'url' => '/api/{apiVersion}/share',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -269,7 +270,7 @@ return [
 			'url' => '/api/{apiVersion}/share/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		// TODO: Remove POST in next API release
@@ -286,7 +287,7 @@ return [
 			'url' => '/api/{apiVersion}/share/update',
 			'verb' => 'PATCH',
 			'requirements' => [
-				'apiVersion' => 'v2\.[2-3]'
+				'apiVersion' => 'v2\.[2-4]'
 			]
 		],
 
@@ -296,7 +297,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -320,7 +321,7 @@ return [
 			'url' => '/api/{apiVersion}/submissions/{formId}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -328,7 +329,7 @@ return [
 			'url' => '/api/{apiVersion}/submission/insert',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -336,7 +337,7 @@ return [
 			'url' => '/api/{apiVersion}/submission/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		// Submissions linking with file in cloud
