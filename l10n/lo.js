@@ -10,6 +10,7 @@ OC.L10N.register(
     "Internal link" : "ລີງພາຍໃນ",
     "Edit" : "ແກ້ໄຂ",
     "Share" : "ແບ່ງປັນ",
+    "Download" : "ດາວໂຫລດ",
     "Sharing" : "ການແບ່ງປັນ",
     "Settings" : "ການຕັ້ງຄ່າ",
     "Date" : "ວັນທີ",

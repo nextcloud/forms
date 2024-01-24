@@ -11,6 +11,7 @@ OC.L10N.register(
     "Edit" : "தொகுக்க",
     "Share" : "பகிர்வு",
     "Description" : "விவரிப்பு",
+    "Download" : "பதிவிறக்குக",
     "Settings" : "அமைப்புகள்",
     "Date" : "Date"
 },

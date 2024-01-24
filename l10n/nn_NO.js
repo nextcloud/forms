@@ -15,6 +15,7 @@ OC.L10N.register(
     "Share" : "Del",
     "Description" : "Skildring",
     "Summary" : "Oppsumering",
+    "Download" : "Last ned",
     "Sharing" : "Deling",
     "Settings" : "Instillingar",
     "Abort" : "Avbryt",

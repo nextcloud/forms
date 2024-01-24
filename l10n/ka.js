@@ -18,6 +18,7 @@ OC.L10N.register(
     "Share" : "Share",
     "Description" : "Description",
     "Summary" : "Summary",
+    "Download" : "Download",
     "Sharing" : "Sharing",
     "Settings" : "Settings",
     "Submit" : "Submit",

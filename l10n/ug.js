@@ -9,6 +9,7 @@ OC.L10N.register(
     "Edit" : "تەھرىر",
     "Share" : "ھەمبەھىر",
     "Description" : "چۈشەندۈرۈش",
+    "Download" : "چۈشۈر",
     "Sharing" : "ھەمبەھىر",
     "Settings" : "تەڭشەكلەر",
     "Date" : "Date",

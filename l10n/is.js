@@ -65,6 +65,7 @@ OC.L10N.register(
     "Summary" : "Samantekt",
     "Responses" : "Svör",
     "Options" : "Valkostir",
+    "Download" : "Sækja",
     "Delete all responses" : "Eyða öllum svörum",
     "There was an error while removing responses" : "Villa kom upp við að fjarlægja svör",
     "Sharing" : "Deiling",

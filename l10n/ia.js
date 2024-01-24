@@ -13,6 +13,7 @@ OC.L10N.register(
     "Share" : "Compartir",
     "Description" : "Description",
     "Summary" : "Summario",
+    "Download" : "Discargar",
     "Sharing" : "Compartente",
     "Settings" : "Configurationes",
     "Date" : "Date",

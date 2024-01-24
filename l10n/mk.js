@@ -72,6 +72,7 @@ OC.L10N.register(
     "Summary" : "Резиме",
     "Responses" : "Одговори",
     "Options" : "Опции",
+    "Download" : "Преземи",
     "Delete all responses" : "Избриши ги сите одговори",
     "There was an error while loading the results" : "Настана грешка при вчитување на резултатите",
     "There was an error while removing this response" : "Настана грешка при бришење на одговор",

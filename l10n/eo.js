@@ -19,6 +19,7 @@ OC.L10N.register(
     "Share" : "Kunhavigi",
     "Description" : "Priskribo",
     "Summary" : "Resumo",
+    "Download" : "Elŝuti",
     "Sharing" : "Kunhavigo",
     "Settings" : "Agordoj",
     "Submit" : "Sendi",

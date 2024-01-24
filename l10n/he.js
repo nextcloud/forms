@@ -73,6 +73,7 @@ OC.L10N.register(
     "Summary" : "תקציר",
     "Responses" : "תגובות",
     "Options" : "אפשרויות",
+    "Download" : "הורדה",
     "Delete all responses" : "מחיקת כל התגובות",
     "There was an error while loading the results" : "אירעה שגיאה בטעינת התוצאות",
     "There was an error while removing this response" : "אירעה שגיאה בהסרת התגובה הזאת",

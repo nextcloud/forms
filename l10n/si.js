@@ -11,6 +11,7 @@ OC.L10N.register(
     "Description" : "විස්තරය",
     "Summary" : "සාරාංශය",
     "Responses" : "ප්‍රතිචාර",
+    "Download" : "බාගන්න",
     "Settings" : "සැකසුම්",
     "Abort" : "රෝධනය",
     "Date" : "දිනය",
