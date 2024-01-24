@@ -1,0 +1,7 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ES2020",
+		"moduleResolution": "Bundler",
+	}
+}
