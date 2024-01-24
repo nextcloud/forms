@@ -30,6 +30,7 @@
 			:options="options"
 			:placeholder="t('forms', 'Search for user, group or circle …')"
 			:user-select="true"
+			:filter-by="() => true"
 			label="displayName"
 			@search="asyncSearch"
 			@input="addShare">
