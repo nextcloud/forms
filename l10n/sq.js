@@ -19,6 +19,7 @@ OC.L10N.register(
     "Share" : "Shpërndaje",
     "Description" : "Përshkrim",
     "Summary" : "Përmbledhje",
+    "Download" : "Shkarko",
     "Sharing" : "Ndarje",
     "Settings" : "Rregullimet",
     "Submit" : "Dërgo",

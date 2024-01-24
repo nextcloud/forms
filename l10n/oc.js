@@ -19,6 +19,7 @@ OC.L10N.register(
     "Toggle settings" : "Bascular los paramètres",
     "Description" : "Descripcion",
     "Options" : "Opcions",
+    "Download" : "Teledescargar",
     "Sharing" : "Partiment",
     "Settings" : "Paramètres",
     "Submit" : "Transmetre",

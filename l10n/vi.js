@@ -19,6 +19,7 @@ OC.L10N.register(
     "Share" : "Chia sẻ",
     "Description" : "Mô tả",
     "Summary" : "tóm tắt",
+    "Download" : "Tải xuống",
     "Sharing" : "Đang chia sẽ",
     "Settings" : "Thiết lập",
     "Submit" : "Gửi đi",

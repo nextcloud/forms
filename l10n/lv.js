@@ -20,6 +20,7 @@ OC.L10N.register(
     "Share" : "Koplietot",
     "Description" : "Apraksts",
     "Summary" : "Kopsavilkums",
+    "Download" : "Lejupielādēt",
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",
     "Submit" : "Iesniegt",

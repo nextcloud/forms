@@ -12,6 +12,7 @@ OC.L10N.register(
     "Edit" : "Ẓreg",
     "Share" : "Bḍu",
     "Options" : "Iɣewwaṛen",
+    "Download" : "Sider",
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaṛen",
     "Phone number" : "Uṭṭun n tiliɣri",

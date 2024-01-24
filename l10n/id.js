@@ -18,6 +18,7 @@ OC.L10N.register(
     "Description" : "Deskrisi",
     "Summary" : "Kesimpulan",
     "Options" : "Pilihan",
+    "Download" : "Unduh",
     "Sharing" : "Berbagi",
     "Settings" : "Setelan",
     "Abort" : "Batal",

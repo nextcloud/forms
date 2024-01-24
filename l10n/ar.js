@@ -14,10 +14,10 @@ OC.L10N.register(
     "Anonymous response" : "رد مجهول ",
     "Shared by %s" : "تمت مشاركته مِن قبل %s",
     "Forms including questions and submissions" : "النماذج بما فيها الأسئلة و الإرسالات submissions",
+    "responses" : "الردود ",
     "User ID" : "رمز المستخدم",
     "User display name" : "اسم العرض للمستخدم",
     "Timestamp" : "الطابع الزمني ",
-    "responses" : "الردود ",
     "📝 Simple surveys and questionnaires, self-hosted" : " 📝 استبيانات بسيطة، مستضافة ذاتيًا",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🧑‍💻 Connect to your software:** Easily integrate Forms into your service with our full-fledged [REST-API](https://github.com/nextcloud/forms/blob/main/docs/API.md).\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "** استبيانات واستبيانات بسيطة ، ذاتية الاستضافة! ** \n- ** 📝 تصميم بسيط: ** لا يوجد تنوّعٌ كبيرٌ في الخيارات، فقط الأساسيات. يعمل بشكل جيد على الهاتف المحمول ايضاً \n- ** 📊 عرض النتائج وتصديرها: ** يتم عرض النتائج ويمكن أيضًا تصديرها كملف CSV بنفس التنسيق المستخدم بواسطة نماذج Google . \n- ** 🔒 بياناتك تحت سيطرتك! ** على عكس نماذج Google و Typeform و Doodle وغيرها، تظل معلومات الاستبيان والردود على خادومك. \n- ** 🧑‍💻 الاتصال بالبرنامج الخاص بك: ** يمكنك دمج النماذج بسهولة في خدمتك من خلال [REST-API] الكاملة الخاصة بنا (https://github.com/nextcloud/forms/blob/main/docs/API.md) . \n- ** 🙋 شارك! ** لدينا الكثير من الأشياء المخطط لها مثل المزيد من أنواع الأسئلة ، والتعاون في النماذج ، [والمزيد] (https://github.com/nextcloud/forms/milestones) !",
     "New form" : "نموذج جديد ",
@@ -149,14 +149,8 @@ OC.L10N.register(
     "Summary" : "المُلخَّص",
     "Responses" : "الردود",
     "Options" : "الخيارات",
-    "Save CSV to Files" : "حفظ CSV في الملفات",
-    "Download CSV" : "تحميل CSV",
     "Delete all responses" : "مسح جميع الردود ",
     "There was an error while loading the results" : "حدث خطأ أثناء تحميل النتائج ",
-    "Save as {filename}" : " حِفظ كـ {filename}",
-    "Save to home" : "حِفظ في الدليل الرئيسي",
-    "Save to {path}" : "حِفظ في {path}",
-    "No target selected" : "لم يتم تحديد المَقصِد",
     "Export successful to {file}" : "تم التصدير بنجاح إلى {file}",
     "There was an error, while exporting to Files" : "حدث خطأ أثناء التصدير إلى الملفات",
     "Submission deleted" : "تمّ حذف الإرسال",

@@ -42,6 +42,7 @@ OC.L10N.register(
     "Error while saving form" : "양식 저장 실패",
     "Summary" : "요약",
     "Options" : "옵션들",
+    "Download" : "다운로드",
     "Sharing" : "공유",
     "Settings" : "설정",
     "Thank you for completing the form!" : "양식을 작성해주셔서 감사합니다!",

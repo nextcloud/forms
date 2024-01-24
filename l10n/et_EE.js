@@ -18,6 +18,7 @@ OC.L10N.register(
     "Share" : "Jaga",
     "Description" : "Kirjeldus",
     "Summary" : "Kokkuvõte",
+    "Download" : "Laadi alla",
     "Sharing" : "Jagamine",
     "Settings" : "Seaded",
     "Submit" : "Saada",
