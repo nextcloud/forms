@@ -24,6 +24,9 @@ import Vue from 'vue'
 
 import FormsEmptyContent from './FormsEmptyContent.vue'
 
+// eslint-disable-next-line import/no-unresolved, n/no-missing-import
+import 'vite/modulepreload-polyfill'
+
 Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 

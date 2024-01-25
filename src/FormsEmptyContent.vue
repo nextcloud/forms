@@ -21,18 +21,21 @@
   -->
 
 <template>
-	<NcContent app-name="forms" class="forms-emptycontent">
-		<NcEmptyContent :name="currentModel.title"
-			:description="currentModel.description">
-			<template #icon>
-				<Icon :is="currentModel.icon" :size="64" />
-			</template>
-		</NcEmptyContent>
+	<NcContent app-name="forms">
+		<NcAppContent class="forms-emptycontent">
+			<NcEmptyContent :name="currentModel.title"
+				:description="currentModel.description">
+				<template #icon>
+					<Icon :is="currentModel.icon" :size="64" />
+				</template>
+			</NcEmptyContent>
+		</NcAppContent>
 	</NcContent>
 </template>
 
 <script>
 import { loadState } from '@nextcloud/initial-state'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcContent from '@nextcloud/vue/dist/Components/NcContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import IconCheck from 'vue-material-design-icons/Check.vue'
@@ -44,6 +47,7 @@ export default {
 	components: {
 		FormsIcon,
 		IconCheck,
+		NcAppContent,
 		NcContent,
 		NcEmptyContent,
 	},
