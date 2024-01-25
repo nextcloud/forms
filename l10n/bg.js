@@ -122,6 +122,7 @@ OC.L10N.register(
     "Summary" : "Резюме",
     "Responses" : "Отговори",
     "Options" : "Опции",
+    "Download" : "Изтегляне",
     "Delete all responses" : "Изтриване на всички отговори",
     "There was an error while loading the results" : "Възникна грешка при зареждането на резултатите",
     "Export successful to {file}" : "Успешен износ към {file}",

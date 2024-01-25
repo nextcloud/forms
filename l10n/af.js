@@ -16,6 +16,7 @@ OC.L10N.register(
     "Share" : "Deel",
     "Description" : "Beskrywing",
     "Summary" : "Opsomming",
+    "Download" : "Laai af",
     "Settings" : "Instellings",
     "Submit" : "Dien in",
     "Date" : "Datum",

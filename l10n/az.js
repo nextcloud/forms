@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share" : "Paylaş",
     "Description" : "Açıqlanma",
     "Summary" : "Xülasə",
+    "Download" : "Yüklə",
     "Sharing" : "Paylaşılır",
     "Settings" : "Quraşdırmalar",
     "Abort" : "Durdur",

@@ -16,6 +16,7 @@ OC.L10N.register(
     "There was an error while removing the question" : "Hebo un error mentanto se quitaba la entruga",
     "Summary" : "Resume",
     "Options" : "Opciones",
+    "Download" : "Baxar",
     "There was an error while loading the results" : "Hebo un error mentanto se guardaben los resultaos",
     "There was an error while removing this response" : "Hebo un error mentanto se quitaba esta rempuesta",
     "There was an error while removing responses" : "Hebo un error mentanto se quitaben les rempuestes",
