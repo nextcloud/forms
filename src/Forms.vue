@@ -55,7 +55,7 @@
 		</NcAppNavigation>
 
 		<!-- No forms & loading emptycontents -->
-		<NcAppContent v-if="loading || !hasForms || !routeHash || !routeAllowed">
+		<NcAppContent v-if="loading || !routeHash || !routeAllowed">
 			<NcEmptyContent v-if="loading"
 				class="forms-emptycontent"
 				:name="t('forms', 'Loading forms …')">
