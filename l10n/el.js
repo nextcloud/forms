@@ -143,6 +143,7 @@ OC.L10N.register(
     "Summary" : "Σύνοψη",
     "Responses" : "Απαντήσεις",
     "Options" : "Επιλογές",
+    "Download" : "Λήψη",
     "Delete all responses" : "Διαγραφή απαντήσεων",
     "There was an error while loading the results" : "Υπήρξε σφάλμα κατά την φόρτωση των αποτελεσμάτων",
     "Export successful to {file}" : "Εξαγωγή επιτυχούς στο {file}",

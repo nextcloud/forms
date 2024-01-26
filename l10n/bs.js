@@ -11,6 +11,7 @@ OC.L10N.register(
     "Edit" : "Izmjeni",
     "Share" : "Podjeli",
     "Description" : "Opis",
+    "Download" : "Preuzmi",
     "Sharing" : "Dijeljenje",
     "Settings" : "Podešavanje",
     "Date" : "Date"

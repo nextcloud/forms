@@ -149,6 +149,7 @@ OC.L10N.register(
     "Summary" : "Souhrn",
     "Responses" : "Odpovědi",
     "Options" : "Volby",
+    "Download" : "Stáhnout",
     "Delete all responses" : "Smazat všechny odpovědi",
     "There was an error while loading the results" : "Při načítání výsledků došlo k chybě",
     "Export successful to {file}" : "Úspěšný export do {file}",

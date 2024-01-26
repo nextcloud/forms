@@ -124,6 +124,7 @@ OC.L10N.register(
     "Summary" : "Oversigt",
     "Responses" : "Svar",
     "Options" : "Valgmuligheder",
+    "Download" : "Download",
     "Delete all responses" : "Slet alle svar",
     "There was an error while loading the results" : "Der opstod en fejl under indlæsning af resultaterne",
     "Export successful to {file}" : "Eksporten lykkedes til {file}",

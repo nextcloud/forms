@@ -148,6 +148,7 @@ OC.L10N.register(
     "Summary" : "Zusammenfassung",
     "Responses" : "Antworten",
     "Options" : "Optionen",
+    "Download" : "Herunterladen",
     "Delete all responses" : "Alle Antworten löschen",
     "There was an error while loading the results" : "Fehler beim Laden der Ergebnisse",
     "Export successful to {file}" : "Export in {file} erfolgreich",

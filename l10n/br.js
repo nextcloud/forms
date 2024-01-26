@@ -14,6 +14,7 @@ OC.L10N.register(
     "Share" : "Rannan",
     "Description" : "Diskrivadur",
     "Summary" : "Diverrañ",
+    "Download" : "Pellgargañ",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
     "Submit" : "Kinnig",

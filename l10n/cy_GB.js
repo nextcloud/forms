@@ -15,6 +15,7 @@ OC.L10N.register(
     "Share" : "Rhannu",
     "Description" : "Disgrifiad",
     "Summary" : "Crynodeb",
+    "Download" : "Llwytho i lawr",
     "Settings" : "Gosodiadau",
     "Date" : "Date",
     "Pick a date" : "Dewiswch ddyddiad",

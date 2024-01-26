@@ -124,6 +124,7 @@ OC.L10N.register(
     "Summary" : "Resum",
     "Responses" : "Respostes",
     "Options" : "Opcions",
+    "Download" : "Baixa",
     "Delete all responses" : "Suprimeix totes les respostes",
     "There was an error while loading the results" : "S'ha produït un error en carregar els resultats",
     "Export successful to {file}" : "S'ha exportat correctament a {file}",
