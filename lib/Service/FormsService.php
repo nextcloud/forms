@@ -387,7 +387,8 @@ class FormsService {
 		// Shown if permitall and showntoall are both set.
 		if ($access['permitAllUsers'] &&
 			$access['showToAllUsers'] &&
-			$this->configService->getAllowPermitAll()) {
+			$this->configService->getAllowPermitAll() &&
+			$this->configService->getAllowShowToAll()) {
 			return true;
 		}
 

@@ -133,7 +133,7 @@
 					type="switch"
 					@update:checked="onPermitAllUsersChange" />
 			</div>
-			<div v-if="form.access.permitAllUsers" class="share-div share-div--indent">
+			<div v-if="appConfig.allowShowToAll && form.access.permitAllUsers" class="share-div share-div--indent">
 				<div class="share-div__avatar">
 					<FormsIcon :size="16" />
 				</div>
