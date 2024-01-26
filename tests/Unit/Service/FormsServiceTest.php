@@ -1134,7 +1134,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn(false);
 
 		$this->configService->expects($this->any())
-			->method('getAllowPermitAll')
+			->method('getAllowShowToAll')
 			->willReturn(false);
 
 		$this->shareMapper->expects($this->any())
@@ -1160,7 +1160,7 @@ class FormsServiceTest extends TestCase {
 			->willReturn(true);
 
 		$this->configService->expects($this->any())
-			->method('getAllowPermitAll')
+			->method('getAllowShowToAll')
 			->willReturn(false);
 
 		$this->shareMapper->expects($this->any())
