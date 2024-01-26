@@ -166,7 +166,9 @@
 								{{ t('forms', 'Download') }}
 							</NcActionButton>
 
-							<NcActionButton v-if="canDeleteSubmissions" @click="deleteAllSubmissions">
+							<NcActionButton v-if="canDeleteSubmissions"
+								:close-after-click="true"
+								@click="deleteAllSubmissions">
 								<template #icon>
 									<IconDelete :size="20" />
 								</template>
@@ -226,6 +228,12 @@
 					@delete="deleteSubmission(submission.id)" />
 			</section>
 		</template>
+
+		<!-- Confirmation dialog for deleting all submissions -->
+		<NcDialog :open.sync="showConfirmDeleteDialog"
+			:name="t('forms', 'Delete submissions')"
+			:message="t('forms', 'Are you sure you want to delete all responses of {title}?', { title: formTitle })"
+			:buttons="confirmDeleteButtons" />
 	</NcAppContent>
 </template>
 
@@ -245,8 +253,10 @@ import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 
+import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 import IconDownload from 'vue-material-design-icons/Download.vue'
 import IconFileDelimited from 'vue-material-design-icons/FileDelimited.vue'
 import IconFileDelimitedSvg from '@mdi/svg/svg/file-delimited.svg?raw'
@@ -313,6 +323,7 @@ export default {
 			loadingResults: true,
 			picker: null,
 			showSummary: true,
+			showConfirmDeleteDialog: false,
 			showLinkedFileNotAvailableDialog: false,
 			linkedFileNotAvailableButtons: [
 				{
@@ -326,6 +337,20 @@ export default {
 					icon: IconLinkSvg,
 					type: 'primary',
 					callback: () => { this.onLinkFile() },
+				},
+			],
+			confirmDeleteButtons: [
+				{
+					label: t('forms', 'Cancel'),
+					icon: IconCancelSvg,
+					type: 'tertiary',
+					callback: () => { this.showConfirmDeleteDialog = false },
+				},
+				{
+					label: t('forms', 'Delete submissions'),
+					icon: IconDeleteSvg,
+					type: 'error',
+					callback: () => { this.deleteAllSubmissionsConfirmed() },
 				},
 			],
 		}
@@ -496,11 +521,12 @@ export default {
 			}
 		},
 
-		async deleteAllSubmissions() {
-			if (!confirm(t('forms', 'Are you sure you want to delete all responses of {title}?', { title: this.formTitle }))) {
-				return
-			}
+		deleteAllSubmissions() {
+			this.showConfirmDeleteDialog = true
+		},
 
+		async deleteAllSubmissionsConfirmed() {
+			this.showConfirmDeleteDialog = false
 			this.loadingResults = true
 			try {
 				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/submissions/{formId}', { formId: this.form.id }))
