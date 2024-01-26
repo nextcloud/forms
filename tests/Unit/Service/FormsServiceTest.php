@@ -1021,6 +1021,235 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals(false, $formsService->hasUserAccess($form));
 	}
 
+	public function dataIsSharedFormShown() {
+		return [
+			'dontShowToOwner' => [
+				'ownerId' => 'currentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => false,
+			],
+			'expiredForm' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 1,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => false,
+			],
+			'shownToAll' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => true,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => true,
+			],
+			'sharedToUser' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_USER,
+				'expected' => true,
+			],
+			'notShown' => [
+				'ownerId' => 'notCurrentUser',
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => true,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_LINK,
+				'expected' => false,
+			]
+		];
+	}
+	/**
+	 * @dataProvider dataIsSharedFormShown
+	 *
+	 * @param string $ownerId
+	 * @param int $expires
+	 * @param array $access
+	 * @param int $shareType ShareType used for dummy-share here.
+	 * @param bool $expected
+	 */
+	public function testIsSharedFormShown(string $ownerId, int $expires, array $access, int $shareType, bool $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId($ownerId);
+		$form->setExpires($expires);
+		$form->setAccess($access);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
+
+		$this->configService->expects($this->any())
+			->method('getAllowShowToAll')
+			->willReturn(true);
+
+		$share = new Share();
+		$share->setShareType($shareType);
+		$share->setShareWith('currentUser'); // Only relevant, if $shareType is TYPE_USER, otherwise it's just some 'hash'
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals($expected, $this->formsService->isSharedFormShown($form));
+	}
+
+	public function testIsSharedFormShown_PermitAllNotAllowed() {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('notCurrentUser');
+		$form->setExpires(false);
+		$form->setAccess([
+			'permitAllUsers' => true,
+			'showToAllUsers' => true,
+		]);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(false);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(false);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([]);
+
+		$this->assertEquals(false, $this->formsService->isSharedFormShown($form));
+	}
+
+	public function testIsSharedFormShown_PermitShowNotAllowed() {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('notCurrentUser');
+		$form->setExpires(false);
+		$form->setAccess([
+			'permitAllUsers' => true,
+			'showToAllUsers' => true,
+		]);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(false);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([]);
+
+		$this->assertEquals(false, $this->formsService->isSharedFormShown($form));
+	}
+
+	public function dataIsSharedToUser() {
+		return [
+			'sharedToUser' => [
+				'shareType' => IShare::TYPE_USER,
+				'shareWith' => 'currentUser',
+				'expected' => true,
+			],
+			'sharedToOtherUser' => [
+				'shareType' => IShare::TYPE_USER,
+				'shareWith' => 'NotcurrentUser',
+				'expected' => false,
+			],
+			'sharedToGroup' => [
+				'shareType' => IShare::TYPE_GROUP,
+				'shareWith' => 'goodGroup',
+				'expected' => true,
+			],
+			'sharedToOtherGroup' => [
+				'shareType' => IShare::TYPE_GROUP,
+				'shareWith' => 'wrongGroup',
+				'expected' => false,
+			],
+			'sharedToCircle' => [
+				'shareType' => IShare::TYPE_CIRCLE,
+				'shareWith' => 'goodCircle',
+				'expected' => true,
+			],
+			'sharedToOtherCircle' => [
+				'shareType' => IShare::TYPE_CIRCLE,
+				'shareWith' => 'wrongCircle',
+				'expected' => false,
+			],
+			'NotSharedToUser' => [
+				'shareType' => IShare::TYPE_LINK,
+				'shareWith' => 'abcdefg',
+				'expected' => false,
+			],
+		];
+	}
+	/**
+	 * @dataProvider dataIsSharedToUser
+	 *
+	 * @param int $shareType
+	 * @param string $shareWith
+	 * @param bool $expected
+	 */
+	public function testIsSharedToUser(int $shareType, string $shareWith, bool $expected) {
+		$share = new Share();
+		$share->setShareType($shareType);
+		$share->setShareWith($shareWith);
+		$this->shareMapper->expects($this->once())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->groupManager->expects($shareType === IShare::TYPE_GROUP ? $this->once() : $this->never())
+			->method('isInGroup')
+			->will($this->returnValueMap([
+				['currentUser', 'goodGroup', true],
+				['currentUser', 'wrongGroup', false],
+			]));
+
+		$this->circlesService->expects($shareType === IShare::TYPE_CIRCLE ? $this->once() : $this->never())
+			->method('isUserInCircle')
+			->willReturnCallback(function ($id, $user) {
+				return $id === 'goodCircle';
+			});
+
+		$this->assertEquals($expected, $this->formsService->isSharedToUser(42));
+	}
+
+	public function testIsSharedToCircle_circlesDisabled() {
+		$this->circlesService->expects($this->once())
+			->method('isUserInCircle')
+			->with('circle1', 'currentUser')
+			->willReturn(false);
+
+		$share = new Share();
+		$share->setShareType(IShare::TYPE_CIRCLE);
+		$share->setShareWith('circle1');
+		$this->shareMapper->expects($this->once())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals(false, $this->formsService->isSharedToUser(42));
+	}
+
 	public function dataHasFormExpired() {
 		return [
 			'hasExpired' => [time() - 3600, Constants::FORM_STATE_ACTIVE, true],

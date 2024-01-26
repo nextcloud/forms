@@ -465,7 +465,21 @@ class FormsService {
 			return false;
 		}
 
-		return true;
+		// Shown if user in List of Shared Users/Groups
+		if ($this->isSharedToUser($form->getId())) {
+			return true;
+		}
+		
+		// Shown if permitall and showntoall are both set.
+		if ($form->getAccess()['permitAllUsers'] &&
+			$form->getAccess()['showToAllUsers'] &&
+			$this->configService->getAllowPermitAll() &&
+			$this->configService->getAllowShowToAll()) {
+			return true;
+		}
+
+		// No Reason found to show form.
+		return false;
 	}
 
 	/**

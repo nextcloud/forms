@@ -77,7 +77,7 @@ class ConfigControllerTest extends TestCase {
 				'allow' => 'someConfig',
 				'permit' => 'all'
 			]);
-		
+
 		$this->assertEquals(new DataResponse([
 			'allow' => 'someConfig',
 			'permit' => 'all'
@@ -90,6 +90,11 @@ class ConfigControllerTest extends TestCase {
 				'configKey' => 'allowPermitAll',
 				'configValue' => true,
 				'strConfig' => 'true'
+			],
+			'booleanConfig' => [
+				'configKey' => 'allowShowToAll',
+				'configValue' => true,
+				'strConfig' => "true"
 			],
 			'arrayConfig' => [
 				'configKey' => 'allowPermitAll',
@@ -111,7 +116,7 @@ class ConfigControllerTest extends TestCase {
 	public function testUpdateAppConfig(string $configKey, $configValue, string $strConfig) {
 		$this->logger->expects($this->once())
 			->method('debug');
-		
+
 		$this->config->expects($this->once())
 			->method('setAppValue')
 			->with('forms', $configKey, $strConfig);
@@ -122,7 +127,7 @@ class ConfigControllerTest extends TestCase {
 	public function testUpdateAppConfig_unknownKey() {
 		$this->logger->expects($this->once())
 			->method('debug');
-		
+
 		$this->config->expects($this->never())
 			->method('setAppValue');
 
