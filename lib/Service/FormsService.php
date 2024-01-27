@@ -259,6 +259,16 @@ class FormsService {
 	}
 
 	/**
+	 * Can the current user edit a form
+	 *
+	 * @param Form $form
+	 * @return boolean
+	 */
+	public function canEditForm(Form $form): bool {
+		return in_array(Constants::PERMISSION_EDIT, $this->getPermissions($form));
+	}
+
+	/**
 	 * Can the current user see results of a form
 	 *
 	 * @param Form $form

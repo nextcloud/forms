@@ -62,7 +62,7 @@
 						{{ t('forms', 'Share form') }}
 					</NcButton>
 
-					<NcButton v-if="!form.fileId" type="tertiary-no-background" @click="onLinkFile">
+					<NcButton v-if="canEditForm && !form.fileId" type="tertiary-no-background" @click="onLinkFile">
 						<template #icon>
 							<IconLink :size="20" />
 						</template>
@@ -112,28 +112,30 @@
 						</label>
 					</div>
 
-					<NcButton v-if="form.fileId" :href="fileUrl" type="tertiary-no-background">
-						<template #icon>
-							<IconTable :size="20" />
-						</template>
-						{{ t('forms', 'Open spreadsheet') }}
-					</NcButton>
-
-					<NcActions v-else type="tertiary-no-background" :force-name="true">
-						<NcActionButton @click="onLinkFile">
+					<template v-if="canEditForm">
+						<NcButton v-if="form.fileId" :href="fileUrl" type="tertiary-no-background">
 							<template #icon>
-								<IconLink :size="20" />
+								<IconTable :size="20" />
 							</template>
-							{{ t('forms', 'Create spreadsheet') }}
-						</NcActionButton>
-					</NcActions>
+							{{ t('forms', 'Open spreadsheet') }}
+						</NcButton>
+
+						<NcActions v-else type="tertiary-no-background" :force-name="true">
+							<NcActionButton @click="onLinkFile">
+								<template #icon>
+									<IconLink :size="20" />
+								</template>
+								{{ t('forms', 'Create spreadsheet') }}
+							</NcActionButton>
+						</NcActions>
+					</template>
 
 					<!-- Action menu for cloud export and deletion -->
 					<NcActions :aria-label="t('forms', 'Options')"
 						:force-menu="true"
 						@close="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
-							<template v-if="form.fileId">
+							<template v-if="canEditForm && form.fileId">
 								<NcActionButton :close-after-click="true" @click="onReExport">
 									<template #icon>
 										<IconRefresh :size="20" />
@@ -356,6 +358,10 @@ export default {
 			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE)
 		},
 
+		canEditForm() {
+			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+		},
+
 		noSubmissions() {
 			return this.form.submissions?.length === 0
 		},
@@ -479,7 +485,7 @@ export default {
 			this.$set(this.form, 'fileFormat', form.fileFormat)
 			this.$set(this.form, 'fileId', form.fileId)
 			this.$set(this.form, 'filePath', form.filePath)
-			this.showLinkedFileNotAvailableDialog = form.fileId && !form.filePath
+			this.showLinkedFileNotAvailableDialog = this.canEditForm && form.fileId && !form.filePath
 		},
 
 		async onReExport() {
