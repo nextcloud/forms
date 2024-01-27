@@ -30,7 +30,7 @@
 		"phpunit/phpunit": "^9"
 	},
 	"require": {
-		"phpoffice/phpspreadsheet": "^1.29"
+		"phpoffice/phpspreadsheet": "^2.0"
 	},
 	"extra": {
 		"bamarni-bin": {
