@@ -1,6 +1,7 @@
 <!--
  - @copyright Copyright (c) 2020 John Molakvoæ <skjnldsv@protonmail.com>
  -
+ - @author Christian Hartmann <chris-hartmann@gmx.de>
  - @author John Molakvoæ <skjnldsv@protonmail.com>
  - @author Michael Schmidmaier
  -
@@ -119,6 +120,13 @@
 			:name="t('forms', 'Confirm submit')"
 			:message="t('forms', 'Are you sure you want to submit an empty form?')"
 			:buttons="confirmEmptyModalButtons" />
+		<!-- Confirmation dialog if form is left unsubmitted -->
+		<NcDialog :open.sync="showConfirmLeaveDialog"
+			:name="t('forms', 'Leave form')"
+			:message="t('forms', 'You have unsaved changes! Do you still want to leave?')"
+			:buttons="confirmLeaveFormButtons"
+			:can-close="false"
+			:close-on-click-outside="false" />
 	</NcAppContent>
 </template>
 
@@ -172,10 +180,10 @@ export default {
 	 * This is used to confirm that the user wants to leave the page
 	 * if the form is unsubmitted.
 	 */
-	beforeRouteUpdate(to, from, next) {
+	async beforeRouteUpdate(to, from, next) {
 		// This navigation guard is called when the route parameters changed (e.g. form hash)
 		// continue with the navigation if there are no changes or the user confirms to leave the form
-		if (this.confirmLeaveForm()) {
+		if (await this.confirmLeaveForm()) {
 			next()
 		} else {
 			// Otherwise cancel the navigation
@@ -183,10 +191,10 @@ export default {
 		}
 	},
 
-	beforeRouteLeave(to, from, next) {
+	async beforeRouteLeave(to, from, next) {
 		// This navigation guard is called when the route changed and a new view should be shown
 		// continue with the navigation if there are no changes or the user confirms to leave the form
-		if (this.confirmLeaveForm()) {
+		if (await this.confirmLeaveForm()) {
 			next()
 		} else {
 			// Otherwise cancel the navigation
@@ -220,6 +228,7 @@ export default {
 			/** Submit state of the form, true if changes are currently submitted */
 			submitForm: false,
 			showConfirmEmptyModal: false,
+			showConfirmLeaveDialog: false,
 		}
 	},
 
@@ -300,6 +309,22 @@ export default {
 				icon: IconCheckSvg,
 				type: 'primary',
 				callback: () => this.onConfirmedSubmit(),
+			}]
+		},
+
+		/**
+		 * Buttons for the "confirm leave unsubmitted form" dialog
+		 */
+		confirmLeaveFormButtons() {
+			return [{
+				label: t('forms', 'Abort'),
+				icon: IconCancelSvg,
+				callback: () => this.confirmButtonCallback(false),
+			}, {
+				label: t('forms', 'Leave'),
+				icon: IconCheckSvg,
+				type: 'primary',
+				callback: () => this.confirmButtonCallback(true),
 			}]
 		},
 	},
@@ -439,7 +464,7 @@ export default {
 		 * Methods for catching unwanted unload events
 		 */
 		beforeWindowUnload(e) {
-			if (!this.confirmLeaveForm()) {
+			if (!(this.submitForm || Object.keys(this.answers).length === 0)) {
 				// Cancel the window unload event
 				e.preventDefault()
 				e.returnValue = ''
@@ -450,11 +475,17 @@ export default {
 		Check if the form contains unsaved changes, returns true if the the form can be leaved safely, false if the navigation should be canceled.
 		 */
 		confirmLeaveForm() {
-			return (
-				this.submitForm
-				|| Object.keys(this.answers).length === 0
-				|| confirm(t('forms', 'You have unsaved changes! Do you still want to leave?'))
-			)
+			if (!this.submitForm && Object.keys(this.answers).length !== 0) {
+				this.showConfirmLeaveDialog = true
+				return new Promise((resolve) => {
+					this.confirmButtonCallback = (val) => {
+						this.showConfirmLeaveDialog = false
+						resolve(val)
+					}
+				})
+			}
+
+			return true
 		},
 
 		/**
@@ -501,6 +532,7 @@ export default {
 		resetData() {
 			this.answers = {}
 			this.loading = false
+			this.showConfirmLeaveDialog = false
 			this.success = false
 			this.submitForm = false
 		},
