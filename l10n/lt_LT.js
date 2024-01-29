@@ -99,6 +99,7 @@ OC.L10N.register(
     "Options" : "Parinktys",
     "Download" : "Atsisiųsti",
     "Delete all responses" : "Ištrinti visus atsakymus",
+    "Cancel" : "Atsisakyti",
     "There was an error while loading the results" : "Įkeliant rezultatus, įvyko klaida",
     "Export successful to {file}" : "Eksportavimas į {file} sėkmingas",
     "There was an error while removing this response" : "Šalinant šį atsakymą, įvyko klaida",

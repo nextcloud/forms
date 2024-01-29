@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share" : "Կիսվել",
     "Description" : "Նկարագրություն",
     "Download" : "Ներբեռնել",
+    "Cancel" : "չեղարկել",
     "Settings" : "կարգավորումներ",
     "Date" : "Date",
     "Time" : "Ժամ"

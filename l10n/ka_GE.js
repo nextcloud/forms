@@ -18,6 +18,7 @@ OC.L10N.register(
     "Description" : "აღწერილობა",
     "Summary" : "შეჯამება",
     "Download" : "ჩამოტვირთვა",
+    "Cancel" : "გაუქმება",
     "Sharing" : "გაზიარება",
     "Settings" : "პარამეტრები",
     "Submit" : "გაგზავნა",

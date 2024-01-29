@@ -19,6 +19,7 @@ OC.L10N.register(
     "Description" : "Description",
     "Summary" : "Summary",
     "Download" : "Download",
+    "Cancel" : "Cancel",
     "Sharing" : "Sharing",
     "Settings" : "Settings",
     "Submit" : "Submit",

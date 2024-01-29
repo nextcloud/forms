@@ -19,6 +19,7 @@ OC.L10N.register(
     "Summary" : "Kesimpulan",
     "Options" : "Pilihan",
     "Download" : "Unduh",
+    "Cancel" : "Batal",
     "Sharing" : "Berbagi",
     "Settings" : "Setelan",
     "Abort" : "Batal",

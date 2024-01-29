@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share" : "ভাগাভাগি কর",
     "Description" : "বিবরণ",
     "Download" : "ডাউনলোড",
+    "Cancel" : "বাতিল করুন",
     "Sharing" : "ভাগাভাগিরত",
     "Settings" : "সেটিংস",
     "Abort" : "বাতিল কর",

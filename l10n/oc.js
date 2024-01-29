@@ -20,6 +20,7 @@ OC.L10N.register(
     "Description" : "Descripcion",
     "Options" : "Opcions",
     "Download" : "Teledescargar",
+    "Cancel" : "Anullar",
     "Sharing" : "Partiment",
     "Settings" : "Paramètres",
     "Submit" : "Transmetre",

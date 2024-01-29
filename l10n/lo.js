@@ -11,6 +11,7 @@ OC.L10N.register(
     "Edit" : "ແກ້ໄຂ",
     "Share" : "ແບ່ງປັນ",
     "Download" : "ດາວໂຫລດ",
+    "Cancel" : "ຍົກເລີກ",
     "Sharing" : "ການແບ່ງປັນ",
     "Settings" : "ການຕັ້ງຄ່າ",
     "Date" : "ວັນທີ",

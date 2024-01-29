@@ -20,6 +20,7 @@ OC.L10N.register(
     "Description" : "Përshkrim",
     "Summary" : "Përmbledhje",
     "Download" : "Shkarko",
+    "Cancel" : "Anuloje",
     "Sharing" : "Ndarje",
     "Settings" : "Rregullimet",
     "Submit" : "Dërgo",

@@ -60,6 +60,7 @@ OC.L10N.register(
     "Description" : "รายละเอียด",
     "Add a question" : "เพิ่มคำถาม",
     "Download" : "ดาวน์โหลด",
+    "Cancel" : "ยกเลิก",
     "Sharing" : "การแชร์",
     "Settings" : "การตั้งค่า",
     "Submitting form …" : "กำลังส่งฟอร์ม …",

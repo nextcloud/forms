@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share" : "Podjeli",
     "Description" : "Opis",
     "Download" : "Preuzmi",
+    "Cancel" : "Odustani",
     "Sharing" : "Dijeljenje",
     "Settings" : "Podešavanje",
     "Date" : "Date"

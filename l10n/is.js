@@ -67,6 +67,7 @@ OC.L10N.register(
     "Options" : "Valkostir",
     "Download" : "Sækja",
     "Delete all responses" : "Eyða öllum svörum",
+    "Cancel" : "Hætta við",
     "There was an error while removing responses" : "Villa kom upp við að fjarlægja svör",
     "Sharing" : "Deiling",
     "Settings" : "Stillingar",

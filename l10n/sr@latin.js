@@ -11,6 +11,7 @@ OC.L10N.register(
     "Edit" : "Izmeni",
     "Share" : "Podeli",
     "Description" : "Opis",
+    "Cancel" : "Poništi",
     "Sharing" : "Deljenje",
     "Settings" : "Поставке",
     "Abort" : "Prekini",

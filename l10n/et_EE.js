@@ -19,6 +19,7 @@ OC.L10N.register(
     "Description" : "Kirjeldus",
     "Summary" : "Kokkuvõte",
     "Download" : "Laadi alla",
+    "Cancel" : "Tühista",
     "Sharing" : "Jagamine",
     "Settings" : "Seaded",
     "Submit" : "Saada",

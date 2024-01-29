@@ -25,6 +25,7 @@ OC.L10N.register(
     "Summary" : "Rezumat",
     "Options" : "Opțiuni",
     "Download" : "Descărcare",
+    "Cancel" : "Anulare",
     "Sharing" : "Partajare",
     "Settings" : "Setări",
     "Submit" : "Trimite",

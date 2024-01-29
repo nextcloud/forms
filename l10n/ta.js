@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share" : "பகிர்வு",
     "Description" : "விவரிப்பு",
     "Download" : "பதிவிறக்குக",
+    "Cancel" : "ரத்து செய்",
     "Settings" : "அமைப்புகள்",
     "Date" : "Date"
 },
