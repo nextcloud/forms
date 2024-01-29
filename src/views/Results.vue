@@ -129,10 +129,9 @@
 					</NcActions>
 
 					<!-- Action menu for cloud export and deletion -->
-					<NcActions class="results-menu"
-						:aria-label="t('forms', 'Options')"
+					<NcActions :aria-label="t('forms', 'Options')"
 						:force-menu="true"
-						@close="hideSubActions">
+						@close="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
 							<template v-if="form.fileId">
 								<NcActionButton :close-after-click="true" @click="onReExport">
@@ -141,25 +140,23 @@
 									</template>
 									{{ t('forms', 'Re-export spreadsheet') }}
 								</NcActionButton>
-
 								<NcActionButton :close-after-click="true" @click="onUnlinkFile">
 									<template #icon>
 										<IconLinkVariantOff :size="20" />
 									</template>
 									{{ t('forms', 'Unlink spreadsheet') }}
 								</NcActionButton>
-
 								<NcActionSeparator />
 							</template>
-
 							<NcActionButton :close-after-click="true" @click="onStoreToFiles">
 								<template #icon>
 									<IconFolder :size="20" />
 								</template>
 								{{ t('forms', 'Save copy to Files') }}
 							</NcActionButton>
-
-							<NcActionButton :close-after-click="false" @click="isDownloadActionOpened = true">
+							<NcActionButton :close-after-click="false"
+								:is-menu="true"
+								@click="isDownloadActionOpened = true">
 								<template #icon>
 									<IconDownload :size="20" />
 								</template>
@@ -176,29 +173,27 @@
 							</NcActionButton>
 						</template>
 
-						<template v-if="isDownloadActionOpened">
-							<NcActionButton :close-after-click="false" @click="hideSubActions">
+						<template v-else>
+							<!-- Back to top-level button -->
+							<NcActionButton @click="isDownloadActionOpened = false">
 								<template #icon>
-									<IconChevronLeft :title="t('mail', 'Download')"
-										:size="20" />
+									<IconChevronLeft :size="20" />
 								</template>
 								{{ t('forms', 'Download') }}
 							</NcActionButton>
-
+							<NcActionSeparator />
 							<NcActionButton :close-after-click="true" @click="onDownloadFile('csv')">
 								<template #icon>
 									<IconFileDelimited :size="20" />
 								</template>
 								CSV
 							</NcActionButton>
-
 							<NcActionButton :close-after-click="true" @click="onDownloadFile('ods')">
 								<template #icon>
 									<IconTable :size="20" />
 								</template>
 								ODS
 							</NcActionButton>
-
 							<NcActionButton :close-after-click="true" @click="onDownloadFile('xlsx')">
 								<template #icon>
 									<IconFileExcel :size="20" />
@@ -560,13 +555,6 @@ export default {
 			})
 
 			return submissions
-		},
-
-		hideSubActions() {
-			// close event is fired too early, which lead to showing main menu for few ms, so we need to wait a bit
-			setTimeout(() => {
-				this.isDownloadActionOpened = false
-			}, 100)
 		},
 
 		getPicker() {
