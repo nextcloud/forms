@@ -3,6 +3,7 @@
   -
   - @author John Molakvoæ <skjnldsv@protonmail.com>
   - @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+  - @author Ferdinand Thiessen <opensource@fthiessen.de>
   -
   - @license AGPL-3.0-or-later
   -
@@ -24,6 +25,7 @@
 <template>
 	<div class="sidebar-tabs__content">
 		<NcCheckboxRadioSwitch :checked="form.isAnonymous"
+			:disabled="formArchived"
 			type="switch"
 			@update:checked="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
@@ -31,17 +33,18 @@
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch v-tooltip="disableSubmitMultipleExplanation"
 			:checked="submitMultiple"
-			:disabled="disableSubmitMultiple"
+			:disabled="disableSubmitMultiple || formArchived"
 			type="switch"
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch :checked="formExpires"
+			:disabled="formArchived"
 			type="switch"
 			@update:checked="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
-		<div v-show="formExpires" class="settings-div--indent">
+		<div v-show="formExpires && !formArchived" class="settings-div--indent">
 			<NcDateTimePicker id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled-date="notBeforeToday"
@@ -59,7 +62,27 @@
 				{{ t('forms', 'Show expiration date on form') }}
 			</NcCheckboxRadioSwitch>
 		</div>
+		<NcCheckboxRadioSwitch :checked="formClosed"
+			:disabled="formArchived"
+			aria-describedby="forms-settings__close-form"
+			type="switch"
+			@update:checked="onFormClosedChange">
+			{{ t('forms', 'Close form') }}
+		</NcCheckboxRadioSwitch>
+		<p id="forms-settings__close-form" class="settings-hint">
+			{{ t('forms', 'Closed forms do not accept new submissions.') }}
+		</p>
+		<NcCheckboxRadioSwitch :checked="formArchived"
+			aria-describedby="forms-settings__archive-form"
+			type="switch"
+			@update:checked="onFormArchivedChange">
+			{{ t('forms', 'Archive form') }}
+		</NcCheckboxRadioSwitch>
+		<p id="forms-settings__archive-form" class="settings-hint">
+			{{ t('forms', 'Archived forms do not accept new submissions and can not be modified.') }}
+		</p>
 		<NcCheckboxRadioSwitch :checked="hasCustomSubmissionMessage"
+			:disabled="formArchived"
 			type="switch"
 			@update:checked="onUpdateHasCustomSubmissionMessage">
 			{{ t('forms', 'Custom submission message') }}
@@ -68,7 +91,7 @@
 			class="settings-div--indent submission-message"
 			:tabindex="editMessage ? undefined : '0'"
 			@focus="editMessage = true">
-			<textarea v-if="editMessage || !form.submissionMessage"
+			<textarea v-if="!formArchived && (editMessage || !form.submissionMessage)"
 				v-click-outside="() => { editMessage = false }"
 				aria-describedby="forms-submission-message-description"
 				:aria-label="t('forms', 'Custom submission message')"
@@ -102,6 +125,7 @@ import TransferOwnership from './TransferOwnership.vue'
 
 import { directive as ClickOutside } from 'v-click-outside'
 import { loadState } from '@nextcloud/initial-state'
+import { FormState } from '../../models/FormStates.ts'
 
 export default {
 	components: {
@@ -171,6 +195,15 @@ export default {
 		formExpires() {
 			return this.form.expires !== 0
 		},
+
+		formArchived() {
+			return this.form.state === FormState.FormArchived
+		},
+
+		formClosed() {
+			return this.form.state !== FormState.FormActive
+		},
+
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
@@ -215,6 +248,14 @@ export default {
 		 */
 		onExpirationDateChange(datetime) {
 			this.$emit('update:formProp', 'expires', parseInt(moment(datetime).format('X')))
+		},
+
+		onFormClosedChange(isClosed) {
+			this.$emit('update:formProp', 'state', isClosed ? FormState.FormClosed : FormState.FormActive)
+		},
+
+		onFormArchivedChange(isArchived) {
+			this.$emit('update:formProp', 'state', isArchived ? FormState.FormArchived : FormState.FormClosed)
 		},
 
 		onSubmissionMessageChange({ target }) {
@@ -288,6 +329,11 @@ export default {
 
 .settings-div--indent {
 	margin-inline-start: 40px;
+}
+
+.settings-hint {
+	color: var(--color-text-maxcontrast);
+	padding-inline-start: 16px;
 }
 
 .sidebar-tabs__content {

@@ -389,8 +389,6 @@ class FormsService {
 	 * @return bool
 	 */
 	public function isSharedFormShown(Form $form): bool {
-		$access = $form->getAccess();
-
 		// Dont show here to owner, as its in the owned list anyways.
 		if ($form->getOwnerId() === $this->currentUser->getUID()) {
 			return false;
@@ -401,6 +399,7 @@ class FormsService {
 			return false;
 		}
 
+		$access = $form->getAccess();
 		// Shown if permitall and showntoall are both set.
 		if ($access['permitAllUsers'] &&
 			$access['showToAllUsers'] &&

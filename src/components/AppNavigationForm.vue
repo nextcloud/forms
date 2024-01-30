@@ -22,15 +22,16 @@
 
 <template>
 	<NcListItem ref="navigationItem"
+		:active="isActive"
+		:actions-aria-label="t('forms', 'Form actions')"
+		:counter-number="form.submissionCount"
+		:compact="true"
+		:force-display-actions="forceDisplayActions"
 		:name="formTitle"
 		:to="{
 			name: routerTarget,
 			params: { hash: form.hash }
 		}"
-		:counter-number="form.submissionCount"
-		:active="isActive"
-		:compact="true"
-		:actions-aria-label="t('forms', 'Form actions')"
 		@click="mobileCloseNavigation">
 		<template #icon>
 			<NcLoadingIcon v-if="loading" :size="16" />
@@ -41,7 +42,8 @@
 			{{ formSubtitle }}
 		</template>
 		<template v-if="!loading && !readOnly" #actions>
-			<NcActionRouter :close-after-click="true"
+			<NcActionRouter v-if="!isArchived"
+				:close-after-click="true"
 				:exact="true"
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
@@ -50,7 +52,9 @@
 				</template>
 				{{ t('forms', 'Edit form') }}
 			</NcActionRouter>
-			<NcActionButton :close-after-click="true" @click="onShareForm">
+			<NcActionButton v-if="!isArchived"
+				:close-after-click="true"
+				@click="onShareForm">
 				<template #icon>
 					<IconShareVariant :size="20" />
 				</template>
@@ -65,14 +69,21 @@
 				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
-			<NcActionButton :close-after-click="true" @click="onCloneForm">
+			<NcActionButton v-if="canEdit && !isArchived" :close-after-click="true" @click="onCloneForm">
 				<template #icon>
 					<IconContentCopy :size="20" />
 				</template>
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
-			<NcActionSeparator />
-			<NcActionButton :close-after-click="true" @click="showDeleteDialog = true">
+			<NcActionSeparator v-if="canEdit" />
+			<NcActionButton v-if="canEdit" :close-after-click="true" @click="onToggleArchive">
+				<template #icon>
+					<IconArchiveOff v-if="isArchived" :size="20" />
+					<IconArchive v-else :size="20" />
+				</template>
+				{{ isArchived ? t('forms', 'Unarchive form') : t('forms', 'Archive form') }}
+			</NcActionButton>
+			<NcActionButton v-if="canEdit" :close-after-click="true" @click="showDeleteDialog = true">
 				<template #icon>
 					<IconDelete :size="20" />
 				</template>
@@ -97,6 +108,8 @@ import NcListItem from '@nextcloud/vue/dist/Components/NcListItem.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
+import IconArchive from 'vue-material-design-icons/Archive.vue'
+import IconArchiveOff from 'vue-material-design-icons/ArchiveOff.vue'
 import IconCheck from 'vue-material-design-icons/Check.vue'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
@@ -108,6 +121,8 @@ import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 
 import FormsIcon from './Icons/FormsIcon.vue'
 
+import { FormState } from '../models/FormStates.ts'
+import PermissionTypes from '../mixins/PermissionTypes.js'
 import logger from '../utils/Logger.js'
 
 export default {
@@ -115,6 +130,8 @@ export default {
 
 	components: {
 		FormsIcon,
+		IconArchive,
+		IconArchiveOff,
 		IconCheck,
 		IconContentCopy,
 		IconDelete,
@@ -129,10 +146,17 @@ export default {
 		NcLoadingIcon,
 	},
 
+	mixins: [PermissionTypes],
+
 	props: {
 		form: {
 			type: Object,
 			required: true,
+		},
+		forceDisplayActions: {
+			type: Boolean,
+			default: false,
+			required: false,
 		},
 		readOnly: {
 			type: Boolean,
@@ -156,11 +180,22 @@ export default {
 	},
 
 	computed: {
+		canEdit() {
+			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+		},
+
 		/**
 		 * Check if form is current form and set active
 		 */
 		isActive() {
 			return this.form.hash === this.$route.params.hash
+		},
+
+		/**
+		 * Check if the form is archived
+		 */
+		isArchived() {
+			return this.form.state === FormState.FormArchived
 		},
 
 		/**
@@ -186,6 +221,10 @@ export default {
 		 * Return expiration details for subtitle
 		 */
 		formSubtitle() {
+			if (this.form.state === FormState.FormClosed) {
+				// TRANSLATORS: The form was closed manually so it does not take new submissions
+				return t('forms', 'Form closed')
+			}
 			if (this.form.expires) {
 				const relativeDate = moment(this.form.expires, 'X').fromNow()
 				if (this.isExpired) {
@@ -230,6 +269,22 @@ export default {
 		},
 		onCloneForm() {
 			this.$emit('clone', this.form.id)
+		},
+
+		async onToggleArchive() {
+			try {
+				// TODO: add loading status feedback ?
+				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/form/update'), {
+					id: this.form.id,
+					keyValuePairs: {
+						state: this.isArchived ? FormState.FormClosed : FormState.FormArchived,
+					},
+				})
+				this.$set(this.form, 'state', this.isArchived ? FormState.FormClosed : FormState.FormArchived)
+			} catch (error) {
+				logger.error('Error changing archived state of form', { error })
+				showError(t('forms', 'Error changing archived state of form'))
+			}
 		},
 
 		async onDeleteForm() {

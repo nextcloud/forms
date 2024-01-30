@@ -24,111 +24,123 @@
   -->
 
 <template>
-	<NcAppContent v-if="isLoadingForm">
-		<NcEmptyContent class="emtpycontent"
+	<NcAppContent>
+		<!-- Show results & sidebar button -->
+		<TopBar :archived="isFormArchived"
+			:permissions="form?.permissions"
+			:sidebar-opened="sidebarOpened"
+			@update:sidebarOpened="onSidebarChange"
+			@share-form="onShareForm" />
+
+		<NcEmptyContent v-if="isLoadingForm"
+			class="emtpycontent"
 			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
 		</NcEmptyContent>
-	</NcAppContent>
 
-	<NcAppContent v-else>
-		<!-- Show results & sidebar button -->
-		<TopBar :permissions="form?.permissions"
-			:sidebar-opened="sidebarOpened"
-			@update:sidebarOpened="onSidebarChange"
-			@share-form="onShareForm" />
-		<!-- Forms title & description-->
-		<header>
-			<h2>
-				<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
-				<textarea id="form-title"
-					ref="title"
-					v-model="form.title"
-					class="form-title"
+		<NcEmptyContent v-else-if="isFormArchived"
+			class="emtpycontent"
+			:name="t('forms', 'Form is archived')"
+			:description="t('forms', 'Form \'{title}\' is archived and can not be modified.', { title: form.title })">
+			<template #icon>
+				<IconLock :size="64" />
+			</template>
+		</NcEmptyContent>
+
+		<template v-else>
+			<!-- Forms title & description-->
+			<header>
+				<h2>
+					<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
+					<textarea id="form-title"
+						ref="title"
+						v-model="form.title"
+						class="form-title"
+						rows="1"
+						dir="auto"
+						:maxlength="maxStringLengths.formTitle"
+						:placeholder="t('forms', 'Form title')"
+						:required="true"
+						autofocus
+						@input="onTitleChange" />
+				</h2>
+				<label class="hidden-visually" for="form-desc">
+					{{ t('forms', 'Description') }}
+				</label>
+				<textarea id="form-desc"
+					ref="description"
+					class="form-desc"
 					rows="1"
 					dir="auto"
-					:maxlength="maxStringLengths.formTitle"
-					:placeholder="t('forms', 'Form title')"
-					:required="true"
-					autofocus
-					@input="onTitleChange" />
-			</h2>
-			<label class="hidden-visually" for="form-desc">
-				{{ t('forms', 'Description') }}
-			</label>
-			<textarea id="form-desc"
-				ref="description"
-				class="form-desc"
-				rows="1"
-				dir="auto"
-				:value="form.description"
-				:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
-				:maxlength="maxStringLengths.formDescription"
-				@input="updateDescription" />
-			<!-- Show expiration message-->
-			<p v-if="form.expires && form.showExpiration" class="info-message">
-				{{ expirationMessage }}
-			</p>
-			<!-- Generate form information message-->
-			<p v-if="infoMessage" class="info-message">
-				{{ infoMessage }}
-			</p>
-		</header>
+					:value="form.description"
+					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
+					:maxlength="maxStringLengths.formDescription"
+					@input="updateDescription" />
+				<!-- Show expiration message-->
+				<p v-if="form.expires && form.showExpiration" class="info-message">
+					{{ expirationMessage }}
+				</p>
+				<!-- Generate form information message-->
+				<p v-if="infoMessage" class="info-message">
+					{{ infoMessage }}
+				</p>
+			</header>
 
-		<section>
-			<!-- Questions list -->
-			<Draggable v-model="form.questions"
-				:animation="200"
-				tag="ul"
-				handle=".question__drag-handle"
-				@change="onQuestionOrderChange"
-				@start="isDragging = true"
-				@end="isDragging = false">
-				<transition-group :name="isDragging ? 'no-external-transition-on-drag' : 'question-list'">
-					<component :is="answerTypes[question.type].component"
-						v-for="(question, index) in form.questions"
-						ref="questions"
-						:key="question.id"
-						:can-move-down="index < (form.questions.length - 1)"
-						:can-move-up="index > 0"
-						:answer-type="answerTypes[question.type]"
-						:index="index + 1"
-						:max-string-lengths="maxStringLengths"
-						v-bind.sync="form.questions[index]"
-						@clone="cloneQuestion(question)"
-						@delete="deleteQuestion(question)"
-						@move-down="onMoveDown(index)"
-						@move-up="onMoveUp(index)" />
-				</transition-group>
-			</Draggable>
+			<section>
+				<!-- Questions list -->
+				<Draggable v-model="form.questions"
+					:animation="200"
+					tag="ul"
+					handle=".question__drag-handle"
+					@change="onQuestionOrderChange"
+					@start="isDragging = true"
+					@end="isDragging = false">
+					<transition-group :name="isDragging ? 'no-external-transition-on-drag' : 'question-list'">
+						<component :is="answerTypes[question.type].component"
+							v-for="(question, index) in form.questions"
+							ref="questions"
+							:key="question.id"
+							:can-move-down="index < (form.questions.length - 1)"
+							:can-move-up="index > 0"
+							:answer-type="answerTypes[question.type]"
+							:index="index + 1"
+							:max-string-lengths="maxStringLengths"
+							v-bind.sync="form.questions[index]"
+							@clone="cloneQuestion(question)"
+							@delete="deleteQuestion(question)"
+							@move-down="onMoveDown(index)"
+							@move-up="onMoveUp(index)" />
+					</transition-group>
+				</Draggable>
 
-			<!-- Add new questions menu -->
-			<div class="question-menu">
-				<NcActions ref="questionMenu"
-					:open.sync="questionMenuOpened"
-					:menu-name="t('forms', 'Add a question')"
-					:aria-label="t('forms', 'Add a question')"
-					:primary="true">
-					<template #icon>
-						<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
-						<IconPlus v-else :size="20" />
-					</template>
-					<NcActionButton v-for="(answer, type) in answerTypesFilter"
-						:key="answer.label"
-						:close-after-click="true"
-						:disabled="isLoadingQuestions"
-						class="question-menu__question"
-						@click="addQuestion(type)">
+				<!-- Add new questions menu -->
+				<div class="question-menu">
+					<NcActions ref="questionMenu"
+						:open.sync="questionMenuOpened"
+						:menu-name="t('forms', 'Add a question')"
+						:aria-label="t('forms', 'Add a question')"
+						:primary="true">
 						<template #icon>
-							<Icon :is="answer.icon" :size="20" />
+							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
+							<IconPlus v-else :size="20" />
 						</template>
-						{{ answer.label }}
-					</NcActionButton>
-				</NcActions>
-			</div>
-		</section>
+						<NcActionButton v-for="(answer, type) in answerTypesFilter"
+							:key="answer.label"
+							:close-after-click="true"
+							:disabled="isLoadingQuestions"
+							class="question-menu__question"
+							@click="addQuestion(type)">
+							<template #icon>
+								<Icon :is="answer.icon" :size="20" />
+							</template>
+							{{ answer.label }}
+						</NcActionButton>
+					</NcActions>
+				</div>
+			</section>
+		</template>
 	</NcAppContent>
 </template>
 
@@ -147,8 +159,10 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import IconLock from 'vue-material-design-icons/Lock.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
+import { FormState } from '../models/FormStates.ts'
 import answerTypes from '../models/AnswerTypes.js'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
@@ -166,6 +180,7 @@ export default {
 	name: 'Create',
 	components: {
 		Draggable,
+		IconLock,
 		IconPlus,
 		NcActionButton,
 		NcActions,
@@ -208,6 +223,13 @@ export default {
 		 */
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
+		},
+
+		/**
+		 * Check if the form was archived
+		 */
+		isFormArchived() {
+			return this.form.state === FormState.FormArchived
 		},
 
 		infoMessage() {

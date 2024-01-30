@@ -31,7 +31,8 @@
 			size="normal"
 			:can-close="false" />
 
-		<TopBar :permissions="form?.permissions"
+		<TopBar :archived="isFormArchived"
+			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
@@ -270,6 +271,7 @@ import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 import IconTable from 'vue-material-design-icons/Table.vue'
 import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
 
+import { FormState } from '../models/FormStates.ts'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
@@ -354,8 +356,12 @@ export default {
 	},
 
 	computed: {
+		isFormArchived() {
+			return this.form.state === FormState.FormArchived
+		},
+
 		canDeleteSubmissions() {
-			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE)
+			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE) && !this.isFormArchived
 		},
 
 		canEditForm() {
