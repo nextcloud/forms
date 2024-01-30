@@ -17,6 +17,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | access      | [Access-Object](#access-object) |  | Describing access-settings of the form |
 | expires     | unix-timestamp  |               | When the form should expire. Timestamp `0` indicates _never_ |
 | isAnonymous | Boolean         |               | If Answers will be stored anonymously |
+| state       | Integer         | [Form state](#form-state)| The state of the form |
 | submitMultiple  | Boolean     |               | If users are allowed to submit multiple times to the form |
 | showExpiration | Boolean      |               | If the expiration date will be shown on the form |
 | canSubmit   | Boolean         |               | If the user can Submit to the form, i.e. calculated information out of `submitMultiple` and existing submissions. |
@@ -45,10 +46,20 @@ This document describes the Object-Structure, that is used within the Forms App 
     "submit"
   ],
   "questions": [],
-  "submissions": [],
+  "state": 0,
   "shares": []
+  "submissions": [],
 }
 ```
+
+#### Form state
+The form state is used for additional states, currently following states are defined:
+
+| Value          | Meaning                                     |
+|----------------|---------------------------------------------|
+| 0              | Form is active and open for new submissions |
+| 1              | Form is closed and does not allow new submissions |
+| 2              | Form is archived, it does not allow new submissions and can also not be modified anymore |
 
 ### Question
 | Property       | Type            | Restrictions | Description |

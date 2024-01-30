@@ -193,7 +193,8 @@ class FormsService {
 			'expires' => $form->getExpires(),
 			'lastUpdated' => $form->getLastUpdated(),
 			'permissions' => $this->getPermissions($form),
-			'partial' => true
+			'partial' => true,
+			'state' => $form->getState(),
 		];
 
 		// Append submissionCount if currentUser has permissions to see results
@@ -285,7 +286,13 @@ class FormsService {
 	 * @return boolean
 	 */
 	public function canDeleteResults(Form $form): bool {
-		return in_array(Constants::PERMISSION_RESULTS_DELETE, $this->getPermissions($form));
+		// Check permissions
+		if (!in_array(Constants::PERMISSION_RESULTS_DELETE, $this->getPermissions($form))) {
+			return false;
+		}
+
+		// Do not allow deleting results on archived forms
+		return !$this->isFormArchived($form);
 	}
 
 	/**
@@ -421,13 +428,25 @@ class FormsService {
 		return count($shareEntities) > 0;
 	}
 
-	/*
-	 * Has the form expired?
+	/**
+	 * Check if the form is archived
+	 * If a form is archived no changes are allowed
+	 */
+	public function isFormArchived(Form $form): bool {
+		return $form->getState() === Constants::FORM_STATE_ARCHIVED;
+	}
+
+	/**
+	 * Check if the form was closed or archived or has expired.
 	 *
 	 * @param Form $form
 	 * @return boolean
 	 */
 	public function hasFormExpired(Form $form): bool {
+		// Check for form state first
+		if ($form->getState() !== Constants::FORM_STATE_ACTIVE) {
+			return true;
+		}
 		return ($form->getExpires() !== 0 && $form->getExpires() < time());
 	}
 

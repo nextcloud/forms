@@ -386,6 +386,7 @@ class ApiControllerTest extends TestCase {
 		return [
 			'forms' => ['expectedForm' => [
 				'id' => 7,
+				'state' => 0,
 				'hash' => 'formHash',
 				'title' => '',
 				'description' => '',

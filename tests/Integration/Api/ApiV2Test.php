@@ -62,6 +62,7 @@ class ApiV2Test extends TestCase {
 				],
 				'created' => 12345,
 				'expires' => 0,
+				'state' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'show_expiration' => false,
@@ -167,6 +168,7 @@ class ApiV2Test extends TestCase {
 				],
 				'created' => 12345,
 				'expires' => 0,
+				'state' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'show_expiration' => false,
@@ -205,6 +207,7 @@ class ApiV2Test extends TestCase {
 				],
 				'created' => 12345,
 				'expires' => 0,
+				'state' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'show_expiration' => false,
@@ -270,6 +273,7 @@ class ApiV2Test extends TestCase {
 					'access_json' => $qb->createNamedParameter(json_encode($form['access_json']), IQueryBuilder::PARAM_STR),
 					'created' => $qb->createNamedParameter($form['created'], IQueryBuilder::PARAM_INT),
 					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
+					'state' => $qb->createNamedParameter($form['state'], IQueryBuilder::PARAM_INT),
 					'is_anonymous' => $qb->createNamedParameter($form['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL),
 					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
@@ -427,6 +431,7 @@ class ApiV2Test extends TestCase {
 						'hash' => 'abcdefg',
 						'title' => 'Title of a Form',
 						'expires' => 0,
+						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => Constants::PERMISSION_ALL,
 						'partial' => true,
@@ -436,6 +441,7 @@ class ApiV2Test extends TestCase {
 						'hash' => 'third',
 						'title' => 'Title of a third Form',
 						'expires' => 0,
+						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => Constants::PERMISSION_ALL,
 						'partial' => true,
@@ -468,6 +474,7 @@ class ApiV2Test extends TestCase {
 						'hash' => 'abcdefghij',
 						'title' => 'Title of a second Form',
 						'expires' => 0,
+						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => [
 							'submit'
@@ -500,6 +507,7 @@ class ApiV2Test extends TestCase {
 					'hash' => 'abcdefghij',
 					'title' => 'Title of a second Form',
 					'expires' => 0,
+					'state' => 0,
 					'lastUpdated' => 123456789,
 					'permissions' => [
 						'submit'
@@ -538,6 +546,7 @@ class ApiV2Test extends TestCase {
 						'showToAllUsers' => false
 					],
 					'expires' => 0,
+					'state' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'showExpiration' => false,
@@ -596,6 +605,7 @@ class ApiV2Test extends TestCase {
 						'showToAllUsers' => false
 					],
 					'expires' => 0,
+					'state' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'showExpiration' => false,

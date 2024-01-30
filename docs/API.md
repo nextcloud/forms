@@ -58,7 +58,8 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
       "results",
       "submit"
     ],
-    "partial": true
+    "partial": true,
+    "state": 0
   },
   {
     "id": 3,
@@ -70,7 +71,8 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
       "results",
       "submit"
     ],
-    "partial": true
+    "partial": true,
+    "state": 0
   }
 ]
 ```
@@ -103,7 +105,8 @@ Returns a single partial form object, corresponding to owned/shared form-listing
   "permissions": [
     "submit"
   ],
-  "partial": true
+  "partial": true,
+  "state": 0
 }
 ```
 
@@ -146,6 +149,7 @@ Returns the full-depth object of the requested form (without submissions).
   "submitMultiple": true,
   "showExpiration": false,
   "canSubmit": true,
+  "state": 0,
   "permissions": [
     "edit",
     "results",

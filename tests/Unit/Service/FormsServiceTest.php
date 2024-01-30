@@ -170,6 +170,7 @@ class FormsServiceTest extends TestCase {
 			// Just the full form without submissions
 			'one-full-form' => [[
 				'id' => 42,
+				'state' => 0,
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'description' => 'Description Text',
@@ -250,6 +251,7 @@ class FormsServiceTest extends TestCase {
 		// The form
 		$form = new Form();
 		$form->setId(42);
+		$form->setState(0); // default => 0 means active
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
 		$form->setDescription('Description Text');
@@ -341,13 +343,14 @@ class FormsServiceTest extends TestCase {
 		return [
 			'onePartialOwnedForm' => [[
 				'id' => 42,
+				'state' => 0,
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
 				'lastUpdated' => 123456789,
 				'permissions' => Constants::PERMISSION_ALL,
 				'submissionCount' => 123,
-				'partial' => true
+				'partial' => true,
 			]]
 		];
 	}
@@ -358,6 +361,7 @@ class FormsServiceTest extends TestCase {
 	 */
 	public function testGetPartialForm(array $expected) {
 		$form = new Form();
+		$form->setState(0);
 		$form->setId(42);
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
@@ -384,7 +388,8 @@ class FormsServiceTest extends TestCase {
 				'lastUpdated' => 123456789,
 				'permissions' => ['results', 'submit'],
 				'submissionCount' => 123,
-				'partial' => true
+				'state' => 0,
+				'partial' => true,
 			]]
 		];
 	}
@@ -397,6 +402,7 @@ class FormsServiceTest extends TestCase {
 	public function testGetPartialFormShared(array $expected) {
 		$form = new Form();
 		$form->setId(42);
+		$form->setState(0);
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
 		$form->setOwnerId('otherUser');
@@ -428,6 +434,7 @@ class FormsServiceTest extends TestCase {
 			// Bare form without questions, checking removed access & ownerId
 			'one-full-form' => [[
 				'id' => 42,
+				'state' => 0,
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'description' => 'Description Text',
@@ -455,6 +462,7 @@ class FormsServiceTest extends TestCase {
 		// The form
 		$form = new Form();
 		$form->setId(42);
+		$form->setState(0);
 		$form->setHash('abcdefg');
 		$form->setTitle('Form 1');
 		$form->setDescription('Description Text');
@@ -1034,6 +1042,7 @@ class FormsServiceTest extends TestCase {
 		return [
 			'dontShowToOwner' => [
 				'ownerId' => 'currentUser',
+				'state' => 0,
 				'expires' => 0,
 				'access' => [
 					'permitAllUsers' => true,
@@ -1044,6 +1053,7 @@ class FormsServiceTest extends TestCase {
 			],
 			'expiredForm' => [
 				'ownerId' => 'notCurrentUser',
+				'state' => 0,
 				'expires' => 1,
 				'access' => [
 					'permitAllUsers' => true,
@@ -1054,6 +1064,7 @@ class FormsServiceTest extends TestCase {
 			],
 			'shownToAll' => [
 				'ownerId' => 'notCurrentUser',
+				'state' => 0,
 				'expires' => 0,
 				'access' => [
 					'permitAllUsers' => true,
@@ -1064,6 +1075,7 @@ class FormsServiceTest extends TestCase {
 			],
 			'sharedToUser' => [
 				'ownerId' => 'notCurrentUser',
+				'state' => 0,
 				'expires' => 0,
 				'access' => [
 					'permitAllUsers' => false,
@@ -1074,6 +1086,7 @@ class FormsServiceTest extends TestCase {
 			],
 			'notShown' => [
 				'ownerId' => 'notCurrentUser',
+				'state' => 0,
 				'expires' => 0,
 				'access' => [
 					'permitAllUsers' => true,
@@ -1081,21 +1094,45 @@ class FormsServiceTest extends TestCase {
 				],
 				'shareType' => IShare::TYPE_LINK,
 				'expected' => false,
-			]
+			],
+			'ArchivedIsNotShown' => [
+				'ownerId' => 'notCurrentUser',
+				'state' => Constants::FORM_STATE_ARCHIVED,
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_USER,
+				'expected' => false,
+			],
+			'ClosedIsNotShown' => [
+				'ownerId' => 'notCurrentUser',
+				'state' => Constants::FORM_STATE_CLOSED,
+				'expires' => 0,
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'shareType' => IShare::TYPE_USER,
+				'expected' => false,
+			],
 		];
 	}
 	/**
 	 * @dataProvider dataIsSharedFormShown
 	 *
 	 * @param string $ownerId
-	 * @param int $expires
+	 * @param int $state The form state
+	 * @param int $expires The form expiration date
 	 * @param array $access
 	 * @param int $shareType ShareType used for dummy-share here.
 	 * @param bool $expected
 	 */
-	public function testIsSharedFormShown(string $ownerId, int $expires, array $access, int $shareType, bool $expected) {
+	public function testIsSharedFormShown(string $ownerId, int $state, int $expires, array $access, int $shareType, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
+		$form->setState($state);
 		$form->setOwnerId($ownerId);
 		$form->setExpires($expires);
 		$form->setAccess($access);
@@ -1227,19 +1264,23 @@ class FormsServiceTest extends TestCase {
 
 	public function dataHasFormExpired() {
 		return [
-			'hasExpired' => [time() - 3600, true],
-			'hasNotExpired' => [time() + 3600, false],
-			'doesNeverExpire' => [0, false]
+			'hasExpired' => [time() - 3600, Constants::FORM_STATE_ACTIVE, true],
+			'hasNotExpired' => [time() + 3600, Constants::FORM_STATE_ACTIVE, false],
+			'doesNeverExpire' => [0, Constants::FORM_STATE_ACTIVE, false],
+			'isClosed' => [time() + 3600, Constants::FORM_STATE_CLOSED, true],
+			'isArchived' => [time() + 3600, Constants::FORM_STATE_ARCHIVED, true],
 		];
 	}
 	/**
 	 * @dataProvider dataHasFormExpired
 	 *
 	 * @param int $expires
+	 * @param int $state the form state
 	 * @param bool $expected has expired
 	 */
-	public function testHasFormExpired(int $expires, bool $expected) {
+	public function testHasFormExpired(int $expires, int $state, bool $expected) {
 		$form = new Form();
+		$form->setState($state);
 		$form->setExpires($expires);
 
 		$this->assertEquals($expected, $this->formsService->hasFormExpired($form));

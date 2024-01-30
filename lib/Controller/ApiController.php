@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
  * @author affan98 <affan98@gmail.com>
+ * @author Ferdinand Thiessen <opensource@fthiessen.de>
  * @author Jan-Christoph Borchardt <hey@jancborchardt.net>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
@@ -471,6 +472,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
 		// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
 		$questions = $this->questionMapper->findByForm($formId);
 		$lastQuestion = array_pop($questions);
@@ -527,6 +533,11 @@ class ApiController extends OCSController {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
 
@@ -627,6 +638,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
@@ -690,6 +706,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
 		// Store Order of deleted Question
 		$deletedOrder = $question->getOrder();
 
@@ -738,6 +759,11 @@ class ApiController extends OCSController {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
 
@@ -797,6 +823,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
 		$option = new Option();
 
 		$option->setQuestionId($questionId);
@@ -838,6 +869,11 @@ class ApiController extends OCSController {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
 
@@ -892,6 +928,11 @@ class ApiController extends OCSController {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
 
@@ -1180,8 +1221,9 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
+		// The current user has permissions to remove submissions
+		if (!$this->formsService->canDeleteResults($form)) {
+			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
 			throw new OCSForbiddenException();
 		}
 

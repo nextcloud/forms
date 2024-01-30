@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @author affan98 <affan98@gmail.com>
  * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @author Ferdinand Thiessen <opensource@fthiessen.de>
  *
  * @license AGPL-3.0-or-later
  *
@@ -44,20 +45,22 @@ use OCP\AppFramework\Db\Entity;
  * @method void setFileFormat(string|null $value)
  * @method array getAccess()
  * @method void setAccess(array $value)
- * @method integer getCreated()
- * @method void setCreated(integer $value)
- * @method integer getExpires()
- * @method void setExpires(integer $value)
- * @method integer getIsAnonymous()
+ * @method int getCreated()
+ * @method void setCreated(int $value)
+ * @method int getExpires()
+ * @method void setExpires(int $value)
+ * @method int getIsAnonymous()
  * @method void setIsAnonymous(bool $value)
- * @method integer getSubmitMultiple()
+ * @method int getSubmitMultiple()
  * @method void setSubmitMultiple(bool $value)
- * @method integer getShowExpiration()
+ * @method int getShowExpiration()
  * @method void setShowExpiration(bool $value)
- * @method integer getLastUpdated()
- * @method void setLastUpdated(integer $value)
+ * @method int getLastUpdated()
+ * @method void setLastUpdated(int $value)
  * @method ?string getSubmissionMessage()
  * @method void setSubmissionMessage(?string $value)
+ * @method int getState()
+ * @method void setState(?int $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -74,6 +77,7 @@ class Form extends Entity {
 	protected $showExpiration;
 	protected $submissionMessage;
 	protected $lastUpdated;
+	protected $state;
 
 	/**
 	 * Form constructor.
@@ -85,6 +89,7 @@ class Form extends Entity {
 		$this->addType('submitMultiple', 'bool');
 		$this->addType('showExpiration', 'bool');
 		$this->addType('lastUpdated', 'integer');
+		$this->addType('state', 'integer');
 	}
 
 	// JSON-Decoding of access-column.
@@ -115,6 +120,7 @@ class Form extends Entity {
 			'showExpiration' => (bool)$this->getShowExpiration(),
 			'lastUpdated' => (int)$this->getLastUpdated(),
 			'submissionMessage' => $this->getSubmissionMessage(),
+			'state' => $this->getState(),
 		];
 	}
 }

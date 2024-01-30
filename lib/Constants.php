@@ -54,6 +54,13 @@ class Constants {
 	];
 
 	/**
+	 * State flags of a form
+	 */
+	public const FORM_STATE_ACTIVE = 0;
+	public const FORM_STATE_CLOSED = 1;
+	public const FORM_STATE_ARCHIVED = 2;
+
+	/**
 	 * !! Keep in sync with src/models/AnswerTypes.js !!
 	 */
 
