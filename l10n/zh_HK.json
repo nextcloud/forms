@@ -156,6 +156,7 @@
     "Save copy to Files" : "保存副本至檔案",
     "Download" : "下載",
     "Delete all responses" : "刪除所有回應",
+    "Delete submissions" : "刪除遞交",
     "Are you sure you want to delete all responses of {title}?" : "您確定您想要刪除 {title} 的所有回應嗎？",
     "Cancel" : "取消",
     "There was an error while loading the results" : "載入結果時發生錯誤",

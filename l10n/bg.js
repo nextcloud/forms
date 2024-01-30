@@ -125,6 +125,7 @@ OC.L10N.register(
     "Download" : "Изтегляне",
     "Delete all responses" : "Изтриване на всички отговори",
     "Are you sure you want to delete all responses of {title}?" : "Сигурни ли сте, че искате да изтриете всички отговори на {title}?",
+    "Cancel" : "Отказ",
     "There was an error while loading the results" : "Възникна грешка при зареждането на резултатите",
     "Export successful to {file}" : "Успешен износ към {file}",
     "There was an error, while exporting to Files" : "Възникна грешка при изнасянето към Файлове",
