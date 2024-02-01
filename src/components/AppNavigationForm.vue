@@ -235,7 +235,7 @@ export default {
 		async onDeleteForm() {
 			this.loading = true
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/form/{id}', { id: this.form.id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id: this.form.id }))
 				this.$emit('delete', this.form.id)
 			} catch (error) {
 				logger.error(`Error while deleting ${this.formTitle}`, { error: error.response })

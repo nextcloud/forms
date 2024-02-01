@@ -290,7 +290,7 @@ export default {
 
 			if (!option.local) {
 				// let's not await, deleting in background
-				axios.delete(generateOcsUrl('apps/forms/api/v2.2/option/{id}', { id: option.id }))
+				axios.delete(generateOcsUrl('apps/forms/api/v2.4/option/{id}', { id: option.id }))
 					.catch(error => {
 						logger.error('Error while deleting an option', { option, error })
 						showError(t('forms', 'There was an issue deleting this option'))

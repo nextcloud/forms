@@ -240,7 +240,7 @@ export default {
 			this.isLoading = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/share'), {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/share'), {
 					formId: this.form.id,
 					shareType: newShare.shareType,
 					shareWith: newShare.shareWith,
@@ -262,7 +262,7 @@ export default {
 			this.isLoading = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/share'), {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/share'), {
 					formId: this.form.id,
 					shareType: this.SHARE_TYPES.SHARE_TYPE_LINK,
 				})
@@ -288,7 +288,7 @@ export default {
 			this.isLoading = true
 
 			try {
-				const response = await axios.patch(generateOcsUrl('apps/forms/api/v2.2/share/update'), {
+				const response = await axios.patch(generateOcsUrl('apps/forms/api/v2.4/share/update'), {
 					id: updatedShare.id,
 					keyValuePairs: {
 						permissions: updatedShare.permissions,
@@ -316,7 +316,7 @@ export default {
 			this.isLoading = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/share/{id}', {
+				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/share/{id}', {
 					id: share.id,
 				}))
 				this.$emit('remove-share', share)

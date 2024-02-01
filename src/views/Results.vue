@@ -402,7 +402,7 @@ export default {
 			logger.debug(`Loading results for form ${this.form.hash}`)
 
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.2/submissions/{hash}', { hash: this.form.hash }))
+				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/submissions/{hash}', { hash: this.form.hash }))
 
 				let loadedSubmissions = OcsResponse2Data(response).submissions
 				const loadedQuestions = OcsResponse2Data(response).questions
@@ -489,7 +489,7 @@ export default {
 				return
 			}
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.1/submissions/export'),
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/submissions/export'),
 					{ hash: this.form.hash, path: this.form.filePath, fileFormat: this.form.fileFormat },
 				)
 				showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
@@ -503,7 +503,7 @@ export default {
 			this.loadingResults = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/submission/{id}', { id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/submission/{id}', { id }))
 				showSuccess(t('forms', 'Submission deleted'))
 				const index = this.form.submissions.findIndex(search => search.id === id)
 				this.form.submissions.splice(index, 1)
@@ -524,7 +524,7 @@ export default {
 			this.showConfirmDeleteDialog = false
 			this.loadingResults = true
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.2/submissions/{formId}', { formId: this.form.id }))
+				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/submissions/{formId}', { formId: this.form.id }))
 				this.form.submissions = []
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {

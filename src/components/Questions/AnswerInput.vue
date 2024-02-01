@@ -166,7 +166,7 @@ export default {
 		 */
 		async createAnswer(answer) {
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.2/option'), {
+				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/option'), {
 					questionId: answer.questionId,
 					text: answer.text,
 				})
@@ -194,7 +194,7 @@ export default {
 		 */
 		async updateAnswer(answer) {
 			try {
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.2/option/update'), {
+				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/option/update'), {
 					id: this.answer.id,
 					keyValuePairs: {
 						text: answer.text,

@@ -451,7 +451,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetForms(array $expected): void {
-		$resp = $this->http->request('GET', 'api/v2.1/forms');
+		$resp = $this->http->request('GET', 'api/v2.4/forms');
 
 		$data = $this->OcsResponse2Data($resp);
 		$data = $this->arrayUnsetId($data);
@@ -484,7 +484,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetSharedForms(array $expected): void {
-		$resp = $this->http->request('GET', 'api/v2.1/shared_forms');
+		$resp = $this->http->request('GET', 'api/v2.4/shared_forms');
 
 		$data = $this->OcsResponse2Data($resp);
 		$data = $this->arrayUnsetId($data);
@@ -560,7 +560,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetNewForm(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2.2/form');
+		$resp = $this->http->request('POST', 'api/v2.4/form');
 		$data = $this->OcsResponse2Data($resp);
 
 		// Store for deletion on tearDown
@@ -782,7 +782,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testUpdateFormProperties(array $expected): void {
-		$resp = $this->http->request('PATCH', 'api/v2.2/form/update', [
+		$resp = $this->http->request('PATCH', 'api/v2.4/form/update', [
 			'json' => [
 				'id' => $this->testForms[0]['id'],
 				'keyValuePairs' => [
@@ -857,7 +857,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testCreateNewQuestion(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2.2/question', [
+		$resp = $this->http->request('POST', 'api/v2.4/question', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'type' => 'short',
@@ -897,7 +897,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateQuestionProperties(array $fullFormExpected): void {
-		$resp = $this->http->request('PATCH', 'api/v2.2/question/update', [
+		$resp = $this->http->request('PATCH', 'api/v2.4/question/update', [
 			'json' => [
 				'id' => $this->testForms[0]['questions'][0]['id'],
 				'keyValuePairs' => [
@@ -939,7 +939,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testReorderQuestions(array $fullFormExpected): void {
-		$resp = $this->http->request('PUT', 'api/v2.2/question/reorder', [
+		$resp = $this->http->request('PUT', 'api/v2.4/question/reorder', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'newOrder' => [
@@ -991,7 +991,7 @@ class ApiV2Test extends TestCase {
 	}
 
 	public function testCloneQuestion() {
-		$resp = $this->http->request('POST', 'api/v2.3/question/clone/' . $this->testForms[0]['questions'][0]['id']);
+		$resp = $this->http->request('POST', 'api/v2.4/question/clone/' . $this->testForms[0]['questions'][0]['id']);
 		$data = $this->OcsResponse2Data($resp);
 		$this->testForms[0]['questions'][] = $data;
 
@@ -1022,7 +1022,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testCreateNewOption(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2.2/option', [
+		$resp = $this->http->request('POST', 'api/v2.4/option', [
 			'json' => [
 				'questionId' => $this->testForms[0]['questions'][1]['id'],
 				'text' => 'A new Option.'
@@ -1058,7 +1058,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateOptionProperties(array $fullFormExpected): void {
-		$resp = $this->http->request('PATCH', 'api/v2.2/option/update', [
+		$resp = $this->http->request('PATCH', 'api/v2.4/option/update', [
 			'json' => [
 				'id' => $this->testForms[0]['questions'][1]['options'][0]['id'],
 				'keyValuePairs' => [
@@ -1123,7 +1123,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $expected
 	 */
 	public function testAddShare(array $expected) {
-		$resp = $this->http->request('POST', 'api/v2.2/share', [
+		$resp = $this->http->request('POST', 'api/v2.4/share', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'shareType' => 0,
@@ -1159,7 +1159,7 @@ class ApiV2Test extends TestCase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateShare(array $fullFormExpected) {
-		$resp = $this->http->request('PATCH', 'api/v2.2/share/update', [
+		$resp = $this->http->request('PATCH', 'api/v2.4/share/update', [
 			'json' => [
 				'id' => $this->testForms[0]['shares'][0]['id'],
 				'keyValuePairs' => [
@@ -1416,7 +1416,7 @@ CSV
 	 * @param array $submissionsExpected
 	 */
 	public function testInsertSubmission(array $submissionsExpected) {
-		$resp = $this->http->request('POST', 'api/v2.2/submission/insert', [
+		$resp = $this->http->request('POST', 'api/v2.4/submission/insert', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'answers' => [
