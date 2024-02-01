@@ -1272,8 +1272,8 @@ class ApiController extends OCSController {
 			throw new OCSNotFoundException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
+		if (!$this->formsService->canEditForm($form)) {
+			$this->logger->debug('User has no permissions to unlink this form from files');
 			throw new OCSForbiddenException();
 		}
 
@@ -1315,8 +1315,9 @@ class ApiController extends OCSController {
 			$this->logger->debug('Could not find form');
 			throw new OCSNotFoundException();
 		}
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
+
+		if (!$this->formsService->canEditForm($form)) {
+			$this->logger->debug('User has no permissions to link this form with files');
 			throw new OCSForbiddenException();
 		}
 

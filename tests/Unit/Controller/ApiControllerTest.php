@@ -362,6 +362,11 @@ class ApiControllerTest extends TestCase {
 			->with('hash')
 			->willReturn($form);
 
+		$this->formsService->expects($this->once())
+			->method('canEditForm')
+			->with($form)
+			->willReturn(true);
+
 		$this->apiController->unlinkFile('hash');
 
 		$this->assertNull($form->getFileId());

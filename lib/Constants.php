@@ -152,7 +152,7 @@ class Constants {
 		self::PERMISSION_EDIT,
 		self::PERMISSION_RESULTS,
 		self::PERMISSION_RESULTS_DELETE,
-		self::PERMISSION_SUBMIT
+		self::PERMISSION_SUBMIT,
 	];
 
 	/**
