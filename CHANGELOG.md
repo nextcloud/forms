@@ -1,5 +1,29 @@
 # Changelog
 
+## v4.1.0 - 2024-02-02
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.0.0...v4.1.0)
+
+### Enhancements
+- enh: Use NcDialog for confirmation when deleting all submissions [\#1910](https://github.com/nextcloud/forms/pull/1910) ([Chartman123](https://github.com/Chartman123))
+- enh: Use NcDialog to confirm leaving [\#1880](https://github.com/nextcloud/forms/pull/1880) ([Chartman123](https://github.com/Chartman123))
+- Added possibility to link spreadsheet for automatic submission export in multiple formats [\#1758](https://github.com/nextcloud/forms/pull/1758) ([Koc](https://github.com/Koc))
+- enh: Better text contrast for form description (closes #1878) [\#1881](https://github.com/nextcloud/forms/pull/1881) ([mschmidm](https://github.com/mschmidm))
+- enh: Replace confirm dialog for deletion with NcDialog [\#1663](https://github.com/nextcloud/forms/pull/1663) ([Chartman123](https://github.com/Chartman123))
+- Question duplication [\#1423](https://github.com/nextcloud/forms/pull/1423) ([KaasKop97](https://github.com/KaasKop97))
+
+### Fixed
+- Fix sharing form [\#1907](https://github.com/nextcloud/forms/pull/1907) ([avinash-0007](https://github.com/avinash-0007))
+- fix empty content public page view [\#1904](https://github.com/nextcloud/forms/pull/1904) ([Chartman123](https://github.com/Chartman123))
+- stop filtering result while sharing [\#1895](https://github.com/nextcloud/forms/pull/1895) ([avinash-0007](https://github.com/avinash-0007))
+- fix: Prevent race condition on unique-submission forms [\#1841](https://github.com/nextcloud/forms/pull/1841) ([susnux](https://github.com/susnux))
+
+### Merged
+- Update API version to v2.4 [\#1932](https://github.com/nextcloud/forms/pull/1932) ([Chartman123](https://github.com/Chartman123))
+- refactoring: move code to separate function storeAnswersForQuestion [\#1866](https://github.com/nextcloud/forms/pull/1866) ([tpokorra](https://github.com/tpokorra))
+- chore: replace isMobile mixin with useIsMobile composable [\#1863](https://github.com/nextcloud/forms/pull/1863) ([Chartman123](https://github.com/Chartman123))
+
+
 ## v4.0.0 - 2023-12-12
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.0...v4.0.0)
