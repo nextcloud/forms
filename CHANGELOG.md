@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.4.5 - 2024-02-02
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.4...v3.4.5)
+
+### Enhancements
+- [stable3] enh: Better text contrast for form description (closes #1878) [\#1884](https://github.com/nextcloud/forms/pull/1884) ([backportbot-nextcloud[bot]](https://github.com/apps/backportbot-nextcloud))
+
+### Fixed
+- [stable3] Fix sharing form [\#1909](https://github.com/nextcloud/forms/pull/1909) ([backportbot[bot]](https://github.com/apps/backportbot))
+- [stable3] stop filtering result while sharing [\#1896](https://github.com/nextcloud/forms/pull/1896) ([backportbot[bot]](https://github.com/apps/backportbot))
+- [stable3] fix empty content public page view [\#1905](https://github.com/nextcloud/forms/pull/1905) ([backportbot[bot]](https://github.com/apps/backportbot))
+
+
 ## v3.4.4 - 2024-01-09
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.3...v3.4.4)
