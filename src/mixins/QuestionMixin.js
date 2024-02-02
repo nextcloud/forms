@@ -340,7 +340,7 @@ export default {
 		async saveQuestionProperty(key, value) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.2/question/update'), {
+				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/question/update'), {
 					id: this.id,
 					keyValuePairs: {
 						[key]: value,

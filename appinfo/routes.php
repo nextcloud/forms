@@ -117,7 +117,7 @@ return [
 			'url' => '/api/{apiVersion}/form/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -176,7 +176,7 @@ return [
 			'url' => '/api/{apiVersion}/question/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -193,7 +193,7 @@ return [
 			'url' => '/api/{apiVersion}/question/reorder',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -236,7 +236,7 @@ return [
 			'url' => '/api/{apiVersion}/option/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2(\.[1-3])?'
+				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		[
@@ -279,7 +279,7 @@ return [
 			'url' => '/api/{apiVersion}/share/update',
 			'verb' => 'POST',
 			'requirements' => [
-				'apiVersion' => 'v2.1'
+				'apiVersion' => 'v2\.[1-4]'
 			]
 		],
 		[
