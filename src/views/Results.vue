@@ -133,7 +133,7 @@
 					<!-- Action menu for cloud export and deletion -->
 					<NcActions :aria-label="t('forms', 'Options')"
 						:force-menu="true"
-						@close="isDownloadActionOpened = false">
+						@blur="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
 							<template v-if="canEditForm && form.fileId">
 								<NcActionButton :close-after-click="true" @click="onReExport">
