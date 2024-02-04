@@ -24,7 +24,7 @@
 
 namespace OCA\Forms\Migration;
 
-use \DateTime;
+use DateTime;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
