@@ -638,7 +638,7 @@ class FormsService {
 	public function getFilePath(Form $form): ?string {
 		$fileId = $form->getFileId();
 
-		if (null === $fileId) {
+		if ($fileId === null) {
 			return null;
 		}
 
