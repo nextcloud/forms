@@ -135,6 +135,8 @@ jobs:
       - name: Upload Unit coverage
         if: matrix.coverage == true
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           root_dir: ./apps/${{ env.APP_NAME }}
           files: ./apps/${{ env.APP_NAME }}/tests/clover.unit.xml
@@ -162,6 +164,8 @@ jobs:
       - name: Upload Integration coverage
         if: matrix.coverage == true
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           root_dir: ./apps/${{ env.APP_NAME }}
           files: ./apps/${{ env.APP_NAME }}/tests/clover.integration.xml
