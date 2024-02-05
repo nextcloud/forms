@@ -177,7 +177,7 @@ class PageController extends Controller {
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
 	}
 
-	public function provideEmptyContent(string $renderAs, Form $form = null): TemplateResponse {
+	public function provideEmptyContent(string $renderAs, ?Form $form = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-emptyContent');
 		$this->initialState->provideInitialState('renderAs', $renderAs);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
@@ -191,7 +191,7 @@ class PageController extends Controller {
 	 * @param Form $form Necessary to set header on public forms, not necessary for 'notfound'-template
 	 * @return TemplateResponse
 	 */
-	public function provideTemplate(string $template, Form $form = null, array $options = []): TemplateResponse {
+	public function provideTemplate(string $template, ?Form $form = null, array $options = []): TemplateResponse {
 		Util::addStyle($this->appName, 'forms-style');
 		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {

@@ -62,7 +62,7 @@ class Provider implements IProvider {
 	 * @return IEvent
 	 * @throws \InvalidArgumentException
 	 */
-	public function parse($language, IEvent $event, IEvent $previousEvent = null): IEvent {
+	public function parse($language, IEvent $event, ?IEvent $previousEvent = null): IEvent {
 		// Throw Exception, if not our activity. Necessary for workflow of Activity-App.
 		if ($event->getApp() !== $this->appName) {
 			throw new \InvalidArgumentException();
