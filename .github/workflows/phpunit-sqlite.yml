@@ -15,8 +15,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest-low
+    outputs:
+      php-max: ${{ steps.versions.outputs.php-max-list }}
+      server-max: ${{ steps.versions.outputs.branches-max-list }}
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Get version matrix
+        id: versions
+        uses: icewind1991/nextcloud-version-matrix@d594a6929da316b732c53355e52a1ead77ba36c7 # v1.2.0
+
   changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-low
 
     outputs:
       src: ${{ steps.changes.outputs.src}}
@@ -42,17 +55,13 @@ jobs:
   phpunit-sqlite:
     runs-on: ubuntu-latest
 
-    needs: changes
+    needs: [changes, matrix]
     if: needs.changes.outputs.src != 'false'
 
     strategy:
       matrix:
-        php-versions: ['8.0', '8.1', '8.2', '8.3']
-        server-versions: ['master', 'stable28']
-        include:
-          - php-versions: '8.2'
-            server-versions: 'stable28'
-            coverage: true
+        php-versions: ${{ fromJson(needs.matrix.outputs.php-max) }}
+        server-versions: ${{ fromJson(needs.matrix.outputs.server-max) }}
 
     steps:
       - name: Set app env
@@ -85,7 +94,7 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
-          coverage: ${{ matrix.coverage == true && 'xdebug' || 'none' }}
+          coverage: none
           ini-file: development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -174,7 +183,7 @@ jobs:
   summary:
     permissions:
       contents: none
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-low
     needs: [changes, phpunit-sqlite]
 
     if: always()
