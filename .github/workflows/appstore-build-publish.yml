@@ -51,7 +51,7 @@ jobs:
         with:
           path: ${{ env.APP_NAME }}
           fallbackNode: '^20'
-          fallbackNpm: '^9'
+          fallbackNpm: '^10'
 
       - name: Set up node ${{ steps.versions.outputs.nodeVersion }}
         # Skip if no package.json
@@ -70,7 +70,6 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none
-          extensions: gd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
