@@ -101,6 +101,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Takk for at du fylte ut skjemaet!",
     "Submit" : "Send inn",
     "Submit form" : "Send skjema",
+    "You have unsaved changes! Do you still want to leave?" : "Du har ulagrede endringer. Ønsker du fremdeles å gå ut?",
     "Abort" : "Avbryt",
     "There was an error submitting the form" : "Det oppsto en feil ved innsending av skjema",
     "Error while saving question" : "Det oppsto en feil ved lagring av spørsmål",
