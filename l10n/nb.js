@@ -65,6 +65,7 @@ OC.L10N.register(
     "Share link" : "Del lenke",
     "Add link" : "Legg ved lenke",
     "Copy to clipboard" : "Kopiert til utklippstavlen",
+    "Remove link" : "Fjern kobling",
     "Internal link" : "Intern lenke",
     "View" : "Vis",
     "Edit" : "Rediger",
