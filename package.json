@@ -64,6 +64,6 @@
     "cypress-split": "^1.19.1",
     "cypress-vite": "^1.5.0",
     "eslint-plugin-cypress": "^2.15.1",
-    "vite": "^5.0.12"
+    "vite": "^5.1.1"
   }
 }
