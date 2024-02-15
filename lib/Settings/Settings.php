@@ -72,6 +72,7 @@ class Settings implements ISettings {
 	}
 
 	public function getForm(): TemplateResponse {
+		Util::addStyle($this->appName, 'forms-style');
 		Util::addScript($this->appName, 'forms-settings');
 		$this->initialState->provideInitialState('availableGroups', $this->getAvailableGroups());
 		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
