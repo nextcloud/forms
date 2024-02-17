@@ -109,7 +109,7 @@ export default {
 		 * @return {Date}
 		 */
 		parse(dateString) {
-			return moment(dateString, this.answerType.storageFormat).toDate()
+			return moment(dateString, this.answerType.momentFormat).toDate()
 		},
 
 		/**
