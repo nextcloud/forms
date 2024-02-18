@@ -19,6 +19,8 @@ yarn-error.log*
 build/
 coverage/
 
+css/forms-style.css
+
 cypress/screenshots
 cypress/snapshots
 
