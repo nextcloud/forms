@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.4.6 - 2024-02-18
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.5...v3.4.6)
+
+### Fixed
+- [stable3] fix: Update moment format for date parsing [\#1974](https://github.com/nextcloud/forms/pull/1974) ([backportbot[bot]](https://github.com/apps/backportbot))
+
+
 ## v3.4.5 - 2024-02-02
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.4...v3.4.5)
