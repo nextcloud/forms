@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.1.1 - 2024-02-18
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.1.0...v4.1.1)
+
+### Fixed
+- fix: Update moment format for date parsing [\#1969](https://github.com/nextcloud/forms/pull/1969) ([Chartman123](https://github.com/Chartman123))
+- fix: Load styles also for settings section [\#1963](https://github.com/nextcloud/forms/pull/1963) ([susnux](https://github.com/susnux))
+
+
 ## v4.1.0 - 2024-02-02
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.0.0...v4.1.0)
