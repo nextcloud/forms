@@ -141,7 +141,7 @@ export default {
 
 		pickerType: 'date',
 		storageFormat: 'YYYY-MM-DD',
-		momentFormat: 'LL',
+		momentFormat: 'L',
 	},
 
 	datetime: {
