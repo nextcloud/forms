@@ -61,7 +61,7 @@ jobs:
           TESTING=true npm run build --if-present
 
       - name: Save context
-        uses: buildjet/cache/save@v3 # v3
+        uses: buildjet/cache/save@v4 # v3
         with:
           key: cypress-context-${{ github.run_id }}
           path: ./
@@ -85,7 +85,7 @@ jobs:
 
     steps:
       - name: Restore context
-        uses: buildjet/cache/restore@v3 # v3
+        uses: buildjet/cache/restore@v4 # v3
         with:
           fail-on-cache-miss: true
           key: cypress-context-${{ github.run_id }}
