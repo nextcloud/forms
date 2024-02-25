@@ -28,6 +28,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir",
     "Date" : "Data",
     "Text" : "Testu",
-    "Phone number" : "Númberu de teléfonu"
+    "Phone number" : "Númberu de teléfonu",
+    "Email address" : "Direición de corréu electrónicu"
 },
 "nplurals=2; plural=(n != 1);");
