@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy" : "Copiar",
     "Shared with you" : "Compartióse contigo",
     "This form does not exist" : "Esti formulariu nun esiste",
     "Permissions" : "Permisos",
