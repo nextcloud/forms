@@ -28,6 +28,7 @@ OC.L10N.register(
     "Settings" : "Configuración",
     "Submit" : "Unviar",
     "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
+    "Cannot copy, please copy the link manually" : "Nun se pue copiar. Copia l'enllaz manualmente",
     "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir",
     "Date" : "Data",
     "Text" : "Testu",
