@@ -2,10 +2,12 @@ OC.L10N.register(
     "forms",
     {
     "Copy" : "Copiar",
+    "Timestamp" : "Marca de tiempu",
     "Shared with you" : "Compartióse contigo",
     "This form does not exist" : "Esti formulariu nun esiste",
     "Permissions" : "Permisos",
     "Delete" : "Desaniciar",
+    "Group" : "Grupu",
     "Circle" : "Círculu",
     "Copy to clipboard" : "Copiar nel cartafueyu",
     "Internal link" : "Enllaz internu",
