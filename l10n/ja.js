@@ -126,6 +126,7 @@ OC.L10N.register(
     "Pick a time" : "時間を指定",
     "Text" : "テキスト",
     "Phone number" : "電話番号",
-    "Email address" : "メールアドレス"
+    "Email address" : "メールアドレス",
+    "Number" : "数字"
 },
 "nplurals=1; plural=0;");

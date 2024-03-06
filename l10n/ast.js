@@ -33,6 +33,7 @@ OC.L10N.register(
     "Cannot copy, please copy the link manually" : "Nun se pue copiar. Copia l'enllaz manualmente",
     "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir",
     "Date" : "Data",
+    "Time" : "Data",
     "Text" : "Testu",
     "Phone number" : "Númberu de teléfonu",
     "Email address" : "Direición de corréu electrónicu"
