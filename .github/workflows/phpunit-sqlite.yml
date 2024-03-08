@@ -3,7 +3,7 @@
 # https://github.com/nextcloud/.github
 # https://docs.github.com/en/actions/learn-github-actions/sharing-workflows-with-your-organization
 
-name: PHPUnit sqlite
+name: PHPUnit SQLite
 
 on: pull_request
 
@@ -18,7 +18,7 @@ jobs:
   matrix:
     runs-on: ubuntu-latest-low
     outputs:
-      php-max: ${{ steps.versions.outputs.php-max-list }}
+      php-version: ${{ steps.versions.outputs.php-available-list }}
       server-max: ${{ steps.versions.outputs.branches-max-list }}
     steps:
       - name: Checkout app
@@ -60,11 +60,10 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ${{ fromJson(needs.matrix.outputs.php-max) }}
+        php-versions: ${{ fromJson(needs.matrix.outputs.php-version) }}
         server-versions: ${{ fromJson(needs.matrix.outputs.server-max) }}
-        include:
-          - php-versions: 8.3
-            coverage: true
+
+    name: SQLite PHP ${{ matrix.php-versions }} Nextcloud ${{ matrix.server-versions }}
 
     steps:
       - name: Set app env
@@ -97,7 +96,7 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
-          coverage: ${{ matrix.coverage == true && 'xdebug' || 'none' }}
+          coverage: none
           ini-file: development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
