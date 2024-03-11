@@ -18,7 +18,7 @@ jobs:
   matrix:
     runs-on: ubuntu-latest-low
     outputs:
-      php-max: ${{ steps.versions.outputs.php-max-list }}
+      php-version: ${{ steps.versions.outputs.php-available-list }}
       server-max: ${{ steps.versions.outputs.branches-max-list }}
     steps:
       - name: Checkout app
@@ -60,8 +60,10 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ${{ fromJson(needs.matrix.outputs.php-max) }}
+        php-versions: ${{ fromJson(needs.matrix.outputs.php-version) }}
         server-versions: ${{ fromJson(needs.matrix.outputs.server-max) }}
+
+    name: OCI PHP ${{ matrix.php-versions }} Nextcloud ${{ matrix.server-versions }}
 
     services:
       oracle:
