@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.2.0-alpha.1 - 2024-03-13
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.1.1...v4.2.0-alpha.1)
+
+### Merged
+- chore: Add Nextcloud 29 support [\#2003](https://github.com/nextcloud/forms/pull/2003) ([susnux](https://github.com/susnux))
+- Rename Circles to Teams in UI/logging [\#2000](https://github.com/nextcloud/forms/pull/2000) ([Chartman123](https://github.com/Chartman123))
+- Update cypress.yml [\#1976](https://github.com/nextcloud/forms/pull/1976) ([Chartman123](https://github.com/Chartman123))
+- Update dependencies and translations
+
+
 ## v4.1.1 - 2024-02-18
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.1.0...v4.1.1)
