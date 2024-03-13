@@ -106,7 +106,7 @@ class CirclesService {
 	 */
 	public function getCircleUsers(string $circleId): array {
 		if (!$this->circlesEnabled) {
-			$this->logger->debug('Circles app is disabled');
+			$this->logger->debug('Teams app is disabled');
 			return [];
 		}
 
@@ -122,7 +122,7 @@ class CirclesService {
 
 			$users = array_map(fn ($user) => $user->getUserId(), $members);
 		} catch (Throwable $error) {
-			$this->logger->debug('Could not fetch users of circle', ['error' => $error]);
+			$this->logger->debug('Could not fetch users of team', ['error' => $error]);
 		}
 		return $users;
 	}

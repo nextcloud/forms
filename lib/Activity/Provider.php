@@ -99,7 +99,7 @@ class Provider implements IProvider {
 				return $l10n->t('{user} has shared the form {formTitle} with group {group}');
 
 			case ActivityConstants::SUBJECT_NEWCIRCLESHARE:
-				return $l10n->t('{user} has shared the form {formTitle} with circle {circle}');
+				return $l10n->t('{user} has shared the form {formTitle} with team {circle}');
 
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
 				return $l10n->t('{user} answered your form {formTitle}');

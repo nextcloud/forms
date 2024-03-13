@@ -210,7 +210,7 @@ class ProviderTest extends TestCase {
 		return [
 			['newshare', '{user} has shared the form {formTitle} with you'],
 			['newgroupshare', '{user} has shared the form {formTitle} with group {group}'],
-			['newcircleshare', '{user} has shared the form {formTitle} with circle {circle}'],
+			['newcircleshare', '{user} has shared the form {formTitle} with team {circle}'],
 			['newsubmission', '{user} answered your form {formTitle}']
 		];
 	}

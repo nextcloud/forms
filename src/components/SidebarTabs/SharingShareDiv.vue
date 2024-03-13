@@ -99,7 +99,7 @@ export default {
 			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
 				return `(${t('forms', 'Group')})`
 			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
-				return `(${t('forms', 'Circle')})`
+				return `(${t('forms', 'Team')})`
 			default:
 				return ''
 			}
