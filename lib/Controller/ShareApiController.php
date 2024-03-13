@@ -162,13 +162,13 @@ class ShareApiController extends OCSController {
 
 			case IShare::TYPE_CIRCLE:
 				if (!$this->circlesService->isCirclesEnabled()) {
-					$this->logger->debug('Circles app is disabled, sharing to circles not possible.');
-					throw new OCSException('Circles app is disabled.');
+					$this->logger->debug('Teams app is disabled, sharing to teams not possible.');
+					throw new OCSException('Teams app is disabled.');
 				}
 				$circle = $this->circlesService->getCircle($shareWith);
 				if (is_null($circle)) {
-					$this->logger->debug('Invalid circle to share with.');
-					throw new OCSBadRequestException('Invalid circle to share with.');
+					$this->logger->debug('Invalid team to share with.');
+					throw new OCSBadRequestException('Invalid team to share with.');
 				}
 				break;
 

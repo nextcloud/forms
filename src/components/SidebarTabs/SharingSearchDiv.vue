@@ -28,7 +28,7 @@
 			:loading="showLoadingCircle"
 			:get-option-key="(option) => option.key"
 			:options="options"
-			:placeholder="t('forms', 'Search for user, group or circle …')"
+			:placeholder="t('forms', 'Search for user, group or team …')"
 			:user-select="true"
 			:filter-by="() => true"
 			label="displayName"
