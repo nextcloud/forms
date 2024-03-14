@@ -9,7 +9,6 @@ OC.L10N.register(
     "Set expiration date" : "Đặt ngày hết hạn",
     "Delete" : "Xóa",
     "Group" : "N",
-    "Circle" : "Vòng kết nối",
     "Share link" : "Chia sẻ liên kết",
     "Add link" : "Thêm đường dẫn",
     "Copy to clipboard" : "Sao chép vào clipboard",

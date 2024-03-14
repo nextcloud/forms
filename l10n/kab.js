@@ -6,7 +6,6 @@ OC.L10N.register(
     "Other" : "Wayeḍ",
     "Delete" : "Kkes",
     "Group" : "Agraw",
-    "Circle" : "Tawinest",
     "Share link" : "Fren aseɣwen",
     "Copy to clipboard" : "Copier dans le presse-papiers",
     "Edit" : "Ẓreg",

@@ -81,7 +81,6 @@ OC.L10N.register(
     "View responses" : "Преглед на отговорите",
     "Delete" : "Изтриване",
     "Group" : "Група",
-    "Circle" : "Кръг",
     "Share link" : "Връзка за споделяне",
     "Add link" : "Добавяне на връзка",
     "Copy to clipboard" : "Копиране в клипборда",

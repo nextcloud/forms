@@ -9,7 +9,6 @@ OC.L10N.register(
     "Permissions" : "Permissions",
     "Delete" : "Delete",
     "Group" : "Group",
-    "Circle" : "Circle",
     "Share link" : "Share link",
     "Copy to clipboard" : "Copy to clipboard",
     "Internal link" : "Internal link",

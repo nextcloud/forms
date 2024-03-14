@@ -83,6 +83,7 @@ OC.L10N.register(
     "View responses" : "Mostra les respostes",
     "Delete" : "Suprimeix",
     "Group" : "Grup",
+    "Team" : "Equip",
     "Share link" : "Comparteix l'enllaç",
     "Add link" : "Afegeix un enllaç",
     "Copy to clipboard" : "Copia-ho al porta-papers",

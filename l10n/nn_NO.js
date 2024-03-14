@@ -9,7 +9,6 @@ OC.L10N.register(
     "Set expiration date" : "Set utløpsdato",
     "Delete" : "Slett",
     "Group" : "Gruppe",
-    "Circle" : "Sirkel",
     "Share link" : "Del lenkje",
     "Edit" : "Rediger",
     "Share" : "Del",

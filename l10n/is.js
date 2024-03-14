@@ -44,7 +44,6 @@ OC.L10N.register(
     "Permissions" : "Heimildir",
     "Delete" : "Eyða",
     "Group" : "Hópur",
-    "Circle" : "Hringur",
     "Share link" : "Deila tengli",
     "Add link" : "Bæta við tengli",
     "Copy to clipboard" : "Afrita á klippispjald",

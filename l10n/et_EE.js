@@ -9,7 +9,6 @@ OC.L10N.register(
     "Set expiration date" : "Määra aegumise kuupäev",
     "Delete" : "Kustuta",
     "Group" : "Grupp",
-    "Circle" : "Ring",
     "Share link" : "Jaga link",
     "Add link" : "Lisa link",
     "Copy to clipboard" : "Kopeeri lõikepuhvrisse",

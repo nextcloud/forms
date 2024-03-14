@@ -48,7 +48,6 @@ OC.L10N.register(
     "Permissions" : "הרשאות",
     "Delete" : "מחיקה",
     "Group" : "קבוצה",
-    "Circle" : "מעגל",
     "Share link" : "קישור שיתוף",
     "Add link" : "הוספת קישור",
     "Copy to clipboard" : "העתקה ללוח הגזירים",
@@ -118,4 +117,4 @@ OC.L10N.register(
     "Phone number" : "מספר טלפון",
     "Email address" : "כתובת דוא״ל"
 },
-"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;");
+"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

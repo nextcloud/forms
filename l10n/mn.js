@@ -8,7 +8,6 @@ OC.L10N.register(
     "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Delete" : "Устгах",
     "Group" : "Бүлэг",
-    "Circle" : "Тойрог",
     "Share link" : "Холбоос хуваалцах",
     "Edit" : "засварлах",
     "Share" : "Түгээх",

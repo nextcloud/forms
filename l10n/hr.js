@@ -60,7 +60,6 @@ OC.L10N.register(
     "Permissions" : "Dopuštenja",
     "Delete" : "Izbriši",
     "Group" : "Grupa",
-    "Circle" : "Krug",
     "Share link" : "Dijeli poveznicu",
     "Add link" : "Dodaj poveznicu",
     "Copy to clipboard" : "Kopiraj u međuspremnik",

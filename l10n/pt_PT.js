@@ -59,7 +59,6 @@ OC.L10N.register(
     "Expires on {date}" : "Expira em {date}",
     "Delete" : "Apagar",
     "Group" : "Grupo",
-    "Circle" : "Círculo",
     "Share link" : "Partilhar ligação",
     "Copy to clipboard" : "Copiar para área de transferência",
     "View" : "Ver",

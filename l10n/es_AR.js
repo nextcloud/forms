@@ -40,7 +40,6 @@ OC.L10N.register(
     "Permissions" : "Permisos",
     "Delete" : "Eliminar",
     "Group" : "Grupo",
-    "Circle" : "Círculo",
     "Share link" : "Compartir enlace",
     "Copy to clipboard" : "Copiar al portapapeles",
     "View" : "Ver",

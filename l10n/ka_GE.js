@@ -10,7 +10,6 @@ OC.L10N.register(
     "Permissions" : "უფლებები",
     "Delete" : "წაშლა",
     "Group" : "ჯგუფი",
-    "Circle" : "წრე",
     "Share link" : "ბმულის გაზიარება",
     "Copy to clipboard" : "კოპირება ბუფერში",
     "Edit" : "შეცვლა",

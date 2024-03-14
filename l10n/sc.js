@@ -60,7 +60,6 @@ OC.L10N.register(
     "Permissions" : "Permissos",
     "Delete" : "Cantzella",
     "Group" : "Grupu",
-    "Circle" : "Giru",
     "Share link" : "Cumpartzi ligòngiu",
     "Add link" : "Agiunghe ligòngiu",
     "Copy to clipboard" : "Còpia in is punta de billete",

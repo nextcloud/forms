@@ -11,7 +11,6 @@ OC.L10N.register(
     "Permissions" : "Permisiuni",
     "Delete" : "Șterge",
     "Group" : "Grup",
-    "Circle" : "Cerc",
     "Share link" : "Partajează link-ul",
     "Add link" : "Adaugă link",
     "Copy to clipboard" : "Copiază în clipboard",

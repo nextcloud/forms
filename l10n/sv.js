@@ -80,7 +80,7 @@ OC.L10N.register(
     "View responses" : "Visa svar",
     "Delete" : "Radera",
     "Group" : "Grupp",
-    "Circle" : "Cirkel",
+    "Team" : "Team",
     "Share link" : "Delningslänk",
     "Add link" : "Lägg till länk",
     "Copy to clipboard" : "Kopiera till urklipp",
