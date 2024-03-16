@@ -153,7 +153,7 @@ OC.L10N.register(
     "Re-export spreadsheet" : "Повторно експортувати таблицю",
     "Unlink spreadsheet" : "Відв'язати таблицю",
     "Save copy to Files" : "Зберегти копію у Файли",
-    "Download" : "Завантажити",
+    "Download" : "Звантажити",
     "Delete all responses" : "Видалити всі відповіді",
     "Delete submissions" : "Видалити відповіді",
     "Are you sure you want to delete all responses of {title}?" : "Ви справді хочете видалити всі відповіді в {title}?",
