@@ -22,7 +22,7 @@ jobs:
       server-max: ${{ steps.versions.outputs.branches-max-list }}
     steps:
       - name: Checkout app
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
 
       - name: Get version matrix
         id: versions
@@ -82,19 +82,19 @@ jobs:
           echo "APP_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
 
       - name: Checkout server
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           submodules: true
           repository: nextcloud/server
           ref: ${{ matrix.server-versions }}
 
       - name: Checkout app
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           path: apps/${{ env.APP_NAME }}
 
       - name: Checkout circles dependency
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           repository: nextcloud/circles
           ref: ${{ matrix.server-versions }}
