@@ -178,7 +178,7 @@ class SubmissionService {
 	 * @throws NotPermittedException
 	 */
 	public function writeFileToCloud(Form $form, string $path, string $fileFormat, ?string $ownerId = null): File {
-		if (empty(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
+		if (!isset(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
 			throw new \InvalidArgumentException('Invalid file format');
 		}
 
@@ -239,7 +239,7 @@ class SubmissionService {
 	 * @return string File content
 	 */
 	public function getSubmissionsData(Form $form, string $fileFormat, ?File $file = null): string {
-		if (empty(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
+		if (!isset(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
 			throw new \InvalidArgumentException('Invalid file format');
 		}
 
