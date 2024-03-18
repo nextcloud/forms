@@ -655,7 +655,7 @@ class FormsService {
 	}
 
 	public function getFileName(Form $form, string $fileFormat): string {
-		if (empty(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
+		if (!isset(Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat])) {
 			throw new \InvalidArgumentException('Invalid file format');
 		}
 
