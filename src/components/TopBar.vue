@@ -33,7 +33,7 @@
 				<template #icon>
 					<IconEye :size="20" />
 				</template>
-				<template v-if="!isMobile">
+				<template v-if="!isMobile" #default>
 					{{ t('forms', 'View') }}
 				</template>
 			</NcButton>
@@ -44,7 +44,7 @@
 				<template #icon>
 					<IconPencil :size="20" />
 				</template>
-				<template v-if="!isMobile">
+				<template v-if="!isMobile" #default>
 					{{ t('forms', 'Edit') }}
 				</template>
 			</NcButton>
@@ -55,7 +55,7 @@
 				<template #icon>
 					<IconPoll :size="20" />
 				</template>
-				<template v-if="!isMobile">
+				<template v-if="!isMobile" #default>
 					{{ t('forms', 'Results') }}
 				</template>
 			</NcButton>
@@ -67,7 +67,7 @@
 			<template #icon>
 				<IconShareVariant :size="20" />
 			</template>
-			<template v-if="!isMobile">
+			<template v-if="!isMobile" #default>
 				{{ t('forms', 'Share') }}
 			</template>
 		</NcButton>
