@@ -389,8 +389,8 @@ class FormsService {
 			return false;
 		}
 
-		// Dont show expired forms.
-		if ($this->hasFormExpired($form)) {
+		// Dont show expired forms if user isn't allowed to see results.
+		if ($this->hasFormExpired($form) && !$this->canSeeResults($form)) {
 			return false;
 		}
 
