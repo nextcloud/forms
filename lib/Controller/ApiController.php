@@ -1036,6 +1036,7 @@ class ApiController extends OCSController {
 	/**
 	 * @CORS
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 * @PublicPage
 	 *
 	 * Process a new submission
