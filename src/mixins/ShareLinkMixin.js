@@ -38,11 +38,25 @@ export default {
 		/**
 		 * Get the publish share link for a given share
 		 *
-		 * @param {string} publicHash The share hash
+		 * @param {object} share The share
 		 * @return {string} link
 		 */
-		getPublicShareLink(publicHash) {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/s/${publicHash}`)
+		getPublicShareLink(share) {
+			let url
+			if (this.isEmbeddingAllowed(share)) {
+				url = generateUrl(`/apps/forms/embed/${share.shareWith}`)
+			} else {
+				url = generateUrl(`/apps/forms/s/${share.shareWith}`)
+			}
+			return (new URL(url, window.location)).href
+		},
+
+		/**
+		 * Check if a share can be used for embedding
+		 * @param {{ shareType: number, permissions: string[] }} share The share to check
+		 */
+		isEmbeddingAllowed(share) {
+			return share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK && share.permissions?.includes(this.PERMISSION_TYPES.PERMISSION_EMBED)
 		},
 
 		/**
@@ -67,11 +81,10 @@ export default {
 		/**
 		 * Copy code to embed public share inside external websites
 		 *
-		 * @param {string} publicHash Hash of public link-share
+		 * @param {object} share Public link-share
 		 */
-		 async copyEmbeddingCode(publicHash) {
-			const url = generateUrl(`/apps/forms/embed/${publicHash}`)
-			const code = `<iframe src="${window.location.protocol}//${window.location.host}${url}" width="750" height="900"></iframe>`
+		 async copyEmbeddingCode(share) {
+			const code = `<iframe src="${this.getPublicShareLink(share)}" width="750" height="900"></iframe>`
 			try {
 				await navigator.clipboard.writeText(code)
 				showSuccess(t('forms', 'Embedding code copied'))

@@ -32,8 +32,7 @@ use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IGroupManager;
-use OCP\IInitialStateService;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IURLGenerator;
@@ -70,11 +69,8 @@ class PageControllerTest extends TestCase {
 	/** @var IAccountManager|MockObject */
 	private $accountManager;
  
-	/** @var IGroupManager|MockObject */
-	private $groupManager;
- 
-	/** @var IInitialStateService|MockObject */
-	private $initialStateService;
+	/** @var IInitialState|MockObject */
+	private $initialState;
 
 	/** @var IL10N|MockObject */
 	private $l10n;
@@ -97,8 +93,7 @@ class PageControllerTest extends TestCase {
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->accountManager = $this->createMock(IAccountManager::class);
-		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->initialStateService = $this->createMock(IInitialStateService::class);
+		$this->initialState = $this->createMock(IInitialState::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
@@ -113,8 +108,7 @@ class PageControllerTest extends TestCase {
 			$this->configService,
 			$this->formsService,
 			$this->accountManager,
-			$this->groupManager,
-			$this->initialStateService,
+			$this->initialState,
 			$this->l10n,
 			$this->logger,
 			$this->urlGenerator,

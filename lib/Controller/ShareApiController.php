@@ -325,6 +325,12 @@ class ShareApiController extends OCSController {
 				case IShare::TYPE_GROUP:
 				case IShare::TYPE_CIRCLE:
 					break;
+				case IShare::TYPE_LINK:
+					// For link shares we only allow the embedding permission
+					if (count($sanitizedPermissions) > 2 || !in_array(Constants::PERMISSION_EMBED, $sanitizedPermissions)) {
+						return false;
+					}
+					break;
 				default:
 					// e.g. link shares ...
 					return false;
