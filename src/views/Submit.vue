@@ -23,110 +23,119 @@
  -->
 
 <template>
-	<NcAppContent v-if="isLoadingForm">
-		<NcEmptyContent class="forms-emptycontent"
-			:name="t('forms', 'Loading {title} …', { title: form.title })">
-			<template #icon>
-				<NcLoadingIcon :size="64" />
-			</template>
-		</NcEmptyContent>
-	</NcAppContent>
-
-	<NcAppContent v-else :class="{'app-content--public': publicView}">
+	<NcAppContent :class="{'app-content--public': publicView}">
 		<TopBar v-if="!publicView"
+			:archived="isArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 
-		<!-- Forms title & description-->
-		<header>
-			<h2 ref="title" class="form-title" dir="auto">
-				{{ formTitle }}
-			</h2>
-			<!-- eslint-disable vue/no-v-html -->
-			<div v-if="!loading && !success && !!formDescription"
-				class="form-desc"
-				dir="auto"
-				v-html="formDescription" />
-			<!-- eslint-enable vue/no-v-html -->
-			<!-- Show expiration message-->
-			<p v-if="form.expires && form.showExpiration" class="info-message">
-				{{ expirationMessage }}
-			</p>
-			<!-- Generate form information message-->
-			<p v-if="infoMessage" class="info-message">
-				{{ infoMessage }}
-			</p>
-		</header>
-
-		<NcEmptyContent v-if="loading"
+		<!-- Form is loading -->
+		<NcEmptyContent v-if="isLoadingForm"
 			class="forms-emptycontent"
-			:name="t('forms', 'Submitting form …')">
+			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
 		</NcEmptyContent>
-		<NcEmptyContent v-else-if="success || !form.canSubmit"
-			class="forms-emptycontent"
-			:name="t('forms', 'Thank you for completing the form!')"
-			:description="form.submissionMessage">
-			<template #icon>
-				<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
-			</template>
-			<template v-if="submissionMessageHTML" #description>
-				<!-- eslint-disable-next-line vue/no-v-html -->
-				<p class="submission-message" v-html="submissionMessageHTML" />
-			</template>
-		</NcEmptyContent>
-		<NcEmptyContent v-else-if="isExpired"
-			class="forms-emptycontent"
-			:name="t('forms', 'Form expired')"
-			:description="t('forms', 'This form has expired and is no longer taking answers')">
-			<template #icon>
-				<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
-			</template>
-		</NcEmptyContent>
 
-		<!-- Questions list -->
-		<form v-else
-			ref="form"
-			@submit.prevent="onSubmit">
-			<ul>
-				<Questions :is="answerTypes[question.type].component"
-					v-for="(question, index) in validQuestions"
-					ref="questions"
-					:key="question.id"
-					:read-only="true"
-					:answer-type="answerTypes[question.type]"
-					:index="index + 1"
-					:max-string-lengths="maxStringLengths"
-					:values="answers[question.id]"
-					v-bind="question"
-					@keydown.enter="onKeydownEnter"
-					@keydown.ctrl.enter="onKeydownCtrlEnter"
-					@update:values="(values) => onUpdate(question, values)" />
-			</ul>
-			<input ref="submitButton"
-				class="primary"
-				type="submit"
-				:value="t('forms', 'Submit')"
-				:disabled="loading"
-				:aria-label="t('forms', 'Submit form')">
-		</form>
+		<template v-else>
+			<!-- Forms title & description-->
+			<header>
+				<h2 ref="title" class="form-title" dir="auto">
+					{{ formTitle }}
+				</h2>
+				<!-- eslint-disable vue/no-v-html -->
+				<div v-if="!loading && !success && !!formDescription"
+					class="form-desc"
+					dir="auto"
+					v-html="formDescription" />
+				<p v-if="isExpired" class="info-message">
+					{{ expirationMessage }}
+				</p>
+				<!-- Generate form information message-->
+				<p v-if="infoMessage" class="info-message">
+					{{ infoMessage }}
+				</p>
+			</header>
 
-		<!-- Confirmation dialog if form is empty submitted -->
-		<NcDialog :open.sync="showConfirmEmptyModal"
-			:name="t('forms', 'Confirm submit')"
-			:message="t('forms', 'Are you sure you want to submit an empty form?')"
-			:buttons="confirmEmptyModalButtons" />
-		<!-- Confirmation dialog if form is left unsubmitted -->
-		<NcDialog :open.sync="showConfirmLeaveDialog"
-			:name="t('forms', 'Leave form')"
-			:message="t('forms', 'You have unsaved changes! Do you still want to leave?')"
-			:buttons="confirmLeaveFormButtons"
-			:can-close="false"
-			:close-on-click-outside="false" />
+			<NcEmptyContent v-if="loading"
+				class="forms-emptycontent"
+				:name="t('forms', 'Submitting form …')">
+				<template #icon>
+					<NcLoadingIcon :size="64" />
+				</template>
+			</NcEmptyContent>
+			<NcEmptyContent v-else-if="success || !form.canSubmit"
+				class="forms-emptycontent"
+				:name="t('forms', 'Thank you for completing the form!')"
+				:description="form.submissionMessage">
+				<template #icon>
+					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
+				</template>
+				<template v-if="submissionMessageHTML" #description>
+					<!-- eslint-disable-next-line vue/no-v-html -->
+					<p class="submission-message" v-html="submissionMessageHTML" />
+				</template>
+			</NcEmptyContent>
+			<NcEmptyContent v-else-if="isExpired"
+				class="forms-emptycontent"
+				:name="t('forms', 'Form expired')"
+				:description="t('forms', 'This form has expired and is no longer taking answers')">
+				<template #icon>
+					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
+				</template>
+			</NcEmptyContent>
+			<NcEmptyContent v-else-if="isClosed || isArchived"
+				class="forms-emptycontent"
+				:name="t('forms', 'Form closed')"
+				:description="t('forms', 'This form was closed and is no longer taking answers')">
+				<template #icon>
+					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
+				</template>
+			</NcEmptyContent>
+
+			<!-- Questions list -->
+			<form v-else
+				ref="form"
+				@submit.prevent="onSubmit">
+				<ul>
+					<Questions :is="answerTypes[question.type].component"
+						v-for="(question, index) in validQuestions"
+						ref="questions"
+						:key="question.id"
+						:read-only="true"
+						:answer-type="answerTypes[question.type]"
+						:index="index + 1"
+						:max-string-lengths="maxStringLengths"
+						:values="answers[question.id]"
+						v-bind="question"
+						@keydown.enter="onKeydownEnter"
+						@keydown.ctrl.enter="onKeydownCtrlEnter"
+						@update:values="(values) => onUpdate(question, values)" />
+				</ul>
+				<input ref="submitButton"
+					class="primary"
+					type="submit"
+					:value="t('forms', 'Submit')"
+					:disabled="loading"
+					:aria-label="t('forms', 'Submit form')">
+			</form>
+
+			<!-- Confirmation dialog if form is empty submitted -->
+			<NcDialog :open.sync="showConfirmEmptyModal"
+				:name="t('forms', 'Confirm submit')"
+				:message="t('forms', 'Are you sure you want to submit an empty form?')"
+				:buttons="confirmEmptyModalButtons" />
+			<!-- Confirmation dialog if form is left unsubmitted -->
+			<NcDialog :open.sync="showConfirmLeaveDialog"
+				:name="t('forms', 'Leave form')"
+				:message="t('forms', 'You have unsaved changes! Do you still want to leave?')"
+				:buttons="confirmLeaveFormButtons"
+				:can-close="false"
+				:close-on-click-outside="false" />
+		</template>
 	</NcAppContent>
 </template>
 
@@ -147,6 +156,7 @@ import NcIconSvgWrapper from '@nextcloud/vue/dist/Components/NcIconSvgWrapper.js
 import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 
+import { FormState } from '../models/FormStates.ts'
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
 
@@ -261,6 +271,14 @@ export default {
 		 */
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
+		},
+
+		isArchived() {
+			return this.form.state === FormState.FormArchived
+		},
+
+		isClosed() {
+			return this.form.state === FormState.FormClosed
 		},
 
 		infoMessage() {

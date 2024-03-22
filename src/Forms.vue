@@ -33,8 +33,8 @@
 			</NcAppNavigationNew>
 			<template #list>
 				<!-- Form-Owner-->
-				<NcAppNavigationCaption v-if="!noOwnedForms" :name="t('forms', 'Your Forms')" />
-				<AppNavigationForm v-for="form in forms"
+				<NcAppNavigationCaption v-if="ownedForms.length > 0" :name="t('forms', 'Your Forms')" />
+				<AppNavigationForm v-for="form in ownedForms"
 					:key="form.id"
 					:form="form"
 					:read-only="false"
@@ -44,13 +44,27 @@
 					@delete="onDeleteForm" />
 
 				<!-- Shared Forms-->
-				<NcAppNavigationCaption v-if="!noSharedForms" :name="t('forms', 'Shared with you')" />
+				<NcAppNavigationCaption v-if="sharedForms.length > 0" :name="t('forms', 'Shared with you')" />
 				<AppNavigationForm v-for="form in sharedForms"
 					:key="form.id"
 					:form="form"
 					:read-only="true"
 					@open-sharing="openSharing"
 					@mobile-close-navigation="mobileCloseNavigation" />
+			</template>
+			<template #footer>
+				<div v-if="archivedForms.length > 0" class="forms-navigation-footer">
+					<NcButton alignment="start"
+						class="forms__archived-forms-toggle"
+						type="tertiary"
+						wide
+						@click="showArchivedForms = true">
+						<template #icon>
+							<IconArchive :size="20" />
+						</template>
+						{{ t('forms', 'Archived forms') }}
+					</NcButton>
+				</div>
 			</template>
 		</NcAppNavigation>
 
@@ -102,6 +116,9 @@
 				:active.sync="sidebarActive"
 				name="sidebar" />
 		</template>
+
+		<!-- Archived forms modal -->
+		<ArchivedFormsModal :open.sync="showArchivedForms" :forms="archivedForms" />
 	</NcContent>
 </template>
 
@@ -123,20 +140,25 @@ import NcContent from '@nextcloud/vue/dist/Components/NcContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 
+import IconArchive from 'vue-material-design-icons/Archive.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
-import FormsIcon from './components/Icons/FormsIcon.vue'
+import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import AppNavigationForm from './components/AppNavigationForm.vue'
+import FormsIcon from './components/Icons/FormsIcon.vue'
 import PermissionTypes from './mixins/PermissionTypes.js'
 import OcsResponse2Data from './utils/OcsResponse2Data.js'
 import logger from './utils/Logger.js'
+import { FormState } from './models/FormStates.ts'
 
 export default {
 	name: 'Forms',
 
 	components: {
 		AppNavigationForm,
+		ArchivedFormsModal,
 		FormsIcon,
+		IconArchive,
 		IconPlus,
 		NcAppContent,
 		NcAppNavigation,
@@ -162,7 +184,9 @@ export default {
 			sidebarOpened: false,
 			sidebarActive: 'forms-sharing',
 			forms: [],
-			sharedForms: [],
+			allSharedForms: [],
+
+			showArchivedForms: false,
 
 			canCreateForms: loadState(appName, 'appConfig').canCreateForms,
 		}
@@ -172,14 +196,41 @@ export default {
 		canEdit() {
 			return this.selectedForm.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
 		},
+
 		hasForms() {
-			return !this.noOwnedForms || !this.noSharedForms
+			return this.allSharedForms.length > 0 || this.forms.length > 0
 		},
-		noOwnedForms() {
-			return this.forms?.length === 0
+
+		/**
+		 * All own active forms
+		 */
+		ownedForms() {
+			const now = Date.now() / 1000
+
+			return this.forms
+				.filter((form) => form.state !== FormState.FormArchived)
+				.filter((form) => form.expires === 0 || form.expires >= now)
 		},
-		noSharedForms() {
-			return this.sharedForms?.length === 0
+
+		/**
+		 * All active shared forms
+		 */
+		sharedForms() {
+			const now = Date.now() / 1000
+
+			return this.allSharedForms
+				.filter((form) => form.state !== FormState.FormArchived)
+				.filter((form) => form.expires === 0 || form.expires >= now)
+		},
+
+		/**
+		 * All forms that have been archived
+		 */
+		archivedForms() {
+			return [
+				...this.forms,
+				...this.allSharedForms,
+			].filter((form) => form.state === FormState.FormArchived)
 		},
 
 		routeHash() {
@@ -194,7 +245,7 @@ export default {
 			}
 
 			// Try to find form in owned & shared list
-			const form = [...this.forms, ...this.sharedForms]
+			const form = [...this.forms, ...this.allSharedForms]
 				.find(form => form.hash === this.routeHash)
 
 			// If no form found, load it from server. Route will be automatically re-evaluated.
@@ -210,7 +261,7 @@ export default {
 		selectedForm: {
 			get() {
 				if (this.routeAllowed) {
-					return this.forms.concat(this.sharedForms).find(form => form.hash === this.routeHash)
+					return this.forms.concat(this.allSharedForms).find(form => form.hash === this.routeHash)
 				}
 				return {}
 			},
@@ -222,9 +273,9 @@ export default {
 					return
 				}
 				// Otherwise a shared form
-				index = this.sharedForms.findIndex(search => search.hash === this.routeHash)
+				index = this.allSharedForms.findIndex(search => search.hash === this.routeHash)
 				if (index > -1) {
-					this.$set(this.sharedForms, index, form)
+					this.$set(this.allSharedForms, index, form)
 				}
 			},
 		},
@@ -285,7 +336,7 @@ export default {
 			// Load shared forms
 			try {
 				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/shared_forms'))
-				this.sharedForms = OcsResponse2Data(response)
+				this.allSharedForms = OcsResponse2Data(response)
 			} catch (error) {
 				logger.error('Error while loading shared forms list', { error })
 				showError(t('forms', 'An error occurred while loading the forms list'))
@@ -300,22 +351,34 @@ export default {
 		 * @param {string} hash the hash of the form to load
 		 */
 		async fetchPartialForm(hash) {
-			this.loading = true
-
-			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/partial_form/{hash}', { hash }))
-				const form = OcsResponse2Data(response)
-
-				// If the user has (at least) submission-permissions, add it to the shared forms
-				if (form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)) {
-					this.sharedForms.push(form)
+			await new Promise((resolve) => {
+				const wait = () => {
+					if (this.loading) {
+						window.setTimeout(wait, 250)
+					} else {
+						resolve()
+					}
 				}
-			} catch (error) {
-				logger.error(`Form ${hash} not found`, { error })
-				showError(t('forms', 'Form not found'))
-			} finally {
-				this.loading = false
+				wait()
+			})
+
+			this.loading = true
+			if ([...this.forms, ...this.allSharedForms].find((form) => form.hash === hash) === undefined) {
+				try {
+					const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/partial_form/{hash}', { hash }))
+					const form = OcsResponse2Data(response)
+
+					// If the user has (at least) submission-permissions, add it to the shared forms
+					if (form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)) {
+						this.allSharedForms.push(form)
+					}
+				} catch (error) {
+					logger.error(`Form ${hash} not found`, { error })
+					showError(t('forms', 'Form not found'))
+				}
 			}
+
+			this.loading = false
 		},
 
 		/**
@@ -381,9 +444,9 @@ export default {
 				this.forms[formIndex].lastUpdated = moment().unix()
 				this.forms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			} else {
-				const sharedFormIndex = this.sharedForms.findIndex(form => form.id === id)
-				this.sharedForms[sharedFormIndex].lastUpdated = moment().unix()
-				this.sharedForms.sort((b, a) => a.lastUpdated - b.lastUpdated)
+				const sharedFormIndex = this.allSharedForms.findIndex(form => form.id === id)
+				this.allSharedForms[sharedFormIndex].lastUpdated = moment().unix()
+				this.allSharedForms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			}
 		},
 	},
@@ -391,6 +454,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+.forms-navigation-footer {
+	display: flex;
+	flex-direction: column;
+	padding: var(--app-navigation-padding);
+}
+
 .forms-emptycontent {
 	height: 100%;
 }

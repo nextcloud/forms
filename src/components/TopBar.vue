@@ -18,10 +18,6 @@
   - You should have received a copy of the GNU Affero General Public License
   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -
-  -
-  - UPDATE: Adds Quiz option and takes the input:
-  - is yet to store input of quizzes and cannot represtent them
-  - requires quizFormItem.vue (should be added to svn)
   -->
 <template>
 	<div class="top-bar" role="toolbar">
@@ -110,6 +106,11 @@ export default {
 	mixins: [PermissionTypes],
 
 	props: {
+		archived: {
+			type: Boolean,
+			default: false,
+		},
+
 		sidebarOpened: {
 			type: Boolean,
 			default: null,
@@ -128,7 +129,7 @@ export default {
 
 	computed: {
 		canEdit() {
-			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) && !this.archived
 		},
 		canSubmit() {
 			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
@@ -144,7 +145,7 @@ export default {
 			return this.permissions.length === 1 && this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
 		},
 		showSidebarToggle() {
-			return this.canEdit && this.sidebarOpened !== null
+			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) && this.sidebarOpened !== null
 		},
 	},
 
