@@ -78,6 +78,7 @@ OC.L10N.register(
     "Permissions" : "Uprawnienia",
     "Delete" : "Usuń",
     "Group" : "Grupa",
+    "Team" : "Zespół",
     "Share link" : "Udostępnij link",
     "Add link" : "Dodaj link",
     "Copy to clipboard" : "Kopiuj do schowka",
