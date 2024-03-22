@@ -45,20 +45,34 @@
 		<TransitionGroup v-else tag="div">
 			<div v-for="share in publicLinkShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
-				class="share-div share-div--link">
+				:set="void(isEmbeddable = isEmbeddingAllowed(share))"
+				class="share-div share-div--link"
+				:class="{ 'share-div--embeddable': isEmbeddingAllowed(share) }">
 				<div class="share-div__avatar">
-					<IconLinkVariant :size="20" />
+					<IconLinkBoxVariantOutline v-if="isEmbeddable" :size="20" />
+					<IconLinkVariant v-else :size="20" />
 				</div>
-				<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
-				<NcActions>
-					<NcActionLink :href="getPublicShareLink(share.shareWith)" @click.prevent="copyLink($event, getPublicShareLink(share.shareWith))">
+				<span class="share-div__desc">{{ isEmbeddable ? t('forms', 'Embeddable link') : t('forms', 'Share link') }}</span>
+				<NcActions :inline="1">
+					<NcActionLink :href="getPublicShareLink(share)" @click.prevent="copyLink($event, getPublicShareLink(share))">
 						<template #icon>
 							<IconCopyAll :size="20" />
 						</template>
 						{{ t('forms', 'Copy to clipboard') }}
 					</NcActionLink>
-				</NcActions>
-				<NcActions>
+					<NcActionButton v-if="isEmbeddable" @click="copyEmbeddingCode(share)">
+						<template #icon>
+							<IconCodeBrackets :size="20" />
+						</template>
+						{{ t('forms', 'Copy embedding code') }}
+					</NcActionButton>
+					<NcActionButton v-else @click="makeEmbeddable(share)">
+						<template #icon>
+							<IconLinkBoxVariantOutline :size="20" />
+						</template>
+						<!-- TRANSLATORS: This means the link can be embedded into external websites -->
+						{{ t('forms', 'Convert to embeddable link') }}
+					</NcActionButton>
 					<NcActionButton @click="removeShare(share)">
 						<template #icon>
 							<IconDelete :size="20" />
@@ -162,6 +176,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
+
 import axios from '@nextcloud/axios'
 import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
@@ -169,7 +184,9 @@ import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple.vue'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
+import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxVariantOutline.vue'
 import IconLinkVariant from 'vue-material-design-icons/LinkVariant.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
@@ -177,6 +194,7 @@ import FormsIcon from '../Icons/FormsIcon.vue'
 import IconCopyAll from '../Icons/IconCopyAll.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
+import PermissionTypes from '../../mixins/PermissionTypes.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
@@ -187,8 +205,10 @@ export default {
 		FormsIcon,
 		IconAccountMultiple,
 		IconAlertCircleOutline,
+		IconCodeBrackets,
 		IconCopyAll,
 		IconDelete,
+		IconLinkBoxVariantOutline,
 		IconLinkVariant,
 		IconPlus,
 		NcActions,
@@ -199,7 +219,7 @@ export default {
 		SharingShareDiv,
 	},
 
-	mixins: [ShareTypes, ShareLinkMixin],
+	mixins: [ShareTypes, ShareLinkMixin, PermissionTypes],
 
 	props: {
 		form: {
@@ -226,7 +246,9 @@ export default {
 			return this.publicLinkShares.length !== 0
 		},
 		publicLinkShares() {
-			return this.form.shares.filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
+			const shares = this.form.shares.filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
+			shares.sort((a, b) => this.isEmbeddingAllowed(a) ? 1 : (this.isEmbeddingAllowed(b) ? -1 : 0))
+			return shares
 		},
 	},
 
@@ -277,6 +299,14 @@ export default {
 			} finally {
 				this.isLoading = false
 			}
+		},
+
+		/**
+		 * Make a share embeddable into websites (sets the internal permission)
+		 * @param {{ permissions: string[] }} share The public link share to make embeddable
+		 */
+		makeEmbeddable(share) {
+			this.updateShare({ ...share, permissions: [...share.permissions, this.PERMISSION_TYPES.PERMISSION_EMBED] })
 		},
 
 		/**
@@ -372,8 +402,15 @@ export default {
 
 	&--link {
 		.share-div__avatar {
-			background-color: var(--color-primary);
-			color: var(--color-primary-text);
+			background-color: var(--color-primary-element);
+			color: var(--color-primary-element-text);
+		}
+	}
+
+	&--embeddable {
+		.share-div__avatar {
+			background-color: var(--color-primary-element-light);
+			color: var(--color-primary-element-light-text);
 		}
 	}
 

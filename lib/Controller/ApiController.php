@@ -1035,8 +1035,8 @@ class ApiController extends OCSController {
 
 	/**
 	 * @CORS
-	 * @PublicCORSFix
 	 * @NoAdminRequired
+	 * @NoCSRFRequired
 	 * @PublicPage
 	 *
 	 * Process a new submission
@@ -1104,7 +1104,7 @@ class ApiController extends OCSController {
 		$submission->setFormId($formId);
 		$submission->setTimestamp(time());
 
-		// If not logged in or anonymous use anonID
+		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
 			$anonID = "anon-user-".  hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);

@@ -21,6 +21,7 @@
  */
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
+import logger from '../utils/Logger.js'
 
 export default {
 	methods: {
@@ -37,11 +38,25 @@ export default {
 		/**
 		 * Get the publish share link for a given share
 		 *
-		 * @param {string} publicHash The share hash
+		 * @param {object} share The share
 		 * @return {string} link
 		 */
-		getPublicShareLink(publicHash) {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/s/${publicHash}`)
+		getPublicShareLink(share) {
+			let url
+			if (this.isEmbeddingAllowed(share)) {
+				url = generateUrl(`/apps/forms/embed/${share.shareWith}`)
+			} else {
+				url = generateUrl(`/apps/forms/s/${share.shareWith}`)
+			}
+			return (new URL(url, window.location)).href
+		},
+
+		/**
+		 * Check if a share can be used for embedding
+		 * @param {{ shareType: number, permissions: string[] }} share The share to check
+		 */
+		isEmbeddingAllowed(share) {
+			return share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK && share.permissions?.includes(this.PERMISSION_TYPES.PERMISSION_EMBED)
 		},
 
 		/**
@@ -57,6 +72,25 @@ export default {
 				showSuccess(t('forms', 'Form link copied'))
 			} catch (error) {
 				showError(t('forms', 'Cannot copy, please copy the link manually'))
+				logger.error('Copy link failed', { error })
+			}
+			// Set back focus as clipboard removes focus
+			event.target.focus()
+		},
+
+		/**
+		 * Copy code to embed public share inside external websites
+		 *
+		 * @param {object} share Public link-share
+		 */
+		 async copyEmbeddingCode(share) {
+			const code = `<iframe src="${this.getPublicShareLink(share)}" width="750" height="900"></iframe>`
+			try {
+				await navigator.clipboard.writeText(code)
+				showSuccess(t('forms', 'Embedding code copied'))
+			} catch (error) {
+				showError(t('forms', 'Cannot copy the code'))
+				logger.error('Copy embedding code failed', { error })
 			}
 			// Set back focus as clipboard removes focus
 			event.target.focus()

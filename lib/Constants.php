@@ -154,12 +154,15 @@ class Constants {
 	public const PERMISSION_RESULTS = 'results';
 	public const PERMISSION_RESULTS_DELETE = 'results_delete';
 	public const PERMISSION_SUBMIT = 'submit';
+	/** Special internal permissions to allow embedding a form (share) into external websites */
+	public const PERMISSION_EMBED = 'embed';
 
 	public const PERMISSION_ALL = [
 		self::PERMISSION_EDIT,
 		self::PERMISSION_RESULTS,
 		self::PERMISSION_RESULTS_DELETE,
 		self::PERMISSION_SUBMIT,
+		self::PERMISSION_EMBED,
 	];
 
 	/**

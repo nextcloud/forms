@@ -36,6 +36,7 @@ use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\Template\PublicTemplateResponse;
@@ -152,9 +153,6 @@ class PageController extends Controller {
 	 * @return TemplateResponse Public template.
 	 */
 	public function publicLinkView(string $hash): Response {
-		// Inject style on all templates
-		Util::addStyle($this->appName, 'forms');
-
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
 			$form = $this->formMapper->findById($share->getFormId());
@@ -162,14 +160,57 @@ class PageController extends Controller {
 			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
 		}
 
+		return $this->createPublicSubmitView($form, $hash);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @PublicPage
+	 * @NoCSRFRequired
+	 *
+	 * @param string $hash
+	 * @return Response
+	 */
+	public function embeddedFormView(string $hash): Response {
+		try {
+			$share = $this->shareMapper->findPublicShareByHash($hash);
+			// Check if the form is allwed to be embedded
+			if (!in_array(Constants::PERMISSION_EMBED, $share->getPermissions())) {
+				throw new DoesNotExistException('Shared form not allowed to be embedded');
+			}
+
+			$form = $this->formMapper->findById($share->getFormId());
+		} catch (DoesNotExistException $e) {
+			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
+			// We do not handle the MultipleObjectsReturnedException as this will automatically result in a 500 error as expected
+		}
+
+		Util::addStyle($this->appName, 'embedded');
+		$response = $this->createPublicSubmitView($form, $hash)
+			->renderAs(TemplateResponse::RENDER_AS_BASE);
+		
+		$this->initialState->provideInitialState('isEmbedded', true);
+		
+		return $this->setEmbeddedCSP($response);
+	}
+
+	/**
+	 * Create a TemplateResponse for a given public form
+	 * This sets all needed headers, initial state, loads scripts and styles
+	 */
+	protected function createPublicSubmitView(Form $form, string $hash): TemplateResponse {
 		// Has form expired
 		if ($this->formsService->hasFormExpired($form)) {
 			return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
 		}
 
+		$this->insertHeaderOnIos();
+
+		// Inject style on all templates
+		Util::addStyle($this->appName, 'forms');
 		// Main Template to fill the form
 		Util::addScript($this->appName, 'forms-submit');
-		$this->insertHeaderOnIos();
+
 		$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form));
 		$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialState->provideInitialState('shareHash', $hash);
@@ -177,21 +218,22 @@ class PageController extends Controller {
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
 	}
 
-	public function provideEmptyContent(string $renderAs, ?Form $form = null): TemplateResponse {
+	/**
+	 * Provide empty content message response for a form
+	 */
+	protected function provideEmptyContent(string $renderAs, ?Form $form = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-emptyContent');
 		$this->initialState->provideInitialState('renderAs', $renderAs);
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @PublicPage
+	 * Helper function to create a template response from a form
 	 * @param string $template
 	 * @param Form $form Necessary to set header on public forms, not necessary for 'notfound'-template
 	 * @return TemplateResponse
 	 */
-	public function provideTemplate(string $template, ?Form $form = null, array $options = []): TemplateResponse {
+	protected function provideTemplate(string $template, ?Form $form = null, array $options = []): TemplateResponse {
 		Util::addStyle($this->appName, 'forms-style');
 		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {
@@ -217,7 +259,6 @@ class PageController extends Controller {
 					}
 				}
 			}
-
 			return $response;
 		}
 
@@ -230,7 +271,7 @@ class PageController extends Controller {
 	/**
 	 * Insert the extended viewport Header on iPhones to prevent automatic zooming.
 	 */
-	public function insertHeaderOnIos(): void {
+	protected function insertHeaderOnIos(): void {
 		$USER_AGENT_IPHONE_SAFARI = '/^Mozilla\/5\.0 \(iPhone[^)]+\) AppleWebKit\/[0-9.]+ \(KHTML, like Gecko\) Version\/[0-9.]+ Mobile\/[0-9.A-Z]+ Safari\/[0-9.A-Z]+$/';
 		if (preg_match($USER_AGENT_IPHONE_SAFARI, $this->request->getHeader('User-Agent'))) {
 			Util::addHeader('meta', [
@@ -238,5 +279,18 @@ class PageController extends Controller {
 				'content' => 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
 			]);
 		}
+	}
+
+	/**
+	 * Set CSP options to allow the page be embedded using <iframe>
+	 */
+	protected function setEmbeddedCSP(TemplateResponse $response) {
+		$policy = new ContentSecurityPolicy();
+		$policy->addAllowedFrameAncestorDomain('*');
+
+		$response->addHeader('X-Frame-Options', 'ALLOW');
+		$response->setContentSecurityPolicy($policy);
+
+		return $response;
 	}
 }

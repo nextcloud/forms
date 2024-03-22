@@ -609,6 +609,21 @@ class ShareApiControllerTest extends TestCase {
 				'expected' => 1,
 				'exception' => null
 			],
+			'link-share-allows-embed' => [
+				'share' => [
+					'id' => 1,
+					'formId' => 5,
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => 'somehash',
+					'permissions' => [Constants::PERMISSION_SUBMIT]
+				],
+				'formOwner' => 'currentUser',
+				'keyValuePairs' => [
+					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_EMBED]
+				],
+				'expected' => 1,
+				'exception' => null,
+			],
 			'no-permission' => [
 				'share' => [
 					'id' => 1,
@@ -774,8 +789,7 @@ class ShareApiControllerTest extends TestCase {
 	}
 
 	/**
-	 * Test update a share
-	 * @dataProvider dataUpdateShare
+	 * Test update a share that does not exist
 	 */
 	public function testUpdateShare_NotExistingShare() {
 		$exception = $this->createMock(MapperException::class);
@@ -794,7 +808,6 @@ class ShareApiControllerTest extends TestCase {
 
 	/**
 	 * Test update a share
-	 * @dataProvider dataUpdateShare
 	 */
 	public function testUpdateShare_NotExistingForm() {
 		$exception = $this->createMock(MapperException::class);
