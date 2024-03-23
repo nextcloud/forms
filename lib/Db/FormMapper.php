@@ -97,14 +97,17 @@ class FormMapper extends QBMapper {
 	/**
 	 * @return Form[]
 	 */
-	public function findAll(): array {
+	public function findAllSharedForms(string $currentUser): array {
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select('*')
-			->from($this->getTableName())
+		$qb->select('forms.*')
+			->from($this->getTableName(), 'forms')
+			->join('forms', 'forms_v2_shares', 'shares', $qb->expr()->eq('forms.id', 'shares.form_id'))
+			->where($qb->expr()->eq('shares.share_with', $qb->createNamedParameter($currentUser)))
+			->orWhere($qb->expr()->like('forms.access_json', $qb->createNamedParameter('%"showToAllUsers":true%')))
 			//Last updated forms first, then newest forms first
-			->addOrderBy('last_updated', 'DESC')
-			->addOrderBy('created', 'DESC');
+			->addOrderBy('forms.last_updated', 'DESC')
+			->addOrderBy('forms.created', 'DESC');
 
 		return $this->findEntities($qb);
 	}

@@ -114,7 +114,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse
 	 */
 	public function getSharedForms(): DataResponse {
-		$forms = $this->formMapper->findAll();
+		$forms = $this->formMapper->findAllSharedForms($this->currentUser->getUID());
 
 		$result = [];
 		foreach ($forms as $form) {
