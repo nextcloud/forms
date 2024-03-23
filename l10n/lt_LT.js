@@ -68,6 +68,7 @@ OC.L10N.register(
     "Share link" : "Bendrinimo nuoroda",
     "Add link" : "Pridėti nuorodą",
     "Copy to clipboard" : "Kopijuoti į iškarpinę",
+    "Copy embedding code" : "Kopijuoti įterpimo kodą",
     "Remove link" : "Šalinti nuorodą",
     "Internal link" : "Vidinė nuoroda",
     "There was an error while adding the share" : "Pridedant viešinį įvyko klaida",

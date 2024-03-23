@@ -58,6 +58,7 @@ OC.L10N.register(
     "Share link" : "リンクを共有",
     "Add link" : "リンクを追加",
     "Copy to clipboard" : "クリップボードにコピー",
+    "Copy embedding code" : "埋め込みコードをコピー",
     "Remove link" : "リンクを削除",
     "Internal link" : "内部リンク",
     "View" : "表示",

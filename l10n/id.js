@@ -11,6 +11,7 @@ OC.L10N.register(
     "Share link" : "Bagikan tautan",
     "Add link" : "Tambah tautan",
     "Copy to clipboard" : "Salin ke papan klip",
+    "Copy embedding code" : "Salin kode penyemat",
     "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Untuk kompatibilitas dengan Berbagi lawas, tautan internal masih dapat digunakan sebagai tautan Berbagi. Kami menyarankan mengubah tautan dengan tautan Berbagi baru.",
     "View" : "Tampilan",
     "Edit" : "Sunting",

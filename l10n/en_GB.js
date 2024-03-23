@@ -102,6 +102,7 @@ OC.L10N.register(
     "Share link" : "Share link",
     "Add link" : "Add link",
     "Copy to clipboard" : "Copy to clipboard",
+    "Copy embedding code" : "Copy embedding code",
     "Remove link" : "Remove link",
     "Legacy Link" : "Legacy Link",
     "Form still supports old sharing-link." : "Form still supports old sharing-link.",

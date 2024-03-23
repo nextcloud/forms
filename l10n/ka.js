@@ -11,6 +11,7 @@ OC.L10N.register(
     "Group" : "Group",
     "Share link" : "Share link",
     "Copy to clipboard" : "Copy to clipboard",
+    "Copy embedding code" : "Copy embedding code",
     "Internal link" : "Internal link",
     "View" : "View",
     "Edit" : "Edit",

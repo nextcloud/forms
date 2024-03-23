@@ -12,6 +12,7 @@ OC.L10N.register(
     "Share link" : "Chia sẻ liên kết",
     "Add link" : "Thêm đường dẫn",
     "Copy to clipboard" : "Sao chép vào clipboard",
+    "Copy embedding code" : "Đang sao chép mã nhúng",
     "Internal link" : "Liên kết nội bộ",
     "View" : "Xem",
     "Edit" : "Chỉnh sửa",

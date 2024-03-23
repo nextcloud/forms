@@ -102,6 +102,7 @@ OC.L10N.register(
     "Share link" : "分享連結",
     "Add link" : "加入連結",
     "Copy to clipboard" : "複製到剪貼板",
+    "Copy embedding code" : "複製內嵌程式碼",
     "Remove link" : "移除連結",
     "Legacy Link" : "舊版連結",
     "Form still supports old sharing-link." : "表格仍然支持舊的分享連結。",

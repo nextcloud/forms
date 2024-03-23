@@ -102,6 +102,7 @@ OC.L10N.register(
     "Share link" : "Веза дељења",
     "Add link" : "Додај везу",
     "Copy to clipboard" : "Копирај у оставу",
+    "Copy embedding code" : "Копирај кôд за уградњу",
     "Remove link" : "Уклони линк",
     "Legacy Link" : "Линк старе верзије",
     "Form still supports old sharing-link." : "Формулар још увек подржава стати линк за дељење.",

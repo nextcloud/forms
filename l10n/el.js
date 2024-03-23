@@ -94,6 +94,7 @@ OC.L10N.register(
     "Share link" : "Διαμοιρασμός συνδέσμου",
     "Add link" : "Προσθήκη συνδέσμου",
     "Copy to clipboard" : "Αντιγραφή στο πρόχειρο",
+    "Copy embedding code" : "Αντιγραφή ενσωματωμένου κώδικα",
     "Remove link" : "Αφαίρεση συνδέσμου",
     "Form still supports old sharing-link." : "Η φόρμα εξακολουθεί να υποστηρίζει τον παλιό σύνδεσμο κοινής χρήσης.",
     "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Για συμβατότητα με την παλιά Κοινή Χρήση, ο εσωτερικός σύνδεσμος εξακολουθεί να μπορεί να χρησιμοποιηθεί. Συνιστούμε να αντικαταστήσετε τον σύνδεσμο με έναν νέου τύπου.",

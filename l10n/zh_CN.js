@@ -88,6 +88,7 @@ OC.L10N.register(
     "Share link" : "共享链接",
     "Add link" : "添加链接",
     "Copy to clipboard" : "复制到剪贴板",
+    "Copy embedding code" : "复制嵌入代码",
     "Remove link" : "移除链接",
     "Legacy Link" : "旧版链接",
     "Form still supports old sharing-link." : "表单依然支持旧的分享链接",

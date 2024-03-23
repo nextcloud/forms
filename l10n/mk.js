@@ -51,6 +51,7 @@ OC.L10N.register(
     "Share link" : "Сподели линк",
     "Add link" : "Додади линк",
     "Copy to clipboard" : "Копирај во клипборд",
+    "Copy embedding code" : "Копирај код за вградување",
     "Internal link" : "Внатрешен линк",
     "View" : "Погледни",
     "Edit" : "Уреди",

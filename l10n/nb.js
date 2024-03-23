@@ -102,6 +102,7 @@ OC.L10N.register(
     "Share link" : "Del lenke",
     "Add link" : "Legg ved lenke",
     "Copy to clipboard" : "Kopiert til utklippstavlen",
+    "Copy embedding code" : "Kopier innbyggingskode",
     "Remove link" : "Fjern kobling",
     "Legacy Link" : "Eldre kobling",
     "Form still supports old sharing-link." : "Form støtter fortsatt gammel delingslenke.",

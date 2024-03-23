@@ -81,6 +81,7 @@ OC.L10N.register(
     "Share link" : "Jaa linkki",
     "Add link" : "Lisää linkki",
     "Copy to clipboard" : "Kopioi leikepöydälle",
+    "Copy embedding code" : "Kopioi upotuskoodi",
     "Remove link" : "Poista linkki",
     "Internal link" : "Sisäinen linkki",
     "Permit access to all logged in accounts" : "Salli pääsy kaikille kirjautuneille tileille",

@@ -90,6 +90,7 @@ OC.L10N.register(
     "Share link" : "Megosztási hivatkozás",
     "Add link" : "Hivatkozás hozzáadása",
     "Copy to clipboard" : "Másolás a vágólapra",
+    "Copy embedding code" : "Beágyazó kód másolása",
     "Remove link" : "Hivatkozás eltávolítása",
     "Legacy Link" : "Örökölt hivatkozás",
     "Form still supports old sharing-link." : "Az űrlap még mindig támogatja a régi megosztási hivatkozást.",

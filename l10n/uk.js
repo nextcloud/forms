@@ -99,6 +99,7 @@ OC.L10N.register(
     "Share link" : "Поділитися посиланням",
     "Add link" : "Додати посиланя",
     "Copy to clipboard" : "Копіювати до буферу обміну",
+    "Copy embedding code" : "Копіювати код вбудування",
     "Remove link" : "Вилучити посилання",
     "Legacy Link" : "Застаріле посилання",
     "Form still supports old sharing-link." : "Форма все ще підтримує старе посилання для спільного доступу.",

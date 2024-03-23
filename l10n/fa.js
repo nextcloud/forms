@@ -86,6 +86,7 @@ OC.L10N.register(
     "Share link" : "هم‌رسانی پیوند",
     "Add link" : "افزودن پیوند",
     "Copy to clipboard" : "کپی کردن به حافظه موقت",
+    "Copy embedding code" : "کد تعبیه شده را کپی کنید",
     "Remove link" : "حذف پیوند",
     "Legacy Link" : "پیوند قدیمی",
     "Form still supports old sharing-link." : "Form still supports old sharing-link.",

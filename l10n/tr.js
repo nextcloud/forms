@@ -100,6 +100,7 @@ OC.L10N.register(
     "Share link" : "Bağlantıyı paylaş",
     "Add link" : "Bağlantı ekle",
     "Copy to clipboard" : "Panoya kopyala",
+    "Copy embedding code" : "Gömme kodunu kopyala",
     "Remove link" : "Bağlantıyı kaldır",
     "Legacy Link" : "Eski bağlantı",
     "Form still supports old sharing-link." : "Form hala eski paylaşım bağlantısını destekliyor.",

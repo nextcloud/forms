@@ -51,6 +51,7 @@ OC.L10N.register(
     "Share link" : "קישור שיתוף",
     "Add link" : "הוספת קישור",
     "Copy to clipboard" : "העתקה ללוח הגזירים",
+    "Copy embedding code" : "העתקת קוד הטמעה",
     "Internal link" : "קישור פנימ",
     "View" : "צפייה",
     "Edit" : "עריכה",

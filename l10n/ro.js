@@ -14,6 +14,7 @@ OC.L10N.register(
     "Share link" : "Partajează link-ul",
     "Add link" : "Adaugă link",
     "Copy to clipboard" : "Copiază în clipboard",
+    "Copy embedding code" : "Copiați codul de încorporare",
     "Internal link" : "Link intern",
     "Only works for logged in accounts with access rights" : "Funcționează doar pentru conturile autentificate, cu drepturi de acces",
     "Permit access to all logged in accounts" : "Permite accesul tuturor conturilor autentificate",

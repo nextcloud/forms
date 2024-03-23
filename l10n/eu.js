@@ -88,6 +88,7 @@ OC.L10N.register(
     "Share link" : "Partekatu esteka",
     "Add link" : "Gehitu esteka",
     "Copy to clipboard" : "Kopiatu arbelera",
+    "Copy embedding code" : "Kopiatu kapsulatze-kodea",
     "Remove link" : "Kendu esteka",
     "Legacy Link" : "Legatu-esteka",
     "Form still supports old sharing-link." : "Inprimakiak partekatzeko esteka zaharra onartzen du oraindik.",

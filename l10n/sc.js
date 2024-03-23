@@ -63,6 +63,7 @@ OC.L10N.register(
     "Share link" : "Cumpartzi ligòngiu",
     "Add link" : "Agiunghe ligòngiu",
     "Copy to clipboard" : "Còpia in is punta de billete",
+    "Copy embedding code" : "Còpia su còdighe de insertada",
     "Internal link" : "Ligòngiu de intro",
     "View" : "Visualiza",
     "Edit" : "Modìfica",

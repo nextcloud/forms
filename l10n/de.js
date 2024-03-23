@@ -99,6 +99,7 @@ OC.L10N.register(
     "Share link" : "Link teilen",
     "Add link" : "Link hinzufügen",
     "Copy to clipboard" : "In die Zwischenablage kopieren",
+    "Copy embedding code" : "Einbettungscode kopieren",
     "Remove link" : "Link entfernen",
     "Legacy Link" : "Alter Link",
     "Form still supports old sharing-link." : "Das Formular unterstützt weiterhin den alten Freigabe-Link.",

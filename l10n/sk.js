@@ -100,6 +100,7 @@ OC.L10N.register(
     "Share link" : "Zdieľať odkaz",
     "Add link" : "Pridať odkaz",
     "Copy to clipboard" : "Skopírovať do schránky",
+    "Copy embedding code" : "Kopírovať vložený kód",
     "Remove link" : "Odstrániť odkaz",
     "Legacy Link" : "Starší odkaz",
     "Form still supports old sharing-link." : "Formulár stále podporuje starý odkaz na zdieľanie.",

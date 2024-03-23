@@ -86,6 +86,7 @@ OC.L10N.register(
     "Share link" : "Del link",
     "Add link" : "Tilføj link",
     "Copy to clipboard" : "Kopier til udklipsholder",
+    "Copy embedding code" : "Kopier indlejringskode",
     "Remove link" : "Fjern link",
     "Legacy Link" : "Nedarvet link",
     "Form still supports old sharing-link." : "Formularen understøtter stadig gammelt delingslink.",

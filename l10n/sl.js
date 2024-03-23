@@ -82,6 +82,7 @@ OC.L10N.register(
     "Share link" : "Povezava za souporabo",
     "Add link" : "Dodaj povezavo",
     "Copy to clipboard" : "Kopiraj v odložišče",
+    "Copy embedding code" : "Kopiraj vstavljivo kodo",
     "Remove link" : "Odstrani povezavo",
     "Form still supports old sharing-link." : "Vprašalnik še vedno podpira zastarel način povezave objave.",
     "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Zaradi združljivosti s starim deljenjem je notranja povezava še vedno uporabna kot povezava objave. Priporočeno je povezavo zamenjati z novo.",
