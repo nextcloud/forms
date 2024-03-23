@@ -93,7 +93,11 @@
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
 					<slot name="actions" />
-					<NcActionInput :value="name" :label="t('forms', 'Technical name of the question')" @input="onNameChange">
+					<NcActionInput :label="t('forms', 'Technical name of the question')"
+						:label-outside="false"
+						:show-trailing-button="false"
+						:value="name"
+						@input="onNameChange">
 						<template #icon>
 							<IconIdentifier :size="20" />
 						</template>
