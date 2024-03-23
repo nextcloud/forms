@@ -126,4 +126,24 @@ class CirclesService {
 		}
 		return $users;
 	}
+
+	public function getUserTeamIds(string $userId): array {
+		if (!$this->circlesEnabled) {
+			$this->logger->debug('Teams app is disabled');
+			return [];
+		}
+
+		$teamsManager = $this->container->get(CirclesManager::class);
+
+		try {
+			$user = $teamsManager->getLocalFederatedUser($userId);
+			$teamsManager->startSession($user);
+			$teams = $teamsManager->probeCircles();
+			$teamsManager->stopSession();
+		} catch (Throwable $error) {
+			$this->logger->debug('Could not fetch users of team', ['error' => $error]);
+			return [];
+		}
+		return array_map(fn (Circle $team) => $team->getSingleId(), $teams);
+	}
 }

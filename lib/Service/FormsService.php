@@ -89,7 +89,7 @@ class FormsService {
 	 * @param integer $questionId
 	 * @return array
 	 */
-	public function getOptions(int $questionId): array {
+	private function getOptions(int $questionId): array {
 		$optionList = [];
 		try {
 			$optionEntities = $this->optionMapper->findByQuestion($questionId);
@@ -331,7 +331,7 @@ class FormsService {
 	 * @param Form $form
 	 * @return boolean
 	 */
-	public function hasPublicLink(Form $form): bool {
+	private function hasPublicLink(Form $form): bool {
 		$access = $form->getAccess();
 
 		if (isset($access['legacyLink'])) {
@@ -383,37 +383,35 @@ class FormsService {
 	}
 
 	/**
-	 * Is the form shown on sidebar to the user.
+	 * Get all forms shared to the user
+	 */
+	public function getSharedForms(IUser $user): array {
+		$groups = $this->groupManager->getUserGroupIds($user);
+		$teams = $this->circlesService->getUserTeamIds($user->getUID());
+		$forms = $this->formMapper->findSharedForms(
+			$user->getUID(),
+			$groups,
+			$teams,
+		);
+
+		// filter expired forms
+		$forms = array_filter($forms, fn (Form $form): bool => $this->isSharedFormShown($form));
+		return $forms;
+	}
+
+	/**
+	 * Is the shared form shown on sidebar to the user.
 	 *
 	 * @param Form $form
 	 * @return bool
 	 */
-	public function isSharedFormShown(Form $form): bool {
-		// Dont show here to owner, as its in the owned list anyways.
-		if ($form->getOwnerId() === $this->currentUser->getUID()) {
-			return false;
-		}
-
+	private function isSharedFormShown(Form $form): bool {
 		// Dont show expired forms if user isn't allowed to see results.
 		if ($this->hasFormExpired($form) && !$this->canSeeResults($form)) {
 			return false;
 		}
 
-		$access = $form->getAccess();
-		// Shown if permitall and showntoall are both set.
-		if ($access['permitAllUsers'] &&
-			$access['showToAllUsers'] &&
-			$this->configService->getAllowPermitAll()) {
-			return true;
-		}
-
-		// Shown if user in List of Shared Users/Groups
-		if ($this->isSharedToUser($form->getId())) {
-			return true;
-		}
-
-		// No Reason found to show form.
-		return false;
+		return true;
 	}
 
 	/**
@@ -422,7 +420,7 @@ class FormsService {
 	 * @param int $formId
 	 * @return bool
 	 */
-	public function isSharedToUser(int $formId): bool {
+	private function isSharedToUser(int $formId): bool {
 		$shareEntities = $this->getSharesWithUser($formId, $this->currentUser->getUID());
 		return count($shareEntities) > 0;
 	}
@@ -531,7 +529,7 @@ class FormsService {
 	 * @param string $userId The user to check if shared with
 	 * @return Share[]
 	 */
-	protected function getSharesWithUser(int $formId, string $userId): array {
+	private function getSharesWithUser(int $formId, string $userId): array {
 		$shareEntities = $this->shareMapper->findByForm($formId);
 
 		return array_filter($shareEntities, function ($shareEntity) use ($userId) {

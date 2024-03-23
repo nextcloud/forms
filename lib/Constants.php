@@ -61,6 +61,24 @@ class Constants {
 	public const FORM_STATE_ARCHIVED = 2;
 
 	/**
+	 * Access flags of a form
+	 */
+	public const FORM_ACCESS_NOPUBLICSHARE = 0;
+	public const FORM_ACCESS_PERMITALLUSERS = 1;
+	public const FORM_ACCESS_SHOWTOALLUSERS = 2;
+	public const FORM_ACCESS_LEGACYLINK = 3;
+	public const FORM_ACCESS_LEGACYLINK_PERMITALLUSERS = 4;
+	public const FORM_ACCESS_LEGACYLINK_SHOWTOALLUSERS = 5;
+	public const FORM_ACCESS_ARRAY_PERMIT = [
+		self::FORM_ACCESS_PERMITALLUSERS,
+		self::FORM_ACCESS_LEGACYLINK_PERMITALLUSERS
+	];
+	public const FORM_ACCESS_ARRAY_SHOWN = [
+		self::FORM_ACCESS_SHOWTOALLUSERS,
+		self::FORM_ACCESS_LEGACYLINK_SHOWTOALLUSERS
+	];
+
+	/**
 	 * !! Keep in sync with src/models/AnswerTypes.js !!
 	 */
 

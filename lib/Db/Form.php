@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Db;
 
+use OCA\Forms\Constants;
 use OCP\AppFramework\Db\Entity;
 
 /**
@@ -69,7 +70,7 @@ class Form extends Entity {
 	protected $ownerId;
 	protected $fileId;
 	protected $fileFormat;
-	protected $accessJson;
+	protected $accessEnum;
 	protected $created;
 	protected $expires;
 	protected $isAnonymous;
@@ -94,12 +95,49 @@ class Form extends Entity {
 
 	// JSON-Decoding of access-column.
 	public function getAccess(): array {
-		return json_decode($this->getAccessJson(), true); // assoc=true, => Convert to associative Array
+		$accessEnum = $this->getAccessEnum();
+		$access = [];
+
+		if ($accessEnum >= Constants::FORM_ACCESS_LEGACYLINK) {
+			$access['legacyLink'] = true;
+		}
+		switch ($accessEnum % Constants::FORM_ACCESS_LEGACYLINK) {
+			case Constants::FORM_ACCESS_NOPUBLICSHARE:
+				$access['permitAllUsers'] = false;
+				$access['showToAllUsers'] = false;
+				break;
+			case Constants::FORM_ACCESS_PERMITALLUSERS:
+				$access['permitAllUsers'] = true;
+				$access['showToAllUsers'] = false;
+				break;
+			case Constants::FORM_ACCESS_SHOWTOALLUSERS:
+				$access['permitAllUsers'] = true;
+				$access['showToAllUsers'] = true;
+				break;
+		}
+
+		return $access;
 	}
 
 	// JSON-Encoding of access-column.
 	public function setAccess(array $access) {
-		$this->setAccessJson(json_encode($access));
+		// No further permissions -> 0
+		// Permit all users, but don't show in navigation -> 1
+		// Permit all users and show in navigation -> 2
+		if (!$access['permitAllUsers'] && !$access['showToAllUsers']) {
+			$value = Constants::FORM_ACCESS_NOPUBLICSHARE;
+		} elseif ($access['permitAllUsers'] && !$access['showToAllUsers']) {
+			$value = Constants::FORM_ACCESS_PERMITALLUSERS;
+		} else {
+			$value = Constants::FORM_ACCESS_SHOWTOALLUSERS;
+		}
+		
+		// If legacyLink add 3
+		if (isset($access['legacyLink'])) {
+			$value += Constants::FORM_ACCESS_LEGACYLINK;
+		}
+
+		$this->setAccessEnum($value);
 	}
 
 	// Read full form
