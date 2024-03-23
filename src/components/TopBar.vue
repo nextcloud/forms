@@ -21,41 +21,10 @@
   -->
 <template>
 	<div class="top-bar" role="toolbar">
-		<div v-if="!canOnlySubmit" class="top-bar__view-select">
-			<NcButton v-if="canSubmit"
-				:aria-label="isMobile ? t('forms', 'View form') : null"
-				:type="$route.name === 'submit' ? 'secondary' : 'tertiary'"
-				@click="showSubmit">
-				<template #icon>
-					<IconEye :size="20" />
-				</template>
-				<template v-if="!isMobile" #default>
-					{{ t('forms', 'View') }}
-				</template>
-			</NcButton>
-			<NcButton v-if="canEdit"
-				:aria-label="isMobile ? t('forms', 'Edit form') : null"
-				:type="$route.name === 'edit' ? 'secondary' : 'tertiary'"
-				@click="showEdit">
-				<template #icon>
-					<IconPencil :size="20" />
-				</template>
-				<template v-if="!isMobile" #default>
-					{{ t('forms', 'Edit') }}
-				</template>
-			</NcButton>
-			<NcButton v-if="canSeeResults"
-				:aria-label="isMobile ? t('forms', 'Show results') : null"
-				:type="$route.name === 'results' ? 'secondary' : 'tertiary'"
-				@click="showResults">
-				<template #icon>
-					<IconPoll :size="20" />
-				</template>
-				<template v-if="!isMobile" #default>
-					{{ t('forms', 'Results') }}
-				</template>
-			</NcButton>
-		</div>
+		<PillMenu v-if="!canOnlySubmit"
+			:active="currentView"
+			:options="availableViews"
+			@update:active="onChangeView" />
 		<NcButton v-if="canShare && !sidebarOpened"
 			:aria-label="isMobile ? t('forms', 'Share form') : null"
 			type="tertiary"
@@ -68,8 +37,8 @@
 			</template>
 		</NcButton>
 		<NcButton v-if="showSidebarToggle"
-			v-tooltip="t('forms', 'Toggle settings')"
 			:aria-label="t('forms', 'Toggle settings')"
+			:title="t('forms', 'Toggle settings')"
 			type="tertiary"
 			@click="toggleSidebar">
 			<template #icon>
@@ -81,26 +50,44 @@
 </template>
 
 <script>
-import logger from '../utils/Logger.js'
+import { mdiEye, mdiPencil, mdiPoll } from '@mdi/js'
 import { useIsMobile } from '@nextcloud/vue'
+
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
-import IconEye from 'vue-material-design-icons/Eye.vue'
 import IconMenuOpen from 'vue-material-design-icons/MenuOpen.vue'
-import IconPencil from 'vue-material-design-icons/Pencil.vue'
-import IconPoll from 'vue-material-design-icons/Poll.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
+
+import logger from '../utils/Logger.js'
 import PermissionTypes from '../mixins/PermissionTypes.js'
+import PillMenu from './PillMenu.vue'
+
+const submitView = {
+	ariaLabel: t('forms', 'View form'),
+	icon: mdiEye,
+	title: t('forms', 'View'),
+	id: 'submit',
+}
+const editView = {
+	ariaLabel: t('forms', 'Edit form'),
+	icon: mdiPencil,
+	title: t('forms', 'Edit'),
+	id: 'edit',
+}
+const resultsView = {
+	ariaLabel: t('forms', 'Show results'),
+	icon: mdiPoll,
+	title: t('forms', 'Results'),
+	id: 'results',
+}
 
 export default {
 	name: 'TopBar',
 
 	components: {
-		IconEye,
 		IconMenuOpen,
-		IconPencil,
-		IconPoll,
 		IconShareVariant,
 		NcButton,
+		PillMenu,
 	},
 
 	mixins: [PermissionTypes],
@@ -128,11 +115,27 @@ export default {
 	},
 
 	computed: {
-		canEdit() {
-			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) && !this.archived
+		currentView() {
+			return this.availableViews.filter(v => v.id === this.$route.name)[0]
+		},
+		availableViews() {
+			const views = []
+			if (this.canSubmit) {
+				views.push(submitView)
+			}
+			if (this.canEdit) {
+				views.push(editView)
+			}
+			if (this.canSeeResults) {
+				views.push(resultsView)
+			}
+			return views
 		},
 		canSubmit() {
 			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+		},
+		canEdit() {
+			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) && !this.archived
 		},
 		canSeeResults() {
 			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
@@ -156,37 +159,23 @@ export default {
 
 		/**
 		 * Router methods
+		 *
+		 * @param {object} option The selected pill menu option
 		 */
-		showEdit() {
-			if (this.$route.name !== 'edit') {
-				this.$router.push({
-					name: 'edit',
-					params: {
-						hash: this.$route.params.hash,
-					},
-				}).catch((error) => logger.debug('Navigation cancelled', { error }))
+		async onChangeView(option) {
+			if (this.$route.name === option.id) {
+				return
 			}
-		},
 
-		showResults() {
-			if (this.$route.name !== 'results') {
-				this.$router.push({
-					name: 'results',
+			try {
+				await this.$router.push({
+					name: option.id,
 					params: {
 						hash: this.$route.params.hash,
 					},
-				}).catch((error) => logger.debug('Navigation cancelled', { error }))
-			}
-		},
-
-		showSubmit() {
-			if (this.$route.name !== 'submit') {
-				this.$router.push({
-					name: 'submit',
-					params: {
-						hash: this.$route.params.hash,
-					},
-				}).catch((error) => logger.debug('Navigation cancelled', { error }))
+				})
+			} catch (error) {
+				logger.debug('Navigation cancelled', { error })
 			}
 		},
 
@@ -199,25 +188,20 @@ export default {
 
 <style lang="scss" scoped>
 .top-bar {
-	top: 0;
-	z-index: 100;
 	display: flex;
-	position: sticky;
 	align-items: center;
 	align-self: flex-end;
+	// allow to wrap on small screens - wrap reverse so the sidebar toggle keeps aligned with the navigation toggle
+	flex-wrap: wrap-reverse;
 	justify-content: flex-end;
-	padding: var(--app-navigation-padding);
 
-	&__view-select {
-		display: flex;
-		height: 44px;
-		align-items: center;
-		align-self: flex-end;
-		justify-content: flex-end;
-		background: var(--color-main-background);
-		border: 2px solid var(--color-border);
-		border-radius: var(--border-radius-pill);
-	}
+	// align with navigation toggle, but ensure it is not overlayed
+	padding: var(--app-navigation-padding);
+	margin-inline-start: var(--default-clickable-area, 44px);
+
+	position: sticky;
+	top: 0;
+	z-index: 100;
 }
 
 .icon--flipped {

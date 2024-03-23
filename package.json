@@ -54,6 +54,7 @@
     "npm": "^10.0.0"
   },
   "devDependencies": {
+    "@mdi/js": "^7.4.47",
     "@mdi/svg": "^7.4.47",
     "@nextcloud/browserslist-config": "^3.0.0",
     "@nextcloud/cypress": "^1.0.0-beta.7",
