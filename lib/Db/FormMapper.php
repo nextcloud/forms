@@ -102,7 +102,7 @@ class FormMapper extends QBMapper {
 
 		$qb->select('forms.*')
 			->from($this->getTableName(), 'forms')
-			->join('forms', 'forms_v2_shares', 'shares', $qb->expr()->eq('forms.id', 'shares.form_id'))
+			->leftJoin('forms', 'forms_v2_shares', 'shares', $qb->expr()->eq('forms.id', 'shares.form_id'))
 			->where($qb->expr()->eq('shares.share_with', $qb->createNamedParameter($currentUser)))
 			->orWhere($qb->expr()->like('forms.access_json', $qb->createNamedParameter('%"showToAllUsers":true%')))
 			//Last updated forms first, then newest forms first
