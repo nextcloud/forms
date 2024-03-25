@@ -904,4 +904,39 @@ class ApiControllerTest extends TestCase {
 			]
 		];
 	}
+
+	public function testTransferOwnerNotOwner() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('otherUser');
+
+		$newOwner = $this->createMock(IUser::class);
+		$this->userManager->expects($this->once())
+			->method('get')
+			->with('newOwner')
+			->willReturn($newOwner);
+		
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('This form is not owned by the current user');
+		$this->apiController->transferOwner(1, 'newOwner');
+
+	}
+	public function testTransferOwner() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('currentUser');
+
+		$newOwner = $this->createMock(IUser::class);
+		$this->userManager->expects($this->once())
+			->method('get')
+			->with('newOwner')
+			->willReturn($newOwner);
+		
+		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwner(1, 'newOwner'));
+		$this->assertEquals('newOwner', $form->getOwnerId());
+
+	}
 }
