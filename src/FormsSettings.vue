@@ -52,6 +52,12 @@
 				@update:checked="onAllowPermitAllChange">
 				{{ t('forms', 'Allow sharing to all logged in accounts') }}
 			</NcCheckboxRadioSwitch>
+			<NcCheckboxRadioSwitch ref="switchAllowShowToAll"
+				:checked.sync="appConfig.allowShowToAll"
+				type="switch"
+				@update:checked="onAllowShowToAllChange">
+				{{ t('forms', 'Allow showing form to all logged in accounts on sidebar') }}
+			</NcCheckboxRadioSwitch>
 		</NcSettingsSection>
 	</div>
 </template>
@@ -117,7 +123,12 @@ export default {
 			await this.saveAppConfig('allowPermitAll', newVal)
 			el.loading = false
 		},
-
+		async onAllowShowToAllChange(newVal) {
+			const el = this.$refs.switchAllowShowToAll
+			el.loading = true
+			await this.saveAppConfig('allowShowToAll', newVal)
+			el.loading = false
+		},
 		/**
 		 * Save a key-value pair to the appConfig.
 		 *

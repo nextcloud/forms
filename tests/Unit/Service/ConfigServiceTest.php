@@ -84,6 +84,7 @@ class ConfigServiceTest extends TestCase {
 			'oneFullConfig' => [
 				'strConfig' => [
 					'allowPermitAll' => 'false',
+					'allowShowToAll' => 'false',
 					'allowPublicLink' => 'false',
 					'creationAllowedGroups' => '["group1", "group2", "nonExisting"]',
 					'restrictCreation' => 'true',
@@ -94,6 +95,7 @@ class ConfigServiceTest extends TestCase {
 				],
 				'expected' => [
 					'allowPermitAll' => false,
+					'allowShowToAll' => false,
 					'allowPublicLink' => false,
 					'creationAllowedGroups' => [
 						[
@@ -156,6 +158,7 @@ class ConfigServiceTest extends TestCase {
 			'defaultValues' => [
 				'expected' => [
 					'allowPermitAll' => true,
+					'allowShowToAll' => true,
 					'allowPublicLink' => true,
 					'creationAllowedGroups' => [],
 					'restrictCreation' => false,
@@ -223,7 +226,7 @@ class ConfigServiceTest extends TestCase {
 			->method('getUserGroupIds')
 			->with($this->currentUser)
 			->willReturn(["usersGroup"]);
-		
+
 		$this->assertEquals($expected, $this->configService->canCreateForms());
 	}
 }
