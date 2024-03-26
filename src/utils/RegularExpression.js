@@ -27,7 +27,7 @@ const REGEX_WITH_DELIMITERS = /^\/(.+)\/([smi]{0,3})$/
 /**
  * Find unescaped slashes within a string
  */
-const REGEX_UNESCAPED_SLASH = /(?<=(^|[^\\]))(\\\\)*\//
+const REGEX_UNESCAPED_SLASH = /(?:^|[^\\])(?:\\\\)*\//
 
 /**
  * Check if a regex is valid and enclosed with delimiters
