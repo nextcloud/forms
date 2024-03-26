@@ -96,7 +96,7 @@ OC.L10N.register(
     "Delete responses" : "Yanıtları sil",
     "Delete" : "Sil",
     "Group" : "Grup",
-    "Team" : "Ekip",
+    "Team" : "Takım",
     "Share link" : "Bağlantıyı paylaş",
     "Add link" : "Bağlantı ekle",
     "Copy to clipboard" : "Panoya kopyala",
