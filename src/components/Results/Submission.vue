@@ -42,6 +42,7 @@
 		<Answer v-for="question in answeredQuestions"
 			:key="question.id"
 			:answer-text="question.squashedAnswers"
+			:answers="question.answers"
 			:question-text="question.text" />
 	</div>
 </template>
@@ -53,6 +54,7 @@ import moment from '@nextcloud/moment'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 
 import Answer from './Answer.vue'
+import { generateUrl } from '@nextcloud/router'
 
 export default {
 	name: 'Submission',
@@ -99,13 +101,29 @@ export default {
 				if (!answers.length) {
 					return // no answers, go to next question
 				}
-				const squashedAnswers = answers.map(answer => answer.text).join('; ')
 
-				answeredQuestionsArray.push({
-					id: question.id,
-					text: question.text,
-					squashedAnswers,
-				})
+				if (question.type === 'file') {
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						answers: answers.map(answer => {
+							return {
+								id: answer.id,
+								text: answer.text,
+								url: generateUrl('/f/{fileId}', { fileId: answer.fileId }),
+							}
+						}),
+					})
+				} else {
+					const squashedAnswers = answers.map(answer => answer.text).join('; ')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						squashedAnswers,
+					})
+				}
+
 			})
 			return answeredQuestionsArray
 		},

@@ -43,6 +43,28 @@ function time($expected = null) {
 	return $value;
 }
 
+namespace OCA\Forms\Controller;
+
+/**
+ * mock is_uploaded_file() function used in services
+ * @param string|bool|null $filename the value that should be returned when called
+ */
+function is_uploaded_file(string|bool|null $filename) {
+	static $value;
+	if ($filename === false || $filename === true || $filename === null) {
+		$value = $filename;
+
+		return false;
+	}
+
+	if (is_null($value)) {
+		return \is_uploaded_file($filename);
+	}
+
+	return $value;
+}
+
+
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Forms\Constants;
@@ -56,6 +78,7 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
@@ -66,6 +89,11 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
+use OCP\Files\File;
+use OCP\Files\Folder;
+use OCP\Files\IMimeTypeDetector;
+use OCP\Files\IRootFolder;
+use OCP\Files\Storage\IStorage;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IUser;
@@ -105,6 +133,12 @@ class ApiControllerTest extends TestCase {
 	private $userManager;
 	/** @var IL10N|MockObject */
 	private $l10n;
+	/** @var IRootFolder|MockObject */
+	private $storage;
+	/** @var UploadedFileMapper|MockObject */
+	private $uploadedFileMapper;
+	/** @var IMimeTypeDetector|MockObject */
+	private $mimeTypeDetector;
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
@@ -125,6 +159,10 @@ class ApiControllerTest extends TestCase {
 			->willReturnCallback(function ($v) {
 				return $v;
 			});
+		$this->storage = $this->createMock(IRootFolder::class);
+		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
+		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
+
 		$this->apiController = new ApiController(
 			'forms',
 			$this->request,
@@ -141,6 +179,9 @@ class ApiControllerTest extends TestCase {
 			$this->l10n,
 			$this->logger,
 			$this->userManager,
+			$this->storage,
+			$this->uploadedFileMapper,
+			$this->mimeTypeDetector,
 		);
 	}
 
@@ -430,6 +471,9 @@ class ApiControllerTest extends TestCase {
 			 	$this->l10n,
 			 	$this->logger,
 			 	$this->userManager,
+			 	$this->storage,
+			 	$this->uploadedFileMapper,
+			 	$this->mimeTypeDetector,
 			 ])->getMock();
 		// Set the time that should be set for `lastUpdated`
 		\OCA\Forms\Controller\time(123456789);
@@ -587,6 +631,9 @@ class ApiControllerTest extends TestCase {
 				$this->l10n,
 				$this->logger,
 				$this->userManager,
+				$this->storage,
+				$this->uploadedFileMapper,
+				$this->mimeTypeDetector,
 			])
 			->getMock();
 
@@ -626,11 +673,77 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->cloneQuestion(42);
 	}
 
+	public function testUploadFiles() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->request->expects($this->once())
+			->method('getUploadedFile')
+			->with('files')
+			->willReturn([
+				'size' => [100],
+				'tmp_name' => [tempnam('/tmp', 'test')],
+				'name' => ['file.txt'],
+				'error' => [0],
+			]);
+
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('canSubmit')
+			->with($form)
+			->willReturn(true);
+
+		\OCA\Forms\Controller\is_uploaded_file(true);
+
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($this->once())
+			->method('nodeExists')
+			->willReturn(true);
+
+		$storage = $this->createMock(IStorage::class);
+		$userFolder->expects($this->once())
+			->method('getStorage')
+			->willReturn($storage);
+
+		$file = $this->createMock(File::class);
+		$file->expects($this->once())
+			->method('getId')
+			->willReturn(100);
+
+		$folder = $this->createMock(Folder::class);
+		$folder->expects($this->once())
+			->method('newFile')
+			->willReturn($file);
+
+		$userFolder->expects($this->once())
+			->method('get')
+			->willReturn($folder);
+
+		$this->storage->expects($this->once())
+			->method('getUserFolder')
+			->with('currentUser')
+			->willReturn($userFolder);
+
+
+		$this->apiController->uploadFiles(1, 10, '');
+	}
+
 	public function testInsertSubmission_answers() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setHash('hash');
-		$form->setOwnerId('99');
+		$form->setOwnerId('admin');
 		$form->setFileId(100);
 		$form->setFileFormat('xlsx');
 
@@ -656,13 +769,22 @@ class ApiControllerTest extends TestCase {
 					['id' => 4, 'text' => 'test id 4'],
 				],
 			],
+			[
+				'id' => 4,
+				'name' => null,
+				'text' => 'Dummy file question',
+				'type' => Constants::ANSWER_TYPE_FILE,
+				'options' => [],
+				'extraSettings' => ['maxAllowedFilesCount' => 2],
+			],
 		];
 
 		$answers = [
 			1 => ['3'],
 			2 => ['2', '5', Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer'],
 			3 => ['short anwer'],
-			4 => ['ignore unknown question'],
+			4 => [['uploadedFileId' => 100]],
+			5 => ['ignore unknown question'],
 		];
 
 		$this->formMapper->expects($this->once())
@@ -688,7 +810,7 @@ class ApiControllerTest extends TestCase {
 				return true;
 			}));
 
-		$this->answerMapper->expects($this->exactly(4))
+		$this->answerMapper->expects($this->exactly(5))
 			->method('insert')
 			->with($this->callback(function ($answer) {
 				if ($answer->getSubmissionId() !== 12) {
@@ -730,7 +852,29 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('writeFileToCloud')
-			->with($form, 'foo/bar', 'xlsx', '99');
+			->with($form, 'foo/bar', 'xlsx', 'admin');
+
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($this->once())
+			->method('nodeExists')
+			->willReturn(true);
+
+		$file = $this->createMock(File::class);
+
+		$userFolder->expects($this->once())
+			->method('getById')
+			->willReturn([$file]);
+
+		$folder = $this->createMock(Folder::class);
+
+		$userFolder->expects($this->once())
+			->method('get')
+			->willReturn($folder);
+
+		$this->storage->expects($this->once())
+			->method('getUserFolder')
+			->with('admin')
+			->willReturn($userFolder);
 
 		$this->apiController->insertSubmission(1, $answers, '');
 	}
@@ -762,6 +906,7 @@ class ApiControllerTest extends TestCase {
 	public function testInsertSubmission_forbiddenException($hasUserAccess, $hasFormExpired, $canSubmit) {
 		$form = new Form();
 		$form->setId(1);
+		$form->setOwnerId('admin');
 
 		$this->formMapper->expects($this->once())
 			->method('findById')
@@ -782,6 +927,7 @@ class ApiControllerTest extends TestCase {
 	public function testInsertSubmission_validateSubmission() {
 		$form = new Form();
 		$form->setId(1);
+		$form->setOwnerId('admin');
 
 		$this->formMapper->expects($this->once())
 			->method('findById')
@@ -956,7 +1102,7 @@ class ApiControllerTest extends TestCase {
 			->method('get')
 			->with('newOwner')
 			->willReturn($newOwner);
-		
+
 		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwner(1, 'newOwner'));
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}

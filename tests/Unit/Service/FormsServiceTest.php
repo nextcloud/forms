@@ -22,6 +22,27 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+namespace OCA\Forms\Service;
+
+/**
+ * mock microtime() function used in services
+ * @param float|false|null $expected the value that should be returned when called
+ */
+function microtime(bool|float $asFloat = false) {
+	static $value;
+	if ($asFloat === -1) {
+		$value = null;
+	} elseif (is_numeric($asFloat)) {
+		$value = $asFloat;
+	}
+	// Return real time if no mocked value is set
+	if (is_null($value)) {
+		return \microtime($asFloat);
+	}
+	return $value;
+}
+
 namespace OCA\Forms\Tests\Unit\Service;
 
 use OCA\Circles\Model\Circle;
@@ -41,6 +62,7 @@ use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\Files\Folder;
+use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IGroup;
@@ -103,6 +125,9 @@ class FormsServiceTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
+	/** @var IMimeTypeDetector|MockObject */
+	private $mimeTypeDetector;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -137,6 +162,8 @@ class FormsServiceTest extends TestCase {
 				return $identity;
 			}));
 
+		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
+
 		$this->formsService = new FormsService(
 			$userSession,
 			$this->activityManager,
@@ -152,7 +179,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 	}
 
@@ -209,7 +237,8 @@ class FormsServiceTest extends TestCase {
 								'questionId' => 1,
 								'text' => 'Option 2'
 							]
-						]
+						],
+						'accept' => [],
 					],
 					[
 						'id' => 2,
@@ -221,7 +250,8 @@ class FormsServiceTest extends TestCase {
 						'text' => 'Question 2',
 						'description' => '',
 						'name' => 'city',
-						'options' => []
+						'options' => [],
+						'accept' => [],
 					]
 				],
 				'shares' => [
@@ -623,7 +653,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 
 		$form = new Form();
@@ -862,7 +893,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -973,7 +1005,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 
 		$form = new Form();
@@ -1200,7 +1233,8 @@ class FormsServiceTest extends TestCase {
 				$this->secureRandom,
 				$this->circlesService,
 				$this->storage,
-				$this->l10n
+				$this->l10n,
+				$this->mimeTypeDetector,
 			])
 			->getMock();
 
@@ -1410,5 +1444,29 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 
 		$this->assertSame('Form 1 (responses).xlsx', $this->formsService->getFileName($form, 'xlsx'));
+	}
+
+	public function testGetUploadedFilePath() {
+		$form = new Form();
+		$form->setId(10);
+		$form->setTitle('Form 1');
+
+		$this->assertSame('Forms/10 - Form 1/20/30 - question name',
+			$this->formsService->getUploadedFilePath($form, 20, 30, 'question name', 'question text'));
+	}
+
+	public function testGetTemporaryUploadedFilePath() {
+		$form = new Form();
+		$form->setId(10);
+		$form->setTitle('Form 1');
+
+		$question = new Question();
+		$question->setId(30);
+		$question->setName('question name');
+
+		\OCA\Forms\Service\microtime(1234567.89);
+
+		$this->assertSame('Forms/unsubmitted/1234567.89/10 - Form 1/30 - question name',
+			$this->formsService->getTemporaryUploadedFilePath($form, $question));
 	}
 }

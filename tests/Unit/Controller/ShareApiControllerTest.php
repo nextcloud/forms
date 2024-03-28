@@ -41,6 +41,9 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\Files\File;
+use OCP\Files\Folder;
+use OCP\Files\IRootFolder;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
@@ -48,6 +51,7 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
+use OCP\Share\IManager;
 use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
@@ -94,6 +98,12 @@ class ShareApiControllerTest extends TestCase {
 	/** @var CirclesService|MockObject */
 	private $circlesService;
 
+	/** @var IRootFolder|MockObject */
+	private $storage;
+
+	/** @var IManager|MockObject */
+	private $shareManager;
+
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
@@ -115,6 +125,9 @@ class ShareApiControllerTest extends TestCase {
 			->method('getUser')
 			->willReturn($user);
 
+		$this->storage = $this->createMock(IRootFolder::class);
+		$this->shareManager = $this->createMock(IManager::class);
+
 		$this->shareApiController = new ShareApiController(
 			'forms',
 			$this->request,
@@ -127,7 +140,9 @@ class ShareApiControllerTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
-			$this->circlesService
+			$this->circlesService,
+			$this->storage,
+			$this->shareManager,
 		);
 	}
 
@@ -209,7 +224,7 @@ class ShareApiControllerTest extends TestCase {
 			->method('getCircle')
 			->with($shareWith)
 			->willReturn($this->createMock(Circle::class));
-		
+
 		$share = new Share();
 		$share->setFormId(5);
 		$share->setShareType($shareType);
@@ -472,7 +487,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->circlesService->expects($this->once())
 			->method('isCirclesEnabled')
 			->willReturn(false);
-		
+
 
 		$this->expectException(OCSException::class);
 
@@ -534,7 +549,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareMapper->expects($this->once())
 			->method('deleteById')
 			->with('8');
-		
+
 		$response = new DataResponse(8);
 		$this->assertEquals($response, $this->shareApiController->deleteShare(8));
 	}
@@ -761,6 +776,34 @@ class ShareApiControllerTest extends TestCase {
 			->with('otherUser')
 			->willReturn($this->createMock(IUser::class));
 
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($this->any())
+			->method('nodeExists')
+			->willReturn(true);
+
+		$file = $this->createMock(File::class);
+		$file->expects($this->any())
+			->method('getId')
+			->willReturn(100);
+
+		$folder = $this->createMock(Folder::class);
+		$folder->expects($this->any())
+			->method('newFile')
+			->willReturn($file);
+
+		$userFolder->expects($this->any())
+			->method('get')
+			->willReturn($folder);
+
+		$this->storage->expects($this->any())
+			->method('getUserFolder')
+			->with('currentUser')
+			->willReturn($userFolder);
+
+		$this->shareManager->expects($this->any())
+			->method('newShare')
+			->willReturn($this->createMock(IShare::class));
+
 		$shareEntity = new Share();
 		$shareEntity->setId($share['id']);
 		$shareEntity->setFormId($share['formId']);
@@ -793,7 +836,7 @@ class ShareApiControllerTest extends TestCase {
 	 */
 	public function testUpdateShare_NotExistingShare() {
 		$exception = $this->createMock(MapperException::class);
-		
+
 		$this->shareMapper->expects($this->once())
 			->method('findById')
 			->with(1337)
@@ -811,7 +854,7 @@ class ShareApiControllerTest extends TestCase {
 	 */
 	public function testUpdateShare_NotExistingForm() {
 		$exception = $this->createMock(MapperException::class);
-		
+
 		$share = new Share();
 		$share->setId(1337);
 		$share->setFormId(7331);

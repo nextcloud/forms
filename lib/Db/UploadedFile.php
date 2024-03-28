@@ -3,11 +3,9 @@
 declare(strict_types=1);
 
 /**
- * @copyright Copyright (c) 2020 Jonas Rittershofer <jotoeri@users.noreply.github.com>
+ * @copyright Copyright (c) 2024 Kostiantyn Miakshyn <molodchick@gmail.com>
  *
- * @author affan98 <affan98@gmail.com>
- * @author Jonas Rittershofer <jotoeri@users.noreply.github.com>
- * @author Roeland Jago Douma <roeland@famdouma.nl>
+ * @author Kostiantyn Miakshyn <molodchick@gmail.com>
  *
  * @license AGPL-3.0-or-later
  *
@@ -31,37 +29,38 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getSubmissionId()
- * @method void setSubmissionId(integer $value)
- * @method integer getQuestionId()
- * @method void setQuestionId(integer $value)
- * @method integer|null getFileId()
- * @method void setFileId(?integer $value)
- * @method string getText()
- * @method void setText(string $value)
+ * @method integer getFormId()
+ * @method void setFormId(integer $value)
+ * @method string getOriginalFileName()
+ * @method void setOriginalFileName(string $value)
+ * @method integer getFileId()
+ * @method void setFileId(integer $value)
+ * @method integer getCreated()
+ * @method void setCreated(integer $value)
  */
-class Answer extends Entity {
-	protected $submissionId;
-	protected $questionId;
+class UploadedFile extends Entity {
+	protected $formId;
+	protected $originalFileName;
 	protected $fileId;
-	protected $text;
+	protected $created;
 
 	/**
 	 * Answer constructor.
 	 */
 	public function __construct() {
-		$this->addType('submissionId', 'integer');
-		$this->addType('questionId', 'integer');
+		$this->addType('formId', 'integer');
+		$this->addType('originalFileName', 'string');
 		$this->addType('fileId', 'integer');
+		$this->addType('created', 'integer');
 	}
 
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
-			'submissionId' => $this->getSubmissionId(),
+			'formId' => $this->getFormId(),
+			'originalFileName' => $this->getOriginalFileName(),
 			'fileId' => $this->getFileId(),
-			'questionId' => $this->getQuestionId(),
-			'text' => (string)$this->getText(),
+			'created' => $this->getCreated(),
 		];
 	}
 }

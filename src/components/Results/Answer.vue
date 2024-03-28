@@ -27,18 +27,39 @@
 		</h4>
 		<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 		<!-- eslint-disable-next-line -->
-		<p class="answer__text" dir="auto">{{ answerText }}</p>
+		<template v-if="answers.length">
+			<p v-for="answer of answers"
+				:key="answer.id"
+				class="answer__text"
+				dir="auto">
+				<a :href="answer.url" target="_blank"><IconFile :size="20" class="answer__text-icon" /> {{ answer.text }}</a>
+			</p>
+		</template>
+		<p v-else class="answer__text" dir="auto">
+			{{ answerText }}
+		</p>
 	</div>
 </template>
 
 <script>
+import IconFile from 'vue-material-design-icons/File.vue'
+
 export default {
 	name: 'Answer',
+	components: {
+		IconFile,
+	},
 
 	props: {
+		answers: {
+			type: Array,
+			required: false,
+			default: () => [],
+		},
 		answerText: {
 			type: String,
-			required: true,
+			required: false,
+			default: '',
 		},
 		questionText: {
 			type: String,
@@ -59,6 +80,12 @@ export default {
 
 	&__text {
 		white-space: pre-line;
+
+		&-icon {
+			display: inline-flex;
+			position: relative;
+			top: 4px;
+		}
 	}
 }
 

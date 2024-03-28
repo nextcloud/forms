@@ -156,6 +156,16 @@ export default {
 		},
 
 		/**
+		 * Mime-Types and file extensions that are allowed to be uploaded
+		 */
+		accept: {
+			type: Array,
+			default() {
+				return []
+			},
+		},
+
+		/**
 		 * Can question be moved up in order?
 		 */
 		canMoveUp: {

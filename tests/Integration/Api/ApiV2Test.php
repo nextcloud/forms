@@ -37,6 +37,10 @@ class ApiV2Test extends IntegrationBase {
 	/** @var GuzzleHttp\Client */
 	private $http;
 
+	protected array $users = [
+		'test' => 'Test user',
+	];
+
 	/**
 	 * Store Test Forms Array.
 	 * Necessary as function due to object type-casting.
@@ -68,6 +72,7 @@ class ApiV2Test extends IntegrationBase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
+						'accept' => [],
 						'extraSettings' => []
 					],
 					[
@@ -88,10 +93,26 @@ class ApiV2Test extends IntegrationBase {
 								'text' => ''
 							]
 						],
+						'accept' => [],
 						'extraSettings' => [
 							'shuffleOptions' => true
 						]
-					]
+					],
+					[
+						'type' => 'file',
+						'text' => 'File Question?',
+						'description' => '',
+						'isRequired' => false,
+						'name' => 'file',
+						'order' => 3,
+						'options' => [],
+						'accept' => ['.txt'],
+						'extraSettings' => [
+							'allowedFileExtensions' => ['txt'],
+							'maxAllowedFilesCount' => 1,
+							'maxFileSize' => 1024,
+						],
+					],
 				],
 				'shares' => [
 					[
@@ -171,6 +192,7 @@ class ApiV2Test extends IntegrationBase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
+						'accept' => [],
 						'extraSettings' => []
 					],
 				],
@@ -207,6 +229,7 @@ class ApiV2Test extends IntegrationBase {
 						'name' => '',
 						'order' => 1,
 						'options' => [],
+						'accept' => [],
 						'extraSettings' => []
 					],
 				],
@@ -461,6 +484,7 @@ class ApiV2Test extends IntegrationBase {
 							'name' => '',
 							'order' => 1,
 							'options' => [],
+							'accept' => [],
 							'description' => 'Please answer this.',
 							'extraSettings' => []
 						],
@@ -481,11 +505,27 @@ class ApiV2Test extends IntegrationBase {
 									'text' => ''
 								]
 							],
+							'accept' => [],
 							'description' => '',
 							'extraSettings' => [
 								'shuffleOptions' => true,
 							]
-						]
+						],
+						[
+							'type' => 'file',
+							'text' => 'File Question?',
+							'isRequired' => false,
+							'name' => 'file',
+							'order' => 3,
+							'options' => [],
+							'accept' => ['.txt'],
+							'description' => '',
+							'extraSettings' => [
+								'allowedFileExtensions' => ['txt'],
+								'maxAllowedFilesCount' => 1,
+								'maxFileSize' => 1024,
+							],
+						],
 					],
 					'shares' => [
 						[
@@ -682,6 +722,7 @@ class ApiV2Test extends IntegrationBase {
 					'text' => 'Already some Question?',
 					'name' => '',
 					'options' => [],
+					'accept' => [],
 					'description' => '',
 					'extraSettings' => [],
 				]
@@ -695,6 +736,7 @@ class ApiV2Test extends IntegrationBase {
 					'text' => '',
 					'name' => '',
 					'options' => [],
+					'accept' => [],
 					'description' => '',
 					'extraSettings' => [],
 				]
@@ -794,7 +836,8 @@ class ApiV2Test extends IntegrationBase {
 				'formId' => $this->testForms[0]['id'],
 				'newOrder' => [
 					$this->testForms[0]['questions'][1]['id'],
-					$this->testForms[0]['questions'][0]['id']
+					$this->testForms[0]['questions'][0]['id'],
+					$this->testForms[0]['questions'][2]['id'],
 				]
 			]
 		]);
@@ -803,7 +846,8 @@ class ApiV2Test extends IntegrationBase {
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals([
 			$this->testForms[0]['questions'][0]['id'] => [ 'order' => 2 ],
-			$this->testForms[0]['questions'][1]['id'] => [ 'order' => 1 ]
+			$this->testForms[0]['questions'][1]['id'] => [ 'order' => 1 ],
+			$this->testForms[0]['questions'][2]['id'] => [ 'order' => 3 ],
 		], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
@@ -816,6 +860,7 @@ class ApiV2Test extends IntegrationBase {
 		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
 		array_splice($fullFormExpected['questions'], 0, 1);
 		$fullFormExpected['questions'][0]['order'] = 1;
+		$fullFormExpected['questions'][1]['order'] = 2;
 
 		return [
 			'deleteQuestion' => [
@@ -1068,12 +1113,14 @@ class ApiV2Test extends IntegrationBase {
 								[
 									// 'submissionId' => Checked dynamically
 									// 'questionId' => Checked dynamically
-									'text' => 'This is a short answer.'
+									'text' => 'This is a short answer.',
+									'fileId' => null,
 								],
 								[
 									// 'submissionId' => Checked dynamically
 									// 'questionId' => Checked dynamically
-									'text' => 'Option 1'
+									'text' => 'Option 1',
+									'fileId' => null,
 								]
 							]
 						],
@@ -1086,12 +1133,14 @@ class ApiV2Test extends IntegrationBase {
 								[
 									// 'submissionId' => Checked dynamically
 									// 'questionId' => Checked dynamically
-									'text' => 'This is another short answer.'
+									'text' => 'This is another short answer.',
+									'fileId' => null,
 								],
 								[
 									// 'submissionId' => Checked dynamically
 									// 'questionId' => Checked dynamically
-									'text' => 'Option 2'
+									'text' => 'Option 2',
+									'fileId' => null,
 								]
 							]
 						],
@@ -1104,7 +1153,8 @@ class ApiV2Test extends IntegrationBase {
 								[
 									// 'submissionId' => Checked dynamically
 									// 'questionId' => Checked dynamically
-									'text' => ''
+									'text' => '',
+									'fileId' => null,
 								]
 							]
 						]
@@ -1159,10 +1209,10 @@ class ApiV2Test extends IntegrationBase {
 		return [
 			'exportSubmissions' => [
 				'expected' => <<<'CSV'
-					"User ID","User display name","Timestamp","First Question?","Second Question?"
-					"","Anonymous user","1970-01-01T00:20:34+00:00","",""
-					"","Anonymous user","1970-01-01T03:25:45+00:00","This is another short answer.","Option 2"
-					"user1","User No. 1","1970-01-02T10:17:36+00:00","This is a short answer.","Option 1"
+					"User ID","User display name","Timestamp","First Question?","Second Question?","File Question?"
+					"","Anonymous user","1970-01-01T00:20:34+00:00","","",""
+					"","Anonymous user","1970-01-01T03:25:45+00:00","This is another short answer.","Option 2",""
+					"user1","User No. 1","1970-01-02T10:17:36+00:00","This is a short answer.","Option 1",""
 CSV
 			]
 		];
@@ -1266,6 +1316,22 @@ CSV
 	 * @param array $submissionsExpected
 	 */
 	public function testInsertSubmission(array $submissionsExpected) {
+
+		$uploadedFileResponse = $this->http->request('POST',
+			'api/v2.5/uploadFiles/'.$this->testForms[0]['id'].'/'.$this->testForms[0]['questions'][2]['id'],
+			[
+				'multipart' => [
+					[
+						'name' => 'files[]',
+						'contents' => 'hello world',
+						'filename' => 'test.txt'
+					]
+				]
+			]);
+
+		$data = $this->OcsResponse2Data($uploadedFileResponse);
+		$uploadedFileId = $data[0]['uploadedFileId'];
+
 		$resp = $this->http->request('POST', 'api/v2.4/submission/insert', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
@@ -1273,7 +1339,8 @@ CSV
 					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer!'],
 					$this->testForms[0]['questions'][1]['id'] => [
 						$this->testForms[0]['questions'][1]['options'][0]['id']
-					]
+					],
+					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId]]
 				]
 			]
 		]);
@@ -1306,12 +1373,19 @@ CSV
 			'answers' => [
 				[
 					'questionId' => $this->testForms[0]['questions'][0]['id'],
-					'text' => 'ShortAnswer!'
+					'text' => 'ShortAnswer!',
+					'fileId' => null,
 				],
 				[
 					'questionId' => $this->testForms[0]['questions'][1]['id'],
-					'text' => 'Option 1'
-				]
+					'text' => 'Option 1',
+					'fileId' => null,
+				],
+				[
+					'questionId' => $this->testForms[0]['questions'][2]['id'],
+					'text' => 'test.txt',
+					'fileId' => 28,
+				],
 			]
 		], $data['submissions'][0]);
 	}

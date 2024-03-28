@@ -28,6 +28,8 @@ This file contains the API-Documentation. For more information on the returned D
 - Completely new way of handling access & shares.
 
 ### Other API changes
+- In API version 2.5 the following endpoints were introduced:
+  - `POST /api/2.5/uploadFiles/{formId}/{questionId}` to upload files to answer before form submitting
 - In API version 2.4 the following endpoints were introduced:
   - `POST /api/2.4/form/link/{fileFormat}` to link form to a file
   - `POST /api/2.4/form/unlink` to unlink form from a file
@@ -176,18 +178,20 @@ Returns the full-depth object of the requested form (without submissions).
           "text": "Option 2"
         }
       ],
+      "accept": [],
       "extraSettings": {}
     },
     {
       "id": 2,
       "formId": 3,
       "order": 2,
-      "type": "short",
+      "type": "file",
       "isRequired": true,
       "text": "Question 2",
       "name": "something_other",
       "options": [],
       "extraSettings": {}
+      "accept": ["image/*", ".pdf"],
     }
   ],
   "shares": [
@@ -629,6 +633,21 @@ Delete all Submissions to a form
 "data": 3
 ```
 
+### Upload a file
+Upload a files to answer before form submitting
+- Endpoint: `/api/2.5/uploadFiles/{formId}/{questionId}`
+- Method: `POST`
+- Parameters:
+  | Parameter    | Type           | Description |
+  |--------------|----------------|-------------|
+  | _formId_     | Integer        | ID of the form to upload the file to |
+  | _questionId_ | Integer        | ID of the question to upload the file to |
+  | _files_      | Array of files | Files to upload |
+- Response: **Status-Code OK**, as well as the id of the uploaded file and it's name.
+```
+"data": {"uploadedFileId": integer, "fileName": "string"}
+```
+
 ### Insert a Submission
 Store Submission to Database
 - Endpoint: `/api/v2.4/submission/insert`
@@ -644,10 +663,15 @@ Store Submission to Database
   - QuestionID as key
   - An **array** of values as value --> Even for short Text Answers, wrapped into Array.
   - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs.
+  - For File-Uploads, the array contains the objects with key `uploadedFileId` (value from Upload a file endpoint).
   ```
   {
     "1":[27,32],              // dropdown or multiple
     "2":["ShortTextAnswer"],  // All Text-Based Question-Types
+    "3":[                     // File-Upload
+        {"uploadedFileId": integer},
+        {"uploadedFileId": integer}
+    ],
   }
   ```
 - Response: **Status-Code OK**.

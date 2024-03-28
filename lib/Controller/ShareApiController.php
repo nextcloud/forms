@@ -41,6 +41,7 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCSController;
+use OCP\Files\IRootFolder;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
@@ -48,6 +49,7 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
+use OCP\Share\IManager;
 use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
@@ -67,6 +69,8 @@ class ShareApiController extends OCSController {
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
+		private IRootFolder $storage,
+		private IManager $shareManager,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -189,7 +193,7 @@ class ShareApiController extends OCSController {
 
 		// Create share-notifications (activity)
 		$this->formsService->notifyNewShares($form, $share);
-		
+
 		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		// Append displayName for Frontend
@@ -254,8 +258,8 @@ class ShareApiController extends OCSController {
 		]);
 
 		try {
-			$share = $this->shareMapper->findById($id);
-			$form = $this->formMapper->findById($share->getFormId());
+			$formShare = $this->shareMapper->findById($id);
+			$form = $this->formMapper->findById($formShare->getFormId());
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find share', ['exception' => $e]);
 			throw new OCSBadRequestException('Could not find share');
@@ -278,16 +282,46 @@ class ShareApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		if (!$this->validatePermissions($keyValuePairs['permissions'], $share->getShareType())) {
+		if (!$this->validatePermissions($keyValuePairs['permissions'], $formShare->getShareType())) {
 			throw new OCSBadRequestException('Invalid permission given');
 		}
 
-		$share->setPermissions($keyValuePairs['permissions']);
-		$share = $this->shareMapper->update($share);
+		$formShare->setPermissions($keyValuePairs['permissions']);
+		$formShare = $this->shareMapper->update($formShare);
+
+		if (in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
+			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
+			if ($userFolder->nodeExists($uploadedFilesFolderPath)) {
+				$folder = $userFolder->get($uploadedFilesFolderPath);
+			} else {
+				$folder = $userFolder->newFolder($uploadedFilesFolderPath);
+			}
+			/** @var \OCP\Files\Folder $folder */
+
+			if (in_array(Constants::PERMISSION_RESULTS, $keyValuePairs['permissions'], true)) {
+				$folderShare = $this->shareManager->newShare();
+				$folderShare->setShareType($formShare->getShareType());
+				$folderShare->setSharedWith($formShare->getShareWith());
+				$folderShare->setSharedBy($form->getOwnerId());
+				$folderShare->setPermissions(\OCP\Constants::PERMISSION_READ);
+				$folderShare->setNode($folder);
+				$folderShare->setShareOwner($form->getOwnerId());
+
+				$this->shareManager->createShare($folderShare);
+			} else {
+				$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder);
+				foreach ($folderShares as $folderShare) {
+					if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
+						$this->shareManager->deleteShare($folderShare);
+					}
+				}
+			}
+		}
 
 		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
-		return new DataResponse($share->getId());
+		return new DataResponse($formShare->getId());
 	}
 
 	/**
