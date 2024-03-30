@@ -8,6 +8,8 @@ OC.L10N.register(
     "Permissions" : "Permisos",
     "Delete" : "Desaniciar",
     "Group" : "Grupu",
+    "Team" : "Equipu",
+    "Share link" : "Compartir l'enllaz",
     "Copy to clipboard" : "Copiar nel cartafueyu",
     "Remove link" : "Quitar l'enllaz",
     "Internal link" : "Enllaz internu",

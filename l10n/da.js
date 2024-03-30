@@ -107,6 +107,7 @@ OC.L10N.register(
     "Edit" : "Redigér",
     "Show results" : "Vis resultater",
     "Loading {title} …" : "Indlæser {title} …",
+    "Form '{title}' is archived and can not be modified." : "Formular '{title}' er arkiveret og kan ikke ændres.",
     "Form title" : "Formular titel",
     "Description" : "Beskrivelse",
     "Add a question" : "Tilføj et spørgsmål",
