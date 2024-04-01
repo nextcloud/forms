@@ -1112,7 +1112,6 @@ class ApiController extends OCSController {
 
 		// Insert new submission
 		$this->submissionMapper->insert($submission);
-		$submissionId = $submission->getId();
 
 		// Ensure the form is unique if needed.
 		// If we can not submit anymore then the submission must be unique
