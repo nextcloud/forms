@@ -37,6 +37,7 @@
     "Time" : "Data",
     "Text" : "Testu",
     "Phone number" : "Númberu de teléfonu",
-    "Email address" : "Direición de corréu electrónicu"
+    "Email address" : "Direición de corréu electrónicu",
+    "Number" : "Númberu"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -39,6 +39,7 @@ OC.L10N.register(
     "Time" : "Data",
     "Text" : "Testu",
     "Phone number" : "Númberu de teléfonu",
-    "Email address" : "Direición de corréu electrónicu"
+    "Email address" : "Direición de corréu electrónicu",
+    "Number" : "Númberu"
 },
 "nplurals=2; plural=(n != 1);");
