@@ -119,6 +119,7 @@
     "Are you sure you want to delete all responses of {title}?" : "Estas seguro que deseas borrar todas las respuestas para {título}?",
     "Summary" : "Resumen",
     "Responses" : "Respuestas",
+    "Cancel" : "Cancelar",
     "There was an error while loading the results" : "Ha habido un error al cargar los resultados",
     "Export successful to {file}" : "Exportado con éxito a {file}",
     "There was an error, while exporting to Files" : "Hubo un error, mientras se exportaba a Archivos",
