@@ -1141,6 +1141,10 @@ class FormsServiceTest extends TestCase {
 			->method('getAllowPermitAll')
 			->willReturn(true);
 
+		$this->configService->expects($this->any())
+			->method('getAllowShowToAll')
+			->willReturn(true);
+
 		$share = new Share();
 		$share->setShareType($shareType);
 		$share->setShareWith('currentUser'); // Only relevant, if $shareType is TYPE_USER, otherwise it's just some 'hash'
@@ -1164,6 +1168,36 @@ class FormsServiceTest extends TestCase {
 
 		$this->configService->expects($this->any())
 			->method('getAllowPermitAll')
+			->willReturn(false);
+
+		$this->configService->expects($this->any())
+			->method('getAllowShowToAll')
+			->willReturn(false);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([]);
+
+		$this->assertEquals(false, $this->formsService->isSharedFormShown($form));
+	}
+
+	public function testIsSharedFormShown_PermitShowNotAllowed() {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('notCurrentUser');
+		$form->setExpires(false);
+		$form->setAccess([
+			'permitAllUsers' => true,
+			'showToAllUsers' => true,
+		]);
+
+		$this->configService->expects($this->any())
+			->method('getAllowPermitAll')
+			->willReturn(true);
+
+		$this->configService->expects($this->any())
+			->method('getAllowShowToAll')
 			->willReturn(false);
 
 		$this->shareMapper->expects($this->any())
