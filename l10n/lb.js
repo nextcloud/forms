@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Copy" : "Kopie",
     "Shared with you" : "Mat dir gedeelt",
     "Select groups" : "Wiel Gruppen äus",
     "Required" : "Noutwendeg",
