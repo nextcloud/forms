@@ -1,7 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: composer
-  target-branch: "main"
+  target-branch: "stable3"
   directory: "/"
   schedule:
     interval: weekly
@@ -14,7 +14,7 @@ updates:
   - dependencies
 
 - package-ecosystem: composer
-  target-branch: "main"
+  target-branch: "stable3"
   directory: "/vendor-bin/cs-fixer/"
   schedule:
     interval: weekly
@@ -27,7 +27,7 @@ updates:
   - dependencies
 
 - package-ecosystem: npm
-  target-branch: "main"
+  target-branch: "stable3"
   directory: "/"
   schedule:
     interval: weekly
@@ -40,7 +40,7 @@ updates:
   - dependencies
 
 - package-ecosystem: github-actions
-  target-branch: "main"
+  target-branch: "stable3"
   directory: "/"
   schedule:
     interval: weekly
