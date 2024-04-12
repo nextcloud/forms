@@ -50,7 +50,7 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms3.png</screenshot>
 
 	<dependencies>
-		<nextcloud min-version="26" max-version="27" />
+		<nextcloud min-version="27" max-version="27" />
 	</dependencies>
 
 	<settings>
