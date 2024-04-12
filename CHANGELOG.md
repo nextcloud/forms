@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.4.7 - 2024-04-12
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.6...v3.4.7)
+
+### Fixed
+- [stable3] fix: remove positive lookbehind for finding unescaped slashes [\#2034](https://github.com/nextcloud/forms/pull/2034) ([backportbot[bot]](https://github.com/apps/backportbot))
+- [stable3] Show expired shared forms to users with results permission [\#2017](https://github.com/nextcloud/forms/pull/2017) ([backportbot[bot]](https://github.com/apps/backportbot))
+- [stable3] fix(TopBar): provide optional button text via new slot syntax [\#2016](https://github.com/nextcloud/forms/pull/2016) ([backportbot[bot]](https://github.com/apps/backportbot))
+
+
 ## v3.4.6 - 2024-02-18
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v3.4.5...v3.4.6)
