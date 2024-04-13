@@ -176,8 +176,8 @@
   </file>
   <file src="lib/Db/Form.php">
     <UndefinedMagicMethod>
-      <code>getAccessJson</code>
-      <code>setAccessJson</code>
+      <code>getAccessEnum</code>
+      <code>setAccessEnum</code>
     </UndefinedMagicMethod>
   </file>
   <file src="lib/Db/Question.php">

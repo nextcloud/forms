@@ -56,10 +56,7 @@ class ApiV2Test extends TestCase {
 				'title' => 'Title of a Form',
 				'description' => 'Just a simple form.',
 				'owner_id' => 'test',
-				'access_json' => [
-					'permitAllUsers' => false,
-					'showToAllUsers' => false
-				],
+				'access_enum' => 0,
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
@@ -162,10 +159,7 @@ class ApiV2Test extends TestCase {
 				'title' => 'Title of a second Form',
 				'description' => '',
 				'owner_id' => 'someUser',
-				'access_json' => [
-					'permitAllUsers' => true,
-					'showToAllUsers' => true
-				],
+				'access_enum' => 2,
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
@@ -201,10 +195,7 @@ class ApiV2Test extends TestCase {
 				'title' => 'Title of a third Form',
 				'description' => '',
 				'owner_id' => 'test',
-				'access_json' => [
-					'permitAllUsers' => true,
-					'showToAllUsers' => true
-				],
+				'access_enum' => 2,
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
@@ -270,7 +261,7 @@ class ApiV2Test extends TestCase {
 					'title' => $qb->createNamedParameter($form['title'], IQueryBuilder::PARAM_STR),
 					'description' => $qb->createNamedParameter($form['description'], IQueryBuilder::PARAM_STR),
 					'owner_id' => $qb->createNamedParameter($form['owner_id'], IQueryBuilder::PARAM_STR),
-					'access_json' => $qb->createNamedParameter(json_encode($form['access_json']), IQueryBuilder::PARAM_STR),
+					'access_enum' => $qb->createNamedParameter($form['access_enum'], IQueryBuilder::PARAM_INT),
 					'created' => $qb->createNamedParameter($form['created'], IQueryBuilder::PARAM_INT),
 					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
 					'state' => $qb->createNamedParameter($form['state'], IQueryBuilder::PARAM_INT),

@@ -114,16 +114,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse
 	 */
 	public function getSharedForms(): DataResponse {
-		$forms = $this->formMapper->findAll();
-
-		$result = [];
-		foreach ($forms as $form) {
-			// Check if the form should be shown on sidebar
-			if (!$this->formsService->isSharedFormShown($form)) {
-				continue;
-			}
-			$result[] = $this->formsService->getPartialFormArray($form);
-		}
+		$forms = $this->formsService->getSharedForms($this->currentUser);
+		$result = array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms);
 
 		return new DataResponse($result);
 	}
@@ -1120,7 +1112,6 @@ class ApiController extends OCSController {
 
 		// Insert new submission
 		$this->submissionMapper->insert($submission);
-		$submissionId = $submission->getId();
 
 		// Ensure the form is unique if needed.
 		// If we can not submit anymore then the submission must be unique
