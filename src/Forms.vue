@@ -205,16 +205,22 @@ export default {
 		 * All own active forms
 		 */
 		ownedForms() {
+			const now = Date.now() / 1000
+
 			return this.forms
 				.filter((form) => form.state !== FormState.FormArchived)
+				.filter((form) => form.expires === 0 || form.expires >= now)
 		},
 
 		/**
 		 * All active shared forms
 		 */
 		sharedForms() {
+			const now = Date.now() / 1000
+
 			return this.allSharedForms
 				.filter((form) => form.state !== FormState.FormArchived)
+				.filter((form) => form.expires === 0 || form.expires >= now)
 		},
 
 		/**
