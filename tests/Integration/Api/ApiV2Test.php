@@ -1491,4 +1491,22 @@ CSV
 
 		$this->testGetSubmissions($submissionsExpected);
 	}
+
+	/**
+	 * Test transfer owner endpoint for form
+	 *
+	 * Keep this test at the end as it might break other tests
+	 */
+	public function testTransferOwner() {
+		$resp = $this->http->request('POST', "api/v2.4/form/transfer", [
+			'json' => [
+				'formId' => $this->testForms[0]['id'],
+				'uid' => 'user1'
+			],
+		]);
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals('user1', $data);
+	}
 };
