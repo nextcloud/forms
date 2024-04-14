@@ -1,13 +1,24 @@
 # Changelog
 
-## v4.2.0-alpha.1 - 2024-03-13
+## v4.2.0 - 2024-04-14
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.1.1...v4.2.0-alpha.1)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.1.1...v4.2.0)
+
+### Enhancements
+- Get only forms shared with user from database [\#2029](https://github.com/nextcloud/forms/pull/2029) ([Chartman123](https://github.com/Chartman123))
+- Allow embedding forms within other websites [\#1353](https://github.com/nextcloud/forms/pull/1353) ([susnux](https://github.com/susnux))
+- feat: Add forms `state` to close and archive forms [\#1925](https://github.com/nextcloud/forms/pull/1925) ([susnux](https://github.com/susnux))
+
+### Fixed
+- fix: remove positive lookbehind for finding unescaped slashes [\#2033](https://github.com/nextcloud/forms/pull/2033) ([Chartman123](https://github.com/Chartman123))
+- fix: Do not show trailing button for technical name input [\#2021](https://github.com/nextcloud/forms/pull/2021) ([susnux](https://github.com/susnux))
+- Show expired shared forms to users with results permission [\#2013](https://github.com/nextcloud/forms/pull/2013) ([Chartman123](https://github.com/Chartman123))
+- fix(TopBar): provide optional button text via new slot syntax [\#2015](https://github.com/nextcloud/forms/pull/2015) ([ShGKme](https://github.com/ShGKme))
 
 ### Merged
 - chore: Add Nextcloud 29 support [\#2003](https://github.com/nextcloud/forms/pull/2003) ([susnux](https://github.com/susnux))
 - Rename Circles to Teams in UI/logging [\#2000](https://github.com/nextcloud/forms/pull/2000) ([Chartman123](https://github.com/Chartman123))
-- Update cypress.yml [\#1976](https://github.com/nextcloud/forms/pull/1976) ([Chartman123](https://github.com/Chartman123))
+- Reuse top bar component for responses view toggle [\#1576](https://github.com/nextcloud/forms/pull/1576) ([susnux](https://github.com/susnux))
 - Update dependencies and translations
 
 
