@@ -27,6 +27,7 @@ declare(strict_types=1);
 namespace OCA\Forms\Migration;
 
 use Closure;
+use OCA\Forms\Constants;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
@@ -95,22 +96,22 @@ class Version040200Date20240402200139 extends SimpleMigrationStep {
 			// Decode access to array (param assoc=true)
 			$access = json_decode($row['access_json'], true);
 
-			$value = 0;
+			$value = Constants::FORM_ACCESS_NOPUBLICSHARE;
 
 			// No further permissions -> 0
 			// Permit all users, but don't show in navigation -> 1
 			// Permit all users and show in navigation -> 2
 			if (!$access['permitAllUsers'] && !$access['showToAllUsers']) {
-				$value = 0;
+				$value = Constants::FORM_ACCESS_NOPUBLICSHARE;
 			} elseif ($access['permitAllUsers'] && !$access['showToAllUsers']) {
-				$value = 1;
+				$value = Constants::FORM_ACCESS_PERMITALLUSERS;
 			} else {
-				$value = 2;
+				$value = Constants::FORM_ACCESS_SHOWTOALLUSERS;
 			}
 
 			// If legacyLink add 3
-			if ($access['legacyLink']) {
-				$value += 3;
+			if (isset($access['legacyLink']) && $access['legacyLink']) {
+				$value += Constants::FORM_ACCESS_LEGACYLINK;
 			}
 
 			$qbUpdate->setParameter('id', $row['id'], IQueryBuilder::PARAM_INT)
