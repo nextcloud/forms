@@ -305,8 +305,18 @@ export default {
 
 	mixins: [PermissionTypes, ViewsMixin],
 
-	setup() {
+	data() {
 		return {
+			activeResponseView: responseViews[0],
+
+			isDownloadActionOpened: false,
+			loadingResults: true,
+
+			picker: null,
+			showSummary: true,
+			showConfirmDeleteDialog: false,
+			showLinkedFileNotAvailableDialog: false,
+
 			isMobile: useIsSmallMobile(),
 
 			// non reactive props
@@ -340,20 +350,6 @@ export default {
 					callback: () => { this.deleteAllSubmissionsConfirmed() },
 				},
 			],
-		}
-	},
-
-	data() {
-		return {
-			activeResponseView: responseViews[0],
-
-			isDownloadActionOpened: false,
-			loadingResults: true,
-
-			picker: null,
-			showSummary: true,
-			showConfirmDeleteDialog: false,
-			showLinkedFileNotAvailableDialog: false,
 		}
 	},
 
@@ -410,6 +406,7 @@ export default {
 			this.form.fileFormat = null
 			this.form.fileId = null
 			this.form.filePath = null
+			emit('forms:last-updated:set', this.form.id)
 		},
 		async loadFormResults() {
 			this.loadingResults = true
@@ -457,6 +454,7 @@ export default {
 							this.form.filePath = responseData.filePath
 
 							showSuccess(t('forms', 'File {file} successfully linked', { file: responseData.fileName }))
+							emit('forms:last-updated:set', this.form.id)
 						} catch (error) {
 							logger.error('Error while exporting to Files and linking', { error })
 							showError(t('forms', 'There was an error while linking the file'))
