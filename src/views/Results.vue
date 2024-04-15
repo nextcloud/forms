@@ -305,6 +305,15 @@ export default {
 
 	mixins: [PermissionTypes, ViewsMixin],
 
+	setup() {
+		return {
+			isMobile: useIsSmallMobile(),
+
+			// non reactive props
+			responseViews,
+		}
+	},
+
 	data() {
 		return {
 			activeResponseView: responseViews[0],
@@ -316,11 +325,6 @@ export default {
 			showSummary: true,
 			showConfirmDeleteDialog: false,
 			showLinkedFileNotAvailableDialog: false,
-
-			isMobile: useIsSmallMobile(),
-
-			// non reactive props
-			responseViews,
 
 			linkedFileNotAvailableButtons: [
 				{
