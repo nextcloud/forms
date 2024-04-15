@@ -28,22 +28,14 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 use OCA\Forms\Constants;
-use OCA\Forms\Db\FormMapper;
-use OCP\DB\QueryBuilder\IQueryBuilder;
-use Test\TestCase;
+use OCA\Forms\Tests\Integration\IntegrationBase;
 
 /**
  * @group DB
  */
-class ApiV2Test extends TestCase {
+class ApiV2Test extends IntegrationBase {
 	/** @var GuzzleHttp\Client */
 	private $http;
-
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var Array */
-	private $testForms;
 
 	/**
 	 * Store Test Forms Array.
@@ -234,115 +226,13 @@ class ApiV2Test extends TestCase {
 	 * Writing testforms into db, preparing http request
 	 */
 	public function setUp(): void {
-		parent::setUp();
-		$userManager = \OC::$server->getUserManager();
-		$user = $userManager->get('test');
-		if ($user === null) {
-			$user = $userManager->createUser('test', 'test');
-		}
-		$user->setDisplayName('Test Displayname');
-
-		// We also have user2 and user3 but those accounts are "deleted"
-		$user = $userManager->get("user1");
-		if ($user === null) {
-			$user = $userManager->createUser("user1", "user1");
-		}
-		$user->setDisplayName("User No. 1");
-
 		$this->setTestForms();
+		$this->users = [
+			'test' => 'Test Displayname',
+			'user1' => 'User No. 1',
+		];
 
-		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
-
-		// Write our test forms into db
-		foreach ($this->testForms as $index => $form) {
-			$qb->insert('forms_v2_forms')
-				->values([
-					'hash' => $qb->createNamedParameter($form['hash'], IQueryBuilder::PARAM_STR),
-					'title' => $qb->createNamedParameter($form['title'], IQueryBuilder::PARAM_STR),
-					'description' => $qb->createNamedParameter($form['description'], IQueryBuilder::PARAM_STR),
-					'owner_id' => $qb->createNamedParameter($form['owner_id'], IQueryBuilder::PARAM_STR),
-					'access_enum' => $qb->createNamedParameter($form['access_enum'], IQueryBuilder::PARAM_INT),
-					'created' => $qb->createNamedParameter($form['created'], IQueryBuilder::PARAM_INT),
-					'expires' => $qb->createNamedParameter($form['expires'], IQueryBuilder::PARAM_INT),
-					'state' => $qb->createNamedParameter($form['state'], IQueryBuilder::PARAM_INT),
-					'is_anonymous' => $qb->createNamedParameter($form['is_anonymous'], IQueryBuilder::PARAM_BOOL),
-					'submit_multiple' => $qb->createNamedParameter($form['submit_multiple'], IQueryBuilder::PARAM_BOOL),
-					'show_expiration' => $qb->createNamedParameter($form['show_expiration'], IQueryBuilder::PARAM_BOOL),
-					'last_updated' => $qb->createNamedParameter($form['last_updated'], IQueryBuilder::PARAM_INT),
-					'submission_message' => $qb->createNamedParameter($form['submission_message'], IQueryBuilder::PARAM_STR),
-					'file_id' => $qb->createNamedParameter($form['file_id'], IQueryBuilder::PARAM_INT),
-					'file_format' => $qb->createNamedParameter($form['file_format'], IQueryBuilder::PARAM_STR),
-				]);
-			$qb->executeStatement();
-			$formId = $qb->getLastInsertId();
-			$this->testForms[$index]['id'] = $formId;
-
-			// Insert Questions into DB
-			foreach ($form['questions'] as $qIndex => $question) {
-				$qb->insert('forms_v2_questions')
-					->values([
-						'form_id' => $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT),
-						'order' => $qb->createNamedParameter($question['order'], IQueryBuilder::PARAM_INT),
-						'type' => $qb->createNamedParameter($question['type'], IQueryBuilder::PARAM_STR),
-						'is_required' => $qb->createNamedParameter($question['isRequired'], IQueryBuilder::PARAM_BOOL),
-						'text' => $qb->createNamedParameter($question['text'], IQueryBuilder::PARAM_STR),
-						'name' => $qb->createNamedParameter($question['name'], IQueryBuilder::PARAM_STR),
-						'description' => $qb->createNamedParameter($question['description'], IQueryBuilder::PARAM_STR),
-						'extra_settings_json' => $qb->createNamedParameter(json_encode($question['extraSettings']), IQueryBuilder::PARAM_STR),
-					]);
-				$qb->executeStatement();
-				$questionId = $qb->getLastInsertId();
-				$this->testForms[$index]['questions'][$qIndex]['id'] = $questionId;
-
-				// Insert Options into DB
-				foreach ($question['options'] as $oIndex => $option) {
-					$qb->insert('forms_v2_options')
-						->values([
-							'question_id' => $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT),
-							'text' => $qb->createNamedParameter($option['text'], IQueryBuilder::PARAM_STR)
-						]);
-					$qb->executeStatement();
-					$this->testForms[$index]['questions'][$qIndex]['options'][$oIndex]['id'] = $qb->getLastInsertId();
-				}
-			}
-
-			// Insert Shares into DB
-			foreach ($form['shares'] as $sIndex => $share) {
-				$qb->insert('forms_v2_shares')
-					->values([
-						'form_id' => $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT),
-						'share_type' => $qb->createNamedParameter($share['shareType'], IQueryBuilder::PARAM_STR),
-						'share_with' => $qb->createNamedParameter($share['shareWith'], IQueryBuilder::PARAM_STR),
-						'permissions_json' => $qb->createNamedParameter(json_encode($share['permissions'] ?? null), IQueryBuilder::PARAM_STR),
-					]);
-				$qb->executeStatement();
-				$this->testForms[$index]['shares'][$sIndex]['id'] = $qb->getLastInsertId();
-			}
-
-			// Insert Submissions into DB
-			foreach ($form['submissions'] as $suIndex => $submission) {
-				$qb->insert('forms_v2_submissions')
-					->values([
-						'form_id' => $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT),
-						'user_id' => $qb->createNamedParameter($submission['userId'], IQueryBuilder::PARAM_STR),
-						'timestamp' => $qb->createNamedParameter($submission['timestamp'], IQueryBuilder::PARAM_INT)
-					]);
-				$qb->executeStatement();
-				$submissionId = $qb->getLastInsertId();
-				$this->testForms[$index]['submissions'][$suIndex]['id'] = $submissionId;
-
-				foreach ($submission['answers'] as $aIndex => $answer) {
-					$qb->insert('forms_v2_answers')
-						->values([
-							'submission_id' => $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT),
-							'question_id' => $qb->createNamedParameter($this->testForms[$index]['questions'][$answer['questionIndex']]['id'], IQueryBuilder::PARAM_INT),
-							'text' => $qb->createNamedParameter($answer['text'], IQueryBuilder::PARAM_STR)
-						]);
-					$qb->executeStatement();
-					$this->testForms[$index]['submissions'][$suIndex]['answers'][$aIndex]['id'] = $qb->getLastInsertId();
-				}
-			}
-		}
+		parent::setUp();
 
 		// Set up http Client
 		$this->http = new Client([
@@ -355,48 +245,7 @@ class ApiV2Test extends TestCase {
 		]);
 	}
 
-	/** Clean up database from testforms */
 	public function tearDown(): void {
-		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
-
-		foreach ($this->testForms as $form) {
-			$qb->delete('forms_v2_forms')
-				->where($qb->expr()->eq('id', $qb->createNamedParameter($form['id'], IQueryBuilder::PARAM_INT)));
-			$qb->executeStatement();
-
-			foreach ($form['questions'] as $question) {
-				$qb->delete('forms_v2_questions')
-					->where($qb->expr()->eq('id', $qb->createNamedParameter($question['id'], IQueryBuilder::PARAM_INT)));
-				$qb->executeStatement();
-
-				foreach ($question['options'] as $option) {
-					$qb->delete('forms_v2_options')
-						->where($qb->expr()->eq('id', $qb->createNamedParameter($option['id'], IQueryBuilder::PARAM_INT)));
-					$qb->executeStatement();
-				}
-			}
-
-			foreach ($form['shares'] as $share) {
-				$qb->delete('forms_v2_shares')
-					->where($qb->expr()->eq('id', $qb->createNamedParameter($share['id'], IQueryBuilder::PARAM_INT)));
-				$qb->executeStatement();
-			}
-
-			if (isset($form['submissions'])) {
-				foreach ($form['submissions'] as $submission) {
-					$qb->delete('forms_v2_submissions')
-						->where($qb->expr()->eq('id', $qb->createNamedParameter($submission['id'], IQueryBuilder::PARAM_INT)));
-					$qb->executeStatement();
-
-					foreach ($submission['answers'] as $answer) {
-						$qb->delete('forms_v2_answers')
-							->where($qb->expr()->eq('id', $qb->createNamedParameter($answer['id'], IQueryBuilder::PARAM_INT)));
-						$qb->executeStatement();
-					}
-				}
-			}
-		}
-
 		parent::tearDown();
 	}
 
