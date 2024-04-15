@@ -36,3 +36,11 @@ v8-compile-cache-0/
 .phpunit.result.cache
 clover.unit.xml
 clover.integration.xml
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

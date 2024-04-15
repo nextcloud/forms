@@ -15,16 +15,15 @@
   "type": "module",
   "scripts": {
     "build": "vite --mode production build",
-    "cypress": "cypress run --e2e",
-    "cypress:gui": "cypress open",
     "dev": "vite --mode development build",
+    "dev:watch": "NODE_OPTIONS='--max-old-space-size=4096' npx vite --mode development build --watch",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
+    "start:nextcloud": "node playwright/start-nextcloud-server.mjs",
     "stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
-    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix",
-    "watch": "vite --mode development build --watch"
+    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
@@ -61,12 +60,14 @@
     "@nextcloud/prettier-config": "^1.1.0",
     "@nextcloud/stylelint-config": "^3.0.1",
     "@nextcloud/vite-config": "^1.2.4",
-    "cypress": "^13.11.0",
-    "cypress-split": "^1.24.0",
-    "cypress-vite": "^1.5.0",
+    "@playwright/test": "^1.44.1",
+    "@vue/tsconfig": "^0.5.1",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-cypress": "^3.3.0",
     "prettier": "^3.3.2",
     "vite": "^5.2.13"
+  },
+  "engines": {
+    "node": "^20.0.0",
+    "npm": "^10.0.0"
   }
 }
