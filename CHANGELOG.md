@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.2.2 - 2024-04-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.1...v4.2.2)
+
+### Fixed
+- fix(DB): Correctly fetch shared forms by @susnux in [\#2069](https://github.com/nextcloud/forms/pull/2069)
+- fix(Form): If `permitAllUsers` is not set then no public access is granted by @susnux in [\#2070](https://github.com/nextcloud/forms/pull/2070)
+
+
 ## v4.2.1 - 2024-04-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.0...v4.2.1)
