@@ -305,8 +305,18 @@ export default {
 
 	mixins: [PermissionTypes, ViewsMixin],
 
-	setup() {
+	data() {
 		return {
+			activeResponseView: responseViews[0],
+
+			isDownloadActionOpened: false,
+			loadingResults: true,
+
+			picker: null,
+			showSummary: true,
+			showConfirmDeleteDialog: false,
+			showLinkedFileNotAvailableDialog: false,
+
 			isMobile: useIsSmallMobile(),
 
 			// non reactive props
@@ -340,20 +350,6 @@ export default {
 					callback: () => { this.deleteAllSubmissionsConfirmed() },
 				},
 			],
-		}
-	},
-
-	data() {
-		return {
-			activeResponseView: responseViews[0],
-
-			isDownloadActionOpened: false,
-			loadingResults: true,
-
-			picker: null,
-			showSummary: true,
-			showConfirmDeleteDialog: false,
-			showLinkedFileNotAvailableDialog: false,
 		}
 	},
 
