@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.2.1 - 2024-04-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.0...v4.2.1)
+
+### Fixed
+- fix: remove setup() and move code to data() in Results.vue by @Chartman123 in [\#2065](https://github.com/nextcloud/forms/pull/2065)
+- fix: Move non-reactive props and composables to `setup` by @susnux in [\#2068](https://github.com/nextcloud/forms/pull/2068)
+- Set lastUpdated on link/unlink file by @Chartman123 in [\#2066](https://github.com/nextcloud/forms/pull/2066)
+- fix: `legacyLink` access handling by @Chartman123 in [\#2060](https://github.com/nextcloud/forms/pull/2060)
+- fix: don't filter expired forms in navigation by @Chartman123 in [\#2062](https://github.com/nextcloud/forms/pull/2062)
+
+
 ## v4.2.0 - 2024-04-14
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.1.1...v4.2.0)
