@@ -97,23 +97,23 @@ class FormMapper extends QBMapper {
 	 * @return Form[]
 	 */
 	public function findSharedForms(string $userId, array $groups = [], array $teams = [], bool $filterShown = true): array {
-		$qbForms = $this->db->getQueryBuilder();
 		$qbShares = $this->db->getQueryBuilder();
+		$qbForms = $this->db->getQueryBuilder();
 
 		$memberships = $qbShares->expr()->orX();
 		// share type user and share with current user
 		$memberships->add(
 			$qbShares->expr()->andX(
-				$qbShares->expr()->eq('share_type', $qbShares->createNamedParameter(IShare::TYPE_USER)),
-				$qbShares->expr()->eq('share_with', $qbShares->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qbShares->expr()->eq('shares.share_type', $qbShares->createNamedParameter(IShare::TYPE_USER)),
+				$qbShares->expr()->eq('shares.share_with', $qbShares->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
 			),
 		);
 		// share type group and one of the user groups
 		if (!empty($groups)) {
 			$memberships->add(
 				$qbShares->expr()->andX(
-					$qbShares->expr()->eq('share_type', $qbShares->createNamedParameter(IShare::TYPE_GROUP)),
-					$qbShares->expr()->in('share_with', $qbShares->createNamedParameter($groups, IQueryBuilder::PARAM_STR_ARRAY)),
+					$qbShares->expr()->eq('shares.share_type', $qbShares->createNamedParameter(IShare::TYPE_GROUP)),
+					$qbShares->expr()->in('shares.share_with', $qbShares->createNamedParameter($groups, IQueryBuilder::PARAM_STR_ARRAY)),
 				),
 			);
 		}
@@ -121,42 +121,40 @@ class FormMapper extends QBMapper {
 		if (!empty($teams)) {
 			$memberships->add(
 				$qbShares->expr()->andX(
-					$qbShares->expr()->eq('share_type', $qbShares->createNamedParameter(IShare::TYPE_CIRCLE)),
-					$qbShares->expr()->in('share_with', $qbShares->createNamedParameter($teams, IQueryBuilder::PARAM_STR_ARRAY)),
+					$qbShares->expr()->eq('shares.share_type', $qbShares->createNamedParameter(IShare::TYPE_CIRCLE)),
+					$qbShares->expr()->in('shares.share_with', $qbShares->createNamedParameter($teams, IQueryBuilder::PARAM_STR_ARRAY)),
 				),
 			);
 		}
 
-		// get form_id's that are shared to user
-		$qbShares->selectDistinct('form_id')
-			->from('forms_v2_shares')
-			->where($memberships);
-		$sharedFormIdsResult = $qbShares->executeQuery();
-		$sharedFormIds = [];
-		for ($i = 0; $i < $sharedFormIdsResult->rowCount(); $i++) {
-			$sharedFormIds[] = $sharedFormIdsResult->fetchOne();
-		}
-
 		// build expression for publicy shared forms (default only directly shown)
 		if ($filterShown) {
-			$access = $qbForms->expr()->in('access_enum', $qbForms->createNamedParameter(Constants::FORM_ACCESS_ARRAY_SHOWN, IQueryBuilder::PARAM_INT_ARRAY));
+			// Only shown
+			$access = $qbShares->expr()->in('access_enum', $qbShares->createNamedParameter(Constants::FORM_ACCESS_ARRAY_SHOWN, IQueryBuilder::PARAM_INT_ARRAY));
 		} else {
-			$access = $qbForms->expr()->in('access_enum', $qbForms->createNamedParameter(Constants::FORM_ACCESS_ARRAY_PERMIT, IQueryBuilder::PARAM_INT_ARRAY));
+			// All
+			$access = $qbShares->expr()->neq('access_enum', $qbShares->createNamedParameter(Constants::FORM_ACCESS_NOPUBLICSHARE, IQueryBuilder::PARAM_INT));
 		}
 
-		$whereTerm = $qbForms->expr()->orX();
-		$whereTerm->add($qbForms->expr()->in('id', $qbForms->createNamedParameter($sharedFormIds, IQueryBuilder::PARAM_INT_ARRAY)));
-		$whereTerm->add($access);
+		// Select all DISTINCT IDs of shared forms
+		$qbShares->selectDistinct('forms.id')
+			->from($this->getTableName(), 'forms')
+			->leftJoin('forms', $this->shareMapper->getTableName(), 'shares', $qbShares->expr()->eq('forms.id', 'shares.form_id'))
+			->where($memberships)
+			->orWhere($access)
+			->andWhere($qbShares->expr()->neq('forms.owner_id', $qbShares->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 
+		// Select the whole forms for the DISTINCT shared forms IDs
 		$qbForms->select('*')
 			->from($this->getTableName())
-			// user is member of or form is publicly shared
-			->where($whereTerm)
-			// ensure not to include owned forms
-			->andWhere($qbForms->expr()->neq('owner_id', $qbForms->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
-			//Last updated forms first, then newest forms first
+			->where(
+				$qbForms->expr()->in('id', $qbForms->createFunction($qbShares->getSQL())),
+			)
 			->addOrderBy('last_updated', 'DESC')
 			->addOrderBy('created', 'DESC');
+
+		// We need to add the parameters from the shared forms IDs select to the final select query
+		$qbForms->setParameters($qbShares->getParameters(), $qbShares->getParameterTypes());
 
 		return $this->findEntities($qbForms);
 	}

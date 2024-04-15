@@ -384,14 +384,17 @@ class FormsService {
 
 	/**
 	 * Get all forms shared to the user
+	 * @param IUser $user User to query shared forms for
+	 * @param bool $filterShown Set to false to also include forms shared but not visible on sidebar
 	 */
-	public function getSharedForms(IUser $user): array {
+	public function getSharedForms(IUser $user, bool $filterShown = true): array {
 		$groups = $this->groupManager->getUserGroupIds($user);
 		$teams = $this->circlesService->getUserTeamIds($user->getUID());
 		$forms = $this->formMapper->findSharedForms(
 			$user->getUID(),
 			$groups,
 			$teams,
+			$filterShown,
 		);
 
 		// filter expired forms
