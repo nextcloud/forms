@@ -124,12 +124,15 @@ class Form extends Entity {
 		// No further permissions -> 0
 		// Permit all users, but don't show in navigation -> 1
 		// Permit all users and show in navigation -> 2
-		if (!$access['permitAllUsers'] && !$access['showToAllUsers']) {
+		if (!$access['permitAllUsers']) {
+			// no permit means no public share
 			$value = Constants::FORM_ACCESS_NOPUBLICSHARE;
-		} elseif ($access['permitAllUsers'] && !$access['showToAllUsers']) {
-			$value = Constants::FORM_ACCESS_PERMITALLUSERS;
-		} else {
+		} elseif ($access['showToAllUsers']) {
+			// permit all + show to all
 			$value = Constants::FORM_ACCESS_SHOWTOALLUSERS;
+		} else {
+			// only permit all but not shown to all
+			$value = Constants::FORM_ACCESS_PERMITALLUSERS;
 		}
 		
 		// If legacyLink add 3
