@@ -1320,6 +1320,8 @@ class ApiController extends OCSController {
 
 		$this->formMapper->update($form);
 
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
+
 		return new DataResponse($hash);
 	}
 
@@ -1362,6 +1364,8 @@ class ApiController extends OCSController {
 		$this->formMapper->update($form);
 
 		$filePath = $this->formsService->getFilePath($form);
+
+		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
 		return new DataResponse([
 			'fileId' => $file->getId(),
