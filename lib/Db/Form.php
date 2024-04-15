@@ -133,7 +133,7 @@ class Form extends Entity {
 		}
 		
 		// If legacyLink add 3
-		if (isset($access['legacyLink'])) {
+		if (isset($access['legacyLink']) && $access['legacyLink']) {
 			$value += Constants::FORM_ACCESS_LEGACYLINK;
 		}
 
