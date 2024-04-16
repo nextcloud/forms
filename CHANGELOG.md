@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.2.3 - 2024-04-16
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.2...v4.2.3)
+
+### Merged
+- Fix fetching shared forms and return array values in ApiController.php by @Chartman123 in [\#2076](https://github.com/nextcloud/forms/pull/2076)
+- Fix toggle between Summary and Responses Submission overview by @Koc in [\#2073](https://github.com/nextcloud/forms/pull/2073)
+
+
 ## v4.2.2 - 2024-04-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.1...v4.2.2)
