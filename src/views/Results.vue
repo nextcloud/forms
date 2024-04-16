@@ -183,7 +183,7 @@
 			</header>
 
 			<!-- Summary view for visualization -->
-			<section v-if="showSummary">
+			<section v-if="activeResponseView.id === 'summary'">
 				<ResultsSummary v-for="question in form.questions"
 					:key="question.id"
 					:question="question"
@@ -322,7 +322,6 @@ export default {
 			loadingResults: true,
 
 			picker: null,
-			showSummary: true,
 			showConfirmDeleteDialog: false,
 			showLinkedFileNotAvailableDialog: false,
 
