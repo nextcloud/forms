@@ -115,7 +115,7 @@ class ApiController extends OCSController {
 	 */
 	public function getSharedForms(): DataResponse {
 		$forms = $this->formsService->getSharedForms($this->currentUser);
-		$result = array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms);
+		$result = array_values(array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms));
 
 		return new DataResponse($result);
 	}
