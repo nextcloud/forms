@@ -95,6 +95,7 @@ OC.L10N.register(
     "Delete responses" : "Eliminar as respostas",
     "Delete" : "Eliminar",
     "Group" : "Grupo",
+    "Team" : "Equipo",
     "Share link" : "Ligazón para compartir",
     "Add link" : "Engadir a ligazón",
     "Copy to clipboard" : "Copiar no portapapeis.",
