@@ -22,6 +22,7 @@
     "Unable to copy form" : "Nun ye posible copiar el formulariu",
     "This form does not exist" : "Esti formulariu nun esiste",
     "Form expired" : "El formulariu caducó",
+    "Select groups" : "Seleicionar grupos",
     "Error while saving configuration" : "Hebo un error mentanto se guardaba la configuración",
     "Error while reloading config" : "Hebo un error mentanto se volvia guardar la configuración",
     "Form actions" : "Aiciones del formulariu",
