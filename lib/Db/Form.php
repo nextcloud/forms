@@ -164,4 +164,18 @@ class Form extends Entity {
 			'state' => $this->getState(),
 		];
 	}
+
+	/**
+	 * Read only required fields for shared forms or needed for overview in sidebar
+	 */
+	public function readPartial() {
+		return [
+			'id' => $this->getId(),
+			'hash' => $this->getHash(),
+			'title' => $this->getTitle(),
+			'expires' => $this->getExpires(),
+			'state' => $this->getState(),
+			'lastUpdated' => $this->getLastUpdated(),
+		];
+	}
 }

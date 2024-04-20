@@ -26,6 +26,8 @@ namespace OCA\Forms;
 use OCP\Share\IShare;
 
 class Constants {
+	public const API_BASE = '/api/{apiVersion}';
+
 	/**
 	 * Used AppConfig Keys
 	 */
