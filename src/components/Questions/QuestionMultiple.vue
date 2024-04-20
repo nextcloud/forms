@@ -36,11 +36,45 @@
 				@update:checked="onAllowOtherAnswerChange">
 				{{ t('forms', 'Add "other"') }}
 			</NcActionCheckbox>
+
+			<!-- For multiple (checkbox) options allow to limit the answers -->
+			<template v-if="!isUnique">
+				<!-- Allow setting a minimum of options to be checked -->
+				<NcActionCheckbox :checked="!!extraSettings?.optionsLimitMin"
+					@update:checked="(checked) => onLimitOptionsMin(checked ? 1 : null)">
+					{{ t('forms', 'Require a minimum of options to be checked') }}
+				</NcActionCheckbox>
+				<NcActionInput v-if="extraSettings?.optionsLimitMin"
+					type="number"
+					:label="t('forms', 'Minimum options to be checked')"
+					:label-outside="false"
+					:show-trailing-button="false"
+					:value="extraSettings.optionsLimitMin"
+					@update:value="onLimitOptionsMin" />
+
+				<!-- Allow setting a maximum -->
+				<NcActionCheckbox :checked="!!extraSettings?.optionsLimitMax"
+					@update:checked="(checked) => onLimitOptionsMax(checked ? (sortedOptions.length || 1) : null)">
+					{{ t('forms', 'Require a maximum of options to be checked') }}
+				</NcActionCheckbox>
+				<NcActionInput v-if="extraSettings?.optionsLimitMax"
+					type="number"
+					:label="t('forms', 'Maximum options to be checked')"
+					:label-outside="false"
+					:show-trailing-button="false"
+					:value="extraSettings.optionsLimitMax"
+					@update:value="onLimitOptionsMax" />
+			</template>
 		</template>
 		<template v-if="readOnly">
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
+				<NcNoteCard v-if="hasError" :id="errorId" type="error">
+					{{ errorMessage }}
+				</NcNoteCard>
 				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
 					:key="answer.id"
+					:aria-errormessage="hasError ? errorId : undefined"
+					:aria-invalid="hasError ? 'true' : undefined"
 					:checked="questionValues"
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
@@ -52,6 +86,8 @@
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
 					<NcCheckboxRadioSwitch :checked="questionValues"
+						:aria-errormessage="hasError ? errorId : undefined"
+						:aria-invalid="hasError ? 'true' : undefined"
 						:value="otherAnswer ?? QUESTION_EXTRASETTINGS_OTHER_PREFIX"
 						:name="`${id}-answer`"
 						:type="isUnique ? 'radio' : 'checkbox'"
@@ -112,11 +148,14 @@
 <script>
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
+import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
@@ -135,14 +174,20 @@ export default {
 		IconCheckboxBlankOutline,
 		IconRadioboxBlank,
 		NcActionCheckbox,
+		NcActionInput,
 		NcCheckboxRadioSwitch,
 		NcInputField,
+		NcNoteCard,
 	},
 
 	mixins: [QuestionMixin],
 
 	data() {
 		return {
+			/**
+			 * The shown error message
+			 */
+			errorMessage: null,
 			/**
 			 * This is used to cache the "other" answer, meaning if the user:
 			 * checks "other" types text, unchecks "other" and then re-check "other" the typed text is preserved
@@ -170,6 +215,10 @@ export default {
 			return this.options.length === 0
 		},
 
+		hasError() {
+			return !!this.errorMessage
+		},
+
 		areNoneChecked() {
 			return this.values.length === 0
 		},
@@ -195,6 +244,10 @@ export default {
 
 		titleId() {
 			return `q${this.index}_title`
+		},
+
+		errorId() {
+			return `q${this.index}_error`
 		},
 
 		allowOtherAnswer() {
@@ -245,6 +298,25 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (!this.isUnique) {
+				// Validate limits
+				const max = this.extraSettings.optionsLimitMax ?? 0
+				const min = this.extraSettings.optionsLimitMin ?? 0
+				if (max && this.values.length > max) {
+					this.errorMessage = n('forms', 'You must choose at most one option', 'You must choose a maximum of %n options', max)
+					return false
+				}
+				if (min && this.values.length < min) {
+					this.errorMessage = n('forms', 'You must choose at least one option', 'You must choose at least %n options', min)
+					return false
+				}
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		/**
 		 * Resets the local "other" answer text to the one from the options if available
 		 */
@@ -272,6 +344,42 @@ export default {
 				this.onChange([...pureValue, `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${this.cachedOtherAnswerText}`])
 			} else {
 				this.onChange(value)
+			}
+		},
+
+		/**
+		 * Updating the maximum number
+		 * @param {number|null} max Maximum options
+		 */
+		onLimitOptionsMax(max) {
+			max = max && Number.parseInt(max.toString(), 10)
+			if (this.isUnique || max === null) {
+				// For unique (radio) options we cannot set limits, also if null is passed then we need to remove the limit
+				this.onExtraSettingsChange({ optionsLimitMax: undefined })
+			} else if (max) {
+				if ((this.extraSettings.optionsLimitMin ?? 0) > max) {
+					showError(t('forms', 'Upper options limit must be greater than the lower limit'))
+					return
+				}
+				// If a valid number was passed, update the backend
+				this.onExtraSettingsChange({ optionsLimitMax: max })
+			}
+		},
+
+		/**
+		 * Update the minimum of checked options
+		 * @param {number|null} min Minimum of checked options
+		 */
+		onLimitOptionsMin(min) {
+			min = min && Number.parseInt(min.toString(), 10)
+			if (this.isUnique || min === null) {
+				this.onExtraSettingsChange({ optionsLimitMin: undefined })
+			} else if (min) {
+				if (this.extraSettings.optionsLimitMax && min > this.extraSettings.optionsLimitMax) {
+					showError(t('forms', 'Lower options limit must be smaller than the upper limit'))
+					return
+				}
+				this.onExtraSettingsChange({ optionsLimitMin: min })
 			}
 		},
 

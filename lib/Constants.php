@@ -145,6 +145,8 @@ class Constants {
 
 	public const EXTRA_SETTINGS_MULTIPLE = [
 		'allowOtherAnswer' => ['boolean'],
+		'optionsLimitMax' => ['integer'],
+		'optionsLimitMin' => ['integer'],
 		'shuffleOptions' => ['boolean'],
 	];
 

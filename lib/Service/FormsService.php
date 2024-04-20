@@ -613,8 +613,15 @@ class FormsService {
 			}
 		}
 
-		// Special handling of short input for validation
-		if ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
+		if ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {
+			// Ensure limits are sane
+			if (isset($extraSettings['optionsLimitMax']) && isset($extraSettings['optionsLimitMin'])
+				&& $extraSettings['optionsLimitMax'] < $extraSettings['optionsLimitMin']) {
+				return false;
+			}
+
+			// Special handling of short input for validation
+		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
 			// Ensure input validation type is known
 			if (!in_array($extraSettings['validationType'], Constants::SHORT_INPUT_TYPES)) {
 				return false;

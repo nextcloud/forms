@@ -370,36 +370,48 @@ class SubmissionService {
 				return false;
 			}
 
-			// Perform further checks only for answered questions
-			if ($questionAnswered) {
+			// Perform further checks only for answered questions - otherwise early return
+			if (!$questionAnswered) {
+				continue;
+			}
+
+			// Check number of answers
+			$answersCount = count($answers[$questionId]);
+			if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE) {
+				$minOptions = $question['extraSettings']['optionsLimitMin'] ?? -1;
+				$maxOptions = $question['extraSettings']['optionsLimitMax'] ?? -1;
+				// If number of answers is limited check the limits
+				if (($minOptions > 0 && $answersCount < $minOptions)
+					|| ($maxOptions > 0 && $answersCount > $maxOptions)) {
+					return false;
+				}
+			} elseif ($answersCount > 1) {
 				// Check if non multiple questions have not more than one answer
-				if ($question['type'] !== Constants::ANSWER_TYPE_MULTIPLE && count($answers[$questionId]) > 1) {
-					return false;
-				}
+				return false;
+			}
 
-				/*
-				 * Check if date questions have valid answers
-				 * $answers[$questionId][0] -> date/time questions can only have one answer
-				 */
-				if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME) &&
-					!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
-					return false;
-				}
+			/*
+			 * Check if date questions have valid answers
+			 * $answers[$questionId][0] -> date/time questions can only have one answer
+			 */
+			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME) &&
+				!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
+				return false;
+			}
 
-				// Check if all answers are within the possible options
-				if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
-					foreach ($answers[$questionId] as $answer) {
-						// Search corresponding option, return false if non-existent
-						if (array_search($answer, array_column($question['options'], 'id')) === false) {
-							return false;
-						}
+			// Check if all answers are within the possible options
+			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
+				foreach ($answers[$questionId] as $answer) {
+					// Search corresponding option, return false if non-existent
+					if (array_search($answer, array_column($question['options'], 'id')) === false) {
+						return false;
 					}
 				}
+			}
 
-				// Handle custom validation of short answers
-				if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
-					return false;
-				}
+			// Handle custom validation of short answers
+			if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
+				return false;
 			}
 		}
 
