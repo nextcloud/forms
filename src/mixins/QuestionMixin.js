@@ -215,6 +215,13 @@ export default {
 
 	methods: {
 		/**
+		 * Override to allow custom validation
+		 */
+		async validate() {
+			return true
+		},
+
+		/**
 		 * Forward the title change to the parent and store to db
 		 *
 		 * @param {string} text the title
