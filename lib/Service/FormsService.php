@@ -600,9 +600,17 @@ class FormsService {
 				$allowed = [];
 		}
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
-		$diff = array_diff(array_keys($extraSettings), $allowed);
+		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
 			return false;
+		}
+
+		// Check type of extra settings
+		foreach ($extraSettings as $key => $value) {
+			if (!in_array(gettype($value), $allowed[$key])) {
+				// Not allowed type
+				return false;
+			}
 		}
 
 		// Special handling of short input for validation

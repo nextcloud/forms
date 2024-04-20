@@ -139,18 +139,18 @@ class Constants {
 
 	// This are allowed extra settings
 	public const EXTRA_SETTINGS_DROPDOWN = [
-		'allowOtherAnswer',
-		'shuffleOptions',
+		'allowOtherAnswer' => ['boolean'],
+		'shuffleOptions' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_MULTIPLE = [
-		'allowOtherAnswer',
-		'shuffleOptions',
+		'allowOtherAnswer' => ['boolean'],
+		'shuffleOptions' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_SHORT = [
-		'validationType',
-		'validationRegex'
+		'validationType' => ['string'],
+		'validationRegex' => ['string'],
 	];
 
 	/**
