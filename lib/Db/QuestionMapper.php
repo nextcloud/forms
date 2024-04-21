@@ -90,7 +90,11 @@ class QuestionMapper extends QBMapper {
 		$qb->executeStatement();
 	}
 
-	public function findById(int $questionId): Question {
+	/**
+	 * Find Question by its ID
+	 * @param int|float $questionId The question ID (int but for 32bit systems PHP uses float)
+	 */
+	public function findById(int|float $questionId): Question {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')

@@ -764,12 +764,22 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
+		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
+		$options = $this->optionMapper->findByQuestion($questionId);
+		$lastOption = array_pop($options);
+		if ($lastOption) {
+			$optionOrder = $lastOption->getOrder() + 1;
+		} else {
+			$optionOrder = 1;
+		}
+
 		$addedOptions = [];
 		foreach ($optionTexts as $text) {
 			$option = new Option();
 
 			$option->setQuestionId($questionId);
 			$option->setText($text);
+			$option->setOrder($optionOrder++);
 
 			try {
 				$option = $this->optionMapper->insert($option);
@@ -889,9 +899,102 @@ class ApiController extends OCSController {
 		}
 
 		$this->optionMapper->delete($option);
+
+		// Reorder the remaining options
+		$options = array_values($this->optionMapper->findByQuestion($questionId));
+		foreach ($options as $order => $option) {
+			// Always start order with 1
+			$option->setOrder($order + 1);
+			$this->optionMapper->update($option);
+		}
+
 		$this->formMapper->update($form);
 
 		return new DataResponse($optionId);
+	}
+
+	/**
+	 * Reorder options for a given question
+	 * @param int $formId id of form
+	 * @param int $questionId id of question
+	 * @param Array<int, int> $newOrder Order to use
+	 */
+	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question', ['exception' => $e]);
+			throw new OCSNotFoundException('Could not find form or question');
+		}
+
+		if ($question->getFormId() !== $formId) {
+			$this->logger->debug('The given question id doesn\'t match the form.');
+			throw new OCSBadRequestException();
+		}
+
+		// Check if array contains duplicates
+		if (array_unique($newOrder) !== $newOrder) {
+			$this->logger->debug('The given array contains duplicates');
+			throw new OCSBadRequestException('The given array contains duplicates');
+		}
+		
+		$options = $this->optionMapper->findByQuestion($questionId);
+		
+		if (sizeof($options) !== sizeof($newOrder)) {
+			$this->logger->debug('The length of the given array does not match the number of stored options');
+			throw new OCSBadRequestException('The length of the given array does not match the number of stored options');
+		}
+		
+		$options = []; // Clear Array of Entities
+		$response = []; // Array of ['optionId' => ['order' => newOrder]]
+
+		// Store array of Option entities and check the Options questionId & old order.
+		foreach ($newOrder as $arrayKey => $optionId) {
+			try {
+				$options[$arrayKey] = $this->optionMapper->findById($optionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find option. Id: {optionId}', [
+					'optionId' => $optionId
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Abort if a question is not part of the Form.
+			if ($options[$arrayKey]->getQuestionId() !== $questionId) {
+				$this->logger->debug('This Option is not part of the given Question: formId: {formId}', [
+					'formId' => $formId
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Abort if a question is already marked as deleted (order==0)
+			$oldOrder = $options[$arrayKey]->getOrder();
+
+			// Only set order, if it changed.
+			if ($oldOrder !== $arrayKey + 1) {
+				// Set Order. ArrayKey counts from zero, order counts from 1.
+				$options[$arrayKey]->setOrder($arrayKey + 1);
+			}
+		}
+
+		// Write to Database
+		foreach ($options as $option) {
+			$this->optionMapper->update($option);
+
+			$response[$option->getId()] = [
+				'order' => $option->getOrder()
+			];
+		}
+
+		$this->formMapper->update($form);
+	
+		return new DataResponse($response);
 	}
 
 	// Submissions
@@ -1964,10 +2067,20 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
+		$options = $this->optionMapper->findByQuestion($questionId);
+		$lastOption = array_pop($options);
+		if ($lastOption) {
+			$optionOrder = $lastOption->getOrder() + 1;
+		} else {
+			$optionOrder = 1;
+		}
+
 		$option = new Option();
 
 		$option->setQuestionId($questionId);
 		$option->setText($text);
+		$option->setOrder($optionOrder);
 
 		$option = $this->optionMapper->insert($option);
 		$this->formMapper->update($form);
@@ -2071,6 +2184,15 @@ class ApiController extends OCSController {
 		}
 
 		$this->optionMapper->delete($option);
+
+		// Reorder the remaining options
+		$options = array_values($this->optionMapper->findByQuestion($option->getQuestionId()));
+		foreach ($options as $order => $option) {
+			// Always start order with 1
+			$option->setOrder($order + 1);
+			$this->optionMapper->update($option);
+		}
+
 		$this->formMapper->update($form);
 
 		return new DataResponse($id);

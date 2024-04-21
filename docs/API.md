@@ -41,6 +41,8 @@ This file contains the API-Documentation. For more information on the returned D
 
 -   In API version 2.5 the following endpoints were introduced:
     -   `POST /api/2.5/uploadFiles/{formId}/{questionId}` to upload files to answer before form submitting
+-   In API version 2.5 the following change was made:
+    -   Options now contain a property `order`
 -   In API version 2.4 the following endpoints were introduced:
     -   `POST /api/2.4/form/link/{fileFormat}` to link form to a file
     -   `POST /api/2.4/form/unlink` to unlink form from a file
@@ -58,7 +60,7 @@ This file contains the API-Documentation. For more information on the returned D
 
 Returns condensed objects of all Forms beeing owned by the authenticated user.
 
--   Endpoint: `/api/v2.4/forms`
+-   Endpoint: `/api/v2.5/forms`
 -   Method: `GET`
 -   Parameters: None
 -   Response: Array of condensed Form Objects, sorted as newest first.
@@ -98,7 +100,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
 
 Returns condensed objects of all Forms, that are shared & shown to the authenticated user and that have not expired yet.
 
--   Endpoint: `/api/v2.4/shared_forms`
+-   Endpoint: `/api/v2.5/shared_forms`
 -   Method: `GET`
 -   Parameters: None
 -   Response: Array of condensed Form Objects, sorted as newest first, similar to [List owned Forms](#list-owned-forms).
@@ -111,7 +113,7 @@ See above, 'List owned forms'
 
 Returns a single partial form object, corresponding to owned/shared form-listings.
 
--   Endpoint: `/api/v2.4/partial_form/{hash}`
+-   Endpoint: `/api/v2.5/partial_form/{hash}`
 -   Method: `GET`
 -   Url-Parameter:
     | Parameter | Type | Description |
@@ -135,7 +137,7 @@ Returns a single partial form object, corresponding to owned/shared form-listing
 
 ### Create a new Form
 
--   Endpoint: `/api/v2.4/form`
+-   Endpoint: `/api/v2.5/form`
 -   Method: `POST`
 -   Parameters: None
 -   Response: The new form object, similar to requesting an existing form.
@@ -148,7 +150,7 @@ See next section, 'Request full data of a form'
 
 Returns the full-depth object of the requested form (without submissions).
 
--   Endpoint: `/api/v2.4/form/{id}`
+-   Endpoint: `/api/v2.5/form/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -196,12 +198,14 @@ Returns the full-depth object of the requested form (without submissions).
         {
           "id": 1,
           "questionId": 1,
-          "text": "Option 1"
+          "text": "Option 1",
+          "order": null
         },
         {
           "id": 2,
           "questionId": 1,
-          "text": "Option 2"
+          "text": "Option 2",
+          "order": null
         }
       ],
       "accept": [],
@@ -243,7 +247,7 @@ Returns the full-depth object of the requested form (without submissions).
 
 Creates a clone of a form (without submissions).
 
--   Endpoint: `/api/v2.4/form/clone/{id}`
+-   Endpoint: `/api/v2.5/form/clone/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -259,7 +263,7 @@ See section 'Request full data of a form'.
 
 Update a single or multiple properties of a form-object. Concerns **only** the Form-Object, properties of Questions, Options and Submissions, as well as their creation or deletion, are handled separately.
 
--   Endpoint: `/api/v2.4/form/update`
+-   Endpoint: `/api/v2.5/form/update`
 -   Method: `PATCH`
 -   _Method: `POST` deprecated_
 -   Parameters:
@@ -278,7 +282,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
 
 Transfer the ownership of a form to another user
 
--   Endpoint: `/api/v2.4/form/transfer`
+-   Endpoint: `/api/v2.5/form/transfer`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Description |
@@ -294,7 +298,7 @@ Transfer the ownership of a form to another user
 
 ### Delete a form
 
--   Endpoint: `/api/v2.4/form/{id}`
+-   Endpoint: `/api/v2.5/form/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -308,7 +312,7 @@ Transfer the ownership of a form to another user
 
 ### Link a form to a file
 
--   Endpoint: `/api/v2.4/form/link/{fileFormat}`
+-   Endpoint: `/api/v2.5/form/link/{fileFormat}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |--------------|---------|--------------|
@@ -332,7 +336,7 @@ Transfer the ownership of a form to another user
 
 ### Unlink file from form
 
--   Endpoint: `/api/v2.4/form/unlink`
+-   Endpoint: `/api/v2.5/form/unlink`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Description |
@@ -346,7 +350,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
 
 ### Create a new question
 
--   Endpoint: `/api/v2.4/question`
+-   Endpoint: `/api/v2.5/question`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Optional | Description |
@@ -374,7 +378,7 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
 
 Update a single or multiple properties of a question-object.
 
--   Endpoint: `/api/v2.4/question/update`
+-   Endpoint: `/api/v2.5/question/update`
 -   Method: `PATCH`
 -   _Method: `POST` deprecated_
 -   Parameters:
@@ -393,7 +397,7 @@ Update a single or multiple properties of a question-object.
 
 Reorders all Questions of a single form
 
--   Endpoint: `/api/v2.4/question/reorder`
+-   Endpoint: `/api/v2.5/question/reorder`
 -   Method: `PUT`
 -   _Method: `POST` deprecated_
 -   Parameters:
@@ -420,7 +424,7 @@ Reorders all Questions of a single form
 
 ### Delete a question
 
--   Endpoint: `/api/v2.4/question/{id}`
+-   Endpoint: `/api/v2.5/question/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -436,7 +440,7 @@ Reorders all Questions of a single form
 
 Creates a clone of a question with all its options.
 
--   Endpoint: `/api/v2.4/question/clone/{id}`
+-   Endpoint: `/api/v2.5/question/clone/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -454,7 +458,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 
 ### Create a new Option
 
--   Endpoint: `/api/v2.4/option`
+-   Endpoint: `/api/v2.5/option`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Description |
@@ -475,7 +479,7 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 
 Update a single or all properties of an option-object
 
--   Endpoint: `/api/v2.4/option/update`
+-   Endpoint: `/api/v2.5/option/update`
 -   Method: `PATCH`
 -   _Method: `POST` deprecated_
 -   Parameters:
@@ -492,7 +496,7 @@ Update a single or all properties of an option-object
 
 ### Delete an option
 
--   Endpoint: `/api/v2.4/option/{id}`
+-   Endpoint: `/api/v2.5/option/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -508,7 +512,7 @@ Update a single or all properties of an option-object
 
 ### Add a new Share
 
--   Endpoint: `/api/v2.4/share`
+-   Endpoint: `/api/v2.5/share`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Description |
@@ -532,7 +536,7 @@ Update a single or all properties of an option-object
 
 ### Delete a Share
 
--   Endpoint: `/api/v2.4/share/{id}`
+-   Endpoint: `/api/v2.5/share/{id}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -546,7 +550,7 @@ Update a single or all properties of an option-object
 
 ### Update a Share
 
--   Endpoint: `/api/v2.4/share/update`
+-   Endpoint: `/api/v2.5/share/update`
 -   Parameters:
     | Parameter | Type | Description |
     |------------------|----------|-------------|
@@ -569,7 +573,7 @@ Update a single or all properties of an option-object
 
 Get all Submissions to a Form
 
--   Endpoint: `/api/v2.4/submissions/{hash}`
+-   Endpoint: `/api/v2.5/submissions/{hash}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -635,17 +639,20 @@ Get all Submissions to a Form
         {
           "id": 1,
           "questionId": 1,
-          "text": "Option 1"
+          "text": "Option 1",
+          "order": null
         },
         {
           "id": 27,
           "questionId": 1,
-          "text": "Option 2"
+          "text": "Option 2",
+          "order": null
         },
         {
           "id": 30,
           "questionId": 1,
-          "text": "Option 3"
+          "text": "Option 3",
+          "order": null
         }
       ],
       "extraSettings": {}
@@ -668,7 +675,7 @@ Get all Submissions to a Form
 
 Returns all submissions to the form in form of a csv-file.
 
--   Endpoint: `/api/v2.4/submissions/export/{hash}`
+-   Endpoint: `/api/v2.5/submissions/export/{hash}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |--------------|---------|-------------|
@@ -687,7 +694,7 @@ Returns all submissions to the form in form of a csv-file.
 
 Creates a csv file and stores it to the cloud, resp. Files-App.
 
--   Endpoint: `/api/v2.4/submissions/export`
+-   Endpoint: `/api/v2.5/submissions/export`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Description |
@@ -705,7 +712,7 @@ Creates a csv file and stores it to the cloud, resp. Files-App.
 
 Delete all Submissions to a form
 
--   Endpoint: `/api/v2.4/submissions/{formId}`
+-   Endpoint: `/api/v2.5/submissions/{formId}`
 -   Url-Parameter:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
@@ -739,7 +746,7 @@ Upload a files to answer before form submitting
 
 Store Submission to Database
 
--   Endpoint: `/api/v2.4/submission/insert`
+-   Endpoint: `/api/v2.5/submission/insert`
 -   Method: `POST`
 -   Parameters:
     | Parameter | Type | Description |
@@ -771,7 +778,7 @@ Store Submission to Database
 
 ### Delete a single Submission
 
--   Endpoint: `/api/v2.4/submission/{id}`
+-   Endpoint: `/api/v2.5/submission/{id}`
 -   Url-Parameter:
   | Parameter | Type | Description |
   |-----------|---------|-------------|
