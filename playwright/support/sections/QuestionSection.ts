@@ -19,10 +19,10 @@ export class QuestionSection {
 			name: /title of/i,
 		})
 		this.newAnswerInput = this.section.getByRole('textbox', {
-			name: 'Add a new answer',
+			name: 'Add a new answer option',
 		})
 		this.answerInputs = this.section.getByRole('textbox', {
-			name: /Answer number \d+/i,
+			name: /The text of option \d+/i,
 		})
 	}
 

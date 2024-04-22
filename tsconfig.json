@@ -5,6 +5,7 @@
 
 {
 	"extends": "@vue/tsconfig",
+	"include": ["src/**.ts", "*.ts"],
 	"compilerOptions": {
 		"allowJs": true,
 		"target": "ESNext",

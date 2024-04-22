@@ -43,7 +43,6 @@
     "crypto-js": "^4.2.0",
     "debounce": "^2.2.0",
     "markdown-it": "^14.1.0",
-    "p-debounce": "^4.0.0",
     "p-queue": "^8.0.1",
     "qrcode": "^1.5.4",
     "v-click-outside": "^3.2.0",

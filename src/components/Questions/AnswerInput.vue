@@ -11,28 +11,55 @@
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
-			:aria-label="t('forms', 'Answer number {index}', { index: index + 1 })"
-			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
+			:aria-label="ariaLabel"
+			:placeholder="placeholder"
 			:value="answer.text"
 			class="question__input"
 			:class="{ 'question__input--shifted': !isDropdown }"
 			:maxlength="maxOptionLength"
-			minlength="1"
 			type="text"
 			dir="auto"
 			@input="debounceOnInput"
 			@keydown.delete="deleteEntry"
-			@keydown.enter.prevent="focusNextInput" />
+			@keydown.enter.prevent="focusNextInput"
+			@compositionstart="onCompositionEnd"
+			@compositionend="onCompositionEnd" />
 
-		<!-- Delete answer -->
-		<NcActions>
-			<NcActionButton @click="deleteEntry">
-				<template #icon>
-					<IconClose :size="20" />
+		<!-- Actions for reordering and deleting the option  -->
+		<div class="option__actions">
+			<template v-if="!answer.local">
+				<template v-if="allowReorder">
+					<NcButton
+						ref="buttonUp"
+						:aria-label="t('forms', 'Move option up')"
+						:disabled="index === 0"
+						type="tertiary"
+						@click="onMoveUp">
+						<template #icon>
+							<IconArrowUp :size="20" />
+						</template>
+					</NcButton>
+					<NcButton
+						ref="buttonDown"
+						:aria-label="t('forms', 'Move option down')"
+						:disabled="index === maxIndex"
+						type="tertiary"
+						@click="onMoveDown">
+						<template #icon>
+							<IconArrowDown :size="20" />
+						</template>
+					</NcButton>
 				</template>
-				{{ t('forms', 'Delete answer') }}
-			</NcActionButton>
-		</NcActions>
+				<NcButton
+					type="tertiary"
+					:aria-label="t('forms', 'Delete answer')"
+					@click="deleteEntry">
+					<template #icon>
+						<IconDelete :size="20" />
+					</template>
+				</NcButton>
+			</template>
+		</div>
 	</li>
 </template>
 
@@ -40,13 +67,13 @@
 import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import pDebounce from 'p-debounce'
-// eslint-disable-next-line import/no-unresolved, n/no-missing-import
+import debounce from 'debounce'
 import PQueue from 'p-queue'
 
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import IconClose from 'vue-material-design-icons/Close.vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
+import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
+import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
@@ -57,14 +84,19 @@ export default {
 	name: 'AnswerInput',
 
 	components: {
-		IconClose,
+		IconArrowDown,
+		IconArrowUp,
 		IconCheckboxBlankOutline,
+		IconDelete,
 		IconRadioboxBlank,
-		NcActions,
-		NcActionButton,
+		NcButton,
 	},
 
 	props: {
+		allowReorder: {
+			type: Boolean,
+			default: true,
+		},
 		answer: {
 			type: Object,
 			required: true,
@@ -85,6 +117,10 @@ export default {
 			type: Boolean,
 			required: true,
 		},
+		maxIndex: {
+			type: Number,
+			required: true,
+		},
 		maxOptionLength: {
 			type: Number,
 			required: true,
@@ -95,10 +131,27 @@ export default {
 		return {
 			queue: null,
 			debounceOnInput: null,
+			isIMEComposing: false,
 		}
 	},
 
 	computed: {
+		ariaLabel() {
+			if (this.answer.local) {
+				return t('forms', 'Add a new answer option')
+			}
+			return t('forms', 'The text of option {index}', {
+				index: this.index + 1,
+			})
+		},
+
+		placeholder() {
+			if (this.answer.local) {
+				return t('forms', 'Add a new answer option')
+			}
+			return t('forms', 'Answer number {index}', { index: this.index + 1 })
+		},
+
 		pseudoIcon() {
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
@@ -108,8 +161,8 @@ export default {
 		this.queue = new PQueue({ concurrency: 1 })
 
 		// As data instead of method, to have a separate debounce per AnswerInput
-		this.debounceOnInput = pDebounce(() => {
-			return this.queue.add(() => this.onInput())
+		this.debounceOnInput = debounce((event) => {
+			return this.queue.add(() => this.onInput(event))
 		}, 500)
 	},
 
@@ -122,29 +175,34 @@ export default {
 		 * Focus the input
 		 */
 		focus() {
-			this.$refs.input.focus()
+			this.$refs.input?.focus()
 		},
 
 		/**
 		 * Option changed, processing the data
+		 *
+		 * @param {InputEvent} event The input event that triggered adding a new entry
 		 */
-		async onInput() {
-			// clone answer
-			const answer = Object.assign({}, this.answer)
-			answer.text = this.$refs.input.value
+		async onInput({ target, isComposing }) {
+			if (!isComposing && !this.isIMEComposing && target.value !== '') {
+				// clone answer
+				const answer = Object.assign({}, this.answer)
+				answer.text = this.$refs.input.value
 
-			if (this.answer.local) {
-				// Dispatched for creation. Marked as synced
-				this.$set(this.answer, 'local', false)
-				const newAnswer = await this.createAnswer(answer)
+				if (this.answer.local) {
+					// Dispatched for creation. Marked as synced
+					this.$set(this.answer, 'local', false)
+					const newAnswer = await this.createAnswer(answer)
 
-				// Forward changes, but use current answer.text to avoid erasing
-				// any in-between changes while creating the answer
-				newAnswer.text = this.$refs.input.value
-				this.$emit('update:answer', answer.id, newAnswer)
-			} else {
-				await this.updateAnswer(answer)
-				this.$emit('update:answer', answer.id, answer)
+					// Forward changes, but use current answer.text to avoid erasing
+					// any in-between changes while creating the answer
+					newAnswer.text = this.$refs.input.value
+
+					this.$emit('create-answer', this.index, newAnswer)
+				} else {
+					await this.updateAnswer(answer)
+					this.$emit('update:answer', this.index, answer)
+				}
 			}
 		},
 
@@ -152,7 +210,9 @@ export default {
 		 * Request a new answer
 		 */
 		focusNextInput() {
-			this.$emit('focus-next', this.index)
+			if (this.index <= this.maxIndex) {
+				this.$emit('focus-next', this.index)
+			}
 		},
 
 		/**
@@ -162,6 +222,10 @@ export default {
 		 * @param {Event} e the event
 		 */
 		async deleteEntry(e) {
+			if (this.answer.local) {
+				return
+			}
+
 			if (e.type !== 'click' && this.$refs.input.value.length !== 0) {
 				return
 			}
@@ -169,7 +233,13 @@ export default {
 			// Dismiss delete key action
 			e.preventDefault()
 
-			this.$emit('delete', this.answer.id)
+			// do this in queue to prevent race conditions between PATCH and DELETE
+			this.queue.add(() => {
+				this.$emit('delete', this.answer.id)
+				// Prevent any patch requests
+				this.queue.pause()
+				this.queue.clear()
+			})
 		},
 
 		/**
@@ -196,7 +266,7 @@ export default {
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
-				return Object.assign({}, answer, OcsResponse2Data(response)[0])
+				return OcsResponse2Data(response)[0]
 			} catch (error) {
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
@@ -233,6 +303,45 @@ export default {
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
 			}
+			return answer
+		},
+
+		/**
+		 * Reorder option but keep focus on the button
+		 */
+		onMoveDown() {
+			this.$emit('move-down')
+			if (this.index < this.maxIndex - 1) {
+				this.$nextTick(() => this.$refs.buttonDown.$el.focus())
+			} else {
+				this.$nextTick(() => this.$refs.buttonUp.$el.focus())
+			}
+		},
+		onMoveUp() {
+			this.$emit('move-up')
+			if (this.index > 1) {
+				this.$nextTick(() => this.$refs.buttonUp.$el.focus())
+			} else {
+				this.$nextTick(() => this.$refs.buttonDown.$el.focus())
+			}
+		},
+
+		/**
+		 * Handle composition start event for IME inputs
+		 */
+		onCompositionStart() {
+			this.isIMEComposing = true
+		},
+
+		/**
+		 * Handle composition end event for IME inputs
+		 * @param {CompositionEvent} event The input event that triggered adding a new entry
+		 */
+		onCompositionEnd({ target, isComposing }) {
+			this.isIMEComposing = false
+			if (!isComposing) {
+				this.onInput({ target, isComposing })
+			}
 		},
 	},
 }
@@ -243,11 +352,19 @@ export default {
 	position: relative;
 	display: inline-flex;
 	min-height: var(--default-clickable-area);
+	width: 100%;
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
 		margin-inline-start: -2px;
 		z-index: 1;
+	}
+
+	.option__actions {
+		display: flex;
+		position: absolute;
+		right: 16px;
+		height: 100%;
 	}
 
 	.question__input {
