@@ -722,7 +722,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newOption(int $questionId, string $text): DataResponse {
+	public function newOption(int $questionId, string $text, int|null $order = null): DataResponse {
 		$this->logger->debug('Adding new option: questionId: {questionId}, text: {text}', [
 			'questionId' => $questionId,
 			'text' => $text,
@@ -750,6 +750,9 @@ class ApiController extends OCSController {
 
 		$option->setQuestionId($questionId);
 		$option->setText($text);
+		if ($order !== null) {
+			$option->setOrder($order);
+		}
 
 		$option = $this->optionMapper->insert($option);
 
@@ -856,9 +859,57 @@ class ApiController extends OCSController {
 
 		$this->optionMapper->delete($option);
 
+		// Reorder the remaining options
+		$options = array_values($this->optionMapper->findByQuestion($question->getId()));
+		foreach ($options as $order => $option) {
+			$option->setOrder($order);
+			$this->optionMapper->update($option);
+		}
+
 		$this->formsService->setLastUpdatedTimestamp($form->getId());
 
 		return new DataResponse($id);
+	}
+
+	/**
+	 * Reorder options for a given question
+	 * @param int $id The question ID
+	 * @param int[] $order Order to use
+	 */
+	public function reorderOptions(int $id, array $order) {
+		try {
+			/** @var int[] */
+			$order = array_flip(array_values($order));
+		} catch (\Error $e) {
+			throw new OCSBadRequestException('Invalid order parameter');
+		}
+
+		try {
+			$question = $this->questionMapper->findById($id);
+			$form = $this->formMapper->findById($question->getFormId());
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question', ['exception' => $e]);
+			throw new OCSNotFoundException('Could not find question');
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		$options = $this->optionMapper->findByQuestion($id);
+
+		foreach ($options as $option) {
+			$option->setOrder($order[$option->getId()] ?? 0);
+			$this->optionMapper->update($option);
+		}
+
+		return new DataResponse([]);
 	}
 
 	/**

@@ -69,51 +69,40 @@
 			</fieldset>
 		</template>
 
-		<template v-else>
-			<ul class="question__content">
-				<!-- Answer text input edit -->
-				<AnswerInput v-for="(answer, index) in sortedOptions"
-					:key="index /* using index to keep the same vnode after new answer creation */"
-					ref="input"
-					:answer="answer"
-					:index="index"
-					:is-unique="isUnique"
-					:is-dropdown="false"
-					:max-option-length="maxStringLengths.optionText"
-					@delete="deleteOption"
-					@update:answer="updateAnswer"
-					@focus-next="focusNextInput"
-					@tabbed-out="checkValidOption" />
-				<li v-if="allowOtherAnswer" class="question__item">
-					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input :placeholder="t('forms', 'Other')"
-						class="question__input"
-						:maxlength="maxStringLengths.optionText"
-						minlength="1"
-						type="text"
-						:readonly="!readOnly">
-				</li>
-				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
-					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input ref="pseudoInput"
-						class="question__input"
-						:aria-label="t('forms', 'Add a new answer')"
-						:placeholder="t('forms', 'Add a new answer')"
-						:maxlength="maxStringLengths.optionText"
-						minlength="1"
-						type="text"
-						@input="addNewEntry">
-				</li>
-			</ul>
-		</template>
+		<TransitionList v-else class="question__content">
+			<!-- Answer text input edit -->
+			<AnswerInput v-for="(answer, index) in sortedOptions"
+				:key="answer.local ? 'option-local' : answer.id"
+				ref="input"
+				:answer="answer"
+				:allow-reorder="!extraSettings?.shuffleOptions"
+				:index="index"
+				:max-index="options.length - 1"
+				:is-unique="isUnique"
+				:max-option-length="maxStringLengths.optionText"
+				@move-up="onOptionMoveUp(index)"
+				@move-down="onOptionMoveDown(index)"
+				@delete="deleteOption"
+				@update:answer="updateAnswer(index, $event)"
+				@focus-next="focusNextInput"
+				@tabbed-out="checkValidOption" />
+
+			<li v-if="allowOtherAnswer"
+				key="option-add-other"
+				class="question__item">
+				<div :is="pseudoIcon" class="question__item__pseudoInput" />
+				<input :placeholder="t('forms', 'Other')"
+					class="question__input"
+					:disabled="!readonly"
+					:maxlength="maxStringLengths.optionText"
+					minlength="1"
+					type="text">
+			</li>
+		</TransitionList>
 	</Question>
 </template>
 
 <script>
-import { showError } from '@nextcloud/dialogs'
-import { emit } from '@nextcloud/event-bus'
-import { generateOcsUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
@@ -122,8 +111,8 @@ import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import GenRandomId from '../../utils/GenRandomId.js'
-import logger from '../../utils/Logger.js'
+import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
+import TransitionList from '../TransitionList.vue'
 
 const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
 
@@ -137,9 +126,10 @@ export default {
 		NcActionCheckbox,
 		NcCheckboxRadioSwitch,
 		NcInputField,
+		TransitionList,
 	},
 
-	mixins: [QuestionMixin],
+	mixins: [QuestionMixin, QuestionMultipleMixin],
 
 	data() {
 		return {
@@ -157,11 +147,6 @@ export default {
 			return this.answerType.validate(this)
 		},
 
-		isLastEmpty() {
-			const value = this.options[this.options.length - 1]
-			return value?.text?.trim?.().length === 0
-		},
-
 		isUnique() {
 			return this.answerType.unique === true
 		},
@@ -175,7 +160,7 @@ export default {
 		},
 
 		shiftDragHandle() {
-			return !this.readonly && this.options.length !== 0 && !this.isLastEmpty
+			return !this.readonly && this.options.length !== 0
 		},
 
 		pseudoIcon() {
@@ -298,168 +283,6 @@ export default {
 
 			// For checkboxes, only required if no other is checked
 			return this.areNoneChecked
-		},
-
-		/**
-		 * Remove any empty options when leaving an option
-		 */
-		checkValidOption() {
-			// When leaving edit mode, filter and delete empty options
-			this.options.forEach(option => {
-				if (!option.text) {
-					this.deleteOption(option.id)
-				}
-			})
-		},
-
-		/**
-		 * Set focus on next AnswerInput
-		 *
-		 * @param {number} index Index of current option
-		 */
-		focusNextInput(index) {
-			if (index < this.options.length - 1) {
-				this.$refs.input[index + 1].focus()
-			} else if (!this.isLastEmpty || this.hasNoAnswer) {
-				this.$refs.pseudoInput.focus()
-			}
-		},
-
-		/**
-		 * Update the options
-		 * This will handle updating the form (emitting the changes) and update last changed property
-		 *
-		 * @param {Array} options options to change
-		 */
-		updateOptions(options) {
-			this.$emit('update:options', options)
-			emit('forms:last-updated:set', this.formId)
-		},
-
-		/**
-		 * Update an existing answer locally
-		 *
-		 * @param {string|number} id the answer id
-		 * @param {object} answer the answer to update
-		 */
-		updateAnswer(id, answer) {
-			const options = [...this.options]
-			const answerIndex = options.findIndex(option => option.id === id)
-			options[answerIndex] = answer
-
-			this.updateOptions(options)
-		},
-
-		/**
-		 * Add a new empty answer locally
-		 * @param {InputEvent} event The input event that triggered adding a new entry
-		 */
-		addNewEntry({ target }) {
-			// Add local entry
-			const options = [
-				...this.options,
-				{
-					id: GenRandomId(),
-					questionId: this.id,
-					text: target?.value ?? '',
-					local: true,
-				},
-			]
-
-			// Reset the "new answer" input if needed
-			if (this.$refs.pseudoInput) {
-				this.$refs.pseudoInput.value = ''
-			}
-
-			// Update questions
-			this.updateOptions(options)
-
-			this.$nextTick(() => {
-				// Set focus to the created input element
-				this.focusIndex(options.length - 1)
-
-				// Trigger onInput on new AnswerInput for posting the new option to the API
-				this.$refs.input[options.length - 1].onInput()
-			})
-		},
-
-		/**
-		 * Restore an option locally
-		 *
-		 * @param {object} option the option
-		 * @param {number} index the options index in this.options
-		 */
-		restoreOption(option, index) {
-			const options = this.options.slice()
-			options.splice(index, 0, option)
-
-			this.updateOptions(options)
-			this.focusIndex(index)
-		},
-
-		/**
-		 * Delete an option
-		 *
-		 * @param {number} id the options id
-		 */
-		deleteOption(id) {
-			const options = this.options.slice()
-			const optionIndex = options.findIndex(option => option.id === id)
-
-			if (options.length === 1) {
-				// Clear Text, but don't remove. Will be removed, when leaving edit-mode
-				options[0].text = ''
-			} else {
-				// Remove entry
-				const option = Object.assign({}, this.options[optionIndex])
-
-				// delete locally
-				options.splice(optionIndex, 1)
-
-				// delete from Db
-				this.deleteOptionFromDatabase(option)
-			}
-
-			// Update question
-			this.updateOptions(options)
-
-			this.$nextTick(() => {
-				this.focusIndex(optionIndex - 1)
-			})
-		},
-
-		/**
-		 * Delete the option from Db in background.
-		 * Restore option if delete not possible
-		 *
-		 * @param {object} option The option to delete
-		 */
-		deleteOptionFromDatabase(option) {
-			const optionIndex = this.options.findIndex(opt => opt.id === option.id)
-
-			if (!option.local) {
-				// let's not await, deleting in background
-				axios.delete(generateOcsUrl('apps/forms/api/v2.4/option/{id}', { id: option.id }))
-					.catch(error => {
-						logger.error('Error while deleting an option', { error, option })
-						showError(t('forms', 'There was an issue deleting this option'))
-						// restore option
-						this.restoreOption(option, optionIndex)
-					})
-			}
-		},
-
-		/**
-		 * Focus the input matching the index
-		 *
-		 * @param {number} index the value index
-		 */
-		focusIndex(index) {
-			const inputs = this.$refs.input
-			if (inputs && inputs[index]) {
-				const input = inputs[index]
-				input.focus()
-			}
 		},
 
 		/**

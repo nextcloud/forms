@@ -187,14 +187,6 @@ export default {
 			})
 			return props
 		},
-		sortedOptions() {
-			// Only shuffle options if not in editing mode (and shuffling is enabled)
-			if (this.readOnly && this.extraSettings?.shuffleOptions) {
-				return this.shuffleArray(this.options)
-			}
-			// Ensure order of options always is the same
-			return [...this.options].sort((a, b) => a.id - b.id)
-		},
 
 		/**
 		 * Listeners for all questions to forward
@@ -223,6 +215,7 @@ export default {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
 		}, 200),
+
 		/**
 		 * Forward the description change to the parent and store to db
 		 *
