@@ -4,7 +4,7 @@ websites.
 
 ## Obtaining the embedding code
 
-For embedding a form it is **required** to create a *public share link*.\
+For embedding a form it is **required** to create a *public share link* first and then *convert it to an embeddable link*.\
 The embedding code can be copied from the *sharing sidebar* or crafted manually by using the public share link:
 
 If the public share link looks like this:\
@@ -19,7 +19,7 @@ Using the copy-embedding-code button on the *sharing sidebar* will automatically
 ```
 The size parameters are based on our default forms styling.
 
-## window message events 
+## Window message events 
 The embedded view provides a `MessageEvent` to communicate its size with its parent window.
 This is done as accessing the document within an `iframe` is not possible if not on the same domain.
 
