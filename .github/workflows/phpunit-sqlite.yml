@@ -5,7 +5,13 @@
 
 name: PHPUnit SQLite
 
-on: pull_request
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - stable*
 
 permissions:
   contents: read
@@ -135,7 +141,6 @@ jobs:
         run: composer run test:unit
 
       - name: Upload Unit coverage
-        if: matrix.coverage == true
         uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -164,7 +169,6 @@ jobs:
         run: composer run test:integration
 
       - name: Upload Integration coverage
-        if: matrix.coverage == true
         uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
