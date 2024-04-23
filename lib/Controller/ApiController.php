@@ -236,18 +236,7 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		try {
-			$oldForm = $this->formMapper->findById($id);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
-
-		// Only allow owner to clone a form
-		if ($oldForm->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
+		$oldForm = $this->getFormIfAllowed($id);
 
 		// Read Form, set new Form specific data, extend Title.
 		$formData = $oldForm->read();
@@ -305,17 +294,7 @@ class ApiController extends OCSController {
 			'keyValuePairs' => $keyValuePairs
 		]);
 
-		try {
-			$form = $this->formMapper->findById($id);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
+		$form = $this->getFormIfAllowed($id);
 
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
@@ -361,22 +340,11 @@ class ApiController extends OCSController {
 			'uid' => $uid
 		]);
 
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new NotFoundException('Could not find form');
-		}
-
+		$form = $this->getFormIfAllowed($formId);
 		$user = $this->userManager->get($uid);
 		if ($user == null) {
 			$this->logger->debug('Could not find new form owner');
 			throw new OCSBadRequestException('Could not find new form owner');
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException('This form is not owned by the current user');
 		}
 
 		// update form owner
@@ -404,18 +372,7 @@ class ApiController extends OCSController {
 			'id' => $id,
 		]);
 
-		try {
-			$form = $this->formMapper->findById($id);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
+		$form = $this->getFormIfAllowed($id);
 		$this->formMapper->deleteForm($form);
 
 		return new DataResponse($id);
@@ -452,18 +409,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Datetime question type no longer supported');
 		}
 
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
+		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
@@ -516,18 +462,7 @@ class ApiController extends OCSController {
 			'newOrder' => $newOrder
 		]);
 
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
+		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
@@ -619,17 +554,12 @@ class ApiController extends OCSController {
 
 		try {
 			$question = $this->questionMapper->findById($id);
-			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question');
-			throw new OCSBadRequestException('Could not find form or question');
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException('Could not find question');
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
+		$form = $this->getFormIfAllowed($question->getFormId());
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
@@ -687,16 +617,12 @@ class ApiController extends OCSController {
 
 		try {
 			$question = $this->questionMapper->findById($id);
-			$form = $this->formMapper->findById($question->getFormId());
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question');
-			throw new OCSBadRequestException('Could not find form or question');
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException('Could not find question');
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
+		$form = $this->getFormIfAllowed($question->getFormId());
 
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
@@ -1373,5 +1299,27 @@ class ApiController extends OCSController {
 			'fileName' => $file->getName(),
 			'filePath' => $filePath,
 		]);
+	}
+
+	/**
+	 * Helper that retrieves a form if the current user is allowed to edit it
+	 * This throws an exception in case either the form is not found or permissions are missing.
+	 * @param int $id The form ID to retrieve
+	 * @throws OCSNotFoundException If the form was not found
+	 * @throws OCSForbiddenException If the current user has no permission to edit
+	 */
+	private function getFormIfAllowed(int $id): Form {
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSNotFoundException();
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+		return $form;
 	}
 }

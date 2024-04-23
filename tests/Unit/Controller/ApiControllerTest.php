@@ -466,7 +466,7 @@ class ApiControllerTest extends TestCase {
 			'not found' => [
 				'canCreate' => true,
 				'callback' => fn ($id): Form => $this->throwMockedException(MockedMapperException::class),
-				'exception' => OCSBadRequestException::class
+				'exception' => OCSNotFoundException::class
 			],
 			'not owned' => [
 				'canCreate' => true,
@@ -916,14 +916,27 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
-		$newOwner = $this->createMock(IUser::class);
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->transferOwner(1, 'newOwner');
+	}
+
+	public function testTransferNewOwnerNotFound() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
 		$this->userManager->expects($this->once())
 			->method('get')
 			->with('newOwner')
-			->willReturn($newOwner);
+			->willReturn(null);
 
-		$this->expectException(OCSForbiddenException::class);
-		$this->expectExceptionMessage('This form is not owned by the current user');
+		$this->expectException(OCSBadRequestException::class);
 		$this->apiController->transferOwner(1, 'newOwner');
 	}
 
