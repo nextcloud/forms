@@ -43,7 +43,7 @@
 		<NcEmptyContent v-else-if="isFormArchived"
 			class="emtpycontent"
 			:name="t('forms', 'Form is archived')"
-			:description="t('forms', 'Form \'{title}\' is archived and can not be modified.', { title: form.title })">
+			:description="t('forms', 'Form \'{title}\' is archived and cannot be modified.', { title: form.title })">
 			<template #icon>
 				<IconLock :size="64" />
 			</template>
