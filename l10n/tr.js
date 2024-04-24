@@ -143,7 +143,6 @@ OC.L10N.register(
     "Show results" : "Sonuçları görüntüle",
     "Loading {title} …" : "{title} yükleniyor…",
     "Form is archived" : "Form arşivlenmiş",
-    "Form '{title}' is archived and can not be modified." : "'{title}' formu arşivlenmiş ve değiştirilemez.",
     "Form title" : "Form başlığı",
     "Description" : "Açıklama",
     "Add a question" : "Bir soru ekle",

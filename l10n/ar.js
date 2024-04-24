@@ -143,7 +143,6 @@ OC.L10N.register(
     "Show results" : "عرض النتائج",
     "Loading {title} …" : "جارِ التحميل {title} ... ",
     "Form is archived" : "النموذح مؤرشف",
-    "Form '{title}' is archived and can not be modified." : "النموذج '{title}' مؤرشف و لا يمكن تعديله.",
     "Form title" : "عنوان النموذج ",
     "Description" : "الوصف",
     "Add a question" : "إضافة سؤال ",

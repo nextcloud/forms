@@ -143,7 +143,6 @@ OC.L10N.register(
     "Show results" : "顯示結果",
     "Loading {title} …" : "正在載入 {title}……",
     "Form is archived" : "表格已封存",
-    "Form '{title}' is archived and can not be modified." : "表單「{title}」已封存且無法修改。",
     "Form title" : "表格標題",
     "Description" : "描述",
     "Add a question" : "新增問題",

@@ -123,7 +123,6 @@ OC.L10N.register(
     "Show results" : "Näytä tulokset",
     "Loading {title} …" : "Ladataan {title}…",
     "Form is archived" : "Lomake on arkistoitu",
-    "Form '{title}' is archived and can not be modified." : "Lomake '{title}' on arkistoitu, eikä sitä voi muokata.",
     "Form title" : "Lomakkeen otsikko",
     "Description" : "Kuvaus",
     "Add a question" : "Lisää kysymys",

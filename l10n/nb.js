@@ -143,7 +143,6 @@ OC.L10N.register(
     "Show results" : "Vis resultater",
     "Loading {title} …" : "Laster {title} ...",
     "Form is archived" : "Skjema er arkivert",
-    "Form '{title}' is archived and can not be modified." : "Skjema '{title}' er arkivert og kan ikke endres.",
     "Form title" : "Skjematittel",
     "Description" : "Beskrivelse",
     "Add a question" : "Legg til et spørsmål",

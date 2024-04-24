@@ -143,7 +143,6 @@ OC.L10N.register(
     "Show results" : "Прикажи резултате",
     "Loading {title} …" : "Учитавам {title}…",
     "Form is archived" : "Формулар је архивиран",
-    "Form '{title}' is archived and can not be modified." : "Формулар ’{title}’ је архивиран и не може да се измени.",
     "Form title" : "Наслов упитника",
     "Description" : "Опис",
     "Add a question" : "Додај питање",

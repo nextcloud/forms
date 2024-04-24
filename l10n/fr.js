@@ -143,7 +143,6 @@ OC.L10N.register(
     "Show results" : "Afficher les résultats",
     "Loading {title} …" : "Chargement {title} …",
     "Form is archived" : "Le formulaire est archivé",
-    "Form '{title}' is archived and can not be modified." : "Le formulaire « {title} » est archivé et ne peut être modifié.",
     "Form title" : "Titre du formulaire",
     "Description" : "Description",
     "Add a question" : "Ajouter une question",
