@@ -141,12 +141,12 @@ jobs:
         run: composer run test:unit
 
       - name: Upload Unit coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@84508663e988701840491b86de86b666e8a86bed # v4.3.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          root_dir: ./apps/${{ env.APP_NAME }}
-          files: ./apps/${{ env.APP_NAME }}/tests/clover.unit.xml
+          working-directory: apps/${{ env.APP_NAME }}
+          file: tests/clover.unit.xml
           fail_ci_if_error: true
           flags: unit
 
@@ -168,13 +168,13 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer run test:integration
 
-      - name: Upload Integration coverage
-        uses: codecov/codecov-action@v4
+      - name: Upload Unit coverage
+        uses: codecov/codecov-action@84508663e988701840491b86de86b666e8a86bed # v4.3.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          root_dir: ./apps/${{ env.APP_NAME }}
-          files: ./apps/${{ env.APP_NAME }}/tests/clover.integration.xml
+          working-directory: apps/${{ env.APP_NAME }}
+          file: tests/clover.unit.xml
           fail_ci_if_error: true
           flags: integration
 
