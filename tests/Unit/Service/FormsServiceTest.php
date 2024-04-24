@@ -1251,6 +1251,45 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => true
 			],
+			'valid-options-limit' => [
+				'extraSettings' => [
+					'optionsLimitMax' => 3,
+					'optionsLimitMin' => 2,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'valid-options-limit-min' => [
+				'extraSettings' => [
+					'optionsLimitMin' => 4,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'valid-options-limit-max' => [
+				'extraSettings' => [
+					'optionsLimitMax' => 2,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'invalid-options-limit' => [
+				// max < min
+				'extraSettings' => [
+					'optionsLimitMax' => 2,
+					'optionsLimitMin' => 4,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false
+			],
+			'invalid-settings-type' => [
+				'extraSettings' => [
+					'optionsLimitMax' => 'hello',
+					'optionsLimitMin' => false,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false
+			],
 			'invalid subtype' => [
 				'extraSettings' => [
 					'validationType' => 'iban',

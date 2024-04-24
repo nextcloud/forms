@@ -715,6 +715,57 @@ class SubmissionServiceTest extends TestCase {
 				// Expected Result
 				false
 			],
+			'invalid-multiple-too-many-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMax' => 2], 'options' => [
+						['id' => 3],
+						['id' => 5],
+						['id' => 7],
+						['id' => 9],
+					]]
+				],
+				// Answers
+				[
+					'1' => [3, 5, 7]
+				],
+				// Expected Result
+				false
+			],
+			'invalid-multiple-too-few-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2], 'options' => [
+						['id' => 3],
+						['id' => 5],
+						['id' => 7],
+						['id' => 9],
+					]]
+				],
+				// Answers
+				[
+					'1' => [3]
+				],
+				// Expected Result
+				false
+			],
+			'valid-multiple-with-limits' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2, 'optionsLimitMax' => 3], 'options' => [
+						['id' => 3],
+						['id' => 5],
+						['id' => 7],
+						['id' => 9],
+					]]
+				],
+				// Answers
+				[
+					'1' => [3,9]
+				],
+				// Expected Result
+				true
+			],
 			'invalid-short-phone' => [
 				// Questions
 				[

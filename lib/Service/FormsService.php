@@ -600,13 +600,28 @@ class FormsService {
 				$allowed = [];
 		}
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
-		$diff = array_diff(array_keys($extraSettings), $allowed);
+		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
 			return false;
 		}
 
-		// Special handling of short input for validation
-		if ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
+		// Check type of extra settings
+		foreach ($extraSettings as $key => $value) {
+			if (!in_array(gettype($value), $allowed[$key])) {
+				// Not allowed type
+				return false;
+			}
+		}
+
+		if ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {
+			// Ensure limits are sane
+			if (isset($extraSettings['optionsLimitMax']) && isset($extraSettings['optionsLimitMin'])
+				&& $extraSettings['optionsLimitMax'] < $extraSettings['optionsLimitMin']) {
+				return false;
+			}
+
+			// Special handling of short input for validation
+		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
 			// Ensure input validation type is known
 			if (!in_array($extraSettings['validationType'], Constants::SHORT_INPUT_TYPES)) {
 				return false;

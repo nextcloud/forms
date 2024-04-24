@@ -509,13 +509,26 @@ export default {
 		/**
 		 * Submit the form after the browser validated it 🚀 or show confirmation modal if empty
 		 */
-		onSubmit() {
-			// in case no answer is set or all are empty show the confirmation dialog
-			if (Object.keys(this.answers).length === 0 || Object.values(this.answers).every((answers) => answers.length === 0)) {
-				this.showConfirmEmptyModal = true
-			} else {
-				// otherwise do the real submit
-				this.onConfirmedSubmit()
+		async onSubmit() {
+			const validation = (this.$refs.questions ?? []).map(async (question) => await question.validate())
+
+			try {
+				// wait for all to be validated
+				const result = await Promise.all(validation)
+				if (result.some((v) => !v)) {
+					throw new Error('One question did not validate sucessfully')
+				}
+
+				// in case no answer is set or all are empty show the confirmation dialog
+				if (Object.keys(this.answers).length === 0 || Object.values(this.answers).every((answers) => answers.length === 0)) {
+					this.showConfirmEmptyModal = true
+				} else {
+					// otherwise do the real submit
+					this.onConfirmedSubmit()
+				}
+			} catch (error) {
+				logger.debug('One question is not valid', { error })
+				showError(t('forms', 'Some answers are not valid'))
 			}
 		},
 
