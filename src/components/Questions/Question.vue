@@ -59,7 +59,7 @@
 		<!-- Header -->
 		<div class="question__header">
 			<div class="question__header__title">
-				<input v-if="!readOnly || !questionValid"
+				<input v-if="!readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="t('forms', 'Title of question number {index}', {index})"
 					:value="text"
@@ -87,6 +87,14 @@
 					:force-menu="true"
 					placement="bottom-end"
 					class="question__header__title__menu">
+					<template v-if="isRequired" #icon>
+						<IconOverlay>
+							<template #overlay>
+								<IconAsterisk :size="20" />
+							</template>
+							<IconDotsHorizontal :size="20" />
+						</IconOverlay>
+					</template>
 					<NcActionCheckbox :checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -118,8 +126,8 @@
 					</NcActionButton>
 				</NcActions>
 			</div>
-			<div v-if="hasDescription || !readOnly || !questionValid" class="question__header__description">
-				<textarea v-if="!readOnly || !questionValid"
+			<div v-if="hasDescription || !readOnly" class="question__header__description">
+				<textarea v-if="!readOnly"
 					ref="description"
 					dir="auto"
 					:value="description"
@@ -147,10 +155,13 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
+import IconAsterisk from 'vue-material-design-icons/Asterisk.vue'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
+import IconDotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
+import IconOverlay from '../Icons/IconOverlay.vue'
 
 export default {
 	name: 'Question',
@@ -159,10 +170,13 @@ export default {
 		IconAlertCircleOutline,
 		IconArrowDown,
 		IconArrowUp,
+		IconAsterisk,
 		IconContentCopy,
 		IconDelete,
 		IconDragHorizontalVariant,
+		IconDotsHorizontal,
 		IconIdentifier,
+		IconOverlay,
 		NcActions,
 		NcActionButton,
 		NcActionCheckbox,
