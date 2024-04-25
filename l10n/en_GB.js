@@ -143,6 +143,7 @@ OC.L10N.register(
     "Show results" : "Show results",
     "Loading {title} …" : "Loading {title} …",
     "Form is archived" : "Form is archived",
+    "Form '{title}' is archived and cannot be modified." : "Form '{title}' is archived and cannot be modified.",
     "Form title" : "Form title",
     "Description" : "Description",
     "Add a question" : "Add a question",
