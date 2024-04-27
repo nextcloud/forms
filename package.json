@@ -25,7 +25,7 @@
     "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
   },
   "dependencies": {
-    "@nextcloud/auth": "^2.2.1",
+    "@nextcloud/auth": "^2.3.0",
     "@nextcloud/axios": "^2.4.0",
     "@nextcloud/dialogs": "^5.3.1",
     "@nextcloud/event-bus": "^3.1.0",
