@@ -10,6 +10,9 @@
 # Compiled JS output
 js/
 
+# Handled by transifex
+l10n/
+
 # PHP
 lib/
 **/*.php
