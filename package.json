@@ -19,6 +19,8 @@
     "watch": "vite --mode development build --watch",
     "cypress": "cypress run --e2e",
     "cypress:gui": "cypress open",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
@@ -60,12 +62,15 @@
     "@nextcloud/browserslist-config": "^3.0.1",
     "@nextcloud/cypress": "^1.0.0-beta.8",
     "@nextcloud/eslint-config": "^8.4.1",
+    "@nextcloud/prettier-config": "^1.1.0",
     "@nextcloud/stylelint-config": "^3.0.1",
     "@nextcloud/vite-config": "^1.2.3",
     "cypress": "^13.11.0",
     "cypress-split": "^1.24.0",
     "cypress-vite": "^1.5.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-cypress": "^3.3.0",
+    "prettier": "^3.2.5",
     "vite": "^5.2.13"
   }
 }
