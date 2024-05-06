@@ -21,18 +21,21 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		v-on="commonListeners">
 		<template #actions>
-			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
+			<NcActionCheckbox
+				:checked="extraSettings?.shuffleOptions"
 				@update:checked="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
-			<NcActionCheckbox :checked="allowOtherAnswer"
+			<NcActionCheckbox
+				:checked="allowOtherAnswer"
 				@update:checked="onAllowOtherAnswerChange">
 				{{ t('forms', 'Add "other"') }}
 			</NcActionCheckbox>
@@ -40,11 +43,15 @@
 			<!-- For multiple (checkbox) options allow to limit the answers -->
 			<template v-if="!isUnique">
 				<!-- Allow setting a minimum of options to be checked -->
-				<NcActionCheckbox :checked="!!extraSettings?.optionsLimitMin"
-					@update:checked="(checked) => onLimitOptionsMin(checked ? 1 : null)">
+				<NcActionCheckbox
+					:checked="!!extraSettings?.optionsLimitMin"
+					@update:checked="
+						(checked) => onLimitOptionsMin(checked ? 1 : null)
+					">
 					{{ t('forms', 'Require a minimum of options to be checked') }}
 				</NcActionCheckbox>
-				<NcActionInput v-if="extraSettings?.optionsLimitMin"
+				<NcActionInput
+					v-if="extraSettings?.optionsLimitMin"
 					type="number"
 					:label="t('forms', 'Minimum options to be checked')"
 					:label-outside="false"
@@ -53,11 +60,18 @@
 					@update:value="onLimitOptionsMin" />
 
 				<!-- Allow setting a maximum -->
-				<NcActionCheckbox :checked="!!extraSettings?.optionsLimitMax"
-					@update:checked="(checked) => onLimitOptionsMax(checked ? (sortedOptions.length || 1) : null)">
+				<NcActionCheckbox
+					:checked="!!extraSettings?.optionsLimitMax"
+					@update:checked="
+						(checked) =>
+							onLimitOptionsMax(
+								checked ? sortedOptions.length || 1 : null,
+							)
+					">
 					{{ t('forms', 'Require a maximum of options to be checked') }}
 				</NcActionCheckbox>
-				<NcActionInput v-if="extraSettings?.optionsLimitMax"
+				<NcActionInput
+					v-if="extraSettings?.optionsLimitMax"
 					type="number"
 					:label="t('forms', 'Maximum options to be checked')"
 					:label-outside="false"
@@ -71,7 +85,8 @@
 				<NcNoteCard v-if="hasError" :id="errorId" type="error">
 					{{ errorMessage }}
 				</NcNoteCard>
-				<NcCheckboxRadioSwitch v-for="(answer) in sortedOptions"
+				<NcCheckboxRadioSwitch
+					v-for="answer in sortedOptions"
 					:key="answer.id"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
@@ -85,7 +100,8 @@
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
-					<NcCheckboxRadioSwitch :checked="questionValues"
+					<NcCheckboxRadioSwitch
+						:checked="questionValues"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined"
 						:value="otherAnswer ?? QUESTION_EXTRASETTINGS_OTHER_PREFIX"
@@ -97,7 +113,8 @@
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
-					<NcInputField class="question__input"
+					<NcInputField
+						class="question__input"
 						:label="placeholderOtherAnswer"
 						:required="otherAnswer !== undefined"
 						:value.sync="otherAnswerText" />
@@ -108,8 +125,11 @@
 		<template v-else>
 			<ul class="question__content">
 				<!-- Answer text input edit -->
-				<AnswerInput v-for="(answer, index) in sortedOptions"
-					:key="index /* using index to keep the same vnode after new answer creation */"
+				<AnswerInput
+					v-for="(answer, index) in sortedOptions"
+					:key="
+						index /* using index to keep the same vnode after new answer creation */
+					"
 					ref="input"
 					:answer="answer"
 					:index="index"
@@ -122,23 +142,25 @@
 					@tabbed-out="checkValidOption" />
 				<li v-if="allowOtherAnswer" class="question__item">
 					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input :placeholder="t('forms', 'Other')"
+					<input
+						:placeholder="t('forms', 'Other')"
 						class="question__input"
 						:maxlength="maxStringLengths.optionText"
 						minlength="1"
 						type="text"
-						:readonly="!readOnly">
+						:readonly="!readOnly" />
 				</li>
 				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
 					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input ref="pseudoInput"
+					<input
+						ref="pseudoInput"
 						class="question__input"
 						:aria-label="t('forms', 'Add a new answer')"
 						:placeholder="t('forms', 'Add a new answer')"
 						:maxlength="maxStringLengths.optionText"
 						minlength="1"
 						type="text"
-						@input="addNewEntry">
+						@input="addNewEntry" />
 				</li>
 			</ul>
 		</template>
@@ -258,7 +280,9 @@ export default {
 		 * The full "other" answer including prefix, undefined if no "other answer"
 		 */
 		otherAnswer() {
-			return this.values.find((v) => v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			return this.values.find((v) =>
+				v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
+			)
 		},
 
 		/**
@@ -279,7 +303,17 @@ export default {
 				// emit the values and add the "other" answer
 				this.$emit(
 					'update:values',
-					this.isUnique ? [prefixedValue] : [...this.values.filter((v) => !v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX)), prefixedValue],
+					this.isUnique
+						? [prefixedValue]
+						: [
+								...this.values.filter(
+									(v) =>
+										!v.startsWith(
+											QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+										),
+								),
+								prefixedValue,
+							],
 				)
 			},
 		},
@@ -304,11 +338,21 @@ export default {
 				const max = this.extraSettings.optionsLimitMax ?? 0
 				const min = this.extraSettings.optionsLimitMin ?? 0
 				if (max && this.values.length > max) {
-					this.errorMessage = n('forms', 'You must choose at most one option', 'You must choose a maximum of %n options', max)
+					this.errorMessage = n(
+						'forms',
+						'You must choose at most one option',
+						'You must choose a maximum of %n options',
+						max,
+					)
 					return false
 				}
 				if (min && this.values.length < min) {
-					this.errorMessage = n('forms', 'You must choose at least one option', 'You must choose at least %n options', min)
+					this.errorMessage = n(
+						'forms',
+						'You must choose at least one option',
+						'You must choose at least %n options',
+						min,
+					)
 					return false
 				}
 			}
@@ -323,7 +367,10 @@ export default {
 		resetOtherAnswerText() {
 			if (this.otherAnswer) {
 				// make sure to use cached value if empty value is passed
-				this.cachedOtherAnswerText = this.otherAnswer.slice(QUESTION_EXTRASETTINGS_OTHER_PREFIX.length) || this.cachedOtherAnswerText
+				this.cachedOtherAnswerText =
+					this.otherAnswer.slice(
+						QUESTION_EXTRASETTINGS_OTHER_PREFIX.length,
+					) || this.cachedOtherAnswerText
 			}
 		},
 
@@ -337,11 +384,16 @@ export default {
 		 */
 		onChangeOther(value) {
 			value = [value].flat()
-			const pureValue = value.filter((v) => !v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+			const pureValue = value.filter(
+				(v) => !v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
+			)
 
 			if (value.length > pureValue.length) {
 				// make sure to add the cached test on re-enable
-				this.onChange([...pureValue, `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${this.cachedOtherAnswerText}`])
+				this.onChange([
+					...pureValue,
+					`${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${this.cachedOtherAnswerText}`,
+				])
 			} else {
 				this.onChange(value)
 			}
@@ -358,7 +410,12 @@ export default {
 				this.onExtraSettingsChange({ optionsLimitMax: undefined })
 			} else if (max) {
 				if ((this.extraSettings.optionsLimitMin ?? 0) > max) {
-					showError(t('forms', 'Upper options limit must be greater than the lower limit'))
+					showError(
+						t(
+							'forms',
+							'Upper options limit must be greater than the lower limit',
+						),
+					)
 					return
 				}
 				// If a valid number was passed, update the backend
@@ -375,8 +432,16 @@ export default {
 			if (this.isUnique || min === null) {
 				this.onExtraSettingsChange({ optionsLimitMin: undefined })
 			} else if (min) {
-				if (this.extraSettings.optionsLimitMax && min > this.extraSettings.optionsLimitMax) {
-					showError(t('forms', 'Lower options limit must be smaller than the upper limit'))
+				if (
+					this.extraSettings.optionsLimitMax &&
+					min > this.extraSettings.optionsLimitMax
+				) {
+					showError(
+						t(
+							'forms',
+							'Lower options limit must be smaller than the upper limit',
+						),
+					)
 					return
 				}
 				this.onExtraSettingsChange({ optionsLimitMin: min })
@@ -413,7 +478,7 @@ export default {
 		 */
 		checkValidOption() {
 			// When leaving edit mode, filter and delete empty options
-			this.options.forEach(option => {
+			this.options.forEach((option) => {
 				if (!option.text) {
 					this.deleteOption(option.id)
 				}
@@ -452,7 +517,7 @@ export default {
 		 */
 		updateAnswer(id, answer) {
 			const options = [...this.options]
-			const answerIndex = options.findIndex(option => option.id === id)
+			const answerIndex = options.findIndex((option) => option.id === id)
 			options[answerIndex] = answer
 
 			this.updateOptions(options)
@@ -512,7 +577,7 @@ export default {
 		 */
 		deleteOption(id) {
 			const options = this.options.slice()
-			const optionIndex = options.findIndex(option => option.id === id)
+			const optionIndex = options.findIndex((option) => option.id === id)
 
 			if (options.length === 1) {
 				// Clear Text, but don't remove. Will be removed, when leaving edit-mode
@@ -543,14 +608,24 @@ export default {
 		 * @param {object} option The option to delete
 		 */
 		deleteOptionFromDatabase(option) {
-			const optionIndex = this.options.findIndex(opt => opt.id === option.id)
+			const optionIndex = this.options.findIndex((opt) => opt.id === option.id)
 
 			if (!option.local) {
 				// let's not await, deleting in background
-				axios.delete(generateOcsUrl('apps/forms/api/v2.4/option/{id}', { id: option.id }))
-					.catch(error => {
-						logger.error('Error while deleting an option', { error, option })
-						showError(t('forms', 'There was an issue deleting this option'))
+				axios
+					.delete(
+						generateOcsUrl('apps/forms/api/v2.4/option/{id}', {
+							id: option.id,
+						}),
+					)
+					.catch((error) => {
+						logger.error('Error while deleting an option', {
+							error,
+							option,
+						})
+						showError(
+							t('forms', 'There was an issue deleting this option'),
+						)
 						// restore option
 						this.restoreOption(option, optionIndex)
 					})
@@ -655,5 +730,4 @@ export default {
 .question__other-answer:deep() .input-field__input {
 	min-height: 44px;
 }
-
 </style>

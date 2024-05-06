@@ -21,32 +21,32 @@
  -->
 
 <template>
-	<NcAppSidebar :open="sidebarOpened"
+	<NcAppSidebar
+		:open="sidebarOpened"
 		:active="active"
 		:name="t('forms', 'Form settings')"
 		@update:active="onUpdateActive"
 		@update:open="$emit('update:sidebarOpened', $event)">
-		<NcAppSidebarTab id="forms-sharing"
-			:order="0"
-			:name="t('forms', 'Sharing')">
+		<NcAppSidebarTab id="forms-sharing" :order="0" :name="t('forms', 'Sharing')">
 			<template #icon>
 				<IconShareVariant :size="20" />
 			</template>
-			<SharingSidebarTab :form="form"
+			<SharingSidebarTab
+				:form="form"
 				@update:formProp="onPropertyChange"
 				@add-share="onAddShare"
 				@remove-share="onRemoveShare"
 				@update-share="onUpdateShare" />
 		</NcAppSidebarTab>
 
-		<NcAppSidebarTab id="forms-settings"
+		<NcAppSidebarTab
+			id="forms-settings"
 			:order="1"
 			:name="t('forms', 'Settings')">
 			<template #icon>
 				<IconSettings :size="20" />
 			</template>
-			<SettingsSidebarTab :form="form"
-				@update:formProp="onPropertyChange" />
+			<SettingsSidebarTab :form="form" @update:formProp="onPropertyChange" />
 		</NcAppSidebarTab>
 	</NcAppSidebar>
 </template>
@@ -109,12 +109,16 @@ export default {
 			emit('forms:last-updated:set', this.form.id)
 		},
 		onRemoveShare(share) {
-			const index = this.form.shares.findIndex(search => search.id === share.id)
+			const index = this.form.shares.findIndex(
+				(search) => search.id === share.id,
+			)
 			this.form.shares.splice(index, 1)
 			emit('forms:last-updated:set', this.form.id)
 		},
 		onUpdateShare(share) {
-			const index = this.form.shares.findIndex(search => search.id === share.id)
+			const index = this.form.shares.findIndex(
+				(search) => search.id === share.id,
+			)
 			this.form.shares.splice(index, 1, share)
 			emit('forms:last-updated:set', this.form.id)
 		},

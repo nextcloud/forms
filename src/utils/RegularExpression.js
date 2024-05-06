@@ -54,7 +54,7 @@ export function validateExpression(input) {
 
 	// Check if regular expression can be compiled
 	try {
-		(() => new RegExp(pattern, modifiers))()
+		;(() => new RegExp(pattern, modifiers))()
 		return true
 	} catch (e) {
 		return false

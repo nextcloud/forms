@@ -21,19 +21,22 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		v-on="commonListeners">
 		<template #actions>
-			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
+			<NcActionCheckbox
+				:checked="extraSettings?.shuffleOptions"
 				@update:checked="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
 		</template>
-		<NcSelect v-if="readOnly"
+		<NcSelect
+			v-if="readOnly"
 			v-model="selectedOption"
 			:name="name || undefined"
 			:placeholder="selectOptionPlaceholder"
@@ -46,8 +49,11 @@
 
 		<ol v-if="!readOnly" class="question__content">
 			<!-- Answer text input edit -->
-			<AnswerInput v-for="(answer, index) in options"
-				:key="index /* using index to keep the same vnode after new answer creation */"
+			<AnswerInput
+				v-for="(answer, index) in options"
+				:key="
+					index /* using index to keep the same vnode after new answer creation */
+				"
 				ref="input"
 				:answer="answer"
 				:index="index"
@@ -60,7 +66,8 @@
 				@tabbed-out="checkValidOption" />
 
 			<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
-				<input ref="pseudoInput"
+				<input
+					ref="pseudoInput"
 					v-model="inputValue"
 					:aria-label="t('forms', 'Add a new answer')"
 					:placeholder="t('forms', 'Add a new answer')"
@@ -68,7 +75,7 @@
 					:maxlength="maxStringLengths.optionText"
 					minlength="1"
 					type="text"
-					@input="addNewEntry">
+					@input="addNewEntry" />
 			</li>
 		</ol>
 	</Question>
@@ -143,7 +150,9 @@ export default {
 	mounted() {
 		// Init selected options from values prop
 		if (this.values) {
-			const selected = this.values.map(id => this.options.find(option => option.id === id))
+			const selected = this.values.map((id) =>
+				this.options.find((option) => option.id === id),
+			)
 			this.selectedOption = this.isMultiple ? selected : selected[0]
 		}
 	},
@@ -151,7 +160,9 @@ export default {
 	methods: {
 		onInput(option) {
 			if (Array.isArray(option)) {
-				this.$emit('update:values', [...new Set(option.map((opt) => opt.id))])
+				this.$emit('update:values', [
+					...new Set(option.map((opt) => opt.id)),
+				])
 				return
 			}
 
@@ -164,7 +175,7 @@ export default {
 		 */
 		checkValidOption() {
 			// When leaving edit mode, filter and delete empty options
-			this.options.forEach(option => {
+			this.options.forEach((option) => {
 				if (!option.text) {
 					this.deleteOption(option.id)
 				}
@@ -202,7 +213,7 @@ export default {
 		 */
 		updateAnswer(id, answer) {
 			const options = this.options.slice()
-			const answerIndex = options.findIndex(option => option.id === id)
+			const answerIndex = options.findIndex((option) => option.id === id)
 			options[answerIndex] = answer
 
 			this.updateOptions(options)
@@ -255,7 +266,7 @@ export default {
 		 */
 		deleteOption(id) {
 			const options = this.options.slice()
-			const optionIndex = options.findIndex(option => option.id === id)
+			const optionIndex = options.findIndex((option) => option.id === id)
 
 			if (options.length === 1) {
 				// Clear Text, but don't remove. Will be removed, when leaving edit-mode
@@ -286,14 +297,24 @@ export default {
 		 * @param {object} option The option to delete
 		 */
 		deleteOptionFromDatabase(option) {
-			const optionIndex = this.options.findIndex(opt => opt.id === option.id)
+			const optionIndex = this.options.findIndex((opt) => opt.id === option.id)
 
 			if (!option.local) {
 				// let's not await, deleting in background
-				axios.delete(generateOcsUrl('apps/forms/api/v2.4/option/{id}', { id: option.id }))
-					.catch(error => {
-						logger.error('Error while deleting an option', { option, error })
-						showError(t('forms', 'There was an issue deleting this option'))
+				axios
+					.delete(
+						generateOcsUrl('apps/forms/api/v2.4/option/{id}', {
+							id: option.id,
+						}),
+					)
+					.catch((error) => {
+						logger.error('Error while deleting an option', {
+							option,
+							error,
+						})
+						showError(
+							t('forms', 'There was an issue deleting this option'),
+						)
 						// restore option
 						this.restoreOption(option, optionIndex)
 					})

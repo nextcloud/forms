@@ -1,21 +1,25 @@
 <template>
 	<li class="question__item" @focusout="handleTabbing">
-		<div :is="pseudoIcon"
+		<div
+			:is="pseudoIcon"
 			v-if="!isDropdown"
 			class="question__item__pseudoInput" />
-		<input ref="input"
-			:aria-label="t('forms', 'An answer for the {index} option', { index: index + 1 })"
+		<input
+			ref="input"
+			:aria-label="
+				t('forms', 'An answer for the {index} option', { index: index + 1 })
+			"
 			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 			:value="answer.text"
 			class="question__input"
-			:class="{ 'question__input--shifted' : !isDropdown }"
+			:class="{ 'question__input--shifted': !isDropdown }"
 			:maxlength="maxOptionLength"
 			minlength="1"
 			type="text"
 			dir="auto"
 			@input="onInput"
 			@keydown.delete="deleteEntry"
-			@keydown.enter.prevent="focusNextInput">
+			@keydown.enter.prevent="focusNextInput" />
 
 		<!-- Delete answer -->
 		<NcActions>
@@ -85,7 +89,7 @@ export default {
 			queue: new PQueue({ concurrency: 1 }),
 
 			// As data instead of Method, to have a separate debounce per AnswerInput
-			debounceUpdateAnswer: pDebounce(function(answer) {
+			debounceUpdateAnswer: pDebounce(function (answer) {
 				return this.queue.add(() => this.updateAnswer(answer))
 			}, 500),
 		}
@@ -118,7 +122,6 @@ export default {
 			answer.text = this.$refs.input.value
 
 			if (this.answer.local) {
-
 				// Dispatched for creation. Marked as synced
 				// eslint-disable-next-line vue/no-mutating-props
 				this.answer.local = false
@@ -166,10 +169,13 @@ export default {
 		 */
 		async createAnswer(answer) {
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/option'), {
-					questionId: answer.questionId,
-					text: answer.text,
-				})
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/option'),
+					{
+						questionId: answer.questionId,
+						text: answer.text,
+					},
+				)
 				logger.debug('Created answer', { answer })
 
 				// Was synced once, this is now up to date with the server
@@ -182,7 +188,7 @@ export default {
 
 			return answer
 		},
-		debounceCreateAnswer: pDebounce(function(answer) {
+		debounceCreateAnswer: pDebounce(function (answer) {
 			return this.queue.add(() => this.createAnswer(answer))
 		}, 100),
 
@@ -194,12 +200,15 @@ export default {
 		 */
 		async updateAnswer(answer) {
 			try {
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/option/update'), {
-					id: this.answer.id,
-					keyValuePairs: {
-						text: answer.text,
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v2.4/option/update'),
+					{
+						id: this.answer.id,
+						keyValuePairs: {
+							text: answer.text,
+						},
 					},
-				})
+				)
 				logger.debug('Updated answer', { answer })
 			} catch (error) {
 				logger.error('Error while saving answer', { answer, error })

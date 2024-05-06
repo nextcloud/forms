@@ -39,7 +39,8 @@
 			{{ submissionDateTime }}
 		</p>
 
-		<Answer v-for="question in answeredQuestions"
+		<Answer
+			v-for="question in answeredQuestions"
 			:key="question.id"
 			:answer-text="question.squashedAnswers"
 			:answers="question.answers"
@@ -96,8 +97,10 @@ export default {
 		answeredQuestions() {
 			const answeredQuestionsArray = []
 
-			this.questions.forEach(question => {
-				const answers = this.submission.answers.filter(answer => answer.questionId === question.id)
+			this.questions.forEach((question) => {
+				const answers = this.submission.answers.filter(
+					(answer) => answer.questionId === question.id,
+				)
 				if (!answers.length) {
 					return // no answers, go to next question
 				}
@@ -106,16 +109,20 @@ export default {
 					answeredQuestionsArray.push({
 						id: question.id,
 						text: question.text,
-						answers: answers.map(answer => {
+						answers: answers.map((answer) => {
 							return {
 								id: answer.id,
 								text: answer.text,
-								url: generateUrl('/f/{fileId}', { fileId: answer.fileId }),
+								url: generateUrl('/f/{fileId}', {
+									fileId: answer.fileId,
+								}),
 							}
 						}),
 					})
 				} else {
-					const squashedAnswers = answers.map(answer => answer.text).join('; ')
+					const squashedAnswers = answers
+						.map((answer) => answer.text)
+						.join('; ')
 
 					answeredQuestionsArray.push({
 						id: question.id,
@@ -123,7 +130,6 @@ export default {
 						squashedAnswers,
 					})
 				}
-
 			})
 			return answeredQuestionsArray
 		},

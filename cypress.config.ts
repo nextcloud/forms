@@ -19,7 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { startNextcloud, waitOnNextcloud, configureNextcloud } from '@nextcloud/cypress/docker'
+import {
+	startNextcloud,
+	waitOnNextcloud,
+	configureNextcloud,
+} from '@nextcloud/cypress/docker'
 import { defineConfig } from 'cypress'
 import { readFileSync } from 'node:fs'
 import cypressSplit from 'cypress-split'
@@ -45,9 +49,13 @@ export default defineConfig({
 			cypressSplit(on, config)
 
 			const appinfo = readFileSync('appinfo/info.xml').toString()
-			const maxVersion = appinfo.match(/<nextcloud min-version="\d+" max-version="(\d\d+)" \/>/)?.[1]
+			const maxVersion = appinfo.match(
+				/<nextcloud min-version="\d+" max-version="(\d\d+)" \/>/,
+			)?.[1]
 
-			const IP = await startNextcloud(maxVersion ? `stable${maxVersion}` : undefined)
+			const IP = await startNextcloud(
+				maxVersion ? `stable${maxVersion}` : undefined,
+			)
 			await waitOnNextcloud(IP)
 			await configureNextcloud(['forms', 'viewer'])
 

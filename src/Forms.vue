@@ -23,9 +23,11 @@
 
 <template>
 	<NcContent app-name="forms">
-		<NcAppNavigation v-if="canCreateForms || hasForms"
+		<NcAppNavigation
+			v-if="canCreateForms || hasForms"
 			:aria-label="t('forms', 'Forms navigation')">
-			<NcAppNavigationNew v-if="canCreateForms"
+			<NcAppNavigationNew
+				v-if="canCreateForms"
 				:text="t('forms', 'New form')"
 				@click="onNewForm">
 				<template #icon>
@@ -34,8 +36,11 @@
 			</NcAppNavigationNew>
 			<template #list>
 				<!-- Form-Owner-->
-				<NcAppNavigationCaption v-if="ownedForms.length > 0" :name="t('forms', 'Your Forms')" />
-				<AppNavigationForm v-for="form in ownedForms"
+				<NcAppNavigationCaption
+					v-if="ownedForms.length > 0"
+					:name="t('forms', 'Your Forms')" />
+				<AppNavigationForm
+					v-for="form in ownedForms"
 					:key="form.id"
 					:form="form"
 					:read-only="false"
@@ -45,8 +50,11 @@
 					@delete="onDeleteForm" />
 
 				<!-- Shared Forms-->
-				<NcAppNavigationCaption v-if="sharedForms.length > 0" :name="t('forms', 'Shared with you')" />
-				<AppNavigationForm v-for="form in sharedForms"
+				<NcAppNavigationCaption
+					v-if="sharedForms.length > 0"
+					:name="t('forms', 'Shared with you')" />
+				<AppNavigationForm
+					v-for="form in sharedForms"
 					:key="form.id"
 					:form="form"
 					:read-only="true"
@@ -55,7 +63,8 @@
 			</template>
 			<template #footer>
 				<div v-if="archivedForms.length > 0" class="forms-navigation-footer">
-					<NcButton alignment="start"
+					<NcButton
+						alignment="start"
 						class="forms__archived-forms-toggle"
 						type="tertiary"
 						wide
@@ -71,7 +80,8 @@
 
 		<!-- No forms & loading emptycontents -->
 		<NcAppContent v-if="loading || !routeHash || !routeAllowed">
-			<NcEmptyContent v-if="loading"
+			<NcEmptyContent
+				v-if="loading"
 				class="forms-emptycontent"
 				:name="t('forms', 'Loading forms …')">
 				<template #icon>
@@ -79,7 +89,8 @@
 				</template>
 			</NcEmptyContent>
 
-			<NcEmptyContent v-else-if="!hasForms"
+			<NcEmptyContent
+				v-else-if="!hasForms"
 				class="forms-emptycontent"
 				:name="t('forms', 'No forms created yet')">
 				<template #icon>
@@ -92,9 +103,14 @@
 				</template>
 			</NcEmptyContent>
 
-			<NcEmptyContent v-else
+			<NcEmptyContent
+				v-else
 				class="forms-emptycontent"
-				:name="canCreateForms ? t('forms', 'Select a form or create a new one') : t('forms', 'Please select a form')">
+				:name="
+					canCreateForms
+						? t('forms', 'Select a form or create a new one')
+						: t('forms', 'Please select a form')
+				">
 				<template #icon>
 					<FormsIcon :size="64" />
 				</template>
@@ -108,10 +124,12 @@
 
 		<!-- No errors show router content -->
 		<template v-else>
-			<router-view :form.sync="selectedForm"
+			<router-view
+				:form.sync="selectedForm"
 				:sidebar-opened.sync="sidebarOpened"
 				@open-sharing="openSharing" />
-			<router-view v-if="!selectedForm.partial && canEdit"
+			<router-view
+				v-if="!selectedForm.partial && canEdit"
 				:form="selectedForm"
 				:sidebar-opened.sync="sidebarOpened"
 				:active.sync="sidebarActive"
@@ -195,7 +213,9 @@ export default {
 
 	computed: {
 		canEdit() {
-			return this.selectedForm.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+			return this.selectedForm.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
+			)
 		},
 
 		hasForms() {
@@ -206,26 +226,25 @@ export default {
 		 * All own active forms
 		 */
 		ownedForms() {
-			return this.forms
-				.filter((form) => form.state !== FormState.FormArchived)
+			return this.forms.filter((form) => form.state !== FormState.FormArchived)
 		},
 
 		/**
 		 * All active shared forms
 		 */
 		sharedForms() {
-			return this.allSharedForms
-				.filter((form) => form.state !== FormState.FormArchived)
+			return this.allSharedForms.filter(
+				(form) => form.state !== FormState.FormArchived,
+			)
 		},
 
 		/**
 		 * All forms that have been archived
 		 */
 		archivedForms() {
-			return [
-				...this.forms,
-				...this.allSharedForms,
-			].filter((form) => form.state === FormState.FormArchived)
+			return [...this.forms, ...this.allSharedForms].filter(
+				(form) => form.state === FormState.FormArchived,
+			)
 		},
 
 		routeHash() {
@@ -240,8 +259,9 @@ export default {
 			}
 
 			// Try to find form in owned & shared list
-			const form = [...this.forms, ...this.allSharedForms]
-				.find(form => form.hash === this.routeHash)
+			const form = [...this.forms, ...this.allSharedForms].find(
+				(form) => form.hash === this.routeHash,
+			)
 
 			// If no form found, load it from server. Route will be automatically re-evaluated.
 			if (form === undefined) {
@@ -256,19 +276,25 @@ export default {
 		selectedForm: {
 			get() {
 				if (this.routeAllowed) {
-					return this.forms.concat(this.allSharedForms).find(form => form.hash === this.routeHash)
+					return this.forms
+						.concat(this.allSharedForms)
+						.find((form) => form.hash === this.routeHash)
 				}
 				return {}
 			},
 			set(form) {
 				// If a owned form
-				let index = this.forms.findIndex(search => search.hash === this.routeHash)
+				let index = this.forms.findIndex(
+					(search) => search.hash === this.routeHash,
+				)
 				if (index > -1) {
 					this.$set(this.forms, index, form)
 					return
 				}
 				// Otherwise a shared form
-				index = this.allSharedForms.findIndex(search => search.hash === this.routeHash)
+				index = this.allSharedForms.findIndex(
+					(search) => search.hash === this.routeHash,
+				)
 				if (index > -1) {
 					this.$set(this.allSharedForms, index, form)
 				}
@@ -286,7 +312,9 @@ export default {
 	},
 
 	unmounted() {
-		unsubscribe('forms:last-updated:set', (id) => this.onLastUpdatedByEventBus(id))
+		unsubscribe('forms:last-updated:set', (id) =>
+			this.onLastUpdatedByEventBus(id),
+		)
 		unsubscribe('forms:ownership-transfered', (id) => this.onDeleteForm(id))
 	},
 
@@ -321,20 +349,28 @@ export default {
 
 			// Load Owned forms
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/forms'))
+				const response = await axios.get(
+					generateOcsUrl('apps/forms/api/v2.4/forms'),
+				)
 				this.forms = OcsResponse2Data(response)
 			} catch (error) {
 				logger.error('Error while loading owned forms list', { error })
-				showError(t('forms', 'An error occurred while loading the forms list'))
+				showError(
+					t('forms', 'An error occurred while loading the forms list'),
+				)
 			}
 
 			// Load shared forms
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/shared_forms'))
+				const response = await axios.get(
+					generateOcsUrl('apps/forms/api/v2.4/shared_forms'),
+				)
 				this.allSharedForms = OcsResponse2Data(response)
 			} catch (error) {
 				logger.error('Error while loading shared forms list', { error })
-				showError(t('forms', 'An error occurred while loading the forms list'))
+				showError(
+					t('forms', 'An error occurred while loading the forms list'),
+				)
 			}
 
 			this.loading = false
@@ -358,13 +394,25 @@ export default {
 			})
 
 			this.loading = true
-			if ([...this.forms, ...this.allSharedForms].find((form) => form.hash === hash) === undefined) {
+			if (
+				[...this.forms, ...this.allSharedForms].find(
+					(form) => form.hash === hash,
+				) === undefined
+			) {
 				try {
-					const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/partial_form/{hash}', { hash }))
+					const response = await axios.get(
+						generateOcsUrl('apps/forms/api/v2.4/partial_form/{hash}', {
+							hash,
+						}),
+					)
 					const form = OcsResponse2Data(response)
 
 					// If the user has (at least) submission-permissions, add it to the shared forms
-					if (form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)) {
+					if (
+						form.permissions.includes(
+							this.PERMISSION_TYPES.PERMISSION_SUBMIT,
+						)
+					) {
 						this.allSharedForms.push(form)
 					}
 				} catch (error) {
@@ -382,7 +430,9 @@ export default {
 		async onNewForm() {
 			try {
 				// Request a new empty form
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/form'))
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/form'),
+				)
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
@@ -400,7 +450,9 @@ export default {
 		 */
 		async onCloneForm(id) {
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/form/clone/{id}', { id }))
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/form/clone/{id}', { id }),
+				)
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
 				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
@@ -417,7 +469,7 @@ export default {
 		 * @param {number} id the form id
 		 */
 		async onDeleteForm(id) {
-			const formIndex = this.forms.findIndex(form => form.id === id)
+			const formIndex = this.forms.findIndex((form) => form.id === id)
 			const deletedHash = this.forms[formIndex].hash
 
 			this.forms.splice(formIndex, 1)
@@ -434,12 +486,14 @@ export default {
 		 * @param {number} id the form id
 		 */
 		onLastUpdatedByEventBus(id) {
-			const formIndex = this.forms.findIndex(form => form.id === id)
+			const formIndex = this.forms.findIndex((form) => form.id === id)
 			if (formIndex !== -1) {
 				this.forms[formIndex].lastUpdated = moment().unix()
 				this.forms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			} else {
-				const sharedFormIndex = this.allSharedForms.findIndex(form => form.id === id)
+				const sharedFormIndex = this.allSharedForms.findIndex(
+					(form) => form.id === id,
+				)
 				this.allSharedForms[sharedFormIndex].lastUpdated = moment().unix()
 				this.allSharedForms.sort((b, a) => a.lastUpdated - b.lastUpdated)
 			}
@@ -449,7 +503,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 .forms-navigation-footer {
 	display: flex;
 	flex-direction: column;

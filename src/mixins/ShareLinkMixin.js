@@ -32,7 +32,12 @@ export default {
 		 * @return {string} link
 		 */
 		getInternalShareLink(formHash) {
-			return window.location.protocol + '//' + window.location.host + generateUrl(`/apps/forms/${this.form.hash}`)
+			return (
+				window.location.protocol +
+				'//' +
+				window.location.host +
+				generateUrl(`/apps/forms/${this.form.hash}`)
+			)
 		},
 
 		/**
@@ -48,7 +53,7 @@ export default {
 			} else {
 				url = generateUrl(`/apps/forms/s/${share.shareWith}`)
 			}
-			return (new URL(url, window.location)).href
+			return new URL(url, window.location).href
 		},
 
 		/**
@@ -56,7 +61,10 @@ export default {
 		 * @param {{ shareType: number, permissions: string[] }} share The share to check
 		 */
 		isEmbeddingAllowed(share) {
-			return share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK && share.permissions?.includes(this.PERMISSION_TYPES.PERMISSION_EMBED)
+			return (
+				share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK &&
+				share.permissions?.includes(this.PERMISSION_TYPES.PERMISSION_EMBED)
+			)
 		},
 
 		/**
@@ -83,7 +91,7 @@ export default {
 		 *
 		 * @param {object} share Public link-share
 		 */
-		 async copyEmbeddingCode(share) {
+		async copyEmbeddingCode(share) {
 			const code = `<iframe src="${this.getPublicShareLink(share)}" width="750" height="900"></iframe>`
 			try {
 				await navigator.clipboard.writeText(code)

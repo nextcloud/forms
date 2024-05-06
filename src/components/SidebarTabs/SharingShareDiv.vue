@@ -22,7 +22,8 @@
 
 <template>
 	<li class="share-div">
-		<NcAvatar :user="share.shareWith"
+		<NcAvatar
+			:user="share.shareWith"
 			:disable-menu="true"
 			:display-name="displayName"
 			:is-no-user="isNoUser" />
@@ -32,10 +33,15 @@
 		</div>
 		<NcActions class="share-div__actions">
 			<NcActionCaption :name="t('forms', 'Permissions')" />
-			<NcActionCheckbox :checked="canAccessResults" @update:checked="updatePermissionResults">
+			<NcActionCheckbox
+				:checked="canAccessResults"
+				@update:checked="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>
-			<NcActionCheckbox :checked="canDeleteResults" :disabled="!canAccessResults" @update:checked="updatePermissionDeleteResults">
+			<NcActionCheckbox
+				:checked="canDeleteResults"
+				:disabled="!canAccessResults"
+				@update:checked="updatePermissionDeleteResults">
 				{{ t('forms', 'Delete responses') }}
 			</NcActionCheckbox>
 			<NcActionSeparator />
@@ -83,25 +89,31 @@ export default {
 
 	computed: {
 		canAccessResults() {
-			return this.share.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
+			return this.share.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+			)
 		},
 		canDeleteResults() {
-			return this.share.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE)
+			return this.share.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+			)
 		},
 		isNoUser() {
 			return this.share.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
 		},
 		displayName() {
-			return !this.share.displayName ? this.share.shareWith : this.share.displayName
+			return !this.share.displayName
+				? this.share.shareWith
+				: this.share.displayName
 		},
 		displayNameAppendix() {
 			switch (this.share.shareType) {
-			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
-				return `(${t('forms', 'Group')})`
-			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
-				return `(${t('forms', 'Team')})`
-			default:
-				return ''
+				case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+					return `(${t('forms', 'Group')})`
+				case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+					return `(${t('forms', 'Team')})`
+				default:
+					return ''
 			}
 		},
 	},
@@ -117,16 +129,25 @@ export default {
 		updatePermissionResults(hasPermission) {
 			if (hasPermission === false) {
 				// ensure to remove the delete permission if results permission is dropped
-				this.updatePermission(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE, false)
+				this.updatePermission(
+					this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+					false,
+				)
 			}
-			return this.updatePermission(this.PERMISSION_TYPES.PERMISSION_RESULTS, hasPermission)
+			return this.updatePermission(
+				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+				hasPermission,
+			)
 		},
 
 		/**
 		 * @param {boolean} hasPermission If the results_delete permission should be granted
 		 */
 		updatePermissionDeleteResults(hasPermission) {
-			return this.updatePermission(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE, hasPermission)
+			return this.updatePermission(
+				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				hasPermission,
+			)
 		},
 
 		/**
@@ -140,12 +161,13 @@ export default {
 			if (hasPermission) {
 				share.permissions = [...new Set([...share.permissions, permission])]
 			} else {
-				share.permissions = share.permissions.filter(perm => perm !== permission)
+				share.permissions = share.permissions.filter(
+					(perm) => perm !== permission,
+				)
 			}
 			this.$emit('update:share', share)
 		},
 	},
-
 }
 </script>
 

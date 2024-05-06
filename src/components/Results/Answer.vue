@@ -28,11 +28,15 @@
 		<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 		<!-- eslint-disable-next-line -->
 		<template v-if="answers.length">
-			<p v-for="answer of answers"
+			<p
+				v-for="answer of answers"
 				:key="answer.id"
 				class="answer__text"
 				dir="auto">
-				<a :href="answer.url" target="_blank"><IconFile :size="20" class="answer__text-icon" /> {{ answer.text }}</a>
+				<a :href="answer.url" target="_blank"
+					><IconFile :size="20" class="answer__text-icon" />
+					{{ answer.text }}</a
+				>
 			</p>
 		</template>
 		<p v-else class="answer__text" dir="auto">
@@ -88,5 +92,4 @@ export default {
 		}
 	}
 }
-
 </style>

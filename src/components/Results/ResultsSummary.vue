@@ -30,20 +30,24 @@
 		</p>
 
 		<!-- Answers with countable results for visualization -->
-		<ol v-if="answerTypes[question.type].predefined"
+		<ol
+			v-if="answerTypes[question.type].predefined"
 			class="question-summary__statistic">
-			<li v-for="option in questionOptions"
-				:key="option.id">
+			<li v-for="option in questionOptions" :key="option.id">
 				<label :for="`option-${option.questionId}-${option.id}`">
 					{{ option.count }}
 					<span class="question-summary__statistic-percentage">
 						({{ option.percentage }}%):
 					</span>
-					<span :class="{'question-summary__statistic-text--best':option.best}">
+					<span
+						:class="{
+							'question-summary__statistic-text--best': option.best,
+						}">
 						{{ option.text }}
 					</span>
 				</label>
-				<meter :id="`option-${option.questionId}-${option.id}`"
+				<meter
+					:id="`option-${option.questionId}-${option.id}`"
 					min="0"
 					:max="submissions.length"
 					:value="option.count" />
@@ -56,7 +60,10 @@
 			<!-- eslint-disable-next-line -->
 			<li v-for="answer in answers" :key="answer.id" dir="auto">
 				<template v-if="answer.url">
-					<a :href="answer.url" target="_blank"><IconFile :size="20" class="question-summary__text-icon" /> {{ answer.text }}</a>
+					<a :href="answer.url" target="_blank"
+						><IconFile :size="20" class="question-summary__text-icon" />
+						{{ answer.text }}</a
+					>
 				</template>
 				<template v-else>
 					{{ answer.text }}
@@ -99,7 +106,7 @@ export default {
 		// For countable questions like multiple choice and checkboxes
 		questionOptions() {
 			// Build list of question options
-			const questionOptionsStats = this.question.options.map(option => ({
+			const questionOptionsStats = this.question.options.map((option) => ({
 				...option,
 				count: 0,
 				percentage: 0,
@@ -123,16 +130,20 @@ export default {
 			})
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach(submission => {
-				const answers = submission.answers.filter(answer => answer.questionId === this.question.id)
+			this.submissions.forEach((submission) => {
+				const answers = submission.answers.filter(
+					(answer) => answer.questionId === this.question.id,
+				)
 				if (!answers.length) {
 					// Record 'No response'
 					questionOptionsStats[0].count++
 				}
 
 				// Check question options to find which needs to be increased
-				answers.forEach(answer => {
-					const optionsStatIndex = questionOptionsStats.findIndex(option => option.text === answer.text)
+				answers.forEach((answer) => {
+					const optionsStatIndex = questionOptionsStats.findIndex(
+						(option) => option.text === answer.text,
+					)
 					if (optionsStatIndex < 0) {
 						if (this.question.extraSettings?.allowOtherAnswer) {
 							questionOptionsStats[1].count++
@@ -154,11 +165,14 @@ export default {
 				return object2.count - object1.count
 			})
 
-			questionOptionsStats.forEach(questionOptionsStat => {
+			questionOptionsStats.forEach((questionOptionsStat) => {
 				// Fill percentage values
-				questionOptionsStat.percentage = Math.round((100 * questionOptionsStat.count) / this.submissions.length)
+				questionOptionsStat.percentage = Math.round(
+					(100 * questionOptionsStat.count) / this.submissions.length,
+				)
 				// Mark all best results. First one is best for sure due to sorting
-				questionOptionsStat.best = (questionOptionsStat.count === questionOptionsStats[0].count)
+				questionOptionsStat.best =
+					questionOptionsStat.count === questionOptionsStats[0].count
 			})
 
 			return questionOptionsStats
@@ -172,20 +186,24 @@ export default {
 			let noResponseCount = 0
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach(submission => {
-				const answers = submission.answers.filter(answer => answer.questionId === this.question.id)
+			this.submissions.forEach((submission) => {
+				const answers = submission.answers.filter(
+					(answer) => answer.questionId === this.question.id,
+				)
 				if (!answers.length) {
 					// Record 'No response'
 					noResponseCount++
 				}
 
 				// Add text answers
-				answers.forEach(answer => {
+				answers.forEach((answer) => {
 					if (answer.fileId) {
 						answersModels.push({
 							id: answer.id,
 							text: answer.text,
-							url: generateUrl('/f/{fileId}', { fileId: answer.fileId }),
+							url: generateUrl('/f/{fileId}', {
+								fileId: answer.fileId,
+							}),
 						})
 					} else {
 						answersModels.push({
@@ -197,8 +215,18 @@ export default {
 			})
 
 			// Calculate no response percentage
-			const noResponsePercentage = Math.round((100 * noResponseCount) / this.submissions.length)
-			answersModels.unshift({ id: 0, text: noResponseCount + ' (' + noResponsePercentage + '%): ' + t('forms', 'No response') })
+			const noResponsePercentage = Math.round(
+				(100 * noResponseCount) / this.submissions.length,
+			)
+			answersModels.unshift({
+				id: 0,
+				text:
+					noResponseCount +
+					' (' +
+					noResponsePercentage +
+					'%): ' +
+					t('forms', 'No response'),
+			})
 
 			return answersModels
 		},

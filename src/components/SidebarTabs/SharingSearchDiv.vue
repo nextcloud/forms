@@ -23,7 +23,8 @@
 
 <template>
 	<div>
-		<NcSelect :clear-search-on-select="false"
+		<NcSelect
+			:clear-search-on-select="false"
 			:close-on-select="false"
 			:loading="showLoadingCircle"
 			:get-option-key="(option) => option.key"
@@ -56,7 +57,7 @@ export default {
 	props: {
 		currentShares: {
 			type: Array,
-			default: () => ([]),
+			default: () => [],
 		},
 		showLoading: {
 			type: Boolean,
@@ -74,10 +75,24 @@ export default {
 		options() {
 			if (this.isValidQuery) {
 				// Suggestions without existing shares
-				return this.suggestions.filter(item => !this.currentShares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
+				return this.suggestions.filter(
+					(item) =>
+						!this.currentShares.find(
+							(share) =>
+								share.shareWith === item.shareWith &&
+								share.shareType === item.shareType,
+						),
+				)
 			}
 			// Recommendations without existing shares
-			return this.recommendations.filter(item => !this.currentShares.find(share => share.shareWith === item.shareWith && share.shareType === item.shareType))
+			return this.recommendations.filter(
+				(item) =>
+					!this.currentShares.find(
+						(share) =>
+							share.shareWith === item.shareWith &&
+							share.shareType === item.shareType,
+					),
+			)
 		},
 
 		/**
@@ -112,8 +127,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.select {
-		margin-block-end: 8px !important;
-		width: 100%;
-	}
+.select {
+	margin-block-end: 8px !important;
+	width: 100%;
+}
 </style>

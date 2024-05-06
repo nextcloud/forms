@@ -21,19 +21,22 @@
   -->
 
 <template>
-	<li :class="{
-			'question': true,
-			'question--editable': !readOnly
+	<li
+		:class="{
+			question: true,
+			'question--editable': !readOnly,
 		}"
-		:aria-label="t('forms', 'Question number {index}', {index})">
+		:aria-label="t('forms', 'Question number {index}', { index })">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
-		<div v-if="!readOnly"
+		<div
+			v-if="!readOnly"
 			:class="{
 				'question__drag-handle': true,
-				'question__drag-handle--shiftup': shiftDragHandle
+				'question__drag-handle--shiftup': shiftDragHandle,
 			}">
-			<NcButton ref="buttonUp"
+			<NcButton
+				ref="buttonUp"
 				:aria-label="t('forms', 'Move question up')"
 				:disabled="!canMoveUp"
 				class="question__drag-handle-button"
@@ -44,7 +47,8 @@
 				</template>
 			</NcButton>
 			<IconDragHorizontalVariant :size="20" />
-			<NcButton ref="buttonDown"
+			<NcButton
+				ref="buttonDown"
 				:aria-label="t('forms', 'Move question down')"
 				:disabled="!canMoveDown"
 				class="question__drag-handle-button"
@@ -59,9 +63,12 @@
 		<!-- Header -->
 		<div class="question__header">
 			<div class="question__header__title">
-				<input v-if="!readOnly"
+				<input
+					v-if="!readOnly"
 					:placeholder="titlePlaceholder"
-					:aria-label="t('forms', 'Title of question number {index}', {index})"
+					:aria-label="
+						t('forms', 'Title of question number {index}', { index })
+					"
 					:value="text"
 					class="question__header__title__text question__header__title__text__input"
 					type="text"
@@ -69,20 +76,23 @@
 					minlength="1"
 					:maxlength="maxStringLengths.questionText"
 					required
-					@input="onTitleChange">
-				<h3 v-else
+					@input="onTitleChange" />
+				<h3
+					v-else
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
 					{{ computedText }}
 				</h3>
-				<div v-if="!readOnly && !questionValid"
+				<div
+					v-if="!readOnly && !questionValid"
 					v-tooltip.auto="warningInvalid"
 					class="question__header__title__warning"
 					tabindex="0">
 					<IconAlertCircleOutline :size="20" />
 				</div>
-				<NcActions v-if="!readOnly"
+				<NcActions
+					v-if="!readOnly"
 					:id="actionsId"
 					:force-menu="true"
 					placement="bottom-end"
@@ -95,13 +105,15 @@
 							<IconDotsHorizontal :size="20" />
 						</IconOverlay>
 					</template>
-					<NcActionCheckbox :checked="isRequired"
+					<NcActionCheckbox
+						:checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
 					<slot name="actions" />
-					<NcActionInput :label="t('forms', 'Technical name of the question')"
+					<NcActionInput
+						:label="t('forms', 'Technical name of the question')"
 						:label-outside="false"
 						:show-trailing-button="false"
 						:value="name"
@@ -111,8 +123,7 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton :close-after-click="true"
-						@click="onClone">
+					<NcActionButton :close-after-click="true" @click="onClone">
 						<template #icon>
 							<IconContentCopy :size="20" />
 						</template>
@@ -126,17 +137,29 @@
 					</NcActionButton>
 				</NcActions>
 			</div>
-			<div v-if="hasDescription || !readOnly" class="question__header__description">
-				<textarea v-if="!readOnly"
+			<div
+				v-if="hasDescription || !readOnly"
+				class="question__header__description">
+				<textarea
+					v-if="!readOnly"
 					ref="description"
 					dir="auto"
 					:value="description"
-					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
+					:placeholder="
+						t(
+							'forms',
+							'Description (formatting using Markdown is supported)',
+						)
+					"
 					:maxlength="maxStringLengths.questionDescription"
 					class="question__header__description__input"
 					@input="onDescriptionChange" />
-				<!-- eslint-disable-next-line vue/no-v-html -->
-				<div v-else class="question__header__description__output" v-html="computedDescription" />
+				<!-- eslint-disable vue/no-v-html -->
+				<div
+					v-else
+					class="question__header__description__output"
+					v-html="computedDescription" />
+				<!-- eslint-enable vue/no-v-html -->
 			</div>
 		</div>
 
@@ -373,7 +396,7 @@ export default {
 		gap: 12px;
 		width: 44px;
 		height: 100%;
-		opacity: .5;
+		opacity: 0.5;
 		cursor: grab;
 
 		&-button {
@@ -481,5 +504,4 @@ export default {
 		}
 	}
 }
-
 </style>

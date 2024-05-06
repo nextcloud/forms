@@ -69,12 +69,15 @@ export default {
 		icon: IconCheckboxOutline,
 		label: t('forms', 'Checkboxes'),
 		predefined: true,
-		validate: question => question.options.length > 0,
+		validate: (question) => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
 		createPlaceholder: t('forms', 'People can submit a different answer'),
 		submitPlaceholder: t('forms', 'Enter your answer'),
-		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
 	},
 
 	multiple_unique: {
@@ -82,12 +85,15 @@ export default {
 		icon: IconRadioboxMarked,
 		label: t('forms', 'Radio buttons'),
 		predefined: true,
-		validate: question => question.options.length > 0,
+		validate: (question) => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Radio buttons question title'),
 		createPlaceholder: t('forms', 'People can submit a different answer'),
 		submitPlaceholder: t('forms', 'Enter your answer'),
-		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
 
 		// Using the same vue-component as multiple, this specifies that the component renders as multiple_unique.
 		unique: true,
@@ -98,12 +104,15 @@ export default {
 		icon: IconArrowDownDropCircleOutline,
 		label: t('forms', 'Dropdown'),
 		predefined: true,
-		validate: question => question.options.length > 0,
+		validate: (question) => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Dropdown question title'),
 		createPlaceholder: t('forms', 'People can pick one option'),
 		submitPlaceholder: t('forms', 'Pick an option'),
-		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
 	},
 
 	file: {

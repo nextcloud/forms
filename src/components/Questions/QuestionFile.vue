@@ -21,7 +21,8 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
@@ -45,7 +46,8 @@
 					{{ t('forms', 'Allow only specific file types') }}
 				</NcActionButton>
 
-				<NcActionCheckbox v-for="({ label: fileTypeLabel }, fileType) in fileTypes"
+				<NcActionCheckbox
+					v-for="({ label: fileTypeLabel }, fileType) in fileTypes"
 					:key="fileType"
 					:checked="extraSettings?.allowedFileTypes?.includes(fileType)"
 					:value="fileType"
@@ -54,7 +56,8 @@
 					{{ fileTypeLabel }}
 				</NcActionCheckbox>
 
-				<NcActionInput :label="t('forms', 'Custom file extensions')"
+				<NcActionInput
+					:label="t('forms', 'Custom file extensions')"
 					type="multiselect"
 					multiple
 					taggable
@@ -66,21 +69,24 @@
 			</template>
 
 			<template v-if="!allowedFileTypesDialogOpened">
-				<NcActionInput type="number"
+				<NcActionInput
+					type="number"
 					:value="maxAllowedFilesCount"
 					label-outside
 					:label="t('forms', 'Maximum number of files')"
 					:show-trailing-button="false"
 					@input="onMaxAllowedFilesCountInput($event.target.value)" />
 
-				<NcActionInput type="number"
+				<NcActionInput
+					type="number"
 					:value="maxFileSizeValue"
 					label-outside
 					:show-trailing-button="false"
 					:label="t('forms', 'Maximum file size')"
 					@input="onMaxFileSizeValueInput($event.target.value)" />
 
-				<NcActionInput type="multiselect"
+				<NcActionInput
+					type="multiselect"
 					:value="maxFileSizeUnit"
 					:options="availableUnits"
 					required
@@ -91,7 +97,8 @@
 
 		<div class="question__content">
 			<ul>
-				<NcListItem v-for="uploadedFile of values"
+				<NcListItem
+					v-for="uploadedFile of values"
 					:key="uploadedFile.uploadedFileId"
 					:name="uploadedFile.fileName"
 					compact>
@@ -100,8 +107,11 @@
 					</template>
 
 					<template #actions>
-						<NcActionButton class="delete-button-wrapper"
-							@click="onDeleteUploadedFile(uploadedFile.uploadedFileId)">
+						<NcActionButton
+							class="delete-button-wrapper"
+							@click="
+								onDeleteUploadedFile(uploadedFile.uploadedFileId)
+							">
 							<template #icon>
 								<IconDelete :size="20" />
 							</template>
@@ -113,10 +123,13 @@
 
 			<NcLoadingIcon v-show="fileLoading" />
 
-			<input v-show="!fileLoading"
+			<input
+				v-show="!fileLoading"
 				ref="fileInput"
 				type="file"
-				:aria-label="t('forms', 'A file answer for the question “{text}”', { text })"
+				:aria-label="
+					t('forms', 'A file answer for the question “{text}”', { text })
+				"
 				:disabled="!readOnly || values.length >= maxAllowedFilesCount"
 				:multiple="maxAllowedFilesCount > 1"
 				:name="name || undefined"
@@ -127,7 +140,6 @@
 </template>
 
 <script>
-
 import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
@@ -192,7 +204,11 @@ export default {
 		allowedFileTypesLabel() {
 			const allowedFileTypes = []
 			if (this.extraSettings?.allowedFileTypes?.length) {
-				allowedFileTypes.push(...this.extraSettings.allowedFileTypes.map(type => fileTypes[type].label))
+				allowedFileTypes.push(
+					...this.extraSettings.allowedFileTypes.map(
+						(type) => fileTypes[type].label,
+					),
+				)
 			}
 
 			if (this.extraSettings?.allowedFileExtensions?.length) {
@@ -200,7 +216,9 @@ export default {
 			}
 
 			if (allowedFileTypes.length) {
-				return t('forms', 'Allowed file types: {fileTypes}.', { fileTypes: allowedFileTypes.join(', ') })
+				return t('forms', 'Allowed file types: {fileTypes}.', {
+					fileTypes: allowedFileTypes.join(', '),
+				})
 			}
 
 			return t('forms', 'All file types are allowed.')
@@ -209,13 +227,15 @@ export default {
 
 	mounted() {
 		if (this.extraSettings.maxFileSize) {
-			Object.keys(FILE_SIZE_UNITS).forEach(unit => {
+			Object.keys(FILE_SIZE_UNITS).forEach((unit) => {
 				if (this.extraSettings.maxFileSize > FILE_SIZE_UNITS[unit]) {
 					this.maxFileSizeUnit = unit
 				}
 			})
 
-			this.maxFileSizeValue = this.extraSettings.maxFileSize / FILE_SIZE_UNITS[this.maxFileSizeUnit]
+			this.maxFileSizeValue =
+				this.extraSettings.maxFileSize /
+				FILE_SIZE_UNITS[this.maxFileSizeUnit]
 		}
 	},
 
@@ -223,14 +243,27 @@ export default {
 		async onFileInput() {
 			const fileInput = this.$refs.fileInput
 			const formData = new FormData()
-			let fileInvalid = false;
+			let fileInvalid = false
 
-			[...fileInput.files].forEach(file => {
+			;[...fileInput.files].forEach((file) => {
 				formData.append('files[]', file)
 
-				if (this.extraSettings.maxFileSize > 0 && file.size > this.extraSettings.maxFileSize) {
-					showError(t('forms', 'The file {fileName} is too large. The maximum file size is {maxFileSize}.',
-						{ fileName: file.name, maxFileSize: formatFileSize(this.extraSettings.maxFileSize) }))
+				if (
+					this.extraSettings.maxFileSize > 0 &&
+					file.size > this.extraSettings.maxFileSize
+				) {
+					showError(
+						t(
+							'forms',
+							'The file {fileName} is too large. The maximum file size is {maxFileSize}.',
+							{
+								fileName: file.name,
+								maxFileSize: formatFileSize(
+									this.extraSettings.maxFileSize,
+								),
+							},
+						),
+					)
 
 					fileInvalid = true
 				}
@@ -242,19 +275,29 @@ export default {
 
 			formData.append('shareHash', loadState('forms', 'shareHash', null))
 
-			const url = generateOcsUrl('apps/forms/api/v2.5/uploadFiles/{formId}/{questionId}', {
-				formId: this.formId,
-				questionId: this.id,
-			})
+			const url = generateOcsUrl(
+				'apps/forms/api/v2.5/uploadFiles/{formId}/{questionId}',
+				{
+					formId: this.formId,
+					questionId: this.id,
+				},
+			)
 
 			let response
 			try {
 				this.fileLoading = true
-				response = await axios.post(url, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+				response = await axios.post(url, formData, {
+					headers: { 'Content-Type': 'multipart/form-data' },
+				})
 			} catch (error) {
 				logger.error('Error while submitting the form', { error })
-				showError(t('forms', 'There was an error during submitting the file: {message}.',
-					{ message: error.response.data.ocs.meta.message }))
+				showError(
+					t(
+						'forms',
+						'There was an error during submitting the file: {message}.',
+						{ message: error.response.data.ocs.meta.message },
+					),
+				)
 
 				return
 			} finally {
@@ -262,23 +305,32 @@ export default {
 				fileInput.value = null
 			}
 
-			this.$emit('update:values', [...this.values, ...OcsResponse2Data(response)])
+			this.$emit('update:values', [
+				...this.values,
+				...OcsResponse2Data(response),
+			])
 		},
 
 		onMaxAllowedFilesCountInput(maxAllowedFilesCount) {
-			return this.onExtraSettingsChange({ maxAllowedFilesCount: parseInt(maxAllowedFilesCount) })
+			return this.onExtraSettingsChange({
+				maxAllowedFilesCount: parseInt(maxAllowedFilesCount),
+			})
 		},
 
 		onMaxFileSizeValueInput(maxFileSizeValue) {
 			this.maxFileSizeValue = maxFileSizeValue
-			const maxFileSize = Math.round(maxFileSizeValue * FILE_SIZE_UNITS[this.maxFileSizeUnit])
+			const maxFileSize = Math.round(
+				maxFileSizeValue * FILE_SIZE_UNITS[this.maxFileSizeUnit],
+			)
 
 			return this.onExtraSettingsChange({ maxFileSize })
 		},
 
 		onMaxFileSizeUnitInput(maxFileSizeUnit) {
 			this.maxFileSizeUnit = maxFileSizeUnit
-			const maxFileSize = Math.round(this.maxFileSizeValue * FILE_SIZE_UNITS[maxFileSizeUnit])
+			const maxFileSize = Math.round(
+				this.maxFileSizeValue * FILE_SIZE_UNITS[maxFileSizeUnit],
+			)
 
 			return this.onExtraSettingsChange({ maxFileSize })
 		},
@@ -289,28 +341,36 @@ export default {
 			if (allowed) {
 				allowedFileTypes.push(fileType)
 			} else {
-				allowedFileTypes = allowedFileTypes.filter(type => type !== fileType)
+				allowedFileTypes = allowedFileTypes.filter(
+					(type) => type !== fileType,
+				)
 			}
 
 			return this.onExtraSettingsChange({ allowedFileTypes })
 		},
 
 		onAllowedFileExtensionsAdded(fileExtension) {
-			const allowedFileExtensions = this.extraSettings.allowedFileExtensions || []
+			const allowedFileExtensions =
+				this.extraSettings.allowedFileExtensions || []
 			allowedFileExtensions.push(fileExtension)
 
 			return this.onExtraSettingsChange({ allowedFileExtensions })
 		},
 
 		onAllowedFileExtensionsDeleted(fileExtension) {
-			let allowedFileExtensions = this.extraSettings.allowedFileExtensions || []
-			allowedFileExtensions = allowedFileExtensions.filter(extension => extension !== fileExtension)
+			let allowedFileExtensions =
+				this.extraSettings.allowedFileExtensions || []
+			allowedFileExtensions = allowedFileExtensions.filter(
+				(extension) => extension !== fileExtension,
+			)
 
 			return this.onExtraSettingsChange({ allowedFileExtensions })
 		},
 
 		onDeleteUploadedFile(uploadedFileId) {
-			const values = this.values.filter(value => value.uploadedFileId !== uploadedFileId)
+			const values = this.values.filter(
+				(value) => value.uploadedFileId !== uploadedFileId,
+			)
 
 			this.$emit('update:values', values)
 		},

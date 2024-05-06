@@ -20,16 +20,19 @@
   -
   -->
 <template>
-	<div class="top-bar"
+	<div
+		class="top-bar"
 		:class="{
 			'top-bar--has-sidebar': sidebarOpened,
 		}"
 		role="toolbar">
-		<PillMenu v-if="!canOnlySubmit"
+		<PillMenu
+			v-if="!canOnlySubmit"
 			:active="currentView"
 			:options="availableViews"
 			@update:active="onChangeView" />
-		<NcButton v-if="canShare && !sidebarOpened"
+		<NcButton
+			v-if="canShare && !sidebarOpened"
 			:aria-label="isMobile ? t('forms', 'Share form') : null"
 			type="tertiary"
 			@click="onShareForm">
@@ -38,6 +41,18 @@
 			</template>
 			<template v-if="!isMobile" #default>
 				{{ t('forms', 'Share') }}
+			</template>
+		</NcButton>
+		<NcButton
+			v-if="showSidebarToggle"
+			:aria-label="t('forms', 'Toggle settings')"
+			:title="t('forms', 'Toggle settings')"
+			type="tertiary"
+			@click="toggleSidebar">
+			<template #icon>
+				<IconMenuOpen
+					:size="24"
+					:class="{ 'icon--flipped': sidebarOpened }" />
 			</template>
 		</NcButton>
 	</div>
@@ -109,7 +124,7 @@ export default {
 
 	computed: {
 		currentView() {
-			return this.availableViews.filter(v => v.id === this.$route.name)[0]
+			return this.availableViews.filter((v) => v.id === this.$route.name)[0]
 		},
 		availableViews() {
 			const views = []
@@ -128,17 +143,25 @@ export default {
 			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
 		},
 		canEdit() {
-			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) && !this.archived
+			return (
+				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) &&
+				!this.archived
+			)
 		},
 		canSeeResults() {
-			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
+			return this.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+			)
 		},
 		canShare() {
 			// This probably can get a permission of itself
 			return this.canEdit
 		},
 		canOnlySubmit() {
-			return this.permissions.length === 1 && this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+			return (
+				this.permissions.length === 1 &&
+				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+			)
 		},
 	},
 
