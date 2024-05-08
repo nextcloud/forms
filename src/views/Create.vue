@@ -24,7 +24,7 @@
   -->
 
 <template>
-	<NcAppContent>
+	<NcAppContent :page-heading="form.title ? t('forms', 'Edit form') : t('forms', 'Create form')">
 		<!-- Show results & sidebar button -->
 		<TopBar :archived="isFormArchived"
 			:permissions="form?.permissions"

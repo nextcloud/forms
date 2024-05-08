@@ -23,7 +23,7 @@
   -->
 
 <template>
-	<NcAppContent>
+	<NcAppContent :page-heading="t('forms', 'Results')">
 		<NcDialog :open.sync="showLinkedFileNotAvailableDialog"
 			:name="t('forms', 'Linked file not available')"
 			:message="t('forms', 'Linked file is not available, would you like to link a new file?')"
