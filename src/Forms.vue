@@ -23,7 +23,8 @@
 
 <template>
 	<NcContent app-name="forms">
-		<NcAppNavigation v-if="canCreateForms || hasForms">
+		<NcAppNavigation v-if="canCreateForms || hasForms"
+			:aria-label="t('forms', 'Forms navigation')">
 			<NcAppNavigationNew v-if="canCreateForms"
 				:text="t('forms', 'New form')"
 				@click="onNewForm">
