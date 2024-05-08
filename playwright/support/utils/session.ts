@@ -14,25 +14,36 @@ import { expect, type APIRequestContext } from '@playwright/test'
  * @param options.user User to use for executing the command
  * @param options.rejectOnError Reject the returned promise in case of non-zero exit code
  */
-export async function runShell(command: string, options?: { user?: string, rejectOnError?: boolean, env?: Record<string, string|number>}) {
+export async function runShell(
+	command: string,
+	options?: {
+		user?: string
+		rejectOnError?: boolean
+		env?: Record<string, string | number>
+	},
+) {
 	const containerName = 'nextcloud-cypress-tests_forms'
 	const container = docker.getContainer(containerName)
 
 	const exec = await container.exec({
 		Cmd: ['sh', '-c', command],
-		Env: Object.entries(options?.env ?? {}).map(([name, value]) => `${name}=${value}`),
+		Env: Object.entries(options?.env ?? {}).map(
+			([name, value]) => `${name}=${value}`,
+		),
 		User: options?.user,
 		AttachStderr: true,
 		AttachStdout: true,
 	})
 
-	const stream = await exec.start({ })
+	const stream = await exec.start({})
 	return new Promise((resolve, reject) => {
 		let data = ''
-		stream.on('data', (chunk: string) => { data += chunk })
+		stream.on('data', (chunk: string) => {
+			data += chunk
+		})
 		stream.on('error', (error: unknown) => reject(error))
 		stream.on('end', async () => {
-			const inspect = await exec.inspect({ })
+			const inspect = await exec.inspect({})
 			if (options?.rejectOnError !== false && inspect.ExitCode) {
 				reject(data)
 			} else {
@@ -49,14 +60,14 @@ export async function runShell(command: string, options?: { user?: string, rejec
  * @param options.env Process environment to pass
  * @param options.rejectOnError Reject the returned promise in case of non-zero exit code
  */
-export async function runOCC(command: string, options?: { env?: Record<string, string|number>, rejectOnError?: boolean }) {
-	return await runShell(
-		`php ./occ ${command}`,
-		{
-			...options,
-			user: 'www-data',
-		},
-	)
+export async function runOCC(
+	command: string,
+	options?: { env?: Record<string, string | number>; rejectOnError?: boolean },
+) {
+	return await runShell(`php ./occ ${command}`, {
+		...options,
+		user: 'www-data',
+	})
 }
 
 /**
@@ -72,7 +83,11 @@ export function restoreDatabase() {
  * @param user The username to login
  * @param password The password to login
  */
-export async function login(request: APIRequestContext, user: string, password: string) {
+export async function login(
+	request: APIRequestContext,
+	user: string,
+	password: string,
+) {
 	const tokenResponse = await request.get('./csrftoken')
 	const requesttoken = (await tokenResponse.json()).token
 
