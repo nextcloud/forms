@@ -23,7 +23,7 @@
  -->
 
 <template>
-	<NcAppContent :class="{'app-content--public': publicView}">
+	<NcAppContent :class="{'app-content--public': publicView}" :page-heading="t('forms', 'Submit form')">
 		<TopBar v-if="!publicView"
 			:archived="isArchived"
 			:permissions="form?.permissions"
