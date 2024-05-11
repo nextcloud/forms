@@ -62,7 +62,7 @@
     "@nextcloud/stylelint-config": "^3.0.1",
     "@nextcloud/vite-config": "^1.2.3",
     "cypress": "^13.9.0",
-    "cypress-split": "^1.23.1",
+    "cypress-split": "^1.23.2",
     "cypress-vite": "^1.5.0",
     "eslint-plugin-cypress": "^3.2.0",
     "vite": "^5.2.11"
