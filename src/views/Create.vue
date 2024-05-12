@@ -65,18 +65,27 @@
 						autofocus
 						@input="onTitleChange" />
 				</h2>
-				<label class="hidden-visually" for="form-desc">
-					{{ t('forms', 'Description') }}
-				</label>
-				<textarea id="form-desc"
-					ref="description"
-					class="form-desc"
-					rows="1"
-					dir="auto"
-					:value="form.description"
-					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
-					:maxlength="maxStringLengths.formDescription"
-					@input="updateDescription" />
+
+				<div v-show="editor">
+					<label for="form-desc-editor">{{ t('forms', 'Description') }}</label>
+					<div id="form-desc-editor" ref="editor" />
+				</div>
+
+				<template v-if="!editor">
+					<label class="hidden-visually" for="form-desc">
+						{{ t('forms', 'Description') }}
+					</label>
+					<textarea id="form-desc"
+						ref="description"
+						class="form-desc"
+						rows="1"
+						dir="auto"
+						:value="form.description"
+						:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
+						:maxlength="maxStringLengths.formDescription"
+						@input="updateDescription" />
+				</template>
+
 				<!-- Show expiration message-->
 				<p v-if="form.expires && form.showExpiration" class="info-message">
 					{{ expirationMessage }}
@@ -177,6 +186,7 @@ window.axios = axios
 
 export default {
 	name: 'Create',
+
 	components: {
 		Draggable,
 		IconLock,
@@ -193,7 +203,9 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [
+		ViewsMixin,
+	],
 
 	data() {
 		return {
@@ -205,6 +217,7 @@ export default {
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
+			editor: null,
 		}
 	},
 
@@ -285,9 +298,15 @@ export default {
 		},
 	},
 
-	mounted() {
-		this.fetchFullForm(this.form.id)
+	async mounted() {
+		await this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
+
+		await this.setupEditor()
+	},
+
+	beforeDestroy() {
+		this.editor?.destroy()
 	},
 
 	methods: {
@@ -465,6 +484,22 @@ export default {
 				this.isLoadingQuestions = false
 			}
 		},
+
+		async setupEditor() {
+			if (!window.OCA.Text) {
+				return
+			}
+
+			this.editor = await window.OCA.Text.createEditor({
+				el: this.$refs.editor,
+				content: this.form.description,
+				readOnly: false,
+				onUpdate: ({ markdown }) => {
+					this.form.description = markdown
+					this.saveDescription()
+				},
+			})
+		},
 	},
 }
 </script>
@@ -522,6 +557,10 @@ export default {
 			&::placeholder {
 				font-size: 28px;
 			}
+		}
+
+		:deep(.ProseMirror) {
+			padding-bottom: 10px;
 		}
 
 		.form-desc,

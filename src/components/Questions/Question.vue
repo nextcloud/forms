@@ -127,16 +127,24 @@
 				</NcActions>
 			</div>
 			<div v-if="hasDescription || !readOnly" class="question__header__description">
-				<textarea v-if="!readOnly"
-					ref="description"
-					dir="auto"
-					:value="description"
-					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
-					:maxlength="maxStringLengths.questionDescription"
-					class="question__header__description__input"
-					@input="onDescriptionChange" />
-				<!-- eslint-disable-next-line vue/no-v-html -->
-				<div v-else class="question__header__description__output" v-html="computedDescription" />
+				<div v-show="editor">
+					<label>{{ t('forms', 'Description') }}</label>
+					<div v-if="!readOnly" ref="editor" />
+				</div>
+
+				<template v-if="!editor">
+					<textarea v-if="!readOnly"
+						ref="description"
+						dir="auto"
+						:value="description"
+						:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
+						:maxlength="maxStringLengths.questionDescription"
+						class="question__header__description__input"
+						@input="onDescriptionChange" />
+
+					<!-- eslint-disable-next-line vue/no-v-html -->
+					<div v-else class="question__header__description__output" v-html="computedDescription" />
+				</template>
 			</div>
 		</div>
 
@@ -162,6 +170,7 @@ import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalV
 import IconDotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
 import IconOverlay from '../Icons/IconOverlay.vue'
+import debounce from 'debounce'
 
 export default {
 	name: 'Question',
@@ -241,6 +250,12 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			editor: null,
+		}
+	},
+
 	computed: {
 		/**
 		 * Extend text with asterisk if question is required
@@ -279,10 +294,18 @@ export default {
 			return this.description !== ''
 		},
 	},
+
 	// Ensure description is sized correctly on initial render
-	mounted() {
+	async mounted() {
 		this.$nextTick(() => this.resizeDescription())
+
+		await this.setupEditor()
 	},
+
+	beforeDestroy() {
+		this.editor?.destroy()
+	},
+
 	methods: {
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
@@ -338,6 +361,28 @@ export default {
 		onClone() {
 			this.$emit('clone')
 		},
+
+		async setupEditor() {
+			if (!window.OCA.Text || this.readOnly) {
+				return
+			}
+
+			this.editor = await window.OCA.Text.createEditor({
+				el: this.$refs.editor,
+				content: this.description,
+				readOnly: false,
+				onUpdate: ({ markdown }) => {
+					this.updateEditorContent(markdown)
+				},
+				onFileInsert() {
+					console.log(arguments)
+				},
+			})
+		},
+
+		updateEditorContent: debounce(function(markdown) {
+			this.$emit('update:description', markdown)
+		}, 200, { immediate: true }),
 	},
 }
 </script>
@@ -358,6 +403,10 @@ export default {
 
 	&--editable {
 		padding-inline-start: 56px; // add 12px for the title input box
+
+		:deep(.ProseMirror) {
+			padding-bottom: 10px;
+		}
 	}
 
 	> * {
@@ -449,7 +498,7 @@ export default {
 		}
 
 		&__description {
-			display: flex;
+			//display: flex;
 
 			&__input {
 				margin: 0px;
