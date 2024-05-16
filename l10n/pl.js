@@ -59,6 +59,7 @@ OC.L10N.register(
     "Title of question number {index}" : "Tytuł pytania numer {index}",
     "Required" : "Wymagany",
     "Delete question" : "Usuń pytanie",
+    "Description (formatting using Markdown is supported)" : "Opis (obsługiwane jest formatowanie przy użyciu Markdown)",
     "This question needs a title!" : "To pytanie wymaga tytułu!",
     "Shuffle options" : "Opcje losowe",
     "Add a new answer" : "Dodaj nową odpowiedź",
