@@ -20,7 +20,11 @@
   -
   -->
 <template>
-	<div class="top-bar" role="toolbar">
+	<div class="top-bar"
+		:class="{
+			'top-bar--has-sidebar': sidebarOpened,
+		}"
+		role="toolbar">
 		<PillMenu v-if="!canOnlySubmit"
 			:active="currentView"
 			:options="availableViews"
@@ -36,16 +40,6 @@
 				{{ t('forms', 'Share') }}
 			</template>
 		</NcButton>
-		<NcButton v-if="showSidebarToggle"
-			:aria-label="t('forms', 'Toggle settings')"
-			:title="t('forms', 'Toggle settings')"
-			type="tertiary"
-			@click="toggleSidebar">
-			<template #icon>
-				<IconMenuOpen :size="24"
-					:class="{ 'icon--flipped' : sidebarOpened }" />
-			</template>
-		</NcButton>
 	</div>
 </template>
 
@@ -54,7 +48,6 @@ import { mdiEye, mdiPencil, mdiPoll } from '@mdi/js'
 import { useIsMobile } from '@nextcloud/vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
-import IconMenuOpen from 'vue-material-design-icons/MenuOpen.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 
 import logger from '../utils/Logger.js'
@@ -84,7 +77,6 @@ export default {
 	name: 'TopBar',
 
 	components: {
-		IconMenuOpen,
 		IconShareVariant,
 		NcButton,
 		PillMenu,
@@ -100,8 +92,9 @@ export default {
 
 		sidebarOpened: {
 			type: Boolean,
-			default: null,
+			default: false,
 		},
+
 		permissions: {
 			type: Array,
 			default: () => [],
@@ -147,16 +140,9 @@ export default {
 		canOnlySubmit() {
 			return this.permissions.length === 1 && this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
 		},
-		showSidebarToggle() {
-			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) && this.sidebarOpened !== null
-		},
 	},
 
 	methods: {
-		toggleSidebar() {
-			this.$emit('update:sidebarOpened', !this.sidebarOpened)
-		},
-
 		/**
 		 * Router methods
 		 *
@@ -191,17 +177,22 @@ export default {
 	display: flex;
 	align-items: center;
 	align-self: flex-end;
-	// allow to wrap on small screens - wrap reverse so the sidebar toggle keeps aligned with the navigation toggle
-	flex-wrap: wrap-reverse;
+	// allow to wrap on small screens
+	flex-wrap: wrap;
 	justify-content: flex-end;
 
-	// align with navigation toggle, but ensure it is not overlayed
+	// align with navigation and sidebar toggle, but ensure it is not overlayed
 	padding: var(--app-navigation-padding);
-	margin-inline-start: var(--default-clickable-area, 44px);
+	margin-inline: var(--default-clickable-area, 44px);
 
 	position: sticky;
 	top: 0;
 	z-index: 100;
+
+	&--has-sidebar {
+		// Remove margin as the toggle button does not exist when open
+		margin-inline-end: 0;
+	}
 }
 
 .icon--flipped {
