@@ -34,7 +34,6 @@
 		<TopBar :archived="isFormArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
-			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 
 		<!-- Loading submissions -->

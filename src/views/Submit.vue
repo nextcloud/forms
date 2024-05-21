@@ -28,7 +28,6 @@
 			:archived="isArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
-			@update:sidebarOpened="onSidebarChange"
 			@share-form="onShareForm" />
 
 		<!-- Form is loading -->
