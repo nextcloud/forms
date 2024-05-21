@@ -21,11 +21,11 @@
  -->
 
 <template>
-	<NcAppSidebar v-show="sidebarOpened"
+	<NcAppSidebar :open="sidebarOpened"
 		:active="active"
 		:name="t('forms', 'Form settings')"
-		@close="onClose"
-		@update:active="onUpdateActive">
+		@update:active="onUpdateActive"
+		@update:open="$emit('update:sidebarOpened', $event)">
 		<NcAppSidebarTab id="forms-sharing"
 			:order="0"
 			:name="t('forms', 'Sharing')">
@@ -84,15 +84,6 @@ export default {
 	},
 
 	methods: {
-		/**
-		 * Sidebar state methods
-		 */
-		onClose() {
-			this.$emit('update:sidebarOpened', false)
-		},
-		onToggle() {
-			this.$emit('update:sidebarOpened', !this.sidebarOpened)
-		},
 		onUpdateActive(active) {
 			this.$emit('update:active', active)
 		},
