@@ -145,7 +145,6 @@ OC.L10N.register(
     "This form is now owned by" : "هذا النموذج يملكه الآن ",
     "An error occurred while transfering ownership" : "حدث خطأ أثناء نقل مِلكِية",
     "Share" : "مشاركة",
-    "Toggle settings" : " حدد الإعدادت",
     "View form" : "عرض النموذج",
     "View" : "عرض",
     "Edit" : "تعديل",

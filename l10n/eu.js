@@ -105,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the share" : "Errore bat gertatu da partekatzea kentzean",
     "Transfer ownership" : "Jabetzaren transferentzia",
     "Share" : "Partekatu",
-    "Toggle settings" : "Txandakatu ezarpenak",
     "View form" : "Ikusi formularioa",
     "View" : "Ikusi",
     "Edit" : "Aldatu",

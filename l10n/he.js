@@ -54,7 +54,6 @@ OC.L10N.register(
     "Copy embedding code" : "העתקת קוד הטמעה",
     "Internal link" : "קישור פנימ",
     "Share" : "שתף",
-    "Toggle settings" : "החלפת מצב הגדרות",
     "View" : "צפייה",
     "Edit" : "עריכה",
     "Loading {title} …" : "{title} בטעינה…",

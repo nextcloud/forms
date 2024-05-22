@@ -66,7 +66,6 @@ OC.L10N.register(
     "Copy embedding code" : "Kopiraj šifru za ugradnju",
     "Internal link" : "Dijeli internu poveznicu",
     "Share" : "Dijeli",
-    "Toggle settings" : "Uklj./isklj. postavke",
     "View" : "Pregledaj",
     "Edit" : "Uredi",
     "Loading {title} …" : "Učitavanje {title}…",

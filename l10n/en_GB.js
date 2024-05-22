@@ -145,7 +145,6 @@ OC.L10N.register(
     "This form is now owned by" : "This form is now owned by",
     "An error occurred while transfering ownership" : "An error occurred while transfering ownership",
     "Share" : "Share",
-    "Toggle settings" : "Toggle settings",
     "View form" : "View form",
     "View" : "View",
     "Edit" : "Edit",

@@ -145,7 +145,6 @@ OC.L10N.register(
     "This form is now owned by" : "Dieses Formular gehört jetzt",
     "An error occurred while transfering ownership" : "Fehler beim Übertragen des Besitzes",
     "Share" : "Teilen",
-    "Toggle settings" : "Einstellungen umschalten",
     "View form" : "Formular ansehen",
     "View" : "Ansehen",
     "Edit" : "Bearbeiten",

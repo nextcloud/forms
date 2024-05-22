@@ -81,7 +81,6 @@ OC.L10N.register(
     "Transfer ownership" : "Trasferisci la proprietà",
     "You're going to transfer the ownership of {name} to another account. Please select the account to which you want to transfer ownership." : "Stai per trasferire la proprietà di {name} a un altro account. Seleziona l'account a cui desideri trasferire la proprietà.",
     "Share" : "Condividi",
-    "Toggle settings" : "Commuta le impostazioni",
     "View form" : "Visualizza il modulo",
     "View" : "Visualizza",
     "Edit" : "Modifica",

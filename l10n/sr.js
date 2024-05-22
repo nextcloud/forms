@@ -145,7 +145,6 @@ OC.L10N.register(
     "This form is now owned by" : "Овај формулар је сада власништво",
     "An error occurred while transfering ownership" : "Дошло је до грешке приликом преноса власништва",
     "Share" : "Подели",
-    "Toggle settings" : "Укључи/искључи поставке",
     "View form" : "Погледајт формулар",
     "View" : "Погледај",
     "Edit" : "Измени",

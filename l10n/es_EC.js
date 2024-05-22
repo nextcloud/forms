@@ -101,7 +101,6 @@ OC.L10N.register(
     "There was an error while updating the share" : "Hubo un error al actualizar la compartición",
     "There was an error while removing the share" : "Hubo un error al eliminar la compartición",
     "Share" : "Compartir",
-    "Toggle settings" : "Alternar ajustes",
     "View form" : "Ver formulario",
     "View" : "Ver",
     "Edit" : "Editar",

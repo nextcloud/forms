@@ -143,7 +143,6 @@ OC.L10N.register(
     "This form is now owned by" : "该表格现在归",
     "An error occurred while transfering ownership" : "转移所有权时发生错误",
     "Share" : "共享",
-    "Toggle settings" : "切换设置",
     "View form" : "查看表单",
     "View" : "查看",
     "Edit" : "编辑",

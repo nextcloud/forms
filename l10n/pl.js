@@ -98,7 +98,6 @@ OC.L10N.register(
     "There was an error while removing the share" : "Wystąpił błąd podczas usuwania udostępnienia",
     "Transfer ownership" : "Przeniesienie własności",
     "Share" : "Udostępnij",
-    "Toggle settings" : "Przełącz ustawienia",
     "View form" : "Zobacz formularz",
     "View" : "Podgląd",
     "Edit" : "Edytuj",

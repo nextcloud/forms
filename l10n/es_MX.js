@@ -95,7 +95,6 @@ OC.L10N.register(
     "There was an error while adding the link" : "Ha habido un error al añadir el enlace",
     "There was an error while removing the share" : "Ha habido un error al eliminar el compartido",
     "Share" : "Compartir",
-    "Toggle settings" : "Habilitar/Deshabilitar configuraciones",
     "View form" : "Ver formulario",
     "View" : "Ver",
     "Edit" : "Editar",

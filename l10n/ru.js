@@ -106,7 +106,6 @@ OC.L10N.register(
     "There was an error while updating the share" : "При обновлении общего ресурса произошла ошибка",
     "There was an error while removing the share" : "При удалении общего ресурса произошла ошибка",
     "Share" : "Поделиться",
-    "Toggle settings" : "Настройки переключения",
     "View form" : "Показать форму",
     "View" : "Просмотр",
     "Edit" : "Редактировать",

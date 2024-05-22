@@ -145,7 +145,6 @@ OC.L10N.register(
     "This form is now owned by" : "Bu formun yeni sahibi",
     "An error occurred while transfering ownership" : "Sahiplik aktarılırken bir sorun çıktı",
     "Share" : "Paylaş",
-    "Toggle settings" : "Ayarları değiştir",
     "View form" : "Formu görüntüle",
     "View" : "Görüntüle",
     "Edit" : "Düzenle",

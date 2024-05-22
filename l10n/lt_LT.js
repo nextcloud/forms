@@ -75,7 +75,6 @@ OC.L10N.register(
     "There was an error while adding the link" : "Pridedant nuorodą įvyko klaida",
     "There was an error while removing the share" : "Šalinant viešinį įvyko klaida",
     "Share" : "Bendrinti",
-    "Toggle settings" : "Perjungti nustatymus",
     "View form" : "Rodyti anketą",
     "View" : "Rodyti",
     "Edit" : "Taisyti",

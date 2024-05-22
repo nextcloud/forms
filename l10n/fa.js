@@ -101,7 +101,6 @@ OC.L10N.register(
     "There was an error while updating the share" : "There was an error while updating the share",
     "There was an error while removing the share" : "There was an error while removing the share",
     "Share" : "هم‌رسانی",
-    "Toggle settings" : "تعویض تنظیمات",
     "View form" : "نمایش فرم",
     "View" : "نمایش",
     "Edit" : "ویرایش",

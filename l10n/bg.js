@@ -99,7 +99,6 @@ OC.L10N.register(
     "There was an error while updating the share" : "Възникна грешка при актуализиране на споделянето",
     "There was an error while removing the share" : "Възникна грешка при премахване на споделянето",
     "Share" : "Споделяне",
-    "Toggle settings" : "Превключване на настройките",
     "View form" : "Преглед на формуляра",
     "View" : "Изглед",
     "Edit" : "Редактиране",

@@ -90,7 +90,6 @@ OC.L10N.register(
     "Only works for logged in accounts with access rights" : "Deluje le za prijavljene račune z ustreznimi dovoljenji",
     "Permit access to all logged in accounts" : "Dovoli dostop vsem prijavljenim računom",
     "Share" : "Souporaba",
-    "Toggle settings" : "Preklopi nastavitve",
     "View form" : "Pogled vprašalnika",
     "View" : "Pogled",
     "Edit" : "Uredi",
