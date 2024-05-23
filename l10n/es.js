@@ -209,7 +209,7 @@ OC.L10N.register(
     "Confirm submit" : "Confirmar envío",
     "Are you sure you want to submit an empty form?" : "¿Está seguro que desea enviar un formulario vacío?",
     "Leave form" : "Abandonar formulario",
-    "You have unsaved changes! Do you still want to leave?" : "¡Tienes cambios sin guardar!\n¿Todavía quieres salir?",
+    "You have unsaved changes! Do you still want to leave?" : "¡Tiene cambios sin guardar! , ¿Está seguro que desea salir?",
     "Abort" : "Abortar",
     "Leave" : "Abandonar",
     "Some answers are not valid" : "Algunas respuestas no son válidas",

@@ -16,7 +16,7 @@ OC.L10N.register(
     "Internal link" : "Iekšējā saite",
     "Share" : "Koplietot",
     "View" : "Skats",
-    "Edit" : "Rediģēt",
+    "Edit" : "Labot",
     "Description" : "Apraksts",
     "Download" : "Lejupielādēt",
     "Summary" : "Kopsavilkums",

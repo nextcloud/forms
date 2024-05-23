@@ -7,6 +7,7 @@ OC.L10N.register(
     "Group" : "Grúpa",
     "Share" : "Comhroinn",
     "Edit" : "Cuir in eagar",
+    "Description" : "Cur síos",
     "Download" : "Íoslódáil",
     "Cancel" : "Cealaigh",
     "Sharing" : "Roinnt",
