@@ -13,7 +13,7 @@
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 	]]></description>
 
-	<version>4.2.3</version>
+	<version>4.2.4</version>
 	<licence>agpl</licence>
 
 	<author>Affan Hussain</author>
@@ -27,6 +27,7 @@
 	<author>Jonas Rittershofer</author>
 	<author>Kai Schröer</author>
 	<author>Kameron Sheppard</author>
+	<author>Kostiantyn Miakshyn</author>
 	<author>Natalie Gilbert</author>
 	<author>Nick Gallo</author>
 	<author>René Gieling</author>
