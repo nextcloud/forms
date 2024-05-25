@@ -5,6 +5,7 @@ OC.L10N.register(
     "User ID" : "ID Úsáideora",
     "Delete" : "Scrios",
     "Group" : "Grúpa",
+    "Remove link" : "Bain nasc",
     "Share" : "Comhroinn",
     "Edit" : "Cuir in eagar",
     "Description" : "Cur síos",
@@ -14,7 +15,9 @@ OC.L10N.register(
     "Settings" : "Socruithe",
     "Submit" : "Cuir isteach",
     "Abort" : "ginmhilleadh",
+    "Cannot copy, please copy the link manually" : "Ní féidir cóip a dhéanamh, cóipeáil an nasc de láimh",
     "Date" : "Dáta",
+    "Text" : "Téacs",
     "Phone number" : "Uimhir teileafón",
     "Email address" : "Seoladh ríomhphoist"
 },
