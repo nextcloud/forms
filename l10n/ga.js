@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Cóipeáil",
     "User ID" : "ID Úsáideora",
+    "Select groups" : "Roghnaigh grúpaí",
     "Delete" : "Scrios",
     "Group" : "Grúpa",
     "Remove link" : "Bain nasc",
