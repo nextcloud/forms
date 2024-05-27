@@ -6,8 +6,10 @@ OC.L10N.register(
     "Select groups" : "Roghnaigh grúpaí",
     "Delete" : "Scrios",
     "Group" : "Grúpa",
+    "Share link" : "Comhroinn nasc",
     "Remove link" : "Bain nasc",
     "Share" : "Comhroinn",
+    "View" : "Amharc",
     "Edit" : "Cuir in eagar",
     "Description" : "Cur síos",
     "Download" : "Íoslódáil",
@@ -18,6 +20,7 @@ OC.L10N.register(
     "Abort" : "ginmhilleadh",
     "Cannot copy, please copy the link manually" : "Ní féidir cóip a dhéanamh, cóipeáil an nasc de láimh",
     "Date" : "Dáta",
+    "Time" : "Am",
     "Text" : "Téacs",
     "Phone number" : "Uimhir teileafón",
     "Email address" : "Seoladh ríomhphoist"
