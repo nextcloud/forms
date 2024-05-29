@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Cóipeáil",
     "User ID" : "ID Úsáideora",
     "Select groups" : "Roghnaigh grúpaí",
+    "Set expiration date" : "Socraigh dáta éaga",
     "Delete" : "Scrios",
     "Group" : "Grúpa",
     "Share link" : "Comhroinn nasc",
