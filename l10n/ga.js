@@ -12,6 +12,7 @@ OC.L10N.register(
     "Team" : "Foireann",
     "Share link" : "Comhroinn nasc",
     "Copy to clipboard" : "Cóipeáil chuig an ngearrthaisce",
+    "Copy embedding code" : "Cóipeáil cód leabú",
     "Remove link" : "Bain nasc",
     "Internal link" : "Nasc inmheánach",
     "Share" : "Comhroinn",
@@ -30,7 +31,9 @@ OC.L10N.register(
     "No elements found." : "Níor aimsíodh aon eilimintí.",
     "Checkboxes" : "Boscaí seiceála",
     "Date" : "Dáta",
+    "Pick a date" : "Roghnaigh dáta",
     "Time" : "Am",
+    "Pick a time" : "Roghnaigh am",
     "Text" : "Téacs",
     "Phone number" : "Uimhir teileafón",
     "Email address" : "Seoladh ríomhphoist"
