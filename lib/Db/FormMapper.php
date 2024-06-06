@@ -162,17 +162,35 @@ class FormMapper extends QBMapper {
 	/**
 	 * @return Form[]
 	 */
-	public function findAllByOwnerId(string $ownerId): array {
+	public function findAllByOwnerId(
+		string $ownerId,
+		array $filter = [],
+		int $limit = 0,
+		int $offset = 0,
+	): array {
 		$qb = $this->db->getQueryBuilder();
+
+		$filterExpression = $qb->expr()->andX();
+		if ($filter['name'] ?? false) {
+			$filterExpression->add($qb->expr()->iLike('name', $qb->createNamedParameter($filter['name'])));
+		}
 
 		$qb->select('*')
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('owner_id', $qb->createNamedParameter($ownerId))
 			)
+			->andWhere($filterExpression)
 			//Last updated forms first, then newest forms first
 			->addOrderBy('last_updated', 'DESC')
 			->addOrderBy('created', 'DESC');
+
+		if ($limit > 0) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset > 0) {
+			$qb->setFirstResult($offset);
+		}
 
 		return $this->findEntities($qb);
 	}
