@@ -27,6 +27,8 @@
 				<referencedClass name="OCA\Circles\CirclesManager" />
 				<referencedClass name="OCA\Circles\Model\Circle" />
 				<referencedClass name="OCA\Circles\Model\Member" />
+				<referencedClass name="OCA\Analytics\Datasource\IDatasource" />
+				<referencedClass name="OCA\Analytics\Datasource\DatasourceEvent" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>
@@ -35,6 +37,7 @@
 				<referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
 				<referencedClass name="Doctrine\DBAL\Driver\Statement" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
+				<referencedClass name="OCA\Analytics\Datasource\DatasourceEvent" />
 			</errorLevel>
 		</UndefinedDocblockClass>
 	</issueHandlers>
