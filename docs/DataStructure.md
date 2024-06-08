@@ -194,11 +194,15 @@ Currently supported Question-Types are:
 ## Extra Settings
 Optional extra settings for some [Question Types](#question-types)
 
-| Extra Setting      | Question Type | Type    | Values | Description |
-|--------------------|---------------|---------|--------|-------------|
-| `allowOtherAnswer` | `multiple, multiple_unique` | Boolean | `true/false` | Allows the user to specify a custom answer |
-| `shuffleOptions`   | `dropdown, multiple, multiple_unique` | Boolean | `true/false` | The list of options should be shuffled |
-| `optionsLimitMax`  | `multiple`    | Integer | -      | Maximum number of options that can be selected |
-| `optionsLimitMin`  | `multiple`    | Integer | -      | Minimum number of options that must be selected |
-| `validationType`   | `short` | string | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission |
-| `validationRegex`  | `short` | string | regular expression | if `validationType` is 'regex' this defines the regular expression to apply |
+| Extra Setting           | Question Type                         | Type             | Values                                      | Description                                                                 |
+|-------------------------|---------------------------------------|------------------|---------------------------------------------|-----------------------------------------------------------------------------|
+| `allowOtherAnswer`      | `multiple, multiple_unique`           | Boolean          | `true/false`                                | Allows the user to specify a custom answer                                  |
+| `shuffleOptions`        | `dropdown, multiple, multiple_unique` | Boolean          | `true/false`                                | The list of options should be shuffled                                      |
+| `optionsLimitMax`       | `multiple`                            | Integer          | -                                           | Maximum number of options that can be selected                              |
+| `optionsLimitMin`       | `multiple`                            | Integer          | -                                           | Minimum number of options that must be selected                             |
+| `validationType`        | `short`                               | string           | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission                                 |
+| `validationRegex`       | `short`                               | string           | regular expression                          | if `validationType` is 'regex' this defines the regular expression to apply |
+| `allowedFileTypes`      | `file`                                | Array of strings | `'image', 'x-office/document'`              | Allowed file types for file upload                                          |
+| `allowedFileExtensions` | `file`                                | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
+| `maxAllowedFilesCount`  | `file`                                | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |
+| `maxFileSize`           | `file`                                | Integer          | -                                           | Maximum file size in bytes, 0 means no limit                                |

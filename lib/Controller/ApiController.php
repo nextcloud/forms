@@ -40,6 +40,8 @@ use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFile;
+use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
@@ -48,10 +50,13 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
+use OCP\Files\IMimeTypeDetector;
+use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -81,6 +86,9 @@ class ApiController extends OCSController {
 		private IL10N $l10n,
 		private LoggerInterface $logger,
 		private IUserManager $userManager,
+		private IRootFolder $storage,
+		private UploadedFileMapper $uploadedFileMapper,
+		private IMimeTypeDetector $mimeTypeDetector,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -438,6 +446,7 @@ class ApiController extends OCSController {
 
 		$response = $question->read();
 		$response['options'] = [];
+		$response['accept'] = [];
 
 		$this->formsService->setLastUpdatedTimestamp($formId);
 
@@ -696,6 +705,7 @@ class ApiController extends OCSController {
 
 		$response = $newQuestion->read();
 		$response['options'] = [];
+		$response['accept'] = [];
 
 		foreach ($sourceOptions as $sourceOption) {
 			$optionData = $sourceOption->read();
@@ -918,14 +928,19 @@ class ApiController extends OCSController {
 	/**
 	 * Insert answers for a question
 	 *
+	 * @param Form $form
 	 * @param int $submissionId
 	 * @param array $question
-	 * @param array $answerArray [arrayOfString]
+	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
 	 */
-	private function storeAnswersForQuestion($submissionId, array $question, array $answerArray) {
+	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray) {
 		foreach ($answerArray as $answer) {
-			$answerText = '';
+			$answerEntity = new Answer();
+			$answerEntity->setSubmissionId($submissionId);
+			$answerEntity->setQuestionId($question['id']);
 
+			$answerText = '';
+			$uploadedFile = null;
 			// Are we using answer ids as values
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 				// Search corresponding option, skip processing if not found
@@ -935,6 +950,25 @@ class ApiController extends OCSController {
 				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
 				}
+			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
+				$answerEntity->setFileId($uploadedFile->getFileId());
+
+				$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
+
+				if ($userFolder->nodeExists($path)) {
+					$folder = $userFolder->get($path);
+				} else {
+					$folder = $userFolder->newFolder($path);
+				}
+				/** @var \OCP\Files\Folder $folder */
+
+				$file = $userFolder->getById($uploadedFile->getFileId())[0];
+				$name = $folder->getNonExistingName($file->getName());
+				$file->move($folder->getPath() . '/' . $name);
+
+				$answerText = $name;
 			} else {
 				$answerText = $answer; // Not a multiple-question, answerText is given answer
 			}
@@ -943,12 +977,130 @@ class ApiController extends OCSController {
 				continue;
 			}
 
-			$answerEntity = new Answer();
-			$answerEntity->setSubmissionId($submissionId);
-			$answerEntity->setQuestionId($question['id']);
 			$answerEntity->setText($answerText);
 			$this->answerMapper->insert($answerEntity);
+			if ($uploadedFile) {
+				$this->uploadedFileMapper->delete($uploadedFile);
+			}
 		}
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 * @PublicPage
+	 *
+	 * Uploads a temporary files to the server during form filling
+	 *
+	 * @return Response
+	 */
+	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): Response {
+		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}',
+			['formId' => $formId, 'questionId' => $questionId]);
+
+		$uploadedFiles = [];
+		foreach ($this->request->getUploadedFile('files') as $key => $files) {
+			foreach ($files as $i => $value) {
+				$uploadedFiles[$i][$key] = $value;
+			}
+		}
+
+		if (!count($uploadedFiles)) {
+			throw new OCSBadRequestException('No files provided');
+		}
+
+		$form = $this->loadFormForSubmission($formId, $shareHash);
+
+		if (!$this->formsService->canSubmit($form)) {
+			throw new OCSForbiddenException('Already submitted');
+		}
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question with id {questionId}', ['questionId' => $questionId]);
+			throw new OCSBadRequestException(previous: $e instanceof \Exception ? $e : null);
+		}
+
+		$path = $this->formsService->getTemporaryUploadedFilePath($form, $question);
+
+		$response = [];
+		foreach ($uploadedFiles as $uploadedFile) {
+			$error = $uploadedFile['error'] ?? 0;
+			if ($error !== UPLOAD_ERR_OK) {
+				$this->logger->error('Failed to get the uploaded file. PHP file upload error code: ' . $error,
+					['file_name' => $uploadedFile['name']]);
+
+				throw new OCSBadRequestException(sprintf('Failed to upload the file "%s".', $uploadedFile['name']));
+			}
+
+			if (!is_uploaded_file($uploadedFile['tmp_name'])) {
+				throw new OCSBadRequestException('Invalid file provided');
+			}
+
+			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder->getStorage()->verifyPath($path, $uploadedFile['name']);
+
+			$extraSettings = $question->getExtraSettings();
+			if (($extraSettings['maxFileSize'] ?? 0) > 0 && $uploadedFile['size'] > $extraSettings['maxFileSize']) {
+				throw new OCSBadRequestException(sprintf('File size exceeds the maximum allowed size of %s bytes.', $extraSettings['maxFileSize']));
+			}
+
+			if (!empty($extraSettings['allowedFileTypes']) || !empty($extraSettings['allowedFileExtensions'])) {
+				$mimeType = $this->mimeTypeDetector->detectContent($uploadedFile['tmp_name']);
+				$aliases = $this->mimeTypeDetector->getAllAliases();
+
+				$valid = false;
+				foreach ($extraSettings['allowedFileTypes'] ?? [] as $allowedFileType) {
+					if (str_starts_with($aliases[$mimeType] ?? '', $allowedFileType)) {
+						$valid = true;
+						break;
+					}
+				}
+
+				if (!$valid && !empty($extraSettings['allowedFileExtensions'])) {
+					$mimeTypesPerExtension = method_exists($this->mimeTypeDetector, 'getAllMappings')
+						? $this->mimeTypeDetector->getAllMappings() : [];
+					foreach ($extraSettings['allowedFileExtensions'] as $allowedFileExtension) {
+						if (isset($mimeTypesPerExtension[$allowedFileExtension])
+							&& in_array($mimeType, $mimeTypesPerExtension[$allowedFileExtension])) {
+							$valid = true;
+							break;
+						}
+					}
+				}
+
+				if (!$valid) {
+					throw new OCSBadRequestException(sprintf('File type is not allowed. Allowed file types: %s',
+						implode(', ', array_merge($extraSettings['allowedFileTypes'] ?? [], $extraSettings['allowedFileExtensions'] ?? []))
+					));
+				}
+			}
+
+			if ($userFolder->nodeExists($path)) {
+				$folder = $userFolder->get($path);
+			} else {
+				$folder = $userFolder->newFolder($path);
+			}
+			/** @var \OCP\Files\Folder $folder */
+
+			$fileName = $folder->getNonExistingName($uploadedFile['name']);
+			$file = $folder->newFile($fileName, file_get_contents($uploadedFile['tmp_name']));
+
+			$uploadedFileEntity = new UploadedFile();
+			$uploadedFileEntity->setFormId($formId);
+			$uploadedFileEntity->setOriginalFileName($fileName);
+			$uploadedFileEntity->setFileId($file->getId());
+			$uploadedFileEntity->setCreated(time());
+			$this->uploadedFileMapper->insert($uploadedFileEntity);
+
+			$response[] = [
+				'uploadedFileId' => $uploadedFileEntity->getId(),
+				'fileName' => $fileName,
+			];
+		}
+
+		return new DataResponse($response);
 	}
 
 	/**
@@ -973,47 +1125,15 @@ class ApiController extends OCSController {
 			'shareHash' => $shareHash,
 		]);
 
-		try {
-			$form = $this->formMapper->findById($formId);
-			$questions = $this->formsService->getQuestions($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
+		$form = $this->loadFormForSubmission($formId, $shareHash);
 
-		// Does the user have access to the form (Either by logged in user, or by providing public share-hash.)
-		try {
-			$isPublicShare = false;
-
-			// If hash given, find the corresponding share & check if hash corresponds to given formId.
-			if ($shareHash !== '') {
-				// public by legacy Link
-				if (isset($form->getAccess()['legacyLink']) && $shareHash === $form->getHash()) {
-					$isPublicShare = true;
-				}
-
-				// Public link share
-				$share = $this->shareMapper->findPublicShareByHash($shareHash);
-				if ($share->getFormId() === $formId) {
-					$isPublicShare = true;
-				}
-			}
-		} catch (DoesNotExistException $e) {
-			// $isPublicShare already false.
-		} finally {
-			// Now forbid, if no public share and no direct share.
-			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
-				throw new OCSForbiddenException('Not allowed to access this form');
-			}
-		}
-
-		// Not allowed if form has expired.
-		if ($this->formsService->hasFormExpired($form)) {
-			throw new OCSForbiddenException('This form is no longer taking answers');
-		}
-
+		$questions = $this->formsService->getQuestions($formId);
 		// Is the submission valid
-		if (!$this->submissionService->validateSubmission($questions, $answers)) {
+		$isSubmissionValid = $this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+		if (is_string($isSubmissionValid)) {
+			throw new OCSBadRequestException($isSubmissionValid);
+		}
+		if ($isSubmissionValid === false) {
 			throw new OCSBadRequestException('At least one submitted answer is not valid');
 		}
 
@@ -1054,7 +1174,7 @@ class ApiController extends OCSController {
 				continue;
 			}
 
-			$this->storeAnswersForQuestion($submission->getId(), $questions[$questionIndex], $answerArray);
+			$this->storeAnswersForQuestion($form, $submission->getId(), $questions[$questionIndex], $answerArray);
 		}
 
 		$this->formsService->setLastUpdatedTimestamp($formId);
@@ -1299,6 +1419,48 @@ class ApiController extends OCSController {
 			'fileName' => $file->getName(),
 			'filePath' => $filePath,
 		]);
+	}
+
+	private function loadFormForSubmission(int $formId, string $shareHash): Form {
+		try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException(previous: $e instanceof \Exception ? $e : null);
+		}
+
+		// Does the user have access to the form (Either by logged-in user, or by providing public share-hash.)
+		try {
+			$isPublicShare = false;
+
+			// If hash given, find the corresponding share & check if hash corresponds to given formId.
+			if ($shareHash !== '') {
+				// public by legacy Link
+				if (isset($form->getAccess()['legacyLink']) && $shareHash === $form->getHash()) {
+					$isPublicShare = true;
+				}
+
+				// Public link share
+				$share = $this->shareMapper->findPublicShareByHash($shareHash);
+				if ($share->getFormId() === $formId) {
+					$isPublicShare = true;
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			// $isPublicShare already false.
+		} finally {
+			// Now forbid, if no public share and no direct share.
+			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
+				throw new OCSForbiddenException('Not allowed to access this form');
+			}
+		}
+
+		// Not allowed if form has expired.
+		if ($this->formsService->hasFormExpired($form)) {
+			throw new OCSForbiddenException('This form is no longer taking answers');
+		}
+
+		return $form;
 	}
 
 	/**

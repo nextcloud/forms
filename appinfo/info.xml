@@ -55,6 +55,10 @@
 		<nextcloud min-version="28" max-version="29" />
 	</dependencies>
 
+	<background-jobs>
+		<job>OCA\Forms\BackgroundJob\CleanupUploadedFilesJob</job>
+	</background-jobs>
+
 	<settings>
 		<admin>OCA\Forms\Settings\Settings</admin>
 		<admin-section>OCA\Forms\Settings\SettingsSection</admin-section>

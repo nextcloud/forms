@@ -54,16 +54,29 @@
 		<ul v-else class="question-summary__text">
 			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 			<!-- eslint-disable-next-line -->
-			<li v-for="answer in textAnswers" :key="answer.id" dir="auto">{{ answer }}</li>
+			<li v-for="answer in answers" :key="answer.id" dir="auto">
+				<template v-if="answer.url">
+					<a :href="answer.url" target="_blank"><IconFile :size="20" class="question-summary__text-icon" /> {{ answer.text }}</a>
+				</template>
+				<template v-else>
+					{{ answer.text }}
+				</template>
+			</li>
 		</ul>
 	</div>
 </template>
 
 <script>
 import answerTypes from '../../models/AnswerTypes.js'
+import { generateUrl } from '@nextcloud/router'
+import IconFile from 'vue-material-design-icons/File.vue'
 
 export default {
 	name: 'ResultsSummary',
+
+	components: {
+		IconFile,
+	},
 
 	props: {
 		submissions: {
@@ -152,8 +165,8 @@ export default {
 		},
 
 		// For text answers like short answer and long text
-		textAnswers() {
-			const textAnswers = []
+		answers() {
+			const answersModels = []
 
 			// Also record 'No response'
 			let noResponseCount = 0
@@ -168,15 +181,26 @@ export default {
 
 				// Add text answers
 				answers.forEach(answer => {
-					textAnswers.push(answer.text)
+					if (answer.fileId) {
+						answersModels.push({
+							id: answer.id,
+							text: answer.text,
+							url: generateUrl('/f/{fileId}', { fileId: answer.fileId }),
+						})
+					} else {
+						answersModels.push({
+							id: answer.id,
+							text: answer.text,
+						})
+					}
 				})
 			})
 
 			// Calculate no response percentage
 			const noResponsePercentage = Math.round((100 * noResponseCount) / this.submissions.length)
-			textAnswers.unshift(noResponseCount + ' (' + noResponsePercentage + '%): ' + t('forms', 'No response'))
+			answersModels.unshift({ id: 0, text: noResponseCount + ' (' + noResponsePercentage + '%): ' + t('forms', 'No response') })
 
-			return textAnswers
+			return answersModels
 		},
 	},
 }
@@ -211,6 +235,12 @@ export default {
 			&:first-child {
 				font-weight: bold;
 			}
+		}
+
+		&-icon {
+			display: inline-flex;
+			position: relative;
+			top: 4px;
 		}
 	}
 

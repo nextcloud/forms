@@ -33,9 +33,11 @@ use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFileMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\Files\File;
@@ -45,6 +47,7 @@ use OCP\IConfig;
 
 use OCP\IL10N;
 use OCP\ITempManager;
+use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -103,6 +106,8 @@ class SubmissionService {
 		IMailer $mailer,
 		private ITempManager $tempManager,
 		private FormsService $formsService,
+		private IUrlGenerator $urlGenerator,
+		private UploadedFileMapper $uploadedFileMapper,
 	) {
 		$this->formMapper = $formMapper;
 		$this->questionMapper = $questionMapper;
@@ -266,8 +271,11 @@ class SubmissionService {
 		$header[] = $this->l10n->t('User ID');
 		$header[] = $this->l10n->t('User display name');
 		$header[] = $this->l10n->t('Timestamp');
+		/** @var array<int, Question> $questionPerQuestionId */
+		$questionPerQuestionId = [];
 		foreach ($questions as $question) {
 			$header[] = $question->getText();
+			$questionPerQuestionId[$question->getId()] = $question;
 		}
 
 		// Init dataset
@@ -293,18 +301,30 @@ class SubmissionService {
 			$row[] = date_format(date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone)), 'c');
 
 			// Answers, make sure we keep the question order
-			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()), function (array $carry, Answer $answer) {
-				$questionId = $answer->getQuestionId();
+			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()),
+				function (array $carry, Answer $answer) use ($questionPerQuestionId) {
+					$questionId = $answer->getQuestionId();
 
-				// If key exists, insert separator
-				if (array_key_exists($questionId, $carry)) {
-					$carry[$questionId] .= '; ' . $answer->getText();
-				} else {
-					$carry[$questionId] = $answer->getText();
-				}
+					if (isset($questionPerQuestionId[$questionId]) &&
+						$questionPerQuestionId[$questionId]->getType() === Constants::ANSWER_TYPE_FILE) {
+						if (array_key_exists($questionId, $carry)) {
+							$carry[$questionId]['label'] .= "; \n" . $answer->getText();
+						} else {
+							$carry[$questionId] = [
+								'label' => $answer->getText(),
+								'url' => $this->urlGenerator->linkToRouteAbsolute('files.View.showFile', ['fileid' => $answer->getFileId()])
+							];
+						}
+					} else {
+						if (array_key_exists($questionId, $carry)) {
+							$carry[$questionId] .= '; ' . $answer->getText();
+						} else {
+							$carry[$questionId] = $answer->getText();
+						}
+					}
 
-				return $carry;
-			}, []);
+					return $carry;
+				}, []);
 
 			foreach ($questions as $question) {
 				$row[] = $answers[$question->getId()] ?? null;
@@ -318,7 +338,7 @@ class SubmissionService {
 
 	/**
 	 * @param array<int, string> $header
-	 * @param array<int, array<int, string>> $data
+	 * @param array<int, array<int, string>|non-empty-list<array{label: string, url: string}>> $data
 	 */
 	private function exportData(array $header, array $data, string $fileFormat, ?File $file = null): string {
 		if ($file && $file->getContent()) {
@@ -333,9 +353,23 @@ class SubmissionService {
 		foreach ($header as $columnIndex => $value) {
 			$activeWorksheet->setCellValue([$columnIndex + 1, 1], $value);
 		}
-		foreach ($data as $rowIndex => $row) {
-			foreach ($row as $columnIndex => $value) {
-				$activeWorksheet->setCellValue([$columnIndex + 1, $rowIndex + 2], $value);
+		foreach ($data as $rowIndex => $rowData) {
+			foreach ($rowData as $columnIndex => $value) {
+				$column = $columnIndex + 1;
+				$row = $rowIndex + 2;
+
+				if (is_array($value)) {
+					$activeWorksheet->getCell([$column, $row])
+						->setValueExplicit($value['label'])
+						->getHyperlink()
+						->setUrl($value['url']);
+
+					$activeWorksheet->getStyle([$column, $row])
+						->getAlignment()
+						->setWrapText(true);
+				} else {
+					$activeWorksheet->setCellValue([$column, $row], $value);
+				}
 			}
 		}
 
@@ -353,9 +387,10 @@ class SubmissionService {
 	 * Validate all answers against the questions
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
-	 * @return boolean If the submission is valid
+	 * @param string $formOwnerId Owner of the form
+	 * @return boolean|string True for valid submission, false or error message for invalid
 	 */
-	public function validateSubmission(array $questions, array $answers): bool {
+	public function validateSubmission(array $questions, array $answers, string $formOwnerId): bool|string {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -364,13 +399,20 @@ class SubmissionService {
 			// Check if all required questions have an answer
 			if ($question['isRequired'] &&
 				(!$questionAnswered ||
-				!array_filter($answers[$questionId], 'strlen') ||
+				!array_filter($answers[$questionId], function (string|array $value): bool {
+					// file type
+					if (is_array($value)) {
+						return !empty($value['uploadedFileId']);
+					}
+
+					return $value !== '';
+				}) ||
 				(!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
 				return false;
 			}
 
-			// Perform further checks only for answered questions - otherwise early return
+			// Perform further checks only for answered questions
 			if (!$questionAnswered) {
 				continue;
 			}
@@ -385,8 +427,8 @@ class SubmissionService {
 					|| ($maxOptions > 0 && $answersCount > $maxOptions)) {
 					return false;
 				}
-			} elseif ($answersCount > 1) {
-				// Check if non multiple questions have not more than one answer
+			} elseif ($answersCount > 1 && $question['type'] !== Constants::ANSWER_TYPE_FILE) {
+				// Check if non-multiple questions have not more than one answer
 				return false;
 			}
 
@@ -412,6 +454,25 @@ class SubmissionService {
 			// Handle custom validation of short answers
 			if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
 				return false;
+			}
+
+			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+				$maxAllowedFilesCount = $question['extraSettings']['maxAllowedFilesCount'] ?? 0;
+				if ($maxAllowedFilesCount > 0 && count($answers[$questionId]) > $maxAllowedFilesCount) {
+					return sprintf('Too many files uploaded for question "%s". Maximum allowed: %d', $question['text'], $maxAllowedFilesCount);
+				}
+
+				foreach ($answers[$questionId] as $answer) {
+					$uploadedFile = $this->uploadedFileMapper->findByUploadedFileId($answer['uploadedFileId']);
+					if (!$uploadedFile) {
+						return sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']);
+					}
+
+					$nodes = $this->storage->getUserFolder($formOwnerId)->getById($uploadedFile->getFileId());
+					if (empty($nodes)) {
+						return sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']);
+					}
+				}
 			}
 		}
 

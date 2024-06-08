@@ -95,7 +95,8 @@
 					<NcActions :aria-label="t('forms', 'Options')"
 						force-name
 						:inline="isMobile ? 0 : 1"
-						@blur="isDownloadActionOpened = false">
+						@blur="isDownloadActionOpened = false"
+						@close="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
 							<template v-if="canEditForm && form.fileId">
 								<NcActionButton :href="fileUrl" type="tertiary-no-background">
