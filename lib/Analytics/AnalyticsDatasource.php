@@ -9,7 +9,7 @@
  * @author Marcel Scherello <analytics@scherello.de>
  */
 
-namespace OCA\Forms\Datasource;
+namespace OCA\Forms\Analytics;
 
 /** @psalm-suppress UndefinedClass */
 use OCA\Analytics\Datasource\IDatasource;
@@ -20,21 +20,15 @@ use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class AnalyticsDatasource implements IDatasource {
-	private LoggerInterface $logger;
-	private IL10N $l10n;
-	protected ?string $userId;
 
 	public function __construct(
-		IL10N                     $l10n,
-		LoggerInterface           $logger,
-		?string                   $userId,
-		private FormMapper        $formMapper,
-		private FormsService      $formsService,
-		private SubmissionService $submissionService
+		protected ?string $userId,
+		private IL10N $l10n,
+		private LoggerInterface $logger,
+		private FormMapper $formMapper,
+		private FormsService $formsService,
+		private SubmissionService $submissionService,
 	) {
-		$this->l10n = $l10n;
-		$this->logger = $logger;
-		$this->userId = $userId;
 	}
 
 	/**
