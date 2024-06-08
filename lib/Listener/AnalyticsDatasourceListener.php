@@ -18,7 +18,7 @@ use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 
 /**
- * @template-implements IEventListener<Event|DatasourceEvent>
+ * @template-implements IEventListener<DatasourceEvent>
  */
 class AnalyticsDatasourceListener implements IEventListener {
 	public function handle(Event $event): void {
