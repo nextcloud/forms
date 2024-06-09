@@ -3,9 +3,9 @@
     "Shared with you" : "Sinuga jagatud",
     "Select groups" : "Vali grupid",
     "Required" : "Kohustuslik",
+    "Delete" : "Kustuta",
     "Other" : "Muu",
     "Set expiration date" : "Määra aegumise kuupäev",
-    "Delete" : "Kustuta",
     "Group" : "Grupp",
     "Share link" : "Jaga link",
     "Add link" : "Lisa link",
@@ -23,8 +23,10 @@
     "Abort" : "Katkesta",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
+    "File" : "Fail",
     "Date" : "Kuupäev",
     "Time" : "Aeg",
+    "Presentation" : "Esitlus",
     "Phone number" : "Telefoninumber",
     "Email address" : "E-posti aadress"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

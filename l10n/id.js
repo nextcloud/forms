@@ -4,9 +4,9 @@ OC.L10N.register(
     "Copy" : "Salin",
     "Shared with you" : "Shared with you",
     "Select groups" : "Pilih grup",
+    "Delete" : "Hapus",
     "Other" : "Lainnya",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
-    "Delete" : "Hapus",
     "Group" : "Grup",
     "Share link" : "Bagikan tautan",
     "Add link" : "Tambah tautan",
@@ -30,6 +30,7 @@ OC.L10N.register(
     "Pick a date" : "Pilih tanggal",
     "Time" : "Waktu",
     "Pick a time" : "Pilih waktu",
+    "Image" : "Gambar",
     "Text" : "Teks",
     "Phone number" : "Nomor telefon",
     "Email address" : "Alamat surel"

@@ -5,9 +5,9 @@ OC.L10N.register(
     "Shared with you" : "Shared with you",
     "Select groups" : "Vel grupper",
     "Required" : "Nødvendig",
+    "Delete" : "Slett",
     "Other" : "Anna",
     "Set expiration date" : "Set utløpsdato",
-    "Delete" : "Slett",
     "Group" : "Gruppe",
     "Share link" : "Del lenkje",
     "Share" : "Del",
@@ -18,6 +18,7 @@ OC.L10N.register(
     "Sharing" : "Deling",
     "Settings" : "Instillingar",
     "Abort" : "Avbryt",
+    "File" : "Fil",
     "Date" : "Dato",
     "Time" : "Tid"
 },

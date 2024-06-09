@@ -1,8 +1,8 @@
 { "translations": {
     "Copy" : "Nɣel",
     "Results" : "Igmaḍ",
-    "Other" : "Wayeḍ",
     "Delete" : "Kkes",
+    "Other" : "Wayeḍ",
     "Group" : "Agraw",
     "Share link" : "Fren aseɣwen",
     "Copy to clipboard" : "Copier dans le presse-papiers",
@@ -12,6 +12,7 @@
     "Download" : "Sider",
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaṛen",
+    "File" : "Afaylu",
     "Phone number" : "Uṭṭun n tiliɣri",
     "Email address" : "Tansa imayl"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

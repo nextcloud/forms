@@ -2,9 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
+    "Delete" : "Obriši",
     "Other" : "Ostali",
     "Set expiration date" : "Postavite datum isteka",
-    "Delete" : "Obriši",
     "Group" : "Grupa",
     "Share link" : "Podijelite vezu",
     "Share" : "Podjeli",

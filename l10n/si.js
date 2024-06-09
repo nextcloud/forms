@@ -15,6 +15,7 @@ OC.L10N.register(
     "Cancel" : "අවලංගු",
     "Settings" : "සැකසුම්",
     "Abort" : "රෝධනය",
+    "File" : "ගොනුව",
     "Date" : "දිනය",
     "Time" : "වේලාව",
     "Phone number" : "දුරකථන අංකය"

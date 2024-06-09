@@ -3,9 +3,9 @@ OC.L10N.register(
     {
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
+    "Delete" : "நீக்குக",
     "Other" : "மற்றவை",
     "Set expiration date" : "காலாவதி தேதியை குறிப்பிடுக",
-    "Delete" : "நீக்குக",
     "Group" : "Group",
     "Share link" : "Share link",
     "Share" : "பகிர்வு",
@@ -14,6 +14,7 @@ OC.L10N.register(
     "Download" : "பதிவிறக்குக",
     "Cancel" : "ரத்து செய்",
     "Settings" : "அமைப்புகள்",
+    "File" : "File",
     "Date" : "Date"
 },
 "nplurals=2; plural=(n != 1);");

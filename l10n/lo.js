@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Copy" : "ສຳເນົາ",
     "Shared with you" : "ແບ່ງປັບກັບທ່ານ",
-    "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
     "Delete" : "ລຶບ",
+    "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
     "Group" : "ກຸ່ມ",
     "Share link" : "ແບ່ງປັນລິງ",
     "Internal link" : "ລີງພາຍໃນ",
@@ -14,6 +14,7 @@ OC.L10N.register(
     "Cancel" : "ຍົກເລີກ",
     "Sharing" : "ການແບ່ງປັນ",
     "Settings" : "ການຕັ້ງຄ່າ",
+    "File" : "ຟາຍ",
     "Date" : "ວັນທີ",
     "Phone number" : "ເບີໂທລະສັບ"
 },

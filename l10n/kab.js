@@ -3,8 +3,8 @@ OC.L10N.register(
     {
     "Copy" : "Nɣel",
     "Results" : "Igmaḍ",
-    "Other" : "Wayeḍ",
     "Delete" : "Kkes",
+    "Other" : "Wayeḍ",
     "Group" : "Agraw",
     "Share link" : "Fren aseɣwen",
     "Copy to clipboard" : "Copier dans le presse-papiers",
@@ -14,6 +14,7 @@ OC.L10N.register(
     "Download" : "Sider",
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaṛen",
+    "File" : "Afaylu",
     "Phone number" : "Uṭṭun n tiliɣri",
     "Email address" : "Tansa imayl"
 },
