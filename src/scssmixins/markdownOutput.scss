@@ -84,5 +84,49 @@
 				list-style-type: square;
 			}
 		}
+
+		.columns {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			column-gap: 2em;
+
+			img {
+				max-width: 100%;
+				height: auto;
+			}
+
+			.column-single {
+				flex: 1 1;
+				overflow: hidden;
+			}
+
+			.column-double {
+				flex: 2 1;
+				overflow: hidden;
+			}
+
+			.column-triple {
+				flex: 3 1;
+				overflow: hidden;
+			}
+
+			.column-quad {
+				flex: 4 1;
+				overflow: hidden;
+			}
+
+			@media (max-width: 512px) {
+				flex-direction: column;
+				column-gap: 0;
+
+				.column-single,
+				.column-double,
+				.column-triple,
+				.column-quad {
+					flex: 1 1 100%;
+				}
+			}
+		}
 	}
 }

@@ -25,6 +25,7 @@ import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import axios from '@nextcloud/axios'
 import MarkdownIt from 'markdown-it'
+import MarkdownItContainer from 'markdown-it-container'
 
 import CancelableRequest from '../utils/CancelableRequest.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
@@ -65,7 +66,12 @@ export default {
 			cancelFetchFullForm: () => {},
 
 			// markdown renderer for descriptions
-			markdownit: new MarkdownIt({ breaks: true }),
+			markdownit: new MarkdownIt({ breaks: true })
+				.use(MarkdownItContainer, 'columns', {})
+				.use(MarkdownItContainer, 'column-single', {})
+				.use(MarkdownItContainer, 'column-double', {})
+				.use(MarkdownItContainer, 'column-triple', {})
+				.use(MarkdownItContainer, 'column-quad', {}),
 		}
 	},
 
