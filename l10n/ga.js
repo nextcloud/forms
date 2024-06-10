@@ -8,6 +8,7 @@ OC.L10N.register(
     "Delete" : "Scrios",
     "Other" : "Eile",
     "Set expiration date" : "Socraigh dáta éaga",
+    "Permissions" : "Permissions",
     "Group" : "Grúpa",
     "Team" : "Foireann",
     "Share link" : "Comhroinn nasc",

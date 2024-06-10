@@ -19,6 +19,7 @@ OC.L10N.register(
     "Summary" : "Opsomming",
     "Settings" : "Instellings",
     "Submit" : "Dien in",
+    "File" : "Lêer",
     "Date" : "Datum",
     "Time" : "Tyd",
     "Text" : "Teks",
