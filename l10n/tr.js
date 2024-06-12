@@ -252,7 +252,7 @@ OC.L10N.register(
     "Image" : "Görsel",
     "Document" : "Belge",
     "Presentation" : "Sunum",
-    "Spreadsheet" : "Çalışma Sayfası",
+    "Spreadsheet" : "Çalışma sayfası",
     "Text" : "Metin",
     "Phone number" : "Telefon numarası",
     "The input is not a valid phone number" : "Yazılan telefon numarası geçersiz",
