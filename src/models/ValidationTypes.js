@@ -70,7 +70,8 @@ export default {
 		inputType: 'tel',
 		label: t('forms', 'Phone number'),
 		// Remove common separator symbols, like space or braces, and validate rest are pure numbers
-		validate: (input) => /^\+?[0-9]{3,}$/.test(input.replace(/[\s()-/x.]/ig, '')),
+		validate: (input) =>
+			/^\+?[0-9]{3,}$/.test(input.replace(/[\s()-/x.]/gi, '')),
 		errorMessage: t('forms', 'The input is not a valid phone number'),
 		createPlaceholder: t('forms', 'People can enter a telephone number'),
 		submitPlaceholder: t('forms', 'Enter a telephone number'),
@@ -116,7 +117,8 @@ export default {
 		icon: IconRegex,
 		inputType: 'text',
 		label: t('forms', 'Custom regular expression'),
-		validate: (input, { pattern, modifiers }) => (new RegExp(pattern, modifiers)).test(input),
+		validate: (input, { pattern, modifiers }) =>
+			new RegExp(pattern, modifiers).test(input),
 		errorMessage: t('forms', 'The input does not match the required pattern'),
 	},
 }

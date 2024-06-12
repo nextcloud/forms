@@ -35,5 +35,5 @@ export default new Vue({
 	el: '#content',
 	// eslint-disable-next-line vue/match-component-file-name
 	name: 'FormsSubmitRoot',
-	render: h => h(FormsSubmitRoot),
+	render: (h) => h(FormsSubmitRoot),
 })

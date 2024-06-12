@@ -64,22 +64,22 @@ export default {
 		 */
 		shareTypeToIcon(type) {
 			switch (type) {
-			case this.SHARE_TYPES.SHARE_TYPE_GUEST:
-			// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
-			// case this.SHARE_TYPES.SHARE_TYPE_USER:
-				return IconUserSvg
-			case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
-			case this.SHARE_TYPES.SHARE_TYPE_GROUP:
-				return IconGroupSvg
-			case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
-				return IconMailSvg
-			case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
-				return IconCircleSvg
-			case this.SHARE_TYPES.SHARE_TYPE_ROOM:
-				return IconChatSvg
+				case this.SHARE_TYPES.SHARE_TYPE_GUEST:
+					// case this.SHARE_TYPES.SHARE_TYPE_REMOTE:
+					// case this.SHARE_TYPES.SHARE_TYPE_USER:
+					return IconUserSvg
+				case this.SHARE_TYPES.SHARE_TYPE_REMOTE_GROUP:
+				case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+					return IconGroupSvg
+				case this.SHARE_TYPES.SHARE_TYPE_EMAIL:
+					return IconMailSvg
+				case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+					return IconCircleSvg
+				case this.SHARE_TYPES.SHARE_TYPE_ROOM:
+					return IconChatSvg
 
-			default:
-				return ''
+				default:
+					return ''
 			}
 		},
 	},

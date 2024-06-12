@@ -24,28 +24,32 @@
 
 <template>
 	<div class="sidebar-tabs__content">
-		<NcCheckboxRadioSwitch :checked="form.isAnonymous"
+		<NcCheckboxRadioSwitch
+			:checked="form.isAnonymous"
 			:disabled="formArchived"
 			type="switch"
 			@update:checked="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
 			{{ t('forms', 'Store responses anonymously') }}
 		</NcCheckboxRadioSwitch>
-		<NcCheckboxRadioSwitch v-tooltip="disableSubmitMultipleExplanation"
+		<NcCheckboxRadioSwitch
+			v-tooltip="disableSubmitMultipleExplanation"
 			:checked="submitMultiple"
 			:disabled="disableSubmitMultiple || formArchived"
 			type="switch"
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
-		<NcCheckboxRadioSwitch :checked="formExpires"
+		<NcCheckboxRadioSwitch
+			:checked="formExpires"
 			:disabled="formArchived"
 			type="switch"
 			@update:checked="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires && !formArchived" class="settings-div--indent">
-			<NcDateTimePicker id="expiresDatetimePicker"
+			<NcDateTimePicker
+				id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled-date="notBeforeToday"
 				:disabled-time="notBeforeNow"
@@ -56,13 +60,15 @@
 				:value="expirationDate"
 				type="datetime"
 				@change="onExpirationDateChange" />
-			<NcCheckboxRadioSwitch :checked="form.showExpiration"
+			<NcCheckboxRadioSwitch
+				:checked="form.showExpiration"
 				type="switch"
 				@update:checked="onShowExpirationChange">
 				{{ t('forms', 'Show expiration date on form') }}
 			</NcCheckboxRadioSwitch>
 		</div>
-		<NcCheckboxRadioSwitch :checked="formClosed"
+		<NcCheckboxRadioSwitch
+			:checked="formClosed"
 			:disabled="formArchived"
 			aria-describedby="forms-settings__close-form"
 			type="switch"
@@ -72,43 +78,69 @@
 		<p id="forms-settings__close-form" class="settings-hint">
 			{{ t('forms', 'Closed forms do not accept new submissions.') }}
 		</p>
-		<NcCheckboxRadioSwitch :checked="formArchived"
+		<NcCheckboxRadioSwitch
+			:checked="formArchived"
 			aria-describedby="forms-settings__archive-form"
 			type="switch"
 			@update:checked="onFormArchivedChange">
 			{{ t('forms', 'Archive form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__archive-form" class="settings-hint">
-			{{ t('forms', 'Archived forms do not accept new submissions and can not be modified.') }}
+			{{
+				t(
+					'forms',
+					'Archived forms do not accept new submissions and can not be modified.',
+				)
+			}}
 		</p>
-		<NcCheckboxRadioSwitch :checked="hasCustomSubmissionMessage"
+		<NcCheckboxRadioSwitch
+			:checked="hasCustomSubmissionMessage"
 			:disabled="formArchived"
 			type="switch"
 			@update:checked="onUpdateHasCustomSubmissionMessage">
 			{{ t('forms', 'Custom submission message') }}
 		</NcCheckboxRadioSwitch>
-		<div v-show="hasCustomSubmissionMessage"
+		<div
+			v-show="hasCustomSubmissionMessage"
 			class="settings-div--indent submission-message"
 			:tabindex="editMessage ? undefined : '0'"
 			@focus="editMessage = true">
-			<textarea v-if="!formArchived && (editMessage || !form.submissionMessage)"
-				v-click-outside="() => { editMessage = false }"
+			<textarea
+				v-if="!formArchived && (editMessage || !form.submissionMessage)"
+				v-click-outside="
+					() => {
+						editMessage = false
+					}
+				"
 				aria-describedby="forms-submission-message-description"
 				:aria-label="t('forms', 'Custom submission message')"
 				:value="form.submissionMessage"
 				:maxlength="maxStringLengths.submissionMessage"
-				:placeholder="t('forms', 'Message to show after a user submitted the form (formatting using Markdown is supported)')"
+				:placeholder="
+					t(
+						'forms',
+						'Message to show after a user submitted the form (formatting using Markdown is supported)',
+					)
+				"
 				class="submission-message__input"
 				@blur="editMessage = false"
 				@change="onSubmissionMessageChange" />
 			<!-- eslint-disable vue/no-v-html -->
-			<div v-else
+			<div
+				v-else
 				:aria-label="t('forms', 'Custom submission message')"
 				class="submission-message__output"
 				v-html="submissionMessageHTML" />
 			<!-- eslint-enable vue/no-v-html -->
-			<div id="forms-submission-message-description" class="submission-message__description">
-				{{ t('forms', 'Message to show after a user submitted the form. Please note that the message will not be translated!') }}
+			<div
+				id="forms-submission-message-description"
+				class="submission-message__description">
+				{{
+					t(
+						'forms',
+						'Message to show after a user submitted the form. Please note that the message will not be translated!',
+					)
+				}}
 			</div>
 		</div>
 
@@ -166,25 +198,37 @@ export default {
 		 * If the form has a custom submission message or the user wants to add one (settings switch)
 		 */
 		hasCustomSubmissionMessage() {
-			return this.form?.submissionMessage !== undefined && this.form?.submissionMessage !== null
+			return (
+				this.form?.submissionMessage !== undefined &&
+				this.form?.submissionMessage !== null
+			)
 		},
 
 		/**
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
 		disableSubmitMultiple() {
-			return this.hasPublicLink || this.form.access.legacyLink || this.form.isAnonymous
+			return (
+				this.hasPublicLink ||
+				this.form.access.legacyLink ||
+				this.form.isAnonymous
+			)
 		},
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {
-				return t('forms', 'This can not be controlled, if the form has a public link or stores responses anonymously.')
+				return t(
+					'forms',
+					'This can not be controlled, if the form has a public link or stores responses anonymously.',
+				)
 			}
 			return ''
 		},
 		hasPublicLink() {
-			return this.form.shares
-				.filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
-				.length !== 0
+			return (
+				this.form.shares.filter(
+					(share) => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK,
+				).length !== 0
+			)
 		},
 
 		// If disabled, submitMultiple will be casted to true
@@ -232,7 +276,11 @@ export default {
 		},
 		onFormExpiresChange(checked) {
 			if (checked) {
-				this.$emit('update:formProp', 'expires', moment().add(1, 'hour').unix()) // Expires in one hour.
+				this.$emit(
+					'update:formProp',
+					'expires',
+					moment().add(1, 'hour').unix(),
+				) // Expires in one hour.
 			} else {
 				this.$emit('update:formProp', 'expires', 0)
 			}
@@ -247,15 +295,27 @@ export default {
 		 * @param {Date} datetime the expiration Date
 		 */
 		onExpirationDateChange(datetime) {
-			this.$emit('update:formProp', 'expires', parseInt(moment(datetime).format('X')))
+			this.$emit(
+				'update:formProp',
+				'expires',
+				parseInt(moment(datetime).format('X')),
+			)
 		},
 
 		onFormClosedChange(isClosed) {
-			this.$emit('update:formProp', 'state', isClosed ? FormState.FormClosed : FormState.FormActive)
+			this.$emit(
+				'update:formProp',
+				'state',
+				isClosed ? FormState.FormClosed : FormState.FormActive,
+			)
 		},
 
 		onFormArchivedChange(isArchived) {
-			this.$emit('update:formProp', 'state', isArchived ? FormState.FormArchived : FormState.FormClosed)
+			this.$emit(
+				'update:formProp',
+				'state',
+				isArchived ? FormState.FormArchived : FormState.FormClosed,
+			)
 		},
 
 		onSubmissionMessageChange({ target }) {
@@ -347,7 +407,8 @@ export default {
 		font-size: 13px;
 	}
 
-	&__input, &__output {
+	&__input,
+	&__output {
 		width: 100%;
 		min-height: 100px;
 		line-height: 24px;

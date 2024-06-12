@@ -32,14 +32,11 @@ describe('Create empty form', () => {
 			.should('exist')
 			.and('be.visible')
 
-		cy.contains('button', 'Create a form')
-			.should('be.visible')
+		cy.contains('button', 'Create a form').should('be.visible')
 	})
 
 	it('can use button to create new form', () => {
-		cy.contains('button', 'Create a form')
-			.first()
-			.click()
+		cy.contains('button', 'Create a form').first().click()
 
 		cy.url().should('match', /apps\/forms\/.+/)
 
@@ -48,9 +45,7 @@ describe('Create empty form', () => {
 	})
 
 	it('can use app navigation to create new form', () => {
-		cy.get('nav').contains('button', 'New form')
-			.first()
-			.click()
+		cy.get('nav').contains('button', 'New form').first().click()
 
 		cy.url().should('match', /apps\/forms\/.+/)
 
@@ -59,23 +54,17 @@ describe('Create empty form', () => {
 	})
 
 	it('Updates the form title in the navigation', () => {
-		cy.get('nav').contains('button', 'New form')
-			.first()
-			.click()
+		cy.get('nav').contains('button', 'New form').first().click()
 
 		cy.url().then((url) => {
 			expect(url).to.match(/apps\/forms\/.+/)
 			const formId = url.match(/apps\/forms\/([^/?]+)/)[1]
 
-			cy.get(`nav a[href*="${formId}"]`)
-				.should('contain', 'New form')
+			cy.get(`nav a[href*="${formId}"]`).should('contain', 'New form')
 
-			cy.get('h2 textarea')
-				.should('have.focus')
-				.type('Test form')
+			cy.get('h2 textarea').should('have.focus').type('Test form')
 
-			cy.get(`nav a[href*="${formId}"]`)
-				.should('contain', 'Test form')
+			cy.get(`nav a[href*="${formId}"]`).should('contain', 'Test form')
 		})
 	})
 })

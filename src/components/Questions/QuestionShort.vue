@@ -21,13 +21,17 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<div class="question__content">
-			<input ref="input"
-				:aria-label="t('forms', 'A short answer for the question “{text}”', { text })"
+			<input
+				ref="input"
+				:aria-label="
+					t('forms', 'A short answer for the question “{text}”', { text })
+				"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:name="name || undefined"
@@ -40,10 +44,15 @@
 				:type="validationObject.inputType"
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
 				@input="onInput"
-				@keydown.enter.exact.prevent="onKeydownEnter">
-			<NcActions v-if="!readOnly"
+				@keydown.enter.exact.prevent="onKeydownEnter" />
+			<NcActions
+				v-if="!readOnly"
 				:id="validationTypeMenuId"
-				:aria-label="t('forms', 'Input types (currently: {type})', { type: validationObject.label })"
+				:aria-label="
+					t('forms', 'Input types (currently: {type})', {
+						type: validationObject.label,
+					})
+				"
 				:container="`#${validationTypeMenuId}`"
 				:open.sync="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
@@ -51,14 +60,18 @@
 				<template #icon>
 					<component :is="validationObject.icon" :size="20" />
 				</template>
-				<NcActionRadio v-for="(validationTypeObject, validationTypeName) in validationTypes"
+				<NcActionRadio
+					v-for="(
+						validationTypeObject, validationTypeName
+					) in validationTypes"
 					:key="validationTypeName"
 					:checked="validationType === validationTypeName"
 					:name="validationTypeName"
 					@update:checked="onChangeValidationType(validationTypeName)">
 					{{ validationTypeObject.label }}
 				</NcActionRadio>
-				<NcActionInput v-if="validationType === 'regex'"
+				<NcActionInput
+					v-if="validationType === 'regex'"
 					ref="regexInput"
 					:label="t('forms', 'Regular expression for input validation')"
 					:value="validationRegex"
@@ -107,9 +120,15 @@ export default {
 	computed: {
 		submissionInputPlaceholder() {
 			if (!this.readOnly) {
-				return this.validationObject.createPlaceholder || this.answerType.createPlaceholder
+				return (
+					this.validationObject.createPlaceholder ||
+					this.answerType.createPlaceholder
+				)
 			}
-			return this.validationObject.submitPlaceholder || this.answerType.submitPlaceholder
+			return (
+				this.validationObject.submitPlaceholder ||
+				this.answerType.submitPlaceholder
+			)
 		},
 		/**
 		 * Current user input validation type
@@ -151,7 +170,13 @@ export default {
 				// Then check native browser validation (might be better then our)
 				// If the browsers validation succeeds either the browser does not implement a validation
 				// or it is valid, so we double check by running our custom validation.
-				if (!input.checkValidity() || !this.validationObject.validate(value, splitRegex(this.validationRegex))) {
+				if (
+					!input.checkValidity() ||
+					!this.validationObject.validate(
+						value,
+						splitRegex(this.validationRegex),
+					)
+				) {
 					input.setCustomValidity(this.validationObject.errorMessage)
 				}
 			}
@@ -167,11 +192,17 @@ export default {
 		onChangeValidationType(validationType) {
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
-				this.onExtraSettingsChange({ validationType, validationRegex: this.validationRegex })
+				this.onExtraSettingsChange({
+					validationType,
+					validationRegex: this.validationRegex,
+				})
 			} else {
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
 				this.isValidationTypeMenuOpen = false
-				this.onExtraSettingsChange({ validationType: validationType === 'text' ? undefined : validationType })
+				this.onExtraSettingsChange({
+					validationType:
+						validationType === 'text' ? undefined : validationType,
+				})
 			}
 		},
 
@@ -237,6 +268,6 @@ export default {
 
 :deep(input:invalid) {
 	// nextcloud/server#36548
-	border-color: var(--color-error)!important;
+	border-color: var(--color-error) !important;
 }
 </style>

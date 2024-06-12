@@ -3,6 +3,6 @@
 		"allowJs": true,
 		"target": "ESNext",
 		"module": "ES2020",
-		"moduleResolution": "Bundler",
+		"moduleResolution": "Bundler"
 	}
 }

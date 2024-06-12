@@ -31,7 +31,6 @@ import Question from '../components/Questions/Question.vue'
 export default {
 	inheritAttrs: false,
 	props: {
-
 		/**
 		 * Question-Id
 		 */
@@ -236,7 +235,7 @@ export default {
 		 *
 		 * @param {string} text the title
 		 */
-		onTitleChange: debounce(function(text) {
+		onTitleChange: debounce(function (text) {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
 		}, 200),
@@ -245,7 +244,7 @@ export default {
 		 *
 		 * @param {string} description the description
 		 */
-		onDescriptionChange: debounce(function(description) {
+		onDescriptionChange: debounce(function (description) {
 			this.$emit('update:description', description)
 			this.saveQuestionProperty('description', description)
 		}, 200),
@@ -255,7 +254,7 @@ export default {
 		 *
 		 * @param {boolean} isRequiredValue new isRequired Value
 		 */
-		onRequiredChange: debounce(function(isRequiredValue) {
+		onRequiredChange: debounce(function (isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
 			this.saveQuestionProperty('isRequired', isRequiredValue)
 		}, 200),
@@ -267,7 +266,7 @@ export default {
 		 *
 		 * @param {object} newSettings changed settings
 		 */
-		onExtraSettingsChange: debounce(function(newSettings) {
+		onExtraSettingsChange: debounce(function (newSettings) {
 			const newExtraSettings = { ...this.extraSettings, ...newSettings }
 			this.$emit('update:extraSettings', newExtraSettings)
 			this.saveQuestionProperty('extraSettings', newExtraSettings)
@@ -278,7 +277,7 @@ export default {
 		 *
 		 * @param {string} name The new technical name of the input
 		 */
-		onNameChange: debounce(function(name) {
+		onNameChange: debounce(function (name) {
 			this.$emit('update:name', name)
 			this.saveQuestionProperty('name', name)
 		}, 200),
@@ -331,7 +330,9 @@ export default {
 		focus() {
 			this.$el.scrollIntoView({ behavior: 'smooth' })
 			this.$nextTick(() => {
-				const title = this.$el.querySelector('.question__header__title__text__input')
+				const title = this.$el.querySelector(
+					'.question__header__title__text__input',
+				)
 				if (title) {
 					title.focus()
 				}
@@ -348,8 +349,11 @@ export default {
 			const shuffled = [...input]
 			let idx = shuffled.length
 			while (--idx > 0) {
-				const rndIdx = Math.floor(Math.random() * (idx + 1));
-				[shuffled[rndIdx], shuffled[idx]] = [shuffled[idx], shuffled[rndIdx]]
+				const rndIdx = Math.floor(Math.random() * (idx + 1))
+				;[shuffled[rndIdx], shuffled[idx]] = [
+					shuffled[idx],
+					shuffled[rndIdx],
+				]
 			}
 			return shuffled
 		},
@@ -357,12 +361,15 @@ export default {
 		async saveQuestionProperty(key, value) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/question/update'), {
-					id: this.id,
-					keyValuePairs: {
-						[key]: value,
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v2.4/question/update'),
+					{
+						id: this.id,
+						keyValuePairs: {
+							[key]: value,
+						},
 					},
-				})
+				)
 				emit('forms:last-updated:set', this.formId)
 			} catch (error) {
 				logger.error('Error while saving question', { error })

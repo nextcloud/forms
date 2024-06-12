@@ -43,5 +43,5 @@ export default new Vue({
 	// eslint-disable-next-line vue/match-component-file-name
 	name: 'FormsRoot',
 	router,
-	render: h => h(Forms),
+	render: (h) => h(Forms),
 })

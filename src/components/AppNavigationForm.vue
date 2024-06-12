@@ -21,7 +21,8 @@
   -->
 
 <template>
-	<NcListItem ref="navigationItem"
+	<NcListItem
+		ref="navigationItem"
 		:active="isActive"
 		:actions-aria-label="t('forms', 'Form actions')"
 		:counter-number="form.submissionCount"
@@ -30,7 +31,7 @@
 		:name="formTitle"
 		:to="{
 			name: routerTarget,
-			params: { hash: form.hash }
+			params: { hash: form.hash },
 		}"
 		@click="mobileCloseNavigation">
 		<template #icon>
@@ -42,7 +43,8 @@
 			{{ formSubtitle }}
 		</template>
 		<template v-if="!loading && !readOnly" #actions>
-			<NcActionRouter v-if="!isArchived"
+			<NcActionRouter
+				v-if="!isArchived"
 				:close-after-click="true"
 				:exact="true"
 				:to="{ name: 'edit', params: { hash: form.hash } }"
@@ -52,7 +54,8 @@
 				</template>
 				{{ t('forms', 'Edit form') }}
 			</NcActionRouter>
-			<NcActionButton v-if="!isArchived"
+			<NcActionButton
+				v-if="!isArchived"
 				:close-after-click="true"
 				@click="onShareForm">
 				<template #icon>
@@ -60,7 +63,8 @@
 				</template>
 				{{ t('forms', 'Share form') }}
 			</NcActionButton>
-			<NcActionRouter :close-after-click="true"
+			<NcActionRouter
+				:close-after-click="true"
 				:exact="true"
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
@@ -69,29 +73,47 @@
 				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
-			<NcActionButton v-if="canEdit && !isArchived" :close-after-click="true" @click="onCloneForm">
+			<NcActionButton
+				v-if="canEdit && !isArchived"
+				:close-after-click="true"
+				@click="onCloneForm">
 				<template #icon>
 					<IconContentCopy :size="20" />
 				</template>
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
 			<NcActionSeparator v-if="canEdit" />
-			<NcActionButton v-if="canEdit" :close-after-click="true" @click="onToggleArchive">
+			<NcActionButton
+				v-if="canEdit"
+				:close-after-click="true"
+				@click="onToggleArchive">
 				<template #icon>
 					<IconArchiveOff v-if="isArchived" :size="20" />
 					<IconArchive v-else :size="20" />
 				</template>
-				{{ isArchived ? t('forms', 'Unarchive form') : t('forms', 'Archive form') }}
+				{{
+					isArchived
+						? t('forms', 'Unarchive form')
+						: t('forms', 'Archive form')
+				}}
 			</NcActionButton>
-			<NcActionButton v-if="canEdit" :close-after-click="true" @click="showDeleteDialog = true">
+			<NcActionButton
+				v-if="canEdit"
+				:close-after-click="true"
+				@click="showDeleteDialog = true">
 				<template #icon>
 					<IconDelete :size="20" />
 				</template>
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
-			<NcDialog :open.sync="showDeleteDialog"
+			<NcDialog
+				:open.sync="showDeleteDialog"
 				:name="t('forms', 'Delete form')"
-				:message="t('forms', 'Are you sure you want to delete {title}?', { title: formTitle })"
+				:message="
+					t('forms', 'Are you sure you want to delete {title}?', {
+						title: formTitle,
+					})
+				"
 				:buttons="buttons" />
 		</template>
 	</NcListItem>
@@ -173,7 +195,9 @@ export default {
 					label: t('forms', 'Delete form'),
 					icon: IconDeleteSvg,
 					type: 'error',
-					callback: () => { this.onDeleteForm() },
+					callback: () => {
+						this.onDeleteForm()
+					},
 				},
 			],
 		}
@@ -181,7 +205,9 @@ export default {
 
 	computed: {
 		canEdit() {
-			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+			return this.form.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
+			)
 		},
 
 		/**
@@ -274,13 +300,22 @@ export default {
 		async onToggleArchive() {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/form/update'), {
-					id: this.form.id,
-					keyValuePairs: {
-						state: this.isArchived ? FormState.FormClosed : FormState.FormArchived,
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v2.4/form/update'),
+					{
+						id: this.form.id,
+						keyValuePairs: {
+							state: this.isArchived
+								? FormState.FormClosed
+								: FormState.FormArchived,
+						},
 					},
-				})
-				this.$set(this.form, 'state', this.isArchived ? FormState.FormClosed : FormState.FormArchived)
+				)
+				this.$set(
+					this.form,
+					'state',
+					this.isArchived ? FormState.FormClosed : FormState.FormArchived,
+				)
 			} catch (error) {
 				logger.error('Error changing archived state of form', { error })
 				showError(t('forms', 'Error changing archived state of form'))
@@ -290,11 +325,21 @@ export default {
 		async onDeleteForm() {
 			this.loading = true
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id: this.form.id }))
+				await axios.delete(
+					generateOcsUrl('apps/forms/api/v2.4/form/{id}', {
+						id: this.form.id,
+					}),
+				)
 				this.$emit('delete', this.form.id)
 			} catch (error) {
-				logger.error(`Error while deleting ${this.formTitle}`, { error: error.response })
-				showError(t('forms', 'Error while deleting {title}', { title: this.formTitle }))
+				logger.error(`Error while deleting ${this.formTitle}`, {
+					error: error.response,
+				})
+				showError(
+					t('forms', 'Error while deleting {title}', {
+						title: this.formTitle,
+					}),
+				)
 			} finally {
 				this.loading = false
 			}

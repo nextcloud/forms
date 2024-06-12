@@ -23,12 +23,15 @@
 
 <template>
 	<div class="sidebar-tabs__content">
-		<SharingSearchDiv :current-shares="form.shares"
+		<SharingSearchDiv
+			:current-shares="form.shares"
 			:show-loading="isLoading"
 			@add-share="addShare" />
 
 		<!-- Public Link -->
-		<div v-if="!hasPublicLink && appConfig.allowPublicLink" class="share-div share-div--link">
+		<div
+			v-if="!hasPublicLink && appConfig.allowPublicLink"
+			class="share-div share-div--link">
 			<div class="share-div__avatar">
 				<IconLinkVariant :size="20" />
 			</div>
@@ -43,24 +46,33 @@
 			</NcActions>
 		</div>
 		<TransitionGroup v-else tag="div">
-			<div v-for="share in publicLinkShares"
+			<div
+				v-for="share in publicLinkShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
-				:set="void(isEmbeddable = isEmbeddingAllowed(share))"
+				:set="void (isEmbeddable = isEmbeddingAllowed(share))"
 				class="share-div share-div--link"
 				:class="{ 'share-div--embeddable': isEmbeddingAllowed(share) }">
 				<div class="share-div__avatar">
 					<IconLinkBoxVariantOutline v-if="isEmbeddable" :size="20" />
 					<IconLinkVariant v-else :size="20" />
 				</div>
-				<span class="share-div__desc">{{ isEmbeddable ? t('forms', 'Embeddable link') : t('forms', 'Share link') }}</span>
+				<span class="share-div__desc">{{
+					isEmbeddable
+						? t('forms', 'Embeddable link')
+						: t('forms', 'Share link')
+				}}</span>
 				<NcActions :inline="1">
-					<NcActionLink :href="getPublicShareLink(share)" @click.prevent="copyLink($event, getPublicShareLink(share))">
+					<NcActionLink
+						:href="getPublicShareLink(share)"
+						@click.prevent="copyLink($event, getPublicShareLink(share))">
 						<template #icon>
 							<IconCopyAll :size="20" />
 						</template>
 						{{ t('forms', 'Copy to clipboard') }}
 					</NcActionLink>
-					<NcActionButton v-if="isEmbeddable" @click="copyEmbeddingCode(share)">
+					<NcActionButton
+						v-if="isEmbeddable"
+						@click="copyEmbeddingCode(share)">
 						<template #icon>
 							<IconCodeBrackets :size="20" />
 						</template>
@@ -79,7 +91,8 @@
 						</template>
 						{{ t('forms', 'Remove link') }}
 					</NcActionButton>
-					<NcActionButton v-if="appConfig.allowPublicLink"
+					<NcActionButton
+						v-if="appConfig.allowPublicLink"
 						:close-after-click="true"
 						@click="addPublicLink">
 						<template #icon>
@@ -98,9 +111,17 @@
 			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Legacy Link') }}</span>
-				<span>{{ t('forms', 'Form still supports old sharing-link.') }}</span>
+				<span>{{
+					t('forms', 'Form still supports old sharing-link.')
+				}}</span>
 			</div>
-			<div v-tooltip="t('forms', 'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.')"
+			<div
+				v-tooltip="
+					t(
+						'forms',
+						'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.',
+					)
+				"
 				class="share-div__legacy-warning">
 				<IconAlertCircleOutline :size="20" />
 			</div>
@@ -121,10 +142,19 @@
 			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Internal link') }}</span>
-				<span>{{ t('forms', 'Only works for logged in accounts with access rights') }}</span>
+				<span>{{
+					t(
+						'forms',
+						'Only works for logged in accounts with access rights',
+					)
+				}}</span>
 			</div>
 			<NcActions>
-				<NcActionLink :href="getInternalShareLink(form.hash)" @click.prevent="copyLink($event, getInternalShareLink(form.hash))">
+				<NcActionLink
+					:href="getInternalShareLink(form.hash)"
+					@click.prevent="
+						copyLink($event, getInternalShareLink(form.hash))
+					">
 					<template #icon>
 						<IconCopyAll :size="20" />
 					</template>
@@ -142,19 +172,23 @@
 				<label for="share-switch__permit-all" class="share-div__desc">
 					{{ t('forms', 'Permit access to all logged in accounts') }}
 				</label>
-				<NcCheckboxRadioSwitch id="share-switch__permit-all"
+				<NcCheckboxRadioSwitch
+					id="share-switch__permit-all"
 					:checked="form.access.permitAllUsers"
 					type="switch"
 					@update:checked="onPermitAllUsersChange" />
 			</div>
-			<div v-if="form.access.permitAllUsers" class="share-div share-div--indent">
+			<div
+				v-if="form.access.permitAllUsers"
+				class="share-div share-div--indent">
 				<div class="share-div__avatar">
 					<FormsIcon :size="16" />
 				</div>
 				<label for="share-switch__show-to-all" class="share-div__desc">
 					{{ t('forms', 'Show to all accounts on sidebar') }}
 				</label>
-				<NcCheckboxRadioSwitch id="share-switch__show-to-all"
+				<NcCheckboxRadioSwitch
+					id="share-switch__show-to-all"
 					:checked="form.access.showToAllUsers"
 					type="switch"
 					@update:checked="onShowToAllUsersChange" />
@@ -163,7 +197,8 @@
 
 		<!-- Single shares -->
 		<TransitionGroup tag="ul">
-			<SharingShareDiv v-for="share in sortedShares"
+			<SharingShareDiv
+				v-for="share in sortedShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
 				@remove-share="removeShare"
@@ -239,15 +274,21 @@ export default {
 		sortedShares() {
 			// Remove Link-Shares, which are handled separately, then sort
 			return this.form.shares
-				.filter(share => share.shareType !== this.SHARE_TYPES.SHARE_TYPE_LINK)
+				.filter(
+					(share) => share.shareType !== this.SHARE_TYPES.SHARE_TYPE_LINK,
+				)
 				.sort(this.sortByTypeAndDisplayname)
 		},
 		hasPublicLink() {
 			return this.publicLinkShares.length !== 0
 		},
 		publicLinkShares() {
-			const shares = this.form.shares.filter(share => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK)
-			shares.sort((a, b) => this.isEmbeddingAllowed(a) ? 1 : (this.isEmbeddingAllowed(b) ? -1 : 0))
+			const shares = this.form.shares.filter(
+				(share) => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK,
+			)
+			shares.sort((a, b) =>
+				this.isEmbeddingAllowed(a) ? 1 : this.isEmbeddingAllowed(b) ? -1 : 0,
+			)
 			return shares
 		},
 	},
@@ -262,18 +303,23 @@ export default {
 			this.isLoading = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/share'), {
-					formId: this.form.id,
-					shareType: newShare.shareType,
-					shareWith: newShare.shareWith,
-				})
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/share'),
+					{
+						formId: this.form.id,
+						shareType: newShare.shareType,
+						shareWith: newShare.shareWith,
+					},
+				)
 				const share = OcsResponse2Data(response)
 
 				// Add new share
 				this.$emit('add-share', share)
-
 			} catch (error) {
-				logger.error('Error while adding new share', { error, share: newShare })
+				logger.error('Error while adding new share', {
+					error,
+					share: newShare,
+				})
 				showError(t('forms', 'There was an error while adding the share'))
 			} finally {
 				this.isLoading = false
@@ -284,15 +330,17 @@ export default {
 			this.isLoading = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/share'), {
-					formId: this.form.id,
-					shareType: this.SHARE_TYPES.SHARE_TYPE_LINK,
-				})
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/share'),
+					{
+						formId: this.form.id,
+						shareType: this.SHARE_TYPES.SHARE_TYPE_LINK,
+					},
+				)
 				const share = OcsResponse2Data(response)
 
 				// Add new share
 				this.$emit('add-share', share)
-
 			} catch (error) {
 				logger.error('Error adding public link', { error })
 				showError(t('forms', 'There was an error while adding the link'))
@@ -306,7 +354,13 @@ export default {
 		 * @param {{ permissions: string[] }} share The public link share to make embeddable
 		 */
 		makeEmbeddable(share) {
-			this.updateShare({ ...share, permissions: [...share.permissions, this.PERMISSION_TYPES.PERMISSION_EMBED] })
+			this.updateShare({
+				...share,
+				permissions: [
+					...share.permissions,
+					this.PERMISSION_TYPES.PERMISSION_EMBED,
+				],
+			})
 		},
 
 		/**
@@ -318,19 +372,26 @@ export default {
 			this.isLoading = true
 
 			try {
-				const response = await axios.patch(generateOcsUrl('apps/forms/api/v2.4/share/update'), {
-					id: updatedShare.id,
-					keyValuePairs: {
-						permissions: updatedShare.permissions,
+				const response = await axios.patch(
+					generateOcsUrl('apps/forms/api/v2.4/share/update'),
+					{
+						id: updatedShare.id,
+						keyValuePairs: {
+							permissions: updatedShare.permissions,
+						},
 					},
+				)
+				const share = Object.assign(updatedShare, {
+					id: OcsResponse2Data(response),
 				})
-				const share = Object.assign(updatedShare, { id: OcsResponse2Data(response) })
 
 				// Add new share
 				this.$emit('update-share', share)
-
 			} catch (error) {
-				logger.error('Error while updating share', { error, share: updatedShare })
+				logger.error('Error while updating share', {
+					error,
+					share: updatedShare,
+				})
 				showError(t('forms', 'There was an error while updating the share'))
 			} finally {
 				this.isLoading = false
@@ -346,9 +407,11 @@ export default {
 			this.isLoading = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/share/{id}', {
-					id: share.id,
-				}))
+				await axios.delete(
+					generateOcsUrl('apps/forms/api/v2.4/share/{id}', {
+						id: share.id,
+					}),
+				)
 				this.$emit('remove-share', share)
 			} catch (error) {
 				logger.error('Error while removing share', { error, share })
@@ -451,7 +514,7 @@ export default {
 	&__legacy-warning {
 		background-size: 18px;
 		margin-inline-end: 4px;
-		color: var(--color-error)
+		color: var(--color-error);
 	}
 }
 </style>

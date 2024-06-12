@@ -23,7 +23,8 @@
 <template>
 	<NcContent app-name="forms">
 		<NcAppContent class="forms-emptycontent">
-			<NcEmptyContent :name="currentModel.title"
+			<NcEmptyContent
+				:name="currentModel.title"
 				:description="currentModel.description">
 				<template #icon>
 					<Icon :is="currentModel.icon" :size="64" />
@@ -66,7 +67,10 @@ export default {
 				},
 				expired: {
 					title: t('forms', 'Form expired'),
-					description: t('forms', 'This form has expired and is no longer taking answers'),
+					description: t(
+						'forms',
+						'This form has expired and is no longer taking answers',
+					),
 					icon: IconCheck,
 				},
 			},

@@ -7,8 +7,7 @@
 	</span>
 </template>
 
-<script setup>
-</script>
+<script setup></script>
 
 <style scoped>
 .icon-overlay-wrapper {

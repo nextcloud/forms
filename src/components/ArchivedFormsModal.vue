@@ -21,13 +21,15 @@
   -->
 
 <template>
-	<NcDialog content-classes="archived-forms"
+	<NcDialog
+		content-classes="archived-forms"
 		:name="t('forms', 'Archived forms')"
 		:open="open"
 		size="normal"
 		@update:open="$emit('update:open', $event)">
 		<ul :aria-label="t('forms', 'Archived forms')">
-			<AppNavigationForm v-for="form, key in shownForms"
+			<AppNavigationForm
+				v-for="(form, key) in shownForms"
 				:key="key"
 				:form="form"
 				:read-only="false"

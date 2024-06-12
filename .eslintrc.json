@@ -3,11 +3,23 @@
 		"appName": true
 	},
 	"extends": [
-		"@nextcloud"
+		"@nextcloud",
+		"prettier" // < this needs to be the last one to override all previous
 	],
 	"rules": {
 		// We are using the @nextcloud/logger
 		"no-console": "error",
 		"import/no-unresolved": ["error", { "ignore": ["\\?raw"] }]
-	}
+	},
+	"overrides": [
+		{
+			"files": ["**/*.vue"],
+			"rules": {
+				"vue/first-attribute-linebreak": [
+					"error",
+					{ "multiline": "below", "singleline": "ignore" }
+				]
+			}
+		}
+	]
 }

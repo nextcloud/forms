@@ -37,8 +37,10 @@ export default {
 
 			query: '',
 			// TODO: have a global mixin for this, shared with server?
-			maxAutocompleteResults: parseInt(OC.config['sharing.maxAutocompleteResults'], 10) || 200,
-			minSearchStringLength: parseInt(OC.config['sharing.minSearchStringLength'], 10) || 0,
+			maxAutocompleteResults:
+				parseInt(OC.config['sharing.maxAutocompleteResults'], 10) || 200,
+			minSearchStringLength:
+				parseInt(OC.config['sharing.minSearchStringLength'], 10) || 0,
 			// Search Results
 			recommendations: [],
 			suggestions: [],
@@ -51,7 +53,11 @@ export default {
 		 * @return {boolean}
 		 */
 		isValidQuery() {
-			return this.query && this.query.trim() !== '' && this.query.length > this.minSearchStringLength
+			return (
+				this.query &&
+				this.query.trim() !== '' &&
+				this.query.length > this.minSearchStringLength
+			)
 		},
 		/**
 		 * Text when there is no Results to be shown
@@ -66,16 +72,16 @@ export default {
 		},
 	},
 	methods: {
-	/**
-	 * Search for suggestions
-	 *
-	 * @param {string} query The search query to search for
-	 */
+		/**
+		 * Search for suggestions
+		 *
+		 * @param {string} query The search query to search for
+		 */
 		async asyncSearch(query) {
-		// save query to check if valid
+			// save query to check if valid
 			this.query = query.trim()
 			if (this.isValidQuery) {
-			// already set loading to have proper ux feedback during debounce
+				// already set loading to have proper ux feedback during debounce
 				this.loading = true
 				await this.debounceGetSuggestions(query)
 			}
@@ -86,7 +92,7 @@ export default {
 		 *
 		 * @param {...*} args arguments to pass
 		 */
-		debounceGetSuggestions: debounce(function(...args) {
+		debounceGetSuggestions: debounce(function (...args) {
 			this.getSuggestions(...args)
 		}, 300),
 
@@ -99,18 +105,23 @@ export default {
 			this.loading = true
 
 			// Search for all used share-types, except public link.
-			const shareType = this.SHARE_TYPES_USED.filter(type => type !== this.SHARE_TYPES.SHARE_TYPE_LINK)
+			const shareType = this.SHARE_TYPES_USED.filter(
+				(type) => type !== this.SHARE_TYPES.SHARE_TYPE_LINK,
+			)
 
 			try {
-				const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees'), {
-					params: {
-						format: 'json',
-						itemType: 'file',
-						perPage: this.maxAutocompleteResults,
-						search: query,
-						shareType,
+				const request = await axios.get(
+					generateOcsUrl('apps/files_sharing/api/v1/sharees'),
+					{
+						params: {
+							format: 'json',
+							itemType: 'file',
+							perPage: this.maxAutocompleteResults,
+							search: query,
+							shareType,
+						},
 					},
-				})
+				)
 
 				const data = OcsResponse2Data(request)
 				const exact = data.exact
@@ -134,14 +145,19 @@ export default {
 			this.loading = true
 
 			try {
-				const request = await axios.get(generateOcsUrl('apps/files_sharing/api/v1/sharees_recommended'), {
-					params: {
-						format: 'json',
-						itemType: 'file',
+				const request = await axios.get(
+					generateOcsUrl('apps/files_sharing/api/v1/sharees_recommended'),
+					{
+						params: {
+							format: 'json',
+							itemType: 'file',
+						},
 					},
-				})
+				)
 
-				this.recommendations = this.formatSearchResults(OcsResponse2Data(request).exact)
+				this.recommendations = this.formatSearchResults(
+					OcsResponse2Data(request).exact,
+				)
 			} catch (error) {
 				logger.error('Fetching recommendations failed.', { error })
 			} finally {
@@ -163,10 +179,12 @@ export default {
 			// flatten array of arrays
 			const flatResults = Object.values(results).flat()
 
-			return this.filterUnwantedShares(flatResults)
-				.map(share => this.formatForMultiselect(share))
-				// sort by type so we can get user&groups first...
-				.sort((a, b) => a.shareType - b.shareType)
+			return (
+				this.filterUnwantedShares(flatResults)
+					.map((share) => this.formatForMultiselect(share))
+					// sort by type so we can get user&groups first...
+					.sort((a, b) => a.shareType - b.shareType)
+			)
 		},
 
 		/**
@@ -185,8 +203,10 @@ export default {
 
 				try {
 					// filter out current user
-					if (share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
-							&& share.value.shareWith === getCurrentUser().uid) {
+					if (
+						share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER &&
+						share.value.shareWith === getCurrentUser().uid
+					) {
 						return false
 					}
 
