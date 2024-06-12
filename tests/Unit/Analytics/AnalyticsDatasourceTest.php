@@ -24,6 +24,7 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Unit\Analytics;
 
+use OCA\Analytics\Datasource\IDatasource;
 use OCA\Forms\Analytics\AnalyticsDatasource;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\FormsService;
@@ -35,8 +36,6 @@ use Test\TestCase;
 
 class AnalyticsDatasourceTest extends TestCase {
 
-	private AnalyticsDatasource $dataSource;
-
 	private IL10N|MockObject $l10n;
 	private LoggerInterface|MockObject $logger;
 	private FormMapper|MockObject $formMapper;
@@ -45,13 +44,21 @@ class AnalyticsDatasourceTest extends TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
+
+		if (!\class_exists(IDatasource::class)) {
+			$this->markTestSkipped('The analytics app is not installed!');
+			return;
+		}
+
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->submissionService = $this->createMock(SubmissionService::class);
+	}
 
-		$this->dataSource = new AnalyticsDatasource(
+	protected function mockDatasource() {
+		return new AnalyticsDatasource(
 			null,
 			$this->l10n,
 			$this->logger,
@@ -66,11 +73,11 @@ class AnalyticsDatasourceTest extends TestCase {
 			->expects($this->any())
 			->method('t')
 			->willReturnCallback(fn (string $str) => $str);
-		$this->assertEquals('Nextcloud Forms', $this->dataSource->getName());
+		$this->assertEquals('Nextcloud Forms', $this->mockDatasource()->getName());
 	}
 
 	public function testGetId() {
-		$this->assertEquals(66, $this->dataSource->getId());
+		$this->assertEquals(66, $this->mockDatasource()->getId());
 	}
 
 	// TODO: Write tests for `getTemplate` and `readData`
