@@ -1,8 +1,9 @@
 {
+	"extends": "@vue/tsconfig",
 	"compilerOptions": {
 		"allowJs": true,
 		"target": "ESNext",
-		"module": "ES2020",
+		"module": "ESNext",
 		"moduleResolution": "Bundler"
 	}
 }
