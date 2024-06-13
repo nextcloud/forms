@@ -43,6 +43,6 @@
 	</issueHandlers>
 	<stubs>
 		<file name="tests/stubs/oc_hooks_emitter.php" />
-		<file name="tests/stubs/OCA-Analytics-IDatasource.php" />
+		<file name="tests/stubs/oca-analytics-idatasource.php" />
 	</stubs>
 </psalm>
