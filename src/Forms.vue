@@ -34,33 +34,45 @@
 					<IconPlus :size="20" decorative />
 				</template>
 			</NcAppNavigationNew>
-			<template #list>
-				<!-- Form-Owner-->
-				<NcAppNavigationCaption
-					v-if="ownedForms.length > 0"
-					:name="t('forms', 'Your Forms')" />
-				<AppNavigationForm
-					v-for="form in ownedForms"
-					:key="form.id"
-					:form="form"
-					:read-only="false"
-					@open-sharing="openSharing"
-					@mobile-close-navigation="mobileCloseNavigation"
-					@clone="onCloneForm"
-					@delete="onDeleteForm" />
 
-				<!-- Shared Forms-->
+			<!-- Form-Owner-->
+			<template v-if="ownedForms.length > 0">
 				<NcAppNavigationCaption
-					v-if="sharedForms.length > 0"
-					:name="t('forms', 'Shared with you')" />
-				<AppNavigationForm
-					v-for="form in sharedForms"
-					:key="form.id"
-					:form="form"
-					:read-only="true"
-					@open-sharing="openSharing"
-					@mobile-close-navigation="mobileCloseNavigation" />
+					is-heading
+					class="forms-navigation__list-heading"
+					heading-id="forms-navigation-your-forms"
+					:name="t('forms', 'Your forms')" />
+				<ul aria-labelledby="forms-navigation-your-forms">
+					<AppNavigationForm
+						v-for="form in ownedForms"
+						:key="form.id"
+						:form="form"
+						:read-only="false"
+						@open-sharing="openSharing"
+						@mobile-close-navigation="mobileCloseNavigation"
+						@clone="onCloneForm"
+						@delete="onDeleteForm" />
+				</ul>
 			</template>
+
+			<!-- Shared Forms-->
+			<template v-if="sharedForms.length > 0">
+				<NcAppNavigationCaption
+					is-heading
+					class="forms-navigation__list-heading"
+					heading-id="forms-navigation-shared-forms"
+					:name="t('forms', 'Shared with you')" />
+				<ul aria-labelledby="forms-navigation-shared-forms">
+					<AppNavigationForm
+						v-for="form in sharedForms"
+						:key="form.id"
+						:form="form"
+						:read-only="true"
+						@open-sharing="openSharing"
+						@mobile-close-navigation="mobileCloseNavigation" />
+				</ul>
+			</template>
+
 			<template #footer>
 				<div v-if="archivedForms.length > 0" class="forms-navigation-footer">
 					<NcButton
@@ -507,6 +519,16 @@ export default {
 	display: flex;
 	flex-direction: column;
 	padding: var(--app-navigation-padding);
+}
+
+// Fix the margin of the lists
+.forms-navigation__list-heading {
+	margin-block: calc(var(--default-grid-baseline) * 2) 0 !important;
+
+	:deep(h2) {
+		// Make the list more condensed
+		margin-block: 0;
+	}
 }
 
 .forms-emptycontent {
