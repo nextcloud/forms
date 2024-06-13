@@ -63,6 +63,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Copiar para área de transferência",
     "Copy embedding code" : "Copiar código embebido",
     "Share" : "Partilhar",
+    "Toggle settings" : "Configurações do Google",
     "View" : "Ver",
     "Edit" : "Editar",
     "Loading {title} …" : "A carregar {title} …",

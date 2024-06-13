@@ -125,6 +125,7 @@ OC.L10N.register(
     "This form is now owned by" : "Ця форма зараз належить",
     "An error occurred while transfering ownership" : "Виникла помилка під час передачі власності",
     "Share" : "Спільний доступ",
+    "Toggle settings" : "Перемикач меню налаштувань",
     "View form" : "Переглянути форму",
     "View" : "Перегляд",
     "Edit" : "Редагувати",

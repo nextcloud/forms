@@ -67,6 +67,7 @@ OC.L10N.register(
     "Copy embedding code" : "Còpia su còdighe de insertada",
     "Internal link" : "Ligòngiu de intro",
     "Share" : "Cumpartzidura",
+    "Toggle settings" : "Càmbia sa cunfiguratzione",
     "View" : "Visualiza",
     "Edit" : "Modìfica",
     "Loading {title} …" : "Carrighende {title} …",

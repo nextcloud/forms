@@ -14,6 +14,7 @@ OC.L10N.register(
     "Add link" : "Apondre un ligam",
     "Copy to clipboard" : "Copiar dins lo quichapapièrs",
     "Share" : "Partejar",
+    "Toggle settings" : "Bascular los paramètres",
     "View" : "Veire",
     "Edit" : "Modificar",
     "Description" : "Descripcion",

@@ -76,6 +76,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
     "No elements found." : "No se encontraron elementos",
     "Checkboxes" : "Casillas de verificación",
+    "File" : "Archivo",
     "Short answer" : "Respuesta breve",
     "Long text" : "Texto largo",
     "Date" : "Fecha",

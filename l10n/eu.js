@@ -146,6 +146,7 @@ OC.L10N.register(
     "This form is now owned by" : "Galdetegi honen jabe berria:",
     "An error occurred while transfering ownership" : "Errore bat gertatu da jabetza transferitzean",
     "Share" : "Partekatu",
+    "Toggle settings" : "Txandakatu ezarpenak",
     "View form" : "Ikusi formularioa",
     "View" : "Ikusi",
     "Edit" : "Aldatu",

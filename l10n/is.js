@@ -52,6 +52,7 @@ OC.L10N.register(
     "Remove link" : "Fjarlægja tengil",
     "Internal link" : "Internal link",
     "Share" : "Deila",
+    "Toggle settings" : "Víxla stillingum af/á",
     "View" : "Skoða",
     "Edit" : "Breyta",
     "Loading {title} …" : "Hleð inn {title} …",

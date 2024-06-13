@@ -118,6 +118,7 @@ OC.L10N.register(
     "This form is now owned by" : "Αυτή η φόρμα ανήκει τώρα στον/στην",
     "An error occurred while transfering ownership" : "Παρουσιάστηκε σφάλμα κατά τη μεταφορά της κυριότητας",
     "Share" : "Διαμοιρασμός",
+    "Toggle settings" : "Εναλλαγή ρυθμίσεων",
     "View form" : "Προβολή φόρμας",
     "View" : "Προβολή",
     "Edit" : "Επεξεργασία",

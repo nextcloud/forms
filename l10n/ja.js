@@ -78,6 +78,7 @@ OC.L10N.register(
     "Internal link" : "内部リンク",
     "Search for a user" : "ユーザーを検索",
     "Share" : "共有",
+    "Toggle settings" : "セッティングを切り替え",
     "View form" : "フォームを閲覧",
     "View" : "表示",
     "Edit" : "編集",

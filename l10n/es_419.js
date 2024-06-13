@@ -20,6 +20,7 @@ OC.L10N.register(
     "Settings" : "Configuraciones ",
     "Submit" : "Enviar",
     "Abort" : "Abortar",
+    "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",
     "Text" : "Texto",

@@ -69,6 +69,7 @@ OC.L10N.register(
     "Copy embedding code" : "Kopieer embedded code",
     "Internal link" : "Interne link",
     "Share" : "Delen",
+    "Toggle settings" : "Omschakelen instellingen",
     "View" : "Bekijken",
     "Edit" : "Bewerk",
     "Show results" : "Toon resultaten",

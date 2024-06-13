@@ -117,6 +117,7 @@ OC.L10N.register(
     "This form is now owned by" : "Tämän lomakkeen omistaa nyt",
     "An error occurred while transfering ownership" : "Omistajuutta siirtäessä tapahtui virhe",
     "Share" : "Jaa",
+    "Toggle settings" : "Asetukset päälle/pois",
     "View form" : "Näytä lomake",
     "View" : "Näytä",
     "Edit" : "Muokkaa",

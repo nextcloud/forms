@@ -101,6 +101,7 @@ OC.L10N.register(
     "There was an error while removing the share" : "Det uppstod ett fel när delningen skulle tas bort",
     "Transfer ownership" : "Överför ägarskap",
     "Share" : "Dela",
+    "Toggle settings" : "Växla inställningar",
     "View form" : "Visa formulär",
     "View" : "Visa",
     "Edit" : "Ändra",

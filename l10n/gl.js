@@ -117,6 +117,7 @@ OC.L10N.register(
     "Transfer ownership" : "Transferir a propiedade",
     "You're going to transfer the ownership of {name} to another account. Please select the account to which you want to transfer ownership." : "Vai transferir a propiedade de {name} a outra conta. Seleccione a conta á que quere transferirlle a propiedade.",
     "Share" : "Compartir",
+    "Toggle settings" : "Cambiar os axustes",
     "View form" : "Ver formulario",
     "View" : "Ver",
     "Edit" : "Editar",

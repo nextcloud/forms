@@ -125,6 +125,7 @@ OC.L10N.register(
     "This form is now owned by" : "Tento formulár je teraz vlastnený",
     "An error occurred while transfering ownership" : "Vyskytla sa chyba pri prenose vlastníctva",
     "Share" : "Zdieľať",
+    "Toggle settings" : "Prepnúť nastavenia",
     "View form" : "Zobraziť formulár",
     "View" : "Zobraziť",
     "Edit" : "Upraviť",

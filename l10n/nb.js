@@ -137,6 +137,7 @@ OC.L10N.register(
     "This form is now owned by" : "Skjemaet eies nå av",
     "An error occurred while transfering ownership" : "Det oppstod en feil under overføring av eierskap",
     "Share" : "Del",
+    "Toggle settings" : "Innstillinger av/på",
     "View form" : "Vis skjema",
     "View" : "Vis",
     "Edit" : "Rediger",

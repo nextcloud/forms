@@ -102,6 +102,7 @@ OC.L10N.register(
     "There was an error while updating the share" : "Der opstod en fejl under opdatering af delingen",
     "There was an error while removing the share" : "Der opstod en fejl under fjernelse af delingen",
     "Share" : "Del",
+    "Toggle settings" : "Skift indstillinger",
     "View form" : "Vis formularen",
     "View" : "Vis",
     "Edit" : "Redigér",
