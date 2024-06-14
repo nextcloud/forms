@@ -14,7 +14,6 @@ OC.L10N.register(
     "User ID" : "Naudotojo ID",
     "Timestamp" : "Laiko žyma",
     "New form" : "Nauja anketa",
-    "Your Forms" : "Jūsų anketos",
     "Shared with you" : "Bendrinama su jumis",
     "Loading forms …" : "Įkeliamos anketos…",
     "No forms created yet" : "Kol kas nėra sukurtų anketų",

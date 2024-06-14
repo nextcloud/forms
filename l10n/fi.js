@@ -17,7 +17,6 @@ OC.L10N.register(
     "Timestamp" : "Aikaleima",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Yksinkertaisia kyselyitä omalla palvelimella",
     "New form" : "Uusi lomake",
-    "Your Forms" : "Lomakkeesi",
     "Shared with you" : "Jaettu kanssasi",
     "Archived forms" : "Arkistoidut lomakkeet",
     "Loading forms …" : "Ladataan lomakkeita…",

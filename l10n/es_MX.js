@@ -18,7 +18,6 @@ OC.L10N.register(
     "Timestamp" : "Marca de tiempo",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Encuestas y cuestionarios sencillos, autoalojados.",
     "New form" : "Nuevo formulario",
-    "Your Forms" : "Sus formularios",
     "Shared with you" : "Compartido con usted",
     "Loading forms …" : "Cargando formularios …",
     "No forms created yet" : "Aún no se han creado formularios",

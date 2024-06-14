@@ -16,7 +16,6 @@ OC.L10N.register(
     "Timestamp" : "Indicador de dia e hora",
     "📝 Simple surveys and questionnaires, self-hosted" : "Formulários e questionários simples, feitos à medida",
     "New form" : "Novo formulário",
-    "Your Forms" : "Os seus formulários",
     "Shared with you" : "Partilhado consigo",
     "Loading forms …" : "Carregando formulários",
     "No forms created yet" : "Nenhum formulário ainda criado",

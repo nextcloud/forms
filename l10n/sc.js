@@ -16,7 +16,6 @@ OC.L10N.register(
     "Timestamp" : "Marca temporale",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Sondàgios e cuestionàrios simpres, autònomos",
     "New form" : "Mòdulu nou",
-    "Your Forms" : "Is mòdulos tuos",
     "Shared with you" : "Cumpartzidos cun tegus",
     "Loading forms …" : "Carrighende mòdulos …",
     "No forms created yet" : "Ancora perunu mòdulu creadu",

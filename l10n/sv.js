@@ -18,7 +18,6 @@ OC.L10N.register(
     "Timestamp" : "Tidsstämpel",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 enkla undersökningar och formulär, egenhostade",
     "New form" : "Nytt formulär",
-    "Your Forms" : "Dina formulär",
     "Shared with you" : "Delat med dig",
     "Loading forms …" : "Laddar formulär ...",
     "No forms created yet" : "Inga formulär ännu",

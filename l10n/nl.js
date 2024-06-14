@@ -17,7 +17,6 @@ OC.L10N.register(
     "Timestamp" : "Tijdstempel",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Eenvoudige enquête en vragenlijst, zelf gehost",
     "New form" : "Nieuw formulier",
-    "Your Forms" : "Jouw formulieren",
     "Shared with you" : "Gedeeld met jou",
     "Loading forms …" : "Formulieren laden ...",
     "No forms created yet" : "Nog geen formulieren gecreëerd",

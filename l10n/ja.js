@@ -13,7 +13,6 @@ OC.L10N.register(
     "Timestamp" : "タイムスタンプ",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 自前で作る、簡単なアンケート",
     "New form" : "新しいフォーム",
-    "Your Forms" : "あなたのフォーム",
     "Shared with you" : "共有中",
     "Archived forms" : "アーカイブされたフォーム",
     "Loading forms …" : "フォームを読み込み中…",

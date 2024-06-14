@@ -22,7 +22,6 @@ OC.L10N.register(
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🧑‍💻 Connect to your software:** Easily integrate Forms into your service with our full-fledged [REST-API](https://github.com/nextcloud/forms/blob/main/docs/API.md).\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "** استبيانات واستبيانات بسيطة ، ذاتية الاستضافة! ** \n- ** 📝 تصميم بسيط: ** لا يوجد تنوّعٌ كبيرٌ في الخيارات، فقط الأساسيات. يعمل بشكل جيد على الهاتف المحمول ايضاً \n- ** 📊 عرض النتائج وتصديرها: ** يتم عرض النتائج ويمكن أيضًا تصديرها كملف CSV بنفس التنسيق المستخدم بواسطة نماذج Google . \n- ** 🔒 بياناتك تحت سيطرتك! ** على عكس نماذج Google و Typeform و Doodle وغيرها، تظل معلومات الاستبيان والردود على خادومك. \n- ** 🧑‍💻 الاتصال بالبرنامج الخاص بك: ** يمكنك دمج النماذج بسهولة في خدمتك من خلال [REST-API] الكاملة الخاصة بنا (https://github.com/nextcloud/forms/blob/main/docs/API.md) . \n- ** 🙋 شارك! ** لدينا الكثير من الأشياء المخطط لها مثل المزيد من أنواع الأسئلة ، والتعاون في النماذج ، [والمزيد] (https://github.com/nextcloud/forms/milestones) !",
     "Forms navigation" : "التنقل في النماذج",
     "New form" : "نموذج جديد ",
-    "Your Forms" : "نماذجك ",
     "Shared with you" : "تم مشاركتها معك",
     "Archived forms" : "نماذج مؤرشفة",
     "Loading forms …" : "جارِ تحميل النماذج ",
@@ -154,6 +153,7 @@ OC.L10N.register(
     "This form is now owned by" : "هذا النموذج يملكه الآن ",
     "An error occurred while transfering ownership" : "حدث خطأ أثناء نقل مِلكِية",
     "Share" : "مشاركة",
+    "Toggle settings" : " حدد الإعدادت",
     "View form" : "عرض النموذج",
     "View" : "عرض",
     "Edit" : "تعديل",

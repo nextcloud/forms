@@ -18,7 +18,6 @@ OC.L10N.register(
     "Timestamp" : "Časovni žig",
     "📝 Simple surveys and questionnaires, self-hosted" : "Enostavni vprašalnik in ankete na domačem strežniku",
     "New form" : "Nov vprašalnik",
-    "Your Forms" : "Moji vprašalniki",
     "Shared with you" : "V souporabi z vami",
     "Loading forms …" : "Poteka nalaganje vprašalnikov …",
     "No forms created yet" : "Ni še ustvarjenih vprašalnikov",
