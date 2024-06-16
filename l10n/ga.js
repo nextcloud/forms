@@ -7,6 +7,7 @@ OC.L10N.register(
     "Shared with you" : "Roinnte leat",
     "Select groups" : "Roghnaigh grúpaí",
     "Results" : "Torthaí",
+    "Maximum file size" : "Uasmhéid comhaid",
     "Delete" : "Scrios",
     "Other" : "Eile",
     "Set expiration date" : "Socraigh dáta éaga",
