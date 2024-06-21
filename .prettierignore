@@ -16,3 +16,4 @@ l10n/
 # PHP
 lib/
 **/*.php
+composer.lock
