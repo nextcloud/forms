@@ -372,9 +372,14 @@ export default {
 			try {
 				// TODO: add loading status feedback ?
 				await axios.patch(
-					generateOcsUrl('apps/forms/api/v2.4/question/update'),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+						{
+							id: this.formId,
+							questionId: this.id,
+						},
+					),
 					{
-						id: this.id,
 						keyValuePairs: {
 							[key]: value,
 						},
@@ -393,29 +398,38 @@ export default {
 		 * @param {Array<string>} answers - The array of answers for the question.
 		 */
 		async handleMultipleOptions(answers) {
-			const options = this.options.slice()
 			this.isLoading = true
-			for (let i = 0; i < answers.length; i++) {
+			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2/option'),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
+						{
+							id: this.formId,
+							questionId: this.id,
+						},
+					),
 					{
-						questionId: this.id,
-						text: answers[i],
+						optionTexts: answers, // Send the entire array of answers at once
 					},
 				)
-				const newServerOption = OcsResponse2Data(response)
-				const option = {
-					id: newServerOption.id, // use the ID from the server
-					questionId: this.id,
-					text: answers[i],
-					local: false,
-				}
-				options.push(option)
+				const newServerOptions = OcsResponse2Data(response) // Assuming this function can handle arrays
+				const options = this.options.slice()
+				newServerOptions.forEach((option) => {
+					options.push({
+						id: option.id, // Use the ID from the server
+						questionId: this.id,
+						text: option.text,
+						local: false,
+					})
+				})
+				this.updateOptions(options)
+				this.$nextTick(() => {
+					this.focusIndex(options.length - 1)
+				})
+			} catch (error) {
+				logger.error('Error while saving question options', { error })
+				showError(t('forms', 'Error while saving question options'))
 			}
-			this.updateOptions(options)
-			this.$nextTick(() => {
-				this.focusIndex(options.length - 1)
-			})
 			this.isLoading = false
 		},
 

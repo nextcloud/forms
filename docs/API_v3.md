@@ -1,7 +1,5 @@
 # Forms Public API
 
-## API v2 is now deprecated and will be removed with Forms v5. Please see documentation for [API v3](API_v3.md)
-
 This file contains the API-Documentation. For more information on the returned Data-Structures, please refer to the [corresponding Documentation](DataStructure.md).
 
 ## Generals
@@ -29,21 +27,31 @@ This file contains the API-Documentation. For more information on the returned D
 
 ### Deprecation info
 
--   Starting with Forms v4.3 API v2 will be deprecated and removed with Forms v5: Please see the documentation for [API v3](API_v3.md)
+-   Starting with Forms v4.3 API v2 will be deprecated and removed with Forms v5
 -   Starting with API v2.2 all endpoints that update data will use PATCH/PUT as method. POST is now deprecated and will be removed in API v3
 
-### Breaking Changes on API v2
+### Breaking changes on API v3
+
+-   Most routes changed from API v2 to v3. Please adjust your applications accordingly.
+-   Removed possibility to get a single partial form
+
+### Breaking changes on API v2
 
 -   The `mandatory` property of questions has been removed. It is replaced by `isRequired`.
 -   Completely new way of handling access & shares.
 
 ### Other API changes
 
+-   In API version 3.0 the following endpoints were introduced/changed:
+    -   `GET /api/v3/forms/{formId}/questions` to get all questions of a form
+    -   `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
+    -   `POST /api/v3/forms/{formId}/questions/{questionId}/options` does now accept more options at once
+    -   `POST /api/v3/forms/{formId}/submissions/files/{questionId}` to upload a file to a file question before submitting the form
 -   In API version 2.5 the following endpoints were introduced:
-    -   `POST /api/2.5/uploadFiles/{formId}/{questionId}` to upload files to answer before form submitting
+    -   `POST /api/v2.5/uploadFiles/{formId}/{questionId}` to upload files to answer before form submitting
 -   In API version 2.4 the following endpoints were introduced:
-    -   `POST /api/2.4/form/link/{fileFormat}` to link form to a file
-    -   `POST /api/2.4/form/unlink` to unlink form from a file
+    -   `POST /api/v2.4/form/link/{fileFormat}` to link form to a file
+    -   `POST /api/v2.4/form/unlink` to unlink form from a file
 -   In API version 2.4 the following endpoints were changed:
     -   `GET /api/v2.4/submissions/export/{hash}` was extended with optional parameter `fileFormat` to export submissions in different formats
     -   `GET /api/v2.4/submissions/export` was extended with optional parameter `fileFormat` to export submissions to cloud in different formats
@@ -58,7 +66,7 @@ This file contains the API-Documentation. For more information on the returned D
 
 Returns condensed objects of all Forms beeing owned by the authenticated user.
 
--   Endpoint: `/api/v2.4/forms`
+-   Endpoint: `/api/v3/forms[?type=owned]`
 -   Method: `GET`
 -   Parameters: None
 -   Response: Array of condensed Form Objects, sorted as newest first.
@@ -98,7 +106,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
 
 Returns condensed objects of all Forms, that are shared & shown to the authenticated user and that have not expired yet.
 
--   Endpoint: `/api/v2.4/shared_forms`
+-   Endpoint: `/api/v3/forms?type=shared`
 -   Method: `GET`
 -   Parameters: None
 -   Response: Array of condensed Form Objects, sorted as newest first, similar to [List owned Forms](#list-owned-forms).
@@ -107,35 +115,9 @@ Returns condensed objects of all Forms, that are shared & shown to the authentic
 See above, 'List owned forms'
 ```
 
-### Get a partial Form
-
-Returns a single partial form object, corresponding to owned/shared form-listings.
-
--   Endpoint: `/api/v2.4/partial_form/{hash}`
--   Method: `GET`
--   Url-Parameter:
-    | Parameter | Type | Description |
-    |-----------|---------|-------------|
-    | _hash_ | String | Hash of the form to request |
--   Response: Partial form object, similar to form-list elements.
-
-```
-"data": {
-  "id": 6,
-  "hash": "yWeMwcwCwoqRs8T2",
-  "title": "Form 2",
-  "expires": 0,
-  "permissions": [
-    "submit"
-  ],
-  "partial": true,
-  "state": 0
-}
-```
-
 ### Create a new Form
 
--   Endpoint: `/api/v2.4/form`
+-   Endpoint: `/api/v3/forms`
 -   Method: `POST`
 -   Parameters: None
 -   Response: The new form object, similar to requesting an existing form.
@@ -148,12 +130,12 @@ See next section, 'Request full data of a form'
 
 Returns the full-depth object of the requested form (without submissions).
 
--   Endpoint: `/api/v2.4/form/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}`
+-   Method: `GET`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the form to request |
--   Method: `GET`
+    | _formId_ | Integer | ID of the form to request |
 -   Response: A full object of the form, including access, questions and options in full depth.
 
 ```
@@ -243,12 +225,12 @@ Returns the full-depth object of the requested form (without submissions).
 
 Creates a clone of a form (without submissions).
 
--   Endpoint: `/api/v2.4/form/clone/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms?fromId={formId}`
+-   Method: `POST`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the form to clone |
--   Method: `POST`
+    | _formId_ | Integer | ID of the form to clone |
 -   Response: Returns the full object of the new form. See [Request full data of a Form](#request-full-data-of-a-form)
 
 ```
@@ -259,99 +241,106 @@ See section 'Request full data of a form'.
 
 Update a single or multiple properties of a form-object. Concerns **only** the Form-Object, properties of Questions, Options and Submissions, as well as their creation or deletion, are handled separately.
 
--   Endpoint: `/api/v2.4/form/update`
+-   Endpoint: `/api/v3/forms/{formId}`
 -   Method: `PATCH`
--   _Method: `POST` deprecated_
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form to update |
 -   Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the form to update |
     | _keyValuePairs_ | Array | Array of key-value pairs to update |
--   Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, hash, ownerId, created_
+-   Restrictions:
+    -   It is **not allowed** to update one of the following key-value pairs: _id, hash, ownerId, created_
+    -   To transfer the ownership of a form to another user, you must only send a single _keyValuePair_ containing the key `ownerId` and the user id of the new owner.
+    -   To link a file for submissions, the _keyValuePairs_ need to contain the keys `path` and `fileFormat`
+    -   To unlink a file for submissions, the _keyValuePairs_ need to contain the keys `fileId` and `fileFormat` need to contain the value `null`
 -   Response: **Status-Code OK**, as well as the id of the updated form.
 
 ```
 "data": 3
 ```
 
-### Transfer form ownership
-
-Transfer the ownership of a form to another user
-
--   Endpoint: `/api/v2.4/form/transfer`
--   Method: `POST`
--   Parameters:
-    | Parameter | Type | Description |
-    |-----------|---------|-------------|
-    | _formId_ | Integer | ID of the form to tranfer |
-    | _uid_ | Integer | ID of the new form owner |
--   Restrictions: The initiator must be the current form owner.
--   Response: **Status-Code OK**, as well as the id of the new owner.
-
-```
-"data": "user1"
-```
-
 ### Delete a form
 
--   Endpoint: `/api/v2.4/form/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}`
+-   Method: `DELETE`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the form to delete |
--   Method: `DELETE`
+    | _formId_ | Integer | ID of the form to delete |
 -   Response: **Status-Code OK**, as well as the id of the deleted form.
 
 ```
 "data": 3
 ```
 
-### Link a form to a file
-
--   Endpoint: `/api/v2.4/form/link/{fileFormat}`
--   Url-Parameter:
-    | Parameter | Type | Description |
-    |--------------|---------|--------------|
-    | _fileFormat_ | String | csv|ods|xlsx |
--   Method: `POST`
--   Parameters:
-    | Parameter | Type | Description |
-    |-----------|---------|--------------------------------------------|
-    | _hash_ | String | Hash of the form to update |
-    | _path_ | String | Path within User-Dir, to store the file to |
--   Response: The new question object.
-
-```
-"data": {
-  "fileFormat": "csv",
-  "fileId": 157,
-  "filePath": "foo/bar",
-  "fileName": "Form 1 (responses).csv"
-}
-```
-
-### Unlink file from form
-
--   Endpoint: `/api/v2.4/form/unlink`
--   Method: `POST`
--   Parameters:
-    | Parameter | Type | Description |
-    |-----------|---------|----------------------------|
-    | _hash_ | String | Hash of the form to update |
--   Response: **Status-Code OK**
-
 ## Question Endpoints
 
-Contains only manipulative question-endpoints. To retrieve questions, request the full form data.
+### Get all questions of a form
+
+Returns the questions and options of the given form (without submissions).
+
+-   Endpoint: `/api/v3/forms/{formId}/questions`
+-   Method: `GET`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form |
+-   Response: An array of all questions of the form including options.
+
+```
+"data": [
+  {
+    "id": 1,
+    "formId": 3,
+    "order": 1,
+    "type": "dropdown",
+    "isRequired": false,
+    "text": "Question 1",
+    "name": "something",
+    "options": [
+      {
+        "id": 1,
+        "questionId": 1,
+        "text": "Option 1"
+      },
+      {
+        "id": 2,
+        "questionId": 1,
+        "text": "Option 2"
+      }
+    ],
+    "accept": [],
+    "extraSettings": {}
+  },
+  {
+    "id": 2,
+    "formId": 3,
+    "order": 2,
+    "type": "file",
+    "isRequired": true,
+    "text": "Question 2",
+    "name": "something_other",
+    "options": [],
+    "extraSettings": {}
+    "accept": ["image/*", ".pdf"],
+  }
+]
+```
 
 ### Create a new question
 
--   Endpoint: `/api/v2.4/question`
+-   Endpoint: `/api/v3/forms/{formId}/questions`
 -   Method: `POST`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form |
 -   Parameters:
     | Parameter | Type | Optional | Description |
     |-----------|---------|----------|-------------|
-    | _formId_ | Integer | | ID of the form, the new question will belong to |
     | _type_ | [QuestionType](DataStructure.md#question-types) | | The question-type of the new question |
     | _text_ | String | yes | _Optional_ The text of the new question. |
 -   Response: The new question object.
@@ -370,17 +359,59 @@ Contains only manipulative question-endpoints. To retrieve questions, request th
 }
 ```
 
+### Get all questions of a form
+
+Returns the requested question and options of the given form (without submissions).
+
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}`
+-   Method: `GET`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form |
+    | _questionId_ | Integer | ID of the question |
+-   Response: An object of the requested question including options.
+
+```
+"data": {
+    "id": 1,
+    "formId": 3,
+    "order": 1,
+    "type": "dropdown",
+    "isRequired": false,
+    "text": "Question 1",
+    "name": "something",
+    "options": [
+      {
+        "id": 1,
+        "questionId": 1,
+        "text": "Option 1"
+      },
+      {
+        "id": 2,
+        "questionId": 1,
+        "text": "Option 2"
+      }
+    ],
+    "accept": [],
+    "extraSettings": {}
+}
+```
+
 ### Update question properties
 
 Update a single or multiple properties of a question-object.
 
--   Endpoint: `/api/v2.4/question/update`
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}`
 -   Method: `PATCH`
--   _Method: `POST` deprecated_
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form to request |
+    | _questionId_ | Integer | Id of the
 -   Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the question to update |
     | _keyValuePairs_ | Array | Array of key-value pairs to update |
 -   Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order_.
 -   Response: **Status-Code OK**, as well as the id of the updated question.
@@ -393,13 +424,15 @@ Update a single or multiple properties of a question-object.
 
 Reorders all Questions of a single form
 
--   Endpoint: `/api/v2.4/question/reorder`
--   Method: `PUT`
--   _Method: `POST` deprecated_
--   Parameters:
+-   Endpoint: `/api/v3/forms/{formId}/questions`
+-   Method: `PATCH`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
     | _formId_ | Integer | ID of the form, the questions belong to |
+-   Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
     | _newOrder_ | Array | Array of **all** Question-IDs, ordered in the desired order |
 -   Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates.
 -   Response: Array of questionIDs and their corresponding order.
@@ -420,12 +453,13 @@ Reorders all Questions of a single form
 
 ### Delete a question
 
--   Endpoint: `/api/v2.4/question/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}`
+-   Method: `DELETE`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the question to delete |
--   Method: `DELETE`
+    | _formId_ | Integer | ID of the form containing the question |
+    | _questionId_ | Integer | ID of the question to delete |
 -   Response: **Status-Code OK**, as well as the id of the deleted question.
 
 ```
@@ -436,12 +470,13 @@ Reorders all Questions of a single form
 
 Creates a clone of a question with all its options.
 
--   Endpoint: `/api/v2.4/question/clone/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/questions?fromId={questionId}`
+-   Method: `POST`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the question to clone |
--   Method: `POST`
+    | _formId_ | Integer | ID of the form containing the question |
+    | _questionId_ | Integer | ID of the question to clone |
 -   Response: Returns cloned question object with the new ID set.
 
 ```
@@ -454,14 +489,18 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 
 ### Create a new Option
 
--   Endpoint: `/api/v2.4/option`
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}/options`
 -   Method: `POST`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form containing the question |
+    | _questionId_ | Integer | ID of the question, the new option will belong to |
 -   Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _questionId_ | Integer | ID of the question, the new option will belong to |
-    | _text_ | String | The text of the new option |
--   Response: The new option object
+    | _text_ | Array | Array of strings containing the new options |
+-   Response: The new array of option objects
 
 ```
 "data": {
@@ -475,13 +514,17 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 
 Update a single or all properties of an option-object
 
--   Endpoint: `/api/v2.4/option/update`
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}`
 -   Method: `PATCH`
--   _Method: `POST` deprecated_
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form containing the question and option |
+    | _questionId_ | Integer | ID of the question, the new option will belong to |
+    | _optionId_ | Integer | ID of the option to update |
 -   Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the option to update |
     | _keyValuePairs_ | Array | Array of key-value pairs to update |
 -   Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, questionId_.
 -   Response: **Status-Code OK**, as well as the id of the updated option.
@@ -492,12 +535,14 @@ Update a single or all properties of an option-object
 
 ### Delete an option
 
--   Endpoint: `/api/v2.4/option/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}`
+-   Method: `DELETE`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _id_ | Integer | ID of the option to delete |
--   Method: `DELETE`
+    | _formId_ | Integer | ID of the form containing the question and option |
+    | _questionId_ | Integer | ID of the question, the new option will belong to |
+    | _optionId_ | Integer | ID of the option to delete |
 -   Response: **Status-Code OK**, as well as the id of the deleted option.
 
 ```
@@ -508,12 +553,15 @@ Update a single or all properties of an option-object
 
 ### Add a new Share
 
--   Endpoint: `/api/v2.4/share`
+-   Endpoint: `/api/v3/forms/{formId}/shares`
 -   Method: `POST`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |--------------|----------|-------------|
+    | _formId_ | Integer | ID of the form to share |
 -   Parameters:
     | Parameter | Type | Description |
     |--------------|----------|-------------|
-    | _formId_ | Integer | Id of the form to share |
     | _shareType_ | String | NC-shareType, out of the used shareTypes. |
     | _shareWith_ | String | User/Group for the share. Not used for link-shares. |
     | _permissions_ | String[] | Permissions of the sharees, see [DataStructure](DataStructure.md#Permissions). |
@@ -530,34 +578,36 @@ Update a single or all properties of an option-object
 }
 ```
 
-### Delete a Share
+### Update a Share
 
--   Endpoint: `/api/v2.4/share/{id}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/shares/{shareId}`
+-   Method: `PATCH`
+-   Url-Parameters:
     | Parameter | Type | Description |
-    |-----------|---------|-------------|
-    | _id_ | Integer | ID of the share to delete |
--   Method: `DELETE`
--   Response: **Status-Code OK**, as well as the id of the deleted share.
+    |------------------|----------|-------------|
+    | _formId_ | Integer | ID of the form containing the share |
+    | _shareId_ | Integer | ID of the share to update |
+-   Parameters:
+    | Parameter | Type | Description |
+    |------------------|----------|-------------|
+    | _keyValuePairs_ | Array | Array of key-value pairs to update |
+-   Restrictions: Currently only the _permissions_ can be updated.
+-   Response: **Status-Code OK**, as well as the id of the share object.
 
 ```
 "data": 5
 ```
 
-### Update a Share
+### Delete a Share
 
--   Endpoint: `/api/v2.4/share/update`
--   Parameters:
+-   Endpoint: `/api/v3/forms/{formId}/shares/{shareId}`
+-   Method: `DELETE`
+-   Url-Parameters:
     | Parameter | Type | Description |
-    |------------------|----------|-------------|
-    | _id_ | Integer | ID of the share to update |
-    | *keyValuePairs*¹ | Array | Array of key-value pairs to update |
-
-    ¹Currently only the _permissions_ can be updated.
-
--   Method: `PATCH`
--   _Method: `POST` deprecated_
--   Response: **Status-Code OK**, as well as the id of the share object.
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form containing the share |
+    | _shareId_ | Integer | ID of the share to delete |
+-   Response: **Status-Code OK**, as well as the id of the deleted share.
 
 ```
 "data": 5
@@ -569,12 +619,12 @@ Update a single or all properties of an option-object
 
 Get all Submissions to a Form
 
--   Endpoint: `/api/v2.4/submissions/{hash}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/submissions`
+-   Method: `GET`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _hash_ | String | Hash of the form to get the submissions for |
--   Method: `GET`
+    | _formId_ | Integer | ID of the form to get the submissions for |
 -   Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions.
 
 ```
@@ -668,14 +718,14 @@ Get all Submissions to a Form
 
 Returns all submissions to the form in form of a csv-file.
 
--   Endpoint: `/api/v2.4/submissions/export/{hash}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/submissions?fileFormat={fileFormat}`
+-   Method: `GET`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |--------------|---------|-------------|
-    | _hash_ | String | Hash of the form to get the submissions for |
-    | _fileFormat_ | String | csv|ods|xlsx |
--   Method: `GET`
--   Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv.
+    | _formId_ | Integer | Id of the form to get the submissions for |
+    | _fileFormat_ | String | `csv|ods|xlsx` |
+-   Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file.
 
 ```
 "User display name","Timestamp","Question 1","Question 2"
@@ -687,12 +737,15 @@ Returns all submissions to the form in form of a csv-file.
 
 Creates a csv file and stores it to the cloud, resp. Files-App.
 
--   Endpoint: `/api/v2.4/submissions/export`
+-   Endpoint: `/api/v3/forms/{formId}/submissions/export`
 -   Method: `POST`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |--------------|---------|-------------|
+    | _formId_ | Integer | ID of the form to get the submissions for |
 -   Parameters:
     | Parameter | Type | Description |
     |--------------|---------|-------------|
-    | _hash_ | String | Hash of the form to get the submissions for |
     | _path_ | String | Path within User-Dir, to store the file to |
     | _fileFormat_ | String | csv|ods|xlsx |
 -   Response: Stores the file to the given path and returns the fileName.
@@ -705,12 +758,12 @@ Creates a csv file and stores it to the cloud, resp. Files-App.
 
 Delete all Submissions to a form
 
--   Endpoint: `/api/v2.4/submissions/{formId}`
--   Url-Parameter:
+-   Endpoint: `/api/v3/forms/{formId}/submissions`
+-   Method: `DELETE`
+-   Url-Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
     | _formId_ | Integer | ID of the form to delete the submissions for |
--   Method: `DELETE`
 -   Response: **Status-Code OK**, as well as the id of the corresponding form.
 
 ```
@@ -719,15 +772,18 @@ Delete all Submissions to a form
 
 ### Upload a file
 
-Upload a files to answer before form submitting
+Upload a file to an answer before form submission
 
--   Endpoint: `/api/2.5/uploadFiles/{formId}/{questionId}`
+-   Endpoint: `/api/v3/forms/{formId}/submissions/files/{questionId}`
 -   Method: `POST`
--   Parameters:
+-   Url-Parameters:
     | Parameter | Type | Description |
     |--------------|----------------|-------------|
     | _formId_ | Integer | ID of the form to upload the file to |
     | _questionId_ | Integer | ID of the question to upload the file to |
+-   Parameters:
+    | Parameter | Type | Description |
+    |--------------|----------------|-------------|
     | _files_ | Array of files | Files to upload |
 -   Response: **Status-Code OK**, as well as the id of the uploaded file and it's name.
 
@@ -739,24 +795,24 @@ Upload a files to answer before form submitting
 
 Store Submission to Database
 
--   Endpoint: `/api/v2.4/submission/insert`
+-   Endpoint: `/api/v3/forms/{formId}/submissions`
 -   Method: `POST`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |--------------|----------------|-------------|
+    | _formId_ | Integer | ID of the form to upload the file to |
 -   Parameters:
     | Parameter | Type | Description |
     |-----------|---------|-------------|
-    | _formId_ | Integer | ID of the form to submit into |
-    | _answers_ | Array | Array of Answers |
+    | _answers_ | Array | Array of answers |
     | _shareHash_ | String | optional, only neccessary for submissions to a public share link |
-
-    The Array of Answers has the following structure:
-
+-   Restrictions: The array of answers has the following structure:
     -   QuestionID as key
     -   An **array** of values as value --> Even for short Text Answers, wrapped into Array.
     -   For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs.
-
     -   For File-Uploads, the array contains the objects with key `uploadedFileId` (value from Upload a file endpoint).
 
-````
+```
   {
     "1":[27,32],              // dropdown or multiple
     "2":["ShortTextAnswer"],  // All Text-Based Question-Types
@@ -765,24 +821,23 @@ Store Submission to Database
       {"uploadedFileId": integer}
   ],
 }
-  ```
+```
 
 -   Response: **Status-Code OK**.
 
 ### Delete a single Submission
 
--   Endpoint: `/api/v2.4/submission/{id}`
--   Url-Parameter:
-  | Parameter | Type | Description |
-  |-----------|---------|-------------|
-  | _id_ | Integer | ID of the submission to delete |
+-   Endpoint: `/api/v3/forms/{formId}/submissions/{submissionId}`
 -   Method: `DELETE`
+-   Url-Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form containing the submission |
+    | _submissionId_ | Integer | ID of the submission to delete |
 -   Response: **Status-Code OK**, as well as the id of the deleted submission.
 
 ````
-
 "data": 5
-
 ```
 
 ## Error Responses
@@ -842,3 +897,4 @@ This Error is not produed by the Forms-API, but comes from Nextclouds OCS API. T
 ```
 
 ```
+````

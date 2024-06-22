@@ -79,13 +79,16 @@ class PageController extends Controller {
 	 *
 	 * @return TemplateResponse
 	 */
-	public function index(): TemplateResponse {
+	public function index(?string $hash = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms-style');
 		$this->insertHeaderOnIos();
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
+		if (isset($hash)) {
+			$this->initialState->provideInitialState('formId', $this->formMapper->findByHash($hash)->id);
+		}
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
 			'id-app-content' => '#app-content-vue',
 			'id-app-navigation' => '#app-navigation-vue',
@@ -98,8 +101,8 @@ class PageController extends Controller {
 	 *
 	 * @return TemplateResponse
 	 */
-	public function views(): TemplateResponse {
-		return $this->index();
+	public function views(string $hash): TemplateResponse {
+		return $this->index($hash);
 	}
 
 	/**

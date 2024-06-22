@@ -60,7 +60,7 @@ export class FormSection {
 				response
 					.request()
 					.url()
-					.endsWith('/ocs/v2.php/apps/forms/api/v2.4/form/update'),
+					.includes('/ocs/v2.php/apps/forms/api/v3/forms/'),
 		)
 	}
 }

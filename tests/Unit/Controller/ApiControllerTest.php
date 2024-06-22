@@ -43,8 +43,6 @@ function time($expected = null) {
 	return $value;
 }
 
-namespace OCA\Forms\Controller;
-
 /**
  * mock is_uploaded_file() function used in services
  * @param string|bool|null $filename the value that should be returned when called
@@ -113,6 +111,8 @@ class ApiControllerTest extends TestCase {
 	private $formMapper;
 	/** @var OptionMapper|MockObject */
 	private $optionMapper;
+	/** @var Question|MockObject */
+	private $question;
 	/** @var QuestionMapper|MockObject */
 	private $questionMapper;
 	/** @var ShareMapper|MockObject */
@@ -144,6 +144,7 @@ class ApiControllerTest extends TestCase {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
+		$this->question = $this->createMock(Question::class);
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
@@ -225,22 +226,21 @@ class ApiControllerTest extends TestCase {
 	public function testGetSubmissions_invalidForm() {
 		$exception = $this->createMock(MapperException::class);
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(1)
 			->willThrowException($exception);
-		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->getSubmissions('hash');
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->getSubmissions(1);
 	}
 
 	public function testGetSubmissions_noPermissions() {
 		$form = new Form();
 		$form->setId(1);
-		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
 
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(1)
 			->willReturn($form);
 
 		$this->formsService->expects(($this->once()))
@@ -249,7 +249,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn(false);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->getSubmissions('hash');
+		$this->apiController->getSubmissions(1);
 	}
 
 	public function dataGetSubmissions() {
@@ -293,12 +293,11 @@ class ApiControllerTest extends TestCase {
 	public function testGetSubmissions(array $submissions, array $questions, array $expected) {
 		$form = new Form();
 		$form->setId(1);
-		$form->setHash('hash');
 		$form->setOwnerId('otherUser');
 
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(1)
 			->willReturn($form);
 
 		$this->formsService->expects(($this->once()))
@@ -316,28 +315,27 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($questions);
 
-		$this->assertEquals(new DataResponse($expected), $this->apiController->getSubmissions('hash'));
+		$this->assertEquals(new DataResponse($expected), $this->apiController->getSubmissions(1));
 	}
 
 	public function testExportSubmissions_invalidForm() {
 		$exception = $this->createMock(MapperException::class);
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(99)
 			->willThrowException($exception);
 		$this->expectException(OCSNotFoundException::class);
-		$this->apiController->exportSubmissions('hash');
+		$this->apiController->getSubmissions(99, 'csv');
 	}
 
 	public function testExportSubmissions_noPermissions() {
 		$form = new Form();
 		$form->setId(1);
-		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
 
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(1)
 			->willReturn($form);
 
 		$this->formsService->expects(($this->once()))
@@ -346,18 +344,17 @@ class ApiControllerTest extends TestCase {
 			->willReturn(false);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->exportSubmissions('hash');
+		$this->apiController->getSubmissions(1, 'csv');
 	}
 
 	public function testExportSubmissions() {
 		$form = new Form();
 		$form->setId(1);
-		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
 
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(1)
 			->willReturn($form);
 
 		$this->formsService->expects(($this->once()))
@@ -377,17 +374,17 @@ class ApiControllerTest extends TestCase {
 			->with($form, 'csv')
 			->willReturn($fileName);
 
-		$this->assertEquals(new DataDownloadResponse($csv, $fileName, 'text/csv'), $this->apiController->exportSubmissions('hash'));
+		$this->assertEquals(new DataDownloadResponse($csv, $fileName, 'text/csv'), $this->apiController->getSubmissions(1, 'csv'));
 	}
 
 	public function testExportSubmissionsToCloud_invalidForm() {
 		$exception = $this->createMock(MapperException::class);
 		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
+			->method('findById')
+			->with(1)
 			->willThrowException($exception);
 		$this->expectException(OCSNotFoundException::class);
-		$this->apiController->exportSubmissionsToCloud('hash', '');
+		$this->apiController->exportSubmissionsToCloud(1, '');
 	}
 
 	public function testUnlinkFile() {
@@ -408,7 +405,7 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn(true);
 
-		$this->apiController->unlinkFile('hash');
+		$this->apiController->unlinkFileLegacy('hash');
 
 		$this->assertNull($form->getFileId());
 		$this->assertNull($form->getFileFormat());
@@ -537,7 +534,7 @@ class ApiControllerTest extends TestCase {
 			->with(7)
 			->willReturnCallback($callback);
 		$this->expectException($exception);
-		$this->apiController->cloneForm(7);
+		$this->apiController->newForm(7);
 	}
 
 	public function dataCloneForm() {
@@ -641,7 +638,7 @@ class ApiControllerTest extends TestCase {
 			->method('getForm')
 			->with(14)
 			->willReturn(new DataResponse('success'));
-		$this->assertEquals(new DataResponse('success'), $apiController->cloneForm(7));
+		$this->assertEquals(new DataResponse('success'), $apiController->newForm(7));
 	}
 
 	private function formAccess(bool $hasUserAccess = true, bool $hasFormExpired = false, bool $canSubmit = true) {
@@ -661,7 +658,7 @@ class ApiControllerTest extends TestCase {
 	public function testCloneQuestion_notFound() {
 		$this->questionMapper->method('findById')->with(42)->willThrowException($this->createMock(IMapperException::class));
 		$this->expectException(OCSNotFoundException::class);
-		$this->apiController->cloneQuestion(42);
+		$this->apiController->cloneQuestionLegacy(42);
 	}
 
 	public function testCloneQuestion_noPermission() {
@@ -670,7 +667,7 @@ class ApiControllerTest extends TestCase {
 		$this->questionMapper->method('findById')->with(42)->willReturn($question);
 		$this->formMapper->method('findById')->with(1)->willReturn($form);
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->cloneQuestion(42);
+		$this->apiController->cloneQuestionLegacy(42);
 	}
 
 	public function testUploadFiles() {
@@ -678,12 +675,18 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
-
+		$question = Question::fromParams(['formId' => 1]);
+		
 		$this->formMapper->expects($this->once())
 			->method('findById')
 			->with(1)
 			->willReturn($form);
-
+		
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with(10)
+			->willReturn($question);
+		
 		$this->request->expects($this->once())
 			->method('getUploadedFile')
 			->with('files')
@@ -739,7 +742,7 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->uploadFiles(1, 10, '');
 	}
 
-	public function testInsertSubmission_answers() {
+	public function testNewSubmission_answers() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setHash('hash');
@@ -876,17 +879,17 @@ class ApiControllerTest extends TestCase {
 			->with('admin')
 			->willReturn($userFolder);
 
-		$this->apiController->insertSubmission(1, $answers, '');
+		$this->apiController->newSubmission(1, $answers, '');
 	}
 
-	public function testInsertSubmission_formNotFound() {
+	public function testNewSubmission_formNotFound() {
 		$exception = $this->createMock(MapperException::class);
 		$this->formMapper->expects($this->once())
 			->method('findById')
 			->with(1)
 			->willThrowException($exception);
 		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->insertSubmission(1, [], '');
+		$this->apiController->newSubmission(1, [], '');
 	}
 
 	/**
@@ -903,7 +906,7 @@ class ApiControllerTest extends TestCase {
 	/**
 	 * @dataProvider dataForCheckForbiddenException()
 	 */
-	public function testInsertSubmission_forbiddenException($hasUserAccess, $hasFormExpired, $canSubmit) {
+	public function testNewSubmission_forbiddenException($hasUserAccess, $hasFormExpired, $canSubmit) {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('admin');
@@ -921,10 +924,10 @@ class ApiControllerTest extends TestCase {
 
 		$this->expectException(OCSForbiddenException::class);
 
-		$this->apiController->insertSubmission(1, [], '');
+		$this->apiController->newSubmission(1, [], '');
 	}
 
-	public function testInsertSubmission_validateSubmission() {
+	public function testNewSubmission_validateSubmission() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('admin');
@@ -947,7 +950,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->expectException(OCSBadRequestException::class);
 
-		$this->apiController->insertSubmission(1, [], '');
+		$this->apiController->newSubmission(1, [], '');
 	}
 
 	public function testDeleteSubmissionNotFound() {
@@ -960,7 +963,7 @@ class ApiControllerTest extends TestCase {
 			->willThrowException($exception);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->deleteSubmission(42);
+		$this->apiController->deleteSubmission(1, 42);
 	}
 
 	/**
@@ -987,7 +990,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn(false);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->deleteSubmission(42);
+		$this->apiController->deleteSubmission(1, 42);
 	}
 
 	/**
@@ -1023,7 +1026,7 @@ class ApiControllerTest extends TestCase {
 			->method('setLastUpdatedTimestamp')
 			->with($formData['id']);
 
-		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(42));
+		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(1, 42));
 	}
 
 	public function dataTestDeletePermission() {
@@ -1063,7 +1066,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->transferOwner(1, 'newOwner');
+		$this->apiController->transferOwnerLegacy(1, 'newOwner');
 	}
 
 	public function testTransferNewOwnerNotFound() {
@@ -1083,7 +1086,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn(null);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->transferOwner(1, 'newOwner');
+		$this->apiController->transferOwnerLegacy(1, 'newOwner');
 	}
 
 	public function testTransferOwner() {
@@ -1103,7 +1106,7 @@ class ApiControllerTest extends TestCase {
 			->with('newOwner')
 			->willReturn($newOwner);
 
-		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwner(1, 'newOwner'));
+		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwnerLegacy(1, 'newOwner'));
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}
 }
