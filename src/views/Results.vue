@@ -474,9 +474,17 @@ export default {
 
 	methods: {
 		async onUnlinkFile() {
-			await axios.post(generateOcsUrl('apps/forms/api/v2.4/form/unlink'), {
-				hash: this.form.hash,
-			})
+			await axios.update(
+				generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+					id: this.form.id,
+				}),
+				{
+					keyValuePairs: {
+						fileId: null,
+						fileFormat: null,
+					},
+				},
+			)
 
 			this.form.fileFormat = null
 			this.form.fileId = null
@@ -531,14 +539,15 @@ export default {
 					.pick()
 					.then(async (path) => {
 						try {
-							const response = await axios.post(
-								generateOcsUrl(
-									'apps/forms/api/v2.4/form/link/{fileFormat}',
-									{ fileFormat },
-								),
+							const response = await axios.patch(
+								generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+									id: this.form.id,
+								}),
 								{
-									hash: this.form.hash,
-									path,
+									keyValuePairs: {
+										path,
+										fileFormat,
+									},
 								},
 							)
 							const responseData = OcsResponse2Data(response)
@@ -608,7 +617,7 @@ export default {
 
 		async fetchLinkedFileInfo() {
 			const response = await axios.get(
-				generateOcsUrl('apps/forms/api/v2.4/form/{id}', {
+				generateOcsUrl('apps/forms/api/v3/forms/{id}', {
 					id: this.form.id,
 				}),
 			)

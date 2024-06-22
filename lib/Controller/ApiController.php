@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2017 Vinzenz Rosenkranz <vinzenz.rosenkranz@gmail.com>
  *
  * @author affan98 <affan98@gmail.com>
+ * @author Christian Hartmann <chris-hartmann@gmx.de>
  * @author Ferdinand Thiessen <opensource@fthiessen.de>
  * @author Jan-Christoph Borchardt <hey@jancborchardt.net>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
@@ -94,6 +95,7 @@ class ApiController extends OCSController {
 		$this->currentUser = $userSession->getUser();
 	}
 
+	// API v3 methods
 	/**
 	 * @CORS
 	 * @NoAdminRequired
@@ -102,7 +104,272 @@ class ApiController extends OCSController {
 	 * Return only with necessary information for Listing.
 	 * @return DataResponse
 	 */
-	public function getForms(): DataResponse {
+	public function getForms(string $type = 'owned'): DataResponse {
+		if ($type === 'owned') {
+			$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
+			$result = [];
+			foreach ($forms as $form) {
+				$result[] = $this->formsService->getPartialFormArray($form);
+			}
+			return new DataResponse($result);
+		} elseif ($type === 'shared') {
+			$forms = $this->formsService->getSharedForms($this->currentUser);
+			$result = array_values(array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms));
+			return new DataResponse($result);
+		} else {
+			throw new OCSBadRequestException();
+		}
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Create a new Form and return the Form to edit.
+	 * Return a cloned Form if the parameter $fromId is set
+	 *
+	 * @param int $fromId (optional) ID of the Form that should be cloned
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function newForm(?int $fromId = null): DataResponse {
+		// Check if user is allowed
+		if (!$this->configService->canCreateForms()) {
+			$this->logger->debug('This user is not allowed to create Forms.');
+			throw new OCSForbiddenException();
+		}
+
+		if($fromId === null) {
+			// Create Form
+			$form = new Form();
+			$form->setOwnerId($this->currentUser->getUID());
+			$form->setCreated(time());
+			$form->setHash($this->formsService->generateFormHash());
+			$form->setTitle('');
+			$form->setDescription('');
+			$form->setAccess([
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			]);
+			$form->setSubmitMultiple(false);
+			$form->setShowExpiration(false);
+			$form->setExpires(0);
+			$form->setIsAnonymous(false);
+			$form->setLastUpdated(time());
+	
+			$this->formMapper->insert($form);
+		} else {
+			$oldForm = $this->getFormIfAllowed($fromId);
+
+			// Read Form, set new Form specific data, extend Title.
+			$formData = $oldForm->read();
+			unset($formData['id']);
+			$formData['created'] = time();
+			$formData['lastUpdated'] = time();
+			$formData['hash'] = $this->formsService->generateFormHash();
+			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
+			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
+
+			$form = Form::fromParams($formData);
+			$this->formMapper->insert($form);
+
+			// Get Questions, set new formId, reinsert
+			$questions = $this->questionMapper->findByForm($oldForm->getId());
+			foreach ($questions as $oldQuestion) {
+				$questionData = $oldQuestion->read();
+
+				unset($questionData['id']);
+				$questionData['formId'] = $form->getId();
+				$newQuestion = Question::fromParams($questionData);
+				$this->questionMapper->insert($newQuestion);
+
+				// Get Options, set new QuestionId, reinsert
+				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
+				foreach ($options as $oldOption) {
+					$optionData = $oldOption->read();
+
+					unset($optionData['id']);
+					$optionData['questionId'] = $newQuestion->getId();
+					$newOption = Option::fromParams($optionData);
+					$this->optionMapper->insert($newOption);
+				}
+			}
+		}
+		return $this->getForm($form->getId());
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
+	 *
+	 * @param int $id FormId, pass `0` for using the optional `hash` parameter
+	 * @param string $hash Hash of the Form
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function getForm(int $id = 0, ?string $hash = null): DataResponse {
+		if ($id > 0) {
+			try {
+				$form = $this->formMapper->findById($id);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find form');
+				throw new OCSBadRequestException();
+			}
+	
+			if (!$this->formsService->hasUserAccess($form)) {
+				$this->logger->debug('User has no permissions to get this form');
+				throw new OCSForbiddenException();
+			}
+
+			$formData = $this->formsService->getForm($form);
+		} elseif ($hash !== null) {
+			try {
+				$form = $this->formMapper->findByHash($hash);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find form');
+				throw new OCSBadRequestException();
+			}
+	
+			if (!$this->formsService->hasUserAccess($form)) {
+				$this->logger->debug('User has no permissions to get this form');
+				throw new OCSForbiddenException();
+			}
+	
+			$formData = $this->formsService->getPartialFormArray($form);
+		} else {
+			throw new OCSBadRequestException();
+		}
+
+		return new DataResponse($formData);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Writes the given key-value pairs into Database.
+	 *
+	 * @param int $id FormId of form to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function updateForm(int $id, array $keyValuePairs): DataResponse {
+		$this->logger->debug('Updating form: FormId: {id}, values: {keyValuePairs}', [
+			'id' => $id,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		$form = $this->getFormIfAllowed($id);
+
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		// Process owner transfer
+		if (sizeof($keyValuePairs) === 1 && key_exists('ownerId', $keyValuePairs)) {
+			$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
+				'formId' => $id,
+				'uid' => $keyValuePairs['ownerId']
+			]);
+	
+			$form = $this->getFormIfAllowed($id);
+			$user = $this->userManager->get($keyValuePairs['ownerId']);
+			if ($user == null) {
+				$this->logger->debug('Could not find new form owner');
+				throw new OCSBadRequestException('Could not find new form owner');
+			}
+	
+			// update form owner
+			$form->setOwnerId($keyValuePairs['ownerId']);
+	
+			// Update changed Columns in Db.
+			$this->formMapper->update($form);
+	
+			return new DataResponse($form->getOwnerId());
+		}
+
+		// Don't allow to change params id, hash, ownerId, created, lastUpdated, fileId
+		if (key_exists('id', $keyValuePairs) || key_exists('hash', $keyValuePairs) ||
+			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs) ||
+			isset($keyValuePairs['fileId']) || key_exists('lastUpdated', $keyValuePairs)) {
+			$this->logger->info('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');
+			throw new OCSForbiddenException();
+		}
+
+		// Process file linking
+		if (isset($keyValuePairs['path']) && isset($keyValuePairs['fileFormat'])) {
+			$file = $this->submissionService->writeFileToCloud($form, $keyValuePairs['path'], $keyValuePairs['fileFormat']);
+
+			$form->setFileId($file->getId());
+			$form->setFileFormat($keyValuePairs['fileFormat']);
+		}
+
+		// Process file unlinking
+		if (key_exists('fileId', $keyValuePairs) && key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileId']) && !isset($keyValuePairs['fileFormat'])) {
+			$form->setFileId(null);
+			$form->setFileFormat(null);
+		}
+
+		unset($keyValuePairs['path']);
+		unset($keyValuePairs['fileId']);
+		unset($keyValuePairs['fileFormat']);
+
+		// Create FormEntity with given Params & Id.
+		foreach ($keyValuePairs as $key => $value) {
+			$method = 'set' . ucfirst($key);
+			$form->$method($value);
+		}
+
+		// Update changed Columns in Db.
+		$this->formMapper->update($form);
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($form->getId());
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Delete a form
+	 *
+	 * @param int $id the form id
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function deleteForm(int $id): DataResponse {
+		$this->logger->debug('Delete Form: {id}', [
+			'id' => $id,
+		]);
+
+		$form = $this->getFormIfAllowed($id);
+		$this->formMapper->deleteForm($form);
+
+		return new DataResponse($id);
+	}
+
+	/*
+	/* Legacy API v2 methods (TODO: remove with Forms v5)
+	 */
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Read Form-List of owned forms
+	 * Return only with necessary information for Listing.
+	 * @return DataResponse
+	 */
+	public function getFormsLegacy(): DataResponse {
 		$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
 
 		$result = [];
@@ -121,7 +388,7 @@ class ApiController extends OCSController {
 	 * Return only with necessary information for Listing.
 	 * @return DataResponse
 	 */
-	public function getSharedForms(): DataResponse {
+	public function getSharedFormsLegacy(): DataResponse {
 		$forms = $this->formsService->getSharedForms($this->currentUser);
 		$result = array_values(array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms));
 
@@ -138,7 +405,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse
 	 * @throws OCSBadRequestException if forbidden or not found
 	 */
-	public function getPartialForm(string $hash): DataResponse {
+	public function getPartialFormLegacy(string $hash): DataResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
@@ -165,7 +432,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function getForm(int $id): DataResponse {
+	public function getFormLegacy(int $id): DataResponse {
 		try {
 			$form = $this->formMapper->findById($id);
 			$formData = $this->formsService->getForm($form);
@@ -192,7 +459,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newForm(): DataResponse {
+	public function newFormLegacy(): DataResponse {
 		// Check if user is allowed
 		if (!$this->configService->canCreateForms()) {
 			$this->logger->debug('This user is not allowed to create Forms.');
@@ -233,7 +500,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function cloneForm(int $id): DataResponse {
+	public function cloneFormLegacy(int $id): DataResponse {
 		$this->logger->debug('Cloning Form: {id}', [
 			'id' => $id
 		]);
@@ -296,7 +563,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function updateForm(int $id, array $keyValuePairs): DataResponse {
+	public function updateFormLegacy(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: FormId: {id}, values: {keyValuePairs}', [
 			'id' => $id,
 			'keyValuePairs' => $keyValuePairs
@@ -342,7 +609,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function transferOwner(int $formId, string $uid): DataResponse {
+	public function transferOwnerLegacy(int $formId, string $uid): DataResponse {
 		$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
 			'formId' => $formId,
 			'uid' => $uid
@@ -375,7 +642,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function deleteForm(int $id): DataResponse {
+	public function deleteFormLegacy(int $id): DataResponse {
 		$this->logger->debug('Delete Form: {id}', [
 			'id' => $id,
 		]);
@@ -1343,7 +1610,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param string $hash of the form
 	 */
-	public function unlinkFile(string $hash): DataResponse {
+	public function unlinkFileLegacy(string $hash): DataResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
@@ -1383,7 +1650,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function linkFile(string $hash, string $path, string $fileFormat): DataResponse {
+	public function linkFileLegacy(string $hash, string $path, string $fileFormat): DataResponse {
 		$this->logger->debug('Linking form {hash} to file at /{path} in format {fileFormat}', [
 			'hash' => $hash,
 			'path' => $path,

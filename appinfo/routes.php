@@ -25,147 +25,87 @@
  *
  */
 
+$requirements_v3 = [
+	'apiVersion' => 'v3'
+];
+
 return [
 	'routes' => [
 		// Internal AppConfig routes
-		[
-			'name' => 'config#getAppConfig',
-			'url' => '/config',
-			'verb' => 'GET'
-		],
-		[
-			'name' => 'config#updateAppConfig',
-			'url' => '/config/update',
-			'verb' => 'PATCH'
-		],
+		['name' => 'config#getAppConfig', 'url' => '/config', 'verb' => 'GET'],
+		['name' => 'config#updateAppConfig', 'url' => '/config/update', 'verb' => 'PATCH'],
 
 		// Public Share Link
-		[
-			'name' => 'page#public_link_view',
-			'url' => '/s/{hash}',
-			'verb' => 'GET'
-		],
+		['name' => 'page#public_link_view', 'url' => '/s/{hash}', 'verb' => 'GET'],
 
 		// Embedded View
-		[
-			'name' => 'page#embedded_form_view',
-			'url' => '/embed/{hash}',
-			'verb' => 'GET'
-		],
+		['name' => 'page#embedded_form_view', 'url' => '/embed/{hash}', 'verb' => 'GET'],
 
 		// Internal views
-		[
-			'name' => 'page#views',
-			'url' => '/{hash}/{view}',
-			'verb' => 'GET'
-		],
+		['name' => 'page#views', 'url' => '/{hash}/{view}', 'verb' => 'GET'],
 		// Internal Form Link
-		[
-			'name' => 'page#internal_link_view',
-			'url' => '/{hash}',
-			'verb' => 'GET'
-		],
+		['name' => 'page#internal_link_view', 'url' => '/{hash}', 'verb' => 'GET'],
 		// App Root
-		[
-			'name' => 'page#index',
-			'url' => '/',
-			'verb' => 'GET'
-		],
+		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 	],
 
 	'ocs' => [
 		// CORS Preflight
-		[
-			'name' => 'api#preflightedCors',
-			'url' => '/api/{apiVersion}/{path}',
-			'verb' => 'OPTIONS',
+		['name' => 'api#preflightedCors', 'url' => '/api/{apiVersion}/{path}', 'verb' => 'OPTIONS',
 			'requirements' => [
 				'path' => '.+',
-				'apiVersion' => 'v2(\.[1-4])?'
+				'apiVersion' => 'v2(\.[1-4])?|v3'
 			]
 		],
 
+		// API routes v3
+		['name' => 'api#getForms', 'url' => '/api/{apiVersion}/forms', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#newForm', 'url' => '/api/{apiversion}/forms', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		['name' => 'api#getForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#updateForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
+		['name' => 'api#deleteForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+
+		// Legacy v2 routes (TODO: remove with Forms v5)
 		// Forms
-		[
-			'name' => 'api#getForms',
-			'url' => '/api/{apiVersion}/forms',
-			'verb' => 'GET',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#getFormsLegacy', 'url' => '/api/{apiVersion}/forms', 'verb' => 'GET', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]
 		],
-		[
-			'name' => 'api#newForm',
-			'url' => '/api/{apiVersion}/form',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#newFormLegacy', 'url' => '/api/{apiVersion}/form', 'verb' => 'POST', 'requirements' => [
+			'apiVersion_path' => 'v2(\.[1-4])?'
+		]
 		],
-		[
-			'name' => 'api#getForm',
-			'url' => '/api/{apiVersion}/form/{id}',
-			'verb' => 'GET',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#getFormLegacy', 'url' => '/api/{apiVersion}/form/{id}', 'verb' => 'GET', 'requirements' => [
+			'apiVersion_path' => 'v2(\.[1-4])?'
+		]
 		],
-		[
-			'name' => 'api#cloneForm',
-			'url' => '/api/{apiVersion}/form/clone/{id}',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#cloneFormLegacy', 'url' => '/api/{apiVersion}/form/clone/{id}', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]
 		],
-		// TODO: Remove POST in next API release
-		[
-			'name' => 'api#updateForm',
-			'url' => '/api/{apiVersion}/form/update',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#updateFormLegacy', 'url' => '/api/{apiVersion}/form/update', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]
 		],
-		[
-			'name' => 'api#updateForm',
-			'url' => '/api/{apiVersion}/form/update',
-			'verb' => 'PATCH',
-			'requirements' => [
-				'apiVersion' => 'v2\.[2-4]'
-			]
+		['name' => 'api#updateFormLegacy', 'url' => '/api/{apiVersion}/form/update', 'verb' => 'PATCH', 'requirements' => [
+			'apiVersion' => 'v2\.[2-4]'
+		]
 		],
-		[
-			'name' => 'api#transferOwner',
-			'url' => '/api/{apiVersion}/form/transfer',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2\.[2-4]'
-			]
+		['name' => 'api#transferOwnerLegacy', 'url' => '/api/{apiVersion}/form/transfer', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2\.[2-4]'
+		]
 		],
-		[
-			'name' => 'api#deleteForm',
-			'url' => '/api/{apiVersion}/form/{id}',
-			'verb' => 'DELETE',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#deleteFormLegacy', 'url' => '/api/{apiVersion}/form/{id}', 'verb' => 'DELETE', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]
 		],
-		[
-			'name' => 'api#getPartialForm',
-			'url' => '/api/{apiVersion}/partial_form/{hash}',
-			'verb' => 'GET',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#getPartialFormLegacy', 'url' => '/api/{apiVersion}/partial_form/{hash}', 'verb' => 'GET', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]
 		],
-		[
-			'name' => 'api#getSharedForms',
-			'url' => '/api/{apiVersion}/shared_forms',
-			'verb' => 'GET',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
+		['name' => 'api#getSharedFormsLegacy', 'url' => '/api/{apiVersion}/shared_forms', 'verb' => 'GET', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]
 		],
 
 		// Questions
@@ -356,22 +296,14 @@ return [
 			]
 		],
 		// Submissions linking with file in cloud
-		[
-			'name' => 'api#linkFile',
-			'url' => '/api/{apiVersion}/form/link/{fileFormat}',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2.4',
-				'fileFormat' => 'csv|ods|xlsx'
-			]
+		['name' => 'api#linkFileLegacy', 'url' => '/api/{apiVersion}/form/link/{fileFormat}', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2.4',
+			'fileFormat' => 'csv|ods|xlsx'
+		]
 		],
-		[
-			'name' => 'api#unlinkFile',
-			'url' => '/api/{apiVersion}/form/unlink',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2.4',
-			]
+		['name' => 'api#unlinkFileLegacy', 'url' => '/api/{apiVersion}/form/unlink', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2.4',
+		]
 		]
 	]
 ];
