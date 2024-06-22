@@ -1,0 +1,139 @@
+<!--
+  - @copyright Copyright (c) 2024 Christian Hartmann <chris-hartmann@gmx.de>
+  -
+  - @author Christian Hartmann <chris-hartmann@gmx.de>
+  -
+  - @license AGPL-3.0-or-later
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -
+  -->
+
+<template>
+	<NcDialog
+		content-classes="options-modal"
+		:name="t('forms', 'Add multiple options')"
+		:open="open"
+		:buttons="buttons"
+		size="normal"
+		@update:open="$emit('update:open', $event)">
+		<NcTextArea
+			:value.sync="enteredOptions"
+			:label="t('forms', 'Add multiple options (one per line)')"
+			:placeholder="t('forms', 'Add multiple options (one per line)')"
+			resize="vertical"
+			rows="10" />
+		<NcSelect
+			:input-label="t('forms', 'Options')"
+			multiple
+			disabled
+			:value="multipleOptions" />
+	</NcDialog>
+</template>
+
+<script>
+import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
+import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcTextArea from '@nextcloud/vue/dist/Components/NcTextArea.js'
+
+import IconCheck from '@mdi/svg/svg/check.svg?raw'
+
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+	name: 'OptionInputDialog',
+
+	components: {
+		NcDialog,
+		NcSelect,
+		NcTextArea,
+	},
+
+	props: {
+		open: {
+			type: Boolean,
+			required: true,
+		},
+	},
+
+	emits: ['update:open'],
+
+	data() {
+		return {
+			enteredOptions: '',
+		}
+	},
+
+	computed: {
+		buttons() {
+			return [
+				{
+					label: t('forms', 'Cancel'),
+					callback: () => {
+						this.$emit('update:open', false)
+					},
+				},
+				{
+					label: t('forms', 'Add options'),
+					type: 'primary',
+					icon: IconCheck,
+					callback: () => {
+						this.onMultipleOptions()
+					},
+				},
+			]
+		},
+
+		multipleOptions() {
+			const allOptions = this.enteredOptions.split(/\r?\n/g)
+			return allOptions.filter((answer) => {
+				return answer.trim().length > 0
+			})
+		},
+	},
+
+	methods: {
+		t,
+
+		onMultipleOptions() {
+			this.$emit('update:open', false)
+			if (this.multipleOptions.length > 1) {
+				// extract all options entries to parent
+				this.$emit('multiple-answers', this.multipleOptions)
+				this.enteredOptions = ''
+				return
+			}
+			// in case of only one option, just show an error message because it is probably missuse of the feature
+			showError(t('forms', 'Options should be seperated by new line!'))
+		},
+	},
+})
+</script>
+
+<style scoped>
+:deep(.options-modal) {
+	padding-block: 0px 12px;
+	padding-inline: 8px 20px;
+}
+
+:deep(.v-select) {
+	width: 100%;
+	margin-top: 10px !important;
+	display: flex;
+	flex-direction: column;
+	gap: 2px 0;
+}
+</style>

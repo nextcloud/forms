@@ -34,6 +34,12 @@
 				@update:checked="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
+			<NcActionButton close-after-click @click="isOptionDialogShown = true">
+				<template #icon>
+					<IconContentPaste :size="20" />
+				</template>
+				{{ t('forms', 'Add multiple options') }}
+			</NcActionButton>
 		</template>
 		<NcSelect
 			v-if="readOnly"
@@ -47,37 +53,47 @@
 			label="text"
 			@input="onInput" />
 
-		<ol v-if="!readOnly" class="question__content">
-			<!-- Answer text input edit -->
-			<AnswerInput
-				v-for="(answer, index) in options"
-				:key="
-					index /* using index to keep the same vnode after new answer creation */
-				"
-				ref="input"
-				:answer="answer"
-				:index="index"
-				:is-unique="!isMultiple"
-				:is-dropdown="true"
-				:max-option-length="maxStringLengths.optionText"
-				@delete="deleteOption"
-				@update:answer="updateAnswer"
-				@focus-next="focusNextInput"
-				@tabbed-out="checkValidOption" />
+		<template v-else>
+			<div v-if="isLoading">
+				<NcLoadingIcon :size="64" />
+			</div>
+			<ol v-else class="question__content">
+				<!-- Answer text input edit -->
+				<AnswerInput
+					v-for="(answer, index) in options"
+					:key="
+						index /* using index to keep the same vnode after new answer creation */
+					"
+					ref="input"
+					:answer="answer"
+					:index="index"
+					:is-unique="!isMultiple"
+					:is-dropdown="true"
+					:max-option-length="maxStringLengths.optionText"
+					@delete="deleteOption"
+					@update:answer="updateAnswer"
+					@focus-next="focusNextInput"
+					@tabbed-out="checkValidOption" />
 
-			<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
-				<input
-					ref="pseudoInput"
-					v-model="inputValue"
-					:aria-label="t('forms', 'Add a new answer')"
-					:placeholder="t('forms', 'Add a new answer')"
-					class="question__input"
-					:maxlength="maxStringLengths.optionText"
-					minlength="1"
-					type="text"
-					@input="addNewEntry" />
-			</li>
-		</ol>
+				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
+					<input
+						ref="pseudoInput"
+						v-model="inputValue"
+						:aria-label="t('forms', 'Add a new answer')"
+						:placeholder="t('forms', 'Add a new answer')"
+						class="question__input"
+						:maxlength="maxStringLengths.optionText"
+						minlength="1"
+						type="text"
+						@input="addNewEntry" />
+				</li>
+			</ol>
+		</template>
+
+		<!-- Add multiple options modal -->
+		<OptionInputDialog
+			:open.sync="isOptionDialogShown"
+			@multiple-answers="handleMultipleOptions" />
 	</Question>
 </template>
 
@@ -87,9 +103,14 @@ import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 
+import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
+
 import AnswerInput from './AnswerInput.vue'
+import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
@@ -99,8 +120,12 @@ export default {
 
 	components: {
 		AnswerInput,
+		IconContentPaste,
+		NcActionButton,
 		NcActionCheckbox,
+		NcLoadingIcon,
 		NcSelect,
+		OptionInputDialog,
 	},
 
 	mixins: [QuestionMixin],
@@ -109,6 +134,8 @@ export default {
 		return {
 			selectedOption: null,
 			inputValue: '',
+			isOptionDialogShown: false,
+			isLoading: false,
 		}
 	},
 
