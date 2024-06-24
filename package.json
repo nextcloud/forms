@@ -45,6 +45,7 @@
     "markdown-it": "^14.1.0",
     "p-debounce": "^4.0.0",
     "p-queue": "^8.0.1",
+    "qrcode": "^1.5.3",
     "v-click-outside": "^3.2.0",
     "vue": "^2.7.16",
     "vue-material-design-icons": "^5.3.0",
