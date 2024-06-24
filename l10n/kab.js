@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Nɣel",
     "Results" : "Igmaḍ",
+    "Options" : "Iɣewwaṛen",
     "Delete" : "Kkes",
     "Other" : "Wayeḍ",
     "Group" : "Agraw",
@@ -10,7 +11,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Copier dans le presse-papiers",
     "Share" : "Bḍu",
     "Edit" : "Ẓreg",
-    "Options" : "Iɣewwaṛen",
     "Download" : "Sider",
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaṛen",

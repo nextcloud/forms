@@ -26,6 +26,7 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
 import logger from '../utils/Logger.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import Question from '../components/Questions/Question.vue'
 
 export default {
@@ -375,6 +376,38 @@ export default {
 				logger.error('Error while saving question', { error })
 				showError(t('forms', 'Error while saving question'))
 			}
+		},
+
+		/**
+		 * Handles multiple options for a question.
+		 *
+		 * @param {Array<string>} answers - The array of answers for the question.
+		 */
+		async handleMultipleOptions(answers) {
+			const options = this.options.slice()
+			this.isLoading = true
+			for (let i = 0; i < answers.length; i++) {
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2/option'),
+					{
+						questionId: this.id,
+						text: answers[i],
+					},
+				)
+				const newServerOption = OcsResponse2Data(response)
+				const option = {
+					id: newServerOption.id, // use the ID from the server
+					questionId: this.id,
+					text: answers[i],
+					local: false,
+				}
+				options.push(option)
+			}
+			this.updateOptions(options)
+			this.$nextTick(() => {
+				this.focusIndex(options.length - 1)
+			})
+			this.isLoading = false
 		},
 	},
 }

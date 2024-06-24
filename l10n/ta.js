@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
+    "Cancel" : "ரத்து செய்",
     "Delete" : "நீக்குக",
     "Other" : "மற்றவை",
     "Set expiration date" : "காலாவதி தேதியை குறிப்பிடுக",
@@ -12,7 +13,6 @@ OC.L10N.register(
     "Edit" : "தொகுக்க",
     "Description" : "விவரிப்பு",
     "Download" : "பதிவிறக்குக",
-    "Cancel" : "ரத்து செய்",
     "Settings" : "அமைப்புகள்",
     "File" : "File",
     "Date" : "Date"

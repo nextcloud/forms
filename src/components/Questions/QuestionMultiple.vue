@@ -79,6 +79,12 @@
 					:value="extraSettings.optionsLimitMax"
 					@update:value="onLimitOptionsMax" />
 			</template>
+			<NcActionButton close-after-click @click="isOptionDialogShown = true">
+				<template #icon>
+					<IconContentPaste :size="20" />
+				</template>
+				{{ t('forms', 'Add multiple options') }}
+			</NcActionButton>
 		</template>
 		<template v-if="readOnly">
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
@@ -123,47 +129,59 @@
 		</template>
 
 		<template v-else>
-			<ul class="question__content">
-				<!-- Answer text input edit -->
-				<AnswerInput
-					v-for="(answer, index) in sortedOptions"
-					:key="
-						index /* using index to keep the same vnode after new answer creation */
-					"
-					ref="input"
-					:answer="answer"
-					:index="index"
-					:is-unique="isUnique"
-					:is-dropdown="false"
-					:max-option-length="maxStringLengths.optionText"
-					@delete="deleteOption"
-					@update:answer="updateAnswer"
-					@focus-next="focusNextInput"
-					@tabbed-out="checkValidOption" />
-				<li v-if="allowOtherAnswer" class="question__item">
-					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input
-						:placeholder="t('forms', 'Other')"
-						class="question__input"
-						:maxlength="maxStringLengths.optionText"
-						minlength="1"
-						type="text"
-						:readonly="!readOnly" />
-				</li>
-				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
-					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input
-						ref="pseudoInput"
-						class="question__input"
-						:aria-label="t('forms', 'Add a new answer')"
-						:placeholder="t('forms', 'Add a new answer')"
-						:maxlength="maxStringLengths.optionText"
-						minlength="1"
-						type="text"
-						@input="addNewEntry" />
-				</li>
-			</ul>
+			<template v-if="isLoading">
+				<div>
+					<NcLoadingIcon :size="64" />
+				</div>
+			</template>
+			<template v-else>
+				<ul class="question__content">
+					<!-- Answer text input edit -->
+					<AnswerInput
+						v-for="(answer, index) in sortedOptions"
+						:key="
+							index /* using index to keep the same vnode after new answer creation */
+						"
+						ref="input"
+						:answer="answer"
+						:index="index"
+						:is-unique="isUnique"
+						:is-dropdown="false"
+						:max-option-length="maxStringLengths.optionText"
+						@delete="deleteOption"
+						@update:answer="updateAnswer"
+						@focus-next="focusNextInput"
+						@tabbed-out="checkValidOption" />
+					<li v-if="allowOtherAnswer" class="question__item">
+						<div :is="pseudoIcon" class="question__item__pseudoInput" />
+						<input
+							:placeholder="t('forms', 'Other')"
+							class="question__input"
+							:maxlength="maxStringLengths.optionText"
+							minlength="1"
+							type="text"
+							:readonly="!readOnly" />
+					</li>
+					<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
+						<div :is="pseudoIcon" class="question__item__pseudoInput" />
+						<input
+							ref="pseudoInput"
+							class="question__input"
+							:aria-label="t('forms', 'Add a new answer')"
+							:placeholder="t('forms', 'Add a new answer')"
+							:maxlength="maxStringLengths.optionText"
+							minlength="1"
+							type="text"
+							@input="addNewEntry" />
+					</li>
+				</ul>
+			</template>
 		</template>
+
+		<!-- Add multiple options modal -->
+		<OptionInputDialog
+			:open.sync="isOptionDialogShown"
+			@multiple-answers="handleMultipleOptions" />
 	</Question>
 </template>
 
@@ -173,18 +191,23 @@ import { emit } from '@nextcloud/event-bus'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
+
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
+import OptionInputDialog from '../OptionInputDialog.vue'
 
 const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
 
@@ -194,12 +217,16 @@ export default {
 	components: {
 		AnswerInput,
 		IconCheckboxBlankOutline,
+		IconContentPaste,
 		IconRadioboxBlank,
+		NcActionButton,
 		NcActionCheckbox,
 		NcActionInput,
 		NcCheckboxRadioSwitch,
 		NcInputField,
+		NcLoadingIcon,
 		NcNoteCard,
+		OptionInputDialog,
 	},
 
 	mixins: [QuestionMixin],
@@ -216,6 +243,9 @@ export default {
 			 */
 			cachedOtherAnswerText: '',
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+
+			isOptionDialogShown: false,
+			isLoading: false,
 		}
 	},
 

@@ -2,6 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Shared with you" : "Shared with you",
+    "Options" : "ជម្រើស",
+    "Cancel" : "លើកលែង",
     "Delete" : "លុប",
     "Other" : "ផ្សេងៗ",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
@@ -10,9 +12,7 @@ OC.L10N.register(
     "Share" : "ចែក​រំលែក",
     "Edit" : "កែប្រែ",
     "Description" : "ការ​អធិប្បាយ",
-    "Options" : "ជម្រើស",
     "Download" : "ទាញយក",
-    "Cancel" : "លើកលែង",
     "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",
     "Abort" : "អំពី",

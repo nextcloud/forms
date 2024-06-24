@@ -34,6 +34,7 @@ OC.L10N.register(
     "Presentation" : "Prezentācija",
     "Spreadsheet" : "Izklājlapa",
     "Text" : "Teksts",
-    "Phone number" : "Tālruņa numurs"
+    "Phone number" : "Tālruņa numurs",
+    "Email address" : "E-pasta adrese"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");
