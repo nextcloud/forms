@@ -70,6 +70,12 @@
 						</template>
 						{{ t('forms', 'Copy to clipboard') }}
 					</NcActionLink>
+					<NcActionButton @click="openQrDialog(share)">
+						<template #icon>
+							<IconQr :size="20" />
+						</template>
+						{{ t('forms', 'Show QR code') }}
+					</NcActionButton>
 					<NcActionButton
 						v-if="isEmbeddable"
 						@click="copyEmbeddingCode(share)">
@@ -103,6 +109,11 @@
 				</NcActions>
 			</div>
 		</TransitionGroup>
+
+		<QRDialog
+			:title="t('forms', 'Share {formTitle}', { formTitle: form.title })"
+			:text="qrDialogText"
+			@closed="qrDialogText = ''" />
 
 		<!-- Legacy Info, if present -->
 		<div v-if="form.access.legacyLink" class="share-div">
@@ -224,12 +235,14 @@ import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxVariantOutline.vue'
 import IconLinkVariant from 'vue-material-design-icons/LinkVariant.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
+import IconQr from 'vue-material-design-icons/Qrcode.vue'
 
 import FormsIcon from '../Icons/FormsIcon.vue'
 import IconCopyAll from '../Icons/IconCopyAll.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
+import QRDialog from '../QRDialog.vue'
 import ShareTypes from '../../mixins/ShareTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
@@ -246,10 +259,12 @@ export default {
 		IconLinkBoxVariantOutline,
 		IconLinkVariant,
 		IconPlus,
+		IconQr,
 		NcActions,
 		NcActionButton,
 		NcActionLink,
 		NcCheckboxRadioSwitch,
+		QRDialog,
 		SharingSearchDiv,
 		SharingShareDiv,
 	},
@@ -267,6 +282,7 @@ export default {
 		return {
 			isLoading: false,
 			appConfig: loadState(appName, 'appConfig'),
+			qrDialogText: '',
 		}
 	},
 
@@ -452,6 +468,10 @@ export default {
 			const newAccess = { ...this.form.access }
 			delete newAccess.legacyLink
 			this.$emit('update:formProp', 'access', newAccess)
+		},
+
+		openQrDialog(share) {
+			this.qrDialogText = this.getPublicShareLink(share)
 		},
 	},
 }
