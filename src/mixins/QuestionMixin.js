@@ -372,9 +372,14 @@ export default {
 			try {
 				// TODO: add loading status feedback ?
 				await axios.patch(
-					generateOcsUrl('apps/forms/api/v2.4/question/update'),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+						{
+							id: this.formId,
+							questionId: this.id,
+						},
+					),
 					{
-						id: this.id,
 						keyValuePairs: {
 							[key]: value,
 						},

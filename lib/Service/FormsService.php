@@ -145,6 +145,40 @@ class FormsService {
 	}
 
 	/**
+	 * Load specific question
+	 *
+	 * @param integer $questionId id of the question
+	 * @return array
+	 */
+	public function getQuestion(int $questionId): array {
+		$question = [];
+		try {
+			$questionEntity = $this->questionMapper->findById($questionId);
+			$question = $questionEntity->read();
+			$question['options'] = $this->getOptions($question['id']);
+			$question['accept'] = [];
+			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+				if ($question['extraSettings']['allowedFileTypes'] ?? null) {
+					$question['accept'] = array_keys(array_intersect(
+						$this->mimeTypeDetector->getAllAliases(),
+						$question['extraSettings']['allowedFileTypes']
+					));
+				}
+
+				if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
+					foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
+						$question['accept'][] = '.' . $extension;
+					}
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			//handle silently
+		} finally {
+			return $question;
+		}
+	}
+
+	/**
 	 * Load shares corresponding to form
 	 *
 	 * @param integer $formId

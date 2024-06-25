@@ -96,6 +96,7 @@ class ApiController extends OCSController {
 	}
 
 	// API v3 methods
+	// Forms
 	/**
 	 * @CORS
 	 * @NoAdminRequired
@@ -355,6 +356,393 @@ class ApiController extends OCSController {
 		$this->formMapper->deleteForm($form);
 
 		return new DataResponse($id);
+	}
+
+	// Questions
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Read all questions (including options)
+	 *
+	 * @param int $id FormId
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function getQuestions(int $id): DataResponse {
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->hasUserAccess($form)) {
+			$this->logger->debug('User has no permissions to get this form');
+			throw new OCSForbiddenException();
+		}
+
+		$questionData = $this->formsService->getQuestions($id);
+
+		return new DataResponse($questionData);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Read a specific question (including options)
+	 *
+	 * @param int $id FormId
+	 * @param int $questionId QuestionId
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function getQuestion(int $id, int $questionId): DataResponse {
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->hasUserAccess($form)) {
+			$this->logger->debug('User has no permissions to get this form');
+			throw new OCSForbiddenException();
+		}
+
+		$question = $this->formsService->getQuestion($questionId);
+
+		if ($question['id'] !== $id) {
+			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+		}
+
+		return new DataResponse($question);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Add a new question
+	 *
+	 * @param int $id the form id
+	 * @param string $type the new question type
+	 * @param string $text the new question title
+	 * @param int $fromId (optional) id of the question that should be cloned
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function newQuestion(int $id, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
+		$form = $this->getFormIfAllowed($id);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+		
+		if($fromId === null) {
+			$this->logger->debug('Adding new question: formId: {id}, type: {type}, text: {text}', [
+				'id' => $id,
+				'type' => $type,
+				'text' => $text,
+			]);
+	
+			if (array_search($type, Constants::ANSWER_TYPES) === false) {
+				$this->logger->debug('Invalid type');
+				throw new OCSBadRequestException('Invalid type');
+			}
+	
+			// Block creation of datetime questions
+			if ($type === 'datetime') {
+				$this->logger->debug('Datetime question type no longer supported');
+				throw new OCSBadRequestException('Datetime question type no longer supported');
+			}
+	
+			// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
+			$questions = $this->questionMapper->findByForm($id);
+			$lastQuestion = array_pop($questions);
+			if ($lastQuestion) {
+				$questionOrder = $lastQuestion->getOrder() + 1;
+			} else {
+				$questionOrder = 1;
+			}
+	
+			$question = new Question();
+	
+			$question->setFormId($id);
+			$question->setOrder($questionOrder);
+			$question->setType($type);
+			$question->setText($text);
+			$question->setDescription('');
+			$question->setIsRequired(false);
+			$question->setExtraSettings([]);
+	
+			$question = $this->questionMapper->insert($question);
+	
+			$response = $question->read();
+			$response['options'] = [];
+			$response['accept'] = [];
+	
+			$this->formsService->setLastUpdatedTimestamp($id);
+		} else {
+			$this->logger->debug('Question to be cloned: {id}', [
+				'id' => $id
+			]);
+	
+			try {
+				$sourceQuestion = $this->questionMapper->findById($fromId);
+				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find question');
+				throw new OCSNotFoundException('Could not find question');
+			}
+	
+			$allQuestions = $this->questionMapper->findByForm($id);
+	
+			$questionData = $sourceQuestion->read();
+			unset($questionData['id']);
+			$questionData["order"] = end($allQuestions)->getOrder() + 1;
+	
+			$newQuestion = Question::fromParams($questionData);
+			$this->questionMapper->insert($newQuestion);
+	
+			$response = $newQuestion->read();
+			$response['options'] = [];
+			$response['accept'] = [];
+	
+			foreach ($sourceOptions as $sourceOption) {
+				$optionData = $sourceOption->read();
+	
+				unset($optionData['id']);
+				$optionData['questionId'] = $newQuestion->getId();
+				$newOption = Option::fromParams($optionData);
+				$insertedOption = $this->optionMapper->insert($newOption);
+	
+				$response['options'][] = $insertedOption->read();
+			}
+		}
+
+		return new DataResponse($response);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Writes the given key-value pairs into Database.
+	 * Key 'order' should only be changed by reorderQuestions() and is not allowed here.
+	 *
+	 * @param int $id the form id
+	 * @param int $questionId id of question to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function updateQuestion(int $id, int $questionId, array $keyValuePairs): DataResponse {
+		$this->logger->debug('Updating question: formId: {id}, questionId: {id}, values: {keyValuePairs}', [
+			'id' => $id,
+			'questionId' => $questionId,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException('Could not find question');
+		}
+
+		if ($question->getFormId() !== $id) {
+			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+		}
+
+		$form = $this->getFormIfAllowed($id);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		//Don't allow to change id or formId
+		if (key_exists('id', $keyValuePairs) || key_exists('formId', $keyValuePairs)) {
+			$this->logger->debug('Not allowed to update id or formId');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow to reorder here
+		if (key_exists('order', $keyValuePairs)) {
+			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
+			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
+		}
+
+		if (key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
+			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
+		}
+
+		// Create QuestionEntity with given Params & Id.
+		$question = Question::fromParams($keyValuePairs);
+		$question->setId($questionId);
+
+		// Update changed Columns in Db.
+		$this->questionMapper->update($question);
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($question->getId());
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Delete a question
+	 *
+	 * @param int $id the form id
+	 * @param int $questionId the question id
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function deleteQuestion(int $id, int $questionId): DataResponse {
+		$this->logger->debug('Mark question as deleted: {questionId}', [
+			'questionId' => $questionId,
+		]);
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException('Could not find question');
+		}
+
+		if ($question->getFormId() !== $id) {
+			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+		}
+
+		$form = $this->getFormIfAllowed($id);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		// Store Order of deleted Question
+		$deletedOrder = $question->getOrder();
+
+		// Mark question as deleted
+		$question->setOrder(0);
+		$this->questionMapper->update($question);
+
+		// Update all question-order > deleted order.
+		$formQuestions = $this->questionMapper->findByForm($id);
+		foreach ($formQuestions as $question) {
+			$questionOrder = $question->getOrder();
+			if ($questionOrder > $deletedOrder) {
+				$question->setOrder($questionOrder - 1);
+				$this->questionMapper->update($question);
+			}
+		}
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($questionId);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Updates the Order of all Questions of a Form.
+	 *
+	 * @param int $id Id of the form to reorder
+	 * @param Array<int, int> $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function reorderQuestions(int $id, array $newOrder): DataResponse {
+		$this->logger->debug('Reordering Questions on Form {id} as Question-Ids {newOrder}', [
+			'id' => $id,
+			'newOrder' => $newOrder
+		]);
+
+		$form = $this->getFormIfAllowed($id);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		// Check if array contains duplicates
+		if (array_unique($newOrder) !== $newOrder) {
+			$this->logger->debug('The given Array contains duplicates');
+			throw new OCSBadRequestException('The given Array contains duplicates');
+		}
+
+		// Check if all questions are given in Array.
+		$questions = $this->questionMapper->findByForm($id);
+		if (sizeof($questions) !== sizeof($newOrder)) {
+			$this->logger->debug('The length of the given array does not match the number of stored questions');
+			throw new OCSBadRequestException('The length of the given array does not match the number of stored questions');
+		}
+
+		$questions = []; // Clear Array of Entities
+		$response = []; // Array of ['questionId' => ['order' => newOrder]]
+
+		// Store array of Question-Entities and check the Questions FormId & old Order.
+		foreach ($newOrder as $arrayKey => $questionId) {
+			try {
+				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find question. Id:{id}', [
+					'id' => $questionId
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Abort if a question is not part of the Form.
+			if ($questions[$arrayKey]->getFormId() !== $id) {
+				$this->logger->debug('This Question is not part of the given Form: questionId: {questionId}', [
+					'questionId' => $questionId
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Abort if a question is already marked as deleted (order==0)
+			$oldOrder = $questions[$arrayKey]->getOrder();
+			if ($oldOrder === 0) {
+				$this->logger->debug('This Question has already been marked as deleted: Id: {id}', [
+					'id' => $questions[$arrayKey]->getId()
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Only set order, if it changed.
+			if ($oldOrder !== $arrayKey + 1) {
+				// Set Order. ArrayKey counts from zero, order counts from 1.
+				$questions[$arrayKey]->setOrder($arrayKey + 1);
+			}
+		}
+
+		// Write to Database
+		foreach ($questions as $question) {
+			$this->questionMapper->update($question);
+
+			$response[$question->getId()] = [
+				'order' => $question->getOrder()
+			];
+		}
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($response);
 	}
 
 	/*
@@ -666,7 +1054,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newQuestion(int $formId, string $type, string $text = ''): DataResponse {
+	public function newQuestionLegacy(int $formId, string $type, string $text = ''): DataResponse {
 		$this->logger->debug('Adding new question: formId: {formId}, type: {type}, text: {text}', [
 			'formId' => $formId,
 			'type' => $type,
@@ -732,7 +1120,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function reorderQuestions(int $formId, array $newOrder): DataResponse {
+	public function reorderQuestionsLegacy(int $formId, array $newOrder): DataResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
 			'formId' => $formId,
 			'newOrder' => $newOrder
@@ -822,7 +1210,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function updateQuestion(int $id, array $keyValuePairs): DataResponse {
+	public function updateQuestionLegacy(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating question: questionId: {id}, values: {keyValuePairs}', [
 			'id' => $id,
 			'keyValuePairs' => $keyValuePairs
@@ -886,7 +1274,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function deleteQuestion(int $id): DataResponse {
+	public function deleteQuestionLegacy(int $id): DataResponse {
 		$this->logger->debug('Mark question as deleted: {id}', [
 			'id' => $id,
 		]);
@@ -937,7 +1325,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse
 	 * @throws OCSBadRequestException|OCSForbiddenException
 	 */
-	public function cloneQuestion(int $id): DataResponse {
+	public function cloneQuestionLegacy(int $id): DataResponse {
 		$this->logger->debug('Question to be cloned: {id}', [
 			'id' => $id
 		]);

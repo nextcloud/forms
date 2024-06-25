@@ -748,9 +748,8 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $expected
 	 */
 	public function testCreateNewQuestion(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2.4/question', [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
 			'json' => [
-				'formId' => $this->testForms[0]['id'],
 				'type' => 'short',
 				'text' => $expected['text']
 			]
@@ -788,9 +787,8 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateQuestionProperties(array $fullFormExpected): void {
-		$resp = $this->http->request('PATCH', 'api/v2.4/question/update', [
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$this->testForms[0]['questions'][0]['id']}", [
 			'json' => [
-				'id' => $this->testForms[0]['questions'][0]['id'],
 				'keyValuePairs' => [
 					'isRequired' => false,
 					'text' => 'Still first Question!'
@@ -830,9 +828,8 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testReorderQuestions(array $fullFormExpected): void {
-		$resp = $this->http->request('PUT', 'api/v2.4/question/reorder', [
+		$resp = $this->http->request('PUT', "api/v3/forms/{$this->testForms[0]['id']}/questions/reorder", [
 			'json' => [
-				'formId' => $this->testForms[0]['id'],
 				'newOrder' => [
 					$this->testForms[0]['questions'][1]['id'],
 					$this->testForms[0]['questions'][0]['id'],
@@ -873,7 +870,7 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testDeleteQuestion(array $fullFormExpected) {
-		$resp = $this->http->request('DELETE', "api/v2.1/question/{$this->testForms[0]['questions'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$this->testForms[0]['questions'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -885,7 +882,7 @@ class ApiV3Test extends IntegrationBase {
 	}
 
 	public function testCloneQuestion() {
-		$resp = $this->http->request('POST', 'api/v2.4/question/clone/' . $this->testForms[0]['questions'][0]['id']);
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions?fromId=" . $this->testForms[0]['questions'][0]['id']);
 		$data = $this->OcsResponse2Data($resp);
 		$this->testForms[0]['questions'][] = $data;
 

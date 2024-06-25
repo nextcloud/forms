@@ -661,7 +661,7 @@ class ApiControllerTest extends TestCase {
 	public function testCloneQuestion_notFound() {
 		$this->questionMapper->method('findById')->with(42)->willThrowException($this->createMock(IMapperException::class));
 		$this->expectException(OCSNotFoundException::class);
-		$this->apiController->cloneQuestion(42);
+		$this->apiController->cloneQuestionLegacy(42);
 	}
 
 	public function testCloneQuestion_noPermission() {
@@ -670,7 +670,7 @@ class ApiControllerTest extends TestCase {
 		$this->questionMapper->method('findById')->with(42)->willReturn($question);
 		$this->formMapper->method('findById')->with(1)->willReturn($form);
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->cloneQuestion(42);
+		$this->apiController->cloneQuestionLegacy(42);
 	}
 
 	public function testUploadFiles() {
