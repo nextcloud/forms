@@ -59,11 +59,15 @@ return [
 		],
 
 		// API routes v3
+		// Forms
 		['name' => 'api#getForms', 'url' => '/api/{apiVersion}/forms', 'verb' => 'GET', 'requirements' => $requirements_v3],
 		['name' => 'api#newForm', 'url' => '/api/{apiversion}/forms', 'verb' => 'POST', 'requirements' => $requirements_v3],
 		['name' => 'api#getForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'GET', 'requirements' => $requirements_v3],
 		['name' => 'api#updateForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
 		['name' => 'api#deleteForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+
+		// Questions
+		['name' => 'api#getQuestions', 'url' => '/api/{apiVersion}/forms/{id}/questions', 'verb' => 'GET', 'requirements' => $requirements_v3],
 
 		// Legacy v2 routes (TODO: remove with Forms v5)
 		// Forms

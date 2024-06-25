@@ -96,6 +96,7 @@ class ApiController extends OCSController {
 	}
 
 	// API v3 methods
+	// Forms
 	/**
 	 * @CORS
 	 * @NoAdminRequired
@@ -355,6 +356,36 @@ class ApiController extends OCSController {
 		$this->formMapper->deleteForm($form);
 
 		return new DataResponse($id);
+	}
+
+	// Questions
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Read all questions (including options)
+	 *
+	 * @param int $id FormId
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function getQuestions(int $id): DataResponse {
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		if (!$this->formsService->hasUserAccess($form)) {
+			$this->logger->debug('User has no permissions to get this form');
+			throw new OCSForbiddenException();
+		}
+
+		$questionData = $this->formsService->getQuestions($id);
+
+		return new DataResponse($questionData);
 	}
 
 	/*
