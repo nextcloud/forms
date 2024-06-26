@@ -117,7 +117,7 @@ export default defineComponent({
 				return
 			}
 			// in case of only one option, just show an error message because it is probably missuse of the feature
-			showError(t('forms', 'Options should be seperated by new line!'))
+			showError(t('forms', 'Options should be separated by new line!'))
 		},
 	},
 })
