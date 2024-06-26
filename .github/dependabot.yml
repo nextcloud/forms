@@ -26,6 +26,19 @@ updates:
       - 3. to review
       - dependencies
 
+  - package-ecosystem: composer
+    target-branch: 'main'
+    directory: '/vendor-bin/psalm/'
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '03:00'
+      timezone: Europe/Paris
+    open-pull-requests-limit: 10
+    labels:
+      - 3. to review
+      - dependencies
+
   - package-ecosystem: npm
     target-branch: 'main'
     directory: '/'
@@ -41,59 +54,6 @@ updates:
 
   - package-ecosystem: github-actions
     target-branch: 'main'
-    directory: '/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  # Update stable3 until NC27 is out of support
-  - package-ecosystem: composer
-    target-branch: 'stable3'
-    directory: '/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'stable3'
-    directory: '/vendor-bin/cs-fixer/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: npm
-    target-branch: 'stable3'
-    directory: '/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: github-actions
-    target-branch: 'stable3'
     directory: '/'
     schedule:
       interval: weekly
