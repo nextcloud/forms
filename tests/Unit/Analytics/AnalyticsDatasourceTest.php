@@ -80,5 +80,68 @@ class AnalyticsDatasourceTest extends TestCase {
 		$this->assertEquals(66, $this->mockDatasource()->getId());
 	}
 
-	// TODO: Write tests for `getTemplate` and `readData`
+    public function testGetTemplate() {
+		// Mock form object
+		$form = $this->createMock(\OCA\Forms\Db\Form::class);
+		$form->method('getId')->willReturn(1);
+		$form->method('getTitle')->willReturn('Sample Form');
+
+		// Mock findAllByOwnerId to return an array of forms
+		$this->formMapper->method('findAllByOwnerId')->willReturn([$form]);
+
+		// Mock translation method
+		$this->l10n->method('t')->will($this->returnArgument(0));
+
+		// Call getTemplate and assert the result
+		$template = $this->analyticsDatasource->getTemplate();
+
+		$expectedTemplate = [
+			['id' => 'formId', 'name' => 'Select form', 'type' => 'tf', 'placeholder' => '1-Sample Form/'],
+			['id' => 'timestamp', 'name' => 'Timestamp of data load', 'placeholder' => 'false-No/true-Yes', 'type' => 'tf']
+		];
+
+		$this->assertEquals($expectedTemplate, $template);
+	}
+
+	public function testReadData() {
+		// Mock questions
+		$questions = [
+			['id' => 1, 'text' => 'Question 1'],
+			['id' => 2, 'text' => 'Question 2']
+		];
+		$this->formsService->method('getQuestions')->willReturn($questions);
+
+		// Mock submissions
+		$submissions = [
+			['answers' => [
+				['questionId' => 1, 'text' => 'Answer 1'],
+				['questionId' => 2, 'text' => 'Answer 2']
+			]],
+			['answers' => [
+				['questionId' => 1, 'text' => 'Answer 1']
+			]]
+		];
+		$this->submissionService->method('getSubmissions')->willReturn($submissions);
+
+		// Mock translation method
+		$this->l10n->method('t')->will($this->returnArgument(0));
+
+		// Define options
+		$options = ['formId' => 123];
+
+		// Call readData and assert the result
+		$data = $this->analyticsDatasource->readData($options);
+
+		$expectedData = [
+			'header' => ['Question', 'Answer', 'Count'],
+			'dimensions' => ['Question', 'Answer'],
+			'data' => [
+				['Question 1', 'Answer 1', 2],
+				['Question 2', 'Answer 2', 1]
+			],
+			'error' => 0
+		];
+
+		$this->assertEquals($expectedData, $data);
+	}
 }
