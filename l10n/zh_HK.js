@@ -60,6 +60,8 @@ OC.L10N.register(
     "Expires {relativeDate}" : "有效期至 {relativeDate}",
     "Error changing archived state of form" : "更改表格的封存狀態時發生錯誤",
     "Error while deleting {title}" : "刪除 {title} 時發生錯誤",
+    "Add multiple options" : "添加多個選項",
+    "Add multiple options (one per line)" : "添加多個選項（每行一個）",
     "Options" : "設定",
     "Cancel" : "取消",
     "Add options" : "添加選項",

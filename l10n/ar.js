@@ -65,7 +65,6 @@ OC.L10N.register(
     "Options" : "الخيارات",
     "Cancel" : "إلغاء",
     "Add options" : "إضافة خيارات",
-    "Options should be seperated by new line!" : "يجب الفصل بين الخيارات بسطر جديد!",
     "An answer for the {index} option" : "إجابة لخيار {index}",
     "Answer number {index}" : "رقم الإجابة {index}",
     "Delete answer" : "حذف الإجابة ",

@@ -65,7 +65,6 @@ OC.L10N.register(
     "Options" : "Roghanna",
     "Cancel" : "Cealaigh",
     "Add options" : "Cuir roghanna leis",
-    "Options should be seperated by new line!" : "Ba chóir roghanna a dheighilt le líne nua!",
     "An answer for the {index} option" : "Freagra don rogha {index}",
     "Answer number {index}" : "Uimhir fhreagra {index}",
     "Delete answer" : "Scrios an freagra",
