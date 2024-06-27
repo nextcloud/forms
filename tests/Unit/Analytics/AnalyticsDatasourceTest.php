@@ -46,8 +46,8 @@ class AnalyticsDatasourceTest extends TestCase {
 		parent::setUp();
 
 		if (!\class_exists(IDatasource::class)) {
-			$this->markTestSkipped('The analytics app is not installed!');
-			return;
+			#$this->markTestSkipped('The analytics app is not installed!');
+			#return;
 		}
 
 		$this->l10n = $this->createMock(IL10N::class);
