@@ -166,13 +166,6 @@ class SubmissionService {
 	}
 
 	/**
-	 * Validate the new submission is unique
-	 */
-	public function isUniqueSubmission(Submission $newSubmission): bool {
-		return $this->submissionMapper->countSubmissions($newSubmission->getFormId(), $newSubmission->getUserId()) === 1;
-	}
-
-	/**
 	 * Export Submissions to Cloud-Filesystem
 	 *
 	 * @param Form $form the form
