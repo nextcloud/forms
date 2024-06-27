@@ -80,7 +80,7 @@ class AnalyticsDatasourceTest extends TestCase {
 		$this->assertEquals(66, $this->mockDatasource()->getId());
 	}
 
-    public function testGetTemplate() {
+	public function testGetTemplate() {
 		// Mock form object
 		$form = $this->createMock(\OCA\Forms\Db\Form::class);
 		$form->method('getId')->willReturn(1);
