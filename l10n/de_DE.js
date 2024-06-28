@@ -65,6 +65,7 @@ OC.L10N.register(
     "Options" : "Optionen",
     "Cancel" : "Abbrechen",
     "Add options" : "Optionen hinzufügen",
+    "Options should be separated by new line!" : "Optionen sollten durch eine neue Zeile getrennt werden!",
     "An answer for the {index} option" : "Eine Antwort für die {index} Option",
     "Answer number {index}" : "Antwort Nummer {index}",
     "Delete answer" : "Antwort löschen",
