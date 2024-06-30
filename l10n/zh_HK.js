@@ -65,6 +65,7 @@ OC.L10N.register(
     "Options" : "設定",
     "Cancel" : "取消",
     "Add options" : "添加選項",
+    "Options should be separated by new line!" : "選項應該用新行分隔！",
     "An answer for the {index} option" : "{index} 選項的答案",
     "Answer number {index}" : "回應編號 {index}",
     "Delete answer" : "刪除答案",
