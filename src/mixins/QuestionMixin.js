@@ -26,6 +26,7 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
 import logger from '../utils/Logger.js'
+import GenRandomId from '../utils/GenRandomId.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import Question from '../components/Questions/Question.vue'
 
@@ -408,6 +409,42 @@ export default {
 				this.focusIndex(options.length - 1)
 			})
 			this.isLoading = false
+		},
+
+		/**
+		 * Add a new empty answer locally
+		 * @param {InputEvent} event The input event that triggered adding a new entry
+		 */
+		addNewEntry({ target, isComposing }) {
+			// Needed for languages using IME like Japanese or Chinese
+			if (!isComposing && target.value !== '') {
+				// Add local entry
+				const options = [
+					...this.options,
+					{
+						id: GenRandomId(),
+						questionId: this.id,
+						text: target?.value ?? '',
+						local: true,
+					},
+				]
+
+				// Reset the "new answer" input if needed
+				if (this.$refs.pseudoInput) {
+					this.$refs.pseudoInput.value = ''
+				}
+
+				// Update questions
+				this.updateOptions(options)
+
+				this.$nextTick(() => {
+					// Set focus to the created input element
+					this.focusIndex(options.length - 1)
+
+					// Trigger onInput on new AnswerInput for posting the new option to the API
+					this.$refs.input[options.length - 1].onInput()
+				})
+			}
 		},
 	},
 }
