@@ -362,7 +362,7 @@ export default {
 			// Load Owned forms
 			try {
 				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v2.4/forms'),
+					generateOcsUrl('apps/forms/api/v3/forms'),
 				)
 				this.forms = OcsResponse2Data(response)
 			} catch (error) {
@@ -375,7 +375,7 @@ export default {
 			// Load shared forms
 			try {
 				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v2.4/shared_forms'),
+					generateOcsUrl('apps/forms/api/v3/forms?type=shared'),
 				)
 				this.allSharedForms = OcsResponse2Data(response)
 			} catch (error) {
@@ -413,7 +413,7 @@ export default {
 			) {
 				try {
 					const response = await axios.get(
-						generateOcsUrl('apps/forms/api/v2.4/partial_form/{hash}', {
+						generateOcsUrl('apps/forms/api/v3/forms/0?hash={hash}', {
 							hash,
 						}),
 					)
@@ -443,7 +443,7 @@ export default {
 			try {
 				// Request a new empty form
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/form'),
+					generateOcsUrl('apps/forms/api/v3/forms'),
 				)
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
@@ -463,7 +463,7 @@ export default {
 		async onCloneForm(id) {
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/form/clone/{id}', { id }),
+					generateOcsUrl('apps/forms/api/v3/forms?fromId={id}', { id }),
 				)
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)

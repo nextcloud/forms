@@ -408,7 +408,7 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn(true);
 
-		$this->apiController->unlinkFile('hash');
+		$this->apiController->unlinkFileLegacy('hash');
 
 		$this->assertNull($form->getFileId());
 		$this->assertNull($form->getFileFormat());
@@ -537,7 +537,7 @@ class ApiControllerTest extends TestCase {
 			->with(7)
 			->willReturnCallback($callback);
 		$this->expectException($exception);
-		$this->apiController->cloneForm(7);
+		$this->apiController->newForm(7);
 	}
 
 	public function dataCloneForm() {
@@ -641,7 +641,7 @@ class ApiControllerTest extends TestCase {
 			->method('getForm')
 			->with(14)
 			->willReturn(new DataResponse('success'));
-		$this->assertEquals(new DataResponse('success'), $apiController->cloneForm(7));
+		$this->assertEquals(new DataResponse('success'), $apiController->newForm(7));
 	}
 
 	private function formAccess(bool $hasUserAccess = true, bool $hasFormExpired = false, bool $canSubmit = true) {
@@ -1063,7 +1063,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->transferOwner(1, 'newOwner');
+		$this->apiController->transferOwnerLegacy(1, 'newOwner');
 	}
 
 	public function testTransferNewOwnerNotFound() {
@@ -1083,7 +1083,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn(null);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->transferOwner(1, 'newOwner');
+		$this->apiController->transferOwnerLegacy(1, 'newOwner');
 	}
 
 	public function testTransferOwner() {
@@ -1103,7 +1103,7 @@ class ApiControllerTest extends TestCase {
 			->with('newOwner')
 			->willReturn($newOwner);
 
-		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwner(1, 'newOwner'));
+		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwnerLegacy(1, 'newOwner'));
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}
 }
