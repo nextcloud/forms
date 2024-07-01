@@ -78,14 +78,15 @@
 				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
 					<input
 						ref="pseudoInput"
-						v-model="inputValue"
+						class="question__input"
 						:aria-label="t('forms', 'Add a new answer')"
 						:placeholder="t('forms', 'Add a new answer')"
-						class="question__input"
 						:maxlength="maxStringLengths.optionText"
 						minlength="1"
 						type="text"
-						@input="addNewEntry" />
+						@input="addNewEntry"
+						@compositionstart="onCompositionStart"
+						@compositionend="onCompositionEnd" />
 				</li>
 			</ol>
 		</template>
@@ -112,7 +113,6 @@ import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import AnswerInput from './AnswerInput.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
 
 export default {
@@ -153,7 +153,7 @@ export default {
 
 		isLastEmpty() {
 			const value = this.options[this.options.length - 1]
-			return value?.text?.trim().length === 0
+			return value?.text?.trim?.().length === 0
 		},
 
 		isMultiple() {
@@ -239,37 +239,11 @@ export default {
 		 * @param {object} answer the answer to update
 		 */
 		updateAnswer(id, answer) {
-			const options = this.options.slice()
+			const options = [...this.options]
 			const answerIndex = options.findIndex((option) => option.id === id)
 			options[answerIndex] = answer
 
 			this.updateOptions(options)
-		},
-
-		/**
-		 * Add a new empty answer locally
-		 */
-		addNewEntry() {
-			// Add local entry
-			const options = this.options.slice()
-			options.push({
-				id: GenRandomId(),
-				questionId: this.id,
-				text: this.inputValue,
-				local: true,
-			})
-
-			this.inputValue = ''
-
-			// Update question
-			this.updateOptions(options)
-
-			this.$nextTick(() => {
-				this.focusIndex(options.length - 1)
-
-				// Trigger onInput on new AnswerInput for posting the new option to the API
-				this.$refs.input[options.length - 1].onInput()
-			})
 		},
 
 		/**
