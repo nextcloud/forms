@@ -86,44 +86,48 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $formId
-	 * @throws DoesNotExistException if not found
-	 * @return array
+	 * Checks if the specified user has submissions for the specified form
+	 * @param int $formId ID of the form
+	 * @param string $userId UID of the user
+	 * @param bool $checkMultipleFormSubmissions if true, we check if there is more than one submissions, if false, at least one submissions
+	 * @return bool
 	 */
-	public function findParticipantsByForm(int $formId): array {
+	public function hasFormSubmissionsByUser(
+		int $formId,
+		string $userId,
+		bool $checkMultipleFormSubmissions
+	): bool {
+		$requireCountFormSubmissions = $checkMultipleFormSubmissions ? 2 : 1;
+
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select('user_id')
+		$query = $qb->select('id')
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-			);
+			)
+			->andWhere(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+			)
+			->setMaxResults($requireCountFormSubmissions);
+		$result = $query->executeQuery();
+		$rows = $result->fetchAll();
+		$result->closeCursor();
 
-		$submissionEntities = $this->findEntities($qb);
-
-		// From array of submissionEntities produce array of userIds.
-		$userIds = array_map(function ($submissionEntity) {
-			return $submissionEntity->getUserId();
-		}, $submissionEntities);
-
-		return $userIds;
+		return count($rows) === $requireCountFormSubmissions;
 	}
 
 	/**
-	 * Count submissions by form and optionally also by userId
-	 * @param int $formId ID of the form to count submissions for
-	 * @param string|null $userId optionally limit submissions to the one of that user
+	 * Count submissions by form
+	 * @param int $formId ID of the form to count submissions
 	 * @throws \Exception
 	 */
-	public function countSubmissions(int $formId, ?string $userId = null): int {
+	public function countSubmissions(int $formId): int {
 		$qb = $this->db->getQueryBuilder();
 
 		$query = $qb->select($qb->func()->count('*', 'num_submissions'))
 			->from($this->getTableName())
 			->where($qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)));
-		if (!is_null($userId)) {
-			$query->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
-		}
 
 		$result = $query->executeQuery();
 		$row = $result->fetch();
