@@ -41,6 +41,7 @@ class AnalyticsDatasourceTest extends TestCase {
 	private FormMapper|MockObject $formMapper;
 	private FormsService|MockObject $formsService;
 	private SubmissionService|MockObject $submissionService;
+	private AnalyticsDatasource $analyticsDatasource;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -55,10 +56,8 @@ class AnalyticsDatasourceTest extends TestCase {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->submissionService = $this->createMock(SubmissionService::class);
-	}
 
-	protected function mockDatasource() {
-		return new AnalyticsDatasource(
+		$this->analyticsDatasource = new AnalyticsDatasource(
 			null,
 			$this->l10n,
 			$this->logger,
@@ -73,11 +72,11 @@ class AnalyticsDatasourceTest extends TestCase {
 			->expects($this->any())
 			->method('t')
 			->willReturnCallback(fn (string $str) => $str);
-		$this->assertEquals('Nextcloud Forms', $this->mockDatasource()->getName());
+		$this->assertEquals('Nextcloud Forms', $this->analyticsDatasource->getName());
 	}
 
 	public function testGetId() {
-		$this->assertEquals(66, $this->mockDatasource()->getId());
+		$this->assertEquals(66, $this->analyticsDatasource->getId());
 	}
 
 	public function testGetTemplate() {
