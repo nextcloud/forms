@@ -1,6 +1,6 @@
 <?php
 /**
- * Analytics data source
+ * Analytics App data source
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the LICENSE.md file.
