@@ -135,6 +135,7 @@ OC.L10N.register(
     "Add link" : "Cuir nasc leis",
     "Embeddable link" : "Nasc inleabaithe",
     "Copy to clipboard" : "Cóipeáil chuig an ngearrthaisce",
+    "Show QR code" : "Taispeáin cód QR",
     "Copy embedding code" : "Cóipeáil cód leabú",
     "Convert to embeddable link" : "Tiontaigh go nasc inleabaithe",
     "Remove link" : "Bain nasc",

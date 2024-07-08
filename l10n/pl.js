@@ -86,6 +86,7 @@ OC.L10N.register(
     "Share link" : "Udostępnij link",
     "Add link" : "Dodaj link",
     "Copy to clipboard" : "Kopiuj do schowka",
+    "Show QR code" : "Pokaż kod QR",
     "Copy embedding code" : "Kopiuj kod osadzania",
     "Remove link" : "Usuń link",
     "Legacy Link" : "Link w starszej wersji",

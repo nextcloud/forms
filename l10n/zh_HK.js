@@ -135,6 +135,7 @@ OC.L10N.register(
     "Add link" : "加入連結",
     "Embeddable link" : "可嵌入連結",
     "Copy to clipboard" : "複製到剪貼板",
+    "Show QR code" : "顯示 QR 碼",
     "Copy embedding code" : "複製內嵌程式碼",
     "Convert to embeddable link" : "轉換為可嵌入連結",
     "Remove link" : "移除連結",

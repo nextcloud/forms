@@ -88,6 +88,7 @@ OC.L10N.register(
     "Share link" : "هم‌رسانی پیوند",
     "Add link" : "افزودن پیوند",
     "Copy to clipboard" : "کپی کردن به حافظه موقت",
+    "Show QR code" : "Show QR code",
     "Copy embedding code" : "کد تعبیه شده را کپی کنید",
     "Remove link" : "حذف پیوند",
     "Legacy Link" : "پیوند قدیمی",

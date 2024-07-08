@@ -135,6 +135,7 @@ OC.L10N.register(
     "Add link" : "Engadir a ligazón",
     "Embeddable link" : "Ligazón incrustábel",
     "Copy to clipboard" : "Copiar no portapapeis.",
+    "Show QR code" : "Amosar o código QR",
     "Copy embedding code" : "Copiar o código incrustado",
     "Convert to embeddable link" : "Converter a ligazón incrustábel",
     "Remove link" : "Retirar ligazón",

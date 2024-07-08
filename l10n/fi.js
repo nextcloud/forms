@@ -106,6 +106,7 @@ OC.L10N.register(
     "Add link" : "Lisää linkki",
     "Embeddable link" : "Upotettava linkki",
     "Copy to clipboard" : "Kopioi leikepöydälle",
+    "Show QR code" : "Näytä QR-koodi",
     "Copy embedding code" : "Kopioi upotuskoodi",
     "Convert to embeddable link" : "Muunna upotettavaksi linkiksi",
     "Remove link" : "Poista linkki",

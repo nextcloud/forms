@@ -12,6 +12,7 @@ OC.L10N.register(
     "Group" : "Grupa",
     "Share link" : "Koplietot saiti",
     "Copy to clipboard" : "Kopēt starpliktuvē",
+    "Show QR code" : "Parādīt kvadrātkodu",
     "Remove link" : "Noņemt saiti",
     "Internal link" : "Iekšējā saite",
     "Share" : "Koplietot",

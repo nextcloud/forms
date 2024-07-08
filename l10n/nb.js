@@ -135,6 +135,7 @@ OC.L10N.register(
     "Add link" : "Legg ved lenke",
     "Embeddable link" : "Innbyggbar lenke",
     "Copy to clipboard" : "Kopiert til utklippstavlen",
+    "Show QR code" : "Vis QR-koden",
     "Copy embedding code" : "Kopier innbyggingskode",
     "Convert to embeddable link" : "Konverter til innbyggbar lenke",
     "Remove link" : "Fjern kobling",

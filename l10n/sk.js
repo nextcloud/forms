@@ -102,6 +102,7 @@ OC.L10N.register(
     "Share link" : "Zdieľať odkaz",
     "Add link" : "Pridať odkaz",
     "Copy to clipboard" : "Skopírovať do schránky",
+    "Show QR code" : "Zobraziť QR kód",
     "Copy embedding code" : "Kopírovať vložený kód",
     "Remove link" : "Odstrániť odkaz",
     "Legacy Link" : "Starší odkaz",

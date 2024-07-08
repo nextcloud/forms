@@ -92,6 +92,7 @@ OC.L10N.register(
     "Share link" : "Megosztási hivatkozás",
     "Add link" : "Hivatkozás hozzáadása",
     "Copy to clipboard" : "Másolás a vágólapra",
+    "Show QR code" : "QR-kód megjelenítése",
     "Copy embedding code" : "Beágyazó kód másolása",
     "Remove link" : "Hivatkozás eltávolítása",
     "Legacy Link" : "Örökölt hivatkozás",

@@ -122,6 +122,7 @@ OC.L10N.register(
     "Add link" : "Gehitu esteka",
     "Embeddable link" : "Esteka txertagarria",
     "Copy to clipboard" : "Kopiatu arbelera",
+    "Show QR code" : "Erakutsi QR kodea",
     "Copy embedding code" : "Kopiatu kapsulatze-kodea",
     "Convert to embeddable link" : "Bihurtu esteka txertagarria",
     "Remove link" : "Kendu esteka",

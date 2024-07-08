@@ -89,6 +89,7 @@ OC.L10N.register(
     "Share link" : "Comparteix l'enllaç",
     "Add link" : "Afegeix un enllaç",
     "Copy to clipboard" : "Copia-ho al porta-papers",
+    "Show QR code" : "Mostra el codi QR",
     "Copy embedding code" : "Còpia del codi per inserir",
     "Remove link" : "Suprimeix l'enllaç",
     "Legacy Link" : "Enllaç heretat",

@@ -123,6 +123,7 @@ OC.L10N.register(
     "Add link" : "Bağlantı ekle",
     "Embeddable link" : "Gömülebilir bağlantı",
     "Copy to clipboard" : "Panoya kopyala",
+    "Show QR code" : "QR kodunu görüntüle",
     "Copy embedding code" : "Gömme kodunu kopyala",
     "Convert to embeddable link" : "Gömülebilir bağlantıya çevir",
     "Remove link" : "Bağlantıyı kaldır",

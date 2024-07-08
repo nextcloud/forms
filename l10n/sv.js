@@ -86,6 +86,7 @@ OC.L10N.register(
     "Share link" : "Delningslänk",
     "Add link" : "Lägg till länk",
     "Copy to clipboard" : "Kopiera till urklipp",
+    "Show QR code" : "Visa QR-kod",
     "Copy embedding code" : "Kopiera inbäddningskod",
     "Remove link" : "Ta bort länk",
     "Legacy Link" : "Äldre länk",
