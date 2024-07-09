@@ -66,6 +66,7 @@ OC.L10N.register(
     "Cancel" : "取消",
     "Add options" : "添加选项",
     "Options should be separated by new line!" : "选项应使用换行符分隔！",
+    "QR code representation of {text}" : "{text}的二维码表示",
     "An answer for the {index} option" : " {index}选项的一个答复",
     "Answer number {index}" : "第{index}个答复",
     "Delete answer" : "删除答复",
