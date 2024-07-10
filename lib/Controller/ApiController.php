@@ -1161,7 +1161,7 @@ class ApiController extends OCSController {
 
 		// Ensure the form is unique if needed.
 		// If we can not submit anymore then the submission must be unique
-		if (!$this->formsService->canSubmit($form) && !$this->submissionService->isUniqueSubmission($submission)) {
+		if (!$this->formsService->canSubmit($form) && $this->submissionMapper->hasMultipleFormSubmissionsByUser($form, $submission->getUserId())) {
 			$this->submissionMapper->delete($submission);
 			throw new OCSForbiddenException('Already submitted');
 		}

@@ -86,36 +86,40 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $formId
-	 * @throws DoesNotExistException if not found
-	 * @return array
+	 * Сhecks if there are multiple form submissions by user
+	 * @param Form $form of the form to count submissions
+	 * @param string $userId ID of the user to count submissions
 	 */
-	public function findParticipantsByForm(int $formId): array {
-		$qb = $this->db->getQueryBuilder();
-
-		$qb->select('user_id')
-			->from($this->getTableName())
-			->where(
-				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-			);
-
-		$submissionEntities = $this->findEntities($qb);
-
-		// From array of submissionEntities produce array of userIds.
-		$userIds = array_map(function ($submissionEntity) {
-			return $submissionEntity->getUserId();
-		}, $submissionEntities);
-
-		return $userIds;
+	public function hasMultipleFormSubmissionsByUser(Form $form, string $userId): bool {
+		return $this->countSubmissionsWithFilters($form->getId(), $userId, 2) >= 2;
 	}
 
 	/**
-	 * Count submissions by form and optionally also by userId
-	 * @param int $formId ID of the form to count submissions for
-	 * @param string|null $userId optionally limit submissions to the one of that user
+	 * Сhecks if there are form submissions by user
+	 * @param Form $form of the form to count submissions
+	 * @param string $userId ID of the user to count submissions
+	 */
+	public function hasFormSubmissionsByUser(Form $form, string $userId): bool {
+		return (bool)$this->countSubmissionsWithFilters($form->getId(), $userId, 1);
+	}
+
+	/**
+	 * Count submissions by form
+	 * @param int $formId ID of the form to count submissions
 	 * @throws \Exception
 	 */
-	public function countSubmissions(int $formId, ?string $userId = null): int {
+	public function countSubmissions(int $formId): int {
+		return $this->countSubmissionsWithFilters($formId, null, -1);
+	}
+
+	/**
+	 * Count submissions by form with optional filters
+	 * @param int $formId ID of the form to count submissions
+	 * @param string|null $userId optionally limit submissions to the one of that user
+	 * @param int $limit allows to limit the query selection. If -1, the restriction is ignored
+	 * @throws \Exception
+	 */
+	protected function countSubmissionsWithFilters(int $formId, ?string $userId = null, int $limit = -1): int {
 		$qb = $this->db->getQueryBuilder();
 
 		$query = $qb->select($qb->func()->count('*', 'num_submissions'))
@@ -123,6 +127,9 @@ class SubmissionMapper extends QBMapper {
 			->where($qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)));
 		if (!is_null($userId)) {
 			$query->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+		}
+		if ($limit !== -1) {
+			$query->setMaxResults($limit);
 		}
 
 		$result = $query->executeQuery();

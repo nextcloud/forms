@@ -802,25 +802,25 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'submitMultiple' => false,
-				'participantsArray' => ['currentUser'],
+				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			],
 			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
-				'participantsArray' => ['notCurrentUser'],
+				'hasFormSubmissionsByUser' => false,
 				'expected' => true
 			],
 			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
-				'participantsArray' => ['notCurrentUser', 'currentUser'],
+				'hasFormSubmissionsByUser' => true,
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => true,
-				'participantsArray' => ['currentUser'],
+				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			]
 		];
@@ -830,10 +830,10 @@ class FormsServiceTest extends TestCase {
 	 *
 	 * @param string $ownerId
 	 * @param bool $submitMultiple
-	 * @param array $participantsArray
+	 * @param bool $hasFormSubmissionsByUser
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitMultiple, array $participantsArray, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $hasFormSubmissionsByUser, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -844,9 +844,9 @@ class FormsServiceTest extends TestCase {
 		$form->setSubmitMultiple($submitMultiple);
 
 		$this->submissionMapper->expects($this->any())
-			->method('findParticipantsByForm')
-			->with(42)
-			->willReturn($participantsArray);
+			->method('hasFormSubmissionsByUser')
+			->with($form, 'currentUser')
+			->willReturn($hasFormSubmissionsByUser);
 
 		$this->assertEquals($expected, $this->formsService->canSubmit($form));
 	}
