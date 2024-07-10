@@ -122,13 +122,10 @@ class FormsService {
 				$question['accept'] = [];
 				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-						$aliases = $this->mimeTypeDetector->getAllAliases();
-
-						foreach ($question['extraSettings']['allowedFileTypes'] as $type) {
-							$question['accept'] = array_keys(array_filter($aliases, function (string $alias) use ($type) {
-								return $alias === $type;
-							}));
-						}
+						$question['accept'] = array_keys(array_intersect(
+							$this->mimeTypeDetector->getAllAliases(),
+							$question['extraSettings']['allowedFileTypes']
+						));
 					}
 
 					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
