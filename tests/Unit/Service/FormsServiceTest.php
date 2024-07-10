@@ -61,6 +61,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
@@ -1468,5 +1469,50 @@ class FormsServiceTest extends TestCase {
 
 		$this->assertSame('Forms/unsubmitted/1234567.89/10 - Form 1/30 - question name',
 			$this->formsService->getTemporaryUploadedFilePath($form, $question));
+	}
+
+	public function testGetQuestionsReturnsEmptyArrayWhenNoQuestions(): void {
+		$this->questionMapper->method('findByForm')->willReturn([]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertEmpty($result);
+	}
+
+	public function testGetQuestionsWithVariousQuestionTypes(): void {
+		$questionEntities = [
+			$this->createQuestionEntity(['id' => 1, 'type' => 'text']),
+			$this->createQuestionEntity(['id' => 2, 'type' => Constants::ANSWER_TYPE_FILE, 'extraSettings' => [
+				'allowedFileTypes' => ['image', 'x-office/document'],
+				'allowedFileExtensions' => ['jpg']
+			]])
+		];
+
+		$this->questionMapper->method('findByForm')->willReturn($questionEntities);
+		$this->mimeTypeDetector->method('getAllAliases')->willReturn([
+			'application/coreldraw' => 'image',
+			'application/msonenote' => 'x-office/document',
+		]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertCount(2, $result);
+		$this->assertEquals('text', $result[0]['type']);
+		$this->assertEquals(Constants::ANSWER_TYPE_FILE, $result[1]['type']);
+		$this->assertEquals(['application/coreldraw', 'application/msonenote', '.jpg'], $result[1]['accept']);
+	}
+
+	public function testGetQuestionsHandlesDoesNotExistException(): void {
+		$this->questionMapper->method('findByForm')->willThrowException(new DoesNotExistException('test'));
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertEmpty($result);
+	}
+
+	private function createQuestionEntity(array $data): Question {
+		$questionEntity = $this->createMock(Question::class);
+		$questionEntity->method('read')->willReturn($data);
+		return $questionEntity;
 	}
 }
