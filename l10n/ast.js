@@ -53,6 +53,7 @@ OC.L10N.register(
     "Add link" : "Amestar un enllaz",
     "Embeddable link" : "Enllaz empotrable",
     "Copy to clipboard" : "Copiar nel cartafueyu",
+    "Show QR code" : "Amosar el códigu QR",
     "Copy embedding code" : "Copiar el códigu empotráu",
     "Remove link" : "Quitar l'enllaz",
     "Legacy Link" : "Enllaz heredáu",

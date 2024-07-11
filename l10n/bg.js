@@ -86,6 +86,7 @@ OC.L10N.register(
     "Share link" : "Връзка за споделяне",
     "Add link" : "Добавяне на връзка",
     "Copy to clipboard" : "Копиране в клипборда",
+    "Show QR code" : "Показване на QR код",
     "Copy embedding code" : "Копиране на кода за вграждане",
     "Remove link" : "Премахване на връзка",
     "Legacy Link" : "Наследена връзка",
