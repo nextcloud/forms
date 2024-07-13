@@ -2,6 +2,9 @@
 #
 # https://github.com/nextcloud/.github
 # https://docs.github.com/en/actions/learn-github-actions/sharing-workflows-with-your-organization
+#
+# SPDX-FileCopyrightText: 2021-2024 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: MIT
 
 name: Build and publish app release
 
@@ -38,7 +41,7 @@ jobs:
         uses: skjnldsv/xpath-action@7e6a7c379d0e9abc8acaef43df403ab4fc4f770c # master
         with:
           filename: ${{ env.APP_NAME }}/appinfo/info.xml
-          expression: '//info//dependencies//nextcloud/@min-version'
+          expression: "//info//dependencies//nextcloud/@min-version"
 
       - name: Read package.json node and npm engines version
         uses: skjnldsv/read-package-engines-version-actions@06d6baf7d8f41934ab630e97d9e6c0bc9c9ac5e4 # v3
@@ -53,14 +56,14 @@ jobs:
       - name: Set up node ${{ steps.versions.outputs.nodeVersion }}
         # Skip if no package.json
         if: ${{ steps.versions.outputs.nodeVersion }}
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v3
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v3
         with:
           node-version: ${{ steps.versions.outputs.nodeVersion }}
 
       - name: Set up npm ${{ steps.versions.outputs.npmVersion }}
         # Skip if no package.json
         if: ${{ steps.versions.outputs.npmVersion }}
-        run: npm i -g npm@"${{ steps.versions.outputs.npmVersion }}"
+        run: npm i -g 'npm@${{ steps.versions.outputs.npmVersion }}'
 
       - name: Get php version
         id: php-versions
@@ -69,7 +72,7 @@ jobs:
           filename: ${{ env.APP_NAME }}/appinfo/info.xml
 
       - name: Set up php ${{ steps.php-versions.outputs.php-min }}
-        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2
+        uses: shivammathur/setup-php@2e947f1f6932d141d076ca441d0e1e881775e95b # v2.31.0
         with:
           php-version: ${{ steps.php-versions.outputs.php-min }}
           coverage: none
@@ -78,9 +81,9 @@ jobs:
 
       - name: Check composer.json
         id: check_composer
-        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v2
+        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v3.0.0
         with:
-          files: '${{ env.APP_NAME }}/composer.json'
+          files: "${{ env.APP_NAME }}/composer.json"
 
       - name: Install composer dependencies
         if: steps.check_composer.outputs.files_exists == 'true'
@@ -92,15 +95,15 @@ jobs:
         # Skip if no package.json
         if: ${{ steps.versions.outputs.nodeVersion }}
         env:
-          CYPRESS_INSTALL_BINARY: 0
+          NODE_ENV: production
         run: |
           cd ${{ env.APP_NAME }}
           npm ci
-          npm run build
+          npm run build --if-present
 
       - name: Check Krankerl config
         id: krankerl
-        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v2
+        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v3.0.0
         with:
           files: ${{ env.APP_NAME }}/krankerl.toml
 
@@ -126,7 +129,7 @@ jobs:
         continue-on-error: true
         id: server-checkout
         run: |
-          NCVERSION=${{ fromJSON(steps.appinfo.outputs.result).nextcloud.min-version }}
+          NCVERSION='${{ fromJSON(steps.appinfo.outputs.result).nextcloud.min-version }}'
           wget --quiet https://download.nextcloud.com/server/releases/latest-$NCVERSION.zip
           unzip latest-$NCVERSION.zip
 
@@ -145,7 +148,7 @@ jobs:
           tar -xvf ${{ env.APP_NAME }}.tar.gz
           cd ../../../
           # Setting up keys
-          echo "${{ secrets.APP_PRIVATE_KEY }}" > ${{ env.APP_NAME }}.key
+          echo '${{ secrets.APP_PRIVATE_KEY }}' > ${{ env.APP_NAME }}.key
           wget --quiet "https://github.com/nextcloud/app-certificate-requests/raw/master/${{ env.APP_NAME }}/${{ env.APP_NAME }}.crt"
           # Signing
           php nextcloud/occ integrity:sign-app --privateKey=../${{ env.APP_NAME }}.key --certificate=../${{ env.APP_NAME }}.crt --path=../${{ env.APP_NAME }}/build/artifacts/${{ env.APP_NAME }}
