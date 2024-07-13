@@ -102,7 +102,7 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
-          coverage: none
+          coverage: xdebug
           ini-file: development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -140,6 +140,16 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer run test:unit
 
+      - name: Upload Unit coverage
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          working-directory: apps/${{ env.APP_NAME }}
+          file: tests/clover.unit.xml
+          fail_ci_if_error: true
+          flags: unit
+
       - name: Check PHPUnit integration script is defined
         id: check_integration
         continue-on-error: true
@@ -157,6 +167,16 @@ jobs:
         if: steps.check_integration.outcome == 'success'
         working-directory: apps/${{ env.APP_NAME }}
         run: composer run test:integration
+
+      - name: Upload Unit coverage
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          working-directory: apps/${{ env.APP_NAME }}
+          file: tests/clover.unit.xml
+          fail_ci_if_error: true
+          flags: integration
 
       - name: Print logs
         if: always()

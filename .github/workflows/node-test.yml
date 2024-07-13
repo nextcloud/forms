@@ -92,6 +92,8 @@ jobs:
 
       - name: Collect coverage
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: ./coverage/lcov.info
 
