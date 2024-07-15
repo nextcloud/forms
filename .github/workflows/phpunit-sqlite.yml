@@ -2,16 +2,13 @@
 #
 # https://github.com/nextcloud/.github
 # https://docs.github.com/en/actions/learn-github-actions/sharing-workflows-with-your-organization
+#
+# SPDX-FileCopyrightText: 2022-2024 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: MIT
 
 name: PHPUnit SQLite
 
-on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - master
-      - stable*
+on: pull_request
 
 permissions:
   contents: read
@@ -36,6 +33,9 @@ jobs:
 
   changes:
     runs-on: ubuntu-latest-low
+    permissions:
+      contents: read
+      pull-requests: read
 
     outputs:
       src: ${{ steps.changes.outputs.src}}
@@ -97,7 +97,7 @@ jobs:
           path: apps/circles
 
       - name: Set up php ${{ matrix.php-versions }}
-        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2
+        uses: shivammathur/setup-php@2e947f1f6932d141d076ca441d0e1e881775e95b # v2.31.0
         with:
           php-version: ${{ matrix.php-versions }}
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
@@ -109,7 +109,7 @@ jobs:
 
       - name: Check composer file existence
         id: check_composer
-        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v2
+        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v3.0.0
         with:
           files: apps/${{ env.APP_NAME }}/composer.json
 
@@ -132,7 +132,7 @@ jobs:
         continue-on-error: true
         working-directory: apps/${{ env.APP_NAME }}
         run: |
-          composer run --list | grep "^  test:unit " | wc -l | grep 1
+          composer run --list | grep '^  test:unit ' | wc -l | grep 1
 
       - name: PHPUnit
         # Only run if phpunit config file exists
@@ -155,7 +155,7 @@ jobs:
         continue-on-error: true
         working-directory: apps/${{ env.APP_NAME }}
         run: |
-          composer run --list | grep "^  test:integration " | wc -l | grep 1
+          composer run --list | grep '^  test:integration ' | wc -l | grep 1
 
       - name: Run Nextcloud
         # Only run if phpunit integration config file exists
