@@ -913,13 +913,12 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $expected
 	 */
 	public function testCreateNewOption(array $expected): void {
-		$resp = $this->http->request('POST', 'api/v2.4/option', [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$this->testForms[0]['questions'][1]['id']}/options", [
 			'json' => [
-				'questionId' => $this->testForms[0]['questions'][1]['id'],
-				'text' => 'A new Option.'
+				'optionTexts' => ['A new Option.']
 			]
 		]);
-		$data = $this->OcsResponse2Data($resp);
+		$data = $this->OcsResponse2Data($resp)[0];
 
 		// Store for deletion on tearDown
 		$this->testForms[0]['questions'][1]['options'][] = $data;
@@ -949,9 +948,8 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateOptionProperties(array $fullFormExpected): void {
-		$resp = $this->http->request('PATCH', 'api/v2.4/option/update', [
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$this->testForms[0]['questions'][1]['id']}/options/{$this->testForms[0]['questions'][1]['options'][0]['id']}", [
 			'json' => [
-				'id' => $this->testForms[0]['questions'][1]['options'][0]['id'],
 				'keyValuePairs' => [
 					'text' => 'New option Text.'
 				]
@@ -984,7 +982,7 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testDeleteOption(array $fullFormExpected) {
-		$resp = $this->http->request('DELETE', "api/v2.1/option/{$this->testForms[0]['questions'][1]['options'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$this->testForms[0]['questions'][1]['id']}/options/{$this->testForms[0]['questions'][1]['options'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());

@@ -25,6 +25,7 @@
  *
  */
 
+$apiBase = '/api/{apiVersion}/';
 $requirements_v3 = [
 	'apiVersion' => 'v3'
 ];
@@ -51,126 +52,112 @@ return [
 
 	'ocs' => [
 		// CORS Preflight
-		['name' => 'api#preflightedCors', 'url' => '/api/{apiVersion}/{path}', 'verb' => 'OPTIONS',
-			'requirements' => [
-				'path' => '.+',
-				'apiVersion' => 'v2(\.[1-4])?|v3'
-			]
-		],
+		['name' => 'api#preflightedCors', 'url' => $apiBase . '{path}', 'verb' => 'OPTIONS', 'requirements' => [
+			'path' => '.+',
+			'apiVersion' => 'v2(\.[1-4])?|v3'
+		]],
 
 		// API routes v3
 		// Forms
-		['name' => 'api#getForms', 'url' => '/api/{apiVersion}/forms', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#newForm', 'url' => '/api/{apiversion}/forms', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		['name' => 'api#getForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#updateForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteForm', 'url' => '/api/{apiVersion}/forms/{id}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+		['name' => 'api#getForms', 'url' => $apiBase . 'forms', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#newForm', 'url' => $apiBase . 'forms', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		['name' => 'api#getForm', 'url' => $apiBase . 'forms/{id}', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#updateForm', 'url' => $apiBase . 'forms/{id}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
+		['name' => 'api#deleteForm', 'url' => $apiBase . 'forms/{id}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
 
 		// Questions
-		['name' => 'api#getQuestions', 'url' => '/api/{apiVersion}/forms/{id}/questions', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#newQuestion', 'url' => '/api/{apiVersion}/forms/{id}/questions', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		['name' => 'api#getQuestion', 'url' => '/api/{apiVersion}/forms/{id}/questions/{questionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#updateQuestion', 'url' => '/api/{apiVersion}/forms/{id}/questions/{questionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteQuestion', 'url' => '/api/{apiVersion}/forms/{id}/questions/{questionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-		['name' => 'api#reorderQuestions', 'url' => '/api/{apiVersion}/forms/{id}/questions/reorder', 'verb' => 'PUT', 'requirements' => $requirements_v3],
+		['name' => 'api#getQuestions', 'url' => $apiBase . 'forms/{id}/questions', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#newQuestion', 'url' => $apiBase . 'forms/{id}/questions', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		['name' => 'api#getQuestion', 'url' => $apiBase . 'forms/{id}/questions/{questionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#updateQuestion', 'url' => $apiBase . 'forms/{id}/questions/{questionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
+		['name' => 'api#deleteQuestion', 'url' => $apiBase . 'forms/{id}/questions/{questionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+		['name' => 'api#reorderQuestions', 'url' => $apiBase . 'forms/{id}/questions/reorder', 'verb' => 'PUT', 'requirements' => $requirements_v3],
+
+		// Options
+		// ['name' => 'api#getOptions', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#newOption', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		// ['name' => 'api#getOption', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options/{optionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#updateOption', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options/{optionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
+		['name' => 'api#deleteOption', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options/{optionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+		// ['name' => 'api#reorderOptions', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options/reorder', 'verb' => 'PUT', 'requirements' => $requirements_v3],
 
 		// Legacy v2 routes (TODO: remove with Forms v5)
 		// Forms
-		['name' => 'api#getFormsLegacy', 'url' => '/api/{apiVersion}/forms', 'verb' => 'GET', 'requirements' => [
+		['name' => 'api#getFormsLegacy', 'url' => $apiBase . 'forms', 'verb' => 'GET', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#newFormLegacy', 'url' => '/api/{apiVersion}/form', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#newFormLegacy', 'url' => $apiBase . 'form', 'verb' => 'POST', 'requirements' => [
 			'apiVersion_path' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#getFormLegacy', 'url' => '/api/{apiVersion}/form/{id}', 'verb' => 'GET', 'requirements' => [
+		['name' => 'api#getFormLegacy', 'url' => $apiBase . 'form/{id}', 'verb' => 'GET', 'requirements' => [
 			'apiVersion_path' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#cloneFormLegacy', 'url' => '/api/{apiVersion}/form/clone/{id}', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#cloneFormLegacy', 'url' => $apiBase . 'form/clone/{id}', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#updateFormLegacy', 'url' => '/api/{apiVersion}/form/update', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#updateFormLegacy', 'url' => $apiBase . 'form/update', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#updateFormLegacy', 'url' => '/api/{apiVersion}/form/update', 'verb' => 'PATCH', 'requirements' => [
+		['name' => 'api#updateFormLegacy', 'url' => $apiBase . 'form/update', 'verb' => 'PATCH', 'requirements' => [
 			'apiVersion' => 'v2\.[2-4]'
 		]],
-		['name' => 'api#transferOwnerLegacy', 'url' => '/api/{apiVersion}/form/transfer', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#transferOwnerLegacy', 'url' => $apiBase . 'form/transfer', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2\.[2-4]'
 		]],
-		['name' => 'api#deleteFormLegacy', 'url' => '/api/{apiVersion}/form/{id}', 'verb' => 'DELETE', 'requirements' => [
+		['name' => 'api#deleteFormLegacy', 'url' => $apiBase . 'form/{id}', 'verb' => 'DELETE', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#getPartialFormLegacy', 'url' => '/api/{apiVersion}/partial_form/{hash}', 'verb' => 'GET', 'requirements' => [
+		['name' => 'api#getPartialFormLegacy', 'url' => $apiBase . 'partial_form/{hash}', 'verb' => 'GET', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#getSharedFormsLegacy', 'url' => '/api/{apiVersion}/shared_forms', 'verb' => 'GET', 'requirements' => [
+		['name' => 'api#getSharedFormsLegacy', 'url' => $apiBase . 'shared_forms', 'verb' => 'GET', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
 
 		// Questions
-		['name' => 'api#newQuestionLegacy', 'url' => '/api/{apiVersion}/question', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#newQuestionLegacy', 'url' => $apiBase . 'question', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
 		// TODO: Remove POST in next API release
-		['name' => 'api#updateQuestionLegacy', 'url' => '/api/{apiVersion}/question/update', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#updateQuestionLegacy', 'url' => $apiBase . 'question/update', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#updateQuestionLegacy', 'url' => '/api/{apiVersion}/question/update', 'verb' => 'PATCH', 'requirements' => [
+		['name' => 'api#updateQuestionLegacy', 'url' => $apiBase . 'question/update', 'verb' => 'PATCH', 'requirements' => [
 			'apiVersion' => 'v2\.[2-4]'
 		]],
 		// TODO: Remove POST in next API release
-		['name' => 'api#reorderQuestionsLegacy', 'url' => '/api/{apiVersion}/question/reorder', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#reorderQuestionsLegacy', 'url' => $apiBase . 'question/reorder', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#reorderQuestionsLegacy', 'url' => '/api/{apiVersion}/question/reorder', 'verb' => 'PUT', 'requirements' => [
+		['name' => 'api#reorderQuestionsLegacy', 'url' => $apiBase . 'question/reorder', 'verb' => 'PUT', 'requirements' => [
 			'apiVersion' => 'v2\.[2-4]'
 		]],
-		['name' => 'api#deleteQuestionLegacy', 'url' => '/api/{apiVersion}/question/{id}', 'verb' => 'DELETE', 'requirements' => [
+		['name' => 'api#deleteQuestionLegacy', 'url' => $apiBase . 'question/{id}', 'verb' => 'DELETE', 'requirements' => [
 			'apiVersion' => 'v2(\.[1-4])?'
 		]],
-		['name' => 'api#cloneQuestionLegacy', 'url' => '/api/{apiVersion}/question/clone/{id}', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#cloneQuestionLegacy', 'url' => $apiBase . 'question/clone/{id}', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2\.[3-4]'
 		]],
 
 		// Options
-		[
-			'name' => 'api#newOption',
-			'url' => '/api/{apiVersion}/option',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
+		['name' => 'api#newOptionLegacy', 'url' => $apiBase . 'option', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
 		// TODO: Remove POST in next API release
-		[
-			'name' => 'api#updateOption',
-			'url' => '/api/{apiVersion}/option/update',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'api#updateOption',
-			'url' => '/api/{apiVersion}/option/update',
-			'verb' => 'PATCH',
-			'requirements' => [
-				'apiVersion' => 'v2\.[2-4]'
-			]
-		],
-		[
-			'name' => 'api#deleteOption',
-			'url' => '/api/{apiVersion}/option/{id}',
-			'verb' => 'DELETE',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
+		['name' => 'api#updateOptionLegacy', 'url' => $apiBase . 'option/update', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'api#updateOptionLegacy', 'url' => $apiBase . 'option/update', 'verb' => 'PATCH', 'requirements' => [
+			'apiVersion' => 'v2\.[2-4]'
+		]],
+		['name' => 'api#deleteOptionLegacy', 'url' => $apiBase . 'option/{id}', 'verb' => 'DELETE', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
 
 		// Shares
 		[
 			'name' => 'shareApi#newShare',
-			'url' => '/api/{apiVersion}/share',
+			'url' => $apiBase . 'share',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -178,7 +165,7 @@ return [
 		],
 		[
 			'name' => 'shareApi#deleteShare',
-			'url' => '/api/{apiVersion}/share/{id}',
+			'url' => $apiBase . 'share/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -187,7 +174,7 @@ return [
 		// TODO: Remove POST in next API release
 		[
 			'name' => 'shareApi#updateShare',
-			'url' => '/api/{apiVersion}/share/update',
+			'url' => $apiBase . 'share/update',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2\.[1-4]'
@@ -195,7 +182,7 @@ return [
 		],
 		[
 			'name' => 'shareApi#updateShare',
-			'url' => '/api/{apiVersion}/share/update',
+			'url' => $apiBase . 'share/update',
 			'verb' => 'PATCH',
 			'requirements' => [
 				'apiVersion' => 'v2\.[2-4]'
@@ -205,7 +192,7 @@ return [
 		// Submissions
 		[
 			'name' => 'api#getSubmissions',
-			'url' => '/api/{apiVersion}/submissions/{hash}',
+			'url' => $apiBase . 'submissions/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -213,7 +200,7 @@ return [
 		],
 		[
 			'name' => 'api#exportSubmissions',
-			'url' => '/api/{apiVersion}/submissions/export/{hash}',
+			'url' => $apiBase . 'submissions/export/{hash}',
 			'verb' => 'GET',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -221,7 +208,7 @@ return [
 		],
 		[
 			'name' => 'api#exportSubmissionsToCloud',
-			'url' => '/api/{apiVersion}/submissions/export',
+			'url' => $apiBase . 'submissions/export',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -229,7 +216,7 @@ return [
 		],
 		[
 			'name' => 'api#deleteAllSubmissions',
-			'url' => '/api/{apiVersion}/submissions/{formId}',
+			'url' => $apiBase . 'submissions/{formId}',
 			'verb' => 'DELETE',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -237,7 +224,7 @@ return [
 		],
 		[
 			'name' => 'api#uploadFiles',
-			'url' => '/api/{apiVersion}/uploadFiles/{formId}/{questionId}',
+			'url' => $apiBase . 'uploadFiles/{formId}/{questionId}',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2.5'
@@ -245,7 +232,7 @@ return [
 		],
 		[
 			'name' => 'api#insertSubmission',
-			'url' => '/api/{apiVersion}/submission/insert',
+			'url' => $apiBase . 'submission/insert',
 			'verb' => 'POST',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
@@ -253,19 +240,19 @@ return [
 		],
 		[
 			'name' => 'api#deleteSubmission',
-			'url' => '/api/{apiVersion}/submission/{id}',
+			'url' => $apiBase . 'submission/{id}',
 			'verb' => 'DELETE',
 			'requirements' => [
 				'apiVersion' => 'v2(\.[1-4])?'
 			]
 		],
 		// Submissions linking with file in cloud
-		['name' => 'api#linkFileLegacy', 'url' => '/api/{apiVersion}/form/link/{fileFormat}', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#linkFileLegacy', 'url' => $apiBase . 'form/link/{fileFormat}', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2.4',
 			'fileFormat' => 'csv|ods|xlsx'
 		]
 		],
-		['name' => 'api#unlinkFileLegacy', 'url' => '/api/{apiVersion}/form/unlink', 'verb' => 'POST', 'requirements' => [
+		['name' => 'api#unlinkFileLegacy', 'url' => $apiBase . 'form/unlink', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2.4',
 		]
 		]

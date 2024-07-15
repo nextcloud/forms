@@ -745,8 +745,195 @@ class ApiController extends OCSController {
 		return new DataResponse($response);
 	}
 
+	/**
+	 * @NoAdminRequired
+	 *
+	 * Add a new option to a question
+	 *
+	 * @param int $id id of the form
+	 * @param int $questionId id of the question
+	 * @param array<string> $optionTexts the new option text
+	 * @return DataResponse Returns a DataResponse containing the added options
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function newOption(int $id, int $questionId, array $optionTexts): DataResponse {
+		$this->logger->debug('Adding new options: formId: {id}, questionId: {questionId}, text: {text}', [
+			'id' => $id,
+			'questionId' => $questionId,
+			'text' => $optionTexts,
+		]);
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question');
+			throw new OCSBadRequestException('Could not find form or question');
+		}
+
+		if ($question->getFormId() !== $id) {
+			$this->logger->debug('This Question is not part of the given Form: questionId: {questionId}', [
+				'questionId' => $questionId
+			]);
+			throw new OCSBadRequestException();
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		$addedOptions = [];
+		foreach ($optionTexts as $text) {
+			$option = new Option();
+			
+			$option->setQuestionId($questionId);
+			$option->setText($text);
+			
+			try {
+				$option = $this->optionMapper->insert($option);
+				// Add the stored option to the collection of added options
+				$addedOptions[] = $option->read();
+			} catch (IMapperException $e) {
+				$this->logger->error("Failed to add option: {$e->getMessage()}");
+				// Optionally handle the error, e.g., by continuing to the next iteration or returning an error response
+			}
+		}
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($addedOptions);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Writes the given key-value pairs into Database.
+	 *
+	 * @param int $id id of form
+	 * @param int $questionId id of question
+	 * @param int $optionId id of option to update
+	 * @param array $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function updateOption(int $id, int $questionId, int $optionId, array $keyValuePairs): DataResponse {
+		$this->logger->debug('Updating option: form: {id}, question: {questionId}, option: {optionId}, values: {keyValuePairs}', [
+			'id' => $id,
+			'questionId' => $questionId,
+			'optionId' => $optionId,
+			'keyValuePairs' => $keyValuePairs
+		]);
+
+		try {
+			$option = $this->optionMapper->findById($optionId);
+			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find option, question or form');
+			throw new OCSBadRequestException('Could not find option, question or form');
+		}
+
+		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $id) {
+			$this->logger->debug('The given option id doesn\'t match the question or form.');
+			throw new OCSBadRequestException();
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		// Don't allow empty array
+		if (sizeof($keyValuePairs) === 0) {
+			$this->logger->info('Empty keyValuePairs, will not update.');
+			throw new OCSForbiddenException();
+		}
+
+		//Don't allow to change id or questionId
+		if (key_exists('id', $keyValuePairs) || key_exists('questionId', $keyValuePairs)) {
+			$this->logger->debug('Not allowed to update id or questionId');
+			throw new OCSForbiddenException();
+		}
+
+		// Create OptionEntity with given Params & Id.
+		$option = Option::fromParams($keyValuePairs);
+		$option->setId($optionId);
+
+		// Update changed Columns in Db.
+		$this->optionMapper->update($option);
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($option->getId());
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Delete an option
+	 *
+	 * @param int $id id of form
+	 * @param int $questionId id of question
+	 * @param int $optionId id of option to update
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function deleteOption(int $id, int $questionId, int $optionId): DataResponse {
+		$this->logger->debug('Deleting option: {optionId}', [
+			'optionId' => $optionId
+		]);
+
+		try {
+			$option = $this->optionMapper->findById($optionId);
+			$question = $this->questionMapper->findById($questionId);
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form, question or option');
+			throw new OCSBadRequestException('Could not find form, question or option');
+		}
+
+		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $id) {
+			$this->logger->debug('The given option id doesn\'t match the question or form.');
+			throw new OCSBadRequestException();
+		}
+
+		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+			$this->logger->debug('This form is not owned by the current user');
+			throw new OCSForbiddenException();
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
+		$this->optionMapper->delete($option);
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($optionId);
+	}
+
 	/*
-	/* Legacy API v2 methods (TODO: remove with Forms v5)
+	 *
+	 * Legacy API v2 methods (TODO: remove with Forms v5)
+	 *
 	 */
 
 	/**
@@ -1387,7 +1574,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newOption(int $questionId, string $text): DataResponse {
+	public function newOptionLegacy(int $questionId, string $text): DataResponse {
 		$this->logger->debug('Adding new option: questionId: {questionId}, text: {text}', [
 			'questionId' => $questionId,
 			'text' => $text,
@@ -1435,7 +1622,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function updateOption(int $id, array $keyValuePairs): DataResponse {
+	public function updateOptionLegacy(int $id, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating option: option: {id}, values: {keyValuePairs}', [
 			'id' => $id,
 			'keyValuePairs' => $keyValuePairs
@@ -1495,7 +1682,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function deleteOption(int $id): DataResponse {
+	public function deleteOptionLegacy(int $id): DataResponse {
 		$this->logger->debug('Deleting option: {id}', [
 			'id' => $id
 		]);
