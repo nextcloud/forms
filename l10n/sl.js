@@ -81,6 +81,7 @@ OC.L10N.register(
     "Permissions" : "Dovoljenja",
     "View responses" : "Pregled odzivov",
     "Group" : "Skupina",
+    "Team" : "Skupina",
     "Share link" : "Povezava za souporabo",
     "Add link" : "Dodaj povezavo",
     "Copy to clipboard" : "Kopiraj v odložišče",
