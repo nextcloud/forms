@@ -83,6 +83,7 @@ OC.L10N.register(
     "Share link" : "Compartir liga",
     "Add link" : "Añadir liga",
     "Copy to clipboard" : "Copiar al portapapeles",
+    "Copy embedding code" : "Copiar código embebido",
     "Remove link" : "Eliminar enlace",
     "Legacy Link" : "Enlace legado",
     "Form still supports old sharing-link." : "El formulario todavía admite el enlace para compartir antiguo.",
