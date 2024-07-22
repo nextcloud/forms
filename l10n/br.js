@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Eilañ",
     "Shared with you" : "Rannet ganeoc'h",
     "Select groups" : "Choaz ar strolladoù",
+    "Cancel" : "Nullañ",
     "Delete" : "Lemel",
     "Set expiration date" : "Lakaat un deizat termen",
     "Group" : "Stollad",
