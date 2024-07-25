@@ -41,6 +41,7 @@ OC.L10N.register(
     "Spreadsheet" : "Bảng tính",
     "Text" : "Văn bản",
     "Phone number" : "Số điện thoại",
-    "Email address" : "Địa chỉ thư điện tử"
+    "Email address" : "Địa chỉ thư điện tử",
+    "Number" : "Số"
 },
 "nplurals=1; plural=0;");
