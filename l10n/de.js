@@ -99,6 +99,7 @@ OC.L10N.register(
     "View responses" : "Antworten anzeigen",
     "Delete responses" : "Antworten löschen",
     "Group" : "Gruppe",
+    "Team" : "Team",
     "Share link" : "Link teilen",
     "Add link" : "Link hinzufügen",
     "Copy to clipboard" : "In die Zwischenablage kopieren",
