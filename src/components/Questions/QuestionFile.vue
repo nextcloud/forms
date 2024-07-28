@@ -108,7 +108,6 @@
 
 					<template #actions>
 						<NcActionButton
-							class="delete-button-wrapper"
 							@click="
 								onDeleteUploadedFile(uploadedFile.uploadedFileId)
 							">
@@ -121,20 +120,24 @@
 				</NcListItem>
 			</ul>
 
-			<NcLoadingIcon v-show="fileLoading" />
+			<div class="question__input--wrapper">
+				<NcLoadingIcon v-show="fileLoading" />
 
-			<input
-				v-show="!fileLoading"
-				ref="fileInput"
-				type="file"
-				:aria-label="
-					t('forms', 'A file answer for the question “{text}”', { text })
-				"
-				:disabled="!readOnly || values.length >= maxAllowedFilesCount"
-				:multiple="maxAllowedFilesCount > 1"
-				:name="name || undefined"
-				:accept="accept.length ? accept.join(',') : null"
-				@input="onFileInput" />
+				<input
+					v-show="!fileLoading"
+					ref="fileInput"
+					type="file"
+					:aria-label="
+						t('forms', 'A file answer for the question “{text}”', {
+							text,
+						})
+					"
+					:disabled="!readOnly || values.length >= maxAllowedFilesCount"
+					:multiple="maxAllowedFilesCount > 1"
+					:name="name || undefined"
+					:accept="accept.length ? accept.join(',') : null"
+					@input="onFileInput" />
+			</div>
 		</div>
 	</Question>
 </template>
@@ -381,5 +384,21 @@ export default {
 <style scoped>
 .file-type-checkbox {
 	margin-left: 30px;
+}
+
+.question__input--wrapper {
+	&:has(input:disabled) {
+		margin-left: -13px;
+	}
+
+	input {
+		height: 44px;
+		padding-top: 8px;
+	}
+
+	input:disabled {
+		height: 35px;
+		padding-top: 3px;
+	}
 }
 </style>
