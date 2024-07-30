@@ -8,6 +8,8 @@ OC.L10N.register(
     "Anonymous user" : "Anonimni korisnik",
     "A form has been <strong>shared</strong> with you" : "Obrazac je <strong>podijeljen</strong> s vama",
     "Someone <strong>answered</strong> a form" : "Netko je <strong>odgovorio</strong> na obrazac",
+    "No" : "Ne",
+    "Yes" : "Da",
     "Copy" : "Kopiraj",
     "Anonymous response" : "Anoniman odgovor",
     "Shared by %s" : "Dijeli %s",

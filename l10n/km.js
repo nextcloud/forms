@@ -1,6 +1,8 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "ទេ",
+    "Yes" : "បាទ ឬចាស",
     "Shared with you" : "Shared with you",
     "Options" : "ជម្រើស",
     "Cancel" : "លើកលែង",

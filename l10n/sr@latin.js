@@ -1,6 +1,8 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "Ne",
+    "Yes" : "Da",
     "Copy" : "Kopija",
     "Shared with you" : "Shared with you",
     "Cancel" : "Poništi",

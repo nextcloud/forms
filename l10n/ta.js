@@ -1,6 +1,8 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "இல்லை",
+    "Yes" : "ஆம்",
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
     "Cancel" : "ரத்து செய்",

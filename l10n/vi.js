@@ -1,6 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "Timestamp of data load" : "Dấu thời gian của dữ liệu được tải",
+    "No" : "Không",
+    "Yes" : "Có",
     "Copy" : "Sao chép",
     "Shared with you" : "Đã chia sẻ với bạn",
     "Select groups" : "Chọn nhóm",

@@ -8,6 +8,8 @@ OC.L10N.register(
     "Anonymous user" : "ผู้ใช้ไม่ระบุชื่อ",
     "A form has been <strong>shared</strong> with you" : "มีฟอร์มที่ถูก<strong>แชร์</strong>กับคุณ",
     "Someone <strong>answered</strong> a form" : "มีคน<strong>ตอบ</strong>ฟอร์ม",
+    "No" : "ไม่ตกลง",
+    "Yes" : "ใช่",
     "Copy" : "คัดลอก",
     "Anonymous response" : "การตอบกลับไม่ระบุตัวตน",
     "Shared by %s" : "แชร์โดย %s",

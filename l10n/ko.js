@@ -1,6 +1,10 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "아니오",
+    "Yes" : "예",
+    "Question" : "질문",
+    "Count" : "총수",
     "Copy" : "복사",
     "Anonymous response" : "익명 답변",
     "Shared by %s" : "%s에 의해 공유됨",

@@ -10,6 +10,8 @@ OC.L10N.register(
     "A form has been <strong>shared</strong> with you" : "A form has been <strong>shared</strong> with you",
     "Someone <strong>answered</strong> a shared form" : "Someone <strong>answered</strong> a shared form",
     "Someone <strong>answered</strong> a form" : "Someone <strong>answered</strong> a form",
+    "Timestamp of data load" : "Timestamp of data load",
+    "Question" : "Question",
     "Copy" : "Copy",
     "Anonymous response" : "Anonymous response",
     "Shared by %s" : "Shared by %s",

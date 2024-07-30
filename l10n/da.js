@@ -8,6 +8,7 @@ OC.L10N.register(
     "Anonymous user" : "Anonym bruger",
     "A form has been <strong>shared</strong> with you" : "En formular er blevet <strong>delt</strong> med dig",
     "Someone <strong>answered</strong> a form" : "Nogen <strong>besvarede</strong> en formular",
+    "Timestamp of data load" : "Tidsstempel for dataindlæsning",
     "Copy" : "Kopiér",
     "Anonymous response" : "Anonymt svar",
     "Shared by %s" : "Delt af %s",

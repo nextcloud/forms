@@ -1,6 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "No",
+    "Yes" : "Yes",
+    "Question" : "Question",
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
     "Select groups" : "Select groups",

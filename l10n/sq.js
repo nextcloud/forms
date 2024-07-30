@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Yes" : "Po",
     "Copy" : "Kopjo",
     "Shared with you" : "E ndarë me ju",
     "Select groups" : "Përzgjidhni grupe",

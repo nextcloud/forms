@@ -8,6 +8,8 @@ OC.L10N.register(
     "Anonymous user" : "Utente chene nùmene",
     "A form has been <strong>shared</strong> with you" : "Ant cumpartzidu unu <strong>mòdulu</strong> cun tegus",
     "Someone <strong>answered</strong> a form" : "Ant <strong>rispostu </strong> a unu mòdulu",
+    "No" : "No",
+    "Yes" : "Si",
     "Copy" : "Còpia",
     "Anonymous response" : "Risposta anònima",
     "Shared by %s" : "Cumpartzidu dae %s",

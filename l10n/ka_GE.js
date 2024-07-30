@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Yes" : "დიახ",
     "Copy" : "კოპირება",
     "Shared with you" : "გაზიარებული თქვენთან",
     "Select groups" : "ჯგუფების არჩევა",

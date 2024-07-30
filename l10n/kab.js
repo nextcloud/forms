@@ -1,6 +1,9 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "Uhu",
+    "Yes" : "Oui",
+    "Question" : "Asteqsi",
     "Copy" : "Nɣel",
     "Results" : "Igmaḍ",
     "Options" : "Iɣewwaṛen",

@@ -2,6 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Formularios",
+    "Timestamp of data load" : "Marca de tiempo de carga de datos",
+    "Yes" : "Sí",
     "Copy" : "Copiar",
     "Anonymous response" : "Respuesta anónima",
     "Shared by %s" : "Compartido por %s ",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "නැහැ",
     "Copy" : "පිටපත්",
     "Anonymous response" : "නිර්නාමික ප්‍රතිචාරය",
     "responses" : "ප්‍රතිචාර",

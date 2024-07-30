@@ -2,6 +2,9 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Formularis",
+    "No" : "Non",
+    "Yes" : "Òc",
+    "Question" : "Question",
     "Copy" : "Copiar",
     "Shared with you" : "Partejat amb vos",
     "Loading forms …" : "Cargament del formulari...",

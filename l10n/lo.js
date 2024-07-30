@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "ບໍ່",
     "Copy" : "ສຳເນົາ",
     "Shared with you" : "ແບ່ງປັບກັບທ່ານ",
     "Cancel" : "ຍົກເລີກ",

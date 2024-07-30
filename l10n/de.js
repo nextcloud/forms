@@ -9,6 +9,8 @@ OC.L10N.register(
     "A form has been <strong>shared</strong> with you" : "Ein Formular wurde mit dir <strong>geteilt</strong>",
     "Someone <strong>answered</strong> a shared form" : "Jemand hat ein geteiltes Formular <strong>ausgefüllt</strong>",
     "Someone <strong>answered</strong> a form" : "Jemand hat ein Formular <strong>ausgefüllt</strong>",
+    "Timestamp of data load" : "Zeitpunkt der Datenladung",
+    "Question" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
     "Copy" : "Kopie",
     "Anonymous response" : "Anonyme Antwort",
     "Shared by %s" : "Geteilt von %s",
