@@ -1,6 +1,8 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "না",
+    "Yes" : "হ্যাঁ",
     "Shared with you" : "Shared with you",
     "Select groups" : "গ্রুপ নির্ধারণ",
     "Cancel" : "বাতিল করুন",

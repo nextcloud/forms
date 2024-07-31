@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "Ket",
     "Copy" : "Eilañ",
     "Shared with you" : "Rannet ganeoc'h",
     "Select groups" : "Choaz ar strolladoù",
