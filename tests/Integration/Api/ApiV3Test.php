@@ -1012,9 +1012,8 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $expected
 	 */
 	public function testAddShare(array $expected) {
-		$resp = $this->http->request('POST', 'api/v2.4/share', [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/shares", [
 			'json' => [
-				'formId' => $this->testForms[0]['id'],
 				'shareType' => 0,
 				'shareWith' => 'test',
 				'permissions' => ['submit']
@@ -1048,9 +1047,8 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testUpdateShare(array $fullFormExpected) {
-		$resp = $this->http->request('PATCH', 'api/v2.4/share/update', [
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/shares/{$this->testForms[0]['shares'][0]['id']}", [
 			'json' => [
-				'id' => $this->testForms[0]['shares'][0]['id'],
 				'keyValuePairs' => [
 					'permissions' => [ Constants::PERMISSION_SUBMIT ],
 				],
@@ -1082,7 +1080,7 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $fullFormExpected
 	 */
 	public function testDeleteShare(array $fullFormExpected) {
-		$resp = $this->http->request('DELETE', "api/v2.1/share/{$this->testForms[0]['shares'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/shares/{$this->testForms[0]['shares'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());

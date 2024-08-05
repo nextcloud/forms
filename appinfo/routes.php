@@ -81,6 +81,14 @@ return [
 		['name' => 'api#deleteOption', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options/{optionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
 		// ['name' => 'api#reorderOptions', 'url' => $apiBase . 'forms/{id}/questions/{questionId}/options/reorder', 'verb' => 'PUT', 'requirements' => $requirements_v3],
 
+		// Shares
+		// ['name' => 'shareApi#getUserShares', 'url' => $apiBase . 'shares', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		// ['name' => 'shareApi#getShares', 'url' => $apiBase . 'forms/{id}/shares', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'shareApi#newShare', 'url' => $apiBase . 'forms/{id}/shares', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		// ['name' => 'shareApi#getShare', 'url' => $apiBase . 'forms/{id}/shares/{shareId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'shareApi#updateShare', 'url' => $apiBase . 'forms/{id}/shares/{shareId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
+		['name' => 'shareApi#deleteShare', 'url' => $apiBase . 'forms/{id}/shares/{shareId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+
 		// Legacy v2 routes (TODO: remove with Forms v5)
 		// Forms
 		['name' => 'api#getFormsLegacy', 'url' => $apiBase . 'forms', 'verb' => 'GET', 'requirements' => [
@@ -155,39 +163,19 @@ return [
 		]],
 
 		// Shares
-		[
-			'name' => 'shareApi#newShare',
-			'url' => $apiBase . 'share',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'shareApi#deleteShare',
-			'url' => $apiBase . 'share/{id}',
-			'verb' => 'DELETE',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
+		['name' => 'shareApi#newShareLegacy', 'url' => $apiBase . 'share', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'shareApi#deleteShareLegacy', 'url' => $apiBase . 'share/{id}', 'verb' => 'DELETE', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
 		// TODO: Remove POST in next API release
-		[
-			'name' => 'shareApi#updateShare',
-			'url' => $apiBase . 'share/update',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2\.[1-4]'
-			]
-		],
-		[
-			'name' => 'shareApi#updateShare',
-			'url' => $apiBase . 'share/update',
-			'verb' => 'PATCH',
-			'requirements' => [
-				'apiVersion' => 'v2\.[2-4]'
-			]
-		],
+		['name' => 'shareApi#updateShareLegacy', 'url' => $apiBase . 'share/update', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2\.[1-4]'
+		]],
+		['name' => 'shareApi#updateShareLegacy', 'url' => $apiBase . 'share/update', 'verb' => 'PATCH', 'requirements' => [
+			'apiVersion' => 'v2\.[2-4]'
+		]],
 
 		// Submissions
 		[
