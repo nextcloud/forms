@@ -37,6 +37,7 @@ OC.L10N.register(
     "Delete form" : "ลบฟอร์ม",
     "Are you sure you want to delete {title}?" : "คุณแน่ใจที่จะลบ {title} หรือไม่",
     "Error while deleting {title}" : "เกิดข้อผิดพลาดขณะลบ {title}",
+    "Options" : "ตัวเลือก",
     "Cancel" : "ยกเลิก",
     "Delete answer" : "ลบคำตอบ",
     "Error while saving the answer" : "ข้อผิดพลาดขณะบันทึกคำตอบ",
