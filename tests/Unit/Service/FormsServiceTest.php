@@ -57,11 +57,13 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
@@ -182,6 +184,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 	}
 
@@ -656,6 +659,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$form = new Form();
@@ -896,6 +900,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -1008,6 +1013,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$form = new Form();
@@ -1213,9 +1219,13 @@ class FormsServiceTest extends TestCase {
 	public function testNotifyNewSubmission($shares, $shareNotifications) {
 		$owner = 'ownerUser';
 		$submitter = 'someUser';
+		$submission = new Submission();
+		$submission->setUserId($submitter);
 
 		$userSession = $this->createMock(IUserSession::class);
 		$userSession->method('getUser')->willReturn(null);
+
+		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 
 		$formsService = $this->getMockBuilder(FormsService::class)
 			->onlyMethods(['getShares'])
@@ -1236,6 +1246,7 @@ class FormsServiceTest extends TestCase {
 				$this->storage,
 				$this->l10n,
 				$this->mimeTypeDetector,
+				$eventDispatcher,
 			])
 			->getMock();
 
@@ -1250,7 +1261,9 @@ class FormsServiceTest extends TestCase {
 		$this->activityManager->expects($this->exactly($shareNotifications))
 			->method('publishNewSharedSubmission');
 
-		$formsService->notifyNewSubmission($form, $submitter);
+		$eventDispatcher->expects($this->exactly(1))->method('dispatchTyped')->withAnyParameters();
+
+		$formsService->notifyNewSubmission($form, $submission);
 	}
 
 	/**

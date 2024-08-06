@@ -33,9 +33,12 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -72,6 +75,7 @@ class FormsService {
 		private IRootFolder $storage,
 		private IL10N $l10n,
 		private IMimeTypeDetector $mimeTypeDetector,
+		private IEventDispatcher $eventDispatcher,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -571,17 +575,19 @@ class FormsService {
 	 * @param Form $form Related Form
 	 * @param string $submitter The ID of the user who submitted the form. Can also be our 'anon-user-'-ID
 	 */
-	public function notifyNewSubmission(Form $form, string $submitter): void {
+	public function notifyNewSubmission(Form $form, Submission $submission): void {
 		$shares = $this->getShares($form->getId());
-		$this->activityManager->publishNewSubmission($form, $submitter);
+		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
 
 		foreach ($shares as $share) {
 			if (!in_array(Constants::PERMISSION_RESULTS, $share['permissions'])) {
 				continue;
 			}
 
-			$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submitter);
+			$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submission->getUserId());
 		}
+
+		$this->eventDispatcher->dispatchTyped(new FormSubmittedEvent($form, $submission));
 	}
 
 	/**

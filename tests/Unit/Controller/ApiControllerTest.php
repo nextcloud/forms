@@ -846,8 +846,7 @@ class ApiControllerTest extends TestCase {
 			->with(1);
 
 		$this->formsService->expects($this->once())
-			->method('notifyNewSubmission')
-			->with($form, 'currentUser');
+			->method('notifyNewSubmission');
 
 		$this->formsService->expects($this->once())
 			->method('getFilePath')
