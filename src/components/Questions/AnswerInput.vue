@@ -6,9 +6,7 @@
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
-			:aria-label="
-				t('forms', 'An answer for the {index} option', { index: index + 1 })
-			"
+			:aria-label="t('forms', 'Answer number {index}', { index: index + 1 })"
 			:placeholder="t('forms', 'Answer number {index}', { index: index + 1 })"
 			:value="answer.text"
 			class="question__input"

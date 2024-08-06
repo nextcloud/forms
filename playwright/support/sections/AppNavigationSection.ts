@@ -29,6 +29,7 @@ export class AppNavigationSection {
 
 	public async clickNewForm(): Promise<void> {
 		await this.newFormLocator.click()
+		await this.page.waitForURL(/apps\/forms\/.+/)
 	}
 
 	public async openArchivedForms(): Promise<void> {
