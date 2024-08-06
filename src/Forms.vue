@@ -430,6 +430,10 @@ export default {
 				} catch (error) {
 					logger.error(`Form ${hash} not found`, { error })
 					showError(t('forms', 'Form not found'))
+
+					if ([403, 404].includes(error.response?.status)) {
+						this.$router.push({ name: 'root' })
+					}
 				}
 			}
 
