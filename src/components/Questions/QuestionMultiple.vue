@@ -172,7 +172,9 @@
 							:maxlength="maxStringLengths.optionText"
 							minlength="1"
 							type="text"
-							@input="addNewEntry" />
+							@input="addNewEntry"
+							@compositionstart="onCompositionStart"
+							@compositionend="onCompositionEnd" />
 					</li>
 				</ul>
 			</template>
@@ -205,7 +207,6 @@ import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
 import OptionInputDialog from '../OptionInputDialog.vue'
 
@@ -485,10 +486,9 @@ export default {
 		 * So we require the one that are checked or all
 		 * if none are checked yet.
 		 *
-		 * @param {number} id the answer id
 		 * @return {boolean}
 		 */
-		checkRequired(id) {
+		checkRequired() {
 			// false, if question not required
 			if (!this.isRequired) {
 				return false
@@ -551,39 +551,6 @@ export default {
 			options[answerIndex] = answer
 
 			this.updateOptions(options)
-		},
-
-		/**
-		 * Add a new empty answer locally
-		 * @param {InputEvent} event The input event that triggered adding a new entry
-		 */
-		addNewEntry({ target }) {
-			// Add local entry
-			const options = [
-				...this.options,
-				{
-					id: GenRandomId(),
-					questionId: this.id,
-					text: target?.value ?? '',
-					local: true,
-				},
-			]
-
-			// Reset the "new answer" input if needed
-			if (this.$refs.pseudoInput) {
-				this.$refs.pseudoInput.value = ''
-			}
-
-			// Update questions
-			this.updateOptions(options)
-
-			this.$nextTick(() => {
-				// Set focus to the created input element
-				this.focusIndex(options.length - 1)
-
-				// Trigger onInput on new AnswerInput for posting the new option to the API
-				this.$refs.input[options.length - 1].onInput()
-			})
 		},
 
 		/**
