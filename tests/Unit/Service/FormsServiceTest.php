@@ -62,6 +62,7 @@ use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
@@ -182,6 +183,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 	}
 
@@ -656,6 +658,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$form = new Form();
@@ -896,6 +899,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -1008,6 +1012,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$form = new Form();
@@ -1236,6 +1241,7 @@ class FormsServiceTest extends TestCase {
 				$this->storage,
 				$this->l10n,
 				$this->mimeTypeDetector,
+				\OCP\Server::get(IEventDispatcher::class),
 			])
 			->getMock();
 
