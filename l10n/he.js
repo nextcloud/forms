@@ -27,7 +27,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "שגיאה במחיקת {title}",
     "Options" : "אפשרויות",
     "Cancel" : "ביטול",
-    "An answer for the {index} option" : "תשובה לאפשרות {index}",
     "Answer number {index}" : "תשובה מספר {index}",
     "Delete answer" : "מחיקת תשובה",
     "Error while saving the answer" : "שגיאה בעת שמירת התשובה",

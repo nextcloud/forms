@@ -52,7 +52,6 @@
     "Error while deleting {title}" : "Fejl under sletning {title}",
     "Options" : "Valgmuligheder",
     "Cancel" : "Annullér",
-    "An answer for the {index} option" : "Et svar til {index} mulighed",
     "Answer number {index}" : "Svar nummer {index}",
     "Delete answer" : "Slet svar",
     "Error while saving the answer" : "Der opstod en fejl under lagring af svaret",

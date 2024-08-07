@@ -67,7 +67,6 @@ OC.L10N.register(
     "Options" : "Seçenekler",
     "Cancel" : "İptal",
     "Add options" : "Seçenek ekle",
-    "An answer for the {index} option" : "{index} seçeneği için bir yanıt",
     "Answer number {index}" : "{index} numaralı yanıt",
     "Delete answer" : "Yanıtı sil",
     "Error while saving the answer" : "Yanıt kaydedilirken sorun çıktı",

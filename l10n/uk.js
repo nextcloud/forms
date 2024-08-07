@@ -70,7 +70,6 @@ OC.L10N.register(
     "Cancel" : "Скасувати",
     "Add options" : "Додати варіанти",
     "Options should be separated by new line!" : "Варіанти відповідей потрібно подавати поокремо з нового рядка!",
-    "An answer for the {index} option" : "Текст відповіді для варіанту {index}",
     "Answer number {index}" : "Варіант номер {index}",
     "Delete answer" : "Вилучити відповідь",
     "Error while saving the answer" : "Помилка при збереженні варіанту",

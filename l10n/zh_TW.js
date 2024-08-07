@@ -75,7 +75,6 @@ OC.L10N.register(
     "Add options" : "新增選項",
     "Options should be separated by new line!" : "選項應該用新行分隔！",
     "QR code representation of {text}" : "{text} 的 QR 碼表示",
-    "An answer for the {index} option" : "{index} 選項的答案",
     "Answer number {index}" : "回應編號 {index}",
     "Delete answer" : "刪除答案",
     "Error while saving the answer" : "儲存答案時發生錯誤",

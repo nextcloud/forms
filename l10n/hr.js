@@ -40,7 +40,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Pogreška pri brisanju {title}",
     "Options" : "Mogućnosti",
     "Cancel" : "Odustani",
-    "An answer for the {index} option" : "Odgovor za opciju {index}",
     "Answer number {index}" : "Broj odgovora {index}",
     "Delete answer" : "Izbriši odgovor",
     "Error while saving the answer" : "Pogreška pri spremanju odgovora",

@@ -40,7 +40,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Errore in sa cantzelladura de {title}",
     "Options" : "Optziones",
     "Cancel" : "Annulla",
-    "An answer for the {index} option" : "Una risposta pro s'optzione {index}",
     "Answer number {index}" : "Risposta nùmeru {index}",
     "Delete answer" : "Cantzella risposta",
     "Error while saving the answer" : "Errore sarvende sa risposta",

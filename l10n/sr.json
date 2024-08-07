@@ -70,7 +70,6 @@
     "Add options" : "Додај опције",
     "Options should be separated by new line!" : "Опције би требало да су раздвојене преломима линије!",
     "QR code representation of {text}" : "QR код представа {text}",
-    "An answer for the {index} option" : "Одговор за избор {index}",
     "Answer number {index}" : "Одговор број {index}",
     "Delete answer" : "Обриши одговор",
     "Error while saving the answer" : "Грешка приликом чувања одговора",

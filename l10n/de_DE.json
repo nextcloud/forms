@@ -73,7 +73,6 @@
     "Add options" : "Optionen hinzufügen",
     "Options should be separated by new line!" : "Optionen sollten durch eine neue Zeile getrennt werden!",
     "QR code representation of {text}" : "QR-Code-Darstellung von {text}",
-    "An answer for the {index} option" : "Eine Antwort für die {index} Option",
     "Answer number {index}" : "Antwort Nummer {index}",
     "Delete answer" : "Antwort löschen",
     "Error while saving the answer" : "Fehler beim Speichern der Antwort",

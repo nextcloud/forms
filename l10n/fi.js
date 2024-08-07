@@ -59,7 +59,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Virhe poistaessa {title}",
     "Options" : "Valinnat",
     "Cancel" : "Peruuta",
-    "An answer for the {index} option" : "Vastaus vaihtoehtoon numero {index}",
     "Answer number {index}" : "Vastausnumero {index}",
     "Delete answer" : "Poista vastaus",
     "Error while saving the answer" : "Virhe vastausta tallennettaessa",

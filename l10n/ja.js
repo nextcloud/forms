@@ -48,7 +48,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "{title} を削除中にエラー",
     "Options" : "オプション",
     "Cancel" : "キャンセル",
-    "An answer for the {index} option" : "{index} 番目の選択肢の回答",
     "Answer number {index}" : "回答数 {index}",
     "Delete answer" : "回答を削除",
     "Error while saving the answer" : "回答を保存中にエラーが発生しました",

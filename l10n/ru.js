@@ -57,7 +57,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Не удалось удалить {title}",
     "Options" : "Варианты",
     "Cancel" : "Отмена",
-    "An answer for the {index} option" : "Ответ для варианта {index}",
     "Answer number {index}" : "Ответ номер {index}",
     "Delete answer" : "Удалить ответ",
     "Error while saving the answer" : "Не удалось сохранить этот ответ",

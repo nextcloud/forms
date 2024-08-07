@@ -75,7 +75,6 @@ OC.L10N.register(
     "Add options" : "Legg til alternativer",
     "Options should be separated by new line!" : "Alternativene skal skilles med ny linje!",
     "QR code representation of {text}" : "QR-kode representasjon av {text}",
-    "An answer for the {index} option" : "Et svar for det {index} valget",
     "Answer number {index}" : "Svar nummer {index}",
     "Delete answer" : "Slett svar",
     "Error while saving the answer" : "Feil ved lagring av svar",

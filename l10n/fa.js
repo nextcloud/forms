@@ -55,7 +55,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Error while deleting {title}",
     "Options" : "گزینه‌ها",
     "Cancel" : "منصرف شدن",
-    "An answer for the {index} option" : "پاسخی برای گزینه {index}",
     "Answer number {index}" : "پاسخ شماره {index}",
     "Delete answer" : "حذف پاسخ",
     "Error while saving the answer" : "بروز خطا حین ذخیره پاسخ",

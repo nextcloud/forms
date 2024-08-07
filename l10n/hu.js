@@ -58,7 +58,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Hiba a(z) {title} törlése során",
     "Options" : "Beállítások",
     "Cancel" : "Mégse",
-    "An answer for the {index} option" : "Válasz a(z) {index}. lehetőségre",
     "Answer number {index}" : "{index}. számú válasz",
     "Delete answer" : "Válasz törlése",
     "Error while saving the answer" : "Hiba történt a válasz mentése során",

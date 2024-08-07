@@ -75,7 +75,6 @@ OC.L10N.register(
     "Add options" : "Adicionar opções",
     "Options should be separated by new line!" : "As opções devem ser separadas por nova linha!",
     "QR code representation of {text}" : "Representação de código QR de {text}",
-    "An answer for the {index} option" : "Uma resposta para a opção {index}",
     "Answer number {index}" : "Resposta número {index}",
     "Delete answer" : "Excluir resposta",
     "Error while saving the answer" : "Erro ao salvar a resposta",

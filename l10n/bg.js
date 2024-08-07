@@ -57,7 +57,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Грешка при изтриването на {title}",
     "Options" : "Опции",
     "Cancel" : "Отказ",
-    "An answer for the {index} option" : "Отговор за опцията {index}",
     "Answer number {index}" : "Номер на отговора {index}",
     "Delete answer" : "Изтриване на отговора",
     "Error while saving the answer" : "Грешка при записване на отговора",

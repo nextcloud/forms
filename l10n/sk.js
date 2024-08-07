@@ -59,7 +59,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Pri odstraňovaní {title} sa vyskytla chyba",
     "Options" : "Možnosti",
     "Cancel" : "Zrušiť",
-    "An answer for the {index} option" : "Odpoveď na možnosť {index}",
     "Answer number {index}" : "Odpoveď číslo {index}",
     "Delete answer" : "Odstrániť odpoveď",
     "Error while saving the answer" : "Pri ukladaní odpovede došlo k chybe",

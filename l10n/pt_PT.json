@@ -36,7 +36,6 @@
     "Error while deleting {title}" : "Erro ao apagar {title}",
     "Options" : "Opções",
     "Cancel" : "Cancelar",
-    "An answer for the {index} option" : "Uma resposta para a opção {index}",
     "Answer number {index}" : "Resposta número {index}",
     "Delete answer" : "Apague resposta",
     "Error while saving the answer" : "Erro ao salvar a resposta",

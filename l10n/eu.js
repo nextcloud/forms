@@ -65,7 +65,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Errorea {title} ezabatzean",
     "Options" : "Aukerak",
     "Cancel" : "Utzi",
-    "An answer for the {index} option" : "Erantzun bat {index} aukerarentzat",
     "Answer number {index}" : "{index}. erantzuna",
     "Delete answer" : "Ezabatu erantzuna",
     "Error while saving the answer" : "Errorea erantzuna gordetzean",

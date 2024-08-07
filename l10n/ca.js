@@ -57,7 +57,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "S'ha produït un error en suprimir {title}",
     "Options" : "Opcions",
     "Cancel" : "Cancelar",
-    "An answer for the {index} option" : "Resposta per a l'opció {index}",
     "Answer number {index}" : "Resposta número {index}",
     "Delete answer" : "Suprimeix la resposta",
     "Error while saving the answer" : "S'ha produït un error en desar la resposta",

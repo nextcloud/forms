@@ -56,7 +56,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Kunde inte ta bort {title}",
     "Options" : "Alternativ",
     "Cancel" : "Avbryt",
-    "An answer for the {index} option" : "Ett svar för alternativ {index}",
     "Answer number {index}" : "Svar {index}",
     "Delete answer" : "Ta bort svaret",
     "Error while saving the answer" : "Kunde inte spara svaret",

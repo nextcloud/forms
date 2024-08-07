@@ -44,7 +44,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Fout bij het verwijderen van {title}",
     "Options" : "Opties",
     "Cancel" : "Annuleren",
-    "An answer for the {index} option" : "Een antwoord voor de {index} optie",
     "Answer number {index}" : "Antwoord nummer {index}",
     "Delete answer" : "Verwijder antwoord",
     "Error while saving the answer" : "Fout bij opslaan antwoord",

@@ -64,7 +64,6 @@ OC.L10N.register(
     "Error while deleting {title}" : "Erreur lors de la suppression de {title}",
     "Options" : "Choix",
     "Cancel" : "Annuler",
-    "An answer for the {index} option" : "Une réponse pour l'option {index}",
     "Answer number {index}" : "Réponse numéro {index}",
     "Delete answer" : "Supprimer la réponse",
     "Error while saving the answer" : "Erreur lors de la sauvegarde de la réponse",

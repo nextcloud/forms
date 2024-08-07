@@ -75,7 +75,6 @@ OC.L10N.register(
     "Add options" : "إضافة خيارات",
     "Options should be separated by new line!" : "يجب الفصل بين الخيارات بسطر جديد!",
     "QR code representation of {text}" : "QR code representation of {text}",
-    "An answer for the {index} option" : "إجابة لخيار {index}",
     "Answer number {index}" : "رقم الإجابة {index}",
     "Delete answer" : "حذف الإجابة ",
     "Error while saving the answer" : "حدث خطأ أثناء حفظ الإجابة ",

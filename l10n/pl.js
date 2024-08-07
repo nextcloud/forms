@@ -58,7 +58,6 @@ OC.L10N.register(
     "Options" : "Opcje",
     "Cancel" : "Anuluj",
     "Add options" : "Dodaj opcje",
-    "An answer for the {index} option" : "Odpowiedź na opcję {index}",
     "Answer number {index}" : "Numer odpowiedzi {index}",
     "Delete answer" : "Usuń odpowiedź",
     "Error while saving the answer" : "Błąd podczas zapisywania odpowiedzi",
