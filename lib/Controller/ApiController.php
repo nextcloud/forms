@@ -48,6 +48,8 @@ use OCA\Forms\Service\SubmissionService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\Response;
@@ -132,23 +134,23 @@ class ApiController extends OCSController {
 	 * @CORS
 	 * @NoAdminRequired
 	 *
-	 * Get a partial form by its hash. Implicitely checks, if the user has access.
+	 * Get a partial form by its hash. Implicitly checks, if the user has access.
 	 *
 	 * @param string $hash The form hash
 	 * @return DataResponse
-	 * @throws OCSBadRequestException if forbidden or not found
 	 */
+	#[BruteForceProtection(action: 'form')]
 	public function getPartialForm(string $hash): DataResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			return $this->throttledResponse(Http::STATUS_NOT_FOUND);
 		}
 
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
-			throw new OCSForbiddenException();
+			return $this->throttledResponse(Http::STATUS_NOT_FOUND);
 		}
 
 		return new DataResponse($this->formsService->getPartialFormArray($form));
@@ -162,21 +164,20 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $id FormId
 	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
 	 */
+	#[BruteForceProtection(action: 'form')]
 	public function getForm(int $id): DataResponse {
 		try {
 			$form = $this->formMapper->findById($id);
 			$formData = $this->formsService->getForm($form);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			return $this->throttledResponse(Http::STATUS_NOT_FOUND);
 		}
 
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
-			throw new OCSForbiddenException();
+			return $this->throttledResponse(Http::STATUS_NOT_FOUND);
 		}
 
 		return new DataResponse($formData);
@@ -1483,5 +1484,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 		return $form;
+	}
+
+	private function throttledResponse(int $status): DataResponse {
+		$response = new DataResponse([], $status);
+		$response->throttle();
+		return $response;
 	}
 }
