@@ -89,6 +89,16 @@ return [
 		['name' => 'shareApi#updateShare', 'url' => $apiBase . 'forms/{id}/shares/{shareId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
 		['name' => 'shareApi#deleteShare', 'url' => $apiBase . 'forms/{id}/shares/{shareId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
 
+		// Submissions
+		['name' => 'api#getSubmissions', 'url' => $apiBase . 'forms/{id}/submissions', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		['name' => 'api#newSubmission', 'url' => $apiBase . 'forms/{id}/submissions', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		['name' => 'api#deleteAllSubmissions', 'url' => $apiBase . 'forms/{id}/submissions', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+		//['name' => 'api#getSubmission', 'url' => $apiBase . 'forms/{id}/submissions/{submissionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
+		//['name' => 'api#updateSubmission', 'url' => $apiBase . 'forms/{id}/submissions/{submissionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
+		['name' => 'api#deleteSubmission', 'url' => $apiBase . 'forms/{id}/submissions/{submissionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
+		['name' => 'api#exportSubmissionsToCloud', 'url' => $apiBase . 'forms/{id}/submissions/export', 'verb' => 'POST', 'requirements' => $requirements_v3],
+		['name' => 'api#uploadFiles', 'url' => $apiBase . 'forms/{id}/submissions/files/{questionId}', 'verb' => 'POST', 'requirements' => $requirements_v3],
+
 		// Legacy v2 routes (TODO: remove with Forms v5)
 		// Forms
 		['name' => 'api#getFormsLegacy', 'url' => $apiBase . 'forms', 'verb' => 'GET', 'requirements' => [
@@ -178,71 +188,34 @@ return [
 		]],
 
 		// Submissions
-		[
-			'name' => 'api#getSubmissions',
-			'url' => $apiBase . 'submissions/{hash}',
-			'verb' => 'GET',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'api#exportSubmissions',
-			'url' => $apiBase . 'submissions/export/{hash}',
-			'verb' => 'GET',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'api#exportSubmissionsToCloud',
-			'url' => $apiBase . 'submissions/export',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'api#deleteAllSubmissions',
-			'url' => $apiBase . 'submissions/{formId}',
-			'verb' => 'DELETE',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'api#uploadFiles',
-			'url' => $apiBase . 'uploadFiles/{formId}/{questionId}',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2.5'
-			]
-		],
-		[
-			'name' => 'api#insertSubmission',
-			'url' => $apiBase . 'submission/insert',
-			'verb' => 'POST',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
-		[
-			'name' => 'api#deleteSubmission',
-			'url' => $apiBase . 'submission/{id}',
-			'verb' => 'DELETE',
-			'requirements' => [
-				'apiVersion' => 'v2(\.[1-4])?'
-			]
-		],
+		['name' => 'api#getSubmissionsLegacy', 'url' => $apiBase . 'submissions/{hash}', 'verb' => 'GET', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'api#exportSubmissionsLegacy', 'url' => $apiBase . 'submissions/export/{hash}', 'verb' => 'GET', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'api#exportSubmissionsToCloudLegacy', 'url' => $apiBase . 'submissions/export', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'api#deleteAllSubmissionsLegacy', 'url' => $apiBase . 'submissions/{formId}', 'verb' => 'DELETE', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'api#uploadFilesLegacy', 'url' => $apiBase . 'uploadFiles/{formId}/{questionId}', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2.5'
+		]],
+		['name' => 'api#insertSubmissionLegacy', 'url' => $apiBase . 'submission/insert', 'verb' => 'POST', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
+		['name' => 'api#deleteSubmissionLegacy', 'url' => $apiBase . 'submission/{id}', 'verb' => 'DELETE', 'requirements' => [
+			'apiVersion' => 'v2(\.[1-4])?'
+		]],
 		// Submissions linking with file in cloud
 		['name' => 'api#linkFileLegacy', 'url' => $apiBase . 'form/link/{fileFormat}', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2.4',
 			'fileFormat' => 'csv|ods|xlsx'
-		]
-		],
+		]],
 		['name' => 'api#unlinkFileLegacy', 'url' => $apiBase . 'form/unlink', 'verb' => 'POST', 'requirements' => [
 			'apiVersion' => 'v2.4',
-		]
-		]
+		]]
 	]
 ];

@@ -1162,7 +1162,7 @@ class ApiV3Test extends IntegrationBase {
 	 * @param array $expected
 	 */
 	public function testGetSubmissions(array $expected) {
-		$resp = $this->http->request('GET', "api/v2.1/submissions/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
 		$data = $this->OcsResponse2Data($resp);
 
 		// Cannot control ids, but check general consistency.
@@ -1215,7 +1215,7 @@ CSV
 	 * @param array $expected
 	 */
 	public function testExportSubmissions(string $expected) {
-		$resp = $this->http->request('GET', "api/v2.4/submissions/export/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions?fileFormat=csv");
 		$data = substr($resp->getBody()->getContents(), 3); // Some strange Character removed at the beginning
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1257,9 +1257,8 @@ CSV
 	}
 
 	public function testExportToCloud() {
-		$resp = $this->http->request('POST', 'api/v2.4/submissions/export', [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions/export", [
 			'json' => [
-				'hash' => $this->testForms[0]['hash'],
 				'path' => ''
 			]]
 		);
@@ -1285,7 +1284,7 @@ CSV
 	 * @param array $submissionsExpected
 	 */
 	public function testDeleteSubmissions(array $submissionsExpected) {
-		$resp = $this->http->request('DELETE', "api/v2.1/submissions/{$this->testForms[0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());
@@ -1294,7 +1293,7 @@ CSV
 		$this->testGetSubmissions($submissionsExpected);
 	}
 
-	public function dataInsertSubmission() {
+	public function dataNewSubmission() {
 		$submissionsExpected = $this->dataGetSubmissions()['getSubmissions']['expected'];
 		$submissionsExpected['submissions'][] = [
 			'userId' => 'test'
@@ -1307,14 +1306,12 @@ CSV
 		];
 	}
 	/**
-	 * @dataProvider dataInsertSubmission
-	 *
-	 * @param array $submissionsExpected
+	 * @dataProvider dataNewSubmission
 	 */
-	public function testInsertSubmission(array $submissionsExpected) {
+	public function testNewSubmission() {
 
 		$uploadedFileResponse = $this->http->request('POST',
-			'api/v2.5/uploadFiles/'.$this->testForms[0]['id'].'/'.$this->testForms[0]['questions'][2]['id'],
+			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
 			[
 				'multipart' => [
 					[
@@ -1328,9 +1325,8 @@ CSV
 		$data = $this->OcsResponse2Data($uploadedFileResponse);
 		$uploadedFileId = $data[0]['uploadedFileId'];
 
-		$resp = $this->http->request('POST', 'api/v2.4/submission/insert', [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions", [
 			'json' => [
-				'formId' => $this->testForms[0]['id'],
 				'answers' => [
 					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer!'],
 					$this->testForms[0]['questions'][1]['id'] => [
@@ -1345,7 +1341,7 @@ CSV
 		$this->assertEquals(200, $resp->getStatusCode());
 
 		// Check stored submissions
-		$resp = $this->http->request('GET', "api/v2.1/submissions/{$this->testForms[0]['hash']}");
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
 		$data = $this->OcsResponse2Data($resp);
 
 		// Store for deletion
@@ -1407,7 +1403,7 @@ CSV
 	 * @param array $submissionsExpected
 	 */
 	public function testDeleteSingleSubmission(array $submissionsExpected) {
-		$resp = $this->http->request('DELETE', "api/v2.1/submission/{$this->testForms[0]['submissions'][0]['id']}");
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 
 		$this->assertEquals(200, $resp->getStatusCode());

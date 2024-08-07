@@ -497,8 +497,8 @@ export default {
 
 			try {
 				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v2.4/submissions/{hash}', {
-						hash: this.form.hash,
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+						id: this.form.id,
 					}),
 				)
 
@@ -523,8 +523,8 @@ export default {
 
 		async onDownloadFile(fileFormat) {
 			const exportUrl =
-				generateOcsUrl('apps/forms/api/v2.4/submissions/export/{hash}', {
-					hash: this.form.hash,
+				generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+					id: this.form.id,
 				}) +
 				'?requesttoken=' +
 				encodeURIComponent(getRequestToken()) +
@@ -590,9 +590,15 @@ export default {
 						try {
 							const response = await axios.post(
 								generateOcsUrl(
-									'apps/forms/api/v2.4/submissions/export',
+									'apps/forms/api/v3/forms/{id}/submissions/export',
+									{
+										id: this.form.id,
+									},
 								),
-								{ hash: this.form.hash, path, fileFormat },
+								{
+									path,
+									fileFormat,
+								},
 							)
 							showSuccess(
 								t('forms', 'Export successful to {file}', {
@@ -637,9 +643,13 @@ export default {
 			}
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/submissions/export'),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/submissions/export',
+						{
+							id: this.form.id,
+						},
+					),
 					{
-						hash: this.form.hash,
 						path: this.form.filePath,
 						fileFormat: this.form.fileFormat,
 					},
@@ -660,7 +670,13 @@ export default {
 
 			try {
 				await axios.delete(
-					generateOcsUrl('apps/forms/api/v2.4/submission/{id}', { id }),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
+						{
+							id: this.form.id,
+							submissionId: id,
+						},
+					),
 				)
 				showSuccess(t('forms', 'Submission deleted'))
 				const index = this.form.submissions.findIndex(
@@ -687,8 +703,8 @@ export default {
 			this.loadingResults = true
 			try {
 				await axios.delete(
-					generateOcsUrl('apps/forms/api/v2.4/submissions/{formId}', {
-						formId: this.form.id,
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+						id: this.form.id,
 					}),
 				)
 				this.form.submissions = []

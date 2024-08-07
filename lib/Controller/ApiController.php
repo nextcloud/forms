@@ -745,6 +745,8 @@ class ApiController extends OCSController {
 		return new DataResponse($response);
 	}
 
+	// Options
+
 	/**
 	 * @NoAdminRequired
 	 *
@@ -930,6 +932,401 @@ class ApiController extends OCSController {
 		return new DataResponse($optionId);
 	}
 
+	// Submissions
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Get all the submissions of a given form
+	 *
+	 * @param int $id of the form
+	 * @return DataResponse|DataDownloadResponse
+	 * @throws OCSNotFoundException
+	 * @throws OCSForbiddenException
+	 */
+	public function getSubmissions(int $id, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSNotFoundException();
+		}
+
+		if (!$this->formsService->canSeeResults($form)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
+			throw new OCSForbiddenException();
+		}
+
+		if ($fileFormat !== null) {
+			$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
+			$fileName = $this->formsService->getFileName($form, $fileFormat);
+	
+			return new DataDownloadResponse($submissionsData, $fileName, Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat]);
+		}
+
+		// Load submissions and currently active questions
+		$submissions = $this->submissionService->getSubmissions($id);
+		$questions = $this->formsService->getQuestions($id);
+
+		// Append Display Names
+		foreach ($submissions as $key => $submission) {
+			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
+				// Anonymous User
+				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
+				$submissions[$key]['userDisplayName'] = $this->l10n->t('Anonymous response');
+			} else {
+				$userEntity = $this->userManager->get($submission['userId']);
+
+				if ($userEntity instanceof IUser) {
+					$submissions[$key]['userDisplayName'] = $userEntity->getDisplayName();
+				} else {
+					// Fallback, should not occur regularly.
+					$submissions[$key]['userDisplayName'] = $submission['userId'];
+				}
+			}
+		}
+
+		$response = [
+			'submissions' => $submissions,
+			'questions' => $questions,
+		];
+
+		return new DataResponse($response);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Delete all submissions of a specified form
+	 *
+	 * @param int $id the form id
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function deleteAllSubmissions(int $id): DataResponse {
+		$this->logger->debug('Delete all submissions to form: {formId}', [
+			'formId' => $id,
+		]);
+		
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+		
+		// The current user has permissions to remove submissions
+		if (!$this->formsService->canDeleteResults($form)) {
+			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
+			throw new OCSForbiddenException();
+		}
+		
+		// Delete all submissions (incl. Answers)
+		$this->submissionMapper->deleteByForm($id);
+		
+		$this->formsService->setLastUpdatedTimestamp($id);
+		
+		return new DataResponse($id);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 * @PublicPage
+	 *
+	 * Process a new submission
+	 *
+	 * @param int $id the form id
+	 * @param array $answers [question_id => arrayOfString]
+	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function newSubmission(int $id, array $answers, string $shareHash = ''): DataResponse {
+		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
+			'formId' => $id,
+			'answers' => $answers,
+			'shareHash' => $shareHash,
+		]);
+
+		$form = $this->loadFormForSubmission($id, $shareHash);
+
+		$questions = $this->formsService->getQuestions($id);
+		// Is the submission valid
+		$isSubmissionValid = $this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+		if (is_string($isSubmissionValid)) {
+			throw new OCSBadRequestException($isSubmissionValid);
+		}
+		if ($isSubmissionValid === false) {
+			throw new OCSBadRequestException('At least one submitted answer is not valid');
+		}
+
+		// Create Submission
+		$submission = new Submission();
+		$submission->setFormId($id);
+		$submission->setTimestamp(time());
+
+		// If not logged in, anonymous, or embedded use anonID
+		if (!$this->currentUser || $form->getIsAnonymous()) {
+			$anonID = "anon-user-".  hash('md5', strval(time() + rand()));
+			$submission->setUserId($anonID);
+		} else {
+			$submission->setUserId($this->currentUser->getUID());
+		}
+
+		// Does the user have permissions to submit
+		// This is done right before insert so we minimize race conditions for submitting on unique-submission forms
+		if (!$this->formsService->canSubmit($form)) {
+			throw new OCSForbiddenException('Already submitted');
+		}
+
+		// Insert new submission
+		$this->submissionMapper->insert($submission);
+
+		// Ensure the form is unique if needed.
+		// If we can not submit anymore then the submission must be unique
+		if (!$this->formsService->canSubmit($form) && $this->submissionMapper->hasMultipleFormSubmissionsByUser($form, $submission->getUserId())) {
+			$this->submissionMapper->delete($submission);
+			throw new OCSForbiddenException('Already submitted');
+		}
+
+		// Process Answers
+		foreach ($answers as $questionId => $answerArray) {
+			// Search corresponding Question, skip processing if not found
+			$questionIndex = array_search($questionId, array_column($questions, 'id'));
+			if ($questionIndex === false) {
+				continue;
+			}
+
+			$this->storeAnswersForQuestion($form, $submission->getId(), $questions[$questionIndex], $answerArray);
+		}
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		//Create Activity
+		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
+
+		if ($form->getFileId() !== null) {
+			try {
+				$filePath = $this->formsService->getFilePath($form);
+				$fileFormat = $form->getFileFormat();
+				$ownerId = $form->getOwnerId();
+
+				$this->submissionService->writeFileToCloud($form, $filePath, $fileFormat, $ownerId);
+			} catch (NotFoundException $e) {
+				$this->logger->notice('Form {formId} linked to a file that doesn\'t exist anymore', ['formId' => $id]);
+			}
+		}
+
+		return new DataResponse();
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Delete a specific submission
+	 *
+	 * @param int $id the form id
+	 * @param int $submissionId the submission id
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function deleteSubmission(int $id, int $submissionId): DataResponse {
+		$this->logger->debug('Delete Submission: {submissionId}', [
+			'submissionId' => $submissionId,
+		]);
+
+		try {
+			$submission = $this->submissionMapper->findById($submissionId);
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or submission');
+			throw new OCSBadRequestException();
+		}
+
+		if ($id !== $submission->getFormId()) {
+			$this->logger->debug('Submission doesn\'t belong to given form');
+			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
+		}
+
+		// The current user has permissions to remove submissions
+		if (!$this->formsService->canDeleteResults($form)) {
+			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
+			throw new OCSForbiddenException();
+		}
+
+		// Delete submission (incl. Answers)
+		$this->submissionMapper->deleteById($submissionId);
+
+		$this->formsService->setLastUpdatedTimestamp($id);
+
+		return new DataResponse($submissionId);
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
+	 * Export Submissions to the Cloud
+	 *
+	 * @param int $id of the form
+	 * @param string $path The Cloud-Path to export to
+	 * @param string $fileFormat File format used for export
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	public function exportSubmissionsToCloud(int $id, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
+		try {
+			$form = $this->formMapper->findById($id);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSNotFoundException();
+		}
+
+		if (!$this->formsService->canSeeResults($form)) {
+			$this->logger->debug('The current user has no permission to get the results for this form');
+			throw new OCSForbiddenException();
+		}
+
+		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
+
+		return new DataResponse($file->getName());
+	}
+
+	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 * @PublicPage
+	 *
+	 * Uploads a temporary files to the server during form filling
+	 *
+	 * @param int $id id of the form
+	 * @param int $questionId id of the question
+	 * @param string $shareHash hash of the form share
+	 * @return Response
+	 */
+	public function uploadFiles(int $id, int $questionId, string $shareHash = ''): Response {
+		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}',
+			['formId' => $id, 'questionId' => $questionId]);
+
+		$uploadedFiles = [];
+		foreach ($this->request->getUploadedFile('files') as $key => $files) {
+			foreach ($files as $i => $value) {
+				$uploadedFiles[$i][$key] = $value;
+			}
+		}
+
+		if (!count($uploadedFiles)) {
+			throw new OCSBadRequestException('No files provided');
+		}
+
+		$form = $this->loadFormForSubmission($id, $shareHash);
+
+		if (!$this->formsService->canSubmit($form)) {
+			throw new OCSForbiddenException('Already submitted');
+		}
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question with id {questionId}', ['questionId' => $questionId]);
+			throw new OCSBadRequestException(previous: $e instanceof \Exception ? $e : null);
+		}
+
+		if ($id !== $question->getFormId()) {
+			$this->logger->debug('Question doesn\'t belong to the given form');
+			throw new OCSBadRequestException('Question doesn\'t belong to the given form');
+		}
+
+		$path = $this->formsService->getTemporaryUploadedFilePath($form, $question);
+
+		$response = [];
+		foreach ($uploadedFiles as $uploadedFile) {
+			$error = $uploadedFile['error'] ?? 0;
+			if ($error !== UPLOAD_ERR_OK) {
+				$this->logger->error('Failed to get the uploaded file. PHP file upload error code: ' . $error,
+					['file_name' => $uploadedFile['name']]);
+
+				throw new OCSBadRequestException(sprintf('Failed to upload the file "%s".', $uploadedFile['name']));
+			}
+
+			if (!is_uploaded_file($uploadedFile['tmp_name'])) {
+				throw new OCSBadRequestException('Invalid file provided');
+			}
+
+			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder->getStorage()->verifyPath($path, $uploadedFile['name']);
+
+			$extraSettings = $question->getExtraSettings();
+			if (($extraSettings['maxFileSize'] ?? 0) > 0 && $uploadedFile['size'] > $extraSettings['maxFileSize']) {
+				throw new OCSBadRequestException(sprintf('File size exceeds the maximum allowed size of %s bytes.', $extraSettings['maxFileSize']));
+			}
+
+			if (!empty($extraSettings['allowedFileTypes']) || !empty($extraSettings['allowedFileExtensions'])) {
+				$mimeType = $this->mimeTypeDetector->detectContent($uploadedFile['tmp_name']);
+				$aliases = $this->mimeTypeDetector->getAllAliases();
+
+				$valid = false;
+				foreach ($extraSettings['allowedFileTypes'] ?? [] as $allowedFileType) {
+					if (str_starts_with($aliases[$mimeType] ?? '', $allowedFileType)) {
+						$valid = true;
+						break;
+					}
+				}
+
+				if (!$valid && !empty($extraSettings['allowedFileExtensions'])) {
+					$mimeTypesPerExtension = method_exists($this->mimeTypeDetector, 'getAllMappings')
+						? $this->mimeTypeDetector->getAllMappings() : [];
+					foreach ($extraSettings['allowedFileExtensions'] as $allowedFileExtension) {
+						if (isset($mimeTypesPerExtension[$allowedFileExtension])
+							&& in_array($mimeType, $mimeTypesPerExtension[$allowedFileExtension])) {
+							$valid = true;
+							break;
+						}
+					}
+				}
+
+				if (!$valid) {
+					throw new OCSBadRequestException(sprintf('File type is not allowed. Allowed file types: %s',
+						implode(', ', array_merge($extraSettings['allowedFileTypes'] ?? [], $extraSettings['allowedFileExtensions'] ?? []))
+					));
+				}
+			}
+
+			if ($userFolder->nodeExists($path)) {
+				$folder = $userFolder->get($path);
+			} else {
+				$folder = $userFolder->newFolder($path);
+			}
+			/** @var \OCP\Files\Folder $folder */
+
+			$fileName = $folder->getNonExistingName($uploadedFile['name']);
+			$file = $folder->newFile($fileName, file_get_contents($uploadedFile['tmp_name']));
+
+			$uploadedFileEntity = new UploadedFile();
+			$uploadedFileEntity->setFormId($id);
+			$uploadedFileEntity->setOriginalFileName($fileName);
+			$uploadedFileEntity->setFileId($file->getId());
+			$uploadedFileEntity->setCreated(time());
+			$this->uploadedFileMapper->insert($uploadedFileEntity);
+
+			$response[] = [
+				'uploadedFileId' => $uploadedFileEntity->getId(),
+				'fileName' => $fileName,
+			];
+		}
+
+		return new DataResponse($response);
+	}
+	
 	/*
 	 *
 	 * Legacy API v2 methods (TODO: remove with Forms v5)
@@ -1724,7 +2121,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function getSubmissions(string $hash): DataResponse {
+	public function getSubmissionsLegacy(string $hash): DataResponse {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
@@ -1768,66 +2165,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * Insert answers for a question
-	 *
-	 * @param Form $form
-	 * @param int $submissionId
-	 * @param array $question
-	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
-	 */
-	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray) {
-		foreach ($answerArray as $answer) {
-			$answerEntity = new Answer();
-			$answerEntity->setSubmissionId($submissionId);
-			$answerEntity->setQuestionId($question['id']);
-
-			$answerText = '';
-			$uploadedFile = null;
-			// Are we using answer ids as values
-			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
-				// Search corresponding option, skip processing if not found
-				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
-				if ($optionIndex !== false) {
-					$answerText = $question['options'][$optionIndex]['text'];
-				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
-					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
-				}
-			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
-				$answerEntity->setFileId($uploadedFile->getFileId());
-
-				$userFolder = $this->storage->getUserFolder($form->getOwnerId());
-				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
-
-				if ($userFolder->nodeExists($path)) {
-					$folder = $userFolder->get($path);
-				} else {
-					$folder = $userFolder->newFolder($path);
-				}
-				/** @var \OCP\Files\Folder $folder */
-
-				$file = $userFolder->getById($uploadedFile->getFileId())[0];
-				$name = $folder->getNonExistingName($file->getName());
-				$file->move($folder->getPath() . '/' . $name);
-
-				$answerText = $name;
-			} else {
-				$answerText = $answer; // Not a multiple-question, answerText is given answer
-			}
-
-			if ($answerText === "") {
-				continue;
-			}
-
-			$answerEntity->setText($answerText);
-			$this->answerMapper->insert($answerEntity);
-			if ($uploadedFile) {
-				$this->uploadedFileMapper->delete($uploadedFile);
-			}
-		}
-	}
-
-	/**
 	 * @CORS
 	 * @NoAdminRequired
 	 * @PublicPage
@@ -1836,7 +2173,7 @@ class ApiController extends OCSController {
 	 *
 	 * @return Response
 	 */
-	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): Response {
+	public function uploadFilesLegacy(int $formId, int $questionId, string $shareHash = ''): Response {
 		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}',
 			['formId' => $formId, 'questionId' => $questionId]);
 
@@ -1960,7 +2297,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function insertSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
+	public function insertSubmissionLegacy(int $formId, array $answers, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
 			'answers' => $answers,
@@ -2050,7 +2387,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function deleteSubmission(int $id): DataResponse {
+	public function deleteSubmissionLegacy(int $id): DataResponse {
 		$this->logger->debug('Delete Submission: {id}', [
 			'id' => $id,
 		]);
@@ -2088,7 +2425,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function deleteAllSubmissions(int $formId): DataResponse {
+	public function deleteAllSubmissionsLegacy(int $formId): DataResponse {
 		$this->logger->debug('Delete all submissions to form: {formId}', [
 			'formId' => $formId,
 		]);
@@ -2126,7 +2463,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function exportSubmissions(string $hash, string $fileFormat = Constants::DEFAULT_FILE_FORMAT): DataDownloadResponse {
+	public function exportSubmissionsLegacy(string $hash, string $fileFormat = Constants::DEFAULT_FILE_FORMAT): DataDownloadResponse {
 		$this->logger->debug('Export submissions for form: {hash}', [
 			'hash' => $hash,
 		]);
@@ -2162,7 +2499,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function exportSubmissionsToCloud(string $hash, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
+	public function exportSubmissionsToCloudLegacy(string $hash, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
 		try {
 			$form = $this->formMapper->findByHash($hash);
 		} catch (IMapperException $e) {
@@ -2261,6 +2598,68 @@ class ApiController extends OCSController {
 			'fileName' => $file->getName(),
 			'filePath' => $filePath,
 		]);
+	}
+
+	// private functions
+
+	/**
+	 * Insert answers for a question
+	 *
+	 * @param Form $form
+	 * @param int $submissionId
+	 * @param array $question
+	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
+	 */
+	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray) {
+		foreach ($answerArray as $answer) {
+			$answerEntity = new Answer();
+			$answerEntity->setSubmissionId($submissionId);
+			$answerEntity->setQuestionId($question['id']);
+
+			$answerText = '';
+			$uploadedFile = null;
+			// Are we using answer ids as values
+			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+				// Search corresponding option, skip processing if not found
+				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
+				if ($optionIndex !== false) {
+					$answerText = $question['options'][$optionIndex]['text'];
+				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
+					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
+				}
+			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
+				$answerEntity->setFileId($uploadedFile->getFileId());
+
+				$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
+
+				if ($userFolder->nodeExists($path)) {
+					$folder = $userFolder->get($path);
+				} else {
+					$folder = $userFolder->newFolder($path);
+				}
+				/** @var \OCP\Files\Folder $folder */
+
+				$file = $userFolder->getById($uploadedFile->getFileId())[0];
+				$name = $folder->getNonExistingName($file->getName());
+				$file->move($folder->getPath() . '/' . $name);
+
+				$answerText = $name;
+			} else {
+				$answerText = $answer; // Not a multiple-question, answerText is given answer
+			}
+
+			if ($answerText === "") {
+				continue;
+			}
+
+			$answerEntity->setText($answerText);
+			$this->answerMapper->insert($answerEntity);
+			if ($uploadedFile) {
+				$this->uploadedFileMapper->delete($uploadedFile);
+			}
+		}
 	}
 
 	private function loadFormForSubmission(int $formId, string $shareHash): Form {
