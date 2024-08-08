@@ -55,7 +55,7 @@ use Psr\Log\LoggerInterface;
 
 class ShareApiController extends OCSController {
 	private IUser $currentUser;
-
+	
 	public function __construct(
 		string $appName,
 		IRequest $request,

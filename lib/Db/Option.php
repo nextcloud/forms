@@ -29,8 +29,8 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getQuestionId()
- * @method void setQuestionId(integer $value)
+ * @method int getQuestionId()
+ * @method void setQuestionId(int $value)
  * @method string getText()
  * @method void setText(string $value)
  */

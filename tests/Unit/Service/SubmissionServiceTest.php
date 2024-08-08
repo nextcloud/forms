@@ -135,7 +135,6 @@ class SubmissionServiceTest extends TestCase {
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 
 		$this->submissionService = new SubmissionService(
-			$this->formMapper,
 			$this->questionMapper,
 			$this->submissionMapper,
 			$this->answerMapper,

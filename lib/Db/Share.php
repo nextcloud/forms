@@ -30,9 +30,9 @@ use OCA\Forms\Constants;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getFormId()
+ * @method int getFormId()
  * @method void setFormId(integer $value)
- * @method integer getShareType()
+ * @method int getShareType()
  * @method void setShareType(integer $value)
  * @method string getShareWith()
  * @method void setShareWith(string $value)

@@ -55,7 +55,8 @@ use Psr\Log\LoggerInterface;
 class PageController extends Controller {
 	private const TEMPLATE_MAIN = 'main';
 
-	public function __construct(string $appName,
+	public function __construct(
+		string $appName,
 		IRequest $request,
 		private FormMapper $formMapper,
 		private ShareMapper $shareMapper,

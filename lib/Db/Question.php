@@ -34,9 +34,9 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getFormId()
+ * @method int getFormId()
  * @method void setFormId(integer $value)
- * @method integer getOrder()
+ * @method int getOrder()
  * @method void setOrder(integer $value)
  * @method string getType()
  * @method void setType(string $value)
