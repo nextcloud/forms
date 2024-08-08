@@ -31,11 +31,11 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getFormId()
+ * @method int getFormId()
  * @method void setFormId(integer $value)
  * @method string getUserId()
  * @method void setUserId(string $value)
- * @method integer getTimestamp()
+ * @method int getTimestamp()
  * @method void setTimestamp(integer $value)
  */
 class Submission extends Entity {

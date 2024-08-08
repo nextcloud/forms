@@ -35,17 +35,10 @@ use Psr\Log\LoggerInterface;
  * @implements IEventListener<UserDeletedEvent>
  */
 class UserDeletedListener implements IEventListener {
-
-	/** @var IJobList */
-	private $jobList;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	public function __construct(IJobList $jobList,
-		LoggerInterface $logger) {
-		$this->jobList = $jobList;
-		$this->logger = $logger;
+	public function __construct(
+		private IJobList $jobList,
+		private LoggerInterface $logger
+	) {
 	}
 
 	public function handle(Event $event): void {

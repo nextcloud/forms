@@ -35,17 +35,16 @@ use OCP\IDBConnection;
  * @extends QBMapper<Submission>
  */
 class SubmissionMapper extends QBMapper {
-	private $answerMapper;
-
 	/**
 	 * SubmissionMapper constructor.
 	 * @param IDBConnection $db
 	 * @param AnswerMapper $answerMapper
 	 */
-	public function __construct(IDBConnection $db, AnswerMapper $answerMapper) {
+	public function __construct(
+		IDBConnection $db,
+		private AnswerMapper $answerMapper
+	) {
 		parent::__construct($db, 'forms_v2_submissions', Submission::class);
-
-		$this->answerMapper = $answerMapper;
 	}
 
 	/**

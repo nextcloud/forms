@@ -47,7 +47,6 @@ class AnswerMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @return Answer[]
 	 */
-
 	public function findBySubmission(int $submissionId): array {
 		$qb = $this->db->getQueryBuilder();
 

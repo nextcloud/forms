@@ -36,27 +36,14 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 class ConfigController extends ApiController {
-	protected $appName;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var IConfig */
-	private $config;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	public function __construct(string $appName,
-		ConfigService $configService,
-		IConfig $config,
-		LoggerInterface $logger,
-		IRequest $request) {
+	public function __construct(
+		protected $appName,
+		private ConfigService $configService,
+		private IConfig $config,
+		private LoggerInterface $logger,
+		IRequest $request
+	) {
 		parent::__construct($appName, $request);
-		$this->appName = $appName;
-		$this->configService = $configService;
-		$this->config = $config;
-		$this->logger = $logger;
 	}
 
 	/**
