@@ -8,6 +8,7 @@ OC.L10N.register(
     "Anonymous user" : "Usuario anónimo",
     "A form has been <strong>shared</strong> with you" : "Se ha <strong>compartido</strong> un formulario con usted",
     "Someone <strong>answered</strong> a form" : "Alguien <strong>respondió</strong> a un formulario",
+    "Timestamp of data load" : "Timestamp de la carga de datos",
     "Copy" : "Copiar",
     "Anonymous response" : "Respuesta anónima",
     "Shared by %s" : "Compartido por %s ",
