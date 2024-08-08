@@ -30,16 +30,10 @@ use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
 
 class SettingsSection implements IIconSection {
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	public function __construct(IL10N $l10n, IURLGenerator $urlGenerator) {
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
+	public function __construct(
+		private IL10N $l10n,
+		private IURLGenerator $urlGenerator
+	) {
 	}
 
 	/**

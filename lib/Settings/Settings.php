@@ -33,25 +33,12 @@ use OCP\Settings\ISettings;
 use OCP\Util;
 
 class Settings implements ISettings {
-	private $appName;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var IInitialState */
-	private $initialState;
-
-	public function __construct(string $appName,
-		ConfigService $configService,
-		IGroupManager $groupManager,
-		IInitialState $initialState) {
-		$this->appName = $appName;
-		$this->configService = $configService;
-		$this->groupManager = $groupManager;
-		$this->initialState = $initialState;
+	public function __construct(
+		private string $appName,
+		private ConfigService $configService,
+		private IGroupManager $groupManager,
+		private IInitialState $initialState
+	) {
 	}
 
 	/**
