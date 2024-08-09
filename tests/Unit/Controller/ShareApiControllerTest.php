@@ -551,7 +551,7 @@ class ShareApiControllerTest extends TestCase {
 			->with('8');
 
 		$response = new DataResponse(8);
-		$this->assertEquals($response, $this->shareApiController->deleteShare(8));
+		$this->assertEquals($response, $this->shareApiController->deleteShare(5, 8));
 	}
 
 	/**
@@ -565,7 +565,7 @@ class ShareApiControllerTest extends TestCase {
 		;
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->deleteShare(8);
+		$this->shareApiController->deleteShare(1, 8);
 	}
 
 	/**
@@ -589,7 +589,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->shareApiController->deleteShare(8);
+		$this->shareApiController->deleteShare(5, 8);
 	}
 
 	public function dataUpdateShare() {
@@ -824,10 +824,10 @@ class ShareApiControllerTest extends TestCase {
 
 		if ($exception === null) {
 			$expectedResponse = new DataResponse($expected);
-			$this->assertEquals($expectedResponse, $this->shareApiController->updateShare($share['id'], $keyValuePairs));
+			$this->assertEquals($expectedResponse, $this->shareApiController->updateShare($share['formId'], $share['id'], $keyValuePairs));
 		} else {
 			$this->expectException($exception);
-			$this->shareApiController->updateShare($share['id'], $keyValuePairs);
+			$this->shareApiController->updateShare($share['formId'], $share['id'], $keyValuePairs);
 		}
 	}
 
@@ -846,7 +846,7 @@ class ShareApiControllerTest extends TestCase {
 			->method('debug');
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShare(1337, [Constants::PERMISSION_SUBMIT]);
+		$this->shareApiController->updateShare(1, 1337, [Constants::PERMISSION_SUBMIT]);
 	}
 
 	/**
@@ -876,6 +876,6 @@ class ShareApiControllerTest extends TestCase {
 			->method('debug');
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShare(1337, [Constants::PERMISSION_SUBMIT]);
+		$this->shareApiController->updateShare(7331, 1337, [Constants::PERMISSION_SUBMIT]);
 	}
 }
