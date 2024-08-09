@@ -82,16 +82,16 @@ class ShareApiController extends OCSController {
 	 *
 	 * Add a new share
 	 *
-	 * @param int $id The form to share
+	 * @param int $formId The form to share
 	 * @param int $shareType Nextcloud-ShareType
 	 * @param string $shareWith ID of user/group/... to share with. For Empty shareWith and shareType Link, this will be set as RandomID.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function newShare(int $id, int $shareType, string $shareWith = '', array $permissions = [Constants::PERMISSION_SUBMIT]): DataResponse {
+	public function newShare(int $formId, int $shareType, string $shareWith = '', array $permissions = [Constants::PERMISSION_SUBMIT]): DataResponse {
 		$this->logger->debug('Adding new share: formId: {formId}, shareType: {shareType}, shareWith: {shareWith}, permissions: {permissions}', [
-			'formId' => $id,
+			'formId' => $formId,
 			'shareType' => $shareType,
 			'shareWith' => $shareWith,
 			'permissions' => $permissions,
@@ -110,7 +110,7 @@ class ShareApiController extends OCSController {
 		}
 
 		try {
-			$form = $this->formMapper->findById($id);
+			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form', ['exception' => $e]);
 			throw new OCSBadRequestException('Could not find form');
@@ -183,7 +183,7 @@ class ShareApiController extends OCSController {
 		}
 
 		$share = new Share();
-		$share->setFormId($id);
+		$share->setFormId($formId);
 		$share->setShareType($shareType);
 		$share->setShareWith($shareWith);
 		$share->setPermissions($permissions);
@@ -194,7 +194,7 @@ class ShareApiController extends OCSController {
 		// Create share-notifications (activity)
 		$this->formsService->notifyNewShares($form, $share);
 
-		$this->formsService->setLastUpdatedTimestamp($id);
+		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		// Append displayName for Frontend
 		$shareData = $share->read();
@@ -209,29 +209,29 @@ class ShareApiController extends OCSController {
 	 *
 	 * Update permissions of a share
 	 *
-	 * @param int $id of the form
+	 * @param int $formId of the form
 	 * @param int $shareId of the share to update
 	 * @param array $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function updateShare(int $id, int $shareId, array $keyValuePairs): DataResponse {
-		$this->logger->debug('Updating share: {shareId} of form {id}, permissions: {permissions}', [
-			'id' => $id,
+	public function updateShare(int $formId, int $shareId, array $keyValuePairs): DataResponse {
+		$this->logger->debug('Updating share: {shareId} of form {formId}, permissions: {permissions}', [
+			'formId' => $formId,
 			'shareId' => $shareId,
 			'keyValuePairs' => $keyValuePairs
 		]);
 
 		try {
 			$formShare = $this->shareMapper->findById($shareId);
-			$form = $this->formMapper->findById($id);
+			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find share', ['exception' => $e]);
 			throw new OCSBadRequestException('Could not find share');
 		}
 
-		if ($id !== $formShare->getFormId()) {
+		if ($formId !== $formShare->getFormId()) {
 			$this->logger->debug('This share doesn\'t belong to the given Form');
 			throw new OCSBadRequestException('Share doesn\'t belong to given Form');
 		}
@@ -290,7 +290,7 @@ class ShareApiController extends OCSController {
 			}
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($id);
+		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		return new DataResponse($formShare->getId());
 	}
@@ -301,27 +301,27 @@ class ShareApiController extends OCSController {
 	 *
 	 * Delete a share
 	 *
-	 * @param int $id of the form
+	 * @param int $formId of the form
 	 * @param int $shareId of the share to delete
 	 * @return DataResponse
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
-	public function deleteShare(int $id, int $shareId): DataResponse {
-		$this->logger->debug('Deleting share: {shareId} of form {id}', [
-			'id' => $id,
+	public function deleteShare(int $formId, int $shareId): DataResponse {
+		$this->logger->debug('Deleting share: {shareId} of form {formId}', [
+			'formId' => $formId,
 			'shareId' => $shareId,
 		]);
 
 		try {
 			$share = $this->shareMapper->findById($shareId);
-			$form = $this->formMapper->findById($id);
+			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find share', ['exception' => $e]);
 			throw new OCSBadRequestException('Could not find share');
 		}
 
-		if ($id !== $share->getFormId()) {
+		if ($formId !== $share->getFormId()) {
 			$this->logger->debug('This share doesn\'t belong to the given Form');
 			throw new OCSBadRequestException('Share doesn\'t belong to given Form');
 		}
@@ -333,7 +333,7 @@ class ShareApiController extends OCSController {
 
 		$this->shareMapper->deleteById($shareId);
 
-		$this->formsService->setLastUpdatedTimestamp($id);
+		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		return new DataResponse($shareId);
 	}
