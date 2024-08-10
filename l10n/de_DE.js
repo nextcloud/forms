@@ -12,7 +12,7 @@ OC.L10N.register(
     "Someone <strong>answered</strong> a form" : "Jemand hat ein Formular <strong>ausgefüllt</strong>",
     "Nextcloud Forms" : "Nextcloud Forms",
     "Select form" : "Formular auswählen",
-    "Timestamp of data load" : "Zeitstempel des Datenladens",
+    "Timestamp of data load" : "Zeitpunkt der Datenladung",
     "No" : "Nein",
     "Yes" : "Ja",
     "Question" : "Frage",
