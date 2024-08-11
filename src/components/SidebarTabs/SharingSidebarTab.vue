@@ -130,7 +130,7 @@
 				v-tooltip="
 					t(
 						'forms',
-						'For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.',
+						'For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0',
 					)
 				"
 				class="share-div__legacy-warning">
