@@ -104,6 +104,19 @@
 				<p v-if="infoMessage" class="info-message">
 					{{ infoMessage }}
 				</p>
+				<!-- TODO: remove with Forms 5.0
+				 Show info about legacyLink that will be removed -->
+				<NcNoteCard
+					v-if="form.access.legacyLink"
+					type="warning"
+					:heading="t('forms', 'Legacy link in use')">
+					{{
+						t(
+							'forms',
+							'This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism.',
+						)
+					}}
+				</NcNoteCard>
 			</header>
 
 			<section>
@@ -186,6 +199,7 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import IconLock from 'vue-material-design-icons/Lock.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
@@ -214,6 +228,7 @@ export default {
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
+		NcNoteCard,
 		Question,
 		QuestionLong,
 		QuestionShort,
