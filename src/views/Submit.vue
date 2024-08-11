@@ -145,13 +145,17 @@
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
 						@update:values="(values) => onUpdate(question, values)" />
 				</ul>
-				<input
-					ref="submitButton"
-					class="primary"
-					type="submit"
-					:value="t('forms', 'Submit')"
+				<NcButton
+					alignment="center-reverse"
+					class="submit-button"
 					:disabled="loading"
-					:aria-label="t('forms', 'Submit form')" />
+					native-type="submit"
+					type="primary">
+					<template #icon>
+						<NcIconSvgWrapper :svg="IconSendSvg" />
+					</template>
+					{{ t('forms', 'Submit') }}
+				</NcButton>
 			</form>
 
 			<!-- Confirmation dialog if form is empty submitted -->
@@ -188,6 +192,7 @@ import { emit } from '@nextcloud/event-bus'
 import axios from '@nextcloud/axios'
 import moment from '@nextcloud/moment'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
@@ -196,6 +201,7 @@ import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
 import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
+import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
 
 import { FormState } from '../models/FormStates.ts'
 import answerTypes from '../models/AnswerTypes.js'
@@ -214,6 +220,7 @@ export default {
 
 	components: {
 		NcAppContent,
+		NcButton,
 		NcDialog,
 		NcEmptyContent,
 		NcLoadingIcon,
@@ -266,9 +273,18 @@ export default {
 		},
 	},
 
+	setup() {
+		// Non reactive properties
+		return {
+			IconCheckSvg,
+			IconSendSvg,
+
+			maxStringLengths: loadState('forms', 'maxStringLengths'),
+		}
+	},
+
 	data() {
 		return {
-			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			answerTypes,
 			/**
 			 * Mapping of questionId => answers
@@ -285,10 +301,6 @@ export default {
 	},
 
 	computed: {
-		IconCheckSvg() {
-			return IconCheckSvg
-		},
-
 		validQuestions() {
 			return this.form.questions.filter((question) => {
 				// All questions must have a valid title
@@ -539,8 +551,7 @@ export default {
 		 * Some inputs do automatically, while some need explicit handling
 		 */
 		onKeydownCtrlEnter() {
-			// Using button-click event to not bypass validity-checks and use our specified behaviour
-			this.$refs.submitButton.click()
+			this.$refs.form.requestSubmit()
 		},
 
 		/*
@@ -730,12 +741,11 @@ export default {
 			padding-inline-start: 44px;
 		}
 
-		input[type='submit'] {
+		.submit-button {
 			align-self: flex-end;
 			margin: 5px;
 			margin-block-end: 160px;
-			padding-block: 10px;
-			padding-inline: 20px;
+			padding-inline-start: 20px;
 		}
 	}
 }
