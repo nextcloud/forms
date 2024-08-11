@@ -384,7 +384,7 @@ export default {
 
 <style lang="scss" scoped>
 #expiresDatetimePicker {
-	width: calc(100% - 44px);
+	width: calc(100% - var(--default-clickable-area));
 }
 
 .settings-div--indent {

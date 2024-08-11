@@ -236,7 +236,7 @@ export default {
 
 <style lang="scss" scoped>
 .question-summary {
-	padding-inline: 44px 16px;
+	padding-inline: var(--default-clickable-area) 16px;
 
 	h3 {
 		font-weight: bold;

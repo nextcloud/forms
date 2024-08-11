@@ -140,7 +140,7 @@ export default {
 	}
 
 	:deep(.mx-input) {
-		height: 44px !important;
+		height: var(--default-clickable-area) !important;
 	}
 }
 </style>

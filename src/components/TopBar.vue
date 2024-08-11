@@ -206,7 +206,7 @@ export default {
 
 	// align with navigation and sidebar toggle, but ensure it is not overlayed
 	padding: var(--app-navigation-padding);
-	margin-inline: var(--default-clickable-area, 44px);
+	margin-inline: var(--default-clickable-area);
 
 	position: sticky;
 	top: 0;

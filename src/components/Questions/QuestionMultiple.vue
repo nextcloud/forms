@@ -663,7 +663,7 @@ export default {
 .question__item {
 	position: relative;
 	display: inline-flex;
-	min-height: 44px;
+	min-height: var(--default-clickable-area);
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
@@ -720,11 +720,11 @@ export default {
 	}
 
 	.input-field__input {
-		min-height: 44px;
+		min-height: var(--default-clickable-area);
 	}
 }
 
 .question__other-answer:deep() .input-field__input {
-	min-height: 44px;
+	min-height: var(--default-clickable-area);
 }
 </style>
