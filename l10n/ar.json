@@ -148,7 +148,6 @@
     "Share {formTitle}" : "شارِك {formTitle}",
     "Legacy Link" : "رابط قديم",
     "Form still supports old sharing-link." : "النموذج مازال يدعم روابط المشاركة القديمة",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "لأجل التوافق مع المشاركات القديمة، لا زال الرابط الداخلي قابلاً للاستخدام كرابط مشاركة. ننصح باستبداله برابط مشاركة جديد.",
     "Remove Legacy Link" : "حذف رابط قديم",
     "Internal link" : "رابط داخلي",
     "Only works for logged in accounts with access rights" : "يعمل فقط للحسابات الداخلة و التي لها حق الوصول",

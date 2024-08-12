@@ -150,7 +150,6 @@ OC.L10N.register(
     "Share {formTitle}" : "Share {formTitle}",
     "Legacy Link" : "Legacy Link",
     "Form still supports old sharing-link." : "Form still supports old sharing-link.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.",
     "Remove Legacy Link" : "Remove Legacy Link",
     "Internal link" : "Internal link",
     "Only works for logged in accounts with access rights" : "Only works for logged in accounts with access rights",

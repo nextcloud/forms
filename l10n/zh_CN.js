@@ -150,7 +150,6 @@ OC.L10N.register(
     "Share {formTitle}" : "分享{formTitle}",
     "Legacy Link" : "旧版链接",
     "Form still supports old sharing-link." : "表单依然支持旧的分享链接",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "为兼容旧版共享功能，内部链接仍可用作分享链接。我们建议将这类链接替换为新的分享链接。",
     "Remove Legacy Link" : "移除旧版链接",
     "Internal link" : "内部链接",
     "Only works for logged in accounts with access rights" : "仅适用于具有访问权限的已登录用户",

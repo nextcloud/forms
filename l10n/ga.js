@@ -150,7 +150,6 @@ OC.L10N.register(
     "Share {formTitle}" : "Comhroinn {formTitle}",
     "Legacy Link" : "Nasc oidhreachta",
     "Form still supports old sharing-link." : "Tacaíonn an fhoirm le sean-nasc comhroinnte fós.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Chun comhoiriúnacht leis an Sean Roinnt, tá an nasc inmheánach fós inúsáidte mar nasc Comhroinn. Molaimid nasc Share nua a chur in ionad an nasc.",
     "Remove Legacy Link" : "Bain Nasc Legacy",
     "Internal link" : "Nasc inmheánach",
     "Only works for logged in accounts with access rights" : "Ní oibríonn ach do chuntais logáilte isteach a bhfuil cearta rochtana acu",

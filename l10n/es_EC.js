@@ -94,7 +94,6 @@ OC.L10N.register(
     "Remove link" : "Eliminar enlace",
     "Legacy Link" : "Enlace antiguo",
     "Form still supports old sharing-link." : "El formulario todavía admite el enlace de compartición antiguo.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Por compatibilidad con la antigua compartición, el enlace interno todavía es utilizable como enlace de compartición. Recomendamos reemplazar el enlace con un nuevo enlace de compartición.",
     "Remove Legacy Link" : "Eliminar enlace antiguo",
     "Internal link" : "Enlace interno",
     "Only works for logged in accounts with access rights" : "Solo funciona para cuentas con derechos de acceso",

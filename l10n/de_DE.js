@@ -150,7 +150,6 @@ OC.L10N.register(
     "Share {formTitle}" : "{formTitle} teilen",
     "Legacy Link" : "Alter Link",
     "Form still supports old sharing-link." : "Das Formular unterstützt weiterhin den alten Freigabe-Link.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Aus Kompatibilitätsgründen mit der alten Freigabefunktion ist der interne Link weiterhin als Freigabe-Link nutzbar. Es empfiehlt sich, den Link durch einen neuen Freigabe-Link zu ersetzen.",
     "Remove Legacy Link" : "Alten Link entfernen",
     "Internal link" : "Interner Link",
     "Only works for logged in accounts with access rights" : "Funktioniert nur für angemeldete Konten mit Zugriffsrechten",

@@ -147,7 +147,6 @@ OC.L10N.register(
     "Share {formTitle}" : "Дели {formTitle}",
     "Legacy Link" : "Линк старе верзије",
     "Form still supports old sharing-link." : "Формулар још увек подржава стати линк за дељење.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Из разлога компатибилности са старим Дељење, интерни линк је јођ увек употребљив као линк за дељење. Препоручујемо вам да га замените новим линком за дељење.",
     "Remove Legacy Link" : "Уклони линк старе верзије",
     "Internal link" : "Интерна веза",
     "Only works for logged in accounts with access rights" : "Функционипе са мо за пријављене налоге са правима приступа",

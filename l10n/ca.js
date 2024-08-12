@@ -97,7 +97,6 @@ OC.L10N.register(
     "Remove link" : "Suprimeix l'enllaç",
     "Legacy Link" : "Enllaç heretat",
     "Form still supports old sharing-link." : "El formulari encara admet l'enllaç de compartició antic.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Per a la compatibilitat amb l'antic Compartit, l'enllaç intern encara es pot utilitzar com a enllaç per compartir. Us recomanem que substituïu l'enllaç per un nou enllaç per compartir.",
     "Remove Legacy Link" : "Suprimeix l'enllaç heretat",
     "Internal link" : "Enllaç intern",
     "Only works for logged in accounts with access rights" : "Només funciona per a comptes connectats amb drets d'accés",

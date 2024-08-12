@@ -94,7 +94,6 @@ OC.L10N.register(
     "Remove link" : "حذف پیوند",
     "Legacy Link" : "پیوند قدیمی",
     "Form still supports old sharing-link." : "Form still supports old sharing-link.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link.",
     "Remove Legacy Link" : "Remove Legacy Link",
     "Internal link" : "پیوند داخلی",
     "Only works for logged in accounts with access rights" : "Only works for logged in accounts with access rights",

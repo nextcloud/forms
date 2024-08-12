@@ -111,7 +111,6 @@ OC.L10N.register(
     "Remove link" : "Odstrániť odkaz",
     "Legacy Link" : "Starší odkaz",
     "Form still supports old sharing-link." : "Formulár stále podporuje starý odkaz na zdieľanie.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Kvôli kompatibilite so starým zdieľaním je interný odkaz stále použiteľný ako odkaz na zdieľanie. Odporúčame nahradiť odkaz novým odkazom Zdieľať.",
     "Remove Legacy Link" : "Odstrániť starý odkaz",
     "Internal link" : "Interný odkaz",
     "Only works for logged in accounts with access rights" : "Funguje iba pre prihlásené účty s prístupovými právami",

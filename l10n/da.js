@@ -92,7 +92,6 @@ OC.L10N.register(
     "Remove link" : "Fjern link",
     "Legacy Link" : "Nedarvet link",
     "Form still supports old sharing-link." : "Formularen understøtter stadig gammelt delingslink.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "For kompatibilitet med den gamle Deling kan det interne link stadig bruges som Dele-link. Vi anbefaler at erstatte linket med et nyt Dele-link.",
     "Remove Legacy Link" : "Fjern nedarvet Link",
     "Internal link" : "Internt link",
     "Only works for logged in accounts with access rights" : "Virker kun for aktive konti med adgangsrettigheder",

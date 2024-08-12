@@ -131,7 +131,6 @@ OC.L10N.register(
     "Remove link" : "Kendu esteka",
     "Legacy Link" : "Legatu-esteka",
     "Form still supports old sharing-link." : "Inprimakiak partekatzeko esteka zaharra onartzen du oraindik.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Partekatu zaharrarekin bateragarri izateko, barne-esteka partekatu esteka gisa erabil daiteke oraindik. Esteka partekatzeko esteka berri batekin ordezkatzea gomendatzen dugu.",
     "Remove Legacy Link" : "Kendu legatu-esteka",
     "Internal link" : "Barneko esteka",
     "Only works for logged in accounts with access rights" : "Sarbide-eskubideekin saioa hasita dauden kontuetarako bakarrik funtzionatzen du",

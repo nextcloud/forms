@@ -150,7 +150,6 @@ OC.L10N.register(
     "Share {formTitle}" : "Del {formTitle}",
     "Legacy Link" : "Eldre kobling",
     "Form still supports old sharing-link." : "Form støtter fortsatt gammel delingslenke.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "For kompatibilitet med den gamle delingen kan den interne lenken fortsatt brukes som delingskobling. Vi anbefaler at du erstatter koblingen med en ny Del-kobling.",
     "Remove Legacy Link" : "Fjern eldre kobling",
     "Internal link" : "Intern lenke",
     "Only works for logged in accounts with access rights" : "Fungerer bare for innloggede kontoer med tilgangsrettigheter",

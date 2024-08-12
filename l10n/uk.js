@@ -143,7 +143,6 @@ OC.L10N.register(
     "Remove link" : "Вилучити посилання",
     "Legacy Link" : "Застаріле посилання",
     "Form still supports old sharing-link." : "Форма все ще підтримує старе посилання для спільного доступу.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "Для сумісності зі старою версією Sharing внутрішнє посилання все ще можна використовувати як посилання поділитися. Ми рекомендуємо замінити посилання на нове посилання Поділитися.",
     "Remove Legacy Link" : "Вилучити застаріле посилання",
     "Internal link" : "Внутрішнє посилання",
     "Only works for logged in accounts with access rights" : "Стосується користувачів, які мають доступ.",
