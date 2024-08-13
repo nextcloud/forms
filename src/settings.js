@@ -32,8 +32,8 @@ Vue.prototype.t = translate
 Vue.prototype.n = translatePlural
 
 export default new Vue({
-	 el: '#forms-settings',
-	 // eslint-disable-next-line vue/match-component-file-name
-	 name: 'FormsSettings',
-	 render: h => h(FormsSettings),
+	el: '#forms-settings',
+	// eslint-disable-next-line vue/match-component-file-name
+	name: 'FormsSettings',
+	render: (h) => h(FormsSettings),
 })

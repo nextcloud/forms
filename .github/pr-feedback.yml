@@ -21,6 +21,6 @@ jobs:
             Your feedback is valuable to us as we continuously strive to improve our community developer experience. Please take a moment to complete our short survey by clicking on the following link: https://cloud.nextcloud.com/apps/forms/s/i9Ago4EQRZ7TWxjfmeEpPkf6
             Thank you for contributing to Nextcloud and we hope to hear from you soon!
           days-before-feedback: 14
-          start-date: "2023-07-10"
-          exempt-authors: "${{ steps.scrape.outputs.users }}"
+          start-date: '2023-07-10'
+          exempt-authors: '${{ steps.scrape.outputs.users }}'
           exempt-bots: true

@@ -83,7 +83,10 @@ export default {
 		},
 
 		formDescription() {
-			return this.markdownit.render(this.form.description) || this.form.description
+			return (
+				this.markdownit.render(this.form.description) ||
+				this.form.description
+			)
 		},
 	},
 
@@ -120,19 +123,25 @@ export default {
 			logger.debug(`Loading form ${id}`)
 
 			// Create new cancelable get request
-			const { request, cancel } = CancelableRequest(async function(url, requestOptions) {
-				return axios.get(url, requestOptions)
-			})
+			const { request, cancel } = CancelableRequest(
+				async function (url, requestOptions) {
+					return axios.get(url, requestOptions)
+				},
+			)
 			// Store cancel-function
 			this.cancelFetchFullForm = cancel
 
 			try {
-				const response = await request(generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id }))
+				const response = await request(
+					generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id }),
+				)
 				this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
 			} catch (error) {
 				if (axios.isCancel(error)) {
-					logger.debug(`The request for form ${id} has been canceled`, { error })
+					logger.debug(`The request for form ${id} has been canceled`, {
+						error,
+					})
 				} else {
 					logger.error(`Unexpected error fetching form ${id}`, { error })
 					this.isLoadingForm = false
@@ -147,12 +156,15 @@ export default {
 		async saveFormProperty(key) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/form/update'), {
-					id: this.form.id,
-					keyValuePairs: {
-						[key]: this.form[key],
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v2.4/form/update'),
+					{
+						id: this.form.id,
+						keyValuePairs: {
+							[key]: this.form[key],
+						},
 					},
-				})
+				)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error saving form property', { error })

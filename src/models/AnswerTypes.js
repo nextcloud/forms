@@ -20,17 +20,19 @@
  *
  */
 
-import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
-import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
-import QuestionShort from '../components/Questions/QuestionShort.vue'
-import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
+import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
+import QuestionFile from '../components/Questions/QuestionFile.vue'
+import QuestionLong from '../components/Questions/QuestionLong.vue'
+import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import QuestionShort from '../components/Questions/QuestionShort.vue'
 
 import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
 import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 import IconTextLong from 'vue-material-design-icons/TextLong.vue'
+import IconFile from 'vue-material-design-icons/File.vue'
 import IconCalendar from 'vue-material-design-icons/Calendar.vue'
 import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
 
@@ -67,12 +69,15 @@ export default {
 		icon: IconCheckboxOutline,
 		label: t('forms', 'Checkboxes'),
 		predefined: true,
-		validate: question => question.options.length > 0,
+		validate: (question) => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
 		createPlaceholder: t('forms', 'People can submit a different answer'),
 		submitPlaceholder: t('forms', 'Enter your answer'),
-		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
 	},
 
 	multiple_unique: {
@@ -80,12 +85,15 @@ export default {
 		icon: IconRadioboxMarked,
 		label: t('forms', 'Radio buttons'),
 		predefined: true,
-		validate: question => question.options.length > 0,
+		validate: (question) => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Radio buttons question title'),
 		createPlaceholder: t('forms', 'People can submit a different answer'),
 		submitPlaceholder: t('forms', 'Enter your answer'),
-		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
 
 		// Using the same vue-component as multiple, this specifies that the component renders as multiple_unique.
 		unique: true,
@@ -96,12 +104,25 @@ export default {
 		icon: IconArrowDownDropCircleOutline,
 		label: t('forms', 'Dropdown'),
 		predefined: true,
-		validate: question => question.options.length > 0,
+		validate: (question) => question.options.length > 0,
 
 		titlePlaceholder: t('forms', 'Dropdown question title'),
 		createPlaceholder: t('forms', 'People can pick one option'),
 		submitPlaceholder: t('forms', 'Pick an option'),
-		warningInvalid: t('forms', 'This question needs a title and at least one answer!'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
+	},
+
+	file: {
+		component: QuestionFile,
+		icon: IconFile,
+		label: t('forms', 'File'),
+		predefined: false,
+
+		titlePlaceholder: t('forms', 'File question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
 	short: {

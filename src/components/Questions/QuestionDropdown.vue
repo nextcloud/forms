@@ -21,19 +21,28 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		:content-valid="contentValid"
 		:shift-drag-handle="shiftDragHandle"
 		v-on="commonListeners">
 		<template #actions>
-			<NcActionCheckbox :checked="extraSettings?.shuffleOptions"
+			<NcActionCheckbox
+				:checked="extraSettings?.shuffleOptions"
 				@update:checked="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
+			<NcActionButton close-after-click @click="isOptionDialogShown = true">
+				<template #icon>
+					<IconContentPaste :size="20" />
+				</template>
+				{{ t('forms', 'Add multiple options') }}
+			</NcActionButton>
 		</template>
-		<NcSelect v-if="readOnly"
+		<NcSelect
+			v-if="readOnly"
 			v-model="selectedOption"
 			:name="name || undefined"
 			:placeholder="selectOptionPlaceholder"
@@ -44,33 +53,48 @@
 			label="text"
 			@input="onInput" />
 
-		<ol v-if="!readOnly" class="question__content">
-			<!-- Answer text input edit -->
-			<AnswerInput v-for="(answer, index) in options"
-				:key="index /* using index to keep the same vnode after new answer creation */"
-				ref="input"
-				:answer="answer"
-				:index="index"
-				:is-unique="!isMultiple"
-				:is-dropdown="true"
-				:max-option-length="maxStringLengths.optionText"
-				@delete="deleteOption"
-				@update:answer="updateAnswer"
-				@focus-next="focusNextInput"
-				@tabbed-out="checkValidOption" />
+		<template v-else>
+			<div v-if="isLoading">
+				<NcLoadingIcon :size="64" />
+			</div>
+			<ol v-else class="question__content">
+				<!-- Answer text input edit -->
+				<AnswerInput
+					v-for="(answer, index) in options"
+					:key="
+						index /* using index to keep the same vnode after new answer creation */
+					"
+					ref="input"
+					:answer="answer"
+					:index="index"
+					:is-unique="!isMultiple"
+					:is-dropdown="true"
+					:max-option-length="maxStringLengths.optionText"
+					@delete="deleteOption"
+					@update:answer="updateAnswer"
+					@focus-next="focusNextInput"
+					@tabbed-out="checkValidOption" />
 
-			<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
-				<input ref="pseudoInput"
-					v-model="inputValue"
-					:aria-label="t('forms', 'Add a new answer')"
-					:placeholder="t('forms', 'Add a new answer')"
-					class="question__input"
-					:maxlength="maxStringLengths.optionText"
-					minlength="1"
-					type="text"
-					@input="addNewEntry">
-			</li>
-		</ol>
+				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
+					<input
+						ref="pseudoInput"
+						class="question__input"
+						:aria-label="t('forms', 'Add a new answer')"
+						:placeholder="t('forms', 'Add a new answer')"
+						:maxlength="maxStringLengths.optionText"
+						minlength="1"
+						type="text"
+						@input="addNewEntry"
+						@compositionstart="onCompositionStart"
+						@compositionend="onCompositionEnd" />
+				</li>
+			</ol>
+		</template>
+
+		<!-- Add multiple options modal -->
+		<OptionInputDialog
+			:open.sync="isOptionDialogShown"
+			@multiple-answers="handleMultipleOptions" />
 	</Question>
 </template>
 
@@ -80,11 +104,15 @@ import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 
+import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
+
 import AnswerInput from './AnswerInput.vue'
+import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import GenRandomId from '../../utils/GenRandomId.js'
 import logger from '../../utils/Logger.js'
 
 export default {
@@ -92,8 +120,12 @@ export default {
 
 	components: {
 		AnswerInput,
+		IconContentPaste,
+		NcActionButton,
 		NcActionCheckbox,
+		NcLoadingIcon,
 		NcSelect,
+		OptionInputDialog,
 	},
 
 	mixins: [QuestionMixin],
@@ -102,6 +134,8 @@ export default {
 		return {
 			selectedOption: null,
 			inputValue: '',
+			isOptionDialogShown: false,
+			isLoading: false,
 		}
 	},
 
@@ -119,7 +153,7 @@ export default {
 
 		isLastEmpty() {
 			const value = this.options[this.options.length - 1]
-			return value?.text?.trim().length === 0
+			return value?.text?.trim?.().length === 0
 		},
 
 		isMultiple() {
@@ -143,7 +177,9 @@ export default {
 	mounted() {
 		// Init selected options from values prop
 		if (this.values) {
-			const selected = this.values.map(id => this.options.find(option => option.id === id))
+			const selected = this.values.map((id) =>
+				this.options.find((option) => option.id === id),
+			)
 			this.selectedOption = this.isMultiple ? selected : selected[0]
 		}
 	},
@@ -151,7 +187,9 @@ export default {
 	methods: {
 		onInput(option) {
 			if (Array.isArray(option)) {
-				this.$emit('update:values', [...new Set(option.map((opt) => opt.id))])
+				this.$emit('update:values', [
+					...new Set(option.map((opt) => opt.id)),
+				])
 				return
 			}
 
@@ -164,7 +202,7 @@ export default {
 		 */
 		checkValidOption() {
 			// When leaving edit mode, filter and delete empty options
-			this.options.forEach(option => {
+			this.options.forEach((option) => {
 				if (!option.text) {
 					this.deleteOption(option.id)
 				}
@@ -201,37 +239,11 @@ export default {
 		 * @param {object} answer the answer to update
 		 */
 		updateAnswer(id, answer) {
-			const options = this.options.slice()
-			const answerIndex = options.findIndex(option => option.id === id)
+			const options = [...this.options]
+			const answerIndex = options.findIndex((option) => option.id === id)
 			options[answerIndex] = answer
 
 			this.updateOptions(options)
-		},
-
-		/**
-		 * Add a new empty answer locally
-		 */
-		addNewEntry() {
-			// Add local entry
-			const options = this.options.slice()
-			options.push({
-				id: GenRandomId(),
-				questionId: this.id,
-				text: this.inputValue,
-				local: true,
-			})
-
-			this.inputValue = ''
-
-			// Update question
-			this.updateOptions(options)
-
-			this.$nextTick(() => {
-				this.focusIndex(options.length - 1)
-
-				// Trigger onInput on new AnswerInput for posting the new option to the API
-				this.$refs.input[options.length - 1].onInput()
-			})
 		},
 
 		/**
@@ -255,7 +267,7 @@ export default {
 		 */
 		deleteOption(id) {
 			const options = this.options.slice()
-			const optionIndex = options.findIndex(option => option.id === id)
+			const optionIndex = options.findIndex((option) => option.id === id)
 
 			if (options.length === 1) {
 				// Clear Text, but don't remove. Will be removed, when leaving edit-mode
@@ -286,14 +298,24 @@ export default {
 		 * @param {object} option The option to delete
 		 */
 		deleteOptionFromDatabase(option) {
-			const optionIndex = this.options.findIndex(opt => opt.id === option.id)
+			const optionIndex = this.options.findIndex((opt) => opt.id === option.id)
 
 			if (!option.local) {
 				// let's not await, deleting in background
-				axios.delete(generateOcsUrl('apps/forms/api/v2.4/option/{id}', { id: option.id }))
-					.catch(error => {
-						logger.error('Error while deleting an option', { option, error })
-						showError(t('forms', 'There was an issue deleting this option'))
+				axios
+					.delete(
+						generateOcsUrl('apps/forms/api/v2.4/option/{id}', {
+							id: option.id,
+						}),
+					)
+					.catch((error) => {
+						logger.error('Error while deleting an option', {
+							option,
+							error,
+						})
+						showError(
+							t('forms', 'There was an issue deleting this option'),
+						)
 						// restore option
 						this.restoreOption(option, optionIndex)
 					})

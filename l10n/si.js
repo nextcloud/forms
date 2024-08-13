@@ -1,9 +1,11 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "නැහැ",
     "Copy" : "පිටපත්",
     "Anonymous response" : "නිර්නාමික ප්‍රතිචාරය",
     "responses" : "ප්‍රතිචාර",
+    "Cancel" : "අවලංගු",
     "Other" : "වෙනත්",
     "Group" : "සමූහය",
     "Share" : "බෙදාගන්න",
@@ -12,9 +14,9 @@ OC.L10N.register(
     "Download" : "බාගන්න",
     "Summary" : "සාරාංශය",
     "Responses" : "ප්‍රතිචාර",
-    "Cancel" : "අවලංගු",
     "Settings" : "සැකසුම්",
     "Abort" : "රෝධනය",
+    "File" : "ගොනුව",
     "Date" : "දිනය",
     "Time" : "වේලාව",
     "Phone number" : "දුරකථන අංකය"

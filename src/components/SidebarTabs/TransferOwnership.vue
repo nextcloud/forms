@@ -22,23 +22,38 @@
 
 <template>
 	<div>
-		<NcButton class="transfer-button"
+		<NcButton
+			class="transfer-button"
 			alignment="start"
 			type="tertiary"
 			:wide="true"
 			@click="openModal">
-			<span class="transfer-button__text">{{ t('forms', 'Transfer ownership') }}</span>
+			<span class="transfer-button__text">{{
+				t('forms', 'Transfer ownership')
+			}}</span>
 		</NcButton>
 
-		<NcDialog :open.sync="showModal"
+		<NcDialog
+			:open.sync="showModal"
 			content-classes="modal-content"
 			:name="t('forms', 'Transfer ownership')"
 			:out-transition="true"
 			@close="closeModal">
 			<template #default>
-				<!-- eslint-disable-next-line vue/no-v-html -->
-				<p v-html="t('forms', 'You\'re going to transfer the ownership of {name} to another account. Please select the account to which you want to transfer ownership.', { name: `<strong>${form.title}</strong>` }, undefined, { escape: false })" />
-				<NcSelect v-model="selected"
+				<!-- eslint-disable vue/no-v-html -->
+				<p
+					v-html="
+						t(
+							'forms',
+							'You\'re going to transfer the ownership of {name} to another account. Please select the account to which you want to transfer ownership.',
+							{ name: `<strong>${form.title}</strong>` },
+							undefined,
+							{ escape: false },
+						)
+					" />
+				<!-- eslint-enable vue/no-v-html -->
+				<NcSelect
+					v-model="selected"
 					class="modal-content__select"
 					:reset-focus-on-options-change="false"
 					:clear-search-on-select="true"
@@ -49,26 +64,42 @@
 					:placeholder="t('forms', 'Search for a user')"
 					:user-select="true"
 					label="displayName"
-					@search="(query)=>asyncSearch(query,true)">
+					@search="(query) => asyncSearch(query, true)">
 					<template #no-options>
 						{{ noResultText }}
 					</template>
 				</NcSelect>
 
-				<br>
+				<br />
 
-				<!-- eslint-disable-next-line vue/no-v-html -->
-				<p v-html="t('forms', 'Type {text} to confirm.', { text: `<strong>${confirmationString}</strong>` }, undefined, { escape: false })" />
-				<NcTextField :label="t('forms', 'Confirmation text')"
+				<!-- eslint-disable vue/no-v-html -->
+				<p
+					v-html="
+						t(
+							'forms',
+							'Type {text} to confirm.',
+							{ text: `<strong>${confirmationString}</strong>` },
+							undefined,
+							{ escape: false },
+						)
+					" />
+				<!-- eslint-enable vue/no-v-html -->
+				<NcTextField
+					:label="t('forms', 'Confirmation text')"
 					:value.sync="confirmationInput"
 					:success="confirmationInput === confirmationString" />
 
-				<br>
+				<br />
 
-				<p><strong>{{ t('forms','This can not be undone.') }}</strong></p>
+				<p>
+					<strong>{{ t('forms', 'This can not be undone.') }}</strong>
+				</p>
 			</template>
 			<template #actions>
-				<NcButton :disabled="!canTransfer" type="error" @click="onOwnershipTransfer">
+				<NcButton
+					:disabled="!canTransfer"
+					type="error"
+					@click="onOwnershipTransfer">
 					{{ t('forms', 'I understand, transfer this form') }}
 				</NcButton>
 			</template>
@@ -114,7 +145,9 @@ export default {
 	},
 	computed: {
 		canTransfer() {
-			return this.confirmationInput === this.confirmationString && !!this.selected
+			return (
+				this.confirmationInput === this.confirmationString && !!this.selected
+			)
 		},
 		confirmationString() {
 			return `${this.form.ownerId}/${this.form.title}`
@@ -143,26 +176,35 @@ export default {
 			if (this.form.id && this.selected.shareWith) {
 				try {
 					emit('forms:last-updated:set', this.form.id)
-					await axios.post(generateOcsUrl('apps/forms/api/v2.4/form/transfer'), {
-						formId: this.form.id,
-						uid: this.selected.shareWith,
-					})
-					showSuccess(`${t('forms', 'This form is now owned by')} ${this.selected.displayName}`)
+					await axios.post(
+						generateOcsUrl('apps/forms/api/v2.4/form/transfer'),
+						{
+							formId: this.form.id,
+							uid: this.selected.shareWith,
+						},
+					)
+					showSuccess(
+						`${t('forms', 'This form is now owned by')} ${this.selected.displayName}`,
+					)
 					emit('forms:ownership-transfered', this.form.id)
 				} catch (error) {
 					logger.error('Error while transfering form ownership', { error })
-					showError(t('forms', 'An error occurred while transfering ownership'))
+					showError(
+						t('forms', 'An error occurred while transfering ownership'),
+					)
 				}
-
 			} else {
-				logger.error('Null parameters while transfering form ownership', { selectedUser: this.selected })
-				showError(t('forms', 'An error occurred while transfering ownership'))
+				logger.error('Null parameters while transfering form ownership', {
+					selectedUser: this.selected,
+				})
+				showError(
+					t('forms', 'An error occurred while transfering ownership'),
+				)
 			}
 		},
 		clearSelected() {
 			this.selected = null
 		},
-
 	},
 }
 </script>

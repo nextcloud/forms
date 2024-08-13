@@ -22,7 +22,8 @@
 
 <template>
 	<div class="pill-menu">
-		<NcCheckboxRadioSwitch v-for="option of options"
+		<NcCheckboxRadioSwitch
+			v-for="option of options"
 			:key="option.id"
 			:aria-label="isMobile ? option.ariaLabel : null"
 			:checked="active.id"

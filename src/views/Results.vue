@@ -24,20 +24,28 @@
 
 <template>
 	<NcAppContent :page-heading="t('forms', 'Results')">
-		<NcDialog :open.sync="showLinkedFileNotAvailableDialog"
+		<NcDialog
+			:open.sync="showLinkedFileNotAvailableDialog"
 			:name="t('forms', 'Linked file not available')"
-			:message="t('forms', 'Linked file is not available, would you like to link a new file?')"
+			:message="
+				t(
+					'forms',
+					'Linked file is not available, would you like to link a new file?',
+				)
+			"
 			:buttons="linkedFileNotAvailableButtons"
 			size="normal"
 			:can-close="false" />
 
-		<TopBar :archived="isFormArchived"
+		<TopBar
+			:archived="isFormArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@share-form="onShareForm" />
 
 		<!-- Loading submissions -->
-		<NcEmptyContent v-if="loadingResults"
+		<NcEmptyContent
+			v-if="loadingResults"
 			class="forms-emptycontent"
 			:name="t('forms', 'Loading responses …')">
 			<template #icon>
@@ -46,10 +54,13 @@
 		</NcEmptyContent>
 
 		<!-- No submissions -->
-		<NcEmptyContent v-else-if="noSubmissions"
+		<NcEmptyContent
+			v-else-if="noSubmissions"
 			:name="t('forms', 'No responses yet')"
 			class="forms-emptycontent"
-			:description="t('forms', 'Results of submitted forms will show up here')">
+			:description="
+				t('forms', 'Results of submitted forms will show up here')
+			">
 			<template #icon>
 				<IconPoll :size="64" />
 			</template>
@@ -62,14 +73,20 @@
 						{{ t('forms', 'Share form') }}
 					</NcButton>
 
-					<NcButton v-if="canEditForm && !form.fileId" type="tertiary-no-background" @click="onLinkFile">
+					<NcButton
+						v-if="canEditForm && !form.fileId"
+						type="tertiary-no-background"
+						@click="onLinkFile">
 						<template #icon>
 							<IconLink :size="20" />
 						</template>
 						{{ t('forms', 'Create spreadsheet') }}
 					</NcButton>
 
-					<NcButton v-if="form.fileId" :href="fileUrl" type="tertiary-no-background">
+					<NcButton
+						v-if="form.fileId"
+						:href="fileUrl"
+						type="tertiary-no-background">
 						<template #icon>
 							<IconTable :size="20" />
 						</template>
@@ -85,32 +102,49 @@
 				<h2 dir="auto">
 					{{ formTitle }}
 				</h2>
-				<p>{{ t('forms', '{amount} responses', { amount: form.submissions.length }) }}</p>
+				<p>
+					{{
+						t('forms', '{amount} responses', {
+							amount: form.submissions.length,
+						})
+					}}
+				</p>
 
 				<!-- View switcher between Summary and Responses -->
 				<div class="response-actions">
-					<PillMenu :options="responseViews" :active.sync="activeResponseView" class="response-actions__toggle" />
+					<PillMenu
+						:options="responseViews"
+						:active.sync="activeResponseView"
+						class="response-actions__toggle" />
 
 					<!-- Action menu for cloud export and deletion -->
-					<NcActions :aria-label="t('forms', 'Options')"
+					<NcActions
+						:aria-label="t('forms', 'Options')"
 						force-name
 						:inline="isMobile ? 0 : 1"
-						@blur="isDownloadActionOpened = false">
+						@blur="isDownloadActionOpened = false"
+						@close="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
 							<template v-if="canEditForm && form.fileId">
-								<NcActionButton :href="fileUrl" type="tertiary-no-background">
+								<NcActionButton
+									:href="fileUrl"
+									type="tertiary-no-background">
 									<template #icon>
 										<IconTable :size="20" />
 									</template>
 									{{ t('forms', 'Open spreadsheet') }}
 								</NcActionButton>
-								<NcActionButton close-after-click @click="onReExport">
+								<NcActionButton
+									close-after-click
+									@click="onReExport">
 									<template #icon>
 										<IconRefresh :size="20" />
 									</template>
 									{{ t('forms', 'Re-export spreadsheet') }}
 								</NcActionButton>
-								<NcActionButton close-after-click @click="onUnlinkFile">
+								<NcActionButton
+									close-after-click
+									@click="onUnlinkFile">
 									<template #icon>
 										<IconLinkVariantOff :size="20" />
 									</template>
@@ -118,19 +152,24 @@
 								</NcActionButton>
 								<NcActionSeparator />
 							</template>
-							<NcActionButton v-else-if="canEditForm" @click="onLinkFile">
+							<NcActionButton
+								v-else-if="canEditForm"
+								@click="onLinkFile">
 								<template #icon>
 									<IconLink :size="20" />
 								</template>
 								{{ t('forms', 'Create spreadsheet') }}
 							</NcActionButton>
-							<NcActionButton close-after-click @click="onStoreToFiles">
+							<NcActionButton
+								close-after-click
+								@click="onStoreToFiles">
 								<template #icon>
 									<IconFolder :size="20" />
 								</template>
 								{{ t('forms', 'Save copy to Files') }}
 							</NcActionButton>
-							<NcActionButton :close-after-click="false"
+							<NcActionButton
+								:close-after-click="false"
 								:is-menu="true"
 								@click="isDownloadActionOpened = true">
 								<template #icon>
@@ -139,7 +178,8 @@
 								{{ t('forms', 'Download') }}
 							</NcActionButton>
 
-							<NcActionButton v-if="canDeleteSubmissions"
+							<NcActionButton
+								v-if="canDeleteSubmissions"
 								close-after-click
 								@click="deleteAllSubmissions">
 								<template #icon>
@@ -158,19 +198,25 @@
 								{{ t('forms', 'Download') }}
 							</NcActionButton>
 							<NcActionSeparator />
-							<NcActionButton close-after-click @click="onDownloadFile('csv')">
+							<NcActionButton
+								close-after-click
+								@click="onDownloadFile('csv')">
 								<template #icon>
 									<IconFileDelimited :size="20" />
 								</template>
 								CSV
 							</NcActionButton>
-							<NcActionButton close-after-click @click="onDownloadFile('ods')">
+							<NcActionButton
+								close-after-click
+								@click="onDownloadFile('ods')">
 								<template #icon>
 									<IconTable :size="20" />
 								</template>
 								ODS
 							</NcActionButton>
-							<NcActionButton close-after-click @click="onDownloadFile('xlsx')">
+							<NcActionButton
+								close-after-click
+								@click="onDownloadFile('xlsx')">
 								<template #icon>
 									<IconFileExcel :size="20" />
 								</template>
@@ -183,7 +229,8 @@
 
 			<!-- Summary view for visualization -->
 			<section v-if="activeResponseView.id === 'summary'">
-				<ResultsSummary v-for="question in form.questions"
+				<ResultsSummary
+					v-for="question in form.questions"
 					:key="question.id"
 					:question="question"
 					:submissions="form.submissions" />
@@ -191,7 +238,8 @@
 
 			<!-- Responses view for individual responses -->
 			<section v-else>
-				<Submission v-for="submission in form.submissions"
+				<Submission
+					v-for="submission in form.submissions"
 					:key="submission.id"
 					:submission="submission"
 					:questions="form.questions"
@@ -201,9 +249,16 @@
 		</template>
 
 		<!-- Confirmation dialog for deleting all submissions -->
-		<NcDialog :open.sync="showConfirmDeleteDialog"
+		<NcDialog
+			:open.sync="showConfirmDeleteDialog"
 			:name="t('forms', 'Delete submissions')"
-			:message="t('forms', 'Are you sure you want to delete all responses of {title}?', { title: formTitle })"
+			:message="
+				t(
+					'forms',
+					'Are you sure you want to delete all responses of {title}?',
+					{ title: formTitle },
+				)
+			"
 			:buttons="confirmDeleteButtons" />
 	</NcAppContent>
 </template>
@@ -258,7 +313,11 @@ import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import PillMenu from '../components/PillMenu.vue'
 
-const SUPPORTED_FILE_FORMATS = { ods: IconTableSvg, csv: IconFileDelimitedSvg, xlsx: IconFileExcelSvg }
+const SUPPORTED_FILE_FORMATS = {
+	ods: IconTableSvg,
+	csv: IconFileDelimitedSvg,
+	xlsx: IconFileExcelSvg,
+}
 let fileFormat = 'csv'
 
 const responseViews = [
@@ -329,13 +388,17 @@ export default {
 					label: t('forms', 'Unlink spreadsheet'),
 					icon: IconLinkVariantOffSvg,
 					type: 'error',
-					callback: () => { this.onUnlinkFile() },
+					callback: () => {
+						this.onUnlinkFile()
+					},
 				},
 				{
 					label: t('forms', 'Create spreadsheet'),
 					icon: IconLinkSvg,
 					type: 'primary',
-					callback: () => { this.onLinkFile() },
+					callback: () => {
+						this.onLinkFile()
+					},
 				},
 			],
 			confirmDeleteButtons: [
@@ -343,13 +406,17 @@ export default {
 					label: t('forms', 'Cancel'),
 					icon: IconCancelSvg,
 					type: 'tertiary',
-					callback: () => { this.showConfirmDeleteDialog = false },
+					callback: () => {
+						this.showConfirmDeleteDialog = false
+					},
 				},
 				{
 					label: t('forms', 'Delete submissions'),
 					icon: IconDeleteSvg,
 					type: 'error',
-					callback: () => { this.deleteAllSubmissionsConfirmed() },
+					callback: () => {
+						this.deleteAllSubmissionsConfirmed()
+					},
 				},
 			],
 		}
@@ -361,11 +428,17 @@ export default {
 		},
 
 		canDeleteSubmissions() {
-			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE) && !this.isFormArchived
+			return (
+				this.form.permissions.includes(
+					this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				) && !this.isFormArchived
+			)
 		},
 
 		canEditForm() {
-			return this.form.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+			return this.form.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
+			)
 		},
 
 		noSubmissions() {
@@ -415,12 +488,19 @@ export default {
 			logger.debug(`Loading results for form ${this.form.hash}`)
 
 			try {
-				const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/submissions/{hash}', { hash: this.form.hash }))
+				const response = await axios.get(
+					generateOcsUrl('apps/forms/api/v2.4/submissions/{hash}', {
+						hash: this.form.hash,
+					}),
+				)
 
 				let loadedSubmissions = OcsResponse2Data(response).submissions
 				const loadedQuestions = OcsResponse2Data(response).questions
 
-				loadedSubmissions = this.formatDateAnswers(loadedSubmissions, loadedQuestions)
+				loadedSubmissions = this.formatDateAnswers(
+					loadedSubmissions,
+					loadedQuestions,
+				)
 
 				// Append questions & submissions
 				this.$set(this.form, 'submissions', loadedSubmissions)
@@ -434,32 +514,56 @@ export default {
 		},
 
 		async onDownloadFile(fileFormat) {
-			const exportUrl = generateOcsUrl('apps/forms/api/v2.4/submissions/export/{hash}', { hash: this.form.hash })
-				+ '?requesttoken=' + encodeURIComponent(getRequestToken())
-				+ '&fileFormat=' + fileFormat
+			const exportUrl =
+				generateOcsUrl('apps/forms/api/v2.4/submissions/export/{hash}', {
+					hash: this.form.hash,
+				}) +
+				'?requesttoken=' +
+				encodeURIComponent(getRequestToken()) +
+				'&fileFormat=' +
+				fileFormat
 			window.open(exportUrl, '_self')
 		},
 
 		async onLinkFile() {
 			try {
-				await this.getPicker().pick()
+				await this.getPicker()
+					.pick()
 					.then(async (path) => {
 						try {
-							const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/form/link/{fileFormat}', { fileFormat }), {
-								hash: this.form.hash,
-								path,
-							})
+							const response = await axios.post(
+								generateOcsUrl(
+									'apps/forms/api/v2.4/form/link/{fileFormat}',
+									{ fileFormat },
+								),
+								{
+									hash: this.form.hash,
+									path,
+								},
+							)
 							const responseData = OcsResponse2Data(response)
 
 							this.form.fileFormat = responseData.fileFormat
 							this.form.fileId = responseData.fileId
 							this.form.filePath = responseData.filePath
 
-							showSuccess(t('forms', 'File {file} successfully linked', { file: responseData.fileName }))
+							showSuccess(
+								t('forms', 'File {file} successfully linked', {
+									file: responseData.fileName,
+								}),
+							)
 							emit('forms:last-updated:set', this.form.id)
 						} catch (error) {
-							logger.error('Error while exporting to Files and linking', { error })
-							showError(t('forms', 'There was an error while linking the file'))
+							logger.error(
+								'Error while exporting to Files and linking',
+								{ error },
+							)
+							showError(
+								t(
+									'forms',
+									'There was an error while linking the file',
+								),
+							)
 						}
 					})
 			} catch (error) {
@@ -471,14 +575,29 @@ export default {
 		// Show Filepicker, then call API to store
 		async onStoreToFiles() {
 			try {
-				await this.getPicker().pick()
+				await this.getPicker()
+					.pick()
 					.then(async (path) => {
 						try {
-							const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/submissions/export'), { hash: this.form.hash, path, fileFormat })
-							showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+							const response = await axios.post(
+								generateOcsUrl(
+									'apps/forms/api/v2.4/submissions/export',
+								),
+								{ hash: this.form.hash, path, fileFormat },
+							)
+							showSuccess(
+								t('forms', 'Export successful to {file}', {
+									file: OcsResponse2Data(response),
+								}),
+							)
 						} catch (error) {
 							logger.error('Error while exporting to Files', { error })
-							showError(t('forms', 'There was an error while exporting to Files'))
+							showError(
+								t(
+									'forms',
+									'There was an error while exporting to Files',
+								),
+							)
 						}
 					})
 			} catch (error) {
@@ -488,12 +607,17 @@ export default {
 		},
 
 		async fetchLinkedFileInfo() {
-			const response = await axios.get(generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id: this.form.id }))
+			const response = await axios.get(
+				generateOcsUrl('apps/forms/api/v2.4/form/{id}', {
+					id: this.form.id,
+				}),
+			)
 			const form = OcsResponse2Data(response)
 			this.$set(this.form, 'fileFormat', form.fileFormat)
 			this.$set(this.form, 'fileId', form.fileId)
 			this.$set(this.form, 'filePath', form.filePath)
-			this.showLinkedFileNotAvailableDialog = this.canEditForm && form.fileId && !form.filePath
+			this.showLinkedFileNotAvailableDialog =
+				this.canEditForm && form.fileId && !form.filePath
 		},
 
 		async onReExport() {
@@ -503,10 +627,19 @@ export default {
 				return
 			}
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/submissions/export'),
-					{ hash: this.form.hash, path: this.form.filePath, fileFormat: this.form.fileFormat },
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/submissions/export'),
+					{
+						hash: this.form.hash,
+						path: this.form.filePath,
+						fileFormat: this.form.fileFormat,
+					},
 				)
-				showSuccess(t('forms', 'Export successful to {file}', { file: OcsResponse2Data(response) }))
+				showSuccess(
+					t('forms', 'Export successful to {file}', {
+						file: OcsResponse2Data(response),
+					}),
+				)
 			} catch (error) {
 				logger.error('Error while exporting to Files', { error })
 				showError(t('forms', 'There was an error, while exporting to Files'))
@@ -517,14 +650,20 @@ export default {
 			this.loadingResults = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/submission/{id}', { id }))
+				await axios.delete(
+					generateOcsUrl('apps/forms/api/v2.4/submission/{id}', { id }),
+				)
 				showSuccess(t('forms', 'Submission deleted'))
-				const index = this.form.submissions.findIndex(search => search.id === id)
+				const index = this.form.submissions.findIndex(
+					(search) => search.id === id,
+				)
 				this.form.submissions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error(`Error while removing response ${id}`, { error })
-				showError(t('forms', 'There was an error while removing this response'))
+				showError(
+					t('forms', 'There was an error while removing this response'),
+				)
 			} finally {
 				this.loadingResults = false
 			}
@@ -538,7 +677,11 @@ export default {
 			this.showConfirmDeleteDialog = false
 			this.loadingResults = true
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/submissions/{formId}', { formId: this.form.id }))
+				await axios.delete(
+					generateOcsUrl('apps/forms/api/v2.4/submissions/{formId}', {
+						formId: this.form.id,
+					}),
+				)
 				this.form.submissions = []
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
@@ -553,17 +696,30 @@ export default {
 			// Filter questions that are date/datetime/time
 			const dateQuestions = Object.fromEntries(
 				questions
-					.filter(question => question.type === 'date' | question.type === 'datetime' | question.type === 'time')
-					.map(question => [question.id, question.type]),
+					.filter(
+						(question) =>
+							(question.type === 'date') |
+							(question.type === 'datetime') |
+							(question.type === 'time'),
+					)
+					.map((question) => [question.id, question.type]),
 			)
 
 			// Go through submissions and reformat answers to date/time questions
-			submissions.forEach(submission => {
-				submission.answers.filter(answer => answer.questionId in dateQuestions)
-					.forEach(answer => {
-						const date = moment(answer.text, answerTypes[dateQuestions[answer.questionId]].storageFormat)
+			submissions.forEach((submission) => {
+				submission.answers
+					.filter((answer) => answer.questionId in dateQuestions)
+					.forEach((answer) => {
+						const date = moment(
+							answer.text,
+							answerTypes[dateQuestions[answer.questionId]]
+								.storageFormat,
+						)
 						if (date.isValid()) {
-							answer.text = date.format(answerTypes[dateQuestions[answer.questionId]].momentFormat)
+							answer.text = date.format(
+								answerTypes[dateQuestions[answer.questionId]]
+									.momentFormat,
+							)
 						}
 					})
 			})
@@ -576,21 +732,29 @@ export default {
 				return this.picker
 			}
 
-			this.picker = getFilePickerBuilder(t('forms', 'Choose spreadsheet location'))
+			this.picker = getFilePickerBuilder(
+				t('forms', 'Choose spreadsheet location'),
+			)
 				.setMultiSelect(false)
 				.allowDirectories()
 				.setButtonFactory((selectedNodes, currentPath, currentView) => {
 					if (selectedNodes.length === 1) {
-						const extension = selectedNodes[0].extension.slice(1).toLowerCase()
+						const extension = selectedNodes[0].extension
+							.slice(1)
+							.toLowerCase()
 						if (SUPPORTED_FILE_FORMATS[extension]) {
-							return [{
-								label: t('forms', 'Select {file}', { file: selectedNodes[0].basename }),
-								icon: SUPPORTED_FILE_FORMATS[extension],
-								callback() {
-									fileFormat = extension
+							return [
+								{
+									label: t('forms', 'Select {file}', {
+										file: selectedNodes[0].basename,
+									}),
+									icon: SUPPORTED_FILE_FORMATS[extension],
+									callback() {
+										fileFormat = extension
+									},
+									type: 'primary',
 								},
-								type: 'primary',
-							}]
+							]
 						}
 
 						return []

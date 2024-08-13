@@ -25,7 +25,7 @@
 	overflow-wrap: break-word;
 
 	:deep() {
-		>:not(:first-child) {
+		> :not(:first-child) {
 			margin-block-start: 1.5em;
 		}
 
@@ -59,11 +59,12 @@
 		p code {
 			background-color: var(--color-background-dark);
 			border-radius: var(--border-radius);
-			padding-block: .1em;
-			padding-inline: .3em;
+			padding-block: 0.1em;
+			padding-inline: 0.3em;
 		}
 
-		ul, ol {
+		ul,
+		ol {
 			padding-inline-start: 10px;
 			margin-inline-start: 10px;
 		}

@@ -4,8 +4,8 @@ OC.L10N.register(
     "Copy" : "Copiar",
     "Shared with you" : "Compartite con te",
     "Required" : "Requirite",
-    "Set expiration date" : "Assignar data de expiration",
     "Delete" : "Deler",
+    "Set expiration date" : "Assignar data de expiration",
     "Group" : "Gruppo",
     "Share link" : "Compartir ligamine",
     "Share" : "Compartir",
@@ -18,6 +18,9 @@ OC.L10N.register(
     "Settings" : "Configurationes",
     "Date" : "Date",
     "Time" : "Tempore",
+    "Document" : "Documento",
+    "Presentation" : "Presentation",
+    "Spreadsheet" : "Folios de labor",
     "Phone number" : "Numero de telephono"
 },
 "nplurals=2; plural=(n != 1);");

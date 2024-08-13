@@ -91,6 +91,7 @@ class Constants {
 	public const ANSWER_TYPE_DATE = 'date';
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_TIME = 'time';
+	public const ANSWER_TYPE_FILE = 'file';
 
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
@@ -101,7 +102,8 @@ class Constants {
 		self::ANSWER_TYPE_LONG,
 		self::ANSWER_TYPE_DATE,
 		self::ANSWER_TYPE_DATETIME,
-		self::ANSWER_TYPE_TIME
+		self::ANSWER_TYPE_TIME,
+		self::ANSWER_TYPE_FILE,
 	];
 
 	// AnswerTypes, that need/have predefined Options
@@ -139,18 +141,35 @@ class Constants {
 
 	// This are allowed extra settings
 	public const EXTRA_SETTINGS_DROPDOWN = [
-		'allowOtherAnswer',
-		'shuffleOptions',
+		'allowOtherAnswer' => ['boolean'],
+		'shuffleOptions' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_MULTIPLE = [
-		'allowOtherAnswer',
-		'shuffleOptions',
+		'allowOtherAnswer' => ['boolean'],
+		'optionsLimitMax' => ['integer'],
+		'optionsLimitMin' => ['integer'],
+		'shuffleOptions' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_SHORT = [
-		'validationType',
-		'validationRegex'
+		'validationType' => ['string'],
+		'validationRegex' => ['string'],
+	];
+
+	public const EXTRA_SETTINGS_FILE = [
+		'allowedFileTypes' => ['array'],
+		'allowedFileExtensions' => ['array'],
+		'maxAllowedFilesCount' => ['integer'],
+		'maxFileSize' => ['integer'],
+	];
+
+	// should be in sync with FileTypes.js
+	public const EXTRA_SETTINGS_ALLOWED_FILE_TYPES = [
+		'image',
+		'x-office/document',
+		'x-office/presentation',
+		'x-office/spreadsheet',
 	];
 
 	/**
@@ -202,4 +221,8 @@ class Constants {
 	];
 
 	public const DEFAULT_FILE_FORMAT = 'csv';
+
+	public const UNSUBMITTED_FILES_FOLDER = self::FILES_FOLDER . '/unsubmitted';
+
+	public const FILES_FOLDER = 'Forms';
 }

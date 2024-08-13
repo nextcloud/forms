@@ -33,6 +33,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 
@@ -43,6 +44,7 @@ use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\ITempManager;
+use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -93,6 +95,12 @@ class SubmissionServiceTest extends TestCase {
 	/** @var FormsService|MockObject */
 	private $formsService;
 
+	/** @var IURLGenerator|MockObject */
+	private $urlGenerator;
+
+	/** @var UploadedFileMapper|MockObject */
+	private $uploadedFileMapper;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -123,6 +131,8 @@ class SubmissionServiceTest extends TestCase {
 			}));
 
 		$this->formsService = $this->createMock(FormsService::class);
+		$this->urlGenerator = $this->createMock(IURLGenerator::class);
+		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 
 		$this->submissionService = new SubmissionService(
 			$this->formMapper,
@@ -137,43 +147,10 @@ class SubmissionServiceTest extends TestCase {
 			$userSession,
 			$this->mailer,
 			$this->tempManager,
-			$this->formsService
+			$this->formsService,
+			$this->urlGenerator,
+			$this->uploadedFileMapper,
 		);
-	}
-
-	/**
-	 * @dataProvider dataIsUniqueSubmission
-	 */
-	public function testIsUniqueSubmission(array $submissionData, int $numberOfSubmissions, bool $expected) {
-		$this->submissionMapper->method('countSubmissions')
-			->with($submissionData['formId'], $submissionData['userId'])
-			->willReturn($numberOfSubmissions);
-
-		$submission = Submission::fromParams($submissionData);
-		$this->assertEquals($expected, $this->submissionService->isUniqueSubmission($submission));
-	}
-
-	public function dataIsUniqueSubmission() {
-		return [
-			[
-				'submissionData' => [
-					'id' => 1,
-					'userId' => 'user',
-					'formId' => 1,
-				],
-				'numberOfSubmissions' => 1,
-				'expected' => true,
-			],
-			[
-				'submissionData' => [
-					'id' => 3,
-					'userId' => 'user',
-					'formId' => 1,
-				],
-				'numberOfSubmissions' => 2,
-				'expected' => false,
-			],
-		];
 	}
 
 	public function testGetSubmissions() {
@@ -222,13 +199,15 @@ class SubmissionServiceTest extends TestCase {
 						'id' => 35,
 						'submissionId' => 42,
 						'questionId' => 422,
-						'text' => 'Just some Text'
+						'text' => 'Just some Text',
+						'fileId' => null,
 					],
 					[
 						'id' => 36,
 						'submissionId' => 42,
 						'questionId' => 423,
-						'text' => 'Just some more Text'
+						'text' => 'Just some more Text',
+						'fileId' => null,
 					]
 				]
 			],
@@ -348,7 +327,7 @@ class SubmissionServiceTest extends TestCase {
 				// Questions
 				[
 					['id' => 1, 'text' => 'Question 1'],
-					['id' => 2, 'text' => 'Question 2']
+					['id' => 2, 'text' => 'Question 2'],
 				],
 				// Array of Submissions incl. Answers
 				[
@@ -400,6 +379,30 @@ class SubmissionServiceTest extends TestCase {
 				'
 				"User ID","User display name","Timestamp","Question 1"
 				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1; Q1A2; Q1A3"
+				'
+			],
+			'file-multi-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'file', 'text' => 'Question 1']
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'file1.txt', 'fileId' => 1],
+							['questionId' => 1, 'text' => 'file2.txt', 'fileId' => 2],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"User ID","User display name","Timestamp","Question 1"
+				"user1","User 1","1973-11-29T22:33:09+01:00","file1.txt; '.'
+file2.txt"
 				'
 			],
 			'anonymous-user' => [
@@ -715,6 +718,57 @@ class SubmissionServiceTest extends TestCase {
 				// Expected Result
 				false
 			],
+			'invalid-multiple-too-many-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMax' => 2], 'options' => [
+						['id' => 3],
+						['id' => 5],
+						['id' => 7],
+						['id' => 9],
+					]]
+				],
+				// Answers
+				[
+					'1' => [3, 5, 7]
+				],
+				// Expected Result
+				false
+			],
+			'invalid-multiple-too-few-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2], 'options' => [
+						['id' => 3],
+						['id' => 5],
+						['id' => 7],
+						['id' => 9],
+					]]
+				],
+				// Answers
+				[
+					'1' => [3]
+				],
+				// Expected Result
+				false
+			],
+			'valid-multiple-with-limits' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2, 'optionsLimitMax' => 3], 'options' => [
+						['id' => 3],
+						['id' => 5],
+						['id' => 7],
+						['id' => 9],
+					]]
+				],
+				// Answers
+				[
+					'1' => [3,9]
+				],
+				// Expected Result
+				true
+			],
 			'invalid-short-phone' => [
 				// Questions
 				[
@@ -827,6 +881,6 @@ class SubmissionServiceTest extends TestCase {
 			return $mail === 'some.name+context@example.com';
 		});
 
-		$this->assertEquals($expected, $this->submissionService->validateSubmission($questions, $answers));
+		$this->assertEquals($expected, $this->submissionService->validateSubmission($questions, $answers, 'admin'));
 	}
 };

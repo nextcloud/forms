@@ -332,6 +332,14 @@ return [
 			]
 		],
 		[
+			'name' => 'api#uploadFiles',
+			'url' => '/api/{apiVersion}/uploadFiles/{formId}/{questionId}',
+			'verb' => 'POST',
+			'requirements' => [
+				'apiVersion' => 'v2.5'
+			]
+		],
+		[
 			'name' => 'api#insertSubmission',
 			'url' => '/api/{apiVersion}/submission/insert',
 			'verb' => 'POST',

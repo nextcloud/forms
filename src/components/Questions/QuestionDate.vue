@@ -21,12 +21,14 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<div class="question__content">
-			<NcDateTimePicker v-model="time"
+			<NcDateTimePicker
+				v-model="time"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
@@ -109,7 +111,10 @@ export default {
 		 * @return {Date}
 		 */
 		parse(dateString) {
-			return moment(dateString, [this.answerType.momentFormat, this.answerType.storageFormat]).toDate()
+			return moment(dateString, [
+				this.answerType.momentFormat,
+				this.answerType.storageFormat,
+			]).toDate()
 		},
 
 		/**
@@ -118,7 +123,9 @@ export default {
 		 * @param {Date} date The date to store
 		 */
 		onValueChange(date) {
-			this.$emit('update:values', [moment(date).format(this.answerType.storageFormat)])
+			this.$emit('update:values', [
+				moment(date).format(this.answerType.storageFormat),
+			])
 		},
 	},
 }

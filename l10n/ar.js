@@ -10,6 +10,14 @@ OC.L10N.register(
     "A form has been <strong>shared</strong> with you" : "نموذج  تم <strong>مشاركته</strong> معك",
     "Someone <strong>answered</strong> a shared form" : "شخصٌ ما <strong>استجاب</strong> للنموذج المشترك",
     "Someone <strong>answered</strong> a form" : "شخص ما <strong>أجاب </strong>على نموذج ",
+    "Nextcloud Forms" : "نماذج نكست كلاود",
+    "Select form" : "حدِّد نموذجاً",
+    "Timestamp of data load" : "الختم الزمني Timestamp  لحِمل البيانات",
+    "No" : "لا",
+    "Yes" : "نعم",
+    "Question" : "سؤال",
+    "Answer" : "الإجابة",
+    "Count" : "عدّاد",
     "Copy" : "نسخ",
     "Anonymous response" : "رد مجهول ",
     "Shared by %s" : "تمت مشاركته مِن قبل %s",
@@ -20,8 +28,9 @@ OC.L10N.register(
     "Timestamp" : "الطابع الزمني ",
     "📝 Simple surveys and questionnaires, self-hosted" : " 📝 استبيانات بسيطة، مستضافة ذاتيًا",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🧑‍💻 Connect to your software:** Easily integrate Forms into your service with our full-fledged [REST-API](https://github.com/nextcloud/forms/blob/main/docs/API.md).\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "** استبيانات واستبيانات بسيطة ، ذاتية الاستضافة! ** \n- ** 📝 تصميم بسيط: ** لا يوجد تنوّعٌ كبيرٌ في الخيارات، فقط الأساسيات. يعمل بشكل جيد على الهاتف المحمول ايضاً \n- ** 📊 عرض النتائج وتصديرها: ** يتم عرض النتائج ويمكن أيضًا تصديرها كملف CSV بنفس التنسيق المستخدم بواسطة نماذج Google . \n- ** 🔒 بياناتك تحت سيطرتك! ** على عكس نماذج Google و Typeform و Doodle وغيرها، تظل معلومات الاستبيان والردود على خادومك. \n- ** 🧑‍💻 الاتصال بالبرنامج الخاص بك: ** يمكنك دمج النماذج بسهولة في خدمتك من خلال [REST-API] الكاملة الخاصة بنا (https://github.com/nextcloud/forms/blob/main/docs/API.md) . \n- ** 🙋 شارك! ** لدينا الكثير من الأشياء المخطط لها مثل المزيد من أنواع الأسئلة ، والتعاون في النماذج ، [والمزيد] (https://github.com/nextcloud/forms/milestones) !",
+    "Forms navigation" : "التنقل في النماذج",
     "New form" : "نموذج جديد ",
-    "Your Forms" : "نماذجك ",
+    "Your forms" : "نماذجك",
     "Shared with you" : "تم مشاركتها معك",
     "Archived forms" : "نماذج مؤرشفة",
     "Loading forms …" : "جارِ تحميل النماذج ",
@@ -59,7 +68,13 @@ OC.L10N.register(
     "Expires {relativeDate}" : "تنتهي صلاحيته {relativeDate}",
     "Error changing archived state of form" : "حدث خطأ أثناء تغيير حالة الأرشفة للنموذج",
     "Error while deleting {title}" : "حدث خطأ أثناء حذف العنوان {title}",
-    "An answer for the {index} option" : "إجابة لخيار {index}",
+    "Add multiple options" : "إضافات خيارات متعددة",
+    "Add multiple options (one per line)" : "إضافة خيارات متعددة ( واحد في كل سطر)",
+    "Options" : "الخيارات",
+    "Cancel" : "إلغاء",
+    "Add options" : "إضافة خيارات",
+    "Options should be separated by new line!" : "يجب الفصل بين الخيارات بسطر جديد!",
+    "QR code representation of {text}" : "QR code representation of {text}",
     "Answer number {index}" : "رقم الإجابة {index}",
     "Delete answer" : "حذف الإجابة ",
     "Error while saving the answer" : "حدث خطأ أثناء حفظ الإجابة ",
@@ -77,10 +92,28 @@ OC.L10N.register(
     "Shuffle options" : "خلط الخيارات",
     "Add a new answer" : "إضافة إجابة جديدة ",
     "There was an issue deleting this option" : "حدث خطأ أثناء إزالة هذا الخيار",
+    "Allow only specific file types" : "السماح فقط لأنواع محددة من الملفات",
+    "Custom file extensions" : "امتدادات مخصصة للملفات",
+    "Maximum number of files" : "العدد الأقصى من الملفات",
+    "Maximum file size" : "أقصى حجم ملف",
+    "Delete" : "إزالة",
+    "A file answer for the question “{text}”" : "ملف إجابات الأسئلة: “{text}”",
+    "Allowed file types: {fileTypes}." : "أنواع الملفات المسموح بها: {fileTypes}.",
+    "All file types are allowed." : "جميع أنواع الملفات مسموحٌ لها",
+    "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "حجم الملف {fileName} كبيرٌ جداً. أقصى حجم مسموحٌ به للملف هو: {maxFileSize}.",
+    "There was an error during submitting the file: {message}." : "حدث خطأٌ أثناء إرسال الملف: {message}.",
     "A long answer for the question “{text}”" : "إجابة طويلة للسؤال “{text}”",
     "Add \"other\"" : "أضِف \"أخرى\"",
+    "Require a minimum of options to be checked" : "يلزم الحد الأدنى من الخيارات للتحقق منها",
+    "Minimum options to be checked" : "الحد الأدنى من الخيارات التي سبتم التحقق منها",
+    "Require a maximum of options to be checked" : "يلزم الحد الأقصى من الخيارات للتحقق منها",
+    "Maximum options to be checked" : "الحد الأقصى من الخيارات التي سيتم التحقق منها",
     "Other:" : "أُخرَى:",
     "Other" : "آخَر",
+    "Upper options limit must be greater than the lower limit" : "خيارات الحد الأعلى يجب أن تكون أكبر  من خيارات الحد الأدنى",
+    "Lower options limit must be smaller than the upper limit" : "خيارات الحد الأدنى يجب أن تكون أصغر من خيارات الحد الأعلى",
+    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["يجب أن تختار كحد أقصى %n خياراً","يجب أن تختار كحد أقصى خياراً واحداً","يجب أن تختار كحد أقصى %n خيارين","يجب أن تختار كحد أقصى %n خيارات","يجب أن تختار كحد أقصى %n خياراً","يجب أن تختار كحد أقصى %n خياراً"],
+    "_You must choose at least one option_::_You must choose at least %n options_" : ["يجب أن تختار كحد أدنى %n خياراً","يجب أن تختار كحد أدنى خياراً واحداً","يجب أن تختار كحد أدنى %n خيارين","يجب أن تختار كحد أدنى %n خيارات","يجب أن تختار كحد أدنى %n خياراً","يجب أن تختار كحد أدنى %n خياراً"],
     "A short answer for the question “{text}”" : "إجابة قصيرة للسؤال “{text}”",
     "Input types (currently: {type})" : "أنواع المُدخلات (حاليّاً: {type})",
     "Regular expression for input validation" : "التعبير النمطي RE للتحقُّق من صحة المُدخلات",
@@ -104,19 +137,20 @@ OC.L10N.register(
     "Permissions" : "الصلاحيّات",
     "View responses" : "عرض الإجابات",
     "Delete responses" : "إحذِف الاستجابات",
-    "Delete" : "إزالة",
     "Group" : "المجموعة",
     "Team" : "الفريق",
     "Share link" : "رابط مُشاركة",
     "Add link" : "إضافة رابط",
     "Embeddable link" : "رابط قابل للتضمين",
     "Copy to clipboard" : "نسخ الرابط إلى الحافظة",
+    "Show QR code" : "عرض رمز الاستجابة السريعة QR",
     "Copy embedding code" : "نسخ كود التضمين",
     "Convert to embeddable link" : "تحويل إلى رابط قابل للتضمين",
     "Remove link" : "حذف الرابط",
+    "Share {formTitle}" : "شارِك {formTitle}",
     "Legacy Link" : "رابط قديم",
     "Form still supports old sharing-link." : "النموذج مازال يدعم روابط المشاركة القديمة",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. We recommend replacing the link with a new Share link." : "لأجل التوافق مع المشاركات القديمة، لا زال الرابط الداخلي قابلاً للاستخدام كرابط مشاركة. ننصح باستبداله برابط مشاركة جديد.",
+    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "لغرض الحفاظ على التوافقية مع المشاركة القديمة، لا يزال الرابط الداخلي قابلاً للاستخدام كرابط مشاركة. يرجى استبدال الرابط برابط مشاركة جديد. لن يعمل رابط المشاركة الداخلية بعد الآن بدءاً من الإصدار 5.0 من تطبيق \"النماذج\" Forms",
     "Remove Legacy Link" : "حذف رابط قديم",
     "Internal link" : "رابط داخلي",
     "Only works for logged in accounts with access rights" : "يعمل فقط للحسابات الداخلة و التي لها حق الوصول",
@@ -141,11 +175,14 @@ OC.L10N.register(
     "View" : "عرض",
     "Edit" : "تعديل",
     "Show results" : "عرض النتائج",
+    "Create form" : "إنشاء نموذج",
     "Loading {title} …" : "جارِ التحميل {title} ... ",
     "Form is archived" : "النموذح مؤرشف",
-    "Form '{title}' is archived and can not be modified." : "النموذج '{title}' مؤرشف و لا يمكن تعديله.",
+    "Form '{title}' is archived and cannot be modified." : "النموذج '{title}' تمّت أرشفته و لا يمكن تعديله.",
     "Form title" : "عنوان النموذج ",
     "Description" : "الوصف",
+    "Legacy link in use" : "رابط قديم قيد الاستخدام",
+    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "لا يزال هذا النموذج يستخدم رابط مشاركة مهمل، والذي ستتم إزالته في الإصدار  5.0 من تطبيق \"النماذج\" Forms. الرجاء استخدام آلية المشاركة الجديدة.",
     "Add a question" : "إضافة سؤال ",
     "Responses are anonymous." : "الردود مجهولة ",
     "Responses are connected to your account." : "الاستجابات responses مربوطة مع حسابك",
@@ -163,7 +200,6 @@ OC.L10N.register(
     "Create spreadsheet" : "إنشاء جدول أعمال",
     "Open spreadsheet" : "فتح جدول أعمال",
     "{amount} responses" : "{amount} الردود ",
-    "Options" : "الخيارات",
     "Re-export spreadsheet" : "إعادة تصدير جدول أعمال",
     "Unlink spreadsheet" : "فك رابط لجدول أعمال",
     "Save copy to Files" : "حفظ نسخة في \"الملفات\" Files",
@@ -173,7 +209,6 @@ OC.L10N.register(
     "Are you sure you want to delete all responses of {title}?" : "هل تريد حقًا حذف جميع الردود  {title}؟",
     "Summary" : "المُلخَّص",
     "Responses" : "الردود",
-    "Cancel" : "إلغاء",
     "There was an error while loading the results" : "حدث خطأ أثناء تحميل النتائج ",
     "File {file} successfully linked" : "تمّ بنجاح ربط الملف {file}  ",
     "There was an error while linking the file" : "حدث خطأ أثناء ربط الملف",
@@ -192,18 +227,19 @@ OC.L10N.register(
     "Form settings" : "إعدادات النموذج",
     "Sharing" : "المشاركة",
     "Settings" : "الإعدادات",
+    "Submit form" : "إرسال النموذج ",
     "Submitting form …" : "جارِ إرسال النموذج...",
     "Thank you for completing the form!" : "شكرًا لك على إكمالك للنموذج! ",
     "This form was closed and is no longer taking answers" : "هذا النموذج مغلق و لم يعد يستقبل الإجابات",
     "Submit" : "إرسال ",
-    "Submit form" : "إرسال النموذج ",
     "Confirm submit" : "تأكيد الإرسال",
     "Are you sure you want to submit an empty form?" : "هل أنت متأكد من أنك ترغب في إرسال نموذج فارغ؟",
     "Leave form" : "نموذج إجازة",
     "You have unsaved changes! Do you still want to leave?" : "لديك تغييرات غير محفوظة! هل مازلت تريد الخروج؟",
     "Abort" : "إلغاء",
     "Leave" : "إجازة",
-    "There was an error submitting the form" : "حدث خطأ أثناء إرسال النموذج ",
+    "Some answers are not valid" : "بعض الإجابات غير صحيحة",
+    "There was an error submitting the form: {message}" : "حدث خطأٌ أثناء إرسال النموذج: {message}.",
     "Error while saving question" : "حدث خطأ أثناء حفظ السؤال ",
     "Form link copied" : "تم نسخ رابط النموذج ",
     "Cannot copy, please copy the link manually" : "لا يمكن النسخ، يرجى نسخ الرابط يدويًا",
@@ -220,6 +256,8 @@ OC.L10N.register(
     "Dropdown question title" : "عنوان سؤال القائمة المنسدلة ",
     "People can pick one option" : "يمكن للناس اختيار خيار ",
     "Pick an option" : "اختر خيار",
+    "File" : "File",
+    "File question title" : "عنوان ملف الأسئلة",
     "Short answer" : "إجابة قصيرة ",
     "Short answer question title" : "عنوان سؤال الإجابة القصيرة ",
     "People can enter a short answer" : "يمكن للناس إدخال إجابة قصيرة ",
@@ -238,6 +276,10 @@ OC.L10N.register(
     "Time question title" : "عنوان سؤال الوقت",
     "People can pick a time" : "يُمكن للأشخاص اختيار وقتٍ",
     "Pick a time" : "اختر الوقت",
+    "Image" : "صورة",
+    "Document" : "وثيقة",
+    "Presentation" : "عرض تقديمي",
+    "Spreadsheet" : "جدول العمل",
     "Text" : "نص",
     "Phone number" : "رقم الجوال",
     "The input is not a valid phone number" : "البيان المُدخل ليس رقم هاتف صحيح",

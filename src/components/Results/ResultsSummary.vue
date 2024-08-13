@@ -30,20 +30,24 @@
 		</p>
 
 		<!-- Answers with countable results for visualization -->
-		<ol v-if="answerTypes[question.type].predefined"
+		<ol
+			v-if="answerTypes[question.type].predefined"
 			class="question-summary__statistic">
-			<li v-for="option in questionOptions"
-				:key="option.id">
+			<li v-for="option in questionOptions" :key="option.id">
 				<label :for="`option-${option.questionId}-${option.id}`">
 					{{ option.count }}
 					<span class="question-summary__statistic-percentage">
 						({{ option.percentage }}%):
 					</span>
-					<span :class="{'question-summary__statistic-text--best':option.best}">
+					<span
+						:class="{
+							'question-summary__statistic-text--best': option.best,
+						}">
 						{{ option.text }}
 					</span>
 				</label>
-				<meter :id="`option-${option.questionId}-${option.id}`"
+				<meter
+					:id="`option-${option.questionId}-${option.id}`"
 					min="0"
 					:max="submissions.length"
 					:value="option.count" />
@@ -54,16 +58,32 @@
 		<ul v-else class="question-summary__text">
 			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 			<!-- eslint-disable-next-line -->
-			<li v-for="answer in textAnswers" :key="answer.id" dir="auto">{{ answer }}</li>
+			<li v-for="answer in answers" :key="answer.id" dir="auto">
+				<template v-if="answer.url">
+					<a :href="answer.url" target="_blank"
+						><IconFile :size="20" class="question-summary__text-icon" />
+						{{ answer.text }}</a
+					>
+				</template>
+				<template v-else>
+					{{ answer.text }}
+				</template>
+			</li>
 		</ul>
 	</div>
 </template>
 
 <script>
 import answerTypes from '../../models/AnswerTypes.js'
+import { generateUrl } from '@nextcloud/router'
+import IconFile from 'vue-material-design-icons/File.vue'
 
 export default {
 	name: 'ResultsSummary',
+
+	components: {
+		IconFile,
+	},
 
 	props: {
 		submissions: {
@@ -86,7 +106,7 @@ export default {
 		// For countable questions like multiple choice and checkboxes
 		questionOptions() {
 			// Build list of question options
-			const questionOptionsStats = this.question.options.map(option => ({
+			const questionOptionsStats = this.question.options.map((option) => ({
 				...option,
 				count: 0,
 				percentage: 0,
@@ -110,16 +130,20 @@ export default {
 			})
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach(submission => {
-				const answers = submission.answers.filter(answer => answer.questionId === this.question.id)
+			this.submissions.forEach((submission) => {
+				const answers = submission.answers.filter(
+					(answer) => answer.questionId === this.question.id,
+				)
 				if (!answers.length) {
 					// Record 'No response'
 					questionOptionsStats[0].count++
 				}
 
 				// Check question options to find which needs to be increased
-				answers.forEach(answer => {
-					const optionsStatIndex = questionOptionsStats.findIndex(option => option.text === answer.text)
+				answers.forEach((answer) => {
+					const optionsStatIndex = questionOptionsStats.findIndex(
+						(option) => option.text === answer.text,
+					)
 					if (optionsStatIndex < 0) {
 						if (this.question.extraSettings?.allowOtherAnswer) {
 							questionOptionsStats[1].count++
@@ -141,42 +165,70 @@ export default {
 				return object2.count - object1.count
 			})
 
-			questionOptionsStats.forEach(questionOptionsStat => {
+			questionOptionsStats.forEach((questionOptionsStat) => {
 				// Fill percentage values
-				questionOptionsStat.percentage = Math.round((100 * questionOptionsStat.count) / this.submissions.length)
+				questionOptionsStat.percentage = Math.round(
+					(100 * questionOptionsStat.count) / this.submissions.length,
+				)
 				// Mark all best results. First one is best for sure due to sorting
-				questionOptionsStat.best = (questionOptionsStat.count === questionOptionsStats[0].count)
+				questionOptionsStat.best =
+					questionOptionsStat.count === questionOptionsStats[0].count
 			})
 
 			return questionOptionsStats
 		},
 
 		// For text answers like short answer and long text
-		textAnswers() {
-			const textAnswers = []
+		answers() {
+			const answersModels = []
 
 			// Also record 'No response'
 			let noResponseCount = 0
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach(submission => {
-				const answers = submission.answers.filter(answer => answer.questionId === this.question.id)
+			this.submissions.forEach((submission) => {
+				const answers = submission.answers.filter(
+					(answer) => answer.questionId === this.question.id,
+				)
 				if (!answers.length) {
 					// Record 'No response'
 					noResponseCount++
 				}
 
 				// Add text answers
-				answers.forEach(answer => {
-					textAnswers.push(answer.text)
+				answers.forEach((answer) => {
+					if (answer.fileId) {
+						answersModels.push({
+							id: answer.id,
+							text: answer.text,
+							url: generateUrl('/f/{fileId}', {
+								fileId: answer.fileId,
+							}),
+						})
+					} else {
+						answersModels.push({
+							id: answer.id,
+							text: answer.text,
+						})
+					}
 				})
 			})
 
 			// Calculate no response percentage
-			const noResponsePercentage = Math.round((100 * noResponseCount) / this.submissions.length)
-			textAnswers.unshift(noResponseCount + ' (' + noResponsePercentage + '%): ' + t('forms', 'No response'))
+			const noResponsePercentage = Math.round(
+				(100 * noResponseCount) / this.submissions.length,
+			)
+			answersModels.unshift({
+				id: 0,
+				text:
+					noResponseCount +
+					' (' +
+					noResponsePercentage +
+					'%): ' +
+					t('forms', 'No response'),
+			})
 
-			return textAnswers
+			return answersModels
 		},
 	},
 }
@@ -211,6 +263,12 @@ export default {
 			&:first-child {
 				font-weight: bold;
 			}
+		}
+
+		&-icon {
+			display: inline-flex;
+			position: relative;
+			top: 4px;
 		}
 	}
 

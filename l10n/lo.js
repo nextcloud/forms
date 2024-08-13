@@ -1,19 +1,21 @@
 OC.L10N.register(
     "forms",
     {
+    "No" : "ບໍ່",
     "Copy" : "ສຳເນົາ",
     "Shared with you" : "ແບ່ງປັບກັບທ່ານ",
-    "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
+    "Cancel" : "ຍົກເລີກ",
     "Delete" : "ລຶບ",
+    "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
     "Group" : "ກຸ່ມ",
     "Share link" : "ແບ່ງປັນລິງ",
     "Internal link" : "ລີງພາຍໃນ",
     "Share" : "ແບ່ງປັນ",
     "Edit" : "ແກ້ໄຂ",
     "Download" : "ດາວໂຫລດ",
-    "Cancel" : "ຍົກເລີກ",
     "Sharing" : "ການແບ່ງປັນ",
     "Settings" : "ການຕັ້ງຄ່າ",
+    "File" : "ຟາຍ",
     "Date" : "ວັນທີ",
     "Phone number" : "ເບີໂທລະສັບ"
 },

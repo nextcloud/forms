@@ -26,12 +26,13 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
 import logger from '../utils/Logger.js'
+import GenRandomId from '../utils/GenRandomId.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import Question from '../components/Questions/Question.vue'
 
 export default {
 	inheritAttrs: false,
 	props: {
-
 		/**
 		 * Question-Id
 		 */
@@ -156,6 +157,16 @@ export default {
 		},
 
 		/**
+		 * Mime-Types and file extensions that are allowed to be uploaded
+		 */
+		accept: {
+			type: Array,
+			default() {
+				return []
+			},
+		},
+
+		/**
 		 * Can question be moved up in order?
 		 */
 		canMoveUp: {
@@ -167,6 +178,14 @@ export default {
 		 * Can question be moved down in order?
 		 */
 		canMoveDown: {
+			type: Boolean,
+			default: false,
+		},
+
+		/**
+		 * isComposing for IME handling
+		 */
+		isIMEComposing: {
 			type: Boolean,
 			default: false,
 		},
@@ -215,11 +234,18 @@ export default {
 
 	methods: {
 		/**
+		 * Override to allow custom validation
+		 */
+		async validate() {
+			return true
+		},
+
+		/**
 		 * Forward the title change to the parent and store to db
 		 *
 		 * @param {string} text the title
 		 */
-		onTitleChange: debounce(function(text) {
+		onTitleChange: debounce(function (text) {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
 		}, 200),
@@ -228,7 +254,7 @@ export default {
 		 *
 		 * @param {string} description the description
 		 */
-		onDescriptionChange: debounce(function(description) {
+		onDescriptionChange: debounce(function (description) {
 			this.$emit('update:description', description)
 			this.saveQuestionProperty('description', description)
 		}, 200),
@@ -238,7 +264,7 @@ export default {
 		 *
 		 * @param {boolean} isRequiredValue new isRequired Value
 		 */
-		onRequiredChange: debounce(function(isRequiredValue) {
+		onRequiredChange: debounce(function (isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
 			this.saveQuestionProperty('isRequired', isRequiredValue)
 		}, 200),
@@ -250,7 +276,7 @@ export default {
 		 *
 		 * @param {object} newSettings changed settings
 		 */
-		onExtraSettingsChange: debounce(function(newSettings) {
+		onExtraSettingsChange: debounce(function (newSettings) {
 			const newExtraSettings = { ...this.extraSettings, ...newSettings }
 			this.$emit('update:extraSettings', newExtraSettings)
 			this.saveQuestionProperty('extraSettings', newExtraSettings)
@@ -261,7 +287,7 @@ export default {
 		 *
 		 * @param {string} name The new technical name of the input
 		 */
-		onNameChange: debounce(function(name) {
+		onNameChange: debounce(function (name) {
 			this.$emit('update:name', name)
 			this.saveQuestionProperty('name', name)
 		}, 200),
@@ -314,7 +340,9 @@ export default {
 		focus() {
 			this.$el.scrollIntoView({ behavior: 'smooth' })
 			this.$nextTick(() => {
-				const title = this.$el.querySelector('.question__header__title__text__input')
+				const title = this.$el.querySelector(
+					'.question__header__title__text__input',
+				)
 				if (title) {
 					title.focus()
 				}
@@ -331,8 +359,11 @@ export default {
 			const shuffled = [...input]
 			let idx = shuffled.length
 			while (--idx > 0) {
-				const rndIdx = Math.floor(Math.random() * (idx + 1));
-				[shuffled[rndIdx], shuffled[idx]] = [shuffled[idx], shuffled[rndIdx]]
+				const rndIdx = Math.floor(Math.random() * (idx + 1))
+				;[shuffled[rndIdx], shuffled[idx]] = [
+					shuffled[idx],
+					shuffled[rndIdx],
+				]
 			}
 			return shuffled
 		},
@@ -340,16 +371,109 @@ export default {
 		async saveQuestionProperty(key, value) {
 			try {
 				// TODO: add loading status feedback ?
-				await axios.patch(generateOcsUrl('apps/forms/api/v2.4/question/update'), {
-					id: this.id,
-					keyValuePairs: {
-						[key]: value,
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v2.4/question/update'),
+					{
+						id: this.id,
+						keyValuePairs: {
+							[key]: value,
+						},
 					},
-				})
+				)
 				emit('forms:last-updated:set', this.formId)
 			} catch (error) {
 				logger.error('Error while saving question', { error })
 				showError(t('forms', 'Error while saving question'))
+			}
+		},
+
+		/**
+		 * Handles multiple options for a question.
+		 *
+		 * @param {Array<string>} answers - The array of answers for the question.
+		 */
+		async handleMultipleOptions(answers) {
+			const options = this.options.slice()
+			this.isLoading = true
+			for (let i = 0; i < answers.length; i++) {
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2/option'),
+					{
+						questionId: this.id,
+						text: answers[i],
+					},
+				)
+				const newServerOption = OcsResponse2Data(response)
+				const option = {
+					id: newServerOption.id, // use the ID from the server
+					questionId: this.id,
+					text: answers[i],
+					local: false,
+				}
+				options.push(option)
+			}
+			this.updateOptions(options)
+			this.$nextTick(() => {
+				this.focusIndex(options.length - 1)
+			})
+			this.isLoading = false
+		},
+
+		/**
+		 * Add a new empty answer locally
+		 * @param {InputEvent} event The input event that triggered adding a new entry
+		 */
+		addNewEntry({ target, isComposing }) {
+			/*
+			 * Check for !isComposing needed for languages using IME like Japanese or Chinese
+			 * Check for !this.isComposing needed for IME inputs handled by CompositionEvents
+			 * Check for target.value !== '' needed for Linux/Mac for characters like á or è
+			 */
+			if (!isComposing && !this.isIMEComposing && target.value !== '') {
+				// Add local entry
+				const options = [
+					...this.options,
+					{
+						id: GenRandomId(),
+						questionId: this.id,
+						text: target.value,
+						local: true,
+					},
+				]
+
+				// Reset the "new answer" input if needed
+				if (this.$refs.pseudoInput) {
+					this.$refs.pseudoInput.value = ''
+				}
+
+				// Update questions
+				this.updateOptions(options)
+
+				this.$nextTick(() => {
+					// Set focus to the created input element
+					this.focusIndex(options.length - 1)
+
+					// Trigger onInput on new AnswerInput for posting the new option to the API
+					this.$refs.input[options.length - 1].onInput()
+				})
+			}
+		},
+
+		/**
+		 * Handle compostion start event for IME inputs
+		 */
+		onCompositionStart() {
+			this.isIMEComposing = true
+		},
+
+		/**
+		 * Handle compostion end event for IME inputs
+		 * @param {CompositionEvent} event The input event that triggered adding a new entry
+		 */
+		onCompositionEnd({ target, isComposing }) {
+			this.isIMEComposing = false
+			if (!isComposing) {
+				this.addNewEntry({ target, isComposing })
 			}
 		},
 	},

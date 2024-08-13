@@ -24,14 +24,19 @@
   -->
 
 <template>
-	<NcAppContent :page-heading="form.title ? t('forms', 'Edit form') : t('forms', 'Create form')">
+	<NcAppContent
+		:page-heading="
+			form.title ? t('forms', 'Edit form') : t('forms', 'Create form')
+		">
 		<!-- Show results & sidebar button -->
-		<TopBar :archived="isFormArchived"
+		<TopBar
+			:archived="isFormArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@share-form="onShareForm" />
 
-		<NcEmptyContent v-if="isLoadingForm"
+		<NcEmptyContent
+			v-if="isLoadingForm"
 			class="emtpycontent"
 			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
@@ -39,10 +44,15 @@
 			</template>
 		</NcEmptyContent>
 
-		<NcEmptyContent v-else-if="isFormArchived"
+		<NcEmptyContent
+			v-else-if="isFormArchived"
 			class="emtpycontent"
 			:name="t('forms', 'Form is archived')"
-			:description="t('forms', 'Form \'{title}\' is archived and cannot be modified.', { title: form.title })">
+			:description="
+				t('forms', 'Form \'{title}\' is archived and cannot be modified.', {
+					title: form.title,
+				})
+			">
 			<template #icon>
 				<IconLock :size="64" />
 			</template>
@@ -52,8 +62,11 @@
 			<!-- Forms title & description-->
 			<header>
 				<h2>
-					<label class="hidden-visually" for="form-title">{{ t('forms', 'Form title') }}</label>
-					<textarea id="form-title"
+					<label class="hidden-visually" for="form-title">{{
+						t('forms', 'Form title')
+					}}</label>
+					<textarea
+						id="form-title"
 						ref="title"
 						v-model="form.title"
 						class="form-title"
@@ -68,13 +81,19 @@
 				<label class="hidden-visually" for="form-desc">
 					{{ t('forms', 'Description') }}
 				</label>
-				<textarea id="form-desc"
+				<textarea
+					id="form-desc"
 					ref="description"
 					class="form-desc"
 					rows="1"
 					dir="auto"
 					:value="form.description"
-					:placeholder="t('forms', 'Description (formatting using Markdown is supported)')"
+					:placeholder="
+						t(
+							'forms',
+							'Description (formatting using Markdown is supported)',
+						)
+					"
 					:maxlength="maxStringLengths.formDescription"
 					@input="updateDescription" />
 				<!-- Show expiration message-->
@@ -85,23 +104,43 @@
 				<p v-if="infoMessage" class="info-message">
 					{{ infoMessage }}
 				</p>
+				<!-- TODO: remove with Forms 5.0
+				 Show info about legacyLink that will be removed -->
+				<NcNoteCard
+					v-if="form.access.legacyLink"
+					type="warning"
+					:heading="t('forms', 'Legacy link in use')">
+					{{
+						t(
+							'forms',
+							'This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism.',
+						)
+					}}
+				</NcNoteCard>
 			</header>
 
 			<section>
 				<!-- Questions list -->
-				<Draggable v-model="form.questions"
+				<Draggable
+					v-model="form.questions"
 					:animation="200"
 					tag="ul"
 					handle=".question__drag-handle"
 					@change="onQuestionOrderChange"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<transition-group :name="isDragging ? 'no-external-transition-on-drag' : 'question-list'">
-						<component :is="answerTypes[question.type].component"
+					<transition-group
+						:name="
+							isDragging
+								? 'no-external-transition-on-drag'
+								: 'question-list'
+						">
+						<component
+							:is="answerTypes[question.type].component"
 							v-for="(question, index) in form.questions"
 							ref="questions"
 							:key="question.id"
-							:can-move-down="index < (form.questions.length - 1)"
+							:can-move-down="index < form.questions.length - 1"
 							:can-move-up="index > 0"
 							:answer-type="answerTypes[question.type]"
 							:index="index + 1"
@@ -116,7 +155,8 @@
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
-					<NcActions ref="questionMenu"
+					<NcActions
+						ref="questionMenu"
 						:open.sync="questionMenuOpened"
 						:menu-name="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
@@ -125,7 +165,8 @@
 							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
 							<IconPlus v-else :size="20" />
 						</template>
-						<NcActionButton v-for="(answer, type) in answerTypesFilter"
+						<NcActionButton
+							v-for="(answer, type) in answerTypesFilter"
 							:key="answer.label"
 							:close-after-click="true"
 							:disabled="isLoadingQuestions"
@@ -158,6 +199,7 @@ import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
 import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import IconLock from 'vue-material-design-icons/Lock.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
@@ -186,6 +228,7 @@ export default {
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
+		NcNoteCard,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -214,7 +257,10 @@ export default {
 		},
 
 		isRequiredUsed() {
-			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
+			return this.form.questions.reduce(
+				(isUsed, question) => isUsed || question.isRequired,
+				false,
+			)
 		},
 
 		/**
@@ -243,7 +289,9 @@ export default {
 			}
 
 			if (this.isRequiredUsed) {
-				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
+				message +=
+					' ' +
+					t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
 			return message
@@ -293,13 +341,16 @@ export default {
 	methods: {
 		onMoveUp(index) {
 			if (index > 0) {
-				[this.form.questions[index - 1], this.form.questions[index]] = [this.form.questions[index], this.form.questions[index - 1]]
+				;[this.form.questions[index - 1], this.form.questions[index]] = [
+					this.form.questions[index],
+					this.form.questions[index - 1],
+				]
 				this.onQuestionOrderChange()
 			}
 		},
 		onMoveDown(index) {
 			// only if not the last one
-			if (index < (this.form.questions.length - 1)) {
+			if (index < this.form.questions.length - 1) {
 				this.onMoveUp(index + 1)
 			}
 		},
@@ -347,10 +398,10 @@ export default {
 		/**
 		 * Title & description save methods
 		 */
-		saveTitle: debounce(async function() {
+		saveTitle: debounce(async function () {
 			this.saveFormProperty('title')
 		}, 200),
-		saveDescription: debounce(async function() {
+		saveDescription: debounce(async function () {
 			this.saveFormProperty('description')
 		}, 200),
 
@@ -364,31 +415,41 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/question'), {
-					formId: this.form.id,
-					type,
-					text,
-				})
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/question'),
+					{
+						formId: this.form.id,
+						type,
+						text,
+					},
+				)
 				const question = OcsResponse2Data(response)
 
 				// Add newly created question
-				this.form.questions.push(Object.assign({
-					text,
-					type,
-					answers: [],
-				}, question))
+				this.form.questions.push(
+					Object.assign(
+						{
+							text,
+							type,
+							answers: [],
+						},
+						question,
+					),
+				)
 
 				// Focus newly added question
 				this.$nextTick(() => {
-					const lastQuestion = this.$refs.questions[this.$refs.questions.length - 1]
+					const lastQuestion =
+						this.$refs.questions[this.$refs.questions.length - 1]
 					lastQuestion.focus()
 				})
 
 				emit('forms:last-updated:set', this.form.id)
-
 			} catch (error) {
 				logger.error('Error while adding new question', { error })
-				showError(t('forms', 'There was an error while adding the new question'))
+				showError(
+					t('forms', 'There was an error while adding the new question'),
+				)
 			} finally {
 				this.isLoadingQuestions = false
 			}
@@ -404,13 +465,19 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				await axios.delete(generateOcsUrl('apps/forms/api/v2.4/question/{id}', { id }))
-				const index = this.form.questions.findIndex(search => search.id === id)
+				await axios.delete(
+					generateOcsUrl('apps/forms/api/v2.4/question/{id}', { id }),
+				)
+				const index = this.form.questions.findIndex(
+					(search) => search.id === id,
+				)
 				this.form.questions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error(`Error while removing question ${id}`, { error })
-				showError(t('forms', 'There was an error while removing the question'))
+				showError(
+					t('forms', 'There was an error while removing the question'),
+				)
 			} finally {
 				this.isLoadingQuestions = false
 			}
@@ -425,18 +492,27 @@ export default {
 			this.isLoadingQuestions = true
 
 			try {
-				const response = await axios.post(generateOcsUrl('apps/forms/api/v2.4/question/clone/{id}', { id }))
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/question/clone/{id}', {
+						id,
+					}),
+				)
 				const question = OcsResponse2Data(response)
 
-				this.form.questions.push(Object.assign({
-					answers: [],
-				}, question))
+				this.form.questions.push(
+					Object.assign(
+						{
+							answers: [],
+						},
+						question,
+					),
+				)
 
 				this.$nextTick(() => {
-					const lastQuestion = this.$refs.questions[this.$refs.questions.length - 1]
+					const lastQuestion =
+						this.$refs.questions[this.$refs.questions.length - 1]
 					lastQuestion.focus()
 				})
-
 			} catch (error) {
 				logger.error(`Error while duplicating question ${id}`, { error })
 				showError('There was an error while duplicating the question')
@@ -450,13 +526,16 @@ export default {
 		 */
 		async onQuestionOrderChange() {
 			this.isLoadingQuestions = true
-			const newOrder = this.form.questions.map(question => question.id)
+			const newOrder = this.form.questions.map((question) => question.id)
 
 			try {
-				await axios.put(generateOcsUrl('apps/forms/api/v2.4/question/reorder'), {
-					formId: this.form.id,
-					newOrder,
-				})
+				await axios.put(
+					generateOcsUrl('apps/forms/api/v2.4/question/reorder'),
+					{
+						formId: this.form.id,
+						newOrder,
+					},
+				)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while saving form', { error })
@@ -514,7 +593,9 @@ export default {
 			padding-inline: 10px;
 			margin-block: 22px 14px;
 			margin-inline: 0;
-			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
+			width: calc(
+				100% - 56px
+			); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			overflow: hidden;
 			text-overflow: ellipsis;
 			resize: none;

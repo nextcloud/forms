@@ -21,13 +21,17 @@
   -->
 
 <template>
-	<Question v-bind="questionProps"
+	<Question
+		v-bind="questionProps"
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<div class="question__content">
-			<textarea ref="textarea"
-				:aria-label="t('forms', 'A long answer for the question “{text}”', { text })"
+			<textarea
+				ref="textarea"
+				:aria-label="
+					t('forms', 'A long answer for the question “{text}”', { text })
+				"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:required="isRequired"
@@ -102,5 +106,4 @@ export default {
 		margin-inline-start: -12px;
 	}
 }
-
 </style>

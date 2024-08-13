@@ -1,13 +1,14 @@
 OC.L10N.register(
     "forms",
     {
+    "Yes" : "Si",
     "Copy" : "Copiar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
     "Required" : "Requerido",
+    "Delete" : "Borrar",
     "Set expiration date" : "Establecer fecha de expiración",
     "Permissions" : "Permisos",
-    "Delete" : "Borrar",
     "Group" : "Grupo",
     "Share link" : "Compartir liga",
     "Copy to clipboard" : "Copiar al portapapeles",
@@ -20,6 +21,7 @@ OC.L10N.register(
     "Settings" : "Configuraciones ",
     "Submit" : "Enviar",
     "Abort" : "Abortar",
+    "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",
     "Text" : "Texto",

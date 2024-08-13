@@ -35,12 +35,15 @@ use OCP\AppFramework\Db\Entity;
  * @method void setSubmissionId(integer $value)
  * @method integer getQuestionId()
  * @method void setQuestionId(integer $value)
+ * @method integer|null getFileId()
+ * @method void setFileId(?integer $value)
  * @method string getText()
  * @method void setText(string $value)
  */
 class Answer extends Entity {
 	protected $submissionId;
 	protected $questionId;
+	protected $fileId;
 	protected $text;
 
 	/**
@@ -49,12 +52,14 @@ class Answer extends Entity {
 	public function __construct() {
 		$this->addType('submissionId', 'integer');
 		$this->addType('questionId', 'integer');
+		$this->addType('fileId', 'integer');
 	}
 
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
 			'submissionId' => $this->getSubmissionId(),
+			'fileId' => $this->getFileId(),
 			'questionId' => $this->getQuestionId(),
 			'text' => (string)$this->getText(),
 		];

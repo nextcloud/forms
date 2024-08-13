@@ -23,14 +23,16 @@
 <template>
 	<div>
 		<NcSettingsSection :name="t('forms', 'Form creation')">
-			<NcCheckboxRadioSwitch ref="switchRestrictCreation"
+			<NcCheckboxRadioSwitch
+				ref="switchRestrictCreation"
 				:checked.sync="appConfig.restrictCreation"
 				class="forms-settings__creation__switch"
 				type="switch"
 				@update:checked="onRestrictCreationChange">
 				{{ t('forms', 'Restrict form creation to selected groups') }}
 			</NcCheckboxRadioSwitch>
-			<NcSelect v-model="appConfig.creationAllowedGroups"
+			<NcSelect
+				v-model="appConfig.creationAllowedGroups"
 				:disabled="!appConfig.restrictCreation"
 				:multiple="true"
 				:options="availableGroups"
@@ -40,13 +42,15 @@
 				@input="onCreationAllowedGroupsChange" />
 		</NcSettingsSection>
 		<NcSettingsSection :name="t('forms', 'Form sharing')">
-			<NcCheckboxRadioSwitch ref="switchAllowPublicLink"
+			<NcCheckboxRadioSwitch
+				ref="switchAllowPublicLink"
 				:checked.sync="appConfig.allowPublicLink"
 				type="switch"
 				@update:checked="onAllowPublicLinkChange">
 				{{ t('forms', 'Allow sharing by link') }}
 			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch ref="switchAllowPermitAll"
+			<NcCheckboxRadioSwitch
+				ref="switchAllowPermitAll"
 				:checked.sync="appConfig.allowPermitAll"
 				type="switch"
 				@update:checked="onAllowPermitAllChange">
@@ -102,7 +106,10 @@ export default {
 		async onCreationAllowedGroupsChange(newVal) {
 			const el = this.$refs.switchRestrictCreation
 			el.loading = true
-			await this.saveAppConfig('creationAllowedGroups', newVal.map(group => group.groupId))
+			await this.saveAppConfig(
+				'creationAllowedGroups',
+				newVal.map((group) => group.groupId),
+			)
 			el.loading = false
 		},
 		async onAllowPublicLinkChange(newVal) {

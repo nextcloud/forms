@@ -48,8 +48,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setDescription(string $value)
  * @method string getName()
  * @method void setName(string $value)
- * @method object getExtraSettings()
- * @method void setExtraSettings(object $value)
  */
 class Question extends Entity {
 	protected $formId;
@@ -82,7 +80,7 @@ class Question extends Entity {
 				unset($extraSettings[$key]);
 			}
 		}
-		
+
 		$this->setExtraSettingsJson(json_encode($extraSettings, JSON_FORCE_OBJECT));
 	}
 

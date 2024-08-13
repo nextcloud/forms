@@ -29,12 +29,14 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
+use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IGroup;
@@ -69,6 +71,7 @@ class FormsService {
 		private CirclesService $circlesService,
 		private IRootFolder $storage,
 		private IL10N $l10n,
+		private IMimeTypeDetector $mimeTypeDetector,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -116,6 +119,22 @@ class FormsService {
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
 				$question['options'] = $this->getOptions($question['id']);
+				$question['accept'] = [];
+				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
+						$question['accept'] = array_keys(array_intersect(
+							$this->mimeTypeDetector->getAllAliases(),
+							$question['extraSettings']['allowedFileTypes']
+						));
+					}
+
+					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
+						foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
+							$question['accept'][] = '.' . $extension;
+						}
+					}
+				}
+
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {
@@ -313,13 +332,11 @@ class FormsService {
 		}
 
 		// Refuse access, if SubmitMultiple is not set and user already has taken part.
-		if (!$form->getSubmitMultiple()) {
-			$participants = $this->submissionMapper->findParticipantsByForm($form->getId());
-			foreach ($participants as $participant) {
-				if ($participant === $this->currentUser->getUID()) {
-					return false;
-				}
-			}
+		if (
+			!$form->getSubmitMultiple() &&
+			$this->submissionMapper->hasFormSubmissionsByUser($form, $this->currentUser->getUID())
+		) {
+			return false;
 		}
 
 		return true;
@@ -596,17 +613,35 @@ class FormsService {
 			case Constants::ANSWER_TYPE_SHORT:
 				$allowed = Constants::EXTRA_SETTINGS_SHORT;
 				break;
+			case Constants::ANSWER_TYPE_FILE:
+				$allowed = Constants::EXTRA_SETTINGS_FILE;
+				break;
 			default:
 				$allowed = [];
 		}
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
-		$diff = array_diff(array_keys($extraSettings), $allowed);
+		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
 			return false;
 		}
 
-		// Special handling of short input for validation
-		if ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
+		// Check type of extra settings
+		foreach ($extraSettings as $key => $value) {
+			if (!in_array(gettype($value), $allowed[$key])) {
+				// Not allowed type
+				return false;
+			}
+		}
+
+		if ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {
+			// Ensure limits are sane
+			if (isset($extraSettings['optionsLimitMax']) && isset($extraSettings['optionsLimitMin'])
+				&& $extraSettings['optionsLimitMax'] < $extraSettings['optionsLimitMin']) {
+				return false;
+			}
+
+			// Special handling of short input for validation
+		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
 			// Ensure input validation type is known
 			if (!in_array($extraSettings['validationType'], Constants::SHORT_INPUT_TYPES)) {
 				return false;
@@ -681,8 +716,35 @@ class FormsService {
 		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
 		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').'.$fileFormat;
 
-		// Sanitize file name, replace all invalid characters
-		return str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
+		return self::normalizeFileName($fileName);
 	}
 
+	public function getFormUploadedFilesFolderPath(Form $form): string {
+		return implode('/', [
+			Constants::FILES_FOLDER,
+			self::normalizeFileName($form->getId().' - '.$form->getTitle()),
+		]);
+	}
+
+	public function getUploadedFilePath(Form $form, int $submissionId, int $questionId, ?string $questionName, string $questionText): string {
+
+		return implode('/', [
+			$this->getFormUploadedFilesFolderPath($form),
+			$submissionId,
+			self::normalizeFileName($questionId.' - '.($questionName ?: $questionText))
+		]);
+	}
+
+	public function getTemporaryUploadedFilePath(Form $form, Question $question): string {
+		return implode('/', [
+			Constants::UNSUBMITTED_FILES_FOLDER,
+			microtime(true),
+			self::normalizeFileName($form->getId().' - '.$form->getTitle()),
+			self::normalizeFileName($question->getId().' - '.($question->getName() ?: $question->getText()))
+		]);
+	}
+
+	private static function normalizeFileName(string $fileName): string {
+		return str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
+	}
 }

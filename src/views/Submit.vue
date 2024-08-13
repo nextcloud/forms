@@ -23,15 +23,19 @@
  -->
 
 <template>
-	<NcAppContent :class="{'app-content--public': publicView}" :page-heading="t('forms', 'Submit form')">
-		<TopBar v-if="!publicView"
+	<NcAppContent
+		:class="{ 'app-content--public': publicView }"
+		:page-heading="t('forms', 'Submit form')">
+		<TopBar
+			v-if="!publicView"
 			:archived="isArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			@share-form="onShareForm" />
 
 		<!-- Form is loading -->
-		<NcEmptyContent v-if="isLoadingForm"
+		<NcEmptyContent
+			v-if="isLoadingForm"
 			class="forms-emptycontent"
 			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
@@ -46,7 +50,8 @@
 					{{ formTitle }}
 				</h2>
 				<!-- eslint-disable vue/no-v-html -->
-				<div v-if="!loading && !success && !!formDescription"
+				<div
+					v-if="!loading && !success && !!formDescription"
 					class="form-desc"
 					dir="auto"
 					v-html="formDescription" />
@@ -57,16 +62,31 @@
 				<p v-if="infoMessage" class="info-message">
 					{{ infoMessage }}
 				</p>
+				<!-- TODO: remove with Forms 5.0
+				 Show info about legacyLink that will be removed -->
+				<NcNoteCard
+					v-if="form.access.legacyLink"
+					type="warning"
+					:heading="t('forms', 'Legacy link in use')">
+					{{
+						t(
+							'forms',
+							'This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism.',
+						)
+					}}
+				</NcNoteCard>
 			</header>
 
-			<NcEmptyContent v-if="loading"
+			<NcEmptyContent
+				v-if="loading"
 				class="forms-emptycontent"
 				:name="t('forms', 'Submitting form …')">
 				<template #icon>
 					<NcLoadingIcon :size="64" />
 				</template>
 			</NcEmptyContent>
-			<NcEmptyContent v-else-if="success || !form.canSubmit"
+			<NcEmptyContent
+				v-else-if="success || !form.canSubmit"
 				class="forms-emptycontent"
 				:name="t('forms', 'Thank you for completing the form!')"
 				:description="form.submissionMessage">
@@ -78,29 +98,40 @@
 					<p class="submission-message" v-html="submissionMessageHTML" />
 				</template>
 			</NcEmptyContent>
-			<NcEmptyContent v-else-if="isExpired"
+			<NcEmptyContent
+				v-else-if="isExpired"
 				class="forms-emptycontent"
 				:name="t('forms', 'Form expired')"
-				:description="t('forms', 'This form has expired and is no longer taking answers')">
+				:description="
+					t(
+						'forms',
+						'This form has expired and is no longer taking answers',
+					)
+				">
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
 				</template>
 			</NcEmptyContent>
-			<NcEmptyContent v-else-if="isClosed || isArchived"
+			<NcEmptyContent
+				v-else-if="isClosed || isArchived"
 				class="forms-emptycontent"
 				:name="t('forms', 'Form closed')"
-				:description="t('forms', 'This form was closed and is no longer taking answers')">
+				:description="
+					t(
+						'forms',
+						'This form was closed and is no longer taking answers',
+					)
+				">
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
 				</template>
 			</NcEmptyContent>
 
 			<!-- Questions list -->
-			<form v-else
-				ref="form"
-				@submit.prevent="onSubmit">
+			<form v-else ref="form" @submit.prevent="onSubmit">
 				<ul>
-					<Questions :is="answerTypes[question.type].component"
+					<Questions
+						:is="answerTypes[question.type].component"
 						v-for="(question, index) in validQuestions"
 						ref="questions"
 						:key="question.id"
@@ -114,23 +145,33 @@
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
 						@update:values="(values) => onUpdate(question, values)" />
 				</ul>
-				<input ref="submitButton"
+				<input
+					ref="submitButton"
 					class="primary"
 					type="submit"
 					:value="t('forms', 'Submit')"
 					:disabled="loading"
-					:aria-label="t('forms', 'Submit form')">
+					:aria-label="t('forms', 'Submit form')" />
 			</form>
 
 			<!-- Confirmation dialog if form is empty submitted -->
-			<NcDialog :open.sync="showConfirmEmptyModal"
+			<NcDialog
+				:open.sync="showConfirmEmptyModal"
 				:name="t('forms', 'Confirm submit')"
-				:message="t('forms', 'Are you sure you want to submit an empty form?')"
+				:message="
+					t('forms', 'Are you sure you want to submit an empty form?')
+				"
 				:buttons="confirmEmptyModalButtons" />
 			<!-- Confirmation dialog if form is left unsubmitted -->
-			<NcDialog :open.sync="showConfirmLeaveDialog"
+			<NcDialog
+				:open.sync="showConfirmLeaveDialog"
 				:name="t('forms', 'Leave form')"
-				:message="t('forms', 'You have unsaved changes! Do you still want to leave?')"
+				:message="
+					t(
+						'forms',
+						'You have unsaved changes! Do you still want to leave?',
+					)
+				"
 				:buttons="confirmLeaveFormButtons"
 				:can-close="false"
 				:close-on-click-outside="false" />
@@ -151,6 +192,7 @@ import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
 import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcIconSvgWrapper from '@nextcloud/vue/dist/Components/NcIconSvgWrapper.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
 import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
@@ -176,6 +218,7 @@ export default {
 		NcEmptyContent,
 		NcLoadingIcon,
 		NcIconSvgWrapper,
+		NcNoteCard,
 		Question,
 		QuestionLong,
 		QuestionShort,
@@ -247,7 +290,7 @@ export default {
 		},
 
 		validQuestions() {
-			return this.form.questions.filter(question => {
+			return this.form.questions.filter((question) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
 					return false
@@ -262,7 +305,10 @@ export default {
 		},
 
 		isRequiredUsed() {
-			return this.form.questions.reduce((isUsed, question) => isUsed || question.isRequired, false)
+			return this.form.questions.reduce(
+				(isUsed, question) => isUsed || question.isRequired,
+				false,
+			)
 		},
 
 		/**
@@ -289,7 +335,9 @@ export default {
 				message += t('forms', 'Responses are connected to your account.')
 			}
 			if (this.isRequiredUsed) {
-				message += ' ' + t('forms', 'An asterisk (*) indicates mandatory questions.')
+				message +=
+					' ' +
+					t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
 			return message
@@ -299,7 +347,10 @@ export default {
 		 * Rendered HTML of the custom submission message
 		 */
 		submissionMessageHTML() {
-			if (this.form.submissionMessage && (this.success || !this.form.canSubmit)) {
+			if (
+				this.form.submissionMessage &&
+				(this.success || !this.form.canSubmit)
+			) {
 				return this.markdownit.render(this.form.submissionMessage)
 			}
 			return ''
@@ -317,32 +368,38 @@ export default {
 		 * Buttons for the "confirm submit empty form" dialog
 		 */
 		confirmEmptyModalButtons() {
-			return [{
-				label: t('forms', 'Abort'),
-				icon: IconCancelSvg,
-				callback: () => {},
-			}, {
-				label: t('forms', 'Submit'),
-				icon: IconCheckSvg,
-				type: 'primary',
-				callback: () => this.onConfirmedSubmit(),
-			}]
+			return [
+				{
+					label: t('forms', 'Abort'),
+					icon: IconCancelSvg,
+					callback: () => {},
+				},
+				{
+					label: t('forms', 'Submit'),
+					icon: IconCheckSvg,
+					type: 'primary',
+					callback: () => this.onConfirmedSubmit(),
+				},
+			]
 		},
 
 		/**
 		 * Buttons for the "confirm leave unsubmitted form" dialog
 		 */
 		confirmLeaveFormButtons() {
-			return [{
-				label: t('forms', 'Abort'),
-				icon: IconCancelSvg,
-				callback: () => this.confirmButtonCallback(false),
-			}, {
-				label: t('forms', 'Leave'),
-				icon: IconCheckSvg,
-				type: 'primary',
-				callback: () => this.confirmButtonCallback(true),
-			}]
+			return [
+				{
+					label: t('forms', 'Abort'),
+					icon: IconCancelSvg,
+					callback: () => this.confirmButtonCallback(false),
+				},
+				{
+					label: t('forms', 'Leave'),
+					icon: IconCheckSvg,
+					type: 'primary',
+					callback: () => this.confirmButtonCallback(true),
+				},
+			]
 		},
 	},
 
@@ -387,7 +444,9 @@ export default {
 		 * @return {Record<string,any>}
 		 */
 		getFormValuesFromLocalStorage() {
-			const fromLocalStorage = localStorage.getItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)
+			const fromLocalStorage = localStorage.getItem(
+				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
+			)
 			if (fromLocalStorage) {
 				return JSON.parse(fromLocalStorage)
 			}
@@ -403,15 +462,15 @@ export default {
 				for (const [key, answer] of Object.entries(savedState)) {
 					const answers = []
 					switch (answer?.type) {
-					case 'QuestionMultiple':
-						answer.value.forEach(num => {
-							answers.push(num.toString())
-						})
-						this.answers[key] = answers
-						break
-					default:
-						this.answers[key] = answer.value
-						break
+						case 'QuestionMultiple':
+							answer.value.forEach((num) => {
+								answers.push(num.toString())
+							})
+							this.answers[key] = answers
+							break
+						default:
+							this.answers[key] = answer.value
+							break
 					}
 				}
 			}
@@ -434,14 +493,19 @@ export default {
 				},
 			}
 			const stringified = JSON.stringify(state)
-			localStorage.setItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`, stringified)
+			localStorage.setItem(
+				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
+				stringified,
+			)
 		},
 
 		deleteFormFieldFromLocalStorage() {
 			if (!this.isLoggedIn) {
 				return
 			}
-			localStorage.removeItem(`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`)
+			localStorage.removeItem(
+				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
+			)
 		},
 
 		/**
@@ -449,7 +513,7 @@ export default {
 		 * @param {{id: number}} question The question to answer
 		 * @param {unknown[]} values The new values
 		 */
-		 onUpdate(question, values) {
+		onUpdate(question, values) {
 			this.answers = { ...this.answers, [question.id]: values }
 			this.addFormFieldToLocalStorage(question)
 		},
@@ -462,7 +526,9 @@ export default {
 		 */
 		onKeydownEnter(event) {
 			const formInputs = Array.from(this.$refs.form)
-			const sourceInputIndex = formInputs.findIndex(input => input === event.originalTarget)
+			const sourceInputIndex = formInputs.findIndex(
+				(input) => input === event.originalTarget,
+			)
 
 			// Focus next form element
 			formInputs[sourceInputIndex + 1].focus()
@@ -508,13 +574,33 @@ export default {
 		/**
 		 * Submit the form after the browser validated it 🚀 or show confirmation modal if empty
 		 */
-		onSubmit() {
-			// in case no answer is set or all are empty show the confirmation dialog
-			if (Object.keys(this.answers).length === 0 || Object.values(this.answers).every((answers) => answers.length === 0)) {
-				this.showConfirmEmptyModal = true
-			} else {
-				// otherwise do the real submit
-				this.onConfirmedSubmit()
+		async onSubmit() {
+			const validation = (this.$refs.questions ?? []).map(
+				async (question) => await question.validate(),
+			)
+
+			try {
+				// wait for all to be validated
+				const result = await Promise.all(validation)
+				if (result.some((v) => !v)) {
+					throw new Error('One question did not validate sucessfully')
+				}
+
+				// in case no answer is set or all are empty show the confirmation dialog
+				if (
+					Object.keys(this.answers).length === 0 ||
+					Object.values(this.answers).every(
+						(answers) => answers.length === 0,
+					)
+				) {
+					this.showConfirmEmptyModal = true
+				} else {
+					// otherwise do the real submit
+					this.onConfirmedSubmit()
+				}
+			} catch (error) {
+				logger.debug('One question is not valid', { error })
+				showError(t('forms', 'Some answers are not valid'))
 			}
 		},
 
@@ -526,18 +612,25 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(generateOcsUrl('apps/forms/api/v2.4/submission/insert'), {
-					formId: this.form.id,
-					answers: this.answers,
-					shareHash: this.shareHash,
-				})
+				await axios.post(
+					generateOcsUrl('apps/forms/api/v2.4/submission/insert'),
+					{
+						formId: this.form.id,
+						answers: this.answers,
+						shareHash: this.shareHash,
+					},
+				)
 				this.submitForm = true
 				this.success = true
 				this.deleteFormFieldFromLocalStorage()
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while submitting the form', { error })
-				showError(t('forms', 'There was an error submitting the form'))
+				showError(
+					t('forms', 'There was an error submitting the form: {message}', {
+						message: error.response.data.ocs.meta.message,
+					}),
+				)
 			} finally {
 				this.loading = false
 			}
@@ -554,7 +647,6 @@ export default {
 			this.submitForm = false
 		},
 	},
-
 }
 </script>
 <style lang="scss" scoped>
@@ -589,7 +681,9 @@ export default {
 		.form-title,
 		.form-desc,
 		.info-message {
-			width: calc(100% - 56px); // margin of header, needed if screen is < 806px (max-width + margin-left)
+			width: calc(
+				100% - 56px
+			); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			font-size: 100%;
 			padding-block: 0px;
 			padding-inline: 16px;
@@ -636,7 +730,7 @@ export default {
 			padding-inline-start: 44px;
 		}
 
-		input[type=submit] {
+		input[type='submit'] {
 			align-self: flex-end;
 			margin: 5px;
 			margin-block-end: 160px;

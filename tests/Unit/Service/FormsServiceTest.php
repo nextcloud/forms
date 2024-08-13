@@ -22,6 +22,27 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+namespace OCA\Forms\Service;
+
+/**
+ * mock microtime() function used in services
+ * @param float|false|null $expected the value that should be returned when called
+ */
+function microtime(bool|float $asFloat = false) {
+	static $value;
+	if ($asFloat === -1) {
+		$value = null;
+	} elseif (is_numeric($asFloat)) {
+		$value = $asFloat;
+	}
+	// Return real time if no mocked value is set
+	if (is_null($value)) {
+		return \microtime($asFloat);
+	}
+	return $value;
+}
+
 namespace OCA\Forms\Tests\Unit\Service;
 
 use OCA\Circles\Model\Circle;
@@ -40,7 +61,9 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Files\Folder;
+use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IGroup;
@@ -103,6 +126,9 @@ class FormsServiceTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
+	/** @var IMimeTypeDetector|MockObject */
+	private $mimeTypeDetector;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -137,6 +163,8 @@ class FormsServiceTest extends TestCase {
 				return $identity;
 			}));
 
+		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
+
 		$this->formsService = new FormsService(
 			$userSession,
 			$this->activityManager,
@@ -152,7 +180,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 	}
 
@@ -209,7 +238,8 @@ class FormsServiceTest extends TestCase {
 								'questionId' => 1,
 								'text' => 'Option 2'
 							]
-						]
+						],
+						'accept' => [],
 					],
 					[
 						'id' => 2,
@@ -221,7 +251,8 @@ class FormsServiceTest extends TestCase {
 						'text' => 'Question 2',
 						'description' => '',
 						'name' => 'city',
-						'options' => []
+						'options' => [],
+						'accept' => [],
 					]
 				],
 				'shares' => [
@@ -623,7 +654,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 
 		$form = new Form();
@@ -771,25 +803,25 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'submitMultiple' => false,
-				'participantsArray' => ['currentUser'],
+				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			],
 			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
-				'participantsArray' => ['notCurrentUser'],
+				'hasFormSubmissionsByUser' => false,
 				'expected' => true
 			],
 			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
-				'participantsArray' => ['notCurrentUser', 'currentUser'],
+				'hasFormSubmissionsByUser' => true,
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => true,
-				'participantsArray' => ['currentUser'],
+				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			]
 		];
@@ -799,10 +831,10 @@ class FormsServiceTest extends TestCase {
 	 *
 	 * @param string $ownerId
 	 * @param bool $submitMultiple
-	 * @param array $participantsArray
+	 * @param bool $hasFormSubmissionsByUser
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitMultiple, array $participantsArray, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $hasFormSubmissionsByUser, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -813,9 +845,9 @@ class FormsServiceTest extends TestCase {
 		$form->setSubmitMultiple($submitMultiple);
 
 		$this->submissionMapper->expects($this->any())
-			->method('findParticipantsByForm')
-			->with(42)
-			->willReturn($participantsArray);
+			->method('hasFormSubmissionsByUser')
+			->with($form, 'currentUser')
+			->willReturn($hasFormSubmissionsByUser);
 
 		$this->assertEquals($expected, $this->formsService->canSubmit($form));
 	}
@@ -862,7 +894,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -973,7 +1006,8 @@ class FormsServiceTest extends TestCase {
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
-			$this->l10n
+			$this->l10n,
+			$this->mimeTypeDetector,
 		);
 
 		$form = new Form();
@@ -1200,7 +1234,8 @@ class FormsServiceTest extends TestCase {
 				$this->secureRandom,
 				$this->circlesService,
 				$this->storage,
-				$this->l10n
+				$this->l10n,
+				$this->mimeTypeDetector,
 			])
 			->getMock();
 
@@ -1250,6 +1285,45 @@ class FormsServiceTest extends TestCase {
 				],
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => true
+			],
+			'valid-options-limit' => [
+				'extraSettings' => [
+					'optionsLimitMax' => 3,
+					'optionsLimitMin' => 2,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'valid-options-limit-min' => [
+				'extraSettings' => [
+					'optionsLimitMin' => 4,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'valid-options-limit-max' => [
+				'extraSettings' => [
+					'optionsLimitMax' => 2,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'invalid-options-limit' => [
+				// max < min
+				'extraSettings' => [
+					'optionsLimitMax' => 2,
+					'optionsLimitMin' => 4,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false
+			],
+			'invalid-settings-type' => [
+				'extraSettings' => [
+					'optionsLimitMax' => 'hello',
+					'optionsLimitMin' => false,
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false
 			],
 			'invalid subtype' => [
 				'extraSettings' => [
@@ -1371,5 +1445,74 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 
 		$this->assertSame('Form 1 (responses).xlsx', $this->formsService->getFileName($form, 'xlsx'));
+	}
+
+	public function testGetUploadedFilePath() {
+		$form = new Form();
+		$form->setId(10);
+		$form->setTitle('Form 1');
+
+		$this->assertSame('Forms/10 - Form 1/20/30 - question name',
+			$this->formsService->getUploadedFilePath($form, 20, 30, 'question name', 'question text'));
+	}
+
+	public function testGetTemporaryUploadedFilePath() {
+		$form = new Form();
+		$form->setId(10);
+		$form->setTitle('Form 1');
+
+		$question = new Question();
+		$question->setId(30);
+		$question->setName('question name');
+
+		\OCA\Forms\Service\microtime(1234567.89);
+
+		$this->assertSame('Forms/unsubmitted/1234567.89/10 - Form 1/30 - question name',
+			$this->formsService->getTemporaryUploadedFilePath($form, $question));
+	}
+
+	public function testGetQuestionsReturnsEmptyArrayWhenNoQuestions(): void {
+		$this->questionMapper->method('findByForm')->willReturn([]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertEmpty($result);
+	}
+
+	public function testGetQuestionsWithVariousQuestionTypes(): void {
+		$questionEntities = [
+			$this->createQuestionEntity(['id' => 1, 'type' => 'text']),
+			$this->createQuestionEntity(['id' => 2, 'type' => Constants::ANSWER_TYPE_FILE, 'extraSettings' => [
+				'allowedFileTypes' => ['image', 'x-office/document'],
+				'allowedFileExtensions' => ['jpg']
+			]])
+		];
+
+		$this->questionMapper->method('findByForm')->willReturn($questionEntities);
+		$this->mimeTypeDetector->method('getAllAliases')->willReturn([
+			'application/coreldraw' => 'image',
+			'application/msonenote' => 'x-office/document',
+		]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertCount(2, $result);
+		$this->assertEquals('text', $result[0]['type']);
+		$this->assertEquals(Constants::ANSWER_TYPE_FILE, $result[1]['type']);
+		$this->assertEquals(['application/coreldraw', 'application/msonenote', '.jpg'], $result[1]['accept']);
+	}
+
+	public function testGetQuestionsHandlesDoesNotExistException(): void {
+		$this->questionMapper->method('findByForm')->willThrowException(new DoesNotExistException('test'));
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertEmpty($result);
+	}
+
+	private function createQuestionEntity(array $data): Question {
+		$questionEntity = $this->createMock(Question::class);
+		$questionEntity->method('read')->willReturn($data);
+		return $questionEntity;
 	}
 }

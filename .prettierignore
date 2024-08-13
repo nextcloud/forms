@@ -1,0 +1,19 @@
+# version control systems directories
+**/.git
+**/.svn
+**/.hg
+
+# 3rdparty dependencies
+**/node_modules
+**/vendor
+
+# Compiled JS output
+js/
+
+# Handled by transifex
+l10n/
+
+# PHP
+lib/
+**/*.php
+composer.lock
