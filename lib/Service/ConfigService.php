@@ -36,30 +36,15 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 class ConfigService {
-	protected $appName;
-
-	/** @var IConfig */
-	private $config;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IUser */
-	private $currentUser;
-
-	public function __construct(string $appName,
-		IConfig $config,
-		IGroupManager $groupManager,
-		LoggerInterface $logger,
-		IUserSession $userSession) {
-		$this->appName = $appName;
-		$this->config = $config;
-		$this->groupManager = $groupManager;
-		$this->logger = $logger;
-
+	private IUser $currentUser;
+		
+	public function __construct(
+		protected string $appName,
+		private IConfig $config,
+		private IGroupManager $groupManager,
+		private LoggerInterface $logger,
+		IUserSession $userSession
+	) {
 		$this->currentUser = $userSession->getUser();
 	}
 

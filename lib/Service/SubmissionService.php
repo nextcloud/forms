@@ -32,10 +32,8 @@ use OCA\Forms\Db\Answer;
 
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
-use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
-use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -60,66 +58,24 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Psr\Log\LoggerInterface;
 
 class SubmissionService {
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var QuestionMapper */
-	private $questionMapper;
-
-	/** @var SubmissionMapper */
-	private $submissionMapper;
-
-	/** @var AnswerMapper */
-	private $answerMapper;
-
-	/** @var IRootFolder */
-	private $storage;
-
-	/** @var IConfig */
-	private $config;
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var IUser */
-	private $currentUser;
-
-	/** @var IMailer */
-	private $mailer;
-
-	public function __construct(FormMapper $formMapper,
-		QuestionMapper $questionMapper,
-		SubmissionMapper $submissionMapper,
-		AnswerMapper $answerMapper,
-		IRootFolder $storage,
-		IConfig $config,
-		IL10N $l10n,
-		LoggerInterface $logger,
-		IUserManager $userManager,
+	private ?IUser $currentUser;
+	
+	public function __construct(
+		private QuestionMapper $questionMapper,
+		private SubmissionMapper $submissionMapper,
+		private AnswerMapper $answerMapper,
+		private UploadedFileMapper $uploadedFileMapper,
+		private IRootFolder $storage,
+		private IConfig $config,
+		private IL10N $l10n,
+		private LoggerInterface $logger,
+		private IUserManager $userManager,
 		IUserSession $userSession,
-		IMailer $mailer,
+		private IMailer $mailer,
 		private ITempManager $tempManager,
 		private FormsService $formsService,
 		private IUrlGenerator $urlGenerator,
-		private UploadedFileMapper $uploadedFileMapper,
 	) {
-		$this->formMapper = $formMapper;
-		$this->questionMapper = $questionMapper;
-		$this->submissionMapper = $submissionMapper;
-		$this->answerMapper = $answerMapper;
-		$this->storage = $storage;
-		$this->config = $config;
-		$this->l10n = $l10n;
-		$this->logger = $logger;
-		$this->userManager = $userManager;
-		$this->mailer = $mailer;
-
 		$this->currentUser = $userSession->getUser();
 	}
 
@@ -253,7 +209,7 @@ class SubmissionService {
 		$questions = $this->questionMapper->findByForm($form->getId());
 		$defaultTimeZone = date_default_timezone_get();
 
-		if ($this->currentUser == null) {
+		if (!$this->currentUser) {
 			$userTimezone = $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
 		} else {
 			$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
