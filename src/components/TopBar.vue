@@ -21,6 +21,7 @@
   -->
 <template>
 	<div
+		:aria-label="t('forms', 'View mode')"
 		class="top-bar"
 		:class="{
 			'top-bar--has-sidebar': sidebarOpened,
@@ -60,6 +61,7 @@
 
 <script>
 import { mdiEye, mdiPencil, mdiPoll } from '@mdi/js'
+import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
@@ -118,6 +120,8 @@ export default {
 
 	setup() {
 		return {
+			t,
+
 			isMobile: useIsMobile(),
 		}
 	},
