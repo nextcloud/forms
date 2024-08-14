@@ -54,7 +54,7 @@ use Psr\Log\LoggerInterface;
  */
 class FormsService {
 	private ?IUser $currentUser;
-
+	
 	public function __construct(
 		IUserSession $userSession,
 		private ActivityManager $activityManager,

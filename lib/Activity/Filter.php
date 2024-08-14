@@ -28,20 +28,11 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 
 class Filter implements IFilter {
-	protected $appName;
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	public function __construct(string $appName,
-		IL10N $l10n,
-		IURLGenerator $urlGenerator) {
-		$this->appName = $appName;
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
+	public function __construct(
+		protected string $appName,
+		private IL10N $l10n,
+		private IURLGenerator $urlGenerator
+	) {
 	}
 
 	/**

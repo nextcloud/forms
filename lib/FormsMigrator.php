@@ -53,54 +53,20 @@ use Throwable;
 class FormsMigrator implements IMigrator {
 	use TMigratorBasicVersionHandling;
 
-	/** @var AnswerMapper */
-	private $answerMapper;
-
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var OptionMapper */
-	private $optionMapper;
-
-	/** @var QuestionMapper */
-	private $questionMapper;
-
-	/** @var SubmissionMapper */
-	private $submissionMapper;
-
-	/** @var FormsService */
-	private $formsService;
-
-	/** @var SubmissionService */
-	private $submissionService;
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var IUserManager */
-	private $userManager;
-
 	private const PATH_ROOT = Application::APP_ID . '/';
 	private const PATH_MYAPP_FILE = FormsMigrator::PATH_ROOT . 'forms.json';
 
-	public function __construct(AnswerMapper $answerMapper,
-		FormMapper $formMapper,
-		OptionMapper $optionMapper,
-		QuestionMapper $questionMapper,
-		SubmissionMapper $submissionMapper,
-		FormsService $formsService,
-		SubmissionService $submissionService,
-		IL10N $l10n,
-		IUserManager $userManager) {
-		$this->answerMapper = $answerMapper;
-		$this->formMapper = $formMapper;
-		$this->optionMapper = $optionMapper;
-		$this->questionMapper = $questionMapper;
-		$this->submissionMapper = $submissionMapper;
-		$this->formsService = $formsService;
-		$this->submissionService = $submissionService;
-		$this->l10n = $l10n;
-		$this->userManager = $userManager;
+	public function __construct(
+		private AnswerMapper $answerMapper,
+		private FormMapper $formMapper,
+		private OptionMapper $optionMapper,
+		private QuestionMapper $questionMapper,
+		private SubmissionMapper $submissionMapper,
+		private FormsService $formsService,
+		private SubmissionService $submissionService,
+		private IL10N $l10n,
+		private IUserManager $userManager
+	) {
 	}
 
 	/**

@@ -29,14 +29,14 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method integer getFormId()
- * @method void setFormId(integer $value)
+ * @method int getFormId()
+ * @method void setFormId(int $value)
  * @method string getOriginalFileName()
  * @method void setOriginalFileName(string $value)
- * @method integer getFileId()
- * @method void setFileId(integer $value)
- * @method integer getCreated()
- * @method void setCreated(integer $value)
+ * @method int getFileId()
+ * @method void setFileId(int $value)
+ * @method int getCreated()
+ * @method void setCreated(int $value)
  */
 class UploadedFile extends Entity {
 	protected $formId;

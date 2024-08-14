@@ -31,19 +31,12 @@ use Psr\Log\LoggerInterface;
 
 class UserDeletedJob extends QueuedJob {
 
-	/** @var FormMapper */
-	private $formMapper;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	public function __construct(FormMapper $formMapper,
+	public function __construct(
+		private FormMapper $formMapper,
 		ITimeFactory $time,
-		LoggerInterface $logger) {
+		private LoggerInterface $logger
+	) {
 		parent::__construct($time);
-
-		$this->formMapper = $formMapper;
-		$this->logger = $logger;
 	}
 
 	/**

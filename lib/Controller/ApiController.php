@@ -67,9 +67,8 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 class ApiController extends OCSController {
-	/** @var IUser */
-	private $currentUser;
-
+	private ?IUser $currentUser;
+	
 	public function __construct(
 		string $appName,
 		IRequest $request,
