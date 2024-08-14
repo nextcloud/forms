@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { Locator, Page } from '@playwright/test'
+import type { Locator, Page, Response } from '@playwright/test'
 import type { QuestionType } from './QuestionType'
 import { QuestionSection } from './QuestionSection'
 
 export class FormSection {
 	public readonly mainContent: Locator
 	public readonly titleField: Locator
+	public readonly descriptionField: Locator
 	public readonly newQuestionButton: Locator
 
 	// eslint-disable-next-line no-useless-constructor
@@ -21,10 +22,21 @@ export class FormSection {
 		this.titleField = this.mainContent.getByRole('textbox', {
 			name: 'Form title',
 		})
+		this.descriptionField = this.mainContent.getByRole('textbox', {
+			name: 'Description',
+		})
 	}
 
 	public async fillTitle(text: string): Promise<void> {
+		const update = this.getFormUpdatedPromise()
 		await this.titleField.fill(text)
+		await update
+	}
+
+	public async fillDescription(text: string): Promise<void> {
+		const update = this.getFormUpdatedPromise()
+		await this.descriptionField.fill(text)
+		await update
 	}
 
 	public async addQuestion(type: QuestionType): Promise<void> {
@@ -39,5 +51,16 @@ export class FormSection {
 			.then((sections) =>
 				sections.map((section) => new QuestionSection(this.page, section)),
 			)
+	}
+
+	private getFormUpdatedPromise(): Promise<Response> {
+		return this.page.waitForResponse(
+			(response) =>
+				response.request().method() === 'PATCH' &&
+				response
+					.request()
+					.url()
+					.endsWith('/ocs/v2.php/apps/forms/api/v2.4/form/update'),
+		)
 	}
 }
