@@ -174,7 +174,7 @@ export default {
 <style lang="scss" scoped>
 .share-div {
 	display: flex;
-	height: 44px;
+	height: var(--default-clickable-area);
 	align-items: center;
 
 	&__desc {

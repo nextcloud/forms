@@ -21,6 +21,7 @@
   -->
 <template>
 	<div
+		:aria-label="t('forms', 'View mode')"
 		class="top-bar"
 		:class="{
 			'top-bar--has-sidebar': sidebarOpened,
@@ -60,6 +61,7 @@
 
 <script>
 import { mdiEye, mdiPencil, mdiPoll } from '@mdi/js'
+import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
@@ -118,6 +120,8 @@ export default {
 
 	setup() {
 		return {
+			t,
+
 			isMobile: useIsMobile(),
 		}
 	},
@@ -206,7 +210,7 @@ export default {
 
 	// align with navigation and sidebar toggle, but ensure it is not overlayed
 	padding: var(--app-navigation-padding);
-	margin-inline: var(--default-clickable-area, 44px);
+	margin-inline: var(--default-clickable-area);
 
 	position: sticky;
 	top: 0;

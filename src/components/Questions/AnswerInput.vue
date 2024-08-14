@@ -221,7 +221,7 @@ export default {
 .question__item {
 	position: relative;
 	display: inline-flex;
-	min-height: 44px;
+	min-height: var(--default-clickable-area);
 
 	&__pseudoInput {
 		color: var(--color-primary-element);

@@ -375,7 +375,7 @@ export default {
 	flex-direction: column;
 	justify-content: stretch;
 	margin-block-end: 64px;
-	padding-inline-start: 44px;
+	padding-inline-start: var(--default-clickable-area);
 	user-select: none;
 	background-color: var(--color-main-background);
 
@@ -394,7 +394,7 @@ export default {
 		flex-direction: column;
 		justify-content: center;
 		gap: 12px;
-		width: 44px;
+		width: var(--default-clickable-area);
 		height: 100%;
 		opacity: 0.5;
 		cursor: grab;
@@ -406,7 +406,7 @@ export default {
 
 		// Avoid moving drag-handle due to newAnswer-input on multiple-Questions
 		&--shiftup {
-			height: calc(100% - 44px);
+			height: calc(100% - var(--default-clickable-area));
 		}
 
 		&:hover,
