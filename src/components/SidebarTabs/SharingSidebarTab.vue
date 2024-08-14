@@ -480,7 +480,7 @@ export default {
 <style lang="scss" scoped>
 .share-div {
 	display: flex;
-	min-height: 44px;
+	min-height: var(--default-clickable-area);
 	align-items: center;
 
 	&--link {

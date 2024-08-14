@@ -650,7 +650,7 @@ export default {
 			align-self: flex-start;
 
 			// To align with text
-			margin-inline-start: 44px;
+			margin-inline-start: var(--default-clickable-area);
 		}
 	}
 }

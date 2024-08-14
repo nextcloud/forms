@@ -347,7 +347,7 @@ export default {
 .question__item {
 	position: relative;
 	display: inline-flex;
-	min-height: 44px;
+	min-height: var(--default-clickable-area);
 
 	.question__input {
 		width: 100%;

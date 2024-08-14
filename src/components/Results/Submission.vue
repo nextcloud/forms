@@ -145,7 +145,7 @@ export default {
 
 <style lang="scss" scoped>
 .submission {
-	padding-inline: 44px 16px;
+	padding-inline: var(--default-clickable-area) 16px;
 
 	&-head {
 		display: flex;

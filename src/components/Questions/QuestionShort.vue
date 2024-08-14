@@ -252,7 +252,7 @@ export default {
 <style lang="scss" scoped>
 .question__input {
 	width: 100%;
-	min-height: 44px;
+	min-height: var(--default-clickable-area);
 
 	&:disabled {
 		width: calc(100% - 32px) !important;
@@ -262,7 +262,7 @@ export default {
 
 .validation-type-menu__toggle {
 	position: relative;
-	left: calc(100% - 44px);
+	left: calc(100% - var(--default-clickable-area));
 	top: -47px; // input height + margin
 }
 
