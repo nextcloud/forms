@@ -118,26 +118,40 @@
 						</NcActionButton>
 					</template>
 				</NcListItem>
+				<li v-if="fileLoading" class="question__loading">
+					<NcLoadingIcon v-show="fileLoading" />
+					{{ t('forms', 'Uploading …') }}
+				</li>
+				<li v-else-if="values.length < maxAllowedFilesCount">
+					<div class="question__input-wrapper">
+						<label>
+							{{ t('forms', 'Add new file as answer') }}
+							<input
+								ref="fileInput"
+								class="hidden-visually"
+								type="file"
+								:disabled="!readOnly"
+								:multiple="maxAllowedFilesCount > 1"
+								:name="name || undefined"
+								:accept="accept.length ? accept.join(',') : null"
+								@input="onFileInput" />
+						</label>
+						<NcButton
+							:disabled="
+								!readOnly || values.length >= maxAllowedFilesCount
+							"
+							type="tertiary-no-background"
+							@click="toggleFileInput">
+							<template #icon>
+								<IconUploadMultiple
+									v-if="maxAllowedFilesCount > 1"
+									:size="20" />
+								<IconUpload v-else :size="20" />
+							</template>
+						</NcButton>
+					</div>
+				</li>
 			</ul>
-
-			<div class="question__input--wrapper">
-				<NcLoadingIcon v-show="fileLoading" />
-
-				<input
-					v-show="!fileLoading"
-					ref="fileInput"
-					type="file"
-					:aria-label="
-						t('forms', 'A file answer for the question “{text}”', {
-							text,
-						})
-					"
-					:disabled="!readOnly || values.length >= maxAllowedFilesCount"
-					:multiple="maxAllowedFilesCount > 1"
-					:name="name || undefined"
-					:accept="accept.length ? accept.join(',') : null"
-					@input="onFileInput" />
-			</div>
 		</div>
 	</Question>
 </template>
@@ -147,10 +161,13 @@ import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
 import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlert.vue'
+import IconUpload from 'vue-material-design-icons/Upload.vue'
+import IconUploadMultiple from 'vue-material-design-icons/UploadMultiple.vue'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
 import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator.js'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcListItem from '@nextcloud/vue/dist/Components/NcListItem.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
@@ -176,10 +193,13 @@ export default {
 		IconDelete,
 		IconFile,
 		IconFileDocumentAlert,
+		IconUpload,
+		IconUploadMultiple,
 		NcActionButton,
 		NcActionCheckbox,
 		NcActionInput,
 		NcActionSeparator,
+		NcButton,
 		NcListItem,
 		NcLoadingIcon,
 	},
@@ -243,6 +263,10 @@ export default {
 	},
 
 	methods: {
+		toggleFileInput() {
+			this.$refs.fileInput.click()
+		},
+
 		async onFileInput() {
 			const fileInput = this.$refs.fileInput
 			const formData = new FormData()
@@ -381,24 +405,56 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .file-type-checkbox {
 	margin-left: 30px;
 }
-
-.question__input--wrapper {
-	&:has(input:disabled) {
-		margin-left: -13px;
+.question {
+	&--editable {
+		.question__input-wrapper {
+			margin-inline-start: -13px;
+		}
 	}
 
-	input {
-		height: 44px;
-		padding-top: 8px;
+	&__loading {
+		display: flex;
+		justify-content: center;
+		width: 300px;
 	}
 
-	input:disabled {
-		height: 35px;
-		padding-top: 3px;
+	&__input-wrapper {
+		--focus-offset: calc(
+			(var(--border-width-input-focused, 2px) - var(--border-width-input, 2px))
+		);
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border: var(--border-width-input, 2px) solid var(--color-border-dark);
+		border-radius: var(--border-radius-element, var(--border-radius-large));
+		padding-inline: calc(3 * var(--default-grid-baseline)) var(--focus-offset);
+		padding-block: var(--focus-offset);
+		height: var(--default-clickable-area);
+		width: 300px;
+
+		label {
+			color: var(--color-text-maxcontrast);
+
+			&:has(input:disabled) {
+				cursor: default;
+			}
+		}
+
+		&:hover,
+		&:focus-within {
+			border-color: var(--color-main-text);
+			border-width: var(--border-width-input-focused, 2px);
+			padding-block: 0;
+			padding-inline: calc(
+					3 * var(--default-grid-baseline) - var(--focus-offset)
+				)
+				0;
+		}
 	}
 }
 </style>
