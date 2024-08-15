@@ -7,6 +7,7 @@ OC.L10N.register(
     "Options" : "Pilihan",
     "Cancel" : "Batal",
     "Delete" : "Hapus",
+    "Uploading …" : "Mengunggah …",
     "Other" : "Lainnya",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
     "Group" : "Grup",

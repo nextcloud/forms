@@ -7,6 +7,7 @@ OC.L10N.register(
     "Cancel" : "Цуцлах",
     "Required" : "Шаардлагатай",
     "Delete" : "Устгах",
+    "Uploading …" : "Байршуулж байна...",
     "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Group" : "Бүлэг",
     "Share link" : "Холбоос хуваалцах",

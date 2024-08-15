@@ -7,6 +7,7 @@ OC.L10N.register(
     "Select groups" : "Seleccionar grupos",
     "Required" : "Requerido",
     "Delete" : "Borrar",
+    "Uploading …" : "Cargando...",
     "Set expiration date" : "Establecer fecha de expiración",
     "Permissions" : "Permisos",
     "Group" : "Grupo",

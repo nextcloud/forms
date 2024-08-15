@@ -10,6 +10,7 @@ OC.L10N.register(
     "Cancel" : "Hủy",
     "Required" : "Bắt buộc",
     "Delete" : "Xóa",
+    "Uploading …" : "Đang tải lên …",
     "Other" : "Khác",
     "Set expiration date" : "Đặt ngày hết hạn",
     "Group" : "N",

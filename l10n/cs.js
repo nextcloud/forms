@@ -137,6 +137,7 @@ OC.L10N.register(
     "I understand, transfer this form" : "Rozumím, předat tento formulář",
     "This form is now owned by" : "Tento formulář je nyní vlastněn",
     "An error occurred while transfering ownership" : "Došlo k chybě při předávání vlastnictví",
+    "View mode" : "Režim zobrazení",
     "Share" : "Sdílet",
     "Toggle settings" : "Přepnout nastavení",
     "View form" : "Zobrazit formulář",

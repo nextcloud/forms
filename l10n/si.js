@@ -6,6 +6,7 @@ OC.L10N.register(
     "Anonymous response" : "නිර්නාමික ප්‍රතිචාරය",
     "responses" : "ප්‍රතිචාර",
     "Cancel" : "අවලංගු",
+    "Uploading …" : "උඩුගත වෙමින්…",
     "Other" : "වෙනත්",
     "Group" : "සමූහය",
     "Share" : "බෙදාගන්න",

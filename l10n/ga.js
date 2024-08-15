@@ -97,7 +97,7 @@ OC.L10N.register(
     "Maximum number of files" : "Uaslíon comhad",
     "Maximum file size" : "Uasmhéid comhaid",
     "Delete" : "Scrios",
-    "A file answer for the question “{text}”" : "Freagra comhaid don cheist “{text}”",
+    "Uploading …" : "Á uaslódáil…",
     "Allowed file types: {fileTypes}." : "Cineálacha comhaid ceadaithe: {fileTypes}.",
     "All file types are allowed." : "Tá gach cineál comhaid ceadaithe.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Tá an comhad {fileName} ró-mhór. Is é {maxFileSize} an t-uasmhéid comhaid.",

@@ -46,6 +46,7 @@ OC.L10N.register(
     "This question needs a title!" : "คำถามนี้ต้องใส่หัวข้อ!",
     "Add a new answer" : "เพิ่มคำตอบใหม่",
     "Delete" : "ลบ",
+    "Uploading …" : "กำลังอัปโหลด …",
     "Other" : "อื่น ๆ",
     "No response" : "ไม่มีการตอบกลับ",
     "Delete this response" : "ลบการตอบกลับนี้",

@@ -9,6 +9,7 @@ OC.L10N.register(
     "Select groups" : "Select groups",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
+    "Uploading …" : "Uploading …",
     "Other" : "Other",
     "Set expiration date" : "Set expiration date",
     "Permissions" : "Permissions",
