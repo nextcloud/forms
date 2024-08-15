@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.0-alpha3 - 2024-08-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha2...v4.3.0-alpha3)
+
+-   merged: fix app store build workflow
+
 ## v4.3.0-alpha2 - 2024-08-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha1...v4.3.0-alpha2)
