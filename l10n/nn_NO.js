@@ -6,6 +6,7 @@ OC.L10N.register(
     "Select groups" : "Vel grupper",
     "Required" : "Nødvendig",
     "Delete" : "Slett",
+    "Uploading …" : "Lastar opp...",
     "Other" : "Anna",
     "Set expiration date" : "Set utløpsdato",
     "Group" : "Gruppe",

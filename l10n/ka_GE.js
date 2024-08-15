@@ -8,6 +8,7 @@ OC.L10N.register(
     "Cancel" : "გაუქმება",
     "Required" : "სავალდებულო",
     "Delete" : "წაშლა",
+    "Uploading …" : "იტვირთება ...",
     "Other" : "სხვა",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
     "Permissions" : "უფლებები",

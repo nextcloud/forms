@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.3.0-alpha3 - 2024-08-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha2...v4.3.0-alpha3)
+
+-   merged: fix app store build workflow
+
+## v4.3.0-alpha2 - 2024-08-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha1...v4.3.0-alpha2)
+
+### Fixed
+
+-   fix: Improve styles of layout for QuestionFile #2253 by @Koc in [\#2259](https://github.com/nextcloud/forms/pull/2259)
+
 ## v4.3.0-alpha1 - 2024-08-14
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.4...v4.3.0-alpha1)

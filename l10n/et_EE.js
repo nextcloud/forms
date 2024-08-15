@@ -7,6 +7,7 @@ OC.L10N.register(
     "Cancel" : "Tühista",
     "Required" : "Kohustuslik",
     "Delete" : "Kustuta",
+    "Uploading …" : "Üleslaadmine ...",
     "Other" : "Muu",
     "Set expiration date" : "Määra aegumise kuupäev",
     "Group" : "Grupp",

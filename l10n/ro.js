@@ -11,6 +11,7 @@ OC.L10N.register(
     "Cancel" : "Anulare",
     "Required" : "Necesar",
     "Delete" : "Șterge",
+    "Uploading …" : "Încărcare...",
     "Other" : "Altele",
     "Set expiration date" : "Specifică data expirării",
     "Permissions" : "Permisiuni",

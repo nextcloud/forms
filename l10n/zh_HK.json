@@ -95,7 +95,7 @@
     "Maximum number of files" : "最大檔案數目",
     "Maximum file size" : "最大檔案大小",
     "Delete" : "刪除",
-    "A file answer for the question “{text}”" : "問題「{text}」的檔案答案",
+    "Uploading …" : "上傳中...",
     "Allowed file types: {fileTypes}." : "允許的檔案類型：{fileTypes}。",
     "All file types are allowed." : "允許所有檔案類型。",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "檔案 {fileName} 太大。最大檔案大小為 {maxFileSize}。",

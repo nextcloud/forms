@@ -59,6 +59,7 @@ OC.L10N.register(
     "Add a new answer" : "Pridėti naują atsakymą",
     "Maximum file size" : "Didžiausias failo dydis",
     "Delete" : "Ištrinti",
+    "Uploading …" : "Įkeliama…",
     "A long answer for the question “{text}”" : "Ilgas atsakymas į klausimą „{text}“",
     "Other" : "Kita",
     "A short answer for the question “{text}”" : "Trumpas atsakymas į klausimą „{text}“",
