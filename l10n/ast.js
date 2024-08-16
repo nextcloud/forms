@@ -41,6 +41,7 @@ OC.L10N.register(
     "This question needs a title!" : "¡Esta entruga precisa un títulu!",
     "There was an issue deleting this option" : "Hebo un problema al desaniciar esta opción",
     "Delete" : "Desaniciar",
+    "Uploading …" : "Xubiendo…",
     "Invalid regular expression" : "La espresión regular ye inválida",
     "No response" : "Nun hai nenguna rempuesta",
     "Delete this response" : "Desaniciar esta rempuesta",

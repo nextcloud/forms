@@ -96,6 +96,7 @@
     "Maximum file size" : "Tamanho máximo de arquivo",
     "Delete" : "Excluir",
     "Uploading …" : "Enviando...",
+    "Add new file as answer" : "Adicione novo arquivo como resposta",
     "Allowed file types: {fileTypes}." : "Tipos de arquivo permitidos: {fileTypes}.",
     "All file types are allowed." : "Todos os tipos de arquivo são permitidos.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "O arquivo {fileName} é muito grande. O tamanho máximo do arquivo é {maxFileSize}.",
