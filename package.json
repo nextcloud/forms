@@ -29,7 +29,7 @@
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
-    "@nextcloud/auth": "^2.3.0",
+    "@nextcloud/auth": "^2.4.0",
     "@nextcloud/axios": "^2.5.0",
     "@nextcloud/dialogs": "^5.3.5",
     "@nextcloud/event-bus": "^3.3.1",
