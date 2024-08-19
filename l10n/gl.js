@@ -259,7 +259,7 @@ OC.L10N.register(
     "People can pick one option" : "A xente pode escoller unha opción",
     "Pick an option" : "Escolla unha opción",
     "File" : "Ficheiro",
-    "File question title" : "Título da pregunta do ficheiro",
+    "File question title" : "Título da pregunta de ficheiro",
     "Short answer" : "Resposta curta",
     "Short answer question title" : "Título da pregunta de resposta curta",
     "People can enter a short answer" : "A xente pode introducir unha resposta curta",
