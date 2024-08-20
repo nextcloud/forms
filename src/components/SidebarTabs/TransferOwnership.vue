@@ -46,7 +46,9 @@
 						t(
 							'forms',
 							'You\'re going to transfer the ownership of {name} to another account. Please select the account to which you want to transfer ownership.',
-							{ name: `<strong>${form.title}</strong>` },
+							{
+								name: `<strong>${escapedString(form.title)}</strong>`,
+							},
 							undefined,
 							{ escape: false },
 						)
@@ -78,7 +80,9 @@
 						t(
 							'forms',
 							'Type {text} to confirm.',
-							{ text: `<strong>${confirmationString}</strong>` },
+							{
+								text: `<strong>${escapedString(confirmationString)}</strong>`,
+							},
 							undefined,
 							{ escape: false },
 						)
@@ -167,6 +171,9 @@ export default {
 		},
 		closeModal() {
 			this.showModal = false
+		},
+		escapedString(textToEscape) {
+			return '' + textToEscape.replace('<', '&lt;').replace('>', '&gt;')
 		},
 		openModal() {
 			this.showModal = true
