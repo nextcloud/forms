@@ -65,7 +65,7 @@
 				<!-- TODO: remove with Forms 5.0
 				 Show info about legacyLink that will be removed -->
 				<NcNoteCard
-					v-if="form.access.legacyLink"
+					v-if="form.access?.legacyLink"
 					type="warning"
 					:heading="t('forms', 'Legacy link in use')">
 					{{
