@@ -32,7 +32,6 @@ use OCP\Activity\IManager;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
-use OCP\IUserSession;
 use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -61,17 +60,8 @@ class ActivityManagerTest extends TestCase {
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->circlesService = $this->createMock(CirclesService::class);
-		$userSession = $this->createMock(IUserSession::class);
 
-		$user = $this->createMock(IUser::class);
-		$user->expects($this->any())
-			->method('getUID')
-			->willReturn('currentUser');
-		$userSession->expects($this->once())
-			->method('getUser')
-			->willReturn($user);
-
-		$this->activityManager = new ActivityManager('forms', $this->manager, $this->groupManager, $this->logger, $userSession, $this->circlesService);
+		$this->activityManager = new ActivityManager('forms', 'currentUser', $this->manager, $this->groupManager, $this->logger, $this->circlesService);
 	}
 
 	public function testPublishNewShare() {
