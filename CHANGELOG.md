@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.0-alpha4 - 2024-08-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha3...v4.3.0-alpha4)
+
+### Fixed
+
+-   Fix: Show complete title in TransferOwnership dialog by @Chartman123 in [\#2292](https://github.com/nextcloud/forms/pull/2292)
+-   fix(submit): `access` is unset for public forms so check for existance first by @susnux in [\#2291](https://github.com/nextcloud/forms/pull/2291)
+
 ## v4.3.0-alpha3 - 2024-08-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha2...v4.3.0-alpha3)

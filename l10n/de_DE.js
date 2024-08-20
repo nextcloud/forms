@@ -98,6 +98,7 @@ OC.L10N.register(
     "Maximum file size" : "Maximale Dateigröße",
     "Delete" : "Löschen",
     "Uploading …" : "Lade hoch …",
+    "Add new file as answer" : "Neue Datei als Antwort hinzufügen",
     "Allowed file types: {fileTypes}." : "Erlaubte Dateitypen: {fileTypes}.",
     "All file types are allowed." : "Alle Dateitypen sind zulässig.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Die Datei {fileName} ist zu groß. Die maximale Dateigröße beträgt {maxFileSize}.",

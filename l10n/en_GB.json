@@ -96,6 +96,7 @@
     "Maximum file size" : "Maximum file size",
     "Delete" : "Delete",
     "Uploading …" : "Uploading …",
+    "Add new file as answer" : "Add new file as answer",
     "Allowed file types: {fileTypes}." : "Allowed file types: {fileTypes}.",
     "All file types are allowed." : "All file types are allowed.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "The file {fileName} is too large. The maximum file size is {maxFileSize}.",

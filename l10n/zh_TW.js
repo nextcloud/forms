@@ -98,6 +98,7 @@ OC.L10N.register(
     "Maximum file size" : "最大檔案大小",
     "Delete" : "刪除",
     "Uploading …" : "正在上傳……",
+    "Add new file as answer" : "新增檔案作為答案",
     "Allowed file types: {fileTypes}." : "允許的檔案類型：{fileTypes}。",
     "All file types are allowed." : "允許所有檔案類型。",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "檔案 {fileName} 太大。最大檔案大小為 {maxFileSize}。",

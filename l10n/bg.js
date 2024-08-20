@@ -71,6 +71,7 @@ OC.L10N.register(
     "There was an issue deleting this option" : "Възникна проблем при изтриването на тази опция",
     "Maximum file size" : "Максимален размер на файл",
     "Delete" : "Изтриване",
+    "Uploading …" : "Качване …",
     "A long answer for the question “{text}”" : "Дълъг отговор на въпроса „{text}“ 48",
     "Other" : "Други",
     "A short answer for the question “{text}”" : "Кратък отговор на въпроса „{text}“",
