@@ -73,6 +73,7 @@ OC.L10N.register(
     "There was an issue deleting this option" : "Hi ha hagut un problema en suprimir aquesta opció",
     "Maximum file size" : "Mida màxima dels fitxers",
     "Delete" : "Suprimeix",
+    "Uploading …" : "S'està pujant…",
     "A long answer for the question “{text}”" : "Resposta llarga per a la pregunta «{text}»",
     "Other" : "Altres",
     "A short answer for the question “{text}”" : "Resposta curta per a la pregunta «{text}»",

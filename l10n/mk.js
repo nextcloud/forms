@@ -23,6 +23,7 @@ OC.L10N.register(
     "This form has expired and is no longer taking answers" : "Оваа форма е истечена и повеќе неможе да се внесуваат оговари",
     "Select groups" : "Одбери групи",
     "Share form" : "Сподели форма",
+    "Results" : "Резултати",
     "Delete form" : "Избриши форма",
     "Are you sure you want to delete {title}?" : "Дали си сигурен дека сакаш да ја избришеш {title}?",
     "Error while deleting {title}" : "Грешка при бришење на {title}",

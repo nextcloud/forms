@@ -7,6 +7,7 @@ OC.L10N.register(
     "Select groups" : "Choaz ar strolladoù",
     "Cancel" : "Nullañ",
     "Delete" : "Lemel",
+    "Uploading …" : "O pellgas ...",
     "Set expiration date" : "Lakaat un deizat termen",
     "Group" : "Stollad",
     "Share link" : "Lodañ al liamm",
