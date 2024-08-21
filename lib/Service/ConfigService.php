@@ -36,7 +36,7 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 class ConfigService {
-	private IUser $currentUser;
+	private ?IUser $currentUser;
 		
 	public function __construct(
 		protected string $appName,
@@ -107,6 +107,10 @@ class ConfigService {
 	 * @return bool
 	 */
 	public function canCreateForms(): bool {
+		if ($this->currentUser === null) {
+			return false;
+		}
+
 		// Restriction active or not
 		if (!$this->getRestrictCreation()) {
 			return true;
