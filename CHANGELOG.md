@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.0-alpha5 - 2024-08-21
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha4...v4.3.0-alpha5)
+
+### Fixed
+
+-   fix: DI `userId` instead of `userSession` in [\#2293](https://github.com/nextcloud/forms/pull/2293)
+
 ## v4.3.0-alpha4 - 2024-08-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha3...v4.3.0-alpha4)
