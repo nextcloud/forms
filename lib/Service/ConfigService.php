@@ -36,8 +36,8 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 class ConfigService {
-	private IUser $currentUser;
-		
+	private ?IUser $currentUser;
+
 	public function __construct(
 		protected string $appName,
 		private IConfig $config,
@@ -110,6 +110,10 @@ class ConfigService {
 		// Restriction active or not
 		if (!$this->getRestrictCreation()) {
 			return true;
+		}
+
+		if ($this->currentUser === null) {
+			return false;
 		}
 
 		$userGroups = $this->groupManager->getUserGroupIds($this->currentUser);

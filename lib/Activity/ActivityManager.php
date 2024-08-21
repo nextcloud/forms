@@ -35,8 +35,8 @@ use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
 class ActivityManager {
-	private IUser $currentUser;
-	
+	private ?IUser $currentUser;
+
 	public function __construct(
 		protected string $appName,
 		private IManager $manager,
