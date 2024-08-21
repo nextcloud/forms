@@ -29,23 +29,20 @@ use OCA\Forms\Service\CirclesService;
 use OCP\Activity\IManager;
 use OCP\IGroupManager;
 use OCP\IUser;
-use OCP\IUserSession;
 use OCP\Share\IShare;
 
 use Psr\Log\LoggerInterface;
 
 class ActivityManager {
-	private IUser $currentUser;
 	
 	public function __construct(
 		protected string $appName,
+		private ?string $userId,
 		private IManager $manager,
 		private IGroupManager $groupManager,
 		private LoggerInterface $logger,
-		private IUserSession $userSession,
 		private CirclesService $circlesService,
 	) {
-		$this->currentUser = $userSession->getUser();
 	}
 
 	/**
@@ -58,9 +55,9 @@ class ActivityManager {
 		$event->setApp($this->appName)
 			->setType(ActivityConstants::TYPE_NEWSHARE)
 			->setAffectedUser($shareeId)
-			->setAuthor($this->currentUser->getUID())
+			->setAuthor($this->userId)
 			->setSubject(ActivityConstants::SUBJECT_NEWSHARE, [
-				'userId' => $this->currentUser->getUID(),
+				'userId' => $this->userId,
 				'formTitle' => $form->getTitle(),
 				'formHash' => $form->getHash()
 			])
@@ -82,9 +79,9 @@ class ActivityManager {
 			$event->setApp($this->appName)
 				->setType(ActivityConstants::TYPE_NEWSHARE)
 				->setAffectedUser($user->getUID())
-				->setAuthor($this->currentUser->getUID())
+				->setAuthor($this->userId)
 				->setSubject(ActivityConstants::SUBJECT_NEWGROUPSHARE, [
-					'userId' => $this->currentUser->getUID(),
+					'userId' => $this->userId,
 					'groupId' => $groupId,
 					'formTitle' => $form->getTitle(),
 					'formHash' => $form->getHash()
@@ -109,9 +106,9 @@ class ActivityManager {
 			$event->setApp($this->appName)
 				->setType(ActivityConstants::TYPE_NEWSHARE)
 				->setAffectedUser($user)
-				->setAuthor($this->currentUser->getUID())
+				->setAuthor($this->userId)
 				->setSubject(ActivityConstants::SUBJECT_NEWCIRCLESHARE, [
-					'userId' => $this->currentUser->getUID(),
+					'userId' => $this->userId,
 					'circleId' => $circleId,
 					'formTitle' => $form->getTitle(),
 					'formHash' => $form->getHash()

@@ -138,6 +138,7 @@ class SubmissionServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->submissionMapper,
 			$this->answerMapper,
+			$this->uploadedFileMapper,
 			$this->storage,
 			$this->config,
 			$this->l10n,
@@ -148,7 +149,6 @@ class SubmissionServiceTest extends TestCase {
 			$this->tempManager,
 			$this->formsService,
 			$this->urlGenerator,
-			$this->uploadedFileMapper,
 		);
 	}
 
