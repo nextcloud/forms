@@ -41,7 +41,7 @@ jobs:
         uses: skjnldsv/xpath-action@7e6a7c379d0e9abc8acaef43df403ab4fc4f770c # master
         with:
           filename: ${{ env.APP_NAME }}/appinfo/info.xml
-          expression: '//info//dependencies//nextcloud/@min-version'
+          expression: "//info//dependencies//nextcloud/@min-version"
 
       - name: Read package.json node and npm engines version
         uses: skjnldsv/read-package-engines-version-actions@06d6baf7d8f41934ab630e97d9e6c0bc9c9ac5e4 # v3
@@ -83,7 +83,7 @@ jobs:
         id: check_composer
         uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v3.0.0
         with:
-          files: '${{ env.APP_NAME }}/composer.json'
+          files: "${{ env.APP_NAME }}/composer.json"
 
       - name: Install composer dependencies
         if: steps.check_composer.outputs.files_exists == 'true'
