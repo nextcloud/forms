@@ -3,6 +3,9 @@
 **/.svn
 **/.hg
 
+# Github workflows
+.github/
+
 # 3rdparty dependencies
 **/node_modules
 **/vendor
