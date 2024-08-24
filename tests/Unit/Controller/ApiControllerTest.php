@@ -455,26 +455,26 @@ class ApiControllerTest extends TestCase {
 		// Create a partial mock, as we only test newForm and not getForm
 		/** @var ApiController|MockObject */
 		$apiController = $this->getMockBuilder(ApiController::class)
-			 ->onlyMethods(['getForm'])
-			 ->setConstructorArgs(['forms',
-			 	$this->request,
-			 	$this->createUserSession(),
-			 	$this->answerMapper,
-			 	$this->formMapper,
-			 	$this->optionMapper,
-			 	$this->questionMapper,
-			 	$this->shareMapper,
-			 	$this->submissionMapper,
-			 	$this->configService,
-			 	$this->formsService,
-			 	$this->submissionService,
-			 	$this->l10n,
-			 	$this->logger,
-			 	$this->userManager,
-			 	$this->storage,
-			 	$this->uploadedFileMapper,
-			 	$this->mimeTypeDetector,
-			 ])->getMock();
+			->onlyMethods(['getForm'])
+			->setConstructorArgs(['forms',
+				$this->request,
+				$this->createUserSession(),
+				$this->answerMapper,
+				$this->formMapper,
+				$this->optionMapper,
+				$this->questionMapper,
+				$this->shareMapper,
+				$this->submissionMapper,
+				$this->configService,
+				$this->formsService,
+				$this->submissionService,
+				$this->l10n,
+				$this->logger,
+				$this->userManager,
+				$this->storage,
+				$this->uploadedFileMapper,
+				$this->mimeTypeDetector,
+			])->getMock();
 		// Set the time that should be set for `lastUpdated`
 		\OCA\Forms\Controller\time(123456789);
 

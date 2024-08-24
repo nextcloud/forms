@@ -1421,7 +1421,7 @@ CSV
 	 * Keep this test at the end as it might break other tests
 	 */
 	public function testTransferOwner() {
-		$resp = $this->http->request('POST', "api/v2.4/form/transfer", [
+		$resp = $this->http->request('POST', 'api/v2.4/form/transfer', [
 			'json' => [
 				'formId' => $this->testForms[0]['id'],
 				'uid' => 'user1'

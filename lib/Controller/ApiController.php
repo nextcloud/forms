@@ -697,7 +697,7 @@ class ApiController extends OCSController {
 
 		$questionData = $sourceQuestion->read();
 		unset($questionData['id']);
-		$questionData["order"] = end($allQuestions)->getOrder() + 1;
+		$questionData['order'] = end($allQuestions)->getOrder() + 1;
 
 		$newQuestion = Question::fromParams($questionData);
 		$this->questionMapper->insert($newQuestion);
@@ -947,7 +947,7 @@ class ApiController extends OCSController {
 				if ($optionIndex !== false) {
 					$answerText = $question['options'][$optionIndex]['text'];
 				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
-					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, "", $answer);
+					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
 				}
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
@@ -972,7 +972,7 @@ class ApiController extends OCSController {
 				$answerText = $answer; // Not a multiple-question, answerText is given answer
 			}
 
-			if ($answerText === "") {
+			if ($answerText === '') {
 				continue;
 			}
 
@@ -1143,7 +1143,7 @@ class ApiController extends OCSController {
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = "anon-user-".  hash('md5', strval(time() + rand()));
+			$anonID = 'anon-user-'.  hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());

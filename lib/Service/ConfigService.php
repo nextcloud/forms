@@ -52,19 +52,19 @@ class ConfigService {
 	 * Load the single values, decode, have default values
 	 */
 	public function getAllowPermitAll(): bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPERMITALL, "true"));
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPERMITALL, 'true'));
 	}
 	public function getAllowPublicLink(): bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPUBLICLINK, "true"));
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPUBLICLINK, 'true'));
 	}
 	private function getUnformattedCreationAllowedGroups(): array {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS, "[]"));
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS, '[]'));
 	}
 	public function getCreationAllowedGroups(): array {
 		return $this->formatGroupsForMultiselect($this->getUnformattedCreationAllowedGroups());
 	}
 	public function getRestrictCreation(): bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_RESTRICTCREATION, "false"));
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_RESTRICTCREATION, 'false'));
 	}
 
 	/**
