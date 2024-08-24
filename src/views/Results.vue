@@ -736,13 +736,40 @@ export default {
 				t('forms', 'Choose spreadsheet location'),
 			)
 				.setMultiSelect(false)
-				.allowDirectories()
+				.allowDirectories(true)
 				.setButtonFactory((selectedNodes, currentPath, currentView) => {
 					if (selectedNodes.length === 1) {
 						const extension = selectedNodes[0].extension
-							.slice(1)
-							.toLowerCase()
-						if (SUPPORTED_FILE_FORMATS[extension]) {
+							?.slice(1)
+							?.toLowerCase()
+						if (!extension) {
+							return [
+								{
+									label: t('forms', 'Create XLSX'),
+									icon: IconFileExcelSvg,
+									callback() {
+										fileFormat = 'xlsx'
+									},
+									type: 'secondary',
+								},
+								{
+									label: t('forms', 'Create CSV'),
+									icon: IconFileDelimitedSvg,
+									callback() {
+										fileFormat = 'csv'
+									},
+									type: 'secondary',
+								},
+								{
+									label: t('forms', 'Create ODS'),
+									icon: IconTableSvg,
+									callback() {
+										fileFormat = 'ods'
+									},
+									type: 'primary',
+								},
+							]
+						} else if (SUPPORTED_FILE_FORMATS[extension]) {
 							return [
 								{
 									label: t('forms', 'Select {file}', {
@@ -756,36 +783,9 @@ export default {
 								},
 							]
 						}
-
-						return []
 					}
 
-					return [
-						{
-							label: t('forms', 'Create XLSX'),
-							icon: IconFileExcelSvg,
-							callback() {
-								fileFormat = 'xlsx'
-							},
-							type: 'secondary',
-						},
-						{
-							label: t('forms', 'Create CSV'),
-							icon: IconFileDelimitedSvg,
-							callback() {
-								fileFormat = 'csv'
-							},
-							type: 'secondary',
-						},
-						{
-							label: t('forms', 'Create ODS'),
-							icon: IconTableSvg,
-							callback() {
-								fileFormat = 'ods'
-							},
-							type: 'primary',
-						},
-					]
+					return []
 				})
 				.build()
 
