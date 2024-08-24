@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.0-alpha6 - 2024-08-24
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha5...v4.3.0-alpha6)
+
+### Merged
+
+-   fix: make FilePicker work with latest dialogs by @Chartman123 in [\#2300](https://github.com/nextcloud/forms/pull/2300)
+
 ## v4.3.0-alpha5 - 2024-08-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha4...v4.3.0-alpha5)

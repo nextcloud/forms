@@ -1,6 +1,7 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "Vormid",
     "Copy" : "Kopeeri",
     "Shared with you" : "Sinuga jagatud",
     "Select groups" : "Vali grupid",
@@ -18,6 +19,8 @@ OC.L10N.register(
     "Share" : "Jaga",
     "Edit" : "Redigeeri",
     "Description" : "Kirjeldus",
+    "Responses are connected to your account." : "Vastused on seotud sinu kontoga.",
+    "An asterisk (*) indicates mandatory questions." : "Tärniga (*) tähistatud küsimustele vastamine on kohustuslik.",
     "Download" : "Laadi alla",
     "Summary" : "Kokkuvõte",
     "Sharing" : "Jagamine",
@@ -26,6 +29,8 @@ OC.L10N.register(
     "Abort" : "Katkesta",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
+    "Enter your answer" : "Sisesta oma vastus",
+    "Pick an option" : "Vali vastus",
     "File" : "Fail",
     "Date" : "Kuupäev",
     "Time" : "Aeg",

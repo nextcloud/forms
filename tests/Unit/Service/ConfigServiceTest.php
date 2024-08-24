@@ -222,7 +222,7 @@ class ConfigServiceTest extends TestCase {
 		$this->groupManager->expects($this->any())
 			->method('getUserGroupIds')
 			->with($this->currentUser)
-			->willReturn(["usersGroup"]);
+			->willReturn(['usersGroup']);
 		
 		$this->assertEquals($expected, $this->configService->canCreateForms());
 	}

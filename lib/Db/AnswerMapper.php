@@ -66,9 +66,9 @@ class AnswerMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->delete($this->getTableName())
-		->where(
-			$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT))
-		);
+			->where(
+				$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT))
+			);
 
 		$qb->executeStatement();
 	}

@@ -193,7 +193,7 @@ OC.L10N.register(
     "Linked file is not available, would you like to link a new file?" : "Le fichier associé n'est pas disponible, voulez-vous associer un nouveau fichier ?",
     "Loading responses …" : "Chargement des réponses…",
     "No responses yet" : "Pas de réponse actuellement",
-    "Results of submitted forms will show up here" : "Les résultats du formulaire soumis seront affichés ici",
+    "Results of submitted forms will show up here" : "Les résultats du formulaire soumis apparaîtront ici",
     "Create spreadsheet" : "Créer une feuille de calcul",
     "Open spreadsheet" : "Ouvrir la feuille de calcul",
     "{amount} responses" : "{amount} réponses",

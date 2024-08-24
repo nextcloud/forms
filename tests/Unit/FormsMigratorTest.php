@@ -210,19 +210,19 @@ JSON
 			->with(42)
 			->willReturn([
 				[
-					"id" => 14,
+					'id' => 14,
 					'formId' => 42,
-					"order" => 2,
-					"type" => "multiple",
-					"isRequired" => false,
-					"text" => "checkbox",
-					"description" => "huhu",
-					"extraSettings" => (object)[],
-					"options" => [
+					'order' => 2,
+					'type' => 'multiple',
+					'isRequired' => false,
+					'text' => 'checkbox',
+					'description' => 'huhu',
+					'extraSettings' => (object)[],
+					'options' => [
 						[
 							'id' => 35,
 							'questionId' => 14,
-							"text" => "ans1"
+							'text' => 'ans1'
 						]
 					]
 				]
@@ -234,14 +234,14 @@ JSON
 				[
 					'id' => 28,
 					'formId' => 42,
-					'userId' => "anyUser",
-					"timestamp" => 1651354059,
+					'userId' => 'anyUser',
+					'timestamp' => 1651354059,
 					'answers' => [
 						[
 							'id' => 35,
 							'submissionId' => 28,
-							"questionId" => 14,
-							"text" => "ans1"
+							'questionId' => 14,
+							'text' => 'ans1'
 						]
 					]
 				]
