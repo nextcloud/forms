@@ -4,7 +4,7 @@
 **/.hg
 
 # Github workflows
-.github/
+.github/workflows/
 
 # 3rdparty dependencies
 **/node_modules
