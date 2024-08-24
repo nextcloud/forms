@@ -135,7 +135,7 @@ class SubmissionMapper extends QBMapper {
 		$row = $result->fetch();
 		$result->closeCursor();
 
-		return (int) ($row['num_submissions'] ?? 0);
+		return (int)($row['num_submissions'] ?? 0);
 	}
 
 	/**
@@ -151,9 +151,9 @@ class SubmissionMapper extends QBMapper {
 
 		//Delete Submission
 		$qb->delete($this->getTableName())
-		->where(
-			$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
-		);
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			);
 
 		$qb->executeStatement();
 	}
@@ -173,9 +173,9 @@ class SubmissionMapper extends QBMapper {
 
 		//Delete Submissions
 		$qb->delete($this->getTableName())
-		->where(
-			$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-		);
+			->where(
+				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+			);
 
 		$qb->executeStatement();
 	}

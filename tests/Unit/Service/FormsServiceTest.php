@@ -873,7 +873,7 @@ class FormsServiceTest extends TestCase {
 		// Make sure, we don't pass the PublicLinkCheck (which would then reach 'getUID')
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->never())
-		->method('getUID');
+			->method('getUID');
 		$userSession = $this->createMock(IUserSession::class);
 		$userSession->expects($this->once())
 			->method('getUser')

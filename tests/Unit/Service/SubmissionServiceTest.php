@@ -568,16 +568,16 @@ file2.txt"
 			}));
 
 		$this->questionMapper->expects($this->once())
-		->method('findByForm')
-		->with(5)
+			->method('findByForm')
+			->with(5)
 		// Return QuestionObjects for given Questions
-		->will($this->returnCallback(function (int $formId) use ($questions) {
-			$questionEntities = array_map(function ($question) {
-				return Question::fromParams($question);
-			}, $questions);
+			->will($this->returnCallback(function (int $formId) use ($questions) {
+				$questionEntities = array_map(function ($question) {
+					return Question::fromParams($question);
+				}, $questions);
 
-			return $questionEntities;
-		}));
+				return $questionEntities;
+			}));
 
 		date_default_timezone_set('Europe/Berlin');
 		$this->config->expects($this->once())
@@ -601,19 +601,19 @@ file2.txt"
 			]));
 
 		$this->answerMapper->expects($this->any())
-		->method('findBySubmission')
+			->method('findBySubmission')
 		// Return AnswerObjects for corresponding submission
-		->will($this->returnCallback(function (int $submissionId) use ($submissions) {
-			$matchingSubmission = array_filter($submissions, function ($submission) use ($submissionId) {
-				return $submission['id'] === $submissionId;
-			});
+			->will($this->returnCallback(function (int $submissionId) use ($submissions) {
+				$matchingSubmission = array_filter($submissions, function ($submission) use ($submissionId) {
+					return $submission['id'] === $submissionId;
+				});
 
-			$answerEntities = array_map(function ($answer) {
-				return Answer::fromParams($answer);
-			}, current($matchingSubmission)['answers']);
+				$answerEntities = array_map(function ($answer) {
+					return Answer::fromParams($answer);
+				}, current($matchingSubmission)['answers']);
 
-			return $answerEntities;
-		}));
+				return $answerEntities;
+			}));
 
 		// Prepend BOM-Sequence as Writer does and remove formatting-artefacts of dataProvider.
 		$dataExpectation = chr(239).chr(187).chr(191) . ltrim(preg_replace('/\t+/', '', $csvText));

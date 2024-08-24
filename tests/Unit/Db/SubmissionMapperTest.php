@@ -38,9 +38,9 @@ class SubmissionMapperTest extends TestCase {
 		parent::setUp();
 
 		$this->mockSubmissionMapper = $this->getMockBuilder(SubmissionMapper::class)
-					 ->disableOriginalConstructor()
-					 ->setMethods(['countSubmissionsWithFilters'])
-					 ->getMock();
+			->disableOriginalConstructor()
+			->setMethods(['countSubmissionsWithFilters'])
+			->getMock();
 	}
 
 	/**
@@ -48,8 +48,8 @@ class SubmissionMapperTest extends TestCase {
 	 */
 	public function testHasMultipleFormSubmissionsByUser(int $numberOfSubmissions, bool $expected) {
 		$this->mockSubmissionMapper->expects($this->once())
-			 ->method('countSubmissionsWithFilters')
-			 ->will($this->returnValue($numberOfSubmissions));
+			->method('countSubmissionsWithFilters')
+			->will($this->returnValue($numberOfSubmissions));
 
 		$form = new Form();
 		$form->setId(1);
@@ -83,8 +83,8 @@ class SubmissionMapperTest extends TestCase {
 	 */
 	public function testHasFormSubmissionsByUser(int $numberOfSubmissions, bool $expected) {
 		$this->mockSubmissionMapper->expects($this->once())
-			 ->method('countSubmissionsWithFilters')
-			 ->will($this->returnValue($numberOfSubmissions));
+			->method('countSubmissionsWithFilters')
+			->will($this->returnValue($numberOfSubmissions));
 
 		$form = new Form();
 		$form->setId(1);
@@ -114,8 +114,8 @@ class SubmissionMapperTest extends TestCase {
 	 */
 	public function testCountSubmissions(int $numberOfSubmissions, int $expected) {
 		$this->mockSubmissionMapper->expects($this->once())
-			 ->method('countSubmissionsWithFilters')
-			 ->will($this->returnValue($numberOfSubmissions));
+			->method('countSubmissionsWithFilters')
+			->will($this->returnValue($numberOfSubmissions));
 
 		$this->assertEquals($expected, $this->mockSubmissionMapper->countSubmissions(1));
 	}

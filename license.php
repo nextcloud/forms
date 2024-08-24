@@ -71,7 +71,7 @@ EOD;
  *
  */
 EOD;
-		$this->licenseTextLegacy = str_replace('@YEAR@', date("Y"), $this->licenseTextLegacy);
+		$this->licenseTextLegacy = str_replace('@YEAR@', date('Y'), $this->licenseTextLegacy);
 	}
 
 	/**
@@ -123,7 +123,7 @@ EOD;
 
 	public function writeAuthorsFile() {
 		ksort($this->authors);
-		$template = "Nextcloud is written by:
+		$template = 'Nextcloud is written by:
 @AUTHORS@
 
 With help from many libraries and frameworks including:
@@ -131,9 +131,9 @@ With help from many libraries and frameworks including:
 	SabreDAV
 	jQuery
 	…
-";
+';
 		$authors = implode(PHP_EOL, array_map(function ($author) {
-			return " - ".$author;
+			return ' - '.$author;
 		}, $this->authors));
 		$template = str_replace('@AUTHORS@', $authors, $template);
 		file_put_contents(__DIR__.'/../AUTHORS', $template);
@@ -162,9 +162,9 @@ With help from many libraries and frameworks including:
 
 		[$source, $isStrict] = $this->eatOldLicense($source);
 		if ($isStrict) {
-			$source = "<?php" . PHP_EOL . PHP_EOL . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL . $license . PHP_EOL . $source;
+			$source = '<?php' . PHP_EOL . PHP_EOL . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL . $license . PHP_EOL . $source;
 		} else {
-			$source = "<?php" . PHP_EOL . $license . PHP_EOL . $source;
+			$source = '<?php' . PHP_EOL . $license . PHP_EOL . $source;
 		}
 		file_put_contents($path, $source);
 		echo "License updated: $path" . PHP_EOL;
@@ -301,8 +301,8 @@ With help from many libraries and frameworks including:
 	private function printFilesToCheck() {
 		if (!empty($this->checkFiles)) {
 			print "\n";
-			print "For following files all lines changed since the Nextcloud fork." . PHP_EOL;
-			print "Please check if these files can be moved over to AGPLv3 or later" . PHP_EOL;
+			print 'For following files all lines changed since the Nextcloud fork.' . PHP_EOL;
+			print 'Please check if these files can be moved over to AGPLv3 or later' . PHP_EOL;
 			print "\n";
 			foreach ($this->checkFiles as $file) {
 				print $file . PHP_EOL;

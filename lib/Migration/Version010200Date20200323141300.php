@@ -263,12 +263,12 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				}
 
 				$qb_restore->insert('forms_v2_questions')
-				->values([
-					'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['newId'], IQueryBuilder::PARAM_INT),
-					'order' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['nextQuestionOrder']++, IQueryBuilder::PARAM_INT),
-					'type' => $qb_restore->createNamedParameter($this->questionTypeMap[$question['form_question_type']], IQueryBuilder::PARAM_STR),
-					'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
-				]);
+					->values([
+						'form_id' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['newId'], IQueryBuilder::PARAM_INT),
+						'order' => $qb_restore->createNamedParameter($id_mapping['events'][$question['form_id']]['nextQuestionOrder']++, IQueryBuilder::PARAM_INT),
+						'type' => $qb_restore->createNamedParameter($this->questionTypeMap[$question['form_question_type']], IQueryBuilder::PARAM_STR),
+						'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
+					]);
 				$qb_restore->execute();
 				$id_mapping['questions'][$question['id']]['newId'] = $qb_restore->getLastInsertId(); //Store new question-id to connect options to new question.
 			}

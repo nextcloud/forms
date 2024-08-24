@@ -89,13 +89,13 @@ class ConfigControllerTest extends TestCase {
 			'booleanConfig' => [
 				'configKey' => 'allowPermitAll',
 				'configValue' => true,
-				'strConfig' => "true"
+				'strConfig' => 'true'
 			],
 			'arrayConfig' => [
 				'configKey' => 'allowPermitAll',
 				'configValue' => [
-					"admin",
-					"group1"
+					'admin',
+					'group1'
 				],
 				'strConfig' => '["admin","group1"]'
 			]
