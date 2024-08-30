@@ -66,6 +66,7 @@
 					"
 					ref="input"
 					:answer="answer"
+					:form-id="formId"
 					:index="index"
 					:is-unique="!isMultiple"
 					:is-dropdown="true"
@@ -304,9 +305,14 @@ export default {
 				// let's not await, deleting in background
 				axios
 					.delete(
-						generateOcsUrl('apps/forms/api/v2.4/option/{id}', {
-							id: option.id,
-						}),
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
+							{
+								id: this.formId,
+								questionId: this.id,
+								optionId: option.id,
+							},
+						),
 					)
 					.catch((error) => {
 						logger.error('Error while deleting an option', {

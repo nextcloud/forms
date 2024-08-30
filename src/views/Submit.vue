@@ -624,9 +624,10 @@ export default {
 
 			try {
 				await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/submission/insert'),
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+						id: this.form.id,
+					}),
 					{
-						formId: this.form.id,
 						answers: this.answers,
 						shareHash: this.shareHash,
 					},

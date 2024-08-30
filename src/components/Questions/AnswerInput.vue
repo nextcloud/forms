@@ -68,6 +68,10 @@ export default {
 			type: Number,
 			required: true,
 		},
+		formId: {
+			type: Number,
+			required: true,
+		},
 		isUnique: {
 			type: Boolean,
 			required: true,
@@ -168,17 +172,22 @@ export default {
 		async createAnswer(answer) {
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/option'),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
+						{
+							id: this.formId,
+							questionId: answer.questionId,
+						},
+					),
 					{
-						questionId: answer.questionId,
-						text: answer.text,
+						optionTexts: [answer.text],
 					},
 				)
 				logger.debug('Created answer', { answer })
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
-				return Object.assign({}, answer, OcsResponse2Data(response))
+				return Object.assign({}, answer, OcsResponse2Data(response)[0])
 			} catch (error) {
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
@@ -199,9 +208,15 @@ export default {
 		async updateAnswer(answer) {
 			try {
 				await axios.patch(
-					generateOcsUrl('apps/forms/api/v2.4/option/update'),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
+						{
+							id: this.formId,
+							questionId: answer.questionId,
+							optionId: answer.id,
+						},
+					),
 					{
-						id: this.answer.id,
 						keyValuePairs: {
 							text: answer.text,
 						},

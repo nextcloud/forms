@@ -301,9 +301,10 @@ export default {
 			try {
 				// TODO: add loading status feedback ?
 				await axios.patch(
-					generateOcsUrl('apps/forms/api/v2.4/form/update'),
-					{
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
 						id: this.form.id,
+					}),
+					{
 						keyValuePairs: {
 							state: this.isArchived
 								? FormState.FormClosed
@@ -326,7 +327,7 @@ export default {
 			this.loading = true
 			try {
 				await axios.delete(
-					generateOcsUrl('apps/forms/api/v2.4/form/{id}', {
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
 						id: this.form.id,
 					}),
 				)

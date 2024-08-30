@@ -183,11 +183,12 @@ export default {
 			if (this.form.id && this.selected.shareWith) {
 				try {
 					emit('forms:last-updated:set', this.form.id)
-					await axios.post(
-						generateOcsUrl('apps/forms/api/v2.4/form/transfer'),
+					await axios.patch(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+							id: this.form.id,
+						}),
 						{
-							formId: this.form.id,
-							uid: this.selected.shareWith,
+							ownerId: this.selected.shareWith,
 						},
 					)
 					showSuccess(

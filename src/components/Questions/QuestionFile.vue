@@ -303,9 +303,9 @@ export default {
 			formData.append('shareHash', loadState('forms', 'shareHash', null))
 
 			const url = generateOcsUrl(
-				'apps/forms/api/v2.5/uploadFiles/{formId}/{questionId}',
+				'apps/forms/api/v3/forms/{id}/submissions/files/{questionId}',
 				{
-					formId: this.formId,
+					id: this.formId,
 					questionId: this.id,
 				},
 			)
