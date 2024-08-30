@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.0-alpha7 - 2024-08-31
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha6...v4.3.0-alpha7)
+
+### Merged
+
+-   chore: add API v3 by @Chartman123 in [\#2222](https://github.com/nextcloud/forms/pull/2222)
+
 ## v4.3.0-alpha6 - 2024-08-24
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha5...v4.3.0-alpha6)
