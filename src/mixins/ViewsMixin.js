@@ -154,7 +154,7 @@ export default {
 
 			try {
 				const response = await request(
-					generateOcsUrl('apps/forms/api/v2.4/form/{id}', { id }),
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', { id }),
 				)
 				this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
@@ -178,9 +178,10 @@ export default {
 			try {
 				// TODO: add loading status feedback ?
 				await axios.patch(
-					generateOcsUrl('apps/forms/api/v2.4/form/update'),
-					{
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
 						id: this.form.id,
+					}),
+					{
 						keyValuePairs: {
 							[key]: this.form[key],
 						},

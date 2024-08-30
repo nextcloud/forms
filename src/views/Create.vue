@@ -147,7 +147,7 @@
 							:max-string-lengths="maxStringLengths"
 							v-bind.sync="form.questions[index]"
 							@clone="cloneQuestion(question)"
-							@delete="deleteQuestion(question)"
+							@delete="deleteQuestion(question.id)"
 							@move-down="onMoveDown(index)"
 							@move-up="onMoveUp(index)" />
 					</transition-group>
@@ -416,9 +416,10 @@ export default {
 
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/question'),
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
+						id: this.form.id,
+					}),
 					{
-						formId: this.form.id,
 						type,
 						text,
 					},
@@ -458,23 +459,30 @@ export default {
 		/**
 		 * Delete a question
 		 *
-		 * @param {object} question the question to delete
-		 * @param {number} question.id the question id to delete
+		 * @param {number} questionId the question id to delete
 		 */
-		async deleteQuestion({ id }) {
+		async deleteQuestion(questionId) {
 			this.isLoadingQuestions = true
 
 			try {
 				await axios.delete(
-					generateOcsUrl('apps/forms/api/v2.4/question/{id}', { id }),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+						{
+							id: this.form.id,
+							questionId,
+						},
+					),
 				)
 				const index = this.form.questions.findIndex(
-					(search) => search.id === id,
+					(search) => search.id === questionId,
 				)
 				this.form.questions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
-				logger.error(`Error while removing question ${id}`, { error })
+				logger.error(`Error while removing question ${questionId}`, {
+					error,
+				})
 				showError(
 					t('forms', 'There was an error while removing the question'),
 				)
@@ -493,9 +501,13 @@ export default {
 
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v2.4/question/clone/{id}', {
-						id,
-					}),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions?fromId={questionId}',
+						{
+							id: this.form.id,
+							questionId: id,
+						},
+					),
 				)
 				const question = OcsResponse2Data(response)
 
@@ -529,10 +541,11 @@ export default {
 			const newOrder = this.form.questions.map((question) => question.id)
 
 			try {
-				await axios.put(
-					generateOcsUrl('apps/forms/api/v2.4/question/reorder'),
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
+						id: this.form.id,
+					}),
 					{
-						formId: this.form.id,
 						newOrder,
 					},
 				)
