@@ -31,11 +31,13 @@ class Constants {
 	 */
 	public const CONFIG_KEY_ALLOWPERMITALL = 'allowPermitAll';
 	public const CONFIG_KEY_ALLOWPUBLICLINK = 'allowPublicLink';
+	public const CONFIG_KEY_ALLOWSHOWTOALL = 'allowShowToAll';
 	public const CONFIG_KEY_CREATIONALLOWEDGROUPS = 'creationAllowedGroups';
 	public const CONFIG_KEY_RESTRICTCREATION = 'restrictCreation';
 	public const CONFIG_KEYS = [
 		self::CONFIG_KEY_ALLOWPERMITALL,
 		self::CONFIG_KEY_ALLOWPUBLICLINK,
+		self::CONFIG_KEY_ALLOWSHOWTOALL,
 		self::CONFIG_KEY_CREATIONALLOWEDGROUPS,
 		self::CONFIG_KEY_RESTRICTCREATION
 	];

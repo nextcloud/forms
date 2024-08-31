@@ -85,6 +85,7 @@ class ConfigServiceTest extends TestCase {
 				'strConfig' => [
 					'allowPermitAll' => 'false',
 					'allowPublicLink' => 'false',
+					'allowShowToAll' => 'false',
 					'creationAllowedGroups' => '["group1", "group2", "nonExisting"]',
 					'restrictCreation' => 'true',
 				],
@@ -95,6 +96,7 @@ class ConfigServiceTest extends TestCase {
 				'expected' => [
 					'allowPermitAll' => false,
 					'allowPublicLink' => false,
+					'allowShowToAll' => false,
 					'creationAllowedGroups' => [
 						[
 							'groupId' => 'group1',
@@ -157,9 +159,9 @@ class ConfigServiceTest extends TestCase {
 				'expected' => [
 					'allowPermitAll' => true,
 					'allowPublicLink' => true,
+					'allowShowToAll' => true,
 					'creationAllowedGroups' => [],
 					'restrictCreation' => false,
-
 					'canCreateForms' => true
 				]
 			]
