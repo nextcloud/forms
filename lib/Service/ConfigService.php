@@ -55,7 +55,7 @@ class ConfigService {
 		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPERMITALL, 'true'));
 	}
 	public function getAllowShowToAll() : bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWSHOWTOALL, "true"));
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWSHOWTOALL, 'true'));
 	}
 	public function getAllowPublicLink(): bool {
 		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPUBLICLINK, 'true'));
