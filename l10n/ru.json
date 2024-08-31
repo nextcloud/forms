@@ -157,6 +157,7 @@
     "No elements found." : "Ничего не найдено.",
     "Checkboxes" : "Несколько из списка",
     "Checkbox question title" : "Введите вопрос",
+    "People can submit a different answer" : "Люди могут дать другой ответ",
     "Enter your answer" : "Введите ответ",
     "This question needs a title and at least one answer!" : "Необходимо задать название вопроса и не менее одного варианта ответа.",
     "Radio buttons" : "Переключатели",
@@ -190,7 +191,10 @@
     "Spreadsheet" : "Таблица",
     "Text" : "Текст",
     "Phone number" : "Телефон",
+    "People can enter a telephone number" : "Люди могут ввести номер телефона",
     "Email address" : "Адрес эл. почты",
-    "Number" : "Число"
+    "People can enter an email address" : "Пользователи могут ввести адрес электронной почты",
+    "Number" : "Число",
+    "People can enter a number" : "Люди могут ввести номер"
 },"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"
 }
