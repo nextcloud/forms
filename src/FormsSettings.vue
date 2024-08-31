@@ -56,11 +56,17 @@
 				@update:checked="onAllowPermitAllChange">
 				{{ t('forms', 'Allow sharing to all logged in accounts') }}
 			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch ref="switchAllowShowToAll"
+			<NcCheckboxRadioSwitch
+				ref="switchAllowShowToAll"
 				:checked.sync="appConfig.allowShowToAll"
 				type="switch"
 				@update:checked="onAllowShowToAllChange">
-				{{ t('forms', 'Allow showing form to all logged in accounts on sidebar') }}
+				{{
+					t(
+						'forms',
+						'Allow showing form to all logged in accounts on sidebar',
+					)
+				}}
 			</NcCheckboxRadioSwitch>
 		</NcSettingsSection>
 	</div>
