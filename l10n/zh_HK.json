@@ -241,6 +241,7 @@
     "Some answers are not valid" : "有些答案無效",
     "There was an error submitting the form: {message}" : "遞交表格時發生錯誤：{message}",
     "Error while saving question" : "儲存問題時發生錯誤",
+    "Error while saving question options" : "儲存問題選項時發生錯誤",
     "Form link copied" : "已複製表格連結",
     "Cannot copy, please copy the link manually" : "無法複製，請手動複製連結",
     "No recommendations. Start typing." : "無建議。開始打字。",

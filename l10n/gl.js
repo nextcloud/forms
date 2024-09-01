@@ -243,6 +243,7 @@ OC.L10N.register(
     "Some answers are not valid" : "Algunhas respostas non son válidas",
     "There was an error submitting the form: {message}" : "Produciuse un erro ao enviar o formulario: {message}",
     "Error while saving question" : "Produciuse un erro ao gardar a pregunta",
+    "Error while saving question options" : "Produciuse un erro ao gardar as opcións da pregunta",
     "Form link copied" : "Copiada a ligazón do formulario",
     "Cannot copy, please copy the link manually" : "Non foi posíbel copiala. Copie a ligazón manualmente",
     "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",

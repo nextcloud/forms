@@ -243,6 +243,7 @@ OC.L10N.register(
     "Some answers are not valid" : "Níl roinnt freagraí bailí",
     "There was an error submitting the form: {message}" : "Tharla earráid agus an fhoirm á cur isteach: {message}",
     "Error while saving question" : "Earráid agus an cheist á sábháil",
+    "Error while saving question options" : "Earráid agus roghanna ceiste á sábháil",
     "Form link copied" : "Cóipeáladh nasc na foirme",
     "Cannot copy, please copy the link manually" : "Ní féidir cóip a dhéanamh, cóipeáil an nasc de láimh",
     "No recommendations. Start typing." : "Gan moltaí. Tosaigh ag clóscríobh.",

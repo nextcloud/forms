@@ -243,6 +243,7 @@ OC.L10N.register(
     "Some answers are not valid" : "بعض الإجابات غير صحيحة",
     "There was an error submitting the form: {message}" : "حدث خطأٌ أثناء إرسال النموذج: {message}.",
     "Error while saving question" : "حدث خطأ أثناء حفظ السؤال ",
+    "Error while saving question options" : "حدث خطأ أثناء حفظ خيارات إجابة السؤال",
     "Form link copied" : "تم نسخ رابط النموذج ",
     "Cannot copy, please copy the link manually" : "لا يمكن النسخ، يرجى نسخ الرابط يدويًا",
     "No recommendations. Start typing." : "لا توجد توصيات. ابدأ بالكتابة.",

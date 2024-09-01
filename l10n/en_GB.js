@@ -243,6 +243,7 @@ OC.L10N.register(
     "Some answers are not valid" : "Some answers are not valid",
     "There was an error submitting the form: {message}" : "There was an error submitting the form: {message}",
     "Error while saving question" : "Error while saving question",
+    "Error while saving question options" : "Error while saving question options",
     "Form link copied" : "Form link copied",
     "Cannot copy, please copy the link manually" : "Cannot copy, please copy the link manually",
     "No recommendations. Start typing." : "No recommendations. Start typing.",
