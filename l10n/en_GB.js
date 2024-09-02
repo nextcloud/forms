@@ -52,6 +52,7 @@ OC.L10N.register(
     "Form sharing" : "Form sharing",
     "Allow sharing by link" : "Allow sharing by link",
     "Allow sharing to all logged in accounts" : "Allow sharing to all logged in accounts",
+    "Allow showing form to all logged in accounts on sidebar" : "Allow showing form to all logged in accounts on sidebar",
     "Error while saving configuration" : "Error while saving configuration",
     "Error while reloading config" : "Error while reloading config",
     "Form actions" : "Form actions",

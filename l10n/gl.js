@@ -52,6 +52,7 @@ OC.L10N.register(
     "Form sharing" : "Compartir formularios",
     "Allow sharing by link" : "Permitir compartir mediante unha ligazón",
     "Allow sharing to all logged in accounts" : "Permitir compartir a todas as contas conectadas",
+    "Allow showing form to all logged in accounts on sidebar" : "Permitir amosar o formulario a todas as contas conectadas na barra lateral",
     "Error while saving configuration" : "Produciuse un erro ao gardar a configuración",
     "Error while reloading config" : "Produciuse un erro ao recargar a configuración",
     "Form actions" : "Accións de formulario",

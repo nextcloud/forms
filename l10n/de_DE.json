@@ -50,6 +50,7 @@
     "Form sharing" : "Formular teilen",
     "Allow sharing by link" : "Teilen per Link zulassen",
     "Allow sharing to all logged in accounts" : "Teilen mit allen angemeldeten Konten erlauben",
+    "Allow showing form to all logged in accounts on sidebar" : "Anzeige des Formulars in der Seitenleiste für alle angemeldeten Konten zulassen",
     "Error while saving configuration" : "Fehler beim Speichern der Einstellungen",
     "Error while reloading config" : "Fehler beim Neuladen der Einstellungen",
     "Form actions" : "Formularaktionen",
