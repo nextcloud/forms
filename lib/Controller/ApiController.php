@@ -1092,7 +1092,7 @@ class ApiController extends OCSController {
 		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
+		$this->formsService->notifyNewSubmission($form, $submission);
 
 		if ($form->getFileId() !== null) {
 			try {
@@ -2362,7 +2362,7 @@ class ApiController extends OCSController {
 		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
+		$this->formsService->notifyNewSubmission($form, $submission);
 
 		if ($form->getFileId() !== null) {
 			try {
