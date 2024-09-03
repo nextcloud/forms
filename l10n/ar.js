@@ -52,6 +52,7 @@ OC.L10N.register(
     "Form sharing" : "مشاركة النموذج",
     "Allow sharing by link" : "السماح بالمشاركة عن طريق الرابط",
     "Allow sharing to all logged in accounts" : "السماح بالمشاركة لكل الحسابات التي سجلت دخولها",
+    "Allow showing form to all logged in accounts on sidebar" : "السماح بعرض النموذج لكل الحسابات المسجلة على الشريط الجانبي",
     "Error while saving configuration" : "خطأ أثناء حفظ الإعدادات",
     "Error while reloading config" : "خطأ أثناء إعادة تحميل الإعدادات",
     "Form actions" : "إجراءات النماذج",
