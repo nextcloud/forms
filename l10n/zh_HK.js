@@ -52,6 +52,7 @@ OC.L10N.register(
     "Form sharing" : "表格分享",
     "Allow sharing by link" : "允許透過連結分享",
     "Allow sharing to all logged in accounts" : "允許分享給所有登錄的帳戶",
+    "Allow showing form to all logged in accounts on sidebar" : "允許在側邊欄向所有已登入帳戶顯示表格",
     "Error while saving configuration" : "儲存配置時發生錯誤",
     "Error while reloading config" : "重新加載配置時出錯",
     "Form actions" : "表格操作",
