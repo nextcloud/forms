@@ -50,6 +50,7 @@
     "Form sharing" : "Comhroinnt foirmeacha",
     "Allow sharing by link" : "Ceadaigh roinnt trí nasc",
     "Allow sharing to all logged in accounts" : "Ceadaigh roinnt do gach cuntas logáilte isteach",
+    "Allow showing form to all logged in accounts on sidebar" : "Ceadaigh an fhoirm a thaispeáint do gach cuntas logáilte isteach ar an mbarra taoibh",
     "Error while saving configuration" : "Earráid agus cumraíocht á sábháil",
     "Error while reloading config" : "Earráid agus an chumraíocht á athlódáil",
     "Form actions" : "Foirm gníomhartha",
