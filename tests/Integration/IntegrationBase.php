@@ -48,7 +48,7 @@ class IntegrationBase extends TestCase {
 		parent::setUp();
 
 		$userManager = \OC::$server->getUserManager();
-		foreach($this->users as $userId => $displayName) {
+		foreach ($this->users as $userId => $displayName) {
 			$user = $userManager->get($userId);
 			if ($user === null) {
 				$user = $userManager->createUser($userId, $userId);
