@@ -47,7 +47,6 @@ class QuestionMapper extends QBMapper {
 	 * @throws DoesNotExistException if not found
 	 * @return Question[]
 	 */
-
 	public function findByForm(int $formId, bool $loadDeleted = false): array {
 		$qb = $this->db->getQueryBuilder();
 

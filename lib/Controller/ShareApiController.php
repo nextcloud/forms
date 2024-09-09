@@ -190,11 +190,10 @@ class ShareApiController extends OCSController {
 
 		/** @var Share */
 		$share = $this->shareMapper->insert($share);
+		$this->formMapper->update($form);
 
 		// Create share-notifications (activity)
 		$this->formsService->notifyNewShares($form, $share);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		// Append displayName for Frontend
 		$shareData = $share->read();
@@ -290,7 +289,7 @@ class ShareApiController extends OCSController {
 			}
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($formShare->getId());
 	}
@@ -331,9 +330,8 @@ class ShareApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		$this->shareMapper->deleteById($shareId);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->shareMapper->delete($share);
+		$this->formMapper->update($form);
 
 		return new DataResponse($shareId);
 	}
@@ -458,11 +456,10 @@ class ShareApiController extends OCSController {
 
 		/** @var Share */
 		$share = $this->shareMapper->insert($share);
+		$this->formMapper->update($form);
 
 		// Create share-notifications (activity)
 		$this->formsService->notifyNewShares($form, $share);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		// Append displayName for Frontend
 		$shareData = $share->read();
@@ -500,9 +497,8 @@ class ShareApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
-		$this->shareMapper->deleteById($id);
-
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->shareMapper->delete($share);
+		$this->formMapper->update($form);
 
 		return new DataResponse($id);
 	}
@@ -587,7 +583,7 @@ class ShareApiController extends OCSController {
 			}
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->formMapper->update($form);
 
 		return new DataResponse($formShare->getId());
 	}

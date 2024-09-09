@@ -49,7 +49,6 @@ class OptionMapper extends QBMapper {
 	 * @throws DoesNotExistException if not found
 	 * @return Option[]
 	 */
-
 	public function findByQuestion(int $questionId): array {
 		$qb = $this->db->getQueryBuilder();
 

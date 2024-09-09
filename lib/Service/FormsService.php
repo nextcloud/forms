@@ -624,17 +624,6 @@ class FormsService {
 		});
 	}
 
-	/**
-	 * Update lastUpdated timestamp for the given form
-	 *
-	 * @param int $formId The form to update
-	 */
-	public function setLastUpdatedTimestamp(int $formId): void {
-		$form = $this->formMapper->findById($formId);
-		$form->setLastUpdated(time());
-		$this->formMapper->update($form);
-	}
-
 	/*
 	 * Validates the extraSettings
 	 *
