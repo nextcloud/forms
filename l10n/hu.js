@@ -106,8 +106,6 @@ OC.L10N.register(
     "Add \"other\"" : "\"Egyéb\" hozzáadása",
     "Other:" : "Egyéb:",
     "Other" : "Egyebek",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Maximum egy lehetőséget választhat ki","Maximum %n lehetőséget választhat ki"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Minimum egy lehetőséget ki kell választania","Minimum %n lehetőséget ki kell választania"],
     "A short answer for the question “{text}”" : "Rövid válasz a(z) „{text}” kérdésre",
     "Input types (currently: {type})" : "Bemeneti típusok (jelenleg: {type})",
     "Regular expression for input validation" : "Reguláris kifejezés a bemenet ellenőrzésére",

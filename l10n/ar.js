@@ -114,8 +114,6 @@ OC.L10N.register(
     "Other" : "آخَر",
     "Upper options limit must be greater than the lower limit" : "خيارات الحد الأعلى يجب أن تكون أكبر  من خيارات الحد الأدنى",
     "Lower options limit must be smaller than the upper limit" : "خيارات الحد الأدنى يجب أن تكون أصغر من خيارات الحد الأعلى",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["يجب أن تختار كحد أقصى %n خياراً","يجب أن تختار كحد أقصى خياراً واحداً","يجب أن تختار كحد أقصى %n خيارين","يجب أن تختار كحد أقصى %n خيارات","يجب أن تختار كحد أقصى %n خياراً","يجب أن تختار كحد أقصى %n خياراً"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["يجب أن تختار كحد أدنى %n خياراً","يجب أن تختار كحد أدنى خياراً واحداً","يجب أن تختار كحد أدنى %n خيارين","يجب أن تختار كحد أدنى %n خيارات","يجب أن تختار كحد أدنى %n خياراً","يجب أن تختار كحد أدنى %n خياراً"],
     "A short answer for the question “{text}”" : "إجابة قصيرة للسؤال “{text}”",
     "Input types (currently: {type})" : "أنواع المُدخلات (حاليّاً: {type})",
     "Regular expression for input validation" : "التعبير النمطي RE للتحقُّق من صحة المُدخلات",

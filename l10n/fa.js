@@ -111,8 +111,6 @@ OC.L10N.register(
     "Other" : "دیگر",
     "Upper options limit must be greater than the lower limit" : "حد بالایی گزینه‌ها بایستی بیشتر از حد پایینی‌شان باشد",
     "Lower options limit must be smaller than the upper limit" : "حد پایینی گزینه‌ها بایستی کم‌تر از حد بالایی‌شان باشد",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["نهایتا بایستی یک گزینه را انتخاب کنید","بایستی نهایتا %n گزینه را انتخاب کنید"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["بایستی دست کم یک گزینه را انتخاب کنید","بایستی دست کم %n گزینه را انتخاب کنید"],
     "A short answer for the question “{text}”" : "A short answer for the question “{text}”",
     "Input types (currently: {type})" : "نوع ورودی (در حال حاضر: {type})",
     "Regular expression for input validation" : "عبارات باقاعده برای اعتبارسنجی ورودی",

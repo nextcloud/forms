@@ -112,8 +112,6 @@
     "Other" : "Annet",
     "Upper options limit must be greater than the lower limit" : "Den øvre grensen for alternativer må være større enn den nedre grensen",
     "Lower options limit must be smaller than the upper limit" : "Nedre alternativgrense må være mindre enn den øvre grensen",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Du må velge maksimalt ett alternativ","Du må velge maksimalt %n alternativer"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Du må velge minst ett alternativ","Du må velge minst %n alternativer"],
     "A short answer for the question “{text}”" : "Et kort svar for spørsmålet \"{text}\"",
     "Input types (currently: {type})" : "Inndatatyper (for øyeblikket: {type})",
     "Regular expression for input validation" : "Regulært uttrykk for validering av inndata",

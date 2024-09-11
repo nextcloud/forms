@@ -114,8 +114,6 @@ OC.L10N.register(
     "Other" : "Outro",
     "Upper options limit must be greater than the lower limit" : "O limite superior de opções deve ser maior que o limite inferior",
     "Lower options limit must be smaller than the upper limit" : "O limite inferior de opções deve ser menor que o limite superior",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Você deve escolher um máximo de %n opções","Você deve escolher um máximo de %n opções","Você deve escolher um máximo de %n opções"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Você deve escolher pelo menos %n opções","Você deve escolher pelo menos %n opções","Você deve escolher pelo menos %n opções"],
     "A short answer for the question “{text}”" : "Uma resposta curta para a pergunta “{text}”",
     "Input types (currently: {type})" : "Tipos de entrada (atualmente: {type})",
     "Regular expression for input validation" : "Expressão regular para validação de entrada",

@@ -114,8 +114,6 @@ OC.L10N.register(
     "Other" : "Diğer",
     "Upper options limit must be greater than the lower limit" : "Üst seçenek sayısı sınırı alt seçenek sayısı sınırından büyük olmalıdır",
     "Lower options limit must be smaller than the upper limit" : "Alt seçenek sayısı sınırı üst seçenek sayısı sınırından küçük olmalıdır",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["En fazla bir seçenek seçmelisiniz","En fazla %n seçenek seçmelisiniz"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["En fazla bir seçenek seçmelisiniz","En az %n seçenek seçmelisiniz"],
     "A short answer for the question “{text}”" : "“{text}” sorusu için kısa bir yanıt",
     "Input types (currently: {type})" : "Giriş türleri (şu anda: {type})",
     "Regular expression for input validation" : "Giriş doğrulaması için kurallı ifade",

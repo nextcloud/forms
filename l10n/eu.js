@@ -97,8 +97,6 @@ OC.L10N.register(
     "Other" : "Besteak",
     "Upper options limit must be greater than the lower limit" : "Aukeren goiko muga beheko muga baino handiagoa izan behar da",
     "Lower options limit must be smaller than the upper limit" : "Aukeren beheko muga goiko muga baino txikiagoa izan behar da",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Gehienez aukera %n hautatu dezakezu","Gehienez  %n aukera hautatu ditzakezu"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Gutxienez aukera %n hautatu behar duzu","Gutxienez %n aukera hautatu behar dituzu"],
     "A short answer for the question “{text}”" : "Erantzun labur bat “{text}” galderarentzat",
     "Input types (currently: {type})" : "Sarrera motak (currently: {type})",
     "Regular expression for input validation" : "Sarrera baliozkotzeko adierazpen erregularra",

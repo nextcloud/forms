@@ -113,8 +113,6 @@ OC.L10N.register(
     "Other" : "Остали",
     "Upper options limit must be greater than the lower limit" : "Горња граница опција мора да буде већа од доње границе",
     "Lower options limit must be smaller than the upper limit" : "Доња граница опција мора да буде мања од горње границе",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Морате да изаберете највише једну опцију","Морате да изаберете највише %n опције","Морате да изаберете највише %n опција"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Морате да изаберете барем једну опцију","Морате да изаберете барем %n опције","Морате да изаберете барем %n опција"],
     "A short answer for the question “{text}”" : "Кратки одговор на питање „{text}”",
     "Input types (currently: {type})" : "Типови уноса (тренутно: {type})",
     "Regular expression for input validation" : "Регуларни израз за проверу исправности уноса",

@@ -114,8 +114,6 @@ OC.L10N.register(
     "Other" : "其他",
     "Upper options limit must be greater than the lower limit" : "选项上限必须大于下限",
     "Lower options limit must be smaller than the upper limit" : "选项下限必须小于上限",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["您最多只能选择 %n 个选项"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["您最少只能选择 %n 个选项"],
     "A short answer for the question “{text}”" : "问题“{text}”的简短答复",
     "Input types (currently: {type})" : "输入类型 (当前：{type})",
     "Regular expression for input validation" : "用于输入验证的正则表达式",

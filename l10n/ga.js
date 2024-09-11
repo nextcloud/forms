@@ -114,8 +114,6 @@ OC.L10N.register(
     "Other" : "Eile",
     "Upper options limit must be greater than the lower limit" : "Caithfidh uasteorainn na roghanna a bheith níos airde ná an teorainn íochtair",
     "Lower options limit must be smaller than the upper limit" : "Ní mór teorainn roghanna níos ísle a bheith níos lú ná an uasteorainn",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Ní mór duit rogha amháin a roghnú ar a mhéad","Ní mór duit %n rogha ar a mhéad a roghnú","Ní mór duit %n rogha ar a mhéad a roghnú","Ní mór duit %n rogha ar a mhéad a roghnú","Ní mór duit %n rogha ar a mhéad a roghnú"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Ní mór duit rogha amháin ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú"],
     "A short answer for the question “{text}”" : "Freagra gairid ar an gceist “{text}”",
     "Input types (currently: {type})" : "Cineálacha ionchuir (faoi láthair: {type})",
     "Regular expression for input validation" : "Slonn rialta le haghaidh bailíochtú ionchuir",

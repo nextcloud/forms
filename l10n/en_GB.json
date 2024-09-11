@@ -112,8 +112,6 @@
     "Other" : "Other",
     "Upper options limit must be greater than the lower limit" : "Upper options limit must be greater than the lower limit",
     "Lower options limit must be smaller than the upper limit" : "Lower options limit must be smaller than the upper limit",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["You must choose at most one option","You must choose a maximum of %n options"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["You must choose at least one option","You must choose at least %n options"],
     "A short answer for the question “{text}”" : "A short answer for the question “{text}”",
     "Input types (currently: {type})" : "Input types (currently: {type})",
     "Regular expression for input validation" : "Regular expression for input validation",
