@@ -43,7 +43,7 @@
 		</template>
 		<NcSelect
 			v-if="readOnly"
-			v-model="selectedOption"
+			:value="selectedOption"
 			:name="name || undefined"
 			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"
@@ -133,7 +133,6 @@ export default {
 
 	data() {
 		return {
-			selectedOption: null,
 			inputValue: '',
 			isOptionDialogShown: false,
 			isLoading: false,
@@ -173,16 +172,18 @@ export default {
 		shiftDragHandle() {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
-	},
 
-	mounted() {
-		// Init selected options from values prop
-		if (this.values) {
+		selectedOption() {
+			if (!this.values) {
+				return null
+			}
+
 			const selected = this.values.map((id) =>
 				this.options.find((option) => option.id === id),
 			)
-			this.selectedOption = this.isMultiple ? selected : selected[0]
-		}
+
+			return this.isMultiple ? selected : selected[0]
+		},
 	},
 
 	methods: {
