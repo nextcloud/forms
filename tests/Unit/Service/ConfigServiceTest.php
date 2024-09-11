@@ -33,7 +33,6 @@ use OCP\IUser;
 use OCP\IUserSession;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 
 use Test\TestCase;
 
@@ -48,9 +47,6 @@ class ConfigServiceTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
 	/** @var IUser|MockObject */
 	private $currentUser;
 
@@ -59,7 +55,6 @@ class ConfigServiceTest extends TestCase {
 
 		$this->config = $this->createMock(IConfig::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$userSession = $this->createMock(IUserSession::class);
 
 		$this->currentUser = $this->createMock(IUser::class);
@@ -74,7 +69,6 @@ class ConfigServiceTest extends TestCase {
 			'forms',
 			$this->config,
 			$this->groupManager,
-			$this->logger,
 			$userSession
 		);
 	}

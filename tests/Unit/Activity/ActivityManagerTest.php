@@ -34,7 +34,6 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class ActivityManagerTest extends TestCase {
@@ -48,9 +47,6 @@ class ActivityManagerTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
 	/** @var CirclesService|MockObject */
 	private $circlesService;
 
@@ -58,10 +54,9 @@ class ActivityManagerTest extends TestCase {
 		parent::setUp();
 		$this->manager = $this->createMock(IManager::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->circlesService = $this->createMock(CirclesService::class);
 
-		$this->activityManager = new ActivityManager('forms', 'currentUser', $this->manager, $this->groupManager, $this->logger, $this->circlesService);
+		$this->activityManager = new ActivityManager('forms', 'currentUser', $this->manager, $this->groupManager, $this->circlesService);
 	}
 
 	public function testPublishNewShare() {

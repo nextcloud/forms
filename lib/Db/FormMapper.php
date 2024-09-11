@@ -31,7 +31,6 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Share\IShare;
-use Psr\Log\LoggerInterface;
 
 /**
  * @extends QBMapper<Form>
@@ -46,7 +45,6 @@ class FormMapper extends QBMapper {
 		private QuestionMapper $questionMapper,
 		private ShareMapper $shareMapper,
 		private SubmissionMapper $submissionMapper,
-		private LoggerInterface $logger,
 		IDBConnection $db,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);

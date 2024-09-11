@@ -50,7 +50,6 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
-use Psr\Log\LoggerInterface;
 
 /**
  * Trait for getting forms information in a service
@@ -68,7 +67,6 @@ class FormsService {
 		private SubmissionMapper $submissionMapper,
 		private ConfigService $configService,
 		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
