@@ -31,8 +31,6 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\Share\IShare;
 
-use Psr\Log\LoggerInterface;
-
 class ActivityManager {
 	
 	public function __construct(
@@ -40,7 +38,6 @@ class ActivityManager {
 		private ?string $userId,
 		private IManager $manager,
 		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
 		private CirclesService $circlesService,
 	) {
 	}

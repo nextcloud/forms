@@ -39,7 +39,6 @@ use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 
 use Test\TestCase;
 
@@ -47,9 +46,6 @@ class PageControllerTest extends TestCase {
 
 	/** @var PageController */
 	private $pageController;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
 
 	/** @var IRequest|MockObject */
 	private $request;
@@ -95,7 +91,6 @@ class PageControllerTest extends TestCase {
 		$this->accountManager = $this->createMock(IAccountManager::class);
 		$this->initialState = $this->createMock(IInitialState::class);
 		$this->l10n = $this->createMock(IL10N::class);
-		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->userSession = $this->createMock(IUserSession::class);
@@ -110,7 +105,6 @@ class PageControllerTest extends TestCase {
 			$this->accountManager,
 			$this->initialState,
 			$this->l10n,
-			$this->logger,
 			$this->urlGenerator,
 			$this->userManager,
 			$this->userSession

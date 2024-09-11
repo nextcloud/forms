@@ -78,7 +78,6 @@ use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
@@ -110,9 +109,6 @@ class FormsServiceTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
 	/** @var IUserManager|MockObject */
 	private $userManager;
 
@@ -142,7 +138,6 @@ class FormsServiceTest extends TestCase {
 		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
@@ -177,7 +172,6 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
@@ -652,7 +646,6 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
@@ -893,7 +886,6 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
@@ -1006,7 +998,6 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
@@ -1239,7 +1230,6 @@ class FormsServiceTest extends TestCase {
 				$this->submissionMapper,
 				$this->configService,
 				$this->groupManager,
-				$this->logger,
 				$this->userManager,
 				$this->secureRandom,
 				$this->circlesService,

@@ -33,8 +33,6 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserSession;
 
-use Psr\Log\LoggerInterface;
-
 class ConfigService {
 	private ?IUser $currentUser;
 		
@@ -42,7 +40,6 @@ class ConfigService {
 		protected string $appName,
 		private IConfig $config,
 		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
 		IUserSession $userSession
 	) {
 		$this->currentUser = $userSession->getUser();
