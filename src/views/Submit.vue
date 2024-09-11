@@ -470,22 +470,17 @@ export default {
 		 */
 		initFromLocalStorage() {
 			const savedState = this.getFormValuesFromLocalStorage()
-			if (savedState) {
-				for (const [key, answer] of Object.entries(savedState)) {
-					const answers = []
-					switch (answer?.type) {
-						case 'QuestionMultiple':
-							answer.value.forEach((num) => {
-								answers.push(num.toString())
-							})
-							this.answers[key] = answers
-							break
-						default:
-							this.answers[key] = answer.value
-							break
-					}
-				}
+			if (!savedState) {
+				return
 			}
+			const answers = {}
+			for (const [questionId, answer] of Object.entries(savedState)) {
+				answers[questionId] =
+					answer.type === 'QuestionMultiple'
+						? answer.value.map(String)
+						: answer.value
+			}
+			this.answers = answers
 		},
 
 		/**
@@ -590,6 +585,17 @@ export default {
 				async (question) => await question.validate(),
 			)
 
+			// Clean up answers for questions that do not exist anymore
+			const questionIds = new Map(
+				this.validQuestions.map((question) => [question.id, true]),
+			)
+			for (const questionId of Object.keys(this.answers)) {
+				if (!questionIds.has(parseInt(questionId))) {
+					logger.debug('Question does not exist anymore', { questionId })
+					delete this.answers[questionId]
+				}
+			}
+
 			try {
 				// wait for all to be validated
 				const result = await Promise.all(validation)
@@ -667,6 +673,7 @@ export default {
 .forms-emptycontent {
 	height: 100%;
 }
+
 .app-content {
 	display: flex;
 	align-items: center;
