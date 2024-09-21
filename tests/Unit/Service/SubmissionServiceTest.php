@@ -400,7 +400,7 @@ class SubmissionServiceTest extends TestCase {
 				// Expected CSV-Result
 				'
 				"User ID","User display name","Timestamp","Question 1"
-				"user1","User 1","1973-11-29T22:33:09+01:00","file1.txt; '.'
+				"user1","User 1","1973-11-29T22:33:09+01:00","file1.txt; ' . '
 file2.txt"
 				'
 			],
@@ -616,7 +616,7 @@ file2.txt"
 			}));
 
 		// Prepend BOM-Sequence as Writer does and remove formatting-artefacts of dataProvider.
-		$dataExpectation = chr(239).chr(187).chr(191) . ltrim(preg_replace('/\t+/', '', $csvText));
+		$dataExpectation = chr(239) . chr(187) . chr(191) . ltrim(preg_replace('/\t+/', '', $csvText));
 
 		return $dataExpectation;
 	}

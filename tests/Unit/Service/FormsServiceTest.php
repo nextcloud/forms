@@ -1378,7 +1378,7 @@ class FormsServiceTest extends TestCase {
 			'invalid-custom-regex-pattern' => [
 				'extraSettings' => [
 					'validationType' => 'regex',
-					'validationRegex' => '/'.'[/'
+					'validationRegex' => '/' . '[/'
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'rval' => false

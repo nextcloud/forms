@@ -40,7 +40,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 		private FormMapper $formMapper,
 		private UploadedFileMapper $uploadedFileMapper,
 		private LoggerInterface $logger,
-		ITimeFactory $time
+		ITimeFactory $time,
 	) {
 		parent::__construct($time);
 

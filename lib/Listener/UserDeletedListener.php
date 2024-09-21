@@ -34,7 +34,7 @@ use OCP\User\Events\UserDeletedEvent;
  */
 class UserDeletedListener implements IEventListener {
 	public function __construct(
-		private IJobList $jobList
+		private IJobList $jobList,
 	) {
 	}
 

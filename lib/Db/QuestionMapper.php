@@ -37,7 +37,7 @@ use OCP\IDBConnection;
 class QuestionMapper extends QBMapper {
 	public function __construct(
 		IDBConnection $db,
-		private OptionMapper $optionMapper
+		private OptionMapper $optionMapper,
 	) {
 		parent::__construct($db, 'forms_v2_questions', Question::class);
 	}

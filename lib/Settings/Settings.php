@@ -37,7 +37,7 @@ class Settings implements ISettings {
 		private string $appName,
 		private ConfigService $configService,
 		private IGroupManager $groupManager,
-		private IInitialState $initialState
+		private IInitialState $initialState,
 	) {
 	}
 

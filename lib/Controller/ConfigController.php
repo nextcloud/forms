@@ -41,7 +41,7 @@ class ConfigController extends ApiController {
 		private ConfigService $configService,
 		private IConfig $config,
 		private LoggerInterface $logger,
-		IRequest $request
+		IRequest $request,
 	) {
 		parent::__construct($appName, $request);
 	}
