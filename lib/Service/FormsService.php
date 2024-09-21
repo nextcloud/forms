@@ -760,7 +760,7 @@ class FormsService {
 		}
 
 		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
-		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').'.$fileFormat;
+		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').' . $fileFormat;
 
 		return self::normalizeFileName($fileName);
 	}
@@ -768,7 +768,7 @@ class FormsService {
 	public function getFormUploadedFilesFolderPath(Form $form): string {
 		return implode('/', [
 			Constants::FILES_FOLDER,
-			self::normalizeFileName($form->getId().' - '.$form->getTitle()),
+			self::normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
 		]);
 	}
 
@@ -777,7 +777,7 @@ class FormsService {
 		return implode('/', [
 			$this->getFormUploadedFilesFolderPath($form),
 			$submissionId,
-			self::normalizeFileName($questionId.' - '.($questionName ?: $questionText))
+			self::normalizeFileName($questionId . ' - ' . ($questionName ?: $questionText))
 		]);
 	}
 
@@ -785,8 +785,8 @@ class FormsService {
 		return implode('/', [
 			Constants::UNSUBMITTED_FILES_FOLDER,
 			microtime(true),
-			self::normalizeFileName($form->getId().' - '.$form->getTitle()),
-			self::normalizeFileName($question->getId().' - '.($question->getName() ?: $question->getText()))
+			self::normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
+			self::normalizeFileName($question->getId() . ' - ' . ($question->getName() ?: $question->getText()))
 		]);
 	}
 

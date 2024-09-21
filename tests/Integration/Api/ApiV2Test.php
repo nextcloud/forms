@@ -1318,7 +1318,7 @@ CSV
 	public function testInsertSubmission(array $submissionsExpected) {
 
 		$uploadedFileResponse = $this->http->request('POST',
-			'api/v2.5/uploadFiles/'.$this->testForms[0]['id'].'/'.$this->testForms[0]['questions'][2]['id'],
+			'api/v2.5/uploadFiles/' . $this->testForms[0]['id'] . '/' . $this->testForms[0]['questions'][2]['id'],
 			[
 				'multipart' => [
 					[

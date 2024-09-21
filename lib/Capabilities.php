@@ -28,7 +28,7 @@ use OCP\Capabilities\ICapability;
 
 class Capabilities implements ICapability {
 	public function __construct(
-		private IAppManager $appManager
+		private IAppManager $appManager,
 	) {
 	}
 

@@ -42,7 +42,7 @@ class SubmissionMapper extends QBMapper {
 	 */
 	public function __construct(
 		IDBConnection $db,
-		private AnswerMapper $answerMapper
+		private AnswerMapper $answerMapper,
 	) {
 		parent::__construct($db, 'forms_v2_submissions', Submission::class);
 	}

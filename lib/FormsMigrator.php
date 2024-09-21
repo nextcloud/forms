@@ -65,7 +65,7 @@ class FormsMigrator implements IMigrator {
 		private FormsService $formsService,
 		private SubmissionService $submissionService,
 		private IL10N $l10n,
-		private IUserManager $userManager
+		private IUserManager $userManager,
 	) {
 	}
 

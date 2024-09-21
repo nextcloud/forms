@@ -29,7 +29,7 @@ use OCP\IL10N;
 abstract class FormsActivitySettings extends ActivitySettings {
 	public function __construct(
 		protected string $appName,
-		protected IL10N $l10n
+		protected IL10N $l10n,
 	) {
 	}
 

@@ -40,7 +40,7 @@ class ConfigService {
 		protected string $appName,
 		private IConfig $config,
 		private IGroupManager $groupManager,
-		IUserSession $userSession
+		IUserSession $userSession,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}

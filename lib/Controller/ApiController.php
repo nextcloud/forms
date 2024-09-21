@@ -1056,7 +1056,7 @@ class ApiController extends OCSController {
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = 'anon-user-' .  hash('md5', strval(time() + rand()));
+			$anonID = 'anon-user-' . hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());
@@ -2326,7 +2326,7 @@ class ApiController extends OCSController {
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = 'anon-user-' .  hash('md5', strval(time() + rand()));
+			$anonID = 'anon-user-' . hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());
