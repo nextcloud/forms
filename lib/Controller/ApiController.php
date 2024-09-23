@@ -262,7 +262,6 @@ class ApiController extends OCSController {
 				'uid' => $keyValuePairs['ownerId']
 			]);
 
-			$form = $this->getFormIfAllowed($formId);
 			$user = $this->userManager->get($keyValuePairs['ownerId']);
 			if ($user == null) {
 				$this->logger->debug('Could not find new form owner');
@@ -749,12 +748,17 @@ class ApiController extends OCSController {
 			'text' => $optionTexts,
 		]);
 
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+		
 		try {
 			$question = $this->questionMapper->findById($questionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question');
-			throw new OCSBadRequestException('Could not find form or question');
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException('Could not find question');
 		}
 
 		if ($question->getFormId() !== $formId) {
@@ -762,16 +766,6 @@ class ApiController extends OCSController {
 				'questionId' => $questionId
 			]);
 			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
 		}
 
 		$addedOptions = [];
@@ -818,28 +812,23 @@ class ApiController extends OCSController {
 			'keyValuePairs' => $keyValuePairs
 		]);
 
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find option, question or form');
-			throw new OCSBadRequestException('Could not find option, question or form');
+			$this->logger->debug('Could not find option or question');
+			throw new OCSBadRequestException('Could not find option or question');
 		}
 
 		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $formId) {
 			$this->logger->debug('The given option id doesn\'t match the question or form.');
 			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
 		}
 
 		// Don't allow empty array
@@ -884,10 +873,15 @@ class ApiController extends OCSController {
 			'optionId' => $optionId
 		]);
 
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+		
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form, question or option');
 			throw new OCSBadRequestException('Could not find form, question or option');
@@ -896,16 +890,6 @@ class ApiController extends OCSController {
 		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $formId) {
 			$this->logger->debug('The given option id doesn\'t match the question or form.');
 			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
 		}
 
 		$this->optionMapper->delete($option);
