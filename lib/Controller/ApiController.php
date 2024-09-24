@@ -87,7 +87,7 @@ class ApiController extends OCSController {
 		private IL10N $l10n,
 		private LoggerInterface $logger,
 		private IUserManager $userManager,
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private UploadedFileMapper $uploadedFileMapper,
 		private IMimeTypeDetector $mimeTypeDetector,
 	) {
@@ -1253,7 +1253,7 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Invalid file provided');
 			}
 
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 			$userFolder->getStorage()->verifyPath($path, $uploadedFile['name']);
 
 			$extraSettings = $question->getExtraSettings();
@@ -2217,7 +2217,7 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Invalid file provided');
 			}
 
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 			$userFolder->getStorage()->verifyPath($path, $uploadedFile['name']);
 
 			$extraSettings = $question->getExtraSettings();
@@ -2634,7 +2634,7 @@ class ApiController extends OCSController {
 				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
 				$answerEntity->setFileId($uploadedFile->getFileId());
 
-				$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
 
 				if ($userFolder->nodeExists($path)) {

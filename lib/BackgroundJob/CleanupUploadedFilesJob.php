@@ -36,7 +36,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 	private const FILE_LIFETIME = '-1 hour';
 
 	public function __construct(
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private FormMapper $formMapper,
 		private UploadedFileMapper $uploadedFileMapper,
 		private LoggerInterface $logger,
@@ -69,7 +69,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 
 			$form = $this->formMapper->findById($uploadedFile->getFormId());
 			$usersToCleanup[$form->getOwnerId()] = true;
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 
 			$nodes = $userFolder->getById($uploadedFile->getFileId());
 
@@ -93,7 +93,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 		$deleted = 0;
 		foreach (array_keys($usersToCleanup) as $userId) {
 			$this->logger->info('Cleaning up empty folders for user {userId}.', ['userId' => $userId]);
-			$userFolder = $this->storage->getUserFolder($userId);
+			$userFolder = $this->rootFolder->getUserFolder($userId);
 
 			$unsubmittedFilesFolder = $userFolder->get(Constants::UNSUBMITTED_FILES_FOLDER);
 			if (!$unsubmittedFilesFolder instanceof Folder) {

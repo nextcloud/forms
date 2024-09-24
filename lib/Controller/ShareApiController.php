@@ -69,7 +69,7 @@ class ShareApiController extends OCSController {
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private IManager $shareManager,
 	) {
 		parent::__construct($appName, $request);
@@ -261,7 +261,7 @@ class ShareApiController extends OCSController {
 		$formShare = $this->shareMapper->update($formShare);
 
 		if (in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 			$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
 			if ($userFolder->nodeExists($uploadedFilesFolderPath)) {
 				$folder = $userFolder->get($uploadedFilesFolderPath);
@@ -558,7 +558,7 @@ class ShareApiController extends OCSController {
 		$formShare = $this->shareMapper->update($formShare);
 
 		if (in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 			$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
 			if ($userFolder->nodeExists($uploadedFilesFolderPath)) {
 				$folder = $userFolder->get($uploadedFilesFolderPath);
