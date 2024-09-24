@@ -70,7 +70,7 @@ class FormsService {
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private IL10N $l10n,
 		private IMimeTypeDetector $mimeTypeDetector,
 		private IEventDispatcher $eventDispatcher,
@@ -742,7 +742,7 @@ class FormsService {
 			return null;
 		}
 
-		$folder = $this->storage->getUserFolder($form->getOwnerId());
+		$folder = $this->rootFolder->getUserFolder($form->getOwnerId());
 		$nodes = $folder->getById($fileId);
 
 		if (empty($nodes)) {

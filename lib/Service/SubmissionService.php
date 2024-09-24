@@ -65,7 +65,7 @@ class SubmissionService {
 		private SubmissionMapper $submissionMapper,
 		private AnswerMapper $answerMapper,
 		private UploadedFileMapper $uploadedFileMapper,
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private IConfig $config,
 		private IL10N $l10n,
 		private LoggerInterface $logger,
@@ -146,9 +146,9 @@ class SubmissionService {
 
 		/** @var \OCP\Files\Folder|File $node */
 		if ($ownerId) {
-			$node = $this->storage->getUserFolder($ownerId)->get($path);
+			$node = $this->rootFolder->getUserFolder($ownerId)->get($path);
 		} else {
-			$node = $this->storage->getUserFolder($this->currentUser->getUID())->get($path);
+			$node = $this->rootFolder->getUserFolder($this->currentUser->getUID())->get($path);
 		}
 
 		// If chosen path is a file with expected extension - overwrite it and use parent folder otherwise.
@@ -417,7 +417,7 @@ class SubmissionService {
 						return sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']);
 					}
 
-					$nodes = $this->storage->getUserFolder($formOwnerId)->getById($uploadedFile->getFileId());
+					$nodes = $this->rootFolder->getUserFolder($formOwnerId)->getById($uploadedFile->getFileId());
 					if (empty($nodes)) {
 						return sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']);
 					}
