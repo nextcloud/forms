@@ -27,6 +27,7 @@
 namespace OCA\Forms\Db;
 
 use OCA\Forms\Constants;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -48,6 +49,30 @@ class FormMapper extends QBMapper {
 		IDBConnection $db,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
+	}
+
+	
+	/**
+	 * @param Entity $entity
+	 * @psalm-param Form $entity
+	 * @return Form
+	 * @throws \OCP\DB\Exception
+	 */
+	public function insert(Entity $entity): Form {
+		$entity->setCreated(time());
+		$entity->setLastUpdated(time());
+		return parent::insert($entity);
+	}
+
+	/**
+	 * @param Entity $entity
+	 * @psalm-param Form $entity
+	 * @return Form
+	 * @throws \OCP\DB\Exception
+	 */
+	public function update(Entity $entity): Form {
+		$entity->setLastUpdated(time());
+		return parent::update($entity);
 	}
 
 	/**

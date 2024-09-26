@@ -547,8 +547,8 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->shareMapper->expects($this->once())
-			->method('deleteById')
-			->with('8');
+			->method('delete')
+			->with($share);
 
 		$response = new DataResponse(8);
 		$this->assertEquals($response, $this->shareApiController->deleteShare(5, 8));
