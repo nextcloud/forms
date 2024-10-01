@@ -740,7 +740,9 @@ export default {
 
 	.submission-message {
 		@include markdown-output;
-		text-align: center;
+		& {
+			text-align: center;
+		}
 	}
 
 	form {
