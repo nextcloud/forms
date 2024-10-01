@@ -22,7 +22,9 @@
  */
 
 @mixin markdown-output {
-	overflow-wrap: break-word;
+	& {
+		overflow-wrap: break-word;
+	}
 
 	:deep() {
 		> :not(:first-child) {
