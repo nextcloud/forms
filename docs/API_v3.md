@@ -46,6 +46,7 @@ This file contains the API-Documentation. For more information on the returned D
     -   `GET /api/v3/forms/{formId}/questions` to get all questions of a form
     -   `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
     -   `POST /api/v3/forms/{formId}/questions/{questionId}/options` does now accept more options at once
+    -   `PATCH /api/v3/forms/{formId}/questions/{questionId}/options/reorder` to reorder the options
     -   `POST /api/v3/forms/{formId}/submissions/files/{questionId}` to upload a file to a file question before submitting the form
 -   In API version 2.5 the following endpoints were introduced:
     -   `POST /api/v2.5/uploadFiles/{formId}/{questionId}` to upload files to answer before form submitting
@@ -178,12 +179,14 @@ Returns the full-depth object of the requested form (without submissions).
         {
           "id": 1,
           "questionId": 1,
-          "text": "Option 1"
+          "text": "Option 1",
+          "order": null
         },
         {
           "id": 2,
           "questionId": 1,
-          "text": "Option 2"
+          "text": "Option 2",
+          "order": null
         }
       ],
       "accept": [],
@@ -304,12 +307,14 @@ Returns the questions and options of the given form (without submissions).
       {
         "id": 1,
         "questionId": 1,
-        "text": "Option 1"
+        "text": "Option 1",
+        "order": null
       },
       {
         "id": 2,
         "questionId": 1,
-        "text": "Option 2"
+        "text": "Option 2",
+        "order": null
       }
     ],
     "accept": [],
@@ -385,12 +390,14 @@ Returns the requested question and options of the given form (without submission
       {
         "id": 1,
         "questionId": 1,
-        "text": "Option 1"
+        "text": "Option 1",
+        "order": null
       },
       {
         "id": 2,
         "questionId": 1,
         "text": "Option 2"
+        "order": null
       }
     ],
     "accept": [],
@@ -549,6 +556,22 @@ Update a single or all properties of an option-object
 "data": 7
 ```
 
+### Reorder options
+
+-   Endpoint: `/api/v3/forms/{formId}/questions/{questionId}/options/reorder`
+-   Method: `PATCH`
+-   Url-Parameter:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _formId_ | Integer | ID of the form containing the question and option |
+    | _questionId_ | Integer | ID of the question, the new option will belong to |
+-   Parameters:
+    | Parameter | Type | Description |
+    |-----------|---------|-------------|
+    | _newOrder_ | Array | Array of **all** option IDs, ordered in the desired order |
+-   Restrictions: The Array **must** contain all option IDs corresponding to the specified question and **must not** contain any duplicates.
+-   Response: Array of optionIds and their corresponding order.
+
 ## Sharing Endpoints
 
 ### Add a new Share
@@ -685,17 +708,20 @@ Get all Submissions to a Form
         {
           "id": 1,
           "questionId": 1,
-          "text": "Option 1"
+          "text": "Option 1",
+          "order": null
         },
         {
           "id": 27,
           "questionId": 1,
-          "text": "Option 2"
+          "text": "Option 2",
+          "order": null
         },
         {
           "id": 30,
           "questionId": 1,
-          "text": "Option 3"
+          "text": "Option 3",
+          "order": null
         }
       ],
       "extraSettings": {}

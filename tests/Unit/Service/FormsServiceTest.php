@@ -228,12 +228,14 @@ class FormsServiceTest extends TestCase {
 							[
 								'id' => 1,
 								'questionId' => 1,
-								'text' => 'Option 1'
+								'text' => 'Option 1',
+								'order' => null,
 							],
 							[
 								'id' => 2,
 								'questionId' => 1,
-								'text' => 'Option 2'
+								'text' => 'Option 2',
+								'order' => null,
 							]
 						],
 						'accept' => [],

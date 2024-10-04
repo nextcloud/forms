@@ -104,7 +104,8 @@ class IntegrationBase extends TestCase {
 					$qb->insert('forms_v2_options')
 						->values([
 							'question_id' => $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT),
-							'text' => $qb->createNamedParameter($option['text'], IQueryBuilder::PARAM_STR)
+							'text' => $qb->createNamedParameter($option['text'], IQueryBuilder::PARAM_STR),
+							'order' => $qb->createNamedParameter($option['order'], IQueryBuilder::PARAM_INT)
 						]);
 					$qb->executeStatement();
 					$this->testForms[$index]['questions'][$qIndex]['options'][$oIndex]['id'] = $qb->getLastInsertId();
