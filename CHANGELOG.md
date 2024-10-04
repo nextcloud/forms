@@ -1,69 +1,30 @@
 # Changelog
 
-## v4.3.0-alpha7 - 2024-08-31
+## v4.3.0 - 2024-10-04
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha6...v4.3.0-alpha7)
-
-### Merged
-
--   chore: add API v3 by @Chartman123 in [\#2222](https://github.com/nextcloud/forms/pull/2222)
-
-## v4.3.0-alpha6 - 2024-08-24
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha5...v4.3.0-alpha6)
-
-### Merged
-
--   fix: make FilePicker work with latest dialogs by @Chartman123 in [\#2300](https://github.com/nextcloud/forms/pull/2300)
-
-## v4.3.0-alpha5 - 2024-08-21
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha4...v4.3.0-alpha5)
-
-### Fixed
-
--   fix: DI `userId` instead of `userSession` in [\#2293](https://github.com/nextcloud/forms/pull/2293)
-
-## v4.3.0-alpha4 - 2024-08-20
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha3...v4.3.0-alpha4)
-
-### Fixed
-
--   Fix: Show complete title in TransferOwnership dialog by @Chartman123 in [\#2292](https://github.com/nextcloud/forms/pull/2292)
--   fix(submit): `access` is unset for public forms so check for existance first by @susnux in [\#2291](https://github.com/nextcloud/forms/pull/2291)
-
-## v4.3.0-alpha3 - 2024-08-15
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha2...v4.3.0-alpha3)
-
--   merged: fix app store build workflow
-
-## v4.3.0-alpha2 - 2024-08-15
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0-alpha1...v4.3.0-alpha2)
-
-### Fixed
-
--   fix: Improve styles of layout for QuestionFile #2253 by @Koc in [\#2259](https://github.com/nextcloud/forms/pull/2259)
-
-## v4.3.0-alpha1 - 2024-08-14
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.4...v4.3.0-alpha1)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.4...v4.3.0)
 
 ### Enhancements
 
+-   feat: Allow to reorder options for "multiple" question type in backend by @Chartman123 in [\#2333](https://github.com/nextcloud/forms/pull/2333)
+-   Add support for file question by @Koc in [\#2040](https://github.com/nextcloud/forms/pull/2040)
+-   feat: Allow listening to form submissions via events and webhooks by @marcelklehr in [\#2265](https://github.com/nextcloud/forms/pull/2265)
+-   enh: make show to all users an admin setting by @Chartman123 in [\#2306](https://github.com/nextcloud/forms/pull/2306)
 -   fix: add `target="_blank"` to links in description by @Chartman123 in [\#2280](https://github.com/nextcloud/forms/pull/2280)
 -   feat: add warning about removing legacy links by @Chartman123 in [\#2277](https://github.com/nextcloud/forms/pull/2277)
 -   Add QR-Code for Share Links by @Himmelxd in [\#2162](https://github.com/nextcloud/forms/pull/2162)
 -   feat: add multiple options with one paste by @hamza221 in [\#1407](https://github.com/nextcloud/forms/pull/1407)
--   Add support for file question by @Koc in [\#2040](https://github.com/nextcloud/forms/pull/2040)
--   Data source for the Analytics App by @Rello in [\#2195](https://github.com/nextcloud/forms/pull/2195)
 
 ### Fixed
 
+-   fix(export): remove new lines from form title in the exported filename by @tcitworld in [\#2343](https://github.com/nextcloud/forms/pull/2343)
+-   fix: update values in QuestionMultiple component correctly when `isUnique === true` by @Chartman123 in [\#2323](https://github.com/nextcloud/forms/pull/2323)
+-   Do not submit fields that not exists anymore by @Koc in [\#2312](https://github.com/nextcloud/forms/pull/2312)
+-   Fix: Show complete title in TransferOwnership dialog by @Chartman123 in [\#2292](https://github.com/nextcloud/forms/pull/2292)
+-   fix(submit): `access` is unset for public forms so check for existance first by @susnux in [\#2291](https://github.com/nextcloud/forms/pull/2291)
+-   Bug. Question type File. When multiple types are selected, only one is used. by @AIlkiv in [\#2241](https://github.com/nextcloud/forms/pull/2241)
+-   fix: Improve styles of layout for QuestionFile #2253 by @Koc in [\#2259](https://github.com/nextcloud/forms/pull/2259)
 -   fix: Adjust app to be compatible with Nextcloud 30 by @susnux in [\#2278](https://github.com/nextcloud/forms/pull/2278)
--   fix: Question type File. When multiple types are selected, only one is used. by @AIlkiv in [\#2241](https://github.com/nextcloud/forms/pull/2241)
 -   fix: Fix form view without permissions by @Koc in [\#2268](https://github.com/nextcloud/forms/pull/2268)
 -   fix: Add support for adding new entries with IME input by @Chartman123 in [\#2232](https://github.com/nextcloud/forms/pull/2232)
 -   fix: Fix merging of options for cancelable request by @Koc in [\#2260](https://github.com/nextcloud/forms/pull/2260)
@@ -71,15 +32,12 @@
 
 ### Merged
 
--   chore: unify \_\_construct functions by @Chartman123 in [\#2270](https://github.com/nextcloud/forms/pull/2270)
--   test: Add e2e tests for form description by @susnux in [\#2283](https://github.com/nextcloud/forms/pull/2283)
--   test: Add e2e test for IME input by @susnux in [\#2267](https://github.com/nextcloud/forms/pull/2267)
--   fix: ignore composer.lock in prettier by @Koc in [\#2261](https://github.com/nextcloud/forms/pull/2261)
+-   chore: add API v3 by @Chartman123 in [\#2222](https://github.com/nextcloud/forms/pull/2222)
+-   Data source for the Analytics App by @Rello in [\#2195](https://github.com/nextcloud/forms/pull/2195)
 -   Optimization method FormsService::canSubmit by @AIlkiv in [\#2225](https://github.com/nextcloud/forms/pull/2225)
 -   Replace app icon with Material Symbols version by @AndyScherzinger in [\#2233](https://github.com/nextcloud/forms/pull/2233)
 -   Drop NC27 support for dependabot by @Chartman123 in [\#2223](https://github.com/nextcloud/forms/pull/2223)
 -   fix(i18n): Fixed grammar by @rakekniven in [\#2224](https://github.com/nextcloud/forms/pull/2224)
--   fix: reformat composer.lock with prettier by @Chartman123 in [\#2215](https://github.com/nextcloud/forms/pull/2215)
 -   feat: Switch to PlayWright for E2E and component tests by @susnux in [\#2077](https://github.com/nextcloud/forms/pull/2077)
 -   chore: Use prettier for stylistic rules by @Chartman123 in [\#2143](https://github.com/nextcloud/forms/pull/2143)
 
