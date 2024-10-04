@@ -256,16 +256,16 @@
 		},
 		{
 			"name": "phpoffice/phpspreadsheet",
-			"version": "2.1.0",
+			"version": "2.1.1",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-				"reference": "dbed77bd3a0f68f96c0dd68ad4499d5674fecc3e"
+				"reference": "4e58d8ae1502d7f22af9e4cfeb2d645e243dec4e"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/dbed77bd3a0f68f96c0dd68ad4499d5674fecc3e",
-				"reference": "dbed77bd3a0f68f96c0dd68ad4499d5674fecc3e",
+				"url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/4e58d8ae1502d7f22af9e4cfeb2d645e243dec4e",
+				"reference": "4e58d8ae1502d7f22af9e4cfeb2d645e243dec4e",
 				"shasum": ""
 			},
 			"require": {
@@ -354,9 +354,9 @@
 			],
 			"support": {
 				"issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-				"source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/2.1.0"
+				"source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/2.1.1"
 			},
-			"time": "2024-05-11T04:17:56+00:00"
+			"time": "2024-09-29T07:06:46+00:00"
 		},
 		{
 			"name": "psr/http-client",
@@ -764,12 +764,12 @@
 			"source": {
 				"type": "git",
 				"url": "https://github.com/nextcloud-deps/ocp.git",
-				"reference": "be3a853bcba7702887aab852fc3c8006787865d8"
+				"reference": "13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/be3a853bcba7702887aab852fc3c8006787865d8",
-				"reference": "be3a853bcba7702887aab852fc3c8006787865d8",
+				"url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee",
+				"reference": "13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee",
 				"shasum": ""
 			},
 			"require": {
@@ -800,20 +800,20 @@
 				"issues": "https://github.com/nextcloud-deps/ocp/issues",
 				"source": "https://github.com/nextcloud-deps/ocp/tree/stable28"
 			},
-			"time": "2024-09-04T00:40:09+00:00"
+			"time": "2024-09-17T00:34:06+00:00"
 		},
 		{
 			"name": "nikic/php-parser",
-			"version": "v5.1.0",
+			"version": "v5.3.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/nikic/PHP-Parser.git",
-				"reference": "683130c2ff8c2739f4822ff7ac5c873ec529abd1"
+				"reference": "3abf7425cd284141dc5d8d14a9ee444de3345d1a"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/683130c2ff8c2739f4822ff7ac5c873ec529abd1",
-				"reference": "683130c2ff8c2739f4822ff7ac5c873ec529abd1",
+				"url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/3abf7425cd284141dc5d8d14a9ee444de3345d1a",
+				"reference": "3abf7425cd284141dc5d8d14a9ee444de3345d1a",
 				"shasum": ""
 			},
 			"require": {
@@ -856,9 +856,9 @@
 			],
 			"support": {
 				"issues": "https://github.com/nikic/PHP-Parser/issues",
-				"source": "https://github.com/nikic/PHP-Parser/tree/v5.1.0"
+				"source": "https://github.com/nikic/PHP-Parser/tree/v5.3.0"
 			},
-			"time": "2024-07-01T20:03:41+00:00"
+			"time": "2024-09-29T13:56:26+00:00"
 		},
 		{
 			"name": "phar-io/manifest",
@@ -1299,16 +1299,16 @@
 		},
 		{
 			"name": "phpunit/phpunit",
-			"version": "9.6.20",
+			"version": "9.6.21",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/sebastianbergmann/phpunit.git",
-				"reference": "49d7820565836236411f5dc002d16dd689cde42f"
+				"reference": "de6abf3b6f8dd955fac3caad3af7a9504e8c2ffa"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/49d7820565836236411f5dc002d16dd689cde42f",
-				"reference": "49d7820565836236411f5dc002d16dd689cde42f",
+				"url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/de6abf3b6f8dd955fac3caad3af7a9504e8c2ffa",
+				"reference": "de6abf3b6f8dd955fac3caad3af7a9504e8c2ffa",
 				"shasum": ""
 			},
 			"require": {
@@ -1323,7 +1323,7 @@
 				"phar-io/manifest": "^2.0.4",
 				"phar-io/version": "^3.2.1",
 				"php": ">=7.3",
-				"phpunit/php-code-coverage": "^9.2.31",
+				"phpunit/php-code-coverage": "^9.2.32",
 				"phpunit/php-file-iterator": "^3.0.6",
 				"phpunit/php-invoker": "^3.1.1",
 				"phpunit/php-text-template": "^2.0.4",
@@ -1382,7 +1382,7 @@
 			"support": {
 				"issues": "https://github.com/sebastianbergmann/phpunit/issues",
 				"security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-				"source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.20"
+				"source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.21"
 			},
 			"funding": [
 				{
@@ -1398,7 +1398,7 @@
 					"type": "tidelift"
 				}
 			],
-			"time": "2024-07-10T11:45:39+00:00"
+			"time": "2024-09-19T10:50:18+00:00"
 		},
 		{
 			"name": "psr/clock",
