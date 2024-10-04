@@ -56,7 +56,7 @@ use OCP\Share\IShare;
  */
 class FormsService {
 	private ?IUser $currentUser;
-	
+
 	public function __construct(
 		IUserSession $userSession,
 		private ActivityManager $activityManager,
@@ -780,6 +780,6 @@ class FormsService {
 	}
 
 	private static function normalizeFileName(string $fileName): string {
-		return str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
+		return str_replace([...mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), "\n"], '-', $fileName);
 	}
 }
