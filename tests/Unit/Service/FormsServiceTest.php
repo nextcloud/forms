@@ -1445,6 +1445,13 @@ class FormsServiceTest extends TestCase {
 		$this->formsService->getFileName($form, 'dummy');
 	}
 
+	public function testGetFileNameReplacesNewLines() {
+		$form = new Form();
+		$form->setTitle("Form \n new line");
+
+		$this->assertSame('Form - new line (responses).xlsx', $this->formsService->getFileName($form, 'xlsx'));
+	}
+
 	public function testGetFileName() {
 		$form = new Form();
 		$form->setTitle('Form 1');
