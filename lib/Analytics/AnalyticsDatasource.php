@@ -16,14 +16,12 @@ use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCP\IL10N;
-use Psr\Log\LoggerInterface;
 
 class AnalyticsDatasource implements IDatasource {
 
 	public function __construct(
 		protected ?string $userId,
 		private IL10N $l10n,
-		private LoggerInterface $logger,
 		private FormMapper $formMapper,
 		private FormsService $formsService,
 		private SubmissionService $submissionService,

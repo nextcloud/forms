@@ -105,20 +105,6 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
-	 * Delete a share
-	 * @param int $id of the share.
-	 */
-	public function deleteById(int $id): void {
-		$qb = $this->db->getQueryBuilder();
-
-		$qb->delete($this->getTableName())
-			->where(
-				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
-			);
-		$qb->executeStatement();
-	}
-
-	/**
 	 * Delete all Shares of a form.
 	 * @param int $formId
 	 */

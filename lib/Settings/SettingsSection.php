@@ -32,7 +32,7 @@ use OCP\Settings\IIconSection;
 class SettingsSection implements IIconSection {
 	public function __construct(
 		private IL10N $l10n,
-		private IURLGenerator $urlGenerator
+		private IURLGenerator $urlGenerator,
 	) {
 	}
 

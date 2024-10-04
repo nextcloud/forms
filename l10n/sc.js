@@ -59,7 +59,7 @@ OC.L10N.register(
     "No response" : "Peruna risposta",
     "Delete this response" : "Cantzella custa risposta",
     "Allow multiple responses per person" : "Permite rispostas mùltiplas pro persone",
-    "Set expiration date" : "Imposta data de iscadèntzia",
+    "Set expiration date" : "Cunfigura una data de iscadèntzia",
     "Expired on {date}" : "Iscadidu su {date}",
     "Expires on {date}" : "Iscadit su {date}",
     "Permissions" : "Permissos",

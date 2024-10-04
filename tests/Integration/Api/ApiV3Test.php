@@ -84,13 +84,16 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 2,
 						'options' => [
 							[
-								'text' => 'Option 1'
+								'text' => 'Option 1',
+								'order' => 1
 							],
 							[
-								'text' => 'Option 2'
+								'text' => 'Option 2',
+								'order' => 2
 							],
 							[
-								'text' => ''
+								'text' => '',
+								'order' => 3
 							]
 						],
 						'accept' => [],
@@ -464,13 +467,16 @@ class ApiV3Test extends IntegrationBase {
 							'order' => 2,
 							'options' => [
 								[
-									'text' => 'Option 1'
+									'text' => 'Option 1',
+									'order' => 1,
 								],
 								[
-									'text' => 'Option 2'
+									'text' => 'Option 2',
+									'order' => 2,
 								],
 								[
-									'text' => ''
+									'text' => '',
+									'order' => 3,
 								]
 							],
 							'accept' => [],
@@ -870,7 +876,8 @@ class ApiV3Test extends IntegrationBase {
 			'newOption' => [
 				'expected' => [
 					// 'questionId' => Done dynamically below.
-					'text' => 'A new Option.'
+					'text' => 'A new Option.',
+					'order' => 4,
 				]
 			]
 		];
@@ -957,6 +964,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['questions'][1]['options'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['questions'][1]['options'][0]['order'] = 1;
+		$fullFormExpected['questions'][1]['options'][1]['order'] = 2;
 
 		$this->testGetFullForm($fullFormExpected);
 	}

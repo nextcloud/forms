@@ -31,7 +31,7 @@ class Filter implements IFilter {
 	public function __construct(
 		protected string $appName,
 		private IL10N $l10n,
-		private IURLGenerator $urlGenerator
+		private IURLGenerator $urlGenerator,
 	) {
 	}
 

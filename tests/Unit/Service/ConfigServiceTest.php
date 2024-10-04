@@ -33,7 +33,6 @@ use OCP\IUser;
 use OCP\IUserSession;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 
 use Test\TestCase;
 
@@ -48,9 +47,6 @@ class ConfigServiceTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
 	/** @var IUser|MockObject */
 	private $currentUser;
 
@@ -59,7 +55,6 @@ class ConfigServiceTest extends TestCase {
 
 		$this->config = $this->createMock(IConfig::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$userSession = $this->createMock(IUserSession::class);
 
 		$this->currentUser = $this->createMock(IUser::class);
@@ -74,7 +69,6 @@ class ConfigServiceTest extends TestCase {
 			'forms',
 			$this->config,
 			$this->groupManager,
-			$this->logger,
 			$userSession
 		);
 	}
@@ -85,6 +79,7 @@ class ConfigServiceTest extends TestCase {
 				'strConfig' => [
 					'allowPermitAll' => 'false',
 					'allowPublicLink' => 'false',
+					'allowShowToAll' => 'false',
 					'creationAllowedGroups' => '["group1", "group2", "nonExisting"]',
 					'restrictCreation' => 'true',
 				],
@@ -95,6 +90,7 @@ class ConfigServiceTest extends TestCase {
 				'expected' => [
 					'allowPermitAll' => false,
 					'allowPublicLink' => false,
+					'allowShowToAll' => false,
 					'creationAllowedGroups' => [
 						[
 							'groupId' => 'group1',
@@ -157,9 +153,9 @@ class ConfigServiceTest extends TestCase {
 				'expected' => [
 					'allowPermitAll' => true,
 					'allowPublicLink' => true,
+					'allowShowToAll' => true,
 					'creationAllowedGroups' => [],
 					'restrictCreation' => false,
-
 					'canCreateForms' => true
 				]
 			]

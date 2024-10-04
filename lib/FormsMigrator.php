@@ -65,7 +65,7 @@ class FormsMigrator implements IMigrator {
 		private FormsService $formsService,
 		private SubmissionService $submissionService,
 		private IL10N $l10n,
-		private IUserManager $userManager
+		private IUserManager $userManager,
 	) {
 	}
 
@@ -159,14 +159,12 @@ class FormsMigrator implements IMigrator {
 				$form->setTitle($formData['title']);
 				$form->setDescription($formData['description']);
 				$form->setOwnerId($user->getUID());
-				$form->setCreated($formData['created']);
 				$form->setAccess($formData['access']);
 				$form->setExpires($formData['expires']);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
 				$form->setShowExpiration($formData['showExpiration']);
-				$form->setLastUpdated($formData['lastUpdated']);
-
+				
 				$this->formMapper->insert($form);
 
 				$questionIdMap = [];

@@ -33,9 +33,12 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -47,14 +50,13 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
-use Psr\Log\LoggerInterface;
 
 /**
  * Trait for getting forms information in a service
  */
 class FormsService {
 	private ?IUser $currentUser;
-	
+
 	public function __construct(
 		IUserSession $userSession,
 		private ActivityManager $activityManager,
@@ -65,13 +67,13 @@ class FormsService {
 		private SubmissionMapper $submissionMapper,
 		private ConfigService $configService,
 		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private IL10N $l10n,
 		private IMimeTypeDetector $mimeTypeDetector,
+		private IEventDispatcher $eventDispatcher,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -465,6 +467,14 @@ class FormsService {
 			return false;
 		}
 
+		// Shown if permitall and showntoall are both set.
+		if ($form->getAccess()['permitAllUsers'] &&
+			$form->getAccess()['showToAllUsers'] &&
+			$this->configService->getAllowPermitAll() &&
+			$this->configService->getAllowShowToAll()) {
+
+			return true;
+		}
 		return true;
 	}
 
@@ -563,17 +573,19 @@ class FormsService {
 	 * @param Form $form Related Form
 	 * @param string $submitter The ID of the user who submitted the form. Can also be our 'anon-user-'-ID
 	 */
-	public function notifyNewSubmission(Form $form, string $submitter): void {
+	public function notifyNewSubmission(Form $form, Submission $submission): void {
 		$shares = $this->getShares($form->getId());
-		$this->activityManager->publishNewSubmission($form, $submitter);
+		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
 
 		foreach ($shares as $share) {
 			if (!in_array(Constants::PERMISSION_RESULTS, $share['permissions'])) {
 				continue;
 			}
 
-			$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submitter);
+			$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submission->getUserId());
 		}
+
+		$this->eventDispatcher->dispatchTyped(new FormSubmittedEvent($form, $submission));
 	}
 
 	/**
@@ -610,17 +622,6 @@ class FormsService {
 					return false;
 			}
 		});
-	}
-
-	/**
-	 * Update lastUpdated timestamp for the given form
-	 *
-	 * @param int $formId The form to update
-	 */
-	public function setLastUpdatedTimestamp(int $formId): void {
-		$form = $this->formMapper->findById($formId);
-		$form->setLastUpdated(time());
-		$this->formMapper->update($form);
 	}
 
 	/*
@@ -730,7 +731,7 @@ class FormsService {
 			return null;
 		}
 
-		$folder = $this->storage->getUserFolder($form->getOwnerId());
+		$folder = $this->rootFolder->getUserFolder($form->getOwnerId());
 		$nodes = $folder->getById($fileId);
 
 		if (empty($nodes)) {
@@ -748,7 +749,7 @@ class FormsService {
 		}
 
 		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
-		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').'.$fileFormat;
+		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').' . $fileFormat;
 
 		return self::normalizeFileName($fileName);
 	}
@@ -756,7 +757,7 @@ class FormsService {
 	public function getFormUploadedFilesFolderPath(Form $form): string {
 		return implode('/', [
 			Constants::FILES_FOLDER,
-			self::normalizeFileName($form->getId().' - '.$form->getTitle()),
+			self::normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
 		]);
 	}
 
@@ -765,7 +766,7 @@ class FormsService {
 		return implode('/', [
 			$this->getFormUploadedFilesFolderPath($form),
 			$submissionId,
-			self::normalizeFileName($questionId.' - '.($questionName ?: $questionText))
+			self::normalizeFileName($questionId . ' - ' . ($questionName ?: $questionText))
 		]);
 	}
 
@@ -773,12 +774,12 @@ class FormsService {
 		return implode('/', [
 			Constants::UNSUBMITTED_FILES_FOLDER,
 			microtime(true),
-			self::normalizeFileName($form->getId().' - '.$form->getTitle()),
-			self::normalizeFileName($question->getId().' - '.($question->getName() ?: $question->getText()))
+			self::normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
+			self::normalizeFileName($question->getId() . ' - ' . ($question->getName() ?: $question->getText()))
 		]);
 	}
 
 	private static function normalizeFileName(string $fileName): string {
-		return str_replace(mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), '-', $fileName);
+		return str_replace([...mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), "\n"], '-', $fileName);
 	}
 }

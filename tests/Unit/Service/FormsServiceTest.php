@@ -57,11 +57,13 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
@@ -76,7 +78,6 @@ use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
@@ -108,9 +109,6 @@ class FormsServiceTest extends TestCase {
 	/** @var IGroupManager|MockObject */
 	private $groupManager;
 
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
 	/** @var IUserManager|MockObject */
 	private $userManager;
 
@@ -140,7 +138,6 @@ class FormsServiceTest extends TestCase {
 		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
@@ -175,13 +172,13 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 	}
 
@@ -231,12 +228,14 @@ class FormsServiceTest extends TestCase {
 							[
 								'id' => 1,
 								'questionId' => 1,
-								'text' => 'Option 1'
+								'text' => 'Option 1',
+								'order' => null,
 							],
 							[
 								'id' => 2,
 								'questionId' => 1,
-								'text' => 'Option 2'
+								'text' => 'Option 2',
+								'order' => null,
 							]
 						],
 						'accept' => [],
@@ -649,13 +648,13 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$form = new Form();
@@ -889,13 +888,13 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -1001,13 +1000,13 @@ class FormsServiceTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->groupManager,
-			$this->logger,
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
 			$this->mimeTypeDetector,
+			\OCP\Server::get(IEventDispatcher::class),
 		);
 
 		$form = new Form();
@@ -1213,9 +1212,13 @@ class FormsServiceTest extends TestCase {
 	public function testNotifyNewSubmission($shares, $shareNotifications) {
 		$owner = 'ownerUser';
 		$submitter = 'someUser';
+		$submission = new Submission();
+		$submission->setUserId($submitter);
 
 		$userSession = $this->createMock(IUserSession::class);
 		$userSession->method('getUser')->willReturn(null);
+
+		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 
 		$formsService = $this->getMockBuilder(FormsService::class)
 			->onlyMethods(['getShares'])
@@ -1229,13 +1232,13 @@ class FormsServiceTest extends TestCase {
 				$this->submissionMapper,
 				$this->configService,
 				$this->groupManager,
-				$this->logger,
 				$this->userManager,
 				$this->secureRandom,
 				$this->circlesService,
 				$this->storage,
 				$this->l10n,
 				$this->mimeTypeDetector,
+				$eventDispatcher,
 			])
 			->getMock();
 
@@ -1250,7 +1253,9 @@ class FormsServiceTest extends TestCase {
 		$this->activityManager->expects($this->exactly($shareNotifications))
 			->method('publishNewSharedSubmission');
 
-		$formsService->notifyNewSubmission($form, $submitter);
+		$eventDispatcher->expects($this->exactly(1))->method('dispatchTyped')->withAnyParameters();
+
+		$formsService->notifyNewSubmission($form, $submission);
 	}
 
 	/**
@@ -1375,7 +1380,7 @@ class FormsServiceTest extends TestCase {
 			'invalid-custom-regex-pattern' => [
 				'extraSettings' => [
 					'validationType' => 'regex',
-					'validationRegex' => '/'.'[/'
+					'validationRegex' => '/' . '[/'
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'rval' => false
@@ -1438,6 +1443,13 @@ class FormsServiceTest extends TestCase {
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->formsService->getFileName($form, 'dummy');
+	}
+
+	public function testGetFileNameReplacesNewLines() {
+		$form = new Form();
+		$form->setTitle("Form \n new line");
+
+		$this->assertSame('Form - new line (responses).xlsx', $this->formsService->getFileName($form, 'xlsx'));
 	}
 
 	public function testGetFileName() {

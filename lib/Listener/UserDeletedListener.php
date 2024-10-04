@@ -29,15 +29,12 @@ use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\User\Events\UserDeletedEvent;
 
-use Psr\Log\LoggerInterface;
-
 /**
  * @implements IEventListener<UserDeletedEvent>
  */
 class UserDeletedListener implements IEventListener {
 	public function __construct(
 		private IJobList $jobList,
-		private LoggerInterface $logger
 	) {
 	}
 

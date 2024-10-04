@@ -91,6 +91,11 @@ class ConfigControllerTest extends TestCase {
 				'configValue' => true,
 				'strConfig' => 'true'
 			],
+			'booleanConfig' => [
+				'configKey' => 'allowShowToAll',
+				'configValue' => true,
+				'strConfig' => 'true'
+			],
 			'arrayConfig' => [
 				'configKey' => 'allowPermitAll',
 				'configValue' => [

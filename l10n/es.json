@@ -94,8 +94,6 @@
     "Other" : "Otro",
     "Upper options limit must be greater than the lower limit" : "El límite de opciones máximas debe ser mayor al número de opciones mínimas",
     "Lower options limit must be smaller than the upper limit" : "El límite de opciones mínimas debe ser menor al número de opciones máximas",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Debe escoger al menos una opción","Debe escoger un máximo %n opciones","Debe escoger un máximo %n opciones"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Debe escoger al menos una opción","Debe escoger al menos %n opciones","Debe escoger al menos %n opciones"],
     "A short answer for the question “{text}”" : "Una respuesta corta para la pregunta \"{index}\"",
     "Input types (currently: {type})" : "Tipos de entrada (actualmente: {type})",
     "Regular expression for input validation" : "Expresión regular para validación de entrada",

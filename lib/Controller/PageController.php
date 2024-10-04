@@ -50,8 +50,6 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Util;
 
-use Psr\Log\LoggerInterface;
-
 class PageController extends Controller {
 	private const TEMPLATE_MAIN = 'main';
 
@@ -65,7 +63,6 @@ class PageController extends Controller {
 		private IAccountManager $accountManager,
 		private IInitialState $initialState,
 		private IL10N $l10n,
-		private LoggerInterface $logger,
 		private IUrlGenerator $urlGenerator,
 		private IUserManager $userManager,
 		private IUserSession $userSession,

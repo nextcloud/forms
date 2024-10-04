@@ -111,8 +111,6 @@
     "Other" : "Інше",
     "Upper options limit must be greater than the lower limit" : "Максимальна кількість варіантів має бути більшею за мінімальну",
     "Lower options limit must be smaller than the upper limit" : "Мінімальна кількість варіантів має бути меншею за максимальну",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Потрібно вибрати щонайбільше 1 варіант","Потрібно вибрати не більше %n варіантів","Потрібно вибрати не більше %n варіантів","Потрібно вибрати не більше %n варіантів"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Потрібно вибрати щонайменше 1 варіант","Потрібно вибрати не менше %n варіантів","Потрібно вибрати не менше %n варіантів","Потрібно вибрати не менше %n варіантів"],
     "A short answer for the question “{text}”" : "Коротка відповідь для запитання “{text}”",
     "Input types (currently: {type})" : "Тип поля (вибрано: {type})",
     "Regular expression for input validation" : "Регулярний вираз для перевірки поля",

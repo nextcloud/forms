@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Db;
 
-use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 
@@ -45,12 +44,10 @@ class OptionMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $questionId
-	 * @throws DoesNotExistException if not found
+	 * @param int|float $questionId
 	 * @return Option[]
 	 */
-
-	public function findByQuestion(int $questionId): array {
+	public function findByQuestion(int|float $questionId): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
@@ -58,7 +55,8 @@ class OptionMapper extends QBMapper {
 			->where(
 				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
 			)
-			->orderBy('id');
+			->orderBy('order')
+			->addOrderBy('id');
 
 		return $this->findEntities($qb);
 	}
@@ -74,7 +72,10 @@ class OptionMapper extends QBMapper {
 		$qb->executeStatement();
 	}
 
-	public function findById(int $optionId): Option {
+	/**
+	 * @param int|float $optionId The option ID (int but for 32bit systems PHP will use float)
+	 */
+	public function findById(int|float $optionId): Option {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')

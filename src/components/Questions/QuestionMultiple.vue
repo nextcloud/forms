@@ -407,7 +407,7 @@ export default {
 		},
 
 		onChange(value) {
-			this.$emit('update:values', this.isUnique ? [value] : value)
+			this.$emit('update:values', this.isUnique ? [value].flat() : value)
 		},
 
 		/**
@@ -421,7 +421,7 @@ export default {
 			)
 
 			if (value.length > pureValue.length) {
-				// make sure to add the cached test on re-enable
+				// make sure to add the cached text on re-enable
 				this.onChange([
 					...pureValue,
 					`${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${this.cachedOtherAnswerText}`,

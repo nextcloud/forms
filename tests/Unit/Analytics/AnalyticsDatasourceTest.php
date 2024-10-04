@@ -31,13 +31,11 @@ use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class AnalyticsDatasourceTest extends TestCase {
 
 	private IL10N|MockObject $l10n;
-	private LoggerInterface|MockObject $logger;
 	private FormMapper|MockObject $formMapper;
 	private FormsService|MockObject $formsService;
 	private SubmissionService|MockObject $submissionService;
@@ -52,7 +50,6 @@ class AnalyticsDatasourceTest extends TestCase {
 		}
 
 		$this->l10n = $this->createMock(IL10N::class);
-		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->submissionService = $this->createMock(SubmissionService::class);
@@ -60,7 +57,6 @@ class AnalyticsDatasourceTest extends TestCase {
 		$this->analyticsDatasource = new AnalyticsDatasource(
 			null,
 			$this->l10n,
-			$this->logger,
 			$this->formMapper,
 			$this->formsService,
 			$this->submissionService,

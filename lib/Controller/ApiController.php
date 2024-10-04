@@ -87,7 +87,7 @@ class ApiController extends OCSController {
 		private IL10N $l10n,
 		private LoggerInterface $logger,
 		private IUserManager $userManager,
-		private IRootFolder $storage,
+		private IRootFolder $rootFolder,
 		private UploadedFileMapper $uploadedFileMapper,
 		private IMimeTypeDetector $mimeTypeDetector,
 	) {
@@ -145,7 +145,6 @@ class ApiController extends OCSController {
 			// Create Form
 			$form = new Form();
 			$form->setOwnerId($this->currentUser->getUID());
-			$form->setCreated(time());
 			$form->setHash($this->formsService->generateFormHash());
 			$form->setTitle('');
 			$form->setDescription('');
@@ -157,7 +156,6 @@ class ApiController extends OCSController {
 			$form->setShowExpiration(false);
 			$form->setExpires(0);
 			$form->setIsAnonymous(false);
-			$form->setLastUpdated(time());
 
 			$this->formMapper->insert($form);
 		} else {
@@ -166,8 +164,8 @@ class ApiController extends OCSController {
 			// Read Form, set new Form specific data, extend Title.
 			$formData = $oldForm->read();
 			unset($formData['id']);
-			$formData['created'] = time();
-			$formData['lastUpdated'] = time();
+			unset($formData['created']);
+			unset($formData['lastUpdated']);
 			$formData['hash'] = $this->formsService->generateFormHash();
 			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
@@ -262,7 +260,6 @@ class ApiController extends OCSController {
 				'uid' => $keyValuePairs['ownerId']
 			]);
 
-			$form = $this->getFormIfAllowed($formId);
 			$user = $this->userManager->get($keyValuePairs['ownerId']);
 			if ($user == null) {
 				$this->logger->debug('Could not find new form owner');
@@ -314,7 +311,6 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
-		$this->formsService->setLastUpdatedTimestamp($formId);
 
 		return new DataResponse($form->getId());
 	}
@@ -468,8 +464,6 @@ class ApiController extends OCSController {
 			$response = $question->read();
 			$response['options'] = [];
 			$response['accept'] = [];
-
-			$this->formsService->setLastUpdatedTimestamp($formId);
 		} else {
 			$this->logger->debug('Question to be cloned: {fromId}', [
 				'fromId' => $fromId
@@ -507,6 +501,8 @@ class ApiController extends OCSController {
 				$response['options'][] = $insertedOption->read();
 			}
 		}
+
+		$this->formMapper->update($form);
 
 		return new DataResponse($response);
 	}
@@ -577,8 +573,7 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->questionMapper->update($question);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($question->getId());
 	}
@@ -634,7 +629,7 @@ class ApiController extends OCSController {
 			}
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($questionId);
 	}
@@ -723,7 +718,7 @@ class ApiController extends OCSController {
 			];
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($response);
 	}
@@ -749,12 +744,17 @@ class ApiController extends OCSController {
 			'text' => $optionTexts,
 		]);
 
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+		
 		try {
 			$question = $this->questionMapper->findById($questionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question');
-			throw new OCSBadRequestException('Could not find form or question');
+			$this->logger->debug('Could not find question');
+			throw new OCSBadRequestException('Could not find question');
 		}
 
 		if ($question->getFormId() !== $formId) {
@@ -764,14 +764,13 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
+		$options = $this->optionMapper->findByQuestion($questionId);
+		$lastOption = array_pop($options);
+		if ($lastOption) {
+			$optionOrder = $lastOption->getOrder() + 1;
+		} else {
+			$optionOrder = 1;
 		}
 
 		$addedOptions = [];
@@ -780,6 +779,7 @@ class ApiController extends OCSController {
 
 			$option->setQuestionId($questionId);
 			$option->setText($text);
+			$option->setOrder($optionOrder++);
 
 			try {
 				$option = $this->optionMapper->insert($option);
@@ -791,7 +791,7 @@ class ApiController extends OCSController {
 			}
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($addedOptions);
 	}
@@ -818,28 +818,23 @@ class ApiController extends OCSController {
 			'keyValuePairs' => $keyValuePairs
 		]);
 
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find option, question or form');
-			throw new OCSBadRequestException('Could not find option, question or form');
+			$this->logger->debug('Could not find option or question');
+			throw new OCSBadRequestException('Could not find option or question');
 		}
 
 		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $formId) {
 			$this->logger->debug('The given option id doesn\'t match the question or form.');
 			throw new OCSBadRequestException();
-		}
-
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
-		}
-
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
 		}
 
 		// Don't allow empty array
@@ -861,7 +856,7 @@ class ApiController extends OCSController {
 		// Update changed Columns in Db.
 		$this->optionMapper->update($option);
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($option->getId());
 	}
@@ -884,10 +879,15 @@ class ApiController extends OCSController {
 			'optionId' => $optionId
 		]);
 
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException();
+		}
+		
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form, question or option');
 			throw new OCSBadRequestException('Could not find form, question or option');
@@ -898,21 +898,103 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException();
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
+		$this->optionMapper->delete($option);
+
+		// Reorder the remaining options
+		$options = array_values($this->optionMapper->findByQuestion($questionId));
+		foreach ($options as $order => $option) {
+			// Always start order with 1
+			$option->setOrder($order + 1);
+			$this->optionMapper->update($option);
 		}
 
+		$this->formMapper->update($form);
+
+		return new DataResponse($optionId);
+	}
+
+	/**
+	 * Reorder options for a given question
+	 * @param int $formId id of form
+	 * @param int $questionId id of question
+	 * @param Array<int, int> $newOrder Order to use
+	 */
+	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
+		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
 
-		$this->optionMapper->delete($option);
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form or question', ['exception' => $e]);
+			throw new OCSNotFoundException('Could not find form or question');
+		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		if ($question->getFormId() !== $formId) {
+			$this->logger->debug('The given question id doesn\'t match the form.');
+			throw new OCSBadRequestException();
+		}
 
-		return new DataResponse($optionId);
+		// Check if array contains duplicates
+		if (array_unique($newOrder) !== $newOrder) {
+			$this->logger->debug('The given array contains duplicates');
+			throw new OCSBadRequestException('The given array contains duplicates');
+		}
+		
+		$options = $this->optionMapper->findByQuestion($questionId);
+		
+		if (sizeof($options) !== sizeof($newOrder)) {
+			$this->logger->debug('The length of the given array does not match the number of stored options');
+			throw new OCSBadRequestException('The length of the given array does not match the number of stored options');
+		}
+		
+		$options = []; // Clear Array of Entities
+		$response = []; // Array of ['optionId' => ['order' => newOrder]]
+
+		// Store array of Option entities and check the Options questionId & old order.
+		foreach ($newOrder as $arrayKey => $optionId) {
+			try {
+				$options[$arrayKey] = $this->optionMapper->findById($optionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find option. Id: {optionId}', [
+					'optionId' => $optionId
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Abort if a question is not part of the Form.
+			if ($options[$arrayKey]->getQuestionId() !== $questionId) {
+				$this->logger->debug('This Option is not part of the given Question: formId: {formId}', [
+					'formId' => $formId
+				]);
+				throw new OCSBadRequestException();
+			}
+
+			// Abort if a question is already marked as deleted (order==0)
+			$oldOrder = $options[$arrayKey]->getOrder();
+
+			// Only set order, if it changed.
+			if ($oldOrder !== $arrayKey + 1) {
+				// Set Order. ArrayKey counts from zero, order counts from 1.
+				$options[$arrayKey]->setOrder($arrayKey + 1);
+			}
+		}
+
+		// Write to Database
+		foreach ($options as $option) {
+			$this->optionMapper->update($option);
+
+			$response[$option->getId()] = [
+				'order' => $option->getOrder()
+			];
+		}
+
+		$this->formMapper->update($form);
+	
+		return new DataResponse($response);
 	}
 
 	// Submissions
@@ -1009,8 +1091,7 @@ class ApiController extends OCSController {
 
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($formId);
 	}
@@ -1056,7 +1137,7 @@ class ApiController extends OCSController {
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = 'anon-user-' .  hash('md5', strval(time() + rand()));
+			$anonID = 'anon-user-' . hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());
@@ -1089,10 +1170,10 @@ class ApiController extends OCSController {
 			$this->storeAnswersForQuestion($form, $submission->getId(), $questions[$questionIndex], $answerArray);
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
+		$this->formsService->notifyNewSubmission($form, $submission);
 
 		if ($form->getFileId() !== null) {
 			try {
@@ -1149,8 +1230,7 @@ class ApiController extends OCSController {
 
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->deleteById($submissionId);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($submissionId);
 	}
@@ -1253,7 +1333,7 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Invalid file provided');
 			}
 
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 			$userFolder->getStorage()->verifyPath($path, $uploadedFile['name']);
 
 			$extraSettings = $question->getExtraSettings();
@@ -1435,7 +1515,6 @@ class ApiController extends OCSController {
 		// Create Form
 		$form = new Form();
 		$form->setOwnerId($this->currentUser->getUID());
-		$form->setCreated(time());
 		$form->setHash($this->formsService->generateFormHash());
 		$form->setTitle('');
 		$form->setDescription('');
@@ -1447,7 +1526,6 @@ class ApiController extends OCSController {
 		$form->setShowExpiration(false);
 		$form->setExpires(0);
 		$form->setIsAnonymous(false);
-		$form->setLastUpdated(time());
 
 		$this->formMapper->insert($form);
 
@@ -1561,7 +1639,6 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
-		$this->formsService->setLastUpdatedTimestamp($id);
 
 		return new DataResponse($form->getId());
 	}
@@ -1683,7 +1760,7 @@ class ApiController extends OCSController {
 		$response['options'] = [];
 		$response['accept'] = [];
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($response);
 	}
@@ -1772,7 +1849,7 @@ class ApiController extends OCSController {
 			];
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($response);
 	}
@@ -1837,8 +1914,7 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->questionMapper->update($question);
-
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->formMapper->update($form);
 
 		return new DataResponse($question->getId());
 	}
@@ -1890,7 +1966,7 @@ class ApiController extends OCSController {
 			}
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->formMapper->update($form);
 
 		return new DataResponse($id);
 	}
@@ -1991,14 +2067,23 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
+		$options = $this->optionMapper->findByQuestion($questionId);
+		$lastOption = array_pop($options);
+		if ($lastOption) {
+			$optionOrder = $lastOption->getOrder() + 1;
+		} else {
+			$optionOrder = 1;
+		}
+
 		$option = new Option();
 
 		$option->setQuestionId($questionId);
 		$option->setText($text);
+		$option->setOrder($optionOrder);
 
 		$option = $this->optionMapper->insert($option);
-
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->formMapper->update($form);
 
 		return new DataResponse($option->read());
 	}
@@ -2058,8 +2143,7 @@ class ApiController extends OCSController {
 
 		// Update changed Columns in Db.
 		$this->optionMapper->update($option);
-
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->formMapper->update($form);
 
 		return new DataResponse($option->getId());
 	}
@@ -2101,7 +2185,15 @@ class ApiController extends OCSController {
 
 		$this->optionMapper->delete($option);
 
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		// Reorder the remaining options
+		$options = array_values($this->optionMapper->findByQuestion($option->getQuestionId()));
+		foreach ($options as $order => $option) {
+			// Always start order with 1
+			$option->setOrder($order + 1);
+			$this->optionMapper->update($option);
+		}
+
+		$this->formMapper->update($form);
 
 		return new DataResponse($id);
 	}
@@ -2217,7 +2309,7 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Invalid file provided');
 			}
 
-			$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 			$userFolder->getStorage()->verifyPath($path, $uploadedFile['name']);
 
 			$extraSettings = $question->getExtraSettings();
@@ -2326,7 +2418,7 @@ class ApiController extends OCSController {
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = 'anon-user-' .  hash('md5', strval(time() + rand()));
+			$anonID = 'anon-user-' . hash('md5', strval(time() + rand()));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());
@@ -2359,10 +2451,10 @@ class ApiController extends OCSController {
 			$this->storeAnswersForQuestion($form, $submission->getId(), $questions[$questionIndex], $answerArray);
 		}
 
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission->getUserId());
+		$this->formsService->notifyNewSubmission($form, $submission);
 
 		if ($form->getFileId() !== null) {
 			try {
@@ -2411,8 +2503,7 @@ class ApiController extends OCSController {
 
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->deleteById($id);
-
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
+		$this->formMapper->update($form);
 
 		return new DataResponse($id);
 	}
@@ -2448,8 +2539,7 @@ class ApiController extends OCSController {
 
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
-
-		$this->formsService->setLastUpdatedTimestamp($formId);
+		$this->formMapper->update($form);
 
 		return new DataResponse($formId);
 	}
@@ -2548,8 +2638,6 @@ class ApiController extends OCSController {
 
 		$this->formMapper->update($form);
 
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
-
 		return new DataResponse($hash);
 	}
 
@@ -2593,8 +2681,6 @@ class ApiController extends OCSController {
 
 		$filePath = $this->formsService->getFilePath($form);
 
-		$this->formsService->setLastUpdatedTimestamp($form->getId());
-
 		return new DataResponse([
 			'fileId' => $file->getId(),
 			'fileFormat' => $fileFormat,
@@ -2634,7 +2720,7 @@ class ApiController extends OCSController {
 				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
 				$answerEntity->setFileId($uploadedFile->getFileId());
 
-				$userFolder = $this->storage->getUserFolder($form->getOwnerId());
+				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
 
 				if ($userFolder->nodeExists($path)) {

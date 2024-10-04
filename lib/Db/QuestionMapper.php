@@ -37,7 +37,7 @@ use OCP\IDBConnection;
 class QuestionMapper extends QBMapper {
 	public function __construct(
 		IDBConnection $db,
-		private OptionMapper $optionMapper
+		private OptionMapper $optionMapper,
 	) {
 		parent::__construct($db, 'forms_v2_questions', Question::class);
 	}
@@ -47,7 +47,6 @@ class QuestionMapper extends QBMapper {
 	 * @throws DoesNotExistException if not found
 	 * @return Question[]
 	 */
-
 	public function findByForm(int $formId, bool $loadDeleted = false): array {
 		$qb = $this->db->getQueryBuilder();
 
@@ -91,7 +90,11 @@ class QuestionMapper extends QBMapper {
 		$qb->executeStatement();
 	}
 
-	public function findById(int $questionId): Question {
+	/**
+	 * Find Question by its ID
+	 * @param int|float $questionId The question ID (int but for 32bit systems PHP uses float)
+	 */
+	public function findById(int|float $questionId): Question {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')

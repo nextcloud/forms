@@ -111,8 +111,6 @@ OC.L10N.register(
     "Other" : "Autre",
     "Upper options limit must be greater than the lower limit" : "Le nombre d'options maxi à cocher doit être supérieur au nombre d'options mini.",
     "Lower options limit must be smaller than the upper limit" : "Le nombre d'options mini à cocher doit être inférieur au nombre d'options maxi.",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Vous devez choisir au minimum %n option","Vous devez choisir au minimum %n options","Vous devez choisir au maximum %n options"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Vous devez choisir au minimum %n option","Vous devez choisir au minimum %n options","Vous devez choisir au minimum %n options"],
     "A short answer for the question “{text}”" : "Une réponse courte à la question “{text}”",
     "Input types (currently: {type})" : "Types de saisie (actuellement : {type})",
     "Regular expression for input validation" : "Expression régulière pour validation de la saisie",

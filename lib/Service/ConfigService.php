@@ -33,8 +33,6 @@ use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserSession;
 
-use Psr\Log\LoggerInterface;
-
 class ConfigService {
 	private ?IUser $currentUser;
 		
@@ -42,8 +40,7 @@ class ConfigService {
 		protected string $appName,
 		private IConfig $config,
 		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
-		IUserSession $userSession
+		IUserSession $userSession,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -56,6 +53,9 @@ class ConfigService {
 	}
 	public function getAllowPublicLink(): bool {
 		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPUBLICLINK, 'true'));
+	}
+	public function getAllowShowToAll() : bool {
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWSHOWTOALL, 'true'));
 	}
 	private function getUnformattedCreationAllowedGroups(): array {
 		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS, '[]'));
@@ -74,6 +74,7 @@ class ConfigService {
 		return [
 			Constants::CONFIG_KEY_ALLOWPERMITALL => $this->getAllowPermitAll(),
 			Constants::CONFIG_KEY_ALLOWPUBLICLINK => $this->getAllowPublicLink(),
+			Constants::CONFIG_KEY_ALLOWSHOWTOALL => $this->getAllowShowToAll(),
 			Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS => $this->getCreationAllowedGroups(),
 			Constants::CONFIG_KEY_RESTRICTCREATION => $this->getRestrictCreation(),
 

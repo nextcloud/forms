@@ -28,7 +28,7 @@ use OCP\Capabilities\ICapability;
 
 class Capabilities implements ICapability {
 	public function __construct(
-		private IAppManager $appManager
+		private IAppManager $appManager,
 	) {
 	}
 
@@ -40,7 +40,7 @@ class Capabilities implements ICapability {
 		return [
 			'forms' => [
 				'version' => $this->appManager->getAppVersion('forms'),
-				'apiVersions' => ['v2','v2.1','v2.2']
+				'apiVersions' => ['v2','v2.1','v2.2','v2.3','v2.4','v2.5','v3']
 			]
 		];
 	}

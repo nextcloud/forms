@@ -99,8 +99,6 @@ OC.L10N.register(
     "Other" : "Άλλο",
     "Upper options limit must be greater than the lower limit" : "Το ανώτερο όριο επιλογών πρέπει να είναι μεγαλύτερο από το κατώτερο όριο",
     "Lower options limit must be smaller than the upper limit" : "Το κατώτερο όριο επιλογών πρέπει να είναι μικρότερο από το ανώτερο όριο",
-    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Πρέπει να επιλέξετε το πολύ μια επιλογή","Πρέπει να επιλέξετε το πολύ %n επιλογές"],
-    "_You must choose at least one option_::_You must choose at least %n options_" : ["Πρέπει να επιλέξετε τουλάχιστον μία επιλογή","Πρέπει να επιλέξετε τουλάχιστον %n επιλογές"],
     "A short answer for the question “{text}”" : "Σύντομη απάντηση στην ερώτηση “{text}”",
     "Regular expression for input validation" : "Regular expression για επικύρωση εισόδου",
     "Invalid regular expression" : "Μη έγκυρη regular expression",
