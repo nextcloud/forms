@@ -36,6 +36,10 @@ use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Http\Attribute\FrontpageRoute;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\Response;
@@ -71,11 +75,11 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @return TemplateResponse
 	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[FrontpageRoute(verb: 'GET', url: '/')]
 	public function index(?string $hash = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
@@ -93,22 +97,23 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @return TemplateResponse
 	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[FrontpageRoute(verb: 'GET', url: '/{hash}/{view}')]
 	public function views(string $hash): TemplateResponse {
 		return $this->index($hash);
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @PublicPage
 	 * @param string $hash
 	 * @return RedirectResponse|TemplateResponse Redirect to login or internal view.
 	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[FrontpageRoute(verb: 'GET', url: '/{hash}')]
 	public function internalLinkView(string $hash): Response {
 		$internalView = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
 
@@ -122,12 +127,13 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @PublicPage
 	 * @param string $hash Public sharing hash.
 	 * @return TemplateResponse Public template.
 	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}')]
 	public function publicLinkView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
@@ -140,13 +146,13 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @PublicPage
-	 * @NoCSRFRequired
-	 *
 	 * @param string $hash
 	 * @return Response
 	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[FrontpageRoute(verb: 'GET', url: '/embed/{hash}')]
 	public function embeddedFormView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
