@@ -50,6 +50,9 @@ use OCA\Forms\Service\SubmissionService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\Response;
@@ -98,13 +101,13 @@ class ApiController extends OCSController {
 	// API v3 methods
 	// Forms
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Read Form-List of owned forms
 	 * Return only with necessary information for Listing.
 	 * @return DataResponse
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function getForms(string $type = 'owned'): DataResponse {
 		if ($type === 'owned') {
 			$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
@@ -123,9 +126,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Create a new Form and return the Form to edit.
 	 * Return a cloned Form if the parameter $fromId is set
 	 *
@@ -134,6 +134,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function newForm(?int $fromId = null): DataResponse {
 		// Check if user is allowed
 		if (!$this->configService->canCreateForms()) {
@@ -199,9 +202,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
 	 *
 	 * @param int $formId Id of the form
@@ -209,6 +209,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function getForm(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -228,9 +231,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Writes the given key-value pairs into Database.
 	 *
 	 * @param int $formId FormId of form to update
@@ -239,6 +239,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function updateForm(int $formId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: formId: {formId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -316,9 +319,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Delete a form
 	 *
 	 * @param int $formId the form id
@@ -326,6 +326,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function deleteForm(int $formId): DataResponse {
 		$this->logger->debug('Delete Form: {formId}', [
 			'formId' => $formId,
@@ -339,9 +342,6 @@ class ApiController extends OCSController {
 
 	// Questions
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Read all questions (including options)
 	 *
 	 * @param int $formId FormId
@@ -349,6 +349,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function getQuestions(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -368,9 +371,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Read a specific question (including options)
 	 *
 	 * @param int $formId FormId
@@ -379,6 +379,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function getQuestion(int $formId, int $questionId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -402,9 +405,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Add a new question
 	 *
 	 * @param int $formId the form id
@@ -415,6 +415,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
@@ -508,9 +511,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Writes the given key-value pairs into Database.
 	 * Key 'order' should only be changed by reorderQuestions() and is not allowed here.
 	 *
@@ -521,6 +521,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function updateQuestion(int $formId, int $questionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating question: formId: {formId}, questionId: {questionId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -579,9 +582,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Delete a question
 	 *
 	 * @param int $formId the form id
@@ -590,6 +590,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function deleteQuestion(int $formId, int $questionId): DataResponse {
 		$this->logger->debug('Mark question as deleted: {questionId}', [
 			'questionId' => $questionId,
@@ -635,9 +638,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Updates the Order of all Questions of a Form.
 	 *
 	 * @param int $formId Id of the form to reorder
@@ -646,6 +646,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function reorderQuestions(int $formId, array $newOrder): DataResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
 			'formId' => $formId,
@@ -726,8 +729,6 @@ class ApiController extends OCSController {
 	// Options
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * Add a new option to a question
 	 *
 	 * @param int $formId id of the form
@@ -737,6 +738,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function newOption(int $formId, int $questionId, array $optionTexts): DataResponse {
 		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}', [
 			'formId' => $formId,
@@ -797,9 +801,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Writes the given key-value pairs into Database.
 	 *
 	 * @param int $formId id of form
@@ -810,6 +811,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options/{optionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function updateOption(int $formId, int $questionId, int $optionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating option: form: {formId}, question: {questionId}, option: {optionId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -862,9 +866,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Delete an option
 	 *
 	 * @param int $formId id of form
@@ -874,6 +875,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options/{optionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function deleteOption(int $formId, int $questionId, int $optionId): DataResponse {
 		$this->logger->debug('Deleting option: {optionId}', [
 			'optionId' => $optionId
@@ -919,6 +923,9 @@ class ApiController extends OCSController {
 	 * @param int $questionId id of question
 	 * @param Array<int, int> $newOrder Order to use
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
@@ -1000,9 +1007,6 @@ class ApiController extends OCSController {
 	// Submissions
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Get all the submissions of a given form
 	 *
 	 * @param int $formId of the form
@@ -1010,6 +1014,9 @@ class ApiController extends OCSController {
 	 * @throws OCSNotFoundException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function getSubmissions(int $formId, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -1061,9 +1068,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Delete all submissions of a specified form
 	 *
 	 * @param int $formId the form id
@@ -1071,6 +1075,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function deleteAllSubmissions(int $formId): DataResponse {
 		$this->logger->debug('Delete all submissions to form: {formId}', [
 			'formId' => $formId,
@@ -1097,11 +1104,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 * @PublicPage
-	 *
 	 * Process a new submission
 	 *
 	 * @param int $formId the form id
@@ -1111,6 +1113,11 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function newSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
@@ -1193,9 +1200,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Delete a specific submission
 	 *
 	 * @param int $formId the form id
@@ -1204,6 +1208,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/submissions/{submissionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function deleteSubmission(int $formId, int $submissionId): DataResponse {
 		$this->logger->debug('Delete Submission: {submissionId}', [
 			'submissionId' => $submissionId,
@@ -1236,9 +1243,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 *
 	 * Export Submissions to the Cloud
 	 *
 	 * @param int $formId of the form
@@ -1248,6 +1252,9 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException
 	 * @throws OCSForbiddenException
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/export', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function exportSubmissionsToCloud(int $formId, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -1267,10 +1274,6 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * @CORS
-	 * @NoAdminRequired
-	 * @PublicPage
-	 *
 	 * Uploads a temporary files to the server during form filling
 	 *
 	 * @param int $formId id of the form
@@ -1278,6 +1281,10 @@ class ApiController extends OCSController {
 	 * @param string $shareHash hash of the form share
 	 * @return Response
 	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[PublicPage()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/files/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
 	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): Response {
 		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}', [
 			'formId' => $formId,

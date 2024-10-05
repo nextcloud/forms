@@ -25,83 +25,14 @@
  *
  */
 
-$apiBase = '/api/{apiVersion}/';
-$requirements_v3 = [
-	'apiVersion' => 'v3',
-	'formId' => '\d+',
-	'questionId' => '\d+',
-	'optionId' => '\d+',
-	'shareId' => '\d+',
-	'submissionId' => '\d+'
-];
+use OCA\Forms\Constants;
 
 return [
-	'routes' => [
-		// Internal AppConfig routes
-		['name' => 'config#getAppConfig', 'url' => '/config', 'verb' => 'GET'],
-		['name' => 'config#updateAppConfig', 'url' => '/config/update', 'verb' => 'PATCH'],
-
-		// Public Share Link
-		['name' => 'page#public_link_view', 'url' => '/s/{hash}', 'verb' => 'GET'],
-
-		// Embedded View
-		['name' => 'page#embedded_form_view', 'url' => '/embed/{hash}', 'verb' => 'GET'],
-
-		// Internal views
-		['name' => 'page#views', 'url' => '/{hash}/{view}', 'verb' => 'GET'],
-		// Internal Form Link
-		['name' => 'page#internal_link_view', 'url' => '/{hash}', 'verb' => 'GET'],
-		// App Root
-		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-	],
-
 	'ocs' => [
 		// CORS Preflight
-		['name' => 'api#preflightedCors', 'url' => $apiBase . '{path}', 'verb' => 'OPTIONS', 'requirements' => [
+		['name' => 'api#preflightedCors', 'url' => Constants::API_BASE . '{path}', 'verb' => 'OPTIONS', 'requirements' => [
 			'path' => '.+',
 			'apiVersion' => 'v3'
 		]],
-
-		// API routes v3
-		// Forms
-		['name' => 'api#getForms', 'url' => $apiBase . 'forms', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#newForm', 'url' => $apiBase . 'forms', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		['name' => 'api#getForm', 'url' => $apiBase . 'forms/{formId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#updateForm', 'url' => $apiBase . 'forms/{formId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteForm', 'url' => $apiBase . 'forms/{formId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-
-		// Questions
-		['name' => 'api#getQuestions', 'url' => $apiBase . 'forms/{formId}/questions', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#newQuestion', 'url' => $apiBase . 'forms/{formId}/questions', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		['name' => 'api#getQuestion', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#updateQuestion', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteQuestion', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-		['name' => 'api#reorderQuestions', 'url' => $apiBase . 'forms/{formId}/questions', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-
-		// Options
-		// ['name' => 'api#getOptions', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}/options', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#newOption', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}/options', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		// ['name' => 'api#getOption', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}/options/{optionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#updateOption', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}/options/{optionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteOption', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}/options/{optionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-		['name' => 'api#reorderOptions', 'url' => $apiBase . 'forms/{formId}/questions/{questionId}/options', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-
-		// Shares
-		// ['name' => 'shareApi#getUserShares', 'url' => $apiBase . 'shares', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		// ['name' => 'shareApi#getShares', 'url' => $apiBase . 'forms/{formId}/shares', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'shareApi#newShare', 'url' => $apiBase . 'forms/{formId}/shares', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		// ['name' => 'shareApi#getShare', 'url' => $apiBase . 'forms/{formId}/shares/{shareId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'shareApi#updateShare', 'url' => $apiBase . 'forms/{formId}/shares/{shareId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'shareApi#deleteShare', 'url' => $apiBase . 'forms/{formId}/shares/{shareId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-
-		// Submissions
-		['name' => 'api#getSubmissions', 'url' => $apiBase . 'forms/{formId}/submissions', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		['name' => 'api#newSubmission', 'url' => $apiBase . 'forms/{formId}/submissions', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteAllSubmissions', 'url' => $apiBase . 'forms/{formId}/submissions', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-		//['name' => 'api#getSubmission', 'url' => $apiBase . 'forms/{formId}/submissions/{submissionId}', 'verb' => 'GET', 'requirements' => $requirements_v3],
-		//['name' => 'api#updateSubmission', 'url' => $apiBase . 'forms/{formId}/submissions/{submissionId}', 'verb' => 'PATCH', 'requirements' => $requirements_v3],
-		['name' => 'api#deleteSubmission', 'url' => $apiBase . 'forms/{formId}/submissions/{submissionId}', 'verb' => 'DELETE', 'requirements' => $requirements_v3],
-		['name' => 'api#exportSubmissionsToCloud', 'url' => $apiBase . 'forms/{formId}/submissions/export', 'verb' => 'POST', 'requirements' => $requirements_v3],
-		['name' => 'api#uploadFiles', 'url' => $apiBase . 'forms/{formId}/submissions/files/{questionId}', 'verb' => 'POST', 'requirements' => $requirements_v3],
 	]
 ];
