@@ -54,7 +54,6 @@
 -   fix(i18n): Aligned grammar by @rakekniven in [\#2095](https://github.com/nextcloud/forms/pull/2095)
 -   fix: Parse momentFormat and storageFormat by @Chartman123 in [\#2093](https://github.com/nextcloud/forms/pull/2093)
 
-
 ## v4.2.3 - 2024-04-16
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.2...v4.2.3)

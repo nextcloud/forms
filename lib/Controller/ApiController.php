@@ -726,6 +726,7 @@ class ApiController extends OCSController {
 	// Options
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Add a new option to a question
@@ -914,6 +915,9 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
+	 * @NoAdminRequired
+	 *
 	 * Reorder options for a given question
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
@@ -1644,6 +1648,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Transfer ownership of a form to another user
@@ -2033,6 +2038,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Add a new option to a question
