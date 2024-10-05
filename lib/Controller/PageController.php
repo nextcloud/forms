@@ -117,31 +117,6 @@ class PageController extends Controller {
 			return new RedirectResponse($internalView);
 		}
 
-		// For legacy-support, show public template
-		try {
-			$form = $this->formMapper->findByHash($hash);
-		} catch (DoesNotExistException $e) {
-			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
-		}
-		if (isset($form->getAccess()['legacyLink'])) {
-			// Inject style on all templates
-			Util::addStyle($this->appName, 'forms');
-
-			// Has form expired
-			if ($this->formsService->hasFormExpired($form)) {
-				return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
-			}
-
-			// Public Template to fill the form
-			Util::addScript($this->appName, 'forms-submit');
-			$this->insertHeaderOnIos();
-			$this->initialState->provideInitialState('form', $this->formsService->getPublicForm($form));
-			$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
-			$this->initialState->provideInitialState('shareHash', $hash);
-			$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
-			return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
-		}
-
 		// Otherwise Redirect to login (& then internal view)
 		return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', ['redirect_url' => $internalView]));
 	}

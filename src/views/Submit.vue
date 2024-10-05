@@ -63,19 +63,6 @@
 				<p v-if="infoMessage" class="info-message">
 					{{ infoMessage }}
 				</p>
-				<!-- TODO: remove with Forms 5.0
-				 Show info about legacyLink that will be removed -->
-				<NcNoteCard
-					v-if="form.access?.legacyLink"
-					type="warning"
-					:heading="t('forms', 'Legacy link in use')">
-					{{
-						t(
-							'forms',
-							'This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism.',
-						)
-					}}
-				</NcNoteCard>
 			</header>
 
 			<NcEmptyContent

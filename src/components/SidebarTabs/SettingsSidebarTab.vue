@@ -208,11 +208,7 @@ export default {
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
 		disableSubmitMultiple() {
-			return (
-				this.hasPublicLink ||
-				this.form.access.legacyLink ||
-				this.form.isAnonymous
-			)
+			return this.hasPublicLink || this.form.isAnonymous
 		},
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {

@@ -115,37 +115,6 @@
 			:text="qrDialogText"
 			@closed="qrDialogText = ''" />
 
-		<!-- Legacy Info, if present -->
-		<div v-if="form.access.legacyLink" class="share-div">
-			<div class="share-div__avatar">
-				<IconLinkVariant :size="20" />
-			</div>
-			<div class="share-div__desc share-div__desc--twoline">
-				<span>{{ t('forms', 'Legacy Link') }}</span>
-				<span>{{
-					t('forms', 'Form still supports old sharing-link.')
-				}}</span>
-			</div>
-			<div
-				v-tooltip="
-					t(
-						'forms',
-						'For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0',
-					)
-				"
-				class="share-div__legacy-warning">
-				<IconAlertCircleOutline :size="20" />
-			</div>
-			<NcActions>
-				<NcActionButton @click="removeLegacyLink">
-					<template #icon>
-						<IconDelete :size="20" />
-					</template>
-					{{ t('forms', 'Remove Legacy Link') }}
-				</NcActionButton>
-			</NcActions>
-		</div>
-
 		<!-- Internal link -->
 		<div class="share-div">
 			<div class="share-div__avatar">
@@ -229,7 +198,6 @@ import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcActionLink from '@nextcloud/vue/dist/Components/NcActionLink.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple.vue'
-import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxVariantOutline.vue'
@@ -252,7 +220,6 @@ export default {
 	components: {
 		FormsIcon,
 		IconAccountMultiple,
-		IconAlertCircleOutline,
 		IconCodeBrackets,
 		IconCopyAll,
 		IconDelete,
@@ -469,11 +436,6 @@ export default {
 			newAccess.showToAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
-		removeLegacyLink() {
-			const newAccess = { ...this.form.access }
-			delete newAccess.legacyLink
-			this.$emit('update:formProp', 'access', newAccess)
-		},
 
 		openQrDialog(share) {
 			this.qrDialogText = this.getPublicShareLink(share)
@@ -534,12 +496,6 @@ export default {
 				color: var(--color-text-maxcontrast);
 			}
 		}
-	}
-
-	&__legacy-warning {
-		background-size: 18px;
-		margin-inline-end: 4px;
-		color: var(--color-error);
 	}
 }
 </style>
