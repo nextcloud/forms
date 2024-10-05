@@ -29,6 +29,7 @@ use OCA\Forms\Constants;
 use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IConfig;
 use OCP\IRequest;
@@ -50,6 +51,7 @@ class ConfigController extends ApiController {
 	 * Get the current AppConfig
 	 * @return DataResponse
 	 */
+	#[FrontpageRoute(verb: 'GET', url: '/config')]
 	public function getAppConfig(): DataResponse {
 		return new DataResponse($this->configService->getAppConfig());
 	}
@@ -62,6 +64,7 @@ class ConfigController extends ApiController {
 	 * @param mixed $configValues Corresponding AppConfig Value
 	 *
 	 */
+	#[FrontpageRoute(verb: 'PATCH', url: '/config')]
 	public function updateAppConfig(string $configKey, $configValue): DataResponse {
 		$this->logger->debug('Updating AppConfig: {configKey} => {configValue}', [
 			'configKey' => $configKey,
