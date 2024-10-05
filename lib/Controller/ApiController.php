@@ -2617,6 +2617,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * @param string $hash of the form
@@ -2648,6 +2649,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * @CORS
 	 * @NoAdminRequired
 	 *
 	 * Export Submissions to the Cloud and Link the FileId to the form
