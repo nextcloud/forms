@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.1 - 2024-10-05
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v4.3.1)
+
+### Fixed
+
+-   fix(stable4): add missing annotations by @Chartman123 in [\#2354](https://github.com/nextcloud/forms/pull/2354)
+
 ## v4.3.0 - 2024-10-04
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.4...v4.3.0)
