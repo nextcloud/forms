@@ -145,17 +145,31 @@
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
 						@update:values="(values) => onUpdate(question, values)" />
 				</ul>
-				<NcButton
-					alignment="center-reverse"
-					class="submit-button"
-					:disabled="loading"
-					native-type="submit"
-					type="primary">
-					<template #icon>
-						<NcIconSvgWrapper :svg="IconSendSvg" />
-					</template>
-					{{ t('forms', 'Submit') }}
-				</NcButton>
+				<div class="form-buttons">
+					<NcButton
+						alignment="center-reverse"
+						class="submit-button"
+						:disabled="!hasAnswers"
+						native-type="reset"
+						type="tertiary-no-background"
+						@click.prevent="showClearFormDialog = true">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconRefreshSvg" />
+						</template>
+						{{ t('forms', 'Clear form') }}
+					</NcButton>
+					<NcButton
+						alignment="center-reverse"
+						class="submit-button"
+						:disabled="loading"
+						native-type="submit"
+						type="primary">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconSendSvg" />
+						</template>
+						{{ t('forms', 'Submit') }}
+					</NcButton>
+				</div>
 			</form>
 
 			<!-- Confirmation dialog if form is empty submitted -->
@@ -177,6 +191,27 @@
 					)
 				"
 				:buttons="confirmLeaveFormButtons"
+				:can-close="false"
+				:close-on-click-outside="false" />
+			<!-- Confirmation dialog for clear form -->
+			<NcDialog
+				:open.sync="showClearFormDialog"
+				:name="t('forms', 'Clear form')"
+				:message="t('forms', 'Do you want to clear all answers?')"
+				:buttons="confirmClearFormButtons"
+				:can-close="false"
+				:close-on-click-outside="false" />
+			<!-- Confirmation dialog if form was changed -->
+			<NcDialog
+				:open.sync="showClearFormDueToChangeDialog"
+				:name="t('forms', 'Clear form')"
+				:message="
+					t(
+						'forms',
+						'The form has changed since your last visit. Do you want to clear all answers?',
+					)
+				"
+				:buttons="confirmClearFormButtons"
 				:can-close="false"
 				:close-on-click-outside="false" />
 		</template>
@@ -201,6 +236,7 @@ import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
 import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
+import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
 
 import { FormState } from '../models/FormStates.ts'
@@ -277,6 +313,7 @@ export default {
 		// Non reactive properties
 		return {
 			IconCheckSvg,
+			IconRefreshSvg,
 			IconSendSvg,
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
@@ -297,6 +334,8 @@ export default {
 			submitForm: false,
 			showConfirmEmptyModal: false,
 			showConfirmLeaveDialog: false,
+			showClearFormDialog: false,
+			showClearFormDueToChangeDialog: false,
 		}
 	},
 
@@ -314,6 +353,10 @@ export default {
 				}
 				return true
 			})
+		},
+
+		validQuestionsIds() {
+			return new Set(this.validQuestions.map((question) => question.id))
 		},
 
 		isRequiredUsed() {
@@ -413,6 +456,29 @@ export default {
 				},
 			]
 		},
+
+		/**
+		 * Buttons for the "confirm clear form" dialog
+		 */
+		confirmClearFormButtons() {
+			return [
+				{
+					label: t('forms', 'Abort'),
+					icon: IconCancelSvg,
+					callback: () => {},
+				},
+				{
+					label: t('forms', 'Clear'),
+					icon: IconCheckSvg,
+					type: 'primary',
+					callback: () => this.onResetSubmission(),
+				},
+			]
+		},
+
+		hasAnswers() {
+			return Object.keys(this.answers).length > 0
+		},
 	},
 
 	watch: {
@@ -437,17 +503,19 @@ export default {
 		window.addEventListener('beforeunload', this.beforeWindowUnload)
 	},
 
-	beforeMount() {
+	async beforeMount() {
 		// Public Views get their form by initial-state from parent. No fetch necessary.
 		if (this.publicView) {
 			this.isLoadingForm = false
 		} else {
-			this.fetchFullForm(this.form.id)
+			await this.fetchFullForm(this.form.id)
 		}
-		SetWindowTitle(this.formTitle)
+
 		if (this.isLoggedIn) {
 			this.initFromLocalStorage()
 		}
+
+		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
@@ -473,8 +541,16 @@ export default {
 			if (!savedState) {
 				return
 			}
+
 			const answers = {}
 			for (const [questionId, answer] of Object.entries(savedState)) {
+				// Clean up answers for questions that do not exist anymore
+				if (!this.validQuestionsIds.has(parseInt(questionId))) {
+					this.showClearFormDueToChangeDialog = true
+					logger.debug('Question does not exist anymore', { questionId })
+					continue
+				}
+
 				answers[questionId] =
 					answer.type === 'QuestionMultiple'
 						? answer.value.map(String)
@@ -585,17 +661,6 @@ export default {
 				async (question) => await question.validate(),
 			)
 
-			// Clean up answers for questions that do not exist anymore
-			const questionIds = new Map(
-				this.validQuestions.map((question) => [question.id, true]),
-			)
-			for (const questionId of Object.keys(this.answers)) {
-				if (!questionIds.has(parseInt(questionId))) {
-					logger.debug('Question does not exist anymore', { questionId })
-					delete this.answers[questionId]
-				}
-			}
-
 			try {
 				// wait for all to be validated
 				const result = await Promise.all(validation)
@@ -654,6 +719,11 @@ export default {
 			}
 		},
 
+		onResetSubmission() {
+			this.deleteFormFieldFromLocalStorage()
+			this.resetData()
+		},
+
 		/**
 		 * Reset View-Data
 		 */
@@ -661,6 +731,8 @@ export default {
 			this.answers = {}
 			this.loading = false
 			this.showConfirmLeaveDialog = false
+			this.showClearFormDialog = false
+			this.showClearFormDueToChangeDialog = false
 			this.success = false
 			this.submitForm = false
 		},
@@ -751,8 +823,12 @@ export default {
 			padding-inline-start: var(--default-clickable-area);
 		}
 
+		.form-buttons {
+			display: flex;
+			justify-content: flex-end;
+		}
+
 		.submit-button {
-			align-self: flex-end;
 			margin: 5px;
 			margin-block-end: 160px;
 			padding-inline-start: 20px;

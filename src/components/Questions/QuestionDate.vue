@@ -28,7 +28,7 @@
 		v-on="commonListeners">
 		<div class="question__content">
 			<NcDateTimePicker
-				v-model="time"
+				:value="time"
 				:disabled="!readOnly"
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
@@ -57,7 +57,6 @@ export default {
 
 	data() {
 		return {
-			time: null,
 			formatter: {
 				stringify: this.stringify,
 				parse: this.parse,
@@ -84,13 +83,10 @@ export default {
 				name: this.name || undefined,
 			}
 		},
-	},
 
-	mounted() {
-		// Init time from values prop
-		if (this.values) {
-			this.time = this.parse(this.values[0])
-		}
+		time() {
+			return this.values ? this.parse(this.values[0]) : null
+		},
 	},
 
 	methods: {

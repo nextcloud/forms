@@ -71,18 +71,27 @@ export default {
 		},
 	},
 
-	mounted() {
-		this.autoSizeText()
+	watch: {
+		values: {
+			handler() {
+				this.$nextTick(() => {
+					this.autoSizeText()
+				})
+			},
+			immediate: true,
+		},
 	},
 
 	methods: {
 		onInput() {
 			const textarea = this.$refs.textarea
 			this.$emit('update:values', [textarea.value])
-			this.autoSizeText()
 		},
 		autoSizeText() {
 			const textarea = this.$refs.textarea
+			if (!textarea) {
+				return
+			}
 			textarea.style.cssText = 'height:auto; padding:0'
 			textarea.style.cssText = `height: ${textarea.scrollHeight + 28}px`
 		},
