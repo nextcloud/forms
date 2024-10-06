@@ -238,6 +238,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Наявні незбережені зміни! Ви справді хочете залишити сторінку?",
     "Abort" : "Скасувати",
     "Leave" : "Залишити",
+    "Clear" : "Очистити",
     "Some answers are not valid" : "Деякі відповіді не дійсні",
     "There was an error submitting the form: {message}" : "Плмилка під час надсилання форми: {message}",
     "Error while saving question" : "Помилка при збереженні запитання",

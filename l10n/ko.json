@@ -62,6 +62,7 @@
     "Submit" : "제출",
     "You have unsaved changes! Do you still want to leave?" : "저장되지 않은 변경사항이 있습니다. 정말 돌아가시겠습니까?",
     "Abort" : "중단",
+    "Clear" : "비우기",
     "Error while saving question" : "질문 저장 실패",
     "Cannot copy, please copy the link manually" : "복사할 수 없습니다, 링크를 수동으로 복사하세요.",
     "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",

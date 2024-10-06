@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "您有未保存的更改！你還要離開嗎？",
     "Abort" : "中止",
     "Leave" : "離開",
+    "Clear" : "清除",
     "Some answers are not valid" : "有些答案無效",
     "There was an error submitting the form: {message}" : "遞交表格時發生錯誤：{message}",
     "Error while saving question" : "儲存問題時發生錯誤",

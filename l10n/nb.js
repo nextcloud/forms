@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Du har ulagrede endringer. Ønsker du fremdeles å gå ut?",
     "Abort" : "Avbryt",
     "Leave" : "Forlat",
+    "Clear" : "Tøm",
     "Some answers are not valid" : "Noen svar er ikke gyldige",
     "There was an error submitting the form: {message}" : "Det oppstod en feil under innsending av skjemaet: {message}.",
     "Error while saving question" : "Det oppsto en feil ved lagring av spørsmål",

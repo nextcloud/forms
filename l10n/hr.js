@@ -105,6 +105,7 @@ OC.L10N.register(
     "Submit" : "Šalji",
     "You have unsaved changes! Do you still want to leave?" : "Postoje nespremljene promjene! Želite li još uvijek izaći?",
     "Abort" : "Prekid",
+    "Clear" : "Izbriši",
     "Error while saving question" : "Pogreška pri spremanju pitanja",
     "Form link copied" : "Poveznica na obrazac je kopirana",
     "Cannot copy, please copy the link manually" : "Kopiranje nije moguće, ručno kopirajte poveznicu",

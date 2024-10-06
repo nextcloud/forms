@@ -144,6 +144,7 @@ OC.L10N.register(
     "Submit" : "Tilføj",
     "You have unsaved changes! Do you still want to leave?" : "Du har ikke-gemte ændringer! Vil du stadig lukke?",
     "Abort" : "Afbryd",
+    "Clear" : "Ryd",
     "Error while saving question" : "Der opstod en fejl under lagring af spørgsmål",
     "Form link copied" : "Formularlinket er kopieret",
     "Cannot copy, please copy the link manually" : "Kan ikke kopiere, kopier venligst linket manuelt",

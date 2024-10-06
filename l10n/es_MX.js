@@ -136,6 +136,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "¡Gracias por completar el formulario!",
     "Submit" : "Enviar",
     "Abort" : "Abortar",
+    "Clear" : "Limpiar",
     "Error while saving question" : "Hubo un error mientras se guardaba la pregunta",
     "Form link copied" : "Enlace del formulario copiado",
     "Cannot copy, please copy the link manually" : "No se ha podido copiar, por favor, copia el enlace manualmente",

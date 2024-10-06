@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Aveți modificări nesalvate! Sigur doriți să părăsiți pagina?",
     "Abort" : "Anuleaza",
     "Leave" : "Părăsește",
+    "Clear" : "Șterge ",
     "Some answers are not valid" : "Câteva răspunsuri nu sunt valide",
     "There was an error submitting the form: {message}" : "A apărut o eroare la trimiterea formularului: {message}",
     "Error while saving question" : "Eroare la salvarea întrebării",

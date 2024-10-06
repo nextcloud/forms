@@ -233,6 +233,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Vous avez des modifications non enregistrées. Voulez-vous malgré tout quitter ?",
     "Abort" : "Annuler",
     "Leave" : "Quitter",
+    "Clear" : "Effacer",
     "Some answers are not valid" : "Certaines réponses sont invalides",
     "There was an error submitting the form: {message}" : "Erreur à la validation du formulaire {message}",
     "Error while saving question" : "Erreur lors de la sauvegarde de la question",

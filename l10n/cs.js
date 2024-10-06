@@ -212,6 +212,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Jsou zde neuložené změny! Opravdu chcete odejít?",
     "Abort" : "Přerušit",
     "Leave" : "Opustit",
+    "Clear" : "Vyčistit",
     "Some answers are not valid" : "Některé odpovědi nejsou platné",
     "There was an error submitting the form: {message}" : "Při odesílání formuláře došlo k chybě: {message}",
     "Error while saving question" : "Chyba při ukládání otázky",

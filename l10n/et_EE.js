@@ -27,6 +27,7 @@ OC.L10N.register(
     "Settings" : "Seaded",
     "Submit" : "Saada",
     "Abort" : "Katkesta",
+    "Clear" : "Tühjenda",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
     "Enter your answer" : "Sisesta oma vastus",

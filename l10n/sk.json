@@ -192,6 +192,7 @@
     "You have unsaved changes! Do you still want to leave?" : "Máte neuložené zmeny! Stále chcete odísť?",
     "Abort" : "Prerušiť",
     "Leave" : "Odísť",
+    "Clear" : "Vyčistiť",
     "Error while saving question" : "Pri ukladaní otázky sa vyskytla chyba",
     "Form link copied" : "Odkaz na formulár je skopírovaný",
     "Cannot copy, please copy the link manually" : "Nedarí sa skopírovať, skopírujte prosím ručne.",

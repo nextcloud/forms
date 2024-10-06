@@ -147,6 +147,7 @@ OC.L10N.register(
     "Submit" : "Skicka",
     "You have unsaved changes! Do you still want to leave?" : "Du har osparade förändringar! Vill du fortfarande lämna?",
     "Abort" : "Avbryt",
+    "Clear" : "Rensa",
     "Error while saving question" : "Ett fel uppstod vid sparande av frågan",
     "Form link copied" : "Formulärlänken kopierad",
     "Cannot copy, please copy the link manually" : "Kan inte kopiera, länken måste kopieras manuellt",

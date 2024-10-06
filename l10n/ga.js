@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Tá athruithe gan sábháil agat! Ar mhaith leat imeacht fós?",
     "Abort" : "ginmhilleadh",
     "Leave" : "Fág",
+    "Clear" : "Glan",
     "Some answers are not valid" : "Níl roinnt freagraí bailí",
     "There was an error submitting the form: {message}" : "Tharla earráid agus an fhoirm á cur isteach: {message}",
     "Error while saving question" : "Earráid agus an cheist á sábháil",

@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Nem mentett módosításai vannak! Elhagyja az oldalt?",
     "Abort" : "Megszakítás",
     "Leave" : "Elhagyás",
+    "Clear" : "Törlés",
     "Some answers are not valid" : "Néhány válasz nem érvényes",
     "There was an error submitting the form: {message}" : "Hiba történt az űrlap beküldése során: {message}.",
     "Error while saving question" : "Hiba a kérdés mentése során",

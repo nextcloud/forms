@@ -71,6 +71,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "ขอบคุณที่ทำแบบฟอร์ม!",
     "Submit" : "ส่ง",
     "Abort" : "ยกเลิก",
+    "Clear" : "ล้าง",
     "Error while saving question" : "ข้อผิดพลาดขณะบันทึกคำถาม",
     "Form link copied" : "คัดลอกลิงก์ฟอร์มแล้ว",
     "Cannot copy, please copy the link manually" : "ไม่สามารถคัดลอก กรุณาคัดลอกลิงก์เอง",

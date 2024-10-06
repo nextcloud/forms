@@ -108,6 +108,7 @@
     "Submit" : "Verwerken",
     "You have unsaved changes! Do you still want to leave?" : "Je hebt niet-opgeslagen wijzigingen! Wil je toch weg?",
     "Abort" : "Afbreken",
+    "Clear" : "Terug",
     "Error while saving question" : "Fout bij opslaan vraag",
     "Form link copied" : "Formulier link gekopieerd",
     "Cannot copy, please copy the link manually" : "Kopiëren niet mogelijk, kopieer de link handmatig",

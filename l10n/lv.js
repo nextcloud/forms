@@ -28,6 +28,7 @@ OC.L10N.register(
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",
     "Submit" : "Iesniegt",
+    "Clear" : "Notīrīt",
     "No elements found." : "Elementi netika atrasti.",
     "File" : "Datne",
     "Date" : "Datums",

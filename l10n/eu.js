@@ -218,6 +218,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Gorde gabeko aldaketak dauzkazu! Atera nahi duzu hala ere?",
     "Abort" : "Utzi bertan behera",
     "Leave" : "Irten",
+    "Clear" : "Garbitu",
     "Some answers are not valid" : "Erantzun batzuek ez dute balio",
     "Error while saving question" : "Errorea galdera gordetzean",
     "Form link copied" : "Galdetegiaren esteka kopiatu da",

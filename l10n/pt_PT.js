@@ -99,6 +99,7 @@ OC.L10N.register(
     "Submit" : "Submeter",
     "You have unsaved changes! Do you still want to leave?" : "Existem alterações que não estão guardadas. Tem a certeza que quer sair?",
     "Abort" : "Abortar",
+    "Clear" : "Limpar",
     "Error while saving question" : "Erro ao guardar a pergunta",
     "Form link copied" : "Ligação do formulário copiada",
     "Cannot copy, please copy the link manually" : "Não foi possível copiar, copie a ligação manualmente",

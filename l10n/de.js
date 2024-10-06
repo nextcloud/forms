@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Du hast noch nicht gespeicherte Änderungen! Willst du diese Seite wirklich verlassen?",
     "Abort" : "Abbrechen",
     "Leave" : "Verlassen",
+    "Clear" : "Löschen",
     "Some answers are not valid" : "Einige Antworten sind ungültig",
     "There was an error submitting the form: {message}" : "Es ist ein Fehler beim Übermitteln des Formulars aufgetreten: {message}",
     "Error while saving question" : "Fehler beim Speichern der Frage",

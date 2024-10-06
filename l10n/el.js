@@ -210,6 +210,7 @@ OC.L10N.register(
     "Are you sure you want to submit an empty form?" : "Είστε σίγουροι ότι θέλετε να υποβάλετε μια κενή φόρμα;",
     "You have unsaved changes! Do you still want to leave?" : "Έχετε μη αποθηκευμένες αλλαγές! Θέλετε ακόμα να αποχωρήσετε;",
     "Abort" : "Ματαίωση",
+    "Clear" : "Εκκαθάριση",
     "Some answers are not valid" : "Ορισμένες απαντήσεις δεν είναι έγκυρες",
     "There was an error submitting the form: {message}" : "Υπήρξε σφάλμα κατά την υποβολή της φόρμας: {message}",
     "Error while saving question" : "Σφάλμα κατά την αποθήκευση ερώτησης",

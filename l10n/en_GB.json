@@ -237,6 +237,7 @@
     "You have unsaved changes! Do you still want to leave?" : "You have unsaved changes! Do you still want to leave?",
     "Abort" : "Abort",
     "Leave" : "Leave",
+    "Clear" : "Clear",
     "Some answers are not valid" : "Some answers are not valid",
     "There was an error submitting the form: {message}" : "There was an error submitting the form: {message}",
     "Error while saving question" : "Error while saving question",

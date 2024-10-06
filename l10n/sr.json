@@ -237,6 +237,7 @@
     "You have unsaved changes! Do you still want to leave?" : "Имате измене којие нисте сачували! Да ли још увек желите да напустите?",
     "Abort" : "Прекини",
     "Leave" : "Напуштање",
+    "Clear" : "Очисти",
     "Some answers are not valid" : "Неки одговори нису исправни",
     "There was an error submitting the form: {message}" : "Дошло је до грешке приликом подношења формулара: {message}.",
     "Error while saving question" : "Грешка током чувања питања",

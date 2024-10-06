@@ -183,6 +183,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Sinulla on tallentamattomia muutoksia! Haluatko silti poistua?",
     "Abort" : "Keskeytä",
     "Leave" : "Poistu",
+    "Clear" : "Tyhjennä",
     "Some answers are not valid" : "Jotkin vastaukset eivät ole kelvollisia",
     "There was an error submitting the form: {message}" : "Lomaketta lähettäessä ilmeni virhe: {message}",
     "Error while saving question" : "Virhe kysymystä tallennettaessa",

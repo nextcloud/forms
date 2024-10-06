@@ -89,6 +89,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "תודה לך על שהשלמת את הטופס!",
     "Submit" : "שליחה",
     "Abort" : "להפסיק",
+    "Clear" : "פינוי",
     "Error while saving question" : "שגיאה בשמירת השאלה",
     "Form link copied" : "קישור הטופס הועתק",
     "Cannot copy, please copy the link manually" : "לא ניתן להעתיק, נא להעתיק את הקישור ידנית",

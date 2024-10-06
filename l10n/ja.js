@@ -148,6 +148,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "保存されていない変更があります！離れるつもりですか？",
     "Abort" : "中止",
     "Leave" : "出る",
+    "Clear" : "クリア",
     "Error while saving question" : "質問の保存中にエラーが発生しました",
     "Form link copied" : "フォームのリンクをコピーしました",
     "Cannot copy, please copy the link manually" : "コピーできませんでした。手動でリンクをコピーしてください。",

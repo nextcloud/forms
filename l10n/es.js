@@ -217,6 +217,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "¡Tiene cambios sin guardar! , ¿Está seguro que desea salir?",
     "Abort" : "Abortar",
     "Leave" : "Abandonar",
+    "Clear" : "Borrar",
     "Some answers are not valid" : "Algunas respuestas no son válidas",
     "Error while saving question" : "Error al guardar pregunta",
     "Form link copied" : "Enlace del formulario copiado",

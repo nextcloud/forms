@@ -128,6 +128,7 @@ OC.L10N.register(
     "Submit" : "Invia",
     "You have unsaved changes! Do you still want to leave?" : "Hai delle modifiche non salvate! Vuoi uscire comunque?",
     "Abort" : "Interrompi",
+    "Clear" : "Pulisci",
     "Error while saving question" : "Errore durante il salvataggio della domanda",
     "Form link copied" : "Collegamento del modulo copiato",
     "Cannot copy, please copy the link manually" : "Impossibile copiare, copia il collegamento manualmente",

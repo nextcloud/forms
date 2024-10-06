@@ -90,6 +90,7 @@ OC.L10N.register(
     "Thank you for completing the form!" : "Ви благодариме што ја комплетиравте формата!",
     "Submit" : "Испрати",
     "Abort" : "Прекини",
+    "Clear" : "Исчисти",
     "Error while saving question" : "Грешка при зачувување на прашање",
     "Form link copied" : "Линкот до прашалникот е копиран",
     "Cannot copy, please copy the link manually" : "Неможе да се копира, копирајте го линкот рачно",

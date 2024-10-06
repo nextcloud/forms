@@ -21,6 +21,7 @@ OC.L10N.register(
     "Settings" : "Configuraciones ",
     "Submit" : "Enviar",
     "Abort" : "Abortar",
+    "Clear" : "Limpiar",
     "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",

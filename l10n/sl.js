@@ -149,6 +149,7 @@ OC.L10N.register(
     "Submit" : "Pošlji",
     "You have unsaved changes! Do you still want to leave?" : "Zaznane so neshranjene spremembe! Ali vseeno želite zapustiti stran?",
     "Abort" : "Prekini",
+    "Clear" : "Počisti",
     "Error while saving question" : "Prišlo je do napake med shranjevanjem vprašanja",
     "Form link copied" : "Povezava vprašalnika je kopirana",
     "Cannot copy, please copy the link manually" : "Povezave ni mogoče kopirati. Storite to ročno.",

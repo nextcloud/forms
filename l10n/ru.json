@@ -237,6 +237,7 @@
     "You have unsaved changes! Do you still want to leave?" : "У вас есть несохранённые изменения! Вы всё ещё хотите уйти?",
     "Abort" : "Отмена",
     "Leave" : "Выйти",
+    "Clear" : "Очистить",
     "Some answers are not valid" : "Некоторые ответы недействительны",
     "There was an error submitting the form: {message}" : "При отправке формы произошла ошибка: {message}",
     "Error while saving question" : "Ошибка при сохранении вопроса",

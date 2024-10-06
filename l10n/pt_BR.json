@@ -237,6 +237,7 @@
     "You have unsaved changes! Do you still want to leave?" : "Você tem alterações não salvas! Você ainda quer sair?",
     "Abort" : "Interromper",
     "Leave" : "Sair",
+    "Clear" : "Limpar",
     "Some answers are not valid" : "Algumas respostas não são válidas",
     "There was an error submitting the form: {message}" : "Ocorreu um erro ao enviar o formulário: {message}",
     "Error while saving question" : "Erro ao salvar a pergunta",

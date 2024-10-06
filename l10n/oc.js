@@ -29,6 +29,7 @@ OC.L10N.register(
     "Settings" : "Paramètres",
     "Submit" : "Transmetre",
     "Abort" : "Anullar",
+    "Clear" : "Escafar",
     "File" : "Fichier",
     "Date" : "Data",
     "Pick a date" : "Causir una data",

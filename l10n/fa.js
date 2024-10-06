@@ -217,6 +217,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "You have unsaved changes! Do you still want to leave?",
     "Abort" : "صرف نظر",
     "Leave" : "خروج",
+    "Clear" : "پاک کردن",
     "Some answers are not valid" : "برخی از پاسخ‌ها معتبر نیستند",
     "There was an error submitting the form: {message}" : "خطایی در ارسال این فرم بروز کرد: {message}",
     "Error while saving question" : "Error while saving question",

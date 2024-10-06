@@ -146,6 +146,7 @@ OC.L10N.register(
     "Submit" : "Wyślij",
     "You have unsaved changes! Do you still want to leave?" : "Masz niezapisane zmiany! Czy nadal chcesz wyjść?",
     "Abort" : "Anuluj",
+    "Clear" : "Wyczyść ",
     "Error while saving question" : "Błąd podczas zapisywania pytania",
     "Form link copied" : "Link do formularza został skopiowany",
     "Cannot copy, please copy the link manually" : "Nie można skopiować, spróbuj skopiować link ręcznie",

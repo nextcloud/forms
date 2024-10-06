@@ -239,6 +239,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Kaydedilmemiş değişiklikleriniz var. Gene de ayrılmak istiyor musunuz?",
     "Abort" : "Vazgeç",
     "Leave" : "Ayrıl",
+    "Clear" : "Temizle",
     "Some answers are not valid" : "Bazı yanıtlar geçersiz",
     "There was an error submitting the form: {message}" : "Form gönderilirken bir sorun çıktı: {message}.",
     "Error while saving question" : "Soru silinirken sorun çıktı",

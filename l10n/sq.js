@@ -25,6 +25,7 @@ OC.L10N.register(
     "Settings" : "Rregullimet",
     "Submit" : "Dërgo",
     "Abort" : "Ndërprite",
+    "Clear" : "Pastro",
     "File" : "Skedar ",
     "Date" : "Data",
     "Time" : "Kohë",
