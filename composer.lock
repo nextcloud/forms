@@ -4,36 +4,39 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "9f8bb75cc8745c84b1408667f1ed4c46",
+	"content-hash": "a1a93ba6c8342794b215dae13fe0e349",
 	"packages": [
 		{
 			"name": "maennchen/zipstream-php",
-			"version": "2.4.0",
+			"version": "3.1.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/maennchen/ZipStream-PHP.git",
-				"reference": "3fa72e4c71a43f9e9118752a5c90e476a8dc9eb3"
+				"reference": "b8174494eda667f7d13876b4a7bfef0f62a7c0d1"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/3fa72e4c71a43f9e9118752a5c90e476a8dc9eb3",
-				"reference": "3fa72e4c71a43f9e9118752a5c90e476a8dc9eb3",
+				"url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/b8174494eda667f7d13876b4a7bfef0f62a7c0d1",
+				"reference": "b8174494eda667f7d13876b4a7bfef0f62a7c0d1",
 				"shasum": ""
 			},
 			"require": {
 				"ext-mbstring": "*",
-				"myclabs/php-enum": "^1.5",
-				"php": "^8.0",
-				"psr/http-message": "^1.0"
+				"ext-zlib": "*",
+				"php-64bit": "^8.1"
 			},
 			"require-dev": {
 				"ext-zip": "*",
-				"friendsofphp/php-cs-fixer": "^3.9",
-				"guzzlehttp/guzzle": "^6.5.3 || ^7.2.0",
+				"friendsofphp/php-cs-fixer": "^3.16",
+				"guzzlehttp/guzzle": "^7.5",
 				"mikey179/vfsstream": "^1.6",
-				"php-coveralls/php-coveralls": "^2.4",
-				"phpunit/phpunit": "^8.5.8 || ^9.4.2",
+				"php-coveralls/php-coveralls": "^2.5",
+				"phpunit/phpunit": "^10.0",
 				"vimeo/psalm": "^5.0"
+			},
+			"suggest": {
+				"guzzlehttp/psr7": "^2.4",
+				"psr/http-message": "^2.0"
 			},
 			"type": "library",
 			"autoload": {
@@ -70,7 +73,7 @@
 			],
 			"support": {
 				"issues": "https://github.com/maennchen/ZipStream-PHP/issues",
-				"source": "https://github.com/maennchen/ZipStream-PHP/tree/2.4.0"
+				"source": "https://github.com/maennchen/ZipStream-PHP/tree/3.1.0"
 			},
 			"funding": [
 				{
@@ -82,7 +85,7 @@
 					"type": "open_collective"
 				}
 			],
-			"time": "2022-12-08T12:29:14+00:00"
+			"time": "2023-06-21T14:59:35+00:00"
 		},
 		{
 			"name": "markbaker/complex",
@@ -192,80 +195,17 @@
 			"time": "2022-12-02T22:17:43+00:00"
 		},
 		{
-			"name": "myclabs/php-enum",
-			"version": "1.8.4",
-			"source": {
-				"type": "git",
-				"url": "https://github.com/myclabs/php-enum.git",
-				"reference": "a867478eae49c9f59ece437ae7f9506bfaa27483"
-			},
-			"dist": {
-				"type": "zip",
-				"url": "https://api.github.com/repos/myclabs/php-enum/zipball/a867478eae49c9f59ece437ae7f9506bfaa27483",
-				"reference": "a867478eae49c9f59ece437ae7f9506bfaa27483",
-				"shasum": ""
-			},
-			"require": {
-				"ext-json": "*",
-				"php": "^7.3 || ^8.0"
-			},
-			"require-dev": {
-				"phpunit/phpunit": "^9.5",
-				"squizlabs/php_codesniffer": "1.*",
-				"vimeo/psalm": "^4.6.2"
-			},
-			"type": "library",
-			"autoload": {
-				"psr-4": {
-					"MyCLabs\\Enum\\": "src/"
-				},
-				"classmap": [
-					"stubs/Stringable.php"
-				]
-			},
-			"notification-url": "https://packagist.org/downloads/",
-			"license": [
-				"MIT"
-			],
-			"authors": [
-				{
-					"name": "PHP Enum contributors",
-					"homepage": "https://github.com/myclabs/php-enum/graphs/contributors"
-				}
-			],
-			"description": "PHP Enum implementation",
-			"homepage": "http://github.com/myclabs/php-enum",
-			"keywords": [
-				"enum"
-			],
-			"support": {
-				"issues": "https://github.com/myclabs/php-enum/issues",
-				"source": "https://github.com/myclabs/php-enum/tree/1.8.4"
-			},
-			"funding": [
-				{
-					"url": "https://github.com/mnapoli",
-					"type": "github"
-				},
-				{
-					"url": "https://tidelift.com/funding/github/packagist/myclabs/php-enum",
-					"type": "tidelift"
-				}
-			],
-			"time": "2022-08-04T09:53:51+00:00"
-		},
-		{
 			"name": "phpoffice/phpspreadsheet",
-			"version": "2.1.1",
+			"version": "2.3.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-				"reference": "4e58d8ae1502d7f22af9e4cfeb2d645e243dec4e"
+				"reference": "c972c146ddd5e8350ea839355b9bb0ce6a8fa33e"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/4e58d8ae1502d7f22af9e4cfeb2d645e243dec4e",
-				"reference": "4e58d8ae1502d7f22af9e4cfeb2d645e243dec4e",
+				"url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/c972c146ddd5e8350ea839355b9bb0ce6a8fa33e",
+				"reference": "c972c146ddd5e8350ea839355b9bb0ce6a8fa33e",
 				"shasum": ""
 			},
 			"require": {
@@ -285,21 +225,21 @@
 				"maennchen/zipstream-php": "^2.1 || ^3.0",
 				"markbaker/complex": "^3.0",
 				"markbaker/matrix": "^3.0",
-				"php": "^8.0",
+				"php": "^8.1",
 				"psr/http-client": "^1.0",
 				"psr/http-factory": "^1.0",
 				"psr/simple-cache": "^1.0 || ^2.0 || ^3.0"
 			},
 			"require-dev": {
 				"dealerdirect/phpcodesniffer-composer-installer": "dev-main",
-				"dompdf/dompdf": "^2.0",
+				"dompdf/dompdf": "^2.0 || ^3.0",
 				"friendsofphp/php-cs-fixer": "^3.2",
 				"mitoteam/jpgraph": "^10.3",
 				"mpdf/mpdf": "^8.1.1",
 				"phpcompatibility/php-compatibility": "^9.3",
 				"phpstan/phpstan": "^1.1",
 				"phpstan/phpstan-phpunit": "^1.0",
-				"phpunit/phpunit": "^9.6",
+				"phpunit/phpunit": "^9.6 || ^10.5",
 				"squizlabs/php_codesniffer": "^3.7",
 				"tecnickcom/tcpdf": "^6.5"
 			},
@@ -354,9 +294,9 @@
 			],
 			"support": {
 				"issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-				"source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/2.1.1"
+				"source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/2.3.0"
 			},
-			"time": "2024-09-29T07:06:46+00:00"
+			"time": "2024-09-29T07:06:02+00:00"
 		},
 		{
 			"name": "psr/http-client",
@@ -467,16 +407,16 @@
 		},
 		{
 			"name": "psr/http-message",
-			"version": "1.1",
+			"version": "2.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/php-fig/http-message.git",
-				"reference": "cb6ce4845ce34a8ad9e68117c10ee90a29919eba"
+				"reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/php-fig/http-message/zipball/cb6ce4845ce34a8ad9e68117c10ee90a29919eba",
-				"reference": "cb6ce4845ce34a8ad9e68117c10ee90a29919eba",
+				"url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+				"reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
 				"shasum": ""
 			},
 			"require": {
@@ -485,7 +425,7 @@
 			"type": "library",
 			"extra": {
 				"branch-alias": {
-					"dev-master": "1.1.x-dev"
+					"dev-master": "2.0.x-dev"
 				}
 			},
 			"autoload": {
@@ -500,7 +440,7 @@
 			"authors": [
 				{
 					"name": "PHP-FIG",
-					"homepage": "http://www.php-fig.org/"
+					"homepage": "https://www.php-fig.org/"
 				}
 			],
 			"description": "Common interface for HTTP messages",
@@ -514,9 +454,9 @@
 				"response"
 			],
 			"support": {
-				"source": "https://github.com/php-fig/http-message/tree/1.1"
+				"source": "https://github.com/php-fig/http-message/tree/2.0"
 			},
-			"time": "2023-04-04T09:50:52+00:00"
+			"time": "2023-04-04T09:54:51+00:00"
 		},
 		{
 			"name": "psr/simple-cache",
@@ -630,30 +570,30 @@
 		},
 		{
 			"name": "doctrine/instantiator",
-			"version": "1.5.0",
+			"version": "2.0.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/doctrine/instantiator.git",
-				"reference": "0a0fa9780f5d4e507415a065172d26a98d02047b"
+				"reference": "c6222283fa3f4ac679f8b9ced9a4e23f163e80d0"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/doctrine/instantiator/zipball/0a0fa9780f5d4e507415a065172d26a98d02047b",
-				"reference": "0a0fa9780f5d4e507415a065172d26a98d02047b",
+				"url": "https://api.github.com/repos/doctrine/instantiator/zipball/c6222283fa3f4ac679f8b9ced9a4e23f163e80d0",
+				"reference": "c6222283fa3f4ac679f8b9ced9a4e23f163e80d0",
 				"shasum": ""
 			},
 			"require": {
-				"php": "^7.1 || ^8.0"
+				"php": "^8.1"
 			},
 			"require-dev": {
-				"doctrine/coding-standard": "^9 || ^11",
+				"doctrine/coding-standard": "^11",
 				"ext-pdo": "*",
 				"ext-phar": "*",
-				"phpbench/phpbench": "^0.16 || ^1",
-				"phpstan/phpstan": "^1.4",
-				"phpstan/phpstan-phpunit": "^1",
-				"phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
-				"vimeo/psalm": "^4.30 || ^5.4"
+				"phpbench/phpbench": "^1.2",
+				"phpstan/phpstan": "^1.9.4",
+				"phpstan/phpstan-phpunit": "^1.3",
+				"phpunit/phpunit": "^9.5.27",
+				"vimeo/psalm": "^5.4"
 			},
 			"type": "library",
 			"autoload": {
@@ -680,7 +620,7 @@
 			],
 			"support": {
 				"issues": "https://github.com/doctrine/instantiator/issues",
-				"source": "https://github.com/doctrine/instantiator/tree/1.5.0"
+				"source": "https://github.com/doctrine/instantiator/tree/2.0.0"
 			},
 			"funding": [
 				{
@@ -696,7 +636,7 @@
 					"type": "tidelift"
 				}
 			],
-			"time": "2022-12-30T00:15:36+00:00"
+			"time": "2022-12-30T00:23:10+00:00"
 		},
 		{
 			"name": "myclabs/deep-copy",
@@ -760,16 +700,16 @@
 		},
 		{
 			"name": "nextcloud/ocp",
-			"version": "dev-stable28",
+			"version": "dev-stable30",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/nextcloud-deps/ocp.git",
-				"reference": "13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee"
+				"reference": "fddf605cdc7cd9b3b020ea40f6f0a6331127dc12"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee",
-				"reference": "13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee",
+				"url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/fddf605cdc7cd9b3b020ea40f6f0a6331127dc12",
+				"reference": "fddf605cdc7cd9b3b020ea40f6f0a6331127dc12",
 				"shasum": ""
 			},
 			"require": {
@@ -782,7 +722,7 @@
 			"type": "library",
 			"extra": {
 				"branch-alias": {
-					"dev-stable28": "28.0.0-dev"
+					"dev-stable30": "30.0.0-dev"
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
@@ -798,9 +738,9 @@
 			"description": "Composer package containing Nextcloud's public API (classes, interfaces)",
 			"support": {
 				"issues": "https://github.com/nextcloud-deps/ocp/issues",
-				"source": "https://github.com/nextcloud-deps/ocp/tree/stable28"
+				"source": "https://github.com/nextcloud-deps/ocp/tree/stable30"
 			},
-			"time": "2024-09-17T00:34:06+00:00"
+			"time": "2024-10-03T00:42:50+00:00"
 		},
 		{
 			"name": "nikic/php-parser",
@@ -2625,7 +2565,7 @@
 	"platform": [],
 	"platform-dev": [],
 	"platform-overrides": {
-		"php": "8.0"
+		"php": "8.1"
 	},
 	"plugin-api-version": "2.6.0"
 }
