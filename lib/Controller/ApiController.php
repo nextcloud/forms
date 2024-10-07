@@ -50,6 +50,7 @@ use OCA\Forms\Service\SubmissionService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -57,7 +58,6 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
@@ -104,7 +104,7 @@ class ApiController extends OCSController {
 	/**
 	 * Handle CORS options request by calling parent function
 	 */
-	#[ApiRoute(verb: 'OPTIONS', url: Constants::API_BASE . '{path}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'OPTIONS', url: '/api/v3/{path}', requirements: ['path' => '.+'])]
 	public function preflightedCors() {
 		parent::preflightedCors();
 	}
@@ -118,7 +118,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms')]
 	public function getForms(string $type = 'owned'): DataResponse {
 		if ($type === 'owned') {
 			$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
@@ -147,7 +147,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms')]
 	public function newForm(?int $fromId = null): DataResponse {
 		// Check if user is allowed
 		if (!$this->configService->canCreateForms()) {
@@ -222,7 +222,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
 	public function getForm(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -252,7 +252,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}')]
 	public function updateForm(int $formId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: formId: {formId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -339,7 +339,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}')]
 	public function deleteForm(int $formId): DataResponse {
 		$this->logger->debug('Delete Form: {formId}', [
 			'formId' => $formId,
@@ -362,7 +362,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/questions')]
 	public function getQuestions(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -392,7 +392,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function getQuestion(int $formId, int $questionId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -428,7 +428,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
 	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
@@ -534,7 +534,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function updateQuestion(int $formId, int $questionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating question: formId: {formId}, questionId: {questionId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -603,7 +603,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function deleteQuestion(int $formId, int $questionId): DataResponse {
 		$this->logger->debug('Mark question as deleted: {questionId}', [
 			'questionId' => $questionId,
@@ -659,7 +659,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions')]
 	public function reorderQuestions(int $formId, array $newOrder): DataResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
 			'formId' => $formId,
@@ -751,7 +751,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function newOption(int $formId, int $questionId, array $optionTexts): DataResponse {
 		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}', [
 			'formId' => $formId,
@@ -824,7 +824,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options/{optionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}')]
 	public function updateOption(int $formId, int $questionId, int $optionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating option: form: {formId}, question: {questionId}, option: {optionId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -888,7 +888,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options/{optionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}')]
 	public function deleteOption(int $formId, int $questionId, int $optionId): DataResponse {
 		$this->logger->debug('Deleting option: {optionId}', [
 			'optionId' => $optionId
@@ -936,7 +936,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
@@ -1027,7 +1027,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions')]
 	public function getSubmissions(int $formId, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -1088,7 +1088,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions')]
 	public function deleteAllSubmissions(int $formId): DataResponse {
 		$this->logger->debug('Delete all submissions to form: {formId}', [
 			'formId' => $formId,
@@ -1128,7 +1128,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions')]
 	public function newSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
@@ -1221,7 +1221,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/submissions/{submissionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function deleteSubmission(int $formId, int $submissionId): DataResponse {
 		$this->logger->debug('Delete Submission: {submissionId}', [
 			'submissionId' => $submissionId,
@@ -1265,7 +1265,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/export', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/export')]
 	public function exportSubmissionsToCloud(int $formId, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
 		try {
 			$form = $this->formMapper->findById($formId);
@@ -1290,13 +1290,13 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param string $shareHash hash of the form share
-	 * @return Response
+	 * @return DataResponse
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[PublicPage()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/files/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
-	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): Response {
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/files/{questionId}')]
+	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}', [
 			'formId' => $formId,
 			'questionId' => $questionId
