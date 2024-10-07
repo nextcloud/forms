@@ -22,6 +22,10 @@
 		</ignoreFiles>
 	</extraFiles>
 	<issueHandlers>
+		<LessSpecificReturnStatement errorLevel="error"/>
+		<LessSpecificReturnType errorLevel="error"/>
+		<LessSpecificImplementedReturnType errorLevel="error"/>
+		<MoreSpecificReturnType errorLevel="error"/>
 		<UndefinedClass>
 			<errorLevel type="suppress">
 				<referencedClass name="OCA\Circles\CirclesManager" />
