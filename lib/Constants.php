@@ -27,6 +27,19 @@ use OCP\Share\IShare;
 
 class Constants {
 	/**
+	 * Constants for API Controllers
+	 */
+	public const API_BASE = '/api/{apiVersion}/';
+	public const API_V3_REQUIREMENTS = [
+		'apiVersion' => 'v3',
+		'formId' => '\d+',
+		'questionId' => '\d+',
+		'optionId' => '\d+',
+		'shareId' => '\d+',
+		'submissionId' => '\d+'
+	];
+	
+	/**
 	 * Used AppConfig Keys
 	 */
 	public const CONFIG_KEY_ALLOWPERMITALL = 'allowPermitAll';

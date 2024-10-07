@@ -50,6 +50,7 @@ class ConfigController extends ApiController {
 	 * Get the current AppConfig
 	 * @return DataResponse
 	 */
+	#[FrontpageRoute(verb: 'GET', url: '/config')]
 	public function getAppConfig(): DataResponse {
 		return new DataResponse($this->configService->getAppConfig());
 	}
@@ -62,6 +63,7 @@ class ConfigController extends ApiController {
 	 * @param mixed $configValues Corresponding AppConfig Value
 	 *
 	 */
+	#[FrontpageRoute(verb: 'PATCH', url: '/config')]
 	public function updateAppConfig(string $configKey, $configValue): DataResponse {
 		$this->logger->debug('Updating AppConfig: {configKey} => {configValue}', [
 			'configKey' => $configKey,
