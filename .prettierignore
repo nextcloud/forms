@@ -19,7 +19,11 @@ js/
 # Handled by transifex
 l10n/
 
+# OpenAPI
+openapi.json
+
 # PHP
 lib/
 **/*.php
+composer.json
 composer.lock

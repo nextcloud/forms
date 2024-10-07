@@ -9,15 +9,21 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Db;
 
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @psalm-import-type FormsQuestionExtraSettings from ResponseDefinitions
+ * @psalm-import-type FormsQuestionType from ResponseDefinitions
  * @method int getFormId()
  * @method void setFormId(integer $value)
  * @method int getOrder()
  * @method void setOrder(integer $value)
+ * @psalm-method FormsQuestionType getType()
  * @method string getType()
+ * @psalm-method 'date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' getType()
  * @method void setType(string $value)
+ * @psalm-method void setType('date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' $value)
  * @method bool getIsRequired()
  * @method void setIsRequired(bool $value)
  * @method string getText()
@@ -47,10 +53,16 @@ class Question extends Entity {
 		$this->addType('name', 'string');
 	}
 
+	/**
+	 * @return FormsQuestionExtraSettings
+	 */
 	public function getExtraSettings(): array {
-		return json_decode($this->getExtraSettingsJson() ?: '{}', true); // assoc=true, => Convert to associative Array
+		return json_decode($this->getExtraSettingsJson() ?: '{}', true, 512, JSON_THROW_ON_ERROR);
 	}
 
+	/**
+	 * @param FormsQuestionExtraSettings $extraSettings
+	 */
 	public function setExtraSettings(array $extraSettings) {
 		// Remove extraSettings that are not set
 		foreach ($extraSettings as $key => $value) {
@@ -59,9 +71,22 @@ class Question extends Entity {
 			}
 		}
 
-		$this->setExtraSettingsJson(json_encode($extraSettings, JSON_FORCE_OBJECT));
+		$this->setExtraSettingsJson(json_encode($extraSettings, JSON_THROW_ON_ERROR | JSON_FORCE_OBJECT));
 	}
 
+	/**
+	 * @return array{
+	 *    id: int,
+	 *    formId: int,
+	 *    order: int,
+	 *    type: FormsQuestionType,
+	 *    isRequired: bool,
+	 *    text: string,
+	 *    name: string,
+	 *    description: string,
+	 *    extraSettings: FormsQuestionExtraSettings,
+	 *  }
+	 */
 	public function read(): array {
 		return [
 			'id' => $this->getId(),

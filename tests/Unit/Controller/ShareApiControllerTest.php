@@ -20,10 +20,11 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
-use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -226,7 +227,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($shareWith . ' DisplayName');
 
 		// Share Form '5' to 'user1' of share-type 'user=0'
-		$expectedResponse = new DataResponse($expected);
+		$expectedResponse = new DataResponse($expected, Http::STATUS_CREATED);
 		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
 	}
 
@@ -309,7 +310,7 @@ class ShareApiControllerTest extends TestCase {
 
 		if ($exception === null) {
 			// Share the form.
-			$expectedResponse = new DataResponse($expected);
+			$expectedResponse = new DataResponse($expected, Http::STATUS_CREATED);
 			$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
 		} else {
 			$this->expectException($exception);
@@ -346,7 +347,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareMapper->expects($this->never())
 			->method('insert');
 
-		$this->expectException(OCSException::class);
+		$this->expectException(OCSBadRequestException::class);
 		$this->shareApiController->newShare(5, IShare::TYPE_LINK, '');
 	}
 
@@ -365,7 +366,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareMapper->expects($this->never())
 			->method('insert');
 
-		$this->expectException(OCSException::class);
+		$this->expectException(OCSForbiddenException::class);
 		$this->shareApiController->newShare(5, IShare::TYPE_LINK, '');
 	}
 
@@ -472,7 +473,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn(false);
 
 
-		$this->expectException(OCSException::class);
+		$this->expectException(OCSBadRequestException::class);
 
 		// Share Form '5' to 'noCircle'
 		$this->shareApiController->newShare(5, IShare::TYPE_CIRCLE, 'noCircle');
@@ -488,7 +489,7 @@ class ShareApiControllerTest extends TestCase {
 			->will($this->throwException(new DoesNotExistException('Form not found')));
 		;
 
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->shareApiController->newShare(5, 0, 'user1');
 	}
 
@@ -547,7 +548,7 @@ class ShareApiControllerTest extends TestCase {
 			->will($this->throwException(new DoesNotExistException('Share not found')));
 		;
 
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->shareApiController->deleteShare(1, 8);
 	}
 
@@ -828,7 +829,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->logger->expects($this->exactly(2))
 			->method('debug');
 
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->shareApiController->updateShare(1, 1337, [Constants::PERMISSION_SUBMIT]);
 	}
 
@@ -858,7 +859,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->logger->expects($this->exactly(2))
 			->method('debug');
 
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->shareApiController->updateShare(7331, 1337, [Constants::PERMISSION_SUBMIT]);
 	}
 }

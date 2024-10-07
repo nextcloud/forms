@@ -22,12 +22,14 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -35,8 +37,8 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
@@ -51,6 +53,16 @@ use OCP\IUserSession;
 
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type FormsForm from ResponseDefinitions
+ * @psalm-import-type FormsOption from ResponseDefinitions
+ * @psalm-import-type FormsOrder from ResponseDefinitions
+ * @psalm-import-type FormsPartialForm from ResponseDefinitions
+ * @psalm-import-type FormsQuestion from ResponseDefinitions
+ * @psalm-import-type FormsQuestionType from ResponseDefinitions
+ * @psalm-import-type FormsSubmissions from ResponseDefinitions
+ * @psalm-import-type FormsUploadedFile from ResponseDefinitions
+ */
 class ApiController extends OCSController {
 	private ?IUser $currentUser;
 
@@ -83,7 +95,7 @@ class ApiController extends OCSController {
 	/**
 	 * Handle CORS options request by calling parent function
 	 */
-	#[ApiRoute(verb: 'OPTIONS', url: Constants::API_BASE . '{path}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'OPTIONS', url: '/api/v3/{path}', requirements: ['path' => '.+'])]
 	public function preflightedCors() {
 		parent::preflightedCors();
 	}
@@ -91,47 +103,56 @@ class ApiController extends OCSController {
 	// API v3 methods
 	// Forms
 	/**
-	 * Read Form-List of owned forms
-	 * Return only with necessary information for Listing.
-	 * @return DataResponse
+	 * Get all forms available to the user (owned/shared)
+	 *
+	 * @param string $type The type of forms to retrieve. Defaults to `owned`.
+	 *                     Possible values:
+	 *                     - `owned`: Forms owned by the user.
+	 *                     - `shared`: Forms shared with the user.
+	 * @return DataResponse<Http::STATUS_OK, list<FormsPartialForm>, array{}>
+	 * @throws OCSBadRequestException wrong form type supplied
+	 *
+	 * 200: Array containing the partial owned or shared forms
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms')]
 	public function getForms(string $type = 'owned'): DataResponse {
+		$result = [];
+
 		if ($type === 'owned') {
 			$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
-			$result = [];
 			foreach ($forms as $form) {
 				$result[] = $this->formsService->getPartialFormArray($form);
 			}
-			return new DataResponse($result);
 		} elseif ($type === 'shared') {
 			$forms = $this->formsService->getSharedForms($this->currentUser);
 			$result = array_values(array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms));
-			return new DataResponse($result);
 		} else {
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('wrong form type supplied');
 		}
+
+		return new DataResponse($result, Http::STATUS_OK);
 	}
 
 	/**
-	 * Create a new Form and return the Form to edit.
-	 * Return a cloned Form if the parameter $fromId is set
+	 * Create a new form and return the form
+	 * Return a copy of the form if the parameter $fromId is set
 	 *
-	 * @param int $fromId (optional) ID of the Form that should be cloned
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param ?int $fromId (optional) Id of the form that should be cloned
+	 * @return DataResponse<Http::STATUS_CREATED, FormsForm, array{}>
+	 * @throws OCSForbiddenException The user is not allowed to create forms
+	 *
+	 * 201: the created form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms')]
 	public function newForm(?int $fromId = null): DataResponse {
 		// Check if user is allowed
 		if (!$this->configService->canCreateForms()) {
 			$this->logger->debug('This user is not allowed to create Forms.');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This user is not allowed to create Forms.');
 		}
 
 		if ($fromId === null) {
@@ -188,50 +209,56 @@ class ApiController extends OCSController {
 				}
 			}
 		}
-		return $this->getForm($form->getId());
+
+		return new DataResponse($this->formsService->getForm($form), Http::STATUS_CREATED);
 	}
 
 	/**
-	 * Read all information to edit a Form (form, questions, options, except submissions/answers).
+	 * Read all information to edit a Form (form, questions, options, except submissions/answers)
 	 *
 	 * @param int $formId Id of the form
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>
+	 * @throws OCSBadRequestException Could not find form
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 *
+	 * 200: the requested form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
 	public function getForm(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('Could not find form');
 		}
 
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('User has no permissions to get this form');
 		}
 
-		$formData = $this->formsService->getForm($form);
-
-		return new DataResponse($formData);
+		return new DataResponse($this->formsService->getForm($form));
 	}
 
 	/**
-	 * Writes the given key-value pairs into Database.
+	 * Writes the given key-value pairs into Database
 	 *
 	 * @param int $formId FormId of form to update
-	 * @param array $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse<Http::STATUS_OK, int|string, array{}>
+	 * @throws OCSBadRequestException Could not find new form owner
+	 * @throws OCSForbiddenException Empty keyValuePairs provided
+	 * @throws OCSForbiddenException Not allowed to update id, hash, created, fileId or lastUpdated. OwnerId only allowed if no other key provided.
+	 * @throws OCSForbiddenException User is not allowed to modify the form
+	 * @throws OCSNotFoundException Form not found
+	 *
+	 * 200: the id of the updated form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}')]
 	public function updateForm(int $formId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: formId: {formId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -243,7 +270,7 @@ class ApiController extends OCSController {
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('Empty keyValuePairs, will not update.');
 		}
 
 		// Process owner transfer
@@ -275,7 +302,7 @@ class ApiController extends OCSController {
 			isset($keyValuePairs['fileId']) || key_exists('lastUpdated', $keyValuePairs)
 		) {
 			$this->logger->info('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');
 		}
 
 		// Do not allow changing showToAllUsers if disabled
@@ -298,7 +325,7 @@ class ApiController extends OCSController {
 		}
 
 		// Process file unlinking
-		if (key_exists('fileId', $keyValuePairs) && key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileId']) && !isset($keyValuePairs['fileFormat'])) {
+		if (key_exists('fileId', $keyValuePairs) && key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileFormat'])) {
 			$form->setFileId(null);
 			$form->setFileFormat(null);
 		}
@@ -323,13 +350,15 @@ class ApiController extends OCSController {
 	 * Delete a form
 	 *
 	 * @param int $formId the form id
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSForbiddenException User is not allowed to delete the form
+	 * @throws OCSNotFoundException Form not found
+	 *
+	 * 200: the id of the deleted form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}')]
 	public function deleteForm(int $formId): DataResponse {
 		$this->logger->debug('Delete Form: {formId}', [
 			'formId' => $formId,
@@ -345,28 +374,36 @@ class ApiController extends OCSController {
 	/**
 	 * Read all questions (including options)
 	 *
-	 * @param int $formId FormId
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param int $formId the form id
+	 * @return DataResponse<Http::STATUS_OK, list<FormsQuestion>, array{}>
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 200: the questions of the given form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/questions')]
 	public function getQuestions(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('User has no permissions to get this form');
 		}
 
 		$questionData = $this->formsService->getQuestions($formId);
+		$questionData = array_map(static function (array $question) {
+			if (empty($question['extraSettings'])) {
+				$question['extraSettings'] = new \stdClass();
+			}
+			return $question;
+		}, $questionData);
 
 		return new DataResponse($questionData);
 	}
@@ -376,30 +413,40 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId FormId
 	 * @param int $questionId QuestionId
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, FormsQuestion, array{}>
+	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 200: the requested question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function getQuestion(int $formId, int $questionId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('User has no permissions to get this form');
 		}
 
 		$question = $this->formsService->getQuestion($questionId);
+		if ($question === null) {
+			throw new OCSNotFoundException('Question doesn\'t exist');
+		}
 
 		if ($question['formId'] !== $formId) {
-			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+			throw new OCSBadRequestException('Question doesn\'t belong to given form');
+		}
+
+		if (empty($question['extraSettings'])) {
+			$question['extraSettings'] = new \stdClass();
 		}
 
 		return new DataResponse($question);
@@ -409,21 +456,27 @@ class ApiController extends OCSController {
 	 * Add a new question
 	 *
 	 * @param int $formId the form id
-	 * @param string $type the new question type
+	 * @param FormsQuestionType $type the new question type
 	 * @param string $text the new question title
-	 * @param int $fromId (optional) id of the question that should be cloned
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param ?int $fromId (optional) id of the question that should be cloned
+	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
+	 * @throws OCSBadRequestException Invalid type
+	 * @throws OCSBadRequestException Datetime question type no longer supported
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 201: the created question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
 	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		if ($fromId === null) {
@@ -465,7 +518,10 @@ class ApiController extends OCSController {
 
 			$question = $this->questionMapper->insert($question);
 
-			$response = $question->read();
+			$response = $this->formsService->getQuestion($question->getId());
+			if ($response === null) {
+				throw new OCSException('Failed to create question');
+			}
 			$response['options'] = [];
 			$response['accept'] = [];
 		} else {
@@ -508,23 +564,36 @@ class ApiController extends OCSController {
 
 		$this->formMapper->update($form);
 
-		return new DataResponse($response);
+		if (empty($response['extraSettings'])) {
+			$response['extraSettings'] = new \stdClass();
+		}
+
+		return new DataResponse($response, Http::STATUS_CREATED);
 	}
 
 	/**
-	 * Writes the given key-value pairs into Database.
-	 * Key 'order' should only be changed by reorderQuestions() and is not allowed here.
+	 * Writes the given key-value pairs into Database
+	 * Key `order` should only be changed by reorderQuestions() and is not allowed here
 	 *
 	 * @param int $formId the form id
 	 * @param int $questionId id of question to update
-	 * @param array $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
+	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
+	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
+	 * @throws OCSForbiddenException Not allowed to update `id` or `formId`
+	 * @throws OCSForbiddenException Please use reorderQuestions() to change order
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the id of the updated question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function updateQuestion(int $formId, int $questionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating question: formId: {formId}, questionId: {questionId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -536,7 +605,7 @@ class ApiController extends OCSController {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find question');
-			throw new OCSBadRequestException('Could not find question');
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		if ($question->getFormId() !== $formId) {
@@ -546,19 +615,19 @@ class ApiController extends OCSController {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
-			throw new OCSForbiddenException();
+			throw new OCSBadRequestException('This form is archived and can not be modified');
 		}
 
 		//Don't allow to change id or formId
 		if (key_exists('id', $keyValuePairs) || key_exists('formId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update \'id\' or \'formId\'');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('Not allowed to update \'id\' or \'formId\'');
 		}
 
 		// Don't allow to reorder here
@@ -587,13 +656,18 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param int $questionId the question id
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the id of the deleted question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function deleteQuestion(int $formId, int $questionId): DataResponse {
 		$this->logger->debug('Mark question as deleted: {questionId}', [
 			'questionId' => $questionId,
@@ -603,7 +677,7 @@ class ApiController extends OCSController {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find question');
-			throw new OCSBadRequestException('Could not find question');
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		if ($question->getFormId() !== $formId) {
@@ -613,7 +687,7 @@ class ApiController extends OCSController {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		// Store Order of deleted Question
@@ -639,17 +713,25 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * Updates the Order of all Questions of a Form.
+	 * Updates the Order of all Questions of a Form
 	 *
 	 * @param int $formId Id of the form to reorder
-	 * @param Array<int, int> $newOrder Array of Question-Ids in new order.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param list<int> $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
+	 * @throws OCSBadRequestException The given array contains duplicates
+	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
+	 * @throws OCSBadRequestException Question doesn't belong to given Form
+	 * @throws OCSBadRequestException One question has already been marked as deleted
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the question ids of the given form in the new order
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions')]
 	public function reorderQuestions(int $formId, array $newOrder): DataResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
 			'formId' => $formId,
@@ -659,7 +741,7 @@ class ApiController extends OCSController {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		// Check if array contains duplicates
@@ -683,27 +765,27 @@ class ApiController extends OCSController {
 			try {
 				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
 			} catch (IMapperException $e) {
-				$this->logger->debug('Could not find question. Id: {questionId}', [
+				$this->logger->debug('Could not find question {questionId}', [
 					'questionId' => $questionId
 				]);
-				throw new OCSBadRequestException();
+				throw new OCSNotFoundException('Could not find question');
 			}
 
 			// Abort if a question is not part of the Form.
 			if ($questions[$arrayKey]->getFormId() !== $formId) {
-				$this->logger->debug('This Question is not part of the given Form: questionId: {questionId}', [
+				$this->logger->debug('This Question is not part of the given form: {questionId}', [
 					'questionId' => $questionId
 				]);
-				throw new OCSBadRequestException();
+				throw new OCSBadRequestException('Question doesn\'t belong to given Form');
 			}
 
 			// Abort if a question is already marked as deleted (order==0)
 			$oldOrder = $questions[$arrayKey]->getOrder();
 			if ($oldOrder === 0) {
-				$this->logger->debug('This Question has already been marked as deleted: Id: {questionId}', [
+				$this->logger->debug('This question has already been marked as deleted: Id: {questionId}', [
 					'questionId' => $questions[$arrayKey]->getId()
 				]);
-				throw new OCSBadRequestException();
+				throw new OCSBadRequestException('One question has already been marked as deleted');
 			}
 
 			// Only set order, if it changed.
@@ -717,7 +799,7 @@ class ApiController extends OCSController {
 		foreach ($questions as $question) {
 			$this->questionMapper->update($question);
 
-			$response[$question->getId()] = [
+			$response[(string)$question->getId()] = [
 				'order' => $question->getOrder()
 			];
 		}
@@ -734,14 +816,19 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
-	 * @param array<string> $optionTexts the new option text
-	 * @return DataResponse Returns a DataResponse containing the added options
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param list<string> $optionTexts the new option text
+	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
+	 * @throws OCSBadRequestException This question is not part ot the given form
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException Current user has no permission to edit
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 201: the created option
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function newOption(int $formId, int $questionId, array $optionTexts): DataResponse {
 		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}', [
 			'formId' => $formId,
@@ -752,21 +839,21 @@ class ApiController extends OCSController {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find question');
-			throw new OCSBadRequestException('Could not find question');
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		if ($question->getFormId() !== $formId) {
-			$this->logger->debug('This Question is not part of the given Form: questionId: {questionId}', [
+			$this->logger->debug('This question is not part of the given form: questionId: {questionId}', [
 				'questionId' => $questionId
 			]);
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('This question is not part ot the given form');
 		}
 
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
@@ -798,23 +885,30 @@ class ApiController extends OCSController {
 
 		$this->formMapper->update($form);
 
-		return new DataResponse($addedOptions);
+		return new DataResponse($addedOptions, Http::STATUS_CREATED);
 	}
 
 	/**
-	 * Writes the given key-value pairs into Database.
+	 * Writes the given key-value pairs into Database
 	 *
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param int $optionId id of option to update
-	 * @param array $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the updated option
+	 * @throws OCSBadRequestException The given option id doesn't match the question or form
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException Current user has no permission to edit
+	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
+	 * @throws OCSForbiddenException Not allowed to update id or questionId
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find option or question
+	 *
+	 * 200: the id of the updated option
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options/{optionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}')]
 	public function updateOption(int $formId, int $questionId, int $optionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating option: form: {formId}, question: {questionId}, option: {optionId}, values: {keyValuePairs}', [
 			'formId' => $formId,
@@ -826,7 +920,7 @@ class ApiController extends OCSController {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		try {
@@ -834,24 +928,24 @@ class ApiController extends OCSController {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find option or question');
-			throw new OCSBadRequestException('Could not find option or question');
+			throw new OCSNotFoundException('Could not find option or question');
 		}
 
 		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $formId) {
 			$this->logger->debug('The given option id doesn\'t match the question or form.');
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
-			$this->logger->info('Empty keyValuePairs, will not update.');
-			throw new OCSForbiddenException();
+			$this->logger->info('Empty keyValuePairs, will not update');
+			throw new OCSForbiddenException('Empty keyValuePairs, will not update');
 		}
 
 		//Don't allow to change id or questionId
 		if (key_exists('id', $keyValuePairs) || key_exists('questionId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update id or questionId');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('Not allowed to update id or questionId');
 		}
 
 		// Create OptionEntity with given Params & Id.
@@ -872,13 +966,18 @@ class ApiController extends OCSController {
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param int $optionId id of option to update
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the deleted option
+	 * @throws OCSBadRequestException The given option id doesn't match the question or form
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException Current user has no permission to edit
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question or option
+	 *
+	 * 200: the id of the deleted option
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options/{optionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}')]
 	public function deleteOption(int $formId, int $questionId, int $optionId): DataResponse {
 		$this->logger->debug('Deleting option: {optionId}', [
 			'optionId' => $optionId
@@ -887,20 +986,20 @@ class ApiController extends OCSController {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form, question or option');
-			throw new OCSBadRequestException('Could not find form, question or option');
+			$this->logger->debug('Could not find option or question');
+			throw new OCSBadRequestException('Could not find option or question');
 		}
 
 		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $formId) {
 			$this->logger->debug('The given option id doesn\'t match the question or form.');
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
 		$this->optionMapper->delete($option);
@@ -922,28 +1021,39 @@ class ApiController extends OCSController {
 	 * Reorder options for a given question
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
-	 * @param Array<int, int> $newOrder Order to use
+	 * @param list<int> $newOrder Array of option ids in new order.
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
+	 * @throws OCSBadRequestException The given question id doesn't match the form
+	 * @throws OCSBadRequestException The given array contains duplicates
+	 * @throws OCSBadRequestException The length of the given array does not match the number of stored options
+	 * @throws OCSBadRequestException This option is not part of the given question
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException Current user has no permission to edit
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the options of the question in the new order
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/questions/{questionId}/options', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or question', ['exception' => $e]);
-			throw new OCSNotFoundException('Could not find form or question');
+			$this->logger->debug('Could not find question');
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		if ($question->getFormId() !== $formId) {
 			$this->logger->debug('The given question id doesn\'t match the form.');
-			throw new OCSBadRequestException();
+			throw new OCSBadRequestException('The given question id doesn\'t match the form.');
 		}
 
 		// Check if array contains duplicates
@@ -970,18 +1080,17 @@ class ApiController extends OCSController {
 				$this->logger->debug('Could not find option. Id: {optionId}', [
 					'optionId' => $optionId
 				]);
-				throw new OCSBadRequestException();
+				throw new OCSNotFoundException('Could not find option');
 			}
 
-			// Abort if a question is not part of the Form.
+			// Abort if a option is not part of the question.
 			if ($options[$arrayKey]->getQuestionId() !== $questionId) {
-				$this->logger->debug('This Option is not part of the given Question: formId: {formId}', [
+				$this->logger->debug('This option is not part of the given question: formId: {formId}', [
 					'formId' => $formId
 				]);
-				throw new OCSBadRequestException();
+				throw new OCSBadRequestException('This option is not part of the given question');
 			}
 
-			// Abort if a question is already marked as deleted (order==0)
 			$oldOrder = $options[$arrayKey]->getOrder();
 
 			// Only set order, if it changed.
@@ -995,7 +1104,7 @@ class ApiController extends OCSController {
 		foreach ($options as $option) {
 			$this->optionMapper->update($option);
 
-			$response[$option->getId()] = [
+			$response[(string)$option->getId()] = [
 				'order' => $option->getOrder()
 			];
 		}
@@ -1011,24 +1120,31 @@ class ApiController extends OCSController {
 	 * Get all the submissions of a given form
 	 *
 	 * @param int $formId of the form
-	 * @return DataResponse|DataDownloadResponse
-	 * @throws OCSNotFoundException
-	 * @throws OCSForbiddenException
+	 * @param ?string $fileFormat the file format that should be used for the download. Defaults to `null`
+	 *                            Possible values:
+	 *                            - `csv`: Comma-separated value
+	 *                            - `ods`: OpenDocument Spreadsheet
+	 *                            - `xlsx`: Excel Open XML Spreadsheet
+	 * @return DataResponse<Http::STATUS_OK, FormsSubmissions, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
+	 *
+	 * 200: the submissions of the form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'GET', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions')]
 	public function getSubmissions(int $formId, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException();
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		if (!$this->formsService->canSeeResults($form)) {
 			$this->logger->debug('The current user has no permission to get the results for this form');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('The current user has no permission to get the results for this form');
 		}
 
 		if ($fileFormat !== null) {
@@ -1043,22 +1159,30 @@ class ApiController extends OCSController {
 		$questions = $this->formsService->getQuestions($formId);
 
 		// Append Display Names
-		foreach ($submissions as $key => $submission) {
+		$submissions = array_map(function (array $submission) {
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
-				$submissions[$key]['userDisplayName'] = $this->l10n->t('Anonymous response');
+				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);
 
 				if ($userEntity instanceof IUser) {
-					$submissions[$key]['userDisplayName'] = $userEntity->getDisplayName();
+					$submission['userDisplayName'] = $userEntity->getDisplayName();
 				} else {
 					// Fallback, should not occur regularly.
-					$submissions[$key]['userDisplayName'] = $submission['userId'];
+					$submission['userDisplayName'] = $submission['userId'];
 				}
 			}
-		}
+			return $submission;
+		}, $submissions);
+
+		$questions = array_map(static function (array $question) {
+			if (empty($question['extraSettings'])) {
+				$question['extraSettings'] = new \stdClass();
+			}
+			return $question;
+		}, $questions);
 
 		$response = [
 			'submissions' => $submissions,
@@ -1072,13 +1196,15 @@ class ApiController extends OCSController {
 	 * Delete all submissions of a specified form
 	 *
 	 * @param int $formId the form id
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
+	 *
+	 * 200: the form id of the deleted submission
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions')]
 	public function deleteAllSubmissions(int $formId): DataResponse {
 		$this->logger->debug('Delete all submissions to form: {formId}', [
 			'formId' => $formId,
@@ -1088,13 +1214,13 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		// The current user has permissions to remove submissions
 		if (!$this->formsService->canDeleteResults($form)) {
 			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is not owned by the current user and user has no `results_delete` permission');
 		}
 
 		// Delete all submissions (incl. Answers)
@@ -1108,17 +1234,23 @@ class ApiController extends OCSController {
 	 * Process a new submission
 	 *
 	 * @param int $formId the form id
-	 * @param array $answers [question_id => arrayOfString]
+	 * @param array<string, list<string>> $answers [question_id => arrayOfString]
 	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_CREATED, null, array{}>
+	 * @throws OCSBadRequestException At least one submitted answer is not valid
+	 * @throws OCSForbiddenException Already submitted
+	 * @throws OCSForbiddenException Not allowed to access this form
+	 * @throws OCSForbiddenException This form is no longer taking answers
+	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
+	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 201: empty response
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions')]
 	public function newSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
@@ -1187,7 +1319,7 @@ class ApiController extends OCSController {
 			$this->jobList->add(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $form->getId()]);
 		}
 
-		return new DataResponse();
+		return new DataResponse(null, Http::STATUS_CREATED);
 	}
 
 	/**
@@ -1195,13 +1327,16 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param int $submissionId the submission id
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Submission doesn't belong to given form
+	 * @throws OCSNotFoundException Could not find form or submission
+	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
+	 *
+	 * 200: the id of the deleted submission
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/submissions/{submissionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function deleteSubmission(int $formId, int $submissionId): DataResponse {
 		$this->logger->debug('Delete Submission: {submissionId}', [
 			'submissionId' => $submissionId,
@@ -1212,7 +1347,7 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form or submission');
-			throw new OCSBadRequestException();
+			throw new OCSNotFoundException('Could not find form or submission');
 		}
 
 		if ($formId !== $submission->getFormId()) {
@@ -1223,7 +1358,7 @@ class ApiController extends OCSController {
 		// The current user has permissions to remove submissions
 		if (!$this->formsService->canDeleteResults($form)) {
 			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is not owned by the current user and user has no `results_delete` permission');
 		}
 
 		// Delete submission (incl. Answers)
@@ -1239,24 +1374,26 @@ class ApiController extends OCSController {
 	 * @param int $formId of the form
 	 * @param string $path The Cloud-Path to export to
 	 * @param string $fileFormat File format used for export
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, string, array{}>
+	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
+	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 200: the file name used for storing the submissions
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/export', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/export')]
 	public function exportSubmissionsToCloud(int $formId, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException();
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		if (!$this->formsService->canSeeResults($form)) {
 			$this->logger->debug('The current user has no permission to get the results for this form');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('The current user has no permission to get the results for this form');
 		}
 
 		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
@@ -1270,13 +1407,23 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param string $shareHash hash of the form share
-	 * @return Response
+	 * @return DataResponse<Http::STATUS_OK, list<FormsUploadedFile>, array{}>
+	 * @throws OCSBadRequestException No files provided
+	 * @throws OCSBadRequestException Question doesn't belong to the given form
+	 * @throws OCSBadRequestException Invalid file provided
+	 * @throws OCSBadRequestException Failed to upload the file
+	 * @throws OCSBadRequestException File size exceeds the maximum allowed size
+	 * @throws OCSBadRequestException File type is not allowed
+	 * @throws OCSForbiddenException Already submitted
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the file id and name of the uploaded file
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[PublicPage()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/files/{questionId}', requirements: Constants::API_V3_REQUIREMENTS)]
-	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): Response {
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/files/{questionId}')]
+	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}', [
 			'formId' => $formId,
 			'questionId' => $questionId
@@ -1305,7 +1452,7 @@ class ApiController extends OCSController {
 			$this->logger->debug('Could not find question with id {questionId}', [
 				'questionId' => $questionId
 			]);
-			throw new OCSBadRequestException(previous: $e instanceof \Exception ? $e : null);
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		if ($formId !== $question->getFormId()) {
@@ -1466,7 +1613,7 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException(previous: $e instanceof \Exception ? $e : null);
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		// Does the user have access to the form (Either by logged-in user, or by providing public share-hash.)
@@ -1510,12 +1657,12 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException();
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is not owned by the current user');
 		}
 		return $form;
 	}

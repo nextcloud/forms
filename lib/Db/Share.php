@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace OCA\Forms\Db;
 
 use OCA\Forms\Constants;
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @psalm-import-type FormsPermission from ResponseDefinitions
  * @method int getFormId()
  * @method void setFormId(integer $value)
  * @method int getShareType()
@@ -39,21 +41,33 @@ class Share extends Entity {
 		$this->addType('shareWith', 'string');
 	}
 
+	/**
+	 * @return list<FormsPermission>
+	 */
 	public function getPermissions(): array {
 		// Fallback to submit permission
 		return json_decode($this->getPermissionsJson() ?: 'null') ?? [ Constants::PERMISSION_SUBMIT ];
 	}
 
 	/**
-	 * @param array $permissions
+	 * @param list<FormsPermission> $permissions
 	 */
 	public function setPermissions(array $permissions) {
 		$this->setPermissionsJson(
 			// Make sure to only encode array values as the indices might be non consecutively so it would be encoded as a json object
-			json_encode(array_values($permissions))
+			json_encode($permissions)
 		);
 	}
 
+	/**
+	 * @return array{
+	 *   id: int,
+	 *   formId: int,
+	 *   shareType: int,
+	 *   shareWith: string,
+	 *   permissions: list<FormsPermission>,
+	 * }
+	 */
 	public function read(): array {
 		return [
 			'id' => $this->getId(),

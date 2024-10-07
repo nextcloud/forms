@@ -32,6 +32,14 @@ class Submission extends Entity {
 		$this->addType('timestamp', 'integer');
 	}
 
+	/**
+	 * @return array{
+	 *     id: int,
+	 *     formId: int,
+	 *     userId: string,
+	 *     timestamp: int,
+	 * }
+	 */
 	public function read(): array {
 		return [
 			'id' => $this->getId(),

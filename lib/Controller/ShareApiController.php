@@ -13,19 +13,21 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
-use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\Files\IRootFolder;
 use OCP\IGroup;
@@ -39,6 +41,9 @@ use OCP\Share\IManager;
 use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type FormsShare from ResponseDefinitions
+ */
 class ShareApiController extends OCSController {
 	private IUser $currentUser;
 
@@ -68,13 +73,29 @@ class ShareApiController extends OCSController {
 	 * @param int $formId The form to share
 	 * @param int $shareType Nextcloud-ShareType
 	 * @param string $shareWith ID of user/group/... to share with. For Empty shareWith and shareType Link, this will be set as RandomID.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param list<string> $permissions the permissions granted on the share, defaults to `submit`
+	 *                                  Possible values:
+	 *                                  - `submit` user can submit
+	 *                                  - `results` user can see the results
+	 *                                  - `results_delete` user can see and delete results
+	 * @return DataResponse<Http::STATUS_CREATED, FormsShare, array{}>
+	 * @throws OCSBadRequestException Invalid shareType
+	 * @throws OCSBadRequestException Invalid permission given
+	 * @throws OCSBadRequestException Invalid user to share with
+	 * @throws OCSBadRequestException Invalid group to share with
+	 * @throws OCSBadRequestException Invalid team to share with
+	 * @throws OCSBadRequestException Unknown shareType
+	 * @throws OCSBadRequestException Share hash exists, please try again
+	 * @throws OCSBadRequestException Teams app is disabled
+	 * @throws OCSForbiddenException Link share not allowed
+	 * @throws OCSForbiddenException This form is not owned by the current user
+	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 201: the created share
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/shares', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/shares')]
 	public function newShare(int $formId, int $shareType, string $shareWith = '', array $permissions = [Constants::PERMISSION_SUBMIT]): DataResponse {
 		$this->logger->debug('Adding new share: formId: {formId}, shareType: {shareType}, shareWith: {shareWith}, permissions: {permissions}', [
 			'formId' => $formId,
@@ -92,20 +113,20 @@ class ShareApiController extends OCSController {
 		// Block LinkShares if not allowed
 		if ($shareType === IShare::TYPE_LINK && !$this->configService->getAllowPublicLink()) {
 			$this->logger->debug('Link Share not allowed.');
-			throw new OCSForbiddenException('Link Share not allowed.');
+			throw new OCSForbiddenException('Link share not allowed.');
 		}
 
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form', ['exception' => $e]);
-			throw new OCSBadRequestException('Could not find form');
+			throw new OCSNotFoundException('Could not find form');
 		}
 
 		// Check for permission to share form
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is not owned by the current user');
 		}
 
 		if (!$this->validatePermissions($permissions, $shareType)) {
@@ -140,11 +161,11 @@ class ShareApiController extends OCSController {
 				// Check if hash already exists. (Unfortunately not possible here by unique index on db.)
 				try {
 					// Try loading a share to the hash.
-					$nonex = $this->shareMapper->findPublicShareByHash($shareWith);
+					$this->shareMapper->findPublicShareByHash($shareWith);
 
 					// If we come here, a share has been found --> The share hash already exists, thus aborting.
-					$this->logger->debug('Share Hash already exists.');
-					throw new OCSException('Share Hash exists. Please retry.');
+					$this->logger->debug('Share hash already exists.');
+					throw new OCSBadRequestException('Share hash exists, please retry.');
 				} catch (DoesNotExistException $e) {
 					// Just continue, this is what we expect to happen (share hash not existing yet).
 				}
@@ -153,7 +174,7 @@ class ShareApiController extends OCSController {
 			case IShare::TYPE_CIRCLE:
 				if (!$this->circlesService->isCirclesEnabled()) {
 					$this->logger->debug('Teams app is disabled, sharing to teams not possible.');
-					throw new OCSException('Teams app is disabled.');
+					throw new OCSBadRequestException('Teams app is disabled.');
 				}
 				$circle = $this->circlesService->getCircle($shareWith);
 				if (is_null($circle)) {
@@ -165,7 +186,7 @@ class ShareApiController extends OCSController {
 			default:
 				// This passed the check for used shareTypes, but has not been found here.
 				$this->logger->warning('Unknown, but used shareType: {shareType}. Please file an issue on GitHub.', [ 'shareType' => $shareType ]);
-				throw new OCSException('Unknown shareType.');
+				throw new OCSBadRequestException('Unknown shareType.');
 		}
 
 		$share = new Share();
@@ -185,7 +206,7 @@ class ShareApiController extends OCSController {
 		$shareData = $share->read();
 		$shareData['displayName'] = $this->formsService->getShareDisplayName($shareData);
 
-		return new DataResponse($shareData);
+		return new DataResponse($shareData, Http::STATUS_CREATED);
 	}
 
 	/**
@@ -193,14 +214,20 @@ class ShareApiController extends OCSController {
 	 *
 	 * @param int $formId of the form
 	 * @param int $shareId of the share to update
-	 * @param array $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Share doesn't belong to given Form
+	 * @throws OCSBadRequestException Invalid permission given
+	 * @throws OCSForbiddenException This form is not owned by the current user
+	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
+	 * @throws OCSForbiddenException Not allowed to update other properties than permissions
+	 * @throws OCSNotFoundException Could not find share
+	 *
+	 * 200: the id of the updated share
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/shares/{shareId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/shares/{shareId}')]
 	public function updateShare(int $formId, int $shareId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating share: {shareId} of form {formId}, permissions: {permissions}', [
 			'formId' => $formId,
@@ -213,7 +240,7 @@ class ShareApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find share', ['exception' => $e]);
-			throw new OCSBadRequestException('Could not find share');
+			throw new OCSNotFoundException('Could not find share');
 		}
 
 		if ($formId !== $formShare->getFormId()) {
@@ -223,19 +250,19 @@ class ShareApiController extends OCSController {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is not owned by the current user');
 		}
 
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('Empty keyValuePairs, will not update');
 		}
 
 		//Don't allow to change other properties than permissions
-		if (count($keyValuePairs) > 1 || !key_exists('permissions', $keyValuePairs)) {
+		if (count($keyValuePairs) > 1 || !array_key_exists('permissions', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update other properties than permissions');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('Not allowed to update other properties than permissions');
 		}
 
 		if (!$this->validatePermissions($keyValuePairs['permissions'], $formShare->getShareType())) {
@@ -285,13 +312,16 @@ class ShareApiController extends OCSController {
 	 *
 	 * @param int $formId of the form
 	 * @param int $shareId of the share to delete
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Share doesn't belong to given Form
+	 * @throws OCSForbiddenException This form is not owned by the current user
+	 * @throws OCSNotFoundException Could not find share
+	 *
+	 * 200: the id of the deleted share
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/shares/{shareId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/shares/{shareId}')]
 	public function deleteShare(int $formId, int $shareId): DataResponse {
 		$this->logger->debug('Deleting share: {shareId} of form {formId}', [
 			'formId' => $formId,
@@ -303,7 +333,7 @@ class ShareApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find share', ['exception' => $e]);
-			throw new OCSBadRequestException('Could not find share');
+			throw new OCSNotFoundException('Could not find share');
 		}
 
 		if ($formId !== $share->getFormId()) {
@@ -313,7 +343,7 @@ class ShareApiController extends OCSController {
 
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException();
+			throw new OCSForbiddenException('This form is not owned by the current user');
 		}
 
 		$this->shareMapper->delete($share);

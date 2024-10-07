@@ -47,6 +47,7 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCA\Forms\Tests\Unit\MockedMapperException;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -228,7 +229,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'anon-user-1']
 				],
-				'questions' => ['questions'],
+				'questions' => [['name' => 'questions']],
 				'expected' => [
 					'submissions' => [
 						[
@@ -236,14 +237,19 @@ class ApiControllerTest extends TestCase {
 							'userDisplayName' => 'Anonymous response',
 						]
 					],
-					'questions' => ['questions'],
+					'questions' => [
+						[
+							'name' => 'questions',
+							'extraSettings' => new \stdClass(),
+						],
+					],
 				]
 			],
 			'user' => [
 				'submissions' => [
 					['userId' => 'jdoe']
 				],
-				'questions' => ['questions'],
+				'questions' => [['name' => 'questions']],
 				'expected' => [
 					'submissions' => [
 						[
@@ -251,7 +257,12 @@ class ApiControllerTest extends TestCase {
 							'userDisplayName' => 'jdoe',
 						]
 					],
-					'questions' => ['questions'],
+					'questions' => [
+						[
+							'name' => 'questions',
+							'extraSettings' => new \stdClass(),
+						],
+					],
 				]
 			]
 		];
@@ -395,31 +406,6 @@ class ApiControllerTest extends TestCase {
 	 * @dataProvider dataTestCreateNewForm()
 	 */
 	public function testCreateNewForm($expectedForm) {
-		// Create a partial mock, as we only test newForm and not getForm
-		/** @var ApiController|MockObject */
-		$apiController = $this->getMockBuilder(ApiController::class)
-			->onlyMethods(['getForm'])
-			->setConstructorArgs(['forms',
-				$this->request,
-				$this->createUserSession(),
-				$this->answerMapper,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->formsService,
-				$this->submissionService,
-				$this->l10n,
-				$this->logger,
-				$this->userManager,
-				$this->storage,
-				$this->uploadedFileMapper,
-				$this->mimeTypeDetector,
-				$this->jobList,
-			])->getMock();
-
 		$this->configService->expects($this->once())
 			->method('canCreateForms')
 			->willReturn(true);
@@ -438,11 +424,7 @@ class ApiControllerTest extends TestCase {
 				$form->setId(7);
 				return $form;
 			});
-		$apiController->expects($this->once())
-			->method('getForm')
-			->with(7)
-			->willReturn(new DataResponse('succeeded'));
-		$this->assertEquals(new DataResponse('succeeded'), $apiController->newForm());
+		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm());
 	}
 
 	public function dataCloneForm_exceptions() {
@@ -558,36 +540,7 @@ class ApiControllerTest extends TestCase {
 			->with(7)
 			->willReturn([]);
 
-		/** @var ApiController|MockObject */
-		$apiController = $this->getMockBuilder(ApiController::class)
-			->onlyMethods(['getForm'])
-			->setConstructorArgs(['forms',
-				$this->request,
-				$this->createUserSession(),
-				$this->answerMapper,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->formsService,
-				$this->submissionService,
-				$this->l10n,
-				$this->logger,
-				$this->userManager,
-				$this->storage,
-				$this->uploadedFileMapper,
-				$this->mimeTypeDetector,
-				$this->jobList,
-			])
-			->getMock();
-
-		$apiController->expects($this->once())
-			->method('getForm')
-			->with(14)
-			->willReturn(new DataResponse('success'));
-		$this->assertEquals(new DataResponse('success'), $apiController->newForm(7));
+		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm(7));
 	}
 
 	private function formAccess(bool $hasUserAccess = true, bool $hasFormExpired = false, bool $canSubmit = true) {
@@ -610,17 +563,17 @@ class ApiControllerTest extends TestCase {
 		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
 		$question = Question::fromParams(['formId' => 1]);
-		
+
 		$this->formMapper->expects($this->once())
 			->method('findById')
 			->with(1)
 			->willReturn($form);
-		
+
 		$this->questionMapper->expects($this->once())
 			->method('findById')
 			->with(10)
 			->willReturn($question);
-		
+
 		$this->request->expects($this->once())
 			->method('getUploadedFile')
 			->with('files')
@@ -813,7 +766,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with(1)
 			->willThrowException($exception);
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->apiController->newSubmission(1, [], '');
 	}
 
@@ -887,7 +840,7 @@ class ApiControllerTest extends TestCase {
 			->with(42)
 			->willThrowException($exception);
 
-		$this->expectException(OCSBadRequestException::class);
+		$this->expectException(OCSNotFoundException::class);
 		$this->apiController->deleteSubmission(1, 42);
 	}
 
