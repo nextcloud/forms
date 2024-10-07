@@ -144,6 +144,7 @@ OC.L10N.register(
     "Submit" : "Изпращане",
     "You have unsaved changes! Do you still want to leave?" : "Имате незапазени промени! Все още ли искате да напуснете?",
     "Abort" : "Прекрати",
+    "Clear" : "Изчистване",
     "Error while saving question" : "Грешка при записване на въпроса",
     "Form link copied" : "Връзката към формуляра е копирана",
     "Cannot copy, please copy the link manually" : "Не може да се копира, моля, копирайте връзката ръчно",
