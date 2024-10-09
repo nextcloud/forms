@@ -98,10 +98,7 @@ class Form extends Entity {
 		$accessEnum = $this->getAccessEnum();
 		$access = [];
 
-		if ($accessEnum >= Constants::FORM_ACCESS_LEGACYLINK) {
-			$access['legacyLink'] = true;
-		}
-		switch ($accessEnum % Constants::FORM_ACCESS_LEGACYLINK) {
+		switch ($accessEnum) {
 			case Constants::FORM_ACCESS_NOPUBLICSHARE:
 				$access['permitAllUsers'] = false;
 				$access['showToAllUsers'] = false;
@@ -135,11 +132,6 @@ class Form extends Entity {
 			$value = Constants::FORM_ACCESS_PERMITALLUSERS;
 		}
 		
-		// If legacyLink add 3
-		if (isset($access['legacyLink']) && $access['legacyLink']) {
-			$value += Constants::FORM_ACCESS_LEGACYLINK;
-		}
-
 		$this->setAccessEnum($value);
 	}
 

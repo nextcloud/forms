@@ -357,7 +357,7 @@ class FormsService {
 	 * @return boolean
 	 */
 	public function canSubmit(Form $form): bool {
-		// We cannot control how many time users can submit if public link / legacyLink available
+		// We cannot control how many time users can submit if public link available
 		if ($this->hasPublicLink($form)) {
 			return true;
 		}
@@ -386,10 +386,6 @@ class FormsService {
 	 */
 	private function hasPublicLink(Form $form): bool {
 		$access = $form->getAccess();
-
-		if (isset($access['legacyLink'])) {
-			return true;
-		}
 
 		$shareEntities = $this->shareMapper->findByForm($form->getId());
 		foreach ($shareEntities as $shareEntity) {
