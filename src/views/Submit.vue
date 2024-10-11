@@ -55,7 +55,8 @@
 					class="form-desc"
 					dir="auto"
 					v-html="formDescription" />
-				<p v-if="isExpired" class="info-message">
+				<!-- Show expiration message-->
+				<p v-if="form.expires && form.showExpiration" class="info-message">
 					{{ expirationMessage }}
 				</p>
 				<!-- Generate form information message-->
