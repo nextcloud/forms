@@ -150,6 +150,7 @@ OC.L10N.register(
     "You have unsaved changes! Do you still want to leave?" : "Teniu canvis no desats! Encara vols marxar?",
     "Abort" : "Cancel·la",
     "Leave" : "Abandona",
+    "Clear" : "Neteja",
     "Error while saving question" : "S'ha produït un error en desar la pregunta",
     "Form link copied" : "S'ha copiat l'enllaç del formulari",
     "Cannot copy, please copy the link manually" : "No s'ha pogut copiar; copieu l'enllaç manualment",

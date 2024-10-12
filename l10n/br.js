@@ -22,6 +22,7 @@ OC.L10N.register(
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
     "Submit" : "Kinnig",
+    "Clear" : "Netaat",
     "File" : "Restr",
     "Date" : "Deiz",
     "Presentation" : "Kinnigadenn"
