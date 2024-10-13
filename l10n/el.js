@@ -127,8 +127,6 @@ OC.L10N.register(
     "Show QR code" : "Εμφάνιση QR code",
     "Copy embedding code" : "Αντιγραφή ενσωματωμένου κώδικα",
     "Remove link" : "Αφαίρεση συνδέσμου",
-    "Form still supports old sharing-link." : "Η φόρμα εξακολουθεί να υποστηρίζει τον παλιό σύνδεσμο κοινής χρήσης.",
-    "Remove Legacy Link" : "Αφαίρεση του συνδέσμου παλαιού τύπου",
     "Internal link" : "Εσωτερικός σύνδεσμος",
     "Only works for logged in accounts with access rights" : "Λειτουργεί μόνο για συνδεδεμένους λογαριασμούς με δικαιώματα πρόσβασης",
     "Permit access to all logged in accounts" : "Επιτρέψτε την πρόσβαση σε όλους τους συνδεδεμένους λογαριασμούς",

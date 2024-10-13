@@ -60,7 +60,6 @@ OC.L10N.register(
     "Show QR code" : "Amosar el códigu QR",
     "Copy embedding code" : "Copiar el códigu empotráu",
     "Remove link" : "Quitar l'enllaz",
-    "Legacy Link" : "Enllaz heredáu",
     "Internal link" : "Enllaz internu",
     "There was an error while adding the share" : "Hebo un error mentanto s'amestaba l'elementu compartíu",
     "There was an error while adding the link" : "Hebo un error mentanto s'amestaba l'enllaz",

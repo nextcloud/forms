@@ -104,7 +104,6 @@ OC.L10N.register(
     "Copy to clipboard" : "Kopiraj v odložišče",
     "Copy embedding code" : "Kopiraj vstavljivo kodo",
     "Remove link" : "Odstrani povezavo",
-    "Form still supports old sharing-link." : "Vprašalnik še vedno podpira zastarel način povezave objave.",
     "Internal link" : "Notranja povezava",
     "Only works for logged in accounts with access rights" : "Deluje le za prijavljene račune z ustreznimi dovoljenji",
     "Permit access to all logged in accounts" : "Dovoli dostop vsem prijavljenim računom",

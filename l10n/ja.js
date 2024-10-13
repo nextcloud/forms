@@ -92,7 +92,6 @@ OC.L10N.register(
     "Copy embedding code" : "埋め込みコードをコピー",
     "Convert to embeddable link" : "埋め込み可能なリンクに変換する",
     "Remove link" : "リンクを削除",
-    "Form still supports old sharing-link." : "フォームではまだ古い共有リンクをサポートしています。",
     "Internal link" : "内部リンク",
     "Only works for logged in accounts with access rights" : "アクセス権を持つログインアカウントにのみ機能します",
     "Permit access to all logged in accounts" : "すべてのログイン済みアカウントからのアクセスを許可する",
