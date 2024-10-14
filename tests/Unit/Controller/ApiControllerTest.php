@@ -63,7 +63,6 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCA\Forms\Tests\Unit\MockedMapperException;
-use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -369,30 +368,6 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->exportSubmissionsToCloud(1, '');
 	}
 
-	public function testUnlinkFile() {
-		$form = new Form();
-		$form->setId(1);
-		$form->setHash('hash');
-		$form->setOwnerId('currentUser');
-		$form->setFileId(100);
-		$form->setFileFormat('csv');
-
-		$this->formMapper->expects($this->once())
-			->method('findByHash')
-			->with('hash')
-			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('canEditForm')
-			->with($form)
-			->willReturn(true);
-
-		$this->apiController->unlinkFileLegacy('hash');
-
-		$this->assertNull($form->getFileId());
-		$this->assertNull($form->getFileFormat());
-	}
-
 	public function testCreateNewForm_notAllowed() {
 		$this->configService->expects($this->once())
 			->method('canCreateForms')
@@ -636,21 +611,6 @@ class ApiControllerTest extends TestCase {
 		$this->formsService
 			->method('canSubmit')
 			->willReturn($canSubmit);
-	}
-
-	public function testCloneQuestion_notFound() {
-		$this->questionMapper->method('findById')->with(42)->willThrowException($this->createMock(IMapperException::class));
-		$this->expectException(OCSNotFoundException::class);
-		$this->apiController->cloneQuestionLegacy(42);
-	}
-
-	public function testCloneQuestion_noPermission() {
-		$form = Form::fromParams(['ownerId' => 'otherUser']);
-		$question = Question::fromParams(['formId' => 1]);
-		$this->questionMapper->method('findById')->with(42)->willReturn($question);
-		$this->formMapper->method('findById')->with(1)->willReturn($form);
-		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->cloneQuestionLegacy(42);
 	}
 
 	public function testUploadFiles() {
@@ -1039,7 +999,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->apiController->transferOwnerLegacy(1, 'newOwner');
+		$this->apiController->updateForm(1, ['ownerId' => 'newOwner']);
 	}
 
 	public function testTransferNewOwnerNotFound() {
@@ -1059,7 +1019,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn(null);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->transferOwnerLegacy(1, 'newOwner');
+		$this->apiController->updateForm(1, ['ownerId' => 'newOwner']);
 	}
 
 	public function testTransferOwner() {
@@ -1079,7 +1039,7 @@ class ApiControllerTest extends TestCase {
 			->with('newOwner')
 			->willReturn($newOwner);
 
-		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->transferOwnerLegacy(1, 'newOwner'));
+		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->updateForm(1, ['ownerId' => 'newOwner']));
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}
 }
