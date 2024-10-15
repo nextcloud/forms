@@ -188,7 +188,9 @@ export default {
 							id: this.form.id,
 						}),
 						{
-							ownerId: this.selected.shareWith,
+							keyValuePairs: {
+								ownerId: this.selected.shareWith,
+							},
 						},
 					)
 					showSuccess(
