@@ -52,7 +52,7 @@ OC.L10N.register(
     "Form sharing" : "共享表单",
     "Allow sharing by link" : "允许使用链接共享",
     "Allow sharing to all logged in accounts" : "允许共享给所有已登录用户",
-    "Allow showing form to all logged in accounts on sidebar" : "允许在侧边栏向所有登录的账户显示表单",
+    "Allow showing form to all logged in accounts on sidebar" : "允许在侧边栏向所有登录的账号显示表单",
     "Error while saving configuration" : "保存配置时发生错误",
     "Error while reloading config" : "重新载入配置时发生错误",
     "Form actions" : "表单操作",
