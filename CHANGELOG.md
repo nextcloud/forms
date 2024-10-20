@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.2 - 2024-10-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.1...v4.3.2)
+
+### Fixed
+
+-   [stable4] fix: Update transfer ownership logic by @backportbot[bot] in [\#2372](https://github.com/nextcloud/forms/pull/2372)
+-   [stable4] fix: show expiration message again in submit view by @backportbot[bot] in [\#2360](https://github.com/nextcloud/forms/pull/2360)
+
 ## v4.3.1 - 2024-10-05
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v4.3.1)
