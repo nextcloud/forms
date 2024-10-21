@@ -123,7 +123,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Yanıtlar anonim olarak kaydedilsin",
     "Allow multiple responses per person" : "Bir kişi birkaç kez yanıtlayabilirsin",
     "Set expiration date" : "Geçerlilik sonu tarihini ayarla",
-    "Show expiration date on form" : "Form üzerinde geçerlilik tarihi görüntülensin",
+    "Show expiration date on form" : "Form üzerinde geçerlilik sonu tarihi görüntülensin",
     "Close form" : "Formu kapat",
     "Closed forms do not accept new submissions." : "Kapatılmış formlardan yeni gönderimleri kabul etmez.",
     "Archived forms do not accept new submissions and can not be modified." : "Arşivlenmiş formlar yeni gönderimleri kabul etmez ve değiştirilemez.",

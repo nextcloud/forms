@@ -243,7 +243,7 @@ OC.L10N.register(
     "Error while saving question options" : "保存问题选项时发生错误",
     "Form link copied" : "已复制表单链接",
     "Cannot copy, please copy the link manually" : "无法复制，请手动复制链接",
-    "No recommendations. Start typing." : "没有推荐。开始输入。",
+    "No recommendations. Start typing." : "无建议。开始输入。",
     "No elements found." : "未发现元素。",
     "Checkboxes" : "不定项选择",
     "Checkbox question title" : "不定项选择的标题",
