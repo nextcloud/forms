@@ -36,6 +36,7 @@ use OCP\IRequest;
 
 use Psr\Log\LoggerInterface;
 
+#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 class ConfigController extends ApiController {
 	public function __construct(
 		protected $appName,

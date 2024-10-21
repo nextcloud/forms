@@ -54,6 +54,7 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Util;
 
+#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 class PageController extends Controller {
 	private const TEMPLATE_MAIN = 'main';
 
