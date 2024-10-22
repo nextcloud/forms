@@ -63,7 +63,7 @@ class Question extends Entity {
 		$this->addType('formId', 'integer');
 		$this->addType('order', 'integer');
 		$this->addType('type', 'string');
-		$this->addType('isRequired', 'bool');
+		$this->addType('isRequired', 'boolean');
 		$this->addType('text', 'string');
 		$this->addType('description', 'string');
 		$this->addType('name', 'string');
