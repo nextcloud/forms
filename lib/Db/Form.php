@@ -86,9 +86,9 @@ class Form extends Entity {
 	public function __construct() {
 		$this->addType('created', 'integer');
 		$this->addType('expires', 'integer');
-		$this->addType('isAnonymous', 'bool');
-		$this->addType('submitMultiple', 'bool');
-		$this->addType('showExpiration', 'bool');
+		$this->addType('isAnonymous', 'boolean');
+		$this->addType('submitMultiple', 'boolean');
+		$this->addType('showExpiration', 'boolean');
 		$this->addType('lastUpdated', 'integer');
 		$this->addType('state', 'integer');
 	}
