@@ -91,7 +91,7 @@ class ShareApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/shares', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/shares')]
 	public function newShare(int $formId, int $shareType, string $shareWith = '', array $permissions = [Constants::PERMISSION_SUBMIT]): DataResponse {
 		$this->logger->debug('Adding new share: formId: {formId}, shareType: {shareType}, shareWith: {shareWith}, permissions: {permissions}', [
 			'formId' => $formId,
@@ -217,7 +217,7 @@ class ShareApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'PATCH', url: Constants::API_BASE . 'forms/{formId}/shares/{shareId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/shares/{shareId}')]
 	public function updateShare(int $formId, int $shareId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating share: {shareId} of form {formId}, permissions: {permissions}', [
 			'formId' => $formId,
@@ -308,7 +308,7 @@ class ShareApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
-	#[ApiRoute(verb: 'DELETE', url: Constants::API_BASE . 'forms/{formId}/shares/{shareId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/shares/{shareId}')]
 	public function deleteShare(int $formId, int $shareId): DataResponse {
 		$this->logger->debug('Deleting share: {shareId} of form {formId}', [
 			'formId' => $formId,
