@@ -102,6 +102,7 @@ OC.L10N.register(
     "Share link" : "Povezava za souporabo",
     "Add link" : "Dodaj povezavo",
     "Copy to clipboard" : "Kopiraj v odložišče",
+    "Show QR code" : "Pokaži kodo QR",
     "Copy embedding code" : "Kopiraj vstavljivo kodo",
     "Remove link" : "Odstrani povezavo",
     "Internal link" : "Notranja povezava",
