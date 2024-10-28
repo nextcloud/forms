@@ -39,6 +39,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\RedirectResponse;
@@ -171,9 +172,9 @@ class PageController extends Controller {
 		Util::addStyle($this->appName, 'embedded');
 		$response = $this->createPublicSubmitView($form, $hash)
 			->renderAs(TemplateResponse::RENDER_AS_BASE);
-		
+
 		$this->initialState->provideInitialState('isEmbedded', true);
-		
+
 		return $this->setEmbeddedCSP($response);
 	}
 

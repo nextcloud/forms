@@ -95,7 +95,7 @@ class ShareApiController extends OCSController {
 	 *                                   - `submit` user can submit
 	 *                                   - `results` user can see the results
 	 *                                   - `results_delete` user can see and delete results
-	 * @return DataResponse<array<FormsShare>, Http::STATUS_CREATED, array<>>
+	 * @return DataResponse<Http::STATUS_CREATED, FormsShare, array{}>
 	 * @throws OCSBadRequestException Invalid shareType
 	 * @throws OCSBadRequestException Invalid permission given
 	 * @throws OCSBadRequestException Invalid user to share with
@@ -230,7 +230,7 @@ class ShareApiController extends OCSController {
 	 * @param int $formId of the form
 	 * @param int $shareId of the share to update
 	 * @param array{key: string, values: mixed} $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse<array<int>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Share doesn't belong to given Form
 	 * @throws OCSBadRequestException Invalid permission given
 	 * @throws OCSForbiddenException This form is not owned by the current user
@@ -325,7 +325,7 @@ class ShareApiController extends OCSController {
 	 *
 	 * @param int $formId of the form
 	 * @param int $shareId of the share to delete
-	 * @return DataResponse<array<int>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Share doesn't belong to given Form
 	 * @throws OCSForbiddenException This form is not owned by the current user
 	 * @throws OCSNotFoundException Could not find share

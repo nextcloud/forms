@@ -127,7 +127,7 @@ class ApiController extends OCSController {
 	 *                     Possible values:
 	 *                     - `owned`: Forms owned by the user.
 	 *                     - `shared`: Forms shared with the user.
-	 * @return DataResponse<array<FormsPartialForm>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, array<FormsPartialForm>, array{}>
 	 * @throws OCSBadRequestException wrong form type supplied
 	 */
 	#[CORS()]
@@ -156,7 +156,7 @@ class ApiController extends OCSController {
 	 * Return a copy of the form if the parameter $fromId is set
 	 *
 	 * @param ?int $fromId (optional) Id of the form that should be cloned
-	 * @return DataResponse<FormsForm, Http::STATUS_CREATED, array<>>
+	 * @return DataResponse<Http::STATUS_CREATED, FormsForm, array{}>
 	 * @throws OCSForbiddenException The user is not allowed to create forms
 	 */
 	#[CORS()]
@@ -231,7 +231,7 @@ class ApiController extends OCSController {
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers)
 	 *
 	 * @param int $formId Id of the form
-	 * @return DataResponse<array<FormsForm>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, array<FormsForm>, array{}>
 	 * @throws OCSBadRequestException Could not find form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 */
@@ -259,7 +259,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId FormId of form to update
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse<int formId, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Could not find new form owner
 	 * @throws OCSForbiddenException Empty keyValuePairs provided
 	 * @throws OCSForbiddenException Not allowed to update id, hash, created, fileId or lastUpdated. OwnerId only allowed if no other key provided.
@@ -349,7 +349,7 @@ class ApiController extends OCSController {
 	 * Delete a form
 	 *
 	 * @param int $formId the form id
-	 * @return DataResponse<int formId, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSForbiddenException User is not allowed to delete the form
 	 * @throws OCSNotFoundException Form not found
 	 */
@@ -372,7 +372,7 @@ class ApiController extends OCSController {
 	 * Read all questions (including options)
 	 *
 	 * @param int $formId the form id
-	 * @return DataResponse<array<FormQuestion>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, array<FormsQuestion>, array{}>
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 */
@@ -402,7 +402,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId FormId
 	 * @param int $questionId QuestionId
-	 * @return DataResponse<FormQuestion, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
@@ -439,7 +439,7 @@ class ApiController extends OCSController {
 	 * @param string $type the new question type
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
-	 * @return DataResponse<FormQuestion, Http::STATUS_CREATED, array<>>
+	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Invalid type
 	 * @throws OCSBadRequestException Datetime question type no longer supported
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -549,7 +549,7 @@ class ApiController extends OCSController {
 	 * @param int $formId the form id
 	 * @param int $questionId id of question to update
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse<int id, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
@@ -590,7 +590,7 @@ class ApiController extends OCSController {
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
-			throw new OCSBacRequestException('This form is archived and can not be modified');
+			throw new OCSBadRequestException('This form is archived and can not be modified');
 		}
 
 		//Don't allow to change id or formId
@@ -625,7 +625,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param int $questionId the question id
-	 * @return DataResponse<int id, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -684,7 +684,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param array<string, int> $newOrder Array of Question-Ids in new order.
-	 * @return DataResponse<array<int, int>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, array<string, int>, array{}>
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
@@ -782,7 +782,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param array<string> $optionTexts the new option text
-	 * @return DataResponse<array<FormsOption>, Http::STATUS_CREATED, array<>> Returns a DataResponse containing the added options
+	 * @return DataResponse<Http::STATUS_CREATED, array<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
@@ -804,7 +804,7 @@ class ApiController extends OCSController {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
-		
+
 		try {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
@@ -858,7 +858,7 @@ class ApiController extends OCSController {
 	 * @param int $questionId id of question
 	 * @param int $optionId id of option to update
 	 * @param array{key: string, value: mixed} $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse<id: int, Http::STATUS_OK, array<>> Returns the id of the updated option
+	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the updated option
 	 * @throws OCSBadRequestException The given option id doesn't match the question or form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
@@ -927,7 +927,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param int $optionId id of option to update
-	 * @return DataResponse<id: int, Http::STATUS_OK, array<>> Returns the id of the deleted option
+	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the deleted option
 	 * @throws OCSBadRequestException The given option id doesn't match the question or form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
@@ -947,7 +947,7 @@ class ApiController extends OCSController {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
-		
+
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
@@ -981,7 +981,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param array<string, int> $newOrder Array of option ids in new order.
-	 * @return DataResponse<array<int, int>, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, array<string, int>, array{}>
 	 * @throws OCSBadRequestException The given question id doesn't match the form
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored options
@@ -1018,14 +1018,14 @@ class ApiController extends OCSController {
 			$this->logger->debug('The given array contains duplicates');
 			throw new OCSBadRequestException('The given array contains duplicates');
 		}
-		
+
 		$options = $this->optionMapper->findByQuestion($questionId);
-		
+
 		if (sizeof($options) !== sizeof($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored options');
 			throw new OCSBadRequestException('The length of the given array does not match the number of stored options');
 		}
-		
+
 		$options = []; // Clear Array of Entities
 		$response = []; // Array of ['optionId' => ['order' => newOrder]]
 
@@ -1061,13 +1061,13 @@ class ApiController extends OCSController {
 		foreach ($options as $option) {
 			$this->optionMapper->update($option);
 
-			$response[$option->getId()] = [
+			$response[(string)$option->getId()] = [
 				'order' => $option->getOrder()
 			];
 		}
 
 		$this->formMapper->update($form);
-	
+
 		return new DataResponse($response);
 	}
 
@@ -1082,7 +1082,7 @@ class ApiController extends OCSController {
 	 *                            - `csv`: Comma-separated value
 	 *                            - `ods`: OpenDocument Spreadsheet
 	 *                            - `xlsx`: Excel Open XML Spreadsheet
-	 * @return DataResponse|DataDownloadResponse<FormsSubmissions, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, FormsSubmissions, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
 	 */
@@ -1143,7 +1143,7 @@ class ApiController extends OCSController {
 	 * Delete all submissions of a specified form
 	 *
 	 * @param int $formId the form id
-	 * @return DataResponse<int: formId, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
 	 */
@@ -1181,7 +1181,7 @@ class ApiController extends OCSController {
 	 * @param int $formId the form id
 	 * @param array<string, array<string>> $answers [question_id => arrayOfString]
 	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
-	 * @return DataResponse<array<>, Http::STATUS_CREATED, array<>>
+	 * @return DataResponse<Http::STATUS_CREATED, null, array{}>
 	 * @throws OCSBadRequestException At least one submitted answer is not valid
 	 * @throws OCSForbiddenException Already submitted
 	 * @throws OCSForbiddenException Not allowed to access this form
@@ -1280,7 +1280,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param int $submissionId the submission id
-	 * @return DataResponse<int: submissionId, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Submission doesn't belong to given form
 	 * @throws OCSNotFoundException Could not find form or submission
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
@@ -1325,7 +1325,7 @@ class ApiController extends OCSController {
 	 * @param int $formId of the form
 	 * @param string $path The Cloud-Path to export to
 	 * @param string $fileFormat File format used for export
-	 * @return DataResponse<string: fileName, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, string, array{}>
 	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
 	 * @throws OCSNotFoundException Could not find form
 	 */
@@ -1356,7 +1356,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param string $shareHash hash of the form share
-	 * @return DataResponse<FormsUploadedFile, Http::STATUS_OK, array<>>
+	 * @return DataResponse<Http::STATUS_OK, FormsUploadedFile, array{}>
 	 * @throws OCSBadRequestException No files provided
 	 * @throws OCSBadRequestException Question doesn't belong to the given form
 	 * @throws OCSBadRequestException Invalid file provided

@@ -24,6 +24,57 @@
 namespace OCA\Forms;
 
 /**
+ * @psalm-type FormsPartialForm = array{
+ *   id: int,
+ *   hash: string,
+ *   title: string,
+ *   expires: int,
+ *   permissions: string[],
+ *   partial: bool,
+ *   state: int
+ * }
+ *
+ * @psalm-type FormsOption = array{
+ *   id: int,
+ *   questionId: int,
+ *   text: string,
+ *   order: ?int
+ * }
+ *
+ * @psalm-type FormsQuestion = array{
+ *   id: int,
+ *   formId: int,
+ *   order: int,
+ *   type: string,
+ *   isRequired: bool,
+ *   text: string,
+ *   name: string,
+ *   options: array<FormsOption>,
+ *   accept: string[],
+ *   extraSettings: \stdClass
+ * }
+ *
+ * @psalm-type FormsAnswer = array{
+ *   id: int,
+ *   submissionId: int,
+ *   questionId: int,
+ *   text: string
+ * }
+ *
+ * @psalm-type FormsSubmission = array{
+ *   id: int,
+ *   formId: int,
+ *   userId: string,
+ *   timestamp: int,
+ *   answers: array<FormsAnswer>,
+ *   userDisplayName: string
+ * }
+ *
+ * @psalm-type FormsSubmissions = array{
+ *   submissions: array<FormsSubmission>,
+ *   questions: array<FormsQuestion>
+ * }
+ *
  * @psalm-type FormsForm = array{
  *   id: int,
  *   hash: string,
@@ -42,57 +93,6 @@ namespace OCA\Forms;
  *   state: int,
  *   shares: string[],
  *   submissions: array<FormsSubmission>,
- * }
- *
- * @psalm-type FormsPartialForm = array{
- *   id: int,
- *   hash: string,
- *   title: string,
- *   expires: int,
- *   permissions: string[],
- *   partial: bool,
- *   state: int
- * }
- *
- * @psalm-type FormsQuestion = array{
- *   id: int,
- *   formId: int,
- *   order: int,
- *   type: string,
- *   isRequired: bool,
- *   text: string,
- *   name: string,
- *   options: array<FormsOption>,
- *   accept: string[],
- *   extraSettings: stdClass
- * }
- *
- * @psalm-type FormsOption = array{
- *   id: int,
- *   questionId: int,
- *   text: string,
- *   order: ?int
- * }
- *
- * @psalm-type FormsSubmissions = {
- *   submissions: array<FormsSubmission>,
- *   questions: array<FormsQuestion>
- * }
- *
- * @psalm-type FormsSubmission = array{
- *   id: int,
- *   formId: int,
- *   userId: string,
- *   timestamp: int,
- *   answers: array<FormsAnswer>,
- *   userDisplayName: string
- * }
- *
- * @psalm-type FormsAnswer = array{
- *   id: int,
- *   submissionId: int,
- *   questionId: int,
- *   text: string
  * }
  *
  * @psalm-type FormsUploadedFile = array{
