@@ -90,12 +90,12 @@ class ShareApiController extends OCSController {
 	 * @param int $formId The form to share
 	 * @param int $shareType Nextcloud-ShareType
 	 * @param string $shareWith ID of user/group/... to share with. For Empty shareWith and shareType Link, this will be set as RandomID.
-	 * @param array<string> $permissions the permissions granted on the share, defaults to `submit`
-	 *                                   Possible values:
-	 *                                   - `submit` user can submit
-	 *                                   - `results` user can see the results
-	 *                                   - `results_delete` user can see and delete results
-	 * @return DataResponse<Http::STATUS_CREATED, FormsShare, array{}>
+	 * @param list<string> $permissions the permissions granted on the share, defaults to `submit`
+	 *                                  Possible values:
+	 *                                  - `submit` user can submit
+	 *                                  - `results` user can see the results
+	 *                                  - `results_delete` user can see and delete results
+	 * @return DataResponse<Http::STATUS_CREATED, array<FormsShare>, array{}>
 	 * @throws OCSBadRequestException Invalid shareType
 	 * @throws OCSBadRequestException Invalid permission given
 	 * @throws OCSBadRequestException Invalid user to share with
@@ -231,7 +231,7 @@ class ShareApiController extends OCSController {
 	 *
 	 * @param int $formId of the form
 	 * @param int $shareId of the share to update
-	 * @param array{key: string, values: mixed} $keyValuePairs Array of key=>value pairs to update.
+	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Share doesn't belong to given Form
 	 * @throws OCSBadRequestException Invalid permission given
@@ -277,7 +277,7 @@ class ShareApiController extends OCSController {
 		}
 
 		//Don't allow to change other properties than permissions
-		if (count($keyValuePairs) > 1 || !key_exists('permissions', $keyValuePairs)) {
+		if (count($keyValuePairs) > 1 || !array_key_exists('permissions', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update other properties than permissions');
 			throw new OCSForbiddenException('Not allowed to update other properties than permissions');
 		}

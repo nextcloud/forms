@@ -20,6 +20,21 @@
             }
         },
         "schemas": {
+            "Access": {
+                "type": "object",
+                "required": [
+                    "permitAllUsers",
+                    "showToAllUsers"
+                ],
+                "properties": {
+                    "permitAllUsers": {
+                        "type": "boolean"
+                    },
+                    "showToAllUsers": {
+                        "type": "boolean"
+                    }
+                }
+            },
             "Answer": {
                 "type": "object",
                 "required": [
@@ -115,8 +130,7 @@
                         "format": "int64"
                     },
                     "access": {
-                        "type": "object",
-                        "additionalProperties": true
+                        "$ref": "#/components/schemas/Access"
                     },
                     "expires": {
                         "type": "integer",
@@ -137,7 +151,7 @@
                     "permissions": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/Permission"
                         }
                     },
                     "questions": {
@@ -148,7 +162,12 @@
                     },
                     "state": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
                     },
                     "shares": {
                         "type": "array",
@@ -215,6 +234,18 @@
                     }
                 }
             },
+            "Order": {
+                "type": "object",
+                "required": [
+                    "order"
+                ],
+                "properties": {
+                    "order": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
             "PartialForm": {
                 "type": "object",
                 "required": [
@@ -244,17 +275,30 @@
                     "permissions": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/Permission"
                         }
                     },
                     "partial": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "enum": [
+                            true
+                        ]
                     },
                     "state": {
                         "type": "integer",
                         "format": "int64"
                     }
                 }
+            },
+            "Permission": {
+                "type": "string",
+                "enum": [
+                    "edit",
+                    "results",
+                    "results_delete",
+                    "submit",
+                    "embed"
+                ]
             },
             "Question": {
                 "type": "object",
@@ -266,9 +310,10 @@
                     "isRequired",
                     "text",
                     "name",
+                    "description",
+                    "extraSettings",
                     "options",
-                    "accept",
-                    "extraSettings"
+                    "accept"
                 ],
                 "properties": {
                     "id": {
@@ -284,7 +329,17 @@
                         "format": "int64"
                     },
                     "type": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "dropdown",
+                            "multiple",
+                            "multiple_unique",
+                            "date",
+                            "time",
+                            "short",
+                            "long",
+                            "file"
+                        ]
                     },
                     "isRequired": {
                         "type": "boolean"
@@ -295,21 +350,99 @@
                     "name": {
                         "type": "string"
                     },
+                    "description": {
+                        "type": "string"
+                    },
+                    "extraSettings": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/QuestionExtraSettings"
+                            },
+                            {
+                                "type": "object"
+                            }
+                        ]
+                    },
                     "options": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Option"
-                        }
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Option"
+                                }
+                            },
+                            {
+                                "type": "object"
+                            }
+                        ]
                     },
                     "accept": {
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            {
+                                "type": "object"
+                            }
+                        ]
+                    }
+                }
+            },
+            "QuestionExtraSettings": {
+                "type": "object",
+                "properties": {
+                    "allowOtherAnswer": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "allowedFileExtensions": {
                         "type": "array",
+                        "nullable": true,
                         "items": {
                             "type": "string"
                         }
                     },
-                    "extraSettings": {
-                        "type": "object",
-                        "additionalProperties": true
+                    "allowedFileTypes": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "maxAllowedFilesCount": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "maxFileSize": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "optionsLimitMax": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "optionsLimitMin": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "shuffleOptions": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "validationRegex": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "validationType": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },
@@ -342,7 +475,7 @@
                     "permissions": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/Permission"
                         }
                     },
                     "displayName": {
@@ -1382,9 +1515,9 @@
                                 ],
                                 "properties": {
                                     "newOrder": {
-                                        "type": "object",
+                                        "type": "array",
                                         "description": "Array of Question-Ids in new order.",
-                                        "additionalProperties": {
+                                        "items": {
                                             "type": "integer",
                                             "format": "int64"
                                         }
@@ -1440,8 +1573,7 @@
                                                 "data": {
                                                     "type": "object",
                                                     "additionalProperties": {
-                                                        "type": "integer",
-                                                        "format": "int64"
+                                                        "$ref": "#/components/schemas/Order"
                                                     }
                                                 }
                                             }
@@ -2252,9 +2384,9 @@
                                 ],
                                 "properties": {
                                     "newOrder": {
-                                        "type": "object",
+                                        "type": "array",
                                         "description": "Array of option ids in new order.",
-                                        "additionalProperties": {
+                                        "items": {
                                             "type": "integer",
                                             "format": "int64"
                                         }
@@ -2320,8 +2452,7 @@
                                                 "data": {
                                                     "type": "object",
                                                     "additionalProperties": {
-                                                        "type": "integer",
-                                                        "format": "int64"
+                                                        "$ref": "#/components/schemas/Order"
                                                     }
                                                 }
                                             }
@@ -2443,17 +2574,8 @@
                                     "keyValuePairs": {
                                         "type": "object",
                                         "description": "Array of key=>value pairs to update.",
-                                        "required": [
-                                            "key",
-                                            "value"
-                                        ],
-                                        "properties": {
-                                            "key": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "object"
-                                            }
+                                        "additionalProperties": {
+                                            "type": "object"
                                         }
                                     }
                                 }
@@ -2858,7 +2980,10 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "$ref": "#/components/schemas/Submissions"
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Submissions"
+                                                    }
                                                 }
                                             }
                                         }
@@ -3643,7 +3768,10 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "$ref": "#/components/schemas/UploadedFile"
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UploadedFile"
+                                                    }
                                                 }
                                             }
                                         }
@@ -3774,7 +3902,7 @@
                                     "permissions": {
                                         "type": "array",
                                         "default": [],
-                                        "description": "the permissions granted on the share, defaults to `submit`\n                                  Possible values:\n                                  - `submit` user can submit\n                                  - `results` user can see the results\n                                  - `results_delete` user can see and delete results",
+                                        "description": "the permissions granted on the share, defaults to `submit`\n                                 Possible values:\n                                 - `submit` user can submit\n                                 - `results` user can see the results\n                                 - `results_delete` user can see and delete results",
                                         "items": {
                                             "type": "string"
                                         }
@@ -3828,7 +3956,10 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "$ref": "#/components/schemas/Share"
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Share"
+                                                    }
                                                 }
                                             }
                                         }
@@ -3949,17 +4080,8 @@
                                     "keyValuePairs": {
                                         "type": "object",
                                         "description": "Array of key=>value pairs to update.",
-                                        "required": [
-                                            "key",
-                                            "values"
-                                        ],
-                                        "properties": {
-                                            "key": {
-                                                "type": "string"
-                                            },
-                                            "values": {
-                                                "type": "object"
-                                            }
+                                        "additionalProperties": {
+                                            "type": "object"
                                         }
                                     }
                                 }

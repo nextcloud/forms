@@ -75,10 +75,11 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 /**
- * @psalm-import-type FormsPartialForm from ResponseDefinitions
  * @psalm-import-type FormsForm from ResponseDefinitions
- * @psalm-import-type FormsQuestion from ResponseDefinitions
  * @psalm-import-type FormsOption from ResponseDefinitions
+ * @psalm-import-type FormsOrder from ResponseDefinitions
+ * @psalm-import-type FormsPartialForm from ResponseDefinitions
+ * @psalm-import-type FormsQuestion from ResponseDefinitions
  * @psalm-import-type FormsSubmissions from ResponseDefinitions
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
  */
@@ -512,7 +513,7 @@ class ApiController extends OCSController {
 
 			$question = $this->questionMapper->insert($question);
 
-			$response = $question->read();
+			$response = $this->formsService->getQuestion($question->getId());
 			$response['options'] = [];
 			$response['accept'] = [];
 		} else {
@@ -703,11 +704,11 @@ class ApiController extends OCSController {
 	 * Updates the Order of all Questions of a Form
 	 *
 	 * @param int $formId Id of the form to reorder
-	 * @param array<string, int> $newOrder Array of Question-Ids in new order.
-	 * @return DataResponse<Http::STATUS_OK, array<string, int>, array{}>
+	 * @param list<int> $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
-	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
+	 * @throws OCSBadRequestException Question doesn't belong to given Form
 	 * @throws OCSBadRequestException One question has already been marked as deleted
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -786,7 +787,7 @@ class ApiController extends OCSController {
 		foreach ($questions as $question) {
 			$this->questionMapper->update($question);
 
-			$response[$question->getId()] = [
+			$response[(string)$question->getId()] = [
 				'order' => $question->getOrder()
 			];
 		}
@@ -881,7 +882,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param int $optionId id of option to update
-	 * @param array{key: string, value: mixed} $keyValuePairs Array of key=>value pairs to update.
+	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the updated option
 	 * @throws OCSBadRequestException The given option id doesn't match the question or form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -1008,8 +1009,8 @@ class ApiController extends OCSController {
 	 * Reorder options for a given question
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
-	 * @param array<string, int> $newOrder Array of option ids in new order.
-	 * @return DataResponse<Http::STATUS_OK, array<string, int>, array{}>
+	 * @param list<int> $newOrder Array of option ids in new order.
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
 	 * @throws OCSBadRequestException The given question id doesn't match the form
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored options
@@ -1112,7 +1113,7 @@ class ApiController extends OCSController {
 	 *                            - `csv`: Comma-separated value
 	 *                            - `ods`: OpenDocument Spreadsheet
 	 *                            - `xlsx`: Excel Open XML Spreadsheet
-	 * @return DataResponse<Http::STATUS_OK, FormsSubmissions, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<FormsSubmissions>, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
 	 *
@@ -1396,7 +1397,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param string $shareHash hash of the form share
-	 * @return DataResponse<Http::STATUS_OK, FormsUploadedFile, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<FormsUploadedFile>, array{}>
 	 * @throws OCSBadRequestException No files provided
 	 * @throws OCSBadRequestException Question doesn't belong to the given form
 	 * @throws OCSBadRequestException Invalid file provided

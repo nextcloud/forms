@@ -24,16 +24,6 @@
 namespace OCA\Forms;
 
 /**
- * @psalm-type FormsPartialForm = array{
- *   id: int,
- *   hash: string,
- *   title: string,
- *   expires: int,
- *   permissions: string[],
- *   partial: bool,
- *   state: int
- * }
- *
  * @psalm-type FormsOption = array{
  *   id: int,
  *   questionId: int,
@@ -41,17 +31,35 @@ namespace OCA\Forms;
  *   order: ?int
  * }
  *
+ * @psalm-type FormsOrder = array{
+ *   order: int
+ * }
+ *
+ * @psalm-type FormsQuestionExtraSettings = array{
+ *   allowOtherAnswer?: ?bool,
+ *   allowedFileExtensions?: ?list<string>,
+ *   allowedFileTypes?: ?list<string>,
+ *   maxAllowedFilesCount?: ?int,
+ *   maxFileSize?: ?int,
+ *   optionsLimitMax?: ?int,
+ *   optionsLimitMin?: ?int,
+ *   shuffleOptions?: ?bool,
+ *   validationRegex?: ?string,
+ *   validationType?: ?string
+ * }
+ *
  * @psalm-type FormsQuestion = array{
  *   id: int,
  *   formId: int,
  *   order: int,
- *   type: string,
+ *   type: "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file",
  *   isRequired: bool,
  *   text: string,
  *   name: string,
- *   options: array<FormsOption>,
- *   accept: string[],
- *   extraSettings: \stdClass
+ *   description: string,
+ *   extraSettings: FormsQuestionExtraSettings|array{},
+ *   options: list<FormsOption>|array{},
+ *   accept: list<string>|array{}
  * }
  *
  * @psalm-type FormsAnswer = array{
@@ -66,13 +74,39 @@ namespace OCA\Forms;
  *   formId: int,
  *   userId: string,
  *   timestamp: int,
- *   answers: array<FormsAnswer>,
+ *   answers: list<FormsAnswer>,
  *   userDisplayName: string
  * }
  *
  * @psalm-type FormsSubmissions = array{
- *   submissions: array<FormsSubmission>,
- *   questions: array<FormsQuestion>
+ *   submissions: list<FormsSubmission>,
+ *   questions: list<FormsQuestion>
+ * }
+ *
+ * @psalm-type FormsAccess = array{
+ *   permitAllUsers: bool,
+ *   showToAllUsers: bool
+ * }
+ *
+ * @psalm-type FormsPermission = "edit"|"results"|"results_delete"|"submit"|"embed"
+ *
+ * @psalm-type FormsShare = array{
+ *   id: int,
+ *   formId: int,
+ *   shareType: int,
+ *   shareWith: string,
+ *   permissions: list<FormsPermission>,
+ *   displayName: string
+ * }
+ *
+ * @psalm-type FormsPartialForm = array{
+ *   id: int,
+ *   hash: string,
+ *   title: string,
+ *   expires: int,
+ *   permissions: list<FormsPermission>,
+ *   partial: true,
+ *   state: int
  * }
  *
  * @psalm-type FormsForm = array{
@@ -82,31 +116,22 @@ namespace OCA\Forms;
  *   description: string,
  *   ownerId: string,
  *   created: int,
- *   access: \stdClass,
+ *   access: FormsAccess,
  *   expires: int,
  *   isAnonymous: bool,
  *   submitMultiple: bool,
  *   showExpiration: bool,
  *   canSubmit: bool,
- *   permissions: string[],
- *   questions: array<FormsQuestion>,
- *   state: int,
- *   shares: string[],
- *   submissions: array<FormsSubmission>,
+ *   permissions: list<FormsPermission>,
+ *   questions: list<FormsQuestion>,
+ *   state: 0|1|2,
+ *   shares: list<string>,
+ *   submissions: list<FormsSubmission>,
  * }
  *
  * @psalm-type FormsUploadedFile = array{
  *   uploadedFileId: int,
  *   fileName: string
- * }
- *
- * @psalm-type FormsShare = array{
- *   id: int,
- *   formId: int,
- *   shareType: int,
- *   shareWith: string,
- *   permissions: string[],
- *   displayName: string
  * }
  */
 class ResponseDefinitions {
