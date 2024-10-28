@@ -88,7 +88,7 @@ namespace OCA\Forms;
  *   submitMultiple: bool,
  *   showExpiration: bool,
  *   canSubmit: bool,
- *   permissions: array<string>,
+ *   permissions: string[],
  *   questions: array<FormsQuestion>,
  *   state: int,
  *   shares: string[],

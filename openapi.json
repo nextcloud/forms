@@ -462,7 +462,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Array containing the partial owned or shared forms",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -567,7 +567,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
+                        "description": "the created form",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -663,7 +663,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the requested form",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -810,7 +810,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the updated form",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -830,8 +830,15 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "type": "integer",
-                                                    "format": "int64"
+                                                    "oneOf": [
+                                                        {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        {
+                                                            "type": "string"
+                                                        }
+                                                    ]
                                                 }
                                             }
                                         }
@@ -961,7 +968,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the deleted form",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1086,7 +1093,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the questions of the given form",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1238,7 +1245,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
+                        "description": "the created question",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1411,7 +1418,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the question ids of the given form in the new order",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1577,7 +1584,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the requested question",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1759,7 +1766,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the updated question",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1920,7 +1927,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the deleted question",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2105,7 +2112,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
+                        "description": "the created option",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2291,7 +2298,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the options of the question in the new order",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2498,7 +2505,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the updated option",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2669,7 +2676,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the deleted option",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2831,7 +2838,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the submissions of the form",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2971,7 +2978,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the form id of the deleted submission",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3125,7 +3132,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
+                        "description": "empty response",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3287,7 +3294,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the deleted submission",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3464,7 +3471,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the file name used for storing the submissions",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3616,7 +3623,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the file id and name of the uploaded file",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3801,7 +3808,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
+                        "description": "the created share",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3994,7 +4001,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the updated share",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4155,7 +4162,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "the id of the deleted share",
                         "content": {
                             "application/json": {
                                 "schema": {

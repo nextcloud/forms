@@ -129,6 +129,8 @@ class ApiController extends OCSController {
 	 *                     - `shared`: Forms shared with the user.
 	 * @return DataResponse<Http::STATUS_OK, array<FormsPartialForm>, array{}>
 	 * @throws OCSBadRequestException wrong form type supplied
+	 *
+	 * 200: Array containing the partial owned or shared forms
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -158,6 +160,8 @@ class ApiController extends OCSController {
 	 * @param ?int $fromId (optional) Id of the form that should be cloned
 	 * @return DataResponse<Http::STATUS_CREATED, FormsForm, array{}>
 	 * @throws OCSForbiddenException The user is not allowed to create forms
+	 *
+	 * 201: the created form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -234,6 +238,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array<FormsForm>, array{}>
 	 * @throws OCSBadRequestException Could not find form
 	 * @throws OCSForbiddenException User has no permissions to get this form
+	 *
+	 * 200: the requested form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -259,12 +265,14 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId FormId of form to update
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @return DataResponse<Http::STATUS_OK, int|string, array{}>
 	 * @throws OCSBadRequestException Could not find new form owner
 	 * @throws OCSForbiddenException Empty keyValuePairs provided
 	 * @throws OCSForbiddenException Not allowed to update id, hash, created, fileId or lastUpdated. OwnerId only allowed if no other key provided.
 	 * @throws OCSForbiddenException User is not allowed to modify the form
 	 * @throws OCSNotFoundException Form not found
+	 *
+	 * 200: the id of the updated form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -324,7 +332,7 @@ class ApiController extends OCSController {
 		}
 
 		// Process file unlinking
-		if (key_exists('fileId', $keyValuePairs) && key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileId']) && !isset($keyValuePairs['fileFormat'])) {
+		if (key_exists('fileId', $keyValuePairs) && key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileFormat'])) {
 			$form->setFileId(null);
 			$form->setFileFormat(null);
 		}
@@ -352,6 +360,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSForbiddenException User is not allowed to delete the form
 	 * @throws OCSNotFoundException Form not found
+	 *
+	 * 200: the id of the deleted form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -375,6 +385,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array<FormsQuestion>, array{}>
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 200: the questions of the given form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -406,6 +418,8 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 200: the requested question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -446,6 +460,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 201: the created question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -559,6 +575,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the id of the updated question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -631,6 +649,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the id of the deleted question
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -693,6 +713,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the question ids of the given form in the new order
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -788,6 +810,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException Current user has no permission to edit
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 201: the created option
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -866,6 +890,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException Not allowed to update id or questionId
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find option or question
+	 *
+	 * 200: the id of the updated option
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -933,6 +959,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException Current user has no permission to edit
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question or option
+	 *
+	 * 200: the id of the deleted option
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -990,6 +1018,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException Current user has no permission to edit
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the options of the question in the new order
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1085,6 +1115,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, FormsSubmissions, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
+	 *
+	 * 200: the submissions of the form
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1146,6 +1178,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
+	 *
+	 * 200: the form id of the deleted submission
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1188,6 +1222,8 @@ class ApiController extends OCSController {
 	 * @throws OCSForbiddenException This form is no longer taking answers
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
 	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 201: empty response
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1284,6 +1320,8 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException Submission doesn't belong to given form
 	 * @throws OCSNotFoundException Could not find form or submission
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
+	 *
+	 * 200: the id of the deleted submission
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1328,6 +1366,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, string, array{}>
 	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
 	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 200: the file name used for storing the submissions
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1365,6 +1405,8 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException File type is not allowed
 	 * @throws OCSForbiddenException Already submitted
 	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the file id and name of the uploaded file
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]

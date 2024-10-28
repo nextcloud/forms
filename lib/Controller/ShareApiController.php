@@ -107,6 +107,8 @@ class ShareApiController extends OCSController {
 	 * @throws OCSForbiddenException Link share not allowed
 	 * @throws OCSForbiddenException This form is not owned by the current user
 	 * @throws OCSNotFoundException Could not find form
+	 *
+	 * 201: the created share
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -237,6 +239,8 @@ class ShareApiController extends OCSController {
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
 	 * @throws OCSForbiddenException Not allowed to update other properties than permissions
 	 * @throws OCSNotFoundException Could not find share
+	 *
+	 * 200: the id of the updated share
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -329,6 +333,8 @@ class ShareApiController extends OCSController {
 	 * @throws OCSBadRequestException Share doesn't belong to given Form
 	 * @throws OCSForbiddenException This form is not owned by the current user
 	 * @throws OCSNotFoundException Could not find share
+	 *
+	 * 200: the id of the deleted share
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
