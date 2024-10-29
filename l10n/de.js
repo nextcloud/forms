@@ -233,7 +233,7 @@ OC.L10N.register(
     "Leave form" : "Formular verlassen",
     "You have unsaved changes! Do you still want to leave?" : "Du hast noch nicht gespeicherte Änderungen! Willst du diese Seite wirklich verlassen?",
     "Do you want to clear all answers?" : "Möchtest du alle Antworten löschen?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Das Formular hat sich seit Ihrem letzten Besuch geändert. Möchtest du alle Antworten löschen?",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Das Formular hat sich seit deinem letzten Besuch geändert. Möchtest du alle Antworten löschen?",
     "Abort" : "Abbrechen",
     "Leave" : "Verlassen",
     "Clear" : "Löschen",
