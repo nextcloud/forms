@@ -19,7 +19,7 @@
 		"lint": "find . -name \\*.php -not -path './vendor*/*' -print0 | xargs -0 -n1 php -l",
 		"test:unit": "phpunit -c tests/phpunit.xml",
 		"test:integration": "phpunit -c tests/phpunit.integration.xml",
-		"psalm": "psalm",
+		"psalm": "psalm --no-cache",
 		"openapi": "generate-spec"
 	},
 	"require-dev": {
