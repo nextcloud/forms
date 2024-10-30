@@ -130,7 +130,7 @@ class ApiController extends OCSController {
 	 *                     Possible values:
 	 *                     - `owned`: Forms owned by the user.
 	 *                     - `shared`: Forms shared with the user.
-	 * @return DataResponse<Http::STATUS_OK, array<FormsPartialForm>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<FormsPartialForm>, array{}>
 	 * @throws OCSBadRequestException wrong form type supplied
 	 *
 	 * 200: Array containing the partial owned or shared forms
@@ -238,7 +238,7 @@ class ApiController extends OCSController {
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers)
 	 *
 	 * @param int $formId Id of the form
-	 * @return DataResponse<Http::STATUS_OK, array<FormsForm>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>
 	 * @throws OCSBadRequestException Could not find form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 *
@@ -385,7 +385,7 @@ class ApiController extends OCSController {
 	 * Read all questions (including options)
 	 *
 	 * @param int $formId the form id
-	 * @return DataResponse<Http::STATUS_OK, array<FormsQuestion>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<FormsQuestion>, array{}>
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 *
@@ -812,8 +812,8 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
-	 * @param array<string> $optionTexts the new option text
-	 * @return DataResponse<Http::STATUS_CREATED, array<FormsOption>, array{}> Returns a DataResponse containing the added options
+	 * @param list<string> $optionTexts the new option text
+	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
@@ -1223,7 +1223,7 @@ class ApiController extends OCSController {
 	 * Process a new submission
 	 *
 	 * @param int $formId the form id
-	 * @param array<string, array<string>> $answers [question_id => arrayOfString]
+	 * @param array<string, list<string>> $answers [question_id => arrayOfString]
 	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
 	 * @return DataResponse<Http::STATUS_CREATED, null, array{}>
 	 * @throws OCSBadRequestException At least one submitted answer is not valid

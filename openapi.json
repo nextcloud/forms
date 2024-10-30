@@ -22,10 +22,6 @@
         "schemas": {
             "Access": {
                 "type": "object",
-                "required": [
-                    "permitAllUsers",
-                    "showToAllUsers"
-                ],
                 "properties": {
                     "permitAllUsers": {
                         "type": "boolean"
@@ -104,7 +100,10 @@
                     "created",
                     "access",
                     "expires",
+                    "fileFormat",
+                    "fileId",
                     "isAnonymous",
+                    "lastUpdated",
                     "submitMultiple",
                     "showExpiration",
                     "canSubmit",
@@ -112,7 +111,7 @@
                     "questions",
                     "state",
                     "shares",
-                    "submissions"
+                    "submissionMessage"
                 ],
                 "properties": {
                     "id": {
@@ -142,8 +141,25 @@
                         "type": "integer",
                         "format": "int64"
                     },
+                    "fileFormat": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "fileId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "filePath": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "isAnonymous": {
                         "type": "boolean"
+                    },
+                    "lastUpdated": {
+                        "type": "integer",
+                        "format": "int64"
                     },
                     "submitMultiple": {
                         "type": "boolean"
@@ -178,14 +194,16 @@
                     "shares": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/Share"
                         }
                     },
-                    "submissions": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Submission"
-                        }
+                    "submissionCount": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "submissionMessage": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },
@@ -820,10 +838,7 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/Form"
-                                                    }
+                                                    "$ref": "#/components/schemas/Form"
                                                 }
                                             }
                                         }
@@ -3960,10 +3975,7 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/Share"
-                                                    }
+                                                    "$ref": "#/components/schemas/Share"
                                                 }
                                             }
                                         }

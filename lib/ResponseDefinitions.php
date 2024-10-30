@@ -87,8 +87,8 @@ namespace OCA\Forms;
  * }
  *
  * @psalm-type FormsAccess = array{
- *   permitAllUsers: bool,
- *   showToAllUsers: bool
+ *   permitAllUsers?: bool,
+ *   showToAllUsers?: bool
  * }
  *
  * @psalm-type FormsPermission = "edit"|"results"|"results_delete"|"submit"|"embed"
@@ -121,15 +121,20 @@ namespace OCA\Forms;
  *   created: int,
  *   access: FormsAccess,
  *   expires: int,
+ *   fileFormat: ?string,
+ *   fileId: ?int,
+ *   filePath?: ?string,
  *   isAnonymous: bool,
+ *   lastUpdated: int,
  *   submitMultiple: bool,
  *   showExpiration: bool,
  *   canSubmit: bool,
  *   permissions: list<FormsPermission>,
  *   questions: list<FormsQuestion>,
  *   state: 0|1|2,
- *   shares: list<string>,
- *   submissions: list<FormsSubmission>,
+ *   shares: list<FormsShare>,
+ *   submissionCount?: int,
+ *   submissionMessage: ?string,
  * }
  *
  * @psalm-type FormsUploadedFile = array{

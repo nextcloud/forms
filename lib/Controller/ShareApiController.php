@@ -95,7 +95,7 @@ class ShareApiController extends OCSController {
 	 *                                  - `submit` user can submit
 	 *                                  - `results` user can see the results
 	 *                                  - `results_delete` user can see and delete results
-	 * @return DataResponse<Http::STATUS_CREATED, array<FormsShare>, array{}>
+	 * @return DataResponse<Http::STATUS_CREATED, FormsShare, array{}>
 	 * @throws OCSBadRequestException Invalid shareType
 	 * @throws OCSBadRequestException Invalid permission given
 	 * @throws OCSBadRequestException Invalid user to share with

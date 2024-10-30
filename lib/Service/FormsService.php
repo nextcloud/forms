@@ -56,6 +56,9 @@ use OCP\Share\IShare;
  * Trait for getting forms information in a service
  * @psalm-import-type FormsQuestion from ResponseDefinitions
  * @psalm-import-type FormsOption from ResponseDefinitions
+ * @psalm-import-type FormsForm from ResponseDefinitions
+ * @psalm-import-type FormsPermission from ResponseDefinitions
+ * @psalm-import-type FormsShare from ResponseDefinitions
  */
 class FormsService {
 	private ?IUser $currentUser;
@@ -188,7 +191,7 @@ class FormsService {
 	 * Load shares corresponding to form
 	 *
 	 * @param integer $formId
-	 * @return array
+	 * @return list<FormsShare>
 	 */
 	public function getShares(int $formId): array {
 		$shareList = [];
@@ -207,7 +210,7 @@ class FormsService {
 	 * Get a form data
 	 *
 	 * @param Form $form
-	 * @return array
+	 * @return FormsForm
 	 * @throws IMapperException
 	 */
 	public function getForm(Form $form): array {
@@ -289,7 +292,7 @@ class FormsService {
 	 * Get current users permissions on a form
 	 *
 	 * @param Form $form
-	 * @return array
+	 * @return list<FormsPermission>
 	 */
 	public function getPermissions(Form $form): array {
 		if (!$this->currentUser) {
