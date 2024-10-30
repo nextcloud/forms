@@ -36,6 +36,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Events\FormSubmittedEvent;
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -53,6 +54,8 @@ use OCP\Share\IShare;
 
 /**
  * Trait for getting forms information in a service
+ * @psalm-import-type FormsQuestion from ResponseDefinitions
+ * @psalm-import-type FormsOption from ResponseDefinitions
  */
 class FormsService {
 	private ?IUser $currentUser;
@@ -92,7 +95,7 @@ class FormsService {
 	 * Load options corresponding to question
 	 *
 	 * @param integer $questionId
-	 * @return array
+	 * @return list<FormsOption>
 	 */
 	private function getOptions(int $questionId): array {
 		$optionList = [];
@@ -112,7 +115,7 @@ class FormsService {
 	 * Load questions corresponding to form
 	 *
 	 * @param integer $formId
-	 * @return array
+	 * @return list<FormsQuestion>
 	 */
 	public function getQuestions(int $formId): array {
 		$questionList = [];
@@ -150,10 +153,9 @@ class FormsService {
 	 * Load specific question
 	 *
 	 * @param integer $questionId id of the question
-	 * @return array
+	 * @return ?FormsQuestion
 	 */
-	public function getQuestion(int $questionId): array {
-		$question = [];
+	public function getQuestion(int $questionId): ?array {
 		try {
 			$questionEntity = $this->questionMapper->findById($questionId);
 			$question = $questionEntity->read();
@@ -173,10 +175,12 @@ class FormsService {
 					}
 				}
 			}
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		} finally {
+			if (empty($question['extraSettings'])) {
+				$question['extraSettings'] = new \stdClass();
+			}
 			return $question;
+		} catch (DoesNotExistException $e) {
+			return null;
 		}
 	}
 

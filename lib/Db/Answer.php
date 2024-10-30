@@ -28,9 +28,11 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Db;
 
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @psalm-import-type FormsAnswer from ResponseDefinitions
  * @method integer getSubmissionId()
  * @method void setSubmissionId(integer $value)
  * @method integer getQuestionId()
@@ -55,6 +57,9 @@ class Answer extends Entity {
 		$this->addType('fileId', 'integer');
 	}
 
+	/**
+	 * @return FormsAnswer
+	 */
 	public function read(): array {
 		return [
 			'id' => $this->getId(),

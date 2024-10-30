@@ -40,6 +40,7 @@
                 "required": [
                     "id",
                     "submissionId",
+                    "fileId",
                     "questionId",
                     "text"
                 ],
@@ -51,6 +52,11 @@
                     "submissionId": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "fileId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     },
                     "questionId": {
                         "type": "integer",
@@ -221,8 +227,16 @@
                         "format": "int64"
                     },
                     "questionId": {
-                        "type": "integer",
-                        "format": "int64"
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        ]
                     },
                     "text": {
                         "type": "string"
@@ -329,17 +343,7 @@
                         "format": "int64"
                     },
                     "type": {
-                        "type": "string",
-                        "enum": [
-                            "dropdown",
-                            "multiple",
-                            "multiple_unique",
-                            "date",
-                            "time",
-                            "short",
-                            "long",
-                            "file"
-                        ]
+                        "$ref": "#/components/schemas/QuestionType"
                     },
                     "isRequired": {
                         "type": "boolean"
@@ -359,35 +363,22 @@
                                 "$ref": "#/components/schemas/QuestionExtraSettings"
                             },
                             {
-                                "type": "object"
+                                "type": "object",
+                                "additionalProperties": true
                             }
                         ]
                     },
                     "options": {
-                        "oneOf": [
-                            {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/Option"
-                                }
-                            },
-                            {
-                                "type": "object"
-                            }
-                        ]
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Option"
+                        }
                     },
                     "accept": {
-                        "oneOf": [
-                            {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            {
-                                "type": "object"
-                            }
-                        ]
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -445,6 +436,19 @@
                         "nullable": true
                     }
                 }
+            },
+            "QuestionType": {
+                "type": "string",
+                "enum": [
+                    "dropdown",
+                    "multiple",
+                    "multiple_unique",
+                    "date",
+                    "time",
+                    "short",
+                    "long",
+                    "file"
+                ]
             },
             "Share": {
                 "type": "object",
@@ -1328,14 +1332,17 @@
                     }
                 ],
                 "requestBody": {
-                    "required": false,
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "type"
+                                ],
                                 "properties": {
                                     "type": {
-                                        "type": "string",
+                                        "$ref": "#/components/schemas/QuestionType",
                                         "description": "the new question type"
                                     },
                                     "text": {
@@ -2980,10 +2987,7 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/Submissions"
-                                                    }
+                                                    "$ref": "#/components/schemas/Submissions"
                                                 }
                                             }
                                         }

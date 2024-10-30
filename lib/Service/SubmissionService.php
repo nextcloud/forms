@@ -36,6 +36,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\Files\File;
@@ -57,9 +58,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 use Psr\Log\LoggerInterface;
 
+/**
+ * @psalm-import-type FormsSubmission from ResponseDefinitions
+ * @psalm-import-type FormsAnswer from ResponseDefinitions
+ */
 class SubmissionService {
 	private ?IUser $currentUser;
-	
+
 	public function __construct(
 		private QuestionMapper $questionMapper,
 		private SubmissionMapper $submissionMapper,
@@ -83,7 +88,7 @@ class SubmissionService {
 	 * Get all the answers of a given submission
 	 *
 	 * @param int $submissionId the submission id
-	 * @return array
+	 * @return list<FormsAnswer>
 	 */
 	private function getAnswers(int $submissionId): array {
 		$answerList = [];
@@ -103,7 +108,13 @@ class SubmissionService {
 	 * Get all submissions of a form
 	 *
 	 * @param int $formId the form id
-	 * @return array
+	 * @return list<array{
+	 *     id: int,
+	 *     formId: int,
+	 *     userId: string,
+	 *     timestamp: int,
+	 *     answers: list<FormsAnswer>,
+	 * }>
 	 */
 	public function getSubmissions(int $formId): array {
 		$submissionList = [];

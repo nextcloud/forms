@@ -26,7 +26,7 @@ namespace OCA\Forms;
 /**
  * @psalm-type FormsOption = array{
  *   id: int,
- *   questionId: int,
+ *   questionId: int|float,
  *   text: string,
  *   order: ?int
  * }
@@ -48,23 +48,26 @@ namespace OCA\Forms;
  *   validationType?: ?string
  * }
  *
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"
+ *
  * @psalm-type FormsQuestion = array{
  *   id: int,
  *   formId: int,
  *   order: int,
- *   type: "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file",
+ *   type: FormsQuestionType,
  *   isRequired: bool,
  *   text: string,
  *   name: string,
  *   description: string,
- *   extraSettings: FormsQuestionExtraSettings|array{},
- *   options: list<FormsOption>|array{},
- *   accept: list<string>|array{}
+ *   extraSettings: FormsQuestionExtraSettings|\stdClass,
+ *   options: list<FormsOption>,
+ *   accept: list<string>,
  * }
  *
  * @psalm-type FormsAnswer = array{
  *   id: int,
  *   submissionId: int,
+ *   fileId: ?int,
  *   questionId: int,
  *   text: string
  * }

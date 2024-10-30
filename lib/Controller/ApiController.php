@@ -60,6 +60,7 @@ use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
@@ -80,6 +81,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsOrder from ResponseDefinitions
  * @psalm-import-type FormsPartialForm from ResponseDefinitions
  * @psalm-import-type FormsQuestion from ResponseDefinitions
+ * @psalm-import-type FormsQuestionType from ResponseDefinitions
  * @psalm-import-type FormsSubmissions from ResponseDefinitions
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
  */
@@ -439,6 +441,9 @@ class ApiController extends OCSController {
 		}
 
 		$question = $this->formsService->getQuestion($questionId);
+		if ($question === null) {
+			throw new OCSNotFoundException('Question doesn\'t exist');
+		}
 
 		if ($question['formId'] !== $formId) {
 			throw new OCSBadRequestException('Question doesn\'t belong to given form');
@@ -451,7 +456,7 @@ class ApiController extends OCSController {
 	 * Add a new question
 	 *
 	 * @param int $formId the form id
-	 * @param string $type the new question type
+	 * @param FormsQuestionType $type the new question type
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
@@ -467,7 +472,7 @@ class ApiController extends OCSController {
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
-	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
+	public function newQuestion(int $formId, string $type, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
@@ -514,6 +519,9 @@ class ApiController extends OCSController {
 			$question = $this->questionMapper->insert($question);
 
 			$response = $this->formsService->getQuestion($question->getId());
+			if ($response === null) {
+				throw new OCSException('Failed to create question');
+			}
 			$response['options'] = [];
 			$response['accept'] = [];
 		} else {
@@ -1113,7 +1121,7 @@ class ApiController extends OCSController {
 	 *                            - `csv`: Comma-separated value
 	 *                            - `ods`: OpenDocument Spreadsheet
 	 *                            - `xlsx`: Excel Open XML Spreadsheet
-	 * @return DataResponse<Http::STATUS_OK, list<FormsSubmissions>, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
+	 * @return DataResponse<Http::STATUS_OK, FormsSubmissions, array{}>|DataDownloadResponse<Http::STATUS_OK, 'text/csv'|'application/vnd.oasis.opendocument.spreadsheet'|'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', array{}>
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSForbiddenException The current user has no permission to get the results for this form
 	 *
@@ -1147,22 +1155,23 @@ class ApiController extends OCSController {
 		$questions = $this->formsService->getQuestions($formId);
 
 		// Append Display Names
-		foreach ($submissions as $key => $submission) {
+		$submissions = array_map(function (array $submission) {
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
-				$submissions[$key]['userDisplayName'] = $this->l10n->t('Anonymous response');
+				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
 				$userEntity = $this->userManager->get($submission['userId']);
 
 				if ($userEntity instanceof IUser) {
-					$submissions[$key]['userDisplayName'] = $userEntity->getDisplayName();
+					$submission['userDisplayName'] = $userEntity->getDisplayName();
 				} else {
 					// Fallback, should not occur regularly.
-					$submissions[$key]['userDisplayName'] = $submission['userId'];
+					$submission['userDisplayName'] = $submission['userId'];
 				}
 			}
-		}
+			return $submission;
+		}, $submissions);
 
 		$response = [
 			'submissions' => $submissions,
