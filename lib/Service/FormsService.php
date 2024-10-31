@@ -143,6 +143,10 @@ class FormsService {
 					}
 				}
 
+				if (empty($question['extraSettings'])) {
+					$question['extraSettings'] = new \stdClass();
+				}
+
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {

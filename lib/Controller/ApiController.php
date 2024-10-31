@@ -472,7 +472,7 @@ class ApiController extends OCSController {
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
-	public function newQuestion(int $formId, string $type, string $text = '', ?int $fromId = null): DataResponse {
+	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->getFormIfAllowed($formId);
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');

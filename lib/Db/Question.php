@@ -36,14 +36,16 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @psalm-import-type FormsQuestionExtraSettings from ResponseDefinitions
+ * @psalm-import-type FormsQuestionType from ResponseDefinitions
  * @method int getFormId()
  * @method void setFormId(integer $value)
  * @method int getOrder()
  * @method void setOrder(integer $value)
+ * @psalm-method FormsQuestionType getType()
  * @method string getType()
- * @psalm-method 'date'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' getType()
+ * @psalm-method 'date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' getType()
  * @method void setType(string $value)
- * @psalm-method void setType('date'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' $value)
+ * @psalm-method void setType('date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' $value)
  * @method bool getIsRequired()
  * @method void setIsRequired(bool $value)
  * @method string getText()
@@ -77,7 +79,7 @@ class Question extends Entity {
 	 * @return FormsQuestionExtraSettings
 	 */
 	public function getExtraSettings(): array {
-		return json_decode($this->getExtraSettingsJson() ?: '{}', false, 512, JSON_THROW_ON_ERROR);
+		return json_decode($this->getExtraSettingsJson() ?: '{}', true, 512, JSON_THROW_ON_ERROR);
 	}
 
 	/**
@@ -99,7 +101,7 @@ class Question extends Entity {
 	 *    id: int,
 	 *    formId: int,
 	 *    order: int,
-	 *    type: "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file",
+	 *    type: FormsQuestionType,
 	 *    isRequired: bool,
 	 *    text: string,
 	 *    name: string,

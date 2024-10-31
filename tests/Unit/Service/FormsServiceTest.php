@@ -246,7 +246,7 @@ class FormsServiceTest extends TestCase {
 						'order' => 2,
 						'type' => 'short',
 						'isRequired' => true,
-						'extraSettings' => [],
+						'extraSettings' => new \stdClass,
 						'text' => 'Question 2',
 						'description' => '',
 						'name' => 'city',

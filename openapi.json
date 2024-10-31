@@ -465,7 +465,8 @@
                     "time",
                     "short",
                     "long",
-                    "file"
+                    "file",
+                    "datetime"
                 ]
             },
             "Share": {
@@ -1347,14 +1348,11 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
+                    "required": false,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "required": [
-                                    "type"
-                                ],
                                 "properties": {
                                     "type": {
                                         "$ref": "#/components/schemas/QuestionType",
