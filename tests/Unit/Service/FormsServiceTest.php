@@ -65,7 +65,6 @@ use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
-use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IGroup;
@@ -124,9 +123,6 @@ class FormsServiceTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
-	/** @var IMimeTypeDetector|MockObject */
-	private $mimeTypeDetector;
-
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -160,8 +156,6 @@ class FormsServiceTest extends TestCase {
 				return $identity;
 			}));
 
-		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
-
 		$this->formsService = new FormsService(
 			$userSession,
 			$this->activityManager,
@@ -177,7 +171,6 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
-			$this->mimeTypeDetector,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 	}
@@ -653,7 +646,6 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
-			$this->mimeTypeDetector,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 
@@ -893,7 +885,6 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
-			$this->mimeTypeDetector,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 
@@ -1005,7 +996,6 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
-			$this->mimeTypeDetector,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 
@@ -1237,7 +1227,6 @@ class FormsServiceTest extends TestCase {
 				$this->circlesService,
 				$this->storage,
 				$this->l10n,
-				$this->mimeTypeDetector,
 				$eventDispatcher,
 			])
 			->getMock();
@@ -1496,22 +1485,18 @@ class FormsServiceTest extends TestCase {
 			$this->createQuestionEntity(['id' => 1, 'type' => 'text']),
 			$this->createQuestionEntity(['id' => 2, 'type' => Constants::ANSWER_TYPE_FILE, 'extraSettings' => [
 				'allowedFileTypes' => ['image', 'x-office/document'],
-				'allowedFileExtensions' => ['jpg']
+				'allowedFileExtensions' => ['pdf']
 			]])
 		];
 
 		$this->questionMapper->method('findByForm')->willReturn($questionEntities);
-		$this->mimeTypeDetector->method('getAllAliases')->willReturn([
-			'application/coreldraw' => 'image',
-			'application/msonenote' => 'x-office/document',
-		]);
 
 		$result = $this->formsService->getQuestions(1);
 
 		$this->assertCount(2, $result);
 		$this->assertEquals('text', $result[0]['type']);
 		$this->assertEquals(Constants::ANSWER_TYPE_FILE, $result[1]['type']);
-		$this->assertEquals(['application/coreldraw', 'application/msonenote', '.jpg'], $result[1]['accept']);
+		$this->assertEquals(['image/*', 'x-office/document', '.pdf'], $result[1]['accept']);
 	}
 
 	public function testGetQuestionsHandlesDoesNotExistException(): void {

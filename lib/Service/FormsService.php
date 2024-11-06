@@ -39,7 +39,6 @@ use OCA\Forms\Events\FormSubmittedEvent;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IGroup;
@@ -72,7 +71,6 @@ class FormsService {
 		private CirclesService $circlesService,
 		private IRootFolder $rootFolder,
 		private IL10N $l10n,
-		private IMimeTypeDetector $mimeTypeDetector,
 		private IEventDispatcher $eventDispatcher,
 	) {
 		$this->currentUser = $userSession->getUser();
@@ -124,10 +122,9 @@ class FormsService {
 				$question['accept'] = [];
 				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-						$question['accept'] = array_keys(array_intersect(
-							$this->mimeTypeDetector->getAllAliases(),
-							$question['extraSettings']['allowedFileTypes']
-						));
+						$question['accept'] = array_map(function (string $fileType) {
+							return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
+						}, $question['extraSettings']['allowedFileTypes']);
 					}
 
 					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
@@ -161,10 +158,9 @@ class FormsService {
 			$question['accept'] = [];
 			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-					$question['accept'] = array_keys(array_intersect(
-						$this->mimeTypeDetector->getAllAliases(),
-						$question['extraSettings']['allowedFileTypes']
-					));
+					$question['accept'] = array_map(function (string $fileType) {
+						return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
+					}, $question['extraSettings']['allowedFileTypes']);
 				}
 
 				if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
