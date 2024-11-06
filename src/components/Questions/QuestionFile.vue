@@ -435,7 +435,8 @@ export default {
 		padding-inline: calc(3 * var(--default-grid-baseline)) var(--focus-offset);
 		padding-block: var(--focus-offset);
 		height: var(--default-clickable-area);
-		width: 300px;
+		width: 100%;
+		max-width: 300px;
 
 		label {
 			color: var(--color-text-maxcontrast);
