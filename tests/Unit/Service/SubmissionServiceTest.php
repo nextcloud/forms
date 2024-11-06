@@ -579,7 +579,11 @@ file2.txt"
 				return $questionEntities;
 			}));
 
-		date_default_timezone_set('Europe/Berlin');
+		$this->config->expects($this->once())
+			->method('getSystemValueString')
+			->with('default_timezone', 'UTC')
+			->willReturn('Europe/Berlin');
+
 		$this->config->expects($this->once())
 			->method('getUserValue')
 			->with('currentUser', 'core', 'timezone', 'Europe/Berlin')
