@@ -53,6 +53,7 @@ OC.L10N.register(
     "Expires on {date}" : "Истекува на {date}",
     "Permissions" : "Дозволи",
     "Group" : "Група",
+    "Team" : "Тим",
     "Share link" : "Сподели линк",
     "Add link" : "Додади линк",
     "Copy to clipboard" : "Копирај во клипборд",
