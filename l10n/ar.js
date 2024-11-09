@@ -293,7 +293,7 @@ OC.L10N.register(
     "The input is not a valid number" : "البيان المُدخل ليس عدداً صحيحاً",
     "People can enter a number" : "يمكن للأشخاص إدخال عدد",
     "Enter a number" : "أدخِل عدداً",
-    "Custom regular expression" : "تعبير نمطي مُخصّص",
+    "Custom regular expression" : "تعبير نمطي مخصص",
     "The input does not match the required pattern" : "البيان المُدخل لا يتطابق مع النمط المطلوب"
 },
 "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");
