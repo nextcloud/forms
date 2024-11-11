@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.3 - 2024-11-11
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.2...v4.3.3)
+
+### Fixed
+
+-   [stable4] Add padding and max width so they don't stick to right screen border by @backportbot[bot] in [\#2406](https://github.com/nextcloud/forms/pull/2406)
+-   [stable4] (fix) default timezone for export by @backportbot[bot] in [\#2398](https://github.com/nextcloud/forms/pull/2398)
+
 ## v4.3.2 - 2024-10-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.1...v4.3.2)
