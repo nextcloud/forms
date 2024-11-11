@@ -808,7 +808,7 @@ export default {
 	form {
 		.question {
 			// Less padding needed as submit view does not have drag handles
-			padding-inline-start: var(--default-clickable-area);
+			padding-inline: var(--default-clickable-area);
 		}
 
 		.form-buttons {

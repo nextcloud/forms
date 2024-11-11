@@ -129,7 +129,8 @@ export default {
 
 <style lang="scss" scoped>
 .mx-datepicker {
-	width: 300px;
+	width: 100%;
+	max-width: 300px;
 
 	&.disabled {
 		inset-inline-start: -12px;
