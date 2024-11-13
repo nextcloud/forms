@@ -30,6 +30,7 @@
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
@@ -62,9 +63,9 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
+use OCP\BackgroundJob\IJobList;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
-use OCP\Files\NotFoundException;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IUser;
@@ -95,6 +96,7 @@ class ApiController extends OCSController {
 		private IRootFolder $rootFolder,
 		private UploadedFileMapper $uploadedFileMapper,
 		private IMimeTypeDetector $mimeTypeDetector,
+		private IJobList $jobList,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -1194,17 +1196,7 @@ class ApiController extends OCSController {
 		$this->formsService->notifyNewSubmission($form, $submission);
 
 		if ($form->getFileId() !== null) {
-			try {
-				$filePath = $this->formsService->getFilePath($form);
-				$fileFormat = $form->getFileFormat();
-				$ownerId = $form->getOwnerId();
-
-				$this->submissionService->writeFileToCloud($form, $filePath, $fileFormat, $ownerId);
-			} catch (NotFoundException $e) {
-				$this->logger->notice('Form {formId} linked to a file that doesn\'t exist anymore', [
-					'formId' => $formId
-				]);
-			}
+			$this->jobList->add(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $form->getId()]);
 		}
 
 		return new DataResponse();
