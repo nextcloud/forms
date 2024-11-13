@@ -47,6 +47,7 @@ function is_uploaded_file(string|bool|null $filename) {
 
 namespace OCA\Forms\Tests\Unit\Controller;
 
+use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
@@ -69,6 +70,7 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
+use OCP\BackgroundJob\IJobList;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
@@ -121,6 +123,8 @@ class ApiControllerTest extends TestCase {
 	private $uploadedFileMapper;
 	/** @var IMimeTypeDetector|MockObject */
 	private $mimeTypeDetector;
+	/** @var IJobList|MockObject */
+	private $jobList;
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
@@ -145,6 +149,7 @@ class ApiControllerTest extends TestCase {
 		$this->storage = $this->createMock(IRootFolder::class);
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
+		$this->jobList = $this->createMock(IJobList::class);
 
 		$this->apiController = new ApiController(
 			'forms',
@@ -165,6 +170,7 @@ class ApiControllerTest extends TestCase {
 			$this->storage,
 			$this->uploadedFileMapper,
 			$this->mimeTypeDetector,
+			$this->jobList,
 		);
 	}
 
@@ -453,6 +459,7 @@ class ApiControllerTest extends TestCase {
 				$this->storage,
 				$this->uploadedFileMapper,
 				$this->mimeTypeDetector,
+				$this->jobList,
 			])->getMock();
 
 		$this->configService->expects($this->once())
@@ -614,6 +621,7 @@ class ApiControllerTest extends TestCase {
 				$this->storage,
 				$this->uploadedFileMapper,
 				$this->mimeTypeDetector,
+				$this->jobList,
 			])
 			->getMock();
 
@@ -827,13 +835,9 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('notifyNewSubmission');
 
-		$this->formsService->expects($this->once())
-			->method('getFilePath')
-			->willReturn('foo/bar');
-
-		$this->submissionService->expects($this->once())
-			->method('writeFileToCloud')
-			->with($form, 'foo/bar', 'xlsx', 'admin');
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => 1]);
 
 		$userFolder = $this->createMock(Folder::class);
 		$userFolder->expects($this->once())
