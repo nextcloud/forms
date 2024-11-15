@@ -35,6 +35,7 @@ class Capabilities implements ICapability {
 	/**
 	 * Provide App Capabilities
 	 * @inheritdoc
+	 * @return array{forms: array{version: string, apiVersions: list<string>}}
 	 */
 	public function getCapabilities() {
 		return [

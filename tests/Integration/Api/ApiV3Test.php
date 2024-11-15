@@ -421,7 +421,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEqualsWithDelta(time(), $data['lastUpdated'], 10);
 		unset($data['lastUpdated']);
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
 	}
 
@@ -623,7 +623,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertTrue(time() - $data['lastUpdated'] < 10);
 		unset($data['lastUpdated']);
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
 	}
 
@@ -740,7 +740,7 @@ class ApiV3Test extends IntegrationBase {
 		unset($data['order']);
 		unset($data['id']);
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
 	}
 
@@ -860,7 +860,7 @@ class ApiV3Test extends IntegrationBase {
 		$data = $this->OcsResponse2Data($resp);
 		$this->testForms[0]['questions'][] = $data;
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertNotEquals($data['id'], $this->testForms[0]['questions'][0]['id']);
 
 		$copy = $this->testForms[0]['questions'][0];
@@ -903,7 +903,7 @@ class ApiV3Test extends IntegrationBase {
 		unset($data['questionId']);
 		unset($data['id']);
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
 	}
 
@@ -1001,7 +1001,7 @@ class ApiV3Test extends IntegrationBase {
 		// Store for cleanup
 		$this->testForms[0]['shares'][] = $data;
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertEquals($this->testForms[0]['id'], $data['formId']);
 		unset($data['formId']);
 		unset($data['id']);
@@ -1315,7 +1315,7 @@ CSV
 		]);
 		$data = $this->OcsResponse2Data($resp);
 
-		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals(201, $resp->getStatusCode());
 
 		// Check stored submissions
 		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
