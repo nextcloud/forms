@@ -103,7 +103,7 @@
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "文件 {fileName} 过大。最大运行上传文件大小为 {maxFileSize}。",
     "There was an error during submitting the file: {message}." : "提交文件时发生错误：{message}。",
     "A long answer for the question “{text}”" : "问题“{text}”的长篇答复",
-    "Add \"other\"" : "新增「其它」",
+    "Add \"other\"" : "新增“其它”",
     "Require a minimum of options to be checked" : "要求至少勾选一定数量的选项",
     "Minimum options to be checked" : "要勾选的最少选项",
     "Require a maximum of options to be checked" : "要求至多勾选一定数量的选项",
