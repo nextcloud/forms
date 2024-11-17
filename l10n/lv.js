@@ -6,6 +6,8 @@ OC.L10N.register(
     "Copy" : "Kopēt",
     "Shared with you" : "Koplietots ar jums",
     "Select groups" : "Izvēlieties grupas",
+    "Results" : "Rezultāti",
+    "Cancel" : "Atcelt",
     "Required" : "Nepieciešams",
     "Delete" : "Dzēst",
     "Uploading …" : "Augšupielādē…",
