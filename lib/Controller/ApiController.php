@@ -764,7 +764,7 @@ class ApiController extends OCSController {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
-		
+
 		try {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException $e) {
@@ -899,7 +899,7 @@ class ApiController extends OCSController {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException();
 		}
-		
+
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
@@ -961,14 +961,14 @@ class ApiController extends OCSController {
 			$this->logger->debug('The given array contains duplicates');
 			throw new OCSBadRequestException('The given array contains duplicates');
 		}
-		
+
 		$options = $this->optionMapper->findByQuestion($questionId);
-		
+
 		if (sizeof($options) !== sizeof($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored options');
 			throw new OCSBadRequestException('The length of the given array does not match the number of stored options');
 		}
-		
+
 		$options = []; // Clear Array of Entities
 		$response = []; // Array of ['optionId' => ['order' => newOrder]]
 
@@ -1011,7 +1011,7 @@ class ApiController extends OCSController {
 		}
 
 		$this->formMapper->update($form);
-	
+
 		return new DataResponse($response);
 	}
 
@@ -1365,7 +1365,7 @@ class ApiController extends OCSController {
 
 				$valid = false;
 				foreach ($extraSettings['allowedFileTypes'] ?? [] as $allowedFileType) {
-					if (str_starts_with($aliases[$mimeType] ?? '', $allowedFileType)) {
+					if (str_starts_with($mimeType, $allowedFileType) || str_starts_with($aliases[$mimeType] ?? '', $allowedFileType)) {
 						$valid = true;
 						break;
 					}
