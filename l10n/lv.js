@@ -12,7 +12,7 @@ OC.L10N.register(
     "Delete" : "Dzēst",
     "Uploading …" : "Augšupielādē…",
     "Other" : "Cits",
-    "Set expiration date" : "Uzstādīt beigu termiņu",
+    "Set expiration date" : "Iestatīt derīguma beigu datumu",
     "Permissions" : "Atļaujas",
     "Group" : "Grupa",
     "Share link" : "Koplietot saiti",
