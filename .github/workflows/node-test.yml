@@ -95,6 +95,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
+          disable_search: true
           files: ./coverage/lcov.info
 
   summary:
