@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.4 - 2024-11-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.3...v4.3.4)
+
+### Fixed
+
+-   [stable4] fix: simplify mime-type checks to support jpg and other image formats by @backportbot[bot] in [\#2422](https://github.com/nextcloud/forms/pull/2422)
+-   [stable4] feat: Refactor form sync to run as a background job with retry by @Koc in [\#2424](https://github.com/nextcloud/forms/pull/2424)
+
 ## v4.3.3 - 2024-11-11
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.2...v4.3.3)
