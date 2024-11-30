@@ -19,10 +19,10 @@
 
 ![](screenshots/forms3.png)
 
--   **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
--   **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.
--   **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
--   **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
+- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.
+- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.
+- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
+- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 
 ## 🏗 Development setup
 
@@ -37,18 +37,18 @@ To build the Javascript whenever you make changes, you can use `npm run build`. 
 
 You run several tests by:
 
--   `npm run lint` for JavaScript linting
--   `npm run stylelint` for CSS linting
--   `composer cs:check` for the Nextcloud php coding standard
--   `composer lint` for php linting
--   `composer test:unit` and `composer test:integration` to run the php functionality tests
--   `composer psalm` for static code analysis
+- `npm run lint` for JavaScript linting
+- `npm run stylelint` for CSS linting
+- `composer cs:check` for the Nextcloud php coding standard
+- `composer lint` for php linting
+- `composer test:unit` and `composer test:integration` to run the php functionality tests
+- `composer psalm` for static code analysis
 
 ## ♥ How to create a pull request
 
 This guide will help you get started:
 
--   💃 [Opening a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request)
+- 💃 [Opening a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request)
 
 ## ✌ Code of conduct
 
