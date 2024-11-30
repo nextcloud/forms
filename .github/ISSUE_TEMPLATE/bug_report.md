@@ -28,21 +28,21 @@ If applicable, add screenshots to help explain your problem.
 
 **Nextcloud (please complete the following information):**
 
--   Nextcloud-Version: [e.g. 19.0.0]
--   Forms-Version: [e.g. 2.0.0-beta4]
+- Nextcloud-Version: [e.g. 19.0.0]
+- Forms-Version: [e.g. 2.0.0-beta4]
 
 **Desktop (please complete the following information):**
 
--   OS: [e.g. iOS]
--   Browser [e.g. chrome, safari]
--   Version [e.g. 22]
+- OS: [e.g. iOS]
+- Browser [e.g. chrome, safari]
+- Version [e.g. 22]
 
 **Smartphone (please complete the following information):**
 
--   Device: [e.g. iPhone6]
--   OS: [e.g. iOS8.1]
--   Browser [e.g. stock browser, safari]
--   Version [e.g. 22]
+- Device: [e.g. iPhone6]
+- OS: [e.g. iOS8.1]
+- Browser [e.g. stock browser, safari]
+- Version [e.g. 22]
 
 **Browser log**
 
@@ -55,15 +55,15 @@ Open your console, reload your page and/or do the action leading to this issue a
 
 # Chrome
 
--   Press either CTRL + SHIFT + J to open the “console” tab of the Developer Tools.
--   Alternative method:
+- Press either CTRL + SHIFT + J to open the “console” tab of the Developer Tools.
+- Alternative method:
     1. Press either CTRL + SHIFT + I or F12 to open the Developer Tools.
     2. Click the “console” tab.
 
 # Safari
 
--   Press CMD + ALT + I to open the Web Inspector.
--   See Chrome’s step 2. (Chrome and Safari have pretty much identical dev tools.)
+- Press CMD + ALT + I to open the Web Inspector.
+- See Chrome’s step 2. (Chrome and Safari have pretty much identical dev tools.)
 
 # IE9
 
@@ -72,8 +72,8 @@ Open your console, reload your page and/or do the action leading to this issue a
 
 # Firefox
 
--   Press CTRL + SHIFT + K to open the Web console (COMMAND + SHIFT + K on Macs).
--   or, if Firebug is installed (recommended):
+- Press CTRL + SHIFT + K to open the Web console (COMMAND + SHIFT + K on Macs).
+- or, if Firebug is installed (recommended):
     1. Press F12 to open Firebug.
     2. Click on the “console” tab.
 
