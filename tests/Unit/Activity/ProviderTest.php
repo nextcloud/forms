@@ -178,10 +178,10 @@ class ProviderTest extends TestCase {
 			]);
 		$event->expects($this->once())
 			->method('setParsedSubject')
-			->with('The affected User answered your form SomeChangedNiceFormTitle');
+			->with('Your form SomeChangedNiceFormTitle was answered by The affected User');
 		$event->expects($this->once())
 			->method('setRichSubject')
-			->with('{user} answered your form {formTitle}', [
+			->with('Your form {formTitle} was answered by {user}', [
 				'user' => [
 					'type' => 'user',
 					'id' => 'affectedUser',
@@ -211,7 +211,7 @@ class ProviderTest extends TestCase {
 			['newshare', '{user} has shared the form {formTitle} with you'],
 			['newgroupshare', '{user} has shared the form {formTitle} with group {group}'],
 			['newcircleshare', '{user} has shared the form {formTitle} with team {circle}'],
-			['newsubmission', '{user} answered your form {formTitle}']
+			['newsubmission', 'Your form {formTitle} was answered by {user}']
 		];
 	}
 	/**

@@ -102,7 +102,7 @@ class Provider implements IProvider {
 				return $l10n->t('{user} has shared the form {formTitle} with team {circle}');
 
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
-				return $l10n->t('{user} answered your form {formTitle}');
+				return $l10n->t('Your form {formTitle} was answered by {user}');
 
 			default:
 				$this->logger->warning('Some unknown activity has been found: ' . $subject);
