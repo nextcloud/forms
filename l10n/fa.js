@@ -5,7 +5,6 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} فرم {formTitle} را با شما هم‌رسانی کرده است",
     "{user} has shared the form {formTitle} with group {group}" : "{user} فرم {formTitle} را با گروه {group} هم‌رسانی کرده است",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} فرم {formTitle} را با تیم {circle} هم‌رسانی کرده است",
-    "{user} answered your form {formTitle}" : "{user} به فرم {formTitle} شما پاسخ داد",
     "Anonymous user" : "کاربر ناشناس",
     "A form has been <strong>shared</strong> with you" : "فرمی با شما <strong>هم‌رسانی</strong> شده است",
     "Someone <strong>answered</strong> a shared form" : "فردی به یک فرم هم‌رسانده <strong>پاسخ داد</strong> ",

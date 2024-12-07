@@ -3,7 +3,6 @@
     "{user} has shared the form {formTitle} with you" : "{user} 和你分享了表单 {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} 和组 {group} 分享了表单 {formTitle}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} 已与团队 {circle} 共享表单 {formTitle}",
-    "{user} answered your form {formTitle}" : "{user} 答复了你的表单 {formTitle}",
     "Anonymous user" : "匿名用户",
     "A form has been <strong>shared</strong> with you" : "您收到一张表单 <strong>分享</strong>",
     "Someone <strong>answered</strong> a shared form" : "有人 <strong> 回答了 </strong> 个共享表单",

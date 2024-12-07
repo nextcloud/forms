@@ -3,7 +3,6 @@
     "{user} has shared the form {formTitle} with you" : "{user} поділив(-ла-)ся з вами формою {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} поділив(-ла-)ся формою {formTitle} з групою {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} поділився формою {formTitle} з командою {circle}",
-    "{user} answered your form {formTitle}" : "{user} заповнив вашу форму {formTitle}",
     "Anonymous user" : "Анонімний користувач",
     "A form has been <strong>shared</strong> with you" : "З вами поділилися формою",
     "Someone <strong>answered</strong> a shared form" : "Хтось <strong>заповнив</strong> загальну форму",

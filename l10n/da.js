@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Formularer",
     "{user} has shared the form {formTitle} with you" : "{user} har delt formularen {formTitle} med dig",
     "{user} has shared the form {formTitle} with group {group}" : "{user} har delt formularen {formTitle} med gruppen {group}",
-    "{user} answered your form {formTitle}" : "{user} besvarede din formular {formTitle}",
     "Anonymous user" : "Anonym bruger",
     "A form has been <strong>shared</strong> with you" : "En formular er blevet <strong>delt</strong> med dig",
     "Someone <strong>answered</strong> a form" : "Nogen <strong>besvarede</strong> en formular",

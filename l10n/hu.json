@@ -3,7 +3,6 @@
     "{user} has shared the form {formTitle} with you" : "{user} megosztotta Önnel a(z) {formTitle} űrlapot",
     "{user} has shared the form {formTitle} with group {group}" : "{user} megosztotta a(z) {group} csoporttal a(z) {formTitle} űrlapot.",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} megosztotta a(z) {circle} csapattal a(z) {formTitle} űrlapot.",
-    "{user} answered your form {formTitle}" : "{user} kitöltötte a(z) {formTitle} űrlapot.",
     "Anonymous user" : "Névtelen felhasználó",
     "A form has been <strong>shared</strong> with you" : "Egy űrlapot <strong>megosztottak</strong> Önnel",
     "Someone <strong>answered</strong> a shared form" : "Valaki <strong>megválaszolt</strong> egy megosztott űrlapot",

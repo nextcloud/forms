@@ -3,7 +3,6 @@
     "{user} has shared the form {formTitle} with you" : "{user} erabiltzaileak {formTitle} galdetegia partekatu du zurekin",
     "{user} has shared the form {formTitle} with group {group}" : "{user} erabiltzaileak {formTitle} galdetegia partekatu du  {group} taldearekin",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} erabiltzaileak {formTitle} galdetegia partekatu du {circle} taldearekin",
-    "{user} answered your form {formTitle}" : "{user} erabiltzaileak zure {formTitle} galdetegia erantzun du",
     "Anonymous user" : "Erabiltzaile anonimoa",
     "A form has been <strong>shared</strong> with you" : "Galdetegi bat <strong>partekatu da</strong> zurekin",
     "Someone <strong>answered</strong> a shared form" : "Norbaitek partekatutako galdetegia <strong>erantzun</strong> du",

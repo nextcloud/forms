@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "ฟอร์ม",
     "{user} has shared the form {formTitle} with you" : "{user} ได้แชร์ฟอร์ม {formTitle} กับคุณ",
     "{user} has shared the form {formTitle} with group {group}" : "{user} ได้แชร์ฟอร์ม {formTitle} กับกลุ่ม {group}",
-    "{user} answered your form {formTitle}" : "{user} ได้ตอบฟอร์ม {formTitle} ของคุณ",
     "Anonymous user" : "ผู้ใช้ไม่ระบุชื่อ",
     "A form has been <strong>shared</strong> with you" : "มีฟอร์มที่ถูก<strong>แชร์</strong>กับคุณ",
     "Someone <strong>answered</strong> a form" : "มีคน<strong>ตอบ</strong>ฟอร์ม",

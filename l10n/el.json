@@ -2,7 +2,6 @@
     "Forms" : "Φόρμες",
     "{user} has shared the form {formTitle} with you" : "Ο/η {user} έχει διαμοιραστεί την φόρμα {formTitle}με εσάς",
     "{user} has shared the form {formTitle} with group {group}" : "Ο/η {user} έχει διαμοιραστεί την φόρμα {formTitle} με την ομάδα {group}",
-    "{user} answered your form {formTitle}" : "Ο/η {user} απάντησε στην φόρμα σας {formTitle}",
     "Anonymous user" : "Ανώνυμος χρήστης",
     "A form has been <strong>shared</strong> with you" : "Μία φόρμα έχει <strong>διαμοιραστεί</strong> με εσάς",
     "Someone <strong>answered</strong> a shared form" : "Κάποιος <strong>απάντησε</strong> σε μια κοινόχρηστη φόρμα",

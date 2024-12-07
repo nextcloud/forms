@@ -5,7 +5,6 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} on jakanut lomakkeen {formTitle} kanssasi",
     "{user} has shared the form {formTitle} with group {group}" : "{user} on jakanut lomakkeen {formTitle} ryhmän {group} kanssa",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} on jakanut lomakkeen {formTitle} tiimin {circle} kanssa",
-    "{user} answered your form {formTitle}" : "{user} vastasi lomakkeeseesi {formTitle}",
     "Anonymous user" : "Anonyymi käyttäjä",
     "A form has been <strong>shared</strong> with you" : "Lomake on <strong>jaettu</strong> kanssasi",
     "Someone <strong>answered</strong> a shared form" : "Joku <strong>vastasi</strong> jaettuun lomakkeeseen",

@@ -1,8 +1,8 @@
 { "translations": {
     "Forms" : "Formuláre",
-    "{user} has shared the form {formTitle} with you" : "{user} nazdieľal formulár {formTitle} s vami",
-    "{user} has shared the form {formTitle} with group {group}" : "{user} nazdieľal formulár {formTitle} so skupinou {group}",
-    "{user} answered your form {formTitle}" : "{user} odpovedal na váš formulár {formTitle}",
+    "{user} has shared the form {formTitle} with you" : "{user} zdieľa s vami formulár {formTitle}",
+    "{user} has shared the form {formTitle} with group {group}" : "{user} zdieľa formulár {formTitle} so skupinou {group}",
+    "{user} has shared the form {formTitle} with team {circle}" : "{user} zdieľa formulár {formTitle} s tímom {circle}",
     "Anonymous user" : "Anonymný užívateľ",
     "A form has been <strong>shared</strong> with you" : "Formulár <strong>bol nazdieľaný</strong> s vami",
     "Someone <strong>answered</strong> a shared form" : "Niekto <strong>odpovedal</strong> na zdieľaný formulár",

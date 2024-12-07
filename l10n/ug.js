@@ -1,6 +1,17 @@
 OC.L10N.register(
     "forms",
     {
+    "Forms" : "جەدۋەل",
+    "{user} has shared the form {formTitle} with you" : "{user} formTitle form جەدۋىلىنى سىز بىلەن ئورتاقلاشتى",
+    "{user} has shared the form {formTitle} with group {group}" : "{user} گۇرۇپپا {گۇرۇپپا {formTitle form جەدۋىلىنى ھەمبەھىرلىدى",
+    "{user} has shared the form {formTitle} with team {circle}" : "{user} جەدۋەل {formTitle team جەدۋىلىنى گۇرۇپپا {چەمبىرىكى بىلەن ئورتاقلاشتى",
+    "Anonymous user" : "نامسىز ئىشلەتكۈچى",
+    "A form has been <strong>shared</strong> with you" : "بىر جەدۋەل <strong> ئورتاقلاشتى </ strong>",
+    "Someone <strong>answered</strong> a shared form" : "بىرەيلەن <strong> ئورتاقلاشقان جەدۋەلگە جاۋاب بەردى",
+    "Someone <strong>answered</strong> a form" : "بىرەيلەن <strong> بىر جەدۋەلگە جاۋاب بەردى",
+    "Nextcloud Forms" : "Nextcloud شەكىللىرى",
+    "Select form" : "جەدۋەلنى تاللاڭ",
+    "Timestamp of data load" : "سانلىق مەلۇمات يۈكلەش ۋاقتى",
     "No" : "ياق",
     "Yes" : "ھەئە",
     "Shared with you" : "Shared with you",

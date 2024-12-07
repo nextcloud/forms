@@ -4,7 +4,7 @@ OC.L10N.register(
     "Forms" : "Formuláře",
     "{user} has shared the form {formTitle} with you" : "{user} vám nasdílel(a) formulář {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} nasdílel(a) formulář {formTitle} skupině {group}",
-    "{user} answered your form {formTitle}" : "{user} vyplnil(a) váš formulář {formTitle}",
+    "{user} has shared the form {formTitle} with team {circle}" : "{user} nasdílel(a) formulář {formTitle} týmu {circle}",
     "Anonymous user" : "Anonymní uživatel",
     "A form has been <strong>shared</strong> with you" : "Byl vám <strong>nasdílen</strong> formulář",
     "Someone <strong>answered</strong> a shared form" : "Někdo <strong>odpověděl</strong> ve sdíleném formuláři",

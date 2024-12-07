@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Mòdulos",
     "{user} has shared the form {formTitle} with you" : "{user} at cumpartzidu su mòdulu {formTitle} cun tegus",
     "{user} has shared the form {formTitle} with group {group}" : "{user} at cumpartzidu su mòdulu {formTitle} cun su grupu {group}",
-    "{user} answered your form {formTitle}" : "{user} at rispostu a su mòdulu {formTitle}",
     "Anonymous user" : "Utente chene nùmene",
     "A form has been <strong>shared</strong> with you" : "Ant cumpartzidu unu <strong>mòdulu</strong> cun tegus",
     "Someone <strong>answered</strong> a form" : "Ant <strong>rispostu </strong> a unu mòdulu",
