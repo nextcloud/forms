@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Formularios",
     "{user} has shared the form {formTitle} with you" : "{user} ha compartido el formulario {formTitle} con usted",
     "{user} has shared the form {formTitle} with group {group}" : "{user} ha compartido el formulario {formTitle} con el grupo {group}",
-    "{user} answered your form {formTitle}" : "{user} respondió a su formulario {formTitle}",
     "Anonymous user" : "Usuario anónimo",
     "A form has been <strong>shared</strong> with you" : "Se ha <strong>compartido</strong> un formulario con usted",
     "Someone <strong>answered</strong> a form" : "Alguien <strong>respondió</strong> a un formulario",

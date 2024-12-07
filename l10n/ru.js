@@ -5,7 +5,6 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} поделился формой {formTitle} с вами",
     "{user} has shared the form {formTitle} with group {group}" : "{user} поделился формой {formTitle} с группой {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} поделился формой {formTitle} с командой {circle}",
-    "{user} answered your form {formTitle}" : "{user} прошел вашу форму {formTitle}",
     "Anonymous user" : "Анонимный пользователь",
     "A form has been <strong>shared</strong> with you" : "Вам <strong>предоставили доступ</strong> к форме ",
     "Someone <strong>answered</strong> a shared form" : "Кто-то <strong>ответил</strong> на общую форму",

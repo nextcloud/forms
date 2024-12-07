@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Formulieren",
     "{user} has shared the form {formTitle} with you" : "{user} heeft het formulier {formTitle} met je gedeeld",
     "{user} has shared the form {formTitle} with group {group}" : "{user} deelde formulier {formTitle} met groep {group}",
-    "{user} answered your form {formTitle}" : "{user} beantwoordde jouw formulier {formTitle}",
     "Anonymous user" : "Anonieme gebruiker",
     "A form has been <strong>shared</strong> with you" : "Er is een formulier met jou </strong>gedeeld</strong>",
     "Someone <strong>answered</strong> a form" : "Iemand <strong>beantwoordde</strong> een formulier",

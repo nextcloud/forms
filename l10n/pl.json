@@ -2,7 +2,6 @@
     "Forms" : "Formularze",
     "{user} has shared the form {formTitle} with you" : "{user} udostępnił Tobie formularz {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} udostępnił formularz {formTitle} grupie {group}",
-    "{user} answered your form {formTitle}" : "{user} odpowiedział na Twój formularz {formTitle}",
     "Anonymous user" : "Anonimowy użytkownik",
     "A form has been <strong>shared</strong> with you" : "Został Tobie <strong>udostępniony</strong> formularz",
     "Someone <strong>answered</strong> a form" : "Ktoś <strong>odpowiedział</strong> na formularz",

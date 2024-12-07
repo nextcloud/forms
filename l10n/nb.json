@@ -3,7 +3,6 @@
     "{user} has shared the form {formTitle} with you" : "{user} har delt skjemaet {formTitle} med deg",
     "{user} has shared the form {formTitle} with group {group}" : "{user} har delt skjemaet {formTitle} med gruppen {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} har delt skjemaet {formTitle} med laget {circle}",
-    "{user} answered your form {formTitle}" : "{user} svarte på ditt skjema {formTitle}",
     "Anonymous user" : "Anonym bruker",
     "A form has been <strong>shared</strong> with you" : "Et skjema har blitt <strong>delt</strong> med deg",
     "Someone <strong>answered</strong> a shared form" : "Noen <strong>svarte</strong> på et delt skjema",

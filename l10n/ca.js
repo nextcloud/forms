@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Formularis",
     "{user} has shared the form {formTitle} with you" : "{user} ha compartit el formulari {formTitle} amb vós",
     "{user} has shared the form {formTitle} with group {group}" : "{user} ha compartit el formulari {formTitle} amb el grup {group}",
-    "{user} answered your form {formTitle}" : "{user} ha respost el formulari {formTitle}",
     "Anonymous user" : "Usuari anònim",
     "A form has been <strong>shared</strong> with you" : "S'ha <strong>compartit</strong> un formulari amb vós",
     "Someone <strong>answered</strong> a form" : "Algú ha <strong>respost</strong> a un formulari",

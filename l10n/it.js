@@ -5,7 +5,6 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} ha condiviso il modulo {formTitle} con te",
     "{user} has shared the form {formTitle} with group {group}" : "{user} ha condiviso il modulo {formTitle} con il gruppo {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} ha condiviso il modulo {formTitle} con il team {circle}",
-    "{user} answered your form {formTitle}" : "{user} ha risposto al tuo modulo {formTitle}",
     "Anonymous user" : "Utente anonimo",
     "A form has been <strong>shared</strong> with you" : "Un modulo è stato <strong>condiviso</strong> con te",
     "Someone <strong>answered</strong> a shared form" : "Qualcuno <strong>ha risposto</strong> a un modulo condiviso",

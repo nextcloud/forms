@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Формуляри",
     "{user} has shared the form {formTitle} with you" : "{user} сподели формуляра {formTitle} с вас",
     "{user} has shared the form {formTitle} with group {group}" : "{user} сподели формуляра {formTitle} с група {group}",
-    "{user} answered your form {formTitle}" : "{user} отговори на формуляра ви {formTitle}",
     "Anonymous user" : "Анонимен потребител",
     "A form has been <strong>shared</strong> with you" : "С вас е бил <strong>споделен</strong> формуляр",
     "Someone <strong>answered</strong> a form" : "Някой <strong>отговори</strong> на формуляр",

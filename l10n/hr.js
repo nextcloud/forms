@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "Obrasci",
     "{user} has shared the form {formTitle} with you" : "{user} je s vama podijelio obrazac {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} je podijelio obrazac {formTitle} s grupom {group}",
-    "{user} answered your form {formTitle}" : "{user} je odgovorio na vaš obrazac {formTitle}",
     "Anonymous user" : "Anonimni korisnik",
     "A form has been <strong>shared</strong> with you" : "Obrazac je <strong>podijeljen</strong> s vama",
     "Someone <strong>answered</strong> a form" : "Netko je <strong>odgovorio</strong> na obrazac",

@@ -5,7 +5,6 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} formTitle form جەدۋىلىنى سىز بىلەن ئورتاقلاشتى",
     "{user} has shared the form {formTitle} with group {group}" : "{user} گۇرۇپپا {گۇرۇپپا {formTitle form جەدۋىلىنى ھەمبەھىرلىدى",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} جەدۋەل {formTitle team جەدۋىلىنى گۇرۇپپا {چەمبىرىكى بىلەن ئورتاقلاشتى",
-    "{user} answered your form {formTitle}" : "{ئىشلەتكۈچى} جەدۋىلىڭىزگە {formTitle} جاۋاب بەردى",
     "Anonymous user" : "نامسىز ئىشلەتكۈچى",
     "A form has been <strong>shared</strong> with you" : "بىر جەدۋەل <strong> ئورتاقلاشتى </ strong>",
     "Someone <strong>answered</strong> a shared form" : "بىرەيلەن <strong> ئورتاقلاشقان جەدۋەلگە جاۋاب بەردى",

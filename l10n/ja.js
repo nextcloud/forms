@@ -4,7 +4,6 @@ OC.L10N.register(
     "Forms" : "フォーム",
     "{user} has shared the form {formTitle} with you" : "{user}が{formTitle}をあなたと共有しました。",
     "{user} has shared the form {formTitle} with group {group}" : "{user}はグループ {group}とフォーム {formTitle} を共有した",
-    "{user} answered your form {formTitle}" : "{user} が {formTitle} に回答しました",
     "Anonymous user" : "匿名ユーザー",
     "Nextcloud Forms" : "Nextcloud フォーム",
     "Select form" : "フォームを選択",
