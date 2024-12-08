@@ -3,6 +3,7 @@
     "{user} has shared the form {formTitle} with you" : "Roinn {user} an fhoirm {formTitle} leat",
     "{user} has shared the form {formTitle} with group {group}" : "Roinn {user} an fhoirm {formTitle} le grúpa {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "Roinn {user} an fhoirm {formTitle} le foireann {circle}",
+    "Your form {formTitle} was answered by {user}" : "D'fhreagair {formTitle} d'fhoirm {user}",
     "Anonymous user" : "Úsáideoir gan ainm",
     "A form has been <strong>shared</strong> with you" : "Tá foirm <strong>roinnte</strong> agat",
     "Someone <strong>answered</strong> a shared form" : "D'fhreagair <strong>duine</strong> foirm chomhroinnte",

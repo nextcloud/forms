@@ -67,6 +67,7 @@ OC.L10N.register(
     "Expires on {date}" : "Vervalt op {date}",
     "Permissions" : "Rechten",
     "Group" : "Groep",
+    "Team" : "Team",
     "Share link" : "Deel link",
     "Add link" : "Voeg link toe",
     "Copy to clipboard" : "Kopiëren naar het klembord",

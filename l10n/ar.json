@@ -3,6 +3,7 @@
     "{user} has shared the form {formTitle} with you" : "{user} قام بمشاركة النموذج {formTitle} معك",
     "{user} has shared the form {formTitle} with group {group}" : "{user} قام بمشاركة نموذجك {formTitle} مع مجموعة {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} قام بمشاركة النموذج {formTitle} مع الفريق {circle}",
+    "Your form {formTitle} was answered by {user}" : "نموذجك {formTitle} تمّت الإجابة عنه من قِبَل {user}",
     "Anonymous user" : "مستخدم مجهول",
     "A form has been <strong>shared</strong> with you" : "نموذج  تم <strong>مشاركته</strong> معك",
     "Someone <strong>answered</strong> a shared form" : "شخصٌ ما <strong>استجاب</strong> للنموذج المشترك",
