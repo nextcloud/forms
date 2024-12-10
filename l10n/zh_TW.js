@@ -5,6 +5,7 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} 已與您分享了表單 {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} 已與群組 {group} 分享了表單 {formTitle}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} 已與團隊 {circle} 分享了表單 {formTitle}",
+    "Your form {formTitle} was answered by {user}" : "您的表單 {formTitle} 已由 {user} 回答",
     "Anonymous user" : "匿名使用者",
     "A form has been <strong>shared</strong> with you" : "有人與您<strong>分享</strong>了表單",
     "Someone <strong>answered</strong> a shared form" : "某人<strong>回應</strong>了分享的表單",
