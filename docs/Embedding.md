@@ -1,3 +1,8 @@
+<!--
+  - SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 # Embedding
 
 Besides sharing and using the [API](./API.md) for custom forms it is possible to embed forms inside external

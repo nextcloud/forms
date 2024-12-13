@@ -1,10 +1,17 @@
+<!--
+  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 ---
+
 name: Feature request
 about: Suggest an idea for this project
 title: ''
 labels: 0. Needs triage, enhancement
 type: 'Enhancement'
 assignees: ''
+
 ---
 
 **Nextcloud (please complete the following information):**

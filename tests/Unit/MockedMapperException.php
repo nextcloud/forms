@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * SPDX-FileCopyrightText: 2023 Ferdinand Thiessen <rpm@fthiessen.de>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 namespace OCA\Forms\Tests\Unit;
 
 use OCP\AppFramework\Db\IMapperException;
