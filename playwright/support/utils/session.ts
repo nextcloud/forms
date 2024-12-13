@@ -62,7 +62,10 @@ export async function runShell(
  */
 export async function runOCC(
 	command: string,
-	options?: { env?: Record<string, string | number>; rejectOnError?: boolean },
+	options?: {
+		env?: Record<string, string | number>
+		rejectOnError?: boolean
+	},
 ) {
 	return await runShell(`php ./occ ${command}`, {
 		...options,
@@ -109,6 +112,8 @@ export async function login(
  */
 export async function createRandomUser(): Promise<string> {
 	const uid = (Math.random() + 1).toString(36).substring(7)
-	await runOCC(`user:add --password-from-env ${uid}`, { env: { OC_PASS: uid } })
+	await runOCC(`user:add --password-from-env ${uid}`, {
+		env: { OC_PASS: uid },
+	})
 	return uid
 }

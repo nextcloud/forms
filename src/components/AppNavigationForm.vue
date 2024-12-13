@@ -254,7 +254,9 @@ export default {
 			if (this.form.expires) {
 				const relativeDate = moment(this.form.expires, 'X').fromNow()
 				if (this.isExpired) {
-					return t('forms', 'Expired {relativeDate}', { relativeDate })
+					return t('forms', 'Expired {relativeDate}', {
+						relativeDate,
+					})
 				}
 				return t('forms', 'Expires {relativeDate}', { relativeDate })
 			}
@@ -318,7 +320,9 @@ export default {
 					this.isArchived ? FormState.FormClosed : FormState.FormArchived,
 				)
 			} catch (error) {
-				logger.error('Error changing archived state of form', { error })
+				logger.error('Error changing archived state of form', {
+					error,
+				})
 				showError(t('forms', 'Error changing archived state of form'))
 			}
 		},

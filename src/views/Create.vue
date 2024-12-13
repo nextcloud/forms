@@ -513,7 +513,9 @@ export default {
 					lastQuestion.focus()
 				})
 			} catch (error) {
-				logger.error(`Error while duplicating question ${id}`, { error })
+				logger.error(`Error while duplicating question ${id}`, {
+					error,
+				})
 				showError('There was an error while duplicating the question')
 			} finally {
 				this.isLoadingQuestions = false

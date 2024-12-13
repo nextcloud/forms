@@ -164,7 +164,9 @@ export default {
 						error,
 					})
 				} else {
-					logger.error(`Unexpected error fetching form ${id}`, { error })
+					logger.error(`Unexpected error fetching form ${id}`, {
+						error,
+					})
 					this.isLoadingForm = false
 				}
 			} finally {

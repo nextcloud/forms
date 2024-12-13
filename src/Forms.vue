@@ -379,7 +379,9 @@ export default {
 				)
 				this.allSharedForms = OcsResponse2Data(response)
 			} catch (error) {
-				logger.error('Error while loading shared forms list', { error })
+				logger.error('Error while loading shared forms list', {
+					error,
+				})
 				showError(
 					t('forms', 'An error occurred while loading the forms list'),
 				)
@@ -451,7 +453,10 @@ export default {
 				)
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
-				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
+				this.$router.push({
+					name: 'edit',
+					params: { hash: newForm.hash },
+				})
 				this.mobileCloseNavigation()
 			} catch (error) {
 				logger.error('Unable to create new form', { error })
@@ -467,11 +472,16 @@ export default {
 		async onCloneForm(id) {
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms?fromId={id}', { id }),
+					generateOcsUrl('apps/forms/api/v3/forms?fromId={id}', {
+						id,
+					}),
 				)
 				const newForm = OcsResponse2Data(response)
 				this.forms.unshift(newForm)
-				this.$router.push({ name: 'edit', params: { hash: newForm.hash } })
+				this.$router.push({
+					name: 'edit',
+					params: { hash: newForm.hash },
+				})
 				this.mobileCloseNavigation()
 			} catch (error) {
 				logger.error(`Unable to copy form ${id}`, { error })
