@@ -12,7 +12,10 @@ import { createRandomUser, login } from '../utils/session'
 export const test = base.extend({
 	page: async ({ browser, baseURL }, use) => {
 		// Important: make sure we authenticate in a clean environment by unsetting storage state.
-		const page = await browser.newPage({ storageState: undefined, baseURL })
+		const page = await browser.newPage({
+			storageState: undefined,
+			baseURL,
+		})
 
 		const uid = await createRandomUser()
 		await login(page.request, uid, uid)

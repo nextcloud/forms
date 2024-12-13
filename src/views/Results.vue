@@ -606,7 +606,9 @@ export default {
 								}),
 							)
 						} catch (error) {
-							logger.error('Error while exporting to Files', { error })
+							logger.error('Error while exporting to Files', {
+								error,
+							})
 							showError(
 								t(
 									'forms',

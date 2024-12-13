@@ -198,7 +198,9 @@ export default {
 					)
 					emit('forms:ownership-transfered', this.form.id)
 				} catch (error) {
-					logger.error('Error while transfering form ownership', { error })
+					logger.error('Error while transfering form ownership', {
+						error,
+					})
 					showError(
 						t('forms', 'An error occurred while transfering ownership'),
 					)

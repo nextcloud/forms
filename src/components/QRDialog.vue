@@ -32,7 +32,9 @@
 				:src="uri"
 				:title="text"
 				:alt="
-					t('forms', 'QR code representation of {text}', { text: text })
+					t('forms', 'QR code representation of {text}', {
+						text: text,
+					})
 				" />
 		</div>
 	</NcDialog>
@@ -90,7 +92,9 @@ export default {
 		async generateQr() {
 			if (this.text) {
 				try {
-					this.uri = await QRCode.toDataURL(this.text, { width: 256 })
+					this.uri = await QRCode.toDataURL(this.text, {
+						width: 256,
+					})
 				} catch (err) {
 					console.error(err)
 				}

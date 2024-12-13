@@ -535,7 +535,9 @@ export default {
 				// Clean up answers for questions that do not exist anymore
 				if (!this.validQuestionsIds.has(parseInt(questionId))) {
 					this.showClearFormDueToChangeDialog = true
-					logger.debug('Question does not exist anymore', { questionId })
+					logger.debug('Question does not exist anymore', {
+						questionId,
+					})
 					continue
 				}
 

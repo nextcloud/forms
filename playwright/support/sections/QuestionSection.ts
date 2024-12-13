@@ -15,7 +15,9 @@ export class QuestionSection {
 		public readonly page: Page,
 		public readonly section: Locator,
 	) {
-		this.titleInput = this.section.getByRole('textbox', { name: /title of/i })
+		this.titleInput = this.section.getByRole('textbox', {
+			name: /title of/i,
+		})
 		this.newAnswerInput = this.section.getByRole('textbox', {
 			name: 'Add a new answer',
 		})

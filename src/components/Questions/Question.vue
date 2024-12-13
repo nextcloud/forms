@@ -67,7 +67,9 @@
 					v-if="!readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="
-						t('forms', 'Title of question number {index}', { index })
+						t('forms', 'Title of question number {index}', {
+							index,
+						})
 					"
 					:value="text"
 					class="question__header__title__text question__header__title__text__input"
