@@ -3,6 +3,7 @@
     "{user} has shared the form {formTitle} with you" : "{user} је са вама поделио упитник {formTitle}",
     "{user} has shared the form {formTitle} with group {group}" : "{user} је поделио упитник {formTitle} са групом {group}",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} је поделио упитник {formTitle} са тимом {circle}",
+    "Your form {formTitle} was answered by {user}" : "{user} корисника је одговорило на ваш формулар {formTitle}",
     "Anonymous user" : "Анонимни корисник",
     "A form has been <strong>shared</strong> with you" : "Упитник је <strong>подељен</strong> са вама",
     "Someone <strong>answered</strong> a shared form" : "Неко је <strong>одговорио</strong> на дељени упитник",
