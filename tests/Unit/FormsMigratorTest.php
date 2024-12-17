@@ -83,11 +83,6 @@ class FormsMigratorTest extends TestCase {
 	public function setUp(): void {
 		parent::setUp();
 
-		// UserMigration is not available below NC24, skip all tests here.
-		if (\OC_Util::getVersion()[0] < 24) {
-			$this->markTestSkipped('UserMigration not available below NC24');
-		}
-
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);

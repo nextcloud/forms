@@ -375,8 +375,7 @@ class ProviderTest extends TestCase {
 			->willReturn($form);
 
 		$this->validator->expects($this->any())
-			->method('validate')
-			->willReturn(true);
+			->method('validate');
 
 		$this->assertEquals($expected, $this->provider->getRichParams($l10n, $subject, $subjectParams));
 	}
