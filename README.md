@@ -5,6 +5,7 @@
 
 # Nextcloud Forms
 
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/forms)](https://api.reuse.software/info/github.com/nextcloud/forms)
 ![Downloads](https://img.shields.io/github/downloads/nextcloud-releases/forms/total?style=flat-square)
 [![Code coverage](https://img.shields.io/codecov/c/github/nextcloud/forms.svg?style=flat-square)](https://codecov.io/gh/nextcloud/forms/)
 [![Dependabot status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg?longCache=true&style=flat-square&logo=dependabot)](https://dependabot.com)
