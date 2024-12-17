@@ -1,11 +1,7 @@
 <?php
 /**
- * Report Forms App data with the Analytics App
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later. See the LICENSE.md file.
- *
- * @author Marcel Scherello <analytics@scherello.de>
+ * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 declare(strict_types=1);
 

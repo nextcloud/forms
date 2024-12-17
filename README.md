@@ -1,3 +1,8 @@
+<!--
+  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 # Nextcloud Forms
 
 ![Downloads](https://img.shields.io/github/downloads/nextcloud-releases/forms/total?style=flat-square)

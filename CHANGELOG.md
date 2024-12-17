@@ -1,3 +1,8 @@
+<!--
+  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 # Changelog
 
 ## v4.3.0 - 2024-10-04

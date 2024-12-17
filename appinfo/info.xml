@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!--
+  - SPDX-FileCopyrightText: 2019-2024 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-only
+-->
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>forms</id>
@@ -52,7 +56,7 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms3.png</screenshot>
 
 	<dependencies>
-		<nextcloud min-version="30" max-version="30" />
+		<nextcloud min-version="30" max-version="31" />
 	</dependencies>
 
 	<background-jobs>

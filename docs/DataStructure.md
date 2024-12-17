@@ -1,3 +1,8 @@
+<!--
+  - SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 # Forms Data Structure
 
 **State: Forms v3.3.1 - 08.10.2023**

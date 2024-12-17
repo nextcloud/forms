@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: 2024 Ferdinand Thiessen <opensource@fthiessen.de>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 import { expect, mergeTests } from '@playwright/test'
 import { test as randomUserTest } from '../support/fixtures/random-user'
 import { test as appNavigationTest } from '../support/fixtures/navigation'
