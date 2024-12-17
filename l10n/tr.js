@@ -5,6 +5,7 @@ OC.L10N.register(
     "{user} has shared the form {formTitle} with you" : "{user} sizinle {formTitle} formunu paylaştı",
     "{user} has shared the form {formTitle} with group {group}" : "{user}, [group] grubuyla {formTitle} formunu paylaştı",
     "{user} has shared the form {formTitle} with team {circle}" : "{user} kullanıcısı {formTitle} formunu {circle} takımı ile paylaştı",
+    "Your form {formTitle} was answered by {user}" : "{formTitle} formunuz {user} tarafından dolduruldu",
     "Anonymous user" : "Anonim kullanıcı",
     "A form has been <strong>shared</strong> with you" : "Sizinle bir form <strong>paylaşıldı</strong>",
     "Someone <strong>answered</strong> a shared form" : "Biri paylaşılmış bir formu <strong>doldurdu</strong>",
