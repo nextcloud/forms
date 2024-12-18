@@ -59,7 +59,7 @@ class SyncSubmissionsWithLinkedFileJob extends QueuedJob {
 	public function run($argument): void {
 		$oldUser = $this->userSession->getUser();
 		$formId = $argument['form_id'];
-		$attempt = $argument['attempt'] ?: 1;
+		$attempt = $argument['attempt'] ?? 1;
 
 		try {
 			$form = $this->formMapper->findById($formId);
