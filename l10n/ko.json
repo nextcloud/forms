@@ -43,6 +43,7 @@
     "Add link" : "링크 추가",
     "Copy to clipboard" : "클립보드로 복사",
     "Copy embedding code" : "삽입 코드 복사",
+    "Remove link" : "링크 제거",
     "Internal link" : "내부 링크",
     "Only works for logged in accounts with access rights" : "로그인된 계정 중 접속 권한이 있는 계정에게만 동작",
     "Permit access to all logged in accounts" : "모든 로그인된 계정에 접근 허가",
