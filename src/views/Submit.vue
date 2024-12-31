@@ -698,22 +698,28 @@ export default {
 			try {
 				if (this.submissionId) {
 					await axios.post(
-						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions/{submissionId}', {
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
+							{
+								id: this.form.id,
+								submissionId: this.submissionId,
+							},
+						),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						},
+					)
+				} else {
+					await axios.post(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
 							id: this.form.id,
-							submissionId: this.submissionId
 						}),
 						{
 							answers: this.answers,
 							shareHash: this.shareHash,
-						})
-				} else {
-					await axios.post(generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-						id: this.form.id,
-					}),
-					{
-						answers: this.answers,
-						shareHash: this.shareHash,
-					})
+						},
+					)
 				}
 				this.submitForm = true
 				this.success = true
