@@ -1668,9 +1668,6 @@ class ApiController extends OCSController {
 
 				$answerEntity->setText($answerText);
 				$this->answerMapper->insert($answerEntity);
-				if ($uploadedFile) {
-					$this->uploadedFileMapper->delete($uploadedFile);
-				}
 			} else {
 				$answerText = $answer; // Not a multiple-question, answerText is given answer
 
@@ -1688,6 +1685,10 @@ class ApiController extends OCSController {
 					$answerEntity->setText($answerText);
 					$this->answerMapper->insert($answerEntity);
 				}
+			}
+
+			if ($uploadedFile) {
+				$this->uploadedFileMapper->delete($uploadedFile);
 			}
 		}
 
