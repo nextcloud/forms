@@ -172,6 +172,7 @@ class ApiController extends OCSController {
 				'showToAllUsers' => false,
 			]);
 			$form->setSubmitMultiple(false);
+			$form->setAllowEdit(false);
 			$form->setShowExpiration(false);
 			$form->setExpires(0);
 			$form->setIsAnonymous(false);
@@ -1294,7 +1295,7 @@ class ApiController extends OCSController {
 				continue;
 			}
 
-			$this->storeAnswersForQuestion($form, $submission->getId(), $questions[$questionIndex], $answerArray);
+			$this->storeAnswersForQuestion($form, $submission->getId(), $questions[$questionIndex], $answerArray, false);
 		}
 
 		$this->formMapper->update($form);
@@ -1307,6 +1308,64 @@ class ApiController extends OCSController {
 		}
 
 		return new DataResponse(null, Http::STATUS_CREATED);
+	}
+
+	/**
+	 * Update an existing submission
+	 *
+	 * @param int $formId the form id
+	 * @param int $submissionId the submission id
+	 * @param array $answers [question_id => arrayOfString]
+	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
+	 * @return DataResponse
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[ApiRoute(verb: 'POST', url: Constants::API_BASE . 'forms/{formId}/submissions/{submissionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	public function updateSubmission(int $formId, int $submissionId, array $answers, string $shareHash = ''): DataResponse {
+		$this->logger->debug('Updating submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
+			'formId' => $formId,
+			'answers' => $answers,
+			'shareHash' => $shareHash,
+		]);
+
+		list($form, $questions) = $this->checkAndPrepareSubmission($formId, $answers, $shareHash);
+
+		// if edit is allowed get existing submission of this user
+		if ($form->getAllowEdit() && $this->currentUser) {
+			try {
+				$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
+			} catch (DoesNotExistException $e) {
+				throw new OCSBadRequestException('Cannot update a non existing submission');
+			}
+		} else {
+			throw new OCSBadRequestException('Can only update if AllowEdit is set');
+		}
+
+		$submission->setTimestamp(time());
+		$this->submissionMapper->update($submission);
+
+		// Process Answers
+		foreach ($answers as $questionId => $answerArray) {
+			// Search corresponding Question, skip processing if not found
+			$questionIndex = array_search($questionId, array_column($questions, 'id'));
+			if ($questionIndex === false) {
+				continue;
+			}
+
+			$question = $questions[$questionIndex];
+
+			$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray, true);
+		}
+
+		//Create Activity
+		$this->formsService->notifyNewSubmission($form, $submission);
+
+		return new DataResponse();
 	}
 
 	/**
@@ -1522,14 +1581,23 @@ class ApiController extends OCSController {
 	// private functions
 
 	/**
-	 * Insert answers for a question
+	 * Insert or update answers for a question
 	 *
 	 * @param Form $form
 	 * @param int $submissionId
 	 * @param array $question
 	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
+	 * @param bool $update
 	 */
-	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
+	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray, bool $update): void {
+		// get stored answers for this question
+		$storedAnswers = [];
+		if ($update) {
+			$storedAnswers = $this->answerMapper->findBySubmissionAndQuestion($submissionId, $question['id']);
+		}
+
+		$newAnswerTexts = array();
+		
 		foreach ($answerArray as $answer) {
 			$answerEntity = new Answer();
 			$answerEntity->setSubmissionId($submissionId);
@@ -1546,6 +1614,33 @@ class ApiController extends OCSController {
 				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
 				}
+
+				if (!array_key_exists($question['id'], $newAnswerTexts)) {
+					$newAnswerTexts[$question['id']] = [];
+				}
+				$newAnswerTexts[$question['id']][] = $answerText;
+
+				// has this answer already been stored?
+				$foundAnswer = false;
+				foreach($storedAnswers as $storedAnswer) {
+					if ($storedAnswer->getText() == $answerText) {
+						// nothing to be changed
+						$foundAnswer = true;
+						break;
+					}
+				}
+				if (!$foundAnswer) {
+					if ($answerText === "") {
+						continue;
+					}
+					// need to add answer
+					$answerEntity = new Answer();
+					$answerEntity->setSubmissionId($submissionId);
+					$answerEntity->setQuestionId($question['id']);
+					$answerEntity->setText($answerText);
+					$this->answerMapper->insert($answerEntity);
+				}
+
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
 				$answerEntity->setFileId($uploadedFile->getFileId());
@@ -1565,18 +1660,40 @@ class ApiController extends OCSController {
 				$file->move($folder->getPath() . '/' . $name);
 
 				$answerText = $name;
+
+				$answerEntity->setText($answerText);
+				$this->answerMapper->insert($answerEntity);
+				if ($uploadedFile) {
+					$this->uploadedFileMapper->delete($uploadedFile);
+				}
 			} else {
 				$answerText = $answer; // Not a multiple-question, answerText is given answer
+
+				if (!empty($storedAnswers)) {
+					$answerEntity = $storedAnswers[0];
+					$answerEntity->setText($answerText);
+					$this->answerMapper->update($answerEntity);
+				} else {
+					if ($answerText === "") {
+						continue;
+					}
+					$answerEntity = new Answer();
+					$answerEntity->setSubmissionId($submissionId);
+					$answerEntity->setQuestionId($question['id']);
+					$answerEntity->setText($answerText);
+					$this->answerMapper->insert($answerEntity);
+				}
 			}
 
-			if ($answerText === '') {
-				continue;
-			}
-
-			$answerEntity->setText($answerText);
-			$this->answerMapper->insert($answerEntity);
-			if ($uploadedFile) {
-				$this->uploadedFileMapper->delete($uploadedFile);
+			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+				// drop all answers that are not in new set of answers
+				foreach($storedAnswers as $storedAnswer) {
+					$questionId = $storedAnswer->getQuestionId();
+	
+					if (empty($newAnswerTexts[$questionId]) || !in_array($storedAnswer->getText(), $newAnswerTexts[$questionId])) {
+						$this->answerMapper->delete($storedAnswer);
+					}
+				}
 			}
 		}
 	}
@@ -1616,6 +1733,64 @@ class ApiController extends OCSController {
 		}
 
 		return $form;
+	}
+
+	/**
+	 * check a submission and return some required data objects
+	 *
+	 * @param int $formId the form id
+	 * @param array $answers [question_id => arrayOfString]
+	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
+	 * @return array
+	 * @throws OCSBadRequestException
+	 * @throws OCSForbiddenException
+	 */
+	private function checkAndPrepareSubmission(int $formId, array $answers, string $shareHash = ''): array {
+		try {
+			$form = $this->formMapper->findById($formId);
+			$questions = $this->formsService->getQuestions($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new OCSBadRequestException();
+		}
+
+		// Does the user have access to the form (Either by logged in user, or by providing public share-hash.)
+		try {
+			$isPublicShare = false;
+
+			// If hash given, find the corresponding share & check if hash corresponds to given formId.
+			if ($shareHash !== '') {
+				// public by legacy Link
+				if (isset($form->getAccess()['legacyLink']) && $shareHash === $form->getHash()) {
+					$isPublicShare = true;
+				}
+
+				// Public link share
+				$share = $this->shareMapper->findPublicShareByHash($shareHash);
+				if ($share->getFormId() === $formId) {
+					$isPublicShare = true;
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			// $isPublicShare already false.
+		} finally {
+			// Now forbid, if no public share and no direct share.
+			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
+				throw new OCSForbiddenException('Not allowed to access this form');
+			}
+		}
+
+		// Not allowed if form has expired.
+		if ($this->formsService->hasFormExpired($form)) {
+			throw new OCSForbiddenException('This form is no longer taking answers');
+		}
+
+		// Is the submission valid
+		if (!$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId())) {
+			throw new OCSBadRequestException('At least one submitted answer is not valid');
+		}
+
+		return array($form, $questions);
 	}
 
 	/**
