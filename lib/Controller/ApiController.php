@@ -1349,17 +1349,24 @@ class ApiController extends OCSController {
 		$submission->setTimestamp(time());
 		$this->submissionMapper->update($submission);
 
-		// Process Answers
-		foreach ($answers as $questionId => $answerArray) {
-			// Search corresponding Question, skip processing if not found
-			$questionIndex = array_search($questionId, array_column($questions, 'id'));
-			if ($questionIndex === false) {
-				continue;
+		if (empty($answers)) {
+			// Clear Answers
+			foreach ($questions as $question) {
+				$this->storeAnswersForQuestion($form, $submission->getId(), $question, array(''), true);
 			}
+		} else {
+			// Process Answers
+			foreach ($answers as $questionId => $answerArray) {
+				// Search corresponding Question, skip processing if not found
+				$questionIndex = array_search($questionId, array_column($questions, 'id'));
+				if ($questionIndex === false) {
+					continue;
+				}
 
-			$question = $questions[$questionIndex];
+				$question = $questions[$questionIndex];
 
-			$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray, true);
+				$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray, true);
+			}
 		}
 
 		//Create Activity
@@ -1684,15 +1691,15 @@ class ApiController extends OCSController {
 					$this->answerMapper->insert($answerEntity);
 				}
 			}
+		}
 
-			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
-				// drop all answers that are not in new set of answers
-				foreach($storedAnswers as $storedAnswer) {
-					$questionId = $storedAnswer->getQuestionId();
-	
-					if (empty($newAnswerTexts[$questionId]) || !in_array($storedAnswer->getText(), $newAnswerTexts[$questionId])) {
-						$this->answerMapper->delete($storedAnswer);
-					}
+		if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+			// drop all answers that are not in new set of answers
+			foreach($storedAnswers as $storedAnswer) {
+				$questionId = $storedAnswer->getQuestionId();
+
+				if (empty($newAnswerTexts[$questionId]) || !in_array($storedAnswer->getText(), $newAnswerTexts[$questionId])) {
+					$this->answerMapper->delete($storedAnswer);
 				}
 			}
 		}
