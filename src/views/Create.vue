@@ -13,6 +13,7 @@
 			:archived="isFormArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
+			:submission-count="form?.submissionCount"
 			@share-form="onShareForm" />
 
 		<NcEmptyContent

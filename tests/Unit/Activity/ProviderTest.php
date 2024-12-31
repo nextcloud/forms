@@ -85,11 +85,11 @@ class ProviderTest extends TestCase {
 			}));
 		$this->urlGenerator->expects($this->any())
 			->method('imagePath')
-			->will($this->returnValueMap([
+			->willReturnMap([
 				['core', 'actions/shared.svg', '/core/img/actions/shared.svg'],
 				['core', 'actions/add.svg', '/core/img/actions/add.svg'],
 				['forms', 'forms-dark.svg', '/apps/forms/img/forms-dark.svg']
-			]));
+			]);
 
 		$this->provider = new Provider('forms',
 			$this->formMapper,

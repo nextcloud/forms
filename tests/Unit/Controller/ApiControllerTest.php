@@ -48,6 +48,7 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCA\Forms\Tests\Unit\MockedMapperException;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
@@ -399,6 +400,7 @@ class ApiControllerTest extends TestCase {
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
+				'allowEditSubmissions' => false
 			]]
 		];
 	}
@@ -903,6 +905,12 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn(true);
 
+		$this->formsService
+			->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn(Constants::PERMISSION_ALL);
+
 		$this->submissionMapper
 			->expects($this->once())
 			->method('deleteById')
@@ -990,5 +998,536 @@ class ApiControllerTest extends TestCase {
 
 		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->updateForm(1, ['ownerId' => 'newOwner']));
 		$this->assertEquals('newOwner', $form->getOwnerId());
+	}
+	
+	public function testGetSubmission_invalidForm() {
+		$exception = $this->createMock(MapperException::class);
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willThrowException($exception);
+		$this->expectException(NoSuchFormException::class);
+		$this->apiController->getSubmission(1, 42);
+	}
+	
+	public function testGetSubmission_noPermissions() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+	
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+	
+		$this->formsService->expects($this->once())
+			->method('canSeeResults')
+			->with($form)
+			->willReturn(false);
+	
+		$this->expectException(NoSuchFormException::class);
+		$this->apiController->getSubmission(1, 42);
+	}
+	
+	public function testGetSubmission_notFound() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+	
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+	
+		$this->formsService->expects($this->once())
+			->method('canSeeResults')
+			->with($form)
+			->willReturn(true);
+	
+		$this->submissionService->expects($this->once()) // Changed from submissionMapper
+			->method('getSubmission')
+			->with(42)
+			->willReturn(null); // Service returns null when submission not found
+	
+		$this->expectException(OCSNotFoundException::class);
+		$this->expectExceptionMessage('Submission doesn\'t exist');
+		$this->apiController->getSubmission(1, 42);
+	}
+	
+	public function testGetSubmission_success() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+	
+		// Data that submissionService->getSubmission() is expected to return
+		$submissionDataFromService = [
+			'id' => 42,
+			'formId' => 1,
+			'userId' => 'jdoe',
+			// Add any other fields that SubmissionService::getSubmission would return, e.g., timestamp
+			'timestamp' => 1234567890
+		];
+	
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+	
+		$this->formsService->expects($this->once())
+			->method('canSeeResults')
+			->with($form)
+			->willReturn(true);
+	
+		$this->submissionService->expects($this->once()) // Changed from submissionMapper
+			->method('getSubmission')
+			->with(42)
+			->willReturn($submissionDataFromService); // Service returns an array
+	
+		$user = $this->createMock(IUser::class);
+		$user->method('getDisplayName')->willReturn('jdoe');
+		$this->userManager->expects($this->once())
+			->method('get')
+			->with('jdoe')
+			->willReturn($user);
+	
+		$expectedSubmissionInResponse = $submissionDataFromService;
+		$expectedSubmissionInResponse['userDisplayName'] = 'jdoe';
+		$this->assertEquals(new DataResponse($expectedSubmissionInResponse), $this->apiController->getSubmission(1, 42));
+	}
+
+	public function testGetSubmission_mismatchedFormId() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		// Data that submissionService->getSubmission() is expected to return
+		$submissionDataFromService = [
+			'id' => 42,
+			'formId' => 2, // Mismatched formId
+			'userId' => 'jdoe',
+			'timestamp' => 1234567890
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('canSeeResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->submissionService->expects($this->once()) // Changed from submissionMapper
+			->method('getSubmission')
+			->with(42)
+			->willReturn($submissionDataFromService); // Service returns an array
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Submission doesn\'t belong to given form');
+		$this->apiController->getSubmission(1, 42);
+	}
+
+	public function testGetSubmission_anonymousUser() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		// Data that submissionService->getSubmission() is expected to return
+		$submissionDataFromService = [
+			'id' => 42,
+			'formId' => 1,
+			'userId' => 'anon-user-123',
+			'timestamp' => 1234567890
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('canSeeResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->submissionService->expects($this->once()) // Changed from submissionMapper
+			->method('getSubmission')
+			->with(42)
+			->willReturn($submissionDataFromService); // Service returns an array
+
+		$this->l10n->expects($this->once())
+			->method('t')
+			->with('Anonymous response')
+			->willReturn('Anonymous response');
+
+		$expectedSubmissionInResponse = $submissionDataFromService;
+		$expectedSubmissionInResponse['userDisplayName'] = 'Anonymous response';
+		$this->assertEquals(new DataResponse($expectedSubmissionInResponse), $this->apiController->getSubmission(1, 42));
+	}
+
+	public function testGetSubmission_userNotFound() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		// Data that submissionService->getSubmission() is expected to return
+		$submissionDataFromService = [
+			'id' => 42,
+			'formId' => 1,
+			'userId' => 'nonExistentUser',
+			'timestamp' => 1234567890
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('canSeeResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->submissionService->expects($this->once()) // Changed from submissionMapper
+			->method('getSubmission')
+			->with(42)
+			->willReturn($submissionDataFromService); // Service returns an array
+
+		$this->userManager->expects($this->once())
+			->method('get')
+			->with('nonExistentUser')
+			->willReturn(null);
+
+		$expectedSubmissionInResponse = $submissionDataFromService;
+		$expectedSubmissionInResponse['userDisplayName'] = 'nonExistentUser'; // Fallback to userId
+		$this->assertEquals(new DataResponse($expectedSubmissionInResponse), $this->apiController->getSubmission(1, 42));
+	}
+
+	public function testUpdateSubmission_success() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+		$userId = 'currentUser';
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId($formId);
+		$submission->setUserId($userId);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->with($form)
+			->willReturn(false);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->submissionMapper->expects($this->once())
+			->method('update')
+			->with($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('deleteBySubmission')
+			->with($submissionId);
+
+		$this->answerMapper->expects($this->once())
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission')
+			->with($form, $submission);
+
+		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
+		$this->assertEquals(new DataResponse($submissionId), $response);
+	}
+
+	public function testUpdateSubmission_formNotEditable() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(false); // Form does not allow edits
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->willReturn(false);
+		
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Can only update if allowEditSubmissions is set');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_invalidAnswers() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['invalid_answer_format']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+		
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->willReturn(false);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->willThrowException(new \InvalidArgumentException('Invalid answers'));
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Invalid answers');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_submissionNotFound() {
+		$formId = 1;
+		$submissionId = 42; // This submission ID won't be found
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->willReturn(false);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willThrowException(new DoesNotExistException('Submission not found'));
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Submission doesn\'t exist');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_mismatchedFormId() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId(2); // Belongs to a different form
+		$submission->setUserId('currentUser');
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+		
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->willReturn(false);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Submission doesn\'t belong to given form');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_notOwnSubmission() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId($formId);
+		$submission->setUserId('anotherUser'); // Submission belongs to another user
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->willReturn(false);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('Can only update your own submissions');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_loadForm_notFound() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willThrowException(new DoesNotExistException('Form not found by mapper')); // Corrected Exception
+
+		$this->expectException(NoSuchFormException::class);
+		$this->expectExceptionMessage('Could not find form');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_loadForm_noAccess_noShare() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		// No share hash provided, so hasUserAccess will be checked
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(NoSuchFormException::class);
+		$this->expectExceptionMessage('Not allowed to access this form');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_loadForm_formExpired() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		// Assuming access is granted (e.g., via user access or a valid share)
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess') // Or shareMapper would be mocked if shareHash was used
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->with($form)
+			->willReturn(true); // Form has expired
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('This form is no longer taking answers');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
 	}
 }

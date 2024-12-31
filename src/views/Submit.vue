@@ -12,6 +12,7 @@
 			:archived="isArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
+			:submission-count="form?.submissionCount"
 			@share-form="onShareForm" />
 
 		<!-- Form is loading -->
@@ -208,9 +209,13 @@ import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
 
-import { FormState } from '../models/Constants.ts'
+import {
+	FormState,
+	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+} from '../models/Constants.ts'
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
@@ -457,6 +462,13 @@ export default {
 		hasAnswers() {
 			return Object.keys(this.answers).length > 0
 		},
+
+		submissionId() {
+			const id =
+				this.$route?.params.submissionId
+				|| loadState(appName, 'submissionId', null)
+			return id ? parseInt(id) : null
+		},
 	},
 
 	watch: {
@@ -490,7 +502,11 @@ export default {
 		}
 
 		if (this.isLoggedIn) {
-			this.initFromLocalStorage()
+			if (this.submissionId && this.form.allowEditSubmissions) {
+				this.fetchSubmission()
+			} else {
+				this.initFromLocalStorage()
+			}
 		}
 
 		SetWindowTitle(this.formTitle)
@@ -569,6 +585,81 @@ export default {
 			localStorage.removeItem(
 				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
 			)
+		},
+
+		async fetchSubmission() {
+			logger.debug(`Loading submission ${this.submissionId}`)
+
+			try {
+				const response = await axios.get(
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
+						{
+							id: this.form.id,
+							submissionId: this.submissionId,
+						},
+					),
+				)
+
+				const answers = {}
+				const loadedAnswers = OcsResponse2Data(response).answers
+				for (const answer of loadedAnswers) {
+					const questionId = answer.questionId
+					const text = answer.text
+					answers[questionId] = []
+
+					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
+					// Clean up answers for questions that do not exist anymore
+					if (!this.validQuestionsIds.has(parseInt(questionId))) {
+						this.showClearFormDueToChangeDialog = true
+						logger.debug('Question does not exist anymore', {
+							questionId,
+						})
+						continue
+					}
+
+					const question = this.form.questions.find(
+						(question) => question.id === questionId,
+					)
+					if (
+						['multiple', 'multiple_unique', 'dropdown'].includes(
+							question.type,
+						)
+					) {
+						const option = question.options.filter(
+							(option) => option.text === text,
+						)
+						if (option.length > 0) {
+							answers[questionId].push(String(option[0].id))
+						} else if (
+							question.extraSettings.allowOtherAnswer
+							&& !answers[questionId].some((answer) =>
+								answer.startsWith(
+									QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+								),
+							)
+						) {
+							answers[questionId].push(
+								QUESTION_EXTRASETTINGS_OTHER_PREFIX + text,
+							)
+						} else {
+							// error handling
+							logger.debug(
+								`option ${text} could not be mapped to an option for question ${questionId}`,
+							)
+						}
+					} else {
+						answers[questionId].push(text)
+					}
+				}
+
+				this.answers = answers
+			} catch (error) {
+				logger.error('Error while loading submission', { error })
+				showError(
+					t('forms', 'There was an error while loading the submission'),
+				)
+			}
 		},
 
 		/**
@@ -694,15 +785,30 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-						id: this.form.id,
-					}),
-					{
-						answers: this.answers,
-						shareHash: this.shareHash,
-					},
-				)
+				if (this.submissionId) {
+					await axios.put(
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
+							{
+								id: this.form.id,
+								submissionId: this.submissionId,
+							},
+						),
+						{
+							answers: this.answers,
+						},
+					)
+				} else {
+					await axios.post(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+							id: this.form.id,
+						}),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						},
+					)
+				}
 				this.submitForm = true
 				this.success = true
 				this.deleteFormFieldFromLocalStorage()
@@ -716,6 +822,9 @@ export default {
 				)
 			} finally {
 				this.loading = false
+				if (!this.publicView) {
+					this.fetchFullForm(this.form.id)
+				}
 			}
 		},
 

@@ -35,6 +35,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setIsAnonymous(bool $value)
  * @method int getSubmitMultiple()
  * @method void setSubmitMultiple(bool $value)
+ * @method int getAllowEditSubmissions()
+ * @method void setAllowEditSubmissions(bool $value)
  * @method int getShowExpiration()
  * @method void setShowExpiration(bool $value)
  * @method int getLastUpdated()
@@ -58,6 +60,7 @@ class Form extends Entity {
 	protected $expires;
 	protected $isAnonymous;
 	protected $submitMultiple;
+	protected $allowEditSubmissions;
 	protected $showExpiration;
 	protected $submissionMessage;
 	protected $lastUpdated;
@@ -71,6 +74,7 @@ class Form extends Entity {
 		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'boolean');
 		$this->addType('submitMultiple', 'boolean');
+		$this->addType('allowEditSubmissions', 'boolean');
 		$this->addType('showExpiration', 'boolean');
 		$this->addType('lastUpdated', 'integer');
 		$this->addType('state', 'integer');
@@ -140,6 +144,7 @@ class Form extends Entity {
 	 *   expires: int,
 	 *   isAnonymous: bool,
 	 *   submitMultiple: bool,
+	 *   allowEditSubmissions: bool,
 	 *   showExpiration: bool,
 	 *   lastUpdated: int,
 	 *   submissionMessage: ?string,
@@ -160,6 +165,7 @@ class Form extends Entity {
 			'expires' => (int)$this->getExpires(),
 			'isAnonymous' => (bool)$this->getIsAnonymous(),
 			'submitMultiple' => (bool)$this->getSubmitMultiple(),
+			'allowEditSubmissions' => (bool)$this->getAllowEditSubmissions(),
 			'showExpiration' => (bool)$this->getShowExpiration(),
 			'lastUpdated' => (int)$this->getLastUpdated(),
 			'submissionMessage' => $this->getSubmissionMessage(),

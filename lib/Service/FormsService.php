@@ -203,6 +203,13 @@ class FormsService {
 		// Append submissionCount if currentUser has permissions to see results
 		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
 			$result['submissionCount'] = $this->submissionMapper->countSubmissions($form->getId());
+		} elseif ($this->currentUser) {
+			$userSubmissionCount = $this->submissionMapper->countSubmissions($form->getId(), $this->currentUser->getUID());
+			if ($userSubmissionCount > 0) {
+				$result['submissionCount'] = $userSubmissionCount;
+				// Append `results` permission if user has submitted to the form
+				$result['permissions'][] = Constants::PERMISSION_RESULTS;
+			}
 		}
 
 		if ($result['fileId']) {
@@ -239,6 +246,13 @@ class FormsService {
 		// Append submissionCount if currentUser has permissions to see results
 		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
 			$result['submissionCount'] = $this->submissionMapper->countSubmissions($form->getId());
+		} else {
+			$userSubmissionCount = $this->submissionMapper->countSubmissions($form->getId(), $this->currentUser->getUID());
+			if ($userSubmissionCount > 0) {
+				$result['submissionCount'] = $userSubmissionCount;
+				// Append `results` permission if user has submitted to the form
+				$result['permissions'][] = Constants::PERMISSION_RESULTS;
+			}
 		}
 
 		return $result;
@@ -309,29 +323,47 @@ class FormsService {
 	}
 
 	/**
-	 * Can the current user see results of a form
+	 * Determines if the current user has permission to view the results of a given form.
 	 *
-	 * @param Form $form
-	 * @return boolean
+	 * A user can see the results of a form if they have made at least one submission
+	 * to the form or possess the required permission to view results.
+	 *
+	 * @param Form $form The form for which the results visibility is being checked.
+	 * @return bool True if the user can see the results, false otherwise.
 	 */
 	public function canSeeResults(Form $form): bool {
-		return in_array(Constants::PERMISSION_RESULTS, $this->getPermissions($form));
+		return $this->submissionMapper->countSubmissions($form->getId(), $this->currentUser->getUID()) > 0
+			|| in_array(Constants::PERMISSION_RESULTS, $this->getPermissions($form));
 	}
 
 	/**
-	 * Can the current user delete results of a form
+	 * Determines if the current user has permission to delete the results of a given form.
 	 *
-	 * @param Form $form
-	 * @return boolean
+	 * A user can delete the results of a form if the form is not archived and one of the following conditions is met:
+	 * - The user has the "results_delete" permission.
+	 * - The user has not submitted any responses, and the form allows editing.
+	 * - The form is not archived.
+	 *
+	 * @param Form $form The form for which the results deletion permission is being checked.
+	 * @return bool True if the user can delete the results, false otherwise.
 	 */
 	public function canDeleteResults(Form $form): bool {
-		// Check permissions
-		if (!in_array(Constants::PERMISSION_RESULTS_DELETE, $this->getPermissions($form))) {
+		// Do not allow deleting results on archived forms
+		if ($this->isFormArchived($form)) {
 			return false;
 		}
+		
+		// Allow deleting results if the current user has the "results_delete" permission
+		if (in_array(Constants::PERMISSION_RESULTS_DELETE, $this->getPermissions($form))) {
+			return true;
+		}
 
-		// Do not allow deleting results on archived forms
-		return !$this->isFormArchived($form);
+		// Allow deleting results if the current user has already submitted
+		if ($form->getAllowEditSubmissions() && $this->submissionMapper->countSubmissions($form->getId(), $this->currentUser->getUID()) > 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -351,7 +383,7 @@ class FormsService {
 			return true;
 		}
 
-		// Refuse access, if SubmitMultiple is not set and user already has taken part.
+		// Refuse access, if submitMultiple is not set and user already has taken part.
 		if (
 			!$form->getSubmitMultiple() &&
 			$this->submissionMapper->hasFormSubmissionsByUser($form, $this->currentUser->getUID())
@@ -445,7 +477,7 @@ class FormsService {
 			return false;
 		}
 
-		// Shown if permitall and showntoall are both set.
+		// Shown if permitAll and showToAll are both set.
 		if ($form->getAccess()['permitAllUsers'] &&
 			$form->getAccess()['showToAllUsers'] &&
 			$this->configService->getAllowPermitAll() &&

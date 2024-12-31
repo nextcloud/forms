@@ -19,7 +19,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
-
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -163,12 +163,17 @@ class SubmissionServiceTest extends TestCase {
 			->with(5)
 			->willReturn([$submission_1, $submission_2]);
 
+		$this->submissionMapper->expects($this->once())
+			->method('findByFormAndUser')
+			->with(5, 'someOtherUser')
+			->willReturn([$submission_2]);
+
 		$this->answerMapper->expects($this->any())
 			->method('findBySubmission')
-			->will($this->returnValueMap([
+			->willReturnMap([
 				[42, [$answer_1, $answer_2]],
 				[43, []]
-			]));
+			]);
 
 		$expected = [
 			[
@@ -202,7 +207,73 @@ class SubmissionServiceTest extends TestCase {
 			]
 		];
 
+		// All submissions
 		$this->assertEquals($expected, $this->submissionService->getSubmissions(5));
+		// Only submissions for a single user
+		$this->assertEquals([$expected[1]], $this->submissionService->getSubmissions(5, 'someOtherUser'));
+	}
+
+	public function testGetSubmission() {
+		$submission_1 = new Submission();
+		$submission_1->setId(42);
+		$submission_1->setFormId(5);
+		$submission_1->setUserId('someUser');
+		$submission_1->setTimestamp(123456);
+		$answer_1 = new Answer();
+		$answer_1->setId(35);
+		$answer_1->setSubmissionId(42);
+		$answer_1->setQuestionId(422);
+		$answer_1->setText('Just some Text');
+		$answer_2 = new Answer();
+		$answer_2->setId(36);
+		$answer_2->setSubmissionId(42);
+		$answer_2->setQuestionId(423);
+		$answer_2->setText('Just some more Text');
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with(42)
+			->willReturn($submission_1);
+
+		$this->answerMapper->expects($this->any())
+			->method('findBySubmission')
+			->willReturnMap([
+				[42, [$answer_1, $answer_2]]
+			]);
+
+		$expected = [
+			'id' => 42,
+			'formId' => 5,
+			'userId' => 'someUser',
+			'timestamp' => 123456,
+			'answers' => [
+				[
+					'id' => 35,
+					'submissionId' => 42,
+					'questionId' => 422,
+					'text' => 'Just some Text',
+					'fileId' => null,
+				],
+				[
+					'id' => 36,
+					'submissionId' => 42,
+					'questionId' => 423,
+					'text' => 'Just some more Text',
+					'fileId' => null,
+				]
+			]
+		];
+
+		$this->assertEquals($expected, $this->submissionService->getSubmission(42));
+	}
+
+	public function testGetSubmissionNotFound() {
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with(999)
+			->willThrowException(new DoesNotExistException('Submission not found'));
+
+		$this->assertNull($this->submissionService->getSubmission(999));
 	}
 
 	public function dataWriteFileToCloud() {
@@ -581,11 +652,11 @@ file2.txt"
 			->will($this->onConsecutiveCalls('User 1', 'User 2'));
 		$this->userManager->expects($this->any())
 			->method('get')
-			->will($this->returnValueMap([
+			->willReturnMap([
 				['user1', $user],
 				['user2', $user],
 				['unknown', null]
-			]));
+			]);
 
 		$this->answerMapper->expects($this->any())
 			->method('findBySubmission')

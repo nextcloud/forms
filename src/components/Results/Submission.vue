@@ -10,6 +10,17 @@
 				{{ submission.userDisplayName }}
 			</h3>
 			<NcActions class="submission-menu" force-menu>
+				<NcActionRouter
+					v-if="canEditSubmission"
+					:to="{
+						name: 'submit',
+						params: { hash: formHash, submissionId: submission.id },
+					}">
+					<template #icon>
+						<IconPencil :size="20" />
+					</template>
+					{{ t('forms', 'Edit this response') }}
+				</NcActionRouter>
 				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>
 						<IconDelete :size="20" />
@@ -34,8 +45,10 @@
 <script>
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import moment from '@nextcloud/moment'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconPencil from 'vue-material-design-icons/Pencil.vue'
 
 import Answer from './Answer.vue'
 import { generateUrl } from '@nextcloud/router'
@@ -46,11 +59,17 @@ export default {
 	components: {
 		Answer,
 		IconDelete,
+		IconPencil,
 		NcActions,
 		NcActionButton,
+		NcActionRouter,
 	},
 
 	props: {
+		formHash: {
+			type: String,
+			required: true,
+		},
 		submission: {
 			type: Object,
 			required: true,
@@ -60,6 +79,10 @@ export default {
 			required: true,
 		},
 		canDeleteSubmission: {
+			type: Boolean,
+			required: true,
+		},
+		canEditSubmission: {
 			type: Boolean,
 			required: true,
 		},

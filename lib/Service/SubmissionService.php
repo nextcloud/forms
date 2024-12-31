@@ -91,6 +91,7 @@ class SubmissionService {
 	 * Get all submissions of a form
 	 *
 	 * @param int $formId the form id
+	 * @param string|null $userId optional user id to filter submissions
 	 * @return list<array{
 	 *     id: int,
 	 *     formId: int,
@@ -99,10 +100,15 @@ class SubmissionService {
 	 *     answers: list<FormsAnswer>,
 	 * }>
 	 */
-	public function getSubmissions(int $formId): array {
+	public function getSubmissions(int $formId, ?string $userId = null): array {
 		$submissionList = [];
 		try {
-			$submissionEntities = $this->submissionMapper->findByForm($formId);
+			if (is_null($userId)) {
+				$submissionEntities = $this->submissionMapper->findByForm($formId);
+			} else {
+				$submissionEntities = $this->submissionMapper->findByFormAndUser($formId, $userId);
+			}
+
 			foreach ($submissionEntities as $submissionEntity) {
 				$submission = $submissionEntity->read();
 				$submission['answers'] = $this->getAnswers($submission['id']);
@@ -112,6 +118,29 @@ class SubmissionService {
 			// Just ignore, if no Data. Returns empty Submissions-Array
 		} finally {
 			return $submissionList;
+		}
+	}
+
+	/**
+	 * Load specific submission
+	 *
+	 * @param integer $submissionId id of the submission
+	 * @return array{
+	 *     id: int,
+	 *     formId: int,
+	 *     userId: string,
+	 *     timestamp: int,
+	 *     answers: list<FormsAnswer>,
+	 * }
+	 */
+	public function getSubmission(int $submissionId): ?array {
+		try {
+			$submissionEntity = $this->submissionMapper->findById($submissionId);
+			$submission = $submissionEntity->read();
+			$submission['answers'] = $this->getAnswers($submission['id']);
+			return $submission;
+		} catch (DoesNotExistException $e) {
+			return null;
 		}
 	}
 

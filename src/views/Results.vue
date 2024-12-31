@@ -22,6 +22,7 @@
 			:archived="isFormArchived"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
+			:submission-count="form?.submissionCount"
 			@share-form="onShareForm" />
 
 		<!-- Loading submissions -->
@@ -204,9 +205,11 @@
 				<Submission
 					v-for="submission in submissions"
 					:key="submission.id"
+					:form-hash="form.hash"
 					:submission="submission"
 					:questions="questions"
-					:can-delete-submission="canDeleteSubmissions"
+					:can-delete-submission="canDeleteSubmission(submission.userId)"
+					:can-edit-submission="canEditSubmission(submission.userId)"
 					@delete="deleteSubmission(submission.id)" />
 			</section>
 		</template>
@@ -227,7 +230,7 @@
 </template>
 
 <script>
-import { getRequestToken } from '@nextcloud/auth'
+import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
@@ -626,6 +629,36 @@ export default {
 				logger.error('Error while exporting to Files', { error })
 				showError(t('forms', 'There was an error, while exporting to Files'))
 			}
+		},
+
+		/**
+		 * Determines if a submission can be deleted.
+		 *
+		 * @param {string} submissionUser - The ID of the user who created the submission.
+		 * @return {boolean} - Returns true if the submission can be deleted, otherwise false.
+		 *                     	A submission can be deleted if:
+		 *                      - The user has the `canDeleteSubmissions` permission, or
+		 *                      - The form allows editing (`form.allowEditSubmissions`) and the current user is the owner of the submission.
+		 */
+		canDeleteSubmission(submissionUser) {
+			return (
+				this.canDeleteSubmissions
+				|| (this.form.allowEditSubmissions
+					&& getCurrentUser().uid === submissionUser)
+			)
+		},
+
+		/**
+		 * Determines if a submission can be edited.
+		 *
+		 * @param {string} submissionUser - The ID of the user who created the submission.
+		 * @return {boolean} - Returns true if the submission can be edited, otherwise false.
+		 */
+		canEditSubmission(submissionUser) {
+			return (
+				this.form.allowEditSubmissions
+				&& getCurrentUser().uid === submissionUser
+			)
 		},
 
 		async deleteSubmission(id) {

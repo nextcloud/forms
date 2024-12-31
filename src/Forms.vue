@@ -286,6 +286,9 @@ export default {
 				return {}
 			},
 			set(form) {
+				// always close sidebar
+				this.sidebarOpened = false
+
 				// If a owned form
 				let index = this.forms.findIndex(
 					(search) => search.hash === this.routeHash,
