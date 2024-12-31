@@ -1352,7 +1352,7 @@ class ApiController extends OCSController {
 		if (empty($answers)) {
 			// Clear Answers
 			foreach ($questions as $question) {
-				$this->storeAnswersForQuestion($form, $submission->getId(), $question, ['']), true);
+				$this->storeAnswersForQuestion($form, $submission->getId(), $question, [''], true);
 			}
 		} else {
 			// Process Answers
