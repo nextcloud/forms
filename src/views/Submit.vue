@@ -138,6 +138,17 @@
 						</template>
 						{{ t('forms', 'Submit') }}
 					</NcButton>
+					<NcButton
+						v-if="!newSubmission"
+						class="delete-button"
+						:disabled="loading"
+						type="button"
+						@click="onDeleteSubmission">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconDeleteSvg" />
+						</template>
+						{{ t('forms', 'Delete') }}
+					</NcButton>
 				</div>
 			</form>
 
@@ -207,6 +218,7 @@ import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 
 import { FormState } from '../models/FormStates.ts'
 import answerTypes from '../models/AnswerTypes.js'
@@ -284,6 +296,7 @@ export default {
 			IconCheckSvg,
 			IconRefreshSvg,
 			IconSendSvg,
+			IconDeleteSvg,
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 		}
@@ -694,15 +707,25 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+				if (this.newSubmission === false) {
+					await axios.post(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions/{submissionId}', {
+							id: this.form.id,
+							submissionId: this.submissionId
+						}),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						})
+				} else {
+					await axios.post(generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
 						id: this.form.id,
 					}),
 					{
 						answers: this.answers,
 						shareHash: this.shareHash,
-					},
-				)
+					})
+				}
 				this.submitForm = true
 				this.success = true
 				this.deleteFormFieldFromLocalStorage()
@@ -725,10 +748,43 @@ export default {
 		},
 
 		/**
+		 * Delete the submission
+		 */
+		async onDeleteSubmission() {
+			if (!confirm(t('forms', 'Are you sure you want to delete your response?'))) {
+				return
+			}
+
+			this.loading = true
+
+			try {
+				if (this.newSubmission === false) {
+					await axios.delete(generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions/{submissionId}', {
+							id: this.form.id,
+							submissionId: this.submissionId
+						}))
+				} else {
+					throw new Error('cannot delete new submission')
+				}
+				this.success = true
+				this.submitForm = true
+				this.success = true
+				this.deleteFormFieldFromLocalStorage()
+				emit('forms:last-updated:set', this.form.id)
+			} catch (error) {
+				logger.error('Error while deleting the form submission', { error })
+				showError(t('forms', 'There was an error deleting the form submission'))
+			} finally {
+				this.loading = false
+			}
+		},
+
+		/**
 		 * Reset View-Data
 		 */
 		resetData() {
 			this.answers = {}
+			this.newSubmission = true
 			this.loading = false
 			this.showConfirmLeaveDialog = false
 			this.showClearFormDialog = false
@@ -831,6 +887,13 @@ export default {
 		.submit-button {
 			margin: 5px;
 			margin-block-end: 160px;
+			padding-inline-start: 20px;
+		}
+
+		.delete-button {
+			float:right;
+			background-color: red;
+			margin: 5px;
 			padding-inline-start: 20px;
 		}
 	}
