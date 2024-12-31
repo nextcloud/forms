@@ -106,7 +106,7 @@ class FormsService {
 			$answer = $answerEntity->read();
 			$questionId = $answer['questionId'];
 			if (!array_key_exists($questionId, $answerList)) {
-				$answerList[$questionId] = array();
+				$answerList[$questionId] = [];
 			}
 			$options = $this->getOptions($answer['questionId']);
 			if (!empty($options)) {
