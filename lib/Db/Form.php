@@ -74,7 +74,7 @@ class Form extends Entity {
 		$this->addType('expires', 'integer');
 		$this->addType('isAnonymous', 'boolean');
 		$this->addType('submitMultiple', 'boolean');
-		$this->addType('allowEdit', 'bool');
+		$this->addType('allowEdit', 'boolean');
 		$this->addType('showExpiration', 'boolean');
 		$this->addType('lastUpdated', 'integer');
 		$this->addType('state', 'integer');

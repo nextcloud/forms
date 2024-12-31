@@ -234,9 +234,7 @@ class FormsService {
 					$result['submissionId'] = $submissionEntity->getId();
 				}
 			} catch (DoesNotExistException $e) {
-				// do nothing
-			} catch (MultipleObjectsReturnedException $e) {
-				// do nothing
+				//handle silently
 			}
 		}
 
