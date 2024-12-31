@@ -146,6 +146,7 @@ class FormsMigrator implements IMigrator {
 				$form->setExpires($formData['expires']);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
+				$form->setAllowEdit($formData['allowEdit']);
 				$form->setShowExpiration($formData['showExpiration']);
 				
 				$this->formMapper->insert($form);

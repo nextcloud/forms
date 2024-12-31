@@ -27,6 +27,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | isAnonymous       | Boolean                              |                                         | If Answers will be stored anonymously                                                                                            |
 | state             | Integer                              | [Form state](#form-state)               | The state of the form                                                                                                            |
 | submitMultiple    | Boolean                              |                                         | If users are allowed to submit multiple times to the form                                                                        |
+| allowEdit         | Boolean                              |                                         | If users are allowed to edit or delete their response                                                                            |
 | showExpiration    | Boolean                              |                                         | If the expiration date will be shown on the form                                                                                 |
 | canSubmit         | Boolean                              |                                         | If the user can Submit to the form, i.e. calculated information out of `submitMultiple` and existing submissions.                |
 | permissions       | Array of [Permissions](#permissions) | Array of permissions regarding the form |
@@ -46,6 +47,7 @@ This document describes the Object-Structure, that is used within the Forms App 
   "expires": 0,
   "isAnonymous": false,
   "submitMultiple": true,
+  "allowEdit": false,
   "showExpiration": false,
   "canSubmit": true,
   "permissions": [

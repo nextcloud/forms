@@ -43,6 +43,26 @@ class AnswerMapper extends QBMapper {
 
 	/**
 	 * @param int $submissionId
+	 * @param int $questionId
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @return Answer[]
+	 */
+
+	public function findBySubmissionAndQuestion(int $submissionId, int $questionId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT))
+			);
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @param int $submissionId
 	 */
 	public function deleteBySubmission(int $submissionId): void {
 		$qb = $this->db->getQueryBuilder();
