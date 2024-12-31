@@ -21,7 +21,8 @@
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
-		<NcCheckboxRadioSwitch v-tooltip="disableAllowEditExplanation"
+		<NcCheckboxRadioSwitch
+			v-tooltip="disableAllowEditExplanation"
 			:checked="allowEdit"
 			type="switch"
 			:disabled="disableAllowEdit"
@@ -211,7 +212,8 @@ export default {
 			if (this.disableAllowEdit) {
 				return t(
 					'forms',
-					'This can not be controlled, if the form has a public link or stores responses anonymously, or multiple responses are allowed.')
+					'This can not be controlled, if the form has a public link or stores responses anonymously, or multiple responses are allowed.',
+				)
 			}
 			return ''
 		},
@@ -226,7 +228,7 @@ export default {
 		// If disabled, submitMultiple will be casted to false if allowEdit is true, else casted to true
 		submitMultiple() {
 			if (this.disableSubmitMultiple && this.allowEdit) {
-				return false;
+				return false
 			}
 			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
@@ -234,7 +236,7 @@ export default {
 		// If disabled, allowEdit will be casted to false
 		allowEdit() {
 			if (this.disableAllowEdit) {
-				return false;
+				return false
 			}
 			return this.form.allowEdit
 		},
