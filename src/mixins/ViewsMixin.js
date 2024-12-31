@@ -135,8 +135,14 @@ export default {
 				const response = await request(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}', { id }),
 				)
-				this.$emit('update:form', OcsResponse2Data(response))
+				await this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
+				// load answers from the server into this form
+				if (this.form.answers) {
+					this.answers = this.form.answers
+					this.newSubmission = this.form.newSubmission
+					this.submissionId = this.form.submissionId
+				}
 			} catch (error) {
 				if (isCancel(error)) {
 					logger.debug(`The request for form ${id} has been canceled`, {
