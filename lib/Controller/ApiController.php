@@ -1333,7 +1333,7 @@ class ApiController extends OCSController {
 			'shareHash' => $shareHash,
 		]);
 
-		list($form, $questions) = $this->checkAndPrepareSubmission($formId, $answers, $shareHash);
+		[$form, $questions] = $this->checkAndPrepareSubmission($formId, $answers, $shareHash);
 
 		// if edit is allowed get existing submission of this user
 		if ($form->getAllowEdit() && $this->currentUser) {
@@ -1352,7 +1352,7 @@ class ApiController extends OCSController {
 		if (empty($answers)) {
 			// Clear Answers
 			foreach ($questions as $question) {
-				$this->storeAnswersForQuestion($form, $submission->getId(), $question, array(''), true);
+				$this->storeAnswersForQuestion($form, $submission->getId(), $question, ['']), true);
 			}
 		} else {
 			// Process Answers
@@ -1603,7 +1603,7 @@ class ApiController extends OCSController {
 			$storedAnswers = $this->answerMapper->findBySubmissionAndQuestion($submissionId, $question['id']);
 		}
 
-		$newAnswerTexts = array();
+		$newAnswerTexts = [];
 		
 		foreach ($answerArray as $answer) {
 			$answerEntity = new Answer();
@@ -1629,7 +1629,7 @@ class ApiController extends OCSController {
 
 				// has this answer already been stored?
 				$foundAnswer = false;
-				foreach($storedAnswers as $storedAnswer) {
+				foreach ($storedAnswers as $storedAnswer) {
 					if ($storedAnswer->getText() == $answerText) {
 						// nothing to be changed
 						$foundAnswer = true;
@@ -1637,7 +1637,7 @@ class ApiController extends OCSController {
 					}
 				}
 				if (!$foundAnswer) {
-					if ($answerText === "") {
+					if ($answerText === '') {
 						continue;
 					}
 					// need to add answer
@@ -1681,7 +1681,7 @@ class ApiController extends OCSController {
 					$answerEntity->setText($answerText);
 					$this->answerMapper->update($answerEntity);
 				} else {
-					if ($answerText === "") {
+					if ($answerText === '') {
 						continue;
 					}
 					$answerEntity = new Answer();
@@ -1695,7 +1695,7 @@ class ApiController extends OCSController {
 
 		if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 			// drop all answers that are not in new set of answers
-			foreach($storedAnswers as $storedAnswer) {
+			foreach ($storedAnswers as $storedAnswer) {
 				$questionId = $storedAnswer->getQuestionId();
 
 				if (empty($newAnswerTexts[$questionId]) || !in_array($storedAnswer->getText(), $newAnswerTexts[$questionId])) {
@@ -1797,7 +1797,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('At least one submitted answer is not valid');
 		}
 
-		return array($form, $questions);
+		return [$form, $questions];
 	}
 
 	/**
