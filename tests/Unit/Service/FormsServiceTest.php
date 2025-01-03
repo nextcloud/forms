@@ -42,6 +42,7 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -85,6 +86,9 @@ class FormsServiceTest extends TestCase {
 	/** @var SubmissionMapper|MockObject */
 	private $submissionMapper;
 
+	/** @var AnswerMapper|MockObject */
+	private $answerMapper;
+
 	/** @var ConfigService|MockObject */
 	private $configService;
 
@@ -114,6 +118,7 @@ class FormsServiceTest extends TestCase {
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
+		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
@@ -147,6 +152,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -243,7 +249,8 @@ class FormsServiceTest extends TestCase {
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
-				'permissions' => Constants::PERMISSION_ALL
+				'permissions' => Constants::PERMISSION_ALL,
+				'allowEdit' => false,
 			]]
 		];
 	}
@@ -456,6 +463,7 @@ class FormsServiceTest extends TestCase {
 					'submit'
 				],
 				'submissionMessage' => null,
+				'allowEdit' => false,
 			]]
 		];
 	}
@@ -622,6 +630,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -861,6 +870,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -972,6 +982,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -1203,6 +1214,7 @@ class FormsServiceTest extends TestCase {
 				$this->questionMapper,
 				$this->shareMapper,
 				$this->submissionMapper,
+				$this->answerMapper,
 				$this->configService,
 				$this->groupManager,
 				$this->userManager,
