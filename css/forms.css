@@ -9,3 +9,14 @@
 html {
 	scroll-padding-top: calc(var(--header-height) + 60px);
 }
+
+.icon-forms {
+	background-image: url(../img/forms-dark.svg);
+	filter: var(--background-invert-if-dark);
+}
+
+.icon-forms-white,
+.icon-forms.icon-white {
+	background-image: url(../img/forms.svg);
+	filter: var(--background-invert-if-dark);
+}

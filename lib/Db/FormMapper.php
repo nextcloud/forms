@@ -97,9 +97,10 @@ class FormMapper extends QBMapper {
 	 * @param string[] $groups IDs of groups the user is memeber of
 	 * @param string[] $teams IDs of teams the user is memeber of
 	 * @param bool $filterShown Set to false to also include forms shared but not visible on sidebar
+	 * @param string $queryTerm optional: The search query for universal search
 	 * @return Form[]
 	 */
-	public function findSharedForms(string $userId, array $groups = [], array $teams = [], bool $filterShown = true): array {
+	public function findSharedForms(string $userId, array $groups = [], array $teams = [], bool $filterShown = true, ?string $queryTerm = null): array {
 		$qbShares = $this->db->getQueryBuilder();
 		$qbForms = $this->db->getQueryBuilder();
 
@@ -156,6 +157,11 @@ class FormMapper extends QBMapper {
 			->addOrderBy('last_updated', 'DESC')
 			->addOrderBy('created', 'DESC');
 
+		if ($queryTerm) {
+			$qbForms->andWhere($qbForms->expr()->iLike('title', $qbForms->createNamedParameter('%' . $this->db->escapeLikeParameter($queryTerm) . '%')) .
+				' OR ' . $qbForms->expr()->iLike('description', $qbForms->createNamedParameter('%' . $this->db->escapeLikeParameter($queryTerm) . '%')));
+		}
+
 		// We need to add the parameters from the shared forms IDs select to the final select query
 		$qbForms->setParameters($qbShares->getParameters(), $qbShares->getParameterTypes());
 
@@ -163,9 +169,10 @@ class FormMapper extends QBMapper {
 	}
 
 	/**
+	 * @param string $queryTerm optional: The search query for universal search
 	 * @return Form[]
 	 */
-	public function findAllByOwnerId(string $ownerId): array {
+	public function findAllByOwnerId(string $ownerId, ?string $queryTerm = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
@@ -176,6 +183,11 @@ class FormMapper extends QBMapper {
 			//Last updated forms first, then newest forms first
 			->addOrderBy('last_updated', 'DESC')
 			->addOrderBy('created', 'DESC');
+
+		if ($queryTerm) {
+			$qb->andWhere($qb->expr()->iLike('title', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($queryTerm) . '%')) .
+				' OR ' . $qb->expr()->iLike('description', $qb->createNamedParameter('%' . $this->db->escapeLikeParameter($queryTerm) . '%')));
+		}
 
 		return $this->findEntities($qb);
 	}

@@ -14,6 +14,7 @@ use OCA\Forms\Capabilities;
 use OCA\Forms\FormsMigrator;
 use OCA\Forms\Listener\AnalyticsDatasourceListener;
 use OCA\Forms\Listener\UserDeletedListener;
+use OCA\Forms\Search\SearchProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -42,6 +43,7 @@ class Application extends App implements IBootstrap {
 		$context->registerCapability(Capabilities::class);
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
+		$context->registerSearchProvider(SearchProvider::class);
 		$context->registerUserMigrator(FormsMigrator::class);
 	}
 
