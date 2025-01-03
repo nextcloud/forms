@@ -32,6 +32,7 @@ use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\ActivityManager;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Option;
@@ -42,7 +43,6 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
-use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
