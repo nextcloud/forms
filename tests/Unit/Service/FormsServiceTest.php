@@ -810,7 +810,21 @@ class FormsServiceTest extends TestCase {
 				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => true
-			]
+			],
+			'allowEditGood' => [
+				'ownerId' => 'someUser',
+				'submitMultiple' => false,
+				'allowEdit' => true,
+				'hasFormSubmissionsByUser' => true,
+				'expected' => true
+			],
+			'allowEditNotGood' => [
+				'ownerId' => 'someUser',
+				'submitMultiple' => false,
+				'allowEdit' => false,
+				'hasFormSubmissionsByUser' => true,
+				'expected' => false
+			],
 		];
 	}
 	/**
