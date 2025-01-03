@@ -786,24 +786,28 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			],
 			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => false,
 				'expected' => true
 			],
 			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			]
