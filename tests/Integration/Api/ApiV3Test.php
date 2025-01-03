@@ -366,6 +366,7 @@ class ApiV3Test extends IntegrationBase {
 					'state' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false,
 					// 'lastUpdated' => time() can not be checked exactly
 					'canSubmit' => true,
@@ -425,6 +426,7 @@ class ApiV3Test extends IntegrationBase {
 					'state' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false,
 					'lastUpdated' => 123456789,
 					'canSubmit' => true,
