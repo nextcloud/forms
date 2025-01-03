@@ -821,7 +821,7 @@ class FormsServiceTest extends TestCase {
 	 * @param bool $hasFormSubmissionsByUser
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $hasFormSubmissionsByUser, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $allowEdit, bool $hasFormSubmissionsByUser, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -830,6 +830,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setOwnerId($ownerId);
 		$form->setSubmitMultiple($submitMultiple);
+		$form->setAllowEdit($allowEdit);
 
 		$this->submissionMapper->expects($this->any())
 			->method('hasFormSubmissionsByUser')
