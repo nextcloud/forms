@@ -11,6 +11,8 @@ use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use OCP\IUser;
+use OCP\Search\ISearchQuery;
 use OCP\Share\IShare;
 
 /**
@@ -177,6 +179,18 @@ class FormMapper extends QBMapper {
 			->addOrderBy('last_updated', 'DESC')
 			->addOrderBy('created', 'DESC');
 
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @param IUser $user the user that performs the search
+	 * @param ISearchQuery $query the query to search the forms
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @return Form[] array of Forms
+	 */
+	public function search(IUser $user, ISearchQuery $query): array {
+		$qb = $this->db->getQueryBuilder();
+		// TODO: implement search for Query Builder
 		return $this->findEntities($qb);
 	}
 

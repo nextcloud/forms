@@ -29,6 +29,7 @@ use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Search\ISearchQuery;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
@@ -696,6 +697,23 @@ class FormsService {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Get list of forms
+	 *
+	 * @param IUser $user the user that performs the search
+	 * @param ISearchQuery $query the query to search the forms
+	 * @return array list of forms that match the query
+	 */
+	public function search(IUser $user, ISearchQuery $query): array {
+		$formsList = [];
+		try {
+			$formsList = $this->formMapper->search($user, $query);
+		} catch (DoesNotExistException $e) {
+			// silent catch
+		}
+		return $formsList;
 	}
 
 	public function getFilePath(Form $form): ?string {
