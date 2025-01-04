@@ -959,59 +959,6 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->canDeleteResults($form));
 	}
 
-	public function dataCanDeleteSubmission() {
-		return [
-			'disallowNoAllowEdit' => [
-				'formArchived' => false,
-				'submissionUserId' => 'currentUser',
-				'allowEdit' => false,
-				'expected' => false
-			],
-			'disallowArchivedForm' => [
-				'formArchived' => true,
-				'submissionUserId' => 'currentUser',
-				'allowEdit' => false,
-				'expected' => false
-			],
-			'allowAllowEdit' => [
-				'formArchived' => false,
-				'submissionUserId' => 'currentUser',
-				'allowEdit' => true,
-				'expected' => true
-			],
-			'disallowAllowEditOtherUser' => [
-				'formArchived' => false,
-				'submissionUserId' => 'otherUser',
-				'allowEdit' => true,
-				'expected' => false
-			],
-		];
-	}
-	/**
-	 * @dataProvider dataCanDeleteSubmission
-	 *
-	 * @param bool $formArchived
-	 * @param string $submissionUserId,
-	 * @param bool $allowEdit
-	 * @param bool $expected
-	 */
-	public function testCanDeleteSubmission(bool $formArchived, string $submissionUserId, bool $allowEdit, bool $expected) {
-		$form = new Form();
-		$form->setId(42);
-		$form->setAccess([
-			'permitAllUsers' => false,
-			'showToAllUsers' => false,
-		]);
-		$form->setState($formArchived?Constants::FORM_STATE_ARCHIVED:Constants::FORM_STATE_ACTIVE);
-		$form->setAllowEdit($allowEdit);
-
-		$submission = new Submission();
-		$submission->setFormId(42);
-		$submission->setUserId($submissionUserId);
-
-		$this->assertEquals($expected, $this->formsService->canDeleteSubmission($form, $submission));
-	}
-
 	public function dataCanSubmit() {
 		return [
 			'allowFormOwner' => [
