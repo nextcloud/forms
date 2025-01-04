@@ -382,11 +382,13 @@ class ApiControllerTest extends TestCase {
 				'expires' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'showExpiration' => false,
 				'lastUpdated' => 123456789,
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
+				'allowEdit' => null,
 			]]
 		];
 	}
@@ -502,6 +504,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false
 				],
 				'new' => [
@@ -517,6 +520,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false
 				]
 			]
@@ -676,7 +680,10 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->uploadFiles(1, 10, '');
 	}
 
-	public function testNewSubmission_answers() {
+	/**
+	 * Values for the mock objects for the following methods: testNewSubmission_answers, testUpdateSubmission_answers.
+	 */
+	public function dataForSubmission_answers() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setHash('hash');
@@ -723,6 +730,16 @@ class ApiControllerTest extends TestCase {
 			4 => [['uploadedFileId' => 100]],
 			5 => ['ignore unknown question'],
 		];
+
+		return [
+			'test' => [$form, $questions, $answers],
+		];
+	}
+
+	/**
+	 * @dataProvider dataForSubmission_answers()
+	 */
+	public function testNewSubmission_answers($form, $questions, $answers) {
 
 		$this->formMapper->expects($this->once())
 			->method('findById')
@@ -878,6 +895,61 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newSubmission(1, [], '');
 	}
 
+	/**
+	 * @dataProvider dataForSubmission_answers()
+	 */
+	public function testUpdateSubmission_answers($form, $questions, $answers) {
+
+		$form->setAllowEdit(true);
+		$submission = new Submission();
+		$submission->setId(12);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn($questions);
+
+		$this->formAccess();
+
+		$this->submissionService
+			->method('validateSubmission')
+			->willReturn(true);
+
+		$this->submissionMapper->expects($this->once())
+			->method('findByFormAndUser')
+			->with(1, 'currentUser')
+			->willReturn($submission);
+
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($this->once())
+			->method('nodeExists')
+			->willReturn(true);
+
+		$file = $this->createMock(File::class);
+
+		$userFolder->expects($this->once())
+			->method('getById')
+			->willReturn([$file]);
+
+		$folder = $this->createMock(Folder::class);
+
+		$userFolder->expects($this->once())
+			->method('get')
+			->willReturn($folder);
+
+		$this->storage->expects($this->once())
+			->method('getUserFolder')
+			->with('admin')
+			->willReturn($userFolder);
+
+		$this->apiController->updateSubmission(1, 12, $answers, '');
+	}
+
 	public function testDeleteSubmissionNotFound() {
 		$exception = $this->createMock(MapperException::class);
 
@@ -968,6 +1040,7 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false
 				],
 			]

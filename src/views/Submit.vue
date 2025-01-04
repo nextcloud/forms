@@ -207,6 +207,7 @@ import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 
 import { FormState } from '../models/FormStates.ts'
 import answerTypes from '../models/AnswerTypes.js'
@@ -284,6 +285,7 @@ export default {
 			IconCheckSvg,
 			IconRefreshSvg,
 			IconSendSvg,
+			IconDeleteSvg,
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 		}
@@ -665,15 +667,31 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-						id: this.form.id,
-					}),
-					{
-						answers: this.answers,
-						shareHash: this.shareHash,
-					},
-				)
+				if (this.submissionId) {
+					await axios.post(
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
+							{
+								id: this.form.id,
+								submissionId: this.submissionId,
+							},
+						),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						},
+					)
+				} else {
+					await axios.post(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+							id: this.form.id,
+						}),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						},
+					)
+				}
 				this.submitForm = true
 				this.success = true
 				this.deleteFormFieldFromLocalStorage()
