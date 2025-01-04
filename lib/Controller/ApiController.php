@@ -1333,7 +1333,17 @@ class ApiController extends OCSController {
 			'shareHash' => $shareHash,
 		]);
 
-		[$form, $questions] = $this->checkAndPrepareSubmission($formId, $answers, $shareHash);
+		$form = $this->loadFormForSubmission($formId, $shareHash);
+
+		$questions = $this->formsService->getQuestions($formId);
+		// Is the submission valid
+		$isSubmissionValid = $this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+		if (is_string($isSubmissionValid)) {
+			throw new OCSBadRequestException($isSubmissionValid);
+		}
+		if ($isSubmissionValid === false) {
+			throw new OCSBadRequestException('At least one submitted answer is not valid');
+		}
 
 		// if edit is allowed get existing submission of this user
 		if ($form->getAllowEdit() && $this->currentUser) {
@@ -1745,64 +1755,6 @@ class ApiController extends OCSController {
 		}
 
 		return $form;
-	}
-
-	/**
-	 * check a submission and return some required data objects
-	 *
-	 * @param int $formId the form id
-	 * @param array $answers [question_id => arrayOfString]
-	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
-	 * @return array
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
-	 */
-	private function checkAndPrepareSubmission(int $formId, array $answers, string $shareHash = ''): array {
-		try {
-			$form = $this->formMapper->findById($formId);
-			$questions = $this->formsService->getQuestions($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException();
-		}
-
-		// Does the user have access to the form (Either by logged in user, or by providing public share-hash.)
-		try {
-			$isPublicShare = false;
-
-			// If hash given, find the corresponding share & check if hash corresponds to given formId.
-			if ($shareHash !== '') {
-				// public by legacy Link
-				if (isset($form->getAccess()['legacyLink']) && $shareHash === $form->getHash()) {
-					$isPublicShare = true;
-				}
-
-				// Public link share
-				$share = $this->shareMapper->findPublicShareByHash($shareHash);
-				if ($share->getFormId() === $formId) {
-					$isPublicShare = true;
-				}
-			}
-		} catch (DoesNotExistException $e) {
-			// $isPublicShare already false.
-		} finally {
-			// Now forbid, if no public share and no direct share.
-			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
-				throw new OCSForbiddenException('Not allowed to access this form');
-			}
-		}
-
-		// Not allowed if form has expired.
-		if ($this->formsService->hasFormExpired($form)) {
-			throw new OCSForbiddenException('This form is no longer taking answers');
-		}
-
-		// Is the submission valid
-		if (!$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId())) {
-			throw new OCSBadRequestException('At least one submitted answer is not valid');
-		}
-
-		return [$form, $questions];
 	}
 
 	/**
