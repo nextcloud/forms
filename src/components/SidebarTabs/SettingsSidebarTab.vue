@@ -27,7 +27,7 @@
 			type="switch"
 			:disabled="disableAllowEdit"
 			@update:checked="onAllowEditChange">
-			{{ t('forms', 'Allow editing and deleting responses per person') }}
+			{{ t('forms', 'Allow editing responses per person') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:checked="formExpires"
