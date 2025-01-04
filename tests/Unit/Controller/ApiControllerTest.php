@@ -944,7 +944,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->formsService
 			->expects($this->once())
-			->method('canDeleteResults')
+			->method('canDeleteSubmission')
 			->with($form)
 			->willReturn(false);
 
@@ -971,7 +971,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->formsService
 			->expects($this->once())
-			->method('canDeleteResults')
+			->method('canDeleteSubmission')
 			->with($form)
 			->willReturn(true);
 
