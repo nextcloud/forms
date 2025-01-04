@@ -380,28 +380,6 @@ class FormsService {
 	}
 
 	/**
-	 * Can the current user delete own submission
-	 *
-	 * @param Form $form
-	 * @param Submission $submission
-	 * @return boolean
-	 */
-	public function canDeleteSubmission(Form $form, Submission $submission): bool {
-
-		// Do not allow deleting results on archived forms
-		if ($this->isFormArchived($form)) {
-			return false;
-		}
-
-		// if AllowEdit then the current user can delete own submission
-		if ($form->getAllowEdit() && $submission->getUserId() == $this->currentUser->getUID()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Can the user submit a form
 	 *
 	 * @param Form $form
