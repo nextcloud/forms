@@ -44,7 +44,6 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
-use OCA\Forms\Service\AnswerService;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -356,7 +355,7 @@ class FormsServiceTest extends TestCase {
 
 	public function dataGetFormWithAnswers() {
 		return [
-			// Just the full form with Answers
+			// Just the full form with answers for AllowEdit
 			'one-full-form-with-answers' => [[
 				'id' => 42,
 				'state' => 0,
@@ -439,7 +438,7 @@ class FormsServiceTest extends TestCase {
 	 *
 	 * @param array $expected
 	 */
-	public function testGetFormWithAnswers(array $expected) {
+	public function testGetFormAllowEditWithAnswers(array $expected) {
 		// The form, with AllowEdit
 		$form = new Form();
 		$form->setId(42);
@@ -516,6 +515,102 @@ class FormsServiceTest extends TestCase {
 		$answer2Entity->setQuestionId(2);
 		$answer2Entity->setText('London');
 		$answers = [ $answerEntity, $answer2Entity ];
+
+		$this->submissionMapper->expects($this->once())
+			->method('findByFormAndUser')
+			->with(42, 'currentUser')
+			->willReturn($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('findBySubmission')
+			->with(12)
+			->willReturn($answers);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(42)
+			->willReturn(123);
+
+		// Run the test
+		$this->assertEquals($expected, $this->formsService->getForm($form));
+	}
+
+	/**
+	 * @dataProvider dataGetFormWithAnswers
+	 *
+	 * @param array $expected
+	 */
+	public function testGetFormAllowEditWithoutAnswers(array $expected) {
+		// drop the answers for this test
+		unset($expected['answers']);
+		unset($expected['newSubmission']);
+		unset($expected['submissionId']);
+
+		// The form, with AllowEdit
+		$form = new Form();
+		$form->setId(42);
+		$form->setState(0); // default => 0 means active
+		$form->setHash('abcdefg');
+		$form->setTitle('Form 1');
+		$form->setDescription('Description Text');
+		$form->setOwnerId('currentUser');
+		$form->setCreated(123456789);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+		$form->setExpires(0);
+		$form->setIsAnonymous(false);
+		$form->setSubmitMultiple(false);
+		$form->setAllowEdit(true);
+		$form->setShowExpiration(false);
+		$form->setLastUpdated(123456789);
+
+		$submission = new Submission();
+		$submission->setId(12);
+
+		// Questions
+		$question1 = new Question();
+		$question1->setId(1);
+		$question1->setFormId(42);
+		$question1->setOrder(1);
+		$question1->setType('dropdown');
+		$question1->setIsRequired(false);
+		$question1->setExtraSettings([
+			'shuffleOptions' => true
+		]);
+		$question1->setText('Question 1');
+		$question1->setDescription('This is our first question.');
+		$question2 = new Question();
+		$question2->setId(2);
+		$question2->setFormId(42);
+		$question2->setOrder(2);
+		$question2->setType('short');
+		$question2->setIsRequired(true);
+		$question2->setText('Question 2');
+		$question2->setDescription('');
+		$question2->setName('city');
+		$question2->setExtraSettings([]);
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$question1, $question2]);
+
+		// Options
+		$option1 = new Option();
+		$option1->setId(1);
+		$option1->setQuestionId(1);
+		$option1->setText('Option 1');
+		$option2 = new Option();
+		$option2->setId(2);
+		$option2->setQuestionId(1);
+		$option2->setText('Option 2');
+		$this->optionMapper->expects($this->any())
+			->method('findByQuestion')
+			->with(1)
+			->willReturn([$option1, $option2]);
+
+		$answers = [ ];
 
 		$this->submissionMapper->expects($this->once())
 			->method('findByFormAndUser')
