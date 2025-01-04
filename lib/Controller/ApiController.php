@@ -1346,6 +1346,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Can only update if AllowEdit is set');
 		}
 
+		if ($submissionId != $submission->getId()) {
+			throw new OCSBadRequestException('Can only update your own submissions');
+		}
+
 		$submission->setTimestamp(time());
 		$this->submissionMapper->update($submission);
 
@@ -1596,7 +1600,7 @@ class ApiController extends OCSController {
 	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
 	 * @param bool $update
 	 */
-	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray, bool $update): void {
+	private function storeAnswersForQuestion(Form $form, int $submissionId, array $question, array $answerArray, bool $update): void {
 		// get stored answers for this question
 		$storedAnswers = [];
 		if ($update) {
