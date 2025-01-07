@@ -5,6 +5,12 @@
 
 # Changelog
 
+## v5.0.0 - tbd
+
+- **Unified Search integration**
+
+    You can now use the Unified Search to search forms based on the title and the description.
+
 ## v4.3.0 - 2024-10-04
 
 - **New question type: Files**

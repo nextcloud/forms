@@ -29,6 +29,7 @@ use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Search\ISearchQuery;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
@@ -696,6 +697,33 @@ class FormsService {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Get list of forms
+	 *
+	 * @param ISearchQuery $query the query to search the forms
+	 * @return Form[] list of forms that match the query
+	 */
+	public function search(ISearchQuery $query): array {
+		$formsList = [];
+		$groups = $this->groupManager->getUserGroupIds($this->currentUser);
+		$teams = $this->circlesService->getUserTeamIds($this->currentUser->getUID());
+
+		try {
+			$ownedForms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID(), $query->getTerm());
+			$sharedForms = $this->formMapper->findSharedForms(
+				$this->currentUser->getUID(),
+				$groups,
+				$teams,
+				true,
+				$query->getTerm()
+			);
+			$formsList = array_merge($ownedForms, $sharedForms);
+		} catch (DoesNotExistException $e) {
+			// silent catch
+		}
+		return $formsList;
 	}
 
 	public function getFilePath(Form $form): ?string {
