@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { docker } from '@nextcloud/cypress/docker'
+import { getContainer } from '@nextcloud/cypress/docker'
 import { expect, type APIRequestContext } from '@playwright/test'
 
 /**
@@ -22,8 +22,7 @@ export async function runShell(
 		env?: Record<string, string | number>
 	},
 ) {
-	const containerName = 'nextcloud-cypress-tests_forms'
-	const container = docker.getContainer(containerName)
+	const container = getContainer()
 
 	const exec = await container.exec({
 		Cmd: ['sh', '-c', command],
