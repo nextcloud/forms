@@ -364,8 +364,6 @@ class FormsService {
 	 * @return boolean
 	 */
 	private function hasPublicLink(Form $form): bool {
-		$access = $form->getAccess();
-
 		$shareEntities = $this->shareMapper->findByForm($form->getId());
 		foreach ($shareEntities as $shareEntity) {
 			if ($shareEntity->getShareType() === IShare::TYPE_LINK) {
