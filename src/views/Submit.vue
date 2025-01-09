@@ -207,7 +207,6 @@ import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
-import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 
 import { FormState } from '../models/FormStates.ts'
 import answerTypes from '../models/AnswerTypes.js'
@@ -285,7 +284,6 @@ export default {
 			IconCheckSvg,
 			IconRefreshSvg,
 			IconSendSvg,
-			IconDeleteSvg,
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 		}
