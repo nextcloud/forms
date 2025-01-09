@@ -203,7 +203,7 @@ export default {
 			if (this.disableSubmitMultiple) {
 				return t(
 					'forms',
-					'This can not be controlled, if the form has a public link or stores responses anonymously, or the response can be edited.',
+					'This can not be controlled, if the form has a public link, stores responses anonymously, or the response can be edited.',
 				)
 			}
 			return ''
@@ -212,7 +212,7 @@ export default {
 			if (this.disableAllowEdit) {
 				return t(
 					'forms',
-					'This can not be controlled, if the form has a public link or stores responses anonymously, or multiple responses are allowed.',
+					'This can not be controlled, if the form has a public link, stores responses anonymously, or multiple responses are allowed.',
 				)
 			}
 			return ''
