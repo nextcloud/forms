@@ -695,7 +695,7 @@ export default {
 
 			try {
 				if (this.submissionId) {
-					await axios.post(
+					await axios.put(
 						generateOcsUrl(
 							'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
 							{
