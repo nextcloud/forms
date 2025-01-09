@@ -4,7 +4,7 @@
  */
 
 import { test as setup } from '@playwright/test'
-import { configureNextcloud, getContainer } from '@nextcloud/cypress/docker'
+import { configureNextcloud } from '@nextcloud/cypress/docker'
 
 /**
  * We use this to ensure Nextcloud is configured correctly before running our tests
@@ -13,5 +13,5 @@ import { configureNextcloud, getContainer } from '@nextcloud/cypress/docker'
  * as that only checks for the URL to be accessible which happens already before everything is configured.
  */
 setup('Configure Nextcloud', async () => {
-	await configureNextcloud(['forms', 'viewer'], undefined, getContainer())
+	await configureNextcloud(['forms'])
 })
