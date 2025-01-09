@@ -91,15 +91,20 @@ export async function login(
 	password: string,
 ) {
 	const tokenResponse = await request.get('./csrftoken')
+	expect(tokenResponse.status()).toBe(200)
 	const requesttoken = (await tokenResponse.json()).token
 
-	await request.post('./login', {
+	const loginResponse = await request.post('./login', {
 		form: {
 			user,
 			password,
 			requesttoken,
 		},
+		headers: {
+			Origin: tokenResponse.url().replace(/index.php.*/, ''),
+		},
 	})
+	expect(loginResponse.status()).toBe(200)
 
 	const response = await request.get('apps/files')
 	expect(response.status()).toBe(200)
