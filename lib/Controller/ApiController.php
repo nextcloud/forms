@@ -1335,6 +1335,10 @@ class ApiController extends OCSController {
 
 		$form = $this->loadFormForSubmission($formId, $shareHash);
 
+		if (!($form->getAllowEdit() && $this->currentUser)) {
+			throw new OCSBadRequestException('Can only update if AllowEdit is set');
+		}
+
 		$questions = $this->formsService->getQuestions($formId);
 		// Is the submission valid
 		$isSubmissionValid = $this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
@@ -1345,15 +1349,11 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('At least one submitted answer is not valid');
 		}
 
-		// if edit is allowed get existing submission of this user
-		if ($form->getAllowEdit() && $this->currentUser) {
-			try {
-				$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
-			} catch (DoesNotExistException $e) {
-				throw new OCSBadRequestException('Cannot update a non existing submission');
-			}
-		} else {
-			throw new OCSBadRequestException('Can only update if AllowEdit is set');
+		// get existing submission of this user
+		try {
+			$submission = $this->submissionMapper->findByFormAndUser($form->getId(), $this->currentUser->getUID());
+		} catch (DoesNotExistException $e) {
+			throw new OCSBadRequestException('Cannot update a non existing submission');
 		}
 
 		if ($submissionId != $submission->getId()) {
