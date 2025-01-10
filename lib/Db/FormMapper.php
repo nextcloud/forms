@@ -7,6 +7,7 @@
 namespace OCA\Forms\Db;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -23,10 +24,11 @@ class FormMapper extends QBMapper {
 	 * @param IDBConnection $db
 	 */
 	public function __construct(
+		IDBConnection $db,
 		private QuestionMapper $questionMapper,
 		private ShareMapper $shareMapper,
 		private SubmissionMapper $submissionMapper,
-		IDBConnection $db,
+		private ConfigService $configService,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
 	}
@@ -132,20 +134,24 @@ class FormMapper extends QBMapper {
 		}
 
 		// build expression for publicly shared forms (default only directly shown)
-		if ($filterShown) {
-			// Only shown
-			$access = $qbShares->expr()->in('access_enum', $qbShares->createNamedParameter(Constants::FORM_ACCESS_ARRAY_SHOWN, IQueryBuilder::PARAM_INT_ARRAY, ':access_shown'));
-		} else {
-			// All
-			$access = $qbShares->expr()->neq('access_enum', $qbShares->createNamedParameter(Constants::FORM_ACCESS_NOPUBLICSHARE, IQueryBuilder::PARAM_INT, ':access_nopublicshare'));
+		if ($this->configService->getAllowPermitAll()) {
+			if ($filterShown && $this->configService->getAllowShowToAll()) {
+				// Only shown forms
+				$access = $qbShares->expr()->in('access_enum', $qbShares->createNamedParameter(Constants::FORM_ACCESS_ARRAY_SHOWN, IQueryBuilder::PARAM_INT_ARRAY, ':access_shown'));
+			} elseif ($filterShown === false) {
+				// All
+				$access = $qbShares->expr()->neq('access_enum', $qbShares->createNamedParameter(Constants::FORM_ACCESS_NOPUBLICSHARE, IQueryBuilder::PARAM_INT, ':access_nopublicshare'));
+			}
 		}
+
+		// Build the where clause for membership or public access
+		$memberOrPublic = isset($access) ? $qbShares->expr()->orX($memberships, $access) : $memberships;
 
 		// Select all DISTINCT IDs of shared forms
 		$qbShares->selectDistinct('forms.id')
 			->from($this->getTableName(), 'forms')
 			->leftJoin('forms', $this->shareMapper->getTableName(), 'shares', $qbShares->expr()->eq('forms.id', 'shares.form_id'))
-			->where($memberships)
-			->orWhere($access)
+			->where($memberOrPublic)
 			->andWhere($qbShares->expr()->neq('forms.owner_id', $qbShares->createNamedParameter($userId, IQueryBuilder::PARAM_STR, ':owner_id')));
 
 		// Select the whole forms for the DISTINCT shared forms IDs
