@@ -175,13 +175,13 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer run test:integration
 
-      - name: Upload Unit coverage
+      - name: Upload integration coverage
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           working-directory: apps/${{ env.APP_NAME }}
-          file: tests/clover.unit.xml
+          file: tests/clover.integration.xml
           fail_ci_if_error: true
           flags: integration
 
