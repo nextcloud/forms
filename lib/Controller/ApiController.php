@@ -278,6 +278,17 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException();
 		}
 
+		// Do not allow changing showToAllUsers if disabled
+		if (isset($keyValuePairs['access'])) {
+			$showAll = $keyValuePairs['access']['showToAllUsers'] ?? false;
+			$permitAll = $keyValuePairs['access']['permitAllUsers'] ?? false;
+			if (($showAll && !$this->configService->getAllowShowToAll())
+				|| ($permitAll && !$this->configService->getAllowPermitAll())) {
+				$this->logger->info('Not allowed to update showToAllUsers or permitAllUsers');
+				throw new OCSForbiddenException();
+			}
+		}
+
 		// Process file linking
 		if (isset($keyValuePairs['path']) && isset($keyValuePairs['fileFormat'])) {
 			$file = $this->submissionService->writeFileToCloud($form, $keyValuePairs['path'], $keyValuePairs['fileFormat']);
