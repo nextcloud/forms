@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.3.5 - 2025-01-11
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.4...v4.3.5)
+
+### Fixed
+
+- [stable4] fix: Check admin settings when fetching shared forms by @backportbot[bot] in [\#2488](https://github.com/nextcloud/forms/pull/2488)
+- [stable4] Fix: Typo broke background sync by @backportbot[bot] in [\#2471](https://github.com/nextcloud/forms/pull/2471)
+- [stable4] Fix translation problem in notifications by @backportbot[bot] in [\#2448](https://github.com/nextcloud/forms/pull/2448)
+
+### Merged
+
+- [stable4] Remove duplicate playwright entries from gitignore by @backportbot[bot] in [\#2477](https://github.com/nextcloud/forms/pull/2477)
+
 ## v4.3.4 - 2024-11-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.3...v4.3.4)
