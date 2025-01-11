@@ -24,7 +24,12 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Integration;
 
+use OCA\Forms\AppInfo\Application;
+use OCA\Forms\Constants;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\IConfig;
+use OCP\IDBConnection;
+use OCP\IUserManager;
 use Test\TestCase;
 
 /**
@@ -47,7 +52,12 @@ class IntegrationBase extends TestCase {
 	public function setUp(): void {
 		parent::setUp();
 
-		$userManager = \OC::$server->getUserManager();
+		$config = \OCP\Server::get(IConfig::class);
+		foreach (Constants::CONFIG_KEYS as $key) {
+			$config->deleteAppValue(Application::APP_ID, $key);
+		}
+
+		$userManager = \OCP\Server::get(IUserManager::class);
 		foreach ($this->users as $userId => $displayName) {
 			$user = $userManager->get($userId);
 			if ($user === null) {
@@ -56,7 +66,7 @@ class IntegrationBase extends TestCase {
 			$user->setDisplayName($displayName);
 		}
 
-		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+		$qb = \OCP\Server::get(IDBConnection::class)->getQueryBuilder();
 
 		// Write our test forms into db
 		foreach ($this->testForms as $index => $form) {
@@ -153,7 +163,8 @@ class IntegrationBase extends TestCase {
 
 	/** Clean up database from testforms */
 	public function tearDown(): void {
-		$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+		$db = \OCP\Server::get(IDBConnection::class);
+		$qb = $db->getQueryBuilder();
 
 		foreach ($this->testForms as $form) {
 			$qb->delete('forms_v2_forms')

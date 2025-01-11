@@ -25,9 +25,11 @@ declare(strict_types=1);
  */
 namespace OCA\Forms\Tests\Integration\Api;
 
+use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Tests\Integration\IntegrationBase;
+use OCP\IConfig;
 
 /**
  * @group DB
@@ -188,5 +190,87 @@ class SharedFormsTest extends IntegrationBase {
 			['aaaa', 'bbbb', 'cccc', 'dddd'],
 			array_map(fn ($form) => $form->read()['hash'], $forms),
 		);
+	}
+
+	/**
+	 * Test that no public shared forms are shown to user if admin disabled it
+	 * @dataProvider dataForbidPublicShowAccess
+	 */
+	public function testShowNoSharedFormsIfDisabled(array $configValues) {
+		$config = \OCP\Server::get(IConfig::class);
+		foreach ($configValues as $key => $value) {
+			$config->setAppValue(Application::APP_ID, $key, json_encode($value));
+		}
+
+		$formMapper = \OCP\Server::get(FormMapper::class);
+		$forms = $formMapper->findSharedForms('user1');
+
+		$this->assertEquals(2, count($forms));
+		$this->assertEqualsCanonicalizing(
+			['aaaa', 'dddd'],
+			array_map(fn ($form) => $form->read()['hash'], $forms),
+		);
+	}
+
+	/**
+	 * Test that a form with public access can be accessed even if show permissions are not granted (can fill out but not see in sidebar)
+	 */
+	public function testAllowPublicAccessOnDeniedPublicVisibility(): void {
+		$config = \OCP\Server::get(IConfig::class);
+		$config->setAppValue(Application::APP_ID, Constants::CONFIG_KEY_ALLOWSHOWTOALL, json_encode(false));
+
+		$formMapper = \OCP\Server::get(FormMapper::class);
+		$forms = $formMapper->findSharedForms('user1', filterShown: false);
+
+		$this->assertEqualsCanonicalizing(
+			['aaaa', 'bbbb', 'cccc', 'dddd'],
+			array_map(fn ($form) => $form->read()['hash'], $forms),
+		);
+	}
+
+	/**
+	 * Test that no public shared forms are available to user if admin disabled it
+	 * @dataProvider dataForbidPublicAccess
+	 */
+	public function testShowNoSharedFormsAccessIfDisabled(array $configValues): void {
+		$config = \OCP\Server::get(IConfig::class);
+		foreach ($configValues as $key => $value) {
+			$config->setAppValue(Application::APP_ID, $key, json_encode($value));
+		}
+
+		$formMapper = \OCP\Server::get(FormMapper::class);
+		$forms = $formMapper->findSharedForms('user1', filterShown: false);
+
+		$this->assertEquals(2, count($forms));
+		$this->assertEqualsCanonicalizing(
+			['aaaa', 'dddd'],
+			array_map(fn ($form) => $form->read()['hash'], $forms),
+		);
+	}
+
+	public static function dataForbidPublicAccess(): array {
+		return [
+			'no-permit' => [
+				[
+					Constants::CONFIG_KEY_ALLOWPERMITALL => false,
+				],
+			],
+			'non-at-all' => [
+				[
+					Constants::CONFIG_KEY_ALLOWSHOWTOALL => false,
+					Constants::CONFIG_KEY_ALLOWPERMITALL => false,
+				],
+			],
+		];
+	}
+
+	public static function dataForbidPublicShowAccess(): array {
+		return array_merge(self::dataForbidPublicAccess(), [
+			'no-show-to-all' => [
+				[
+					Constants::CONFIG_KEY_ALLOWSHOWTOALL => false,
+				],
+			],
+		]);
 	}
 }
