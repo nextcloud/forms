@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace OCA\Forms\Db;
 
 use OCA\Forms\Constants;
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @psalm-import-type FormsAccess from ResponseDefinitions
  * @method string getHash()
  * @method void setHash(string $value)
  * @method string getTitle()
@@ -25,8 +27,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setFileId(int|null $value)
  * @method string|null getFileFormat()
  * @method void setFileFormat(string|null $value)
- * @method array getAccess()
- * @method void setAccess(array $value)
  * @method int getCreated()
  * @method void setCreated(int $value)
  * @method int getExpires()
@@ -39,10 +39,12 @@ use OCP\AppFramework\Db\Entity;
  * @method void setShowExpiration(bool $value)
  * @method int getLastUpdated()
  * @method void setLastUpdated(int $value)
- * @method ?string getSubmissionMessage()
- * @method void setSubmissionMessage(?string $value)
+ * @method string|null getSubmissionMessage()
+ * @method void setSubmissionMessage(string|null $value)
  * @method int getState()
- * @method void setState(?int $value)
+ * @psalm-method 0|1|2 getState()
+ * @method void setState(int|null $value)
+ * @psalm-method void setState(0|1|2|null $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -75,6 +77,10 @@ class Form extends Entity {
 	}
 
 	// JSON-Decoding of access-column.
+
+	/**
+	 * @return FormsAccess
+	 */
 	public function getAccess(): array {
 		$accessEnum = $this->getAccessEnum();
 		$access = [];
@@ -98,6 +104,10 @@ class Form extends Entity {
 	}
 
 	// JSON-Encoding of access-column.
+
+	/**
+	 * @param FormsAccess $access
+	 */
 	public function setAccess(array $access) {
 		// No further permissions -> 0
 		// Permit all users, but don't show in navigation -> 1
@@ -112,11 +122,30 @@ class Form extends Entity {
 			// only permit all but not shown to all
 			$value = Constants::FORM_ACCESS_PERMITALLUSERS;
 		}
-		
+
 		$this->setAccessEnum($value);
 	}
 
-	// Read full form
+	/**
+	 * @return array{
+	 *   id: int,
+	 *   hash: string,
+	 *   title: string,
+	 *   description: string,
+	 *   ownerId: string,
+	 *   fileId: ?int,
+	 *   fileFormat: ?string,
+	 *   created: int,
+	 *   access: FormsAccess,
+	 *   expires: int,
+	 *   isAnonymous: bool,
+	 *   submitMultiple: bool,
+	 *   showExpiration: bool,
+	 *   lastUpdated: int,
+	 *   submissionMessage: ?string,
+	 *   state: 0|1|2,
+	 *  }
+	 */
 	public function read() {
 		return [
 			'id' => $this->getId(),

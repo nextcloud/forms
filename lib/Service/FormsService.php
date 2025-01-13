@@ -18,6 +18,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Events\FormSubmittedEvent;
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -35,6 +36,11 @@ use OCP\Share\IShare;
 
 /**
  * Trait for getting forms information in a service
+ * @psalm-import-type FormsQuestion from ResponseDefinitions
+ * @psalm-import-type FormsOption from ResponseDefinitions
+ * @psalm-import-type FormsForm from ResponseDefinitions
+ * @psalm-import-type FormsPermission from ResponseDefinitions
+ * @psalm-import-type FormsShare from ResponseDefinitions
  */
 class FormsService {
 	private ?IUser $currentUser;
@@ -73,7 +79,7 @@ class FormsService {
 	 * Load options corresponding to question
 	 *
 	 * @param integer $questionId
-	 * @return array
+	 * @return list<FormsOption>
 	 */
 	private function getOptions(int $questionId): array {
 		$optionList = [];
@@ -93,7 +99,7 @@ class FormsService {
 	 * Load questions corresponding to form
 	 *
 	 * @param integer $formId
-	 * @return array
+	 * @return list<FormsQuestion>
 	 */
 	public function getQuestions(int $formId): array {
 		$questionList = [];
@@ -130,10 +136,9 @@ class FormsService {
 	 * Load specific question
 	 *
 	 * @param integer $questionId id of the question
-	 * @return array
+	 * @return ?FormsQuestion
 	 */
-	public function getQuestion(int $questionId): array {
-		$question = [];
+	public function getQuestion(int $questionId): ?array {
 		try {
 			$questionEntity = $this->questionMapper->findById($questionId);
 			$question = $questionEntity->read();
@@ -152,10 +157,9 @@ class FormsService {
 					}
 				}
 			}
-		} catch (DoesNotExistException $e) {
-			//handle silently
-		} finally {
 			return $question;
+		} catch (DoesNotExistException $e) {
+			return null;
 		}
 	}
 
@@ -163,7 +167,7 @@ class FormsService {
 	 * Load shares corresponding to form
 	 *
 	 * @param integer $formId
-	 * @return array
+	 * @return list<FormsShare>
 	 */
 	public function getShares(int $formId): array {
 		$shareList = [];
@@ -182,7 +186,7 @@ class FormsService {
 	 * Get a form data
 	 *
 	 * @param Form $form
-	 * @return array
+	 * @return FormsForm
 	 * @throws IMapperException
 	 */
 	public function getForm(Form $form): array {
@@ -264,7 +268,7 @@ class FormsService {
 	 * Get current users permissions on a form
 	 *
 	 * @param Form $form
-	 * @return array
+	 * @return list<FormsPermission>
 	 */
 	public function getPermissions(Form $form): array {
 		if (!$this->currentUser) {

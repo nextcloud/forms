@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Db;
 
+use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\Entity;
 
 /**
+ * @psalm-import-type FormsOption from ResponseDefinitions
  * @method int|float getQuestionId()
  * @method void setQuestionId(int|float $value)
  * @method string getText()
@@ -38,6 +40,9 @@ class Option extends Entity {
 		$this->addType('text', 'string');
 	}
 
+	/**
+	 * @return FormsOption
+	 */
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
