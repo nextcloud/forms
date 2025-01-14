@@ -17,6 +17,7 @@
 				:form="form"
 				:read-only="false"
 				force-display-actions
+				@clone="onCloneForm(form.id)"
 				@delete="onDelete(form)"
 				@mobile-close-navigation="$emit('update:open', false)" />
 		</ul>
@@ -68,6 +69,11 @@ export default defineComponent({
 
 	methods: {
 		t,
+
+		onCloneForm(formId) {
+			this.$emit('clone', formId)
+			this.$emit('update:open', false)
+		},
 
 		onDelete(form) {
 			this.shownForms = this.shownForms.filter(({ id }) => id !== form.id)

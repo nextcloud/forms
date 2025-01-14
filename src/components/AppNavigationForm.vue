@@ -57,7 +57,7 @@
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
 			<NcActionButton
-				v-if="canEdit && !isArchived"
+				v-if="canEdit"
 				:close-after-click="true"
 				@click="onCloneForm">
 				<template #icon>
@@ -278,6 +278,7 @@ export default {
 		onShareForm() {
 			this.$emit('open-sharing', this.form.hash)
 		},
+
 		onCloneForm() {
 			this.$emit('clone', this.form.id)
 		},
