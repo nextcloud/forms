@@ -180,6 +180,7 @@ class ApiController extends OCSController {
 			unset($formData['id']);
 			unset($formData['created']);
 			unset($formData['lastUpdated']);
+			unset($formData['state']);
 			$formData['hash'] = $this->formsService->generateFormHash();
 			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
