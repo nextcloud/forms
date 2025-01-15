@@ -1,12 +1,10 @@
 ---
-
 name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: 0. Needs triage, bug
 type: 'Bug'
 assignees: ''
-
 ---
 
 **Please use the 👍 [reaction](https://blog.github.com/2016-03-10-add-reactions-to-pull-requests-issues-and-comments/) to show that you are affected by the same issue. Please don't comment if you have no relevant information to add!**

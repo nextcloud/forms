@@ -1,12 +1,10 @@
 ---
-
 name: Feature request
 about: Suggest an idea for this project
 title: ''
 labels: 0. Needs triage, enhancement
 type: 'Enhancement'
 assignees: ''
-
 ---
 
 **Nextcloud (please complete the following information):**
