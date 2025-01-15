@@ -11,6 +11,7 @@ namespace OCA\Forms\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -31,8 +32,11 @@ class Version050000Date20241005173955 extends SimpleMigrationStep {
 		$qbUpdate = $this->db->getQueryBuilder();
 
 		$qbUpdate->update('forms_v2_forms')
-			->set('access_enum', 'access_enum - 3')
-			->where($qbUpdate->expr()->gte('access_enum', '3'))
+			->set('access_enum', $qbUpdate->func()->subtract(
+				'access_enum',
+				$qbUpdate->createNamedParameter(3, IQueryBuilder::PARAM_INT)
+			))
+			->where($qbUpdate->expr()->gte('access_enum', $qbUpdate->createNamedParameter(3, IQueryBuilder::PARAM_INT)))
 			->executeStatement();
 	}
 }
