@@ -131,7 +131,10 @@
 		</template>
 
 		<!-- Archived forms modal -->
-		<ArchivedFormsModal :open.sync="showArchivedForms" :forms="archivedForms" />
+		<ArchivedFormsModal
+			:open.sync="showArchivedForms"
+			:forms="archivedForms"
+			@clone="onCloneForm" />
 	</NcContent>
 </template>
 
