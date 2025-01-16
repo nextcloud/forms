@@ -187,7 +187,7 @@ OC.L10N.register(
     "There was an error while adding the new question" : "Hiba történt a kérdés hozzáadása során",
     "There was an error while removing the question" : "Hiba történt a kérdés eltávolítása során",
     "Error while saving form" : "Hiba az űrlap mentésekor",
-    "Linked file not available" : "A hivatkozott fájl nem elérhető",
+    "Linked file not available" : "A hivatkozott fájl nem érhető el",
     "Linked file is not available, would you like to link a new file?" : "A hivatkozott fájl nem érhető el, szeretne egy új fájlra hivatkozni?",
     "Loading responses …" : "Válaszok betöltése…",
     "No responses yet" : "Még nem érkezett válasz",
