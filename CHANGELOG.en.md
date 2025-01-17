@@ -11,6 +11,14 @@
 
     You can now use the Unified Search to search forms based on the title and the description.
 
+- **Clone archived forms**
+
+    You can now clone an archived form.
+
+- **Clear a form**
+
+    You can now clear a form and also get asked if you want to start new when the form has changed since your last visit and you didn't submit the form yet.
+
 ## v4.3.0 - 2024-10-04
 
 - **New question type: Files**

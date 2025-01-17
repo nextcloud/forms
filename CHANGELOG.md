@@ -5,6 +5,79 @@
 
 # Changelog
 
+## v5.0.0-alpha.0 - 2025-01-17
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v5.0.0-alpha.0)
+
+### Enhancements
+
+- feat: allow cloning archived forms by @Chartman123 in [\#2490](https://github.com/nextcloud/forms/pull/2490)
+- chore: make Forms OpenAPI compliant by @Chartman123 in [\#2358](https://github.com/nextcloud/forms/pull/2358)
+- feat: integration of unified search by @Chartman123 in [\#2479](https://github.com/nextcloud/forms/pull/2479)
+- feat: Ask for restarting submission if form was changed by @Koc in [\#2319](https://github.com/nextcloud/forms/pull/2319)
+
+### Fixed
+
+- fix: subtraction in access_enum by @Chartman123 in [\#2501](https://github.com/nextcloud/forms/pull/2501)
+- fix: failing tests by @hamza221 in [\#2466](https://github.com/nextcloud/forms/pull/2466)
+
+### Merged
+
+- chore: remove unused access variable in hasPublicLink method by @Chartman123 in [\#2478](https://github.com/nextcloud/forms/pull/2478)
+- chore: remove API v2 by @Chartman123 in [\#2351](https://github.com/nextcloud/forms/pull/2351)
+- chore: Add reuse compliance by @hamza221 in [\#2455](https://github.com/nextcloud/forms/pull/2455)
+- chore: use attributes to define routes by @Chartman123 in [\#2353](https://github.com/nextcloud/forms/pull/2353)
+- chore: remove legacy link support by @Chartman123 in [\#2355](https://github.com/nextcloud/forms/pull/2355)
+- chore: set min NC30 and add stable4 to dependabot by @Chartman123 in [\#2352](https://github.com/nextcloud/forms/pull/2352)
+
+## v4.3.5 - 2025-01-11
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.4...v4.3.5)
+
+### Fixed
+
+- fix: Check admin settings when fetching shared forms by @susnux in [\#2485](https://github.com/nextcloud/forms/pull/2485)
+- Fix: Typo broke background sync by @toad in [\#2470](https://github.com/nextcloud/forms/pull/2470)
+- Fix translation problem in notifications by @Chartman123 in [\#2447](https://github.com/nextcloud/forms/pull/2447)
+
+## v4.3.4 - 2024-11-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.3...v4.3.4)
+
+### Fixed
+
+- fix: simplify mime-type checks to support jpg and other image formats by @Koc in [\#2401](https://github.com/nextcloud/forms/pull/2401)
+
+### Merged
+
+- feat: Refactor form sync to run as a background job with retry by @AIlkiv in [\#2408](https://github.com/nextcloud/forms/pull/2408)
+
+## v4.3.3 - 2024-11-11
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.2...v4.3.3)
+
+### Fixed
+
+- Add padding and max width so they don't stick to right screen border by @Elsensee in [\#2400](https://github.com/nextcloud/forms/pull/2400)
+- (fix) default timezone for export by @AIlkiv in [\#2397](https://github.com/nextcloud/forms/pull/2397)
+
+## v4.3.2 - 2024-10-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.1...v4.3.2)
+
+### Fixed
+
+- fix: Update transfer ownership logic by @Chartman123 in [\#2371](https://github.com/nextcloud/forms/pull/2371)
+- fix: show expiration message again in submit view by @Chartman123 in [\#2359](https://github.com/nextcloud/forms/pull/2359)
+
+## v4.3.1 - 2024-10-05
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v4.3.1)
+
+### Fixed
+
+- fix(stable4): add missing annotations by @Chartman123 in [\#2354](https://github.com/nextcloud/forms/pull/2354)
+
 ## v4.3.0 - 2024-10-04
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.2.4...v4.3.0)
