@@ -81,7 +81,7 @@ OC.L10N.register(
     "Permissions" : "Leidimai",
     "Group" : "Grupė",
     "Team" : "Komanda",
-    "Share link" : "Bendrinimo nuoroda",
+    "Share link" : "Viešinio nuoroda",
     "Add link" : "Pridėti nuorodą",
     "Copy to clipboard" : "Kopijuoti į iškarpinę",
     "Show QR code" : "Rodyti QR kodą",
