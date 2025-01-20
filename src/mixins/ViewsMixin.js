@@ -6,7 +6,7 @@
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
-import axios from '@nextcloud/axios'
+import axios, { isCancel } from '@nextcloud/axios'
 import MarkdownIt from 'markdown-it'
 
 import CancelableRequest from '../utils/CancelableRequest.js'
@@ -142,7 +142,7 @@ export default {
 				this.$emit('update:form', OcsResponse2Data(response))
 				this.isLoadingForm = false
 			} catch (error) {
-				if (axios.isCancel(error)) {
+				if (isCancel(error)) {
 					logger.debug(`The request for form ${id} has been canceled`, {
 						error,
 					})
