@@ -1604,7 +1604,7 @@ class ApiController extends OCSController {
 		} finally {
 			// Now forbid, if no public share and no direct share.
 			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
-				throw new NoSuchFormException('Not allowed to access this form');
+				throw new NoSuchFormException('Not allowed to access this form', Http::STATUS_FORBIDDEN);
 			}
 		}
 
