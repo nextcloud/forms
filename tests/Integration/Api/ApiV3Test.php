@@ -664,7 +664,7 @@ class ApiV3Test extends IntegrationBase {
 		} catch (ClientException $e) {
 			$resp = $e->getResponse();
 		}
-		$this->assertEquals(400, $resp->getStatusCode());
+		$this->assertEquals(404, $resp->getStatusCode());
 	}
 
 	public function dataCreateNewQuestion() {
