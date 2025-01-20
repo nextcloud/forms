@@ -350,6 +350,15 @@ export default {
 			return this.form.state === FormState.FormClosed
 		},
 
+		/**
+		 * Checks if the current state is active.
+		 *
+		 * @return {boolean} - Returns true if active, otherwise false.
+		 */
+		isActive() {
+			return !this.isArchived && !this.isClosed && !this.isExpired
+		},
+
 		infoMessage() {
 			let message = ''
 			if (this.form.isAnonymous) {
@@ -600,7 +609,11 @@ export default {
 		 * Methods for catching unwanted unload events
 		 */
 		beforeWindowUnload(e) {
-			if (!(this.submitForm || Object.keys(this.answers).length === 0)) {
+			if (
+				this.isActive &&
+				!this.submitForm &&
+				Object.keys(this.answers).length !== 0
+			) {
 				// Cancel the window unload event
 				e.preventDefault()
 				e.returnValue = ''
@@ -608,10 +621,26 @@ export default {
 		},
 
 		/**
-		Check if the form contains unsaved changes, returns true if the the form can be leaved safely, false if the navigation should be canceled.
+		 * Checks if the user is attempting to leave the form under certain conditions
+		 * and shows a confirmation dialog if necessary.
+		 *
+		 * Conditions to show the confirmation dialog:
+		 * - The form is active.
+		 * - The form is not currently submitted.
+		 * - There are answers provided in the form.
+		 *
+		 * If the conditions are met, a confirmation dialog is shown and a promise is returned.
+		 * The promise resolves with the value passed to the confirm button callback.
+		 *
+		 * @return {Promise<boolean>|boolean} - Returns a promise that resolves with the value
+		 * passed to the confirm button callback if the dialog is shown, otherwise returns true.
 		 */
 		confirmLeaveForm() {
-			if (!this.submitForm && Object.keys(this.answers).length !== 0) {
+			if (
+				this.isActive &&
+				!this.submitForm &&
+				Object.keys(this.answers).length !== 0
+			) {
 				this.showConfirmLeaveDialog = true
 				return new Promise((resolve) => {
 					this.confirmButtonCallback = (val) => {
