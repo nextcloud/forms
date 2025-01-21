@@ -144,6 +144,7 @@ class Form extends Entity {
 	 *   expires: int,
 	 *   isAnonymous: bool,
 	 *   submitMultiple: bool,
+	 *   allowEdit: bool,
 	 *   showExpiration: bool,
 	 *   lastUpdated: int,
 	 *   submissionMessage: ?string,
