@@ -40,7 +40,7 @@ updates:
     labels:
       - 3. to review
       - dependencies
-  
+
   - package-ecosystem: composer
     target-branch: 'main'
     directory: '/vendor-bin/psalm/'
