@@ -244,7 +244,7 @@ OC.L10N.register(
     "Form link copied" : "Copiada a ligazón do formulario",
     "Cannot copy, please copy the link manually" : "Non foi posíbel copiala. Copie a ligazón manualmente",
     "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",
-    "No elements found." : "Non se atoparon elementos.",
+    "No elements found." : "Non se atopou ningún elemento.",
     "Checkboxes" : "Caixas de selección",
     "Checkbox question title" : "Título da pregunta da caixa de selección",
     "People can submit a different answer" : "A xente pode enviar unha resposta diferente",
