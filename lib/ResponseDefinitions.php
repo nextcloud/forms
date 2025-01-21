@@ -120,6 +120,9 @@ namespace OCA\Forms;
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,
+ *   answers?: list<FormsAnswer>,
+ *   newSubmission?: bool,
+ *   submissionId?: int,
  * }
  *
  * @psalm-type FormsUploadedFile = array{
