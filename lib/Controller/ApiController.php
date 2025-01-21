@@ -1320,6 +1320,8 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Can only update submission if AllowEdit is set and the answers are valid
 	 * @throws OCSForbiddenException Can only update your own submission
+	 *
+	 * 200: the id of the updated submission
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
