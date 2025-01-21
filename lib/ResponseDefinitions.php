@@ -111,6 +111,7 @@ namespace OCA\Forms;
  *   isAnonymous: bool,
  *   lastUpdated: int,
  *   submitMultiple: bool,
+ *   allowEdit: bool,
  *   showExpiration: bool,
  *   canSubmit: bool,
  *   permissions: list<FormsPermission>,
