@@ -1357,7 +1357,7 @@ CSV
 	 */
 	public function testUpdateSubmission() {
 
-		$uploadedFileResponse = $this->http->request('PUT',
+		$uploadedFileResponse = $this->http->request('POST',
 			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
 			[
 				'multipart' => [
