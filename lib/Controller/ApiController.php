@@ -1325,7 +1325,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[ApiRoute(verb: 'PUT', url: Constants::API_BASE . 'forms/{formId}/submissions/{submissionId}', requirements: Constants::API_V3_REQUIREMENTS)]
+	#[ApiRoute(verb: 'PUT', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function updateSubmission(int $formId, int $submissionId, array $answers, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Updating submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
 			'formId' => $formId,
