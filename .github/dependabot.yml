@@ -95,19 +95,6 @@ updates:
 
   - package-ecosystem: composer
     target-branch: 'stable4'
-    directory: '/vendor-bin/openapi-extractor/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'stable4'
     directory: '/vendor-bin/psalm/'
     schedule:
       interval: weekly
