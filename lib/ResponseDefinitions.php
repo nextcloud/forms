@@ -120,7 +120,7 @@ namespace OCA\Forms;
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,
- *   answers?: list<FormsAnswer>,
+ *   answers?: array<string,mixed>,
  *   newSubmission?: bool,
  *   submissionId?: int,
  * }
