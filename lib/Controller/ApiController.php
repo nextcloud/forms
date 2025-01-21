@@ -1315,11 +1315,11 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param int $submissionId the submission id
-	 * @param array $answers [question_id => arrayOfString]
+	 * @param array<string, list<string>> $answers [question_id => arrayOfString]
 	 * @param string $shareHash public share-hash -> Necessary to submit on public link-shares.
-	 * @return DataResponse
-	 * @throws OCSBadRequestException
-	 * @throws OCSForbiddenException
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Can only update submission if AllowEdit is set and the answers are valid
+	 * @throws OCSForbiddenException Can only update your own submission
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -1357,7 +1357,7 @@ class ApiController extends OCSController {
 		}
 
 		if ($submissionId != $submission->getId()) {
-			throw new OCSBadRequestException('Can only update your own submissions');
+			throw new OCSForbiddenException('Can only update your own submissions');
 		}
 
 		$submission->setTimestamp(time());
@@ -1386,7 +1386,7 @@ class ApiController extends OCSController {
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
-		return new DataResponse();
+		return new DataResponse($submissionId);
 	}
 
 	/**
