@@ -65,7 +65,7 @@
     "@vue/tsconfig": "^0.5.1",
     "eslint-config-prettier": "^10.0.1",
     "prettier": "^3.4.2",
-    "vite": "^5.4.11"
+    "vite": "^5.4.13"
   },
   "engines": {
     "node": "^20.0.0",
