@@ -1429,8 +1429,8 @@ CSV
 		unset($data['submissions'][0]['timestamp']);
 
 		$this->assertEquals([
-			'userId' => 'test',
-			'userDisplayName' => 'Test Displayname',
+			'userId' => 'user1',
+			'userDisplayName' => 'User No. 1',
 			'formId' => $this->testForms[0]['id'],
 			'answers' => [
 				[
