@@ -1395,7 +1395,7 @@ CSV
 		$resp = $this->httpUser1->request('PUT', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}", [
 			'json' => [
 				'answers' => [
-					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer!2'],
+					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer2!'],
 					$this->testForms[0]['questions'][1]['id'] => [
 						$this->testForms[0]['questions'][1]['options'][1]['id']
 					],
