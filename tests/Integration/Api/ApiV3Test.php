@@ -261,7 +261,7 @@ class ApiV3Test extends IntegrationBase {
 		// Set up http Client for user user1
 		$this->httpUser1 = new Client([
 			'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
-			'auth' => ['user1', 'test'],
+			'auth' => ['user1', 'user1'],
 			'headers' => [
 				'OCS-ApiRequest' => 'true',
 				'Accept' => 'application/json'
