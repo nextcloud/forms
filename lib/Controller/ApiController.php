@@ -1337,7 +1337,7 @@ class ApiController extends OCSController {
 
 		$form = $this->loadFormForSubmission($formId, $shareHash);
 
-		if (!($form->getAllowEdit() && $this->currentUser)) {
+		if (!$form->getAllowEdit()) {
 			throw new OCSBadRequestException('Can only update if AllowEdit is set');
 		}
 
