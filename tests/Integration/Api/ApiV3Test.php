@@ -1357,6 +1357,14 @@ CSV
 	 */
 	public function testUpdateSubmission() {
 
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'AllowEdit' => true,
+				]
+			]
+		]);
+
 		$uploadedFileResponse = $this->http->request('POST',
 			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
 			[
