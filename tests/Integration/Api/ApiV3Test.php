@@ -19,6 +19,8 @@ use OCA\Forms\Tests\Integration\IntegrationBase;
 class ApiV3Test extends IntegrationBase {
 	/** @var GuzzleHttp\Client */
 	private $http;
+	/** @var GuzzleHttp\Client */
+	private $httpUser1;
 
 	protected array $users = [
 		'test' => 'Test user',
@@ -250,6 +252,16 @@ class ApiV3Test extends IntegrationBase {
 		$this->http = new Client([
 			'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
 			'auth' => ['test', 'test'],
+			'headers' => [
+				'OCS-ApiRequest' => 'true',
+				'Accept' => 'application/json'
+			],
+		]);
+
+		// Set up http Client for user user1
+		$this->httpUser1 = new Client([
+			'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
+			'auth' => ['user1', 'test'],
 			'headers' => [
 				'OCS-ApiRequest' => 'true',
 				'Accept' => 'application/json'
@@ -1365,7 +1377,7 @@ CSV
 			]
 		]);
 
-		$uploadedFileResponse = $this->http->request('POST',
+		$uploadedFileResponse = $this->httpUser1->request('POST',
 			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
 			[
 				'multipart' => [
@@ -1380,7 +1392,7 @@ CSV
 		$data = $this->OcsResponse2Data($uploadedFileResponse);
 		$uploadedFileId = $data[0]['uploadedFileId'];
 
-		$resp = $this->http->request('PUT', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}", [
+		$resp = $this->httpUser1->request('PUT', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}", [
 			'json' => [
 				'answers' => [
 					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer!2'],
