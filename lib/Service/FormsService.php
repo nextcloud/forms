@@ -777,6 +777,6 @@ class FormsService {
 	}
 
 	private static function normalizeFileName(string $fileName): string {
-		return str_replace([...mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), "\n"], '-', $fileName);
+		return trim(str_replace(Constants::FILENAME_INVALID_CHARS, '-', $fileName));
 	}
 }
