@@ -43,6 +43,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
@@ -200,7 +201,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with(1)
 			->willThrowException($exception);
-		$this->expectException(OCSNotFoundException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1);
 	}
 
@@ -219,7 +220,7 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn(false);
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1);
 	}
 
@@ -305,7 +306,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with(99)
 			->willThrowException($exception);
-		$this->expectException(OCSNotFoundException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(99, 'csv');
 	}
 
@@ -324,7 +325,7 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn(false);
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1, 'csv');
 	}
 
@@ -364,7 +365,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with(1)
 			->willThrowException($exception);
-		$this->expectException(OCSNotFoundException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->exportSubmissionsToCloud(1, '');
 	}
 
@@ -437,7 +438,7 @@ class ApiControllerTest extends TestCase {
 			'not found' => [
 				'canCreate' => true,
 				'callback' => fn ($id): Form => $this->throwMockedException(MockedMapperException::class),
-				'exception' => OCSNotFoundException::class
+				'exception' => NoSuchFormException::class
 			],
 			'not owned' => [
 				'canCreate' => true,
@@ -447,7 +448,7 @@ class ApiControllerTest extends TestCase {
 					$form->setOwnerId('otherUser');
 					return $form;
 				},
-				'exception' => OCSForbiddenException::class
+				'exception' => NoSuchFormException::class
 			]
 		];
 	}
@@ -766,7 +767,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with(1)
 			->willThrowException($exception);
-		$this->expectException(OCSNotFoundException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->newSubmission(1, [], '');
 	}
 
@@ -775,16 +776,16 @@ class ApiControllerTest extends TestCase {
 	 */
 	public function dataForCheckForbiddenException() {
 		return [
-			'user_dont_have_access_to_form' => [false, true, true],
-			'form_expired' => [true, true, true],
-			'not_allowed_to_submit' => [true, false, false],
+			'user_dont_have_access_to_form' => [false, true, true, NoSuchFormException::class],
+			'form_expired' => [true, true, true, OCSForbiddenException::class],
+			'not_allowed_to_submit' => [true, false, false, OCSForbiddenException::class],
 		];
 	}
 
 	/**
 	 * @dataProvider dataForCheckForbiddenException()
 	 */
-	public function testNewSubmission_forbiddenException($hasUserAccess, $hasFormExpired, $canSubmit) {
+	public function testNewSubmission_forbiddenException($hasUserAccess, $hasFormExpired, $canSubmit, $exception) {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('admin');
@@ -800,7 +801,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->formAccess($hasUserAccess, $hasFormExpired, $canSubmit);
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->expectException($exception);
 
 		$this->apiController->newSubmission(1, [], '');
 	}
@@ -834,12 +835,27 @@ class ApiControllerTest extends TestCase {
 	public function testDeleteSubmissionNotFound() {
 		$exception = $this->createMock(MapperException::class);
 
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formMapper->expects(self::once())
+			->method('findById')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects(self::once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
 		$this->submissionMapper
 			->expects($this->once())
 			->method('findById')
 			->with(42)
 			->willThrowException($exception);
 
+		// Not found as this is about the submission, not the form
 		$this->expectException(OCSNotFoundException::class);
 		$this->apiController->deleteSubmission(1, 42);
 	}
@@ -867,7 +883,7 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn(false);
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->deleteSubmission(1, 42);
 	}
 
@@ -938,7 +954,7 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->apiController->updateForm(1, ['ownerId' => 'newOwner']);
 	}
 

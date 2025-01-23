@@ -22,6 +22,7 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -31,6 +32,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
@@ -147,6 +149,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms')]
 	public function newForm(?int $fromId = null): DataResponse {
 		// Check if user is allowed
@@ -226,19 +229,10 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
 	public function getForm(int $formId): DataResponse {
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSBadRequestException('Could not find form');
-		}
-
-		if (!$this->formsService->hasUserAccess($form)) {
-			$this->logger->debug('User has no permissions to get this form');
-			throw new OCSForbiddenException('User has no permissions to get this form');
-		}
+		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_SUBMIT);
 
 		return new DataResponse($this->formsService->getForm($form));
 	}
@@ -259,6 +253,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}')]
 	public function updateForm(int $formId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating form: formId: {formId}, values: {keyValuePairs}', [
@@ -359,6 +354,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}')]
 	public function deleteForm(int $formId): DataResponse {
 		$this->logger->debug('Delete Form: {formId}', [
@@ -472,6 +468,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
 	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->getFormIfAllowed($formId);
@@ -594,6 +591,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function updateQuestion(int $formId, int $questionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating question: formId: {formId}, questionId: {questionId}, values: {keyValuePairs}', [
@@ -601,6 +599,14 @@ class ApiController extends OCSController {
 			'questionId' => $questionId,
 			'keyValuePairs' => $keyValuePairs
 		]);
+
+		// Make sure we query the form first to check the user has permissions
+		// So the user does not get information about "questions" if they do not even have permissions to the form
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
@@ -611,12 +617,6 @@ class ApiController extends OCSController {
 
 		if ($question->getFormId() !== $formId) {
 			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
-		}
-
-		$form = $this->getFormIfAllowed($formId);
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		// Don't allow empty array
@@ -668,11 +668,19 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/questions/{questionId}')]
 	public function deleteQuestion(int $formId, int $questionId): DataResponse {
 		$this->logger->debug('Mark question as deleted: {questionId}', [
 			'questionId' => $questionId,
 		]);
+
+
+		$form = $this->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
@@ -683,12 +691,6 @@ class ApiController extends OCSController {
 
 		if ($question->getFormId() !== $formId) {
 			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
-		}
-
-		$form = $this->getFormIfAllowed($formId);
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		// Store Order of deleted Question
@@ -732,6 +734,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions')]
 	public function reorderQuestions(int $formId, array $newOrder): DataResponse {
 		$this->logger->debug('Reordering Questions on Form {formId} as Question-Ids {newOrder}', [
@@ -829,6 +832,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function newOption(int $formId, int $questionId, array $optionTexts): DataResponse {
 		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}', [
@@ -909,6 +913,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}')]
 	public function updateOption(int $formId, int $questionId, int $optionId, array $keyValuePairs): DataResponse {
 		$this->logger->debug('Updating option: form: {formId}, question: {questionId}, option: {optionId}, values: {keyValuePairs}', [
@@ -978,6 +983,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/questions/{questionId}/options/{optionId}')]
 	public function deleteOption(int $formId, int $questionId, int $optionId): DataResponse {
 		$this->logger->debug('Deleting option: {optionId}', [
@@ -1037,6 +1043,7 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
 		$form = $this->getFormIfAllowed($formId);
@@ -1134,19 +1141,10 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions')]
 	public function getSubmissions(int $formId, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException('Could not find form');
-		}
-
-		if (!$this->formsService->canSeeResults($form)) {
-			$this->logger->debug('The current user has no permission to get the results for this form');
-			throw new OCSForbiddenException('The current user has no permission to get the results for this form');
-		}
+		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
 
 		if ($fileFormat !== null) {
 			$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
@@ -1205,24 +1203,10 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions')]
 	public function deleteAllSubmissions(int $formId): DataResponse {
-		$this->logger->debug('Delete all submissions to form: {formId}', [
-			'formId' => $formId,
-		]);
-
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException('Could not find form');
-		}
-
-		// The current user has permissions to remove submissions
-		if (!$this->formsService->canDeleteResults($form)) {
-			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
-			throw new OCSForbiddenException('This form is not owned by the current user and user has no `results_delete` permission');
-		}
+		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
 
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
@@ -1337,29 +1321,24 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function deleteSubmission(int $formId, int $submissionId): DataResponse {
 		$this->logger->debug('Delete Submission: {submissionId}', [
 			'submissionId' => $submissionId,
 		]);
 
+		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
-			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form or submission');
-			throw new OCSNotFoundException('Could not find form or submission');
+			$this->logger->debug('Could not find submission');
+			throw new OCSNotFoundException('Could not find submission');
 		}
 
 		if ($formId !== $submission->getFormId()) {
 			$this->logger->debug('Submission doesn\'t belong to given form');
 			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
-		}
-
-		// The current user has permissions to remove submissions
-		if (!$this->formsService->canDeleteResults($form)) {
-			$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
-			throw new OCSForbiddenException('This form is not owned by the current user and user has no `results_delete` permission');
 		}
 
 		// Delete submission (incl. Answers)
@@ -1383,20 +1362,10 @@ class ApiController extends OCSController {
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/export')]
 	public function exportSubmissionsToCloud(int $formId, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException('Could not find form');
-		}
-
-		if (!$this->formsService->canSeeResults($form)) {
-			$this->logger->debug('The current user has no permission to get the results for this form');
-			throw new OCSForbiddenException('The current user has no permission to get the results for this form');
-		}
-
+		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
 		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
 
 		return new DataResponse($file->getName());
@@ -1421,8 +1390,9 @@ class ApiController extends OCSController {
 	 * 200: the file id and name of the uploaded file
 	 */
 	#[CORS()]
-	#[NoAdminRequired()]
 	#[PublicPage()]
+	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/files/{questionId}')]
 	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}', [
@@ -1614,7 +1584,7 @@ class ApiController extends OCSController {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException('Could not find form');
+			throw new NoSuchFormException('Could not find form');
 		}
 
 		// Does the user have access to the form (Either by logged-in user, or by providing public share-hash.)
@@ -1634,7 +1604,7 @@ class ApiController extends OCSController {
 		} finally {
 			// Now forbid, if no public share and no direct share.
 			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
-				throw new OCSForbiddenException('Not allowed to access this form');
+				throw new NoSuchFormException('Not allowed to access this form', Http::STATUS_FORBIDDEN);
 			}
 		}
 
@@ -1650,20 +1620,42 @@ class ApiController extends OCSController {
 	 * Helper that retrieves a form if the current user is allowed to edit it
 	 * This throws an exception in case either the form is not found or permissions are missing.
 	 * @param int $formId The form ID to retrieve
-	 * @throws OCSNotFoundException If the form was not found
-	 * @throws OCSForbiddenException If the current user has no permission to edit
+	 * @throws NoSuchFormException If the form was not found or the current user has no permission to edit
 	 */
-	private function getFormIfAllowed(int $formId): Form {
+	private function getFormIfAllowed(int $formId, string $permissions = 'all'): Form {
 		try {
 			$form = $this->formMapper->findById($formId);
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find form');
-			throw new OCSNotFoundException('Could not find form');
+			throw new NoSuchFormException('Could not find form');
 		}
 
-		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-			$this->logger->debug('This form is not owned by the current user');
-			throw new OCSForbiddenException('This form is not owned by the current user');
+		switch ($permissions) {
+			case Constants::PERMISSION_SUBMIT:
+				if (!$this->formsService->hasUserAccess($form)) {
+					$this->logger->debug('User has no permissions to get this form');
+					throw new NoSuchFormException('User has no permissions to get this form', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			case Constants::PERMISSION_RESULTS:
+				if (!$this->formsService->canSeeResults($form)) {
+					$this->logger->debug('The current user has no permission to get the results for this form');
+					throw new NoSuchFormException('The current user has no permission to get the results for this form', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			case Constants::PERMISSION_RESULTS_DELETE:
+				if (!$this->formsService->canDeleteResults($form)) {
+					$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
+					throw new NoSuchFormException('This form is not owned by the current user and user has no `results_delete` permission', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			default:
+				// By default we request full permissions
+				if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+					$this->logger->debug('This form is not owned by the current user');
+					throw new NoSuchFormException('This form is not owned by the current user', Http::STATUS_FORBIDDEN);
+				}
+				break;
 		}
 		return $form;
 	}
