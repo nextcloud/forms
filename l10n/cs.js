@@ -175,7 +175,7 @@ OC.L10N.register(
     "Create form" : "Vytvořit formulář",
     "Loading {title} …" : "Načítání {title}…",
     "Form is archived" : "Formulář je archivován",
-    "Form '{title}' is archived and cannot be modified." : "Formulář „{title}“ je zaarchivován a není ho proto možné měnit.  ",
+    "Form '{title}' is archived and cannot be modified." : "Formulář „{title}“ je archivován a není ho proto možné měnit.  ",
     "Form title" : "Nadpis formuláře",
     "Description" : "Popis",
     "Add a question" : "Přidat otázku",
