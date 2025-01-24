@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.0.0-alpha.1 - 2025-01-24
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.0...v5.0.0-alpha.1)
+
+### Fixed
+
+- fix: Add brute force protection to form endpoints by @susnux in [\#2269](https://github.com/nextcloud/forms/pull/2269)
+- Fix: only show confirmation dialog for active forms by @Chartman123 in [\#2504](https://github.com/nextcloud/forms/pull/2504)
+
 ## v5.0.0-alpha.0 - 2025-01-17
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v5.0.0-alpha.0)
