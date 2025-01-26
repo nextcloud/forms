@@ -49,6 +49,7 @@ OC.L10N.register(
     "Expires on {date}" : "Rennur út {date}",
     "Permissions" : "Heimildir",
     "Group" : "Hópur",
+    "Team" : "Teymi",
     "Share link" : "Deila tengli",
     "Add link" : "Bæta við tengli",
     "Copy to clipboard" : "Afrita á klippispjald",
