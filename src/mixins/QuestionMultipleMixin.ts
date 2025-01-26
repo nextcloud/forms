@@ -25,6 +25,7 @@ export default defineComponent({
 			if (this.readOnly && this.extraSettings?.shuffleOptions) {
 				return this.shuffleArray(this.options)
 			}
+
 			// Ensure order of options always is the same
 			const options = [...this.options].sort((a, b) => {
 				if (a.order === b.order) {
@@ -169,9 +170,14 @@ export default defineComponent({
 				// let's not await, deleting in background
 				axios
 					.delete(
-						generateOcsUrl('apps/forms/api/v2.4/option/{id}', {
-							id: option.id,
-						}),
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
+							{
+								id: this.formId,
+								questionId: this.id,
+								optionId: option.id,
+							},
+						),
 					)
 					.catch((error) => {
 						logger.error('Error while deleting an option', {
@@ -209,7 +215,11 @@ export default defineComponent({
 
 				await axios.patch(
 					generateOcsUrl(
-						`apps/forms/api/v2.5/question/${this.id}/options`,
+						`apps/forms/api/v3/forms/{id}/questions/{questionId}/options`,
+						{
+							id: this.formId,
+							questionId: this.id,
+						},
 					),
 					{
 						order,

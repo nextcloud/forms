@@ -11,9 +11,9 @@
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
-			v-model="localAnswer.text"
 			:aria-label="ariaLabel"
 			:placeholder="placeholder"
+			:value="localAnswer.text"
 			class="question__input"
 			:class="{ 'question__input--shifted': !isDropdown }"
 			:maxlength="maxOptionLength"
@@ -91,13 +91,13 @@ export default {
 	},
 
 	props: {
-		answer: {
-			type: Object,
-			required: true,
-		},
 		allowReorder: {
 			type: Boolean,
 			default: true,
+		},
+		answer: {
+			type: Object,
+			required: true,
 		},
 		index: {
 			type: Number,
@@ -107,16 +107,16 @@ export default {
 			type: Number,
 			required: true,
 		},
-		maxIndex: {
-			type: Number,
-			required: true,
-		},
 		isUnique: {
 			type: Boolean,
 			required: true,
 		},
 		isDropdown: {
 			type: Boolean,
+			required: true,
+		},
+		maxIndex: {
+			type: Number,
 			required: true,
 		},
 		maxOptionLength: {
@@ -183,8 +183,11 @@ export default {
 		 */
 		async handleInput() {
 			let response
+
 			if (this.localAnswer.local) {
+				this.localAnswer.local = false
 				response = await this.createAnswer(this.localAnswer)
+				response.text = this.$refs.input.value
 			} else {
 				response = await this.updateAnswer(this.localAnswer)
 			}
@@ -244,7 +247,6 @@ export default {
 						{
 							id: this.formId,
 							questionId: answer.questionId,
-							order: answer.order ?? this.maxIndex,
 						},
 					),
 					{
