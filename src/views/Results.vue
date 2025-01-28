@@ -34,49 +34,6 @@
 			</template>
 		</NcEmptyContent>
 
-		<!-- No submissions -->
-		<NcEmptyContent
-			v-else-if="noSubmissions"
-			:name="t('forms', 'No responses yet')"
-			class="forms-emptycontent"
-			:description="
-				t('forms', 'Results of submitted forms will show up here')
-			">
-			<template #icon>
-				<IconPoll :size="64" />
-			</template>
-			<template #action>
-				<div class="response-actions">
-					<NcButton type="primary" @click="onShareForm">
-						<template #icon>
-							<IconShareVariant :size="20" decorative />
-						</template>
-						{{ t('forms', 'Share form') }}
-					</NcButton>
-
-					<NcButton
-						v-if="canEditForm && !form.fileId"
-						type="tertiary-no-background"
-						@click="onLinkFile">
-						<template #icon>
-							<IconLink :size="20" />
-						</template>
-						{{ t('forms', 'Create spreadsheet') }}
-					</NcButton>
-
-					<NcButton
-						v-if="form.fileId"
-						:href="fileUrl"
-						type="tertiary-no-background">
-						<template #icon>
-							<IconTable :size="20" />
-						</template>
-						{{ t('forms', 'Open spreadsheet') }}
-					</NcButton>
-				</div>
-			</template>
-		</NcEmptyContent>
-
 		<!-- Showing submissions -->
 		<template v-else>
 			<header>
@@ -94,6 +51,7 @@
 				<!-- View switcher between Summary and Responses -->
 				<div class="response-actions">
 					<PillMenu
+						:disabled="noSubmissions"
 						:options="responseViews"
 						:active.sync="activeResponseView"
 						class="response-actions__toggle" />
@@ -208,8 +166,31 @@
 				</div>
 			</header>
 
+			<!-- No submissions -->
+			<NcEmptyContent
+				v-if="noSubmissions"
+				:name="t('forms', 'No responses yet')"
+				class="forms-emptycontent"
+				:description="
+					t('forms', 'Results of submitted forms will show up here')
+				">
+				<template #icon>
+					<IconPoll :size="64" />
+				</template>
+				<template #action>
+					<div class="response-actions">
+						<NcButton type="primary" @click="onShareForm">
+							<template #icon>
+								<IconShareVariant :size="20" decorative />
+							</template>
+							{{ t('forms', 'Share form') }}
+						</NcButton>
+					</div>
+				</template>
+			</NcEmptyContent>
+
 			<!-- Summary view for visualization -->
-			<section v-if="activeResponseView.id === 'summary'">
+			<section v-else-if="activeResponseView.id === 'summary'">
 				<ResultsSummary
 					v-for="question in form.questions"
 					:key="question.id"
