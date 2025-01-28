@@ -10,6 +10,7 @@
 			:key="option.id"
 			:aria-label="isMobile ? option.ariaLabel : null"
 			:checked="active.id"
+			:disabled="disabled"
 			class="pill-menu__toggle"
 			:class="{ 'pill-menu__toggle--icon-only': isMobile && option.icon }"
 			button-variant
@@ -46,6 +47,15 @@ export default {
 			type: Object,
 			required: true,
 		},
+
+		/**
+		 * If the PillMenu is disabled
+		 */
+		disabled: {
+			type: Boolean,
+			required: true,
+		},
+
 		/**
 		 * List of available options
 		 * `option: {id: string, title: string, ariaLabel: string, icon?: string}`
