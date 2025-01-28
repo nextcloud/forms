@@ -344,7 +344,6 @@ export default {
 
 			picker: null,
 			showConfirmDeleteDialog: false,
-			showLinkedFileNotAvailableDialog: false,
 
 			linkedFileNotAvailableButtons: [
 				{
@@ -419,19 +418,26 @@ export default {
 			}
 			return window.location.href
 		},
+
+		showLinkedFileNotAvailableDialog() {
+			if (this.form.partial) {
+				return false
+			}
+			return this.canEditForm && this.form.fileId && !this.form.filePath
+		},
 	},
 
 	watch: {
 		// Reload results, when form changes
 		async hash() {
+			await this.fetchFullForm(this.form.id)
 			this.loadFormResults()
-			await this.fetchLinkedFileInfo()
 		},
 	},
 
 	async beforeMount() {
+		await this.fetchFullForm(this.form.id)
 		this.loadFormResults()
-		await this.fetchLinkedFileInfo()
 		SetWindowTitle(this.formTitle)
 	},
 
@@ -584,20 +590,6 @@ export default {
 				// User aborted
 				logger.debug('No file selected', { error })
 			}
-		},
-
-		async fetchLinkedFileInfo() {
-			const response = await axios.get(
-				generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-					id: this.form.id,
-				}),
-			)
-			const form = OcsResponse2Data(response)
-			this.$set(this.form, 'fileFormat', form.fileFormat)
-			this.$set(this.form, 'fileId', form.fileId)
-			this.$set(this.form, 'filePath', form.filePath)
-			this.showLinkedFileNotAvailableDialog =
-				this.canEditForm && form.fileId && !form.filePath
 		},
 
 		async onReExport() {

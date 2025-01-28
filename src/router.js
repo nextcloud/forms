@@ -9,7 +9,6 @@ import { generateUrl } from '@nextcloud/router'
 
 import Create from './views/Create.vue'
 import Results from './views/Results.vue'
-import Sidebar from './views/Sidebar.vue'
 import Submit from './views/Submit.vue'
 
 Vue.use(Router)
@@ -37,7 +36,6 @@ export default new Router({
 			path: '/:hash/edit',
 			components: {
 				default: Create,
-				sidebar: Sidebar,
 			},
 			name: 'edit',
 			props: { default: true },
@@ -46,7 +44,6 @@ export default new Router({
 			path: '/:hash/results',
 			components: {
 				default: Results,
-				sidebar: Sidebar,
 			},
 			name: 'results',
 			props: { default: true },
@@ -55,7 +52,6 @@ export default new Router({
 			path: '/:hash/submit',
 			components: {
 				default: Submit,
-				sidebar: Sidebar,
 			},
 			name: 'submit',
 			props: { default: true },
