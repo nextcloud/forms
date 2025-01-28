@@ -44,6 +44,19 @@ use OCP\Share\IShare;
  * @psalm-import-type FormsShare from ResponseDefinitions
  */
 class FormsService {
+	private const FILENAME_INVALID_CHARS = [
+		"\n",
+		'/',
+		'\\',
+		':',
+		'*',
+		'?',
+		'"',
+		'<',
+		'>',
+		'|',
+	];
+
 	private ?IUser $currentUser;
 
 	public function __construct(
@@ -785,6 +798,6 @@ class FormsService {
 	}
 
 	private static function normalizeFileName(string $fileName): string {
-		return str_replace([...mb_str_split(\OCP\Constants::FILENAME_INVALID_CHARS), "\n"], '-', $fileName);
+		return trim(str_replace(self::FILENAME_INVALID_CHARS, '-', $fileName));
 	}
 }
