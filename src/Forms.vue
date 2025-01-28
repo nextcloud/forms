@@ -140,12 +140,11 @@
 				:form.sync="selectedForm"
 				:sidebar-opened.sync="sidebarOpened"
 				@open-sharing="openSharing" />
-			<router-view
+			<Sidebar
 				v-if="!selectedForm.partial && canEdit"
 				:form="selectedForm"
 				:sidebar-opened.sync="sidebarOpened"
-				:active.sync="sidebarActive"
-				name="sidebar" />
+				:active.sync="sidebarActive" />
 		</template>
 
 		<!-- Archived forms modal -->
@@ -177,8 +176,9 @@ import IconPlus from 'vue-material-design-icons/Plus.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import AppNavigationForm from './components/AppNavigationForm.vue'
 import FormsIcon from './components/Icons/FormsIcon.vue'
-import PermissionTypes from './mixins/PermissionTypes.js'
 import OcsResponse2Data from './utils/OcsResponse2Data.js'
+import PermissionTypes from './mixins/PermissionTypes.js'
+import Sidebar from './views/Sidebar.vue'
 import logger from './utils/Logger.js'
 import { FormState } from './models/FormStates.ts'
 
@@ -199,6 +199,7 @@ export default {
 		NcContent,
 		NcEmptyContent,
 		NcLoadingIcon,
+		Sidebar,
 	},
 
 	mixins: [PermissionTypes],

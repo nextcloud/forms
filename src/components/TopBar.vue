@@ -44,18 +44,6 @@
 				{{ t('forms', 'Share') }}
 			</template>
 		</NcButton>
-		<NcButton
-			v-if="showSidebarToggle"
-			:aria-label="t('forms', 'Toggle settings')"
-			:title="t('forms', 'Toggle settings')"
-			type="tertiary"
-			@click="toggleSidebar">
-			<template #icon>
-				<IconMenuOpen
-					:size="24"
-					:class="{ 'icon--flipped': sidebarOpened }" />
-			</template>
-		</NcButton>
 	</div>
 </template>
 
@@ -220,9 +208,5 @@ export default {
 		// Remove margin as the toggle button does not exist when open
 		margin-inline-end: 0;
 	}
-}
-
-.icon--flipped {
-	transform: scaleX(-1);
 }
 </style>
