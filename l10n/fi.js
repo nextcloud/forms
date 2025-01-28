@@ -9,6 +9,7 @@ OC.L10N.register(
     "A form has been <strong>shared</strong> with you" : "Lomake on <strong>jaettu</strong> kanssasi",
     "Someone <strong>answered</strong> a shared form" : "Joku <strong>vastasi</strong> jaettuun lomakkeeseen",
     "Someone <strong>answered</strong> a form" : "Joku <strong>vastasi</strong> lomakkeeseen",
+    "Timestamp of data load" : "Tietojen lataamisen aikaleima",
     "No" : "Ei",
     "Yes" : "Kyllä",
     "Question" : "Kysymys",
