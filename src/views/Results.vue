@@ -105,7 +105,7 @@
 				<p>
 					{{
 						t('forms', '{amount} responses', {
-							amount: form.submissions.length,
+							amount: form.submissions?.length ?? 0,
 						})
 					}}
 				</p>
@@ -125,6 +125,14 @@
 						@blur="isDownloadActionOpened = false"
 						@close="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
+							<NcActionButton
+								v-if="canEditForm && !form.fileId"
+								@click="onLinkFile">
+								<template #icon>
+									<IconLink :size="20" />
+								</template>
+								{{ t('forms', 'Create spreadsheet') }}
+							</NcActionButton>
 							<template v-if="canEditForm && form.fileId">
 								<NcActionButton
 									:href="fileUrl"
@@ -150,16 +158,8 @@
 									</template>
 									{{ t('forms', 'Unlink spreadsheet') }}
 								</NcActionButton>
-								<NcActionSeparator />
+								<NcActionSeparator v-if="!noSubmissions" />
 							</template>
-							<NcActionButton
-								v-else-if="canEditForm"
-								@click="onLinkFile">
-								<template #icon>
-									<IconLink :size="20" />
-								</template>
-								{{ t('forms', 'Create spreadsheet') }}
-							</NcActionButton>
 							<NcActionButton
 								close-after-click
 								@click="onStoreToFiles">
@@ -469,6 +469,7 @@ export default {
 		async hash() {
 			await this.fetchFullForm(this.form.id)
 			this.loadFormResults()
+			SetWindowTitle(this.formTitle)
 		},
 	},
 
@@ -492,11 +493,16 @@ export default {
 				},
 			)
 
-			this.form.fileFormat = null
-			this.form.fileId = null
-			this.form.filePath = null
+			const updatedForm = {
+				...this.form,
+				fileFormat: null,
+				fileId: null,
+				filePath: null,
+			}
+			this.$emit('update:form', updatedForm)
 			emit('forms:last-updated:set', this.form.id)
 		},
+
 		async loadFormResults() {
 			this.loadingResults = true
 			logger.debug(`Loading results for form ${this.form.hash}`)
@@ -545,7 +551,7 @@ export default {
 					.pick()
 					.then(async (path) => {
 						try {
-							const response = await axios.patch(
+							await axios.patch(
 								generateOcsUrl('apps/forms/api/v3/forms/{id}', {
 									id: this.form.id,
 								}),
@@ -556,15 +562,12 @@ export default {
 									},
 								},
 							)
-							const responseData = OcsResponse2Data(response)
-
-							this.form.fileFormat = responseData.fileFormat
-							this.form.fileId = responseData.fileId
-							this.form.filePath = responseData.filePath
+							await this.fetchFullForm(this.form.id)
+							await this.loadFormResults()
 
 							showSuccess(
 								t('forms', 'File {file} successfully linked', {
-									file: responseData.fileName,
+									file: this.form.filePath.split('/').pop(),
 								}),
 							)
 							emit('forms:last-updated:set', this.form.id)
