@@ -331,9 +331,9 @@ class SubmissionService {
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
-	 * @return boolean|string True for valid submission, false or error message for invalid
+	 * @return null|string Error message if validation failed, null otherwise
 	 */
-	public function validateSubmission(array $questions, array $answers, string $formOwnerId): bool|string {
+	public function validateSubmission(array $questions, array $answers, string $formOwnerId): ?string {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -342,7 +342,7 @@ class SubmissionService {
 			// Check if all required questions have an answer
 			if ($question['isRequired'] &&
 				(!$questionAnswered ||
-				!array_filter($answers[$questionId], function (string|array $value): bool {
+				!array_filter($answers[$questionId], static function (string|array $value): bool {
 					// file type
 					if (is_array($value)) {
 						return !empty($value['uploadedFileId']);
@@ -352,7 +352,7 @@ class SubmissionService {
 				}) ||
 				(!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
-				return false;
+				return sprintf('Question "%s" is required.', $question['text']);
 			}
 
 			// Perform further checks only for answered questions
@@ -368,11 +368,11 @@ class SubmissionService {
 				// If number of answers is limited check the limits
 				if (($minOptions > 0 && $answersCount < $minOptions)
 					|| ($maxOptions > 0 && $answersCount > $maxOptions)) {
-					return false;
+					return sprintf('Question "%s" requires between %d and %d answers.', $question['text'], $minOptions, $maxOptions);
 				}
 			} elseif ($answersCount > 1 && $question['type'] !== Constants::ANSWER_TYPE_FILE) {
 				// Check if non-multiple questions have not more than one answer
-				return false;
+				return sprintf('Question "%s" can only have one answer.', $question['text']);
 			}
 
 			/*
@@ -381,22 +381,22 @@ class SubmissionService {
 			 */
 			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME) &&
 				!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
-				return false;
+				return sprintf('Invalid date/time format for question "%s".', $question['text']);
 			}
 
 			// Check if all answers are within the possible options
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 				foreach ($answers[$questionId] as $answer) {
 					// Search corresponding option, return false if non-existent
-					if (array_search($answer, array_column($question['options'], 'id')) === false) {
-						return false;
+					if (!in_array($answer, array_column($question['options'], 'id'))) {
+						return sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']);
 					}
 				}
 			}
 
 			// Handle custom validation of short answers
 			if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
-				return false;
+				return sprintf('Invalid input for question "%s".', $question['text']);
 			}
 
 			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
@@ -422,13 +422,12 @@ class SubmissionService {
 		// Check for excess answers
 		foreach ($answers as $id => $answerArray) {
 			// Search corresponding question, return false if not found
-			$questionIndex = array_search($id, array_column($questions, 'id'));
-			if ($questionIndex === false) {
-				return false;
+			if (!in_array($id, array_column($questions, 'id'))) {
+				return sprintf('Answer for non-existent question with ID %d.', $id);
 			}
 		}
 
-		return true;
+		return null;
 	}
 
 	/**

@@ -614,29 +614,29 @@ file2.txt"
 			'required-not-answered' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'short', 'isRequired' => true]
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => true]
 				],
 				// Answers
 				[],
 				// Expected Result
-				false
+				'Question "q1" is required.',
 			],
 			'required-not-answered-string' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'short', 'isRequired' => true]
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => true]
 				],
 				// Answers
 				[
 					'1' => ['']
 				],
 				// Expected Result
-				false
+				'Question "q1" is required.',
 			],
 			'required-empty-other-answer' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple_unique', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
 						['id' => 3]
 					]]
 				],
@@ -645,12 +645,12 @@ file2.txt"
 					'1' => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX]
 				],
 				// Expected Result
-				false
+				'Question "q1" is required.',
 			],
 			'more-than-allowed' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple_unique', 'isRequired' => false, 'options' => [
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'options' => [
 						['id' => 3],
 						['id' => 5]
 					]]
@@ -660,12 +660,12 @@ file2.txt"
 					'1' => [3,5]
 				],
 				// Expected Result
-				false
+				'Question "q1" can only have one answer.'
 			],
 			'option-not-known' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'options' => [
+					['id' => 1, 'type' => 'multiple', 'text' => 'q1', 'isRequired' => false, 'options' => [
 						['id' => 3],
 						['id' => 5]
 					]],
@@ -675,12 +675,12 @@ file2.txt"
 					'1' => [3,10]
 				],
 				// Expected Result
-				false
+				'Answer "10" for question "q1" is not a valid option.',
 			],
 			'other-answer-not-allowed' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'options' => [
+					['id' => 1, 'type' => 'multiple', 'text' => 'q1', 'isRequired' => false, 'options' => [
 						['id' => 3],
 						['id' => 5]
 					]],
@@ -690,24 +690,24 @@ file2.txt"
 					'1' => [3, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer']
 				],
 				// Expected Result
-				false
+				'Answer "system-other-answer:other answer" for question "q1" is not a valid option.',
 			],
 			'question-not-known' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'short', 'isRequired' => false]
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false]
 				],
 				// Answers
 				[
 					'2' => ['answer']
 				],
 				// Expected Result
-				false
+				'Answer for non-existent question with ID 2.',
 			],
 			'invalid-multiple-too-many-answers' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMax' => 2], 'options' => [
+					['id' => 1, 'type' => 'multiple', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLimitMax' => 2], 'options' => [
 						['id' => 3],
 						['id' => 5],
 						['id' => 7],
@@ -719,12 +719,12 @@ file2.txt"
 					'1' => [3, 5, 7]
 				],
 				// Expected Result
-				false
+				'Question "q1" requires between -1 and 2 answers.',
 			],
 			'invalid-multiple-too-few-answers' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2], 'options' => [
+					['id' => 1, 'type' => 'multiple', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2], 'options' => [
 						['id' => 3],
 						['id' => 5],
 						['id' => 7],
@@ -736,12 +736,12 @@ file2.txt"
 					'1' => [3]
 				],
 				// Expected Result
-				false
+				'Question "q1" requires between 2 and -1 answers.',
 			],
 			'valid-multiple-with-limits' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'multiple', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2, 'optionsLimitMax' => 3], 'options' => [
+					['id' => 1, 'type' => 'multiple', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2, 'optionsLimitMax' => 3], 'options' => [
 						['id' => 3],
 						['id' => 5],
 						['id' => 7],
@@ -753,55 +753,55 @@ file2.txt"
 					'1' => [3,9]
 				],
 				// Expected Result
-				true
+				null,
 			],
 			'invalid-short-phone' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']]
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']]
 				],
 				// Answers
 				[
 					'1' => ['0800 NEXTCLOUD']
 				],
 				// Expected Result
-				false
+				'Invalid input for question "q1".',
 			],
 			'invalid-short-regex-not-matching' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{4}/']]
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{4}/']]
 				],
 				// Answers
 				[
 					'1' => ['abc']
 				],
 				// Expected Result
-				false
+				'Invalid input for question "q1".',
 			],
 			'invalid-short-number' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']]
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']]
 				],
 				// Answers
 				[
 					'1' => ['11i']
 				],
 				// Expected Result
-				false
+				'Invalid input for question "q1".',
 			],
 			'invalid-date-question' => [
 				// Questions
 				[
-					['id' => 1, 'type' => 'date', 'isRequired' => false]
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => false]
 				],
 				// Answers
 				[
 					'1' => ['31.12.2022']
 				],
 				// Expected Result
-				false
+				'Invalid date/time format for question "q1".',
 			],
 			'full-good-submission' => [
 				// Questions
@@ -850,7 +850,7 @@ file2.txt"
 					'13' => ['abc123'],
 				],
 				// Expected Result
-				true
+				null,
 			]
 		];
 	}
@@ -860,9 +860,9 @@ file2.txt"
 	 *
 	 * @param array $questions
 	 * @param array $answers
-	 * @param bool $expected
+	 * @param null|string $expected
 	 */
-	public function testValidateSubmission(array $questions, array $answers, bool $expected) {
+	public function testValidateSubmission(array $questions, array $answers, ?string $expected) {
 		$this->mailer->method('validateMailAddress')->willReturnCallback(function ($mail) {
 			return $mail === 'some.name+context@example.com';
 		});
