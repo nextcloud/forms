@@ -474,9 +474,9 @@ export default {
 
 	methods: {
 		async onUnlinkFile() {
-			await axios.update(
-				generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-					id: this.form.id,
+			await axios.patch(
+				generateOcsUrl('apps/forms/api/v3/forms/{formId}', {
+					formId: this.form.id,
 				}),
 				{
 					keyValuePairs: {
