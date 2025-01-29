@@ -1251,9 +1251,6 @@ class ApiController extends OCSController {
 		if (is_string($isSubmissionValid)) {
 			throw new OCSBadRequestException($isSubmissionValid);
 		}
-		if ($isSubmissionValid === false) {
-			throw new OCSBadRequestException('At least one submitted answer is not valid');
-		}
 
 		// Create Submission
 		$submission = new Submission();
