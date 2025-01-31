@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.6 - 2025-01-31
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.5...v4.3.6)
+
+### Fixed
+
+- [stable4] Fix: Show sidebar toggle in all views by @backportbot[bot] in [\#2536](https://github.com/nextcloud/forms/pull/2536)
+- [stable4] fix: Fix spreadsheet unlinking by @backportbot[bot] in [\#2535](https://github.com/nextcloud/forms/pull/2535)
+
 ## v4.3.5 - 2025-01-11
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.4...v4.3.5)
