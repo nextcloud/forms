@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.0.0-alpha.2 - 2025-01-31
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.1...v5.0.0-alpha.2)
+
+### Fixed
+
+- Fix: Show sidebar toggle in all views by @Chartman123 in [\#2532](https://github.com/nextcloud/forms/pull/2532)
+- fix: Fix spreadsheet unlinking by @Koc in [\#2534](https://github.com/nextcloud/forms/pull/2534)
+- Fix: Add disabled state to PillMenu and update Results view when there are no submissions by @Chartman123 in [\#2530](https://github.com/nextcloud/forms/pull/2530)
+
 ## v5.0.0-alpha.1 - 2025-01-24
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.0...v5.0.0-alpha.1)
