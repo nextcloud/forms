@@ -24,6 +24,7 @@ OC.L10N.register(
     "Sharing" : "Berbagi",
     "Settings" : "Setelan",
     "Abort" : "Batal",
+    "Clear" : "Bersihkan",
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
     "Checkboxes" : "Kotak centang",
     "Date" : "Date",

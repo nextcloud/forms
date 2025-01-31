@@ -142,9 +142,6 @@
     "Convert to embeddable link" : "تبدیل به پیوند توکار",
     "Remove link" : "حذف پیوند",
     "Share {formTitle}" : "هم‌رسانی {formTitle}",
-    "Legacy Link" : "پیوند قدیمی",
-    "Form still supports old sharing-link." : "Form still supports old sharing-link.",
-    "Remove Legacy Link" : "Remove Legacy Link",
     "Internal link" : "پیوند داخلی",
     "Only works for logged in accounts with access rights" : "Only works for logged in accounts with access rights",
     "Permit access to all logged in accounts" : "Permit access to all logged in accounts",
@@ -182,11 +179,11 @@
     "There was an error while removing the question" : "There was an error while removing the question",
     "Error while saving form" : "Error while saving form",
     "Loading responses …" : "Loading responses …",
-    "No responses yet" : "No responses yet",
-    "Results of submitted forms will show up here" : "Results of submitted forms will show up here",
     "{amount} responses" : "{amount} responses",
     "Download" : "بارگیری",
     "Delete all responses" : "Delete all responses",
+    "No responses yet" : "No responses yet",
+    "Results of submitted forms will show up here" : "Results of submitted forms will show up here",
     "Delete submissions" : "پاک کردن پاسخ‌ها",
     "Are you sure you want to delete all responses of {title}?" : "Are you sure you want to delete all responses of {title}?",
     "Summary" : "چکیده",
@@ -214,6 +211,7 @@
     "You have unsaved changes! Do you still want to leave?" : "You have unsaved changes! Do you still want to leave?",
     "Abort" : "صرف نظر",
     "Leave" : "خروج",
+    "Clear" : "پاک کردن",
     "Some answers are not valid" : "برخی از پاسخ‌ها معتبر نیستند",
     "There was an error submitting the form: {message}" : "خطایی در ارسال این فرم بروز کرد: {message}",
     "Error while saving question" : "Error while saving question",
@@ -270,6 +268,9 @@
     "People can enter a number" : "افراد می‌توانند عدد وارد کنند",
     "Enter a number" : "عددی وارد کنید",
     "Custom regular expression" : "عبارت باقاعدهٔ سفارشی",
-    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد"
+    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد",
+    "Legacy Link" : "پیوند قدیمی",
+    "Form still supports old sharing-link." : "Form still supports old sharing-link.",
+    "Remove Legacy Link" : "Remove Legacy Link"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

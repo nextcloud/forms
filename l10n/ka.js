@@ -28,6 +28,7 @@ OC.L10N.register(
     "Settings" : "Settings",
     "Submit" : "Submit",
     "Abort" : "Abort",
+    "Clear" : "Clear",
     "Cannot copy, please copy the link manually" : "Cannot copy, please copy the link manually",
     "No recommendations. Start typing." : "No recommendations. Start typing.",
     "No elements found." : "No elements found.",

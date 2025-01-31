@@ -27,6 +27,7 @@ OC.L10N.register(
     "Sharing" : "Kunhavigo",
     "Settings" : "Agordoj",
     "Submit" : "Sendi",
+    "Clear" : "Viŝi",
     "Cannot copy, please copy the link manually" : "Ne eblis kopii la ligilon; kopiu ĝin permane.",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
     "No elements found." : "Nenio trovita.",
