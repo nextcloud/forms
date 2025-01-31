@@ -294,6 +294,9 @@ OC.L10N.register(
     "People can enter a number" : "Användare kan ange ett nummer",
     "Enter a number" : "Fyll i ett tal",
     "Custom regular expression" : "Anpassa regular expression",
-    "The input does not match the required pattern" : "Svaret passar inte det förväntade mönstret"
+    "The input does not match the required pattern" : "Svaret passar inte det förväntade mönstret",
+    "Legacy Link" : "Äldre länk",
+    "Form still supports old sharing-link." : "Formulär stöder fortfarande gammal delningslänk.",
+    "Remove Legacy Link" : "Ta bort äldre länk"
 },
 "nplurals=2; plural=(n != 1);");

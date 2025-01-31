@@ -187,6 +187,8 @@ OC.L10N.register(
     "Text" : "Text",
     "Phone number" : "Telèfon",
     "Email address" : "Adreça electrònica",
-    "Number" : "Número"
+    "Number" : "Número",
+    "Legacy Link" : "Enllaç heretat",
+    "Remove Legacy Link" : "Suprimeix l'enllaç heretat"
 },
 "nplurals=2; plural=(n != 1);");

@@ -264,6 +264,8 @@ OC.L10N.register(
     "People can enter a number" : "Οι χρήστες μπορούν να εισάγουν έναν αριθμό",
     "Enter a number" : "Πληκτρολογήστε έναν αριθμό",
     "Custom regular expression" : "Προσαρμοσμένη regular expression",
-    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με τους απαιτούμενους κανόνες"
+    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με τους απαιτούμενους κανόνες",
+    "Form still supports old sharing-link." : "Η φόρμα εξακολουθεί να υποστηρίζει τον παλιό σύνδεσμο κοινής χρήσης.",
+    "Remove Legacy Link" : "Αφαίρεση του συνδέσμου παλαιού τύπου"
 },
 "nplurals=2; plural=(n != 1);");

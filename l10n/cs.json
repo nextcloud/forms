@@ -292,6 +292,9 @@
     "People can enter a number" : "Lidé mohou zadat číslo",
     "Enter a number" : "Zadat číslo",
     "Custom regular expression" : "Uživatelsky určený regulární výraz",
-    "The input does not match the required pattern" : "Zadání neodpovídá požadovanému vzoru"
+    "The input does not match the required pattern" : "Zadání neodpovídá požadovanému vzoru",
+    "Legacy Link" : "Odkaz dle starého způsobu",
+    "Remove Legacy Link" : "Odebrat odkaz dle starého způsobu",
+    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Tento formulář pořád ještě používá zastaralý odkaz na sdílení, jejichž podpora bude odebrána ve Formulářích 5.0. Použijte nový mechanizmus pro sdílení."
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }

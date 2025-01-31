@@ -294,6 +294,9 @@ OC.L10N.register(
     "People can enter a number" : "Ľudia môžu zadať číslo",
     "Enter a number" : "Zadajte číslo",
     "Custom regular expression" : "Vlastný regulárny výraz",
-    "The input does not match the required pattern" : "Vstup nezodpovedá požadovanému vzoru"
+    "The input does not match the required pattern" : "Vstup nezodpovedá požadovanému vzoru",
+    "Legacy Link" : "Starší odkaz",
+    "Form still supports old sharing-link." : "Formulár stále podporuje starý odkaz na zdieľanie.",
+    "Remove Legacy Link" : "Odstrániť starý odkaz"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

@@ -173,6 +173,9 @@ OC.L10N.register(
     "Spreadsheet" : "Hoja de cálculo",
     "Text" : "Texto",
     "Phone number" : "Número telefónico",
-    "Email address" : "Dirección de correo electrónico"
+    "Email address" : "Dirección de correo electrónico",
+    "Legacy Link" : "Enlace legado",
+    "Form still supports old sharing-link." : "El formulario todavía admite el enlace para compartir antiguo.",
+    "Remove Legacy Link" : "Eliminar enlace legado"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -185,6 +185,9 @@ OC.L10N.register(
     "Text" : "Tekst",
     "Phone number" : "Telefonnummer",
     "Email address" : "Email adresse",
-    "Number" : "Nummer"
+    "Number" : "Nummer",
+    "Legacy Link" : "Nedarvet link",
+    "Form still supports old sharing-link." : "Formularen understøtter stadig gammelt delingslink.",
+    "Remove Legacy Link" : "Fjern nedarvet Link"
 },
 "nplurals=2; plural=(n != 1);");
