@@ -99,10 +99,6 @@ export default {
 			this.$emit('open-sharing', this.form.hash)
 		},
 
-		onSidebarChange(newState) {
-			this.$emit('update:sidebarOpened', newState)
-		},
-
 		/**
 		 * Focus title after form load
 		 */
