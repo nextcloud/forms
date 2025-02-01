@@ -58,7 +58,6 @@ OC.L10N.register(
     "Internal link" : "Internal link",
     "View mode" : "Skoðunarhamur",
     "Share" : "Deila",
-    "Toggle settings" : "Víxla stillingum af/á",
     "View" : "Skoða",
     "Edit" : "Breyta",
     "Loading {title} …" : "Hleð inn {title} …",

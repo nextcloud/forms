@@ -167,7 +167,6 @@ OC.L10N.register(
     "An error occurred while transfering ownership" : "Sahiplik aktarılırken bir sorun çıktı",
     "View mode" : "Görünüm kipi",
     "Share" : "Paylaş",
-    "Toggle settings" : "Ayarları değiştir",
     "View form" : "Formu görüntüle",
     "View" : "Görüntüle",
     "Edit" : "Düzenle",
@@ -191,10 +190,10 @@ OC.L10N.register(
     "Linked file is not available, would you like to link a new file?" : "Bağlantılı dosya kullanılamıyor. Başka bir dosya bağlamak ister misiniz?",
     "Loading responses …" : "Yanıtlar yükleniyor…",
     "{amount} responses" : "{amount} yanıt",
+    "Create spreadsheet" : "Çalışma sayfası oluştur",
     "Open spreadsheet" : "Çalışma sayfası aç",
     "Re-export spreadsheet" : "Çalışma sayfasını yeniden dışa aktar",
     "Unlink spreadsheet" : "Çalışma sayfası bağlantısını kaldır",
-    "Create spreadsheet" : "Çalışma sayfası oluştur",
     "Save copy to Files" : "Dosyalar uygulamasına kaydet",
     "Download" : "İndir",
     "Delete all responses" : "Tüm yanıtları sil",
@@ -300,6 +299,6 @@ OC.L10N.register(
     "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Eski paylaşım ile uyumluluk sağlamak için, paylaşım bağlantısı olarak hala iç bağlantı kullanılabilir. Lütfen bağlantıyı yeni bir paylaşım bağlantısıyla değiştirin. İç paylaşım bağlantısı Forms 5.0 sürümünden başlayarak çalışmayacak",
     "Remove Legacy Link" : "Eski bağlantıyı kaldır",
     "Legacy link in use" : "Eski bağlantı kullanılıyor",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Bu form hala kullanımdan kaldırılmış bir paylaşım bağlantısı kullanıyor. Bu bağlantı Forms 5.0 sürümünden başlayarak kaldırılacak. Lütfen yeni paylaşım yöntemini kullanın."
+    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Bu form kullanımdan kaldırılmış bir paylaşım bağlantısı kullanıyor. Bu bağlantı Forms 5.0 sürümünden başlayarak kaldırılacak. Lütfen yeni paylaşım yöntemini kullanın."
 },
 "nplurals=2; plural=(n > 1);");

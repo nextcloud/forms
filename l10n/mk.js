@@ -60,7 +60,6 @@ OC.L10N.register(
     "Copy embedding code" : "Копирај код за вградување",
     "Internal link" : "Внатрешен линк",
     "Share" : "Сподели",
-    "Toggle settings" : "Вклучени параметри",
     "View" : "Погледни",
     "Edit" : "Уреди",
     "Loading {title} …" : "Се вчитува {title} …",

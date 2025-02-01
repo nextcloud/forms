@@ -74,7 +74,6 @@ OC.L10N.register(
     "Internal link" : "Ligòngiu de intro",
     "Only works for logged in accounts with access rights" : "Funtzionat isceti pro contos identificados cun deretu de atzessu",
     "Share" : "Cumpartzidura",
-    "Toggle settings" : "Càmbia sa cunfiguratzione",
     "View" : "Visualiza",
     "Edit" : "Modìfica",
     "Loading {title} …" : "Carrighende {title} …",

@@ -94,7 +94,6 @@ OC.L10N.register(
     "There was an error while removing the share" : "Šalinant viešinį įvyko klaida",
     "Search for a user" : "Ieškoti naudotojo",
     "Share" : "Bendrinti",
-    "Toggle settings" : "Perjungti nustatymus",
     "View form" : "Rodyti anketą",
     "View" : "Rodyti",
     "Edit" : "Taisyti",

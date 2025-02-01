@@ -70,7 +70,6 @@ OC.L10N.register(
     "Internal link" : "Dijeli internu poveznicu",
     "View mode" : "Način prikaza",
     "Share" : "Dijeli",
-    "Toggle settings" : "Uklj./isklj. postavke",
     "View" : "Pregledaj",
     "Edit" : "Uredi",
     "Loading {title} …" : "Učitavanje {title}…",
