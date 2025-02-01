@@ -70,7 +70,6 @@ OC.L10N.register(
     "Copy embedding code" : "Copiar código embebido",
     "View mode" : "Modo de visualização",
     "Share" : "Partilhar",
-    "Toggle settings" : "Configurações do Google",
     "View" : "Ver",
     "Edit" : "Editar",
     "Loading {title} …" : "A carregar {title} …",

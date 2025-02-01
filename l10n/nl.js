@@ -75,7 +75,6 @@ OC.L10N.register(
     "Internal link" : "Interne link",
     "View mode" : "Weergavemodus",
     "Share" : "Delen",
-    "Toggle settings" : "Omschakelen instellingen",
     "View" : "Bekijken",
     "Edit" : "Bewerk",
     "Show results" : "Toon resultaten",

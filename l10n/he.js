@@ -58,7 +58,6 @@ OC.L10N.register(
     "Internal link" : "קישור פנימ",
     "View mode" : "מצב הצגה",
     "Share" : "שתף",
-    "Toggle settings" : "החלפת מצב הגדרות",
     "View" : "צפייה",
     "Edit" : "עריכה",
     "Loading {title} …" : "{title} בטעינה…",

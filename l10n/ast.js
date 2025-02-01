@@ -85,10 +85,10 @@ OC.L10N.register(
     "Linked file is not available, would you like to link a new file?" : "El ficheru enllaciáu nun ta disponible, ¿quies enllaciar otru nuevu?",
     "Loading responses …" : "Cargando les rempuesta…",
     "{amount} responses" : "{amount} rempuestes",
+    "Create spreadsheet" : "Crear la fueya de cálculu",
     "Open spreadsheet" : "Abrir la fueya de cálculu",
     "Re-export spreadsheet" : "Volver esportar la fueya de cálculu",
     "Unlink spreadsheet" : "Desenllaciar la fueya de cálculu",
-    "Create spreadsheet" : "Crear la fueya de cálculu",
     "Save copy to Files" : "Guardar la copia en Ficheros",
     "Download" : "Baxar",
     "Delete all responses" : "Desaniciar toles rempuestes",
@@ -147,6 +147,7 @@ OC.L10N.register(
     "Email address" : "Direición de corréu electrónicu",
     "People can enter an email address" : "La xente pue introducir una direición de corréu electrónicu",
     "Number" : "Númberu",
-    "People can enter a number" : "La xente pue introducir un númberu"
+    "People can enter a number" : "La xente pue introducir un númberu",
+    "Legacy Link" : "Enllaz heredáu"
 },
 "nplurals=2; plural=(n != 1);");

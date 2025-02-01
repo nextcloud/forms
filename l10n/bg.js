@@ -101,7 +101,6 @@ OC.L10N.register(
     "There was an error while updating the share" : "Възникна грешка при актуализиране на споделянето",
     "There was an error while removing the share" : "Възникна грешка при премахване на споделянето",
     "Share" : "Споделяне",
-    "Toggle settings" : "Превключване на настройките",
     "View form" : "Преглед на формуляра",
     "View" : "Изглед",
     "Edit" : "Редактиране",
@@ -181,6 +180,9 @@ OC.L10N.register(
     "Text" : "Текст",
     "Phone number" : "Телефонен номер",
     "Email address" : "Имейл адрес",
-    "Number" : "Номер"
+    "Number" : "Номер",
+    "Legacy Link" : "Наследена връзка",
+    "Form still supports old sharing-link." : "Формулярът все още поддържа стара връзка за споделяне.",
+    "Remove Legacy Link" : "Премахване на наследената връзка"
 },
 "nplurals=2; plural=(n != 1);");

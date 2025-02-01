@@ -105,7 +105,6 @@ OC.L10N.register(
     "There was an error while removing the share" : "S'ha produït un error en eliminar la compartició",
     "View mode" : "Mode de visualització",
     "Share" : "Compartir",
-    "Toggle settings" : "Obre o tanca la configuració",
     "View form" : "Veure formulari",
     "View" : "Visualitza",
     "Edit" : "Edició",
@@ -189,6 +188,7 @@ OC.L10N.register(
     "Email address" : "Adreça electrònica",
     "Number" : "Número",
     "Legacy Link" : "Enllaç heretat",
+    "Form still supports old sharing-link." : "El formulari encara admet l'enllaç de compartició antic.",
     "Remove Legacy Link" : "Suprimeix l'enllaç heretat"
 },
 "nplurals=2; plural=(n != 1);");

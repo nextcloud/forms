@@ -102,7 +102,6 @@ OC.L10N.register(
     "There was an error while removing the share" : "Hubo un error al eliminar la compartición",
     "View mode" : "Modo de visualización",
     "Share" : "Compartir",
-    "Toggle settings" : "Alternar ajustes",
     "View form" : "Ver formulario",
     "View" : "Ver",
     "Edit" : "Editar",

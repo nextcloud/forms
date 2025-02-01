@@ -161,7 +161,6 @@ OC.L10N.register(
     "This form is now owned by" : "این فرم از الان متعلق است به",
     "View mode" : "حالت نمایش",
     "Share" : "هم‌رسانی",
-    "Toggle settings" : "تعویض تنظیمات",
     "View form" : "نمایش فرم",
     "View" : "نمایش",
     "Edit" : "ویرایش",
