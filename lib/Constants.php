@@ -23,7 +23,7 @@ class Constants {
 		'submissionId' => '\d+',
 		'path' => '.+'
 	];
-	
+
 	/**
 	 * Used AppConfig Keys
 	 */
@@ -167,6 +167,19 @@ class Constants {
 		'x-office/document',
 		'x-office/presentation',
 		'x-office/spreadsheet',
+	];
+
+	public const FILENAME_INVALID_CHARS = [
+		"\n",
+		'/',
+		'\\',
+		':',
+		'*',
+		'?',
+		'"',
+		'<',
+		'>',
+		'|',
 	];
 
 	/**
