@@ -296,6 +296,9 @@ OC.L10N.register(
     "The input does not match the required pattern" : "Svaret passar inte det förväntade mönstret",
     "Legacy Link" : "Äldre länk",
     "Form still supports old sharing-link." : "Formulär stöder fortfarande gammal delningslänk.",
-    "Remove Legacy Link" : "Ta bort äldre länk"
+    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "För kompatibilitet med den gamla delningsfunktionen är den interna länken fortfarande användbar som delningslänk. Vänligen ersätt länken med en ny delningslänk. Den interna delningslänken kommer inte längre att fungera från och med Forms 5.0.",
+    "Remove Legacy Link" : "Ta bort äldre länk",
+    "Legacy link in use" : "Äldre länk används",
+    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Detta formulär använder fortfarande en föråldrad delningslänk, som kommer att tas bort i Forms 5.0. Vänligen använd den nya delningsmekanismen."
 },
 "nplurals=2; plural=(n != 1);");
