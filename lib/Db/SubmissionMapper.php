@@ -48,6 +48,29 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int $formId
+	 * @param string $userId
+	 *
+	 * @return Submission
+	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 */
+	public function findByFormAndUser(int $formId, string $userId): Submission {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+			)
+			//Newest submissions first
+			->orderBy('timestamp', 'DESC');
+
+		return $this->findEntity($qb);
+	}
+
+	/**
 	 * @param int $id
 	 * @return Submission
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result

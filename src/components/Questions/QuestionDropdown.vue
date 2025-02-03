@@ -162,7 +162,7 @@ export default {
 			}
 
 			const selected = this.values.map((id) =>
-				this.options.find((option) => option.id === id),
+				this.options.find((option) => option.id === parseInt(id)),
 			)
 
 			return this.isMultiple ? selected : selected[0]
