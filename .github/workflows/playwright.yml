@@ -44,7 +44,7 @@ jobs:
           TESTING=true npm run build --if-present
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium --only-shell
 
       - name: Run Playwright tests
         run: npx playwright test
