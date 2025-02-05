@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { runExec, addUser } from '@nextcloud/cypress/docker'
+import { runExec, addUser } from '@nextcloud/e2e-test-server/docker'
 import { expect, type APIRequestContext } from '@playwright/test'
 
 /**

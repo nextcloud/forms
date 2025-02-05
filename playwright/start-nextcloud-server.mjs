@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { startNextcloud, stopNextcloud } from '@nextcloud/cypress/docker'
+import { startNextcloud, stopNextcloud } from '@nextcloud/e2e-test-server/docker'
 import { readFileSync } from 'fs'
 
 const start = async () => {
