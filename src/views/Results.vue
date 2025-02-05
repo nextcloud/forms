@@ -105,7 +105,7 @@
 				<p>
 					{{
 						t('forms', '{amount} responses', {
-							amount: form.submissions?.length ?? 0,
+							amount: submissions.length ?? 0,
 						})
 					}}
 				</p>
@@ -230,19 +230,19 @@
 			<!-- Summary view for visualization -->
 			<section v-if="activeResponseView.id === 'summary'">
 				<ResultsSummary
-					v-for="question in form.questions"
+					v-for="question in questions"
 					:key="question.id"
 					:question="question"
-					:submissions="form.submissions" />
+					:submissions="submissions" />
 			</section>
 
 			<!-- Responses view for individual responses -->
 			<section v-else>
 				<Submission
-					v-for="submission in form.submissions"
+					v-for="submission in submissions"
 					:key="submission.id"
 					:submission="submission"
-					:questions="form.questions"
+					:questions="questions"
 					:can-delete-submission="canDeleteSubmissions"
 					@delete="deleteSubmission(submission.id)" />
 			</section>
@@ -376,6 +376,9 @@ export default {
 		return {
 			activeResponseView: responseViews[0],
 
+			questions: [],
+			submissions: [],
+
 			isDownloadActionOpened: false,
 			loadingResults: true,
 
@@ -441,7 +444,7 @@ export default {
 		},
 
 		noSubmissions() {
-			return this.form.submissions?.length === 0
+			return this.submissions.length === 0
 		},
 
 		/**
@@ -523,8 +526,8 @@ export default {
 				)
 
 				// Append questions & submissions
-				this.$set(this.form, 'submissions', loadedSubmissions)
-				this.$set(this.form, 'questions', loadedQuestions)
+				this.submissions = loadedSubmissions
+				this.questions = loadedQuestions
 			} catch (error) {
 				logger.error('Error while loading results', { error })
 				showError(t('forms', 'There was an error while loading the results'))
@@ -674,10 +677,10 @@ export default {
 					),
 				)
 				showSuccess(t('forms', 'Submission deleted'))
-				const index = this.form.submissions.findIndex(
+				const index = this.submissions.findIndex(
 					(search) => search.id === id,
 				)
-				this.form.submissions.splice(index, 1)
+				this.submissions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error(`Error while removing response ${id}`, { error })
@@ -702,7 +705,7 @@ export default {
 						id: this.form.id,
 					}),
 				)
-				this.form.submissions = []
+				this.submissions = []
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while removing responses', { error })
