@@ -32,7 +32,7 @@
 				<meter
 					:id="`option-${option.questionId}-${option.id}`"
 					min="0"
-					:max="submissions?.length"
+					:max="submissions.length"
 					:value="option.count" />
 			</li>
 		</ol>
@@ -113,7 +113,7 @@ export default {
 			})
 
 			// Go through submissions to check which options have how many responses
-			this.submissions?.forEach((submission) => {
+			this.submissions.forEach((submission) => {
 				const answers = submission.answers.filter(
 					(answer) => answer.questionId === this.question.id,
 				)
@@ -151,7 +151,7 @@ export default {
 			questionOptionsStats.forEach((questionOptionsStat) => {
 				// Fill percentage values
 				questionOptionsStat.percentage = Math.round(
-					(100 * questionOptionsStat.count) / this.submissions?.length,
+					(100 * questionOptionsStat.count) / this.submissions.length,
 				)
 				// Mark all best results. First one is best for sure due to sorting
 				questionOptionsStat.best =
@@ -169,7 +169,7 @@ export default {
 			let noResponseCount = 0
 
 			// Go through submissions to check which options have how many responses
-			this.submissions?.forEach((submission) => {
+			this.submissions.forEach((submission) => {
 				const answers = submission.answers.filter(
 					(answer) => answer.questionId === this.question.id,
 				)
@@ -199,7 +199,7 @@ export default {
 
 			// Calculate no response percentage
 			const noResponsePercentage = Math.round(
-				(100 * noResponseCount) / this.submissions?.length,
+				(100 * noResponseCount) / this.submissions.length,
 			)
 			answersModels.unshift({
 				id: 0,
