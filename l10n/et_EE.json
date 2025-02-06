@@ -3,6 +3,7 @@
     "Copy" : "Kopeeri",
     "Shared with you" : "Sinuga jagatud",
     "Select groups" : "Vali grupid",
+    "Options" : "Sätted",
     "Cancel" : "Tühista",
     "Required" : "Kohustuslik",
     "Delete" : "Kustuta",
@@ -13,8 +14,10 @@
     "Share link" : "Jaga link",
     "Add link" : "Lisa link",
     "Copy to clipboard" : "Kopeeri lõikepuhvrisse",
+    "Show QR code" : "Kuva QR-kood",
     "Internal link" : "Sisemine link",
     "Share" : "Jaga",
+    "View" : "Vaata",
     "Edit" : "Redigeeri",
     "Description" : "Kirjeldus",
     "Responses are connected to your account." : "Vastused on seotud sinu kontoga.",
@@ -33,7 +36,9 @@
     "File" : "Fail",
     "Date" : "Kuupäev",
     "Time" : "Aeg",
+    "Image" : "Pilt",
     "Presentation" : "Esitlus",
+    "Text" : "Tekst",
     "Phone number" : "Telefoninumber",
     "Email address" : "E-posti aadress"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
