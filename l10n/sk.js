@@ -296,6 +296,9 @@ OC.L10N.register(
     "The input does not match the required pattern" : "Vstup nezodpovedá požadovanému vzoru",
     "Legacy Link" : "Starší odkaz",
     "Form still supports old sharing-link." : "Formulár stále podporuje starý odkaz na zdieľanie.",
-    "Remove Legacy Link" : "Odstrániť starý odkaz"
+    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Kvôli kompatibilite so starým zdieľaním je interný odkaz stále použiteľný ako odkaz na zdieľanie. Nahraďte odkaz novým odkazom Zdieľať. Odkaz na interné zdieľanie už nebude fungovať od Forms 5.0",
+    "Remove Legacy Link" : "Odstrániť starý odkaz",
+    "Legacy link in use" : "Používa sa starší odkaz",
+    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Tento formulár stále používa zastaraný odkaz na zdieľanie, ktorý bude vo Formulároch 5.0 odstránený. Použite nový mechanizmus zdieľania."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");
