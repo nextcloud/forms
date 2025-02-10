@@ -719,7 +719,7 @@ file2.txt"
 					'1' => [3, 5, 7]
 				],
 				// Expected Result
-				'Question "q1" requires between -1 and 2 answers.',
+				'Question "q1" requires at most 2 answers.',
 			],
 			'invalid-multiple-too-few-answers' => [
 				// Questions
@@ -736,7 +736,7 @@ file2.txt"
 					'1' => [3]
 				],
 				// Expected Result
-				'Question "q1" requires between 2 and -1 answers.',
+				'Question "q1" requires at least 2 answers.',
 			],
 			'valid-multiple-with-limits' => [
 				// Questions
@@ -867,6 +867,12 @@ file2.txt"
 			return $mail === 'some.name+context@example.com';
 		});
 
-		$this->assertEquals($expected, $this->submissionService->validateSubmission($questions, $answers, 'admin'));
+		if ($expected !== null) {
+			$this->expectException(\InvalidArgumentException::class);
+			$this->expectExceptionMessage($expected);
+		}
+
+		$this->submissionService->validateSubmission($questions, $answers, 'admin');
+		$this->assertTrue(true);
 	}
 };
