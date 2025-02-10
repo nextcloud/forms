@@ -131,7 +131,7 @@ export default {
 		 * Id of the validation type menu
 		 */
 		validationTypeMenuId() {
-			return 'q' + this.$attrs.index + '__validation_menu'
+			return 'q' + this.index + '__validation_menu'
 		},
 		/**
 		 * The regular expression
