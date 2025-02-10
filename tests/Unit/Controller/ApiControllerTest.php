@@ -690,10 +690,6 @@ class ApiControllerTest extends TestCase {
 
 		$this->formAccess();
 
-		$this->submissionService
-			->method('validateSubmission')
-			->willReturn(null);
-
 		$this->submissionMapper->expects($this->once())
 			->method('insert')
 			->with($this->callback(function ($submission) {
@@ -795,10 +791,6 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
-		$this->submissionService
-			->method('validateSubmission')
-			->willReturn(null);
-
 		$this->formAccess($hasUserAccess, $hasFormExpired, $canSubmit);
 
 		$this->expectException($exception);
@@ -825,9 +817,10 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService
 			->method('validateSubmission')
-			->willReturn('error message');
+			->willThrowException(new \InvalidArgumentException('error message'));
 
 		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('error message');
 
 		$this->apiController->newSubmission(1, [], '');
 	}
