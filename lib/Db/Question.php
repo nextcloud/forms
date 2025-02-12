@@ -63,7 +63,7 @@ class Question extends Entity {
 	/**
 	 * @param FormsQuestionExtraSettings $extraSettings
 	 */
-	public function setExtraSettings(array $extraSettings) {
+	public function setExtraSettings(array $extraSettings): void {
 		// Remove extraSettings that are not set
 		foreach ($extraSettings as $key => $value) {
 			if ($value === false) {

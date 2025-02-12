@@ -248,8 +248,10 @@ class PageController extends Controller {
 
 	/**
 	 * Set CSP options to allow the page be embedded using <iframe>
+	 *
+	 * @return TemplateResponse
 	 */
-	protected function setEmbeddedCSP(TemplateResponse $response) {
+	protected function setEmbeddedCSP(TemplateResponse $response): TemplateResponse {
 		$policy = new ContentSecurityPolicy();
 		$policy->addAllowedFrameAncestorDomain('*');
 

@@ -28,9 +28,12 @@ class Version020202Date20210311150843 extends SimpleMigrationStep {
 
 	/**
 	 * Update old Access-Objects to be full objects containing (empty) user- and group-key.
+	 *
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
 	 * @param array $options
+	 *
+	 * @return void
 	 */
 	public function preSchemaChange(IOutput $output, Closure $schemaClosure, array $options) {
 		$qb_fetch = $this->connection->getQueryBuilder();
