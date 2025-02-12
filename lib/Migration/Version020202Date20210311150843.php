@@ -38,7 +38,7 @@ class Version020202Date20210311150843 extends SimpleMigrationStep {
 
 		$qb_fetch->select('id', 'access_json')
 			->from('forms_v2_forms');
-		$cursor = $qb_fetch->execute();
+		$cursor = $qb_fetch->executeQuery();
 
 		$qb_update->update('forms_v2_forms')
 			->set('access_json', $qb_update->createParameter('access_json'))
@@ -63,7 +63,7 @@ class Version020202Date20210311150843 extends SimpleMigrationStep {
 			if ($update_necessary) {
 				$qb_update->setParameter('id', $row['id'], IQueryBuilder::PARAM_INT)
 					->setParameter('access_json', json_encode($access), IQueryBuilder::PARAM_STR);
-				$qb_update->execute();
+				$qb_update->executeStatement();
 			}
 		}
 		$cursor->closeCursor();

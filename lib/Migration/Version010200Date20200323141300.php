@@ -207,7 +207,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 			$qb_fetch->select('id', 'hash', 'title', 'description', 'owner', 'created', 'access', 'expire', 'is_anonymous', 'unique')
 				->from('forms_events');
-			$cursor = $qb_fetch->execute();
+			$cursor = $qb_fetch->executeQuery();
 			while ($event = $cursor->fetch()) {
 				$newAccessJSON = $this->convertAccessList($event['access']);
 
@@ -223,7 +223,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 						'is_anonymous' => $qb_restore->createNamedParameter($event['is_anonymous'], IQueryBuilder::PARAM_BOOL),
 						'submit_once' => $qb_restore->createNamedParameter($event['unique'], IQueryBuilder::PARAM_BOOL)
 					]);
-				$qb_restore->execute();
+				$qb_restore->executeStatement();
 				$id_mapping['events'][$event['id']] = [
 					'newId' => $qb_restore->getLastInsertId(), //Store new form-id to connect questions to new form.
 					'nextQuestionOrder' => 1 //Prepare for sorting questions
@@ -237,7 +237,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 			$qb_fetch->select('id', 'form_id', 'form_question_type', 'form_question_text')
 				->from('forms_questions');
-			$cursor = $qb_fetch->execute();
+			$cursor = $qb_fetch->executeQuery();
 			while ($question = $cursor->fetch()) {
 				//In case the old Question would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
 				if (strlen($question['form_question_text']) > 2048) {
@@ -252,7 +252,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 						'type' => $qb_restore->createNamedParameter($this->questionTypeMap[$question['form_question_type']], IQueryBuilder::PARAM_STR),
 						'text' => $qb_restore->createNamedParameter($question['form_question_text'], IQueryBuilder::PARAM_STR)
 					]);
-				$qb_restore->execute();
+				$qb_restore->executeStatement();
 				$id_mapping['questions'][$question['id']]['newId'] = $qb_restore->getLastInsertId(); //Store new question-id to connect options to new question.
 			}
 			$cursor->closeCursor();
@@ -263,7 +263,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 			$qb_fetch->select('question_id', 'text')
 				->from('forms_answers');
-			$cursor = $qb_fetch->execute();
+			$cursor = $qb_fetch->executeQuery();
 			while ($answer = $cursor->fetch()) {
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
 				if (strlen($answer['text']) > 1024) {
@@ -276,7 +276,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$answer['question_id']]['newId'], IQueryBuilder::PARAM_INT),
 						'text' => $qb_restore->createNamedParameter($answer['text'], IQueryBuilder::PARAM_STR)
 					]);
-				$qb_restore->execute();
+				$qb_restore->executeStatement();
 			}
 			$cursor->closeCursor();
 
@@ -287,7 +287,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$qb_fetch = $this->connection->getQueryBuilder();
 			$qb_fetch->select('id')
 				->from('forms_events');
-			$cursor = $qb_fetch->execute();
+			$cursor = $qb_fetch->executeQuery();
 			while ($tmp = $cursor->fetch()) {
 				$event_structure[$tmp['id']] = $tmp;
 			}
@@ -299,7 +299,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				$qb_fetch->select('id', 'form_question_text')
 					->from('forms_questions')
 					->where($qb_fetch->expr()->eq('form_id', $qb_fetch->createNamedParameter($event['id'], IQueryBuilder::PARAM_INT)));
-				$cursor = $qb_fetch->execute();
+				$cursor = $qb_fetch->executeQuery();
 				while ($tmp = $cursor->fetch()) {
 					$event_structure[$event['id']]['questions'][] = $tmp;
 				}
@@ -317,7 +317,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 			$qb_fetch->select('id', 'form_id', 'user_id', 'vote_option_id', 'vote_option_text', 'vote_answer')
 				->from('forms_votes');
-			$cursor = $qb_fetch->execute();
+			$cursor = $qb_fetch->executeQuery();
 			while ($vote = $cursor->fetch()) {
 				//If the form changed, if the user changed or if vote_option_id became smaller than last one, then a new submission is interpreted.
 				if (($vote['form_id'] !== $last_vote['form_id']) || ($vote['user_id'] !== $last_vote['user_id']) || ($vote['vote_option_id'] < $last_vote['vote_option_id'])) {
@@ -327,7 +327,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 							'user_id' => $qb_restore->createNamedParameter($vote['user_id'], IQueryBuilder::PARAM_STR),
 							'timestamp' => $qb_restore->createNamedParameter(time(), IQueryBuilder::PARAM_STR) //Information not available. Just using Migration-Timestamp.
 						]);
-					$qb_restore->execute();
+					$qb_restore->executeStatement();
 					$id_mapping['currentSubmission'] = $qb_restore->getLastInsertId(); //Store submission-id to connect answers to submission.
 				}
 				$last_vote = $vote;
@@ -353,7 +353,7 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 						'question_id' => $qb_restore->createNamedParameter($id_mapping['questions'][$oldQuestionId]['newId'], IQueryBuilder::PARAM_STR),
 						'text' => $qb_restore->createNamedParameter($vote['vote_answer'], IQueryBuilder::PARAM_STR)
 					]);
-				$qb_restore->execute();
+				$qb_restore->executeStatement();
 			}
 		}
 	}
