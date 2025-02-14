@@ -84,7 +84,7 @@ class PageController extends Controller {
 	 */
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
-	#[FrontpageRoute(verb: 'GET', url: '/{hash}/{view}')]
+	#[FrontpageRoute(verb: 'GET', url: '/{hash}/{view}', requirements: ['hash' => '[a-zA-Z0-9]{16,}'])]
 	public function views(string $hash): TemplateResponse {
 		return $this->index($hash);
 	}
@@ -96,7 +96,7 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[FrontpageRoute(verb: 'GET', url: '/{hash}')]
+	#[FrontpageRoute(verb: 'GET', url: '/{hash}', requirements: ['hash' => '[a-zA-Z0-9]{16,}'])]
 	public function internalLinkView(string $hash): Response {
 		$internalView = $this->urlGenerator->linkToRoute('forms.page.views', ['hash' => $hash, 'view' => 'submit']);
 
@@ -116,7 +116,7 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}')]
+	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => '[a-zA-Z0-9]{24,}'])]
 	public function publicLinkView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
