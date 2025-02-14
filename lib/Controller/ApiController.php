@@ -96,6 +96,8 @@ class ApiController extends OCSController {
 	// CORS preflight
 	/**
 	 * Handle CORS options request by calling parent function
+	 *
+	 * @return void
 	 */
 	#[ApiRoute(verb: 'OPTIONS', url: '/api/v3/{path}', requirements: ['path' => '.+'])]
 	public function preflightedCors() {
@@ -1527,7 +1529,7 @@ class ApiController extends OCSController {
 	 * @param array $question
 	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
 	 */
-	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray) {
+	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
 		foreach ($answerArray as $answer) {
 			$answerEntity = new Answer();
 			$answerEntity->setSubmissionId($submissionId);

@@ -51,6 +51,8 @@ class Version040200Date20240219201500 extends SimpleMigrationStep {
 
 	/**
 	 * Set all old forms to active state
+	 *
+	 * @return void
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options) {
 		$query = $this->db->getQueryBuilder();

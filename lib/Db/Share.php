@@ -52,7 +52,7 @@ class Share extends Entity {
 	/**
 	 * @param list<FormsPermission> $permissions
 	 */
-	public function setPermissions(array $permissions) {
+	public function setPermissions(array $permissions): void {
 		$this->setPermissionsJson(
 			// Make sure to only encode array values as the indices might be non consecutively so it would be encoded as a json object
 			json_encode($permissions)

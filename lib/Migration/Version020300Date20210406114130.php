@@ -50,11 +50,14 @@ class Version020300Date20210406114130 extends SimpleMigrationStep {
 		return null;
 	}
 
+	/**
+	 * @return void
+	 */
 	public function postSchemaChange(IOutput $output, \Closure $schemaClosure, array $options) {
 		$qb_update = $this->connection->getQueryBuilder();
 
 		$qb_update->update('forms_v2_questions')
 			->set('is_required', 'mandatory');
-		$qb_update->execute();
+		$qb_update->executeStatement();
 	}
 }

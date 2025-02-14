@@ -108,7 +108,7 @@ class Form extends Entity {
 	/**
 	 * @param FormsAccess $access
 	 */
-	public function setAccess(array $access) {
+	public function setAccess(array $access): void {
 		// No further permissions -> 0
 		// Permit all users, but don't show in navigation -> 1
 		// Permit all users and show in navigation -> 2

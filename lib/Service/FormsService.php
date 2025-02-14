@@ -609,7 +609,7 @@ class FormsService {
 	 * @param string $questionType the question type
 	 * @return bool if the settings are valid
 	 */
-	public function areExtraSettingsValid(array $extraSettings, string $questionType) {
+	public function areExtraSettingsValid(array $extraSettings, string $questionType): bool {
 		if (count($extraSettings) === 0) {
 			return true;
 		}

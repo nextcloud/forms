@@ -28,10 +28,11 @@ class ActivityManager {
 
 	/**
 	 * Publish a new-Share Activity
+	 *
 	 * @param Form $form The shared form
 	 * @param string $shareeId UserId, the form has been shared to
 	 */
-	public function publishNewShare(Form $form, string $shareeId) {
+	public function publishNewShare(Form $form, string $shareeId): void {
 		$event = $this->manager->generateEvent();
 		$event->setApp($this->appName)
 			->setType(ActivityConstants::TYPE_NEWSHARE)
@@ -49,10 +50,11 @@ class ActivityManager {
 
 	/**
 	 * Publish a new-GroupShare Activity to each affected user
+	 *
 	 * @param Form $form The shared form
 	 * @param string $groupId Group the form has been shared to
 	 */
-	public function publishNewGroupShare(Form $form, string $groupId) {
+	public function publishNewGroupShare(Form $form, string $groupId): void {
 		$affectedUsers = $this->groupManager->get($groupId)->getUsers();
 
 		foreach ($affectedUsers as $user) {
@@ -79,7 +81,7 @@ class ActivityManager {
 	 * @param Form $form The shared form
 	 * @param string $circleId Circle the form has been shared to
 	 */
-	public function publishNewCircleShare(Form $form, string $circleId) {
+	public function publishNewCircleShare(Form $form, string $circleId): void {
 		$users = $this->circlesService->getCircleUsers($circleId);
 
 		foreach ($users as $user) {
@@ -102,10 +104,11 @@ class ActivityManager {
 
 	/**
 	 * Publish a new-Submission Activity
+	 *
 	 * @param Form $form The affected Form
 	 * @param string $submitterID ID of the User who submitted the form. Can also be our 'anon-user-'-ID
 	 */
-	public function publishNewSubmission(Form $form, string $submitterID) {
+	public function publishNewSubmission(Form $form, string $submitterID): void {
 		$event = $this->manager->generateEvent();
 		$event->setApp($this->appName)
 			->setType(ActivityConstants::TYPE_NEWSUBMISSION)
@@ -127,7 +130,7 @@ class ActivityManager {
 	 * @param Form $form The affected Form
 	 * @param string $submitterID ID of the User who submitted the form. Can also be our 'anon-user-'-ID
 	 */
-	public function publishNewSharedSubmission(Form $form, int $shareType, string $shareWith, string $submitterID) {
+	public function publishNewSharedSubmission(Form $form, int $shareType, string $shareWith, string $submitterID): void {
 		$users = [];
 		switch ($shareType) {
 			case IShare::TYPE_USER:
