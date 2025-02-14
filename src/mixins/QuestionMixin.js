@@ -468,7 +468,7 @@ export default {
 					this.focusIndex(options.length - 1)
 
 					// Trigger onInput on new AnswerInput for posting the new option to the API
-					this.$refs.input[options.length - 1].onInput()
+					this.$refs.input[options.length - 1].debounceOnInput()
 				})
 			}
 		},
