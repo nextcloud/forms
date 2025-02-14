@@ -15,7 +15,7 @@
 			minlength="1"
 			type="text"
 			dir="auto"
-			@input="onInput"
+			@input="debounceOnInput"
 			@keydown.delete="deleteEntry"
 			@keydown.enter.prevent="focusNextInput" />
 
@@ -88,12 +88,8 @@ export default {
 
 	data() {
 		return {
-			queue: new PQueue({ concurrency: 1 }),
-
-			// As data instead of Method, to have a separate debounce per AnswerInput
-			debounceUpdateAnswer: pDebounce(function (answer) {
-				return this.queue.add(() => this.updateAnswer(answer))
-			}, 500),
+			queue: null,
+			debounceOnInput: null,
 		}
 	},
 
@@ -101,6 +97,15 @@ export default {
 		pseudoIcon() {
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
+	},
+
+	created() {
+		this.queue = new PQueue({ concurrency: 1 })
+
+		// As data instead of method, to have a separate debounce per AnswerInput
+		this.debounceOnInput = pDebounce(() => {
+			return this.queue.add(() => this.onInput())
+		}, 500)
 	},
 
 	methods: {
@@ -125,16 +130,15 @@ export default {
 
 			if (this.answer.local) {
 				// Dispatched for creation. Marked as synced
-				// eslint-disable-next-line vue/no-mutating-props
-				this.answer.local = false
-				const newAnswer = await this.debounceCreateAnswer(answer)
+				this.$set(this.answer, 'local', false)
+				const newAnswer = await this.createAnswer(answer)
 
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while creating the answer
 				newAnswer.text = this.$refs.input.value
 				this.$emit('update:answer', answer.id, newAnswer)
 			} else {
-				this.debounceUpdateAnswer(answer)
+				await this.updateAnswer(answer)
 				this.$emit('update:answer', answer.id, answer)
 			}
 		},
@@ -195,9 +199,6 @@ export default {
 
 			return answer
 		},
-		debounceCreateAnswer: pDebounce(function (answer) {
-			return this.queue.add(() => this.createAnswer(answer))
-		}, 100),
 
 		/**
 		 * Save to the server, only do it after 500ms
