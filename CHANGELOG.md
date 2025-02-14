@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.3.7 - 2025-02-14
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.6...v4.3.7)
+
+### Fixed
+
+- [stable4] Fix: Implement debounced input handling for AnswerInput component by @backportbot[bot] in [\#2557](https://github.com/nextcloud/forms/pull/2557)
+- [stable4] fix: Correct validationTypeMenuId to use local index instead of $attrs by @backportbot[bot] in [\#2556](https://github.com/nextcloud/forms/pull/2556)
+
+### Merged
+
+- [stable4] Chore: Refactor submission handling in Results.vue by @backportbot[bot] in [\#2546](https://github.com/nextcloud/forms/pull/2546)
+
 ## v4.3.6 - 2025-01-31
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.5...v4.3.6)
