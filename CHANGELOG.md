@@ -5,6 +5,21 @@
 
 # Changelog
 
+## v5.0.0-alpha.3 - 2025-02-14
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.2...v5.0.0-alpha.3)
+
+### Fixed
+
+- Fix(routes): Add hash requirements for frontpage routes by @Chartman123 in [\#2555](https://github.com/nextcloud/forms/pull/2555)
+- Fix: Implement debounced input handling for AnswerInput component by @Chartman123 in [\#2553](https://github.com/nextcloud/forms/pull/2553)
+- fix: Correct validationTypeMenuId to use local index instead of $attrs by @Chartman123 in [\#2549](https://github.com/nextcloud/forms/pull/2549)
+
+### Merged
+
+- fix(migration): Replace execute() with executeQuery() and executeStatement() for improved query execution by @Chartman123 in [\#2551](https://github.com/nextcloud/forms/pull/2551)
+- Chore: Refactor submission handling in Results.vue by @Chartman123 in [\#2541](https://github.com/nextcloud/forms/pull/2541)
+
 ## v5.0.0-alpha.2 - 2025-01-31
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.1...v5.0.0-alpha.2)
