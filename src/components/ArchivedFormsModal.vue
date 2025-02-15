@@ -28,7 +28,7 @@
 import { translate as t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 
-import NcDialog from '@nextcloud/vue/dist/Components/NcDialog.js'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
 import AppNavigationForm from './AppNavigationForm.vue'
 
 export default defineComponent({
