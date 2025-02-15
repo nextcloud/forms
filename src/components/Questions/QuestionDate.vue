@@ -27,7 +27,7 @@
 import moment from '@nextcloud/moment'
 
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import NcDateTimePicker from '@nextcloud/vue/dist/Components/NcDateTimePicker.js'
+import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 
 export default {
 	name: 'QuestionDate',

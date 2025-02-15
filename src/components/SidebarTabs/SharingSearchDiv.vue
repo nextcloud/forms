@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
 
 import UserSearchMixin from '../../mixins/UserSearchMixin.js'
 
