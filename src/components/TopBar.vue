@@ -35,7 +35,7 @@ import { mdiEye, mdiPencil, mdiPoll } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
 
-import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 
 import logger from '../utils/Logger.js'

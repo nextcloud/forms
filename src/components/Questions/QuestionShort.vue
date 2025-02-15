@@ -80,9 +80,9 @@ import validationTypes from '../../models/ValidationTypes.js'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
 import IconRegex from 'vue-material-design-icons/Regex.vue'
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
-import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
-import NcActionRadio from '@nextcloud/vue/dist/Components/NcActionRadio.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 
 export default {
 	name: 'QuestionShort',
