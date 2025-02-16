@@ -767,7 +767,7 @@ export default {
 	// Title & description header
 	header {
 		margin-block-end: 24px;
-		margin-inline-start: 56px;
+		margin-inline-start: 40px;
 
 		.form-title,
 		.form-desc,

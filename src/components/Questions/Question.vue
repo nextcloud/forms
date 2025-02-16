@@ -444,7 +444,6 @@ export default {
 				&__input {
 					position: relative;
 					inset-inline-start: -12px;
-					margin-inline-end: -12px !important;
 					padding-inline-start: 10px !important;
 				}
 			}
@@ -477,7 +476,7 @@ export default {
 				z-index: inherit;
 				overflow-wrap: break-word;
 				// match with other inputs
-				width: calc(100% - 32px);
+				width: calc(100% - 36px);
 			}
 			&__output {
 				//compensate border

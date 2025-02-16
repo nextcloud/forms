@@ -804,7 +804,7 @@ export default {
 		display: flex;
 		flex-direction: column;
 		margin-block-end: 24px;
-		margin-inline-start: 56px;
+		margin-inline-start: 40px;
 
 		h2 {
 			margin-block-end: 0; // because the input field has enough padding
