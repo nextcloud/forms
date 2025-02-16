@@ -362,12 +362,13 @@ export default {
 
 	.option__actions {
 		display: flex;
-		// make sure even the "add new" option is aligned correctly
-		min-width: 44px;
+		position: absolute;
+		right: 16px;
+		height: 100%;
 	}
 
 	.question__input {
-		width: 100%;
+		width: calc(100% - var(--default-clickable-area));
 		position: relative;
 		inset-inline-start: -12px;
 		margin-inline-end: -12px !important;
