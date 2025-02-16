@@ -9,7 +9,6 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
 import logger from '../utils/Logger.js'
-import GenRandomId from '../utils/GenRandomId.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import Question from '../components/Questions/Question.vue'
 
@@ -164,14 +163,6 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-
-		/**
-		 * isComposing for IME handling
-		 */
-		isIMEComposing: {
-			type: Boolean,
-			default: false,
-		},
 	},
 
 	components: {
@@ -188,14 +179,6 @@ export default {
 				}
 			})
 			return props
-		},
-		sortedOptions() {
-			// Only shuffle options if not in editing mode (and shuffling is enabled)
-			if (this.readOnly && this.extraSettings?.shuffleOptions) {
-				return this.shuffleArray(this.options)
-			}
-			// Ensure order of options always is the same
-			return [...this.options].sort((a, b) => a.id - b.id)
 		},
 
 		/**
@@ -232,6 +215,7 @@ export default {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
 		}, 200),
+
 		/**
 		 * Forward the description change to the parent and store to db
 		 *
@@ -414,64 +398,6 @@ export default {
 				showError(t('forms', 'Error while saving question options'))
 			}
 			this.isLoading = false
-		},
-
-		/**
-		 * Add a new empty answer locally
-		 * @param {InputEvent} event The input event that triggered adding a new entry
-		 */
-		addNewEntry({ target, isComposing }) {
-			/*
-			 * Check for !isComposing needed for languages using IME like Japanese or Chinese
-			 * Check for !this.isComposing needed for IME inputs handled by CompositionEvents
-			 * Check for target.value !== '' needed for Linux/Mac for characters like á or è
-			 */
-			if (!isComposing && !this.isIMEComposing && target.value !== '') {
-				// Add local entry
-				const options = [
-					...this.options,
-					{
-						id: GenRandomId(),
-						questionId: this.id,
-						text: target.value,
-						local: true,
-					},
-				]
-
-				// Reset the "new answer" input if needed
-				if (this.$refs.pseudoInput) {
-					this.$refs.pseudoInput.value = ''
-				}
-
-				// Update questions
-				this.updateOptions(options)
-
-				this.$nextTick(() => {
-					// Set focus to the created input element
-					this.focusIndex(options.length - 1)
-
-					// Trigger onInput on new AnswerInput for posting the new option to the API
-					this.$refs.input[options.length - 1].debounceOnInput()
-				})
-			}
-		},
-
-		/**
-		 * Handle compostion start event for IME inputs
-		 */
-		onCompositionStart() {
-			this.isIMEComposing = true
-		},
-
-		/**
-		 * Handle compostion end event for IME inputs
-		 * @param {CompositionEvent} event The input event that triggered adding a new entry
-		 */
-		onCompositionEnd({ target, isComposing }) {
-			this.isIMEComposing = false
-			if (!isComposing) {
-				this.addNewEntry({ target, isComposing })
-			}
 		},
 	},
 }
