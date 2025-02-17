@@ -7,6 +7,10 @@
 
 ## v5.0.0 - tbd
 
+- **Re-order options**
+
+    Options of multiple choice questions (radio/checkbox/dropdown) can now be re-ordered using a menu or drag'n'drop.
+
 - **Unified Search integration**
 
     You can now use the Unified Search to search forms based on the title and the description.

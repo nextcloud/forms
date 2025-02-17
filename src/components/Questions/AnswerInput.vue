@@ -26,43 +26,43 @@
 			@compositionend="onCompositionEnd" />
 
 		<!-- Actions for reordering and deleting the option  -->
-		<div class="option__actions">
-			<template v-if="!answer.local">
-				<NcButton
-					ref="buttonUp"
-					class="option__actions-button"
-					:aria-label="t('forms', 'Move option up')"
+		<div v-if="!answer.local" class="option__actions">
+			<NcActions
+				:id="optionDragMenuId"
+				:container="`#${optionDragMenuId}`"
+				:aria-label="t('forms', 'Move option actions')"
+				class="option__drag-handle"
+				type="tertiary-no-background">
+				<template #icon>
+					<IconDragIndicator :size="20" />
+				</template>
+				<NcActionButton
+					ref="buttonOptionUp"
 					:disabled="index === 0"
-					size="small"
-					type="tertiary"
 					@click="onMoveUp">
 					<template #icon>
 						<IconArrowUp :size="20" />
 					</template>
-				</NcButton>
-				<NcButton
-					ref="buttonDown"
-					class="option__actions-button"
-					:aria-label="t('forms', 'Move option down')"
+					{{ t('forms', 'Move option up') }}
+				</NcActionButton>
+				<NcActionButton
+					ref="buttonOptionDown"
 					:disabled="index === maxIndex"
-					size="small"
-					type="tertiary"
 					@click="onMoveDown">
 					<template #icon>
 						<IconArrowDown :size="20" />
 					</template>
-				</NcButton>
-				<NcButton
-					class="option__actions-button"
-					:aria-label="t('forms', 'Delete answer')"
-					size="small"
-					type="tertiary"
-					@click="deleteEntry">
-					<template #icon>
-						<IconDelete :size="20" />
-					</template>
-				</NcButton>
-			</template>
+					{{ t('forms', 'Move option down') }}
+				</NcActionButton>
+			</NcActions>
+			<NcButton
+				:aria-label="t('forms', 'Delete answer')"
+				type="tertiary"
+				@click="deleteEntry">
+				<template #icon>
+					<IconDelete :size="20" />
+				</template>
+			</NcButton>
 		</div>
 	</li>
 </template>
@@ -74,12 +74,16 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import PQueue from 'p-queue'
 
-import NcButton from '@nextcloud/vue/components/NcButton'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
-import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
+
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcButton from '@nextcloud/vue/components/NcButton'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
@@ -92,7 +96,10 @@ export default {
 		IconArrowUp,
 		IconCheckboxBlankOutline,
 		IconDelete,
+		IconDragIndicator,
 		IconRadioboxBlank,
+		NcActions,
+		NcActionButton,
 		NcButton,
 	},
 
@@ -143,6 +150,10 @@ export default {
 			return t('forms', 'The text of option {index}', {
 				index: this.index + 1,
 			})
+		},
+
+		optionDragMenuId() {
+			return `q${this.answer.questionId}o${this.answer.id}__drag_menu`
 		},
 
 		placeholder() {
@@ -303,7 +314,6 @@ export default {
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
 			}
-			return answer
 		},
 
 		/**
@@ -311,19 +321,18 @@ export default {
 		 */
 		onMoveDown() {
 			this.$emit('move-down')
-			if (this.index < this.maxIndex - 1) {
-				this.$nextTick(() => this.$refs.buttonDown.$el.focus())
-			} else {
-				this.$nextTick(() => this.$refs.buttonUp.$el.focus())
-			}
+			this.focusButton(
+				this.index < this.maxIndex - 1
+					? 'buttonOptionDown'
+					: 'buttonOptionUp',
+			)
 		},
 		onMoveUp() {
 			this.$emit('move-up')
-			if (this.index > 1) {
-				this.$nextTick(() => this.$refs.buttonUp.$el.focus())
-			} else {
-				this.$nextTick(() => this.$refs.buttonDown.$el.focus())
-			}
+			this.focusButton(this.index > 1 ? 'buttonOptionUp' : 'buttonOptionDown')
+		},
+		focusButton(refName) {
+			this.$nextTick(() => this.$refs[refName].$el.focus())
 		},
 
 		/**
@@ -356,7 +365,7 @@ export default {
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
-		margin-inline-start: calc(-1 * var(--default-grid-baseline));
+		margin-inline-start: -2px;
 		z-index: 1;
 	}
 
@@ -364,15 +373,28 @@ export default {
 		display: flex;
 		position: absolute;
 		gap: var(--default-grid-baseline);
-		inset-inline-end: 16px;
-		height: var(--default-clickable-area);
+		inset-inline-end: 12px;
+		height: 100%;
 	}
 
-	.option__actions-button {
+	.option__drag-handle,
+	.drag-indicator-icon {
+		color: var(--color-text-maxcontrast);
+		cursor: grab;
 		margin-block: auto;
 
-		&:last-of-type {
-			margin-inline: 5px;
+		&:hover,
+		&:focus,
+		&:focus-within {
+			color: var(--color-main-text);
+		}
+
+		&:active {
+			cursor: grabbing;
+		}
+
+		> * {
+			cursor: grab;
 		}
 	}
 
@@ -380,7 +402,6 @@ export default {
 		width: calc(100% - var(--default-clickable-area));
 		position: relative;
 		inset-inline-start: -12px;
-		margin-block: 0 !important;
 		margin-inline-end: -12px !important;
 
 		&--shifted {
