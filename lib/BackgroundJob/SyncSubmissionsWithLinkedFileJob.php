@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright (c) 2024 Andrii Ilkiv <ailkiv@users.noreply.github.com>
  *
