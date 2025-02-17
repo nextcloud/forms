@@ -375,7 +375,7 @@ export default {
 	&__drag-handle {
 		position: absolute;
 		display: flex;
-		inset-inline-start: 0;
+		inset-inline-start: var(--default-grid-baseline);
 		flex-direction: column;
 		justify-content: center;
 		gap: 12px;
