@@ -44,8 +44,8 @@ import pDebounce from 'p-debounce'
 // eslint-disable-next-line import/no-unresolved, n/no-missing-import
 import PQueue from 'p-queue'
 
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import IconClose from 'vue-material-design-icons/Close.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'

@@ -131,8 +131,8 @@
 
 <script>
 import moment from '@nextcloud/moment'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcDateTimePicker from '@nextcloud/vue/dist/Components/NcDateTimePicker.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import ShareTypes from '../../mixins/ShareTypes.js'
 import TransferOwnership from './TransferOwnership.vue'
 
