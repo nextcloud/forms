@@ -19,6 +19,8 @@ use OCA\Forms\Tests\Integration\IntegrationBase;
 class ApiV3Test extends IntegrationBase {
 	/** @var GuzzleHttp\Client */
 	private $http;
+	/** @var GuzzleHttp\Client */
+	private $httpUser1;
 
 	protected array $users = [
 		'test' => 'Test user',
@@ -41,6 +43,7 @@ class ApiV3Test extends IntegrationBase {
 				'state' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
+				'allow_edit' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'submission_message' => 'Back to website',
@@ -164,6 +167,7 @@ class ApiV3Test extends IntegrationBase {
 				'state' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
+				'allow_edit' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'submission_message' => '',
@@ -201,6 +205,7 @@ class ApiV3Test extends IntegrationBase {
 				'state' => 0,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
+				'allow_edit' => true,
 				'show_expiration' => false,
 				'last_updated' => 123456789,
 				'submission_message' => '',
@@ -247,6 +252,16 @@ class ApiV3Test extends IntegrationBase {
 		$this->http = new Client([
 			'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
 			'auth' => ['test', 'test'],
+			'headers' => [
+				'OCS-ApiRequest' => 'true',
+				'Accept' => 'application/json'
+			],
+		]);
+
+		// Set up http Client for user user1
+		$this->httpUser1 = new Client([
+			'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
+			'auth' => ['user1', 'user1'],
 			'headers' => [
 				'OCS-ApiRequest' => 'true',
 				'Accept' => 'application/json'
@@ -366,6 +381,7 @@ class ApiV3Test extends IntegrationBase {
 					'state' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false,
 					// 'lastUpdated' => time() can not be checked exactly
 					'canSubmit' => true,
@@ -425,6 +441,7 @@ class ApiV3Test extends IntegrationBase {
 					'state' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
+					'allowEdit' => false,
 					'showExpiration' => false,
 					'lastUpdated' => 123456789,
 					'canSubmit' => true,
@@ -1342,6 +1359,93 @@ CSV
 				[
 					'questionId' => $this->testForms[0]['questions'][2]['id'],
 					'text' => 'test.txt',
+				],
+			]
+		], $data['submissions'][0]);
+	}
+
+	/**
+	 * @dataProvider dataNewSubmission
+	 */
+	public function testUpdateSubmission() {
+
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'AllowEdit' => true,
+				]
+			]
+		]);
+
+		$uploadedFileResponse = $this->httpUser1->request('POST',
+			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
+			[
+				'multipart' => [
+					[
+						'name' => 'files[]',
+						'contents' => 'hello world2',
+						'filename' => 'test2.txt'
+					]
+				]
+			]);
+
+		$data = $this->OcsResponse2Data($uploadedFileResponse);
+		$uploadedFileId = $data[0]['uploadedFileId'];
+
+		$resp = $this->httpUser1->request('PUT', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}", [
+			'json' => [
+				'answers' => [
+					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer2!'],
+					$this->testForms[0]['questions'][1]['id'] => [
+						$this->testForms[0]['questions'][1]['options'][1]['id']
+					],
+					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId]]
+				]
+			]
+		]);
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Check stored submissions
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
+		$data = $this->OcsResponse2Data($resp);
+
+		// Check Ids
+		foreach ($data['submissions'][0]['answers'] as $aIndex => $answer) {
+			$this->assertEquals($data['submissions'][0]['id'], $answer['submissionId']);
+			unset($data['submissions'][0]['answers'][$aIndex]['id']);
+			unset($data['submissions'][0]['answers'][$aIndex]['submissionId']);
+
+			if (isset($answer['fileId'])) {
+				$this->assertIsNumeric($answer['fileId'], 'fileId should be numeric.');
+				$this->assertGreaterThan(0, $answer['fileId'], 'fileId should be greater than 0.');
+				unset($data['submissions'][0]['answers'][$aIndex]['fileId']);
+			}
+		}
+		unset($data['submissions'][0]['id']);
+		// Check general behaviour of timestamp (Insert in the last 10 seconds)
+		$this->assertTrue(time() - $data['submissions'][0]['timestamp'] < 10);
+		unset($data['submissions'][0]['timestamp']);
+
+		$this->assertEquals([
+			'userId' => 'user1',
+			'userDisplayName' => 'User No. 1',
+			'formId' => $this->testForms[0]['id'],
+			'answers' => [
+				[
+					'questionId' => $this->testForms[0]['questions'][0]['id'],
+					'text' => 'ShortAnswer2!',
+					'fileId' => null,
+				],
+				[
+					'questionId' => $this->testForms[0]['questions'][1]['id'],
+					'text' => 'Option 2',
+					'fileId' => null,
+				],
+				[
+					'questionId' => $this->testForms[0]['questions'][2]['id'],
+					'text' => 'test2.txt',
 				],
 			]
 		], $data['submissions'][0]);
