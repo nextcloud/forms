@@ -247,8 +247,8 @@ export default {
 
 .validation-type-menu__toggle {
 	position: relative;
-	left: calc(100% - var(--default-clickable-area));
-	top: -47px; // input height + margin
+	right: calc(4px + var(--default-clickable-area));
+	top: 4px;
 }
 
 :deep(input:invalid) {
