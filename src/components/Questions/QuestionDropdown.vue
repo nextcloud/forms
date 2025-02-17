@@ -40,28 +40,43 @@
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />
 			</div>
-			<TransitionList v-else class="question__content">
-				<!-- Answer text input edit -->
-				<AnswerInput
-					v-for="(answer, index) in sortedOptions"
-					:key="answer.local ? 'option-local' : answer.id"
-					ref="input"
-					:answer="answer"
-					is-dropdown
-					:allow-reorder="!extraSettings?.shuffleOptions"
-					:form-id="formId"
-					:index="index"
-					:is-unique="!isMultiple"
-					:max-index="options.length - 1"
-					:max-option-length="maxStringLengths.optionText"
-					@create-answer="onCreateAnswer"
-					@update:answer="updateAnswer(index, $event)"
-					@delete="deleteOption"
-					@focus-next="focusNextInput"
-					@move-up="onOptionMoveUp(index)"
-					@move-down="onOptionMoveDown(index)"
-					@tabbed-out="checkValidOption" />
-			</TransitionList>
+			<Draggable
+				v-else
+				v-model="sortedOptions"
+				animation="200"
+				tag="ul"
+				handle=".option__drag-handle"
+				@change="saveOptionsOrder"
+				@start="isDragging = true"
+				@end="isDragging = false">
+				<transition-group
+					:name="
+						isDragging
+							? 'no-external-transition-on-drag'
+							: 'option-list'
+					">
+					<!-- Answer text input edit -->
+					<AnswerInput
+						v-for="(answer, index) in sortedOptions"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						is-dropdown
+						:allow-reorder="!extraSettings?.shuffleOptions"
+						:form-id="formId"
+						:index="index"
+						:is-unique="!isMultiple"
+						:max-index="options.length - 1"
+						:max-option-length="maxStringLengths.optionText"
+						@create-answer="onCreateAnswer"
+						@update:answer="updateAnswer(index, $event)"
+						@delete="deleteOption"
+						@focus-next="focusNextInput"
+						@move-up="onOptionMoveUp(index)"
+						@move-down="onOptionMoveDown(index)"
+						@tabbed-out="checkValidOption" />
+				</transition-group>
+			</Draggable>
 		</template>
 
 		<!-- Add multiple options modal -->
@@ -72,6 +87,8 @@
 </template>
 
 <script>
+import Draggable from 'vuedraggable'
+
 import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
@@ -83,26 +100,32 @@ import AnswerInput from './AnswerInput.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
-import TransitionList from '../TransitionList.vue'
+// import TransitionList from '../TransitionList.vue'
 
 export default {
 	name: 'QuestionDropdown',
 
 	components: {
 		AnswerInput,
+		Draggable,
 		IconContentPaste,
 		NcActionButton,
 		NcActionCheckbox,
 		NcLoadingIcon,
 		NcSelect,
 		OptionInputDialog,
-		TransitionList,
+		// TransitionList,
 	},
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
 
 	data() {
-		return { inputValue: '', isOptionDialogShown: false, isLoading: false }
+		return {
+			inputValue: '',
+			isDragging: false,
+			isLoading: false,
+			isOptionDialogShown: false,
+		}
 	},
 
 	computed: {

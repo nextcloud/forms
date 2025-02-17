@@ -28,28 +28,33 @@
 		<!-- Actions for reordering and deleting the option  -->
 		<div class="option__actions">
 			<template v-if="!answer.local">
-				<template v-if="allowReorder">
-					<NcButton
+				<NcActions
+					v-if="allowReorder"
+					:id="optionDragMenuId"
+					:container="`#${optionDragMenuId}`"
+					class="option__drag-handle">
+					<template #icon>
+						<IconDragHandle :size="20" />
+					</template>
+					<NcActionButton
 						ref="buttonUp"
-						:aria-label="t('forms', 'Move option up')"
 						:disabled="index === 0"
-						type="tertiary"
 						@click="onMoveUp">
 						<template #icon>
 							<IconArrowUp :size="20" />
 						</template>
-					</NcButton>
-					<NcButton
+						{{ t('forms', 'Move option up') }}
+					</NcActionButton>
+					<NcActionButton
 						ref="buttonDown"
-						:aria-label="t('forms', 'Move option down')"
 						:disabled="index === maxIndex"
-						type="tertiary"
 						@click="onMoveDown">
 						<template #icon>
 							<IconArrowDown :size="20" />
 						</template>
-					</NcButton>
-				</template>
+						{{ t('forms', 'Move option down') }}
+					</NcActionButton>
+				</NcActions>
 				<NcButton
 					type="tertiary"
 					:aria-label="t('forms', 'Delete answer')"
@@ -70,12 +75,16 @@ import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import PQueue from 'p-queue'
 
-import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
-import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDragHandle from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
+
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
@@ -88,7 +97,10 @@ export default {
 		IconArrowUp,
 		IconCheckboxBlankOutline,
 		IconDelete,
+		IconDragHandle,
 		IconRadioboxBlank,
+		NcActions,
+		NcActionButton,
 		NcButton,
 	},
 
@@ -143,6 +155,10 @@ export default {
 			return t('forms', 'The text of option {index}', {
 				index: this.index + 1,
 			})
+		},
+
+		optionDragMenuId() {
+			return 'o' + this.index + '__drag_menu'
 		},
 
 		placeholder() {
@@ -365,6 +381,28 @@ export default {
 		position: absolute;
 		right: 16px;
 		height: 100%;
+	}
+
+	.option__drag-handle {
+		position: absolute;
+		right: var(--default-clickable-area);
+		top: 4px;
+		opacity: 0.5;
+		cursor: grab;
+
+		&:hover,
+		&:focus,
+		&:focus-within {
+			opacity: 1;
+		}
+
+		&:active {
+			cursor: grabbing;
+		}
+
+		> * {
+			cursor: grab;
+		}
 	}
 
 	.question__input {

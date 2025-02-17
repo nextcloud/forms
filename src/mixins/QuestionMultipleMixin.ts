@@ -14,6 +14,7 @@ import { defineComponent } from 'vue'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import logger from '../utils/Logger'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 export default defineComponent({
 	computed: {
@@ -37,33 +38,43 @@ export default defineComponent({
 		/**
 		 * Options sorted by order or randomized if configured
 		 */
-		sortedOptions() {
-			// Only shuffle options if not in editing mode (and shuffling is enabled)
-			if (this.readOnly && this.extraSettings?.shuffleOptions) {
-				return this.shuffleArray(this.options)
-			}
-
-			// Ensure order of options always is the same
-			const options = [...this.options].sort((a, b) => {
-				if (a.order === b.order) {
-					return a.id - b.id
+		sortedOptions: {
+			get() {
+				// Only shuffle options if not in editing mode (and shuffling is enabled)
+				if (this.readOnly && this.extraSettings?.shuffleOptions) {
+					return this.shuffleArray(this.options)
 				}
-				return (a.order ?? 0) - (b.order ?? 0)
-			})
 
-			if (!this.readOnly) {
-				// In edit mode append an empty option
-				return [
-					...options,
-					{
-						local: true,
-						questionId: this.id,
-						text: '',
-						order: options.length,
-					},
-				]
-			}
-			return options
+				// Ensure order of options always is the same
+				const options = [...this.options].sort((a, b) => {
+					if (a.order === b.order) {
+						return a.id - b.id
+					}
+					return (a.order ?? 0) - (b.order ?? 0)
+				})
+
+				if (!this.readOnly) {
+					// In edit mode append an empty option
+					return [
+						...options,
+						{
+							local: true,
+							questionId: this.id,
+							text: '',
+							order: options.length,
+						},
+					]
+				}
+				return options
+			},
+			set(newOrder) {
+				this.options = newOrder
+					.filter(option => !option.local)
+					.map((option, index) => ({
+						...option,
+						order: index,
+					}))
+			},
 		},
 
 		/**
@@ -244,7 +255,7 @@ export default defineComponent({
 					.filter((option) => !option.local)
 					.map((option) => option.id)
 
-				await axios.patch(
+				const response = await axios.patch(
 					generateOcsUrl(
 						`apps/forms/api/v3/forms/{id}/questions/{questionId}/options`,
 						{
@@ -256,7 +267,7 @@ export default defineComponent({
 						newOrder,
 					},
 				)
-				emit('forms:last-updated:set', this.formId)
+				this.updateOptions(OcsResponse2Data(response))
 			} catch (error) {
 				logger.error('Could not reorder options', { error })
 				showError(t('forms', 'Error while saving options order'))
