@@ -41,7 +41,7 @@
 				:container="`#${validationTypeMenuId}`"
 				:open.sync="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
-				type="tertiary-no-background">
+				type="tertiary">
 				<template #icon>
 					<component :is="validationObject.icon" :size="20" />
 				</template>
@@ -240,15 +240,15 @@ export default {
 	min-height: var(--default-clickable-area);
 
 	&:disabled {
-		width: calc(100% - 32px) !important;
+		width: calc(100% - var(--default-clickable-area)) !important;
 		margin-inline-start: -12px;
 	}
 }
 
 .validation-type-menu__toggle {
 	position: relative;
-	left: calc(100% - var(--default-clickable-area));
-	top: -47px; // input height + margin
+	inset-inline-start: -4px;
+	inset-block-start: 4px;
 }
 
 :deep(input:invalid) {

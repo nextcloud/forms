@@ -576,7 +576,7 @@ export default {
 			margin-block: 22px 14px;
 			margin-inline: 0;
 			width: calc(
-				100% - 56px
+				100% - 58px
 			); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -593,7 +593,7 @@ export default {
 			min-height: unset;
 			padding-block: 0px 20px;
 			padding-inline: 12px;
-			width: calc(100% - 56px);
+			width: calc(100% - 58px);
 		}
 
 		.form-desc {

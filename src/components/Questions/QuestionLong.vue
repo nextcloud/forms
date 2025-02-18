@@ -96,7 +96,7 @@ export default {
 		// Just overrides Server CSS-Styling for disabled inputs. -> Not Good??
 		background-color: var(--color-main-background);
 		color: var(--color-main-text);
-		width: calc(100% - 32px) !important;
+		width: calc(100% - var(--default-clickable-area)) !important;
 		margin-inline-start: -12px;
 	}
 }

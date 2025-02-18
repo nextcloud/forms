@@ -451,8 +451,13 @@ export default {
 
 			&__warning {
 				margin-block: auto;
-				margin-inline: 4px 12px;
+				margin-inline: 8px;
 				color: var(--color-error);
+			}
+
+			&__menu {
+				margin-block: auto;
+				margin-inline-end: 12px;
 			}
 		}
 
@@ -477,7 +482,7 @@ export default {
 				z-index: inherit;
 				overflow-wrap: break-word;
 				// match with other inputs
-				width: calc(100% - 32px);
+				width: calc(100% - var(--default-clickable-area));
 			}
 			&__output {
 				//compensate border
