@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright (c) 2023 Ferdinand Thiessen <rpm@fthiessen.de>
  *

@@ -52,7 +52,7 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms3.png</screenshot>
 
 	<dependencies>
-		<nextcloud min-version="28" max-version="30" />
+		<nextcloud min-version="29" max-version="30" />
 	</dependencies>
 
 	<background-jobs>
