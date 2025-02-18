@@ -180,12 +180,14 @@ class ApiController extends OCSController {
 		} else {
 			$oldForm = $this->getFormIfAllowed($fromId);
 
-			// Read Form, set new Form specific data, extend Title.
+			// Read old form, (un)set new form specific data, extend title
 			$formData = $oldForm->read();
 			unset($formData['id']);
 			unset($formData['created']);
 			unset($formData['lastUpdated']);
 			unset($formData['state']);
+			unset($formData['fileId']);
+			unset($formData['fileFormat']);
 			$formData['hash'] = $this->formsService->generateFormHash();
 			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
