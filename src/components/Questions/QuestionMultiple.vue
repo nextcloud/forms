@@ -661,7 +661,7 @@ export default {
 	}
 
 	.question__input {
-		width: 100%;
+		width: calc(100% - var(--default-clickable-area));
 		position: relative;
 		inset-inline-start: -34px;
 		inset-block-start: 1px;
