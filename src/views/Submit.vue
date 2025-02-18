@@ -767,17 +767,17 @@ export default {
 	// Title & description header
 	header {
 		margin-block-end: 24px;
-		margin-inline-start: 56px;
+		margin-inline-start: var(--default-clickable-area);
 
 		.form-title,
 		.form-desc,
 		.info-message {
 			width: calc(
-				100% - 56px
+				100% - 58px
 			); // margin of header, needed if screen is < 806px (max-width + margin-left)
 			font-size: 100%;
-			padding-block: 0px;
-			padding-inline: 16px;
+			padding-block: 0;
+			padding-inline: 18px;
 			border: none;
 		}
 		.form-title {
