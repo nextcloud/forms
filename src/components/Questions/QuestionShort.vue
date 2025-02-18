@@ -41,7 +41,7 @@
 				:container="`#${validationTypeMenuId}`"
 				:open.sync="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
-				type="tertiary">
+				type="tertiary-no-background">
 				<template #icon>
 					<component :is="validationObject.icon" :size="20" />
 				</template>
@@ -247,7 +247,7 @@ export default {
 
 .validation-type-menu__toggle {
 	position: relative;
-	inset-inline-start: -4px;
+	inset-inline-end: calc(4px + var(--default-clickable-area));
 	inset-block-start: 4px;
 }
 
