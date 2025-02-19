@@ -21,8 +21,8 @@
 
 .icon-overlay {
 	position: absolute;
-	inset-inline-start: 2px;
-	inset-block-start: 2px;
+	inset-inline-start: 0;
+	inset-block-start: -2px;
 
 	transform: scale(0.7);
 }

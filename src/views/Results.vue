@@ -804,7 +804,7 @@ export default {
 		display: flex;
 		flex-direction: column;
 		margin-block-end: 24px;
-		margin-inline-start: 56px;
+		margin-inline-start: 40px;
 
 		h2 {
 			margin-block-end: 0; // because the input field has enough padding
@@ -827,11 +827,12 @@ export default {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		margin-top: 8px;
-		padding-left: calc(14px - var(--border-radius-pill));
+		margin-block-start: 8px;
+		margin-inline-start: 8px;
+		padding-inline-start: calc(14px - var(--border-radius-pill));
 
 		&__toggle {
-			margin-right: 1em;
+			margin-inline-end: 1em;
 		}
 	}
 }

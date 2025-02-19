@@ -240,15 +240,15 @@ export default {
 	min-height: var(--default-clickable-area);
 
 	&:disabled {
-		width: calc(100% - 32px) !important;
+		width: calc(100% - var(--default-clickable-area)) !important;
 		margin-inline-start: -12px;
 	}
 }
 
 .validation-type-menu__toggle {
 	position: relative;
-	left: calc(100% - var(--default-clickable-area));
-	top: -47px; // input height + margin
+	inset-inline-end: calc(4px + var(--default-clickable-area));
+	inset-block-start: 4px;
 }
 
 :deep(input:invalid) {
