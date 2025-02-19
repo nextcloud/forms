@@ -175,6 +175,19 @@ class Constants {
 		'x-office/spreadsheet',
 	];
 
+	public const FILENAME_INVALID_CHARS = [
+		"\n",
+		'/',
+		'\\',
+		':',
+		'*',
+		'?',
+		'"',
+		'<',
+		'>',
+		'|',
+	];
+
 	/**
 	 * !! Keep in sync with src/mixins/ShareTypes.js !!
 	 */
