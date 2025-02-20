@@ -29,7 +29,7 @@
 					<IconArrowUp :size="20" />
 				</template>
 			</NcButton>
-			<IconDragHorizontalVariant :size="20" />
+			<IconDragIndicator :size="20" />
 			<NcButton
 				ref="buttonDown"
 				:aria-label="t('forms', 'Move question down')"
@@ -166,8 +166,8 @@ import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconAsterisk from 'vue-material-design-icons/Asterisk.vue'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
-import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import IconDotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
+import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
 import IconOverlay from '../Icons/IconOverlay.vue'
 
@@ -181,8 +181,8 @@ export default {
 		IconAsterisk,
 		IconContentCopy,
 		IconDelete,
-		IconDragHorizontalVariant,
 		IconDotsHorizontal,
+		IconDragIndicator,
 		IconIdentifier,
 		IconOverlay,
 		NcActions,
