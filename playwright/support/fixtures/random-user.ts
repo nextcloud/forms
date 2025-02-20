@@ -4,7 +4,7 @@
  */
 
 import { test as base } from '@playwright/test'
-import { createRandomUser, login } from '../utils/session'
+import { createRandomUser, login } from '@nextcloud/e2e-test-server/playwright'
 
 /**
  * This test fixture ensures a new random user is created and used for the test (current page)
@@ -17,8 +17,8 @@ export const test = base.extend({
 			baseURL,
 		})
 
-		const uid = await createRandomUser()
-		await login(page.request, uid, uid)
+		const user = await createRandomUser()
+		await login(page.request, user)
 
 		await use(page)
 		await page.close()
