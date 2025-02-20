@@ -124,7 +124,6 @@
 					:key="answer.local ? 'option-local' : answer.id"
 					ref="input"
 					:answer="answer"
-					:allow-reorder="!extraSettings?.shuffleOptions"
 					:form-id="formId"
 					:index="index"
 					:is-unique="isUnique"

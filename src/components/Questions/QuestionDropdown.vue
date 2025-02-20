@@ -48,7 +48,6 @@
 					ref="input"
 					:answer="answer"
 					is-dropdown
-					:allow-reorder="!extraSettings?.shuffleOptions"
 					:form-id="formId"
 					:index="index"
 					:is-unique="!isMultiple"

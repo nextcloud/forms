@@ -28,28 +28,26 @@
 		<!-- Actions for reordering and deleting the option  -->
 		<div class="option__actions">
 			<template v-if="!answer.local">
-				<template v-if="allowReorder">
-					<NcButton
-						ref="buttonUp"
-						:aria-label="t('forms', 'Move option up')"
-						:disabled="index === 0"
-						type="tertiary"
-						@click="onMoveUp">
-						<template #icon>
-							<IconArrowUp :size="20" />
-						</template>
-					</NcButton>
-					<NcButton
-						ref="buttonDown"
-						:aria-label="t('forms', 'Move option down')"
-						:disabled="index === maxIndex"
-						type="tertiary"
-						@click="onMoveDown">
-						<template #icon>
-							<IconArrowDown :size="20" />
-						</template>
-					</NcButton>
-				</template>
+				<NcButton
+					ref="buttonUp"
+					:aria-label="t('forms', 'Move option up')"
+					:disabled="index === 0"
+					type="tertiary"
+					@click="onMoveUp">
+					<template #icon>
+						<IconArrowUp :size="20" />
+					</template>
+				</NcButton>
+				<NcButton
+					ref="buttonDown"
+					:aria-label="t('forms', 'Move option down')"
+					:disabled="index === maxIndex"
+					type="tertiary"
+					@click="onMoveDown">
+					<template #icon>
+						<IconArrowDown :size="20" />
+					</template>
+				</NcButton>
 				<NcButton
 					type="tertiary"
 					:aria-label="t('forms', 'Delete answer')"
@@ -93,10 +91,6 @@ export default {
 	},
 
 	props: {
-		allowReorder: {
-			type: Boolean,
-			default: true,
-		},
 		answer: {
 			type: Object,
 			required: true,
