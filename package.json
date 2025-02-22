@@ -57,7 +57,7 @@
     "@mdi/svg": "^7.4.47",
     "@nextcloud/browserslist-config": "^3.0.1",
     "@nextcloud/e2e-test-server": "^0.2.1",
-    "@nextcloud/eslint-config": "^8.4.1",
+    "@nextcloud/eslint-config": "^8.4.2",
     "@nextcloud/prettier-config": "^1.1.0",
     "@nextcloud/stylelint-config": "^3.0.1",
     "@nextcloud/vite-config": "^1.5.2",
