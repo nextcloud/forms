@@ -82,16 +82,16 @@
         },
         {
             "name": "nextcloud/openapi-extractor",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-releases/openapi-extractor.git",
-                "reference": "c0761cb7a3a0cd29c85ede9f27883d7f9f477bd0"
+                "reference": "6292e66132d7c6e9409249e51f29b8d93adac91a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-releases/openapi-extractor/zipball/c0761cb7a3a0cd29c85ede9f27883d7f9f477bd0",
-                "reference": "c0761cb7a3a0cd29c85ede9f27883d7f9f477bd0",
+                "url": "https://api.github.com/repos/nextcloud-releases/openapi-extractor/zipball/6292e66132d7c6e9409249e51f29b8d93adac91a",
+                "reference": "6292e66132d7c6e9409249e51f29b8d93adac91a",
                 "shasum": ""
             },
             "require": {
@@ -123,9 +123,9 @@
             "description": "A tool for extracting OpenAPI specifications from Nextcloud source code",
             "support": {
                 "issues": "https://github.com/nextcloud-releases/openapi-extractor/issues",
-                "source": "https://github.com/nextcloud-releases/openapi-extractor/tree/v1.3.0"
+                "source": "https://github.com/nextcloud-releases/openapi-extractor/tree/v1.4.0"
             },
-            "time": "2024-12-17T16:34:26+00:00"
+            "time": "2025-02-21T14:47:17+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -235,13 +235,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
+    "platform": [],
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
