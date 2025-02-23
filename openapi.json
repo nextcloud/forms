@@ -577,6 +577,7 @@
             "get": {
                 "operationId": "api-get-forms",
                 "summary": "Get all forms available to the user (owned/shared)",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -673,6 +674,7 @@
             "post": {
                 "operationId": "api-new-form",
                 "summary": "Create a new form and return the form Return a copy of the form if the parameter $fromId is set",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -777,6 +779,7 @@
             "get": {
                 "operationId": "api-get-form",
                 "summary": "Read all information to edit a Form (form, questions, options, except submissions/answers)",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -899,6 +902,7 @@
             "patch": {
                 "operationId": "api-update-form",
                 "summary": "Writes the given key-value pairs into Database",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1079,6 +1083,7 @@
             "delete": {
                 "operationId": "api-delete-form",
                 "summary": "Delete a form",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1204,6 +1209,7 @@
             "get": {
                 "operationId": "api-get-questions",
                 "summary": "Read all questions (including options)",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1329,6 +1335,7 @@
             "post": {
                 "operationId": "api-new-question",
                 "summary": "Add a new question",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1506,6 +1513,7 @@
             "patch": {
                 "operationId": "api-reorder-questions",
                 "summary": "Updates the Order of all Questions of a Form",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1684,6 +1692,7 @@
             "get": {
                 "operationId": "api-get-question",
                 "summary": "Read a specific question (including options)",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1844,6 +1853,7 @@
             "patch": {
                 "operationId": "api-update-question",
                 "summary": "Writes the given key-value pairs into Database Key `order` should only be changed by reorderQuestions() and is not allowed here",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2027,6 +2037,7 @@
             "delete": {
                 "operationId": "api-delete-question",
                 "summary": "Delete a question",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2190,6 +2201,7 @@
             "post": {
                 "operationId": "api-new-option",
                 "summary": "Add a new option to a question",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2375,6 +2387,7 @@
             "patch": {
                 "operationId": "api-reorder-options",
                 "summary": "Reorder options for a given question",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2563,6 +2576,7 @@
             "patch": {
                 "operationId": "api-update-option",
                 "summary": "Writes the given key-value pairs into Database",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2756,6 +2770,7 @@
             "delete": {
                 "operationId": "api-delete-option",
                 "summary": "Delete an option",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2929,6 +2944,7 @@
             "get": {
                 "operationId": "api-get-submissions",
                 "summary": "Get all the submissions of a given form",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3078,6 +3094,7 @@
             "delete": {
                 "operationId": "api-delete-all-submissions",
                 "summary": "Delete all submissions of a specified form",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3201,6 +3218,7 @@
             "post": {
                 "operationId": "api-new-submission",
                 "summary": "Process a new submission",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3384,6 +3402,7 @@
             "delete": {
                 "operationId": "api-delete-submission",
                 "summary": "Delete a specific submission",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3547,6 +3566,7 @@
             "post": {
                 "operationId": "api-export-submissions-to-cloud",
                 "summary": "Export Submissions to the Cloud",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3695,6 +3715,7 @@
             "post": {
                 "operationId": "api-upload-files",
                 "summary": "Uploads a temporary files to the server during form filling",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3878,6 +3899,7 @@
             "post": {
                 "operationId": "share_api-new-share",
                 "summary": "Add a new share",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "share_api"
                 ],
@@ -4063,6 +4085,7 @@
             "patch": {
                 "operationId": "share_api-update-share",
                 "summary": "Update permissions of a share",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "share_api"
                 ],
@@ -4246,6 +4269,7 @@
             "delete": {
                 "operationId": "share_api-delete-share",
                 "summary": "Delete a share",
+                "description": "This endpoint allows CORS requests",
                 "tags": [
                     "share_api"
                 ],
