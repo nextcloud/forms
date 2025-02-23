@@ -39,12 +39,12 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
-import NcActionCaption from '@nextcloud/vue/dist/Components/NcActionCaption.js'
-import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
-import NcActionSeparator from '@nextcloud/vue/dist/Components/NcActionSeparator.js'
-import NcAvatar from '@nextcloud/vue/dist/Components/NcAvatar.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
+import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
+import NcAvatar from '@nextcloud/vue/components/NcAvatar'
 
 import IconClose from 'vue-material-design-icons/Close.vue'
 import ShareTypes from '../../mixins/ShareTypes.js'

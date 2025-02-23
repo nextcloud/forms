@@ -27,9 +27,9 @@
 </template>
 
 <script>
-import { useIsSmallMobile } from '@nextcloud/vue/dist/Composables/useIsMobile.js'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcIconSvgWrapper from '@nextcloud/vue/dist/Components/NcIconSvgWrapper.js'
+import { useIsSmallMobile } from '@nextcloud/vue'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 
 export default {
 	name: 'PillMenu',

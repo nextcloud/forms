@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import moment from '@nextcloud/moment'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 

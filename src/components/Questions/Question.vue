@@ -154,11 +154,11 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
-import NcActionCheckbox from '@nextcloud/vue/dist/Components/NcActionCheckbox.js'
-import NcActionInput from '@nextcloud/vue/dist/Components/NcActionInput.js'
-import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
+import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import NcButton from '@nextcloud/vue/components/NcButton'
 
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'

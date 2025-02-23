@@ -60,9 +60,9 @@ import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
-import NcSettingsSection from '@nextcloud/vue/dist/Components/NcSettingsSection.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
 
 import logger from './utils/Logger.js'
 
