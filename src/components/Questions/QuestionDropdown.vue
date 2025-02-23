@@ -40,39 +40,27 @@
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />
 			</div>
-			<ol v-else class="question__content">
+			<TransitionList v-else class="question__content">
 				<!-- Answer text input edit -->
 				<AnswerInput
-					v-for="(answer, index) in options"
-					:key="
-						index /* using index to keep the same vnode after new answer creation */
-					"
+					v-for="(answer, index) in sortedOptions"
+					:key="answer.local ? 'option-local' : answer.id"
 					ref="input"
 					:answer="answer"
 					:form-id="formId"
+					is-dropdown
 					:index="index"
 					:is-unique="!isMultiple"
-					:is-dropdown="true"
+					:max-index="options.length - 1"
 					:max-option-length="maxStringLengths.optionText"
+					@create-answer="onCreateAnswer"
+					@update:answer="updateAnswer(index, $event)"
 					@delete="deleteOption"
-					@update:answer="updateAnswer"
 					@focus-next="focusNextInput"
+					@move-up="onOptionMoveUp(index)"
+					@move-down="onOptionMoveDown(index)"
 					@tabbed-out="checkValidOption" />
-
-				<li v-if="!isLastEmpty || hasNoAnswer" class="question__item">
-					<input
-						ref="pseudoInput"
-						class="question__input"
-						:aria-label="t('forms', 'Add a new answer')"
-						:placeholder="t('forms', 'Add a new answer')"
-						:maxlength="maxStringLengths.optionText"
-						minlength="1"
-						type="text"
-						@input="addNewEntry"
-						@compositionstart="onCompositionStart"
-						@compositionend="onCompositionEnd" />
-				</li>
-			</ol>
+			</TransitionList>
 		</template>
 
 		<!-- Add multiple options modal -->
@@ -83,10 +71,6 @@
 </template>
 
 <script>
-import { showError } from '@nextcloud/dialogs'
-import { emit } from '@nextcloud/event-bus'
-import { generateOcsUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
@@ -97,7 +81,8 @@ import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import AnswerInput from './AnswerInput.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import logger from '../../utils/Logger.js'
+import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
+import TransitionList from '../TransitionList.vue'
 
 export default {
 	name: 'QuestionDropdown',
@@ -110,16 +95,13 @@ export default {
 		NcLoadingIcon,
 		NcSelect,
 		OptionInputDialog,
+		TransitionList,
 	},
 
-	mixins: [QuestionMixin],
+	mixins: [QuestionMixin, QuestionMultipleMixin],
 
 	data() {
-		return {
-			inputValue: '',
-			isOptionDialogShown: false,
-			isLoading: false,
-		}
+		return { inputValue: '', isOptionDialogShown: false, isLoading: false }
 	},
 
 	computed: {
@@ -130,26 +112,9 @@ export default {
 			return this.answerType.createPlaceholder
 		},
 
-		contentValid() {
-			return this.answerType.validate(this)
-		},
-
-		isLastEmpty() {
-			const value = this.options[this.options.length - 1]
-			return value?.text?.trim?.().length === 0
-		},
-
 		isMultiple() {
 			// This can be extended if we want to include support for <select multiple>
 			return false
-		},
-
-		hasNoAnswer() {
-			return this.options.length === 0
-		},
-
-		areNoneChecked() {
-			return this.values.length === 0
 		},
 
 		shiftDragHandle() {
@@ -181,149 +146,6 @@ export default {
 			// Simple select
 			this.$emit('update:values', option ? [option.id] : [])
 		},
-
-		/**
-		 * Remove any empty options when leaving an option
-		 */
-		checkValidOption() {
-			// When leaving edit mode, filter and delete empty options
-			this.options.forEach((option) => {
-				if (!option.text) {
-					this.deleteOption(option.id)
-				}
-			})
-		},
-
-		/**
-		 * Set focus on next AnswerInput
-		 *
-		 * @param {number} index Index of current option
-		 */
-		focusNextInput(index) {
-			if (index < this.options.length - 1) {
-				this.$refs.input[index + 1].focus()
-			} else if (!this.isLastEmpty || this.hasNoAnswer) {
-				this.$refs.pseudoInput.focus()
-			}
-		},
-
-		/**
-		 * Update the options
-		 *
-		 * @param {Array} options options to change
-		 */
-		updateOptions(options) {
-			this.$emit('update:options', options)
-			emit('forms:last-updated:set', this.formId)
-		},
-
-		/**
-		 * Update an existing answer locally
-		 *
-		 * @param {string|number} id the answer id
-		 * @param {object} answer the answer to update
-		 */
-		updateAnswer(id, answer) {
-			const options = [...this.options]
-			const answerIndex = options.findIndex((option) => option.id === id)
-			options[answerIndex] = answer
-
-			this.updateOptions(options)
-		},
-
-		/**
-		 * Restore an option locally
-		 *
-		 * @param {object} option the option
-		 * @param {number} index the options index in this.options
-		 */
-		restoreOption(option, index) {
-			const options = this.options.slice()
-			options.splice(index, 0, option)
-
-			this.updateOptions(options)
-			this.focusIndex(index)
-		},
-
-		/**
-		 * Delete an option
-		 *
-		 * @param {number} id the options id
-		 */
-		deleteOption(id) {
-			const options = this.options.slice()
-			const optionIndex = options.findIndex((option) => option.id === id)
-
-			if (options.length === 1) {
-				// Clear Text, but don't remove. Will be removed, when leaving edit-mode
-				options[0].text = ''
-			} else {
-				// Remove entry
-				const option = Object.assign({}, this.options[optionIndex])
-
-				// delete locally
-				options.splice(optionIndex, 1)
-
-				// delete from Db
-				this.deleteOptionFromDatabase(option)
-			}
-
-			// Update question
-			this.updateOptions(options)
-
-			this.$nextTick(() => {
-				this.focusIndex(optionIndex - 1)
-			})
-		},
-
-		/**
-		 * Delete the option from Db in background.
-		 * Restore option if delete not possible
-		 *
-		 * @param {object} option The option to delete
-		 */
-		deleteOptionFromDatabase(option) {
-			const optionIndex = this.options.findIndex((opt) => opt.id === option.id)
-
-			if (!option.local) {
-				// let's not await, deleting in background
-				axios
-					.delete(
-						generateOcsUrl(
-							'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
-							{
-								id: this.formId,
-								questionId: this.id,
-								optionId: option.id,
-							},
-						),
-					)
-					.catch((error) => {
-						logger.error('Error while deleting an option', {
-							option,
-							error,
-						})
-						showError(
-							t('forms', 'There was an issue deleting this option'),
-						)
-						// restore option
-						this.restoreOption(option, optionIndex)
-					})
-			}
-		},
-
-		/**
-		 * Focus the input matching the index
-		 *
-		 * @param {number} index the value index
-		 */
-		focusIndex(index) {
-			const inputs = this.$refs.input
-			if (inputs && inputs[index]) {
-				const input = inputs[index]
-				input.focus()
-			}
-		},
 	},
 }
 </script>
@@ -332,6 +154,7 @@ export default {
 .question__content {
 	display: flex;
 	flex-direction: column;
+	gap: var(--default-grid-baseline);
 }
 
 .question__item {
