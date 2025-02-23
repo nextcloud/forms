@@ -127,7 +127,6 @@
 					:form-id="formId"
 					:index="index"
 					:is-unique="isUnique"
-					:is-dropdown="false"
 					:max-index="options.length - 1"
 					:max-option-length="maxStringLengths.optionText"
 					@create-answer="onCreateAnswer"
@@ -475,6 +474,7 @@ export default {
 .question__content {
 	display: flex;
 	flex-direction: column;
+	gap: var(--default-grid-baseline);
 }
 
 .question__item {

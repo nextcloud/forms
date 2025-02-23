@@ -47,8 +47,8 @@
 					:key="answer.local ? 'option-local' : answer.id"
 					ref="input"
 					:answer="answer"
-					is-dropdown
 					:form-id="formId"
+					is-dropdown
 					:index="index"
 					:is-unique="!isMultiple"
 					:max-index="options.length - 1"
@@ -154,6 +154,7 @@ export default {
 .question__content {
 	display: flex;
 	flex-direction: column;
+	gap: var(--default-grid-baseline);
 }
 
 .question__item {

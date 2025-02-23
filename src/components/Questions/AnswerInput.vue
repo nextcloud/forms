@@ -30,8 +30,10 @@
 			<template v-if="!answer.local">
 				<NcButton
 					ref="buttonUp"
+					class="option__actions-button"
 					:aria-label="t('forms', 'Move option up')"
 					:disabled="index === 0"
+					size="small"
 					type="tertiary"
 					@click="onMoveUp">
 					<template #icon>
@@ -40,8 +42,10 @@
 				</NcButton>
 				<NcButton
 					ref="buttonDown"
+					class="option__actions-button"
 					:aria-label="t('forms', 'Move option down')"
 					:disabled="index === maxIndex"
+					size="small"
 					type="tertiary"
 					@click="onMoveDown">
 					<template #icon>
@@ -49,8 +53,10 @@
 					</template>
 				</NcButton>
 				<NcButton
-					type="tertiary"
+					class="option__actions-button"
 					:aria-label="t('forms', 'Delete answer')"
+					size="small"
+					type="tertiary"
 					@click="deleteEntry">
 					<template #icon>
 						<IconDelete :size="20" />
@@ -109,7 +115,7 @@ export default {
 		},
 		isDropdown: {
 			type: Boolean,
-			required: true,
+			default: false,
 		},
 		maxIndex: {
 			type: Number,
@@ -350,28 +356,38 @@ export default {
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
-		margin-inline-start: -2px;
+		margin-inline-start: calc(-1 * var(--default-grid-baseline));
 		z-index: 1;
 	}
 
 	.option__actions {
 		display: flex;
 		position: absolute;
-		right: 16px;
-		height: 100%;
+		gap: var(--default-grid-baseline);
+		inset-inline-end: 16px;
+		height: var(--default-clickable-area);
+	}
+
+	.option__actions-button {
+		margin-block: auto;
+
+		&:last-of-type {
+			margin-inline: 5px;
+		}
 	}
 
 	.question__input {
 		width: calc(100% - var(--default-clickable-area));
 		position: relative;
 		inset-inline-start: -12px;
+		margin-block: 0 !important;
 		margin-inline-end: -12px !important;
 
 		&--shifted {
-			inset-inline-start: -34px;
-			inset-block-start: 1px;
-			margin-inline-end: -34px !important;
-			padding-inline-start: 36px !important;
+			inset-inline-start: calc(-1 * var(--default-clickable-area));
+			padding-inline-start: calc(
+				var(--default-clickable-area) + var(--default-grid-baseline)
+			) !important;
 		}
 	}
 }
