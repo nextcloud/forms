@@ -25,15 +25,13 @@ OC.L10N.register(
     "Are you sure you want to delete {title}?" : "Esta seguro que desea borrar {título}?",
     "Error while deleting {title}" : "Error mientras se borraba {título}",
     "Options" : "Opciones",
-    "Answer number {index}" : "Respuesta numero {índice}",
     "Delete answer" : "Borrar respuesta",
+    "Answer number {index}" : "Respuesta numero {índice}",
     "Error while saving the answer" : "Error mientras se guardaba la respuesta",
     "Question number {index}" : "Pregunta numero {índice}",
     "Title of question number {index}" : "Titulo de la pregunta numero {índice}",
     "Required" : "Requerido",
     "Delete question" : "Borrar pregunta",
-    "Add a new answer" : "Añadir una nueva respuesta",
-    "There was an issue deleting this option" : "Hubo un error mientras se eliminaba esta opción",
     "Delete" : "Eliminar",
     "Uploading …" : "Actualizando...",
     "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{texto}\"",
@@ -76,6 +74,7 @@ OC.L10N.register(
     "Abort" : "Abortar",
     "Clear" : "Borrar",
     "Error while saving question" : "Hubo un error mientras se guardaba la pregunta",
+    "There was an issue deleting this option" : "Hubo un error mientras se eliminaba esta opción",
     "Form link copied" : "Enlace del formulario copiado",
     "Cannot copy, please copy the link manually" : "No es posible copiar, por favor copia el enlace manualmente",
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
@@ -87,6 +86,7 @@ OC.L10N.register(
     "Date" : "Fecha",
     "Time" : "Hora",
     "Text" : "Texto",
-    "Phone number" : "Número telefónico"
+    "Phone number" : "Número telefónico",
+    "Add a new answer" : "Añadir una nueva respuesta"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

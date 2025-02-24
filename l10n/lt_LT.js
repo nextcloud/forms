@@ -52,8 +52,8 @@ OC.L10N.register(
     "Error while deleting {title}" : "Klaida ištrinant {title}",
     "Options" : "Parinktys",
     "Cancel" : "Atsisakyti",
-    "Answer number {index}" : "Atsakymas nr. {index}",
     "Delete answer" : "Ištrinti atsakymą",
+    "Answer number {index}" : "Atsakymas nr. {index}",
     "Error while saving the answer" : "Klaida įrašant atsakymą",
     "Question number {index}" : "Klausimas nr. {index}",
     "Move question up" : "Pakelti klausimą",
@@ -65,7 +65,6 @@ OC.L10N.register(
     "Copy question" : "Kopijuoti klausimą",
     "Delete question" : "Ištrinti klausimą",
     "This question needs a title!" : "Šiam klausimui reikalinga antraštė!",
-    "Add a new answer" : "Pridėti naują atsakymą",
     "Maximum file size" : "Didžiausias failo dydis",
     "Delete" : "Ištrinti",
     "Uploading …" : "Įkeliama…",
@@ -175,6 +174,7 @@ OC.L10N.register(
     "Spreadsheet" : "Skaičiuoklė",
     "Text" : "Tekstas",
     "Phone number" : "Telefono numeris",
-    "Email address" : "El. pašto adresas"
+    "Email address" : "El. pašto adresas",
+    "Add a new answer" : "Pridėti naują atsakymą"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

@@ -43,7 +43,6 @@ OC.L10N.register(
     "Required" : "จำเป็น",
     "Delete question" : "ลบคำถาม",
     "This question needs a title!" : "คำถามนี้ต้องใส่หัวข้อ!",
-    "Add a new answer" : "เพิ่มคำตอบใหม่",
     "Delete" : "ลบ",
     "Uploading …" : "กำลังอัปโหลด …",
     "Other" : "อื่น ๆ",
@@ -87,6 +86,7 @@ OC.L10N.register(
     "Spreadsheet" : "สเปรดชีต",
     "Text" : "ข้อความ",
     "Phone number" : "หมายเลขโทรศัพท์",
-    "Email address" : "ที่อยู่อีเมล"
+    "Email address" : "ที่อยู่อีเมล",
+    "Add a new answer" : "เพิ่มคำตอบใหม่"
 },
 "nplurals=1; plural=0;");

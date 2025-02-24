@@ -35,16 +35,14 @@
     "Error while deleting {title}" : "Erro ao apagar {title}",
     "Options" : "Opções",
     "Cancel" : "Cancelar",
-    "Answer number {index}" : "Resposta número {index}",
     "Delete answer" : "Apague resposta",
+    "Answer number {index}" : "Resposta número {index}",
     "Error while saving the answer" : "Erro ao guardar a resposta",
     "Question number {index}" : "Pergunta número {index}",
     "Title of question number {index}" : "Título da pergunta número {index}",
     "Required" : "Obrigatório",
     "Delete question" : "Apague pergunta",
     "This question needs a title!" : "Esta pergunta precisa de título",
-    "Add a new answer" : "Acrescente uma nova pergunta",
-    "There was an issue deleting this option" : "Ocorreu um problema no apagar desta opção",
     "Delete" : "Apagar",
     "Uploading …" : "A carregar ...",
     "A long answer for the question “{text}”" : "Uma resposta longa para a pergunta \"{text}\"",
@@ -103,6 +101,7 @@
     "Abort" : "Abortar",
     "Clear" : "Limpar",
     "Error while saving question" : "Erro ao guardar a pergunta",
+    "There was an issue deleting this option" : "Ocorreu um problema no apagar desta opção",
     "Form link copied" : "Ligação do formulário copiada",
     "Cannot copy, please copy the link manually" : "Não foi possível copiar, copie a ligação manualmente",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
@@ -137,6 +136,7 @@
     "Spreadsheet" : "Folha de Cálculo",
     "Text" : "Texto",
     "Phone number" : "Número de telefone",
-    "Email address" : "Endereço de email"
+    "Email address" : "Endereço de email",
+    "Add a new answer" : "Acrescente uma nova pergunta"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
