@@ -8,32 +8,32 @@ SPDX-PackageDownloadLocation = "https://github.com/nextcloud/forms"
 [[annotations]]
 path = ["l10n/**.js", "l10n/**.json", "js/**.js.map", "js/**.js"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = " 2019-2024 Nextcloud GmbH and Nextcloud contributors"
-SPDX-License-Identifier = "AGPL-3.0-only"
+SPDX-FileCopyrightText = "2019-2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
 path = ["composer.json", "composer.lock"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2019-2024 Nextcloud GmbH and Nextcloud contributors"
-SPDX-License-Identifier = "AGPL-3.0-only"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
 path = ["package-lock.json", "package.json"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = " 2018-2024 Nextcloud GmbH and Nextcloud contributors"
-SPDX-License-Identifier = "AGPL-3.0-only"
+SPDX-FileCopyrightText = "2018-2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
 path = ["vendor-bin/psalm/composer.json", "vendor-bin/psalm/composer.lock"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = " 2018-2024 Nextcloud GmbH and Nextcloud contributors"
-SPDX-License-Identifier = "AGPL-3.0-only"
+SPDX-FileCopyrightText = "2018-2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = [".prettierrc.json"]
+path = [".prettierrc.json", ".env.development"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = " 2024 Nextcloud GmbH and Nextcloud contributors"
-SPDX-License-Identifier = "AGPL-3.0-only"
+SPDX-FileCopyrightText = "Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "CC0-1.0"
 
 [[annotations]]
 path = ["vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock", "vendor-bin/psalm/composer.json", "vendor-bin/psalm/composer.lock", "vendor-bin/openapi-extractor/composer.json", "vendor-bin/openapi-extractor/composer.lock", "openapi.json"]
@@ -48,7 +48,7 @@ SPDX-FileCopyrightText = "2018 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["tests/phpunit.integration.xml", "tests/phpunit.xml", "tests/psalm-baseline.xml" , "psalm.xml"]
+path = ["tests/phpunit.integration.xml", "tests/phpunit.xml", "tests/psalm-baseline.xml", "psalm.xml"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2019 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
