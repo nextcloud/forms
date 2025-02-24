@@ -1250,13 +1250,11 @@ class ApiController extends OCSController {
 		$form = $this->loadFormForSubmission($formId, $shareHash);
 
 		$questions = $this->formsService->getQuestions($formId);
-		// Is the submission valid
-		$isSubmissionValid = $this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
-		if (is_string($isSubmissionValid)) {
-			throw new OCSBadRequestException($isSubmissionValid);
-		}
-		if ($isSubmissionValid === false) {
-			throw new OCSBadRequestException('At least one submitted answer is not valid');
+		try {
+			// Is the submission valid
+			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+		} catch (\InvalidArgumentException $e) {
+			throw new OCSBadRequestException($e->getMessage());
 		}
 
 		// Create Submission

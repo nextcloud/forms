@@ -331,9 +331,9 @@ class SubmissionService {
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
-	 * @return boolean|string True for valid submission, false or error message for invalid
+	 * @throw \InvalidArgumentException if validation failed
 	 */
-	public function validateSubmission(array $questions, array $answers, string $formOwnerId): bool|string {
+	public function validateSubmission(array $questions, array $answers, string $formOwnerId): void {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -342,7 +342,7 @@ class SubmissionService {
 			// Check if all required questions have an answer
 			if ($question['isRequired'] &&
 				(!$questionAnswered ||
-				!array_filter($answers[$questionId], function (string|array $value): bool {
+				!array_filter($answers[$questionId], static function (string|array $value): bool {
 					// file type
 					if (is_array($value)) {
 						return !empty($value['uploadedFileId']);
@@ -352,7 +352,7 @@ class SubmissionService {
 				}) ||
 				(!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
-				return false;
+				throw new \InvalidArgumentException(sprintf('Question "%s" is required.', $question['text']));
 			}
 
 			// Perform further checks only for answered questions
@@ -367,12 +367,16 @@ class SubmissionService {
 				$maxOptions = $question['extraSettings']['optionsLimitMax'] ?? -1;
 				// If number of answers is limited check the limits
 				if (($minOptions > 0 && $answersCount < $minOptions)
-					|| ($maxOptions > 0 && $answersCount > $maxOptions)) {
-					return false;
+					&& ($maxOptions > 0 && $answersCount > $maxOptions)) {
+					throw new \InvalidArgumentException(sprintf('Question "%s" requires between %d and %d answers.', $question['text'], $minOptions, $maxOptions));
+				} elseif ($minOptions > 0 && $answersCount < $minOptions) {
+					throw new \InvalidArgumentException(sprintf('Question "%s" requires at least %d answers.', $question['text'], $minOptions));
+				} elseif ($maxOptions > 0 && $answersCount > $maxOptions) {
+					throw new \InvalidArgumentException(sprintf('Question "%s" requires at most %d answers.', $question['text'], $maxOptions));
 				}
 			} elseif ($answersCount > 1 && $question['type'] !== Constants::ANSWER_TYPE_FILE) {
 				// Check if non-multiple questions have not more than one answer
-				return false;
+				throw new \InvalidArgumentException(sprintf('Question "%s" can only have one answer.', $question['text']));
 			}
 
 			/*
@@ -381,39 +385,39 @@ class SubmissionService {
 			 */
 			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME) &&
 				!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
-				return false;
+				throw new \InvalidArgumentException(sprintf('Invalid date/time format for question "%s".', $question['text']));
 			}
 
 			// Check if all answers are within the possible options
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 				foreach ($answers[$questionId] as $answer) {
 					// Search corresponding option, return false if non-existent
-					if (array_search($answer, array_column($question['options'], 'id')) === false) {
-						return false;
+					if (!in_array($answer, array_column($question['options'], 'id'))) {
+						throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
 					}
 				}
 			}
 
 			// Handle custom validation of short answers
 			if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
-				return false;
+				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
 			}
 
 			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				$maxAllowedFilesCount = $question['extraSettings']['maxAllowedFilesCount'] ?? 0;
 				if ($maxAllowedFilesCount > 0 && count($answers[$questionId]) > $maxAllowedFilesCount) {
-					return sprintf('Too many files uploaded for question "%s". Maximum allowed: %d', $question['text'], $maxAllowedFilesCount);
+					throw new \InvalidArgumentException(sprintf('Too many files uploaded for question "%s". Maximum allowed: %d', $question['text'], $maxAllowedFilesCount));
 				}
 
 				foreach ($answers[$questionId] as $answer) {
 					$uploadedFile = $this->uploadedFileMapper->findByUploadedFileId($answer['uploadedFileId']);
 					if (!$uploadedFile) {
-						return sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']);
+						throw new \InvalidArgumentException(sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']));
 					}
 
 					$nodes = $this->rootFolder->getUserFolder($formOwnerId)->getById($uploadedFile->getFileId());
 					if (empty($nodes)) {
-						return sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']);
+						throw new \InvalidArgumentException(sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']));
 					}
 				}
 			}
@@ -422,13 +426,10 @@ class SubmissionService {
 		// Check for excess answers
 		foreach ($answers as $id => $answerArray) {
 			// Search corresponding question, return false if not found
-			$questionIndex = array_search($id, array_column($questions, 'id'));
-			if ($questionIndex === false) {
-				return false;
+			if (!in_array($id, array_column($questions, 'id'))) {
+				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %d.', $id));
 			}
 		}
-
-		return true;
 	}
 
 	/**
