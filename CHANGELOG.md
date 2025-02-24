@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.3.8 - 2025-02-24
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.7...v4.3.8)
+
+### Fixed
+
+- [stable4] Fix: Add disabled state to PillMenu and update Results view when there are no submissions by @backportbot[bot] in [\#2580](https://github.com/nextcloud/forms/pull/2580)
+- [stable4] fix: remove linked file from cloned form by @backportbot[bot] in [\#2582](https://github.com/nextcloud/forms/pull/2582)
+- [stable4] fix: Improve compatibility with Windows for uploaded files by @Koc in [\#2587](https://github.com/nextcloud/forms/pull/2587)
+
+### Merged
+
+- chore(stable4): Move to min version 29 by @Chartman123 in [\#2575](https://github.com/nextcloud/forms/pull/2575)
+
 ## v4.3.7 - 2025-02-14
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.6...v4.3.7)
