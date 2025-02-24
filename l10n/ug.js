@@ -75,8 +75,8 @@ OC.L10N.register(
     "Add options" : "تاللاش قوشۇڭ",
     "Options should be separated by new line!" : "تاللاشلارنى يېڭى قۇر بىلەن ئايرىش كېرەك!",
     "QR code representation of {text}" : "QR كودنىڭ ئىپادىلىنىشى {text}",
-    "Answer number {index}" : "جاۋاب نومۇرى {index}",
     "Delete answer" : "جاۋابنى ئۆچۈرۈڭ",
+    "Answer number {index}" : "جاۋاب نومۇرى {index}",
     "Error while saving the answer" : "جاۋابنى ساقلاش جەريانىدا خاتالىق",
     "Question number {index}" : "سوئال نومۇرى {index}",
     "Move question up" : "سوئالنى يۆتكەڭ",
@@ -90,8 +90,6 @@ OC.L10N.register(
     "Description (formatting using Markdown is supported)" : "چۈشەندۈرۈش (Markdown نى ئىشلىتىپ فورماتلاشنى قوللايدۇ)",
     "This question needs a title!" : "بۇ سوئال بىر ماۋزۇغا موھتاج!",
     "Shuffle options" : "Shuffle options",
-    "Add a new answer" : "يېڭى جاۋاب قوشۇڭ",
-    "There was an issue deleting this option" : "بۇ تاللاشنى ئۆچۈرۈشتە مەسىلە كۆرۈلدى",
     "Allow only specific file types" : "پەقەت ئالاھىدە ھۆججەت تىپلىرىغا يول قويۇڭ",
     "Custom file extensions" : "ھۆججەت كېڭەيتىلمىسىنى ئىختىيارىي قىلىڭ",
     "Maximum number of files" : "ھۆججەتلەرنىڭ ئەڭ كۆپ سانى",
@@ -239,6 +237,7 @@ OC.L10N.register(
     "There was an error submitting the form: {message}" : "جەدۋەلنى يوللاشتا خاتالىق كۆرۈلدى: {message}",
     "Error while saving question" : "سوئالنى ساقلاش جەريانىدا خاتالىق",
     "Error while saving question options" : "سوئال تاللانمىلىرىنى ساقلاشتا خاتالىق",
+    "There was an issue deleting this option" : "بۇ تاللاشنى ئۆچۈرۈشتە مەسىلە كۆرۈلدى",
     "Form link copied" : "جەدۋەل ئۇلىنىشى كۆچۈرۈلدى",
     "Cannot copy, please copy the link manually" : "كۆچۈرگىلى بولمايدۇ ، ئۇلىنىشنى قولدا كۆچۈرۈڭ",
     "No recommendations. Start typing." : "تەۋسىيە يوق. يېزىشنى باشلاڭ.",
@@ -292,6 +291,7 @@ OC.L10N.register(
     "People can enter a number" : "كىشىلەر بىر ساننى كىرگۈزەلەيدۇ",
     "Enter a number" : "سان كىرگۈزۈڭ",
     "Custom regular expression" : "دائىملىق ئىپادىلەش",
-    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ"
+    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ",
+    "Add a new answer" : "يېڭى جاۋاب قوشۇڭ"
 },
 "nplurals=2; plural=(n != 1);");

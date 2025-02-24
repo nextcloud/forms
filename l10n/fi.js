@@ -59,8 +59,8 @@ OC.L10N.register(
     "Error while deleting {title}" : "Virhe poistaessa {title}",
     "Options" : "Valinnat",
     "Cancel" : "Peruuta",
-    "Answer number {index}" : "Vastausnumero {index}",
     "Delete answer" : "Poista vastaus",
+    "Answer number {index}" : "Vastausnumero {index}",
     "Error while saving the answer" : "Virhe vastausta tallennettaessa",
     "Question number {index}" : "Kysymys numero {index}",
     "Move question up" : "Siirrä kysymys ylös",
@@ -73,8 +73,6 @@ OC.L10N.register(
     "Delete question" : "Poista kysymys",
     "Description (formatting using Markdown is supported)" : "Kuvaus (muotoilu Markdownia käyttäen on tuettu)",
     "This question needs a title!" : "Tämä kysymys vaatii otsikon!",
-    "Add a new answer" : "Lisää uusi vastaus",
-    "There was an issue deleting this option" : "Tätä valintaa poistaessa ilmeni ongelma",
     "Allow only specific file types" : "Salli vain tietyt tiedostotyypit",
     "Maximum number of files" : "Tiedostojen enimmäismäärä",
     "Maximum file size" : "Tiedoston enimmäiskoko",
@@ -186,6 +184,7 @@ OC.L10N.register(
     "Some answers are not valid" : "Jotkin vastaukset eivät ole kelvollisia",
     "There was an error submitting the form: {message}" : "Lomaketta lähettäessä ilmeni virhe: {message}",
     "Error while saving question" : "Virhe kysymystä tallennettaessa",
+    "There was an issue deleting this option" : "Tätä valintaa poistaessa ilmeni ongelma",
     "Form link copied" : "Lomakkeen linkki kopioitu",
     "Cannot copy, please copy the link manually" : "Kopioiminen ei onnistu. Kopioi linkki manuaalisesti",
     "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
@@ -233,6 +232,7 @@ OC.L10N.register(
     "Number" : "Numero",
     "The input is not a valid number" : "Syöte ei ole kelvollinen numero",
     "Enter a number" : "Kirjoita numero",
-    "Custom regular expression" : "Mukautettu säännöllinen lauseke"
+    "Custom regular expression" : "Mukautettu säännöllinen lauseke",
+    "Add a new answer" : "Lisää uusi vastaus"
 },
 "nplurals=2; plural=(n != 1);");

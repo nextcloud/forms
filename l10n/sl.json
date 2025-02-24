@@ -61,8 +61,8 @@
     "Options" : "Možnosti",
     "Cancel" : "Prekliči",
     "Add options" : "Dodaj možnost",
-    "Answer number {index}" : "Odgovor številka {index}",
     "Delete answer" : "Izbriši odgovor",
+    "Answer number {index}" : "Odgovor številka {index}",
     "Error while saving the answer" : "Prišlo je do napake med shranjevanjem odgovora",
     "Question number {index}" : "Vprašanje številka {index}",
     "Move question up" : "Pomakni vprašanje višje",
@@ -75,8 +75,6 @@
     "Delete question" : "Izbriši vprašanje",
     "This question needs a title!" : "To vprašanje zahteva naslov",
     "Shuffle options" : "Premešaj možnosti",
-    "Add a new answer" : "Dodaj nov odgovor",
-    "There was an issue deleting this option" : "Prišlo je do napake med brisanjem možnosti",
     "Maximum file size" : "Največja velikost datoteke",
     "Delete" : "Izbriši",
     "Uploading …" : "Poteka pošiljanje ...",
@@ -160,6 +158,7 @@
     "Abort" : "Prekini",
     "Clear" : "Počisti",
     "Error while saving question" : "Prišlo je do napake med shranjevanjem vprašanja",
+    "There was an issue deleting this option" : "Prišlo je do napake med brisanjem možnosti",
     "Form link copied" : "Povezava vprašalnika je kopirana",
     "Cannot copy, please copy the link manually" : "Povezave ni mogoče kopirati. Storite to ročno.",
     "No recommendations. Start typing." : "Ni priporočil; začnite vpisovati",
@@ -201,6 +200,7 @@
     "Phone number" : "Telefonska številka",
     "Email address" : "Elektronski naslov",
     "Number" : "Številčne vrednosti",
+    "Add a new answer" : "Dodaj nov odgovor",
     "Form still supports old sharing-link." : "Vprašalnik še vedno podpira zastarel način povezave objave."
 },"pluralForm" :"nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);"
 }

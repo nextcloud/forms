@@ -37,16 +37,14 @@
     "Error while deleting {title}" : "Pogreška pri brisanju {title}",
     "Options" : "Mogućnosti",
     "Cancel" : "Odustani",
-    "Answer number {index}" : "Broj odgovora {index}",
     "Delete answer" : "Izbriši odgovor",
+    "Answer number {index}" : "Broj odgovora {index}",
     "Error while saving the answer" : "Pogreška pri spremanju odgovora",
     "Question number {index}" : "Broj pitanja {index}",
     "Title of question number {index}" : "Broj naslova pitanja {index}",
     "Required" : "Obvezno",
     "Delete question" : "Izbriši pitanje",
     "This question needs a title!" : "Potreban je naslov za ovo pitanje!",
-    "Add a new answer" : "Dodaj novi odgovor",
-    "There was an issue deleting this option" : "Došlo je do problema pri brisanju ove opcije",
     "Maximum file size" : "Maksimalna veličina datoteke",
     "Delete" : "Izbriši",
     "Uploading …" : "Otpremanje...",
@@ -103,6 +101,7 @@
     "Abort" : "Prekid",
     "Clear" : "Izbriši",
     "Error while saving question" : "Pogreška pri spremanju pitanja",
+    "There was an issue deleting this option" : "Došlo je do problema pri brisanju ove opcije",
     "Form link copied" : "Poveznica na obrazac je kopirana",
     "Cannot copy, please copy the link manually" : "Kopiranje nije moguće, ručno kopirajte poveznicu",
     "No recommendations. Start typing." : "Nema preporuka. Započnite unos.",
@@ -135,6 +134,7 @@
     "Presentation" : "Prezentacija",
     "Text" : "Tekst",
     "Phone number" : "Broj telefona",
-    "Email address" : "Adresa e-pošte"
+    "Email address" : "Adresa e-pošte",
+    "Add a new answer" : "Dodaj novi odgovor"
 },"pluralForm" :"nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;"
 }

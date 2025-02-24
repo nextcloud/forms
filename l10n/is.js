@@ -27,15 +27,14 @@ OC.L10N.register(
     "Error while deleting {title}" : "Villa kom upp við að eyða {title}",
     "Options" : "Valkostir",
     "Cancel" : "Hætta við",
-    "Answer number {index}" : "Svar númer {index}",
     "Delete answer" : "Eyða svari",
+    "Answer number {index}" : "Svar númer {index}",
     "Error while saving the answer" : "Villa kom upp við að vista svarið",
     "Question number {index}" : "Spurning númer {index}",
     "Title of question number {index}" : "Titill á spurningu númer {index}",
     "Required" : "þetta þarf",
     "Delete question" : "Eyða spurningu",
     "This question needs a title!" : "Þessi spurning þarf að vera með titil!",
-    "Add a new answer" : "Bæta við nýju svari",
     "Maximum file size" : "Hámarks skráastærð",
     "Delete" : "Eyða",
     "Uploading …" : "Sendi inn …",
@@ -106,6 +105,7 @@ OC.L10N.register(
     "Spreadsheet" : "Töflureiknisskjal",
     "Text" : "Texti",
     "Phone number" : "Símanúmer",
-    "Email address" : "Tölvupóstfang"
+    "Email address" : "Tölvupóstfang",
+    "Add a new answer" : "Bæta við nýju svari"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

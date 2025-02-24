@@ -38,16 +38,14 @@
     "Options" : "Optziones",
     "Cancel" : "Annulla",
     "Options should be separated by new line!" : "Is optziones depent èssere partzidas cun lìnias noas.",
-    "Answer number {index}" : "Risposta nùmeru {index}",
     "Delete answer" : "Cantzella risposta",
+    "Answer number {index}" : "Risposta nùmeru {index}",
     "Error while saving the answer" : "Errore sarvende sa risposta",
     "Question number {index}" : "Pregonta nùmeru {index}",
     "Title of question number {index}" : "Tìtulu de sa pregonta nùmeru {index}",
     "Required" : "Rechertu",
     "Delete question" : "Cantzella pregonta",
     "This question needs a title!" : "Sa pregonta bolet unu tìtulu!",
-    "Add a new answer" : "Agiunghe una risposta noa",
-    "There was an issue deleting this option" : "Ddoe at àpidu unu problema cantzellende custa optzione",
     "Maximum file size" : "Mannària màssima de s'archìviu",
     "Delete" : "Cantzella",
     "Uploading …" : "Carrighende ...",
@@ -108,6 +106,7 @@
     "Abort" : "Annulla",
     "Clear" : "Lìmpia",
     "Error while saving question" : "Errore sarvende sa pregonta",
+    "There was an issue deleting this option" : "Ddoe at àpidu unu problema cantzellende custa optzione",
     "Form link copied" : "Ligòngiu de su mòdulu copiadu",
     "Cannot copy, please copy the link manually" : "No at fatu a copiare, copia su ligòngiu a manu",
     "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
@@ -141,6 +140,7 @@
     "Presentation" : "Presentatzione",
     "Text" : "Testu",
     "Phone number" : "Nùmeru de telèfonu",
-    "Email address" : "Indiritzu de posta eletrònica"
+    "Email address" : "Indiritzu de posta eletrònica",
+    "Add a new answer" : "Agiunghe una risposta noa"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

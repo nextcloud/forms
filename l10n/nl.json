@@ -41,16 +41,14 @@
     "Error while deleting {title}" : "Fout bij het verwijderen van {title}",
     "Options" : "Opties",
     "Cancel" : "Annuleren",
-    "Answer number {index}" : "Antwoord nummer {index}",
     "Delete answer" : "Verwijder antwoord",
+    "Answer number {index}" : "Antwoord nummer {index}",
     "Error while saving the answer" : "Fout bij opslaan antwoord",
     "Question number {index}" : "Vraag nummer {index}",
     "Title of question number {index}" : "Titel van vraag nummer {index}",
     "Required" : "Vereist",
     "Delete question" : "Verwijder vraag",
     "This question needs a title!" : "Deze vraag heeft een titel nodig!",
-    "Add a new answer" : "Voeg een nieuw antwoord toe",
-    "There was an issue deleting this option" : "Er is een fout opgetreden bij het verwijderen van deze optie",
     "Maximum file size" : "Maximale bestandsgrootte",
     "Delete" : "Verwijder",
     "Uploading …" : "Uploaden ...",
@@ -110,6 +108,7 @@
     "Abort" : "Afbreken",
     "Clear" : "Terug",
     "Error while saving question" : "Fout bij opslaan vraag",
+    "There was an issue deleting this option" : "Er is een fout opgetreden bij het verwijderen van deze optie",
     "Form link copied" : "Formulier link gekopieerd",
     "Cannot copy, please copy the link manually" : "Kopiëren niet mogelijk, kopieer de link handmatig",
     "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",
@@ -148,6 +147,7 @@
     "Text" : "Tekst",
     "Phone number" : "Telefoonnummer",
     "Email address" : "E-mailadres",
-    "Number" : "Nummer"
+    "Number" : "Nummer",
+    "Add a new answer" : "Voeg een nieuw antwoord toe"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
