@@ -112,45 +112,61 @@
 		</template>
 
 		<template v-else>
-			<template v-if="isLoading">
-				<div>
-					<NcLoadingIcon :size="64" />
-				</div>
-			</template>
-			<TransitionList v-else class="question__content">
-				<!-- Answer text input edit -->
-				<AnswerInput
-					v-for="(answer, index) in sortedOptions"
-					:key="answer.local ? 'option-local' : answer.id"
-					ref="input"
-					:answer="answer"
-					:form-id="formId"
-					:index="index"
-					:is-unique="isUnique"
-					:max-index="options.length - 1"
-					:max-option-length="maxStringLengths.optionText"
-					@create-answer="onCreateAnswer"
-					@update:answer="updateAnswer"
-					@delete="deleteOption"
-					@focus-next="focusNextInput"
-					@move-up="onOptionMoveUp(index)"
-					@move-down="onOptionMoveDown(index)"
-					@tabbed-out="checkValidOption" />
-				<li
-					v-if="allowOtherAnswer"
-					key="option-add-other"
-					class="question__item">
-					<div :is="pseudoIcon" class="question__item__pseudoInput" />
-					<input
-						:placeholder="t('forms', 'Other')"
-						class="question__input"
-						:disabled="!readonly"
-						:maxlength="maxStringLengths.optionText"
-						minlength="1"
-						type="text"
-						:readonly="!readOnly" />
-				</li>
-			</TransitionList>
+			<div v-if="isLoading">
+				<NcLoadingIcon :size="64" />
+			</div>
+			<Draggable
+				v-else
+				v-model="sortedOptions"
+				class="question__content"
+				animation="200"
+				direction="vertical"
+				handle=".option__drag-handle"
+				invert-swap
+				tag="ul"
+				@change="saveOptionsOrder"
+				@start="isDragging = true"
+				@end="isDragging = false">
+				<TransitionGroup
+					:name="
+						isDragging
+							? 'no-external-transition-on-drag'
+							: 'options-list-transition'
+					">
+					<!-- Answer text input edit -->
+					<AnswerInput
+						v-for="(answer, index) in sortedOptions"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						:form-id="formId"
+						:index="index"
+						:is-unique="isUnique"
+						:max-index="options.length - 1"
+						:max-option-length="maxStringLengths.optionText"
+						@create-answer="onCreateAnswer"
+						@update:answer="updateAnswer(index, answer)"
+						@delete="deleteOption"
+						@focus-next="focusNextInput"
+						@move-up="onOptionMoveUp(index)"
+						@move-down="onOptionMoveDown(index)"
+						@tabbed-out="checkValidOption" />
+				</TransitionGroup>
+			</Draggable>
+			<li
+				v-if="allowOtherAnswer"
+				key="option-add-other"
+				class="question__item">
+				<div :is="pseudoIcon" class="question__item__pseudoInput" />
+				<input
+					:placeholder="t('forms', 'Other')"
+					class="question__input"
+					:disabled="!readOnly"
+					:maxlength="maxStringLengths.optionText"
+					minlength="1"
+					type="text"
+					:readonly="!readOnly" />
+			</li>
 		</template>
 
 		<!-- Add multiple options modal -->
@@ -163,6 +179,7 @@
 <script>
 import { showError } from '@nextcloud/dialogs'
 import { translate as t, translatePlural as n } from '@nextcloud/l10n'
+import Draggable from 'vuedraggable'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -179,7 +196,6 @@ import AnswerInput from './AnswerInput.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
-import TransitionList from '../TransitionList.vue'
 
 const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
 
@@ -188,6 +204,7 @@ export default {
 
 	components: {
 		AnswerInput,
+		Draggable,
 		IconCheckboxBlankOutline,
 		IconContentPaste,
 		IconRadioboxBlank,
@@ -199,7 +216,6 @@ export default {
 		NcLoadingIcon,
 		NcNoteCard,
 		OptionInputDialog,
-		TransitionList,
 	},
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
@@ -217,6 +233,7 @@ export default {
 			cachedOtherAnswerText: '',
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 
+			isDragging: false,
 			isOptionDialogShown: false,
 			isLoading: false,
 		}
@@ -232,7 +249,7 @@ export default {
 		},
 
 		shiftDragHandle() {
-			return !this.readonly && this.options.length !== 0
+			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
 
 		pseudoIcon() {
@@ -543,5 +560,23 @@ export default {
 
 .question__other-answer:deep() .input-field__input {
 	min-height: var(--default-clickable-area);
+}
+
+.options-list-transition-move,
+.options-list-transition-enter-active,
+.options-list-transition-leave-active {
+	transition: all var(--animation-slow) ease;
+}
+
+.options-list-transition-enter-from,
+.options-list-transition-leave-to {
+	opacity: 0;
+	transform: translateX(44px);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.options-list-transition-leave-active {
+	position: absolute;
 }
 </style>

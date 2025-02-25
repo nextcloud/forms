@@ -40,27 +40,45 @@
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />
 			</div>
-			<TransitionList v-else class="question__content">
-				<!-- Answer text input edit -->
-				<AnswerInput
-					v-for="(answer, index) in sortedOptions"
-					:key="answer.local ? 'option-local' : answer.id"
-					ref="input"
-					:answer="answer"
-					:form-id="formId"
-					is-dropdown
-					:index="index"
-					:is-unique="!isMultiple"
-					:max-index="options.length - 1"
-					:max-option-length="maxStringLengths.optionText"
-					@create-answer="onCreateAnswer"
-					@update:answer="updateAnswer(index, $event)"
-					@delete="deleteOption"
-					@focus-next="focusNextInput"
-					@move-up="onOptionMoveUp(index)"
-					@move-down="onOptionMoveDown(index)"
-					@tabbed-out="checkValidOption" />
-			</TransitionList>
+			<Draggable
+				v-else
+				v-model="sortedOptions"
+				class="question__content"
+				animation="200"
+				direction="vertical"
+				handle=".option__drag-handle"
+				invert-swap
+				tag="ul"
+				@change="saveOptionsOrder"
+				@start="isDragging = true"
+				@end="isDragging = false">
+				<TransitionGroup
+					:name="
+						isDragging
+							? 'no-external-transition-on-drag'
+							: 'options-list-transition'
+					">
+					<!-- Answer text input edit -->
+					<AnswerInput
+						v-for="(answer, index) in sortedOptions"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						:form-id="formId"
+						is-dropdown
+						:index="index"
+						:is-unique="!isMultiple"
+						:max-index="options.length - 1"
+						:max-option-length="maxStringLengths.optionText"
+						@create-answer="onCreateAnswer"
+						@update:answer="updateAnswer(index, answer)"
+						@delete="deleteOption"
+						@focus-next="focusNextInput"
+						@move-up="onOptionMoveUp(index)"
+						@move-down="onOptionMoveDown(index)"
+						@tabbed-out="checkValidOption" />
+				</TransitionGroup>
+			</Draggable>
 		</template>
 
 		<!-- Add multiple options modal -->
@@ -71,6 +89,8 @@
 </template>
 
 <script>
+import Draggable from 'vuedraggable'
+
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
@@ -82,26 +102,29 @@ import AnswerInput from './AnswerInput.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
-import TransitionList from '../TransitionList.vue'
 
 export default {
 	name: 'QuestionDropdown',
 
 	components: {
 		AnswerInput,
+		Draggable,
 		IconContentPaste,
 		NcActionButton,
 		NcActionCheckbox,
 		NcLoadingIcon,
 		NcSelect,
 		OptionInputDialog,
-		TransitionList,
 	},
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
 
 	data() {
-		return { inputValue: '', isOptionDialogShown: false, isLoading: false }
+		return {
+			isDragging: false,
+			isLoading: false,
+			isOptionDialogShown: false,
+		}
 	},
 
 	computed: {
@@ -168,5 +191,23 @@ export default {
 		inset-inline-start: -12px;
 		margin-inline-end: 32px !important;
 	}
+}
+
+.options-list-transition-move,
+.options-list-transition-enter-active,
+.options-list-transition-leave-active {
+	transition: all var(--animation-slow) ease;
+}
+
+.options-list-transition-enter-from,
+.options-list-transition-leave-to {
+	opacity: 0;
+	transform: translateX(44px);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.options-list-transition-leave-active {
+	position: absolute;
 }
 </style>

@@ -37,33 +37,45 @@ export default defineComponent({
 		/**
 		 * Options sorted by order or randomized if configured
 		 */
-		sortedOptions() {
-			// Only shuffle options if not in editing mode (and shuffling is enabled)
-			if (this.readOnly && this.extraSettings?.shuffleOptions) {
-				return this.shuffleArray(this.options)
-			}
-
-			// Ensure order of options always is the same
-			const options = [...this.options].sort((a, b) => {
-				if (a.order === b.order) {
-					return a.id - b.id
+		sortedOptions: {
+			get() {
+				// Only shuffle options if not in editing mode (and shuffling is enabled)
+				if (this.readOnly && this.extraSettings?.shuffleOptions) {
+					return this.shuffleArray(this.options)
 				}
-				return (a.order ?? 0) - (b.order ?? 0)
-			})
 
-			if (!this.readOnly) {
-				// In edit mode append an empty option
-				return [
-					...options,
-					{
-						local: true,
-						questionId: this.id,
-						text: '',
-						order: options.length,
-					},
-				]
-			}
-			return options
+				// Ensure order of options always is the same
+				const options = [...this.options].sort((a, b) => {
+					if (a.order === b.order) {
+						return a.id - b.id
+					}
+					return (a.order ?? 0) - (b.order ?? 0)
+				})
+
+				if (!this.readOnly) {
+					// In edit mode append an empty option
+					return [
+						...options,
+						{
+							local: true,
+							questionId: this.id,
+							text: '',
+							order: options.length,
+						},
+					]
+				}
+				return options
+			},
+			set(newOptions: FormsOption[]) {
+				this.updateOptions(
+					newOptions
+						.filter((option) => !option.local)
+						.map((option, index) => ({
+							...option,
+							order: index,
+						})),
+				)
+			},
 		},
 
 		/**

@@ -381,7 +381,7 @@ export default {
 		gap: 12px;
 		width: var(--default-clickable-area);
 		height: 100%;
-		opacity: 0.5;
+		color: var(--color-text-maxcontrast);
 		cursor: grab;
 
 		&-button {
@@ -397,7 +397,7 @@ export default {
 		&:hover,
 		&:focus,
 		&:focus-within {
-			opacity: 1;
+			color: var(--color-main-text);
 
 			.question__drag-handle-button {
 				position: initial;
