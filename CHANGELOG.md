@@ -5,64 +5,81 @@
 
 # Changelog
 
-## v5.0.0-alpha.3 - 2025-02-14
+## v5.0.0 - 2025-02-25
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.2...v5.0.0-alpha.3)
-
-### Fixed
-
-- Fix(routes): Add hash requirements for frontpage routes by @Chartman123 in [\#2555](https://github.com/nextcloud/forms/pull/2555)
-- Fix: Implement debounced input handling for AnswerInput component by @Chartman123 in [\#2553](https://github.com/nextcloud/forms/pull/2553)
-- fix: Correct validationTypeMenuId to use local index instead of $attrs by @Chartman123 in [\#2549](https://github.com/nextcloud/forms/pull/2549)
-
-### Merged
-
-- fix(migration): Replace execute() with executeQuery() and executeStatement() for improved query execution by @Chartman123 in [\#2551](https://github.com/nextcloud/forms/pull/2551)
-- Chore: Refactor submission handling in Results.vue by @Chartman123 in [\#2541](https://github.com/nextcloud/forms/pull/2541)
-
-## v5.0.0-alpha.2 - 2025-01-31
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.1...v5.0.0-alpha.2)
-
-### Fixed
-
-- Fix: Show sidebar toggle in all views by @Chartman123 in [\#2532](https://github.com/nextcloud/forms/pull/2532)
-- fix: Fix spreadsheet unlinking by @Koc in [\#2534](https://github.com/nextcloud/forms/pull/2534)
-- Fix: Add disabled state to PillMenu and update Results view when there are no submissions by @Chartman123 in [\#2530](https://github.com/nextcloud/forms/pull/2530)
-
-## v5.0.0-alpha.1 - 2025-01-24
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0-alpha.0...v5.0.0-alpha.1)
-
-### Fixed
-
-- fix: Add brute force protection to form endpoints by @susnux in [\#2269](https://github.com/nextcloud/forms/pull/2269)
-- Fix: only show confirmation dialog for active forms by @Chartman123 in [\#2504](https://github.com/nextcloud/forms/pull/2504)
-
-## v5.0.0-alpha.0 - 2025-01-17
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v5.0.0-alpha.0)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v5.0.0)
 
 ### Enhancements
 
-- feat: allow cloning archived forms by @Chartman123 in [\#2490](https://github.com/nextcloud/forms/pull/2490)
+- feat: make options draggable by @Chartman123 in [\#2579](https://github.com/nextcloud/forms/pull/2579)
+- feat: Improve error messages for invalid submissions by @Koc in [\#2533](https://github.com/nextcloud/forms/pull/2533)
+- feat: Allow to reorder options of "checkbox" "radio" and "dropdown" question types in frontend by @susnux in [\#2092](https://github.com/nextcloud/forms/pull/2092)
+- feat: replace drag icon for questions by @Chartman123 in [\#2584](https://github.com/nextcloud/forms/pull/2584)
 - chore: make Forms OpenAPI compliant by @Chartman123 in [\#2358](https://github.com/nextcloud/forms/pull/2358)
+- feat: allow cloning archived forms by @Chartman123 in [\#2490](https://github.com/nextcloud/forms/pull/2490)
 - feat: integration of unified search by @Chartman123 in [\#2479](https://github.com/nextcloud/forms/pull/2479)
 - feat: Ask for restarting submission if form was changed by @Koc in [\#2319](https://github.com/nextcloud/forms/pull/2319)
 
 ### Fixed
 
+- Fix(routes): Add hash requirements for frontpage routes by @Chartman123 in [\#2555](https://github.com/nextcloud/forms/pull/2555)
+- fix: Add brute force protection to form endpoints by @susnux in [\#2269](https://github.com/nextcloud/forms/pull/2269)
+- Fix: only show confirmation dialog for active forms by @Chartman123 in [\#2504](https://github.com/nextcloud/forms/pull/2504)
 - fix: subtraction in access_enum by @Chartman123 in [\#2501](https://github.com/nextcloud/forms/pull/2501)
-- fix: failing tests by @hamza221 in [\#2466](https://github.com/nextcloud/forms/pull/2466)
+- Fix misaligned form elements by @Elsensee in [\#2578](https://github.com/nextcloud/forms/pull/2578)
 
 ### Merged
 
+- Chore(api): Add CORS support description to multiple endpoints by @Chartman123 in [\#2592](https://github.com/nextcloud/forms/pull/2592)
+- Chore(psalm): Update psalm settings and baseline by @Chartman123 in [\#2550](https://github.com/nextcloud/forms/pull/2550)
+- fix(migration): Replace execute() with executeQuery() and executeStatement() for improved query execution by @Chartman123 in [\#2551](https://github.com/nextcloud/forms/pull/2551)
 - chore: remove unused access variable in hasPublicLink method by @Chartman123 in [\#2478](https://github.com/nextcloud/forms/pull/2478)
 - chore: remove API v2 by @Chartman123 in [\#2351](https://github.com/nextcloud/forms/pull/2351)
 - chore: Add reuse compliance by @hamza221 in [\#2455](https://github.com/nextcloud/forms/pull/2455)
 - chore: use attributes to define routes by @Chartman123 in [\#2353](https://github.com/nextcloud/forms/pull/2353)
 - chore: remove legacy link support by @Chartman123 in [\#2355](https://github.com/nextcloud/forms/pull/2355)
 - chore: set min NC30 and add stable4 to dependabot by @Chartman123 in [\#2352](https://github.com/nextcloud/forms/pull/2352)
+
+### Known Issues
+
+- Menu for re-ordering options must be improved (doesn't always keep focus)
+
+## v4.3.8 - 2025-02-24
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.7...v4.3.8)
+
+### Fixed
+
+- Fix: Add disabled state to PillMenu and update Results view when there are no submissions by @Chartman123 in [\#2530](https://github.com/nextcloud/forms/pull/2530)
+forms/pull/2580)
+- fix: remove linked file from cloned form by @Chartman123 in [\#2581](https://github.com/nextcloud/forms/pull/2581)
+- fix: Improve compatibility with Windows for uploaded files by @Koc in [\#2513](https://github.com/nextcloud/forms/pull/2513)
+
+### Merged
+
+- chore(stable4): Move to min version 29 by @Chartman123 in [\#2575](https://github.com/nextcloud/forms/pull/2575)
+
+## v4.3.7 - 2025-02-14
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.6...v4.3.7)
+
+### Fixed
+
+- Fix: Implement debounced input handling for AnswerInput component by @Chartman123 in [\#2553](https://github.com/nextcloud/forms/pull/2553)
+- fix: Correct validationTypeMenuId to use local index instead of $attrs by @Chartman123 in [\#2549](https://github.com/nextcloud/forms/pull/2549)
+
+### Merged
+
+- Chore: Refactor submission handling in Results.vue by @Chartman123 in [\#2541](https://github.com/nextcloud/forms/pull/2541)
+
+## v4.3.6 - 2025-01-31
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.5...v4.3.6)
+
+### Fixed
+
+- Fix: Show sidebar toggle in all views by @Chartman123 in [\#2532](https://github.com/nextcloud/forms/pull/2532)
+- fix: Fix spreadsheet unlinking by @Koc in [\#2534](https://github.com/nextcloud/forms/pull/2534)
 
 ## v4.3.5 - 2025-01-11
 
