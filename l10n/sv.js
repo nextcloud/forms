@@ -76,6 +76,7 @@ OC.L10N.register(
     "Add options" : "Lägg till alternativ",
     "Options should be separated by new line!" : "Alternativ måste separeras med nya rader!",
     "QR code representation of {text}" : "QR-kod för {text}",
+    "Move option actions" : "Flytta åtgärder för alternativ",
     "Move option up" : "Flytta upp alternativ",
     "Move option down" : "Flytta ned alternativ",
     "Delete answer" : "Ta bort svaret",

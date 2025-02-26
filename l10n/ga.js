@@ -76,6 +76,7 @@ OC.L10N.register(
     "Add options" : "Cuir roghanna leis",
     "Options should be separated by new line!" : "Ba chóir roghanna a dheighilt le líne nua!",
     "QR code representation of {text}" : "Léiriú cód QR de {text}",
+    "Move option actions" : "Bog gníomhartha rogha",
     "Move option up" : "Bog rogha suas",
     "Move option down" : "Bog rogha síos",
     "Delete answer" : "Scrios an freagra",
