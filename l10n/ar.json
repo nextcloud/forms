@@ -26,6 +26,10 @@
     "Timestamp" : "الطابع الزمني ",
     "📝 Simple surveys and questionnaires, self-hosted" : " 📝 استبيانات بسيطة، مستضافة ذاتيًا",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🧑‍💻 Connect to your software:** Easily integrate Forms into your service with our full-fledged [REST-API](https://github.com/nextcloud/forms/blob/main/docs/API.md).\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "** استبيانات واستبيانات بسيطة ، ذاتية الاستضافة! ** \n- ** 📝 تصميم بسيط: ** لا يوجد تنوّعٌ كبيرٌ في الخيارات، فقط الأساسيات. يعمل بشكل جيد على الهاتف المحمول ايضاً \n- ** 📊 عرض النتائج وتصديرها: ** يتم عرض النتائج ويمكن أيضًا تصديرها كملف CSV بنفس التنسيق المستخدم بواسطة نماذج Google . \n- ** 🔒 بياناتك تحت سيطرتك! ** على عكس نماذج Google و Typeform و Doodle وغيرها، تظل معلومات الاستبيان والردود على خادومك. \n- ** 🧑‍💻 الاتصال بالبرنامج الخاص بك: ** يمكنك دمج النماذج بسهولة في خدمتك من خلال [REST-API] الكاملة الخاصة بنا (https://github.com/nextcloud/forms/blob/main/docs/API.md) . \n- ** 🙋 شارك! ** لدينا الكثير من الأشياء المخطط لها مثل المزيد من أنواع الأسئلة ، والتعاون في النماذج ، [والمزيد] (https://github.com/nextcloud/forms/milestones) !",
+    "An error occurred while loading the forms list" : "حدث خطأ أثناء تحميل قائمة النماذج ",
+    "Form not found" : "تعذر العثور على النموذج ",
+    "Unable to create a new form" : "تعذر إنشاء نموذج جديد ",
+    "Unable to copy form" : "تعذر نسخ النموذج ",
     "Forms navigation" : "التنقل في النماذج",
     "New form" : "نموذج جديد ",
     "Your forms" : "نماذجك",
@@ -37,13 +41,11 @@
     "Select a form or create a new one" : "اختر نموذج أو أنشى نموذج جديد ",
     "Please select a form" : "إختر نموذجاً من فضلك",
     "Create new form" : "إنشاء نموذج جديد ",
-    "An error occurred while loading the forms list" : "حدث خطأ أثناء تحميل قائمة النماذج ",
-    "Form not found" : "تعذر العثور على النموذج ",
-    "Unable to create a new form" : "تعذر إنشاء نموذج جديد ",
-    "Unable to copy form" : "تعذر نسخ النموذج ",
     "This form does not exist" : "هذا النموذج غير موجود ",
     "Form expired" : "انتهت صلاحية النموذج ",
     "This form has expired and is no longer taking answers" : "انتهت صلاحية النموذج ولا يمكن استقبال إجابات ",
+    "Error while saving configuration" : "خطأ أثناء حفظ الإعدادات",
+    "Error while reloading config" : "خطأ أثناء إعادة تحميل الإعدادات",
     "Form creation" : "إنشاء النموذج",
     "Restrict form creation to selected groups" : "حصر حق إنشاء النموذج في مجموعات معينة",
     "Select groups" : "إختر مجموعة",
@@ -51,8 +53,12 @@
     "Allow sharing by link" : "السماح بالمشاركة عن طريق الرابط",
     "Allow sharing to all logged in accounts" : "السماح بالمشاركة لكل الحسابات التي سجلت دخولها",
     "Allow showing form to all logged in accounts on sidebar" : "السماح بعرض النموذج لكل الحسابات المسجلة على الشريط الجانبي",
-    "Error while saving configuration" : "خطأ أثناء حفظ الإعدادات",
-    "Error while reloading config" : "خطأ أثناء إعادة تحميل الإعدادات",
+    "Delete form" : "حذف النموذج ",
+    "Form closed" : "نموذج مغلق",
+    "Expired {relativeDate}" : "منتهي الصلاحية {relativeDate}",
+    "Expires {relativeDate}" : "تنتهي صلاحيته {relativeDate}",
+    "Error changing archived state of form" : "حدث خطأ أثناء تغيير حالة الأرشفة للنموذج",
+    "Error while deleting {title}" : "حدث خطأ أثناء حذف العنوان {title}",
     "Form actions" : "إجراءات النماذج",
     "Edit form" : "تعديل نموذج",
     "Share form" : "مشاركة النموذج ",
@@ -60,27 +66,22 @@
     "Copy form" : "نسخ النموذج ",
     "Unarchive form" : "نماذج غير مؤرشفة",
     "Archive form" : "أرشفة نموذج",
-    "Delete form" : "حذف النموذج ",
     "Are you sure you want to delete {title}?" : "هل تريد حقًا حذف العنوان {title}؟",
-    "Form closed" : "نموذج مغلق",
-    "Expired {relativeDate}" : "منتهي الصلاحية {relativeDate}",
-    "Expires {relativeDate}" : "تنتهي صلاحيته {relativeDate}",
-    "Error changing archived state of form" : "حدث خطأ أثناء تغيير حالة الأرشفة للنموذج",
-    "Error while deleting {title}" : "حدث خطأ أثناء حذف العنوان {title}",
-    "Add multiple options" : "إضافات خيارات متعددة",
-    "Add multiple options (one per line)" : "إضافة خيارات متعددة ( واحد في كل سطر)",
-    "Options" : "الخيارات",
     "Cancel" : "إلغاء",
     "Add options" : "إضافة خيارات",
     "Options should be separated by new line!" : "يجب الفصل بين الخيارات بسطر جديد!",
+    "Add multiple options" : "إضافات خيارات متعددة",
+    "Add multiple options (one per line)" : "إضافة خيارات متعددة ( واحد في كل سطر)",
+    "Options" : "الخيارات",
     "QR code representation of {text}" : "QR code representation of {text}",
-    "Move option up" : "نقل الخيار لأعلى ",
-    "Move option down" : "نقل الخيار لأسفل",
-    "Delete answer" : "حذف الإجابة ",
     "Add a new answer option" : "إضافة خيار إجابة جديدة",
     "The text of option {index}" : "نص الخيار {index}",
     "Answer number {index}" : "رقم الإجابة {index}",
     "Error while saving the answer" : "حدث خطأ أثناء حفظ الإجابة ",
+    "Move option up" : "نقل الخيار لأعلى ",
+    "Move option down" : "نقل الخيار لأسفل",
+    "Delete answer" : "حذف الإجابة ",
+    "This question needs a title!" : "هذا السؤال بحاجه إلى عنوان!",
     "Question number {index}" : "رقم السؤال {index}",
     "Move question up" : "رفع السؤال لأعلى",
     "Move question down" : "خفض السؤال لأسفل",
@@ -91,8 +92,11 @@
     "Copy question" : "إنسَخ السؤال",
     "Delete question" : "حذف السؤال ",
     "Description (formatting using Markdown is supported)" : "الوصف ( صيغة ماركداون مدعومة أيضاً)",
-    "This question needs a title!" : "هذا السؤال بحاجه إلى عنوان!",
     "Shuffle options" : "خلط الخيارات",
+    "Allowed file types: {fileTypes}." : "أنواع الملفات المسموح بها: {fileTypes}.",
+    "All file types are allowed." : "جميع أنواع الملفات مسموحٌ لها",
+    "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "حجم الملف {fileName} كبيرٌ جداً. أقصى حجم مسموحٌ به للملف هو: {maxFileSize}.",
+    "There was an error during submitting the file: {message}." : "حدث خطأٌ أثناء إرسال الملف: {message}.",
     "Allow only specific file types" : "السماح فقط لأنواع محددة من الملفات",
     "Custom file extensions" : "امتدادات مخصصة للملفات",
     "Maximum number of files" : "العدد الأقصى من الملفات",
@@ -100,11 +104,9 @@
     "Delete" : "إزالة",
     "Uploading …" : "جاري الرفع...",
     "Add new file as answer" : "أضِف ملفاً جديداً كإجابة",
-    "Allowed file types: {fileTypes}." : "أنواع الملفات المسموح بها: {fileTypes}.",
-    "All file types are allowed." : "جميع أنواع الملفات مسموحٌ لها",
-    "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "حجم الملف {fileName} كبيرٌ جداً. أقصى حجم مسموحٌ به للملف هو: {maxFileSize}.",
-    "There was an error during submitting the file: {message}." : "حدث خطأٌ أثناء إرسال الملف: {message}.",
     "A long answer for the question “{text}”" : "إجابة طويلة للسؤال “{text}”",
+    "Upper options limit must be greater than the lower limit" : "خيارات الحد الأعلى يجب أن تكون أكبر  من خيارات الحد الأدنى",
+    "Lower options limit must be smaller than the upper limit" : "خيارات الحد الأدنى يجب أن تكون أصغر من خيارات الحد الأعلى",
     "Add \"other\"" : "أضِف \"أخرى\"",
     "Require a minimum of options to be checked" : "يلزم الحد الأدنى من الخيارات للتحقق منها",
     "Minimum options to be checked" : "الحد الأدنى من الخيارات التي سبتم التحقق منها",
@@ -112,14 +114,15 @@
     "Maximum options to be checked" : "الحد الأقصى من الخيارات التي سيتم التحقق منها",
     "Other:" : "أُخرَى:",
     "Other" : "آخَر",
-    "Upper options limit must be greater than the lower limit" : "خيارات الحد الأعلى يجب أن تكون أكبر  من خيارات الحد الأدنى",
-    "Lower options limit must be smaller than the upper limit" : "خيارات الحد الأدنى يجب أن تكون أصغر من خيارات الحد الأعلى",
+    "Invalid regular expression" : "التعبير النمطي غير صحيح",
     "A short answer for the question “{text}”" : "إجابة قصيرة للسؤال “{text}”",
     "Input types (currently: {type})" : "أنواع المُدخلات (حاليّاً: {type})",
     "Regular expression for input validation" : "التعبير النمطي RE للتحقُّق من صحة المُدخلات",
-    "Invalid regular expression" : "التعبير النمطي غير صحيح",
     "No response" : "لا رد ",
     "Delete this response" : "حذف هذا الرد ",
+    "This can not be controlled, if the form has a public link or stores responses anonymously." : "هذا لا يمكن السيطرة عليه؛ إذا كان للنماذج روابط عمومية أو كانت الإجابات محفوظة غُفْلاً من أسماء أصحابها.",
+    "Expired on {date}" : "انتهى بتاريخ {date}",
+    "Expires on {date}" : "ينتهي بتاريخ {date}",
     "Store responses anonymously" : "حفظ الإجابات غُفْلاً من أسماء أصحابها",
     "Allow multiple responses per person" : "السماح بردود متعددة لكل شخص ",
     "Set expiration date" : "تعيين تاريخ إنتهاء الصلاحية",
@@ -130,15 +133,16 @@
     "Custom submission message" : "رسالة إرسال مخصصة",
     "Message to show after a user submitted the form (formatting using Markdown is supported)" : "رسالة تُعرض بعد أن يقوم المستخدِم بإرسال النموذج (التنسيق باستعمال ماركداون Markdown مدعوم)",
     "Message to show after a user submitted the form. Please note that the message will not be translated!" : "رسالة تُعرض بعد أن يقوم المستخدِم بإرسال النموذج. لاحظ أن الرسالة لن تتم ترجمتها!",
-    "This can not be controlled, if the form has a public link or stores responses anonymously." : "هذا لا يمكن السيطرة عليه؛ إذا كان للنماذج روابط عمومية أو كانت الإجابات محفوظة غُفْلاً من أسماء أصحابها.",
-    "Expired on {date}" : "انتهى بتاريخ {date}",
-    "Expires on {date}" : "ينتهي بتاريخ {date}",
     "Search for user, group or team …" : "البحث عن مستخدِم، أو مجموعة، أو فريق ...",
+    "Group" : "المجموعة",
+    "Team" : "الفريق",
     "Permissions" : "الصلاحيّات",
     "View responses" : "عرض الإجابات",
     "Delete responses" : "حذف الإجابات",
-    "Group" : "المجموعة",
-    "Team" : "الفريق",
+    "There was an error while adding the share" : "حدث خطأ أثناء إضافة المشاركة",
+    "There was an error while adding the link" : "حدث خطأ أثناء إضافة الرابط",
+    "There was an error while updating the share" : "حدث خطأ أثناء تعديل المشاركة",
+    "There was an error while removing the share" : "حدث خطأ أثناء حذف المشاركة",
     "Share link" : "رابط مُشاركة",
     "Add link" : "إضافة رابط",
     "Embeddable link" : "رابط قابل للتضمين",
@@ -152,10 +156,8 @@
     "Only works for logged in accounts with access rights" : "يعمل فقط للحسابات المسجل دخولها و التي لها حق الوصول",
     "Permit access to all logged in accounts" : "السماح بالوصول لكل الحسابات المسجل دخولها",
     "Show to all accounts on sidebar" : "عرض لكل الحسابات في الشريط الجانبي",
-    "There was an error while adding the share" : "حدث خطأ أثناء إضافة المشاركة",
-    "There was an error while adding the link" : "حدث خطأ أثناء إضافة الرابط",
-    "There was an error while updating the share" : "حدث خطأ أثناء تعديل المشاركة",
-    "There was an error while removing the share" : "حدث خطأ أثناء حذف المشاركة",
+    "This form is now owned by" : "هذا النموذج يملكه الآن ",
+    "An error occurred while transfering ownership" : "حدث خطأ أثناء نقل مِلكِية",
     "Transfer ownership" : "أنقُل المِلكِية",
     "You're going to transfer the ownership of {name} to another account. Please select the account to which you want to transfer ownership." : "أنت في طريقك لنقل ملكية حساب {name} إلى حساب آخر. من فضلك، قم بتحديد الحساب الذي ترغب في نقل ملكيته.",
     "Search for a user" : "البحث عن مستخدِم",
@@ -163,21 +165,12 @@
     "Confirmation text" : "نصُّ الموافقة",
     "This can not be undone." : "لا يمكن التراجع عن هذا لاحقاً",
     "I understand, transfer this form" : "أنا موافق, قُم بنقل هذا النموذج",
-    "This form is now owned by" : "هذا النموذج يملكه الآن ",
-    "An error occurred while transfering ownership" : "حدث خطأ أثناء نقل مِلكِية",
-    "View mode" : "وضعية العرض",
-    "Share" : "مشاركة",
     "View form" : "عرض النموذج",
     "View" : "عرض",
     "Edit" : "تعديل",
     "Show results" : "عرض النتائج",
-    "Create form" : "إنشاء نموذج",
-    "Loading {title} …" : "جارِ التحميل {title} ... ",
-    "Form is archived" : "النموذح مؤرشف",
-    "Form '{title}' is archived and cannot be modified." : "النموذج '{title}' تمّت أرشفته و لا يمكن تعديله.",
-    "Form title" : "عنوان النموذج ",
-    "Description" : "الوصف",
-    "Add a question" : "إضافة سؤال ",
+    "View mode" : "وضعية العرض",
+    "Share" : "مشاركة",
     "Responses are anonymous." : "الردود مجهولة ",
     "Responses are connected to your account." : "الاستجابات responses مربوطة مع حسابك",
     "An asterisk (*) indicates mandatory questions." : "تشير علامة النجمة (*) إلى الأسئلة الإزامية.",
@@ -186,23 +179,18 @@
     "There was an error while adding the new question" : "حدث خطأ أثناء إضافة سؤال جديد ",
     "There was an error while removing the question" : "حدث خطأ أثناء إزالة السؤال ",
     "Error while saving form" : "حدث خطأ أثناء حفظ النموذج ",
-    "Linked file not available" : "الملف المرتبط غير مُتاح",
-    "Linked file is not available, would you like to link a new file?" : "الملف المرتبط غير مٌتاح. هل ترغب في ربط ملف جديد؟",
-    "Loading responses …" : "جارِ تحميل الردود ",
-    "{amount} responses" : "{amount} الردود ",
-    "Create spreadsheet" : "إنشاء جدول أعمال",
-    "Open spreadsheet" : "فتح جدول أعمال",
-    "Re-export spreadsheet" : "إعادة تصدير جدول أعمال",
-    "Unlink spreadsheet" : "فك رابط لجدول أعمال",
-    "Save copy to Files" : "حفظ نسخة في \"الملفات\" Files",
-    "Download" : "تنزيل",
-    "Delete all responses" : "مسح جميع الردود ",
-    "No responses yet" : "لا يوجد ردود حتى الآن",
-    "Results of submitted forms will show up here" : "سوف تظهر نتائج النماذج المقدمة هنا",
-    "Delete submissions" : "حذف المُرسلات",
-    "Are you sure you want to delete all responses of {title}?" : "هل تريد حقًا حذف جميع الردود  {title}؟",
+    "Create form" : "إنشاء نموذج",
+    "Loading {title} …" : "جارِ التحميل {title} ... ",
+    "Form is archived" : "النموذح مؤرشف",
+    "Form '{title}' is archived and cannot be modified." : "النموذج '{title}' تمّت أرشفته و لا يمكن تعديله.",
+    "Form title" : "عنوان النموذج ",
+    "Description" : "الوصف",
+    "Add a question" : "إضافة سؤال ",
     "Summary" : "المُلخَّص",
     "Responses" : "الردود",
+    "Unlink spreadsheet" : "فك رابط لجدول أعمال",
+    "Create spreadsheet" : "إنشاء جدول أعمال",
+    "Delete submissions" : "حذف المُرسلات",
     "There was an error while loading the results" : "حدث خطأ أثناء تحميل النتائج ",
     "File {file} successfully linked" : "تمّ بنجاح ربط الملف {file}  ",
     "There was an error while linking the file" : "حدث خطأ أثناء ربط الملف",
@@ -218,26 +206,38 @@
     "Create CSV" : "إنشاء ملف CSV",
     "Create ODS" : "إنشاء ملف ODS",
     "Select {file}" : "إختَر {file}",
+    "Linked file not available" : "الملف المرتبط غير مُتاح",
+    "Linked file is not available, would you like to link a new file?" : "الملف المرتبط غير مٌتاح. هل ترغب في ربط ملف جديد؟",
+    "Loading responses …" : "جارِ تحميل الردود ",
+    "{amount} responses" : "{amount} الردود ",
+    "Open spreadsheet" : "فتح جدول أعمال",
+    "Re-export spreadsheet" : "إعادة تصدير جدول أعمال",
+    "Save copy to Files" : "حفظ نسخة في \"الملفات\" Files",
+    "Download" : "تنزيل",
+    "Delete all responses" : "مسح جميع الردود ",
+    "No responses yet" : "لا يوجد ردود حتى الآن",
+    "Results of submitted forms will show up here" : "سوف تظهر نتائج النماذج المقدمة هنا",
+    "Are you sure you want to delete all responses of {title}?" : "هل تريد حقًا حذف جميع الردود  {title}؟",
     "Form settings" : "إعدادات النموذج",
     "Sharing" : "المشاركة",
     "Settings" : "الإعدادات",
+    "Abort" : "إلغاء",
+    "Submit" : "إرسال ",
+    "Leave" : "إجازة",
+    "Clear" : "محو",
+    "Some answers are not valid" : "بعض الإجابات غير صحيحة",
+    "There was an error submitting the form: {message}" : "حدث خطأٌ أثناء إرسال النموذج: {message}.",
     "Submit form" : "إرسال النموذج ",
     "Submitting form …" : "جارِ إرسال النموذج...",
     "Thank you for completing the form!" : "شكرًا لك على إكمالك للنموذج! ",
     "This form was closed and is no longer taking answers" : "هذا النموذج مغلق و لم يعد يستقبل الإجابات",
     "Clear form" : "محو النموذج",
-    "Submit" : "إرسال ",
     "Confirm submit" : "تأكيد الإرسال",
     "Are you sure you want to submit an empty form?" : "هل أنت متأكد من أنك ترغب في إرسال نموذج فارغ؟",
     "Leave form" : "نموذج إجازة",
     "You have unsaved changes! Do you still want to leave?" : "لديك تغييرات غير محفوظة! هل مازلت تريد الخروج؟",
     "Do you want to clear all answers?" : "هل ترغب في محو كل الإجابات؟",
     "The form has changed since your last visit. Do you want to clear all answers?" : "النموذج أجريت عليه تغييرات منذ آخر زيارة لك. هل ترغب في محو كل الإجابات؟",
-    "Abort" : "إلغاء",
-    "Leave" : "إجازة",
-    "Clear" : "محو",
-    "Some answers are not valid" : "بعض الإجابات غير صحيحة",
-    "There was an error submitting the form: {message}" : "حدث خطأٌ أثناء إرسال النموذج: {message}.",
     "Error while saving question" : "حدث خطأ أثناء حفظ السؤال ",
     "Error while saving question options" : "حدث خطأ أثناء حفظ خيارات إجابة السؤال",
     "There was an issue deleting this option" : "حدث خطأ أثناء إزالة هذا الخيار",
