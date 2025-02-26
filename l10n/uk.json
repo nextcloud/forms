@@ -94,7 +94,7 @@
     "Maximum file size" : "Максимальний розмір файлу",
     "Delete" : "Вилучити",
     "Uploading …" : "Завантаження…",
-    "Add new file as answer" : "Додати новий файл яко відповідь",
+    "Add new file as answer" : "Додати новий файл як відповідь",
     "Allowed file types: {fileTypes}." : "Дозволені типи файлів: {fileTypes}.",
     "All file types are allowed." : "Дозволені всі типи файлів.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Файл {fileName} завеликий. Максимальний допустимий розмір {maxFileSize}.",

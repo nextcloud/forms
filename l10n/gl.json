@@ -74,6 +74,7 @@
     "Add options" : "Engadir opcións",
     "Options should be separated by new line!" : "As opcións deben estar separadas por unha liña nova!",
     "QR code representation of {text}" : "Representación de {text} en código QR",
+    "Move option actions" : "Mover as accións de opción",
     "Move option up" : "Mover a opción cara arriba",
     "Move option down" : "Mover a opción cara abaixo",
     "Delete answer" : "Eliminar resposta",

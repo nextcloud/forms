@@ -76,6 +76,7 @@ OC.L10N.register(
     "Add options" : "添加選項",
     "Options should be separated by new line!" : "選項應該用新行分隔！",
     "QR code representation of {text}" : "{text} 的 QR 碼表示",
+    "Move option actions" : "移動選項動作",
     "Move option up" : "將選項上移",
     "Move option down" : "將選項下移",
     "Delete answer" : "刪除答案",

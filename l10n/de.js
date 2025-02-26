@@ -76,6 +76,7 @@ OC.L10N.register(
     "Add options" : "Optionen hinzufügen",
     "Options should be separated by new line!" : "Optionen sollten durch eine neue Zeile getrennt werden!",
     "QR code representation of {text}" : "QR-Code-Darstellung von {text}",
+    "Move option actions" : "Optionenaktionen verschieben",
     "Move option up" : "Option nach oben verschieben",
     "Move option down" : "Option nach unten verschieben",
     "Delete answer" : "Antwort löschen",
