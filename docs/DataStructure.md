@@ -209,6 +209,7 @@ Currently supported Question-Types are:
 | `date`            | Showing a dropdown calendar to select a date.                                                                                              |
 | _`datetime`_      | _deprecated: No longer available for new questions. Showing a dropdown calendar to select a date **and** a time._                          |
 | `time`            | Showing a dropdown menu to select a time.                                                                                                  |
+| `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                   |
 
 ## Extra Settings
 
@@ -226,3 +227,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `allowedFileExtensions` | `file`                                | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
 | `maxAllowedFilesCount`  | `file`                                | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |
 | `maxFileSize`           | `file`                                | Integer          | -                                           | Maximum file size in bytes, 0 means no limit                                |
+| `optionsLowest`         | `linearscale`                         | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`                             |
+| `optionsHighest`        | `linearscale`                         | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
+| `optionsLabelLowest`    | `linearscale`                         | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
+| `optionsLabelHighest`   | `linearscale`                         | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
