@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.0.1 - 2025-02-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0...v5.0.1)
+
+### Fixed
+
+- fix(32bit): pin `maennchen/zipstream-php` dependency to v2 for 32-bit compatibility by @susnux in [\#2600](https://github.com/nextcloud/forms/pull/2600)
+
 ## v5.0.0 - 2025-02-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.0...v5.0.0)
@@ -51,7 +59,7 @@
 ### Fixed
 
 - Fix: Add disabled state to PillMenu and update Results view when there are no submissions by @Chartman123 in [\#2530](https://github.com/nextcloud/forms/pull/2530)
-forms/pull/2580)
+  forms/pull/2580)
 - fix: remove linked file from cloned form by @Chartman123 in [\#2581](https://github.com/nextcloud/forms/pull/2581)
 - fix: Improve compatibility with Windows for uploaded files by @Koc in [\#2513](https://github.com/nextcloud/forms/pull/2513)
 
