@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.0.2 - 2025-02-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.1...v5.0.2)
+
+### Fixed
+
+- fix: remove group restriction on server level by @Chartman123 in [\#2603](https://github.com/nextcloud/forms/pull/2603)
+
 ## v5.0.1 - 2025-02-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.0...v5.0.1)
