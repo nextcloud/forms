@@ -875,6 +875,18 @@ file2.txt"
 				// Expected Result
 				'Question "q1" can only have one answer.',
 			],
+			'invalid-linearcale-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				// Answers
+				[
+					'1' => ['6']
+				],
+				// Expected Result
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
 			'full-good-submission' => [
 				// Questions
 				[
@@ -904,7 +916,8 @@ file2.txt"
 					['id' => 11, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']],
 					['id' => 12, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']],
 					['id' => 13, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{3}[0-9]{3}/']],
-					['id' => 16, 'type' => 'date', 'isRequired' => false, 'extraSettings' => [
+					['id' => 14, 'type' => 'linearscale', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]],
+					['id' => 15, 'type' => 'date', 'isRequired' => false, 'extraSettings' => [
 						'dateMin' => 1742860800,
 						'dateMax' => 1743033600]
 					],
@@ -924,7 +937,8 @@ file2.txt"
 					'11' => ['100.45'],
 					'12' => ['+49 711 25 24 28 90'],
 					'13' => ['abc123'],
-					'16' => ['2025-03-26']
+					'14' => ['3'],
+					'15' => ['2025-03-26'],
 				],
 				// Expected Result
 				null,
