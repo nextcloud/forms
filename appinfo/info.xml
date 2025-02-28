@@ -39,6 +39,10 @@
 	<author>Tim Sattizahn</author>
 	<author>Vinzenz Rosenkranz</author>
 
+	<types>
+		<prevent_group_restriction />
+	</types>
+
 	<documentation>
 		<admin>https://github.com/nextcloud/forms/blob/main/README.md</admin>
 	</documentation>
