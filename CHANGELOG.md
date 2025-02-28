@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.9 - 2025-02-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.8...v4.3.9)
+
+### Fixed
+
+- [stable4] fix: remove group restriction on server level by @backportbot[bot] in [\#2604](https://github.com/nextcloud/forms/pull/2604)
+
 ## v4.3.8 - 2025-02-24
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.7...v4.3.8)
