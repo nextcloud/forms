@@ -437,6 +437,27 @@
                         "type": "integer",
                         "format": "int64"
                     },
+                    "optionsHighest": {
+                        "type": "integer",
+                        "format": "int64",
+                        "enum": [
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10
+                        ]
+                    },
+                    "optionsLabelHighest": {
+                        "type": "string"
+                    },
+                    "optionsLabelLowest": {
+                        "type": "string"
+                    },
                     "optionsLimitMax": {
                         "type": "integer",
                         "format": "int64"
@@ -444,6 +465,14 @@
                     "optionsLimitMin": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "optionsLowest": {
+                        "type": "integer",
+                        "format": "int64",
+                        "enum": [
+                            0,
+                            1
+                        ]
                     },
                     "shuffleOptions": {
                         "type": "boolean"
