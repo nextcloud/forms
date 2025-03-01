@@ -141,7 +141,7 @@ export default {
 	}
 	
 	&-menu {
-		margin: 0 0 12px 12px;
+		margin: 0 0 12px var(--default-grid-baseline);
 		display: inline-block;
 	}
 
