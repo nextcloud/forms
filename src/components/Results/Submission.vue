@@ -138,9 +138,11 @@ export default {
 			font-weight: bold;
 		}
 
-		&-menu {
-			display: inline-block;
-		}
+	}
+	
+	&-menu {
+		margin: 0 0 12px 12px;
+		display: inline-block;
 	}
 
 	&-date {
