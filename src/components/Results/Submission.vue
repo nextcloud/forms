@@ -137,7 +137,6 @@ export default {
 		h3 {
 			font-weight: bold;
 		}
-
 	}
 
 	&-menu {
