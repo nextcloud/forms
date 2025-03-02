@@ -80,6 +80,7 @@ OC.L10N.register(
     "The text of option {index}" : "The text of option {index}",
     "Answer number {index}" : "Answer number {index}",
     "Error while saving the answer" : "Error while saving the answer",
+    "Move option actions" : "Move option actions",
     "Move option up" : "Move option up",
     "Move option down" : "Move option down",
     "Delete answer" : "Delete answer",
