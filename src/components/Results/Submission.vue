@@ -139,7 +139,7 @@ export default {
 		}
 
 	}
-	
+
 	&-menu {
 		margin: 0 0 12px var(--default-grid-baseline);
 		display: inline-block;
