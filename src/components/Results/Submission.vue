@@ -137,10 +137,11 @@ export default {
 		h3 {
 			font-weight: bold;
 		}
+	}
 
-		&-menu {
-			display: inline-block;
-		}
+	&-menu {
+		margin: 0 0 12px var(--default-grid-baseline);
+		display: inline-block;
 	}
 
 	&-date {
