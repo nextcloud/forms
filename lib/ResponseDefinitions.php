@@ -25,8 +25,12 @@ namespace OCA\Forms;
  *   allowedFileTypes?: list<string>,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
+ *   optionsEnd?: int,
+ *   optionsLabelBest?: string,
+ *   optionsLabelWorst?: string,
  *   optionsLimitMax?: int,
  *   optionsLimitMin?: int,
+ *   optionsStart?: int
  *   shuffleOptions?: bool,
  *   validationRegex?: string,
  *   validationType?: string
