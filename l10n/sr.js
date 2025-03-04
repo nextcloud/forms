@@ -80,6 +80,7 @@ OC.L10N.register(
     "The text of option {index}" : "Текст опције {index}",
     "Answer number {index}" : "Одговор број {index}",
     "Error while saving the answer" : "Грешка приликом чувања одговора",
+    "Move option actions" : "Померање акција разговора",
     "Move option up" : "Помери опцију навише",
     "Move option down" : "Помери опцију наниже",
     "Delete answer" : "Обриши одговор",
