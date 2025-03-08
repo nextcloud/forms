@@ -2201,7 +2201,7 @@
             "post": {
                 "operationId": "api-new-option",
                 "summary": "Add a new option to a question",
-                "description": "This endpoint allows CORS requests",
+                "description": "Returns a DataResponse containing the added options\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2576,7 +2576,7 @@
             "patch": {
                 "operationId": "api-update-option",
                 "summary": "Writes the given key-value pairs into Database",
-                "description": "This endpoint allows CORS requests",
+                "description": "Returns the id of the updated option\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2770,7 +2770,7 @@
             "delete": {
                 "operationId": "api-delete-option",
                 "summary": "Delete an option",
-                "description": "This endpoint allows CORS requests",
+                "description": "Returns the id of the deleted option\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
