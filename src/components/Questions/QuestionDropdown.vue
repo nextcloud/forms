@@ -71,7 +71,7 @@
 						:max-index="options.length - 1"
 						:max-option-length="maxStringLengths.optionText"
 						@create-answer="onCreateAnswer"
-						@update:answer="updateAnswer(index, answer)"
+						@update:answer="updateAnswer"
 						@delete="deleteOption"
 						@focus-next="focusNextInput"
 						@move-up="onOptionMoveUp(index)"
