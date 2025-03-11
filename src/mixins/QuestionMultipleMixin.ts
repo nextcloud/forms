@@ -148,7 +148,7 @@ export default defineComponent({
 		 * @param {string|number} index the current index to update
 		 * @param {object} answer the new answer value
 		 */
-		updateAnswer(index: number, answer: FormsOption & { local?: boolean }) {
+		updateAnswer(index: number, answer: FormsOption) {
 			const options = [...this.sortedOptions]
 			const [oldValue] = options.splice(index, 1, answer)
 
