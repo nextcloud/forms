@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.0.3 - 2025-03-11
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.2...v5.0.3)
+
+### Fixed
+
+- fix: parameter confusion in `update:answer` events for multiple questions by @Chartman123 in [\#2635](https://github.com/nextcloud/forms/pull/2635)
+- fix: Update QRDialog title to include escape and sanitize options by @Chartman123 in [\#2633](https://github.com/nextcloud/forms/pull/2633)
+- fix: misaligned result button by @pReya in [\#2618](https://github.com/nextcloud/forms/pull/2618)
+
 ## v5.0.2 - 2025-02-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.1...v5.0.2)
