@@ -93,7 +93,14 @@
 		</TransitionGroup>
 
 		<QRDialog
-			:title="t('forms', 'Share {formTitle}', { formTitle: form.title })"
+			:title="
+				t(
+					'forms',
+					'Share {formTitle}',
+					{ formTitle: form.title },
+					{ escape: false, sanitize: false },
+				)
+			"
 			:text="qrDialogText"
 			@closed="qrDialogText = ''" />
 
