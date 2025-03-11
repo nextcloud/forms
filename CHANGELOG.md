@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.10 - 2025-03-11
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.9...v4.3.10)
+
+### Fixed
+
+- [stable4] fix: Update QRDialog title to include escape and sanitize options by @backportbot[bot] in [\#2636](https://github.com/nextcloud/forms/pull/2636)
+
 ## v4.3.9 - 2025-02-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.8...v4.3.9)
