@@ -143,7 +143,7 @@ OC.L10N.register(
     "Search for a user" : "Buscar un usuario",
     "Type {text} to confirm." : "Escriba {text} para confirmar.",
     "Confirmation text" : "Texto de confirmación",
-    "This can not be undone." : "Esto no puede ser desecho.",
+    "This can not be undone." : "Esto no puede deshacerse.",
     "I understand, transfer this form" : "Yo entiendo, transferir este formulario",
     "View form" : "Ver formulario",
     "View" : "Ver",
