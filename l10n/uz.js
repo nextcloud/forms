@@ -5,6 +5,7 @@ OC.L10N.register(
     "Yes" : "Yes",
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
+    "Results" : "Natijalar",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Uploading …" : "Yuklanmoqda...",
@@ -19,7 +20,9 @@ OC.L10N.register(
     "Sharing" : "Ulashish",
     "Settings" : "Settings",
     "File" : "File",
+    "Date" : "Sana",
     "Pick a date" : "Sana tanlang",
-    "Pick a time" : "Vaqtni tanlang"
+    "Pick a time" : "Vaqtni tanlang",
+    "Email address" : "E-pochta manzili"
 },
 "nplurals=1; plural=0;");
