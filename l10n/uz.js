@@ -1,12 +1,15 @@
 OC.L10N.register(
     "forms",
     {
+    "Timestamp of data load" : "Ma'lumotlarni yuklash vaqt belgisi",
     "No" : "No",
     "Yes" : "Yes",
+    "Count" : "Hisoblash",
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
     "Results" : "Natijalar",
     "Cancel" : "Cancel",
+    "Options" : "Variantlar",
     "Delete" : "Delete",
     "Uploading …" : "Yuklanmoqda...",
     "Other" : "Boshqa",
@@ -15,6 +18,7 @@ OC.L10N.register(
     "Copy embedding code" : "O'rnatish kodini nusxalash",
     "Internal link" : "Ichki havola",
     "Edit" : "Tahrirlash",
+    "Share" : "Ulashish",
     "Description" : "Tavsif",
     "Download" : "Download",
     "Sharing" : "Ulashish",
