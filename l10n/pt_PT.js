@@ -7,6 +7,8 @@ OC.L10N.register(
     "Anonymous user" : "Utilizador anónimo",
     "A form has been <strong>shared</strong> with you" : "Um formulário foi <strong>partilhado</strong> consigo",
     "Someone <strong>answered</strong> a form" : " Alguém <strong>respondeu</strong>a um formulário ",
+    "No" : "Não",
+    "Yes" : "Sim",
     "Copy" : "copiar",
     "Anonymous response" : "Resposta anónima",
     "Shared by %s" : "Partilhado por %s",
