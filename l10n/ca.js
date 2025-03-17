@@ -11,6 +11,7 @@ OC.L10N.register(
     "No" : "No",
     "Yes" : "Sí",
     "Question" : "Pregunta",
+    "Count" : "Recompte",
     "Copy" : "Còpia",
     "Anonymous response" : "Resposta anònima",
     "Shared by %s" : "Compartit per %s",
