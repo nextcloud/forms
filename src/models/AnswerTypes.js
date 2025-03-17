@@ -43,7 +43,9 @@ export default {
 	 * @property {Function} validate *optional* Define conditions where this question is not ok
 	 * @property {string} titlePlaceholder The placeholder users see as empty question-title in edit-mode
 	 * @property {string} createPlaceholder *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field
+	 * @property {string} createPlaceholderRange *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field for date fields that use a date range
 	 * @property {string} submitPlaceholder *optional* The placeholder that is visible in submit-mode, to indicate a form input-field
+	 * @property {string} submitPlaceholderRange *optional* The placeholder that is visible in submit-mode, to indicate a form input-field for date fields that use a date range
 	 * @property {string} warningInvalid The warning users see in edit mode, if the question is invalid.
 	 */
 
@@ -140,7 +142,9 @@ export default {
 
 		titlePlaceholder: t('forms', 'Date question title'),
 		createPlaceholder: t('forms', 'People can pick a date'),
+		createPlaceholderRange: t('forms', 'People can pick a date range'),
 		submitPlaceholder: t('forms', 'Pick a date'),
+		submitPlaceholderRange: t('forms', 'Pick a date range'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 
 		pickerType: 'date',

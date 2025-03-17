@@ -629,6 +629,9 @@ class FormsService {
 			case Constants::ANSWER_TYPE_FILE:
 				$allowed = Constants::EXTRA_SETTINGS_FILE;
 				break;
+			case Constants::ANSWER_TYPE_DATE:
+				$allowed = Constants::EXTRA_SETTINGS_DATE;
+				break;
 			default:
 				$allowed = [];
 		}
@@ -646,7 +649,14 @@ class FormsService {
 			}
 		}
 
-		if ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {
+		// Validate extraSettings for specific question types
+		if ($questionType === Constants::ANSWER_TYPE_DATE) {
+			// Ensure dateMin and dateMax don't overlap
+			if (isset($extraSettings['dateMin']) && isset($extraSettings['dateMax'])
+				&& $extraSettings['dateMin'] > $extraSettings['dateMax']) {
+				return false;
+			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {
 			// Ensure limits are sane
 			if (isset($extraSettings['optionsLimitMax']) && isset($extraSettings['optionsLimitMin'])
 				&& $extraSettings['optionsLimitMax'] < $extraSettings['optionsLimitMin']) {

@@ -43,10 +43,10 @@
 			<!-- eslint-disable-next-line -->
 			<li v-for="answer in answers" :key="answer.id" dir="auto">
 				<template v-if="answer.url">
-					<a :href="answer.url" target="_blank"
-						><IconFile :size="20" class="question-summary__text-icon" />
-						{{ answer.text }}</a
-					>
+					<a :href="answer.url" target="_blank">
+						<IconFile :size="20" class="question-summary__text-icon" />
+						{{ answer.text }}
+					</a>
 				</template>
 				<template v-else>
 					{{ answer.text }}
@@ -179,22 +179,30 @@ export default {
 				}
 
 				// Add text answers
-				answers.forEach((answer) => {
-					if (answer.fileId) {
-						answersModels.push({
-							id: answer.id,
-							text: answer.text,
-							url: generateUrl('/f/{fileId}', {
-								fileId: answer.fileId,
-							}),
-						})
-					} else {
-						answersModels.push({
-							id: answer.id,
-							text: answer.text,
-						})
-					}
-				})
+				if (this.question.type === 'date' && answers.length === 2) {
+					// Combine the first two answers in order for date range questions
+					answersModels.push({
+						id: `${answers[0].id}-${answers[1].id}`,
+						text: `${answers[0].text} - ${answers[1].text}`,
+					})
+				} else {
+					answers.forEach((answer) => {
+						if (answer.fileId) {
+							answersModels.push({
+								id: answer.id,
+								text: answer.text,
+								url: generateUrl('/f/{fileId}', {
+									fileId: answer.fileId,
+								}),
+							})
+						} else {
+							answersModels.push({
+								id: answer.id,
+								text: answer.text,
+							})
+						}
+					})
+				}
 			})
 
 			// Calculate no response percentage
