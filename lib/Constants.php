@@ -147,6 +147,11 @@ class Constants {
 		'maxFileSize' => ['integer'],
 	];
 
+	public const EXTRA_SETTINGS_DATE = [
+		'dateMax' => ['integer'],
+		'dateMin' => ['integer'],
+	];
+
 	// should be in sync with FileTypes.js
 	public const EXTRA_SETTINGS_ALLOWED_FILE_TYPES = [
 		'image',
