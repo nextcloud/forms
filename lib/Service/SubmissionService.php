@@ -374,18 +374,21 @@ class SubmissionService {
 				} elseif ($maxOptions > 0 && $answersCount > $maxOptions) {
 					throw new \InvalidArgumentException(sprintf('Question "%s" requires at most %d answers.', $question['text'], $maxOptions));
 				}
-			} elseif ($answersCount > 1 && $question['type'] !== Constants::ANSWER_TYPE_FILE) {
+			} elseif ($answersCount != 2 && $question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])) {
+				// Check if date range questions have exactly two answers
+				throw new \InvalidArgumentException(sprintf('Question "%s" can only have two answers.', $question['text']));
+			} elseif ($answersCount > 1 && $question['type'] !== Constants::ANSWER_TYPE_FILE && !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange']))) {
 				// Check if non-multiple questions have not more than one answer
 				throw new \InvalidArgumentException(sprintf('Question "%s" can only have one answer.', $question['text']));
 			}
 
 			/*
-			 * Check if date questions have valid answers
-			 * $answers[$questionId][0] -> date/time questions can only have one answer
+			 * Validate answers for date/time questions
+			 * If a date range is specified, validate all answers in the range
+			 * Otherwise, validate the single answer for the date/time question
 			 */
-			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME) &&
-				!$this->validateDateTime($answers[$questionId][0], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']])) {
-				throw new \InvalidArgumentException(sprintf('Invalid date/time format for question "%s".', $question['text']));
+			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME)) {
+				$this->validateDateTime($answers[$questionId], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']], $question['text'] ?? null, $question['extraSettings'] ?? null);
 			}
 
 			// Check if all answers are within the possible options
@@ -434,13 +437,33 @@ class SubmissionService {
 
 	/**
 	 * Validate correct date/time formats
-	 * @param string $dateStr String with date from answer
+	 * @param array $answers Array with date from answer
 	 * @param string $format String with the format to validate
-	 * @return boolean If the submitted date/time is valid
+	 * @param string|null $text String with the title of the question
+	 * @param array|null $extraSettings Array with extra settings for validation
 	 */
-	private function validateDateTime(string $dateStr, string $format) {
-		$d = DateTime::createFromFormat($format, $dateStr);
-		return $d && $d->format($format) === $dateStr;
+	private function validateDateTime(array $answers, string $format, ?string $text = null, ?array $extraSettings = null): void {
+		$previousDate = null;
+
+		foreach ($answers as $dateStr) {
+			$d = DateTime::createFromFormat($format, $dateStr);
+			if (!$d || $d->format($format) !== $dateStr) {
+				throw new \InvalidArgumentException(sprintf('Invalid date/time format for question "%s".', $text));
+			}
+
+			if ($previousDate !== null && $d < $previousDate) {
+				throw new \InvalidArgumentException(sprintf('Dates for question "%s" must be in ascending order.', $text));
+			}
+			$previousDate = $d;
+
+			if ($extraSettings) {
+				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin'])) ||
+					(isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
+				) {
+					throw new \InvalidArgumentException(sprintf('Date is not in the allowed range for question "%s".', $text));
+				}
+			}
+		}
 	}
 
 	/**

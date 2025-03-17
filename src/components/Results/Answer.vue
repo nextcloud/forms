@@ -16,10 +16,10 @@
 				:key="answer.id"
 				class="answer__text"
 				dir="auto">
-				<a :href="answer.url" target="_blank"
-					><IconFile :size="20" class="answer__text-icon" />
-					{{ answer.text }}</a
-				>
+				<a :href="answer.url" target="_blank">
+					<IconFile :size="20" class="answer__text-icon" />
+					{{ answer.text }}
+				</a>
 			</p>
 		</template>
 		<p v-else class="answer__text" dir="auto">

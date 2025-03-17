@@ -803,6 +803,78 @@ file2.txt"
 				// Expected Result
 				'Invalid date/time format for question "q1".',
 			],
+			'date-out-of-range-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['dateMin' => 1742860800]]
+				],
+				// Answers
+				[
+					'1' => ['2025-03-24']
+				],
+				// Expected Result
+				'Date is not in the allowed range for question "q1".',
+			],
+			'valid-date-range' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['dateRange' => true]]
+				],
+				// Answers
+				[
+					'1' => ['2023-01-01', '2023-12-31']
+				],
+				// Expected Result
+				null,
+			],
+			'invalid-date-range-single-date' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['dateRange' => true]]
+				],
+				// Answers
+				[
+					'1' => ['2023-01-01']
+				],
+				// Expected Result
+				'Question "q1" can only have two answers.',
+			],
+			'invalid-date-range-wrong-order' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['dateRange' => true]]
+				],
+				// Answers
+				[
+					'1' => ['2023-12-31', '2023-01-01']
+				],
+				// Expected Result
+				'Dates for question "q1" must be in ascending order.',
+			],
+			'valid-single-date' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => true]
+				],
+				// Answers
+				[
+					'1' => ['2023-01-01']
+				],
+				// Expected Result
+				null,
+			],
+			'invalid-single-date-multiple-dates' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => true]
+				],
+				// Answers
+				[
+					'1' => ['2023-01-01', '2023-12-31']
+				],
+				// Expected Result
+				'Question "q1" can only have one answer.',
+			],
 			'full-good-submission' => [
 				// Questions
 				[
@@ -832,6 +904,10 @@ file2.txt"
 					['id' => 11, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']],
 					['id' => 12, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']],
 					['id' => 13, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{3}[0-9]{3}/']],
+					['id' => 16, 'type' => 'date', 'isRequired' => false, 'extraSettings' => [
+						'dateMin' => 1742860800,
+						'dateMax' => 1743033600]
+					],
 				],
 				// Answers
 				[
@@ -848,6 +924,7 @@ file2.txt"
 					'11' => ['100.45'],
 					'12' => ['+49 711 25 24 28 90'],
 					'13' => ['abc123'],
+					'16' => ['2025-03-26']
 				],
 				// Expected Result
 				null,
