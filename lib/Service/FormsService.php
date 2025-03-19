@@ -629,6 +629,9 @@ class FormsService {
 			case Constants::ANSWER_TYPE_FILE:
 				$allowed = Constants::EXTRA_SETTINGS_FILE;
 				break;
+			case Constants::ANSWER_TYPE_DATE:
+				$allowed = Constants::EXTRA_SETTINGS_DATE;
+				break;
 			default:
 				$allowed = [];
 		}

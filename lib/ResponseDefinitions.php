@@ -23,6 +23,8 @@ namespace OCA\Forms;
  *   allowOtherAnswer?: bool,
  *   allowedFileExtensions?: list<string>,
  *   allowedFileTypes?: list<string>,
+ *   dateMax?: int,
+ *   dateMin?: int,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
  *   optionsLimitMax?: int,
