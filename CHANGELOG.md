@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.0.4 - 2025-03-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.3...v5.0.4)
+
+### Fixed
+
+- Fix(migration): Rename primary key of uploaded_files table by @Chartman123 in [\#2649](https://github.com/nextcloud/forms/pull/2649)
+
 ## v5.0.3 - 2025-03-11
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.2...v5.0.3)
