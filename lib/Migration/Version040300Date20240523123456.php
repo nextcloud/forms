@@ -76,7 +76,7 @@ class Version040300Date20240523123456 extends SimpleMigrationStep {
 				'notnull' => false,
 				'comment' => 'unix-timestamp',
 			]);
-			$table->setPrimaryKey(['id'], 'id');
+			$table->setPrimaryKey(['id'], 'forms_upload_files_id');
 		}
 
 		return $schema;
