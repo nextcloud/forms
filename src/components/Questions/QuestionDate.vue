@@ -15,7 +15,8 @@
 				:aria-label="t('forms', 'Pick minimum date')"
 				:formatter="extraSettingsFormatter"
 				type="date"
-				clearable>
+				clearable
+				@clear="onClearMinDate">
 				{{ t('forms', 'Pick minimum date') }}
 			</NcActionInput>
 			<NcActionInput
@@ -97,12 +98,12 @@ export default {
 
 		dateMax: {
 			get() {
-				return moment(this.extraSettings?.dateMax, 'X').toDate() ?? null
+				return moment(this.extraSettings?.dateMax, 'X').toDate() ?? undefined
 			},
 			set(value) {
 				if (!value) {
 					this.onExtraSettingsChange({
-						dateMax: null,
+						dateMax: undefined,
 					})
 				} else {
 					this.onExtraSettingsChange({
@@ -114,12 +115,12 @@ export default {
 
 		dateMin: {
 			get() {
-				return moment(this.extraSettings?.dateMin, 'X').toDate() ?? null
+				return moment(this.extraSettings?.dateMin, 'X').toDate() ?? undefined
 			},
 			set(value) {
-				if (!value) {
+				if (value === 0) {
 					this.onExtraSettingsChange({
-						dateMax: null,
+						dateMin: undefined,
 					})
 				} else {
 					this.onExtraSettingsChange({
@@ -196,6 +197,13 @@ export default {
 		 */
 		parseTimestampToDate(value) {
 			return moment(value, 'X').toDate()
+		},
+
+		onClearMinDate() {
+			this.dateMin(undefined)
+			this.onExtraSettingsChange({
+				dateMin: undefined,
+			})
 		},
 	},
 }
