@@ -3,8 +3,10 @@ OC.L10N.register(
     {
     "Forms" : "Vormid",
     "Copy" : "Kopeeri",
+    "Shared by %s" : "Jagaja: %s",
     "Shared with you" : "Sinuga jagatud",
     "Select groups" : "Vali grupid",
+    "Expires {relativeDate}" : "Aegub {relativeDate}",
     "Cancel" : "Tühista",
     "Options" : "Sätted",
     "Required" : "Kohustuslik",
@@ -13,6 +15,7 @@ OC.L10N.register(
     "Other" : "Muu",
     "Set expiration date" : "Määra aegumise kuupäev",
     "Group" : "Grupp",
+    "Team" : "Tiim",
     "Share link" : "Jaga link",
     "Add link" : "Lisa link",
     "Copy to clipboard" : "Kopeeri lõikepuhvrisse",
