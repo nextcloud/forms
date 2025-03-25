@@ -2,6 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Vormid",
+    "No" : "Ei",
+    "Yes" : "Ja",
     "Copy" : "Kopeeri",
     "Shared by %s" : "Jagaja: %s",
     "Shared with you" : "Sinuga jagatud",
