@@ -70,9 +70,17 @@ class PageController extends Controller {
 		$this->insertHeaderOnIos();
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
+
 		if (isset($hash)) {
-			$this->initialState->provideInitialState('formId', $this->formMapper->findByHash($hash)->id);
+			try {
+				$form = $this->formMapper->findByHash($hash);
+				$this->initialState->provideInitialState('formId', $form->id);
+			} catch (DoesNotExistException $e) {
+				// Provide null to indicate no form was found
+				$this->initialState->provideInitialState('formId', 'invalid');
+			}
 		}
+
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
 			'id-app-content' => '#app-content-vue',
 			'id-app-navigation' => '#app-navigation-vue',
