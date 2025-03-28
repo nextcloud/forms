@@ -803,6 +803,18 @@ file2.txt"
 				// Expected Result
 				'Invalid date/time format for question "q1".',
 			],
+			'invalid-linearcale-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				// Answers
+				[
+					'1' => ['6']
+				],
+				// Expected Result
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
 			'full-good-submission' => [
 				// Questions
 				[
@@ -832,6 +844,7 @@ file2.txt"
 					['id' => 11, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number']],
 					['id' => 12, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'phone']],
 					['id' => 13, 'type' => 'short', 'isRequired' => false, 'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '/[a-z]{3}[0-9]{3}/']],
+					['id' => 14, 'type' => 'linearscale', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
 				],
 				// Answers
 				[
@@ -848,6 +861,7 @@ file2.txt"
 					'11' => ['100.45'],
 					'12' => ['+49 711 25 24 28 90'],
 					'13' => ['abc123'],
+					'14' => ['3'],
 				],
 				// Expected Result
 				null,

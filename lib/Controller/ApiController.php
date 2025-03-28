@@ -1538,7 +1538,7 @@ class ApiController extends OCSController {
 			$answerText = '';
 			$uploadedFile = null;
 			// Are we using answer ids as values
-			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
+			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && $question['type'] !== Constants::ANSWER_TYPE_LINEARSCALE) {
 				// Search corresponding option, skip processing if not found
 				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 				if ($optionIndex !== false) {
