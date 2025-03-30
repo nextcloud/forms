@@ -266,6 +266,11 @@ export default {
 
 		// If the user is allowed to access this route
 		routeAllowed() {
+			// Check formId from initial state on app initialization
+			if (this.loading && loadState(appName, 'formId') === 'invalid') {
+				return false
+			}
+
 			// Not allowed, if no hash
 			if (!this.routeHash) {
 				return false
@@ -433,7 +438,9 @@ export default {
 					showError(t('forms', 'Form not found'))
 
 					if ([403, 404].includes(error.response?.status)) {
-						this.$router.push({ name: 'root' })
+						if (this.$route.name !== 'root') {
+							this.$router.push({ name: 'root' })
+						}
 					}
 				}
 			}
@@ -441,9 +448,6 @@ export default {
 			this.loading = false
 		},
 
-		/**
-		 *
-		 */
 		async onNewForm() {
 			try {
 				// Request a new empty form
@@ -492,7 +496,7 @@ export default {
 			this.forms.splice(formIndex, 1)
 
 			// Redirect if current form has been deleted
-			if (deletedHash === this.routeHash) {
+			if (deletedHash === this.routeHash && this.$route.name !== 'root') {
 				this.$router.push({ name: 'root' })
 			}
 		},
