@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.11 - 2025-03-31
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.10...v4.3.11)
+
+### Fixed
+
+- [stable4] Fix(migration): Rename primary key of uploaded_files table by @backportbot[bot] in [\#2650](https://github.com/nextcloud/forms/pull/2650)
+- [stable4] Fix: Handle invalid form hashes correctly by @backportbot[bot] in [\#2666](https://github.com/nextcloud/forms/pull/2666)
+
 ## v4.3.10 - 2025-03-11
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.9...v4.3.10)
