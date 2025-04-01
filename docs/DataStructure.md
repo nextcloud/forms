@@ -226,3 +226,6 @@ Optional extra settings for some [Question Types](#question-types)
 | `allowedFileExtensions` | `file`                                | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
 | `maxAllowedFilesCount`  | `file`                                | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |
 | `maxFileSize`           | `file`                                | Integer          | -                                           | Maximum file size in bytes, 0 means no limit                                |
+| `dateMax`               | `date`                                | Integer          | -                                           | Maximum allowed date to be chosen (as Unix timestamp)                       |
+| `dateMin`               | `date`                                | Integer          | -                                           | Minimum allowed date to be chosen (as Unix timestamp)                       |
+| `dateRange`             | `date`                                | Boolean          | `true/false`                                | The date picker should query a date range                                   |

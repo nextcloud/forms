@@ -418,6 +418,17 @@
                             "type": "string"
                         }
                     },
+                    "dateMax": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "dateMin": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "dateRange": {
+                        "type": "boolean"
+                    },
                     "maxAllowedFilesCount": {
                         "type": "integer",
                         "format": "int64"

@@ -102,6 +102,16 @@ export default {
 							}
 						}),
 					})
+				} else if (question.type === 'date') {
+					const squashedAnswers = answers
+						.map((answer) => answer.text)
+						.join(' - ')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						squashedAnswers,
+					})
 				} else {
 					const squashedAnswers = answers
 						.map((answer) => answer.text)
