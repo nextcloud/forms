@@ -312,6 +312,11 @@ class SubmissionService {
 						->setWrapText(true);
 				} else {
 					$activeWorksheet->setCellValue([$column, $row], $value);
+
+					// Quote cell values that start with '=' to prevent evaluation of formulas
+					if (is_string($value) && str_starts_with($value, '=')) {
+						$activeWorksheet->getCell([$column, $row])->getStyle()->setQuotePrefix(true);
+					}
 				}
 			}
 		}
