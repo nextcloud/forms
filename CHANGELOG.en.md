@@ -5,7 +5,13 @@
 
 # Changelog
 
-## v5.0.0 - tbd
+## v5.1.0 - 2025-04-03
+
+- **Date: restrictions and ranges**
+
+    The date question type got three new settings: You can ask for a date range and set a minimum/maximum date that can be chosen.
+
+## v5.0.0 - 2025-02-25
 
 - **Re-order options**
 

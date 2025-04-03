@@ -5,6 +5,19 @@
 
 # Changelog
 
+## v5.1.0 - 2025-04-03
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.4...v5.1.0)
+
+### Enhancements
+
+- feat(date): allow restrictions for dates and query date ranges by @Chartman123 in [\#2646](https://github.com/nextcloud/forms/pull/2646)
+
+### Fixed
+
+- fix: quote cell values to prevent formula evaluation by @Chartman123 in [\#2674](https://github.com/nextcloud/forms/pull/2674)
+- Fix: Handle invalid form hashes correctly by @Chartman123 in [\#2655](https://github.com/nextcloud/forms/pull/2655)
+
 ## v5.0.4 - 2025-03-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.3...v5.0.4)
