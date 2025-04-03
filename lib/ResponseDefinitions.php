@@ -31,6 +31,9 @@ namespace OCA\Forms;
  *   optionsLimitMax?: int,
  *   optionsLimitMin?: int,
  *   shuffleOptions?: bool,
+ *   timeMax?: string,
+ *   timeMin?: string,
+ *   timeRange?: bool,
  *   validationRegex?: string,
  *   validationType?: string
  * }

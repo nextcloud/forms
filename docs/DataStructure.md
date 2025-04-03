@@ -229,3 +229,6 @@ Optional extra settings for some [Question Types](#question-types)
 | `dateMax`               | `date`                                | Integer          | -                                           | Maximum allowed date to be chosen (as Unix timestamp)                       |
 | `dateMin`               | `date`                                | Integer          | -                                           | Minimum allowed date to be chosen (as Unix timestamp)                       |
 | `dateRange`             | `date`                                | Boolean          | `true/false`                                | The date picker should query a date range                                   |
+| `timeMin`               | `time`                                | Integer          | -                                           | Maximum allowed time to be chosen (as `HH:mm` string)                       |
+| `timeMax`               | `time`                                | Integer          | -                                           | Minimum allowed time to be chosen (as `HH:mm` string)                       |
+| `timeRange`             | `time`                                | Boolean          | `true/false`                                | The time picker should query a time range                                   |

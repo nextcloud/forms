@@ -179,7 +179,11 @@ export default {
 				}
 
 				// Add text answers
-				if (this.question.type === 'date' && answers.length === 2) {
+				if (
+					(this.question.type === 'date' ||
+						this.question.type === 'time') &&
+					answers.length === 2
+				) {
 					// Combine the first two answers in order for date range questions
 					answersModels.push({
 						id: `${answers[0].id}-${answers[1].id}`,

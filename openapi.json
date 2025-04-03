@@ -448,6 +448,15 @@
                     "shuffleOptions": {
                         "type": "boolean"
                     },
+                    "timeMax": {
+                        "type": "string"
+                    },
+                    "timeMin": {
+                        "type": "string"
+                    },
+                    "timeRange": {
+                        "type": "boolean"
+                    },
                     "validationRegex": {
                         "type": "string"
                     },

@@ -42,6 +42,39 @@
 				</template>
 			</NcActionInput>
 		</template>
+		<template v-else-if="answerType.pickerType === 'time'" #actions>
+			<NcActionCheckbox v-model="timeRange">
+				{{ t('forms', 'Use time range') }}
+			</NcActionCheckbox>
+			<NcActionInput
+				v-model="timeMin"
+				type="time"
+				:label="t('forms', 'Earliest time')"
+				hide-label
+				:formatter="formatter"
+				is-native-picker
+				:max="timeMax">
+				<template #icon>
+					<NcIconSvgWrapper
+						:svg="svgClockArrowUpIcon"
+						:name="t('forms', 'Earliest time')" />
+				</template>
+			</NcActionInput>
+			<NcActionInput
+				v-model="timeMax"
+				type="time"
+				:label="t('forms', 'Latest time')"
+				hide-label
+				:formatter="formatter"
+				is-native-picker
+				:min="timeMin">
+				<template #icon>
+					<NcIconSvgWrapper
+						:svg="svgClockArrowDownIcon"
+						:name="t('forms', 'Latest time')" />
+				</template>
+			</NcActionInput>
+		</template>
 		<div class="question__content">
 			<NcDateTimePicker
 				:value="time"
@@ -60,6 +93,8 @@
 </template>
 
 <script>
+import svgClockArrowDownIcon from '../../../img/clock_arrow_down.svg?raw'
+import svgClockArrowUpIcon from '../../../img/clock_arrow_up.svg?raw'
 import svgEventIcon from '../../../img/event.svg?raw'
 import svgTodayIcon from '../../../img/today.svg?raw'
 
@@ -92,6 +127,8 @@ export default {
 				stringify: this.stringifyDate,
 				parse: this.parseTimestampToDate,
 			},
+			svgClockArrowDownIcon,
+			svgClockArrowUpIcon,
 			svgEventIcon,
 			svgTodayIcon,
 		}
@@ -100,11 +137,11 @@ export default {
 	computed: {
 		datetimePickerPlaceholder() {
 			if (this.readOnly) {
-				return this.extraSettings?.dateRange
+				return this.extraSettings?.dateRange || this.extraSettings?.timeRange
 					? this.answerType.submitPlaceholderRange
 					: this.answerType.submitPlaceholder
 			}
-			return this.extraSettings?.dateRange
+			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
 				? this.answerType.createPlaceholderRange
 				: this.answerType.createPlaceholder
 		},
@@ -122,7 +159,7 @@ export default {
 		},
 
 		time() {
-			if (this.extraSettings?.dateRange) {
+			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
 				return this.values
 					? [this.parse(this.values[0]), this.parse(this.values[1])]
 					: null
@@ -168,6 +205,47 @@ export default {
 			},
 			set(value) {
 				this.onExtraSettingsChange({ dateRange: value === true ?? null })
+			},
+		},
+
+		/**
+		 * The maximum allowable time for the time input field
+		 */
+		timeMax: {
+			get() {
+				return this.extraSettings?.timeMax
+					? this.parse(this.extraSettings.timeMax)
+					: null
+			},
+			set(value) {
+				this.onExtraSettingsChange({
+					timeMax: this.stringify(value),
+				})
+			},
+		},
+
+		/**
+		 * The minimum allowable time for the time input field
+		 */
+		timeMin: {
+			get() {
+				return this.extraSettings?.timeMin
+					? this.parse(this.extraSettings.timeMax)
+					: null
+			},
+			set(value) {
+				this.onExtraSettingsChange({
+					timeMin: this.stringify(value),
+				})
+			},
+		},
+
+		timeRange: {
+			get() {
+				return this.extraSettings?.timeRange ?? false
+			},
+			set(value) {
+				this.onExtraSettingsChange({ timeRange: value === true ?? null })
 			},
 		},
 	},

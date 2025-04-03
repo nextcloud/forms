@@ -632,6 +632,9 @@ class FormsService {
 			case Constants::ANSWER_TYPE_DATE:
 				$allowed = Constants::EXTRA_SETTINGS_DATE;
 				break;
+			case Constants::ANSWER_TYPE_TIME:
+				$allowed = Constants::EXTRA_SETTINGS_TIME;
+				break;
 			default:
 				$allowed = [];
 		}
@@ -654,6 +657,12 @@ class FormsService {
 			// Ensure dateMin and dateMax don't overlap
 			if (isset($extraSettings['dateMin']) && isset($extraSettings['dateMax'])
 				&& $extraSettings['dateMin'] > $extraSettings['dateMax']) {
+				return false;
+			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_TIME) {
+			// Ensure timeMin and timeMax don't overlap
+			if (isset($extraSettings['timeMin']) && isset($extraSettings['timeMax'])
+				&& $extraSettings['timeMin'] > $extraSettings['timeMax']) {
 				return false;
 			}
 		} elseif ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {

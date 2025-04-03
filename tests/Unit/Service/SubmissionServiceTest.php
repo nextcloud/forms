@@ -813,7 +813,7 @@ file2.txt"
 					'1' => ['2025-03-24']
 				],
 				// Expected Result
-				'Date is not in the allowed range for question "q1".',
+				'Date/time is not in the allowed range for question "q1".',
 			],
 			'valid-date-range' => [
 				// Questions
@@ -849,7 +849,7 @@ file2.txt"
 					'1' => ['2023-12-31', '2023-01-01']
 				],
 				// Expected Result
-				'Dates for question "q1" must be in ascending order.',
+				'Dates/times for question "q1" must be in ascending order.',
 			],
 			'valid-single-date' => [
 				// Questions

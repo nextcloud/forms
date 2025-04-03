@@ -457,15 +457,17 @@ class SubmissionService {
 			}
 
 			if ($previousDate !== null && $d < $previousDate) {
-				throw new \InvalidArgumentException(sprintf('Dates for question "%s" must be in ascending order.', $text));
+				throw new \InvalidArgumentException(sprintf('Dates/times for question "%s" must be in ascending order.', $text));
 			}
 			$previousDate = $d;
 
 			if ($extraSettings) {
 				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin'])) ||
-					(isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
+					(isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax'])) ||
+					(isset($extraSettings['timeMin']) && $d > (new DateTime())->setTimestamp($extraSettings['timeMin'])) ||
+					(isset($extraSettings['timeMax']) && $d > (new DateTime())->setTimestamp($extraSettings['timeMax']))
 				) {
-					throw new \InvalidArgumentException(sprintf('Date is not in the allowed range for question "%s".', $text));
+					throw new \InvalidArgumentException(sprintf('Date/time is not in the allowed range for question "%s".', $text));
 				}
 			}
 		}

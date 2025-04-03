@@ -153,6 +153,12 @@ class Constants {
 		'dateRange' => ['boolean', 'NULL'],
 	];
 
+	public const EXTRA_SETTINGS_TIME = [
+		'timeMax' => ['string', 'NULL'],
+		'timeMin' => ['string', 'NULL'],
+		'timeRange' => ['boolean', 'NULL'],
+	];
+
 	// should be in sync with FileTypes.js
 	public const EXTRA_SETTINGS_ALLOWED_FILE_TYPES = [
 		'image',
