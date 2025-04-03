@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.12 - 2025-04-03
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.11...v4.3.12)
+
+### Fixed
+
+- [stable4] fix: quote cell values to prevent formula evaluation by @backportbot[bot] in [\#2675](https://github.com/nextcloud/forms/pull/2675)
+
 ## v4.3.11 - 2025-03-31
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.10...v4.3.11)
