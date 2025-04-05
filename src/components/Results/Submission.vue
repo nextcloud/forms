@@ -9,7 +9,7 @@
 			<h3 dir="auto">
 				{{ submission.userDisplayName }}
 			</h3>
-			<NcActions class="submission-menu" :force-menu="true">
+			<NcActions class="submission-menu" force-menu>
 				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>
 						<IconDelete :size="20" />

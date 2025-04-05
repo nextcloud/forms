@@ -18,7 +18,7 @@
 		<NcButton
 			v-if="canShare && !sidebarOpened"
 			:aria-label="isMobile ? t('forms', 'Share form') : null"
-			type="tertiary"
+			variant="tertiary"
 			@click="onShareForm">
 			<template #icon>
 				<IconShareVariant :size="20" />
