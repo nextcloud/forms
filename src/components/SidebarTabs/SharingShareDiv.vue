@@ -7,7 +7,7 @@
 	<li class="share-div">
 		<NcAvatar
 			:user="share.shareWith"
-			:disable-menu="true"
+			disable-menu
 			:display-name="displayName"
 			:is-no-user="isNoUser" />
 		<div class="share-div__desc">

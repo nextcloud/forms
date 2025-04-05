@@ -7,7 +7,7 @@
 	<NcContent app-name="forms" :class="{ 'app-forms-embedded': isEmbedded }">
 		<Submit
 			:form="form"
-			:public-view="true"
+			public-view
 			:share-hash="shareHash"
 			:is-logged-in="isLoggedIn" />
 	</NcContent>

@@ -81,7 +81,7 @@
 					</NcActionButton>
 					<NcActionButton
 						v-if="appConfig.allowPublicLink"
-						:close-after-click="true"
+						close-after-click
 						@click="addPublicLink">
 						<template #icon>
 							<IconPlus :size="20" />

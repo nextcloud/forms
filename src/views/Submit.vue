@@ -104,7 +104,7 @@
 						v-for="(question, index) in validQuestions"
 						ref="questions"
 						:key="question.id"
-						:read-only="true"
+						read-only
 						:answer-type="answerTypes[question.type]"
 						:index="index + 1"
 						:max-string-lengths="maxStringLengths"
@@ -119,8 +119,8 @@
 						alignment="center-reverse"
 						class="submit-button"
 						:disabled="!hasAnswers"
-						native-type="reset"
-						type="tertiary-no-background"
+						type="reset"
+						variant="tertiary-no-background"
 						@click.prevent="showClearFormDialog = true">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconRefreshSvg" />
@@ -131,8 +131,8 @@
 						alignment="center-reverse"
 						class="submit-button"
 						:disabled="loading"
-						native-type="submit"
-						type="primary">
+						type="submit"
+						variant="primary">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconSendSvg" />
 						</template>
@@ -160,7 +160,7 @@
 					)
 				"
 				:buttons="confirmLeaveFormButtons"
-				:can-close="false"
+				no-close
 				:close-on-click-outside="false" />
 			<!-- Confirmation dialog for clear form -->
 			<NcDialog
@@ -168,7 +168,7 @@
 				:name="t('forms', 'Clear form')"
 				:message="t('forms', 'Do you want to clear all answers?')"
 				:buttons="confirmClearFormButtons"
-				:can-close="false"
+				no-close
 				:close-on-click-outside="false" />
 			<!-- Confirmation dialog if form was changed -->
 			<NcDialog
@@ -181,7 +181,7 @@
 					)
 				"
 				:buttons="confirmClearFormButtons"
-				:can-close="false"
+				no-close
 				:close-on-click-outside="false" />
 		</template>
 	</NcAppContent>

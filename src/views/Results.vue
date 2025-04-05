@@ -16,7 +16,7 @@
 			"
 			:buttons="linkedFileNotAvailableButtons"
 			size="normal"
-			:can-close="false" />
+			no-close />
 
 		<TopBar
 			:archived="isFormArchived"
@@ -111,7 +111,7 @@
 							<NcActionButton
 								v-if="!noSubmissions"
 								:close-after-click="false"
-								:is-menu="true"
+								is-menu
 								@click="isDownloadActionOpened = true">
 								<template #icon>
 									<IconDownload :size="20" />
@@ -180,7 +180,7 @@
 				</template>
 				<template #action>
 					<div class="response-actions">
-						<NcButton type="primary" @click="onShareForm">
+						<NcButton variant="primary" @click="onShareForm">
 							<template #icon>
 								<IconShareVariant :size="20" decorative />
 							</template>

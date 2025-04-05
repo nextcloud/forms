@@ -123,7 +123,7 @@
 							:disabled="
 								!readOnly || values.length >= maxAllowedFilesCount
 							"
-							type="tertiary-no-background"
+							variant="tertiary-no-background"
 							@click="toggleFileInput">
 							<template #icon>
 								<IconUploadMultiple
