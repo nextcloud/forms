@@ -12,7 +12,7 @@
 			:get-option-key="(option) => option.key"
 			:options="options"
 			:placeholder="t('forms', 'Search for user, group or team …')"
-			:user-select="true"
+			user-select
 			:filter-by="() => true"
 			label="displayName"
 			@search="asyncSearch"

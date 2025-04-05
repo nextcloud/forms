@@ -8,8 +8,8 @@
 		<NcButton
 			class="transfer-button"
 			alignment="start"
-			type="tertiary"
-			:wide="true"
+			variant="tertiary"
+			wide
 			@click="openModal">
 			<span class="transfer-button__text">{{
 				t('forms', 'Transfer ownership')
@@ -20,7 +20,7 @@
 			:open.sync="showModal"
 			content-classes="modal-content"
 			:name="t('forms', 'Transfer ownership')"
-			:out-transition="true"
+			out-transition
 			@close="closeModal">
 			<template #default>
 				<!-- eslint-disable vue/no-v-html -->
@@ -41,13 +41,13 @@
 					v-model="selected"
 					class="modal-content__select"
 					:reset-focus-on-options-change="false"
-					:clear-search-on-select="true"
-					:close-on-select="true"
+					clear-search-on-select
+					close-on-select
 					:loading="loading"
 					:get-option-key="(option) => option.key"
 					:options="options"
 					:placeholder="t('forms', 'Search for a user')"
-					:user-select="true"
+					user-select
 					label="displayName"
 					@search="(query) => asyncSearch(query, true)">
 					<template #no-options>
@@ -85,7 +85,7 @@
 			<template #actions>
 				<NcButton
 					:disabled="!canTransfer"
-					type="error"
+					variant="error"
 					@click="onOwnershipTransfer">
 					{{ t('forms', 'I understand, transfer this form') }}
 				</NcButton>

@@ -23,7 +23,7 @@
 				:aria-label="t('forms', 'Move question up')"
 				:disabled="!canMoveUp"
 				class="question__drag-handle-button"
-				type="tertiary-no-background"
+				variant="tertiary-no-background"
 				@click.stop="onMoveUp">
 				<template #icon>
 					<IconArrowUp :size="20" />
@@ -35,7 +35,7 @@
 				:aria-label="t('forms', 'Move question down')"
 				:disabled="!canMoveDown"
 				class="question__drag-handle-button"
-				type="tertiary-no-background"
+				variant="tertiary-no-background"
 				@click.stop="onMoveDown">
 				<template #icon>
 					<IconArrowDown :size="20" />
@@ -79,7 +79,7 @@
 				<NcActions
 					v-if="!readOnly"
 					:id="actionsId"
-					:force-menu="true"
+					force-menu
 					placement="bottom-end"
 					class="question__header__title__menu">
 					<template v-if="isRequired" #icon>
@@ -108,7 +108,7 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton :close-after-click="true" @click="onClone">
+					<NcActionButton close-after-click @click="onClone">
 						<template #icon>
 							<IconContentCopy :size="20" />
 						</template>
