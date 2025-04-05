@@ -54,7 +54,7 @@
 						dir="auto"
 						:maxlength="maxStringLengths.formTitle"
 						:placeholder="t('forms', 'Form title')"
-						:required="true"
+						required
 						autofocus
 						@input="onTitleChange" />
 				</h2>
@@ -127,7 +127,7 @@
 						:open.sync="questionMenuOpened"
 						:menu-name="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
-						:primary="true">
+						primary>
 						<template #icon>
 							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
 							<IconPlus v-else :size="20" />
@@ -135,7 +135,7 @@
 						<NcActionButton
 							v-for="(answer, type) in answerTypesFilter"
 							:key="answer.label"
-							:close-after-click="true"
+							close-after-click
 							:disabled="isLoadingQuestions"
 							class="question-menu__question"
 							@click="addQuestion(type)">

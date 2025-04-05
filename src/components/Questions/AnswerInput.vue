@@ -57,7 +57,7 @@
 			</NcActions>
 			<NcButton
 				:aria-label="t('forms', 'Delete answer')"
-				type="tertiary"
+				variant="tertiary"
 				@click="deleteEntry">
 				<template #icon>
 					<IconDelete :size="20" />
