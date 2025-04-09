@@ -209,6 +209,7 @@ Currently supported Question-Types are:
 | `date`            | Showing a dropdown calendar to select a date.                                                                                              |
 | _`datetime`_      | _deprecated: No longer available for new questions. Showing a dropdown calendar to select a date **and** a time._                          |
 | `time`            | Showing a dropdown menu to select a time.                                                                                                  |
+| `file`            | One or multiple files. It is possible to specify which mime types are allowed                                                              |
 
 ## Extra Settings
 
