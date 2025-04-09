@@ -10,17 +10,20 @@
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<template v-if="answerType.pickerType === 'date'" #actions>
-			<NcActionCheckbox v-model="dateRange">
+			<NcActionCheckbox
+				:model-value="dateRange"
+				@update:model-value="onDateRangeChange">
 				{{ t('forms', 'Use date range') }}
 			</NcActionCheckbox>
 			<NcActionInput
-				v-model="dateMin"
 				type="date"
+				is-native-picker
+				:model-value="dateMin"
 				:label="t('forms', 'Earliest date')"
 				hide-label
 				:formatter="extraSettingsFormatter"
-				is-native-picker
-				:max="dateMax">
+				:max="dateMax"
+				@update:model-value="onDateMinChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgTodayIcon"
@@ -28,13 +31,14 @@
 				</template>
 			</NcActionInput>
 			<NcActionInput
-				v-model="dateMax"
 				type="date"
+				is-native-picker
+				:model-value="dateMax"
 				:label="t('forms', 'Latest date')"
 				hide-label
 				:formatter="extraSettingsFormatter"
-				is-native-picker
-				:min="dateMin">
+				:min="dateMin"
+				@update:model-value="onDateMaxChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgEventIcon"
@@ -133,42 +137,23 @@ export default {
 		/**
 		 * The maximum allowable date for the date input field
 		 */
-		dateMax: {
-			get() {
-				return this.extraSettings?.dateMax
-					? moment(this.extraSettings.dateMax, 'X').toDate()
-					: null
-			},
-			set(value) {
-				this.onExtraSettingsChange({
-					dateMax: parseInt(moment(value).format('X')),
-				})
-			},
+		dateMax() {
+			return this.extraSettings?.dateMax
+				? moment(this.extraSettings.dateMax, 'X').toDate()
+				: null
 		},
 
 		/**
 		 * The minimum allowable date for the date input field
 		 */
-		dateMin: {
-			get() {
-				return this.extraSettings?.dateMin
-					? moment(this.extraSettings.dateMin, 'X').toDate()
-					: null
-			},
-			set(value) {
-				this.onExtraSettingsChange({
-					dateMin: parseInt(moment(value).format('X')),
-				})
-			},
+		dateMin() {
+			return this.extraSettings?.dateMin
+				? moment(this.extraSettings.dateMin, 'X').toDate()
+				: null
 		},
 
-		dateRange: {
-			get() {
-				return this.extraSettings?.dateRange ?? false
-			},
-			set(value) {
-				this.onExtraSettingsChange({ dateRange: value === true ?? null })
-			},
+		dateRange() {
+			return this.extraSettings?.dateRange ?? false
 		},
 	},
 
@@ -194,6 +179,41 @@ export default {
 				this.answerType.momentFormat,
 				this.answerType.storageFormat,
 			]).toDate()
+		},
+
+		/**
+		 * Handles the change event for the maximum date input.
+		 * Updates the maximum allowable date based on the provided value.
+		 *
+		 * @param {string | Date} value - The new maximum date value. Can be a string or a Date object.
+		 */
+		onDateMaxChange(value) {
+			this.onExtraSettingsChange({
+				dateMax: parseInt(moment(value).format('X')),
+			})
+		},
+
+		/**
+		 * Handles the change event for the minimum date input.
+		 * Updates the minimum allowable date based on the provided value.
+		 *
+		 * @param {string | Date} value - The new minimum date value. Can be a string or a Date object.
+		 */
+		onDateMinChange(value) {
+			this.onExtraSettingsChange({
+				dateMin: parseInt(moment(value).format('X')),
+			})
+		},
+
+		/**
+		 * Handles the change event for the date range selection.
+		 * Updates the extra settings with the new date range value.
+		 *
+		 * @param {boolean} value - The new value of the date range selection.
+		 *                          If true, the date range is enabled; otherwise, null.
+		 */
+		onDateRangeChange(value) {
+			this.onExtraSettingsChange({ dateRange: value === true ?? null })
 		},
 
 		/**
