@@ -64,6 +64,7 @@ OC.L10N.register(
     "Archive form" : "Archivar formulario",
     "Are you sure you want to delete {title}?" : "¿Seguro que quieres borrar {title}?",
     "Cancel" : "Cancelar",
+    "Add options" : "Añadir opciones",
     "Options" : "Opciones",
     "Answer number {index}" : "Respuesta número {index}",
     "Error while saving the answer" : "Error al guardar la respuesta",
