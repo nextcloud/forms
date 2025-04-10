@@ -15,6 +15,7 @@
 			user-select
 			:filter-by="() => true"
 			label="displayName"
+			:aria-label-combobox="t('forms', 'Search for user, group or team …')"
 			@search="asyncSearch"
 			@input="addShare">
 			<template #no-options>

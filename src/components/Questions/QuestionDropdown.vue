@@ -34,8 +34,8 @@
 			:options="sortedOptions"
 			:searchable="false"
 			label="text"
+			:aria-label-combobox="selectOptionPlaceholder"
 			@input="onInput" />
-
 		<template v-else>
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />
