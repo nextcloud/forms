@@ -49,7 +49,7 @@
 						v-for="form in sharedForms"
 						:key="form.id"
 						:form="form"
-						:read-only="true"
+						read-only
 						@open-sharing="openSharing"
 						@mobile-close-navigation="mobileCloseNavigation" />
 				</ul>
@@ -60,7 +60,7 @@
 					<NcButton
 						alignment="start"
 						class="forms__archived-forms-toggle"
-						type="tertiary"
+						variant="tertiary"
 						wide
 						@click="showArchivedForms = true">
 						<template #icon>
@@ -91,7 +91,7 @@
 					<FormsIcon :size="64" />
 				</template>
 				<template v-if="canCreateForms" #action>
-					<NcButton type="primary" @click="onNewForm">
+					<NcButton variant="primary" @click="onNewForm">
 						{{ t('forms', 'Create a form') }}
 					</NcButton>
 				</template>
@@ -109,7 +109,7 @@
 					<FormsIcon :size="64" />
 				</template>
 				<template v-if="canCreateForms" #action>
-					<NcButton type="primary" @click="onNewForm">
+					<NcButton variant="primary" @click="onNewForm">
 						{{ t('forms', 'Create new form') }}
 					</NcButton>
 				</template>

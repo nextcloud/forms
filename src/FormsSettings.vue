@@ -17,7 +17,7 @@
 			<NcSelect
 				v-model="appConfig.creationAllowedGroups"
 				:disabled="!appConfig.restrictCreation"
-				:multiple="true"
+				multiple
 				:options="availableGroups"
 				:placeholder="t('forms', 'Select groups')"
 				class="forms-settings__creation__multiselect"
