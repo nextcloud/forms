@@ -107,13 +107,13 @@ export default {
 		submissionInputPlaceholder() {
 			if (!this.readOnly) {
 				return (
-					this.validationObject.createPlaceholder ||
-					this.answerType.createPlaceholder
+					this.validationObject.createPlaceholder
+					|| this.answerType.createPlaceholder
 				)
 			}
 			return (
-				this.validationObject.submitPlaceholder ||
-				this.answerType.submitPlaceholder
+				this.validationObject.submitPlaceholder
+				|| this.answerType.submitPlaceholder
 			)
 		},
 		/**
@@ -157,8 +157,8 @@ export default {
 				// If the browsers validation succeeds either the browser does not implement a validation
 				// or it is valid, so we double check by running our custom validation.
 				if (
-					!input.checkValidity() ||
-					!this.validationObject.validate(
+					!input.checkValidity()
+					|| !this.validationObject.validate(
 						value,
 						splitRegex(this.validationRegex),
 					)
