@@ -465,8 +465,8 @@ export default {
 				this.onExtraSettingsChange({ optionsLimitMin: undefined })
 			} else if (min) {
 				if (
-					this.extraSettings.optionsLimitMax &&
-					min > this.extraSettings.optionsLimitMax
+					this.extraSettings.optionsLimitMax
+					&& min > this.extraSettings.optionsLimitMax
 				) {
 					showError(
 						t(

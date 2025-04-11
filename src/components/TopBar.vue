@@ -136,8 +136,8 @@ export default {
 		},
 		canEdit() {
 			return (
-				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT) &&
-				!this.archived
+				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+				&& !this.archived
 			)
 		},
 		canSeeResults() {
@@ -151,8 +151,8 @@ export default {
 		},
 		canOnlySubmit() {
 			return (
-				this.permissions.length === 1 &&
-				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+				this.permissions.length === 1
+				&& this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
 			)
 		},
 	},
