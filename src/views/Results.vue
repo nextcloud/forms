@@ -503,11 +503,11 @@ export default {
 			const exportUrl =
 				generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
 					id: this.form.id,
-				}) +
-				'?requesttoken=' +
-				encodeURIComponent(getRequestToken()) +
-				'&fileFormat=' +
-				fileFormat
+				})
+				+ '?requesttoken='
+				+ encodeURIComponent(getRequestToken())
+				+ '&fileFormat='
+				+ fileFormat
 			window.open(exportUrl, '_self')
 		},
 
@@ -686,9 +686,9 @@ export default {
 				questions
 					.filter(
 						(question) =>
-							(question.type === 'date') |
-							(question.type === 'datetime') |
-							(question.type === 'time'),
+							(question.type === 'date')
+							| (question.type === 'datetime')
+							| (question.type === 'time'),
 					)
 					.map((question) => [question.id, question.type]),
 			)

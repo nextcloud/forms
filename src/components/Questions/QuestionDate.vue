@@ -242,8 +242,8 @@ export default {
 		 */
 		disabledDates(date) {
 			return (
-				(this.dateMin && date < this.dateMin) ||
-				(this.dateMax && date > this.dateMax)
+				(this.dateMin && date < this.dateMin)
+				|| (this.dateMax && date > this.dateMax)
 			)
 		},
 

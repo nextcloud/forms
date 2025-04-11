@@ -240,8 +240,8 @@ export default {
 			})
 
 			this.maxFileSizeValue =
-				this.extraSettings.maxFileSize /
-				FILE_SIZE_UNITS[this.maxFileSizeUnit]
+				this.extraSettings.maxFileSize
+				/ FILE_SIZE_UNITS[this.maxFileSizeUnit]
 		}
 	},
 
@@ -259,8 +259,8 @@ export default {
 				formData.append('files[]', file)
 
 				if (
-					this.extraSettings.maxFileSize > 0 &&
-					file.size > this.extraSettings.maxFileSize
+					this.extraSettings.maxFileSize > 0
+					&& file.size > this.extraSettings.maxFileSize
 				) {
 					showError(
 						t(
