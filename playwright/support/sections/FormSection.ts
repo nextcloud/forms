@@ -56,8 +56,8 @@ export class FormSection {
 	private getFormUpdatedPromise(): Promise<Response> {
 		return this.page.waitForResponse(
 			(response) =>
-				response.request().method() === 'PATCH' &&
-				response
+				response.request().method() === 'PATCH'
+				&& response
 					.request()
 					.url()
 					.includes('/ocs/v2.php/apps/forms/api/v3/forms/'),

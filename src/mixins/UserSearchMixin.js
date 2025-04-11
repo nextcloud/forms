@@ -54,9 +54,9 @@ export default {
 		 */
 		isValidQuery() {
 			return (
-				this.query &&
-				this.query.trim() !== '' &&
-				this.query.length > this.minSearchStringLength
+				this.query
+				&& this.query.trim() !== ''
+				&& this.query.length > this.minSearchStringLength
 			)
 		},
 		/**
@@ -204,8 +204,8 @@ export default {
 				try {
 					// filter out current user
 					if (
-						share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER &&
-						share.value.shareWith === getCurrentUser().uid
+						share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
+						&& share.value.shareWith === getCurrentUser().uid
 					) {
 						return false
 					}

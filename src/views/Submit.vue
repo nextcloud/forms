@@ -349,8 +349,8 @@ export default {
 			}
 			if (this.isRequiredUsed) {
 				message +=
-					' ' +
-					t('forms', 'An asterisk (*) indicates mandatory questions.')
+					' '
+					+ t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
 			return message
@@ -361,8 +361,8 @@ export default {
 		 */
 		submissionMessageHTML() {
 			if (
-				this.form.submissionMessage &&
-				(this.success || !this.form.canSubmit)
+				this.form.submissionMessage
+				&& (this.success || !this.form.canSubmit)
 			) {
 				return this.markdownit.render(this.form.submissionMessage)
 			}
@@ -606,8 +606,8 @@ export default {
 
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
-					Object.keys(this.answers).length === 0 ||
-					Object.values(this.answers).every(
+					Object.keys(this.answers).length === 0
+					|| Object.values(this.answers).every(
 						(answers) => answers.length === 0,
 					)
 				) {

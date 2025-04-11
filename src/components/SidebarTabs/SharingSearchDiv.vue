@@ -79,8 +79,8 @@ export default {
 					(item) =>
 						!this.currentShares.find(
 							(share) =>
-								share.shareWith === item.shareWith &&
-								share.shareType === item.shareType,
+								share.shareWith === item.shareWith
+								&& share.shareType === item.shareType,
 						),
 				)
 			}
@@ -89,8 +89,8 @@ export default {
 				(item) =>
 					!this.currentShares.find(
 						(share) =>
-							share.shareWith === item.shareWith &&
-							share.shareType === item.shareType,
+							share.shareWith === item.shareWith
+							&& share.shareType === item.shareType,
 					),
 			)
 		},

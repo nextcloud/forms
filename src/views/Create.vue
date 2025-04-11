@@ -290,8 +290,8 @@ export default {
 
 			if (this.isRequiredUsed) {
 				message +=
-					' ' +
-					t('forms', 'An asterisk (*) indicates mandatory questions.')
+					' '
+					+ t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
 			return message
