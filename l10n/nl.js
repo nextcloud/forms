@@ -11,6 +11,7 @@ OC.L10N.register(
     "No" : "Nee",
     "Yes" : "Ja",
     "Question" : "Vraag",
+    "Count" : "Aantal",
     "Copy" : "Kopiëren",
     "Anonymous response" : "Anoniem antwoord",
     "Shared by %s" : "Gedeeld door %s",
