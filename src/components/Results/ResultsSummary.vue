@@ -212,11 +212,11 @@ export default {
 			answersModels.unshift({
 				id: 0,
 				text:
-					noResponseCount +
-					' (' +
-					noResponsePercentage +
-					'%): ' +
-					t('forms', 'No response'),
+					noResponseCount
+					+ ' ('
+					+ noResponsePercentage
+					+ '%): '
+					+ t('forms', 'No response'),
 			})
 
 			return answersModels

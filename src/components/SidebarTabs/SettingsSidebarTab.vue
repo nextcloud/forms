@@ -180,8 +180,8 @@ export default {
 		 */
 		hasCustomSubmissionMessage() {
 			return (
-				this.form?.submissionMessage !== undefined &&
-				this.form?.submissionMessage !== null
+				this.form?.submissionMessage !== undefined
+				&& this.form?.submissionMessage !== null
 			)
 		},
 
