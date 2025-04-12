@@ -7,6 +7,7 @@ OC.L10N.register(
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
     "Select groups" : "Select groups",
+    "Results" : "შედეგი",
     "Cancel" : "Cancel",
     "Delete" : "Delete",
     "Uploading …" : "Uploading …",
