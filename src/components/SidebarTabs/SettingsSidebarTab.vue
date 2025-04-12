@@ -199,8 +199,8 @@ export default {
 		 */
 		hasCustomSubmissionMessage() {
 			return (
-				this.form?.submissionMessage !== undefined &&
-				this.form?.submissionMessage !== null
+				this.form?.submissionMessage !== undefined
+				&& this.form?.submissionMessage !== null
 			)
 		},
 
@@ -209,9 +209,9 @@ export default {
 		 */
 		disableSubmitMultiple() {
 			return (
-				this.hasPublicLink ||
-				this.form.access.legacyLink ||
-				this.form.isAnonymous
+				this.hasPublicLink
+				|| this.form.access.legacyLink
+				|| this.form.isAnonymous
 			)
 		},
 		disableSubmitMultipleExplanation() {

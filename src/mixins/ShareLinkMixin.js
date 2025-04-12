@@ -33,10 +33,10 @@ export default {
 		 */
 		getInternalShareLink(formHash) {
 			return (
-				window.location.protocol +
-				'//' +
-				window.location.host +
-				generateUrl(`/apps/forms/${this.form.hash}`)
+				window.location.protocol
+				+ '//'
+				+ window.location.host
+				+ generateUrl(`/apps/forms/${this.form.hash}`)
 			)
 		},
 
@@ -62,8 +62,10 @@ export default {
 		 */
 		isEmbeddingAllowed(share) {
 			return (
-				share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK &&
-				share.permissions?.includes(this.PERMISSION_TYPES.PERMISSION_EMBED)
+				share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK
+				&& share.permissions?.includes(
+					this.PERMISSION_TYPES.PERMISSION_EMBED,
+				)
 			)
 		},
 
