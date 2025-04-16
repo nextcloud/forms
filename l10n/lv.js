@@ -17,7 +17,7 @@ OC.L10N.register(
     "Results" : "Rezultāti",
     "Cancel" : "Atcelt",
     "Required" : "Nepieciešams",
-    "Delete" : "Dzēst",
+    "Delete" : "Izdzēst",
     "Uploading …" : "Augšupielādē…",
     "Other" : "Cits",
     "Set expiration date" : "Iestatīt derīguma beigu datumu",
