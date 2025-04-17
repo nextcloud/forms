@@ -65,7 +65,7 @@ export default {
 			if (this.isValidQuery) {
 				// already set loading to have proper ux feedback during debounce
 				this.loading = true
-				await this.debounceGetSuggestions(query)
+				this.debounceGetSuggestions(query)
 			}
 		},
 
