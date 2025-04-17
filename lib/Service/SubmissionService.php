@@ -382,7 +382,13 @@ class SubmissionService {
 			} elseif ($answersCount != 2 && $question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])) {
 				// Check if date range questions have exactly two answers
 				throw new \InvalidArgumentException(sprintf('Question "%s" can only have two answers.', $question['text']));
-			} elseif ($answersCount > 1 && $question['type'] !== Constants::ANSWER_TYPE_FILE && !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange']))) {
+			} elseif ($answersCount != 2 && $question['type'] === Constants::ANSWER_TYPE_TIME && isset($question['extraSettings']['timeRange'])) {
+				// Check if date range questions have exactly two answers
+				throw new \InvalidArgumentException(sprintf('Question "%s" can only have two answers.', $question['text']));
+			} elseif ($answersCount > 1
+						&& $question['type'] !== Constants::ANSWER_TYPE_FILE
+						&& !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])
+						|| $question['type'] === Constants::ANSWER_TYPE_TIME && isset($question['extraSettings']['timeRange']))) {
 				// Check if non-multiple questions have not more than one answer
 				throw new \InvalidArgumentException(sprintf('Question "%s" can only have one answer.', $question['text']));
 			}
@@ -466,15 +472,17 @@ class SubmissionService {
 			}
 
 			if ($previousDate !== null && $d < $previousDate) {
-				throw new \InvalidArgumentException(sprintf('Dates for question "%s" must be in ascending order.', $text));
+				throw new \InvalidArgumentException(sprintf('Date/time values for question "%s" must be in ascending order.', $text));
 			}
 			$previousDate = $d;
 
 			if ($extraSettings) {
 				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin'])) ||
-					(isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
+					(isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax'])) ||
+					(isset($extraSettings['timeMin']) && $d < DateTime::createFromFormat($format, $extraSettings['timeMin'])) ||
+					(isset($extraSettings['timeMax']) && $d > DateTime::createFromFormat($format, $extraSettings['timeMax']))
 				) {
-					throw new \InvalidArgumentException(sprintf('Date is not in the allowed range for question "%s".', $text));
+					throw new \InvalidArgumentException(sprintf('Date/time is not in the allowed range for question "%s".', $text));
 				}
 			}
 		}

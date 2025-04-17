@@ -477,6 +477,17 @@
                     "shuffleOptions": {
                         "type": "boolean"
                     },
+                    "timeMax": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "timeMin": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "timeRange": {
+                        "type": "boolean"
+                    },
                     "validationRegex": {
                         "type": "string"
                     },

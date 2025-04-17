@@ -632,6 +632,9 @@ class FormsService {
 			case Constants::ANSWER_TYPE_DATE:
 				$allowed = Constants::EXTRA_SETTINGS_DATE;
 				break;
+			case Constants::ANSWER_TYPE_TIME:
+				$allowed = Constants::EXTRA_SETTINGS_TIME;
+				break;
 			case Constants::ANSWER_TYPE_LINEARSCALE:
 				$allowed = Constants::EXTRA_SETTINGS_LINEARSCALE;
 				break;
@@ -657,6 +660,32 @@ class FormsService {
 			// Ensure dateMin and dateMax don't overlap
 			if (isset($extraSettings['dateMin']) && isset($extraSettings['dateMax'])
 				&& $extraSettings['dateMin'] > $extraSettings['dateMax']) {
+				return false;
+			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_TIME) {
+			$format = Constants::ANSWER_PHPDATETIME_FORMAT['time'];
+
+			// Validate timeMin format
+			if (isset($extraSettings['timeMin'])) {
+				$timeMinString = $extraSettings['timeMin'];
+				$timeMinDate = \DateTime::createFromFormat($format, $timeMinString);
+				if (!$timeMinDate || $timeMinDate->format($format) !== $timeMinString) {
+					return false;
+				}
+			}
+
+			// Validate timeMax format
+			if (isset($extraSettings['timeMax'])) {
+				$timeMaxString = $extraSettings['timeMax'];
+				$timeMaxDate = \DateTime::createFromFormat($format, $timeMaxString);
+				if (!$timeMaxDate || $timeMaxDate->format($format) !== $timeMaxString) {
+					return false;
+				}
+			}
+
+			// Ensure timeMin and timeMax don't overlap
+			if (isset($extraSettings['timeMin']) && isset($extraSettings['timeMax'])
+				&& $timeMinDate > $timeMaxDate) {
 				return false;
 			}
 		} elseif ($questionType === Constants::ANSWER_TYPE_MULTIPLE) {

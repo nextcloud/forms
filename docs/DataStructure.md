@@ -231,6 +231,9 @@ Optional extra settings for some [Question Types](#question-types)
 | `dateMax`               | `date`                                | Integer          | -                                           | Maximum allowed date to be chosen (as Unix timestamp)                       |
 | `dateMin`               | `date`                                | Integer          | -                                           | Minimum allowed date to be chosen (as Unix timestamp)                       |
 | `dateRange`             | `date`                                | Boolean          | `true/false`                                | The date picker should query a date range                                   |
+| `timeMax`               | `time`                                | string           | -                                           | Maximum allowed time to be chosen (as `HH:mm` string)                       |
+| `timeMin`               | `time`                                | string           | -                                           | Minimum allowed time to be chosen (as `HH:mm` string)                       |
+| `timeRange`             | `time`                                | Boolean          | `true/false`                                | The time picker should query a time range                                   |
 | `optionsLowest`         | `linearscale`                         | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`                             |
 | `optionsHighest`        | `linearscale`                         | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
 | `optionsLabelLowest`    | `linearscale`                         | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |

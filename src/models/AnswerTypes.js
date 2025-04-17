@@ -179,7 +179,9 @@ export default {
 
 		titlePlaceholder: t('forms', 'Time question title'),
 		createPlaceholder: t('forms', 'People can pick a time'),
+		createPlaceholderRange: t('forms', 'People can pick a time range'),
 		submitPlaceholder: t('forms', 'Pick a time'),
+		submitPlaceholderRange: t('forms', 'Pick a time range'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 
 		pickerType: 'time',

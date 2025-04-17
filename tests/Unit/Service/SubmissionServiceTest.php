@@ -813,7 +813,7 @@ file2.txt"
 					'1' => ['2025-03-24']
 				],
 				// Expected Result
-				'Date is not in the allowed range for question "q1".',
+				'Date/time is not in the allowed range for question "q1".',
 			],
 			'valid-date-range' => [
 				// Questions
@@ -849,7 +849,7 @@ file2.txt"
 					'1' => ['2023-12-31', '2023-01-01']
 				],
 				// Expected Result
-				'Dates for question "q1" must be in ascending order.',
+				'Date/time values for question "q1" must be in ascending order.',
 			],
 			'valid-single-date' => [
 				// Questions
@@ -871,6 +871,66 @@ file2.txt"
 				// Answers
 				[
 					'1' => ['2023-01-01', '2023-12-31']
+				],
+				// Expected Result
+				'Question "q1" can only have one answer.',
+			],
+			'invalid-time-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'time', 'text' => 'q1', 'isRequired' => false]
+				],
+				// Answers
+				[
+					'1' => ['12:34am']
+				],
+				// Expected Result
+				'Invalid date/time format for question "q1".',
+			],
+			'time-out-of-range-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'time', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['timeMin' => '12:34']]
+				],
+				// Answers
+				[
+					'1' => ['12:33']
+				],
+				// Expected Result
+				'Date/time is not in the allowed range for question "q1".',
+			],
+			'invalid-time-range-single-time' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'time', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['timeRange' => true]]
+				],
+				// Answers
+				[
+					'1' => ['12:34']
+				],
+				// Expected Result
+				'Question "q1" can only have two answers.',
+			],
+			'invalid-time-range-wrong-order' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'time', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['timeRange' => true]]
+				],
+				// Answers
+				[
+					'1' => ['12:34', '12:33']
+				],
+				// Expected Result
+				'Date/time values for question "q1" must be in ascending order.',
+			],
+			'invalid-single-time-multiple-times' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'time', 'text' => 'q1', 'isRequired' => true]
+				],
+				// Answers
+				[
+					'1' => ['12:33', '12:34']
 				],
 				// Expected Result
 				'Question "q1" can only have one answer.',
@@ -921,6 +981,13 @@ file2.txt"
 						'dateMin' => 1742860800,
 						'dateMax' => 1743033600]
 					],
+					// time limits
+					['id' => 17, 'type' => 'time', 'isRequired' => false, 'extraSettings' => [
+						'timeMin' => '12:30',
+						'timeMax' => '12:34']
+					],
+					// time range
+					['id' => 18, 'type' => 'time', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['timeRange' => true]],
 				],
 				// Answers
 				[
@@ -939,6 +1006,10 @@ file2.txt"
 					'13' => ['abc123'],
 					'14' => ['3'],
 					'15' => ['2025-03-26'],
+					// valid time in limits
+					'17' => ['12:33'],
+					// valid time range
+					'18' => ['12:33', '12:34'],
 				],
 				// Expected Result
 				null,
