@@ -7,6 +7,6 @@
 		}
 	},
 	"require": {
-		"nextcloud/coding-standard": "^1.1"
+		"nextcloud/coding-standard": "^1.3"
 	}
 }
