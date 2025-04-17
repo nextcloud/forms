@@ -102,7 +102,7 @@ export default {
 							}
 						}),
 					})
-				} else if (question.type === 'date') {
+				} else if (['date', 'time'].includes(question.type)) {
 					const squashedAnswers = answers
 						.map((answer) => answer.text)
 						.join(' - ')

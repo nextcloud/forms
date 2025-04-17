@@ -1397,6 +1397,31 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => false
 			],
+			'valid-time-settings' => [
+				'extraSettings' => [
+					'timeMin' => '12:34',
+					'timeMax' => null,
+				],
+				'questionType' => Constants::ANSWER_TYPE_TIME,
+				'expected' => true
+			],
+			'invalid-time-settings' => [
+				'extraSettings' => [
+					'timeMin' => 'today',
+					'timeMax2' => null,
+				],
+				'questionType' => Constants::ANSWER_TYPE_TIME,
+				'expected' => false
+			],
+			'invalid-time-limits' => [
+				// max < min
+				'extraSettings' => [
+					'dateMin' => '12:34',
+					'dateMax' => '12:33',
+				],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false
+			],
 			'valid-dropdown-settings' => [
 				'extraSettings' => [
 					'shuffleOptions' => false,
