@@ -44,7 +44,7 @@
 				<p>
 					{{
 						t('forms', '{amount} responses', {
-							amount: submissions.length ?? 0,
+							amount: filteredSubmissionsCount,
 						})
 					}}
 				</p>
@@ -165,12 +165,45 @@
 							</NcActionButton>
 						</template>
 					</NcActions>
+
+					<div
+						v-if="
+							(!noSubmissions || submissionSearch.length > 0)
+							&& activeResponseView.id !== 'summary'
+						"
+						class="search-wrapper">
+						<NcTextField
+							v-model="submissionSearch"
+							:label="t('forms', 'Search')"
+							trailing-button-icon="close"
+							:show-trailing-button="submissionSearch.length > 0"
+							@trailing-button-click="submissionSearch = ''">
+							<template #icon>
+								<IconMagnify :size="20" />
+							</template>
+						</NcTextField>
+					</div>
 				</div>
 			</header>
 
+			<!-- Empty search results -->
+			<NcEmptyContent
+				v-if="noSubmissions && submissionSearch.length > 0"
+				:name="t('forms', 'No results found')"
+				class="forms-emptycontent"
+				:description="
+					t('forms', 'No results found for {submissionSearch}', {
+						submissionSearch,
+					})
+				">
+				<template #icon>
+					<IconPoll :size="64" />
+				</template>
+			</NcEmptyContent>
+
 			<!-- No submissions -->
 			<NcEmptyContent
-				v-if="noSubmissions"
+				v-else-if="noSubmissions"
 				:name="t('forms', 'No responses yet')"
 				class="forms-emptycontent"
 				:description="
@@ -208,9 +241,16 @@
 					:form-hash="form.hash"
 					:submission="submission"
 					:questions="questions"
+					:highlight="submissionSearch"
 					:can-delete-submission="canDeleteSubmission(submission.userId)"
 					:can-edit-submission="canEditSubmission(submission.userId)"
 					@delete="deleteSubmission(submission.id)" />
+
+				<PaginationToolbar
+					class="bottom-pagination"
+					:total-items-count="filteredSubmissionsCount"
+					:limit.sync="limit"
+					:offset.sync="offset" />
 			</section>
 		</template>
 
@@ -242,6 +282,7 @@ import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import axios from '@nextcloud/axios'
@@ -266,8 +307,9 @@ import IconRefresh from 'vue-material-design-icons/Refresh.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 import IconTable from 'vue-material-design-icons/Table.vue'
 import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
+import IconMagnify from 'vue-material-design-icons/Magnify.vue'
 
-import { FormState } from '../models/Constants.ts'
+import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
@@ -276,8 +318,10 @@ import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import PaginationToolbar from '../components/PaginationToolbar.vue'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import PillMenu from '../components/PillMenu.vue'
+import debounce from 'debounce'
 
 const SUPPORTED_FILE_FORMATS = {
 	ods: IconTableSvg,
@@ -319,6 +363,9 @@ export default {
 		NcAppContent,
 		NcButton,
 		NcDialog,
+		NcTextField,
+		PaginationToolbar,
+		IconMagnify,
 		NcEmptyContent,
 		NcLoadingIcon,
 		PillMenu,
@@ -344,12 +391,18 @@ export default {
 
 			questions: [],
 			submissions: [],
+			filteredSubmissionsCount: 0,
 
 			isDownloadActionOpened: false,
 			loadingResults: true,
+			skipReloadOnOffsetChange: false,
 
 			picker: null,
 			showConfirmDeleteDialog: false,
+
+			submissionSearch: '',
+			limit: 20,
+			offset: 0,
 
 			linkedFileNotAvailableButtons: [
 				{
@@ -434,12 +487,29 @@ export default {
 	},
 
 	watch: {
-		// Reload results, when form changes
+		// Reload results when form changes
 		async hash() {
 			await this.fetchFullForm(this.form.id)
 			this.loadFormResults()
 			SetWindowTitle(this.formTitle)
 		},
+		limit() {
+			this.loadFormResults()
+		},
+		offset() {
+			// Only load results if we're not changing offset from submissionSearch watch
+			if (!this.skipReloadOnOffsetChange) {
+				this.loadFormResults()
+			}
+		},
+		submissionSearch: debounce(function () {
+			this.skipReloadOnOffsetChange = true
+			this.offset = 0
+			this.$nextTick(() => {
+				this.skipReloadOnOffsetChange = false
+			})
+			this.loadFormResults()
+		}, INPUT_DEBOUNCE_MS),
 	},
 
 	async beforeMount() {
@@ -478,22 +548,25 @@ export default {
 
 			try {
 				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-						id: this.form.id,
-					}),
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/submissions?limit={limit}&offset={offset}&query={query}',
+						{
+							id: this.form.id,
+							limit: this.limit,
+							offset: this.offset,
+							query: this.submissionSearch,
+						},
+					),
 				)
-
-				let loadedSubmissions = OcsResponse2Data(response).submissions
-				const loadedQuestions = OcsResponse2Data(response).questions
-
-				loadedSubmissions = this.formatDateAnswers(
-					loadedSubmissions,
-					loadedQuestions,
-				)
+				const data = OcsResponse2Data(response)
 
 				// Append questions & submissions
-				this.submissions = loadedSubmissions
-				this.questions = loadedQuestions
+				this.submissions = this.formatDateAnswers(
+					data.submissions,
+					data.questions,
+				)
+				this.questions = data.questions
+				this.filteredSubmissionsCount = data.filteredSubmissionsCount
 			} catch (error) {
 				logger.error('Error while loading results', { error })
 				showError(t('forms', 'There was an error while loading the results'))
@@ -868,5 +941,15 @@ export default {
 			margin-inline-end: 1em;
 		}
 	}
+}
+
+.search-wrapper {
+	margin-block-start: calc(-1 * var(--default-grid-baseline));
+	margin-inline-start: auto;
+	margin-inline-end: var(--default-clickable-area);
+}
+
+.bottom-pagination {
+	margin-bottom: 24px;
 }
 </style>

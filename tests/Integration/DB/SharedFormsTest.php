@@ -6,7 +6,7 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-namespace OCA\Forms\Tests\Integration\Api;
+namespace OCA\Forms\Tests\Integration\Db;
 
 use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Constants;

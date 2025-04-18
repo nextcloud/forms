@@ -77,7 +77,8 @@ namespace OCA\Forms;
  *
  * @psalm-type FormsSubmissions = array{
  *   submissions: list<FormsSubmission>,
- *   questions: list<FormsQuestion>
+ *   questions: list<FormsQuestion>,
+ *   filteredSubmissionsCount: int
  * }
  *
  * @psalm-type FormsAccess = array{

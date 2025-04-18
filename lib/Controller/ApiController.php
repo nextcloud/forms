@@ -1134,7 +1134,10 @@ class ApiController extends OCSController {
 	 * Get all the submissions of a given form
 	 *
 	 * @param int $formId of the form
-	 * @param ?string $fileFormat the file format that should be used for the download. Defaults to `null`
+	 * @param ?string $query (optional) A search query to filter submissions
+	 * @param ?int $limit (optional) The maximum number of submissions to retrieve. Defaults to `null`
+	 * @param int $offset (optional) The offset for pagination. Defaults to `0`
+	 * @param ?string $fileFormat (optional) The file format that should be used for the download. Defaults to `null`
 	 *                            Possible values:
 	 *                            - `csv`: Comma-separated value
 	 *                            - `ods`: OpenDocument Spreadsheet
@@ -1149,7 +1152,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions')]
-	public function getSubmissions(int $formId, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
+	public function getSubmissions(int $formId, ?string $query = null, ?int $limit = null, int $offset = 0, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
 		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
 
 		if ($fileFormat !== null) {
@@ -1161,9 +1164,12 @@ class ApiController extends OCSController {
 
 		// Load submissions and currently active questions
 		if (in_array(Constants::PERMISSION_RESULTS, $this->formsService->getPermissions($form))) {
-			$submissions = $this->submissionService->getSubmissions($formId);
+			$submissions = $this->submissionService->getSubmissions($formId, null, $query, $limit, $offset);
+			$filteredSubmissionsCount = $this->submissionMapper->countSubmissions($formId, null, $query);
 		} else {
-			$submissions = $this->submissionService->getSubmissions($formId, $this->currentUser->getUID());
+			$userId = $this->currentUser->getUID();
+			$submissions = $this->submissionService->getSubmissions($formId, $userId, $query, $limit, $offset);
+			$filteredSubmissionsCount = $this->submissionMapper->countSubmissions($formId, $userId, $query);
 		}
 		$questions = $this->formsService->getQuestions($formId);
 
@@ -1196,6 +1202,7 @@ class ApiController extends OCSController {
 		$response = [
 			'submissions' => $submissions,
 			'questions' => $questions,
+			'filteredSubmissionsCount' => $filteredSubmissionsCount,
 		];
 
 		return new DataResponse($response);

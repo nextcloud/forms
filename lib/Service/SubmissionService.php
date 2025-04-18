@@ -92,6 +92,9 @@ class SubmissionService {
 	 *
 	 * @param int $formId the form id
 	 * @param string|null $userId optional user id to filter submissions
+	 * @param string|null $query optional search query to filter submissions
+	 * @param int|null $limit the maximum number of submissions to return
+	 * @param int $offset the number of submissions to skip
 	 * @return list<array{
 	 *     id: int,
 	 *     formId: int,
@@ -100,14 +103,10 @@ class SubmissionService {
 	 *     answers: list<FormsAnswer>,
 	 * }>
 	 */
-	public function getSubmissions(int $formId, ?string $userId = null): array {
+	public function getSubmissions(int $formId, ?string $userId = null, ?string $query = null, ?int $limit = null, int $offset = 0): array {
 		$submissionList = [];
 		try {
-			if (is_null($userId)) {
-				$submissionEntities = $this->submissionMapper->findByForm($formId);
-			} else {
-				$submissionEntities = $this->submissionMapper->findByFormAndUser($formId, $userId);
-			}
+			$submissionEntities = $this->submissionMapper->findByForm($formId, $userId, $query, $limit, $offset);
 
 			foreach ($submissionEntities as $submissionEntity) {
 				$submission = $submissionEntity->read();

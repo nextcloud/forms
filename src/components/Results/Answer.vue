@@ -18,23 +18,25 @@
 				dir="auto">
 				<a :href="answer.url" target="_blank">
 					<IconFile :size="20" class="answer__text-icon" />
-					{{ answer.text }}
+					<NcHighlight :text="answer.text" :search="highlight" />
 				</a>
 			</p>
 		</template>
 		<p v-else class="answer__text" dir="auto">
-			{{ answerText }}
+			<NcHighlight :text="answerText" :search="highlight" />
 		</p>
 	</div>
 </template>
 
 <script>
 import IconFile from 'vue-material-design-icons/File.vue'
+import NcHighlight from '@nextcloud/vue/components/NcHighlight'
 
 export default {
 	name: 'Answer',
 	components: {
 		IconFile,
+		NcHighlight,
 	},
 
 	props: {
@@ -51,6 +53,11 @@ export default {
 		questionText: {
 			type: String,
 			required: true,
+		},
+		highlight: {
+			type: String,
+			required: false,
+			default: '',
 		},
 	},
 }

@@ -592,7 +592,8 @@
                 "type": "object",
                 "required": [
                     "submissions",
-                    "questions"
+                    "questions",
+                    "filteredSubmissionsCount"
                 ],
                 "properties": {
                     "submissions": {
@@ -606,6 +607,10 @@
                         "items": {
                             "$ref": "#/components/schemas/Question"
                         }
+                    },
+                    "filteredSubmissionsCount": {
+                        "type": "integer",
+                        "format": "int64"
                     }
                 }
             },
@@ -3020,9 +3025,38 @@
                         }
                     },
                     {
+                        "name": "query",
+                        "in": "query",
+                        "description": "(optional) A search query to filter submissions",
+                        "schema": {
+                            "type": "string",
+                            "nullable": true
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "(optional) The maximum number of submissions to retrieve. Defaults to `null`",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "nullable": true
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "(optional) The offset for pagination. Defaults to `0`",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "default": 0
+                        }
+                    },
+                    {
                         "name": "fileFormat",
                         "in": "query",
-                        "description": "the file format that should be used for the download. Defaults to `null` Possible values: - `csv`: Comma-separated value - `ods`: OpenDocument Spreadsheet - `xlsx`: Excel Open XML Spreadsheet",
+                        "description": "(optional) The file format that should be used for the download. Defaults to `null` Possible values: - `csv`: Comma-separated value - `ods`: OpenDocument Spreadsheet - `xlsx`: Excel Open XML Spreadsheet",
                         "schema": {
                             "type": "string",
                             "nullable": true
