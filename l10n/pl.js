@@ -236,10 +236,6 @@ OC.L10N.register(
     "Text" : "Tekst",
     "Phone number" : "Numer telefonu",
     "Email address" : "Adres e-mail",
-    "Number" : "Liczba",
-    "Add a new answer" : "Dodaj nową odpowiedź",
-    "Legacy Link" : "Link w starszej wersji",
-    "Form still supports old sharing-link." : "Formularz obsługuje wciąż stary link udostępniania.",
-    "Remove Legacy Link" : "Usuń link w starszej wersji"
+    "Number" : "Liczba"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

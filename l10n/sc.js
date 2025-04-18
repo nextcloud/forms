@@ -142,7 +142,6 @@ OC.L10N.register(
     "Presentation" : "Presentatzione",
     "Text" : "Testu",
     "Phone number" : "Nùmeru de telèfonu",
-    "Email address" : "Indiritzu de posta eletrònica",
-    "Add a new answer" : "Agiunghe una risposta noa"
+    "Email address" : "Indiritzu de posta eletrònica"
 },
 "nplurals=2; plural=(n != 1);");

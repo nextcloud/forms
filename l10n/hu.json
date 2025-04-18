@@ -292,13 +292,6 @@
     "People can enter a number" : "Szám írható be",
     "Enter a number" : "Adjon meg egy számot",
     "Custom regular expression" : "Egyedi reguláris kifejezés",
-    "The input does not match the required pattern" : "A bemenet nem felel meg a kért mintának",
-    "Add a new answer" : "Új válasz hozzáadása",
-    "Legacy Link" : "Örökölt hivatkozás",
-    "Form still supports old sharing-link." : "Az űrlap még mindig támogatja a régi megosztási hivatkozást.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "A régi Megosztás kompatibilitásának megőrzése érdekében a belső hivatkozás továbbra is használható megosztási hivatkozásként. Kérjük, cserélje le a hivatkozást egy új Megosztás hivatkozásra. A belső megosztási hivatkozás a Forms 5.0-tól kezdve már nem fog működni.",
-    "Remove Legacy Link" : "Örökölt hivatkozás eltávolítása",
-    "Legacy link in use" : "Örökölt hivatkozás van használatban",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Ez az űrlap még mindig egy elavult megosztási hivatkozást használ, amely a Forms 5.0-ban el lesz távolítva. Kérjük, használja az új megosztási mechanizmust."
+    "The input does not match the required pattern" : "A bemenet nem felel meg a kért mintának"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

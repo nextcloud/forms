@@ -299,13 +299,6 @@ OC.L10N.register(
     "People can enter a number" : "İnsanlar bir sayı yazabilir",
     "Enter a number" : "Bir sayı yazın",
     "Custom regular expression" : "Özel kurallı ifade",
-    "The input does not match the required pattern" : "Yazdığınız bilgi istenilen biçimde değil",
-    "Add a new answer" : "Yeni bir yanıt ekle",
-    "Legacy Link" : "Eski bağlantı",
-    "Form still supports old sharing-link." : "Form hala eski paylaşım bağlantısını destekliyor.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Eski paylaşım ile uyumluluk sağlamak için, paylaşım bağlantısı olarak hala iç bağlantı kullanılabilir. Lütfen bağlantıyı yeni bir paylaşım bağlantısıyla değiştirin. İç paylaşım bağlantısı Forms 5.0 sürümünden başlayarak çalışmayacak",
-    "Remove Legacy Link" : "Eski bağlantıyı kaldır",
-    "Legacy link in use" : "Eski bağlantı kullanılıyor",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Bu form kullanımdan kaldırılmış bir paylaşım bağlantısı kullanıyor. Bu bağlantı Forms 5.0 sürümünden başlayarak kaldırılacak. Lütfen yeni paylaşım yöntemini kullanın."
+    "The input does not match the required pattern" : "Yazdığınız bilgi istenilen biçimde değil"
 },
 "nplurals=2; plural=(n > 1);");

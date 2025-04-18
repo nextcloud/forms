@@ -293,13 +293,6 @@ OC.L10N.register(
     "People can enter a number" : "Респондент може ввести число",
     "Enter a number" : "Введіть число",
     "Custom regular expression" : "Регулярний вираз",
-    "The input does not match the required pattern" : "Поле не відповідає визначеному шаблону",
-    "Add a new answer" : "Додати новий варіант",
-    "Legacy Link" : "Застаріле посилання",
-    "Form still supports old sharing-link." : "Форма все ще підтримує старе посилання для спільного доступу.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Для сумісності із застарілим способом надання у спільний доступ внутрішні посилання все ще використовуються як посилання для спільного доступу. Прохання замінити посилання на новий спосіб надання у спільний доступ через посилання. Внутрішнє посилання не працюватиме від версії Форми 5.0.",
-    "Remove Legacy Link" : "Вилучити застаріле посилання",
-    "Legacy link in use" : "Використовується застаріле посилання",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Ця форма все ще використовує застарілий спосіб надання у спільний доступ через посилання, яке буде недоступне від версії Форм 5.0. Прохання використовувати новий спосіб надання у спільний доступ."
+    "The input does not match the required pattern" : "Поле не відповідає визначеному шаблону"
 },
 "nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);");

@@ -296,13 +296,6 @@
     "People can enter a number" : "Les répondants peuvent saisir un nombre",
     "Enter a number" : "Saisissez un nombre",
     "Custom regular expression" : "Expression régulière personnalisée",
-    "The input does not match the required pattern" : "La saisie ne correspond pas au motif exigé",
-    "Add a new answer" : "Ajouter une nouvelle réponse",
-    "Legacy Link" : "Lien d'origine",
-    "Form still supports old sharing-link." : "Le formulaire supporte toujours les anciens liens de partage.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Pour des raisons de compatibilité avec l'ancien système de partage, le lien interne est toujours utilisable comme lien de partage. Merci de remplacer le lien par un nouveau lien de partage. Le lien interne ne fonctionnera plus à partir de Formulaires 5.0.",
-    "Remove Legacy Link" : "Retirer le lien d'origine",
-    "Legacy link in use" : "Utilisation d'un lien d'origine",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Ce formulaire utilise un lien de partage déprécié qui sera supprimé dans Formulaires 5.0. Merci d'utiliser la nouvelle méthode de partage."
+    "The input does not match the required pattern" : "La saisie ne correspond pas au motif exigé"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

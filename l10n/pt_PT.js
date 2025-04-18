@@ -140,7 +140,6 @@ OC.L10N.register(
     "Spreadsheet" : "Folha de Cálculo",
     "Text" : "Texto",
     "Phone number" : "Número de telefone",
-    "Email address" : "Endereço de email",
-    "Add a new answer" : "Acrescente uma nova pergunta"
+    "Email address" : "Endereço de email"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

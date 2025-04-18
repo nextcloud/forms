@@ -304,13 +304,6 @@ OC.L10N.register(
     "People can enter a number" : "Људи могу унети број",
     "Enter a number" : "Унесите број",
     "Custom regular expression" : "Произвољни регуларни израз",
-    "The input does not match the required pattern" : "Унос не задовољава тражени шаблон",
-    "Add a new answer" : "Додајте нови одговор",
-    "Legacy Link" : "Линк старе верзије",
-    "Form still supports old sharing-link." : "Формулар још увек подржава стати линк за дељење.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Из разлога компатибилности са старом апликацијом Дељење, интерни линк је још увек употребљив као линк за дељење. Интерни линк за дељење више неће радити, почевши са верзијом Формулари 5.0",
-    "Remove Legacy Link" : "Уклони линк старе верзије",
-    "Legacy link in use" : "Користи се линк старе верзије",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Овај формулар још увек користи застарели линк дељења који ће се уклонити у верзији Формулари 5.0. Молимо вас да користите нови механизам за дељење."
+    "The input does not match the required pattern" : "Унос не задовољава тражени шаблон"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

@@ -299,13 +299,6 @@ OC.L10N.register(
     "People can enter a number" : "A xente pode introducir un número",
     "Enter a number" : "Introduza un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "A entrada non coincide co patrón requirido",
-    "Add a new answer" : "Engadir unha nova resposta",
-    "Legacy Link" : "Ligazón de estilo antigo",
-    "Form still supports old sharing-link." : "O formulario aínda admite as ligazóns de compartir antigas",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Por compatibilidade con como se compartía antes, a ligazón interna aínda se pode usar como ligazón de compartir. Substitúa a ligazón pola nova ligazón de compartir. A ligazón de compartir interna xa non funcionará a partir de Formularios 5.0",
-    "Remove Legacy Link" : "Retirar ligazón de estilo antigo",
-    "Legacy link in use" : "Estase a empregar a ligazón estilo antigo",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Este formulario aínda usa unha ligazón para compartir obsoleta, que se retirar en Formularios 5.0. Empregue o novo mecanismo de compartición."
+    "The input does not match the required pattern" : "A entrada non coincide co patrón requirido"
 },
 "nplurals=2; plural=(n != 1);");

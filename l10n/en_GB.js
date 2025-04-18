@@ -304,13 +304,6 @@ OC.L10N.register(
     "People can enter a number" : "People can enter a number",
     "Enter a number" : "Enter a number",
     "Custom regular expression" : "Custom regular expression",
-    "The input does not match the required pattern" : "The input does not match the required pattern",
-    "Add a new answer" : "Add a new answer",
-    "Legacy Link" : "Legacy Link",
-    "Form still supports old sharing-link." : "Form still supports old sharing-link.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0",
-    "Remove Legacy Link" : "Remove Legacy Link",
-    "Legacy link in use" : "Legacy link in use",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism."
+    "The input does not match the required pattern" : "The input does not match the required pattern"
 },
 "nplurals=2; plural=(n != 1);");

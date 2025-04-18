@@ -186,10 +186,6 @@ OC.L10N.register(
     "Text" : "Text",
     "Phone number" : "Telèfon",
     "Email address" : "Adreça electrònica",
-    "Number" : "Número",
-    "Add a new answer" : "Afegeix una resposta nova",
-    "Legacy Link" : "Enllaç heretat",
-    "Form still supports old sharing-link." : "El formulari encara admet l'enllaç de compartició antic.",
-    "Remove Legacy Link" : "Suprimeix l'enllaç heretat"
+    "Number" : "Número"
 },
 "nplurals=2; plural=(n != 1);");

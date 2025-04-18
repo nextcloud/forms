@@ -304,13 +304,6 @@ OC.L10N.register(
     "People can enter a number" : "Is féidir le daoine uimhir a chur isteach",
     "Enter a number" : "Cuir isteach uimhir",
     "Custom regular expression" : "Sloinneadh rialta saincheaptha",
-    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach",
-    "Add a new answer" : "Cuir freagra nua leis",
-    "Legacy Link" : "Nasc oidhreachta",
-    "Form still supports old sharing-link." : "Tacaíonn an fhoirm le sean-nasc comhroinnte fós.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Chun comhoiriúnacht leis an Sean Roinnt, tá an nasc inmheánach fós inúsáidte mar nasc Comhroinn. Cuir nasc Comhroinnte nua in ionad an nasc le do thoil. Ní oibreoidh an nasc comhroinnte inmheánach a thuilleadh ag tosú le Foirmeacha 5.0",
-    "Remove Legacy Link" : "Bain Nasc Legacy",
-    "Legacy link in use" : "Nasc oidhreachta in úsáid",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Baineann an fhoirm seo úsáid as nasc scaireanna dímheasta fós, a bhainfear i bhFoirmeacha 5.0. Bain úsáid as an meicníocht nua roinnte le do thoil."
+    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

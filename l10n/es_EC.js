@@ -181,10 +181,6 @@ OC.L10N.register(
     "Text" : "Texto",
     "Phone number" : "Número telefónico",
     "Email address" : "Dirección de correo electrónico",
-    "Number" : "Número",
-    "Add a new answer" : "Añadir una nueva respuesta",
-    "Legacy Link" : "Enlace antiguo",
-    "Form still supports old sharing-link." : "El formulario todavía admite el enlace de compartición antiguo.",
-    "Remove Legacy Link" : "Eliminar enlace antiguo"
+    "Number" : "Número"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

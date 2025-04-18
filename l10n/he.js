@@ -121,7 +121,6 @@ OC.L10N.register(
     "Spreadsheet" : "גיליון נתונים",
     "Text" : "טקסט",
     "Phone number" : "מספר טלפון",
-    "Email address" : "כתובת דוא״ל",
-    "Add a new answer" : "הוספת תשובה חדשה"
+    "Email address" : "כתובת דוא״ל"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

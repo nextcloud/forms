@@ -290,13 +290,6 @@ OC.L10N.register(
     "People can enter a number" : "Se poate introduce un număr",
     "Enter a number" : "Introduceți un număr",
     "Custom regular expression" : "Expresie regulată personalizată",
-    "The input does not match the required pattern" : "Textul introdus nu coincide cu modelul necesar",
-    "Add a new answer" : "Adaugă un răspuns nou",
-    "Legacy Link" : "Link vechi",
-    "Form still supports old sharing-link." : "Formularul înca permite link-ul vechi pentru distribuire.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Pentru a asigura compatibilitatea cu sistemul vechi de Distribuire, link-ul intern va rămâne utilizabil ca link de Distribuire. Vă rugăm înlocuiți acest link cu unul nou. Link-ul intern nu va mai funcționa începând cu Formulare 5.0",
-    "Remove Legacy Link" : "Șterge link-ul vechi",
-    "Legacy link in use" : "Se folosește un link vechi",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Acest formular încă folosește un link de distribuire învechit, care va fi șters în Formulare 5.0. Vă rugăm să folosiți mecanismul nou de distribuire."
+    "The input does not match the required pattern" : "Textul introdus nu coincide cu modelul necesar"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

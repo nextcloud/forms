@@ -179,10 +179,6 @@ OC.L10N.register(
     "Text" : "Текст",
     "Phone number" : "Телефонен номер",
     "Email address" : "Имейл адрес",
-    "Number" : "Номер",
-    "Add a new answer" : "Добавяне на нов отговор",
-    "Legacy Link" : "Наследена връзка",
-    "Form still supports old sharing-link." : "Формулярът все още поддържа стара връзка за споделяне.",
-    "Remove Legacy Link" : "Премахване на наследената връзка"
+    "Number" : "Номер"
 },
 "nplurals=2; plural=(n != 1);");

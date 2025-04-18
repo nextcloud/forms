@@ -147,7 +147,6 @@ OC.L10N.register(
     "Email address" : "Direición de corréu electrónicu",
     "People can enter an email address" : "La xente pue introducir una direición de corréu electrónicu",
     "Number" : "Númberu",
-    "People can enter a number" : "La xente pue introducir un númberu",
-    "Legacy Link" : "Enllaz heredáu"
+    "People can enter a number" : "La xente pue introducir un númberu"
 },
 "nplurals=2; plural=(n != 1);");

@@ -289,13 +289,6 @@
     "People can enter a number" : "Люди могут ввести номер",
     "Enter a number" : "Введите номер",
     "Custom regular expression" : "Пользовательское регулярное выражение",
-    "The input does not match the required pattern" : "Ввод не соответствует требуемому шаблону",
-    "Add a new answer" : "Добавить новый ответ",
-    "Legacy Link" : "Устаревшая ссылка",
-    "Form still supports old sharing-link." : "Форма по-прежнему поддерживает старый формат ссылок.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Для обеспечения совместимости со старым общим доступом внутренняя ссылка по-прежнему используется в качестве ссылки для общего доступа. Пожалуйста, замените ее новой ссылкой для общего доступа. Начиная с версии Forms 5.0 внутренняя ссылка для общего доступа больше не будет работать",
-    "Remove Legacy Link" : "Удалить устаревшую ссылку",
-    "Legacy link in use" : "Используется устаревшая ссылка",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "В этой форме по-прежнему используется устаревшая ссылка на общий доступ, которая будет удалена в версии Forms 5.0. Пожалуйста, используйте новый механизм общего доступа."
+    "The input does not match the required pattern" : "Ввод не соответствует требуемому шаблону"
 },"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"
 }

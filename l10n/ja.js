@@ -204,8 +204,6 @@ OC.L10N.register(
     "The input is not a valid email address" : "入力されたメールアドレスは無効です。",
     "Enter an email address" : "メールアドレスを入力",
     "Number" : "数字",
-    "Enter a number" : "数値を入力",
-    "Add a new answer" : "回答を追加",
-    "Form still supports old sharing-link." : "フォームではまだ古い共有リンクをサポートしています。"
+    "Enter a number" : "数値を入力"
 },
 "nplurals=1; plural=0;");

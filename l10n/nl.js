@@ -150,7 +150,6 @@ OC.L10N.register(
     "Text" : "Tekst",
     "Phone number" : "Telefoonnummer",
     "Email address" : "E-mailadres",
-    "Number" : "Nummer",
-    "Add a new answer" : "Voeg een nieuw antwoord toe"
+    "Number" : "Nummer"
 },
 "nplurals=2; plural=(n != 1);");

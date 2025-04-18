@@ -124,7 +124,6 @@ OC.L10N.register(
     "Presentation" : "Презентација",
     "Text" : "Текст",
     "Phone number" : "Телефонски број",
-    "Email address" : "Е-пошта адреса",
-    "Add a new answer" : "Додади нов одговор"
+    "Email address" : "Е-пошта адреса"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

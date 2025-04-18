@@ -296,13 +296,6 @@ OC.L10N.register(
     "People can enter a number" : "Le persone possono inserire un numero",
     "Enter a number" : "Inserisci un numero",
     "Custom regular expression" : "Espressione regolare personalizzata",
-    "The input does not match the required pattern" : "L'input non corrisponde al modello richiesto",
-    "Add a new answer" : "Aggiungi una nuova risposta",
-    "Legacy Link" : "Collegamento legacy",
-    "Form still supports old sharing-link." : "Il modulo supporta ancora il vecchio collegamento di condivisione.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Per compatibilità con la vecchia Condivisione, il collegamento interno è ancora utilizzabile come collegamento di condivisione. Sostituisci il collegamento con un nuovo collegamento di condivisione. Il collegamento di condivisione interno non funzionerà più a partire da Forms 5.0",
-    "Remove Legacy Link" : "Rimuovi collegamento legacy",
-    "Legacy link in use" : "Collegamento legacy in uso",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Questo modulo utilizza ancora un collegamento di condivisione obsoleto, che verrà rimosso in Forms 5.0. Si prega di utilizzare il nuovo meccanismo di condivisione."
+    "The input does not match the required pattern" : "L'input non corrisponde al modello richiesto"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

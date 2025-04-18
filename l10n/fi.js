@@ -241,7 +241,6 @@ OC.L10N.register(
     "Number" : "Numero",
     "The input is not a valid number" : "Syöte ei ole kelvollinen numero",
     "Enter a number" : "Kirjoita numero",
-    "Custom regular expression" : "Mukautettu säännöllinen lauseke",
-    "Add a new answer" : "Lisää uusi vastaus"
+    "Custom regular expression" : "Mukautettu säännöllinen lauseke"
 },
 "nplurals=2; plural=(n != 1);");

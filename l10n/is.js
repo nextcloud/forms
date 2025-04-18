@@ -105,7 +105,6 @@ OC.L10N.register(
     "Spreadsheet" : "Töflureiknisskjal",
     "Text" : "Texti",
     "Phone number" : "Símanúmer",
-    "Email address" : "Tölvupóstfang",
-    "Add a new answer" : "Bæta við nýju svari"
+    "Email address" : "Tölvupóstfang"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

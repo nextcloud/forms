@@ -302,13 +302,6 @@
     "People can enter a number" : "يمكن للأشخاص إدخال عدد",
     "Enter a number" : "أدخِل عدداً",
     "Custom regular expression" : "تعبير نمطي مخصص",
-    "The input does not match the required pattern" : "البيان المُدخل لا يتطابق مع النمط المطلوب",
-    "Add a new answer" : "إضافة إجابة جديدة ",
-    "Legacy Link" : "رابط قديم",
-    "Form still supports old sharing-link." : "النموذج مازال يدعم روابط المشاركة القديمة",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "لغرض الحفاظ على التوافقية مع المشاركة القديمة، لا يزال الرابط الداخلي قابلاً للاستخدام كرابط مشاركة. يرجى استبدال الرابط برابط مشاركة جديد. لن يعمل رابط المشاركة الداخلية بعد الآن بدءاً من الإصدار 5.0 من تطبيق \"النماذج\" Forms",
-    "Remove Legacy Link" : "حذف رابط قديم",
-    "Legacy link in use" : "رابط قديم قيد الاستخدام",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "لا يزال هذا النموذج يستخدم رابط مشاركة مهمل، والذي ستتم إزالته في الإصدار  5.0 من تطبيق \"النماذج\" Forms. الرجاء استخدام آلية المشاركة الجديدة."
+    "The input does not match the required pattern" : "البيان المُدخل لا يتطابق مع النمط المطلوب"
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }

@@ -201,8 +201,6 @@ OC.L10N.register(
     "Text" : "Besedilo",
     "Phone number" : "Telefonska številka",
     "Email address" : "Elektronski naslov",
-    "Number" : "Številčne vrednosti",
-    "Add a new answer" : "Dodaj nov odgovor",
-    "Form still supports old sharing-link." : "Vprašalnik še vedno podpira zastarel način povezave objave."
+    "Number" : "Številčne vrednosti"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

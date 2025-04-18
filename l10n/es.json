@@ -24,7 +24,7 @@
     "User ID" : "ID de usuario",
     "User display name" : "Nombre a mostrar del usuario",
     "Timestamp" : "Marca de tiempo",
-    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Encuestas y cuestionarios sencillos, autoalojados.",
+    "📝 Simple surveys and questionnaires, self-hosted" : "📝 Encuestas y cuestionarios sencillos, auto-alojados",
     "**Simple surveys and questionnaires, self-hosted!**\n\n- **📝 Simple design:** No mass of options, only the essentials. Works well on mobile of course.\n- **📊 View & export results:** Results are visualized and can also be exported as CSV in the same format used by Google Forms.\n- **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.\n- **🧑‍💻 Connect to your software:** Easily integrate Forms into your service with our full-fledged [REST-API](https://github.com/nextcloud/forms/blob/main/docs/API.md).\n- **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!" : "**Encuestas y cuestionarios simples, auto-alojados!**\n\n- **📝 Diseño simple:** No hay una masa de opciones, sólo las esenciales. Por supuesto funciona bien en el móvil.\n- **📊 Ver y exportar resultados:** Los resultados se visualizan y también se pueden exportar como CSV en el mismo formato utilizado por Google Forms.\n- **🔒 ¡Datos bajo tu control!** A diferencia de los formularios de Google, Typeform, Doodle y otros, la información y las respuestas de la encuesta se mantienen privadas en su instancia.\n- **🧑‍💻 Conecte con su software:** esta aplicación se puede integrar fácilmente con sus servicios mediante nuestra [API-REST](https://github.com/nextcloud/forms/blob/main/docs/API.md).\n- **🙋 Involúcrate!** Tenemos muchas cosas planeadas como más tipos de preguntas, colaboración en formularios, [y mucho más](https://github.com/nextcloud/forms/milestones)!",
     "An error occurred while loading the forms list" : "Ha ocurrido un error al cargar la lista de formularios",
     "Form not found" : "Formulario no encontrado",
@@ -302,13 +302,6 @@
     "People can enter a number" : "Las personas pueden ingresar un número",
     "Enter a number" : "Ingrese un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "El valor ingresado no coincide con el patrón requerido",
-    "Add a new answer" : "Añadir una respuesta nueva",
-    "Legacy Link" : "Enlace antiguo",
-    "Form still supports old sharing-link." : "El formulario todavía admite el enlace para compartir antiguo.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "Por compatibilidad con la compartición antigua, el enlace interno todavía se puede usar como enlace para compartir. Recomendamos reemplazar el enlace por un nuevo enlace de compartición. El enlace de compartición interno dejará de funcionar a partir de la versión 5.0 de Forms.",
-    "Remove Legacy Link" : "Eliminar enlace antiguo",
-    "Legacy link in use" : "Enlace antiguo en uso",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Este formulario todavía utiliza un enlace de compartición legado, que será eliminado en Forms 5.0. Por favor, utilice el nuevo mecanismo de compartición"
+    "The input does not match the required pattern" : "El valor ingresado no coincide con el patrón requerido"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

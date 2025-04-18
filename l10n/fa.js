@@ -270,10 +270,6 @@ OC.L10N.register(
     "People can enter a number" : "افراد می‌توانند عدد وارد کنند",
     "Enter a number" : "عددی وارد کنید",
     "Custom regular expression" : "عبارت باقاعدهٔ سفارشی",
-    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد",
-    "Add a new answer" : "پاسخ جدیدی بدهید",
-    "Legacy Link" : "پیوند قدیمی",
-    "Form still supports old sharing-link." : "Form still supports old sharing-link.",
-    "Remove Legacy Link" : "Remove Legacy Link"
+    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد"
 },
 "nplurals=2; plural=(n > 1);");

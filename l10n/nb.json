@@ -288,13 +288,6 @@
     "People can enter a number" : "Folk kan skrive inn et nummer",
     "Enter a number" : "Angi et nummer",
     "Custom regular expression" : "Tilpasset regulært uttrykk",
-    "The input does not match the required pattern" : "Inndataene samsvarer ikke med det påkrevde mønsteret",
-    "Add a new answer" : "Legg til et nytt svar",
-    "Legacy Link" : "Eldre kobling",
-    "Form still supports old sharing-link." : "Form støtter fortsatt gammel delingslenke.",
-    "For compatibility with the old Sharing, the internal link is still usable as Share link. Please replace the link with a new Share link. The internal sharing link will not work anymore starting with Forms 5.0" : "For kompatibilitet med den gamle delingen kan den interne lenken fortsatt brukes som delingslenke. Vennligst bytt ut lenken med en ny Del-lenke. Den interne delingskoblingen fungerer ikke lenger fra og med Forms 5.0",
-    "Remove Legacy Link" : "Fjern eldre kobling",
-    "Legacy link in use" : "Eldre kobling i bruk",
-    "This form still uses a deprecated share link, that will be removed in Forms 5.0. Please use the new sharing mechanism." : "Dette skjemaet bruker fortsatt en avviklet delingskobling, som fjernes i Forms 5.0. Bruk den nye delingsmekanismen."
+    "The input does not match the required pattern" : "Inndataene samsvarer ikke med det påkrevde mønsteret"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

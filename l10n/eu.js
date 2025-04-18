@@ -292,10 +292,6 @@ OC.L10N.register(
     "People can enter a number" : "Jendeak zenbaki bat sar dezake",
     "Enter a number" : "Sartu zenbaki bat",
     "Custom regular expression" : "Pertsonalizatu adierazpen erregularra",
-    "The input does not match the required pattern" : "Sarrera ez dator bat behar den ereduarekin",
-    "Add a new answer" : "Gehitu erantzun berri bat",
-    "Legacy Link" : "Legatu-esteka",
-    "Form still supports old sharing-link." : "Inprimakiak partekatzeko esteka zaharra onartzen du oraindik.",
-    "Remove Legacy Link" : "Kendu legatu-esteka"
+    "The input does not match the required pattern" : "Sarrera ez dator bat behar den ereduarekin"
 },
 "nplurals=2; plural=(n != 1);");

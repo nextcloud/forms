@@ -86,7 +86,6 @@ OC.L10N.register(
     "Spreadsheet" : "สเปรดชีต",
     "Text" : "ข้อความ",
     "Phone number" : "หมายเลขโทรศัพท์",
-    "Email address" : "ที่อยู่อีเมล",
-    "Add a new answer" : "เพิ่มคำตอบใหม่"
+    "Email address" : "ที่อยู่อีเมล"
 },
 "nplurals=1; plural=0;");

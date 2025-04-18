@@ -291,7 +291,6 @@ OC.L10N.register(
     "People can enter a number" : "كىشىلەر بىر ساننى كىرگۈزەلەيدۇ",
     "Enter a number" : "سان كىرگۈزۈڭ",
     "Custom regular expression" : "دائىملىق ئىپادىلەش",
-    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ",
-    "Add a new answer" : "يېڭى جاۋاب قوشۇڭ"
+    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ"
 },
 "nplurals=2; plural=(n != 1);");
