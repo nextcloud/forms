@@ -27,6 +27,7 @@
 			:key="question.id"
 			:answer-text="question.squashedAnswers"
 			:answers="question.answers"
+			:highlight="highlight"
 			:question-text="question.text" />
 	</div>
 </template>
@@ -62,6 +63,9 @@ export default {
 		canDeleteSubmission: {
 			type: Boolean,
 			required: true,
+		},
+		highlight: {
+			type: String,
 		},
 	},
 
