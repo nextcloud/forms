@@ -106,7 +106,8 @@
 						class="question__input"
 						:label="placeholderOtherAnswer"
 						:required="otherAnswer !== undefined"
-						:value.sync="otherAnswerText" />
+						:model-value="cachedOtherAnswerText"
+						@update:model-value="onOtherAnswerTextChange" />
 				</div>
 			</fieldset>
 		</template>
@@ -287,39 +288,6 @@ export default {
 				v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
 			)
 		},
-
-		/**
-		 * The text value of the "other" answer
-		 */
-		otherAnswerText: {
-			get() {
-				return this.cachedOtherAnswerText
-			},
-			/**
-			 * Called when the value of the "other" anwer is changed input
-			 * @param {string} value the new text of the "other" answer
-			 */
-			set(value) {
-				this.cachedOtherAnswerText = value
-				// Prefix the value
-				const prefixedValue = `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${value}`
-				// emit the values and add the "other" answer
-				this.$emit(
-					'update:values',
-					this.isUnique
-						? [prefixedValue]
-						: [
-								...this.values.filter(
-									(v) =>
-										!v.startsWith(
-											QUESTION_EXTRASETTINGS_OTHER_PREFIX,
-										),
-								),
-								prefixedValue,
-							],
-				)
-			},
-		},
 	},
 
 	watch: {
@@ -482,6 +450,40 @@ export default {
 		 */
 		onAllowOtherAnswerChange(allowOtherAnswer) {
 			return this.onExtraSettingsChange({ allowOtherAnswer })
+		},
+
+		/**
+		 * Handles the change event for the "Other" answer text input.
+		 *
+		 * @param {string} value - The new value entered for the "Other" answer.
+		 *
+		 * This method performs the following actions:
+		 * 1. Updates the cached value of the "Other" answer text (`cachedOtherAnswerText`).
+		 * 2. Prefixes the input value with a predefined constant (`QUESTION_EXTRASETTINGS_OTHER_PREFIX`).
+		 * 3. Emits an `update:values` event with the updated list of values:
+		 *    - If `isUnique` is true, the emitted values will only include the prefixed "Other" answer.
+		 *    - If `isUnique` is false, the emitted values will include all existing values
+		 *      (excluding any that start with the "Other" prefix) and the new prefixed "Other" answer.
+		 */
+		onOtherAnswerTextChange(value) {
+			this.cachedOtherAnswerText = value
+			// Prefix the value
+			const prefixedValue = `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${value}`
+			// emit the values and add the "other" answer
+			this.$emit(
+				'update:values',
+				this.isUnique
+					? [prefixedValue]
+					: [
+							...this.values.filter(
+								(v) =>
+									!v.startsWith(
+										QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+									),
+							),
+							prefixedValue,
+						],
+			)
 		},
 	},
 }
