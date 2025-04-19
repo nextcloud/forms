@@ -32,6 +32,8 @@ use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\ActivityManager;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Db\Answer;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Option;
@@ -85,6 +87,9 @@ class FormsServiceTest extends TestCase {
 	/** @var SubmissionMapper|MockObject */
 	private $submissionMapper;
 
+	/** @var AnswerMapper|MockObject */
+	private $answerMapper;
+
 	/** @var ConfigService|MockObject */
 	private $configService;
 
@@ -114,6 +119,7 @@ class FormsServiceTest extends TestCase {
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
+		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
 
 		$this->groupManager = $this->createMock(IGroupManager::class);
@@ -147,6 +153,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -243,17 +250,13 @@ class FormsServiceTest extends TestCase {
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
-				'permissions' => Constants::PERMISSION_ALL
+				'permissions' => Constants::PERMISSION_ALL,
+				'allowEdit' => false,
 			]]
 		];
 	}
 
-	/**
-	 * @dataProvider dataGetForm
-	 *
-	 * @param array $expected
-	 */
-	public function testGetForm(array $expected) {
+	private function prepareFormTest(bool $withUserMock) {
 		// The form
 		$form = new Form();
 		$form->setId(42);
@@ -275,13 +278,15 @@ class FormsServiceTest extends TestCase {
 
 		// User & Group Formatting
 		$user = $this->createMock(IUser::class);
-		$user->expects($this->once())
-			->method('getDisplayName')
-			->willReturn('Some User');
-		$this->userManager->expects($this->once())
-			->method('get')
-			->with('someUser')
-			->willReturn($user);
+		if ($withUserMock) {
+			$user->expects($this->once())
+				->method('getDisplayName')
+				->willReturn('Some User');
+			$this->userManager->expects($this->once())
+				->method('get')
+				->with('someUser')
+				->willReturn($user);
+		}
 
 		// Questions
 		$question1 = new Question();
@@ -331,10 +336,178 @@ class FormsServiceTest extends TestCase {
 		$share->setShareWith('someUser');
 		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
 
+		$answerEntity = new Answer();
+		$answerEntity->setId(1);
+		$answerEntity->setSubmissionId(12);
+		$answerEntity->setFileId(112);
+		$answerEntity->setQuestionId(1);
+		$answerEntity->setText('Option 1');
+		$answer2Entity = new Answer();
+		$answer2Entity->setId(2);
+		$answer2Entity->setSubmissionId(12);
+		$answer2Entity->setQuestionId(2);
+		$answer2Entity->setText('London');
+		$answers = [ $answerEntity, $answer2Entity ];
+
+		return [$form, $user, $share, $answers];
+	}
+
+	/**
+	 * @dataProvider dataGetForm
+	 *
+	 * @param array $expected
+	 */
+	public function testGetForm(array $expected) {
+		[$form, $user, $share, $answers] = $this->prepareFormTest(true);
+
 		$this->shareMapper->expects($this->any())
 			->method('findByForm')
 			->with(42)
 			->willReturn([$share]);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(42)
+			->willReturn(123);
+
+		// Run the test
+		$this->assertEquals($expected, $this->formsService->getForm($form));
+	}
+
+	public function dataGetFormWithAnswers() {
+		return [
+			// Just the full form with answers for AllowEdit
+			'one-full-form-with-answers' => [[
+				'id' => 42,
+				'state' => 0,
+				'hash' => 'abcdefg',
+				'title' => 'Form 1',
+				'description' => 'Description Text',
+				'ownerId' => 'currentUser',
+				'created' => 123456789,
+				'access' => [
+					'permitAllUsers' => false,
+					'showToAllUsers' => false,
+				],
+				'expires' => 0,
+				'isAnonymous' => false,
+				'submitMultiple' => false,
+				'showExpiration' => false,
+				'lastUpdated' => 123456789,
+				'canSubmit' => true,
+				'submissionCount' => 123,
+				'questions' => [
+					[
+						'id' => 1,
+						'formId' => 42,
+						'order' => 1,
+						'type' => 'dropdown',
+						'isRequired' => false,
+						'extraSettings' => ['shuffleOptions' => true],
+						'text' => 'Question 1',
+						'description' => 'This is our first question.',
+						'name' => '',
+						'options' => [
+							[
+								'id' => 1,
+								'questionId' => 1,
+								'text' => 'Option 1',
+								'order' => null,
+							],
+							[
+								'id' => 2,
+								'questionId' => 1,
+								'text' => 'Option 2',
+								'order' => null,
+							]
+						],
+						'accept' => [],
+					],
+					[
+						'id' => 2,
+						'formId' => 42,
+						'order' => 2,
+						'type' => 'short',
+						'isRequired' => true,
+						'extraSettings' => [],
+						'text' => 'Question 2',
+						'description' => '',
+						'name' => 'city',
+						'options' => [],
+						'accept' => [],
+					]
+				],
+				'shares' => [
+				],
+				'answers' => [
+					1 => [ 0 => '1' ],
+					2 => [ 0 => 'London' ],
+				],
+				'submissionMessage' => null,
+				'fileId' => null,
+				'fileFormat' => null,
+				'permissions' => Constants::PERMISSION_ALL,
+				'allowEdit' => true,
+				'newSubmission' => false,
+				'submissionId' => 12,
+			]]
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetFormWithAnswers
+	 *
+	 * @param array $expected
+	 */
+	public function testGetFormAllowEditWithAnswers(array $expected) {
+		[$form, $user, $share, $answers] = $this->prepareFormTest(false);
+
+		// The form, with AllowEdit
+		$form->setSubmitMultiple(false);
+		$form->setAllowEdit(true);
+
+		$submission = new Submission();
+		$submission->setId(12);
+
+		$this->submissionMapper->expects($this->once())
+			->method('findByFormAndUser')
+			->with(42, 'currentUser')
+			->willReturn($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('findBySubmission')
+			->with(12)
+			->willReturn($answers);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(42)
+			->willReturn(123);
+
+		// Run the test
+		$this->assertEquals($expected, $this->formsService->getForm($form));
+	}
+
+	/**
+	 * @dataProvider dataGetFormWithAnswers
+	 *
+	 * @param array $expected
+	 */
+	public function testGetFormAllowEditWithoutSubmission(array $expected) {
+		// drop the submissions and answers for this test
+		unset($expected['answers']);
+		unset($expected['newSubmission']);
+		unset($expected['submissionId']);
+		[$form, $user, $share, $answers] = $this->prepareFormTest(false);
+
+		// The form, with AllowEdit
+		$form->setSubmitMultiple(false);
+		$form->setAllowEdit(true);
+
+		$this->submissionMapper->expects($this->once())
+			->method('findByFormAndUser')
+			->with(42, 'currentUser')
+			->willThrowException(new DoesNotExistException('Test exception'));
 
 		$this->submissionMapper->expects($this->once())
 			->method('countSubmissions')
@@ -456,6 +629,7 @@ class FormsServiceTest extends TestCase {
 					'submit'
 				],
 				'submissionMessage' => null,
+				'allowEdit' => false,
 			]]
 		];
 	}
@@ -622,6 +796,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -710,7 +885,14 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'sharesArray' => [],
+				'formArchived' => false,
 				'expected' => true
+			],
+			'disallowArchivedForm' => [
+				'ownerId' => 'currentUser',
+				'sharesArray' => [],
+				'formArchived' => true,
+				'expected' => false
 			],
 			'allowShared' => [
 				'ownerId' => 'someUser',
@@ -719,11 +901,13 @@ class FormsServiceTest extends TestCase {
 					'type' => 0,
 					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS, Constants::PERMISSION_RESULTS_DELETE],
 				]],
+				'formArchived' => false,
 				'expected' => true
 			],
 			'disallowNotowned' => [
 				'ownerId' => 'someUser',
 				'sharesArray' => [],
+				'formArchived' => false,
 				'expected' => false
 			],
 			'allowNotShared' => [
@@ -733,6 +917,7 @@ class FormsServiceTest extends TestCase {
 					'type' => 0,
 					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS],
 				]],
+				'formArchived' => false,
 				'expected' => false
 			]
 		];
@@ -742,9 +927,10 @@ class FormsServiceTest extends TestCase {
 	 *
 	 * @param string $ownerId
 	 * @param array $sharesArray
+	 * @param bool $formArchived
 	 * @param bool $expected
 	 */
-	public function testCanDeleteResults(string $ownerId, array $sharesArray, bool $expected) {
+	public function testCanDeleteResults(string $ownerId, array $sharesArray, bool $formArchived, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setOwnerId($ownerId);
@@ -752,6 +938,7 @@ class FormsServiceTest extends TestCase {
 			'permitAllUsers' => false,
 			'showToAllUsers' => false,
 		]);
+		$form->setState($formArchived?Constants::FORM_STATE_ARCHIVED:Constants::FORM_STATE_ACTIVE);
 
 		$shares = [];
 		foreach ($sharesArray as $id => $share) {
@@ -777,27 +964,45 @@ class FormsServiceTest extends TestCase {
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => true
 			],
 			'submitMultipleGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => false,
 				'expected' => true
 			],
 			'submitMultipleNotGood' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => false,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => false
 			],
 			'submitMultiple' => [
 				'ownerId' => 'someUser',
 				'submitMultiple' => true,
+				'allowEdit' => false,
 				'hasFormSubmissionsByUser' => true,
 				'expected' => true
-			]
+			],
+			'allowEditGood' => [
+				'ownerId' => 'someUser',
+				'submitMultiple' => false,
+				'allowEdit' => true,
+				'hasFormSubmissionsByUser' => true,
+				'expected' => true
+			],
+			'allowEditNotGood' => [
+				'ownerId' => 'someUser',
+				'submitMultiple' => false,
+				'allowEdit' => false,
+				'hasFormSubmissionsByUser' => true,
+				'expected' => false
+			],
 		];
 	}
 	/**
@@ -808,7 +1013,7 @@ class FormsServiceTest extends TestCase {
 	 * @param bool $hasFormSubmissionsByUser
 	 * @param bool $expected
 	 */
-	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $hasFormSubmissionsByUser, bool $expected) {
+	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $allowEdit, bool $hasFormSubmissionsByUser, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
 		$form->setAccess([
@@ -817,6 +1022,7 @@ class FormsServiceTest extends TestCase {
 		]);
 		$form->setOwnerId($ownerId);
 		$form->setSubmitMultiple($submitMultiple);
+		$form->setAllowEdit($allowEdit);
 
 		$this->submissionMapper->expects($this->any())
 			->method('hasFormSubmissionsByUser')
@@ -861,6 +1067,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -972,6 +1179,7 @@ class FormsServiceTest extends TestCase {
 			$this->questionMapper,
 			$this->shareMapper,
 			$this->submissionMapper,
+			$this->answerMapper,
 			$this->configService,
 			$this->groupManager,
 			$this->userManager,
@@ -1203,6 +1411,7 @@ class FormsServiceTest extends TestCase {
 				$this->questionMapper,
 				$this->shareMapper,
 				$this->submissionMapper,
+				$this->answerMapper,
 				$this->configService,
 				$this->groupManager,
 				$this->userManager,

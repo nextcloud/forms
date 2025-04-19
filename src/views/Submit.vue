@@ -694,15 +694,31 @@ export default {
 			this.loading = true
 
 			try {
-				await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-						id: this.form.id,
-					}),
-					{
-						answers: this.answers,
-						shareHash: this.shareHash,
-					},
-				)
+				if (this.submissionId) {
+					await axios.put(
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
+							{
+								id: this.form.id,
+								submissionId: this.submissionId,
+							},
+						),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						},
+					)
+				} else {
+					await axios.post(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
+							id: this.form.id,
+						}),
+						{
+							answers: this.answers,
+							shareHash: this.shareHash,
+						},
+					)
+				}
 				this.submitForm = true
 				this.success = true
 				this.deleteFormFieldFromLocalStorage()

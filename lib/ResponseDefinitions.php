@@ -114,6 +114,7 @@ namespace OCA\Forms;
  *   isAnonymous: bool,
  *   lastUpdated: int,
  *   submitMultiple: bool,
+ *   allowEdit: bool,
  *   showExpiration: bool,
  *   canSubmit: bool,
  *   permissions: list<FormsPermission>,
@@ -122,6 +123,9 @@ namespace OCA\Forms;
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,
+ *   answers?: array<string,mixed>,
+ *   newSubmission?: bool,
+ *   submissionId?: int,
  * }
  *
  * @psalm-type FormsUploadedFile = array{
