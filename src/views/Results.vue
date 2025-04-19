@@ -201,12 +201,79 @@
 
 			<!-- Responses view for individual responses -->
 			<section v-else>
+				<div class="pagination-block" :class="{ 'large-width': isMobile }">
+					<div class="pagination-items">
+						<NcButton
+							type="tertiary"
+							:disabled="totalPages === 1 || pageNumber <= 1"
+							:aria-label="t('tables', 'Go to first page')"
+							@click="pageNumber = 1">
+							<template #icon>
+								<PageFirstIcon :size="20" />
+							</template>
+						</NcButton>
+						<NcButton
+							type="tertiary"
+							:disabled="totalPages === 1 || pageNumber <= 1"
+							:aria-label="t('tables', 'Go to previous page')"
+							@click="pageNumber--">
+							<template #icon>
+								<IconChevronLeft :size="20" />
+							</template>
+						</NcButton>
+						<div class="page-number">
+							<NcSelect
+								v-model="pageNumber"
+								:options="allPageNumbersArray"
+								:aria-label-combobox="t('tables', 'Page number')">
+								<template #selected-option-container="{ option }">
+									<span class="selected-page">
+										{{ option.label }} of {{ totalPages }}
+									</span>
+								</template>
+							</NcSelect>
+						</div>
+						<NcButton
+							type="tertiary"
+							:disabled="totalPages === 1 || pageNumber >= totalPages"
+							:aria-label="t('tables', 'Go to next page')"
+							@click="pageNumber++">
+							<template #icon>
+								<IconChevronRight :size="20" />
+							</template>
+						</NcButton>
+						<NcButton
+							type="tertiary"
+							:disabled="totalPages === 1 || pageNumber >= totalPages"
+							:aria-label="t('tables', 'Go to last page')"
+							@click="pageNumber = totalPages">
+							<template #icon>
+								<PageLastIcon :size="20" />
+							</template>
+						</NcButton>
+
+						<div>
+							<NcTextField
+								v-model="submissionSearch"
+								:label="t('forms', 'Search')"
+								trailing-button-icon="close"
+								:show-trailing-button="submissionSearch.length > 0"
+								@trailing-button-click="submissionSearch = ''">
+								<template #icon>
+									<IconMagnify :size="20" />
+								</template>
+							</NcTextField>
+						</div>
+					</div>
+				</div>
+
 				<Submission
-					v-for="submission in submissions"
+					v-for="submission in currentPageSubmissions"
 					:key="submission.id"
 					:submission="submission"
 					:questions="questions"
 					:can-delete-submission="canDeleteSubmissions"
+					:highlight="submissionSearch"
 					@delete="deleteSubmission(submission.id)" />
 			</section>
 		</template>
@@ -239,6 +306,7 @@ import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import axios from '@nextcloud/axios'
@@ -263,6 +331,11 @@ import IconRefresh from 'vue-material-design-icons/Refresh.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 import IconTable from 'vue-material-design-icons/Table.vue'
 import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
+import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
+import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
+import IconChevronRight from 'vue-material-design-icons/ChevronRight.vue'
+import IconMagnify from 'vue-material-design-icons/Magnify.vue'
 
 import { FormState } from '../models/FormStates.ts'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
@@ -316,6 +389,12 @@ export default {
 		NcAppContent,
 		NcButton,
 		NcDialog,
+		NcTextField,
+		NcSelect,
+		PageLastIcon,
+		PageFirstIcon,
+		IconChevronRight,
+		IconMagnify,
 		NcEmptyContent,
 		NcLoadingIcon,
 		PillMenu,
@@ -347,6 +426,10 @@ export default {
 
 			picker: null,
 			showConfirmDeleteDialog: false,
+
+			submissionSearch: '',
+			pageNumber: 1,
+			rowsPerPage: 50,
 
 			linkedFileNotAvailableButtons: [
 				{
@@ -427,6 +510,34 @@ export default {
 				return false
 			}
 			return this.canEditForm && this.form.fileId && !this.form.filePath
+		},
+
+		allPageNumbersArray() {
+			return Array.from(
+				{ length: this.totalPages },
+				(value, index) => 1 + index,
+			)
+		},
+		currentPageSubmissions() {
+			return this.getFilteredSubmissions.slice(
+				(this.pageNumber - 1) * this.rowsPerPage,
+				(this.pageNumber - 1) * this.rowsPerPage + this.rowsPerPage,
+			)
+		},
+		totalPages() {
+			return Math.ceil(this.getFilteredSubmissions.length / this.rowsPerPage)
+		},
+		getFilteredSubmissions() {
+			if (!this.submissionSearch) {
+				return this.submissions
+			}
+
+			const submissionFilter = (submission) =>
+				submission.answers.filter((answer) =>
+					answer.text.includes(this.submissionSearch),
+				).length > 0
+
+			return this.submissions.filter(submissionFilter)
 		},
 	},
 
@@ -835,5 +946,52 @@ export default {
 			margin-inline-end: 1em;
 		}
 	}
+}
+
+:deep(.vs__clear) {
+	display: none;
+}
+
+:deep(.v-select) {
+	min-width: 95px !important;
+	.vs__dropdown-toggle {
+		background: none;
+	}
+}
+
+.selected-page {
+	padding-left: 5px;
+
+	display: inline-flex;
+	align-items: center;
+}
+
+.page-number {
+	padding-inline: 5px;
+}
+
+.large-width {
+	width: 100vw !important;
+	left: 0 !important;
+}
+
+.pagination-items {
+	background-color: var(--color-main-background);
+	border-radius: var(--border-radius-large);
+	pointer-events: all;
+
+	display: flex;
+	align-items: center;
+}
+
+.pagination-block {
+	box-shadow: var(--box-shadow);
+	filter: drop-shadow(0 1px 6px var(--color-box-shadow));
+	width: 100%;
+	pointer-events: none;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 </style>
