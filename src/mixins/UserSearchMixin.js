@@ -64,7 +64,6 @@ export default {
 			this.query = query.trim()
 			if (this.isValidQuery) {
 				// already set loading to have proper ux feedback during debounce
-				this.loading = true
 				await this.debounceGetSuggestions(query)
 			}
 		},
@@ -84,8 +83,6 @@ export default {
 		 * @param {string} query the search query
 		 */
 		async getSuggestions(query) {
-			this.loading = true
-
 			// Search for all used share-types, except public link.
 			const shareType = this.SHARE_TYPES_USED.filter(
 				(type) => type !== this.SHARE_TYPES.SHARE_TYPE_LINK,
@@ -115,8 +112,6 @@ export default {
 				this.suggestions = exactSuggestions.concat(suggestions)
 			} catch (error) {
 				logger.error('Loading Suggestions failed.', { error })
-			} finally {
-				this.loading = false
 			}
 		},
 

@@ -5,34 +5,38 @@
 
 <template>
 	<div>
-		<NcSelect
+		<NcSelectUsers
 			:clear-search-on-select="false"
-			:close-on-select="false"
+			keep-open
 			:loading="showLoadingCircle"
 			:get-option-key="(option) => option.key"
 			:options="options"
 			:placeholder="t('forms', 'Search for user, group or team …')"
-			user-select
 			:filter-by="() => true"
 			label="displayName"
 			:aria-label-combobox="t('forms', 'Search for user, group or team …')"
-			@search="asyncSearch"
+			@search="
+				(search, loading) => {
+					loading(true)
+					asyncSearch(search).then(() => loading(false))
+				}
+			"
 			@input="addShare">
 			<template #no-options>
 				{{ noResultText }}
 			</template>
-		</NcSelect>
+		</NcSelectUsers>
 	</div>
 </template>
 
 <script>
-import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 
 import UserSearchMixin from '../../mixins/UserSearchMixin.js'
 
 export default {
 	components: {
-		NcSelect,
+		NcSelectUsers,
 	},
 
 	mixins: [UserSearchMixin],
