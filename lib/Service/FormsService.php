@@ -632,6 +632,9 @@ class FormsService {
 			case Constants::ANSWER_TYPE_DATE:
 				$allowed = Constants::EXTRA_SETTINGS_DATE;
 				break;
+			case Constants::ANSWER_TYPE_LINEARSCALE:
+				$allowed = Constants::EXTRA_SETTINGS_LINEARSCALE;
+				break;
 			default:
 				$allowed = [];
 		}
@@ -707,6 +710,14 @@ class FormsService {
 				if (@preg_match($extraSettings['validationRegex'], 'some string') === false) {
 					return false;
 				}
+			}
+
+			// Special handling of linear scale validation
+		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
+			// Ensure limits are sane
+			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1) ||
+				isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
+				return false;
 			}
 		}
 		return true;
