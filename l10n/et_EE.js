@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Vormid",
+    "Your form {formTitle} was answered by {user}" : "{user} vastas sinu „{formTitle}“ andmevormile",
     "No" : "Ei",
     "Yes" : "Ja",
     "Question" : "Küsimus",
@@ -25,7 +26,7 @@ OC.L10N.register(
     "Earliest date" : "Varaseim kuupäev",
     "Latest date" : "Hiliseim kuupäev",
     "Delete" : "Kustuta",
-    "Uploading …" : "Üleslaadmine ...",
+    "Uploading …" : "Üleslaadmisel...",
     "Add new file as answer" : "Lisa vastusena uus fail",
     "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Sa pead valima maksimaalselt ühe valiku","Sa pead valima maksimaalselt %n valikut"],
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Sa pead valima vähemalt ühe valiku","Sa pead valima vähemalt %n valikut"],
