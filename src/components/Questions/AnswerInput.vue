@@ -212,6 +212,10 @@ export default {
 					this.$emit('create-answer', this.index, newAnswer)
 				} else {
 					await this.updateAnswer(answer)
+
+					// Forward changes, but use current answer.text to avoid erasing
+					// any in-between changes while updating the answer
+					answer.text = this.$refs.input.value
 					this.$emit('update:answer', this.index, answer)
 				}
 			}
