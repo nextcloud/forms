@@ -26,6 +26,7 @@ OC.L10N.register(
     "File" : "File",
     "Date" : "Sana",
     "Pick a date" : "Sana tanlang",
+    "Time" : "Vaqt",
     "Pick a time" : "Vaqtni tanlang",
     "Email address" : "E-pochta manzili"
 },
