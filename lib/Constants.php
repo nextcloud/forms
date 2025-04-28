@@ -75,6 +75,7 @@ class Constants {
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_TIME = 'time';
 	public const ANSWER_TYPE_FILE = 'file';
+	public const ANSWER_TYPE_LINEARSCALE = 'linearscale';
 
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
@@ -87,13 +88,15 @@ class Constants {
 		self::ANSWER_TYPE_DATETIME,
 		self::ANSWER_TYPE_TIME,
 		self::ANSWER_TYPE_FILE,
+		self::ANSWER_TYPE_LINEARSCALE,
 	];
 
 	// AnswerTypes, that need/have predefined Options
 	public const ANSWER_TYPES_PREDEFINED = [
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
-		self::ANSWER_TYPE_DROPDOWN
+		self::ANSWER_TYPE_DROPDOWN,
+		self::ANSWER_TYPE_LINEARSCALE,
 	];
 
 	// AnswerTypes for date/time questions
@@ -159,6 +162,13 @@ class Constants {
 		'x-office/document',
 		'x-office/presentation',
 		'x-office/spreadsheet',
+	];
+
+	public const EXTRA_SETTINGS_LINEARSCALE = [
+		'optionsLowest' => ['integer', 'NULL'],
+		'optionsHighest' => ['integer', 'NULL'],
+		'optionsLabelLowest' => ['string', 'NULL'],
+		'optionsLabelHighest' => ['string', 'NULL'],
 	];
 
 	public const FILENAME_INVALID_CHARS = [

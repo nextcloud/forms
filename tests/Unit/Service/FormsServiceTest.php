@@ -1411,7 +1411,36 @@ class FormsServiceTest extends TestCase {
 				],
 				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
-			]
+			],
+			'valid-linearscale-settings' => [
+				'extraSettings' => [
+					'optionsLowest' => 0,
+					'optionsHighest' => 5,
+					'optionsLabelLowest' => 'disagree',
+					'optionsLabelHighest' => 'agree'
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'invalid-linearscale-settings' => [
+				'extraSettings' => [
+					'optionsLowest' => 1,
+					'optionsHighest' => 10,
+					'optionsLabelLowest' => 'disagree',
+					'optionsLabelHighest' => 'agree',
+					'someInvalidOption' => true
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'outofrange-linearscale-settings' => [
+				'extraSettings' => [
+					'optionsLowest' => 3,
+					'optionsHighest' => 11,
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
 		];
 	}
 

@@ -365,7 +365,7 @@ class SubmissionService {
 				continue;
 			}
 
-			// Check number of answers
+			// Check number of answers for multiple answers
 			$answersCount = count($answers[$questionId]);
 			if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE) {
 				$minOptions = $question['extraSettings']['optionsLimitMin'] ?? -1;
@@ -399,8 +399,16 @@ class SubmissionService {
 			// Check if all answers are within the possible options
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 				foreach ($answers[$questionId] as $answer) {
+					// Handle linear scale questions
+					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
+						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
+						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
+						if (!ctype_digit($answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
+							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
+						}
+					}
 					// Search corresponding option, return false if non-existent
-					if (!in_array($answer, array_column($question['options'], 'id'))) {
+					elseif (!in_array($answer, array_column($question['options'], 'id'))) {
 						throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
 					}
 				}
@@ -411,6 +419,7 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
 			}
 
+			// Handle file questions
 			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				$maxAllowedFilesCount = $question['extraSettings']['maxAllowedFilesCount'] ?? 0;
 				if ($maxAllowedFilesCount > 0 && count($answers[$questionId]) > $maxAllowedFilesCount) {

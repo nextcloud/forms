@@ -28,8 +28,12 @@ namespace OCA\Forms;
  *   dateRange?: bool,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
+ *   optionsHighest?: 2|3|4|5|6|7|8|9|10,
+ *   optionsLabelHighest?: string,
+ *   optionsLabelLowest?: string,
  *   optionsLimitMax?: int,
  *   optionsLimitMin?: int,
+ *   optionsLowest?: 0|1,
  *   shuffleOptions?: bool,
  *   validationRegex?: string,
  *   validationType?: string

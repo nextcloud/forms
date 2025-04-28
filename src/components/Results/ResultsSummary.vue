@@ -9,7 +9,7 @@
 			{{ question.text }}
 		</h3>
 		<p class="question-summary__detail">
-			{{ answerTypes[question.type].label }}
+			{{ questionTypeLabel }}
 		</p>
 
 		<!-- Answers with countable results for visualization -->
@@ -86,14 +86,62 @@ export default {
 	},
 
 	computed: {
+		questionTypeLabel() {
+			const label = this.answerTypes[this.question.type].label
+			const labelLowest =
+				this.question.extraSettings?.optionsLabelLowest
+				?? t('forms', 'Strongly disagree')
+			const labelHighest =
+				this.question.extraSettings?.optionsLabelHighest
+				?? t('forms', 'Strongly agree')
+			const optionsLowest =
+				this.question.extraSettings?.optionsLowest?.toString() ?? '1'
+			const optionsHighest =
+				this.question.extraSettings?.optionsHighest?.toString() ?? '5'
+
+			if (labelLowest === '' && labelHighest === '') {
+				return label
+			}
+
+			const descriptionParts = []
+			if (labelLowest !== '') {
+				descriptionParts.push(`${optionsLowest}: ${labelLowest}`)
+			}
+			if (labelHighest !== '') {
+				descriptionParts.push(`${optionsHighest}: ${labelHighest}`)
+			}
+
+			const description = ` (${descriptionParts.join(', ')})`
+			return label + description
+		},
+
 		// For countable questions like multiple choice and checkboxes
 		questionOptions() {
 			// Build list of question options
-			const questionOptionsStats = this.question.options.map((option) => ({
-				...option,
-				count: 0,
-				percentage: 0,
-			}))
+			let questionOptionsStats
+			if (this.question.type !== 'linearscale') {
+				questionOptionsStats = this.question.options.map((option) => ({
+					...option,
+					count: 0,
+					percentage: 0,
+				}))
+			} else {
+				questionOptionsStats = Array.from(
+					{
+						length:
+							(this.question.extraSettings?.optionsHighest ?? 5)
+							- (this.question.extraSettings?.optionsLowest ?? 1)
+							+ 1,
+					},
+					(_, i) => ({
+						text: (
+							i + (this.question.extraSettings?.optionsLowest ?? 1)
+						).toString(),
+						count: 0,
+						percentage: 0,
+					}),
+				)
+			}
 
 			// Also record 'Other'
 			if (this.question.extraSettings?.allowOtherAnswer) {
@@ -144,18 +192,25 @@ export default {
 			})
 
 			// Sort options by response count
-			questionOptionsStats.sort((object1, object2) => {
-				return object2.count - object1.count
-			})
+			if (this.question.type !== 'linearscale') {
+				questionOptionsStats.sort((object1, object2) => {
+					return object2.count - object1.count
+				})
+			} else {
+				// for linear scale questions move the "No response" element to the end
+				questionOptionsStats.push(questionOptionsStats.shift())
+			}
 
 			questionOptionsStats.forEach((questionOptionsStat) => {
 				// Fill percentage values
 				questionOptionsStat.percentage = Math.round(
 					(100 * questionOptionsStat.count) / this.submissions.length,
 				)
-				// Mark all best results. First one is best for sure due to sorting
-				questionOptionsStat.best =
-					questionOptionsStat.count === questionOptionsStats[0].count
+				// Mark all best results
+				const maxCount = Math.max(
+					...questionOptionsStats.map((option) => option.count),
+				)
+				questionOptionsStat.best = questionOptionsStat.count === maxCount
 			})
 
 			return questionOptionsStats

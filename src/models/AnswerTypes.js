@@ -6,18 +6,20 @@
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
 import QuestionFile from '../components/Questions/QuestionFile.vue'
+import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 
-import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
-import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
 import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
-import IconTextShort from 'vue-material-design-icons/TextShort.vue'
-import IconTextLong from 'vue-material-design-icons/TextLong.vue'
-import IconFile from 'vue-material-design-icons/File.vue'
 import IconCalendar from 'vue-material-design-icons/Calendar.vue'
+import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
 import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
+import IconFile from 'vue-material-design-icons/File.vue'
+import IconLinearScale from '../components/Icons/IconLinearScale.vue'
+import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
+import IconTextLong from 'vue-material-design-icons/TextLong.vue'
+import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 
 /**
  * @typedef {object} AnswerTypes
@@ -29,6 +31,7 @@ import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
  * @property {string} date Date Answer
  * @property {string} datetime Date and Time Answer
  * @property {string} time Time Answer
+ * @property {string} linearscale Linear Scale Answer
  */
 export default {
 	/**
@@ -182,5 +185,15 @@ export default {
 		pickerType: 'time',
 		storageFormat: 'HH:mm',
 		momentFormat: 'LT',
+	},
+
+	linearscale: {
+		component: QuestionLinearScale,
+		icon: IconLinearScale,
+		label: t('forms', 'Linear scale'),
+		predefined: true,
+
+		titlePlaceholder: t('forms', 'Linear scale question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 }
