@@ -88,31 +88,31 @@ export default {
 	computed: {
 		questionTypeLabel() {
 			const label = this.answerTypes[this.question.type].label
-			const labelLowest =
-				this.question.extraSettings?.optionsLabelLowest
-				?? t('forms', 'Strongly disagree')
-			const labelHighest =
-				this.question.extraSettings?.optionsLabelHighest
-				?? t('forms', 'Strongly agree')
-			const optionsLowest =
-				this.question.extraSettings?.optionsLowest?.toString() ?? '1'
-			const optionsHighest =
-				this.question.extraSettings?.optionsHighest?.toString() ?? '5'
 
-			if (labelLowest === '' && labelHighest === '') {
-				return label
+			if (this.question.type === 'linearscale') {
+				const labelLowest =
+					this.question.extraSettings?.optionsLabelLowest
+					?? t('forms', 'Strongly disagree')
+				const labelHighest =
+					this.question.extraSettings?.optionsLabelHighest
+					?? t('forms', 'Strongly agree')
+				const optionsLowest =
+					this.question.extraSettings?.optionsLowest?.toString() ?? '1'
+				const optionsHighest =
+					this.question.extraSettings?.optionsHighest?.toString() ?? '5'
+
+				const descriptionParts = []
+				if (labelLowest !== '') {
+					descriptionParts.push(`${optionsLowest}: ${labelLowest}`)
+				}
+				if (labelHighest !== '') {
+					descriptionParts.push(`${optionsHighest}: ${labelHighest}`)
+				}
+				const description = ` (${descriptionParts.join(', ')})`
+				return label + description
 			}
 
-			const descriptionParts = []
-			if (labelLowest !== '') {
-				descriptionParts.push(`${optionsLowest}: ${labelLowest}`)
-			}
-			if (labelHighest !== '') {
-				descriptionParts.push(`${optionsHighest}: ${labelHighest}`)
-			}
-
-			const description = ` (${descriptionParts.join(', ')})`
-			return label + description
+			return label
 		},
 
 		// For countable questions like multiple choice and checkboxes
