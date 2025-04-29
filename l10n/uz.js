@@ -23,11 +23,13 @@ OC.L10N.register(
     "Download" : "Download",
     "Sharing" : "Ulashish",
     "Settings" : "Settings",
+    "Checkboxes" : "Belgilash katakchalari",
     "File" : "File",
     "Date" : "Sana",
     "Pick a date" : "Sana tanlang",
     "Time" : "Vaqt",
     "Pick a time" : "Vaqtni tanlang",
+    "Text" : "Matn",
     "Email address" : "E-pochta manzili"
 },
 "nplurals=1; plural=0;");
