@@ -174,7 +174,7 @@ export default {
 		// As data instead of method, to have a separate debounce per AnswerInput
 		this.debounceOnInput = debounce((event) => {
 			return this.queue.add(() => this.onInput(event))
-		}, 500)
+		}, 400)
 	},
 
 	methods: {

@@ -82,7 +82,7 @@ export default defineComponent({
 		 * Debounced function to save options order
 		 */
 		onOptionsReordered() {
-			return debounce(this.saveOptionsOrder, 750)
+			return debounce(this.saveOptionsOrder, 400)
 		},
 	},
 

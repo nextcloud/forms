@@ -76,7 +76,7 @@ export default {
 		 */
 		debounceGetSuggestions: debounce(function (...args) {
 			this.getSuggestions(...args)
-		}, 300),
+		}, 400),
 
 		/**
 		 * Get suggestions

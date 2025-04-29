@@ -214,7 +214,7 @@ export default {
 		onTitleChange: debounce(function (text) {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
-		}, 200),
+		}, 400),
 
 		/**
 		 * Forward the description change to the parent and store to db
@@ -224,7 +224,7 @@ export default {
 		onDescriptionChange: debounce(function (description) {
 			this.$emit('update:description', description)
 			this.saveQuestionProperty('description', description)
-		}, 200),
+		}, 400),
 
 		/**
 		 * Forward the required change to the parent and store to db
@@ -234,7 +234,7 @@ export default {
 		onRequiredChange: debounce(function (isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
 			this.saveQuestionProperty('isRequired', isRequiredValue)
-		}, 200),
+		}, 400),
 
 		/**
 		 * Create mapper to forward the required change to the parent and store to db
@@ -247,7 +247,7 @@ export default {
 			const newExtraSettings = { ...this.extraSettings, ...newSettings }
 			this.$emit('update:extraSettings', newExtraSettings)
 			this.saveQuestionProperty('extraSettings', newExtraSettings)
-		}, 200),
+		}, 400),
 
 		/**
 		 * Forward the technical-name change to the parent and store to db
@@ -257,7 +257,7 @@ export default {
 		onNameChange: debounce(function (name) {
 			this.$emit('update:name', name)
 			this.saveQuestionProperty('name', name)
-		}, 200),
+		}, 400),
 
 		/**
 		 * Forward the required change to the parent and store to db

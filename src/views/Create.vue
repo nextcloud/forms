@@ -367,10 +367,10 @@ export default {
 		 */
 		saveTitle: debounce(async function () {
 			this.saveFormProperty('title')
-		}, 200),
+		}, 400),
 		saveDescription: debounce(async function () {
 			this.saveFormProperty('description')
-		}, 200),
+		}, 400),
 
 		/**
 		 * Add a new question to the current form
