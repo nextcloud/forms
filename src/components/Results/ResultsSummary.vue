@@ -234,7 +234,10 @@ export default {
 				}
 
 				// Add text answers
-				if (this.question.type === 'date' && answers.length === 2) {
+				if (
+					['date', 'time'].includes(this.question.type)
+					&& answers.length === 2
+				) {
 					// Combine the first two answers in order for date range questions
 					answersModels.push({
 						id: `${answers[0].id}-${answers[1].id}`,

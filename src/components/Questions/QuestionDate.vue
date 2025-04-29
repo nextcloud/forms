@@ -46,6 +46,41 @@
 				</template>
 			</NcActionInput>
 		</template>
+		<template v-else-if="answerType.pickerType === 'time'" #actions>
+			<NcActionCheckbox
+				:model-value="timeRange"
+				@update:model-value="onTimeRangeChange">
+				{{ t('forms', 'Use time range') }}
+			</NcActionCheckbox>
+			<NcActionInput
+				type="time"
+				is-native-picker
+				:model-value="timeMin"
+				:label="t('forms', 'Earliest time')"
+				hide-label
+				:max="timeMax"
+				@update:model-value="onTimeMinChange">
+				<template #icon>
+					<NcIconSvgWrapper
+						:svg="svgClockLoader20"
+						:name="t('forms', 'Earliest time')" />
+				</template>
+			</NcActionInput>
+			<NcActionInput
+				type="time"
+				is-native-picker
+				:model-value="timeMax"
+				:label="t('forms', 'Latest time')"
+				hide-label
+				:min="timeMin"
+				@update:model-value="onTimeMaxChange">
+				<template #icon>
+					<NcIconSvgWrapper
+						:svg="svgClockLoader80"
+						:name="t('forms', 'Latest time')" />
+				</template>
+			</NcActionInput>
+		</template>
 		<div class="question__content">
 			<NcDateTimePicker
 				:value="time"
@@ -53,10 +88,10 @@
 				:formatter="formatter"
 				:placeholder="datetimePickerPlaceholder"
 				:show-second="false"
-				:type="answerType.pickerType"
+				:type="dateTimePickerType"
 				:disabled-date="disabledDates"
+				:disabled-time="disabledTimes"
 				:input-attr="inputAttr"
-				:range="extraSettings?.dateRange"
 				range-separator=" - "
 				@change="onValueChange" />
 		</div>
@@ -64,6 +99,8 @@
 </template>
 
 <script>
+import svgClockLoader20 from '../../../img/clock_loader_20.svg?raw'
+import svgClockLoader80 from '../../../img/clock_loader_80.svg?raw'
 import svgEventIcon from '../../../img/event.svg?raw'
 import svgTodayIcon from '../../../img/today.svg?raw'
 
@@ -96,6 +133,8 @@ export default {
 				stringify: this.stringifyDate,
 				parse: this.parseTimestampToDate,
 			},
+			svgClockLoader80,
+			svgClockLoader20,
 			svgEventIcon,
 			svgTodayIcon,
 		}
@@ -104,13 +143,19 @@ export default {
 	computed: {
 		datetimePickerPlaceholder() {
 			if (this.readOnly) {
-				return this.extraSettings?.dateRange
+				return this.extraSettings?.dateRange || this.extraSettings?.timeRange
 					? this.answerType.submitPlaceholderRange
 					: this.answerType.submitPlaceholder
 			}
-			return this.extraSettings?.dateRange
+			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
 				? this.answerType.createPlaceholderRange
 				: this.answerType.createPlaceholder
+		},
+
+		dateTimePickerType() {
+			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
+				? this.answerType.pickerType + '-range'
+				: this.answerType.pickerType
 		},
 
 		/**
@@ -126,7 +171,7 @@ export default {
 		},
 
 		time() {
-			if (this.extraSettings?.dateRange) {
+			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
 				return this.values
 					? [this.parse(this.values[0]), this.parse(this.values[1])]
 					: null
@@ -154,6 +199,34 @@ export default {
 
 		dateRange() {
 			return this.extraSettings?.dateRange ?? false
+		},
+
+		/**
+		 * The maximum allowable time for the time input field
+		 */
+		timeMax() {
+			return this.extraSettings?.timeMax
+				? moment(
+						this.extraSettings.timeMax,
+						this.answerType.storageFormat,
+					).toDate()
+				: new Date(new Date().setHours(24, 0, 0, 0))
+		},
+
+		/**
+		 * The minimum allowable time for the time input field
+		 */
+		timeMin() {
+			return this.extraSettings?.timeMin
+				? moment(
+						this.extraSettings.timeMin,
+						this.answerType.storageFormat,
+					).toDate()
+				: new Date(new Date().setHours(0, 0, 0, 0))
+		},
+
+		timeRange() {
+			return this.extraSettings?.timeRange ?? false
 		},
 	},
 
@@ -217,12 +290,55 @@ export default {
 		},
 
 		/**
+		 * Handles the change event for the maximum time input.
+		 * Updates the maximum allowable date based on the provided value.
+		 *
+		 * @param {string | Date} value - The new maximum date value. Can be a string or a Date object.
+		 */
+		onTimeMaxChange(value) {
+			this.onExtraSettingsChange({
+				timeMax:
+					value === null
+					|| value === new Date(new Date().setHours(24, 0, 0, 0))
+						? null
+						: moment(value).format(this.answerType.storageFormat),
+			})
+		},
+
+		/**
+		 * Handles the change event for the minimum date input.
+		 * Updates the minimum allowable date based on the provided value.
+		 *
+		 * @param {string | Date} value - The new minimum date value. Can be a string or a Date object.
+		 */
+		onTimeMinChange(value) {
+			this.onExtraSettingsChange({
+				timeMin:
+					value === null
+					|| value === new Date(new Date().setHours(0, 0, 0, 0))
+						? null
+						: moment(value).format(this.answerType.storageFormat),
+			})
+		},
+
+		/**
+		 * Handles the change event for the date range selection.
+		 * Updates the extra settings with the new date range value.
+		 *
+		 * @param {boolean} value - The new value of the date range selection.
+		 *                          If true, the date range is enabled; otherwise, null.
+		 */
+		onTimeRangeChange(value) {
+			this.onExtraSettingsChange({ timeRange: value === true ?? null })
+		},
+
+		/**
 		 * Store Value
 		 *
 		 * @param {Date|Array<Date>} date The date or date range to store
 		 */
 		onValueChange(date) {
-			if (this.extraSettings?.dateRange) {
+			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
 				this.$emit('update:values', [
 					moment(date[0]).format(this.answerType.storageFormat),
 					moment(date[1]).format(this.answerType.storageFormat),
@@ -244,6 +360,19 @@ export default {
 			return (
 				(this.dateMin && date < this.dateMin)
 				|| (this.dateMax && date > this.dateMax)
+			)
+		},
+
+		/**
+		 * Determines if a given time should be disabled.
+		 *
+		 * @param {Date} time - The time to check.
+		 * @return {boolean} - Returns true if the time should be disabled, otherwise false.
+		 */
+		disabledTimes(time) {
+			return (
+				(this.timeMin && time < this.timeMin)
+				|| (this.timeMax && time > this.timeMax)
 			)
 		},
 
