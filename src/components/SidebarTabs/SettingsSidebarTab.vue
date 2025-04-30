@@ -138,7 +138,7 @@ import TransferOwnership from './TransferOwnership.vue'
 
 import { directive as ClickOutside } from 'v-click-outside'
 import { loadState } from '@nextcloud/initial-state'
-import { FormState } from '../../models/FormStates.ts'
+import { FormState } from '../../models/Constants.ts'
 
 export default {
 	components: {

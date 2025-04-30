@@ -165,7 +165,7 @@ import OcsResponse2Data from './utils/OcsResponse2Data.js'
 import PermissionTypes from './mixins/PermissionTypes.js'
 import Sidebar from './views/Sidebar.vue'
 import logger from './utils/Logger.js'
-import { FormState } from './models/FormStates.ts'
+import { FormState } from './models/Constants.ts'
 
 export default {
 	name: 'Forms',

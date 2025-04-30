@@ -123,7 +123,7 @@ import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 
 import FormsIcon from './Icons/FormsIcon.vue'
 
-import { FormState } from '../models/FormStates.ts'
+import { FormState } from '../models/Constants.ts'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import logger from '../utils/Logger.js'
 

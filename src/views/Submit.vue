@@ -208,7 +208,7 @@ import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
 
-import { FormState } from '../models/FormStates.ts'
+import { FormState } from '../models/Constants.ts'
 import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
 

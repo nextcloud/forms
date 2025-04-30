@@ -194,11 +194,10 @@ import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import AnswerInput from './AnswerInput.vue'
+import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../../models/Constants.ts'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
-
-const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
 
 export default {
 	name: 'QuestionMultiple',

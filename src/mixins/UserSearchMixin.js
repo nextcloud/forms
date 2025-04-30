@@ -7,6 +7,7 @@ import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
+import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import logger from '../utils/Logger.js'
 import ShareTypes from './ShareTypes.js'
@@ -76,7 +77,7 @@ export default {
 		 */
 		debounceGetSuggestions: debounce(function (...args) {
 			this.getSuggestions(...args)
-		}, 300),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Get suggestions
