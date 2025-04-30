@@ -1172,10 +1172,24 @@ class ApiController extends OCSController {
 			$submissions = $this->submissionService->getSubmissions($formId, $userId, $query, $limit, $offset);
 			$filteredSubmissionsCount = $this->submissionMapper->countSubmissions($formId, $userId, $query);
 		}
-		$questions = $this->formsService->getQuestions($formId);
+		$questions = [];
+		foreach ($this->formsService->getQuestions($formId) as $question) {
+			$questions[$question['id']] = $question;
+		}
+
 
 		// Append Display Names
-		$submissions = array_map(function (array $submission) {
+		$submissions = array_map(function (array $submission) use ($questions) {
+			if (!empty($submission['answers'])) {
+				$submission['answers'] = array_map(function (array $answer) use ($questions) {
+					$name = $questions[$answer['questionId']]['name'];
+					if ($name) {
+						$answer['questionName'] = $name;
+					}
+					return $answer;
+				}, $submission['answers']);
+			}
+
 			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
 				// Anonymous User
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
@@ -1202,7 +1216,7 @@ class ApiController extends OCSController {
 
 		$response = [
 			'submissions' => $submissions,
-			'questions' => $questions,
+			'questions' => array_values($questions),
 			'filteredSubmissionsCount' => $filteredSubmissionsCount,
 		];
 

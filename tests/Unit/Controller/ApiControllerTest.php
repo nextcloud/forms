@@ -223,7 +223,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'anon-user-1']
 				],
-				'questions' => [['name' => 'questions']],
+				'questions' => [['id' => 1, 'name' => 'questions']],
 				'expected' => [
 					'submissions' => [
 						[
@@ -233,6 +233,7 @@ class ApiControllerTest extends TestCase {
 					],
 					'questions' => [
 						[
+							'id' => 1,
 							'name' => 'questions',
 							'extraSettings' => new \stdClass(),
 						],
@@ -244,7 +245,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'jdoe']
 				],
-				'questions' => [['name' => 'questions']],
+				'questions' => [['id' => 1, 'name' => 'questions']],
 				'expected' => [
 					'submissions' => [
 						[
@@ -254,6 +255,7 @@ class ApiControllerTest extends TestCase {
 					],
 					'questions' => [
 						[
+							'id' => 1,
 							'name' => 'questions',
 							'extraSettings' => new \stdClass(),
 						],

@@ -1117,6 +1117,7 @@ class ApiV3Test extends IntegrationBase {
 									// 'questionId' => Checked dynamically
 									'text' => 'Option 1',
 									'fileId' => null,
+									'questionName' => 'city',
 								]
 							]
 						],
@@ -1137,6 +1138,7 @@ class ApiV3Test extends IntegrationBase {
 									// 'questionId' => Checked dynamically
 									'text' => 'Option 2',
 									'fileId' => null,
+									'questionName' => 'city'
 								]
 							]
 						],
@@ -1384,10 +1386,12 @@ CSV
 					'questionId' => $this->testForms[0]['questions'][1]['id'],
 					'text' => 'Option 1',
 					'fileId' => null,
+					'questionName' => 'city',
 				],
 				[
 					'questionId' => $this->testForms[0]['questions'][2]['id'],
 					'text' => 'test.txt',
+					'questionName' => 'file',
 				],
 			]
 		], $data['submissions'][0]);

@@ -164,19 +164,21 @@ A submission-object describes a single submission by a user to a form.
 
 The actual answers of users on submission.
 
-| Property     | Type    | Restrictions  | Description                                     |
-| ------------ | ------- | ------------- | ----------------------------------------------- |
-| id           | Integer | unique        | An instance-wide unique id of the submission    |
-| submissionId | Integer |               | The id of the submission, the answer belongs to |
-| questionId   | Integer |               | The id of the question, the answer belongs to   |
-| text         | String  | max. 4096 ch. | The actual answer text, the user submitted      |
+| Property     | Type    | Restrictions  | Description                                          |
+| ------------ | ------- | ------------- | ---------------------------------------------------- |
+| id           | Integer | unique        | An instance-wide unique id of the submission         |
+| submissionId | Integer |               | The id of the submission, the answer belongs to      |
+| questionId   | Integer |               | The id of the question, the answer belongs to        |
+| questionName | String  |               | The technical name that was assigned to the question |
+| text         | String  | max. 4096 ch. | The actual answer text, the user submitted           |
 
-```
+```json
 {
-  "id": 5,
-  "submissionId": 5,
-  "questionId": 1,
-  "text": "Option 2"
+	"id": 5,
+	"submissionId": 5,
+	"questionId": 1,
+	"questionName": "preference",
+	"text": "Option 2"
 }
 ```
 
