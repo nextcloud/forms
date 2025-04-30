@@ -11,6 +11,7 @@ import { translate as t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import { defineComponent } from 'vue'
 
+import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import logger from '../utils/Logger'
@@ -82,7 +83,7 @@ export default defineComponent({
 		 * Debounced function to save options order
 		 */
 		onOptionsReordered() {
-			return debounce(this.saveOptionsOrder, 400)
+			return debounce(this.saveOptionsOrder, INPUT_DEBOUNCE_MS)
 		},
 	},
 

@@ -163,6 +163,16 @@ import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import { formatFileSize } from '@nextcloud/files'
 
+/**
+ * A constant object representing file size units in bytes.
+ *
+ * @example
+ * ```typescript
+ * const kilobytes = FILE_SIZE_UNITS.kb; // 1024
+ * const megabytes = FILE_SIZE_UNITS.mb; // 1048576
+ * const gigabytes = FILE_SIZE_UNITS.gb; // 1073741824
+ * ```
+ */
 const FILE_SIZE_UNITS = {
 	kb: 1024,
 	mb: 1024 ** 2,

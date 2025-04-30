@@ -85,6 +85,7 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcButton from '@nextcloud/vue/components/NcButton'
 
+import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
 
@@ -174,7 +175,7 @@ export default {
 		// As data instead of method, to have a separate debounce per AnswerInput
 		this.debounceOnInput = debounce((event) => {
 			return this.queue.add(() => this.onInput(event))
-		}, 400)
+		}, INPUT_DEBOUNCE_MS)
 	},
 
 	methods: {

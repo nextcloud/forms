@@ -264,7 +264,7 @@ import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
 import IconTable from 'vue-material-design-icons/Table.vue'
 import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
 
-import { FormState } from '../models/FormStates.ts'
+import { FormState } from '../models/Constants.ts'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'

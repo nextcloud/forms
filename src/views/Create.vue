@@ -170,7 +170,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconLock from 'vue-material-design-icons/Lock.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
-import { FormState } from '../models/FormStates.ts'
+import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import answerTypes from '../models/AnswerTypes.js'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
@@ -367,10 +367,10 @@ export default {
 		 */
 		saveTitle: debounce(async function () {
 			this.saveFormProperty('title')
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 		saveDescription: debounce(async function () {
 			this.saveFormProperty('description')
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Add a new question to the current form

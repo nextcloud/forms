@@ -8,6 +8,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 
+import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import Question from '../components/Questions/Question.vue'
@@ -214,7 +215,7 @@ export default {
 		onTitleChange: debounce(function (text) {
 			this.$emit('update:text', text)
 			this.saveQuestionProperty('text', text)
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Forward the description change to the parent and store to db
@@ -224,7 +225,7 @@ export default {
 		onDescriptionChange: debounce(function (description) {
 			this.$emit('update:description', description)
 			this.saveQuestionProperty('description', description)
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Forward the required change to the parent and store to db
@@ -234,7 +235,7 @@ export default {
 		onRequiredChange: debounce(function (isRequiredValue) {
 			this.$emit('update:isRequired', isRequiredValue)
 			this.saveQuestionProperty('isRequired', isRequiredValue)
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Create mapper to forward the required change to the parent and store to db
@@ -247,7 +248,7 @@ export default {
 			const newExtraSettings = { ...this.extraSettings, ...newSettings }
 			this.$emit('update:extraSettings', newExtraSettings)
 			this.saveQuestionProperty('extraSettings', newExtraSettings)
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Forward the technical-name change to the parent and store to db
@@ -257,7 +258,7 @@ export default {
 		onNameChange: debounce(function (name) {
 			this.$emit('update:name', name)
 			this.saveQuestionProperty('name', name)
-		}, 400),
+		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Forward the required change to the parent and store to db
