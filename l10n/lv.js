@@ -36,6 +36,7 @@ OC.L10N.register(
     "Share" : "Koplietot",
     "Description" : "Apraksts",
     "Summary" : "Kopsavilkums",
+    "Linked file is not available, would you like to link a new file?" : "Sasaistītā datne nav pieejama. Sasaistīt jaunu datni?",
     "Download" : "Lejupielādēt",
     "Results of submitted forms will show up here" : "Šeit tiks parādīts iesniegto veidlapu apkopojums",
     "Sharing" : "Koplietošana",
