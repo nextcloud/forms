@@ -3,15 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { generateOcsUrl } from '@nextcloud/router'
+import axios, { isCancel } from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
-import axios, { isCancel } from '@nextcloud/axios'
+import { generateOcsUrl } from '@nextcloud/router'
 import MarkdownIt from 'markdown-it'
+// Import various mdit-plugins
+import { align } from '@mdit/plugin-align'
+import { imgSize, obsidianImgSize } from "@mdit/plugin-img-size"
+import { mark } from '@mdit/plugin-mark'
+import { sub } from '@mdit/plugin-sub'
+import { sup } from '@mdit/plugin-sup'
 
 import CancelableRequest from '../utils/CancelableRequest.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import logger from '../utils/Logger.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 export default {
 	provide() {
@@ -48,7 +54,14 @@ export default {
 			cancelFetchFullForm: () => {},
 
 			// markdown renderer for descriptions
-			markdownit: new MarkdownIt({ breaks: true }),
+			markdownit: new MarkdownIt({ breaks: true })
+				// Add .use to support the mdit plugins
+				.use(align)
+				.use(imgSize)
+				.use(obsidianImgSize)
+				.use(mark)
+				.use(sub)
+				.use(sup)
 		}
 	},
 

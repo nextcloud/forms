@@ -54,6 +54,11 @@
   "devDependencies": {
     "@mdi/js": "^7.4.47",
     "@mdi/svg": "^7.4.47",
+    "@mdit/plugin-align": "^0.18.0",
+    "@mdit/plugin-img-size": "^0.18.0",
+    "@mdit/plugin-mark": "^0.18.0",
+    "@mdit/plugin-sub": "^0.18.0",
+    "@mdit/plugin-sup": "^0.18.0",
     "@nextcloud/browserslist-config": "^3.0.1",
     "@nextcloud/e2e-test-server": "^0.2.1",
     "@nextcloud/eslint-config": "^8.4.2",
