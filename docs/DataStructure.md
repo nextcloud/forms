@@ -13,26 +13,27 @@ This document describes the Object-Structure, that is used within the Forms App 
 
 ### Form
 
-| Property          | Type                                 | Restrictions                            | Description                                                                                                                      |
-| ----------------- | ------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| id                | Integer                              | unique                                  | An instance-wide unique id of the form                                                                                           |
-| hash              | 16-char String                       | unique                                  | An instance-wide unique hash                                                                                                     |
-| title             | String                               | max. 256 ch.                            | The form title                                                                                                                   |
-| description       | String                               | max. 8192 ch.                           | The Form description                                                                                                             |
-| ownerId           | String                               |                                         | The nextcloud userId of the form owner                                                                                           |
-| submissionMessage | String                               | max. 2048 ch.                           | Optional custom message, with Markdown support, to be shown to users when the form is submitted (default is used if set to null) |
-| created           | unix timestamp                       |                                         | When the form has been created                                                                                                   |
-| access            | [Access-Object](#access-object)      |                                         | Describing access-settings of the form                                                                                           |
-| expires           | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
-| isAnonymous       | Boolean                              |                                         | If Answers will be stored anonymously                                                                                            |
-| state             | Integer                              | [Form state](#form-state)               | The state of the form                                                                                                            |
-| submitMultiple    | Boolean                              |                                         | If users are allowed to submit multiple times to the form                                                                        |
-| showExpiration    | Boolean                              |                                         | If the expiration date will be shown on the form                                                                                 |
-| canSubmit         | Boolean                              |                                         | If the user can Submit to the form, i.e. calculated information out of `submitMultiple` and existing submissions.                |
-| permissions       | Array of [Permissions](#permissions) | Array of permissions regarding the form |
-| questions         | Array of [Questions](#question)      |                                         | Array of questions belonging to the form                                                                                         |
-| shares            | Array of [Shares](#share)            |                                         | Array of shares of the form                                                                                                      |
-| submissions       | Array of [Submissions](#submission)  |                                         | Array of submissions belonging to the form                                                                                       |
+| Property             | Type                                 | Restrictions                            | Description                                                                                                                      |
+| -------------------- | ------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| id                   | Integer                              | unique                                  | An instance-wide unique id of the form                                                                                           |
+| hash                 | 16-char String                       | unique                                  | An instance-wide unique hash                                                                                                     |
+| title                | String                               | max. 256 ch.                            | The form title                                                                                                                   |
+| description          | String                               | max. 8192 ch.                           | The Form description                                                                                                             |
+| ownerId              | String                               |                                         | The nextcloud userId of the form owner                                                                                           |
+| submissionMessage    | String                               | max. 2048 ch.                           | Optional custom message, with Markdown support, to be shown to users when the form is submitted (default is used if set to null) |
+| created              | unix timestamp                       |                                         | When the form has been created                                                                                                   |
+| access               | [Access-Object](#access-object)      |                                         | Describing access-settings of the form                                                                                           |
+| expires              | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
+| isAnonymous          | Boolean                              |                                         | If Answers will be stored anonymously                                                                                            |
+| state                | Integer                              | [Form state](#form-state)               | The state of the form                                                                                                            |
+| submitMultiple       | Boolean                              |                                         | If users are allowed to submit multiple times to the form                                                                        |
+| allowEditSubmissions | Boolean                              |                                         | If users are allowed to edit or delete their response                                                                            |
+| showExpiration       | Boolean                              |                                         | If the expiration date will be shown on the form                                                                                 |
+| canSubmit            | Boolean                              |                                         | If the user can Submit to the form, i.e. calculated information out of `submitMultiple` and existing submissions.                |
+| permissions          | Array of [Permissions](#permissions) | Array of permissions regarding the form |
+| questions            | Array of [Questions](#question)      |                                         | Array of questions belonging to the form                                                                                         |
+| shares               | Array of [Shares](#share)            |                                         | Array of shares of the form                                                                                                      |
+| submissions          | Array of [Submissions](#submission)  |                                         | Array of submissions belonging to the form                                                                                       |
 
 ```
 {
@@ -46,6 +47,7 @@ This document describes the Object-Structure, that is used within the Forms App 
   "expires": 0,
   "isAnonymous": false,
   "submitMultiple": true,
+  "allowEditSubmissions": false,
   "showExpiration": false,
   "canSubmit": true,
   "permissions": [

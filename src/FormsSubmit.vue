@@ -9,7 +9,8 @@
 			:form="form"
 			public-view
 			:share-hash="shareHash"
-			:is-logged-in="isLoggedIn" />
+			:is-logged-in="isLoggedIn"
+			:sidebar-opened="false" />
 	</NcContent>
 </template>
 

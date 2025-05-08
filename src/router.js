@@ -49,7 +49,7 @@ export default new Router({
 			props: { default: true },
 		},
 		{
-			path: '/:hash/submit',
+			path: '/:hash/submit/:submissionId?',
 			components: {
 				default: Submit,
 			},

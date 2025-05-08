@@ -243,7 +243,8 @@ class FormsServiceTest extends TestCase {
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
-				'permissions' => Constants::PERMISSION_ALL
+				'permissions' => Constants::PERMISSION_ALL,
+				'allowEditSubmissions' => false
 			]]
 		];
 	}
@@ -456,6 +457,7 @@ class FormsServiceTest extends TestCase {
 					'submit'
 				],
 				'submissionMessage' => null,
+				'allowEditSubmissions' => false,
 			]]
 		];
 	}

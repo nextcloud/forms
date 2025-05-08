@@ -62,6 +62,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsPartialForm from ResponseDefinitions
  * @psalm-import-type FormsQuestion from ResponseDefinitions
  * @psalm-import-type FormsQuestionType from ResponseDefinitions
+ * @psalm-import-type FormsSubmission from ResponseDefinitions
  * @psalm-import-type FormsSubmissions from ResponseDefinitions
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
  */
@@ -172,6 +173,7 @@ class ApiController extends OCSController {
 				'showToAllUsers' => false,
 			]);
 			$form->setSubmitMultiple(false);
+			$form->setAllowEditSubmissions(false);
 			$form->setShowExpiration(false);
 			$form->setExpires(0);
 			$form->setIsAnonymous(false);
@@ -1158,7 +1160,11 @@ class ApiController extends OCSController {
 		}
 
 		// Load submissions and currently active questions
-		$submissions = $this->submissionService->getSubmissions($formId);
+		if (in_array(Constants::PERMISSION_RESULTS, $this->formsService->getPermissions($form))) {
+			$submissions = $this->submissionService->getSubmissions($formId);
+		} else {
+			$submissions = $this->submissionService->getSubmissions($formId, $this->currentUser->getUID());
+		}
 		$questions = $this->formsService->getQuestions($formId);
 
 		// Append Display Names
@@ -1193,6 +1199,54 @@ class ApiController extends OCSController {
 		];
 
 		return new DataResponse($response);
+	}
+
+	/**
+	 * Get a specific submission
+	 *
+	 * @param int $formId of the form
+	 * @param int $submissionId of the submission
+	 * @return DataResponse<Http::STATUS_OK, FormsSubmission, array{}>
+	 * @throws OCSBadRequestException Submission doesn't belong to given form
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Submission doesn't exist
+	 * @throws OCSForbiddenException The current user has no permission to get this submission
+	 *
+	 * 200: the submissions of the form
+	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
+	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
+	public function getSubmission(int $formId, int $submissionId): DataResponse|DataDownloadResponse {
+		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+
+		$submission = $this->submissionService->getSubmission($submissionId);
+		if ($submission === null) {
+			throw new OCSNotFoundException('Submission doesn\'t exist');
+		}
+
+		if ($submission['formId'] !== $formId) {
+			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
+		}
+
+		// Append Display Names
+		if (substr($submission['userId'], 0, 10) === 'anon-user-') {
+			// Anonymous User
+			// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
+			$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
+		} else {
+			$userEntity = $this->userManager->get($submission['userId']);
+
+			if ($userEntity instanceof IUser) {
+				$submission['userDisplayName'] = $userEntity->getDisplayName();
+			} else {
+				// Fallback, should not occur regularly.
+				$submission['userDisplayName'] = $submission['userId'];
+			}
+		}
+
+		return new DataResponse($submission);
 	}
 
 	/**
@@ -1310,6 +1364,84 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * Update an existing submission
+	 *
+	 * @param int $formId the form id
+	 * @param int $submissionId the submission id
+	 * @param array<string, list<string>> $answers [question_id => arrayOfString]
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Can only update submission if allowEditSubmissions is set and the answers are valid
+	 * @throws OCSForbiddenException Can only update your own submission
+	 *
+	 * 200: the id of the updated submission
+	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[ApiRoute(verb: 'PUT', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
+	public function updateSubmission(int $formId, int $submissionId, array $answers): DataResponse {
+		$this->logger->debug('Updating submission: formId: {formId}, answers: {answers}', [
+			'formId' => $formId,
+			'answers' => $answers,
+		]);
+
+		// submissions can't be updated on public shares, so passing empty shareHash
+		$form = $this->loadFormForSubmission($formId, '');
+
+		if (!$form->getAllowEditSubmissions()) {
+			throw new OCSBadRequestException('Can only update if allowEditSubmissions is set');
+		}
+
+		$questions = $this->formsService->getQuestions($formId);
+		try {
+			// Is the submission valid
+			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+		} catch (\InvalidArgumentException $e) {
+			throw new OCSBadRequestException($e->getMessage());
+		}
+
+		// get existing submission of this user
+		try {
+			$submission = $this->submissionMapper->findById($submissionId);
+		} catch (DoesNotExistException $e) {
+			throw new OCSBadRequestException('Submission doesn\'t exist');
+		}
+
+		if ($formId !== $submission->getFormId()) {
+			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
+		}
+
+		if ($this->currentUser->getUID() !== $submission->getUserId()) {
+			throw new OCSForbiddenException('Can only update your own submissions');
+		}
+
+		$submission->setTimestamp(time());
+		$this->submissionMapper->update($submission);
+
+		// Delete current answers
+		$this->answerMapper->deleteBySubmission($submissionId);
+
+		// Process Answers
+		foreach ($answers as $questionId => $answerArray) {
+			// Search corresponding Question, skip processing if not found
+			$questionIndex = array_search($questionId, array_column($questions, 'id'));
+			if ($questionIndex === false) {
+				continue;
+			}
+
+			$question = $questions[$questionIndex];
+
+			$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray);
+		}
+
+		//Create Activity
+		$this->formsService->notifyNewSubmission($form, $submission);
+
+		return new DataResponse($submissionId);
+	}
+
+	/**
 	 * Delete a specific submission
 	 *
 	 * @param int $formId the form id
@@ -1341,6 +1473,13 @@ class ApiController extends OCSController {
 		if ($formId !== $submission->getFormId()) {
 			$this->logger->debug('Submission doesn\'t belong to given form');
 			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
+		}
+
+		if (
+			!in_array(Constants::PERMISSION_RESULTS_DELETE, $this->formsService->getPermissions($form))
+			&& $this->currentUser->getUID() !== $submission->getUserId()
+		) {
+			throw new OCSForbiddenException('Can only delete your own submissions');
 		}
 
 		// Delete submission (incl. Answers)

@@ -822,6 +822,43 @@ Upload a file to an answer before form submission
 "data": {"uploadedFileId": integer, "fileName": "string"}
 ```
 
+### Get a specific submission
+
+Get all Submissions to a Form
+
+- Endpoint: `/api/v3/forms/{formId}/submissions/{submissionId}`
+- Method: `GET`
+- Url-Parameters:
+  | Parameter | Type | Description |
+  |-----------|---------|-------------|
+  | _formId_ | Integer | ID of the form to get the submissions for |
+  | _submissionId_ | Integer | ID of the submission to get |
+- Response: The submission
+
+```
+"data": {
+  "id": 6,
+  "formId": 3,
+  "userId": "jonas",
+  "timestamp": 1611274453,
+  "answers": [
+    {
+      "id": 8,
+      "submissionId": 6,
+      "questionId": 1,
+      "text": "Option 3"
+    },
+    {
+      "id": 9,
+      "submissionId": 6,
+      "questionId": 2,
+      "text": "One more."
+    },
+  ],
+  "userDisplayName": "jonas"
+}
+```
+
 ### Insert a Submission
 
 Store Submission to Database

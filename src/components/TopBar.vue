@@ -87,6 +87,11 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+
+		submissionCount: {
+			type: Number,
+			default: 0,
+		},
 	},
 
 	setup() {
@@ -124,8 +129,9 @@ export default {
 			)
 		},
 		canSeeResults() {
-			return this.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+			return (
+				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
+				|| this.submissionCount > 0
 			)
 		},
 		canShare() {
@@ -136,6 +142,7 @@ export default {
 			return (
 				this.permissions.length === 1
 				&& this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+				&& this.submissionCount === 0
 			)
 		},
 	},

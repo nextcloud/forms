@@ -11,6 +11,7 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 
@@ -45,6 +46,7 @@ class PageController extends Controller {
 		IRequest $request,
 		private FormMapper $formMapper,
 		private ShareMapper $shareMapper,
+		private SubmissionMapper $submissionMapper,
 		private ConfigService $configService,
 		private FormsService $formsService,
 		private IAccountManager $accountManager,
@@ -63,7 +65,7 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[FrontpageRoute(verb: 'GET', url: '/')]
-	public function index(?string $hash = null): TemplateResponse {
+	public function index(?string $hash = null, ?int $submissionId = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-main');
 		Util::addStyle($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms-style');
@@ -81,6 +83,15 @@ class PageController extends Controller {
 			}
 		}
 
+		if (isset($submissionId)) {
+			try {
+				$submission = $this->submissionMapper->findById($submissionId);
+				$this->initialState->provideInitialState('submissionId', $submission->id);
+			} catch (DoesNotExistException $e) {
+				// Ignore exception and just don't set the initialState value
+			}
+		}
+
 		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
 			'id-app-content' => '#app-content-vue',
 			'id-app-navigation' => '#app-navigation-vue',
@@ -95,6 +106,16 @@ class PageController extends Controller {
 	#[FrontpageRoute(verb: 'GET', url: '/{hash}/{view}', requirements: ['hash' => '[a-zA-Z0-9]{16,}'])]
 	public function views(string $hash): TemplateResponse {
 		return $this->index($hash);
+	}
+
+	/**
+	 * @return TemplateResponse
+	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[FrontpageRoute(verb: 'GET', url: '/{hash}/submit/{submissionId}', requirements: ['hash' => '[a-zA-Z0-9]{16,}', 'submissionId' => '\d+'])]
+	public function submitViewWithSubmission(string $hash, int $submissionId): TemplateResponse {
+		return $this->formMapper->findByHash($hash)->getAllowEditSubmissions() ? $this->index($hash, $submissionId) : $this->index($hash);
 	}
 
 	/**
