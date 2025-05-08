@@ -177,6 +177,7 @@ OC.L10N.register(
     "There was an issue deleting this option" : "Selle valiku kustutamisel tekkis viga",
     "Cannot copy, please copy the link manually" : "Ei saa kopeerida, palun kopeeri link käsitsi",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
+    "No elements found." : "Elemente ei leidu.",
     "Checkboxes" : "Märkeruudud",
     "Enter your answer" : "Sisesta oma vastus",
     "Pick an option" : "Vali vastus",
