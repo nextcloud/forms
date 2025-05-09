@@ -10,7 +10,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import MarkdownIt from 'markdown-it'
 // Import various mdit-plugins
 import { align } from '@mdit/plugin-align'
-import { imgSize, obsidianImgSize } from "@mdit/plugin-img-size"
+import { imgSize } from "@mdit/plugin-img-size"
 import { mark } from '@mdit/plugin-mark'
 import { sub } from '@mdit/plugin-sub'
 import { sup } from '@mdit/plugin-sup'
@@ -58,10 +58,9 @@ export default {
 				// Add .use to support the mdit plugins
 				.use(align)
 				.use(imgSize)
-				.use(obsidianImgSize)
 				.use(mark)
 				.use(sub)
-				.use(sup)
+				.use(sup),
 		}
 	},
 
