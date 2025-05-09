@@ -29,6 +29,11 @@
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
+    "@mdit/plugin-align": "^0.18.0",
+    "@mdit/plugin-img-size": "^0.18.0",
+    "@mdit/plugin-mark": "^0.18.0",
+    "@mdit/plugin-sub": "^0.18.0",
+    "@mdit/plugin-sup": "^0.18.0",
     "@nextcloud/auth": "^2.4.0",
     "@nextcloud/axios": "^2.5.1",
     "@nextcloud/dialogs": "^6.2.0",
