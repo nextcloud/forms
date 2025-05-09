@@ -29,6 +29,11 @@
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
+    "@mdit/plugin-align": "^0.18.0",
+    "@mdit/plugin-img-size": "^0.18.0",
+    "@mdit/plugin-mark": "^0.18.0",
+    "@mdit/plugin-sub": "^0.18.0",
+    "@mdit/plugin-sup": "^0.18.0",
     "@nextcloud/auth": "^2.4.0",
     "@nextcloud/axios": "^2.5.1",
     "@nextcloud/dialogs": "^6.2.0",
@@ -43,11 +48,6 @@
     "crypto-js": "^4.2.0",
     "debounce": "^2.2.0",
     "markdown-it": "^14.1.0",
-    "@mdit/plugin-align": "^0.18.0",
-    "@mdit/plugin-img-size": "^0.18.0",
-    "@mdit/plugin-mark": "^0.18.0",
-    "@mdit/plugin-sub": "^0.18.0",
-    "@mdit/plugin-sup": "^0.18.0",
     "p-queue": "^8.0.1",
     "qrcode": "^1.5.4",
     "v-click-outside": "^3.2.0",
