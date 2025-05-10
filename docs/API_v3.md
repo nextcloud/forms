@@ -53,6 +53,8 @@ This file contains the API-Documentation. For more information on the returned D
     - `POST /api/v3/forms/{formId}/questions/{questionId}/options` does now accept more options at once
     - `PATCH /api/v3/forms/{formId}/questions/{questionId}/options/reorder` to reorder the options
     - `POST /api/v3/forms/{formId}/submissions/files/{questionId}` to upload a file to a file question before submitting the form
+    - `GET /api/v3/forms/{formId}/submissions/{submissionId}` to get a single submission
+    - `PUT /api/v3/forms/{formId}/submissions/{submissionId}` to update an existing submission
 - In API version 2.5 the following endpoints were introduced:
     - `POST /api/v2.5/uploadFiles/{formId}/{questionId}` to upload files to answer before form submitting
 - In API version 2.4 the following endpoints were introduced:
@@ -163,6 +165,7 @@ Returns the full-depth object of the requested form (without submissions).
   "filePath": "foo/bar",
   "isAnonymous": false,
   "submitMultiple": true,
+  "allowEditSubmissions": false,
   "showExpiration": false,
   "canSubmit": true,
   "state": 0,
@@ -225,7 +228,9 @@ Returns the full-depth object of the requested form (without submissions).
       "shareWith": "dYcTWjrSsxjMFFQzFAywzq5J",
       "displayName": ""
     }
-  ]
+  ],
+  "submissionCount": 0,
+  "submissionMessage": "",
 }
 ```
 

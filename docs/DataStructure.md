@@ -34,6 +34,8 @@ This document describes the Object-Structure, that is used within the Forms App 
 | questions            | Array of [Questions](#question)      |                                         | Array of questions belonging to the form                                                                                         |
 | shares               | Array of [Shares](#share)            |                                         | Array of shares of the form                                                                                                      |
 | submissions          | Array of [Submissions](#submission)  |                                         | Array of submissions belonging to the form                                                                                       |
+| submissionCount      | Integer                              |                                         | Number of submissions to the form                                                                                                |
+| submissionMessage    | String                               |                                         | Message to show after a submission                                                                                               |
 
 ```
 {
@@ -59,6 +61,8 @@ This document describes the Object-Structure, that is used within the Forms App 
   "state": 0,
   "shares": []
   "submissions": [],
+  "submissionCount": 0,
+  "submissionMessage": "string"
 }
 ```
 
