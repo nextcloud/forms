@@ -138,6 +138,7 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Tipos da entrada (atualmente: {type})",
     "Regular expression for input validation" : "Expressão regular para validação da entrada",
     "No response" : "Sem resposta",
+    "Edit this response" : "Editar esta resposta",
     "Delete this response" : "Excluir esta resposta",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Isto não poderá ser controlado se o formulário tiver um link público ou armazenar as respostas de forma anônima.",
     "Expired on {date}" : "Expira em {date}",
