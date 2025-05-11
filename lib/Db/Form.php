@@ -47,6 +47,10 @@ use OCP\AppFramework\Db\Entity;
  * @psalm-method 0|1|2 getState()
  * @method void setState(int|null $value)
  * @psalm-method void setState(0|1|2|null $value)
+ * @method string getLockedBy()
+ * @method void setLockedBy(string|null $value)
+ * @method int getLockedUntil()
+ * @method void setLockedUntil(int|null $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -65,6 +69,8 @@ class Form extends Entity {
 	protected $submissionMessage;
 	protected $lastUpdated;
 	protected $state;
+	protected $lockedBy;
+	protected $lockedUntil;
 
 	/**
 	 * Form constructor.
@@ -78,6 +84,8 @@ class Form extends Entity {
 		$this->addType('showExpiration', 'boolean');
 		$this->addType('lastUpdated', 'integer');
 		$this->addType('state', 'integer');
+		$this->addType('lockedBy', 'string');
+		$this->addType('lockedUntil', 'integer');
 	}
 
 	// JSON-Decoding of access-column.
@@ -149,6 +157,8 @@ class Form extends Entity {
 	 *   lastUpdated: int,
 	 *   submissionMessage: ?string,
 	 *   state: 0|1|2,
+	 *   lockedBy: ?string,
+	 *   lockedUntil: ?int,
 	 *  }
 	 */
 	public function read() {
@@ -170,6 +180,8 @@ class Form extends Entity {
 			'lastUpdated' => (int)$this->getLastUpdated(),
 			'submissionMessage' => $this->getSubmissionMessage(),
 			'state' => $this->getState(),
+			'lockedBy' => $this->getLockedBy(),
+			'lockedUntil' => $this->getLockedUntil(),
 		];
 	}
 }
