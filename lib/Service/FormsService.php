@@ -62,8 +62,8 @@ class FormsService {
 		private CirclesService $circlesService,
 		private IRootFolder $rootFolder,
 		private IL10N $l10n,
-		private IEventDispatcher $eventDispatcher,
 		private LoggerInterface $logger,
+		private IEventDispatcher $eventDispatcher,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -243,6 +243,8 @@ class FormsService {
 			'permissions' => $this->getPermissions($form),
 			'partial' => true,
 			'state' => $form->getState(),
+			'lockedBy' => $form->getLockedBy(),
+			'lockedUntil' => $form->getLockedUntil(),
 		];
 
 		// Append submissionCount if currentUser has permissions to see results
@@ -279,6 +281,75 @@ class FormsService {
 		unset($formData['fileFormat']);
 
 		return $formData;
+	}
+
+	/**
+	 * Helper that retrieves a form if the current user is allowed to edit it
+	 * This throws an exception in case either the form is not found or permissions are missing.
+	 * @param int $formId The form ID to retrieve
+	 * @throws NoSuchFormException If the form was not found or the current user has no permission to edit
+	 */
+	public function getFormIfAllowed(int $formId, string $permissions = 'all'): Form {
+		try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new NoSuchFormException('Could not find form');
+		}
+
+		switch ($permissions) {
+			case Constants::PERMISSION_SUBMIT:
+				if (!$this->hasUserAccess($form)) {
+					$this->logger->debug('User has no permissions to get this form');
+					throw new NoSuchFormException('User has no permissions to get this form', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			case Constants::PERMISSION_RESULTS:
+				if (!$this->canSeeResults($form)) {
+					$this->logger->debug('The current user has no permission to get the results for this form');
+					throw new NoSuchFormException('The current user has no permission to get the results for this form', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			case Constants::PERMISSION_RESULTS_DELETE:
+				if (!$this->canDeleteResults($form)) {
+					$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
+					throw new NoSuchFormException('This form is not owned by the current user and user has no `results_delete` permission', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			case Constants::PERMISSION_EDIT:
+				if (!$this->canEditForm($form)) {
+					$this->logger->debug('This form is not owned by the current user and user has no `edit` permission');
+					throw new NoSuchFormException('This form is not owned by the current user and user has no `edit` permission', Http::STATUS_FORBIDDEN);
+				}
+				break;
+			default:
+				// By default we request full permissions
+				if ($form->getOwnerId() !== $this->currentUser->getUID()) {
+					$this->logger->debug('This form is not owned by the current user');
+					throw new NoSuchFormException('This form is not owned by the current user', Http::STATUS_FORBIDDEN);
+				}
+				break;
+		}
+		return $form;
+	}
+
+	/**
+	 * Locks the given form for the current user for a duration of 15 minutes.
+	 *
+	 * @param Form $form The form instance to lock.
+	 */
+	public function obtainFormLock(Form $form): void {
+		// Only lock if not locked or locked by current user, or lock has expired
+		if (
+			$form->getLockedBy() !== null
+			&& $form->getLockedBy() !== $this->currentUser->getUID()
+			&& ($form->getLockedUntil() >= time() || $form->getLockedUntil() === 0)
+		) {
+			throw new OCSForbiddenException('Form is currently locked by another user.');
+		}
+
+		$form->setLockedBy($this->currentUser->getUID());
+		$form->setLockedUntil(time() + 15 * 60);
 	}
 
 	/**
