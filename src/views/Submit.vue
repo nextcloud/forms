@@ -10,6 +10,7 @@
 		<TopBar
 			v-if="!publicView"
 			:archived="isArchived"
+			:locked="isFormLocked"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			:submission-count="form?.submissionCount"

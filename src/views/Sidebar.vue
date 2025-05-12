@@ -16,6 +16,8 @@
 			</template>
 			<SharingSidebarTab
 				:form="form"
+				:locked="isFormLocked"
+				:locked-until="lockedUntilFormatted"
 				@update:formProp="onPropertyChange"
 				@add-share="onAddShare"
 				@remove-share="onRemoveShare"
@@ -29,13 +31,18 @@
 			<template #icon>
 				<IconSettings :size="20" />
 			</template>
-			<SettingsSidebarTab :form="form" @update:formProp="onPropertyChange" />
+			<SettingsSidebarTab
+				:form="form"
+				:locked="isFormLocked"
+				:locked-until="lockedUntilFormatted"
+				@update:formProp="onPropertyChange" />
 		</NcAppSidebarTab>
 	</NcAppSidebar>
 </template>
 
 <script>
 import { emit } from '@nextcloud/event-bus'
+import moment from '@nextcloud/moment'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import IconSettings from 'vue-material-design-icons/Cog.vue'
@@ -63,6 +70,15 @@ export default {
 		active: {
 			type: String,
 			default: 'forms-sharing',
+		},
+	},
+
+	computed: {
+		lockedUntilFormatted() {
+			if (this.form.lockedUntil === 0 || this.form.lockedUntil === null) {
+				return ''
+			}
+			return moment(this.form.lockedUntil, 'X').fromNow()
 		},
 	},
 
@@ -112,10 +128,6 @@ export default {
 <style lang="scss" scoped>
 .app-sidebar__tab:focus {
 	box-shadow: none;
-}
-
-.sidebar-tabs__content {
-	margin: 4px;
 }
 
 h3 {
