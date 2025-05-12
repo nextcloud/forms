@@ -11,6 +11,7 @@
 		<!-- Show results & sidebar button -->
 		<TopBar
 			:archived="isFormArchived"
+			:locked="isFormLocked"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			:submission-count="form?.submissionCount"
@@ -33,6 +34,29 @@
 				t('forms', 'Form \'{title}\' is archived and cannot be modified.', {
 					title: form.title,
 				})
+			">
+			<template #icon>
+				<IconLock :size="64" />
+			</template>
+		</NcEmptyContent>
+
+		<NcEmptyContent
+			v-else-if="isFormLocked"
+			class="emtpycontent"
+			:name="t('forms', 'Form is locked')"
+			:description="
+				t(
+					'forms',
+					'Form \'{title}\' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}',
+					{
+						title: form.title,
+						lockedBy: form.lockedBy,
+						lockedUntil:
+							form.lockedUntil === 0
+								? t('forms', 'never')
+								: lockedUntilFormatted,
+					},
+				)
 			">
 			<template #icon>
 				<IconLock :size="64" />
@@ -278,6 +302,10 @@ export default {
 			// Extract property datetime from answerTypes and copy rest to filteredAnswerTypes
 			const { datetime, ...filteredAnswerTypes } = answerTypes
 			return filteredAnswerTypes
+		},
+
+		lockedUntilFormatted() {
+			return moment(this.form.lockedUntil, 'X').fromNow()
 		},
 	},
 

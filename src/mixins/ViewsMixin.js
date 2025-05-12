@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { getCurrentUser } from '@nextcloud/auth'
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
@@ -12,6 +13,7 @@ import MarkdownIt from 'markdown-it'
 import CancelableRequest from '../utils/CancelableRequest.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import logger from '../utils/Logger.js'
+import moment from '@nextcloud/moment'
 
 export default {
 	provide() {
@@ -90,6 +92,14 @@ export default {
 			return (
 				this.markdownit.render(this.form.description)
 				|| this.form.description
+			)
+		},
+
+		isFormLocked() {
+			return (
+				this.form.lockedUntil === 0
+				|| (this.form.lockedUntil > moment().unix()
+					&& this.form.lockedBy !== getCurrentUser().uid)
 			)
 		},
 	},

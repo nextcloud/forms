@@ -18,22 +18,24 @@
 			<NcActionCaption :name="t('forms', 'Permissions')" />
 			<NcActionCheckbox
 				:model-value="canEditForm"
+				:disabled="locked"
 				@update:model-value="updatePermissionEdit">
 				{{ t('forms', 'Edit form') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
 				:model-value="canAccessResults"
+				:disabled="locked"
 				@update:model-value="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
 				:model-value="canDeleteResults"
-				:disabled="!canAccessResults"
+				:disabled="!canAccessResults || locked"
 				@update:model-value="updatePermissionDeleteResults">
 				{{ t('forms', 'Delete responses') }}
 			</NcActionCheckbox>
 			<NcActionSeparator />
-			<NcActionButton @click="removeShare">
+			<NcActionButton :disabled="locked" @click="removeShare">
 				<template #icon>
 					<IconClose :size="20" />
 				</template>
@@ -71,6 +73,11 @@ export default {
 	props: {
 		share: {
 			type: Object,
+			required: true,
+		},
+
+		locked: {
+			type: Boolean,
 			required: true,
 		},
 	},

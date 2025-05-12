@@ -10,6 +10,7 @@
 			alignment="start"
 			variant="tertiary"
 			wide
+			:disabled="locked"
 			@click="openModal">
 			<span class="transfer-button__text">{{
 				t('forms', 'Transfer ownership')
@@ -118,6 +119,11 @@ export default {
 	props: {
 		form: {
 			type: Object,
+			required: true,
+		},
+
+		locked: {
+			type: Boolean,
 			required: true,
 		},
 	},

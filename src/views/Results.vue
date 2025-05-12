@@ -20,6 +20,7 @@
 
 		<TopBar
 			:archived="isFormArchived"
+			:locked="isFormLocked"
 			:permissions="form?.permissions"
 			:sidebar-opened="sidebarOpened"
 			:submission-count="form?.submissionCount"
@@ -66,7 +67,7 @@
 						@close="isDownloadActionOpened = false">
 						<template v-if="!isDownloadActionOpened">
 							<NcActionButton
-								v-if="canEditForm && !form.fileId"
+								v-if="canEditForm && !form.fileId && !isFormLocked"
 								@click="onLinkFile">
 								<template #icon>
 									<IconLink :size="20" />
@@ -92,6 +93,7 @@
 								</NcActionButton>
 								<NcActionButton
 									close-after-click
+									:disabled="isFormLocked"
 									@click="onUnlinkFile">
 									<template #icon>
 										<IconLinkVariantOff :size="20" />
@@ -482,7 +484,12 @@ export default {
 			if (this.form.partial) {
 				return false
 			}
-			return this.canEditForm && this.form.fileId && !this.form.filePath
+			return (
+				this.canEditForm
+				&& this.form.fileId
+				&& !this.form.filePath
+				&& !this.isFormLocked
+			)
 		},
 	},
 

@@ -10,7 +10,7 @@
 			:key="option.id"
 			:aria-label="isMobile ? option.ariaLabel : null"
 			:checked="active.id"
-			:disabled="disabled"
+			:disabled="disabled || option.disabled"
 			class="pill-menu__toggle"
 			:class="{ 'pill-menu__toggle--icon-only': isMobile && option.icon }"
 			button-variant

@@ -53,6 +53,7 @@ const editView = {
 	icon: mdiPencil,
 	title: t('forms', 'Edit'),
 	id: 'edit',
+	disabled: false,
 }
 const resultsView = {
 	ariaLabel: t('forms', 'Show results'),
@@ -76,6 +77,11 @@ export default {
 		archived: {
 			type: Boolean,
 			default: false,
+		},
+
+		locked: {
+			type: Boolean,
+			required: true,
 		},
 
 		sidebarOpened: {
@@ -112,7 +118,10 @@ export default {
 				views.push(submitView)
 			}
 			if (this.canEdit) {
-				views.push(editView)
+				views.push({
+					...editView,
+					disabled: this.locked,
+				})
 			}
 			if (this.canSeeResults) {
 				views.push(resultsView)

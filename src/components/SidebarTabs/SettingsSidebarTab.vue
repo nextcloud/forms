@@ -5,9 +5,31 @@
 
 <template>
 	<div class="sidebar-tabs__content">
+		<NcNoteCard
+			v-if="locked"
+			type="info"
+			:heading="t('forms', 'Form is locked')"
+			:text="
+				t('forms', 'Lock by {lockedBy}, expires: {lockedUntil}', {
+					lockedBy: form.lockedBy ? form.lockedBy : form.ownerId,
+					lockedUntil:
+						lockedUntil === '' ? t('forms', 'never') : lockedUntil,
+				})
+			" />
+		<NcButton
+			v-if="locked && isCurrentUserOwner"
+			wide
+			@click="onFormLockChange(false)">
+			<template #icon>
+				<NcIconSvgWrapper
+					:svg="svgLockOpen"
+					:name="t('forms', 'Open lock')" />
+			</template>
+			{{ t('forms', 'Unlock form') }}
+		</NcButton>
 		<NcCheckboxRadioSwitch
 			:checked="form.isAnonymous"
-			:disabled="formArchived"
+			:disabled="formArchived || locked"
 			type="switch"
 			@update:checked="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
@@ -16,21 +38,21 @@
 		<NcCheckboxRadioSwitch
 			v-tooltip="disableSubmitMultipleExplanation"
 			:checked="submitMultiple"
-			:disabled="disableSubmitMultiple || formArchived"
+			:disabled="disableSubmitMultiple || formArchived || locked"
 			type="switch"
 			@update:checked="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:model-value="form.allowEditSubmissions"
-			:disabled="formArchived"
+			:disabled="formArchived || locked"
 			type="switch"
 			@update:model-value="onAllowEditSubmissionsChange">
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:checked="formExpires"
-			:disabled="formArchived"
+			:disabled="formArchived || locked"
 			type="switch"
 			@update:checked="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
@@ -39,6 +61,7 @@
 			<NcDateTimePicker
 				id="expiresDatetimePicker"
 				:clearable="false"
+				:disabled="locked"
 				:disabled-date="notBeforeToday"
 				:disabled-time="notBeforeNow"
 				:editable="false"
@@ -50,6 +73,7 @@
 				@change="onExpirationDateChange" />
 			<NcCheckboxRadioSwitch
 				:checked="form.showExpiration"
+				:disabled="locked"
 				type="switch"
 				@update:checked="onShowExpirationChange">
 				{{ t('forms', 'Show expiration date on form') }}
@@ -57,7 +81,7 @@
 		</div>
 		<NcCheckboxRadioSwitch
 			:checked="formClosed"
-			:disabled="formArchived"
+			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
 			type="switch"
 			@update:checked="onFormClosedChange">
@@ -67,8 +91,20 @@
 			{{ t('forms', 'Closed forms do not accept new submissions.') }}
 		</p>
 		<NcCheckboxRadioSwitch
+			:model-value="isFormLockedPermanently"
+			:disabled="
+				formArchived
+				|| (locked && form.lockedUntil !== 0)
+				|| !isCurrentUserOwner
+			"
+			type="switch"
+			@update:model-value="onFormLockChange">
+			{{ t('forms', 'Lock form permanently') }}
+		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch
 			:checked="formArchived"
 			aria-describedby="forms-settings__archive-form"
+			:disabled="locked"
 			type="switch"
 			@update:checked="onFormArchivedChange">
 			{{ t('forms', 'Archive form') }}
@@ -83,7 +119,7 @@
 		</p>
 		<NcCheckboxRadioSwitch
 			:checked="hasCustomSubmissionMessage"
-			:disabled="formArchived"
+			:disabled="formArchived || locked"
 			type="switch"
 			@update:checked="onUpdateHasCustomSubmissionMessage">
 			{{ t('forms', 'Custom submission message') }}
@@ -103,6 +139,7 @@
 				aria-describedby="forms-submission-message-description"
 				:aria-label="t('forms', 'Custom submission message')"
 				:value="form.submissionMessage"
+				:disabled="locked"
 				:maxlength="maxStringLengths.submissionMessage"
 				:placeholder="
 					t(
@@ -132,25 +169,33 @@
 			</div>
 		</div>
 
-		<TransferOwnership :form="form" />
+		<TransferOwnership :locked="locked" :form="form" />
 	</div>
 </template>
 
 <script>
+import { getCurrentUser } from '@nextcloud/auth'
 import moment from '@nextcloud/moment'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import ShareTypes from '../../mixins/ShareTypes.js'
 import TransferOwnership from './TransferOwnership.vue'
 
 import { directive as ClickOutside } from 'v-click-outside'
 import { loadState } from '@nextcloud/initial-state'
 import { FormState } from '../../models/Constants.ts'
+import svgLockOpen from '../../../img/lock_open.svg?raw'
 
 export default {
 	components: {
+		NcButton,
 		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
+		NcIconSvgWrapper,
+		NcNoteCard,
 		TransferOwnership,
 	},
 
@@ -167,6 +212,16 @@ export default {
 			type: Object,
 			required: true,
 		},
+
+		locked: {
+			type: Boolean,
+			required: true,
+		},
+
+		lockedUntil: {
+			type: String,
+			default: '',
+		},
 	},
 
 	data() {
@@ -178,10 +233,19 @@ export default {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
+			svgLockOpen,
 		}
 	},
 
 	computed: {
+		isCurrentUserOwner() {
+			return getCurrentUser().uid === this.form.ownerId
+		},
+
+		isFormLockedPermanently() {
+			return this.locked && this.form.lockedUntil === 0
+		},
+
 		/**
 		 * If the form has a custom submission message or the user wants to add one (settings switch)
 		 */
@@ -297,6 +361,10 @@ export default {
 			)
 		},
 
+		onFormLockChange(locked) {
+			this.$emit('update:formProp', 'lockedUntil', locked ? 0 : null)
+		},
+
 		onFormArchivedChange(isArchived) {
 			this.$emit(
 				'update:formProp',
@@ -386,7 +454,6 @@ export default {
 .sidebar-tabs__content {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
 }
 .submission-message {
 	&__description {
