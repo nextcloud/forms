@@ -14,7 +14,7 @@
 			{{ t('forms', 'Store responses anonymously') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			v-tooltip="disableSubmitMultipleExplanation"
+			:title="disableSubmitMultipleExplanation"
 			:checked="submitMultiple"
 			:disabled="disableSubmitMultiple || formArchived"
 			type="switch"
