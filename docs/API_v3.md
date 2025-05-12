@@ -658,6 +658,12 @@ Get all Submissions to a Form
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to get the submissions for |
+- Parameters:
+  | Parameter | Type | Description |
+  |------------------|----------|-------------|
+  | _query_ | String | Phrase for full text search |
+  | _limit_ | Integer | How many items to get |
+  | _offset_ | Integer | How many items to skip for a pagination |
 - Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions.
 
 ```
@@ -746,7 +752,8 @@ Get all Submissions to a Form
       "options": [],
       "extraSettings": {}
     }
-  ]
+  ],
+  "filteredSubmissionsCount": 40
 }
 ```
 

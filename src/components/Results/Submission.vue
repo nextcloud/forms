@@ -36,6 +36,7 @@
 		<Answer
 			v-for="question in answeredQuestions"
 			:key="question.id"
+			:highlight="highlight"
 			:answer-text="question.squashedAnswers"
 			:answers="question.answers"
 			:question-text="question.text" />
@@ -85,6 +86,10 @@ export default {
 		canEditSubmission: {
 			type: Boolean,
 			required: true,
+		},
+		highlight: {
+			type: String,
+			default: null,
 		},
 	},
 

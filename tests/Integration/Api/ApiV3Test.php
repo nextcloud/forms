@@ -1116,7 +1116,8 @@ class ApiV3Test extends IntegrationBase {
 							]
 						]
 					],
-					'questions' => $this->dataGetFullForm()['getFullForm']['expected']['questions']
+					'questions' => $this->dataGetFullForm()['getFullForm']['expected']['questions'],
+					'filteredSubmissionsCount' => 3,
 				]
 			]
 		];
@@ -1236,6 +1237,7 @@ CSV
 	public function dataDeleteSubmissions() {
 		$submissionsExpected = $this->dataGetSubmissions()['getSubmissions']['expected'];
 		$submissionsExpected['submissions'] = [];
+		$submissionsExpected['filteredSubmissionsCount'] = 0;
 
 		return [
 			'deleteSubmissions' => [
@@ -1368,6 +1370,7 @@ CSV
 	 * @param array $submissionsExpected
 	 */
 	public function testDeleteSingleSubmission(array $submissionsExpected) {
+		$submissionsExpected['filteredSubmissionsCount'] = $submissionsExpected['filteredSubmissionsCount'] - 1;
 		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 

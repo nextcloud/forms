@@ -245,6 +245,7 @@ class ApiControllerTest extends TestCase {
 							'extraSettings' => new \stdClass(),
 						],
 					],
+					'filteredSubmissionsCount' => 1,
 				]
 			],
 			'user' => [
@@ -265,6 +266,7 @@ class ApiControllerTest extends TestCase {
 							'extraSettings' => new \stdClass(),
 						],
 					],
+					'filteredSubmissionsCount' => 1,
 				]
 			]
 		];
@@ -297,6 +299,11 @@ class ApiControllerTest extends TestCase {
 			->method('getQuestions')
 			->with(1)
 			->willReturn($questions);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(1)
+			->willReturn(1);
 
 		$this->assertEquals(new DataResponse($expected), $this->apiController->getSubmissions(1));
 	}
@@ -357,7 +364,7 @@ class ApiControllerTest extends TestCase {
 			->with($form, 'csv')
 			->willReturn($fileName);
 
-		$this->assertEquals(new DataDownloadResponse($csv, $fileName, 'text/csv'), $this->apiController->getSubmissions(1, 'csv'));
+		$this->assertEquals(new DataDownloadResponse($csv, $fileName, 'text/csv'), $this->apiController->getSubmissions(1, fileFormat: 'csv'));
 	}
 
 	public function testExportSubmissionsToCloud_invalidForm() {

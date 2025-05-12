@@ -158,15 +158,15 @@ class SubmissionServiceTest extends TestCase {
 		$submission_2->setUserId('someOtherUser');
 		$submission_2->setTimestamp(1234);
 
-		$this->submissionMapper->expects($this->once())
+		$this->submissionMapper->expects($this->any())
 			->method('findByForm')
-			->with(5)
-			->willReturn([$submission_1, $submission_2]);
+			->willReturnCallback(function ($formId, $userId = null) use ($submission_1, $submission_2) {
+				if ($userId === 'someOtherUser') {
+					return [$submission_2];
+				}
 
-		$this->submissionMapper->expects($this->once())
-			->method('findByFormAndUser')
-			->with(5, 'someOtherUser')
-			->willReturn([$submission_2]);
+				return [$submission_1, $submission_2];
+			});
 
 		$this->answerMapper->expects($this->any())
 			->method('findBySubmission')

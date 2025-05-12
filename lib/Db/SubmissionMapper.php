@@ -29,42 +29,49 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	 * @param int $formId
-	 * @throws DoesNotExistException if not found
-	 * @return Submission[]
-	 */
-	public function findByForm(int $formId): array {
-		$qb = $this->db->getQueryBuilder();
-
-		$qb->select('*')
-			->from($this->getTableName())
-			->where(
-				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-			)
-			//Newest submissions first
-			->orderBy('timestamp', 'DESC');
-
-		return $this->findEntities($qb);
-	}
-
-	/**
-	 * @param int $formId
-	 * @param string $userId
+	 * Retrieves a list of submissions for a specific form.
 	 *
-	 * @return Submission[]
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @param int $formId The ID of the form whose submissions are being retrieved.
+	 * @param string|null $userId An optional user ID to filter the submissions.
+	 * @param string|null $query An optional search query to filter the submissions.
+	 * @param int|null $limit The maximum number of submissions to retrieve, default: all submissions
+	 * @param int $offset The number of submissions to skip before starting to retrieve, default: 0
+	 *
+	 * @return Submission[] An array of Submission objects.
+	 * @throws DoesNotExistException If no submissions are found for the given form ID.
+	 *
 	 */
-	public function findByFormAndUser(int $formId, string $userId): array {
+	public function findByForm(int $formId, ?string $userId = null, ?string $query = null, ?int $limit = null, int $offset = 0): array {
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select('*')
-			->from($this->getTableName())
-			->where(
-				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)),
-				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+		$filters = [
+			$qb->expr()->eq('submissions.form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)),
+		];
+		if ($userId) {
+			$filters[] = $qb->expr()->eq('submissions.user_id', $qb->createNamedParameter($userId));
+		}
+
+		// Select all columns from the submissions table
+		$qb->selectDistinct('submissions.*')
+			->from($this->getTableName(), 'submissions')
+			->where(...$filters)
+			// Newest submissions first
+			->orderBy('submissions.timestamp', 'DESC')
+			->setFirstResult($offset)
+			->setMaxResults($limit);
+
+		// If a query is provided, join the answers table and filter by the query text
+		if (!is_null($query) && $query !== '') {
+			$qb->join(
+				'submissions',
+				$this->answerMapper->getTableName(),
+				'answers',
+				$qb->expr()->eq('submissions.id', 'answers.submission_id')
 			)
-			//Newest submissions first
-			->orderBy('timestamp', 'DESC');
+				->andWhere(
+					$qb->expr()->like('answers.text', $qb->createNamedParameter('%' . $query . '%'))
+				);
+		}
 
 		return $this->findEntities($qb);
 	}
@@ -106,40 +113,62 @@ class SubmissionMapper extends QBMapper {
 	}
 
 	/**
-	 * Count submissions by form
-	 * @param int $formId ID of the form to count submissions
-	 * @param null|string $userId (optional) ID of the current user, defaults to `null`
-	 * @throws \Exception
+	 * Counts the number of submissions associated with a specific form.
+	 *
+	 * @param int $formId The ID of the form for which submissions are to be counted.
+	 * @param ?string $searchString An optional search string to filter submissions by their answers.
+	 * @return int The total number of submissions for the specified form.
+	 * @throws \Exception If an error occurs during the count operation.
 	 */
-	public function countSubmissions(int $formId, ?string $userId = null): int {
-		return $this->countSubmissionsWithFilters($formId, $userId, -1);
+	public function countSubmissions(int $formId, ?string $userId = null, ?string $searchString = null): int {
+		return $this->countSubmissionsWithFilters($formId, $userId, -1, $searchString);
 	}
 
 	/**
-	 * Count submissions by form with optional filters
-	 * @param int $formId ID of the form to count submissions
-	 * @param string|null $userId optionally limit submissions to the one of that user
-	 * @param int $limit allows to limit the query selection. If -1, the restriction is ignored
-	 * @throws \Exception
+	 * Count submissions by form with optional filters.
+	 *
+	 * @param int $formId The ID of the form for which submissions are to be counted.
+	 * @param string|null $userId Optionally limit submissions to those made by the specified user.
+	 * @param int $limit The maximum number of submissions to count. If -1, no limit is applied.
+	 * @param string|null $searchString An optional search string to filter submissions by their answers.
+	 *
+	 * @return int The total number of submissions matching the specified filters.
+	 *
+	 * @throws \Exception If an error occurs during the count operation.
 	 */
-	protected function countSubmissionsWithFilters(int $formId, ?string $userId = null, int $limit = -1): int {
+	protected function countSubmissionsWithFilters(int $formId, ?string $userId = null, int $limit = -1, ?string $searchString = null): int {
 		$qb = $this->db->getQueryBuilder();
 
-		$query = $qb->select($qb->func()->count('*', 'num_submissions'))
-			->from($this->getTableName())
-			->where($qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)));
+		$query = $qb->select('submissions.id')
+			->from($this->getTableName(), 'submissions')
+			->where($qb->expr()->eq('submissions.form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)))
+			->groupBy('submissions.id');
+
 		if (!is_null($userId)) {
-			$query->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+			$query->andWhere($qb->expr()->eq('submissions.user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
 		}
+
+		if (!is_null($searchString) && $searchString !== '') {
+			$query->join(
+				'submissions',
+				$this->answerMapper->getTableName(),
+				'answers',
+				$qb->expr()->eq('submissions.id', 'answers.submission_id')
+			)
+				->andWhere(
+					$qb->expr()->like('answers.text', $qb->createNamedParameter('%' . $searchString . '%'))
+				);
+		}
+
 		if ($limit !== -1) {
 			$query->setMaxResults($limit);
 		}
 
 		$result = $query->executeQuery();
-		$row = $result->fetch();
+		$rows = $result->fetchAll();
 		$result->closeCursor();
 
-		return (int)($row['num_submissions'] ?? 0);
+		return count($rows);
 	}
 
 	/**
