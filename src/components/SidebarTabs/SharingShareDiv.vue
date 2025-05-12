@@ -17,14 +17,19 @@
 		<NcActions class="share-div__actions">
 			<NcActionCaption :name="t('forms', 'Permissions')" />
 			<NcActionCheckbox
-				:checked="canAccessResults"
-				@update:checked="updatePermissionResults">
+				:model-value="canEditForm"
+				@update:model-value="updatePermissionEdit">
+				{{ t('forms', 'Edit form') }}
+			</NcActionCheckbox>
+			<NcActionCheckbox
+				:model-value="canAccessResults"
+				@update:model-value="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
-				:checked="canDeleteResults"
+				:model-value="canDeleteResults"
 				:disabled="!canAccessResults"
-				@update:checked="updatePermissionDeleteResults">
+				@update:model-value="updatePermissionDeleteResults">
 				{{ t('forms', 'Delete responses') }}
 			</NcActionCheckbox>
 			<NcActionSeparator />
@@ -81,6 +86,11 @@ export default {
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 			)
 		},
+		canEditForm() {
+			return this.share.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
+			)
+		},
 		isNoUser() {
 			return this.share.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
 		},
@@ -129,6 +139,16 @@ export default {
 		updatePermissionDeleteResults(hasPermission) {
 			return this.updatePermission(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				hasPermission,
+			)
+		},
+
+		/**
+		 * @param {boolean} hasPermission If the results_delete permission should be granted
+		 */
+		updatePermissionEdit(hasPermission) {
+			return this.updatePermission(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
 				hasPermission,
 			)
 		},
