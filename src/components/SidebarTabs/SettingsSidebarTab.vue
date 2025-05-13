@@ -23,6 +23,7 @@
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:model-value="form.allowEditSubmissions"
+			:disabled="formArchived"
 			type="switch"
 			@update:model-value="onAllowEditSubmissionsChange">
 			{{ t('forms', 'Allow editing own responses') }}
