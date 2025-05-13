@@ -95,6 +95,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} rispostas",
     "Download" : "Iscàrriga",
     "Delete all responses" : "Cantzella totu is rispostas",
+    "Search" : "Chirca",
+    "No results found" : "Perunu resurtadu agatadu",
     "No responses yet" : "Ancora peruna risposta",
     "Results of submitted forms will show up here" : "Is resurtados de is mòdulos imbiados s'ant a mustrare inoghe",
     "Are you sure you want to delete all responses of {title}?" : "A beru boles cantzellare totu is rispostas de {title}?",

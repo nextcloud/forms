@@ -24,6 +24,7 @@ OC.L10N.register(
     "Share" : "Partejar",
     "Description" : "Descripcion",
     "Download" : "Teledescargar",
+    "Search" : "Recercar",
     "Sharing" : "Partiment",
     "Settings" : "Paramètres",
     "Abort" : "Anullar",

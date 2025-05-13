@@ -15,6 +15,7 @@ OC.L10N.register(
     "Edit" : "Ẓreg",
     "Share" : "Bḍu",
     "Download" : "Sider",
+    "Search" : "Nadi",
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaṛen",
     "File" : "Afaylu",

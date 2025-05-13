@@ -214,6 +214,8 @@ OC.L10N.register(
     "Save copy to Files" : "Salvează o copie în Fisiere",
     "Download" : "Descărcare",
     "Delete all responses" : "Șterge toate răspunsurile",
+    "Search" : "Căutare",
+    "No results found" : "Nu s-a găsit nimic",
     "No responses yet" : "Nu există răspunsuri încă",
     "Results of submitted forms will show up here" : "Rezultatele formularelor vor fi afișate aici",
     "Are you sure you want to delete all responses of {title}?" : "Sigur doriți să ștergeți toate răspunsurile din {title}?",

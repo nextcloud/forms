@@ -90,6 +90,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} odgovora",
     "Download" : "Preuzmi",
     "Delete all responses" : "Izbriši sve odgovore",
+    "Search" : "Traži",
+    "No results found" : "Nema rezultata",
     "No responses yet" : "Još nema odgovora",
     "Results of submitted forms will show up here" : "Ovdje će se prikazati rezultati poslanih obrazaca",
     "Are you sure you want to delete all responses of {title}?" : "Jeste li sigurni da želite izbrisati sve odgovore u {title}?",

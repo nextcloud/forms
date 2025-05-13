@@ -16,6 +16,7 @@ OC.L10N.register(
     "Description" : "Тодорхойлолт",
     "Summary" : "Хураангуй",
     "Download" : "Татах",
+    "Search" : "Хайх",
     "Sharing" : "Түгээх",
     "Settings" : "Тохиргоо",
     "Submit" : "мэдэгдэх",

@@ -98,6 +98,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} reacties",
     "Download" : "Download",
     "Delete all responses" : "Verwijder alle antwoorden",
+    "Search" : "Zoeken",
+    "No results found" : "Geen resultaten gevonden",
     "No responses yet" : "Nog geen antwoorden",
     "Results of submitted forms will show up here" : "Resultaten van ingeleverde formulieren worden hier getoond",
     "Are you sure you want to delete all responses of {title}?" : "Weet je zeker dat je alle reacties op {title} wilt verwijderen?",

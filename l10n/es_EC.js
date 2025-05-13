@@ -127,6 +127,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} respuestas",
     "Download" : "Descargar",
     "Delete all responses" : "Eliminar todas las respuestas",
+    "Search" : "Buscar",
+    "No results found" : "No se encontraron resultados",
     "No responses yet" : "Aún no hay respuestas",
     "Results of submitted forms will show up here" : "Los resultados de los formularios enviados aparecerán aquí",
     "Are you sure you want to delete all responses of {title}?" : "¿Seguro que deseas eliminar todas las respuestas de {title}?",

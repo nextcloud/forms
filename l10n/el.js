@@ -192,6 +192,8 @@ OC.L10N.register(
     "Save copy to Files" : "Αποθήκευση αντιγράφου στα Αρχεία",
     "Download" : "Λήψη",
     "Delete all responses" : "Διαγραφή απαντήσεων",
+    "Search" : "Αναζήτηση",
+    "No results found" : "Δεν βρέθηκαν αποτελέσματα",
     "No responses yet" : "Καμία απάντηση ακόμη",
     "Results of submitted forms will show up here" : "Τα αποτελέσματα των φορμών θα εμφανίζονται εδώ",
     "Are you sure you want to delete all responses of {title}?" : "Θέλετε σίγουρα να διαγράψετε όλες τις απαντήσεις του {title};",

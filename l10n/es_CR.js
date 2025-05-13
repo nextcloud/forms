@@ -17,6 +17,7 @@ OC.L10N.register(
     "Share" : "Compartir",
     "Description" : "Descripción",
     "Summary" : "Resumen",
+    "Search" : "Buscar",
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Abort" : "Abortar",

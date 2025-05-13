@@ -21,6 +21,8 @@ OC.L10N.register(
     "Share" : "Ulashish",
     "Description" : "Tavsif",
     "Download" : "Download",
+    "Search" : "Qidiruv",
+    "No results found" : "Hech qanday natija topilmadi",
     "Sharing" : "Ulashish",
     "Settings" : "Settings",
     "Checkboxes" : "Belgilash katakchalari",

@@ -127,6 +127,8 @@ OC.L10N.register(
     "{amount} responses" : "Atsakymų: {amount}",
     "Download" : "Atsisiųsti",
     "Delete all responses" : "Ištrinti visus atsakymus",
+    "Search" : "Paieška",
+    "No results found" : "Nerasta jokių rezultatų",
     "No responses yet" : "Kol kas atsakymų nėra",
     "Results of submitted forms will show up here" : "Čia bus rodomi pateiktų anketų rezultatai",
     "Form settings" : "Anketos nustatymai",

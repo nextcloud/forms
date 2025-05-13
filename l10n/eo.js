@@ -24,6 +24,7 @@ OC.L10N.register(
     "Description" : "Priskribo",
     "Summary" : "Resumo",
     "Download" : "Elŝuti",
+    "Search" : "Serĉi",
     "Sharing" : "Kunhavigo",
     "Settings" : "Agordoj",
     "Submit" : "Sendi",

@@ -146,6 +146,8 @@ OC.L10N.register(
     "Save copy to Files" : "Kopijo shranite v Datoteke",
     "Download" : "Prejmi",
     "Delete all responses" : "Izbriši vse odzive",
+    "Search" : "Poišči",
+    "No results found" : "Ni najdenih zadetkov",
     "No responses yet" : "Ni še odzivov",
     "Results of submitted forms will show up here" : "Rezultati poslanih anket bodo prikazani na tem mestu.",
     "Are you sure you want to delete all responses of {title}?" : "Ali ste prepričani, da želite izbrisati vse odzive v anketi {title}?",

@@ -15,6 +15,7 @@ OC.L10N.register(
     "Share" : "பகிர்வு",
     "Description" : "விவரிப்பு",
     "Download" : "பதிவிறக்குக",
+    "Search" : "தேடுதல்",
     "Settings" : "அமைப்புகள்",
     "File" : "File",
     "Date" : "Date"

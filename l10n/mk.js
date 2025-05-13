@@ -78,6 +78,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} одговори",
     "Download" : "Преземи",
     "Delete all responses" : "Избриши ги сите одговори",
+    "Search" : "Барај",
+    "No results found" : "Нема пронајдено резултати",
     "No responses yet" : "Сеуште нема одговори",
     "Results of submitted forms will show up here" : "Резултатите од испратените прашалници ќе се појават овде",
     "Are you sure you want to delete all responses of {title}?" : "Дали сте сигурни дека сакате да ги избришете сите одговори на {title}?",

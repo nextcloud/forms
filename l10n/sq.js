@@ -21,6 +21,7 @@ OC.L10N.register(
     "Description" : "Përshkrim",
     "Summary" : "Përmbledhje",
     "Download" : "Shkarko",
+    "Search" : "Kërko",
     "Sharing" : "Ndarje",
     "Settings" : "Rregullimet",
     "Abort" : "Ndërprite",

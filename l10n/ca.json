@@ -55,6 +55,7 @@
     "Are you sure you want to delete {title}?" : "Segur que voleu suprimir {title}?",
     "Cancel" : "Cancelar",
     "Options" : "Opcions",
+    "Go to previous page" : "Torna a la pàgina anterior",
     "Answer number {index}" : "Resposta número {index}",
     "Error while saving the answer" : "S'ha produït un error en desar la resposta",
     "Delete answer" : "Suprimeix la resposta",

@@ -16,6 +16,7 @@ OC.L10N.register(
     "Description" : "Skildring",
     "Summary" : "Oppsumering",
     "Download" : "Last ned",
+    "Search" : "Søk",
     "Sharing" : "Deling",
     "Settings" : "Instillingar",
     "Abort" : "Avbryt",

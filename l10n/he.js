@@ -76,6 +76,7 @@ OC.L10N.register(
     "{amount} responses" : "{amount} תגובות",
     "Download" : "הורדה",
     "Delete all responses" : "מחיקת כל התגובות",
+    "Search" : "חיפוש",
     "No responses yet" : "אין תגובות עדיין",
     "Results of submitted forms will show up here" : "התוצאות לטפסים שהוגשו תופענה כאן",
     "Are you sure you want to delete all responses of {title}?" : "למחוק את כל התגובות על {title}?",

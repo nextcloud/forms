@@ -16,6 +16,7 @@ OC.L10N.register(
     "Share" : "Deelen",
     "Description" : "Beschreiwung",
     "Download" : "Eroflueden",
+    "Search" : "Sichen",
     "Sharing" : "Gedeelt",
     "Settings" : "Astellungen",
     "Date" : "Date",

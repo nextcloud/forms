@@ -38,6 +38,7 @@ OC.L10N.register(
     "Summary" : "Kopsavilkums",
     "Linked file is not available, would you like to link a new file?" : "Sasaistītā datne nav pieejama. Sasaistīt jaunu datni?",
     "Download" : "Lejupielādēt",
+    "Search" : "Meklēt",
     "Results of submitted forms will show up here" : "Šeit tiks parādīts iesniegto veidlapu apkopojums",
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",

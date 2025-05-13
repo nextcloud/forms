@@ -62,6 +62,7 @@ OC.L10N.register(
     "Description" : "รายละเอียด",
     "Add a question" : "เพิ่มคำถาม",
     "Download" : "ดาวน์โหลด",
+    "Search" : "ค้นหา",
     "Sharing" : "การแชร์",
     "Settings" : "การตั้งค่า",
     "Abort" : "ยกเลิก",

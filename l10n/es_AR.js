@@ -62,6 +62,7 @@ OC.L10N.register(
     "Loading responses …" : "Cargando respuestas",
     "Download" : "Descargar",
     "Delete all responses" : "Borrar todas las respuestas",
+    "Search" : "Buscar",
     "No responses yet" : "Aún no han habido respuestas",
     "Results of submitted forms will show up here" : "Los resultados de los formularios cargados se mostraran aquí",
     "Are you sure you want to delete all responses of {title}?" : "Estas seguro que deseas borrar todas las respuestas para {título}?",

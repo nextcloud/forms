@@ -20,6 +20,7 @@ OC.L10N.register(
     "Description" : "აღწერილობა",
     "Summary" : "შეჯამება",
     "Download" : "ჩამოტვირთვა",
+    "Search" : "ძიება",
     "Sharing" : "გაზიარება",
     "Settings" : "პარამეტრები",
     "Abort" : "შეჩერება",

@@ -14,6 +14,7 @@ OC.L10N.register(
     "Description" : "Description",
     "Summary" : "Summario",
     "Download" : "Discargar",
+    "Search" : "Cercar",
     "Sharing" : "Compartente",
     "Settings" : "Configurationes",
     "Date" : "Date",

@@ -15,6 +15,7 @@ OC.L10N.register(
     "Share" : "ចែក​រំលែក",
     "Description" : "ការ​អធិប្បាយ",
     "Download" : "ទាញយក",
+    "Search" : "ស្វែងរក",
     "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",
     "Abort" : "អំពី",
