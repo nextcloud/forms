@@ -407,7 +407,9 @@ class ApiControllerTest extends TestCase {
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
-				'allowEditSubmissions' => false
+				'allowEditSubmissions' => false,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -977,6 +979,11 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
+		$this->formsService
+			->method('canEditForm')
+			->with($form)
+			->willReturn(true);
+
 		$this->userManager->expects($this->once())
 			->method('get')
 			->with('newOwner')
@@ -996,6 +1003,11 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with(1)
 			->willReturn($form);
+
+		$this->formsService
+			->method('canEditForm')
+			->with($form)
+			->willReturn(true);
 
 		$newOwner = $this->createMock(IUser::class);
 		$this->userManager->expects($this->once())
