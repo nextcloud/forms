@@ -15,6 +15,7 @@ OC.L10N.register(
     "Description" : "Açıqlanma",
     "Summary" : "Xülasə",
     "Download" : "Yüklə",
+    "Search" : "Axtarış",
     "Sharing" : "Paylaşılır",
     "Settings" : "Quraşdırmalar",
     "Abort" : "Durdur",

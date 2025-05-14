@@ -123,6 +123,8 @@
     "{amount} responses" : "{amount} отговори",
     "Download" : "Изтегляне",
     "Delete all responses" : "Изтриване на всички отговори",
+    "Search" : "Търсене",
+    "No results found" : "Няма намерени резултати",
     "No responses yet" : "Все още няма отговори",
     "Results of submitted forms will show up here" : "Резултатите от изпратените формуляри ще се покажат тук",
     "Are you sure you want to delete all responses of {title}?" : "Сигурни ли сте, че искате да изтриете всички отговори на {title}?",

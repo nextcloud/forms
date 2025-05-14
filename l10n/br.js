@@ -19,6 +19,7 @@ OC.L10N.register(
     "Description" : "Diskrivadur",
     "Summary" : "Diverrañ",
     "Download" : "Pellgargañ",
+    "Search" : "Klask",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
     "Submit" : "Kinnig",

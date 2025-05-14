@@ -18,6 +18,7 @@ OC.L10N.register(
     "Description" : "Disgrifiad",
     "Summary" : "Crynodeb",
     "Download" : "Llwytho i lawr",
+    "Search" : "Chwilio",
     "Settings" : "Gosodiadau",
     "Date" : "Date",
     "Pick a date" : "Dewiswch ddyddiad",

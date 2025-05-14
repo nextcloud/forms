@@ -132,6 +132,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} respostes",
     "Download" : "Baixa",
     "Delete all responses" : "Suprimeix totes les respostes",
+    "Search" : "Cercar",
+    "No results found" : "No s'ha trobat cap resultat",
     "No responses yet" : "Encara no hi ha respostes",
     "Results of submitted forms will show up here" : "Els resultats dels formularis enviats es mostraran aquí",
     "Are you sure you want to delete all responses of {title}?" : "Segur que voleu suprimir totes les respostes de {title}?",

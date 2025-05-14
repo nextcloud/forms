@@ -19,6 +19,7 @@ OC.L10N.register(
     "Description" : "Beskrywing",
     "Summary" : "Opsomming",
     "Download" : "Laai af",
+    "Search" : "Soek",
     "Settings" : "Instellings",
     "Submit" : "Dien in",
     "File" : "Lêer",
