@@ -244,7 +244,9 @@ class FormsServiceTest extends TestCase {
 				'fileId' => null,
 				'fileFormat' => null,
 				'permissions' => Constants::PERMISSION_ALL,
-				'allowEditSubmissions' => false
+				'allowEditSubmissions' => false,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -358,6 +360,8 @@ class FormsServiceTest extends TestCase {
 				'permissions' => Constants::PERMISSION_ALL,
 				'submissionCount' => 123,
 				'partial' => true,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -397,6 +401,8 @@ class FormsServiceTest extends TestCase {
 				'submissionCount' => 123,
 				'state' => 0,
 				'partial' => true,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -458,6 +464,8 @@ class FormsServiceTest extends TestCase {
 				],
 				'submissionMessage' => null,
 				'allowEditSubmissions' => false,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
