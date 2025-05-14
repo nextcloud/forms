@@ -268,6 +268,17 @@ class ApiController extends OCSController {
 		]);
 
 		$form = $this->getFormIfAllowed($formId);
+		if (
+			$this->formsService->isFormArchived($form)
+			&& !(
+				sizeof($keyValuePairs) === 1
+				&& key_exists('state', $keyValuePairs)
+				&& $keyValuePairs['state'] === Constants::FORM_STATE_CLOSED
+			)
+		) {
+			$this->logger->debug('This form is archived and can not be modified except to change state to closed.');
+			throw new OCSForbiddenException('This form is archived and can not be modified except to change state to closed.');
+		}
 
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {

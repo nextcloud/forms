@@ -123,6 +123,11 @@ class ShareApiController extends OCSController {
 			throw new OCSNotFoundException('Could not find form');
 		}
 
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
+
 		// Check for permission to share form
 		if ($form->getOwnerId() !== $this->currentUser->getUID()) {
 			$this->logger->debug('This form is not owned by the current user');
@@ -243,6 +248,11 @@ class ShareApiController extends OCSController {
 			throw new OCSNotFoundException('Could not find share');
 		}
 
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
+
 		if ($formId !== $formShare->getFormId()) {
 			$this->logger->debug('This share doesn\'t belong to the given Form');
 			throw new OCSBadRequestException('Share doesn\'t belong to given Form');
@@ -334,6 +344,11 @@ class ShareApiController extends OCSController {
 		} catch (IMapperException $e) {
 			$this->logger->debug('Could not find share', ['exception' => $e]);
 			throw new OCSNotFoundException('Could not find share');
+		}
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		if ($formId !== $share->getFormId()) {
