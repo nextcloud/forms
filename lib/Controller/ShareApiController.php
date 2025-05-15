@@ -104,6 +104,12 @@ class ShareApiController extends OCSController {
 			'permissions' => $permissions,
 		]);
 
+		$form = $this->formsService->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
+
 		// Only accept usable shareTypes
 		if (array_search($shareType, Constants::SHARE_TYPES_USED) === false) {
 			$this->logger->debug('Invalid shareType');
@@ -118,12 +124,6 @@ class ShareApiController extends OCSController {
 
 		if (!$this->validatePermissions($permissions, $shareType)) {
 			throw new OCSBadRequestException('Invalid permission given');
-		}
-
-		$form = $this->formsService->getFormIfAllowed($formId);
-		if ($this->formsService->isFormArchived($form)) {
-			$this->logger->debug('This form is archived and can not be modified');
-			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
 		// Create public-share hash, if necessary.

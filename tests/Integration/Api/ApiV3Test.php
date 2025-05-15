@@ -1053,6 +1053,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -1080,6 +1082,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		$this->testGetFullForm($fullFormExpected);
 	}

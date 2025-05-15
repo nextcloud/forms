@@ -15,6 +15,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -186,8 +187,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -270,8 +271,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -326,8 +327,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -388,8 +389,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -412,8 +413,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -436,8 +437,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -463,8 +464,8 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -483,10 +484,10 @@ class ShareApiControllerTest extends TestCase {
 	 * Sharing a non-existing form.
 	 */
 	public function testShareUnknownForm() {
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
-			->will($this->throwException(new DoesNotExistException('Form not found')));
+			->willThrowException(new OCSNotFoundException('Form not found'));
 		;
 
 		$this->expectException(OCSNotFoundException::class);
@@ -501,12 +502,12 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId('5');
 		$form->setOwnerId('someOtherUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
-			->willReturn($form);
+			->willThrowException(new NoSuchFormException('This form is not owned by the current user'));
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->shareApiController->newShare(5, 0, 'user1');
 	}
 
@@ -525,8 +526,8 @@ class ShareApiControllerTest extends TestCase {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with('5')
 			->willReturn($form);
 
@@ -559,20 +560,17 @@ class ShareApiControllerTest extends TestCase {
 		$share = new Share();
 		$share->setId(8);
 		$share->setFormId(5);
-		$this->shareMapper->expects($this->once())
-			->method('findById')
-			->with('8')
-			->willReturn($share);
 
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('someOtherUser');
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with('5')
-			->willReturn($form);
 
-		$this->expectException(OCSForbiddenException::class);
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with('5')
+			->willThrowException(new NoSuchFormException('This form is not owned by the current user'));
+
+		$this->expectException(NoSuchFormException::class);
 		$this->shareApiController->deleteShare(5, 8);
 	}
 
@@ -636,7 +634,7 @@ class ShareApiControllerTest extends TestCase {
 					'permissions' => []
 				],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+				'exception' => OCSBadRequestException::class,
 			],
 			'invalid-permission-missing-submit' => [
 				'share' => [
@@ -651,7 +649,7 @@ class ShareApiControllerTest extends TestCase {
 					'permissions' => [Constants::PERMISSION_RESULTS_DELETE],
 				],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+				'exception' => OCSBadRequestException::class,
 			],
 			// PERMISSION_RESULTS_DELETE is only allowed if PERMISSION_RESULTS is set
 			'invalid-permission-missing-results' => [
@@ -667,7 +665,7 @@ class ShareApiControllerTest extends TestCase {
 					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS_DELETE],
 				],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+				'exception' => OCSBadRequestException::class,
 			],
 			'invalid-permission' => [
 				'share' => [
@@ -682,7 +680,7 @@ class ShareApiControllerTest extends TestCase {
 					'permissions' => ['invalid']
 				],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+				'exception' => OCSBadRequestException::class,
 			],
 			'invalid-share-type-permission' => [
 				'share' => [
@@ -698,7 +696,7 @@ class ShareApiControllerTest extends TestCase {
 					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS]
 				],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSBadRequestException'
+				'exception' => OCSBadRequestException::class,
 			],
 			'form-not-owned' => [
 				'share' => [
@@ -711,7 +709,7 @@ class ShareApiControllerTest extends TestCase {
 				'formOwner' => 'otherUser',
 				'keyValuePairs' => ['permissions' => [Constants::PERMISSION_SUBMIT]],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSForbiddenException'
+				'exception' => NoSuchFormException::class,
 			],
 			'empty-key-value-pairs' => [
 				'share' => [
@@ -724,7 +722,7 @@ class ShareApiControllerTest extends TestCase {
 				'formOwner' => 'otherUser',
 				'keyValuePairs' => [],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSForbiddenException'
+				'exception' => OCSForbiddenException::class,
 			],
 			'invalid-key-value-pairs' => [
 				'share' => [
@@ -737,7 +735,7 @@ class ShareApiControllerTest extends TestCase {
 				'formOwner' => 'otherUser',
 				'keyValuePairs' => ['formId' => 6],
 				'expected' => null,
-				'exception' => '\OCP\AppFramework\OCS\OCSForbiddenException'
+				'exception' => OCSForbiddenException::class,
 			],
 		];
 	}
@@ -750,10 +748,17 @@ class ShareApiControllerTest extends TestCase {
 		$form->setId($share['formId']);
 		$form->setOwnerId($formOwner);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($share['formId'])
-			->willReturn($form);
+		if ($exception === NoSuchFormException::class) {
+			$this->formsService->expects($this->once())
+				->method('getFormIfAllowed')
+				->with($share['formId'])
+				->willThrowException(new NoSuchFormException('This form is not owned by the current user'));
+		} else {
+			$this->formsService->expects($this->once())
+				->method('getFormIfAllowed')
+				->with($share['formId'])
+				->willReturn($form);
+		}
 
 		$this->userManager->expects($this->any())
 			->method('get')
@@ -794,10 +799,13 @@ class ShareApiControllerTest extends TestCase {
 		$shareEntity->setShareType($share['shareType']);
 		$shareEntity->setShareWith($share['shareWith']);
 		$shareEntity->setPermissions($share['permissions']);
-		$this->shareMapper->expects($this->once())
-			->method('findById')
-			->with($share['id'])
-			->willReturn($shareEntity);
+		
+		if ($exception !== NoSuchFormException::class) {
+			$this->shareMapper->expects($this->once())
+				->method('findById')
+				->with($share['id'])
+				->willReturn($shareEntity);
+		}
 
 		$this->shareMapper->expects($exception === null ? $this->once() : $this->any())
 			->method('update')
@@ -837,8 +845,6 @@ class ShareApiControllerTest extends TestCase {
 	 * Test update a share
 	 */
 	public function testUpdateShare_NotExistingForm() {
-		$exception = $this->createMock(MapperException::class);
-
 		$share = new Share();
 		$share->setId(1337);
 		$share->setFormId(7331);
@@ -846,20 +852,12 @@ class ShareApiControllerTest extends TestCase {
 		$share->setShareWith('hash');
 		$share->setPermissions([]);
 
-		$this->shareMapper->expects($this->once())
-			->method('findById')
-			->with(1337)
-			->willReturn($share);
-
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with(7331)
-			->willThrowException($exception);
+			->willThrowException(new NoSuchFormException('Could not find form'));
 
-		$this->logger->expects($this->exactly(2))
-			->method('debug');
-
-		$this->expectException(OCSNotFoundException::class);
+		$this->expectException(NoSuchFormException::class);
 		$this->shareApiController->updateShare(7331, 1337, [Constants::PERMISSION_SUBMIT]);
 	}
 }

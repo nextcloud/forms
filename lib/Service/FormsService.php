@@ -19,9 +19,12 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Events\FormSubmittedEvent;
+use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
@@ -330,6 +333,43 @@ class FormsService {
 				}
 				break;
 		}
+		return $form;
+	}
+
+	public function loadFormForSubmission(int $formId, string $shareHash): Form {
+		try {
+			$form = $this->formMapper->findById($formId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find form');
+			throw new NoSuchFormException('Could not find form');
+		}
+
+		// Does the user have access to the form (Either by logged-in user, or by providing public share-hash.)
+		try {
+			$isPublicShare = false;
+
+			// If hash given, find the corresponding share & check if hash corresponds to given formId.
+			if ($shareHash !== '') {
+				// Public link share
+				$share = $this->shareMapper->findPublicShareByHash($shareHash);
+				if ($share->getFormId() === $formId) {
+					$isPublicShare = true;
+				}
+			}
+		} catch (DoesNotExistException $e) {
+			// $isPublicShare already false.
+		} finally {
+			// Now forbid, if no public share and no direct share.
+			if (!$isPublicShare && !$this->hasUserAccess($form)) {
+				throw new NoSuchFormException('Not allowed to access this form', Http::STATUS_FORBIDDEN);
+			}
+		}
+
+		// Not allowed if form has expired.
+		if ($this->hasFormExpired($form)) {
+			throw new OCSForbiddenException('This form is no longer taking answers');
+		}
+
 		return $form;
 	}
 

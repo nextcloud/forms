@@ -22,7 +22,6 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
-use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -272,161 +271,42 @@ class ApiController extends OCSController {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
 		$currentUserId = $this->currentUser->getUID();
 
-		// Don't allow empty array
-		if (sizeof($keyValuePairs) === 0) {
+		if (empty($keyValuePairs)) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
 			throw new OCSForbiddenException('Empty keyValuePairs, will not update.');
 		}
 
 		// Only allow the form owner to set/unset the "archived" state
-		if (
-			(
-				$this->formsService->isFormArchived($form)
-				&& !(
-					$currentUserId === $form->getOwnerId()
-					&& sizeof($keyValuePairs) === 1
-					&& key_exists('state', $keyValuePairs)
-					&& $keyValuePairs['state'] === Constants::FORM_STATE_CLOSED
-				)
-			)
-			|| (
-				!$this->formsService->isFormArchived($form)
-				&& !(
-					$currentUserId === $form->getOwnerId()
-					&& sizeof($keyValuePairs) === 1
-					&& key_exists('state', $keyValuePairs)
-					&& $keyValuePairs['state'] === Constants::FORM_STATE_ARCHIVED
-				)
-			)
-		) {
-			$this->logger->debug('Only the form owner can set/unset the \`archived\' state');
-			throw new OCSForbiddenException('Only the form owner can set/unset the \`archived\' state');
+		$this->checkArchivePermission($form, $currentUserId, $keyValuePairs);
+
+		// Handle form locking/unlocking
+		if ($this->isLockingRequest($keyValuePairs)) {
+			return $this->handleFormLocking($form, $currentUserId);
 		}
-
-		// Process complete form locking (lockedUntil: 0)
-		if (
-			sizeof($keyValuePairs) === 1
-			&& array_key_exists('lockedUntil', $keyValuePairs)
-			&& $keyValuePairs['lockedUntil'] === 0
-		) {
-			// Only allow form locking for form owner
-			if ($currentUserId !== $form->getOwnerId() || ($form->getLockedBy() !== null && $currentUserId !== $form->getLockedBy())) {
-				$this->logger->debug('Only the form owner can lock the form permanently');
-				throw new OCSForbiddenException('Only the form owner can lock the form permanently');
-			}
-
-			// Only allow if the form is not currently locked by another user
-			if (
-				$form->getLockedBy() !== null
-				&& $form->getLockedBy() !== $currentUserId
-				&& $form->getLockedUntil() >= time()
-			) {
-				$this->logger->debug('Form is currently locked by another user.');
-				throw new OCSForbiddenException('Form is currently locked by another user.');
-			}
-
-			// Abort if form is already completely locked
-			if ($form->getLockedUntil() === 0) {
-				$this->logger->debug('Form is already locked completely.');
-				throw new OCSBadRequestException('Form is already locked completely.');
-			}
-
-			$form->setLockedBy($form->getOwnerId());
-			$form->setLockedUntil(0);
-
-			// Update changed Columns in Db.
-			$this->formMapper->update($form);
-
-			return new DataResponse($form->getId());
-		}
-
-		// Process form unlocking
-		if (
-			sizeof($keyValuePairs) === 1
-			&& array_key_exists('lockedUntil', $keyValuePairs) && is_null($keyValuePairs['lockedUntil'])
-		) {
-			// Only allow form unlocking if for form owner or lock user
-			if ($currentUserId !== $form->getOwnerId() && $currentUserId !== $form->getLockedBy() && $form->getLockedUntil() !== 0) {
-				$this->logger->debug('Only the form owner or the user who obtained the lock can unlock the form');
-				throw new OCSForbiddenException('Only the form owner or the user who obtained the lock can unlock the form');
-			}
-
-			// remove form lock
-			$form->setLockedBy(null);
-			$form->setLockedUntil(null);
-
-			// Update changed Columns in Db.
-			$this->formMapper->update($form);
-
-			return new DataResponse($form->getId());
+		if ($this->isUnlockingRequest($keyValuePairs)) {
+			return $this->handleFormUnlocking($form, $currentUserId);
 		}
 
 		// Lock form temporary
 		$this->formsService->obtainFormLock($form);
-		
-		// Process owner transfer
-		if (sizeof($keyValuePairs) === 1 && key_exists('ownerId', $keyValuePairs)) {
-			// Only allow owner transfer if current user is the form owner
-			if ($currentUserId !== $form->getOwnerId()) {
-				$this->logger->debug('Only the form owner can transfer ownership');
-				throw new OCSForbiddenException('Only the form owner can transfer ownership');
-			}
 
-			$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
-				'formId' => $formId,
-				'uid' => $keyValuePairs['ownerId']
-			]);
-
-			$user = $this->userManager->get($keyValuePairs['ownerId']);
-			if ($user == null) {
-				$this->logger->debug('Could not find new form owner');
-				throw new OCSBadRequestException('Could not find new form owner');
-			}
-
-			// update form owner and remove form lock
-			$form->setOwnerId($keyValuePairs['ownerId']);
-			$form->setLockedBy(null);
-			$form->setLockedUntil(null);
-
-			// Update changed Columns in Db.
-			$this->formMapper->update($form);
-
-			return new DataResponse($form->getOwnerId());
+		// Handle owner transfer
+		if ($this->isOwnerTransferRequest($keyValuePairs)) {
+			return $this->handleOwnerTransfer($form, $formId, $currentUserId, $keyValuePairs);
 		}
 
 		// Don't allow to change the following attributes
-		$forbiddenKeys = [
-			'id', 'hash', 'ownerId', 'created', 'lastUpdated', 'lockedBy', 'lockedUntil'
-		];
-
-		foreach ($forbiddenKeys as $key) {
-			if (array_key_exists($key, $keyValuePairs)) {
-				$this->logger->info("Not allowed to update {$key}");
-				throw new OCSForbiddenException("Not allowed to update {$key}");
-			}
-		}
+		$this->checkForbiddenKeys($keyValuePairs);
 
 		// Don't allow to change fileId
-		if (isset($keyValuePairs['fileId'])) {
-			$this->logger->info('Not allowed to update fileId');
-			throw new OCSForbiddenException('Not allowed to update fileId');
-		}
+		$this->checkFileIdUpdate($keyValuePairs);
 
-		// Do not allow changing showToAllUsers if disabled
-		if (isset($keyValuePairs['access'])) {
-			$showAll = $keyValuePairs['access']['showToAllUsers'] ?? false;
-			$permitAll = $keyValuePairs['access']['permitAllUsers'] ?? false;
-			if (($showAll && !$this->configService->getAllowShowToAll())
-				|| ($permitAll && !$this->configService->getAllowPermitAll())) {
-				$this->logger->info('Not allowed to update showToAllUsers or permitAllUsers');
-				throw new OCSForbiddenException();
-			}
-		}
+		// Do not allow changing showToAllUsers or permitAllUsers if disabled
+		$this->checkAccessUpdate($keyValuePairs);
 
 		// Process file linking
 		if (isset($keyValuePairs['path']) && isset($keyValuePairs['fileFormat'])) {
 			$file = $this->submissionService->writeFileToCloud($form, $keyValuePairs['path'], $keyValuePairs['fileFormat']);
-
 			$form->setFileId($file->getId());
 			$form->setFileFormat($keyValuePairs['fileFormat']);
 		}
@@ -1429,7 +1309,7 @@ class ApiController extends OCSController {
 			'shareHash' => $shareHash,
 		]);
 
-		$form = $this->loadFormForSubmission($formId, $shareHash);
+		$form = $this->formsService->loadFormForSubmission($formId, $shareHash);
 
 		$questions = $this->formsService->getQuestions($formId);
 		try {
@@ -1515,7 +1395,7 @@ class ApiController extends OCSController {
 		]);
 
 		// submissions can't be updated on public shares, so passing empty shareHash
-		$form = $this->loadFormForSubmission($formId, '');
+		$form = $this->formsService->loadFormForSubmission($formId, '');
 
 		if (!$form->getAllowEditSubmissions()) {
 			throw new OCSBadRequestException('Can only update if allowEditSubmissions is set');
@@ -1680,7 +1560,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('No files provided');
 		}
 
-		$form = $this->loadFormForSubmission($formId, $shareHash);
+		$form = $this->formsService->loadFormForSubmission($formId, $shareHash);
 
 		if (!$this->formsService->canSubmit($form)) {
 			throw new OCSForbiddenException('Already submitted');
@@ -1848,40 +1728,148 @@ class ApiController extends OCSController {
 		}
 	}
 
-	private function loadFormForSubmission(int $formId, string $shareHash): Form {
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new NoSuchFormException('Could not find form');
-		}
-
-		// Does the user have access to the form (Either by logged-in user, or by providing public share-hash.)
-		try {
-			$isPublicShare = false;
-
-			// If hash given, find the corresponding share & check if hash corresponds to given formId.
-			if ($shareHash !== '') {
-				// Public link share
-				$share = $this->shareMapper->findPublicShareByHash($shareHash);
-				if ($share->getFormId() === $formId) {
-					$isPublicShare = true;
-				}
-			}
-		} catch (DoesNotExistException $e) {
-			// $isPublicShare already false.
-		} finally {
-			// Now forbid, if no public share and no direct share.
-			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
-				throw new NoSuchFormException('Not allowed to access this form', Http::STATUS_FORBIDDEN);
+	/**
+	 * Throws if forbidden keys are present in update
+	 */
+	private function checkForbiddenKeys(array $keyValuePairs): void {
+		$forbiddenKeys = [
+			'id', 'hash', 'ownerId', 'created', 'lastUpdated', 'lockedBy', 'lockedUntil'
+		];
+		foreach ($forbiddenKeys as $key) {
+			if (array_key_exists($key, $keyValuePairs)) {
+				$this->logger->info("Not allowed to update {$key}");
+				throw new OCSForbiddenException("Not allowed to update {$key}");
 			}
 		}
+	}
 
-		// Not allowed if form has expired.
-		if ($this->formsService->hasFormExpired($form)) {
-			throw new OCSForbiddenException('This form is no longer taking answers');
+	/**
+	 * Throws if fileId is present in update
+	 */
+	private function checkFileIdUpdate(array $keyValuePairs): void {
+		if (isset($keyValuePairs['fileId'])) {
+			$this->logger->info('Not allowed to update fileId');
+			throw new OCSForbiddenException('Not allowed to update fileId');
 		}
+	}
 
-		return $form;
+	/**
+	 * Throws if access keys are being updated when not allowed
+	 */
+	private function checkAccessUpdate(array $keyValuePairs): void {
+		if (isset($keyValuePairs['access'])) {
+			$showAll = $keyValuePairs['access']['showToAllUsers'] ?? false;
+			$permitAll = $keyValuePairs['access']['permitAllUsers'] ?? false;
+			if (($showAll && !$this->configService->getAllowShowToAll())
+				|| ($permitAll && !$this->configService->getAllowPermitAll())) {
+				$this->logger->info('Not allowed to update showToAllUsers or permitAllUsers');
+				throw new OCSForbiddenException();
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current user is allowed to archive/unarchive the form
+	 */
+	private function checkArchivePermission(Form $form, string $currentUserId, array $keyValuePairs): void {
+		$isArchived = $this->formsService->isFormArchived($form);
+		$owner = $currentUserId === $form->getOwnerId();
+		$onlyState = sizeof($keyValuePairs) === 1 && key_exists('state', $keyValuePairs);
+
+		// Only check if the request is trying to change the archived state
+		if ($onlyState && $keyValuePairs['state'] === Constants::FORM_STATE_ARCHIVED) {
+			// Trying to archive
+			if (!$owner || $isArchived) {
+				$this->logger->debug('Only the form owner can archive the form, and only if it is not already archived');
+				throw new OCSForbiddenException('Only the form owner can archive the form, and only if it is not already archived');
+			}
+		} elseif ($onlyState && $keyValuePairs['state'] === Constants::FORM_STATE_CLOSED) {
+			// Trying to unarchive
+			if (!$owner || !$isArchived) {
+				$this->logger->debug('Only the form owner can unarchive the form, and only if it is currently archived');
+				throw new OCSForbiddenException('Only the form owner can unarchive the form, and only if it is currently archived');
+			}
+		}
+		// All other updates are allowed (including updates that do not touch the state)
+	}
+
+	private function isLockingRequest(array $keyValuePairs): bool {
+		return sizeof($keyValuePairs) === 1
+			&& array_key_exists('lockedUntil', $keyValuePairs)
+			&& $keyValuePairs['lockedUntil'] === 0;
+	}
+
+	private function isUnlockingRequest(array $keyValuePairs): bool {
+		return sizeof($keyValuePairs) === 1
+			&& array_key_exists('lockedUntil', $keyValuePairs)
+			&& is_null($keyValuePairs['lockedUntil']);
+	}
+
+	private function isOwnerTransferRequest(array $keyValuePairs): bool {
+		return sizeof($keyValuePairs) === 1 && key_exists('ownerId', $keyValuePairs);
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 */
+	private function handleFormLocking(Form $form, string $currentUserId): DataResponse {
+		if ($currentUserId !== $form->getOwnerId() || ($form->getLockedBy() !== null && $currentUserId !== $form->getLockedBy())) {
+			$this->logger->debug('Only the form owner can lock the form permanently');
+			throw new OCSForbiddenException('Only the form owner can lock the form permanently');
+		}
+		if (
+			$form->getLockedBy() !== null
+			&& $form->getLockedBy() !== $currentUserId
+			&& $form->getLockedUntil() >= time()
+		) {
+			$this->logger->debug('Form is currently locked by another user.');
+			throw new OCSForbiddenException('Form is currently locked by another user.');
+		}
+		if ($form->getLockedUntil() === 0) {
+			$this->logger->debug('Form is already locked completely.');
+			throw new OCSBadRequestException('Form is already locked completely.');
+		}
+		$form->setLockedBy($form->getOwnerId());
+		$form->setLockedUntil(0);
+		$this->formMapper->update($form);
+		return new DataResponse($form->getId());
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 */
+	private function handleFormUnlocking(Form $form, string $currentUserId): DataResponse {
+		if ($currentUserId !== $form->getOwnerId() && $currentUserId !== $form->getLockedBy() && $form->getLockedUntil() !== 0) {
+			$this->logger->debug('Only the form owner or the user who obtained the lock can unlock the form');
+			throw new OCSForbiddenException('Only the form owner or the user who obtained the lock can unlock the form');
+		}
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+		$this->formMapper->update($form);
+		return new DataResponse($form->getId());
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_OK, string, array{}>
+	 */
+	private function handleOwnerTransfer(Form $form, int $formId, string $currentUserId, array $keyValuePairs): DataResponse {
+		if ($currentUserId !== $form->getOwnerId()) {
+			$this->logger->debug('Only the form owner can transfer ownership');
+			throw new OCSForbiddenException('Only the form owner can transfer ownership');
+		}
+		$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
+			'formId' => $formId,
+			'uid' => $keyValuePairs['ownerId']
+		]);
+		$user = $this->userManager->get($keyValuePairs['ownerId']);
+		if ($user == null) {
+			$this->logger->debug('Could not find new form owner');
+			throw new OCSBadRequestException('Could not find new form owner');
+		}
+		$form->setOwnerId($keyValuePairs['ownerId']);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+		$this->formMapper->update($form);
+		return new DataResponse($form->getOwnerId());
 	}
 }
