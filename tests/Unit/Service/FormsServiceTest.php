@@ -60,6 +60,7 @@ use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
@@ -106,6 +107,9 @@ class FormsServiceTest extends TestCase {
 	/** @var IL10N|MockObject */
 	private $l10n;
 
+	/** @var LoggerInterface|MockObject */
+	private $logger;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -115,7 +119,7 @@ class FormsServiceTest extends TestCase {
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
-
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
@@ -154,6 +158,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 	}
@@ -639,6 +644,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 
@@ -878,6 +884,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 
@@ -989,6 +996,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 		);
 
@@ -1220,6 +1228,7 @@ class FormsServiceTest extends TestCase {
 				$this->circlesService,
 				$this->storage,
 				$this->l10n,
+				$this->logger,
 				$eventDispatcher,
 			])
 			->getMock();
