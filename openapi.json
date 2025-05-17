@@ -754,6 +754,7 @@
                                         "type": "integer",
                                         "format": "int64",
                                         "nullable": true,
+                                        "default": null,
                                         "description": "(optional) Id of the form that should be cloned"
                                     }
                                 }
@@ -1413,6 +1414,7 @@
                                 "properties": {
                                     "type": {
                                         "$ref": "#/components/schemas/QuestionType",
+                                        "default": null,
                                         "description": "the new question type"
                                     },
                                     "text": {
@@ -1424,6 +1426,7 @@
                                         "type": "integer",
                                         "format": "int64",
                                         "nullable": true,
+                                        "default": null,
                                         "description": "(optional) id of the question that should be cloned"
                                     }
                                 }
@@ -3030,7 +3033,8 @@
                         "description": "(optional) A search query to filter submissions",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "default": null
                         }
                     },
                     {
@@ -3040,7 +3044,8 @@
                         "schema": {
                             "type": "integer",
                             "format": "int64",
-                            "nullable": true
+                            "nullable": true,
+                            "default": null
                         }
                     },
                     {
@@ -3059,7 +3064,8 @@
                         "description": "(optional) The file format that should be used for the download. Defaults to `null` Possible values: - `csv`: Comma-separated value - `ods`: OpenDocument Spreadsheet - `xlsx`: Excel Open XML Spreadsheet",
                         "schema": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "default": null
                         }
                     },
                     {
