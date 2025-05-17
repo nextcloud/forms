@@ -104,7 +104,9 @@ namespace OCA\Forms;
  *   expires: int,
  *   permissions: list<FormsPermission>,
  *   partial: true,
- *   state: int
+ *   state: int,
+ *   lockedBy: ?string,
+ *   lockedUntil: ?int,
  * }
  *
  * @psalm-type FormsForm = array{
@@ -128,6 +130,8 @@ namespace OCA\Forms;
  *   permissions: list<FormsPermission>,
  *   questions: list<FormsQuestion>,
  *   state: 0|1|2,
+ *   lockedBy: ?string,
+ *   lockedUntil: ?int,
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,
