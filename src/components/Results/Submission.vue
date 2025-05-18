@@ -39,7 +39,8 @@
 			:highlight="highlight"
 			:answer-text="question.squashedAnswers"
 			:answers="question.answers"
-			:question-text="question.text" />
+			:question-text="question.text"
+			:question-type="question.type" />
 	</div>
 </template>
 
@@ -120,6 +121,7 @@ export default {
 					answeredQuestionsArray.push({
 						id: question.id,
 						text: question.text,
+						type: question.type,
 						answers: answers.map((answer) => {
 							return {
 								id: answer.id,
@@ -138,6 +140,7 @@ export default {
 					answeredQuestionsArray.push({
 						id: question.id,
 						text: question.text,
+						type: question.type,
 						squashedAnswers,
 					})
 				} else {
@@ -148,6 +151,7 @@ export default {
 					answeredQuestionsArray.push({
 						id: question.id,
 						text: question.text,
+						type: question.type,
 						squashedAnswers,
 					})
 				}
