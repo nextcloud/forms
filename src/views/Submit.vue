@@ -58,7 +58,11 @@
 			<NcEmptyContent
 				v-else-if="success || !form.canSubmit"
 				class="forms-emptycontent"
-				:name="t('forms', 'Thank you for completing the form!')"
+				:name="
+					form.submissionMessage
+						? ''
+						: t('forms', 'Thank you for completing the form!')
+				"
 				:description="form.submissionMessage">
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
