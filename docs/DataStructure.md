@@ -217,6 +217,7 @@ Currently supported Question-Types are:
 | `time`            | Showing a dropdown menu to select a time.                                                                                                  |
 | `file`            | One or multiple files. It is possible to specify which mime types are allowed                                                              |
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                   |
+| `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                |
 
 ## Extra Settings
 

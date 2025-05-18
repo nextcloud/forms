@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import QuestionColor from '../components/Questions/QuestionColor.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
 import QuestionFile from '../components/Questions/QuestionFile.vue'
@@ -17,6 +18,7 @@ import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
 import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
 import IconFile from 'vue-material-design-icons/File.vue'
 import IconLinearScale from '../components/Icons/IconLinearScale.vue'
+import IconPalette from '../components/Icons/IconPalette.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
 import IconTextLong from 'vue-material-design-icons/TextLong.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
@@ -32,6 +34,7 @@ import IconTextShort from 'vue-material-design-icons/TextShort.vue'
  * @property {string} datetime Date and Time Answer
  * @property {string} time Time Answer
  * @property {string} linearscale Linear Scale Answer
+ * @property {string} color Color Answer
  */
 export default {
 	/**
@@ -196,6 +199,18 @@ export default {
 		predefined: true,
 
 		titlePlaceholder: t('forms', 'Linear scale question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	color: {
+		component: QuestionColor,
+		icon: IconPalette,
+		label: t('forms', 'Color'),
+		predefined: false,
+
+		titlePlaceholder: t('forms', 'Color question title'),
+		createPlaceholder: t('forms', 'People can pick a color'),
+		submitPlaceholder: t('forms', 'Pick a color'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 }
