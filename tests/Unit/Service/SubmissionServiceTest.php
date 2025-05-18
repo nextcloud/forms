@@ -1018,6 +1018,18 @@ file2.txt"
 				// Expected Result
 				'The answer for question "q1" must be an integer between 0 and 5.',
 			],
+			'invalid-color-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'color', 'text' => 'q1', 'isRequired' => false]
+				],
+				// Answers
+				[
+					'1' => ['red']
+				],
+				// Expected Result
+				'Invalid color string for question "q1".',
+			],
 			'full-good-submission' => [
 				// Questions
 				[
@@ -1059,6 +1071,7 @@ file2.txt"
 					],
 					// time range
 					['id' => 18, 'type' => 'time', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['timeRange' => true]],
+					['id' => 19, 'type' => 'color', 'isRequired' => false],
 				],
 				// Answers
 				[
@@ -1081,6 +1094,7 @@ file2.txt"
 					'17' => ['12:33'],
 					// valid time range
 					'18' => ['12:33', '12:34'],
+					'19' => ['#FF0000'],
 				],
 				// Expected Result
 				null,

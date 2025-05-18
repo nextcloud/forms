@@ -22,6 +22,14 @@
 				</a>
 			</p>
 		</template>
+		<template v-else-if="questionType === 'color'">
+			<div class="color__result">
+				<div
+					:style="{ 'background-color': answerText }"
+					class="color__field" />
+				<NcHighlight :text="answerText" :search="highlight" />
+			</div>
+		</template>
 		<p v-else class="answer__text" dir="auto">
 			<NcHighlight :text="answerText" :search="highlight" />
 		</p>
@@ -54,6 +62,10 @@ export default {
 			type: String,
 			required: true,
 		},
+		questionType: {
+			type: String,
+			required: true,
+		},
 		highlight: {
 			type: String,
 			required: false,
@@ -80,6 +92,21 @@ export default {
 			position: relative;
 			top: 4px;
 		}
+	}
+
+	.color__field {
+		width: 100px;
+		height: var(--default-clickable-area);
+		border-radius: var(--border-radius-element);
+		position: relative;
+		inset-block-start: 12px;
+		margin-block-start: -12px;
+	}
+
+	.color__result {
+		align-items: baseline;
+		display: flex;
+		gap: calc(var(--clickable-area-small) / 2);
 	}
 }
 </style>

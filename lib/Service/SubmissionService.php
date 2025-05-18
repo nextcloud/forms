@@ -453,6 +453,15 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
 			}
 
+			// Handle color questions
+			if (
+				$question['type'] === Constants::ANSWER_TYPE_COLOR
+				&& $answers[$questionId][0] !== ''
+				&& !preg_match('/^#[a-f0-9]{6}$/i', $answers[$questionId][0])
+			) {
+				throw new \InvalidArgumentException(sprintf('Invalid color string for question "%s".', $question['text']));
+			}
+
 			// Handle file questions
 			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				$maxAllowedFilesCount = $question['extraSettings']['maxAllowedFilesCount'] ?? 0;

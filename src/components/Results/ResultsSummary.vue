@@ -41,12 +41,25 @@
 		<ul v-else class="question-summary__text">
 			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 			<!-- eslint-disable-next-line -->
-			<li v-for="answer in answers" :key="answer.id" dir="auto">
+			<li v-for="(answer, index) in answers" :key="answer.id" dir="auto">
 				<template v-if="answer.url">
 					<a :href="answer.url" target="_blank">
 						<IconFile :size="20" class="question-summary__text-icon" />
 						{{ answer.text }}
 					</a>
+				</template>
+				<template v-else-if="question.type === 'color'">
+					<div class="color__result">
+						<div
+							v-if="answer.id !== 0"
+							:style="{ 'background-color': answer.text }"
+							:class="
+								index === 1
+									? 'color__field color__field__first'
+									: 'color__field'
+							" />
+						{{ answer.text }}
+					</div>
 				</template>
 				<template v-else>
 					{{ answer.text }}
@@ -367,6 +380,24 @@ export default {
 				}
 			}
 		}
+	}
+
+	.color__field {
+		width: 100px;
+		height: var(--default-clickable-area);
+		border-radius: var(--border-radius-element);
+		position: relative;
+		inset-block-start: 12px;
+
+		&__first {
+			margin-block-start: -12px;
+		}
+	}
+
+	.color__result {
+		align-items: baseline;
+		display: flex;
+		gap: calc(var(--clickable-area-small) / 2);
 	}
 }
 </style>
