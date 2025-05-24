@@ -9,15 +9,11 @@ namespace OCA\Forms\Tests\Unit;
 
 use OCA\Forms\Db\AnswerMapper;
 
-// use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
-// use OCA\Forms\Db\Option;
 use OCA\Forms\Db\QuestionMapper;
-// use OCA\Forms\Db\Question;
 use OCA\Forms\Db\SubmissionMapper;
-// use OCA\Forms\Db\Submission;
 use OCA\Forms\FormsMigrator;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
@@ -106,6 +102,8 @@ class FormsMigratorTest extends TestCase {
     },
     "expires": 0,
 	"state": 0,
+	"lockedBy": null,
+	"lockedUntil": null,
     "isAnonymous": false,
     "submitMultiple": false,
     "allowEditSubmissions": false,
@@ -168,6 +166,8 @@ JSON
 		$form = new Form();
 		$form->setId(42);
 		$form->setState(0);
+		$form->setLockedBy(null);
+		$form->setLockedBy(null);
 		$form->setHash('abcdefg');
 		$form->setTitle('Link');
 		$form->setDescription('');
@@ -253,7 +253,7 @@ JSON
 	public function dataImport() {
 		return [
 			'exactlyOneOfEach' => [
-				'$inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
+				'$inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
 			]
 		];
 	}
