@@ -7,7 +7,7 @@ OC.L10N.register(
     "Yes" : "Jā",
     "Copy" : "Kopēt",
     "Forms including questions and submissions" : "Veidlapas ar jautājumiem un iesniegšanu",
-    "An error occurred while loading the forms list" : "Atgadījās kļūda veidlapu saraksta ielādēšanas laikā",
+    "An error occurred while loading the forms list" : "Veidlapu saraksta ielādēšanas laikā atgadījās kļūda",
     "Your forms" : "Tavas veidlapas",
     "Shared with you" : "Koplietots ar jums",
     "Archived forms" : "Arhivētās veidlapas",
