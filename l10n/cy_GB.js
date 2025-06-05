@@ -5,6 +5,7 @@ OC.L10N.register(
     "Yes" : "Ie",
     "Copy" : "Copïo",
     "Shared with you" : "Shared with you",
+    "Cancel" : "Cancel",
     "Required" : "Angen",
     "Delete" : "Dileu",
     "Other" : "Arall",

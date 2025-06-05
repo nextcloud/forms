@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Copiar",
     "Shared with you" : "Compartite con te",
+    "Cancel" : "Cancel",
     "Required" : "Requirite",
     "Delete" : "Deler",
     "Set expiration date" : "Assignar data de expiration",

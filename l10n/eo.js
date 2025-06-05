@@ -6,6 +6,7 @@ OC.L10N.register(
     "Copy" : "Kopii",
     "Shared with you" : "Kunhavata kun vi",
     "Select groups" : "Elekti grupojn",
+    "Cancel" : "Cancel",
     "Required" : "Nepra",
     "Maximum file size" : "Maksimuma dosiergrando",
     "Delete" : "Forigi",

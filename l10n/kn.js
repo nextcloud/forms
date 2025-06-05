@@ -5,6 +5,7 @@ OC.L10N.register(
     "Yes" : "﻿ಹೌದು",
     "Copy" : "ನಕಲಿಸಿ",
     "Shared with you" : "Shared with you",
+    "Cancel" : "Cancel",
     "Delete" : "﻿ಅಳಿಸಿ",
     "Other" : "﻿ಇತರೆ",
     "Set expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕವನ್ನು ನಿರ್ದರಿಸಿ",

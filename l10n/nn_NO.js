@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Kopier",
     "Shared with you" : "Shared with you",
     "Select groups" : "Vel grupper",
+    "Cancel" : "Cancel",
     "Required" : "Nødvendig",
     "Delete" : "Slett",
     "Uploading …" : "Lastar opp...",

@@ -128,6 +128,8 @@ OC.L10N.register(
     "From {firstOption} to {lastOption}" : "От {firstOption} до {lastOption}",
     "Label for highest value" : "Метка для наивысшим значением",
     "A long answer for the question “{text}”" : "Длинный ответ для вопроса “{text}”",
+    "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Вы должны выбрать не более одной опции","Вы должны выбрать не более %n опций","Вы должны выбрать не более %n опций","Вы должны выбрать не более %n опций"],
+    "_You must choose at least one option_::_You must choose at least %n options_" : ["Вы должны выбрать хотя бы одну опцию","Вы должны выбрать как минимум %n опций","Вы должны выбрать как минимум %n опций","Вы должны выбрать как минимум %n опций"],
     "Upper options limit must be greater than the lower limit" : "Верхний предел параметров должен быть больше нижнего предела",
     "Lower options limit must be smaller than the upper limit" : "Нижний предел параметров должен быть меньше верхнего предела",
     "Add \"other\"" : "Добавить \"другое\"",

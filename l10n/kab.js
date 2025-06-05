@@ -6,6 +6,7 @@ OC.L10N.register(
     "Question" : "Asteqsi",
     "Copy" : "Nɣel",
     "Results" : "Igmaḍ",
+    "Cancel" : "Cancel",
     "Options" : "Iɣewwaṛen",
     "Delete" : "Kkes",
     "Other" : "Wayeḍ",

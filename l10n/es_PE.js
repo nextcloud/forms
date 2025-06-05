@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Copiar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
+    "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
     "Uploading …" : "Cargando...",

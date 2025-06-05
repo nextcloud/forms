@@ -24,6 +24,7 @@ OC.L10N.register(
     "Delete form" : "Borrar formulario",
     "Error while deleting {title}" : "Error mientras se borraba {título}",
     "Are you sure you want to delete {title}?" : "Esta seguro que desea borrar {título}?",
+    "Cancel" : "Cancel",
     "Options" : "Opciones",
     "Answer number {index}" : "Respuesta numero {índice}",
     "Error while saving the answer" : "Error mientras se guardaba la respuesta",
