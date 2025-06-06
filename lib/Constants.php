@@ -66,37 +66,39 @@ class Constants {
 	 */
 
 	// Available AnswerTypes
-	public const ANSWER_TYPE_MULTIPLE = 'multiple';
-	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
-	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
-	public const ANSWER_TYPE_SHORT = 'short';
-	public const ANSWER_TYPE_LONG = 'long';
+	public const ANSWER_TYPE_COLOR = 'color';
 	public const ANSWER_TYPE_DATE = 'date';
 	public const ANSWER_TYPE_DATETIME = 'datetime';
-	public const ANSWER_TYPE_TIME = 'time';
+	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
 	public const ANSWER_TYPE_FILE = 'file';
 	public const ANSWER_TYPE_LINEARSCALE = 'linearscale';
+	public const ANSWER_TYPE_LONG = 'long';
+	public const ANSWER_TYPE_MULTIPLE = 'multiple';
+	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
+	public const ANSWER_TYPE_SHORT = 'short';
+	public const ANSWER_TYPE_TIME = 'time';
 
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
-		self::ANSWER_TYPE_MULTIPLE,
-		self::ANSWER_TYPE_MULTIPLEUNIQUE,
-		self::ANSWER_TYPE_DROPDOWN,
-		self::ANSWER_TYPE_SHORT,
-		self::ANSWER_TYPE_LONG,
+		self::ANSWER_TYPE_COLOR,
 		self::ANSWER_TYPE_DATE,
 		self::ANSWER_TYPE_DATETIME,
-		self::ANSWER_TYPE_TIME,
+		self::ANSWER_TYPE_DROPDOWN,
 		self::ANSWER_TYPE_FILE,
 		self::ANSWER_TYPE_LINEARSCALE,
+		self::ANSWER_TYPE_LONG,
+		self::ANSWER_TYPE_MULTIPLE,
+		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_SHORT,
+		self::ANSWER_TYPE_TIME,
 	];
 
 	// AnswerTypes, that need/have predefined Options
 	public const ANSWER_TYPES_PREDEFINED = [
-		self::ANSWER_TYPE_MULTIPLE,
-		self::ANSWER_TYPE_MULTIPLEUNIQUE,
 		self::ANSWER_TYPE_DROPDOWN,
 		self::ANSWER_TYPE_LINEARSCALE,
+		self::ANSWER_TYPE_MULTIPLE,
+		self::ANSWER_TYPE_MULTIPLEUNIQUE,
 	];
 
 	// AnswerTypes for date/time questions
@@ -194,10 +196,10 @@ class Constants {
 	 * !! Keep in sync with src/mixins/ShareTypes.js !!
 	 */
 	public const SHARE_TYPES_USED = [
-		IShare::TYPE_USER,
+		IShare::TYPE_CIRCLE,
 		IShare::TYPE_GROUP,
 		IShare::TYPE_LINK,
-		IShare::TYPE_CIRCLE
+		IShare::TYPE_USER,
 	];
 
 	/**
@@ -214,18 +216,18 @@ class Constants {
 
 	public const PERMISSION_ALL = [
 		self::PERMISSION_EDIT,
+		self::PERMISSION_EMBED,
 		self::PERMISSION_RESULTS,
 		self::PERMISSION_RESULTS_DELETE,
 		self::PERMISSION_SUBMIT,
-		self::PERMISSION_EMBED,
 	];
 
 	/**
 	 * !! Keep in sync with src/FormsEmptyContent.vue !!
 	 * InitialStates for emptyContent to render as...
 	 */
-	public const EMPTY_NOTFOUND = 'notfound';
 	public const EMPTY_EXPIRED = 'expired';
+	public const EMPTY_NOTFOUND = 'notfound';
 
 	/**
 	 * Constants related to extra settings for questions
