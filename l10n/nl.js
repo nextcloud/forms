@@ -72,6 +72,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Kopiëren naar het klembord",
     "Copy embedding code" : "Kopieer embedded code",
     "Remove link" : "Link verwijderen",
+    "Share {formTitle}" : "Delen {formTitle}",
     "Internal link" : "Interne link",
     "View" : "Bekijken",
     "Edit" : "Bewerk",
