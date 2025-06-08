@@ -33,7 +33,7 @@ class SubmissionMapper extends QBMapper {
 	 *
 	 * @param int $formId The ID of the form whose submissions are being retrieved.
 	 * @param string|null $userId An optional user ID to filter the submissions.
-	 * @param string|null $query An optional search query to filter the submissions.
+	 * @param string|null $searchString An optional search query to filter the submissions.
 	 * @param int|null $limit The maximum number of submissions to retrieve, default: all submissions
 	 * @param int $offset The number of submissions to skip before starting to retrieve, default: 0
 	 *
@@ -41,7 +41,7 @@ class SubmissionMapper extends QBMapper {
 	 * @throws DoesNotExistException If no submissions are found for the given form ID.
 	 *
 	 */
-	public function findByForm(int $formId, ?string $userId = null, ?string $query = null, ?int $limit = null, int $offset = 0): array {
+	public function findByForm(int $formId, ?string $userId = null, ?string $searchString = null, ?int $limit = null, int $offset = 0): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$filters = [
@@ -61,7 +61,7 @@ class SubmissionMapper extends QBMapper {
 			->setMaxResults($limit);
 
 		// If a query is provided, join the answers table and filter by the query text
-		if (!is_null($query) && $query !== '') {
+		if (!is_null($searchString) && $searchString !== '') {
 			$qb->join(
 				'submissions',
 				$this->answerMapper->getTableName(),
@@ -69,7 +69,10 @@ class SubmissionMapper extends QBMapper {
 				$qb->expr()->eq('submissions.id', 'answers.submission_id')
 			)
 				->andWhere(
-					$qb->expr()->like('answers.text', $qb->createNamedParameter('%' . $query . '%'))
+					$qb->expr()->orX(
+						$qb->expr()->iLike('submissions.user_id', $qb->createNamedParameter('%' . $searchString . '%')),
+						$qb->expr()->iLike('answers.text', $qb->createNamedParameter('%' . $searchString . '%')),
+					),
 				);
 		}
 
@@ -156,7 +159,10 @@ class SubmissionMapper extends QBMapper {
 				$qb->expr()->eq('submissions.id', 'answers.submission_id')
 			)
 				->andWhere(
-					$qb->expr()->like('answers.text', $qb->createNamedParameter('%' . $searchString . '%'))
+					$qb->expr()->orX(
+						$qb->expr()->iLike('submissions.user_id', $qb->createNamedParameter('%' . $searchString . '%')),
+						$qb->expr()->iLike('answers.text', $qb->createNamedParameter('%' . $searchString . '%')),
+					),
 				);
 		}
 
