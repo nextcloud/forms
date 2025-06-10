@@ -137,7 +137,7 @@
 							:answer-type="answerTypes[question.type]"
 							:index="index + 1"
 							:max-string-lengths="maxStringLengths"
-							v-bind.sync="form.questions[index]"
+							v-bind="form.questions[index]"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
 							@move-down="onMoveDown(index)"
@@ -148,7 +148,7 @@
 				<!-- Add new questions menu -->
 				<div class="question-menu">
 					<NcActions
-						:open.sync="questionMenuOpened"
+						v-model:open="questionMenuOpened"
 						:menu-name="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
 						primary>
