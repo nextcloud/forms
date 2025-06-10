@@ -1,29 +1,20 @@
-/**
- * SPDX-FileCopyrightText: 2018 Nextcloud GmbH and Nextcloud contributors
- * SPDX-License-Identifier: AGPL-3.0-or-later
- */
-
-import { translate, translatePlural } from '@nextcloud/l10n'
-
-import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip.js'
 import Vue from 'vue'
+import { Tooltip } from '@nextcloud/vue'
 
 import router from './router.js'
 import Forms from './Forms.vue'
+import { translate, translatePlurals } from '@nextcloud/l10n'
 
-// eslint-disable-next-line import/no-unresolved, n/no-missing-import
-import 'vite/modulepreload-polyfill'
 import '@nextcloud/dialogs/style.css'
+
+Vue.prototype.t = translate
+Vue.prototype.n = translatePlurals
 
 Vue.directive('tooltip', Tooltip)
 
-Vue.prototype.t = translate
-Vue.prototype.n = translatePlural
-
-export default new Vue({
-	el: '#content',
-	// eslint-disable-next-line vue/match-component-file-name
-	name: 'FormsRoot',
+const app = new Vue({
 	router,
 	render: (h) => h(Forms),
-})
+}).$mount('#content')
+
+export default app

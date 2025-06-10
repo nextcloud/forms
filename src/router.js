@@ -1,26 +1,17 @@
-/**
- * SPDX-FileCopyrightText: 2018 Nextcloud GmbH and Nextcloud contributors
- * SPDX-License-Identifier: AGPL-3.0-or-later
- */
-
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
 
-import Create from './views/Create.vue'
-import Results from './views/Results.vue'
-import Submit from './views/Submit.vue'
-
 Vue.use(Router)
 
-export default new Router({
-	mode: 'history',
+const Create = () => import('./views/Create.vue')
+const Results = () => import('./views/Results.vue')
+const Submit = () => import('./views/Submit.vue')
 
-	// if index.php is in the url AND we got this far, then it's working:
-	// let's keep using index.php in the url
+const router = new Router({
+	mode: 'history',
 	base: generateUrl('/apps/forms', ''),
 	linkActiveClass: 'active',
-
 	routes: [
 		{
 			path: '/',
@@ -34,27 +25,23 @@ export default new Router({
 		},
 		{
 			path: '/:hash/edit',
-			components: {
-				default: Create,
-			},
+			components: { default: Create },
 			name: 'edit',
 			props: { default: true },
 		},
 		{
 			path: '/:hash/results',
-			components: {
-				default: Results,
-			},
+			components: { default: Results },
 			name: 'results',
 			props: { default: true },
 		},
 		{
 			path: '/:hash/submit/:submissionId?',
-			components: {
-				default: Submit,
-			},
+			components: { default: Submit },
 			name: 'submit',
 			props: { default: true },
 		},
 	],
 })
+
+export default router
