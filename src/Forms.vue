@@ -138,22 +138,23 @@
 </template>
 
 <script>
-import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { ref, computed, onMounted, onUnmounted, defineComponent } from 'vue'
+
+import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
 
-import { useIsMobile } from '@nextcloud/vue'
-import NcAppContent from '@nextcloud/vue/components/NcAppContent'
-import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
-import NcAppNavigationCaption from '@nextcloud/vue/components/NcAppNavigationCaption'
-import NcAppNavigationNew from '@nextcloud/vue/components/NcAppNavigationNew'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import NcContent from '@nextcloud/vue/components/NcContent'
-import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
-import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import { useIsMobile } from '@nextcloud/vue/dist/Composables/useIsMobile.js'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent.js'
+import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation.js'
+import NcAppNavigationCaption from '@nextcloud/vue/dist/Components/NcAppNavigationCaption.js'
+import NcAppNavigationNew from '@nextcloud/vue/dist/Components/NcAppNavigationNew.js'
+import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcContent from '@nextcloud/vue/dist/Components/NcContent.js'
+import NcEmptyContent from '@nextcloud/vue/dist/Components/NcEmptyContent.js'
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 
 import IconArchive from 'vue-material-design-icons/Archive.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
@@ -162,20 +163,14 @@ import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import AppNavigationForm from './components/AppNavigationForm.vue'
 import FormsIcon from './components/Icons/FormsIcon.vue'
 import OcsResponse2Data from './utils/OcsResponse2Data.js'
-import PermissionTypes from './mixins/PermissionTypes.js'
 import Sidebar from './views/Sidebar.vue'
 import logger from './utils/Logger.js'
 import { FormState } from './models/Constants.ts'
 
-export default {
+export default defineComponent({
 	name: 'Forms',
 
 	components: {
-		AppNavigationForm,
-		ArchivedFormsModal,
-		FormsIcon,
-		IconArchive,
-		IconPlus,
 		NcAppContent,
 		NcAppNavigation,
 		NcAppNavigationCaption,
@@ -184,341 +179,330 @@ export default {
 		NcContent,
 		NcEmptyContent,
 		NcLoadingIcon,
+		IconArchive,
+		IconPlus,
+		ArchivedFormsModal,
+		AppNavigationForm,
+		FormsIcon,
 		Sidebar,
 	},
 
-	mixins: [PermissionTypes],
+	setup(_, { emit }) {
+		const appName = 'forms'
+		const route = window.VueRouter.default.currentRoute
+		const router = window.VueRouter.default
+		const isMobile = useIsMobile()
 
-	setup() {
-		return {
-			isMobile: useIsMobile(),
-		}
-	},
+		const loading = ref(true)
+		const sidebarOpened = ref(false)
+		const sidebarActive = ref('forms-sharing')
+		const forms = ref([])
+		const allSharedForms = ref([])
+		const showArchivedForms = ref(false)
+		const canCreateForms = ref(loadState(appName, 'appConfig').canCreateForms)
 
-	data() {
-		return {
-			loading: true,
-			sidebarOpened: false,
-			sidebarActive: 'forms-sharing',
-			forms: [],
-			allSharedForms: [],
+		const hasForms = computed(() => {
+			return forms.value.length > 0 || allSharedForms.value.length > 0
+		})
 
-			showArchivedForms: false,
+		const ownedForms = computed(() => {
+			return forms.value.filter((form) => form.state === FormState.Active)
+		})
 
-			canCreateForms: loadState(appName, 'appConfig').canCreateForms,
-		}
-	},
-
-	computed: {
-		canEdit() {
-			return this.selectedForm.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_EDIT,
+		const sharedForms = computed(() => {
+			return allSharedForms.value.filter(
+				(form) => form.state === FormState.Active,
 			)
-		},
+		})
 
-		hasForms() {
-			return this.allSharedForms.length > 0 || this.forms.length > 0
-		},
-
-		/**
-		 * All own active forms
-		 */
-		ownedForms() {
-			return this.forms.filter((form) => form.state !== FormState.FormArchived)
-		},
-
-		/**
-		 * All active shared forms
-		 */
-		sharedForms() {
-			return this.allSharedForms.filter(
-				(form) => form.state !== FormState.FormArchived,
+		const archivedForms = computed(() => {
+			return [...forms.value, ...allSharedForms.value].filter(
+				(form) => form.state === FormState.Archived,
 			)
-		},
+		})
 
-		/**
-		 * All forms that have been archived
-		 */
-		archivedForms() {
-			return [...this.forms, ...this.allSharedForms].filter(
-				(form) => form.state === FormState.FormArchived,
-			)
-		},
+		const routeHash = computed(() => route.params.hash)
 
-		routeHash() {
-			return this.$route.params.hash
-		},
+		const routeAllowed = computed(() => {
+			if (!routeHash.value) return false
 
-		// If the user is allowed to access this route
-		routeAllowed() {
-			// Check formId from initial state on app initialization
-			if (this.loading && loadState(appName, 'formId') === 'invalid') {
-				return false
+			const form =
+				forms.value.find((f) => f.hash === routeHash.value) ||
+				allSharedForms.value.find((f) => f.hash === routeHash.value)
+
+			if (!form) return false
+
+			// Check if user has at least read permissions
+			return form.permissions.includes('read')
+		})
+
+		// Methods
+		const openSharing = (hash) => {
+			if (hash !== routeHash.value) {
+				router.push({ name: 'edit', params: { hash } })
 			}
+			sidebarActive.value = 'forms-sharing'
+			sidebarOpened.value = true
 
-			// Not allowed, if no hash
-			if (!this.routeHash) {
-				return false
-			}
-
-			// Try to find form in owned & shared list
-			const form = [...this.forms, ...this.allSharedForms].find(
-				(form) => form.hash === this.routeHash,
-			)
-
-			// If no form found, load it from server. Route will be automatically re-evaluated.
-			if (form === undefined) {
-				this.fetchPartialForm(this.routeHash)
-				return false
-			}
-
-			// Return whether route is in the permissions-list
-			return form?.permissions.includes(this.$route.name)
-		},
-
-		selectedForm: {
-			get() {
-				if (this.routeAllowed) {
-					return this.forms
-						.concat(this.allSharedForms)
-						.find((form) => form.hash === this.routeHash)
-				}
-				return {}
-			},
-			set(form) {
-				// always close sidebar
-				this.sidebarOpened = false
-
-				// If a owned form
-				let index = this.forms.findIndex(
-					(search) => search.hash === this.routeHash,
-				)
-				if (index > -1) {
-					this.$set(this.forms, index, form)
-					return
-				}
-				// Otherwise a shared form
-				index = this.allSharedForms.findIndex(
-					(search) => search.hash === this.routeHash,
-				)
-				if (index > -1) {
-					this.$set(this.allSharedForms, index, form)
-				}
-			},
-		},
-	},
-
-	beforeMount() {
-		this.loadForms()
-	},
-
-	mounted() {
-		subscribe('forms:last-updated:set', (id) => this.onLastUpdatedByEventBus(id))
-		subscribe('forms:ownership-transfered', (id) => this.onDeleteForm(id))
-	},
-
-	unmounted() {
-		unsubscribe('forms:last-updated:set', (id) =>
-			this.onLastUpdatedByEventBus(id),
-		)
-		unsubscribe('forms:ownership-transfered', (id) => this.onDeleteForm(id))
-	},
-
-	methods: {
-		/**
-		 * Closes the App-Navigation on mobile-devices
-		 */
-		mobileCloseNavigation() {
-			if (this.isMobile) {
+			// If on mobile, close the navigation
+			if (isMobile.value) {
 				emit('toggle-navigation', { open: false })
 			}
-		},
+		}
 
-		/**
-		 * Open a form and its sidebar for sharing
-		 *
-		 * @param {string} hash the hash of the form to load
-		 */
-		openSharing(hash) {
-			if (hash !== this.routeHash) {
-				this.$router.push({ name: 'edit', params: { hash } })
+		const loadForms = async () => {
+			try {
+				loading.value = true
+				const [formsResponse, sharedFormsResponse] = await Promise.all([
+					axios.get(generateOcsUrl('apps/forms/api/v3/forms')),
+					axios.get(generateOcsUrl('apps/forms/api/v3/shared')),
+				])
+
+				forms.value = OcsResponse2Data(formsResponse)
+				allSharedForms.value = OcsResponse2Data(sharedFormsResponse)
+
+				// If we have a hash in the route, ensure the form is loaded
+				if (route.params.hash) {
+					await fetchPartialForm(route.params.hash)
+				}
+			} catch (error) {
+				logger.error('Error loading forms', { error })
+				showError(t('forms', 'An error occurred while loading forms'))
+			} finally {
+				loading.value = false
 			}
-			this.sidebarActive = 'forms-sharing'
-			this.sidebarOpened = true
-		},
+		}
 
-		/**
-		 * Initial forms load
-		 */
-		async loadForms() {
-			this.loading = true
-
-			// Load Owned forms
+		const fetchPartialForm = async (hash) => {
 			try {
 				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v3/forms'),
+					generateOcsUrl(`apps/forms/api/v3/form/${hash}`),
 				)
-				this.forms = OcsResponse2Data(response)
-			} catch (error) {
-				logger.error('Error while loading owned forms list', { error })
-				showError(
-					t('forms', 'An error occurred while loading the forms list'),
-				)
-			}
+				const form = OcsResponse2Data(response)
 
-			// Load shared forms
-			try {
-				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v3/forms?type=shared'),
-				)
-				this.allSharedForms = OcsResponse2Data(response)
-			} catch (error) {
-				logger.error('Error while loading shared forms list', {
-					error,
-				})
-				showError(
-					t('forms', 'An error occurred while loading the forms list'),
-				)
-			}
-
-			this.loading = false
-		},
-
-		/**
-		 * Fetch a partial form by its hash and add it to the shared forms list.
-		 *
-		 * @param {string} hash the hash of the form to load
-		 */
-		async fetchPartialForm(hash) {
-			await new Promise((resolve) => {
-				const wait = () => {
-					if (this.loading) {
-						window.setTimeout(wait, 250)
-					} else {
-						resolve()
+				// Update the form in the appropriate array
+				let index = forms.value.findIndex((f) => f.hash === hash)
+				if (index > -1) {
+					const newForms = [...forms.value]
+					newForms[index] = form
+					forms.value = newForms
+				} else {
+					index = allSharedForms.value.findIndex((f) => f.hash === hash)
+					if (index > -1) {
+						const newSharedForms = [...allSharedForms.value]
+						newSharedForms[index] = form
+						allSharedForms.value = newSharedForms
 					}
 				}
-				wait()
-			})
 
-			this.loading = true
-			if (
-				[...this.forms, ...this.allSharedForms].find(
-					(form) => form.hash === hash,
-				) === undefined
-			) {
-				try {
-					const response = await axios.get(
-						generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-							id: loadState(appName, 'formId'),
-						}),
-					)
-					const form = OcsResponse2Data(response)
-
-					// If the user has (at least) submission-permissions, add it to the shared forms
-					if (
-						form.permissions.includes(
-							this.PERMISSION_TYPES.PERMISSION_SUBMIT,
-						)
-					) {
-						this.allSharedForms.push(form)
-					}
-				} catch (error) {
-					logger.error(`Form ${hash} not found`, { error })
-					showError(t('forms', 'Form not found'))
-
-					if ([403, 404].includes(error.response?.status)) {
-						if (this.$route.name !== 'root') {
-							this.$router.push({ name: 'root' })
-						}
-					}
-				}
+				return form
+			} catch (error) {
+				logger.error('Error while loading form', { error, hash })
+				showError(t('forms', 'An error occurred while loading the form'))
+				throw error
 			}
+		}
 
-			this.loading = false
-		},
-
-		async onNewForm() {
+		const onNewForm = async () => {
 			try {
 				// Request a new empty form
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms'),
 				)
 				const newForm = OcsResponse2Data(response)
-				this.forms.unshift(newForm)
-				this.$router.push({
+				updateFormInArrays(newForm)
+				router.push({
 					name: 'edit',
 					params: { hash: newForm.hash },
 				})
-				this.mobileCloseNavigation()
+				mobileCloseNavigation()
 			} catch (error) {
 				logger.error('Unable to create new form', { error })
 				showError(t('forms', 'Unable to create a new form'))
 			}
-		},
+		}
 
-		/**
-		 * Request to clone a form, store returned form and open it.
-		 *
-		 * @param {number} id id of the form to clone
-		 */
-		async onCloneForm(id) {
+		const onDeleteForm = async (id) => {
+			const formIndex = forms.value.findIndex((form) => form.id === id)
+			if (formIndex === -1) return
+
+			const deletedHash = forms.value[formIndex].hash
+
+			try {
+				await axios.delete(
+					generateOcsUrl(`apps/forms/api/v3/form/${deletedHash}`),
+				)
+
+				// Remove the form from the forms array
+				forms.value = forms.value.filter((form) => form.id !== id)
+
+				// Redirect if current form has been deleted
+				if (deletedHash === route.hash && route.name !== 'root') {
+					router.push({ name: 'root' })
+				}
+			} catch (error) {
+				logger.error(`Error deleting form ${id}`, { error })
+				showError(t('forms', 'Error deleting form'))
+			}
+		}
+
+		const onLastUpdatedByEventBus = (id) => {
+			const formIndex = forms.value.findIndex((form) => form.id === id)
+			if (formIndex !== -1) {
+				const newForms = [...forms.value]
+				newForms[formIndex] = {
+					...newForms[formIndex],
+					lastUpdated: Math.floor(Date.now() / 1000),
+				}
+				forms.value = newForms.sort((a, b) => b.lastUpdated - a.lastUpdated)
+			} else {
+				const sharedFormIndex = allSharedForms.value.findIndex(
+					(form) => form.id === id,
+				)
+
+				if (sharedFormIndex !== -1) {
+					const newSharedForms = [...allSharedForms.value]
+					newSharedForms[sharedFormIndex] = {
+						...newSharedForms[sharedFormIndex],
+						lastUpdated: Math.floor(Date.now() / 1000),
+					}
+					allSharedForms.value = newSharedForms.sort(
+						(a, b) => b.lastUpdated - a.lastUpdated,
+					)
+				}
+			}
+		}
+
+		const mobileCloseNavigation = () => {
+			if (isMobile.value) {
+				emit('toggle-navigation', { open: false })
+			}
+			sidebarActive.value = 'forms-sharing'
+			sidebarOpened.value = true
+		}
+
+		const updateFormInArrays = (form) => {
+			let index = forms.value.findIndex((f) => f.hash === form.hash)
+			if (index > -1) {
+				const newForms = [...forms.value]
+				newForms[index] = form
+				forms.value = newForms
+			} else {
+				index = allSharedForms.value.findIndex((f) => f.hash === form.hash)
+				if (index > -1) {
+					const newSharedForms = [...allSharedForms.value]
+					newSharedForms[index] = form
+					allSharedForms.value = newSharedForms
+				} else if (form.permissions?.includes('submit')) {
+					allSharedForms.value.push(form)
+				}
+			}
+		}
+
+		onMounted(() => {
+			loadForms()
+
+			subscribe('forms:form:updated', onLastUpdatedByEventBus)
+
+			return () => {
+				unsubscribe('forms:form:updated', onLastUpdatedByEventBus)
+			}
+		})
+
+		onMounted(() => {
+			loadForms()
+			subscribe('forms:last-updated:set', onLastUpdatedByEventBus)
+			subscribe('forms:ownership-transfered', onDeleteForm)
+		})
+
+		onUnmounted(() => {
+			unsubscribe('forms:last-updated:set', onLastUpdatedByEventBus)
+			unsubscribe('forms:ownership-transfered', onDeleteForm)
+		})
+
+		const onCloneForm = async (id) => {
 			try {
 				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms?fromId={id}', {
-						id,
-					}),
+					generateOcsUrl(`apps/forms/api/v3/forms?fromId=${id}`),
 				)
 				const newForm = OcsResponse2Data(response)
-				this.forms.unshift(newForm)
-				this.$router.push({
+				updateFormInArrays(newForm)
+				router.push({
 					name: 'edit',
 					params: { hash: newForm.hash },
 				})
-				this.mobileCloseNavigation()
+				mobileCloseNavigation()
 			} catch (error) {
 				logger.error(`Unable to copy form ${id}`, { error })
 				showError(t('forms', 'Unable to copy form'))
 			}
-		},
+		}
 
-		/**
-		 * Remove form from forms list after successful server deletion request
-		 *
-		 * @param {number} id the form id
-		 */
-		async onDeleteForm(id) {
-			const formIndex = this.forms.findIndex((form) => form.id === id)
-			const deletedHash = this.forms[formIndex].hash
+		return {
+			loading,
+			sidebarOpened,
+			sidebarActive,
+			forms,
+			allSharedForms,
+			showArchivedForms,
+			canCreateForms,
+			isMobile,
+			route,
+			router,
 
-			this.forms.splice(formIndex, 1)
+			hasForms,
+			ownedForms,
+			sharedForms,
+			archivedForms,
+			routeHash,
+			routeAllowed,
+			selectedForm: {
+				get() {
+					if (!routeHash.value) return { partial: true }
 
-			// Redirect if current form has been deleted
-			if (deletedHash === this.routeHash && this.$route.name !== 'root') {
-				this.$router.push({ name: 'root' })
-			}
-		},
+					const form =
+						forms.value.find((f) => f.hash === routeHash.value) ||
+						allSharedForms.value.find((f) => f.hash === routeHash.value)
 
-		/**
-		 * Update last updated timestamp in given form
-		 *
-		 * @param {number} id the form id
-		 */
-		onLastUpdatedByEventBus(id) {
-			const formIndex = this.forms.findIndex((form) => form.id === id)
-			if (formIndex !== -1) {
-				this.forms[formIndex].lastUpdated = moment().unix()
-				this.forms.sort((b, a) => a.lastUpdated - b.lastUpdated)
-			} else {
-				const sharedFormIndex = this.allSharedForms.findIndex(
-					(form) => form.id === id,
-				)
-				this.allSharedForms[sharedFormIndex].lastUpdated = moment().unix()
-				this.allSharedForms.sort((b, a) => a.lastUpdated - b.lastUpdated)
-			}
-		},
+					return form || { partial: true, hash: routeHash.value }
+				},
+				set(form) {
+					if (form.partial) {
+						fetchPartialForm(form.hash)
+						return
+					}
+
+					// Update in the appropriate array
+					let index = forms.value.findIndex((f) => f.hash === form.hash)
+					if (index > -1) {
+						const newForms = [...forms.value]
+						newForms[index] = form
+						forms.value = newForms
+					} else {
+						index = allSharedForms.value.findIndex(
+							(f) => f.hash === form.hash,
+						)
+						if (index > -1) {
+							const newSharedForms = [...allSharedForms.value]
+							newSharedForms[index] = form
+							allSharedForms.value = newSharedForms
+						}
+					}
+				},
+			},
+
+			openSharing,
+			loadForms,
+			fetchPartialForm,
+			onNewForm,
+			onCloneForm,
+			onDeleteForm,
+			onLastUpdatedByEventBus,
+			mobileCloseNavigation,
+			updateFormInArrays,
+		}
 	},
-}
+})
 </script>
 
 <style scoped lang="scss">
