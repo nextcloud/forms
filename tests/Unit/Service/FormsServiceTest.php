@@ -58,8 +58,9 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
-
 use PHPUnit\Framework\MockObject\MockObject;
+
+use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
@@ -105,6 +106,8 @@ class FormsServiceTest extends TestCase {
 
 	/** @var IL10N|MockObject */
 	private $l10n;
+	/** @var LoggerInterface|MockObject */
+	private $logger;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -120,6 +123,7 @@ class FormsServiceTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);
@@ -155,6 +159,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			\OCP\Server::get(IEventDispatcher::class),
+			$this->logger,
 		);
 	}
 
@@ -632,6 +637,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			\OCP\Server::get(IEventDispatcher::class),
+			$this->logger,
 		);
 
 		$form = new Form();
@@ -871,6 +877,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			\OCP\Server::get(IEventDispatcher::class),
+			$this->logger,
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -982,6 +989,7 @@ class FormsServiceTest extends TestCase {
 			$this->storage,
 			$this->l10n,
 			\OCP\Server::get(IEventDispatcher::class),
+			$this->logger,
 		);
 
 		$form = new Form();
@@ -1213,6 +1221,7 @@ class FormsServiceTest extends TestCase {
 				$this->storage,
 				$this->l10n,
 				$eventDispatcher,
+				$this->logger,
 			])
 			->getMock();
 
