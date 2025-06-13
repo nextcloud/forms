@@ -56,6 +56,7 @@ OC.L10N.register(
     "Delete" : "Verwijder",
     "Uploading …" : "Uploaden ...",
     "A long answer for the question “{text}”" : "Een lang antwoord voor vraag “{text}”",
+    "Other:" : "Andere",
     "Other" : "Andere",
     "A short answer for the question “{text}”" : "Een kort antwoord voor vraag “{text}”",
     "No response" : "Geen antwoord",
