@@ -34,6 +34,7 @@ use OCP\IUserSession;
 use OCP\Search\ISearchQuery;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
+use Psr\Log\LoggerInterface;
 
 /**
  * Trait for getting forms information in a service
@@ -62,6 +63,7 @@ class FormsService {
 		private IRootFolder $rootFolder,
 		private IL10N $l10n,
 		private IEventDispatcher $eventDispatcher,
+		private LoggerInterface $logger,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -562,19 +564,30 @@ class FormsService {
 	 * @param Share $share The new Share
 	 */
 	public function notifyNewShares(Form $form, Share $share): void {
-		switch ($share->getShareType()) {
-			case IShare::TYPE_USER:
-				$this->activityManager->publishNewShare($form, $share->getShareWith());
-				break;
-			case IShare::TYPE_GROUP:
-				$this->activityManager->publishNewGroupShare($form, $share->getShareWith());
-				break;
-			case IShare::TYPE_CIRCLE:
-				$this->activityManager->publishNewCircleShare($form, $share->getShareWith());
-				break;
-			default:
-				// Do nothing.
+		try {
+			switch ($share->getShareType()) {
+				case IShare::TYPE_USER:
+					$this->activityManager->publishNewShare($form, $share->getShareWith());
+					break;
+				case IShare::TYPE_GROUP:
+					$this->activityManager->publishNewGroupShare($form, $share->getShareWith());
+					break;
+				case IShare::TYPE_CIRCLE:
+					$this->activityManager->publishNewCircleShare($form, $share->getShareWith());
+					break;
+				default:
+					// Do nothing.
+			}
+		} catch (\Exception $e) {
+			// Handle exceptions silently, as this is not critical.
+			// We don't want to break the share creation process just because of an activity error.
+			$this->logger->error(
+				'Error while publishing new share activity',
+				[$e]
+			);
+			
 		}
+		
 	}
 
 	/**
@@ -585,14 +598,31 @@ class FormsService {
 	 */
 	public function notifyNewSubmission(Form $form, Submission $submission): void {
 		$shares = $this->getShares($form->getId());
-		$this->activityManager->publishNewSubmission($form, $submission->getUserId());
+		try {
+			$this->activityManager->publishNewSubmission($form, $submission->getUserId());
+		} catch (\Exception $e) {
+			// Handle exceptions silently, as this is not critical.
+			// We don't want to break the submission process just because of an activity error.
+			$this->logger->error(
+				'Error while publishing new submission activity',
+				[$e]
+			);
+		}
 
 		foreach ($shares as $share) {
 			if (!in_array(Constants::PERMISSION_RESULTS, $share['permissions'])) {
 				continue;
 			}
-
-			$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submission->getUserId());
+			try {
+				$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submission->getUserId());
+			} catch (\Exception $e) {
+				// Handle exceptions silently, as this is not critical.
+				// We don't want to break the submission process just because of an activity error.
+				$this->logger->error(
+					'Error while publishing new shared submission activity',
+					[$e]
+				);
+			}
 		}
 
 		$this->eventDispatcher->dispatchTyped(new FormSubmittedEvent($form, $submission));
