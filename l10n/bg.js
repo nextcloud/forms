@@ -11,6 +11,7 @@ OC.L10N.register(
     "No" : "Не",
     "Yes" : "Да",
     "Question" : "Въпрос",
+    "Count" : "Брой",
     "Copy" : "Копие",
     "Anonymous response" : "Анонимен отговор",
     "Shared by %s" : "Споделено от %s",
