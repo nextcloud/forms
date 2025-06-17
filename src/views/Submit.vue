@@ -818,12 +818,21 @@ export default {
 				this.deleteFormFieldFromLocalStorage()
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
+				const errorMessage = error.response?.data?.ocs?.meta?.message
 				logger.error('Error while submitting the form', { error })
-				showError(
-					t('forms', 'There was an error submitting the form: {message}', {
-						message: error.response.data.ocs.meta.message,
-					}),
-				)
+				if (errorMessage) {
+					showError(
+						t(
+							'forms',
+							'There was an error submitting the form: {message}',
+							{
+								message: errorMessage,
+							},
+						),
+					)
+				} else {
+					showError(t('forms', 'There was an error submitting the form'))
+				}
 			} finally {
 				this.loading = false
 				if (!this.publicView) {
