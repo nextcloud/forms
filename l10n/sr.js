@@ -258,6 +258,7 @@ OC.L10N.register(
     "There was an error while loading the submission" : "Дошло је до грешке током учитавања поднеска",
     "Some answers are not valid" : "Неки одговори нису исправни",
     "There was an error submitting the form: {message}" : "Дошло је до грешке приликом подношења формулара: {message}.",
+    "There was an error submitting the form" : "Дошло је до грешке током подношења упитника",
     "Submit form" : "Поднеси упитник",
     "Submitting form …" : "Подношење упитника ...",
     "Thank you for completing the form!" : "Хвала вам што се попунили упитник!",

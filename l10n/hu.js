@@ -230,6 +230,7 @@ OC.L10N.register(
     "Clear" : "Törlés",
     "Some answers are not valid" : "Néhány válasz nem érvényes",
     "There was an error submitting the form: {message}" : "Hiba történt az űrlap beküldése során: {message}.",
+    "There was an error submitting the form" : "Hiba az űrlap beküldése során",
     "Submit form" : "Űrlap beküldése",
     "Submitting form …" : "Űrlap beküldése…",
     "Thank you for completing the form!" : "Köszönöm, hogy kitöltötte az űrlapot!",

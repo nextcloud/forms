@@ -228,6 +228,7 @@ OC.L10N.register(
     "Clear" : "Garbitu",
     "Some answers are not valid" : "Erantzun batzuek ez dute balio",
     "There was an error submitting the form: {message}" : " Errore bat gertatu da galdetegi hau bidaltzean: {message}",
+    "There was an error submitting the form" : "Errore bat gertatu da galdetegia bidaltzean",
     "Submit form" : "Bidali galdetegia",
     "Submitting form …" : "Galdetegia bidaltzen ...",
     "Thank you for completing the form!" : "Mila esker galdetegia betetzeagatik!",

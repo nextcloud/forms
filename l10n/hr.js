@@ -100,6 +100,7 @@ OC.L10N.register(
     "Abort" : "Prekid",
     "Submit" : "Šalji",
     "Clear" : "Izbriši",
+    "There was an error submitting the form" : "Došlo je do pogreške pri slanju obrasca",
     "Submit form" : "Šalji obrazac",
     "Submitting form …" : "Slanje obrasca u tijeku…",
     "Thank you for completing the form!" : "Hvala što ste ispunili obrazac!",

@@ -157,6 +157,7 @@ OC.L10N.register(
     "Abort" : "Prekini",
     "Submit" : "Pošlji",
     "Clear" : "Počisti",
+    "There was an error submitting the form" : "Prišlo je do napake med pošiljanjem vprašalnika",
     "Submit form" : "Objavi obrazec",
     "Submitting form …" : "Poteka objavljanje obrazca ...",
     "Thank you for completing the form!" : "Hvala za izpolnjevanje vprašalnika!",

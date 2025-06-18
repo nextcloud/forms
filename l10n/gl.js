@@ -239,6 +239,7 @@ OC.L10N.register(
     "Clear" : "Limpar",
     "Some answers are not valid" : "Algunhas respostas non son válidas",
     "There was an error submitting the form: {message}" : "Produciuse un erro ao enviar o formulario: {message}",
+    "There was an error submitting the form" : "Produciuse un erro no envío do formulario",
     "Submit form" : "Enviar o formulario",
     "Submitting form …" : "Enviando o formulario…",
     "Thank you for completing the form!" : "Grazas por completar o formulario.",

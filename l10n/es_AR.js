@@ -72,6 +72,7 @@ OC.L10N.register(
     "Abort" : "Abortar",
     "Submit" : "Enviar",
     "Clear" : "Borrar",
+    "There was an error submitting the form" : "Hubo un error al enviar el formulario",
     "Submit form" : "Enviar formulario",
     "Submitting form …" : "Enviando formulario ...",
     "Thank you for completing the form!" : "Gracias por completar el formulario!",

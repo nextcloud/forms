@@ -256,6 +256,7 @@
     "There was an error while loading the submission" : "Ocorreu um erro ao carregar o envio",
     "Some answers are not valid" : "Algumas respostas não são válidas",
     "There was an error submitting the form: {message}" : "Ocorreu um erro ao enviar o formulário: {message}",
+    "There was an error submitting the form" : "Houve um erro ao enviar o formulário",
     "Submit form" : "Enviar formulário",
     "Submitting form …" : "Enviando formulário...",
     "Thank you for completing the form!" : "Obrigado por completar o formulário!",

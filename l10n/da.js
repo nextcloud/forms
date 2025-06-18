@@ -238,6 +238,7 @@ OC.L10N.register(
     "Clear" : "Ryd",
     "Some answers are not valid" : "Nogle svar er ikke gyldige",
     "There was an error submitting the form: {message}" : "Der opstod en fejl under indsendelse af formularen: {message}",
+    "There was an error submitting the form" : "Der opstod en fejl under indsendelse af formularen",
     "Submit form" : "Indsend formular",
     "Submitting form …" : "Indsender formular...",
     "Thank you for completing the form!" : "Tak fordi du udfyldte formularen!",

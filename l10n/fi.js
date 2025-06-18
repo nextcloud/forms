@@ -197,6 +197,7 @@ OC.L10N.register(
     "Clear" : "Tyhjennä",
     "Some answers are not valid" : "Jotkin vastaukset eivät ole kelvollisia",
     "There was an error submitting the form: {message}" : "Lomaketta lähettäessä ilmeni virhe: {message}",
+    "There was an error submitting the form" : "Lomaketta lähettäessä tapahtui virhe",
     "Submit form" : "Lähetä lomake",
     "Submitting form …" : "Lähetetään lomaketta…",
     "Thank you for completing the form!" : "Kiitos kun täytit lomakkeen!",

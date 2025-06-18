@@ -208,6 +208,7 @@ OC.L10N.register(
     "Clear" : "پاک کردن",
     "Some answers are not valid" : "برخی از پاسخ‌ها معتبر نیستند",
     "There was an error submitting the form: {message}" : "خطایی در ارسال این فرم بروز کرد: {message}",
+    "There was an error submitting the form" : "There was an error submitting the form",
     "Submit form" : "ارسال فرم",
     "Submitting form …" : "در حال فرستادن فرم...",
     "Thank you for completing the form!" : "سپاس از شما برای تکمیل فرم!",

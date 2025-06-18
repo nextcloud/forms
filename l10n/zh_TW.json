@@ -256,6 +256,7 @@
     "There was an error while loading the submission" : "載入提交時發生錯誤",
     "Some answers are not valid" : "有些答案無效",
     "There was an error submitting the form: {message}" : "遞交表單時發生錯誤：{message}",
+    "There was an error submitting the form" : "遞交表單時發生錯誤",
     "Submit form" : "遞交表單",
     "Submitting form …" : "正在遞交表單……",
     "Thank you for completing the form!" : "感謝您填寫表單！",

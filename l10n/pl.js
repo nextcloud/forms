@@ -190,6 +190,7 @@ OC.L10N.register(
     "Submit" : "Wyślij",
     "Leave" : "Opuść",
     "Clear" : "Wyczyść",
+    "There was an error submitting the form" : "Podczas przesyłania formularza wystąpił błąd",
     "Submit form" : "Wyślij formularz",
     "Submitting form …" : "Wysyłanie formularza…",
     "Thank you for completing the form!" : "Dziękujemy za wypełnienie formularza!",

@@ -203,6 +203,7 @@
     "Clear" : "Εκκαθάριση",
     "Some answers are not valid" : "Ορισμένες απαντήσεις δεν είναι έγκυρες",
     "There was an error submitting the form: {message}" : "Υπήρξε σφάλμα κατά την υποβολή της φόρμας: {message}",
+    "There was an error submitting the form" : "Σφάλμα κατά την υποβολή της φόρμας",
     "Submit form" : "Υποβολή φόρμας",
     "Submitting form …" : "Υποβολή φόρμας ...",
     "Thank you for completing the form!" : "Σας ευχαριστούμε για την συμπλήρωση της φόρμας!",

@@ -85,6 +85,7 @@ OC.L10N.register(
     "Abort" : "להפסיק",
     "Submit" : "שליחה",
     "Clear" : "פינוי",
+    "There was an error submitting the form" : "עלתה שגיאה בעת הגשת הטופס",
     "Submit form" : "הגשת הטופס",
     "Submitting form …" : "הטופס מוגש…",
     "Thank you for completing the form!" : "תודה לך על שהשלמת את הטופס!",

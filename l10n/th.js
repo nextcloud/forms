@@ -68,6 +68,7 @@ OC.L10N.register(
     "Abort" : "ยกเลิก",
     "Submit" : "ส่ง",
     "Clear" : "ล้าง",
+    "There was an error submitting the form" : "เกิดข้อผิดพลาดขณะส่งฟอร์ม",
     "Submit form" : "ส่งฟอร์ม",
     "Submitting form …" : "กำลังส่งฟอร์ม …",
     "Thank you for completing the form!" : "ขอบคุณที่ทำแบบฟอร์ม!",

@@ -235,6 +235,7 @@ OC.L10N.register(
     "Clear" : "Очистити",
     "Some answers are not valid" : "Деякі відповіді не дійсні",
     "There was an error submitting the form: {message}" : "Плмилка під час надсилання форми: {message}",
+    "There was an error submitting the form" : "Виникла помилка при відправленні форми",
     "Submit form" : "Надіслати форму",
     "Submitting form …" : "Надсилання форми ...",
     "Thank you for completing the form!" : "Дякуємо за заповнену форму!",

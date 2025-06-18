@@ -157,6 +157,7 @@ OC.L10N.register(
     "Leave" : "出る",
     "Clear" : "クリア",
     "Some answers are not valid" : "いくつかの回答が無効です",
+    "There was an error submitting the form" : "フォームの送信中にエラーが発生しました",
     "Submit form" : "フォームを送信",
     "Submitting form …" : "フォームを送信中...",
     "Thank you for completing the form!" : "回答のご協力ありがとうございました！",

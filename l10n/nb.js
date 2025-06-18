@@ -233,6 +233,7 @@ OC.L10N.register(
     "Clear" : "Tøm",
     "Some answers are not valid" : "Noen svar er ikke gyldige",
     "There was an error submitting the form: {message}" : "Det oppstod en feil under innsending av skjemaet: {message}.",
+    "There was an error submitting the form" : "Det oppsto en feil ved innsending av skjema",
     "Submit form" : "Send skjema",
     "Submitting form …" : "Sender skjema ...",
     "Thank you for completing the form!" : "Takk for at du fylte ut skjemaet!",

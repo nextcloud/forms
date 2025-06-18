@@ -79,6 +79,7 @@ OC.L10N.register(
     "Abort" : "Hætta við",
     "Submit" : "Senda inn",
     "Clear" : "Hreinsa",
+    "There was an error submitting the form" : "Það kom upp villa við að senda  eyðuformið inn",
     "Submit form" : "Senda inn eyðuform",
     "Submitting form …" : "Sendi inn eyðuform …",
     "Thank you for completing the form!" : "Takk fyrir að fylla út í eyðuformið!",

@@ -256,6 +256,7 @@
     "There was an error while loading the submission" : "При загрузке отправки произошла ошибка",
     "Some answers are not valid" : "Некоторые ответы недействительны",
     "There was an error submitting the form: {message}" : "При отправке формы произошла ошибка: {message}",
+    "There was an error submitting the form" : "При сохранении формы произошла ошибка",
     "Submit form" : "Сохранить форму",
     "Submitting form …" : "Сохранение формы...",
     "Thank you for completing the form!" : "Спасибо за заполнение формы!",

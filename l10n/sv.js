@@ -242,6 +242,7 @@ OC.L10N.register(
     "Clear" : "Rensa",
     "Some answers are not valid" : "Vissa svar är ogiltiga",
     "There was an error submitting the form: {message}" : "Ett fel uppstod vid inskickning av formuläret: {message}",
+    "There was an error submitting the form" : "Ett fel uppstod vid inskickande av formuläret",
     "Submit form" : "Skicka in formulär",
     "Submitting form …" : "Skickar formulär …",
     "Thank you for completing the form!" : "Tack för att du fyllde i formuläret!",

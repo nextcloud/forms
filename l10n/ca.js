@@ -144,6 +144,7 @@ OC.L10N.register(
     "Submit" : "Envia",
     "Leave" : "Abandona",
     "Clear" : "Neteja",
+    "There was an error submitting the form" : "S'ha produït un error en enviar el formulari",
     "Submit form" : "Envia el formulari",
     "Submitting form …" : "Enviant el formulari …",
     "Thank you for completing the form!" : "Gràcies per emplenar el formulari!",

@@ -75,6 +75,7 @@
     "Abort" : "중단",
     "Submit" : "제출",
     "Clear" : "비우기",
+    "There was an error submitting the form" : "양식 제출 실패",
     "Thank you for completing the form!" : "양식을 작성해주셔서 감사합니다!",
     "You have unsaved changes! Do you still want to leave?" : "저장되지 않은 변경사항이 있습니다. 정말 돌아가시겠습니까?",
     "Error while saving question" : "질문 저장 실패",

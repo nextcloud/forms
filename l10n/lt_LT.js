@@ -137,6 +137,7 @@ OC.L10N.register(
     "Abort" : "Nutraukti",
     "Submit" : "Pateikti",
     "Clear" : "Išvalyti",
+    "There was an error submitting the form" : "Pateikiant anketą, įvyko klaida",
     "Submit form" : "Pateikti anketą",
     "Submitting form …" : "Anketa pateikiama…",
     "Thank you for completing the form!" : "Dėkojame, kad užpildėte anketą!",

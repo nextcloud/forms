@@ -235,6 +235,7 @@ OC.L10N.register(
     "Clear" : "清除",
     "Some answers are not valid" : "有些答案无效",
     "There was an error submitting the form: {message}" : "提交表单时发生错误：{message}",
+    "There was an error submitting the form" : "提交表单时出错",
     "Submit form" : "提交表单",
     "Submitting form …" : "正在提交表格 ......",
     "Thank you for completing the form!" : "感谢您填写此表单！",

@@ -258,6 +258,7 @@ OC.L10N.register(
     "There was an error while loading the submission" : "There was an error while loading the submission",
     "Some answers are not valid" : "Some answers are not valid",
     "There was an error submitting the form: {message}" : "There was an error submitting the form: {message}",
+    "There was an error submitting the form" : "There was an error submitting the form",
     "Submit form" : "Submit form",
     "Submitting form …" : "Submitting form …",
     "Thank you for completing the form!" : "Thank you for completing the form!",

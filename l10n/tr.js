@@ -242,6 +242,7 @@ OC.L10N.register(
     "Clear" : "Temizle",
     "Some answers are not valid" : "Bazı yanıtlar geçersiz",
     "There was an error submitting the form: {message}" : "Form gönderilirken bir sorun çıktı: {message}.",
+    "There was an error submitting the form" : "Form gönderilirken bir sorun çıktı",
     "Submit form" : "Formu gönder",
     "Submitting form …" : "Form gönderiliyor …",
     "Thank you for completing the form!" : "Formu doldurduğunuz için teşekkürler!",

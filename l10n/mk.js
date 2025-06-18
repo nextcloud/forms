@@ -88,6 +88,7 @@ OC.L10N.register(
     "Abort" : "Прекини",
     "Submit" : "Испрати",
     "Clear" : "Исчисти",
+    "There was an error submitting the form" : "Настана грешка при испраќање на формата",
     "Submit form" : "Испрати",
     "Submitting form …" : "Испраќање форма ...",
     "Thank you for completing the form!" : "Ви благодариме што ја комплетиравте формата!",

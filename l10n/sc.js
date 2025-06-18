@@ -105,6 +105,7 @@ OC.L10N.register(
     "Abort" : "Annulla",
     "Submit" : "Imbia",
     "Clear" : "Lìmpia",
+    "There was an error submitting the form" : "B'at àpidu un'errore imbiende su mòdulu",
     "Submit form" : "Imbia mòdulu",
     "Submitting form …" : "Imbia mòdulu …",
     "Thank you for completing the form!" : "Gràtzias pro àere cumpletadu su mòdulu!",

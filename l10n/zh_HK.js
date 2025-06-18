@@ -258,6 +258,7 @@ OC.L10N.register(
     "There was an error while loading the submission" : "載入提交時發生錯誤",
     "Some answers are not valid" : "有些答案無效",
     "There was an error submitting the form: {message}" : "遞交表格時發生錯誤：{message}",
+    "There was an error submitting the form" : "遞交表格時發生錯誤",
     "Submit form" : "遞交表格",
     "Submitting form …" : "正在遞交表格……",
     "Thank you for completing the form!" : "感謝您填寫表格！",

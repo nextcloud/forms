@@ -239,6 +239,7 @@ OC.L10N.register(
     "Clear" : "Vyčistiť",
     "Some answers are not valid" : "Niektoré odpovede sú neplatné",
     "There was an error submitting the form: {message}" : "Pri odosielaní formulára došlo k chybe: {message}",
+    "There was an error submitting the form" : "Pri odosielaní formulára sa vyskytla chyba",
     "Submit form" : "Odoslať formulár",
     "Submitting form …" : "Formulár sa odosiela…",
     "Thank you for completing the form!" : "Ďakujeme za vyplnenie formulára!",

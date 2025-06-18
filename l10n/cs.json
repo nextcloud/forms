@@ -256,6 +256,7 @@
     "There was an error while loading the submission" : "Při načítání příspěvku k chybě",
     "Some answers are not valid" : "Některé odpovědi nejsou platné",
     "There was an error submitting the form: {message}" : "Při odesílání formuláře došlo k chybě: {message}",
+    "There was an error submitting the form" : "Při odesílání formuláře došlo k chybě",
     "Submit form" : "Odeslat formulář",
     "Submitting form …" : "Odesílání formuláře…",
     "Thank you for completing the form!" : "Děkujeme za vyplnění formuláře!",
