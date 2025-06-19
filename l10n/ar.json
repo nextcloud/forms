@@ -240,6 +240,7 @@
     "Clear" : "محو",
     "Some answers are not valid" : "بعض الإجابات غير صحيحة",
     "There was an error submitting the form: {message}" : "حدث خطأٌ أثناء إرسال النموذج: {message}.",
+    "There was an error submitting the form" : "حدث خطأ أثناء إرسال النموذج ",
     "Submit form" : "إرسال النموذج ",
     "Submitting form …" : "جارِ إرسال النموذج...",
     "Thank you for completing the form!" : "شكرًا لك على إكمالك للنموذج! ",

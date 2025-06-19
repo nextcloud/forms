@@ -258,6 +258,7 @@ OC.L10N.register(
     "There was an error while loading the submission" : "Vastuse laadimisel tekkis viga",
     "Some answers are not valid" : "Mõned vastused pole korrektsed",
     "There was an error submitting the form: {message}" : "Vastuse edastamisel tekkis viga: {message}",
+    "There was an error submitting the form" : "Vastuse edastamisel tekkis viga",
     "Submit form" : "Salvesta vastus",
     "Submitting form …" : "Salvestan vastust…",
     "Thank you for completing the form!" : "Tänud vormi täitmise eest!",
