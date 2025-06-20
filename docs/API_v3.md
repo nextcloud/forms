@@ -845,6 +845,9 @@ Get all Submissions to a Form
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to get the submissions for |
   | _submissionId_ | Integer | ID of the submission to get |
+  | _query_ | Integer | Search string for full-text search. Can be a username |
+  | _limit_ | Integer | How many submissions to fetch |
+  | _offset_ | Integer | Offset for the pagination |
 - Response: The submission
 
 ```
