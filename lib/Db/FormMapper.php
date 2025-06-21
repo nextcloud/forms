@@ -34,7 +34,7 @@ class FormMapper extends QBMapper {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
 	}
 
-	
+
 	/**
 	 * @param Entity $entity
 	 * @psalm-param Form $entity

@@ -202,7 +202,7 @@ class ConfigServiceTest extends TestCase {
 			->method('getUserGroupIds')
 			->with($this->currentUser)
 			->willReturn(['usersGroup']);
-		
+
 		$this->assertEquals($expected, $this->configService->canCreateForms());
 	}
 }

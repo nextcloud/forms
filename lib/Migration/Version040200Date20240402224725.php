@@ -30,7 +30,7 @@ class Version040200Date20240402224725 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 
 		$table = $schema->getTable('forms_v2_forms');
-		
+
 		if ($table->hasColumn('access_json') && $table->hasColumn('access_enum')) {
 			$table->dropColumn('access_json');
 			return $schema;

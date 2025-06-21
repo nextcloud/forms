@@ -60,7 +60,7 @@ class ConfigControllerTest extends TestCase {
 				'allow' => 'someConfig',
 				'permit' => 'all'
 			]);
-		
+
 		$this->assertEquals(new DataResponse([
 			'allow' => 'someConfig',
 			'permit' => 'all'
@@ -99,7 +99,7 @@ class ConfigControllerTest extends TestCase {
 	public function testUpdateAppConfig(string $configKey, $configValue, string $strConfig) {
 		$this->logger->expects($this->once())
 			->method('debug');
-		
+
 		$this->config->expects($this->once())
 			->method('setAppValue')
 			->with('forms', $configKey, $strConfig);
@@ -110,7 +110,7 @@ class ConfigControllerTest extends TestCase {
 	public function testUpdateAppConfig_unknownKey() {
 		$this->logger->expects($this->once())
 			->method('debug');
-		
+
 		$this->config->expects($this->never())
 			->method('setAppValue');
 

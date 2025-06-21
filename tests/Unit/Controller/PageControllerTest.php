@@ -51,16 +51,16 @@ class PageControllerTest extends TestCase {
 
 	/** @var IAccountManager|MockObject */
 	private $accountManager;
- 
+
 	/** @var IInitialState|MockObject */
 	private $initialState;
 
 	/** @var IL10N|MockObject */
 	private $l10n;
- 
+
 	/** @var IURLGenerator|MockObject */
 	private $urlGenerator;
- 
+
 	/** @var IUserManager|MockObject */
 	private $userManager;
 

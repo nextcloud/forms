@@ -121,7 +121,7 @@ class CirclesServiceText extends TestCase {
 			->onlyMethods(['getCircle'])
 			->setConstructorArgs([$this->appManager, $this->container, $this->logger])
 			->getMock();
-		
+
 		$circlesService->expects($this->never())
 			->method('getCircle');
 
@@ -138,7 +138,7 @@ class CirclesServiceText extends TestCase {
 			->onlyMethods(['getCircle'])
 			->setConstructorArgs([$this->appManager, $this->container, $this->logger])
 			->getMock();
-		
+
 		$circlesService->expects($this->once())
 			->method('getCircle')
 			->with('noCircle')
@@ -173,7 +173,7 @@ class CirclesServiceText extends TestCase {
 			->onlyMethods(['getCircle'])
 			->setConstructorArgs([$this->appManager, $this->container, $this->logger])
 			->getMock();
-		
+
 		$circlesService->expects($this->once())
 			->method('getCircle')
 			->with('circle')
