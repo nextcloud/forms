@@ -256,6 +256,7 @@
     "There was an error while loading the submission" : "Tharla earráid agus an aighneacht á luchtú",
     "Some answers are not valid" : "Níl roinnt freagraí bailí",
     "There was an error submitting the form: {message}" : "Tharla earráid agus an fhoirm á cur isteach: {message}",
+    "There was an error submitting the form" : "Tharla earráid agus an fhoirm á cur isteach",
     "Submit form" : "Cuir foirm isteach",
     "Submitting form …" : "Foirm á cur isteach…",
     "Thank you for completing the form!" : "Go raibh maith agat as an fhoirm a chomhlánú!",
