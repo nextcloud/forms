@@ -170,11 +170,11 @@ The actual answers of users on submission.
 
 ```json
 {
-  "id": 5,
-  "submissionId": 5,
-  "questionId": 1,
-  "questionName": "preference",
-  "text": "Option 2"
+	"id": 5,
+	"submissionId": 5,
+	"questionId": 1,
+	"questionName": "preference",
+	"text": "Option 2"
 }
 ```
 
