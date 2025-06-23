@@ -310,9 +310,9 @@ class ApiController extends OCSController {
 
 		// Don't allow to change params id, hash, ownerId, created, lastUpdated, fileId
 		if (
-			key_exists('id', $keyValuePairs) || key_exists('hash', $keyValuePairs) ||
-			key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs) ||
-			isset($keyValuePairs['fileId']) || key_exists('lastUpdated', $keyValuePairs)
+			key_exists('id', $keyValuePairs) || key_exists('hash', $keyValuePairs)
+			|| key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs)
+			|| isset($keyValuePairs['fileId']) || key_exists('lastUpdated', $keyValuePairs)
 		) {
 			$this->logger->info('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');
 			throw new OCSForbiddenException('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');

@@ -354,7 +354,7 @@ class FormsService {
 		if ($this->isFormArchived($form)) {
 			return false;
 		}
-		
+
 		// Allow deleting results if the current user has the "results_delete" permission
 		if (in_array(Constants::PERMISSION_RESULTS_DELETE, $this->getPermissions($form))) {
 			return true;
@@ -387,8 +387,8 @@ class FormsService {
 
 		// Refuse access, if submitMultiple is not set and user already has taken part.
 		if (
-			!$form->getSubmitMultiple() &&
-			$this->submissionMapper->hasFormSubmissionsByUser($form, $this->currentUser->getUID())
+			!$form->getSubmitMultiple()
+			&& $this->submissionMapper->hasFormSubmissionsByUser($form, $this->currentUser->getUID())
 		) {
 			return false;
 		}
@@ -480,10 +480,10 @@ class FormsService {
 		}
 
 		// Shown if permitAll and showToAll are both set.
-		if ($form->getAccess()['permitAllUsers'] &&
-			$form->getAccess()['showToAllUsers'] &&
-			$this->configService->getAllowPermitAll() &&
-			$this->configService->getAllowShowToAll()) {
+		if ($form->getAccess()['permitAllUsers']
+			&& $form->getAccess()['showToAllUsers']
+			&& $this->configService->getAllowPermitAll()
+			&& $this->configService->getAllowShowToAll()) {
 
 			return true;
 		}
@@ -585,9 +585,9 @@ class FormsService {
 				'Error while publishing new share activity',
 				[$e]
 			);
-			
+
 		}
-		
+
 	}
 
 	/**
@@ -806,8 +806,8 @@ class FormsService {
 			// Special handling of linear scale validation
 		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
 			// Ensure limits are sane
-			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1) ||
-				isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
+			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
+				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
 		}

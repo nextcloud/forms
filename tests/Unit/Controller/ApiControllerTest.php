@@ -1006,7 +1006,7 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->updateForm(1, ['ownerId' => 'newOwner']));
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}
-	
+
 	public function testGetSubmission_invalidForm() {
 		$exception = $this->createMock(MapperException::class);
 		$this->formMapper->expects($this->once())
@@ -1016,56 +1016,56 @@ class ApiControllerTest extends TestCase {
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmission(1, 42);
 	}
-	
+
 	public function testGetSubmission_noPermissions() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
-	
+
 		$this->formMapper->expects($this->once())
 			->method('findById')
 			->with(1)
 			->willReturn($form);
-	
+
 		$this->formsService->expects($this->once())
 			->method('canSeeResults')
 			->with($form)
 			->willReturn(false);
-	
+
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmission(1, 42);
 	}
-	
+
 	public function testGetSubmission_notFound() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
-	
+
 		$this->formMapper->expects($this->once())
 			->method('findById')
 			->with(1)
 			->willReturn($form);
-	
+
 		$this->formsService->expects($this->once())
 			->method('canSeeResults')
 			->with($form)
 			->willReturn(true);
-	
+
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
 			->with(42)
 			->willReturn(null); // Service returns null when submission not found
-	
+
 		$this->expectException(OCSNotFoundException::class);
 		$this->expectExceptionMessage('Submission doesn\'t exist');
 		$this->apiController->getSubmission(1, 42);
 	}
-	
+
 	public function testGetSubmission_success() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
-	
+
 		// Data that submissionService->getSubmission() is expected to return
 		$submissionDataFromService = [
 			'id' => 42,
@@ -1074,29 +1074,29 @@ class ApiControllerTest extends TestCase {
 			// Add any other fields that SubmissionService::getSubmission would return, e.g., timestamp
 			'timestamp' => 1234567890
 		];
-	
+
 		$this->formMapper->expects($this->once())
 			->method('findById')
 			->with(1)
 			->willReturn($form);
-	
+
 		$this->formsService->expects($this->once())
 			->method('canSeeResults')
 			->with($form)
 			->willReturn(true);
-	
+
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
 			->with(42)
 			->willReturn($submissionDataFromService); // Service returns an array
-	
+
 		$user = $this->createMock(IUser::class);
 		$user->method('getDisplayName')->willReturn('jdoe');
 		$this->userManager->expects($this->once())
 			->method('get')
 			->with('jdoe')
 			->willReturn($user);
-	
+
 		$expectedSubmissionInResponse = $submissionDataFromService;
 		$expectedSubmissionInResponse['userDisplayName'] = 'jdoe';
 		$this->assertEquals(new DataResponse($expectedSubmissionInResponse), $this->apiController->getSubmission(1, 42));
@@ -1295,7 +1295,7 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('hasFormExpired')
 			->willReturn(false);
-		
+
 		$this->expectException(OCSBadRequestException::class);
 		$this->expectExceptionMessage('Can only update if allowEditSubmissions is set');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
@@ -1315,7 +1315,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with($formId)
 			->willReturn($form);
-		
+
 		$this->formsService->expects($this->once())
 			->method('hasUserAccess')
 			->willReturn(true);
@@ -1397,7 +1397,7 @@ class ApiControllerTest extends TestCase {
 			->method('findById')
 			->with($formId)
 			->willReturn($form);
-		
+
 		$this->formsService->expects($this->once())
 			->method('hasUserAccess')
 			->willReturn(true);

@@ -94,8 +94,8 @@ class FormsMigrator implements IMigrator {
 				// Mark userIds with instance.
 				foreach ($formData['submissions'] as $sKey => $submission) {
 					// Anonymous submission or already migrated, just keep it.
-					if (substr($submission['userId'], 0, 10) === 'anon-user-' ||
-						substr($submission['userId'], 0, 8) === 'unknown~') {
+					if (substr($submission['userId'], 0, 10) === 'anon-user-'
+						|| substr($submission['userId'], 0, 8) === 'unknown~') {
 						continue;
 					}
 
@@ -148,7 +148,7 @@ class FormsMigrator implements IMigrator {
 				$form->setSubmitMultiple($formData['submitMultiple']);
 				$form->setAllowEditSubmissions($formData['allowEditSubmissions']);
 				$form->setShowExpiration($formData['showExpiration']);
-				
+
 				$this->formMapper->insert($form);
 
 				$questionIdMap = [];

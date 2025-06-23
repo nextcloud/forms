@@ -25,7 +25,7 @@ class Version030000Date20220707130109 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 
 		$table = $schema->getTable('forms_v2_forms');
-		
+
 		if ($table->hasColumn('submit_once') && $table->hasColumn('submit_multiple')) {
 			$table->dropColumn('submit_once');
 			return $schema;

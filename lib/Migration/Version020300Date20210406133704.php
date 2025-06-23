@@ -24,12 +24,12 @@ class Version020300Date20210406133704 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
-		
+
 		$table = $schema->getTable('forms_v2_questions');
-		
+
 		if ($table->hasColumn('mandatory') && $table->hasColumn('is_required')) {
 			$table->dropColumn('mandatory');
-		
+
 			return $schema;
 		}
 

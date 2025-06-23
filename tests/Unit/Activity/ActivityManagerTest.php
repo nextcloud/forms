@@ -79,7 +79,7 @@ class ActivityManagerTest extends TestCase {
 		$form->setTitle('TestForm-Title');
 		$form->setHash('abcdefg12345');
 		$groupId = 'sharedGroup';
-		
+
 		$group = $this->createMock(IGroup::class);
 		$user = $this->createMock(IUser::class);
 
@@ -154,7 +154,7 @@ class ActivityManagerTest extends TestCase {
 
 	public function testPublishNewCircleShare_circlesDisabled() {
 		$form = $this->createMock(Form::class);
-		
+
 		$this->circlesService->expects($this->once())
 			->method('getCircleUsers')
 			->with('circle')
