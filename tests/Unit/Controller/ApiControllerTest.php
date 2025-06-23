@@ -276,7 +276,7 @@ class ApiControllerTest extends TestCase {
 			->method('getFormIfAllowed')
 			->with(1, Constants::PERMISSION_RESULTS)
 			->willReturn($form);
-		
+
 		$this->submissionService->expects($this->once())
 			->method('getSubmissions')
 			->with(1)
@@ -1000,7 +1000,7 @@ class ApiControllerTest extends TestCase {
 			->method('getFormIfAllowed')
 			->with(1, Constants::PERMISSION_RESULTS)
 			->willReturn($form);
-	
+
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
 			->with(42)
@@ -1029,7 +1029,7 @@ class ApiControllerTest extends TestCase {
 			->method('getFormIfAllowed')
 			->with(1, Constants::PERMISSION_RESULTS)
 			->willReturn($form);
-	
+
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
 			->with(42)
@@ -1229,7 +1229,7 @@ class ApiControllerTest extends TestCase {
 			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
-		
+
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
@@ -1297,7 +1297,7 @@ class ApiControllerTest extends TestCase {
 			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
-		
+
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)

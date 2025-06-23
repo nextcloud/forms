@@ -235,7 +235,7 @@ class ShareApiController extends OCSController {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
-		
+
 		try {
 			$formShare = $this->shareMapper->findById($shareId);
 		} catch (IMapperException $e) {

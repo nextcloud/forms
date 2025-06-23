@@ -799,7 +799,7 @@ class ShareApiControllerTest extends TestCase {
 		$shareEntity->setShareType($share['shareType']);
 		$shareEntity->setShareWith($share['shareWith']);
 		$shareEntity->setPermissions($share['permissions']);
-		
+
 		if ($exception !== NoSuchFormException::class) {
 			$this->shareMapper->expects($this->once())
 				->method('findById')
