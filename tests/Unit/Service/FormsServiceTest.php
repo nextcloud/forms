@@ -124,7 +124,6 @@ class FormsServiceTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
-		$this->logger = $this->createMock(LoggerInterface::class);
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);
