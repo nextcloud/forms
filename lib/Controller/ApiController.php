@@ -1183,10 +1183,10 @@ class ApiController extends OCSController {
 			$filteredSubmissionsCount = $this->submissionMapper->countSubmissions($formId, $userId, $query);
 		}
 		$questions = [];
-		foreach($this->formsService->getQuestions($formId) as $question) {
+		foreach ($this->formsService->getQuestions($formId) as $question) {
 			$questions[$question['id']] = $question;
 		}
-		
+
 
 		// Append Display Names
 		$submissions = array_map(function (array $submission) use ($questions) {
