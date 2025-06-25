@@ -46,7 +46,7 @@
     "p-queue": "^8.0.1",
     "qrcode": "^1.5.4",
     "v-click-outside": "^3.2.0",
-    "vue": "^2.7.16",
+    "vue": "^3.5.17",
     "vue-material-design-icons": "^5.3.1",
     "vue-router": "^3.6.5",
     "vuedraggable": "^2.24.3"
