@@ -13,7 +13,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use Test\TestCase;
 
 class SubmissionMapperTest extends TestCase {
-	
+
 	private SubmissionMapper $mockSubmissionMapper;
 
 
@@ -36,7 +36,7 @@ class SubmissionMapperTest extends TestCase {
 
 		$form = new Form();
 		$form->setId(1);
-		
+
 		$this->assertEquals($expected, $this->mockSubmissionMapper->hasMultipleFormSubmissionsByUser($form, 'user1'));
 	}
 
@@ -71,7 +71,7 @@ class SubmissionMapperTest extends TestCase {
 
 		$form = new Form();
 		$form->setId(1);
-		
+
 		$this->assertEquals($expected, $this->mockSubmissionMapper->hasFormSubmissionsByUser($form, 'user1'));
 	}
 
