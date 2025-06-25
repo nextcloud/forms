@@ -5,6 +5,25 @@
 
 # Changelog
 
+## v5.1.1 - 2025-06-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.0...v5.1.1)
+
+### Fixed
+
+- [stable5] fix: Preserve intermediate changes when updating answer text by @backportbot[bot] in [\#2801](https://github.com/nextcloud/forms/pull/2801)
+- [stable5] fix: properly set string values in exports to escape formulas by @backportbot[bot] in [\#2797](https://github.com/nextcloud/forms/pull/2797)
+- [stable5] fix(validation): Update validationType handling by @backportbot[bot] in [\#2793](https://github.com/nextcloud/forms/pull/2793)
+
+### Merged
+
+- [stable5] chore(QuestionMultiple): update "Other" answer handling to use v-model and add change handler by @backportbot[bot] in [\#2800](https://github.com/nextcloud/forms/pull/2800)
+- [stable5] fix: address vue warnings in console by @backportbot[bot] in [\#2798](https://github.com/nextcloud/forms/pull/2798)
+- [stable5] chore: Simplify props usage by removing unnecessary bindings in various components by @backportbot[bot] in [\#2792](https://github.com/nextcloud/forms/pull/2792)
+- [stable5] chore(QuestionDate): refactor handling of computed props by @backportbot[bot] in [\#2794](https://github.com/nextcloud/forms/pull/2794)
+- [stable5] chore: fix linting on CI by @backportbot[bot] in [\#2795](https://github.com/nextcloud/forms/pull/2795)
+- [stable5] Mention file type in docs by @backportbot[bot] in [\#2791](https://github.com/nextcloud/forms/pull/2791)
+
 ## v5.1.0 - 2025-04-03
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.4...v5.1.0)
