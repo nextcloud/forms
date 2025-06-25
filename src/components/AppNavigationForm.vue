@@ -9,7 +9,7 @@
 		:active="isActive"
 		:actions-aria-label="t('forms', 'Form actions')"
 		:counter-number="form.submissionCount"
-		:compact="true"
+		compact
 		:force-display-actions="forceDisplayActions"
 		:name="formTitle"
 		:to="{
@@ -28,8 +28,8 @@
 		<template v-if="!loading && !readOnly" #actions>
 			<NcActionRouter
 				v-if="!isArchived"
-				:close-after-click="true"
-				:exact="true"
+				close-after-click
+				exact
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -39,7 +39,7 @@
 			</NcActionRouter>
 			<NcActionButton
 				v-if="!isArchived"
-				:close-after-click="true"
+				close-after-click
 				@click="onShareForm">
 				<template #icon>
 					<IconShareVariant :size="20" />
@@ -47,8 +47,8 @@
 				{{ t('forms', 'Share form') }}
 			</NcActionButton>
 			<NcActionRouter
-				:close-after-click="true"
-				:exact="true"
+				close-after-click
+				exact
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -56,10 +56,7 @@
 				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
-			<NcActionButton
-				v-if="canEdit"
-				:close-after-click="true"
-				@click="onCloneForm">
+			<NcActionButton v-if="canEdit" close-after-click @click="onCloneForm">
 				<template #icon>
 					<IconContentCopy :size="20" />
 				</template>
@@ -68,7 +65,7 @@
 			<NcActionSeparator v-if="canEdit" />
 			<NcActionButton
 				v-if="canEdit"
-				:close-after-click="true"
+				close-after-click
 				@click="onToggleArchive">
 				<template #icon>
 					<IconArchiveOff v-if="isArchived" :size="20" />
@@ -82,7 +79,7 @@
 			</NcActionButton>
 			<NcActionButton
 				v-if="canEdit"
-				:close-after-click="true"
+				close-after-click
 				@click="showDeleteDialog = true">
 				<template #icon>
 					<IconDelete :size="20" />
