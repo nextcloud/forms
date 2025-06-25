@@ -1,5 +1,15 @@
 # Changelog
 
+
+## v4.3.13 - 2025-06-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.12...v4.3.13)
+
+### Fixed
+
+- [stable4] fix(validation): change validationType handling [\#2687](https://github.com/nextcloud/forms/pull/2687)
+- [stable4] fix: properly set string values in exports to escape formulas [\#2796](https://github.com/nextcloud/forms/pull/2796)
+
 ## v4.3.12 - 2025-04-03
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.11...v4.3.12)
