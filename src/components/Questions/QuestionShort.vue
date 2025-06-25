@@ -50,9 +50,10 @@
 						validationTypeObject, validationTypeName
 					) in validationTypes"
 					:key="validationTypeName"
-					:checked="validationType === validationTypeName"
-					:name="validationTypeName"
-					@update:checked="onChangeValidationType(validationTypeName)">
+					:model-value="validationType"
+					:name="`${id}_validationMenu`"
+					:value="validationTypeName"
+					@update:model-value="onChangeValidationType(validationTypeName)">
 					{{ validationTypeObject.label }}
 				</NcActionRadio>
 				<NcActionInput
