@@ -62,7 +62,7 @@
     "@playwright/test": "^1.53.1",
     "@vue/tsconfig": "^0.5.1",
     "eslint-config-prettier": "^10.1.5",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.1",
     "vite": "^6.3.5"
   },
   "engines": {
