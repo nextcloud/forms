@@ -48,7 +48,7 @@
     "v-click-outside": "^3.2.0",
     "vue": "^2.7.16",
     "vue-material-design-icons": "^5.3.1",
-    "vue-router": "^3.6.5",
+    "vue-router": "^4.5.1",
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
