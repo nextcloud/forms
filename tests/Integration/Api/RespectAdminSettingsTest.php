@@ -128,10 +128,10 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'submissionMessage' => '',
 				'permissions' => [
 					'edit',
+					'embed',
 					'results',
 					'results_delete',
 					'submit',
-					'embed',
 				],
 				'canSubmit' => true,
 				'submissionCount' => 0,
