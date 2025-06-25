@@ -248,8 +248,8 @@ class SubmissionService {
 				function (array $carry, Answer $answer) use ($questionPerQuestionId) {
 					$questionId = $answer->getQuestionId();
 
-					if (isset($questionPerQuestionId[$questionId]) &&
-						$questionPerQuestionId[$questionId]->getType() === Constants::ANSWER_TYPE_FILE) {
+					if (isset($questionPerQuestionId[$questionId])
+						&& $questionPerQuestionId[$questionId]->getType() === Constants::ANSWER_TYPE_FILE) {
 						if (array_key_exists($questionId, $carry)) {
 							$carry[$questionId]['label'] .= "; \n" . $answer->getText();
 						} else {
@@ -346,17 +346,17 @@ class SubmissionService {
 			$questionAnswered = array_key_exists($questionId, $answers);
 
 			// Check if all required questions have an answer
-			if ($question['isRequired'] &&
-				(!$questionAnswered ||
-				!array_filter($answers[$questionId], static function (string|array $value): bool {
+			if ($question['isRequired']
+				&& (!$questionAnswered
+				|| !array_filter($answers[$questionId], static function (string|array $value): bool {
 					// file type
 					if (is_array($value)) {
 						return !empty($value['uploadedFileId']);
 					}
 
 					return $value !== '';
-				}) ||
-				(!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
+				})
+				|| (!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
 				throw new \InvalidArgumentException(sprintf('Question "%s" is required.', $question['text']));
 			}
@@ -463,8 +463,8 @@ class SubmissionService {
 			$previousDate = $d;
 
 			if ($extraSettings) {
-				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin'])) ||
-					(isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
+				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin']))
+					|| (isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
 				) {
 					throw new \InvalidArgumentException(sprintf('Date is not in the allowed range for question "%s".', $text));
 				}

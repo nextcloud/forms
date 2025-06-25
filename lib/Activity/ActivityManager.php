@@ -16,7 +16,7 @@ use OCP\IUser;
 use OCP\Share\IShare;
 
 class ActivityManager {
-	
+
 	public function __construct(
 		protected string $appName,
 		private ?string $userId,

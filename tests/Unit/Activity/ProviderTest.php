@@ -73,7 +73,7 @@ class ProviderTest extends TestCase {
 		$this->l10nFactory = $this->createMock(IFactory::class);
 		$this->validator = $this->createMock(IValidator::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
-		
+
 		$this->urlGenerator->expects($this->any())
 			->method('linkToRouteAbsolute')
 			->with('forms.page.index')

@@ -70,7 +70,7 @@ class Version040200Date20240402200139 extends SimpleMigrationStep {
 		$qbUpdate->update('forms_v2_forms')
 			->set('access_enum', $qbUpdate->createParameter('access_enum'))
 			->where($qbUpdate->expr()->eq('id', $qbUpdate->createParameter('id')));
-		
+
 		// Fetch Forms...
 		$cursor = $qbFetch->executeQuery();
 

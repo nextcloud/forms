@@ -22,7 +22,7 @@ class Version050000Date20241005173955 extends SimpleMigrationStep {
 		protected IDBConnection $db,
 	) {
 	}
-	
+
 	/**
 	 * @param IOutput $output
 	 * @param Closure(): ISchemaWrapper $schemaClosure

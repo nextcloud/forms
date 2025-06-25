@@ -18,7 +18,7 @@ use OCP\IUserSession;
 
 class ConfigService {
 	private ?IUser $currentUser;
-		
+
 	public function __construct(
 		protected string $appName,
 		private IConfig $config,

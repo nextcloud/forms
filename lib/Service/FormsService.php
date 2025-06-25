@@ -353,8 +353,8 @@ class FormsService {
 
 		// Refuse access, if SubmitMultiple is not set and user already has taken part.
 		if (
-			!$form->getSubmitMultiple() &&
-			$this->submissionMapper->hasFormSubmissionsByUser($form, $this->currentUser->getUID())
+			!$form->getSubmitMultiple()
+			&& $this->submissionMapper->hasFormSubmissionsByUser($form, $this->currentUser->getUID())
 		) {
 			return false;
 		}
@@ -446,10 +446,10 @@ class FormsService {
 		}
 
 		// Shown if permitall and showntoall are both set.
-		if ($form->getAccess()['permitAllUsers'] &&
-			$form->getAccess()['showToAllUsers'] &&
-			$this->configService->getAllowPermitAll() &&
-			$this->configService->getAllowShowToAll()) {
+		if ($form->getAccess()['permitAllUsers']
+			&& $form->getAccess()['showToAllUsers']
+			&& $this->configService->getAllowPermitAll()
+			&& $this->configService->getAllowShowToAll()) {
 
 			return true;
 		}
