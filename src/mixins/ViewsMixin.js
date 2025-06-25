@@ -68,8 +68,8 @@ export default {
 		formDescription() {
 			// Remember the old renderer if overridden, or proxy to the default renderer.
 			const defaultRender =
-				this.markdownit.renderer.rules.link_open ||
-				function (tokens, idx, options, env, self) {
+				this.markdownit.renderer.rules.link_open
+				|| function (tokens, idx, options, env, self) {
 					return self.renderToken(tokens, idx, options)
 				}
 
@@ -88,8 +88,8 @@ export default {
 			}
 
 			return (
-				this.markdownit.render(this.form.description) ||
-				this.form.description
+				this.markdownit.render(this.form.description)
+				|| this.form.description
 			)
 		},
 	},
