@@ -314,6 +314,7 @@ OC.L10N.register(
     "Pick a time range" : "挑選時間範圍",
     "Linear scale" : "線性刻度",
     "Linear scale question title" : "線性刻度問題標題",
+    "Color" : "顏色",
     "Image" : "圖片",
     "Document" : "文件",
     "Presentation" : "簡報",

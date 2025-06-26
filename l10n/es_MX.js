@@ -168,6 +168,7 @@ OC.L10N.register(
     "Time question title" : "Título de la pregunta sobre el tiempo",
     "People can pick a time" : "Los usuarios puede elegir una hora",
     "Pick a time" : "Elige una hora",
+    "Color" : "Color",
     "Image" : "Imagen",
     "Document" : "Documento",
     "Presentation" : "Presentación",

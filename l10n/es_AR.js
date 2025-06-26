@@ -88,6 +88,7 @@ OC.L10N.register(
     "Long text" : "Texto largo",
     "Date" : "Fecha",
     "Time" : "Hora",
+    "Color" : "Color",
     "Text" : "Texto",
     "Phone number" : "Número telefónico"
 },

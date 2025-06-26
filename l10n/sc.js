@@ -140,6 +140,7 @@ OC.L10N.register(
     "Pick a date and time" : "Sèbera data e ora",
     "Time" : "Ora",
     "Pick a time" : "Sèbera una ora",
+    "Color" : "Colore",
     "Image" : "Immàgine",
     "Document" : "Documentu",
     "Presentation" : "Presentatzione",

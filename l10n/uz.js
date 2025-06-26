@@ -31,6 +31,7 @@ OC.L10N.register(
     "Pick a date" : "Sana tanlang",
     "Time" : "Vaqt",
     "Pick a time" : "Vaqtni tanlang",
+    "Color" : "Rang",
     "Text" : "Matn",
     "Email address" : "E-pochta manzili"
 },

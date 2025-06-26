@@ -83,6 +83,7 @@ OC.L10N.register(
     "Datetime" : "วันที่และเวลา",
     "Pick a date and time" : "เลือกวันที่และเวลา",
     "Time" : "เวลา",
+    "Color" : "สี",
     "Document" : "เอกสาร",
     "Presentation" : "งานนำเสนอ",
     "Spreadsheet" : "สเปรดชีต",

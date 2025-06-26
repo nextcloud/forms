@@ -294,6 +294,7 @@ OC.L10N.register(
     "Time question title" : "Saat sorusunun başlığı",
     "People can pick a time" : "İnsanlar bir saat seçebilir",
     "Pick a time" : "Bir saat seçin",
+    "Color" : "Renk",
     "Image" : "Görsel",
     "Document" : "Belge",
     "Presentation" : "Sunum",

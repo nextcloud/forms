@@ -122,6 +122,7 @@ OC.L10N.register(
     "Pick a date and time" : "Изберете датум и време",
     "Time" : "Време",
     "Pick a time" : "Избери време",
+    "Color" : "Боја",
     "Image" : "Слика",
     "Document" : "Документ",
     "Presentation" : "Презентација",

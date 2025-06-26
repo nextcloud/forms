@@ -29,6 +29,7 @@ OC.L10N.register(
     "File" : "ფაილი",
     "Date" : "თარიღი",
     "Time" : "დრო",
+    "Color" : "ფერი",
     "Text" : "ტექსტი",
     "Phone number" : "ტელეფონის ნომერი"
 },

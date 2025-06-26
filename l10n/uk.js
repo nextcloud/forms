@@ -285,6 +285,7 @@ OC.L10N.register(
     "Time question title" : "Текст питання для часу",
     "People can pick a time" : "Респондент може вибрати час",
     "Pick a time" : "Вибрати час",
+    "Color" : "Колір",
     "Image" : "Зображення",
     "Document" : "Документ",
     "Presentation" : "Презентація",

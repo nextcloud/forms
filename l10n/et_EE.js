@@ -314,6 +314,7 @@ OC.L10N.register(
     "Pick a time range" : "Vali ajavahemik",
     "Linear scale" : "Lineaarne skaala",
     "Linear scale question title" : "Lineaarse skaala küsimuse pealkiri",
+    "Color" : "Värv",
     "Image" : "Pilt",
     "Document" : "Dokument",
     "Presentation" : "Esitlus",

@@ -278,6 +278,7 @@ OC.L10N.register(
     "Time question title" : "Denbora galderaren izenburua",
     "People can pick a time" : "Jendeak noiz aukera dezake",
     "Pick a time" : "Aukeratu noiz",
+    "Color" : "Kolorea",
     "Image" : "Irudia",
     "Document" : "Dokumentua",
     "Presentation" : "Aurkezpena",

@@ -311,6 +311,7 @@ OC.L10N.register(
     "Pick a time" : "Choisissez une heure",
     "Pick a time range" : "Choisissez une plage horaire",
     "Linear scale" : "Échelle linéaire",
+    "Color" : "Couleur",
     "Image" : "Image",
     "Document" : "Document",
     "Presentation" : "Présentation",

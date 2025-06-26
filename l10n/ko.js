@@ -93,6 +93,7 @@ OC.L10N.register(
     "Pick a date and time" : "날짜와 시간을 선택",
     "Time" : "시간",
     "Pick a time" : "시간 선택",
+    "Color" : "색",
     "Image" : "이미지",
     "Document" : "문서",
     "Presentation" : "프레젠테이션",

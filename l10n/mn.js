@@ -22,6 +22,7 @@ OC.L10N.register(
     "Submit" : "мэдэгдэх",
     "Date" : "Он сар өдөр",
     "Time" : "Цаг",
+    "Color" : "Өнгө",
     "Phone number" : "Утасны дугаар"
 },
 "nplurals=2; plural=(n != 1);");

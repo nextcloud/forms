@@ -32,6 +32,7 @@ OC.L10N.register(
     "Pick a date" : "Pilih tanggal",
     "Time" : "Waktu",
     "Pick a time" : "Pilih waktu",
+    "Color" : "Warna",
     "Image" : "Gambar",
     "Text" : "Teks",
     "Phone number" : "Nomor telefon",

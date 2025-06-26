@@ -171,6 +171,7 @@ OC.L10N.register(
     "Pick a date and time" : "Pasirinkite datą ir laiką",
     "Time" : "Laikas",
     "Pick a time" : "Pasirinkite laiką",
+    "Color" : "Spalva",
     "Image" : "Paveikslas",
     "Document" : "Dokumentas",
     "Presentation" : "Pateiktis",

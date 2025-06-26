@@ -198,6 +198,7 @@ OC.L10N.register(
     "Time question title" : "時間の設問のタイトル",
     "People can pick a time" : "時間を選択できます",
     "Pick a time" : "時間を指定",
+    "Color" : "色",
     "Image" : "画像",
     "Document" : "ドキュメント",
     "Presentation" : "プレゼンテーション",

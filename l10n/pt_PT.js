@@ -137,6 +137,7 @@ OC.L10N.register(
     "People can pick a date and time" : "Pessoas podem escolher data e hora",
     "Pick a date and time" : "Escolha uma data e hora",
     "Time" : "Tempo",
+    "Color" : "Cor",
     "Image" : "Imagem",
     "Document" : "Documento",
     "Presentation" : "Apresentação",

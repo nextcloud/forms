@@ -289,6 +289,7 @@ OC.L10N.register(
     "Time question title" : "Názov otázky pre čas",
     "People can pick a time" : "Ľudia si môžu vybrať čas",
     "Pick a time" : "Vyberte čas",
+    "Color" : "Farba",
     "Image" : "Obrázok",
     "Document" : "Dokument",
     "Presentation" : "Prezentácia",

@@ -280,6 +280,7 @@ OC.L10N.register(
     "Time question title" : "Tittel på tidsspørsmål",
     "People can pick a time" : "Folk kan velge et tidspunkt",
     "Pick a time" : "Velg et tidspunkt",
+    "Color" : "Farge",
     "Image" : "Bilde",
     "Document" : "Dokument",
     "Presentation" : "Presentasjon",

@@ -280,6 +280,7 @@ OC.L10N.register(
     "Time question title" : "Időt váró kérdés címe",
     "People can pick a time" : "Az emberek választhatnak időt",
     "Pick a time" : "Válasszon egy időt",
+    "Color" : "Színes",
     "Image" : "Kép",
     "Document" : "Dokumentum",
     "Presentation" : "Bemutató",

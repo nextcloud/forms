@@ -285,6 +285,7 @@ OC.L10N.register(
     "Time question title" : "时间问题标题",
     "People can pick a time" : "这里可以选择一个时间",
     "Pick a time" : "选择一个时间",
+    "Color" : "颜色",
     "Image" : "图片",
     "Document" : "文档",
     "Presentation" : "报告",

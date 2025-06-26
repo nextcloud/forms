@@ -314,6 +314,7 @@ OC.L10N.register(
     "Pick a time range" : "Pick a time range",
     "Linear scale" : "Linear scale",
     "Linear scale question title" : "Linear scale question title",
+    "Color" : "Colour",
     "Image" : "Image",
     "Document" : "Document",
     "Presentation" : "Presentation",

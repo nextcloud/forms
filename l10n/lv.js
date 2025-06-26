@@ -50,6 +50,7 @@ OC.L10N.register(
     "Pick a date" : "Izvēlieties datumu",
     "Time" : "Laiks",
     "Pick a time" : "Izvēlieties laiku",
+    "Color" : "Krāsa",
     "Image" : "Attēli",
     "Document" : "Dokuments",
     "Presentation" : "Prezentācija",

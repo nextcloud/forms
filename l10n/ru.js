@@ -314,6 +314,7 @@ OC.L10N.register(
     "Pick a time range" : "Выберите временной диапазон",
     "Linear scale" : "Линейная шкала",
     "Linear scale question title" : "Укажите заголовок",
+    "Color" : "Цвет",
     "Image" : "Изображение",
     "Document" : "Документ",
     "Presentation" : "Презентация",

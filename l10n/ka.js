@@ -42,6 +42,7 @@ OC.L10N.register(
     "Pick a date" : "Pick a date",
     "Time" : "Time",
     "Pick a time" : "Pick a time",
+    "Color" : "Color",
     "Image" : "Image",
     "Presentation" : "Presentation",
     "Text" : "Text",

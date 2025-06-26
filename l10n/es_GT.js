@@ -28,6 +28,7 @@ OC.L10N.register(
     "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",
+    "Color" : "Color",
     "Text" : "Texto",
     "Phone number" : "Número telefónico",
     "Email address" : "Dirección de correo electrónico"

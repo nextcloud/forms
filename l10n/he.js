@@ -117,6 +117,7 @@ OC.L10N.register(
     "Pick a date and time" : "נא לבחור תאריך ושעה",
     "Time" : "זמן",
     "Pick a time" : "בחר זמן",
+    "Color" : "צבע",
     "Image" : "תמונה",
     "Document" : "מסמך",
     "Presentation" : "מצגת",

@@ -43,6 +43,7 @@ OC.L10N.register(
     "Pick a date" : "Chọn ngày",
     "Time" : "Thời gian",
     "Pick a time" : "Chọn thời gian",
+    "Color" : "Màu sắc",
     "Image" : "Hình ảnh",
     "Document" : "Tài liệu",
     "Presentation" : "Buổi thuyết trình",

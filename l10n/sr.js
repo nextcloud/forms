@@ -314,6 +314,7 @@ OC.L10N.register(
     "Pick a time range" : "Изаберите временски опсег",
     "Linear scale" : "Линеарна скала",
     "Linear scale question title" : "Наслов питања линеарне скале",
+    "Color" : "Боја",
     "Image" : "Слика",
     "Document" : "Документ",
     "Presentation" : "Презентација",

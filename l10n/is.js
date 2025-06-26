@@ -102,6 +102,7 @@ OC.L10N.register(
     "Pick a date" : "Veldu dagsetningu",
     "Time" : "Tími",
     "Pick a time" : "Veldu tíma",
+    "Color" : "Litur",
     "Image" : "Mynd",
     "Document" : "Skjal",
     "Presentation" : "Kynning",

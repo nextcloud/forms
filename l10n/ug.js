@@ -280,6 +280,7 @@ OC.L10N.register(
     "Time question title" : "ۋاقىت سوئال ماۋزۇسى",
     "People can pick a time" : "كىشىلەر ۋاقىت تاللىيالايدۇ",
     "Pick a time" : "ۋاقىت تاللاڭ",
+    "Color" : "رەڭ",
     "Image" : "رەسىم",
     "Document" : "پۈتۈك",
     "Presentation" : "Presentation",

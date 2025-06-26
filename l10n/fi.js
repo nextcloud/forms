@@ -243,6 +243,7 @@ OC.L10N.register(
     "Time question title" : "Ajan kysymyksen otsikko",
     "People can pick a time" : "Ihmiset voivat valita ajan",
     "Pick a time" : "Valitse aika",
+    "Color" : "Väri",
     "Image" : "Kuva",
     "Document" : "Asiakirja",
     "Presentation" : "Esitys",

@@ -250,6 +250,7 @@ OC.L10N.register(
     "Time question title" : "Τίτλος ερώτησης ώρας",
     "People can pick a time" : "Οι χρήστες μπορούν να επιλέξουν μια ώρα",
     "Pick a time" : "Επιλέξτε μια ώρα",
+    "Color" : "Χρώμα",
     "Image" : "Εικόνα",
     "Document" : "Έγγραφο",
     "Presentation" : "Παρουσίαση",

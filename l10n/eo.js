@@ -36,6 +36,7 @@ OC.L10N.register(
     "File" : "Dosiero",
     "Date" : "Date",
     "Time" : "Dato",
+    "Color" : "Koloro",
     "Text" : "Teksto",
     "Phone number" : "Telefonnumero",
     "Email address" : "Retpoŝtadreso"

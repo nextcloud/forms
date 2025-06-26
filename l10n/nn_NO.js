@@ -23,6 +23,7 @@ OC.L10N.register(
     "Abort" : "Avbryt",
     "File" : "Fil",
     "Date" : "Dato",
-    "Time" : "Tid"
+    "Time" : "Tid",
+    "Color" : "Farge"
 },
 "nplurals=2; plural=(n != 1);");

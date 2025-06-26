@@ -274,6 +274,7 @@ OC.L10N.register(
     "Time question title" : "Titlul întrebării cu interval orar",
     "People can pick a time" : "Se poate alege un interval orar",
     "Pick a time" : "Alegeți un interval orar",
+    "Color" : "Culoare",
     "Image" : "Imagine",
     "Document" : "Document",
     "Presentation" : "Prezentare",

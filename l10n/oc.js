@@ -35,6 +35,7 @@ OC.L10N.register(
     "Pick a date" : "Causir una data",
     "Time" : "Ora",
     "Pick a time" : "Causir una ora",
+    "Color" : "Color",
     "Document" : "Document",
     "Presentation" : "Presentacion",
     "Text" : "Tèxt",

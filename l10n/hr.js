@@ -135,6 +135,7 @@ OC.L10N.register(
     "Pick a date and time" : "Odaberite datum i vrijeme",
     "Time" : "Vrijeme",
     "Pick a time" : "Odaberi vrijeme",
+    "Color" : "Boja",
     "Image" : "Slika",
     "Presentation" : "Prezentacija",
     "Text" : "Tekst",

@@ -30,6 +30,7 @@ OC.L10N.register(
     "File" : "Skedar ",
     "Date" : "Data",
     "Time" : "Kohë",
+    "Color" : "Ngjyrë ",
     "Document" : "Dokument",
     "Presentation" : "Paraqitje",
     "Spreadsheet" : "Fletëllogaritje",

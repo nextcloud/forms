@@ -21,6 +21,7 @@ OC.L10N.register(
     "Abort" : "អំពី",
     "File" : "ឯកសារ",
     "Date" : "Date",
-    "Time" : "ម៉ោង"
+    "Time" : "ម៉ោង",
+    "Color" : "ព័ណ៌"
 },
 "nplurals=1; plural=0;");

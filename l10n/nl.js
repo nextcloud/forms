@@ -148,6 +148,7 @@ OC.L10N.register(
     "Time question title" : "Tijdvraag titel",
     "People can pick a time" : "Mensen kunnen een tijdstip kiezen",
     "Pick a time" : "Kies een tijd",
+    "Color" : "Kleur",
     "Image" : "Afbeelding",
     "Document" : "Document",
     "Presentation" : "Presentatie",
