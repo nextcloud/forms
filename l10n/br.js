@@ -6,7 +6,7 @@ OC.L10N.register(
     "Shared with you" : "Rannet ganeoc'h",
     "Select groups" : "Choaz ar strolladoù",
     "Cancel" : "Nullañ",
-    "Delete" : "Lemel",
+    "Delete" : "Dilemel",
     "Uploading …" : "O pellgas ...",
     "Set expiration date" : "Lakaat un deizat termen",
     "Group" : "Stollad",
@@ -19,12 +19,15 @@ OC.L10N.register(
     "Description" : "Diskrivadur",
     "Summary" : "Diverrañ",
     "Download" : "Pellgargañ",
+    "Search" : "Klask",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
     "Submit" : "Kinnig",
     "Clear" : "Netaat",
     "File" : "Restr",
     "Date" : "Deiz",
-    "Presentation" : "Kinnigadenn"
+    "Presentation" : "Kinnigadenn",
+    "Text" : "Testenn",
+    "Phone number" : "Niverenn bellgomz"
 },
 "nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > 19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 && n % 1000000 == 0) ? 3 : 4);");

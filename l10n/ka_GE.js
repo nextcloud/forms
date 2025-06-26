@@ -20,6 +20,7 @@ OC.L10N.register(
     "Description" : "აღწერილობა",
     "Summary" : "შეჯამება",
     "Download" : "ჩამოტვირთვა",
+    "Search" : "ძიება",
     "Sharing" : "გაზიარება",
     "Settings" : "პარამეტრები",
     "Abort" : "შეჩერება",
@@ -28,6 +29,7 @@ OC.L10N.register(
     "File" : "ფაილი",
     "Date" : "თარიღი",
     "Time" : "დრო",
+    "Color" : "ფერი",
     "Text" : "ტექსტი",
     "Phone number" : "ტელეფონის ნომერი"
 },

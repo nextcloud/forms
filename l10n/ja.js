@@ -56,6 +56,8 @@ OC.L10N.register(
     "Add multiple options" : "複数のオプションを追加",
     "Add multiple options (one per line)" : "複数のオプションを追加（1行ごとに1つ）",
     "Options" : "オプション",
+    "Go to first page" : "最初のページへ",
+    "Go to previous page" : "前のページへ",
     "Answer number {index}" : "回答数 {index}",
     "Error while saving the answer" : "回答を保存中にエラーが発生しました",
     "Delete answer" : "回答を削除",
@@ -142,6 +144,8 @@ OC.L10N.register(
     "Save copy to Files" : "ファイルのコピーを保存",
     "Download" : "ダウンロード",
     "Delete all responses" : "全ての返信を削除",
+    "Search" : "検索",
+    "No results found" : "結果が見つかりません",
     "No responses yet" : "まだ返信はありません",
     "Results of submitted forms will show up here" : "送信したフォームの結果はここに表示されます",
     "Are you sure you want to delete all responses of {title}?" : "本当にすべての {title} を削除してもよろしいですか？",
@@ -153,6 +157,7 @@ OC.L10N.register(
     "Leave" : "出る",
     "Clear" : "クリア",
     "Some answers are not valid" : "いくつかの回答が無効です",
+    "There was an error submitting the form" : "フォームの送信中にエラーが発生しました",
     "Submit form" : "フォームを送信",
     "Submitting form …" : "フォームを送信中...",
     "Thank you for completing the form!" : "回答のご協力ありがとうございました！",
@@ -193,6 +198,7 @@ OC.L10N.register(
     "Time question title" : "時間の設問のタイトル",
     "People can pick a time" : "時間を選択できます",
     "Pick a time" : "時間を指定",
+    "Color" : "色",
     "Image" : "画像",
     "Document" : "ドキュメント",
     "Presentation" : "プレゼンテーション",
@@ -204,8 +210,6 @@ OC.L10N.register(
     "The input is not a valid email address" : "入力されたメールアドレスは無効です。",
     "Enter an email address" : "メールアドレスを入力",
     "Number" : "数字",
-    "Enter a number" : "数値を入力",
-    "Add a new answer" : "回答を追加",
-    "Form still supports old sharing-link." : "フォームではまだ古い共有リンクをサポートしています。"
+    "Enter a number" : "数値を入力"
 },
 "nplurals=1; plural=0;");

@@ -90,6 +90,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} odgovora",
     "Download" : "Preuzmi",
     "Delete all responses" : "Izbriši sve odgovore",
+    "Search" : "Traži",
+    "No results found" : "Nema rezultata",
     "No responses yet" : "Još nema odgovora",
     "Results of submitted forms will show up here" : "Ovdje će se prikazati rezultati poslanih obrazaca",
     "Are you sure you want to delete all responses of {title}?" : "Jeste li sigurni da želite izbrisati sve odgovore u {title}?",
@@ -98,6 +100,7 @@ OC.L10N.register(
     "Abort" : "Prekid",
     "Submit" : "Šalji",
     "Clear" : "Izbriši",
+    "There was an error submitting the form" : "Došlo je do pogreške pri slanju obrasca",
     "Submit form" : "Šalji obrazac",
     "Submitting form …" : "Slanje obrasca u tijeku…",
     "Thank you for completing the form!" : "Hvala što ste ispunili obrazac!",
@@ -132,11 +135,11 @@ OC.L10N.register(
     "Pick a date and time" : "Odaberite datum i vrijeme",
     "Time" : "Vrijeme",
     "Pick a time" : "Odaberi vrijeme",
+    "Color" : "Boja",
     "Image" : "Slika",
     "Presentation" : "Prezentacija",
     "Text" : "Tekst",
     "Phone number" : "Broj telefona",
-    "Email address" : "Adresa e-pošte",
-    "Add a new answer" : "Dodaj novi odgovor"
+    "Email address" : "Adresa e-pošte"
 },
 "nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;");

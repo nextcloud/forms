@@ -16,11 +16,13 @@ OC.L10N.register(
     "Description" : "Тодорхойлолт",
     "Summary" : "Хураангуй",
     "Download" : "Татах",
+    "Search" : "Хайх",
     "Sharing" : "Түгээх",
     "Settings" : "Тохиргоо",
     "Submit" : "мэдэгдэх",
     "Date" : "Он сар өдөр",
     "Time" : "Цаг",
+    "Color" : "Өнгө",
     "Phone number" : "Утасны дугаар"
 },
 "nplurals=2; plural=(n != 1);");

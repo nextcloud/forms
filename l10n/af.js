@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopieer",
     "Shared with you" : "Met u gedeel",
+    "Cancel" : "Cancel",
     "Required" : "Vereis",
     "Delete" : "Skrap",
     "Uploading …" : "Laai tans op …",
@@ -19,6 +20,7 @@ OC.L10N.register(
     "Description" : "Beskrywing",
     "Summary" : "Opsomming",
     "Download" : "Laai af",
+    "Search" : "Soek",
     "Settings" : "Instellings",
     "Submit" : "Dien in",
     "File" : "Lêer",

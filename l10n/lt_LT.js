@@ -127,6 +127,8 @@ OC.L10N.register(
     "{amount} responses" : "Atsakymų: {amount}",
     "Download" : "Atsisiųsti",
     "Delete all responses" : "Ištrinti visus atsakymus",
+    "Search" : "Paieška",
+    "No results found" : "Nerasta jokių rezultatų",
     "No responses yet" : "Kol kas atsakymų nėra",
     "Results of submitted forms will show up here" : "Čia bus rodomi pateiktų anketų rezultatai",
     "Form settings" : "Anketos nustatymai",
@@ -135,6 +137,7 @@ OC.L10N.register(
     "Abort" : "Nutraukti",
     "Submit" : "Pateikti",
     "Clear" : "Išvalyti",
+    "There was an error submitting the form" : "Pateikiant anketą, įvyko klaida",
     "Submit form" : "Pateikti anketą",
     "Submitting form …" : "Anketa pateikiama…",
     "Thank you for completing the form!" : "Dėkojame, kad užpildėte anketą!",
@@ -168,13 +171,13 @@ OC.L10N.register(
     "Pick a date and time" : "Pasirinkite datą ir laiką",
     "Time" : "Laikas",
     "Pick a time" : "Pasirinkite laiką",
+    "Color" : "Spalva",
     "Image" : "Paveikslas",
     "Document" : "Dokumentas",
     "Presentation" : "Pateiktis",
     "Spreadsheet" : "Skaičiuoklė",
     "Text" : "Tekstas",
     "Phone number" : "Telefono numeris",
-    "Email address" : "El. pašto adresas",
-    "Add a new answer" : "Pridėti naują atsakymą"
+    "Email address" : "El. pašto adresas"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

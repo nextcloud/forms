@@ -21,12 +21,18 @@ OC.L10N.register(
     "Share" : "Ulashish",
     "Description" : "Tavsif",
     "Download" : "Download",
+    "Search" : "Qidiruv",
+    "No results found" : "Hech qanday natija topilmadi",
     "Sharing" : "Ulashish",
     "Settings" : "Settings",
+    "Checkboxes" : "Belgilash katakchalari",
     "File" : "File",
     "Date" : "Sana",
     "Pick a date" : "Sana tanlang",
+    "Time" : "Vaqt",
     "Pick a time" : "Vaqtni tanlang",
+    "Color" : "Rang",
+    "Text" : "Matn",
     "Email address" : "E-pochta manzili"
 },
 "nplurals=1; plural=0;");

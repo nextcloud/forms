@@ -76,6 +76,7 @@ OC.L10N.register(
     "{amount} responses" : "{amount} תגובות",
     "Download" : "הורדה",
     "Delete all responses" : "מחיקת כל התגובות",
+    "Search" : "חיפוש",
     "No responses yet" : "אין תגובות עדיין",
     "Results of submitted forms will show up here" : "התוצאות לטפסים שהוגשו תופענה כאן",
     "Are you sure you want to delete all responses of {title}?" : "למחוק את כל התגובות על {title}?",
@@ -84,6 +85,7 @@ OC.L10N.register(
     "Abort" : "להפסיק",
     "Submit" : "שליחה",
     "Clear" : "פינוי",
+    "There was an error submitting the form" : "עלתה שגיאה בעת הגשת הטופס",
     "Submit form" : "הגשת הטופס",
     "Submitting form …" : "הטופס מוגש…",
     "Thank you for completing the form!" : "תודה לך על שהשלמת את הטופס!",
@@ -115,13 +117,13 @@ OC.L10N.register(
     "Pick a date and time" : "נא לבחור תאריך ושעה",
     "Time" : "זמן",
     "Pick a time" : "בחר זמן",
+    "Color" : "צבע",
     "Image" : "תמונה",
     "Document" : "מסמך",
     "Presentation" : "מצגת",
     "Spreadsheet" : "גיליון נתונים",
     "Text" : "טקסט",
     "Phone number" : "מספר טלפון",
-    "Email address" : "כתובת דוא״ל",
-    "Add a new answer" : "הוספת תשובה חדשה"
+    "Email address" : "כתובת דוא״ל"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

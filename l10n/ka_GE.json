@@ -18,6 +18,7 @@
     "Description" : "აღწერილობა",
     "Summary" : "შეჯამება",
     "Download" : "ჩამოტვირთვა",
+    "Search" : "ძიება",
     "Sharing" : "გაზიარება",
     "Settings" : "პარამეტრები",
     "Abort" : "შეჩერება",
@@ -26,6 +27,7 @@
     "File" : "ფაილი",
     "Date" : "თარიღი",
     "Time" : "დრო",
+    "Color" : "ფერი",
     "Text" : "ტექსტი",
     "Phone number" : "ტელეფონის ნომერი"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"

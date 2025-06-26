@@ -125,6 +125,8 @@
     "{amount} responses" : "{amount} respuestas",
     "Download" : "Descargar",
     "Delete all responses" : "Eliminar todas las respuestas",
+    "Search" : "Buscar",
+    "No results found" : "No se encontraron resultados",
     "No responses yet" : "Aún no hay respuestas",
     "Results of submitted forms will show up here" : "Los resultados de los formularios enviados aparecerán aquí",
     "Are you sure you want to delete all responses of {title}?" : "¿Seguro que deseas eliminar todas las respuestas de {title}?",
@@ -134,6 +136,7 @@
     "Abort" : "Abortar",
     "Submit" : "Enviar",
     "Clear" : "Limpiar",
+    "There was an error submitting the form" : "Hubo un error al enviar el formulario",
     "Submit form" : "Enviar formulario",
     "Submitting form …" : "Enviando formulario...",
     "Thank you for completing the form!" : "¡Gracias por completar el formulario!",
@@ -173,16 +176,13 @@
     "Time question title" : "Título de la pregunta de hora",
     "People can pick a time" : "Las personas pueden elegir una hora",
     "Pick a time" : "Seleccionar una hora",
+    "Color" : "Color",
     "Image" : "Imagen",
     "Document" : "Documento",
     "Presentation" : "Presentación",
     "Text" : "Texto",
     "Phone number" : "Número telefónico",
     "Email address" : "Dirección de correo electrónico",
-    "Number" : "Número",
-    "Add a new answer" : "Añadir una nueva respuesta",
-    "Legacy Link" : "Enlace antiguo",
-    "Form still supports old sharing-link." : "El formulario todavía admite el enlace de compartición antiguo.",
-    "Remove Legacy Link" : "Eliminar enlace antiguo"
+    "Number" : "Número"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Kopier",
     "Shared with you" : "Shared with you",
     "Select groups" : "Vel grupper",
+    "Cancel" : "Cancel",
     "Required" : "Nødvendig",
     "Delete" : "Slett",
     "Uploading …" : "Lastar opp...",
@@ -16,11 +17,13 @@ OC.L10N.register(
     "Description" : "Skildring",
     "Summary" : "Oppsumering",
     "Download" : "Last ned",
+    "Search" : "Søk",
     "Sharing" : "Deling",
     "Settings" : "Instillingar",
     "Abort" : "Avbryt",
     "File" : "Fil",
     "Date" : "Dato",
-    "Time" : "Tid"
+    "Time" : "Tid",
+    "Color" : "Farge"
 },
 "nplurals=2; plural=(n != 1);");

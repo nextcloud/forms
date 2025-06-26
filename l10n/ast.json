@@ -33,6 +33,7 @@
     "Results" : "Resultaos",
     "Cancel" : "Encaboxar",
     "Options" : "Opciones",
+    "Go to previous page" : "Dir a la páxina anterior",
     "This question needs a title!" : "¡Esta entruga precisa un títulu!",
     "Technical name" : "Nome téunicu",
     "Copy question" : "Copiar la entruga",
@@ -100,6 +101,8 @@
     "Save copy to Files" : "Guardar la copia en Ficheros",
     "Download" : "Baxar",
     "Delete all responses" : "Desaniciar toles rempuestes",
+    "Search" : "Buscar",
+    "No results found" : "Nun s'atopó nengún resultáu",
     "No responses yet" : "Nun hai nenguna rempuesta",
     "Results of submitted forms will show up here" : "Equí apaecen los resultaos de los formularios unviaos",
     "Are you sure you want to delete all responses of {title}?" : "¿De xuru que quies desaniciar toles rempuestes de «{title}»?",
@@ -110,6 +113,7 @@
     "Submit" : "Unviar",
     "Leave" : "Colar",
     "Clear" : "Borrar",
+    "There was an error submitting the form" : "Hebo un error al unviar el formulariu",
     "Submit form" : "Unviar el formulariu",
     "Submitting form …" : "Unviando'l formulariu…",
     "Thank you for completing the form!" : "¡Gracies por completar el formulariu!",
@@ -145,7 +149,6 @@
     "Email address" : "Direición de corréu electrónicu",
     "People can enter an email address" : "La xente pue introducir una direición de corréu electrónicu",
     "Number" : "Númberu",
-    "People can enter a number" : "La xente pue introducir un númberu",
-    "Legacy Link" : "Enllaz heredáu"
+    "People can enter a number" : "La xente pue introducir un númberu"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

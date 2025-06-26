@@ -192,6 +192,8 @@ OC.L10N.register(
     "Save copy to Files" : "Αποθήκευση αντιγράφου στα Αρχεία",
     "Download" : "Λήψη",
     "Delete all responses" : "Διαγραφή απαντήσεων",
+    "Search" : "Αναζήτηση",
+    "No results found" : "Δεν βρέθηκαν αποτελέσματα",
     "No responses yet" : "Καμία απάντηση ακόμη",
     "Results of submitted forms will show up here" : "Τα αποτελέσματα των φορμών θα εμφανίζονται εδώ",
     "Are you sure you want to delete all responses of {title}?" : "Θέλετε σίγουρα να διαγράψετε όλες τις απαντήσεις του {title};",
@@ -203,6 +205,7 @@ OC.L10N.register(
     "Clear" : "Εκκαθάριση",
     "Some answers are not valid" : "Ορισμένες απαντήσεις δεν είναι έγκυρες",
     "There was an error submitting the form: {message}" : "Υπήρξε σφάλμα κατά την υποβολή της φόρμας: {message}",
+    "There was an error submitting the form" : "Σφάλμα κατά την υποβολή της φόρμας",
     "Submit form" : "Υποβολή φόρμας",
     "Submitting form …" : "Υποβολή φόρμας ...",
     "Thank you for completing the form!" : "Σας ευχαριστούμε για την συμπλήρωση της φόρμας!",
@@ -247,6 +250,7 @@ OC.L10N.register(
     "Time question title" : "Τίτλος ερώτησης ώρας",
     "People can pick a time" : "Οι χρήστες μπορούν να επιλέξουν μια ώρα",
     "Pick a time" : "Επιλέξτε μια ώρα",
+    "Color" : "Χρώμα",
     "Image" : "Εικόνα",
     "Document" : "Έγγραφο",
     "Presentation" : "Παρουσίαση",
@@ -265,9 +269,6 @@ OC.L10N.register(
     "People can enter a number" : "Οι χρήστες μπορούν να εισάγουν έναν αριθμό",
     "Enter a number" : "Πληκτρολογήστε έναν αριθμό",
     "Custom regular expression" : "Προσαρμοσμένη regular expression",
-    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με τους απαιτούμενους κανόνες",
-    "Add a new answer" : "Προσθέστε μια νέα απάντηση",
-    "Form still supports old sharing-link." : "Η φόρμα εξακολουθεί να υποστηρίζει τον παλιό σύνδεσμο κοινής χρήσης.",
-    "Remove Legacy Link" : "Αφαίρεση του συνδέσμου παλαιού τύπου"
+    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με τους απαιτούμενους κανόνες"
 },
 "nplurals=2; plural=(n != 1);");

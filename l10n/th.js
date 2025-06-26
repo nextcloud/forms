@@ -62,11 +62,13 @@ OC.L10N.register(
     "Description" : "รายละเอียด",
     "Add a question" : "เพิ่มคำถาม",
     "Download" : "ดาวน์โหลด",
+    "Search" : "ค้นหา",
     "Sharing" : "การแชร์",
     "Settings" : "การตั้งค่า",
     "Abort" : "ยกเลิก",
     "Submit" : "ส่ง",
     "Clear" : "ล้าง",
+    "There was an error submitting the form" : "เกิดข้อผิดพลาดขณะส่งฟอร์ม",
     "Submit form" : "ส่งฟอร์ม",
     "Submitting form …" : "กำลังส่งฟอร์ม …",
     "Thank you for completing the form!" : "ขอบคุณที่ทำแบบฟอร์ม!",
@@ -81,12 +83,12 @@ OC.L10N.register(
     "Datetime" : "วันที่และเวลา",
     "Pick a date and time" : "เลือกวันที่และเวลา",
     "Time" : "เวลา",
+    "Color" : "สี",
     "Document" : "เอกสาร",
     "Presentation" : "งานนำเสนอ",
     "Spreadsheet" : "สเปรดชีต",
     "Text" : "ข้อความ",
     "Phone number" : "หมายเลขโทรศัพท์",
-    "Email address" : "ที่อยู่อีเมล",
-    "Add a new answer" : "เพิ่มคำตอบใหม่"
+    "Email address" : "ที่อยู่อีเมล"
 },
 "nplurals=1; plural=0;");

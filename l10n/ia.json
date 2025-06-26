@@ -1,6 +1,7 @@
 { "translations": {
     "Copy" : "Copiar",
     "Shared with you" : "Compartite con te",
+    "Cancel" : "Cancel",
     "Required" : "Requirite",
     "Delete" : "Deler",
     "Set expiration date" : "Assignar data de expiration",
@@ -12,6 +13,7 @@
     "Description" : "Description",
     "Summary" : "Summario",
     "Download" : "Discargar",
+    "Search" : "Cercar",
     "Sharing" : "Compartente",
     "Settings" : "Configurationes",
     "Date" : "Date",

@@ -9,6 +9,7 @@
     "No" : "Nee",
     "Yes" : "Ja",
     "Question" : "Vraag",
+    "Count" : "Aantal",
     "Copy" : "Kopiëren",
     "Anonymous response" : "Anoniem antwoord",
     "Shared by %s" : "Gedeeld door %s",
@@ -53,6 +54,7 @@
     "Delete" : "Verwijder",
     "Uploading …" : "Uploaden ...",
     "A long answer for the question “{text}”" : "Een lang antwoord voor vraag “{text}”",
+    "Other:" : "Andere",
     "Other" : "Andere",
     "A short answer for the question “{text}”" : "Een kort antwoord voor vraag “{text}”",
     "No response" : "Geen antwoord",
@@ -69,6 +71,7 @@
     "Copy to clipboard" : "Kopiëren naar het klembord",
     "Copy embedding code" : "Kopieer embedded code",
     "Remove link" : "Link verwijderen",
+    "Share {formTitle}" : "Delen {formTitle}",
     "Internal link" : "Interne link",
     "View" : "Bekijken",
     "Edit" : "Bewerk",
@@ -95,6 +98,8 @@
     "{amount} responses" : "{amount} reacties",
     "Download" : "Download",
     "Delete all responses" : "Verwijder alle antwoorden",
+    "Search" : "Zoeken",
+    "No results found" : "Geen resultaten gevonden",
     "No responses yet" : "Nog geen antwoorden",
     "Results of submitted forms will show up here" : "Resultaten van ingeleverde formulieren worden hier getoond",
     "Are you sure you want to delete all responses of {title}?" : "Weet je zeker dat je alle reacties op {title} wilt verwijderen?",
@@ -103,6 +108,7 @@
     "Abort" : "Afbreken",
     "Submit" : "Verwerken",
     "Clear" : "Terug",
+    "There was an error submitting the form" : "Er trad een fout op bij het insturen van het formulier",
     "Submit form" : "Insturen formulier",
     "Submitting form …" : "Insturen formulier …",
     "Thank you for completing the form!" : "Bedankt voor het invullen van het formulier!",
@@ -140,6 +146,7 @@
     "Time question title" : "Tijdvraag titel",
     "People can pick a time" : "Mensen kunnen een tijdstip kiezen",
     "Pick a time" : "Kies een tijd",
+    "Color" : "Kleur",
     "Image" : "Afbeelding",
     "Document" : "Document",
     "Presentation" : "Presentatie",
@@ -147,7 +154,6 @@
     "Text" : "Tekst",
     "Phone number" : "Telefoonnummer",
     "Email address" : "E-mailadres",
-    "Number" : "Nummer",
-    "Add a new answer" : "Voeg een nieuw antwoord toe"
+    "Number" : "Nummer"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

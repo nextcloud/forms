@@ -195,6 +195,7 @@ OC.L10N.register(
     "{amount} responses" : "{amount} responses",
     "Download" : "بارگیری",
     "Delete all responses" : "Delete all responses",
+    "Search" : "جستجو",
     "No responses yet" : "No responses yet",
     "Results of submitted forms will show up here" : "Results of submitted forms will show up here",
     "Are you sure you want to delete all responses of {title}?" : "Are you sure you want to delete all responses of {title}?",
@@ -207,6 +208,7 @@ OC.L10N.register(
     "Clear" : "پاک کردن",
     "Some answers are not valid" : "برخی از پاسخ‌ها معتبر نیستند",
     "There was an error submitting the form: {message}" : "خطایی در ارسال این فرم بروز کرد: {message}",
+    "There was an error submitting the form" : "There was an error submitting the form",
     "Submit form" : "ارسال فرم",
     "Submitting form …" : "در حال فرستادن فرم...",
     "Thank you for completing the form!" : "سپاس از شما برای تکمیل فرم!",
@@ -252,6 +254,7 @@ OC.L10N.register(
     "Time question title" : "Time question title",
     "People can pick a time" : "People can pick a time",
     "Pick a time" : "Pick a time",
+    "Color" : "رنگ",
     "Image" : "Image",
     "Document" : "Document",
     "Presentation" : "ارائه",
@@ -270,10 +273,6 @@ OC.L10N.register(
     "People can enter a number" : "افراد می‌توانند عدد وارد کنند",
     "Enter a number" : "عددی وارد کنید",
     "Custom regular expression" : "عبارت باقاعدهٔ سفارشی",
-    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد",
-    "Add a new answer" : "پاسخ جدیدی بدهید",
-    "Legacy Link" : "پیوند قدیمی",
-    "Form still supports old sharing-link." : "Form still supports old sharing-link.",
-    "Remove Legacy Link" : "Remove Legacy Link"
+    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد"
 },
 "nplurals=2; plural=(n > 1);");

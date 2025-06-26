@@ -1,6 +1,7 @@
 { "translations": {
     "Copy" : "Kopieer",
     "Shared with you" : "Met u gedeel",
+    "Cancel" : "Cancel",
     "Required" : "Vereis",
     "Delete" : "Skrap",
     "Uploading …" : "Laai tans op …",
@@ -17,6 +18,7 @@
     "Description" : "Beskrywing",
     "Summary" : "Opsomming",
     "Download" : "Laai af",
+    "Search" : "Soek",
     "Settings" : "Instellings",
     "Submit" : "Dien in",
     "File" : "Lêer",

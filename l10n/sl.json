@@ -144,6 +144,8 @@
     "Save copy to Files" : "Kopijo shranite v Datoteke",
     "Download" : "Prejmi",
     "Delete all responses" : "Izbriši vse odzive",
+    "Search" : "Poišči",
+    "No results found" : "Ni najdenih zadetkov",
     "No responses yet" : "Ni še odzivov",
     "Results of submitted forms will show up here" : "Rezultati poslanih anket bodo prikazani na tem mestu.",
     "Are you sure you want to delete all responses of {title}?" : "Ali ste prepričani, da želite izbrisati vse odzive v anketi {title}?",
@@ -153,6 +155,7 @@
     "Abort" : "Prekini",
     "Submit" : "Pošlji",
     "Clear" : "Počisti",
+    "There was an error submitting the form" : "Prišlo je do napake med pošiljanjem vprašalnika",
     "Submit form" : "Objavi obrazec",
     "Submitting form …" : "Poteka objavljanje obrazca ...",
     "Thank you for completing the form!" : "Hvala za izpolnjevanje vprašalnika!",
@@ -192,6 +195,7 @@
     "Time question title" : "Vprašanje za izbor časa",
     "People can pick a time" : "Izbrati je mogoče določen čas",
     "Pick a time" : "Izbor časa",
+    "Color" : "Barva",
     "Image" : "Slika",
     "Document" : "Dokument",
     "Presentation" : "Predstavitev",
@@ -199,8 +203,6 @@
     "Text" : "Besedilo",
     "Phone number" : "Telefonska številka",
     "Email address" : "Elektronski naslov",
-    "Number" : "Številčne vrednosti",
-    "Add a new answer" : "Dodaj nov odgovor",
-    "Form still supports old sharing-link." : "Vprašalnik še vedno podpira zastarel način povezave objave."
+    "Number" : "Številčne vrednosti"
 },"pluralForm" :"nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);"
 }

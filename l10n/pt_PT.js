@@ -92,6 +92,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} respostas",
     "Download" : "Transferir",
     "Delete all responses" : "Apagar todas as respostas",
+    "Search" : "Pesquisa sobre",
+    "No results found" : "No results found",
     "No responses yet" : "Sem respostas ainda",
     "Results of submitted forms will show up here" : "Resultados dos formulários entregues aparecem aqui",
     "Are you sure you want to delete all responses of {title}?" : "Tem a certeza de querer remover todas as respostas de {title}?",
@@ -100,6 +102,7 @@ OC.L10N.register(
     "Abort" : "Abortar",
     "Submit" : "Submeter",
     "Clear" : "Limpar",
+    "There was an error submitting the form" : "Ocorreu um erro ao submeter o formulário",
     "Submit form" : "Submeter formulário",
     "Submitting form …" : "Submetendo o formulário …",
     "Thank you for completing the form!" : "Obrigado por ter preenchido o formulário!",
@@ -134,13 +137,13 @@ OC.L10N.register(
     "People can pick a date and time" : "Pessoas podem escolher data e hora",
     "Pick a date and time" : "Escolha uma data e hora",
     "Time" : "Tempo",
+    "Color" : "Cor",
     "Image" : "Imagem",
     "Document" : "Documento",
     "Presentation" : "Apresentação",
     "Spreadsheet" : "Folha de Cálculo",
     "Text" : "Texto",
     "Phone number" : "Número de telefone",
-    "Email address" : "Endereço de email",
-    "Add a new answer" : "Acrescente uma nova pergunta"
+    "Email address" : "Endereço de email"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

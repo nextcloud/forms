@@ -71,6 +71,7 @@
     "Add multiple options" : "Dodaj wiele opcji",
     "Add multiple options (one per line)" : "Dodaj wiele opcji (po jednej w wierszu)",
     "Options" : "Opcje",
+    "Go to previous page" : "Przejdź do poprzedniej strony",
     "Add a new answer option" : "Dodaj nową odpowiedź do pytania",
     "Answer number {index}" : "Numer odpowiedzi {index}",
     "Error while saving the answer" : "Błąd podczas zapisywania odpowiedzi",
@@ -175,6 +176,8 @@
     "Save copy to Files" : "Zapisz odpowiedzi do Pliku",
     "Download" : "Pobierz",
     "Delete all responses" : "Usuń wszystkie odpowiedzi",
+    "Search" : "Szukaj",
+    "No results found" : "Nie znaleziono wyników",
     "No responses yet" : "Brak odpowiedzi",
     "Results of submitted forms will show up here" : "Wyniki wysłanych formularzy pojawią się tutaj",
     "Are you sure you want to delete all responses of {title}?" : "Czy na pewno chcesz usunąć wszystkie odpowiedzi z {title}?",
@@ -183,7 +186,9 @@
     "Settings" : "Ustawienia",
     "Abort" : "Anuluj",
     "Submit" : "Wyślij",
-    "Clear" : "Wyczyść ",
+    "Leave" : "Opuść",
+    "Clear" : "Wyczyść",
+    "There was an error submitting the form" : "Podczas przesyłania formularza wystąpił błąd",
     "Submit form" : "Wyślij formularz",
     "Submitting form …" : "Wysyłanie formularza…",
     "Thank you for completing the form!" : "Dziękujemy za wypełnienie formularza!",
@@ -226,6 +231,7 @@
     "Time question title" : "Tytuł pytania o czas",
     "People can pick a time" : "Ludzie mogą wybrać czas",
     "Pick a time" : "Wybierz czas",
+    "Color" : "Kolor",
     "Image" : "Obraz",
     "Document" : "Dokument",
     "Presentation" : "Prezentacja",
@@ -233,10 +239,6 @@
     "Text" : "Tekst",
     "Phone number" : "Numer telefonu",
     "Email address" : "Adres e-mail",
-    "Number" : "Liczba",
-    "Add a new answer" : "Dodaj nową odpowiedź",
-    "Legacy Link" : "Link w starszej wersji",
-    "Form still supports old sharing-link." : "Formularz obsługuje wciąż stary link udostępniania.",
-    "Remove Legacy Link" : "Usuń link w starszej wersji"
+    "Number" : "Liczba"
 },"pluralForm" :"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"
 }

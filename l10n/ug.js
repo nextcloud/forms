@@ -74,6 +74,11 @@ OC.L10N.register(
     "Add multiple options" : "كۆپ خىل تاللاش قوشۇڭ",
     "Add multiple options (one per line)" : "كۆپ تاللاش قوشۇڭ (ھەر بىر قۇرغا)",
     "Options" : "تاللانما",
+    "Go to first page" : "بىرىنچى بەتكە بېرىڭ",
+    "Go to previous page" : "ئالدىنقى بەتكە بېرىڭ",
+    "Page number" : "بەت نومۇرى",
+    "Go to next page" : "كېيىنكى بەتكە بېرىڭ",
+    "Go to last page" : "ئاخىرقى بەتكە بېرىڭ",
     "QR code representation of {text}" : "QR كودنىڭ ئىپادىلىنىشى {text}",
     "Answer number {index}" : "جاۋاب نومۇرى {index}",
     "Error while saving the answer" : "جاۋابنى ساقلاش جەريانىدا خاتالىق",
@@ -212,6 +217,8 @@ OC.L10N.register(
     "Save copy to Files" : "كۆپەيتىلگەن ھۆججەتلەرنى ھۆججەتلەرگە ساقلاڭ",
     "Download" : "چۈشۈر",
     "Delete all responses" : "بارلىق جاۋابلارنى ئۆچۈرۈڭ",
+    "Search" : "ئىزدەش",
+    "No results found" : "ھېچقانداق نەتىجە تېپىلمىدى",
     "No responses yet" : "ھازىرچە ھېچقانداق جاۋاب يوق",
     "Results of submitted forms will show up here" : "يوللانغان جەدۋەللەرنىڭ نەتىجىسى بۇ يەردە كۆرسىتىلىدۇ",
     "Are you sure you want to delete all responses of {title}?" : "{title} نىڭ بارلىق جاۋابلىرىنى ئۆچۈرمەكچىمۇ؟",
@@ -273,6 +280,7 @@ OC.L10N.register(
     "Time question title" : "ۋاقىت سوئال ماۋزۇسى",
     "People can pick a time" : "كىشىلەر ۋاقىت تاللىيالايدۇ",
     "Pick a time" : "ۋاقىت تاللاڭ",
+    "Color" : "رەڭ",
     "Image" : "رەسىم",
     "Document" : "پۈتۈك",
     "Presentation" : "Presentation",
@@ -291,7 +299,6 @@ OC.L10N.register(
     "People can enter a number" : "كىشىلەر بىر ساننى كىرگۈزەلەيدۇ",
     "Enter a number" : "سان كىرگۈزۈڭ",
     "Custom regular expression" : "دائىملىق ئىپادىلەش",
-    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ",
-    "Add a new answer" : "يېڭى جاۋاب قوشۇڭ"
+    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ"
 },
 "nplurals=2; plural=(n != 1);");

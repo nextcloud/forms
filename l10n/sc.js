@@ -95,6 +95,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} rispostas",
     "Download" : "Iscàrriga",
     "Delete all responses" : "Cantzella totu is rispostas",
+    "Search" : "Chirca",
+    "No results found" : "Perunu resurtadu agatadu",
     "No responses yet" : "Ancora peruna risposta",
     "Results of submitted forms will show up here" : "Is resurtados de is mòdulos imbiados s'ant a mustrare inoghe",
     "Are you sure you want to delete all responses of {title}?" : "A beru boles cantzellare totu is rispostas de {title}?",
@@ -103,6 +105,7 @@ OC.L10N.register(
     "Abort" : "Annulla",
     "Submit" : "Imbia",
     "Clear" : "Lìmpia",
+    "There was an error submitting the form" : "B'at àpidu un'errore imbiende su mòdulu",
     "Submit form" : "Imbia mòdulu",
     "Submitting form …" : "Imbia mòdulu …",
     "Thank you for completing the form!" : "Gràtzias pro àere cumpletadu su mòdulu!",
@@ -137,12 +140,12 @@ OC.L10N.register(
     "Pick a date and time" : "Sèbera data e ora",
     "Time" : "Ora",
     "Pick a time" : "Sèbera una ora",
+    "Color" : "Colore",
     "Image" : "Immàgine",
     "Document" : "Documentu",
     "Presentation" : "Presentatzione",
     "Text" : "Testu",
     "Phone number" : "Nùmeru de telèfonu",
-    "Email address" : "Indiritzu de posta eletrònica",
-    "Add a new answer" : "Agiunghe una risposta noa"
+    "Email address" : "Indiritzu de posta eletrònica"
 },
 "nplurals=2; plural=(n != 1);");

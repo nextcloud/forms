@@ -57,6 +57,7 @@ OC.L10N.register(
     "Are you sure you want to delete {title}?" : "Segur que voleu suprimir {title}?",
     "Cancel" : "Cancelar",
     "Options" : "Opcions",
+    "Go to previous page" : "Torna a la pàgina anterior",
     "Answer number {index}" : "Resposta número {index}",
     "Error while saving the answer" : "S'ha produït un error en desar la resposta",
     "Delete answer" : "Suprimeix la resposta",
@@ -131,6 +132,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} respostes",
     "Download" : "Baixa",
     "Delete all responses" : "Suprimeix totes les respostes",
+    "Search" : "Cercar",
+    "No results found" : "No s'ha trobat cap resultat",
     "No responses yet" : "Encara no hi ha respostes",
     "Results of submitted forms will show up here" : "Els resultats dels formularis enviats es mostraran aquí",
     "Are you sure you want to delete all responses of {title}?" : "Segur que voleu suprimir totes les respostes de {title}?",
@@ -141,6 +144,7 @@ OC.L10N.register(
     "Submit" : "Envia",
     "Leave" : "Abandona",
     "Clear" : "Neteja",
+    "There was an error submitting the form" : "S'ha produït un error en enviar el formulari",
     "Submit form" : "Envia el formulari",
     "Submitting form …" : "Enviant el formulari …",
     "Thank you for completing the form!" : "Gràcies per emplenar el formulari!",
@@ -186,10 +190,6 @@ OC.L10N.register(
     "Text" : "Text",
     "Phone number" : "Telèfon",
     "Email address" : "Adreça electrònica",
-    "Number" : "Número",
-    "Add a new answer" : "Afegeix una resposta nova",
-    "Legacy Link" : "Enllaç heretat",
-    "Form still supports old sharing-link." : "El formulari encara admet l'enllaç de compartició antic.",
-    "Remove Legacy Link" : "Suprimeix l'enllaç heretat"
+    "Number" : "Número"
 },
 "nplurals=2; plural=(n != 1);");

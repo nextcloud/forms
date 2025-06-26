@@ -15,6 +15,7 @@ OC.L10N.register(
     "Summary" : "සාරාංශය",
     "Responses" : "ප්‍රතිචාර",
     "Download" : "බාගන්න",
+    "Search" : "සොයන්න",
     "Settings" : "සැකසුම්",
     "Abort" : "රෝධනය",
     "File" : "ගොනුව",

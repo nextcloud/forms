@@ -2,6 +2,7 @@
     "Copy" : "Copiar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
+    "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
     "Uploading …" : "Cargando...",
@@ -15,6 +16,7 @@
     "Description" : "Descripción",
     "Summary" : "Resumen",
     "Download" : "Descargar",
+    "Search" : "Buscar",
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Abort" : "Abortar",
@@ -22,6 +24,7 @@
     "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",
+    "Color" : "Color",
     "Text" : "Texto",
     "Phone number" : "Número telefónico"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"

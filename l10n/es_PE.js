@@ -4,6 +4,7 @@ OC.L10N.register(
     "Copy" : "Copiar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
+    "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
     "Uploading …" : "Cargando...",
@@ -18,6 +19,7 @@ OC.L10N.register(
     "Description" : "Descripción",
     "Summary" : "Resumen",
     "Download" : "Descargar",
+    "Search" : "Buscar",
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Abort" : "Abortar",
@@ -25,6 +27,7 @@ OC.L10N.register(
     "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",
+    "Color" : "Color",
     "Text" : "Texto",
     "Phone number" : "Número telefónico"
 },

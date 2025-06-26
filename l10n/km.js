@@ -15,11 +15,13 @@ OC.L10N.register(
     "Share" : "ចែក​រំលែក",
     "Description" : "ការ​អធិប្បាយ",
     "Download" : "ទាញយក",
+    "Search" : "ស្វែងរក",
     "Sharing" : "ការ​ចែក​រំលែក",
     "Settings" : "ការកំណត់",
     "Abort" : "អំពី",
     "File" : "ឯកសារ",
     "Date" : "Date",
-    "Time" : "ម៉ោង"
+    "Time" : "ម៉ោង",
+    "Color" : "ព័ណ៌"
 },
 "nplurals=1; plural=0;");

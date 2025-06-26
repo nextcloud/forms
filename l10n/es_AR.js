@@ -24,6 +24,7 @@ OC.L10N.register(
     "Delete form" : "Borrar formulario",
     "Error while deleting {title}" : "Error mientras se borraba {título}",
     "Are you sure you want to delete {title}?" : "Esta seguro que desea borrar {título}?",
+    "Cancel" : "Cancel",
     "Options" : "Opciones",
     "Answer number {index}" : "Respuesta numero {índice}",
     "Error while saving the answer" : "Error mientras se guardaba la respuesta",
@@ -62,6 +63,7 @@ OC.L10N.register(
     "Loading responses …" : "Cargando respuestas",
     "Download" : "Descargar",
     "Delete all responses" : "Borrar todas las respuestas",
+    "Search" : "Buscar",
     "No responses yet" : "Aún no han habido respuestas",
     "Results of submitted forms will show up here" : "Los resultados de los formularios cargados se mostraran aquí",
     "Are you sure you want to delete all responses of {title}?" : "Estas seguro que deseas borrar todas las respuestas para {título}?",
@@ -70,6 +72,7 @@ OC.L10N.register(
     "Abort" : "Abortar",
     "Submit" : "Enviar",
     "Clear" : "Borrar",
+    "There was an error submitting the form" : "Hubo un error al enviar el formulario",
     "Submit form" : "Enviar formulario",
     "Submitting form …" : "Enviando formulario ...",
     "Thank you for completing the form!" : "Gracias por completar el formulario!",
@@ -85,8 +88,8 @@ OC.L10N.register(
     "Long text" : "Texto largo",
     "Date" : "Fecha",
     "Time" : "Hora",
+    "Color" : "Color",
     "Text" : "Texto",
-    "Phone number" : "Número telefónico",
-    "Add a new answer" : "Añadir una nueva respuesta"
+    "Phone number" : "Número telefónico"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

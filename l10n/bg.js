@@ -11,6 +11,7 @@ OC.L10N.register(
     "No" : "Не",
     "Yes" : "Да",
     "Question" : "Въпрос",
+    "Count" : "Брой",
     "Copy" : "Копие",
     "Anonymous response" : "Анонимен отговор",
     "Shared by %s" : "Споделено от %s",
@@ -125,6 +126,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} отговори",
     "Download" : "Изтегляне",
     "Delete all responses" : "Изтриване на всички отговори",
+    "Search" : "Търсене",
+    "No results found" : "Няма намерени резултати",
     "No responses yet" : "Все още няма отговори",
     "Results of submitted forms will show up here" : "Резултатите от изпратените формуляри ще се покажат тук",
     "Are you sure you want to delete all responses of {title}?" : "Сигурни ли сте, че искате да изтриете всички отговори на {title}?",
@@ -134,6 +137,7 @@ OC.L10N.register(
     "Abort" : "Прекрати",
     "Submit" : "Изпращане",
     "Clear" : "Изчистване",
+    "There was an error submitting the form" : "Възникна грешка при изпращането на формуляра",
     "Submit form" : "Изпращане на формуляр",
     "Submitting form …" : "Изпращане на формуляр …",
     "Thank you for completing the form!" : "Благодарим ви, че попълнихте формуляра!",
@@ -179,10 +183,6 @@ OC.L10N.register(
     "Text" : "Текст",
     "Phone number" : "Телефонен номер",
     "Email address" : "Имейл адрес",
-    "Number" : "Номер",
-    "Add a new answer" : "Добавяне на нов отговор",
-    "Legacy Link" : "Наследена връзка",
-    "Form still supports old sharing-link." : "Формулярът все още поддържа стара връзка за споделяне.",
-    "Remove Legacy Link" : "Премахване на наследената връзка"
+    "Number" : "Номер"
 },
 "nplurals=2; plural=(n != 1);");

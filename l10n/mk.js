@@ -78,6 +78,8 @@ OC.L10N.register(
     "{amount} responses" : "{amount} одговори",
     "Download" : "Преземи",
     "Delete all responses" : "Избриши ги сите одговори",
+    "Search" : "Барај",
+    "No results found" : "Нема пронајдено резултати",
     "No responses yet" : "Сеуште нема одговори",
     "Results of submitted forms will show up here" : "Резултатите од испратените прашалници ќе се појават овде",
     "Are you sure you want to delete all responses of {title}?" : "Дали сте сигурни дека сакате да ги избришете сите одговори на {title}?",
@@ -86,6 +88,7 @@ OC.L10N.register(
     "Abort" : "Прекини",
     "Submit" : "Испрати",
     "Clear" : "Исчисти",
+    "There was an error submitting the form" : "Настана грешка при испраќање на формата",
     "Submit form" : "Испрати",
     "Submitting form …" : "Испраќање форма ...",
     "Thank you for completing the form!" : "Ви благодариме што ја комплетиравте формата!",
@@ -119,12 +122,12 @@ OC.L10N.register(
     "Pick a date and time" : "Изберете датум и време",
     "Time" : "Време",
     "Pick a time" : "Избери време",
+    "Color" : "Боја",
     "Image" : "Слика",
     "Document" : "Документ",
     "Presentation" : "Презентација",
     "Text" : "Текст",
     "Phone number" : "Телефонски број",
-    "Email address" : "Е-пошта адреса",
-    "Add a new answer" : "Додади нов одговор"
+    "Email address" : "Е-пошта адреса"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");
