@@ -141,6 +141,7 @@ OC.L10N.register(
     "Date" : "Data",
     "Pick a date" : "Escueyi una data",
     "Time" : "Data",
+    "Color" : "Color",
     "Image" : "Imaxe",
     "Document" : "Documentu",
     "Presentation" : "Presentación",
