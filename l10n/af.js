@@ -26,6 +26,7 @@ OC.L10N.register(
     "File" : "Lêer",
     "Date" : "Datum",
     "Time" : "Tyd",
+    "Color" : "Kleur",
     "Text" : "Teks",
     "Phone number" : "Foonnommer",
     "Email address" : "E-posadres"
