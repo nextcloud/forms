@@ -26,6 +26,7 @@ OC.L10N.register(
     "Clear" : "Netaat",
     "File" : "Restr",
     "Date" : "Deiz",
+    "Color" : "Liv",
     "Presentation" : "Kinnigadenn",
     "Text" : "Testenn",
     "Phone number" : "Niverenn bellgomz"
