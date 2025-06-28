@@ -316,7 +316,7 @@ OC.L10N.register(
     "Linear scale" : "Lineare Skala",
     "Linear scale question title" : "Titel der Frage mit linearer Skala",
     "Color" : "Farbe",
-    "Color question title" : "Farbe des Fragentitels",
+    "Color question title" : "Titel der Farbenfrage",
     "People can pick a color" : "Personen können eine Farbe wählen",
     "Pick a color" : "Wählen Sie eine Farbe",
     "Image" : "Bild",
