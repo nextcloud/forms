@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Get php version
         id: php_versions
@@ -68,7 +70,7 @@ jobs:
         if: ${{ steps.node_versions.outputs.nodeVersion }}
         run: npm i -g 'npm@${{ steps.node_versions.outputs.npmVersion }}'
 
-      - name: Install dependencies & build
+      - name: Install dependencies
         if: ${{ steps.node_versions.outputs.nodeVersion }}
         env:
           CYPRESS_INSTALL_BINARY: 0
