@@ -319,6 +319,7 @@ OC.L10N.register(
     "Linear scale" : "線性刻度",
     "Linear scale question title" : "線性刻度問題標題",
     "Color" : "顏色",
+    "Color question title" : "顏色選擇器字段標籤",
     "People can pick a color" : "可以挑選顏色",
     "Pick a color" : "挑選顏色",
     "Image" : "圖像",
