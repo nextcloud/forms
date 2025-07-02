@@ -41,7 +41,7 @@ OC.L10N.register(
     "No forms created yet" : "Bis jetzt wurden noch keine Formulare erstellt",
     "Create a form" : "Erstelle ein Formular",
     "Select a form or create a new one" : "Wähle ein Formular aus oder erstelle ein Neues",
-    "Please select a form" : "Bitte wähle ein Formular aus",
+    "Please select a form" : "Bitte ein Formular auswählen",
     "Create new form" : "Neues Formular erstellen",
     "This form does not exist" : "Dieses Formular existiert nicht",
     "Form expired" : "Formular abgelaufen",
