@@ -312,9 +312,12 @@ class SubmissionService {
 						->setWrapText(true);
 				} else {
 					// Explicitly set the type of the value to string for values that start with '=' to prevent it being interpreted as formulas
-					if (is_string($value) && str_starts_with($value, '=')) {
+					if (is_string($value)) {
 						$activeWorksheet->getCell([$column, $row])
-							->setValueExplicit($value);
+							->setValueExplicit($fileFormat === 'csv'
+								? $this->escapeCSV($value)
+								: $value,
+							);
 					} else {
 						$activeWorksheet->setCellValue([$column, $row], $value);
 					}
@@ -330,6 +333,19 @@ class SubmissionService {
 		$writer->save($exportedFile);
 
 		return file_get_contents($exportedFile);
+	}
+
+	/**
+	 * Escape a value for writing it to a CSV file.
+	 * This is needed to ensure the CSV, when loaded into an spreadsheet application, does not execute potential formulas.
+	 */
+	private function escapeCSV(string $value): string {
+		$BAD_CHARACTERS = ['=', '+', '-', '@', "\t", "\r"];
+		if (strlen($value) > 0 && in_array(mb_str_split($value)[0], $BAD_CHARACTERS)) {
+			// Escape the value by adding a leading single quote
+			return "'$value";
+		}
+		return $value;
 	}
 
 	/**
