@@ -47,7 +47,6 @@ use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
-use OCA\Forms\Tests\Unit\MockedMapperException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDownloadResponse;
@@ -80,8 +79,6 @@ class ApiControllerTest extends TestCase {
 	private $formMapper;
 	/** @var OptionMapper|MockObject */
 	private $optionMapper;
-	/** @var Question|MockObject */
-	private $question;
 	/** @var QuestionMapper|MockObject */
 	private $questionMapper;
 	/** @var ShareMapper|MockObject */
@@ -115,7 +112,6 @@ class ApiControllerTest extends TestCase {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
-		$this->question = $this->createMock(Question::class);
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
@@ -197,11 +193,12 @@ class ApiControllerTest extends TestCase {
 	}
 
 	public function testGetSubmissions_invalidForm() {
-		$exception = $this->createMock(MapperException::class);
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willThrowException($exception);
+		// Simulate the service throwing the correct exception type
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willThrowException(new NoSuchFormException('Could not find form'));
+
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1);
 	}
@@ -211,15 +208,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
-		$this->formsService->expects(($this->once()))
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(false);
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willThrowException(new NoSuchFormException('The current user has no permission to get the results for this form'));
 
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1);
@@ -280,15 +272,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('otherUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
 			->willReturn($form);
-
-		$this->formsService->expects(($this->once()))
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
 
 		$this->submissionService->expects($this->once())
 			->method('getSubmissions')
@@ -309,11 +296,11 @@ class ApiControllerTest extends TestCase {
 	}
 
 	public function testExportSubmissions_invalidForm() {
-		$exception = $this->createMock(MapperException::class);
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(99)
-			->willThrowException($exception);
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(99, Constants::PERMISSION_RESULTS)
+			->willThrowException(new NoSuchFormException('Could not find form'));
+
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(99, 'csv');
 	}
@@ -323,15 +310,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
-		$this->formsService->expects(($this->once()))
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(false);
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willThrowException(new NoSuchFormException('The current user has no permission to get the results for this form'));
 
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1, 'csv');
@@ -342,15 +324,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
 			->willReturn($form);
-
-		$this->formsService->expects(($this->once()))
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
 
 		$csv = 'foo,bar';
 		$this->submissionService->expects($this->once())
@@ -368,11 +345,10 @@ class ApiControllerTest extends TestCase {
 	}
 
 	public function testExportSubmissionsToCloud_invalidForm() {
-		$exception = $this->createMock(MapperException::class);
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willThrowException($exception);
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willThrowException(new NoSuchFormException('Could not find form'));
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->exportSubmissionsToCloud(1, '');
 	}
@@ -407,7 +383,9 @@ class ApiControllerTest extends TestCase {
 				'submissionMessage' => null,
 				'fileId' => null,
 				'fileFormat' => null,
-				'allowEditSubmissions' => false
+				'allowEditSubmissions' => false,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -446,17 +424,12 @@ class ApiControllerTest extends TestCase {
 			],
 			'not found' => [
 				'canCreate' => true,
-				'callback' => fn ($id): Form => $this->throwMockedException(MockedMapperException::class),
+				'callback' => fn ($id): Form => throw new NoSuchFormException('Could not find form'),
 				'exception' => NoSuchFormException::class
 			],
 			'not owned' => [
 				'canCreate' => true,
-				'callback' => function ($id): Form {
-					$form = new Form();
-					$form->setId($id);
-					$form->setOwnerId('otherUser');
-					return $form;
-				},
+				'callback' => fn ($id): Form => throw new NoSuchFormException('This form is not owned by the current user and user has no `edit` permission'),
 				'exception' => NoSuchFormException::class
 			]
 		];
@@ -469,9 +442,9 @@ class ApiControllerTest extends TestCase {
 		$this->configService->expects($this->once())
 			->method('canCreateForms')
 			->willReturn($canCreate);
-		$this->formMapper->expects($canCreate ? $this->once() : $this->never())
-			->method('findById')
-			->with(7)
+		$this->formsService->expects($canCreate ? $this->once() : $this->never())
+			->method('getFormIfAllowed')
+			->with(7, Constants::PERMISSION_EDIT)
 			->willReturnCallback($callback);
 		$this->expectException($exception);
 		$this->apiController->newForm(7);
@@ -524,8 +497,8 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$oldForm = Form::fromParams($old);
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
 			->with(7)
 			->willReturn($oldForm);
 
@@ -574,8 +547,8 @@ class ApiControllerTest extends TestCase {
 		$form->setOwnerId('currentUser');
 		$question = Question::fromParams(['formId' => 1]);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
 
@@ -593,11 +566,6 @@ class ApiControllerTest extends TestCase {
 				'name' => ['file.txt'],
 				'error' => [0],
 			]);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->with($form)
-			->willReturn(true);
 
 		$this->formsService->expects($this->once())
 			->method('canSubmit')
@@ -687,8 +655,8 @@ class ApiControllerTest extends TestCase {
 			5 => ['ignore unknown question'],
 		];
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
 
@@ -767,11 +735,10 @@ class ApiControllerTest extends TestCase {
 	}
 
 	public function testNewSubmission_formNotFound() {
-		$exception = $this->createMock(MapperException::class);
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
 			->with(1)
-			->willThrowException($exception);
+			->willThrowException(new NoSuchFormException('Could not find form'));
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->newSubmission(1, [], '');
 	}
@@ -795,10 +762,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('admin');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
 			->with(1)
-			->willReturn($form);
+			->willThrowException(new $exception);
 
 		$this->formAccess($hasUserAccess, $hasFormExpired, $canSubmit);
 
@@ -812,8 +779,8 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('admin');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
 
@@ -841,15 +808,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects(self::once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects(self::once())
-			->method('canDeleteResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS_DELETE)
+			->willReturn($form);
 
 		$this->submissionMapper
 			->expects($this->once())
@@ -874,18 +836,12 @@ class ApiControllerTest extends TestCase {
 			->with(42)
 			->willReturn($submission);
 
-		$this->formMapper
-			->method('findById')
-			->with(1)
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS_DELETE)
 			->willReturn($form);
 
-		$this->formsService
-			->expects($this->once())
-			->method('canDeleteResults')
-			->with($form)
-			->willReturn(false);
-
-		$this->expectException(NoSuchFormException::class);
+		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->deleteSubmission(1, 42);
 	}
 
@@ -901,16 +857,10 @@ class ApiControllerTest extends TestCase {
 			->with(42)
 			->willReturn($submission);
 
-		$this->formMapper
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService
-			->expects($this->once())
-			->method('canDeleteResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS_DELETE)
+			->willReturn($form);
 
 		$this->formsService
 			->expects($this->once())
@@ -957,12 +907,12 @@ class ApiControllerTest extends TestCase {
 		$form->setHash('hash');
 		$form->setOwnerId('otherUser');
 
-		$this->formMapper
-			->method('findById')
-			->with(1)
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
 			->willReturn($form);
 
-		$this->expectException(NoSuchFormException::class);
+		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->updateForm(1, ['ownerId' => 'newOwner']);
 	}
 
@@ -972,10 +922,15 @@ class ApiControllerTest extends TestCase {
 		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper
-			->method('findById')
-			->with(1)
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
 			->willReturn($form);
+
+		$this->formsService
+			->method('canEditForm')
+			->with($form)
+			->willReturn(true);
 
 		$this->userManager->expects($this->once())
 			->method('get')
@@ -992,10 +947,15 @@ class ApiControllerTest extends TestCase {
 		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper
-			->method('findById')
-			->with(1)
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
 			->willReturn($form);
+
+		$this->formsService
+			->method('canEditForm')
+			->with($form)
+			->willReturn(true);
 
 		$newOwner = $this->createMock(IUser::class);
 		$this->userManager->expects($this->once())
@@ -1008,10 +968,10 @@ class ApiControllerTest extends TestCase {
 	}
 
 	public function testGetSubmission_invalidForm() {
-		$exception = $this->createMock(MapperException::class);
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
+		$exception = $this->createMock(NoSuchFormException::class);
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
 			->willThrowException($exception);
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmission(1, 42);
@@ -1022,15 +982,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects($this->once())
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(false);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willThrowException(new NoSuchFormException('The current user has no permission to get the results for this form'));
 
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmission(1, 42);
@@ -1041,15 +996,10 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects($this->once())
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
 
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
@@ -1075,15 +1025,10 @@ class ApiControllerTest extends TestCase {
 			'timestamp' => 1234567890
 		];
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects($this->once())
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
 
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
@@ -1115,15 +1060,10 @@ class ApiControllerTest extends TestCase {
 			'timestamp' => 1234567890
 		];
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects($this->once())
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
 
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
@@ -1148,15 +1088,10 @@ class ApiControllerTest extends TestCase {
 			'timestamp' => 1234567890
 		];
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects($this->once())
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
 
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
@@ -1186,15 +1121,10 @@ class ApiControllerTest extends TestCase {
 			'timestamp' => 1234567890
 		];
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with(1)
-			->willReturn($form);
-
 		$this->formsService->expects($this->once())
-			->method('canSeeResults')
-			->with($form)
-			->willReturn(true);
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
 
 		$this->submissionService->expects($this->once()) // Changed from submissionMapper
 			->method('getSubmission')
@@ -1227,19 +1157,10 @@ class ApiControllerTest extends TestCase {
 		$submission->setFormId($formId);
 		$submission->setUserId($userId);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
 			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->with($form)
-			->willReturn(true);
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->with($form)
-			->willReturn(false);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -1284,17 +1205,10 @@ class ApiControllerTest extends TestCase {
 		$form->setOwnerId('formOwner');
 		$form->setAllowEditSubmissions(false); // Form does not allow edits
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
 			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->willReturn(true);
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->willReturn(false);
 
 		$this->expectException(OCSBadRequestException::class);
 		$this->expectExceptionMessage('Can only update if allowEditSubmissions is set');
@@ -1311,17 +1225,10 @@ class ApiControllerTest extends TestCase {
 		$form->setOwnerId('formOwner');
 		$form->setAllowEditSubmissions(true);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
 			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->willReturn(true);
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->willReturn(false);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -1347,17 +1254,10 @@ class ApiControllerTest extends TestCase {
 		$form->setOwnerId('formOwner');
 		$form->setAllowEditSubmissions(true);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
 			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->willReturn(true);
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->willReturn(false);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -1393,17 +1293,10 @@ class ApiControllerTest extends TestCase {
 		$submission->setFormId(2); // Belongs to a different form
 		$submission->setUserId('currentUser');
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
 			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->willReturn(true);
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->willReturn(false);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -1439,17 +1332,10 @@ class ApiControllerTest extends TestCase {
 		$submission->setFormId($formId);
 		$submission->setUserId('anotherUser'); // Submission belongs to another user
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
 			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->willReturn(true);
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->willReturn(false);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -1475,10 +1361,10 @@ class ApiControllerTest extends TestCase {
 		$submissionId = 42;
 		$answers = ['q1' => ['answer1']];
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
-			->willThrowException(new DoesNotExistException('Form not found by mapper')); // Corrected Exception
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willThrowException(new NoSuchFormException('Could not find form'));
 
 		$this->expectException(NoSuchFormException::class);
 		$this->expectExceptionMessage('Could not find form');
@@ -1493,16 +1379,10 @@ class ApiControllerTest extends TestCase {
 		$form = new Form();
 		$form->setId($formId);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
-			->willReturn($form);
-
-		// No share hash provided, so hasUserAccess will be checked
 		$this->formsService->expects($this->once())
-			->method('hasUserAccess')
-			->with($form)
-			->willReturn(false);
+			->method('loadFormForSubmission')
+			->with(1)
+			->willThrowException(new NoSuchFormException('Not allowed to access this form'));
 
 		$this->expectException(NoSuchFormException::class);
 		$this->expectExceptionMessage('Not allowed to access this form');
@@ -1517,21 +1397,10 @@ class ApiControllerTest extends TestCase {
 		$form = new Form();
 		$form->setId($formId);
 
-		$this->formMapper->expects($this->once())
-			->method('findById')
-			->with($formId)
-			->willReturn($form);
-
-		// Assuming access is granted (e.g., via user access or a valid share)
 		$this->formsService->expects($this->once())
-			->method('hasUserAccess') // Or shareMapper would be mocked if shareHash was used
-			->with($form)
-			->willReturn(true);
-
-		$this->formsService->expects($this->once())
-			->method('hasFormExpired')
-			->with($form)
-			->willReturn(true); // Form has expired
+			->method('loadFormForSubmission')
+			->with(1)
+			->willThrowException(new OCSForbiddenException('This form is no longer taking answers'));
 
 		$this->expectException(OCSForbiddenException::class);
 		$this->expectExceptionMessage('This form is no longer taking answers');

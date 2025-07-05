@@ -40,6 +40,8 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'allowEditSubmissions' => false,
@@ -61,6 +63,8 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'allowEditSubmissions' => false,
@@ -82,6 +86,8 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'allowEditSubmissions' => false,
@@ -112,6 +118,8 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'questions' => [],
 				'shares' => [],
 				'ownerId' => 'test',
@@ -196,9 +204,11 @@ class RespectAdminSettingsTest extends IntegrationBase {
 		// we do not know the ID and the update time is flaky
 		unset($data['id']);
 		unset($data['lastUpdated']);
+		$data['lockedUntil'] = null;
 
 		$expected = self::sharedTestForms()[0];
 		$expected['access'] = ['permitAllUsers' => true, 'showToAllUsers' => true];
+		$expected['lockedBy'] = 'test';
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
@@ -235,6 +245,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 		// we do not know the ID or the update
 		unset($data['id']);
 		unset($data['lastUpdated']);
+		$data['lockedUntil'] = null;
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals(self::sharedTestForms()[0], $data);

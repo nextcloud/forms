@@ -41,7 +41,7 @@ class ConfigControllerTest extends TestCase {
 
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->config = $this->createMock(IConfig::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
 
 		$this->configController = new ConfigController(
