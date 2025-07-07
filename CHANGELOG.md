@@ -5,6 +5,12 @@
 
 # Changelog
 
+## v5.1.2 - 2025-07-07
+
+### Fixed
+
+* [stable5] fix(export): escape CSV export for spreadsheet applications [\#2807](https://github.com/nextcloud/forms/pull/2807)
+
 ## v5.1.1 - 2025-06-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.0...v5.1.1)
