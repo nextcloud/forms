@@ -44,6 +44,7 @@ OC.L10N.register(
     "Settings" : "Iestatījumi",
     "Submit" : "Iesniegt",
     "Clear" : "Notīrīt",
+    "No recommendations. Start typing." : "Nav ieteikumu. Jāsāk rakstīt.",
     "No elements found." : "Elementi netika atrasti.",
     "File" : "Datne",
     "Date" : "Datums",
