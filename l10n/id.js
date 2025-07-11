@@ -35,7 +35,7 @@ OC.L10N.register(
     "Color" : "Warna",
     "Image" : "Gambar",
     "Text" : "Teks",
-    "Phone number" : "Nomor telefon",
-    "Email address" : "Alamat surel"
+    "Phone number" : "Nomor telepon",
+    "Email address" : "Alamat email"
 },
 "nplurals=1; plural=0;");
