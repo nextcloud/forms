@@ -67,7 +67,7 @@ class ProviderTest extends TestCase {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->eventMerger = $this->createMock(IEventMerger::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->l10nFactory = $this->createMock(IFactory::class);

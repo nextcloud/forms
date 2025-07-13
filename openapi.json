@@ -111,6 +111,8 @@
                     "permissions",
                     "questions",
                     "state",
+                    "lockedBy",
+                    "lockedUntil",
                     "shares",
                     "submissionMessage"
                 ],
@@ -194,6 +196,15 @@
                             1,
                             2
                         ]
+                    },
+                    "lockedBy": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lockedUntil": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     },
                     "shares": {
                         "type": "array",
@@ -291,7 +302,9 @@
                     "expires",
                     "permissions",
                     "partial",
-                    "state"
+                    "state",
+                    "lockedBy",
+                    "lockedUntil"
                 ],
                 "properties": {
                     "id": {
@@ -323,6 +336,15 @@
                     "state": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "lockedBy": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lockedUntil": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
                     }
                 }
             },
