@@ -44,6 +44,7 @@ OC.L10N.register(
     "Settings" : "Iestatījumi",
     "Submit" : "Iesniegt",
     "Clear" : "Notīrīt",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Veidlapa kopš pēdējā apmeklējuma ir mainījusies. Vai notīrīt visas atbildes?",
     "No recommendations. Start typing." : "Nav ieteikumu. Jāsāk rakstīt.",
     "No elements found." : "Elementi netika atrasti.",
     "File" : "Datne",
