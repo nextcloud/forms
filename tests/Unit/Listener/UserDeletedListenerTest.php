@@ -32,7 +32,7 @@ class UserDeletedListenerTest extends TestCase {
 	public function setUp(): void {
 		parent::setUp();
 		$this->jobList = $this->createMock(IJobList::class);
-		$this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->userDeletedListener = new UserDeletedListener($this->jobList, $this->logger);
 	}
 
