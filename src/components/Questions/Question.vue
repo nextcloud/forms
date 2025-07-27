@@ -8,6 +8,7 @@
 		:class="{
 			question: true,
 			'question--editable': !readOnly,
+			'question--section': isSection,
 		}"
 		:aria-label="t('forms', 'Question number {index}', { index })">
 		<!-- Drag handle -->
@@ -47,7 +48,7 @@
 		<div class="question__header">
 			<div class="question__header__title">
 				<input
-					v-if="!readOnly"
+					v-if="!readOnly && !isSection"
 					:placeholder="titlePlaceholder"
 					:aria-label="
 						t('forms', 'Title of question number {index}', {
@@ -62,6 +63,29 @@
 					:maxlength="maxStringLengths.questionText"
 					required
 					@input="onTitleChange" />
+				<input
+					v-else-if="!readOnly && isSection"
+					:placeholder="titlePlaceholder"
+					:aria-label="
+						t('forms', 'Title of section number {index}', {
+							index,
+						})
+					"
+					:value="text"
+					class="question__header__title__text question__header__title__text__input question__header__title__text__input--section"
+					type="text"
+					dir="auto"
+					minlength="1"
+					:maxlength="maxStringLengths.questionText"
+					required
+					@input="onTitleChange" />
+				<h3
+					v-else-if="readOnly && isSection"
+					:id="titleId"
+					class="question__header__title__text question__header__title__text--section"
+					dir="auto">
+					{{ text }}
+				</h3>
 				<h3
 					v-else
 					:id="titleId"
@@ -82,7 +106,7 @@
 					force-menu
 					placement="bottom-end"
 					class="question__header__title__menu">
-					<template v-if="isRequired" #icon>
+					<template v-if="isRequired && !isSection" #icon>
 						<IconOverlay>
 							<template #overlay>
 								<IconAsterisk :size="20" />
@@ -90,7 +114,14 @@
 							<IconDotsHorizontal :size="20" />
 						</IconOverlay>
 					</template>
+					<template v-else-if="!isSection" #icon>
+						<IconDotsHorizontal :size="20" />
+					</template>
+					<template v-else #icon>
+						<IconDotsHorizontal :size="20" />
+					</template>
 					<NcActionCheckbox
+						v-if="!isSection"
 						:checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -98,7 +129,7 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
-						:label="t('forms', 'Technical name of the question')"
+						:label="isSection ? t('forms', 'Technical name of the section') : t('forms', 'Technical name of the question')"
 						:label-outside="false"
 						:show-trailing-button="false"
 						:value="name"
@@ -112,18 +143,18 @@
 						<template #icon>
 							<IconContentCopy :size="20" />
 						</template>
-						{{ t('forms', 'Copy question') }}
+						{{ isSection ? t('forms', 'Copy section') : t('forms', 'Copy question') }}
 					</NcActionButton>
 					<NcActionButton @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
 						</template>
-						{{ t('forms', 'Delete question') }}
+						{{ isSection ? t('forms', 'Delete section') : t('forms', 'Delete question') }}
 					</NcActionButton>
 				</NcActions>
 			</div>
 			<div
-				v-if="hasDescription || !readOnly"
+				v-if="(hasDescription || !readOnly) && !isSection"
 				class="question__header__description">
 				<textarea
 					v-if="!readOnly"
@@ -247,6 +278,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		type: {
+			type: String,
+			default: '',
+		},
 	},
 
 	computed: {
@@ -285,6 +320,15 @@ export default {
 
 		hasDescription() {
 			return this.description !== ''
+		},
+
+		/**
+		 * Check if this is a section type question
+		 *
+		 * @return {boolean} true if this is a section
+		 */
+		isSection() {
+			return this.type === 'section'
 		},
 	},
 	// Ensure description is sized correctly on initial render
@@ -366,6 +410,29 @@ export default {
 
 	&--editable {
 		padding-inline-start: 56px; // add 12px for the title input box
+
+		&.question--section {
+			background-color: transparent;
+			border: none;
+			margin: 0.5rem 0;
+			padding: 0;
+			cursor: grab;
+		}
+	}
+
+	&.question--section {
+		background-color: transparent;
+		border: none;
+		margin: 0.5rem 0;
+		padding: 0;
+
+		.question__header {
+			padding-block-end: 0;
+		}
+
+		.question__header__title {
+			min-height: auto;
+		}
 	}
 
 	> * {
@@ -446,6 +513,22 @@ export default {
 					inset-inline-start: -12px;
 					margin-inline-end: -12px !important;
 					padding-inline-start: 10px !important;
+				}
+
+				&__input--section {
+					font-size: 18px !important;
+					font-weight: 600;
+					color: var(--color-main-text);
+					background: transparent;
+					border: none;
+					outline: none;
+				}
+
+				&--section {
+					font-size: 18px !important;
+					font-weight: 600;
+					color: var(--color-main-text);
+					margin: 0;
 				}
 			}
 

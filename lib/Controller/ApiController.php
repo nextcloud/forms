@@ -204,6 +204,12 @@ class ApiController extends OCSController {
 
 				unset($questionData['id']);
 				$questionData['formId'] = $form->getId();
+				
+				// Sections are never required
+				if ($questionData['type'] === 'section') {
+					$questionData['isRequired'] = false;
+				}
+				
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
 
@@ -512,6 +518,11 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
+			// Sections don't need to be required
+			if ($type === 'section') {
+				// This will be set after creating the question object
+			}
+
 			// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
 			$questions = $this->questionMapper->findByForm($formId);
 			$lastQuestion = array_pop($questions);
@@ -530,6 +541,11 @@ class ApiController extends OCSController {
 			$question->setDescription('');
 			$question->setIsRequired(false);
 			$question->setExtraSettings([]);
+
+			// Sections are never required
+			if ($type === 'section') {
+				$question->setIsRequired(false);
+			}
 
 			$question = $this->questionMapper->insert($question);
 
@@ -557,6 +573,11 @@ class ApiController extends OCSController {
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
 			$questionData['order'] = end($allQuestions)->getOrder() + 1;
+
+			// Sections are never required
+			if ($questionData['type'] === 'section') {
+				$questionData['isRequired'] = false;
+			}
 
 			$newQuestion = Question::fromParams($questionData);
 			$this->questionMapper->insert($newQuestion);
@@ -656,6 +677,11 @@ class ApiController extends OCSController {
 
 		if (key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
+		}
+
+		// Sections cannot be required
+		if (key_exists('isRequired', $keyValuePairs) && $question->getType() === 'section' && $keyValuePairs['isRequired'] === true) {
+			throw new OCSBadRequestException('Sections cannot be required.');
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -878,6 +904,12 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('This question is not part ot the given form');
 		}
 
+		// Sections cannot have options
+		if ($question->getType() === 'section') {
+			$this->logger->debug('Sections cannot have options');
+			throw new OCSBadRequestException('Sections cannot have options');
+		}
+
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
 		$options = $this->optionMapper->findByQuestion($questionId);
 		$lastOption = array_pop($options);
@@ -959,6 +991,12 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
+		// Sections cannot have options
+		if ($question->getType() === 'section') {
+			$this->logger->debug('Sections cannot have options');
+			throw new OCSBadRequestException('Sections cannot have options');
+		}
+
 		// Don't allow empty array
 		if (sizeof($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update');
@@ -1026,6 +1064,12 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
+		// Sections cannot have options
+		if ($question->getType() === 'section') {
+			$this->logger->debug('Sections cannot have options');
+			throw new OCSBadRequestException('Sections cannot have options');
+		}
+
 		$this->optionMapper->delete($option);
 
 		// Reorder the remaining options
@@ -1079,6 +1123,12 @@ class ApiController extends OCSController {
 		if ($question->getFormId() !== $formId) {
 			$this->logger->debug('The given question id doesn\'t match the form.');
 			throw new OCSBadRequestException('The given question id doesn\'t match the form.');
+		}
+
+		// Sections cannot have options
+		if ($question->getType() === 'section') {
+			$this->logger->debug('Sections cannot have options');
+			throw new OCSBadRequestException('Sections cannot have options');
 		}
 
 		// Check if array contains duplicates
@@ -1209,6 +1259,11 @@ class ApiController extends OCSController {
 			}
 			return $question;
 		}, $questions);
+
+		// Filter out sections from questions for export
+		$questions = array_filter($questions, static function (array $question) {
+			return $question['type'] !== 'section';
+		});
 
 		$response = [
 			'submissions' => $submissions,
@@ -1590,6 +1645,12 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Question doesn\'t belong to the given form');
 		}
 
+		// Sections cannot have file uploads
+		if ($question->getType() === 'section') {
+			$this->logger->debug('Sections cannot have file uploads');
+			throw new OCSBadRequestException('Sections cannot have file uploads');
+		}
+
 		$path = $this->formsService->getTemporaryUploadedFilePath($form, $question);
 
 		$response = [];
@@ -1687,6 +1748,11 @@ class ApiController extends OCSController {
 	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
 	 */
 	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
+		// Don't store answers for sections
+		if ($question['type'] === 'section') {
+			return;
+		}
+
 		foreach ($answerArray as $answer) {
 			$answerEntity = new Answer();
 			$answerEntity->setSubmissionId($submissionId);

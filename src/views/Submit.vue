@@ -113,6 +113,7 @@
 						:answer-type="answerTypes[question.type]"
 						:index="index + 1"
 						:max-string-lengths="maxStringLengths"
+						:type="question.type"
 						:values="answers[question.id]"
 						v-bind="question"
 						@keydown.enter="onKeydownEnter"
@@ -325,6 +326,11 @@ export default {
 					return false
 				}
 
+				// Sections are always valid and don't need additional validation
+				if (question.type === 'section') {
+					return true
+				}
+
 				// If specific conditions provided, test against them
 				if ('validate' in answerTypes[question.type]) {
 					return answerTypes[question.type].validate(question)
@@ -339,7 +345,7 @@ export default {
 
 		isRequiredUsed() {
 			return this.form.questions.reduce(
-				(isUsed, question) => isUsed || question.isRequired,
+				(isUsed, question) => isUsed || (question.isRequired && question.type !== 'section'),
 				false,
 			)
 		},
@@ -567,6 +573,10 @@ export default {
 			if (!this.isLoggedIn) {
 				return
 			}
+			// Don't save sections to localStorage
+			if (question.type === 'section') {
+				return
+			}
 			// We make sure the values are updated by the `values.sync` handler
 			const state = {
 				...(this.getFormValuesFromLocalStorage() ?? {}),
@@ -752,7 +762,12 @@ export default {
 		 * Submit the form after the browser validated it 🚀 or show confirmation modal if empty
 		 */
 		async onSubmit() {
-			const validation = (this.$refs.questions ?? []).map(
+			// Filter out sections from validation
+			const questionsToValidate = (this.$refs.questions ?? []).filter(
+				(question) => question.type !== 'section'
+			)
+			
+			const validation = questionsToValidate.map(
 				async (question) => await question.validate(),
 			)
 
