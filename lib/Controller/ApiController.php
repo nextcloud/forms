@@ -206,7 +206,7 @@ class ApiController extends OCSController {
 				$questionData['formId'] = $form->getId();
 				
 				// Sections are never required
-				if ($questionData['type'] === 'section') {
+				if ($questionData['type'] === Constants::ANSWER_TYPE_SECTION) {
 					$questionData['isRequired'] = false;
 				}
 				
@@ -518,11 +518,6 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
-			// Sections don't need to be required
-			if ($type === 'section') {
-				// This will be set after creating the question object
-			}
-
 			// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
 			$questions = $this->questionMapper->findByForm($formId);
 			$lastQuestion = array_pop($questions);
@@ -541,11 +536,6 @@ class ApiController extends OCSController {
 			$question->setDescription('');
 			$question->setIsRequired(false);
 			$question->setExtraSettings([]);
-
-			// Sections are never required
-			if ($type === 'section') {
-				$question->setIsRequired(false);
-			}
 
 			$question = $this->questionMapper->insert($question);
 
@@ -575,7 +565,7 @@ class ApiController extends OCSController {
 			$questionData['order'] = end($allQuestions)->getOrder() + 1;
 
 			// Sections are never required
-			if ($questionData['type'] === 'section') {
+			if ($questionData['type'] === Constants::ANSWER_TYPE_SECTION) {
 				$questionData['isRequired'] = false;
 			}
 
@@ -680,7 +670,7 @@ class ApiController extends OCSController {
 		}
 
 		// Sections cannot be required
-		if (key_exists('isRequired', $keyValuePairs) && $question->getType() === 'section' && $keyValuePairs['isRequired'] === true) {
+		if (key_exists('isRequired', $keyValuePairs) && $question->getType() === Constants::ANSWER_TYPE_SECTION && $keyValuePairs['isRequired'] === true) {
 			throw new OCSBadRequestException('Sections cannot be required.');
 		}
 
@@ -905,7 +895,7 @@ class ApiController extends OCSController {
 		}
 
 		// Sections cannot have options
-		if ($question->getType() === 'section') {
+		if ($question->getType() === Constants::ANSWER_TYPE_SECTION) {
 			$this->logger->debug('Sections cannot have options');
 			throw new OCSBadRequestException('Sections cannot have options');
 		}
@@ -992,7 +982,7 @@ class ApiController extends OCSController {
 		}
 
 		// Sections cannot have options
-		if ($question->getType() === 'section') {
+		if ($question->getType() === Constants::ANSWER_TYPE_SECTION) {
 			$this->logger->debug('Sections cannot have options');
 			throw new OCSBadRequestException('Sections cannot have options');
 		}
@@ -1065,7 +1055,7 @@ class ApiController extends OCSController {
 		}
 
 		// Sections cannot have options
-		if ($question->getType() === 'section') {
+		if ($question->getType() === Constants::ANSWER_TYPE_SECTION) {
 			$this->logger->debug('Sections cannot have options');
 			throw new OCSBadRequestException('Sections cannot have options');
 		}
@@ -1126,7 +1116,7 @@ class ApiController extends OCSController {
 		}
 
 		// Sections cannot have options
-		if ($question->getType() === 'section') {
+		if ($question->getType() === Constants::ANSWER_TYPE_SECTION) {
 			$this->logger->debug('Sections cannot have options');
 			throw new OCSBadRequestException('Sections cannot have options');
 		}
@@ -1261,9 +1251,9 @@ class ApiController extends OCSController {
 		}, $questions);
 
 		// Filter out sections from questions for export
-		$questions = array_filter($questions, static function (array $question) {
-			return $question['type'] !== 'section';
-		});
+		$questions = array_values(array_filter($questions, static function (array $question) {
+			return $question['type'] !== Constants::ANSWER_TYPE_SECTION;
+		}));
 
 		$response = [
 			'submissions' => $submissions,
@@ -1646,7 +1636,7 @@ class ApiController extends OCSController {
 		}
 
 		// Sections cannot have file uploads
-		if ($question->getType() === 'section') {
+		if ($question->getType() === Constants::ANSWER_TYPE_SECTION) {
 			$this->logger->debug('Sections cannot have file uploads');
 			throw new OCSBadRequestException('Sections cannot have file uploads');
 		}
@@ -1749,7 +1739,7 @@ class ApiController extends OCSController {
 	 */
 	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
 		// Don't store answers for sections
-		if ($question['type'] === 'section') {
+		if ($question['type'] === Constants::ANSWER_TYPE_SECTION) {
 			return;
 		}
 
