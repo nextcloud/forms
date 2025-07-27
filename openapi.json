@@ -58,6 +58,9 @@
                         "type": "integer",
                         "format": "int64"
                     },
+                    "questionName": {
+                        "type": "string"
+                    },
                     "text": {
                         "type": "string"
                     }
