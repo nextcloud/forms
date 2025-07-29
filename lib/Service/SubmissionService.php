@@ -229,6 +229,12 @@ class SubmissionService {
 		$submissionEntities = array_reverse($submissionEntities);
 
 		$questions = $this->questionMapper->findByForm($form->getId());
+		
+		// Filter out sections from export
+		$questions = array_filter($questions, function (Question $question) {
+			return $question->getType() !== Constants::ANSWER_TYPE_SECTION;
+		});
+		
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {

@@ -1122,4 +1122,127 @@ file2.txt"
 		$this->submissionService->validateSubmission($questions, $answers, 'admin');
 		$this->assertTrue(true);
 	}
+
+	/**
+	 * Test that sections are filtered out from export data
+	 */
+	public function testGetSubmissionsData_sectionsAreFilteredOut() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setTitle('Test Form');
+
+		$questions = [
+			new Question(),
+			new Question(),
+			new Question(),
+		];
+
+		// Set up questions with different types
+		$questions[0]->setId(1);
+		$questions[0]->setType(Constants::ANSWER_TYPE_SHORT);
+		$questions[0]->setText('Short question');
+
+		$questions[1]->setId(2);
+		$questions[1]->setType(Constants::ANSWER_TYPE_SECTION);
+		$questions[1]->setText('Section title');
+
+		$questions[2]->setId(3);
+		$questions[2]->setType(Constants::ANSWER_TYPE_MULTIPLE);
+		$questions[2]->setText('Multiple choice question');
+
+		$submissions = [
+			new Submission(),
+		];
+		$submissions[0]->setId(1);
+		$submissions[0]->setUserId('user1');
+		$submissions[0]->setTimestamp(time());
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with(1)
+			->willReturn($questions);
+
+		$this->submissionMapper->expects($this->once())
+			->method('findByForm')
+			->with(1)
+			->willReturn($submissions);
+
+		$this->answerMapper->expects($this->once())
+			->method('findBySubmission')
+			->with(1)
+			->willReturn([]);
+
+		$this->config->expects($this->atLeastOnce())
+			->method('getSystemValueString')
+			->with('default_timezone', 'UTC')
+			->willReturn('UTC');
+
+		$this->config->expects($this->atLeastOnce())
+			->method('getUserValue')
+			->willReturn('UTC');
+
+		$this->l10n->expects($this->atLeastOnce())
+			->method('t')
+			->willReturnCallback(function ($text) {
+				return $text;
+			});
+
+		$result = $this->submissionService->getSubmissionsData($form, 'csv');
+
+		// Check that the CSV contains only non-section questions
+		$this->assertStringContainsString('Short question', $result);
+		$this->assertStringContainsString('Multiple choice question', $result);
+		$this->assertStringNotContainsString('Section title', $result);
+	}
+
+	/**
+	 * Test that sections are not validated in submissions
+	 */
+	public function testValidateSubmission_sectionsAreIgnored() {
+		$questions = [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+				'text' => 'Short question',
+				'isRequired' => true,
+			],
+			[
+				'id' => 2,
+				'type' => Constants::ANSWER_TYPE_SECTION,
+				'text' => 'Section title',
+				'isRequired' => false,
+			],
+		];
+
+		$answers = [
+			'1' => ['Answer 1'],
+			// No answer for section (which is correct)
+		];
+
+		// Should not throw an exception even though section is not answered
+		$this->submissionService->validateSubmission($questions, $answers, 'admin');
+		$this->assertTrue(true);
+	}
+
+	/**
+	 * Test that sections cannot be required in validation
+	 */
+	public function testValidateSubmission_sectionsCannotBeRequired() {
+		$questions = [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_SECTION,
+				'text' => 'Section title',
+				'isRequired' => true, // This should be ignored
+			],
+		];
+
+		$answers = [
+			// No answers provided
+		];
+
+		// Should not throw an exception even though section is "required"
+		$this->submissionService->validateSubmission($questions, $answers, 'admin');
+		$this->assertTrue(true);
+	}
 };

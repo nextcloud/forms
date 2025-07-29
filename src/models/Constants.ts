@@ -31,3 +31,8 @@ export const INPUT_DEBOUNCE_MS = 400
  * A constant representing the prefix used for identifying "other" answers
  */
 export const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
+
+/**
+ * Answer type constants
+ */
+export const ANSWER_TYPE_SECTION = 'section'

@@ -1537,4 +1537,256 @@ class ApiControllerTest extends TestCase {
 		$this->expectExceptionMessage('This form is no longer taking answers');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
 	}
+
+	/**
+	 * Test that sections cannot be required
+	 */
+	public function testUpdateQuestion_sectionCannotBeRequired() {
+		$formId = 1;
+		$questionId = 42;
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+
+		$question = new Question();
+		$question->setId($questionId);
+		$question->setFormId($formId);
+		$question->setType(Constants::ANSWER_TYPE_SECTION);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($questionId)
+			->willReturn($question);
+
+		$this->formsService->expects($this->once())
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Sections cannot be required.');
+		$this->apiController->updateQuestion($formId, $questionId, ['isRequired' => true]);
+	}
+
+	/**
+	 * Test that sections cannot have options
+	 */
+	public function testNewOption_sectionCannotHaveOptions() {
+		$formId = 1;
+		$questionId = 42;
+		$optionTexts = ['Option 1', 'Option 2'];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+
+		$question = new Question();
+		$question->setId($questionId);
+		$question->setFormId($formId);
+		$question->setType(Constants::ANSWER_TYPE_SECTION);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($questionId)
+			->willReturn($question);
+
+		$this->formsService->expects($this->once())
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Sections cannot have options');
+		$this->apiController->newOption($formId, $questionId, $optionTexts);
+	}
+
+	/**
+	 * Test that sections cannot have file uploads
+	 */
+	public function testUploadFiles_sectionCannotHaveFileUploads() {
+		$formId = 1;
+		$questionId = 42;
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+
+		$question = new Question();
+		$question->setId($questionId);
+		$question->setFormId($formId);
+		$question->setType(Constants::ANSWER_TYPE_SECTION);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($question);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($questionId)
+			->willReturn($question);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Sections cannot have file uploads');
+		$this->apiController->uploadFiles($formId, $questionId);
+	}
+
+	/**
+	 * Test that sections are filtered out from submissions export
+	 */
+	public function testGetSubmissions_sectionsAreFilteredOut() {
+		$formId = 1;
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+
+		$questions = [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+				'text' => 'Short question',
+				'extraSettings' => new \stdClass(),
+			],
+			[
+				'id' => 2,
+				'type' => Constants::ANSWER_TYPE_SECTION,
+				'text' => 'Section title',
+				'extraSettings' => new \stdClass(),
+			],
+			[
+				'id' => 3,
+				'type' => Constants::ANSWER_TYPE_MULTIPLE,
+				'text' => 'Multiple choice question',
+				'extraSettings' => new \stdClass(),
+			],
+		];
+
+		$submissions = [
+			[
+				'id' => 1,
+				'userId' => 'user1',
+				'answers' => [],
+			],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS]);
+
+		$this->submissionService->expects($this->once())
+			->method('getSubmissions')
+			->with($formId, null, null, null, 0)
+			->willReturn($submissions);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with($formId, null, null)
+			->willReturn(1);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn($questions);
+
+		$response = $this->apiController->getSubmissions($formId);
+
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$data = $response->getData();
+
+		// Check that sections are filtered out
+		$this->assertCount(2, $data['questions']);
+		$this->assertEquals(Constants::ANSWER_TYPE_SHORT, $data['questions'][0]['type']);
+		$this->assertEquals(Constants::ANSWER_TYPE_MULTIPLE, $data['questions'][1]['type']);
+		$this->assertNotContains(Constants::ANSWER_TYPE_SECTION, array_column($data['questions'], 'type'));
+	}
+
+	/**
+	 * Test that sections are not stored in answers
+	 */
+	public function testNewSubmission_sectionsAreNotStored() {
+		$formId = 1;
+		$answers = [
+			'1' => ['Answer 1'],
+			'2' => ['Answer 2'], // This is a section, should be ignored
+		];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+
+		$questions = [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+				'text' => 'Short question',
+				'isRequired' => false,
+			],
+			[
+				'id' => 2,
+				'type' => Constants::ANSWER_TYPE_SECTION,
+				'text' => 'Section title',
+				'isRequired' => false,
+			],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with($formId)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('hasFormExpired')
+			->with($form)
+			->willReturn(false);
+
+		$this->formsService->expects($this->once())
+			->method('canSubmit')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn($questions);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($questions, ['1' => ['Answer 1']], 'formOwner'); // Section answer should be filtered out
+
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->willReturn(new Submission());
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$response = $this->apiController->newSubmission($formId, $answers);
+
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
+	}
 }

@@ -113,6 +113,7 @@
 							:answer-type="answerTypes[question.type]"
 							:index="index + 1"
 							:max-string-lengths="maxStringLengths"
+							:type="question.type"
 							v-bind.sync="form.questions[index]"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
