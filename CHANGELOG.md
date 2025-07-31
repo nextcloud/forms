@@ -9,7 +9,7 @@
 
 ### Fixed
 
-* [stable5] fix(export): escape CSV export for spreadsheet applications [\#2807](https://github.com/nextcloud/forms/pull/2807)
+- [stable5] fix(export): escape CSV export for spreadsheet applications [\#2807](https://github.com/nextcloud/forms/pull/2807)
 
 ## v5.1.1 - 2025-06-25
 
