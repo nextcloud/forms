@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "No" : "Не",
     "Yes" : "Так",
+    "Question" : "Пытанне",
     "Copy" : "Капіяваць",
     "Shared with you" : "Абагулена з вамі",
     "Results" : "Вынікі",
