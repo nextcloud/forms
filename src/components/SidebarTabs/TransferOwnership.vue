@@ -37,23 +37,20 @@
 						)
 					" />
 				<!-- eslint-enable vue/no-v-html -->
-				<NcSelect
+				<NcSelectUsers
 					v-model="selected"
 					class="modal-content__select"
-					:reset-focus-on-options-change="false"
-					clear-search-on-select
-					close-on-select
+					:reset-on-options-change="false"
 					:loading="loading"
 					:get-option-key="(option) => option.key"
 					:options="options"
 					:placeholder="t('forms', 'Search for a user')"
-					user-select
 					label="displayName"
-					@search="(query) => asyncSearch(query, true)">
+					@search="asyncSearch">
 					<template #no-options>
 						{{ noResultText }}
 					</template>
-				</NcSelect>
+				</NcSelectUsers>
 
 				<br />
 
@@ -102,7 +99,7 @@ import axios from '@nextcloud/axios'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 import UserSearchMixin from '../../mixins/UserSearchMixin.js'
 import logger from '../../utils/Logger.js'
 
@@ -111,7 +108,7 @@ export default {
 		NcButton,
 		NcDialog,
 		NcTextField,
-		NcSelect,
+		NcSelectUsers,
 	},
 	mixins: [UserSearchMixin],
 
