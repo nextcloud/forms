@@ -16,6 +16,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Капіяваць у буфер абмену",
     "Edit" : "Рэдагаваць",
     "Share" : "Абагуліць",
+    "Description" : "Апісанне",
     "Download" : "Спампаваць",
     "Search" : "Пошук",
     "Settings" : "Налады",
