@@ -106,6 +106,7 @@ class FormsServiceTest extends TestCase {
 
 	/** @var IL10N|MockObject */
 	private $l10n;
+
 	/** @var LoggerInterface|MockObject */
 	private $logger;
 
@@ -118,12 +119,11 @@ class FormsServiceTest extends TestCase {
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
-
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
-		$this->logger = $this->createMock(LoggerInterface::class);
 		$userSession = $this->createMock(IUserSession::class);
 
 		$user = $this->createMock(IUser::class);
@@ -158,6 +158,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 			$this->logger,
 		);
@@ -249,7 +250,9 @@ class FormsServiceTest extends TestCase {
 				'fileId' => null,
 				'fileFormat' => null,
 				'permissions' => Constants::PERMISSION_ALL,
-				'allowEditSubmissions' => false
+				'allowEditSubmissions' => false,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -363,6 +366,8 @@ class FormsServiceTest extends TestCase {
 				'permissions' => Constants::PERMISSION_ALL,
 				'submissionCount' => 123,
 				'partial' => true,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -402,6 +407,8 @@ class FormsServiceTest extends TestCase {
 				'submissionCount' => 123,
 				'state' => 0,
 				'partial' => true,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -463,6 +470,8 @@ class FormsServiceTest extends TestCase {
 				],
 				'submissionMessage' => null,
 				'allowEditSubmissions' => false,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 			]]
 		];
 	}
@@ -636,6 +645,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 			$this->logger,
 		);
@@ -876,6 +886,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 			$this->logger,
 		);
@@ -988,6 +999,7 @@ class FormsServiceTest extends TestCase {
 			$this->circlesService,
 			$this->storage,
 			$this->l10n,
+			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
 			$this->logger,
 		);
@@ -1220,6 +1232,7 @@ class FormsServiceTest extends TestCase {
 				$this->circlesService,
 				$this->storage,
 				$this->l10n,
+				$this->logger,
 				$eventDispatcher,
 				$this->logger,
 			])

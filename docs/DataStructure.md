@@ -26,6 +26,8 @@ This document describes the Object-Structure, that is used within the Forms App 
 | expires              | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
 | isAnonymous          | Boolean                              |                                         | If Answers will be stored anonymously                                                                                            |
 | state                | Integer                              | [Form state](#form-state)               | The state of the form                                                                                                            |
+| lockedBy             | String                               |                                         | The user ID for who has exclusive edit access at the moment                                                                      |
+| lockedUntil          | unix timestamp                       |                                         | When the form lock will expire                                                                                                   |
 | submitMultiple       | Boolean                              |                                         | If users are allowed to submit multiple times to the form                                                                        |
 | allowEditSubmissions | Boolean                              |                                         | If users are allowed to edit or delete their response                                                                            |
 | showExpiration       | Boolean                              |                                         | If the expiration date will be shown on the form                                                                                 |
@@ -59,6 +61,8 @@ This document describes the Object-Structure, that is used within the Forms App 
   ],
   "questions": [],
   "state": 0,
+  "lockedBy": null,
+  "lockedUntil": null,
   "shares": []
   "submissions": [],
   "submissionCount": 0,

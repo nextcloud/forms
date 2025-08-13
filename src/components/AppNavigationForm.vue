@@ -25,10 +25,13 @@
 		<template v-if="hasSubtitle" #subname>
 			{{ formSubtitle }}
 		</template>
-		<template v-if="!loading && !readOnly" #actions>
+		<template
+			v-if="!loading && (!readOnly || canEdit || canSeeResults)"
+			#actions>
 			<NcActionRouter
-				v-if="!isArchived"
+				v-if="!isArchived && canEdit"
 				close-after-click
+				:disabled="isFormLocked"
 				exact
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
@@ -38,7 +41,7 @@
 				{{ t('forms', 'Edit form') }}
 			</NcActionRouter>
 			<NcActionButton
-				v-if="!isArchived"
+				v-if="!isArchived && !readOnly"
 				close-after-click
 				@click="onShareForm">
 				<template #icon>
@@ -47,6 +50,7 @@
 				{{ t('forms', 'Share form') }}
 			</NcActionButton>
 			<NcActionRouter
+				v-if="canSeeResults"
 				close-after-click
 				exact
 				:to="{ name: 'results', params: { hash: form.hash } }"
@@ -62,10 +66,11 @@
 				</template>
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
-			<NcActionSeparator v-if="canEdit" />
+			<NcActionSeparator v-if="canEdit && !readOnly" />
 			<NcActionButton
-				v-if="canEdit"
+				v-if="canEdit && !readOnly"
 				close-after-click
+				:disabled="isFormLocked"
 				@click="onToggleArchive">
 				<template #icon>
 					<IconArchiveOff v-if="isArchived" :size="20" />
@@ -78,8 +83,9 @@
 				}}
 			</NcActionButton>
 			<NcActionButton
-				v-if="canEdit"
+				v-if="canEdit && !readOnly"
 				close-after-click
+				:disabled="isFormLocked"
 				@click="showDeleteDialog = true">
 				<template #icon>
 					<IconDelete :size="20" />
@@ -100,6 +106,7 @@
 </template>
 
 <script>
+import { getCurrentUser } from '@nextcloud/auth'
 import { generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -190,6 +197,14 @@ export default {
 			)
 		},
 
+		canSeeResults() {
+			return (
+				this.form.permissions.includes(
+					this.PERMISSION_TYPES.PERMISSION_RESULTS,
+				) || this.form.submissionCount > 0
+			)
+		},
+
 		/**
 		 * Check if form is current form and set active
 		 */
@@ -209,6 +224,17 @@ export default {
 		 */
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
+		},
+
+		/**
+		 * Check if form is locked
+		 */
+		isFormLocked() {
+			return (
+				this.form.lockedUntil === 0
+				|| (this.form.lockedUntil > moment().unix()
+					&& this.form.lockedBy !== getCurrentUser().uid)
+			)
 		},
 
 		/**

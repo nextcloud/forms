@@ -39,6 +39,8 @@ class ApiV3Test extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'allowEditSubmissions' => false,
@@ -163,6 +165,8 @@ class ApiV3Test extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'allowEditSubmissions' => false,
@@ -201,6 +205,8 @@ class ApiV3Test extends IntegrationBase {
 				'created' => 12345,
 				'expires' => 0,
 				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
 				'is_anonymous' => false,
 				'submit_multiple' => false,
 				'allowEditSubmissions' => false,
@@ -288,6 +294,8 @@ class ApiV3Test extends IntegrationBase {
 						'permissions' => Constants::PERMISSION_ALL,
 						'partial' => true,
 						'submissionCount' => 3,
+						'lockedBy' => null,
+						'lockedUntil' => null,
 					],
 					[
 						'hash' => 'zyxwvutsrq654321',
@@ -298,6 +306,8 @@ class ApiV3Test extends IntegrationBase {
 						'permissions' => Constants::PERMISSION_ALL,
 						'partial' => true,
 						'submissionCount' => 0,
+						'lockedBy' => null,
+						'lockedUntil' => null,
 					]
 				]
 			]
@@ -331,7 +341,9 @@ class ApiV3Test extends IntegrationBase {
 						'permissions' => [
 							'submit'
 						],
-						'partial' => true
+						'partial' => true,
+						'lockedBy' => null,
+						'lockedUntil' => null,
 					],
 				]
 			]
@@ -367,6 +379,8 @@ class ApiV3Test extends IntegrationBase {
 					],
 					'expires' => 0,
 					'state' => 0,
+					'lockedBy' => null,
+					'lockedUntil' => null,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'allowEditSubmissions' => false,
@@ -427,6 +441,8 @@ class ApiV3Test extends IntegrationBase {
 					],
 					'expires' => 0,
 					'state' => 0,
+					'lockedBy' => null,
+					'lockedUntil' => null,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'allowEditSubmissions' => false,
@@ -651,6 +667,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['id'], $data);
 
 		$expected['lastUpdated'] = time();
+		$expected['lockedBy'] = 'test';
+		$expected['lockedUntil'] = time() + 900;
 
 		// Check if form equals updated form.
 		$this->testGetFullForm($expected);
@@ -763,6 +781,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['questions'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		// Check if form equals updated form.
 		$this->testGetFullForm($fullFormExpected);
@@ -809,6 +829,8 @@ class ApiV3Test extends IntegrationBase {
 		], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		// Check if form equals updated form.
 		$this->testGetFullForm($fullFormExpected);
@@ -839,6 +861,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['questions'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -924,6 +948,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['questions'][1]['options'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		// Check if form equals updated form.
 		$this->testGetFullForm($fullFormExpected);
@@ -952,6 +978,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['questions'][1]['options'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 		$fullFormExpected['questions'][1]['options'][0]['order'] = 1;
 		$fullFormExpected['questions'][1]['options'][1]['order'] = 2;
 
@@ -1025,6 +1053,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		$this->testGetFullForm($fullFormExpected);
 	}
@@ -1052,6 +1082,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($this->testForms[0]['shares'][0]['id'], $data);
 
 		$fullFormExpected['lastUpdated'] = time();
+		$fullFormExpected['lockedBy'] = 'test';
+		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		$this->testGetFullForm($fullFormExpected);
 	}

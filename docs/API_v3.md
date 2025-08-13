@@ -92,7 +92,9 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
       "submit"
     ],
     "partial": true,
-    "state": 0
+    "state": 0,
+    "lockedBy": null,
+    "lockedUntil": null
   },
   {
     "id": 3,
@@ -105,7 +107,9 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
       "submit"
     ],
     "partial": true,
-    "state": 0
+    "state": 0,
+    "lockedBy": "someUser"
+    "lockedUntil": 123456789
   }
 ]
 ```
@@ -169,6 +173,8 @@ Returns the full-depth object of the requested form (without submissions).
   "showExpiration": false,
   "canSubmit": true,
   "state": 0,
+  "lockedBy": null,
+  "lockedUntil": null,
   "permissions": [
     "edit",
     "results",

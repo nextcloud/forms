@@ -17,18 +17,25 @@
 		<NcActions class="share-div__actions">
 			<NcActionCaption :name="t('forms', 'Permissions')" />
 			<NcActionCheckbox
-				:checked="canAccessResults"
-				@update:checked="updatePermissionResults">
+				:model-value="canEditForm"
+				:disabled="locked"
+				@update:model-value="updatePermissionEdit">
+				{{ t('forms', 'Edit form') }}
+			</NcActionCheckbox>
+			<NcActionCheckbox
+				:model-value="canAccessResults"
+				:disabled="locked"
+				@update:model-value="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
-				:checked="canDeleteResults"
-				:disabled="!canAccessResults"
-				@update:checked="updatePermissionDeleteResults">
+				:model-value="canDeleteResults"
+				:disabled="!canAccessResults || locked"
+				@update:model-value="updatePermissionDeleteResults">
 				{{ t('forms', 'Delete responses') }}
 			</NcActionCheckbox>
 			<NcActionSeparator />
-			<NcActionButton @click="removeShare">
+			<NcActionButton :disabled="locked" @click="removeShare">
 				<template #icon>
 					<IconClose :size="20" />
 				</template>
@@ -68,6 +75,11 @@ export default {
 			type: Object,
 			required: true,
 		},
+
+		locked: {
+			type: Boolean,
+			required: true,
+		},
 	},
 
 	computed: {
@@ -79,6 +91,11 @@ export default {
 		canDeleteResults() {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+			)
+		},
+		canEditForm() {
+			return this.share.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
 			)
 		},
 		isNoUser() {
@@ -129,6 +146,16 @@ export default {
 		updatePermissionDeleteResults(hasPermission) {
 			return this.updatePermission(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				hasPermission,
+			)
+		},
+
+		/**
+		 * @param {boolean} hasPermission If the results_delete permission should be granted
+		 */
+		updatePermissionEdit(hasPermission) {
+			return this.updatePermission(
+				this.PERMISSION_TYPES.PERMISSION_EDIT,
 				hasPermission,
 			)
 		},

@@ -40,7 +40,7 @@ class CleanupUploadedFilesJobTest extends TestCase {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 		$time = $this->createMock(ITimeFactory::class);
-		$this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->cleanupUploadedFilesJob = new CleanupUploadedFilesJob(
 			$this->rootFolder,
 			$this->formMapper,

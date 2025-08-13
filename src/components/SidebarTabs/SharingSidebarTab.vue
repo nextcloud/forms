@@ -5,9 +5,21 @@
 
 <template>
 	<div class="sidebar-tabs__content">
+		<NcNoteCard
+			v-if="locked"
+			type="info"
+			:heading="t('forms', 'Form is locked')"
+			:text="
+				t('forms', 'Lock by {lockedBy}, expires: {lockedUntil}', {
+					lockedBy: form.lockedBy ? form.lockedBy : form.ownerId,
+					lockedUntil:
+						lockedUntil === '' ? t('forms', 'never') : lockedUntil,
+				})
+			" />
 		<SharingSearchDiv
 			:current-shares="form.shares"
 			:show-loading="isLoading"
+			:locked="locked"
 			@add-share="addShare" />
 
 		<!-- Public Link -->
@@ -19,7 +31,7 @@
 			</div>
 			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 			<NcActions>
-				<NcActionButton @click="addPublicLink">
+				<NcActionButton :disabled="locked" @click="addPublicLink">
 					<template #icon>
 						<IconPlus :size="20" />
 					</template>
@@ -66,14 +78,17 @@
 						</template>
 						{{ t('forms', 'Copy embedding code') }}
 					</NcActionButton>
-					<NcActionButton v-else @click="makeEmbeddable(share)">
+					<NcActionButton
+						v-else
+						:disabled="locked"
+						@click="makeEmbeddable(share)">
 						<template #icon>
 							<IconLinkBoxVariantOutline :size="20" />
 						</template>
 						<!-- TRANSLATORS: This means the link can be embedded into external websites -->
 						{{ t('forms', 'Convert to embeddable link') }}
 					</NcActionButton>
-					<NcActionButton @click="removeShare(share)">
+					<NcActionButton :disabled="locked" @click="removeShare(share)">
 						<template #icon>
 							<IconDelete :size="20" />
 						</template>
@@ -82,6 +97,7 @@
 					<NcActionButton
 						v-if="appConfig.allowPublicLink"
 						close-after-click
+						:disabled="locked"
 						@click="addPublicLink">
 						<template #icon>
 							<IconPlus :size="20" />
@@ -144,6 +160,7 @@
 				<NcCheckboxRadioSwitch
 					id="share-switch__permit-all"
 					:checked="form.access.permitAllUsers"
+					:disabled="locked"
 					type="switch"
 					@update:checked="onPermitAllUsersChange" />
 			</div>
@@ -159,6 +176,7 @@
 				<NcCheckboxRadioSwitch
 					id="share-switch__show-to-all"
 					:checked="form.access.showToAllUsers"
+					:disabled="locked"
 					type="switch"
 					@update:checked="onShowToAllUsersChange" />
 			</div>
@@ -170,6 +188,7 @@
 				v-for="share in sortedShares"
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
+				:locked="locked"
 				@remove-share="removeShare"
 				@update:share="updateShare" />
 		</TransitionGroup>
@@ -186,6 +205,7 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/components/NcActionLink'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultiple.vue'
 import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
@@ -220,6 +240,7 @@ export default {
 		NcActionButton,
 		NcActionLink,
 		NcCheckboxRadioSwitch,
+		NcNoteCard,
 		QRDialog,
 		SharingSearchDiv,
 		SharingShareDiv,
@@ -231,6 +252,16 @@ export default {
 		form: {
 			type: Object,
 			required: true,
+		},
+
+		locked: {
+			type: Boolean,
+			required: true,
+		},
+
+		lockedUntil: {
+			type: String,
+			default: '',
 		},
 	},
 
@@ -434,6 +465,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.sidebar-tabs__content {
+	display: flex;
+	flex-direction: column;
+}
+
 .share-div {
 	display: flex;
 	min-height: var(--default-clickable-area);

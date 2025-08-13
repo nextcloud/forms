@@ -22,7 +22,6 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
-use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -180,7 +179,7 @@ class ApiController extends OCSController {
 
 			$this->formMapper->insert($form);
 		} else {
-			$oldForm = $this->getFormIfAllowed($fromId);
+			$oldForm = $this->formsService->getFormIfAllowed($fromId, Constants::PERMISSION_EDIT);
 
 			// Read old form, (un)set new form specific data, extend title
 			$formData = $oldForm->read();
@@ -190,6 +189,8 @@ class ApiController extends OCSController {
 			unset($formData['state']);
 			unset($formData['fileId']);
 			unset($formData['fileFormat']);
+			unset($formData['lockedBy']);
+			unset($formData['lockedUntil']);
 			$formData['hash'] = $this->formsService->generateFormHash();
 			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
@@ -238,7 +239,7 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
 	public function getForm(int $formId): DataResponse {
-		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_SUBMIT);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_SUBMIT);
 
 		return new DataResponse($this->formsService->getForm($form));
 	}
@@ -267,72 +268,45 @@ class ApiController extends OCSController {
 			'keyValuePairs' => $keyValuePairs
 		]);
 
-		$form = $this->getFormIfAllowed($formId);
-		if (
-			$this->formsService->isFormArchived($form)
-			&& !(
-				sizeof($keyValuePairs) === 1
-				&& key_exists('state', $keyValuePairs)
-				&& $keyValuePairs['state'] === Constants::FORM_STATE_CLOSED
-			)
-		) {
-			$this->logger->debug('This form is archived and can not be modified except to change state to closed.');
-			throw new OCSForbiddenException('This form is archived and can not be modified except to change state to closed.');
-		}
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$currentUserId = $this->currentUser->getUID();
 
-		// Don't allow empty array
-		if (sizeof($keyValuePairs) === 0) {
+		if (empty($keyValuePairs)) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
 			throw new OCSForbiddenException('Empty keyValuePairs, will not update.');
 		}
 
-		// Process owner transfer
-		if (sizeof($keyValuePairs) === 1 && key_exists('ownerId', $keyValuePairs)) {
-			$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
-				'formId' => $formId,
-				'uid' => $keyValuePairs['ownerId']
-			]);
+		// Only allow the form owner to set/unset the "archived" state
+		$this->checkArchivePermission($form, $currentUserId, $keyValuePairs);
 
-			$user = $this->userManager->get($keyValuePairs['ownerId']);
-			if ($user == null) {
-				$this->logger->debug('Could not find new form owner');
-				throw new OCSBadRequestException('Could not find new form owner');
-			}
-
-			// update form owner
-			$form->setOwnerId($keyValuePairs['ownerId']);
-
-			// Update changed Columns in Db.
-			$this->formMapper->update($form);
-
-			return new DataResponse($form->getOwnerId());
+		// Handle form locking/unlocking
+		if ($this->isLockingRequest($keyValuePairs)) {
+			return $this->handleFormLocking($form, $currentUserId);
+		}
+		if ($this->isUnlockingRequest($keyValuePairs)) {
+			return $this->handleFormUnlocking($form, $currentUserId);
 		}
 
-		// Don't allow to change params id, hash, ownerId, created, lastUpdated, fileId
-		if (
-			key_exists('id', $keyValuePairs) || key_exists('hash', $keyValuePairs)
-			|| key_exists('ownerId', $keyValuePairs) || key_exists('created', $keyValuePairs)
-			|| isset($keyValuePairs['fileId']) || key_exists('lastUpdated', $keyValuePairs)
-		) {
-			$this->logger->info('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');
-			throw new OCSForbiddenException('Not allowed to update id, hash, ownerId, created, fileId or lastUpdated');
+		// Lock form temporary
+		$this->formsService->obtainFormLock($form);
+
+		// Handle owner transfer
+		if ($this->isOwnerTransferRequest($keyValuePairs)) {
+			return $this->handleOwnerTransfer($form, $formId, $currentUserId, $keyValuePairs);
 		}
 
-		// Do not allow changing showToAllUsers if disabled
-		if (isset($keyValuePairs['access'])) {
-			$showAll = $keyValuePairs['access']['showToAllUsers'] ?? false;
-			$permitAll = $keyValuePairs['access']['permitAllUsers'] ?? false;
-			if (($showAll && !$this->configService->getAllowShowToAll())
-				|| ($permitAll && !$this->configService->getAllowPermitAll())) {
-				$this->logger->info('Not allowed to update showToAllUsers or permitAllUsers');
-				throw new OCSForbiddenException();
-			}
-		}
+		// Don't allow to change the following attributes
+		$this->checkForbiddenKeys($keyValuePairs);
+
+		// Don't allow to change fileId
+		$this->checkFileIdUpdate($keyValuePairs);
+
+		// Do not allow changing showToAllUsers or permitAllUsers if disabled
+		$this->checkAccessUpdate($keyValuePairs);
 
 		// Process file linking
 		if (isset($keyValuePairs['path']) && isset($keyValuePairs['fileFormat'])) {
 			$file = $this->submissionService->writeFileToCloud($form, $keyValuePairs['path'], $keyValuePairs['fileFormat']);
-
 			$form->setFileId($file->getId());
 			$form->setFileFormat($keyValuePairs['fileFormat']);
 		}
@@ -378,7 +352,7 @@ class ApiController extends OCSController {
 			'formId' => $formId,
 		]);
 
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId);
 		$this->formMapper->deleteForm($form);
 
 		return new DataResponse($formId);
@@ -488,7 +462,9 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
 	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -619,7 +595,9 @@ class ApiController extends OCSController {
 
 		// Make sure we query the form first to check the user has permissions
 		// So the user does not get information about "questions" if they do not even have permissions to the form
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -693,7 +671,9 @@ class ApiController extends OCSController {
 		]);
 
 
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -759,7 +739,9 @@ class ApiController extends OCSController {
 			'newOrder' => $newOrder
 		]);
 
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -858,7 +840,9 @@ class ApiController extends OCSController {
 			'text' => $optionTexts,
 		]);
 
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -940,7 +924,9 @@ class ApiController extends OCSController {
 			'keyValuePairs' => $keyValuePairs
 		]);
 
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -1007,7 +993,9 @@ class ApiController extends OCSController {
 			'optionId' => $optionId
 		]);
 
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -1063,7 +1051,9 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
 	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
-		$form = $this->getFormIfAllowed($formId);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
 		if ($this->formsService->isFormArchived($form)) {
 			$this->logger->debug('This form is archived and can not be modified');
 			throw new OCSForbiddenException('This form is archived and can not be modified');
@@ -1164,7 +1154,7 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions')]
 	public function getSubmissions(int $formId, ?string $query = null, ?int $limit = null, int $offset = 0, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
-		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
 
 		if ($fileFormat !== null) {
 			$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
@@ -1237,7 +1227,7 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function getSubmission(int $formId, int $submissionId): DataResponse|DataDownloadResponse {
-		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
 
 		$submission = $this->submissionService->getSubmission($submissionId);
 		if ($submission === null) {
@@ -1282,7 +1272,7 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'DELETE', url: '/api/v3/forms/{formId}/submissions')]
 	public function deleteAllSubmissions(int $formId): DataResponse {
-		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
 
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
@@ -1319,7 +1309,7 @@ class ApiController extends OCSController {
 			'shareHash' => $shareHash,
 		]);
 
-		$form = $this->loadFormForSubmission($formId, $shareHash);
+		$form = $this->formsService->loadFormForSubmission($formId, $shareHash);
 
 		$questions = $this->formsService->getQuestions($formId);
 		try {
@@ -1405,7 +1395,7 @@ class ApiController extends OCSController {
 		]);
 
 		// submissions can't be updated on public shares, so passing empty shareHash
-		$form = $this->loadFormForSubmission($formId, '');
+		$form = $this->formsService->loadFormForSubmission($formId, '');
 
 		if (!$form->getAllowEditSubmissions()) {
 			throw new OCSBadRequestException('Can only update if allowEditSubmissions is set');
@@ -1480,7 +1470,7 @@ class ApiController extends OCSController {
 			'submissionId' => $submissionId,
 		]);
 
-		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
 		} catch (IMapperException $e) {
@@ -1524,7 +1514,7 @@ class ApiController extends OCSController {
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/export')]
 	public function exportSubmissionsToCloud(int $formId, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
-		$form = $this->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
 		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
 
 		return new DataResponse($file->getName());
@@ -1570,7 +1560,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('No files provided');
 		}
 
-		$form = $this->loadFormForSubmission($formId, $shareHash);
+		$form = $this->formsService->loadFormForSubmission($formId, $shareHash);
 
 		if (!$this->formsService->canSubmit($form)) {
 			throw new OCSForbiddenException('Already submitted');
@@ -1738,84 +1728,148 @@ class ApiController extends OCSController {
 		}
 	}
 
-	private function loadFormForSubmission(int $formId, string $shareHash): Form {
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new NoSuchFormException('Could not find form');
-		}
-
-		// Does the user have access to the form (Either by logged-in user, or by providing public share-hash.)
-		try {
-			$isPublicShare = false;
-
-			// If hash given, find the corresponding share & check if hash corresponds to given formId.
-			if ($shareHash !== '') {
-				// Public link share
-				$share = $this->shareMapper->findPublicShareByHash($shareHash);
-				if ($share->getFormId() === $formId) {
-					$isPublicShare = true;
-				}
-			}
-		} catch (DoesNotExistException $e) {
-			// $isPublicShare already false.
-		} finally {
-			// Now forbid, if no public share and no direct share.
-			if (!$isPublicShare && !$this->formsService->hasUserAccess($form)) {
-				throw new NoSuchFormException('Not allowed to access this form', Http::STATUS_FORBIDDEN);
+	/**
+	 * Throws if forbidden keys are present in update
+	 */
+	private function checkForbiddenKeys(array $keyValuePairs): void {
+		$forbiddenKeys = [
+			'id', 'hash', 'ownerId', 'created', 'lastUpdated', 'lockedBy', 'lockedUntil'
+		];
+		foreach ($forbiddenKeys as $key) {
+			if (array_key_exists($key, $keyValuePairs)) {
+				$this->logger->info("Not allowed to update {$key}");
+				throw new OCSForbiddenException("Not allowed to update {$key}");
 			}
 		}
-
-		// Not allowed if form has expired.
-		if ($this->formsService->hasFormExpired($form)) {
-			throw new OCSForbiddenException('This form is no longer taking answers');
-		}
-
-		return $form;
 	}
 
 	/**
-	 * Helper that retrieves a form if the current user is allowed to edit it
-	 * This throws an exception in case either the form is not found or permissions are missing.
-	 * @param int $formId The form ID to retrieve
-	 * @throws NoSuchFormException If the form was not found or the current user has no permission to edit
+	 * Throws if fileId is present in update
 	 */
-	private function getFormIfAllowed(int $formId, string $permissions = 'all'): Form {
-		try {
-			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
-			$this->logger->debug('Could not find form');
-			throw new NoSuchFormException('Could not find form');
+	private function checkFileIdUpdate(array $keyValuePairs): void {
+		if (isset($keyValuePairs['fileId'])) {
+			$this->logger->info('Not allowed to update fileId');
+			throw new OCSForbiddenException('Not allowed to update fileId');
 		}
+	}
 
-		switch ($permissions) {
-			case Constants::PERMISSION_SUBMIT:
-				if (!$this->formsService->hasUserAccess($form)) {
-					$this->logger->debug('User has no permissions to get this form');
-					throw new NoSuchFormException('User has no permissions to get this form', Http::STATUS_FORBIDDEN);
-				}
-				break;
-			case Constants::PERMISSION_RESULTS:
-				if (!$this->formsService->canSeeResults($form)) {
-					$this->logger->debug('The current user has no permission to get the results for this form');
-					throw new NoSuchFormException('The current user has no permission to get the results for this form', Http::STATUS_FORBIDDEN);
-				}
-				break;
-			case Constants::PERMISSION_RESULTS_DELETE:
-				if (!$this->formsService->canDeleteResults($form)) {
-					$this->logger->debug('This form is not owned by the current user and user has no `results_delete` permission');
-					throw new NoSuchFormException('This form is not owned by the current user and user has no `results_delete` permission', Http::STATUS_FORBIDDEN);
-				}
-				break;
-			default:
-				// By default we request full permissions
-				if ($form->getOwnerId() !== $this->currentUser->getUID()) {
-					$this->logger->debug('This form is not owned by the current user');
-					throw new NoSuchFormException('This form is not owned by the current user', Http::STATUS_FORBIDDEN);
-				}
-				break;
+	/**
+	 * Throws if access keys are being updated when not allowed
+	 */
+	private function checkAccessUpdate(array $keyValuePairs): void {
+		if (isset($keyValuePairs['access'])) {
+			$showAll = $keyValuePairs['access']['showToAllUsers'] ?? false;
+			$permitAll = $keyValuePairs['access']['permitAllUsers'] ?? false;
+			if (($showAll && !$this->configService->getAllowShowToAll())
+				|| ($permitAll && !$this->configService->getAllowPermitAll())) {
+				$this->logger->info('Not allowed to update showToAllUsers or permitAllUsers');
+				throw new OCSForbiddenException();
+			}
 		}
-		return $form;
+	}
+
+	/**
+	 * Checks if the current user is allowed to archive/unarchive the form
+	 */
+	private function checkArchivePermission(Form $form, string $currentUserId, array $keyValuePairs): void {
+		$isArchived = $this->formsService->isFormArchived($form);
+		$owner = $currentUserId === $form->getOwnerId();
+		$onlyState = sizeof($keyValuePairs) === 1 && key_exists('state', $keyValuePairs);
+
+		// Only check if the request is trying to change the archived state
+		if ($onlyState && $keyValuePairs['state'] === Constants::FORM_STATE_ARCHIVED) {
+			// Trying to archive
+			if (!$owner || $isArchived) {
+				$this->logger->debug('Only the form owner can archive the form, and only if it is not already archived');
+				throw new OCSForbiddenException('Only the form owner can archive the form, and only if it is not already archived');
+			}
+		} elseif ($onlyState && $keyValuePairs['state'] === Constants::FORM_STATE_CLOSED) {
+			// Trying to unarchive
+			if (!$owner || !$isArchived) {
+				$this->logger->debug('Only the form owner can unarchive the form, and only if it is currently archived');
+				throw new OCSForbiddenException('Only the form owner can unarchive the form, and only if it is currently archived');
+			}
+		}
+		// All other updates are allowed (including updates that do not touch the state)
+	}
+
+	private function isLockingRequest(array $keyValuePairs): bool {
+		return sizeof($keyValuePairs) === 1
+			&& array_key_exists('lockedUntil', $keyValuePairs)
+			&& $keyValuePairs['lockedUntil'] === 0;
+	}
+
+	private function isUnlockingRequest(array $keyValuePairs): bool {
+		return sizeof($keyValuePairs) === 1
+			&& array_key_exists('lockedUntil', $keyValuePairs)
+			&& is_null($keyValuePairs['lockedUntil']);
+	}
+
+	private function isOwnerTransferRequest(array $keyValuePairs): bool {
+		return sizeof($keyValuePairs) === 1 && key_exists('ownerId', $keyValuePairs);
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 */
+	private function handleFormLocking(Form $form, string $currentUserId): DataResponse {
+		if ($currentUserId !== $form->getOwnerId() || ($form->getLockedBy() !== null && $currentUserId !== $form->getLockedBy())) {
+			$this->logger->debug('Only the form owner can lock the form permanently');
+			throw new OCSForbiddenException('Only the form owner can lock the form permanently');
+		}
+		if (
+			$form->getLockedBy() !== null
+			&& $form->getLockedBy() !== $currentUserId
+			&& $form->getLockedUntil() >= time()
+		) {
+			$this->logger->debug('Form is currently locked by another user.');
+			throw new OCSForbiddenException('Form is currently locked by another user.');
+		}
+		if ($form->getLockedUntil() === 0) {
+			$this->logger->debug('Form is already locked completely.');
+			throw new OCSBadRequestException('Form is already locked completely.');
+		}
+		$form->setLockedBy($form->getOwnerId());
+		$form->setLockedUntil(0);
+		$this->formMapper->update($form);
+		return new DataResponse($form->getId());
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 */
+	private function handleFormUnlocking(Form $form, string $currentUserId): DataResponse {
+		if ($currentUserId !== $form->getOwnerId() && $currentUserId !== $form->getLockedBy() && $form->getLockedUntil() !== 0) {
+			$this->logger->debug('Only the form owner or the user who obtained the lock can unlock the form');
+			throw new OCSForbiddenException('Only the form owner or the user who obtained the lock can unlock the form');
+		}
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+		$this->formMapper->update($form);
+		return new DataResponse($form->getId());
+	}
+
+	/**
+	 * @return DataResponse<Http::STATUS_OK, string, array{}>
+	 */
+	private function handleOwnerTransfer(Form $form, int $formId, string $currentUserId, array $keyValuePairs): DataResponse {
+		if ($currentUserId !== $form->getOwnerId()) {
+			$this->logger->debug('Only the form owner can transfer ownership');
+			throw new OCSForbiddenException('Only the form owner can transfer ownership');
+		}
+		$this->logger->debug('Updating owner: formId: {formId}, userId: {uid}', [
+			'formId' => $formId,
+			'uid' => $keyValuePairs['ownerId']
+		]);
+		$user = $this->userManager->get($keyValuePairs['ownerId']);
+		if ($user == null) {
+			$this->logger->debug('Could not find new form owner');
+			throw new OCSBadRequestException('Could not find new form owner');
+		}
+		$form->setOwnerId($keyValuePairs['ownerId']);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+		$this->formMapper->update($form);
+		return new DataResponse($form->getOwnerId());
 	}
 }

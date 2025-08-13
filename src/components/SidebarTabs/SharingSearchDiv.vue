@@ -9,6 +9,7 @@
 			:clear-search-on-select="false"
 			:close-on-select="false"
 			:loading="showLoadingCircle"
+			:disabled="locked"
 			:get-option-key="(option) => option.key"
 			:options="options"
 			:placeholder="t('forms', 'Search for user, group or team …')"
@@ -45,6 +46,10 @@ export default {
 		showLoading: {
 			type: Boolean,
 			default: false,
+		},
+		locked: {
+			type: Boolean,
+			required: true,
 		},
 	},
 
