@@ -148,6 +148,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ní féidir é seo a rialú, má tá nasc poiblí ag an bhfoirm nó má stórálann sí freagraí gan ainm.",
     "Expired on {date}" : "Chuaigh sé in éag ar {date}",
     "Expires on {date}" : "Rachaidh sé in éag ar {date}",
+    "never" : "riamh",
     "Store responses anonymously" : "Stóráil freagraí gan ainm",
     "Allow multiple responses per person" : "Ceadaigh freagraí iolracha in aghaidh an duine",
     "Allow editing own responses" : "Ceadaigh eagarthóireacht a dhéanamh ar do chuid freagraí féin",

@@ -40,6 +40,7 @@ OC.L10N.register(
     "Delete this response" : "Borrar esta respuesta",
     "Expired on {date}" : "Expirado el {día}",
     "Expires on {date}" : "Expira el {día}",
+    "never" : "nunca",
     "Set expiration date" : "Establecer fecha de caducidad",
     "Group" : "Grupo",
     "Permissions" : "Permisos",

@@ -8,6 +8,7 @@ OC.L10N.register(
     "Cancel" : "չեղարկել",
     "Delete" : "հեռացնել",
     "Other" : "Այլ",
+    "never" : "երբեք",
     "Set expiration date" : "Սահմանել վավերականության ժամկետ",
     "Group" : "Խումբ",
     "Share link" : "Կիսվել հղմամբ",

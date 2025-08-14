@@ -10,6 +10,7 @@ OC.L10N.register(
     "Required" : "Noutwendeg",
     "Delete" : "Läschen",
     "Other" : "Aner",
+    "never" : "Ni",
     "Set expiration date" : "Verfallsdatum setzen",
     "Group" : "Grupp",
     "Share link" : "Link deelen",

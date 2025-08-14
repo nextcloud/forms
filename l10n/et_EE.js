@@ -150,6 +150,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Kui vormil on avalik link või andmed salvestatakse anonüümselt, siis sa ei saa seda kontrollida ega tagada.",
     "Expired on {date}" : "Aegus {date}",
     "Expires on {date}" : "Aegub {date}",
+    "never" : "mitte kunagi",
     "Store responses anonymously" : "Salvesta vastused anonüümselt",
     "Allow multiple responses per person" : "Luba ühelt vastajalt mitu vastust",
     "Allow editing own responses" : "Luba omade vastuste muutmist",

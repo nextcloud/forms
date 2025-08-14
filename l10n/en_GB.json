@@ -148,6 +148,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "This can not be controlled, if the form has a public link or stores responses anonymously.",
     "Expired on {date}" : "Expired on {date}",
     "Expires on {date}" : "Expires on {date}",
+    "never" : "never",
     "Store responses anonymously" : "Store responses anonymously",
     "Allow multiple responses per person" : "Allow multiple responses per person",
     "Allow editing own responses" : "Allow editing own responses",

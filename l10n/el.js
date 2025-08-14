@@ -107,6 +107,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Αυτό δεν μπορεί να ελεγχθεί, εάν η φόρμα έχει δημόσιο σύνδεσμο ή αποθηκεύει τις απαντήσεις ανώνυμα.",
     "Expired on {date}" : "Έληξε στις {date}",
     "Expires on {date}" : "Λήγει στις {date}",
+    "never" : "ποτέ",
     "Store responses anonymously" : "Αποθηκεύστε τις απαντήσεις ανώνυμα",
     "Allow multiple responses per person" : "Να επιτρέπονται πολλές απαντήσεις ανά χρήστη",
     "Set expiration date" : "Ορισμός ημερομηνίας λήξης",

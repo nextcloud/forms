@@ -76,6 +76,7 @@
     "Delete this response" : "Ištrinti šį atsakymą",
     "Expired on {date}" : "Nustojo galioti {date}",
     "Expires on {date}" : "Galioja iki {date}",
+    "never" : "niekada",
     "Allow multiple responses per person" : "Leisti kiekvienam žmogui atsakinėti po keletą kartų",
     "Set expiration date" : "Nustatyti galiojimo pabaigos datą",
     "Search for user, group or team …" : "Ieškoti naudotojo, grupės ar komandos…",

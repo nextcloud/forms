@@ -10,6 +10,7 @@ OC.L10N.register(
     "Delete" : "Borrar",
     "Uploading …" : "Cargando...",
     "Other" : "Otro",
+    "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
     "Group" : "Grupo",
     "Permissions" : "Permisos",

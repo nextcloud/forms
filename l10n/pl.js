@@ -104,6 +104,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Można to kontrolować wyłącznie, gdy formularz ma publiczny link lub zachowuje odpowiedzi anonimowo.",
     "Expired on {date}" : "Wygasł {date}",
     "Expires on {date}" : "Wygasa {date}",
+    "never" : "nigdy",
     "Store responses anonymously" : "Zachowuj odpowiedzi anonimowo",
     "Allow multiple responses per person" : "Zezwalaj na wiele odpowiedzi na osobę",
     "Set expiration date" : "Ustaw datę ważności",

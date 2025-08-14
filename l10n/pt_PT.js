@@ -60,6 +60,7 @@ OC.L10N.register(
     "Delete this response" : "Apague esta resposta",
     "Expired on {date}" : "Expirou em {date}",
     "Expires on {date}" : "Expira em {date}",
+    "never" : "nunca",
     "Store responses anonymously" : "Armazene as respostas anonimamente",
     "Allow multiple responses per person" : "Permitir respostas múltiplas por pessoa",
     "Set expiration date" : "Definir a data de expiração",

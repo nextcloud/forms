@@ -43,6 +43,7 @@
     "Delete this response" : "מחיקת התגובה הזאת",
     "Expired on {date}" : "התוקף פג ב־{date}",
     "Expires on {date}" : "התוקף יפוג ב־{date}",
+    "never" : "מעולם לא",
     "Allow multiple responses per person" : "לאפשר מספר תגובות למשתתף",
     "Set expiration date" : "הגדרת תאריך תפוגה",
     "Group" : "קבוצה",

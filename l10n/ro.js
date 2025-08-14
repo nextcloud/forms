@@ -122,6 +122,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Asta nu se poate controla dacă formularul are un link public sau salvează răspunsurile în mod anonim.",
     "Expired on {date}" : "A expirat la {date}",
     "Expires on {date}" : "Expiră la {date}",
+    "never" : "niciodată",
     "Store responses anonymously" : "Salvează răspunsurile în mod anonim",
     "Allow multiple responses per person" : "Permite mai multe răspunsuri per persoană",
     "Set expiration date" : "Specifică data expirării",

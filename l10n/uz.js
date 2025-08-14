@@ -13,6 +13,7 @@ OC.L10N.register(
     "Delete" : "O'chirish",
     "Uploading …" : "Yuklanmoqda...",
     "Other" : "Boshqa",
+    "never" : "hech qachon",
     "Set expiration date" : "Set expiration date",
     "Share link" : "Share link",
     "Copy embedding code" : "O'rnatish kodini nusxalash",

@@ -6,6 +6,7 @@ OC.L10N.register(
     "Shared with you" : "ແບ່ງປັບກັບທ່ານ",
     "Cancel" : "ຍົກເລີກ",
     "Delete" : "ລຶບ",
+    "never" : "ບໍ່ເຄີຍ",
     "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
     "Group" : "ກຸ່ມ",
     "Share link" : "ແບ່ງປັນລິງ",

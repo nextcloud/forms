@@ -148,6 +148,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Hii haiwezi kudhibitiwa, kama fomu ina kiungio cha umma au huhifadhi majibu bila kujulikana",
     "Expired on {date}" : "Muda wake uliisha {date}",
     "Expires on {date}" : "Muda wake unaisha {date}",
+    "never" : "kamwe",
     "Store responses anonymously" : "Hifadhi majibu bila kujulikana",
     "Allow multiple responses per person" : "Ruhusu majibu mengi kwa kila mtu",
     "Allow editing own responses" : "Ruhusu kuhariri majibu yako mwenyewe",

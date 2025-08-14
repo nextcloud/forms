@@ -9,6 +9,7 @@ OC.L10N.register(
     "Delete" : "Hapus",
     "Uploading …" : "Mengunggah …",
     "Other" : "Lainnya",
+    "never" : "tidak pernah.",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
     "Group" : "Grup",
     "Share link" : "Bagikan tautan",

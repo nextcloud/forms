@@ -83,6 +83,7 @@
     "Delete this response" : "この返信を削除",
     "Expired on {date}" : "{date} に有効期限が切れました。",
     "Expires on {date}" : "有効期限: {date}",
+    "never" : "なし",
     "Store responses anonymously" : "回答を匿名で保存する",
     "Allow multiple responses per person" : "ユーザーごとに複数の回答を許可",
     "Set expiration date" : "有効期限を設定",

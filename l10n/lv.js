@@ -20,6 +20,7 @@ OC.L10N.register(
     "Delete" : "Izdzēst",
     "Uploading …" : "Augšupielādē…",
     "Other" : "Cits",
+    "never" : "nekad",
     "Set expiration date" : "Iestatīt derīguma beigu datumu",
     "Closed forms do not accept new submissions." : "Aizvērtās veidlapās netiek pieņemti jauni iesniegumi.",
     "Archived forms do not accept new submissions and can not be modified." : "Aizvērtās formās netiek pieņemti jauni iesniegumi, un tās nevar mainīt.",

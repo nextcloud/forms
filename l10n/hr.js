@@ -57,6 +57,7 @@ OC.L10N.register(
     "Delete this response" : "Izbriši ovaj odgovor",
     "Expired on {date}" : "Isteklo {date}",
     "Expires on {date}" : "Istječe {date}",
+    "never" : "nikad",
     "Allow multiple responses per person" : "Omogući višestruke odgovore po osobi",
     "Set expiration date" : "Postavi datum isteka",
     "Group" : "Grupa",

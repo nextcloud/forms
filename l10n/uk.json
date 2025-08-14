@@ -148,6 +148,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Це не можна контролювати, якщо форма має публічне посилання або зберігає відповіді анонімно.",
     "Expired on {date}" : "Завершено {date}",
     "Expires on {date}" : "Завершити {date}",
+    "never" : "завжди",
     "Store responses anonymously" : "Анонімне збереження відповідей",
     "Allow multiple responses per person" : "Дозволити кілька відповідей від однієї особи",
     "Allow editing own responses" : "Дозволити редагування власних відповідей",

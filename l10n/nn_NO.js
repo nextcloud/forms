@@ -9,6 +9,7 @@ OC.L10N.register(
     "Delete" : "Slett",
     "Uploading …" : "Lastar opp...",
     "Other" : "Anna",
+    "never" : "aldri",
     "Set expiration date" : "Set utløpsdato",
     "Group" : "Gruppe",
     "Share link" : "Del lenkje",

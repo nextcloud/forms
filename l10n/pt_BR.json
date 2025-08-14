@@ -148,6 +148,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Isto não poderá ser controlado se o formulário tiver um link público ou armazenar as respostas de forma anônima.",
     "Expired on {date}" : "Expira em {date}",
     "Expires on {date}" : "Expira em {date}",
+    "never" : "nunca",
     "Store responses anonymously" : "Armazenar respostas de forma anônima",
     "Allow multiple responses per person" : "Permitir múltiplas respostas por pessoa",
     "Allow editing own responses" : "Permitir a edição das próprias respostas",

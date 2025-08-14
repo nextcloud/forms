@@ -129,6 +129,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "表单有公开链接或匿名记录答复时，无法控制此功能",
     "Expired on {date}" : "已于  {date} 到期",
     "Expires on {date}" : " {date} 到期",
+    "never" : "从不",
     "Store responses anonymously" : "匿名记录答复",
     "Allow multiple responses per person" : "允许单人多次回应",
     "Set expiration date" : "设置过期日期",

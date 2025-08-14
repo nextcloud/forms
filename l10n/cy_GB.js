@@ -9,6 +9,7 @@ OC.L10N.register(
     "Required" : "Angen",
     "Delete" : "Dileu",
     "Other" : "Arall",
+    "never" : "byth",
     "Set expiration date" : "Gosod dyddiad dod i ben",
     "Group" : "Grŵp",
     "Share link" : "Rhannu dolen",

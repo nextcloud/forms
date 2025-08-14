@@ -124,6 +124,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ez nem állítható be, ha az űrlapnak nyilvános hivatkozása van, vagy ha a válaszokat névtelenül tárolja.",
     "Expired on {date}" : "Lejárat: {date}",
     "Expires on {date}" : "Lejárat: {date}",
+    "never" : "soha",
     "Store responses anonymously" : "Válaszok tárolása névtelenül",
     "Allow multiple responses per person" : "Több válasz engedélyezése személyenként",
     "Set expiration date" : "Lejárati idő beállítása",

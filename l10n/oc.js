@@ -13,6 +13,7 @@ OC.L10N.register(
     "Options" : "Opcions",
     "Delete" : "Suprimir",
     "Uploading …" : "Mandadís…",
+    "never" : "pas jamai",
     "Set expiration date" : "Especificar una data d'expiracion",
     "Group" : "Grop",
     "Permissions" : "Autorizacions",

@@ -150,6 +150,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Formun bağlantısı herkese açık ise ya da yanıtlar anonim olarak kaydediliyorsa bu denetlenemez.",
     "Expired on {date}" : "Geçerlilik süresi {date} tarihinde dolmuş",
     "Expires on {date}" : "Geçerlilik süresi {date} tarihinde dolacak",
+    "never" : "asla",
     "Store responses anonymously" : "Yanıtlar anonim olarak kaydedilsin",
     "Allow multiple responses per person" : "Bir kişi birkaç kez yanıtlayabilirsin",
     "Allow editing own responses" : "Kendi yanıtlarını düzenleyebilsin",

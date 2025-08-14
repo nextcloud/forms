@@ -13,6 +13,7 @@ OC.L10N.register(
     "Delete" : "Xóa",
     "Uploading …" : "Đang tải lên …",
     "Other" : "Khác",
+    "never" : "không thay đổi",
     "Set expiration date" : "Đặt ngày hết hạn",
     "Group" : "N",
     "Share link" : "Chia sẻ liên kết",
