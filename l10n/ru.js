@@ -149,6 +149,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Это нельзя контролировать, если форма имеет публичную ссылку или хранит ответы анонимно.",
     "Expired on {date}" : "Завершилась {date}",
     "Expires on {date}" : "Завершится {date}",
+    "never" : "никогда",
     "Store responses anonymously" : "Сохранять ответы анонимно",
     "Allow multiple responses per person" : "Разрешить заполнение формы несколько раз",
     "Allow editing own responses" : "Разрешить редактирование собственных ответов",

@@ -47,6 +47,7 @@ OC.L10N.register(
     "Delete this response" : "Избриши го одговорот",
     "Expired on {date}" : "Истечено на {date}",
     "Expires on {date}" : "Истекува на {date}",
+    "never" : "никогаш",
     "Allow multiple responses per person" : "Дозволи повеќе одговори од една личност",
     "Set expiration date" : "Постави рок на траење",
     "Group" : "Група",

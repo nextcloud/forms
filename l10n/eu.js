@@ -122,6 +122,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Hau ezin da kontrolatu formularioak esteka publikoa badu edo erantzunak modu anonimoan gordetzen baditu.",
     "Expired on {date}" : "{date} datan iraungia",
     "Expires on {date}" : "{date} datan iraungitzen da",
+    "never" : "inoiz ez",
     "Store responses anonymously" : "Gorde erantzunak modu anonimoan",
     "Allow multiple responses per person" : "Onartu erantzun ugari pertsonako",
     "Set expiration date" : "Ezarri iraungitze-data",

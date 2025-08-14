@@ -105,6 +105,7 @@ OC.L10N.register(
     "Delete this response" : "Poista tämä vastaus",
     "Expired on {date}" : "Vanheni {date}",
     "Expires on {date}" : "Vanhenee {date}",
+    "never" : "ei koskaan",
     "Store responses anonymously" : "Talleta vastaukset anonyymisti",
     "Allow multiple responses per person" : "Salli useita vastauksia yhdeltä henkilöltä",
     "Allow editing own responses" : "Salli omien vastausten muokkaaminen",

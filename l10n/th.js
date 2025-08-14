@@ -50,6 +50,7 @@ OC.L10N.register(
     "Delete this response" : "ลบการตอบกลับนี้",
     "Expired on {date}" : "หมดอายุเมื่อ {date}",
     "Expires on {date}" : "หมดอายุตอน {date}",
+    "never" : "ไม่เคย",
     "Set expiration date" : "กำหนดวันหมดอายุ",
     "Group" : "กลุ่ม",
     "Share link" : "แชร์ลิงก์",

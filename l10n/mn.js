@@ -8,6 +8,7 @@ OC.L10N.register(
     "Required" : "Шаардлагатай",
     "Delete" : "Устгах",
     "Uploading …" : "Байршуулж байна...",
+    "never" : "хэзээ ч үгүй",
     "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Group" : "Бүлэг",
     "Share link" : "Холбоос хуваалцах",

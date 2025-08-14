@@ -8,6 +8,7 @@ OC.L10N.register(
     "Cancel" : "Poništi",
     "Delete" : "Obriši",
     "Other" : "Ostali",
+    "never" : "nikada",
     "Set expiration date" : "Postavi datum isteka",
     "Group" : "Group",
     "Share link" : "Podeli vezu",

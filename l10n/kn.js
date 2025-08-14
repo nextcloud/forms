@@ -8,6 +8,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Delete" : "﻿ಅಳಿಸಿ",
     "Other" : "﻿ಇತರೆ",
+    "never" : "﻿ಎಂದಿಗೂ",
     "Set expiration date" : "ಮುಕ್ತಾಯ ದಿನಾಂಕವನ್ನು ನಿರ್ದರಿಸಿ",
     "Group" : "﻿ಗುಂಪು",
     "Share link" : "ಸಂಪರ್ಕ ಕೊಂಡಿಯನ್ನು  ﻿ಹಂಚಿಕೊಳ್ಳಬಹುದು",

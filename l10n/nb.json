@@ -125,6 +125,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Dette kan ikke kontrolleres, hvis skjemaet har en offentlig lenke eller lagrer svar anonymt.",
     "Expired on {date}" : "Utløp {date}",
     "Expires on {date}" : "Utløper {date}",
+    "never" : "aldri",
     "Store responses anonymously" : "Lagre svar anonymt",
     "Allow multiple responses per person" : "Tillat flere besvarelser per person",
     "Set expiration date" : "Sett utløpsdato",

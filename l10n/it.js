@@ -149,6 +149,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ciò non può essere controllato se il modulo contiene un collegamento pubblico o memorizza le risposte in forma anonima.",
     "Expired on {date}" : "Scaduto il {date}",
     "Expires on {date}" : "Scade il {date}",
+    "never" : "mai",
     "Store responses anonymously" : "Memorizza le risposte in forma anonima",
     "Allow multiple responses per person" : "Consenti risposte multiple per persona",
     "Allow editing own responses" : "Consenti la modifica delle tue risposte",

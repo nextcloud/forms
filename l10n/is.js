@@ -46,6 +46,7 @@ OC.L10N.register(
     "Delete this response" : "Eyða þessu svari",
     "Expired on {date}" : "Rann út {date}",
     "Expires on {date}" : "Rennur út {date}",
+    "never" : "aldrei",
     "Set expiration date" : "Setja gildistíma",
     "Group" : "Hópur",
     "Team" : "Teymi",

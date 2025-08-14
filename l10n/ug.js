@@ -125,6 +125,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "ئەگەر بۇ جەدۋەلنىڭ ئاممىۋى ئۇلىنىشى بولسا ياكى نامسىز جاۋابلارنى ساقلىسا ، بۇنى كونترول قىلغىلى بولمايدۇ.",
     "Expired on {date}" : "ۋاقتى {date}",
     "Expires on {date}" : "ۋاقتى {date}",
+    "never" : "ھەرگىز",
     "Store responses anonymously" : "جاۋابلارنى نامسىز ساقلاڭ",
     "Allow multiple responses per person" : "ھەر بىر ئادەمگە كۆپ جاۋاب بېرىشكە يول قويۇڭ",
     "Set expiration date" : "ۋاقتى توشىدۇ",

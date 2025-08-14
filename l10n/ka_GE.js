@@ -10,6 +10,7 @@ OC.L10N.register(
     "Delete" : "წაშლა",
     "Uploading …" : "იტვირთება ...",
     "Other" : "სხვა",
+    "never" : "არასდროს",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
     "Group" : "ჯგუფი",
     "Permissions" : "უფლებები",

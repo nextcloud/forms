@@ -119,6 +119,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "This can not be controlled, if the form has a public link or stores responses anonymously.",
     "Expired on {date}" : "Expired on {date}",
     "Expires on {date}" : "Expires on {date}",
+    "never" : "هرگز",
     "Store responses anonymously" : "ذخیره پاسخ‌ها به صورت ناشناس",
     "Allow multiple responses per person" : "مجاز بودن فرستادن چند پاسخ توسط یک فرد",
     "Set expiration date" : "تنظیم تاریخ انقضا",

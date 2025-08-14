@@ -8,6 +8,7 @@ OC.L10N.register(
     "Options" : "ជម្រើស",
     "Delete" : "លុប",
     "Other" : "ផ្សេងៗ",
+    "never" : "មិនដែរ",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
     "Group" : "Group",
     "Share link" : "Share link",

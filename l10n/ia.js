@@ -6,6 +6,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Requirite",
     "Delete" : "Deler",
+    "never" : "nunquam",
     "Set expiration date" : "Assignar data de expiration",
     "Group" : "Gruppo",
     "Share link" : "Compartir ligamine",

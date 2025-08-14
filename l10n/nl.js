@@ -63,6 +63,7 @@ OC.L10N.register(
     "Delete this response" : "Verwijder dit antwoord",
     "Expired on {date}" : "Vervallen op {date}",
     "Expires on {date}" : "Vervalt op {date}",
+    "never" : "geen",
     "Allow multiple responses per person" : "Meerdere reacties per persoon toestaan",
     "Set expiration date" : "Stel vervaldatum in",
     "Group" : "Groep",

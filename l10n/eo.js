@@ -12,6 +12,7 @@ OC.L10N.register(
     "Delete" : "Forigi",
     "Uploading …" : "Alŝutado…",
     "Other" : "Alia",
+    "never" : "neniam",
     "Set expiration date" : "Uzi limdaton",
     "Group" : "Grupo",
     "Share link" : "Kunhavigi ligilon",

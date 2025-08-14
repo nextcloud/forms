@@ -150,6 +150,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "若表單有公開連結或匿名儲存回應，則無法控制此功能。",
     "Expired on {date}" : "已於 {date} 過期",
     "Expires on {date}" : "於 {date} 到期",
+    "never" : "永不",
     "Store responses anonymously" : "匿名儲存回應",
     "Allow multiple responses per person" : "允許單人送出多次作答回應",
     "Allow editing own responses" : "允許編輯自己的回應",

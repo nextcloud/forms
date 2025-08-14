@@ -132,6 +132,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Dette kan ikke kontrolleres, hvis formularen har et offentligt link eller gemmer svar anonymt.",
     "Expired on {date}" : "Udløb den {date}",
     "Expires on {date}" : "Udløber på {date}",
+    "never" : "aldrig",
     "Store responses anonymously" : "Gem svar anonymt",
     "Allow multiple responses per person" : "Tillad flere svar pr. person",
     "Set expiration date" : "Angiv udløbsdato",

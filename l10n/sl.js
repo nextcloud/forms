@@ -90,6 +90,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Tega ni mogoče nadzorovati, če je vprašalnik objavljen z javno povezavo oziroma shranjuje odzive brezimno.",
     "Expired on {date}" : "Preteklo na {date}",
     "Expires on {date}" : "Preteče na {date}",
+    "never" : "nikoli",
     "Store responses anonymously" : "Shrani odzive brezimno",
     "Allow multiple responses per person" : "Dovoli več odzivov vsakega uporabnika",
     "Set expiration date" : "Nastavi datum preteka",

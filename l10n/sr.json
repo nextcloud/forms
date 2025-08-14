@@ -148,6 +148,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ово не може да се контролише, ако упитник има јавни лик или анонимно чува одговоре.",
     "Expired on {date}" : "Истекао {date}",
     "Expires on {date}" : "Истиче {date}",
+    "never" : "никад",
     "Store responses anonymously" : "Чувај одговоре анонимно",
     "Allow multiple responses per person" : "Дозволи да једна особа пошаље више одговора",
     "Allow editing own responses" : "Дозволи уређивање сопствених одговора",
