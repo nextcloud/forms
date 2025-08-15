@@ -10,6 +10,7 @@ OC.L10N.register(
     "Cancel" : "Скасаваць",
     "Delete" : "Выдаліць",
     "Uploading …" : "Запампоўванне …",
+    "never" : "ніколі",
     "Group" : "Група",
     "Team" : "Каманда",
     "Share link" : "Абагуліць спасылку",
