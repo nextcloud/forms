@@ -9,6 +9,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Delete" : "Sil",
     "Other" : "Digər",
+    "never" : "heç vaxt",
     "Group" : "Qrup",
     "Share link" : "Linki yayımla",
     "Edit" : "Dəyişiklik et",

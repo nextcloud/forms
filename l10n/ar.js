@@ -136,6 +136,7 @@ OC.L10N.register(
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "هذا لا يمكن السيطرة عليه؛ إذا كان للنماذج روابط عمومية أو كانت الإجابات محفوظة غُفْلاً من أسماء أصحابها.",
     "Expired on {date}" : "انتهى بتاريخ {date}",
     "Expires on {date}" : "ينتهي بتاريخ {date}",
+    "never" : "أبداً",
     "Store responses anonymously" : "حفظ الإجابات غُفْلاً من أسماء أصحابها",
     "Allow multiple responses per person" : "السماح بردود متعددة لكل شخص ",
     "Set expiration date" : "تعيين تاريخ إنتهاء الصلاحية",
