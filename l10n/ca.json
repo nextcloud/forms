@@ -79,6 +79,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Això no es pot controlar, si el formulari té un enllaç públic o emmagatzema les respostes de manera anònima.",
     "Expired on {date}" : "S'ha tancat el {Date}",
     "Expires on {date}" : "Es tancarà el {data}",
+    "never" : "mai",
     "Store responses anonymously" : "Emmagatzema les respostes de manera anònima",
     "Allow multiple responses per person" : "Permet diverses respostes per persona",
     "Set expiration date" : "Defineix una data de tancament",

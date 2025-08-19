@@ -8,6 +8,7 @@ OC.L10N.register(
     "Cancel" : "Nullañ",
     "Delete" : "Dilemel",
     "Uploading …" : "O pellgas ...",
+    "never" : "james",
     "Set expiration date" : "Lakaat un deizat termen",
     "Group" : "Stollad",
     "Share link" : "Lodañ al liamm",

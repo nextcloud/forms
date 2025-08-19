@@ -76,6 +76,7 @@
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Това не може да се контролира ако формулярът има публична връзка или съхранява отговорите анонимно.",
     "Expired on {date}" : "Изтекъл на {date}",
     "Expires on {date}" : "Изтича на {date}",
+    "never" : "никога",
     "Store responses anonymously" : "Анонимно съхраняване на отговорите",
     "Allow multiple responses per person" : "Разрешаване на няколко отговора на човек",
     "Set expiration date" : "Срок на валидност",
