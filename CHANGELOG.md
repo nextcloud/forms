@@ -5,6 +5,61 @@
 
 # Changelog
 
+## v5.2.0-beta.0 - 2025-08-19
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.2...v5.2.0-beta.0)
+
+### Enhancements
+
+- feat: add form locking mechanism and share `edit` permission by @Chartman123 in [\#2737](https://github.com/nextcloud/forms/pull/2737)
+- feat: add color question type by @Chartman123 in [\#2748](https://github.com/nextcloud/forms/pull/2748)
+- feat: add pagination for submissions by @Koc in [\#2710](https://github.com/nextcloud/forms/pull/2710)
+- feat: make full-text search case-insensitive and search by submission author as well by @Koc in [\#2761](https://github.com/nextcloud/forms/pull/2761)
+- feat: don't show default submission header if custom message is set by @Chartman123 in [\#2747](https://github.com/nextcloud/forms/pull/2747)
+- feat: allow editing of submission by the user by @Chartman123 in [\#2715](https://github.com/nextcloud/forms/pull/2715)
+- feat(time): Add time restrictions and range support by @Chartman123 in [\#2712](https://github.com/nextcloud/forms/pull/2712)
+- feat: add linear scale questions by @Chartman123 in [\#2609](https://github.com/nextcloud/forms/pull/2609)
+
+### Fixed
+
+- fix: show toast on errors with empty response by @hamza221 in [\#2750](https://github.com/nextcloud/forms/pull/2750)
+- fix: prevent modifications to archived forms in ApiController and ShareApiController by @Chartman123 in [\#2741](https://github.com/nextcloud/forms/pull/2741)
+- fix: disable edit switch when the form is archived by @Chartman123 in [\#2739](https://github.com/nextcloud/forms/pull/2739)
+- fix: only show extended label for linear scale questions by @Chartman123 in [\#2718](https://github.com/nextcloud/forms/pull/2718)
+- fix: Add missing documentation by @Chartman123 in [\#2735](https://github.com/nextcloud/forms/pull/2735)
+
+### Merged
+
+- chore(tests): Cleanup bootstrap.php to be forward-compatible by @come-nc in [\#2753](https://github.com/nextcloud/forms/pull/2753)
+- chore: unify debounce timing for input handling by @Chartman123 in [\#2721](https://github.com/nextcloud/forms/pull/2721)
+
+## v5.1.2 - 2025-08-19
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.1...v5.1.2)
+
+### Fixed
+
+- fix(export): escape CSV export for spreadsheet applications by @susnux in [\#2804](https://github.com/nextcloud/forms/pull/2804)
+
+## v5.1.1 - 2025-08-19
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.0...v5.1.1)
+
+### Fixed
+
+- fix: Preserve intermediate changes when updating answer text by @Chartman123 in [\#2714](https://github.com/nextcloud/forms/pull/2714)
+- fix: properly set string values in exports to escape formulas by @susnux in [\#2772](https://github.com/nextcloud/forms/pull/2772)
+- fix(validation): Update validationType handling by @Chartman123 in [\#2685](https://github.com/nextcloud/forms/pull/2685)
+
+### Merged
+
+- chore(QuestionMultiple): update "Other" answer handling to use v-model and add change handler by @Chartman123 in [\#2689](https://github.com/nextcloud/forms/pull/2689)
+- fix: address vue warnings in console by @Chartman123 in [\#2691](https://github.com/nextcloud/forms/pull/2691)
+- chore: fix linting on CI by @susnux in [\#2703](https://github.com/nextcloud/forms/pull/2703)
+- chore(QuestionDate): refactor handling of computed props by @Chartman123 in [\#2688](https://github.com/nextcloud/forms/pull/2688)
+- chore: Simplify props usage by removing unnecessary bindings in various components by @Chartman123 in [\#2683](https://github.com/nextcloud/forms/pull/2683)
+- Mention file type in docs by @Koc in [\#2686](https://github.com/nextcloud/forms/pull/2686)
+
 ## v5.1.0 - 2025-04-03
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.0.4...v5.1.0)

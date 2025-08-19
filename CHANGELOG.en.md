@@ -5,6 +5,28 @@
 
 # Changelog
 
+## v5.2.0 - tbd
+
+- **Time: restrictions and ranges**
+
+    The time question type got three new settings: You can ask for a time range and set a minimum/maximum time that can be chosen.
+
+- **New question types: color and linear scale**
+
+    You can now choose from two new question types: colors and linear/Likert scales.
+
+- **Edit your own submissions**
+
+    You can now edit your own submisions, if the form owner allows it.
+
+- **Pagination of results**
+
+    It's now easier to go through a large number of submissions in the the results view. And you can search for contents and authors.
+
+- **Share edit permission**
+
+    You can share the edit permission with others, making it possible to collaborate on a form.
+
 ## v5.1.0 - 2025-04-03
 
 - **Date: restrictions and ranges**
