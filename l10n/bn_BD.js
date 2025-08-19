@@ -8,6 +8,7 @@ OC.L10N.register(
     "Cancel" : "বাতিল করুন",
     "Delete" : "মুছে",
     "Other" : "অন্যান্য",
+    "never" : "কখনোই নয়",
     "Set expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ নির্ধারণ করুন",
     "Group" : "গোষ্ঠীসমূহ",
     "Share link" : "লিংক ভাগাভাগি করেন",
