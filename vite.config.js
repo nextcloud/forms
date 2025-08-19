@@ -24,6 +24,9 @@ export default createAppConfig(
 						},
 					},
 				},
+				watch: {
+					allowInputInsideOutputPath: true,
+				},
 			},
 		},
 	},
