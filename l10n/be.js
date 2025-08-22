@@ -20,6 +20,7 @@ OC.L10N.register(
     "Description" : "Апісанне",
     "Download" : "Спампаваць",
     "Search" : "Пошук",
+    "Sharing" : "Абагульванне",
     "Settings" : "Налады",
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
     "File" : "Файл",
