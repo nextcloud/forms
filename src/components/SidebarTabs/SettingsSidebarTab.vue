@@ -21,10 +21,7 @@
 			wide
 			@click="onFormLockChange(false)">
 			<template #icon>
-				<!-- TRANSLATORS description of the icon that shows an open lock -->
-				<NcIconSvgWrapper
-					:svg="svgLockOpen"
-					:name="t('forms', 'Open lock')" />
+				<NcIconSvgWrapper :svg="svgLockOpen" />
 			</template>
 			<!-- TRANSLATORS text for the action triggered by the button -->
 			{{ t('forms', 'Unlock form') }}
