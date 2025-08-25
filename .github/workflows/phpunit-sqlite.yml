@@ -158,8 +158,6 @@ jobs:
 
       - name: Upload Unit coverage
         uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           working-directory: apps/${{ env.APP_NAME }}
           disable_search: true
@@ -187,8 +185,6 @@ jobs:
 
       - name: Upload Integration coverage
         uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           working-directory: apps/${{ env.APP_NAME }}
           disable_search: true
