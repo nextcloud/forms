@@ -153,7 +153,6 @@ OC.L10N.register(
     "Form is locked" : "Form is locked",
     "Lock by {lockedBy}, expires: {lockedUntil}" : "Lock by {lockedBy}, expires: {lockedUntil}",
     "never" : "never",
-    "Open lock" : "Open lock",
     "Unlock form" : "Unlock form",
     "Store responses anonymously" : "Store responses anonymously",
     "Allow multiple responses per person" : "Allow multiple responses per person",

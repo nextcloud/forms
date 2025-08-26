@@ -28,6 +28,8 @@ OC.L10N.register(
     "Sharing" : "Абагульванне",
     "Settings" : "Налады",
     "Submit" : "Адправіць",
+    "Clear" : "Ачысціць",
+    "Clear form" : "Ачысціць форму",
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
     "File" : "Файл",
     "Date" : "Дата",

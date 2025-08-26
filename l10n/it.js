@@ -153,7 +153,6 @@ OC.L10N.register(
     "Form is locked" : "Il modulo è bloccato",
     "Lock by {lockedBy}, expires: {lockedUntil}" : " Bloccato da {lockedBy}, scade: {lockedUntil}",
     "never" : "mai",
-    "Open lock" : "Apri blocco",
     "Unlock form" : "Sblocca modulo",
     "Store responses anonymously" : "Memorizza le risposte in forma anonima",
     "Allow multiple responses per person" : "Consenti risposte multiple per persona",
