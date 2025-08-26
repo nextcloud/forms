@@ -153,7 +153,6 @@ OC.L10N.register(
     "Form is locked" : "Tá an fhoirm faoi ghlas",
     "Lock by {lockedBy}, expires: {lockedUntil}" : "Glasáilte ag {lockedBy}, rachaidh in éag: {lockedUntil}",
     "never" : "riamh",
-    "Open lock" : "Glas oscailte",
     "Unlock form" : "Díghlasáil foirm",
     "Store responses anonymously" : "Stóráil freagraí gan ainm",
     "Allow multiple responses per person" : "Ceadaigh freagraí iolracha in aghaidh an duine",

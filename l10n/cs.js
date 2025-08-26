@@ -152,7 +152,6 @@ OC.L10N.register(
     "Expires on {date}" : "Platnost skončí {date}",
     "Form is locked" : "Formulář je uzamčen",
     "never" : "nikdy",
-    "Open lock" : "Otevřít zámek",
     "Unlock form" : "Odemknout formulář",
     "Store responses anonymously" : "Ukládat odpovědi anonymně",
     "Allow multiple responses per person" : "Povolit vícero odpovědí od jedné osoby",

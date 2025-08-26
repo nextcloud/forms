@@ -153,7 +153,6 @@ OC.L10N.register(
     "Form is locked" : "已鎖定表單",
     "Lock by {lockedBy}, expires: {lockedUntil}" : "由 {lockedBy} 鎖定，到期日：{lockedUntil}",
     "never" : "永不",
-    "Open lock" : "開啟鎖定",
     "Unlock form" : "解鎖表單",
     "Store responses anonymously" : "匿名儲存回應",
     "Allow multiple responses per person" : "允許單人送出多次作答回應",

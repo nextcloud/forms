@@ -153,7 +153,6 @@ OC.L10N.register(
     "Form is locked" : "Форма заблокована",
     "Lock by {lockedBy}, expires: {lockedUntil}" : "Заблоковано {lockedBy}, термін дії закінчується: {lockedUntil}",
     "never" : "завжди",
-    "Open lock" : "Відкрити замок",
     "Unlock form" : "Розблокувати форму",
     "Store responses anonymously" : "Анонімне збереження відповідей",
     "Allow multiple responses per person" : "Дозволити кілька відповідей від однієї особи",

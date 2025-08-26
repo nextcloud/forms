@@ -153,7 +153,6 @@ OC.L10N.register(
     "Form is locked" : "Vorm on lukustatud",
     "Lock by {lockedBy}, expires: {lockedUntil}" : "Selle lukustas {lockedBy}, aegumisega {lockedUntil}",
     "never" : "mitte kunagi",
-    "Open lock" : "Ava lukustus",
     "Unlock form" : "Eemalda vormi lukustus",
     "Store responses anonymously" : "Salvesta vastused anonüümselt",
     "Allow multiple responses per person" : "Luba ühelt vastajalt mitu vastust",
