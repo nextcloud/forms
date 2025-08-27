@@ -33,6 +33,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
     "File" : "Файл",
     "Date" : "Дата",
+    "Time" : "Час",
     "Text" : "Тэкст",
     "Phone number" : "Нумар тэлефона",
     "Email address" : "Адрас электроннай пошты"
