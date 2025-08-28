@@ -18,6 +18,7 @@ OC.L10N.register(
     "never" : "ніколі",
     "Group" : "Група",
     "Team" : "Каманда",
+    "Permissions" : "Дазволы",
     "Share link" : "Абагуліць спасылку",
     "Copy to clipboard" : "Капіяваць у буфер абмену",
     "Edit" : "Рэдагаваць",
@@ -34,6 +35,7 @@ OC.L10N.register(
     "File" : "Файл",
     "Date" : "Дата",
     "Time" : "Час",
+    "Document" : "Дакумент",
     "Text" : "Тэкст",
     "Phone number" : "Нумар тэлефона",
     "Email address" : "Адрас электроннай пошты"
