@@ -21,6 +21,7 @@ OC.L10N.register(
     "Permissions" : "Дазволы",
     "Share link" : "Абагуліць спасылку",
     "Copy to clipboard" : "Капіяваць у буфер абмену",
+    "View" : "Выгляд",
     "Edit" : "Рэдагаваць",
     "Share" : "Абагуліць",
     "Description" : "Апісанне",
