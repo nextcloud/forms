@@ -71,7 +71,7 @@
 				</h3>
 				<div
 					v-if="!readOnly && !questionValid"
-					v-tooltip.auto="warningInvalid"
+					:title="warningInvalid"
 					class="question__header__title__warning"
 					tabindex="0">
 					<IconAlertCircleOutline :size="20" />
