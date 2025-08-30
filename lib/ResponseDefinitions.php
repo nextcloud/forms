@@ -63,6 +63,7 @@ namespace OCA\Forms;
  *   submissionId: int,
  *   fileId: ?int,
  *   questionId: int,
+ *   questionName?: string,
  *   text: string
  * }
  *
