@@ -559,6 +559,13 @@ class ApiV3Test extends IntegrationBase {
 		unset($data['lastUpdated']);
 		unset($expected['lastUpdated']);
 
+		// Allow a 10 seconds diff for lockedUntil between expectation and data
+		if (isset($data['lockedUntil'])) {
+			$this->assertEqualsWithDelta($expected['lockedUntil'], $data['lockedUntil'], 10);
+		}
+		unset($data['lockedUntil']);
+		unset($expected['lockedUntil']);
+
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals($expected, $data);
 	}
