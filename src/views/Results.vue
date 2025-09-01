@@ -161,7 +161,7 @@
 								close-after-click
 								@click="onDownloadFile('xlsx')">
 								<template #icon>
-									<IconFileExcel :size="20" />
+									<IconFileExcelOutline :size="20" />
 								</template>
 								XSLX
 							</NcActionButton>
@@ -297,8 +297,8 @@ import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 import IconDownload from 'vue-material-design-icons/TrayArrowDown.vue'
 import IconFileDelimited from 'vue-material-design-icons/FileDelimitedOutline.vue'
 import IconFileDelimitedSvg from '@mdi/svg/svg/file-delimited-outline.svg?raw'
-import IconFileExcel from 'vue-material-design-icons/FileExcel.vue'
-import IconFileExcelSvg from '@mdi/svg/svg/file-excel.svg?raw'
+import IconFileExcelOutline from 'vue-material-design-icons/FileExcelOutline.vue'
+import IconFileExcelOutlineSvg from '@mdi/svg/svg/file-excel-outline.svg?raw'
 import IconFolder from 'vue-material-design-icons/FolderOutline.vue'
 import IconLink from 'vue-material-design-icons/Link.vue'
 import IconLinkSvg from '@mdi/svg/svg/link.svg?raw'
@@ -328,7 +328,7 @@ import debounce from 'debounce'
 const SUPPORTED_FILE_FORMATS = {
 	ods: IconTableSvg,
 	csv: IconFileDelimitedSvg,
-	xlsx: IconFileExcelSvg,
+	xlsx: IconFileExcelOutlineSvg,
 }
 let fileFormat = 'csv'
 
@@ -351,7 +351,7 @@ export default {
 		IconDelete,
 		IconDownload,
 		IconFileDelimited,
-		IconFileExcel,
+		IconFileExcelOutline,
 		IconFolder,
 		IconLink,
 		IconLinkVariantOff,
@@ -847,7 +847,7 @@ export default {
 							return [
 								{
 									label: t('forms', 'Create XLSX'),
-									icon: IconFileExcelSvg,
+									icon: IconFileExcelOutlineSvg,
 									callback() {
 										fileFormat = 'xlsx'
 									},

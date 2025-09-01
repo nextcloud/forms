@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mdiEye, mdiPencil, mdiPoll } from '@mdi/js'
+import { mdiEyeOutline, mdiPencilOutline, mdiPoll } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
 
@@ -44,13 +44,13 @@ import PillMenu from './PillMenu.vue'
 
 const submitView = {
 	ariaLabel: t('forms', 'View form'),
-	icon: mdiEye,
+	icon: mdiEyeOutline,
 	title: t('forms', 'View'),
 	id: 'submit',
 }
 const editView = {
 	ariaLabel: t('forms', 'Edit form'),
-	icon: mdiPencil,
+	icon: mdiPencilOutline,
 	title: t('forms', 'Edit'),
 	id: 'edit',
 	disabled: false,
