@@ -72,7 +72,7 @@
 <script>
 import answerTypes from '../../models/AnswerTypes.js'
 import { generateUrl } from '@nextcloud/router'
-import IconFile from 'vue-material-design-icons/File.vue'
+import IconFile from 'vue-material-design-icons/FileOutline.vue'
 
 export default {
 	name: 'ResultsSummary',

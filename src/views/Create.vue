@@ -192,7 +192,7 @@ import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import IconLock from 'vue-material-design-icons/Lock.vue'
+import IconLock from 'vue-material-design-icons/LockOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'

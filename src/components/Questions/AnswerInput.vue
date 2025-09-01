@@ -77,7 +77,7 @@ import PQueue from 'p-queue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
-import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 

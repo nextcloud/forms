@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import IconFile from 'vue-material-design-icons/File.vue'
+import IconFile from 'vue-material-design-icons/FileOutline.vue'
 import NcHighlight from '@nextcloud/vue/components/NcHighlight'
 
 export default {

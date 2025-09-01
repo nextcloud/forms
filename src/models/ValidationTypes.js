@@ -5,8 +5,8 @@
 
 import { translate as t } from '@nextcloud/l10n'
 
-import IconEMail from 'vue-material-design-icons/Email.vue'
-import IconPhone from 'vue-material-design-icons/Phone.vue'
+import IconEMail from 'vue-material-design-icons/EmailOutline.vue'
+import IconPhone from 'vue-material-design-icons/PhoneOutline.vue'
 import IconRegex from 'vue-material-design-icons/Regex.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 import IconNumeric from 'vue-material-design-icons/Numeric.vue'

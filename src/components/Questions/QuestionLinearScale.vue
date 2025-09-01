@@ -111,7 +111,7 @@ import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 
-import IconPencil from 'vue-material-design-icons/Pencil.vue'
+import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
 
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
