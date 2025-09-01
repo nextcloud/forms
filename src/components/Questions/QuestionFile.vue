@@ -141,11 +141,11 @@
 
 <script>
 import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconDelete from 'vue-material-design-icons/Delete.vue'
-import IconFile from 'vue-material-design-icons/File.vue'
-import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlert.vue'
-import IconUpload from 'vue-material-design-icons/Upload.vue'
-import IconUploadMultiple from 'vue-material-design-icons/UploadMultiple.vue'
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
+import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlertOutline.vue'
+import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
+import IconUploadMultiple from 'vue-material-design-icons/UploadMultipleOutline.vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'

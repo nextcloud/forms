@@ -155,7 +155,7 @@ import NcContent from '@nextcloud/vue/components/NcContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 
-import IconArchive from 'vue-material-design-icons/Archive.vue'
+import IconArchive from 'vue-material-design-icons/ArchiveOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'

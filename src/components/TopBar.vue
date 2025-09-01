@@ -36,7 +36,7 @@ import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
 
 import NcButton from '@nextcloud/vue/components/NcButton'
-import IconShareVariant from 'vue-material-design-icons/ShareVariant.vue'
+import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
 
 import logger from '../utils/Logger.js'
 import PermissionTypes from '../mixins/PermissionTypes.js'
