@@ -6,18 +6,14 @@
 <template>
 	<div>
 		<NcSelectUsers
-			:clear-search-on-select="false"
 			keep-open
 			:loading="showLoadingCircle"
 			:disabled="locked"
-			:get-option-key="(option) => option.key"
 			:options="options"
 			:placeholder="t('forms', 'Search for user, group or team …')"
-			:filter-by="() => true"
-			label="displayName"
-			:aria-label-combobox="t('forms', 'Search for user, group or team …')"
+			:aria-label-listbox="t('forms', 'Search for user, group or team …')"
 			@search="asyncSearch"
-			@update:model-value="addShare">
+			@update:modelValue="addShare">
 			<template #no-options>
 				{{ noResultText }}
 			</template>
