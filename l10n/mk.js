@@ -2,7 +2,10 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Форми",
+    "No" : "Не",
+    "Yes" : "Да",
     "Question" : "Прашање",
+    "Answer" : "Одговор",
     "Copy" : "Копирај",
     "Anonymous response" : "Анонимен одговор",
     "Shared by %s" : "Споделена од %s",
