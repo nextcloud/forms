@@ -7,7 +7,7 @@
 
 **State: Forms v3.3.1 - 08.10.2023**
 
-This document describes the Object-Structure, that is used within the Forms App and on Forms API v2. It does partially **not** equal the actual database structure behind.
+This document describes the Object-Structure, that is used within the Forms App and on Forms API v3. It does partially **not** equal the actual database structure behind.
 
 ## Data Structures
 

@@ -5,7 +5,7 @@
 
 # Embedding
 
-Besides sharing and using the [API](./API.md) for custom forms it is possible to embed forms inside external
+Besides sharing and using the [API](./API_v3.md) for custom forms it is possible to embed forms inside external
 websites.
 
 ## Obtaining the embedding code
