@@ -79,18 +79,18 @@
 					:key="answer.id"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
-					:checked="questionValues"
+					:model-value="questionValues"
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
 					:required="checkRequired(answer.id)"
-					@update:checked="onChange"
+					@update:modelValue="onChange"
 					@keydown.enter.exact.prevent="onKeydownEnter">
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
 					<NcCheckboxRadioSwitch
-						:checked="questionValues"
+						:model-value="questionValues"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined"
 						:value="otherAnswer ?? QUESTION_EXTRASETTINGS_OTHER_PREFIX"
@@ -98,7 +98,7 @@
 						:type="isUnique ? 'radio' : 'checkbox'"
 						:required="checkRequired('other-answer')"
 						class="question__label"
-						@update:checked="onChangeOther"
+						@update:modelValue="onChangeOther"
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
