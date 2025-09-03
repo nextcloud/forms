@@ -20,6 +20,7 @@ OC.L10N.register(
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaṛen",
     "File" : "Afaylu",
+    "Date" : "Azemz",
     "Phone number" : "Uṭṭun n tiliɣri",
     "Email address" : "Tansa imayl"
 },
