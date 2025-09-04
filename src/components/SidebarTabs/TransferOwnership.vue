@@ -41,12 +41,9 @@
 				<NcSelectUsers
 					v-model="selected"
 					class="modal-content__select"
-					:reset-on-options-change="false"
 					:loading="loading"
-					:get-option-key="(option) => option.key"
 					:options="options"
 					:placeholder="t('forms', 'Search for a user')"
-					label="displayName"
 					@search="asyncSearch">
 					<template #no-options>
 						{{ noResultText }}
@@ -199,9 +196,6 @@ export default {
 					t('forms', 'An error occurred while transfering ownership'),
 				)
 			}
-		},
-		clearSelected() {
-			this.selected = null
 		},
 	},
 }
