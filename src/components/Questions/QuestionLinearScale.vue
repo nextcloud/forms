@@ -39,16 +39,15 @@
 		</template>
 
 		<div
-			:class="
-				readOnly
-					? 'question__content'
-					: 'question__content question__content__edit'
-			">
+			class="question__content question-linear-scale"
+			:class="{
+				question__content__edit: !readOnly,
+			}">
 			<NcTextArea
 				v-if="!readOnly"
 				ref="lowest"
 				:model-value="optionsLabelLowest"
-				class="label-input-field"
+				class="question-linear-scale__label-input"
 				:label="t('forms', 'Label for lowest value')"
 				:placeholder="t('forms', 'Label (optional)')"
 				resize="none"
@@ -59,10 +58,10 @@
 			<div
 				v-else-if="optionsLabelLowest !== ''"
 				:id="labelId"
-				class="label-lowest">
+				class="question-linear-scale__label question-linear-scale__label-lowest">
 				{{ optionsLabelLowest }}
 			</div>
-			<fieldset class="question__content__options">
+			<fieldset class="question-linear-scale__options">
 				<legend class="hidden-visually">
 					{{
 						t('forms', 'From {firstOption} to {lastOption}', {
@@ -71,26 +70,29 @@
 						})
 					}}
 				</legend>
-				<NcCheckboxRadioSwitch
+				<div
 					v-for="(option, index) in scaleOptions"
 					:key="option"
-					:aria-describedby="index === 0 ? labelId : undefined"
-					:disabled="!readOnly"
-					:checked="questionValues"
-					:value="option.toString()"
-					:name="`${id}-answer`"
-					type="radio"
-					:required="checkRequired(option)"
-					@update:checked="onChange"
-					@keydown.enter.exact.prevent="onKeydownEnter">
-					{{ option }}
-				</NcCheckboxRadioSwitch>
+					class="question-linear-scale__option">
+					<label :for="`linear-scale-${id}-${option}`">{{ option }}</label>
+					<NcCheckboxRadioSwitch
+						:id="`linear-scale-${id}-${option}`"
+						:aria-describedby="index === 0 ? labelId : undefined"
+						:disabled="!readOnly"
+						:model-value="questionValues"
+						:value="option.toString()"
+						:name="`${id}-answer`"
+						type="radio"
+						:required="checkRequired(option)"
+						@update:modelValue="onChange"
+						@keydown.enter.exact.prevent="onKeydownEnter" />
+				</div>
 			</fieldset>
 			<NcTextArea
 				v-if="!readOnly"
 				ref="highest"
 				:model-value="optionsLabelHighest"
-				class="label-input-field"
+				class="question-linear-scale__label-input"
 				:label="t('forms', 'Label (optional)')"
 				:aria-label="t('forms', 'Label for highest value')"
 				resize="none"
@@ -98,7 +100,9 @@
 				@blur="onBlur('highest')"
 				@update:model-value="onOptionsLabelHighestChange">
 			</NcTextArea>
-			<div v-else-if="optionsLabelHighest !== ''" class="label-highest">
+			<div
+				v-else-if="optionsLabelHighest !== ''"
+				class="question-linear-scale__label question-linear-scale__label-highest">
 				{{ optionsLabelHighest }}
 			</div>
 		</div>
@@ -281,23 +285,6 @@ export default {
 		flex-wrap: wrap; // Allow wrapping for smaller screens
 	}
 
-	@media (min-width: 769px) {
-		padding-block-start: var(--clickable-area-small);
-	}
-
-	&__options {
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-evenly;
-		flex-grow: 1;
-
-		@media (max-width: 768px) {
-			flex-direction: column; // Stack options vertically on smaller screens
-			align-items: flex-start; // Align items to the left
-		}
-	}
-
 	&__edit {
 		margin-inline-start: -12px;
 
@@ -306,62 +293,65 @@ export default {
 		}
 	}
 
-	:deep(.checkbox-content) {
-		display: flex;
-		flex-direction: row; // Labels next to checkboxes by default
-		align-items: center;
-		text-align: center;
+	.question-linear-scale {
+		&__label {
+			width: 120px;
+			align-self: center;
+			flex-shrink: 0;
 
-		@media (min-width: 769px) {
-			flex-direction: column; // Labels above checkboxes on larger screens
+			&-lowest {
+				text-align: start;
+			}
+
+			&-highest {
+				text-align: end;
+
+				@media (max-width: 768px) {
+					text-align: start;
+				}
+			}
+
+			@media (max-width: 768px) {
+				width: 100%; // Full width on smaller screens
+				padding-block: var(--default-grid-baseline);
+			}
+		}
+
+		&__label-input {
+			width: 120px;
+			align-self: center;
+			min-height: fit-content;
+			flex-shrink: 0;
+
+			@media (max-width: 768px) {
+				width: 100%; // Full width on smaller screens
+				padding-block: var(--default-grid-baseline);
+			}
+		}
+
+		&__options {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
 			align-items: center;
+			justify-content: space-evenly;
+			flex-grow: 1;
+
+			@media (max-width: 768px) {
+				flex-direction: column; // Stack options vertically on smaller screens
+				align-items: flex-start; // Align items to the left
+			}
 		}
-	}
 
-	:deep(.checkbox-content__text) {
-		position: absolute;
-		margin-block-start: calc(-1 * var(--clickable-area-small));
+		&__option {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
 
-		@media (max-width: 768px) {
-			margin-block-start: 0;
-			margin-inline-start: var(--default-clickable-area);
-		}
-	}
-
-	.label-input-field {
-		width: 120px;
-		align-self: center;
-		min-height: fit-content;
-		flex-shrink: 0;
-
-		@media (max-width: 768px) {
-			width: 100%; // Full width on smaller screens
-			padding-block: var(--default-grid-baseline);
-		}
-	}
-
-	.label-lowest {
-		width: 120px;
-		align-self: center;
-		text-align: start;
-		flex-shrink: 0;
-
-		@media (max-width: 768px) {
-			width: 100%; // Full width on smaller screens
-			padding-block: var(--default-grid-baseline);
-		}
-	}
-
-	.label-highest {
-		width: 120px;
-		align-self: center;
-		text-align: end;
-		flex-shrink: 0;
-
-		@media (max-width: 768px) {
-			text-align: start;
-			width: 100%; // Full width on smaller screens
-			padding-block: var(--default-grid-baseline);
+			@media (max-width: 768px) {
+				flex-direction: row-reverse;
+			}
 		}
 	}
 }
