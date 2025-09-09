@@ -26,6 +26,157 @@
 			:submission-count="form?.submissionCount"
 			@share-form="onShareForm" />
 
+		<!-- Showing submissions -->
+		<header>
+			<h2 dir="auto">
+				{{ formTitle }}
+			</h2>
+			<p>
+				{{
+					t('forms', '{amount} responses', {
+						amount: filteredSubmissionsCount,
+					})
+				}}
+			</p>
+
+			<!-- View switcher between Summary and Responses -->
+			<div class="response-actions">
+				<PillMenu
+					:disabled="noSubmissions"
+					:options="responseViews"
+					:active.sync="activeResponseView"
+					class="response-actions__toggle" />
+
+				<!-- Action menu for cloud export and deletion -->
+				<NcActions
+					:aria-label="t('forms', 'Options')"
+					force-name
+					:inline="isMobile ? 0 : 1"
+					@blur="isDownloadActionOpened = false"
+					@close="isDownloadActionOpened = false">
+					<template v-if="!isDownloadActionOpened">
+						<NcActionButton
+							v-if="canEditForm && !form.fileId && !isFormLocked"
+							@click="onLinkFile">
+							<template #icon>
+								<IconLink :size="20" />
+							</template>
+							{{ t('forms', 'Create spreadsheet') }}
+						</NcActionButton>
+						<template v-if="canEditForm && form.fileId">
+							<NcActionButton
+								:href="fileUrl"
+								type="tertiary-no-background">
+								<template #icon>
+									<IconTable :size="20" />
+								</template>
+								{{ t('forms', 'Open spreadsheet') }}
+							</NcActionButton>
+							<NcActionButton close-after-click @click="onReExport">
+								<template #icon>
+									<IconRefresh :size="20" />
+								</template>
+								{{ t('forms', 'Re-export spreadsheet') }}
+							</NcActionButton>
+							<NcActionButton
+								close-after-click
+								:disabled="isFormLocked"
+								@click="onUnlinkFile">
+								<template #icon>
+									<IconLinkVariantOff :size="20" />
+								</template>
+								{{ t('forms', 'Unlink spreadsheet') }}
+							</NcActionButton>
+							<NcActionSeparator v-if="!noSubmissions" />
+						</template>
+						<NcActionButton
+							v-if="!noSubmissions"
+							close-after-click
+							@click="onStoreToFiles">
+							<template #icon>
+								<IconFolder :size="20" />
+							</template>
+							{{ t('forms', 'Save copy to Files') }}
+						</NcActionButton>
+						<NcActionButton
+							v-if="!noSubmissions"
+							:close-after-click="false"
+							is-menu
+							@click="isDownloadActionOpened = true">
+							<template #icon>
+								<IconDownload :size="20" />
+							</template>
+							{{ t('forms', 'Download') }}
+						</NcActionButton>
+						<NcActionButton
+							v-if="canDeleteSubmissions && !noSubmissions"
+							close-after-click
+							@click="deleteAllSubmissions">
+							<template #icon>
+								<IconDelete :size="20" />
+							</template>
+							{{ t('forms', 'Delete all responses') }}
+						</NcActionButton>
+					</template>
+
+					<template v-else>
+						<!-- Back to top-level button -->
+						<NcActionButton @click="isDownloadActionOpened = false">
+							<template #icon>
+								<IconChevronLeft :size="20" />
+							</template>
+							{{ t('forms', 'Download') }}
+						</NcActionButton>
+						<NcActionSeparator />
+						<NcActionButton
+							close-after-click
+							@click="onDownloadFile('csv')">
+							<template #icon>
+								<IconFileDelimited :size="20" />
+							</template>
+							CSV
+						</NcActionButton>
+						<NcActionButton
+							close-after-click
+							@click="onDownloadFile('ods')">
+							<template #icon>
+								<IconTable :size="20" />
+							</template>
+							ODS
+						</NcActionButton>
+						<NcActionButton
+							close-after-click
+							@click="onDownloadFile('xlsx')">
+							<template #icon>
+								<IconFileExcelOutline :size="20" />
+							</template>
+							XSLX
+						</NcActionButton>
+					</template>
+				</NcActions>
+
+				<div
+					v-if="
+						(!noSubmissions
+							|| loadingResults
+							|| submissionSearch.length > 0)
+						&& activeResponseView.id !== 'summary'
+					"
+					class="search-wrapper">
+					<NcTextField
+						v-model="submissionSearch"
+						:label="t('forms', 'Search')"
+						trailing-button-icon="close"
+						:show-trailing-button="submissionSearch.length > 0"
+						@trailing-button-click="submissionSearch = ''">
+						<template #icon>
+							<IconMagnify :size="20" />
+						</template>
+					</NcTextField>
+				</div>
+			</div>
+		</header>
+
 		<!-- Loading submissions -->
 		<NcEmptyContent
 			v-if="loadingResults"
@@ -36,225 +187,72 @@
 			</template>
 		</NcEmptyContent>
 
-		<!-- Showing submissions -->
-		<template v-else>
-			<header>
-				<h2 dir="auto">
-					{{ formTitle }}
-				</h2>
-				<p>
-					{{
-						t('forms', '{amount} responses', {
-							amount: filteredSubmissionsCount,
-						})
-					}}
-				</p>
+		<!-- Empty search results -->
+		<NcEmptyContent
+			v-else-if="noFilteredSubmissions && submissionSearch.length > 0"
+			:name="t('forms', 'No results found')"
+			class="forms-emptycontent"
+			:description="
+				t('forms', 'No results found for {submissionSearch}', {
+					submissionSearch,
+				})
+			">
+			<template #icon>
+				<IconPoll :size="64" />
+			</template>
+		</NcEmptyContent>
 
-				<!-- View switcher between Summary and Responses -->
+		<!-- No submissions -->
+		<NcEmptyContent
+			v-else-if="noSubmissions"
+			:name="t('forms', 'No responses yet')"
+			class="forms-emptycontent"
+			:description="
+				t('forms', 'Results of submitted forms will show up here')
+			">
+			<template #icon>
+				<IconPoll :size="64" />
+			</template>
+			<template #action>
 				<div class="response-actions">
-					<PillMenu
-						:disabled="noSubmissions"
-						:options="responseViews"
-						:active.sync="activeResponseView"
-						class="response-actions__toggle" />
-
-					<!-- Action menu for cloud export and deletion -->
-					<NcActions
-						:aria-label="t('forms', 'Options')"
-						force-name
-						:inline="isMobile ? 0 : 1"
-						@blur="isDownloadActionOpened = false"
-						@close="isDownloadActionOpened = false">
-						<template v-if="!isDownloadActionOpened">
-							<NcActionButton
-								v-if="canEditForm && !form.fileId && !isFormLocked"
-								@click="onLinkFile">
-								<template #icon>
-									<IconLink :size="20" />
-								</template>
-								{{ t('forms', 'Create spreadsheet') }}
-							</NcActionButton>
-							<template v-if="canEditForm && form.fileId">
-								<NcActionButton
-									:href="fileUrl"
-									type="tertiary-no-background">
-									<template #icon>
-										<IconTable :size="20" />
-									</template>
-									{{ t('forms', 'Open spreadsheet') }}
-								</NcActionButton>
-								<NcActionButton
-									close-after-click
-									@click="onReExport">
-									<template #icon>
-										<IconRefresh :size="20" />
-									</template>
-									{{ t('forms', 'Re-export spreadsheet') }}
-								</NcActionButton>
-								<NcActionButton
-									close-after-click
-									:disabled="isFormLocked"
-									@click="onUnlinkFile">
-									<template #icon>
-										<IconLinkVariantOff :size="20" />
-									</template>
-									{{ t('forms', 'Unlink spreadsheet') }}
-								</NcActionButton>
-								<NcActionSeparator v-if="!noSubmissions" />
-							</template>
-							<NcActionButton
-								v-if="!noSubmissions"
-								close-after-click
-								@click="onStoreToFiles">
-								<template #icon>
-									<IconFolder :size="20" />
-								</template>
-								{{ t('forms', 'Save copy to Files') }}
-							</NcActionButton>
-							<NcActionButton
-								v-if="!noSubmissions"
-								:close-after-click="false"
-								is-menu
-								@click="isDownloadActionOpened = true">
-								<template #icon>
-									<IconDownload :size="20" />
-								</template>
-								{{ t('forms', 'Download') }}
-							</NcActionButton>
-							<NcActionButton
-								v-if="canDeleteSubmissions && !noSubmissions"
-								close-after-click
-								@click="deleteAllSubmissions">
-								<template #icon>
-									<IconDelete :size="20" />
-								</template>
-								{{ t('forms', 'Delete all responses') }}
-							</NcActionButton>
+					<NcButton variant="primary" @click="onShareForm">
+						<template #icon>
+							<IconShareVariant :size="20" decorative />
 						</template>
-
-						<template v-else>
-							<!-- Back to top-level button -->
-							<NcActionButton @click="isDownloadActionOpened = false">
-								<template #icon>
-									<IconChevronLeft :size="20" />
-								</template>
-								{{ t('forms', 'Download') }}
-							</NcActionButton>
-							<NcActionSeparator />
-							<NcActionButton
-								close-after-click
-								@click="onDownloadFile('csv')">
-								<template #icon>
-									<IconFileDelimited :size="20" />
-								</template>
-								CSV
-							</NcActionButton>
-							<NcActionButton
-								close-after-click
-								@click="onDownloadFile('ods')">
-								<template #icon>
-									<IconTable :size="20" />
-								</template>
-								ODS
-							</NcActionButton>
-							<NcActionButton
-								close-after-click
-								@click="onDownloadFile('xlsx')">
-								<template #icon>
-									<IconFileExcelOutline :size="20" />
-								</template>
-								XSLX
-							</NcActionButton>
-						</template>
-					</NcActions>
-
-					<div
-						v-if="
-							(!noSubmissions || submissionSearch.length > 0)
-							&& activeResponseView.id !== 'summary'
-						"
-						class="search-wrapper">
-						<NcTextField
-							v-model="submissionSearch"
-							:label="t('forms', 'Search')"
-							trailing-button-icon="close"
-							:show-trailing-button="submissionSearch.length > 0"
-							@trailing-button-click="submissionSearch = ''">
-							<template #icon>
-								<IconMagnify :size="20" />
-							</template>
-						</NcTextField>
-					</div>
+						{{ t('forms', 'Share form') }}
+					</NcButton>
 				</div>
-			</header>
+			</template>
+		</NcEmptyContent>
 
-			<!-- Empty search results -->
-			<NcEmptyContent
-				v-if="noSubmissions && submissionSearch.length > 0"
-				:name="t('forms', 'No results found')"
-				class="forms-emptycontent"
-				:description="
-					t('forms', 'No results found for {submissionSearch}', {
-						submissionSearch,
-					})
-				">
-				<template #icon>
-					<IconPoll :size="64" />
-				</template>
-			</NcEmptyContent>
+		<!-- Summary view for visualization -->
+		<section v-else-if="activeResponseView.id === 'summary'">
+			<ResultsSummary
+				v-for="question in questions"
+				:key="question.id"
+				:question="question"
+				:submissions="submissions" />
+		</section>
 
-			<!-- No submissions -->
-			<NcEmptyContent
-				v-else-if="noSubmissions"
-				:name="t('forms', 'No responses yet')"
-				class="forms-emptycontent"
-				:description="
-					t('forms', 'Results of submitted forms will show up here')
-				">
-				<template #icon>
-					<IconPoll :size="64" />
-				</template>
-				<template #action>
-					<div class="response-actions">
-						<NcButton variant="primary" @click="onShareForm">
-							<template #icon>
-								<IconShareVariant :size="20" decorative />
-							</template>
-							{{ t('forms', 'Share form') }}
-						</NcButton>
-					</div>
-				</template>
-			</NcEmptyContent>
+		<!-- Responses view for individual responses -->
+		<section v-else>
+			<Submission
+				v-for="submission in submissions"
+				:key="submission.id"
+				:form-hash="form.hash"
+				:submission="submission"
+				:questions="questions"
+				:highlight="submissionSearch"
+				:can-delete-submission="canDeleteSubmission(submission.userId)"
+				:can-edit-submission="canEditSubmission(submission.userId)"
+				@delete="deleteSubmission(submission.id)" />
 
-			<!-- Summary view for visualization -->
-			<section v-else-if="activeResponseView.id === 'summary'">
-				<ResultsSummary
-					v-for="question in questions"
-					:key="question.id"
-					:question="question"
-					:submissions="submissions" />
-			</section>
-
-			<!-- Responses view for individual responses -->
-			<section v-else>
-				<Submission
-					v-for="submission in submissions"
-					:key="submission.id"
-					:form-hash="form.hash"
-					:submission="submission"
-					:questions="questions"
-					:highlight="submissionSearch"
-					:can-delete-submission="canDeleteSubmission(submission.userId)"
-					:can-edit-submission="canEditSubmission(submission.userId)"
-					@delete="deleteSubmission(submission.id)" />
-
-				<PaginationToolbar
-					class="bottom-pagination"
-					:total-items-count="filteredSubmissionsCount"
-					:limit.sync="limit"
-					:offset.sync="offset" />
-			</section>
-		</template>
+			<PaginationToolbar
+				class="bottom-pagination"
+				:total-items-count="filteredSubmissionsCount"
+				:limit.sync="limit"
+				:offset.sync="offset" />
+		</section>
 
 		<!-- Confirmation dialog for deleting all submissions -->
 		<NcDialog
@@ -465,6 +463,10 @@ export default {
 		},
 
 		noSubmissions() {
+			return this.form?.submissionCount === 0
+		},
+
+		noFilteredSubmissions() {
 			return this.submissions.length === 0
 		},
 
