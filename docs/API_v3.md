@@ -522,13 +522,14 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
 - Parameters:
   | Parameter | Type | Description |
   |-----------|---------|-------------|
-  | _text_ | Array | Array of strings containing the new options |
+  | _optionTexts_ | Array | Array of strings containing the new options |
 - Response: The new array of option objects
 
 ```
 "data": {
   "id": 7,
   "questionId": 1,
+  "order": 1,
   "text": "test"
 }
 ```

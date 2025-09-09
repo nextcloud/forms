@@ -116,12 +116,14 @@ Options are predefined answer-possibilities corresponding to questions with appr
 | ---------- | ------- | ------------- | --------------------------------------------- |
 | id         | Integer | unique        | An instance-wide unique id of the option      |
 | questionId | Integer |               | The id of the question, the option belongs to |
+| order      | Integer |               | The order of the option                       |
 | text       | String  | max. 1024 ch. | The option-text                               |
 
 ```
 {
   "id": 1,
   "questionId": 1,
+  "order": 1,
   "text": "Option 1"
 }
 ```
