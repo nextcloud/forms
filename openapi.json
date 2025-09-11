@@ -536,7 +536,8 @@
                     "short",
                     "long",
                     "file",
-                    "datetime"
+                    "datetime",
+                    "section"
                 ]
             },
             "Share": {
