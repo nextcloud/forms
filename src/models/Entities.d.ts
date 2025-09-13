@@ -8,4 +8,5 @@ export interface FormsOption {
 	text: string
 	order?: number
 	questionId: number
+	optionType: string
 }

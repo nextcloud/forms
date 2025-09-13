@@ -20,6 +20,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setText(string $value)
  * @method int getOrder();
  * @method void setOrder(int $value)
+ * @method string getOptionType()
+ * @method void setOptionType(string $value)
  */
 class Option extends Entity {
 
@@ -27,6 +29,10 @@ class Option extends Entity {
 	protected int|float|null $questionId;
 	protected ?string $text;
 	protected ?int $order;
+	protected ?string $optionType;
+
+	public const OPTION_TYPE_ROW = 'row';
+	public const OPTION_TYPE_COLUMN = 'column';
 
 	/**
 	 * Option constructor.
@@ -35,20 +41,20 @@ class Option extends Entity {
 		$this->questionId = null;
 		$this->text = null;
 		$this->order = null;
+		$this->optionType = null;
 		$this->addType('questionId', 'integer');
 		$this->addType('order', 'integer');
 		$this->addType('text', 'string');
+		$this->addType('optionType', 'string');
 	}
 
-	/**
-	 * @return FormsOption
-	 */
 	public function read(): array {
 		return [
 			'id' => $this->getId(),
 			'questionId' => $this->getQuestionId(),
 			'order' => $this->getOrder(),
 			'text' => (string)$this->getText(),
+			'optionType' => $this->getOptionType(),
 		];
 	}
 }
