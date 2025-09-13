@@ -42,7 +42,8 @@ namespace OCA\Forms;
  *   validationType?: string
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"
+ * @psalm-type FormsQuestionGridSubType = "checkbox"|"number"|"radio"|"text"
  *
  * @psalm-type FormsQuestion = array{
  *   id: int,

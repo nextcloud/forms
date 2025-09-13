@@ -432,6 +432,8 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Question "%s" can only have two answers.', $question['text']));
 			} elseif ($answersCount > 1
 						&& $question['type'] !== Constants::ANSWER_TYPE_FILE
+						// todo: improve this for grid, add mandatory?
+						&& $question['type'] !== Constants::ANSWER_TYPE_GRID
 						&& !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])
 						|| $question['type'] === Constants::ANSWER_TYPE_TIME && isset($question['extraSettings']['timeRange']))) {
 				// Check if non-multiple questions have not more than one answer
