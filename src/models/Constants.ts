@@ -31,3 +31,9 @@ export const INPUT_DEBOUNCE_MS = 400
  * A constant representing the prefix used for identifying "other" answers
  */
 export const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:'
+
+export enum OptionType {
+    Row = 'row',
+    Column = 'column',
+    Choice = 'choice',
+}

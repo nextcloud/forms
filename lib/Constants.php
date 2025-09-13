@@ -71,6 +71,7 @@ class Constants {
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
 	public const ANSWER_TYPE_FILE = 'file';
+	public const ANSWER_TYPE_GRID = 'grid';
 	public const ANSWER_TYPE_LINEARSCALE = 'linearscale';
 	public const ANSWER_TYPE_LONG = 'long';
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
@@ -85,6 +86,7 @@ class Constants {
 		self::ANSWER_TYPE_DATETIME,
 		self::ANSWER_TYPE_DROPDOWN,
 		self::ANSWER_TYPE_FILE,
+		self::ANSWER_TYPE_GRID,
 		self::ANSWER_TYPE_LINEARSCALE,
 		self::ANSWER_TYPE_LONG,
 		self::ANSWER_TYPE_MULTIPLE,
@@ -178,6 +180,20 @@ class Constants {
 		'optionsLabelLowest' => ['string', 'NULL'],
 		'optionsLabelHighest' => ['string', 'NULL'],
 	];
+
+	public const EXTRA_SETTINGS_GRID = [
+		'columnsTitle' => ['string', 'NULL'],
+		'rowsTitle' => ['string', 'NULL'],
+        'columns' => ['array'],
+		'questionType' => ['string'],
+        'rows' => ['array'],
+	];
+
+    public const EXTRA_SETTINGS_GRID_QUESTION_TYPE = [
+        self::ANSWER_TYPE_SHORT,
+        self::ANSWER_TYPE_SHORT,
+        self::ANSWER_TYPE_SHORT,
+    ];
 
 	public const FILENAME_INVALID_CHARS = [
 		"\n",
