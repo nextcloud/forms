@@ -8,6 +8,8 @@ import IconCalendar from 'vue-material-design-icons/CalendarOutline.vue'
 import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
 import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
 import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import IconGrid from 'vue-material-design-icons/Grid.vue'
+import IconNumeric from 'vue-material-design-icons/Numeric.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
 import IconTextLong from 'vue-material-design-icons/TextLong.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
@@ -17,10 +19,12 @@ import QuestionColor from '../components/Questions/QuestionColor.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
 import QuestionFile from '../components/Questions/QuestionFile.vue'
+import QuestionGrid from '../components/Questions/QuestionGrid.vue'
 import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
+import { OptionType } from './Constants.ts'
 
 /**
  * @typedef {object} AnswerTypes
@@ -113,6 +117,53 @@ export default {
 
 		titlePlaceholder: t('forms', 'File question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	grid: {
+		component: QuestionGrid,
+		icon: IconGrid,
+		label: t('forms', 'Grid'),
+		predefined: false,
+
+		subtypes: {
+			radio: {
+				icon: IconRadioboxMarked,
+				label: t('forms', 'Radio buttons'),
+				extraSettings: {
+					questionType: 'radio',
+				},
+			},
+			checkbox: {
+				icon: IconCheckboxOutline,
+				label: t('forms', 'Checkboxes'),
+				extraSettings: {
+					questionType: 'checkbox',
+				},
+			},
+			number: {
+				icon: IconNumeric,
+				label: t('forms', 'Number'),
+				extraSettings: {
+					questionType: 'number',
+				},
+			},
+		},
+
+		validate: (question) => {
+			return (
+				question.options.filter(
+					(option) => option.optionType === OptionType.Column,
+				).length > 0
+				&& question.options.filter(
+					(option) => option.optionType === OptionType.Row,
+				).length > 0
+			)
+		},
+
+		titlePlaceholder: t('forms', 'Grid question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+		createPlaceholder: t('forms', 'People can submit a grid answer'),
+		submitPlaceholder: t('forms', 'Enter your answer'),
 	},
 
 	short: {
