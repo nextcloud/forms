@@ -11,6 +11,7 @@ OC.L10N.register(
     "Timestamp of data load" : "Χρονική σήμανση φόρτωσης δεδομένων",
     "No" : "Όχι",
     "Yes" : "Ναι",
+    "Count" : "Πλήθος",
     "Copy" : "Αντιγραφή",
     "Anonymous response" : "Ανώνυμη απάντηση",
     "Shared by %s" : "Διαμοιράστηκε από %s",

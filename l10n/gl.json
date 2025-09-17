@@ -76,6 +76,7 @@
     "Go to first page" : "Ir á primeira páxina",
     "Go to previous page" : "Ir á páxina anterior",
     "Page number" : "Número de páxina",
+    "{page} of {totalPages}" : "{page} de {totalPages}",
     "Go to next page" : "Ir á páxina seguinte",
     "Go to last page" : "Ir á última páxina",
     "QR code representation of {text}" : "Representación de {text} en código QR",
