@@ -151,6 +151,7 @@ OC.L10N.register(
     "Expired on {date}" : "Platnost skončila {date}",
     "Expires on {date}" : "Platnost skončí {date}",
     "Form is locked" : "Formulář je uzamčen",
+    "Lock by {lockedBy}, expires: {lockedUntil}" : "Zámek od {lockedBy}, skončí: {lockedUntil}",
     "never" : "nikdy",
     "Unlock form" : "Odemknout formulář",
     "Store responses anonymously" : "Ukládat odpovědi anonymně",

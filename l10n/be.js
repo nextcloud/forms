@@ -33,6 +33,7 @@ OC.L10N.register(
     "Description" : "Апісанне",
     "Download" : "Спампаваць",
     "Search" : "Пошук",
+    "No results found" : "Вынікаў не знойдзена",
     "Sharing" : "Абагульванне",
     "Settings" : "Налады",
     "Submit" : "Адправіць",
