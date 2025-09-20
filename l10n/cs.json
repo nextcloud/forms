@@ -214,6 +214,7 @@
     "Loading {title} …" : "Načítání {title}…",
     "Form is archived" : "Formulář je archivován",
     "Form '{title}' is archived and cannot be modified." : "Formulář „{title}“ je archivován a není ho proto možné měnit.  ",
+    "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Formulář „{title}“ je uzamčený uživatelem {lockedBy} a není možné ho měnit. Platnost zámku skončí: {lockedUntil}",
     "Form title" : "Nadpis formuláře",
     "Description" : "Popis",
     "Add a question" : "Přidat otázku",
