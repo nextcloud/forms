@@ -157,6 +157,7 @@
 							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
 							<IconPlus v-else :size="20" />
 						</template>
+<!--            <NcActionSeparator />-->
 						<NcActionButton
 							v-for="(answer, type) in answerTypesFilter"
 							:key="answer.label"
