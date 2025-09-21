@@ -193,6 +193,7 @@ Array of permissions, the user has on the form. Permissions are named by resp. r
 | results | User is allowed to access the form results |
 | results_delete | User is allowed to delete form submissions |
 | submit | User is allowed to submit to the form |
+| embed | only for `shareType: IShare::TYPE_LINK = 3` (link shares): allow [embedding](Embedding.md) |
 
 ## Access Object
 
