@@ -122,6 +122,7 @@ OC.L10N.register(
     "Message to show after a user submitted the form (formatting using Markdown is supported)" : "Μήνυμα που θα εμφανίζεται μετά την υποβολή της φόρμας από τον χρήστη (υποστηρίζεται η μορφοποίηση με χρήση Markdown)",
     "Message to show after a user submitted the form. Please note that the message will not be translated!" : "Μήνυμα που εμφανίζεται μετά την υποβολή της φόρμας από τον χρήστη. Σημειώστε ότι το μήνυμα δε θα μεταφραστεί!",
     "Group" : "Ομάδα",
+    "Team" : "Ομάδα",
     "Permissions" : "Δικαιώματα",
     "View responses" : "Προβολή απαντήσεων",
     "Delete responses" : "Διαγραφή απαντήσεων",
