@@ -5,6 +5,8 @@ OC.L10N.register(
     "Yes" : "Так",
     "Question" : "Пытанне",
     "Copy" : "Капіяваць",
+    "Shared by %s" : "Абагуліў(-ла) %s",
+    "User display name" : "Імя карыстальніка для паказу",
     "Shared with you" : "Абагулена з вамі",
     "Select groups" : "Выберыце групы",
     "Results" : "Вынікі",
