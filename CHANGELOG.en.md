@@ -5,7 +5,7 @@
 
 # Changelog
 
-## v5.2.0 - tbd
+## v5.2.0 - 2025-09-25
 
 - **Time: restrictions and ranges**
 

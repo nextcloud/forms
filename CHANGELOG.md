@@ -5,66 +5,43 @@
 
 # Changelog
 
-## v5.2.0-beta.2 - 2025-09-19
+## v5.2.0 - 2025-09-25
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.0-beta.1...v5.2.0-beta.2)
-
-### Fixed
-
-- fix(linear-scale): add custom wrapper instead of CSS hack by @susnux in [\#2914](https://github.com/nextcloud/forms/pull/2914)
-- fix: Search field loses focus after search by @Koc in [\#2870](https://github.com/nextcloud/forms/pull/2870)
-
-### Merged
-
-- chore(QuestionMultiple): use v-model for better data binding by @Chartman123 in [\#2912](https://github.com/nextcloud/forms/pull/2912)
-
-## v5.2.0-beta.1 - 2025-09-04
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.2...v5.2.0-beta.1)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.2...v5.2.0)
 
 ### Enhancements
 
-- feat: add question name to form answer output by @susnux [\#2723](https://github.com/nextcloud/forms/pull/2723)
-
-### Fixed
-
-- fix: remove unused props and fix event name in user select by @Chartman123 [\#2893](https://github.com/nextcloud/forms/pull/2893)
-- fix: remove name from icon for better a11y by @Chartman123 [\#2881](https://github.com/nextcloud/forms/pull/2881)
-
-### Merged
-
-- chore: adapt changes in nc-vue by @Chartman123 [\#2709](https://github.com/nextcloud/forms/pull/2709)
-- test: Allow a 10 seconds delta for lockedUntil in form tests by @Chartman123 [\#2891](https://github.com/nextcloud/forms/pull/2891)
-- Migrate to outline, Material Symbols like variants by @AndyScherzinger [\#2892](https://github.com/nextcloud/forms/pull/2892)
-- style(icon): update icons to outline variants in TopBar and Results components by @Chartman123 [\#2894](https://github.com/nextcloud/forms/pull/2894)
-
-## v5.2.0-beta.0 - 2025-08-19
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.2...v5.2.0-beta.0)
-
-### Enhancements
-
-- feat: add form locking mechanism and share `edit` permission by @Chartman123 in [\#2737](https://github.com/nextcloud/forms/pull/2737)
-- feat: add color question type by @Chartman123 in [\#2748](https://github.com/nextcloud/forms/pull/2748)
-- feat: add pagination for submissions by @Koc in [\#2710](https://github.com/nextcloud/forms/pull/2710)
+- feat(docs): Add embed permission description for link shares in DataStructure.md by @Chartman123 in [\#2932](https://github.com/nextcloud/forms/pull/2932)
 - feat: make full-text search case-insensitive and search by submission author as well by @Koc in [\#2761](https://github.com/nextcloud/forms/pull/2761)
+- feat: add color question type by @Chartman123 in [\#2748](https://github.com/nextcloud/forms/pull/2748)
 - feat: don't show default submission header if custom message is set by @Chartman123 in [\#2747](https://github.com/nextcloud/forms/pull/2747)
+- feat: add form locking mechanism and share `edit` permission by @Chartman123 in [\#2737](https://github.com/nextcloud/forms/pull/2737)
+- feat: add question name to form answer output by @susnux [\#2723](https://github.com/nextcloud/forms/pull/2723)
 - feat: allow editing of submission by the user by @Chartman123 in [\#2715](https://github.com/nextcloud/forms/pull/2715)
 - feat(time): Add time restrictions and range support by @Chartman123 in [\#2712](https://github.com/nextcloud/forms/pull/2712)
+- feat: add pagination for submissions by @Koc in [\#2710](https://github.com/nextcloud/forms/pull/2710)
 - feat: add linear scale questions by @Chartman123 in [\#2609](https://github.com/nextcloud/forms/pull/2609)
 
 ### Fixed
 
+- fix(linear-scale): add custom wrapper instead of CSS hack by @susnux in [\#2914](https://github.com/nextcloud/forms/pull/2914)
+- fix: remove unused props and fix event name in user select by @Chartman123 [\#2893](https://github.com/nextcloud/forms/pull/2893)
+- fix: remove name from icon for better a11y by @Chartman123 [\#2881](https://github.com/nextcloud/forms/pull/2881)
+- fix: Search field loses focus after search by @Koc in [\#2870](https://github.com/nextcloud/forms/pull/2870)
 - fix: show toast on errors with empty response by @hamza221 in [\#2750](https://github.com/nextcloud/forms/pull/2750)
 - fix: prevent modifications to archived forms in ApiController and ShareApiController by @Chartman123 in [\#2741](https://github.com/nextcloud/forms/pull/2741)
 - fix: disable edit switch when the form is archived by @Chartman123 in [\#2739](https://github.com/nextcloud/forms/pull/2739)
-- fix: only show extended label for linear scale questions by @Chartman123 in [\#2718](https://github.com/nextcloud/forms/pull/2718)
 - fix: Add missing documentation by @Chartman123 in [\#2735](https://github.com/nextcloud/forms/pull/2735)
+- fix: only show extended label for linear scale questions by @Chartman123 in [\#2718](https://github.com/nextcloud/forms/pull/2718)
 
 ### Merged
 
-- chore(tests): Cleanup bootstrap.php to be forward-compatible by @come-nc in [\#2753](https://github.com/nextcloud/forms/pull/2753)
+- chore(QuestionMultiple): use v-model for better data binding by @Chartman123 in [\#2912](https://github.com/nextcloud/forms/pull/2912)
+- style(icon): update icons to outline variants in TopBar and Results components by @Chartman123 [\#2894](https://github.com/nextcloud/forms/pull/2894)
+- Migrate to outline, Material Symbols like variants by @AndyScherzinger [\#2892](https://github.com/nextcloud/forms/pull/2892)
+- test: Allow a 10 seconds delta for lockedUntil in form tests by @Chartman123 [\#2891](https://github.com/nextcloud/forms/pull/2891)
 - chore: unify debounce timing for input handling by @Chartman123 in [\#2721](https://github.com/nextcloud/forms/pull/2721)
+- chore: adapt changes in nc-vue by @Chartman123 [\#2709](https://github.com/nextcloud/forms/pull/2709)
 
 ## v5.1.2 - 2025-08-19
 
