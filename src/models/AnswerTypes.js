@@ -10,6 +10,7 @@ import QuestionFile from '../components/Questions/QuestionFile.vue'
 import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import QuestionSection from '../components/Questions/QuestionSection.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 
 import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
@@ -17,6 +18,7 @@ import IconCalendar from 'vue-material-design-icons/CalendarOutline.vue'
 import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
 import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
 import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import IconFormatSection from 'vue-material-design-icons/FormatSection.vue'
 import IconLinearScale from '../components/Icons/IconLinearScale.vue'
 import IconPalette from '../components/Icons/IconPalette.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
@@ -212,5 +214,15 @@ export default {
 		createPlaceholder: t('forms', 'People can pick a color'),
 		submitPlaceholder: t('forms', 'Pick a color'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	section: {
+		component: QuestionSection,
+		icon: IconFormatSection,
+		label: t('forms', 'Section'),
+		predefined: false,
+
+		titlePlaceholder: t('forms', 'Section title'),
+		warningInvalid: t('forms', 'This section needs a title!'),
 	},
 }

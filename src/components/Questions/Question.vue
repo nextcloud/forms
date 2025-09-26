@@ -8,6 +8,7 @@
 		:class="{
 			question: true,
 			'question--editable': !readOnly,
+			'question--section': readOnly && isSection,
 		}"
 		:aria-label="t('forms', 'Question number {index}', { index })">
 		<!-- Drag handle -->
@@ -91,6 +92,7 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
+						v-if="!isSection"
 						:checked="isRequired"
 						@update:checked="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -98,6 +100,7 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
+						v-if="!isSection"
 						:label="t('forms', 'Technical name of the question')"
 						:label-outside="false"
 						:show-trailing-button="false"
@@ -247,6 +250,10 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		type: {
+			type: String,
+			default: '',
+		},
 	},
 
 	computed: {
@@ -285,6 +292,10 @@ export default {
 
 		hasDescription() {
 			return this.description !== ''
+		},
+
+		isSection() {
+			return this.type === 'section'
 		},
 	},
 	// Ensure description is sized correctly on initial render
@@ -492,6 +503,24 @@ export default {
 				@include markdown-output;
 			}
 		}
+	}
+}
+
+.question--section {
+	margin-block-end: 16px;
+	position: sticky;
+	top: 0;
+	background: var(--color-main-background);
+	z-index: 2;
+
+	h3 {
+		font-size: 24px !important;
+		border-bottom: 1px solid;
+	}
+
+	.question__header__description {
+		max-height: calc(var(--default-font-size) * 8);
+		overflow-y: auto;
 	}
 }
 </style>
