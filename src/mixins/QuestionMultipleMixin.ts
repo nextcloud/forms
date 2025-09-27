@@ -35,90 +35,132 @@ export default defineComponent({
 			return value?.text?.trim?.().length === 0
 		},
 
-		/**
-		 * Options sorted by order or randomized if configured
-		 */
-		sortedOptions: {
-			get() {
-				// Only shuffle options if not in editing mode (and shuffling is enabled)
-				if (this.readOnly && this.extraSettings?.shuffleOptions) {
-					return this.shuffleArray(this.options)
-				}
+        expectedOptionTypes() {
+            return ['row', 'column']
+        },
 
-				// Ensure order of options always is the same
-				const options = [...this.options].sort((a, b) => {
-					if (a.order === b.order) {
-						return a.id - b.id
-					}
-					return (a.order ?? 0) - (b.order ?? 0)
-				})
+        sortedOptionsPerType(): { [key: string]: FormsOption[] } {
+            let optionsPerType = Object.fromEntries(this.expectedOptionTypes.map(optionType => [optionType, []]))
+            // console.log('sortedOptionsPerType', optionsPerType)
 
-				if (!this.readOnly) {
-					// In edit mode append an empty option
-					return [
-						...options,
-						{
-							local: true,
-							questionId: this.id,
-							text: '',
-							order: options.length,
-						},
-					]
-				}
-				return options
-			},
-			set(newOptions: FormsOption[]) {
-				this.updateOptions(
-					newOptions
-						.filter((option) => !option.local)
-						.map((option, index) => ({
-							...option,
-							order: index,
-						})),
-				)
-			},
-		},
+            this.options.forEach(option => {
+                optionsPerType[option.optionType].push(option)
+            })
 
-		/**
-		 * Debounced function to save options order
-		 */
-		onOptionsReordered() {
-			return debounce(this.saveOptionsOrder, INPUT_DEBOUNCE_MS)
-		},
-	},
+            for (const optionType of Object.keys(optionsPerType)) {
+                // Only shuffle options if not in editing mode (and shuffling is enabled)
+                if (this.readOnly && this.extraSettings?.shuffleOptions) {
+                    optionsPerType[optionType] = this.shuffleArray(optionsPerType[optionType])
+                } else {
+                    // Ensure order of options always is the same
+                    optionsPerType[optionType] = [...optionsPerType[optionType]].sort((a, b) => {
+                        if (a.order === b.order) {
+                            return a.id - b.id
+                        }
+                        return (a.order ?? 0) - (b.order ?? 0)
+                    })
+
+                    if (!this.readOnly) {
+                        // In edit mode append an empty option
+                        optionsPerType[optionType].push({
+                            local: true,
+                            questionId: this.id,
+                            text: '',
+                            optionType: optionType,
+                            order: optionsPerType[optionType].length,
+                        })
+                    }
+                }
+            }
+
+            return optionsPerType
+        },
+    },
 
 	methods: {
 		/**
-		 * Set focus on next AnswerInput
-		 *
-		 * @param {number} index Index of current option
-		 */
-		focusNextInput(index: number) {
-			this.focusIndex(index + 1)
+         * Set focus on next AnswerInput
+         *
+         * @param {number} index Index of current option
+         * @param {string} optionType Type of current option
+         */
+		focusNextInput(index: number, optionType: string) {
+			this.focusIndex(index + 1, optionType)
 		},
 
 		/**
 		 * Focus the input matching the index
 		 *
 		 * @param {number} index the value index
+         * @param {string} optionType the option type to focus
 		 */
-		focusIndex(index: number) {
+		focusIndex(index: number, optionType: string) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
 			const item = this.$refs.input.find(
-				({ $vnode: vnode }) =>
-					vnode?.componentOptions.propsData.index === index,
+				({ $vnode: vnode }) => {
+                    const propsData = vnode?.componentOptions.propsData;
+
+                    return propsData.optionType === optionType && propsData?.index === index
+                }
 			)
 			if (item) {
 				item.focus()
 			} else {
 				logger.warn('Could not find option to focus', {
 					index,
-					options: this.sortedOptions,
+					options: this.sortedOptionsPerType[optionType],
 				})
 			}
 		},
 
-		/**
+        sortOptionsOfType(options: FormsOption[], optionType: string): FormsOption[] {
+            // Only shuffle options if not in editing mode (and shuffling is enabled)
+            options = options.filter(option => option.optionType === optionType);
+            if (this.readOnly && this.extraSettings?.shuffleOptions) {
+                return this.shuffleArray(options)
+            }
+
+            // Ensure order of options always is the same
+            options = [...options].sort((a, b) => {
+                if (a.order === b.order) {
+                    return a.id - b.id
+                }
+                return (a.order ?? 0) - (b.order ?? 0)
+            })
+
+            if (!this.readOnly) {
+                // In edit mode append an empty option
+                return [
+                    ...options,
+                    {
+                        local: true,
+                        questionId: this.id,
+                        text: '',
+                        optionType: optionType,
+                        order: options.length,
+                    },
+                ]
+            }
+            return options
+        },
+
+        updateOptionsOrder(newOptions: FormsOption[], optionType: string) {
+            console.log('updateOptionsOrder', newOptions, optionType)
+
+            this.replaceOptionsOfType(
+                newOptions
+                    .filter((option) => !option.local)
+                    .map((option, index) => {
+                        return ({
+                            ...option,
+                            order: index,
+                        });
+                    }),
+                optionType,
+            )
+        },
+
+        /**
 		 * Handles the creation of a new answer option.
 		 *
 		 * @param index the index of the answer
@@ -127,11 +169,25 @@ export default defineComponent({
 		 */
 		onCreateAnswer(index: number, answer: FormsOption): void {
 			this.$nextTick(() => {
-				this.$nextTick(() => this.focusIndex(index))
+				this.$nextTick(() => this.focusIndex(index, answer.optionType))
 			})
 			this.updateOptions([...this.options, answer])
 		},
 
+        /**
+         * Replace all options of a certain type
+         *
+         * @param {Array} options options to change
+         * @param {string} optionType the type of options to update
+         */
+        replaceOptionsOfType(options: FormsOption[], optionType: string) {
+            const updatedOptions = [
+                ...this.options.filter(option => option.optionType !== optionType),
+                ...options
+            ]
+
+            this.updateOptions(updatedOptions)
+        },
 		/**
 		 * Update the options
 		 * This will handle updating the form (emitting the changes) and update last changed property
@@ -150,53 +206,57 @@ export default defineComponent({
 		 * @param {object} answer the new answer value
 		 */
 		updateAnswer(index: number, answer: FormsOption) {
-			const options = [...this.sortedOptions]
+            const options = [...this.sortedOptionsPerType[answer.optionType]]
 			const [oldValue] = options.splice(index, 1, answer)
 
 			// New value created - we need to set the correct focus
 			if (oldValue.local && !answer.local) {
 				this.$nextTick(() => {
-					this.$nextTick(() => this.focusIndex(index))
+					this.$nextTick(() => this.focusIndex(index, answer.optionType))
 				})
 			}
 
-			this.updateOptions(options.filter(({ local }) => !local))
+			this.replaceOptionsOfType(options.filter(({ local }) => !local), answer.optionType)
 		},
 
 		/**
 		 * Remove any empty options when leaving an option
 		 */
-		checkValidOption() {
+		checkValidOption(optionType: string) {
+            console.log('checkValidOption', optionType, this.sortedOptionsPerType[optionType])
 			// When leaving edit mode, filter and delete empty options
-			this.options.forEach((option) => {
+			this.sortedOptionsPerType[optionType].forEach((option) => {
 				if (!option.text && !option.local) {
-					this.deleteOption(option.id)
+					this.deleteOption(option)
 				}
 			})
 		},
 
 		/**
-		 * Delete an option
-		 *
-		 * @param {number} id the options id
-		 */
-		deleteOption(id: number) {
-			const index = this.sortedOptions.findIndex((option) => option.id === id)
-			const options = [...this.sortedOptions]
+         * Delete an option
+         *
+         * @param optionToDelete
+         */
+		deleteOption(optionToDelete: FormsOption) {
+            const optionType = optionToDelete.optionType;
+            const sortedOptions = this.sortedOptionsPerType[optionType];
+            const index = sortedOptions.findIndex((option) => option.id === optionToDelete.id)
+			const options = [...sortedOptions]
 			const [option] = options.splice(index, 1)
 
 			// delete from Db
 			this.deleteOptionFromDatabase(option)
 
 			// Update question - remove option and reorder other
-			this.updateOptions(
+			this.replaceOptionsOfType(
 				options
 					.filter(({ local }) => !local)
 					.map((option, order) => ({ ...option, order })),
+                optionType,
 			)
 
 			// Focus the previous option
-			this.$nextTick(() => this.focusIndex(Math.max(index - 1, 0)))
+			this.$nextTick(() => this.focusIndex(Math.max(index - 1, 0)), optionType)
 		},
 
 		/**
@@ -248,12 +308,12 @@ export default defineComponent({
 			options.splice(index, 0, option)
 
 			this.updateOptions(options)
-			this.focusIndex(index)
+			this.focusIndex(index, option.optionType)
 		},
 
-		async saveOptionsOrder() {
-			try {
-				const newOrder = this.sortedOptions
+		async saveOptionsOrder(optionType: string) {
+            try {
+				const newOrder = this.sortedOptionsPerType[optionType]
 					.filter((option) => !option.local)
 					.map((option) => option.id)
 
@@ -267,6 +327,8 @@ export default defineComponent({
 					),
 					{
 						newOrder,
+                        // fixme: accept optionType on the server side
+                        optionType,
 					},
 				)
 				emit('forms:last-updated:set', this.formId)
@@ -279,28 +341,34 @@ export default defineComponent({
 		/**
 		 * Reorder option by moving it upwards the list
 		 * @param {number} index Option that should move up
+         * @param {string} optionType Type of current option
 		 */
-		onOptionMoveUp(index: number) {
+		onOptionMoveUp(index: number, optionType: string) {
 			if (index > 0) {
-				this.onOptionMoveDown(index - 1)
+				this.onOptionMoveDown(index - 1, optionType)
 			}
 		},
 
 		/**
-		 * Reorder option by moving it downwards the list
-		 * @param {number} index Option that should move down
-		 */
-		onOptionMoveDown(index: number) {
-			if (index === this.sortedOptions.length - 1) {
+         * Reorder option by moving it downwards the list
+         * @param {number} index Option that should move down
+         * @param {string} optionType Type of current option
+         */
+		onOptionMoveDown(index: number, optionType: string) {
+            if (index === this.sortedOptionsPerType[optionType].length - 1) {
 				return
 			}
 
 			// swap positions
-			const first = this.sortedOptions[index]
-			const second = this.sortedOptions[index + 1]
+			const first = this.sortedOptionsPerType[optionType][index]
+			const second = this.sortedOptionsPerType[optionType][index + 1]
 			second.order = index
 			first.order = index + 1
-			this.onOptionsReordered()
-		},
+
+            this.$nextTick(debounce(function() {
+                // fixme: actually debounce not works
+                this.saveOptionsOrder(optionType)
+            }, INPUT_DEBOUNCE_MS))
+        },
 	},
 })

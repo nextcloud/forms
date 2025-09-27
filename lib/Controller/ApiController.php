@@ -820,6 +820,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param list<string> $optionTexts the new option text
+	 * @param string|null $optionType the new option type (e.g. 'row')
 	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -833,11 +834,12 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
-	public function newOption(int $formId, int $questionId, array $optionTexts): DataResponse {
-		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}', [
+	public function newOption(int $formId, int $questionId, array $optionTexts, ?string $optionType = null): DataResponse {
+		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}, optionType: {optionType}', [
 			'formId' => $formId,
 			'questionId' => $questionId,
 			'text' => $optionTexts,
+            'optionType' => $optionType,
 		]);
 
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
@@ -863,7 +865,7 @@ class ApiController extends OCSController {
 		}
 
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
-		$options = $this->optionMapper->findByQuestion($questionId);
+		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 		$lastOption = array_pop($options);
 		if ($lastOption) {
 			$optionOrder = $lastOption->getOrder() + 1;
@@ -878,6 +880,7 @@ class ApiController extends OCSController {
 			$option->setQuestionId($questionId);
 			$option->setText($text);
 			$option->setOrder($optionOrder++);
+            $option->setOptionType($optionType);
 
 			try {
 				$option = $this->optionMapper->insert($option);
