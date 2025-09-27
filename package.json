@@ -30,7 +30,7 @@
   ],
   "dependencies": {
     "@nextcloud/auth": "^2.5.2",
-    "@nextcloud/axios": "^2.5.1",
+    "@nextcloud/axios": "^2.5.2",
     "@nextcloud/dialogs": "^6.3.2",
     "@nextcloud/event-bus": "^3.3.2",
     "@nextcloud/files": "^3.12.0",
