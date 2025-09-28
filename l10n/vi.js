@@ -16,6 +16,7 @@ OC.L10N.register(
     "never" : "không thay đổi",
     "Set expiration date" : "Đặt ngày hết hạn",
     "Group" : "N",
+    "Team" : "Đội",
     "Share link" : "Chia sẻ liên kết",
     "Add link" : "Thêm đường dẫn",
     "Copy to clipboard" : "Sao chép vào clipboard",
