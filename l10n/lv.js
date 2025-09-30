@@ -25,6 +25,7 @@ OC.L10N.register(
     "Closed forms do not accept new submissions." : "Aizvērtās veidlapās netiek pieņemti jauni iesniegumi.",
     "Archived forms do not accept new submissions and can not be modified." : "Aizvērtās formās netiek pieņemti jauni iesniegumi, un tās nevar mainīt.",
     "Group" : "Grupa",
+    "Team" : "Komanda",
     "Permissions" : "Atļaujas",
     "Share link" : "Koplietot saiti",
     "Copy to clipboard" : "Kopēt starpliktuvē",
