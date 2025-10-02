@@ -45,7 +45,8 @@
 					:disabled="noSubmissions"
 					:options="responseViews"
 					:active.sync="activeResponseView"
-					class="response-actions__toggle" />
+					class="response-actions__toggle"
+					@update:active="loadFormResults" />
 
 				<!-- Action menu for cloud export and deletion -->
 				<NcActions
@@ -556,17 +557,26 @@ export default {
 			logger.debug(`Loading results for form ${this.form.hash}`)
 
 			try {
-				const response = await axios.get(
-					generateOcsUrl(
-						'apps/forms/api/v3/forms/{id}/submissions?limit={limit}&offset={offset}&query={query}',
-						{
+				let response = null
+				if (this.activeResponseView.id === 'summary') {
+					response = await axios.get(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
 							id: this.form.id,
-							limit: this.limit,
-							offset: this.offset,
-							query: this.submissionSearch,
-						},
-					),
-				)
+						}),
+					)
+				} else {
+					response = await axios.get(
+						generateOcsUrl(
+							'apps/forms/api/v3/forms/{id}/submissions?limit={limit}&offset={offset}&query={query}',
+							{
+								id: this.form.id,
+								limit: this.limit,
+								offset: this.offset,
+								query: this.submissionSearch,
+							},
+						),
+					)
+				}
 				const data = OcsResponse2Data(response)
 
 				// Append questions & submissions
