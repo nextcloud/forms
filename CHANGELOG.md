@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.2.1 - 2025-10-02
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.0...v5.2.1)
+
+### Fixed
+
+- fix(Results): enhance response loading logic based on active response view by @Chartman123 in [\#2944](https://github.com/nextcloud/forms/pull/2944)
+
 ## v5.2.0 - 2025-09-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.1.2...v5.2.0)
