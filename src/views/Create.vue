@@ -157,18 +157,38 @@
 							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
 							<IconPlus v-else :size="20" />
 						</template>
-						<NcActionButton
-							v-for="(answer, type) in answerTypesFilter"
-							:key="answer.label"
-							close-after-click
-							:disabled="isLoadingQuestions"
-							class="question-menu__question"
-							@click="addQuestion(type)">
-							<template #icon>
-								<Icon :is="answer.icon" :size="20" />
-							</template>
-							{{ answer.label }}
-						</NcActionButton>
+
+            <template v-if="!activeQuestionType">
+              <NcActionButton
+                v-for="(answer, type) in answerTypesFilter"
+                :key="answer.label"
+                :close-after-click="!answer.subtypes"
+                :disabled="isLoadingQuestions"
+                class="question-menu__question"
+                @click="answer.subtypes ? activeQuestionType = type : addQuestion(type)">
+                <template #icon>
+                  <Icon :is="answer.icon" :size="20" />
+                </template>
+                {{ answer.label }}
+              </NcActionButton>
+            </template>
+            <!--            <NcActionSeparator />-->
+
+            <template v-else>
+              <NcActionButton
+                  v-for="(answer, type) in answerTypesFilter[activeQuestionType].subtypes"
+                  :key="'subtype-' + answer.label"
+                  close-after-click
+                  :disabled="isLoadingQuestions"
+                  class="question-menu__question"
+                  @click="addQuestion(activeQuestionType, type)">
+                <template #icon>
+                  <Icon :is="answer.icon" :size="20" />
+                </template>
+                {{ answer.label }}
+              </NcActionButton>
+            </template>
+
 					</NcActions>
 				</div>
 			</section>
@@ -240,6 +260,7 @@ export default {
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
+      activeQuestionType: null,
 		}
 	},
 
@@ -327,6 +348,12 @@ export default {
 				this.resizeDescription()
 			}
 		},
+
+    questionTypeSubtypes(value) {
+      // if (!value) {
+      //   this.activeQuestionType = null
+      // }
+    },
 	},
 
 	mounted() {
@@ -405,8 +432,9 @@ export default {
 		 * Add a new question to the current form
 		 *
 		 * @param {string} type the question type, see AnswerTypes
+		 * @param {string|null} subtype the question subtype, see AnswerTypes.subtypes
 		 */
-		async addQuestion(type) {
+		async addQuestion(type, subtype = null) {
 			const text = ''
 			this.isLoadingQuestions = true
 
@@ -418,6 +446,7 @@ export default {
 					{
 						type,
 						text,
+            subtype,
 					},
 				)
 				const question = OcsResponse2Data(response)

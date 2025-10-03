@@ -80,12 +80,14 @@ import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOut
 import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
+import IconTableColumn from 'vue-material-design-icons/TableColumn.vue'
+import IconTableRow from 'vue-material-design-icons/TableRow.vue'
 
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcButton from '@nextcloud/vue/components/NcButton'
 
-import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
+import { INPUT_DEBOUNCE_MS, OptionType} from '../../models/Constants.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
 
@@ -99,6 +101,8 @@ export default {
 		IconDelete,
 		IconDragIndicator,
 		IconRadioboxBlank,
+    IconTableColumn,
+    IconTableRow,
 		NcActions,
 		NcActionButton,
 		NcButton,
@@ -133,6 +137,10 @@ export default {
 			type: Number,
 			required: true,
 		},
+    optionType: {
+      type: String,
+      required: true,
+    }
 	},
 
 	data() {
@@ -154,7 +162,7 @@ export default {
 		},
 
 		optionDragMenuId() {
-			return `q${this.answer.questionId}o${this.answer.id}__drag_menu`
+			return `q${this.answer.questionId}o${this.answer.id}o${this.optionType}__drag_menu`
 		},
 
 		placeholder() {
@@ -165,6 +173,14 @@ export default {
 		},
 
 		pseudoIcon() {
+      if (this.optionType === OptionType.Column) {
+        return IconTableColumn;
+      }
+
+      if (this.optionType === OptionType.Row) {
+        return IconTableRow;
+      }
+
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
 	},
@@ -180,7 +196,7 @@ export default {
 
 	methods: {
 		handleTabbing() {
-			this.$emit('tabbed-out')
+			this.$emit('tabbed-out', this.optionType)
 		},
 
 		/**
@@ -227,7 +243,7 @@ export default {
 		 */
 		focusNextInput() {
 			if (this.index <= this.maxIndex) {
-				this.$emit('focus-next', this.index)
+				this.$emit('focus-next', this.index, this.optionType)
 			}
 		},
 
@@ -251,7 +267,8 @@ export default {
 
 			// do this in queue to prevent race conditions between PATCH and DELETE
 			this.queue.add(() => {
-				this.$emit('delete', this.answer.id)
+				this.$emit('delete', this.answer)
+        console.log('emit delete', this.answer)
 				// Prevent any patch requests
 				this.queue.pause()
 				this.queue.clear()
@@ -265,6 +282,8 @@ export default {
 		 * @return {object} answer
 		 */
 		async createAnswer(answer) {
+      console.log('debug: createAnswer', {optionType: this.optionType})
+
 			try {
 				const response = await axios.post(
 					generateOcsUrl(
@@ -276,6 +295,7 @@ export default {
 					),
 					{
 						optionTexts: [answer.text],
+            optionType: answer.optionType,
 					},
 				)
 				logger.debug('Created answer', { answer })

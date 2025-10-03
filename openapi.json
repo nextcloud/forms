@@ -536,7 +536,8 @@
                     "short",
                     "long",
                     "file",
-                    "datetime"
+                    "datetime",
+                    "grid"
                 ]
             },
             "Share": {
@@ -2622,6 +2623,12 @@
                                         "items": {
                                             "type": "string"
                                         }
+                                    },
+                                    "optionType": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "the new option type (e.g. 'row')"
                                     }
                                 }
                             }
