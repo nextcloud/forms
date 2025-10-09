@@ -8,10 +8,10 @@
 		<NcSettingsSection :name="t('forms', 'Form creation')">
 			<NcCheckboxRadioSwitch
 				ref="switchRestrictCreation"
-				:checked.sync="appConfig.restrictCreation"
+				v-model="appConfig.restrictCreation"
 				class="forms-settings__creation__switch"
 				type="switch"
-				@update:checked="onRestrictCreationChange">
+				@update:model-value="onRestrictCreationChange">
 				{{ t('forms', 'Restrict form creation to selected groups') }}
 			</NcCheckboxRadioSwitch>
 			<NcSelect
@@ -27,23 +27,23 @@
 		<NcSettingsSection :name="t('forms', 'Form sharing')">
 			<NcCheckboxRadioSwitch
 				ref="switchAllowPublicLink"
-				:checked.sync="appConfig.allowPublicLink"
+				v-model="appConfig.allowPublicLink"
 				type="switch"
-				@update:checked="onAllowPublicLinkChange">
+				@update:model-value="onAllowPublicLinkChange">
 				{{ t('forms', 'Allow sharing by link') }}
 			</NcCheckboxRadioSwitch>
 			<NcCheckboxRadioSwitch
 				ref="switchAllowPermitAll"
-				:checked.sync="appConfig.allowPermitAll"
+				v-model="appConfig.allowPermitAll"
 				type="switch"
-				@update:checked="onAllowPermitAllChange">
+				@update:model-value="onAllowPermitAllChange">
 				{{ t('forms', 'Allow sharing to all logged in accounts') }}
 			</NcCheckboxRadioSwitch>
 			<NcCheckboxRadioSwitch
 				ref="switchAllowShowToAll"
-				:checked.sync="appConfig.allowShowToAll"
+				v-model="appConfig.allowShowToAll"
 				type="switch"
-				@update:checked="onAllowShowToAllChange">
+				@update:model-value="onAllowShowToAllChange">
 				{{
 					t(
 						'forms',
@@ -56,14 +56,13 @@
 </template>
 
 <script>
+import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
-
 import logger from './utils/Logger.js'
 
 export default {
@@ -98,6 +97,7 @@ export default {
 			await this.saveAppConfig('restrictCreation', newVal)
 			el.loading = false
 		},
+
 		async onCreationAllowedGroupsChange(newVal) {
 			const el = this.$refs.switchRestrictCreation
 			el.loading = true
@@ -107,18 +107,21 @@ export default {
 			)
 			el.loading = false
 		},
+
 		async onAllowPublicLinkChange(newVal) {
 			const el = this.$refs.switchAllowPublicLink
 			el.loading = true
 			await this.saveAppConfig('allowPublicLink', newVal)
 			el.loading = false
 		},
+
 		async onAllowPermitAllChange(newVal) {
 			const el = this.$refs.switchAllowPermitAll
 			el.loading = true
 			await this.saveAppConfig('allowPermitAll', newVal)
 			el.loading = false
 		},
+
 		async onAllowShowToAllChange(newVal) {
 			const el = this.$refs.switchAllowShowToAll
 			el.loading = true

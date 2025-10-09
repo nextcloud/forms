@@ -5,7 +5,6 @@
 
 <template>
 	<NcListItem
-		ref="navigationItem"
 		:active="isActive"
 		:actions-aria-label="t('forms', 'Form actions')"
 		:counter-number="form.submissionCount"
@@ -106,32 +105,29 @@
 </template>
 
 <script>
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 import { getCurrentUser } from '@nextcloud/auth'
-import { generateOcsUrl } from '@nextcloud/router'
+import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
+import moment from '@nextcloud/moment'
+import { generateOcsUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
-import IconArchive from 'vue-material-design-icons/ArchiveOutline.vue'
 import IconArchiveOff from 'vue-material-design-icons/ArchiveOffOutline.vue'
+import IconArchive from 'vue-material-design-icons/ArchiveOutline.vue'
 import IconCheck from 'vue-material-design-icons/Check.vue'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
 import IconPoll from 'vue-material-design-icons/Poll.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
-
-import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
-
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import FormsIcon from './Icons/FormsIcon.vue'
-
-import { FormState } from '../models/Constants.ts'
 import PermissionTypes from '../mixins/PermissionTypes.js'
+import { FormState } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
 
 export default {
@@ -162,16 +158,26 @@ export default {
 			type: Object,
 			required: true,
 		},
+
 		forceDisplayActions: {
 			type: Boolean,
 			default: false,
 			required: false,
 		},
+
 		readOnly: {
 			type: Boolean,
-			default: true,
+			default: false,
 		},
 	},
+
+	emits: [
+		'mobile-close-navigation',
+		'open-sharing',
+		'clone',
+		'update-form-state',
+		'delete',
+	],
 
 	data() {
 		return {

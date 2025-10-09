@@ -7,7 +7,7 @@
 	<div class="pagination-block">
 		<div class="pagination-items">
 			<NcButton
-				type="tertiary"
+				variant="tertiary"
 				:disabled="totalPages === 1 || pageNumber <= 1"
 				:aria-label="t('forms', 'Go to first page')"
 				@click="pageNumber = 1">
@@ -16,7 +16,7 @@
 				</template>
 			</NcButton>
 			<NcButton
-				type="tertiary"
+				variant="tertiary"
 				:disabled="totalPages === 1 || pageNumber <= 1"
 				:aria-label="t('forms', 'Go to previous page')"
 				@click="pageNumber--">
@@ -42,7 +42,7 @@
 				</NcSelect>
 			</div>
 			<NcButton
-				type="tertiary"
+				variant="tertiary"
 				:disabled="totalPages === 1 || pageNumber >= totalPages"
 				:aria-label="t('forms', 'Go to next page')"
 				@click="pageNumber++">
@@ -51,7 +51,7 @@
 				</template>
 			</NcButton>
 			<NcButton
-				type="tertiary"
+				variant="tertiary"
 				:disabled="totalPages === 1 || pageNumber >= totalPages"
 				:aria-label="t('forms', 'Go to last page')"
 				@click="pageNumber = totalPages">
@@ -64,10 +64,10 @@
 </template>
 
 <script>
-import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconChevronRight from 'vue-material-design-icons/ChevronRight.vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
+import IconChevronRight from 'vue-material-design-icons/ChevronRight.vue'
 import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
 import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
 
@@ -87,15 +87,18 @@ export default {
 			type: Number,
 			required: true,
 		},
+
 		limit: {
 			type: Number,
 			default: 20,
 		},
+
 		offset: {
 			type: Number,
 			default: 0,
 		},
 	},
+
 	emits: ['update:offset'],
 
 	computed: {
@@ -105,13 +108,16 @@ export default {
 				(value, index) => 1 + index,
 			)
 		},
+
 		totalPages() {
 			return Math.max(1, Math.ceil(this.totalItemsCount / this.limit))
 		},
+
 		pageNumber: {
 			get() {
 				return Math.floor(this.offset / this.limit) + 1
 			},
+
 			set(pageNumber) {
 				this.$emit('update:offset', (pageNumber - 1) * this.limit)
 			},

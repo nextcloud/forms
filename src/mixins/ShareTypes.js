@@ -2,13 +2,11 @@
  * SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-/* eslint-disable import/no-unresolved */
-import IconUserSvg from '@mdi/svg/svg/account.svg?raw'
 import IconGroupSvg from '@mdi/svg/svg/account-group.svg?raw'
-import IconMailSvg from '@mdi/svg/svg/email.svg?raw'
+import IconUserSvg from '@mdi/svg/svg/account.svg?raw'
 import IconChatSvg from '@mdi/svg/svg/chat.svg?raw'
 import IconCircleSvg from '@mdi/svg/svg/circle-outline.svg?raw'
-/* eslint-enable import/no-unresolved */
+import IconMailSvg from '@mdi/svg/svg/email.svg?raw'
 
 export default {
 	data() {

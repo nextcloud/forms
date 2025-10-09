@@ -90,14 +90,14 @@
 </template>
 
 <script>
-import { showSuccess, showError } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
+import { showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import UserSearchMixin from '../../mixins/UserSearchMixin.js'
 import logger from '../../utils/Logger.js'
 
@@ -108,6 +108,7 @@ export default {
 		NcTextField,
 		NcSelectUsers,
 	},
+
 	mixins: [UserSearchMixin],
 
 	props: {
@@ -130,15 +131,18 @@ export default {
 			loading: false,
 		}
 	},
+
 	computed: {
 		canTransfer() {
 			return (
 				this.confirmationInput === this.confirmationString && !!this.selected
 			)
 		},
+
 		confirmationString() {
 			return `${this.form.ownerId}/${this.form.title}`
 		},
+
 		options() {
 			if (this.isValidQuery) {
 				// Suggestions without existing shares
@@ -148,19 +152,24 @@ export default {
 			return this.recommendations
 		},
 	},
+
 	methods: {
 		clearText() {
 			this.confirmationInput = ''
 		},
+
 		closeModal() {
 			this.showModal = false
 		},
+
 		escapedString(textToEscape) {
 			return '' + textToEscape.replace('<', '&lt;').replace('>', '&gt;')
 		},
+
 		openModal() {
 			this.showModal = true
 		},
+
 		async onOwnershipTransfer() {
 			this.showModal = false
 			if (this.form.id && this.selected.shareWith) {

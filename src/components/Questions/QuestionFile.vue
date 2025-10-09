@@ -32,10 +32,12 @@
 				<NcActionCheckbox
 					v-for="({ label: fileTypeLabel }, fileType) in fileTypes"
 					:key="fileType"
-					:checked="extraSettings?.allowedFileTypes?.includes(fileType)"
+					:model-value="
+						extraSettings?.allowedFileTypes?.includes(fileType)
+					"
 					:value="fileType"
 					class="file-type-checkbox"
-					@update:checked="onAllowedFileTypesChange(fileType, $event)">
+					@update:model-value="onAllowedFileTypesChange(fileType, $event)">
 					{{ fileTypeLabel }}
 				</NcActionCheckbox>
 
@@ -103,7 +105,7 @@
 				</NcListItem>
 				<li v-if="fileLoading" class="question__loading">
 					<NcLoadingIcon v-show="fileLoading" />
-					{{ t('forms', 'Uploading …') }}
+					{{ t('forms', 'Uploading …') }}
 				</li>
 				<li v-else-if="values.length < maxAllowedFilesCount">
 					<div class="question__input-wrapper">
@@ -140,12 +142,11 @@
 </template>
 
 <script>
-import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconFile from 'vue-material-design-icons/FileOutline.vue'
-import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlertOutline.vue'
-import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
-import IconUploadMultiple from 'vue-material-design-icons/UploadMultipleOutline.vue'
+import axios from '@nextcloud/axios'
+import { showError } from '@nextcloud/dialogs'
+import { formatFileSize } from '@nextcloud/files'
+import { loadState } from '@nextcloud/initial-state'
+import { generateOcsUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -153,15 +154,17 @@ import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
+import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlertOutline.vue'
+import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
+import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
+import IconUploadMultiple from 'vue-material-design-icons/UploadMultipleOutline.vue'
+import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
-import axios from '@nextcloud/axios'
 import fileTypes from '../../models/FileTypes.js'
 import logger from '../../utils/Logger.js'
-import { generateOcsUrl } from '@nextcloud/router'
-import { loadState } from '@nextcloud/initial-state'
-import { showError } from '@nextcloud/dialogs'
-import { formatFileSize } from '@nextcloud/files'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
 /**
  * A constant object representing file size units in bytes.
@@ -195,9 +198,12 @@ export default {
 		NcButton,
 		NcListItem,
 		NcLoadingIcon,
+		Question,
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values'],
+
 	data() {
 		return {
 			fileTypes,

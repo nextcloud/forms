@@ -3,18 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { FormsOption } from '../models/Entities'
+import type { FormsOption } from '../models/Entities.d.ts'
 
+import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { translate as t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
-
-import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
-import axios from '@nextcloud/axios'
 import debounce from 'debounce'
-import logger from '../utils/Logger'
+import { defineComponent } from 'vue'
+import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import logger from '../utils/Logger.js'
 
 export default defineComponent({
 	computed: {
@@ -91,7 +90,7 @@ export default defineComponent({
 		/**
 		 * Set focus on next AnswerInput
 		 *
-		 * @param {number} index Index of current option
+		 * @param index Index of current option
 		 */
 		focusNextInput(index: number) {
 			this.focusIndex(index + 1)
@@ -100,7 +99,7 @@ export default defineComponent({
 		/**
 		 * Focus the input matching the index
 		 *
-		 * @param {number} index the value index
+		 * @param index the value index
 		 */
 		focusIndex(index: number) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
@@ -122,8 +121,7 @@ export default defineComponent({
 		 * Handles the creation of a new answer option.
 		 *
 		 * @param index the index of the answer
-		 * @param {FormsOption} answer - The new answer option to be added.
-		 * @return {void}
+		 * @param answer - The new answer option to be added.
 		 */
 		onCreateAnswer(index: number, answer: FormsOption): void {
 			this.$nextTick(() => {
@@ -136,7 +134,7 @@ export default defineComponent({
 		 * Update the options
 		 * This will handle updating the form (emitting the changes) and update last changed property
 		 *
-		 * @param {Array} options options to change
+		 * @param options options to change
 		 */
 		updateOptions(options: FormsOption[]) {
 			this.$emit('update:options', options)
@@ -146,8 +144,8 @@ export default defineComponent({
 		/**
 		 * Update an existing answer locally
 		 *
-		 * @param {string|number} index the current index to update
-		 * @param {object} answer the new answer value
+		 * @param index the current index to update
+		 * @param answer the new answer value
 		 */
 		updateAnswer(index: number, answer: FormsOption) {
 			const options = [...this.sortedOptions]
@@ -178,7 +176,7 @@ export default defineComponent({
 		/**
 		 * Delete an option
 		 *
-		 * @param {number} id the options id
+		 * @param id the options id
 		 */
 		deleteOption(id: number) {
 			const index = this.sortedOptions.findIndex((option) => option.id === id)
@@ -203,7 +201,7 @@ export default defineComponent({
 		 * Delete the option from Db in background.
 		 * Restore option if delete not possible
 		 *
-		 * @param {object} option The option to delete
+		 * @param option The option to delete
 		 */
 		deleteOptionFromDatabase(option: FormsOption & { local?: boolean }) {
 			const optionIndex = this.options.findIndex(
@@ -240,8 +238,8 @@ export default defineComponent({
 		/**
 		 * Restore an option locally
 		 *
-		 * @param {FormsOption} option the option
-		 * @param {number} index the options index in this.options
+		 * @param option the option
+		 * @param index the options index in this.options
 		 */
 		restoreOption(option: FormsOption, index: number) {
 			const options = this.options.slice()
@@ -259,7 +257,7 @@ export default defineComponent({
 
 				await axios.patch(
 					generateOcsUrl(
-						`apps/forms/api/v3/forms/{id}/questions/{questionId}/options`,
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
 						{
 							id: this.formId,
 							questionId: this.id,
@@ -278,7 +276,8 @@ export default defineComponent({
 
 		/**
 		 * Reorder option by moving it upwards the list
-		 * @param {number} index Option that should move up
+		 *
+		 * @param index Option that should move up
 		 */
 		onOptionMoveUp(index: number) {
 			if (index > 0) {
@@ -288,7 +287,8 @@ export default defineComponent({
 
 		/**
 		 * Reorder option by moving it downwards the list
-		 * @param {number} index Option that should move down
+		 *
+		 * @param index Option that should move down
 		 */
 		onOptionMoveDown(index: number) {
 			if (index === this.sortedOptions.length - 1) {

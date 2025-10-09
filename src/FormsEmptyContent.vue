@@ -10,7 +10,7 @@
 				:name="currentModel.title"
 				:description="currentModel.description">
 				<template #icon>
-					<Icon :is="currentModel.icon" :size="64" />
+					<component :is="currentModel.icon" :size="64" />
 				</template>
 			</NcEmptyContent>
 		</NcAppContent>
@@ -48,15 +48,18 @@ export default {
 					description: t('forms', 'This form does not exist'),
 					icon: FormsIcon,
 				},
+
 				expired: {
 					title: t('forms', 'Form expired'),
 					description: t(
 						'forms',
 						'This form has expired and is no longer taking answers',
 					),
+
 					icon: IconCheck,
 				},
 			},
+
 			renderAs: loadState(appName, 'renderAs'),
 		}
 	},

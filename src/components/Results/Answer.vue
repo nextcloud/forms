@@ -37,10 +37,11 @@
 </template>
 
 <script>
-import IconFile from 'vue-material-design-icons/FileOutline.vue'
 import NcHighlight from '@nextcloud/vue/components/NcHighlight'
+import IconFile from 'vue-material-design-icons/FileOutline.vue'
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Answer',
 	components: {
 		IconFile,
@@ -53,19 +54,23 @@ export default {
 			required: false,
 			default: () => [],
 		},
+
 		answerText: {
 			type: String,
 			required: false,
 			default: '',
 		},
+
 		questionText: {
 			type: String,
 			required: true,
 		},
+
 		questionType: {
 			type: String,
 			required: true,
 		},
+
 		highlight: {
 			type: String,
 			required: false,

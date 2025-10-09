@@ -85,7 +85,7 @@
 			<NcDateTimePicker
 				:value="time"
 				:disabled="!readOnly"
-				:formatter="formatter"
+				:format="stringify"
 				:placeholder="datetimePickerPlaceholder"
 				:show-second="false"
 				:type="dateTimePickerType"
@@ -99,16 +99,16 @@
 </template>
 
 <script>
-import svgClockLoader20 from '../../../img/clock_loader_20.svg?raw'
-import svgClockLoader80 from '../../../img/clock_loader_80.svg?raw'
-import svgEventIcon from '../../../img/event.svg?raw'
-import svgTodayIcon from '../../../img/today.svg?raw'
-
 import moment from '@nextcloud/moment'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import Question from './Question.vue'
+import svgClockLoader20 from '../../../img/clock_loader_20.svg?raw'
+import svgClockLoader80 from '../../../img/clock_loader_80.svg?raw'
+import svgEventIcon from '../../../img/event.svg?raw'
+import svgTodayIcon from '../../../img/today.svg?raw'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
 export default {
@@ -119,20 +119,19 @@ export default {
 		NcActionInput,
 		NcDateTimePicker,
 		NcIconSvgWrapper,
+		Question,
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values'],
 
 	data() {
 		return {
-			formatter: {
-				stringify: this.stringify,
-				parse: this.parse,
-			},
 			extraSettingsFormatter: {
 				stringify: this.stringifyDate,
 				parse: this.parseTimestampToDate,
 			},
+
 			svgClockLoader80,
 			svgClockLoader20,
 			svgEventIcon,
@@ -241,6 +240,7 @@ export default {
 		stringify(date) {
 			return moment(date).format(this.answerType.momentFormat)
 		},
+
 		/**
 		 * Reinterpret a stored date
 		 *
@@ -286,7 +286,7 @@ export default {
 		 *                          If true, the date range is enabled; otherwise, null.
 		 */
 		onDateRangeChange(value) {
-			this.onExtraSettingsChange({ dateRange: value === true ?? null })
+			this.onExtraSettingsChange({ dateRange: value === true ? true : null })
 		},
 
 		/**
@@ -299,7 +299,10 @@ export default {
 			this.onExtraSettingsChange({
 				timeMax:
 					value === null
-					|| value === new Date(new Date().setHours(24, 0, 0, 0))
+					|| (value
+						&& value.getTime
+						&& value.getTime()
+							=== new Date(new Date().setHours(24, 0, 0, 0)).getTime())
 						? null
 						: moment(value).format(this.answerType.storageFormat),
 			})
@@ -315,7 +318,10 @@ export default {
 			this.onExtraSettingsChange({
 				timeMin:
 					value === null
-					|| value === new Date(new Date().setHours(0, 0, 0, 0))
+					|| (value
+						&& value.getTime
+						&& value.getTime()
+							=== new Date(new Date().setHours(0, 0, 0, 0)).getTime())
 						? null
 						: moment(value).format(this.answerType.storageFormat),
 			})
@@ -329,7 +335,7 @@ export default {
 		 *                          If true, the date range is enabled; otherwise, null.
 		 */
 		onTimeRangeChange(value) {
-			this.onExtraSettingsChange({ timeRange: value === true ?? null })
+			this.onExtraSettingsChange({ timeRange: value === true ? true : null })
 		},
 
 		/**

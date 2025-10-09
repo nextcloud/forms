@@ -25,8 +25,8 @@
 
 <script>
 import QRCode from 'qrcode'
-
 import NcDialog from '@nextcloud/vue/components/NcDialog'
+import logger from '../utils/Logger.js'
 
 export default {
 	name: 'QRDialog',
@@ -40,6 +40,7 @@ export default {
 			type: String,
 			default: '',
 		},
+
 		text: {
 			type: String,
 			default: '',
@@ -54,6 +55,7 @@ export default {
 				type: String,
 				default: '',
 			},
+
 			isOpen: {
 				type: Boolean,
 				default: false,
@@ -79,7 +81,7 @@ export default {
 						width: 256,
 					})
 				} catch (err) {
-					console.error(err)
+					logger.error(err)
 				}
 			} else {
 				this.uri = null

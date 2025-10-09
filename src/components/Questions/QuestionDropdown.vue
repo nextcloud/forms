@@ -13,8 +13,8 @@
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
-				:checked="extraSettings?.shuffleOptions"
-				@update:checked="onShuffleOptionsChange">
+				:model-value="extraSettings?.shuffleOptions"
+				@update:model-value="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
 			<NcActionButton close-after-click @click="isOptionDialogShown = true">
@@ -90,16 +90,14 @@
 
 <script>
 import Draggable from 'vuedraggable'
-
-import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
-
 import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
-
-import AnswerInput from './AnswerInput.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
+import AnswerInput from './AnswerInput.vue'
+import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
 
@@ -115,9 +113,11 @@ export default {
 		NcLoadingIcon,
 		NcSelect,
 		OptionInputDialog,
+		Question,
 	},
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
+	emits: ['update:values'],
 
 	data() {
 		return {

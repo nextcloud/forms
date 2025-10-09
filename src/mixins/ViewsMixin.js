@@ -4,16 +4,15 @@
  */
 
 import { getCurrentUser } from '@nextcloud/auth'
-import { generateOcsUrl } from '@nextcloud/router'
+import axios, { isCancel } from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
-import axios, { isCancel } from '@nextcloud/axios'
-import MarkdownIt from 'markdown-it'
-
-import CancelableRequest from '../utils/CancelableRequest.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
-import logger from '../utils/Logger.js'
 import moment from '@nextcloud/moment'
+import { generateOcsUrl } from '@nextcloud/router'
+import MarkdownIt from 'markdown-it'
+import CancelableRequest from '../utils/CancelableRequest.js'
+import logger from '../utils/Logger.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 export default {
 	provide() {

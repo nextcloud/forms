@@ -20,7 +20,7 @@
 		<NcEmptyContent
 			v-if="isLoadingForm"
 			class="forms-emptycontent"
-			:name="t('forms', 'Loading {title} …', { title: form.title })">
+			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -29,6 +29,7 @@
 		<template v-else>
 			<!-- Forms title & description-->
 			<header>
+				<!-- eslint-disable-next-line vue/no-unused-refs -->
 				<h2 ref="title" class="form-title" dir="auto">
 					{{ formTitle }}
 				</h2>
@@ -51,7 +52,7 @@
 			<NcEmptyContent
 				v-if="loading"
 				class="forms-emptycontent"
-				:name="t('forms', 'Submitting form …')">
+				:name="t('forms', 'Submitting form …')">
 				<template #icon>
 					<NcLoadingIcon :size="64" />
 				</template>
@@ -105,7 +106,7 @@
 			<!-- Questions list -->
 			<form v-else ref="form" @submit.prevent="onSubmit">
 				<ul>
-					<Questions
+					<component
 						:is="answerTypes[question.type].component"
 						v-for="(question, index) in validQuestions"
 						ref="questions"
@@ -194,43 +195,40 @@
 </template>
 
 <script>
-import { loadState } from '@nextcloud/initial-state'
-import { generateOcsUrl } from '@nextcloud/router'
-import { showError } from '@nextcloud/dialogs'
-import { emit } from '@nextcloud/event-bus'
-
-import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
-import NcAppContent from '@nextcloud/vue/components/NcAppContent'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import NcDialog from '@nextcloud/vue/components/NcDialog'
-import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
-import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-
 import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
 import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
 import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
 import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
-
+import axios from '@nextcloud/axios'
+import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
+import { loadState } from '@nextcloud/initial-state'
+import moment from '@nextcloud/moment'
+import { generateOcsUrl } from '@nextcloud/router'
+import NcAppContent from '@nextcloud/vue/components/NcAppContent'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
+import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import Question from '../components/Questions/Question.vue'
+import QuestionLong from '../components/Questions/QuestionLong.vue'
+import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import QuestionShort from '../components/Questions/QuestionShort.vue'
+import TopBar from '../components/TopBar.vue'
+import ViewsMixin from '../mixins/ViewsMixin.js'
+import answerTypes from '../models/AnswerTypes.js'
 import {
 	FormState,
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
-import answerTypes from '../models/AnswerTypes.js'
 import logger from '../utils/Logger.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
-
-import Question from '../components/Questions/Question.vue'
-import QuestionLong from '../components/Questions/QuestionLong.vue'
-import QuestionShort from '../components/Questions/QuestionShort.vue'
-import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
-import TopBar from '../components/TopBar.vue'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
-import ViewsMixin from '../mixins/ViewsMixin.js'
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Submit',
 
 	components: {
@@ -280,8 +278,9 @@ export default {
 		isLoggedIn: {
 			type: Boolean,
 			required: false,
-			default: true,
+			default: false,
 		},
+
 		shareHash: {
 			type: String,
 			default: '',
@@ -304,6 +303,7 @@ export default {
 			answerTypes,
 			/**
 			 * Mapping of questionId => answers
+			 *
 			 * @type {Record<number, string[]>}
 			 */
 			answers: {},
@@ -491,9 +491,10 @@ export default {
 		},
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		window.removeEventListener('beforeunload', this.beforeWindowUnload)
 	},
+
 	created() {
 		window.addEventListener('beforeunload', this.beforeWindowUnload)
 	},
@@ -520,6 +521,7 @@ export default {
 	methods: {
 		/**
 		 * Load saved values for current form from LocalStorage
+		 *
 		 * @return {Record<string,any>}
 		 */
 		getFormValuesFromLocalStorage() {
@@ -562,6 +564,7 @@ export default {
 
 		/**
 		 * Save updated answers for question to LocalStorage in case of browser crash / closes / etc
+		 *
 		 * @param {*} question Question to update
 		 */
 		addFormFieldToLocalStorage(question) {
@@ -669,6 +672,7 @@ export default {
 
 		/**
 		 * Update answers of a give value
+		 *
 		 * @param {{id: number}} question The question to answer
 		 * @param {unknown[]} values The new values
 		 */
@@ -862,6 +866,7 @@ export default {
 	},
 }
 </script>
+
 <style lang="scss" scoped>
 @import '../scssmixins/markdownOutput';
 

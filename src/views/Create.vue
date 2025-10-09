@@ -20,7 +20,7 @@
 		<NcEmptyContent
 			v-if="isLoadingForm"
 			class="emtpycontent"
-			:name="t('forms', 'Loading {title} …', { title: form.title })">
+			:name="t('forms', 'Loading {title} …', { title: form.title })">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -148,7 +148,6 @@
 				<!-- Add new questions menu -->
 				<div class="question-menu">
 					<NcActions
-						ref="questionMenu"
 						:open.sync="questionMenuOpened"
 						:menu-name="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
@@ -165,7 +164,7 @@
 							class="question-menu__question"
 							@click="addQuestion(type)">
 							<template #icon>
-								<Icon :is="answer.icon" :size="20" />
+								<component :is="answer.icon" :size="20" />
 							</template>
 							{{ answer.label }}
 						</NcActionButton>
@@ -177,15 +176,14 @@
 </template>
 
 <script>
-import { generateOcsUrl } from '@nextcloud/router'
-import { loadState } from '@nextcloud/initial-state'
+import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
-import axios from '@nextcloud/axios'
+import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
+import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import Draggable from 'vuedraggable'
-
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
@@ -194,22 +192,22 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconLock from 'vue-material-design-icons/LockOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
-
-import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
-import answerTypes from '../models/AnswerTypes.js'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
+import answerTypes from '../models/AnswerTypes.js'
+import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
-import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import SetWindowTitle from '../utils/SetWindowTitle.js'
 
 window.axios = axios
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Create',
 	components: {
 		Draggable,
@@ -299,7 +297,8 @@ export default {
 
 		// Remove properties from answerTypes for create button
 		answerTypesFilter() {
-			// Extract property datetime from answerTypes and copy rest to filteredAnswerTypes
+			// Remove 'datetime' from answerTypes for create button
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { datetime, ...filteredAnswerTypes } = answerTypes
 			return filteredAnswerTypes
 		},
@@ -316,7 +315,7 @@ export default {
 		},
 
 		// Update Window-Title on title change
-		'form.title'() {
+		'form.title': function () {
 			SetWindowTitle(this.formTitle)
 		},
 
@@ -344,12 +343,14 @@ export default {
 				this.onQuestionOrderChange()
 			}
 		},
+
 		onMoveDown(index) {
 			// only if not the last one
 			if (index < this.form.questions.length - 1) {
 				this.onMoveUp(index + 1)
 			}
 		},
+
 		onTitleChange() {
 			this.resizeTitle()
 			this.saveTitle()
@@ -397,6 +398,7 @@ export default {
 		saveTitle: debounce(async function () {
 			this.saveFormProperty('title')
 		}, INPUT_DEBOUNCE_MS),
+
 		saveDescription: debounce(async function () {
 			this.saveFormProperty('description')
 		}, INPUT_DEBOUNCE_MS),
@@ -423,16 +425,12 @@ export default {
 				const question = OcsResponse2Data(response)
 
 				// Add newly created question
-				this.form.questions.push(
-					Object.assign(
-						{
-							text,
-							type,
-							answers: [],
-						},
-						question,
-					),
-				)
+				this.form.questions.push({
+					text,
+					type,
+					answers: [],
+					...question,
+				})
 
 				// Focus newly added question
 				this.$nextTick(() => {
@@ -507,14 +505,10 @@ export default {
 				)
 				const question = OcsResponse2Data(response)
 
-				this.form.questions.push(
-					Object.assign(
-						{
-							answers: [],
-						},
-						question,
-					),
-				)
+				this.form.questions.push({
+					answers: [],
+					...question,
+				})
 
 				this.$nextTick(() => {
 					const lastQuestion =

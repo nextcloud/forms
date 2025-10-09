@@ -17,7 +17,7 @@
 			button-variant-grouped="horizontal"
 			type="radio"
 			:value="option.id"
-			@update:modelValue="$emit('update:active', option)">
+			@update:model-value="$emit('update:active', option)">
 			<template v-if="option.icon" #icon>
 				<NcIconSvgWrapper :path="option.icon" />
 			</template>
@@ -65,6 +65,8 @@ export default {
 			required: true,
 		},
 	},
+
+	emits: ['update:active'],
 
 	setup() {
 		return {
