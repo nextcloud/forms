@@ -3,6 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
+import IconCalendar from 'vue-material-design-icons/CalendarOutline.vue'
+import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
+import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
+import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
+import IconTextLong from 'vue-material-design-icons/TextLong.vue'
+import IconTextShort from 'vue-material-design-icons/TextShort.vue'
+import IconLinearScale from '../components/Icons/IconLinearScale.vue'
+import IconPalette from '../components/Icons/IconPalette.vue'
 import QuestionColor from '../components/Questions/QuestionColor.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
@@ -11,17 +21,6 @@ import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
-
-import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
-import IconCalendar from 'vue-material-design-icons/CalendarOutline.vue'
-import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
-import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
-import IconFile from 'vue-material-design-icons/FileOutline.vue'
-import IconLinearScale from '../components/Icons/IconLinearScale.vue'
-import IconPalette from '../components/Icons/IconPalette.vue'
-import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
-import IconTextLong from 'vue-material-design-icons/TextLong.vue'
-import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 
 /**
  * @typedef {object} AnswerTypes

@@ -26,15 +26,13 @@
 </template>
 
 <script>
+import IconCheck from '@mdi/svg/svg/check.svg?raw'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
-
-import IconCheck from '@mdi/svg/svg/check.svg?raw'
-
-import { defineComponent } from 'vue'
 
 export default defineComponent({
 	name: 'OptionInputDialog',
@@ -52,7 +50,7 @@ export default defineComponent({
 		},
 	},
 
-	emits: ['update:open'],
+	emits: ['update:open', 'multiple-answers'],
 
 	data() {
 		return {

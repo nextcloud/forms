@@ -1,9 +1,9 @@
+import { showError, showSuccess } from '@nextcloud/dialogs'
 /**
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
 import logger from '../utils/Logger.js'
 
 export default {
@@ -19,7 +19,7 @@ export default {
 				window.location.protocol
 				+ '//'
 				+ window.location.host
-				+ generateUrl(`/apps/forms/${this.form.hash}`)
+				+ generateUrl(`/apps/forms/${formHash}`)
 			)
 		},
 
@@ -41,6 +41,7 @@ export default {
 
 		/**
 		 * Check if a share can be used for embedding
+		 *
 		 * @param {{ shareType: number, permissions: string[] }} share The share to check
 		 */
 		isEmbeddingAllowed(share) {

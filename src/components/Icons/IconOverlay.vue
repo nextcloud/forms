@@ -12,8 +12,6 @@
 	</span>
 </template>
 
-<script setup></script>
-
 <style scoped>
 .icon-overlay-wrapper {
 	position: relative;

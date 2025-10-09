@@ -41,7 +41,7 @@
 				:container="`#${validationTypeMenuId}`"
 				:open.sync="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
-				type="tertiary-no-background">
+				variant="tertiary-no-background">
 				<template #icon>
 					<component :is="validationObject.icon" :size="20" />
 				</template>
@@ -75,15 +75,14 @@
 </template>
 
 <script>
-import { splitRegex, validateExpression } from '../../utils/RegularExpression.js'
-
-import validationTypes from '../../models/ValidationTypes.js'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
-
-import IconRegex from 'vue-material-design-icons/Regex.vue'
-import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import IconRegex from 'vue-material-design-icons/Regex.vue'
+import Question from './Question.vue'
+import QuestionMixin from '../../mixins/QuestionMixin.js'
+import validationTypes from '../../models/ValidationTypes.js'
+import { splitRegex, validateExpression } from '../../utils/RegularExpression.js'
 
 export default {
 	name: 'QuestionShort',
@@ -93,9 +92,11 @@ export default {
 		NcActions,
 		NcActionInput,
 		NcActionRadio,
+		Question,
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values'],
 
 	data() {
 		return {
@@ -103,6 +104,7 @@ export default {
 			isValidationTypeMenuOpen: false,
 		}
 	},
+
 	computed: {
 		submissionInputPlaceholder() {
 			if (!this.readOnly) {
@@ -116,24 +118,28 @@ export default {
 				|| this.answerType.submitPlaceholder
 			)
 		},
+
 		/**
 		 * Current user input validation type
 		 */
 		validationObject() {
 			return validationTypes[this.validationType]
 		},
+
 		/**
 		 * Name of the current validation type, fallsback to 'text'
 		 */
 		validationType() {
 			return this.extraSettings?.validationType || 'text'
 		},
+
 		/**
 		 * Id of the validation type menu
 		 */
 		validationTypeMenuId() {
 			return 'q' + this.index + '__validation_menu'
 		},
+
 		/**
 		 * The regular expression
 		 */

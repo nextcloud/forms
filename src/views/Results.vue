@@ -182,7 +182,7 @@
 		<NcEmptyContent
 			v-if="loadingResults"
 			class="forms-emptycontent"
-			:name="t('forms', 'Loading responses …')">
+			:name="t('forms', 'Loading responses …')">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -271,58 +271,55 @@
 </template>
 
 <script>
+import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
+import IconFileDelimitedSvg from '@mdi/svg/svg/file-delimited-outline.svg?raw'
+import IconFileExcelOutlineSvg from '@mdi/svg/svg/file-excel-outline.svg?raw'
+import IconLinkVariantOffSvg from '@mdi/svg/svg/link-off.svg?raw'
+import IconLinkSvg from '@mdi/svg/svg/link.svg?raw'
+import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
 import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
+import axios from '@nextcloud/axios'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import moment from '@nextcloud/moment'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { useIsSmallMobile } from '@nextcloud/vue'
-
-import NcActions from '@nextcloud/vue/components/NcActions'
+import debounce from 'debounce'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import axios from '@nextcloud/axios'
-import moment from '@nextcloud/moment'
-
-import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
-import IconDownload from 'vue-material-design-icons/TrayArrowDown.vue'
 import IconFileDelimited from 'vue-material-design-icons/FileDelimitedOutline.vue'
-import IconFileDelimitedSvg from '@mdi/svg/svg/file-delimited-outline.svg?raw'
 import IconFileExcelOutline from 'vue-material-design-icons/FileExcelOutline.vue'
-import IconFileExcelOutlineSvg from '@mdi/svg/svg/file-excel-outline.svg?raw'
 import IconFolder from 'vue-material-design-icons/FolderOutline.vue'
 import IconLink from 'vue-material-design-icons/Link.vue'
-import IconLinkSvg from '@mdi/svg/svg/link.svg?raw'
 import IconLinkVariantOff from 'vue-material-design-icons/LinkOff.vue'
-import IconLinkVariantOffSvg from '@mdi/svg/svg/link-off.svg?raw'
+import IconMagnify from 'vue-material-design-icons/Magnify.vue'
 import IconPoll from 'vue-material-design-icons/Poll.vue'
 import IconRefresh from 'vue-material-design-icons/Refresh.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
 import IconTable from 'vue-material-design-icons/Table.vue'
-import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
-import IconMagnify from 'vue-material-design-icons/Magnify.vue'
-
-import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
+import IconDownload from 'vue-material-design-icons/TrayArrowDown.vue'
+import PaginationToolbar from '../components/PaginationToolbar.vue'
+import PillMenu from '../components/PillMenu.vue'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
+import PermissionTypes from '../mixins/PermissionTypes.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
+import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
-import SetWindowTitle from '../utils/SetWindowTitle.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
-import PaginationToolbar from '../components/PaginationToolbar.vue'
-import PermissionTypes from '../mixins/PermissionTypes.js'
-import PillMenu from '../components/PillMenu.vue'
-import debounce from 'debounce'
+import SetWindowTitle from '../utils/SetWindowTitle.js'
 
 const SUPPORTED_FILE_FORMATS = {
 	ods: IconTableSvg,
@@ -343,6 +340,7 @@ const responseViews = [
 ]
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Results',
 
 	components: {
@@ -376,6 +374,7 @@ export default {
 	},
 
 	mixins: [PermissionTypes, ViewsMixin],
+	emits: ['update:form'],
 
 	setup() {
 		return {
@@ -423,6 +422,7 @@ export default {
 					},
 				},
 			],
+
 			confirmDeleteButtons: [
 				{
 					label: t('forms', 'Cancel'),
@@ -503,15 +503,18 @@ export default {
 			this.loadFormResults()
 			SetWindowTitle(this.formTitle)
 		},
+
 		limit() {
 			this.loadFormResults()
 		},
+
 		offset() {
 			// Only load results if we're not changing offset from submissionSearch watch
 			if (!this.skipReloadOnOffsetChange) {
 				this.loadFormResults()
 			}
 		},
+
 		submissionSearch: debounce(function () {
 			this.skipReloadOnOffsetChange = true
 			this.offset = 0
@@ -728,7 +731,7 @@ export default {
 		 *
 		 * @param {string} submissionUser - The ID of the user who created the submission.
 		 * @return {boolean} - Returns true if the submission can be deleted, otherwise false.
-		 *                     	A submission can be deleted if:
+		 *                      A submission can be deleted if:
 		 *                      - The user has the `canDeleteSubmissions` permission, or
 		 *                      - The form allows editing (`form.allowEditSubmissions`) and the current user is the owner of the submission.
 		 */
@@ -850,7 +853,7 @@ export default {
 			)
 				.setMultiSelect(false)
 				.allowDirectories(true)
-				.setButtonFactory((selectedNodes, currentPath, currentView) => {
+				.setButtonFactory((selectedNodes) => {
 					if (selectedNodes.length === 1) {
 						const extension = selectedNodes[0].extension
 							?.slice(1)

@@ -56,14 +56,13 @@
 </template>
 
 <script>
+import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
-
 import logger from './utils/Logger.js'
 
 export default {
@@ -98,6 +97,7 @@ export default {
 			await this.saveAppConfig('restrictCreation', newVal)
 			el.loading = false
 		},
+
 		async onCreationAllowedGroupsChange(newVal) {
 			const el = this.$refs.switchRestrictCreation
 			el.loading = true
@@ -107,18 +107,21 @@ export default {
 			)
 			el.loading = false
 		},
+
 		async onAllowPublicLinkChange(newVal) {
 			const el = this.$refs.switchAllowPublicLink
 			el.loading = true
 			await this.saveAppConfig('allowPublicLink', newVal)
 			el.loading = false
 		},
+
 		async onAllowPermitAllChange(newVal) {
 			const el = this.$refs.switchAllowPermitAll
 			el.loading = true
 			await this.saveAppConfig('allowPermitAll', newVal)
 			el.loading = false
 		},
+
 		async onAllowShowToAllChange(newVal) {
 			const el = this.$refs.switchAllowShowToAll
 			el.loading = true

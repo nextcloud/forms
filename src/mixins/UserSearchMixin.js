@@ -1,15 +1,14 @@
+import { getCurrentUser } from '@nextcloud/auth'
+import axios from '@nextcloud/axios'
 /**
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { generateOcsUrl } from '@nextcloud/router'
-import { getCurrentUser } from '@nextcloud/auth'
-import axios from '@nextcloud/axios'
 import debounce from 'debounce'
-
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import logger from '../utils/Logger.js'
+import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import ShareTypes from './ShareTypes.js'
 
 export default {
@@ -149,6 +148,7 @@ export default {
 		},
 		/**
 		 * A OCS Sharee response
+		 *
 		 * @typedef {{label: string, shareWithDisplayNameUnique: string, value: { shareType: number, shareWith: string }, status?: unknown }} Sharee
 		 */
 

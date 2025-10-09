@@ -8,7 +8,7 @@
  *
  * @param {string} formTitle Title of current form to set on window.
  */
-const SetWindowTitle = function (formTitle) {
+function SetWindowTitle(formTitle) {
 	if (formTitle === '') {
 		window.document.title = t('forms', 'Forms') + ' - ' + OC.theme.title
 	} else {

@@ -10,10 +10,10 @@
 			:loading="showLoadingCircle"
 			:disabled="locked"
 			:options="options"
-			:placeholder="t('forms', 'Search for user, group or team …')"
-			:aria-label-listbox="t('forms', 'Search for user, group or team …')"
+			:placeholder="t('forms', 'Search for user, group or team …')"
+			:aria-label-listbox="t('forms', 'Search for user, group or team …')"
 			@search="asyncSearch"
-			@update:modelValue="addShare">
+			@update:model-value="addShare">
 			<template #no-options>
 				{{ noResultText }}
 			</template>
@@ -23,7 +23,6 @@
 
 <script>
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
-
 import UserSearchMixin from '../../mixins/UserSearchMixin.js'
 
 export default {
@@ -38,15 +37,19 @@ export default {
 			type: Array,
 			default: () => [],
 		},
+
 		showLoading: {
 			type: Boolean,
 			default: false,
 		},
+
 		locked: {
 			type: Boolean,
 			required: true,
 		},
 	},
+
+	emits: ['add-share'],
 
 	computed: {
 		/**

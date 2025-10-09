@@ -39,7 +39,7 @@ export function validateExpression(input) {
 	try {
 		;(() => new RegExp(pattern, modifiers))()
 		return true
-	} catch (e) {
+	} catch {
 		return false
 	}
 }

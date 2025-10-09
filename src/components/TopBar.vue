@@ -34,13 +34,11 @@
 import { mdiEyeOutline, mdiPencilOutline, mdiPoll } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
-
 import NcButton from '@nextcloud/vue/components/NcButton'
 import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
-
-import logger from '../utils/Logger.js'
-import PermissionTypes from '../mixins/PermissionTypes.js'
 import PillMenu from './PillMenu.vue'
+import PermissionTypes from '../mixins/PermissionTypes.js'
+import logger from '../utils/Logger.js'
 
 const submitView = {
 	ariaLabel: t('forms', 'View form'),
@@ -100,6 +98,8 @@ export default {
 		},
 	},
 
+	emits: ['share-form'],
+
 	setup() {
 		return {
 			t,
@@ -112,6 +112,7 @@ export default {
 		currentView() {
 			return this.availableViews.filter((v) => v.id === this.$route.name)[0]
 		},
+
 		availableViews() {
 			const views = []
 			if (this.canSubmit) {
@@ -128,25 +129,30 @@ export default {
 			}
 			return views
 		},
+
 		canSubmit() {
 			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
 		},
+
 		canEdit() {
 			return (
 				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
 				&& !this.archived
 			)
 		},
+
 		canSeeResults() {
 			return (
 				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
 				|| this.submissionCount > 0
 			)
 		},
+
 		canShare() {
 			// This probably can get a permission of itself
 			return this.canEdit
 		},
+
 		canOnlySubmit() {
 			return (
 				this.permissions.length === 1

@@ -64,7 +64,7 @@
 				:disabled-date="notBeforeToday"
 				:disabled-time="notBeforeNow"
 				:editable="false"
-				:formatter="formatter"
+				:format="formatter"
 				:minute-step="5"
 				:show-second="false"
 				:value="expirationDate"
@@ -174,19 +174,18 @@
 
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
+import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
+import { directive as ClickOutside } from 'v-click-outside'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import ShareTypes from '../../mixins/ShareTypes.js'
 import TransferOwnership from './TransferOwnership.vue'
-
-import { directive as ClickOutside } from 'v-click-outside'
-import { loadState } from '@nextcloud/initial-state'
-import { FormState } from '../../models/Constants.ts'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
+import ShareTypes from '../../mixins/ShareTypes.js'
+import { FormState } from '../../models/Constants.ts'
 
 export default {
 	components: {
@@ -223,12 +222,15 @@ export default {
 		},
 	},
 
+	emits: ['update:formProp'],
+
 	data() {
 		return {
 			formatter: {
 				stringify: this.stringifyDate,
 				parse: this.parseTimestampToDate,
 			},
+
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
@@ -261,6 +263,7 @@ export default {
 		disableSubmitMultiple() {
 			return this.hasPublicLink || this.form.isAnonymous
 		},
+
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {
 				return t(
@@ -270,6 +273,7 @@ export default {
 			}
 			return ''
 		},
+
 		hasPublicLink() {
 			return (
 				this.form.shares.filter(
@@ -298,9 +302,11 @@ export default {
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
+
 		expirationDate() {
 			return moment(this.form.expires, 'X').toDate()
 		},
+
 		/**
 		 * The submission message rendered as HTML
 		 */
@@ -318,12 +324,15 @@ export default {
 		onAnonChange(checked) {
 			this.$emit('update:formProp', 'isAnonymous', checked)
 		},
+
 		onSubmitMultipleChange(checked) {
 			this.$emit('update:formProp', 'submitMultiple', checked)
 		},
+
 		onAllowEditSubmissionsChange(checked) {
 			this.$emit('update:formProp', 'allowEditSubmissions', checked)
 		},
+
 		onFormExpiresChange(checked) {
 			if (checked) {
 				this.$emit(
@@ -335,6 +344,7 @@ export default {
 				this.$emit('update:formProp', 'expires', 0)
 			}
 		},
+
 		onShowExpirationChange(checked) {
 			this.$emit('update:formProp', 'showExpiration', checked)
 		},
