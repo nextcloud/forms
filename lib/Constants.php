@@ -71,12 +71,18 @@ class Constants {
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
 	public const ANSWER_TYPE_FILE = 'file';
+	public const ANSWER_TYPE_GRID = 'grid';
 	public const ANSWER_TYPE_LINEARSCALE = 'linearscale';
 	public const ANSWER_TYPE_LONG = 'long';
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
+
+	public const ANSWER_GRID_TYPE_CHECKBOX = 'checkbox';
+	public const ANSWER_GRID_TYPE_NUMBER = 'number';
+	public const ANSWER_GRID_TYPE_RADIO = 'radio';
+	public const ANSWER_GRID_TYPE_TEXT = 'text';
 
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
@@ -85,6 +91,7 @@ class Constants {
 		self::ANSWER_TYPE_DATETIME,
 		self::ANSWER_TYPE_DROPDOWN,
 		self::ANSWER_TYPE_FILE,
+		self::ANSWER_TYPE_GRID,
 		self::ANSWER_TYPE_LINEARSCALE,
 		self::ANSWER_TYPE_LONG,
 		self::ANSWER_TYPE_MULTIPLE,
@@ -177,6 +184,21 @@ class Constants {
 		'optionsHighest' => ['integer', 'NULL'],
 		'optionsLabelLowest' => ['string', 'NULL'],
 		'optionsLabelHighest' => ['string', 'NULL'],
+	];
+
+	public const EXTRA_SETTINGS_GRID = [
+		'columnsTitle' => ['string', 'NULL'],
+		'rowsTitle' => ['string', 'NULL'],
+		'columns' => ['array'],
+		'questionType' => ['string'],
+		'rows' => ['array'],
+	];
+
+	public const EXTRA_SETTINGS_GRID_QUESTION_TYPE = [
+		self::ANSWER_GRID_TYPE_CHECKBOX,
+		self::ANSWER_GRID_TYPE_NUMBER,
+		self::ANSWER_GRID_TYPE_RADIO,
+		self::ANSWER_GRID_TYPE_TEXT,
 	];
 
 	public const FILENAME_INVALID_CHARS = [
