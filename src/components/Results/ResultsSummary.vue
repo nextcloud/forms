@@ -70,9 +70,9 @@
 </template>
 
 <script>
-import answerTypes from '../../models/AnswerTypes.js'
 import { generateUrl } from '@nextcloud/router'
 import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import answerTypes from '../../models/AnswerTypes.js'
 
 export default {
 	name: 'ResultsSummary',
@@ -86,6 +86,7 @@ export default {
 			type: Array,
 			required: true,
 		},
+
 		question: {
 			type: Object,
 			required: true,

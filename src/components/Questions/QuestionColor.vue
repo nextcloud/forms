@@ -14,9 +14,9 @@
 				:model-value="pickedColor"
 				advanced-fields
 				@update:model-value="onUpdatePickedColor">
-				<NcButton :disabled="!readOnly">{{
-					colorPickerPlaceholder
-				}}</NcButton>
+				<NcButton :disabled="!readOnly">
+					{{ colorPickerPlaceholder }}
+				</NcButton>
 			</NcColorPicker>
 			<div :style="{ 'background-color': pickedColor }" class="color__field">
 				<NcButton
@@ -35,10 +35,10 @@
 </template>
 
 <script>
-import IconClose from 'vue-material-design-icons/Close.vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
-
+import IconClose from 'vue-material-design-icons/Close.vue'
+import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
 export default {
@@ -48,9 +48,11 @@ export default {
 		IconClose,
 		NcButton,
 		NcColorPicker,
+		Question,
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values'],
 
 	data() {
 		return {

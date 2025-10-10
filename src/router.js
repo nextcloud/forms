@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { generateUrl } from '@nextcloud/router'
 import Vue from 'vue'
 import Router from 'vue-router'
-import { generateUrl } from '@nextcloud/router'
-
 import Create from './views/Create.vue'
 import Results from './views/Results.vue'
 import Submit from './views/Submit.vue'

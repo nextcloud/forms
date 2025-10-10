@@ -15,7 +15,6 @@
 				v-for="(form, key) in shownForms"
 				:key="key"
 				:form="form"
-				:read-only="false"
 				force-display-actions
 				@clone="onCloneForm(form.id)"
 				@delete="onDelete(form)"
@@ -27,7 +26,6 @@
 <script>
 import { translate as t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
-
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import AppNavigationForm from './AppNavigationForm.vue'
 
@@ -44,13 +42,14 @@ export default defineComponent({
 			type: Boolean,
 			required: true,
 		},
+
 		forms: {
 			type: Array,
 			required: true,
 		},
 	},
 
-	emits: ['update:open'],
+	emits: ['update:open', 'clone'],
 
 	data() {
 		return {

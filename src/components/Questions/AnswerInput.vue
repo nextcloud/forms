@@ -5,7 +5,7 @@
 
 <template>
 	<li class="question__item" @focusout="handleTabbing">
-		<div
+		<component
 			:is="pseudoIcon"
 			v-if="!isDropdown"
 			class="question__item__pseudoInput" />
@@ -32,7 +32,7 @@
 				:container="`#${optionDragMenuId}`"
 				:aria-label="t('forms', 'Move option actions')"
 				class="option__drag-handle"
-				type="tertiary-no-background">
+				variant="tertiary-no-background">
 				<template #icon>
 					<IconDragIndicator :size="20" />
 				</template>
@@ -68,26 +68,23 @@
 </template>
 
 <script>
+import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
-import axios from '@nextcloud/axios'
 import debounce from 'debounce'
 import PQueue from 'p-queue'
-
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDragIndicator from '../Icons/IconDragIndicator.vue'
-import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
-
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcButton from '@nextcloud/vue/components/NcButton'
-
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 import logger from '../../utils/Logger.js'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
 export default {
 	name: 'AnswerInput',
@@ -109,31 +106,47 @@ export default {
 			type: Object,
 			required: true,
 		},
+
 		index: {
 			type: Number,
 			required: true,
 		},
+
 		formId: {
 			type: Number,
 			required: true,
 		},
+
 		isUnique: {
 			type: Boolean,
 			required: true,
 		},
+
 		isDropdown: {
 			type: Boolean,
 			default: false,
 		},
+
 		maxIndex: {
 			type: Number,
 			required: true,
 		},
+
 		maxOptionLength: {
 			type: Number,
 			required: true,
 		},
 	},
+
+	emits: [
+		'tabbed-out',
+		'create-answer',
+		'update:answer',
+		'focus-next',
+		'delete',
+		'move-down',
+		'move-up',
+	],
 
 	data() {
 		return {
@@ -198,7 +211,7 @@ export default {
 		async onInput({ target, isComposing }) {
 			if (!isComposing && !this.isIMEComposing && target.value !== '') {
 				// clone answer
-				const answer = Object.assign({}, this.answer)
+				const answer = { ...this.answer }
 				answer.text = this.$refs.input.value
 
 				if (this.answer.local) {
@@ -332,10 +345,12 @@ export default {
 					: 'buttonOptionUp',
 			)
 		},
+
 		onMoveUp() {
 			this.$emit('move-up')
 			this.focusButton(this.index > 1 ? 'buttonOptionUp' : 'buttonOptionDown')
 		},
+
 		focusButton(refName) {
 			this.$nextTick(() => this.$refs[refName].$el.focus())
 		},
@@ -349,6 +364,7 @@ export default {
 
 		/**
 		 * Handle composition end event for IME inputs
+		 *
 		 * @param {CompositionEvent} event The input event that triggered adding a new entry
 		 */
 		onCompositionEnd({ target, isComposing }) {

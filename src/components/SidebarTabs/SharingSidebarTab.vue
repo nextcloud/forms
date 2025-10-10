@@ -196,34 +196,32 @@
 </template>
 
 <script>
-import { generateOcsUrl } from '@nextcloud/router'
-import { loadState } from '@nextcloud/initial-state'
-import { showError } from '@nextcloud/dialogs'
-
 import axios from '@nextcloud/axios'
-import NcActions from '@nextcloud/vue/components/NcActions'
+import { showError } from '@nextcloud/dialogs'
+import { loadState } from '@nextcloud/initial-state'
+import { generateOcsUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/components/NcActionLink'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultipleOutline.vue'
 import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxOutline.vue'
 import IconLinkVariant from 'vue-material-design-icons/Link.vue'
+import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 import IconQr from 'vue-material-design-icons/Qrcode.vue'
-
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import FormsIcon from '../Icons/FormsIcon.vue'
 import IconCopyAll from '../Icons/IconCopyAll.vue'
+import QRDialog from '../QRDialog.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
-import QRDialog from '../QRDialog.vue'
-import ShareTypes from '../../mixins/ShareTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import ShareTypes from '../../mixins/ShareTypes.js'
 import logger from '../../utils/Logger.js'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
 export default {
 	components: {
@@ -265,6 +263,8 @@ export default {
 		},
 	},
 
+	emits: ['add-share', 'update-share', 'remove-share', 'update:formProp'],
+
 	data() {
 		return {
 			isLoading: false,
@@ -282,9 +282,11 @@ export default {
 				)
 				.sort(this.sortByTypeAndDisplayname)
 		},
+
 		hasPublicLink() {
 			return this.publicLinkShares.length !== 0
 		},
+
 		publicLinkShares() {
 			const shares = this.form.shares.filter(
 				(share) => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK,
@@ -356,6 +358,7 @@ export default {
 
 		/**
 		 * Make a share embeddable into websites (sets the internal permission)
+		 *
 		 * @param {{ permissions: string[] }} share The public link share to make embeddable
 		 */
 		makeEmbeddable(share) {
@@ -437,12 +440,20 @@ export default {
 		 */
 		sortByTypeAndDisplayname(a, b) {
 			// First return, if ShareType does not match
-			if (a.shareType < b.shareType) return -1
-			if (a.shareType > b.shareType) return 1
+			if (a.shareType < b.shareType) {
+				return -1
+			}
+			if (a.shareType > b.shareType) {
+				return 1
+			}
 
 			// Otherwise sort by displayname
-			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) return -1
-			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) return 1
+			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+				return -1
+			}
+			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+				return 1
+			}
 			return 0
 		},
 
@@ -451,6 +462,7 @@ export default {
 			newAccess.permitAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
+
 		onShowToAllUsersChange(newVal) {
 			const newAccess = { ...this.form.access }
 			newAccess.showToAllUsers = newVal

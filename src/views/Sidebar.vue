@@ -18,7 +18,7 @@
 				:form="form"
 				:locked="isFormLocked"
 				:locked-until="lockedUntilFormatted"
-				@update:formProp="onPropertyChange"
+				@update:form-prop="onPropertyChange"
 				@add-share="onAddShare"
 				@remove-share="onRemoveShare"
 				@update-share="onUpdateShare" />
@@ -35,7 +35,7 @@
 				:form="form"
 				:locked="isFormLocked"
 				:locked-until="lockedUntilFormatted"
-				@update:formProp="onPropertyChange" />
+				@update:form-prop="onPropertyChange" />
 		</NcAppSidebarTab>
 	</NcAppSidebar>
 </template>
@@ -47,12 +47,12 @@ import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import IconSettings from 'vue-material-design-icons/CogOutline.vue'
 import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
-
-import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
+import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Sidebar',
 
 	components: {
@@ -72,6 +72,8 @@ export default {
 			default: 'forms-sharing',
 		},
 	},
+
+	emits: ['update:sidebarOpened', 'update:active'],
 
 	computed: {
 		lockedUntilFormatted() {
@@ -107,6 +109,7 @@ export default {
 			this.form.shares.push(share)
 			emit('forms:last-updated:set', this.form.id)
 		},
+
 		onRemoveShare(share) {
 			const index = this.form.shares.findIndex(
 				(search) => search.id === share.id,
@@ -114,6 +117,7 @@ export default {
 			this.form.shares.splice(index, 1)
 			emit('forms:last-updated:set', this.form.id)
 		},
+
 		onUpdateShare(share) {
 			const index = this.form.shares.findIndex(
 				(search) => search.id === share.id,
