@@ -18,7 +18,7 @@
 		</NcButton>
 
 		<NcDialog
-			:open.sync="showModal"
+			v-model:open="showModal"
 			content-classes="modal-content"
 			:name="t('forms', 'Transfer ownership')"
 			out-transition

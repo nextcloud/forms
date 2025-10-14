@@ -117,39 +117,37 @@
 				<Draggable
 					v-model="form.questions"
 					:animation="200"
-					tag="ul"
+					tag="transition-group"
+					:component-data="{
+						name: isDragging
+							? 'no-external-transition-on-drag'
+							: 'question-list',
+					}"
 					handle=".question__drag-handle"
 					@change="onQuestionOrderChange"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<transition-group
-						:name="
-							isDragging
-								? 'no-external-transition-on-drag'
-								: 'question-list'
-						">
+					<template #item="{ element: question, index }">
 						<component
 							:is="answerTypes[question.type].component"
-							v-for="(question, index) in form.questions"
 							ref="questions"
-							:key="question.id"
+							v-model="form.questions[index]"
 							:can-move-down="index < form.questions.length - 1"
 							:can-move-up="index > 0"
 							:answer-type="answerTypes[question.type]"
 							:index="index + 1"
 							:max-string-lengths="maxStringLengths"
-							v-bind.sync="form.questions[index]"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
 							@move-down="onMoveDown(index)"
 							@move-up="onMoveUp(index)" />
-					</transition-group>
+					</template>
 				</Draggable>
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
 					<NcActions
-						:open.sync="questionMenuOpened"
+						v-model:open="questionMenuOpened"
 						:menu-name="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
 						primary>

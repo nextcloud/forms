@@ -31,7 +31,6 @@
 				v-if="!isArchived && canEdit"
 				close-after-click
 				:disabled="isFormLocked"
-				exact
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -51,7 +50,6 @@
 			<NcActionRouter
 				v-if="canSeeResults"
 				close-after-click
-				exact
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -92,7 +90,7 @@
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
 			<NcDialog
-				:open.sync="showDeleteDialog"
+				v-model:open="showDeleteDialog"
 				:name="t('forms', 'Delete form')"
 				:message="
 					t('forms', 'Are you sure you want to delete {title}?', {
@@ -327,11 +325,10 @@ export default {
 						},
 					},
 				)
-				this.$set(
-					this.form,
-					'state',
-					this.isArchived ? FormState.FormClosed : FormState.FormArchived,
-				)
+				// eslint-disable-next-line vue/no-mutating-props
+				this.form.state = this.isArchived
+					? FormState.FormClosed
+					: FormState.FormArchived
 			} catch (error) {
 				logger.error('Error changing archived state of form', {
 					error,

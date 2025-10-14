@@ -273,7 +273,8 @@ export default {
 
 				if (this.answer.local) {
 					// Dispatched for creation. Marked as synced
-					this.$set(this.answer, 'local', false)
+					// eslint-disable-next-line vue/no-mutating-props
+					this.answer.local = false
 					const newAnswer = await this.createAnswer(answer)
 
 					// Forward changes, but use current answer.text to avoid erasing
