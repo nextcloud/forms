@@ -118,19 +118,19 @@
 		<!-- No errors show router content -->
 		<template v-else>
 			<router-view
-				:form.sync="selectedForm"
-				:sidebar-opened.sync="sidebarOpened"
+				v-model:form="selectedForm"
+				v-model:sidebar-opened="sidebarOpened"
 				@open-sharing="openSharing" />
 			<Sidebar
 				v-if="!selectedForm.partial && canEdit"
-				:form="selectedForm"
-				:sidebar-opened.sync="sidebarOpened"
-				:active.sync="sidebarActive" />
+				v-model:sidebar-opened="sidebarOpened"
+				v-model:active="sidebarActive"
+				:form="selectedForm" />
 		</template>
 
 		<!-- Archived forms modal -->
 		<ArchivedFormsModal
-			:open.sync="showArchivedForms"
+			v-model:open="showArchivedForms"
 			:forms="archivedForms"
 			@clone="onCloneForm" />
 	</NcContent>
@@ -292,7 +292,7 @@ export default {
 					(search) => search.hash === this.routeHash,
 				)
 				if (index > -1) {
-					this.$set(this.forms, index, form)
+					this.forms[index] = form
 					return
 				}
 				// Otherwise a shared form
@@ -300,7 +300,7 @@ export default {
 					(search) => search.hash === this.routeHash,
 				)
 				if (index > -1) {
-					this.$set(this.allSharedForms, index, form)
+					this.allSharedForms[index] = form
 				}
 			},
 		},
