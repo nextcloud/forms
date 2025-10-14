@@ -4,22 +4,18 @@
  */
 
 import { translate, translatePlural } from '@nextcloud/l10n'
-import Tooltip from '@nextcloud/vue/directives/Tooltip'
-import Vue from 'vue'
+import { createApp } from 'vue'
 import Forms from './Forms.vue'
 import router from './router.js'
 
 import 'vite/modulepreload-polyfill'
 import '@nextcloud/dialogs/style.css'
 
-Vue.directive('tooltip', Tooltip)
+const app = createApp(Forms)
 
-Vue.prototype.t = translate
-Vue.prototype.n = translatePlural
+app.config.globalProperties.t = translate
+app.config.globalProperties.n = translatePlural
 
-export default new Vue({
-	el: '#content',
-	name: 'FormsRoot',
-	router,
-	render: (h) => h(Forms),
-})
+app.use(router)
+
+app.mount('#content')

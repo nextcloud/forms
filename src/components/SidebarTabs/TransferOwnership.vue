@@ -18,7 +18,7 @@
 		</NcButton>
 
 		<NcDialog
-			:open.sync="showModal"
+			v-model:open="showModal"
 			content-classes="modal-content"
 			:name="t('forms', 'Transfer ownership')"
 			out-transition
@@ -67,8 +67,8 @@
 					" />
 				<!-- eslint-enable vue/no-v-html -->
 				<NcTextField
+					v-model:value="confirmationInput"
 					:label="t('forms', 'Confirmation text')"
-					:value.sync="confirmationInput"
 					:success="confirmationInput === confirmationString" />
 
 				<br />
