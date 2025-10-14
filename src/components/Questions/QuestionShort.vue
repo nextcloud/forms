@@ -39,13 +39,13 @@
 			<NcActions
 				v-if="!readOnly"
 				:id="validationTypeMenuId"
+				v-model:open="isValidationTypeMenuOpen"
 				:aria-label="
 					t('forms', 'Input types (currently: {type})', {
 						type: validationObject.label,
 					})
 				"
 				:container="`#${validationTypeMenuId}`"
-				:open.sync="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
 				variant="tertiary-no-background">
 				<template #icon>
