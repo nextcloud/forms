@@ -172,7 +172,7 @@
 
 		<!-- Add multiple options modal -->
 		<OptionInputDialog
-			:open.sync="isOptionDialogShown"
+			v-model:open="isOptionDialogShown"
 			@multiple-answers="handleMultipleOptions" />
 	</Question>
 </template>
