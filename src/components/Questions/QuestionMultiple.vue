@@ -118,24 +118,21 @@
 				v-else
 				v-model="choices"
 				class="question__content"
-				animation="200"
+				:animation="200"
 				direction="vertical"
 				handle=".option__drag-handle"
 				invert-swap
-				tag="ul"
+				tag="transition-group"
+				:component-data="{
+					name: isDragging
+						? 'no-external-transition-on-drag'
+						: 'options-list-transition',
+				}"
 				@change="saveOptionsOrder('choice')"
 				@start="isDragging = true"
 				@end="isDragging = false">
-				<TransitionGroup
-					:name="
-						isDragging
-							? 'no-external-transition-on-drag'
-							: 'options-list-transition'
-					">
-					<!-- Answer text input edit -->
+				<template #item="{ element: answer, index }">
 					<AnswerInput
-						v-for="(answer, index) in choices"
-						:key="answer.local ? 'option-local' : answer.id"
 						ref="input"
 						:answer="answer"
 						:form-id="formId"
@@ -148,10 +145,10 @@
 						@update:answer="updateAnswer"
 						@delete="deleteOption"
 						@focus-next="focusNextInput"
-						@move-up="onOptionMoveUp(index, 'choice')"
-						@move-down="onOptionMoveDown(index, 'choice')"
-						@tabbed-out="checkValidOption('choice')" />
-				</TransitionGroup>
+						@move-up="onOptionMoveUp(index)"
+						@move-down="onOptionMoveDown(index)"
+						@tabbed-out="checkValidOption" />
+				</template>
 			</Draggable>
 			<li
 				v-if="allowOtherAnswer"
@@ -171,7 +168,7 @@
 
 		<!-- Add multiple options modal -->
 		<OptionInputDialog
-			:open.sync="isOptionDialogShown"
+			v-model:open="isOptionDialogShown"
 			@multiple-answers="handleMultipleOptions" />
 	</Question>
 </template>
