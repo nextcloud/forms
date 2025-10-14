@@ -5,7 +5,7 @@
 
 <template>
 	<NcAppContent
-		:page-heading="
+		:pageHeading="
 			form.title ? t('forms', 'Edit form') : t('forms', 'Create form')
 		">
 		<!-- Show results & sidebar button -->
@@ -13,9 +13,9 @@
 			:archived="isFormArchived"
 			:locked="isFormLocked"
 			:permissions="form?.permissions"
-			:sidebar-opened="sidebarOpened"
-			:submission-count="form?.submissionCount"
-			@share-form="onShareForm" />
+			:sidebarOpened="sidebarOpened"
+			:submissionCount="form?.submissionCount"
+			@shareForm="onShareForm" />
 
 		<NcEmptyContent
 			v-if="isLoadingForm"
@@ -116,41 +116,58 @@
 				<!-- Questions list -->
 				<Draggable
 					v-model="form.questions"
+					:itemKey="(item) => item.id"
 					:animation="200"
-					tag="ul"
+					tag="transition-group"
+					:componentData="{
+						name: isDragging
+							? 'no-external-transition-on-drag'
+							: 'question-list',
+					}"
 					handle=".question__drag-handle"
 					@change="onQuestionOrderChange"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<transition-group
-						:name="
-							isDragging
-								? 'no-external-transition-on-drag'
-								: 'question-list'
-						">
+					<template #item="{ element: question, index }">
 						<component
 							:is="answerTypes[question.type].component"
-							v-for="(question, index) in form.questions"
-							ref="questions"
-							:key="question.id"
-							:can-move-down="index < form.questions.length - 1"
-							:can-move-up="index > 0"
-							:answer-type="answerTypes[question.type]"
+							:ref="setQuestionRef"
+							v-bind="form.questions[index]"
+							:canMoveDown="index < form.questions.length - 1"
+							:canMoveUp="index > 0"
+							:answerType="answerTypes[question.type]"
 							:index="index + 1"
-							:max-string-lengths="maxStringLengths"
-							v-bind.sync="form.questions[index]"
+							:maxStringLengths="maxStringLengths"
+							@update:text="
+								(val) => (form.questions[index].text = val)
+							"
+							@update:description="
+								(val) => (form.questions[index].description = val)
+							"
+							@update:isRequired="
+								(val) => (form.questions[index].isRequired = val)
+							"
+							@update:name="
+								(val) => (form.questions[index].name = val)
+							"
+							@update:extraSettings="
+								(val) => (form.questions[index].extraSettings = val)
+							"
+							@update:options="
+								(val) => (form.questions[index].options = val)
+							"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
-							@move-down="onMoveDown(index)"
-							@move-up="onMoveUp(index)" />
-					</transition-group>
+							@moveDown="onMoveDown(index)"
+							@moveUp="onMoveUp(index)" />
+					</template>
 				</Draggable>
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
 					<NcActions
-						:open.sync="questionMenuOpened"
-						:menu-name="t('forms', 'Add a question')"
+						v-model:open="questionMenuOpened"
+						:menuName="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
 						primary>
 						<template #icon>
@@ -162,9 +179,9 @@
 							<NcActionButton
 								v-for="(answer, type) in answerTypesFilter"
 								:key="answer.label"
-								:close-after-click="!hasSubtypes(answer)"
+								:closeAfterClick="!hasSubtypes(answer)"
 								:disabled="isLoadingQuestions"
-								:is-menu="hasSubtypes(answer)"
+								:isMenu="hasSubtypes(answer)"
 								class="question-menu__question"
 								@click="
 									hasSubtypes(answer)
@@ -195,7 +212,7 @@
 									activeQuestionType
 								].subtypes"
 								:key="'subtype-' + answer.label"
-								close-after-click
+								closeAfterClick
 								:disabled="isLoadingQuestions"
 								class="question-menu__question"
 								@click="addQuestion(activeQuestionType, type)">
@@ -280,6 +297,7 @@ export default {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
 			activeQuestionType: null,
+			questionRefs: [],
 		}
 	},
 
@@ -375,12 +393,22 @@ export default {
 		},
 	},
 
+	beforeUpdate() {
+		this.questionRefs = []
+	},
+
 	mounted() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
+		setQuestionRef(el) {
+			if (el) {
+				this.questionRefs.push(el)
+			}
+		},
+
 		onMoveUp(index) {
 			if (index > 0) {
 				;[this.form.questions[index - 1], this.form.questions[index]] = [
@@ -484,8 +512,8 @@ export default {
 				// Focus newly added question
 				this.$nextTick(() => {
 					const lastQuestion =
-						this.$refs.questions[this.$refs.questions.length - 1]
-					lastQuestion.focus()
+						this.questionRefs[this.questionRefs.length - 1]
+					lastQuestion?.focus()
 				})
 
 				emit('forms:last-updated:set', this.form.id)
@@ -561,8 +589,8 @@ export default {
 
 				this.$nextTick(() => {
 					const lastQuestion =
-						this.$refs.questions[this.$refs.questions.length - 1]
-					lastQuestion.focus()
+						this.questionRefs[this.questionRefs.length - 1]
+					lastQuestion?.focus()
 				})
 			} catch (error) {
 				logger.error(`Error while duplicating question ${id}`, {

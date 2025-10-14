@@ -5,7 +5,7 @@
 
 <template>
 	<NcDialog
-		close-on-click-outside
+		closeOnClickOutside
 		:name="title"
 		:open="isOpen"
 		@close="isOpen = false"

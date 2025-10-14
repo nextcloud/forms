@@ -6,18 +6,18 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
-		:content-valid="contentValid"
-		:shift-drag-handle="shiftDragHandle"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
+		:contentValid="contentValid"
+		:shiftDragHandle="shiftDragHandle"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
-				:model-value="extraSettings?.shuffleOptions"
-				@update:model-value="onShuffleOptionsChange">
+				:modelValue="extraSettings?.shuffleOptions"
+				@update:modelValue="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
-			<NcActionButton close-after-click @click="isOptionDialogShown = true">
+			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
 				<template #icon>
 					<IconContentPaste :size="20" />
 				</template>
@@ -26,21 +26,18 @@
 		</template>
 		<div
 			v-if="readOnly"
-			role="group"
+			:modelValue="selectedOption"
+			:name="name || undefined"
+			:placeholder="selectOptionPlaceholder"
+			:multiple="isMultiple"
+			:required="isRequired"
+			:options="choices"
+			:searchable="false"
+			label="text"
+			:aria-label-combobox="selectOptionPlaceholder"
 			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined">
-			<NcSelect
-				:model-value="selectedOption"
-				:name="name || undefined"
-				:placeholder="selectOptionPlaceholder"
-				:multiple="isMultiple"
-				:required="isRequired"
-				:options="choices"
-				:searchable="false"
-				label="text"
-				:aria-label-combobox="selectOptionPlaceholder"
-				@input="onInput" />
-		</div>
+			@input="onInput" />
 		<template v-else>
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />
@@ -48,49 +45,47 @@
 			<Draggable
 				v-else
 				v-model="choices"
+				:itemKey="(item) => (item.local ? 'option-local' : item.id)"
 				class="question__content"
-				animation="200"
+				:animation="200"
 				direction="vertical"
 				handle=".option__drag-handle"
-				invert-swap
-				tag="ul"
+				invertSwap
+				tag="transition-group"
+				:componentData="{
+					name: isDragging
+						? 'no-external-transition-on-drag'
+						: 'options-list-transition',
+				}"
 				@change="saveOptionsOrder('choice')"
 				@start="isDragging = true"
 				@end="isDragging = false">
-				<TransitionGroup
-					:name="
-						isDragging
-							? 'no-external-transition-on-drag'
-							: 'options-list-transition'
-					">
-					<!-- Answer text input edit -->
-					<AnswerInput
-						v-for="(answer, index) in choices"
-						:key="answer.local ? 'option-local' : answer.id"
-						ref="input"
-						:answer="answer"
-						:form-id="formId"
-						is-dropdown
-						:index="index"
-						:is-unique="!isMultiple"
-						:max-index="options.length - 1"
-						:max-option-length="maxStringLengths.optionText"
-						option-type="choice"
-						@create-answer="onCreateAnswer"
-						@update:answer="updateAnswer"
-						@delete="deleteOption"
-						@focus-next="focusNextInput"
-						@move-up="onOptionMoveUp(index, 'choice')"
-						@move-down="onOptionMoveDown(index, 'choice')"
-						@tabbed-out="checkValidOption('choice')" />
-				</TransitionGroup>
+				<AnswerInput
+					v-for="(answer, index) in choices"
+					:key="answer.local ? 'option-local' : answer.id"
+					ref="input"
+					:answer="answer"
+					:formId="formId"
+					isDropdown
+					:index="index"
+					:isUnique="!isMultiple"
+					:maxIndex="options.length - 1"
+					:maxOptionLength="maxStringLengths.optionText"
+					optionType="choice"
+					@createAnswer="onCreateAnswer"
+					@update:answer="updateAnswer"
+					@delete="deleteOption"
+					@focusNext="focusNextInput"
+					@moveUp="onOptionMoveUp(index, OptionType.Choice)"
+					@moveDown="onOptionMoveDown(index, OptionType.Choice)"
+					@tabbedOut="checkValidOption" />
 			</Draggable>
 		</template>
 
 		<!-- Add multiple options modal -->
 		<OptionInputDialog
-			:open.sync="isOptionDialogShown"
-			@multiple-answers="handleMultipleOptions" />
+			v-model:open="isOptionDialogShown"
+			@multipleAnswers="handleMultipleOptions" />
 	</Question>
 </template>
 
@@ -131,6 +126,7 @@ export default {
 			isDragging: false,
 			isLoading: false,
 			isOptionDialogShown: false,
+			OptionType,
 		}
 	},
 

@@ -200,8 +200,8 @@ export default {
 				'update:description': this.onDescriptionChange,
 				'update:isRequired': this.onRequiredChange,
 				'update:name': this.onNameChange,
-				'move-down': (...args) => this.$emit('move-down', ...args),
-				'move-up': (...args) => this.$emit('move-up', ...args),
+				moveDown: (...args) => this.$emit('moveDown', ...args),
+				moveUp: (...args) => this.$emit('moveUp', ...args),
 			}
 		},
 	},

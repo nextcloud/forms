@@ -4,19 +4,20 @@
  */
 
 import { translate, translatePlural } from '@nextcloud/l10n'
-import Vue from 'vue'
+import { createApp } from 'vue'
 import Forms from './Forms.vue'
 import router from './router.js'
 
 import 'vite/modulepreload-polyfill'
 import '@nextcloud/dialogs/style.css'
 
-Vue.prototype.t = translate
-Vue.prototype.n = translatePlural
+const app = createApp(Forms)
 
-export default new Vue({
-	el: '#content',
-	name: 'FormsRoot',
-	router,
-	render: (h) => h(Forms),
-})
+app.config.globalProperties.t = translate
+app.config.globalProperties.n = translatePlural
+
+app.use(router)
+
+app.mount('#content')
+
+export default app

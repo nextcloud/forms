@@ -172,7 +172,6 @@ export default defineComponent({
 		 *
 		 * @param index the index of the answer
 		 * @param answer - The new answer option to be added.
-		 * @return
 		 */
 		onCreateAnswer(index: number, answer: FormsOption): void {
 			this.$nextTick(() => {
@@ -233,7 +232,7 @@ export default defineComponent({
 		/**
 		 * Remove any empty options when leaving an option
 		 *
-		 * @param optionType
+		 * @param optionType The type of options to validate
 		 */
 		checkValidOption(optionType: string) {
 			// When leaving edit mode, filter and delete empty options
