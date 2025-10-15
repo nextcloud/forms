@@ -40,6 +40,10 @@
 			:answer-text="question.squashedAnswers"
 			:answers="question.answers"
 			:question-text="question.text"
+			:grid-cell-type="question.gridCellType"
+			:grid-columns="question.gridColumns"
+			:grid-rows="question.gridRows"
+			:grid-value="question.gridValue"
 			:question-type="question.type" />
 	</div>
 </template>
@@ -54,6 +58,7 @@ import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
 
 import Answer from './Answer.vue'
 import { generateUrl } from '@nextcloud/router'
+import { OptionType } from '../../models/Constants.ts'
 
 export default {
 	name: 'Submission',
@@ -131,6 +136,64 @@ export default {
 								}),
 							}
 						}),
+					})
+				} else if (question.type === 'grid') {
+					const optionsPerId = {}
+					question.options.forEach((option) => {
+						optionsPerId[option.id] = option
+					})
+					let squashedAnswers = ''
+
+					const gridValue = answers[0].text
+						? JSON.parse(answers[0].text)
+						: null
+					// fixme: rename `questionType` to `gridCellType` everywhere in BE and FE
+					if (
+						gridValue
+						&& question.extraSettings.questionType === 'radio'
+					) {
+						squashedAnswers = Object.keys(gridValue)
+							.map((key) => {
+								return (
+									optionsPerId[key].text
+									+ ': '
+									+ optionsPerId[gridValue[key]].text
+								)
+							})
+							.join('\n')
+					} else if (
+						gridValue
+						&& question.extraSettings.questionType === 'checkbox'
+					) {
+						squashedAnswers = Object.keys(gridValue)
+							.map((key) => {
+								return (
+									optionsPerId[key].text
+									+ ': '
+									+ gridValue[key]
+										.map(
+											(optionId) =>
+												optionsPerId[optionId].text,
+										)
+										.join(', ')
+								)
+							})
+							.join('\n')
+					}
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						gridValue,
+						squashedAnswers,
+						gridCellType: question.extraSettings.questionType,
+						gridRows: question.options.filter(
+							(option) => option.optionType === OptionType.Row,
+						),
+						gridColumns: question.options.filter(
+							(option) => option.optionType === OptionType.Column,
+						),
 					})
 				} else if (['date', 'time'].includes(question.type)) {
 					const squashedAnswers = answers
