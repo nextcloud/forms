@@ -4,16 +4,12 @@
  */
 
 import { translate, translatePlural } from '@nextcloud/l10n'
-import Vue from 'vue'
+import { createApp } from 'vue'
 import FormsSubmitRoot from './FormsSubmit.vue'
 
 import 'vite/modulepreload-polyfill'
 
-Vue.prototype.t = translate
-Vue.prototype.n = translatePlural
-
-export default new Vue({
-	el: '#content',
-	name: 'FormsSubmitRoot',
-	render: (h) => h(FormsSubmitRoot),
-})
+const app = createApp(FormsSubmitRoot)
+app.config.globalProperties.t = translate
+app.config.globalProperties.n = translatePlural
+app.mount('#content')
