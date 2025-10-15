@@ -34,12 +34,18 @@
 </template>
 
 <script>
+import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
 export default {
 	name: 'QuestionLong',
 
+	components: {
+		Question,
+	},
+
 	mixins: [QuestionMixin],
+	emits: ['update:values', 'keydown'],
 
 	data() {
 		return {
@@ -63,6 +69,7 @@ export default {
 					this.autoSizeText()
 				})
 			},
+
 			immediate: true,
 		},
 	},
@@ -72,6 +79,7 @@ export default {
 			const textarea = this.$refs.textarea
 			this.$emit('update:values', [textarea.value])
 		},
+
 		autoSizeText() {
 			const textarea = this.$refs.textarea
 			if (!textarea) {
@@ -80,6 +88,7 @@ export default {
 			textarea.style.cssText = 'height:auto; padding:0'
 			textarea.style.cssText = `height: ${textarea.scrollHeight + 28}px`
 		},
+
 		onKeydownCtrlEnter(event) {
 			this.$emit('keydown', event)
 		},

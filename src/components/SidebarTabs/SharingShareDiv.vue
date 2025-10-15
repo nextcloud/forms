@@ -46,16 +46,15 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAvatar from '@nextcloud/vue/components/NcAvatar'
-
 import IconClose from 'vue-material-design-icons/Close.vue'
-import ShareTypes from '../../mixins/ShareTypes.js'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
+import ShareTypes from '../../mixins/ShareTypes.js'
 
 export default {
 	components: {
@@ -82,30 +81,37 @@ export default {
 		},
 	},
 
+	emits: ['remove-share', 'update:share'],
+
 	computed: {
 		canAccessResults() {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS,
 			)
 		},
+
 		canDeleteResults() {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 			)
 		},
+
 		canEditForm() {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_EDIT,
 			)
 		},
+
 		isNoUser() {
 			return this.share.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
 		},
+
 		displayName() {
 			return !this.share.displayName
 				? this.share.shareWith
 				: this.share.displayName
 		},
+
 		displayNameAppendix() {
 			switch (this.share.shareType) {
 				case this.SHARE_TYPES.SHARE_TYPE_GROUP:

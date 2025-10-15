@@ -10,7 +10,7 @@
  * @param {object} response response returned by axios
  * @return {object} The actual data out of the ocs response
  */
-const OcsResponse2Data = function (response) {
+function OcsResponse2Data(response) {
 	return response.data.ocs.data
 }
 

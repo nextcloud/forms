@@ -45,17 +45,17 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/components/NcActions'
+import moment from '@nextcloud/moment'
+import { generateUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
-import moment from '@nextcloud/moment'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
-
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import Answer from './Answer.vue'
-import { generateUrl } from '@nextcloud/router'
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Submission',
 
 	components: {
@@ -72,27 +72,34 @@ export default {
 			type: String,
 			required: true,
 		},
+
 		submission: {
 			type: Object,
 			required: true,
 		},
+
 		questions: {
 			type: Array,
 			required: true,
 		},
+
 		canDeleteSubmission: {
 			type: Boolean,
 			required: true,
 		},
+
 		canEditSubmission: {
 			type: Boolean,
 			required: true,
 		},
+
 		highlight: {
 			type: String,
 			default: null,
 		},
 	},
+
+	emits: ['delete'],
 
 	computed: {
 		// Format submission-timestamp to DateTime

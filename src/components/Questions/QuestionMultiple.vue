@@ -13,13 +13,13 @@
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
-				:checked="extraSettings?.shuffleOptions"
-				@update:checked="onShuffleOptionsChange">
+				:model-value="extraSettings?.shuffleOptions"
+				@update:model-value="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
-				:checked="allowOtherAnswer"
-				@update:checked="onAllowOtherAnswerChange">
+				:model-value="allowOtherAnswer"
+				@update:model-value="onAllowOtherAnswerChange">
 				{{ t('forms', 'Add "other"') }}
 			</NcActionCheckbox>
 
@@ -27,8 +27,8 @@
 			<template v-if="!isUnique">
 				<!-- Allow setting a minimum of options to be checked -->
 				<NcActionCheckbox
-					:checked="!!extraSettings?.optionsLimitMin"
-					@update:checked="
+					:model-value="!!extraSettings?.optionsLimitMin"
+					@update:model-value="
 						(checked) => onLimitOptionsMin(checked ? 1 : null)
 					">
 					{{ t('forms', 'Require a minimum of options to be checked') }}
@@ -44,8 +44,8 @@
 
 				<!-- Allow setting a maximum -->
 				<NcActionCheckbox
-					:checked="!!extraSettings?.optionsLimitMax"
-					@update:checked="
+					:model-value="!!extraSettings?.optionsLimitMax"
+					@update:model-value="
 						(checked) =>
 							onLimitOptionsMax(
 								checked ? sortedOptions.length || 1 : null,
@@ -84,7 +84,7 @@
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
 					:required="checkRequired(answer.id)"
-					@update:modelValue="onChange"
+					@update:model-value="onChange"
 					@keydown.enter.exact.prevent="onKeydownEnter">
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
@@ -98,7 +98,7 @@
 						:type="isUnique ? 'radio' : 'checkbox'"
 						:required="checkRequired('other-answer')"
 						class="question__label"
-						@update:modelValue="onChangeOther"
+						@update:model-value="onChangeOther"
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
@@ -158,7 +158,7 @@
 				v-if="allowOtherAnswer"
 				key="option-add-other"
 				class="question__item">
-				<div :is="pseudoIcon" class="question__item__pseudoInput" />
+				<component :is="pseudoIcon" class="question__item__pseudoInput" />
 				<input
 					:placeholder="t('forms', 'Other')"
 					class="question__input"
@@ -179,7 +179,7 @@
 
 <script>
 import { showError } from '@nextcloud/dialogs'
-import { translate as t, translatePlural as n } from '@nextcloud/l10n'
+import { translatePlural as n, translate as t } from '@nextcloud/l10n'
 import Draggable from 'vuedraggable'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -188,16 +188,15 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwit
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
-
-import AnswerInput from './AnswerInput.vue'
-import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../../models/Constants.ts'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
 import OptionInputDialog from '../OptionInputDialog.vue'
+import AnswerInput from './AnswerInput.vue'
+import Question from './Question.vue'
+import QuestionMixin from '../../mixins/QuestionMixin.js'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
+import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../../models/Constants.ts'
 
 export default {
 	name: 'QuestionMultiple',
@@ -216,9 +215,11 @@ export default {
 		NcLoadingIcon,
 		NcNoteCard,
 		OptionInputDialog,
+		Question,
 	},
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
+	emits: ['update:values'],
 
 	data() {
 		return {
@@ -350,6 +351,7 @@ export default {
 
 		/**
 		 * Handle toggling the "other"-answer checkbox / radio switch
+		 *
 		 * @param {string|string[]} value The new value of the answer(s)
 		 */
 		onChangeOther(value) {
@@ -371,6 +373,7 @@ export default {
 
 		/**
 		 * Updating the maximum number
+		 *
 		 * @param {number|null} max Maximum options
 		 */
 		onLimitOptionsMax(max) {
@@ -395,6 +398,7 @@ export default {
 
 		/**
 		 * Update the minimum of checked options
+		 *
 		 * @param {number|null} min Minimum of checked options
 		 */
 		onLimitOptionsMin(min) {

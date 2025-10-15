@@ -27,19 +27,19 @@
 			{{ t('forms', 'Unlock form') }}
 		</NcButton>
 		<NcCheckboxRadioSwitch
-			:checked="form.isAnonymous"
+			:model-value="form.isAnonymous"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:checked="onAnonChange">
+			@update:model-value="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
 			{{ t('forms', 'Store responses anonymously') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:title="disableSubmitMultipleExplanation"
-			:checked="submitMultiple"
+			:model-value="submitMultiple"
 			:disabled="disableSubmitMultiple || formArchived || locked"
 			type="switch"
-			@update:checked="onSubmitMultipleChange">
+			@update:model-value="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
@@ -50,10 +50,10 @@
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:checked="formExpires"
+			:model-value="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:checked="onFormExpiresChange">
+			@update:model-value="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires && !formArchived" class="settings-div--indent">
@@ -64,26 +64,26 @@
 				:disabled-date="notBeforeToday"
 				:disabled-time="notBeforeNow"
 				:editable="false"
-				:formatter="formatter"
+				:format="stringifyDate"
 				:minute-step="5"
 				:show-second="false"
 				:value="expirationDate"
 				type="datetime"
 				@change="onExpirationDateChange" />
 			<NcCheckboxRadioSwitch
-				:checked="form.showExpiration"
+				:model-value="form.showExpiration"
 				:disabled="locked"
 				type="switch"
-				@update:checked="onShowExpirationChange">
+				@update:model-value="onShowExpirationChange">
 				{{ t('forms', 'Show expiration date on form') }}
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
-			:checked="formClosed"
+			:model-value="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
 			type="switch"
-			@update:checked="onFormClosedChange">
+			@update:model-value="onFormClosedChange">
 			{{ t('forms', 'Close form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__close-form" class="settings-hint">
@@ -101,11 +101,11 @@
 			{{ t('forms', 'Lock form permanently') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:checked="formArchived"
+			:model-value="formArchived"
 			aria-describedby="forms-settings__archive-form"
 			:disabled="locked"
 			type="switch"
-			@update:checked="onFormArchivedChange">
+			@update:model-value="onFormArchivedChange">
 			{{ t('forms', 'Archive form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__archive-form" class="settings-hint">
@@ -117,10 +117,10 @@
 			}}
 		</p>
 		<NcCheckboxRadioSwitch
-			:checked="hasCustomSubmissionMessage"
+			:model-value="hasCustomSubmissionMessage"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:checked="onUpdateHasCustomSubmissionMessage">
+			@update:model-value="onUpdateHasCustomSubmissionMessage">
 			{{ t('forms', 'Custom submission message') }}
 		</NcCheckboxRadioSwitch>
 		<div
@@ -174,19 +174,18 @@
 
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
+import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
+import { directive as ClickOutside } from 'v-click-outside'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import ShareTypes from '../../mixins/ShareTypes.js'
 import TransferOwnership from './TransferOwnership.vue'
-
-import { directive as ClickOutside } from 'v-click-outside'
-import { loadState } from '@nextcloud/initial-state'
-import { FormState } from '../../models/Constants.ts'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
+import ShareTypes from '../../mixins/ShareTypes.js'
+import { FormState } from '../../models/Constants.ts'
 
 export default {
 	components: {
@@ -223,12 +222,15 @@ export default {
 		},
 	},
 
+	emits: ['update:form-prop'],
+
 	data() {
 		return {
 			formatter: {
 				stringify: this.stringifyDate,
 				parse: this.parseTimestampToDate,
 			},
+
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
@@ -261,6 +263,7 @@ export default {
 		disableSubmitMultiple() {
 			return this.hasPublicLink || this.form.isAnonymous
 		},
+
 		disableSubmitMultipleExplanation() {
 			if (this.disableSubmitMultiple) {
 				return t(
@@ -270,6 +273,7 @@ export default {
 			}
 			return ''
 		},
+
 		hasPublicLink() {
 			return (
 				this.form.shares.filter(
@@ -298,9 +302,11 @@ export default {
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
+
 		expirationDate() {
 			return moment(this.form.expires, 'X').toDate()
 		},
+
 		/**
 		 * The submission message rendered as HTML
 		 */
@@ -316,27 +322,31 @@ export default {
 		 * @param {boolean} checked New Checkbox/Switch Value to use
 		 */
 		onAnonChange(checked) {
-			this.$emit('update:formProp', 'isAnonymous', checked)
+			this.$emit('update:form-prop', 'isAnonymous', checked)
 		},
+
 		onSubmitMultipleChange(checked) {
-			this.$emit('update:formProp', 'submitMultiple', checked)
+			this.$emit('update:form-prop', 'submitMultiple', checked)
 		},
+
 		onAllowEditSubmissionsChange(checked) {
-			this.$emit('update:formProp', 'allowEditSubmissions', checked)
+			this.$emit('update:form-prop', 'allowEditSubmissions', checked)
 		},
+
 		onFormExpiresChange(checked) {
 			if (checked) {
 				this.$emit(
-					'update:formProp',
+					'update:form-prop',
 					'expires',
 					moment().add(1, 'hour').unix(),
 				) // Expires in one hour.
 			} else {
-				this.$emit('update:formProp', 'expires', 0)
+				this.$emit('update:form-prop', 'expires', 0)
 			}
 		},
+
 		onShowExpirationChange(checked) {
-			this.$emit('update:formProp', 'showExpiration', checked)
+			this.$emit('update:form-prop', 'showExpiration', checked)
 		},
 
 		/**
@@ -346,7 +356,7 @@ export default {
 		 */
 		onExpirationDateChange(datetime) {
 			this.$emit(
-				'update:formProp',
+				'update:form-prop',
 				'expires',
 				parseInt(moment(datetime).format('X')),
 			)
@@ -354,26 +364,26 @@ export default {
 
 		onFormClosedChange(isClosed) {
 			this.$emit(
-				'update:formProp',
+				'update:form-prop',
 				'state',
 				isClosed ? FormState.FormClosed : FormState.FormActive,
 			)
 		},
 
 		onFormLockChange(locked) {
-			this.$emit('update:formProp', 'lockedUntil', locked ? 0 : null)
+			this.$emit('update:form-prop', 'lockedUntil', locked ? 0 : null)
 		},
 
 		onFormArchivedChange(isArchived) {
 			this.$emit(
-				'update:formProp',
+				'update:form-prop',
 				'state',
 				isArchived ? FormState.FormArchived : FormState.FormClosed,
 			)
 		},
 
 		onSubmissionMessageChange({ target }) {
-			this.$emit('update:formProp', 'submissionMessage', target.value)
+			this.$emit('update:form-prop', 'submissionMessage', target.value)
 		},
 
 		/**
@@ -382,9 +392,9 @@ export default {
 		 */
 		onUpdateHasCustomSubmissionMessage() {
 			if (this.hasCustomSubmissionMessage) {
-				this.$emit('update:formProp', 'submissionMessage', null)
+				this.$emit('update:form-prop', 'submissionMessage', null)
 			} else {
-				this.$emit('update:formProp', 'submissionMessage', '')
+				this.$emit('update:form-prop', 'submissionMessage', '')
 			}
 		},
 

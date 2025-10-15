@@ -53,8 +53,7 @@
 				resize="none"
 				@input="resizeLabel('lowest')"
 				@blur="onBlur('lowest')"
-				@update:model-value="onOptionsLabelLowestChange">
-			</NcTextArea>
+				@update:model-value="onOptionsLabelLowestChange" />
 			<div
 				v-else-if="optionsLabelLowest !== ''"
 				:id="labelId"
@@ -84,7 +83,7 @@
 						:name="`${id}-answer`"
 						type="radio"
 						:required="checkRequired(option)"
-						@update:modelValue="onChange"
+						@update:model-value="onChange"
 						@keydown.enter.exact.prevent="onKeydownEnter" />
 				</div>
 			</fieldset>
@@ -98,8 +97,7 @@
 				resize="none"
 				@input="resizeLabel('highest')"
 				@blur="onBlur('highest')"
-				@update:model-value="onOptionsLabelHighestChange">
-			</NcTextArea>
+				@update:model-value="onOptionsLabelHighestChange" />
 			<div
 				v-else-if="optionsLabelHighest !== ''"
 				class="question-linear-scale__label question-linear-scale__label-highest">
@@ -114,9 +112,8 @@ import { t } from '@nextcloud/l10n'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
-
 import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
-
+import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
 export default {
@@ -127,9 +124,11 @@ export default {
 		NcActionInput,
 		NcCheckboxRadioSwitch,
 		NcTextArea,
+		Question,
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values'],
 
 	data() {
 		return {
@@ -167,12 +166,14 @@ export default {
 		optionsHighest() {
 			return this.extraSettings?.optionsHighest ?? 5
 		},
+
 		optionsLabelLowest() {
 			return (
 				this.extraSettings?.optionsLabelLowest
 				?? t('forms', 'Strongly disagree')
 			)
 		},
+
 		optionsLabelHighest() {
 			return (
 				this.extraSettings?.optionsLabelHighest
@@ -196,17 +197,20 @@ export default {
 		onOptionsLowestChange(value) {
 			this.onExtraSettingsChange({ optionsLowest: value === 1 ? null : value })
 		},
+
 		onOptionsHighestChange(value) {
 			this.onExtraSettingsChange({
 				optionsHighest: value === 5 ? null : value,
 			})
 		},
+
 		onOptionsLabelLowestChange(value) {
 			this.onExtraSettingsChange({
 				optionsLabelLowest:
 					value === t('forms', 'Strongly disagree') ? null : value,
 			})
 		},
+
 		onOptionsLabelHighestChange(value) {
 			this.onExtraSettingsChange({
 				optionsLabelHighest:

@@ -37,7 +37,7 @@ export default {
 		}
 	},
 
-	destroyed() {
+	unmounted() {
 		unsubscribe('forms:last-updated:set', this.emitSubmitMessage)
 	},
 

@@ -5,8 +5,8 @@
 
 <template>
 	<li
+		class="question"
 		:class="{
-			question: true,
 			'question--editable': !readOnly,
 		}"
 		:aria-label="t('forms', 'Question number {index}', { index })">
@@ -14,8 +14,8 @@
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
 			v-if="!readOnly"
+			class="question__drag-handle"
 			:class="{
-				'question__drag-handle': true,
 				'question__drag-handle--shiftup': shiftDragHandle,
 			}">
 			<NcButton
@@ -91,8 +91,8 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
-						:checked="isRequired"
-						@update:checked="onRequiredChange">
+						:model-value="isRequired"
+						@update:model-value="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
@@ -154,24 +154,24 @@
 </template>
 
 <script>
-import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
-
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconAsterisk from 'vue-material-design-icons/Asterisk.vue'
 import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
-import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
+import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
+import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconOverlay from '../Icons/IconOverlay.vue'
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Question',
 
 	components: {
@@ -199,55 +199,78 @@ export default {
 			type: Number,
 			required: true,
 		},
+
 		text: {
 			type: String,
 			required: true,
 		},
+
 		titlePlaceholder: {
 			type: String,
 			required: true,
 		},
+
 		description: {
 			type: String,
 			required: true,
 		},
+
 		isRequired: {
 			type: Boolean,
 			required: true,
 		},
+
 		shiftDragHandle: {
 			type: Boolean,
 			default: false,
 		},
+
 		readOnly: {
 			type: Boolean,
 			default: false,
 		},
+
 		maxStringLengths: {
 			type: Object,
 			required: true,
 		},
+
 		name: {
 			type: String,
 			default: '',
 		},
+
 		contentValid: {
 			type: Boolean,
-			default: true,
+			default: false,
 		},
+
 		warningInvalid: {
 			type: String,
 			default: t('forms', 'This question needs a title!'),
 		},
+
 		canMoveDown: {
 			type: Boolean,
 			default: false,
 		},
+
 		canMoveUp: {
 			type: Boolean,
 			default: false,
 		},
 	},
+
+	emits: [
+		'update:text',
+		'update:description',
+		'update:name',
+		'update:isRequired',
+		'move-down',
+		'move-up',
+		'delete',
+		'clone',
+	],
 
 	computed: {
 		/**
@@ -287,10 +310,12 @@ export default {
 			return this.description !== ''
 		},
 	},
+
 	// Ensure description is sized correctly on initial render
 	mounted() {
 		this.$nextTick(() => this.resizeDescription())
 	},
+
 	methods: {
 		onTitleChange({ target }) {
 			this.$emit('update:text', target.value)
@@ -328,6 +353,7 @@ export default {
 			this.$emit('move-down')
 			this.$nextTick(() => this.$refs.buttonDown.$el.focus())
 		},
+
 		onMoveUp() {
 			this.$emit('move-up')
 			this.$nextTick(() => this.$refs.buttonUp.$el.focus())

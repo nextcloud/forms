@@ -29,7 +29,6 @@
 						v-for="form in ownedForms"
 						:key="form.id"
 						:form="form"
-						:read-only="false"
 						@open-sharing="openSharing"
 						@mobile-close-navigation="mobileCloseNavigation"
 						@clone="onCloneForm"
@@ -77,7 +76,7 @@
 			<NcEmptyContent
 				v-if="loading"
 				class="forms-emptycontent"
-				:name="t('forms', 'Loading forms …')">
+				:name="t('forms', 'Loading forms …')">
 				<template #icon>
 					<NcLoadingIcon :size="64" />
 				</template>
@@ -138,13 +137,12 @@
 </template>
 
 <script>
-import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
-import { generateOcsUrl } from '@nextcloud/router'
-import { loadState } from '@nextcloud/initial-state'
-import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import { showError } from '@nextcloud/dialogs'
+import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
+import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
-
+import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
@@ -154,20 +152,19 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-
 import IconArchive from 'vue-material-design-icons/ArchiveOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
-
-import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import AppNavigationForm from './components/AppNavigationForm.vue'
+import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import FormsIcon from './components/Icons/FormsIcon.vue'
-import OcsResponse2Data from './utils/OcsResponse2Data.js'
-import PermissionTypes from './mixins/PermissionTypes.js'
 import Sidebar from './views/Sidebar.vue'
-import logger from './utils/Logger.js'
+import PermissionTypes from './mixins/PermissionTypes.js'
 import { FormState } from './models/Constants.ts'
+import logger from './utils/Logger.js'
+import OcsResponse2Data from './utils/OcsResponse2Data.js'
 
 export default {
+	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Forms',
 
 	components: {
@@ -285,6 +282,7 @@ export default {
 				}
 				return {}
 			},
+
 			set(form) {
 				// always close sidebar
 				this.sidebarOpened = false
