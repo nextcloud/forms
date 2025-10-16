@@ -11,7 +11,6 @@ OC.L10N.register(
     "Cancel" : "Bekor qilish",
     "Options" : "Variantlar",
     "Delete" : "O'chirish",
-    "Uploading …" : "Yuklanmoqda...",
     "Other" : "Boshqa",
     "never" : "hech qachon",
     "Set expiration date" : "Set expiration date",
@@ -36,6 +35,7 @@ OC.L10N.register(
     "Pick a time" : "Vaqtni tanlang",
     "Color" : "Rang",
     "Text" : "Matn",
-    "Email address" : "E-pochta manzili"
+    "Email address" : "E-pochta manzili",
+    "Uploading …" : "Yuklanmoqda..."
 },
 "nplurals=1; plural=0;");

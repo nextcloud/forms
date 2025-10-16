@@ -7,12 +7,10 @@ OC.L10N.register(
     "Question" : "Question",
     "Copy" : "Copiar",
     "Shared with you" : "Partejat amb vos",
-    "Loading forms …" : "Cargament del formulari...",
     "No forms created yet" : "Cap de formulari pas encara creat",
     "Cancel" : "Anullar",
     "Options" : "Opcions",
     "Delete" : "Suprimir",
-    "Uploading …" : "Mandadís…",
     "never" : "pas jamai",
     "Set expiration date" : "Especificar una data d'expiracion",
     "Group" : "Grop",
@@ -41,6 +39,8 @@ OC.L10N.register(
     "Presentation" : "Presentacion",
     "Text" : "Tèxt",
     "Phone number" : "Numèro de telefòn",
-    "Email address" : "Adreça mail"
+    "Email address" : "Adreça mail",
+    "Loading forms …" : "Cargament del formulari...",
+    "Uploading …" : "Mandadís…"
 },
 "nplurals=2; plural=(n > 1);");

@@ -26,7 +26,6 @@
     "Your forms" : "あなたのフォーム",
     "Shared with you" : "共有中",
     "Archived forms" : "アーカイブされたフォーム",
-    "Loading forms …" : "フォームを読み込み中…",
     "No forms created yet" : "まだフォームが作成されていません",
     "Create a form" : "フォームの作成",
     "Select a form or create a new one" : "フォームを選択するか、新しく作成します",
@@ -75,7 +74,6 @@
     "Shuffle options" : "選択肢をシャッフル",
     "Maximum file size" : "最大ファイルサイズ",
     "Delete" : "削除",
-    "Uploading …" : "アップロード中...",
     "Strongly disagree" : "全くそうは思わない",
     "Strongly agree" : "非常にそう思う",
     "Lowest value" : "最小値",
@@ -132,7 +130,6 @@
     "There was an error while adding the new question" : "設問の追加中にエラーが発生しました",
     "There was an error while removing the question" : "設問の削除中にエラーが発生しました",
     "Error while saving form" : "フォームの保存中にエラー発生",
-    "Loading {title} …" : "{title} をローディング ...",
     "Form is archived" : "フォームはアーカイブされました",
     "Form title" : "フォームのタイトル",
     "Description" : "説明",
@@ -156,7 +153,6 @@
     "Download" : "ダウンロード",
     "Delete all responses" : "全ての返信を削除",
     "Search" : "検索",
-    "Loading responses …" : "回答をロード中 ...",
     "No results found" : "結果が見つかりません",
     "No responses yet" : "まだ返信はありません",
     "Results of submitted forms will show up here" : "送信したフォームの結果はここに表示されます",
@@ -171,7 +167,6 @@
     "Some answers are not valid" : "いくつかの回答が無効です",
     "There was an error submitting the form" : "フォームの送信中にエラーが発生しました",
     "Submit form" : "フォームを送信",
-    "Submitting form …" : "フォームを送信中...",
     "Thank you for completing the form!" : "回答のご協力ありがとうございました！",
     "Clear form" : "フォームをクリア",
     "Leave form" : "フォームから出る",
@@ -229,6 +224,11 @@
     "The input is not a valid email address" : "入力されたメールアドレスは無効です。",
     "Enter an email address" : "メールアドレスを入力",
     "Number" : "数字",
-    "Enter a number" : "数値を入力"
+    "Enter a number" : "数値を入力",
+    "Loading forms …" : "フォームを読み込み中…",
+    "Uploading …" : "アップロード中...",
+    "Loading {title} …" : "{title} をローディング ...",
+    "Loading responses …" : "回答をロード中 ...",
+    "Submitting form …" : "フォームを送信中..."
 },"pluralForm" :"nplurals=1; plural=0;"
 }

@@ -26,7 +26,6 @@
     "Unable to copy form" : "No s'ha pogut copiar el formulari",
     "New form" : "Formulari nou",
     "Shared with you" : "Compartits amb vós",
-    "Loading forms …" : "Carregant els formularis …",
     "No forms created yet" : "Encara no heu creat cap formulari",
     "Create a form" : "Crea un formulari",
     "Select a form or create a new one" : "Seleccioneu un formulari o creeu-ne un de nou",
@@ -70,7 +69,6 @@
     "Shuffle options" : "Barrejar opcions",
     "Maximum file size" : "Mida màxima dels fitxers",
     "Delete" : "Suprimeix",
-    "Uploading …" : "S'està pujant…",
     "A long answer for the question “{text}”" : "Resposta llarga per a la pregunta «{text}»",
     "Other" : "Altres",
     "A short answer for the question “{text}”" : "Resposta curta per a la pregunta «{text}»",
@@ -116,7 +114,6 @@
     "There was an error while adding the new question" : "S'ha produït un error en afegir la pregunta nova",
     "There was an error while removing the question" : "S'ha produït un error en suprimir la pregunta",
     "Error while saving form" : "S'ha produït un error en desar el formulari",
-    "Loading {title} …" : "Carregant {title} …",
     "Form title" : "Títol del formulari",
     "Description" : "Descripció",
     "Add a question" : "Afegeix una pregunta",
@@ -131,7 +128,6 @@
     "Download" : "Baixa",
     "Delete all responses" : "Suprimeix totes les respostes",
     "Search" : "Cercar",
-    "Loading responses …" : "Carregant les respostes …",
     "No results found" : "No s'ha trobat cap resultat",
     "No responses yet" : "Encara no hi ha respostes",
     "Results of submitted forms will show up here" : "Els resultats dels formularis enviats es mostraran aquí",
@@ -145,7 +141,6 @@
     "Clear" : "Neteja",
     "There was an error submitting the form" : "S'ha produït un error en enviar el formulari",
     "Submit form" : "Envia el formulari",
-    "Submitting form …" : "Enviant el formulari …",
     "Thank you for completing the form!" : "Gràcies per emplenar el formulari!",
     "You have unsaved changes! Do you still want to leave?" : "Teniu canvis no desats! Encara vols marxar?",
     "Error while saving question" : "S'ha produït un error en desar la pregunta",
@@ -190,6 +185,11 @@
     "Text" : "Text",
     "Phone number" : "Telèfon",
     "Email address" : "Adreça electrònica",
-    "Number" : "Número"
+    "Number" : "Número",
+    "Loading forms …" : "Carregant els formularis …",
+    "Uploading …" : "S'està pujant…",
+    "Loading {title} …" : "Carregant {title} …",
+    "Loading responses …" : "Carregant les respostes …",
+    "Submitting form …" : "Enviant el formulari …"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -20,7 +20,6 @@
     "Unable to copy form" : "Kopiranje obrasca nije moguće",
     "New form" : "Novi obrazac",
     "Shared with you" : "Podijeljeno s vama",
-    "Loading forms …" : "Učitavanje obrazaca…",
     "No forms created yet" : "Nema stvorenih obrazaca",
     "Create a form" : "Stvori obrazac",
     "Select a form or create a new one" : "Otvori obrazac ili stvori novi",
@@ -47,7 +46,6 @@
     "Delete question" : "Izbriši pitanje",
     "Maximum file size" : "Maksimalna veličina datoteke",
     "Delete" : "Izbriši",
-    "Uploading …" : "Otpremanje...",
     "A long answer for the question “{text}”" : "Dugi odgovor na pitanje „{text}“",
     "Other" : "Drugo",
     "A short answer for the question “{text}”" : "Kratak odgovor na pitanje „{text}“",
@@ -74,7 +72,6 @@
     "There was an error while adding the new question" : "Došlo je do pogreške pri dodavanju novog pitanja",
     "There was an error while removing the question" : "Došlo je do pogreške pri uklanjanju pitanja",
     "Error while saving form" : "Pogreška pri spremanju obrasca",
-    "Loading {title} …" : "Učitavanje {title}…",
     "Form title" : "Naslov obrasca",
     "Description" : "Opis",
     "Add a question" : "Dodaj pitanje",
@@ -89,7 +86,6 @@
     "Download" : "Preuzmi",
     "Delete all responses" : "Izbriši sve odgovore",
     "Search" : "Traži",
-    "Loading responses …" : "Učitavanje odgovora…",
     "No results found" : "Nema rezultata",
     "No responses yet" : "Još nema odgovora",
     "Results of submitted forms will show up here" : "Ovdje će se prikazati rezultati poslanih obrazaca",
@@ -101,7 +97,6 @@
     "Clear" : "Izbriši",
     "There was an error submitting the form" : "Došlo je do pogreške pri slanju obrasca",
     "Submit form" : "Šalji obrazac",
-    "Submitting form …" : "Slanje obrasca u tijeku…",
     "Thank you for completing the form!" : "Hvala što ste ispunili obrazac!",
     "You have unsaved changes! Do you still want to leave?" : "Postoje nespremljene promjene! Želite li još uvijek izaći?",
     "Error while saving question" : "Pogreška pri spremanju pitanja",
@@ -139,6 +134,11 @@
     "Presentation" : "Prezentacija",
     "Text" : "Tekst",
     "Phone number" : "Broj telefona",
-    "Email address" : "Adresa e-pošte"
+    "Email address" : "Adresa e-pošte",
+    "Loading forms …" : "Učitavanje obrazaca…",
+    "Uploading …" : "Otpremanje...",
+    "Loading {title} …" : "Učitavanje {title}…",
+    "Loading responses …" : "Učitavanje odgovora…",
+    "Submitting form …" : "Slanje obrasca u tijeku…"
 },"pluralForm" :"nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;"
 }

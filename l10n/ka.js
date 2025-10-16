@@ -11,7 +11,6 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Go to previous page" : "Go to previous page",
     "Delete" : "Delete",
-    "Uploading …" : "Uploading …",
     "Other" : "Other",
     "never" : "never",
     "Set expiration date" : "Set expiration date",
@@ -48,6 +47,7 @@ OC.L10N.register(
     "Presentation" : "Presentation",
     "Text" : "Text",
     "Phone number" : "Phone number",
-    "Email address" : "Email address"
+    "Email address" : "Email address",
+    "Uploading …" : "Uploading …"
 },
 "nplurals=2; plural=(n!=1);");

@@ -5,7 +5,6 @@
     "Cancel" : "Цуцлах",
     "Required" : "Шаардлагатай",
     "Delete" : "Устгах",
-    "Uploading …" : "Байршуулж байна...",
     "never" : "хэзээ ч үгүй",
     "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Group" : "Бүлэг",
@@ -22,6 +21,7 @@
     "Date" : "Он сар өдөр",
     "Time" : "Цаг",
     "Color" : "Өнгө",
-    "Phone number" : "Утасны дугаар"
+    "Phone number" : "Утасны дугаар",
+    "Uploading …" : "Байршуулж байна..."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

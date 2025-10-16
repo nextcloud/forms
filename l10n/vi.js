@@ -11,7 +11,6 @@ OC.L10N.register(
     "Cancel" : "Hủy",
     "Required" : "Bắt buộc",
     "Delete" : "Xóa",
-    "Uploading …" : "Đang tải lên …",
     "Other" : "Khác",
     "never" : "không thay đổi",
     "Set expiration date" : "Đặt ngày hết hạn",
@@ -53,6 +52,7 @@ OC.L10N.register(
     "Text" : "Văn bản",
     "Phone number" : "Số điện thoại",
     "Email address" : "Địa chỉ thư điện tử",
-    "Number" : "Số"
+    "Number" : "Số",
+    "Uploading …" : "Đang tải lên …"
 },
 "nplurals=1; plural=0;");

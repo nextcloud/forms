@@ -7,7 +7,6 @@ OC.L10N.register(
     "Cancel" : "Цуцлах",
     "Required" : "Шаардлагатай",
     "Delete" : "Устгах",
-    "Uploading …" : "Байршуулж байна...",
     "never" : "хэзээ ч үгүй",
     "Set expiration date" : "Дуусах хугацааг тохируулах",
     "Group" : "Бүлэг",
@@ -24,6 +23,7 @@ OC.L10N.register(
     "Date" : "Он сар өдөр",
     "Time" : "Цаг",
     "Color" : "Өнгө",
-    "Phone number" : "Утасны дугаар"
+    "Phone number" : "Утасны дугаар",
+    "Uploading …" : "Байршуулж байна..."
 },
 "nplurals=2; plural=(n != 1);");

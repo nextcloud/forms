@@ -8,7 +8,6 @@ OC.L10N.register(
     "Cancel" : "გაუქმება",
     "Required" : "სავალდებულო",
     "Delete" : "წაშლა",
-    "Uploading …" : "იტვირთება ...",
     "Other" : "სხვა",
     "never" : "არასდროს",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
@@ -32,6 +31,7 @@ OC.L10N.register(
     "Time" : "დრო",
     "Color" : "ფერი",
     "Text" : "ტექსტი",
-    "Phone number" : "ტელეფონის ნომერი"
+    "Phone number" : "ტელეფონის ნომერი",
+    "Uploading …" : "იტვირთება ..."
 },
 "nplurals=2; plural=(n!=1);");

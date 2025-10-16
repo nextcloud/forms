@@ -7,7 +7,6 @@ OC.L10N.register(
     "Cancel" : "Batal",
     "Options" : "Pilihan",
     "Delete" : "Hapus",
-    "Uploading …" : "Mengunggah …",
     "Other" : "Lainnya",
     "never" : "tidak pernah.",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
@@ -37,6 +36,7 @@ OC.L10N.register(
     "Image" : "Gambar",
     "Text" : "Teks",
     "Phone number" : "Nomor telepon",
-    "Email address" : "Alamat email"
+    "Email address" : "Alamat email",
+    "Uploading …" : "Mengunggah …"
 },
 "nplurals=1; plural=0;");

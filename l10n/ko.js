@@ -23,7 +23,6 @@ OC.L10N.register(
     "Unable to copy form" : "폼을 복사할 수 없음",
     "New form" : "새로운 형식",
     "Shared with you" : "나와 공유됨",
-    "Loading forms …" : "형식 로딩중 ...",
     "Create a form" : "형식 생성",
     "Create new form" : "새로운 양식 생성",
     "This form does not exist" : "존재하지 않는 양식",
@@ -44,7 +43,6 @@ OC.L10N.register(
     "Delete question" : "질문 삭제",
     "Maximum file size" : "최대 파일 크기",
     "Delete" : "삭제",
-    "Uploading …" : "업로드 중…",
     "Other" : "기타",
     "Delete this response" : "이 응답 지우기",
     "never" : "하지 않음",
@@ -102,6 +100,8 @@ OC.L10N.register(
     "Text" : "텍스트",
     "Phone number" : "휴대폰 번호",
     "Email address" : "이메일 주소",
-    "Number" : "숫자"
+    "Number" : "숫자",
+    "Loading forms …" : "형식 로딩중 ...",
+    "Uploading …" : "업로드 중…"
 },
 "nplurals=1; plural=0;");

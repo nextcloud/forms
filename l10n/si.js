@@ -6,7 +6,6 @@ OC.L10N.register(
     "Anonymous response" : "නිර්නාමික ප්‍රතිචාරය",
     "responses" : "ප්‍රතිචාර",
     "Cancel" : "අවලංගු",
-    "Uploading …" : "උඩුගත වෙමින්…",
     "Other" : "වෙනත්",
     "Group" : "සමූහය",
     "Edit" : "සංස්කරණය",
@@ -21,6 +20,7 @@ OC.L10N.register(
     "File" : "ගොනුව",
     "Date" : "දිනය",
     "Time" : "වේලාව",
-    "Phone number" : "දුරකථන අංකය"
+    "Phone number" : "දුරකථන අංකය",
+    "Uploading …" : "උඩුගත වෙමින්…"
 },
 "nplurals=2; plural=(n != 1);");
