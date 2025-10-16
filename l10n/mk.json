@@ -14,7 +14,6 @@
     "Unable to create a new form" : "Неможе да се креира нова форма",
     "New form" : "Нова форма",
     "Shared with you" : "Споделено со вас",
-    "Loading forms …" : "Вчитување форми ...",
     "No forms created yet" : "Сеуште нема креирано форми",
     "Create a form" : "Креирај форма",
     "Select a form or create a new one" : "Избери форма или креирај нова",
@@ -40,7 +39,6 @@
     "Delete question" : "Избриши прашање",
     "Maximum file size" : "Максимална големина на датотека",
     "Delete" : "Избриши",
-    "Uploading …" : "Прикачување …",
     "A long answer for the question “{text}”" : "Долг одговор за прашањето {index}",
     "Other" : "Останато",
     "A short answer for the question “{text}”" : "Краток одговор за прашањето {index}",
@@ -67,7 +65,6 @@
     "There was an error while adding the new question" : "Настана грешка при додавање на на ново прашање",
     "There was an error while removing the question" : "Настана грешка при бришење на прашање",
     "Error while saving form" : "Грешка при зачувување на форма",
-    "Loading {title} …" : "Се вчитува {title} …",
     "Form title" : "Наслов на формата",
     "Description" : "Опис",
     "Add a question" : "Додади прашање",
@@ -80,7 +77,6 @@
     "Download" : "Преземи",
     "Delete all responses" : "Избриши ги сите одговори",
     "Search" : "Барај",
-    "Loading responses …" : "Вчитување на одговори ...",
     "No results found" : "Нема пронајдено резултати",
     "No responses yet" : "Сеуште нема одговори",
     "Results of submitted forms will show up here" : "Резултатите од испратените прашалници ќе се појават овде",
@@ -92,7 +88,6 @@
     "Clear" : "Исчисти",
     "There was an error submitting the form" : "Настана грешка при испраќање на формата",
     "Submit form" : "Испрати",
-    "Submitting form …" : "Испраќање форма ...",
     "Thank you for completing the form!" : "Ви благодариме што ја комплетиравте формата!",
     "Error while saving question" : "Грешка при зачувување на прашање",
     "There was an issue deleting this option" : "Настана грешка при бришење на опцијата",
@@ -130,6 +125,11 @@
     "Presentation" : "Презентација",
     "Text" : "Текст",
     "Phone number" : "Телефонски број",
-    "Email address" : "Е-пошта адреса"
+    "Email address" : "Е-пошта адреса",
+    "Loading forms …" : "Вчитување форми ...",
+    "Uploading …" : "Прикачување …",
+    "Loading {title} …" : "Се вчитува {title} …",
+    "Loading responses …" : "Вчитување на одговори ...",
+    "Submitting form …" : "Испраќање форма ..."
 },"pluralForm" :"nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;"
 }

@@ -20,7 +20,6 @@
     "Unable to copy form" : "No at fatu a copiare su mòdulu",
     "New form" : "Mòdulu nou",
     "Shared with you" : "Cumpartzidos cun tegus",
-    "Loading forms …" : "Carrighende mòdulos …",
     "No forms created yet" : "Ancora perunu mòdulu creadu",
     "Create a form" : "Crea unu mòdulu",
     "Select a form or create a new one" : "Seletziona unu mòdulu o crea·nde unu nou",
@@ -48,7 +47,6 @@
     "Delete question" : "Cantzella pregonta",
     "Maximum file size" : "Mannària màssima de s'archìviu",
     "Delete" : "Cantzella",
-    "Uploading …" : "Carrighende ...",
     "Add new file as answer" : "Agiunghe archìviu nou comente risposta",
     "A long answer for the question “{text}”" : "Una risposta longa pro sa pregonta “{text}”",
     "Other" : "Àteru",
@@ -78,7 +76,6 @@
     "There was an error while adding the new question" : "Ddoe at àpidu un'errore agiunghende sa pregonta noa",
     "There was an error while removing the question" : "Ddoe at àpidu un'errore boghende·nche sa pregonta",
     "Error while saving form" : "Errore sarvende su mòdulu",
-    "Loading {title} …" : "Carrighende {title} …",
     "Form title" : "Tìtulu de su mòdulu",
     "Description" : "Descritzione",
     "Add a question" : "Agiunghe una pregonta",
@@ -94,7 +91,6 @@
     "Download" : "Iscàrriga",
     "Delete all responses" : "Cantzella totu is rispostas",
     "Search" : "Chirca",
-    "Loading responses …" : "Carrighende is rispostas ...",
     "No results found" : "Perunu resurtadu agatadu",
     "No responses yet" : "Ancora peruna risposta",
     "Results of submitted forms will show up here" : "Is resurtados de is mòdulos imbiados s'ant a mustrare inoghe",
@@ -106,7 +102,6 @@
     "Clear" : "Lìmpia",
     "There was an error submitting the form" : "B'at àpidu un'errore imbiende su mòdulu",
     "Submit form" : "Imbia mòdulu",
-    "Submitting form …" : "Imbia mòdulu …",
     "Thank you for completing the form!" : "Gràtzias pro àere cumpletadu su mòdulu!",
     "You have unsaved changes! Do you still want to leave?" : "No as sarvadu is modìficas! A beru boles essire?",
     "Error while saving question" : "Errore sarvende sa pregonta",
@@ -145,6 +140,11 @@
     "Presentation" : "Presentatzione",
     "Text" : "Testu",
     "Phone number" : "Nùmeru de telèfonu",
-    "Email address" : "Indiritzu de posta eletrònica"
+    "Email address" : "Indiritzu de posta eletrònica",
+    "Loading forms …" : "Carrighende mòdulos …",
+    "Uploading …" : "Carrighende ...",
+    "Loading {title} …" : "Carrighende {title} …",
+    "Loading responses …" : "Carrighende is rispostas ...",
+    "Submitting form …" : "Imbia mòdulu …"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

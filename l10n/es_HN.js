@@ -7,7 +7,6 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
-    "Uploading …" : "Cargando...",
     "Other" : "Otro",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
@@ -31,6 +30,7 @@ OC.L10N.register(
     "Time" : "Hora",
     "Color" : "Color",
     "Text" : "Texto",
-    "Phone number" : "Número telefónico"
+    "Phone number" : "Número telefónico",
+    "Uploading …" : "Cargando..."
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -5,7 +5,6 @@
     "Cancel" : "Batal",
     "Options" : "Pilihan",
     "Delete" : "Hapus",
-    "Uploading …" : "Mengunggah …",
     "Other" : "Lainnya",
     "never" : "tidak pernah.",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
@@ -35,6 +34,7 @@
     "Image" : "Gambar",
     "Text" : "Teks",
     "Phone number" : "Nomor telepon",
-    "Email address" : "Alamat email"
+    "Email address" : "Alamat email",
+    "Uploading …" : "Mengunggah …"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

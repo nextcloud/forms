@@ -10,7 +10,6 @@ OC.L10N.register(
     "Required" : "Nepra",
     "Maximum file size" : "Maksimuma dosiergrando",
     "Delete" : "Forigi",
-    "Uploading …" : "Alŝutado…",
     "Other" : "Alia",
     "never" : "neniam",
     "Set expiration date" : "Uzi limdaton",
@@ -40,6 +39,7 @@ OC.L10N.register(
     "Color" : "Koloro",
     "Text" : "Teksto",
     "Phone number" : "Telefonnumero",
-    "Email address" : "Retpoŝtadreso"
+    "Email address" : "Retpoŝtadreso",
+    "Uploading …" : "Alŝutado…"
 },
 "nplurals=2; plural=(n != 1);");

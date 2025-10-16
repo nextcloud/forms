@@ -10,7 +10,6 @@
     "Unable to create a new form" : "לא ניתן ליצור טופס חדש",
     "New form" : "טופס חדש",
     "Shared with you" : "משותף אתך",
-    "Loading forms …" : "הטפסים נטענים…",
     "No forms created yet" : "לא נוצרו עדיין טפסים",
     "Create a form" : "יצירת טופס",
     "Select a form or create a new one" : "ניתן לבחור טופס או ליצור אחד חדש",
@@ -35,7 +34,6 @@
     "Delete question" : "מחיקת שאלה",
     "Maximum file size" : "גודל הקובץ המרבי",
     "Delete" : "מחיקה",
-    "Uploading …" : "מתבצעת העלאה…",
     "A long answer for the question “{text}”" : "תשובה ארוכה לשאלה „{text}”",
     "Other" : "אחר",
     "A short answer for the question “{text}”" : "תשובה קצרה לשאלה „{text}”",
@@ -62,7 +60,6 @@
     "There was an error while adding the new question" : "אירעה שגיאה בעת הוספת השאלה החדשה",
     "There was an error while removing the question" : "אירעה שגיאה בעת הסרת השאלה",
     "Error while saving form" : "שגיאה בעת שמירת טופס",
-    "Loading {title} …" : "{title} בטעינה…",
     "Form title" : "כותרת טופס",
     "Description" : "תיאור",
     "Add a question" : "הוספת שאלה",
@@ -75,7 +72,6 @@
     "Download" : "הורדה",
     "Delete all responses" : "מחיקת כל התגובות",
     "Search" : "חיפוש",
-    "Loading responses …" : "התגובות נטענות…",
     "No responses yet" : "אין תגובות עדיין",
     "Results of submitted forms will show up here" : "התוצאות לטפסים שהוגשו תופענה כאן",
     "Are you sure you want to delete all responses of {title}?" : "למחוק את כל התגובות על {title}?",
@@ -86,7 +82,6 @@
     "Clear" : "פינוי",
     "There was an error submitting the form" : "עלתה שגיאה בעת הגשת הטופס",
     "Submit form" : "הגשת הטופס",
-    "Submitting form …" : "הטופס מוגש…",
     "Thank you for completing the form!" : "תודה לך על שהשלמת את הטופס!",
     "Error while saving question" : "שגיאה בשמירת השאלה",
     "There was an issue deleting this option" : "מחיקת האפשרות נתקלה בבעיה",
@@ -123,6 +118,11 @@
     "Spreadsheet" : "גיליון נתונים",
     "Text" : "טקסט",
     "Phone number" : "מספר טלפון",
-    "Email address" : "כתובת דוא״ל"
+    "Email address" : "כתובת דוא״ל",
+    "Loading forms …" : "הטפסים נטענים…",
+    "Uploading …" : "מתבצעת העלאה…",
+    "Loading {title} …" : "{title} בטעינה…",
+    "Loading responses …" : "התגובות נטענות…",
+    "Submitting form …" : "הטופס מוגש…"
 },"pluralForm" :"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;"
 }

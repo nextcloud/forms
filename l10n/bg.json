@@ -26,7 +26,6 @@
     "Unable to copy form" : "Неуспешно копиране на формуляр",
     "New form" : "Нов формуляр",
     "Shared with you" : "Споделени с вас",
-    "Loading forms …" : "Зареждане на формуляри ...",
     "No forms created yet" : "Все още няма създадени формуляри",
     "Create a form" : "Създаване на формуляр",
     "Select a form or create a new one" : "Избор на формуляр или създаване на нов",
@@ -67,7 +66,6 @@
     "Shuffle options" : "Опции за разбъркване",
     "Maximum file size" : "Максимален размер на файл",
     "Delete" : "Изтриване",
-    "Uploading …" : "Качване …",
     "A long answer for the question “{text}”" : "Дълъг отговор на въпроса „{text}“ 48",
     "Other" : "Други",
     "A short answer for the question “{text}”" : "Кратък отговор на въпроса „{text}“",
@@ -110,7 +108,6 @@
     "There was an error while adding the new question" : "Възникна грешка при добавянето на новият въпрос",
     "There was an error while removing the question" : "Възникна грешка при премахването на въпроса",
     "Error while saving form" : "Грешка при записване на формуляра",
-    "Loading {title} …" : "Зареждане на {title} ...",
     "Form title" : "Заглавие на формуляр",
     "Description" : "Описание",
     "Add a question" : "Добавяне на въпрос",
@@ -125,7 +122,6 @@
     "Download" : "Изтегляне",
     "Delete all responses" : "Изтриване на всички отговори",
     "Search" : "Търсене",
-    "Loading responses …" : "Зареждане на отговори …",
     "No results found" : "Няма намерени резултати",
     "No responses yet" : "Все още няма отговори",
     "Results of submitted forms will show up here" : "Резултатите от изпратените формуляри ще се покажат тук",
@@ -138,7 +134,6 @@
     "Clear" : "Изчистване",
     "There was an error submitting the form" : "Възникна грешка при изпращането на формуляра",
     "Submit form" : "Изпращане на формуляр",
-    "Submitting form …" : "Изпращане на формуляр …",
     "Thank you for completing the form!" : "Благодарим ви, че попълнихте формуляра!",
     "You have unsaved changes! Do you still want to leave?" : "Имате незапазени промени! Все още ли искате да напуснете?",
     "Error while saving question" : "Грешка при записване на въпроса",
@@ -183,6 +178,11 @@
     "Text" : "Текст",
     "Phone number" : "Телефонен номер",
     "Email address" : "Имейл адрес",
-    "Number" : "Номер"
+    "Number" : "Номер",
+    "Loading forms …" : "Зареждане на формуляри ...",
+    "Uploading …" : "Качване …",
+    "Loading {title} …" : "Зареждане на {title} ...",
+    "Loading responses …" : "Зареждане на отговори …",
+    "Submitting form …" : "Изпращане на формуляр …"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -22,7 +22,6 @@ OC.L10N.register(
     "Unable to copy form" : "ไม่สามารถคัดลอกฟอร์ม",
     "New form" : "ฟอร์มใหม่",
     "Shared with you" : "แชร์กับคุณ",
-    "Loading forms …" : "กำลังโหลดฟอร์ม …",
     "No forms created yet" : "ยังไม่มีฟอร์มที่สร้าง",
     "Create a form" : "สร้างฟอร์มใหม่",
     "Select a form or create a new one" : "เลือกฟอร์มหรือสร้างฟอร์มใหม่",
@@ -44,7 +43,6 @@ OC.L10N.register(
     "Required" : "จำเป็น",
     "Delete question" : "ลบคำถาม",
     "Delete" : "ลบ",
-    "Uploading …" : "กำลังอัปโหลด …",
     "Other" : "อื่น ๆ",
     "No response" : "ไม่มีการตอบกลับ",
     "Delete this response" : "ลบการตอบกลับนี้",
@@ -58,7 +56,6 @@ OC.L10N.register(
     "View" : "มุมมอง",
     "Edit" : "แก้ไข",
     "Share" : "แชร์",
-    "Loading {title} …" : "กำลังโหลด {title} …",
     "Form title" : "หัวข้อฟอร์ม",
     "Description" : "รายละเอียด",
     "Add a question" : "เพิ่มคำถาม",
@@ -71,7 +68,6 @@ OC.L10N.register(
     "Clear" : "ล้าง",
     "There was an error submitting the form" : "เกิดข้อผิดพลาดขณะส่งฟอร์ม",
     "Submit form" : "ส่งฟอร์ม",
-    "Submitting form …" : "กำลังส่งฟอร์ม …",
     "Thank you for completing the form!" : "ขอบคุณที่ทำแบบฟอร์ม!",
     "Error while saving question" : "ข้อผิดพลาดขณะบันทึกคำถาม",
     "Form link copied" : "คัดลอกลิงก์ฟอร์มแล้ว",
@@ -90,6 +86,10 @@ OC.L10N.register(
     "Spreadsheet" : "สเปรดชีต",
     "Text" : "ข้อความ",
     "Phone number" : "หมายเลขโทรศัพท์",
-    "Email address" : "ที่อยู่อีเมล"
+    "Email address" : "ที่อยู่อีเมล",
+    "Loading forms …" : "กำลังโหลดฟอร์ม …",
+    "Uploading …" : "กำลังอัปโหลด …",
+    "Loading {title} …" : "กำลังโหลด {title} …",
+    "Submitting form …" : "กำลังส่งฟอร์ม …"
 },
 "nplurals=1; plural=0;");
