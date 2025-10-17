@@ -23,7 +23,6 @@
     "Unable to copy form" : "No se pudo copiar el formulario",
     "New form" : "Nuevo formulario",
     "Shared with you" : "Compartido con usted",
-    "Loading forms …" : "Cargando formularios...",
     "No forms created yet" : "Aún no se han creado formularios",
     "Create a form" : "Crear un formulario",
     "Select a form or create a new one" : "Selecciona un formulario o crea uno nuevo",
@@ -66,7 +65,6 @@
     "Shuffle options" : "Mezclar opciones",
     "Maximum file size" : "Tamaño máximo de archivo",
     "Delete" : "Borrar",
-    "Uploading …" : "Cargando...",
     "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{text}\"",
     "Other" : "Otro",
     "A short answer for the question “{text}”" : "Una respuesta corta para la pregunta \"{text}\"",
@@ -111,7 +109,6 @@
     "There was an error while adding the new question" : "Hubo un error al añadir la nueva pregunta",
     "There was an error while removing the question" : "Hubo un error al eliminar la pregunta",
     "Error while saving form" : "Error al guardar el formulario",
-    "Loading {title} …" : "Cargando {title}...",
     "Form title" : "Título del formulario",
     "Description" : "Descripción",
     "Add a question" : "Añadir una pregunta",
@@ -126,7 +123,6 @@
     "Download" : "Descargar",
     "Delete all responses" : "Eliminar todas las respuestas",
     "Search" : "Buscar",
-    "Loading responses …" : "Cargando respuestas...",
     "No results found" : "No se encontraron resultados",
     "No responses yet" : "Aún no hay respuestas",
     "Results of submitted forms will show up here" : "Los resultados de los formularios enviados aparecerán aquí",
@@ -139,7 +135,6 @@
     "Clear" : "Limpiar",
     "There was an error submitting the form" : "Hubo un error al enviar el formulario",
     "Submit form" : "Enviar formulario",
-    "Submitting form …" : "Enviando formulario...",
     "Thank you for completing the form!" : "¡Gracias por completar el formulario!",
     "You have unsaved changes! Do you still want to leave?" : "¡Tienes cambios no guardados! ¿Aún quieres salir?",
     "Error while saving question" : "Error al guardar la pregunta",
@@ -184,6 +179,11 @@
     "Text" : "Texto",
     "Phone number" : "Número telefónico",
     "Email address" : "Dirección de correo electrónico",
-    "Number" : "Número"
+    "Number" : "Número",
+    "Loading forms …" : "Cargando formularios...",
+    "Uploading …" : "Cargando...",
+    "Loading {title} …" : "Cargando {title}...",
+    "Loading responses …" : "Cargando respuestas...",
+    "Submitting form …" : "Enviando formulario..."
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

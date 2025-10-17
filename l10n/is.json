@@ -9,7 +9,6 @@
     "Unable to create a new form" : "Gat ekki búið til nýtt eyðuform",
     "New form" : "Nýtt eyðuform",
     "Shared with you" : "Deilt með þér",
-    "Loading forms …" : "Hleð inn eyðuformum …",
     "No forms created yet" : "Engin eyðuform útbúin ennþá",
     "Create a form" : "Búa til eyðuform",
     "Select a form or create a new one" : "Veldu eyðuform eða búðu til nýtt",
@@ -36,7 +35,6 @@
     "Delete question" : "Eyða spurningu",
     "Maximum file size" : "Hámarks skráastærð",
     "Delete" : "Eyða",
-    "Uploading …" : "Sendi inn …",
     "A long answer for the question “{text}”" : "Langt svar við spurningunni “{text}”",
     "Other" : "Annað",
     "A short answer for the question “{text}”" : "Stutt svar við spurningunni “{text}”",
@@ -60,7 +58,6 @@
     "View mode" : "Skoðunarhamur",
     "Share" : "Deila",
     "Error while saving form" : "Villa við að vista eyðuform",
-    "Loading {title} …" : "Hleð inn {title} …",
     "Form title" : "Titill eyðuforms",
     "Description" : "Lýsing",
     "Add a question" : "Bæta við spurningu",
@@ -71,7 +68,6 @@
     "Download" : "Sækja",
     "Delete all responses" : "Eyða öllum svörum",
     "Search" : "Search",
-    "Loading responses …" : "Hleð inn svörum …",
     "Results of submitted forms will show up here" : "Niðurstöður innsendra eyðuforma munu birtast hér",
     "Sharing" : "Deiling",
     "Settings" : "Stillingar",
@@ -80,7 +76,6 @@
     "Clear" : "Hreinsa",
     "There was an error submitting the form" : "Það kom upp villa við að senda  eyðuformið inn",
     "Submit form" : "Senda inn eyðuform",
-    "Submitting form …" : "Sendi inn eyðuform …",
     "Thank you for completing the form!" : "Takk fyrir að fylla út í eyðuformið!",
     "Error while saving question" : "Villa við að vista spurningu",
     "Form link copied" : "Tengill eyðuforms afritaður",
@@ -108,6 +103,11 @@
     "Spreadsheet" : "Töflureiknisskjal",
     "Text" : "Texti",
     "Phone number" : "Símanúmer",
-    "Email address" : "Tölvupóstfang"
+    "Email address" : "Tölvupóstfang",
+    "Loading forms …" : "Hleð inn eyðuformum …",
+    "Uploading …" : "Sendi inn …",
+    "Loading {title} …" : "Hleð inn {title} …",
+    "Loading responses …" : "Hleð inn svörum …",
+    "Submitting form …" : "Sendi inn eyðuform …"
 },"pluralForm" :"nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);"
 }

@@ -5,7 +5,6 @@
     "Cancel" : "Cancel",
     "Required" : "Nødvendig",
     "Delete" : "Slett",
-    "Uploading …" : "Lastar opp...",
     "Other" : "Anna",
     "never" : "aldri",
     "Set expiration date" : "Set utløpsdato",
@@ -23,6 +22,7 @@
     "File" : "Fil",
     "Date" : "Dato",
     "Time" : "Tid",
-    "Color" : "Farge"
+    "Color" : "Farge",
+    "Uploading …" : "Lastar opp..."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

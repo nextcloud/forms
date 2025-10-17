@@ -8,7 +8,6 @@
     "Required" : "Nepra",
     "Maximum file size" : "Maksimuma dosiergrando",
     "Delete" : "Forigi",
-    "Uploading …" : "Alŝutado…",
     "Other" : "Alia",
     "never" : "neniam",
     "Set expiration date" : "Uzi limdaton",
@@ -38,6 +37,7 @@
     "Color" : "Koloro",
     "Text" : "Teksto",
     "Phone number" : "Telefonnumero",
-    "Email address" : "Retpoŝtadreso"
+    "Email address" : "Retpoŝtadreso",
+    "Uploading …" : "Alŝutado…"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

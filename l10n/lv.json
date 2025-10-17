@@ -9,14 +9,12 @@
     "Your forms" : "Tavas veidlapas",
     "Shared with you" : "Koplietots ar jums",
     "Archived forms" : "Arhivētās veidlapas",
-    "Loading forms …" : "Ielādē veidlapas…",
     "No forms created yet" : "Vēl nav izveidota neviena veidlapa",
     "Select groups" : "Atlasīt grupas",
     "Results" : "Rezultāti",
     "Cancel" : "Atcelt",
     "Required" : "Nepieciešams",
     "Delete" : "Izdzēst",
-    "Uploading …" : "Augšupielādē…",
     "Other" : "Cits",
     "never" : "nekad",
     "Set expiration date" : "Iestatīt derīguma beigu datumu",
@@ -59,6 +57,8 @@
     "Spreadsheet" : "Izklājlapa",
     "Text" : "Teksts",
     "Phone number" : "Tālruņa numurs",
-    "Email address" : "E-pasta adrese"
+    "Email address" : "E-pasta adrese",
+    "Loading forms …" : "Ielādē veidlapas…",
+    "Uploading …" : "Augšupielādē…"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);"
 }

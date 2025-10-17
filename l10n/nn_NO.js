@@ -7,7 +7,6 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Nødvendig",
     "Delete" : "Slett",
-    "Uploading …" : "Lastar opp...",
     "Other" : "Anna",
     "never" : "aldri",
     "Set expiration date" : "Set utløpsdato",
@@ -25,6 +24,7 @@ OC.L10N.register(
     "File" : "Fil",
     "Date" : "Dato",
     "Time" : "Tid",
-    "Color" : "Farge"
+    "Color" : "Farge",
+    "Uploading …" : "Lastar opp..."
 },
 "nplurals=2; plural=(n != 1);");

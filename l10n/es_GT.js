@@ -7,7 +7,6 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
-    "Uploading …" : "Cargando...",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
     "Group" : "Grupo",
@@ -32,6 +31,7 @@ OC.L10N.register(
     "Color" : "Color",
     "Text" : "Texto",
     "Phone number" : "Número telefónico",
-    "Email address" : "Dirección de correo electrónico"
+    "Email address" : "Dirección de correo electrónico",
+    "Uploading …" : "Cargando..."
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -20,7 +20,6 @@
     "Unable to copy form" : "Não foi possível copiar o formulário",
     "New form" : "Novo formulário",
     "Shared with you" : "Partilhado consigo",
-    "Loading forms …" : "Carregando formulários",
     "No forms created yet" : "Nenhum formulário ainda criado",
     "Create a form" : "Crie um formulário",
     "Select a form or create a new one" : "Selecione um formulário ou crie um novo",
@@ -46,7 +45,6 @@
     "Required" : "Obrigatório",
     "Delete question" : "Apague pergunta",
     "Delete" : "Apagar",
-    "Uploading …" : "A carregar ...",
     "A long answer for the question “{text}”" : "Uma resposta longa para a pergunta \"{text}\"",
     "Add \"other\"" : "Adicione \"outra\"",
     "Other:" : "Outra:",
@@ -76,7 +74,6 @@
     "There was an error while adding the new question" : "Ocorreu um erro ao adicionar uma nova pergunta",
     "There was an error while removing the question" : "Ocorreu um erro ao remover a pergunta",
     "Error while saving form" : "Erro ao guardar o formulário",
-    "Loading {title} …" : "A carregar {title} …",
     "Form title" : "Título do formulário",
     "Description" : "Descrição",
     "Add a question" : "Acrescente uma pergunta",
@@ -91,7 +88,6 @@
     "Download" : "Transferir",
     "Delete all responses" : "Apagar todas as respostas",
     "Search" : "Pesquisa sobre",
-    "Loading responses …" : "Carregando respostas …",
     "No results found" : "No results found",
     "No responses yet" : "Sem respostas ainda",
     "Results of submitted forms will show up here" : "Resultados dos formulários entregues aparecem aqui",
@@ -103,7 +99,6 @@
     "Clear" : "Limpar",
     "There was an error submitting the form" : "Ocorreu um erro ao submeter o formulário",
     "Submit form" : "Submeter formulário",
-    "Submitting form …" : "Submetendo o formulário …",
     "Thank you for completing the form!" : "Obrigado por ter preenchido o formulário!",
     "You have unsaved changes! Do you still want to leave?" : "Existem alterações que não estão guardadas. Tem a certeza que quer sair?",
     "Error while saving question" : "Erro ao guardar a pergunta",
@@ -143,6 +138,11 @@
     "Spreadsheet" : "Folha de Cálculo",
     "Text" : "Texto",
     "Phone number" : "Número de telefone",
-    "Email address" : "Endereço de email"
+    "Email address" : "Endereço de email",
+    "Loading forms …" : "Carregando formulários",
+    "Uploading …" : "A carregar ...",
+    "Loading {title} …" : "A carregar {title} …",
+    "Loading responses …" : "Carregando respostas …",
+    "Submitting form …" : "Submetendo o formulário …"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
