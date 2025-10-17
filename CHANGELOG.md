@@ -5,6 +5,19 @@
 
 # Changelog
 
+## v5.2.2 - 2025-10-17
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.1...v5.2.2)
+
+### Fixed
+
+- l10n(pt_BR): fixed a placeholder translation in the owner transfer dialog by @hdpoliveira
+
+### Merged
+
+- further translation updates
+- dependency updates
+
 ## v5.2.1 - 2025-10-02
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.0...v5.2.1)
