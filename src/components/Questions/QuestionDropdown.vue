@@ -44,24 +44,22 @@
 				v-else
 				v-model="sortedOptions"
 				class="question__content"
-				animation="200"
+				:animation="200"
 				direction="vertical"
 				handle=".option__drag-handle"
 				invert-swap
-				tag="ul"
+				tag="transition-group"
+				:component-data="{
+					name: isDragging
+						? 'no-external-transition-on-drag'
+						: 'options-list-transition',
+				}"
 				@change="saveOptionsOrder"
 				@start="isDragging = true"
 				@end="isDragging = false">
-				<TransitionGroup
-					:name="
-						isDragging
-							? 'no-external-transition-on-drag'
-							: 'options-list-transition'
-					">
+				<template #item="{ element: answer, index }">
 					<!-- Answer text input edit -->
 					<AnswerInput
-						v-for="(answer, index) in sortedOptions"
-						:key="answer.local ? 'option-local' : answer.id"
 						ref="input"
 						:answer="answer"
 						:form-id="formId"
@@ -77,7 +75,7 @@
 						@move-up="onOptionMoveUp(index)"
 						@move-down="onOptionMoveDown(index)"
 						@tabbed-out="checkValidOption" />
-				</TransitionGroup>
+				</template>
 			</Draggable>
 		</template>
 
