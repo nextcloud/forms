@@ -59,7 +59,7 @@
     "@nextcloud/prettier-config": "^1.2.0",
     "@nextcloud/stylelint-config": "^3.1.1",
     "@nextcloud/vite-config": "^1.7.1",
-    "@playwright/test": "^1.56.0",
+    "@playwright/test": "^1.56.1",
     "@vue/tsconfig": "^0.5.1",
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.6.2",
