@@ -164,7 +164,7 @@
     "Custom submission message" : "Mensagem de envio personalizada",
     "Message to show after a user submitted the form (formatting using Markdown is supported)" : "Mensagem a ser exibida após um usuário enviar o formulário (a formatação usando Markdown é suportada)",
     "Message to show after a user submitted the form. Please note that the message will not be translated!" : "Mensagem a ser exibida após um usuário enviar o formulário. Observe que a mensagem não será traduzida!",
-    "Search for user, group or team …" : "Pesquisa de usuário, grupo ou equipe …",
+    "Search for user, group or team …" : "Pesquisar usuário, grupo ou equipe …",
     "Group" : "Grupo",
     "Team" : "Equipe",
     "Permissions" : "Permissões",
