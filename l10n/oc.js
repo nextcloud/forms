@@ -18,6 +18,7 @@ OC.L10N.register(
     "Share link" : "Partejar lo ligam",
     "Add link" : "Apondre un ligam",
     "Copy to clipboard" : "Copiar dins lo quichapapièrs",
+    "Internal link" : "Ligam intèrn",
     "View" : "Veire",
     "Edit" : "Modificar",
     "Share" : "Partejar",
