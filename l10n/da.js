@@ -216,7 +216,7 @@ OC.L10N.register(
     "Linked file is not available, would you like to link a new file?" : "Linket fil er ikke tilgængelig. Ønsker du at linke til en ny fil?",
     "{amount} responses" : "{amount} svar",
     "Open spreadsheet" : "Åben regneark",
-    "Re-export spreadsheet" : "Geneksporter regneark",
+    "Re-export spreadsheet" : "Geneksportér regneark",
     "Save copy to Files" : "Gem kopi til Filer",
     "Download" : "Download",
     "Delete all responses" : "Slet alle svar",
