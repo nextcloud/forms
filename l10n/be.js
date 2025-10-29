@@ -13,6 +13,7 @@ OC.L10N.register(
     "Results" : "Вынікі",
     "Cancel" : "Скасаваць",
     "Options" : "Варыянты",
+    "Page number" : "Нумар старонкі",
     "Delete answer" : "Выдаліць адказ",
     "Required" : "Абавязкова",
     "Copy question" : "Капіяваць пытанне",
