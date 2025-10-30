@@ -799,6 +799,7 @@ export default {
 					}),
 				)
 				this.submissions = []
+				this.form.submissionCount = 0
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while removing responses', { error })
