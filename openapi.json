@@ -522,8 +522,20 @@
                     },
                     "validationType": {
                         "type": "string"
+                    },
+                    "questionType": {
+                        "type": "string"
                     }
                 }
+            },
+            "QuestionGridSubType": {
+                "type": "string",
+                "enum": [
+                    "checkbox",
+                    "number",
+                    "radio",
+                    "text"
+                ]
             },
             "QuestionType": {
                 "type": "string",
@@ -536,7 +548,8 @@
                     "short",
                     "long",
                     "file",
-                    "datetime"
+                    "datetime",
+                    "grid"
                 ]
             },
             "Share": {
@@ -1610,6 +1623,11 @@
                                         "default": null,
                                         "description": "the new question type"
                                     },
+                                    "subtype": {
+                                        "$ref": "#/components/schemas/QuestionGridSubType",
+                                        "default": null,
+                                        "description": "the new question subtype"
+                                    },
                                     "text": {
                                         "type": "string",
                                         "default": "",
@@ -2622,6 +2640,12 @@
                                         "items": {
                                             "type": "string"
                                         }
+                                    },
+                                    "optionType": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "the new option type (e.g. 'row')"
                                     }
                                 }
                             }
@@ -2837,6 +2861,12 @@
                                             "type": "integer",
                                             "format": "int64"
                                         }
+                                    },
+                                    "optionType": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "the new option type (e.g. 'row')"
                                     }
                                 }
                             }
