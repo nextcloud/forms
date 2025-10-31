@@ -28,7 +28,7 @@ OC.L10N.register(
     "Settings" : "Sozlamalar",
     "Submit" : "Submit",
     "Checkboxes" : "Belgilash katakchalari",
-    "File" : "File",
+    "File" : "Fayl",
     "Date" : "Sana",
     "Pick a date" : "Sana tanlang",
     "Time" : "Vaqt",
