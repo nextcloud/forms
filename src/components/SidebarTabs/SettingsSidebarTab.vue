@@ -103,7 +103,7 @@
 		<NcCheckboxRadioSwitch
 			:model-value="formArchived"
 			aria-describedby="forms-settings__archive-form"
-			:disabled="locked"
+			:disabled="locked || !isCurrentUserOwner"
 			type="switch"
 			@update:model-value="onFormArchivedChange">
 			{{ t('forms', 'Archive form') }}
@@ -168,7 +168,10 @@
 			</div>
 		</div>
 
-		<TransferOwnership :locked="locked" :form="form" />
+		<TransferOwnership
+			:locked="locked"
+			:is-owner="isCurrentUserOwner"
+			:form="form" />
 	</div>
 </template>
 
