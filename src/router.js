@@ -4,56 +4,44 @@
  */
 
 import { generateUrl } from '@nextcloud/router'
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import Create from './views/Create.vue'
 import Results from './views/Results.vue'
 import Submit from './views/Submit.vue'
 
-Vue.use(Router)
+const routes = [
+	{
+		path: '/',
+		name: 'root',
+	},
+	{
+		path: '/:hash',
+		redirect: { name: 'submit' },
+		name: 'formRoot',
+		props: true,
+	},
+	{
+		path: '/:hash/edit',
+		component: Create,
+		name: 'edit',
+		props: true,
+	},
+	{
+		path: '/:hash/results',
+		component: Results,
+		name: 'results',
+		props: true,
+	},
+	{
+		path: '/:hash/submit/:submissionId?',
+		component: Submit,
+		name: 'submit',
+		props: true,
+	},
+]
 
-export default new Router({
-	mode: 'history',
-
-	// if index.php is in the url AND we got this far, then it's working:
-	// let's keep using index.php in the url
-	base: generateUrl('/apps/forms', ''),
+export default createRouter({
+	history: createWebHistory(generateUrl('/apps/forms', '')),
 	linkActiveClass: 'active',
-
-	routes: [
-		{
-			path: '/',
-			name: 'root',
-		},
-		{
-			path: '/:hash',
-			redirect: { name: 'submit' },
-			name: 'formRoot',
-			props: true,
-		},
-		{
-			path: '/:hash/edit',
-			components: {
-				default: Create,
-			},
-			name: 'edit',
-			props: { default: true },
-		},
-		{
-			path: '/:hash/results',
-			components: {
-				default: Results,
-			},
-			name: 'results',
-			props: { default: true },
-		},
-		{
-			path: '/:hash/submit/:submissionId?',
-			components: {
-				default: Submit,
-			},
-			name: 'submit',
-			props: { default: true },
-		},
-	],
+	routes,
 })
