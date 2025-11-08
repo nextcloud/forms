@@ -81,6 +81,7 @@ OC.L10N.register(
     "Set expiration date" : "Срок на валидност",
     "Show expiration date on form" : "Показване на датата на изтичане на валидността на формуляра",
     "Group" : "Група",
+    "Team" : "Екип",
     "Permissions" : "Права",
     "View responses" : "Преглед на отговорите",
     "There was an error while adding the share" : "Възникна грешка при добавяне на споделянето",
