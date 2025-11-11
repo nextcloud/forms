@@ -37,6 +37,7 @@ OC.L10N.register(
     "Description" : "Apraksts",
     "Summary" : "Kopsavilkums",
     "Linked file is not available, would you like to link a new file?" : "Sasaistītā datne nav pieejama. Sasaistīt jaunu datni?",
+    "Open spreadsheet" : "Atvērt izklājlapu",
     "Download" : "Lejupielādēt",
     "Search" : "Meklēt",
     "Results of submitted forms will show up here" : "Šeit tiks parādīts iesniegto veidlapu apkopojums",
