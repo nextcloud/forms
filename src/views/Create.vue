@@ -115,6 +115,7 @@
 				<!-- Questions list -->
 				<Draggable
 					v-model="form.questions"
+					item-key="id"
 					:animation="200"
 					tag="ul"
 					handle=".question__drag-handle"

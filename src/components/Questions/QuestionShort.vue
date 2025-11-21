@@ -39,7 +39,7 @@
 					})
 				"
 				:container="`#${validationTypeMenuId}`"
-				:open.sync="isValidationTypeMenuOpen"
+				v-model:open="isValidationTypeMenuOpen"
 				class="validation-type-menu__toggle"
 				variant="tertiary-no-background">
 				<template #icon>

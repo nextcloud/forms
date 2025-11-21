@@ -118,16 +118,19 @@
 		<!-- No errors show router content -->
 		<template v-else>
 			<router-view
-				v-model:form="selectedForm"
-				v-model:sidebar-opened="sidebarOpened"
+				:form="selectedForm"
+				:sidebar-opened="sidebarOpened"
+				@update:form="updateSelectedForm"
+				@update:sidebar-opened="sidebarOpened = $event"
 				@open-sharing="openSharing" />
 			<Sidebar
 				v-if="!selectedForm.partial && canEdit"
 				:form="selectedForm"
-				v-model:sidebar-opened="sidebarOpened"
-				v-model:active="sidebarActive" />
+				:sidebar-opened="sidebarOpened"
+				:active="sidebarActive"
+				@update:sidebar-opened="sidebarOpened = $event"
+				@update:active="sidebarActive = $event" />
 		</template>
-
 		<!-- Archived forms modal -->
 		<ArchivedFormsModal
 			v-model:open="showArchivedForms"
@@ -202,34 +205,29 @@ export default {
 
 		const PERMISSION_TYPES = PermissionTypes.data().PERMISSION_TYPES
 
-		const selectedForm = computed({
-			get: () => {
-				if (routeAllowed.value) {
-					return [...forms.value, ...allSharedForms.value].find(
-						(form) => form.hash === routeHash.value,
-					) || {}
-				}
-				return {}
-			},
-			set: (form) => {
-				sidebarOpened.value = false
-
-				let index = forms.value.findIndex(
-					(search) => search.hash === routeHash.value,
-				)
-				if (index > -1) {
-					forms.value[index] = form
-					return
-				}
-
-				index = allSharedForms.value.findIndex(
-					(search) => search.hash === routeHash.value,
-				)
-				if (index > -1) {
-					allSharedForms.value[index] = form
-				}
-			},
+		const selectedForm = computed(() => {
+			if (routeAllowed.value) {
+				return [...forms.value, ...allSharedForms.value].find(
+					(form) => form.hash === routeHash.value,
+				) || {}
+			}
+			return {}
 		})
+
+		const updateSelectedForm = (form) => {
+			sidebarOpened.value = false
+
+			const index = forms.value.findIndex((f) => f.hash === form.hash)
+			if (index > -1) {
+				forms.value[index] = form
+				return
+			}
+
+			const sharedIndex = allSharedForms.value.findIndex((f) => f.hash === form.hash)
+			if (sharedIndex > -1) {
+				allSharedForms.value[sharedIndex] = form
+			}
+		}
 
 		const canEdit = computed(() => {
 			return selectedForm.value.permissions?.includes(
@@ -458,6 +456,7 @@ export default {
 			canCreateForms,
 			isMobile,
 			selectedForm,
+			updateSelectedForm,
 			canEdit,
 			hasForms,
 			ownedForms,

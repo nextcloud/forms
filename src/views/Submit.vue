@@ -150,7 +150,7 @@
 
 			<!-- Confirmation dialog if form is empty submitted -->
 			<NcDialog
-				:open.sync="showConfirmEmptyModal"
+				v-model:open="showConfirmEmptyModal"
 				:name="t('forms', 'Confirm submit')"
 				:message="
 					t('forms', 'Are you sure you want to submit an empty form?')
@@ -158,7 +158,7 @@
 				:buttons="confirmEmptyModalButtons" />
 			<!-- Confirmation dialog if form is left unsubmitted -->
 			<NcDialog
-				:open.sync="showConfirmLeaveDialog"
+				v-model:open="showConfirmLeaveDialog"
 				:name="t('forms', 'Leave form')"
 				:message="
 					t(
@@ -171,7 +171,7 @@
 				:close-on-click-outside="false" />
 			<!-- Confirmation dialog for clear form -->
 			<NcDialog
-				:open.sync="showClearFormDialog"
+				v-model:open="showClearFormDialog"
 				:name="t('forms', 'Clear form')"
 				:message="t('forms', 'Do you want to clear all answers?')"
 				:buttons="confirmClearFormButtons"
@@ -179,7 +179,7 @@
 				:close-on-click-outside="false" />
 			<!-- Confirmation dialog if form was changed -->
 			<NcDialog
-				:open.sync="showClearFormDueToChangeDialog"
+				v-model:open="showClearFormDueToChangeDialog"
 				:name="t('forms', 'Clear form')"
 				:message="
 					t(

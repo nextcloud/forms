@@ -92,7 +92,7 @@
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
 			<NcDialog
-				:open.sync="showDeleteDialog"
+				v-model:open="showDeleteDialog"
 				:name="t('forms', 'Delete form')"
 				:message="
 					t('forms', 'Are you sure you want to delete {title}?', {
