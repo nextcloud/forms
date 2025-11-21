@@ -58,14 +58,15 @@ export default {
 		 * Search for suggestions
 		 *
 		 * @param {string} query The search query to search for
+		 * @param {number[]|undefined} shareType The type of recipient to search.
 		 */
-		async asyncSearch(query) {
+		async asyncSearch(query, shareType) {
 			// save query to check if valid
 			this.query = query.trim()
 			if (this.isValidQuery) {
 				// already set loading to have proper ux feedback during debounce
 				this.loading = true
-				this.debounceGetSuggestions(query)
+				this.debounceGetSuggestions(query, shareType)
 			}
 		},
 
@@ -82,12 +83,13 @@ export default {
 		 * Get suggestions
 		 *
 		 * @param {string} query the search query
+		 * @param {number[]|undefined} shareType The type of recipient to search.
 		 */
-		async getSuggestions(query) {
+		async getSuggestions(query, shareType) {
 			this.loading = true
 
 			// Search for all used share-types, except public link.
-			const shareType = this.SHARE_TYPES_USED.filter(
+			shareType ??= this.SHARE_TYPES_USED.filter(
 				(type) => type !== this.SHARE_TYPES.SHARE_TYPE_LINK,
 			)
 
