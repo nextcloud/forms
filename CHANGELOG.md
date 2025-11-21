@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.2.3 - 2025-11-21
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.2...v5.2.3)
+
+### Fixed
+
+- fix: Update permission checks for archiving forms and transfer ownership by @Chartman123 in [\#3028](https://github.com/nextcloud/forms/pull/3028)
+- fix(Settings): Only list users in transfer ownership by @artonge in [\#3050](https://github.com/nextcloud/forms/pull/3050)
+- fix: Reset submission count after clearing submissions by @Chartman123 in [\#3018](https://github.com/nextcloud/forms/pull/3018)
+
 ## v5.2.2 - 2025-10-17
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.1...v5.2.2)
