@@ -1786,25 +1786,31 @@ class ApiController extends OCSController {
 	 * Checks if the current user is allowed to archive/unarchive the form
 	 */
 	private function checkArchivePermission(Form $form, string $currentUserId, array $keyValuePairs): void {
-		$isArchived = $this->formsService->isFormArchived($form);
-		$owner = $currentUserId === $form->getOwnerId();
-		$onlyState = sizeof($keyValuePairs) === 1 && key_exists('state', $keyValuePairs);
-
 		// Only check if the request is trying to change the archived state
-		if ($onlyState && $keyValuePairs['state'] === Constants::FORM_STATE_ARCHIVED) {
-			// Trying to archive
-			if (!$owner || $isArchived) {
-				$this->logger->debug('Only the form owner can archive the form, and only if it is not already archived');
-				throw new OCSForbiddenException('Only the form owner can archive the form, and only if it is not already archived');
-			}
-		} elseif ($onlyState && $keyValuePairs['state'] === Constants::FORM_STATE_CLOSED) {
-			// Trying to unarchive
-			if (!$owner || !$isArchived) {
-				$this->logger->debug('Only the form owner can unarchive the form, and only if it is currently archived');
-				throw new OCSForbiddenException('Only the form owner can unarchive the form, and only if it is currently archived');
-			}
+		if (!array_key_exists('state', $keyValuePairs)) {
+			return;
 		}
-		// All other updates are allowed (including updates that do not touch the state)
+
+		$isArchived = $this->formsService->isFormArchived($form);
+		$isOwner = $currentUserId === $form->getOwnerId();
+
+		// If the request contains 'state' it must be the only key
+		if (sizeof($keyValuePairs) !== 1) {
+			$this->logger->debug('State may only be changed on its own');
+			throw new OCSForbiddenException('State may only be changed on its own');
+		}
+
+		$state = $keyValuePairs['state'];
+
+		if ($state === Constants::FORM_STATE_ARCHIVED && !$isArchived && !$isOwner) {
+			// Trying to archive
+			$this->logger->debug('Only the form owner can archive the form, and only if it is not already archived');
+			throw new OCSForbiddenException('Only the form owner can archive the form, and only if it is not already archived');
+		} elseif ($state === Constants::FORM_STATE_CLOSED && $isArchived && !$isOwner) {
+			// Trying to unarchive
+			$this->logger->debug('Only the form owner can unarchive the form, and only if it is currently archived');
+			throw new OCSForbiddenException('Only the form owner can unarchive the form, and only if it is currently archived');
+		}
 	}
 
 	private function isLockingRequest(array $keyValuePairs): bool {
