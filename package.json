@@ -26,12 +26,15 @@
     "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
   },
   "browserslist": [
-    "extends @nextcloud/browserslist-config"
+    "last 2 versions",
+    "> 1%",
+    "not dead",
+    "firefox esr"
   ],
   "dependencies": {
     "@nextcloud/auth": "^2.5.3",
     "@nextcloud/axios": "^2.5.2",
-    "@nextcloud/dialogs": "^6.4.1",
+    "@nextcloud/dialogs": "^7.1.0",
     "@nextcloud/event-bus": "^3.3.3",
     "@nextcloud/files": "^3.12.0",
     "@nextcloud/initial-state": "^3.0.0",
@@ -39,16 +42,16 @@
     "@nextcloud/logger": "^3.0.2",
     "@nextcloud/moment": "^1.3.5",
     "@nextcloud/router": "^3.1.0",
-    "@nextcloud/vue": "^8.34.0",
+    "@nextcloud/vue": "^9.3.0",
     "debounce": "^3.0.0",
     "markdown-it": "^14.1.0",
     "p-queue": "^9.0.0",
     "qrcode": "^1.5.4",
     "v-click-outside": "^3.2.0",
-    "vue": "^2.7.16",
+    "vue": "^3.5.13",
     "vue-material-design-icons": "^5.3.1",
-    "vue-router": "^3.6.5",
-    "vuedraggable": "^2.24.3"
+    "vue-router": "^4.5.0",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@mdi/js": "^7.4.47",
@@ -58,7 +61,7 @@
     "@nextcloud/eslint-config": "^9.0.0-rc.5",
     "@nextcloud/prettier-config": "^1.2.0",
     "@nextcloud/stylelint-config": "^3.1.1",
-    "@nextcloud/vite-config": "^1.7.2",
+    "@nextcloud/vite-config": "^2.5.2",
     "@playwright/test": "^1.56.1",
     "@vue/tsconfig": "^0.5.1",
     "eslint-plugin-prettier": "^5.5.4",
