@@ -147,7 +147,7 @@ export default {
 		},
 
 		confirmationString() {
-			return `${this.form.ownerId}/${this.form.title}`
+			return `${this.form.ownerId}/${this.form.title.replace(/\s/g, ' ').trim()}`
 		},
 
 		options() {
