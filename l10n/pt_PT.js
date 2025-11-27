@@ -67,6 +67,7 @@ OC.L10N.register(
     "Share link" : "Partilhar ligação",
     "Copy to clipboard" : "Copiar para área de transferência",
     "Copy embedding code" : "Copiar código embebido",
+    "Internal link" : "Ligação interna",
     "View" : "Ver",
     "Edit" : "Editar",
     "View mode" : "Modo de visualização",
