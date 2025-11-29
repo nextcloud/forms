@@ -26,7 +26,7 @@
 		</template>
 		<NcSelect
 			v-if="readOnly"
-			:value="selectedOption"
+			:model-value="selectedOption"
 			:name="name || undefined"
 			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"

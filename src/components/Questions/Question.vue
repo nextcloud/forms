@@ -101,7 +101,7 @@
 						:label="t('forms', 'Technical name of the question')"
 						:label-outside="false"
 						:show-trailing-button="false"
-						:value="name"
+						:model-value="name"
 						@input="onNameChange">
 						<template #icon>
 							<IconIdentifier :size="20" />
