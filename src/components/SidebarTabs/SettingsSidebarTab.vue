@@ -67,7 +67,7 @@
 				:format="stringifyDate"
 				:minute-step="5"
 				:show-second="false"
-				:value="expirationDate"
+				:model-value="expirationDate"
 				type="datetime"
 				@change="onExpirationDateChange" />
 			<NcCheckboxRadioSwitch

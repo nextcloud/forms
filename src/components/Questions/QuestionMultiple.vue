@@ -39,7 +39,7 @@
 					:label="t('forms', 'Minimum options to be checked')"
 					:label-outside="false"
 					:show-trailing-button="false"
-					:value="extraSettings.optionsLimitMin"
+					:model-value="extraSettings.optionsLimitMin"
 					@update:value="onLimitOptionsMin" />
 
 				<!-- Allow setting a maximum -->
@@ -59,7 +59,7 @@
 					:label="t('forms', 'Maximum options to be checked')"
 					:label-outside="false"
 					:show-trailing-button="false"
-					:value="extraSettings.optionsLimitMax"
+					:model-value="extraSettings.optionsLimitMax"
 					@update:value="onLimitOptionsMax" />
 			</template>
 			<NcActionButton close-after-click @click="isOptionDialogShown = true">

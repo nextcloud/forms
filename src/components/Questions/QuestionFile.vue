@@ -46,7 +46,7 @@
 					type="multiselect"
 					multiple
 					taggable
-					:value="extraSettings?.allowedFileExtensions || []"
+					:model-value="extraSettings?.allowedFileExtensions || []"
 					@option:created="onAllowedFileExtensionsAdded"
 					@option:deselected="onAllowedFileExtensionsDeleted" />
 
@@ -56,7 +56,7 @@
 			<template v-if="!allowedFileTypesDialogOpened">
 				<NcActionInput
 					type="number"
-					:value="maxAllowedFilesCount"
+					:model-value="maxAllowedFilesCount"
 					label-outside
 					:label="t('forms', 'Maximum number of files')"
 					:show-trailing-button="false"
@@ -64,7 +64,7 @@
 
 				<NcActionInput
 					type="number"
-					:value="maxFileSizeValue"
+					:model-value="maxFileSizeValue"
 					label-outside
 					:show-trailing-button="false"
 					:label="t('forms', 'Maximum file size')"
@@ -72,7 +72,7 @@
 
 				<NcActionInput
 					type="multiselect"
-					:value="maxFileSizeUnit"
+					:model-value="maxFileSizeUnit"
 					:options="availableUnits"
 					required
 					:clearable="false"

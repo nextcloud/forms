@@ -83,7 +83,7 @@
 		</template>
 		<div class="question__content">
 			<NcDateTimePicker
-				:value="time"
+				:model-value="time"
 				:disabled="!readOnly"
 				:format="stringify"
 				:placeholder="datetimePickerPlaceholder"

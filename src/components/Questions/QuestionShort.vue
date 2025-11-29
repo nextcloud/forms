@@ -60,7 +60,7 @@
 					v-if="validationType === 'regex'"
 					ref="regexInput"
 					:label="t('forms', 'Regular expression for input validation')"
-					:value="validationRegex"
+					:model-value="validationRegex"
 					@input="onInputRegex"
 					@submit="onSubmitRegex">
 					<template #icon>
