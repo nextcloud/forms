@@ -114,7 +114,7 @@
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
-					<NcActionButton @click="onDelete">
+					<NcActionButton close-after-click @click="onDelete">
 						<template #icon>
 							<IconDelete :size="20" />
 						</template>
