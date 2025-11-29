@@ -39,10 +39,12 @@ namespace OCA\Forms;
  *   timeMin?: int,
  *   timeRange?: bool,
  *   validationRegex?: string,
- *   validationType?: string
+ *   validationType?: string,
+ *   questionType?: string,
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"
+ * @psalm-type FormsQuestionGridCellType = "checkbox"|"number"|"radio"
  *
  * @psalm-type FormsQuestion = array{
  *   id: int,

@@ -27,16 +27,19 @@ class OptionMapper extends QBMapper {
 
 	/**
 	 * @param int|float $questionId
+	 * @param string|null $optionType
 	 * @return Option[]
 	 */
-	public function findByQuestion(int|float $questionId): array {
+	public function findByQuestion(int|float $questionId, ?string $optionType = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
 			->from($this->getTableName())
-			->where(
-				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId))
-			)
+			->where($qb->expr()->eq('question_id', $qb->createNamedParameter($questionId)));
+		if ($optionType) {
+			$qb->andWhere($qb->expr()->eq('option_type', $qb->createNamedParameter($optionType)));
+		}
+		$qb
 			->orderBy('order')
 			->addOrderBy('id');
 
