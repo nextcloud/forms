@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## v4.3.13 - 2025-06-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.12...v4.3.13)
