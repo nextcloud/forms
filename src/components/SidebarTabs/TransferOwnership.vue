@@ -66,7 +66,9 @@
 					:placeholder="t('forms', 'Search for a user')"
 					:user-select="true"
 					label="displayName"
-					@search="(query) => asyncSearch(query, true)">
+					@search="
+						(query) => asyncSearch(query, [SHARE_TYPES.SHARE_TYPE_USER])
+					">
 					<template #no-options>
 						{{ noResultText }}
 					</template>
