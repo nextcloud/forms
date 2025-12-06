@@ -284,7 +284,7 @@ OC.L10N.register(
     "Form link copied" : "Copiada a ligazón do formulario",
     "Cannot copy, please copy the link manually" : "Non foi posíbel copiala. Copie a ligazón manualmente",
     "Embedding code copied" : "Copiouse o código incrustado",
-    "Cannot copy the code" : "Non foi posíbel copiar o código",
+    "Cannot copy the code" : "Non é posíbel copiar o código",
     "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",
     "No elements found." : "Non se atopou ningún elemento.",
     "Checkboxes" : "Caixas de selección",
