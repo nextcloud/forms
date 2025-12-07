@@ -4555,8 +4555,7 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "path",
-                                    "fileFormat"
+                                    "path"
                                 ],
                                 "properties": {
                                     "path": {
