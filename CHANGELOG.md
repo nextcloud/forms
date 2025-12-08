@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.14 - 2025-12-08
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.12...v4.3.13)
+
+### Fixed
+
+- [stable4] fix(Settings): Only list users in transfer ownership [\#3078](https://github.com/nextcloud/forms/pull/3078)
+
 ## v4.3.13 - 2025-06-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v4.3.12...v4.3.13)
