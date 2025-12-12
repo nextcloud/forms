@@ -139,7 +139,7 @@
 							:max-string-lengths="maxStringLengths"
 							v-bind.sync="form.questions[index]"
 							@clone="cloneQuestion(question)"
-							@delete="deleteQuestion(question.id)"
+							@delete="questionToDelete = question"
 							@move-down="onMoveDown(index)"
 							@move-up="onMoveUp(index)" />
 					</transition-group>
@@ -172,10 +172,23 @@
 				</div>
 			</section>
 		</template>
+
+		<!-- Confirmation dialog for deleting question -->
+		<NcDialog
+			:open.sync="showConfirmDeleteDialog"
+			:name="t('forms', 'Delete question')"
+			:message="
+				t('forms', 'Are you sure you want to delete question {text}?', {
+					text: questionToDelete ? questionToDelete.text : '',
+				})
+			"
+			:buttons="confirmDeleteButtons" />
 	</NcAppContent>
 </template>
 
 <script>
+import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
+import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
@@ -187,6 +200,8 @@ import Draggable from 'vuedraggable'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
@@ -213,9 +228,13 @@ export default {
 		Draggable,
 		IconLock,
 		IconPlus,
+		IconCancelSvg,
+		IconDeleteSvg,
 		NcActionButton,
 		NcActions,
 		NcAppContent,
+		NcButton,
+		NcDialog,
 		NcEmptyContent,
 		NcLoadingIcon,
 		NcNoteCard,
@@ -238,6 +257,28 @@ export default {
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
+
+			questionToDelete: null,
+
+			confirmDeleteButtons: [
+				{
+					label: t('forms', 'Cancel'),
+					icon: IconCancelSvg,
+					type: 'tertiary',
+					callback: () => {
+						this.questionToDelete = null
+					},
+				},
+				{
+					label: t('forms', 'Delete question'),
+					icon: IconDeleteSvg,
+					type: 'error',
+					callback: () => {
+						this.deleteQuestion(this.questionToDelete.id)
+						this.questionToDelete = null
+					},
+				},
+			],
 		}
 	},
 
@@ -305,6 +346,18 @@ export default {
 
 		lockedUntilFormatted() {
 			return moment(this.form.lockedUntil, 'X').fromNow()
+		},
+
+		showConfirmDeleteDialog: {
+			get() {
+				return this.questionToDelete !== null
+			},
+
+			set(value) {
+				if (!value) {
+					this.questionToDelete = null
+				}
+			},
 		},
 	},
 
