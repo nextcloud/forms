@@ -63,7 +63,7 @@
     "@vue/tsconfig": "^0.5.1",
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.7.4",
-    "vite": "^7.2.6"
+    "vite": "^7.2.7"
   },
   "engines": {
     "node": "^24.0.0",
