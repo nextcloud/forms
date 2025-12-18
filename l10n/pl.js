@@ -95,6 +95,7 @@ OC.L10N.register(
     "Delete" : "Usuń",
     "A long answer for the question “{text}”" : "Długa odpowiedź na pytanie “{text}”",
     "Add \"other\"" : "Dodaj opcję \"inne\"",
+    "Other:" : "Inne:",
     "Other" : "Inne",
     "A short answer for the question “{text}”" : "Krótka odpowiedź na pytanie “{text}”",
     "No response" : "Brak odpowiedzi",
