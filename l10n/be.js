@@ -15,6 +15,7 @@ OC.L10N.register(
     "Cancel" : "Скасаваць",
     "Options" : "Варыянты",
     "Page number" : "Нумар старонкі",
+    "{page} of {totalPages}" : "{page} з {totalPages}",
     "Delete answer" : "Выдаліць адказ",
     "Required" : "Абавязкова",
     "Copy question" : "Капіяваць пытанне",
