@@ -27,6 +27,7 @@ OC.L10N.register(
     "Sharing" : "Ulashish",
     "Settings" : "Sozlamalar",
     "Submit" : "Submit",
+    "No recommendations. Start typing." : "Tavsiyalar yo'q. Yozishni boshlang.",
     "Checkboxes" : "Belgilash katakchalari",
     "File" : "Fayl",
     "Date" : "Sana",
