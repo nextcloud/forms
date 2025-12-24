@@ -37,6 +37,52 @@
 			</li>
 		</ol>
 
+		<div v-else-if="question.type === 'grid'">
+			<table class="answer-grid">
+				<thead>
+					<tr>
+						<th class="first-column"></th>
+
+						<th v-for="column of gridColumns" :key="column.id">
+							{{ column.text }}
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="row of gridRows" :key="row.id">
+						<td class="first-column">{{ row.text }}</td>
+						<td v-for="column of gridColumns" :key="column.id">
+							<template
+								v-if="
+									question.extraSettings.questionType === 'radio'
+								">
+								{{ gridValue[row.id][column.id].answersCount }} ({{
+									gridValue[row.id][column.id].percentage
+								}}%)
+							</template>
+
+							<template
+								v-if="
+									question.extraSettings.questionType
+									=== 'checkbox'
+								">
+								{{ gridValue[row.id][column.id].answersCount }} ({{
+									gridValue[row.id][column.id].percentage
+								}}%)
+							</template>
+
+							<template
+								v-if="
+									question.extraSettings.questionType === 'number'
+								">
+								{{ gridValue[row.id][column.id].averageValue }}
+							</template>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
 		<!-- Text answers are simply listed for now, could be automatically grouped in the future -->
 		<ul v-else class="question-summary__text">
 			<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
@@ -73,6 +119,7 @@
 import { generateUrl } from '@nextcloud/router'
 import IconFile from 'vue-material-design-icons/FileOutline.vue'
 import answerTypes from '../../models/AnswerTypes.js'
+import { GridCellType, OptionType } from '../../models/Constants.ts'
 
 export default {
 	name: 'ResultsSummary',
@@ -102,6 +149,25 @@ export default {
 	computed: {
 		questionTypeLabel() {
 			const label = this.answerTypes[this.question.type].label
+
+			if (this.question.type === 'grid') {
+				if (
+					this.question.extraSettings.questionType
+					=== GridCellType.Checkbox
+				) {
+					return label + ' (' + t('forms', 'Checkbox') + ')'
+				}
+				if (
+					this.question.extraSettings.questionType === GridCellType.Number
+				) {
+					return label + ' (' + t('forms', 'Number') + ')'
+				}
+				if (
+					this.question.extraSettings.questionType === GridCellType.Radio
+				) {
+					return label + ' (' + t('forms', 'Radio') + ')'
+				}
+			}
 
 			if (this.question.type === 'linearscale') {
 				const labelLowest =
@@ -228,6 +294,118 @@ export default {
 			})
 
 			return questionOptionsStats
+		},
+
+		gridColumns() {
+			return this.question.options.filter(
+				(option) => option.optionType === OptionType.Column,
+			)
+		},
+
+		gridRows() {
+			return this.question.options.filter(
+				(option) => option.optionType === OptionType.Row,
+			)
+		},
+
+		gridValue() {
+			const matrix = {}
+			for (const row of this.gridRows) {
+				for (const column of this.gridColumns) {
+					matrix[row.id] = matrix[row.id] || {}
+					matrix[row.id][column.id] = {
+						answersCount: 0,
+						percentage: 0,
+						totalValue: 0,
+						averageValue: 0,
+					}
+				}
+			}
+
+			const answers = []
+			this.submissions.forEach((submission) => {
+				submission.answers.forEach((answer) => {
+					if (answer.questionId === this.question.id) {
+						answers.push(answer)
+					}
+				})
+			})
+
+			answers.forEach((answer) => {
+				const answerJson = JSON.parse(answer.text)
+
+				if (
+					this.question.extraSettings.questionType === GridCellType.Radio
+				) {
+					for (const rowId of Object.keys(answerJson)) {
+						const columnId = answerJson[rowId]
+
+						matrix[rowId][columnId].answersCount++
+					}
+				} else if (
+					this.question.extraSettings.questionType
+					=== GridCellType.Checkbox
+				) {
+					for (const rowId of Object.keys(answerJson)) {
+						for (const columnId of answerJson[rowId]) {
+							matrix[rowId][columnId].answersCount++
+						}
+					}
+				} else if (
+					this.question.extraSettings.questionType === GridCellType.Number
+				) {
+					for (const rowId of Object.keys(answerJson)) {
+						for (const columnId of Object.keys(answerJson[rowId])) {
+							if ('' === answerJson[rowId][columnId]) {
+								continue
+							}
+
+							matrix[rowId][columnId].totalValue += parseFloat(
+								answerJson[rowId][columnId],
+							)
+							matrix[rowId][columnId].answersCount++
+						}
+					}
+				}
+			})
+
+			for (const rowId of Object.keys(matrix)) {
+				for (const columnId of Object.keys(matrix[rowId])) {
+					let totalAnswersCount = this.submissions.length
+					if (
+						this.question.extraSettings.questionType
+						=== GridCellType.Checkbox
+					) {
+						totalAnswersCount = Object.entries(matrix[rowId])
+							.map(([, cell]) => cell.answersCount)
+							.reduce((a, b) => a + b, 0)
+					}
+					if (totalAnswersCount === 0) {
+						totalAnswersCount = 1
+					}
+
+					if (!matrix[rowId][columnId].answersCount) {
+						matrix[rowId][columnId].answersCount = 0
+					}
+
+					matrix[rowId][columnId].percentage = Math.round(
+						(100 * matrix[rowId][columnId].answersCount)
+							/ totalAnswersCount,
+					)
+
+					if (
+						this.question.extraSettings.questionType
+							=== GridCellType.Number
+						&& matrix[rowId][columnId].answersCount > 0
+					) {
+						matrix[rowId][columnId].averageValue =
+							matrix[rowId][columnId].totalValue
+							/ matrix[rowId][columnId].answersCount
+					}
+				}
+			}
+
+			return matrix
 		},
 
 		// For text answers like short answer and long text
@@ -399,6 +577,40 @@ export default {
 		align-items: baseline;
 		display: flex;
 		gap: calc(var(--clickable-area-small) / 2);
+	}
+
+	.answer-grid {
+		border-collapse: collapse;
+		width: 100%;
+
+		thead tr {
+			border-bottom: 2px solid var(--color-border);
+		}
+
+		td {
+			min-height: 34px;
+			min-width: 64px;
+			text-align: center;
+			padding: 8px 4px;
+
+			.checkbox-radio-switch {
+				display: flex;
+				justify-content: center;
+			}
+		}
+
+		th {
+			min-height: 44px;
+			padding: 8px 4px;
+			text-align: center;
+		}
+
+		.first-column {
+			min-width: 200px;
+			text-align: left;
+			position: sticky;
+			left: 0;
+		}
 	}
 }
 </style>
