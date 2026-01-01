@@ -1,0 +1,209 @@
+/**
+ * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/**
+ * RTL (Right-to-Left) adjustments for Hebrew, Arabic, Farsi, and other RTL languages
+ * This file is automatically loaded by Nextcloud when ?forceLanguage=he (or other RTL language)
+ * is present in the URL and a RTL language is detected via IL10N->isRTL()
+ */
+
+/* ============================================
+   Global RTL Direction
+   ============================================ */
+
+/* Set global direction to RTL for main containers */
+body,
+html,
+#content,
+#content-vue {
+	direction: rtl;
+	text-align: right;
+}
+
+/* ============================================
+   Form Header and Title
+   ============================================ */
+
+/* Form title and description */
+.form-title {
+	text-align: right;
+	direction: rtl;
+}
+
+.form-desc,
+.info-message {
+	text-align: right;
+	direction: rtl;
+}
+
+/* ============================================
+   Form Elements and Inputs
+   ============================================ */
+
+/* Text inputs and textareas */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+textarea {
+	direction: rtl;
+	text-align: right;
+}
+
+/* Question containers */
+.question {
+	direction: rtl;
+}
+
+.question__header,
+.question__text {
+	text-align: right;
+	direction: rtl;
+}
+
+.question__content {
+	direction: rtl;
+}
+
+/* ============================================
+   Buttons and Actions
+   ============================================ */
+
+/* Form action buttons */
+.form-buttons {
+	justify-content: flex-end !important;
+	flex-direction: row-reverse;
+}
+
+.form-buttons .submit-button {
+    margin-right: 35px !important;
+}
+
+.submit-button {
+	margin-left: 0 !important;
+	margin-right: 5px !important;
+}
+
+.submit-button:first-child {
+	margin-right: 0 !important;
+}
+
+/* Button icons - flip to the left side */
+.button-vue {
+	flex-direction: row-reverse;
+}
+
+/* ============================================
+   Lists and Options
+   ============================================ */
+
+/* Checkbox and radio button options */
+.question__item {
+	direction: rtl;
+	text-align: right;
+}
+
+/* Answer options text */
+.answer-text,
+.option-text {
+	text-align: right;
+	direction: rtl;
+}
+
+/* ============================================
+   Empty Content / Messages
+   ============================================ */
+
+/* Empty content messages */
+.empty-content,
+.forms-emptycontent {
+	direction: rtl;
+}
+
+.empty-content__name,
+.empty-content__description {
+	text-align: right;
+}
+
+.submission-message {
+	text-align: right !important;
+	direction: rtl;
+}
+
+/* ============================================
+   Date Picker
+   ============================================ */
+
+/* Date picker inputs */
+.mx-datepicker {
+	direction: rtl;
+}
+
+.mx-input {
+	text-align: right;
+	direction: rtl;
+}
+
+/* ============================================
+   Multiselect Dropdown
+   ============================================ */
+
+/* Multiselect component */
+.multiselect {
+	direction: rtl;
+	text-align: right;
+}
+
+.multiselect__tags {
+	text-align: right;
+}
+
+.multiselect__option {
+	text-align: right;
+}
+
+.multiselect__single {
+	text-align: right;
+}
+
+/* ============================================
+   Modal Dialogs
+   ============================================ */
+
+/* Dialog windows */
+.modal-container,
+.dialog {
+	direction: rtl;
+}
+
+.modal-container__content,
+.dialog__content {
+	text-align: right;
+}
+
+/* ============================================
+   Icons and Visual Elements
+   ============================================ */
+
+/* Required asterisk positioning */
+.asterisk,
+.required-asterisk {
+	margin-left: 0;
+	margin-right: 4px;
+}
+
+/* ============================================
+   Responsive and Mobile
+   ============================================ */
+
+/* Ensure RTL on all screen sizes */
+@media (max-width: 1024px) {
+	body,
+	#content,
+	#content-vue {
+		direction: rtl;
+	}
+}
