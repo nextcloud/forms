@@ -222,6 +222,17 @@ class PageController extends Controller {
 	}
 
 	/**
+	 * Check if current language is RTL (Right-to-Left)
+	 * 
+	 * @return bool
+	 */
+	private function isRTL(): bool {
+		$rtlLanguages = ['ar', 'he', 'fa', 'ur', 'ps', 'ku', 'sd', 'yi'];
+		$currentLanguage = $this->l10n->getLanguageCode();
+		return in_array($currentLanguage, $rtlLanguages, true);
+	}
+
+	/**
 	 * Helper function to create a template response from a form
 	 * @param string $template
 	 * @param Form $form Necessary to set header on public forms, not necessary for 'notfound'-template
@@ -229,9 +240,16 @@ class PageController extends Controller {
 	 */
 	protected function provideTemplate(string $template, ?Form $form = null, array $options = []): TemplateResponse {
 		Util::addStyle($this->appName, 'forms-style');
+		
 		// If not logged in, use PublicTemplate
 		if (!$this->userSession->isLoggedIn()) {
 			Util::addStyle($this->appName, 'public');
+			
+			// Load RTL styles for public pages if language is RTL
+			if ($this->isRTL()) {
+				Util::addStyle($this->appName, 'public-rtl');
+			}
+			
 			$response = new PublicTemplateResponse($this->appName, $template, array_merge([
 				'id-app-content' => '#app-content-vue',
 				'id-app-navigation' => null,
