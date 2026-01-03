@@ -61,6 +61,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsPartialForm from ResponseDefinitions
  * @psalm-import-type FormsQuestion from ResponseDefinitions
  * @psalm-import-type FormsQuestionType from ResponseDefinitions
+ * @psalm-import-type FormsQuestionGridCellType from ResponseDefinitions
  * @psalm-import-type FormsSubmission from ResponseDefinitions
  * @psalm-import-type FormsSubmissions from ResponseDefinitions
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
@@ -445,6 +446,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param FormsQuestionType $type the new question type
+	 * @param FormsQuestionGridCellType $subtype the new question subtype
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
@@ -461,7 +463,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
-	public function newQuestion(int $formId, ?string $type = null, string $text = '', ?int $fromId = null): DataResponse {
+	public function newQuestion(int $formId, ?string $type = null, ?string $subtype = null, string $text = '', ?int $fromId = null): DataResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
 		$this->formsService->obtainFormLock($form);
 
@@ -505,7 +507,7 @@ class ApiController extends OCSController {
 			$question->setText($text);
 			$question->setDescription('');
 			$question->setIsRequired(false);
-			$question->setExtraSettings([]);
+			$question->setExtraSettings($subtype ? ['questionType' => $subtype] : []);
 
 			$question = $this->questionMapper->insert($question);
 
@@ -820,6 +822,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param list<string> $optionTexts the new option text
+	 * @param string|null $optionType the new option type (e.g. 'row')
 	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -833,11 +836,12 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
-	public function newOption(int $formId, int $questionId, array $optionTexts): DataResponse {
-		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}', [
+	public function newOption(int $formId, int $questionId, array $optionTexts, ?string $optionType = null): DataResponse {
+		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}, optionType: {optionType}', [
 			'formId' => $formId,
 			'questionId' => $questionId,
 			'text' => $optionTexts,
+			'optionType' => $optionType,
 		]);
 
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
@@ -863,7 +867,7 @@ class ApiController extends OCSController {
 		}
 
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
-		$options = $this->optionMapper->findByQuestion($questionId);
+		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 		$lastOption = array_pop($options);
 		if ($lastOption) {
 			$optionOrder = $lastOption->getOrder() + 1;
@@ -878,6 +882,7 @@ class ApiController extends OCSController {
 			$option->setQuestionId($questionId);
 			$option->setText($text);
 			$option->setOrder($optionOrder++);
+			$option->setOptionType($optionType);
 
 			try {
 				$option = $this->optionMapper->insert($option);
@@ -1034,6 +1039,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param list<int> $newOrder Array of option ids in new order.
+	 * @param string|null $optionType the new option type (e.g. 'row')
 	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
 	 * @throws OCSBadRequestException The given question id doesn't match the form
 	 * @throws OCSBadRequestException The given array contains duplicates
@@ -1050,7 +1056,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
-	public function reorderOptions(int $formId, int $questionId, array $newOrder) {
+	public function reorderOptions(int $formId, int $questionId, array $newOrder, ?string $optionType = null): DataResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
 		$this->formsService->obtainFormLock($form);
 
@@ -1077,7 +1083,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('The given array contains duplicates');
 		}
 
-		$options = $this->optionMapper->findByQuestion($questionId);
+		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 
 		if (sizeof($options) !== sizeof($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored options');
@@ -1691,6 +1697,22 @@ class ApiController extends OCSController {
 	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
 	 */
 	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
+		if ($question['type'] === Constants::ANSWER_TYPE_GRID) {
+			if (!$answerArray) {
+				return;
+			}
+
+			$answerEntity = new Answer();
+			$answerEntity->setSubmissionId($submissionId);
+			$answerEntity->setQuestionId($question['id']);
+
+			$answerText = json_encode($answerArray);
+			$answerEntity->setText($answerText);
+			$this->answerMapper->insert($answerEntity);
+
+			return;
+		}
+
 		foreach ($answerArray as $answer) {
 			$answerEntity = new Answer();
 			$answerEntity->setSubmissionId($submissionId);
