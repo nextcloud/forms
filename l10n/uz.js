@@ -14,6 +14,8 @@ OC.L10N.register(
     "Other" : "Boshqa",
     "never" : "hech qachon",
     "Set expiration date" : "Set expiration date",
+    "Group" : "Guruh",
+    "Team" : "Jamoa",
     "Share link" : "Share link",
     "Copy embedding code" : "O'rnatish kodini nusxalash",
     "Internal link" : "Ichki havola",
