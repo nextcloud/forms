@@ -12,6 +12,8 @@ use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
+use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
@@ -84,6 +86,9 @@ class SubmissionServiceTest extends TestCase {
 	/** @var UploadedFileMapper|MockObject */
 	private $uploadedFileMapper;
 
+	/** @var OptionMapper|MockObject */
+	private $optionMapper;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -117,6 +122,8 @@ class SubmissionServiceTest extends TestCase {
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 
+		$this->optionMapper = $this->createMock(OptionMapper::class);
+
 		$this->submissionService = new SubmissionService(
 			$this->questionMapper,
 			$this->submissionMapper,
@@ -132,6 +139,7 @@ class SubmissionServiceTest extends TestCase {
 			$this->tempManager,
 			$this->formsService,
 			$this->urlGenerator,
+			$this->optionMapper,
 		);
 	}
 
@@ -434,6 +442,33 @@ class SubmissionServiceTest extends TestCase {
 				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1; Q1A2; Q1A3"
 				'
 			],
+			'grid-checkbox-multi-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Question 1', 'extraSettings' => ['questionType' => 'checkbox'],  'options' => [
+						['id' => 2, 'text' => 'Option 2', 'optionType' => 'row'],
+						['id' => 3, 'text' => 'Option 3', 'optionType' => 'row'],
+						['id' => 55, 'text' => 'Option 55', 'optionType' => 'column'],
+						['id' => 56, 'text' => 'Option 56', 'optionType' => 'column'],
+					]]
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => '{"2":["55"],"3":["56"]}'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"User ID","User display name","Timestamp","Question 1 (Option 2)","Question 1 (Option 3)"
+				"user1","User 1","1973-11-29T22:33:09+01:00","Option 55","Option 56"
+				'
+			],
 			'file-multi-answers' => [
 				// Questions
 				[
@@ -627,11 +662,25 @@ file2.txt"
 		// Return QuestionObjects for given Questions
 			->will($this->returnCallback(function (int $formId) use ($questions) {
 				$questionEntities = array_map(function ($question) {
+					unset($question['options']);
 					return Question::fromParams($question);
 				}, $questions);
 
 				return $questionEntities;
 			}));
+
+		if (!empty($questions[0]['options'])) {
+			$this->optionMapper->expects($this->once())
+				->method('findByQuestion')
+				->with($questions[0]['id'])
+				->willReturnCallback(function (int $questionId) use ($questions) {
+					$optionsEntities = array_map(function ($option) {
+						return Option::fromParams($option);
+					}, $questions[0]['options']);
+
+					return $optionsEntities;
+				});
+		}
 
 		$this->config->expects($this->once())
 			->method('getSystemValueString')
