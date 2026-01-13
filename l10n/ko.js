@@ -44,6 +44,7 @@ OC.L10N.register(
     "Maximum file size" : "최대 파일 크기",
     "Delete" : "삭제",
     "Other" : "기타",
+    "No response" : "응답 없음",
     "Delete this response" : "이 응답 지우기",
     "never" : "하지 않음",
     "Set expiration date" : "만료기한 설정",
