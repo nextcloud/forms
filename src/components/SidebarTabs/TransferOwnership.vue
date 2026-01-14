@@ -69,7 +69,7 @@
 					" />
 				<!-- eslint-enable vue/no-v-html -->
 				<NcTextField
-					v-model:value="confirmationInput"
+					v-model="confirmationInput"
 					:label="t('forms', 'Confirmation text')"
 					:success="confirmationInput === confirmationString" />
 

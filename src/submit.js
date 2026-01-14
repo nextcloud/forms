@@ -10,6 +10,10 @@ import FormsSubmitRoot from './FormsSubmit.vue'
 import 'vite/modulepreload-polyfill'
 
 const app = createApp(FormsSubmitRoot)
+
 app.config.globalProperties.t = translate
 app.config.globalProperties.n = translatePlural
+
 app.mount('#content')
+
+export default app

@@ -31,7 +31,6 @@
 				v-if="!isArchived && canEdit"
 				close-after-click
 				:disabled="isFormLocked"
-				exact
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -51,7 +50,6 @@
 			<NcActionRouter
 				v-if="canSeeResults"
 				close-after-click
-				exact
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>

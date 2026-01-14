@@ -10,6 +10,10 @@ import FormsSettings from './FormsSettings.vue'
 import 'vite/modulepreload-polyfill'
 
 const app = createApp(FormsSettings)
+
 app.config.globalProperties.t = translate
 app.config.globalProperties.n = translatePlural
+
 app.mount('#forms-settings')
+
+export default app

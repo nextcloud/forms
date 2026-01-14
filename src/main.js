@@ -19,3 +19,5 @@ app.config.globalProperties.n = translatePlural
 app.use(router)
 
 app.mount('#content')
+
+export default app

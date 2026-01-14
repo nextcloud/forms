@@ -12,7 +12,7 @@
 		size="normal"
 		@update:open="$emit('update:open', $event)">
 		<NcTextArea
-			v-model:value="enteredOptions"
+			v-model="enteredOptions"
 			:label="t('forms', 'Add multiple options (one per line)')"
 			:placeholder="t('forms', 'Add multiple options (one per line)')"
 			resize="vertical"
