@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -135,6 +135,11 @@ class FormsService {
 					$question['isRequired'] = true;
 				}
 
+				// Load subquestions for conditional questions and attach to branches
+				if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
+					$question = $this->loadConditionalSubQuestions($question);
+				}
+
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException) {
@@ -142,6 +147,57 @@ class FormsService {
 		} finally {
 			return $questionList;
 		}
+	}
+
+	/**
+	 * Load subquestions for a conditional question and attach them to branches
+	 *
+	 * @param array $question The conditional question data
+	 * @return array The question with subquestions attached to branches
+	 */
+	private function loadConditionalSubQuestions(array $question): array {
+		$subQuestionEntities = $this->questionMapper->findByParentQuestion($question['id']);
+
+		// Group subquestions by branchId
+		$subQuestionsByBranch = [];
+		foreach ($subQuestionEntities as $subQuestionEntity) {
+			$subQuestion = $subQuestionEntity->read();
+			$subQuestion['options'] = $this->getOptions($subQuestion['id']);
+			$subQuestion['accept'] = [];
+
+			// Handle file type accept for subquestions
+			if ($subQuestion['type'] === Constants::ANSWER_TYPE_FILE) {
+				if ($subQuestion['extraSettings']['allowedFileTypes'] ?? null) {
+					$subQuestion['accept'] = array_map(function (string $fileType) {
+						return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
+					}, $subQuestion['extraSettings']['allowedFileTypes']);
+				}
+
+				if ($subQuestion['extraSettings']['allowedFileExtensions'] ?? null) {
+					foreach ($subQuestion['extraSettings']['allowedFileExtensions'] as $extension) {
+						$subQuestion['accept'][] = '.' . $extension;
+					}
+				}
+			}
+
+			$branchId = $subQuestion['branchId'] ?? null;
+			if ($branchId !== null) {
+				if (!isset($subQuestionsByBranch[$branchId])) {
+					$subQuestionsByBranch[$branchId] = [];
+				}
+				$subQuestionsByBranch[$branchId][] = $subQuestion;
+			}
+		}
+
+		// Attach subquestions to their respective branches in extraSettings
+		if (isset($question['extraSettings']['branches']) && is_array($question['extraSettings']['branches'])) {
+			foreach ($question['extraSettings']['branches'] as $index => $branch) {
+				$branchId = $branch['id'] ?? null;
+				$question['extraSettings']['branches'][$index]['subQuestions'] = $subQuestionsByBranch[$branchId] ?? [];
+			}
+		}
+
+		return $question;
 	}
 
 	/**
@@ -167,6 +223,12 @@ class FormsService {
 					}
 				}
 			}
+
+			// Load subquestions for conditional questions
+			if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
+				$question = $this->loadConditionalSubQuestions($question);
+			}
+
 			return $question;
 		} catch (DoesNotExistException) {
 			return null;
@@ -843,6 +905,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			Constants::ANSWER_TYPE_CONDITIONAL => Constants::EXTRA_SETTINGS_CONDITIONAL,
 			default => [],
 		};
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
@@ -982,6 +1045,39 @@ class FormsService {
 			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
+			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_CONDITIONAL) {
+			// Validate conditional question settings
+			if (!isset($extraSettings['triggerType']) || !is_string($extraSettings['triggerType'])) {
+				return false;
+			}
+
+			// Validate trigger type is a valid question type (and not nested conditional)
+			if (!array_key_exists($extraSettings['triggerType'], Constants::CONDITIONAL_TRIGGER_TYPES)) {
+				return false;
+			}
+
+			// Branches are required for conditional questions
+			if (!isset($extraSettings['branches']) || !is_array($extraSettings['branches'])) {
+				return false;
+			}
+
+			// Branches cannot be empty
+			if (count($extraSettings['branches']) === 0) {
+				return false;
+			}
+
+			// Validate branches structure
+			foreach ($extraSettings['branches'] as $branch) {
+				// Each branch must have an id
+				if (!isset($branch['id']) || !is_string($branch['id'])) {
+					return false;
+				}
+
+				// Branches must have conditions array
+				if (!isset($branch['conditions']) || !is_array($branch['conditions'])) {
+					return false;
+				}
 			}
 		}
 		return true;
