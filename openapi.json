@@ -426,6 +426,15 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "parentQuestionId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "branchId": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },
@@ -536,7 +545,9 @@
                     "short",
                     "long",
                     "file",
-                    "datetime"
+                    "datetime",
+                    "color",
+                    "conditional"
                 ]
             },
             "Share": {
@@ -1621,6 +1632,19 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "(optional) id of the question that should be cloned"
+                                    },
+                                    "parentQuestionId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "(optional) id of the parent conditional question (for subquestions)"
+                                    },
+                                    "branchId": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "(optional) branch id within the parent conditional question"
                                     }
                                 }
                             }
