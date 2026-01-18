@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
@@ -277,7 +277,12 @@ import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-type AnswerValue = string[] | GridQuestionValues
+interface ConditionalAnswerValue {
+	trigger: string[]
+	subQuestions: Record<number, string[]>
+}
+
+type AnswerValue = string[] | GridQuestionValues | ConditionalAnswerValue
 type AnswersMap = Record<number, AnswerValue>
 
 interface StoredAnswerState {
@@ -293,6 +298,8 @@ interface SubmitQuestion extends FormsQuestion {
 	options?: FormsOption[]
 	extraSettings?: Record<string, unknown> & {
 		allowOtherAnswer?: boolean
+		triggerType?: string
+		branches?: { subQuestions?: FormsQuestion[] }[]
 	}
 	isRequired?: boolean
 }
@@ -605,12 +612,26 @@ export default defineComponent({
 					continue
 				}
 
-				localAnswers[parseInt(questionId, 10)] = [
-					'QuestionMultiple',
-					'QuestionRanking',
-				].includes(answer.type)
-					? (answer.value as string[]).map(String)
-					: answer.value
+				if (
+					['QuestionMultiple', 'QuestionRanking'].includes(answer.type)
+					&& Array.isArray(answer.value)
+				) {
+					localAnswers[parseInt(questionId, 10)] = answer.value.map(String)
+				} else if (answer.type === 'QuestionConditional') {
+					// Restore conditional answer structure with proper type conversions
+					const value = Array.isArray(answer.value)
+						? undefined
+						: (answer.value as Partial<ConditionalAnswerValue>)
+					localAnswers[parseInt(questionId, 10)] = {
+						trigger: Array.isArray(value?.trigger)
+							? value.trigger.map(String)
+							: [],
+
+						subQuestions: value?.subQuestions || {},
+					}
+				} else {
+					localAnswers[parseInt(questionId, 10)] = answer.value
+				}
 			}
 			answers.value = localAnswers
 		}
@@ -700,9 +721,55 @@ export default defineComponent({
 				const loaded: AnswersMap = {}
 				const loadedAnswers =
 					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
+
+				/**
+				 * Reuse conditional state regardless of trigger/subquestion answer order.
+				 *
+				 * @param questionId The conditional question ID.
+				 */
+				function getConditionalAnswer(
+					questionId: number,
+				): ConditionalAnswerValue {
+					const value = loaded[questionId]
+					if (value && !Array.isArray(value) && 'trigger' in value) {
+						return value as ConditionalAnswerValue
+					}
+					const conditionalAnswer: ConditionalAnswerValue = {
+						trigger: [],
+						subQuestions: {},
+					}
+					loaded[questionId] = conditionalAnswer
+					return conditionalAnswer
+				}
+
+				// Build a map of subquestion ID → parent conditional question ID
+				const subQuestionToParent = new Map<number, number>()
+				for (const question of props.form.questions as SubmitQuestion[]) {
+					if (question.type === 'conditional') {
+						const branches = question.extraSettings?.branches || []
+						for (const branch of branches) {
+							for (const subQuestion of branch.subQuestions || []) {
+								subQuestionToParent.set(subQuestion.id, question.id)
+							}
+						}
+					}
+				}
+
 				for (const answer of loadedAnswers) {
 					const questionId = Number(answer.questionId)
 					const text = answer.text
+
+					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
+
+					// Check if this answer belongs to a subquestion of a conditional
+					const parentConditionalId = subQuestionToParent.get(questionId)
+					if (parentConditionalId !== undefined) {
+						const conditionalAnswer =
+							getConditionalAnswer(parentConditionalId)
+						conditionalAnswer.subQuestions[questionId] ??= []
+						conditionalAnswer.subQuestions[questionId].push(text)
+						continue
+					}
 
 					// Only initialize once, don't overwrite previous answers
 					if (!loaded[questionId]) {
@@ -712,7 +779,6 @@ export default defineComponent({
 					// other question types collect their answers in this list
 					const questionAnswers = loaded[questionId] as string[]
 
-					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
 					if (!validQuestionsIds.value.has(questionId)) {
 						showClearFormDueToChangeDialog.value = true
@@ -728,6 +794,32 @@ export default defineComponent({
 					if (!question) {
 						continue
 					}
+					if (question.type === 'conditional') {
+						// Handle conditional trigger answer
+						const conditionalAnswer = getConditionalAnswer(questionId)
+						// Map trigger answer to option ID for option-based trigger types
+						const triggerType = question.extraSettings?.triggerType
+						if (
+							['multiple', 'multiple_unique', 'dropdown'].includes(
+								triggerType ?? '',
+							)
+						) {
+							const option = (question.options ?? []).find(
+								(opt) => opt.text === text,
+							)
+							if (option) {
+								conditionalAnswer.trigger.push(String(option.id))
+							} else {
+								logger.debug(
+									`Trigger option ${text} could not be mapped for conditional question ${questionId}`,
+								)
+							}
+						} else {
+							conditionalAnswer.trigger.push(text)
+						}
+						continue
+					}
+
 					if (question.type === 'ranking') {
 						try {
 							questionAnswers.push(...JSON.parse(text).map(String))
