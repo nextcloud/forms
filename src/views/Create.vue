@@ -81,6 +81,7 @@
 						:placeholder="t('forms', 'Form title')"
 						required
 						autofocus
+						@keydown.enter.prevent
 						@input="onTitleChange" />
 				</h2>
 				<label class="hidden-visually" for="form-desc">
