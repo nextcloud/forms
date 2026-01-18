@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -11,11 +11,13 @@ import IconFile from 'vue-material-design-icons/FileOutline.vue'
 import IconGrid from 'vue-material-design-icons/Grid.vue'
 import IconNumeric from 'vue-material-design-icons/Numeric.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
+import IconSourceBranch from 'vue-material-design-icons/SourceBranch.vue'
 import IconTextLong from 'vue-material-design-icons/TextLong.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 import IconLinearScale from '../components/Icons/IconLinearScale.vue'
 import IconPalette from '../components/Icons/IconPalette.vue'
 import QuestionColor from '../components/Questions/QuestionColor.vue'
+import QuestionConditional from '../components/Questions/QuestionConditional.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
 import QuestionFile from '../components/Questions/QuestionFile.vue'
@@ -262,5 +264,24 @@ export default {
 		createPlaceholder: t('forms', 'People can pick a color'),
 		submitPlaceholder: t('forms', 'Pick a color'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	conditional: {
+		component: QuestionConditional,
+		icon: IconSourceBranch,
+		label: t('forms', 'Conditional'),
+		predefined: true,
+		validate: (question) => {
+			// Must have a trigger type and at least one branch
+			const extraSettings = question.extraSettings || {}
+			return !!extraSettings.triggerType && extraSettings.branches?.length > 0
+		},
+
+		titlePlaceholder: t('forms', 'Conditional question title'),
+		createPlaceholder: t('forms', 'Different questions based on the answer'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title, trigger type, and at least one branch!',
+		),
 	},
 }
