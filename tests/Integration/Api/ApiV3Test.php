@@ -473,14 +473,17 @@ class ApiV3Test extends IntegrationBase {
 								[
 									'text' => 'Option 1',
 									'order' => 1,
+									'optionType' => null,
 								],
 								[
 									'text' => 'Option 2',
 									'order' => 2,
+									'optionType' => null,
 								],
 								[
 									'text' => '',
 									'order' => 3,
+									'optionType' => null,
 								]
 							],
 							'accept' => [],
@@ -897,6 +900,7 @@ class ApiV3Test extends IntegrationBase {
 					// 'questionId' => Done dynamically below.
 					'text' => 'A new Option.',
 					'order' => 4,
+					'optionType' => null,
 				]
 			]
 		];
