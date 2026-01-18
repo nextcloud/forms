@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2019-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -35,6 +35,10 @@ class QuestionMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
+			)
+			// Only load top-level questions (not subquestions of conditional questions)
+			->andWhere(
+				$qb->expr()->isNull('parent_question_id')
 			);
 
 		if (!$loadDeleted) {
@@ -48,6 +52,81 @@ class QuestionMapper extends QBMapper {
 		$qb->orderBy('order');
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Find subquestions belonging to a parent conditional question
+	 *
+	 * @param int $parentQuestionId The ID of the parent conditional question
+	 * @param bool $loadDeleted Whether to include soft-deleted questions
+	 * @return Question[]
+	 */
+	public function findByParentQuestion(int $parentQuestionId, bool $loadDeleted = false): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('parent_question_id', $qb->createNamedParameter($parentQuestionId, IQueryBuilder::PARAM_INT))
+			);
+
+		if (!$loadDeleted) {
+			$qb->andWhere(
+				$qb->expr()->neq('order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT))
+			);
+		}
+
+		// Sort by order within the conditional question
+		$qb->orderBy('order');
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Find subquestions belonging to a specific branch of a conditional question
+	 *
+	 * @param int $parentQuestionId The ID of the parent conditional question
+	 * @param string $branchId The branch identifier
+	 * @return Question[]
+	 */
+	public function findByBranch(int $parentQuestionId, string $branchId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('parent_question_id', $qb->createNamedParameter($parentQuestionId, IQueryBuilder::PARAM_INT))
+			)
+			->andWhere(
+				$qb->expr()->eq('branch_id', $qb->createNamedParameter($branchId))
+			)
+			->andWhere(
+				$qb->expr()->neq('order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT))
+			)
+			->orderBy('order');
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Delete all subquestions of a parent conditional question
+	 *
+	 * @param int $parentQuestionId The ID of the parent conditional question
+	 */
+	public function deleteByParentQuestion(int $parentQuestionId): void {
+		// First delete options for all subquestions
+		$subQuestions = $this->findByParentQuestion($parentQuestionId, true);
+		foreach ($subQuestions as $subQuestion) {
+			$this->optionMapper->deleteByQuestion($subQuestion->getId());
+		}
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where(
+				$qb->expr()->eq('parent_question_id', $qb->createNamedParameter($parentQuestionId, IQueryBuilder::PARAM_INT))
+			);
+
+		$qb->executeStatement();
 	}
 
 	/**
