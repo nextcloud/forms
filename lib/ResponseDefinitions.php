@@ -42,7 +42,7 @@ namespace OCA\Forms;
  *   validationType?: string
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"color"|"conditional"
  *
  * @psalm-type FormsQuestion = array{
  *   id: int,
@@ -56,6 +56,8 @@ namespace OCA\Forms;
  *   extraSettings: FormsQuestionExtraSettings|\stdClass,
  *   options: list<FormsOption>,
  *   accept: list<string>,
+ *   parentQuestionId?: ?int,
+ *   branchId?: ?string,
  * }
  *
  * @psalm-type FormsAnswer = array{
