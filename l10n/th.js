@@ -53,6 +53,7 @@ OC.L10N.register(
     "Group" : "กลุ่ม",
     "Share link" : "แชร์ลิงก์",
     "Copy to clipboard" : "คัดลอกไปยังคลิปบอร์ด",
+    "Internal link" : "ลิงค์ภายใน",
     "View" : "มุมมอง",
     "Edit" : "แก้ไข",
     "Share" : "แชร์",

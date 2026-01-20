@@ -9,6 +9,7 @@ OC.L10N.register(
     "Select groups" : "Chọn nhóm",
     "Results" : "Kết quả",
     "Cancel" : "Hủy",
+    "Options" : "Tùy chọn",
     "Required" : "Bắt buộc",
     "Delete" : "Xóa",
     "Other" : "Khác",
