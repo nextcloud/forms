@@ -5,7 +5,7 @@
 
 <template>
 	<li class="question__item" @focusout="handleTabbing">
-		<component
+		<div
 			:is="pseudoIcon"
 			v-if="!isDropdown"
 			class="question__item__pseudoInput" />
@@ -79,10 +79,13 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
+import IconPlus from 'vue-material-design-icons/Plus.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
+import IconTableColumn from 'vue-material-design-icons/TableColumn.vue'
+import IconTableRow from 'vue-material-design-icons/TableRow.vue'
 import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDragIndicator from '../Icons/IconDragIndicator.vue'
-import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
+import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
@@ -96,6 +99,8 @@ export default {
 		IconDelete,
 		IconDragIndicator,
 		IconRadioboxBlank,
+		IconTableColumn,
+		IconTableRow,
 		NcActions,
 		NcActionButton,
 		NcButton,
@@ -136,6 +141,11 @@ export default {
 			type: Number,
 			required: true,
 		},
+
+		optionType: {
+			type: String,
+			required: true,
+		},
 	},
 
 	emits: [
@@ -159,25 +169,72 @@ export default {
 	computed: {
 		ariaLabel() {
 			if (this.answer.local) {
+				if (this.optionType === OptionType.Column) {
+					return t('forms', 'Add a new column')
+				}
+				if (this.optionType === OptionType.Row) {
+					return t('forms', 'Add a new row')
+				}
+
 				return t('forms', 'Add a new answer option')
 			}
+
+			if (this.optionType === OptionType.Column) {
+				return t('forms', 'The text of column {index}', {
+					index: this.index + 1,
+				})
+			}
+
+			if (this.optionType === OptionType.Row) {
+				return t('forms', 'The text of row {index}', {})
+			}
+
 			return t('forms', 'The text of option {index}', {
 				index: this.index + 1,
 			})
 		},
 
 		optionDragMenuId() {
-			return `q${this.answer.questionId}o${this.answer.id}__drag_menu`
+			return `q${this.answer.questionId}o${this.answer.id}o${this.optionType}__drag_menu`
 		},
 
 		placeholder() {
 			if (this.answer.local) {
+				if (this.optionType === OptionType.Column) {
+					return t('forms', 'Add a new column')
+				}
+
+				if (this.optionType === OptionType.Row) {
+					return t('forms', 'Add a new row')
+				}
+
 				return t('forms', 'Add a new answer option')
 			}
+
+			if (this.optionType === OptionType.Column) {
+				return t('forms', 'Column number {index}', { index: this.index + 1 })
+			}
+
+			if (this.optionType === OptionType.Row) {
+				return t('forms', 'Row number {index}', { index: this.index + 1 })
+			}
+
 			return t('forms', 'Answer number {index}', { index: this.index + 1 })
 		},
 
 		pseudoIcon() {
+			if (this.answer.local) {
+				return IconPlus
+			}
+
+			if (this.optionType === OptionType.Column) {
+				return IconTableColumn
+			}
+
+			if (this.optionType === OptionType.Row) {
+				return IconTableRow
+			}
+
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
 	},
@@ -193,7 +250,7 @@ export default {
 
 	methods: {
 		handleTabbing() {
-			this.$emit('tabbed-out')
+			this.$emit('tabbed-out', this.optionType)
 		},
 
 		/**
@@ -240,7 +297,7 @@ export default {
 		 */
 		focusNextInput() {
 			if (this.index <= this.maxIndex) {
-				this.$emit('focus-next', this.index)
+				this.$emit('focus-next', this.index, this.optionType)
 			}
 		},
 
@@ -264,7 +321,7 @@ export default {
 
 			// do this in queue to prevent race conditions between PATCH and DELETE
 			this.queue.add(() => {
-				this.$emit('delete', this.answer.id)
+				this.$emit('delete', this.answer)
 				// Prevent any patch requests
 				this.queue.pause()
 				this.queue.clear()
@@ -289,6 +346,7 @@ export default {
 					),
 					{
 						optionTexts: [answer.text],
+						optionType: answer.optionType,
 					},
 				)
 				logger.debug('Created answer', { answer })

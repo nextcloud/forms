@@ -157,18 +157,53 @@
 							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
 							<IconPlus v-else :size="20" />
 						</template>
-						<NcActionButton
-							v-for="(answer, type) in answerTypesFilter"
-							:key="answer.label"
-							close-after-click
-							:disabled="isLoadingQuestions"
-							class="question-menu__question"
-							@click="addQuestion(type)">
-							<template #icon>
-								<component :is="answer.icon" :size="20" />
-							</template>
-							{{ answer.label }}
-						</NcActionButton>
+
+						<template v-if="!activeQuestionType">
+							<NcActionButton
+								v-for="(answer, type) in answerTypesFilter"
+								:key="answer.label"
+								:close-after-click="!answer.subtypes"
+								:disabled="isLoadingQuestions"
+								class="question-menu__question"
+								@click="
+									answer.subtypes
+										? (activeQuestionType = type)
+										: addQuestion(type)
+								">
+								<template #icon>
+									<component :is="answer.icon" :size="20" />
+								</template>
+								{{ answer.label }}
+							</NcActionButton>
+						</template>
+
+						<template v-else>
+							<NcActionButton
+								:disabled="isLoadingQuestions"
+								class="question-menu__question"
+								@click="activeQuestionType = null">
+								<template #icon>
+									<IconChevronLeft :size="20" />
+								</template>
+								{{ t('forms', 'Grid') }}
+							</NcActionButton>
+							<NcActionSeparator />
+
+							<NcActionButton
+								v-for="(answer, type) in answerTypesFilter[
+									activeQuestionType
+								].subtypes"
+								:key="'subtype-' + answer.label"
+								close-after-click
+								:disabled="isLoadingQuestions"
+								class="question-menu__question"
+								@click="addQuestion(activeQuestionType, type)">
+								<template #icon>
+									<component :is="answer.icon" :size="20" />
+								</template>
+								{{ answer.label }}
+							</NcActionButton>
+						</template>
 					</NcActions>
 				</div>
 			</section>
@@ -187,10 +222,12 @@ import debounce from 'debounce'
 import Draggable from 'vuedraggable'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import IconLock from 'vue-material-design-icons/LockOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 import Question from '../components/Questions/Question.vue'
@@ -212,9 +249,11 @@ export default {
 	name: 'Create',
 	components: {
 		Draggable,
+		IconChevronLeft,
 		IconLock,
 		IconPlus,
 		NcActionButton,
+		NcActionSeparator,
 		NcActions,
 		NcAppContent,
 		NcEmptyContent,
@@ -239,6 +278,7 @@ export default {
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
+			activeQuestionType: null,
 		}
 	},
 
@@ -408,8 +448,9 @@ export default {
 		 * Add a new question to the current form
 		 *
 		 * @param {string} type the question type, see AnswerTypes
+		 * @param {string|null} subtype the question subtype, see AnswerTypes.subtypes
 		 */
-		async addQuestion(type) {
+		async addQuestion(type, subtype = null) {
 			const text = ''
 			this.isLoadingQuestions = true
 
@@ -421,6 +462,7 @@ export default {
 					{
 						type,
 						text,
+						subtype,
 					},
 				)
 				const question = OcsResponse2Data(response)

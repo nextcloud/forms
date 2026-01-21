@@ -75,7 +75,7 @@ export default {
 		 * The user answers
 		 */
 		values: {
-			type: Array,
+			type: [Array, Object],
 			default() {
 				return []
 			},
@@ -386,6 +386,7 @@ export default {
 						id: option.id, // Use the ID from the server
 						questionId: this.id,
 						text: option.text,
+						optionType: option.optionType,
 						local: false,
 					})
 				})

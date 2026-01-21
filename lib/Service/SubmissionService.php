@@ -15,6 +15,8 @@ use OCA\Forms\Db\Answer;
 
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
+use OCA\Forms\Db\Option;
+use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\SubmissionMapper;
@@ -37,6 +39,7 @@ use OCP\Mail\IMailer;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 use Psr\Log\LoggerInterface;
@@ -63,6 +66,7 @@ class SubmissionService {
 		private ITempManager $tempManager,
 		private FormsService $formsService,
 		private IUrlGenerator $urlGenerator,
+		private OptionMapper $optionMapper,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -244,8 +248,42 @@ class SubmissionService {
 		$header[] = $this->l10n->t('Timestamp');
 		/** @var array<int, Question> $questionPerQuestionId */
 		$questionPerQuestionId = [];
+		/** @var array<int, array<int, string>> $gridRowsPerQuestionId */
+		$gridRowsPerQuestionId = [];
+		/** @var array<int, array<int, string>> $gridColumnsPerQuestionId */
+		$gridColumnsPerQuestionId = [];
+
+		$optionPerOptionId = [];
 		foreach ($questions as $question) {
-			$header[] = $question->getText();
+			if ($question->getType() === Constants::ANSWER_TYPE_GRID) {
+				$gridCellType = $question->getExtraSettings()['questionType'];
+				$options = $this->optionMapper->findByQuestion($question->getId());
+
+				foreach ($options as $option) {
+					$optionPerOptionId[$option->getId()] = $option;
+					if ($option->getOptionType() === Option::OPTION_TYPE_ROW) {
+						$gridRowsPerQuestionId[$question->getId()][] = $option->getId();
+					}
+					if ($option->getOptionType() === Option::OPTION_TYPE_COLUMN) {
+						$gridColumnsPerQuestionId[$question->getId()][] = $option->getId();
+					}
+				}
+
+				foreach ($gridRowsPerQuestionId[$question->getId()] as $rowId) {
+					if ($gridCellType === Constants::ANSWER_GRID_TYPE_CHECKBOX || $gridCellType === Constants::ANSWER_GRID_TYPE_RADIO) {
+						$header[] = $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ')';
+					}
+
+					if ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
+						foreach ($gridColumnsPerQuestionId[$question->getId()] as $columnId) {
+							$header[] = $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ' - ' . $optionPerOptionId[$columnId]->getText() . ')';
+						}
+					}
+				}
+			} else {
+				$header[] = $question->getText();
+			}
+
 			$questionPerQuestionId[$question->getId()] = $question;
 		}
 
@@ -273,11 +311,11 @@ class SubmissionService {
 
 			// Answers, make sure we keep the question order
 			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()),
-				function (array $carry, Answer $answer) use ($questionPerQuestionId) {
+				function (array $carry, Answer $answer) use ($questionPerQuestionId, $gridRowsPerQuestionId, $gridColumnsPerQuestionId, $optionPerOptionId) {
 					$questionId = $answer->getQuestionId();
+					$questionType = isset($questionPerQuestionId[$questionId]) ? $questionPerQuestionId[$questionId]->getType() : null;
 
-					if (isset($questionPerQuestionId[$questionId])
-						&& $questionPerQuestionId[$questionId]->getType() === Constants::ANSWER_TYPE_FILE) {
+					if ($questionType === Constants::ANSWER_TYPE_FILE) {
 						if (array_key_exists($questionId, $carry)) {
 							$carry[$questionId]['label'] .= "; \n" . $answer->getText();
 						} else {
@@ -286,6 +324,36 @@ class SubmissionService {
 								'url' => $this->urlGenerator->linkToRouteAbsolute('files.View.showFile', ['fileid' => $answer->getFileId()])
 							];
 						}
+					} elseif ($questionType === Constants::ANSWER_TYPE_GRID) {
+						$gridCellType = isset($questionPerQuestionId[$questionId]) ? $questionPerQuestionId[$questionId]->getExtraSettings()['questionType'] : null;
+						$answerText = json_decode($answer->getText(), true);
+						$columns = [];
+						foreach ($gridRowsPerQuestionId[$questionId] as $row) {
+							if (empty($answerText[$row])) {
+								$columns[] = '';
+								continue;
+							}
+
+							if ($gridCellType === Constants::ANSWER_GRID_TYPE_RADIO) {
+								$columns[] = $optionPerOptionId[$answerText[$row]]->getText();
+							} elseif ($gridCellType === Constants::ANSWER_GRID_TYPE_CHECKBOX) {
+								$columns[] = implode('; ', array_map(function ($optionId) use ($optionPerOptionId) {
+									;
+									return $optionPerOptionId[$optionId]->getText();
+								}, $answerText[$row]));
+							} elseif ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
+								// For number grids, we need to create a header for each cell in the grid
+								foreach ($gridColumnsPerQuestionId[$questionId] as $column) {
+									if (empty($answerText[$row][$column])) {
+										$columns[] = '';
+										continue;
+									}
+
+									$columns[] = $answerText[$row][$column];
+								}
+							}
+						}
+						$carry[$questionId] = ['columns' => $columns];
 					} else {
 						if (array_key_exists($questionId, $carry)) {
 							$carry[$questionId] .= '; ' . $answer->getText();
@@ -309,7 +377,7 @@ class SubmissionService {
 
 	/**
 	 * @param array<int, string> $header
-	 * @param array<int, array<int, string>|non-empty-list<array{label: string, url: string}>> $data
+	 * @param list<non-empty-list<array{columns?: list<mixed|string>, label?: string, url?: string}|mixed|null|string>> $data
 	 */
 	private function exportData(array $header, array $data, string $fileFormat, ?File $file = null): string {
 		if ($file && $file->getContent()) {
@@ -325,11 +393,11 @@ class SubmissionService {
 			$activeWorksheet->setCellValue([$columnIndex + 1, 1], $value);
 		}
 		foreach ($data as $rowIndex => $rowData) {
-			foreach ($rowData as $columnIndex => $value) {
-				$column = $columnIndex + 1;
+			$column = 1;
+			foreach ($rowData as $value) {
 				$row = $rowIndex + 2;
 
-				if (is_array($value)) {
+				if (is_array($value) && isset($value['label'])) { // file question type
 					$activeWorksheet->getCell([$column, $row])
 						->setValueExplicit($value['label'])
 						->getHyperlink()
@@ -338,18 +406,17 @@ class SubmissionService {
 					$activeWorksheet->getStyle([$column, $row])
 						->getAlignment()
 						->setWrapText(true);
-				} else {
-					// Explicitly set the type of the value to string for values that start with '=' to prevent it being interpreted as formulas
-					if (is_string($value)) {
-						$activeWorksheet->getCell([$column, $row])
-							->setValueExplicit($fileFormat === 'csv'
-								? $this->escapeCSV($value)
-								: $value,
-							);
-					} else {
-						$activeWorksheet->setCellValue([$column, $row], $value);
+				} elseif (is_array($value) && isset($value['columns'])) { // grid question type
+					foreach ($value['columns'] as $nestedValue) {
+						$this->setCellValue($activeWorksheet, $column, $row, $nestedValue, $fileFormat);
+						$column++;
 					}
+					continue; // no need to increment the column one more time
+				} else {
+					$this->setCellValue($activeWorksheet, $column, $row, $value, $fileFormat);
 				}
+
+				$column++;
 			}
 		}
 
@@ -432,6 +499,7 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Question "%s" can only have two answers.', $question['text']));
 			} elseif ($answersCount > 1
 						&& $question['type'] !== Constants::ANSWER_TYPE_FILE
+						&& $question['type'] !== Constants::ANSWER_TYPE_GRID
 						&& !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])
 						|| $question['type'] === Constants::ANSWER_TYPE_TIME && isset($question['extraSettings']['timeRange']))) {
 				// Check if non-multiple questions have not more than one answer
@@ -574,6 +642,19 @@ class SubmissionService {
 				$this->logger->error('Invalid input type for question detected, please report this issue!', ['validationType' => $question['extraSettings']['validationType']]);
 				// The result is just a non-validated text on the results, but not a fully declined submission. So no need to throw but simply return false here.
 				return false;
+		}
+	}
+
+	private function setCellValue(Worksheet $activeWorksheet, int $column, int $row, mixed $value, string $fileFormat): void {
+		// Explicitly set the type of the value to string for values that start with '=' to prevent it being interpreted as formulas
+		if (is_string($value)) {
+			$activeWorksheet->getCell([$column, $row])
+				->setValueExplicit($fileFormat === 'csv'
+					? $this->escapeCSV($value)
+					: $value,
+				);
+		} else {
+			$activeWorksheet->setCellValue([$column, $row], $value);
 		}
 	}
 }
