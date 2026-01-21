@@ -614,7 +614,11 @@ export default {
 				for (const answer of loadedAnswers) {
 					const questionId = answer.questionId
 					const text = answer.text
-					answers[questionId] = []
+
+					// Only initialize once, don't overwrite previous answers
+					if (!answers[questionId]) {
+						answers[questionId] = []
+					}
 
 					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
