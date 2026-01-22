@@ -50,6 +50,7 @@
 
 				<!-- Action menu for cloud export and deletion -->
 				<NcActions
+					v-if="canExportSubmissions"
 					:aria-label="t('forms', 'Options')"
 					force-name
 					:inline="isMobile ? 0 : 1"
@@ -447,6 +448,12 @@ export default {
 	computed: {
 		isFormArchived() {
 			return this.form.state === FormState.FormArchived
+		},
+
+		canExportSubmissions() {
+			return this.form.permissions.includes(
+				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+			)
 		},
 
 		canDeleteSubmissions() {

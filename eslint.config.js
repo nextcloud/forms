@@ -6,7 +6,4 @@
 import { recommendedVue2 } from '@nextcloud/eslint-config'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
-export default [
-	...recommendedVue2,
-	eslintPluginPrettierRecommended,
-]
+export default [...recommendedVue2, eslintPluginPrettierRecommended]

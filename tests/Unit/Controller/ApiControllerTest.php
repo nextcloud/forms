@@ -304,7 +304,7 @@ class ApiControllerTest extends TestCase {
 			->willThrowException(new NoSuchFormException('Could not find form'));
 
 		$this->expectException(NoSuchFormException::class);
-		$this->apiController->getSubmissions(99, 'csv');
+		$this->apiController->getSubmissions(99, fileFormat: 'csv');
 	}
 
 	public function testExportSubmissions_noPermissions() {
@@ -318,7 +318,27 @@ class ApiControllerTest extends TestCase {
 			->willThrowException(new NoSuchFormException('The current user has no permission to get the results for this form'));
 
 		$this->expectException(NoSuchFormException::class);
-		$this->apiController->getSubmissions(1, 'csv');
+		$this->apiController->getSubmissions(1, fileFormat: 'csv');
+	}
+
+	public function testExportSubmissions_noExportPermissions() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_SUBMIT]);
+
+
+		$this->expectException(NoSuchFormException::class);
+		$this->apiController->getSubmissions(1, fileFormat: 'csv');
 	}
 
 	public function testExportSubmissions() {
@@ -330,6 +350,11 @@ class ApiControllerTest extends TestCase {
 			->method('getFormIfAllowed')
 			->with(1, Constants::PERMISSION_RESULTS)
 			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS]);
 
 		$csv = 'foo,bar';
 		$this->submissionService->expects($this->once())
