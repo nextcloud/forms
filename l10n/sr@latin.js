@@ -7,6 +7,7 @@ OC.L10N.register(
     "Shared with you" : "Shared with you",
     "Cancel" : "Poništi",
     "Delete" : "Obriši",
+    "Checkbox" : "Štikliranje",
     "Other" : "Ostali",
     "never" : "nikada",
     "Set expiration date" : "Postavi datum isteka",

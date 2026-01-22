@@ -11,6 +11,8 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Go to previous page" : "Go to previous page",
     "Delete" : "Delete",
+    "Checkbox" : "Checkbox",
+    "Text" : "Text",
     "Other" : "Other",
     "never" : "never",
     "Set expiration date" : "Set expiration date",
@@ -45,7 +47,6 @@ OC.L10N.register(
     "Color" : "Color",
     "Image" : "Image",
     "Presentation" : "Presentation",
-    "Text" : "Text",
     "Phone number" : "Phone number",
     "Email address" : "Email address",
     "Uploading …" : "Uploading …"

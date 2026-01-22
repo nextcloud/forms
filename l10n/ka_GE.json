@@ -6,6 +6,8 @@
     "Cancel" : "გაუქმება",
     "Required" : "სავალდებულო",
     "Delete" : "წაშლა",
+    "Checkbox" : "ჩექბოქსი",
+    "Text" : "ტექსტი",
     "Other" : "სხვა",
     "never" : "არასდროს",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
@@ -28,7 +30,6 @@
     "Date" : "თარიღი",
     "Time" : "დრო",
     "Color" : "ფერი",
-    "Text" : "ტექსტი",
     "Phone number" : "ტელეფონის ნომერი",
     "Uploading …" : "იტვირთება ..."
 },"pluralForm" :"nplurals=2; plural=(n!=1);"

@@ -6,6 +6,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Vereis",
     "Delete" : "Skrap",
+    "Text" : "Teks",
     "Other" : "Ander",
     "Set expiration date" : "Stel vervaldatum",
     "Group" : "Groep",
@@ -26,7 +27,6 @@ OC.L10N.register(
     "Date" : "Datum",
     "Time" : "Tyd",
     "Color" : "Kleur",
-    "Text" : "Teks",
     "Phone number" : "Foonnommer",
     "Email address" : "E-posadres",
     "Uploading …" : "Laai tans op …"

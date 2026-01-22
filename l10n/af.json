@@ -4,6 +4,7 @@
     "Cancel" : "Cancel",
     "Required" : "Vereis",
     "Delete" : "Skrap",
+    "Text" : "Teks",
     "Other" : "Ander",
     "Set expiration date" : "Stel vervaldatum",
     "Group" : "Groep",
@@ -24,7 +25,6 @@
     "Date" : "Datum",
     "Time" : "Tyd",
     "Color" : "Kleur",
-    "Text" : "Teks",
     "Phone number" : "Foonnommer",
     "Email address" : "E-posadres",
     "Uploading …" : "Laai tans op …"

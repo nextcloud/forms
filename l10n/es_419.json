@@ -6,6 +6,8 @@
     "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
+    "Checkbox" : "Casilla de verificación",
+    "Text" : "Texto",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
     "Group" : "Grupo",
@@ -26,7 +28,6 @@
     "Date" : "Fecha",
     "Time" : "Hora",
     "Color" : "Color",
-    "Text" : "Texto",
     "Phone number" : "Número telefónico",
     "Uploading …" : "Cargando..."
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
