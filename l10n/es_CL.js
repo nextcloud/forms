@@ -8,6 +8,8 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",
+    "Checkbox" : "Casilla de verificación",
+    "Text" : "Texto",
     "Other" : "Otro",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
@@ -31,7 +33,6 @@ OC.L10N.register(
     "Date" : "Fecha",
     "Time" : "Hora",
     "Color" : "Color",
-    "Text" : "Texto",
     "Phone number" : "Número telefónico",
     "Uploading …" : "Cargando..."
 },

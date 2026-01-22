@@ -6,6 +6,8 @@
     "Cancel" : "Anuloje",
     "Required" : "E domosdoshme",
     "Delete" : "Fshij",
+    "Checkbox" : "Checkbox",
+    "Text" : "Tekst",
     "Other" : "Tjetër",
     "never" : "kurrë",
     "Set expiration date" : "Caktoni datë skadimi",
@@ -33,7 +35,6 @@
     "Document" : "Dokument",
     "Presentation" : "Paraqitje",
     "Spreadsheet" : "Fletëllogaritje",
-    "Text" : "Tekst",
     "Phone number" : "Numri i telefonit"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

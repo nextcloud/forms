@@ -12,6 +12,11 @@ OC.L10N.register(
     "Options" : "Tùy chọn",
     "Required" : "Bắt buộc",
     "Delete" : "Xóa",
+    "Checkbox" : "Hộp chọn",
+    "Number" : "Số",
+    "Text" : "Văn bản",
+    "Columns" : "Các cột",
+    "Rows" : "Các hàng",
     "Other" : "Khác",
     "never" : "không thay đổi",
     "Set expiration date" : "Đặt ngày hết hạn",
@@ -50,10 +55,8 @@ OC.L10N.register(
     "Document" : "Tài liệu",
     "Presentation" : "Buổi thuyết trình",
     "Spreadsheet" : "Bảng tính",
-    "Text" : "Văn bản",
     "Phone number" : "Số điện thoại",
     "Email address" : "Địa chỉ thư điện tử",
-    "Number" : "Số",
     "Uploading …" : "Đang tải lên …"
 },
 "nplurals=1; plural=0;");

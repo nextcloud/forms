@@ -7,6 +7,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Nødvendig",
     "Delete" : "Slett",
+    "Checkbox" : "Avkryssingsfelt",
     "Other" : "Anna",
     "never" : "aldri",
     "Set expiration date" : "Set utløpsdato",

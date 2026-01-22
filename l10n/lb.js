@@ -9,6 +9,7 @@ OC.L10N.register(
     "Cancel" : "Cancel",
     "Required" : "Noutwendeg",
     "Delete" : "Läschen",
+    "Checkbox" : "Checkbox",
     "Other" : "Aner",
     "never" : "Ni",
     "Set expiration date" : "Verfallsdatum setzen",

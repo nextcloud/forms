@@ -9,6 +9,7 @@ OC.L10N.register(
     "Cancel" : "Semmet",
     "Options" : "Tixtiṛiyin",
     "Delete" : "Kkes",
+    "Text" : "Aḍris",
     "Other" : "Wayeḍ",
     "Group" : "Agraw",
     "Team" : "Tarbaɛt",
@@ -34,7 +35,6 @@ OC.L10N.register(
     "Pick a color" : "Fren ini",
     "Image" : "Tugna",
     "Document" : "Isemli",
-    "Text" : "Aḍris",
     "Phone number" : "Uṭṭun n tiliɣri",
     "Email address" : "Tansa imayl"
 },

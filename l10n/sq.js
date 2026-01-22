@@ -8,6 +8,8 @@ OC.L10N.register(
     "Cancel" : "Anuloje",
     "Required" : "E domosdoshme",
     "Delete" : "Fshij",
+    "Checkbox" : "Checkbox",
+    "Text" : "Tekst",
     "Other" : "Tjetër",
     "never" : "kurrë",
     "Set expiration date" : "Caktoni datë skadimi",
@@ -35,7 +37,6 @@ OC.L10N.register(
     "Document" : "Dokument",
     "Presentation" : "Paraqitje",
     "Spreadsheet" : "Fletëllogaritje",
-    "Text" : "Tekst",
     "Phone number" : "Numri i telefonit"
 },
 "nplurals=2; plural=(n != 1);");

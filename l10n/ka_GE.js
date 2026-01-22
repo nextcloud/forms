@@ -8,6 +8,8 @@ OC.L10N.register(
     "Cancel" : "გაუქმება",
     "Required" : "სავალდებულო",
     "Delete" : "წაშლა",
+    "Checkbox" : "ჩექბოქსი",
+    "Text" : "ტექსტი",
     "Other" : "სხვა",
     "never" : "არასდროს",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
@@ -30,7 +32,6 @@ OC.L10N.register(
     "Date" : "თარიღი",
     "Time" : "დრო",
     "Color" : "ფერი",
-    "Text" : "ტექსტი",
     "Phone number" : "ტელეფონის ნომერი",
     "Uploading …" : "იტვირთება ..."
 },

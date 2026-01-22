@@ -10,6 +10,8 @@ OC.L10N.register(
     "Required" : "Nepra",
     "Maximum file size" : "Maksimuma dosiergrando",
     "Delete" : "Forigi",
+    "Checkbox" : "Markobutono",
+    "Text" : "Teksto",
     "Other" : "Alia",
     "never" : "neniam",
     "Set expiration date" : "Uzi limdaton",
@@ -37,7 +39,6 @@ OC.L10N.register(
     "Date" : "Date",
     "Time" : "Dato",
     "Color" : "Koloro",
-    "Text" : "Teksto",
     "Phone number" : "Telefonnumero",
     "Email address" : "Retpoŝtadreso",
     "Uploading …" : "Alŝutado…"
