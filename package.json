@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/nextcloud/forms.git"
   },
-  "license": "AGPL-3.0",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "build": "vite --mode production build",
@@ -61,6 +61,7 @@
     "@nextcloud/vite-config": "^1.7.2",
     "@playwright/test": "^1.57.0",
     "@vue/tsconfig": "^0.5.1",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
     "vite": "^7.3.1"
