@@ -272,8 +272,15 @@ export default {
 				return false
 			}
 
+			if (this.$route.name === 'results') {
+				return (
+					form.permissions.includes(this.$route.name)
+					|| form.submissionCount > 0
+				)
+			}
+
 			// Return whether route is in the permissions-list
-			return form?.permissions.includes(this.$route.name)
+			return form.permissions.includes(this.$route.name)
 		},
 
 		selectedForm: {
