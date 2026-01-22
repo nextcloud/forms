@@ -212,8 +212,6 @@ class FormsService {
 			$userSubmissionCount = $this->submissionMapper->countSubmissions($form->getId(), $this->currentUser->getUID());
 			if ($userSubmissionCount > 0) {
 				$result['submissionCount'] = $userSubmissionCount;
-				// Append `results` permission if user has submitted to the form
-				$result['permissions'][] = Constants::PERMISSION_RESULTS;
 			}
 		}
 
