@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/nextcloud/forms.git"
   },
-  "license": "AGPL-3.0",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "build": "vite --mode production build",
