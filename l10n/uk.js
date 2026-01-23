@@ -181,7 +181,7 @@ OC.L10N.register(
     "Share link" : "Поділитися посиланням",
     "Add link" : "Додати посиланя",
     "Embeddable link" : "Посилання для вставки",
-    "Copy to clipboard" : "Копіювати до буферу обміну",
+    "Copy to clipboard" : "Копіювати до буфера обміну",
     "Show QR code" : "Показати код QR",
     "Copy embedding code" : "Копіювати код вбудування",
     "Convert to embeddable link" : "Перетворити в посилання для вставки",

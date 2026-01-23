@@ -120,6 +120,7 @@ OC.L10N.register(
     "Delete" : "Smazat",
     "Uploading …" : "Nahrávání …",
     "Add new file as answer" : "Přidat jako odpověď nový soubor",
+    "Checkbox" : "Zatržítko",
     "Number" : "Číslo",
     "Text" : "Text",
     "_You must choose at most one option_::_You must choose a maximum of %n options_" : ["Je třeba zvolit nejvýše jednu možnost","Je třeba zvolit nejvýše %n možnosti","Je třeba zvolit nejvýše %n možností","Je třeba zvolit nejvýše %n možnosti"],

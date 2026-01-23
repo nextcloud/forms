@@ -7,6 +7,7 @@ OC.L10N.register(
     "Select groups" : "Choaz ar strolladoù",
     "Cancel" : "Nullañ",
     "Delete" : "Dilemel",
+    "Checkbox" : "Log-askañ",
     "Text" : "Testenn",
     "never" : "james",
     "Set expiration date" : "Lakaat un deizat termen",

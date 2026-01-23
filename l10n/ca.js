@@ -71,6 +71,7 @@ OC.L10N.register(
     "Shuffle options" : "Barrejar opcions",
     "Maximum file size" : "Mida màxima dels fitxers",
     "Delete" : "Suprimeix",
+    "Checkbox" : "Casella de selecció",
     "Number" : "Número",
     "Text" : "Text",
     "Columns" : "Columnes",

@@ -16,6 +16,7 @@ OC.L10N.register(
     "Options" : "Варыянты",
     "Page number" : "Нумар старонкі",
     "{page} of {totalPages}" : "{page} з {totalPages}",
+    "Add a new column" : "Дадайце новы слупок",
     "Delete answer" : "Выдаліць адказ",
     "Required" : "Абавязкова",
     "Copy question" : "Капіяваць пытанне",
