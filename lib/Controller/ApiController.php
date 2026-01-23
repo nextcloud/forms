@@ -22,6 +22,7 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -1155,8 +1156,14 @@ class ApiController extends OCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions')]
 	public function getSubmissions(int $formId, ?string $query = null, ?int $limit = null, int $offset = 0, ?string $fileFormat = null): DataResponse|DataDownloadResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+		$permissions = $this->formsService->getPermissions($form);
+		$canSeeAllSubmissions = in_array(Constants::PERMISSION_RESULTS, $permissions, true);
 
 		if ($fileFormat !== null) {
+			if (!$canSeeAllSubmissions) {
+				throw new NoSuchFormException('The current user has no permission to get the results for this form', Http::STATUS_FORBIDDEN);
+			}
+
 			$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
 			$fileName = $this->formsService->getFileName($form, $fileFormat);
 
@@ -1164,7 +1171,7 @@ class ApiController extends OCSController {
 		}
 
 		// Load submissions and currently active questions
-		if (in_array(Constants::PERMISSION_RESULTS, $this->formsService->getPermissions($form))) {
+		if ($canSeeAllSubmissions) {
 			$submissions = $this->submissionService->getSubmissions($formId, null, $query, $limit, $offset);
 			$filteredSubmissionsCount = $this->submissionMapper->countSubmissions($formId, null, $query);
 		} else {
