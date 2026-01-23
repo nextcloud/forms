@@ -7,6 +7,7 @@ OC.L10N.register(
     "Question" : "Pertanyaan",
     "Copy" : "Salin",
     "Shared by %s" : "Dibagikan oleh %s",
+    "User ID" : "ID Pengguna",
     "Shared with you" : "Shared with you",
     "Select groups" : "Pilih grup",
     "Expires {relativeDate}" : "Kedaluwarsa {relativeDate}",
@@ -27,6 +28,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Salin ke papan klip",
     "Show QR code" : "Tampilkan kode QR",
     "Copy embedding code" : "Salin kode penyemat",
+    "Remove link" : "Hapus tautan",
     "Internal link" : "Tautan internal",
     "View" : "Tampilan",
     "Edit" : "Sunting",
@@ -36,10 +38,12 @@ OC.L10N.register(
     "Summary" : "Kesimpulan",
     "Download" : "Unduh",
     "Search" : "Cari",
+    "No results found" : "Tidak ada hasil ditemukan",
     "Sharing" : "Berbagi",
     "Settings" : "Setelan",
     "Abort" : "Batal",
     "Submit" : "Kirim",
+    "Leave" : "Tinggalkan",
     "Clear" : "Bersihkan",
     "Cannot copy, please copy the link manually" : "Tidak dapat menyalin, silakan salin tautan secara manual",
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
@@ -55,6 +59,7 @@ OC.L10N.register(
     "Presentation" : "Presentasi",
     "Phone number" : "Nomor telepon",
     "Email address" : "Alamat email",
-    "Uploading …" : "Mengunggah …"
+    "Uploading …" : "Mengunggah …",
+    "Loading {title} …" : "Memuat {title} …"
 },
 "nplurals=1; plural=0;");
