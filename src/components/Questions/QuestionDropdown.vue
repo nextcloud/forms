@@ -49,7 +49,7 @@
 				handle=".option__drag-handle"
 				invert-swap
 				tag="ul"
-				@change="saveOptionsOrder"
+				@change="saveOptionsOrder('choice')"
 				@start="isDragging = true"
 				@end="isDragging = false">
 				<TransitionGroup
@@ -75,9 +75,9 @@
 						@update:answer="updateAnswer"
 						@delete="deleteOption"
 						@focus-next="focusNextInput"
-						@move-up="onOptionMoveUp(index)"
-						@move-down="onOptionMoveDown(index)"
-						@tabbed-out="checkValidOption" />
+						@move-up="onOptionMoveUp(index, 'choice')"
+						@move-down="onOptionMoveDown(index, 'choice')"
+						@tabbed-out="checkValidOption('choice')" />
 				</TransitionGroup>
 			</Draggable>
 		</template>
