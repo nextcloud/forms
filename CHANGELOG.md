@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.2.4 - 2026-01-23
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.3...v5.2.4)
+
+### Fixed
+
+- fix: do not add result permissions to see own submissions by @susnux in [\#3128](https://github.com/nextcloud/forms/pull/3128)
+- fix: prevent overwriting previous answers during initialization by @Chartman123 in [\#3124](https://github.com/nextcloud/forms/pull/3124)
+- fix: transfer ownership confirmation string formatting by @AIlkiv in [\#3060](https://github.com/nextcloud/forms/pull/3060)
+
 ## v5.2.3 - 2025-11-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.2...v5.2.3)
