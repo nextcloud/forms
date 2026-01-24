@@ -162,11 +162,12 @@
 							<NcActionButton
 								v-for="(answer, type) in answerTypesFilter"
 								:key="answer.label"
-								:close-after-click="!answer.subtypes"
+								:close-after-click="!hasSubtypes(answer)"
 								:disabled="isLoadingQuestions"
+								:is-menu="hasSubtypes(answer)"
 								class="question-menu__question"
 								@click="
-									answer.subtypes
+									hasSubtypes(answer)
 										? (activeQuestionType = type)
 										: addQuestion(type)
 								">
@@ -342,6 +343,11 @@ export default {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { datetime, ...filteredAnswerTypes } = answerTypes
 			return filteredAnswerTypes
+		},
+
+		hasSubtypes() {
+			return (answer) =>
+				answer && answer.subtypes && Object.keys(answer.subtypes).length > 0
 		},
 
 		lockedUntilFormatted() {
