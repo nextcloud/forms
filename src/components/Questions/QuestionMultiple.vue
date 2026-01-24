@@ -47,9 +47,7 @@
 					:model-value="!!extraSettings?.optionsLimitMax"
 					@update:model-value="
 						(checked) =>
-							onLimitOptionsMax(
-								checked ? sortedOptions.length || 1 : null,
-							)
+							onLimitOptionsMax(checked ? choices.length || 1 : null)
 					">
 					{{ t('forms', 'Require a maximum of options to be checked') }}
 				</NcActionCheckbox>
@@ -75,7 +73,7 @@
 					{{ errorMessage }}
 				</NcNoteCard>
 				<NcCheckboxRadioSwitch
-					v-for="answer in sortedOptions"
+					v-for="answer in choices"
 					:key="answer.id"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
@@ -118,14 +116,14 @@
 			</div>
 			<Draggable
 				v-else
-				v-model="sortedOptions"
+				v-model="choices"
 				class="question__content"
 				animation="200"
 				direction="vertical"
 				handle=".option__drag-handle"
 				invert-swap
 				tag="ul"
-				@change="saveOptionsOrder"
+				@change="saveOptionsOrder('choice')"
 				@start="isDragging = true"
 				@end="isDragging = false">
 				<TransitionGroup
@@ -136,7 +134,7 @@
 					">
 					<!-- Answer text input edit -->
 					<AnswerInput
-						v-for="(answer, index) in sortedOptions"
+						v-for="(answer, index) in choices"
 						:key="answer.local ? 'option-local' : answer.id"
 						ref="input"
 						:answer="answer"
@@ -145,13 +143,14 @@
 						:is-unique="isUnique"
 						:max-index="options.length - 1"
 						:max-option-length="maxStringLengths.optionText"
+						option-type="choice"
 						@create-answer="onCreateAnswer"
 						@update:answer="updateAnswer"
 						@delete="deleteOption"
 						@focus-next="focusNextInput"
-						@move-up="onOptionMoveUp(index)"
-						@move-down="onOptionMoveDown(index)"
-						@tabbed-out="checkValidOption" />
+						@move-up="onOptionMoveUp(index, 'choice')"
+						@move-down="onOptionMoveDown(index, 'choice')"
+						@tabbed-out="checkValidOption('choice')" />
 				</TransitionGroup>
 			</Draggable>
 			<li
@@ -196,7 +195,10 @@ import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
-import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../../models/Constants.ts'
+import {
+	OptionType,
+	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+} from '../../models/Constants.ts'
 
 export default {
 	name: 'QuestionMultiple',
@@ -287,6 +289,16 @@ export default {
 			return this.values.find((v) =>
 				v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
 			)
+		},
+
+		choices: {
+			get() {
+				return this.sortOptionsOfType(this.options, OptionType.Choice)
+			},
+
+			set(value) {
+				this.updateOptionsOrder(value, OptionType.Choice)
+			},
 		},
 	},
 

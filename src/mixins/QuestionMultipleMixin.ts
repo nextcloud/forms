@@ -12,7 +12,7 @@ import { translate as t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
-import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
 
 export default defineComponent({
@@ -31,17 +31,13 @@ export default defineComponent({
 			return this.answerType.validate(this)
 		},
 
-		hasNoAnswer() {
-			return this.options.length === 0
-		},
-
 		isLastEmpty() {
 			const value = this.options[this.options.length - 1]
 			return value?.text?.trim?.().length === 0
 		},
 
 		expectedOptionTypes() {
-			return ['row', 'column']
+			return [OptionType.Choice, OptionType.Row, OptionType.Column]
 		},
 
 		sortedOptionsPerType(): { [key: string]: FormsOption[] } {
