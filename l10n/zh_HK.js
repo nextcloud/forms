@@ -126,6 +126,7 @@ OC.L10N.register(
     "Delete" : "刪除",
     "Uploading …" : "上傳中 …",
     "Add new file as answer" : "新增檔案作為答案",
+    "Radio" : "單選框",
     "Checkbox" : "勾選框",
     "Number" : "數字",
     "Text" : "文本 ",
