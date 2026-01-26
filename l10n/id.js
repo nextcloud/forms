@@ -15,6 +15,7 @@ OC.L10N.register(
     "Cancel" : "Batal",
     "Options" : "Pilihan",
     "Go to previous page" : "Pergi ke halaman sebelumnya",
+    "Maximum file size" : "Ukuran file maksimum",
     "Delete" : "Hapus",
     "Checkbox" : "Kotak centang",
     "Text" : "Teks",
