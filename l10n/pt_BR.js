@@ -312,7 +312,7 @@ OC.L10N.register(
     "Pick an option" : "Escolha uma opção",
     "File" : "Arquivo",
     "File question title" : "Título da pergunta de arquivo",
-    "Grid question title" : "Título da pergunta da grade",
+    "Grid question title" : "Título da pergunta de grade",
     "People can submit a grid answer" : "As pessoas podem enviar uma resposta em forma de grade",
     "Short answer" : "Resposta curta",
     "Short answer question title" : "Título da pergunta de resposta curta",
