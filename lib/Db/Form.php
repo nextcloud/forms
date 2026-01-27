@@ -51,6 +51,12 @@ use OCP\AppFramework\Db\Entity;
  * @method void setLockedBy(string|null $value)
  * @method int getLockedUntil()
  * @method void setLockedUntil(int|null $value)
+ * @method int getConfirmationEmailEnabled()
+ * @method void setConfirmationEmailEnabled(bool $value)
+ * @method string|null getConfirmationEmailSubject()
+ * @method void setConfirmationEmailSubject(string|null $value)
+ * @method string|null getConfirmationEmailBody()
+ * @method void setConfirmationEmailBody(string|null $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -71,6 +77,9 @@ class Form extends Entity {
 	protected $state;
 	protected $lockedBy;
 	protected $lockedUntil;
+	protected $confirmationEmailEnabled;
+	protected $confirmationEmailSubject;
+	protected $confirmationEmailBody;
 
 	/**
 	 * Form constructor.
@@ -86,6 +95,7 @@ class Form extends Entity {
 		$this->addType('state', 'integer');
 		$this->addType('lockedBy', 'string');
 		$this->addType('lockedUntil', 'integer');
+		$this->addType('confirmationEmailEnabled', 'boolean');
 	}
 
 	// JSON-Decoding of access-column.
@@ -159,6 +169,9 @@ class Form extends Entity {
 	 *   state: 0|1|2,
 	 *   lockedBy: ?string,
 	 *   lockedUntil: ?int,
+	 *   confirmationEmailEnabled: bool,
+	 *   confirmationEmailSubject: ?string,
+	 *   confirmationEmailBody: ?string,
 	 *  }
 	 */
 	public function read() {
@@ -182,6 +195,9 @@ class Form extends Entity {
 			'state' => $this->getState(),
 			'lockedBy' => $this->getLockedBy(),
 			'lockedUntil' => $this->getLockedUntil(),
+			'confirmationEmailEnabled' => (bool)$this->getConfirmationEmailEnabled(),
+			'confirmationEmailSubject' => $this->getConfirmationEmailSubject(),
+			'confirmationEmailBody' => $this->getConfirmationEmailBody(),
 		];
 	}
 }

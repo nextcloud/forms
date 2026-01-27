@@ -5,6 +5,18 @@
 
 # Changelog
 
+## Unreleased
+
+- **Confirmation emails for respondents**
+
+    Form owners can enable an automatic confirmation email that is sent to the respondent after a successful submission.
+    Requires an email-validated short text question in the form.
+
+    Supported placeholders in subject/body:
+
+    - `{formTitle}`, `{formDescription}`
+    - `{<fieldName>}` (question `name` or text, sanitized)
+
 ## v5.2.0 - 2025-09-25
 
 - **Time: restrictions and ranges**

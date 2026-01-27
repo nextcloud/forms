@@ -138,6 +138,9 @@ namespace OCA\Forms;
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,
+ *   confirmationEmailEnabled: bool,
+ *   confirmationEmailSubject: ?string,
+ *   confirmationEmailBody: ?string,
  * }
  *
  * @psalm-type FormsUploadedFile = array{

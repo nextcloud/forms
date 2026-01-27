@@ -110,6 +110,9 @@ class FormsMigratorTest extends TestCase {
     "showExpiration": false,
     "lastUpdated": 123456789,
     "submissionMessage": "Back to website",
+    "confirmationEmailEnabled": false,
+    "confirmationEmailSubject": null,
+    "confirmationEmailBody": null,
     "questions": [
       {
         "id": 14,

@@ -175,6 +175,9 @@ Returns the full-depth object of the requested form (without submissions).
   "state": 0,
   "lockedBy": null,
   "lockedUntil": null,
+  "confirmationEmailEnabled": false,
+  "confirmationEmailSubject": null,
+  "confirmationEmailBody": null,
   "permissions": [
     "edit",
     "results",
