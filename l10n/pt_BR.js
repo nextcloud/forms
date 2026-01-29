@@ -126,6 +126,7 @@ OC.L10N.register(
     "Delete" : "Excluir",
     "Uploading …" : "Fazendo upload …",
     "Add new file as answer" : "Adicionar novo arquivo como resposta",
+    "Radio" : "Rádio",
     "Checkbox" : "Caixa de marcação",
     "Number" : "Número",
     "Text" : "Texto",
