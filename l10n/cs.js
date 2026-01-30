@@ -120,6 +120,7 @@ OC.L10N.register(
     "Delete" : "Smazat",
     "Uploading …" : "Nahrávání …",
     "Add new file as answer" : "Přidat jako odpověď nový soubor",
+    "Radio" : "Přepínající",
     "Checkbox" : "Zatržítko",
     "Number" : "Číslo",
     "Text" : "Text",
