@@ -227,7 +227,7 @@ OC.L10N.register(
     "Create spreadsheet" : "Створити таблицю",
     "Delete submissions" : "Вилучити відповіді",
     "There was an error while loading the results" : "Сталася помилка при завантаженні результатів",
-    "File {file} successfully linked" : "Файл {file} успішно прив'язаний",
+    "File {file} successfully linked" : "Файл {file} успішно прив'язано",
     "There was an error while linking the file" : "При прив'язуванні файлу виникла помилка",
     "Export successful to {file}" : "Успішно експортовано в {file}",
     "There was an error while exporting to Files" : "Під час експорту у Файли сталася помилка",
