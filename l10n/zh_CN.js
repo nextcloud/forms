@@ -226,6 +226,7 @@ OC.L10N.register(
     "Form title" : "表单标题",
     "Description" : "描述",
     "Add a question" : "添加一个新问题",
+    "Grid" : "风格",
     "Summary" : "概况",
     "Responses" : "全部回应",
     "Unlink spreadsheet" : "取消链接电子表格",

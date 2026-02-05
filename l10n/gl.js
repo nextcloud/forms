@@ -38,7 +38,7 @@ OC.L10N.register(
     "Shared with you" : "Compartido con Vde.",
     "Archived forms" : "Formularios arquivados",
     "Loading forms …" : "Cargando formularios…",
-    "No forms created yet" : "Aínda non se creo ningún formulario",
+    "No forms created yet" : "Aínda non foi creado ningún formulario",
     "Create a form" : "Crear un formulario",
     "Select a form or create a new one" : "Seleccionar un formulario ou crear un novo",
     "Please select a form" : "Seleccione un formulario",
