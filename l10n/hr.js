@@ -69,6 +69,7 @@ OC.L10N.register(
     "Add link" : "Dodaj poveznicu",
     "Copy to clipboard" : "Kopiraj u međuspremnik",
     "Copy embedding code" : "Kopiraj šifru za ugradnju",
+    "Remove link" : "Ukloni poveznicu",
     "Internal link" : "Dijeli internu poveznicu",
     "View" : "Pregledaj",
     "Edit" : "Uredi",
