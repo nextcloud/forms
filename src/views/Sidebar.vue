@@ -96,7 +96,7 @@ export default {
 		 * @param {any} newVal The new Property value
 		 */
 		onPropertyChange(property, newVal) {
-			this.$set(this.form, property, newVal)
+			this.form[property] = newVal
 			this.saveFormProperty(property)
 		},
 

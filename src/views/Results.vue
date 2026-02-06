@@ -6,7 +6,7 @@
 <template>
 	<NcAppContent :page-heading="t('forms', 'Results')">
 		<NcDialog
-			:open.sync="showLinkedFileNotAvailableDialog"
+			v-model:open="showLinkedFileNotAvailableDialog"
 			:name="t('forms', 'Linked file not available')"
 			:message="
 				t(
@@ -42,9 +42,9 @@
 			<!-- View switcher between Summary and Responses -->
 			<div class="response-actions">
 				<PillMenu
+					v-model:active="activeResponseView"
 					:disabled="noSubmissions"
 					:options="responseViews"
-					:active.sync="activeResponseView"
 					class="response-actions__toggle"
 					@update:active="loadFormResults" />
 
@@ -250,15 +250,15 @@
 				@delete="deleteSubmission(submission.id)" />
 
 			<PaginationToolbar
+				v-model:limit="limit"
+				v-model:offset="offset"
 				class="bottom-pagination"
-				:total-items-count="filteredSubmissionsCount"
-				:limit.sync="limit"
-				:offset.sync="offset" />
+				:total-items-count="filteredSubmissionsCount" />
 		</section>
 
 		<!-- Confirmation dialog for deleting all submissions -->
 		<NcDialog
-			:open.sync="showConfirmDeleteDialog"
+			v-model:open="showConfirmDeleteDialog"
 			:name="t('forms', 'Delete submissions')"
 			:message="
 				t(
