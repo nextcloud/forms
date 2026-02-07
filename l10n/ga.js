@@ -181,7 +181,7 @@ OC.L10N.register(
     "Search for user, group or team …" : "Cuardaigh úsáideoir, grúpa nó foireann …",
     "Group" : "Grúpa",
     "Team" : "Foireann",
-    "Permissions" : "Permissions",
+    "Permissions" : "Ceadanna",
     "View responses" : "Féach ar na freagraí",
     "Delete responses" : "Scrios freagraí",
     "There was an error while adding the share" : "Tharla earráid agus an sciar á cur leis",
