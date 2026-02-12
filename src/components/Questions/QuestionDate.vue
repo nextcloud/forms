@@ -6,24 +6,24 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<template v-if="answerType.pickerType === 'date'" #actions>
 			<NcActionCheckbox
-				:model-value="dateRange"
-				@update:model-value="onDateRangeChange">
+				:modelValue="dateRange"
+				@update:modelValue="onDateRangeChange">
 				{{ t('forms', 'Use date range') }}
 			</NcActionCheckbox>
 			<NcActionInput
 				type="date"
-				is-native-picker
-				:model-value="dateMin"
+				isNativePicker
+				:modelValue="dateMin"
 				:label="t('forms', 'Earliest date')"
-				hide-label
+				hideLabel
 				:formatter="extraSettingsFormatter"
 				:max="dateMax"
-				@update:model-value="onDateMinChange">
+				@update:modelValue="onDateMinChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgTodayIcon"
@@ -32,13 +32,13 @@
 			</NcActionInput>
 			<NcActionInput
 				type="date"
-				is-native-picker
-				:model-value="dateMax"
+				isNativePicker
+				:modelValue="dateMax"
 				:label="t('forms', 'Latest date')"
-				hide-label
+				hideLabel
 				:formatter="extraSettingsFormatter"
 				:min="dateMin"
-				@update:model-value="onDateMaxChange">
+				@update:modelValue="onDateMaxChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgEventIcon"
@@ -48,18 +48,18 @@
 		</template>
 		<template v-else-if="answerType.pickerType === 'time'" #actions>
 			<NcActionCheckbox
-				:model-value="timeRange"
-				@update:model-value="onTimeRangeChange">
+				:modelValue="timeRange"
+				@update:modelValue="onTimeRangeChange">
 				{{ t('forms', 'Use time range') }}
 			</NcActionCheckbox>
 			<NcActionInput
 				type="time"
-				is-native-picker
-				:model-value="timeMin"
+				isNativePicker
+				:modelValue="timeMin"
 				:label="t('forms', 'Earliest time')"
-				hide-label
+				hideLabel
 				:max="timeMax"
-				@update:model-value="onTimeMinChange">
+				@update:modelValue="onTimeMinChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgClockLoader20"
@@ -68,12 +68,12 @@
 			</NcActionInput>
 			<NcActionInput
 				type="time"
-				is-native-picker
-				:model-value="timeMax"
+				isNativePicker
+				:modelValue="timeMax"
 				:label="t('forms', 'Latest time')"
-				hide-label
+				hideLabel
 				:min="timeMin"
-				@update:model-value="onTimeMaxChange">
+				@update:modelValue="onTimeMaxChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgClockLoader80"
@@ -83,16 +83,16 @@
 		</template>
 		<div class="question__content">
 			<NcDateTimePicker
-				:model-value="time"
+				:modelValue="time"
 				:disabled="!readOnly"
 				:format="stringify"
 				:placeholder="datetimePickerPlaceholder"
-				:show-second="false"
+				:showSecond="false"
 				:type="dateTimePickerType"
-				:disabled-date="disabledDates"
-				:disabled-time="disabledTimes"
-				:input-attr="inputAttr"
-				range-separator=" - "
+				:disabledDate="disabledDates"
+				:disabledTime="disabledTimes"
+				:inputAttr="inputAttr"
+				rangeSeparator=" - "
 				@change="onValueChange" />
 		</div>
 	</Question>

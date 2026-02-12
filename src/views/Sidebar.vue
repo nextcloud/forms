@@ -17,11 +17,11 @@
 			<SharingSidebarTab
 				:form="form"
 				:locked="isFormLocked"
-				:locked-until="lockedUntilFormatted"
-				@update:form-prop="onPropertyChange"
-				@add-share="onAddShare"
-				@remove-share="onRemoveShare"
-				@update-share="onUpdateShare" />
+				:lockedUntil="lockedUntilFormatted"
+				@update:formProp="onPropertyChange"
+				@addShare="onAddShare"
+				@removeShare="onRemoveShare"
+				@updateShare="onUpdateShare" />
 		</NcAppSidebarTab>
 
 		<NcAppSidebarTab
@@ -34,8 +34,8 @@
 			<SettingsSidebarTab
 				:form="form"
 				:locked="isFormLocked"
-				:locked-until="lockedUntilFormatted"
-				@update:form-prop="onPropertyChange" />
+				:lockedUntil="lockedUntilFormatted"
+				@update:formProp="onPropertyChange" />
 		</NcAppSidebarTab>
 	</NcAppSidebar>
 </template>
@@ -96,7 +96,7 @@ export default {
 		 * @param {any} newVal The new Property value
 		 */
 		onPropertyChange(property, newVal) {
-			this.$set(this.form, property, newVal)
+			this.form[property] = newVal
 			this.saveFormProperty(property)
 		},
 
