@@ -6,32 +6,32 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionInput
-				:model-value="optionsLowest"
+				:modelValue="optionsLowest"
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Lowest value')"
-				label-outside
+				labelOutside
 				:options="[0, 1]"
 				required
-				@update:model-value="onOptionsLowestChange">
+				@update:modelValue="onOptionsLowestChange">
 				<template #icon>
 					<IconPencil :size="20" />
 				</template>
 			</NcActionInput>
 			<NcActionInput
-				:model-value="optionsHighest"
+				:modelValue="optionsHighest"
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Highest value')"
-				label-outside
+				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
-				@update:model-value="onOptionsHighestChange">
+				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
 					<IconPencil :size="20" />
 				</template>
@@ -46,14 +46,14 @@
 			<NcTextArea
 				v-if="!readOnly"
 				ref="lowest"
-				:model-value="optionsLabelLowest"
+				:modelValue="optionsLabelLowest"
 				class="question-linear-scale__label-input"
 				:label="t('forms', 'Label for lowest value')"
 				:placeholder="t('forms', 'Label (optional)')"
 				resize="none"
 				@input="resizeLabel('lowest')"
 				@blur="onBlur('lowest')"
-				@update:model-value="onOptionsLabelLowestChange" />
+				@update:modelValue="onOptionsLabelLowestChange" />
 			<div
 				v-else-if="optionsLabelLowest !== ''"
 				:id="labelId"
@@ -78,26 +78,26 @@
 						:id="`linear-scale-${id}-${option}`"
 						:aria-describedby="index === 0 ? labelId : undefined"
 						:disabled="!readOnly"
-						:model-value="questionValues"
+						:modelValue="questionValues"
 						:value="option.toString()"
 						:name="`${id}-answer`"
 						type="radio"
 						:required="checkRequired(option)"
-						@update:model-value="onChange"
+						@update:modelValue="onChange"
 						@keydown.enter.exact.prevent="onKeydownEnter" />
 				</div>
 			</fieldset>
 			<NcTextArea
 				v-if="!readOnly"
 				ref="highest"
-				:model-value="optionsLabelHighest"
+				:modelValue="optionsLabelHighest"
 				class="question-linear-scale__label-input"
 				:label="t('forms', 'Label (optional)')"
 				:aria-label="t('forms', 'Label for highest value')"
 				resize="none"
 				@input="resizeLabel('highest')"
 				@blur="onBlur('highest')"
-				@update:model-value="onOptionsLabelHighestChange" />
+				@update:modelValue="onOptionsLabelHighestChange" />
 			<div
 				v-else-if="optionsLabelHighest !== ''"
 				class="question-linear-scale__label question-linear-scale__label-highest">

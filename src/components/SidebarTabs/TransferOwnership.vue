@@ -19,9 +19,9 @@
 
 		<NcDialog
 			v-model:open="showModal"
-			content-classes="modal-content"
+			contentClasses="modal-content"
 			:name="t('forms', 'Transfer ownership')"
-			out-transition
+			outTransition
 			@close="closeModal">
 			<template #default>
 				<!-- eslint-disable vue/no-v-html -->
