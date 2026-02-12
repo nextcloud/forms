@@ -394,6 +394,9 @@ class ApiV3Test extends IntegrationBase {
 					'submissionMessage' => null,
 					'fileId' => null,
 					'fileFormat' => null,
+					'confirmationEmailEnabled' => false,
+					'confirmationEmailSubject' => null,
+					'confirmationEmailBody' => null,
 				]
 			]
 		];
@@ -525,6 +528,9 @@ class ApiV3Test extends IntegrationBase {
 					'submissionCount' => 3,
 					'fileId' => null,
 					'fileFormat' => null,
+					'confirmationEmailEnabled' => false,
+					'confirmationEmailSubject' => null,
+					'confirmationEmailBody' => null,
 				]
 			]
 		];
