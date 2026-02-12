@@ -6,10 +6,10 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
-		:content-valid="contentValid"
-		:shift-drag-handle="shiftDragHandle"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
+		:contentValid="contentValid"
+		:shiftDragHandle="shiftDragHandle"
 		v-on="commonListeners">
 		<template v-if="readOnly">
 			<fieldset :name="name || undefined" :aria-labelledby="titleId">
@@ -43,7 +43,7 @@
 											hasError ? errorId : undefined
 										"
 										:aria-invalid="hasError ? 'true' : undefined"
-										:model-value="values[row.id]"
+										:modelValue="values[row.id]"
 										:value="column.id.toString()"
 										:name="`${row.id}-answer`"
 										type="radio"
@@ -58,7 +58,7 @@
 											hasError ? errorId : undefined
 										"
 										:aria-invalid="hasError ? 'true' : undefined"
-										:model-value="values[row.id] || []"
+										:modelValue="values[row.id] || []"
 										:value="column.id.toString()"
 										:name="`${row.id}-answer`"
 										type="checkbox"
@@ -70,7 +70,7 @@
 								<template v-if="questionType === 'number'">
 									<NcInputField
 										type="number"
-										:model-value="plainValues[row.id][column.id]"
+										:modelValue="plainValues[row.id][column.id]"
 										@input="
 											onChangeTextNumber(
 												row.id,
@@ -99,7 +99,7 @@
 					animation="200"
 					direction="vertical"
 					handle=".option__drag-handle"
-					invert-swap
+					invertSwap
 					tag="ul"
 					@change="saveOptionsOrder('column')"
 					@start="isDragging = true"
@@ -116,19 +116,19 @@
 							:key="answer.local ? 'option-local' : answer.id"
 							ref="input"
 							:answer="answer"
-							:form-id="formId"
+							:formId="formId"
 							:index="index"
-							:is-unique="isUnique"
-							:max-index="columns.length - 2"
-							:max-option-length="maxStringLengths.optionText"
-							option-type="column"
-							@create-answer="onCreateAnswer"
+							:isUnique="isUnique"
+							:maxIndex="columns.length - 2"
+							:maxOptionLength="maxStringLengths.optionText"
+							optionType="column"
+							@createAnswer="onCreateAnswer"
 							@update:answer="updateAnswer"
 							@delete="deleteOption"
-							@focus-next="focusNextInput"
-							@move-up="onOptionMoveUp(index, 'column')"
-							@move-down="onOptionMoveDown(index, 'column')"
-							@tabbed-out="checkValidOption('column')" />
+							@focusNext="focusNextInput"
+							@moveUp="onOptionMoveUp(index, 'column')"
+							@moveDown="onOptionMoveDown(index, 'column')"
+							@tabbedOut="checkValidOption('column')" />
 					</TransitionGroup>
 				</Draggable>
 
@@ -139,7 +139,7 @@
 					animation="200"
 					direction="vertical"
 					handle=".option__drag-handle"
-					invert-swap
+					invertSwap
 					tag="ul"
 					@change="saveOptionsOrder('row')"
 					@start="isDragging = true"
@@ -156,19 +156,19 @@
 							:key="answer.local ? 'option-local' : answer.id"
 							ref="input"
 							:answer="answer"
-							:form-id="formId"
+							:formId="formId"
 							:index="index"
-							:is-unique="isUnique"
-							:max-index="rows.length - 2"
-							:max-option-length="maxStringLengths.optionText"
-							option-type="row"
-							@create-answer="onCreateAnswer"
+							:isUnique="isUnique"
+							:maxIndex="rows.length - 2"
+							:maxOptionLength="maxStringLengths.optionText"
+							optionType="row"
+							@createAnswer="onCreateAnswer"
 							@update:answer="updateAnswer"
 							@delete="deleteOption"
-							@focus-next="focusNextInput"
-							@move-up="onOptionMoveUp(index, 'row')"
-							@move-down="onOptionMoveDown(index, 'row')"
-							@tabbed-out="checkValidOption('row')" />
+							@focusNext="focusNextInput"
+							@moveUp="onOptionMoveUp(index, 'row')"
+							@moveDown="onOptionMoveDown(index, 'row')"
+							@tabbedOut="checkValidOption('row')" />
 					</TransitionGroup>
 				</Draggable>
 			</template>

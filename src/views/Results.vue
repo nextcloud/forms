@@ -4,7 +4,7 @@
 -->
 
 <template>
-	<NcAppContent :page-heading="t('forms', 'Results')">
+	<NcAppContent :pageHeading="t('forms', 'Results')">
 		<NcDialog
 			v-model:open="showLinkedFileNotAvailableDialog"
 			:name="t('forms', 'Linked file not available')"
@@ -16,15 +16,15 @@
 			"
 			:buttons="linkedFileNotAvailableButtons"
 			size="normal"
-			no-close />
+			noClose />
 
 		<TopBar
 			:archived="isFormArchived"
 			:locked="isFormLocked"
 			:permissions="form?.permissions"
-			:sidebar-opened="sidebarOpened"
-			:submission-count="form?.submissionCount"
-			@share-form="onShareForm" />
+			:sidebarOpened="sidebarOpened"
+			:submissionCount="form?.submissionCount"
+			@shareForm="onShareForm" />
 
 		<!-- Showing submissions -->
 		<header>
@@ -52,7 +52,7 @@
 				<NcActions
 					v-if="canExportSubmissions"
 					:aria-label="t('forms', 'Options')"
-					force-name
+					forceName
 					:inline="isMobile ? 0 : 1"
 					@blur="isDownloadActionOpened = false"
 					@close="isDownloadActionOpened = false">
@@ -74,14 +74,14 @@
 								</template>
 								{{ t('forms', 'Open spreadsheet') }}
 							</NcActionButton>
-							<NcActionButton close-after-click @click="onReExport">
+							<NcActionButton closeAfterClick @click="onReExport">
 								<template #icon>
 									<IconRefresh :size="20" />
 								</template>
 								{{ t('forms', 'Re-export spreadsheet') }}
 							</NcActionButton>
 							<NcActionButton
-								close-after-click
+								closeAfterClick
 								:disabled="isFormLocked"
 								@click="onUnlinkFile">
 								<template #icon>
@@ -93,7 +93,7 @@
 						</template>
 						<NcActionButton
 							v-if="!noSubmissions"
-							close-after-click
+							closeAfterClick
 							@click="onStoreToFiles">
 							<template #icon>
 								<IconFolder :size="20" />
@@ -102,8 +102,8 @@
 						</NcActionButton>
 						<NcActionButton
 							v-if="!noSubmissions"
-							:close-after-click="false"
-							is-menu
+							:closeAfterClick="false"
+							isMenu
 							@click="isDownloadActionOpened = true">
 							<template #icon>
 								<IconDownload :size="20" />
@@ -112,7 +112,7 @@
 						</NcActionButton>
 						<NcActionButton
 							v-if="canDeleteSubmissions && !noSubmissions"
-							close-after-click
+							closeAfterClick
 							@click="deleteAllSubmissions">
 							<template #icon>
 								<IconDelete :size="20" />
@@ -131,7 +131,7 @@
 						</NcActionButton>
 						<NcActionSeparator />
 						<NcActionButton
-							close-after-click
+							closeAfterClick
 							@click="onDownloadFile('csv')">
 							<template #icon>
 								<IconFileDelimited :size="20" />
@@ -139,7 +139,7 @@
 							CSV
 						</NcActionButton>
 						<NcActionButton
-							close-after-click
+							closeAfterClick
 							@click="onDownloadFile('ods')">
 							<template #icon>
 								<IconTable :size="20" />
@@ -147,7 +147,7 @@
 							ODS
 						</NcActionButton>
 						<NcActionButton
-							close-after-click
+							closeAfterClick
 							@click="onDownloadFile('xlsx')">
 							<template #icon>
 								<IconFileExcelOutline :size="20" />
@@ -168,9 +168,9 @@
 					<NcTextField
 						v-model="submissionSearch"
 						:label="t('forms', 'Search')"
-						trailing-button-icon="close"
-						:show-trailing-button="submissionSearch.length > 0"
-						@trailing-button-click="submissionSearch = ''">
+						trailingButtonIcon="close"
+						:showTrailingButton="submissionSearch.length > 0"
+						@trailingButtonClick="submissionSearch = ''">
 						<template #icon>
 							<IconMagnify :size="20" />
 						</template>
@@ -241,19 +241,19 @@
 			<Submission
 				v-for="submission in submissions"
 				:key="submission.id"
-				:form-hash="form.hash"
+				:formHash="form.hash"
 				:submission="submission"
 				:questions="questions"
 				:highlight="submissionSearch"
-				:can-delete-submission="canDeleteSubmission(submission.userId)"
-				:can-edit-submission="canEditSubmission(submission.userId)"
+				:canDeleteSubmission="canDeleteSubmission(submission.userId)"
+				:canEditSubmission="canEditSubmission(submission.userId)"
 				@delete="deleteSubmission(submission.id)" />
 
 			<PaginationToolbar
 				v-model:limit="limit"
 				v-model:offset="offset"
 				class="bottom-pagination"
-				:total-items-count="filteredSubmissionsCount" />
+				:totalItemsCount="filteredSubmissionsCount" />
 		</section>
 
 		<!-- Confirmation dialog for deleting all submissions -->

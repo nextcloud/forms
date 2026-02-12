@@ -6,18 +6,18 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
-		:content-valid="contentValid"
-		:shift-drag-handle="shiftDragHandle"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
+		:contentValid="contentValid"
+		:shiftDragHandle="shiftDragHandle"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
-				:model-value="extraSettings?.shuffleOptions"
-				@update:model-value="onShuffleOptionsChange">
+				:modelValue="extraSettings?.shuffleOptions"
+				@update:modelValue="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
-			<NcActionButton close-after-click @click="isOptionDialogShown = true">
+			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
 				<template #icon>
 					<IconContentPaste :size="20" />
 				</template>
@@ -26,7 +26,7 @@
 		</template>
 		<NcSelect
 			v-if="readOnly"
-			:model-value="selectedOption"
+			:modelValue="selectedOption"
 			:name="name || undefined"
 			:placeholder="selectOptionPlaceholder"
 			:multiple="isMultiple"
@@ -47,9 +47,9 @@
 				:animation="200"
 				direction="vertical"
 				handle=".option__drag-handle"
-				invert-swap
+				invertSwap
 				tag="transition-group"
-				:component-data="{
+				:componentData="{
 					name: isDragging
 						? 'no-external-transition-on-drag'
 						: 'options-list-transition',
@@ -62,20 +62,20 @@
 					<AnswerInput
 						ref="input"
 						:answer="answer"
-						:form-id="formId"
-						is-dropdown
+						:formId="formId"
+						isDropdown
 						:index="index"
-						:is-unique="!isMultiple"
-						:max-index="options.length - 1"
-						:max-option-length="maxStringLengths.optionText"
-						option-type="choice"
-						@create-answer="onCreateAnswer"
+						:isUnique="!isMultiple"
+						:maxIndex="options.length - 1"
+						:maxOptionLength="maxStringLengths.optionText"
+						optionType="choice"
+						@createAnswer="onCreateAnswer"
 						@update:answer="updateAnswer"
 						@delete="deleteOption"
-						@focus-next="focusNextInput"
-						@move-up="onOptionMoveUp(index)"
-						@move-down="onOptionMoveDown(index)"
-						@tabbed-out="checkValidOption" />
+						@focusNext="focusNextInput"
+						@moveUp="onOptionMoveUp(index)"
+						@moveDown="onOptionMoveDown(index)"
+						@tabbedOut="checkValidOption" />
 				</template>
 			</Draggable>
 		</template>
@@ -83,7 +83,7 @@
 		<!-- Add multiple options modal -->
 		<OptionInputDialog
 			v-model:open="isOptionDialogShown"
-			@multiple-answers="handleMultipleOptions" />
+			@multipleAnswers="handleMultipleOptions" />
 	</Question>
 </template>
 

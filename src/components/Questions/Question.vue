@@ -79,7 +79,7 @@
 				<NcActions
 					v-if="!readOnly"
 					:id="actionsId"
-					force-menu
+					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
 					<template v-if="isRequired" #icon>
@@ -91,24 +91,24 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
-						:model-value="isRequired"
-						@update:model-value="onRequiredChange">
+						:modelValue="isRequired"
+						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
 						:label="t('forms', 'Technical name of the question')"
-						:label-outside="false"
-						:show-trailing-button="false"
-						:model-value="name"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:modelValue="name"
 						@input="onNameChange">
 						<template #icon>
 							<IconIdentifier :size="20" />
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton close-after-click @click="onClone">
+					<NcActionButton closeAfterClick @click="onClone">
 						<template #icon>
 							<IconContentCopy :size="20" />
 						</template>
@@ -266,8 +266,8 @@ export default {
 		'update:description',
 		'update:name',
 		'update:isRequired',
-		'move-down',
-		'move-up',
+		'moveDown',
+		'moveUp',
 		'delete',
 		'clone',
 	],
@@ -350,12 +350,12 @@ export default {
 		 * Reorder question but keep focus on the button
 		 */
 		onMoveDown() {
-			this.$emit('move-down')
+			this.$emit('moveDown')
 			this.$nextTick(() => this.$refs.buttonDown.$el.focus())
 		},
 
 		onMoveUp() {
-			this.$emit('move-up')
+			this.$emit('moveUp')
 			this.$nextTick(() => this.$refs.buttonUp.$el.focus())
 		},
 

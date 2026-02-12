@@ -6,8 +6,8 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<div class="question__content">
 			<input
@@ -50,17 +50,17 @@
 						validationTypeObject, validationTypeName
 					) in validationTypes"
 					:key="validationTypeName"
-					:model-value="validationType"
+					:modelValue="validationType"
 					:name="`${id}_validationMenu`"
 					:value="validationTypeName"
-					@update:model-value="onChangeValidationType(validationTypeName)">
+					@update:modelValue="onChangeValidationType(validationTypeName)">
 					{{ validationTypeObject.label }}
 				</NcActionRadio>
 				<NcActionInput
 					v-if="validationType === 'regex'"
 					ref="regexInput"
 					:label="t('forms', 'Regular expression for input validation')"
-					:model-value="validationRegex"
+					:modelValue="validationRegex"
 					@input="onInputRegex"
 					@submit="onSubmitRegex">
 					<template #icon>

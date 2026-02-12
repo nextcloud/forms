@@ -47,7 +47,7 @@
 						<td v-for="column of gridColumns" :key="column.id">
 							<template v-if="gridCellType === 'radio'">
 								<NcCheckboxRadioSwitch
-									:model-value="gridValue[row.id]"
+									:modelValue="gridValue[row.id]"
 									:name="`${row.id}-answer`"
 									:value="column.id.toString()"
 									disabled
@@ -56,7 +56,7 @@
 
 							<template v-if="gridCellType === 'checkbox'">
 								<NcCheckboxRadioSwitch
-									:model-value="gridValue[row.id] || []"
+									:modelValue="gridValue[row.id] || []"
 									:name="`${row.id}-answer`"
 									:value="column.id.toString()"
 									disabled
