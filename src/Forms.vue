@@ -4,7 +4,7 @@
 -->
 
 <template>
-	<NcContent app-name="forms">
+	<NcContent appName="forms">
 		<NcAppNavigation
 			v-if="canCreateForms || hasForms"
 			:aria-label="t('forms', 'Forms navigation')">
@@ -20,17 +20,17 @@
 			<!-- Form-Owner-->
 			<template v-if="ownedForms.length > 0">
 				<NcAppNavigationCaption
-					is-heading
+					isHeading
 					class="forms-navigation__list-heading"
-					heading-id="forms-navigation-your-forms"
+					headingId="forms-navigation-your-forms"
 					:name="t('forms', 'Your forms')" />
 				<ul aria-labelledby="forms-navigation-your-forms">
 					<AppNavigationForm
 						v-for="form in ownedForms"
 						:key="form.id"
 						:form="form"
-						@open-sharing="openSharing"
-						@mobile-close-navigation="mobileCloseNavigation"
+						@openSharing="openSharing"
+						@mobileCloseNavigation="mobileCloseNavigation"
 						@clone="onCloneForm"
 						@delete="onDeleteForm" />
 				</ul>
@@ -39,18 +39,18 @@
 			<!-- Shared Forms-->
 			<template v-if="sharedForms.length > 0">
 				<NcAppNavigationCaption
-					is-heading
+					isHeading
 					class="forms-navigation__list-heading"
-					heading-id="forms-navigation-shared-forms"
+					headingId="forms-navigation-shared-forms"
 					:name="t('forms', 'Shared with you')" />
 				<ul aria-labelledby="forms-navigation-shared-forms">
 					<AppNavigationForm
 						v-for="form in sharedForms"
 						:key="form.id"
 						:form="form"
-						read-only
-						@open-sharing="openSharing"
-						@mobile-close-navigation="mobileCloseNavigation" />
+						readOnly
+						@openSharing="openSharing"
+						@mobileCloseNavigation="mobileCloseNavigation" />
 				</ul>
 			</template>
 
@@ -119,16 +119,16 @@
 		<template v-else>
 			<router-view
 				:form="selectedForm"
-				:sidebar-opened="sidebarOpened"
+				:sidebarOpened="sidebarOpened"
 				@update:form="updateSelectedForm"
-				@update:sidebar-opened="sidebarOpened = $event"
-				@open-sharing="openSharing" />
+				@update:sidebarOpened="sidebarOpened = $event"
+				@openSharing="openSharing" />
 			<Sidebar
 				v-if="!selectedForm.partial && canEdit"
 				:form="selectedForm"
-				:sidebar-opened="sidebarOpened"
+				:sidebarOpened="sidebarOpened"
 				:active="sidebarActive"
-				@update:sidebar-opened="sidebarOpened = $event"
+				@update:sidebarOpened="sidebarOpened = $event"
 				@update:active="sidebarActive = $event" />
 		</template>
 
@@ -207,6 +207,35 @@ export default {
 
 		const PERMISSION_TYPES = PermissionTypes.data().PERMISSION_TYPES
 
+		const routeHash = computed(() => route.params.hash)
+
+		const routeAllowed = computed(() => {
+			if (loading.value && loadState(appName, 'formId') === 'invalid') {
+				return false
+			}
+
+			if (!routeHash.value) {
+				return false
+			}
+
+			const form = [...forms.value, ...allSharedForms.value].find(
+				(form) => form.hash === routeHash.value,
+			)
+
+			if (form === undefined) {
+				fetchPartialForm(routeHash.value)
+				return false
+			}
+
+			if (route.name === 'results') {
+				return (
+					form.permissions.includes(route.name) || form.submissionCount > 0
+				)
+			}
+
+			return form?.permissions.includes(route.name)
+		})
+
 		const selectedForm = computed(() => {
 			if (routeAllowed.value) {
 				return (
@@ -263,36 +292,6 @@ export default {
 			)
 		})
 
-		const routeHash = computed(() => route.params.hash)
-
-		const routeAllowed = computed(() => {
-			if (loading.value && loadState(appName, 'formId') === 'invalid') {
-				return false
-			}
-
-			if (!routeHash.value) {
-				return false
-			}
-
-			const form = [...forms.value, ...allSharedForms.value].find(
-				(form) => form.hash === routeHash.value,
-			)
-
-			if (form === undefined) {
-				fetchPartialForm(routeHash.value)
-				return false
-			}
-
-			if (route.name === 'results') {
-				return (
-					form.permissions.includes(route.name)
-					|| form.submissionCount > 0
-				)
-			}
-
-			return form?.permissions.includes(route.name)
-		})
-
 		const mobileCloseNavigation = () => {
 			if (isMobile.value) {
 				emit('toggle-navigation', { open: false })
@@ -341,7 +340,12 @@ export default {
 			loading.value = false
 		}
 
-		const fetchPartialForm = async (hash) => {
+		/**
+		 * Fetch a partial form by its hash after initial load completes.
+		 *
+		 * @param {string} hash The hash of the form to fetch.
+		 */
+		async function fetchPartialForm(hash) {
 			await new Promise((resolve) => {
 				const wait = () => {
 					if (loading.value) {

@@ -7,9 +7,9 @@
 	<NcListItem
 		:active="isActive"
 		:actions-aria-label="t('forms', 'Form actions')"
-		:counter-number="form.submissionCount"
+		:counterNumber="form.submissionCount"
 		compact
-		:force-display-actions="forceDisplayActions"
+		:forceDisplayActions="forceDisplayActions"
 		:name="formTitle"
 		:to="{
 			name: routerTarget,
@@ -29,7 +29,7 @@
 			#actions>
 			<NcActionRouter
 				v-if="!isArchived && canEdit"
-				close-after-click
+				closeAfterClick
 				:disabled="isFormLocked"
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
@@ -40,7 +40,7 @@
 			</NcActionRouter>
 			<NcActionButton
 				v-if="!isArchived && !readOnly"
-				close-after-click
+				closeAfterClick
 				@click="onShareForm">
 				<template #icon>
 					<IconShareVariant :size="20" />
@@ -49,7 +49,7 @@
 			</NcActionButton>
 			<NcActionRouter
 				v-if="canSeeResults"
-				close-after-click
+				closeAfterClick
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -57,7 +57,7 @@
 				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
-			<NcActionButton v-if="canEdit" close-after-click @click="onCloneForm">
+			<NcActionButton v-if="canEdit" closeAfterClick @click="onCloneForm">
 				<template #icon>
 					<IconContentCopy :size="20" />
 				</template>
@@ -66,7 +66,7 @@
 			<NcActionSeparator v-if="canEdit && !readOnly" />
 			<NcActionButton
 				v-if="canEdit && !readOnly"
-				close-after-click
+				closeAfterClick
 				:disabled="isFormLocked"
 				@click="onToggleArchive">
 				<template #icon>
@@ -81,7 +81,7 @@
 			</NcActionButton>
 			<NcActionButton
 				v-if="canEdit && !readOnly"
-				close-after-click
+				closeAfterClick
 				:disabled="isFormLocked"
 				@click="showDeleteDialog = true">
 				<template #icon>
@@ -169,13 +169,7 @@ export default {
 		},
 	},
 
-	emits: [
-		'mobile-close-navigation',
-		'open-sharing',
-		'clone',
-		'update-form-state',
-		'delete',
-	],
+	emits: ['mobileCloseNavigation', 'openSharing', 'clone', 'delete'],
 
 	data() {
 		return {
@@ -299,11 +293,11 @@ export default {
 		 * Closes the App-Navigation on mobile-devices
 		 */
 		mobileCloseNavigation() {
-			this.$emit('mobile-close-navigation')
+			this.$emit('mobileCloseNavigation')
 		},
 
 		onShareForm() {
-			this.$emit('open-sharing', this.form.hash)
+			this.$emit('openSharing', this.form.hash)
 		},
 
 		onCloneForm() {

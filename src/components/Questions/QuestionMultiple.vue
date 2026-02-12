@@ -6,20 +6,20 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
-		:content-valid="contentValid"
-		:shift-drag-handle="shiftDragHandle"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
+		:contentValid="contentValid"
+		:shiftDragHandle="shiftDragHandle"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
-				:model-value="extraSettings?.shuffleOptions"
-				@update:model-value="onShuffleOptionsChange">
+				:modelValue="extraSettings?.shuffleOptions"
+				@update:modelValue="onShuffleOptionsChange">
 				{{ t('forms', 'Shuffle options') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
-				:model-value="allowOtherAnswer"
-				@update:model-value="onAllowOtherAnswerChange">
+				:modelValue="allowOtherAnswer"
+				@update:modelValue="onAllowOtherAnswerChange">
 				{{ t('forms', 'Add "other"') }}
 			</NcActionCheckbox>
 
@@ -27,8 +27,8 @@
 			<template v-if="!isUnique">
 				<!-- Allow setting a minimum of options to be checked -->
 				<NcActionCheckbox
-					:model-value="!!extraSettings?.optionsLimitMin"
-					@update:model-value="
+					:modelValue="!!extraSettings?.optionsLimitMin"
+					@update:modelValue="
 						(checked) => onLimitOptionsMin(checked ? 1 : null)
 					">
 					{{ t('forms', 'Require a minimum of options to be checked') }}
@@ -37,15 +37,15 @@
 					v-if="extraSettings?.optionsLimitMin"
 					type="number"
 					:label="t('forms', 'Minimum options to be checked')"
-					:label-outside="false"
-					:show-trailing-button="false"
-					:model-value="extraSettings.optionsLimitMin"
+					:labelOutside="false"
+					:showTrailingButton="false"
+					:modelValue="extraSettings.optionsLimitMin"
 					@update:value="onLimitOptionsMin" />
 
 				<!-- Allow setting a maximum -->
 				<NcActionCheckbox
-					:model-value="!!extraSettings?.optionsLimitMax"
-					@update:model-value="
+					:modelValue="!!extraSettings?.optionsLimitMax"
+					@update:modelValue="
 						(checked) =>
 							onLimitOptionsMax(checked ? choices.length || 1 : null)
 					">
@@ -55,12 +55,12 @@
 					v-if="extraSettings?.optionsLimitMax"
 					type="number"
 					:label="t('forms', 'Maximum options to be checked')"
-					:label-outside="false"
-					:show-trailing-button="false"
-					:model-value="extraSettings.optionsLimitMax"
+					:labelOutside="false"
+					:showTrailingButton="false"
+					:modelValue="extraSettings.optionsLimitMax"
 					@update:value="onLimitOptionsMax" />
 			</template>
-			<NcActionButton close-after-click @click="isOptionDialogShown = true">
+			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
 				<template #icon>
 					<IconContentPaste :size="20" />
 				</template>
@@ -77,18 +77,18 @@
 					:key="answer.id"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
-					:model-value="questionValues"
+					:modelValue="questionValues"
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
 					:required="checkRequired(answer.id)"
-					@update:model-value="onChange"
+					@update:modelValue="onChange"
 					@keydown.enter.exact.prevent="onKeydownEnter">
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
 					<NcCheckboxRadioSwitch
-						:model-value="questionValues"
+						:modelValue="questionValues"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined"
 						:value="otherAnswer ?? QUESTION_EXTRASETTINGS_OTHER_PREFIX"
@@ -96,7 +96,7 @@
 						:type="isUnique ? 'radio' : 'checkbox'"
 						:required="checkRequired('other-answer')"
 						class="question__label"
-						@update:model-value="onChangeOther"
+						@update:modelValue="onChangeOther"
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
@@ -104,8 +104,8 @@
 						class="question__input"
 						:label="placeholderOtherAnswer"
 						:required="otherAnswer !== undefined"
-						:model-value="cachedOtherAnswerText"
-						@update:model-value="onOtherAnswerTextChange" />
+						:modelValue="cachedOtherAnswerText"
+						@update:modelValue="onOtherAnswerTextChange" />
 				</div>
 			</fieldset>
 		</template>
@@ -121,9 +121,9 @@
 				:animation="200"
 				direction="vertical"
 				handle=".option__drag-handle"
-				invert-swap
+				invertSwap
 				tag="transition-group"
-				:component-data="{
+				:componentData="{
 					name: isDragging
 						? 'no-external-transition-on-drag'
 						: 'options-list-transition',
@@ -135,19 +135,19 @@
 					<AnswerInput
 						ref="input"
 						:answer="answer"
-						:form-id="formId"
+						:formId="formId"
 						:index="index"
-						:is-unique="isUnique"
-						:max-index="options.length - 1"
-						:max-option-length="maxStringLengths.optionText"
-						option-type="choice"
-						@create-answer="onCreateAnswer"
+						:isUnique="isUnique"
+						:maxIndex="options.length - 1"
+						:maxOptionLength="maxStringLengths.optionText"
+						optionType="choice"
+						@createAnswer="onCreateAnswer"
 						@update:answer="updateAnswer"
 						@delete="deleteOption"
-						@focus-next="focusNextInput"
-						@move-up="onOptionMoveUp(index)"
-						@move-down="onOptionMoveDown(index)"
-						@tabbed-out="checkValidOption" />
+						@focusNext="focusNextInput"
+						@moveUp="onOptionMoveUp(index)"
+						@moveDown="onOptionMoveDown(index)"
+						@tabbedOut="checkValidOption" />
 				</template>
 			</Draggable>
 			<li
@@ -169,7 +169,7 @@
 		<!-- Add multiple options modal -->
 		<OptionInputDialog
 			v-model:open="isOptionDialogShown"
-			@multiple-answers="handleMultipleOptions" />
+			@multipleAnswers="handleMultipleOptions" />
 	</Question>
 </template>
 

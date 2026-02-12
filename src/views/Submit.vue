@@ -6,15 +6,15 @@
 <template>
 	<NcAppContent
 		:class="{ 'app-content--public': publicView }"
-		:page-heading="t('forms', 'Submit form')">
+		:pageHeading="t('forms', 'Submit form')">
 		<TopBar
 			v-if="!publicView"
 			:archived="isArchived"
 			:locked="isFormLocked"
 			:permissions="form?.permissions"
-			:sidebar-opened="sidebarOpened"
-			:submission-count="form?.submissionCount"
-			@share-form="onShareForm" />
+			:sidebarOpened="sidebarOpened"
+			:submissionCount="form?.submissionCount"
+			@shareForm="onShareForm" />
 
 		<!-- Form is loading -->
 		<NcEmptyContent
@@ -111,10 +111,10 @@
 						v-for="(question, index) in validQuestions"
 						ref="questions"
 						:key="question.id"
-						read-only
-						:answer-type="answerTypes[question.type]"
+						readOnly
+						:answerType="answerTypes[question.type]"
 						:index="index + 1"
-						:max-string-lengths="maxStringLengths"
+						:maxStringLengths="maxStringLengths"
 						:values="answers[question.id]"
 						v-bind="question"
 						@keydown.enter="onKeydownEnter"
@@ -167,16 +167,16 @@
 					)
 				"
 				:buttons="confirmLeaveFormButtons"
-				no-close
-				:close-on-click-outside="false" />
+				noClose
+				:closeOnClickOutside="false" />
 			<!-- Confirmation dialog for clear form -->
 			<NcDialog
 				v-model:open="showClearFormDialog"
 				:name="t('forms', 'Clear form')"
 				:message="t('forms', 'Do you want to clear all answers?')"
 				:buttons="confirmClearFormButtons"
-				no-close
-				:close-on-click-outside="false" />
+				noClose
+				:closeOnClickOutside="false" />
 			<!-- Confirmation dialog if form was changed -->
 			<NcDialog
 				v-model:open="showClearFormDueToChangeDialog"
@@ -188,8 +188,8 @@
 					)
 				"
 				:buttons="confirmClearFormButtons"
-				no-close
-				:close-on-click-outside="false" />
+				noClose
+				:closeOnClickOutside="false" />
 		</template>
 	</NcAppContent>
 </template>

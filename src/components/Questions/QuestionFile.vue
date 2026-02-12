@@ -6,12 +6,12 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<template #actions>
 			<template v-if="!allowedFileTypesDialogOpened">
-				<NcActionButton is-menu @click="allowedFileTypesDialogOpened = true">
+				<NcActionButton isMenu @click="allowedFileTypesDialogOpened = true">
 					<template #icon>
 						<IconFileDocumentAlert :size="20" />
 					</template>
@@ -32,12 +32,10 @@
 				<NcActionCheckbox
 					v-for="({ label: fileTypeLabel }, fileType) in fileTypes"
 					:key="fileType"
-					:model-value="
-						extraSettings?.allowedFileTypes?.includes(fileType)
-					"
+					:modelValue="extraSettings?.allowedFileTypes?.includes(fileType)"
 					:value="fileType"
 					class="file-type-checkbox"
-					@update:model-value="onAllowedFileTypesChange(fileType, $event)">
+					@update:modelValue="onAllowedFileTypesChange(fileType, $event)">
 					{{ fileTypeLabel }}
 				</NcActionCheckbox>
 
@@ -46,7 +44,7 @@
 					type="multiselect"
 					multiple
 					taggable
-					:model-value="extraSettings?.allowedFileExtensions || []"
+					:modelValue="extraSettings?.allowedFileExtensions || []"
 					@option:created="onAllowedFileExtensionsAdded"
 					@option:deselected="onAllowedFileExtensionsDeleted" />
 
@@ -56,23 +54,23 @@
 			<template v-if="!allowedFileTypesDialogOpened">
 				<NcActionInput
 					type="number"
-					:model-value="maxAllowedFilesCount"
-					label-outside
+					:modelValue="maxAllowedFilesCount"
+					labelOutside
 					:label="t('forms', 'Maximum number of files')"
-					:show-trailing-button="false"
+					:showTrailingButton="false"
 					@input="onMaxAllowedFilesCountInput($event.target.value)" />
 
 				<NcActionInput
 					type="number"
-					:model-value="maxFileSizeValue"
-					label-outside
-					:show-trailing-button="false"
+					:modelValue="maxFileSizeValue"
+					labelOutside
+					:showTrailingButton="false"
 					:label="t('forms', 'Maximum file size')"
 					@input="onMaxFileSizeValueInput($event.target.value)" />
 
 				<NcActionInput
 					type="multiselect"
-					:model-value="maxFileSizeUnit"
+					:modelValue="maxFileSizeUnit"
 					:options="availableUnits"
 					required
 					:clearable="false"

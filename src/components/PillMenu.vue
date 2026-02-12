@@ -9,15 +9,15 @@
 			v-for="option of options"
 			:key="option.id"
 			:aria-label="isMobile ? option.ariaLabel : null"
-			:model-value="active.id"
+			:modelValue="active.id"
 			:disabled="disabled || option.disabled"
 			class="pill-menu__toggle"
 			:class="{ 'pill-menu__toggle--icon-only': isMobile && option.icon }"
-			button-variant
-			button-variant-grouped="horizontal"
+			buttonVariant
+			buttonVariantGrouped="horizontal"
 			type="radio"
 			:value="option.id"
-			@update:model-value="$emit('update:active', option)">
+			@update:modelValue="$emit('update:active', option)">
 			<template v-if="option.icon" #icon>
 				<NcIconSvgWrapper :path="option.icon" />
 			</template>

@@ -5,7 +5,7 @@
 
 <template>
 	<NcDialog
-		content-classes="options-modal"
+		contentClasses="options-modal"
 		:name="t('forms', 'Add multiple options')"
 		:open="open"
 		:buttons="buttons"
@@ -18,10 +18,10 @@
 			resize="vertical"
 			rows="10" />
 		<NcSelect
-			:input-label="t('forms', 'Options')"
+			:inputLabel="t('forms', 'Options')"
 			multiple
 			disabled
-			:model-value="multipleOptions" />
+			:modelValue="multipleOptions" />
 	</NcDialog>
 </template>
 
@@ -50,7 +50,7 @@ export default defineComponent({
 		},
 	},
 
-	emits: ['update:open', 'multiple-answers'],
+	emits: ['update:open', 'multipleAnswers'],
 
 	data() {
 		return {
@@ -93,7 +93,7 @@ export default defineComponent({
 			this.$emit('update:open', false)
 			if (this.multipleOptions.length > 1) {
 				// extract all options entries to parent
-				this.$emit('multiple-answers', this.multipleOptions)
+				this.$emit('multipleAnswers', this.multipleOptions)
 				this.enteredOptions = ''
 				return
 			}

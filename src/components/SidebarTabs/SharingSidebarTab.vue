@@ -17,10 +17,10 @@
 				})
 			" />
 		<SharingSearchDiv
-			:current-shares="form.shares"
-			:show-loading="isLoading"
+			:currentShares="form.shares"
+			:showLoading="isLoading"
 			:locked="locked"
-			@add-share="addShare" />
+			@addShare="addShare" />
 
 		<!-- Public Link -->
 		<div
@@ -96,7 +96,7 @@
 					</NcActionButton>
 					<NcActionButton
 						v-if="appConfig.allowPublicLink"
-						close-after-click
+						closeAfterClick
 						:disabled="locked"
 						@click="addPublicLink">
 						<template #icon>
@@ -159,10 +159,10 @@
 				</label>
 				<NcCheckboxRadioSwitch
 					id="share-switch__permit-all"
-					:model-value="form.access.permitAllUsers"
+					:modelValue="form.access.permitAllUsers"
 					:disabled="locked"
 					type="switch"
-					@update:model-value="onPermitAllUsersChange" />
+					@update:modelValue="onPermitAllUsersChange" />
 			</div>
 			<div
 				v-if="appConfig.allowShowToAll && form.access.permitAllUsers"
@@ -175,10 +175,10 @@
 				</label>
 				<NcCheckboxRadioSwitch
 					id="share-switch__show-to-all"
-					:model-value="form.access.showToAllUsers"
+					:modelValue="form.access.showToAllUsers"
 					:disabled="locked"
 					type="switch"
-					@update:model-value="onShowToAllUsersChange" />
+					@update:modelValue="onShowToAllUsersChange" />
 			</div>
 		</div>
 
@@ -189,7 +189,7 @@
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
 				:locked="locked"
-				@remove-share="removeShare"
+				@removeShare="removeShare"
 				@update:share="updateShare" />
 		</TransitionGroup>
 	</div>
@@ -263,7 +263,7 @@ export default {
 		},
 	},
 
-	emits: ['add-share', 'update-share', 'remove-share', 'update:formProp'],
+	emits: ['addShare', 'updateShare', 'removeShare', 'update:formProp'],
 
 	data() {
 		return {
@@ -320,7 +320,7 @@ export default {
 				const share = OcsResponse2Data(response)
 
 				// Add new share
-				this.$emit('add-share', share)
+				this.$emit('addShare', share)
 			} catch (error) {
 				logger.error('Error while adding new share', {
 					error,
@@ -347,7 +347,7 @@ export default {
 				const share = OcsResponse2Data(response)
 
 				// Add new share
-				this.$emit('add-share', share)
+				this.$emit('addShare', share)
 			} catch (error) {
 				logger.error('Error adding public link', { error })
 				showError(t('forms', 'There was an error while adding the link'))
@@ -396,7 +396,7 @@ export default {
 				})
 
 				// Add new share
-				this.$emit('update-share', share)
+				this.$emit('updateShare', share)
 			} catch (error) {
 				logger.error('Error while updating share', {
 					error,
@@ -423,7 +423,7 @@ export default {
 						shareId: share.id,
 					}),
 				)
-				this.$emit('remove-share', share)
+				this.$emit('removeShare', share)
 			} catch (error) {
 				logger.error('Error while removing share', { error, share })
 				showError(t('forms', 'There was an error while removing the share'))

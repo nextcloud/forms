@@ -6,7 +6,7 @@
 <template>
 	<div>
 		<NcSelectUsers
-			keep-open
+			keepOpen
 			:loading="showLoadingCircle"
 			:disabled="locked"
 			:options="options"
@@ -49,7 +49,7 @@ export default {
 		},
 	},
 
-	emits: ['add-share'],
+	emits: ['addShare'],
 
 	computed: {
 		/**
@@ -106,7 +106,7 @@ export default {
 				displayName: share.displayName,
 				shareType: share.shareType,
 			}
-			this.$emit('add-share', newShare)
+			this.$emit('addShare', newShare)
 		},
 	},
 }

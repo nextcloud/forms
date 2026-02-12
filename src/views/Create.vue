@@ -5,7 +5,7 @@
 
 <template>
 	<NcAppContent
-		:page-heading="
+		:pageHeading="
 			form.title ? t('forms', 'Edit form') : t('forms', 'Create form')
 		">
 		<!-- Show results & sidebar button -->
@@ -13,9 +13,9 @@
 			:archived="isFormArchived"
 			:locked="isFormLocked"
 			:permissions="form?.permissions"
-			:sidebar-opened="sidebarOpened"
-			:submission-count="form?.submissionCount"
-			@share-form="onShareForm" />
+			:sidebarOpened="sidebarOpened"
+			:submissionCount="form?.submissionCount"
+			@shareForm="onShareForm" />
 
 		<NcEmptyContent
 			v-if="isLoadingForm"
@@ -118,7 +118,7 @@
 					v-model="form.questions"
 					:animation="200"
 					tag="transition-group"
-					:component-data="{
+					:componentData="{
 						name: isDragging
 							? 'no-external-transition-on-drag'
 							: 'question-list',
@@ -132,15 +132,15 @@
 							:is="answerTypes[question.type].component"
 							ref="questions"
 							v-model="form.questions[index]"
-							:can-move-down="index < form.questions.length - 1"
-							:can-move-up="index > 0"
-							:answer-type="answerTypes[question.type]"
+							:canMoveDown="index < form.questions.length - 1"
+							:canMoveUp="index > 0"
+							:answerType="answerTypes[question.type]"
 							:index="index + 1"
-							:max-string-lengths="maxStringLengths"
+							:maxStringLengths="maxStringLengths"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
-							@move-down="onMoveDown(index)"
-							@move-up="onMoveUp(index)" />
+							@moveDown="onMoveDown(index)"
+							@moveUp="onMoveUp(index)" />
 					</template>
 				</Draggable>
 
@@ -148,7 +148,7 @@
 				<div class="question-menu">
 					<NcActions
 						v-model:open="questionMenuOpened"
-						:menu-name="t('forms', 'Add a question')"
+						:menuName="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
 						primary>
 						<template #icon>
@@ -160,9 +160,9 @@
 							<NcActionButton
 								v-for="(answer, type) in answerTypesFilter"
 								:key="answer.label"
-								:close-after-click="!hasSubtypes(answer)"
+								:closeAfterClick="!hasSubtypes(answer)"
 								:disabled="isLoadingQuestions"
-								:is-menu="hasSubtypes(answer)"
+								:isMenu="hasSubtypes(answer)"
 								class="question-menu__question"
 								@click="
 									hasSubtypes(answer)
@@ -193,7 +193,7 @@
 									activeQuestionType
 								].subtypes"
 								:key="'subtype-' + answer.label"
-								close-after-click
+								closeAfterClick
 								:disabled="isLoadingQuestions"
 								class="question-menu__question"
 								@click="addQuestion(activeQuestionType, type)">
