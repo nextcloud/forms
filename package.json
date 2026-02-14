@@ -31,7 +31,7 @@
   "dependencies": {
     "@nextcloud/auth": "^2.5.3",
     "@nextcloud/axios": "^2.5.2",
-    "@nextcloud/dialogs": "^6.4.1",
+    "@nextcloud/dialogs": "^7.3.0",
     "@nextcloud/event-bus": "^3.3.3",
     "@nextcloud/files": "^4.0.0",
     "@nextcloud/initial-state": "^3.0.0",
@@ -45,7 +45,7 @@
     "p-queue": "^9.1.0",
     "qrcode": "^1.5.4",
     "v-click-outside": "^3.2.0",
-    "vue": "^2.7.16",
+    "vue": "^3.5.28",
     "vue-material-design-icons": "^5.3.1",
     "vue-router": "^3.6.5",
     "vuedraggable": "^2.24.3"
