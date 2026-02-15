@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-only
 -->
 
@@ -227,6 +227,7 @@ Currently supported Question-Types are:
 | `file`            | One or multiple files. It is possible to specify which mime types are allowed                                                              |
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                   |
 | `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                |
+| `conditional`     | A conditional branching question with a trigger question and multiple branches containing subquestions                                     |
 
 ## Extra Settings
 
@@ -254,3 +255,189 @@ Optional extra settings for some [Question Types](#question-types)
 | `optionsHighest`        | `linearscale`                         | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
 | `optionsLabelLowest`    | `linearscale`                         | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
 | `optionsLabelHighest`   | `linearscale`                         | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
+| `triggerType`           | `conditional`                         | string           | [See trigger types](#conditional-trigger-types) | The type of trigger question (dropdown, multiple_unique, etc.)          |
+| `branches`              | `conditional`                         | Array            | Array of [Branch objects](#branch-object)   | The branches with conditions and subquestions                               |
+
+## Conditional Questions
+
+Conditional questions enable branching logic in forms. A trigger question determines which branch of subquestions appears based on the respondent's answer.
+
+### Question Properties for Subquestions
+
+Subquestions (questions belonging to a conditional question's branch) have additional properties:
+
+| Property         | Type    | Description                                              |
+| ---------------- | ------- | -------------------------------------------------------- |
+| parentQuestionId | Integer | The ID of the parent conditional question (null for regular questions) |
+| branchId         | String  | The ID of the branch this subquestion belongs to         |
+
+### Conditional Trigger Types
+
+Supported trigger types for conditional questions:
+
+| Trigger Type      | Condition Type       | Description                                      |
+| ----------------- | -------------------- | ------------------------------------------------ |
+| `multiple_unique` | `option_selected`    | Radio buttons - single option selection          |
+| `dropdown`        | `option_selected`    | Dropdown - single option selection               |
+| `multiple`        | `options_combination`| Checkboxes - all specified options must be selected |
+| `short`           | `string_equals`, `string_contains`, `regex` | Short text with string/regex matching |
+| `long`            | `string_contains`, `regex` | Long text with string/regex matching    |
+| `linearscale`     | `value_equals`, `value_range` | Linear scale with value matching     |
+| `date`            | `date_range`         | Date with date range matching (YYYY-MM-DD)       |
+| `time`            | `time_range`         | Time with time range matching (HH:mm)            |
+| `color`           | `value_equals`       | Color with exact value matching                  |
+| `file`            | `file_uploaded`      | File with upload status matching                 |
+
+### Branch Object
+
+A branch defines conditions and subquestions that appear when those conditions are met.
+
+| Property     | Type                                        | Description                                   |
+| ------------ | ------------------------------------------- | --------------------------------------------- |
+| id           | String                                      | Unique identifier for the branch              |
+| conditions   | Array of [Conditions](#condition-object)    | Conditions that must be met to show the branch|
+| subQuestions | Array of [Questions](#question)             | Questions shown when conditions are met       |
+
+```json
+{
+  "id": "branch-1705587600000",
+  "conditions": [
+    { "type": "option_selected", "optionId": 42 }
+  ],
+  "subQuestions": [
+    {
+      "id": 101,
+      "formId": 3,
+      "order": 1,
+      "type": "short",
+      "text": "Please provide details",
+      "parentQuestionId": 100,
+      "branchId": "branch-1705587600000"
+    }
+  ]
+}
+```
+
+### Condition Object
+
+Conditions determine when a branch is activated. The structure depends on the trigger type.
+
+#### option_selected (for dropdown, multiple_unique)
+
+```json
+{ "type": "option_selected", "optionId": 42 }
+```
+
+#### options_combination (for multiple/checkboxes)
+
+```json
+{ "type": "options_combination", "optionIds": [42, 43] }
+```
+All options in `optionIds` must be selected for the branch to activate (AND logic).
+
+#### string_equals (for short text)
+
+```json
+{ "type": "string_equals", "value": "yes" }
+```
+
+#### string_contains (for short, long text)
+
+```json
+{ "type": "string_contains", "value": "keyword" }
+```
+
+#### regex (for short, long text)
+
+```json
+{ "type": "regex", "value": "^yes.*" }
+```
+
+#### value_equals (for color)
+
+```json
+{ "type": "value_equals", "value": "#ff0000" }
+```
+
+#### value_range (for linearscale, time)
+
+```json
+{ "type": "value_range", "min": 3, "max": 5 }
+```
+
+#### date_range (for date)
+
+```json
+{ "type": "date_range", "min": "2024-01-01", "max": "2024-12-31" }
+```
+
+#### time_range (for time)
+
+```json
+{ "type": "time_range", "min": "09:00", "max": "17:00" }
+```
+
+#### file_uploaded (for file)
+
+```json
+{ "type": "file_uploaded", "fileUploaded": true }
+```
+
+### Conditional Question Example
+
+A complete conditional question structure:
+
+```json
+{
+  "id": 100,
+  "formId": 3,
+  "order": 1,
+  "type": "conditional",
+  "isRequired": true,
+  "text": "Do you have any dietary restrictions?",
+  "options": [
+    { "id": 42, "questionId": 100, "order": 1, "text": "Yes" },
+    { "id": 43, "questionId": 100, "order": 2, "text": "No" }
+  ],
+  "extraSettings": {
+    "triggerType": "dropdown",
+    "branches": [
+      {
+        "id": "branch-yes",
+        "conditions": [{ "type": "option_selected", "optionId": 42 }],
+        "subQuestions": [
+          {
+            "id": 101,
+            "formId": 3,
+            "order": 1,
+            "type": "long",
+            "text": "Please describe your dietary restrictions",
+            "parentQuestionId": 100,
+            "branchId": "branch-yes"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Conditional Answer Structure
+
+When submitting or storing conditional question answers, the structure differs from regular questions:
+
+```json
+{
+  "100": {
+    "trigger": ["42"],
+    "subQuestions": {
+      "101": ["Vegetarian, no nuts"]
+    }
+  }
+}
+```
+
+| Property     | Type                        | Description                                           |
+| ------------ | --------------------------- | ----------------------------------------------------- |
+| trigger      | Array of strings            | Answer values for the trigger question                |
+| subQuestions | Object (questionId → Array) | Map of subquestion IDs to their answer value arrays   |

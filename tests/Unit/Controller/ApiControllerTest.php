@@ -761,6 +761,79 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newSubmission(1, $answers, '');
 	}
 
+	public function testNewSubmission_conditionalQuestion() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('admin');
+
+		$questions = [
+			[
+				'id' => 100,
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional Q',
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [
+						[
+							'id' => 'branch-a',
+							'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+							'subQuestions' => [
+								[
+									'id' => 101,
+									'type' => 'short',
+									'text' => 'Sub Q',
+									'isRequired' => false,
+								]
+							]
+						]
+					]
+				],
+				'options' => [
+					['id' => 10, 'text' => 'Option A'],
+					['id' => 11, 'text' => 'Option B'],
+				],
+			],
+		];
+
+		$answers = [
+			100 => [
+				'trigger' => ['10'],
+				'subQuestions' => [
+					'101' => ['Sub answer']
+				]
+			],
+		];
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn($questions);
+
+		$this->formAccess();
+
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function ($submission) {
+				$submission->setId(12);
+				return true;
+			}));
+
+		// Trigger answer + subquestion answer = 2 inserts
+		$this->answerMapper->expects($this->exactly(2))
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission');
+
+		$this->apiController->newSubmission(1, $answers, '');
+	}
+
 	public function testNewSubmission_formNotFound() {
 		$this->formsService->expects($this->once())
 			->method('loadFormForSubmission')
@@ -1432,5 +1505,338 @@ class ApiControllerTest extends TestCase {
 		$this->expectException(OCSForbiddenException::class);
 		$this->expectExceptionMessage('This form is no longer taking answers');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	// Tests for new conditional question functionality
+
+	public function testNewQuestion_conditionalQuestion() {
+		$formId = 1;
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with($formId)
+			->willReturn([]);
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(100);
+				return $question;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(100)
+			->willReturn([
+				'id' => 100,
+				'formId' => $formId,
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional Q',
+				'order' => 1,
+				'isRequired' => false,
+				'name' => '',
+				'options' => [],
+				'accept' => [],
+				'description' => '',
+				'extraSettings' => [],
+				'parentQuestionId' => null,
+				'branchId' => null,
+			]);
+
+		$response = $this->apiController->newQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, null, 'Conditional Q');
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
+		$data = $response->getData();
+		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $data['type']);
+	}
+
+	public function testNewQuestion_subQuestion() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByBranch')
+			->with($parentQuestionId, $branchId)
+			->willReturn([]);
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(101);
+				return $question;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(101)
+			->willReturn([
+				'id' => 101,
+				'formId' => $formId,
+				'type' => 'short',
+				'text' => 'Sub Q',
+				'order' => 1,
+				'isRequired' => false,
+				'name' => '',
+				'options' => [],
+				'accept' => [],
+				'description' => '',
+				'extraSettings' => [],
+				'parentQuestionId' => $parentQuestionId,
+				'branchId' => $branchId,
+			]);
+
+		$response = $this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
+		$data = $response->getData();
+		$this->assertEquals($parentQuestionId, $data['parentQuestionId']);
+		$this->assertEquals($branchId, $data['branchId']);
+	}
+
+	public function testNewQuestion_nestedConditionalNotAllowed() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Nested conditional questions are not supported');
+		$this->apiController->newQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, null, 'Nested Conditional', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentNotFound() {
+		$formId = 1;
+		$parentQuestionId = 999;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willThrowException(new DoesNotExistException('Question not found'));
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->expectExceptionMessage('Could not find parent question');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentNotConditional() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType('short'); // Not conditional
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question must be a conditional question');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentDifferentForm() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId(999); // Different form
+		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question does not belong to this form');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_missingBranchId() {
+		$formId = 1;
+		$parentQuestionId = 100;
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('branchId is required when creating a subquestion');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, null);
+	}
+
+	public function testDeleteQuestion_conditionalWithSubquestions(): void {
+		$formId = 1;
+		$questionId = 100;
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$question = new Question();
+		$question->setId($questionId);
+		$question->setFormId($formId);
+		$question->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$question->setOrder(1);
+
+		$subQuestion1 = new Question();
+		$subQuestion1->setId(101);
+		$subQuestion1->setFormId($formId);
+		$subQuestion1->setType('short');
+		$subQuestion1->setOrder(1);
+		$subQuestion1->setParentQuestionId($questionId);
+
+		$subQuestion2 = new Question();
+		$subQuestion2->setId(102);
+		$subQuestion2->setFormId($formId);
+		$subQuestion2->setType('long');
+		$subQuestion2->setOrder(2);
+		$subQuestion2->setParentQuestionId($questionId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->formsService->expects($this->once())
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($questionId)
+			->willReturn($question);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByParentQuestion')
+			->with($questionId)
+			->willReturn([$subQuestion1, $subQuestion2]);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with($formId)
+			->willReturn([]);
+
+		// Expect updates for: subQuestion1, subQuestion2, main question
+		$this->questionMapper->expects($this->exactly(3))
+			->method('update');
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$response = $this->apiController->deleteQuestion($formId, $questionId);
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals($questionId, $response->getData());
 	}
 }

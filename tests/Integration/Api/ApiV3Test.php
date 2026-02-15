@@ -59,7 +59,9 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 1,
 						'options' => [],
 						'accept' => [],
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 					[
 						'type' => 'multiple_unique',
@@ -85,7 +87,9 @@ class ApiV3Test extends IntegrationBase {
 						'accept' => [],
 						'extraSettings' => [
 							'shuffleOptions' => true
-						]
+						],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 					[
 						'type' => 'file',
@@ -101,6 +105,8 @@ class ApiV3Test extends IntegrationBase {
 							'maxAllowedFilesCount' => 1,
 							'maxFileSize' => 1024,
 						],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 				],
 				'shares' => [
@@ -185,7 +191,9 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 1,
 						'options' => [],
 						'accept' => [],
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 				],
 				'shares' => [
@@ -225,7 +233,9 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 1,
 						'options' => [],
 						'accept' => [],
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 				],
 				'shares' => [
@@ -461,7 +471,9 @@ class ApiV3Test extends IntegrationBase {
 							'options' => [],
 							'accept' => [],
 							'description' => 'Please answer this.',
-							'extraSettings' => []
+							'extraSettings' => [],
+							'parentQuestionId' => null,
+							'branchId' => null,
 						],
 						[
 							'type' => 'multiple_unique',
@@ -490,7 +502,9 @@ class ApiV3Test extends IntegrationBase {
 							'description' => '',
 							'extraSettings' => [
 								'shuffleOptions' => true,
-							]
+							],
+							'parentQuestionId' => null,
+							'branchId' => null,
 						],
 						[
 							'type' => 'file',
@@ -506,6 +520,8 @@ class ApiV3Test extends IntegrationBase {
 								'maxAllowedFilesCount' => 1,
 								'maxFileSize' => 1024,
 							],
+							'parentQuestionId' => null,
+							'branchId' => null,
 						],
 					],
 					'shares' => [
@@ -714,6 +730,8 @@ class ApiV3Test extends IntegrationBase {
 					'accept' => [],
 					'description' => '',
 					'extraSettings' => [],
+					'parentQuestionId' => null,
+					'branchId' => null,
 				]
 			],
 			'emptyQuestion' => [
@@ -728,6 +746,8 @@ class ApiV3Test extends IntegrationBase {
 					'accept' => [],
 					'description' => '',
 					'extraSettings' => [],
+					'parentQuestionId' => null,
+					'branchId' => null,
 				]
 			]
 		];
@@ -891,6 +911,184 @@ class ApiV3Test extends IntegrationBase {
 		foreach ($copy as $key => $value) {
 			$this->assertEquals($value, $data[$key]);
 		}
+	}
+
+	/**
+	 * Test creating a conditional question with trigger options
+	 */
+	public function testCreateConditionalQuestion(): void {
+		// First create the conditional question
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional Question'
+			]
+		]);
+		$conditionalQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $conditionalQuestion;
+
+		$this->assertEquals(201, $resp->getStatusCode());
+		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $conditionalQuestion['type']);
+		$this->assertEquals('Conditional Question', $conditionalQuestion['text']);
+		$this->assertNull($conditionalQuestion['parentQuestionId']);
+		$this->assertNull($conditionalQuestion['branchId']);
+
+		// Add options for the trigger
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$conditionalQuestion['id']}/options", [
+			'json' => [
+				'optionTexts' => ['Option A', 'Option B']
+			]
+		]);
+		$options = $this->OcsResponse2Data($resp);
+		$this->assertEquals(201, $resp->getStatusCode());
+		$this->assertCount(2, $options);
+
+		// Update the conditional question with extraSettings
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$conditionalQuestion['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'extraSettings' => [
+						'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+						'branches' => [
+							[
+								'id' => 'branch-a',
+								'conditions' => [['type' => 'option_selected', 'optionId' => $options[0]['id']]]
+							],
+							[
+								'id' => 'branch-b',
+								'conditions' => [['type' => 'option_selected', 'optionId' => $options[1]['id']]]
+							]
+						]
+					]
+				]
+			]
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Now create a subquestion in branch-a
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => 'short',
+				'text' => 'Subquestion for Option A',
+				'parentQuestionId' => $conditionalQuestion['id'],
+				'branchId' => 'branch-a'
+			]
+		]);
+		$subQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $subQuestion;
+
+		$this->assertEquals(201, $resp->getStatusCode());
+		$this->assertEquals('short', $subQuestion['type']);
+		$this->assertEquals('Subquestion for Option A', $subQuestion['text']);
+		$this->assertEquals($conditionalQuestion['id'], $subQuestion['parentQuestionId']);
+		$this->assertEquals('branch-a', $subQuestion['branchId']);
+
+		// Fetch the form and verify the conditional question structure
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}");
+		$form = $this->OcsResponse2Data($resp);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Find the conditional question in the form
+		$foundConditional = null;
+		foreach ($form['questions'] as $question) {
+			if ($question['id'] === $conditionalQuestion['id']) {
+				$foundConditional = $question;
+				break;
+			}
+		}
+
+		$this->assertNotNull($foundConditional);
+		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $foundConditional['type']);
+		$this->assertArrayHasKey('extraSettings', $foundConditional);
+		$this->assertArrayHasKey('branches', $foundConditional['extraSettings']);
+
+		// Verify subquestion is attached to the correct branch
+		$branchA = null;
+		foreach ($foundConditional['extraSettings']['branches'] as $branch) {
+			if ($branch['id'] === 'branch-a') {
+				$branchA = $branch;
+				break;
+			}
+		}
+
+		$this->assertNotNull($branchA);
+		$this->assertArrayHasKey('subQuestions', $branchA);
+		$this->assertCount(1, $branchA['subQuestions']);
+		$this->assertEquals('Subquestion for Option A', $branchA['subQuestions'][0]['text']);
+	}
+
+	/**
+	 * Test that nested conditional questions are not allowed
+	 */
+	public function testNestedConditionalNotAllowed(): void {
+		// First create a conditional question
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Parent Conditional'
+			]
+		]);
+		$parentConditional = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $parentConditional;
+		$this->assertEquals(201, $resp->getStatusCode());
+
+		// Add an option for the trigger
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentConditional['id']}/options", [
+			'json' => [
+				'optionTexts' => ['Trigger Option']
+			]
+		]);
+		$options = $this->OcsResponse2Data($resp);
+
+		// Update with extraSettings
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentConditional['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'extraSettings' => [
+						'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+						'branches' => [
+							['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => $options[0]['id']]]]
+						]
+					]
+				]
+			]
+		]);
+
+		// Try to create a nested conditional (should fail)
+		$this->expectException(ClientException::class);
+		$this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Nested Conditional',
+				'parentQuestionId' => $parentConditional['id'],
+				'branchId' => 'branch-1'
+			]
+		]);
+	}
+
+	/**
+	 * Test that subquestion requires branchId
+	 */
+	public function testSubquestionRequiresBranchId(): void {
+		// First create a conditional question
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional for branch test'
+			]
+		]);
+		$conditionalQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $conditionalQuestion;
+
+		// Try to create a subquestion without branchId (should fail)
+		$this->expectException(ClientException::class);
+		$this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => 'short',
+				'text' => 'Subquestion without branch',
+				'parentQuestionId' => $conditionalQuestion['id']
+			]
+		]);
 	}
 
 	public function dataCreateNewOption() {
