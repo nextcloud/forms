@@ -9,6 +9,7 @@ OC.L10N.register(
     "Cancel" : "Semmet",
     "Options" : "Tixtiṛiyin",
     "Delete" : "Kkes",
+    "Checkbox" : "Tanaka n ṛṛcem",
     "Text" : "Aḍris",
     "Other" : "Wayeḍ",
     "Group" : "Agraw",
