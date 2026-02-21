@@ -517,6 +517,9 @@ class SubmissionService {
 
 			// Check if all answers are within the possible options
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
+				// Normalize option IDs once for consistent comparison (DB may return ints, request may send strings)
+				$optionIds = array_map('intval', array_column($question['options'] ?? [], 'id'));
+
 				foreach ($answers[$questionId] as $answer) {
 					// Handle linear scale questions
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
@@ -527,8 +530,18 @@ class SubmissionService {
 						}
 					}
 					// Search corresponding option, return false if non-existent
-					elseif (!in_array($answer, array_column($question['options'], 'id'))) {
-						throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
+					else {
+						// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
+						$answerId = is_int($answer) ? $answer : (is_string($answer) ? intval(trim($answer)) : null);
+
+						// Reject non-numeric / malformed values early
+						if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
+							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($answer) ? (string)$answer : gettype($answer), $question['text']));
+						}
+
+						if (!in_array($answerId, $optionIds, true)) {
+							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
+						}
 					}
 				}
 			}
