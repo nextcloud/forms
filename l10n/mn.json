@@ -112,6 +112,7 @@
     "Shuffle options" : "Сонголтуудыг холих",
     "Allowed file types: {fileTypes}." : "Зөвшөөрөгдсөн файлын төрлүүд: {fileTypes}.",
     "All file types are allowed." : "Бүх файлын төрөл зөвшөөрөгдсөн.",
+    "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "{fileName} файл хэт том байна. Файлын хамгийн их хэмжээ нь {maxFileSize}.",
     "There was an error during submitting the file: {message}." : "Файл илгээхэд алдаа гарлаа: {message}.",
     "Allow only specific file types" : "Зөвхөн тодорхой файлын төрлүүдийг зөвшөөрөх",
     "Custom file extensions" : "Тусгай файлын өргөтгөлүүд",
