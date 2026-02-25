@@ -15,8 +15,8 @@ use OCP\Search\SearchResultEntry;
 
 class FormsSearchResultEntry extends SearchResultEntry {
 	public function __construct(Form $form, IURLGenerator $urlGenerator) {
-		$formURL = $urlGenerator->linkToRoute('forms.page.views', ['hash' => $form->getHash(), 'view' => 'submit']);
-		$iconURL = $urlGenerator->getAbsoluteURL(($urlGenerator->imagePath(Application::APP_ID, 'forms-dark.svg')));
+		$formURL = $urlGenerator->getAbsoluteURL($urlGenerator->linkToRoute('forms.page.views', ['hash' => $form->getHash(), 'view' => 'submit']));
+		$iconURL = $urlGenerator->getAbsoluteURL($urlGenerator->imagePath(Application::APP_ID, 'forms-dark.svg'));
 		parent::__construct($iconURL, $form->getTitle(), $form->getDescription(), $formURL, 'icon-forms');
 	}
 }
