@@ -7,9 +7,9 @@
 	<NcListItem
 		:active="isActive"
 		:actions-aria-label="t('forms', 'Form actions')"
-		:counter-number="form.submissionCount"
+		:counterNumber="form.submissionCount"
 		compact
-		:force-display-actions="forceDisplayActions"
+		:forceDisplayActions="forceDisplayActions"
 		:name="formTitle"
 		:to="{
 			name: routerTarget,
@@ -29,9 +29,8 @@
 			#actions>
 			<NcActionRouter
 				v-if="!isArchived && canEdit"
-				close-after-click
+				closeAfterClick
 				:disabled="isFormLocked"
-				exact
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -41,7 +40,7 @@
 			</NcActionRouter>
 			<NcActionButton
 				v-if="!isArchived && !readOnly"
-				close-after-click
+				closeAfterClick
 				@click="onShareForm">
 				<template #icon>
 					<IconShareVariant :size="20" />
@@ -50,8 +49,7 @@
 			</NcActionButton>
 			<NcActionRouter
 				v-if="canSeeResults"
-				close-after-click
-				exact
+				closeAfterClick
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
@@ -59,7 +57,7 @@
 				</template>
 				{{ t('forms', 'Results') }}
 			</NcActionRouter>
-			<NcActionButton v-if="canEdit" close-after-click @click="onCloneForm">
+			<NcActionButton v-if="canEdit" closeAfterClick @click="onCloneForm">
 				<template #icon>
 					<IconContentCopy :size="20" />
 				</template>
@@ -68,7 +66,7 @@
 			<NcActionSeparator v-if="canEdit && !readOnly" />
 			<NcActionButton
 				v-if="canEdit && !readOnly"
-				close-after-click
+				closeAfterClick
 				:disabled="isFormLocked"
 				@click="onToggleArchive">
 				<template #icon>
@@ -83,7 +81,7 @@
 			</NcActionButton>
 			<NcActionButton
 				v-if="canEdit && !readOnly"
-				close-after-click
+				closeAfterClick
 				:disabled="isFormLocked"
 				@click="showDeleteDialog = true">
 				<template #icon>
@@ -92,7 +90,7 @@
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
 			<NcDialog
-				:open.sync="showDeleteDialog"
+				v-model:open="showDeleteDialog"
 				:name="t('forms', 'Delete form')"
 				:message="
 					t('forms', 'Are you sure you want to delete {title}?', {
@@ -171,13 +169,7 @@ export default {
 		},
 	},
 
-	emits: [
-		'mobile-close-navigation',
-		'open-sharing',
-		'clone',
-		'update-form-state',
-		'delete',
-	],
+	emits: ['mobileCloseNavigation', 'openSharing', 'clone', 'delete'],
 
 	data() {
 		return {
@@ -301,11 +293,11 @@ export default {
 		 * Closes the App-Navigation on mobile-devices
 		 */
 		mobileCloseNavigation() {
-			this.$emit('mobile-close-navigation')
+			this.$emit('mobileCloseNavigation')
 		},
 
 		onShareForm() {
-			this.$emit('open-sharing', this.form.hash)
+			this.$emit('openSharing', this.form.hash)
 		},
 
 		onCloneForm() {
@@ -327,11 +319,10 @@ export default {
 						},
 					},
 				)
-				this.$set(
-					this.form,
-					'state',
-					this.isArchived ? FormState.FormClosed : FormState.FormArchived,
-				)
+				// eslint-disable-next-line vue/no-mutating-props
+				this.form.state = this.isArchived
+					? FormState.FormClosed
+					: FormState.FormArchived
 			} catch (error) {
 				logger.error('Error changing archived state of form', {
 					error,

@@ -11,7 +11,7 @@
 				v-model="appConfig.restrictCreation"
 				class="forms-settings__creation__switch"
 				type="switch"
-				@update:model-value="onRestrictCreationChange">
+				@update:modelValue="onRestrictCreationChange">
 				{{ t('forms', 'Restrict form creation to selected groups') }}
 			</NcCheckboxRadioSwitch>
 			<NcSelect
@@ -29,21 +29,21 @@
 				ref="switchAllowPublicLink"
 				v-model="appConfig.allowPublicLink"
 				type="switch"
-				@update:model-value="onAllowPublicLinkChange">
+				@update:modelValue="onAllowPublicLinkChange">
 				{{ t('forms', 'Allow sharing by link') }}
 			</NcCheckboxRadioSwitch>
 			<NcCheckboxRadioSwitch
 				ref="switchAllowPermitAll"
 				v-model="appConfig.allowPermitAll"
 				type="switch"
-				@update:model-value="onAllowPermitAllChange">
+				@update:modelValue="onAllowPermitAllChange">
 				{{ t('forms', 'Allow sharing to all logged in accounts') }}
 			</NcCheckboxRadioSwitch>
 			<NcCheckboxRadioSwitch
 				ref="switchAllowShowToAll"
 				v-model="appConfig.allowShowToAll"
 				type="switch"
-				@update:model-value="onAllowShowToAllChange">
+				@update:modelValue="onAllowShowToAllChange">
 				{{
 					t(
 						'forms',

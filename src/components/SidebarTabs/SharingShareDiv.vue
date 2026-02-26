@@ -7,9 +7,9 @@
 	<li class="share-div">
 		<NcAvatar
 			:user="share.shareWith"
-			disable-menu
-			:display-name="displayName"
-			:is-no-user="isNoUser" />
+			disableMenu
+			:displayName="displayName"
+			:isNoUser="isNoUser" />
 		<div class="share-div__desc">
 			<span>{{ displayName }}</span>
 			<span>{{ displayNameAppendix }}</span>
@@ -17,21 +17,21 @@
 		<NcActions class="share-div__actions">
 			<NcActionCaption :name="t('forms', 'Permissions')" />
 			<NcActionCheckbox
-				:model-value="canEditForm"
+				:modelValue="canEditForm"
 				:disabled="locked"
-				@update:model-value="updatePermissionEdit">
+				@update:modelValue="updatePermissionEdit">
 				{{ t('forms', 'Edit form') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
-				:model-value="canAccessResults"
+				:modelValue="canAccessResults"
 				:disabled="locked"
-				@update:model-value="updatePermissionResults">
+				@update:modelValue="updatePermissionResults">
 				{{ t('forms', 'View responses') }}
 			</NcActionCheckbox>
 			<NcActionCheckbox
-				:model-value="canDeleteResults"
+				:modelValue="canDeleteResults"
 				:disabled="!canAccessResults || locked"
-				@update:model-value="updatePermissionDeleteResults">
+				@update:modelValue="updatePermissionDeleteResults">
 				{{ t('forms', 'Delete responses') }}
 			</NcActionCheckbox>
 			<NcActionSeparator />
@@ -81,7 +81,7 @@ export default {
 		},
 	},
 
-	emits: ['remove-share', 'update:share'],
+	emits: ['removeShare', 'update:share'],
 
 	computed: {
 		canAccessResults() {
@@ -126,7 +126,7 @@ export default {
 
 	methods: {
 		removeShare() {
-			this.$emit('remove-share', this.share)
+			this.$emit('removeShare', this.share)
 		},
 
 		/**

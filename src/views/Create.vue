@@ -5,7 +5,7 @@
 
 <template>
 	<NcAppContent
-		:page-heading="
+		:pageHeading="
 			form.title ? t('forms', 'Edit form') : t('forms', 'Create form')
 		">
 		<!-- Show results & sidebar button -->
@@ -13,9 +13,9 @@
 			:archived="isFormArchived"
 			:locked="isFormLocked"
 			:permissions="form?.permissions"
-			:sidebar-opened="sidebarOpened"
-			:submission-count="form?.submissionCount"
-			@share-form="onShareForm" />
+			:sidebarOpened="sidebarOpened"
+			:submissionCount="form?.submissionCount"
+			@shareForm="onShareForm" />
 
 		<NcEmptyContent
 			v-if="isLoadingForm"
@@ -117,40 +117,38 @@
 				<Draggable
 					v-model="form.questions"
 					:animation="200"
-					tag="ul"
+					tag="transition-group"
+					:componentData="{
+						name: isDragging
+							? 'no-external-transition-on-drag'
+							: 'question-list',
+					}"
 					handle=".question__drag-handle"
 					@change="onQuestionOrderChange"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<transition-group
-						:name="
-							isDragging
-								? 'no-external-transition-on-drag'
-								: 'question-list'
-						">
+					<template #item="{ element: question, index }">
 						<component
 							:is="answerTypes[question.type].component"
-							v-for="(question, index) in form.questions"
 							ref="questions"
-							:key="question.id"
-							:can-move-down="index < form.questions.length - 1"
-							:can-move-up="index > 0"
-							:answer-type="answerTypes[question.type]"
+							v-model="form.questions[index]"
+							:canMoveDown="index < form.questions.length - 1"
+							:canMoveUp="index > 0"
+							:answerType="answerTypes[question.type]"
 							:index="index + 1"
-							:max-string-lengths="maxStringLengths"
-							v-bind.sync="form.questions[index]"
+							:maxStringLengths="maxStringLengths"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
-							@move-down="onMoveDown(index)"
-							@move-up="onMoveUp(index)" />
-					</transition-group>
+							@moveDown="onMoveDown(index)"
+							@moveUp="onMoveUp(index)" />
+					</template>
 				</Draggable>
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
 					<NcActions
-						:open.sync="questionMenuOpened"
-						:menu-name="t('forms', 'Add a question')"
+						v-model:open="questionMenuOpened"
+						:menuName="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
 						primary>
 						<template #icon>
@@ -162,9 +160,9 @@
 							<NcActionButton
 								v-for="(answer, type) in answerTypesFilter"
 								:key="answer.label"
-								:close-after-click="!hasSubtypes(answer)"
+								:closeAfterClick="!hasSubtypes(answer)"
 								:disabled="isLoadingQuestions"
-								:is-menu="hasSubtypes(answer)"
+								:isMenu="hasSubtypes(answer)"
 								class="question-menu__question"
 								@click="
 									hasSubtypes(answer)
@@ -195,7 +193,7 @@
 									activeQuestionType
 								].subtypes"
 								:key="'subtype-' + answer.label"
-								close-after-click
+								closeAfterClick
 								:disabled="isLoadingQuestions"
 								class="question-menu__question"
 								@click="addQuestion(activeQuestionType, type)">

@@ -5,7 +5,7 @@
 
 <template>
 	<NcDialog
-		content-classes="archived-forms"
+		contentClasses="archived-forms"
 		:name="t('forms', 'Archived forms')"
 		:open="open"
 		size="normal"
@@ -15,10 +15,10 @@
 				v-for="(form, key) in shownForms"
 				:key="key"
 				:form="form"
-				force-display-actions
+				forceDisplayActions
 				@clone="onCloneForm(form.id)"
 				@delete="onDelete(form)"
-				@mobile-close-navigation="$emit('update:open', false)" />
+				@mobileCloseNavigation="$emit('update:open', false)" />
 		</ul>
 	</NcDialog>
 </template>

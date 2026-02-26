@@ -4,13 +4,13 @@
 -->
 
 <template>
-	<NcContent app-name="forms" :class="{ 'app-forms-embedded': isEmbedded }">
+	<NcContent appName="forms" :class="{ 'app-forms-embedded': isEmbedded }">
 		<Submit
 			:form="form"
-			public-view
-			:share-hash="shareHash"
-			:is-logged-in="isLoggedIn"
-			:sidebar-opened="false" />
+			publicView
+			:shareHash="shareHash"
+			:isLoggedIn="isLoggedIn"
+			:sidebarOpened="false" />
 	</NcContent>
 </template>
 

@@ -18,10 +18,10 @@
 		</NcButton>
 
 		<NcDialog
-			:open.sync="showModal"
-			content-classes="modal-content"
+			v-model:open="showModal"
+			contentClasses="modal-content"
 			:name="t('forms', 'Transfer ownership')"
-			out-transition
+			outTransition
 			@close="closeModal">
 			<template #default>
 				<!-- eslint-disable vue/no-v-html -->
