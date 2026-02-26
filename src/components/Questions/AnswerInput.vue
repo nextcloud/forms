@@ -21,7 +21,7 @@
 			dir="auto"
 			@input="debounceOnInput"
 			@keydown.delete="deleteEntry"
-			@keydown.enter.prevent="focusNextInput"
+			@keydown.enter.prevent="onEnter"
 			@compositionstart="onCompositionStart"
 			@compositionend="onCompositionEnd" />
 
@@ -61,6 +61,17 @@
 				@click="deleteEntry">
 				<template #icon>
 					<IconDelete :size="20" />
+				</template>
+			</NcButton>
+		</div>
+		<div v-else class="option__actions">
+			<NcButton
+				:aria-label="t('forms', 'Add a new answer option')"
+				variant="tertiary"
+				:disabled="isIMEComposing || !canCreateLocalAnswer"
+				@click="createLocalAnswer">
+				<template #icon>
+					<IconPlus :size="20" />
 				</template>
 			</NcButton>
 		</div>
@@ -167,6 +178,10 @@ export default {
 	},
 
 	computed: {
+		canCreateLocalAnswer() {
+			return !!this.$refs.input?.value?.trim()
+		},
+
 		ariaLabel() {
 			if (this.answer.local) {
 				if (this.optionType === OptionType.Column) {
@@ -266,30 +281,55 @@ export default {
 		 * @param {InputEvent} event The input event that triggered adding a new entry
 		 */
 		async onInput({ target, isComposing }) {
+			if (this.answer.local) {
+				this.$set(this.answer, 'text', target.value)
+				return
+			}
+
 			if (!isComposing && !this.isIMEComposing && target.value !== '') {
 				// clone answer
 				const answer = { ...this.answer }
 				answer.text = this.$refs.input.value
 
-				if (this.answer.local) {
-					// Dispatched for creation. Marked as synced
-					this.$set(this.answer, 'local', false)
-					const newAnswer = await this.createAnswer(answer)
+				await this.updateAnswer(answer)
 
-					// Forward changes, but use current answer.text to avoid erasing
-					// any in-between changes while creating the answer
-					newAnswer.text = this.$refs.input.value
-
-					this.$emit('create-answer', this.index, newAnswer)
-				} else {
-					await this.updateAnswer(answer)
-
-					// Forward changes, but use current answer.text to avoid erasing
-					// any in-between changes while updating the answer
-					answer.text = this.$refs.input.value
-					this.$emit('update:answer', this.index, answer)
-				}
+				// Forward changes, but use current answer.text to avoid erasing
+				// any in-between changes while updating the answer
+				answer.text = this.$refs.input.value
+				this.$emit('update:answer', this.index, answer)
 			}
+		},
+
+		onEnter(e) {
+			if (this.answer.local) {
+				this.createLocalAnswer(e)
+				return
+			}
+			this.focusNextInput(e)
+		},
+
+		async createLocalAnswer(e) {
+			if (this.isIMEComposing || e?.isComposing) {
+				return
+			}
+
+			const value = this.$refs.input?.value ?? ''
+			if (!value.trim()) {
+				return
+			}
+
+			const answer = { ...this.answer }
+			answer.text = value
+
+			// Dispatched for creation. Marked as synced
+			this.$set(this.answer, 'local', false)
+			const newAnswer = await this.createAnswer(answer)
+
+			// Forward changes, but use current answer.text to avoid erasing
+			// any in-between changes while creating the answer
+			newAnswer.text = this.$refs.input.value
+
+			this.$emit('create-answer', this.index, newAnswer)
 		},
 
 		/**

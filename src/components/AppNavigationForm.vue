@@ -4,7 +4,8 @@
 -->
 
 <template>
-	<NcListItem
+	<div>
+		<NcListItem
 		:active="isActive"
 		:actions-aria-label="t('forms', 'Form actions')"
 		:counter-number="form.submissionCount"
@@ -91,17 +92,18 @@
 				</template>
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
-			<NcDialog
-				:open.sync="showDeleteDialog"
-				:name="t('forms', 'Delete form')"
-				:message="
-					t('forms', 'Are you sure you want to delete {title}?', {
-						title: formTitle,
-					})
-				"
-				:buttons="buttons" />
 		</template>
-	</NcListItem>
+		</NcListItem>
+		<NcDialog
+			:open.sync="showDeleteDialog"
+			:name="t('forms', 'Delete form')"
+			:message="
+				t('forms', 'Are you sure you want to delete {title}?', {
+					title: formTitle,
+				})
+			"
+			:buttons="buttons" />
+	</div>
 </template>
 
 <script>
