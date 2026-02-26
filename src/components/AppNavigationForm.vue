@@ -6,93 +6,96 @@
 <template>
 	<div>
 		<NcListItem
-		:active="isActive"
-		:actions-aria-label="t('forms', 'Form actions')"
-		:counter-number="form.submissionCount"
-		compact
-		:force-display-actions="forceDisplayActions"
-		:name="formTitle"
-		:to="{
-			name: routerTarget,
-			params: { hash: form.hash },
-		}"
-		@click="mobileCloseNavigation">
-		<template #icon>
-			<NcLoadingIcon v-if="loading" :size="16" />
-			<IconCheck v-else-if="isExpired" :size="16" />
-			<FormsIcon v-else :size="16" />
-		</template>
-		<template v-if="hasSubtitle" #subname>
-			{{ formSubtitle }}
-		</template>
-		<template
-			v-if="!loading && (!readOnly || canEdit || canSeeResults)"
-			#actions>
-			<NcActionRouter
-				v-if="!isArchived && canEdit"
-				close-after-click
-				:disabled="isFormLocked"
-				exact
-				:to="{ name: 'edit', params: { hash: form.hash } }"
-				@click="mobileCloseNavigation">
-				<template #icon>
-					<IconPencil :size="20" />
-				</template>
-				{{ t('forms', 'Edit form') }}
-			</NcActionRouter>
-			<NcActionButton
-				v-if="!isArchived && !readOnly"
-				close-after-click
-				@click="onShareForm">
-				<template #icon>
-					<IconShareVariant :size="20" />
-				</template>
-				{{ t('forms', 'Share form') }}
-			</NcActionButton>
-			<NcActionRouter
-				v-if="canSeeResults"
-				close-after-click
-				exact
-				:to="{ name: 'results', params: { hash: form.hash } }"
-				@click="mobileCloseNavigation">
-				<template #icon>
-					<IconPoll :size="20" />
-				</template>
-				{{ t('forms', 'Results') }}
-			</NcActionRouter>
-			<NcActionButton v-if="canEdit" close-after-click @click="onCloneForm">
-				<template #icon>
-					<IconContentCopy :size="20" />
-				</template>
-				{{ t('forms', 'Copy form') }}
-			</NcActionButton>
-			<NcActionSeparator v-if="canEdit && !readOnly" />
-			<NcActionButton
-				v-if="canEdit && !readOnly"
-				close-after-click
-				:disabled="isFormLocked"
-				@click="onToggleArchive">
-				<template #icon>
-					<IconArchiveOff v-if="isArchived" :size="20" />
-					<IconArchive v-else :size="20" />
-				</template>
-				{{
-					isArchived
-						? t('forms', 'Unarchive form')
-						: t('forms', 'Archive form')
-				}}
-			</NcActionButton>
-			<NcActionButton
-				v-if="canEdit && !readOnly"
-				close-after-click
-				:disabled="isFormLocked"
-				@click="showDeleteDialog = true">
-				<template #icon>
-					<IconDelete :size="20" />
-				</template>
-				{{ t('forms', 'Delete form') }}
-			</NcActionButton>
-		</template>
+			:active="isActive"
+			:actions-aria-label="t('forms', 'Form actions')"
+			:counter-number="form.submissionCount"
+			compact
+			:force-display-actions="forceDisplayActions"
+			:name="formTitle"
+			:to="{
+				name: routerTarget,
+				params: { hash: form.hash },
+			}"
+			@click="mobileCloseNavigation">
+			<template #icon>
+				<NcLoadingIcon v-if="loading" :size="16" />
+				<IconCheck v-else-if="isExpired" :size="16" />
+				<FormsIcon v-else :size="16" />
+			</template>
+			<template v-if="hasSubtitle" #subname>
+				{{ formSubtitle }}
+			</template>
+			<template
+				v-if="!loading && (!readOnly || canEdit || canSeeResults)"
+				#actions>
+				<NcActionRouter
+					v-if="!isArchived && canEdit"
+					close-after-click
+					:disabled="isFormLocked"
+					exact
+					:to="{ name: 'edit', params: { hash: form.hash } }"
+					@click="mobileCloseNavigation">
+					<template #icon>
+						<IconPencil :size="20" />
+					</template>
+					{{ t('forms', 'Edit form') }}
+				</NcActionRouter>
+				<NcActionButton
+					v-if="!isArchived && !readOnly"
+					close-after-click
+					@click="onShareForm">
+					<template #icon>
+						<IconShareVariant :size="20" />
+					</template>
+					{{ t('forms', 'Share form') }}
+				</NcActionButton>
+				<NcActionRouter
+					v-if="canSeeResults"
+					close-after-click
+					exact
+					:to="{ name: 'results', params: { hash: form.hash } }"
+					@click="mobileCloseNavigation">
+					<template #icon>
+						<IconPoll :size="20" />
+					</template>
+					{{ t('forms', 'Results') }}
+				</NcActionRouter>
+				<NcActionButton
+					v-if="canEdit"
+					close-after-click
+					@click="onCloneForm">
+					<template #icon>
+						<IconContentCopy :size="20" />
+					</template>
+					{{ t('forms', 'Copy form') }}
+				</NcActionButton>
+				<NcActionSeparator v-if="canEdit && !readOnly" />
+				<NcActionButton
+					v-if="canEdit && !readOnly"
+					close-after-click
+					:disabled="isFormLocked"
+					@click="onToggleArchive">
+					<template #icon>
+						<IconArchiveOff v-if="isArchived" :size="20" />
+						<IconArchive v-else :size="20" />
+					</template>
+					{{
+						isArchived
+							? t('forms', 'Unarchive form')
+							: t('forms', 'Archive form')
+					}}
+				</NcActionButton>
+				<NcActionButton
+					v-if="canEdit && !readOnly"
+					close-after-click
+					:disabled="isFormLocked"
+					@click="showDeleteDialog = true">
+					<template #icon>
+						<IconDelete :size="20" />
+					</template>
+					{{ t('forms', 'Delete form') }}
+				</NcActionButton>
+			</template>
 		</NcListItem>
 		<NcDialog
 			:open.sync="showDeleteDialog"

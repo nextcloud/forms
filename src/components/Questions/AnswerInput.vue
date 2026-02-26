@@ -109,6 +109,7 @@ export default {
 		IconCheckboxBlankOutline,
 		IconDelete,
 		IconDragIndicator,
+		IconPlus,
 		IconRadioboxBlank,
 		IconTableColumn,
 		IconTableRow,

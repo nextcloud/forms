@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test(
-	'IME input does not trigger new option',
+	'IME input requires explicit intent to create new option',
 	{
 		annotation: {
 			type: 'issue',
@@ -75,7 +75,12 @@ test(
 		await client.send('Input.insertText', {
 			text: 'さ',
 		})
-		// so there were 4 inputs but those should only result in one new option
+		// Committing composition text alone must not create a new option.
+		await expect(question.answerInputs).toHaveCount(0)
+		await expect(question.newAnswerInput).toHaveValue('さ')
+
+		// Explicit intent (Enter) creates exactly one option.
+		await question.newAnswerInput.press('Enter')
 		await expect(question.answerInputs).toHaveCount(1)
 		await expect(question.answerInputs).toHaveValue('さ')
 	},
