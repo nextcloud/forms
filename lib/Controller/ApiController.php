@@ -192,9 +192,19 @@ class ApiController extends OCSController {
 			unset($formData['fileFormat']);
 			unset($formData['lockedBy']);
 			unset($formData['lockedUntil']);
+			$formData['ownerId'] = $this->currentUser->getUID();
 			$formData['hash'] = $this->formsService->generateFormHash();
 			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
 			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
+			$formData['access'] = [
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			];
+			$formData['submitMultiple'] = false;
+			$formData['allowEditSubmissions'] = false;
+			$formData['showExpiration'] = false;
+			$formData['expires'] = 0;
+			$formData['isAnonymous'] = false;
 
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
