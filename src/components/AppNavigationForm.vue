@@ -85,36 +85,25 @@
 				v-if="canEdit && !readOnly"
 				close-after-click
 				:disabled="isFormLocked"
-				@click="showDeleteDialog = true">
+				@click="onConfirmDelete">
 				<template #icon>
 					<IconDelete :size="20" />
 				</template>
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
-			<NcDialog
-				:open.sync="showDeleteDialog"
-				:name="t('forms', 'Delete form')"
-				:message="
-					t('forms', 'Are you sure you want to delete {title}?', {
-						title: formTitle,
-					})
-				"
-				:buttons="buttons" />
 		</template>
 	</NcListItem>
 </template>
 
 <script>
-import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
-import { showError } from '@nextcloud/dialogs'
+import { DialogSeverity, getDialogBuilder, showError } from '@nextcloud/dialogs'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
-import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import IconArchiveOff from 'vue-material-design-icons/ArchiveOffOutline.vue'
@@ -146,7 +135,6 @@ export default {
 		NcActionButton,
 		NcActionRouter,
 		NcActionSeparator,
-		NcDialog,
 		NcListItem,
 		NcLoadingIcon,
 	},
@@ -182,17 +170,6 @@ export default {
 	data() {
 		return {
 			loading: false,
-			showDeleteDialog: false,
-			buttons: [
-				{
-					label: t('forms', 'Delete form'),
-					icon: IconDeleteSvg,
-					type: 'error',
-					callback: () => {
-						this.onDeleteForm()
-					},
-				},
-			],
 		}
 	},
 
@@ -310,6 +287,33 @@ export default {
 
 		onCloneForm() {
 			this.$emit('clone', this.form.id)
+		},
+
+		async onConfirmDelete() {
+			const dialog = getDialogBuilder(t('forms', 'Delete form'))
+				.setText(
+					t('forms', 'Are you sure you want to delete {title}?', {
+						title: this.formTitle,
+					}),
+				)
+				.setSeverity(DialogSeverity.Error)
+				.setButtons([
+					{
+						label: t('forms', 'Cancel'),
+						callback: () => {},
+						variant: 'secondary',
+					},
+					{
+						label: t('forms', 'Delete form'),
+						callback: () => {
+							this.onDeleteForm()
+						},
+						variant: 'error',
+					},
+				])
+				.build()
+
+			await dialog.show()
 		},
 
 		async onToggleArchive() {
