@@ -50,6 +50,7 @@
 						:form="form"
 						read-only
 						@open-sharing="openSharing"
+						@clone="onCloneForm"
 						@mobile-close-navigation="mobileCloseNavigation" />
 				</ul>
 			</template>
