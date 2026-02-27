@@ -283,6 +283,7 @@ import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { FileType } from '@nextcloud/files'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { useIsSmallMobile } from '@nextcloud/vue'
@@ -861,55 +862,58 @@ export default {
 			)
 				.setMultiSelect(false)
 				.allowDirectories(true)
-				.setButtonFactory((selectedNodes) => {
-					if (selectedNodes.length === 1) {
-						const extension = selectedNodes[0].extension
-							?.slice(1)
-							?.toLowerCase()
-						if (!extension) {
-							return [
-								{
-									label: t('forms', 'Create XLSX'),
-									icon: IconFileExcelOutlineSvg,
-									callback() {
-										fileFormat = 'xlsx'
-									},
-									type: 'secondary',
-								},
-								{
-									label: t('forms', 'Create CSV'),
-									icon: IconFileDelimitedSvg,
-									callback() {
-										fileFormat = 'csv'
-									},
-									type: 'secondary',
-								},
-								{
-									label: t('forms', 'Create ODS'),
-									icon: IconTableSvg,
-									callback() {
-										fileFormat = 'ods'
-									},
-									type: 'primary',
-								},
-							]
-						} else if (SUPPORTED_FILE_FORMATS[extension]) {
-							return [
-								{
-									label: t('forms', 'Select {file}', {
-										file: selectedNodes[0].basename,
-									}),
-									icon: SUPPORTED_FILE_FORMATS[extension],
-									callback() {
-										fileFormat = extension
-									},
-									type: 'primary',
-								},
-							]
-						}
+				.setCanPick((file) => {
+					if (file.type === FileType.Folder) {
+						return true
 					}
 
-					return []
+					const extension = file.extension?.slice(1).toLowerCase()
+					return !!extension && extension in SUPPORTED_FILE_FORMATS
+				})
+				.setButtonFactory((selectedNodes) => {
+					const [node] = selectedNodes
+					if (node && node.type === FileType.File) {
+						return [
+							{
+								label: t('forms', 'Select {file}', {
+									file: selectedNodes[0].basename,
+								}),
+								icon: SUPPORTED_FILE_FORMATS[extension],
+								callback() {
+									fileFormat = extension
+								},
+								variant: 'primary',
+							},
+						]
+					}
+
+					// no node selected (pick current folder) or folder selected
+					return [
+						{
+							label: t('forms', 'Create XLSX'),
+							icon: IconFileExcelOutlineSvg,
+							callback() {
+								fileFormat = 'xlsx'
+							},
+							variant: 'secondary',
+						},
+						{
+							label: t('forms', 'Create CSV'),
+							icon: IconFileDelimitedSvg,
+							callback() {
+								fileFormat = 'csv'
+							},
+							variant: 'secondary',
+						},
+						{
+							label: t('forms', 'Create ODS'),
+							icon: IconTableSvg,
+							callback() {
+								fileFormat = 'ods'
+							},
+							variant: 'primary',
+						},
+					]
 				})
 				.build()
 

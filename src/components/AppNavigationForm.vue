@@ -98,7 +98,7 @@
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
-import { DialogSeverity, getDialogBuilder, showError } from '@nextcloud/dialogs'
+import { showConfirmation, showError } from '@nextcloud/dialogs'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -290,30 +290,18 @@ export default {
 		},
 
 		async onConfirmDelete() {
-			const dialog = getDialogBuilder(t('forms', 'Delete form'))
-				.setText(
-					t('forms', 'Are you sure you want to delete {title}?', {
-						title: this.formTitle,
-					}),
-				)
-				.setSeverity(DialogSeverity.Error)
-				.setButtons([
-					{
-						label: t('forms', 'Cancel'),
-						callback: () => {},
-						variant: 'secondary',
-					},
-					{
-						label: t('forms', 'Delete form'),
-						callback: () => {
-							this.onDeleteForm()
-						},
-						variant: 'error',
-					},
-				])
-				.build()
+			const shouldDelete = await showConfirmation({
+				name: t('forms', 'Delete form'),
+				text: t('forms', 'Are you sure you want to delete {title}?', {
+					title: this.formTitle,
+				}),
+				labelConfirm: t('forms', 'Delete form'),
+				labelReject: t('forms', 'Cancel'),
+			})
 
-			await dialog.show()
+			if (shouldDelete) {
+				await this.onDeleteForm()
+			}
 		},
 
 		async onToggleArchive() {
