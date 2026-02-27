@@ -68,7 +68,7 @@
 			<NcButton
 				:aria-label="t('forms', 'Add a new answer option')"
 				variant="tertiary"
-				:disabled="isIMEComposing || !canCreateLocalAnswer"
+				:disabled="isIMEComposing"
 				@click="createLocalAnswer">
 				<template #icon>
 					<IconPlus :size="20" />
@@ -301,6 +301,11 @@ export default {
 			}
 		},
 
+		/**
+		 * Handle Enter key: create local answer or move focus
+		 *
+		 * @param {KeyboardEvent} e the keydown event
+		 */
 		onEnter(e) {
 			if (this.answer.local) {
 				this.createLocalAnswer(e)
@@ -309,6 +314,11 @@ export default {
 			this.focusNextInput(e)
 		},
 
+		/**
+		 * Create a new local answer option from the current input
+		 *
+		 * @param {Event} e the triggering event
+		 */
 		async createLocalAnswer(e) {
 			if (this.isIMEComposing || e?.isComposing) {
 				return
