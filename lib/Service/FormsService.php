@@ -9,6 +9,7 @@ namespace OCA\Forms\Service;
 
 use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
@@ -34,6 +35,7 @@ use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Mail\IMailer;
 use OCP\Search\ISearchQuery;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
@@ -67,6 +69,8 @@ class FormsService {
 		private IL10N $l10n,
 		private LoggerInterface $logger,
 		private IEventDispatcher $eventDispatcher,
+		private IMailer $mailer,
+		private AnswerMapper $answerMapper,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -735,6 +739,151 @@ class FormsService {
 		}
 
 		$this->eventDispatcher->dispatchTyped(new FormSubmittedEvent($form, $submission));
+
+		// Send confirmation email if enabled
+		$this->sendConfirmationEmail($form, $submission);
+	}
+
+	/**
+	 * Send confirmation email to the respondent
+	 *
+	 * @param Form $form The form that was submitted
+	 * @param Submission $submission The submission
+	 */
+	private function sendConfirmationEmail(Form $form, Submission $submission): void {
+		// Check if confirmation email is enabled
+		if (!$form->getConfirmationEmailEnabled()) {
+			return;
+		}
+
+		$subject = $form->getConfirmationEmailSubject();
+		$body = $form->getConfirmationEmailBody();
+
+		// If no subject or body is set, use defaults
+		if (empty($subject)) {
+			$subject = $this->l10n->t('Thank you for your submission');
+		}
+		if (empty($body)) {
+			$body = $this->l10n->t('Thank you for submitting the form "%s".', [$form->getTitle()]);
+		}
+
+		// Get questions and answers
+		$questions = $this->getQuestions($form->getId());
+		$answers = $this->answerMapper->findBySubmission($submission->getId());
+
+		// Build a map of question IDs to questions and answers
+		$questionMap = [];
+		foreach ($questions as $question) {
+			$questionMap[$question['id']] = $question;
+		}
+
+		$answerMap = [];
+		foreach ($answers as $answer) {
+			$questionId = $answer->getQuestionId();
+			if (!isset($answerMap[$questionId])) {
+				$answerMap[$questionId] = [];
+			}
+			$answerMap[$questionId][] = $answer->getText();
+		}
+
+		// Find email address from answers
+		$recipientEmails = [];
+		foreach ($questions as $question) {
+			if ($question['type'] !== Constants::ANSWER_TYPE_SHORT) {
+				continue;
+			}
+
+			$extraSettings = (array)($question['extraSettings'] ?? []);
+			$validationType = $extraSettings['validationType'] ?? null;
+			if ($validationType !== 'email') {
+				continue;
+			}
+
+			$questionId = $question['id'];
+			if (empty($answerMap[$questionId])) {
+				continue;
+			}
+
+			$emailValue = $answerMap[$questionId][0];
+			if ($this->mailer->validateMailAddress($emailValue)) {
+				$recipientEmails[] = $emailValue;
+			}
+		}
+
+		// If no email found, cannot send confirmation
+		if (empty($recipientEmails)) {
+			$this->logger->debug('No valid email address found in submission for confirmation email', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+			]);
+			return;
+		}
+
+		if (count($recipientEmails) > 1) {
+			$this->logger->debug('Multiple email fields found in submission for confirmation email, using first match', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+				'emailCount' => count($recipientEmails),
+			]);
+		}
+
+		$recipientEmail = $recipientEmails[0];
+
+		// Replace placeholders in subject and body
+		$replacements = [
+			'{formTitle}' => $form->getTitle(),
+			'{formDescription}' => $form->getDescription() ?? '',
+		];
+
+		// Add field placeholders (e.g., {name}, {email})
+		foreach ($questions as $question) {
+			$questionId = $question['id'];
+			$questionName = $question['name'] ?? '';
+			$questionText = $question['text'] ?? '';
+
+			// Use question name if available, otherwise use text
+			$fieldKey = !empty($questionName) ? $questionName : $questionText;
+			// Sanitize field key for placeholder (remove special chars, lowercase)
+			$fieldKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fieldKey));
+
+			if (!empty($answerMap[$questionId])) {
+				$answerValue = implode('; ', $answerMap[$questionId]);
+				$replacements['{' . $fieldKey . '}'] = $answerValue;
+				// Also support {questionName} format
+				if (!empty($questionName)) {
+					$replacements['{' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $questionName)) . '}'] = $answerValue;
+				}
+			}
+		}
+
+		// Apply replacements
+		$subject = str_replace(array_keys($replacements), array_values($replacements), $subject);
+		$body = str_replace(array_keys($replacements), array_values($replacements), $body);
+
+		try {
+			$message = $this->mailer->createMessage();
+			$message->setSubject($subject);
+			$message->setPlainBody($body);
+			$message->setTo([$recipientEmail]);
+
+			$this->mailer->send($message);
+			$this->logger->debug('Confirmation email sent successfully', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+				'recipient' => $recipientEmail,
+			]);
+		} catch (\Exception $e) {
+			// Handle exceptions silently, as this is not critical.
+			// We don't want to break the submission process just because of an email error.
+			$this->logger->error(
+				'Error while sending confirmation email',
+				[
+					'exception' => $e,
+					'formId' => $form->getId(),
+					'submissionId' => $submission->getId(),
+				]
+			);
+		}
 	}
 
 	/**

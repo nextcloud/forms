@@ -21,6 +21,9 @@ This document describes the Object-Structure, that is used within the Forms App 
 | description          | String                               | max. 8192 ch.                           | The Form description                                                                                                             |
 | ownerId              | String                               |                                         | The nextcloud userId of the form owner                                                                                           |
 | submissionMessage    | String                               | max. 2048 ch.                           | Optional custom message, with Markdown support, to be shown to users when the form is submitted (default is used if set to null) |
+| confirmationEmailEnabled | Boolean                          |                                         | If enabled, send a confirmation email to the respondent after submission                                                         |
+| confirmationEmailSubject | String                           | max. 255 ch.                            | Optional confirmation email subject template (supports placeholders)                                                              |
+| confirmationEmailBody    | String                           |                                         | Optional confirmation email body template (plain text, supports placeholders)                                                    |
 | created              | unix timestamp                       |                                         | When the form has been created                                                                                                   |
 | access               | [Access-Object](#access-object)      |                                         | Describing access-settings of the form                                                                                           |
 | expires              | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
@@ -46,6 +49,9 @@ This document describes the Object-Structure, that is used within the Forms App 
   "title": "Form 1",
   "description": "Description Text",
   "ownerId": "jonas",
+  "confirmationEmailEnabled": false,
+  "confirmationEmailSubject": null,
+  "confirmationEmailBody": null,
   "created": 1611240961,
   "access": {},
   "expires": 0,

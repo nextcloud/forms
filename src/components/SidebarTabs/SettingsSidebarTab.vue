@@ -168,6 +168,65 @@
 			</div>
 		</div>
 
+		<NcCheckboxRadioSwitch
+			:model-value="form.confirmationEmailEnabled"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onConfirmationEmailEnabledChange">
+			{{ t('forms', 'Send confirmation email to respondents') }}
+		</NcCheckboxRadioSwitch>
+		<div
+			v-show="form.confirmationEmailEnabled && !formArchived"
+			class="settings-div--indent confirmation-email">
+			<p class="confirmation-email__hint">
+				{{
+					t(
+						'forms',
+						'Requires an email field in the form. Available placeholders: {formTitle}, {formDescription}, and field names like {name}.',
+					)
+				}}
+			</p>
+			<NcNoteCard
+				v-if="form.confirmationEmailEnabled && emailQuestionCount === 0"
+				type="error"
+				:text="
+					t(
+						'forms',
+						'Add at least one email field to send confirmation emails.',
+					)
+				" />
+			<NcNoteCard
+				v-else-if="form.confirmationEmailEnabled && emailQuestionCount > 1"
+				type="info"
+				:text="
+					t(
+						'forms',
+						'Multiple email fields found. The first email field in the form order will be used.',
+					)
+				" />
+			<label class="confirmation-email__label">
+				{{ t('forms', 'Email subject') }}
+			</label>
+			<input
+				v-model="confirmationEmailSubject"
+				:disabled="locked"
+				:maxlength="255"
+				:placeholder="t('forms', 'Thank you for your submission')"
+				class="confirmation-email__input"
+				type="text"
+				@blur="onConfirmationEmailSubjectChange" />
+			<label class="confirmation-email__label">
+				{{ t('forms', 'Email body') }}
+			</label>
+			<textarea
+				:value="confirmationEmailBody"
+				:disabled="locked"
+				:placeholder="t('forms', 'Thank you for submitting the form.')"
+				class="confirmation-email__textarea"
+				@input="onConfirmationEmailBodyInput"
+				@blur="onConfirmationEmailBodyChange"></textarea>
+		</div>
+
 		<TransferOwnership
 			:locked="locked"
 			:is-owner="isCurrentUserOwner"
@@ -238,6 +297,8 @@ export default {
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
 			svgLockOpen,
+			confirmationEmailSubject: this.form?.confirmationEmailSubject || '',
+			confirmationEmailBody: this.form?.confirmationEmailBody || '',
 		}
 	},
 
@@ -315,6 +376,38 @@ export default {
 		 */
 		submissionMessageHTML() {
 			return this.$markdownit.render(this.form.submissionMessage || '')
+		},
+
+		/**
+		 * Placeholder text for email body
+		 */
+		emailBodyPlaceholder() {
+			return this.t(
+				'forms',
+				'Thank you for submitting the form "{formTitle}".',
+				{ formTitle: this.form.title || '' },
+			)
+		},
+
+		emailQuestionCount() {
+			const questions = this.form?.questions || []
+			return questions.filter(
+				(question) =>
+					question.type === 'short'
+					&& question.extraSettings?.validationType === 'email',
+			).length
+		},
+	},
+
+	watch: {
+		form: {
+			handler(newForm) {
+				this.confirmationEmailSubject =
+					newForm?.confirmationEmailSubject || ''
+				this.confirmationEmailBody = newForm?.confirmationEmailBody || ''
+			},
+
+			deep: true,
 		},
 	},
 
@@ -399,6 +492,26 @@ export default {
 			} else {
 				this.$emit('update:form-prop', 'submissionMessage', '')
 			}
+		},
+
+		onConfirmationEmailEnabledChange(checked) {
+			this.$emit('update:form-prop', 'confirmationEmailEnabled', checked)
+		},
+
+		onConfirmationEmailSubjectChange() {
+			this.$emit(
+				'update:form-prop',
+				'confirmationEmailSubject',
+				this.confirmationEmailSubject,
+			)
+		},
+
+		onConfirmationEmailBodyInput(event) {
+			this.confirmationEmailBody = event.target.value
+		},
+
+		onConfirmationEmailBodyChange({ target }) {
+			this.$emit('update:form-prop', 'confirmationEmailBody', target.value)
 		},
 
 		/**
@@ -493,6 +606,51 @@ export default {
 		}
 
 		@include markdown-output;
+	}
+}
+
+.confirmation-email {
+	&__hint {
+		color: var(--color-text-maxcontrast);
+		font-size: 13px;
+		margin-bottom: 12px;
+	}
+
+	&__label {
+		display: block;
+		margin-top: 12px;
+		margin-bottom: 4px;
+		font-weight: 600;
+	}
+
+	&__input {
+		width: 100%;
+		padding: 8px;
+		margin-bottom: 12px;
+		border: 2px solid var(--color-border-maxcontrast);
+		border-radius: var(--border-radius-large);
+		font-size: 14px;
+
+		&:focus {
+			outline: none;
+			border-color: var(--color-primary-element);
+		}
+	}
+
+	&__textarea {
+		width: 100%;
+		min-height: 120px;
+		padding: 8px;
+		border: 2px solid var(--color-border-maxcontrast);
+		border-radius: var(--border-radius-large);
+		font-size: 14px;
+		line-height: 1.5;
+		resize: vertical;
+
+		&:focus {
+			outline: none;
+			border-color: var(--color-primary-element);
+		}
 	}
 }
 </style>

@@ -117,7 +117,10 @@
                     "lockedBy",
                     "lockedUntil",
                     "shares",
-                    "submissionMessage"
+                    "submissionMessage",
+                    "confirmationEmailEnabled",
+                    "confirmationEmailSubject",
+                    "confirmationEmailBody"
                 ],
                 "properties": {
                     "id": {
@@ -220,6 +223,17 @@
                         "format": "int64"
                     },
                     "submissionMessage": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "confirmationEmailEnabled": {
+                        "type": "boolean"
+                    },
+                    "confirmationEmailSubject": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "confirmationEmailBody": {
                         "type": "string",
                         "nullable": true
                     }
