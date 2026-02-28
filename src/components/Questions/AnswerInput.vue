@@ -68,7 +68,7 @@
 			<NcButton
 				:aria-label="t('forms', 'Add a new answer option')"
 				variant="tertiary"
-				:disabled="isIMEComposing"
+				:disabled="isIMEComposing || !canCreateLocalAnswer"
 				@click="createLocalAnswer">
 				<template #icon>
 					<IconPlus :size="20" />
