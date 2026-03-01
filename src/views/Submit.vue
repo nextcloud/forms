@@ -105,22 +105,41 @@
 
 			<!-- Questions list -->
 			<form v-else ref="form" @submit.prevent="onSubmit">
-				<ul>
-					<component
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in validQuestions"
-						ref="questions"
-						:key="question.id"
-						read-only
-						:answer-type="answerTypes[question.type]"
-						:index="index + 1"
-						:max-string-lengths="maxStringLengths"
-						:values="answers[question.id]"
-						v-bind="question"
-						@keydown.enter="onKeydownEnter"
-						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="(values) => onUpdate(question, values)" />
-				</ul>
+				<template v-for="(group, groupIndex) in groupedQuestions">
+					<ul :key="`group-${groupIndex}`">
+						<Questions
+							v-if="group.section"
+							:is="answerTypes[group.section.type].component"
+							ref="questions"
+							:key="group.section.id"
+							read-only
+							:answer-type="answerTypes[group.section.type]"
+							:index="group.displayIndex"
+							:max-string-lengths="maxStringLengths"
+							:type="group.section.type"
+							v-bind="group.section" />
+
+						<template v-if="group.questions.length > 0">
+							<component
+								:is="answerTypes[question.type].component"
+								v-for="question in group.questions"
+								ref="questions"
+								:key="question.id"
+								read-only
+								:answer-type="answerTypes[question.type]"
+								:index="question.displayIndex"
+								:max-string-lengths="maxStringLengths"
+								:type="question.type"
+								:values="answers[question.id]"
+								v-bind="question"
+								@keydown.enter="onKeydownEnter"
+								@keydown.ctrl.enter="onKeydownCtrlEnter"
+								@update:values="
+									(values) => onUpdate(question, values)
+								" />
+						</template>
+					</ul>
+				</template>
 				<div class="form-buttons">
 					<NcButton
 						alignment="center-reverse"
@@ -332,6 +351,46 @@ export default {
 				}
 				return true
 			})
+		},
+
+		/**
+		 * Group questions by sections
+		 * Each section contains its questions and the section itself
+		 */
+		groupedQuestions() {
+			const groups = []
+			let currentGroup = { section: null, questions: [] }
+			let questionIndex = 1
+
+			for (const question of this.validQuestions) {
+				if (question.type === 'section') {
+					// Save current group if it has content
+					if (currentGroup.section || currentGroup.questions.length > 0) {
+						groups.push(currentGroup)
+					}
+
+					// Start new group with section
+					currentGroup = {
+						section: question,
+						displayIndex: questionIndex,
+						questions: [],
+					}
+				} else {
+					// Add question to current group
+					currentGroup.questions.push({
+						...question,
+						displayIndex: questionIndex,
+					})
+				}
+				questionIndex++
+			}
+
+			// Add the last group if it has content
+			if (currentGroup.section || currentGroup.questions.length > 0) {
+				groups.push(currentGroup)
+			}
+
+			return groups
 		},
 
 		validQuestionsIds() {
