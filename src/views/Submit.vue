@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
@@ -554,10 +554,20 @@ export default {
 					continue
 				}
 
-				answers[questionId] =
-					answer.type === 'QuestionMultiple'
-						? answer.value.map(String)
-						: answer.value
+				if (answer.type === 'QuestionMultiple') {
+					answers[questionId] = answer.value.map(String)
+				} else if (answer.type === 'QuestionConditional') {
+					// Restore conditional answer structure with proper type conversions
+					answers[questionId] = {
+						trigger: Array.isArray(answer.value?.trigger)
+							? answer.value.trigger.map(String)
+							: [],
+
+						subQuestions: answer.value?.subQuestions || {},
+					}
+				} else {
+					answers[questionId] = answer.value
+				}
 			}
 			this.answers = answers
 		},
@@ -611,16 +621,52 @@ export default {
 
 				const answers = {}
 				const loadedAnswers = OcsResponse2Data(response).answers
+
+				// Build a map of subquestion ID → parent conditional question ID
+				const subQuestionToParent = new Map()
+				for (const question of this.form.questions) {
+					if (question.type === 'conditional') {
+						const branches = question.extraSettings?.branches || []
+						for (const branch of branches) {
+							for (const subQuestion of branch.subQuestions || []) {
+								subQuestionToParent.set(subQuestion.id, question.id)
+							}
+						}
+					}
+				}
+
 				for (const answer of loadedAnswers) {
 					const questionId = answer.questionId
 					const text = answer.text
 
-					// Only initialize once, don't overwrite previous answers
+					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
+
+					// Check if this answer belongs to a subquestion of a conditional
+					const parentConditionalId = subQuestionToParent.get(questionId)
+					if (parentConditionalId !== undefined) {
+						// Initialize conditional answer structure if needed
+						if (!answers[parentConditionalId]) {
+							answers[parentConditionalId] = {
+								trigger: [],
+								subQuestions: {},
+							}
+						}
+						// Add subquestion answer
+						if (!answers[parentConditionalId].subQuestions[questionId]) {
+							answers[parentConditionalId].subQuestions[questionId] =
+								[]
+						}
+						answers[parentConditionalId].subQuestions[questionId].push(
+							text,
+						)
+						continue
+					}
+
+					// Initialize answer array if not already done
 					if (!answers[questionId]) {
 						answers[questionId] = []
 					}
 
-					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
 					if (!this.validQuestionsIds.has(parseInt(questionId))) {
 						this.showClearFormDueToChangeDialog = true
@@ -633,7 +679,36 @@ export default {
 					const question = this.form.questions.find(
 						(question) => question.id === questionId,
 					)
-					if (
+
+					if (question.type === 'conditional') {
+						// Handle conditional trigger answer
+						if (!answers[questionId].trigger) {
+							answers[questionId] = {
+								trigger: [],
+								subQuestions: answers[questionId].subQuestions || {},
+							}
+						}
+						// Map trigger answer to option ID for option-based trigger types
+						const triggerType = question.extraSettings?.triggerType
+						if (
+							['multiple', 'multiple_unique', 'dropdown'].includes(
+								triggerType,
+							)
+						) {
+							const option = question.options.find(
+								(opt) => opt.text === text,
+							)
+							if (option) {
+								answers[questionId].trigger.push(String(option.id))
+							} else {
+								logger.debug(
+									`Trigger option ${text} could not be mapped for conditional question ${questionId}`,
+								)
+							}
+						} else {
+							answers[questionId].trigger.push(text)
+						}
+					} else if (
 						['multiple', 'multiple_unique', 'dropdown'].includes(
 							question.type,
 						)

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -223,6 +223,8 @@ class FormsServiceTest extends TestCase {
 							]
 						],
 						'accept' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 					[
 						'id' => 2,
@@ -236,6 +238,8 @@ class FormsServiceTest extends TestCase {
 						'name' => 'city',
 						'options' => [],
 						'accept' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					]
 				],
 				'shares' => [
@@ -1492,6 +1496,171 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
+			// Conditional question tests
+			'valid-conditional-dropdown-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]],
+						['id' => 'branch-2', 'conditions' => [['type' => 'option_selected', 'optionId' => 2]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'valid-conditional-multiple-unique-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 5]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'valid-conditional-multiple-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_MULTIPLE,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'options_combination', 'optionIds' => [1, 2]]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'valid-conditional-short-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_SHORT,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'string_equals', 'value' => 'yes']]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'valid-conditional-linearscale-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_LINEARSCALE,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'valid-conditional-date-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DATE,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'date_range', 'min' => '2024-01-01', 'max' => '2024-12-31']]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'valid-conditional-file-trigger' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_FILE,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['type' => 'file_uploaded', 'value' => true]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => true
+			],
+			'invalid-conditional-missing-triggerType' => [
+				'extraSettings' => [
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-missing-branches' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-invalid-triggerType' => [
+				'extraSettings' => [
+					'triggerType' => 'invalid_type',
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-nested-not-allowed' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_CONDITIONAL,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-branch-missing-id' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [
+						['conditions' => [['optionId' => 1]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-branch-missing-conditions' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [
+						['id' => 'branch-1']
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-branches-not-array' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => 'not-an-array'
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-empty-branches' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => []
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-triggerType-not-string' => [
+				'extraSettings' => [
+					'triggerType' => 123,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
+					]
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
+			'invalid-conditional-extra-settings-key' => [
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [
+						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
+					],
+					'invalidKey' => 'value'
+				],
+				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'expected' => false
+			],
 		];
 	}
 
@@ -1593,6 +1762,141 @@ class FormsServiceTest extends TestCase {
 		$result = $this->formsService->getQuestions(1);
 
 		$this->assertEmpty($result);
+	}
+
+	public function testGetQuestionsWithConditionalQuestion(): void {
+		$conditionalQuestionData = [
+			'id' => 100,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'text' => 'Conditional Q',
+			'order' => 1,
+			'isRequired' => true,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [
+				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'branches' => [
+					['id' => 'branch-a', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]]],
+					['id' => 'branch-b', 'conditions' => [['type' => 'option_selected', 'optionId' => 11]]]
+				]
+			],
+			'parentQuestionId' => null,
+			'branchId' => null,
+		];
+
+		$subQuestionData = [
+			'id' => 101,
+			'formId' => 1,
+			'type' => 'short',
+			'text' => 'Sub Q in branch A',
+			'order' => 1,
+			'isRequired' => false,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [],
+			'parentQuestionId' => 100,
+			'branchId' => 'branch-a',
+		];
+
+		$conditionalQuestion = $this->createQuestionEntity($conditionalQuestionData);
+		$subQuestion = $this->createQuestionEntity($subQuestionData);
+
+		$this->questionMapper->method('findByForm')->willReturn([$conditionalQuestion]);
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$subQuestion]);
+		$this->optionMapper->method('findByQuestion')->willReturn([]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertCount(1, $result);
+		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $result[0]['type']);
+		$this->assertArrayHasKey('extraSettings', $result[0]);
+		$this->assertArrayHasKey('branches', $result[0]['extraSettings']);
+
+		// Verify subquestion is attached to branch-a
+		$branchA = null;
+		foreach ($result[0]['extraSettings']['branches'] as $branch) {
+			if ($branch['id'] === 'branch-a') {
+				$branchA = $branch;
+				break;
+			}
+		}
+		$this->assertNotNull($branchA);
+		$this->assertArrayHasKey('subQuestions', $branchA);
+		$this->assertCount(1, $branchA['subQuestions']);
+		$this->assertEquals('Sub Q in branch A', $branchA['subQuestions'][0]['text']);
+
+		// Branch-b should have empty subQuestions
+		$branchB = null;
+		foreach ($result[0]['extraSettings']['branches'] as $branch) {
+			if ($branch['id'] === 'branch-b') {
+				$branchB = $branch;
+				break;
+			}
+		}
+		$this->assertNotNull($branchB);
+		$this->assertArrayHasKey('subQuestions', $branchB);
+		$this->assertEmpty($branchB['subQuestions']);
+	}
+
+	public function testGetQuestionsWithConditionalSubQuestionFile(): void {
+		$conditionalQuestionData = [
+			'id' => 100,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'text' => 'Conditional Q',
+			'order' => 1,
+			'isRequired' => true,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [
+				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'branches' => [
+					['id' => 'branch-a', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]]]
+				]
+			],
+			'parentQuestionId' => null,
+			'branchId' => null,
+		];
+
+		$fileSubQuestionData = [
+			'id' => 101,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'text' => 'Upload file',
+			'order' => 1,
+			'isRequired' => false,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [
+				'allowedFileTypes' => ['image', 'application/pdf'],
+				'allowedFileExtensions' => ['txt', 'doc'],
+			],
+			'parentQuestionId' => 100,
+			'branchId' => 'branch-a',
+		];
+
+		$conditionalQuestion = $this->createQuestionEntity($conditionalQuestionData);
+		$fileSubQuestion = $this->createQuestionEntity($fileSubQuestionData);
+
+		$this->questionMapper->method('findByForm')->willReturn([$conditionalQuestion]);
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$fileSubQuestion]);
+		$this->optionMapper->method('findByQuestion')->willReturn([]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertCount(1, $result);
+		$branchA = $result[0]['extraSettings']['branches'][0];
+		$this->assertCount(1, $branchA['subQuestions']);
+
+		$fileQuestion = $branchA['subQuestions'][0];
+		$this->assertEquals(Constants::ANSWER_TYPE_FILE, $fileQuestion['type']);
+		$this->assertArrayHasKey('accept', $fileQuestion);
+		// Should have image/*, application/pdf, .txt, .doc
+		$this->assertContains('image/*', $fileQuestion['accept']);
+		$this->assertContains('application/pdf', $fileQuestion['accept']);
+		$this->assertContains('.txt', $fileQuestion['accept']);
+		$this->assertContains('.doc', $fileQuestion['accept']);
 	}
 
 	private function createQuestionEntity(array $data): Question {

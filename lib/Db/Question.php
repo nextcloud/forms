@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2019-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -21,9 +21,9 @@ use OCP\AppFramework\Db\Entity;
  * @method void setOrder(integer $value)
  * @psalm-method FormsQuestionType getType()
  * @method string getType()
- * @psalm-method 'date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' getType()
+ * @psalm-method 'color'|'conditional'|'date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' getType()
  * @method void setType(string $value)
- * @psalm-method void setType('date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' $value)
+ * @psalm-method void setType('color'|'conditional'|'date'|'datetime'|'dropdown'|'file'|'long'|'multiple'|'multiple_unique'|'short'|'time' $value)
  * @method bool getIsRequired()
  * @method void setIsRequired(bool $value)
  * @method string getText()
@@ -32,6 +32,10 @@ use OCP\AppFramework\Db\Entity;
  * @method void setDescription(string $value)
  * @method string getName()
  * @method void setName(string $value)
+ * @method ?int getParentQuestionId()
+ * @method void setParentQuestionId(?int $value)
+ * @method ?string getBranchId()
+ * @method void setBranchId(?string $value)
  */
 class Question extends Entity {
 	protected $formId;
@@ -42,6 +46,8 @@ class Question extends Entity {
 	protected $name;
 	protected $description;
 	protected $extraSettingsJson;
+	protected $parentQuestionId;
+	protected $branchId;
 
 	public function __construct() {
 		$this->addType('formId', 'integer');
@@ -51,6 +57,8 @@ class Question extends Entity {
 		$this->addType('text', 'string');
 		$this->addType('description', 'string');
 		$this->addType('name', 'string');
+		$this->addType('parentQuestionId', 'integer');
+		$this->addType('branchId', 'string');
 	}
 
 	/**
@@ -85,6 +93,8 @@ class Question extends Entity {
 	 *    name: string,
 	 *    description: string,
 	 *    extraSettings: FormsQuestionExtraSettings,
+	 *    parentQuestionId: ?int,
+	 *    branchId: ?string,
 	 *  }
 	 */
 	public function read(): array {
@@ -98,6 +108,8 @@ class Question extends Entity {
 			'name' => (string)$this->getName(),
 			'description' => (string)$this->getDescription(),
 			'extraSettings' => $this->getExtraSettings(),
+			'parentQuestionId' => $this->getParentQuestionId(),
+			'branchId' => $this->getBranchId(),
 		];
 	}
 }
