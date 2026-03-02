@@ -176,7 +176,8 @@ export default defineComponent({
 		 */
 		onCreateAnswer(index: number, answer: FormsOption): void {
 			this.$nextTick(() => {
-				this.$nextTick(() => this.focusIndex(index, answer.optionType))
+				// Move focus to the newly appended empty local option.
+				this.$nextTick(() => this.focusIndex(index + 1, answer.optionType))
 			})
 			this.updateOptions([...this.options, answer])
 		},
