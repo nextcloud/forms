@@ -11,9 +11,9 @@
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
+			v-model="localText"
 			:aria-label="ariaLabel"
 			:placeholder="placeholder"
-			:value="answer.text"
 			class="question__input"
 			:class="{ 'question__input--shifted': !isDropdown }"
 			:maxlength="maxOptionLength"
@@ -21,7 +21,7 @@
 			dir="auto"
 			@input="debounceOnInput"
 			@keydown.delete="deleteEntry"
-			@keydown.enter.prevent="focusNextInput"
+			@keydown.enter.prevent="onEnter"
 			@compositionstart="onCompositionStart"
 			@compositionend="onCompositionEnd" />
 
@@ -64,6 +64,17 @@
 				</template>
 			</NcButton>
 		</div>
+		<div v-else class="option__actions">
+			<NcButton
+				:aria-label="t('forms', 'Add a new answer option')"
+				variant="tertiary"
+				:disabled="isIMEComposing || !canCreateLocalAnswer"
+				@click="createLocalAnswer">
+				<template #icon>
+					<IconPlus :size="20" />
+				</template>
+			</NcButton>
+		</div>
 	</li>
 </template>
 
@@ -79,6 +90,7 @@ import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDragIndicator from '../Icons/IconDragIndicator.vue'
+import IconPlus from 'vue-material-design-icons/Plus.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -98,6 +110,7 @@ export default {
 		IconCheckboxBlankOutline,
 		IconDelete,
 		IconDragIndicator,
+		IconPlus,
 		IconRadioboxBlank,
 		NcActions,
 		NcActionButton,
@@ -140,10 +153,18 @@ export default {
 			queue: null,
 			debounceOnInput: null,
 			isIMEComposing: false,
+			localText: this.answer?.text ?? '',
 		}
 	},
 
 	computed: {
+		canCreateLocalAnswer() {
+			if (this.answer.local) {
+				return !!this.localText?.trim()
+			}
+			return !!this.answer.text?.trim()
+		},
+
 		ariaLabel() {
 			if (this.answer.local) {
 				return t('forms', 'Add a new answer option')
@@ -166,6 +187,17 @@ export default {
 
 		pseudoIcon() {
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
+		},
+	},
+
+	watch: {
+		// Keep localText in sync when the parent replaces/updates the answer prop
+		answer: {
+			handler(newVal) {
+				this.localText = newVal?.text ?? ''
+			},
+
+			deep: true,
 		},
 	},
 
@@ -196,34 +228,72 @@ export default {
 		 * @param {InputEvent} event The input event that triggered adding a new entry
 		 */
 		async onInput({ target, isComposing }) {
+			if (this.answer.local) {
+				this.localText = target.value
+				return
+			}
+
 			if (!isComposing && !this.isIMEComposing && target.value !== '') {
 				// clone answer
 				const answer = Object.assign({}, this.answer)
 				answer.text = this.$refs.input.value
 
-				if (this.answer.local) {
-					// Dispatched for creation. Marked as synced
-					this.$set(this.answer, 'local', false)
-					const newAnswer = await this.createAnswer(answer)
+				await this.updateAnswer(answer)
 
-					// Forward changes, but use current answer.text to avoid erasing
-					// any in-between changes while creating the answer
-					newAnswer.text = this.$refs.input.value
-
-					this.$emit('create-answer', this.index, newAnswer)
-				} else {
-					await this.updateAnswer(answer)
-
-					// Forward changes, but use current answer.text to avoid erasing
-					// any in-between changes while updating the answer
-					answer.text = this.$refs.input.value
-					this.$emit('update:answer', this.index, answer)
-				}
+				// Forward changes, but use current answer.text to avoid erasing
+				// any in-between changes while updating the answer
+				answer.text = this.$refs.input.value
+				this.$emit('update:answer', this.index, answer)
 			}
 		},
 
 		/**
+		 * Handle Enter key: create local answer or move focus
+		 *
+		 * @param {KeyboardEvent} e the keydown event
+		 */
+		onEnter(e) {
+			if (this.answer.local) {
+				this.createLocalAnswer(e)
+				return
+			}
+			this.focusNextInput(e)
+		},
+
+		/**
+		 * Create a new local answer option from the current input
+		 *
+		 * @param {Event} e the triggering event
+		 */
+		async createLocalAnswer(e) {
+			if (this.isIMEComposing || e?.isComposing) {
+				return
+			}
+
+			const value = this.localText ?? ''
+			if (!value.trim()) {
+				return
+			}
+
+			const answer = { ...this.answer }
+			answer.text = value
+
+			// Dispatched for creation. Marked as synced
+			this.$set(this.answer, 'local', false)
+			const newAnswer = await this.createAnswer(answer)
+
+			// Forward changes, but use current answer.text to avoid erasing
+			// any in-between changes while creating the answer
+			newAnswer.text = this.$refs.input.value
+			this.localText = ''
+
+			this.$emit('create-answer', this.index, newAnswer)
+		},
+
+		/**
 		 * Request a new answer
+		 *
+		 * @param {Event} e the triggering event
 		 */
 		focusNextInput(e) {
 			if (this.isIMEComposing || e?.isComposing) {

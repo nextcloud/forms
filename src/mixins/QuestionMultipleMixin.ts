@@ -127,7 +127,7 @@ export default defineComponent({
 		 */
 		onCreateAnswer(index: number, answer: FormsOption): void {
 			this.$nextTick(() => {
-				this.$nextTick(() => this.focusIndex(index))
+				this.$nextTick(() => this.focusIndex(index + 1))
 			})
 			this.updateOptions([...this.options, answer])
 		},
