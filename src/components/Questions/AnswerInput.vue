@@ -180,7 +180,7 @@ export default {
 
 	computed: {
 		canCreateLocalAnswer() {
-			return !!this.$refs.input?.value?.trim()
+			return !!this.answer.text?.trim()
 		},
 
 		ariaLabel() {
