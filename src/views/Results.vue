@@ -859,17 +859,18 @@ export default {
 			)
 				.setMultiSelect(false)
 				.allowDirectories(true)
-				.setCanPick((file) => {
-					if (file.type === FileType.Folder) {
+				.setCanPick((node) => {
+					if (node.type === FileType.Folder) {
 						return true
 					}
 
-					const extension = file.extension?.slice(1).toLowerCase()
+					const extension = node.extension?.slice(1).toLowerCase()
 					return !!extension && extension in SUPPORTED_FILE_FORMATS
 				})
 				.setButtonFactory((selectedNodes) => {
 					const [node] = selectedNodes
 					if (node && node.type === FileType.File) {
+						const extension = node.extension?.slice(1).toLowerCase()
 						return [
 							{
 								label: t('forms', 'Select {file}', {
