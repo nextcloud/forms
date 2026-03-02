@@ -11,9 +11,9 @@
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
+			v-model="localText"
 			:aria-label="ariaLabel"
 			:placeholder="placeholder"
-			:value="answer.text"
 			class="question__input"
 			:class="{ 'question__input--shifted': !isDropdown }"
 			:maxlength="maxOptionLength"
@@ -175,11 +175,15 @@ export default {
 			queue: null,
 			debounceOnInput: null,
 			isIMEComposing: false,
+			localText: this.answer?.text ?? '',
 		}
 	},
 
 	computed: {
 		canCreateLocalAnswer() {
+			if (this.answer.local) {
+				return !!this.localText?.trim()
+			}
 			return !!this.answer.text?.trim()
 		},
 
@@ -255,6 +259,17 @@ export default {
 		},
 	},
 
+	watch: {
+		// Keep localText in sync when the parent replaces/updates the answer prop
+		answer: {
+			handler(newVal) {
+				this.localText = newVal?.text ?? ''
+			},
+
+			deep: true,
+		},
+	},
+
 	created() {
 		this.queue = new PQueue({ concurrency: 1 })
 
@@ -283,7 +298,7 @@ export default {
 		 */
 		async onInput({ target, isComposing }) {
 			if (this.answer.local) {
-				this.$set(this.answer, 'text', target.value)
+				this.localText = target.value
 				return
 			}
 
@@ -324,7 +339,7 @@ export default {
 				return
 			}
 
-			const value = this.$refs.input?.value ?? ''
+			const value = this.localText ?? ''
 			if (!value.trim()) {
 				return
 			}
@@ -339,12 +354,15 @@ export default {
 			// Forward changes, but use current answer.text to avoid erasing
 			// any in-between changes while creating the answer
 			newAnswer.text = this.$refs.input.value
+			this.localText = ''
 
 			this.$emit('create-answer', this.index, newAnswer)
 		},
 
 		/**
 		 * Request a new answer
+		 *
+		 * @param {Event} e the event
 		 */
 		focusNextInput(e) {
 			if (this.isIMEComposing || e?.isComposing) {
