@@ -399,7 +399,7 @@ export default {
 		},
 
 		onMaxSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'maxSubmissions', checked ? null : null)
+			this.$emit('update:form-prop', 'maxSubmissions', checked ? 1 : null)
 		},
 
 		onMaxSubmissionsValueChange(event) {
