@@ -325,6 +325,7 @@ export default {
 		hasMaxSubmissions() {
 			return this.form.maxSubmissions !== null && this.form.maxSubmissions !== undefined
 		},
+
 		maxSubmissionsValue: {
 			get() {
 				return this.form.maxSubmissions ?? 1
@@ -333,6 +334,7 @@ export default {
 				this.$emit('update:form-prop', 'maxSubmissions', value)
 			},
 		},
+
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
