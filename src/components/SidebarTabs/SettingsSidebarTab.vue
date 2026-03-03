@@ -401,12 +401,14 @@ export default {
 		onMaxSubmissionsChange(checked) {
 			this.$emit('update:form-prop', 'maxSubmissions', checked ? 100 : null)
 		},
+
 		onMaxSubmissionsValueChange(event) {
 			const value = parseInt(event.target.value)
 			if (value > 0) {
 				this.$emit('update:form-prop', 'maxSubmissions', value)
 			}
 		},
+
 		onFormClosedChange(isClosed) {
 			this.$emit(
 				'update:form-prop',
