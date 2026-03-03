@@ -399,7 +399,7 @@ export default {
 		},
 
 		onMaxSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'maxSubmissions', checked ? 100 : null)
+			this.$emit('update:form-prop', 'maxSubmissions', checked ? null : null)
 		},
 
 		onMaxSubmissionsValueChange(event) {
@@ -537,12 +537,6 @@ export default {
 		}
 
 		@include markdown-output;
-	}
-}
-.max-submissions {
-	&__input {
-		width: calc(100% - var(--default-clickable-area));
-		margin-block-start: 4px;
 	}
 }
 </style>
