@@ -28,7 +28,7 @@
 
 		<template v-else>
 			<!-- Forms title & description-->
-			<header v-if="!isMaxSubmissionsReached && !isExpired && !isClosed && !isArchived">
+			<header>
 				<!-- eslint-disable-next-line vue/no-unused-refs -->
 				<h2 ref="title" class="form-title" dir="auto">
 					{{ formTitle }}
