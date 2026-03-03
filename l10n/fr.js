@@ -45,8 +45,6 @@ OC.L10N.register(
     "Create new form" : "Créer un nouveau formulaire",
     "This form does not exist" : "Ce formulaire n’existe pas",
     "Form expired" : "Formulaire expiré",
-    "Form is full" : "Formulaire complet",
-    "This form has reached the maximum number of answers" : "Ce formulaire a atteint le nombre maximum de réponses",
     "This form has expired and is no longer taking answers" : "Ce formulaire a expiré et n'accepte plus de réponses",
     "Error while saving configuration" : "Erreur lors de l'enregistrement de la configuration",
     "Error while reloading config" : "Erreur lors du rechargement de la configuration",
