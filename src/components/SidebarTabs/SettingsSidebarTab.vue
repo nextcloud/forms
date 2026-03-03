@@ -79,6 +79,26 @@
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
+			:model-value="hasMaxSubmissions"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onMaxSubmissionsChange">
+			{{ t('forms', 'Limit number of responses') }}
+		</NcCheckboxRadioSwitch>
+		<div v-show="hasMaxSubmissions && !formArchived" class="settings-div--indent">
+			<input
+				v-model.number="maxSubmissionsValue"
+				type="number"
+				min="1"
+				:disabled="locked"
+				:placeholder="t('forms', 'Maximum number of responses')"
+				class="max-submissions__input"
+				@change="onMaxSubmissionsValueChange" />
+			<p class="settings-hint">
+				{{ t('forms', 'Form will be closed automatically when the limit is reached.') }}
+			</p>
+		</div>
+		<NcCheckboxRadioSwitch
 			:model-value="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
@@ -302,6 +322,17 @@ export default {
 			return this.form.state !== FormState.FormActive
 		},
 
+		hasMaxSubmissions() {
+			return this.form.maxSubmissions !== null && this.form.maxSubmissions !== undefined
+		},
+		maxSubmissionsValue: {
+			get() {
+				return this.form.maxSubmissions ?? 1
+			},
+			set(value) {
+				this.$emit('update:form-prop', 'maxSubmissions', value)
+			},
+		},
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
@@ -365,6 +396,15 @@ export default {
 			)
 		},
 
+		onMaxSubmissionsChange(checked) {
+			this.$emit('update:form-prop', 'maxSubmissions', checked ? 100 : null)
+		},
+		onMaxSubmissionsValueChange(event) {
+			const value = parseInt(event.target.value)
+			if (value > 0) {
+				this.$emit('update:form-prop', 'maxSubmissions', value)
+			}
+		},
 		onFormClosedChange(isClosed) {
 			this.$emit(
 				'update:form-prop',
@@ -493,6 +533,12 @@ export default {
 		}
 
 		@include markdown-output;
+	}
+}
+.max-submissions {
+	&__input {
+		width: calc(100% - var(--default-clickable-area));
+		margin-block-start: 4px;
 	}
 }
 </style>
