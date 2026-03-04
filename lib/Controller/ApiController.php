@@ -1378,8 +1378,9 @@ class ApiController extends OCSController {
 		// Check if max submissions limit is reached
 		$maxSubmissions = $form->getMaxSubmissions();
 		if ($maxSubmissions > 0 && $this->submissionMapper->countSubmissions($formId) >= $maxSubmissions) {
-			throw new OCSForbiddenException($this->l10n->t('Maximum number of submissions reached'));
+			throw new OCSForbiddenException('Maximum number of submissions reached');
 		}
+
 		// Insert new submission
 		$this->submissionMapper->insert($submission);
 
