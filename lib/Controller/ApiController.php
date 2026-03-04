@@ -1372,7 +1372,7 @@ class ApiController extends OCSController {
 		// Does the user have permissions to submit
 		// This is done right before insert so we minimize race conditions for submitting on unique-submission forms
 		if (!$this->formsService->canSubmit($form)) {
-			throw new OCSForbiddenException($this->l10n->t('Already submitted'));
+			throw new OCSForbiddenException('Already submitted');
 		}
 
 		// Check if max submissions limit is reached
