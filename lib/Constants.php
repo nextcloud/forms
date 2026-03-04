@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -67,6 +67,7 @@ class Constants {
 
 	// Available AnswerTypes
 	public const ANSWER_TYPE_COLOR = 'color';
+	public const ANSWER_TYPE_CONDITIONAL = 'conditional';
 	public const ANSWER_TYPE_DATE = 'date';
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
@@ -86,6 +87,7 @@ class Constants {
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
 		self::ANSWER_TYPE_COLOR,
+		self::ANSWER_TYPE_CONDITIONAL,
 		self::ANSWER_TYPE_DATE,
 		self::ANSWER_TYPE_DATETIME,
 		self::ANSWER_TYPE_DROPDOWN,
@@ -195,6 +197,64 @@ class Constants {
 		self::ANSWER_GRID_TYPE_CHECKBOX,
 		self::ANSWER_GRID_TYPE_NUMBER,
 		self::ANSWER_GRID_TYPE_RADIO,
+	];
+
+	/**
+	 * Extra settings for conditional questions
+	 * - triggerType: The question type used for the trigger (e.g., 'multiple_unique', 'dropdown', 'short')
+	 * - branches: Array of branch definitions, each containing:
+	 *   - id: Unique branch identifier
+	 *   - conditions: Array of condition objects defining when this branch is active
+	 *     For predefined types: [{ optionId: number }]
+	 *     For text types: [{ type: 'string_equals'|'string_contains'|'regex', value: string }]
+	 *     For numeric/scale: [{ type: 'value_equals'|'value_range', value: number, min?: number, max?: number }]
+	 */
+	public const EXTRA_SETTINGS_CONDITIONAL = [
+		'triggerType' => ['string'],
+		'branches' => ['array'],
+	];
+
+	/**
+	 * Condition types for conditional questions
+	 */
+	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
+	public const CONDITION_TYPE_OPTIONS_COMBINATION = 'options_combination';
+	public const CONDITION_TYPE_STRING_EQUALS = 'string_equals';
+	public const CONDITION_TYPE_STRING_CONTAINS = 'string_contains';
+	public const CONDITION_TYPE_REGEX = 'regex';
+	public const CONDITION_TYPE_VALUE_EQUALS = 'value_equals';
+	public const CONDITION_TYPE_VALUE_RANGE = 'value_range';
+	public const CONDITION_TYPE_DATE_RANGE = 'date_range';
+	public const CONDITION_TYPE_FILE_UPLOADED = 'file_uploaded';
+
+	public const CONDITION_TYPES = [
+		self::CONDITION_TYPE_OPTION_SELECTED,
+		self::CONDITION_TYPE_OPTIONS_COMBINATION,
+		self::CONDITION_TYPE_STRING_EQUALS,
+		self::CONDITION_TYPE_STRING_CONTAINS,
+		self::CONDITION_TYPE_REGEX,
+		self::CONDITION_TYPE_VALUE_EQUALS,
+		self::CONDITION_TYPE_VALUE_RANGE,
+		self::CONDITION_TYPE_DATE_RANGE,
+		self::CONDITION_TYPE_FILE_UPLOADED,
+	];
+
+	/**
+	 * Trigger types allowed for conditional questions
+	 * Maps each trigger type to its supported condition types
+	 */
+	public const CONDITIONAL_TRIGGER_TYPES = [
+		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::CONDITION_TYPE_OPTION_SELECTED],
+		self::ANSWER_TYPE_DROPDOWN => [self::CONDITION_TYPE_OPTION_SELECTED],
+		self::ANSWER_TYPE_MULTIPLE => [self::CONDITION_TYPE_OPTIONS_COMBINATION],
+		self::ANSWER_TYPE_SHORT => [self::CONDITION_TYPE_STRING_EQUALS, self::CONDITION_TYPE_STRING_CONTAINS, self::CONDITION_TYPE_REGEX],
+		self::ANSWER_TYPE_LONG => [self::CONDITION_TYPE_STRING_CONTAINS, self::CONDITION_TYPE_REGEX],
+		self::ANSWER_TYPE_LINEARSCALE => [self::CONDITION_TYPE_VALUE_EQUALS, self::CONDITION_TYPE_VALUE_RANGE],
+		self::ANSWER_TYPE_DATE => [self::CONDITION_TYPE_DATE_RANGE],
+		self::ANSWER_TYPE_DATETIME => [self::CONDITION_TYPE_DATE_RANGE],
+		self::ANSWER_TYPE_TIME => [self::CONDITION_TYPE_VALUE_RANGE],
+		self::ANSWER_TYPE_COLOR => [self::CONDITION_TYPE_VALUE_EQUALS],
+		self::ANSWER_TYPE_FILE => [self::CONDITION_TYPE_FILE_UPLOADED],
 	];
 
 	public const FILENAME_INVALID_CHARS = [
