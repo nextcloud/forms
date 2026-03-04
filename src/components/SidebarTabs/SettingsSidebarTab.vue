@@ -86,14 +86,13 @@
 			{{ t('forms', 'Limit number of responses') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="hasMaxSubmissions && !formArchived" class="settings-div--indent">
-			<input
-				v-model.number="maxSubmissionsValue"
+			<NcInputField
+				v-model="maxSubmissionsValue"
 				type="number"
-				min="1"
+				:min="1"
 				:disabled="locked"
-				:placeholder="t('forms', 'Maximum number of responses')"
-				class="max-submissions__input"
-				@change="onMaxSubmissionsValueChange" />
+				:label="t('forms', 'Maximum number of responses')"
+				@update:model-value="onMaxSubmissionsValueChange" />
 			<p class="settings-hint">
 				{{ t('forms', 'Form will be closed automatically when the limit is reached.') }}
 			</p>
@@ -201,6 +200,7 @@ import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
 import { directive as ClickOutside } from 'v-click-outside'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -213,6 +213,7 @@ import { FormState } from '../../models/Constants.ts'
 export default {
 	components: {
 		NcButton,
+		NcInputField,
 		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
 		NcIconSvgWrapper,
