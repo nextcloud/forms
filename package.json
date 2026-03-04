@@ -14,6 +14,7 @@
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {
+    "postinstall": "patch-package",
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
     "dev:watch": "NODE_OPTIONS='--max-old-space-size=4096' npx vite --mode development build --watch",
@@ -64,6 +65,7 @@
     "@vue/tsconfig": "^0.5.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "patch-package": "^8.0.1",
     "prettier": "^3.8.1",
     "vite": "^7.3.1"
   },

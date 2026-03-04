@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { markRaw } from 'vue'
 import IconArrowDownDropCircleOutline from 'vue-material-design-icons/ArrowDownDropCircleOutline.vue'
 import IconCalendar from 'vue-material-design-icons/CalendarOutline.vue'
 import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
@@ -59,8 +60,8 @@ export default {
 	 */
 
 	multiple: {
-		component: QuestionMultiple,
-		icon: IconCheckboxOutline,
+		component: markRaw(QuestionMultiple),
+		icon: markRaw(IconCheckboxOutline),
 		label: t('forms', 'Checkboxes'),
 		predefined: true,
 		validate: (question) => question.options.length > 0,
@@ -75,8 +76,8 @@ export default {
 	},
 
 	multiple_unique: {
-		component: QuestionMultiple,
-		icon: IconRadioboxMarked,
+		component: markRaw(QuestionMultiple),
+		icon: markRaw(IconRadioboxMarked),
 		label: t('forms', 'Radio buttons'),
 		predefined: true,
 		validate: (question) => question.options.length > 0,
@@ -94,8 +95,8 @@ export default {
 	},
 
 	dropdown: {
-		component: QuestionDropdown,
-		icon: IconArrowDownDropCircleOutline,
+		component: markRaw(QuestionDropdown),
+		icon: markRaw(IconArrowDownDropCircleOutline),
 		label: t('forms', 'Dropdown'),
 		predefined: true,
 		validate: (question) => question.options.length > 0,
@@ -110,8 +111,8 @@ export default {
 	},
 
 	file: {
-		component: QuestionFile,
-		icon: IconFile,
+		component: markRaw(QuestionFile),
+		icon: markRaw(IconFile),
 		label: t('forms', 'File'),
 		predefined: false,
 
@@ -120,28 +121,28 @@ export default {
 	},
 
 	grid: {
-		component: QuestionGrid,
-		icon: IconGrid,
+		component: markRaw(QuestionGrid),
+		icon: markRaw(IconGrid),
 		label: t('forms', 'Grid'),
 		predefined: false,
 
 		subtypes: {
 			radio: {
-				icon: IconRadioboxMarked,
+				icon: markRaw(IconRadioboxMarked),
 				label: t('forms', 'Radio buttons'),
 				extraSettings: {
 					questionType: 'radio',
 				},
 			},
 			checkbox: {
-				icon: IconCheckboxOutline,
+				icon: markRaw(IconCheckboxOutline),
 				label: t('forms', 'Checkboxes'),
 				extraSettings: {
 					questionType: 'checkbox',
 				},
 			},
 			number: {
-				icon: IconNumeric,
+				icon: markRaw(IconNumeric),
 				label: t('forms', 'Number'),
 				extraSettings: {
 					questionType: 'number',
@@ -167,8 +168,8 @@ export default {
 	},
 
 	short: {
-		component: QuestionShort,
-		icon: IconTextShort,
+		component: markRaw(QuestionShort),
+		icon: markRaw(IconTextShort),
 		label: t('forms', 'Short answer'),
 		predefined: false,
 
@@ -179,8 +180,8 @@ export default {
 	},
 
 	long: {
-		component: QuestionLong,
-		icon: IconTextLong,
+		component: markRaw(QuestionLong),
+		icon: markRaw(IconTextLong),
 		label: t('forms', 'Long text'),
 		predefined: false,
 
@@ -191,8 +192,8 @@ export default {
 	},
 
 	date: {
-		component: QuestionDate,
-		icon: IconCalendar,
+		component: markRaw(QuestionDate),
+		icon: markRaw(IconCalendar),
 		label: t('forms', 'Date'),
 		predefined: false,
 
@@ -209,8 +210,8 @@ export default {
 	},
 
 	datetime: {
-		component: QuestionDate,
-		icon: IconClockOutline,
+		component: markRaw(QuestionDate),
+		icon: markRaw(IconClockOutline),
 		label: t('forms', 'Datetime'),
 		predefined: false,
 
@@ -225,8 +226,8 @@ export default {
 	},
 
 	time: {
-		component: QuestionDate,
-		icon: IconClockOutline,
+		component: markRaw(QuestionDate),
+		icon: markRaw(IconClockOutline),
 		label: t('forms', 'Time'),
 		predefined: false,
 
@@ -243,8 +244,8 @@ export default {
 	},
 
 	linearscale: {
-		component: QuestionLinearScale,
-		icon: IconLinearScale,
+		component: markRaw(QuestionLinearScale),
+		icon: markRaw(IconLinearScale),
 		label: t('forms', 'Linear scale'),
 		predefined: true,
 
@@ -253,8 +254,8 @@ export default {
 	},
 
 	color: {
-		component: QuestionColor,
-		icon: IconPalette,
+		component: markRaw(QuestionColor),
+		icon: markRaw(IconPalette),
 		label: t('forms', 'Color'),
 		predefined: false,
 

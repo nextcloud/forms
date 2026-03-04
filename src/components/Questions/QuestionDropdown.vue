@@ -43,6 +43,7 @@
 			<Draggable
 				v-else
 				v-model="choices"
+				:itemKey="(item) => (item.local ? 'option-local' : item.id)"
 				class="question__content"
 				:animation="200"
 				direction="vertical"

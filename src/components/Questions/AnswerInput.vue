@@ -344,14 +344,13 @@ export default {
 				return
 			}
 
-			const answer = { ...this.answer }
-			answer.text = value
+			const answer = { ...this.answer, text: value, local: false }
 
 			// Prevent any queued debounced PATCHes from running while creating
 			this.queue.pause()
 			try {
 				// Dispatched for creation. Marked as synced
-				this.$set(this.answer, 'local', false)
+				this.$emit('update:answer', answer)
 				const newAnswer = await this.createAnswer(answer)
 
 				// Forward changes, but use current answer.text to avoid erasing
@@ -359,7 +358,7 @@ export default {
 				newAnswer.text = this.$refs.input.value
 				this.localText = ''
 
-				this.$emit('create-answer', this.index, newAnswer)
+				this.$emit('createAnswer', this.index, newAnswer)
 			} finally {
 				// Clear pending update tasks (stale PATCHes) before resuming processing
 				this.queue.clear()
