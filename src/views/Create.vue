@@ -116,6 +116,7 @@
 				<!-- Questions list -->
 				<Draggable
 					v-model="form.questions"
+					:itemKey="(item) => item.id"
 					:animation="200"
 					tag="transition-group"
 					:componentData="{
@@ -130,13 +131,31 @@
 					<template #item="{ element: question, index }">
 						<component
 							:is="answerTypes[question.type].component"
-							ref="questions"
-							v-model="form.questions[index]"
+							:ref="setQuestionRef"
+							v-bind="form.questions[index]"
 							:canMoveDown="index < form.questions.length - 1"
 							:canMoveUp="index > 0"
 							:answerType="answerTypes[question.type]"
 							:index="index + 1"
 							:maxStringLengths="maxStringLengths"
+							@update:text="
+								(val) => (form.questions[index].text = val)
+							"
+							@update:description="
+								(val) => (form.questions[index].description = val)
+							"
+							@update:isRequired="
+								(val) => (form.questions[index].isRequired = val)
+							"
+							@update:name="
+								(val) => (form.questions[index].name = val)
+							"
+							@update:extraSettings="
+								(val) => (form.questions[index].extraSettings = val)
+							"
+							@update:options="
+								(val) => (form.questions[index].options = val)
+							"
 							@clone="cloneQuestion(question)"
 							@delete="deleteQuestion(question.id)"
 							@moveDown="onMoveDown(index)"
@@ -278,6 +297,7 @@ export default {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
 			activeQuestionType: null,
+			questionRefs: [],
 		}
 	},
 
@@ -373,12 +393,22 @@ export default {
 		},
 	},
 
+	beforeUpdate() {
+		this.questionRefs = []
+	},
+
 	mounted() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
+		setQuestionRef(el) {
+			if (el) {
+				this.questionRefs.push(el)
+			}
+		},
+
 		onMoveUp(index) {
 			if (index > 0) {
 				;[this.form.questions[index - 1], this.form.questions[index]] = [
@@ -482,8 +512,8 @@ export default {
 				// Focus newly added question
 				this.$nextTick(() => {
 					const lastQuestion =
-						this.$refs.questions[this.$refs.questions.length - 1]
-					lastQuestion.focus()
+						this.questionRefs[this.questionRefs.length - 1]
+					lastQuestion?.focus()
 				})
 
 				emit('forms:last-updated:set', this.form.id)
@@ -559,8 +589,8 @@ export default {
 
 				this.$nextTick(() => {
 					const lastQuestion =
-						this.$refs.questions[this.$refs.questions.length - 1]
-					lastQuestion.focus()
+						this.questionRefs[this.questionRefs.length - 1]
+					lastQuestion?.focus()
 				})
 			} catch (error) {
 				logger.error(`Error while duplicating question ${id}`, {
