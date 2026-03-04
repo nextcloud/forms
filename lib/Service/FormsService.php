@@ -493,6 +493,7 @@ class FormsService {
 		if ($maxSubmissions !== null && $this->submissionMapper->countSubmissions($form->getId()) >= $maxSubmissions) {
 			return false;
 		}
+
 		// We cannot control how many time users can submit if public link available
 		if ($this->hasPublicLink($form)) {
 			return true;
