@@ -5,6 +5,23 @@
 
 # Changelog
 
+## v5.2.5 - 2026-03-05
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.4...v5.2.5)
+
+### Fixed
+
+- [stable5.2] fix: Improve validation for submission answers with strict type checking by @backportbot[bot] in [\#3202](https://github.com/nextcloud/forms/pull/3202)
+- [stable5.2] Fix form deletion by @backportbot[bot] in [\#3190](https://github.com/nextcloud/forms/pull/3190)
+- [stable5.2] fix: clone shared form and set default values by @backportbot[bot] in [\#3189](https://github.com/nextcloud/forms/pull/3189)
+- [stable5.2] Fix IME composition handling in option inputs by @backportbot[bot] in [\#3184](https://github.com/nextcloud/forms/pull/3184)
+- [stable5.2] Fix: Follow up IME option creation by @backportbot[bot] in [\#3200](https://github.com/nextcloud/forms/pull/3200)
+- [stable5.2] fix: use abolute URL for form by @backportbot[bot] in [\#3182](https://github.com/nextcloud/forms/pull/3182)
+
+### Merged
+
+- [stable5.2] refactor: migrate to `@nextcloud/dialogs` v7 by @Chartman123 in [\#3194](https://github.com/nextcloud/forms/pull/3194)
+
 ## v5.2.4 - 2026-01-23
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.3...v5.2.4)
