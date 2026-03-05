@@ -6,14 +6,14 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<div class="question__content">
 			<NcColorPicker
-				:model-value="pickedColor"
-				advanced-fields
-				@update:model-value="onUpdatePickedColor">
+				:modelValue="pickedColor"
+				advancedFields
+				@update:modelValue="onUpdatePickedColor">
 				<NcButton :disabled="!readOnly">
 					{{ colorPickerPlaceholder }}
 				</NcButton>

@@ -5,10 +5,10 @@
 
 <template>
 	<li class="question__item" @focusout="handleTabbing">
-		<div
+		<component
 			:is="pseudoIcon"
 			v-if="!isDropdown"
-			class="question__item__pseudoInput" />
+			class="question__item__pseudoInput"></component>
 		<input
 			ref="input"
 			v-model="localText"
@@ -161,13 +161,13 @@ export default {
 	},
 
 	emits: [
-		'tabbed-out',
-		'create-answer',
+		'tabbedOut',
+		'createAnswer',
 		'update:answer',
-		'focus-next',
+		'focusNext',
 		'delete',
-		'move-down',
-		'move-up',
+		'moveDown',
+		'moveUp',
 	],
 
 	data() {
@@ -281,7 +281,7 @@ export default {
 
 	methods: {
 		handleTabbing() {
-			this.$emit('tabbed-out', this.optionType)
+			this.$emit('tabbedOut', this.optionType)
 		},
 
 		/**
@@ -344,11 +344,10 @@ export default {
 				return
 			}
 
-			const answer = { ...this.answer }
-			answer.text = value
+			const answer = { ...this.answer, text: value, local: false }
 
 			// Dispatched for creation. Marked as synced
-			this.$set(this.answer, 'local', false)
+			this.$emit('update:answer', answer)
 			const newAnswer = await this.createAnswer(answer)
 
 			// Forward changes, but use current answer.text to avoid erasing
@@ -356,7 +355,7 @@ export default {
 			newAnswer.text = this.$refs.input.value
 			this.localText = ''
 
-			this.$emit('create-answer', this.index, newAnswer)
+			this.$emit('createAnswer', this.index, newAnswer)
 		},
 
 		/**
@@ -369,7 +368,7 @@ export default {
 				return
 			}
 			if (this.index <= this.maxIndex) {
-				this.$emit('focus-next', this.index, this.optionType)
+				this.$emit('focusNext', this.index, this.optionType)
 			}
 		},
 
@@ -472,7 +471,7 @@ export default {
 		 * Reorder option but keep focus on the button
 		 */
 		onMoveDown() {
-			this.$emit('move-down')
+			this.$emit('moveDown')
 			this.focusButton(
 				this.index < this.maxIndex - 1
 					? 'buttonOptionDown'
@@ -481,7 +480,7 @@ export default {
 		},
 
 		onMoveUp() {
-			this.$emit('move-up')
+			this.$emit('moveUp')
 			this.focusButton(this.index > 1 ? 'buttonOptionUp' : 'buttonOptionDown')
 		},
 
