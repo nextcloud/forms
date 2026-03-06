@@ -43,7 +43,7 @@ namespace OCA\Forms;
  *   questionType?: string,
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"|"section"
  * @psalm-type FormsQuestionGridCellType = "checkbox"|"number"|"radio"
  *
  * @psalm-type FormsQuestion = array{

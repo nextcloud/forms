@@ -1197,9 +1197,12 @@ class ApiController extends OCSController {
 		}
 		$questions = [];
 		foreach ($this->formsService->getQuestions($formId) as $question) {
+			if ($question['type'] === Constants::ANSWER_TYPE_SECTION) {
+				continue;
+			}
+
 			$questions[$question['id']] = $question;
 		}
-
 
 		// Append Display Names
 		$submissions = array_map(function (array $submission) use ($questions) {
