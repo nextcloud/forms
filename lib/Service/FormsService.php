@@ -204,6 +204,10 @@ class FormsService {
 		$result['permissions'] = $this->getPermissions($form);
 		// Append canSubmit, to be able to show proper EmptyContent on internal view.
 		$result['canSubmit'] = $this->canSubmit($form);
+		// Append isMaxSubmissionsReached to show proper message on submit view.
+		$maxSubmissions = $form->getMaxSubmissions();
+		$result['isMaxSubmissionsReached'] = $maxSubmissions !== null
+			&& $this->submissionMapper->countSubmissions($form->getId()) >= $maxSubmissions;
 
 		// Append submissionCount if currentUser has permissions to see results
 		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
@@ -484,6 +488,12 @@ class FormsService {
 	 * @return boolean
 	 */
 	public function canSubmit(Form $form): bool {
+		// Check if max submissions limit is reached
+		$maxSubmissions = $form->getMaxSubmissions();
+		if ($maxSubmissions !== null && $this->submissionMapper->countSubmissions($form->getId()) >= $maxSubmissions) {
+			return false;
+		}
+
 		// We cannot control how many time users can submit if public link available
 		if ($this->hasPublicLink($form)) {
 			return true;
