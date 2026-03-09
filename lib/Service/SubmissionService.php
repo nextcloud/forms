@@ -312,9 +312,19 @@ class SubmissionService {
 	 * @param array<int, array<int, string>|non-empty-list<array{label: string, url: string}>> $data
 	 */
 	private function exportData(array $header, array $data, string $fileFormat, ?File $file = null): string {
-		if ($file && $file->getContent()) {
+		$content = null;
+		if ($file) {
+			try {
+				$content = $file->getContent();
+			} catch (\Exception $e) {
+				$this->logger->warning('Failed to read existing linked file content: {msg}', ['msg' => $e->getMessage()]);
+			}
+		}
+
+		// Ignore whitespace-only files (e.g. S3 single-space placeholder).
+		if ($content !== null && trim($content) !== '') {
 			$existentFile = $this->tempManager->getTemporaryFile($fileFormat);
-			file_put_contents($existentFile, $file->getContent());
+			file_put_contents($existentFile, $content);
 			$spreadsheet = IOFactory::load($existentFile);
 		} else {
 			$spreadsheet = new Spreadsheet();
