@@ -11,7 +11,6 @@ export class AppNavigationSection {
 	public readonly ownFormsLocator: Locator
 	public readonly sharedFormsLocator: Locator
 
-	// eslint-disable-next-line no-useless-constructor
 	constructor(public readonly page: Page) {
 		this.navigationLocator = this.page.getByRole('navigation', {
 			name: 'Forms navigation',

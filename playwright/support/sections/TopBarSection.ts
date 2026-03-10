@@ -14,7 +14,6 @@ export enum FormsView {
 export class TopBarSection {
 	public readonly toolbar: Locator
 
-	// eslint-disable-next-line no-useless-constructor
 	constructor(public readonly page: Page) {
 		this.toolbar = this.page.getByRole('toolbar', { name: 'View mode' })
 	}
