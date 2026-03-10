@@ -13,9 +13,15 @@
 			<textarea
 				ref="textarea"
 				:aria-label="
-					t('forms', 'A long answer for the question “{text}”', {
-						text,
-					})
+					t(
+						'forms',
+						'A long answer for the question “{text}”',
+						{
+							text,
+						},
+						undefined,
+						{ escape: false },
+					)
 				"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
