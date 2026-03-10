@@ -14,12 +14,12 @@
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {
-    "postinstall": "patch-package",
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
     "dev:watch": "NODE_OPTIONS='--max-old-space-size=4096' npx vite --mode development build --watch",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "postinstall": "patch-package",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs",
