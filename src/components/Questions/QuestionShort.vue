@@ -13,9 +13,15 @@
 			<input
 				ref="input"
 				:aria-label="
-					t('forms', 'A short answer for the question “{text}”', {
-						text,
-					})
+					t(
+						'forms',
+						'A short answer for the question “{text}”',
+						{
+							text,
+						},
+						undefined,
+						{ escape: false },
+					)
 				"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
