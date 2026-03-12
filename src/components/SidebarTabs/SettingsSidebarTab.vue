@@ -87,7 +87,7 @@
 			{{ t('forms', 'Close form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__close-form" class="settings-hint">
-			{{ t('forms', 'Closed forms do not accept new submissions.') }}
+			{{ t('forms', 'Closed forms do not accept new responses.') }}
 		</p>
 		<NcCheckboxRadioSwitch
 			:model-value="isFormLockedPermanently"
@@ -112,7 +112,7 @@
 			{{
 				t(
 					'forms',
-					'Archived forms do not accept new submissions and can not be modified.',
+					'Archived forms do not accept new responses and cannot be modified.',
 				)
 			}}
 		</p>

@@ -4,7 +4,7 @@
 -->
 
 <template>
-	<NcAppContent :page-heading="t('forms', 'Results')">
+	<NcAppContent :page-heading="t('forms', 'Responses')">
 		<NcDialog
 			:open.sync="showLinkedFileNotAvailableDialog"
 			:name="t('forms', 'Linked file not available')"
@@ -192,10 +192,10 @@
 		<!-- Empty search results -->
 		<NcEmptyContent
 			v-else-if="noFilteredSubmissions && submissionSearch.length > 0"
-			:name="t('forms', 'No results found')"
+			:name="t('forms', 'No responses found')"
 			class="forms-emptycontent"
 			:description="
-				t('forms', 'No results found for {submissionSearch}', {
+				t('forms', 'No responses found for \'{submissionSearch}\'', {
 					submissionSearch,
 				})
 			">
@@ -209,9 +209,7 @@
 			v-else-if="noSubmissions"
 			:name="t('forms', 'No responses yet')"
 			class="forms-emptycontent"
-			:description="
-				t('forms', 'Results of submitted forms will show up here')
-			">
+			:description="t('forms', 'Responses will show up here')">
 			<template #icon>
 				<IconPoll :size="64" />
 			</template>
@@ -259,14 +257,8 @@
 		<!-- Confirmation dialog for deleting all submissions -->
 		<NcDialog
 			:open.sync="showConfirmDeleteDialog"
-			:name="t('forms', 'Delete submissions')"
-			:message="
-				t(
-					'forms',
-					'Are you sure you want to delete all responses of {title}?',
-					{ title: formTitle },
-				)
-			"
+			:name="t('forms', 'Delete responses')"
+			:message="t('forms', 'Are you sure you want to delete all responses?')"
 			:buttons="confirmDeleteButtons" />
 	</NcAppContent>
 </template>
@@ -435,7 +427,7 @@ export default {
 					},
 				},
 				{
-					label: t('forms', 'Delete submissions'),
+					label: t('forms', 'Delete responses'),
 					icon: IconDeleteSvg,
 					type: 'error',
 					callback: () => {
@@ -565,7 +557,7 @@ export default {
 
 		async loadFormResults() {
 			this.loadingResults = true
-			logger.debug(`Loading results for form ${this.form.hash}`)
+			logger.debug(`Loading responses for form ${this.form.hash}`)
 
 			try {
 				let response = null
@@ -598,8 +590,8 @@ export default {
 				this.questions = data.questions
 				this.filteredSubmissionsCount = data.filteredSubmissionsCount
 			} catch (error) {
-				logger.error('Error while loading results', { error })
-				showError(t('forms', 'There was an error while loading the results'))
+				logger.error('Error while loading responses', { error })
+				showError(t('forms', 'An error occurred while loading responses'))
 			} finally {
 				this.loadingResults = false
 			}
@@ -777,16 +769,16 @@ export default {
 						},
 					),
 				)
-				showSuccess(t('forms', 'Submission deleted'))
+				showSuccess(t('forms', 'Response deleted'))
 				const index = this.submissions.findIndex(
 					(search) => search.id === id,
 				)
 				this.submissions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
-				logger.error(`Error while removing response ${id}`, { error })
+				logger.error(`Error while deleting response ${id}`, { error })
 				showError(
-					t('forms', 'There was an error while removing this response'),
+					t('forms', 'An error occurred while deleting this response'),
 				)
 			} finally {
 				this.loadingResults = false
@@ -810,8 +802,8 @@ export default {
 				this.form.submissionCount = 0
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
-				logger.error('Error while removing responses', { error })
-				showError(t('forms', 'There was an error while removing responses'))
+				logger.error('Error while deleting responses', { error })
+				showError(t('forms', 'An error occurred while deleting responses'))
 			} finally {
 				this.loadingResults = false
 			}

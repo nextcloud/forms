@@ -54,9 +54,9 @@ const editView = {
 	disabled: false,
 }
 const resultsView = {
-	ariaLabel: t('forms', 'Show results'),
+	ariaLabel: t('forms', 'Show responses'),
 	icon: mdiPoll,
-	title: t('forms', 'Results'),
+	title: t('forms', 'Responses'),
 	id: 'results',
 }
 
