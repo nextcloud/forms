@@ -57,7 +57,7 @@
 				<template #icon>
 					<IconPoll :size="20" />
 				</template>
-				{{ t('forms', 'Results') }}
+				{{ t('forms', 'Responses') }}
 			</NcActionRouter>
 			<NcActionButton v-if="canEdit" close-after-click @click="onCloneForm">
 				<template #icon>

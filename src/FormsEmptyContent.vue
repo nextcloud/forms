@@ -53,7 +53,7 @@ export default {
 					title: t('forms', 'Form expired'),
 					description: t(
 						'forms',
-						'This form has expired and is no longer taking answers',
+						'This form has expired and is no longer taking responses',
 					),
 
 					icon: IconCheck,

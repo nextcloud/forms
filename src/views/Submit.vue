@@ -81,7 +81,7 @@
 				:description="
 					t(
 						'forms',
-						'This form has expired and is no longer taking answers',
+						'This form has expired and is no longer taking responses',
 					)
 				">
 				<template #icon>
@@ -95,7 +95,7 @@
 				:description="
 					t(
 						'forms',
-						'This form was closed and is no longer taking answers',
+						'This form was closed and is no longer taking responses',
 					)
 				">
 				<template #icon>
@@ -480,7 +480,7 @@ export default {
 		hash() {
 			// If public view, abort. Should normally not occur.
 			if (this.publicView) {
-				logger.error('Hash changed on public View. Aborting.')
+				logger.error('Hash changed on public view. Aborting.')
 				return
 			}
 			this.resetData()
@@ -596,7 +596,7 @@ export default {
 		},
 
 		async fetchSubmission() {
-			logger.debug(`Loading submission ${this.submissionId}`)
+			logger.debug(`Loading response ${this.submissionId}`)
 
 			try {
 				const response = await axios.get(
@@ -667,9 +667,9 @@ export default {
 
 				this.answers = answers
 			} catch (error) {
-				logger.error('Error while loading submission', { error })
+				logger.error('Error while loading response', { error })
 				showError(
-					t('forms', 'There was an error while loading the submission'),
+					t('forms', 'There was an error while loading the response'),
 				)
 			}
 		},
