@@ -58,7 +58,7 @@
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
-				v-else-if="success || !form.canSubmit"
+				v-else-if="success || (!form.canSubmit && !isMaxSubmissionsReached)"
 				class="forms-emptycontent"
 				:name="
 					form.submissionMessage
@@ -72,6 +72,20 @@
 				<template v-if="submissionMessageHTML" #description>
 					<!-- eslint-disable-next-line vue/no-v-html -->
 					<p class="submission-message" v-html="submissionMessageHTML" />
+				</template>
+			</NcEmptyContent>
+			<NcEmptyContent
+				v-else-if="isMaxSubmissionsReached"
+				class="forms-emptycontent"
+				:name="t('forms', 'Limit reached')"
+				:description="
+					t(
+						'forms',
+						'This form has reached the maximum number of responses',
+					)
+				">
+				<template #icon>
+					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
@@ -358,6 +372,10 @@ export default {
 
 		isClosed() {
 			return this.form.state === FormState.FormClosed
+		},
+
+		isMaxSubmissionsReached() {
+			return this.form.isMaxSubmissionsReached === true
 		},
 
 		/**

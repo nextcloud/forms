@@ -79,6 +79,32 @@
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
+			:model-value="hasMaxSubmissions"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onMaxSubmissionsChange">
+			{{ t('forms', 'Limit number of responses') }}
+		</NcCheckboxRadioSwitch>
+		<div
+			v-show="hasMaxSubmissions && !formArchived"
+			class="settings-div--indent">
+			<NcInputField
+				v-model="maxSubmissionsValue"
+				type="number"
+				:min="1"
+				:disabled="locked"
+				:label="t('forms', 'Maximum number of responses')"
+				@update:model-value="onMaxSubmissionsValueChange" />
+			<p class="settings-hint">
+				{{
+					t(
+						'forms',
+						'Form will be closed automatically when the limit is reached.',
+					)
+				}}
+			</p>
+		</div>
+		<NcCheckboxRadioSwitch
 			:model-value="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
@@ -184,6 +210,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
@@ -193,6 +220,7 @@ import { FormState } from '../../models/Constants.ts'
 export default {
 	components: {
 		NcButton,
+		NcInputField,
 		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
 		NcIconSvgWrapper,
@@ -302,6 +330,23 @@ export default {
 			return this.form.state !== FormState.FormActive
 		},
 
+		hasMaxSubmissions() {
+			return (
+				this.form.maxSubmissions !== null
+				&& this.form.maxSubmissions !== undefined
+			)
+		},
+
+		maxSubmissionsValue: {
+			get() {
+				return this.form.maxSubmissions ?? 1
+			},
+
+			set(value) {
+				this.$emit('update:form-prop', 'maxSubmissions', value)
+			},
+		},
+
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
@@ -363,6 +408,16 @@ export default {
 				'expires',
 				parseInt(moment(datetime).format('X')),
 			)
+		},
+
+		onMaxSubmissionsChange(checked) {
+			this.$emit('update:form-prop', 'maxSubmissions', checked ? 1 : null)
+		},
+
+		onMaxSubmissionsValueChange(value) {
+			if (value > 0) {
+				this.$emit('update:form-prop', 'maxSubmissions', value)
+			}
 		},
 
 		onFormClosedChange(isClosed) {

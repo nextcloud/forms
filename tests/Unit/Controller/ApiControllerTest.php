@@ -413,6 +413,7 @@ class ApiControllerTest extends TestCase {
 				'allowEditSubmissions' => false,
 				'lockedBy' => null,
 				'lockedUntil' => null,
+				'maxSubmissions' => null,
 			]]
 		];
 	}
