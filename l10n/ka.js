@@ -8,7 +8,6 @@ OC.L10N.register(
     "Shared with you" : "Shared with you",
     "Select groups" : "Select groups",
     "Cancel" : "Cancel",
-    "Results" : "შედეგი",
     "Go to previous page" : "Go to previous page",
     "Delete" : "Delete",
     "Checkbox" : "Checkbox",
@@ -29,7 +28,6 @@ OC.L10N.register(
     "Summary" : "Summary",
     "Download" : "Download",
     "Search" : "ძიება",
-    "No results found" : "No results found",
     "Sharing" : "Sharing",
     "Settings" : "Settings",
     "Abort" : "Abort",
@@ -49,6 +47,8 @@ OC.L10N.register(
     "Presentation" : "Presentation",
     "Phone number" : "Phone number",
     "Email address" : "Email address",
-    "Uploading …" : "Uploading …"
+    "Results" : "შედეგი",
+    "Uploading …" : "Uploading …",
+    "No results found" : "No results found"
 },
 "nplurals=2; plural=(n!=1);");

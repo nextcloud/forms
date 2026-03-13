@@ -6,7 +6,6 @@
     "Shared with you" : "Đã chia sẻ với bạn",
     "Select groups" : "Chọn nhóm",
     "Cancel" : "Hủy",
-    "Results" : "Kết quả",
     "Options" : "Tùy chọn",
     "Required" : "Bắt buộc",
     "Delete" : "Xóa",
@@ -32,7 +31,6 @@
     "Summary" : "tóm tắt",
     "Download" : "Tải xuống",
     "Search" : "Tìm kiếm",
-    "No results found" : "Không tìm thấy kết quả",
     "Sharing" : "Đang chia sẽ",
     "Settings" : "Thiết lập",
     "Abort" : "Hủy bỏ",
@@ -55,6 +53,8 @@
     "Spreadsheet" : "Bảng tính",
     "Phone number" : "Số điện thoại",
     "Email address" : "Địa chỉ thư điện tử",
-    "Uploading …" : "Đang tải lên …"
+    "Results" : "Kết quả",
+    "Uploading …" : "Đang tải lên …",
+    "No results found" : "Không tìm thấy kết quả"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

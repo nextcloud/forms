@@ -4,7 +4,6 @@
     "Question" : "Asteqsi",
     "Copy" : "Nɣel",
     "Cancel" : "Semmet",
-    "Results" : "Igmaḍ",
     "Options" : "Tixtiṛiyin",
     "Delete" : "Kkes",
     "Checkbox" : "Tanaka n ṛṛcem",
@@ -35,6 +34,7 @@
     "Image" : "Tugna",
     "Document" : "Isemli",
     "Phone number" : "Uṭṭun n tiliɣri",
-    "Email address" : "Tansa imayl"
+    "Email address" : "Tansa imayl",
+    "Results" : "Igmaḍ"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

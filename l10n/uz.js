@@ -8,7 +8,6 @@ OC.L10N.register(
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
     "Cancel" : "Bekor qilish",
-    "Results" : "Natijalar",
     "Options" : "Variantlar",
     "Delete" : "O'chirish",
     "Checkbox" : "Belgilash katagi",
@@ -29,7 +28,6 @@ OC.L10N.register(
     "Description" : "Tavsif",
     "Download" : "Yuklab olish",
     "Search" : "Qidirish",
-    "No results found" : "Hech qanday natija topilmadi",
     "Sharing" : "Ulashish",
     "Settings" : "Sozlamalar",
     "Submit" : "Submit",
@@ -42,6 +40,8 @@ OC.L10N.register(
     "Pick a time" : "Vaqtni tanlang",
     "Color" : "Rang",
     "Email address" : "E-pochta manzili",
-    "Uploading …" : "Yuklanmoqda..."
+    "Results" : "Natijalar",
+    "Uploading …" : "Yuklanmoqda...",
+    "No results found" : "Hech qanday natija topilmadi"
 },
 "nplurals=1; plural=0;");

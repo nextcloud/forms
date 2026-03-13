@@ -6,7 +6,6 @@ OC.L10N.register(
     "Question" : "Asteqsi",
     "Copy" : "Nɣel",
     "Cancel" : "Semmet",
-    "Results" : "Igmaḍ",
     "Options" : "Tixtiṛiyin",
     "Delete" : "Kkes",
     "Checkbox" : "Tanaka n ṛṛcem",
@@ -37,6 +36,7 @@ OC.L10N.register(
     "Image" : "Tugna",
     "Document" : "Isemli",
     "Phone number" : "Uṭṭun n tiliɣri",
-    "Email address" : "Tansa imayl"
+    "Email address" : "Tansa imayl",
+    "Results" : "Igmaḍ"
 },
 "nplurals=2; plural=(n != 1);");

@@ -12,7 +12,6 @@ OC.L10N.register(
     "Select groups" : "Pilih grup",
     "Expires {relativeDate}" : "Kedaluwarsa {relativeDate}",
     "Cancel" : "Batal",
-    "Results" : "Hasil",
     "Options" : "Pilihan",
     "Go to previous page" : "Pergi ke halaman sebelumnya",
     "Maximum file size" : "Ukuran file maksimum",
@@ -41,7 +40,6 @@ OC.L10N.register(
     "Summary" : "Kesimpulan",
     "Download" : "Unduh",
     "Search" : "Cari",
-    "No results found" : "Tidak ada hasil ditemukan",
     "Sharing" : "Berbagi",
     "Settings" : "Setelan",
     "Abort" : "Batal",
@@ -63,7 +61,9 @@ OC.L10N.register(
     "Presentation" : "Presentasi",
     "Phone number" : "Nomor telepon",
     "Email address" : "Alamat email",
+    "Results" : "Hasil",
     "Uploading …" : "Mengunggah …",
-    "Loading {title} …" : "Memuat {title} …"
+    "Loading {title} …" : "Memuat {title} …",
+    "No results found" : "Tidak ada hasil ditemukan"
 },
 "nplurals=1; plural=0;");
