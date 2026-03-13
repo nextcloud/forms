@@ -33,7 +33,6 @@ OC.L10N.register(
     "Are you sure you want to delete {title}?" : "정말로 {title}을 삭제할 것입니까?",
     "Cancel" : "취소",
     "Error while deleting {title}" : "{title} 삭제 실패",
-    "Results" : "결과들",
     "Options" : "옵션들",
     "Go to previous page" : "이전 페이지로 이동",
     "Add a new column" : "새 행 만들기",
@@ -77,7 +76,6 @@ OC.L10N.register(
     "Summary" : "요약",
     "Download" : "다운로드",
     "Search" : "검색",
-    "No results found" : "결과 없음",
     "Sharing" : "공유",
     "Settings" : "설정",
     "Abort" : "중단",
@@ -107,6 +105,8 @@ OC.L10N.register(
     "Phone number" : "휴대폰 번호",
     "Email address" : "이메일 주소",
     "Loading forms …" : "형식 로딩중 ...",
-    "Uploading …" : "업로드 중…"
+    "Results" : "결과들",
+    "Uploading …" : "업로드 중…",
+    "No results found" : "결과 없음"
 },
 "nplurals=1; plural=0;");

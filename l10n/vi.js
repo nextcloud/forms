@@ -8,7 +8,6 @@ OC.L10N.register(
     "Shared with you" : "Đã chia sẻ với bạn",
     "Select groups" : "Chọn nhóm",
     "Cancel" : "Hủy",
-    "Results" : "Kết quả",
     "Options" : "Tùy chọn",
     "Required" : "Bắt buộc",
     "Delete" : "Xóa",
@@ -34,7 +33,6 @@ OC.L10N.register(
     "Summary" : "tóm tắt",
     "Download" : "Tải xuống",
     "Search" : "Tìm kiếm",
-    "No results found" : "Không tìm thấy kết quả",
     "Sharing" : "Đang chia sẽ",
     "Settings" : "Thiết lập",
     "Abort" : "Hủy bỏ",
@@ -57,6 +55,8 @@ OC.L10N.register(
     "Spreadsheet" : "Bảng tính",
     "Phone number" : "Số điện thoại",
     "Email address" : "Địa chỉ thư điện tử",
-    "Uploading …" : "Đang tải lên …"
+    "Results" : "Kết quả",
+    "Uploading …" : "Đang tải lên …",
+    "No results found" : "Không tìm thấy kết quả"
 },
 "nplurals=1; plural=0;");

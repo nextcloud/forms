@@ -6,7 +6,6 @@
     "Shared with you" : "Shared with you",
     "Select groups" : "Select groups",
     "Cancel" : "Cancel",
-    "Results" : "შედეგი",
     "Go to previous page" : "Go to previous page",
     "Delete" : "Delete",
     "Checkbox" : "Checkbox",
@@ -27,7 +26,6 @@
     "Summary" : "Summary",
     "Download" : "Download",
     "Search" : "ძიება",
-    "No results found" : "No results found",
     "Sharing" : "Sharing",
     "Settings" : "Settings",
     "Abort" : "Abort",
@@ -47,6 +45,8 @@
     "Presentation" : "Presentation",
     "Phone number" : "Phone number",
     "Email address" : "Email address",
-    "Uploading …" : "Uploading …"
+    "Results" : "შედეგი",
+    "Uploading …" : "Uploading …",
+    "No results found" : "No results found"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

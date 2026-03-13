@@ -12,15 +12,12 @@
     "No forms created yet" : "Vēl nav izveidota neviena veidlapa",
     "Select groups" : "Atlasīt grupas",
     "Cancel" : "Atcelt",
-    "Results" : "Rezultāti",
     "Required" : "Nepieciešams",
     "Delete" : "Izdzēst",
     "Text" : "Teksts",
     "Other" : "Cits",
     "never" : "nekad",
     "Set expiration date" : "Iestatīt derīguma beigu datumu",
-    "Closed forms do not accept new submissions." : "Aizvērtās veidlapās netiek pieņemti jauni iesniegumi.",
-    "Archived forms do not accept new submissions and can not be modified." : "Aizvērtās formās netiek pieņemti jauni iesniegumi, un tās nevar mainīt.",
     "Group" : "Grupa",
     "Team" : "Komanda",
     "Permissions" : "Atļaujas",
@@ -39,7 +36,6 @@
     "Open spreadsheet" : "Atvērt izklājlapu",
     "Download" : "Lejupielādēt",
     "Search" : "Meklēt",
-    "Results of submitted forms will show up here" : "Šeit tiks parādīts iesniegto veidlapu apkopojums",
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",
     "Submit" : "Iesniegt",
@@ -60,6 +56,10 @@
     "Phone number" : "Tālruņa numurs",
     "Email address" : "E-pasta adrese",
     "Loading forms …" : "Ielādē veidlapas…",
-    "Uploading …" : "Augšupielādē…"
+    "Results" : "Rezultāti",
+    "Uploading …" : "Augšupielādē…",
+    "Closed forms do not accept new submissions." : "Aizvērtās veidlapās netiek pieņemti jauni iesniegumi.",
+    "Archived forms do not accept new submissions and can not be modified." : "Aizvērtās formās netiek pieņemti jauni iesniegumi, un tās nevar mainīt.",
+    "Results of submitted forms will show up here" : "Šeit tiks parādīts iesniegto veidlapu apkopojums"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);"
 }
