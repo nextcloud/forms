@@ -50,6 +50,8 @@ use OCP\AppFramework\Db\Entity;
  * @method string getLockedBy()
  * @method void setLockedBy(string|null $value)
  * @method int getLockedUntil()
+ * @method int|null getMaxSubmissions()
+ * @method void setMaxSubmissions(int|null $value)
  * @method void setLockedUntil(int|null $value)
  */
 class Form extends Entity {
@@ -71,6 +73,7 @@ class Form extends Entity {
 	protected $state;
 	protected $lockedBy;
 	protected $lockedUntil;
+	protected $maxSubmissions;
 
 	/**
 	 * Form constructor.
@@ -86,6 +89,7 @@ class Form extends Entity {
 		$this->addType('state', 'integer');
 		$this->addType('lockedBy', 'string');
 		$this->addType('lockedUntil', 'integer');
+		$this->addType('maxSubmissions', 'integer');
 	}
 
 	// JSON-Decoding of access-column.
@@ -159,6 +163,7 @@ class Form extends Entity {
 	 *   state: 0|1|2,
 	 *   lockedBy: ?string,
 	 *   lockedUntil: ?int,
+	 *   maxSubmissions: ?int,
 	 *  }
 	 */
 	public function read() {
@@ -182,6 +187,7 @@ class Form extends Entity {
 			'state' => $this->getState(),
 			'lockedBy' => $this->getLockedBy(),
 			'lockedUntil' => $this->getLockedUntil(),
+			'maxSubmissions' => $this->getMaxSubmissions(),
 		];
 	}
 }

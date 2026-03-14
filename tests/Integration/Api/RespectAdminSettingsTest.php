@@ -143,6 +143,8 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				],
 				'canSubmit' => true,
 				'submissionCount' => 0,
+				'maxSubmissions' => null,
+				'isMaxSubmissionsReached' => false,
 			],
 		];
 	}
