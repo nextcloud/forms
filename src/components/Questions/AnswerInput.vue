@@ -347,16 +347,24 @@ export default {
 			const answer = { ...this.answer }
 			answer.text = value
 
-			// Dispatched for creation. Marked as synced
-			this.$set(this.answer, 'local', false)
-			const newAnswer = await this.createAnswer(answer)
+			// Prevent any queued debounced PATCHes from running while creating
+			this.queue.pause()
+			try {
+				// Dispatched for creation. Marked as synced
+				this.$set(this.answer, 'local', false)
+				const newAnswer = await this.createAnswer(answer)
 
-			// Forward changes, but use current answer.text to avoid erasing
-			// any in-between changes while creating the answer
-			newAnswer.text = this.$refs.input.value
-			this.localText = ''
+				// Forward changes, but use current answer.text to avoid erasing
+				// any in-between changes while creating the answer
+				newAnswer.text = this.$refs.input.value
+				this.localText = ''
 
-			this.$emit('create-answer', this.index, newAnswer)
+				this.$emit('create-answer', this.index, newAnswer)
+			} finally {
+				// Clear pending update tasks (stale PATCHes) before resuming processing
+				this.queue.clear()
+				this.queue.start()
+			}
 		},
 
 		/**
