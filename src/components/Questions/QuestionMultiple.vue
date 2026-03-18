@@ -68,7 +68,10 @@
 			</NcActionButton>
 		</template>
 		<template v-if="readOnly">
-			<fieldset :name="name || undefined" :aria-labelledby="titleId">
+			<fieldset
+				:name="name || undefined"
+				:aria-labelledby="titleId"
+				:aria-describedby="description ? descriptionId : undefined">
 				<NcNoteCard v-if="hasError" :id="errorId" type="error">
 					{{ errorMessage }}
 				</NcNoteCard>
@@ -268,10 +271,6 @@ export default {
 
 		questionValues() {
 			return this.isUnique ? this.values?.[0] : this.values
-		},
-
-		titleId() {
-			return `q${this.index}_title`
 		},
 
 		errorId() {

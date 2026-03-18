@@ -60,7 +60,10 @@
 				class="question-linear-scale__label question-linear-scale__label-lowest">
 				{{ optionsLabelLowest }}
 			</div>
-			<fieldset class="question-linear-scale__options">
+			<fieldset
+				class="question-linear-scale__options"
+				:aria-labelledby="titleId"
+				:aria-describedby="description ? descriptionId : undefined">
 				<legend class="hidden-visually">
 					{{
 						t('forms', 'From {firstOption} to {lastOption}', {

@@ -12,17 +12,8 @@
 		<div class="question__content">
 			<input
 				ref="input"
-				:aria-label="
-					t(
-						'forms',
-						'A short answer for the question “{text}”',
-						{
-							text,
-						},
-						undefined,
-						{ escape: false },
-					)
-				"
+				:aria-labelledby="titleId"
+				:aria-describedby="description ? descriptionId : undefined"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:name="name || undefined"

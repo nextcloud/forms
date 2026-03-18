@@ -181,6 +181,14 @@ export default {
 			return props
 		},
 
+		titleId() {
+			return 'q' + this.index + '_title'
+		},
+
+		descriptionId() {
+			return 'q' + this.index + '_desc'
+		},
+
 		/**
 		 * Listeners for all questions to forward
 		 */

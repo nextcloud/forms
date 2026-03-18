@@ -142,6 +142,7 @@
 				<!-- eslint-disable vue/no-v-html -->
 				<div
 					v-else
+					:id="descriptionId"
 					class="question__header__description__output"
 					v-html="computedDescription" />
 				<!-- eslint-enable vue/no-v-html -->
@@ -304,6 +305,10 @@ export default {
 
 		titleId() {
 			return 'q' + this.index + '_title'
+		},
+
+		descriptionId() {
+			return 'q' + this.index + '_desc'
 		},
 
 		hasDescription() {
