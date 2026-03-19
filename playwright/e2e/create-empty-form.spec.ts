@@ -4,15 +4,16 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
-import { test as formTest } from '../support/fixtures/form'
+import { test as formTest } from '../support/fixtures/form.ts'
+import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
+import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest)
 
 test.beforeEach(async ({ page }) => {
-	await page.goto('apps/forms')
-	await page.waitForURL(/apps\/forms$/)
+	// use absolute path and wait until network is idle to avoid flaky load waits
+	await page.goto('apps/forms', { waitUntil: 'networkidle' })
+	await page.waitForURL(/apps\/forms\/$/)
 })
 
 test.describe('No forms created - empty content', () => {

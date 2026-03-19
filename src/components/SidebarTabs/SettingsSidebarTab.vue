@@ -27,33 +27,33 @@
 			{{ t('forms', 'Unlock form') }}
 		</NcButton>
 		<NcCheckboxRadioSwitch
-			:model-value="form.isAnonymous"
+			:modelValue="form.isAnonymous"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onAnonChange">
+			@update:modelValue="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
 			{{ t('forms', 'Store responses anonymously') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:title="disableSubmitMultipleExplanation"
-			:model-value="submitMultiple"
+			:modelValue="submitMultiple"
 			:disabled="disableSubmitMultiple || formArchived || locked"
 			type="switch"
-			@update:model-value="onSubmitMultipleChange">
+			@update:modelValue="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:model-value="form.allowEditSubmissions"
+			:modelValue="form.allowEditSubmissions"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onAllowEditSubmissionsChange">
+			@update:modelValue="onAllowEditSubmissionsChange">
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:model-value="formExpires"
+			:modelValue="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onFormExpiresChange">
+			@update:modelValue="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires && !formArchived" class="settings-div--indent">
@@ -61,28 +61,28 @@
 				id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled="locked"
-				:disabled-date="notBeforeToday"
-				:disabled-time="notBeforeNow"
+				:disabledDate="notBeforeToday"
+				:disabledTime="notBeforeNow"
 				:editable="false"
 				:format="stringifyDate"
-				:minute-step="5"
-				:show-second="false"
-				:model-value="expirationDate"
+				:minuteStep="5"
+				:showSecond="false"
+				:modelValue="expirationDate"
 				type="datetime"
 				@change="onExpirationDateChange" />
 			<NcCheckboxRadioSwitch
-				:model-value="form.showExpiration"
+				:modelValue="form.showExpiration"
 				:disabled="locked"
 				type="switch"
-				@update:model-value="onShowExpirationChange">
+				@update:modelValue="onShowExpirationChange">
 				{{ t('forms', 'Show expiration date on form') }}
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
-			:model-value="hasMaxSubmissions"
+			:modelValue="hasMaxSubmissions"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onMaxSubmissionsChange">
+			@update:modelValue="onMaxSubmissionsChange">
 			{{ t('forms', 'Limit number of responses') }}
 		</NcCheckboxRadioSwitch>
 		<div
@@ -94,7 +94,7 @@
 				:min="1"
 				:disabled="locked"
 				:label="t('forms', 'Maximum number of responses')"
-				@update:model-value="onMaxSubmissionsValueChange" />
+				@update:modelValue="onMaxSubmissionsValueChange" />
 			<p class="settings-hint">
 				{{
 					t(
@@ -105,33 +105,59 @@
 			</p>
 		</div>
 		<NcCheckboxRadioSwitch
-			:model-value="formClosed"
+			:modelValue="hasMaxSubmissions"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:modelValue="onMaxSubmissionsChange">
+			{{ t('forms', 'Limit number of responses') }}
+		</NcCheckboxRadioSwitch>
+		<div
+			v-show="hasMaxSubmissions && !formArchived"
+			class="settings-div--indent">
+			<NcInputField
+				v-model="maxSubmissionsValue"
+				type="number"
+				:min="1"
+				:disabled="locked"
+				:label="t('forms', 'Maximum number of responses')"
+				@update:modelValue="onMaxSubmissionsValueChange" />
+			<p class="settings-hint">
+				{{
+					t(
+						'forms',
+						'Form will be closed automatically when the limit is reached.',
+					)
+				}}
+			</p>
+		</div>
+		<NcCheckboxRadioSwitch
+			:modelValue="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
 			type="switch"
-			@update:model-value="onFormClosedChange">
+			@update:modelValue="onFormClosedChange">
 			{{ t('forms', 'Close form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__close-form" class="settings-hint">
 			{{ t('forms', 'Closed forms do not accept new responses.') }}
 		</p>
 		<NcCheckboxRadioSwitch
-			:model-value="isFormLockedPermanently"
+			:modelValue="isFormLockedPermanently"
 			:disabled="
 				formArchived
 				|| (locked && form.lockedUntil !== 0)
 				|| !isCurrentUserOwner
 			"
 			type="switch"
-			@update:model-value="onFormLockChange">
+			@update:modelValue="onFormLockChange">
 			{{ t('forms', 'Lock form permanently') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:model-value="formArchived"
+			:modelValue="formArchived"
 			aria-describedby="forms-settings__archive-form"
 			:disabled="locked || !isCurrentUserOwner"
 			type="switch"
-			@update:model-value="onFormArchivedChange">
+			@update:modelValue="onFormArchivedChange">
 			{{ t('forms', 'Archive form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__archive-form" class="settings-hint">
@@ -143,10 +169,10 @@
 			}}
 		</p>
 		<NcCheckboxRadioSwitch
-			:model-value="hasCustomSubmissionMessage"
+			:modelValue="hasCustomSubmissionMessage"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onUpdateHasCustomSubmissionMessage">
+			@update:modelValue="onUpdateHasCustomSubmissionMessage">
 			{{ t('forms', 'Custom submission message') }}
 		</NcCheckboxRadioSwitch>
 		<div
@@ -196,7 +222,7 @@
 
 		<TransferOwnership
 			:locked="locked"
-			:is-owner="isCurrentUserOwner"
+			:isOwner="isCurrentUserOwner"
 			:form="form" />
 	</div>
 </template>

@@ -4,8 +4,9 @@
  */
 
 import type { Locator, Page, Response } from '@playwright/test'
-import type { QuestionType } from './QuestionType'
-import { QuestionSection } from './QuestionSection'
+import type { QuestionType } from './QuestionType.ts'
+
+import { QuestionSection } from './QuestionSection.ts'
 
 export class FormSection {
 	public readonly mainContent: Locator
@@ -13,7 +14,6 @@ export class FormSection {
 	public readonly descriptionField: Locator
 	public readonly newQuestionButton: Locator
 
-	// eslint-disable-next-line no-useless-constructor
 	constructor(public readonly page: Page) {
 		this.mainContent = this.page.getByRole('main')
 		this.newQuestionButton = this.page.getByRole('button', {

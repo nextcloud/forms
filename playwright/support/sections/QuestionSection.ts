@@ -10,7 +10,6 @@ export class QuestionSection {
 	public readonly newAnswerInput: Locator
 	public readonly answerInputs: Locator
 
-	// eslint-disable-next-line no-useless-constructor
 	constructor(
 		public readonly page: Page,
 		public readonly section: Locator,

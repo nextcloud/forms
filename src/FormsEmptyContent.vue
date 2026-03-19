@@ -4,7 +4,7 @@
 -->
 
 <template>
-	<NcContent app-name="forms">
+	<NcContent appName="forms">
 		<NcAppContent class="forms-emptycontent">
 			<NcEmptyContent
 				:name="currentModel.title"
