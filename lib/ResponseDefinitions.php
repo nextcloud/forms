@@ -43,7 +43,7 @@ namespace OCA\Forms;
  *   questionType?: string,
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"|"color"|"conditional"
  * @psalm-type FormsQuestionGridCellType = "checkbox"|"number"|"radio"
  *
  * @psalm-type FormsQuestion = array{
@@ -58,6 +58,8 @@ namespace OCA\Forms;
  *   extraSettings: FormsQuestionExtraSettings|\stdClass,
  *   options: list<FormsOption>,
  *   accept: list<string>,
+ *   parentQuestionId?: ?int,
+ *   branchId?: ?string,
  * }
  *
  * @psalm-type FormsAnswer = array{
