@@ -12,17 +12,8 @@
 		<div class="question__content">
 			<textarea
 				ref="textarea"
-				:aria-label="
-					t(
-						'forms',
-						'A long answer for the question “{text}”',
-						{
-							text,
-						},
-						undefined,
-						{ escape: false },
-					)
-				"
+				:aria-labelledby="titleId"
+				:aria-describedby="description ? descriptionId : undefined"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:required="isRequired"

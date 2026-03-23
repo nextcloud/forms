@@ -12,7 +12,10 @@
 		:shift-drag-handle="shiftDragHandle"
 		v-on="commonListeners">
 		<template v-if="readOnly">
-			<fieldset :name="name || undefined" :aria-labelledby="titleId">
+			<fieldset
+				:name="name || undefined"
+				:aria-labelledby="titleId"
+				:aria-describedby="description ? descriptionId : undefined">
 				<NcNoteCard v-if="hasError" :id="errorId" type="error">
 					{{ errorMessage }}
 				</NcNoteCard>
@@ -233,10 +236,6 @@ export default {
 
 		shiftDragHandle() {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
-		},
-
-		titleId() {
-			return `q${this.index}_title`
 		},
 
 		errorId() {

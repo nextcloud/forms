@@ -108,7 +108,11 @@
 					{{ t('forms', 'Uploading …') }}
 				</li>
 				<li v-else-if="values.length < maxAllowedFilesCount">
-					<div class="question__input-wrapper">
+					<div
+						class="question__input-wrapper"
+						role="group"
+						:aria-labelledby="titleId"
+						:aria-describedby="description ? descriptionId : undefined">
 						<label>
 							{{ t('forms', 'Add new file as answer') }}
 							<input

@@ -9,7 +9,11 @@
 		:title-placeholder="answerType.titlePlaceholder"
 		:warning-invalid="answerType.warningInvalid"
 		v-on="commonListeners">
-		<div class="question__content">
+		<div
+			class="question__content"
+			role="group"
+			:aria-labelledby="titleId"
+			:aria-describedby="description ? descriptionId : undefined">
 			<NcColorPicker
 				:model-value="pickedColor"
 				advanced-fields
