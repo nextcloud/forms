@@ -24,7 +24,7 @@
 				{{ t('forms', 'Add multiple options') }}
 			</NcActionButton>
 		</template>
-		<div
+		<NcSelect
 			v-if="readOnly"
 			:modelValue="selectedOption"
 			:name="name || undefined"
@@ -36,7 +36,7 @@
 			label="text"
 			:aria-label-combobox="selectOptionPlaceholder"
 			:aria-labelledby="titleId"
-			:aria-describedby="description ? descriptionId : undefined">
+			:aria-describedby="description ? descriptionId : undefined"
 			@input="onInput" />
 		<template v-else>
 			<div v-if="isLoading">
@@ -45,7 +45,6 @@
 			<Draggable
 				v-else
 				v-model="choices"
-				:itemKey="(item) => (item.local ? 'option-local' : item.id)"
 				class="question__content"
 				:animation="200"
 				direction="vertical"
@@ -90,7 +89,7 @@
 </template>
 
 <script>
-import Draggable from 'vuedraggable'
+import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'

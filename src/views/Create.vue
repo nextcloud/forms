@@ -116,7 +116,6 @@
 				<!-- Questions list -->
 				<Draggable
 					v-model="form.questions"
-					:itemKey="(item) => item.id"
 					:animation="200"
 					tag="transition-group"
 					:componentData="{
@@ -128,39 +127,35 @@
 					@change="onQuestionOrderChange"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<template #item="{ element: question, index }">
-						<component
-							:is="answerTypes[question.type].component"
-							:ref="setQuestionRef"
-							v-bind="form.questions[index]"
-							:canMoveDown="index < form.questions.length - 1"
-							:canMoveUp="index > 0"
-							:answerType="answerTypes[question.type]"
-							:index="index + 1"
-							:maxStringLengths="maxStringLengths"
-							@update:text="
-								(val) => (form.questions[index].text = val)
-							"
-							@update:description="
-								(val) => (form.questions[index].description = val)
-							"
-							@update:isRequired="
-								(val) => (form.questions[index].isRequired = val)
-							"
-							@update:name="
-								(val) => (form.questions[index].name = val)
-							"
-							@update:extraSettings="
-								(val) => (form.questions[index].extraSettings = val)
-							"
-							@update:options="
-								(val) => (form.questions[index].options = val)
-							"
-							@clone="cloneQuestion(question)"
-							@delete="deleteQuestion(question.id)"
-							@moveDown="onMoveDown(index)"
-							@moveUp="onMoveUp(index)" />
-					</template>
+					<component
+						:is="answerTypes[question.type].component"
+						v-for="(question, index) in form.questions"
+						:key="question.id"
+						:ref="setQuestionRef"
+						v-bind="form.questions[index]"
+						:canMoveDown="index < form.questions.length - 1"
+						:canMoveUp="index > 0"
+						:answerType="answerTypes[question.type]"
+						:index="index + 1"
+						:maxStringLengths="maxStringLengths"
+						@update:text="(val) => (form.questions[index].text = val)"
+						@update:description="
+							(val) => (form.questions[index].description = val)
+						"
+						@update:isRequired="
+							(val) => (form.questions[index].isRequired = val)
+						"
+						@update:name="(val) => (form.questions[index].name = val)"
+						@update:extraSettings="
+							(val) => (form.questions[index].extraSettings = val)
+						"
+						@update:options="
+							(val) => (form.questions[index].options = val)
+						"
+						@clone="cloneQuestion(question)"
+						@delete="deleteQuestion(question.id)"
+						@moveDown="onMoveDown(index)"
+						@moveUp="onMoveUp(index)" />
 				</Draggable>
 
 				<!-- Add new questions menu -->
@@ -237,7 +232,7 @@ import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import Draggable from 'vuedraggable'
+import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'

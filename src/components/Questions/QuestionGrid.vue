@@ -181,7 +181,7 @@
 
 <script>
 import { translatePlural as n, translate as t } from '@nextcloud/l10n'
-import Draggable from 'vuedraggable'
+import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'

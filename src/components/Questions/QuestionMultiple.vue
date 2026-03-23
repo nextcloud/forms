@@ -120,7 +120,6 @@
 			<Draggable
 				v-else
 				v-model="choices"
-				:itemKey="(item) => (item.local ? 'option-local' : item.id)"
 				class="question__content"
 				:animation="200"
 				direction="vertical"
@@ -180,7 +179,7 @@
 <script>
 import { showError } from '@nextcloud/dialogs'
 import { translatePlural as n, translate as t } from '@nextcloud/l10n'
-import Draggable from 'vuedraggable'
+import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'

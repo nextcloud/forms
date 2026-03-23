@@ -19,7 +19,6 @@
     "dev:watch": "NODE_OPTIONS='--max-old-space-size=4096' npx vite --mode development build --watch",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "postinstall": "patch-package",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs",
@@ -48,9 +47,9 @@
     "qrcode": "^1.5.4",
     "v-click-outside": "^3.2.0",
     "vue": "^3.5.22",
+    "vue-draggable-plus": "^0.6.1",
     "vue-material-design-icons": "^5.3.1",
-    "vue-router": "^4.6.0",
-    "vuedraggable": "^4.1.0"
+    "vue-router": "^4.6.0"
   },
   "devDependencies": {
     "@mdi/js": "^7.4.47",
@@ -65,7 +64,6 @@
     "@vue/tsconfig": "^0.5.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
-    "patch-package": "^8.0.1",
     "prettier": "^3.8.1",
     "vite": "^7.3.1"
   },
