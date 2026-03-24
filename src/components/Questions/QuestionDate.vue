@@ -166,6 +166,10 @@ export default {
 			return {
 				required: this.isRequired,
 				name: this.name || undefined,
+				'aria-labelledby': this.titleId,
+				'aria-describedby': this.description
+					? this.descriptionId
+					: undefined,
 			}
 		},
 

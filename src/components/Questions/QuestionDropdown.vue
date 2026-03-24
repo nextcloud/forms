@@ -24,18 +24,23 @@
 				{{ t('forms', 'Add multiple options') }}
 			</NcActionButton>
 		</template>
-		<NcSelect
+		<div
 			v-if="readOnly"
-			:model-value="selectedOption"
-			:name="name || undefined"
-			:placeholder="selectOptionPlaceholder"
-			:multiple="isMultiple"
-			:required="isRequired"
-			:options="choices"
-			:searchable="false"
-			label="text"
-			:aria-label-combobox="selectOptionPlaceholder"
-			@input="onInput" />
+			role="group"
+			:aria-labelledby="titleId"
+			:aria-describedby="description ? descriptionId : undefined">
+			<NcSelect
+				:model-value="selectedOption"
+				:name="name || undefined"
+				:placeholder="selectOptionPlaceholder"
+				:multiple="isMultiple"
+				:required="isRequired"
+				:options="choices"
+				:searchable="false"
+				label="text"
+				:aria-label-combobox="selectOptionPlaceholder"
+				@input="onInput" />
+		</div>
 		<template v-else>
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />

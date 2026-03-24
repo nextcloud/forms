@@ -5,5 +5,11 @@
 
 export enum QuestionType {
 	Checkboxes = 'Checkboxes',
+	Color = 'Color',
+	Date = 'Date',
 	Dropdown = 'Dropdown',
+	File = 'File',
+	LinearScale = 'Linear scale',
+	LongAnswer = 'Long text',
+	ShortAnswer = 'Short answer',
 }
