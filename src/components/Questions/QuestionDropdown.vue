@@ -37,7 +37,7 @@
 			:aria-label-combobox="selectOptionPlaceholder"
 			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined"
-			@input="onInput" />
+			@update:modelValue="onInput" />
 		<template v-else>
 			<div v-if="isLoading">
 				<NcLoadingIcon :size="64" />
