@@ -253,7 +253,7 @@ export default {
 		},
 	},
 
-	emits: ['update:form-prop'],
+	emits: ['update:formProp'],
 
 	data() {
 		return {
@@ -343,7 +343,7 @@ export default {
 			},
 
 			set(value) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
+				this.$emit('update:formProp', 'maxSubmissions', value)
 			},
 		},
 
@@ -370,31 +370,31 @@ export default {
 		 * @param {boolean} checked New Checkbox/Switch Value to use
 		 */
 		onAnonChange(checked) {
-			this.$emit('update:form-prop', 'isAnonymous', checked)
+			this.$emit('update:formProp', 'isAnonymous', checked)
 		},
 
 		onSubmitMultipleChange(checked) {
-			this.$emit('update:form-prop', 'submitMultiple', checked)
+			this.$emit('update:formProp', 'submitMultiple', checked)
 		},
 
 		onAllowEditSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'allowEditSubmissions', checked)
+			this.$emit('update:formProp', 'allowEditSubmissions', checked)
 		},
 
 		onFormExpiresChange(checked) {
 			if (checked) {
 				this.$emit(
-					'update:form-prop',
+					'update:formProp',
 					'expires',
 					moment().add(1, 'hour').unix(),
 				) // Expires in one hour.
 			} else {
-				this.$emit('update:form-prop', 'expires', 0)
+				this.$emit('update:formProp', 'expires', 0)
 			}
 		},
 
 		onShowExpirationChange(checked) {
-			this.$emit('update:form-prop', 'showExpiration', checked)
+			this.$emit('update:formProp', 'showExpiration', checked)
 		},
 
 		/**
@@ -404,44 +404,44 @@ export default {
 		 */
 		onExpirationDateChange(datetime) {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'expires',
 				parseInt(moment(datetime).format('X')),
 			)
 		},
 
 		onMaxSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'maxSubmissions', checked ? 1 : null)
+			this.$emit('update:formProp', 'maxSubmissions', checked ? 1 : null)
 		},
 
 		onMaxSubmissionsValueChange(value) {
 			if (value > 0) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
+				this.$emit('update:formProp', 'maxSubmissions', value)
 			}
 		},
 
 		onFormClosedChange(isClosed) {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'state',
 				isClosed ? FormState.FormClosed : FormState.FormActive,
 			)
 		},
 
 		onFormLockChange(locked) {
-			this.$emit('update:form-prop', 'lockedUntil', locked ? 0 : null)
+			this.$emit('update:formProp', 'lockedUntil', locked ? 0 : null)
 		},
 
 		onFormArchivedChange(isArchived) {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'state',
 				isArchived ? FormState.FormArchived : FormState.FormClosed,
 			)
 		},
 
 		onSubmissionMessageChange({ target }) {
-			this.$emit('update:form-prop', 'submissionMessage', target.value)
+			this.$emit('update:formProp', 'submissionMessage', target.value)
 		},
 
 		/**
@@ -450,9 +450,9 @@ export default {
 		 */
 		onUpdateHasCustomSubmissionMessage() {
 			if (this.hasCustomSubmissionMessage) {
-				this.$emit('update:form-prop', 'submissionMessage', null)
+				this.$emit('update:formProp', 'submissionMessage', null)
 			} else {
-				this.$emit('update:form-prop', 'submissionMessage', '')
+				this.$emit('update:formProp', 'submissionMessage', '')
 			}
 		},
 
