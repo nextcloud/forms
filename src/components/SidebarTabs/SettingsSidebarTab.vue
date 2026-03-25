@@ -231,7 +231,7 @@
 import { getCurrentUser } from '@nextcloud/auth'
 import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
-import { directive as ClickOutside } from 'v-click-outside'
+import { vOnClickOutside as ClickOutside } from '@vueuse/components'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
