@@ -83,6 +83,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
+import { markRaw } from 'vue'
 import PQueue from 'p-queue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -271,7 +272,7 @@ export default {
 	},
 
 	created() {
-		this.queue = new PQueue({ concurrency: 1 })
+		this.queue = markRaw(new PQueue({ concurrency: 1 }))
 
 		// As data instead of method, to have a separate debounce per AnswerInput
 		this.debounceOnInput = debounce((event) => {
