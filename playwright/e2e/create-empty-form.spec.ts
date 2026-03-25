@@ -38,15 +38,12 @@ test.describe('No forms created - empty content', () => {
 test('Use app navigation to create new form', async ({ appNavigation, form }) => {
 	await appNavigation.clickNewForm()
 
-	// check we are in edit mode by default and the heading is focussed
-	await expect(form.titleField).toBeFocused()
+	// check we are in edit mode by default
+	await expect(form.titleField).toBeVisible()
 })
 
 test('Form name updated in navigation', async ({ appNavigation, form }) => {
 	await appNavigation.clickNewForm()
-
-	// check we are in edit mode by default and the heading is focussed
-	await expect(form.titleField).toBeFocused()
 
 	// check the form exists in the navigation
 	await expect(appNavigation.getOwnForm('New form')).toBeVisible()

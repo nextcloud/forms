@@ -81,7 +81,11 @@
 				</template>
 			</NcActionInput>
 		</template>
-		<div class="question__content">
+		<div
+			class="question__content"
+			role="group"
+			:aria-labelledby="titleId"
+			:aria-describedby="description ? descriptionId : undefined">
 			<NcDateTimePicker
 				:modelValue="time"
 				:disabled="!readOnly"
@@ -91,7 +95,6 @@
 				:type="dateTimePickerType"
 				:disabledDate="disabledDates"
 				:disabledTime="disabledTimes"
-				:inputAttr="inputAttr"
 				rangeSeparator=" - "
 				@change="onValueChange" />
 		</div>
@@ -155,22 +158,6 @@ export default {
 			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
 				? this.answerType.pickerType + '-range'
 				: this.answerType.pickerType
-		},
-
-		/**
-		 * All non-exposed props onto datepicker input-element.
-		 *
-		 * @return {object}
-		 */
-		inputAttr() {
-			return {
-				required: this.isRequired,
-				name: this.name || undefined,
-				'aria-labelledby': this.titleId,
-				'aria-describedby': this.description
-					? this.descriptionId
-					: undefined,
-			}
 		},
 
 		time() {

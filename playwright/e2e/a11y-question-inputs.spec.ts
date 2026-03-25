@@ -4,12 +4,12 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
 import { test as formTest } from '../support/fixtures/form'
+import { test as appNavigationTest } from '../support/fixtures/navigation'
+import { test as randomUserTest } from '../support/fixtures/random-user'
 import { test as topBarTest } from '../support/fixtures/topBar'
-import { FormsView } from '../support/sections/TopBarSection'
 import { QuestionType } from '../support/sections/QuestionType'
+import { FormsView } from '../support/sections/TopBarSection'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest, topBarTest)
 
@@ -41,7 +41,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(input).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(input).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'My question' })).toHaveId('q1_title')
+		await expect(page.getByRole('heading', { name: 'My question' })).toHaveId(
+			'q1_title',
+		)
 		await expect(page.locator('#q1_desc')).toContainText('Some context')
 	})
 
@@ -113,7 +115,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(textarea).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(textarea).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'My long question' })).toHaveId('q1_title')
+		await expect(
+			page.getByRole('heading', { name: 'My long question' }),
+		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Please elaborate')
 	})
 
@@ -140,7 +144,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(group).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(group).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'My dropdown question' })).toHaveId('q1_title')
+		await expect(
+			page.getByRole('heading', { name: 'My dropdown question' }),
+		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Choose an option')
 	})
 
@@ -161,12 +167,14 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await topBar.toggleView(FormsView.View)
 
 		const question = page.getByRole('listitem', { name: /Question number 1/ })
-		const input = question.getByRole('textbox')
+		const group = question.getByRole('group').first()
 
-		await expect(input).toHaveAttribute('aria-labelledby', 'q1_title')
-		await expect(input).toHaveAttribute('aria-describedby', 'q1_desc')
+		await expect(group).toHaveAttribute('aria-labelledby', 'q1_title')
+		await expect(group).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'My date question' })).toHaveId('q1_title')
+		await expect(
+			page.getByRole('heading', { name: 'My date question' }),
+		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Pick a date')
 	})
 
@@ -192,7 +200,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(fieldset).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(fieldset).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'Rate your experience' })).toHaveId('q1_title')
+		await expect(
+			page.getByRole('heading', { name: 'Rate your experience' }),
+		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('From 1 to 5')
 	})
 
@@ -218,7 +228,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(group).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(group).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'My file question' })).toHaveId('q1_title')
+		await expect(
+			page.getByRole('heading', { name: 'My file question' }),
+		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Upload your file')
 	})
 
@@ -244,7 +256,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(group).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(group).toHaveAttribute('aria-describedby', 'q1_desc')
 
-		await expect(page.getByRole('heading', { name: 'My color question' })).toHaveId('q1_title')
+		await expect(
+			page.getByRole('heading', { name: 'My color question' }),
+		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Pick a color')
 	})
 })

@@ -113,7 +113,7 @@ export default {
 		 */
 		focusTitle() {
 			this.$nextTick(() => {
-				this.$refs.title.focus()
+				this.$refs.title?.focus()
 			})
 		},
 
@@ -158,9 +158,7 @@ export default {
 					this.isLoadingForm = false
 				}
 			} finally {
-				if (this.form.title === '') {
-					this.focusTitle()
-				}
+				this.focusTitle()
 			}
 		},
 
