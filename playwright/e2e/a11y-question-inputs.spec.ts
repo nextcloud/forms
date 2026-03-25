@@ -14,8 +14,8 @@ import { QuestionType } from '../support/sections/QuestionType'
 const test = mergeTests(randomUserTest, appNavigationTest, formTest, topBarTest)
 
 test.beforeEach(async ({ page }) => {
-	await page.goto('apps/forms')
-	await page.waitForURL(/apps\/forms$/)
+	await page.goto('apps/forms', { waitUntil: 'networkidle' })
+	await page.waitForURL(/apps\/forms\/$/)
 })
 
 test.describe('Accessibility: aria attributes on question inputs', () => {
