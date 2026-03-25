@@ -99,80 +99,76 @@
 				<Draggable
 					v-model="columns"
 					class="question__content"
-					animation="200"
+					:animation="200"
 					direction="vertical"
 					handle=".option__drag-handle"
 					invertSwap
-					tag="ul"
+					tag="transition-group"
+					:componentData="{
+						name: isDragging
+							? 'no-external-transition-on-drag'
+							: 'options-list-transition',
+					}"
 					@change="saveOptionsOrder('column')"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<TransitionGroup
-						:name="
-							isDragging
-								? 'no-external-transition-on-drag'
-								: 'options-list-transition'
-						">
-						<!-- Column input edit -->
-						<AnswerInput
-							v-for="(answer, index) in columns"
-							:key="answer.local ? 'option-local' : answer.id"
-							ref="input"
-							:answer="answer"
-							:formId="formId"
-							:index="index"
-							:isUnique="isUnique"
-							:maxIndex="columns.length - 2"
-							:maxOptionLength="maxStringLengths.optionText"
-							optionType="column"
-							@createAnswer="onCreateAnswer"
-							@update:answer="updateAnswer"
-							@delete="deleteOption"
-							@focusNext="focusNextInput"
-							@moveUp="onOptionMoveUp(index, 'column')"
-							@moveDown="onOptionMoveDown(index, 'column')"
-							@tabbedOut="checkValidOption('column')" />
-					</TransitionGroup>
+					<!-- Column input edit -->
+					<AnswerInput
+						v-for="(answer, index) in columns"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						:formId="formId"
+						:index="index"
+						:isUnique="isUnique"
+						:maxIndex="columns.length - 2"
+						:maxOptionLength="maxStringLengths.optionText"
+						optionType="column"
+						@createAnswer="onCreateAnswer"
+						@update:answer="updateAnswer"
+						@delete="deleteOption"
+						@focusNext="focusNextInput"
+						@moveUp="onOptionMoveUp(index, 'column')"
+						@moveDown="onOptionMoveDown(index, 'column')"
+						@tabbedOut="checkValidOption('column')" />
 				</Draggable>
 
 				<div>{{ t('forms', 'Rows') }}</div>
 				<Draggable
 					v-model="rows"
 					class="question__content"
-					animation="200"
+					:animation="200"
 					direction="vertical"
 					handle=".option__drag-handle"
 					invertSwap
-					tag="ul"
+					tag="transition-group"
+					:componentData="{
+						name: isDragging
+							? 'no-external-transition-on-drag'
+							: 'options-list-transition',
+					}"
 					@change="saveOptionsOrder('row')"
 					@start="isDragging = true"
 					@end="isDragging = false">
-					<TransitionGroup
-						:name="
-							isDragging
-								? 'no-external-transition-on-drag'
-								: 'options-list-transition'
-						">
-						<!-- Row input edit -->
-						<AnswerInput
-							v-for="(answer, index) in rows"
-							:key="answer.local ? 'option-local' : answer.id"
-							ref="input"
-							:answer="answer"
-							:formId="formId"
-							:index="index"
-							:isUnique="isUnique"
-							:maxIndex="rows.length - 2"
-							:maxOptionLength="maxStringLengths.optionText"
-							optionType="row"
-							@createAnswer="onCreateAnswer"
-							@update:answer="updateAnswer"
-							@delete="deleteOption"
-							@focusNext="focusNextInput"
-							@moveUp="onOptionMoveUp(index, 'row')"
-							@moveDown="onOptionMoveDown(index, 'row')"
-							@tabbedOut="checkValidOption('row')" />
-					</TransitionGroup>
+					<!-- Row input edit -->
+					<AnswerInput
+						v-for="(answer, index) in rows"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						:formId="formId"
+						:index="index"
+						:isUnique="isUnique"
+						:maxIndex="rows.length - 2"
+						:maxOptionLength="maxStringLengths.optionText"
+						optionType="row"
+						@createAnswer="onCreateAnswer"
+						@update:answer="updateAnswer"
+						@delete="deleteOption"
+						@focusNext="focusNextInput"
+						@moveUp="onOptionMoveUp(index, 'row')"
+						@moveDown="onOptionMoveDown(index, 'row')"
+						@tabbedOut="checkValidOption('row')" />
 				</Draggable>
 			</template>
 		</template>
