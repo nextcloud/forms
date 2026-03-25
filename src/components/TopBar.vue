@@ -11,7 +11,7 @@
 		}"
 		role="toolbar">
 		<PillMenu
-			v-if="!canOnlySubmit"
+			v-if="!canOnlySubmit && currentView"
 			:active="currentView"
 			:options="availableViews"
 			@update:active="onChangeView" />
