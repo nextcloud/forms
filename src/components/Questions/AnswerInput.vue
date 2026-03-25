@@ -351,7 +351,7 @@ export default {
 			this.queue.pause()
 			try {
 				// Dispatched for creation. Marked as synced
-				this.$emit('update:answer', answer)
+				this.$emit('update:answer', this.index, answer)
 				const newAnswer = await this.createAnswer(answer)
 
 				// Forward changes, but use current answer.text to avoid erasing
