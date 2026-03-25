@@ -105,32 +105,6 @@
 			</p>
 		</div>
 		<NcCheckboxRadioSwitch
-			:modelValue="hasMaxSubmissions"
-			:disabled="formArchived || locked"
-			type="switch"
-			@update:modelValue="onMaxSubmissionsChange">
-			{{ t('forms', 'Limit number of responses') }}
-		</NcCheckboxRadioSwitch>
-		<div
-			v-show="hasMaxSubmissions && !formArchived"
-			class="settings-div--indent">
-			<NcInputField
-				v-model="maxSubmissionsValue"
-				type="number"
-				:min="1"
-				:disabled="locked"
-				:label="t('forms', 'Maximum number of responses')"
-				@update:modelValue="onMaxSubmissionsValueChange" />
-			<p class="settings-hint">
-				{{
-					t(
-						'forms',
-						'Form will be closed automatically when the limit is reached.',
-					)
-				}}
-			</p>
-		</div>
-		<NcCheckboxRadioSwitch
 			:modelValue="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
