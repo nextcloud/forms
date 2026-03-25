@@ -102,11 +102,10 @@ export default defineComponent({
 		 */
 		focusIndex(index: number, optionType: string) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
-			const item = this.$refs.input.find(({ $vnode: vnode }) => {
-				const propsData = vnode?.componentOptions.propsData
-
+			const item = this.$refs.input.find((instance) => {
 				return (
-					propsData.optionType === optionType && propsData?.index === index
+					instance.$props.optionType === optionType
+					&& instance.$props.index === index
 				)
 			})
 			if (item) {
