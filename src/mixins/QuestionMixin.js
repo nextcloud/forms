@@ -14,6 +14,21 @@ import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 export default {
 	inheritAttrs: false,
+
+	emits: [
+		'update:text',
+		'update:description',
+		'update:isRequired',
+		'update:extraSettings',
+		'update:name',
+		'update:values',
+		'delete',
+		'clone',
+		'keydown',
+		'moveDown',
+		'moveUp',
+	],
+
 	props: {
 		/**
 		 * Question-Id

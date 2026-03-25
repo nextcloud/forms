@@ -16,6 +16,8 @@ import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
 
 export default defineComponent({
+	emits: ['update:options'],
+
 	data() {
 		return {
 			dirtyOptionsType: null,
@@ -268,7 +270,7 @@ export default defineComponent({
 			)
 
 			// Focus the previous option
-			this.$nextTick(() => this.focusIndex(Math.max(index - 1, 0)), optionType)
+			this.$nextTick(() => this.focusIndex(Math.max(index - 1, 0), optionType))
 		},
 
 		/**
