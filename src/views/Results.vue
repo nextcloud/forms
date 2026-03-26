@@ -402,7 +402,7 @@ export default {
 				{
 					label: t('forms', 'Unlink spreadsheet'),
 					icon: IconLinkVariantOffSvg,
-					type: 'error',
+					variant: 'error',
 					callback: () => {
 						this.onUnlinkFile()
 					},
@@ -410,7 +410,7 @@ export default {
 				{
 					label: t('forms', 'Create spreadsheet'),
 					icon: IconLinkSvg,
-					type: 'primary',
+					variant: 'primary',
 					callback: () => {
 						this.onLinkFile()
 					},
@@ -421,7 +421,7 @@ export default {
 				{
 					label: t('forms', 'Cancel'),
 					icon: IconCancelSvg,
-					type: 'tertiary',
+					variant: 'tertiary',
 					callback: () => {
 						this.showConfirmDeleteDialog = false
 					},
@@ -429,7 +429,7 @@ export default {
 				{
 					label: t('forms', 'Delete responses'),
 					icon: IconDeleteSvg,
-					type: 'error',
+					variant: 'error',
 					callback: () => {
 						this.deleteAllSubmissionsConfirmed()
 					},

@@ -69,7 +69,7 @@
 				:showSecond="false"
 				:modelValue="expirationDate"
 				type="datetime"
-				@change="onExpirationDateChange" />
+				@update:modelValue="onExpirationDateChange" />
 			<NcCheckboxRadioSwitch
 				:modelValue="form.showExpiration"
 				:disabled="locked"

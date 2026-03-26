@@ -243,7 +243,7 @@ export default {
 
 		contentValid: {
 			type: Boolean,
-			default: false,
+			default: true,
 		},
 
 		warningInvalid: {

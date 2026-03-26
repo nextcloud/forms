@@ -96,7 +96,7 @@
 				:disabledDate="disabledDates"
 				:disabledTime="disabledTimes"
 				rangeSeparator=" - "
-				@change="onValueChange" />
+				@update:modelValue="onValueChange" />
 		</div>
 	</Question>
 </template>
@@ -162,11 +162,11 @@ export default {
 
 		time() {
 			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
-				return this.values
+				return this.values?.[0]
 					? [this.parse(this.values[0]), this.parse(this.values[1])]
 					: null
 			}
-			return this.values ? this.parse(this.values[0]) : null
+			return this.values?.[0] ? this.parse(this.values[0]) : null
 		},
 
 		/**

@@ -120,6 +120,7 @@
 		<template v-else>
 			<router-view
 				:form="selectedForm"
+				isLoggedIn
 				:sidebarOpened="sidebarOpened"
 				@update:form="updateSelectedForm"
 				@update:sidebarOpened="sidebarOpened = $event"

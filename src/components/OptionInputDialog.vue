@@ -11,12 +11,14 @@
 		:buttons="buttons"
 		size="normal"
 		@update:open="$emit('update:open', $event)">
-		<NcTextArea
-			v-model="enteredOptions"
-			:label="t('forms', 'Add multiple options (one per line)')"
-			:placeholder="t('forms', 'Add multiple options (one per line)')"
-			resize="vertical"
-			rows="10" />
+		<div class="options-text-area">
+			<NcTextArea
+				v-model="enteredOptions"
+				:label="t('forms', 'Add multiple options (one per line)')"
+				:placeholder="t('forms', 'Add multiple options (one per line)')"
+				resize="vertical"
+				rows="10" />
+		</div>
 		<NcSelect
 			:inputLabel="t('forms', 'Options')"
 			multiple
@@ -116,5 +118,9 @@ export default defineComponent({
 	display: flex;
 	flex-direction: column;
 	gap: 2px 0;
+}
+
+.options-text-area {
+	height: 210px;
 }
 </style>

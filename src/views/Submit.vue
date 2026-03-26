@@ -125,12 +125,12 @@
 						v-for="(question, index) in validQuestions"
 						ref="questions"
 						:key="question.id"
+						v-bind="question"
 						readOnly
 						:answerType="answerTypes[question.type]"
 						:index="index + 1"
 						:maxStringLengths="maxStringLengths"
 						:values="answers[question.id]"
-						v-bind="question"
 						@keydown.enter="onKeydownEnter"
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
 						@update:values="(values) => onUpdate(question, values)" />
@@ -438,7 +438,7 @@ export default {
 				{
 					label: t('forms', 'Submit'),
 					icon: IconCheckSvg,
-					type: 'primary',
+					variant: 'primary',
 					callback: () => this.onConfirmedSubmit(),
 				},
 			]
@@ -457,7 +457,7 @@ export default {
 				{
 					label: t('forms', 'Leave'),
 					icon: IconCheckSvg,
-					type: 'primary',
+					variant: 'primary',
 					callback: () => this.confirmButtonCallback(true),
 				},
 			]
@@ -476,7 +476,7 @@ export default {
 				{
 					label: t('forms', 'Clear'),
 					icon: IconCheckSvg,
-					type: 'primary',
+					variant: 'primary',
 					callback: () => this.onResetSubmission(),
 				},
 			]
@@ -678,6 +678,14 @@ export default {
 								`option ${text} could not be mapped to an option for question ${questionId}`,
 							)
 						}
+					} else if (question.type === 'file') {
+						// File answers cannot be restored when editing a submission —
+						// the uploaded file has already been moved to permanent storage
+						// and the temporary uploadedFileId no longer exists.
+						// The user must re-upload files if needed.
+						logger.debug(
+							`Skipping file answer for question ${questionId} — cannot restore uploaded files`,
+						)
 					} else {
 						answers[questionId].push(text)
 					}
