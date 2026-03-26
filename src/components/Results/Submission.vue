@@ -160,7 +160,11 @@ export default {
 						&& question.extraSettings.questionType === 'radio'
 					) {
 						squashedAnswers = Object.keys(gridValue)
-							.filter((key) => optionsPerId[key] && optionsPerId[gridValue[key]])
+							.filter(
+								(key) =>
+									optionsPerId[key]
+									&& optionsPerId[gridValue[key]],
+							)
 							.map((key) => {
 								return (
 									optionsPerId[key].text
@@ -174,16 +178,17 @@ export default {
 						&& question.extraSettings.questionType === 'checkbox'
 					) {
 						squashedAnswers = Object.keys(gridValue)
-							.filter((key) => optionsPerId[key] && Array.isArray(gridValue[key]))
+							.filter(
+								(key) =>
+									optionsPerId[key]
+									&& Array.isArray(gridValue[key]),
+							)
 							.map((key) => {
 								return (
 									optionsPerId[key].text
 									+ ': '
 									+ gridValue[key]
-										.filter(
-											(optionId) =>
-												optionsPerId[optionId],
-										)
+										.filter((optionId) => optionsPerId[optionId])
 										.map(
 											(optionId) =>
 												optionsPerId[optionId].text,
