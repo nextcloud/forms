@@ -46,10 +46,10 @@ export class FormSection {
 
 	public async getQuestions(): Promise<QuestionSection[]> {
 		return this.page
-			.locator('main section')
+			.getByRole('listitem', { name: /Question number \d+/i })
 			.all()
-			.then((sections) =>
-				sections.map((section) => new QuestionSection(this.page, section)),
+			.then((items) =>
+				items.map((item) => new QuestionSection(this.page, item)),
 			)
 	}
 

@@ -8,7 +8,8 @@ import type { Locator, Page } from '@playwright/test'
 export enum FormsView {
 	View = 'View',
 	Edit = 'Edit',
-	Results = 'Results',
+	// TopBar.vue labels this view "Responses" in the UI
+	Results = 'Responses',
 }
 
 export class TopBarSection {

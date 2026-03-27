@@ -12,9 +12,11 @@ export class ResultsSection {
 	public readonly responseCount: Locator
 
 	constructor(public readonly page: Page) {
-		// PillMenu renders NcCheckboxRadioSwitch as radio buttons
-		this.summaryTab = this.page.getByRole('radio', { name: 'Summary' })
-		this.responsesTab = this.page.getByRole('radio', { name: 'Responses' })
+		// Scope to main content to avoid conflict with TopBar radios that have the same names.
+		// The PillMenu tabs are inside NcAppContent (main), the TopBar is in the navigation header.
+		const main = this.page.getByRole('main')
+		this.summaryTab = main.getByRole('radio', { name: 'Summary' })
+		this.responsesTab = main.getByRole('radio', { name: 'Responses' })
 		this.noResponsesMessage = this.page.getByText('No responses yet')
 		// Results.vue renders: "{amount} responses" in a <p> tag
 		this.responseCount = this.page.getByText(/\d+ responses?/)
@@ -33,8 +35,8 @@ export class ResultsSection {
 	 * ResultsSummary components render the question text as a heading.
 	 */
 	public getSummaryForQuestion(name: string | RegExp): Locator {
-		return this.page
-			.locator('section')
-			.filter({ has: this.page.getByRole('heading', { name }) })
+		// ResultsSummary renders as <div class="section question-summary"> with an <h3> inside.
+		// We locate the heading and return its parent element.
+		return this.page.getByRole('main').getByRole('heading', { name }).locator('..')
 	}
 }

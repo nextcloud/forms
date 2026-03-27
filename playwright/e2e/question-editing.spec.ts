@@ -11,14 +11,14 @@ import { QuestionType } from '../support/sections/QuestionType'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest)
 
-test.beforeEach(async ({ page, appNavigation, form }) => {
-	await page.goto('apps/forms')
-	await page.waitForURL(/apps\/forms$/)
-	await appNavigation.clickNewForm()
-	await form.fillTitle('Editing test form')
-})
-
 test.describe('Question editing lifecycle', () => {
+	test.beforeEach(async ({ page, appNavigation, form }) => {
+		await page.goto('apps/forms')
+		await page.waitForURL(/apps\/forms$/)
+		await appNavigation.clickNewForm()
+		await form.fillTitle('Editing test form')
+	})
+
 	const questionTypes = [
 		QuestionType.ShortAnswer,
 		QuestionType.LongAnswer,
