@@ -11,9 +11,9 @@ export class SubmitSection {
 
 	constructor(public readonly page: Page) {
 		this.submitButton = this.page.getByRole('button', { name: 'Submit' })
-		this.successMessage = this.page.getByText(
-			'Thank you for completing the form!',
-		)
+		this.successMessage = this.page.getByRole('heading', {
+			name: 'Thank you for completing the form!',
+		})
 	}
 
 	/**
@@ -74,6 +74,7 @@ export class SubmitSection {
 	): Promise<void> {
 		const question = this.getQuestion(questionName)
 		await question.getByRole('combobox').click()
+		// NcSelect renders its option list in a teleported element outside the question <li>
 		await this.page.getByRole('option', { name: optionName }).click()
 	}
 
@@ -84,7 +85,7 @@ export class SubmitSection {
 	public async submit(): Promise<Response> {
 		const response = this.page.waitForResponse(
 			(resp) =>
-				resp.request().method() === 'POST'
+				(resp.request().method() === 'POST' || resp.request().method() === 'PUT')
 				&& resp.request().url().includes('/api/v3/forms/')
 				&& resp.request().url().includes('/submissions'),
 		)
