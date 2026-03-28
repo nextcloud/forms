@@ -184,6 +184,8 @@ OC.L10N.register(
     "Submit form" : "Wyślij formularz",
     "Thank you for completing the form!" : "Dziękujemy za wypełnienie formularza!",
     "Clear form" : "Wyczyść formularz",
+    "Confirm submit" : "Potwierdź formularz",
+    "Are you sure you want to submit an empty form?" : "Czy na pewno chcesz wysłać pusty formularz?",
     "Leave form" : "Opuść",
     "You have unsaved changes! Do you still want to leave?" : "Masz niezapisane zmiany! Czy nadal chcesz wyjść?",
     "Error while saving question" : "Błąd podczas zapisywania pytania",

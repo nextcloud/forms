@@ -50,6 +50,7 @@ OC.L10N.register(
     "Unarchive form" : "Išarchyvuoti anketą",
     "Archive form" : "Archyvuoti anketą",
     "Options" : "Parinktys",
+    "Go to previous page" : "Go to previous page",
     "Answer number {index}" : "Atsakymas nr. {index}",
     "Error while saving the answer" : "Klaida įrašant atsakymą",
     "Delete answer" : "Ištrinti atsakymą",
