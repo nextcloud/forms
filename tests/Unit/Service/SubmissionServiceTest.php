@@ -573,6 +573,32 @@ file2.txt"
 				"","Anonymous user","1973-11-29T22:33:09+01:00"
 				'
 			],
+			'ranking-submission' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'options' => [
+						['id' => 10, 'text' => 'Option A'],
+						['id' => 11, 'text' => 'Option B'],
+						['id' => 12, 'text' => 'Option C'],
+					]]
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => '[11,10,12]'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"User ID","User display name","Timestamp","Rank these"
+				"user1","User 1","1973-11-29T22:33:09+01:00","Option B, Option A, Option C"
+				'
+			],
 		];
 	}
 	/**
@@ -1121,6 +1147,11 @@ file2.txt"
 					// time range
 					['id' => 18, 'type' => 'time', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['timeRange' => true]],
 					['id' => 19, 'type' => 'color', 'isRequired' => false],
+					['id' => 20, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => false, 'options' => [
+						['id' => 30],
+						['id' => 31],
+						['id' => 32]
+					]],
 				],
 				// Answers
 				[
@@ -1144,10 +1175,73 @@ file2.txt"
 					// valid time range
 					'18' => ['12:33', '12:34'],
 					'19' => ['#FF0000'],
+					'20' => [31, 30, 32],
 				],
 				// Expected Result
 				null,
-			]
+			],
+			'valid-ranking-submission' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => false, 'options' => [
+						['id' => 10],
+						['id' => 11],
+						['id' => 12]
+					]]
+				],
+				// Answers
+				[
+					'1' => [12, 10, 11]
+				],
+				// Expected Result
+				null,
+			],
+			'invalid-ranking-missing-option' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => false, 'options' => [
+						['id' => 10],
+						['id' => 11],
+						['id' => 12]
+					]]
+				],
+				// Answers
+				[
+					'1' => [10, 11]
+				],
+				// Expected Result
+				'Ranking for question "Rank these" must include all options exactly once.',
+			],
+			'invalid-ranking-unknown-option' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => false, 'options' => [
+						['id' => 10],
+						['id' => 11]
+					]]
+				],
+				// Answers
+				[
+					'1' => [10, 99]
+				],
+				// Expected Result – caught by generic predefined-options check before ranking check
+				'Answer "99" for question "Rank these" is not a valid option.',
+			],
+			'invalid-ranking-duplicate-option' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => false, 'options' => [
+						['id' => 10],
+						['id' => 11]
+					]]
+				],
+				// Answers
+				[
+					'1' => [10, 10]
+				],
+				// Expected Result
+				'Ranking for question "Rank these" must include all options exactly once.',
+			],
 		];
 	}
 
