@@ -8,6 +8,7 @@ import IconCalendar from 'vue-material-design-icons/CalendarOutline.vue'
 import IconCheckboxOutline from 'vue-material-design-icons/CheckboxOutline.vue'
 import IconClockOutline from 'vue-material-design-icons/ClockOutline.vue'
 import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import IconFormatListNumbered from 'vue-material-design-icons/FormatListNumbered.vue'
 import IconGrid from 'vue-material-design-icons/Grid.vue'
 import IconNumeric from 'vue-material-design-icons/Numeric.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
@@ -23,6 +24,7 @@ import QuestionGrid from '../components/Questions/QuestionGrid.vue'
 import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import QuestionRanking from '../components/Questions/QuestionRanking.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import { OptionType } from './Constants.ts'
 
@@ -106,6 +108,22 @@ export default {
 		warningInvalid: t(
 			'forms',
 			'This question needs a title and at least one answer!',
+		),
+	},
+
+	ranking: {
+		component: QuestionRanking,
+		icon: IconFormatListNumbered,
+		label: t('forms', 'Ranking'),
+		predefined: true,
+		validate: (question) => question.options.length >= 2,
+
+		titlePlaceholder: t('forms', 'Ranking question title'),
+		createPlaceholder: t('forms', 'People can rank these options'),
+		submitPlaceholder: t('forms', 'Drag to reorder'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least two options!',
 		),
 	},
 

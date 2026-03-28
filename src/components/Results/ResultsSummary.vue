@@ -14,7 +14,7 @@
 
 		<!-- Answers with countable results for visualization -->
 		<ol
-			v-if="answerTypes[question.type].predefined"
+			v-if="answerTypes[question.type].predefined && question.type !== 'ranking'"
 			class="question-summary__statistic">
 			<li v-for="option in questionOptions" :key="option.id">
 				<label :for="`option-${option.questionId}-${option.id}`">
@@ -36,6 +36,22 @@
 					:value="option.count" />
 			</li>
 		</ol>
+
+		<!-- Ranking: average rank per option -->
+		<table v-else-if="question.type === 'ranking'" class="ranking-summary">
+			<thead>
+				<tr>
+					<th>{{ t('forms', 'Option') }}</th>
+					<th>{{ t('forms', 'Average rank') }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="stat in rankingStats" :key="stat.id">
+					<td>{{ stat.text }}</td>
+					<td>{{ stat.averageRank }}</td>
+				</tr>
+			</tbody>
+		</table>
 
 		<div v-else-if="question.type === 'grid'">
 			<table class="answer-grid">
@@ -408,6 +424,55 @@ export default {
 			return matrix
 		},
 
+		// For ranking questions: compute average rank per option
+		rankingStats() {
+			const optionStats = {}
+			this.question.options.forEach((option) => {
+				optionStats[option.id] = {
+					id: option.id,
+					text: option.text,
+					totalRank: 0,
+					count: 0,
+				}
+			})
+
+			this.submissions.forEach((submission) => {
+				const answers = submission.answers.filter(
+					(answer) => answer.questionId === this.question.id,
+				)
+				if (!answers.length) {
+					return
+				}
+
+				const rankedIds = JSON.parse(answers[0].text)
+				if (!Array.isArray(rankedIds)) {
+					return
+				}
+
+				rankedIds.forEach((optionId, index) => {
+					const id = parseInt(optionId)
+					if (optionStats[id]) {
+						optionStats[id].totalRank += index + 1
+						optionStats[id].count++
+					}
+				})
+			})
+
+			return Object.values(optionStats)
+				.map((stat) => ({
+					id: stat.id,
+					text: stat.text,
+					averageRank: stat.count > 0
+						? (stat.totalRank / stat.count).toFixed(1)
+						: '-',
+				}))
+				.sort((a, b) => {
+					if (a.averageRank === '-') return 1
+					if (b.averageRank === '-') return -1
+					return parseFloat(a.averageRank) - parseFloat(b.averageRank)
+				})
+		},
+
 		// For text answers like short answer and long text
 		answers() {
 			const answersModels = []
@@ -610,6 +675,29 @@ export default {
 			text-align: left;
 			position: sticky;
 			left: 0;
+		}
+	}
+
+	.ranking-summary {
+		border-collapse: collapse;
+		margin-block-start: 8px;
+
+		th,
+		td {
+			padding: 8px 16px;
+			text-align: left;
+		}
+
+		thead tr {
+			border-bottom: 2px solid var(--color-border);
+		}
+
+		th {
+			font-weight: bold;
+		}
+
+		tbody tr:nth-child(odd) {
+			background: var(--color-background-dark);
 		}
 	}
 }

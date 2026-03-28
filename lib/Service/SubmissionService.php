@@ -280,6 +280,12 @@ class SubmissionService {
 						}
 					}
 				}
+			} elseif ($question->getType() === Constants::ANSWER_TYPE_RANKING) {
+				$options = $this->optionMapper->findByQuestion($question->getId());
+				foreach ($options as $option) {
+					$optionPerOptionId[$option->getId()] = $option;
+				}
+				$header[] = $question->getText();
 			} else {
 				$header[] = $question->getText();
 			}
@@ -354,6 +360,20 @@ class SubmissionService {
 							}
 						}
 						$carry[$questionId] = ['columns' => $columns];
+					} elseif ($questionType === Constants::ANSWER_TYPE_RANKING) {
+						$rankedIds = json_decode($answer->getText(), true);
+						if (is_array($rankedIds)) {
+							$rankedTexts = [];
+							foreach ($rankedIds as $optionId) {
+								$optionId = (int)$optionId;
+								if (isset($optionPerOptionId[$optionId])) {
+									$rankedTexts[] = $optionPerOptionId[$optionId]->getText();
+								}
+							}
+							$carry[$questionId] = implode(', ', $rankedTexts);
+						} else {
+							$carry[$questionId] = $answer->getText();
+						}
 					} else {
 						if (array_key_exists($questionId, $carry)) {
 							$carry[$questionId] .= '; ' . $answer->getText();
@@ -510,6 +530,7 @@ class SubmissionService {
 			} elseif ($answersCount > 1
 						&& $question['type'] !== Constants::ANSWER_TYPE_FILE
 						&& $question['type'] !== Constants::ANSWER_TYPE_GRID
+						&& $question['type'] !== Constants::ANSWER_TYPE_RANKING
 						&& !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])
 						|| $question['type'] === Constants::ANSWER_TYPE_TIME && isset($question['extraSettings']['timeRange']))) {
 				// Check if non-multiple questions have not more than one answer
@@ -559,6 +580,15 @@ class SubmissionService {
 			// Handle custom validation of short answers
 			if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
 				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
+			}
+
+			// Handle ranking questions: answers must be a permutation of all option IDs
+			if ($question['type'] === Constants::ANSWER_TYPE_RANKING) {
+				$optionIds = array_map('intval', array_column($question['options'] ?? [], 'id'));
+				$rankedIds = array_map('intval', $answers[$questionId]);
+				if (count($rankedIds) !== count($optionIds) || !empty(array_diff($rankedIds, $optionIds))) {
+					throw new \InvalidArgumentException(sprintf('Ranking for question "%s" must include all options exactly once.', $question['text']));
+				}
 			}
 
 			// Handle color questions

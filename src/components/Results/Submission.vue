@@ -202,6 +202,32 @@ export default {
 							(option) => option.optionType === OptionType.Column,
 						),
 					})
+				} else if (question.type === 'ranking') {
+					const optionsPerId = {}
+					question.options.forEach((option) => {
+						optionsPerId[option.id] = option
+					})
+
+					const rankedIds = answers[0].text
+						? JSON.parse(answers[0].text)
+						: null
+
+					let squashedAnswers = ''
+					if (Array.isArray(rankedIds)) {
+						squashedAnswers = rankedIds
+							.map((optionId, index) => {
+								const option = optionsPerId[parseInt(optionId)]
+								return (index + 1) + '. ' + (option ? option.text : optionId)
+							})
+							.join('\n')
+					}
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						squashedAnswers,
+					})
 				} else if (['date', 'time'].includes(question.type)) {
 					const squashedAnswers = answers
 						.map((answer) => answer.text)

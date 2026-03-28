@@ -76,6 +76,7 @@ class Constants {
 	public const ANSWER_TYPE_LONG = 'long';
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
+	public const ANSWER_TYPE_RANKING = 'ranking';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
 
@@ -95,6 +96,7 @@ class Constants {
 		self::ANSWER_TYPE_LONG,
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_RANKING,
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
 	];
@@ -105,6 +107,7 @@ class Constants {
 		self::ANSWER_TYPE_LINEARSCALE,
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_RANKING,
 	];
 
 	// AnswerTypes for date/time questions
@@ -189,6 +192,10 @@ class Constants {
 		'columns' => ['array'],
 		'questionType' => ['string'],
 		'rows' => ['array'],
+	];
+
+	public const EXTRA_SETTINGS_RANKING = [
+		'shuffleOptions' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_GRID_QUESTION_TYPE = [
