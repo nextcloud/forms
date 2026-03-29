@@ -10,7 +10,6 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
-		:allowRequired="false"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
@@ -26,13 +25,38 @@
 			</NcActionButton>
 		</template>
 
-		<!-- Submit mode: drag to rank -->
+		<!-- Submit mode -->
 		<div
 			v-if="readOnly"
 			class="question__content"
 			role="list"
 			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined">
+			<!-- Unranked pool (visible when items remain) -->
+			<div v-if="unrankedOptions.length > 0" class="ranking-unranked">
+				<p class="ranking-unranked__label">
+					{{ t('forms', 'Tap to rank') }}
+				</p>
+				<button
+					v-for="option in unrankedOptions"
+					:key="option.id"
+					class="ranking-unranked__item"
+					@click="rankOption(option)">
+					{{ option.text }}
+				</button>
+			</div>
+
+			<!-- Empty state when nothing ranked yet -->
+			<p v-if="rankedOptions.length === 0" class="ranking-empty">
+				{{ t('forms', 'Tap items above to rank them') }}
+			</p>
+
+			<!-- Ranked list header (to separate from pool) -->
+			<p v-if="rankedOptions.length > 0" class="ranking-ranked__label">
+				{{ t('forms', 'Your ranking') }}
+			</p>
+
+			<!-- Ranked list -->
 			<Draggable
 				v-model="rankedOptions"
 				:animation="200"
@@ -49,6 +73,14 @@
 						<IconDragHorizontalVariant :size="20" />
 					</span>
 					<span class="ranking-item__text">{{ option.text }}</span>
+					<NcButton
+						variant="tertiary"
+						:ariaLabel="t('forms', 'Remove from ranking')"
+						@click="unrankOption(option)">
+						<template #icon>
+							<IconClose :size="20" />
+						</template>
+					</NcButton>
 				</div>
 			</Draggable>
 		</div>
@@ -107,7 +139,9 @@
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import IconClose from 'vue-material-design-icons/Close.vue'
 import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
@@ -123,10 +157,12 @@ export default {
 	components: {
 		AnswerInput,
 		Draggable,
+		IconClose,
 		IconContentPaste,
 		IconDragHorizontalVariant,
 		NcActionButton,
 		NcActionCheckbox,
+		NcButton,
 		NcLoadingIcon,
 		OptionInputDialog,
 		Question,
@@ -141,6 +177,7 @@ export default {
 			isLoading: false,
 			isOptionDialogShown: false,
 			rankedOptions: [],
+			unrankedOptions: [],
 			OptionType,
 		}
 	},
@@ -176,7 +213,7 @@ export default {
 
 	methods: {
 		/**
-		 * Initialize ranked options from existing values or default order
+		 * Initialize ranked/unranked options from existing values or default order
 		 */
 		initRankedOptions() {
 			const sorted = this.sortOptionsOfType(this.options, OptionType.Choice)
@@ -187,28 +224,64 @@ export default {
 				this.rankedOptions = this.values
 					.map((id) => byId[parseInt(id)])
 					.filter(Boolean)
+				this.unrankedOptions = sorted.filter(
+					(o) => !this.rankedOptions.some((r) => r.id === o.id),
+				)
+			} else if (this.readOnly) {
+				// Submit mode: start with all options unranked
+				this.rankedOptions = []
+				this.unrankedOptions = [...sorted]
 			} else {
+				// Edit mode: show all options in default order
 				this.rankedOptions = [...sorted]
+				this.unrankedOptions = []
 			}
+		},
 
-			// In submit mode, emit the initial ranking so the answer is always
-			// recorded – even when the user agrees with the default order.
-			if (this.readOnly && this.rankedOptions.length > 0) {
+		/**
+		 * Move an option from the unranked pool to the ranked list
+		 *
+		 * @param {object} option The option to rank
+		 */
+		rankOption(option) {
+			this.unrankedOptions = this.unrankedOptions.filter(
+				(o) => o.id !== option.id,
+			)
+			this.rankedOptions.push(option)
+			this.emitValues()
+		},
+
+		/**
+		 * Move an option from the ranked list back to the unranked pool
+		 *
+		 * @param {object} option The option to unrank
+		 */
+		unrankOption(option) {
+			this.rankedOptions = this.rankedOptions.filter((o) => o.id !== option.id)
+			this.unrankedOptions.push(option)
+			this.emitValues()
+		},
+
+		/**
+		 * Emit the current ranking after a drag reorder
+		 */
+		onRankingEnd() {
+			this.emitValues()
+		},
+
+		/**
+		 * Emit the current values based on ranking state
+		 */
+		emitValues() {
+			if (this.rankedOptions.length === 0) {
+				// Nothing ranked — emit empty to signal unanswered
+				this.$emit('update:values', [])
+			} else {
 				this.$emit(
 					'update:values',
 					this.rankedOptions.map((o) => o.id),
 				)
 			}
-		},
-
-		/**
-		 * Emit the new ranking after a drag ends
-		 */
-		onRankingEnd() {
-			this.$emit(
-				'update:values',
-				this.rankedOptions.map((o) => o.id),
-			)
 		},
 	},
 }
@@ -219,6 +292,47 @@ export default {
 	display: flex;
 	flex-direction: column;
 	gap: var(--default-grid-baseline);
+}
+
+.ranking-unranked {
+	margin-block-end: 12px;
+
+	&__label {
+		font-weight: bold;
+		color: var(--color-text-maxcontrast);
+		margin-block-end: 8px;
+	}
+
+	&__item {
+		display: inline-block;
+		padding: 8px 16px;
+		margin: 0 8px 8px 0;
+		background-color: var(--color-background-dark);
+		border: 1px solid var(--color-border);
+		border-radius: var(--border-radius-large);
+		cursor: pointer;
+		font-size: inherit;
+		color: var(--color-main-text);
+		transition: background-color var(--animation-quick);
+
+		&:hover,
+		&:focus-visible {
+			background-color: var(--color-background-hover);
+			border-color: var(--color-primary-element);
+		}
+	}
+}
+
+.ranking-empty {
+	color: var(--color-text-maxcontrast);
+	font-style: italic;
+	padding: 12px 0;
+}
+
+.ranking-ranked__label {
+	font-weight: bold;
+	color: var(--color-text-maxcontrast);
+	margin-block-end: 4px;
 }
 
 .ranking-item {

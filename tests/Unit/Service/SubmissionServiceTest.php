@@ -599,6 +599,29 @@ file2.txt"
 				"user1","User 1","1973-11-29T22:33:09+01:00","2","1","3"
 				'
 			],
+			'ranking-unanswered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'options' => [
+						['id' => 10, 'text' => 'Option A'],
+						['id' => 11, 'text' => 'Option B'],
+					]]
+				],
+				// Submission with no ranking answer
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [],
+					],
+				],
+				// Expected CSV-Result: columns exist but values are empty
+				'
+				"User ID","User display name","Timestamp","Rank these (Option A)","Rank these (Option B)"
+				"user1","User 1","1973-11-29T22:33:09+01:00","",""
+				'
+			],
 		];
 	}
 	/**
@@ -1241,6 +1264,34 @@ file2.txt"
 				],
 				// Expected Result
 				'Ranking for question "Rank these" must include all options exactly once.',
+			],
+			'valid-ranking-not-required-unanswered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => false, 'options' => [
+						['id' => 10],
+						['id' => 11],
+						['id' => 12]
+					]]
+				],
+				// Answers – user did not rank anything
+				[],
+				// Expected Result – no error
+				null,
+			],
+			'invalid-ranking-required-unanswered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Rank these', 'isRequired' => true, 'options' => [
+						['id' => 10],
+						['id' => 11],
+						['id' => 12]
+					]]
+				],
+				// Answers – user did not rank anything
+				[],
+				// Expected Result – required question must be answered
+				'Question "Rank these" is required.',
 			],
 		];
 	}
