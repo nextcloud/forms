@@ -1755,6 +1755,22 @@ class ApiController extends OCSController {
 			return;
 		}
 
+		if ($question['type'] === Constants::ANSWER_TYPE_RANKING) {
+			if (!$answerArray) {
+				return;
+			}
+
+			$answerEntity = new Answer();
+			$answerEntity->setSubmissionId($submissionId);
+			$answerEntity->setQuestionId($question['id']);
+
+			$answerText = json_encode($answerArray);
+			$answerEntity->setText($answerText);
+			$this->answerMapper->insert($answerEntity);
+
+			return;
+		}
+
 		foreach ($answerArray as $answer) {
 			$answerEntity = new Answer();
 			$answerEntity->setSubmissionId($submissionId);

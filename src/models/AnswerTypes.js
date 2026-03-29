@@ -12,6 +12,7 @@ import IconFile from 'vue-material-design-icons/FileOutline.vue'
 import IconGrid from 'vue-material-design-icons/Grid.vue'
 import IconNumeric from 'vue-material-design-icons/Numeric.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
+import IconReorderHorizontal from 'vue-material-design-icons/ReorderHorizontal.vue'
 import IconTextLong from 'vue-material-design-icons/TextLong.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 import IconLinearScale from '../components/Icons/IconLinearScale.vue'
@@ -24,6 +25,7 @@ import QuestionGrid from '../components/Questions/QuestionGrid.vue'
 import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
+import QuestionRanking from '../components/Questions/QuestionRanking.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import { OptionType } from './Constants.ts'
 
@@ -263,5 +265,21 @@ export default {
 		createPlaceholder: t('forms', 'People can pick a color'),
 		submitPlaceholder: t('forms', 'Pick a color'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	ranking: {
+		component: markRaw(QuestionRanking),
+		icon: markRaw(IconReorderHorizontal),
+		label: t('forms', 'Ranking'),
+		predefined: true,
+		validate: (question) => question.options.length > 0,
+
+		titlePlaceholder: t('forms', 'Ranking question title'),
+		createPlaceholder: t('forms', 'People can rank options'),
+		submitPlaceholder: t('forms', 'Drag to rank'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one answer!',
+		),
 	},
 }
