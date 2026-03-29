@@ -78,6 +78,10 @@
 			</template>
 		</template>
 
+		<NcNoteCard v-if="hasError" :id="errorId" type="error">
+			{{ errorMessage }}
+		</NcNoteCard>
+
 		<div class="question__content">
 			<ul>
 				<NcListItem
@@ -201,6 +205,7 @@ export default {
 	data() {
 		return {
 			fileTypes,
+			errorMessage: null,
 			fileLoading: false,
 			maxFileSizeUnit: Object.keys(FILE_SIZE_UNITS)[0],
 			maxFileSizeValue: '',
@@ -238,6 +243,14 @@ export default {
 			}
 
 			return t('forms', 'All file types are allowed.')
+		},
+
+		hasError() {
+			return !!this.errorMessage
+		},
+
+		errorId() {
+			return `q${this.index}_error`
 		},
 	},
 
@@ -393,6 +406,18 @@ export default {
 			)
 
 			this.$emit('update:values', values)
+		},
+
+		async validate() {
+			if (this.fileLoading) {
+				this.errorMessage = t(
+					'forms',
+					'Please wait until the file has been uploaded.',
+				)
+				return false
+			}
+			this.errorMessage = null
+			return true
 		},
 	},
 }
