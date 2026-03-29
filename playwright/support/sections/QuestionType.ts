@@ -11,6 +11,7 @@ export enum QuestionType {
 	File = 'File',
 	LinearScale = 'Linear scale',
 	LongAnswer = 'Long text',
+	Ranking = 'Ranking',
 	RadioButtons = 'Radio buttons',
 	ShortAnswer = 'Short answer',
 }

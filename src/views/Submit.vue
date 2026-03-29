@@ -575,10 +575,12 @@ export default {
 					continue
 				}
 
-				answers[questionId] =
-					answer.type === 'QuestionMultiple'
-						? answer.value.map(String)
-						: answer.value
+				answers[questionId] = [
+					'QuestionMultiple',
+					'QuestionRanking',
+				].includes(answer.type)
+					? answer.value.map(String)
+					: answer.value
 			}
 			this.answers = answers
 		},
@@ -654,7 +656,16 @@ export default {
 					const question = this.form.questions.find(
 						(question) => question.id === questionId,
 					)
-					if (
+					if (question.type === 'ranking') {
+						try {
+							answers[questionId].push(...JSON.parse(text).map(String))
+						} catch (error) {
+							logger.debug(
+								`Could not parse ranking answer ${text} for question ${questionId}`,
+								{ error },
+							)
+						}
+					} else if (
 						['multiple', 'multiple_unique', 'dropdown'].includes(
 							question.type,
 						)

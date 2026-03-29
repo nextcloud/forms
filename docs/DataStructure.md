@@ -224,49 +224,50 @@ Defines some extended options of sharing / access
 
 Currently supported Question-Types are:
 
-| Type-ID           | Description                                                                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `multiple`        | Typically known as 'Checkboxes'. Using pre-defined options, the user can select one or multiple from. Needs at least one option available. |
-| `multiple_unique` | Typically known as 'Radio Buttons'. Using pre-defined options, the user can select exactly one from. Needs at least one option available.  |
-| `dropdown`        | Similar to `multiple_unique`, but rendered as dropdown field.                                                                              |
-| `short`           | A short text answer. Single text line                                                                                                      |
-| `long`            | A long text answer. Multi-line supported                                                                                                   |
-| `date`            | Showing a dropdown calendar to select a date.                                                                                              |
-| _`datetime`_      | _deprecated: No longer available for new questions. Showing a dropdown calendar to select a date **and** a time._                          |
-| `time`            | Showing a dropdown menu to select a time.                                                                                                  |
-| `file`            | One or multiple files. It is possible to specify which mime types are allowed                                                              |
-| `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                   |
-| `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                |
+| Type-ID           | Description                                                                                                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `multiple`        | Typically known as 'Checkboxes'. Using pre-defined options, the user can select one or multiple from. Needs at least one option available.                                        |
+| `multiple_unique` | Typically known as 'Radio Buttons'. Using pre-defined options, the user can select exactly one from. Needs at least one option available.                                         |
+| `dropdown`        | Similar to `multiple_unique`, but rendered as dropdown field.                                                                                                                     |
+| `short`           | A short text answer. Single text line                                                                                                                                             |
+| `long`            | A long text answer. Multi-line supported                                                                                                                                          |
+| `date`            | Showing a dropdown calendar to select a date.                                                                                                                                     |
+| _`datetime`_      | _deprecated: No longer available for new questions. Showing a dropdown calendar to select a date **and** a time._                                                                 |
+| `time`            | Showing a dropdown menu to select a time.                                                                                                                                         |
+| `file`            | One or multiple files. It is possible to specify which mime types are allowed                                                                                                     |
+| `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                                                          |
+| `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                                                       |
+| `ranking`         | Using pre-defined options, the user ranks them from most to least preferred. Needs at least one option available. Answers are stored in ranked order (one answer row per option). |
 
 ## Extra Settings
 
 Optional extra settings for some [Question Types](#question-types)
 
-| Extra Setting           | Question Type                         | Type             | Values                                      | Description                                                                 |
-| ----------------------- | ------------------------------------- | ---------------- | ------------------------------------------- | --------------------------------------------------------------------------- |
-| `allowOtherAnswer`      | `multiple, multiple_unique`           | Boolean          | `true/false`                                | Allows the user to specify a custom answer                                  |
-| `shuffleOptions`        | `dropdown, multiple, multiple_unique` | Boolean          | `true/false`                                | The list of options should be shuffled                                      |
-| `optionsLimitMax`       | `multiple`                            | Integer          | -                                           | Maximum number of options that can be selected                              |
-| `optionsLimitMin`       | `multiple`                            | Integer          | -                                           | Minimum number of options that must be selected                             |
-| `validationType`        | `short`                               | string           | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission                                 |
-| `validationRegex`       | `short`                               | string           | regular expression                          | if `validationType` is 'regex' this defines the regular expression to apply |
-| `allowedFileTypes`      | `file`                                | Array of strings | `'image', 'x-office/document'`              | Allowed file types for file upload                                          |
-| `allowedFileExtensions` | `file`                                | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
-| `maxAllowedFilesCount`  | `file`                                | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |
-| `maxFileSize`           | `file`                                | Integer          | -                                           | Maximum file size in bytes, 0 means no limit                                |
-| `dateMax`               | `date`                                | Integer          | -                                           | Maximum allowed date to be chosen (as Unix timestamp)                       |
-| `dateMin`               | `date`                                | Integer          | -                                           | Minimum allowed date to be chosen (as Unix timestamp)                       |
-| `dateRange`             | `date`                                | Boolean          | `true/false`                                | The date picker should query a date range                                   |
-| `timeMax`               | `time`                                | string           | -                                           | Maximum allowed time to be chosen (as `HH:mm` string)                       |
-| `timeMin`               | `time`                                | string           | -                                           | Minimum allowed time to be chosen (as `HH:mm` string)                       |
-| `timeRange`             | `time`                                | Boolean          | `true/false`                                | The time picker should query a time range                                   |
-| `optionsLowest`         | `linearscale`                         | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`                             |
-| `optionsHighest`        | `linearscale`                         | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
-| `optionsLabelLowest`    | `linearscale`                         | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
-| `optionsLabelHighest`   | `linearscale`                         | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
-| `columns`               | `grid`                                | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
-| `rows`                  | `grid`                                | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
-| `questionType`          | `grid`                                | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
+| Extra Setting           | Question Type                                  | Type             | Values                                      | Description                                                                 |
+| ----------------------- | ---------------------------------------------- | ---------------- | ------------------------------------------- | --------------------------------------------------------------------------- |
+| `allowOtherAnswer`      | `multiple, multiple_unique`                    | Boolean          | `true/false`                                | Allows the user to specify a custom answer                                  |
+| `shuffleOptions`        | `dropdown, multiple, multiple_unique, ranking` | Boolean          | `true/false`                                | The list of options should be shuffled                                      |
+| `optionsLimitMax`       | `multiple`                                     | Integer          | -                                           | Maximum number of options that can be selected                              |
+| `optionsLimitMin`       | `multiple`                                     | Integer          | -                                           | Minimum number of options that must be selected                             |
+| `validationType`        | `short`                                        | string           | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission                                 |
+| `validationRegex`       | `short`                                        | string           | regular expression                          | if `validationType` is 'regex' this defines the regular expression to apply |
+| `allowedFileTypes`      | `file`                                         | Array of strings | `'image', 'x-office/document'`              | Allowed file types for file upload                                          |
+| `allowedFileExtensions` | `file`                                         | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
+| `maxAllowedFilesCount`  | `file`                                         | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |
+| `maxFileSize`           | `file`                                         | Integer          | -                                           | Maximum file size in bytes, 0 means no limit                                |
+| `dateMax`               | `date`                                         | Integer          | -                                           | Maximum allowed date to be chosen (as Unix timestamp)                       |
+| `dateMin`               | `date`                                         | Integer          | -                                           | Minimum allowed date to be chosen (as Unix timestamp)                       |
+| `dateRange`             | `date`                                         | Boolean          | `true/false`                                | The date picker should query a date range                                   |
+| `timeMax`               | `time`                                         | string           | -                                           | Maximum allowed time to be chosen (as `HH:mm` string)                       |
+| `timeMin`               | `time`                                         | string           | -                                           | Minimum allowed time to be chosen (as `HH:mm` string)                       |
+| `timeRange`             | `time`                                         | Boolean          | `true/false`                                | The time picker should query a time range                                   |
+| `optionsLowest`         | `linearscale`                                  | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`                             |
+| `optionsHighest`        | `linearscale`                                  | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
+| `optionsLabelLowest`    | `linearscale`                                  | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
+| `optionsLabelHighest`   | `linearscale`                                  | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
+| `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
+| `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
+| `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
 
 ### Option Types
 
