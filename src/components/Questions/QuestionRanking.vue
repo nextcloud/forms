@@ -10,6 +10,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
+		:allowRequired="false"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
@@ -188,6 +189,15 @@ export default {
 					.filter(Boolean)
 			} else {
 				this.rankedOptions = [...sorted]
+			}
+
+			// In submit mode, emit the initial ranking so the answer is always
+			// recorded – even when the user agrees with the default order.
+			if (this.readOnly && this.rankedOptions.length > 0) {
+				this.$emit(
+					'update:values',
+					this.rankedOptions.map((o) => o.id),
+				)
 			}
 		},
 

@@ -82,7 +82,7 @@
 					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
-					<template v-if="isRequired" #icon>
+					<template v-if="isRequired && allowRequired" #icon>
 						<IconOverlay>
 							<template #overlay>
 								<IconAsterisk :size="20" />
@@ -91,6 +91,7 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
+						v-if="allowRequired"
 						:modelValue="isRequired"
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -239,6 +240,11 @@ export default {
 		name: {
 			type: String,
 			default: '',
+		},
+
+		allowRequired: {
+			type: Boolean,
+			default: true,
 		},
 
 		contentValid: {
