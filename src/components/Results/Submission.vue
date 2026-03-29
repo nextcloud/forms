@@ -224,6 +224,29 @@ export default {
 						type: question.type,
 						squashedAnswers,
 					})
+				} else if (question.type === 'ranking') {
+					const optionsPerId = {}
+					question.options.forEach((option) => {
+						optionsPerId[option.id] = option
+					})
+					const rankedIds = answers[0]?.text
+						? JSON.parse(answers[0].text)
+						: []
+					const squashedAnswers = rankedIds
+						.map((id, index) => {
+							const option = optionsPerId[id]
+							return option
+								? `${index + 1}. ${option.text}`
+								: `${index + 1}. ?`
+						})
+						.join('\n')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						squashedAnswers,
+					})
 				} else {
 					const squashedAnswers = answers
 						.map((answer) => answer.text)

@@ -810,6 +810,9 @@ class FormsService {
 			case Constants::ANSWER_TYPE_GRID:
 				$allowed = Constants::EXTRA_SETTINGS_GRID;
 				break;
+			case Constants::ANSWER_TYPE_RANKING:
+				$allowed = Constants::EXTRA_SETTINGS_RANKING;
+				break;
 			case Constants::ANSWER_TYPE_TIME:
 				$allowed = Constants::EXTRA_SETTINGS_TIME;
 				break;
