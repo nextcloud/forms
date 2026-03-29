@@ -2,6 +2,8 @@ OC.L10N.register(
     "forms",
     {
     "Forms" : "Eyðuform",
+    "No" : "Nei",
+    "Yes" : "Já",
     "Copy" : "Afrita",
     "Anonymous response" : "Nafnlaust svar",
     "Shared by %s" : "Deilt af %s",
