@@ -157,6 +157,7 @@ export default {
 			get() {
 				return this.sortOptionsOfType(this.options, OptionType.Choice)
 			},
+
 			set(value) {
 				this.updateOptionsOrder(value, OptionType.Choice)
 			},
