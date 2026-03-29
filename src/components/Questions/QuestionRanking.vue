@@ -69,18 +69,43 @@
 					class="ranking-item"
 					role="listitem">
 					<span class="ranking-item__position">{{ index + 1 }}.</span>
-					<span class="ranking-item__drag-handle">
-						<IconDragHorizontalVariant :size="20" />
-					</span>
 					<span class="ranking-item__text">{{ option.text }}</span>
-					<NcButton
-						variant="tertiary"
-						:ariaLabel="t('forms', 'Remove from ranking')"
-						@click="unrankOption(option)">
-						<template #icon>
-							<IconClose :size="20" />
-						</template>
-					</NcButton>
+					<div class="ranking-item__actions">
+						<NcActions
+							:aria-label="t('forms', 'Move option actions')"
+							class="ranking-item__drag-handle"
+							variant="tertiary-no-background">
+							<template #icon>
+								<IconDragIndicator :size="20" />
+							</template>
+							<NcActionButton
+								ref="buttonOptionUp"
+								:disabled="index === 0"
+								@click="onMoveUp(index)">
+								<template #icon>
+									<IconArrowUp :size="20" />
+								</template>
+								{{ t('forms', 'Move option up') }}
+							</NcActionButton>
+							<NcActionButton
+								ref="buttonOptionDown"
+								:disabled="index === rankedOptions.length - 1"
+								@click="onMoveDown(index)">
+								<template #icon>
+									<IconArrowDown :size="20" />
+								</template>
+								{{ t('forms', 'Move option down') }}
+							</NcActionButton>
+						</NcActions>
+						<NcButton
+							variant="tertiary"
+							:ariaLabel="t('forms', 'Remove from ranking')"
+							@click="unrankOption(option)">
+							<template #icon>
+								<IconClose :size="20" />
+							</template>
+						</NcButton>
+					</div>
 				</div>
 			</Draggable>
 		</div>
@@ -139,11 +164,14 @@
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
+import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
 import IconClose from 'vue-material-design-icons/Close.vue'
 import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
-import IconDragHorizontalVariant from 'vue-material-design-icons/DragHorizontalVariant.vue'
+import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
@@ -157,11 +185,14 @@ export default {
 	components: {
 		AnswerInput,
 		Draggable,
+		IconArrowDown,
+		IconArrowUp,
 		IconClose,
 		IconContentPaste,
-		IconDragHorizontalVariant,
+		IconDragIndicator,
 		NcActionButton,
 		NcActionCheckbox,
+		NcActions,
 		NcButton,
 		NcLoadingIcon,
 		OptionInputDialog,
@@ -263,6 +294,32 @@ export default {
 		},
 
 		/**
+		 * Move the ranked option at index up by one position
+		 *
+		 * @param {number} index Current index
+		 */
+		onMoveUp(index) {
+			if (index <= 0) return
+			const items = [...this.rankedOptions]
+			;[items[index - 1], items[index]] = [items[index], items[index - 1]]
+			this.rankedOptions = items
+			this.emitValues()
+		},
+
+		/**
+		 * Move the ranked option at index down by one position
+		 *
+		 * @param {number} index Current index
+		 */
+		onMoveDown(index) {
+			if (index >= this.rankedOptions.length - 1) return
+			const items = [...this.rankedOptions]
+			;[items[index], items[index + 1]] = [items[index + 1], items[index]]
+			this.rankedOptions = items
+			this.emitValues()
+		},
+
+		/**
 		 * Emit the current ranking after a drag reorder
 		 */
 		onRankingEnd() {
@@ -353,18 +410,29 @@ export default {
 		color: var(--color-text-maxcontrast);
 	}
 
-	&__drag-handle {
+	&__text {
+		flex: 1;
+	}
+
+	&__actions {
 		display: flex;
-		align-items: center;
+		gap: var(--default-grid-baseline);
+		margin-inline-start: auto;
+	}
+
+	&__drag-handle {
+		color: var(--color-text-maxcontrast);
 		cursor: grab;
+
+		&:hover,
+		&:focus,
+		&:focus-within {
+			color: var(--color-main-text);
+		}
 
 		&:active {
 			cursor: grabbing;
 		}
-	}
-
-	&__text {
-		flex: 1;
 	}
 }
 
