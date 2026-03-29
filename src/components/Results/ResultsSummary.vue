@@ -13,33 +13,42 @@
 		</p>
 
 		<!-- Ranking questions: Borda count with average rank -->
-		<div
-			v-if="question.type === 'ranking'"
-			class="question-summary__statistic">
+		<div v-if="question.type === 'ranking'" class="question-summary__statistic">
 			<p class="question-summary__ranking-description">
-				{{ t('forms', 'Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred.', { n: question.options.length, n1: question.options.length - 1 }) }}
+				{{
+					t(
+						'forms',
+						'Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred.',
+						{
+							n: question.options.length,
+							n1: question.options.length - 1,
+						},
+					)
+				}}
 			</p>
 			<ol>
-			<li v-for="option in rankingStats" :key="option.id">
-				<label>
-					<span class="question-summary__statistic-score">
-						{{ option.bordaTotal }}
-					</span>
-					<span class="question-summary__statistic-percentage">
-						({{ t('forms', 'avg. rank {average}', { average: option.avgRank }) }}):
-					</span>
-					<span
-						:class="{
-							'question-summary__statistic-text--best': option.best,
-						}">
-						{{ option.text }}
-					</span>
-				</label>
-				<meter
-					min="0"
-					:max="maxBordaScore"
-					:value="option.bordaTotal" />
-			</li>
+				<li v-for="option in rankingStats" :key="option.id">
+					<label>
+						<span class="question-summary__statistic-score">
+							{{ option.bordaTotal }}
+						</span>
+						<span class="question-summary__statistic-percentage">
+							({{
+								t('forms', 'avg. rank {average}', {
+									average: option.avgRank,
+								})
+							}}):
+						</span>
+						<span
+							:class="{
+								'question-summary__statistic-text--best':
+									option.best,
+							}">
+							{{ option.text }}
+						</span>
+					</label>
+					<meter min="0" :max="maxBordaScore" :value="option.bordaTotal" />
+				</li>
 			</ol>
 		</div>
 
@@ -362,10 +371,7 @@ export default {
 			const result = Object.values(stats)
 				.map((s) => ({
 					...s,
-					avgRank:
-						s.count > 0
-							? (s.rankSum / s.count).toFixed(1)
-							: '-',
+					avgRank: s.count > 0 ? (s.rankSum / s.count).toFixed(1) : '-',
 				}))
 				.sort((a, b) => b.bordaTotal - a.bordaTotal)
 

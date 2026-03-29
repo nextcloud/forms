@@ -367,11 +367,10 @@ class SubmissionService {
 						$carry[$questionId] = ['columns' => $columns];
 					} elseif ($questionType === Constants::ANSWER_TYPE_RANKING) {
 						$rankedIds = json_decode($answer->getText(), true);
-						// Build map: optionId -> rank position (1-based)
-						$rankByOptionId = array_flip($rankedIds);
 						$columns = [];
 						foreach ($rankingOptionsPerQuestionId[$questionId] as $optionId) {
-							$columns[] = isset($rankByOptionId[$optionId]) ? $rankByOptionId[$optionId] + 1 : '';
+							$position = array_search($optionId, $rankedIds);
+							$columns[] = $position !== false ? $position + 1 : '';
 						}
 						$carry[$questionId] = ['columns' => $columns];
 					} else {
