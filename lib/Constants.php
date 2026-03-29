@@ -76,6 +76,7 @@ class Constants {
 	public const ANSWER_TYPE_LONG = 'long';
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
+	public const ANSWER_TYPE_SECTION = 'section';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
 
@@ -95,6 +96,7 @@ class Constants {
 		self::ANSWER_TYPE_LONG,
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_SECTION,
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
 	];
