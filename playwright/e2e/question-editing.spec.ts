@@ -14,7 +14,7 @@ const test = mergeTests(randomUserTest, appNavigationTest, formTest)
 test.describe('Question editing lifecycle', () => {
 	test.beforeEach(async ({ page, appNavigation, form }) => {
 		await page.goto('apps/forms')
-		await page.waitForURL(/apps\/forms$/)
+		await page.waitForURL(/apps\/forms\/?$/)
 		await appNavigation.clickNewForm()
 		await form.fillTitle('Editing test form')
 	})
@@ -77,20 +77,17 @@ test.describe('Question editing lifecycle', () => {
 		await questions[0].fillTitle('First question')
 		await questions[1].fillTitle('Second question')
 
-		// Open the actions menu on the first question and delete it.
-		// NcActions renders as a button inside the question section.
-		// Question.vue uses force-menu so there's always a trigger button.
-		const firstSection = questions[0].section
-		await firstSection.getByRole('button', { name: 'Actions' }).click()
-		await page.getByRole('menuitem', { name: 'Delete question' }).click()
+		await questions[0].delete()
 
-		// Wait for the DELETE response
+		// Wait for Vue to re-render after deletion before taking a snapshot
+		await expect(
+			page.getByRole('listitem', { name: /Question number \d+/i }),
+		).toHaveCount(1)
 		questions = await form.getQuestions()
-		expect(questions).toHaveLength(1)
 		await expect(questions[0].titleInput).toHaveValue('Second question')
 	})
 
-	test('Clone a question', async ({ page, form }) => {
+	test('Clone a question', async ({ form }) => {
 		await form.addQuestion(QuestionType.Checkboxes)
 
 		const questions = await form.getQuestions()
@@ -99,11 +96,8 @@ test.describe('Question editing lifecycle', () => {
 		await question.addAnswer('Red')
 		await question.addAnswer('Blue')
 
-		// Clone via the actions menu
-		await question.section.getByRole('button', { name: 'Actions' }).click()
-		await page.getByRole('menuitem', { name: 'Copy question' }).click()
+		await question.clone()
 
-		// Wait for the clone to appear
 		const updatedQuestions = await form.getQuestions()
 		expect(updatedQuestions).toHaveLength(2)
 

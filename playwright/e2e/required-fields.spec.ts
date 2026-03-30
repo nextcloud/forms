@@ -4,11 +4,11 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
 import { test as formTest } from '../support/fixtures/form'
-import { test as topBarTest } from '../support/fixtures/topBar'
+import { test as appNavigationTest } from '../support/fixtures/navigation'
+import { test as randomUserTest } from '../support/fixtures/random-user'
 import { test as submitTest } from '../support/fixtures/submit'
+import { test as topBarTest } from '../support/fixtures/topBar'
 import { QuestionType } from '../support/sections/QuestionType'
 import { FormsView } from '../support/sections/TopBarSection'
 
@@ -24,7 +24,7 @@ test.describe('Required field validation', () => {
 	// Setup: create form with 2 questions, mark the first as required
 	test.beforeEach(async ({ page, appNavigation, form }) => {
 		await page.goto('apps/forms')
-		await page.waitForURL(/apps\/forms$/)
+		await page.waitForURL(/apps\/forms\/?$/)
 		await appNavigation.clickNewForm()
 		await form.fillTitle('Required fields test')
 
@@ -33,15 +33,7 @@ test.describe('Required field validation', () => {
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('Required field')
 
-		// Toggle required via the actions menu.
-		// Question.vue has an NcActionCheckbox with label "Required"
-		// inside the NcActions menu.
-		await questions[0].section
-			.getByRole('button', { name: 'Actions' })
-			.click()
-		await page.getByRole('menuitemcheckbox', { name: 'Required' }).click()
-		// Close the menu by pressing Escape
-		await page.keyboard.press('Escape')
+		await questions[0].toggleRequired()
 
 		// Add a non-required question
 		await form.addQuestion(QuestionType.ShortAnswer)

@@ -24,7 +24,7 @@ test.describe('Form submission', () => {
 	// Setup: create a form with 4 question types
 	test.beforeEach(async ({ page, appNavigation, form }) => {
 		await page.goto('apps/forms')
-		await page.waitForURL(/apps\/forms$/)
+		await page.waitForURL(/apps\/forms\/?$/)
 		await appNavigation.clickNewForm()
 		await form.fillTitle('Submission test form')
 

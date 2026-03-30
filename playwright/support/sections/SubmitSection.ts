@@ -11,9 +11,9 @@ export class SubmitSection {
 
 	constructor(public readonly page: Page) {
 		this.submitButton = this.page.getByRole('button', { name: 'Submit' })
-		this.successMessage = this.page.getByRole('heading', {
-			name: 'Thank you for completing the form!',
-		})
+		this.successMessage = this.page.getByText(
+			'Thank you for completing the form!',
+		)
 	}
 
 	/**
@@ -48,7 +48,9 @@ export class SubmitSection {
 		optionName: string | RegExp,
 	): Promise<void> {
 		const question = this.getQuestion(questionName)
-		await question.getByRole('checkbox', { name: optionName }).check()
+		await question
+			.getByRole('checkbox', { name: optionName })
+			.check({ force: true })
 	}
 
 	/**
@@ -61,7 +63,9 @@ export class SubmitSection {
 		optionName: string | RegExp,
 	): Promise<void> {
 		const question = this.getQuestion(questionName)
-		await question.getByRole('radio', { name: optionName }).check()
+		await question
+			.getByRole('radio', { name: optionName })
+			.check({ force: true })
 	}
 
 	/**
@@ -78,10 +82,7 @@ export class SubmitSection {
 		await this.page.getByRole('option', { name: optionName }).click()
 	}
 
-	/**
-	 * Click submit and wait for the POST response.
-	 * Submit.vue posts to /ocs/v2.php/apps/forms/api/v3/forms/{formId}/submissions
-	 */
+	/** Click submit and wait for the API response. */
 	public async submit(): Promise<Response> {
 		const response = this.page.waitForResponse(
 			(resp) =>

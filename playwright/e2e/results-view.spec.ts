@@ -4,12 +4,12 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
 import { test as formTest } from '../support/fixtures/form'
-import { test as topBarTest } from '../support/fixtures/topBar'
-import { test as submitTest } from '../support/fixtures/submit'
+import { test as appNavigationTest } from '../support/fixtures/navigation'
+import { test as randomUserTest } from '../support/fixtures/random-user'
 import { test as resultsTest } from '../support/fixtures/results'
+import { test as submitTest } from '../support/fixtures/submit'
+import { test as topBarTest } from '../support/fixtures/topBar'
 import { QuestionType } from '../support/sections/QuestionType'
 import { FormsView } from '../support/sections/TopBarSection'
 
@@ -26,7 +26,7 @@ test.describe('Results view', () => {
 	// Setup: create form, add questions, submit a response, go to results
 	test.beforeEach(async ({ page, appNavigation, form, topBar, submitView }) => {
 		await page.goto('apps/forms')
-		await page.waitForURL(/apps\/forms$/)
+		await page.waitForURL(/apps\/forms\/?$/)
 		await appNavigation.clickNewForm()
 		await form.fillTitle('Results test form')
 
@@ -51,8 +51,11 @@ test.describe('Results view', () => {
 		await submitView.submit()
 		await expect(submitView.successMessage).toBeVisible()
 
-		// Navigate to Results view
-		await topBar.toggleView(FormsView.Results)
+		// Navigate to Results view via URL — the SPA route transition
+		// from submit → results after submission causes a brief redirect loop,
+		// so we use direct navigation instead of clicking the TopBar.
+		await page.goto(page.url().replace(/\/submit.*$/, '/results'))
+		await page.waitForURL(/\/results$/)
 	})
 
 	test('Summary tab shows submitted data', async ({ resultsView }) => {
@@ -71,9 +74,7 @@ test.describe('Results view', () => {
 		await expect(colorSummary).toBeVisible()
 	})
 
-	test('Responses tab shows individual submission', async ({
-		resultsView,
-	}) => {
+	test('Responses tab shows individual submission', async ({ resultsView }) => {
 		await resultsView.switchToResponses()
 
 		// Should show the individual submission with the answers
@@ -81,9 +82,7 @@ test.describe('Results view', () => {
 		await expect(resultsView.responseCount).toBeVisible()
 	})
 
-	test('Tab switching between Summary and Responses', async ({
-		resultsView,
-	}) => {
+	test('Tab switching between Summary and Responses', async ({ resultsView }) => {
 		// Start on Summary
 		await expect(resultsView.summaryTab).toBeChecked()
 

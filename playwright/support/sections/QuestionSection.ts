@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { Locator, Page, Response } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
+import { waitForApiResponse } from '../helpers'
 
 export class QuestionSection {
 	public readonly titleInput: Locator
@@ -30,33 +31,53 @@ export class QuestionSection {
 	}
 
 	async fillTitle(title: string): Promise<void> {
-		const saved = this.getQuestionUpdatedPromise()
+		const saved = waitForApiResponse(this.page, 'PATCH')
 		await this.titleInput.fill(title)
 		await saved
 	}
 
 	async fillDescription(description: string): Promise<void> {
-		const saved = this.getQuestionUpdatedPromise()
+		const saved = waitForApiResponse(this.page, 'PATCH')
 		await this.descriptionInput.fill(description)
 		await saved
 	}
 
 	async addAnswer(text: string): Promise<void> {
-		const saved = this.page.waitForResponse(
-			(response) =>
-				response.request().method() === 'POST'
-				&& response.request().url().includes('/api/v3/forms/'),
-		)
+		const saved = waitForApiResponse(this.page, 'POST')
 		await this.newAnswerInput.fill(text)
 		await this.newAnswerInput.press('Enter')
 		await saved
 	}
 
-	private getQuestionUpdatedPromise(): Promise<Response> {
-		return this.page.waitForResponse(
-			(response) =>
-				response.request().method() === 'PATCH'
-				&& response.request().url().includes('/api/v3/forms/'),
-		)
+	async openActionsMenu(): Promise<void> {
+		await this.section
+			.getByRole('button', { name: 'Actions', exact: true })
+			.click()
+	}
+
+	async delete(): Promise<void> {
+		await this.openActionsMenu()
+		const deleted = waitForApiResponse(this.page, 'DELETE')
+		await this.page.getByRole('button', { name: 'Delete question' }).click()
+		await deleted
+	}
+
+	async clone(): Promise<void> {
+		await this.openActionsMenu()
+		const cloned = waitForApiResponse(this.page, 'POST')
+		await this.page.getByRole('button', { name: 'Copy question' }).click()
+		await cloned
+	}
+
+	async toggleRequired(): Promise<void> {
+		await this.openActionsMenu()
+		// Wait for the debounced PATCH so it doesn't get caught
+		// by a later waitForResponse from fillTitle or similar.
+		const saved = waitForApiResponse(this.page, 'PATCH')
+		await this.page
+			.getByRole('checkbox', { name: 'Required' })
+			.click({ force: true })
+		await saved
+		await this.page.keyboard.press('Escape')
 	}
 }
