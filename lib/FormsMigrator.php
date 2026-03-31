@@ -148,7 +148,7 @@ class FormsMigrator implements IMigrator {
 				$form->setSubmitMultiple($formData['submitMultiple']);
 				$form->setAllowEditSubmissions($formData['allowEditSubmissions']);
 				$form->setShowExpiration($formData['showExpiration']);
-				$form->setMaxSubmissions($formData['maxSubmissions'] ?? null);
+				$form->setNotifyOwnerOnSubmission($formData['notifyOwnerOnSubmission'] ?? false);
 
 				$this->formMapper->insert($form);
 

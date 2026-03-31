@@ -119,7 +119,8 @@
                     "lockedUntil",
                     "maxSubmissions",
                     "shares",
-                    "submissionMessage"
+                    "submissionMessage",
+                    "notifyOwnerOnSubmission"
                 ],
                 "properties": {
                     "id": {
@@ -232,6 +233,9 @@
                     "submissionMessage": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "notifyOwnerOnSubmission": {
+                        "type": "boolean"
                     }
                 }
             },

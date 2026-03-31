@@ -43,6 +43,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setLastUpdated(int $value)
  * @method string|null getSubmissionMessage()
  * @method void setSubmissionMessage(string|null $value)
+ * @method bool getNotifyOwnerOnSubmission()
+ * @method void setNotifyOwnerOnSubmission(bool $value)
  * @method int getState()
  * @psalm-method 0|1|2 getState()
  * @method void setState(int|null $value)
@@ -69,6 +71,7 @@ class Form extends Entity {
 	protected $allowEditSubmissions;
 	protected $showExpiration;
 	protected $submissionMessage;
+	protected $notifyOwnerOnSubmission;
 	protected $lastUpdated;
 	protected $state;
 	protected $lockedBy;
@@ -85,6 +88,7 @@ class Form extends Entity {
 		$this->addType('submitMultiple', 'boolean');
 		$this->addType('allowEditSubmissions', 'boolean');
 		$this->addType('showExpiration', 'boolean');
+		$this->addType('notifyOwnerOnSubmission', 'boolean');
 		$this->addType('lastUpdated', 'integer');
 		$this->addType('state', 'integer');
 		$this->addType('lockedBy', 'string');
@@ -160,6 +164,7 @@ class Form extends Entity {
 	 *   showExpiration: bool,
 	 *   lastUpdated: int,
 	 *   submissionMessage: ?string,
+	 *   notifyOwnerOnSubmission: bool,
 	 *   state: 0|1|2,
 	 *   lockedBy: ?string,
 	 *   lockedUntil: ?int,
@@ -184,6 +189,7 @@ class Form extends Entity {
 			'showExpiration' => (bool)$this->getShowExpiration(),
 			'lastUpdated' => (int)$this->getLastUpdated(),
 			'submissionMessage' => $this->getSubmissionMessage(),
+			'notifyOwnerOnSubmission' => (bool)$this->getNotifyOwnerOnSubmission(),
 			'state' => $this->getState(),
 			'lockedBy' => $this->getLockedBy(),
 			'lockedUntil' => $this->getLockedUntil(),

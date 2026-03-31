@@ -43,6 +43,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -179,6 +180,7 @@ class ApiControllerTest extends TestCase {
 			self::assertInstanceOf(Form::class, $form);
 			$read = $form->read();
 			unset($read['created']);
+			unset($read['notifyOwnerOnSubmission']);
 			self::assertEquals($expected, $read);
 			return true;
 		};
@@ -430,9 +432,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn('formHash');
 		$expected = $expectedForm;
 		$expected['id'] = null;
-		// TODO fix test, currently unset because behaviour has changed
-		$expected['state'] = null;
-		$expected['lastUpdated'] = null;
+		$expected['lastUpdated'] = 0;
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(self::createFormValidator($expected)))
@@ -995,6 +995,27 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}
 
+	public function testUpdateFormRejectsNonBooleanNotifyOwnerOnSubmission(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['notifyOwnerOnSubmission' => 'yes']);
+	}
+
 	public function testGetSubmission_invalidForm() {
 		$exception = $this->createMock(NoSuchFormException::class);
 		$this->formsService->expects($this->once())
@@ -1217,7 +1238,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->formsService->expects($this->once())
 			->method('notifyNewSubmission')
-			->with($form, $submission);
+			->with($form, $submission, FormSubmittedEvent::TRIGGER_UPDATED);
 
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);

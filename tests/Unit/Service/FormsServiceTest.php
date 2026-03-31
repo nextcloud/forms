@@ -257,6 +257,7 @@ class FormsServiceTest extends TestCase {
 				'lockedUntil' => null,
 				'maxSubmissions' => null,
 				'isMaxSubmissionsReached' => false,
+				'notifyOwnerOnSubmission' => false,
 			]]
 		];
 	}

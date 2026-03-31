@@ -50,6 +50,18 @@
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
+			:model-value="form.notifyOwnerOnSubmission"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onNotifyOwnerOnSubmissionChange">
+			{{
+				t(
+					'forms',
+					'Send email notifications for new responses to the form owner',
+				)
+			}}
+		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch
 			:model-value="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
@@ -79,32 +91,6 @@
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
-			:model-value="hasMaxSubmissions"
-			:disabled="formArchived || locked"
-			type="switch"
-			@update:model-value="onMaxSubmissionsChange">
-			{{ t('forms', 'Limit number of responses') }}
-		</NcCheckboxRadioSwitch>
-		<div
-			v-show="hasMaxSubmissions && !formArchived"
-			class="settings-div--indent">
-			<NcInputField
-				v-model="maxSubmissionsValue"
-				type="number"
-				:min="1"
-				:disabled="locked"
-				:label="t('forms', 'Maximum number of responses')"
-				@update:model-value="onMaxSubmissionsValueChange" />
-			<p class="settings-hint">
-				{{
-					t(
-						'forms',
-						'Form will be closed automatically when the limit is reached.',
-					)
-				}}
-			</p>
-		</div>
-		<NcCheckboxRadioSwitch
 			:model-value="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
@@ -113,7 +99,7 @@
 			{{ t('forms', 'Close form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__close-form" class="settings-hint">
-			{{ t('forms', 'Closed forms do not accept new responses.') }}
+			{{ t('forms', 'Closed forms do not accept new submissions.') }}
 		</p>
 		<NcCheckboxRadioSwitch
 			:model-value="isFormLockedPermanently"
@@ -138,7 +124,7 @@
 			{{
 				t(
 					'forms',
-					'Archived forms do not accept new responses and cannot be modified.',
+					'Archived forms do not accept new submissions and can not be modified.',
 				)
 			}}
 		</p>
@@ -210,7 +196,6 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
-import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
@@ -220,7 +205,6 @@ import { FormState } from '../../models/Constants.ts'
 export default {
 	components: {
 		NcButton,
-		NcInputField,
 		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
 		NcIconSvgWrapper,
@@ -330,23 +314,6 @@ export default {
 			return this.form.state !== FormState.FormActive
 		},
 
-		hasMaxSubmissions() {
-			return (
-				this.form.maxSubmissions !== null
-				&& this.form.maxSubmissions !== undefined
-			)
-		},
-
-		maxSubmissionsValue: {
-			get() {
-				return this.form.maxSubmissions ?? 1
-			},
-
-			set(value) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
-			},
-		},
-
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
@@ -381,6 +348,10 @@ export default {
 			this.$emit('update:form-prop', 'allowEditSubmissions', checked)
 		},
 
+		onNotifyOwnerOnSubmissionChange(checked) {
+			this.$emit('update:form-prop', 'notifyOwnerOnSubmission', checked)
+		},
+
 		onFormExpiresChange(checked) {
 			if (checked) {
 				this.$emit(
@@ -408,16 +379,6 @@ export default {
 				'expires',
 				parseInt(moment(datetime).format('X')),
 			)
-		},
-
-		onMaxSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'maxSubmissions', checked ? 1 : null)
-		},
-
-		onMaxSubmissionsValueChange(value) {
-			if (value > 0) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
-			}
 		},
 
 		onFormClosedChange(isClosed) {
@@ -511,6 +472,10 @@ export default {
 
 .settings-div--indent {
 	margin-inline-start: 40px;
+}
+
+.settings-div--separate {
+	margin-block: 4px;
 }
 
 .settings-hint {

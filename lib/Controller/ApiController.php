@@ -22,6 +22,7 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
@@ -178,6 +179,8 @@ class ApiController extends OCSController {
 			$form->setShowExpiration(false);
 			$form->setExpires(0);
 			$form->setIsAnonymous(false);
+			$form->setNotifyOwnerOnSubmission(false);
+			$form->setState(Constants::FORM_STATE_ACTIVE);
 
 			$this->formMapper->insert($form);
 		} else {
@@ -206,6 +209,8 @@ class ApiController extends OCSController {
 			$formData['showExpiration'] = false;
 			$formData['expires'] = 0;
 			$formData['isAnonymous'] = false;
+			$formData['notifyOwnerOnSubmission'] = false;
+			$formData['state'] = Constants::FORM_STATE_ACTIVE;
 
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
@@ -315,6 +320,10 @@ class ApiController extends OCSController {
 
 		// Do not allow changing showToAllUsers or permitAllUsers if disabled
 		$this->checkAccessUpdate($keyValuePairs);
+
+		if (isset($keyValuePairs['notifyOwnerOnSubmission']) && !is_bool($keyValuePairs['notifyOwnerOnSubmission'])) {
+			throw new OCSBadRequestException('notifyOwnerOnSubmission must be a boolean');
+		}
 
 		// Process file linking
 		if (isset($keyValuePairs['path']) && isset($keyValuePairs['fileFormat'])) {
@@ -1405,7 +1414,7 @@ class ApiController extends OCSController {
 		$this->formMapper->update($form);
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission);
+		$this->formsService->notifyNewSubmission($form, $submission, FormSubmittedEvent::TRIGGER_CREATED);
 
 		if ($form->getFileId() !== null) {
 			$this->jobList->add(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $form->getId()]);
@@ -1487,7 +1496,7 @@ class ApiController extends OCSController {
 		}
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission);
+		$this->formsService->notifyNewSubmission($form, $submission, FormSubmittedEvent::TRIGGER_UPDATED);
 
 		return new DataResponse($submissionId);
 	}
