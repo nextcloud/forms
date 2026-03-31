@@ -148,6 +148,7 @@ A submission-object describes a single submission by a user to a form.
 | formId | Integer | | The id of the form, the submission belongs to |
 | userId | String | | The nextcloud userId of the submitting user. If submission is anonymous, this contains `anon-user-<hash>` |
 | timestamp | unix timestamp | | When the user submitted |
+| isVerified | Boolean | | Whether the submission has completed email-address verification, if required |
 | answers | Array of [Answers](#answer) | | Array of the actual user answers, belonging to this submission.
 | userDisplayName | String | | Display name of the nextcloud-user, derived from `userId`. Contains `Anonymous user` if submitted anonymously. Not stored in DB.
 
@@ -157,6 +158,7 @@ A submission-object describes a single submission by a user to a form.
   "formId": 3,
   "userId": "jonas",
   "timestamp": 1611274433,
+  "isVerified": true,
   "answers": [],
   "userDisplayName": "jonas"
 }
@@ -241,6 +243,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `validationType`        | `short`                               | string           | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission                                 |
 | `validationRegex`       | `short`                               | string           | regular expression                          | if `validationType` is 'regex' this defines the regular expression to apply |
 | `confirmationRecipient` | `short`                               | Boolean          | `true/false`                                | Marks an email question as recipient for respondent confirmation emails      |
+| `requireEmailVerification` | `short`                            | Boolean          | `true/false`                                | Requires respondents to verify the confirmation-recipient email before the submission is treated as verified                    |
 | `allowedFileTypes`      | `file`                                | Array of strings | `'image', 'x-office/document'`              | Allowed file types for file upload                                          |
 | `allowedFileExtensions` | `file`                                | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
 | `maxAllowedFilesCount`  | `file`                                | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |

@@ -122,15 +122,18 @@ class IntegrationBase extends TestCase {
 
 			// Insert Submissions into DB
 			foreach (($form['submissions'] ?? []) as $suIndex => $submission) {
+				$isVerified = $submission['isVerified'] ?? true;
 				$qb->insert('forms_v2_submissions')
 					->values([
 						'form_id' => $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT),
 						'user_id' => $qb->createNamedParameter($submission['userId'], IQueryBuilder::PARAM_STR),
-						'timestamp' => $qb->createNamedParameter($submission['timestamp'], IQueryBuilder::PARAM_INT)
+						'timestamp' => $qb->createNamedParameter($submission['timestamp'], IQueryBuilder::PARAM_INT),
+						'is_verified' => $qb->createNamedParameter($isVerified, IQueryBuilder::PARAM_BOOL),
 					]);
 				$qb->executeStatement();
 				$submissionId = $qb->getLastInsertId();
 				$this->testForms[$index]['submissions'][$suIndex]['id'] = $submissionId;
+				$this->testForms[$index]['submissions'][$suIndex]['isVerified'] = $isVerified;
 
 				foreach ($submission['answers'] as $aIndex => $answer) {
 					$qb->insert('forms_v2_answers')

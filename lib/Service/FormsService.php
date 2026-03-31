@@ -882,6 +882,16 @@ class FormsService {
 				}
 			}
 
+			if (($extraSettings['requireEmailVerification'] ?? false) === true) {
+				// Verification is only valid for the selected confirmation-recipient email field
+				if (
+					($extraSettings['validationType'] ?? null) !== 'email'
+					|| ($extraSettings['confirmationRecipient'] ?? false) !== true
+				) {
+					return false;
+				}
+			}
+
 			if (!isset($extraSettings['validationType'])) {
 				return true;
 			}

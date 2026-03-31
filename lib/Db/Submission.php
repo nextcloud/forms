@@ -18,11 +18,14 @@ use OCP\AppFramework\Db\Entity;
  * @method void setUserId(string $value)
  * @method int getTimestamp()
  * @method void setTimestamp(integer $value)
+ * @method bool getIsVerified()
+ * @method void setIsVerified(bool $value)
  */
 class Submission extends Entity {
 	protected $formId;
 	protected $userId;
 	protected $timestamp;
+	protected $isVerified;
 
 	/**
 	 * Submission constructor.
@@ -30,6 +33,7 @@ class Submission extends Entity {
 	public function __construct() {
 		$this->addType('formId', 'integer');
 		$this->addType('timestamp', 'integer');
+		$this->addType('isVerified', 'boolean');
 	}
 
 	/**
@@ -38,6 +42,7 @@ class Submission extends Entity {
 	 *     formId: int,
 	 *     userId: string,
 	 *     timestamp: int,
+	 *     isVerified: bool,
 	 * }
 	 */
 	public function read(): array {
@@ -46,6 +51,7 @@ class Submission extends Entity {
 			'formId' => $this->getFormId(),
 			'userId' => $this->getUserId(),
 			'timestamp' => $this->getTimestamp(),
+			'isVerified' => (bool)$this->getIsVerified(),
 		];
 	}
 }

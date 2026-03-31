@@ -182,6 +182,7 @@ class FormsMigrator implements IMigrator {
 					$submission->setFormId($form->getId());
 					$submission->setUserId($submissionData['userId']);
 					$submission->setTimestamp($submissionData['timestamp']);
+					$submission->setIsVerified($submissionData['isVerified'] ?? true);
 
 					$this->submissionMapper->insert($submission);
 

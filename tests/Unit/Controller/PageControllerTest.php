@@ -13,8 +13,10 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Service\SubmissionVerificationService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\Template\PublicTemplateResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
@@ -66,6 +68,8 @@ class PageControllerTest extends TestCase {
 
 	/** @var IUserSession|MockObject */
 	private $userSession;
+	/** @var SubmissionVerificationService|MockObject */
+	private $submissionVerificationService;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -82,6 +86,7 @@ class PageControllerTest extends TestCase {
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->userSession = $this->createMock(IUserSession::class);
+		$this->submissionVerificationService = $this->createMock(SubmissionVerificationService::class);
 
 		$this->pageController = new PageController(
 			'forms',
@@ -91,6 +96,7 @@ class PageControllerTest extends TestCase {
 			$this->submissionMapper,
 			$this->configService,
 			$this->formsService,
+			$this->submissionVerificationService,
 			$this->accountManager,
 			$this->initialState,
 			$this->l10n,
@@ -108,5 +114,55 @@ class PageControllerTest extends TestCase {
 			->method('setContentSecurityPolicy')
 			->with(self::callback(fn (ContentSecurityPolicy $csp): bool => preg_match('/frame-ancestors[^;]* \*[ ;]/', $csp->buildPolicy()) !== false));
 		TestCase::invokePrivate($this->pageController, 'setEmbeddedCSP', [$response]);
+	}
+
+	public function testVerifySubmissionEmailSuccess(): void {
+		$token = '0123456789abcdef0123456789abcdef0123456789abcdef';
+		$this->submissionVerificationService->expects($this->once())
+			->method('verifyToken')
+			->with($token)
+			->willReturn(true);
+
+		$this->l10n->method('t')
+			->willReturnMap([
+				['Email address verified', [], 'Email address verified'],
+				['Your email address has been verified successfully. You can close this page now.', [], 'verified message'],
+				['Forms', [], 'Forms'],
+			]);
+
+		$response = $this->pageController->verifySubmissionEmail($token);
+
+		$this->assertInstanceOf(PublicTemplateResponse::class, $response);
+		$this->assertSame('verify', $response->getTemplateName());
+		$this->assertSame([
+			'verified' => true,
+			'headline' => 'Email address verified',
+			'message' => 'verified message',
+		], $response->getParams());
+	}
+
+	public function testVerifySubmissionEmailFailure(): void {
+		$token = 'fedcba9876543210fedcba9876543210fedcba9876543210';
+		$this->submissionVerificationService->expects($this->once())
+			->method('verifyToken')
+			->with($token)
+			->willReturn(false);
+
+		$this->l10n->method('t')
+			->willReturnMap([
+				['Email verification failed', [], 'Email verification failed'],
+				['The verification link is invalid or expired.', [], 'failed message'],
+				['Forms', [], 'Forms'],
+			]);
+
+		$response = $this->pageController->verifySubmissionEmail($token);
+
+		$this->assertInstanceOf(PublicTemplateResponse::class, $response);
+		$this->assertSame('verify', $response->getTemplateName());
+		$this->assertSame([
+			'verified' => false,
+			'headline' => 'Email verification failed',
+			'message' => 'failed message',
+		], $response->getParams());
 	}
 }

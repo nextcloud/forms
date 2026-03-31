@@ -150,6 +150,7 @@ class Constants {
 		'validationType' => ['string'],
 		'validationRegex' => ['string'],
 		'confirmationRecipient' => ['boolean'],
+		'requireEmailVerification' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_FILE = [

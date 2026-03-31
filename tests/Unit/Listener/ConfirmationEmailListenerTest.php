@@ -228,6 +228,20 @@ class ConfirmationEmailListenerTest extends TestCase {
 		$this->listener->handle($event);
 	}
 
+	public function testHandleSkipsPendingVerificationOnCreate(): void {
+		$form = $this->createForm(7, 'Feedback form');
+		$submission = $this->createSubmission(12, $form->getId());
+		$submission->setIsVerified(false);
+		$event = new FormSubmittedEvent($form, $submission, FormSubmittedEvent::TRIGGER_CREATED);
+
+		$this->answerMapper->expects($this->never())
+			->method('findBySubmission');
+		$this->mailService->expects($this->never())
+			->method('send');
+
+		$this->listener->handle($event);
+	}
+
 	private function createForm(int $id, string $title): Form {
 		$form = new Form();
 		$form->setId($id);
@@ -257,6 +271,7 @@ class ConfirmationEmailListenerTest extends TestCase {
 		$submission->setFormId($formId);
 		$submission->setUserId('user');
 		$submission->setTimestamp(1);
+		$submission->setIsVerified(true);
 
 		return $submission;
 	}

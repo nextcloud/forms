@@ -41,6 +41,7 @@ namespace OCA\Forms;
  *   validationRegex?: string,
  *   validationType?: string,
  *   confirmationRecipient?: bool,
+ *   requireEmailVerification?: bool,
  *   questionType?: string,
  * }
  *
@@ -75,6 +76,7 @@ namespace OCA\Forms;
  *   formId: int,
  *   userId: string,
  *   timestamp: int,
+ *   isVerified: bool,
  *   answers: list<FormsAnswer>,
  *   userDisplayName: string
  * }

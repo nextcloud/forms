@@ -439,6 +439,7 @@ Update a single or multiple properties of a question-object.
 - Restrictions:
     - It is **not allowed** to update one of the following key-value pairs: _id, formId, order_.
     - `extraSettings.confirmationRecipient` can only be enabled for short questions with `extraSettings.validationType` set to `email`.
+    - `extraSettings.requireEmailVerification` can only be enabled for short questions with `extraSettings.validationType` set to `email` and `extraSettings.confirmationRecipient` set to `true`.
 - Response: **Status-Code OK**, as well as the id of the updated question.
 
 ```
@@ -904,6 +905,7 @@ Store Submission to Database
     - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs.
     - For File-Uploads, the array contains the objects with key `uploadedFileId` (value from Upload a file endpoint).
     - To send a respondent confirmation email, set the corresponding short question to `validationType = email` and `confirmationRecipient = true`.
+    - If the same question also sets `requireEmailVerification = true`, the submission stays pending until the recipient visits the verification link, and the confirmation email is only sent after verification succeeds.
 
 ```
   {

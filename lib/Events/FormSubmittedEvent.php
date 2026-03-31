@@ -13,6 +13,7 @@ use OCA\Forms\Db\Submission;
 class FormSubmittedEvent extends AbstractFormEvent {
 	public const TRIGGER_CREATED = 'created';
 	public const TRIGGER_UPDATED = 'updated';
+	public const TRIGGER_VERIFIED = 'verified';
 
 	public function __construct(
 		Form $form,

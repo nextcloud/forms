@@ -1347,6 +1347,32 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => true,
 			],
+			'valid-require-email-verification' => [
+				'extraSettings' => [
+					'validationType' => 'email',
+					'confirmationRecipient' => true,
+					'requireEmailVerification' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true,
+			],
+			'invalid-require-email-verification-without-confirmation-recipient' => [
+				'extraSettings' => [
+					'validationType' => 'email',
+					'requireEmailVerification' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'invalid-require-email-verification-with-non-email-validation' => [
+				'extraSettings' => [
+					'validationType' => 'number',
+					'confirmationRecipient' => true,
+					'requireEmailVerification' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
 			'invalid-confirmation-recipient-without-email-validation' => [
 				'extraSettings' => [
 					'confirmationRecipient' => true,

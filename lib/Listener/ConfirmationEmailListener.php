@@ -35,12 +35,15 @@ class ConfirmationEmailListener implements IEventListener {
 		if (!($event instanceof FormSubmittedEvent)) {
 			return;
 		}
-		if (!$event->isNewSubmission()) {
+		if (!in_array($event->getTrigger(), [FormSubmittedEvent::TRIGGER_CREATED, FormSubmittedEvent::TRIGGER_VERIFIED], true)) {
 			return;
 		}
 
 		$submission = $event->getSubmission();
 		$form = $event->getForm();
+		if ($event->getTrigger() === FormSubmittedEvent::TRIGGER_CREATED && $submission->getIsVerified() === false) {
+			return;
+		}
 
 		$emailAddress = null;
 		$answerSummaries = [];

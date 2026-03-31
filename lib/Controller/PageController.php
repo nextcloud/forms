@@ -14,6 +14,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Service\SubmissionVerificationService;
 
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
@@ -49,6 +50,7 @@ class PageController extends Controller {
 		private SubmissionMapper $submissionMapper,
 		private ConfigService $configService,
 		private FormsService $formsService,
+		private SubmissionVerificationService $submissionVerificationService,
 		private IAccountManager $accountManager,
 		private IInitialState $initialState,
 		private IL10N $l10n,
@@ -116,6 +118,27 @@ class PageController extends Controller {
 	#[FrontpageRoute(verb: 'GET', url: '/{hash}/submit/{submissionId}', requirements: ['hash' => '[a-zA-Z0-9]{16,}', 'submissionId' => '\d+'])]
 	public function submitViewWithSubmission(string $hash, int $submissionId): TemplateResponse {
 		return $this->formMapper->findByHash($hash)->getAllowEditSubmissions() ? $this->index($hash, $submissionId) : $this->index($hash);
+	}
+
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
+	#[PublicPage()]
+	#[FrontpageRoute(verb: 'GET', url: '/verify/{token}', requirements: ['token' => '[a-f0-9]{48}'])]
+	public function verifySubmissionEmail(string $token): PublicTemplateResponse {
+		$isVerified = $this->submissionVerificationService->verifyToken($token);
+
+		$response = new PublicTemplateResponse($this->appName, 'verify', [
+			'verified' => $isVerified,
+			'headline' => $isVerified
+				? $this->l10n->t('Email address verified')
+				: $this->l10n->t('Email verification failed'),
+			'message' => $isVerified
+				? $this->l10n->t('Your email address has been verified successfully. You can close this page now.')
+				: $this->l10n->t('The verification link is invalid or expired.'),
+		]);
+		$response->setHeaderTitle($this->l10n->t('Forms'));
+
+		return $response;
 	}
 
 	/**

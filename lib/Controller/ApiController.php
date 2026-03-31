@@ -550,6 +550,9 @@ class ApiController extends OCSController {
 			if (is_array($questionData['extraSettings'] ?? null)
 				&& ($questionData['extraSettings']['confirmationRecipient'] ?? false) === true) {
 				$questionData['extraSettings']['confirmationRecipient'] = false;
+				if (($questionData['extraSettings']['requireEmailVerification'] ?? false) === true) {
+					$questionData['extraSettings']['requireEmailVerification'] = false;
+				}
 			}
 
 			$newQuestion = Question::fromParams($questionData);
@@ -1371,6 +1374,7 @@ class ApiController extends OCSController {
 		$submission = new Submission();
 		$submission->setFormId($formId);
 		$submission->setTimestamp(time());
+		$submission->setIsVerified(true);
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
