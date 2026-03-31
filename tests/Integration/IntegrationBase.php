@@ -19,6 +19,8 @@ use Test\TestCase;
  * @group DB
  */
 class IntegrationBase extends TestCase {
+	protected const TEST_USER_PASSWORD = 'Forms-Test-Password-2026!';
+
 	/** @var Array */
 	protected $testForms;
 
@@ -44,7 +46,7 @@ class IntegrationBase extends TestCase {
 		foreach ($this->users as $userId => $displayName) {
 			$user = $userManager->get($userId);
 			if ($user === null) {
-				$user = $userManager->createUser($userId, $userId);
+				$user = $userManager->createUser($userId, self::TEST_USER_PASSWORD);
 			}
 			$user->setDisplayName($displayName);
 		}

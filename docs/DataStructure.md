@@ -240,6 +240,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `optionsLimitMin`       | `multiple`                            | Integer          | -                                           | Minimum number of options that must be selected                             |
 | `validationType`        | `short`                               | string           | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission                                 |
 | `validationRegex`       | `short`                               | string           | regular expression                          | if `validationType` is 'regex' this defines the regular expression to apply |
+| `confirmationRecipient` | `short`                               | Boolean          | `true/false`                                | Marks an email question as recipient for respondent confirmation emails      |
 | `allowedFileTypes`      | `file`                                | Array of strings | `'image', 'x-office/document'`              | Allowed file types for file upload                                          |
 | `allowedFileExtensions` | `file`                                | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
 | `maxAllowedFilesCount`  | `file`                                | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |

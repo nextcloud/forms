@@ -11,8 +11,10 @@ namespace OCA\Forms\AppInfo;
 
 use OCA\Analytics\Datasource\DatasourceEvent;
 use OCA\Forms\Capabilities;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\FormsMigrator;
 use OCA\Forms\Listener\AnalyticsDatasourceListener;
+use OCA\Forms\Listener\ConfirmationEmailListener;
 use OCA\Forms\Listener\UserDeletedListener;
 use OCA\Forms\Middleware\ThrottleFormAccessMiddleware;
 use OCA\Forms\Search\SearchProvider;
@@ -43,6 +45,7 @@ class Application extends App implements IBootstrap {
 
 		$context->registerCapability(Capabilities::class);
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
+		$context->registerEventListener(FormSubmittedEvent::class, ConfirmationEmailListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
 		$context->registerMiddleware(ThrottleFormAccessMiddleware::class);
 		$context->registerSearchProvider(SearchProvider::class);

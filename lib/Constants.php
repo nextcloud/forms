@@ -149,6 +149,7 @@ class Constants {
 	public const EXTRA_SETTINGS_SHORT = [
 		'validationType' => ['string'],
 		'validationRegex' => ['string'],
+		'confirmationRecipient' => ['boolean'],
 	];
 
 	public const EXTRA_SETTINGS_FILE = [

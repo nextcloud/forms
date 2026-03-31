@@ -1339,6 +1339,29 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],
+			'valid-confirmation-recipient' => [
+				'extraSettings' => [
+					'validationType' => 'email',
+					'confirmationRecipient' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true,
+			],
+			'invalid-confirmation-recipient-without-email-validation' => [
+				'extraSettings' => [
+					'confirmationRecipient' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'invalid-confirmation-recipient-with-non-email-validation' => [
+				'extraSettings' => [
+					'validationType' => 'number',
+					'confirmationRecipient' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
 			'valid-custom-regex' => [
 				'extraSettings' => [
 					'validationType' => 'regex',

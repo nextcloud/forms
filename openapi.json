@@ -106,7 +106,6 @@
                     "fileFormat",
                     "fileId",
                     "isAnonymous",
-                    "isMaxSubmissionsReached",
                     "lastUpdated",
                     "submitMultiple",
                     "allowEditSubmissions",
@@ -117,7 +116,6 @@
                     "state",
                     "lockedBy",
                     "lockedUntil",
-                    "maxSubmissions",
                     "shares",
                     "submissionMessage"
                 ],
@@ -165,9 +163,6 @@
                     "isAnonymous": {
                         "type": "boolean"
                     },
-                    "isMaxSubmissionsReached": {
-                        "type": "boolean"
-                    },
                     "lastUpdated": {
                         "type": "integer",
                         "format": "int64"
@@ -210,11 +205,6 @@
                         "nullable": true
                     },
                     "lockedUntil": {
-                        "type": "integer",
-                        "format": "int64",
-                        "nullable": true
-                    },
-                    "maxSubmissions": {
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
@@ -317,8 +307,7 @@
                     "partial",
                     "state",
                     "lockedBy",
-                    "lockedUntil",
-                    "maxSubmissions"
+                    "lockedUntil"
                 ],
                 "properties": {
                     "id": {
@@ -356,11 +345,6 @@
                         "nullable": true
                     },
                     "lockedUntil": {
-                        "type": "integer",
-                        "format": "int64",
-                        "nullable": true
-                    },
-                    "maxSubmissions": {
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
@@ -538,6 +522,9 @@
                     },
                     "validationType": {
                         "type": "string"
+                    },
+                    "confirmationRecipient": {
+                        "type": "boolean"
                     },
                     "questionType": {
                         "type": "string"

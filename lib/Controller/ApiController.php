@@ -22,6 +22,7 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
@@ -546,6 +547,10 @@ class ApiController extends OCSController {
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
 			$questionData['order'] = end($allQuestions)->getOrder() + 1;
+			if (is_array($questionData['extraSettings'] ?? null)
+				&& ($questionData['extraSettings']['confirmationRecipient'] ?? false) === true) {
+				$questionData['extraSettings']['confirmationRecipient'] = false;
+			}
 
 			$newQuestion = Question::fromParams($questionData);
 			$this->questionMapper->insert($newQuestion);
@@ -648,6 +653,12 @@ class ApiController extends OCSController {
 		if (key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
+		$this->assertSingleConfirmationRecipientQuestion(
+			$formId,
+			$questionId,
+			$question->getType(),
+			is_array($keyValuePairs['extraSettings'] ?? null) ? $keyValuePairs['extraSettings'] : null,
+		);
 
 		// Create QuestionEntity with given Params & Id.
 		$question = Question::fromParams($keyValuePairs);
@@ -1405,7 +1416,7 @@ class ApiController extends OCSController {
 		$this->formMapper->update($form);
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission);
+		$this->formsService->notifyNewSubmission($form, $submission, FormSubmittedEvent::TRIGGER_CREATED);
 
 		if ($form->getFileId() !== null) {
 			$this->jobList->add(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $form->getId()]);
@@ -1487,7 +1498,7 @@ class ApiController extends OCSController {
 		}
 
 		//Create Activity
-		$this->formsService->notifyNewSubmission($form, $submission);
+		$this->formsService->notifyNewSubmission($form, $submission, FormSubmittedEvent::TRIGGER_UPDATED);
 
 		return new DataResponse($submissionId);
 	}
@@ -1823,6 +1834,32 @@ class ApiController extends OCSController {
 				|| ($permitAll && !$this->configService->getAllowPermitAll())) {
 				$this->logger->info('Not allowed to update showToAllUsers or permitAllUsers');
 				throw new OCSForbiddenException();
+			}
+		}
+	}
+
+	/**
+	 * Ensure only one short-email question can be used as confirmation recipient in a form.
+	 *
+	 * @param array<string, mixed>|null $extraSettings
+	 */
+	private function assertSingleConfirmationRecipientQuestion(int $formId, int $questionId, string $questionType, ?array $extraSettings): void {
+		if ($questionType !== Constants::ANSWER_TYPE_SHORT || !is_array($extraSettings) || ($extraSettings['confirmationRecipient'] ?? false) !== true) {
+			return;
+		}
+
+		$formQuestions = $this->questionMapper->findByForm($formId);
+		foreach ($formQuestions as $formQuestion) {
+			if ($formQuestion->getId() === $questionId) {
+				continue;
+			}
+
+			$existingSettings = $formQuestion->getExtraSettings();
+			$isExistingConfirmationRecipient = $formQuestion->getType() === Constants::ANSWER_TYPE_SHORT
+				&& ($existingSettings['validationType'] ?? null) === 'email'
+				&& ($existingSettings['confirmationRecipient'] ?? false) === true;
+			if ($isExistingConfirmationRecipient) {
+				throw new OCSBadRequestException('Only one confirmation recipient question is allowed per form');
 			}
 		}
 	}
