@@ -258,6 +258,7 @@ class FormsServiceTest extends TestCase {
 				'maxSubmissions' => null,
 				'isMaxSubmissionsReached' => false,
 				'notifyOwnerOnSubmission' => false,
+				'notificationRecipients' => [],
 			]]
 		];
 	}

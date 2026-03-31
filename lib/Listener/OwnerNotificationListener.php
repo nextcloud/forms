@@ -42,14 +42,28 @@ class OwnerNotificationListener implements IEventListener {
 		}
 
 		$form = $event->getForm();
-		if (!$form->getNotifyOwnerOnSubmission()) {
-			return;
+		$submission = $event->getSubmission();
+		$recipients = $form->getNotificationRecipients();
+
+		if ($form->getNotifyOwnerOnSubmission()) {
+			$owner = $this->userManager->get($form->getOwnerId());
+			$ownerMail = $owner?->getEMailAddress();
+			if (is_string($ownerMail) && trim($ownerMail) !== '') {
+				$recipients[] = trim($ownerMail);
+			}
 		}
 
-		$submission = $event->getSubmission();
-		$owner = $this->userManager->get($form->getOwnerId());
-		$ownerMail = trim((string)$owner?->getEMailAddress());
-		if ($ownerMail === '') {
+		$normalizedRecipients = [];
+		foreach ($recipients as $recipient) {
+			$trimmedRecipient = trim($recipient);
+			if ($trimmedRecipient === '') {
+				continue;
+			}
+
+			$normalizedRecipients[strtolower($trimmedRecipient)] = $trimmedRecipient;
+		}
+
+		if ($normalizedRecipients === []) {
 			return;
 		}
 
@@ -87,7 +101,7 @@ class OwnerNotificationListener implements IEventListener {
 		$this->ownerNotificationMailService->send(
 			$form,
 			$submission,
-			[$ownerMail],
+			array_values($normalizedRecipients),
 			$answerSummaries,
 		);
 	}

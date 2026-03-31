@@ -57,9 +57,10 @@ class OwnerNotificationListenerTest extends TestCase {
 		);
 	}
 
-	public function testHandleSendsOwnerNotification(): void {
+	public function testHandleSendsOwnerAndExternalNotifications(): void {
 		$form = $this->createForm();
 		$form->setNotifyOwnerOnSubmission(true);
+		$form->setNotificationRecipients(['external@example.com']);
 
 		$submission = $this->createSubmission(11, $form->getId());
 		$event = new FormSubmittedEvent($form, $submission);
@@ -106,7 +107,8 @@ class OwnerNotificationListenerTest extends TestCase {
 				$this->identicalTo($form),
 				$this->identicalTo($submission),
 				$this->callback(function (array $recipients): bool {
-					return $recipients === ['owner@example.com'];
+					sort($recipients);
+					return $recipients === ['external@example.com', 'owner@example.com'];
 				}),
 				$this->callback(function (array $summaries): bool {
 					return count($summaries) === 1
@@ -131,7 +133,59 @@ class OwnerNotificationListenerTest extends TestCase {
 		$this->listener->handle($event);
 	}
 
-	public function testHandleSkipsWhenOwnerHasNoMailAddress(): void {
+	public function testHandleSendsExternalNotificationsWithoutOwnerNotification(): void {
+		$form = $this->createForm();
+		$form->setNotificationRecipients(['external@example.com']);
+
+		$submission = $this->createSubmission(11, $form->getId());
+		$event = new FormSubmittedEvent($form, $submission);
+
+		$this->userManager->expects($this->never())
+			->method('get');
+
+		$answer = new Answer();
+		$answer->setQuestionId(22);
+		$answer->setSubmissionId(11);
+		$answer->setText('Short text answer');
+
+		$question = new Question();
+		$question->setId(22);
+		$question->setFormId($form->getId());
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+		$question->setText('Question text');
+		$question->setDescription('');
+		$question->setName('');
+		$question->setOrder(1);
+		$question->setIsRequired(false);
+		$question->setExtraSettings([]);
+
+		$this->answerMapper->expects($this->once())
+			->method('findBySubmission')
+			->with(11)
+			->willReturn([$answer]);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with(22)
+			->willReturn($question);
+
+		$this->mailService->expects($this->once())
+			->method('send')
+			->with(
+				$this->identicalTo($form),
+				$this->identicalTo($submission),
+				['external@example.com'],
+				$this->callback(function (array $summaries): bool {
+					return count($summaries) === 1
+						&& $summaries[0]['question'] === 'Question text'
+						&& $summaries[0]['answer'] === 'Short text answer';
+				})
+			);
+
+		$this->listener->handle($event);
+	}
+
+	public function testHandleSkipsWhenOwnerHasNoMailAddressAndNoExternalRecipients(): void {
 		$form = $this->createForm();
 		$form->setNotifyOwnerOnSubmission(true);
 
@@ -176,6 +230,7 @@ class OwnerNotificationListenerTest extends TestCase {
 		$form->setLockedUntil(null);
 		$form->setSubmissionMessage(null);
 		$form->setNotifyOwnerOnSubmission(false);
+		$form->setNotificationRecipients([]);
 
 		return $form;
 	}

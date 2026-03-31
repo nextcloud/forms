@@ -120,7 +120,8 @@
                     "maxSubmissions",
                     "shares",
                     "submissionMessage",
-                    "notifyOwnerOnSubmission"
+                    "notifyOwnerOnSubmission",
+                    "notificationRecipients"
                 ],
                 "properties": {
                     "id": {
@@ -236,6 +237,12 @@
                     },
                     "notifyOwnerOnSubmission": {
                         "type": "boolean"
+                    },
+                    "notificationRecipients": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },

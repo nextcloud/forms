@@ -61,6 +61,29 @@
 				)
 			}}
 		</NcCheckboxRadioSwitch>
+		<div class="settings-div--separate">
+			<NcTextArea
+				v-model="notificationRecipientsInput"
+				:disabled="formArchived || locked"
+				:label="t('forms', 'Additional notification recipients')"
+				:placeholder="
+					t(
+						'forms',
+						'One email address per line (for example: team@example.com)',
+					)
+				"
+				resize="vertical"
+				rows="4"
+				@blur="onNotificationRecipientsChange" />
+			<p class="settings-hint">
+				{{
+					t(
+						'forms',
+						'Additional recipients are notified for each new response, independent of the owner notification switch.',
+					)
+				}}
+			</p>
+		</div>
 		<NcCheckboxRadioSwitch
 			:model-value="formExpires"
 			:disabled="formArchived || locked"
@@ -197,6 +220,7 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwit
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -209,6 +233,7 @@ export default {
 		NcDateTimePicker,
 		NcIconSvgWrapper,
 		NcNoteCard,
+		NcTextArea,
 		TransferOwnership,
 	},
 
@@ -249,6 +274,7 @@ export default {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
+			notificationRecipientsInput: '',
 			svgLockOpen,
 		}
 	},
@@ -330,6 +356,20 @@ export default {
 		},
 	},
 
+	watch: {
+		'form.notificationRecipients': {
+			handler(value) {
+				this.updateNotificationRecipientsInput(value)
+			},
+
+			deep: true,
+		},
+	},
+
+	created() {
+		this.updateNotificationRecipientsInput(this.form.notificationRecipients)
+	},
+
 	methods: {
 		/**
 		 * Save Form-Properties
@@ -350,6 +390,21 @@ export default {
 
 		onNotifyOwnerOnSubmissionChange(checked) {
 			this.$emit('update:form-prop', 'notifyOwnerOnSubmission', checked)
+		},
+
+		onNotificationRecipientsChange(payload) {
+			const value =
+				typeof payload === 'string'
+					? payload
+					: (payload?.target?.value ?? this.notificationRecipientsInput)
+
+			const recipients = value
+				.split(/[\r\n,]+/g)
+				.map((recipient) => recipient.trim())
+				.filter((recipient) => recipient.length > 0)
+
+			this.notificationRecipientsInput = recipients.join('\n')
+			this.$emit('update:form-prop', 'notificationRecipients', recipients)
 		},
 
 		onFormExpiresChange(checked) {
@@ -460,6 +515,15 @@ export default {
 		 */
 		notBeforeNow(datetime) {
 			return datetime < moment().toDate()
+		},
+
+		updateNotificationRecipientsInput(notificationRecipients) {
+			if (!Array.isArray(notificationRecipients)) {
+				this.notificationRecipientsInput = ''
+				return
+			}
+
+			this.notificationRecipientsInput = notificationRecipients.join('\n')
 		},
 	},
 }

@@ -35,6 +35,13 @@ class Version050300Date20260228170000 extends SimpleMigrationStep {
 			]);
 		}
 
+		if (!$formsTable->hasColumn('notification_recipients_json')) {
+			$formsTable->addColumn('notification_recipients_json', Types::TEXT, [
+				'notnull' => false,
+				'default' => null,
+			]);
+		}
+
 		return $schema;
 	}
 }

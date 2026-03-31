@@ -285,6 +285,7 @@ class FormsService {
 		unset($formData['filePath']);
 		unset($formData['fileFormat']);
 		unset($formData['notifyOwnerOnSubmission']);
+		unset($formData['notificationRecipients']);
 
 		return $formData;
 	}

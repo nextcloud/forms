@@ -397,6 +397,7 @@ class ApiV3Test extends IntegrationBase {
 					'maxSubmissions' => null,
 					'isMaxSubmissionsReached' => false,
 					'notifyOwnerOnSubmission' => false,
+					'notificationRecipients' => [],
 				]
 			]
 		];
@@ -531,6 +532,7 @@ class ApiV3Test extends IntegrationBase {
 					'maxSubmissions' => null,
 					'isMaxSubmissionsReached' => false,
 					'notifyOwnerOnSubmission' => false,
+					'notificationRecipients' => [],
 				]
 			]
 		];

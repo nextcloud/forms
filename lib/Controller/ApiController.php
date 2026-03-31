@@ -53,6 +53,7 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Mail\IMailer;
 
 use Psr\Log\LoggerInterface;
 
@@ -69,6 +70,8 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
  */
 class ApiController extends OCSController {
+	private const MAX_NOTIFICATION_RECIPIENTS = 20;
+
 	private ?IUser $currentUser;
 
 	public function __construct(
@@ -91,6 +94,7 @@ class ApiController extends OCSController {
 		private UploadedFileMapper $uploadedFileMapper,
 		private IMimeTypeDetector $mimeTypeDetector,
 		private IJobList $jobList,
+		private IMailer $mailer,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -181,6 +185,7 @@ class ApiController extends OCSController {
 			$form->setIsAnonymous(false);
 			$form->setNotifyOwnerOnSubmission(false);
 			$form->setState(Constants::FORM_STATE_ACTIVE);
+			$form->setNotificationRecipients([]);
 
 			$this->formMapper->insert($form);
 		} else {
@@ -211,6 +216,7 @@ class ApiController extends OCSController {
 			$formData['isAnonymous'] = false;
 			$formData['notifyOwnerOnSubmission'] = false;
 			$formData['state'] = Constants::FORM_STATE_ACTIVE;
+			$formData['notificationRecipients'] = [];
 
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
@@ -323,6 +329,10 @@ class ApiController extends OCSController {
 
 		if (isset($keyValuePairs['notifyOwnerOnSubmission']) && !is_bool($keyValuePairs['notifyOwnerOnSubmission'])) {
 			throw new OCSBadRequestException('notifyOwnerOnSubmission must be a boolean');
+		}
+
+		if (array_key_exists('notificationRecipients', $keyValuePairs)) {
+			$keyValuePairs['notificationRecipients'] = $this->normalizeNotificationRecipients($keyValuePairs['notificationRecipients']);
 		}
 
 		// Process file linking
@@ -1836,6 +1846,42 @@ class ApiController extends OCSController {
 		}
 	}
 
+	/**
+	 * @param mixed $notificationRecipients
+	 * @return list<string>
+	 */
+	private function normalizeNotificationRecipients(mixed $notificationRecipients): array {
+		if (!is_array($notificationRecipients)) {
+			throw new OCSBadRequestException('notificationRecipients must be an array');
+		}
+
+		$normalizedRecipients = [];
+		foreach ($notificationRecipients as $recipient) {
+			if (!is_string($recipient)) {
+				throw new OCSBadRequestException('notificationRecipients must be an array of strings');
+			}
+
+			$trimmedRecipient = trim($recipient);
+			if ($trimmedRecipient === '') {
+				continue;
+			}
+
+			if (!$this->mailer->validateMailAddress($trimmedRecipient)) {
+				throw new OCSBadRequestException('notificationRecipients contains an invalid email address');
+			}
+
+			$recipientKey = strtolower($trimmedRecipient);
+			if (!isset($normalizedRecipients[$recipientKey])) {
+				$normalizedRecipients[$recipientKey] = $trimmedRecipient;
+			}
+		}
+
+		if (count($normalizedRecipients) > self::MAX_NOTIFICATION_RECIPIENTS) {
+			throw new OCSBadRequestException('Too many notificationRecipients');
+		}
+
+		return array_values($normalizedRecipients);
+	}
 	/**
 	 * Checks if the current user is allowed to archive/unarchive the form
 	 */

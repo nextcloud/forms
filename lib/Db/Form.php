@@ -45,6 +45,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setSubmissionMessage(string|null $value)
  * @method bool getNotifyOwnerOnSubmission()
  * @method void setNotifyOwnerOnSubmission(bool $value)
+ * @method string|null getNotificationRecipientsJson()
+ * @method void setNotificationRecipientsJson(?string $value)
  * @method int getState()
  * @psalm-method 0|1|2 getState()
  * @method void setState(int|null $value)
@@ -72,6 +74,7 @@ class Form extends Entity {
 	protected $showExpiration;
 	protected $submissionMessage;
 	protected $notifyOwnerOnSubmission;
+	protected $notificationRecipientsJson;
 	protected $lastUpdated;
 	protected $state;
 	protected $lockedBy;
@@ -147,6 +150,37 @@ class Form extends Entity {
 	}
 
 	/**
+	 * @return list<string>
+	 */
+	public function getNotificationRecipients(): array {
+		$encodedRecipients = $this->getNotificationRecipientsJson();
+		if ($encodedRecipients === null || $encodedRecipients === '') {
+			return [];
+		}
+
+		$decodedRecipients = json_decode($encodedRecipients, true, 512, JSON_THROW_ON_ERROR);
+		if (!is_array($decodedRecipients)) {
+			return [];
+		}
+
+		return array_values(array_filter(array_map(static fn (mixed $recipient): string => trim((string)$recipient), $decodedRecipients), static fn (string $recipient): bool => $recipient !== ''));
+	}
+
+	/**
+	 * @param list<string> $recipients
+	 */
+	public function setNotificationRecipients(array $recipients): void {
+		$normalizedRecipients = array_values(array_filter(array_map(static fn (string $recipient): string => trim($recipient), $recipients), static fn (string $recipient): bool => $recipient !== ''));
+
+		if ($normalizedRecipients === []) {
+			$this->setNotificationRecipientsJson(null);
+			return;
+		}
+
+		$this->setNotificationRecipientsJson(json_encode($normalizedRecipients, JSON_THROW_ON_ERROR));
+	}
+
+	/**
 	 * @return array{
 	 *   id: int,
 	 *   hash: string,
@@ -165,6 +199,7 @@ class Form extends Entity {
 	 *   lastUpdated: int,
 	 *   submissionMessage: ?string,
 	 *   notifyOwnerOnSubmission: bool,
+	 *   notificationRecipients: list<string>,
 	 *   state: 0|1|2,
 	 *   lockedBy: ?string,
 	 *   lockedUntil: ?int,
@@ -190,6 +225,7 @@ class Form extends Entity {
 			'lastUpdated' => (int)$this->getLastUpdated(),
 			'submissionMessage' => $this->getSubmissionMessage(),
 			'notifyOwnerOnSubmission' => (bool)$this->getNotifyOwnerOnSubmission(),
+			'notificationRecipients' => $this->getNotificationRecipients(),
 			'state' => $this->getState(),
 			'lockedBy' => $this->getLockedBy(),
 			'lockedUntil' => $this->getLockedUntil(),
