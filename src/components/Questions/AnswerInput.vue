@@ -8,7 +8,7 @@
 		<component
 			:is="pseudoIcon"
 			v-if="!isDropdown"
-			class="question__item__pseudoInput"></component>
+			class="question__item__pseudoInput" />
 		<input
 			ref="input"
 			v-model="localText"
