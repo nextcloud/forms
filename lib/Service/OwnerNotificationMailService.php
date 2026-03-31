@@ -22,6 +22,7 @@ class OwnerNotificationMailService {
 		private IMailer $mailer,
 		private IL10N $l10n,
 		private IURLGenerator $urlGenerator,
+		private SubmissionPdfService $submissionPdfService,
 		private LoggerInterface $logger,
 	) {
 	}
@@ -29,8 +30,9 @@ class OwnerNotificationMailService {
 	/**
 	 * @param list<string> $recipients
 	 * @param array<int, array{question: string, answer: string}> $answerSummaries
+	 * @param array<int, array{question: string, answer: string}> $pdfAnswerEntries
 	 */
-	public function send(Form $form, Submission $submission, array $recipients, array $answerSummaries = []): void {
+	public function send(Form $form, Submission $submission, array $recipients, array $answerSummaries = [], array $pdfAnswerEntries = []): void {
 		$validRecipients = array_values(array_unique(array_filter($recipients, fn (string $recipient): bool => $this->mailer->validateMailAddress($recipient))));
 		if ($validRecipients === []) {
 			return;
@@ -77,6 +79,16 @@ class OwnerNotificationMailService {
 			$message->setSubject($subject);
 			$message->setTo($validRecipients);
 			$message->useTemplate($emailTemplate);
+			if ($form->getAttachSubmissionPdf()) {
+				$entriesForPdf = $pdfAnswerEntries !== [] ? $pdfAnswerEntries : $answerSummaries;
+				$message->attach(
+					$this->mailer->createAttachment(
+						$this->submissionPdfService->createPdf($form, $submission, $entriesForPdf),
+						$this->submissionPdfService->createFilename($form, $submission),
+						'application/pdf',
+					),
+				);
+			}
 
 			$this->mailer->send($message);
 		} catch (\Throwable $e) {

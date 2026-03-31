@@ -45,6 +45,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setSubmissionMessage(string|null $value)
  * @method bool getNotifyOwnerOnSubmission()
  * @method void setNotifyOwnerOnSubmission(bool $value)
+ * @method bool getAttachSubmissionPdf()
+ * @method void setAttachSubmissionPdf(bool $value)
  * @method string|null getNotificationRecipientsJson()
  * @method void setNotificationRecipientsJson(?string $value)
  * @method int getState()
@@ -74,6 +76,7 @@ class Form extends Entity {
 	protected $showExpiration;
 	protected $submissionMessage;
 	protected $notifyOwnerOnSubmission;
+	protected $attachSubmissionPdf;
 	protected $notificationRecipientsJson;
 	protected $lastUpdated;
 	protected $state;
@@ -92,6 +95,7 @@ class Form extends Entity {
 		$this->addType('allowEditSubmissions', 'boolean');
 		$this->addType('showExpiration', 'boolean');
 		$this->addType('notifyOwnerOnSubmission', 'boolean');
+		$this->addType('attachSubmissionPdf', 'boolean');
 		$this->addType('lastUpdated', 'integer');
 		$this->addType('state', 'integer');
 		$this->addType('lockedBy', 'string');
@@ -199,6 +203,7 @@ class Form extends Entity {
 	 *   lastUpdated: int,
 	 *   submissionMessage: ?string,
 	 *   notifyOwnerOnSubmission: bool,
+	 *   attachSubmissionPdf: bool,
 	 *   notificationRecipients: list<string>,
 	 *   state: 0|1|2,
 	 *   lockedBy: ?string,
@@ -225,6 +230,7 @@ class Form extends Entity {
 			'lastUpdated' => (int)$this->getLastUpdated(),
 			'submissionMessage' => $this->getSubmissionMessage(),
 			'notifyOwnerOnSubmission' => (bool)$this->getNotifyOwnerOnSubmission(),
+			'attachSubmissionPdf' => (bool)$this->getAttachSubmissionPdf(),
 			'notificationRecipients' => $this->getNotificationRecipients(),
 			'state' => $this->getState(),
 			'lockedBy' => $this->getLockedBy(),

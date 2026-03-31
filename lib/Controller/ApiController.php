@@ -185,6 +185,7 @@ class ApiController extends OCSController {
 			$form->setIsAnonymous(false);
 			$form->setNotifyOwnerOnSubmission(false);
 			$form->setState(Constants::FORM_STATE_ACTIVE);
+			$form->setAttachSubmissionPdf(false);
 			$form->setNotificationRecipients([]);
 
 			$this->formMapper->insert($form);
@@ -216,6 +217,7 @@ class ApiController extends OCSController {
 			$formData['isAnonymous'] = false;
 			$formData['notifyOwnerOnSubmission'] = false;
 			$formData['state'] = Constants::FORM_STATE_ACTIVE;
+			$formData['attachSubmissionPdf'] = false;
 			$formData['notificationRecipients'] = [];
 
 			$form = Form::fromParams($formData);
@@ -329,6 +331,10 @@ class ApiController extends OCSController {
 
 		if (isset($keyValuePairs['notifyOwnerOnSubmission']) && !is_bool($keyValuePairs['notifyOwnerOnSubmission'])) {
 			throw new OCSBadRequestException('notifyOwnerOnSubmission must be a boolean');
+		}
+
+		if (isset($keyValuePairs['attachSubmissionPdf']) && !is_bool($keyValuePairs['attachSubmissionPdf'])) {
+			throw new OCSBadRequestException('attachSubmissionPdf must be a boolean');
 		}
 
 		if (array_key_exists('notificationRecipients', $keyValuePairs)) {

@@ -186,6 +186,7 @@ class ApiControllerTest extends TestCase {
 			$read = $form->read();
 			unset($read['created']);
 			unset($read['notifyOwnerOnSubmission']);
+			unset($read['attachSubmissionPdf']);
 			unset($read['notificationRecipients']);
 			self::assertEquals($expected, $read);
 			return true;
@@ -1107,6 +1108,27 @@ class ApiControllerTest extends TestCase {
 
 		$this->expectException(OCSBadRequestException::class);
 		$this->apiController->updateForm(1, ['notifyOwnerOnSubmission' => 'yes']);
+	}
+
+	public function testUpdateFormRejectsNonBooleanAttachSubmissionPdf(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['attachSubmissionPdf' => 'yes']);
 	}
 
 	public function testGetSubmission_invalidForm() {

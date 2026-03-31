@@ -171,6 +171,7 @@ Returns the full-depth object of the requested form (without submissions).
   "submitMultiple": true,
   "allowEditSubmissions": false,
   "notifyOwnerOnSubmission": false,
+  "attachSubmissionPdf": false,
   "notificationRecipients": ["team@example.com"],
   "showExpiration": false,
   "canSubmit": true,
@@ -278,6 +279,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
     - To link a file for submissions, the _keyValuePairs_ need to contain the keys `path` and `fileFormat`
     - To unlink a file for submissions, the _keyValuePairs_ need to contain the keys `fileId` and `fileFormat` need to contain the value `null`
     - `notifyOwnerOnSubmission` must be a boolean.
+    - `attachSubmissionPdf` must be a boolean.
     - `notificationRecipients` must be an array of valid email addresses.
 - Response: **Status-Code OK**, as well as the id of the updated form.
 

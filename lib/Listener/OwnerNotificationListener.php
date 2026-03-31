@@ -68,6 +68,7 @@ class OwnerNotificationListener implements IEventListener {
 		}
 
 		$answerSummaries = [];
+		$pdfAnswerEntries = [];
 		try {
 			$answers = $this->answerMapper->findBySubmission($submission->getId());
 		} catch (DoesNotExistException $e) {
@@ -87,6 +88,12 @@ class OwnerNotificationListener implements IEventListener {
 
 			$questionType = $question->getType();
 			$answerText = trim($answer->getText() ?? '');
+			if ($answerText !== '') {
+				$pdfAnswerEntries[] = [
+					'question' => $question->getText(),
+					'answer' => $answerText,
+				];
+			}
 			if (
 				$answerText !== ''
 				&& in_array($questionType, [Constants::ANSWER_TYPE_SHORT, Constants::ANSWER_TYPE_LONG], true)
@@ -103,6 +110,7 @@ class OwnerNotificationListener implements IEventListener {
 			$submission,
 			array_values($normalizedRecipients),
 			$answerSummaries,
+			$pdfAnswerEntries,
 		);
 	}
 }

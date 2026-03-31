@@ -61,6 +61,13 @@
 				)
 			}}
 		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch
+			:model-value="form.attachSubmissionPdf"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onAttachSubmissionPdfChange">
+			{{ t('forms', 'Attach each submission as PDF to notification emails') }}
+		</NcCheckboxRadioSwitch>
 		<div class="settings-div--separate">
 			<NcTextArea
 				v-model="notificationRecipientsInput"
@@ -390,6 +397,10 @@ export default {
 
 		onNotifyOwnerOnSubmissionChange(checked) {
 			this.$emit('update:form-prop', 'notifyOwnerOnSubmission', checked)
+		},
+
+		onAttachSubmissionPdfChange(checked) {
+			this.$emit('update:form-prop', 'attachSubmissionPdf', checked)
 		},
 
 		onNotificationRecipientsChange(payload) {

@@ -114,6 +114,11 @@ class OwnerNotificationListenerTest extends TestCase {
 					return count($summaries) === 1
 						&& $summaries[0]['question'] === 'Question text'
 						&& $summaries[0]['answer'] === 'Short text answer';
+				}),
+				$this->callback(function (array $pdfEntries): bool {
+					return count($pdfEntries) === 1
+						&& $pdfEntries[0]['question'] === 'Question text'
+						&& $pdfEntries[0]['answer'] === 'Short text answer';
 				})
 			);
 
@@ -179,6 +184,11 @@ class OwnerNotificationListenerTest extends TestCase {
 					return count($summaries) === 1
 						&& $summaries[0]['question'] === 'Question text'
 						&& $summaries[0]['answer'] === 'Short text answer';
+				}),
+				$this->callback(function (array $pdfEntries): bool {
+					return count($pdfEntries) === 1
+						&& $pdfEntries[0]['question'] === 'Question text'
+						&& $pdfEntries[0]['answer'] === 'Short text answer';
 				})
 			);
 
@@ -230,6 +240,7 @@ class OwnerNotificationListenerTest extends TestCase {
 		$form->setLockedUntil(null);
 		$form->setSubmissionMessage(null);
 		$form->setNotifyOwnerOnSubmission(false);
+		$form->setAttachSubmissionPdf(false);
 		$form->setNotificationRecipients([]);
 
 		return $form;
