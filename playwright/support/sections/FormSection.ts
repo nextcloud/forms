@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { Locator, Page, Response } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
 import type { QuestionType } from './QuestionType.ts'
 
+import { waitForApiResponse } from '../helpers.ts'
 import { QuestionSection } from './QuestionSection.ts'
 
 export class FormSection {
@@ -40,27 +41,22 @@ export class FormSection {
 	}
 
 	public async addQuestion(type: QuestionType): Promise<void> {
+		const created = waitForApiResponse(this.page, 'POST')
 		await this.newQuestionButton.click()
 		await this.page.getByRole('menuitem', { name: type }).click()
+		await created
 	}
 
 	public async getQuestions(): Promise<QuestionSection[]> {
 		return this.page
-			.locator('main section')
+			.getByRole('listitem', { name: /Question number \d+/i })
 			.all()
-			.then((sections) =>
-				sections.map((section) => new QuestionSection(this.page, section)),
+			.then((items) =>
+				items.map((item) => new QuestionSection(this.page, item)),
 			)
 	}
 
-	private getFormUpdatedPromise(): Promise<Response> {
-		return this.page.waitForResponse(
-			(response) =>
-				response.request().method() === 'PATCH'
-				&& response
-					.request()
-					.url()
-					.includes('/ocs/v2.php/apps/forms/api/v3/forms/'),
-		)
+	private getFormUpdatedPromise() {
+		return waitForApiResponse(this.page, 'PATCH')
 	}
 }
