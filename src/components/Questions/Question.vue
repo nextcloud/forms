@@ -147,6 +147,9 @@
 					v-html="computedDescription" />
 				<!-- eslint-enable vue/no-v-html -->
 			</div>
+			<NcNoteCard v-if="hasError" :id="errorId" type="error">
+				{{ errorMessage }}
+			</NcNoteCard>
 		</div>
 
 		<!-- Question content -->
@@ -160,6 +163,7 @@ import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
 import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
 import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
@@ -191,6 +195,7 @@ export default {
 		NcActionCheckbox,
 		NcActionInput,
 		NcButton,
+		NcNoteCard,
 	},
 
 	inject: ['$markdownit'],
@@ -260,6 +265,11 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+
+		errorMessage: {
+			type: String,
+			default: null,
+		},
 	},
 
 	emits: [
@@ -313,6 +323,14 @@ export default {
 
 		hasDescription() {
 			return this.description !== ''
+		},
+
+		hasError() {
+			return !!this.errorMessage
+		},
+
+		errorId() {
+			return `q${this.index}_error`
 		},
 	},
 

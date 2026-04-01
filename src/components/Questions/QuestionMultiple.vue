@@ -10,6 +10,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
@@ -72,9 +73,6 @@
 				:name="name || undefined"
 				:aria-labelledby="titleId"
 				:aria-describedby="description ? descriptionId : undefined">
-				<NcNoteCard v-if="hasError" :id="errorId" type="error">
-					{{ errorMessage }}
-				</NcNoteCard>
 				<NcCheckboxRadioSwitch
 					v-for="answer in choices"
 					:key="answer.id"
@@ -186,7 +184,6 @@ import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
@@ -215,7 +212,6 @@ export default {
 		NcCheckboxRadioSwitch,
 		NcInputField,
 		NcLoadingIcon,
-		NcNoteCard,
 		OptionInputDialog,
 		Question,
 	},
@@ -225,10 +221,6 @@ export default {
 
 	data() {
 		return {
-			/**
-			 * The shown error message
-			 */
-			errorMessage: null,
 			/**
 			 * This is used to cache the "other" answer, meaning if the user:
 			 * checks "other" types text, unchecks "other" and then re-check "other" the typed text is preserved
@@ -249,10 +241,6 @@ export default {
 			return this.answerType.unique === true
 		},
 
-		hasError() {
-			return !!this.errorMessage
-		},
-
 		shiftDragHandle() {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
@@ -270,10 +258,6 @@ export default {
 
 		questionValues() {
 			return this.isUnique ? this.values?.[0] : this.values
-		},
-
-		errorId() {
-			return `q${this.index}_error`
 		},
 
 		allowOtherAnswer() {

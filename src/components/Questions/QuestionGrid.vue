@@ -10,16 +10,13 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<template v-if="readOnly">
 			<fieldset
 				:name="name || undefined"
 				:aria-labelledby="titleId"
 				:aria-describedby="description ? descriptionId : undefined">
-				<NcNoteCard v-if="hasError" :id="errorId" type="error">
-					{{ errorMessage }}
-				</NcNoteCard>
-
 				<table class="answer-grid">
 					<thead>
 						<tr>
@@ -181,7 +178,6 @@ import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
@@ -197,7 +193,6 @@ export default {
 		NcCheckboxRadioSwitch,
 		NcInputField,
 		NcLoadingIcon,
-		NcNoteCard,
 		Question,
 	},
 
@@ -206,11 +201,6 @@ export default {
 
 	data() {
 		return {
-			/**
-			 * The shown error message
-			 */
-			errorMessage: null,
-
 			isDragging: false,
 			isLoading: false,
 			questionTypes: [
@@ -227,16 +217,8 @@ export default {
 			return this.answerType.unique === true
 		},
 
-		hasError() {
-			return !!this.errorMessage
-		},
-
 		shiftDragHandle() {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
-		},
-
-		errorId() {
-			return `q${this.index}_error`
 		},
 
 		questionType() {
