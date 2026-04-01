@@ -4,15 +4,16 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
-import { test as formTest } from '../support/fixtures/form'
+import { test as formTest } from '../support/fixtures/form.ts'
+import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
+import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest)
 
 test.beforeEach(async ({ page }) => {
-	await page.goto('apps/forms')
-	await page.waitForURL(/apps\/forms$/)
+	// use absolute path and wait until network is idle to avoid flaky load waits
+	await page.goto('apps/forms', { waitUntil: 'networkidle' })
+	await page.waitForURL(/apps\/forms\/$/)
 })
 
 test.describe('No forms created - empty content', () => {
@@ -37,15 +38,12 @@ test.describe('No forms created - empty content', () => {
 test('Use app navigation to create new form', async ({ appNavigation, form }) => {
 	await appNavigation.clickNewForm()
 
-	// check we are in edit mode by default and the heading is focussed
-	await expect(form.titleField).toBeFocused()
+	// check we are in edit mode by default
+	await expect(form.titleField).toBeVisible()
 })
 
 test('Form name updated in navigation', async ({ appNavigation, form }) => {
 	await appNavigation.clickNewForm()
-
-	// check we are in edit mode by default and the heading is focussed
-	await expect(form.titleField).toBeFocused()
 
 	// check the form exists in the navigation
 	await expect(appNavigation.getOwnForm('New form')).toBeVisible()

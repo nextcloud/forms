@@ -340,30 +340,42 @@ export default {
 					for (const rowId of Object.keys(answerJson)) {
 						const columnId = answerJson[rowId]
 
-						matrix[rowId][columnId].answersCount++
+						if (matrix[rowId]?.[columnId]) {
+							matrix[rowId][columnId].answersCount++
+						}
 					}
 				} else if (
 					this.question.extraSettings.questionType
 					=== GridCellType.Checkbox
 				) {
 					for (const rowId of Object.keys(answerJson)) {
+						if (!Array.isArray(answerJson[rowId])) {
+							continue
+						}
 						for (const columnId of answerJson[rowId]) {
-							matrix[rowId][columnId].answersCount++
+							if (matrix[rowId]?.[columnId]) {
+								matrix[rowId][columnId].answersCount++
+							}
 						}
 					}
 				} else if (
 					this.question.extraSettings.questionType === GridCellType.Number
 				) {
 					for (const rowId of Object.keys(answerJson)) {
+						if (!matrix[rowId]) {
+							continue
+						}
 						for (const columnId of Object.keys(answerJson[rowId])) {
 							if ('' === answerJson[rowId][columnId]) {
 								continue
 							}
 
-							matrix[rowId][columnId].totalValue += parseFloat(
-								answerJson[rowId][columnId],
-							)
-							matrix[rowId][columnId].answersCount++
+							if (matrix[rowId][columnId]) {
+								matrix[rowId][columnId].totalValue += parseFloat(
+									answerJson[rowId][columnId],
+								)
+								matrix[rowId][columnId].answersCount++
+							}
 						}
 					}
 				}

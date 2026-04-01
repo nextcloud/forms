@@ -14,7 +14,6 @@ export enum FormsView {
 export class TopBarSection {
 	public readonly toolbar: Locator
 
-	// eslint-disable-next-line no-useless-constructor
 	constructor(public readonly page: Page) {
 		this.toolbar = this.page.getByRole('toolbar', { name: 'View mode' })
 	}
@@ -28,11 +27,20 @@ export class TopBarSection {
 	}
 
 	public async toggleView(view: FormsView): Promise<void> {
+		const viewRoutes: Record<FormsView, RegExp> = {
+			[FormsView.View]: /\/submit(\/|$)/,
+			[FormsView.Edit]: /\/edit(\/|$)/,
+			[FormsView.Results]: /\/results(\/|$)/,
+		}
 		const radio = this.toolbar.getByRole('radio', { name: view })
 		if (await radio.isChecked()) {
 			return
 		}
-		await radio.check({ force: true }) // force is needed as the input element is hidden behind the icon
-		await this.page.waitForURL(/\/submit$/)
+		// NcCheckboxRadioSwitch hides the input inside a label; click the label
+		// to trigger Vue's event chain rather than force-checking the hidden input
+		// (which would fail because Vue resets the controlled input state before
+		// Playwright can verify it)
+		await radio.locator('xpath=..').click()
+		await this.page.waitForURL(viewRoutes[view])
 	}
 }

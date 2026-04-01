@@ -4,7 +4,7 @@
  */
 
 import { test as baseTest } from '@playwright/test'
-import { TopBarSection } from '../sections/TopBarSection'
+import { TopBarSection } from '../sections/TopBarSection.ts'
 
 interface TopBarFixture {
 	topBar: TopBarSection

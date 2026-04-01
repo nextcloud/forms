@@ -27,33 +27,33 @@
 			{{ t('forms', 'Unlock form') }}
 		</NcButton>
 		<NcCheckboxRadioSwitch
-			:model-value="form.isAnonymous"
+			:modelValue="form.isAnonymous"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onAnonChange">
+			@update:modelValue="onAnonChange">
 			<!-- TRANSLATORS Checkbox to select whether responses will be stored anonymously or not -->
 			{{ t('forms', 'Store responses anonymously') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:title="disableSubmitMultipleExplanation"
-			:model-value="submitMultiple"
+			:modelValue="submitMultiple"
 			:disabled="disableSubmitMultiple || formArchived || locked"
 			type="switch"
-			@update:model-value="onSubmitMultipleChange">
+			@update:modelValue="onSubmitMultipleChange">
 			{{ t('forms', 'Allow multiple responses per person') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:model-value="form.allowEditSubmissions"
+			:modelValue="form.allowEditSubmissions"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onAllowEditSubmissionsChange">
+			@update:modelValue="onAllowEditSubmissionsChange">
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:model-value="formExpires"
+			:modelValue="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onFormExpiresChange">
+			@update:modelValue="onFormExpiresChange">
 			{{ t('forms', 'Set expiration date') }}
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires && !formArchived" class="settings-div--indent">
@@ -61,28 +61,28 @@
 				id="expiresDatetimePicker"
 				:clearable="false"
 				:disabled="locked"
-				:disabled-date="notBeforeToday"
-				:disabled-time="notBeforeNow"
+				:disabledDate="notBeforeToday"
+				:disabledTime="notBeforeNow"
 				:editable="false"
 				:format="stringifyDate"
-				:minute-step="5"
-				:show-second="false"
-				:model-value="expirationDate"
+				:minuteStep="5"
+				:showSecond="false"
+				:modelValue="expirationDate"
 				type="datetime"
-				@change="onExpirationDateChange" />
+				@update:modelValue="onExpirationDateChange" />
 			<NcCheckboxRadioSwitch
-				:model-value="form.showExpiration"
+				:modelValue="form.showExpiration"
 				:disabled="locked"
 				type="switch"
-				@update:model-value="onShowExpirationChange">
+				@update:modelValue="onShowExpirationChange">
 				{{ t('forms', 'Show expiration date on form') }}
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
-			:model-value="hasMaxSubmissions"
+			:modelValue="hasMaxSubmissions"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onMaxSubmissionsChange">
+			@update:modelValue="onMaxSubmissionsChange">
 			{{ t('forms', 'Limit number of responses') }}
 		</NcCheckboxRadioSwitch>
 		<div
@@ -94,7 +94,7 @@
 				:min="1"
 				:disabled="locked"
 				:label="t('forms', 'Maximum number of responses')"
-				@update:model-value="onMaxSubmissionsValueChange" />
+				@update:modelValue="onMaxSubmissionsValueChange" />
 			<p class="settings-hint">
 				{{
 					t(
@@ -105,33 +105,33 @@
 			</p>
 		</div>
 		<NcCheckboxRadioSwitch
-			:model-value="formClosed"
+			:modelValue="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
 			type="switch"
-			@update:model-value="onFormClosedChange">
+			@update:modelValue="onFormClosedChange">
 			{{ t('forms', 'Close form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__close-form" class="settings-hint">
 			{{ t('forms', 'Closed forms do not accept new responses.') }}
 		</p>
 		<NcCheckboxRadioSwitch
-			:model-value="isFormLockedPermanently"
+			:modelValue="isFormLockedPermanently"
 			:disabled="
 				formArchived
 				|| (locked && form.lockedUntil !== 0)
 				|| !isCurrentUserOwner
 			"
 			type="switch"
-			@update:model-value="onFormLockChange">
+			@update:modelValue="onFormLockChange">
 			{{ t('forms', 'Lock form permanently') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
-			:model-value="formArchived"
+			:modelValue="formArchived"
 			aria-describedby="forms-settings__archive-form"
 			:disabled="locked || !isCurrentUserOwner"
 			type="switch"
-			@update:model-value="onFormArchivedChange">
+			@update:modelValue="onFormArchivedChange">
 			{{ t('forms', 'Archive form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__archive-form" class="settings-hint">
@@ -143,10 +143,10 @@
 			}}
 		</p>
 		<NcCheckboxRadioSwitch
-			:model-value="hasCustomSubmissionMessage"
+			:modelValue="hasCustomSubmissionMessage"
 			:disabled="formArchived || locked"
 			type="switch"
-			@update:model-value="onUpdateHasCustomSubmissionMessage">
+			@update:modelValue="onUpdateHasCustomSubmissionMessage">
 			{{ t('forms', 'Custom submission message') }}
 		</NcCheckboxRadioSwitch>
 		<div
@@ -196,7 +196,7 @@
 
 		<TransferOwnership
 			:locked="locked"
-			:is-owner="isCurrentUserOwner"
+			:isOwner="isCurrentUserOwner"
 			:form="form" />
 	</div>
 </template>
@@ -205,7 +205,7 @@
 import { getCurrentUser } from '@nextcloud/auth'
 import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
-import { directive as ClickOutside } from 'v-click-outside'
+import { vOnClickOutside as ClickOutside } from '@vueuse/components'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
@@ -253,7 +253,7 @@ export default {
 		},
 	},
 
-	emits: ['update:form-prop'],
+	emits: ['update:formProp'],
 
 	data() {
 		return {
@@ -343,7 +343,7 @@ export default {
 			},
 
 			set(value) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
+				this.$emit('update:formProp', 'maxSubmissions', value)
 			},
 		},
 
@@ -370,31 +370,31 @@ export default {
 		 * @param {boolean} checked New Checkbox/Switch Value to use
 		 */
 		onAnonChange(checked) {
-			this.$emit('update:form-prop', 'isAnonymous', checked)
+			this.$emit('update:formProp', 'isAnonymous', checked)
 		},
 
 		onSubmitMultipleChange(checked) {
-			this.$emit('update:form-prop', 'submitMultiple', checked)
+			this.$emit('update:formProp', 'submitMultiple', checked)
 		},
 
 		onAllowEditSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'allowEditSubmissions', checked)
+			this.$emit('update:formProp', 'allowEditSubmissions', checked)
 		},
 
 		onFormExpiresChange(checked) {
 			if (checked) {
 				this.$emit(
-					'update:form-prop',
+					'update:formProp',
 					'expires',
 					moment().add(1, 'hour').unix(),
 				) // Expires in one hour.
 			} else {
-				this.$emit('update:form-prop', 'expires', 0)
+				this.$emit('update:formProp', 'expires', 0)
 			}
 		},
 
 		onShowExpirationChange(checked) {
-			this.$emit('update:form-prop', 'showExpiration', checked)
+			this.$emit('update:formProp', 'showExpiration', checked)
 		},
 
 		/**
@@ -404,44 +404,44 @@ export default {
 		 */
 		onExpirationDateChange(datetime) {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'expires',
 				parseInt(moment(datetime).format('X')),
 			)
 		},
 
 		onMaxSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'maxSubmissions', checked ? 1 : null)
+			this.$emit('update:formProp', 'maxSubmissions', checked ? 1 : null)
 		},
 
 		onMaxSubmissionsValueChange(value) {
 			if (value > 0) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
+				this.$emit('update:formProp', 'maxSubmissions', value)
 			}
 		},
 
 		onFormClosedChange(isClosed) {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'state',
 				isClosed ? FormState.FormClosed : FormState.FormActive,
 			)
 		},
 
 		onFormLockChange(locked) {
-			this.$emit('update:form-prop', 'lockedUntil', locked ? 0 : null)
+			this.$emit('update:formProp', 'lockedUntil', locked ? 0 : null)
 		},
 
 		onFormArchivedChange(isArchived) {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'state',
 				isArchived ? FormState.FormArchived : FormState.FormClosed,
 			)
 		},
 
 		onSubmissionMessageChange({ target }) {
-			this.$emit('update:form-prop', 'submissionMessage', target.value)
+			this.$emit('update:formProp', 'submissionMessage', target.value)
 		},
 
 		/**
@@ -450,9 +450,9 @@ export default {
 		 */
 		onUpdateHasCustomSubmissionMessage() {
 			if (this.hasCustomSubmissionMessage) {
-				this.$emit('update:form-prop', 'submissionMessage', null)
+				this.$emit('update:formProp', 'submissionMessage', null)
 			} else {
-				this.$emit('update:form-prop', 'submissionMessage', '')
+				this.$emit('update:formProp', 'submissionMessage', '')
 			}
 		},
 

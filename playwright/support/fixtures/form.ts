@@ -4,7 +4,7 @@
  */
 
 import { test as baseTest } from '@playwright/test'
-import { FormSection } from '../sections/FormSection'
+import { FormSection } from '../sections/FormSection.ts'
 
 interface FormFixture {
 	form: FormSection

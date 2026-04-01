@@ -11,7 +11,7 @@
 		}"
 		role="toolbar">
 		<PillMenu
-			v-if="!canOnlySubmit"
+			v-if="!canOnlySubmit && currentView"
 			:active="currentView"
 			:options="availableViews"
 			@update:active="onChangeView" />
@@ -98,7 +98,7 @@ export default {
 		},
 	},
 
-	emits: ['share-form'],
+	emits: ['shareForm'],
 
 	setup() {
 		return {
@@ -186,7 +186,7 @@ export default {
 		},
 
 		onShareForm() {
-			this.$emit('share-form')
+			this.$emit('shareForm')
 		},
 	},
 }

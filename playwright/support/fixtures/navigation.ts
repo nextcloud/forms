@@ -4,7 +4,7 @@
  */
 
 import { test as baseTest } from '@playwright/test'
-import { AppNavigationSection } from '../sections/AppNavigationSection'
+import { AppNavigationSection } from '../sections/AppNavigationSection.ts'
 
 interface AppNavigationFixture {
 	appNavigation: AppNavigationSection

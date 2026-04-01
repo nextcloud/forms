@@ -5,23 +5,25 @@
 
 <template>
 	<NcDialog
-		content-classes="options-modal"
+		contentClasses="options-modal"
 		:name="t('forms', 'Add multiple options')"
 		:open="open"
 		:buttons="buttons"
 		size="normal"
 		@update:open="$emit('update:open', $event)">
-		<NcTextArea
-			v-model="enteredOptions"
-			:label="t('forms', 'Add multiple options (one per line)')"
-			:placeholder="t('forms', 'Add multiple options (one per line)')"
-			resize="vertical"
-			rows="10" />
+		<div class="options-text-area">
+			<NcTextArea
+				v-model="enteredOptions"
+				:label="t('forms', 'Add multiple options (one per line)')"
+				:placeholder="t('forms', 'Add multiple options (one per line)')"
+				resize="vertical"
+				rows="10" />
+		</div>
 		<NcSelect
-			:input-label="t('forms', 'Options')"
+			:inputLabel="t('forms', 'Options')"
 			multiple
 			disabled
-			:model-value="multipleOptions" />
+			:modelValue="multipleOptions" />
 	</NcDialog>
 </template>
 
@@ -50,7 +52,7 @@ export default defineComponent({
 		},
 	},
 
-	emits: ['update:open', 'multiple-answers'],
+	emits: ['update:open', 'multipleAnswers'],
 
 	data() {
 		return {
@@ -93,7 +95,7 @@ export default defineComponent({
 			this.$emit('update:open', false)
 			if (this.multipleOptions.length > 1) {
 				// extract all options entries to parent
-				this.$emit('multiple-answers', this.multipleOptions)
+				this.$emit('multipleAnswers', this.multipleOptions)
 				this.enteredOptions = ''
 				return
 			}
@@ -116,5 +118,9 @@ export default defineComponent({
 	display: flex;
 	flex-direction: column;
 	gap: 2px 0;
+}
+
+.options-text-area {
+	height: 210px;
 }
 </style>

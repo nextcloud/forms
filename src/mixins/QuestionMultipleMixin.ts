@@ -16,6 +16,8 @@ import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
 
 export default defineComponent({
+	emits: ['update:options'],
+
 	data() {
 		return {
 			dirtyOptionsType: null,
@@ -102,11 +104,10 @@ export default defineComponent({
 		 */
 		focusIndex(index: number, optionType: string) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
-			const item = this.$refs.input.find(({ $vnode: vnode }) => {
-				const propsData = vnode?.componentOptions.propsData
-
+			const item = this.$refs.input.find((instance) => {
 				return (
-					propsData.optionType === optionType && propsData?.index === index
+					instance.$props.optionType === optionType
+					&& instance.$props.index === index
 				)
 			})
 			if (item) {
@@ -172,7 +173,6 @@ export default defineComponent({
 		 *
 		 * @param index the index of the answer
 		 * @param answer - The new answer option to be added.
-		 * @return
 		 */
 		onCreateAnswer(index: number, answer: FormsOption): void {
 			this.$nextTick(() => {
@@ -233,7 +233,7 @@ export default defineComponent({
 		/**
 		 * Remove any empty options when leaving an option
 		 *
-		 * @param optionType
+		 * @param optionType The type of options to validate
 		 */
 		checkValidOption(optionType: string) {
 			// When leaving edit mode, filter and delete empty options
@@ -270,7 +270,7 @@ export default defineComponent({
 			)
 
 			// Focus the previous option
-			this.$nextTick(() => this.focusIndex(Math.max(index - 1, 0)), optionType)
+			this.$nextTick(() => this.focusIndex(Math.max(index - 1, 0), optionType))
 		},
 
 		/**

@@ -9,7 +9,7 @@
 			<h3 dir="auto">
 				{{ submission.userDisplayName }}
 			</h3>
-			<NcActions class="submission-menu" force-menu>
+			<NcActions class="submission-menu" forceMenu>
 				<NcActionRouter
 					v-if="canEditSubmission"
 					:to="{
@@ -37,14 +37,14 @@
 			v-for="question in answeredQuestions"
 			:key="question.id"
 			:highlight="highlight"
-			:answer-text="question.squashedAnswers"
+			:answerText="question.squashedAnswers"
 			:answers="question.answers"
-			:question-text="question.text"
-			:grid-cell-type="question.gridCellType"
-			:grid-columns="question.gridColumns"
-			:grid-rows="question.gridRows"
-			:grid-value="question.gridValue"
-			:question-type="question.type" />
+			:questionText="question.text"
+			:gridCellType="question.gridCellType"
+			:gridColumns="question.gridColumns"
+			:gridRows="question.gridRows"
+			:gridValue="question.gridValue"
+			:questionType="question.type" />
 	</div>
 </template>
 
@@ -160,6 +160,11 @@ export default {
 						&& question.extraSettings.questionType === 'radio'
 					) {
 						squashedAnswers = Object.keys(gridValue)
+							.filter(
+								(key) =>
+									optionsPerId[key]
+									&& optionsPerId[gridValue[key]],
+							)
 							.map((key) => {
 								return (
 									optionsPerId[key].text
@@ -173,11 +178,17 @@ export default {
 						&& question.extraSettings.questionType === 'checkbox'
 					) {
 						squashedAnswers = Object.keys(gridValue)
+							.filter(
+								(key) =>
+									optionsPerId[key]
+									&& Array.isArray(gridValue[key]),
+							)
 							.map((key) => {
 								return (
 									optionsPerId[key].text
 									+ ': '
 									+ gridValue[key]
+										.filter((optionId) => optionsPerId[optionId])
 										.map(
 											(optionId) =>
 												optionsPerId[optionId].text,

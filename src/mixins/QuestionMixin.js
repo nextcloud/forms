@@ -8,12 +8,27 @@ import { emit } from '@nextcloud/event-bus'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import Question from '../components/Questions/Question.vue'
-import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
 import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 
 export default {
 	inheritAttrs: false,
+
+	emits: [
+		'update:text',
+		'update:description',
+		'update:isRequired',
+		'update:extraSettings',
+		'update:name',
+		'update:values',
+		'delete',
+		'clone',
+		'keydown',
+		'moveDown',
+		'moveUp',
+	],
+
 	props: {
 		/**
 		 * Question-Id
@@ -200,8 +215,8 @@ export default {
 				'update:description': this.onDescriptionChange,
 				'update:isRequired': this.onRequiredChange,
 				'update:name': this.onNameChange,
-				'move-down': (...args) => this.$emit('move-down', ...args),
-				'move-up': (...args) => this.$emit('move-up', ...args),
+				moveDown: (...args) => this.$emit('moveDown', ...args),
+				moveUp: (...args) => this.$emit('moveUp', ...args),
 			}
 		},
 	},
@@ -384,7 +399,8 @@ export default {
 						},
 					),
 					{
-						optionTexts: answers, // Send the entire array of answers at once
+						optionTexts: answers,
+						optionType: OptionType.Choice,
 					},
 				)
 				const newServerOptions = OcsResponse2Data(response) // Assuming this function can handle arrays

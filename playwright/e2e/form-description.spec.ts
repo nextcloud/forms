@@ -4,17 +4,17 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
-import { test as topBarTest } from '../support/fixtures/topBar'
-import { test as formTest } from '../support/fixtures/form'
-import { FormsView } from '../support/sections/TopBarSection'
+import { test as formTest } from '../support/fixtures/form.ts'
+import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
+import { test as randomUserTest } from '../support/fixtures/random-user.ts'
+import { test as topBarTest } from '../support/fixtures/topBar.ts'
+import { FormsView } from '../support/sections/TopBarSection.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest, topBarTest)
 
 test.beforeEach(async ({ page }) => {
-	await page.goto('apps/forms')
-	await page.waitForURL(/apps\/forms$/)
+	await page.goto('apps/forms', { waitUntil: 'networkidle' })
+	await page.waitForURL(/apps\/forms\/$/)
 })
 
 test.describe('Form description', () => {

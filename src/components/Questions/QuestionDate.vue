@@ -6,24 +6,24 @@
 <template>
 	<Question
 		v-bind="questionProps"
-		:title-placeholder="answerType.titlePlaceholder"
-		:warning-invalid="answerType.warningInvalid"
+		:titlePlaceholder="answerType.titlePlaceholder"
+		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
 		<template v-if="answerType.pickerType === 'date'" #actions>
 			<NcActionCheckbox
-				:model-value="dateRange"
-				@update:model-value="onDateRangeChange">
+				:modelValue="dateRange"
+				@update:modelValue="onDateRangeChange">
 				{{ t('forms', 'Use date range') }}
 			</NcActionCheckbox>
 			<NcActionInput
 				type="date"
-				is-native-picker
-				:model-value="dateMin"
+				isNativePicker
+				:modelValue="dateMin"
 				:label="t('forms', 'Earliest date')"
-				hide-label
+				hideLabel
 				:formatter="extraSettingsFormatter"
 				:max="dateMax"
-				@update:model-value="onDateMinChange">
+				@update:modelValue="onDateMinChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgTodayIcon"
@@ -32,13 +32,13 @@
 			</NcActionInput>
 			<NcActionInput
 				type="date"
-				is-native-picker
-				:model-value="dateMax"
+				isNativePicker
+				:modelValue="dateMax"
 				:label="t('forms', 'Latest date')"
-				hide-label
+				hideLabel
 				:formatter="extraSettingsFormatter"
 				:min="dateMin"
-				@update:model-value="onDateMaxChange">
+				@update:modelValue="onDateMaxChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgEventIcon"
@@ -48,18 +48,18 @@
 		</template>
 		<template v-else-if="answerType.pickerType === 'time'" #actions>
 			<NcActionCheckbox
-				:model-value="timeRange"
-				@update:model-value="onTimeRangeChange">
+				:modelValue="timeRange"
+				@update:modelValue="onTimeRangeChange">
 				{{ t('forms', 'Use time range') }}
 			</NcActionCheckbox>
 			<NcActionInput
 				type="time"
-				is-native-picker
-				:model-value="timeMin"
+				isNativePicker
+				:modelValue="timeMin"
 				:label="t('forms', 'Earliest time')"
-				hide-label
+				hideLabel
 				:max="timeMax"
-				@update:model-value="onTimeMinChange">
+				@update:modelValue="onTimeMinChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgClockLoader20"
@@ -68,12 +68,12 @@
 			</NcActionInput>
 			<NcActionInput
 				type="time"
-				is-native-picker
-				:model-value="timeMax"
+				isNativePicker
+				:modelValue="timeMax"
 				:label="t('forms', 'Latest time')"
-				hide-label
+				hideLabel
 				:min="timeMin"
-				@update:model-value="onTimeMaxChange">
+				@update:modelValue="onTimeMaxChange">
 				<template #icon>
 					<NcIconSvgWrapper
 						:svg="svgClockLoader80"
@@ -81,19 +81,22 @@
 				</template>
 			</NcActionInput>
 		</template>
-		<div class="question__content">
+		<div
+			class="question__content"
+			role="group"
+			:aria-labelledby="titleId"
+			:aria-describedby="description ? descriptionId : undefined">
 			<NcDateTimePicker
-				:model-value="time"
+				:modelValue="time"
 				:disabled="!readOnly"
 				:format="stringify"
 				:placeholder="datetimePickerPlaceholder"
-				:show-second="false"
+				:showSecond="false"
 				:type="dateTimePickerType"
-				:disabled-date="disabledDates"
-				:disabled-time="disabledTimes"
-				:input-attr="inputAttr"
-				range-separator=" - "
-				@change="onValueChange" />
+				:disabledDate="disabledDates"
+				:disabledTime="disabledTimes"
+				rangeSeparator=" - "
+				@update:modelValue="onValueChange" />
 		</div>
 	</Question>
 </template>
@@ -157,29 +160,13 @@ export default {
 				: this.answerType.pickerType
 		},
 
-		/**
-		 * All non-exposed props onto datepicker input-element.
-		 *
-		 * @return {object}
-		 */
-		inputAttr() {
-			return {
-				required: this.isRequired,
-				name: this.name || undefined,
-				'aria-labelledby': this.titleId,
-				'aria-describedby': this.description
-					? this.descriptionId
-					: undefined,
-			}
-		},
-
 		time() {
 			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
-				return this.values
+				return this.values?.[0]
 					? [this.parse(this.values[0]), this.parse(this.values[1])]
 					: null
 			}
-			return this.values ? this.parse(this.values[0]) : null
+			return this.values?.[0] ? this.parse(this.values[0]) : null
 		},
 
 		/**
