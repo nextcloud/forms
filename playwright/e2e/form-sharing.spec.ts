@@ -51,7 +51,7 @@ test.describe('Form sharing', () => {
 		// After adding, the share link entry renders NcActions with :inline="1",
 		// so the first action ("Copy to clipboard") appears as an inline button.
 		await expect(
-			shareLinkRow.getByRole('button', { name: /Copy to clipboard/ }),
+			shareLinkRow.getByRole('link', { name: /Copy to clipboard/ }),
 		).toBeVisible()
 	})
 
@@ -65,7 +65,7 @@ test.describe('Form sharing', () => {
 
 		// The inline "Copy to clipboard" action should now be visible
 		await expect(
-			shareLinkRow.getByRole('button', { name: /Copy to clipboard/ }),
+			shareLinkRow.getByRole('link', { name: /Copy to clipboard/ }),
 		).toBeVisible()
 
 		// Open the overflow menu (the "Actions" toggle) to find "Remove link".
