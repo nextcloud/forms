@@ -119,7 +119,10 @@
                     "lockedUntil",
                     "maxSubmissions",
                     "shares",
-                    "submissionMessage"
+                    "submissionMessage",
+                    "notifyOwnerOnSubmission",
+                    "attachSubmissionPdf",
+                    "notificationRecipients"
                 ],
                 "properties": {
                     "id": {
@@ -232,6 +235,18 @@
                     "submissionMessage": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "notifyOwnerOnSubmission": {
+                        "type": "boolean"
+                    },
+                    "attachSubmissionPdf": {
+                        "type": "boolean"
+                    },
+                    "notificationRecipients": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },

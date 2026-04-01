@@ -50,6 +50,48 @@
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
+			:model-value="form.notifyOwnerOnSubmission"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onNotifyOwnerOnSubmissionChange">
+			{{
+				t(
+					'forms',
+					'Send email notifications for new responses to the form owner',
+				)
+			}}
+		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch
+			:model-value="form.attachSubmissionPdf"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:model-value="onAttachSubmissionPdfChange">
+			{{ t('forms', 'Attach each submission as PDF to notification emails') }}
+		</NcCheckboxRadioSwitch>
+		<div class="settings-div--separate">
+			<NcTextArea
+				v-model="notificationRecipientsInput"
+				:disabled="formArchived || locked"
+				:label="t('forms', 'Additional notification recipients')"
+				:placeholder="
+					t(
+						'forms',
+						'One email address per line (for example: team@example.com)',
+					)
+				"
+				resize="vertical"
+				rows="4"
+				@blur="onNotificationRecipientsChange" />
+			<p class="settings-hint">
+				{{
+					t(
+						'forms',
+						'Additional recipients are notified for each new response, independent of the owner notification switch.',
+					)
+				}}
+			</p>
+		</div>
+		<NcCheckboxRadioSwitch
 			:model-value="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
@@ -79,32 +121,6 @@
 			</NcCheckboxRadioSwitch>
 		</div>
 		<NcCheckboxRadioSwitch
-			:model-value="hasMaxSubmissions"
-			:disabled="formArchived || locked"
-			type="switch"
-			@update:model-value="onMaxSubmissionsChange">
-			{{ t('forms', 'Limit number of responses') }}
-		</NcCheckboxRadioSwitch>
-		<div
-			v-show="hasMaxSubmissions && !formArchived"
-			class="settings-div--indent">
-			<NcInputField
-				v-model="maxSubmissionsValue"
-				type="number"
-				:min="1"
-				:disabled="locked"
-				:label="t('forms', 'Maximum number of responses')"
-				@update:model-value="onMaxSubmissionsValueChange" />
-			<p class="settings-hint">
-				{{
-					t(
-						'forms',
-						'Form will be closed automatically when the limit is reached.',
-					)
-				}}
-			</p>
-		</div>
-		<NcCheckboxRadioSwitch
 			:model-value="formClosed"
 			:disabled="formArchived || locked"
 			aria-describedby="forms-settings__close-form"
@@ -113,7 +129,7 @@
 			{{ t('forms', 'Close form') }}
 		</NcCheckboxRadioSwitch>
 		<p id="forms-settings__close-form" class="settings-hint">
-			{{ t('forms', 'Closed forms do not accept new responses.') }}
+			{{ t('forms', 'Closed forms do not accept new submissions.') }}
 		</p>
 		<NcCheckboxRadioSwitch
 			:model-value="isFormLockedPermanently"
@@ -138,7 +154,7 @@
 			{{
 				t(
 					'forms',
-					'Archived forms do not accept new responses and cannot be modified.',
+					'Archived forms do not accept new submissions and can not be modified.',
 				)
 			}}
 		</p>
@@ -210,8 +226,8 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
-import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -220,11 +236,11 @@ import { FormState } from '../../models/Constants.ts'
 export default {
 	components: {
 		NcButton,
-		NcInputField,
 		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
 		NcIconSvgWrapper,
 		NcNoteCard,
+		NcTextArea,
 		TransferOwnership,
 	},
 
@@ -265,6 +281,7 @@ export default {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
+			notificationRecipientsInput: '',
 			svgLockOpen,
 		}
 	},
@@ -330,23 +347,6 @@ export default {
 			return this.form.state !== FormState.FormActive
 		},
 
-		hasMaxSubmissions() {
-			return (
-				this.form.maxSubmissions !== null
-				&& this.form.maxSubmissions !== undefined
-			)
-		},
-
-		maxSubmissionsValue: {
-			get() {
-				return this.form.maxSubmissions ?? 1
-			},
-
-			set(value) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
-			},
-		},
-
 		isExpired() {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
@@ -361,6 +361,20 @@ export default {
 		submissionMessageHTML() {
 			return this.$markdownit.render(this.form.submissionMessage || '')
 		},
+	},
+
+	watch: {
+		'form.notificationRecipients': {
+			handler(value) {
+				this.updateNotificationRecipientsInput(value)
+			},
+
+			deep: true,
+		},
+	},
+
+	created() {
+		this.updateNotificationRecipientsInput(this.form.notificationRecipients)
 	},
 
 	methods: {
@@ -379,6 +393,29 @@ export default {
 
 		onAllowEditSubmissionsChange(checked) {
 			this.$emit('update:form-prop', 'allowEditSubmissions', checked)
+		},
+
+		onNotifyOwnerOnSubmissionChange(checked) {
+			this.$emit('update:form-prop', 'notifyOwnerOnSubmission', checked)
+		},
+
+		onAttachSubmissionPdfChange(checked) {
+			this.$emit('update:form-prop', 'attachSubmissionPdf', checked)
+		},
+
+		onNotificationRecipientsChange(payload) {
+			const value =
+				typeof payload === 'string'
+					? payload
+					: (payload?.target?.value ?? this.notificationRecipientsInput)
+
+			const recipients = value
+				.split(/[\r\n,]+/g)
+				.map((recipient) => recipient.trim())
+				.filter((recipient) => recipient.length > 0)
+
+			this.notificationRecipientsInput = recipients.join('\n')
+			this.$emit('update:form-prop', 'notificationRecipients', recipients)
 		},
 
 		onFormExpiresChange(checked) {
@@ -408,16 +445,6 @@ export default {
 				'expires',
 				parseInt(moment(datetime).format('X')),
 			)
-		},
-
-		onMaxSubmissionsChange(checked) {
-			this.$emit('update:form-prop', 'maxSubmissions', checked ? 1 : null)
-		},
-
-		onMaxSubmissionsValueChange(value) {
-			if (value > 0) {
-				this.$emit('update:form-prop', 'maxSubmissions', value)
-			}
 		},
 
 		onFormClosedChange(isClosed) {
@@ -500,6 +527,15 @@ export default {
 		notBeforeNow(datetime) {
 			return datetime < moment().toDate()
 		},
+
+		updateNotificationRecipientsInput(notificationRecipients) {
+			if (!Array.isArray(notificationRecipients)) {
+				this.notificationRecipientsInput = ''
+				return
+			}
+
+			this.notificationRecipientsInput = notificationRecipients.join('\n')
+		},
 	},
 }
 </script>
@@ -511,6 +547,10 @@ export default {
 
 .settings-div--indent {
 	margin-inline-start: 40px;
+}
+
+.settings-div--separate {
+	margin-block: 4px;
 }
 
 .settings-hint {

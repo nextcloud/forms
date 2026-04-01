@@ -21,6 +21,9 @@ This document describes the Object-Structure, that is used within the Forms App 
 | description          | String                               | max. 8192 ch.                           | The Form description                                                                                                             |
 | ownerId              | String                               |                                         | The nextcloud userId of the form owner                                                                                           |
 | submissionMessage    | String                               | max. 2048 ch.                           | Optional custom message, with Markdown support, to be shown to users when the form is submitted (default is used if set to null) |
+| notifyOwnerOnSubmission | Boolean                           |                                         | If the form owner should receive an email notification with a response summary for each new submission                           |
+| attachSubmissionPdf  | Boolean                              |                                         | If notification emails should include a PDF attachment with the submitted responses                                              |
+| notificationRecipients | Array of Strings                   |                                         | Additional email recipients to notify for each new submission, independent of `notifyOwnerOnSubmission`                         |
 | created              | unix timestamp                       |                                         | When the form has been created                                                                                                   |
 | access               | [Access-Object](#access-object)      |                                         | Describing access-settings of the form                                                                                           |
 | expires              | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
@@ -66,7 +69,10 @@ This document describes the Object-Structure, that is used within the Forms App 
   "shares": []
   "submissions": [],
   "submissionCount": 0,
-  "submissionMessage": "string"
+  "submissionMessage": "string",
+  "notifyOwnerOnSubmission": false,
+  "attachSubmissionPdf": false,
+  "notificationRecipients": ["team@example.com"]
 }
 ```
 

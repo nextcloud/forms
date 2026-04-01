@@ -43,6 +43,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -65,6 +66,7 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Mail\IMailer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -107,6 +109,8 @@ class ApiControllerTest extends TestCase {
 	private $mimeTypeDetector;
 	/** @var IJobList|MockObject */
 	private $jobList;
+	/** @var IMailer|MockObject */
+	private $mailer;
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
@@ -131,6 +135,7 @@ class ApiControllerTest extends TestCase {
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
 		$this->jobList = $this->createMock(IJobList::class);
+		$this->mailer = $this->createMock(IMailer::class);
 
 		$this->apiController = new ApiController(
 			'forms',
@@ -152,6 +157,7 @@ class ApiControllerTest extends TestCase {
 			$this->uploadedFileMapper,
 			$this->mimeTypeDetector,
 			$this->jobList,
+			$this->mailer,
 		);
 	}
 
@@ -179,6 +185,9 @@ class ApiControllerTest extends TestCase {
 			self::assertInstanceOf(Form::class, $form);
 			$read = $form->read();
 			unset($read['created']);
+			unset($read['notifyOwnerOnSubmission']);
+			unset($read['attachSubmissionPdf']);
+			unset($read['notificationRecipients']);
 			self::assertEquals($expected, $read);
 			return true;
 		};
@@ -430,9 +439,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn('formHash');
 		$expected = $expectedForm;
 		$expected['id'] = null;
-		// TODO fix test, currently unset because behaviour has changed
-		$expected['state'] = null;
-		$expected['lastUpdated'] = null;
+		$expected['lastUpdated'] = 0;
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(self::createFormValidator($expected)))
@@ -995,6 +1002,135 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals('newOwner', $form->getOwnerId());
 	}
 
+	public function testUpdateFormNormalizesNotificationRecipients(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+		$form->setNotificationRecipients([]);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->mailer->expects($this->exactly(3))
+			->method('validateMailAddress')
+			->willReturn(true);
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(function (Form $updated): bool {
+				return $updated->getNotificationRecipients() === ['ext@example.com', 'owner@example.com'];
+			}));
+
+		$response = $this->apiController->updateForm(1, [
+			'notificationRecipients' => [
+				' ext@example.com ',
+				'EXT@example.com',
+				'owner@example.com',
+				'',
+			],
+		]);
+
+		$this->assertEquals(new DataResponse(1), $response);
+	}
+
+	public function testUpdateFormRejectsInvalidNotificationRecipientsType(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['notificationRecipients' => 'user@example.com']);
+	}
+
+	public function testUpdateFormRejectsInvalidNotificationRecipientAddress(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->mailer->expects($this->once())
+			->method('validateMailAddress')
+			->with('invalid')
+			->willReturn(false);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['notificationRecipients' => ['invalid']]);
+	}
+
+	public function testUpdateFormRejectsNonBooleanNotifyOwnerOnSubmission(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['notifyOwnerOnSubmission' => 'yes']);
+	}
+
+	public function testUpdateFormRejectsNonBooleanAttachSubmissionPdf(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setLockedBy(null);
+		$form->setLockedUntil(null);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['attachSubmissionPdf' => 'yes']);
+	}
+
 	public function testGetSubmission_invalidForm() {
 		$exception = $this->createMock(NoSuchFormException::class);
 		$this->formsService->expects($this->once())
@@ -1217,7 +1353,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->formsService->expects($this->once())
 			->method('notifyNewSubmission')
-			->with($form, $submission);
+			->with($form, $submission, FormSubmittedEvent::TRIGGER_UPDATED);
 
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);

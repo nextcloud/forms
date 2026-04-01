@@ -255,7 +255,7 @@ class ApiV3Test extends IntegrationBase {
 		// Set up http Client
 		$this->http = new Client([
 			'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
-			'auth' => ['test', 'test'],
+			'auth' => ['test', self::TEST_USER_PASSWORD],
 			'headers' => [
 				'OCS-ApiRequest' => 'true',
 				'Accept' => 'application/json'
@@ -396,6 +396,9 @@ class ApiV3Test extends IntegrationBase {
 					'fileFormat' => null,
 					'maxSubmissions' => null,
 					'isMaxSubmissionsReached' => false,
+					'notifyOwnerOnSubmission' => false,
+					'attachSubmissionPdf' => false,
+					'notificationRecipients' => [],
 				]
 			]
 		];
@@ -529,6 +532,9 @@ class ApiV3Test extends IntegrationBase {
 					'fileFormat' => null,
 					'maxSubmissions' => null,
 					'isMaxSubmissionsReached' => false,
+					'notifyOwnerOnSubmission' => false,
+					'attachSubmissionPdf' => false,
+					'notificationRecipients' => [],
 				]
 			]
 		];
