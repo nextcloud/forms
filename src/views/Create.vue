@@ -480,6 +480,7 @@ export default {
 		 * @param {string|null} subtype the question subtype, see AnswerTypes.subtypes
 		 */
 		async addQuestion(type, subtype = null) {
+			this.activeQuestionType = null
 			const text = ''
 			this.isLoadingQuestions = true
 
