@@ -20,6 +20,8 @@ export class SubmitSection {
 	 * Get a question's list item by its title text.
 	 * Questions render as <li aria-label="Question number N">,
 	 * and each contains an <h3> with the title text.
+	 *
+	 * @param name the title of the question
 	 */
 	public getQuestion(name: string | RegExp): Locator {
 		return this.page
@@ -32,8 +34,14 @@ export class SubmitSection {
 	 * QuestionShort renders <input aria-labelledby="qN_title">,
 	 * QuestionLong renders <textarea aria-labelledby="qN_title">.
 	 * Both are matched by getByRole('textbox').
+	 *
+	 * @param questionName the title of the question
+	 * @param value the answer to the question
 	 */
-	public async fillText(questionName: string | RegExp, value: string): Promise<void> {
+	public async fillText(
+		questionName: string | RegExp,
+		value: string,
+	): Promise<void> {
 		const question = this.getQuestion(questionName)
 		await question.getByRole('textbox').fill(value)
 	}
@@ -42,6 +50,9 @@ export class SubmitSection {
 	 * Check a checkbox option within a question.
 	 * QuestionMultiple renders NcCheckboxRadioSwitch as
 	 * <input type="checkbox"> with the option text as label.
+	 *
+	 * @param questionName the title of the question
+	 * @param optionName the name of the option to check
 	 */
 	public async checkOption(
 		questionName: string | RegExp,
@@ -57,6 +68,9 @@ export class SubmitSection {
 	 * Check a radio option within a question.
 	 * QuestionMultiple (unique) renders NcCheckboxRadioSwitch as
 	 * <input type="radio"> with the option text as label.
+	 *
+	 * @param questionName the title of the question
+	 * @param optionName the name of the option to check
 	 */
 	public async checkRadio(
 		questionName: string | RegExp,
@@ -71,6 +85,9 @@ export class SubmitSection {
 	/**
 	 * Select a dropdown option.
 	 * QuestionDropdown renders NcSelect which uses role="combobox".
+	 *
+	 * @param questionName the title of the question
+	 * @param optionName the name of the option to check
 	 */
 	public async selectDropdown(
 		questionName: string | RegExp,
@@ -86,7 +103,8 @@ export class SubmitSection {
 	public async submit(): Promise<Response> {
 		const response = this.page.waitForResponse(
 			(resp) =>
-				(resp.request().method() === 'POST' || resp.request().method() === 'PUT')
+				(resp.request().method() === 'POST'
+					|| resp.request().method() === 'PUT')
 				&& resp.request().url().includes('/api/v3/forms/')
 				&& resp.request().url().includes('/submissions'),
 		)

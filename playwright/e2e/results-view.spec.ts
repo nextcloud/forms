@@ -4,14 +4,14 @@
  */
 
 import { expect, mergeTests } from '@playwright/test'
-import { test as formTest } from '../support/fixtures/form'
-import { test as appNavigationTest } from '../support/fixtures/navigation'
-import { test as randomUserTest } from '../support/fixtures/random-user'
-import { test as resultsTest } from '../support/fixtures/results'
-import { test as submitTest } from '../support/fixtures/submit'
-import { test as topBarTest } from '../support/fixtures/topBar'
-import { QuestionType } from '../support/sections/QuestionType'
-import { FormsView } from '../support/sections/TopBarSection'
+import { test as formTest } from '../support/fixtures/form.ts'
+import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
+import { test as randomUserTest } from '../support/fixtures/random-user.ts'
+import { test as resultsTest } from '../support/fixtures/results.ts'
+import { test as submitTest } from '../support/fixtures/submit.ts'
+import { test as topBarTest } from '../support/fixtures/topBar.ts'
+import { QuestionType } from '../support/sections/QuestionType.ts'
+import { FormsView } from '../support/sections/TopBarSection.ts'
 
 const test = mergeTests(
 	randomUserTest,
