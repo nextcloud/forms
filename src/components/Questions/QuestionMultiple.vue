@@ -40,7 +40,7 @@
 					:labelOutside="false"
 					:showTrailingButton="false"
 					:modelValue="extraSettings.optionsLimitMin"
-					@update:value="onLimitOptionsMin" />
+					@update:modelValue="onLimitOptionsMin" />
 
 				<!-- Allow setting a maximum -->
 				<NcActionCheckbox
@@ -58,7 +58,7 @@
 					:labelOutside="false"
 					:showTrailingButton="false"
 					:modelValue="extraSettings.optionsLimitMax"
-					@update:value="onLimitOptionsMax" />
+					@update:modelValue="onLimitOptionsMax" />
 			</template>
 			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
 				<template #icon>
