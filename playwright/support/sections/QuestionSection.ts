@@ -4,7 +4,8 @@
  */
 
 import type { Locator, Page } from '@playwright/test'
-import { waitForApiResponse } from '../helpers'
+
+import { waitForApiResponse } from '../helpers.ts'
 
 export class QuestionSection {
 	public readonly titleInput: Locator

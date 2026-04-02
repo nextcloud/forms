@@ -4,7 +4,7 @@
  */
 
 import { test as baseTest } from '@playwright/test'
-import { ResultsSection } from '../sections/ResultsSection'
+import { ResultsSection } from '../sections/ResultsSection.ts'
 
 interface ResultsFixture {
 	resultsView: ResultsSection

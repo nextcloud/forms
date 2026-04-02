@@ -4,7 +4,7 @@
  */
 
 import { test as baseTest } from '@playwright/test'
-import { SubmitSection } from '../sections/SubmitSection'
+import { SubmitSection } from '../sections/SubmitSection.ts'
 
 interface SubmitFixture {
 	submitView: SubmitSection

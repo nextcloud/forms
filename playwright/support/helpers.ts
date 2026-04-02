@@ -10,11 +10,11 @@ const FORMS_API_PATH = '/api/v3/forms/'
 /**
  * Wait for a Forms API response matching the given HTTP method.
  * Must be called BEFORE the action that triggers the request.
+ *
+ * @param page the current page
+ * @param method the request method
  */
-export function waitForApiResponse(
-	page: Page,
-	method: string,
-): Promise<Response> {
+export function waitForApiResponse(page: Page, method: string): Promise<Response> {
 	return page.waitForResponse(
 		(response) =>
 			response.request().method() === method

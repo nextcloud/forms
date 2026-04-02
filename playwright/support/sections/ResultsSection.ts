@@ -33,7 +33,11 @@ export class ResultsSection {
 		await this.responsesTab.dispatchEvent('change')
 	}
 
-	/** Get the summary section for a specific question by its title. */
+	/**
+	 * Get the summary section for a specific question by its title.
+	 *
+	 * @param name the title of the question
+	 */
 	public getSummaryForQuestion(name: string | RegExp): Locator {
 		return this.page
 			.getByRole('main')
