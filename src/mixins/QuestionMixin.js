@@ -184,6 +184,15 @@ export default {
 		Question,
 	},
 
+	data() {
+		return {
+			/**
+			 * The shown error message
+			 */
+			errorMessage: null,
+		}
+	},
+
 	computed: {
 		questionProps() {
 			const props = { ...this.$props }
@@ -202,6 +211,14 @@ export default {
 
 		descriptionId() {
 			return 'q' + this.index + '_desc'
+		},
+
+		hasError() {
+			return !!this.errorMessage
+		},
+
+		errorId() {
+			return 'q' + this.index + '_error'
 		},
 
 		/**

@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<template #actions>
 			<template v-if="!allowedFileTypesDialogOpened">
@@ -77,10 +78,6 @@
 					@input="onMaxFileSizeUnitInput($event)" />
 			</template>
 		</template>
-
-		<NcNoteCard v-if="hasError" :id="errorId" type="error">
-			{{ errorMessage }}
-		</NcNoteCard>
 
 		<div class="question__content">
 			<ul>
@@ -160,7 +157,6 @@ import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
 import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlertOutline.vue'
 import IconFile from 'vue-material-design-icons/FileOutline.vue'
@@ -205,7 +201,6 @@ export default {
 		NcButton,
 		NcListItem,
 		NcLoadingIcon,
-		NcNoteCard,
 		Question,
 	},
 
@@ -215,7 +210,6 @@ export default {
 	data() {
 		return {
 			fileTypes,
-			errorMessage: null,
 			fileLoading: false,
 			maxFileSizeUnit: Object.keys(FILE_SIZE_UNITS)[0],
 			maxFileSizeValue: '',
@@ -253,14 +247,6 @@ export default {
 			}
 
 			return t('forms', 'All file types are allowed.')
-		},
-
-		hasError() {
-			return !!this.errorMessage
-		},
-
-		errorId() {
-			return `q${this.index}_error`
 		},
 	},
 
