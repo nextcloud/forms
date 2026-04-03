@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
@@ -28,49 +28,49 @@
 		<!-- Submit mode -->
 		<div
 			v-if="readOnly"
-			class="question__content"
+			class="question__content ranking-columns"
 			role="list"
 			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined">
-			<!-- Unranked pool (visible when items remain) -->
-			<div v-if="unrankedOptions.length > 0" class="ranking-unranked">
-				<p class="ranking-unranked__label">
-					{{ t('forms', 'Tap to rank') }}
+			<!-- Left: Unranked pool -->
+			<div class="ranking-unranked">
+				<p class="ranking-column__label">
+					{{ t('forms', 'Options') }}
 				</p>
-				<button
-					v-for="option in unrankedOptions"
-					:key="option.id"
-					class="ranking-unranked__item"
-					@click="rankOption(option)">
-					{{ option.text }}
-				</button>
+				<div class="ranking-unranked__pool">
+					<button
+						v-for="option in unrankedOptions"
+						:key="option.id"
+						class="ranking-unranked__item"
+						@click="rankOption(option)">
+						{{ option.text }}
+					</button>
+					<p
+						v-if="unrankedOptions.length === 0"
+						class="ranking-unranked__empty">
+						{{ t('forms', 'All options ranked') }}
+					</p>
+				</div>
 			</div>
 
-			<!-- Empty state when nothing ranked yet -->
-			<p v-if="rankedOptions.length === 0" class="ranking-empty">
-				{{ t('forms', 'Tap items above to rank them') }}
-			</p>
-
-			<!-- Ranked list header (to separate from pool) -->
-			<p v-if="rankedOptions.length > 0" class="ranking-ranked__label">
-				{{ t('forms', 'Your ranking') }}
-			</p>
-
-			<!-- Ranked list -->
-			<Draggable
-				v-model="rankedOptions"
-				:animation="200"
-				direction="vertical"
-				handle=".ranking-item__drag-handle"
-				@end="onRankingEnd">
-				<div
-					v-for="(option, index) in rankedOptions"
-					:key="option.id"
-					class="ranking-item"
-					role="listitem">
-					<span class="ranking-item__position">{{ index + 1 }}.</span>
-					<span class="ranking-item__text">{{ option.text }}</span>
-					<div class="ranking-item__actions">
+			<!-- Right: Ranked list -->
+			<div class="ranking-ranked">
+				<p class="ranking-column__label">
+					{{ t('forms', 'Your ranking') }}
+				</p>
+				<Draggable
+					v-model="rankedOptions"
+					class="ranking-ranked__list"
+					:animation="200"
+					direction="vertical"
+					handle=".ranking-item__drag-handle"
+					@end="onRankingEnd">
+					<div
+						v-for="(option, index) in rankedOptions"
+						:key="option.id"
+						class="ranking-item"
+						role="listitem">
+						<span class="ranking-item__position">{{ index + 1 }}.</span>
 						<NcActions
 							:aria-label="t('forms', 'Move option actions')"
 							class="ranking-item__drag-handle"
@@ -97,6 +97,7 @@
 								{{ t('forms', 'Move option down') }}
 							</NcActionButton>
 						</NcActions>
+						<span class="ranking-item__text">{{ option.text }}</span>
 						<NcButton
 							variant="tertiary"
 							:ariaLabel="t('forms', 'Remove from ranking')"
@@ -106,8 +107,11 @@
 							</template>
 						</NcButton>
 					</div>
-				</div>
-			</Draggable>
+				</Draggable>
+				<p v-if="rankedOptions.length === 0" class="ranking-ranked__empty">
+					{{ t('forms', 'Tap options to rank them') }}
+				</p>
+			</div>
 		</div>
 
 		<!-- Edit mode: manage options -->
@@ -351,25 +355,41 @@ export default {
 	gap: var(--default-grid-baseline);
 }
 
-.ranking-unranked {
-	margin-block-end: 12px;
+.ranking-columns {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: calc(2 * var(--default-grid-baseline));
+	align-items: start;
+}
 
-	&__label {
-		font-weight: bold;
-		color: var(--color-text-maxcontrast);
-		margin-block-end: 8px;
+.ranking-column__label {
+	color: var(--color-text-maxcontrast);
+	margin-block-end: var(--default-grid-baseline);
+	font-size: small;
+}
+
+.ranking-unranked {
+	&__pool {
+		display: flex;
+		flex-direction: column;
+		gap: var(--default-grid-baseline);
 	}
 
 	&__item {
-		display: inline-block;
-		padding: 8px 16px;
-		margin: 0 8px 8px 0;
+		display: block;
+		width: 100%;
+		padding: var(--default-grid-baseline) calc(2 * var(--default-grid-baseline));
+		min-height: var(--default-clickable-area);
+		line-height: calc(
+			var(--default-clickable-area) - 2 * var(--default-grid-baseline)
+		);
 		background-color: var(--color-background-dark);
 		border: 1px solid var(--color-border);
 		border-radius: var(--border-radius-large);
 		cursor: pointer;
 		font-size: inherit;
 		color: var(--color-main-text);
+		text-align: start;
 		transition: background-color var(--animation-quick);
 
 		&:hover,
@@ -378,27 +398,33 @@ export default {
 			border-color: var(--color-primary-element);
 		}
 	}
+
+	&__empty {
+		color: var(--color-text-maxcontrast);
+		font-style: italic;
+		padding: var(--default-grid-baseline) 0;
+	}
 }
 
-.ranking-empty {
-	color: var(--color-text-maxcontrast);
-	font-style: italic;
-	padding: 12px 0;
-}
+.ranking-ranked {
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--default-grid-baseline);
+	}
 
-.ranking-ranked__label {
-	font-weight: bold;
-	color: var(--color-text-maxcontrast);
-	margin-block-end: 4px;
+	&__empty {
+		color: var(--color-text-maxcontrast);
+		font-style: italic;
+		padding: var(--default-grid-baseline) 0;
+	}
 }
 
 .ranking-item {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	padding: 12px 16px;
-	min-height: 44px;
-	margin-block-end: 8px;
+	gap: var(--default-grid-baseline);
+	min-height: var(--default-clickable-area);
 	background-color: var(--color-background-dark);
 	border-radius: var(--border-radius-large);
 	user-select: none;
@@ -412,12 +438,6 @@ export default {
 
 	&__text {
 		flex: 1;
-	}
-
-	&__actions {
-		display: flex;
-		gap: var(--default-grid-baseline);
-		margin-inline-start: auto;
 	}
 
 	&__drag-handle {
@@ -445,7 +465,7 @@ export default {
 .options-list-transition-enter-from,
 .options-list-transition-leave-to {
 	opacity: 0;
-	transform: translateX(44px);
+	transform: translateX(var(--default-clickable-area));
 }
 
 .options-list-transition-leave-active {
