@@ -12,7 +12,7 @@ import IconFile from 'vue-material-design-icons/FileOutline.vue'
 import IconGrid from 'vue-material-design-icons/Grid.vue'
 import IconNumeric from 'vue-material-design-icons/Numeric.vue'
 import IconRadioboxMarked from 'vue-material-design-icons/RadioboxMarked.vue'
-import IconReorderHorizontal from 'vue-material-design-icons/ReorderHorizontal.vue'
+import IconSwapVertical from 'vue-material-design-icons/SwapVertical.vue'
 import IconTextLong from 'vue-material-design-icons/TextLong.vue'
 import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 import IconLinearScale from '../components/Icons/IconLinearScale.vue'
@@ -269,7 +269,7 @@ export default {
 
 	ranking: {
 		component: markRaw(QuestionRanking),
-		icon: markRaw(IconReorderHorizontal),
+		icon: markRaw(IconSwapVertical),		
 		label: t('forms', 'Ranking'),
 		predefined: true,
 		validate: (question) => question.options.length > 0,

@@ -585,11 +585,8 @@ class SubmissionService {
 			if ($question['type'] === Constants::ANSWER_TYPE_RANKING) {
 				$optionIds = array_map('intval', array_column($question['options'] ?? [], 'id'));
 				$rankedIds = array_map('intval', $answers[$questionId]);
-				$sortedRanked = $rankedIds;
-				$sortedOptions = $optionIds;
-				sort($sortedRanked);
-				sort($sortedOptions);
-				if ($sortedRanked !== $sortedOptions) {
+
+				if (sort($rankedIds) !== sort($optionIds)) {
 					throw new \InvalidArgumentException(sprintf('Ranking for question "%s" must include all options exactly once.', $question['text']));
 				}
 			}
