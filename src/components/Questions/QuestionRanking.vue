@@ -28,16 +28,18 @@
 		<!-- Submit mode -->
 		<div
 			v-if="readOnly"
-			class="question__content ranking-columns"
+			class="question__content"
 			role="list"
 			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined">
-			<!-- Left: Unranked pool -->
+			<!-- Unranked pool -->
 			<div class="ranking-unranked">
-				<p class="ranking-column__label">
-					{{ t('forms', 'Options') }}
+				<p class="ranking-section__label">
+					{{ t('forms', 'Tap to rank') }}
 				</p>
-				<div class="ranking-unranked__pool">
+				<div
+					v-show="unrankedOptions.length > 0"
+					class="ranking-unranked__pool">
 					<button
 						v-for="option in unrankedOptions"
 						:key="option.id"
@@ -45,17 +47,17 @@
 						@click="rankOption(option)">
 						{{ option.text }}
 					</button>
-					<p
-						v-if="unrankedOptions.length === 0"
-						class="ranking-unranked__empty">
-						{{ t('forms', 'All options ranked') }}
-					</p>
 				</div>
+				<p
+					v-show="unrankedOptions.length === 0"
+					class="ranking-unranked__empty">
+					{{ t('forms', 'All options ranked') }}
+				</p>
 			</div>
 
-			<!-- Right: Ranked list -->
+			<!-- Ranked list -->
 			<div class="ranking-ranked">
-				<p class="ranking-column__label">
+				<p class="ranking-section__label">
 					{{ t('forms', 'Your ranking') }}
 				</p>
 				<Draggable
@@ -79,7 +81,6 @@
 								<IconDragIndicator :size="20" />
 							</template>
 							<NcActionButton
-								ref="buttonOptionUp"
 								:disabled="index === 0"
 								@click="onMoveUp(index)">
 								<template #icon>
@@ -88,7 +89,6 @@
 								{{ t('forms', 'Move option up') }}
 							</NcActionButton>
 							<NcActionButton
-								ref="buttonOptionDown"
 								:disabled="index === rankedOptions.length - 1"
 								@click="onMoveDown(index)">
 								<template #icon>
@@ -108,8 +108,8 @@
 						</NcButton>
 					</div>
 				</Draggable>
-				<p v-if="rankedOptions.length === 0" class="ranking-ranked__empty">
-					{{ t('forms', 'Tap options to rank them') }}
+				<p v-show="rankedOptions.length === 0" class="ranking-ranked__empty">
+					{{ t('forms', 'Tap options above to rank them') }}
 				</p>
 			</div>
 		</div>
@@ -355,41 +355,30 @@ export default {
 	gap: var(--default-grid-baseline);
 }
 
-.ranking-columns {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: calc(2 * var(--default-grid-baseline));
-	align-items: start;
-}
-
-.ranking-column__label {
+.ranking-section__label {
 	color: var(--color-text-maxcontrast);
 	margin-block-end: var(--default-grid-baseline);
 	font-size: small;
 }
 
 .ranking-unranked {
+	margin-block-end: calc(2 * var(--default-grid-baseline));
+
 	&__pool {
 		display: flex;
-		flex-direction: column;
+		flex-wrap: wrap;
 		gap: var(--default-grid-baseline);
 	}
 
 	&__item {
-		display: block;
-		width: 100%;
+		display: inline-block;
 		padding: var(--default-grid-baseline) calc(2 * var(--default-grid-baseline));
-		min-height: var(--default-clickable-area);
-		line-height: calc(
-			var(--default-clickable-area) - 2 * var(--default-grid-baseline)
-		);
 		background-color: var(--color-background-dark);
 		border: 1px solid var(--color-border);
 		border-radius: var(--border-radius-large);
 		cursor: pointer;
 		font-size: inherit;
 		color: var(--color-main-text);
-		text-align: start;
 		transition: background-color var(--animation-quick);
 
 		&:hover,
@@ -425,7 +414,6 @@ export default {
 	align-items: center;
 	gap: var(--default-grid-baseline);
 	min-height: var(--default-clickable-area);
-	background-color: var(--color-background-dark);
 	border-radius: var(--border-radius-large);
 	user-select: none;
 
