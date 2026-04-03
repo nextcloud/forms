@@ -119,6 +119,7 @@ OC.L10N.register(
     "All file types are allowed." : "允許所有檔案類型。",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "檔案 {fileName} 太大。最大檔案大小為 {maxFileSize}。",
     "There was an error during submitting the file: {message}." : "遞交檔案時發生錯誤：{message}。",
+    "Please wait until the file has been uploaded." : "請等待檔案上傳完成。",
     "Allow only specific file types" : "僅允許特定檔案類型",
     "Custom file extensions" : "自訂副檔名",
     "Maximum number of files" : "最大檔案數",
