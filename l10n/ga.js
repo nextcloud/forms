@@ -119,6 +119,7 @@ OC.L10N.register(
     "All file types are allowed." : "Tá gach cineál comhaid ceadaithe.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Tá an comhad {fileName} ró-mhór. Is é {maxFileSize} an t-uasmhéid comhaid.",
     "There was an error during submitting the file: {message}." : "Tharla earráid agus an comhad á chur isteach: {message}.",
+    "Please wait until the file has been uploaded." : "Fan go dtí go mbeidh an comhad uaslódáilte.",
     "Allow only specific file types" : "Ná ceadaigh ach cineálacha comhaid ar leith",
     "Custom file extensions" : "Síneadh comhaid saincheaptha",
     "Maximum number of files" : "Uaslíon comhad",
