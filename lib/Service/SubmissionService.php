@@ -109,10 +109,13 @@ class SubmissionService {
 	 */
 	public function getSubmissions(int $formId, ?string $userId = null, ?string $query = null, ?int $limit = null, int $offset = 0): array {
 		$submissionList = [];
+		$submissionEntities = [];
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($formId, $userId, $query, $limit, $offset);
 
-			foreach ($submissionEntities as $submissionEntity) {
+			// newest first
+			$sortedSubmissions = array_reverse($submissionEntities);
+			foreach ($sortedSubmissions as $submissionEntity) {
 				$submission = $submissionEntity->read();
 				$submission['answers'] = $this->getAnswers($submission['id']);
 				$submissionList[] = $submission;
