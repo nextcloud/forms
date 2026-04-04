@@ -119,6 +119,7 @@ OC.L10N.register(
     "All file types are allowed." : "All file types are allowed.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "The file {fileName} is too large. The maximum file size is {maxFileSize}.",
     "There was an error during submitting the file: {message}." : "There was an error during submitting the file: {message}.",
+    "Please wait until the file has been uploaded." : "Please wait until the file has been uploaded.",
     "Allow only specific file types" : "Allow only specific file types",
     "Custom file extensions" : "Custom file extensions",
     "Maximum number of files" : "Maximum number of files",
