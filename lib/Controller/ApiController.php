@@ -1265,6 +1265,8 @@ class ApiController extends OCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function getSubmission(int $formId, int $submissionId): DataResponse|DataDownloadResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+		$permissions = $this->formsService->getPermissions($form);
+		$canSeeAllSubmissions = in_array(Constants::PERMISSION_RESULTS, $permissions, true);
 
 		$submission = $this->submissionService->getSubmission($submissionId);
 		if ($submission === null) {
@@ -1273,6 +1275,10 @@ class ApiController extends OCSController {
 
 		if ($submission['formId'] !== $formId) {
 			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
+		}
+
+		if (!$canSeeAllSubmissions && $submission['userId'] !== $this->currentUser->getUID()) {
+			throw new OCSForbiddenException('User is not allowed to see submission');
 		}
 
 		// Append Display Names
