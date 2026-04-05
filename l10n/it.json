@@ -117,6 +117,7 @@
     "All file types are allowed." : "Sono consentiti tutti i tipi di file.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Il file {fileName} è troppo grande. La dimensione massima del file è {maxFileSize}.",
     "There was an error during submitting the file: {message}." : "Si è verificato un errore durante l'invio del file: {message}.",
+    "Please wait until the file has been uploaded." : "Attendi il caricamento del file.",
     "Allow only specific file types" : "Consenti solo tipi di file specifici",
     "Custom file extensions" : "Estensioni di file personalizzate",
     "Maximum number of files" : "Numero massimo di file",
