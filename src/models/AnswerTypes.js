@@ -269,7 +269,7 @@ export default {
 
 	ranking: {
 		component: markRaw(QuestionRanking),
-		icon: markRaw(IconSwapVertical),		
+		icon: markRaw(IconSwapVertical),
 		label: t('forms', 'Ranking'),
 		predefined: true,
 		validate: (question) => question.options.length > 0,

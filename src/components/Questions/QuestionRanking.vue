@@ -74,6 +74,8 @@
 						role="listitem">
 						<span class="ranking-item__position">{{ index + 1 }}.</span>
 						<NcActions
+							:id="`ranking-${option.id}-drag`"
+							:container="`#ranking-${option.id}-drag`"
 							:aria-label="t('forms', 'Move option actions')"
 							class="ranking-item__drag-handle"
 							variant="tertiary-no-background">
@@ -81,6 +83,7 @@
 								<IconDragIndicator :size="20" />
 							</template>
 							<NcActionButton
+								ref="buttonOptionUp"
 								:disabled="index === 0"
 								@click="onMoveUp(index)">
 								<template #icon>
@@ -89,6 +92,7 @@
 								{{ t('forms', 'Move option up') }}
 							</NcActionButton>
 							<NcActionButton
+								ref="buttonOptionDown"
 								:disabled="index === rankedOptions.length - 1"
 								@click="onMoveDown(index)">
 								<template #icon>
@@ -308,6 +312,11 @@ export default {
 			;[items[index - 1], items[index]] = [items[index], items[index - 1]]
 			this.rankedOptions = items
 			this.emitValues()
+			const newIndex = index - 1
+			this.focusButton(
+				newIndex > 0 ? 'buttonOptionUp' : 'buttonOptionDown',
+				newIndex,
+			)
 		},
 
 		/**
@@ -321,6 +330,28 @@ export default {
 			;[items[index], items[index + 1]] = [items[index + 1], items[index]]
 			this.rankedOptions = items
 			this.emitValues()
+			const newIndex = index + 1
+			this.focusButton(
+				newIndex < this.rankedOptions.length - 1
+					? 'buttonOptionDown'
+					: 'buttonOptionUp',
+				newIndex,
+			)
+		},
+
+		/**
+		 * Re-focus a button ref inside a v-for after reorder
+		 *
+		 * @param {string} refName The ref name ('buttonOptionUp' or 'buttonOptionDown')
+		 * @param {number} index The index of the item in the v-for
+		 */
+		focusButton(refName, index) {
+			this.$nextTick(() => {
+				const refs = this.$refs[refName]
+				if (Array.isArray(refs) && refs[index]) {
+					refs[index].$el?.focus()
+				}
+			})
 		},
 
 		/**
