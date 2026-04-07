@@ -58,7 +58,10 @@
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
-				v-else-if="success || (!form.canSubmit && !isMaxSubmissionsReached)"
+				v-else-if="
+					success
+					|| (!form.canSubmit && !isMaxSubmissionsReached && !submissionId)
+				"
 				class="forms-emptycontent"
 				:name="
 					form.submissionMessage
@@ -75,7 +78,7 @@
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
-				v-else-if="isMaxSubmissionsReached"
+				v-else-if="isMaxSubmissionsReached && !submissionId"
 				class="forms-emptycontent"
 				:name="t('forms', 'Limit reached')"
 				:description="
