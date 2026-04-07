@@ -5,6 +5,18 @@
 
 # Changelog
 
+## v5.2.6 - 2026-04-07
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.5...v5.2.6)
+
+### Fixed
+
+- fix: handle submissions correctly when user wants to edit a given response by @Chartman123 in [\#3269](https://github.com/nextcloud/forms/pull/3269)
+- fix: Prevent form submission during file upload by @Koc in [\#3249](https://github.com/nextcloud/forms/pull/3249)
+- fix: prevent race conditions while creating options by @Chartman123 in [\#3225](https://github.com/nextcloud/forms/pull/3225)
+- fix(export): Handle exceptions when reading file content and ignore whitespace-only files by @Chartman123 in [\#3214](https://github.com/nextcloud/forms/pull/3214)
+- fix(a11y): Prevent escaping of aria-labels in QuestionLong and QuestionShort components by @Chartman123 in [\#3215](https://github.com/nextcloud/forms/pull/3215)
+
 ## v5.2.5 - 2026-03-05
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.4...v5.2.5)
