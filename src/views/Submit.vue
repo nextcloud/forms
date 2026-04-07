@@ -57,7 +57,7 @@
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
-				v-else-if="success || !form.canSubmit"
+				v-else-if="success || (!form.canSubmit && !submissionId)"
 				class="forms-emptycontent"
 				:name="
 					form.submissionMessage
@@ -657,6 +657,14 @@ export default {
 								`option ${text} could not be mapped to an option for question ${questionId}`,
 							)
 						}
+					} else if (question.type === 'file') {
+						// File answers cannot be restored when editing a submission —
+						// the uploaded file has already been moved to permanent storage
+						// and the temporary uploadedFileId no longer exists.
+						// The user must re-upload files if needed.
+						logger.debug(
+							`Skipping file answer for question ${questionId} — cannot restore uploaded files`,
+						)
 					} else {
 						answers[questionId].push(text)
 					}
