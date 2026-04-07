@@ -505,6 +505,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use '../../scssmixins/markdownOutput' as *;
+
 #expiresDatetimePicker {
 	width: calc(100% - var(--default-clickable-area));
 }
@@ -536,7 +538,7 @@ export default {
 	}
 
 	&__output {
-		@import '../../scssmixins/markdownOutput';
+		@include markdown-output;
 
 		padding: 12px;
 		margin-block: 3px;
@@ -546,8 +548,6 @@ export default {
 		&:hover {
 			border-color: var(--color-primary-element);
 		}
-
-		@include markdown-output;
 	}
 }
 </style>

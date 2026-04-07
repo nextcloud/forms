@@ -901,7 +901,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../scssmixins/markdownOutput';
+@use '../scssmixins/markdownOutput' as *;
 
 .forms-emptycontent {
 	height: 100%;

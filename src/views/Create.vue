@@ -633,8 +633,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@import '../scssmixins/markdownOutput';
-
 .emptycontent {
 	display: flex;
 	height: 100%;
