@@ -63,6 +63,7 @@ OC.L10N.register(
     "Set expiration date" : "Definir a data de expiração",
     "Close form" : "Fechar formulário",
     "Group" : "Grupo",
+    "Team" : "Grupo",
     "Share link" : "Partilhar ligação",
     "Copy to clipboard" : "Copiar para área de transferência",
     "Copy embedding code" : "Copiar código embebido",
