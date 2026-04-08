@@ -1035,7 +1035,7 @@ class ApiControllerTest extends TestCase {
 	 * Test that a submitter with allowEditSubmissions but without
 	 * PERMISSION_RESULTS_DELETE cannot bulk-delete all submissions.
 	 */
-	public function testDeleteAllSubmissionsNoPermission() {
+	public function testDeleteAllSubmissionsNoPermission(): void {
 		$form = Form::fromParams([
 			'id' => 1,
 			'title' => 'Test Form',
@@ -1076,7 +1076,7 @@ class ApiControllerTest extends TestCase {
 	/**
 	 * Test that the form owner can bulk-delete all submissions.
 	 */
-	public function testDeleteAllSubmissionsAsOwner() {
+	public function testDeleteAllSubmissionsAsOwner(): void {
 		$form = Form::fromParams([
 			'id' => 1,
 			'title' => 'Test Form',
@@ -1114,7 +1114,7 @@ class ApiControllerTest extends TestCase {
 	/**
 	 * Test that a collaborator with PERMISSION_RESULTS_DELETE can bulk-delete.
 	 */
-	public function testDeleteAllSubmissionsWithResultsDeletePermission() {
+	public function testDeleteAllSubmissionsWithResultsDeletePermission(): void {
 		$form = Form::fromParams([
 			'id' => 1,
 			'title' => 'Test Form',
