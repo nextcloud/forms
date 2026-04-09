@@ -567,9 +567,6 @@ class ShareApiControllerTest extends TestCase {
 		$folder = $this->createMock(Folder::class);
 		$userFolder = $this->createMock(Folder::class);
 		$userFolder->expects($this->once())
-			->method('nodeExists')
-			->willReturn(true);
-		$userFolder->expects($this->once())
 			->method('get')
 			->willReturn($folder);
 		$this->storage->expects($this->once())
@@ -864,9 +861,6 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($this->createMock(IUser::class));
 
 		$userFolder = $this->createMock(Folder::class);
-		$userFolder->expects($this->any())
-			->method('nodeExists')
-			->willReturn(true);
 
 		$file = $this->createMock(File::class);
 		$file->expects($this->any())

@@ -31,6 +31,7 @@ use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
@@ -274,12 +275,12 @@ class ShareApiController extends OCSController {
 			if (in_array(Constants::PERMISSION_RESULTS, $keyValuePairs['permissions'], true)) {
 				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 				$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
-				if ($userFolder->nodeExists($uploadedFilesFolderPath)) {
+				try {
+					/** @var \OCP\Files\Folder $folder */
 					$folder = $userFolder->get($uploadedFilesFolderPath);
-				} else {
+				} catch (NotFoundException $e) {
 					$folder = $userFolder->newFolder($uploadedFilesFolderPath);
 				}
-				/** @var \OCP\Files\Folder $folder */
 
 				$folderShare = $this->shareManager->newShare();
 				$folderShare->setShareType($formShare->getShareType());
@@ -359,11 +360,11 @@ class ShareApiController extends OCSController {
 
 		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 		$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
-		if (!$userFolder->nodeExists($uploadedFilesFolderPath)) {
+		try {
+			$folder = $userFolder->get($uploadedFilesFolderPath);
+		} catch (NotFoundException $e) {
 			return;
 		}
-
-		$folder = $userFolder->get($uploadedFilesFolderPath);
 		$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);
 		foreach ($folderShares as $folderShare) {
 			if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
