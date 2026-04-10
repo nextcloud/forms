@@ -1180,6 +1180,11 @@ class ApiController extends OCSController {
 			return new DataDownloadResponse($submissionsData, $fileName, Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat]);
 		}
 
+		// Cap user-supplied page size to avoid unbounded resource use
+		if ($limit !== null) {
+			$limit = max(1, min($limit, Constants::SUBMISSIONS_LIMIT_MAX));
+		}
+
 		// Load submissions and currently active questions
 		if ($canSeeAllSubmissions) {
 			$submissions = $this->submissionService->getSubmissions($formId, null, $query, $limit, $offset);
