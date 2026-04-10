@@ -297,6 +297,108 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse($expected), $this->apiController->getSubmissions(1));
 	}
 
+	public function testGetSubmissions_limitIsCapped(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('otherUser');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS]);
+
+		// An overly large limit must be clamped to SUBMISSIONS_LIMIT_MAX
+		$this->submissionService->expects($this->once())
+			->method('getSubmissions')
+			->with(1, null, null, Constants::SUBMISSIONS_LIMIT_MAX, 0)
+			->willReturn([]);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(1)
+			->willReturn(0);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn([]);
+
+		$this->apiController->getSubmissions(1, limit: 100000);
+	}
+
+	public function testGetSubmissions_limitFloorIsOne(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('otherUser');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS]);
+
+		// A non-positive limit must be floored to 1
+		$this->submissionService->expects($this->once())
+			->method('getSubmissions')
+			->with(1, null, null, 1, 0)
+			->willReturn([]);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(1)
+			->willReturn(0);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn([]);
+
+		$this->apiController->getSubmissions(1, limit: 0);
+	}
+
+	public function testGetSubmissions_nullLimitStaysNull(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('otherUser');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS]);
+
+		// null limit is preserved so the summary view can load all submissions
+		$this->submissionService->expects($this->once())
+			->method('getSubmissions')
+			->with(1, null, null, null, 0)
+			->willReturn([]);
+
+		$this->submissionMapper->expects($this->once())
+			->method('countSubmissions')
+			->with(1)
+			->willReturn(0);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn([]);
+
+		$this->apiController->getSubmissions(1);
+	}
+
 	public function testExportSubmissions_invalidForm() {
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
