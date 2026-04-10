@@ -234,6 +234,11 @@ class Constants {
 	 */
 	public const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:';
 
+	/**
+	 * Maximum number of submissions returned per paginated API request.
+	 */
+	public const SUBMISSIONS_LIMIT_MAX = 1000;
+
 	public const SUPPORTED_EXPORT_FORMATS = [
 		'csv' => 'text/csv',
 		'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
