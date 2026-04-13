@@ -127,6 +127,7 @@ OC.L10N.register(
     "Settings" : "Nustatymai",
     "Abort" : "Nutraukti",
     "Submit" : "Pateikti",
+    "Leave" : "Išeiti",
     "Clear" : "Išvalyti",
     "There was an error submitting the form" : "Pateikiant anketą, įvyko klaida",
     "Submit form" : "Pateikti anketą",
