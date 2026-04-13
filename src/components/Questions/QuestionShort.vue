@@ -66,12 +66,19 @@
 					/^[a-z]{3}$/i
 					<!-- ^ Some example RegExp for the placeholder text -->
 				</NcActionInput>
+				<NcActionCheckbox
+					v-if="validationType === 'email'"
+					:modelValue="isConfirmationEmailRecipient"
+					@update:modelValue="onConfirmationEmailRecipientChange">
+					{{ t('forms', 'Use for confirmation emails') }}
+				</NcActionCheckbox>
 			</NcActions>
 		</div>
 	</Question>
 </template>
 
 <script>
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -86,6 +93,7 @@ export default {
 
 	components: {
 		IconRegex,
+		NcActionCheckbox,
 		NcActions,
 		NcActionInput,
 		NcActionRadio,
@@ -143,6 +151,10 @@ export default {
 		validationRegex() {
 			return this.extraSettings?.validationRegex || ''
 		},
+
+		isConfirmationEmailRecipient() {
+			return this.extraSettings?.confirmationEmailRecipient ?? false
+		},
 	},
 
 	methods: {
@@ -182,6 +194,7 @@ export default {
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
 				this.onExtraSettingsChange({
+					confirmationEmailRecipient: undefined,
 					validationType,
 					validationRegex: this.validationRegex,
 				})
@@ -189,10 +202,22 @@ export default {
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
 				this.isValidationTypeMenuOpen = false
 				this.onExtraSettingsChange({
+					confirmationEmailRecipient:
+						validationType === 'email'
+							? this.isConfirmationEmailRecipient || undefined
+							: undefined,
 					validationType:
 						validationType === 'text' ? undefined : validationType,
 				})
 			}
+		},
+
+		onConfirmationEmailRecipientChange(confirmationEmailRecipient) {
+			this.onExtraSettingsChange({
+				confirmationEmailRecipient: confirmationEmailRecipient
+					? true
+					: undefined,
+			})
 		},
 
 		/**
