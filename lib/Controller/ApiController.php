@@ -1322,6 +1322,14 @@ class ApiController extends OCSController {
 	public function deleteAllSubmissions(int $formId): DataResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
 
+		// Require explicit results_delete permission for bulk deletion.
+		// canDeleteResults() also returns true for submitters with allowEditSubmissions,
+		// but those users should only be able to delete their own submissions individually.
+		if (!in_array(Constants::PERMISSION_RESULTS_DELETE, $this->formsService->getPermissions($form))) {
+			$this->logger->debug('User lacks results_delete permission for bulk deletion');
+			throw new OCSForbiddenException('No permission to delete all submissions');
+		}
+
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
 		$this->formMapper->update($form);

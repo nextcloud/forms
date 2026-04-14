@@ -1031,6 +1031,124 @@ class ApiControllerTest extends TestCase {
 		];
 	}
 
+	/**
+	 * Test that a submitter with allowEditSubmissions but without
+	 * PERMISSION_RESULTS_DELETE cannot bulk-delete all submissions.
+	 */
+	public function testDeleteAllSubmissionsNoPermission(): void {
+		$form = Form::fromParams([
+			'id' => 1,
+			'title' => 'Test Form',
+			'hash' => 'hash',
+			'access' => [
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			],
+			'ownerId' => 'otherUser',
+			'description' => '',
+			'expires' => 0,
+			'isAnonymous' => false,
+			'submitMultiple' => false,
+			'showExpiration' => false,
+		]);
+
+		// getFormIfAllowed passes (canDeleteResults returns true due to allowEditSubmissions)
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS_DELETE)
+			->willReturn($form);
+
+		// But user only has submit permission, not results_delete
+		$this->formsService
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_SUBMIT]);
+
+		// Bulk delete must NOT be called
+		$this->submissionMapper
+			->expects($this->never())
+			->method('deleteByForm');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->deleteAllSubmissions(1);
+	}
+
+	/**
+	 * Test that the form owner can bulk-delete all submissions.
+	 */
+	public function testDeleteAllSubmissionsAsOwner(): void {
+		$form = Form::fromParams([
+			'id' => 1,
+			'title' => 'Test Form',
+			'hash' => 'hash',
+			'access' => [
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			],
+			'ownerId' => 'currentUser',
+			'description' => '',
+			'expires' => 0,
+			'isAnonymous' => false,
+			'submitMultiple' => false,
+			'showExpiration' => false,
+		]);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS_DELETE)
+			->willReturn($form);
+
+		$this->formsService
+			->method('getPermissions')
+			->with($form)
+			->willReturn(Constants::PERMISSION_ALL);
+
+		$this->submissionMapper
+			->expects($this->once())
+			->method('deleteByForm')
+			->with(1);
+
+		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
+	}
+
+	/**
+	 * Test that a collaborator with PERMISSION_RESULTS_DELETE can bulk-delete.
+	 */
+	public function testDeleteAllSubmissionsWithResultsDeletePermission(): void {
+		$form = Form::fromParams([
+			'id' => 1,
+			'title' => 'Test Form',
+			'hash' => 'hash',
+			'access' => [
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			],
+			'ownerId' => 'otherUser',
+			'description' => '',
+			'expires' => 0,
+			'isAnonymous' => false,
+			'submitMultiple' => false,
+			'showExpiration' => false,
+		]);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS_DELETE)
+			->willReturn($form);
+
+		$this->formsService
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS_DELETE, Constants::PERMISSION_SUBMIT]);
+
+		$this->submissionMapper
+			->expects($this->once())
+			->method('deleteByForm')
+			->with(1);
+
+		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
+	}
+
 	public function testTransferOwnerNotOwner() {
 		$form = new Form();
 		$form->setId(1);
