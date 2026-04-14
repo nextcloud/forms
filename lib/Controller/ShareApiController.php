@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Forms\Controller;
 
 use OCA\Forms\Constants;
+use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
@@ -30,6 +31,7 @@ use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IRequest;
@@ -270,16 +272,16 @@ class ShareApiController extends OCSController {
 		$formShare = $this->shareMapper->update($formShare);
 
 		if (in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
-			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-			$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
-			if ($userFolder->nodeExists($uploadedFilesFolderPath)) {
-				$folder = $userFolder->get($uploadedFilesFolderPath);
-			} else {
-				$folder = $userFolder->newFolder($uploadedFilesFolderPath);
-			}
-			/** @var \OCP\Files\Folder $folder */
-
 			if (in_array(Constants::PERMISSION_RESULTS, $keyValuePairs['permissions'], true)) {
+				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+				$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
+				try {
+					/** @var \OCP\Files\Folder $folder */
+					$folder = $userFolder->get($uploadedFilesFolderPath);
+				} catch (NotFoundException $e) {
+					$folder = $userFolder->newFolder($uploadedFilesFolderPath);
+				}
+
 				$folderShare = $this->shareManager->newShare();
 				$folderShare->setShareType($formShare->getShareType());
 				$folderShare->setSharedWith($formShare->getShareWith());
@@ -290,12 +292,7 @@ class ShareApiController extends OCSController {
 
 				$this->shareManager->createShare($folderShare);
 			} else {
-				$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder);
-				foreach ($folderShares as $folderShare) {
-					if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
-						$this->shareManager->deleteShare($folderShare);
-					}
-				}
+				$this->removeUploadedFilesShare($form, $formShare);
 			}
 		}
 
@@ -345,10 +342,35 @@ class ShareApiController extends OCSController {
 
 		$this->formsService->obtainFormLock($form);
 
+		// Revoke any linked Files share before deleting the Forms share
+		if (in_array(Constants::PERMISSION_RESULTS, $share->getPermissions(), true)) {
+			$this->removeUploadedFilesShare($form, $share);
+		}
+
 		$this->shareMapper->delete($share);
 		$this->formMapper->update($form);
 
 		return new DataResponse($shareId);
+	}
+
+	private function removeUploadedFilesShare(Form $form, Share $formShare): void {
+		if (!in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
+			return;
+		}
+
+		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+		$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
+		try {
+			$folder = $userFolder->get($uploadedFilesFolderPath);
+		} catch (NotFoundException $e) {
+			return;
+		}
+		$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);
+		foreach ($folderShares as $folderShare) {
+			if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
+				$this->shareManager->deleteShare($folderShare);
+			}
+		}
 	}
 
 	/**

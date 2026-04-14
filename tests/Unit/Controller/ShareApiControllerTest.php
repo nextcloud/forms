@@ -540,6 +540,101 @@ class ShareApiControllerTest extends TestCase {
 	}
 
 	/**
+	 * Delete share that had results permission — Files share must be cleaned up.
+	 */
+	public function testDeleteShare_cleansUpFileShare(): void {
+		$share = new Share();
+		$share->setId(8);
+		$share->setFormId(5);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('collaborator');
+		$share->setPermissions([Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS]);
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with('8')
+			->willReturn($share);
+
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with('5')
+			->willReturn($form);
+
+		// Mock the uploaded files folder lookup
+		$folder = $this->createMock(Folder::class);
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($this->once())
+			->method('get')
+			->willReturn($folder);
+		$this->storage->expects($this->once())
+			->method('getUserFolder')
+			->with('currentUser')
+			->willReturn($userFolder);
+		$this->formsService->expects($this->once())
+			->method('getFormUploadedFilesFolderPath')
+			->with($form)
+			->willReturn('Forms/my-form');
+
+		// Mock finding and deleting the matching Files share
+		$fileShare = $this->createMock(IShare::class);
+		$fileShare->method('getSharedWith')->willReturn('collaborator');
+		$this->shareManager->expects($this->once())
+			->method('getSharesBy')
+			->with('currentUser', IShare::TYPE_USER, $folder)
+			->willReturn([$fileShare]);
+		$this->shareManager->expects($this->once())
+			->method('deleteShare')
+			->with($fileShare);
+
+		$this->shareMapper->expects($this->once())
+			->method('delete')
+			->with($share);
+
+		$response = new DataResponse(8);
+		$this->assertEquals($response, $this->shareApiController->deleteShare(5, 8));
+	}
+
+	/**
+	 * Delete share without results permission — no file share cleanup needed.
+	 */
+	public function testDeleteShare_noResultsPermission_skipsFileShareCleanup(): void {
+		$share = new Share();
+		$share->setId(8);
+		$share->setFormId(5);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('collaborator');
+		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with('8')
+			->willReturn($share);
+
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with('5')
+			->willReturn($form);
+
+		// No file share interactions expected
+		$this->storage->expects($this->never())->method('getUserFolder');
+		$this->shareManager->expects($this->never())->method('getSharesBy');
+		$this->shareManager->expects($this->never())->method('deleteShare');
+
+		$this->shareMapper->expects($this->once())
+			->method('delete')
+			->with($share);
+
+		$response = new DataResponse(8);
+		$this->assertEquals($response, $this->shareApiController->deleteShare(5, 8));
+	}
+
+	/**
 	 * Delete Non-existing share.
 	 */
 	public function testDeleteUnknownShare() {
@@ -766,9 +861,6 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($this->createMock(IUser::class));
 
 		$userFolder = $this->createMock(Folder::class);
-		$userFolder->expects($this->any())
-			->method('nodeExists')
-			->willReturn(true);
 
 		$file = $this->createMock(File::class);
 		$file->expects($this->any())
