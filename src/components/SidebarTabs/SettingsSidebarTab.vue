@@ -205,53 +205,104 @@
 			v-show="form.confirmationEmailEnabled && !formArchived"
 			class="settings-div--indent confirmation-email">
 			<p class="confirmation-email__hint">
+				{{ t('forms', 'Set up confirmation emails in three steps:') }}
+			</p>
+			<ol class="confirmation-email__steps">
+				<li>{{ t('forms', 'Add an email field to the form.') }}</li>
+				<li>
+					{{
+						t(
+							'forms',
+							'Select which email field receives the confirmation email.',
+						)
+					}}
+				</li>
+				<li>{{ t('forms', 'Customize the subject and message.') }}</li>
+			</ol>
+			<NcNoteCard
+				v-if="hasConfirmationEmailRecipientConflict"
+				type="error"
+				:text="
+					t(
+						'forms',
+						'Only one email field can be used for confirmation emails. Select the recipient field below to fix this.',
+					)
+				" />
+			<NcNoteCard
+				v-else-if="emailQuestionCount === 0"
+				type="error"
+				:text="
+					t(
+						'forms',
+						'Add at least one email field before confirmation emails can be used.',
+					)
+				" />
+			<NcNoteCard
+				v-else-if="requiresConfirmationEmailRecipientSelection"
+				type="error"
+				:text="
+					t(
+						'forms',
+						'Select which email field should receive confirmation emails before finishing this setup.',
+					)
+				" />
+			<div v-if="emailQuestionCount > 0" class="confirmation-email__recipient">
+				<label class="confirmation-email__label">
+					{{ t('forms', 'Recipient field') }}
+				</label>
+				<p
+					v-if="emailQuestionCount === 1"
+					class="confirmation-email__recipient-summary">
+					<strong>{{ selectedConfirmationEmailQuestionLabel }}</strong>
+					<br />
+					{{
+						t(
+							'forms',
+							'Selected automatically because this is the only email field in the form.',
+						)
+					}}
+				</p>
+				<template v-else>
+					<select
+						:value="selectedConfirmationEmailQuestionId"
+						:disabled="locked || isSavingConfirmationEmailRecipient"
+						class="confirmation-email__select"
+						@change="onConfirmationEmailRecipientSelectionChange">
+						<option value="">
+							{{ t('forms', 'Select an email field') }}
+						</option>
+						<option
+							v-for="question in confirmationEmailQuestions"
+							:key="question.id"
+							:value="question.id">
+							{{ confirmationEmailQuestionLabel(question) }}
+						</option>
+					</select>
+					<p
+						v-if="selectedConfirmationEmailQuestionLabel"
+						class="confirmation-email__recipient-summary">
+						{{
+							t('forms', 'Current recipient field: {question}', {
+								question: selectedConfirmationEmailQuestionLabel,
+							})
+						}}
+					</p>
+				</template>
+			</div>
+			<p class="confirmation-email__placeholder-hint">
 				{{
 					t(
 						'forms',
-						'Requires an email field in the form. If the form has multiple email fields, mark one question with “Use for confirmation emails”. Available placeholders: {formTitle}, {formDescription}, and field names like {name}.',
+						'Available placeholders: {formTitle}, {formDescription}, and field names like {name}.',
 					)
 				}}
 			</p>
-			<NcNoteCard
-				v-if="form.confirmationEmailEnabled && emailQuestionCount === 0"
-				type="error"
-				:text="
-					t(
-						'forms',
-						'Add at least one email field to send confirmation emails.',
-					)
-				" />
-			<NcNoteCard
-				v-else-if="
-					form.confirmationEmailEnabled
-					&& emailQuestionCount > 1
-					&& confirmationEmailRecipientCount === 0
-				"
-				type="error"
-				:text="
-					t(
-						'forms',
-						'Select one email field and enable “Use for confirmation emails” on that question.',
-					)
-				" />
-			<NcNoteCard
-				v-else-if="
-					form.confirmationEmailEnabled
-					&& confirmationEmailRecipientCount > 1
-				"
-				type="error"
-				:text="
-					t(
-						'forms',
-						'Only one email field can be used for confirmation emails.',
-					)
-				" />
 			<label class="confirmation-email__label">
 				{{ t('forms', 'Email subject') }}
 			</label>
 			<input
 				v-model="confirmationEmailSubject"
-				:disabled="locked"
+				:disabled="locked || isConfirmationEmailConfigurationBlocked"
 				:maxlength="255"
 				:placeholder="t('forms', 'Thank you for your submission')"
 				class="confirmation-email__input"
@@ -262,7 +313,7 @@
 			</label>
 			<textarea
 				:value="confirmationEmailBody"
-				:disabled="locked"
+				:disabled="locked || isConfirmationEmailConfigurationBlocked"
 				:placeholder="emailBodyPlaceholder"
 				class="confirmation-email__textarea"
 				@input="onConfirmationEmailBodyInput"
@@ -278,8 +329,12 @@
 
 <script>
 import { getCurrentUser } from '@nextcloud/auth'
+import axios from '@nextcloud/axios'
+import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
+import { generateOcsUrl } from '@nextcloud/router'
 import { vOnClickOutside as ClickOutside } from '@vueuse/components'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -343,6 +398,7 @@ export default {
 			svgLockOpen,
 			confirmationEmailSubject: this.form?.confirmationEmailSubject || '',
 			confirmationEmailBody: this.form?.confirmationEmailBody || '',
+			isSavingConfirmationEmailRecipient: false,
 		}
 	},
 
@@ -468,6 +524,55 @@ export default {
 				(question) => question.extraSettings?.confirmationEmailRecipient,
 			).length
 		},
+
+		selectedConfirmationEmailQuestion() {
+			const selectedQuestion = this.confirmationEmailQuestions.find(
+				(question) => question.extraSettings?.confirmationEmailRecipient,
+			)
+			if (selectedQuestion) {
+				return selectedQuestion
+			}
+
+			if (this.emailQuestionCount === 1) {
+				return this.confirmationEmailQuestions[0]
+			}
+
+			return null
+		},
+
+		selectedConfirmationEmailQuestionId() {
+			return this.selectedConfirmationEmailQuestion?.id ?? ''
+		},
+
+		selectedConfirmationEmailQuestionLabel() {
+			if (!this.selectedConfirmationEmailQuestion) {
+				return ''
+			}
+
+			return this.confirmationEmailQuestionLabel(
+				this.selectedConfirmationEmailQuestion,
+			)
+		},
+
+		hasConfirmationEmailRecipientConflict() {
+			return this.confirmationEmailRecipientCount > 1
+		},
+
+		requiresConfirmationEmailRecipientSelection() {
+			return (
+				this.emailQuestionCount > 1
+				&& this.confirmationEmailRecipientCount !== 1
+			)
+		},
+
+		isConfirmationEmailConfigurationBlocked() {
+			return (
+				this.form.confirmationEmailEnabled
+				&& (this.emailQuestionCount === 0
+					|| this.hasConfirmationEmailRecipientConflict
+					|| this.requiresConfirmationEmailRecipientSelection)
+			)
+		},
 	},
 
 	watch: {
@@ -480,9 +585,29 @@ export default {
 
 			deep: true,
 		},
+
+		confirmationEmailQuestions: {
+			async handler() {
+				if (
+					this.form.confirmationEmailEnabled
+					&& this.emailQuestionCount === 1
+					&& this.confirmationEmailRecipientCount !== 1
+				) {
+					await this.saveConfirmationEmailRecipient(
+						this.confirmationEmailQuestions[0].id,
+					)
+				}
+			},
+
+			deep: true,
+		},
 	},
 
 	methods: {
+		confirmationEmailQuestionLabel(question) {
+			return question.text || t('forms', 'Untitled question')
+		},
+
 		/**
 		 * Save Form-Properties
 		 *
@@ -576,12 +701,12 @@ export default {
 		},
 
 		onConfirmationEmailEnabledChange(checked) {
-			this.$emit('update:form-prop', 'confirmationEmailEnabled', checked)
+			this.$emit('update:formProp', 'confirmationEmailEnabled', checked)
 		},
 
 		onConfirmationEmailSubjectChange() {
 			this.$emit(
-				'update:form-prop',
+				'update:formProp',
 				'confirmationEmailSubject',
 				this.confirmationEmailSubject,
 			)
@@ -592,7 +717,105 @@ export default {
 		},
 
 		onConfirmationEmailBodyChange({ target }) {
-			this.$emit('update:form-prop', 'confirmationEmailBody', target.value)
+			this.$emit('update:formProp', 'confirmationEmailBody', target.value)
+		},
+
+		async onConfirmationEmailRecipientSelectionChange(event) {
+			const questionId = Number.parseInt(event.target.value, 10)
+			if (Number.isNaN(questionId)) {
+				return
+			}
+
+			await this.saveConfirmationEmailRecipient(questionId)
+		},
+
+		async saveConfirmationEmailRecipient(selectedQuestionId) {
+			if (!this.form?.id) {
+				return
+			}
+
+			const emailQuestions = this.confirmationEmailQuestions
+			const pendingUpdates = emailQuestions
+				.map((question) => {
+					const nextExtraSettings = { ...(question.extraSettings || {}) }
+					if (selectedQuestionId === question.id) {
+						nextExtraSettings.confirmationEmailRecipient = true
+					} else {
+						delete nextExtraSettings.confirmationEmailRecipient
+					}
+
+					const hasRecipientFlag =
+						!!question.extraSettings?.confirmationEmailRecipient
+					const shouldHaveRecipientFlag =
+						selectedQuestionId === question.id
+
+					if (hasRecipientFlag === shouldHaveRecipientFlag) {
+						return null
+					}
+
+					return {
+						question,
+						nextExtraSettings,
+					}
+				})
+				.filter((update) => update !== null)
+
+			if (pendingUpdates.length === 0) {
+				return
+			}
+
+			const previousExtraSettings = new Map(
+				pendingUpdates.map(({ question }) => [
+					question.id,
+					{ ...(question.extraSettings || {}) },
+				]),
+			)
+
+			pendingUpdates.forEach(({ question, nextExtraSettings }) => {
+				const localQuestion = this.form.questions.find(
+					(searchQuestion) => searchQuestion.id === question.id,
+				)
+				if (localQuestion) {
+					localQuestion.extraSettings = nextExtraSettings
+				}
+			})
+
+			this.isSavingConfirmationEmailRecipient = true
+
+			try {
+				await Promise.all(
+					pendingUpdates.map(({ question, nextExtraSettings }) =>
+						axios.patch(
+							generateOcsUrl(
+								'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+								{
+									id: this.form.id,
+									questionId: question.id,
+								},
+							),
+							{
+								keyValuePairs: {
+									extraSettings: nextExtraSettings,
+								},
+							},
+						),
+					),
+				)
+				emit('forms:last-updated:set', this.form.id)
+			} catch {
+				pendingUpdates.forEach(({ question }) => {
+					const localQuestion = this.form.questions.find(
+						(searchQuestion) => searchQuestion.id === question.id,
+					)
+					if (localQuestion) {
+						localQuestion.extraSettings =
+							previousExtraSettings.get(question.id) || {}
+					}
+				})
+				showError(t('forms', 'Error while saving question'))
+			} finally {
+				this.isSavingConfirmationEmailRecipient = false
+			}
 		},
 
 		/**
@@ -694,7 +917,25 @@ export default {
 	&__hint {
 		color: var(--color-text-maxcontrast);
 		font-size: 13px;
+		margin-bottom: 8px;
+	}
+
+	&__steps {
+		margin: 0 0 12px;
+		padding-inline-start: 20px;
+		color: var(--color-text-maxcontrast);
+		font-size: 13px;
+	}
+
+	&__recipient {
 		margin-bottom: 12px;
+	}
+
+	&__recipient-summary,
+	&__placeholder-hint {
+		color: var(--color-text-maxcontrast);
+		font-size: 13px;
+		margin-top: 8px;
 	}
 
 	&__label {
@@ -711,6 +952,20 @@ export default {
 		border: 2px solid var(--color-border-maxcontrast);
 		border-radius: var(--border-radius-large);
 		font-size: 14px;
+
+		&:focus {
+			outline: none;
+			border-color: var(--color-primary-element);
+		}
+	}
+
+	&__select {
+		width: 100%;
+		padding: 8px;
+		border: 2px solid var(--color-border-maxcontrast);
+		border-radius: var(--border-radius-large);
+		font-size: 14px;
+		background: var(--color-main-background);
 
 		&:focus {
 			outline: none;
