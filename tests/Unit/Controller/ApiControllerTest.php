@@ -516,6 +516,10 @@ class ApiControllerTest extends TestCase {
 				'lockedBy' => null,
 				'lockedUntil' => null,
 				'maxSubmissions' => null,
+				'confirmationEmailEnabled' => false,
+				'confirmationEmailSubject' => null,
+				'confirmationEmailBody' => null,
+				'confirmationEmailRecipient' => null,
 			]]
 		];
 	}
@@ -534,7 +538,10 @@ class ApiControllerTest extends TestCase {
 		$expected['id'] = null;
 		// TODO fix test, currently unset because behaviour has changed
 		$expected['state'] = null;
-		$expected['lastUpdated'] = null;
+		$expected['lastUpdated'] = 0;
+		$expected['confirmationEmailEnabled'] = false;
+		$expected['confirmationEmailSubject'] = null;
+		$expected['confirmationEmailBody'] = null;
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(self::createFormValidator($expected)))

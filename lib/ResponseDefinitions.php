@@ -26,6 +26,7 @@ namespace OCA\Forms;
  *   dateMax?: int,
  *   dateMin?: int,
  *   dateRange?: bool,
+ *   confirmationEmailRecipient?: bool,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
  *   optionsHighest?: 2|3|4|5|6|7|8|9|10,
@@ -141,8 +142,11 @@ namespace OCA\Forms;
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,
+ *   confirmationEmailEnabled: bool,
+ *   confirmationEmailSubject: ?string,
+ *   confirmationEmailBody: ?string,
+ *   confirmationEmailRecipient: ?int,
  * }
- *
  * @psalm-type FormsUploadedFile = array{
  *   uploadedFileId: int,
  *   fileName: string

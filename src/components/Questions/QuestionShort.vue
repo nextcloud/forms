@@ -182,6 +182,7 @@ export default {
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
 				this.onExtraSettingsChange({
+					confirmationEmailRecipient: undefined,
 					validationType,
 					validationRegex: this.validationRegex,
 				})
@@ -189,6 +190,7 @@ export default {
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
 				this.isValidationTypeMenuOpen = false
 				this.onExtraSettingsChange({
+					confirmationEmailRecipient: undefined,
 					validationType:
 						validationType === 'text' ? undefined : validationType,
 				})
