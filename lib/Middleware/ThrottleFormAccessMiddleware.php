@@ -25,7 +25,7 @@ class ThrottleFormAccessMiddleware extends Middleware {
 		}
 
 		$response = new DataResponse(
-			$exception->getMessage(),
+			'Form not found',
 			$exception->getCode(),
 		);
 		$response->throttle(['action' => 'form']);
