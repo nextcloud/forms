@@ -34,12 +34,13 @@
 			:aria-describedby="description ? descriptionId : undefined">
 			<!-- Unranked pool -->
 			<div class="ranking-unranked">
-				<p class="ranking-section__label">
-					{{ t('forms', 'Tap to rank') }}
-				</p>
-				<div
+				<Draggable
 					v-show="unrankedOptions.length > 0"
-					class="ranking-unranked__pool">
+					v-model="unrankedOptions"
+					class="ranking-unranked__pool"
+					:animation="200"
+					:group="{ name: 'ranking', pull: true, put: true }"
+					@end="emitValues">
 					<button
 						v-for="option in unrankedOptions"
 						:key="option.id"
@@ -47,7 +48,7 @@
 						@click="rankOption(option)">
 						{{ option.text }}
 					</button>
-				</div>
+				</Draggable>
 				<p
 					v-show="unrankedOptions.length === 0"
 					class="ranking-unranked__empty">
@@ -64,6 +65,7 @@
 					v-model="rankedOptions"
 					class="ranking-ranked__list"
 					:animation="200"
+					:group="{ name: 'ranking', pull: true, put: true }"
 					direction="vertical"
 					handle=".ranking-item__drag-handle"
 					@end="onRankingEnd">
