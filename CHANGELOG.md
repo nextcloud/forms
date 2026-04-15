@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.2.7 - 2026-04-14
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.6...v5.2.7)
+
+### Fixed
+
+- [stable5.2] fix: clean up file shares on collaborator removal by @pringelmann in [\#3294](https://github.com/nextcloud/forms/pull/3294)
+- [stable5.2] fix: require explicit share permission for bulk submission endpoints by @pringelmann in [\#3292](https://github.com/nextcloud/forms/pull/3292)
+- [stable5.2] fix: cap pagination limit for submissions endpoint by @backportbot[bot] in [\#3277](https://github.com/nextcloud/forms/pull/3277)
+
 ## v5.2.6 - 2026-04-07
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.5...v5.2.6)
