@@ -74,13 +74,13 @@
 						:key="option.id"
 						class="ranking-item"
 						role="listitem">
-						<span class="ranking-item__position">{{ index + 1 }}.</span>
 						<NcActions
 							:id="`ranking-${option.id}-drag`"
 							:container="`#ranking-${option.id}-drag`"
 							:aria-label="t('forms', 'Move option actions')"
 							class="ranking-item__drag-handle"
 							variant="tertiary-no-background">
+
 							<template #icon>
 								<IconDragIndicator :size="20" />
 							</template>
@@ -103,6 +103,7 @@
 								{{ t('forms', 'Move option down') }}
 							</NcActionButton>
 						</NcActions>
+						<span class="ranking-item__position">{{ index + 1 }}.</span>
 						<span class="ranking-item__text">{{ option.text }}</span>
 						<NcButton
 							variant="tertiary"
@@ -445,7 +446,6 @@ export default {
 .ranking-item {
 	display: flex;
 	align-items: center;
-	gap: var(--default-grid-baseline);
 	min-height: var(--default-clickable-area);
 	border-radius: var(--border-radius-large);
 	user-select: none;
@@ -454,6 +454,7 @@ export default {
 		font-weight: bold;
 		min-width: 1.5em;
 		text-align: end;
+		margin-inline-end: calc(3 * var(--default-grid-baseline));
 		color: var(--color-text-maxcontrast);
 	}
 
