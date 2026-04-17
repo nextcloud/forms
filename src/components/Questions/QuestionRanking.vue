@@ -80,7 +80,6 @@
 							:aria-label="t('forms', 'Move option actions')"
 							class="ranking-item__drag-handle"
 							variant="tertiary-no-background">
-
 							<template #icon>
 								<IconDragIndicator :size="20" />
 							</template>
@@ -153,6 +152,7 @@
 					:isUnique="true"
 					:maxIndex="options.length - 1"
 					:maxOptionLength="maxStringLengths.optionText"
+					:isRanking="true"
 					optionType="choice"
 					@createAnswer="onCreateAnswer"
 					@update:answer="updateAnswer"
