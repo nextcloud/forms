@@ -4,51 +4,16 @@ version: 2
 updates:
   - package-ecosystem: composer
     target-branch: 'main'
-    directory: '/'
+    directories:
+      - '/'
+      - '/vendor-bin/*/'
     schedule:
       interval: weekly
       day: saturday
       time: '03:00'
       timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'main'
-    directory: '/vendor-bin/cs-fixer/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'main'
-    directory: '/vendor-bin/openapi-extractor/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'main'
-    directory: '/vendor-bin/psalm/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
+    cooldown:
+      default-days: 4
     open-pull-requests-limit: 10
     labels:
       - 3. to review
@@ -62,6 +27,9 @@ updates:
       day: saturday
       time: '03:00'
       timezone: Europe/Paris
+    cooldown:
+      default-days: 4
+      semver-major-days: 8
     open-pull-requests-limit: 10
     labels:
       - 3. to review
@@ -75,6 +43,8 @@ updates:
       day: saturday
       time: '03:00'
       timezone: Europe/Paris
+    cooldown:
+      default-days: 4
     open-pull-requests-limit: 10
     labels:
       - 3. to review
@@ -82,51 +52,16 @@ updates:
 
   - package-ecosystem: composer
     target-branch: 'stable5.2'
-    directory: '/'
+    directories:
+      - '/'
+      - '/vendor-bin/*/'
     schedule:
       interval: weekly
       day: saturday
       time: '03:00'
       timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'stable5.2'
-    directory: '/vendor-bin/cs-fixer/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'stable5.2'
-    directory: '/vendor-bin/openapi-extractor/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
-    open-pull-requests-limit: 10
-    labels:
-      - 3. to review
-      - dependencies
-
-  - package-ecosystem: composer
-    target-branch: 'stable5.2'
-    directory: '/vendor-bin/psalm/'
-    schedule:
-      interval: weekly
-      day: saturday
-      time: '03:00'
-      timezone: Europe/Paris
+    cooldown:
+      default-days: 4
     open-pull-requests-limit: 10
     labels:
       - 3. to review
@@ -140,6 +75,9 @@ updates:
       day: saturday
       time: '03:00'
       timezone: Europe/Paris
+    cooldown:
+      default-days: 4
+      semver-major-days: 8
     open-pull-requests-limit: 10
     labels:
       - 3. to review
