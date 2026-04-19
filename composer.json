@@ -23,8 +23,7 @@
 		"openapi": "generate-spec"
 	},
 	"require-dev": {
-		"bamarni/composer-bin-plugin": "^1.8",
-		"phpunit/phpunit": "^9"
+		"bamarni/composer-bin-plugin": "^1.8"
 	},
 	"require": {
 		"maennchen/zipstream-php": "^2.4",
