@@ -217,7 +217,7 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->getSubmissions(1);
 	}
 
-	public function dataGetSubmissions() {
+	public static function dataGetSubmissions() {
 		return [
 			'anon' => [
 				'submissions' => [
@@ -491,7 +491,7 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newForm();
 	}
 
-	public function dataTestCreateNewForm() {
+	public static function dataTestCreateNewForm() {
 		return [
 			'forms' => ['expectedForm' => [
 				'id' => 7,
@@ -545,7 +545,7 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm());
 	}
 
-	public function dataCloneForm_exceptions() {
+	public static function dataCloneForm_exceptions() {
 		return [
 			'disabled' => [
 				'canCreate' => false,
@@ -580,7 +580,7 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newForm(7);
 	}
 
-	public function dataCloneForm() {
+	public static function dataCloneForm() {
 		return [
 			'works' => [
 				'old' => [
@@ -876,7 +876,7 @@ class ApiControllerTest extends TestCase {
 	/**
 	 * Values for the formsService mock object for the following methods: hasUserAccess, hasFormExpired, canSubmit.
 	 */
-	public function dataForCheckForbiddenException() {
+	public static function dataForCheckForbiddenException() {
 		return [
 			'user_dont_have_access_to_form' => [false, true, true, NoSuchFormException::class],
 			'form_expired' => [true, true, true, OCSForbiddenException::class],
@@ -1006,7 +1006,7 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(1, 42));
 	}
 
-	public function dataTestDeletePermission() {
+	public static function dataTestDeletePermission() {
 		return [
 			[
 				[

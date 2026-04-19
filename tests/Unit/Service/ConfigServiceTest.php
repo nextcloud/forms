@@ -56,7 +56,7 @@ class ConfigServiceTest extends TestCase {
 		);
 	}
 
-	public function dataGetAppConfig() {
+	public static function dataGetAppConfig() {
 		return [
 			'oneFullConfig' => [
 				'strConfig' => [
@@ -130,7 +130,7 @@ class ConfigServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->configService->getAppConfig());
 	}
 
-	public function dataGetAppConfig_Default() {
+	public static function dataGetAppConfig_Default() {
 		return [
 			'defaultValues' => [
 				'expected' => [
@@ -160,7 +160,7 @@ class ConfigServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->configService->getAppConfig());
 	}
 
-	public function dataCanCreateForms() {
+	public static function dataCanCreateForms() {
 		return [
 			'notRestriced' => [
 				'config' => [

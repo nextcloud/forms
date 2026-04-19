@@ -284,7 +284,7 @@ class SubmissionServiceTest extends TestCase {
 		$this->assertNull($this->submissionService->getSubmission(999));
 	}
 
-	public function dataWriteFileToCloud() {
+	public static function dataWriteFileToCloud() {
 		return [
 			'rootFolder' => ['Some nice Form Title', '', Folder::class, 'csv', 'Some nice Form Title (responses).csv', false],
 			'subFolder' => ['Some nice Form Title', '/folder path', Folder::class, 'csv', 'Some nice Form Title (responses).csv', false],
@@ -382,7 +382,7 @@ class SubmissionServiceTest extends TestCase {
 	}
 
 	// Data for SubmissionCsv
-	public function dataGetSubmissionsData() {
+	public static function dataGetSubmissionsData() {
 		return [
 			'two-basic-submissions' => [
 				// Questions
@@ -729,7 +729,7 @@ file2.txt"
 	}
 
 	// Data for validation of Submissions
-	public function dataValidateSubmission() {
+	public static function dataValidateSubmission() {
 		return [
 			'required-not-answered' => [
 				// Questions

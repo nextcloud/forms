@@ -67,7 +67,7 @@ class ConfigControllerTest extends TestCase {
 		]), $this->configController->getAppConfig());
 	}
 
-	public function dataUpdateAppConfig() {
+	public static function dataUpdateAppConfig() {
 		return [
 			'booleanConfig' => [
 				'configKey' => 'allowPermitAll',

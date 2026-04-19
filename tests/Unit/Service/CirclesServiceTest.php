@@ -12,29 +12,30 @@ use OCA\Circles\Model\Circle;
 use OCA\Circles\Model\Member;
 use OCA\Forms\Service\CirclesService;
 use OCP\App\IAppManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 use Throwable;
 
-class CirclesServiceText extends TestCase {
-	/** @var ContainerInterface|MockObject */
-	private $container;
-	/** @var IAppManager|MockObject */
-	private $appManager;
-	/** @var LoggerInterface|MockObject */
-	private $logger;
+class CirclesServiceTest extends TestCase {
+	private ContainerInterface&MockObject $container;
+	private IAppManager&MockObject $appManager;
+	private LoggerInterface&MockObject $logger;
 
 	public function setUp(): void {
-		parent::setUp();
+		if (!class_exists(CirclesManager::class)) {
+			$this->markTestSkipped('Circles app not available');
+		}
 
+		parent::setUp();
 		$this->container = $this->createMock(ContainerInterface::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->appManager = $this->createMock(IAppManager::class);
 	}
 
-	public function dataIsEnabled() {
+	public static function dataIsEnabled() {
 		return [
 			'not-enabled' => [
 				false,
@@ -47,9 +48,7 @@ class CirclesServiceText extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider dataIsEnabled
-	 */
+	#[DataProvider('dataIsEnabled')]
 	public function testIsEnabled($enabled, $expected) {
 		$this->appManager->expects($this->once())
 			->method('isEnabledForUser')
@@ -59,8 +58,8 @@ class CirclesServiceText extends TestCase {
 		$this->assertEquals($circlesService->isCirclesEnabled(), $expected);
 	}
 
-	public function dataGetCircle() {
-		$circle = $this->createMock(Circle::class);
+	public static function dataGetCircle() {
+		$circle = self::createStub(Circle::class);
 
 		return [
 			'valid-circle' => [
@@ -84,9 +83,7 @@ class CirclesServiceText extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider dataGetCircle
-	 */
+	#[DataProvider('dataGetCircle')]
 	public function testGetCircle($enabled, $throws, $circle, $expected) {
 		$this->appManager->expects($this->once())
 			->method('isEnabledForUser')

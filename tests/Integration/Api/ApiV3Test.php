@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\ClientException;
 
 use OCA\Forms\Constants;
 use OCA\Forms\Tests\Integration\IntegrationBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @group DB
@@ -281,7 +282,7 @@ class ApiV3Test extends IntegrationBase {
 		return $arr;
 	}
 
-	public function dataGetForms() {
+	public static function dataGetForms() {
 		return [
 			'getTestforms' => [
 				'expected' => [
@@ -328,7 +329,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataGetSharedForms() {
+	public static function dataGetSharedForms() {
 		return [
 			'getTestforms' => [
 				'expected' => [
@@ -364,7 +365,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataGetNewForm() {
+	public static function dataGetNewForm() {
 		return [
 			'getNewForm' => [
 				'expected' => [
@@ -428,7 +429,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataGetFullForm() {
+	public static function dataGetFullForm() {
 		return [
 			'getFullForm' => [
 				'expected' => [
@@ -577,8 +578,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataCloneForm() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataCloneForm() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		// Compared to full form expected, update changed properties
 		$fullFormExpected['title'] = 'Title of a Form - Copy';
 		$fullFormExpected['shares'] = [];
@@ -645,8 +646,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataUpdateFormProperties() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataUpdateFormProperties() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['title'] = 'This is my NEW Title!';
 		$fullFormExpected['access'] = [
 			'permitAllUsers' => true,
@@ -704,7 +705,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals(404, $resp->getStatusCode());
 	}
 
-	public function dataCreateNewQuestion() {
+	public static function dataCreateNewQuestion() {
 		return [
 			'newQuestion' => [
 				'expected' => [
@@ -764,8 +765,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataUpdateQuestionProperties() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataUpdateQuestionProperties() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['questions'][0]['text'] = 'Still first Question!';
 		$fullFormExpected['questions'][0]['isRequired'] = false;
 
@@ -802,8 +803,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataReorderQuestions() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataReorderQuestions() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['questions'][0]['order'] = 2;
 		$fullFormExpected['questions'][1]['order'] = 1;
 
@@ -850,8 +851,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataDeleteQuestion() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataDeleteQuestion() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		array_splice($fullFormExpected['questions'], 0, 1);
 		$fullFormExpected['questions'][0]['order'] = 1;
 		$fullFormExpected['questions'][1]['order'] = 2;
@@ -897,7 +898,7 @@ class ApiV3Test extends IntegrationBase {
 		}
 	}
 
-	public function dataCreateNewOption() {
+	public static function dataCreateNewOption() {
 		return [
 			'newOption' => [
 				'expected' => [
@@ -934,8 +935,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataUpdateOptionProperties() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataUpdateOptionProperties() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['questions'][1]['options'][0]['text'] = 'New option Text.';
 
 		return [
@@ -970,8 +971,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataDeleteOption() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataDeleteOption() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		array_splice($fullFormExpected['questions'][1]['options'], 0, 1);
 
 		return [
@@ -1001,7 +1002,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataAddShare() {
+	public static function dataAddShare() {
 		return [
 			'addAShare' => [
 				'expected' => [
@@ -1039,8 +1040,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataUpdateShare() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataUpdateShare() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['shares'][0]['permissions'] = [ Constants::PERMISSION_SUBMIT ];
 
 		return [
@@ -1074,8 +1075,8 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataDeleteShare() {
-		$fullFormExpected = $this->dataGetFullForm()['getFullForm']['expected'];
+	public static function dataDeleteShare() {
+		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		array_splice($fullFormExpected['shares'], 0, 1);
 
 		return [
@@ -1103,7 +1104,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
-	public function dataGetSubmissions() {
+	public static function dataGetSubmissions() {
 		return [
 			'getSubmissions' => [
 				'expected' => [
@@ -1165,7 +1166,7 @@ class ApiV3Test extends IntegrationBase {
 							]
 						]
 					],
-					'questions' => $this->dataGetFullForm()['getFullForm']['expected']['questions'],
+					'questions' => self::dataGetFullForm()['getFullForm']['expected']['questions'],
 					'filteredSubmissionsCount' => 3,
 				]
 			]
@@ -1212,7 +1213,7 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public function dataExportSubmissions() {
+	public static function dataExportSubmissions() {
 		return [
 			'exportSubmissions' => [
 				'expected' => <<<'CSV'
@@ -1283,8 +1284,8 @@ CSV
 		$this->assertEquals('Title of a Form (responses).csv', $data);
 	}
 
-	public function dataDeleteSubmissions() {
-		$submissionsExpected = $this->dataGetSubmissions()['getSubmissions']['expected'];
+	public static function dataDeleteSubmissions() {
+		$submissionsExpected = self::dataGetSubmissions()['getSubmissions']['expected'];
 		$submissionsExpected['submissions'] = [];
 		$submissionsExpected['filteredSubmissionsCount'] = 0;
 
@@ -1294,11 +1295,8 @@ CSV
 			]
 		];
 	}
-	/**
-	 * @dataProvider dataDeleteSubmissions
-	 *
-	 * @param array $submissionsExpected
-	 */
+
+	#[DataProvider('dataDeleteSubmissions')]
 	public function testDeleteSubmissions(array $submissionsExpected) {
 		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
 		$data = $this->OcsResponse2Data($resp);
@@ -1309,23 +1307,7 @@ CSV
 		$this->testGetSubmissions($submissionsExpected);
 	}
 
-	public function dataNewSubmission() {
-		$submissionsExpected = $this->dataGetSubmissions()['getSubmissions']['expected'];
-		$submissionsExpected['submissions'][] = [
-			'userId' => 'test'
-		];
-
-		return [
-			'insertSubmission' => [
-				'submissionsExpected' => $submissionsExpected
-			]
-		];
-	}
-	/**
-	 * @dataProvider dataNewSubmission
-	 */
 	public function testNewSubmission() {
-
 		$uploadedFileResponse = $this->http->request('POST',
 			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
 			[
@@ -1405,8 +1387,8 @@ CSV
 		], $data['submissions'][0]);
 	}
 
-	public function dataDeleteSingleSubmission() {
-		$submissionsExpected = $this->dataGetSubmissions()['getSubmissions']['expected'];
+	public static function dataDeleteSingleSubmission() {
+		$submissionsExpected = self::dataGetSubmissions()['getSubmissions']['expected'];
 		array_splice($submissionsExpected['submissions'], 0, 1);
 
 		return [
