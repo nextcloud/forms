@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<phpunit bootstrap="./bootstrap.php"
-		 colors="true"
-		 convertDeprecationsToExceptions="true"
-		 verbose="true">
-	<testsuite name="Forms integration tests">
-		<directory>./Integration</directory>
-	</testsuite>
-	<coverage>
-		<!-- filters for code coverage -->
-		<include>
-			<directory suffix=".php">../lib</directory>
-		</include>
-		<report>
-			<!-- and this is where your report will be written -->
-			<clover outputFile="./clover.integration.xml"/>
-		</report>
-	</coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="./bootstrap.php"
+  colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+  cacheDirectory=".phpunit.cache">
+  <testsuite name="Forms integration tests">
+    <directory>./Integration</directory>
+  </testsuite>
+  <coverage>
+    <report>
+      <!-- and this is where your report will be written -->
+      <clover outputFile="./clover.integration.xml" />
+    </report>
+  </coverage>
+  <source>
+    <include>
+      <directory suffix=".php">../lib</directory>
+    </include>
+  </source>
 </phpunit>

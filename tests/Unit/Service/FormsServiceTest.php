@@ -58,6 +58,7 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
 use Psr\Log\LoggerInterface;
@@ -139,9 +140,7 @@ class FormsServiceTest extends TestCase {
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->l10n->expects($this->any())
 			->method('t')
-			->will($this->returnCallback(function (string $identity) {
-				return $identity;
-			}));
+			->willReturnArgument(0);
 
 		$this->formsService = new FormsService(
 			$userSession,
@@ -173,7 +172,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals('testHash', $this->formsService->generateFormHash());
 	}
 
-	public function dataGetForm() {
+	public static function dataGetForm() {
 		return [
 			// Just the full form without submissions
 			'one-full-form' => [[
@@ -261,11 +260,7 @@ class FormsServiceTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider dataGetForm
-	 *
-	 * @param array $expected
-	 */
+	#[DataProvider('dataGetForm')]
 	public function testGetForm(array $expected) {
 		// The form
 		$form = new Form();
@@ -358,7 +353,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->getForm($form));
 	}
 
-	public function dataGetPartialForm() {
+	public static function dataGetPartialForm() {
 		return [
 			'onePartialOwnedForm' => [[
 				'id' => 42,
@@ -399,7 +394,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->getPartialFormArray($form));
 	}
 
-	public function dataGetPartialFormShared() {
+	public static function dataGetPartialFormShared() {
 		return [
 			'onePartialOwnedForm' => [[
 				'id' => 42,
@@ -418,10 +413,10 @@ class FormsServiceTest extends TestCase {
 	}
 	/**
 	 * Make sure shared users with results permission also receive the submission count
-	 * @dataProvider dataGetPartialFormShared
 	 *
 	 * @param array $expected
 	 */
+	#[DataProvider('dataGetPartialFormShared')]
 	public function testGetPartialFormShared(array $expected) {
 		$form = new Form();
 		$form->setId(42);
@@ -452,7 +447,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->getPartialFormArray($form));
 	}
 
-	public function dataGetPublicForm() {
+	public static function dataGetPublicForm() {
 		return [
 			// Bare form without questions, checking removed access & ownerId
 			'one-full-form' => [[
@@ -481,11 +476,8 @@ class FormsServiceTest extends TestCase {
 			]]
 		];
 	}
-	/**
-	 * @dataProvider dataGetPublicForm
-	 *
-	 * @param array $expected
-	 */
+
+	#[DataProvider('dataGetPublicForm')]
 	public function testGetPublicForm(array $expected) {
 		// The form
 		$form = new Form();
@@ -538,7 +530,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->getPublicForm($form));
 	}
 
-	public function dataGetPermissions() {
+	public static function dataGetPermissions() {
 		return [
 			'ownerHasAllPermissions' => [
 				'ownerId' => 'currentUser',
@@ -592,13 +584,8 @@ class FormsServiceTest extends TestCase {
 			]
 		];
 	}
-	/**
-	 * @dataProvider dataGetPermissions
-	 *
-	 * @param string $ownerId
-	 * @param array $access
-	 * @param array $expected
-	 */
+
+	#[DataProvider('dataGetPermissions')]
 	public function testGetPermissions(string $ownerId, array $access, array $shares, array $expected) {
 		$form = new Form();
 		$form->setId(42);
@@ -662,7 +649,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals([], $formsService->getPermissions($form));
 	}
 
-	public function dataCanSeeResults() {
+	public static function dataCanSeeResults() {
 		return [
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
@@ -694,13 +681,8 @@ class FormsServiceTest extends TestCase {
 			]
 		];
 	}
-	/**
-	 * @dataProvider dataCanSeeResults
-	 *
-	 * @param string $ownerId
-	 * @param array $sharesArray
-	 * @param bool $expected
-	 */
+
+	#[DataProvider('dataCanSeeResults')]
 	public function testCanSeeResults(string $ownerId, array $sharesArray, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
@@ -729,7 +711,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->canSeeResults($form));
 	}
 
-	public function dataCanDeleteResults() {
+	public static function dataCanDeleteResults() {
 		return [
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
@@ -761,13 +743,8 @@ class FormsServiceTest extends TestCase {
 			]
 		];
 	}
-	/**
-	 * @dataProvider dataCanDeleteResults
-	 *
-	 * @param string $ownerId
-	 * @param array $sharesArray
-	 * @param bool $expected
-	 */
+
+	#[DataProvider('dataCanDeleteResults')]
 	public function testCanDeleteResults(string $ownerId, array $sharesArray, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
@@ -796,7 +773,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->canDeleteResults($form));
 	}
 
-	public function dataCanSubmit() {
+	public static function dataCanSubmit() {
 		return [
 			'allowFormOwner' => [
 				'ownerId' => 'currentUser',
@@ -824,14 +801,8 @@ class FormsServiceTest extends TestCase {
 			]
 		];
 	}
-	/**
-	 * @dataProvider dataCanSubmit
-	 *
-	 * @param string $ownerId
-	 * @param bool $submitMultiple
-	 * @param bool $hasFormSubmissionsByUser
-	 * @param bool $expected
-	 */
+
+	#[DataProvider('dataCanSubmit')]
 	public function testCanSubmit(string $ownerId, bool $submitMultiple, bool $hasFormSubmissionsByUser, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
@@ -900,7 +871,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals(true, $formsService->canSubmit($form));
 	}
 
-	public function dataHasUserAccess() {
+	public static function dataHasUserAccess() {
 		return [
 			'ownerhasAccess' => [
 				'accessArray' => [
@@ -928,13 +899,8 @@ class FormsServiceTest extends TestCase {
 			],
 		];
 	}
-	/**
-	 * @dataProvider dataHasUserAccess
-	 *
-	 * @param array $accessArray
-	 * @param string $ownerId
-	 * @param array $expected
-	 */
+
+	#[DataProvider('dataHasUserAccess')]
 	public function testHasUserAccess(array $accessArray, string $ownerId, bool $expected) {
 		$form = new Form();
 		$form->setId(42);
@@ -1021,7 +987,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals(false, $formsService->hasUserAccess($form));
 	}
 
-	public function dataHasFormExpired() {
+	public static function dataHasFormExpired() {
 		return [
 			'hasExpired' => [time() - 3600, Constants::FORM_STATE_ACTIVE, true],
 			'hasNotExpired' => [time() + 3600, Constants::FORM_STATE_ACTIVE, false],
@@ -1030,13 +996,8 @@ class FormsServiceTest extends TestCase {
 			'isArchived' => [time() + 3600, Constants::FORM_STATE_ARCHIVED, true],
 		];
 	}
-	/**
-	 * @dataProvider dataHasFormExpired
-	 *
-	 * @param int $expires
-	 * @param int $state the form state
-	 * @param bool $expected has expired
-	 */
+
+	#[DataProvider('dataHasFormExpired')]
 	public function testHasFormExpired(int $expires, int $state, bool $expected) {
 		$form = new Form();
 		$form->setState($state);
@@ -1045,7 +1006,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->hasFormExpired($form));
 	}
 
-	public function dataGetShareDisplayName() {
+	public static function dataGetShareDisplayName() {
 		return [
 			'userShare' => [
 				'share' => [
@@ -1077,12 +1038,8 @@ class FormsServiceTest extends TestCase {
 			],
 		];
 	}
-	/**
-	 * @dataProvider dataGetShareDisplayName
-	 *
-	 * @param array $share
-	 * @param string $expected
-	 */
+
+	#[DataProvider('dataGetShareDisplayName')]
 	public function testGetShareDisplayName(array $share, string $expected) {
 		$user = $this->createMock(IUser::class);
 		$user->expects($share['shareType'] === IShare::TYPE_USER ? $this->once() : $this->never())
@@ -1127,7 +1084,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals('', $this->formsService->getShareDisplayName($share));
 	}
 
-	public function dataNotifyNewShares() {
+	public static function dataNotifyNewShares() {
 		return [
 			'newUserShare' => [
 				'shareType' => IShare::TYPE_USER,
@@ -1146,13 +1103,13 @@ class FormsServiceTest extends TestCase {
 			]
 		];
 	}
+
 	/**
-	 * @dataProvider dataNotifyNewShares
-	 *
 	 * @param int $shareType
 	 * @param string $shareWith
 	 * @param string $expectedMethod that will be called on activityManager.
 	 */
+	#[DataProvider('dataNotifyNewShares')]
 	public function testNotifyNewShares(int $shareType, string $shareWith, string $expectedMethod) {
 		$form = $this->createMock(Form::class);
 		$share = new Share();
@@ -1166,7 +1123,7 @@ class FormsServiceTest extends TestCase {
 		$this->formsService->notifyNewShares($form, $share);
 	}
 
-	public function dataNotifyNewSubmission() {
+	public static function dataNotifyNewSubmission() {
 		return [
 			'no-shares' => [
 				[],
@@ -1207,9 +1164,8 @@ class FormsServiceTest extends TestCase {
 
 	/**
 	 * Test creating notifications for new submissions
-	 *
-	 * @dataProvider dataNotifyNewSubmission
 	 */
+	#[DataProvider('dataNotifyNewSubmission')]
 	public function testNotifyNewSubmission($shares, $shareNotifications) {
 		$owner = 'ownerUser';
 		$submitter = 'someUser';
@@ -1261,18 +1217,16 @@ class FormsServiceTest extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataAreExtraSettingsValid
-	 *
 	 * @param array $extraSettings input settings
 	 * @param string $questionType question type
 	 * @param bool $expected expected return value
-	 *
 	 */
+	#[DataProvider('dataAreExtraSettingsValid')]
 	public function testAreExtraSettingsValid(array $extraSettings, string $questionType, bool $expected) {
 		$this->assertEquals($expected, $this->formsService->areExtraSettingsValid($extraSettings, $questionType));
 	}
 
-	public function dataAreExtraSettingsValid() {
+	public static function dataAreExtraSettingsValid() {
 		return [
 			'empty-extra-settings' => [
 				'extraSettings' => [],
@@ -1369,7 +1323,7 @@ class FormsServiceTest extends TestCase {
 					'validationRegex' => '['
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'rval' => false
+				'expected' => false
 			],
 			'invalid-custom-regex-delimiters' => [
 				'extraSettings' => [
@@ -1377,7 +1331,7 @@ class FormsServiceTest extends TestCase {
 					'validationRegex' => '/1/2/'
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'rval' => false
+				'expected' => false
 			],
 			'invalid-custom-regex-pattern' => [
 				'extraSettings' => [
@@ -1385,7 +1339,7 @@ class FormsServiceTest extends TestCase {
 					'validationRegex' => '/' . '[/'
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'rval' => false
+				'expected' => false
 			],
 			'invalid-custom-regex-type' => [
 				'extraSettings' => [
@@ -1393,14 +1347,14 @@ class FormsServiceTest extends TestCase {
 					'validationRegex' => 112
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'rval' => false
+				'expected' => false
 			],
 			'invalid-custom-missing-regex' => [
 				'extraSettings' => [
 					'validationType' => 'regex',
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'rval' => false
+				'expected' => false
 			],
 			'valid-date-settings' => [
 				'extraSettings' => [

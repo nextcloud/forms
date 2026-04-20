@@ -16,22 +16,16 @@ use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\Share\IShare;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 class ActivityManagerTest extends TestCase {
 
-	/** @var ActivityManager */
-	private $activityManager;
-
-	/** @var IManager|MockObject */
-	private $manager;
-
-	/** @var IGroupManager|MockObject */
-	private $groupManager;
-
-	/** @var CirclesService|MockObject */
-	private $circlesService;
+	private ActivityManager $activityManager;
+	private IManager&MockObject $manager;
+	private IGroupManager&MockObject $groupManager;
+	private CirclesService&MockObject $circlesService;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -43,7 +37,7 @@ class ActivityManagerTest extends TestCase {
 	}
 
 	public function testPublishNewShare() {
-		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
+		// Can't mock the DB-Classes, as their Property-Methods are not explicitly defined.
 		$form = new Form();
 		$form->setId(5);
 		$form->setTitle('TestForm-Title');
@@ -73,7 +67,7 @@ class ActivityManagerTest extends TestCase {
 	}
 
 	public function testPublishNewGroupShare() {
-		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
+		// Can't mock the DB-Classes, as their Property-Methods are not explicitly defined.
 		$form = new Form();
 		$form->setId(5);
 		$form->setTitle('TestForm-Title');
@@ -81,14 +75,18 @@ class ActivityManagerTest extends TestCase {
 		$groupId = 'sharedGroup';
 
 		$group = $this->createMock(IGroup::class);
-		$user = $this->createMock(IUser::class);
+		$users = [
+			$this->createMock(IUser::class),
+			$this->createMock(IUser::class),
+			$this->createMock(IUser::class)
+		];
 
-		$user->expects($this->exactly(3))
-			->method('getUID')
-			->will($this->onConsecutiveCalls('user1', 'user2', 'user3'));
+		$users[0]->method('getUID')->willReturn('user1');
+		$users[1]->method('getUID')->willReturn('user2');
+		$users[2]->method('getUID')->willReturn('user3');
 		$group->expects($this->once())
 			->method('getUsers')
-			->willReturn([$user, $user, $user]);
+			->willReturn($users);
 		$this->groupManager->expects($this->once())
 			->method('get')
 			->with($groupId)
@@ -100,7 +98,6 @@ class ActivityManagerTest extends TestCase {
 			->willReturn($event);
 		$event->expects($this->exactly(3))->method('setApp')->with('forms')->willReturn($event);
 		$event->expects($this->exactly(3))->method('setType')->with('forms_newshare')->willReturn($event);
-		$event->expects($this->exactly(3))->method('setAffectedUser')->withConsecutive(['user1'], ['user2'], ['user3'])->willReturn($event);
 		$event->expects($this->exactly(3))->method('setAuthor')->with('currentUser')->willReturn($event);
 		$event->expects($this->exactly(3))->method('setObject')->with('form', 5)->willReturn($event);
 		$event->expects($this->exactly(3))->method('setSubject')->with('newgroupshare', [
@@ -110,15 +107,24 @@ class ActivityManagerTest extends TestCase {
 			'groupId' => 'sharedGroup'
 		])->willReturn($event);
 
+		$affectedUsers = [];
+		$event->expects($this->exactly(3))
+			->method('setAffectedUser')
+			->willReturnCallback(function ($userId) use (&$affectedUsers, &$event) {
+				$affectedUsers[] = $userId;
+				return $event;
+			});
+
 		$this->manager->expects($this->exactly(3))
 			->method('publish')
 			->with($event);
 
 		$this->activityManager->publishNewGroupShare($form, $groupId);
+		$this->assertEquals(['user1', 'user2', 'user3'], $affectedUsers);
 	}
 
 	public function testPublishNewCircleShare() {
-		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
+		// Can't mock the DB-Classes, as their Property-Methods are not explicitly defined.
 		$form = new Form();
 		$form->setId(5);
 		$form->setTitle('TestForm-Title');
@@ -135,7 +141,6 @@ class ActivityManagerTest extends TestCase {
 			->willReturn($event);
 		$event->expects($this->exactly(4))->method('setApp')->with('forms')->willReturn($event);
 		$event->expects($this->exactly(4))->method('setType')->with('forms_newshare')->willReturn($event);
-		$event->expects($this->exactly(4))->method('setAffectedUser')->withConsecutive(['userId'], ['user1'], ['user2'], ['user3'])->willReturn($event);
 		$event->expects($this->exactly(4))->method('setAuthor')->with('currentUser')->willReturn($event);
 		$event->expects($this->exactly(4))->method('setObject')->with('form', 5)->willReturn($event);
 		$event->expects($this->exactly(4))->method('setSubject')->with('newcircleshare', [
@@ -144,12 +149,20 @@ class ActivityManagerTest extends TestCase {
 			'formHash' => 'abcdefg12345',
 			'circleId' => $circleId
 		])->willReturn($event);
+		$affectedUsers = [];
+		$event->expects($this->exactly(4))
+			->method('setAffectedUser')
+			->willReturnCallback(function (string $userId) use (&$affectedUsers, &$event) {
+				$affectedUsers[] = $userId;
+				return $event;
+			});
 
 		$this->manager->expects($this->exactly(4))
 			->method('publish')
 			->with($event);
 
 		$this->activityManager->publishNewCircleShare($form, $circleId);
+		$this->assertEquals(['userId', 'user1', 'user2', 'user3'], $affectedUsers);
 	}
 
 	public function testPublishNewCircleShare_circlesDisabled() {
@@ -167,7 +180,7 @@ class ActivityManagerTest extends TestCase {
 	}
 
 	public function testPublishNewSubmission() {
-		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
+		// Can't mock the DB-Classes, as their Property-Methods are not explicitly defined.
 		$form = new Form();
 		$form->setId(5);
 		$form->setTitle('TestForm-Title');
@@ -197,12 +210,13 @@ class ActivityManagerTest extends TestCase {
 		$this->activityManager->publishNewSubmission($form, $submittorId);
 	}
 
-	public function dataPublichNewSharedSubmission() {
+	public static function dataPublishNewSharedSubmission() {
 		return [
 			'user-share' => [
 				'shareType' => IShare::TYPE_USER,
 				'shareWith' => 'sharedUser',
-				'expected' => [['sharedUser']]
+				'expected' => [['sharedUser']],
+				'sharedUsers' => ['sharedUser'],
 			],
 			'group-share' => [
 				IShare::TYPE_GROUP,
@@ -221,9 +235,8 @@ class ActivityManagerTest extends TestCase {
 
 	/**
 	 * Test notify shared results
-	 *
-	 * @dataProvider dataPublichNewSharedSubmission
 	 */
+	#[DataProvider('dataPublishNewSharedSubmission')]
 	public function testPublishNewSharedSubmission(int $shareType, string $shareWith, array $expected, ?array $sharedUsers = null) {
 		// Can't mock the DB-Classes, as their Property-Methods are not explicitely defined.
 		$form = new Form();
@@ -255,7 +268,6 @@ class ActivityManagerTest extends TestCase {
 			->willReturn($event);
 		$event->expects($this->exactly(count($expected)))->method('setApp')->with('forms')->willReturn($event);
 		$event->expects($this->exactly(count($expected)))->method('setType')->with('forms_newsharedsubmission')->willReturn($event);
-		$event->expects($this->exactly(count($expected)))->method('setAffectedUser')->withConsecutive(...[...$expected])->willReturn($event);
 		$event->expects($this->exactly(count($expected)))->method('setAuthor')->with('submittingUser')->willReturn($event);
 		$event->expects($this->exactly(count($expected)))->method('setObject')->with('form', 5)->willReturn($event);
 		$event->expects($this->exactly(count($expected)))->method('setSubject')->with('newsubmission', [
@@ -263,11 +275,19 @@ class ActivityManagerTest extends TestCase {
 			'formTitle' => 'TestForm-Title',
 			'formHash' => 'abcdefg12345'
 		])->willReturn($event);
+		$affectedUsers = [];
+		$event->expects($this->exactly(count($sharedUsers)))
+			->method('setAffectedUser')
+			->willReturnCallback(function (string $userId) use (&$affectedUsers, &$event) {
+				$affectedUsers[] = $userId;
+				return $event;
+			});
 
 		$this->manager->expects($this->exactly(count($expected)))
 			->method('publish')
 			->with($event);
 
 		$this->activityManager->publishNewSharedSubmission($form, $shareType, $shareWith, $submitterId);
+		$this->assertEquals($sharedUsers, $affectedUsers);
 	}
 }

@@ -189,7 +189,7 @@ class ProviderTest extends TestCase {
 	}
 
 	// Expected data for Subject-Strings
-	public function dataGetSubjectString() {
+	public static function dataGetSubjectString() {
 		return [
 			['newshare', '{user} has shared the form {formTitle} with you'],
 			['newgroupshare', '{user} has shared the form {formTitle} with group {group}'],
@@ -248,7 +248,7 @@ class ProviderTest extends TestCase {
 	/**
 	 * Typical cases of RichParams for subjects
 	 */
-	public function dataGetRichParams() {
+	public static function dataGetRichParams() {
 		$newShareResult = [
 			'user' => [
 				'type' => 'user',
@@ -463,7 +463,7 @@ class ProviderTest extends TestCase {
 	/**
 	 * IconList for Subjects
 	 */
-	public function dataGetEventIcon() {
+	public static function dataGetEventIcon() {
 		return [
 			['newshare', 'http://localhost/core/img/actions/shared.svg'],
 			['newgroupshare', 'http://localhost/core/img/actions/shared.svg'],

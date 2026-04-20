@@ -131,7 +131,7 @@ class ShareApiControllerTest extends TestCase {
 		);
 	}
 
-	public function dataValidNewShare() {
+	public static function dataValidNewShare() {
 		return [
 			'newUserShare' => [
 				'shareType' => IShare::TYPE_USER,
@@ -232,7 +232,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
 	}
 
-	public function dataNewLinkShare() {
+	public static function dataNewLinkShare() {
 		return [
 			'newLinkShare' => [
 				'shareType' => IShare::TYPE_LINK,
@@ -669,7 +669,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->deleteShare(5, 8);
 	}
 
-	public function dataUpdateShare() {
+	public static function dataUpdateShare() {
 		return [
 			'valid-permissions' => [
 				'share' => [
