@@ -20,6 +20,7 @@
 			:current-shares="form.shares"
 			:show-loading="isLoading"
 			:locked="locked"
+			:is-current-user-owner="isCurrentUserOwner"
 			@add-share="addShare" />
 
 		<!-- Public Link -->
@@ -31,7 +32,9 @@
 			</div>
 			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 			<NcActions>
-				<NcActionButton :disabled="locked" @click="addPublicLink">
+				<NcActionButton
+					:disabled="locked || !isCurrentUserOwner"
+					@click="addPublicLink">
 					<template #icon>
 						<IconPlus :size="20" />
 					</template>
@@ -80,7 +83,7 @@
 					</NcActionButton>
 					<NcActionButton
 						v-else
-						:disabled="locked"
+						:disabled="locked || !isCurrentUserOwner"
 						@click="makeEmbeddable(share)">
 						<template #icon>
 							<IconLinkBoxVariantOutline :size="20" />
@@ -88,7 +91,9 @@
 						<!-- TRANSLATORS: This means the link can be embedded into external websites -->
 						{{ t('forms', 'Convert to embeddable link') }}
 					</NcActionButton>
-					<NcActionButton :disabled="locked" @click="removeShare(share)">
+					<NcActionButton
+						:disabled="locked || !isCurrentUserOwner"
+						@click="removeShare(share)">
 						<template #icon>
 							<IconDelete :size="20" />
 						</template>
@@ -97,7 +102,7 @@
 					<NcActionButton
 						v-if="appConfig.allowPublicLink"
 						close-after-click
-						:disabled="locked"
+						:disabled="locked || !isCurrentUserOwner"
 						@click="addPublicLink">
 						<template #icon>
 							<IconPlus :size="20" />
@@ -160,7 +165,7 @@
 				<NcCheckboxRadioSwitch
 					id="share-switch__permit-all"
 					:checked="form.access.permitAllUsers"
-					:disabled="locked"
+					:disabled="locked || !isCurrentUserOwner"
 					type="switch"
 					@update:checked="onPermitAllUsersChange" />
 			</div>
@@ -176,7 +181,7 @@
 				<NcCheckboxRadioSwitch
 					id="share-switch__show-to-all"
 					:checked="form.access.showToAllUsers"
-					:disabled="locked"
+					:disabled="locked || !isCurrentUserOwner"
 					type="switch"
 					@update:checked="onShowToAllUsersChange" />
 			</div>
@@ -189,6 +194,7 @@
 				:key="'share-' + share.shareType + '-' + share.shareWith"
 				:share="share"
 				:locked="locked"
+				:is-current-user-owner="isCurrentUserOwner"
 				@remove-share="removeShare"
 				@update:share="updateShare" />
 		</TransitionGroup>
@@ -196,6 +202,7 @@
 </template>
 
 <script>
+import { getCurrentUser } from '@nextcloud/auth'
 import { generateOcsUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
@@ -274,6 +281,10 @@ export default {
 	},
 
 	computed: {
+		isCurrentUserOwner() {
+			return getCurrentUser().uid === this.form.ownerId
+		},
+
 		sortedShares() {
 			// Remove Link-Shares, which are handled separately, then sort
 			return this.form.shares
