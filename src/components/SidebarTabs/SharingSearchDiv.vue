@@ -8,7 +8,7 @@
 		<NcSelectUsers
 			keepOpen
 			:loading="showLoadingCircle"
-			:disabled="locked"
+			:disabled="locked || !isCurrentUserOwner"
 			:options="options"
 			:placeholder="t('forms', 'Search for user, group or team …')"
 			:aria-label-listbox="t('forms', 'Search for user, group or team …')"
@@ -44,6 +44,11 @@ export default {
 		},
 
 		locked: {
+			type: Boolean,
+			required: true,
+		},
+
+		isCurrentUserOwner: {
 			type: Boolean,
 			required: true,
 		},
