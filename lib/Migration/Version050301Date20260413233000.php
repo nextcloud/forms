@@ -18,7 +18,7 @@ use OCP\Migration\SimpleMigrationStep;
 /**
  * Add confirmation email fields to forms
  */
-class Version050301Date20260413233000 extends SimpleMigrationStep {
+class Version050300Date20260413233000 extends SimpleMigrationStep {
 
 	/**
 	 * @param IOutput $output
