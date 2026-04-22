@@ -147,6 +147,7 @@ namespace OCA\Forms;
  *   confirmationEmailBody: ?string,
  *   confirmationEmailRecipient: ?int,
  * }
+ *
  * @psalm-type FormsUploadedFile = array{
  *   uploadedFileId: int,
  *   fileName: string
