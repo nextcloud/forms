@@ -283,7 +283,6 @@ class FormsServiceTest extends TestCase {
 				'confirmationEmailEnabled' => false,
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
-				'confirmationEmailRecipient' => null,
 			]]
 		];
 	}
@@ -504,7 +503,6 @@ class FormsServiceTest extends TestCase {
 				'confirmationEmailEnabled' => false,
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
-				'confirmationEmailRecipient' => null,
 			]]
 		];
 	}
@@ -2204,6 +2202,21 @@ class FormsServiceTest extends TestCase {
 				],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => true
+			],
+			'invalid-confirmation-recipient-without-email-validation' => [
+				'extraSettings' => [
+					'confirmationEmailRecipient' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-confirmation-recipient-on-non-email-short-question' => [
+				'extraSettings' => [
+					'confirmationEmailRecipient' => true,
+					'validationType' => 'number',
+				],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
 			],
 			'valid-options-limit' => [
 				'extraSettings' => [

@@ -122,8 +122,7 @@
                     "submissionMessage",
                     "confirmationEmailEnabled",
                     "confirmationEmailSubject",
-                    "confirmationEmailBody",
-                    "confirmationEmailRecipient"
+                    "confirmationEmailBody"
                 ],
                 "properties": {
                     "id": {
@@ -246,11 +245,6 @@
                     },
                     "confirmationEmailBody": {
                         "type": "string",
-                        "nullable": true
-                    },
-                    "confirmationEmailRecipient": {
-                        "type": "integer",
-                        "format": "int64",
                         "nullable": true
                     }
                 }

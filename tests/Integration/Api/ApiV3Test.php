@@ -400,7 +400,6 @@ class ApiV3Test extends IntegrationBase {
 					'confirmationEmailEnabled' => false,
 					'confirmationEmailSubject' => null,
 					'confirmationEmailBody' => null,
-					'confirmationEmailRecipient' => null,
 				]
 			]
 		];
@@ -537,7 +536,6 @@ class ApiV3Test extends IntegrationBase {
 					'confirmationEmailEnabled' => false,
 					'confirmationEmailSubject' => null,
 					'confirmationEmailBody' => null,
-					'confirmationEmailRecipient' => null,
 				]
 			]
 		];

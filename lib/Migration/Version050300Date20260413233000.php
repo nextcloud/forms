@@ -53,13 +53,6 @@ class Version050300Date20260413233000 extends SimpleMigrationStep {
 			]);
 		}
 
-		if (!$table->hasColumn('confirmation_email_recipient')) {
-			$table->addColumn('confirmation_email_recipient', Types::INTEGER, [
-				'notnull' => false,
-				'default' => null,
-			]);
-		}
-
 		return $schema;
 	}
 }

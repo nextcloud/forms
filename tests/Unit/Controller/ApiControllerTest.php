@@ -519,7 +519,6 @@ class ApiControllerTest extends TestCase {
 				'confirmationEmailEnabled' => false,
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
-				'confirmationEmailRecipient' => null,
 			]]
 		];
 	}

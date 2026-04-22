@@ -66,6 +66,9 @@ class FormsMigrator implements IMigrator {
 			$forms = $this->formMapper->findAllByOwnerId($user->getUID());
 			foreach ($forms as $form) {
 				$formData = $form->read();
+				$formData['confirmationEmailEnabled'] ??= false;
+				$formData['confirmationEmailSubject'] ??= null;
+				$formData['confirmationEmailBody'] ??= null;
 				$formData['questions'] = $this->formsService->getQuestions($formData['id']);
 				$formData['submissions'] = $this->submissionService->getSubmissions($formData['id']);
 
@@ -149,6 +152,9 @@ class FormsMigrator implements IMigrator {
 				$form->setAllowEditSubmissions($formData['allowEditSubmissions']);
 				$form->setShowExpiration($formData['showExpiration']);
 				$form->setMaxSubmissions($formData['maxSubmissions'] ?? null);
+				$form->setConfirmationEmailEnabled($formData['confirmationEmailEnabled'] ?? false);
+				$form->setConfirmationEmailSubject($formData['confirmationEmailSubject'] ?? null);
+				$form->setConfirmationEmailBody($formData['confirmationEmailBody'] ?? null);
 
 				$this->formMapper->insert($form);
 

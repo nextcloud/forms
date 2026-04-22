@@ -148,7 +148,6 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'confirmationEmailEnabled' => false,
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
-				'confirmationEmailRecipient' => null,
 			],
 		];
 	}

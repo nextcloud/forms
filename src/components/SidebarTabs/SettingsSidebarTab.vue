@@ -220,32 +220,9 @@
 				<li>{{ t('forms', 'Customize the subject and message.') }}</li>
 			</ol>
 			<NcNoteCard
-				v-if="hasConfirmationEmailRecipientConflict"
+				v-if="confirmationEmailErrorText"
 				type="error"
-				:text="
-					t(
-						'forms',
-						'Only one email field can be used for confirmation emails. Select the recipient field below to fix this.',
-					)
-				" />
-			<NcNoteCard
-				v-else-if="emailQuestionCount === 0"
-				type="error"
-				:text="
-					t(
-						'forms',
-						'Add at least one email field before confirmation emails can be used.',
-					)
-				" />
-			<NcNoteCard
-				v-else-if="requiresConfirmationEmailRecipientSelection"
-				type="error"
-				:text="
-					t(
-						'forms',
-						'Select which email field should receive confirmation emails before finishing this setup.',
-					)
-				" />
+				:text="confirmationEmailErrorText" />
 			<div v-if="emailQuestionCount > 0" class="confirmation-email__recipient">
 				<label class="confirmation-email__label">
 					{{ t('forms', 'Recipient field') }}
@@ -263,21 +240,19 @@
 					}}
 				</p>
 				<template v-else>
-					<select
-						:value="selectedConfirmationEmailQuestionId"
+					<NcSelect
+						:modelValue="selectedConfirmationEmailQuestionOption"
 						:disabled="locked || isSavingConfirmationEmailRecipient"
+						:options="confirmationEmailQuestionOptions"
+						:placeholder="t('forms', 'Select an email field')"
 						class="confirmation-email__select"
-						@change="onConfirmationEmailRecipientSelectionChange">
-						<option value="">
-							{{ t('forms', 'Select an email field') }}
-						</option>
-						<option
-							v-for="question in confirmationEmailQuestions"
-							:key="question.id"
-							:value="question.id">
-							{{ confirmationEmailQuestionLabel(question) }}
-						</option>
-					</select>
+						label="label"
+						:searchable="false"
+						:clearable="false"
+						trackBy="id"
+						@update:modelValue="
+							onConfirmationEmailRecipientSelectionChange
+						" />
 					<p
 						v-if="selectedConfirmationEmailQuestionLabel"
 						class="confirmation-email__recipient-summary">
@@ -342,6 +317,7 @@ import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -355,6 +331,7 @@ export default {
 		NcDateTimePicker,
 		NcIconSvgWrapper,
 		NcNoteCard,
+		NcSelect,
 		TransferOwnership,
 	},
 
@@ -544,6 +521,22 @@ export default {
 			return this.selectedConfirmationEmailQuestion?.id ?? ''
 		},
 
+		confirmationEmailQuestionOptions() {
+			return this.confirmationEmailQuestions.map((question) => ({
+				id: question.id,
+				label: this.confirmationEmailQuestionLabel(question),
+			}))
+		},
+
+		selectedConfirmationEmailQuestionOption() {
+			return (
+				this.confirmationEmailQuestionOptions.find(
+					(question) =>
+						question.id === this.selectedConfirmationEmailQuestionId,
+				) || null
+			)
+		},
+
 		selectedConfirmationEmailQuestionLabel() {
 			if (!this.selectedConfirmationEmailQuestion) {
 				return ''
@@ -556,6 +549,31 @@ export default {
 
 		hasConfirmationEmailRecipientConflict() {
 			return this.confirmationEmailRecipientCount > 1
+		},
+
+		confirmationEmailErrorText() {
+			if (this.hasConfirmationEmailRecipientConflict) {
+				return t(
+					'forms',
+					'Only one email field can be used for confirmation emails. Select the recipient field below to fix this.',
+				)
+			}
+
+			if (this.emailQuestionCount === 0) {
+				return t(
+					'forms',
+					'Add at least one email field before confirmation emails can be used.',
+				)
+			}
+
+			if (this.requiresConfirmationEmailRecipientSelection) {
+				return t(
+					'forms',
+					'Select which email field should receive confirmation emails before finishing this setup.',
+				)
+			}
+
+			return ''
 		},
 
 		requiresConfirmationEmailRecipientSelection() {
@@ -720,9 +738,9 @@ export default {
 			this.$emit('update:formProp', 'confirmationEmailBody', target.value)
 		},
 
-		async onConfirmationEmailRecipientSelectionChange(event) {
-			const questionId = Number.parseInt(event.target.value, 10)
-			if (Number.isNaN(questionId)) {
+		async onConfirmationEmailRecipientSelectionChange(option) {
+			const questionId = option?.id
+			if (!questionId) {
 				return
 			}
 
@@ -961,16 +979,6 @@ export default {
 
 	&__select {
 		width: 100%;
-		padding: 8px;
-		border: 2px solid var(--color-border-maxcontrast);
-		border-radius: var(--border-radius-large);
-		font-size: 14px;
-		background: var(--color-main-background);
-
-		&:focus {
-			outline: none;
-			border-color: var(--color-primary-element);
-		}
 	}
 
 	&__textarea {
