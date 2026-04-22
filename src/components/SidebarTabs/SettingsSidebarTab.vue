@@ -213,7 +213,7 @@
 					{{
 						t(
 							'forms',
-							'Select which email field receives the confirmation email.',
+							'Select which email field is used for confirmation emails.',
 						)
 					}}
 				</li>
