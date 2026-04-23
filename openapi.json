@@ -494,9 +494,6 @@
                     "dateRange": {
                         "type": "boolean"
                     },
-                    "confirmationEmailRecipient": {
-                        "type": "boolean"
-                    },
                     "maxAllowedFilesCount": {
                         "type": "integer",
                         "format": "int64"

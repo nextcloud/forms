@@ -800,7 +800,7 @@ class FormsService {
 			$answerMap[$questionId][] = $answer->getText();
 		}
 
-		$recipientQuestion = $this->getConfirmationEmailRecipientQuestion($questions);
+		$recipientQuestion = $this->getConfirmationEmailRecipientQuestion($form, $questions);
 		if ($recipientQuestion === null) {
 			$this->logger->debug('No confirmation email recipient question is available', [
 				'formId' => $form->getId(),
@@ -893,34 +893,26 @@ class FormsService {
 	 * @param list<FormsQuestion> $questions
 	 * @return FormsQuestion|null
 	 */
-	private function getConfirmationEmailRecipientQuestion(array $questions): ?array {
-		$emailQuestions = array_values(array_filter(
-			$questions,
-			fn (array $question): bool => $this->isConfirmationEmailQuestion($question),
-		));
-
-		if ($emailQuestions === []) {
+	private function getConfirmationEmailRecipientQuestion(Form $form, array $questions): ?array {
+		$recipientQuestionId = $form->getConfirmationEmailRecipient();
+		if ($recipientQuestionId === null) {
 			return null;
 		}
 
-		$explicitRecipients = array_values(array_filter(
-			$emailQuestions,
-			function (array $question): bool {
-				$extraSettings = (array)($question['extraSettings'] ?? []);
-				return !empty($extraSettings['confirmationEmailRecipient']);
-			},
-		));
+		foreach ($questions as $questionData) {
+			if (($questionData['id'] ?? null) !== $recipientQuestionId) {
+				continue;
+			}
 
-		if (count($explicitRecipients) === 1) {
-			return $explicitRecipients[0];
-		}
+			if ($this->isConfirmationEmailQuestion($questionData)) {
+				return $questionData;
+			}
 
-		if (count($explicitRecipients) > 1) {
+			$this->logger->debug('Configured confirmation email recipient question is invalid', [
+				'formId' => $form->getId(),
+				'recipientQuestionId' => $recipientQuestionId,
+			]);
 			return null;
-		}
-
-		if (count($emailQuestions) === 1) {
-			return $emailQuestions[0];
 		}
 
 		return null;
@@ -930,12 +922,10 @@ class FormsService {
 	 * @param FormsQuestion $question
 	 */
 	private function isConfirmationEmailQuestion(array $question): bool {
-		if (($question['type'] ?? null) !== Constants::ANSWER_TYPE_SHORT) {
-			return false;
-		}
-
-		$extraSettings = (array)($question['extraSettings'] ?? []);
-		return ($extraSettings['validationType'] ?? null) === 'email';
+		return Question::isEmailTypeStatic(
+			$question['type'] ?? '',
+			(array)($question['extraSettings'] ?? [])
+		);
 	}
 
 	/**
@@ -1072,11 +1062,6 @@ class FormsService {
 
 			// Special handling of short input for validation
 		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT) {
-			if (!empty($extraSettings['confirmationEmailRecipient'])
-				&& ($extraSettings['validationType'] ?? null) !== 'email') {
-				return false;
-			}
-
 			if (!isset($extraSettings['validationType'])) {
 				return true;
 			}
@@ -1220,5 +1205,30 @@ class FormsService {
 
 	private static function normalizeFileName(string $fileName): string {
 		return trim(str_replace(Constants::FILENAME_INVALID_CHARS, '-', $fileName));
+	}
+
+	/**
+	 * @throws \InvalidArgumentException
+	 */
+	public function validateConfirmationEmailRecipient(Form $form, mixed $recipientId): void {
+		if ($recipientId === null) {
+			return;
+		}
+
+		if (!is_int($recipientId)) {
+			throw new \InvalidArgumentException('Invalid confirmationEmailRecipient');
+		}
+
+		try {
+			$question = $this->questionMapper->findById($recipientId);
+		} catch (IMapperException $e) {
+			throw new \InvalidArgumentException('Invalid confirmationEmailRecipient');
+		}
+
+		if ($question->getFormId() !== $form->getId()
+			|| $question->getOrder() === 0
+			|| !$question->isEmailType()) {
+			throw new \InvalidArgumentException('Invalid confirmationEmailRecipient');
+		}
 	}
 }

@@ -519,6 +519,7 @@ class ApiControllerTest extends TestCase {
 				'confirmationEmailEnabled' => false,
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
+				'confirmationEmailRecipient' => null,
 			]]
 		];
 	}
@@ -1154,6 +1155,221 @@ class ApiControllerTest extends TestCase {
 			->with(1);
 
 		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
+	}
+
+	public function testUpdateFormAllowsValidConfirmationEmailRecipient(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('validateConfirmationEmailRecipient')
+			->with($form, 7);
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$this->assertEquals(new DataResponse(1), $this->apiController->updateForm(1, ['confirmationEmailRecipient' => 7]));
+		$this->assertSame(7, $form->getConfirmationEmailRecipient());
+	}
+
+	public function testUpdateFormRejectsInvalidConfirmationEmailRecipient(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('validateConfirmationEmailRecipient')
+			->with($form, 7)
+			->willThrowException(new \InvalidArgumentException());
+
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['confirmationEmailRecipient' => 7]);
+	}
+
+	public function testUpdateFormRejectsConfirmationEmailRecipientFromAnotherForm(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('validateConfirmationEmailRecipient')
+			->with($form, 7)
+			->willThrowException(new \InvalidArgumentException());
+
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['confirmationEmailRecipient' => 7]);
+	}
+
+	public function testUpdateFormRejectsDeletedConfirmationEmailRecipient(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('validateConfirmationEmailRecipient')
+			->with($form, 7)
+			->willThrowException(new \InvalidArgumentException());
+
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, ['confirmationEmailRecipient' => 7]);
+	}
+
+	public function testUpdateQuestionClearsConfirmationEmailRecipientWhenQuestionStopsBeingEmail(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setConfirmationEmailRecipient(7);
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+		$question->setExtraSettings(['validationType' => 'email']);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+		$this->formsService
+			->method('areExtraSettingsValid')
+			->with(['validationType' => 'text'], Constants::ANSWER_TYPE_SHORT)
+			->willReturn(true);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with(7)
+			->willReturn($question);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(function (Question $updatedQuestion): bool {
+				return $updatedQuestion->getId() === 7;
+			}));
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$this->assertEquals(new DataResponse(7), $this->apiController->updateQuestion(1, 7, [
+			'extraSettings' => ['validationType' => 'text'],
+		]));
+		$this->assertNull($form->getConfirmationEmailRecipient());
+	}
+
+	public function testDeleteQuestionClearsConfirmationEmailRecipientWhenDeletingSelectedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setConfirmationEmailRecipient(7);
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with(7)
+			->willReturn($question);
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with(1)
+			->willReturn([]);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(function (Question $updatedQuestion): bool {
+				return $updatedQuestion->getId() === 7 && $updatedQuestion->getOrder() === 0;
+			}));
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$this->assertEquals(new DataResponse(7), $this->apiController->deleteQuestion(1, 7));
+		$this->assertNull($form->getConfirmationEmailRecipient());
+	}
+
+	public function testCloneFormWithConfirmationEmailRecipient(): void {
+		$this->configService->method('canCreateForms')->willReturn(true);
+
+		$oldForm = Form::fromParams([
+			'id' => 7,
+			'title' => 'Old Form',
+			'ownerId' => 'currentUser',
+			'confirmationEmailRecipient' => 10,
+		]);
+		$this->formsService->method('getFormIfAllowed')->with(7)->willReturn($oldForm);
+		$this->formsService->method('generateFormHash')->willReturn('new hash');
+
+		$question = new Question();
+		$question->setId(10);
+		$question->setFormId(7);
+		$this->questionMapper->method('findByForm')->with(7)->willReturn([$question]);
+
+		$clonedForm = null;
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Form $form) use (&$clonedForm) {
+				$form->setId(14);
+				$clonedForm = $form;
+				return true;
+			}));
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Question $newQuestion) {
+				$newQuestion->setId(11);
+				return true;
+			}));
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(function (Form $form) {
+				return $form->getId() === 14 && $form->getConfirmationEmailRecipient() === 11;
+			}));
+
+		$this->apiController->newForm(7);
+		$this->assertEquals(11, $clonedForm->getConfirmationEmailRecipient());
 	}
 
 	public function testTransferOwnerNotOwner() {

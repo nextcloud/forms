@@ -69,6 +69,7 @@ class FormsMigrator implements IMigrator {
 				$formData['confirmationEmailEnabled'] ??= false;
 				$formData['confirmationEmailSubject'] ??= null;
 				$formData['confirmationEmailBody'] ??= null;
+				$formData['confirmationEmailRecipient'] ??= null;
 				$formData['questions'] = $this->formsService->getQuestions($formData['id']);
 				$formData['submissions'] = $this->submissionService->getSubmissions($formData['id']);
 
@@ -155,6 +156,7 @@ class FormsMigrator implements IMigrator {
 				$form->setConfirmationEmailEnabled($formData['confirmationEmailEnabled'] ?? false);
 				$form->setConfirmationEmailSubject($formData['confirmationEmailSubject'] ?? null);
 				$form->setConfirmationEmailBody($formData['confirmationEmailBody'] ?? null);
+				$form->setConfirmationEmailRecipient(null); // Set to null initially, updated after questions are imported
 
 				$this->formMapper->insert($form);
 
@@ -181,6 +183,12 @@ class FormsMigrator implements IMigrator {
 
 						$this->optionMapper->insert($option);
 					}
+				}
+
+				if (($formData['confirmationEmailRecipient'] ?? null) !== null
+					&& isset($questionIdMap[$formData['confirmationEmailRecipient']])) {
+					$form->setConfirmationEmailRecipient($questionIdMap[$formData['confirmationEmailRecipient']]);
+					$this->formMapper->update($form);
 				}
 
 				foreach ($formData['submissions'] as $submissionData) {

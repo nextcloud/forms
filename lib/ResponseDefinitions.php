@@ -26,7 +26,6 @@ namespace OCA\Forms;
  *   dateMax?: int,
  *   dateMin?: int,
  *   dateRange?: bool,
- *   confirmationEmailRecipient?: bool,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
  *   optionsHighest?: 2|3|4|5|6|7|8|9|10,

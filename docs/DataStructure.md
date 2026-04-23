@@ -24,6 +24,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | confirmationEmailEnabled | Boolean                          |                                         | If enabled, send a confirmation email to the respondent after submission                                                         |
 | confirmationEmailSubject | String                           | max. 255 ch.                            | Optional confirmation email subject template (supports placeholders)                                                              |
 | confirmationEmailBody    | String                           |                                         | Optional confirmation email body template (plain text, supports placeholders)                                                    |
+| confirmationEmailRecipient | Integer                          |                                         | The id of the question belonging to the form, that holds the email address of the respondent                                     |
 | created              | unix timestamp                       |                                         | When the form has been created                                                                                                   |
 | access               | [Access-Object](#access-object)      |                                         | Describing access-settings of the form                                                                                           |
 | expires              | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
@@ -52,6 +53,7 @@ This document describes the Object-Structure, that is used within the Forms App 
   "confirmationEmailEnabled": false,
   "confirmationEmailSubject": null,
   "confirmationEmailBody": null,
+  "confirmationEmailRecipient": null,
   "created": 1611240961,
   "access": {},
   "expires": 0,

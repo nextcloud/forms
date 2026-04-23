@@ -47,8 +47,8 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
-use OCP\BackgroundJob\IJobList;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\BackgroundJob\IJobList;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -327,14 +327,14 @@ class FormsServiceTest extends TestCase {
 				'lockedBy' => null,
 				'lockedUntil' => null,
 				'maxSubmissions' => null,
-					'isMaxSubmissionsReached' => false,
-					'confirmationEmailEnabled' => false,
-					'confirmationEmailSubject' => null,
-					'confirmationEmailBody' => null,
-					'confirmationEmailRecipient' => null,
-				]]
-			];
-		}
+				'isMaxSubmissionsReached' => false,
+				'confirmationEmailEnabled' => false,
+				'confirmationEmailSubject' => null,
+				'confirmationEmailBody' => null,
+				'confirmationEmailRecipient' => null,
+			]]
+		];
+	}
 
 	#[DataProvider('dataGetForm')]
 	public function testGetForm(array $expected) {
@@ -548,14 +548,14 @@ class FormsServiceTest extends TestCase {
 				'lockedBy' => null,
 				'lockedUntil' => null,
 				'maxSubmissions' => null,
-					'isMaxSubmissionsReached' => false,
-					'confirmationEmailEnabled' => false,
-					'confirmationEmailSubject' => null,
-					'confirmationEmailBody' => null,
-					'confirmationEmailRecipient' => null,
-				]]
-			];
-		}
+				'isMaxSubmissionsReached' => false,
+				'confirmationEmailEnabled' => false,
+				'confirmationEmailSubject' => null,
+				'confirmationEmailBody' => null,
+				'confirmationEmailRecipient' => null,
+			]]
+		];
+	}
 
 	#[DataProvider('dataGetPublicForm')]
 	public function testGetPublicForm(array $expected) {
@@ -1371,6 +1371,7 @@ class FormsServiceTest extends TestCase {
 			'title' => 'My Form',
 			'description' => 'My Desc',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Thanks {name}',
 			'confirmationEmailBody' => 'Hello {name}',
 		]);
@@ -1446,6 +1447,7 @@ class FormsServiceTest extends TestCase {
 			'title' => 'My Form',
 			'description' => 'My Desc',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Subject {formTitle}',
 			'confirmationEmailBody' => 'Body {formDescription}',
 		]);
@@ -1499,7 +1501,7 @@ class FormsServiceTest extends TestCase {
 		$formsService->notifyNewSubmission($form, $submission);
 	}
 
-	public function testNotifyNewSubmissionConfirmationEmailUsesFirstEmailField(): void {
+	public function testNotifyNewSubmissionConfirmationEmailUsesConfiguredRecipientQuestion(): void {
 		$submission = new Submission();
 		$submission->setId(99);
 		$submission->setUserId('someUser');
@@ -1510,6 +1512,7 @@ class FormsServiceTest extends TestCase {
 			'title' => 'My Form',
 			'description' => 'My Desc',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Thanks',
 			'confirmationEmailBody' => 'Hello',
 		]);
@@ -1520,7 +1523,7 @@ class FormsServiceTest extends TestCase {
 				'type' => Constants::ANSWER_TYPE_SHORT,
 				'text' => 'Email 1',
 				'name' => 'email1',
-				'extraSettings' => ['validationType' => 'email', 'confirmationEmailRecipient' => true],
+				'extraSettings' => ['validationType' => 'email'],
 			],
 			[
 				'id' => 2,
@@ -1589,6 +1592,7 @@ class FormsServiceTest extends TestCase {
 			'title' => 'My Form',
 			'description' => 'My Desc',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Hello {fullname}',
 			'confirmationEmailBody' => 'Body',
 		]);
@@ -1662,6 +1666,7 @@ class FormsServiceTest extends TestCase {
 			'title' => 'My Form',
 			'description' => 'My Desc',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => '',
 			'confirmationEmailBody' => '',
 		]);
@@ -1725,6 +1730,7 @@ class FormsServiceTest extends TestCase {
 			'id' => 42,
 			'ownerId' => 'ownerUser',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 2,
 			'confirmationEmailSubject' => 'Thanks',
 			'confirmationEmailBody' => 'Hello',
 		]);
@@ -1742,10 +1748,7 @@ class FormsServiceTest extends TestCase {
 				'type' => Constants::ANSWER_TYPE_SHORT,
 				'text' => 'Private email',
 				'name' => 'privateEmail',
-				'extraSettings' => [
-					'validationType' => 'email',
-					'confirmationEmailRecipient' => true,
-				],
+				'extraSettings' => ['validationType' => 'email'],
 			],
 		];
 
@@ -1861,6 +1864,7 @@ class FormsServiceTest extends TestCase {
 			'ownerId' => 'ownerUser',
 			'title' => 'My Form',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Thanks',
 			'confirmationEmailBody' => 'Hello',
 		]);
@@ -1885,15 +1889,12 @@ class FormsServiceTest extends TestCase {
 			->with(99)
 			->willReturn([$nameAnswer]);
 
-		$this->logger->expects($this->once())
+		$logged = [];
+		$this->logger->expects($this->exactly(2))
 			->method('debug')
-			->with(
-				'No confirmation email recipient question is available',
-				[
-					'formId' => 42,
-					'submissionId' => 99,
-				]
-			);
+			->willReturnCallback(function (string $message, array $context) use (&$logged): void {
+				$logged[] = [$message, $context];
+			});
 
 		$this->jobList->expects($this->never())->method('add');
 
@@ -1906,6 +1907,23 @@ class FormsServiceTest extends TestCase {
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
 
 		$formsService->notifyNewSubmission($form, $submission);
+
+		$this->assertSame([
+			[
+				'Configured confirmation email recipient question is invalid',
+				[
+					'formId' => 42,
+					'recipientQuestionId' => 1,
+				],
+			],
+			[
+				'No confirmation email recipient question is available',
+				[
+					'formId' => 42,
+					'submissionId' => 99,
+				],
+			],
+		], $logged);
 	}
 
 	public function testNotifyNewSubmissionQueuesConfirmationEmail(): void {
@@ -1918,6 +1936,7 @@ class FormsServiceTest extends TestCase {
 			'ownerId' => 'ownerUser',
 			'title' => 'My Form',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Thanks',
 			'confirmationEmailBody' => 'Hello',
 		]);
@@ -1981,6 +2000,7 @@ class FormsServiceTest extends TestCase {
 			'ownerId' => 'ownerUser',
 			'title' => 'My Form',
 			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
 			'confirmationEmailSubject' => 'Thanks',
 			'confirmationEmailBody' => 'Hello',
 		]);
@@ -2079,29 +2099,6 @@ class FormsServiceTest extends TestCase {
 				],
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => true
-			],
-			'valid-confirmation-recipient' => [
-				'extraSettings' => [
-					'confirmationEmailRecipient' => true,
-					'validationType' => 'email',
-				],
-				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'expected' => true
-			],
-			'invalid-confirmation-recipient-without-email-validation' => [
-				'extraSettings' => [
-					'confirmationEmailRecipient' => true,
-				],
-				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'expected' => false
-			],
-			'invalid-confirmation-recipient-on-non-email-short-question' => [
-				'extraSettings' => [
-					'confirmationEmailRecipient' => true,
-					'validationType' => 'number',
-				],
-				'questionType' => Constants::ANSWER_TYPE_SHORT,
-				'expected' => false
 			],
 			'valid-options-limit' => [
 				'extraSettings' => [
@@ -2409,9 +2406,127 @@ class FormsServiceTest extends TestCase {
 		$this->assertEmpty($result);
 	}
 
-	private function createQuestionEntity(array $data): Question {
+	public function testNotifyNewSubmissionConfirmationEmailFailsIfRecipientQuestionIsNoLongerEmail(): void {
+		$submission = new Submission();
+		$submission->setId(99);
+		$submission->setUserId('someUser');
+
+		$form = Form::fromParams([
+			'id' => 42,
+			'ownerId' => 'ownerUser',
+			'title' => 'My Form',
+			'confirmationEmailEnabled' => true,
+			'confirmationEmailRecipient' => 1,
+		]);
+
+		$questions = [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_LONG, // Changed from short to long
+				'text' => 'Not an email anymore',
+				'name' => 'email',
+			],
+		];
+
+		$this->logger->expects($this->exactly(2))
+			->method('debug')
+			->willReturnCallback(function (string $message, array $context) use (&$logged): void {
+				$logged[] = [$message, $context];
+			});
+
+		$this->jobList->expects($this->never())->method('add');
+
+		$formsService = $this->createFormsServiceWithEventDispatcher($this->createMock(IEventDispatcher::class));
+		$formsService->method('getQuestions')->with(42)->willReturn($questions);
+
+		$formsService->notifyNewSubmission($form, $submission);
+
+		$this->assertSame([
+			[
+				'Configured confirmation email recipient question is invalid',
+				[
+					'formId' => 42,
+					'recipientQuestionId' => 1,
+				],
+			],
+			[
+				'No confirmation email recipient question is available',
+				[
+					'formId' => 42,
+					'submissionId' => 99,
+				],
+			],
+		], $logged);
+	}
+
+	private function createQuestionEntity(array $data): MockObject {
 		$questionEntity = $this->createMock(Question::class);
 		$questionEntity->method('read')->willReturn($data);
 		return $questionEntity;
+	}
+
+	public function testValidateConfirmationEmailRecipientAllowsNull(): void {
+		$form = new Form();
+		$this->formsService->validateConfirmationEmailRecipient($form, null);
+		$this->assertTrue(true); // Should not throw exception
+	}
+
+	public function testValidateConfirmationEmailRecipientRejectsNonInt(): void {
+		$form = new Form();
+		$this->expectException(\InvalidArgumentException::class);
+		$this->formsService->validateConfirmationEmailRecipient($form, '7');
+	}
+
+	public function testValidateConfirmationEmailRecipientRejectsNotFoundQuestion(): void {
+		$form = new Form();
+		$this->questionMapper->method('findById')->willThrowException(new DoesNotExistException(''));
+		$this->expectException(\InvalidArgumentException::class);
+		$this->formsService->validateConfirmationEmailRecipient($form, 7);
+	}
+
+	public function testValidateConfirmationEmailRecipientRejectsMismatchedForm(): void {
+		$form = new Form();
+		$form->setId(1);
+		$question = new Question();
+		$question->setFormId(2);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->expectException(\InvalidArgumentException::class);
+		$this->formsService->validateConfirmationEmailRecipient($form, 7);
+	}
+
+	public function testValidateConfirmationEmailRecipientRejectsDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$question = new Question();
+		$question->setFormId(1);
+		$question->setOrder(0);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->expectException(\InvalidArgumentException::class);
+		$this->formsService->validateConfirmationEmailRecipient($form, 7);
+	}
+
+	public function testValidateConfirmationEmailRecipientRejectsNonEmailQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$question = new Question();
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_LONG);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->expectException(\InvalidArgumentException::class);
+		$this->formsService->validateConfirmationEmailRecipient($form, 7);
+	}
+
+	public function testValidateConfirmationEmailRecipientAllowsValidQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$question = new Question();
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+		$question->setExtraSettings(['validationType' => 'email']);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->formsService->validateConfirmationEmailRecipient($form, 7);
+		$this->assertTrue(true); // Should not throw exception
 	}
 }

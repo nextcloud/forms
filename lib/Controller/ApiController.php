@@ -208,12 +208,15 @@ class ApiController extends OCSController {
 			$formData['showExpiration'] = false;
 			$formData['expires'] = 0;
 			$formData['isAnonymous'] = false;
+			$formData['confirmationEmailRecipient'] = null;
 
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
 
 			// Get Questions, set new formId, reinsert
 			$questions = $this->questionMapper->findByForm($oldForm->getId());
+			$oldConfirmationEmailRecipient = $oldForm->getConfirmationEmailRecipient();
+
 			foreach ($questions as $oldQuestion) {
 				$questionData = $oldQuestion->read();
 
@@ -221,6 +224,12 @@ class ApiController extends OCSController {
 				$questionData['formId'] = $form->getId();
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
+
+				// Map the confirmation email recipient if this question matches
+				if ($oldConfirmationEmailRecipient === $oldQuestion->getId()) {
+					$form->setConfirmationEmailRecipient($newQuestion->getId());
+					$this->formMapper->update($form);
+				}
 
 				// Get Options, set new QuestionId, reinsert
 				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
@@ -334,6 +343,14 @@ class ApiController extends OCSController {
 		unset($keyValuePairs['path']);
 		unset($keyValuePairs['fileId']);
 		unset($keyValuePairs['fileFormat']);
+
+		if (array_key_exists('confirmationEmailRecipient', $keyValuePairs)) {
+			try {
+				$this->formsService->validateConfirmationEmailRecipient($form, $keyValuePairs['confirmationEmailRecipient']);
+			} catch (\InvalidArgumentException $e) {
+				throw new OCSBadRequestException('Invalid confirmationEmailRecipient, will not update.');
+			}
+		}
 
 		// Create FormEntity with given Params & Id.
 		foreach ($keyValuePairs as $key => $value) {
@@ -651,6 +668,11 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
+		if ($form->getConfirmationEmailRecipient() === $question->getId()
+			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)) {
+			$form->setConfirmationEmailRecipient(null);
+		}
+
 		// Create QuestionEntity with given Params & Id.
 		$question = Question::fromParams($keyValuePairs);
 		$question->setId($questionId);
@@ -720,6 +742,10 @@ class ApiController extends OCSController {
 				$question->setOrder($questionOrder - 1);
 				$this->questionMapper->update($question);
 			}
+		}
+
+		if ($form->getConfirmationEmailRecipient() === $questionId) {
+			$form->setConfirmationEmailRecipient(null);
 		}
 
 		$this->formMapper->update($form);
