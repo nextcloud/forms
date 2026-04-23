@@ -952,4 +952,155 @@ class ShareApiControllerTest extends TestCase {
 		$this->expectException(NoSuchFormException::class);
 		$this->shareApiController->updateShare(7331, 1337, [Constants::PERMISSION_SUBMIT]);
 	}
+
+	public function testUpdateShareToken() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->configService->expects($this->once())
+			->method('getAllowCustomPublicToken')
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(5)
+			->willReturn($form);
+
+		$share = new Share();
+		$share->setId(8);
+		$share->setFormId(5);
+		$share->setShareType(IShare::TYPE_LINK);
+		$share->setShareWith('abcdefgh');
+		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(8)
+			->willReturn($share);
+
+		$this->shareMapper->expects($this->once())
+			->method('findPublicShareByHash')
+			->with('tokenabcd')
+			->willThrowException(new DoesNotExistException('Not found'));
+
+		$this->shareMapper->expects($this->once())
+			->method('update')
+			->willReturnCallback(function (Share $updatedShare) {
+				$this->assertSame('tokenabcd', $updatedShare->getShareWith());
+				return $updatedShare;
+			});
+
+		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShareToken(5, 8, 'tokenabcd'));
+	}
+
+	public function testUpdateShareToken_CustomTokensDisabled() {
+		$this->configService->expects($this->once())
+			->method('getAllowCustomPublicToken')
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->shareApiController->updateShareToken(5, 8, 'tokenabcd');
+	}
+
+	public function testUpdateShareToken_ForbiddenForNonLinkShare() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->configService->expects($this->once())
+			->method('getAllowCustomPublicToken')
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(5)
+			->willReturn($form);
+
+		$share = new Share();
+		$share->setId(8);
+		$share->setFormId(5);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('user1');
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(8)
+			->willReturn($share);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->shareApiController->updateShareToken(5, 8, 'tokenabcd');
+	}
+
+	public function testUpdateShareToken_DuplicateHash() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->configService->expects($this->once())
+			->method('getAllowCustomPublicToken')
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(5)
+			->willReturn($form);
+
+		$currentShare = new Share();
+		$currentShare->setId(8);
+		$currentShare->setFormId(5);
+		$currentShare->setShareType(IShare::TYPE_LINK);
+		$currentShare->setShareWith('abcdefgh');
+
+		$existingShare = new Share();
+		$existingShare->setId(9);
+		$existingShare->setFormId(5);
+		$existingShare->setShareType(IShare::TYPE_LINK);
+		$existingShare->setShareWith('tokenabcd');
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(8)
+			->willReturn($currentShare);
+
+		$this->shareMapper->expects($this->once())
+			->method('findPublicShareByHash')
+			->with('tokenabcd')
+			->willReturn($existingShare);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->shareApiController->updateShareToken(5, 8, 'tokenabcd');
+	}
+
+	public function testUpdateShareToken_InvalidToken() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->configService->expects($this->once())
+			->method('getAllowCustomPublicToken')
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(5)
+			->willReturn($form);
+
+		$share = new Share();
+		$share->setId(8);
+		$share->setFormId(5);
+		$share->setShareType(IShare::TYPE_LINK);
+		$share->setShareWith('abcdefgh');
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(8)
+			->willReturn($share);
+
+		$this->shareMapper->expects($this->never())
+			->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->shareApiController->updateShareToken(5, 8, 'invalid-token');
+	}
 }

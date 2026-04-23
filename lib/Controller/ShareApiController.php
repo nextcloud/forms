@@ -302,6 +302,85 @@ class ShareApiController extends OCSController {
 	}
 
 	/**
+	 * Update token/hash of a public link share
+	 *
+	 * @param int $formId of the form
+	 * @param int $shareId of the share to update
+	 * @param string $token The new share token
+	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @throws OCSBadRequestException Share doesn't belong to given Form
+	 * @throws OCSBadRequestException Invalid share token
+	 * @throws OCSBadRequestException Share hash exists, please retry
+	 * @throws OCSForbiddenException Custom public share tokens are not allowed
+	 * @throws OCSForbiddenException Not allowed to update token on non-link share
+	 * @throws OCSForbiddenException This form is not owned by the current user
+	 * @throws OCSNotFoundException Could not find share
+	 *
+	 * 200: the id of the updated share
+	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/shares/{shareId}/token')]
+	public function updateShareToken(int $formId, int $shareId, string $token): DataResponse {
+		$this->logger->debug('Updating share token: {shareId} of form {formId}', [
+			'formId' => $formId,
+			'shareId' => $shareId,
+		]);
+
+		if (!$this->configService->getAllowCustomPublicToken()) {
+			$this->logger->debug('Custom public share tokens are not allowed.');
+			throw new OCSForbiddenException('Custom public share tokens are not allowed.');
+		}
+
+		$form = $this->formsService->getFormIfAllowed($formId);
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
+
+		try {
+			$formShare = $this->shareMapper->findById($shareId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find share', ['exception' => $e]);
+			throw new OCSNotFoundException('Could not find share');
+		}
+
+		if ($formId !== $formShare->getFormId()) {
+			$this->logger->debug('This share doesn\'t belong to the given Form');
+			throw new OCSBadRequestException('Share doesn\'t belong to given Form');
+		}
+
+		if ($formShare->getShareType() !== IShare::TYPE_LINK) {
+			$this->logger->debug('Not allowed to update token on non-link share');
+			throw new OCSForbiddenException('Not allowed to update token on non-link share');
+		}
+
+		if ($token === $formShare->getShareWith()) {
+			return new DataResponse($formShare->getId());
+		}
+
+		$this->validatePublicShareToken($token);
+
+		try {
+			$existingShare = $this->shareMapper->findPublicShareByHash($token);
+			if ($existingShare->getId() !== $formShare->getId()) {
+				$this->logger->debug('Share hash already exists.');
+				throw new OCSBadRequestException('Share hash exists, please retry.');
+			}
+		} catch (DoesNotExistException $e) {
+			// Just continue, this is what we expect to happen (share hash not existing yet).
+		}
+
+		$this->formsService->obtainFormLock($form);
+
+		$formShare->setShareWith($token);
+		$formShare = $this->shareMapper->update($formShare);
+		$this->formMapper->update($form);
+
+		return new DataResponse($formShare->getId());
+	}
+
+	/**
 	 * Delete a share
 	 *
 	 * @param int $formId of the form
@@ -420,5 +499,23 @@ class ShareApiController extends OCSController {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * @throws OCSBadRequestException If token does not satisfy basic safety checks
+	 */
+	private function validatePublicShareToken(string $token): void {
+		if ($token !== trim($token)) {
+			throw new OCSBadRequestException('Invalid share token');
+		}
+
+		$tokenLength = strlen($token);
+		if ($tokenLength < Constants::PUBLIC_SHARE_TOKEN_MIN_LENGTH || $tokenLength > Constants::PUBLIC_SHARE_TOKEN_MAX_LENGTH) {
+			throw new OCSBadRequestException('Invalid share token');
+		}
+
+		if (preg_match('/^[a-zA-Z0-9]+$/', $token) !== 1) {
+			throw new OCSBadRequestException('Invalid share token');
+		}
 	}
 }

@@ -653,6 +653,30 @@ Update a single or all properties of an option-object
 "data": 5
 ```
 
+### Update a Public Share Token
+
+- Endpoint: `/api/v3/forms/{formId}/shares/{shareId}/token`
+- Method: `PATCH`
+- Url-Parameters:
+  | Parameter | Type | Description |
+  |-----------|---------|-------------|
+  | _formId_ | Integer | ID of the form containing the share |
+  | _shareId_ | Integer | ID of the public link share to update |
+- Parameters:
+  | Parameter | Type | Description |
+  |-----------|---------|-------------|
+  | _token_ | String | New token for the public share link |
+- Restrictions:
+  - Only available when the admin setting _allowCustomPublicShareTokens_ is enabled.
+  - Only link shares can be updated.
+  - Token must be unique among link shares and only contain alphanumeric characters.
+  - Token length must be between 8 and 256 characters.
+- Response: **Status-Code OK**, as well as the id of the updated share.
+
+```
+"data": 5
+```
+
 ## Submission Endpoints
 
 ### Get Form Submissions
