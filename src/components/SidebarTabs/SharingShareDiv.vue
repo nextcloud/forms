@@ -14,7 +14,7 @@
 			<span>{{ displayName }}</span>
 			<span>{{ displayNameAppendix }}</span>
 		</div>
-		<NcActions class="share-div__actions">
+		<NcActions class="share-div__actions" :disabled="!isCurrentUserOwner">
 			<NcActionCaption :name="t('forms', 'Permissions')" />
 			<NcActionCheckbox
 				:model-value="canEditForm"
@@ -77,6 +77,11 @@ export default {
 		},
 
 		locked: {
+			type: Boolean,
+			required: true,
+		},
+
+		isCurrentUserOwner: {
 			type: Boolean,
 			required: true,
 		},
