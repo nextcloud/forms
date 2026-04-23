@@ -31,12 +31,14 @@ use OCA\Forms\Service\SubmissionService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AnonRateLimit;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -1353,6 +1355,8 @@ class ApiController extends OCSController {
 	 *
 	 * 201: empty response
 	 */
+	#[AnonRateLimit(limit: 3, period: 3600)]
+	#[UserRateLimit(limit: 10, period: 3600)]
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]

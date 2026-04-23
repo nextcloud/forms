@@ -47,20 +47,22 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCP\BackgroundJob\IJobList;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\ICacheFactory;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IL10N;
+use OCP\IMemcache;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IEmailValidator;
 use OCP\Mail\IMailer;
-use OCP\Mail\IMessage;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -125,6 +127,15 @@ class FormsServiceTest extends TestCase {
 	/** @var AnswerMapper|MockObject */
 	private $answerMapper;
 
+	/** @var IJobList|MockObject */
+	private $jobList;
+
+	/** @var ICacheFactory|MockObject */
+	private $cacheFactory;
+
+	/** @var IMemcache|MockObject */
+	private $cache;
+
 	public function setUp(): void {
 		parent::setUp();
 		$this->activityManager = $this->createMock(ActivityManager::class);
@@ -138,6 +149,9 @@ class FormsServiceTest extends TestCase {
 		$this->mailer = $this->createMock(IMailer::class);
 		$this->emailValidator = $this->createMock(IEmailValidator::class);
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
+		$this->jobList = $this->createMock(IJobList::class);
+		$this->cacheFactory = $this->createMock(ICacheFactory::class);
+		$this->cache = $this->createMock(IMemcache::class);
 		$this->groupManager = $this->createMock(IGroupManager::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
@@ -163,6 +177,9 @@ class FormsServiceTest extends TestCase {
 				}
 				return $text;
 			}));
+		$this->configService->method('getAllowConfirmationEmail')->willReturn(true);
+		$this->cacheFactory->method('createDistributed')->with('forms_confirmation_email')->willReturn($this->cache);
+		$this->cache->method('add')->willReturn(true);
 
 		$this->formsService = new FormsService(
 			$userSession,
@@ -184,7 +201,38 @@ class FormsServiceTest extends TestCase {
 			$this->mailer,
 			$this->emailValidator,
 			$this->answerMapper,
+			$this->jobList,
+			$this->cacheFactory,
 		);
+	}
+
+	private function createFormsServiceWithEventDispatcher(IEventDispatcher $eventDispatcher): FormsService {
+		return $this->getMockBuilder(FormsService::class)
+			->onlyMethods(['getShares', 'getQuestions'])
+			->setConstructorArgs([
+				$this->createMock(IUserSession::class),
+				$this->activityManager,
+				$this->formMapper,
+				$this->optionMapper,
+				$this->questionMapper,
+				$this->shareMapper,
+				$this->submissionMapper,
+				$this->configService,
+				$this->groupManager,
+				$this->userManager,
+				$this->secureRandom,
+				$this->circlesService,
+				$this->storage,
+				$this->l10n,
+				$this->logger,
+				$eventDispatcher,
+				$this->mailer,
+				$this->emailValidator,
+				$this->answerMapper,
+				$this->jobList,
+				$this->cacheFactory,
+			])
+			->getMock();
 	}
 
 	public function testGenerateFormHash() {
@@ -279,13 +327,14 @@ class FormsServiceTest extends TestCase {
 				'lockedBy' => null,
 				'lockedUntil' => null,
 				'maxSubmissions' => null,
-				'isMaxSubmissionsReached' => false,
-				'confirmationEmailEnabled' => false,
-				'confirmationEmailSubject' => null,
-				'confirmationEmailBody' => null,
-			]]
-		];
-	}
+					'isMaxSubmissionsReached' => false,
+					'confirmationEmailEnabled' => false,
+					'confirmationEmailSubject' => null,
+					'confirmationEmailBody' => null,
+					'confirmationEmailRecipient' => null,
+				]]
+			];
+		}
 
 	#[DataProvider('dataGetForm')]
 	public function testGetForm(array $expected) {
@@ -499,13 +548,14 @@ class FormsServiceTest extends TestCase {
 				'lockedBy' => null,
 				'lockedUntil' => null,
 				'maxSubmissions' => null,
-				'isMaxSubmissionsReached' => false,
-				'confirmationEmailEnabled' => false,
-				'confirmationEmailSubject' => null,
-				'confirmationEmailBody' => null,
-			]]
-		];
-	}
+					'isMaxSubmissionsReached' => false,
+					'confirmationEmailEnabled' => false,
+					'confirmationEmailSubject' => null,
+					'confirmationEmailBody' => null,
+					'confirmationEmailRecipient' => null,
+				]]
+			];
+		}
 
 	#[DataProvider('dataGetPublicForm')]
 	public function testGetPublicForm(array $expected) {
@@ -673,6 +723,8 @@ class FormsServiceTest extends TestCase {
 			$this->mailer,
 			$this->emailValidator,
 			$this->answerMapper,
+			$this->jobList,
+			$this->cacheFactory,
 		);
 
 		$form = new Form();
@@ -900,6 +952,8 @@ class FormsServiceTest extends TestCase {
 			$this->mailer,
 			$this->emailValidator,
 			$this->answerMapper,
+			$this->jobList,
+			$this->cacheFactory,
 		);
 
 		$this->assertEquals(true, $formsService->canSubmit($form));
@@ -1010,6 +1064,8 @@ class FormsServiceTest extends TestCase {
 			$this->mailer,
 			$this->emailValidator,
 			$this->answerMapper,
+			$this->jobList,
+			$this->cacheFactory,
 		);
 
 		$form = new Form();
@@ -1235,6 +1291,8 @@ class FormsServiceTest extends TestCase {
 				$this->mailer,
 				$this->emailValidator,
 				$this->answerMapper,
+				$this->jobList,
+				$this->cacheFactory,
 			])
 			->getMock();
 
@@ -1290,12 +1348,14 @@ class FormsServiceTest extends TestCase {
 				$this->mailer,
 				$this->emailValidator,
 				$this->answerMapper,
+				$this->jobList,
+				$this->cacheFactory,
 			])
 			->getMock();
 
 		$formsService->method('getShares')->willReturn([]);
 
-		$this->mailer->expects($this->never())->method('send');
+		$this->jobList->expects($this->never())->method('add');
 
 		$formsService->notifyNewSubmission($form, $submission);
 	}
@@ -1352,56 +1412,22 @@ class FormsServiceTest extends TestCase {
 			->with('respondent@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-
-		$message->expects($this->once())
-			->method('setSubject')
-			->with('Thanks Ada');
-		$message->expects($this->once())
-			->method('setTo')
-			->with(['respondent@example.com']);
-		$message->expects($this->once())
-			->method('setPlainBody')
-			->with($this->callback(function (string $body): bool {
-				$this->assertStringContainsString('Hello Ada', $body);
-				return true;
-			}));
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message);
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				$this->callback(function (array $payload): bool {
+					$this->assertSame('respondent@example.com', $payload['recipient']);
+					$this->assertSame('Thanks Ada', $payload['subject']);
+					$this->assertStringContainsString('Hello Ada', $payload['body']);
+					return true;
+				})
+			);
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -1449,52 +1475,23 @@ class FormsServiceTest extends TestCase {
 			->with('respondent@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-		$message->expects($this->once())
-			->method('setSubject')
-			->with('Subject My Form');
-		$message->expects($this->once())
-			->method('setTo')
-			->with(['respondent@example.com']);
-		$message->expects($this->once())
-			->method('setPlainBody')
-			->with('Body My Desc');
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message);
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				[
+					'recipient' => 'respondent@example.com',
+					'subject' => 'Subject My Form',
+					'body' => 'Body My Desc',
+					'formId' => 42,
+					'submissionId' => 99,
+				]
+			);
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -1554,18 +1551,15 @@ class FormsServiceTest extends TestCase {
 			->with('first@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-		$message->expects($this->once())
-			->method('setTo')
-			->with(['first@example.com']);
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message);
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				$this->callback(function (array $payload): bool {
+					$this->assertSame('first@example.com', $payload['recipient']);
+					return true;
+				})
+			);
 
 		$logged = [];
 		$this->logger->method('debug')
@@ -1576,30 +1570,7 @@ class FormsServiceTest extends TestCase {
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -1659,46 +1630,20 @@ class FormsServiceTest extends TestCase {
 			->with('respondent@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-		$message->expects($this->once())
-			->method('setSubject')
-			->with('Hello Ada');
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message);
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				$this->callback(function (array $payload): bool {
+					$this->assertSame('Hello Ada', $payload['subject']);
+					return true;
+				})
+			);
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -1746,56 +1691,24 @@ class FormsServiceTest extends TestCase {
 			->with('respondent@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-
-		$message->expects($this->once())
-			->method('setSubject')
-			->with('Thank you for your submission');
-		$message->expects($this->once())
-			->method('setTo')
-			->with(['respondent@example.com']);
-		$message->expects($this->once())
-			->method('setPlainBody')
-			->with($this->callback(function (string $body): bool {
-				$this->assertStringContainsString('Thank you for submitting the form "My Form"', $body);
-				return true;
-			}));
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message);
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				$this->callback(function (array $payload): bool {
+					$this->assertSame('respondent@example.com', $payload['recipient']);
+					$this->assertSame('Thank you for your submission', $payload['subject']);
+					$this->assertStringContainsString('Thank you for submitting the form "My Form"', $payload['body']);
+					$this->assertSame(42, $payload['formId']);
+					$this->assertSame(99, $payload['submissionId']);
+					return true;
+				})
+			);
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -1856,45 +1769,23 @@ class FormsServiceTest extends TestCase {
 			->with('private@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-		$message->expects($this->once())->method('setSubject')->with('Thanks');
-		$message->expects($this->once())->method('setPlainBody')->with('Hello');
-		$message->expects($this->once())->method('setTo')->with(['private@example.com']);
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message);
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				[
+					'recipient' => 'private@example.com',
+					'subject' => 'Thanks',
+					'body' => 'Hello',
+					'formId' => 42,
+					'submissionId' => 99,
+				]
+			);
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -1947,35 +1838,12 @@ class FormsServiceTest extends TestCase {
 					'submissionId' => 99,
 				]
 			);
-		$this->mailer->expects($this->never())->method('send');
+		$this->jobList->expects($this->never())->method('add');
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -2027,35 +1895,12 @@ class FormsServiceTest extends TestCase {
 				]
 			);
 
-		$this->mailer->expects($this->never())->method('send');
+		$this->jobList->expects($this->never())->method('add');
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);
@@ -2063,7 +1908,7 @@ class FormsServiceTest extends TestCase {
 		$formsService->notifyNewSubmission($form, $submission);
 	}
 
-	public function testNotifyNewSubmissionHandlesEmailException(): void {
+	public function testNotifyNewSubmissionQueuesConfirmationEmail(): void {
 		$submission = new Submission();
 		$submission->setId(99);
 		$submission->setUserId('someUser');
@@ -2102,61 +1947,101 @@ class FormsServiceTest extends TestCase {
 			->with('respondent@example.com')
 			->willReturn(true);
 
-		$message = $this->createMock(IMessage::class);
-		$message->expects($this->once())->method('setSubject')->with('Thanks');
-		$message->expects($this->once())->method('setPlainBody')->with('Hello');
-		$message->expects($this->once())->method('setTo')->with(['respondent@example.com']);
-
-		$this->mailer->expects($this->once())
-			->method('createMessage')
-			->willReturn($message);
-
-		$exception = new \Exception('Mail server error');
-		$this->mailer->expects($this->once())
-			->method('send')
-			->with($message)
-			->willThrowException($exception);
-
-		$this->logger->expects($this->once())
-			->method('error')
+		$this->jobList->expects($this->once())
+			->method('add')
 			->with(
-				'Error while sending confirmation email',
-				$this->callback(function (array $context): bool {
-					$this->assertArrayHasKey('exception', $context);
-					$this->assertInstanceOf(\Exception::class, $context['exception']);
-					$this->assertEquals(42, $context['formId']);
-					$this->assertEquals(99, $context['submissionId']);
-					return true;
-				})
+				\OCA\Forms\BackgroundJob\SendConfirmationMailJob::class,
+				[
+					'recipient' => 'respondent@example.com',
+					'subject' => 'Thanks',
+					'body' => 'Hello',
+					'formId' => 42,
+					'submissionId' => 99,
+				]
 			);
 
 		$eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
 
-		$formsService = $this->getMockBuilder(FormsService::class)
-			->onlyMethods(['getShares', 'getQuestions'])
-			->setConstructorArgs([
-				$this->createMock(IUserSession::class),
-				$this->activityManager,
-				$this->formMapper,
-				$this->optionMapper,
-				$this->questionMapper,
-				$this->shareMapper,
-				$this->submissionMapper,
-				$this->configService,
-				$this->groupManager,
-				$this->userManager,
-				$this->secureRandom,
-				$this->circlesService,
-				$this->storage,
-				$this->l10n,
-				$this->logger,
-				$eventDispatcher,
-				$this->mailer,
-				$this->emailValidator,
-				$this->answerMapper,
-			])
-			->getMock();
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
+
+		$formsService->method('getShares')->willReturn([]);
+		$formsService->method('getQuestions')->with(42)->willReturn($questions);
+
+		$formsService->notifyNewSubmission($form, $submission);
+	}
+
+	public function testNotifyNewSubmissionSkipsConfirmationEmailWhenRecipientRateLimitIsReached(): void {
+		$submission = new Submission();
+		$submission->setId(99);
+		$submission->setUserId('someUser');
+
+		$form = Form::fromParams([
+			'id' => 42,
+			'ownerId' => 'ownerUser',
+			'title' => 'My Form',
+			'confirmationEmailEnabled' => true,
+			'confirmationEmailSubject' => 'Thanks',
+			'confirmationEmailBody' => 'Hello',
+		]);
+
+		$questions = [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+				'text' => 'Email',
+				'name' => 'email',
+				'extraSettings' => ['validationType' => 'email'],
+			],
+		];
+
+		$emailAnswer = new Answer();
+		$emailAnswer->setSubmissionId(99);
+		$emailAnswer->setQuestionId(1);
+		$emailAnswer->setText('respondent@example.com');
+
+		$this->answerMapper->expects($this->once())
+			->method('findBySubmission')
+			->with(99)
+			->willReturn([$emailAnswer]);
+
+		$this->emailValidator->expects($this->once())
+			->method('isValid')
+			->with('respondent@example.com')
+			->willReturn(true);
+
+		$this->cacheFactory = $this->createMock(ICacheFactory::class);
+		$this->cache = $this->createMock(IMemcache::class);
+		$this->cacheFactory->expects($this->once())
+			->method('createDistributed')
+			->with('forms_confirmation_email')
+			->willReturn($this->cache);
+
+		$cacheKey = 'email_rl_' . hash('sha256', '42:respondent@example.com');
+		$this->cache->expects($this->once())
+			->method('add')
+			->with($cacheKey, 1, 86400)
+			->willReturn(false);
+		$this->cache->expects($this->once())
+			->method('inc')
+			->with($cacheKey)
+			->willReturn(4);
+
+		$this->jobList->expects($this->never())->method('add');
+		$this->logger->expects($this->once())
+			->method('warning')
+			->with(
+				'Per-recipient confirmation email rate limit reached',
+				[
+					'formId' => 42,
+					'submissionId' => 99,
+				]
+			);
+
+		$eventDispatcher = $this->createMock(IEventDispatcher::class);
+		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
+
+		$formsService = $this->createFormsServiceWithEventDispatcher($eventDispatcher);
 
 		$formsService->method('getShares')->willReturn([]);
 		$formsService->method('getQuestions')->with(42)->willReturn($questions);

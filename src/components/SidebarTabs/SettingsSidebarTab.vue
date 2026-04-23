@@ -194,106 +194,116 @@
 			</div>
 		</div>
 
-		<NcCheckboxRadioSwitch
-			:modelValue="form.confirmationEmailEnabled"
-			:disabled="formArchived || locked"
-			type="switch"
-			@update:modelValue="onConfirmationEmailEnabledChange">
-			{{ t('forms', 'Send confirmation email to respondents') }}
-		</NcCheckboxRadioSwitch>
-		<div
-			v-show="form.confirmationEmailEnabled && !formArchived"
-			class="settings-div--indent confirmation-email">
-			<p class="confirmation-email__hint">
-				{{ t('forms', 'Set up confirmation emails in three steps:') }}
-			</p>
-			<ol class="confirmation-email__steps">
-				<li>{{ t('forms', 'Add an email field to the form.') }}</li>
-				<li>
+		<template v-if="appConfig.allowConfirmationEmail">
+			<NcCheckboxRadioSwitch
+				:modelValue="form.confirmationEmailEnabled"
+				:disabled="formArchived || locked"
+				type="switch"
+				@update:modelValue="onConfirmationEmailEnabledChange">
+				{{ t('forms', 'Send confirmation email to respondents') }}
+			</NcCheckboxRadioSwitch>
+			<div
+				v-show="form.confirmationEmailEnabled && !formArchived"
+				class="settings-div--indent confirmation-email">
+				<p class="confirmation-email__hint">
+					{{ t('forms', 'Set up confirmation emails in three steps:') }}
+				</p>
+				<ol class="confirmation-email__steps">
+					<li>{{ t('forms', 'Add an email field to the form.') }}</li>
+					<li>
+						{{
+							t(
+								'forms',
+								'Select which email field is used for confirmation emails.',
+							)
+						}}
+					</li>
+					<li>{{ t('forms', 'Customize the subject and message.') }}</li>
+				</ol>
+				<NcNoteCard
+					v-if="confirmationEmailErrorText"
+					type="error"
+					:text="confirmationEmailErrorText" />
+				<div
+					v-if="emailQuestionCount > 0"
+					class="confirmation-email__recipient">
+					<label class="confirmation-email__label">
+						{{ t('forms', 'Recipient field') }}
+					</label>
+					<p
+						v-if="emailQuestionCount === 1"
+						class="confirmation-email__recipient-summary">
+						<strong>{{ selectedConfirmationEmailQuestionLabel }}</strong>
+						<br />
+						{{
+							t(
+								'forms',
+								'Selected automatically because this is the only email field in the form.',
+							)
+						}}
+					</p>
+					<template v-else>
+						<NcSelect
+							:modelValue="selectedConfirmationEmailQuestionOption"
+							:disabled="locked || isSavingConfirmationEmailRecipient"
+							:options="confirmationEmailQuestionOptions"
+							:placeholder="t('forms', 'Select an email field')"
+							class="confirmation-email__select"
+							label="label"
+							:searchable="false"
+							:clearable="false"
+							trackBy="id"
+							@update:modelValue="
+								onConfirmationEmailRecipientSelectionChange
+							" />
+						<p
+							v-if="selectedConfirmationEmailQuestionLabel"
+							class="confirmation-email__recipient-summary">
+							{{
+								t('forms', 'Current recipient field: {question}', {
+									question: selectedConfirmationEmailQuestionLabel,
+								})
+							}}
+						</p>
+					</template>
+				</div>
+				<p class="confirmation-email__placeholder-hint">
 					{{
 						t(
 							'forms',
-							'Select which email field is used for confirmation emails.',
-						)
-					}}
-				</li>
-				<li>{{ t('forms', 'Customize the subject and message.') }}</li>
-			</ol>
-			<NcNoteCard
-				v-if="confirmationEmailErrorText"
-				type="error"
-				:text="confirmationEmailErrorText" />
-			<div v-if="emailQuestionCount > 0" class="confirmation-email__recipient">
-				<label class="confirmation-email__label">
-					{{ t('forms', 'Recipient field') }}
-				</label>
-				<p
-					v-if="emailQuestionCount === 1"
-					class="confirmation-email__recipient-summary">
-					<strong>{{ selectedConfirmationEmailQuestionLabel }}</strong>
-					<br />
-					{{
-						t(
-							'forms',
-							'Selected automatically because this is the only email field in the form.',
+							'Available placeholders: {formTitle}, {formDescription}, and field names like {name}.',
 						)
 					}}
 				</p>
-				<template v-else>
-					<NcSelect
-						:modelValue="selectedConfirmationEmailQuestionOption"
-						:disabled="locked || isSavingConfirmationEmailRecipient"
-						:options="confirmationEmailQuestionOptions"
-						:placeholder="t('forms', 'Select an email field')"
-						class="confirmation-email__select"
-						label="label"
-						:searchable="false"
-						:clearable="false"
-						trackBy="id"
-						@update:modelValue="
-							onConfirmationEmailRecipientSelectionChange
-						" />
-					<p
-						v-if="selectedConfirmationEmailQuestionLabel"
-						class="confirmation-email__recipient-summary">
-						{{
-							t('forms', 'Current recipient field: {question}', {
-								question: selectedConfirmationEmailQuestionLabel,
-							})
-						}}
-					</p>
-				</template>
+				<label class="confirmation-email__label">
+					{{ t('forms', 'Email subject') }}
+				</label>
+				<input
+					v-model="confirmationEmailSubject"
+					:disabled="locked || isConfirmationEmailConfigurationBlocked"
+					:maxlength="255"
+					:placeholder="t('forms', 'Thank you for your submission')"
+					class="confirmation-email__input"
+					type="text"
+					@blur="onConfirmationEmailSubjectChange" />
+				<label class="confirmation-email__label">
+					{{ t('forms', 'Email body') }}
+				</label>
+				<textarea
+					:value="confirmationEmailBody"
+					:disabled="locked || isConfirmationEmailConfigurationBlocked"
+					:placeholder="emailBodyPlaceholder"
+					class="confirmation-email__textarea"
+					@input="onConfirmationEmailBodyInput"
+					@blur="onConfirmationEmailBodyChange"></textarea>
 			</div>
-			<p class="confirmation-email__placeholder-hint">
-				{{
-					t(
-						'forms',
-						'Available placeholders: {formTitle}, {formDescription}, and field names like {name}.',
-					)
-				}}
-			</p>
-			<label class="confirmation-email__label">
-				{{ t('forms', 'Email subject') }}
-			</label>
-			<input
-				v-model="confirmationEmailSubject"
-				:disabled="locked || isConfirmationEmailConfigurationBlocked"
-				:maxlength="255"
-				:placeholder="t('forms', 'Thank you for your submission')"
-				class="confirmation-email__input"
-				type="text"
-				@blur="onConfirmationEmailSubjectChange" />
-			<label class="confirmation-email__label">
-				{{ t('forms', 'Email body') }}
-			</label>
-			<textarea
-				:value="confirmationEmailBody"
-				:disabled="locked || isConfirmationEmailConfigurationBlocked"
-				:placeholder="emailBodyPlaceholder"
-				class="confirmation-email__textarea"
-				@input="onConfirmationEmailBodyInput"
-				@blur="onConfirmationEmailBodyChange"></textarea>
-		</div>
+		</template>
+		<NcNoteCard
+			v-else
+			type="info"
+			:text="
+				t('forms', 'Confirmation emails are disabled by your administrator.')
+			" />
 
 		<TransferOwnership
 			:locked="locked"
@@ -369,6 +379,7 @@ export default {
 				parse: this.parseTimestampToDate,
 			},
 
+			appConfig: loadState('forms', 'appConfig'),
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,

@@ -541,6 +541,7 @@ class ApiControllerTest extends TestCase {
 		$expected['confirmationEmailEnabled'] = false;
 		$expected['confirmationEmailSubject'] = null;
 		$expected['confirmationEmailBody'] = null;
+		$expected['confirmationEmailRecipient'] = null;
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(self::createFormValidator($expected)))

@@ -8,6 +8,7 @@
 namespace OCA\Forms\Service;
 
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\BackgroundJob\SendConfirmationMailJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
@@ -26,12 +27,15 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\BackgroundJob\IJobList;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\ICacheFactory;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IL10N;
+use OCP\IMemcache;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
@@ -53,6 +57,9 @@ use Psr\Log\LoggerInterface;
 class FormsService {
 	private ?IUser $currentUser;
 
+	private const EMAIL_RATE_LIMIT = 3;
+	private const EMAIL_RATE_LIMIT_TTL = 86400; // 24 hours
+
 	public function __construct(
 		IUserSession $userSession,
 		private ActivityManager $activityManager,
@@ -73,6 +80,8 @@ class FormsService {
 		private IMailer $mailer,
 		private IEmailValidator $emailValidator,
 		private AnswerMapper $answerMapper,
+		private IJobList $jobList,
+		private ICacheFactory $cacheFactory,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -762,10 +771,16 @@ class FormsService {
 			return;
 		}
 
+		if (!$this->configService->getAllowConfirmationEmail()) {
+			$this->logger->debug('Confirmation email feature is disabled by administrator', [
+				'formId' => $form->getId(),
+			]);
+			return;
+		}
+
 		$subject = $form->getConfirmationEmailSubject();
 		$body = $form->getConfirmationEmailBody();
 
-		// If no subject or body is set, use defaults
 		if (empty($subject)) {
 			$subject = $this->l10n->t('Thank you for your submission');
 		}
@@ -773,7 +788,6 @@ class FormsService {
 			$body = $this->l10n->t('Thank you for submitting the form "%s".', [$form->getTitle()]);
 		}
 
-		// Get questions and answers
 		$questions = $this->getQuestions($form->getId());
 		$answers = $this->answerMapper->findBySubmission($submission->getId());
 
@@ -805,61 +819,74 @@ class FormsService {
 			return;
 		}
 
+		$cacheKey = 'email_rl_' . hash('sha256', $form->getId() . ':' . strtolower($recipientEmail));
+		$cache = $this->cacheFactory->createDistributed('forms_confirmation_email');
+		if (!$cache instanceof IMemcache) {
+			$this->logger->warning('Distributed cache does not support atomic increments for confirmation email rate limiting', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+			]);
+			return;
+		}
+
+		if ($cache->add($cacheKey, 1, self::EMAIL_RATE_LIMIT_TTL)) {
+			$count = 1;
+		} else {
+			$count = $cache->inc($cacheKey);
+			if (!is_int($count)) {
+				$this->logger->warning('Failed to increment confirmation email rate limit counter', [
+					'formId' => $form->getId(),
+					'submissionId' => $submission->getId(),
+				]);
+				return;
+			}
+		}
+
+		if ($count > self::EMAIL_RATE_LIMIT) {
+			$this->logger->warning('Per-recipient confirmation email rate limit reached', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+			]);
+			return;
+		}
+
 		// Replace placeholders in subject and body
 		$replacements = [
 			'{formTitle}' => $form->getTitle(),
 			'{formDescription}' => $form->getDescription() ?? '',
 		];
 
-		// Add field placeholders (e.g., {name}, {email})
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
 			$questionName = $question['name'] ?? '';
 			$questionText = $question['text'] ?? '';
 
-			// Use question name if available, otherwise use text
 			$fieldKey = !empty($questionName) ? $questionName : $questionText;
-			// Sanitize field key for placeholder (remove special chars, lowercase)
 			$fieldKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fieldKey));
 
 			if (!empty($answerMap[$questionId])) {
 				$answerValue = implode('; ', $answerMap[$questionId]);
 				$replacements['{' . $fieldKey . '}'] = $answerValue;
-				// Also support {questionName} format
 				if (!empty($questionName)) {
 					$replacements['{' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $questionName)) . '}'] = $answerValue;
 				}
 			}
 		}
 
-		// Apply replacements
 		$subject = str_replace(array_keys($replacements), array_values($replacements), $subject);
 		$body = str_replace(array_keys($replacements), array_values($replacements), $body);
 
-		try {
-			$message = $this->mailer->createMessage();
-			$message->setSubject($subject);
-			$message->setPlainBody($body);
-			$message->setTo([$recipientEmail]);
-
-			$this->mailer->send($message);
-			$this->logger->debug('Confirmation email sent successfully', [
-				'formId' => $form->getId(),
-				'submissionId' => $submission->getId(),
-				'recipient' => $recipientEmail,
-			]);
-		} catch (\Exception $e) {
-			// Handle exceptions silently, as this is not critical.
-			// We don't want to break the submission process just because of an email error.
-			$this->logger->error(
-				'Error while sending confirmation email',
-				[
-					'exception' => $e,
-					'formId' => $form->getId(),
-					'submissionId' => $submission->getId(),
-				]
-			);
-		}
+		$this->jobList->add(SendConfirmationMailJob::class, [
+			'recipient' => $recipientEmail,
+			'subject' => $subject,
+			'body' => $body,
+			'formId' => $form->getId(),
+			'submissionId' => $submission->getId(),
+		]);
+		$this->logger->debug('Confirmation email queued', [
+			'formId' => $form->getId(),
+			'submissionId' => $submission->getId(),
+		]);
 	}
 
 	/**
