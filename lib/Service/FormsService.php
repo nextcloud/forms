@@ -1003,15 +1003,6 @@ class FormsService {
 			}
 		}
 
-		// confirmationEmailRecipient is only valid for short questions with email validation.
-		if (
-			$questionType === Constants::ANSWER_TYPE_SHORT
-			&& !empty($extraSettings['confirmationEmailRecipient'])
-			&& ($extraSettings['validationType'] ?? null) !== 'email'
-		) {
-			return false;
-		}
-
 		// Validate extraSettings for specific question types
 		if ($questionType === Constants::ANSWER_TYPE_DATE) {
 			// Ensure dateMin and dateMax don't overlap
@@ -1053,7 +1044,16 @@ class FormsService {
 			}
 
 			// Special handling of short input for validation
-		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
+		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT) {
+			if (!empty($extraSettings['confirmationEmailRecipient'])
+				&& ($extraSettings['validationType'] ?? null) !== 'email') {
+				return false;
+			}
+
+			if (!isset($extraSettings['validationType'])) {
+				return true;
+			}
+
 			// Ensure input validation type is known
 			if (!in_array($extraSettings['validationType'], Constants::SHORT_INPUT_TYPES)) {
 				return false;
