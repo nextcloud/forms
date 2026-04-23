@@ -449,6 +449,14 @@ export default {
 	min-height: var(--default-clickable-area);
 	border-radius: var(--border-radius-large);
 	user-select: none;
+	transition-property: background-color;
+	transition-duration: 0.1s;
+	transition-timing-function: linear;
+
+	&:hover,
+	&:focus-within {
+		background-color: var(--color-background-hover);
+	}
 
 	&__position {
 		font-weight: bold;
