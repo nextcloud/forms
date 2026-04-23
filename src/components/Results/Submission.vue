@@ -32,6 +32,20 @@
 		<p class="submission-date">
 			{{ submissionDateTime }}
 		</p>
+		<p
+			v-if="showVerificationStatus"
+			class="submission-verification"
+			:class="[
+				submission.isVerified
+					? 'submission-verification--verified'
+					: 'submission-verification--pending',
+			]">
+			{{
+				submission.isVerified
+					? t('forms', 'Email address verified')
+					: t('forms', 'Email address verification pending')
+			}}
+		</p>
 
 		<Answer
 			v-for="question in answeredQuestions"
@@ -110,6 +124,25 @@ export default {
 		// Format submission-timestamp to DateTime
 		submissionDateTime() {
 			return moment(this.submission.timestamp, 'X').format('LLLL')
+		},
+
+		showVerificationStatus() {
+			if (!Object.hasOwn(this.submission, 'isVerified')) {
+				return false
+			}
+
+			return this.questions.some((question) => {
+				if (question.type !== 'short') {
+					return false
+				}
+
+				const extraSettings = question.extraSettings || {}
+				return (
+					extraSettings.validationType === 'email'
+					&& extraSettings.confirmationRecipient === true
+					&& extraSettings.requireEmailVerification === true
+				)
+			})
 		},
 
 		/**
@@ -270,6 +303,20 @@ export default {
 	&-date {
 		color: var(--color-text-lighter);
 		margin-block-start: -8px;
+	}
+
+	&-verification {
+		margin-block: -4px 12px;
+		font-size: 13px;
+		color: var(--color-text-maxcontrast);
+
+		&--verified {
+			color: var(--color-success-text);
+		}
+
+		&--pending {
+			color: var(--color-warning-text);
+		}
 	}
 }
 </style>

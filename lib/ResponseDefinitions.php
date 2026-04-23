@@ -40,6 +40,8 @@ namespace OCA\Forms;
  *   timeRange?: bool,
  *   validationRegex?: string,
  *   validationType?: string,
+ *   confirmationRecipient?: bool,
+ *   requireEmailVerification?: bool,
  *   questionType?: string,
  * }
  *
@@ -74,6 +76,7 @@ namespace OCA\Forms;
  *   formId: int,
  *   userId: string,
  *   timestamp: int,
+ *   isVerified: bool,
  *   answers: list<FormsAnswer>,
  *   userDisplayName: string
  * }
@@ -110,7 +113,6 @@ namespace OCA\Forms;
  *   state: int,
  *   lockedBy: ?string,
  *   lockedUntil: ?int,
- *   maxSubmissions: ?int,
  * }
  *
  * @psalm-type FormsForm = array{
@@ -126,7 +128,6 @@ namespace OCA\Forms;
  *   fileId: ?int,
  *   filePath?: ?string,
  *   isAnonymous: bool,
- *   isMaxSubmissionsReached: bool,
  *   lastUpdated: int,
  *   submitMultiple: bool,
  *   allowEditSubmissions: bool,
@@ -137,7 +138,6 @@ namespace OCA\Forms;
  *   state: 0|1|2,
  *   lockedBy: ?string,
  *   lockedUntil: ?int,
- *   maxSubmissions: ?int,
  *   shares: list<FormsShare>,
  *   submissionCount?: int,
  *   submissionMessage: ?string,

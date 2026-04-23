@@ -149,6 +149,7 @@ class SubmissionServiceTest extends TestCase {
 		$submission_1->setFormId(5);
 		$submission_1->setUserId('someUser');
 		$submission_1->setTimestamp(123456);
+		$submission_1->setIsVerified(true);
 		$answer_1 = new Answer();
 		$answer_1->setId(35);
 		$answer_1->setSubmissionId(42);
@@ -165,6 +166,7 @@ class SubmissionServiceTest extends TestCase {
 		$submission_2->setFormId(5);
 		$submission_2->setUserId('someOtherUser');
 		$submission_2->setTimestamp(1234);
+		$submission_2->setIsVerified(true);
 
 		$this->submissionMapper->expects($this->any())
 			->method('findByForm')
@@ -189,6 +191,7 @@ class SubmissionServiceTest extends TestCase {
 				'formId' => 5,
 				'userId' => 'someUser',
 				'timestamp' => 123456,
+				'isVerified' => true,
 				'answers' => [
 					[
 						'id' => 35,
@@ -211,6 +214,7 @@ class SubmissionServiceTest extends TestCase {
 				'formId' => 5,
 				'userId' => 'someOtherUser',
 				'timestamp' => 1234,
+				'isVerified' => true,
 				'answers' => []
 			]
 		];
@@ -227,6 +231,7 @@ class SubmissionServiceTest extends TestCase {
 		$submission_1->setFormId(5);
 		$submission_1->setUserId('someUser');
 		$submission_1->setTimestamp(123456);
+		$submission_1->setIsVerified(true);
 		$answer_1 = new Answer();
 		$answer_1->setId(35);
 		$answer_1->setSubmissionId(42);
@@ -254,6 +259,7 @@ class SubmissionServiceTest extends TestCase {
 			'formId' => 5,
 			'userId' => 'someUser',
 			'timestamp' => 123456,
+			'isVerified' => true,
 			'answers' => [
 				[
 					'id' => 35,

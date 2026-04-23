@@ -12,8 +12,11 @@
 		<div class="question__content">
 			<input
 				ref="input"
-				:aria-labelledby="titleId"
-				:aria-describedby="description ? descriptionId : undefined"
+				:aria-label="
+					t('forms', 'A short answer for the question “{text}”', {
+						text,
+					})
+				"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:name="name || undefined"
@@ -53,6 +56,28 @@
 					@update:modelValue="onChangeValidationType(validationTypeName)">
 					{{ validationTypeObject.label }}
 				</NcActionRadio>
+				<NcActionCheckbox
+					v-if="validationType === 'email'"
+					:model-value="confirmationRecipient"
+					@update:model-value="onConfirmationRecipientChange">
+					{{
+						t(
+							'forms',
+							'Use this question as confirmation email recipient',
+						)
+					}}
+				</NcActionCheckbox>
+				<NcActionCheckbox
+					v-if="validationType === 'email' && confirmationRecipient"
+					:model-value="requireEmailVerification"
+					@update:model-value="onRequireEmailVerificationChange">
+					{{
+						t(
+							'forms',
+							'Require respondents to verify this email address',
+						)
+					}}
+				</NcActionCheckbox>
 				<NcActionInput
 					v-if="validationType === 'regex'"
 					ref="regexInput"
@@ -72,6 +97,7 @@
 </template>
 
 <script>
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -88,6 +114,7 @@ export default {
 		IconRegex,
 		NcActions,
 		NcActionInput,
+		NcActionCheckbox,
 		NcActionRadio,
 		Question,
 	},
@@ -143,6 +170,14 @@ export default {
 		validationRegex() {
 			return this.extraSettings?.validationRegex || ''
 		},
+
+		confirmationRecipient() {
+			return this.extraSettings?.confirmationRecipient === true
+		},
+
+		requireEmailVerification() {
+			return this.extraSettings?.requireEmailVerification === true
+		},
 	},
 
 	methods: {
@@ -184,15 +219,39 @@ export default {
 				this.onExtraSettingsChange({
 					validationType,
 					validationRegex: this.validationRegex,
+					confirmationRecipient: false,
+					requireEmailVerification: false,
 				})
 			} else {
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
 				this.isValidationTypeMenuOpen = false
+				const isEmailValidation = validationType === 'email'
 				this.onExtraSettingsChange({
 					validationType:
 						validationType === 'text' ? undefined : validationType,
+					confirmationRecipient: isEmailValidation
+						? this.confirmationRecipient
+						: false,
+					requireEmailVerification:
+						isEmailValidation && this.confirmationRecipient
+							? this.requireEmailVerification
+							: false,
 				})
 			}
+		},
+
+		onConfirmationRecipientChange(value) {
+			this.onExtraSettingsChange({
+				confirmationRecipient: value === true,
+				requireEmailVerification:
+					value === true && this.requireEmailVerification,
+			})
+		},
+
+		onRequireEmailVerificationChange(value) {
+			this.onExtraSettingsChange({
+				requireEmailVerification: value === true,
+			})
 		},
 
 		/**
