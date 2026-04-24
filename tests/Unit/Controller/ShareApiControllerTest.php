@@ -1104,8 +1104,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->updateShareToken(5, 8, 'invalid-token');
 	}
 
-	public function testUpdateShareToken_WhitespaceToken()
-	{
+	public function testUpdateShareToken_WhitespaceToken() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -1137,8 +1136,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->updateShareToken(5, 8, ' customtoken ');
 	}
 
-	public function testUpdateShareToken_TooShortToken()
-	{
+	public function testUpdateShareToken_TooShortToken() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -1170,8 +1168,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->updateShareToken(5, 8, 'abc');
 	}
 
-	public function testUpdateShareToken_SameTokenReturnsEarly()
-	{
+	public function testUpdateShareToken_SameTokenReturnsEarly() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -1206,8 +1203,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShareToken(5, 8, 'sameToken123'));
 	}
 
-	public function testUpdateShareToken_ForeignShare()
-	{
+	public function testUpdateShareToken_ForeignShare() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -1236,8 +1232,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->updateShareToken(5, 8, 'customtoken123');
 	}
 
-	public function testUpdateShareToken_ShareNotFound()
-	{
+	public function testUpdateShareToken_ShareNotFound() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
@@ -1260,8 +1255,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->updateShareToken(5, 8, 'customtoken123');
 	}
 
-	public function testUpdateShareToken_ArchivedForm()
-	{
+	public function testUpdateShareToken_ArchivedForm() {
 		$form = new Form();
 		$form->setId('5');
 		$form->setOwnerId('currentUser');
