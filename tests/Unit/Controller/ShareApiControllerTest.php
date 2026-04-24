@@ -991,7 +991,7 @@ class ShareApiControllerTest extends TestCase {
 				return $updatedShare;
 			});
 
-		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShareToken(5, 8, 'tokenabcd'));
+		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShare(5, 8, ['token' => 'tokenabcd']));
 	}
 
 	public function testUpdateShareToken_CustomTokensDisabled() {
@@ -1000,7 +1000,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn(false);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'tokenabcd');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'tokenabcd']);
 	}
 
 	public function testUpdateShareToken_ForbiddenForNonLinkShare() {
@@ -1029,7 +1029,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($share);
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'tokenabcd');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'tokenabcd']);
 	}
 
 	public function testUpdateShareToken_DuplicateHash() {
@@ -1069,7 +1069,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($existingShare);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'tokenabcd');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'tokenabcd']);
 	}
 
 	public function testUpdateShareToken_InvalidToken() {
@@ -1101,7 +1101,7 @@ class ShareApiControllerTest extends TestCase {
 			->method('update');
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'invalid-token');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'invalid-token']);
 	}
 
 	public function testUpdateShareToken_WhitespaceToken() {
@@ -1133,7 +1133,7 @@ class ShareApiControllerTest extends TestCase {
 			->method('findPublicShareByHash');
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShareToken(5, 8, ' customtoken ');
+		$this->shareApiController->updateShare(5, 8, ['token' => ' customtoken ']);
 	}
 
 	public function testUpdateShareToken_TooShortToken() {
@@ -1165,7 +1165,7 @@ class ShareApiControllerTest extends TestCase {
 			->method('findPublicShareByHash');
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'abc');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'abc']);
 	}
 
 	public function testUpdateShareToken_SameTokenReturnsEarly() {
@@ -1200,7 +1200,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->formsService->expects($this->never())
 			->method('obtainFormLock');
 
-		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShareToken(5, 8, 'sameToken123'));
+		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShare(5, 8, ['token' => 'sameToken123']));
 	}
 
 	public function testUpdateShareToken_ForeignShare() {
@@ -1229,7 +1229,7 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($share);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'customtoken123');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'customtoken123']);
 	}
 
 	public function testUpdateShareToken_ShareNotFound() {
@@ -1252,7 +1252,7 @@ class ShareApiControllerTest extends TestCase {
 			->willThrowException(new DoesNotExistException('missing'));
 
 		$this->expectException(OCSNotFoundException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'customtoken123');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'customtoken123']);
 	}
 
 	public function testUpdateShareToken_ArchivedForm() {
@@ -1277,6 +1277,6 @@ class ShareApiControllerTest extends TestCase {
 			->method('findById');
 
 		$this->expectException(OCSForbiddenException::class);
-		$this->shareApiController->updateShareToken(5, 8, 'customtoken123');
+		$this->shareApiController->updateShare(5, 8, ['token' => 'customtoken123']);
 	}
 }

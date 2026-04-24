@@ -30,6 +30,7 @@ class Constants {
 
 	public const PUBLIC_SHARE_TOKEN_MIN_LENGTH = 8;
 	public const PUBLIC_SHARE_TOKEN_MAX_LENGTH = 256;
+	public const PUBLIC_SHARE_HASH_REQUIREMENT = '[a-zA-Z0-9]{' . self::PUBLIC_SHARE_TOKEN_MIN_LENGTH . ',' . self::PUBLIC_SHARE_TOKEN_MAX_LENGTH . '}';
 
 	/**
 	 * Maximum String lengths, the database is set to store.

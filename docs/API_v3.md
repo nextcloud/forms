@@ -631,7 +631,12 @@ Update a single or all properties of an option-object
   | Parameter | Type | Description |
   |------------------|----------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
-- Restrictions: Currently only the _permissions_ can be updated.
+- Restrictions:
+  - Allowed keys are _permissions_ and _token_.
+  - _token_ updates are only available when the admin setting _allowCustomPublicShareTokens_ is enabled.
+  - _token_ can only be updated on link shares.
+  - _token_ must be unique among link shares and only contain alphanumeric characters.
+  - _token_ length must be between 8 and 256 characters.
 - Response: **Status-Code OK**, as well as the id of the share object.
 
 ```
@@ -648,30 +653,6 @@ Update a single or all properties of an option-object
   | _formId_ | Integer | ID of the form containing the share |
   | _shareId_ | Integer | ID of the share to delete |
 - Response: **Status-Code OK**, as well as the id of the deleted share.
-
-```
-"data": 5
-```
-
-### Update a Public Share Token
-
-- Endpoint: `/api/v3/forms/{formId}/shares/{shareId}/token`
-- Method: `PATCH`
-- Url-Parameters:
-  | Parameter | Type | Description |
-  |-----------|---------|-------------|
-  | _formId_ | Integer | ID of the form containing the share |
-  | _shareId_ | Integer | ID of the public link share to update |
-- Parameters:
-  | Parameter | Type | Description |
-  |-----------|---------|-------------|
-  | _token_ | String | New token for the public share link |
-- Restrictions:
-  - Only available when the admin setting _allowCustomPublicShareTokens_ is enabled.
-  - Only link shares can be updated.
-  - Token must be unique among link shares and only contain alphanumeric characters.
-  - Token length must be between 8 and 256 characters.
-- Response: **Status-Code OK**, as well as the id of the updated share.
 
 ```
 "data": 5

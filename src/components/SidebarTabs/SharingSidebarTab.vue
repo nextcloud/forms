@@ -561,14 +561,16 @@ export default {
 			try {
 				const response = await axios.patch(
 					generateOcsUrl(
-						'apps/forms/api/v3/forms/{id}/shares/{shareId}/token',
+						'apps/forms/api/v3/forms/{id}/shares/{shareId}',
 						{
 							id: this.form.id,
 							shareId: share.id,
 						},
 					),
 					{
-						token,
+						keyValuePairs: {
+							token,
+						},
 					},
 				)
 

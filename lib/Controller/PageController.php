@@ -40,7 +40,6 @@ use OCP\Util;
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 class PageController extends Controller {
 	private const TEMPLATE_MAIN = 'main';
-	private const PUBLIC_SHARE_HASH_REQUIREMENT = '[a-zA-Z0-9]{8,256}';
 
 	public function __construct(
 		string $appName,
@@ -146,7 +145,7 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => self::PUBLIC_SHARE_HASH_REQUIREMENT])]
+	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => Constants::PUBLIC_SHARE_HASH_REQUIREMENT])]
 	public function publicLinkView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
