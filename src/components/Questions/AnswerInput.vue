@@ -8,6 +8,7 @@
 		<component
 			:is="pseudoIcon"
 			v-if="!isDropdown"
+			:size="24"
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
@@ -145,6 +146,11 @@ export default {
 			default: false,
 		},
 
+		isRanking: {
+			type: Boolean,
+			default: false,
+		},
+
 		maxIndex: {
 			type: Number,
 			required: true,
@@ -254,6 +260,10 @@ export default {
 
 			if (this.optionType === OptionType.Row) {
 				return IconTableRow
+			}
+
+			if (this.isRanking) {
+				return IconDragIndicator
 			}
 
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
@@ -538,8 +548,7 @@ export default {
 		height: 100%;
 	}
 
-	.option__drag-handle,
-	.drag-indicator-icon {
+	.option__drag-handle {
 		color: var(--color-text-maxcontrast);
 		cursor: grab;
 		margin-block: auto;

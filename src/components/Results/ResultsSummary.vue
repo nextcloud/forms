@@ -12,9 +12,49 @@
 			{{ questionTypeLabel }}
 		</p>
 
+		<!-- Ranking questions: Borda count with average rank -->
+		<div v-if="question.type === 'ranking'" class="question-summary__statistic">
+			<p class="question-summary__ranking-description">
+				{{
+					t(
+						'forms',
+						'Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred.',
+						{
+							n: question.options.length,
+							n1: question.options.length - 1,
+						},
+					)
+				}}
+			</p>
+			<ol>
+				<li v-for="option in rankingStats" :key="option.id">
+					<label>
+						<span class="question-summary__statistic-score">
+							{{ option.bordaTotal }}
+						</span>
+						<span class="question-summary__statistic-percentage">
+							({{
+								t('forms', 'avg. rank {average}', {
+									average: option.avgRank,
+								})
+							}}):
+						</span>
+						<span
+							:class="{
+								'question-summary__statistic-text--best':
+									option.best,
+							}">
+							{{ option.text }}
+						</span>
+					</label>
+					<meter min="0" :max="maxBordaScore" :value="option.bordaTotal" />
+				</li>
+			</ol>
+		</div>
+
 		<!-- Answers with countable results for visualization -->
 		<ol
-			v-if="answerTypes[question.type].predefined"
+			v-else-if="answerTypes[question.type].predefined"
 			class="question-summary__statistic">
 			<li v-for="option in questionOptions" :key="option.id">
 				<label :for="`option-${option.questionId}-${option.id}`">
@@ -296,6 +336,61 @@ export default {
 			return questionOptionsStats
 		},
 
+		/**
+		 * Borda count ranking statistics
+		 */
+		rankingStats() {
+			const n = this.question.options.length
+			const stats = {}
+
+			for (const opt of this.question.options) {
+				stats[opt.id] = {
+					id: opt.id,
+					text: opt.text,
+					bordaTotal: 0,
+					rankSum: 0,
+					count: 0,
+				}
+			}
+
+			for (const submission of this.submissions) {
+				const answer = submission.answers.find(
+					(a) => a.questionId === this.question.id,
+				)
+				if (!answer) continue
+				const ranked = JSON.parse(answer.text)
+				ranked.forEach((optionId, index) => {
+					if (stats[optionId]) {
+						stats[optionId].bordaTotal += n - index
+						stats[optionId].rankSum += index + 1
+						stats[optionId].count++
+					}
+				})
+			}
+
+			const result = Object.values(stats)
+				.map((s) => ({
+					...s,
+					avgRank: s.count > 0 ? (s.rankSum / s.count).toFixed(1) : '-',
+				}))
+				.sort((a, b) => b.bordaTotal - a.bordaTotal)
+
+			// Mark best (highest Borda score)
+			if (result.length > 0 && result[0].bordaTotal > 0) {
+				const best = result[0].bordaTotal
+				result.forEach((o) => {
+					o.best = o.bordaTotal === best
+				})
+			}
+
+			return result
+		},
+
+		maxBordaScore() {
+			const n = this.question.options.length
+			return n * this.submissions.length
+		},
+
 		gridColumns() {
 			return this.question.options.filter(
 				(option) => option.optionType === OptionType.Column,
@@ -535,6 +630,12 @@ export default {
 
 			label {
 				cursor: default;
+			}
+
+			.question-summary__ranking-description {
+				color: var(--color-text-maxcontrast);
+				font-style: italic;
+				margin-block-end: 8px;
 			}
 
 			.question-summary__statistic-text--best {
