@@ -49,6 +49,11 @@
 				</p>
 			</header>
 
+			<!-- Screen-reader-only live region for submission success announcement -->
+			<div class="hidden-visually" aria-live="polite">
+				{{ successAnnouncement }}
+			</div>
+
 			<NcEmptyContent
 				v-if="loading"
 				class="forms-emptycontent"
@@ -326,6 +331,7 @@ export default {
 			answers: {},
 			loading: false,
 			success: false,
+			successAnnouncement: '',
 			/** Submit state of the form, true if changes are currently submitted */
 			submitForm: false,
 			showConfirmEmptyModal: false,
@@ -498,6 +504,22 @@ export default {
 	},
 
 	watch: {
+		success(newVal) {
+			if (newVal) {
+				// Delay populating the live region to avoid the announcement being
+				// swallowed by the simultaneous large DOM change (form replaced by
+				// success view). Screen readers need a moment to process the new DOM
+				// before a polite live region update registers.
+				setTimeout(() => {
+					this.successAnnouncement =
+						this.form.submissionMessage
+						|| t('forms', 'Thank you for completing the form!')
+				}, 100)
+			} else {
+				this.successAnnouncement = ''
+			}
+		},
+
 		hash() {
 			// If public view, abort. Should normally not occur.
 			if (this.publicView) {
