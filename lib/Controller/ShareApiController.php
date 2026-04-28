@@ -263,8 +263,8 @@ class ShareApiController extends OCSController {
 		$allowedKeys = ['permissions', 'token'];
 		foreach (array_keys($keyValuePairs) as $key) {
 			if (!in_array($key, $allowedKeys, true)) {
-				$this->logger->debug('Not allowed to update unknown properties');
-				throw new OCSForbiddenException('Not allowed to update unknown properties');
+				$this->logger->debug('Not allowed to update other properties than permissions or token');
+				throw new OCSForbiddenException('Not allowed to update other properties than permissions or token');
 			}
 		}
 
