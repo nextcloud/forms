@@ -5157,7 +5157,7 @@
         "/ocs/v2.php/apps/forms/api/v3/forms/{formId}/shares/{shareId}": {
             "patch": {
                 "operationId": "share_api-update-share",
-                "summary": "Update permissions of a share",
+                "summary": "Update properties of a share",
                 "description": "This endpoint allows CORS requests",
                 "tags": [
                     "share_api"
@@ -5254,7 +5254,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid permission given",
+                        "description": "Share hash exists, please retry",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5282,7 +5282,7 @@
                         }
                     },
                     "403": {
-                        "description": "Not allowed to update other properties than permissions",
+                        "description": "Not allowed to update unknown properties",
                         "content": {
                             "application/json": {
                                 "schema": {

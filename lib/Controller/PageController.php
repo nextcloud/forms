@@ -145,7 +145,7 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => '[a-zA-Z0-9]{24,}'])]
+	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => Constants::PUBLIC_SHARE_HASH_REQUIREMENT])]
 	public function publicLinkView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
