@@ -1023,6 +1023,38 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController->updateShare(5, 8, ['token' => 'tokenabcd']);
 	}
 
+	public function testUpdateShareToken_NonStringToken() {
+		$form = new Form();
+		$form->setId('5');
+		$form->setOwnerId('currentUser');
+
+		$this->configService->expects($this->once())
+			->method('getAllowCustomPublicToken')
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(5)
+			->willReturn($form);
+
+		$share = new Share();
+		$share->setId(8);
+		$share->setFormId(5);
+		$share->setShareType(IShare::TYPE_LINK);
+		$share->setShareWith('abcdefgh');
+
+		$this->shareMapper->expects($this->once())
+			->method('findById')
+			->with(8)
+			->willReturn($share);
+
+		$this->shareMapper->expects($this->never())
+			->method('findPublicShareByHash');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->shareApiController->updateShare(5, 8, ['token' => 123]);
+	}
+
 	public function testUpdateShareToken_ForbiddenForNonLinkShare() {
 		$form = new Form();
 		$form->setId('5');
