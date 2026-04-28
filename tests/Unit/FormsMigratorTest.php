@@ -111,8 +111,12 @@ class FormsMigratorTest extends TestCase {
     "allowEditSubmissions": false,
     "showExpiration": false,
     "lastUpdated": 123456789,
-    "submissionMessage": "Back to website",
-    "questions": [
+	    "submissionMessage": "Back to website",
+	    "confirmationEmailEnabled": false,
+	    "confirmationEmailSubject": "Thanks",
+	    "confirmationEmailBody": "Body",
+	    "confirmationEmailQuestionId": null,
+	    "questions": [
       {
         "id": 14,
         "order": 2,
@@ -186,6 +190,10 @@ JSON
 		$form->setShowExpiration(false);
 		$form->setLastUpdated(123456789);
 		$form->setSubmissionMessage('Back to website');
+		$form->setConfirmationEmailEnabled(false);
+		$form->setConfirmationEmailSubject('Thanks');
+		$form->setConfirmationEmailBody('Body');
+		$form->setConfirmationEmailQuestionId(null);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -255,7 +263,7 @@ JSON
 	public static function dataImport() {
 		return [
 			'exactlyOneOfEach' => [
-				'inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
+				'inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"confirmationEmailEnabled":true,"confirmationEmailSubject":"Thanks","confirmationEmailBody":"Body","confirmationEmailQuestionId":null,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
 			]
 		];
 	}
@@ -285,7 +293,14 @@ JSON
 			->method('generateFormHash')
 			->willReturn('abcdefg');
 
-		$this->formMapper->expects($this->once())->method('insert');
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function (Form $form) {
+				$this->assertTrue($form->getConfirmationEmailEnabled());
+				$this->assertSame('Thanks', $form->getConfirmationEmailSubject());
+				$this->assertSame('Body', $form->getConfirmationEmailBody());
+				return $form;
+			});
 		$this->questionMapper->expects($this->once())->method('insert');
 		$this->optionMapper->expects($this->once())->method('insert');
 		$this->submissionMapper->expects($this->once())->method('insert');

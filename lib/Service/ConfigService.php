@@ -50,6 +50,10 @@ class ConfigService {
 		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_RESTRICTCREATION, 'false'));
 	}
 
+	public function getAllowConfirmationEmail(): bool {
+		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL, 'false'));
+	}
+
 	/**
 	 * Provide the full AppConfig
 	 */
@@ -60,6 +64,7 @@ class ConfigService {
 			Constants::CONFIG_KEY_ALLOWSHOWTOALL => $this->getAllowShowToAll(),
 			Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS => $this->getCreationAllowedGroups(),
 			Constants::CONFIG_KEY_RESTRICTCREATION => $this->getRestrictCreation(),
+			Constants::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL => $this->getAllowConfirmationEmail(),
 
 			// Additional, calculated information out of Config
 			'canCreateForms' => $this->canCreateForms()

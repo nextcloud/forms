@@ -119,7 +119,11 @@
                     "lockedUntil",
                     "maxSubmissions",
                     "shares",
-                    "submissionMessage"
+                    "submissionMessage",
+                    "confirmationEmailEnabled",
+                    "confirmationEmailSubject",
+                    "confirmationEmailBody",
+                    "confirmationEmailQuestionId"
                 ],
                 "properties": {
                     "id": {
@@ -231,6 +235,22 @@
                     },
                     "submissionMessage": {
                         "type": "string",
+                        "nullable": true
+                    },
+                    "confirmationEmailEnabled": {
+                        "type": "boolean"
+                    },
+                    "confirmationEmailSubject": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "confirmationEmailBody": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "confirmationEmailQuestionId": {
+                        "type": "integer",
+                        "format": "int64",
                         "nullable": true
                     }
                 }

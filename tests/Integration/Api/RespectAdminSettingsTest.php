@@ -145,6 +145,10 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'submissionCount' => 0,
 				'maxSubmissions' => null,
 				'isMaxSubmissionsReached' => false,
+				'confirmationEmailEnabled' => false,
+				'confirmationEmailSubject' => null,
+				'confirmationEmailBody' => null,
+				'confirmationEmailQuestionId' => null,
 			],
 		];
 	}

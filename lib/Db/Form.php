@@ -53,6 +53,14 @@ use OCP\AppFramework\Db\Entity;
  * @method int|null getMaxSubmissions()
  * @method void setMaxSubmissions(int|null $value)
  * @method void setLockedUntil(int|null $value)
+ * @method bool getConfirmationEmailEnabled()
+ * @method void setConfirmationEmailEnabled(bool $value)
+ * @method string|null getConfirmationEmailSubject()
+ * @method void setConfirmationEmailSubject(string|null $value)
+ * @method string|null getConfirmationEmailBody()
+ * @method void setConfirmationEmailBody(string|null $value)
+ * @method int|null getConfirmationEmailQuestionId()
+ * @method void setConfirmationEmailQuestionId(int|null $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -74,6 +82,10 @@ class Form extends Entity {
 	protected $lockedBy;
 	protected $lockedUntil;
 	protected $maxSubmissions;
+	protected $confirmationEmailEnabled;
+	protected $confirmationEmailSubject;
+	protected $confirmationEmailBody;
+	protected $confirmationEmailQuestionId;
 
 	/**
 	 * Form constructor.
@@ -90,6 +102,8 @@ class Form extends Entity {
 		$this->addType('lockedBy', 'string');
 		$this->addType('lockedUntil', 'integer');
 		$this->addType('maxSubmissions', 'integer');
+		$this->addType('confirmationEmailEnabled', 'boolean');
+		$this->addType('confirmationEmailQuestionId', 'integer');
 	}
 
 	// JSON-Decoding of access-column.
@@ -164,6 +178,10 @@ class Form extends Entity {
 	 *   lockedBy: ?string,
 	 *   lockedUntil: ?int,
 	 *   maxSubmissions: ?int,
+	 *   confirmationEmailEnabled: bool,
+	 *   confirmationEmailSubject: ?string,
+	 *   confirmationEmailBody: ?string,
+	 *   confirmationEmailQuestionId: ?int,
 	 *  }
 	 */
 	public function read() {
@@ -188,6 +206,10 @@ class Form extends Entity {
 			'lockedBy' => $this->getLockedBy(),
 			'lockedUntil' => $this->getLockedUntil(),
 			'maxSubmissions' => $this->getMaxSubmissions(),
+			'confirmationEmailEnabled' => (bool)$this->getConfirmationEmailEnabled(),
+			'confirmationEmailSubject' => $this->getConfirmationEmailSubject(),
+			'confirmationEmailBody' => $this->getConfirmationEmailBody(),
+			'confirmationEmailQuestionId' => $this->getConfirmationEmailQuestionId(),
 		];
 	}
 }

@@ -65,6 +65,7 @@ class ConfigServiceTest extends TestCase {
 					'allowShowToAll' => 'false',
 					'creationAllowedGroups' => '["group1", "group2", "nonExisting"]',
 					'restrictCreation' => 'true',
+					'allowConfirmationEmail' => 'false',
 				],
 				'groupDisplayNames' => [
 					'group1' => 'Group No. 1',
@@ -85,6 +86,7 @@ class ConfigServiceTest extends TestCase {
 						]
 					],
 					'restrictCreation' => true,
+					'allowConfirmationEmail' => false,
 
 					'canCreateForms' => false
 				]
@@ -103,7 +105,7 @@ class ConfigServiceTest extends TestCase {
 		$this->config->expects($this->any())
 			->method('getAppValue')
 			->will($this->returnCallback(function ($appName, $configKey, $defaultVal) use ($strConfig) {
-				return $strConfig[$configKey];
+				return $strConfig[$configKey] ?? $defaultVal;
 			}));
 
 
@@ -139,6 +141,7 @@ class ConfigServiceTest extends TestCase {
 					'allowShowToAll' => true,
 					'creationAllowedGroups' => [],
 					'restrictCreation' => false,
+					'allowConfirmationEmail' => false,
 					'canCreateForms' => true
 				]
 			]

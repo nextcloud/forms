@@ -24,6 +24,22 @@
 				label="displayName"
 				@input="onCreationAllowedGroupsChange" />
 		</NcSettingsSection>
+		<NcSettingsSection
+			:name="t('forms', 'Confirmation emails')"
+			:description="
+				t(
+					'forms',
+					'Allow form owners to send a confirmation email to respondents after submission.',
+				)
+			">
+			<NcCheckboxRadioSwitch
+				ref="switchAllowConfirmationEmail"
+				v-model="appConfig.allowConfirmationEmail"
+				type="switch"
+				@update:modelValue="onAllowConfirmationEmailChange">
+				{{ t('forms', 'Allow confirmation emails to form respondents') }}
+			</NcCheckboxRadioSwitch>
+		</NcSettingsSection>
 		<NcSettingsSection :name="t('forms', 'Form sharing')">
 			<NcCheckboxRadioSwitch
 				ref="switchAllowPublicLink"
@@ -126,6 +142,13 @@ export default {
 			const el = this.$refs.switchAllowShowToAll
 			el.loading = true
 			await this.saveAppConfig('allowShowToAll', newVal)
+			el.loading = false
+		},
+
+		async onAllowConfirmationEmailChange(newVal) {
+			const el = this.$refs.switchAllowConfirmationEmail
+			el.loading = true
+			await this.saveAppConfig('allowConfirmationEmail', newVal)
 			el.loading = false
 		},
 

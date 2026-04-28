@@ -206,12 +206,15 @@ class ApiController extends OCSController {
 			$formData['showExpiration'] = false;
 			$formData['expires'] = 0;
 			$formData['isAnonymous'] = false;
+			$formData['confirmationEmailQuestionId'] = null;
 
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
 
 			// Get Questions, set new formId, reinsert
 			$questions = $this->questionMapper->findByForm($oldForm->getId());
+			$oldConfirmationEmailQuestionId = $oldForm->getConfirmationEmailQuestionId();
+
 			foreach ($questions as $oldQuestion) {
 				$questionData = $oldQuestion->read();
 
@@ -219,6 +222,10 @@ class ApiController extends OCSController {
 				$questionData['formId'] = $form->getId();
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
+
+				if ($oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
+					$form->setConfirmationEmailQuestionId($newQuestion->getId());
+				}
 
 				// Get Options, set new QuestionId, reinsert
 				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
@@ -231,6 +238,8 @@ class ApiController extends OCSController {
 					$this->optionMapper->insert($newOption);
 				}
 			}
+
+			$this->formMapper->update($form);
 		}
 
 		return new DataResponse($this->formsService->getForm($form), Http::STATUS_CREATED);
@@ -332,6 +341,14 @@ class ApiController extends OCSController {
 		unset($keyValuePairs['path']);
 		unset($keyValuePairs['fileId']);
 		unset($keyValuePairs['fileFormat']);
+
+		if (array_key_exists('confirmationEmailQuestionId', $keyValuePairs)) {
+			try {
+				$this->formsService->validateConfirmationEmailQuestionId($form, $keyValuePairs['confirmationEmailQuestionId']);
+			} catch (\InvalidArgumentException $e) {
+				throw new OCSBadRequestException('Invalid confirmationEmailQuestionId, will not update.');
+			}
+		}
 
 		// Create FormEntity with given Params & Id.
 		foreach ($keyValuePairs as $key => $value) {
@@ -649,6 +666,11 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
+		if ($form->getConfirmationEmailQuestionId() === $question->getId()
+			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)) {
+			$form->setConfirmationEmailQuestionId(null);
+		}
+
 		// Create QuestionEntity with given Params & Id.
 		$question = Question::fromParams($keyValuePairs);
 		$question->setId($questionId);
@@ -718,6 +740,10 @@ class ApiController extends OCSController {
 				$question->setOrder($questionOrder - 1);
 				$this->questionMapper->update($question);
 			}
+		}
+
+		if ($form->getConfirmationEmailQuestionId() === $questionId) {
+			$form->setConfirmationEmailQuestionId(null);
 		}
 
 		$this->formMapper->update($form);

@@ -397,6 +397,10 @@ class ApiV3Test extends IntegrationBase {
 					'fileFormat' => null,
 					'maxSubmissions' => null,
 					'isMaxSubmissionsReached' => false,
+					'confirmationEmailEnabled' => false,
+					'confirmationEmailSubject' => null,
+					'confirmationEmailBody' => null,
+					'confirmationEmailQuestionId' => null,
 				]
 			]
 		];
@@ -530,6 +534,10 @@ class ApiV3Test extends IntegrationBase {
 					'fileFormat' => null,
 					'maxSubmissions' => null,
 					'isMaxSubmissionsReached' => false,
+					'confirmationEmailEnabled' => false,
+					'confirmationEmailSubject' => null,
+					'confirmationEmailBody' => null,
+					'confirmationEmailQuestionId' => null,
 				]
 			]
 		];

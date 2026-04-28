@@ -8,7 +8,9 @@
 namespace OCA\Forms\Service;
 
 use OCA\Forms\Activity\ActivityManager;
+use OCA\Forms\BackgroundJob\SendConfirmationMailJob;
 use OCA\Forms\Constants;
+use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
@@ -25,15 +27,21 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\BackgroundJob\IJobList;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\ICache;
+use OCP\ICacheFactory;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IL10N;
+use OCP\IMemcache;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Mail\IEmailValidator;
+use OCP\Mail\IMailer;
 use OCP\Search\ISearchQuery;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
@@ -49,6 +57,10 @@ use Psr\Log\LoggerInterface;
  */
 class FormsService {
 	private ?IUser $currentUser;
+	private ICache $emailRateLimitCache;
+
+	private const EMAIL_RATE_LIMIT = 3;
+	private const EMAIL_RATE_LIMIT_TTL = 86400; // 24 hours
 
 	public function __construct(
 		IUserSession $userSession,
@@ -67,8 +79,14 @@ class FormsService {
 		private IL10N $l10n,
 		private LoggerInterface $logger,
 		private IEventDispatcher $eventDispatcher,
+		private IMailer $mailer,
+		private IEmailValidator $emailValidator,
+		private AnswerMapper $answerMapper,
+		private IJobList $jobList,
+		private ICacheFactory $cacheFactory,
 	) {
 		$this->currentUser = $userSession->getUser();
+		$this->emailRateLimitCache = $cacheFactory->createDistributed('forms_confirmation_email');
 	}
 
 	/**
@@ -739,6 +757,139 @@ class FormsService {
 		}
 
 		$this->eventDispatcher->dispatchTyped(new FormSubmittedEvent($form, $submission));
+
+		// Send confirmation email if enabled
+		$this->sendConfirmationEmail($form, $submission);
+	}
+
+	private function sendConfirmationEmail(Form $form, Submission $submission): void {
+		if (!$form->getConfirmationEmailEnabled()) {
+			return;
+		}
+
+		if (!$this->configService->getAllowConfirmationEmail()) {
+			$this->logger->debug('Confirmation email feature is disabled by administrator', [
+				'formId' => $form->getId(),
+			]);
+			return;
+		}
+
+		$questions = $this->getQuestions($form->getId());
+		$answerMap = $this->buildAnswerMap($submission);
+
+		$recipientQuestion = $this->findRecipientQuestion($form, $questions);
+		if ($recipientQuestion === null) {
+			$this->logger->debug('No confirmation email recipient question is available', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+			]);
+			return;
+		}
+
+		$recipientEmail = $answerMap[$recipientQuestion['id']][0] ?? null;
+		if ($recipientEmail === null || !$this->emailValidator->isValid($recipientEmail)) {
+			$this->logger->debug('No valid email address found in submission for confirmation email', [
+				'formId' => $form->getId(),
+				'submissionId' => $submission->getId(),
+			]);
+			return;
+		}
+
+		if (!$this->checkEmailRateLimit($recipientEmail, $form->getId(), $submission->getId())) {
+			return;
+		}
+
+		[$subject, $body] = $this->buildEmailContent($form, $questions, $answerMap);
+
+		$this->jobList->add(SendConfirmationMailJob::class, [
+			'recipient' => $recipientEmail,
+			'subject' => $subject,
+			'body' => $body,
+			'formId' => $form->getId(),
+			'submissionId' => $submission->getId(),
+		]);
+		$this->logger->debug('Confirmation email queued', [
+			'formId' => $form->getId(),
+			'submissionId' => $submission->getId(),
+		]);
+	}
+
+	/**
+	 * @return array<int, string[]>
+	 */
+	private function buildAnswerMap(Submission $submission): array {
+		$answerMap = [];
+		foreach ($this->answerMapper->findBySubmission($submission->getId()) as $answer) {
+			$answerMap[$answer->getQuestionId()][] = $answer->getText();
+		}
+		return $answerMap;
+	}
+
+	/**
+	 * @param list<FormsQuestion> $questions
+	 * @param array<int, string[]> $answerMap
+	 * @return array{string, string}
+	 */
+	private function buildEmailContent(Form $form, array $questions, array $answerMap): array {
+		$subject = $form->getConfirmationEmailSubject();
+		$body = $form->getConfirmationEmailBody();
+
+		if (empty($subject)) {
+			$subject = $this->l10n->t('Thank you for your submission');
+		}
+		if (empty($body)) {
+			$body = $this->l10n->t('Thank you for submitting the form "%s".', [$form->getTitle()]);
+		}
+
+		$replacements = [
+			'{formTitle}' => $form->getTitle(),
+			'{formDescription}' => $form->getDescription() ?? '',
+		];
+
+		foreach ($questions as $question) {
+			$fieldKey = !empty($question['name'] ?? '') ? $question['name'] : ($question['text'] ?? '');
+			$fieldKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fieldKey));
+			if ($fieldKey !== '' && !empty($answerMap[$question['id']])) {
+				$replacements['{' . $fieldKey . '}'] = implode('; ', $answerMap[$question['id']]);
+			}
+		}
+
+		return [
+			str_replace(array_keys($replacements), array_values($replacements), $subject),
+			str_replace(array_keys($replacements), array_values($replacements), $body),
+		];
+	}
+
+	/**
+	 * @param list<FormsQuestion> $questions
+	 * @return FormsQuestion|null
+	 */
+	private function findRecipientQuestion(Form $form, array $questions): ?array {
+		$recipientQuestionId = $form->getConfirmationEmailQuestionId();
+		if ($recipientQuestionId === null) {
+			return null;
+		}
+
+		foreach ($questions as $questionData) {
+			if (($questionData['id'] ?? null) !== $recipientQuestionId) {
+				continue;
+			}
+
+			if (Question::isEmailTypeStatic(
+				$questionData['type'] ?? '',
+				(array)($questionData['extraSettings'] ?? [])
+			)) {
+				return $questionData;
+			}
+
+			$this->logger->debug('Configured confirmation email recipient question is invalid', [
+				'formId' => $form->getId(),
+				'recipientQuestionId' => $recipientQuestionId,
+			]);
+			return null;
+		}
+
+		return null;
 	}
 
 	/**
@@ -1014,5 +1165,66 @@ class FormsService {
 
 	private static function normalizeFileName(string $fileName): string {
 		return trim(str_replace(Constants::FILENAME_INVALID_CHARS, '-', $fileName));
+	}
+
+	private function checkEmailRateLimit(string $email, int $formId, int $submissionId): bool {
+		$cacheKey = 'email_rl_' . hash('sha256', $formId . ':' . strtolower($email));
+
+		if (!$this->emailRateLimitCache instanceof IMemcache) {
+			// No distributed cache available — skip rate limiting and allow the send.
+			// Atomic increment requires IMemcache; without it we cannot safely count.
+			$this->logger->debug('Distributed cache unavailable, skipping confirmation email rate limit', [
+				'formId' => $formId,
+			]);
+			return true;
+		}
+
+		if ($this->emailRateLimitCache->add($cacheKey, 1, self::EMAIL_RATE_LIMIT_TTL)) {
+			$count = 1;
+		} else {
+			$count = $this->emailRateLimitCache->inc($cacheKey);
+			if (!is_int($count)) {
+				$this->logger->warning('Failed to increment confirmation email rate limit counter', [
+					'formId' => $formId,
+					'submissionId' => $submissionId,
+				]);
+				return false;
+			}
+		}
+
+		if ($count > self::EMAIL_RATE_LIMIT) {
+			$this->logger->warning('Per-recipient confirmation email rate limit reached', [
+				'formId' => $formId,
+				'submissionId' => $submissionId,
+			]);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @throws \InvalidArgumentException
+	 */
+	public function validateConfirmationEmailQuestionId(Form $form, mixed $recipientId): void {
+		if ($recipientId === null) {
+			return;
+		}
+
+		if (!is_int($recipientId)) {
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
+		}
+
+		try {
+			$question = $this->questionMapper->findById($recipientId);
+		} catch (IMapperException $e) {
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId', previous: $e);
+		}
+
+		if ($question->getFormId() !== $form->getId()
+			|| $question->getOrder() === 0
+			|| !$question->isEmailType()) {
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
+		}
 	}
 }
