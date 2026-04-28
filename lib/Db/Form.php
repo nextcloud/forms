@@ -59,8 +59,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setConfirmationEmailSubject(string|null $value)
  * @method string|null getConfirmationEmailBody()
  * @method void setConfirmationEmailBody(string|null $value)
- * @method int|null getConfirmationEmailRecipient()
- * @method void setConfirmationEmailRecipient(int|null $value)
+ * @method int|null getConfirmationEmailQuestionId()
+ * @method void setConfirmationEmailQuestionId(int|null $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -85,7 +85,7 @@ class Form extends Entity {
 	protected $confirmationEmailEnabled;
 	protected $confirmationEmailSubject;
 	protected $confirmationEmailBody;
-	protected $confirmationEmailRecipient;
+	protected $confirmationEmailQuestionId;
 
 	/**
 	 * Form constructor.
@@ -103,7 +103,7 @@ class Form extends Entity {
 		$this->addType('lockedUntil', 'integer');
 		$this->addType('maxSubmissions', 'integer');
 		$this->addType('confirmationEmailEnabled', 'boolean');
-		$this->addType('confirmationEmailRecipient', 'integer');
+		$this->addType('confirmationEmailQuestionId', 'integer');
 	}
 
 	// JSON-Decoding of access-column.
@@ -181,7 +181,7 @@ class Form extends Entity {
 	 *   confirmationEmailEnabled: bool,
 	 *   confirmationEmailSubject: ?string,
 	 *   confirmationEmailBody: ?string,
-	 *   confirmationEmailRecipient: ?int,
+	 *   confirmationEmailQuestionId: ?int,
 	 *  }
 	 */
 	public function read() {
@@ -209,7 +209,7 @@ class Form extends Entity {
 			'confirmationEmailEnabled' => (bool)$this->getConfirmationEmailEnabled(),
 			'confirmationEmailSubject' => $this->getConfirmationEmailSubject(),
 			'confirmationEmailBody' => $this->getConfirmationEmailBody(),
-			'confirmationEmailRecipient' => $this->getConfirmationEmailRecipient(),
+			'confirmationEmailQuestionId' => $this->getConfirmationEmailQuestionId(),
 		];
 	}
 }

@@ -30,12 +30,14 @@ class Version050300Date20260413233000 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 		$table = $schema->getTable('forms_v2_forms');
+		$changed = false;
 
 		if (!$table->hasColumn('confirmation_email_enabled')) {
 			$table->addColumn('confirmation_email_enabled', Types::BOOLEAN, [
 				'notnull' => false,
 				'default' => 0,
 			]);
+			$changed = true;
 		}
 
 		if (!$table->hasColumn('confirmation_email_subject')) {
@@ -44,6 +46,7 @@ class Version050300Date20260413233000 extends SimpleMigrationStep {
 				'default' => null,
 				'length' => 255,
 			]);
+			$changed = true;
 		}
 
 		if (!$table->hasColumn('confirmation_email_body')) {
@@ -51,15 +54,17 @@ class Version050300Date20260413233000 extends SimpleMigrationStep {
 				'notnull' => false,
 				'default' => null,
 			]);
+			$changed = true;
 		}
 
-		if (!$table->hasColumn('confirmation_email_recipient')) {
-			$table->addColumn('confirmation_email_recipient', Types::INTEGER, [
+		if (!$table->hasColumn('confirmation_email_question_id')) {
+			$table->addColumn('confirmation_email_question_id', Types::INTEGER, [
 				'notnull' => false,
 				'default' => null,
 			]);
+			$changed = true;
 		}
 
-		return $schema;
+		return $changed ? $schema : null;
 	}
 }

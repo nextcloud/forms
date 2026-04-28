@@ -69,7 +69,7 @@ class FormsMigrator implements IMigrator {
 				$formData['confirmationEmailEnabled'] ??= false;
 				$formData['confirmationEmailSubject'] ??= null;
 				$formData['confirmationEmailBody'] ??= null;
-				$formData['confirmationEmailRecipient'] ??= null;
+				$formData['confirmationEmailQuestionId'] ??= null;
 				$formData['questions'] = $this->formsService->getQuestions($formData['id']);
 				$formData['submissions'] = $this->submissionService->getSubmissions($formData['id']);
 
@@ -156,7 +156,7 @@ class FormsMigrator implements IMigrator {
 				$form->setConfirmationEmailEnabled($formData['confirmationEmailEnabled'] ?? false);
 				$form->setConfirmationEmailSubject($formData['confirmationEmailSubject'] ?? null);
 				$form->setConfirmationEmailBody($formData['confirmationEmailBody'] ?? null);
-				$form->setConfirmationEmailRecipient(null); // Set to null initially, updated after questions are imported
+				$form->setConfirmationEmailQuestionId(null); // Set to null initially, updated after questions are imported
 
 				$this->formMapper->insert($form);
 
@@ -185,9 +185,9 @@ class FormsMigrator implements IMigrator {
 					}
 				}
 
-				if (($formData['confirmationEmailRecipient'] ?? null) !== null
-					&& isset($questionIdMap[$formData['confirmationEmailRecipient']])) {
-					$form->setConfirmationEmailRecipient($questionIdMap[$formData['confirmationEmailRecipient']]);
+				if (($formData['confirmationEmailQuestionId'] ?? null) !== null
+					&& isset($questionIdMap[$formData['confirmationEmailQuestionId']])) {
+					$form->setConfirmationEmailQuestionId($questionIdMap[$formData['confirmationEmailQuestionId']]);
 					$this->formMapper->update($form);
 				}
 

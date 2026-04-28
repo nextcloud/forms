@@ -31,6 +31,7 @@ use OCP\BackgroundJob\IJobList;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\ICache;
 use OCP\ICacheFactory;
 use OCP\IGroup;
 use OCP\IGroupManager;
@@ -56,6 +57,7 @@ use Psr\Log\LoggerInterface;
  */
 class FormsService {
 	private ?IUser $currentUser;
+	private ICache $emailRateLimitCache;
 
 	private const EMAIL_RATE_LIMIT = 3;
 	private const EMAIL_RATE_LIMIT_TTL = 86400; // 24 hours
@@ -84,6 +86,7 @@ class FormsService {
 		private ICacheFactory $cacheFactory,
 	) {
 		$this->currentUser = $userSession->getUser();
+		$this->emailRateLimitCache = $cacheFactory->createDistributed('forms_confirmation_email');
 	}
 
 	/**
@@ -800,7 +803,7 @@ class FormsService {
 			$answerMap[$questionId][] = $answer->getText();
 		}
 
-		$recipientQuestion = $this->getConfirmationEmailRecipientQuestion($form, $questions);
+		$recipientQuestion = $this->getConfirmationEmailQuestionIdQuestion($form, $questions);
 		if ($recipientQuestion === null) {
 			$this->logger->debug('No confirmation email recipient question is available', [
 				'formId' => $form->getId(),
@@ -820,8 +823,7 @@ class FormsService {
 		}
 
 		$cacheKey = 'email_rl_' . hash('sha256', $form->getId() . ':' . strtolower($recipientEmail));
-		$cache = $this->cacheFactory->createDistributed('forms_confirmation_email');
-		if (!$cache instanceof IMemcache) {
+		if (!$this->emailRateLimitCache instanceof IMemcache) {
 			$this->logger->warning('Distributed cache does not support atomic increments for confirmation email rate limiting', [
 				'formId' => $form->getId(),
 				'submissionId' => $submission->getId(),
@@ -829,10 +831,10 @@ class FormsService {
 			return;
 		}
 
-		if ($cache->add($cacheKey, 1, self::EMAIL_RATE_LIMIT_TTL)) {
+		if ($this->emailRateLimitCache->add($cacheKey, 1, self::EMAIL_RATE_LIMIT_TTL)) {
 			$count = 1;
 		} else {
-			$count = $cache->inc($cacheKey);
+			$count = $this->emailRateLimitCache->inc($cacheKey);
 			if (!is_int($count)) {
 				$this->logger->warning('Failed to increment confirmation email rate limit counter', [
 					'formId' => $form->getId(),
@@ -865,11 +867,7 @@ class FormsService {
 			$fieldKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fieldKey));
 
 			if (!empty($answerMap[$questionId])) {
-				$answerValue = implode('; ', $answerMap[$questionId]);
-				$replacements['{' . $fieldKey . '}'] = $answerValue;
-				if (!empty($questionName)) {
-					$replacements['{' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $questionName)) . '}'] = $answerValue;
-				}
+				$replacements['{' . $fieldKey . '}'] = implode('; ', $answerMap[$questionId]);
 			}
 		}
 
@@ -893,8 +891,8 @@ class FormsService {
 	 * @param list<FormsQuestion> $questions
 	 * @return FormsQuestion|null
 	 */
-	private function getConfirmationEmailRecipientQuestion(Form $form, array $questions): ?array {
-		$recipientQuestionId = $form->getConfirmationEmailRecipient();
+	private function getConfirmationEmailQuestionIdQuestion(Form $form, array $questions): ?array {
+		$recipientQuestionId = $form->getConfirmationEmailQuestionId();
 		if ($recipientQuestionId === null) {
 			return null;
 		}
@@ -904,7 +902,7 @@ class FormsService {
 				continue;
 			}
 
-			if ($this->isConfirmationEmailQuestion($questionData)) {
+			if ($this->isEmailQuestion($questionData)) {
 				return $questionData;
 			}
 
@@ -921,7 +919,7 @@ class FormsService {
 	/**
 	 * @param FormsQuestion $question
 	 */
-	private function isConfirmationEmailQuestion(array $question): bool {
+	private function isEmailQuestion(array $question): bool {
 		return Question::isEmailTypeStatic(
 			$question['type'] ?? '',
 			(array)($question['extraSettings'] ?? [])
@@ -1061,11 +1059,7 @@ class FormsService {
 			}
 
 			// Special handling of short input for validation
-		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT) {
-			if (!isset($extraSettings['validationType'])) {
-				return true;
-			}
-
+		} elseif ($questionType === Constants::ANSWER_TYPE_SHORT && isset($extraSettings['validationType'])) {
 			// Ensure input validation type is known
 			if (!in_array($extraSettings['validationType'], Constants::SHORT_INPUT_TYPES)) {
 				return false;
@@ -1210,25 +1204,25 @@ class FormsService {
 	/**
 	 * @throws \InvalidArgumentException
 	 */
-	public function validateConfirmationEmailRecipient(Form $form, mixed $recipientId): void {
+	public function validateConfirmationEmailQuestionId(Form $form, mixed $recipientId): void {
 		if ($recipientId === null) {
 			return;
 		}
 
 		if (!is_int($recipientId)) {
-			throw new \InvalidArgumentException('Invalid confirmationEmailRecipient');
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
 		}
 
 		try {
 			$question = $this->questionMapper->findById($recipientId);
 		} catch (IMapperException $e) {
-			throw new \InvalidArgumentException('Invalid confirmationEmailRecipient');
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
 		}
 
 		if ($question->getFormId() !== $form->getId()
 			|| $question->getOrder() === 0
 			|| !$question->isEmailType()) {
-			throw new \InvalidArgumentException('Invalid confirmationEmailRecipient');
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
 		}
 	}
 }

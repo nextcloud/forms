@@ -254,7 +254,7 @@
 							:clearable="false"
 							trackBy="id"
 							@update:modelValue="
-								onConfirmationEmailRecipientSelectionChange
+								onConfirmationEmailQuestionIdSelectionChange
 							" />
 						<p
 							v-if="selectedConfirmationEmailQuestionLabel"
@@ -504,14 +504,14 @@ export default {
 
 		selectedConfirmationEmailQuestion() {
 			const selectedQuestion = this.confirmationEmailQuestions.find(
-				(question) => question.id === this.form.confirmationEmailRecipient,
+				(question) => question.id === this.form.confirmationEmailQuestionId,
 			)
 			if (selectedQuestion) {
 				return selectedQuestion
 			}
 
 			if (
-				this.form.confirmationEmailRecipient === null
+				this.form.confirmationEmailQuestionId === null
 				&& this.emailQuestionCount === 1
 			) {
 				return this.confirmationEmailQuestions[0]
@@ -522,7 +522,7 @@ export default {
 
 		selectedConfirmationEmailQuestionId() {
 			return (
-				this.form.confirmationEmailRecipient
+				this.form.confirmationEmailQuestionId
 				?? this.selectedConfirmationEmailQuestion?.id
 				?? ''
 			)
@@ -562,7 +562,7 @@ export default {
 				)
 			}
 
-			if (this.requiresConfirmationEmailRecipientSelection) {
+			if (this.requiresConfirmationEmailQuestionIdSelection) {
 				return t(
 					'forms',
 					'Select which email field should receive confirmation emails before finishing this setup.',
@@ -572,7 +572,7 @@ export default {
 			return ''
 		},
 
-		requiresConfirmationEmailRecipientSelection() {
+		requiresConfirmationEmailQuestionIdSelection() {
 			return (
 				this.emailQuestionCount > 1
 				&& !this.selectedConfirmationEmailQuestion
@@ -583,7 +583,7 @@ export default {
 			return (
 				this.form.confirmationEmailEnabled
 				&& (this.emailQuestionCount === 0
-					|| this.requiresConfirmationEmailRecipientSelection)
+					|| this.requiresConfirmationEmailQuestionIdSelection)
 			)
 		},
 	},
@@ -601,7 +601,7 @@ export default {
 
 		confirmationEmailQuestions: {
 			handler() {
-				const selectedRecipientId = this.form.confirmationEmailRecipient
+				const selectedRecipientId = this.form.confirmationEmailQuestionId
 				const hasValidSelectedRecipient =
 					selectedRecipientId !== null
 					&& this.confirmationEmailQuestions.some(
@@ -610,11 +610,11 @@ export default {
 
 				if (selectedRecipientId !== null && !hasValidSelectedRecipient) {
 					if (this.emailQuestionCount === 1) {
-						this.saveConfirmationEmailRecipient(
+						this.saveConfirmationEmailQuestionId(
 							this.confirmationEmailQuestions[0].id,
 						)
 					} else {
-						this.saveConfirmationEmailRecipient(null)
+						this.saveConfirmationEmailQuestionId(null)
 					}
 					return
 				}
@@ -622,9 +622,9 @@ export default {
 				if (
 					this.form.confirmationEmailEnabled
 					&& this.emailQuestionCount === 1
-					&& this.form.confirmationEmailRecipient === null
+					&& this.form.confirmationEmailQuestionId === null
 				) {
-					this.saveConfirmationEmailRecipient(
+					this.saveConfirmationEmailQuestionId(
 						this.confirmationEmailQuestions[0].id,
 					)
 				}
@@ -734,10 +734,10 @@ export default {
 		onConfirmationEmailEnabledChange(checked) {
 			if (
 				checked
-				&& this.form.confirmationEmailRecipient === null
+				&& this.form.confirmationEmailQuestionId === null
 				&& this.emailQuestionCount === 1
 			) {
-				this.saveConfirmationEmailRecipient(
+				this.saveConfirmationEmailQuestionId(
 					this.confirmationEmailQuestions[0].id,
 				)
 			}
@@ -761,23 +761,23 @@ export default {
 			this.$emit('update:formProp', 'confirmationEmailBody', target.value)
 		},
 
-		onConfirmationEmailRecipientSelectionChange(option) {
+		onConfirmationEmailQuestionIdSelectionChange(option) {
 			const questionId = option?.id ?? null
 			if (questionId === null) {
 				return
 			}
 
-			this.saveConfirmationEmailRecipient(questionId)
+			this.saveConfirmationEmailQuestionId(questionId)
 		},
 
-		saveConfirmationEmailRecipient(selectedQuestionId) {
-			if (this.form.confirmationEmailRecipient === selectedQuestionId) {
+		saveConfirmationEmailQuestionId(selectedQuestionId) {
+			if (this.form.confirmationEmailQuestionId === selectedQuestionId) {
 				return
 			}
 
 			this.$emit(
 				'update:formProp',
-				'confirmationEmailRecipient',
+				'confirmationEmailQuestionId',
 				selectedQuestionId,
 			)
 		},

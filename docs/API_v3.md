@@ -178,7 +178,7 @@ Returns the full-depth object of the requested form (without submissions).
   "confirmationEmailEnabled": false,
   "confirmationEmailSubject": null,
   "confirmationEmailBody": null,
-  "confirmationEmailRecipient": null,
+  "confirmationEmailQuestionId": null,
   "permissions": [
     "edit",
     "results",

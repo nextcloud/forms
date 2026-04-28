@@ -31,14 +31,12 @@ use OCA\Forms\Service\SubmissionService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
-use OCP\AppFramework\Http\Attribute\AnonRateLimit;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
-use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -208,14 +206,14 @@ class ApiController extends OCSController {
 			$formData['showExpiration'] = false;
 			$formData['expires'] = 0;
 			$formData['isAnonymous'] = false;
-			$formData['confirmationEmailRecipient'] = null;
+			$formData['confirmationEmailQuestionId'] = null;
 
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
 
 			// Get Questions, set new formId, reinsert
 			$questions = $this->questionMapper->findByForm($oldForm->getId());
-			$oldConfirmationEmailRecipient = $oldForm->getConfirmationEmailRecipient();
+			$oldConfirmationEmailQuestionId = $oldForm->getConfirmationEmailQuestionId();
 
 			foreach ($questions as $oldQuestion) {
 				$questionData = $oldQuestion->read();
@@ -226,8 +224,8 @@ class ApiController extends OCSController {
 				$this->questionMapper->insert($newQuestion);
 
 				// Map the confirmation email recipient if this question matches
-				if ($oldConfirmationEmailRecipient === $oldQuestion->getId()) {
-					$form->setConfirmationEmailRecipient($newQuestion->getId());
+				if ($oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
+					$form->setConfirmationEmailQuestionId($newQuestion->getId());
 					$this->formMapper->update($form);
 				}
 
@@ -344,11 +342,11 @@ class ApiController extends OCSController {
 		unset($keyValuePairs['fileId']);
 		unset($keyValuePairs['fileFormat']);
 
-		if (array_key_exists('confirmationEmailRecipient', $keyValuePairs)) {
+		if (array_key_exists('confirmationEmailQuestionId', $keyValuePairs)) {
 			try {
-				$this->formsService->validateConfirmationEmailRecipient($form, $keyValuePairs['confirmationEmailRecipient']);
+				$this->formsService->validateConfirmationEmailQuestionId($form, $keyValuePairs['confirmationEmailQuestionId']);
 			} catch (\InvalidArgumentException $e) {
-				throw new OCSBadRequestException('Invalid confirmationEmailRecipient, will not update.');
+				throw new OCSBadRequestException('Invalid confirmationEmailQuestionId, will not update.');
 			}
 		}
 
@@ -668,9 +666,9 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
-		if ($form->getConfirmationEmailRecipient() === $question->getId()
+		if ($form->getConfirmationEmailQuestionId() === $question->getId()
 			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)) {
-			$form->setConfirmationEmailRecipient(null);
+			$form->setConfirmationEmailQuestionId(null);
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -744,8 +742,8 @@ class ApiController extends OCSController {
 			}
 		}
 
-		if ($form->getConfirmationEmailRecipient() === $questionId) {
-			$form->setConfirmationEmailRecipient(null);
+		if ($form->getConfirmationEmailQuestionId() === $questionId) {
+			$form->setConfirmationEmailQuestionId(null);
 		}
 
 		$this->formMapper->update($form);
@@ -1381,8 +1379,6 @@ class ApiController extends OCSController {
 	 *
 	 * 201: empty response
 	 */
-	#[AnonRateLimit(limit: 3, period: 3600)]
-	#[UserRateLimit(limit: 10, period: 3600)]
 	#[CORS()]
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
