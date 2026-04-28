@@ -223,10 +223,8 @@ class ApiController extends OCSController {
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
 
-				// Map the confirmation email recipient if this question matches
 				if ($oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
 					$form->setConfirmationEmailQuestionId($newQuestion->getId());
-					$this->formMapper->update($form);
 				}
 
 				// Get Options, set new QuestionId, reinsert
@@ -240,6 +238,8 @@ class ApiController extends OCSController {
 					$this->optionMapper->insert($newOption);
 				}
 			}
+
+			$this->formMapper->update($form);
 		}
 
 		return new DataResponse($this->formsService->getForm($form), Http::STATUS_CREATED);

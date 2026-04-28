@@ -762,14 +762,7 @@ class FormsService {
 		$this->sendConfirmationEmail($form, $submission);
 	}
 
-	/**
-	 * Send confirmation email to the respondent
-	 *
-	 * @param Form $form The form that was submitted
-	 * @param Submission $submission The submission
-	 */
 	private function sendConfirmationEmail(Form $form, Submission $submission): void {
-		// Check if confirmation email is enabled
 		if (!$form->getConfirmationEmailEnabled()) {
 			return;
 		}
@@ -781,29 +774,10 @@ class FormsService {
 			return;
 		}
 
-		$subject = $form->getConfirmationEmailSubject();
-		$body = $form->getConfirmationEmailBody();
-
-		if (empty($subject)) {
-			$subject = $this->l10n->t('Thank you for your submission');
-		}
-		if (empty($body)) {
-			$body = $this->l10n->t('Thank you for submitting the form "%s".', [$form->getTitle()]);
-		}
-
 		$questions = $this->getQuestions($form->getId());
-		$answers = $this->answerMapper->findBySubmission($submission->getId());
+		$answerMap = $this->buildAnswerMap($submission);
 
-		$answerMap = [];
-		foreach ($answers as $answer) {
-			$questionId = $answer->getQuestionId();
-			if (!isset($answerMap[$questionId])) {
-				$answerMap[$questionId] = [];
-			}
-			$answerMap[$questionId][] = $answer->getText();
-		}
-
-		$recipientQuestion = $this->getConfirmationEmailQuestionIdQuestion($form, $questions);
+		$recipientQuestion = $this->findRecipientQuestion($form, $questions);
 		if ($recipientQuestion === null) {
 			$this->logger->debug('No confirmation email recipient question is available', [
 				'formId' => $form->getId(),
@@ -812,8 +786,7 @@ class FormsService {
 			return;
 		}
 
-		$recipientQuestionId = $recipientQuestion['id'];
-		$recipientEmail = $answerMap[$recipientQuestionId][0] ?? null;
+		$recipientEmail = $answerMap[$recipientQuestion['id']][0] ?? null;
 		if ($recipientEmail === null || !$this->emailValidator->isValid($recipientEmail)) {
 			$this->logger->debug('No valid email address found in submission for confirmation email', [
 				'formId' => $form->getId(),
@@ -822,57 +795,11 @@ class FormsService {
 			return;
 		}
 
-		$cacheKey = 'email_rl_' . hash('sha256', $form->getId() . ':' . strtolower($recipientEmail));
-		if (!$this->emailRateLimitCache instanceof IMemcache) {
-			$this->logger->warning('Distributed cache does not support atomic increments for confirmation email rate limiting', [
-				'formId' => $form->getId(),
-				'submissionId' => $submission->getId(),
-			]);
+		if (!$this->checkEmailRateLimit($recipientEmail, $form->getId(), $submission->getId())) {
 			return;
 		}
 
-		if ($this->emailRateLimitCache->add($cacheKey, 1, self::EMAIL_RATE_LIMIT_TTL)) {
-			$count = 1;
-		} else {
-			$count = $this->emailRateLimitCache->inc($cacheKey);
-			if (!is_int($count)) {
-				$this->logger->warning('Failed to increment confirmation email rate limit counter', [
-					'formId' => $form->getId(),
-					'submissionId' => $submission->getId(),
-				]);
-				return;
-			}
-		}
-
-		if ($count > self::EMAIL_RATE_LIMIT) {
-			$this->logger->warning('Per-recipient confirmation email rate limit reached', [
-				'formId' => $form->getId(),
-				'submissionId' => $submission->getId(),
-			]);
-			return;
-		}
-
-		// Replace placeholders in subject and body
-		$replacements = [
-			'{formTitle}' => $form->getTitle(),
-			'{formDescription}' => $form->getDescription() ?? '',
-		];
-
-		foreach ($questions as $question) {
-			$questionId = $question['id'];
-			$questionName = $question['name'] ?? '';
-			$questionText = $question['text'] ?? '';
-
-			$fieldKey = !empty($questionName) ? $questionName : $questionText;
-			$fieldKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fieldKey));
-
-			if (!empty($answerMap[$questionId])) {
-				$replacements['{' . $fieldKey . '}'] = implode('; ', $answerMap[$questionId]);
-			}
-		}
-
-		$subject = str_replace(array_keys($replacements), array_values($replacements), $subject);
-		$body = str_replace(array_keys($replacements), array_values($replacements), $body);
+		[$subject, $body] = $this->buildEmailContent($form, $questions, $answerMap);
 
 		$this->jobList->add(SendConfirmationMailJob::class, [
 			'recipient' => $recipientEmail,
@@ -888,10 +815,56 @@ class FormsService {
 	}
 
 	/**
+	 * @return array<int, string[]>
+	 */
+	private function buildAnswerMap(Submission $submission): array {
+		$answerMap = [];
+		foreach ($this->answerMapper->findBySubmission($submission->getId()) as $answer) {
+			$answerMap[$answer->getQuestionId()][] = $answer->getText();
+		}
+		return $answerMap;
+	}
+
+	/**
+	 * @param list<FormsQuestion> $questions
+	 * @param array<int, string[]> $answerMap
+	 * @return array{string, string}
+	 */
+	private function buildEmailContent(Form $form, array $questions, array $answerMap): array {
+		$subject = $form->getConfirmationEmailSubject();
+		$body = $form->getConfirmationEmailBody();
+
+		if (empty($subject)) {
+			$subject = $this->l10n->t('Thank you for your submission');
+		}
+		if (empty($body)) {
+			$body = $this->l10n->t('Thank you for submitting the form "%s".', [$form->getTitle()]);
+		}
+
+		$replacements = [
+			'{formTitle}' => $form->getTitle(),
+			'{formDescription}' => $form->getDescription() ?? '',
+		];
+
+		foreach ($questions as $question) {
+			$fieldKey = !empty($question['name'] ?? '') ? $question['name'] : ($question['text'] ?? '');
+			$fieldKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $fieldKey));
+			if ($fieldKey !== '' && !empty($answerMap[$question['id']])) {
+				$replacements['{' . $fieldKey . '}'] = implode('; ', $answerMap[$question['id']]);
+			}
+		}
+
+		return [
+			str_replace(array_keys($replacements), array_values($replacements), $subject),
+			str_replace(array_keys($replacements), array_values($replacements), $body),
+		];
+	}
+
+	/**
 	 * @param list<FormsQuestion> $questions
 	 * @return FormsQuestion|null
 	 */
-	private function getConfirmationEmailQuestionIdQuestion(Form $form, array $questions): ?array {
+	private function findRecipientQuestion(Form $form, array $questions): ?array {
 		$recipientQuestionId = $form->getConfirmationEmailQuestionId();
 		if ($recipientQuestionId === null) {
 			return null;
@@ -902,7 +875,10 @@ class FormsService {
 				continue;
 			}
 
-			if ($this->isEmailQuestion($questionData)) {
+			if (Question::isEmailTypeStatic(
+				$questionData['type'] ?? '',
+				(array)($questionData['extraSettings'] ?? [])
+			)) {
 				return $questionData;
 			}
 
@@ -914,16 +890,6 @@ class FormsService {
 		}
 
 		return null;
-	}
-
-	/**
-	 * @param FormsQuestion $question
-	 */
-	private function isEmailQuestion(array $question): bool {
-		return Question::isEmailTypeStatic(
-			$question['type'] ?? '',
-			(array)($question['extraSettings'] ?? [])
-		);
 	}
 
 	/**
@@ -1201,6 +1167,42 @@ class FormsService {
 		return trim(str_replace(Constants::FILENAME_INVALID_CHARS, '-', $fileName));
 	}
 
+	private function checkEmailRateLimit(string $email, int $formId, int $submissionId): bool {
+		$cacheKey = 'email_rl_' . hash('sha256', $formId . ':' . strtolower($email));
+
+		if (!$this->emailRateLimitCache instanceof IMemcache) {
+			// No distributed cache available — skip rate limiting and allow the send.
+			// Atomic increment requires IMemcache; without it we cannot safely count.
+			$this->logger->debug('Distributed cache unavailable, skipping confirmation email rate limit', [
+				'formId' => $formId,
+			]);
+			return true;
+		}
+
+		if ($this->emailRateLimitCache->add($cacheKey, 1, self::EMAIL_RATE_LIMIT_TTL)) {
+			$count = 1;
+		} else {
+			$count = $this->emailRateLimitCache->inc($cacheKey);
+			if (!is_int($count)) {
+				$this->logger->warning('Failed to increment confirmation email rate limit counter', [
+					'formId' => $formId,
+					'submissionId' => $submissionId,
+				]);
+				return false;
+			}
+		}
+
+		if ($count > self::EMAIL_RATE_LIMIT) {
+			$this->logger->warning('Per-recipient confirmation email rate limit reached', [
+				'formId' => $formId,
+				'submissionId' => $submissionId,
+			]);
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @throws \InvalidArgumentException
 	 */
@@ -1216,7 +1218,7 @@ class FormsService {
 		try {
 			$question = $this->questionMapper->findById($recipientId);
 		} catch (IMapperException $e) {
-			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
+			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId', previous: $e);
 		}
 
 		if ($question->getFormId() !== $form->getId()

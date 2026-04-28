@@ -53,7 +53,7 @@ use OCP\AppFramework\Db\Entity;
  * @method int|null getMaxSubmissions()
  * @method void setMaxSubmissions(int|null $value)
  * @method void setLockedUntil(int|null $value)
- * @method int getConfirmationEmailEnabled()
+ * @method bool getConfirmationEmailEnabled()
  * @method void setConfirmationEmailEnabled(bool $value)
  * @method string|null getConfirmationEmailSubject()
  * @method void setConfirmationEmailSubject(string|null $value)

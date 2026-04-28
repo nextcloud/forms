@@ -290,20 +290,13 @@
 					{{ t('forms', 'Email body') }}
 				</label>
 				<textarea
-					:value="confirmationEmailBody"
+					v-model="confirmationEmailBody"
 					:disabled="locked || isConfirmationEmailConfigurationBlocked"
 					:placeholder="emailBodyPlaceholder"
 					class="confirmation-email__textarea"
-					@input="onConfirmationEmailBodyInput"
 					@blur="onConfirmationEmailBodyChange"></textarea>
 			</div>
 		</template>
-		<NcNoteCard
-			v-else
-			type="info"
-			:text="
-				t('forms', 'Confirmation emails are disabled by your administrator.')
-			" />
 
 		<TransferOwnership
 			:locked="locked"
@@ -589,14 +582,12 @@ export default {
 	},
 
 	watch: {
-		form: {
-			handler(newForm) {
-				this.confirmationEmailSubject =
-					newForm?.confirmationEmailSubject || ''
-				this.confirmationEmailBody = newForm?.confirmationEmailBody || ''
-			},
+		'form.confirmationEmailSubject': function (val) {
+			this.confirmationEmailSubject = val || ''
+		},
 
-			deep: true,
+		'form.confirmationEmailBody': function (val) {
+			this.confirmationEmailBody = val || ''
 		},
 
 		confirmationEmailQuestions: {
@@ -753,12 +744,12 @@ export default {
 			)
 		},
 
-		onConfirmationEmailBodyInput(event) {
-			this.confirmationEmailBody = event.target.value
-		},
-
-		onConfirmationEmailBodyChange({ target }) {
-			this.$emit('update:formProp', 'confirmationEmailBody', target.value)
+		onConfirmationEmailBodyChange() {
+			this.$emit(
+				'update:formProp',
+				'confirmationEmailBody',
+				this.confirmationEmailBody,
+			)
 		},
 
 		onConfirmationEmailQuestionIdSelectionChange(option) {
@@ -880,42 +871,41 @@ export default {
 .confirmation-email {
 	&__hint {
 		color: var(--color-text-maxcontrast);
-		font-size: 13px;
-		margin-bottom: 8px;
+		font-size: var(--font-size-small);
+		margin-bottom: calc(var(--default-grid-baseline) * 2);
 	}
 
 	&__steps {
-		margin: 0 0 12px;
-		padding-inline-start: 20px;
+		margin: 0 0 calc(var(--default-grid-baseline) * 3);
+		padding-inline-start: calc(var(--default-grid-baseline) * 5);
 		color: var(--color-text-maxcontrast);
-		font-size: 13px;
+		font-size: var(--font-size-small);
 	}
 
 	&__recipient {
-		margin-bottom: 12px;
+		margin-bottom: calc(var(--default-grid-baseline) * 3);
 	}
 
 	&__recipient-summary,
 	&__placeholder-hint {
 		color: var(--color-text-maxcontrast);
-		font-size: 13px;
-		margin-top: 8px;
+		font-size: var(--font-size-small);
+		margin-top: calc(var(--default-grid-baseline) * 2);
 	}
 
 	&__label {
 		display: block;
-		margin-top: 12px;
-		margin-bottom: 4px;
+		margin-top: calc(var(--default-grid-baseline) * 3);
+		margin-bottom: var(--default-grid-baseline);
 		font-weight: 600;
 	}
 
 	&__input {
 		width: 100%;
-		padding: 8px;
-		margin-bottom: 12px;
+		padding: calc(var(--default-grid-baseline) * 2);
+		margin-bottom: calc(var(--default-grid-baseline) * 3);
 		border: 2px solid var(--color-border-maxcontrast);
 		border-radius: var(--border-radius-large);
-		font-size: 14px;
 
 		&:focus {
 			outline: none;
@@ -929,11 +919,10 @@ export default {
 
 	&__textarea {
 		width: 100%;
-		min-height: 120px;
-		padding: 8px;
+		min-height: calc(var(--default-grid-baseline) * 30);
+		padding: calc(var(--default-grid-baseline) * 2);
 		border: 2px solid var(--color-border-maxcontrast);
 		border-radius: var(--border-radius-large);
-		font-size: 14px;
 		line-height: 1.5;
 		resize: vertical;
 

@@ -112,7 +112,7 @@ class Question extends Entity {
 	}
 
 	/**
-	 * Static version of isEmailType to be used with arrays.
+	 * Static variant for use without a Question instance.
 	 */
 	public static function isEmailTypeStatic(string $type, array $extraSettings): bool {
 		return $type === \OCA\Forms\Constants::ANSWER_TYPE_SHORT

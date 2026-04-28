@@ -1360,6 +1360,57 @@ class FormsServiceTest extends TestCase {
 		$formsService->notifyNewSubmission($form, $submission);
 	}
 
+	public function testNotifyNewSubmissionDoesNotSendConfirmationEmailIfAdminDisabled(): void {
+		$submission = new Submission();
+		$submission->setId(99);
+		$submission->setUserId('someUser');
+
+		$form = Form::fromParams([
+			'id' => 42,
+			'ownerId' => 'ownerUser',
+			'confirmationEmailEnabled' => true,
+		]);
+
+		$this->configService = $this->createMock(ConfigService::class);
+		$this->configService->method('getAllowConfirmationEmail')->willReturn(false);
+
+		$eventDispatcher = $this->createMock(IEventDispatcher::class);
+		$eventDispatcher->expects($this->once())->method('dispatchTyped')->withAnyParameters();
+
+		$formsService = $this->getMockBuilder(FormsService::class)
+			->onlyMethods(['getShares'])
+			->setConstructorArgs([
+				$this->createMock(IUserSession::class),
+				$this->activityManager,
+				$this->formMapper,
+				$this->optionMapper,
+				$this->questionMapper,
+				$this->shareMapper,
+				$this->submissionMapper,
+				$this->configService,
+				$this->groupManager,
+				$this->userManager,
+				$this->secureRandom,
+				$this->circlesService,
+				$this->storage,
+				$this->l10n,
+				$this->logger,
+				$eventDispatcher,
+				$this->mailer,
+				$this->emailValidator,
+				$this->answerMapper,
+				$this->jobList,
+				$this->cacheFactory,
+			])
+			->getMock();
+
+		$formsService->method('getShares')->willReturn([]);
+
+		$this->jobList->expects($this->never())->method('add');
+
+		$formsService->notifyNewSubmission($form, $submission);
+	}
+
 	public function testNotifyNewSubmissionSendsConfirmationEmailWithPlaceholders(): void {
 		$submission = new Submission();
 		$submission->setId(99);
