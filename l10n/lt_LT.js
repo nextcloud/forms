@@ -59,7 +59,7 @@ OC.L10N.register(
     "Move question up" : "Pakelti klausimą",
     "Move question down" : "Nuleisti klausimą",
     "Title of question number {index}" : "Klausimo nr. {index} antraštė",
-    "Required" : "Privalomas",
+    "Required" : "Privaloma",
     "Technical name of the question" : "Techninis klausimo pavadinimas",
     "Technical name" : "Techninis pavadinimas",
     "Copy question" : "Kopijuoti klausimą",
