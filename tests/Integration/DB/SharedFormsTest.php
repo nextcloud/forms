@@ -12,7 +12,7 @@ use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Tests\Integration\IntegrationBase;
-use OCP\IConfig;
+use OCP\IAppConfig;
 
 /**
  * @group DB
@@ -180,9 +180,14 @@ class SharedFormsTest extends IntegrationBase {
 	 * @dataProvider dataForbidPublicShowAccess
 	 */
 	public function testShowNoSharedFormsIfDisabled(array $configValues) {
-		$config = \OCP\Server::get(IConfig::class);
+		$config = \OCP\Server::get(IAppConfig::class);
 		foreach ($configValues as $key => $value) {
-			$config->setAppValue(Application::APP_ID, $key, json_encode($value));
+			if (is_array($value)) {
+				$config->setValueArray(Application::APP_ID, $key, $value);
+			} else {
+				$bool = is_bool($value) ? $value : filter_var($value, FILTER_VALIDATE_BOOLEAN);
+				$config->setValueBool(Application::APP_ID, $key, $bool);
+			}
 		}
 
 		$formMapper = \OCP\Server::get(FormMapper::class);
@@ -199,8 +204,8 @@ class SharedFormsTest extends IntegrationBase {
 	 * Test that a form with public access can be accessed even if show permissions are not granted (can fill out but not see in sidebar)
 	 */
 	public function testAllowPublicAccessOnDeniedPublicVisibility(): void {
-		$config = \OCP\Server::get(IConfig::class);
-		$config->setAppValue(Application::APP_ID, Constants::CONFIG_KEY_ALLOWSHOWTOALL, json_encode(false));
+		$config = \OCP\Server::get(IAppConfig::class);
+		$config->setValueBool(Application::APP_ID, Constants::CONFIG_KEY_ALLOWSHOWTOALL, false);
 
 		$formMapper = \OCP\Server::get(FormMapper::class);
 		$forms = $formMapper->findSharedForms('user1', filterShown: false);
@@ -216,9 +221,14 @@ class SharedFormsTest extends IntegrationBase {
 	 * @dataProvider dataForbidPublicAccess
 	 */
 	public function testShowNoSharedFormsAccessIfDisabled(array $configValues): void {
-		$config = \OCP\Server::get(IConfig::class);
+		$config = \OCP\Server::get(IAppConfig::class);
 		foreach ($configValues as $key => $value) {
-			$config->setAppValue(Application::APP_ID, $key, json_encode($value));
+			if (is_array($value)) {
+				$config->setValueArray(Application::APP_ID, $key, $value);
+			} else {
+				$bool = is_bool($value) ? $value : filter_var($value, FILTER_VALIDATE_BOOLEAN);
+				$config->setValueBool(Application::APP_ID, $key, $bool);
+			}
 		}
 
 		$formMapper = \OCP\Server::get(FormMapper::class);

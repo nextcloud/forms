@@ -10,7 +10,7 @@ namespace OCA\Forms\Tests\Integration;
 use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Constants;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use OCP\IDBConnection;
 use OCP\IUserManager;
 use Test\TestCase;
@@ -34,9 +34,9 @@ class IntegrationBase extends TestCase {
 	public function setUp(): void {
 		parent::setUp();
 
-		$config = \OCP\Server::get(IConfig::class);
+		$config = \OCP\Server::get(IAppConfig::class);
 		foreach (Constants::CONFIG_KEYS as $key) {
-			$config->deleteAppValue(Application::APP_ID, $key);
+			$config->deleteKey(Application::APP_ID, $key);
 		}
 
 		$userManager = \OCP\Server::get(IUserManager::class);

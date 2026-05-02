@@ -15,7 +15,7 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\IConfig;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\IRequest;
 
 use Psr\Log\LoggerInterface;
@@ -25,7 +25,7 @@ class ConfigController extends ApiController {
 	public function __construct(
 		protected $appName,
 		private ConfigService $configService,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private LoggerInterface $logger,
 		IRequest $request,
 	) {
@@ -46,11 +46,11 @@ class ConfigController extends ApiController {
 	 * Admin required, thus not checking separately.
 	 *
 	 * @param string $configKey AppConfig Key to store
-	 * @param mixed $configValues Corresponding AppConfig Value
+	 * @param mixed $configValue Corresponding AppConfig Value
 	 *
 	 */
 	#[FrontpageRoute(verb: 'PATCH', url: '/config')]
-	public function updateAppConfig(string $configKey, $configValue): DataResponse {
+	public function updateAppConfig(string $configKey, mixed $configValue): DataResponse {
 		$this->logger->debug('Updating AppConfig: {configKey} => {configValue}', [
 			'configKey' => $configKey,
 			'configValue' => $configValue
@@ -65,8 +65,24 @@ class ConfigController extends ApiController {
 			return new DataResponse('Mail server is not configured', Http::STATUS_BAD_REQUEST);
 		}
 
-		// Set on DB
-		$this->config->setAppValue($this->appName, $configKey, json_encode($configValue));
+		// Set on DB with typed setters
+		try {
+			switch (Constants::CONFIG_KEY_TYPES[$configKey]) {
+				case 'bool':
+					$this->appConfig->setAppValueBool($configKey, $configValue);
+					break;
+
+				case 'array':
+					$this->appConfig->setAppValueArray($configKey, $configValue);
+					break;
+
+				case 'int':
+					$this->appConfig->setAppValueInt($configKey, $configValue);
+					break;
+			}
+		} catch (\InvalidArgumentException) {
+			return new DataResponse('Invalid value for ' . $configKey, Http::STATUS_BAD_REQUEST);
+		}
 
 		return new DataResponse();
 	}

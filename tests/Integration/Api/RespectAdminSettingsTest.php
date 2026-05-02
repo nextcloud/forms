@@ -11,7 +11,7 @@ use GuzzleHttp\Client;
 use OCA\Forms\AppInfo\Application;
 use OCA\Forms\Constants;
 use OCA\Forms\Tests\Integration\IntegrationBase;
-use OCP\IConfig;
+use OCP\IAppConfig;
 
 /**
  * This tests that the API respects all admin settings
@@ -224,9 +224,14 @@ class RespectAdminSettingsTest extends IntegrationBase {
 	 * @dataProvider forbidUpdateAdminSettingsData
 	 */
 	public function testForbidUpdate(array $accessValue, array $adminConfigKeys): void {
-		$config = \OCP\Server::get(IConfig::class);
+		$config = \OCP\Server::get(IAppConfig::class);
 		foreach ($adminConfigKeys as $key => $value) {
-			$config->setAppValue(Application::APP_ID, $key, $value);
+			if (is_array($value)) {
+				$config->setValueArray(Application::APP_ID, $key, $value);
+			} else {
+				$bool = is_bool($value) ? $value : filter_var($value, FILTER_VALIDATE_BOOLEAN);
+				$config->setValueBool(Application::APP_ID, $key, $bool);
+			}
 		}
 
 		$resp = $this->http->request(
@@ -325,7 +330,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 	 */
 	public function testListFormsNoAdminPermission(): void {
 		// Disable global access
-		\OCP\Server::get(IConfig::class)->setAppValue(Application::APP_ID, Constants::CONFIG_KEY_ALLOWPERMITALL, 'false');
+		\OCP\Server::get(IAppConfig::class)->setValueBool(Application::APP_ID, Constants::CONFIG_KEY_ALLOWPERMITALL, false);
 
 		$resp = $this->http->request(
 			'GET',

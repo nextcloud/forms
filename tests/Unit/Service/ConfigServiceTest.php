@@ -100,11 +100,23 @@ class ConfigServiceTest extends TestCase {
 	 * @param array $expected
 	 */
 	public function testGetAppConfig(array $strConfig, array $groupDisplayNames, array $expected) {
-		// Default Values are set within getAppValue, thus returning this one.
-		$this->config->expects($this->any())
-			->method('getAppValue')
-			->will($this->returnCallback(function ($appName, $configKey, $defaultVal) use ($strConfig) {
-				return $strConfig[$configKey] ?? $defaultVal;
+		// Mock typed getters on IAppConfig
+		$this->appConfig->expects($this->any())
+			->method('getAppValueBool')
+			->will($this->returnCallback(function ($configKey, $defaultVal) use ($strConfig) {
+				if (!array_key_exists($configKey, $strConfig)) {
+					return $defaultVal;
+				}
+				return filter_var($strConfig[$configKey], FILTER_VALIDATE_BOOLEAN);
+			}));
+
+		$this->appConfig->expects($this->any())
+			->method('getAppValueArray')
+			->will($this->returnCallback(function ($configKey, $defaultVal) use ($strConfig) {
+				if (!array_key_exists($configKey, $strConfig)) {
+					return $defaultVal;
+				}
+				return json_decode($strConfig[$configKey], true);
 			}));
 
 		$this->config->expects($this->any())
@@ -166,9 +178,15 @@ class ConfigServiceTest extends TestCase {
 	 */
 	public function testGetAppConfig_Default(array $expected) {
 		// Default Values are set within getAppValue, thus returning this one.
-		$this->config->expects($this->any())
-			->method('getAppValue')
-			->will($this->returnCallback(function ($appName, $configKey, $defaultVal) {
+		$this->appConfig->expects($this->any())
+			->method('getAppValueBool')
+			->will($this->returnCallback(function ($configKey, $defaultVal) {
+				return $defaultVal;
+			}));
+
+		$this->appConfig->expects($this->any())
+			->method('getAppValueArray')
+			->will($this->returnCallback(function ($configKey, $defaultVal) {
 				return $defaultVal;
 			}));
 
@@ -191,20 +209,20 @@ class ConfigServiceTest extends TestCase {
 		return [
 			'notRestriced' => [
 				'config' => [
-					'restrictCreation' => 'false',
+					'restrictCreation' => false,
 				],
 				'expected' => true
 			],
 			'restrictedGroupAllowed' => [
 				'config' => [
-					'restrictCreation' => 'true',
+					'restrictCreation' => true,
 					'creationAllowedGroups' => '["usersGroup","notUsersGroup"]'
 				],
 				'expected' => true
 			],
 			'restrictedNotInGroup' => [
 				'config' => [
-					'restrictCreation' => 'true',
+					'restrictCreation' => true,
 					'creationAllowedGroups' => '["notUsersGroup"]'
 				],
 				'expected' => false
@@ -219,10 +237,16 @@ class ConfigServiceTest extends TestCase {
 	 * @param bool $expected
 	 */
 	public function testCanCreateForms(array $config, bool $expected) {
-		$this->config->expects($this->any())
-			->method('getAppValue')
-			->will($this->returnCallback(function ($appName, $configKey, $defaultVal) use ($config) {
+		$this->appConfig->expects($this->any())
+			->method('getAppValueBool')
+			->will($this->returnCallback(function ($configKey, $defaultVal) use ($config) {
 				return $config[$configKey];
+			}));
+
+		$this->appConfig->expects($this->any())
+			->method('getAppValueArray')
+			->will($this->returnCallback(function ($configKey, $defaultVal) use ($config) {
+				return isset($config[$configKey]) ? json_decode($config[$configKey], true) : $defaultVal;
 			}));
 
 		$this->groupManager->expects($this->any())
