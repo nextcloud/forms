@@ -19,11 +19,8 @@ use OCP\Migration\SimpleMigrationStep;
  */
 class Version0010Date20190000000007 extends SimpleMigrationStep {
 
-	/** @var IDBConnection */
-	protected $connection;
-
-	/** @var IConfig */
-	protected $config;
+	protected IDBConnection $connection;
+	protected IConfig $config;
 
 	/**
 	 * @param IDBConnection $connection

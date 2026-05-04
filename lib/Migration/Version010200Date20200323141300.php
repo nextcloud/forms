@@ -23,14 +23,11 @@ use OCP\Migration\SimpleMigrationStep;
  */
 class Version010200Date20200323141300 extends SimpleMigrationStep {
 
-	/** @var IDBConnection */
-	protected $connection;
-
-	/** @var IConfig */
-	protected $config;
+	protected IDBConnection $connection;
+	protected IConfig $config;
 
 	/** Map of questionTypes to change */
-	private $questionTypeMap = [
+	private array $questionTypeMap = [
 		'radiogroup' => 'multiple_unique',
 		'checkbox' => 'multiple',
 		'text' => 'short',

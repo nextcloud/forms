@@ -20,14 +20,9 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class UserDeletedListenerTest extends TestCase {
-	/** @var UserDeletedListener */
-	private $userDeletedListener;
-
-	/** @var IJobList|MockObject */
-	private $jobList;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
+	private UserDeletedListener $userDeletedListener;
+	private IJobList|MockObject $jobList;
+	private LoggerInterface|MockObject $logger;
 
 	public function setUp(): void {
 		parent::setUp();

@@ -28,44 +28,19 @@ use Test\TestCase;
 
 class PageControllerTest extends TestCase {
 
-	/** @var PageController */
-	private $pageController;
-
-	/** @var IRequest|MockObject */
-	private $request;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var ShareMapper|MockObject */
-	private $shareMapper;
-
-	/** @var SubmissionMapper|MockObject */
-	private $submissionMapper;
-
-	/** @var ConfigService|MockObject */
-	private $configService;
-
-	/** @var FormsService|MockObject */
-	private $formsService;
-
-	/** @var IAccountManager|MockObject */
-	private $accountManager;
-
-	/** @var IInitialState|MockObject */
-	private $initialState;
-
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var IURLGenerator|MockObject */
-	private $urlGenerator;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
-
-	/** @var IUserSession|MockObject */
-	private $userSession;
+	private PageController $pageController;
+	private IRequest|MockObject $request;
+	private FormMapper|MockObject $formMapper;
+	private ShareMapper|MockObject $shareMapper;
+	private SubmissionMapper|MockObject $submissionMapper;
+	private ConfigService|MockObject $configService;
+	private FormsService|MockObject $formsService;
+	private IAccountManager|MockObject $accountManager;
+	private IInitialState|MockObject $initialState;
+	private IL10N|MockObject $l10n;
+	private IURLGenerator|MockObject $urlGenerator;
+	private IUserManager|MockObject $userManager;
+	private IUserSession|MockObject $userSession;
 
 	public function setUp(): void {
 		parent::setUp();

@@ -41,53 +41,22 @@ use Test\TestCase;
 
 class SubmissionServiceTest extends TestCase {
 
-	/** @var SubmissionService */
-	private $submissionService;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var QuestionMapper|MockObject */
-	private $questionMapper;
-
-	/** @var SubmissionMapper|MockObject */
-	private $submissionMapper;
-
-	/** @var AnswerMapper|MockObject */
-	private $answerMapper;
-
-	/** @var IRootFolder|MockObject */
-	private $storage;
-
-	/** @var IConfig|MockObject */
-	private $config;
-
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
-
-	/** @var IMailer|MockObject */
-	private $mailer;
-
-	/** @var ITempManager|MockObject */
-	private $tempManager;
-
-	/** @var FormsService|MockObject */
-	private $formsService;
-
-	/** @var IURLGenerator|MockObject */
-	private $urlGenerator;
-
-	/** @var UploadedFileMapper|MockObject */
-	private $uploadedFileMapper;
-
-	/** @var OptionMapper|MockObject */
-	private $optionMapper;
+	private SubmissionService $submissionService;
+	private FormMapper|MockObject $formMapper;
+	private QuestionMapper|MockObject $questionMapper;
+	private SubmissionMapper|MockObject $submissionMapper;
+	private AnswerMapper|MockObject $answerMapper;
+	private IRootFolder|MockObject $storage;
+	private IConfig|MockObject $config;
+	private IL10N|MockObject $l10n;
+	private LoggerInterface|MockObject $logger;
+	private IUserManager|MockObject $userManager;
+	private IMailer|MockObject $mailer;
+	private ITempManager|MockObject $tempManager;
+	private FormsService|MockObject $formsService;
+	private IURLGenerator|MockObject $urlGenerator;
+	private UploadedFileMapper|MockObject $uploadedFileMapper;
+	private OptionMapper|MockObject $optionMapper;
 
 	public function setUp(): void {
 		parent::setUp();

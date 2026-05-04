@@ -19,20 +19,11 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class CleanupUploadedFilesJobTest extends TestCase {
-	/** @var IRootFolder|MockObject */
-	private $rootFolder;
-
-	/** @var CleanupUploadedFilesJob */
-	private $cleanupUploadedFilesJob;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var UploadedFileMapper|MockObject */
-	private $uploadedFileMapper;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
+	private IRootFolder|MockObject $rootFolder;
+	private CleanupUploadedFilesJob $cleanupUploadedFilesJob;
+	private FormMapper|MockObject $formMapper;
+	private UploadedFileMapper|MockObject $uploadedFileMapper;
+	private LoggerInterface|MockObject $logger;
 
 	public function setUp(): void {
 		parent::setUp();

@@ -18,14 +18,9 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class UserDeletedJobTest extends TestCase {
-	/** @var UserDeletedJob */
-	private $userDeletedJob;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
+	private UserDeletedJob $userDeletedJob;
+	private FormMapper|MockObject $formMapper;
+	private LoggerInterface|MockObject $logger;
 
 	public function setUp(): void {
 		parent::setUp();

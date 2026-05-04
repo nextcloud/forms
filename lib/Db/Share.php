@@ -23,13 +23,9 @@ use OCP\AppFramework\Db\Entity;
  * @method void setShareWith(string $value)
  */
 class Share extends Entity {
-	/** @var int */
 	protected $formId;
-	/** @var int */
 	protected $shareType;
-	/** @var string */
 	protected $shareWith;
-	/** @var string */
 	protected $permissionsJson;
 
 	/**

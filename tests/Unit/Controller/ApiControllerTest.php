@@ -74,42 +74,24 @@ use Test\TestCase;
 
 class ApiControllerTest extends TestCase {
 	private ApiController $apiController;
-	/** @var AnswerMapper|MockObject */
-	private $answerMapper;
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-	/** @var OptionMapper|MockObject */
-	private $optionMapper;
-	/** @var QuestionMapper|MockObject */
-	private $questionMapper;
-	/** @var ShareMapper|MockObject */
-	private $shareMapper;
-	/** @var SubmissionMapper|MockObject */
-	private $submissionMapper;
-	/** @var ConfirmationEmailService|MockObject */
-	private $confirmationEmailService;
-	/** @var ConfigService|MockObject */
-	private $configService;
-	/** @var FormsService|MockObject */
-	private $formsService;
-	/** @var SubmissionService|MockObject */
-	private $submissionService;
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-	/** @var IRequest|MockObject */
-	private $request;
-	/** @var IUserManager|MockObject */
-	private $userManager;
-	/** @var IL10N|MockObject */
-	private $l10n;
-	/** @var IRootFolder|MockObject */
-	private $storage;
-	/** @var UploadedFileMapper|MockObject */
-	private $uploadedFileMapper;
-	/** @var IMimeTypeDetector|MockObject */
-	private $mimeTypeDetector;
-	/** @var IJobList|MockObject */
-	private $jobList;
+	private AnswerMapper|MockObject $answerMapper;
+	private FormMapper|MockObject $formMapper;
+	private OptionMapper|MockObject $optionMapper;
+	private QuestionMapper|MockObject $questionMapper;
+	private ShareMapper|MockObject $shareMapper;
+	private SubmissionMapper|MockObject $submissionMapper;
+	private ConfirmationEmailService|MockObject $confirmationEmailService;
+	private ConfigService|MockObject $configService;
+	private FormsService|MockObject $formsService;
+	private SubmissionService|MockObject $submissionService;
+	private LoggerInterface|MockObject $logger;
+	private IRequest|MockObject $request;
+	private IUserManager|MockObject $userManager;
+	private IL10N|MockObject $l10n;
+	private IRootFolder|MockObject $storage;
+	private UploadedFileMapper|MockObject $uploadedFileMapper;
+	private IMimeTypeDetector|MockObject $mimeTypeDetector;
+	private IJobList|MockObject $jobList;
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);

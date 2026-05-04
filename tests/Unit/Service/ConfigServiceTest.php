@@ -22,20 +22,11 @@ use Test\TestCase;
 
 class ConfigServiceTest extends TestCase {
 
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var IConfig|MockObject */
-	private $config;
-
-	/** @var IAppConfig|MockObject */
-	private $appConfig;
-
-	/** @var IGroupManager|MockObject */
-	private $groupManager;
-
-	/** @var IUser|MockObject */
-	private $currentUser;
+	private ConfigService $configService;
+	private IConfig|MockObject $config;
+	private IAppConfig|MockObject $appConfig;
+	private IGroupManager|MockObject $groupManager;
+	private IUser|MockObject $currentUser;
 
 	public function setUp(): void {
 		parent::setUp();

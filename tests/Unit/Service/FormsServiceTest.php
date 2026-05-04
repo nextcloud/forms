@@ -67,50 +67,21 @@ use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
 
-	/** @var FormsService */
-	private $formsService;
-
-	/** @var ActivityManager|MockObject */
-	private $activityManager;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var OptionMapper|MockObject */
-	private $optionMapper;
-
-	/** @var QuestionMapper|MockObject */
-	private $questionMapper;
-
-	/** @var ShareMapper|MockObject */
-	private $shareMapper;
-
-	/** @var SubmissionMapper|MockObject */
-	private $submissionMapper;
-
-	/** @var ConfigService|MockObject */
-	private $configService;
-
-	/** @var IGroupManager|MockObject */
-	private $groupManager;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
-
-	/** @var ISecureRandom|MockObject */
-	private $secureRandom;
-
-	/** @var CirclesService|MockObject */
-	private $circlesService;
-
-	/** @var IRootFolder|MockObject */
-	private $storage;
-
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
+	private FormsService $formsService;
+	private ActivityManager|MockObject $activityManager;
+	private FormMapper|MockObject $formMapper;
+	private OptionMapper|MockObject $optionMapper;
+	private QuestionMapper|MockObject $questionMapper;
+	private ShareMapper|MockObject $shareMapper;
+	private SubmissionMapper|MockObject $submissionMapper;
+	private ConfigService|MockObject $configService;
+	private IGroupManager|MockObject $groupManager;
+	private IUserManager|MockObject $userManager;
+	private ISecureRandom|MockObject $secureRandom;
+	private CirclesService|MockObject $circlesService;
+	private IRootFolder|MockObject $storage;
+	private IL10N|MockObject $l10n;
+	private LoggerInterface|MockObject $logger;
 
 	/** @var ConfirmationEmailService|MockObject */
 	private $confirmationEmailService;

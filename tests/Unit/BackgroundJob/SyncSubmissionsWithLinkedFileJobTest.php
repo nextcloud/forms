@@ -29,29 +29,14 @@ use Test\TestCase;
 class SyncSubmissionsWithLinkedFileJobTest extends TestCase {
 	private SyncSubmissionsWithLinkedFileJob $job;
 
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var FormsService|MockObject */
-	private $formsService;
-
-	/** @var SubmissionService|MockObject */
-	private $submissionService;
-
-	/** @var ITimeFactory|MockObject */
-	private $timeFactory;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
-
-	/** @var IUserSession|MockObject */
-	private $userSession;
-
-	/** @var IJobList|MockObject */
-	private $jobList;
+	private FormMapper|MockObject $formMapper;
+	private FormsService|MockObject $formsService;
+	private SubmissionService|MockObject $submissionService;
+	private ITimeFactory|MockObject $timeFactory;
+	private LoggerInterface|MockObject $logger;
+	private IUserManager|MockObject $userManager;
+	private IUserSession|MockObject $userSession;
+	private IJobList|MockObject $jobList;
 
 	protected function setUp(): void {
 		parent::setUp();

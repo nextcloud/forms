@@ -10,15 +10,11 @@ namespace OCA\Forms\Tests\Unit\Activity\Settings;
 use OCA\Forms\Activity\Settings\NewSubmission;
 use OCP\IL10N;
 
-use PHPUnit\Framework\MockObject\MockClass;
 use Test\TestCase;
 
 class NewSubmissionTest extends TestCase {
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var NewSubmission|MockClass */
-	private $newShare;
+	private IL10N|MockObject $l10n;
+	private NewSubmission $newShare;
 
 	public function setUp(): void {
 		parent::setUp();

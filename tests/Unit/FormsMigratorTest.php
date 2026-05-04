@@ -30,35 +30,16 @@ use Test\TestCase;
 
 class FormsMigratorTest extends TestCase {
 
-	/** @var FormsMigrator */
-	private $formsMigrator;
-
-	/** @var AnswerMapper|MockObject */
-	private $answerMapper;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var OptionMapper|MockObject */
-	private $optionMapper;
-
-	/** @var QuestionMapper|MockObject */
-	private $questionMapper;
-
-	/** @var SubmissionMapper|MockObject */
-	private $submissionMapper;
-
-	/** @var FormsService|MockObject */
-	private $formsService;
-
-	/** @var SubmissionService|MockObject */
-	private $submissionService;
-
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
+	private FormsMigrator $formsMigrator;
+	private AnswerMapper|MockObject $answerMapper;
+	private FormMapper|MockObject $formMapper;
+	private OptionMapper|MockObject $optionMapper;
+	private QuestionMapper|MockObject $questionMapper;
+	private SubmissionMapper|MockObject $submissionMapper;
+	private FormsService|MockObject $formsService;
+	private SubmissionService|MockObject $submissionService;
+	private IL10N|MockObject $l10n;
+	private IUserManager|MockObject $userManager;
 
 	public function setUp(): void {
 		parent::setUp();

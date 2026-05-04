@@ -21,20 +21,11 @@ use Test\TestCase;
 
 class ConfigControllerTest extends TestCase {
 
-	/** @var ConfigController */
-	private $configController;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var IConfig|MockObject */
-	private $config;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
-	/** @var IRequest|MockObject */
-	private $request;
+	private ConfigController $configController;
+	private ConfigService|MockObject $configService;
+	private IConfig|MockObject $config;
+	private LoggerInterface|MockObject $logger;
+	private IRequest|MockObject $request;
 
 	public function setUp(): void {
 		parent::setUp();
