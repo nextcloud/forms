@@ -217,8 +217,16 @@ export default {
 			return !!this.errorMessage
 		},
 
+		hasInfo() {
+			return !!this.infoMessage
+		},
+
 		errorId() {
-			return 'q' + this.index + '_error'
+			return `q${this.index}_error`
+		},
+
+		infoId() {
+			return `q${this.index}_info`
 		},
 
 		/**

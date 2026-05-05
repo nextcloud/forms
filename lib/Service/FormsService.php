@@ -130,6 +130,11 @@ class FormsService {
 					}
 				}
 
+				// Set `isRequired` if minimum options limit is set
+				if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && $question['extraSettings']['optionsLimitMin'] > 0) {
+					$question['isRequired'] = true;
+				}
+
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {
