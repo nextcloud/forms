@@ -4,7 +4,7 @@ import { showError, showSuccess } from '@nextcloud/dialogs'
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 import { generateUrl } from '@nextcloud/router'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
 
 export default {
 	methods: {

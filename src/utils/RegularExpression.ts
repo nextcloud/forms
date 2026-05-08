@@ -15,27 +15,23 @@ const REGEX_UNESCAPED_SLASH = /(?:^|[^\\])(?:\\\\)*\//
 /**
  * Check if a regex is valid and enclosed with delimiters
  *
- * @param {string} input regular expression
- * @return {boolean}
+ * @param input regular expression
+ * @return is expression valid
  */
-export function validateExpression(input) {
-	// empty regex passes
+export function validateExpression(input: string): boolean {
 	if (input.length === 0) {
 		return true
 	}
 
-	// Validate regex has delimters
 	if (!REGEX_WITH_DELIMITERS.test(input)) {
 		return false
 	}
 
-	// Check pattern is escaped
 	const { pattern, modifiers } = splitRegex(input)
 	if (REGEX_UNESCAPED_SLASH.test(pattern)) {
 		return false
 	}
 
-	// Check if regular expression can be compiled
 	try {
 		;(() => new RegExp(pattern, modifiers))()
 		return true
@@ -47,10 +43,10 @@ export function validateExpression(input) {
 /**
  * Split an enclosed regular expression into pattern and modifiers
  *
- * @param {string} regex regular expression with delimiters
- * @return {{pattern: string, modifiers: string}} pattern and modifiers
+ * @param regex regular expression with delimiters
+ * @return pattern and modifiers
  */
-export function splitRegex(regex) {
+export function splitRegex(regex: string): { pattern: string; modifiers: string } {
 	const [, pattern, modifiers] = regex.match(REGEX_WITH_DELIMITERS) || ['', '', '']
 	return { pattern, modifiers }
 }

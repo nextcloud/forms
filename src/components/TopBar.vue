@@ -42,7 +42,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PillMenu from './PillMenu.vue'
 import PermissionTypes from '../mixins/PermissionTypes.js'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
 
 const submitView = {
 	ariaLabel: t('forms', 'View form'),
