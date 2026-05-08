@@ -7,11 +7,9 @@
  * Extract actual data from Axios OCS response
  * Just a small wrapper for nice code.
  *
- * @param {object} response response returned by axios
- * @return {object} The actual data out of the ocs response
+ * @param response response returned by axios
+ * @return The actual data out of the ocs response
  */
-function OcsResponse2Data(response) {
+export default function OcsResponse2Data(response: unknown): unknown {
 	return response.data.ocs.data
 }
-
-export default OcsResponse2Data

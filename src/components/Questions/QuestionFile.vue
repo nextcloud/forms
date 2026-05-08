@@ -174,8 +174,8 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import fileTypes from '../../models/FileTypes.js'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
 /**
  * A constant object representing file size units in bytes.

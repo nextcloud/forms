@@ -114,7 +114,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
-import logger from './utils/Logger.js'
+import logger from './utils/Logger.ts'
 
 export default {
 	name: 'FormsSettings',
