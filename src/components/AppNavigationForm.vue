@@ -115,7 +115,7 @@ import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import FormsIcon from './Icons/FormsIcon.vue'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import { FormState } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
 
 export default {
 	name: 'AppNavigationForm',

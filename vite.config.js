@@ -8,7 +8,7 @@ import { join, resolve } from 'path'
 
 export default createAppConfig(
 	{
-		emptyContent: resolve(join('src', 'emptyContent.js')),
+		emptyContent: resolve(join('src', 'emptyContent.ts')),
 		main: resolve(join('src', 'main.ts')),
 		submit: resolve(join('src', 'submit.ts')),
 		settings: resolve(join('src', 'settings.ts')),

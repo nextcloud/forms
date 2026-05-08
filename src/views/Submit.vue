@@ -240,9 +240,9 @@ import {
 	FormState,
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
-import SetWindowTitle from '../utils/SetWindowTitle.js'
+import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 export default {
 	// eslint-disable-next-line vue/multi-word-component-names

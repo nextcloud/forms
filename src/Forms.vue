@@ -168,8 +168,8 @@ import FormsIcon from './components/Icons/FormsIcon.vue'
 import Sidebar from './views/Sidebar.vue'
 import PermissionTypes from './mixins/PermissionTypes.js'
 import { FormState } from './models/Constants.ts'
-import logger from './utils/Logger.js'
-import OcsResponse2Data from './utils/OcsResponse2Data.js'
+import logger from './utils/Logger.ts'
+import OcsResponse2Data from './utils/OcsResponse2Data.ts'
 
 const appName = 'forms'
 

@@ -227,8 +227,8 @@ import SharingShareDiv from './SharingShareDiv.vue'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
 export default {
 	components: {

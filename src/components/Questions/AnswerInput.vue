@@ -98,8 +98,8 @@ import IconTableRow from 'vue-material-design-icons/TableRow.vue'
 import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
 import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
 export default {
 	name: 'AnswerInput',

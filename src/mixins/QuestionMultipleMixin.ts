@@ -13,20 +13,20 @@ import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
 
 // Temporary augmentation to allow using `this.<prop>` in mixin methods
 declare module '@vue/runtime-core' {
 	interface ComponentCustomProperties {
 		options: FormsOption[]
-		values: any[]
-		answerType: { validate: (ctx: any) => boolean }
+		values: unknown[]
+		answerType: { validate: (ctx: unknown) => boolean }
 		readOnly: boolean
-		extraSettings?: any
+		extraSettings?: unknown
 		formId: number
 		id: number
 		shuffleArray: <T>(arr: T[]) => T[]
-		$refs: Record<string, any>
+		$refs: Record<string, unknown>
 	}
 }
 
@@ -126,7 +126,7 @@ export default defineComponent({
 		 */
 		focusIndex(index: number, optionType: string) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
-			const item = this.$refs.input.find((instance: any) => {
+			const item = this.$refs.input.find((instance: unknown) => {
 				return (
 					instance.$props.optionType === optionType
 					&& instance.$props.index === index
@@ -409,7 +409,7 @@ export default defineComponent({
 	},
 
 	watch: {
-		dirtyOptionsType: debounce(function (this: any) {
+		dirtyOptionsType: debounce(function (this: unknown) {
 			if (!this.dirtyOptionsType) {
 				return
 			}

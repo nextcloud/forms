@@ -79,7 +79,7 @@ import IconRegex from 'vue-material-design-icons/Regex.vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import validationTypes from '../../models/ValidationTypes.js'
-import { splitRegex, validateExpression } from '../../utils/RegularExpression.js'
+import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
 
 export default {
 	name: 'QuestionShort',
