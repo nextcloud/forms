@@ -100,7 +100,8 @@
 					:hideHeader="true"
 					:values="triggerValues"
 					@update:values="onTriggerValueChange"
-					@update:options="onOptionsChange" />
+					@update:options="onOptionsChange"
+					@delete="clearTriggerType" />
 
 				<!-- Branch Management (Edit Mode) -->
 				<div v-if="!readOnly" class="branches-editor">
