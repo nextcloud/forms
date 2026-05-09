@@ -51,6 +51,10 @@ export const QUESTION_PROPS = {
 		type: Boolean,
 		default: false,
 	},
+	isTrigger: {
+		type: Boolean,
+		default: false,
+	},
 	isRequired: {
 		type: Boolean,
 		required: true,
