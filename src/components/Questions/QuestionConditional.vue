@@ -47,7 +47,7 @@
 
 			<!-- Trigger Question -->
 			<div v-else-if="triggerType" class="trigger-question">
-				<div class="trigger-question__header">
+				<div v-if="!readOnly" class="trigger-question__header">
 					<NcIconSvgWrapper
 						:svg="currentTriggerIcon"
 						class="trigger-question__icon" />
@@ -59,7 +59,6 @@
 						}}
 					</span>
 					<NcButton
-						v-if="!readOnly"
 						variant="tertiary"
 						:aria-label="t('forms', 'Change trigger type')"
 						@click="clearTriggerType">
