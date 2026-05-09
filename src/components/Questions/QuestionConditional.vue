@@ -98,9 +98,11 @@
 					:answerType="triggerAnswerTypeConfig"
 					:readOnly="readOnly"
 					:hideHeader="true"
+					:isTrigger="true"
 					:values="triggerValues"
 					@update:values="onTriggerValueChange"
 					@update:options="onOptionsChange"
+					@update:extraSettings="onExtraSettingsChange"
 					@delete="clearTriggerType" />
 
 				<!-- Branch Management (Edit Mode) -->
