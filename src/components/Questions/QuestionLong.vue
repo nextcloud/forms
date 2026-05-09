@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:hideHeader="hideHeader"
 		v-on="commonListeners">
 		<div class="question__content">
 			<textarea

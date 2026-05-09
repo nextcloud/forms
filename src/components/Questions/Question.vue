@@ -13,7 +13,7 @@
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
-			v-if="!readOnly"
+			v-if="!readOnly && !hideHeader"
 			class="question__drag-handle"
 			:class="{
 				'question__drag-handle--shiftup': shiftDragHandle,
@@ -44,10 +44,10 @@
 		</div>
 
 		<!-- Header -->
-		<div class="question__header">
+		<div v-if="!hideHeader || !readOnly" class="question__header">
 			<div class="question__header__title">
 				<input
-					v-if="!readOnly"
+					v-if="!hideHeader && !readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="
 						t('forms', 'Title of question number {index}', {
@@ -63,12 +63,13 @@
 					required
 					@input="onTitleChange" />
 				<h3
-					v-else
+					v-else-if="readOnly"
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
 					{{ computedText }}
 				</h3>
+				<div v-else class="question__header__title__text"></div>
 				<div
 					v-if="!readOnly && !questionValid"
 					:title="warningInvalid"
@@ -123,7 +124,7 @@
 				</NcActions>
 			</div>
 			<div
-				v-if="hasDescription || !readOnly"
+				v-if="!hideHeader && (hasDescription || !readOnly)"
 				class="question__header__description">
 				<textarea
 					v-if="!readOnly"
@@ -270,6 +271,11 @@ export default {
 		infoMessage: {
 			type: String,
 			default: null,
+		},
+
+		hideHeader: {
+			type: Boolean,
+			default: false,
 		},
 	},
 

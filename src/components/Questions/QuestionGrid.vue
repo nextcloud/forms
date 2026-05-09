@@ -11,6 +11,7 @@
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
 		:errorMessage="errorMessage"
+		:hideHeader="hideHeader"
 		v-on="commonListeners">
 		<template v-if="readOnly">
 			<fieldset

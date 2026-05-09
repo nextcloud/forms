@@ -10,6 +10,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="false"
+		:hideHeader="hideHeader"
 		v-on="commonListeners">
 		<template #actions>
 			<!-- Trigger type selection in menu -->
@@ -87,7 +88,7 @@
 					:id="id"
 					ref="triggerQuestion"
 					:formId="formId"
-					text=""
+					:text="text"
 					description=""
 					:isRequired="false"
 					:index="0"
@@ -96,6 +97,7 @@
 					:maxStringLengths="maxStringLengths"
 					:answerType="triggerAnswerTypeConfig"
 					:readOnly="readOnly"
+					:hideHeader="true"
 					:values="triggerValues"
 					@update:values="onTriggerValueChange"
 					@update:options="onOptionsChange" />
@@ -570,7 +572,6 @@ export default {
 					titlePlaceholder: t('forms', 'Short answer question title'),
 					createPlaceholder: t('forms', 'People can enter a short answer'),
 					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
 
@@ -578,7 +579,6 @@ export default {
 					titlePlaceholder: t('forms', 'Long text question title'),
 					createPlaceholder: t('forms', 'People can enter a long text'),
 					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
 
@@ -592,7 +592,7 @@ export default {
 					submitPlaceholder: t('forms', 'Enter your answer'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -609,7 +609,7 @@ export default {
 					submitPlaceholder: t('forms', 'Enter your answer'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -623,7 +623,7 @@ export default {
 					submitPlaceholder: t('forms', 'Pick an option'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,

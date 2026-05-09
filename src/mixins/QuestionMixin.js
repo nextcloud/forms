@@ -62,6 +62,11 @@ export default {
 			required: true,
 		},
 
+		hideHeader: {
+			type: Boolean,
+			required: false,
+		},
+
 		/**
 		 * Required-Setting
 		 */
