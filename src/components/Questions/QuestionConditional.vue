@@ -100,7 +100,9 @@
 					:isTriggerQuestion="true"
 					:values="triggerValues"
 					@update:values="onTriggerValueChange"
-					@update:options="onOptionsChange" />
+					@update:options="onOptionsChange"
+					@update:extraSettings="onExtraSettingsChange"
+					@delete="clearTriggerType" />
 
 				<!-- Branch Management (Edit Mode) -->
 				<div v-if="!readOnly" class="branches-editor">

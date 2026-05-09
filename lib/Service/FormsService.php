@@ -900,42 +900,28 @@ class FormsService {
 			return true;
 		}
 
-		// Ensure only allowed keys are set
-		switch ($questionType) {
-			case Constants::ANSWER_TYPE_DROPDOWN:
-				$allowed = Constants::EXTRA_SETTINGS_DROPDOWN;
-				break;
-			case Constants::ANSWER_TYPE_MULTIPLE:
-			case Constants::ANSWER_TYPE_MULTIPLEUNIQUE:
-				$allowed = Constants::EXTRA_SETTINGS_MULTIPLE;
-				break;
-			case Constants::ANSWER_TYPE_SHORT:
-				$allowed = Constants::EXTRA_SETTINGS_SHORT;
-				break;
-			case Constants::ANSWER_TYPE_FILE:
-				$allowed = Constants::EXTRA_SETTINGS_FILE;
-				break;
-			case Constants::ANSWER_TYPE_DATE:
-				$allowed = Constants::EXTRA_SETTINGS_DATE;
-				break;
-			case Constants::ANSWER_TYPE_GRID:
-				$allowed = Constants::EXTRA_SETTINGS_GRID;
-				break;
-			case Constants::ANSWER_TYPE_RANKING:
-				$allowed = Constants::EXTRA_SETTINGS_RANKING;
-				break;
-			case Constants::ANSWER_TYPE_TIME:
-				$allowed = Constants::EXTRA_SETTINGS_TIME;
-				break;
-			case Constants::ANSWER_TYPE_LINEARSCALE:
-				$allowed = Constants::EXTRA_SETTINGS_LINEARSCALE;
-				break;
-			case Constants::ANSWER_TYPE_CONDITIONAL:
-				$allowed = Constants::EXTRA_SETTINGS_CONDITIONAL;
-				break;
-			default:
-				$allowed = [];
+		// Map allowed options to answer type
+		$extraSettingsMap = [
+			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
+			Constants::ANSWER_TYPE_MULTIPLE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
+			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
+			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
+			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
+			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_CONDITIONAL => Constants::EXTRA_SETTINGS_CONDITIONAL,
+		];
+
+		// Get triggertype if is conditional
+		$triggerType = $extraSettings['triggerType'] ?? null;
+		if (is_string($triggerType) && isset($extraSettingsMap[$triggerType])) {
+			$extraSettingsMap[Constants::ANSWER_TYPE_CONDITIONAL] += $extraSettingsMap[$triggerType];
 		}
+		// Ensure only allowed keys are set
+		$allowed = $extraSettingsMap[$questionType] ?? [];
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -1071,6 +1057,18 @@ class FormsService {
 					return false;
 				}
 			}
+
+			$diff = array_diff(array_keys($extraSettings), array_keys(Constants::EXTRA_SETTINGS_CONDITIONAL));
+			// Handle options of triggerQuestion
+			if (count($diff) > 0 && isset($triggerType) && $triggerType !== '') {
+				$diffDict = [];
+				foreach ($diff as $k) {
+					$diffDict[$k] = $extraSettings[$k];
+				}
+				$valid = self::areExtraSettingsValid($diffDict, $triggerType);
+				return $valid;
+			}
+
 		}
 		return true;
 	}
