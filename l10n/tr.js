@@ -22,6 +22,7 @@ OC.L10N.register(
     "Anonymous response" : "Anonim yanıt",
     "Shared by %s" : "%s tarafından paylaşıldı",
     "Forms including questions and submissions" : "Soru ve yanıtları içeren formlar",
+    "Thank you for submitting the form \"%s\"." : "Formu gönderdiğiniz için teşekkürler! \"%s\"",
     "responses" : "yanıtlar",
     "User ID" : "Kullanıcı kimliği",
     "User display name" : "Görüntülenecek kullanıcı adı",
