@@ -166,6 +166,10 @@
 											)
 										"
 										v-bind="subQuestion"
+										:canMoveDown="
+											subIndex < branch.subQuestions.length - 1
+										"
+										:canMoveUp="subIndex > 0"
 										:formId="formId"
 										:index="subIndex + 1"
 										:maxStringLengths="maxStringLengths"
@@ -225,7 +229,9 @@
 												branch.id,
 												subQuestion.id,
 											)
-										" />
+										"
+										@moveDown="onMoveDown(subIndex, branchIndex)"
+										@moveUp="onMoveUp(subIndex, branchIndex)" />
 								</li>
 							</ul>
 
@@ -804,6 +810,32 @@ export default {
 			} catch (error) {
 				logger.error('Error adding subquestion', { error })
 				showError(t('forms', 'Error adding subquestion'))
+			}
+		},
+
+		onMoveUp(index, branchIndex) {
+			const newBranches = [...this.branches]
+			const branch = newBranches[branchIndex]
+			const newSubQuestions = branch.subQuestions
+
+			if (index > 0) {
+				;[newSubQuestions[index - 1], newSubQuestions[index]] = [
+					newSubQuestions[index],
+					newSubQuestions[index - 1],
+				]
+
+				newBranches[branchIndex] = {
+					...branch,
+					subQuestions: newSubQuestions,
+				}
+				this.onExtraSettingsChange({ branches: newBranches })
+			}
+		},
+
+		onMoveDown(index, branchIndex) {
+			// only if not the last one
+			if (index < this.branches[branchIndex].subQuestions.length - 1) {
+				this.onMoveUp(index + 1, branchIndex)
 			}
 		},
 
