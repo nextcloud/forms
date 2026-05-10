@@ -944,6 +944,125 @@ class ApiController extends OCSController {
 		return new DataResponse($response);
 	}
 
+	/**
+	 * Updates the Order of all Questions in a Branch of a conditional
+	 *
+	 * @param int $formId Id of the form to reorder
+	 * @param string $branchId Id of the branch.
+	 * @param int $parentQuestionId Id of the parent trigger question.
+	 * @param list<int> $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
+	 * @throws OCSBadRequestException The given array contains duplicates
+	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
+	 * @throws OCSBadRequestException Question doesn't belong to given Form
+	 * @throws OCSBadRequestException One question has already been marked as deleted
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the question ids of the given form in the new order
+	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/subquestions')]
+	public function reorderSubQuestions(int $formId, string $branchId, int $parentQuestionId, array $newOrder): DataResponse {
+		$this->logger->debug('Reordering Sub-Questions on Form {formId}, Parent-Question {parentQuestionId}, Branch {branchId} as Question-Ids {newOrder}', [
+			'formId' => $formId,
+			'parentQuestionId' => $parentQuestionId,
+			'branchId' => $branchId,
+			'newOrder' => $newOrder
+		]);
+
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
+
+		// Check if array contains duplicates
+		if (array_unique($newOrder) !== $newOrder) {
+			$this->logger->debug('The given array contains duplicates');
+			throw new OCSBadRequestException('The given array contains duplicates');
+		}
+
+		// Check if all questions are given in Array.
+		$questions = $this->questionMapper->findByBranch($parentQuestionId, $branchId);
+		if (sizeof($questions) !== sizeof($newOrder)) {
+			$this->logger->debug('The length of the given array does not match the number of stored questions');
+			throw new OCSBadRequestException('The length of the given array does not match the number of stored questions');
+		}
+
+		$questions = []; // Clear Array of Entities
+		$response = []; // Array of ['questionId' => ['order' => newOrder]]
+
+		// Store array of Question-Entities and check the Questions FormId & old Order.
+		foreach ($newOrder as $arrayKey => $questionId) {
+			try {
+				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find question {questionId}', [
+					'questionId' => $questionId
+				]);
+				throw new OCSNotFoundException('Could not find question');
+			}
+
+			// Abort if a question is not part of the Form.
+			if ($questions[$arrayKey]->getFormId() !== $formId) {
+				$this->logger->debug('This Question is not part of the given form: {questionId}', [
+					'questionId' => $questionId
+				]);
+				throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+			}
+			// Abort if a question is not part of the Parent Question.
+			if ($questions[$arrayKey]->getParentQuestionId() !== $parentQuestionId) {
+				$this->logger->debug('This Question is not part of the given parent question: {parentQuestionId}', [
+					'parentQuestionId' => $parentQuestionId
+				]);
+				throw new OCSBadRequestException('Question doesn\'t belong to given Parent Question');
+			}
+
+			// Abort if a question is not part of the Branch.
+			if ($questions[$arrayKey]->getBranchId() !== $branchId) {
+				$this->logger->debug('This Question is not part of the given branch: {branchId}', [
+					'branchId' => $branchId
+				]);
+				throw new OCSBadRequestException('Question doesn\'t belong to given Branch');
+			}
+
+			// Abort if a question is already marked as deleted (order==0)
+			$oldOrder = $questions[$arrayKey]->getOrder();
+			if ($oldOrder === 0) {
+				$this->logger->debug('This question has already been marked as deleted: Id: {questionId}', [
+					'questionId' => $questions[$arrayKey]->getId()
+				]);
+				throw new OCSBadRequestException('One question has already been marked as deleted');
+			}
+
+			// Only set order, if it changed.
+			if ($oldOrder !== $arrayKey + 1) {
+				// Set Order. ArrayKey counts from zero, order counts from 1.
+				$questions[$arrayKey]->setOrder($arrayKey + 1);
+			}
+		}
+
+		// Write to Database
+		foreach ($questions as $question) {
+			$this->questionMapper->update($question);
+
+			$response[(string)$question->getId()] = [
+				'order' => $question->getOrder()
+			];
+		}
+
+		$this->formMapper->update($form);
+
+		return new DataResponse($response);
+	}
+
 	// Options
 
 	/**
