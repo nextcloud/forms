@@ -152,74 +152,105 @@
 						<!-- Subquestions for this branch -->
 						<div class="branch__subquestions">
 							<ul class="branch__subquestions-list">
-								<li
-									v-for="(
-										subQuestion, subIndex
-									) in branch.subQuestions"
-									:key="subQuestion.id"
-									class="subquestion">
-									<component
-										:is="
-											getSubQuestionComponentName(
-												subQuestion.type,
-											)
-										"
-										v-bind="subQuestion"
-										:formId="formId"
-										:index="subIndex + index + 1"
-										:maxStringLengths="maxStringLengths"
-										:answerType="
-											getSubQuestionAnswerTypeConfig(
-												subQuestion.type,
-											)
-										"
-										@update:text="
-											updateSubQuestion(
-												branch.id,
-												subQuestion.id,
-												'text',
-												$event,
-											)
-										"
-										@update:description="
-											updateSubQuestion(
-												branch.id,
-												subQuestion.id,
-												'description',
-												$event,
-											)
-										"
-										@update:isRequired="
-											updateSubQuestion(
-												branch.id,
-												subQuestion.id,
-												'isRequired',
-												$event,
-											)
-										"
-										@update:extraSettings="
-											updateSubQuestion(
-												branch.id,
-												subQuestion.id,
-												'extraSettings',
-												$event,
-											)
-										"
-										@update:options="
-											updateSubQuestion(
-												branch.id,
-												subQuestion.id,
-												'options',
-												$event,
-											)
-										"
-										@delete="
-											deleteSubQuestion(
-												branch.id,
-												subQuestion.id,
-											)
-										" />
-								</li>
+								<Draggable
+									v-model="branches[branchIndex].subQuestions"
+									:animation="200"
+									tag="transition-group"
+									:componentData="{
+										name: isDragging
+											? 'no-external-transition-on-drag'
+											: 'question-list',
+									}"
+									handle=".question__drag-handle"
+									@change="onQuestionOrderChange(branchIndex)"
+									@start="isDragging = true"
+									@end="isDragging = false">
+									<li
+										v-for="(
+											subQuestion, subIndex
+										) in branch.subQuestions"
+										:key="subQuestion.id"
+										class="subquestion">
+										<component
+											:is="
+												getSubQuestionComponentName(
+													subQuestion.type,
+												)
+											"
+											v-bind="subQuestion"
+											:canMoveDown="
+												subIndex
+												< branch.subQuestions.length - 1
+											"
+											:canMoveUp="subIndex > 0"
+											:formId="formId"
+											:index="subIndex + index + 1"
+											:maxStringLengths="maxStringLengths"
+											:answerType="
+												getSubQuestionAnswerTypeConfig(
+													subQuestion.type,
+												)
+											"
+											@update:text="
+												updateSubQuestion(
+													branch.id,
+													subQuestion.id,
+													'text',
+													$event,
+												)
+											"
+											@update:description="
+												updateSubQuestion(
+													branch.id,
+													subQuestion.id,
+													'description',
+													$event,
+												)
+											"
+											@update:isRequired="
+												updateSubQuestion(
+													branch.id,
+													subQuestion.id,
+													'isRequired',
+													$event,
+												)
+											"
+											@update:extraSettings="
+												updateSubQuestion(
+													branch.id,
+													subQuestion.id,
+													'extraSettings',
+													$event,
+												)
+											"
+											@update:options="
+												updateSubQuestion(
+													branch.id,
+													subQuestion.id,
+													'options',
+													$event,
+												)
+											"
+											@delete="
+												deleteSubQuestion(
+													branch.id,
+													subQuestion.id,
+												)
+											"
+											@clone="
+												cloneSubQuestion(
+													branch.id,
+													subQuestion.id,
+												)
+											"
+											@moveDown="
+												onMoveDown(subIndex, branchIndex)
+											"
+											@moveUp="
+												onMoveUp(subIndex, branchIndex)
+											" />
+									</li>
+								</Draggable>
 							</ul>
 
 							<!-- Add subquestion button -->
@@ -279,6 +310,7 @@
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
+import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -331,6 +363,7 @@ export default {
 
 	components: {
 		BranchConditionEditor,
+		Draggable,
 		NcActionButton,
 		NcActions,
 		NcButton,
@@ -369,6 +402,7 @@ export default {
 
 	data() {
 		return {
+			isDragging: false,
 			triggerValues: [],
 			subQuestionValues: {},
 		}
@@ -780,6 +814,79 @@ export default {
 						parentQuestionId: this.id,
 						branchId,
 					},
+				)
+				const newQuestion = OcsResponse2Data(response)
+
+				const branchIndex = this.branches.findIndex((b) => b.id === branchId)
+				const newBranches = [...this.branches]
+				newBranches[branchIndex] = {
+					...branch,
+					subQuestions: [...(branch.subQuestions || []), newQuestion],
+				}
+				this.onExtraSettingsChange({ branches: newBranches })
+			} catch (error) {
+				logger.error('Error adding subquestion', { error })
+				showError(t('forms', 'Error adding subquestion'))
+			}
+		},
+
+		onMoveUp(index, branchIndex) {
+			const subQuestions = this.branches[branchIndex].subQuestions
+
+			if (index > 0) {
+				;[subQuestions[index - 1], subQuestions[index]] = [
+					subQuestions[index],
+					subQuestions[index - 1],
+				]
+			}
+			this.onQuestionOrderChange(branchIndex)
+		},
+
+		onMoveDown(index, branchIndex) {
+			// only if not the last one
+			if (index < this.branches[branchIndex].subQuestions.length - 1) {
+				this.onMoveUp(index + 1, branchIndex)
+			}
+		},
+
+		async onQuestionOrderChange(branchIndex) {
+			this.isLoadingQuestions = true
+			const newOrder = this.branches[branchIndex].subQuestions.map(
+				(question) => question.id,
+			)
+			try {
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/subquestions', {
+						id: this.formId,
+					}),
+					{
+						newOrder,
+						branchId: this.branches[branchIndex].id,
+						parentQuestionId: this.id,
+					},
+				)
+				emit('forms:last-updated:set', this.formId)
+			} catch (error) {
+				logger.error('Error while saving form', { error })
+				showError(t('forms', 'Error while saving form'))
+			} finally {
+				this.isLoadingQuestions = false
+			}
+		},
+
+		async cloneSubQuestion(branchId, questionId) {
+			const branch = this.branches.find((b) => b.id === branchId)
+			if (!branch) return
+
+			try {
+				const response = await axios.post(
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions?fromId={questionId}',
+						{
+							id: this.formId,
+							questionId,
+						},
+					),
 				)
 				const newQuestion = OcsResponse2Data(response)
 
