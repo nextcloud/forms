@@ -198,6 +198,22 @@
 												$event,
 											)
 										"
+										@update:extraSettings="
+											updateSubQuestion(
+												branch.id,
+												subQuestion.id,
+												'extraSettings',
+												$event,
+											)
+										"
+										@update:options="
+											updateSubQuestion(
+												branch.id,
+												subQuestion.id,
+												'options',
+												$event,
+											)
+										"
 										@delete="
 											deleteSubQuestion(
 												branch.id,
