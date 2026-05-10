@@ -197,7 +197,7 @@ OC.L10N.register(
     "Select an email field" : "Ein E-Mail-Feld auswählen",
     "Available placeholders:" : "Verfügbare Platzhalter:",
     "and field labels." : "und Feldbeschriftungen.",
-    "Thank you for your {formTitle} submission" : "Vielen Dank für Ihre {formTitle} Einreichung",
+    "Thank you for your {formTitle} submission" : "Vielen Dank für deine {formTitle} Einreichung",
     "Email subject" : "E-Mail-Betreff",
     "Email body" : "E-Mail-Text",
     "Search for user, group or team …" : "Suche nach Benutzer, Gruppe oder Team …",
