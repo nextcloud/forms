@@ -16,14 +16,9 @@ use Test\TestCase;
 
 class FilterTest extends TestCase {
 
-	/** @var Filter */
-	private $filter;
-
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var IURLGenerator|MockObject */
-	private $urlGenerator;
+	private Filter $filter;
+	private IL10N|MockObject $l10n;
+	private IURLGenerator|MockObject $urlGenerator;
 
 	public function setUp(): void {
 		parent::setUp();

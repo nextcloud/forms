@@ -18,8 +18,7 @@ use OCP\IConfig;
  * @group DB
  */
 class RespectAdminSettingsTest extends IntegrationBase {
-	/** @var GuzzleHttp\Client */
-	private $http;
+	private Client $http;
 
 	protected array $users = [
 		'test' => 'Test user',

@@ -20,8 +20,7 @@ use OCP\Share\IShare;
 
 class Version030000Date20211206213004 extends SimpleMigrationStep {
 
-	/** @var IDBConnection */
-	protected $connection;
+	protected IDBConnection $connection;
 
 	/**
 	 * @param IDBConnection $connection

@@ -50,44 +50,19 @@ interface MapperException extends Throwable, IMapperException {
 
 class ShareApiControllerTest extends TestCase {
 
-	/** @var ShareApiController */
-	private $shareApiController;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var ShareMapper|MockObject */
-	private $shareMapper;
-
-	/** @var ConfigService|MockObject */
-	private $configService;
-
-	/** @var FormsService|MockObject */
-	private $formsService;
-
-	/** @var IGroupManager|MockObject */
-	private $groupManager;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
-	/** @var IRequest|MockObject */
-	private $request;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
-
-	/** @var ISecureRandom|MockObject */
-	private $secureRandom;
-
-	/** @var CirclesService|MockObject */
-	private $circlesService;
-
-	/** @var IRootFolder|MockObject */
-	private $storage;
-
-	/** @var IManager|MockObject */
-	private $shareManager;
+	private ShareApiController $shareApiController;
+	private FormMapper|MockObject $formMapper;
+	private ShareMapper|MockObject $shareMapper;
+	private ConfigService|MockObject $configService;
+	private FormsService|MockObject $formsService;
+	private IGroupManager|MockObject $groupManager;
+	private LoggerInterface|MockObject $logger;
+	private IRequest|MockObject $request;
+	private IUserManager|MockObject $userManager;
+	private ISecureRandom|MockObject $secureRandom;
+	private CirclesService|MockObject $circlesService;
+	private IRootFolder|MockObject $storage;
+	private IManager|MockObject $shareManager;
 
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);

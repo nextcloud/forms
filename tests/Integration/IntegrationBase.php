@@ -19,8 +19,7 @@ use Test\TestCase;
  * @group DB
  */
 class IntegrationBase extends TestCase {
-	/** @var Array */
-	protected $testForms;
+	protected array $testForms = [];
 
 	/**
 	 * Users that are needed by this test case

@@ -10,7 +10,6 @@ namespace OCA\Forms\Tests\Unit\Activity\Settings;
 use OCA\Forms\Activity\Settings\FormsActivitySettings;
 use OCP\IL10N;
 
-use PHPUnit\Framework\MockObject\MockClass;
 use Test\TestCase;
 
 class SettingsTestClass extends FormsActivitySettings {
@@ -22,11 +21,8 @@ class SettingsTestClass extends FormsActivitySettings {
 }
 
 class FormsActivitySettingsTest extends TestCase {
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var SettingsTestClass|MockClass */
-	private $activitySettings;
+	private IL10N|MockObject $l10n;
+	private SettingsTestClass $activitySettings;
 
 	public function setUp(): void {
 		parent::setUp();

@@ -29,38 +29,17 @@ use Test\TestCase;
 
 class ProviderTest extends TestCase {
 
-	/** @var Provider */
-	private $provider;
-
-	/** @var FormMapper|MockObject */
-	private $formMapper;
-
-	/** @var IEventMerger|MockObject */
-	private $eventMerger;
-
-	/** @var IGroupManager|MockObject */
-	private $groupManager;
-
-	/** @var IL10N|MockObject */
-	private $l10n;
-
-	/** @var LoggerInterface|MockObject */
-	private $logger;
-
-	/** @var IURLGenerator|MockObject */
-	private $urlGenerator;
-
-	/** @var IUserManager|MockObject */
-	private $userManager;
-
-	/** @var IFactory|MockObject */
-	private $l10nFactory;
-
-	/** @var IValidator|MockObject */
-	private $validator;
-
-	/** @var CirclesService|MockObject */
-	private $circlesService;
+	private Provider $provider;
+	private FormMapper|MockObject $formMapper;
+	private IEventMerger|MockObject $eventMerger;
+	private IGroupManager|MockObject $groupManager;
+	private IL10N|MockObject $l10n;
+	private LoggerInterface|MockObject $logger;
+	private IURLGenerator|MockObject $urlGenerator;
+	private IUserManager|MockObject $userManager;
+	private IFactory|MockObject $l10nFactory;
+	private IValidator|MockObject $validator;
+	private CirclesService|MockObject $circlesService;
 
 	public function setUp(): void {
 		parent::setUp();

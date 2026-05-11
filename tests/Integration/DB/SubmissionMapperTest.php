@@ -16,8 +16,7 @@ use OCP\IDBConnection;
  * @group DB
  */
 class SubmissionMapperTest extends IntegrationBase {
-	/** @var SubmissionMapper */
-	private $submissionMapper;
+	private SubmissionMapper $submissionMapper;
 
 	protected array $users = [
 		'test' => 'Test user',

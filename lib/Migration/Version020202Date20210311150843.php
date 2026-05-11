@@ -16,8 +16,7 @@ use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version020202Date20210311150843 extends SimpleMigrationStep {
-	/** @var IDBConnection */
-	protected $connection;
+	protected IDBConnection $connection;
 
 	/**
 	 * @param IDBConnection $connection
