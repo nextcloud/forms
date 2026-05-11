@@ -42,6 +42,7 @@ class SubmissionMapperTest extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -105,6 +106,7 @@ class SubmissionMapperTest extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [],
 				'submissions' => []

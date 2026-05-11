@@ -20,6 +20,7 @@ class Constants {
 	public const CONFIG_KEY_RESTRICTCREATION = 'restrictCreation';
 	public const CONFIG_KEY_ALLOWCONFIRMATIONEMAIL = 'allowConfirmationEmail';
 	public const CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT = 'confirmationEmailRateLimit';
+	public const CONFIG_KEY_ALLOWCOMMENTS = 'allowComments';
 	public const CONFIG_KEYS = [
 		self::CONFIG_KEY_ALLOWPERMITALL,
 		self::CONFIG_KEY_ALLOWPUBLICLINK,
@@ -28,6 +29,7 @@ class Constants {
 		self::CONFIG_KEY_RESTRICTCREATION,
 		self::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL,
 		self::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT,
+		self::CONFIG_KEY_ALLOWCOMMENTS,
 	];
 	public const CONFIG_KEY_TYPES = [
 		self::CONFIG_KEY_ALLOWPERMITALL => 'bool',

@@ -92,6 +92,15 @@
 				}}
 			</NcCheckboxRadioSwitch>
 		</NcSettingsSection>
+		<NcSettingsSection :name="t('forms', 'Comments')">
+			<NcCheckboxRadioSwitch
+				v-model="appConfig.allowComments"
+				:loading="loading.allowComments"
+				type="switch"
+				@update:modelValue="onAllowCommentsChange">
+				{{ t('forms', 'Allow comments') }}
+			</NcCheckboxRadioSwitch>
+		</NcSettingsSection>
 	</div>
 </template>
 
@@ -190,6 +199,12 @@ export default {
 			)
 			this.confirmationEmailRateLimitInput = String(value)
 			await this.saveAppConfig('confirmationEmailRateLimit', value)
+		},
+
+		async onAllowCommentsChange(newVal) {
+			this.loading.allowComments = true
+			await this.saveAppConfig('allowComments', newVal)
+			this.loading.allowComments = false
 		},
 
 		/**

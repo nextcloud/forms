@@ -49,6 +49,7 @@ class ApiV3Test extends IntegrationBase {
 				'submission_message' => 'Back to website',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -175,6 +176,7 @@ class ApiV3Test extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -215,6 +217,7 @@ class ApiV3Test extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => 12,
 				'file_format' => 'csv',
+				'allow_comments' => false,
 				'questions' => [
 					[
 						'type' => 'short',
@@ -400,6 +403,7 @@ class ApiV3Test extends IntegrationBase {
 					'confirmationEmailSubject' => null,
 					'confirmationEmailBody' => null,
 					'confirmationEmailQuestionId' => null,
+					'allowComments' => false,
 				]
 			]
 		];
@@ -537,6 +541,7 @@ class ApiV3Test extends IntegrationBase {
 					'confirmationEmailSubject' => null,
 					'confirmationEmailBody' => null,
 					'confirmationEmailQuestionId' => null,
+					'allowComments' => false,
 				]
 			]
 		];

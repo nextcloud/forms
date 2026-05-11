@@ -11,6 +11,7 @@ use OCA\Forms\Constants;
 use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\Comments\ICommentsManager;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Share\IShare;
@@ -30,6 +31,7 @@ class FormMapper extends QBMapper {
 		private ShareMapper $shareMapper,
 		private SubmissionMapper $submissionMapper,
 		private ConfigService $configService,
+		private ICommentsManager $commentsManager,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
 	}
@@ -218,9 +220,11 @@ class FormMapper extends QBMapper {
 	 */
 	public function deleteForm(Form $form): void {
 		// Delete Submissions(incl. Answers), Questions(incl. Options), Shares and Form.
-		$this->submissionMapper->deleteByForm($form->getId());
-		$this->shareMapper->deleteByForm($form->getId());
-		$this->questionMapper->deleteByForm($form->getId());
+		$formId = $form->getId();
+		$this->submissionMapper->deleteByForm($formId);
+		$this->shareMapper->deleteByForm($formId);
+		$this->questionMapper->deleteByForm($formId);
+		$this->commentsManager->deleteCommentsAtObject('forms', (string)$formId);
 		$this->delete($form);
 	}
 }

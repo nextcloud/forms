@@ -39,6 +39,7 @@ class SharedFormsTest extends IntegrationBase {
 				'submission_message' => 'Back to website',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [
 					[
@@ -64,6 +65,7 @@ class SharedFormsTest extends IntegrationBase {
 				'submission_message' => 'Back to website',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [],
 			],
@@ -83,6 +85,7 @@ class SharedFormsTest extends IntegrationBase {
 				'submission_message' => 'Back to website',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [],
 			],
@@ -102,6 +105,7 @@ class SharedFormsTest extends IntegrationBase {
 				'submission_message' => 'Back to website',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [
 					[
@@ -133,6 +137,7 @@ class SharedFormsTest extends IntegrationBase {
 				'submission_message' => 'Back to website',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [
 					[

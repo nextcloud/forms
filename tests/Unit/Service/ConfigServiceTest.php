@@ -64,6 +64,7 @@ class ConfigServiceTest extends TestCase {
 					'restrictCreation' => 'true',
 					'allowConfirmationEmail' => 'false',
 					'confirmationEmailRateLimit' => '5',
+					'allowComments' => 'false',
 				],
 				'groupDisplayNames' => [
 					'group1' => 'Group No. 1',
@@ -87,7 +88,8 @@ class ConfigServiceTest extends TestCase {
 					'allowConfirmationEmail' => false,
 					'confirmationEmailRateLimit' => 5,
 					'isMailConfigured' => true,
-					'canCreateForms' => false
+					'canCreateForms' => false,
+					'allowComments' => false,
 				]
 			]
 		];
@@ -166,7 +168,8 @@ class ConfigServiceTest extends TestCase {
 					'allowConfirmationEmail' => false,
 					'confirmationEmailRateLimit' => 3,
 					'isMailConfigured' => false,
-					'canCreateForms' => true
+					'canCreateForms' => true,
+					'allowComments' => false,
 				]
 			]
 		];

@@ -123,7 +123,8 @@
                     "confirmationEmailEnabled",
                     "confirmationEmailSubject",
                     "confirmationEmailBody",
-                    "confirmationEmailQuestionId"
+                    "confirmationEmailQuestionId",
+                    "allowComments"
                 ],
                 "properties": {
                     "id": {
@@ -252,6 +253,9 @@
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
+                    },
+                    "allowComments": {
+                        "type": "boolean"
                     }
                 }
             },

@@ -61,6 +61,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setConfirmationEmailBody(string|null $value)
  * @method int|null getConfirmationEmailQuestionId()
  * @method void setConfirmationEmailQuestionId(int|null $value)
+ * @method bool getAllowComments()
+ * @method void setAllowComments(bool $value)
  */
 class Form extends Entity {
 	protected $hash;
@@ -86,6 +88,7 @@ class Form extends Entity {
 	protected $confirmationEmailSubject;
 	protected $confirmationEmailBody;
 	protected $confirmationEmailQuestionId;
+	protected $allowComments;
 
 	/**
 	 * Form constructor.
@@ -104,6 +107,7 @@ class Form extends Entity {
 		$this->addType('maxSubmissions', 'integer');
 		$this->addType('confirmationEmailEnabled', 'boolean');
 		$this->addType('confirmationEmailQuestionId', 'integer');
+		$this->addType('allowComments', 'boolean');
 	}
 
 	// JSON-Decoding of access-column.
@@ -182,6 +186,7 @@ class Form extends Entity {
 	 *   confirmationEmailSubject: ?string,
 	 *   confirmationEmailBody: ?string,
 	 *   confirmationEmailQuestionId: ?int,
+	 *   allowComments: bool,
 	 *  }
 	 */
 	public function read() {
@@ -210,6 +215,7 @@ class Form extends Entity {
 			'confirmationEmailSubject' => $this->getConfirmationEmailSubject(),
 			'confirmationEmailBody' => $this->getConfirmationEmailBody(),
 			'confirmationEmailQuestionId' => $this->getConfirmationEmailQuestionId(),
+			'allowComments' => $this->getAllowComments(),
 		];
 	}
 }
