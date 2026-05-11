@@ -4,7 +4,7 @@
 -->
 
 <template>
-	<div class="section submission">
+	<div class="section submission" @copy="onCopy">
 		<div class="submission-head">
 			<h3 dir="auto">
 				{{ submission.userDisplayName }}
@@ -244,6 +244,74 @@ export default {
 	methods: {
 		onDelete() {
 			this.$emit('delete')
+		},
+
+		onCopy(event) {
+			if (!event.clipboardData) return
+
+			const selection = window.getSelection()
+			if (!selection || selection.isCollapsed) return
+
+			const fragment = selection.getRangeAt(0).cloneContents()
+			const text = this.serializeNode(fragment).trim()
+
+			if (!text) return
+
+			event.clipboardData.setData('text/plain', text)
+			event.preventDefault()
+		},
+
+		serializeNode(node) {
+			if (node.nodeType === Node.TEXT_NODE) {
+				return node.textContent
+			}
+
+			if (
+				node.nodeType !== Node.ELEMENT_NODE
+				&& node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+			) {
+				return ''
+			}
+
+			const tag = node.tagName?.toLowerCase()
+
+			if (tag && ['svg', 'script', 'style'].includes(tag)) return ''
+			if (tag === 'br') return '\n'
+
+			const children = Array.from(node.childNodes)
+				.map((child) => this.serializeNode(child))
+				.join('')
+
+			// Answer blocks get a blank line before them as visual separator
+			if (tag === 'div' && node.classList?.contains('answer')) {
+				const trimmed = children.replace(/\s+$/, '')
+				return trimmed ? '\n' + trimmed + '\n' : ''
+			}
+
+			const isBlock =
+				tag
+				&& [
+					'div',
+					'p',
+					'h1',
+					'h2',
+					'h3',
+					'h4',
+					'h5',
+					'h6',
+					'li',
+					'td',
+					'tr',
+					'th',
+					'dt',
+					'dd',
+				].includes(tag)
+			if (isBlock) {
+				const trimmed = children.replace(/\s+$/, '')
+				return trimmed ? trimmed + '\n' : ''
+			}
+
+			return children
 		},
 	},
 }
