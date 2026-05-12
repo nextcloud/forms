@@ -11,7 +11,7 @@ use OCA\Forms\Controller\ConfigController;
 
 use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\IConfig;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\IRequest;
 
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,7 +23,7 @@ class ConfigControllerTest extends TestCase {
 
 	private ConfigController $configController;
 	private ConfigService|MockObject $configService;
-	private IConfig|MockObject $config;
+	private IAppConfig|MockObject $config;
 	private LoggerInterface|MockObject $logger;
 	private IRequest|MockObject $request;
 
@@ -31,7 +31,7 @@ class ConfigControllerTest extends TestCase {
 		parent::setUp();
 
 		$this->configService = $this->createMock(ConfigService::class);
-		$this->config = $this->createMock(IConfig::class);
+		$this->config = $this->createMock(IAppConfig::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
 
@@ -60,18 +60,18 @@ class ConfigControllerTest extends TestCase {
 
 	public static function dataUpdateAppConfig() {
 		return [
-			'booleanConfig' => [
+			'booleanAllowPermitAll' => [
 				'configKey' => 'allowPermitAll',
 				'configValue' => true,
 				'strConfig' => 'true'
 			],
-			'booleanConfig' => [
+			'booleanAllowShowToAll' => [
 				'configKey' => 'allowShowToAll',
 				'configValue' => true,
 				'strConfig' => 'true'
 			],
-			'arrayConfig' => [
-				'configKey' => 'allowPermitAll',
+			'arrayCreationAllowedGroups' => [
+				'configKey' => 'creationAllowedGroups',
 				'configValue' => [
 					'admin',
 					'group1'
@@ -91,9 +91,15 @@ class ConfigControllerTest extends TestCase {
 		$this->logger->expects($this->once())
 			->method('debug');
 
-		$this->config->expects($this->once())
-			->method('setAppValue')
-			->with('forms', $configKey, $strConfig);
+		if (is_array($configValue)) {
+			$this->config->expects($this->once())
+				->method('setAppValueArray')
+				->with($configKey, $configValue);
+		} else {
+			$this->config->expects($this->once())
+				->method('setAppValueBool')
+				->with($configKey, $configValue);
+		}
 
 		$this->assertEquals(new DataResponse(), $this->configController->updateAppConfig($configKey, $configValue));
 	}
@@ -103,7 +109,9 @@ class ConfigControllerTest extends TestCase {
 			->method('debug');
 
 		$this->config->expects($this->never())
-			->method('setAppValue');
+			->method('setAppValueBool');
+		$this->config->expects($this->never())
+			->method('setAppValueArray');
 
 		$this->assertEquals(new DataResponse('Unknown appConfig key: someUnknownKey', 400), $this->configController->updateAppConfig('someUnknownKey', 'storeThisValue!'));
 	}

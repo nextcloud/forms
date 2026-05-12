@@ -34,22 +34,22 @@ class ConfigService {
 	 * Load the single values, decode, have default values
 	 */
 	public function getAllowPermitAll(): bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPERMITALL, 'true'));
+		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWPERMITALL, true);
 	}
 	public function getAllowPublicLink(): bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWPUBLICLINK, 'true'));
+		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWPUBLICLINK, true);
 	}
 	public function getAllowShowToAll() : bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_ALLOWSHOWTOALL, 'true'));
+		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWSHOWTOALL, true);
 	}
 	private function getUnformattedCreationAllowedGroups(): array {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS, '[]'));
+		return $this->appConfig->getAppValueArray(Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS, []);
 	}
 	public function getCreationAllowedGroups(): array {
 		return $this->formatGroupsForMultiselect($this->getUnformattedCreationAllowedGroups());
 	}
 	public function getRestrictCreation(): bool {
-		return json_decode($this->config->getAppValue($this->appName, Constants::CONFIG_KEY_RESTRICTCREATION, 'false'));
+		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_RESTRICTCREATION, false);
 	}
 
 	public function getAllowConfirmationEmail(): bool {

@@ -11,7 +11,6 @@ use DateTime;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
-use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 
@@ -24,7 +23,6 @@ use OCP\Migration\SimpleMigrationStep;
 class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 	protected IDBConnection $connection;
-	protected IConfig $config;
 
 	/** Map of questionTypes to change */
 	private array $questionTypeMap = [
@@ -37,11 +35,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 
 	/**
 	 * @param IDBConnection $connection
-	 * @param IConfig $config
 	 */
-	public function __construct(IDBConnection $connection, IConfig $config) {
+	public function __construct(IDBConnection $connection) {
 		$this->connection = $connection;
-		$this->config = $config;
 	}
 
 	/**

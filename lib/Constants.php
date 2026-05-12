@@ -29,6 +29,16 @@ class Constants {
 		self::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL,
 		self::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT,
 	];
+	public const CONFIG_KEY_TYPES = [
+		self::CONFIG_KEY_ALLOWPERMITALL => 'bool',
+		self::CONFIG_KEY_ALLOWPUBLICLINK => 'bool',
+		self::CONFIG_KEY_ALLOWSHOWTOALL => 'bool',
+		self::CONFIG_KEY_RESTRICTCREATION => 'bool',
+		self::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL => 'bool',
+		self::CONFIG_KEY_CREATIONALLOWEDGROUPS => 'array',
+		self::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT => 'int',
+	];
+
 
 	/**
 	 * Maximum String lengths, the database is set to store.

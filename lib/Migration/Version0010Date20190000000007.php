@@ -8,7 +8,6 @@
 namespace OCA\Forms\Migration;
 
 use OCP\DB\ISchemaWrapper;
-use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -20,15 +19,12 @@ use OCP\Migration\SimpleMigrationStep;
 class Version0010Date20190000000007 extends SimpleMigrationStep {
 
 	protected IDBConnection $connection;
-	protected IConfig $config;
 
 	/**
 	 * @param IDBConnection $connection
-	 * @param IConfig $config
 	 */
-	public function __construct(IDBConnection $connection, IConfig $config) {
+	public function __construct(IDBConnection $connection) {
 		$this->connection = $connection;
-		$this->config = $config;
 	}
 
 	/**
