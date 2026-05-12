@@ -42,7 +42,7 @@ OC.L10N.register(
     "Loading forms …" : "Lade Formulare …",
     "No forms created yet" : "Bis jetzt wurden noch keine Formulare erstellt",
     "Create a form" : "Erstelle ein Formular",
-    "Select a form or create a new one" : "Wähle ein Formular aus oder erstelle ein Neues",
+    "Select a form or create a new one" : "Formular auswählen oder ein Neues erstellen",
     "Please select a form" : "Bitte ein Formular auswählen",
     "Create new form" : "Neues Formular erstellen",
     "This form does not exist" : "Dieses Formular existiert nicht",
