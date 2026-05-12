@@ -5,9 +5,10 @@
 
 <template>
 	<li class="question__item" @focusout="handleTabbing">
-		<component
-			:is="pseudoIcon"
+		<NcIconSvgWrapper
 			v-if="!isDropdown"
+			:svg="pseudoIcon"
+			inline
 			class="question__item__pseudoInput" />
 		<input
 			ref="input"
@@ -34,14 +35,14 @@
 				class="option__drag-handle"
 				variant="tertiary-no-background">
 				<template #icon>
-					<IconDragIndicator :size="20" />
+					<NcIconSvgWrapper :svg="IconDragIndicator" />
 				</template>
 				<NcActionButton
 					ref="buttonOptionUp"
 					:disabled="index === 0"
 					@click="onMoveUp">
 					<template #icon>
-						<IconArrowUp :size="20" />
+						<NcIconSvgWrapper :svg="IconArrowUp" />
 					</template>
 					{{ t('forms', 'Move option up') }}
 				</NcActionButton>
@@ -50,7 +51,7 @@
 					:disabled="index === maxIndex"
 					@click="onMoveDown">
 					<template #icon>
-						<IconArrowDown :size="20" />
+						<NcIconSvgWrapper :svg="IconArrowDown" />
 					</template>
 					{{ t('forms', 'Move option down') }}
 				</NcActionButton>
@@ -60,7 +61,7 @@
 				variant="tertiary"
 				@click="deleteEntry">
 				<template #icon>
-					<IconDelete :size="20" />
+					<NcIconSvgWrapper :svg="IconDelete" />
 				</template>
 			</NcButton>
 		</div>
@@ -71,7 +72,7 @@
 				:disabled="isIMEComposing || !canCreateLocalAnswer"
 				@click="createLocalAnswer">
 				<template #icon>
-					<IconPlus :size="20" />
+					<NcIconSvgWrapper :svg="IconPlus" />
 				</template>
 			</NcButton>
 		</div>
@@ -79,6 +80,15 @@
 </template>
 
 <script>
+import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
+import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconDragIndicator from '@material-symbols/svg-400/outlined/drag_indicator.svg?raw'
+import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
+import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
+import IconRadioboxBlank from '@material-symbols/svg-400/outlined/radio_button_unchecked.svg?raw'
+import IconTableColumn from '@material-symbols/svg-400/outlined/view_column.svg?raw'
+import IconTableRow from '@material-symbols/svg-400/outlined/view_stream.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { generateOcsUrl } from '@nextcloud/router'
@@ -88,15 +98,7 @@ import { markRaw } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
-import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
-import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
-import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
-import IconPlus from 'vue-material-design-icons/Plus.vue'
-import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
-import IconTableColumn from 'vue-material-design-icons/TableColumn.vue'
-import IconTableRow from 'vue-material-design-icons/TableRow.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconDragIndicator from '../Icons/IconDragIndicator.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
@@ -105,15 +107,7 @@ export default {
 	name: 'AnswerInput',
 
 	components: {
-		IconArrowDown,
-		IconArrowUp,
-		IconCheckboxBlankOutline,
-		IconDelete,
-		IconDragIndicator,
-		IconPlus,
-		IconRadioboxBlank,
-		IconTableColumn,
-		IconTableRow,
+		NcIconSvgWrapper,
 		NcActions,
 		NcActionButton,
 		NcButton,
@@ -170,6 +164,16 @@ export default {
 		'moveDown',
 		'moveUp',
 	],
+
+	setup() {
+		return {
+			IconArrowDown,
+			IconArrowUp,
+			IconDelete,
+			IconDragIndicator,
+			IconPlus,
+		}
+	},
 
 	data() {
 		return {
@@ -526,7 +530,7 @@ export default {
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
-		margin-inline-start: -2px;
+		margin-inline-start: 2px;
 		z-index: 1;
 	}
 

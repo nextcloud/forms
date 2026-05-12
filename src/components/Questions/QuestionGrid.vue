@@ -342,12 +342,6 @@ export default {
 	display: inline-flex;
 	min-height: var(--default-clickable-area);
 
-	&__pseudoInput {
-		color: var(--color-primary-element);
-		margin-inline-start: -2px;
-		z-index: 1;
-	}
-
 	.question__input {
 		width: calc(100% - var(--default-clickable-area));
 		position: relative;

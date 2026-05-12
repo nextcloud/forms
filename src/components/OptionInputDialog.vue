@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import IconCheck from '@mdi/svg/svg/check.svg?raw'
+import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import { showError } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'

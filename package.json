@@ -29,6 +29,7 @@
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
+    "@material-symbols/svg-400": "^0.44.6",
     "@nextcloud/auth": "^2.6.0",
     "@nextcloud/axios": "^2.6.0",
     "@nextcloud/dialogs": "^7.3.0",
@@ -46,12 +47,9 @@
     "qrcode": "^1.5.4",
     "vue": "^3.5.22",
     "vue-draggable-plus": "^0.6.1",
-    "vue-material-design-icons": "^5.3.1",
     "vue-router": "^4.6.0"
   },
   "devDependencies": {
-    "@mdi/js": "^7.4.47",
-    "@mdi/svg": "^7.4.47",
     "@nextcloud/browserslist-config": "^3.1.2",
     "@nextcloud/e2e-test-server": "^0.4.0",
     "@nextcloud/eslint-config": "^9.0.0-rc.9",

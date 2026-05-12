@@ -36,7 +36,7 @@
 				})
 			">
 			<template #icon>
-				<IconLock :size="64" />
+				<NcIconSvgWrapper :svg="IconLock" :size="64" />
 			</template>
 		</NcEmptyContent>
 
@@ -59,7 +59,7 @@
 				)
 			">
 			<template #icon>
-				<IconLock :size="64" />
+				<NcIconSvgWrapper :svg="IconLock" :size="64" />
 			</template>
 		</NcEmptyContent>
 
@@ -167,7 +167,7 @@
 						primary>
 						<template #icon>
 							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
-							<IconPlus v-else :size="20" />
+							<NcIconSvgWrapper v-else :svg="IconPlus" />
 						</template>
 
 						<template v-if="!activeQuestionType">
@@ -184,7 +184,7 @@
 										: addQuestion(type)
 								">
 								<template #icon>
-									<component :is="answer.icon" :size="20" />
+									<NcIconSvgWrapper :svg="answer.icon" />
 								</template>
 								{{ answer.label }}
 							</NcActionButton>
@@ -196,7 +196,7 @@
 								class="question-menu__question"
 								@click="activeQuestionType = null">
 								<template #icon>
-									<IconChevronLeft :size="20" />
+									<NcIconSvgWrapper :svg="IconChevronLeft" />
 								</template>
 								{{ t('forms', 'Grid') }}
 							</NcActionButton>
@@ -212,7 +212,7 @@
 								class="question-menu__question"
 								@click="addQuestion(activeQuestionType, type)">
 								<template #icon>
-									<component :is="answer.icon" :size="20" />
+									<NcIconSvgWrapper :svg="answer.icon" />
 								</template>
 								{{ answer.label }}
 							</NcActionButton>
@@ -225,6 +225,9 @@
 </template>
 
 <script>
+import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
+import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
+import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
@@ -238,11 +241,9 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconLock from 'vue-material-design-icons/LockOutline.vue'
-import IconPlus from 'vue-material-design-icons/Plus.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
@@ -262,9 +263,7 @@ export default {
 	name: 'Create',
 	components: {
 		Draggable,
-		IconChevronLeft,
-		IconLock,
-		IconPlus,
+		NcIconSvgWrapper,
 		NcActionButton,
 		NcActionSeparator,
 		NcActions,
@@ -280,6 +279,14 @@ export default {
 	},
 
 	mixins: [ViewsMixin],
+
+	setup() {
+		return {
+			IconChevronLeft,
+			IconLock,
+			IconPlus,
+		}
+	},
 
 	data() {
 		return {

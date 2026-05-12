@@ -26,10 +26,10 @@
 				variant="tertiary-no-background"
 				@click.stop="onMoveUp">
 				<template #icon>
-					<IconArrowUp :size="20" />
+					<NcIconSvgWrapper :svg="IconArrowUp" />
 				</template>
 			</NcButton>
-			<IconDragIndicator :size="20" />
+			<NcIconSvgWrapper :svg="IconDragIndicator" />
 			<NcButton
 				ref="buttonDown"
 				:aria-label="t('forms', 'Move question down')"
@@ -38,7 +38,7 @@
 				variant="tertiary-no-background"
 				@click.stop="onMoveDown">
 				<template #icon>
-					<IconArrowDown :size="20" />
+					<NcIconSvgWrapper :svg="IconArrowDown" />
 				</template>
 			</NcButton>
 		</div>
@@ -74,7 +74,7 @@
 					:title="warningInvalid"
 					class="question__header__title__warning"
 					tabindex="0">
-					<IconAlertCircleOutline :size="20" />
+					<NcIconSvgWrapper :svg="IconAlertCircleOutline" />
 				</div>
 				<NcActions
 					v-if="!readOnly"
@@ -85,9 +85,9 @@
 					<template v-if="isRequired" #icon>
 						<IconOverlay>
 							<template #overlay>
-								<IconAsterisk :size="20" />
+								<NcIconSvgWrapper :svg="IconAsterisk" />
 							</template>
-							<IconDotsHorizontal :size="20" />
+							<NcIconSvgWrapper :svg="IconDotsHorizontal" />
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
@@ -104,19 +104,19 @@
 						:modelValue="name"
 						@input="onNameChange">
 						<template #icon>
-							<IconIdentifier :size="20" />
+							<NcIconSvgWrapper :svg="IconIdentifier" />
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
 					<NcActionButton closeAfterClick @click="onClone">
 						<template #icon>
-							<IconContentCopy :size="20" />
+							<NcIconSvgWrapper :svg="IconContentCopy" />
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
 					<NcActionButton @click="onDelete">
 						<template #icon>
-							<IconDelete :size="20" />
+							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
 						{{ t('forms', 'Delete question') }}
 					</NcActionButton>
@@ -158,21 +158,22 @@
 </template>
 
 <script>
+import IconAsterisk from '@material-symbols/svg-400/outlined/asterisk.svg?raw'
+import IconIdentifier from '@material-symbols/svg-400/outlined/badge.svg?raw'
+import IconContentCopy from '@material-symbols/svg-400/outlined/content_copy.svg?raw'
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconDragIndicator from '@material-symbols/svg-400/outlined/drag_indicator.svg?raw'
+import IconAlertCircleOutline from '@material-symbols/svg-400/outlined/error.svg?raw'
+import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
+import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
+import IconDotsHorizontal from '@material-symbols/svg-400/outlined/more_horiz.svg?raw'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import IconAlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'
-import IconArrowDown from 'vue-material-design-icons/ArrowDown.vue'
-import IconArrowUp from 'vue-material-design-icons/ArrowUp.vue'
-import IconAsterisk from 'vue-material-design-icons/Asterisk.vue'
-import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import IconDotsHorizontal from 'vue-material-design-icons/DotsHorizontal.vue'
-import IconIdentifier from 'vue-material-design-icons/Identifier.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconDragIndicator from '../Icons/IconDragIndicator.vue'
 import IconOverlay from '../Icons/IconOverlay.vue'
 
 export default {
@@ -180,15 +181,7 @@ export default {
 	name: 'Question',
 
 	components: {
-		IconAlertCircleOutline,
-		IconArrowDown,
-		IconArrowUp,
-		IconAsterisk,
-		IconContentCopy,
-		IconDelete,
-		IconDotsHorizontal,
-		IconDragIndicator,
-		IconIdentifier,
+		NcIconSvgWrapper,
 		IconOverlay,
 		NcActions,
 		NcActionButton,
@@ -282,6 +275,20 @@ export default {
 		'delete',
 		'clone',
 	],
+
+	setup() {
+		return {
+			IconAsterisk,
+			IconAlertCircleOutline,
+			IconArrowDown,
+			IconArrowUp,
+			IconContentCopy,
+			IconDelete,
+			IconDotsHorizontal,
+			IconDragIndicator,
+			IconIdentifier,
+		}
+	},
 
 	computed: {
 		/**

@@ -19,7 +19,7 @@
 			:value="option.id"
 			@update:modelValue="$emit('update:active', option)">
 			<template v-if="option.icon" #icon>
-				<NcIconSvgWrapper :path="option.icon" />
+				<NcIconSvgWrapper :svg="option.icon" />
 			</template>
 			{{ !isMobile || !option.icon ? option.title : null }}
 		</NcCheckboxRadioSwitch>

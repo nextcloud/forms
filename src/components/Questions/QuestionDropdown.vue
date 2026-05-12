@@ -19,7 +19,7 @@
 			</NcActionCheckbox>
 			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
 				<template #icon>
-					<IconContentPaste :size="20" />
+					<NcIconSvgWrapper :svg="IconContentPaste" />
 				</template>
 				{{ t('forms', 'Add multiple options') }}
 			</NcActionButton>
@@ -93,12 +93,13 @@
 </template>
 
 <script>
+import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
-import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
@@ -112,7 +113,7 @@ export default {
 	components: {
 		AnswerInput,
 		Draggable,
-		IconContentPaste,
+		NcIconSvgWrapper,
 		NcActionButton,
 		NcActionCheckbox,
 		NcLoadingIcon,
@@ -123,6 +124,12 @@ export default {
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
 	emits: ['update:values'],
+
+	setup() {
+		return {
+			IconContentPaste,
+		}
+	},
 
 	data() {
 		return {

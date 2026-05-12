@@ -17,7 +17,7 @@
 				class="answer__text"
 				dir="auto">
 				<a :href="answer.url" target="_blank">
-					<IconFile :size="20" class="answer__text-icon" />
+					<NcIconSvgWrapper :svg="IconFile" inline />
 					<NcHighlight :text="answer.text" :search="highlight" />
 				</a>
 			</p>
@@ -78,16 +78,17 @@
 </template>
 
 <script>
+import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcHighlight from '@nextcloud/vue/components/NcHighlight'
-import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 
 export default {
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Answer',
 	components: {
 		NcCheckboxRadioSwitch,
-		IconFile,
+		NcIconSvgWrapper,
 		NcHighlight,
 	},
 
@@ -144,6 +145,12 @@ export default {
 			default: '',
 		},
 	},
+
+	setup() {
+		return {
+			IconFile,
+		}
+	},
 }
 </script>
 
@@ -158,12 +165,6 @@ export default {
 
 	&__text {
 		white-space: pre-line;
-
-		&-icon {
-			display: inline-flex;
-			position: relative;
-			top: 4px;
-		}
 	}
 
 	.color__field {

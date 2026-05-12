@@ -28,7 +28,7 @@
 			v-if="!hasPublicLink && appConfig.allowPublicLink"
 			class="share-div share-div--link">
 			<div class="share-div__avatar">
-				<IconLinkVariant :size="20" />
+				<NcIconSvgWrapper :svg="IconLinkVariant" />
 			</div>
 			<span class="share-div__desc">{{ t('forms', 'Share link') }}</span>
 			<NcActions>
@@ -36,7 +36,7 @@
 					:disabled="locked || !isCurrentUserOwner"
 					@click="addPublicLink">
 					<template #icon>
-						<IconPlus :size="20" />
+						<NcIconSvgWrapper :svg="IconPlus" />
 					</template>
 					{{ t('forms', 'Add link') }}
 				</NcActionButton>
@@ -50,8 +50,10 @@
 				class="share-div share-div--link"
 				:class="{ 'share-div--embeddable': isEmbeddingAllowed(share) }">
 				<div class="share-div__avatar">
-					<IconLinkBoxVariantOutline v-if="isEmbeddable" :size="20" />
-					<IconLinkVariant v-else :size="20" />
+					<NcIconSvgWrapper
+						v-if="isEmbeddable"
+						:svg="IconLinkBoxVariantOutline" />
+					<NcIconSvgWrapper v-else :svg="IconLinkVariant" />
 				</div>
 				<span class="share-div__desc">{{
 					isEmbeddable
@@ -63,13 +65,13 @@
 						:href="getPublicShareLink(share)"
 						@click.prevent="copyLink($event, getPublicShareLink(share))">
 						<template #icon>
-							<IconCopyAll :size="20" />
+							<NcIconSvgWrapper :svg="IconCopyAll" />
 						</template>
 						{{ t('forms', 'Copy to clipboard') }}
 					</NcActionLink>
 					<NcActionButton @click="openQrDialog(share)">
 						<template #icon>
-							<IconQr :size="20" />
+							<NcIconSvgWrapper :svg="IconQr" />
 						</template>
 						{{ t('forms', 'Show QR code') }}
 					</NcActionButton>
@@ -77,7 +79,7 @@
 						v-if="isEmbeddable"
 						@click="copyEmbeddingCode(share)">
 						<template #icon>
-							<IconCodeBrackets :size="20" />
+							<NcIconSvgWrapper :svg="IconCodeBrackets" />
 						</template>
 						{{ t('forms', 'Copy embedding code') }}
 					</NcActionButton>
@@ -86,7 +88,7 @@
 						:disabled="locked || !isCurrentUserOwner"
 						@click="makeEmbeddable(share)">
 						<template #icon>
-							<IconLinkBoxVariantOutline :size="20" />
+							<NcIconSvgWrapper :svg="IconLinkBoxVariantOutline" />
 						</template>
 						<!-- TRANSLATORS: This means the link can be embedded into external websites -->
 						{{ t('forms', 'Convert to embeddable link') }}
@@ -95,7 +97,7 @@
 						:disabled="locked || !isCurrentUserOwner"
 						@click="removeShare(share)">
 						<template #icon>
-							<IconDelete :size="20" />
+							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
 						{{ t('forms', 'Remove link') }}
 					</NcActionButton>
@@ -105,7 +107,7 @@
 						:disabled="locked || !isCurrentUserOwner"
 						@click="addPublicLink">
 						<template #icon>
-							<IconPlus :size="20" />
+							<NcIconSvgWrapper :svg="IconPlus" />
 						</template>
 						{{ t('forms', 'Add link') }}
 					</NcActionButton>
@@ -128,7 +130,7 @@
 		<!-- Internal link -->
 		<div class="share-div">
 			<div class="share-div__avatar">
-				<IconLinkVariant :size="20" />
+				<NcIconSvgWrapper :svg="IconLinkVariant" />
 			</div>
 			<div class="share-div__desc share-div__desc--twoline">
 				<span>{{ t('forms', 'Internal link') }}</span>
@@ -146,7 +148,7 @@
 						copyLink($event, getInternalShareLink(form.hash))
 					">
 					<template #icon>
-						<IconCopyAll :size="20" />
+						<NcIconSvgWrapper :svg="IconCopyAll" />
 					</template>
 					{{ t('forms', 'Copy to clipboard') }}
 				</NcActionLink>
@@ -157,7 +159,7 @@
 		<div v-if="appConfig.allowPermitAll">
 			<div class="share-div">
 				<div class="share-div__avatar">
-					<IconAccountMultiple :size="20" />
+					<NcIconSvgWrapper :svg="IconAccountMultiple" />
 				</div>
 				<label for="share-switch__permit-all" class="share-div__desc">
 					{{ t('forms', 'Permit access to all logged in accounts') }}
@@ -173,7 +175,7 @@
 				v-if="appConfig.allowShowToAll && form.access.permitAllUsers"
 				class="share-div share-div--indent">
 				<div class="share-div__avatar">
-					<FormsIcon :size="16" />
+					<NcIconSvgWrapper :svg="FormsIcon" :size="16" />
 				</div>
 				<label for="share-switch__show-to-all" class="share-div__desc">
 					{{ t('forms', 'Show to all accounts on sidebar') }}
@@ -202,6 +204,14 @@
 </template>
 
 <script>
+import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
+import IconCodeBrackets from '@material-symbols/svg-400/outlined/code.svg?raw'
+import IconCopyAll from '@material-symbols/svg-400/outlined/copy_all.svg?raw'
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconAccountMultiple from '@material-symbols/svg-400/outlined/group.svg?raw'
+import IconLinkBoxVariantOutline from '@material-symbols/svg-400/outlined/iframe.svg?raw'
+import IconLinkVariant from '@material-symbols/svg-400/outlined/link_2.svg?raw'
+import IconQr from '@material-symbols/svg-400/outlined/qr_code.svg?raw'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -211,19 +221,12 @@ import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/components/NcActionLink'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import IconAccountMultiple from 'vue-material-design-icons/AccountMultipleOutline.vue'
-import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
-import IconLinkVariant from 'vue-material-design-icons/Link.vue'
-import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxOutline.vue'
-import IconPlus from 'vue-material-design-icons/Plus.vue'
-import IconQr from 'vue-material-design-icons/Qrcode.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import FormsIcon from '../Icons/FormsIcon.vue'
-import IconCopyAll from '../Icons/IconCopyAll.vue'
 import QRDialog from '../QRDialog.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
+import FormsIcon from '../../../img/forms-dark.svg?raw'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
@@ -232,15 +235,7 @@ import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
 export default {
 	components: {
-		FormsIcon,
-		IconAccountMultiple,
-		IconCodeBrackets,
-		IconCopyAll,
-		IconDelete,
-		IconLinkBoxVariantOutline,
-		IconLinkVariant,
-		IconPlus,
-		IconQr,
+		NcIconSvgWrapper,
 		NcActions,
 		NcActionButton,
 		NcActionLink,
@@ -271,6 +266,20 @@ export default {
 	},
 
 	emits: ['addShare', 'updateShare', 'removeShare', 'update:formProp'],
+
+	setup() {
+		return {
+			FormsIcon,
+			IconCopyAll,
+			IconPlus,
+			IconCodeBrackets,
+			IconDelete,
+			IconLinkVariant,
+			IconLinkBoxVariantOutline,
+			IconAccountMultiple,
+			IconQr,
+		}
+	},
 
 	data() {
 		return {

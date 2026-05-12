@@ -12,7 +12,7 @@
 		@update:open="$emit('update:sidebarOpened', $event)">
 		<NcAppSidebarTab id="forms-sharing" :order="0" :name="t('forms', 'Sharing')">
 			<template #icon>
-				<IconShareVariant :size="20" />
+				<NcIconSvgWrapper :svg="IconShareVariant" />
 			</template>
 			<SharingSidebarTab
 				:form="form"
@@ -29,7 +29,7 @@
 			:order="1"
 			:name="t('forms', 'Settings')">
 			<template #icon>
-				<IconSettings :size="20" />
+				<NcIconSvgWrapper :svg="IconSettings" />
 			</template>
 			<SettingsSidebarTab
 				:form="form"
@@ -41,12 +41,13 @@
 </template>
 
 <script>
+import IconSettings from '@material-symbols/svg-400/outlined/settings.svg?raw'
+import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import { emit } from '@nextcloud/event-bus'
 import moment from '@nextcloud/moment'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
-import IconSettings from 'vue-material-design-icons/CogOutline.vue'
-import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
 import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
@@ -56,8 +57,7 @@ export default {
 	name: 'Sidebar',
 
 	components: {
-		IconSettings,
-		IconShareVariant,
+		NcIconSvgWrapper,
 		NcAppSidebar,
 		NcAppSidebarTab,
 		SharingSidebarTab,
@@ -74,6 +74,13 @@ export default {
 	},
 
 	emits: ['update:sidebarOpened', 'update:active'],
+
+	setup() {
+		return {
+			IconSettings,
+			IconShareVariant,
+		}
+	},
 
 	computed: {
 		lockedUntilFormatted() {

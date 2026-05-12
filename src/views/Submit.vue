@@ -212,10 +212,10 @@
 </template>
 
 <script>
-import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
-import IconCheckSvg from '@mdi/svg/svg/check.svg?raw'
-import IconRefreshSvg from '@mdi/svg/svg/refresh.svg?raw'
-import IconSendSvg from '@mdi/svg/svg/send.svg?raw'
+import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
+import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
+import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
+import IconSend from '@material-symbols/svg-400/outlined/send.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
@@ -307,9 +307,9 @@ export default {
 	setup() {
 		// Non reactive properties
 		return {
-			IconCheckSvg,
-			IconRefreshSvg,
-			IconSendSvg,
+			IconCheckSvg: IconCheck,
+			IconRefreshSvg: IconRefresh,
+			IconSendSvg: IconSend,
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 		}
@@ -435,12 +435,12 @@ export default {
 			return [
 				{
 					label: t('forms', 'Abort'),
-					icon: IconCancelSvg,
+					icon: IconCancel,
 					callback: () => {},
 				},
 				{
 					label: t('forms', 'Submit'),
-					icon: IconCheckSvg,
+					icon: IconCheck,
 					variant: 'primary',
 					callback: () => this.onConfirmedSubmit(),
 				},
@@ -454,12 +454,12 @@ export default {
 			return [
 				{
 					label: t('forms', 'Abort'),
-					icon: IconCancelSvg,
+					icon: IconCancel,
 					callback: () => this.confirmButtonCallback(false),
 				},
 				{
 					label: t('forms', 'Leave'),
-					icon: IconCheckSvg,
+					icon: IconCheck,
 					variant: 'primary',
 					callback: () => this.confirmButtonCallback(true),
 				},
@@ -473,12 +473,12 @@ export default {
 			return [
 				{
 					label: t('forms', 'Abort'),
-					icon: IconCancelSvg,
+					icon: IconCancel,
 					callback: () => {},
 				},
 				{
 					label: t('forms', 'Clear'),
-					icon: IconCheckSvg,
+					icon: IconCheck,
 					variant: 'primary',
 					callback: () => this.onResetSubmission(),
 				},

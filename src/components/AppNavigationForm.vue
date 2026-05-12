@@ -18,8 +18,8 @@
 		@click="mobileCloseNavigation">
 		<template #icon>
 			<NcLoadingIcon v-if="loading" :size="16" />
-			<IconCheck v-else-if="isExpired" :size="16" />
-			<FormsIcon v-else :size="16" />
+			<NcIconSvgWrapper v-else-if="isExpired" :svg="IconCheck" :size="16" />
+			<NcIconSvgWrapper v-else :svg="FormsIcon" :size="16" />
 		</template>
 		<template v-if="hasSubtitle" #subname>
 			{{ formSubtitle }}
@@ -34,7 +34,7 @@
 				:to="{ name: 'edit', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
-					<IconPencil :size="20" />
+					<NcIconSvgWrapper :svg="IconPencil" />
 				</template>
 				{{ t('forms', 'Edit form') }}
 			</NcActionRouter>
@@ -43,7 +43,7 @@
 				closeAfterClick
 				@click="onShareForm">
 				<template #icon>
-					<IconShareVariant :size="20" />
+					<NcIconSvgWrapper :svg="IconShareVariant" />
 				</template>
 				{{ t('forms', 'Share form') }}
 			</NcActionButton>
@@ -53,13 +53,13 @@
 				:to="{ name: 'results', params: { hash: form.hash } }"
 				@click="mobileCloseNavigation">
 				<template #icon>
-					<IconPoll :size="20" />
+					<NcIconSvgWrapper :svg="IconPoll" />
 				</template>
 				{{ t('forms', 'Responses') }}
 			</NcActionRouter>
 			<NcActionButton v-if="canEdit" closeAfterClick @click="onCloneForm">
 				<template #icon>
-					<IconContentCopy :size="20" />
+					<NcIconSvgWrapper :svg="IconContentCopy" />
 				</template>
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
@@ -70,8 +70,11 @@
 				:disabled="isFormLocked"
 				@click="onToggleArchive">
 				<template #icon>
-					<IconArchiveOff v-if="isArchived" :size="20" />
-					<IconArchive v-else :size="20" />
+					<NcIconSvgWrapper
+						v-if="isArchived"
+						:svg="IconArchiveOff"
+						:size="20" />
+					<NcIconSvgWrapper v-else :svg="IconArchive" :size="20" />
 				</template>
 				{{
 					isArchived
@@ -85,7 +88,7 @@
 				:disabled="isFormLocked"
 				@click="onConfirmDelete">
 				<template #icon>
-					<IconDelete :size="20" />
+					<NcIconSvgWrapper :svg="IconDelete" />
 				</template>
 				{{ t('forms', 'Delete form') }}
 			</NcActionButton>
@@ -94,6 +97,14 @@
 </template>
 
 <script>
+import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
+import IconPoll from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
+import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
+import IconContentCopy from '@material-symbols/svg-400/outlined/content_copy.svg?raw'
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
+import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
+import IconArchiveOff from '@material-symbols/svg-400/outlined/unarchive.svg?raw'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
@@ -102,17 +113,10 @@ import { generateOcsUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import IconArchiveOff from 'vue-material-design-icons/ArchiveOffOutline.vue'
-import IconArchive from 'vue-material-design-icons/ArchiveOutline.vue'
-import IconCheck from 'vue-material-design-icons/Check.vue'
-import IconContentCopy from 'vue-material-design-icons/ContentCopy.vue'
-import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
-import IconPoll from 'vue-material-design-icons/Poll.vue'
-import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import FormsIcon from './Icons/FormsIcon.vue'
+import FormsIcon from '../../img/forms-dark.svg?raw'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import { FormState } from '../models/Constants.ts'
 import logger from '../utils/Logger.js'
@@ -121,18 +125,10 @@ export default {
 	name: 'AppNavigationForm',
 
 	components: {
-		FormsIcon,
-		IconArchive,
-		IconArchiveOff,
-		IconCheck,
-		IconContentCopy,
-		IconDelete,
-		IconPencil,
-		IconPoll,
-		IconShareVariant,
 		NcActionButton,
 		NcActionRouter,
 		NcActionSeparator,
+		NcIconSvgWrapper,
 		NcListItem,
 		NcLoadingIcon,
 	},
@@ -158,6 +154,20 @@ export default {
 	},
 
 	emits: ['mobileCloseNavigation', 'openSharing', 'clone', 'delete'],
+
+	setup() {
+		return {
+			FormsIcon,
+			IconArchive,
+			IconArchiveOff,
+			IconCheck,
+			IconContentCopy,
+			IconDelete,
+			IconPencil,
+			IconPoll,
+			IconShareVariant,
+		}
+	},
 
 	data() {
 		return {

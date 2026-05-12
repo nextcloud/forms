@@ -14,7 +14,7 @@
 			<template v-if="!allowedFileTypesDialogOpened">
 				<NcActionButton isMenu @click="allowedFileTypesDialogOpened = true">
 					<template #icon>
-						<IconFileDocumentAlert :size="20" />
+						<NcIconSvgWrapper :svg="IconFileDocumentAlert" />
 					</template>
 					{{ allowedFileTypesLabel }}
 				</NcActionButton>
@@ -25,7 +25,7 @@
 
 				<NcActionButton @click="allowedFileTypesDialogOpened = false">
 					<template #icon>
-						<IconChevronLeft :size="20" />
+						<NcIconSvgWrapper :svg="IconChevronLeft" />
 					</template>
 					{{ t('forms', 'Allow only specific file types') }}
 				</NcActionButton>
@@ -87,7 +87,7 @@
 					:name="uploadedFile.fileName"
 					compact>
 					<template #icon>
-						<IconFile :size="20" />
+						<NcIconSvgWrapper :svg="IconFile" />
 					</template>
 
 					<template #actions>
@@ -96,7 +96,7 @@
 								onDeleteUploadedFile(uploadedFile.uploadedFileId)
 							">
 							<template #icon>
-								<IconDelete :size="20" />
+								<NcIconSvgWrapper :svg="IconDelete" />
 							</template>
 							{{ t('forms', 'Delete') }}
 						</NcActionButton>
@@ -131,10 +131,10 @@
 							variant="tertiary-no-background"
 							@click="toggleFileInput">
 							<template #icon>
-								<IconUploadMultiple
+								<NcIconSvgWrapper
 									v-if="maxAllowedFilesCount > 1"
-									:size="20" />
-								<IconUpload v-else :size="20" />
+									:svg="IconUploadMultiple" />
+								<NcIconSvgWrapper v-else :svg="IconUpload" />
 							</template>
 						</NcButton>
 					</div>
@@ -145,6 +145,12 @@
 </template>
 
 <script>
+import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
+import IconFileDocumentAlert from '@material-symbols/svg-400/outlined/quick_reference.svg?raw'
+import IconUpload from '@material-symbols/svg-400/outlined/upload.svg?raw'
+import IconUploadMultiple from '@material-symbols/svg-400/outlined/upload_file.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { formatFileSize } from '@nextcloud/files'
@@ -155,14 +161,9 @@ import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconFileDocumentAlert from 'vue-material-design-icons/FileDocumentAlertOutline.vue'
-import IconFile from 'vue-material-design-icons/FileOutline.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconUpload from 'vue-material-design-icons/TrayArrowUp.vue'
-import IconUploadMultiple from 'vue-material-design-icons/UploadMultipleOutline.vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import fileTypes from '../../models/FileTypes.js'
@@ -188,12 +189,7 @@ const FILE_SIZE_UNITS = {
 export default {
 	name: 'QuestionFile',
 	components: {
-		IconChevronLeft,
-		IconDelete,
-		IconFile,
-		IconFileDocumentAlert,
-		IconUpload,
-		IconUploadMultiple,
+		NcIconSvgWrapper,
 		NcActionButton,
 		NcActionCheckbox,
 		NcActionInput,
@@ -206,6 +202,17 @@ export default {
 
 	mixins: [QuestionMixin],
 	emits: ['update:values'],
+
+	setup() {
+		return {
+			IconChevronLeft,
+			IconDelete,
+			IconFile,
+			IconFileDocumentAlert,
+			IconUpload,
+			IconUploadMultiple,
+		}
+	},
 
 	data() {
 		return {
