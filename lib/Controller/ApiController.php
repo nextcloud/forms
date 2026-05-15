@@ -7,6 +7,7 @@
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\BackgroundJob\DeleteQuestionFoldersJob;
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
@@ -46,6 +47,7 @@ use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\BackgroundJob\IJobList;
+use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
 use OCP\IL10N;
@@ -741,6 +743,14 @@ class ApiController extends OCSController {
 		// Mark question as deleted
 		$question->setOrder(0);
 		$this->questionMapper->update($question);
+
+		if ($question->getType() === Constants::ANSWER_TYPE_FILE) {
+			$this->jobList->add(DeleteQuestionFoldersJob::class, [
+				'formId' => $form->getId(),
+				'questionId' => $question->getId(),
+				'ownerId' => $form->getOwnerId(),
+			]);
+		}
 
 		// Update all question-order > deleted order.
 		$formQuestions = $this->questionMapper->findByForm($formId);
@@ -1589,7 +1599,7 @@ class ApiController extends OCSController {
 		}
 
 		// Delete submission (incl. Answers)
-		$this->submissionMapper->deleteById($submissionId);
+		$this->submissionMapper->deleteById($form, $submissionId);
 		$this->formMapper->update($form);
 
 		return new DataResponse($submissionId);
@@ -1743,8 +1753,7 @@ class ApiController extends OCSController {
 			} else {
 				$folder = $userFolder->newFolder($path);
 			}
-			/** @var \OCP\Files\Folder $folder */
-
+			/** @var Folder $folder */
 			$fileName = $folder->getNonExistingName($uploadedFile['name']);
 			$file = $folder->newFile($fileName, file_get_contents($uploadedFile['tmp_name']));
 
@@ -1819,8 +1828,7 @@ class ApiController extends OCSController {
 				} else {
 					$folder = $userFolder->newFolder($path);
 				}
-				/** @var \OCP\Files\Folder $folder */
-
+				/** @var Folder $folder */
 				$file = $userFolder->getById($uploadedFile->getFileId())[0];
 				$name = $folder->getNonExistingName($file->getName());
 				$file->move($folder->getPath() . '/' . $name);
