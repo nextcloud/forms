@@ -62,6 +62,7 @@ class ConfigServiceTest extends TestCase {
 				'strConfig' => [
 					'allowPermitAll' => 'false',
 					'allowPublicLink' => 'false',
+					'allowCustomPublicShareTokens' => 'true',
 					'allowShowToAll' => 'false',
 					'creationAllowedGroups' => '["group1", "group2", "nonExisting"]',
 					'restrictCreation' => 'true',
@@ -73,6 +74,7 @@ class ConfigServiceTest extends TestCase {
 				'expected' => [
 					'allowPermitAll' => false,
 					'allowPublicLink' => false,
+					'allowCustomPublicShareTokens' => true,
 					'allowShowToAll' => false,
 					'creationAllowedGroups' => [
 						[
@@ -136,6 +138,7 @@ class ConfigServiceTest extends TestCase {
 				'expected' => [
 					'allowPermitAll' => true,
 					'allowPublicLink' => true,
+					'allowCustomPublicShareTokens' => false,
 					'allowShowToAll' => true,
 					'creationAllowedGroups' => [],
 					'restrictCreation' => false,

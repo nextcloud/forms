@@ -69,13 +69,18 @@ class ConfigControllerTest extends TestCase {
 
 	public static function dataUpdateAppConfig() {
 		return [
-			'booleanConfig' => [
+			'booleanConfigAllowPermitAll' => [
 				'configKey' => 'allowPermitAll',
 				'configValue' => true,
 				'strConfig' => 'true'
 			],
-			'booleanConfig' => [
+			'booleanConfigAllowShowToAll' => [
 				'configKey' => 'allowShowToAll',
+				'configValue' => true,
+				'strConfig' => 'true'
+			],
+			'booleanConfigAllowCustomPublicShareTokens' => [
+				'configKey' => 'allowCustomPublicShareTokens',
 				'configValue' => true,
 				'strConfig' => 'true'
 			],
