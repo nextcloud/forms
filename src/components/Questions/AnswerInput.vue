@@ -100,8 +100,8 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
 export default {
 	name: 'AnswerInput',

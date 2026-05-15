@@ -7,8 +7,8 @@ import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import ShareTypes from './ShareTypes.js'
 
 export default {

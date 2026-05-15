@@ -119,7 +119,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import FormsIcon from '../../img/forms-dark.svg?raw'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import { FormState } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
 
 export default {
 	name: 'AppNavigationForm',

@@ -26,7 +26,7 @@
 <script>
 import QRCode from 'qrcode'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
 
 export default {
 	name: 'QRDialog',

@@ -306,9 +306,9 @@ import PermissionTypes from '../mixins/PermissionTypes.js'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
-import SetWindowTitle from '../utils/SetWindowTitle.js'
+import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const SUPPORTED_FILE_FORMATS = {
 	ods: IconTable,
