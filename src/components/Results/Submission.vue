@@ -17,13 +17,13 @@
 						params: { hash: formHash, submissionId: submission.id },
 					}">
 					<template #icon>
-						<IconPencil :size="20" />
+						<NcIconSvgWrapper :svg="IconPencil" />
 					</template>
 					{{ t('forms', 'Edit this response') }}
 				</NcActionRouter>
 				<NcActionButton v-if="canDeleteSubmission" @click="onDelete">
 					<template #icon>
-						<IconDelete :size="20" />
+						<NcIconSvgWrapper :svg="IconDelete" />
 					</template>
 					{{ t('forms', 'Delete this response') }}
 				</NcActionButton>
@@ -49,13 +49,14 @@
 </template>
 
 <script>
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import moment from '@nextcloud/moment'
 import { generateUrl } from '@nextcloud/router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActions from '@nextcloud/vue/components/NcActions'
-import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Answer from './Answer.vue'
 import { OptionType } from '../../models/Constants.ts'
 
@@ -65,8 +66,7 @@ export default {
 
 	components: {
 		Answer,
-		IconDelete,
-		IconPencil,
+		NcIconSvgWrapper,
 		NcActions,
 		NcActionButton,
 		NcActionRouter,
@@ -105,6 +105,13 @@ export default {
 	},
 
 	emits: ['delete'],
+
+	setup() {
+		return {
+			IconDelete,
+			IconPencil,
+		}
+	},
 
 	computed: {
 		// Format submission-timestamp to DateTime

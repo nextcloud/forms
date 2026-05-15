@@ -37,7 +37,7 @@
 			<NcActionSeparator />
 			<NcActionButton :disabled="locked" @click="removeShare">
 				<template #icon>
-					<IconClose :size="20" />
+					<NcIconSvgWrapper :svg="IconClose" />
 				</template>
 				{{ t('forms', 'Delete') }}
 			</NcActionButton>
@@ -46,19 +46,20 @@
 </template>
 
 <script>
+import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAvatar from '@nextcloud/vue/components/NcAvatar'
-import IconClose from 'vue-material-design-icons/Close.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
 
 export default {
 	components: {
-		IconClose,
+		NcIconSvgWrapper,
 		NcActions,
 		NcActionButton,
 		NcActionCaption,
@@ -87,6 +88,12 @@ export default {
 	},
 
 	emits: ['removeShare', 'update:share'],
+
+	setup() {
+		return {
+			IconClose,
+		}
+	},
 
 	computed: {
 		canAccessResults() {

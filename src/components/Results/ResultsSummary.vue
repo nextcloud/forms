@@ -90,7 +90,7 @@
 			<li v-for="(answer, index) in answers" :key="answer.id" dir="auto">
 				<template v-if="answer.url">
 					<a :href="answer.url" target="_blank">
-						<IconFile :size="20" class="question-summary__text-icon" />
+						<NcIconSvgWrapper :svg="IconFile" inline />
 						{{ answer.text }}
 					</a>
 				</template>
@@ -116,8 +116,9 @@
 </template>
 
 <script>
+import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import { generateUrl } from '@nextcloud/router'
-import IconFile from 'vue-material-design-icons/FileOutline.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.js'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
 
@@ -125,7 +126,7 @@ export default {
 	name: 'ResultsSummary',
 
 	components: {
-		IconFile,
+		NcIconSvgWrapper,
 	},
 
 	props: {
@@ -138,6 +139,12 @@ export default {
 			type: Object,
 			required: true,
 		},
+	},
+
+	setup() {
+		return {
+			IconFile,
+		}
 	},
 
 	data() {
@@ -516,12 +523,6 @@ export default {
 			&:first-child {
 				font-weight: bold;
 			}
-		}
-
-		&-icon {
-			display: inline-flex;
-			position: relative;
-			top: 4px;
 		}
 	}
 

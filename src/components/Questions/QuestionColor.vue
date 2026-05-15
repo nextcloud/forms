@@ -30,7 +30,7 @@
 					variant="tertiary"
 					@click="onUpdatePickedColor('')">
 					<template #icon>
-						<IconClose :size="20" />
+						<NcIconSvgWrapper :svg="IconClose" />
 					</template>
 				</NcButton>
 			</div>
@@ -39,9 +39,10 @@
 </template>
 
 <script>
+import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
-import IconClose from 'vue-material-design-icons/Close.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
@@ -49,7 +50,7 @@ export default {
 	name: 'QuestionColor',
 
 	components: {
-		IconClose,
+		NcIconSvgWrapper,
 		NcButton,
 		NcColorPicker,
 		Question,
@@ -57,6 +58,12 @@ export default {
 
 	mixins: [QuestionMixin],
 	emits: ['update:values'],
+
+	setup() {
+		return {
+			IconClose,
+		}
+	},
 
 	data() {
 		return {

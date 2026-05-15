@@ -61,7 +61,7 @@
 							v-if="canEditForm && !form.fileId && !isFormLocked"
 							@click="onLinkFile">
 							<template #icon>
-								<IconLink :size="20" />
+								<NcIconSvgWrapper :svg="IconLink" />
 							</template>
 							{{ t('forms', 'Create spreadsheet') }}
 						</NcActionButton>
@@ -70,13 +70,13 @@
 								:href="fileUrl"
 								type="tertiary-no-background">
 								<template #icon>
-									<IconTable :size="20" />
+									<NcIconSvgWrapper :svg="IconTable" />
 								</template>
 								{{ t('forms', 'Open spreadsheet') }}
 							</NcActionButton>
 							<NcActionButton closeAfterClick @click="onReExport">
 								<template #icon>
-									<IconRefresh :size="20" />
+									<NcIconSvgWrapper :svg="IconRefresh" />
 								</template>
 								{{ t('forms', 'Re-export spreadsheet') }}
 							</NcActionButton>
@@ -85,7 +85,7 @@
 								:disabled="isFormLocked"
 								@click="onUnlinkFile">
 								<template #icon>
-									<IconLinkVariantOff :size="20" />
+									<NcIconSvgWrapper :svg="IconLinkVariantOff" />
 								</template>
 								{{ t('forms', 'Unlink spreadsheet') }}
 							</NcActionButton>
@@ -96,7 +96,7 @@
 							closeAfterClick
 							@click="onStoreToFiles">
 							<template #icon>
-								<IconFolder :size="20" />
+								<NcIconSvgWrapper :svg="IconFolder" />
 							</template>
 							{{ t('forms', 'Save copy to Files') }}
 						</NcActionButton>
@@ -106,7 +106,7 @@
 							isMenu
 							@click="isDownloadActionOpened = true">
 							<template #icon>
-								<IconDownload :size="20" />
+								<NcIconSvgWrapper :svg="IconDownload" />
 							</template>
 							{{ t('forms', 'Download') }}
 						</NcActionButton>
@@ -115,7 +115,7 @@
 							closeAfterClick
 							@click="deleteAllSubmissions">
 							<template #icon>
-								<IconDelete :size="20" />
+								<NcIconSvgWrapper :svg="IconDelete" />
 							</template>
 							{{ t('forms', 'Delete all responses') }}
 						</NcActionButton>
@@ -125,7 +125,7 @@
 						<!-- Back to top-level button -->
 						<NcActionButton @click="isDownloadActionOpened = false">
 							<template #icon>
-								<IconChevronLeft :size="20" />
+								<NcIconSvgWrapper :svg="IconChevronLeft" />
 							</template>
 							{{ t('forms', 'Download') }}
 						</NcActionButton>
@@ -134,7 +134,7 @@
 							closeAfterClick
 							@click="onDownloadFile('csv')">
 							<template #icon>
-								<IconFileDelimited :size="20" />
+								<NcIconSvgWrapper :svg="IconFileDelimited" />
 							</template>
 							CSV
 						</NcActionButton>
@@ -142,7 +142,7 @@
 							closeAfterClick
 							@click="onDownloadFile('ods')">
 							<template #icon>
-								<IconTable :size="20" />
+								<NcIconSvgWrapper :svg="IconTable" />
 							</template>
 							ODS
 						</NcActionButton>
@@ -150,7 +150,7 @@
 							closeAfterClick
 							@click="onDownloadFile('xlsx')">
 							<template #icon>
-								<IconFileExcelOutline :size="20" />
+								<NcIconSvgWrapper :svg="IconFileExcelOutline" />
 							</template>
 							XSLX
 						</NcActionButton>
@@ -172,7 +172,7 @@
 						:showTrailingButton="submissionSearch.length > 0"
 						@trailingButtonClick="submissionSearch = ''">
 						<template #icon>
-							<IconMagnify :size="20" />
+							<NcIconSvgWrapper :svg="IconMagnify" />
 						</template>
 					</NcTextField>
 				</div>
@@ -200,7 +200,7 @@
 				})
 			">
 			<template #icon>
-				<IconPoll :size="64" />
+				<NcIconSvgWrapper :svg="IconPoll" :size="64" />
 			</template>
 		</NcEmptyContent>
 
@@ -211,13 +211,13 @@
 			class="forms-emptycontent"
 			:description="t('forms', 'Responses will show up here')">
 			<template #icon>
-				<IconPoll :size="64" />
+				<NcIconSvgWrapper :svg="IconPoll" :size="64" />
 			</template>
 			<template #action>
 				<div class="response-actions">
 					<NcButton variant="primary" @click="onShareForm">
 						<template #icon>
-							<IconShareVariant :size="20" decorative />
+							<NcIconSvgWrapper :svg="IconShareVariant" />
 						</template>
 						{{ t('forms', 'Share form') }}
 					</NcButton>
@@ -264,13 +264,20 @@
 </template>
 
 <script>
-import IconCancelSvg from '@mdi/svg/svg/cancel.svg?raw'
-import IconDeleteSvg from '@mdi/svg/svg/delete.svg?raw'
-import IconFileDelimitedSvg from '@mdi/svg/svg/file-delimited-outline.svg?raw'
-import IconFileExcelOutlineSvg from '@mdi/svg/svg/file-excel-outline.svg?raw'
-import IconLinkVariantOffSvg from '@mdi/svg/svg/link-off.svg?raw'
-import IconLinkSvg from '@mdi/svg/svg/link.svg?raw'
-import IconTableSvg from '@mdi/svg/svg/table.svg?raw'
+import IconPoll from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
+import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
+import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
+import IconFileDelimited from '@material-symbols/svg-400/outlined/csv.svg?raw'
+import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconDownload from '@material-symbols/svg-400/outlined/download.svg?raw'
+import IconFolder from '@material-symbols/svg-400/outlined/folder.svg?raw'
+import IconLink from '@material-symbols/svg-400/outlined/link.svg?raw'
+import IconLinkVariantOff from '@material-symbols/svg-400/outlined/link_off.svg?raw'
+import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
+import IconMagnify from '@material-symbols/svg-400/outlined/search.svg?raw'
+import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
+import IconFileExcelOutline from '@material-symbols/svg-400/outlined/table.svg?raw'
+import IconTable from '@material-symbols/svg-400/outlined/table_chart.svg?raw'
 import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
@@ -287,21 +294,9 @@ import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconFileDelimited from 'vue-material-design-icons/FileDelimitedOutline.vue'
-import IconFileExcelOutline from 'vue-material-design-icons/FileExcelOutline.vue'
-import IconFolder from 'vue-material-design-icons/FolderOutline.vue'
-import IconLink from 'vue-material-design-icons/Link.vue'
-import IconLinkVariantOff from 'vue-material-design-icons/LinkOff.vue'
-import IconMagnify from 'vue-material-design-icons/Magnify.vue'
-import IconPoll from 'vue-material-design-icons/Poll.vue'
-import IconRefresh from 'vue-material-design-icons/Refresh.vue'
-import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
-import IconTable from 'vue-material-design-icons/Table.vue'
-import IconDelete from 'vue-material-design-icons/TrashCanOutline.vue'
-import IconDownload from 'vue-material-design-icons/TrayArrowDown.vue'
 import PaginationToolbar from '../components/PaginationToolbar.vue'
 import PillMenu from '../components/PillMenu.vue'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
@@ -316,9 +311,9 @@ import OcsResponse2Data from '../utils/OcsResponse2Data.js'
 import SetWindowTitle from '../utils/SetWindowTitle.js'
 
 const SUPPORTED_FILE_FORMATS = {
-	ods: IconTableSvg,
-	csv: IconFileDelimitedSvg,
-	xlsx: IconFileExcelOutlineSvg,
+	ods: IconTable,
+	csv: IconFileDelimited,
+	xlsx: IconFileExcelOutline,
 }
 let fileFormat = 'csv'
 
@@ -338,27 +333,15 @@ export default {
 	name: 'Results',
 
 	components: {
-		IconChevronLeft,
-		IconDelete,
-		IconDownload,
-		IconFileDelimited,
-		IconFileExcelOutline,
-		IconFolder,
-		IconLink,
-		IconLinkVariantOff,
-		IconPoll,
-		IconRefresh,
-		IconShareVariant,
-		IconTable,
 		NcActionButton,
 		NcActionSeparator,
 		NcActions,
 		NcAppContent,
 		NcButton,
 		NcDialog,
+		NcIconSvgWrapper,
 		NcTextField,
 		PaginationToolbar,
-		IconMagnify,
 		NcEmptyContent,
 		NcLoadingIcon,
 		PillMenu,
@@ -376,6 +359,20 @@ export default {
 
 			// non reactive props
 			responseViews,
+
+			IconChevronLeft,
+			IconDelete,
+			IconDownload,
+			IconFileDelimited,
+			IconFileExcelOutline,
+			IconFolder,
+			IconLink,
+			IconLinkVariantOff,
+			IconPoll,
+			IconRefresh,
+			IconShareVariant,
+			IconTable,
+			IconMagnify,
 		}
 	},
 
@@ -401,7 +398,7 @@ export default {
 			linkedFileNotAvailableButtons: [
 				{
 					label: t('forms', 'Unlink spreadsheet'),
-					icon: IconLinkVariantOffSvg,
+					icon: IconLinkVariantOff,
 					variant: 'error',
 					callback: () => {
 						this.onUnlinkFile()
@@ -409,7 +406,7 @@ export default {
 				},
 				{
 					label: t('forms', 'Create spreadsheet'),
-					icon: IconLinkSvg,
+					icon: IconLink,
 					variant: 'primary',
 					callback: () => {
 						this.onLinkFile()
@@ -420,7 +417,7 @@ export default {
 			confirmDeleteButtons: [
 				{
 					label: t('forms', 'Cancel'),
-					icon: IconCancelSvg,
+					icon: IconCancel,
 					variant: 'tertiary',
 					callback: () => {
 						this.showConfirmDeleteDialog = false
@@ -428,7 +425,7 @@ export default {
 				},
 				{
 					label: t('forms', 'Delete responses'),
-					icon: IconDeleteSvg,
+					icon: IconDelete,
 					variant: 'error',
 					callback: () => {
 						this.deleteAllSubmissionsConfirmed()
@@ -884,7 +881,7 @@ export default {
 					return [
 						{
 							label: t('forms', 'Create XLSX'),
-							icon: IconFileExcelOutlineSvg,
+							icon: IconFileExcelOutline,
 							callback() {
 								fileFormat = 'xlsx'
 							},
@@ -892,7 +889,7 @@ export default {
 						},
 						{
 							label: t('forms', 'Create CSV'),
-							icon: IconFileDelimitedSvg,
+							icon: IconFileDelimited,
 							callback() {
 								fileFormat = 'csv'
 							},
@@ -900,7 +897,7 @@ export default {
 						},
 						{
 							label: t('forms', 'Create ODS'),
-							icon: IconTableSvg,
+							icon: IconTable,
 							callback() {
 								fileFormat = 'ods'
 							},

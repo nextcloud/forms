@@ -13,7 +13,7 @@
 				:text="t('forms', 'New form')"
 				@click="onNewForm">
 				<template #icon>
-					<IconPlus :size="20" decorative />
+					<NcIconSvgWrapper :svg="IconPlus" />
 				</template>
 			</NcAppNavigationNew>
 
@@ -64,7 +64,7 @@
 						wide
 						@click="showArchivedForms = true">
 						<template #icon>
-							<IconArchive :size="20" />
+							<NcIconSvgWrapper :svg="IconArchive" />
 						</template>
 						{{ t('forms', 'Archived forms') }}
 					</NcButton>
@@ -88,7 +88,7 @@
 				class="forms-emptycontent"
 				:name="t('forms', 'No forms created yet')">
 				<template #icon>
-					<FormsIcon :size="64" />
+					<NcIconSvgWrapper :svg="FormsIcon" :size="64" />
 				</template>
 				<template v-if="canCreateForms" #action>
 					<NcButton variant="primary" @click="onNewForm">
@@ -106,7 +106,7 @@
 						: t('forms', 'Please select a form')
 				">
 				<template #icon>
-					<FormsIcon :size="64" />
+					<NcIconSvgWrapper :svg="FormsIcon" :size="64" />
 				</template>
 				<template v-if="canCreateForms" #action>
 					<NcButton variant="primary" @click="onNewForm">
@@ -143,6 +143,8 @@
 </template>
 
 <script>
+import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
+import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
@@ -159,13 +161,12 @@ import NcAppNavigationNew from '@nextcloud/vue/components/NcAppNavigationNew'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import IconArchive from 'vue-material-design-icons/ArchiveOutline.vue'
-import IconPlus from 'vue-material-design-icons/Plus.vue'
 import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
-import FormsIcon from './components/Icons/FormsIcon.vue'
 import Sidebar from './views/Sidebar.vue'
+import FormsIcon from '../img/forms-dark.svg?raw'
 import PermissionTypes from './mixins/PermissionTypes.js'
 import { FormState } from './models/Constants.ts'
 import logger from './utils/Logger.js'
@@ -180,9 +181,7 @@ export default {
 	components: {
 		AppNavigationForm,
 		ArchivedFormsModal,
-		FormsIcon,
-		IconArchive,
-		IconPlus,
+		NcIconSvgWrapper,
 		NcAppContent,
 		NcAppNavigation,
 		NcAppNavigationCaption,
@@ -493,6 +492,9 @@ export default {
 			onCloneForm,
 			onDeleteForm,
 			onLastUpdatedByEventBus,
+			IconPlus,
+			IconArchive,
+			FormsIcon,
 		}
 	},
 }

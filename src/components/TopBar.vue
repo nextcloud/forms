@@ -21,7 +21,7 @@
 			variant="tertiary"
 			@click="onShareForm">
 			<template #icon>
-				<IconShareVariant :size="20" />
+				<NcIconSvgWrapper :svg="IconShareVariant" />
 			</template>
 			<template v-if="!isMobile" #default>
 				{{ t('forms', 'Share') }}
@@ -31,31 +31,34 @@
 </template>
 
 <script>
-import { mdiEyeOutline, mdiPencilOutline, mdiPoll } from '@mdi/js'
+import IconBarChart from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
+import IconEdit from '@material-symbols/svg-400/outlined/edit.svg?raw'
+import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
+import IconVisibility from '@material-symbols/svg-400/outlined/visibility.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
-import IconShareVariant from 'vue-material-design-icons/ShareVariantOutline.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PillMenu from './PillMenu.vue'
 import PermissionTypes from '../mixins/PermissionTypes.js'
 import logger from '../utils/Logger.js'
 
 const submitView = {
 	ariaLabel: t('forms', 'View form'),
-	icon: mdiEyeOutline,
+	icon: IconVisibility,
 	title: t('forms', 'View'),
 	id: 'submit',
 }
 const editView = {
 	ariaLabel: t('forms', 'Edit form'),
-	icon: mdiPencilOutline,
+	icon: IconEdit,
 	title: t('forms', 'Edit'),
 	id: 'edit',
 	disabled: false,
 }
 const resultsView = {
 	ariaLabel: t('forms', 'Show responses'),
-	icon: mdiPoll,
+	icon: IconBarChart,
 	title: t('forms', 'Responses'),
 	id: 'results',
 }
@@ -64,7 +67,7 @@ export default {
 	name: 'TopBar',
 
 	components: {
-		IconShareVariant,
+		NcIconSvgWrapper,
 		NcButton,
 		PillMenu,
 	},
@@ -105,6 +108,7 @@ export default {
 			t,
 
 			isMobile: useIsMobile(),
+			IconShareVariant,
 		}
 	},
 

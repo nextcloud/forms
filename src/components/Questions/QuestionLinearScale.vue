@@ -20,7 +20,7 @@
 				required
 				@update:modelValue="onOptionsLowestChange">
 				<template #icon>
-					<IconPencil :size="20" />
+					<NcIconSvgWrapper :svg="IconPencil" />
 				</template>
 			</NcActionInput>
 			<NcActionInput
@@ -33,7 +33,7 @@
 				required
 				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
-					<IconPencil :size="20" />
+					<NcIconSvgWrapper :svg="IconPencil" />
 				</template>
 			</NcActionInput>
 		</template>
@@ -111,11 +111,12 @@
 </template>
 
 <script>
+import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import { t } from '@nextcloud/l10n'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
-import IconPencil from 'vue-material-design-icons/PencilOutline.vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 
@@ -123,7 +124,7 @@ export default {
 	name: 'QuestionLinearScale',
 
 	components: {
-		IconPencil,
+		NcIconSvgWrapper,
 		NcActionInput,
 		NcCheckboxRadioSwitch,
 		NcTextArea,
@@ -132,6 +133,12 @@ export default {
 
 	mixins: [QuestionMixin],
 	emits: ['update:values'],
+
+	setup() {
+		return {
+			IconPencil,
+		}
+	},
 
 	data() {
 		return {

@@ -40,7 +40,7 @@
 				class="validation-type-menu__toggle"
 				variant="tertiary-no-background">
 				<template #icon>
-					<component :is="validationObject.icon" :size="20" />
+					<NcIconSvgWrapper :svg="validationObject.icon" />
 				</template>
 				<NcActionRadio
 					v-for="(
@@ -61,7 +61,7 @@
 					@input="onInputRegex"
 					@submit="onSubmitRegex">
 					<template #icon>
-						<IconRegex :size="20" />
+						<NcIconSvgWrapper :svg="IconRegex" />
 					</template>
 					/^[a-z]{3}$/i
 					<!-- ^ Some example RegExp for the placeholder text -->
@@ -72,10 +72,11 @@
 </template>
 
 <script>
+import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
-import IconRegex from 'vue-material-design-icons/Regex.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import validationTypes from '../../models/ValidationTypes.js'
@@ -85,7 +86,7 @@ export default {
 	name: 'QuestionShort',
 
 	components: {
-		IconRegex,
+		NcIconSvgWrapper,
 		NcActions,
 		NcActionInput,
 		NcActionRadio,
@@ -94,6 +95,12 @@ export default {
 
 	mixins: [QuestionMixin],
 	emits: ['update:values'],
+
+	setup() {
+		return {
+			IconRegex,
+		}
+	},
 
 	data() {
 		return {

@@ -12,7 +12,7 @@
 				:aria-label="t('forms', 'Go to first page')"
 				@click="pageNumber = 1">
 				<template #icon>
-					<PageFirstIcon :size="20" />
+					<NcIconSvgWrapper :svg="PageFirstIcon" />
 				</template>
 			</NcButton>
 			<NcButton
@@ -21,7 +21,7 @@
 				:aria-label="t('forms', 'Go to previous page')"
 				@click="pageNumber--">
 				<template #icon>
-					<IconChevronLeft :size="20" />
+					<NcIconSvgWrapper :svg="IconChevronLeft" />
 				</template>
 			</NcButton>
 			<div class="page-number">
@@ -47,7 +47,7 @@
 				:aria-label="t('forms', 'Go to next page')"
 				@click="pageNumber++">
 				<template #icon>
-					<IconChevronRight :size="20" />
+					<NcIconSvgWrapper :svg="IconChevronRight" />
 				</template>
 			</NcButton>
 			<NcButton
@@ -56,7 +56,7 @@
 				:aria-label="t('forms', 'Go to last page')"
 				@click="pageNumber = totalPages">
 				<template #icon>
-					<PageLastIcon :size="20" />
+					<NcIconSvgWrapper :svg="PageLastIcon" />
 				</template>
 			</NcButton>
 		</div>
@@ -64,22 +64,20 @@
 </template>
 
 <script>
+import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
+import IconChevronRight from '@material-symbols/svg-400/outlined/chevron_right.svg?raw'
+import PageFirstIcon from '@material-symbols/svg-400/outlined/first_page.svg?raw'
+import PageLastIcon from '@material-symbols/svg-400/outlined/last_page.svg?raw'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
-import IconChevronLeft from 'vue-material-design-icons/ChevronLeft.vue'
-import IconChevronRight from 'vue-material-design-icons/ChevronRight.vue'
-import PageFirstIcon from 'vue-material-design-icons/PageFirst.vue'
-import PageLastIcon from 'vue-material-design-icons/PageLast.vue'
 
 export default {
 	name: 'PaginationToolbar',
 	components: {
-		IconChevronLeft,
-		IconChevronRight,
+		NcIconSvgWrapper,
 		NcButton,
 		NcSelect,
-		PageFirstIcon,
-		PageLastIcon,
 	},
 
 	props: {
@@ -100,6 +98,15 @@ export default {
 	},
 
 	emits: ['update:offset'],
+
+	setup() {
+		return {
+			IconChevronLeft,
+			IconChevronRight,
+			PageFirstIcon,
+			PageLastIcon,
+		}
+	},
 
 	computed: {
 		allPageNumbersArray() {

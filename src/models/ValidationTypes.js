@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
+import IconPhone from '@material-symbols/svg-400/outlined/call.svg?raw'
+import IconEMail from '@material-symbols/svg-400/outlined/mail.svg?raw'
+import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
+import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
 import { translate as t } from '@nextcloud/l10n'
-import IconEMail from 'vue-material-design-icons/EmailOutline.vue'
-import IconNumeric from 'vue-material-design-icons/Numeric.vue'
-import IconPhone from 'vue-material-design-icons/PhoneOutline.vue'
-import IconRegex from 'vue-material-design-icons/Regex.vue'
-import IconTextShort from 'vue-material-design-icons/TextShort.vue'
 
 /**
  * @callback ValidationFunction

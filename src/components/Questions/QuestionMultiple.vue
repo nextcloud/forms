@@ -63,7 +63,7 @@
 			</template>
 			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
 				<template #icon>
-					<IconContentPaste :size="20" />
+					<NcIconSvgWrapper :svg="IconContentPaste" />
 				</template>
 				{{ t('forms', 'Add multiple options') }}
 			</NcActionButton>
@@ -155,7 +155,10 @@
 				v-if="allowOtherAnswer"
 				key="option-add-other"
 				class="question__item">
-				<component :is="pseudoIcon" class="question__item__pseudoInput" />
+				<NcIconSvgWrapper
+					:svg="pseudoIcon"
+					inline
+					class="question__item__pseudoInput" />
 				<input
 					:placeholder="t('forms', 'Other')"
 					class="question__input"
@@ -175,6 +178,9 @@
 </template>
 
 <script>
+import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'
+import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
+import IconRadioboxBlank from '@material-symbols/svg-400/outlined/radio_button_unchecked.svg?raw'
 import { showError } from '@nextcloud/dialogs'
 import { translatePlural as n, translate as t } from '@nextcloud/l10n'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
@@ -182,11 +188,9 @@ import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import IconCheckboxBlankOutline from 'vue-material-design-icons/CheckboxBlankOutline.vue'
-import IconContentPaste from 'vue-material-design-icons/ContentPaste.vue'
-import IconRadioboxBlank from 'vue-material-design-icons/RadioboxBlank.vue'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
@@ -203,9 +207,7 @@ export default {
 	components: {
 		AnswerInput,
 		Draggable,
-		IconCheckboxBlankOutline,
-		IconContentPaste,
-		IconRadioboxBlank,
+		NcIconSvgWrapper,
 		NcActionButton,
 		NcActionCheckbox,
 		NcActionInput,
@@ -218,6 +220,14 @@ export default {
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
 	emits: ['update:values'],
+
+	setup() {
+		return {
+			IconCheckboxBlankOutline,
+			IconContentPaste,
+			IconRadioboxBlank,
+		}
+	},
 
 	data() {
 		return {
@@ -500,7 +510,7 @@ export default {
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
-		margin-inline-start: -2px;
+		margin-inline-start: 2px;
 		z-index: 1;
 	}
 

@@ -10,7 +10,7 @@
 				:name="currentModel.title"
 				:description="currentModel.description">
 				<template #icon>
-					<component :is="currentModel.icon" :size="64" />
+					<NcIconSvgWrapper :svg="currentModel.icon" :size="64" />
 				</template>
 			</NcEmptyContent>
 		</NcAppContent>
@@ -18,22 +18,22 @@
 </template>
 
 <script>
+import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import { loadState } from '@nextcloud/initial-state'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
-import IconCheck from 'vue-material-design-icons/Check.vue'
-import FormsIcon from './components/Icons/FormsIcon.vue'
+import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import FormsIcon from '../img/forms-dark.svg?raw'
 
 export default {
 	name: 'FormsEmptyContent',
 
 	components: {
-		FormsIcon,
-		IconCheck,
 		NcAppContent,
 		NcContent,
 		NcEmptyContent,
+		NcIconSvgWrapper,
 	},
 
 	data() {
