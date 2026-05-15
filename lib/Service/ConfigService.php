@@ -38,7 +38,10 @@ class ConfigService {
 	public function getAllowPublicLink(): bool {
 		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWPUBLICLINK, true);
 	}
-	public function getAllowShowToAll() : bool {
+	public function getAllowCustomPublicToken(): bool {
+		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWCUSTOMPUBLICTOKEN, false);
+	}
+	public function getAllowShowToAll(): bool {
 		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWSHOWTOALL, true);
 	}
 	private function getUnformattedCreationAllowedGroups(): array {
@@ -74,6 +77,7 @@ class ConfigService {
 		return [
 			Constants::CONFIG_KEY_ALLOWPERMITALL => $this->getAllowPermitAll(),
 			Constants::CONFIG_KEY_ALLOWPUBLICLINK => $this->getAllowPublicLink(),
+			Constants::CONFIG_KEY_ALLOWCUSTOMPUBLICTOKEN => $this->getAllowCustomPublicToken(),
 			Constants::CONFIG_KEY_ALLOWSHOWTOALL => $this->getAllowShowToAll(),
 			Constants::CONFIG_KEY_CREATIONALLOWEDGROUPS => $this->getCreationAllowedGroups(),
 			Constants::CONFIG_KEY_RESTRICTCREATION => $this->getRestrictCreation(),

@@ -73,6 +73,13 @@
 				{{ t('forms', 'Allow sharing by link') }}
 			</NcCheckboxRadioSwitch>
 			<NcCheckboxRadioSwitch
+				v-model="appConfig.allowCustomPublicShareTokens"
+				:loading="loading.allowCustomPublicShareTokens"
+				type="switch"
+				@update:modelValue="onAllowCustomPublicShareTokensChange">
+				{{ t('forms', 'Allow custom public share tokens') }}
+			</NcCheckboxRadioSwitch>
+			<NcCheckboxRadioSwitch
 				v-model="appConfig.allowPermitAll"
 				:loading="loading.allowPermitAll"
 				type="switch"
@@ -169,6 +176,12 @@ export default {
 			this.loading.allowPublicLink = true
 			await this.saveAppConfig('allowPublicLink', newVal)
 			this.loading.allowPublicLink = false
+		},
+
+		async onAllowCustomPublicShareTokensChange(newVal) {
+			this.loading.allowCustomPublicShareTokens = true
+			await this.saveAppConfig('allowCustomPublicShareTokens', newVal)
+			this.loading.allowCustomPublicShareTokens = false
 		},
 
 		async onAllowPermitAllChange(newVal) {

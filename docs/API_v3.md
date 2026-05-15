@@ -647,7 +647,12 @@ Update a single or all properties of an option-object
   | Parameter | Type | Description |
   |------------------|----------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
-- Restrictions: Currently only the _permissions_ can be updated.
+- Restrictions:
+  - Allowed keys are _permissions_ and _token_.
+  - _token_ updates are only available when the admin setting _allowCustomPublicShareTokens_ is enabled.
+  - _token_ can only be updated on link shares.
+  - _token_ must be unique among link shares and only contain alphanumeric characters.
+  - _token_ length must be between 8 and 256 characters.
 - Response: **Status-Code OK**, as well as the id of the share object.
 
 ```
@@ -667,6 +672,21 @@ Update a single or all properties of an option-object
 
 ```
 "data": 5
+```
+
+### Generate a new Share Token
+
+Generates a new random token that can be used as a custom share link token. This endpoint is used when custom public share tokens are enabled by the admin setting _allowCustomPublicShareTokens_.
+
+- Endpoint: `/api/v3/token`
+- Method: `GET`
+- Parameters: None
+- Response: **Status-Code OK**, as well as the generated token string.
+
+```
+"data": {
+  "token": "abcdefghijklmn1234567890"
+}
 ```
 
 ## Submission Endpoints

@@ -17,6 +17,7 @@ use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
@@ -148,7 +149,8 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => '[a-zA-Z0-9]{24,}'])]
+	#[BruteForceProtection(action: 'share')]
+	#[FrontpageRoute(verb: 'GET', url: '/s/{hash}', requirements: ['hash' => Constants::PUBLIC_SHARE_HASH_REQUIREMENT])]
 	public function publicLinkView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
@@ -167,7 +169,8 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
-	#[FrontpageRoute(verb: 'GET', url: '/embed/{hash}')]
+	#[BruteForceProtection(action: 'share')]
+	#[FrontpageRoute(verb: 'GET', url: '/embed/{hash}', requirements: ['hash' => Constants::PUBLIC_SHARE_HASH_REQUIREMENT])]
 	public function embeddedFormView(string $hash): Response {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
@@ -221,7 +224,15 @@ class PageController extends Controller {
 	protected function provideEmptyContent(string $renderAs, ?Form $form = null): TemplateResponse {
 		Util::addScript($this->appName, 'forms-emptyContent');
 		$this->initialState->provideInitialState('renderAs', $renderAs);
-		return $this->provideTemplate(self::TEMPLATE_MAIN, $form);
+
+		$response = $this->provideTemplate(self::TEMPLATE_MAIN, $form);
+
+		//Throttle on share token not found
+		if ($renderAs === Constants::EMPTY_NOTFOUND) {
+			$response->throttle();
+		}
+
+		return $response;
 	}
 
 	/**
