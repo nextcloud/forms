@@ -207,7 +207,7 @@ class ShareApiController extends OCSController {
 	}
 
 	/**
-	 * Update permissions of a share
+	 * Update properties of a share
 	 *
 	 * @param int $formId of the form
 	 * @param int $shareId of the share to update
@@ -215,9 +215,13 @@ class ShareApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Share doesn't belong to given Form
 	 * @throws OCSBadRequestException Invalid permission given
+	 * @throws OCSBadRequestException Invalid share token
+	 * @throws OCSBadRequestException Share hash exists, please retry
+	 * @throws OCSForbiddenException Custom public share tokens are not allowed
 	 * @throws OCSForbiddenException This form is not owned by the current user
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
-	 * @throws OCSForbiddenException Not allowed to update other properties than permissions
+	 * @throws OCSForbiddenException Not allowed to update token on non-link share
+	 * @throws OCSForbiddenException Not allowed to update unknown properties
 	 * @throws OCSNotFoundException Could not find share
 	 *
 	 * 200: the id of the updated share
@@ -226,7 +230,7 @@ class ShareApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/shares/{shareId}')]
 	public function updateShare(int $formId, int $shareId, array $keyValuePairs): DataResponse {
-		$this->logger->debug('Updating share: {shareId} of form {formId}, permissions: {permissions}', [
+		$this->logger->debug('Updating share: {shareId} of form {formId}, values: {keyValuePairs}', [
 			'formId' => $formId,
 			'shareId' => $shareId,
 			'keyValuePairs' => $keyValuePairs
@@ -256,22 +260,64 @@ class ShareApiController extends OCSController {
 			throw new OCSForbiddenException('Empty keyValuePairs, will not update');
 		}
 
-		//Don't allow to change other properties than permissions
-		if (count($keyValuePairs) > 1 || !array_key_exists('permissions', $keyValuePairs)) {
-			$this->logger->debug('Not allowed to update other properties than permissions');
-			throw new OCSForbiddenException('Not allowed to update other properties than permissions');
+		$allowedKeys = ['permissions', 'token'];
+		foreach (array_keys($keyValuePairs) as $key) {
+			if (!in_array($key, $allowedKeys, true)) {
+				$this->logger->debug('Not allowed to update other properties than permissions or token');
+				throw new OCSForbiddenException('Not allowed to update other properties than permissions or token');
+			}
 		}
 
-		if (!$this->validatePermissions($keyValuePairs['permissions'], $formShare->getShareType())) {
+		if (array_key_exists('permissions', $keyValuePairs) && !$this->validatePermissions($keyValuePairs['permissions'], $formShare->getShareType())) {
 			throw new OCSBadRequestException('Invalid permission given');
+		}
+
+		if (array_key_exists('token', $keyValuePairs)) {
+			if (!$this->configService->getAllowCustomPublicToken()) {
+				$this->logger->debug('Custom public share tokens are not allowed.');
+				throw new OCSForbiddenException('Custom public share tokens are not allowed.');
+			}
+
+			if ($formShare->getShareType() !== IShare::TYPE_LINK) {
+				$this->logger->debug('Not allowed to update token on non-link share');
+				throw new OCSForbiddenException('Not allowed to update token on non-link share');
+			}
+
+			if (!is_string($keyValuePairs['token'])) {
+				throw new OCSBadRequestException('Invalid share token');
+			}
+
+			$token = $keyValuePairs['token'];
+			if (!array_key_exists('permissions', $keyValuePairs) && $token === $formShare->getShareWith()) {
+				return new DataResponse($formShare->getId());
+			}
+
+			if ($token !== $formShare->getShareWith()) {
+				$this->validatePublicShareToken($token);
+
+				try {
+					$existingShare = $this->shareMapper->findPublicShareByHash($token);
+					if ($existingShare->getId() !== $formShare->getId()) {
+						$this->logger->debug('Share hash already exists.');
+						throw new OCSBadRequestException('Share hash exists, please retry.');
+					}
+				} catch (DoesNotExistException $e) {
+					// Just continue, this is what we expect to happen (share hash not existing yet).
+				}
+
+				$formShare->setShareWith($token);
+			}
 		}
 
 		$this->formsService->obtainFormLock($form);
 
-		$formShare->setPermissions($keyValuePairs['permissions']);
+		if (array_key_exists('permissions', $keyValuePairs)) {
+			$formShare->setPermissions($keyValuePairs['permissions']);
+		}
 		$formShare = $this->shareMapper->update($formShare);
 
-		if (in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
+		if (array_key_exists('permissions', $keyValuePairs)
+			&& in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
 			if (in_array(Constants::PERMISSION_RESULTS, $keyValuePairs['permissions'], true)) {
 				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 				$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
@@ -420,5 +466,23 @@ class ShareApiController extends OCSController {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * @throws OCSBadRequestException If token does not satisfy basic safety checks
+	 */
+	private function validatePublicShareToken(string $token): void {
+		if ($token !== trim($token)) {
+			throw new OCSBadRequestException('Invalid share token');
+		}
+
+		$tokenLength = strlen($token);
+		if ($tokenLength < Constants::PUBLIC_SHARE_TOKEN_MIN_LENGTH || $tokenLength > Constants::PUBLIC_SHARE_TOKEN_MAX_LENGTH) {
+			throw new OCSBadRequestException('Invalid share token');
+		}
+
+		if (preg_match('/^[a-zA-Z0-9]+$/', $token) !== 1) {
+			throw new OCSBadRequestException('Invalid share token');
+		}
 	}
 }

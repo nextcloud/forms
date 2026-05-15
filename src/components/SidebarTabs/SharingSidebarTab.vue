@@ -53,11 +53,23 @@
 					<IconLinkBoxVariantOutline v-if="isEmbeddable" :size="20" />
 					<IconLinkVariant v-else :size="20" />
 				</div>
-				<span class="share-div__desc">{{
-					isEmbeddable
-						? t('forms', 'Embeddable link')
-						: t('forms', 'Share link')
-				}}</span>
+				<div class="share-div__desc share-div__desc--tokenized">
+					<span>{{
+						isEmbeddable
+							? t('forms', 'Embeddable link')
+							: t('forms', 'Share link')
+					}}</span>
+					<NcTextField
+						v-if="appConfig.allowCustomPublicShareTokens"
+						:modelValue="getShareTokenInput(share)"
+						:disabled="
+							locked
+							|| !isCurrentUserOwner
+							|| isShareTokenSaving(share)
+						"
+						:label="t('forms', 'Link token')"
+						@update:modelValue="setShareTokenInput(share, $event)" />
+				</div>
 				<NcActions :inline="1">
 					<NcActionLink
 						:href="getPublicShareLink(share)"
@@ -72,6 +84,20 @@
 							<IconQr :size="20" />
 						</template>
 						{{ t('forms', 'Show QR code') }}
+					</NcActionButton>
+					<NcActionButton
+						v-if="appConfig.allowCustomPublicShareTokens"
+						:disabled="
+							locked
+							|| !isCurrentUserOwner
+							|| isShareTokenSaving(share)
+							|| !isShareTokenDirty(share)
+						"
+						@click="updateShareToken(share)">
+						<template #icon>
+							<IconCheck :size="20" />
+						</template>
+						{{ t('forms', 'Save token') }}
 					</NcActionButton>
 					<NcActionButton
 						v-if="isEmbeddable"
@@ -212,7 +238,9 @@ import NcActionLink from '@nextcloud/vue/components/NcActionLink'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import IconAccountMultiple from 'vue-material-design-icons/AccountMultipleOutline.vue'
+import IconCheck from 'vue-material-design-icons/Check.vue'
 import IconCodeBrackets from 'vue-material-design-icons/CodeBrackets.vue'
 import IconLinkVariant from 'vue-material-design-icons/Link.vue'
 import IconLinkBoxVariantOutline from 'vue-material-design-icons/LinkBoxOutline.vue'
@@ -234,6 +262,7 @@ export default {
 	components: {
 		FormsIcon,
 		IconAccountMultiple,
+		IconCheck,
 		IconCodeBrackets,
 		IconCopyAll,
 		IconDelete,
@@ -246,6 +275,7 @@ export default {
 		NcActionLink,
 		NcCheckboxRadioSwitch,
 		NcNoteCard,
+		NcTextField,
 		QRDialog,
 		SharingSearchDiv,
 		SharingShareDiv,
@@ -276,8 +306,25 @@ export default {
 		return {
 			isLoading: false,
 			appConfig: loadState(appName, 'appConfig'),
+			shareTokens: {},
+			savingShareTokens: {},
 			qrDialogText: '',
 		}
+	},
+
+	watch: {
+		publicLinkShares: {
+			immediate: true,
+			handler(shares) {
+				const nextShareTokens = {}
+				for (const share of shares) {
+					nextShareTokens[share.id] =
+						this.shareTokens[share.id] ?? share.shareWith
+				}
+
+				this.shareTokens = nextShareTokens
+			},
+		},
 	},
 
 	computed: {
@@ -480,6 +527,75 @@ export default {
 			this.$emit('update:formProp', 'access', newAccess)
 		},
 
+		getShareTokenInput(share) {
+			return this.shareTokens[share.id] ?? share.shareWith
+		},
+
+		setShareTokenInput(share, value) {
+			this.shareTokens = {
+				...this.shareTokens,
+				[share.id]: value,
+			}
+		},
+
+		isShareTokenSaving(share) {
+			return !!this.savingShareTokens[share.id]
+		},
+
+		isShareTokenDirty(share) {
+			return this.getShareTokenInput(share).trim() !== share.shareWith
+		},
+
+		async updateShareToken(share) {
+			const token = this.getShareTokenInput(share).trim()
+			if (token === share.shareWith) {
+				return
+			}
+
+			this.isLoading = true
+			this.savingShareTokens = {
+				...this.savingShareTokens,
+				[share.id]: true,
+			}
+
+			try {
+				const response = await axios.patch(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares/{shareId}', {
+						id: this.form.id,
+						shareId: share.id,
+					}),
+					{
+						keyValuePairs: {
+							token,
+						},
+					},
+				)
+
+				this.$emit('updateShare', {
+					...share,
+					id: OcsResponse2Data(response),
+					shareWith: token,
+				})
+
+				this.setShareTokenInput(share, token)
+			} catch (error) {
+				logger.error('Error while updating share token', {
+					error,
+					share,
+					token,
+				})
+				showError(
+					t('forms', 'There was an error while updating the link token'),
+				)
+			} finally {
+				this.savingShareTokens = {
+					...this.savingShareTokens,
+					[share.id]: false,
+				}
+				this.isLoading = false
+			}
+		},
+
 		openQrDialog(share) {
 			this.qrDialogText = this.getPublicShareLink(share)
 		},
@@ -534,6 +650,13 @@ export default {
 		padding: 0px 8px;
 		flex-grow: 1;
 
+		&--tokenized {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding-block: 8px;
+		}
+
 		&--twoline {
 			span {
 				display: block;
@@ -544,6 +667,10 @@ export default {
 				color: var(--color-text-maxcontrast);
 			}
 		}
+	}
+
+	:deep(.share-div__desc--tokenized .input-field__main-wrapper) {
+		min-inline-size: 220px;
 	}
 }
 </style>
