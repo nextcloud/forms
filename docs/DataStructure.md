@@ -5,7 +5,7 @@
 
 # Forms Data Structure
 
-**State: Forms v3.3.1 - 08.10.2023**
+**State: Forms v5.3.0 - tbd**
 
 This document describes the Object-Structure, that is used within the Forms App and on Forms API v3. It does partially **not** equal the actual database structure behind.
 
@@ -120,19 +120,21 @@ The form state is used for additional states, currently following states are def
 
 Options are predefined answer-possibilities corresponding to questions with appropriate question-type.
 
-| Property   | Type    | Restrictions  | Description                                   |
-| ---------- | ------- | ------------- | --------------------------------------------- |
-| id         | Integer | unique        | An instance-wide unique id of the option      |
-| questionId | Integer |               | The id of the question, the option belongs to |
-| order      | Integer |               | The order of the option                       |
-| text       | String  | max. 1024 ch. | The option-text                               |
+| Property   | Type                          | Restrictions  | Description                                   |
+| ---------- | ----------------------------- | ------------- | --------------------------------------------- |
+| id         | Integer                       | unique        | An instance-wide unique id of the option      |
+| questionId | Integer                       |               | The id of the question, the option belongs to |
+| order      | Integer                       |               | The order of the option                       |
+| text       | String                        | max. 1024 ch. | The option-text                               |
+| optionType | [Option Types](#option-types) |               | The visual/semantic type of the option.       |
 
 ```
 {
   "id": 1,
   "questionId": 1,
   "order": 1,
-  "text": "Option 1"
+  "text": "Option 1",
+  "optionType": "choice"
 }
 ```
 
@@ -262,3 +264,18 @@ Optional extra settings for some [Question Types](#question-types)
 | `optionsHighest`        | `linearscale`                         | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
 | `optionsLabelLowest`    | `linearscale`                         | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
 | `optionsLabelHighest`   | `linearscale`                         | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
+| `columns`               | `grid`                                | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
+| `rows`                  | `grid`                                | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
+| `questionType`          | `grid`                                | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
+
+### Option Types
+
+Supported option types and their intended usage.
+
+| Type-ID  | Description                                                                                |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `choice` | Standard selectable option used by `dropdown`, `multiple` and `multiple_unique` questions. |
+| `row`    | Represents a row header when rendering options in a grid-style question.                   |
+| `column` | Represents a column header when rendering options in a grid-style question.                |
+
+`row` and `column` option types are primarily used together with `grid` question types to build a two-dimensional selection matrix. `choice` is the default for normal option lists.

@@ -311,6 +311,14 @@
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
+                    },
+                    "optionType": {
+                        "type": "string",
+                        "enum": [
+                            "choice",
+                            "row",
+                            "column"
+                        ]
                     }
                 }
             },

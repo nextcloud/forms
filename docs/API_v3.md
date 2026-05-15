@@ -17,6 +17,8 @@ This file contains the API-Documentation. For more information on the returned D
 - By default, the API returns data formatted as _xml_. If formatting as _json_ is desired, the request should contain the header `Accept: application/json`. For simple representation, the output presented in this document is all formatted as _json_.
 - The OCS-Endpoint _always returns_ an object called `ocs`. This contains an object `meta` holding some meta-data, as well as an object `data` holding the actual data. In this document, the response-blocks only show the `data`, if not explicitely stated different.
 
+- OpenAPI spec: a machine-readable OpenAPI description is available at `/openapi.json` in the repository root. Prefer it as source-of-truth for exact request/response shapes.
+
 ```
 "ocs": {
   "meta": {
@@ -51,7 +53,7 @@ This file contains the API-Documentation. For more information on the returned D
     - `GET /api/v3/forms/{formId}/questions` to get all questions of a form
     - `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
     - `POST /api/v3/forms/{formId}/questions/{questionId}/options` does now accept more options at once
-    - `PATCH /api/v3/forms/{formId}/questions/{questionId}/options/reorder` to reorder the options
+    - `PATCH /api/v3/forms/{formId}/questions/{questionId}/options` to reorder the options (request body `newOrder`, optional `optionType`)
     - `POST /api/v3/forms/{formId}/submissions/files/{questionId}` to upload a file to a file question before submitting the form
     - `GET /api/v3/forms/{formId}/submissions/{submissionId}` to get a single submission
     - `PUT /api/v3/forms/{formId}/submissions/{submissionId}` to update an existing submission
@@ -524,18 +526,23 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
   | _formId_ | Integer | ID of the form containing the question |
   | _questionId_ | Integer | ID of the question, the new option will belong to |
 - Parameters:
-  | Parameter | Type | Description |
-  |-----------|---------|-------------|
-  | _optionTexts_ | Array | Array of strings containing the new options |
-- Response: The new array of option objects
+ - Parameters:
+  | Parameter | Type | Optional | Description |
+  |-----------|---------|----------|-------------|
+  | _optionTexts_ | Array | | Array of strings containing the new options |
+  | _optionType_ | [Option Types](DataStructure.md#Option-Types) | yes | The option-type to assign to the new options (e.g. `row`). |
+ - Response: The new array of option objects
 
 ```
-"data": {
-  "id": 7,
-  "questionId": 1,
-  "order": 1,
-  "text": "test"
-}
+"data": [
+  {
+    "id": 7,
+    "questionId": 1,
+    "order": 1,
+    "text": "test",
+    "optionType": "choice"
+  }
+]
 ```
 
 ### Update option properties
@@ -579,7 +586,7 @@ Update a single or all properties of an option-object
 
 ### Reorder options
 
-- Endpoint: `/api/v3/forms/{formId}/questions/{questionId}/options/reorder`
+- Endpoint: `/api/v3/forms/{formId}/questions/{questionId}/options`
 - Method: `PATCH`
 - Url-Parameter:
   | Parameter | Type | Description |
@@ -590,6 +597,7 @@ Update a single or all properties of an option-object
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _newOrder_ | Array | Array of **all** option IDs, ordered in the desired order |
+  | _optionType_ | [QuestionType](DataStructure.md#question-types) | *optional* option type to reorder (e.g. `row`). |
 - Restrictions: The Array **must** contain all option IDs corresponding to the specified question and **must not** contain any duplicates.
 - Response: Array of optionIds and their corresponding order.
 
@@ -918,6 +926,31 @@ Store Submission to Database
 ```
 
 - Response: **Status-Code OK**.
+
+### Update a Submission
+
+Update an existing submission (only allowed when `allowEditSubmissions` is set on the form).
+
+- Endpoint: `/api/v3/forms/{formId}/submissions/{submissionId}`
+- Method: `PUT`
+- Url-Parameters:
+  | Parameter | Type | Description |
+  |-----------|---------|-------------|
+  | _formId_ | Integer | ID of the form containing the submission |
+  | _submissionId_ | Integer | ID of the submission to update |
+- Parameters:
+  | Parameter | Type | Description |
+  |-----------|---------|-------------|
+  | _answers_ | Array | Array of answers (same structure as insert submission POST) |
+- Restrictions:
+    - The form must have `allowEditSubmissions` enabled.
+    - Only the user who created the submission may update it.
+    - Answers are validated the same way as on submit.
+- Response: **Status-Code OK**, as well as the id of the updated submission.
+
+```
+"data": 5
+```
 
 ### Delete a single Submission
 
