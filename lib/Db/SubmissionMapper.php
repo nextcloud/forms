@@ -7,10 +7,13 @@
 
 namespace OCA\Forms\Db;
 
+use OCA\Forms\Helper\FilePathHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\Files\Folder;
 use OCP\IDBConnection;
+use Psr\Log\LoggerInterface;
 
 /**
  * @extends QBMapper<Submission>
@@ -20,10 +23,14 @@ class SubmissionMapper extends QBMapper {
 	 * SubmissionMapper constructor.
 	 * @param IDBConnection $db
 	 * @param AnswerMapper $answerMapper
+	 * @param FilePathHelper $filePathHelper
+	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		IDBConnection $db,
 		private AnswerMapper $answerMapper,
+		private FilePathHelper $filePathHelper,
+		private LoggerInterface $logger,
 	) {
 		parent::__construct($db, 'forms_v2_submissions', Submission::class);
 	}
@@ -179,22 +186,17 @@ class SubmissionMapper extends QBMapper {
 
 	/**
 	 * Delete the Submission, including answers.
+	 * @param Form $form Form the submission belongs to.
 	 * @param int $id of the submission to delete
 	 */
-	public function deleteById(int $id): void {
-		$qb = $this->db->getQueryBuilder();
-
-		// First delete corresponding answers.
+	public function deleteById(Form $form, int $id): void {
 		$submissionEntity = $this->findById($id);
+
+		$this->deleteSubmissionFolder($form, $submissionEntity->getId());
+
 		$this->answerMapper->deleteBySubmission($submissionEntity->getId());
 
-		//Delete Submission
-		$qb->delete($this->getTableName())
-			->where(
-				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
-			);
-
-		$qb->executeStatement();
+		$this->delete($submissionEntity);
 	}
 
 	/**
@@ -217,5 +219,26 @@ class SubmissionMapper extends QBMapper {
 			);
 
 		$qb->executeStatement();
+	}
+
+	/**
+	 * Delete the submission folder from the file system
+	 * @param Form $form The form instance
+	 * @param int $submissionId The submission ID
+	 */
+	private function deleteSubmissionFolder(Form $form, int $submissionId): void {
+		try {
+            /** @var Folder $submissionFolder */
+			$submissionFolder = $this->filePathHelper->getSubmissionFolder($form, $submissionId);
+			if ($submissionFolder !== null) {
+				$submissionFolder->delete();
+			}
+		} catch (\Throwable $e) {
+			$this->logger->warning('Failed to delete submission folder: {error}', [
+				'error' => $e->getMessage(),
+				'submissionId' => $submissionId,
+				'formId' => $form->getId(),
+			]);
+		}
 	}
 }

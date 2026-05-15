@@ -1010,7 +1010,7 @@ class ApiControllerTest extends TestCase {
 		$this->submissionMapper
 			->expects($this->once())
 			->method('deleteById')
-			->with(42);
+			->with($form, 42);
 
 		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(1, 42));
 	}

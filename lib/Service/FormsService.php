@@ -20,6 +20,7 @@ use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\Exception\NoSuchFormException;
+use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
@@ -63,6 +64,7 @@ class FormsService {
 		private IUserManager $userManager,
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
+		private FilePathHelper $filePathHelper,
 		private IRootFolder $rootFolder,
 		private IL10N $l10n,
 		private LoggerInterface $logger,
@@ -1034,36 +1036,24 @@ class FormsService {
 		// TRANSLATORS Appendix for CSV-Export: 'Form Title (responses).csv'
 		$fileName = $form->getTitle() . ' (' . $this->l10n->t('responses') . ').' . $fileFormat;
 
-		return self::normalizeFileName($fileName);
+		return $this->filePathHelper->normalizeFileName($fileName);
 	}
 
 	public function getFormUploadedFilesFolderPath(Form $form): string {
-		return implode('/', [
-			Constants::FILES_FOLDER,
-			self::normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
-		]);
+		return $this->filePathHelper->getFormUploadedFilesFolderPath($form);
 	}
 
 	public function getUploadedFilePath(Form $form, int $submissionId, int $questionId, ?string $questionName, string $questionText): string {
-
-		return implode('/', [
-			$this->getFormUploadedFilesFolderPath($form),
-			$submissionId,
-			self::normalizeFileName($questionId . ' - ' . ($questionName ?: $questionText))
-		]);
+		return $this->filePathHelper->getUploadedFilePath($form, $submissionId, $questionId, $questionName, $questionText);
 	}
 
 	public function getTemporaryUploadedFilePath(Form $form, Question $question): string {
 		return implode('/', [
 			Constants::UNSUBMITTED_FILES_FOLDER,
 			microtime(true),
-			self::normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
-			self::normalizeFileName($question->getId() . ' - ' . ($question->getName() ?: $question->getText()))
+			$this->filePathHelper->normalizeFileName($form->getId() . ' - ' . $form->getTitle()),
+			$this->filePathHelper->normalizeFileName($question->getId() . ' - ' . ($question->getName() ?: $question->getText()))
 		]);
-	}
-
-	private static function normalizeFileName(string $fileName): string {
-		return trim(str_replace(Constants::FILENAME_INVALID_CHARS, '-', $fileName));
 	}
 
 }
