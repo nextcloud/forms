@@ -12,7 +12,8 @@ namespace OCA\Forms;
  *   id: int,
  *   questionId: int|float,
  *   text: string,
- *   order: ?int
+ *   order: ?int,
+ *   optionType?: "choice"|"row"|"column"
  * }
  *
  * @psalm-type FormsOrder = array{
