@@ -404,6 +404,10 @@ export default {
 		SetWindowTitle(this.formTitle)
 	},
 
+	async unmounted() {
+		await this.tryFormUnlock()
+	},
+
 	methods: {
 		setQuestionRef(el) {
 			if (el) {

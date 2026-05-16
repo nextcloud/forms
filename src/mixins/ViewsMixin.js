@@ -181,5 +181,14 @@ export default {
 				showError(t('forms', 'Error while saving form'))
 			}
 		},
+
+		/**
+		 * Attempt to unlock the form.
+		 */
+		async tryFormUnlock() {
+			this.form.lockedUntil = null
+			await this.saveFormProperty('lockedUntil')
+		},
+
 	},
 }
