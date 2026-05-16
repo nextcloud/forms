@@ -152,7 +152,7 @@ import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
@@ -205,6 +205,7 @@ export default {
 		const allSharedForms = ref([])
 		const showArchivedForms = ref(false)
 		const canCreateForms = ref(loadState(appName, 'appConfig').canCreateForms)
+		const deletedFormHash = ref(null)
 
 		const PERMISSION_TYPES = PermissionTypes.data().PERMISSION_TYPES
 
@@ -216,6 +217,11 @@ export default {
 			}
 
 			if (!routeHash.value) {
+				return false
+			}
+
+			// Don't try to fetch if this form was just deleted
+			if (deletedFormHash.value === routeHash.value) {
 				return false
 			}
 
@@ -435,11 +441,23 @@ export default {
 			const deletedHash = forms.value[formIndex].hash
 
 			forms.value.splice(formIndex, 1)
+			deletedFormHash.value = deletedHash
 
 			if (deletedHash === routeHash.value && route.name !== 'root') {
-				router.push({ name: 'root' })
+				// Navigate to root without triggering route guards
+				router.replace({ name: 'root' })
 			}
 		}
+
+		// Reset deletedFormHash when navigating away from the deleted form
+		watch(
+			() => route.name,
+			(newRouteName) => {
+				if (newRouteName === 'root') {
+					deletedFormHash.value = null
+				}
+			},
+		)
 
 		const onLastUpdatedByEventBus = (id) => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)
