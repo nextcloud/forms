@@ -228,7 +228,7 @@ class SubmissionService {
 		// Oldest first
 		$submissionEntities = array_reverse($submissionEntities);
 
-		$questions = $this->questionMapper->findByForm($form->getId());
+		$questions = $this->questionMapper->findByForm($form->getId(), false, true);
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
