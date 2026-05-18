@@ -310,6 +310,65 @@ class ConfirmationEmailServiceTest extends TestCase {
 		$this->service->send($form, $submission);
 	}
 
+	public function testSendReplacesPlaceholdersOfSubquestions(): void {
+		$form = Form::fromParams([
+			'id' => 1,
+			'title' => 'Survey',
+			'confirmationEmailEnabled' => true,
+			'confirmationEmailQuestionId' => 5,
+			'confirmationEmailBody' => 'Your pet: {pet}',
+		]);
+		$submission = new Submission();
+		$submission->setId(10);
+
+		$this->configService->method('getAllowConfirmationEmail')->willReturn(true);
+		$this->configService->method('getConfirmationEmailRateLimit')->willReturn(3);
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with(1, false, true)
+			->willReturn([
+				$this->createQuestionEntity([
+					'id' => 5,
+					'type' => Constants::ANSWER_TYPE_SHORT,
+					'text' => 'Email',
+					'name' => 'email',
+					'extraSettings' => ['validationType' => 'email'],
+				]),
+				$this->createQuestionEntity([
+					'id' => 7,
+					'type' => Constants::ANSWER_TYPE_SHORT,
+					'text' => 'Pet name',
+					'name' => 'pet',
+					'parentQuestionId' => 6,
+					'branchId' => 'branch-1',
+				]),
+			]);
+
+		$petAnswer = new Answer();
+		$petAnswer->setSubmissionId(10);
+		$petAnswer->setQuestionId(7);
+		$petAnswer->setText('Rex');
+
+		$this->answerMapper->method('findBySubmission')->willReturn([
+			$this->makeEmailAnswer(10, 5, 'alice@example.com'),
+			$petAnswer,
+		]);
+		$this->emailValidator->method('isValid')->willReturn(true);
+		$this->cache->method('add')->willReturn(true);
+
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(
+				SendConfirmationMailJob::class,
+				$this->callback(function (array $payload): bool {
+					$this->assertSame('Your pet: Rex', $payload['body']);
+					return true;
+				})
+			);
+
+		$this->service->send($form, $submission);
+	}
+
 	public function testSendDoesNothingWhenRateLimitExceeded(): void {
 		$form = Form::fromParams([
 			'id' => 1,
