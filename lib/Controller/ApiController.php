@@ -1892,7 +1892,6 @@ class ApiController extends OCSController {
 			$answerEntity->setQuestionId($question['id']);
 
 			$answerText = '';
-			$uploadedFile = null;
 			// Are we using answer ids as values
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && $question['type'] !== Constants::ANSWER_TYPE_LINEARSCALE) {
 				// Search corresponding option, skip processing if not found
@@ -1903,28 +1902,7 @@ class ApiController extends OCSController {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
 				}
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				$uploadedFile = $this->uploadedFileMapper->getForSubmission(
-					(int)$answer['uploadedFileId'],
-					$form->getId(),
-					$question['id'],
-					$answer['uploadToken'] ?? '',
-				);
-				$answerEntity->setFileId($uploadedFile->getFileId());
-
-				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
-
-				if ($userFolder->nodeExists($path)) {
-					$folder = $userFolder->get($path);
-				} else {
-					$folder = $userFolder->newFolder($path);
-				}
-				/** @var Folder $folder */
-				$file = $userFolder->getById($uploadedFile->getFileId())[0];
-				$name = $folder->getNonExistingName($file->getName());
-				$file->move($folder->getPath() . '/' . $name);
-
-				$answerText = $name;
+				$answerText = $this->storeFileAnswer($form, $submissionId, $question, $answer, $answerEntity);
 			} else {
 				$answerText = $answer; // Not a multiple-question, answerText is given answer
 			}
@@ -1935,10 +1913,44 @@ class ApiController extends OCSController {
 
 			$answerEntity->setText($answerText);
 			$this->answerMapper->insert($answerEntity);
-			if ($uploadedFile) {
-				$this->uploadedFileMapper->delete($uploadedFile);
-			}
 		}
+	}
+
+	/**
+	 * Store a file answer by moving the uploaded file to the submission folder.
+	 *
+	 * @param array $question The file question
+	 * @param array{uploadedFileId: int|string, fileName?: string, uploadToken?: string} $answer The uploaded file answer
+	 */
+	private function storeFileAnswer(Form $form, int $submissionId, array $question, array $answer, Answer $answerEntity): string {
+		$uploadedFile = $this->uploadedFileMapper->getForSubmission(
+			(int)$answer['uploadedFileId'],
+			$form->getId(),
+			$question['id'],
+			$answer['uploadToken'] ?? '',
+		);
+		$answerEntity->setFileId($uploadedFile->getFileId());
+
+		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+		$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
+
+		if ($userFolder->nodeExists($path)) {
+			$folder = $userFolder->get($path);
+		} else {
+			$folder = $userFolder->newFolder($path);
+		}
+		/** @var Folder $folder */
+
+		$files = $userFolder->getById($uploadedFile->getFileId());
+		if (empty($files)) {
+			throw new OCSBadRequestException('Uploaded file not found in storage.');
+		}
+		$file = $files[0];
+		$name = $folder->getNonExistingName($file->getName());
+		$file->move($folder->getPath() . '/' . $name);
+		$this->uploadedFileMapper->delete($uploadedFile);
+
+		return $name;
 	}
 
 	/**
@@ -2040,6 +2052,8 @@ class ApiController extends OCSController {
 						} else {
 							$answerText = is_string($subAnswer) ? $subAnswer : '';
 						}
+					} elseif ($subQuestionType === Constants::ANSWER_TYPE_FILE) {
+						$answerText = $this->storeFileAnswer($form, $submissionId, $subQuestion, $subAnswer, $answerEntity);
 					} else {
 						$answerText = is_string($subAnswer) ? $subAnswer : '';
 					}

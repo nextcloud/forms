@@ -47,6 +47,10 @@ export const QUESTION_PROPS = {
 		type: String,
 		required: true,
 	},
+	isTriggerQuestion: {
+		type: Boolean,
+		default: false,
+	},
 	isRequired: {
 		type: Boolean,
 		required: true,
@@ -126,6 +130,7 @@ interface QuestionPropsLike {
 	index: number
 	text: string
 	description: string
+	isTriggerQuestion: boolean
 	isRequired: boolean
 	readOnly: boolean
 	name: string
@@ -141,6 +146,7 @@ interface QuestionForwardedProps {
 	index: number
 	text: string
 	description: string
+	isTriggerQuestion: boolean
 	isRequired: boolean
 	readOnly: boolean
 	maxStringLengths: Record<string, number>
@@ -162,6 +168,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		index: props.index,
 		text: props.text,
 		description: props.description,
+		isTriggerQuestion: props.isTriggerQuestion,
 		isRequired: props.isRequired,
 		readOnly: props.readOnly,
 		maxStringLengths: props.maxStringLengths,
@@ -214,7 +221,10 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	) {
 		const newExtraSettings = { ...props.extraSettings, ...newSettings }
 		options.emit('update:extraSettings', newExtraSettings)
-		saveQuestionProperty('extraSettings', newExtraSettings)
+		// Embedded triggers share their parent's ID; the parent owns persistence.
+		if (!props.isTriggerQuestion) {
+			saveQuestionProperty('extraSettings', newExtraSettings)
+		}
 	}, INPUT_DEBOUNCE_MS)
 
 	const onNameChange = debounce(function (name: string) {
