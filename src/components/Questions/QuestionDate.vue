@@ -9,6 +9,7 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template v-if="answerType.pickerType === 'date'" #actions>
 			<NcActionCheckbox
