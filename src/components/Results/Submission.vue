@@ -36,6 +36,7 @@
 		<Answer
 			v-for="question in answeredQuestions"
 			:key="question.id"
+			:question="question"
 			:highlight="highlight"
 			:answerText="question.squashedAnswers"
 			:answers="question.answers"
@@ -126,9 +127,15 @@ export default {
 		 * @return {Array}
 		 */
 		answeredQuestions() {
+			return this.parseQuestions(this.questions)
+		},
+	},
+
+	methods: {
+		parseQuestions(questions) {
 			const answeredQuestionsArray = []
 
-			this.questions.forEach((question) => {
+			questions.forEach((question) => {
 				const answers = this.submission.answers.filter(
 					(answer) => answer.questionId === question.id,
 				)
@@ -220,6 +227,28 @@ export default {
 							(option) => option.optionType === OptionType.Column,
 						),
 					})
+				} else if (question.type === 'conditional') {
+					// @ts-check
+					const branches = question.extraSettings.branches
+					const subQuestions = branches.map((branch) =>
+						branch.subQuestions
+							.map((sub) => ({
+								...sub,
+								answer: this.submission.answers.find(
+									(answer) => answer.questionId === sub.id,
+								),
+							}))
+							.filter((sub) => sub.answer),
+					)
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.extraSettings.triggerType,
+						conditional: true,
+						extraSettings: question.extraSettings,
+						squashedAnswers: answers[0].text,
+						answers: subQuestions.map((sub) => this.parseQuestions(sub)),
+					})
 				} else if (['date', 'time'].includes(question.type)) {
 					const squashedAnswers = answers
 						.map((answer) => answer.text)
@@ -269,9 +298,7 @@ export default {
 			})
 			return answeredQuestionsArray
 		},
-	},
 
-	methods: {
 		onDelete() {
 			this.$emit('delete')
 		},
