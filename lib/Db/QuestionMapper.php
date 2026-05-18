@@ -28,18 +28,21 @@ class QuestionMapper extends QBMapper {
 	 * @throws DoesNotExistException if not found
 	 * @return Question[]
 	 */
-	public function findByForm(int $formId, bool $loadDeleted = false): array {
+	public function findByForm(int $formId, bool $loadDeleted = false, bool $loadSubquestions = false): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
-			)
+			);
+
+		if (!$loadSubquestions) {
 			// Only load top-level questions (not subquestions of conditional questions)
-			->andWhere(
+			$qb->andWhere(
 				$qb->expr()->isNull('parent_question_id')
 			);
+		}
 
 		if (!$loadDeleted) {
 			// Don't load questions, that are marked as deleted (marked by order==0).
