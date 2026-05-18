@@ -12,6 +12,7 @@ use OCA\Forms\Activity\Provider;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\CirclesService;
+use OCP\Activity\Exceptions\UnknownActivityException;
 use OCP\Activity\IEvent;
 use OCP\Activity\IEventMerger;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -92,7 +93,7 @@ class ProviderTest extends TestCase {
 			->method('getApp')
 			->willReturn('someOtherApp');
 
-		$this->expectException(\InvalidArgumentException::class);
+		$this->expectException(UnknownActivityException::class);
 		$this->provider->parse('de_DE', $event);
 	}
 
@@ -199,7 +200,7 @@ class ProviderTest extends TestCase {
 		$l10n->expects($this->never())
 			->method('t');
 
-		$this->expectException(\InvalidArgumentException::class);
+		$this->expectException(UnknownActivityException::class);
 		$this->provider->getSubjectString($l10n, 'someUnknownSubject');
 	}
 

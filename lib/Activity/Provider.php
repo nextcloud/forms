@@ -11,6 +11,7 @@ use Exception;
 
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\CirclesService;
+use OCP\Activity\Exceptions\UnknownActivityException;
 use OCP\Activity\IEvent;
 use OCP\Activity\IEventMerger;
 use OCP\Activity\IProvider;
@@ -44,12 +45,12 @@ class Provider implements IProvider {
 	 * @param IEvent $event
 	 * @param IEvent|null $previousEvent
 	 * @return IEvent
-	 * @throws \InvalidArgumentException
+	 * @throws UnknownActivityException
 	 */
 	public function parse($language, IEvent $event, ?IEvent $previousEvent = null): IEvent {
 		// Throw Exception, if not our activity. Necessary for workflow of Activity-App.
 		if ($event->getApp() !== $this->appName) {
-			throw new \InvalidArgumentException();
+			throw new UnknownActivityException();
 		}
 		$l10n = $this->l10nFactory->get($this->appName, $language);
 
@@ -72,7 +73,7 @@ class Provider implements IProvider {
 	 * Provide the translated string with placeholders
 	 * @param $subject The events subject
 	 * @return string
-	 * @throws \InvalidArgumentException
+	 * @throws UnknownActivityException
 	 */
 	public function getSubjectString(IL10N $l10n, string $subject): string {
 		switch ($subject) {
@@ -90,7 +91,7 @@ class Provider implements IProvider {
 
 			default:
 				$this->logger->warning('Some unknown activity has been found: ' . $subject);
-				throw new \InvalidArgumentException();
+				throw new UnknownActivityException();
 		}
 	}
 
