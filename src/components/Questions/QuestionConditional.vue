@@ -328,6 +328,7 @@ export default {
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values', 'update:options', 'forms:last-updated:set'],
 
 	setup() {
 		return {

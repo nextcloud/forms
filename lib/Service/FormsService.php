@@ -1057,11 +1057,6 @@ class FormsService {
 				return false;
 			}
 
-			// Branches cannot be empty
-			if (count($extraSettings['branches']) === 0) {
-				return false;
-			}
-
 			// Validate branches structure
 			foreach ($extraSettings['branches'] as $branch) {
 				// Each branch must have an id
