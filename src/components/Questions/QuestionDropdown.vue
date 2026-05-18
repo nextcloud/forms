@@ -10,6 +10,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox

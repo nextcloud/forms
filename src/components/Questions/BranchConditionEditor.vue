@@ -121,7 +121,7 @@
 			<div class="condition-row">
 				<NcCheckboxRadioSwitch
 					:modelValue="fileUploadedCondition"
-					@update:checked="onFileConditionChange">
+					@update:modelValue="onFileConditionChange">
 					{{ t('forms', 'File is uploaded') }}
 				</NcCheckboxRadioSwitch>
 			</div>

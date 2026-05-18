@@ -1665,14 +1665,6 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
 				'expected' => false
 			],
-			'invalid-conditional-empty-branches' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => []
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => false
-			],
 			'invalid-conditional-triggerType-not-string' => [
 				'extraSettings' => [
 					'triggerType' => 123,

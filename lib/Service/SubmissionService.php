@@ -793,7 +793,7 @@ class SubmissionService {
 
 				// Check if required subquestions have an answer
 				if ($subQuestion['isRequired'] ?? false) {
-					if (!$subQuestionAnswered || empty($subQuestionAnswers[$subQuestionId])) {
+					if (!$subQuestionAnswered || !array_filter($subQuestionAnswers[$subQuestionId], fn ($v) => $v !== '' && $v !== null)) {
 						throw new \InvalidArgumentException(sprintf('Subquestion "%s" in conditional question "%s" is required.', $subQuestion['text'] ?? 'Unknown', $question['text']));
 					}
 				}
@@ -848,7 +848,6 @@ class SubmissionService {
 					}
 				}
 				return false;
-
 			case Constants::ANSWER_TYPE_MULTIPLE:
 				// Multi-select: all condition option IDs must be selected
 				foreach ($conditions as $condition) {
@@ -864,7 +863,6 @@ class SubmissionService {
 					return true;
 				}
 				return false;
-
 			case Constants::ANSWER_TYPE_SHORT:
 			case Constants::ANSWER_TYPE_LONG:
 				// Text-based: evaluate regex/string conditions
@@ -892,7 +890,6 @@ class SubmissionService {
 					}
 				}
 				return false;
-
 			case Constants::ANSWER_TYPE_LINEARSCALE:
 				$numValue = (float)($triggerAnswer[0] ?? 0);
 				foreach ($conditions as $condition) {
@@ -910,7 +907,6 @@ class SubmissionService {
 					}
 				}
 				return false;
-
 			case Constants::ANSWER_TYPE_COLOR:
 				$colorValue = $triggerAnswer[0] ?? '';
 				foreach ($conditions as $condition) {
@@ -919,7 +915,6 @@ class SubmissionService {
 					}
 				}
 				return false;
-
 			case Constants::ANSWER_TYPE_FILE:
 				$hasFile = !empty($triggerAnswer);
 				foreach ($conditions as $condition) {
@@ -928,7 +923,6 @@ class SubmissionService {
 					}
 				}
 				return false;
-
 			case Constants::ANSWER_TYPE_DATE:
 			case Constants::ANSWER_TYPE_DATETIME:
 			case Constants::ANSWER_TYPE_TIME:
@@ -959,7 +953,6 @@ class SubmissionService {
 					}
 				}
 				return false;
-
 			default:
 				return false;
 		}

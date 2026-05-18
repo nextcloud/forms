@@ -63,6 +63,14 @@ export default {
 		},
 
 		/**
+		 * Whether this question is a trigger for a conditional
+		 */
+		isTriggerQuestion: {
+			type: Boolean,
+			required: false,
+		},
+
+		/**
 		 * Required-Setting
 		 */
 		isRequired: {
@@ -294,7 +302,9 @@ export default {
 		onExtraSettingsChange: debounce(function (newSettings) {
 			const newExtraSettings = { ...this.extraSettings, ...newSettings }
 			this.$emit('update:extraSettings', newExtraSettings)
-			this.saveQuestionProperty('extraSettings', newExtraSettings)
+			if (!this.isTriggerQuestion) {
+				this.saveQuestionProperty('extraSettings', newExtraSettings)
+			}
 		}, INPUT_DEBOUNCE_MS),
 
 		/**

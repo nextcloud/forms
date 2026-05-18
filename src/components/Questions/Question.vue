@@ -13,7 +13,7 @@
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
-			v-if="!readOnly"
+			v-if="!readOnly && !isTriggerQuestion"
 			class="question__drag-handle"
 			:class="{
 				'question__drag-handle--shiftup': shiftDragHandle,
@@ -44,10 +44,10 @@
 		</div>
 
 		<!-- Header -->
-		<div class="question__header">
+		<div v-if="!isTriggerQuestion || !readOnly" class="question__header">
 			<div class="question__header__title">
 				<input
-					v-if="!readOnly"
+					v-if="!isTriggerQuestion && !readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="
 						t('forms', 'Title of question number {index}', {
@@ -63,12 +63,13 @@
 					required
 					@input="onTitleChange" />
 				<h3
-					v-else
+					v-else-if="readOnly"
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
 					{{ computedText }}
 				</h3>
+				<div v-else class="question__header__title__text"></div>
 				<div
 					v-if="!readOnly && !questionValid"
 					:title="warningInvalid"
@@ -108,7 +109,10 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton closeAfterClick @click="onClone">
+					<NcActionButton
+						v-if="!isTriggerQuestion"
+						closeAfterClick
+						@click="onClone">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconContentCopy" />
 						</template>
@@ -123,7 +127,7 @@
 				</NcActions>
 			</div>
 			<div
-				v-if="hasDescription || !readOnly"
+				v-if="!isTriggerQuestion && (hasDescription || !readOnly)"
 				class="question__header__description">
 				<textarea
 					v-if="!readOnly"
@@ -272,6 +276,11 @@ export default {
 		infoMessage: {
 			type: String,
 			default: null,
+		},
+
+		isTriggerQuestion: {
+			type: Boolean,
+			default: false,
 		},
 	},
 

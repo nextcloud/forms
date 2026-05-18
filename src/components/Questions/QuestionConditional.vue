@@ -10,6 +10,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="false"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template #actions>
 			<!-- Trigger type selection in menu -->
@@ -47,7 +48,7 @@
 
 			<!-- Trigger Question -->
 			<div v-else-if="triggerType" class="trigger-question">
-				<div class="trigger-question__header">
+				<div v-if="!readOnly" class="trigger-question__header">
 					<NcIconSvgWrapper
 						:svg="currentTriggerIcon"
 						class="trigger-question__icon" />
@@ -59,7 +60,6 @@
 						}}
 					</span>
 					<NcButton
-						v-if="!readOnly"
 						variant="tertiary"
 						:aria-label="t('forms', 'Change trigger type')"
 						@click="clearTriggerType">
@@ -88,15 +88,16 @@
 					:id="id"
 					ref="triggerQuestion"
 					:formId="formId"
-					text=""
+					:text="text"
 					description=""
 					:isRequired="false"
-					:index="0"
+					:index="index"
 					:options="options"
 					:extraSettings="triggerExtraSettings"
 					:maxStringLengths="maxStringLengths"
 					:answerType="triggerAnswerTypeConfig"
 					:readOnly="readOnly"
+					:isTriggerQuestion="true"
 					:values="triggerValues"
 					@update:values="onTriggerValueChange"
 					@update:options="onOptionsChange" />
@@ -163,7 +164,7 @@
 										"
 										v-bind="subQuestion"
 										:formId="formId"
-										:index="subIndex + 1"
+										:index="subIndex + index + 1"
 										:maxStringLengths="maxStringLengths"
 										:answerType="
 											getSubQuestionAnswerTypeConfig(
@@ -240,7 +241,7 @@
 						ref="subQuestions"
 						v-bind="subQuestion"
 						:formId="formId"
-						:index="subIndex + 1"
+						:index="subIndex + index + 1"
 						:maxStringLengths="maxStringLengths"
 						:answerType="
 							getSubQuestionAnswerTypeConfig(subQuestion.type)
@@ -328,6 +329,7 @@ export default {
 	},
 
 	mixins: [QuestionMixin],
+	emits: ['update:values', 'update:options', 'forms:last-updated:set'],
 
 	setup() {
 		return {
@@ -509,12 +511,8 @@ export default {
 		values: {
 			immediate: true,
 			handler(newValues) {
-				if (newValues && newValues.trigger) {
-					this.triggerValues = newValues.trigger
-				}
-				if (newValues && newValues.subQuestions) {
-					this.subQuestionValues = { ...newValues.subQuestions }
-				}
+				this.triggerValues = newValues?.trigger ?? []
+				this.subQuestionValues = { ...(newValues?.subQuestions ?? {}) }
 			},
 		},
 	},
@@ -564,7 +562,6 @@ export default {
 					titlePlaceholder: t('forms', 'Short answer question title'),
 					createPlaceholder: t('forms', 'People can enter a short answer'),
 					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
 
@@ -572,7 +569,6 @@ export default {
 					titlePlaceholder: t('forms', 'Long text question title'),
 					createPlaceholder: t('forms', 'People can enter a long text'),
 					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
 
@@ -586,7 +582,7 @@ export default {
 					submitPlaceholder: t('forms', 'Enter your answer'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -603,7 +599,7 @@ export default {
 					submitPlaceholder: t('forms', 'Enter your answer'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -617,7 +613,7 @@ export default {
 					submitPlaceholder: t('forms', 'Pick an option'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,

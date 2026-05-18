@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<div class="question__content">
 			<input
