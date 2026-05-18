@@ -5,11 +5,13 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="false"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template #actions>
 			<!-- Trigger type selection in menu -->
@@ -47,7 +49,7 @@
 
 			<!-- Trigger Question -->
 			<div v-else-if="triggerType" class="trigger-question">
-				<div class="trigger-question__header">
+				<div v-if="!readOnly" class="trigger-question__header">
 					<NcIconSvgWrapper
 						:svg="currentTriggerIcon"
 						class="trigger-question__icon" />
@@ -59,7 +61,6 @@
 						}}
 					</span>
 					<NcButton
-						v-if="!readOnly"
 						variant="tertiary"
 						:aria-label="t('forms', 'Change trigger type')"
 						@click="clearTriggerType">
@@ -88,15 +89,16 @@
 					:id="id"
 					ref="triggerQuestion"
 					:formId="formId"
-					text=""
+					:text="text"
 					description=""
 					:isRequired="false"
-					:index="0"
+					:index="index"
 					:options="options"
 					:extraSettings="triggerExtraSettings"
 					:maxStringLengths="maxStringLengths"
 					:answerType="triggerAnswerTypeConfig"
 					:readOnly="readOnly"
+					:isTriggerQuestion="true"
 					:values="triggerValues"
 					@update:values="onTriggerValueChange"
 					@update:options="onOptionsChange" />
@@ -163,7 +165,7 @@
 										"
 										v-bind="subQuestion"
 										:formId="formId"
-										:index="subIndex + 1"
+										:index="subIndex + index + 1"
 										:maxStringLengths="maxStringLengths"
 										:answerType="
 											getSubQuestionAnswerTypeConfig(
@@ -240,7 +242,7 @@
 						ref="subQuestions"
 						v-bind="subQuestion"
 						:formId="formId"
-						:index="subIndex + 1"
+						:index="subIndex + index + 1"
 						:maxStringLengths="maxStringLengths"
 						:answerType="
 							getSubQuestionAnswerTypeConfig(subQuestion.type)
@@ -259,7 +261,9 @@
 <script>
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
+import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
+import { defineComponent, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -280,7 +284,7 @@ import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import BranchConditionEditor from './BranchConditionEditor.vue'
 import Question from './Question.vue'
-// Question components - imported directly to avoid circular dependency with AnswerTypes.js
+// Question components - imported directly to avoid circular dependency with AnswerTypes.ts
 import QuestionColor from './QuestionColor.vue'
 import QuestionDate from './QuestionDate.vue'
 import QuestionDropdown from './QuestionDropdown.vue'
@@ -289,11 +293,15 @@ import QuestionLinearScale from './QuestionLinearScale.vue'
 import QuestionLong from './QuestionLong.vue'
 import QuestionMultiple from './QuestionMultiple.vue'
 import QuestionShort from './QuestionShort.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
-// Local mapping of question types - avoids circular dependency with AnswerTypes.js
+// Local mapping of question types - avoids circular dependency with AnswerTypes.ts
 const QUESTION_COMPONENTS = {
 	short: QuestionShort,
 	long: QuestionLong,
@@ -307,8 +315,9 @@ const QUESTION_COMPONENTS = {
 	file: QuestionFile,
 }
 
-export default {
+export default defineComponent({
 	name: 'QuestionConditional',
+	inheritAttrs: false,
 
 	components: {
 		BranchConditionEditor,
@@ -327,10 +336,16 @@ export default {
 		QuestionShort,
 	},
 
-	mixins: [QuestionMixin],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, 'update:options', 'forms:last-updated:set'],
 
-	setup() {
+	setup(props, { emit }) {
+		const rootElement = ref(null)
+		const question = useQuestion(props, { emit, rootElement })
 		return {
+			...question,
+			rootElement,
+			t,
 			IconPlus,
 			IconArrowDownDropCircleOutline,
 			IconCalendar,
@@ -509,12 +524,8 @@ export default {
 		values: {
 			immediate: true,
 			handler(newValues) {
-				if (newValues && newValues.trigger) {
-					this.triggerValues = newValues.trigger
-				}
-				if (newValues && newValues.subQuestions) {
-					this.subQuestionValues = { ...newValues.subQuestions }
-				}
+				this.triggerValues = newValues?.trigger ?? []
+				this.subQuestionValues = { ...(newValues?.subQuestions ?? {}) }
 			},
 		},
 	},
@@ -564,7 +575,6 @@ export default {
 					titlePlaceholder: t('forms', 'Short answer question title'),
 					createPlaceholder: t('forms', 'People can enter a short answer'),
 					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
 
@@ -572,7 +582,6 @@ export default {
 					titlePlaceholder: t('forms', 'Long text question title'),
 					createPlaceholder: t('forms', 'People can enter a long text'),
 					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
 
@@ -586,7 +595,7 @@ export default {
 					submitPlaceholder: t('forms', 'Enter your answer'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -603,7 +612,7 @@ export default {
 					submitPlaceholder: t('forms', 'Enter your answer'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -617,7 +626,7 @@ export default {
 					submitPlaceholder: t('forms', 'Pick an option'),
 					warningInvalid: t(
 						'forms',
-						'This question needs a title and at least one answer!',
+						'This question needs at least one answer!',
 					),
 
 					predefined: true,
@@ -978,7 +987,7 @@ export default {
 			return true
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>
