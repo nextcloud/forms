@@ -36,6 +36,7 @@
 		<Answer
 			v-for="question in answeredQuestions"
 			:key="question.id"
+			:question="question"
 			:highlight="highlight"
 			:answerText="question.squashedAnswers"
 			:answers="question.answers"
@@ -53,8 +54,10 @@ import type { PropType } from 'vue'
 import type {
 	FormsOption,
 	FormsQuestion,
+	FormsQuestionExtraSettings,
 	FormsSubmission,
 } from '../../types/Entities.d.ts'
+import type { AnsweredQuestion } from './Answer.vue'
 
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
@@ -69,16 +72,13 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Answer from './Answer.vue'
 import { OptionType } from '../../models/Constants.ts'
 
-interface AnsweredQuestion {
-	id: number
-	text: string
-	type: string
-	squashedAnswers?: string
-	answers?: Array<{ id: number; text: string; url?: string }>
-	gridValue?: Record<string, string | string[] | Record<string, string | number>>
-	gridCellType?: string
-	gridRows?: FormsOption[]
-	gridColumns?: FormsOption[]
+interface SubmissionQuestion extends FormsQuestion {
+	extraSettings?:
+		| (FormsQuestionExtraSettings & {
+				triggerType?: string
+				branches?: { subQuestions: SubmissionQuestion[] }[]
+		  })
+		| null
 }
 
 export default defineComponent({
@@ -105,7 +105,7 @@ export default defineComponent({
 		},
 
 		questions: {
-			type: Array as PropType<FormsQuestion[]>,
+			type: Array as PropType<SubmissionQuestion[]>,
 			required: true,
 		},
 
@@ -191,12 +191,15 @@ export default defineComponent({
 		 * Join answered Questions with corresponding answers.
 		 * Multiple answers to a question are squashed into one string.
 		 *
-		 * @return
+		 * @param questions - Questions to match with submission answers
+		 * @return Questions with their answers prepared for display
 		 */
-		const answeredQuestions = computed<AnsweredQuestion[]>(() => {
+		const parseQuestions = (
+			questions: SubmissionQuestion[],
+		): AnsweredQuestion[] => {
 			const answeredQuestionsArray: AnsweredQuestion[] = []
 
-			props.questions.forEach((question) => {
+			questions.forEach((question) => {
 				const answers = props.submission.answers.filter(
 					(answer) => answer.questionId === question.id,
 				)
@@ -300,6 +303,21 @@ export default defineComponent({
 							(option) => option.optionType === OptionType.Column,
 						),
 					})
+				} else if (question.type === 'conditional') {
+					const branches = question.extraSettings?.branches ?? []
+					const triggerType = question.extraSettings?.triggerType
+					if (!branches.length || !triggerType) {
+						return
+					}
+					const [triggerQuestion] = parseQuestions([
+						{ ...question, type: triggerType },
+					])
+					answeredQuestionsArray.push({
+						...triggerQuestion,
+						branchAnswers: branches.map((branch) =>
+							parseQuestions(branch.subQuestions),
+						),
+					})
 				} else if (['date', 'time'].includes(question.type)) {
 					const squashedAnswers = answers
 						.map((answer) => answer.text)
@@ -348,7 +366,9 @@ export default defineComponent({
 				}
 			})
 			return answeredQuestionsArray
-		})
+		}
+
+		const answeredQuestions = computed(() => parseQuestions(props.questions))
 
 		const onDelete = (): void => {
 			emit('delete')
