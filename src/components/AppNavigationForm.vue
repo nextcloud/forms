@@ -9,6 +9,7 @@
 		:actions-aria-label="t('forms', 'Form actions')"
 		:counterNumber="form.submissionCount"
 		compact
+		forceMenu
 		:forceDisplayActions="forceDisplayActions"
 		:name="formTitle"
 		:to="{
