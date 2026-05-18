@@ -129,7 +129,8 @@ class ConfirmationEmailService {
 	private function loadQuestions(int $formId): array {
 		$questions = [];
 		try {
-			foreach ($this->questionMapper->findByForm($formId) as $entity) {
+			// Subquestions can be placeholders or the recipient as well
+			foreach ($this->questionMapper->findByForm($formId, false, true) as $entity) {
 				$questions[] = $entity->read();
 			}
 		} catch (\Exception $e) {
