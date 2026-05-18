@@ -9,6 +9,7 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<div class="question__content">
 			<textarea
