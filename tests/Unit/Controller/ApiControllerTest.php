@@ -507,6 +507,7 @@ class ApiControllerTest extends TestCase {
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
 				'confirmationEmailQuestionId' => null,
+				'allowComments' => false,
 			]]
 		];
 	}
@@ -526,10 +527,6 @@ class ApiControllerTest extends TestCase {
 		// TODO fix test, currently unset because behaviour has changed
 		$expected['state'] = null;
 		$expected['lastUpdated'] = 0;
-		$expected['confirmationEmailEnabled'] = false;
-		$expected['confirmationEmailSubject'] = null;
-		$expected['confirmationEmailBody'] = null;
-		$expected['confirmationEmailQuestionId'] = null;
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(self::createFormValidator($expected)))

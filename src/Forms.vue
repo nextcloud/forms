@@ -126,7 +126,10 @@
 				@update:sidebarOpened="sidebarOpened = $event"
 				@openSharing="openSharing" />
 			<Sidebar
-				v-if="!selectedForm.partial && canEdit"
+				v-if="
+					!selectedForm.partial
+					&& (canEdit || (allowComments && selectedForm.allowComments))
+				"
 				:form="selectedForm"
 				:sidebarOpened="sidebarOpened"
 				:active="sidebarActive"
@@ -205,6 +208,7 @@ export default {
 		const allSharedForms = ref([])
 		const showArchivedForms = ref(false)
 		const canCreateForms = ref(loadState(appName, 'appConfig').canCreateForms)
+		const allowComments = ref(loadState(appName, 'appConfig').allowComments)
 		const deletedFormHash = ref(null)
 
 		const PERMISSION_TYPES = PermissionTypes.data().PERMISSION_TYPES
@@ -492,6 +496,7 @@ export default {
 			allSharedForms,
 			showArchivedForms,
 			canCreateForms,
+			allowComments,
 			isMobile,
 			selectedForm,
 			updateSelectedForm,

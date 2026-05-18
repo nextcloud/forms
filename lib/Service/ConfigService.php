@@ -64,6 +64,10 @@ class ConfigService {
 		return $this->appConfig->getAppValueInt(Constants::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT, 3);
 	}
 
+	public function getAllowComments(): bool {
+		return $this->appConfig->getAppValueBool(Constants::CONFIG_KEY_ALLOWCOMMENTS, false);
+	}
+
 	/**
 	 * Provide the full AppConfig
 	 */
@@ -77,6 +81,7 @@ class ConfigService {
 			Constants::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL => $this->getAllowConfirmationEmail(),
 			Constants::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT => $this->getConfirmationEmailRateLimit(),
 			'isMailConfigured' => $this->isMailConfigured(),
+			Constants::CONFIG_KEY_ALLOWCOMMENTS => $this->getAllowComments(),
 
 			// Additional, calculated information out of Config
 			'canCreateForms' => $this->canCreateForms()

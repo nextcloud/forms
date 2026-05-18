@@ -50,6 +50,14 @@
 			{{ t('forms', 'Allow editing own responses') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
+			v-if="appConfig.allowComments"
+			:modelValue="form.allowComments"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:modelValue="onAllowCommentsChange">
+			{{ t('forms', 'Allow comments') }}
+		</NcCheckboxRadioSwitch>
+		<NcCheckboxRadioSwitch
 			:modelValue="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
@@ -600,6 +608,10 @@ export default {
 
 		onAllowEditSubmissionsChange(checked) {
 			this.$emit('update:formProp', 'allowEditSubmissions', checked)
+		},
+
+		onAllowCommentsChange(checked) {
+			this.$emit('update:formProp', 'allowComments', checked)
 		},
 
 		onFormExpiresChange(checked) {

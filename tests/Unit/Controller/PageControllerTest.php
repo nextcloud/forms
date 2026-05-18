@@ -17,6 +17,7 @@ use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCP\Comments\ICommentsManager;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IURLGenerator;
@@ -37,6 +38,7 @@ class PageControllerTest extends TestCase {
 	private FormsService|MockObject $formsService;
 	private IAccountManager|MockObject $accountManager;
 	private IInitialState|MockObject $initialState;
+	private ICommentsManager|MockObject $commentsManager;
 	private IL10N|MockObject $l10n;
 	private IURLGenerator|MockObject $urlGenerator;
 	private IUserManager|MockObject $userManager;
@@ -53,6 +55,7 @@ class PageControllerTest extends TestCase {
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->accountManager = $this->createMock(IAccountManager::class);
 		$this->initialState = $this->createMock(IInitialState::class);
+		$this->commentsManager = $this->createMock(ICommentsManager::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->userManager = $this->createMock(IUserManager::class);
@@ -68,6 +71,7 @@ class PageControllerTest extends TestCase {
 			$this->formsService,
 			$this->accountManager,
 			$this->initialState,
+			$this->commentsManager,
 			$this->l10n,
 			$this->urlGenerator,
 			$this->userManager,

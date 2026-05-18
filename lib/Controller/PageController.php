@@ -29,6 +29,7 @@ use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\Template\PublicTemplateResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCP\Comments\ICommentsManager;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IURLGenerator;
@@ -51,6 +52,7 @@ class PageController extends Controller {
 		private FormsService $formsService,
 		private IAccountManager $accountManager,
 		private IInitialState $initialState,
+		private ICommentsManager $commentsManager,
 		private IL10N $l10n,
 		private IUrlGenerator $urlGenerator,
 		private IUserManager $userManager,
@@ -66,7 +68,9 @@ class PageController extends Controller {
 	#[NoCSRFRequired()]
 	#[FrontpageRoute(verb: 'GET', url: '/')]
 	public function index(?string $hash = null, ?int $submissionId = null): TemplateResponse {
-		Util::addScript($this->appName, 'forms-main');
+		// Ensure the Comments client is available and load comments resources
+		$this->commentsManager->load();
+		Util::addScript($this->appName, 'forms-main', 'comments');
 		Util::addStyle($this->appName, 'forms');
 		Util::addStyle($this->appName, 'forms-style');
 		$this->insertHeaderOnIos();

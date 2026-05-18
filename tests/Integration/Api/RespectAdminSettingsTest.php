@@ -49,6 +49,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [],
 				'submissions' => [],
@@ -72,6 +73,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [],
 				'submissions' => [],
@@ -95,6 +97,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'submission_message' => '',
 				'file_id' => null,
 				'file_format' => null,
+				'allow_comments' => false,
 				'questions' => [],
 				'shares' => [
 					[
@@ -148,6 +151,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
 				'confirmationEmailQuestionId' => null,
+				'allowComments' => false,
 			],
 		];
 	}

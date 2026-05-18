@@ -153,6 +153,7 @@ class FormsMigrator implements IMigrator {
 				$form->setConfirmationEmailSubject($formData['confirmationEmailSubject'] ?? null);
 				$form->setConfirmationEmailBody($formData['confirmationEmailBody'] ?? null);
 				$form->setConfirmationEmailQuestionId(null); // Set to null initially, updated after questions are imported
+				$form->setAllowComments($formData['allowComments'] ?? false);
 
 				$this->formMapper->insert($form);
 

@@ -261,6 +261,7 @@ class FormsServiceTest extends TestCase {
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
 				'confirmationEmailQuestionId' => null,
+				'allowComments' => false,
 			]]
 		];
 	}
@@ -482,6 +483,7 @@ class FormsServiceTest extends TestCase {
 				'confirmationEmailSubject' => null,
 				'confirmationEmailBody' => null,
 				'confirmationEmailQuestionId' => null,
+				'allowComments' => false,
 			]]
 		];
 	}
