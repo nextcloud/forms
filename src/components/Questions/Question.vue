@@ -147,6 +147,9 @@
 					v-html="computedDescription" />
 				<!-- eslint-enable vue/no-v-html -->
 			</div>
+			<NcNoteCard v-if="hasInfo" :id="infoId" type="info">
+				{{ infoMessage }}
+			</NcNoteCard>
 			<NcNoteCard v-if="hasError" :id="errorId" type="error">
 				{{ errorMessage }}
 			</NcNoteCard>
@@ -263,6 +266,11 @@ export default {
 			type: String,
 			default: null,
 		},
+
+		infoMessage: {
+			type: String,
+			default: null,
+		},
 	},
 
 	emits: [
@@ -336,8 +344,16 @@ export default {
 			return !!this.errorMessage
 		},
 
+		hasInfo() {
+			return !!this.infoMessage
+		},
+
 		errorId() {
 			return `q${this.index}_error`
+		},
+
+		infoId() {
+			return `q${this.index}_info`
 		},
 	},
 

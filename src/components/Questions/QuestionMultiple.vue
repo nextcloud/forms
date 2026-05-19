@@ -11,6 +11,7 @@
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
 		:errorMessage="errorMessage"
+		:infoMessage="infoMessage"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
@@ -76,6 +77,7 @@
 				<NcCheckboxRadioSwitch
 					v-for="answer in choices"
 					:key="answer.id"
+					:aria-describedby="hasInfo ? infoId : undefined"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
 					:modelValue="questionValues"
@@ -219,7 +221,7 @@ export default {
 	},
 
 	mixins: [QuestionMixin, QuestionMultipleMixin],
-	emits: ['update:values'],
+	emits: ['update:values', 'update:isRequired'],
 
 	setup() {
 		return {
@@ -292,6 +294,54 @@ export default {
 				this.updateOptionsOrder(value, OptionType.Choice)
 			},
 		},
+
+		availableOptions() {
+			return (
+				this.choices.filter(({ text }) => text.trim() !== '').length
+				+ (this.allowOtherAnswer ? 1 : 0)
+			)
+		},
+
+		infoMessage() {
+			const min = this.extraSettings?.optionsLimitMin ?? 0
+			const max = this.extraSettings?.optionsLimitMax ?? 0
+
+			if (!min && !max) {
+				return null
+			}
+
+			if (min && max) {
+				if (min === max) {
+					return n(
+						'forms',
+						'Choose exactly one option',
+						'Choose exactly %n options',
+						min,
+					)
+				}
+
+				return t('forms', 'Choose between {min} and {max} options', {
+					min,
+					max,
+				})
+			}
+
+			if (min) {
+				return n(
+					'forms',
+					'Choose at least one option',
+					'Choose at least %n options',
+					min,
+				)
+			}
+
+			return n(
+				'forms',
+				'Choose at most one option',
+				'Choose at most %n options',
+				max,
+			)
+		},
 	},
 
 	watch: {
@@ -316,7 +366,7 @@ export default {
 					this.errorMessage = n(
 						'forms',
 						'You must choose at most one option',
-						'You must choose a maximum of %n options',
+						'You must choose at most %n options',
 						max,
 					)
 					return false
@@ -386,6 +436,19 @@ export default {
 				// For unique (radio) options we cannot set limits, also if null is passed then we need to remove the limit
 				this.onExtraSettingsChange({ optionsLimitMax: undefined })
 			} else if (max) {
+				if (max > this.availableOptions) {
+					showError(
+						t(
+							'forms',
+							'Upper options limit must not exceed the number of available options',
+						),
+					)
+					this.onExtraSettingsChange({
+						optionsLimitMax: this.availableOptions || undefined,
+					})
+					return
+				}
+
 				if ((this.extraSettings.optionsLimitMin ?? 0) > max) {
 					showError(
 						t(
@@ -410,6 +473,19 @@ export default {
 			if (this.isUnique || min === null) {
 				this.onExtraSettingsChange({ optionsLimitMin: undefined })
 			} else if (min) {
+				if (min > this.availableOptions - 1) {
+					showError(
+						t(
+							'forms',
+							'Lower options limit must be smaller than the number of available options',
+						),
+					)
+					this.onExtraSettingsChange({
+						optionsLimitMin: this.availableOptions - 1 || undefined,
+					})
+					return
+				}
+
 				if (
 					this.extraSettings.optionsLimitMax
 					&& min > this.extraSettings.optionsLimitMax
@@ -423,6 +499,9 @@ export default {
 					return
 				}
 				this.onExtraSettingsChange({ optionsLimitMin: min })
+				if (min > 0) {
+					this.$emit('update:isRequired', true)
+				}
 			}
 		},
 
