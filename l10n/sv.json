@@ -50,6 +50,8 @@
     "Allow sharing by link" : "Tillåt delning via länk",
     "Allow sharing to all logged in accounts" : "Tillåt delning till alla inloggade konton",
     "Allow showing form to all logged in accounts on sidebar" : "Tillåt visning i sidofältet för alla inloggade konton",
+    "Comments" : "Kommentarer",
+    "Allow comments" : "Tillåt kommentarer",
     "Form closed" : "Formulär stängt",
     "Expired {relativeDate}" : "Upphörde {relativeDate}",
     "Expires {relativeDate}" : "Upphör {relativeDate}",

@@ -6,6 +6,8 @@ OC.L10N.register(
     "Copy" : "Kopii",
     "Shared with you" : "Kunhavata kun vi",
     "Select groups" : "Elekti grupojn",
+    "Comments" : "Komentoj",
+    "Allow comments" : "Permesi komentojn",
     "Cancel" : "Cancel",
     "Required" : "Nepra",
     "Maximum file size" : "Maksimuma dosiergrando",

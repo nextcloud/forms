@@ -52,6 +52,8 @@
     "Allow sharing by link" : "Дозволи дељење линком",
     "Allow sharing to all logged in accounts" : "Дозволи дељење свим пријављеним налозима",
     "Allow showing form to all logged in accounts on sidebar" : "Дозволи приказивање формулара на бочној траци свим пријављеним налозима",
+    "Comments" : "Коментари",
+    "Allow comments" : "Дозволи коментаре",
     "Form closed" : "Формулар је затворен",
     "Expired {relativeDate}" : "Истекао {relativeDate}",
     "Expires {relativeDate}" : "Истиче {relativeDate}",

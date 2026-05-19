@@ -20,6 +20,8 @@ OC.L10N.register(
     "This form does not exist" : "Þetta eyðuform er ekki til",
     "Form expired" : "Eyðuform er útrunnið",
     "Select groups" : "Veldu hópa",
+    "Comments" : "Athugasemdir",
+    "Allow comments" : "Leyfa ummæli",
     "Delete form" : "Eyða eyðuformi",
     "Are you sure you want to delete {title}?" : "Ertu viss um að þú viljir eyða {title}?",
     "Cancel" : "Hætta við",

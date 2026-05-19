@@ -55,6 +55,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Allow sharing by link",
     "Allow sharing to all logged in accounts" : "Allow sharing to all logged in accounts",
     "Allow showing form to all logged in accounts on sidebar" : "Allow showing form to all logged in accounts on sidebar",
+    "Comments" : "Comments",
+    "Allow comments" : "Allow comments",
     "Form closed" : "Form closed",
     "Expired {relativeDate}" : "Expired {relativeDate}",
     "Expires {relativeDate}" : "Expires {relativeDate}",

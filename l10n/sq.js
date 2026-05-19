@@ -5,6 +5,8 @@ OC.L10N.register(
     "Copy" : "Kopjo",
     "Shared with you" : "E ndarë me ju",
     "Select groups" : "Përzgjidhni grupe",
+    "Comments" : "Komentet",
+    "Allow comments" : "Lejo komentet",
     "Cancel" : "Anuloje",
     "Required" : "E domosdoshme",
     "Delete" : "Fshij",

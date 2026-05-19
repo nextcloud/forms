@@ -54,6 +54,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Permitir compartir mediante unha ligazón",
     "Allow sharing to all logged in accounts" : "Permitir compartir a todas as contas conectadas",
     "Allow showing form to all logged in accounts on sidebar" : "Permitir amosar o formulario a todas as contas conectadas na barra lateral",
+    "Comments" : "Comentarios",
+    "Allow comments" : "Permitir comentarios",
     "Form closed" : "Formulario pechado",
     "Expired {relativeDate}" : "Caducou o {relativeDate}",
     "Expires {relativeDate}" : "Caduca o {relativeDate}",

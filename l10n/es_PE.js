@@ -4,6 +4,8 @@ OC.L10N.register(
     "Copy" : "Copiar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
+    "Comments" : "Comentarios",
+    "Allow comments" : "Permitir comentarios",
     "Cancel" : "Cancel",
     "Required" : "Requerido",
     "Delete" : "Borrar",

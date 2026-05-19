@@ -7,6 +7,8 @@ OC.L10N.register(
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
     "Select groups" : "Select groups",
+    "Comments" : "კომენტარები",
+    "Allow comments" : "Allow comments",
     "Cancel" : "Cancel",
     "Go to previous page" : "Go to previous page",
     "Delete" : "Delete",

@@ -13,6 +13,8 @@ OC.L10N.register(
     "Archived forms" : "Arhivētās veidlapas",
     "No forms created yet" : "Vēl nav izveidota neviena veidlapa",
     "Select groups" : "Atlasīt grupas",
+    "Comments" : "Piebildes",
+    "Allow comments" : "Atļaut piebildes",
     "Cancel" : "Atcelt",
     "Required" : "Nepieciešams",
     "Delete" : "Izdzēst",

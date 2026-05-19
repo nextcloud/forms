@@ -5,6 +5,8 @@ OC.L10N.register(
     "Copy" : "კოპირება",
     "Shared with you" : "გაზიარებული თქვენთან",
     "Select groups" : "ჯგუფების არჩევა",
+    "Comments" : "კომენტარები",
+    "Allow comments" : "კომენტარების დაშვება",
     "Cancel" : "გაუქმება",
     "Required" : "სავალდებულო",
     "Delete" : "წაშლა",

@@ -7,6 +7,7 @@ OC.L10N.register(
     "Count" : "Hisoblash",
     "Copy" : "Copy",
     "Shared with you" : "Shared with you",
+    "Comments" : "Izohlar",
     "Expires {relativeDate}" : "{relativeDate}",
     "Cancel" : "Bekor qilish",
     "Options" : "Variantlar",

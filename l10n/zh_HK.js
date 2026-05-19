@@ -63,6 +63,8 @@ OC.L10N.register(
     "Allow sharing by link" : "允許透過連結分享",
     "Allow sharing to all logged in accounts" : "允許分享給所有登錄的帳戶",
     "Allow showing form to all logged in accounts on sidebar" : "允許在側邊欄向所有已登入帳戶顯示表格",
+    "Comments" : "留言",
+    "Allow comments" : "允許留言",
     "Form closed" : "表格已關閉",
     "Expired {relativeDate}" : "已過期 {relativeDate}",
     "Expires {relativeDate}" : "有效期至 {relativeDate}",

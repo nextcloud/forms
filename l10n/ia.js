@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Copy" : "Copiar",
     "Shared with you" : "Compartite con te",
+    "Comments" : "Commentarios",
+    "Allow comments" : "Permitter commentarios",
     "Cancel" : "Cancel",
     "Required" : "Requirite",
     "Delete" : "Deler",

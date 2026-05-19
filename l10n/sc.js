@@ -29,6 +29,8 @@ OC.L10N.register(
     "This form does not exist" : "Custu mòdulu no esistit",
     "Form expired" : "Su mòdulu est iscadidu",
     "Select groups" : "Seletziona grupos",
+    "Comments" : "Cummentos",
+    "Allow comments" : "Permite cummentos",
     "Delete form" : "Cantzella mòdulu",
     "Are you sure you want to delete {title}?" : "A beru boles cantzellare {title}?",
     "Cancel" : "Annulla",

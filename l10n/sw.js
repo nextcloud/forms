@@ -54,6 +54,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Ruhusu ushurikishaji kwa kiungio",
     "Allow sharing to all logged in accounts" : "Ruhusu kushiriki kwa wote walioingia katiks akaunti",
     "Allow showing form to all logged in accounts on sidebar" : "Ruhusu kuonesha fomu kwa akaunti zote zilizoingia kwenye upau wa kando",
+    "Comments" : "Maoni",
+    "Allow comments" : "Ruhusu maoni",
     "Form closed" : "Fomu imefungwa",
     "Expired {relativeDate}" : "Iliyoisha wakati{relativeDate}",
     "Expires {relativeDate}" : "Inaisha wakati {relativeDate}",

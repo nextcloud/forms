@@ -5,6 +5,8 @@ OC.L10N.register(
     "Copy" : "පිටපත්",
     "Anonymous response" : "නිර්නාමික ප්‍රතිචාරය",
     "responses" : "ප්‍රතිචාර",
+    "Comments" : "අදහස්",
+    "Allow comments" : "අදහස් දැක්වීමට ඉඩ දෙන්න",
     "Cancel" : "අවලංගු",
     "Responses" : "ප්‍රතිචාර",
     "Other" : "වෙනත්",

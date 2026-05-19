@@ -52,6 +52,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Να επιτρέπεται η κοινή χρήση μέσω συνδέσμου",
     "Allow sharing to all logged in accounts" : "Να επιτρέπεται η κοινή χρήση σε όλους τους λογαριασμούς χρηστών",
     "Allow showing form to all logged in accounts on sidebar" : "Να επιτρέπεται η εμφάνιση φόρμας σε όλους τους λογαριασμούς χρηστών στην πλαϊνή γραμμή",
+    "Comments" : "Σχόλια",
+    "Allow comments" : "Να επιτρέπονται σχόλια",
     "Form closed" : "Η φόρμα έκλεισε",
     "Expired {relativeDate}" : "Έληξε {relativeDate}",
     "Expires {relativeDate}" : "Λήγει {relativeDate}",

@@ -48,6 +48,8 @@ OC.L10N.register(
     "Form sharing" : "هم‌رسانی فرم",
     "Allow sharing by link" : "اجازه دادن برای هم‌رسانی با پیوند",
     "Allow sharing to all logged in accounts" : "اجازه دادن برای هم‌رسانی با حساب‌های وارد شده",
+    "Comments" : "نظرات",
+    "Allow comments" : "اجازه ارسال نظر",
     "Form closed" : "فرم، بسته شده است",
     "Expired {relativeDate}" : "{relativeDate} منقضی شد",
     "Expires {relativeDate}" : "{relativeDate} منقضی می‌شود",

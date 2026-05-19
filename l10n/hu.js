@@ -63,6 +63,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Hivatkozással történő megosztás engedélyezése",
     "Allow sharing to all logged in accounts" : "Megosztás engedélyezése az összes bejelentkezett fiók számára",
     "Allow showing form to all logged in accounts on sidebar" : "Engedélyezi az űrlap megjelenítését az összes bejelentkezett fiók számára az oldalsávon",
+    "Comments" : "Hozzászólások",
+    "Allow comments" : "Hozzászólások engedélyezése",
     "Form closed" : "Lezárt űrlap",
     "Expired {relativeDate}" : "Lejárt: {relativeDate}",
     "Expires {relativeDate}" : "Lejárat: {relativeDate}",

@@ -50,6 +50,8 @@
     "Allow sharing by link" : "Zezwalaj na udostępnianie przez link",
     "Allow sharing to all logged in accounts" : "Zezwalaj na udostępnianie wszystkim zalogowanym kontom",
     "Allow showing form to all logged in accounts on sidebar" : "Zezwalaj na pokazywanie formularza na pasku bocznym wszystkim zalogowanym kontom",
+    "Comments" : "Komentarze",
+    "Allow comments" : "Zezwalaj na komentarze",
     "Form closed" : "Formularz zamknięty",
     "Expired {relativeDate}" : "Wygasł {relativeDate}",
     "Expires {relativeDate}" : "Wygasa {relativeDate}",

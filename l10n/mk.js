@@ -23,6 +23,7 @@ OC.L10N.register(
     "This form does not exist" : "Оваа форма не постои",
     "Form expired" : "Формата е истечена",
     "Select groups" : "Одбери групи",
+    "Comments" : "Коментари",
     "Delete form" : "Избриши форма",
     "Are you sure you want to delete {title}?" : "Дали си сигурен дека сакаш да ја избришеш {title}?",
     "Cancel" : "Откажи",

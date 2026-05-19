@@ -7,6 +7,8 @@ OC.L10N.register(
     "Copy" : "Sao chép",
     "Shared with you" : "Đã chia sẻ với bạn",
     "Select groups" : "Chọn nhóm",
+    "Comments" : "Bình luận",
+    "Allow comments" : "Cho phép bình luận",
     "Cancel" : "Hủy",
     "Options" : "Tùy chọn",
     "Required" : "Bắt buộc",
