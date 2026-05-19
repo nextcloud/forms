@@ -54,6 +54,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Autoriser le partage par lien",
     "Allow sharing to all logged in accounts" : "Autoriser le partage à tous les comptes connectés",
     "Allow showing form to all logged in accounts on sidebar" : "Autoriser l'affichage du formulaire à tous les comptes connectés dans le panneau latéral",
+    "Comments" : "Commentaires",
+    "Allow comments" : "Autoriser les commentaires",
     "Form closed" : "Formulaire fermé",
     "Expired {relativeDate}" : "Expiré {relativeDate}",
     "Expires {relativeDate}" : "Expire {relativeDate}",

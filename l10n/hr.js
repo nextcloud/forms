@@ -55,6 +55,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Dopusti dijeljenje putem poveznice",
     "Allow sharing to all logged in accounts" : "Dopusti dijeljenje sa svim prijavljenim računima",
     "Allow showing form to all logged in accounts on sidebar" : "Dopusti prikaz obrasca svim prijavljenim računima u bočnoj traci",
+    "Comments" : "Komentari",
+    "Allow comments" : "Dopusti napomene",
     "Form closed" : "Obrazac je zatvoren",
     "Expired {relativeDate}" : "Istekao {relativeDate}",
     "Expires {relativeDate}" : "Istječe {relativeDate}",

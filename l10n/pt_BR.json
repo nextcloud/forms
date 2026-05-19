@@ -61,6 +61,8 @@
     "Allow sharing by link" : "Permitir compartilhamento por link",
     "Allow sharing to all logged in accounts" : "Permitir compartilhamento para todas as contas logadas",
     "Allow showing form to all logged in accounts on sidebar" : "Permitir a exibição do formulário para todas as contas logadas na barra lateral",
+    "Comments" : "Comentários",
+    "Allow comments" : "Permitir comentários",
     "Form closed" : "Formulário fechado",
     "Expired {relativeDate}" : "Expirado {relativeDate}",
     "Expires {relativeDate}" : "Expira {relativeDate}",

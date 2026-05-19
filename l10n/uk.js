@@ -52,6 +52,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Дозволити надавати доступ через посилання",
     "Allow sharing to all logged in accounts" : "Дозволити надавати доступ усім авторизованим користувачам",
     "Allow showing form to all logged in accounts on sidebar" : "Дозволити показувати форму всім авторизованим користувачам у боковій панелі",
+    "Comments" : "Коментарі",
+    "Allow comments" : "Дозволити коментарі",
     "Form closed" : "Закриті форми",
     "Expired {relativeDate}" : "Завершено {relativeDate}.",
     "Expires {relativeDate}" : "Завершується {relativeDate}",

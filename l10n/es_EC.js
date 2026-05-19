@@ -39,6 +39,8 @@ OC.L10N.register(
     "Form sharing" : "Compartir formularios",
     "Allow sharing by link" : "Permitir compartir mediante enlace",
     "Allow sharing to all logged in accounts" : "Permitir compartir con todas las cuentas que han iniciado sesión",
+    "Comments" : "Comentarios",
+    "Allow comments" : "Permitir comentarios",
     "Expired {relativeDate}" : "Caducado {relativeDate}",
     "Expires {relativeDate}" : "Caduca {relativeDate}",
     "Delete form" : "Eliminar formulario",

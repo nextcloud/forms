@@ -20,6 +20,8 @@ OC.L10N.register(
     "This form does not exist" : "טופס זה אינו קיים",
     "Form expired" : "תוקף הטופס פג",
     "Select groups" : "בחירת קבוצות",
+    "Comments" : "תגובות",
+    "Allow comments" : "לאפשר תגובות",
     "Delete form" : "מחיקת טופס",
     "Are you sure you want to delete {title}?" : "למחוק את {title}?",
     "Cancel" : "ביטול",

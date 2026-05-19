@@ -63,6 +63,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Teilen per Link erlauben",
     "Allow sharing to all logged in accounts" : "Teilen mit allen angemeldeten Konten erlauben",
     "Allow showing form to all logged in accounts on sidebar" : "Anzeige des Formulars in der Seitenleiste für alle angemeldeten Konten zulassen",
+    "Comments" : "Kommentare",
+    "Allow comments" : "Kommentare erlauben",
     "Form closed" : "Formular geschlossen",
     "Expired {relativeDate}" : "Abgelaufen {relativeDate}",
     "Expires {relativeDate}" : "Läuft ab {relativeDate}",

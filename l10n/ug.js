@@ -54,6 +54,8 @@ OC.L10N.register(
     "Allow sharing by link" : "ئۇلىنىش ئارقىلىق ھەمبەھىرلىنىشكە يول قويۇڭ",
     "Allow sharing to all logged in accounts" : "بارلىق ھېساباتلارغا ئورتاقلىشىشقا يول قويۇڭ",
     "Allow showing form to all logged in accounts on sidebar" : "يان كۆزنەكتىكى بارلىق ھېساباتلارغا جەدۋەل كۆرسىتىشكە يول قويۇڭ",
+    "Comments" : "باھا",
+    "Allow comments" : "باھاغا يول قويۇڭ",
     "Form closed" : "جەدۋەل تاقالدى",
     "Expired {relativeDate}" : "ۋاقتى ئۆتكەن {relativeDate}",
     "Expires {relativeDate}" : "ۋاقتى توشىدۇ {relativeDate}",

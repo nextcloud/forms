@@ -27,6 +27,8 @@
     "This form does not exist" : "ไม่มีฟอร์มนี้",
     "Form expired" : "ฟอร์มหมดอายุ",
     "Select groups" : "เลือกกลุ่ม",
+    "Comments" : "ความคิดเห็น",
+    "Allow comments" : "อนุญาตแสดงความคิดเก็น",
     "Delete form" : "ลบฟอร์ม",
     "Are you sure you want to delete {title}?" : "คุณแน่ใจที่จะลบ {title} หรือไม่",
     "Cancel" : "ยกเลิก",

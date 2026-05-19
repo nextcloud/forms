@@ -50,6 +50,8 @@ OC.L10N.register(
     "Form sharing" : "Inprimaki partekatzea",
     "Allow sharing by link" : "Baimendu esteka bidez partekatzea",
     "Allow sharing to all logged in accounts" : "Baimendu saioa hasitako kontu guztiekin partekatzea",
+    "Comments" : "Iruzkinak",
+    "Allow comments" : "Baimendu iruzkinak",
     "Form closed" : "Galdetegia itxita",
     "Expired {relativeDate}" : "Iraungita {relativeDate}",
     "Expires {relativeDate}" : "Iraungitzea: {relativeDate}",

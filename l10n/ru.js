@@ -63,6 +63,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Разрешить распространение ссылкой",
     "Allow sharing to all logged in accounts" : "Разрешить распространение зарегистрированным пользователям",
     "Allow showing form to all logged in accounts on sidebar" : "Разрешить показ формы для всех вошедших в систему учетных записей на боковой панели",
+    "Comments" : "Комментарии",
+    "Allow comments" : "Разрешить комментарии",
     "Form closed" : "Форма закрыта",
     "Expired {relativeDate}" : "Истекает {relativeDate}",
     "Expires {relativeDate}" : "Истекает {relativeDate}",

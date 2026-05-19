@@ -44,6 +44,8 @@
     "Form sharing" : "フォームをシェア",
     "Allow sharing by link" : "リンクによる共有を許可する",
     "Allow sharing to all logged in accounts" : "ログインしているすべてのアカウントへの共有を許可する",
+    "Comments" : "コメント",
+    "Allow comments" : "コメントを許可",
     "Form closed" : "フォームを閉じる",
     "Delete form" : "フォームを削除",
     "Are you sure you want to delete {title}?" : "本当に {title} を削除してもよろしいですか?",

@@ -50,6 +50,8 @@
     "Allow sharing by link" : "Povoliť zdieľanie odkazom",
     "Allow sharing to all logged in accounts" : "Povoliť zdieľanie všetkým prihláseným účtom",
     "Allow showing form to all logged in accounts on sidebar" : "Povoliť zobrazenie formulára všetkým prihláseným účtom na bočnom paneli",
+    "Comments" : "Komentáre",
+    "Allow comments" : "Povoliť komentáre",
     "Form closed" : "Formulár uzatvorený",
     "Expired {relativeDate}" : "Platnosť vypršala {relativeDate}",
     "Expires {relativeDate}" : "Platnosť končí {relativetime}",

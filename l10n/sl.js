@@ -44,6 +44,8 @@ OC.L10N.register(
     "Form sharing" : "Objava vprašalnikov",
     "Allow sharing by link" : "Dovoli objavo po povezavi",
     "Allow sharing to all logged in accounts" : "Dovoli objavo za vse prijavljene račune",
+    "Comments" : "Opombe",
+    "Allow comments" : "Dovoli komentiranje obvestil",
     "Form closed" : "Vprašalnik je zaprt",
     "Expired {relativeDate}" : "Pretečeno {relativeDate}",
     "Expires {relativeDate}" : "Preteče {relativeDate}",

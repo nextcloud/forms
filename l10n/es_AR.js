@@ -19,6 +19,8 @@ OC.L10N.register(
     "This form does not exist" : "Este formulario no existe",
     "Form expired" : "El formulario ha expirado",
     "Select groups" : "Seleccionar grupos",
+    "Comments" : "Comentarios",
+    "Allow comments" : "Permitir comentarios",
     "Delete form" : "Borrar formulario",
     "Are you sure you want to delete {title}?" : "Esta seguro que desea borrar {título}?",
     "Cancel" : "Cancel",

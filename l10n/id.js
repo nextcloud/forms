@@ -10,6 +10,8 @@ OC.L10N.register(
     "User ID" : "ID Pengguna",
     "Shared with you" : "Shared with you",
     "Select groups" : "Pilih grup",
+    "Comments" : "Komentar",
+    "Allow comments" : "Izinkan komentar",
     "Expires {relativeDate}" : "Kedaluwarsa {relativeDate}",
     "Cancel" : "Batal",
     "Options" : "Pilihan",

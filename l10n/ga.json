@@ -61,6 +61,8 @@
     "Allow sharing by link" : "Ceadaigh roinnt trí nasc",
     "Allow sharing to all logged in accounts" : "Ceadaigh roinnt do gach cuntas logáilte isteach",
     "Allow showing form to all logged in accounts on sidebar" : "Ceadaigh an fhoirm a thaispeáint do gach cuntas logáilte isteach ar an mbarra taoibh",
+    "Comments" : "Tuairimí",
+    "Allow comments" : "Ceadaigh tuairimí",
     "Form closed" : "Foirm dúnta",
     "Expired {relativeDate}" : "Chuaigh {relativeDate} in éag",
     "Expires {relativeDate}" : "In éag {relativeDate}",

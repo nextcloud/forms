@@ -27,6 +27,8 @@
     "Form expired" : "만료된 양식",
     "Select groups" : "그룹 선택",
     "Allow sharing to all logged in accounts" : "모든 로그인된 계정에 공유 허용",
+    "Comments" : "댓글",
+    "Allow comments" : "댓글 허용",
     "Delete form" : "양식 삭제",
     "Are you sure you want to delete {title}?" : "정말로 {title}을 삭제할 것입니까?",
     "Cancel" : "취소",

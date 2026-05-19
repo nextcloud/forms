@@ -51,6 +51,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Permite partajarea prin link",
     "Allow sharing to all logged in accounts" : "Permite tuturor conturilor autentificate să partajeze",
     "Allow showing form to all logged in accounts on sidebar" : "Permite afișarea formularului în bara laterală tuturor conturilor autentificate",
+    "Comments" : "Comentarii",
+    "Allow comments" : "Permite comentarii",
     "Form closed" : "Formular închis",
     "Expired {relativeDate}" : "A expirat la {relativeDate}",
     "Expires {relativeDate}" : "Expiră la {relativeDate}",

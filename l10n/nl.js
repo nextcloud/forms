@@ -35,6 +35,8 @@ OC.L10N.register(
     "Form expired" : "Formulier verlopen",
     "Select groups" : "Selecteer groepen",
     "Allow sharing to all logged in accounts" : "Sta delen met alle ingelogde accounts toe",
+    "Comments" : "Reacties",
+    "Allow comments" : "Reageren toestaan",
     "Delete form" : "Verwijderen formulier",
     "Are you sure you want to delete {title}?" : "Weet je zeker dat je {title} wilt verwijderen?",
     "Cancel" : "Annuleren",

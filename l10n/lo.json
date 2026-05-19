@@ -52,6 +52,8 @@
     "Allow sharing by link" : "ອະນຸຍາດໃຫ້ແບ່ງປັນຜ່ານລິງ",
     "Allow sharing to all logged in accounts" : "ອະນຸຍາດໃຫ້ແບ່ງປັນກັບທຸກບັນຊີທີ່ເຂົ້າສູ່ລະບົບ",
     "Allow showing form to all logged in accounts on sidebar" : "ອະນຸຍາດໃຫ້ສະແດງແບບຟອມໃຫ້ທຸກບັນຊີທີ່ເຂົ້າສູ່ລະບົບໃນແຖບດ້ານຂ້າງ",
+    "Comments" : "ຄຳເຫັນ",
+    "Allow comments" : "ອະນຸຍາດໃຫ້ມີຄຳເຫັນ",
     "Form closed" : "ແບບຟອມຖືກປິດ",
     "Expired {relativeDate}" : "ໝົດອາຍຸ {relativeDate}",
     "Expires {relativeDate}" : "ໝົດອາຍຸ {relativeDate}",

@@ -52,6 +52,8 @@
     "Allow sharing by link" : "Luba jagamist lingiga",
     "Allow sharing to all logged in accounts" : "Luba jagamist kõikidele sisselogitud kasutajatele",
     "Allow showing form to all logged in accounts on sidebar" : "Luba vormi näidata kõikidele sisselogitud kasutajatele külgribal",
+    "Comments" : "Kommentaarid",
+    "Allow comments" : "Luba kommentaarid",
     "Form closed" : "Vorm on suletud",
     "Expired {relativeDate}" : "Aegus {relativeDate}",
     "Expires {relativeDate}" : "Aegub {relativeDate}",

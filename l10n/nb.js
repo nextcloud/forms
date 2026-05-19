@@ -51,6 +51,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Tillat deling via kobling",
     "Allow sharing to all logged in accounts" : "Tillat deling til alle påloggede kontoer",
     "Allow showing form to all logged in accounts on sidebar" : "Tillat visning av skjema til alle påloggede kontoer på sidefeltet",
+    "Comments" : "Kommentarer",
+    "Allow comments" : "Tillatt kommentarer",
     "Form closed" : "Skjema lukket",
     "Expired {relativeDate}" : "Utløpt {relativeDate}",
     "Expires {relativeDate}" : "Utløper {relativeDate}",

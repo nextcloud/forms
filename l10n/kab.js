@@ -5,6 +5,7 @@ OC.L10N.register(
     "Yes" : "Ih",
     "Question" : "Asteqsi",
     "Copy" : "Nɣel",
+    "Comments" : "Iwenniten",
     "Cancel" : "Semmet",
     "Options" : "Tixtiṛiyin",
     "Delete" : "Kkes",

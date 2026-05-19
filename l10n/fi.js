@@ -49,6 +49,8 @@ OC.L10N.register(
     "Form sharing" : "Lomakkeen jakaminen",
     "Allow sharing by link" : "Salli jakaminen linkillä",
     "Allow sharing to all logged in accounts" : "Salli jakaminen kaikille sisäänkirjautuneille tileille",
+    "Comments" : "Kommentit",
+    "Allow comments" : "Salli kommentit",
     "Form closed" : "Lomake suljettu",
     "Expired {relativeDate}" : "Vanheni {relativeDate}",
     "Expires {relativeDate}" : "Vanhenee {relativeDate}",

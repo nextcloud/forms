@@ -56,6 +56,8 @@ OC.L10N.register(
     "Allow sharing by link" : "Bağlantı ile paylaşılabilsin",
     "Allow sharing to all logged in accounts" : "Tüm oturum açmış hesaplarla paylaşabilsin",
     "Allow showing form to all logged in accounts on sidebar" : "Form tüm oturum açmış hesaplara kenar çubuğunda görüntülensin",
+    "Comments" : "Yorumlar",
+    "Allow comments" : "Yorum yapılabilsin",
     "Form closed" : "Form kapatıldı",
     "Expired {relativeDate}" : "Geçerlilik süresi dolmuş {relativeDate}",
     "Expires {relativeDate}" : "Geçerlilik süresi sonu {relativeDate}",
