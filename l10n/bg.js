@@ -42,6 +42,8 @@ OC.L10N.register(
     "Form sharing" : "Споделяне на формуляр",
     "Allow sharing by link" : "Разрешаване на споделянето чрез връзка",
     "Allow sharing to all logged in accounts" : "Разрешаване на споделяне с всички вписани профили",
+    "Comments" : "Коментари",
+    "Allow comments" : "Позволи коментари",
     "Expired {relativeDate}" : "Изтекъл на {relativeDate}",
     "Expires {relativeDate}" : "Изтича на {relativeDate}",
     "Delete form" : "Изтриване на формуляр ",

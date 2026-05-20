@@ -290,6 +290,7 @@ OC.L10N.register(
     "No responses yet" : "Sem respostas ainda",
     "Responses will show up here" : "As respostas aparecerão aqui",
     "Are you sure you want to delete all responses?" : "Tem certeza de que deseja excluir todas as respostas?",
+    "Form comments" : "Comentários de formulário",
     "Form settings" : "Configurações do formulário",
     "Sharing" : "Compartilhamento",
     "Settings" : "Configurações",

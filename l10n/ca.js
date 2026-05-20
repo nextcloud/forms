@@ -42,6 +42,7 @@ OC.L10N.register(
     "Form sharing" : "Compartir formulari",
     "Allow sharing by link" : "Permet compartir mitjançant un enllaç",
     "Allow sharing to all logged in accounts" : "Permet compartir amb tots els comptes connectats",
+    "Comments" : "Comentaris",
     "Allow comments" : "Permet els comentaris",
     "Expired {relativeDate}" : "Caducat {relativeDate}",
     "Expires {relativeDate}" : "Caduca el dia {relativeDate}",

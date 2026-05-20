@@ -290,6 +290,7 @@ OC.L10N.register(
     "No responses yet" : "Kol kas atsakymų nėra",
     "Responses will show up here" : "Atsakymai bus rodomi čia",
     "Are you sure you want to delete all responses?" : "Ar tikrai norite ištrinti visus atsakymus?",
+    "Form comments" : "Anketos komentarai",
     "Form settings" : "Anketos nustatymai",
     "Sharing" : "Bendrinimas",
     "Settings" : "Nustatymai",
