@@ -526,12 +526,11 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
   | _formId_ | Integer | ID of the form containing the question |
   | _questionId_ | Integer | ID of the question, the new option will belong to |
 - Parameters:
- - Parameters:
   | Parameter | Type | Optional | Description |
   |-----------|---------|----------|-------------|
   | _optionTexts_ | Array | | Array of strings containing the new options |
   | _optionType_ | [Option Types](DataStructure.md#Option-Types) | yes | The option-type to assign to the new options (e.g. `row`). |
- - Response: The new array of option objects
+- Response: The new array of option objects
 
 ```
 "data": [
@@ -597,7 +596,7 @@ Update a single or all properties of an option-object
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _newOrder_ | Array | Array of **all** option IDs, ordered in the desired order |
-  | _optionType_ | [QuestionType](DataStructure.md#question-types) | *optional* option type to reorder (e.g. `row`). |
+  | _optionType_ | [QuestionType](DataStructure.md#question-types) | _optional_ option type to reorder (e.g. `row`). |
 - Restrictions: The Array **must** contain all option IDs corresponding to the specified question and **must not** contain any duplicates.
 - Response: Array of optionIds and their corresponding order.
 
@@ -855,19 +854,16 @@ Upload a file to an answer before form submission
 
 ### Get a specific submission
 
-Get all Submissions to a Form
+Get a specific submission of a form. Viewing another user's submission requires the `results` permission; otherwise only the submission owner may view it.
 
 - Endpoint: `/api/v3/forms/{formId}/submissions/{submissionId}`
 - Method: `GET`
 - Url-Parameters:
   | Parameter | Type | Description |
   |-----------|---------|-------------|
-  | _formId_ | Integer | ID of the form to get the submissions for |
+  | _formId_ | Integer | ID of the form containing the submission |
   | _submissionId_ | Integer | ID of the submission to get |
-  | _query_ | Integer | Search string for full-text search. Can be a username |
-  | _limit_ | Integer | How many submissions to fetch |
-  | _offset_ | Integer | Offset for the pagination |
-- Response: The submission
+- Response: The submission (the controller appends `userDisplayName`).
 
 ```
 "data": {
@@ -887,7 +883,7 @@ Get all Submissions to a Form
       "submissionId": 6,
       "questionId": 2,
       "text": "One more."
-    },
+    }
   ],
   "userDisplayName": "jonas"
 }
@@ -963,7 +959,7 @@ Update an existing submission (only allowed when `allowEditSubmissions` is set o
   | _submissionId_ | Integer | ID of the submission to delete |
 - Response: **Status-Code OK**, as well as the id of the deleted submission.
 
-````
+```
 "data": 5
 ```
 
@@ -975,11 +971,10 @@ All Endpoints return one of the following Error-Responses, if the request is not
 
 This returns in case the Request is not properly set. This can e.g. include:
 
--   The corresponding form can not be found
--   Request Parameters are wrong (including formatting or type of parameters)
+- The corresponding form can not be found
+- Request Parameters are wrong (including formatting or type of parameters)
 
 ```
-
 "ocs": {
 "meta": {
 "status": "failure",
@@ -988,18 +983,16 @@ This returns in case the Request is not properly set. This can e.g. include:
 },
 "data": []
 }
-
 ```
 
 ### 403 - Forbidden
 
 This returns in case the authenticated user is not allowed to access this resource/endpoint. This can e.g. include:
 
--   The user has no write access to the form (only form owner is allowed to edit)
--   The user is not allowed to submit to the form (access-settings, form expired, already submitted)
+- The user has no write access to the form (only form owner is allowed to edit)
+- The user is not allowed to submit to the form (access-settings, form expired, already submitted)
 
 ```
-
 "ocs": {
 "meta": {
 "status": "failure",
@@ -1008,7 +1001,6 @@ This returns in case the authenticated user is not allowed to access this resour
 },
 "data": []
 }
-
 ```
 
 ### 412 - Precondition Failed
@@ -1016,12 +1008,7 @@ This returns in case the authenticated user is not allowed to access this resour
 This Error is not produed by the Forms-API, but comes from Nextclouds OCS API. Typically this is the result when missing the Request-Header `OCS-APIRequest: true`.
 
 ```
-
 {
 "message": "CSRF check failed"
 }
-
 ```
-
-```
-````
