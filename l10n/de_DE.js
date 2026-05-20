@@ -290,6 +290,7 @@ OC.L10N.register(
     "No responses yet" : "Bis jetzt noch keine Antworten",
     "Responses will show up here" : "Antworten werden hier angezeigt",
     "Are you sure you want to delete all responses?" : "Sollen alle Antworten gelöscht werden?",
+    "Form comments" : "Formular-Kommentare",
     "Form settings" : "Formular-Einstellungen",
     "Sharing" : "Teilen",
     "Settings" : "Einstellungen",

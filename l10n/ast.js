@@ -29,6 +29,7 @@ OC.L10N.register(
     "Error while saving configuration" : "Hebo un error mentanto se guardaba la configuración",
     "Error while reloading config" : "Hebo un error mentanto se volvia guardar la configuración",
     "Select groups" : "Seleicionar grupos",
+    "Comments" : "Comentarios",
     "Cancel" : "Encaboxar",
     "Form actions" : "Aiciones del formulariu",
     "Edit form" : "Editar el formulariu",

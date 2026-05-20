@@ -52,6 +52,8 @@ OC.L10N.register(
     "Allow sharing by link" : "السماح بالمشاركة عن طريق الرابط",
     "Allow sharing to all logged in accounts" : "السماح بالمشاركة لكل الحسابات التي سجلت دخولها",
     "Allow showing form to all logged in accounts on sidebar" : "السماح بعرض النموذج لكل الحسابات المسجلة على الشريط الجانبي",
+    "Comments" : "تعليقات",
+    "Allow comments" : "السماح بنشر تعليقات",
     "Form closed" : "نموذج مغلق",
     "Expired {relativeDate}" : "منتهي الصلاحية {relativeDate}",
     "Expires {relativeDate}" : "تنتهي صلاحيته {relativeDate}",

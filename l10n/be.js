@@ -11,6 +11,7 @@ OC.L10N.register(
     "Shared with you" : "Абагулена з вамі",
     "Loading forms …" : "Загрузка форм …",
     "Select groups" : "Выберыце групы",
+    "Comments" : "Каментарыі",
     "Cancel" : "Скасаваць",
     "Options" : "Варыянты",
     "Page number" : "Нумар старонкі",
