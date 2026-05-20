@@ -54,4 +54,26 @@ class AnswerMapper extends QBMapper {
 
 		$qb->executeStatement();
 	}
+
+	/**
+	 * Collect all fileIds for answers of a specific submission
+	 * @param int $submissionId
+	 * @return int[] Array of fileIds
+	 */
+	public function findFileIdsBySubmission(int $submissionId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('file_id')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('submission_id', $qb->createNamedParameter($submissionId, IQueryBuilder::PARAM_INT))
+			)
+			->andWhere($qb->expr()->isNotNull('file_id'));
+
+		$result = $qb->executeQuery();
+		$rows = $result->fetchFirstColumn();
+		$result->closeCursor();
+
+		return array_map('intval', $rows);
+	}
 }
