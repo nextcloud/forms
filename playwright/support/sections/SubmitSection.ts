@@ -6,10 +6,12 @@
 import type { Locator, Page, Response } from '@playwright/test'
 
 export class SubmitSection {
+	public readonly clearFormButton: Locator
 	public readonly submitButton: Locator
 	public readonly successMessage: Locator
 
 	constructor(public readonly page: Page) {
+		this.clearFormButton = this.page.getByRole('button', { name: 'Clear form' })
 		this.submitButton = this.page.getByRole('button', { name: 'Submit' })
 		this.successMessage = this.page.getByText(
 			'Thank you for completing the form!',
@@ -97,6 +99,29 @@ export class SubmitSection {
 		await question.getByRole('combobox').click()
 		// NcSelect renders its option list in a teleported element outside the question <li>
 		await this.page.getByRole('option', { name: optionName }).click()
+	}
+
+	/**
+	 * Rank an option by clicking it in the unranked pool.
+	 *
+	 * @param questionName the title of the question
+	 * @param optionName the option text to move into ranked list
+	 */
+	public async rankOption(
+		questionName: string | RegExp,
+		optionName: string | RegExp,
+	): Promise<void> {
+		const question = this.getQuestion(questionName)
+		await question.getByRole('button', { name: optionName }).click()
+	}
+
+	/**
+	 * Click clear form and confirm the dialog.
+	 */
+	public async clearForm(): Promise<void> {
+		await this.clearFormButton.click()
+		const dialog = this.page.getByRole('dialog', { name: 'Clear form' })
+		await dialog.getByRole('button', { name: 'Clear' }).click()
 	}
 
 	/** Click submit and wait for the API response. */
