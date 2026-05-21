@@ -369,6 +369,28 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->exportSubmissionsToCloud(1, '');
 	}
 
+	public function testExportSubmissionsToCloud_noExportPermissions() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('someoneElse');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_SUBMIT]);
+
+		$this->submissionService->expects($this->never())
+			->method('writeFileToCloud');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->exportSubmissionsToCloud(1, '/', 'csv');
+	}
+
 	public function testCreateNewForm_notAllowed() {
 		$this->configService->expects($this->once())
 			->method('canCreateForms')
