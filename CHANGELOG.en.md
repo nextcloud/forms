@@ -5,7 +5,11 @@
 
 # Changelog
 
-## Unreleased
+## v5.3.0 - tbd
+
+- **New question types**
+
+    This release brings two new question types: Ranking and Grid questions will offer new possibilities for your forms.
 
 - **Confirmation emails for respondents**
 
@@ -16,6 +20,14 @@
 
     - `{formTitle}`, `{formDescription}`
     - `{<fieldName>}` (question `name` or text, sanitized)
+
+- **Comments**
+
+    You can now comment on the form you participated (only for logged in users).
+
+- **Limit the number of submissions**
+
+    Set a maximum number of submissions and your form will automatically close once the limit is reached.
 
 ## v5.2.0 - 2025-09-25
 

@@ -5,6 +5,47 @@
 
 # Changelog
 
+## v5.3.0-alpha.0 - 2026-05-21
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.0...v5.3.0-alpha.0)
+
+### Enhancements
+
+- feat: ranking question type by @datapumpernickel in [\#3262](https://github.com/nextcloud/forms/pull/3262)
+- feat: improve handling of option limits by @Chartman123 in [\#3323](https://github.com/nextcloud/forms/pull/3323)
+- feat: add support for comments in forms by @Chartman123 in [\#3329](https://github.com/nextcloud/forms/pull/3329)
+- feat: Add confirmation email for form respondents by @dtretyakov in [\#3289](https://github.com/nextcloud/forms/pull/3289)
+- enh(l10n): Unify wording for form responses across multiple components by @Chartman123 in [\#3218](https://github.com/nextcloud/forms/pull/3218)
+- feat: add maximum submissions limit for forms by @LAfricain in [\#3199](https://github.com/nextcloud/forms/pull/3199)
+- feat: extract subtype check and show submenu indicator for questions with subtypes by @Chartman123 in [\#3142](https://github.com/nextcloud/forms/pull/3142)
+- feat: introduce Grid as a new question type by @Koc in [\#2945](https://github.com/nextcloud/forms/pull/2945)
+
+### Fixed
+
+- fix: always show three dots menu in navigation by @Chartman123 in [\#3346](https://github.com/nextcloud/forms/pull/3346)
+- fix: Prevent infinity loop on form deletion by @Koc in [\#3343](https://github.com/nextcloud/forms/pull/3343)
+- Fix copypasting from responses page resulting in wrong paragraph/newline placement by @jancborchardt in [\#3328](https://github.com/nextcloud/forms/pull/3328)
+- fix(settings): properly handle loading state by @susnux in [\#3316](https://github.com/nextcloud/forms/pull/3316)
+- fix: only allow modifying of sharing to form owners by @Chartman123 in [\#3308](https://github.com/nextcloud/forms/pull/3308)
+- fix(a11y): connect question inputs to heading and description via aria by @pringelmann in [\#3228](https://github.com/nextcloud/forms/pull/3228)
+- fix: dropdown and checkboxes fields are broken after grid type introduction by @Koc in [\#3134](https://github.com/nextcloud/forms/pull/3134)
+
+### Merged
+
+- fix(activity): throw UnknownActivityException for unknown events by @pringelmann in [\#3344](https://github.com/nextcloud/forms/pull/3344)
+- chore: fix documentation by @Chartman123 in [\#3334](https://github.com/nextcloud/forms/pull/3334)
+- refactor: replace material design icons with material symbols by @Chartman123 in [\#3330](https://github.com/nextcloud/forms/pull/3330)
+- Chore: Add grid questions to predefined questions array by @Chartman123 in [\#3333](https://github.com/nextcloud/forms/pull/3333)
+- refactor: replace `@var` tags with typed properties by @Chartman123 in [\#3322](https://github.com/nextcloud/forms/pull/3322)
+- refactor(config): replace IConfig with IAppConfig for improved type safety and clarity by @Chartman123 in [\#3321](https://github.com/nextcloud/forms/pull/3321)
+- chore: change deprecated sass @import rules to @use rules for markdownOutput mixin by @Chartman123 in [\#3272](https://github.com/nextcloud/forms/pull/3272)
+- Chore: fix formatting by @Chartman123 in [\#3261](https://github.com/nextcloud/forms/pull/3261)
+- fix: listen for correct event to update option limits by @Chartman123 in [\#3256](https://github.com/nextcloud/forms/pull/3256)
+- refactor: move error handling to Question component with NcNoteCard by @Chartman123 in [\#3255](https://github.com/nextcloud/forms/pull/3255)
+- Enh/e2e tests by @pringelmann in [\#3250](https://github.com/nextcloud/forms/pull/3250)
+- chore: Support NC34 by @nfebe in [\#3201](https://github.com/nextcloud/forms/pull/3201)
+
+
 ## v5.2.7 - 2026-04-17
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.6...v5.2.7)
