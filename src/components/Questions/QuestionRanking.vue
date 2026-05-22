@@ -80,14 +80,14 @@
 							class="ranking-item__drag-handle"
 							variant="tertiary-no-background">
 							<template #icon>
-								<IconDragIndicator :size="20" />
+								<NcIconSvgWrapper :svg="IconDragIndicator" />
 							</template>
 							<NcActionButton
 								ref="buttonOptionUp"
 								:disabled="index === 0"
 								@click="onMoveUp(index)">
 								<template #icon>
-									<IconArrowUp :size="20" />
+									<NcIconSvgWrapper :svg="IconArrowUp" />
 								</template>
 								{{ t('forms', 'Move option up') }}
 							</NcActionButton>
@@ -96,7 +96,7 @@
 								:disabled="index === rankedOptions.length - 1"
 								@click="onMoveDown(index)">
 								<template #icon>
-									<IconArrowDown :size="20" />
+									<NcIconSvgWrapper :svg="IconArrowDown" />
 								</template>
 								{{ t('forms', 'Move option down') }}
 							</NcActionButton>
@@ -108,7 +108,7 @@
 							:ariaLabel="t('forms', 'Remove from ranking')"
 							@click="unrankOption(option)">
 							<template #icon>
-								<IconClose :size="20" />
+								<NcIconSvgWrapper :svg="IconClose" />
 							</template>
 						</NcButton>
 					</div>
