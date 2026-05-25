@@ -107,6 +107,9 @@
 				{{ optionsLabelHighest }}
 			</div>
 		</div>
+		<template #insert>
+			<slot name="insert" />
+		</template>
 	</Question>
 </template>
 

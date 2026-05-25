@@ -121,37 +121,37 @@
 				v-else
 				v-model="choices"
 				class="question__content"
-				:animation="200"
+				:animation="300"
 				direction="vertical"
 				handle=".option__drag-handle"
 				invertSwap
-				tag="transition-group"
-				:componentData="{
-					name: isDragging
-						? 'no-external-transition-on-drag'
-						: 'options-list-transition',
-				}"
+				target=".sort-target"
 				@change="saveOptionsOrder('choice')"
-				@start="isDragging = true"
-				@end="isDragging = false">
-				<AnswerInput
-					v-for="(answer, index) in choices"
-					:key="answer.local ? 'option-local' : answer.id"
-					ref="input"
-					:answer="answer"
-					:formId="formId"
-					:index="index"
-					:isUnique="isUnique"
-					:maxIndex="options.length - 1"
-					:maxOptionLength="maxStringLengths.optionText"
-					optionType="choice"
-					@createAnswer="onCreateAnswer"
-					@update:answer="updateAnswer"
-					@delete="deleteOption"
-					@focusNext="focusNextInput"
-					@moveUp="onOptionMoveUp(index, OptionType.Choice)"
-					@moveDown="onOptionMoveDown(index, OptionType.Choice)"
-					@tabbedOut="checkValidOption" />
+				@start="onDragStart"
+				@end="onDragEnd">
+				<TransitionGroup
+					tag="ul"
+					:name="isDragging ? undefined : 'options-list-transition'"
+					class="sort-target">
+					<AnswerInput
+						v-for="(answer, index) in choices"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						:formId="formId"
+						:index="index"
+						:isUnique="isUnique"
+						:maxIndex="options.length - 1"
+						:maxOptionLength="maxStringLengths.optionText"
+						optionType="choice"
+						@createAnswer="onCreateAnswer"
+						@update:answer="updateAnswer"
+						@delete="deleteOption"
+						@focusNext="focusNextInput"
+						@moveUp="onOptionMoveUp(index, OptionType.Choice)"
+						@moveDown="onOptionMoveDown(index, OptionType.Choice)"
+						@tabbedOut="checkValidOption" />
+				</TransitionGroup>
 			</Draggable>
 			<li
 				v-if="allowOtherAnswer"
@@ -176,6 +176,9 @@
 		<OptionInputDialog
 			v-model:open="isOptionDialogShown"
 			@multipleAnswers="handleMultipleOptions" />
+		<template #insert>
+			<slot name="insert" />
+		</template>
 	</Question>
 </template>
 
@@ -384,6 +387,16 @@ export default {
 
 			this.errorMessage = null
 			return true
+		},
+
+		onDragStart() {
+			this.isDragging = true
+		},
+
+		onDragEnd() {
+			this.$nextTick(() => {
+				this.isDragging = false
+			})
 		},
 
 		/**
@@ -659,7 +672,7 @@ export default {
 .options-list-transition-enter-from,
 .options-list-transition-leave-to {
 	opacity: 0;
-	transform: translateX(44px);
+	transform: translateX(var(--default-clickable-area));
 }
 
 /* ensure leaving items are taken out of layout flow so that moving

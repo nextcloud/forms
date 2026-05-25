@@ -39,7 +39,7 @@
 					v-if="unrankedOptions.length > 0"
 					v-model="unrankedOptions"
 					class="ranking-unranked__pool"
-					:animation="200"
+					:animation="300"
 					:group="'ranking_' + id"
 					@end="emitValues">
 					<button
@@ -63,55 +63,63 @@
 				<Draggable
 					v-model="rankedOptions"
 					class="ranking-ranked__list"
-					:animation="200"
+					:animation="300"
 					:group="'ranking_' + id"
+					target=".sort-target"
 					direction="vertical"
 					handle=".ranking-item__drag-handle"
 					@end="onRankingEnd">
-					<div
-						v-for="(option, index) in rankedOptions"
-						:key="option.id"
-						class="ranking-item"
-						role="listitem">
-						<NcActions
-							:id="`ranking-${option.id}-drag`"
-							:container="`#ranking-${option.id}-drag`"
-							:aria-label="t('forms', 'Move option actions')"
-							class="ranking-item__drag-handle"
-							variant="tertiary-no-background">
-							<template #icon>
-								<NcIconSvgWrapper :svg="IconDragIndicator" />
-							</template>
-							<NcActionButton
-								ref="buttonOptionUp"
-								:disabled="index === 0"
-								@click="onMoveUp(index)">
+					<TransitionGroup
+						tag="ul"
+						:name="isDragging ? undefined : 'options-list-transition'"
+						class="sort-target">
+						<li
+							v-for="(option, index) in rankedOptions"
+							:key="option.id"
+							class="ranking-item"
+							role="listitem">
+							<NcActions
+								:id="`ranking-${option.id}-drag`"
+								:container="`#ranking-${option.id}-drag`"
+								:aria-label="t('forms', 'Move option actions')"
+								class="ranking-item__drag-handle"
+								variant="tertiary-no-background">
 								<template #icon>
-									<NcIconSvgWrapper :svg="IconArrowUp" />
+									<NcIconSvgWrapper :svg="IconDragIndicator" />
 								</template>
-								{{ t('forms', 'Move option up') }}
-							</NcActionButton>
-							<NcActionButton
-								ref="buttonOptionDown"
-								:disabled="index === rankedOptions.length - 1"
-								@click="onMoveDown(index)">
+								<NcActionButton
+									ref="buttonOptionUp"
+									:disabled="index === 0"
+									@click="onMoveUp(index)">
+									<template #icon>
+										<NcIconSvgWrapper :svg="IconArrowUp" />
+									</template>
+									{{ t('forms', 'Move option up') }}
+								</NcActionButton>
+								<NcActionButton
+									ref="buttonOptionDown"
+									:disabled="index === rankedOptions.length - 1"
+									@click="onMoveDown(index)">
+									<template #icon>
+										<NcIconSvgWrapper :svg="IconArrowDown" />
+									</template>
+									{{ t('forms', 'Move option down') }}
+								</NcActionButton>
+							</NcActions>
+							<span class="ranking-item__position"
+								>{{ index + 1 }}.</span
+							>
+							<span class="ranking-item__text">{{ option.text }}</span>
+							<NcButton
+								variant="tertiary"
+								:ariaLabel="t('forms', 'Remove from ranking')"
+								@click="unrankOption(option)">
 								<template #icon>
-									<NcIconSvgWrapper :svg="IconArrowDown" />
+									<NcIconSvgWrapper :svg="IconClose" />
 								</template>
-								{{ t('forms', 'Move option down') }}
-							</NcActionButton>
-						</NcActions>
-						<span class="ranking-item__position">{{ index + 1 }}.</span>
-						<span class="ranking-item__text">{{ option.text }}</span>
-						<NcButton
-							variant="tertiary"
-							:ariaLabel="t('forms', 'Remove from ranking')"
-							@click="unrankOption(option)">
-							<template #icon>
-								<NcIconSvgWrapper :svg="IconClose" />
-							</template>
-						</NcButton>
-					</div>
+							</NcButton>
+						</li>
+					</TransitionGroup>
 				</Draggable>
 				<p v-if="rankedOptions.length === 0" class="ranking-ranked__empty">
 					{{ t('forms', 'Tap options above to rank them') }}
@@ -128,38 +136,38 @@
 				v-else
 				v-model="choices"
 				class="question__content"
-				:animation="200"
+				:animation="300"
 				direction="vertical"
 				handle=".option__drag-handle"
 				invertSwap
-				tag="transition-group"
-				:componentData="{
-					name: isDragging
-						? 'no-external-transition-on-drag'
-						: 'options-list-transition',
-				}"
+				target=".sort-target"
 				@change="saveOptionsOrder('choice')"
-				@start="isDragging = true"
-				@end="isDragging = false">
-				<AnswerInput
-					v-for="(answer, index) in choices"
-					:key="answer.local ? 'option-local' : answer.id"
-					ref="input"
-					:answer="answer"
-					:formId="formId"
-					:index="index"
-					:isUnique="true"
-					:maxIndex="options.length - 1"
-					:maxOptionLength="maxStringLengths.optionText"
-					:isRanking="true"
-					optionType="choice"
-					@createAnswer="onCreateAnswer"
-					@update:answer="updateAnswer"
-					@delete="deleteOption"
-					@focusNext="focusNextInput"
-					@moveUp="onOptionMoveUp(index, OptionType.Choice)"
-					@moveDown="onOptionMoveDown(index, OptionType.Choice)"
-					@tabbedOut="checkValidOption" />
+				@start="onDragStart"
+				@end="onDragEnd">
+				<TransitionGroup
+					tag="ul"
+					:name="isDragging ? undefined : 'options-list-transition'"
+					class="sort-target">
+					<AnswerInput
+						v-for="(answer, index) in choices"
+						:key="answer.local ? 'option-local' : answer.id"
+						ref="input"
+						:answer="answer"
+						:formId="formId"
+						:index="index"
+						:isUnique="true"
+						:maxIndex="options.length - 1"
+						:maxOptionLength="maxStringLengths.optionText"
+						:isRanking="true"
+						optionType="choice"
+						@createAnswer="onCreateAnswer"
+						@update:answer="updateAnswer"
+						@delete="deleteOption"
+						@focusNext="focusNextInput"
+						@moveUp="onOptionMoveUp(index, OptionType.Choice)"
+						@moveDown="onOptionMoveDown(index, OptionType.Choice)"
+						@tabbedOut="checkValidOption" />
+				</TransitionGroup>
 			</Draggable>
 		</template>
 
@@ -167,6 +175,9 @@
 		<OptionInputDialog
 			v-model:open="isOptionDialogShown"
 			@multipleAnswers="handleMultipleOptions" />
+		<template #insert>
+			<slot name="insert" />
+		</template>
 	</Question>
 </template>
 
@@ -286,6 +297,16 @@ export default {
 
 			this.errorMessage = null
 			return true
+		},
+
+		onDragStart() {
+			this.isDragging = true
+		},
+
+		onDragEnd() {
+			this.$nextTick(() => {
+				this.isDragging = false
+			})
 		},
 
 		/**

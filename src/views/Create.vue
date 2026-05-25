@@ -116,108 +116,103 @@
 				<!-- Questions list -->
 				<Draggable
 					v-model="form.questions"
-					:animation="200"
-					tag="transition-group"
-					:componentData="{
-						name: isDragging
-							? 'no-external-transition-on-drag'
-							: 'question-list',
-					}"
+					:animation="300"
+					target=".sort-target"
+					direction="vertical"
+					invertSwap
 					handle=".question__drag-handle"
 					@change="onQuestionOrderChange"
-					@start="isDragging = true"
-					@end="isDragging = false">
-					<component
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in form.questions"
-						:key="question.id"
-						:ref="setQuestionRef"
-						v-bind="form.questions[index]"
-						:canMoveDown="index < form.questions.length - 1"
-						:canMoveUp="index > 0"
-						:answerType="answerTypes[question.type]"
-						:index="index + 1"
-						:maxStringLengths="maxStringLengths"
-						@update:text="(val) => (form.questions[index].text = val)"
-						@update:description="
-							(val) => (form.questions[index].description = val)
-						"
-						@update:isRequired="
-							(val) => (form.questions[index].isRequired = val)
-						"
-						@update:name="(val) => (form.questions[index].name = val)"
-						@update:extraSettings="
-							(val) => (form.questions[index].extraSettings = val)
-						"
-						@update:options="
-							(val) => (form.questions[index].options = val)
-						"
-						@clone="cloneQuestion(question)"
-						@delete="deleteQuestion(question.id)"
-						@moveDown="onMoveDown(index)"
-						@moveUp="onMoveUp(index)" />
+					@start="onDragStart"
+					@end="onDragEnd">
+					<TransitionGroup
+						tag="ul"
+						:name="isDragging ? undefined : 'question-list'"
+						class="sort-target">
+						<component
+							:is="answerTypes[question.type].component"
+							v-for="(question, index) in form.questions"
+							:key="question.id"
+							:ref="(el) => setQuestionRef(el, question)"
+							v-bind="form.questions[index]"
+							:canMoveDown="index < form.questions.length - 1"
+							:canMoveUp="index > 0"
+							:answerType="answerTypes[question.type]"
+							:index="index + 1"
+							:maxStringLengths="maxStringLengths"
+							@update:text="
+								(val) => (form.questions[index].text = val)
+							"
+							@update:description="
+								(val) => (form.questions[index].description = val)
+							"
+							@update:isRequired="
+								(val) => (form.questions[index].isRequired = val)
+							"
+							@update:name="
+								(val) => (form.questions[index].name = val)
+							"
+							@update:extraSettings="
+								(val) => (form.questions[index].extraSettings = val)
+							"
+							@update:options="
+								(val) => (form.questions[index].options = val)
+							"
+							@clone="cloneQuestion(question, index)"
+							@delete="deleteQuestion(question.id)"
+							@moveDown="onMoveDown(index)"
+							@moveUp="onMoveUp(index)">
+							<template
+								v-if="index < form.questions.length - 1"
+								#insert>
+								<div
+									class="question-insert"
+									:class="[
+										{
+											'is-open':
+												insertMenuOpenedIndex === index,
+										},
+										{
+											'is-mobile': isMobile,
+										},
+									]">
+									<AddQuestionMenu
+										:menuName="t('forms', 'Insert question')"
+										:aria-label="
+											t(
+												'forms',
+												'Insert question after question {index}',
+												{ index: index + 1 },
+											)
+										"
+										variant="tertiary"
+										:position="index"
+										:isLoadingQuestions="isLoadingQuestions"
+										:answerTypesFilter="answerTypesFilter"
+										:hasSubtypes="hasSubtypes"
+										@update:open="
+											(v) =>
+												(insertMenuOpenedIndex = v
+													? index
+													: null)
+										"
+										@addQuestion="addQuestion" />
+								</div>
+							</template>
+						</component>
+					</TransitionGroup>
 				</Draggable>
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
-					<NcActions
+					<AddQuestionMenu
 						v-model:open="questionMenuOpened"
 						:menuName="t('forms', 'Add a question')"
 						:aria-label="t('forms', 'Add a question')"
-						primary>
-						<template #icon>
-							<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
-							<NcIconSvgWrapper v-else :svg="IconPlus" />
-						</template>
-
-						<template v-if="!activeQuestionType">
-							<NcActionButton
-								v-for="(answer, type) in answerTypesFilter"
-								:key="answer.label"
-								:closeAfterClick="!hasSubtypes(answer)"
-								:disabled="isLoadingQuestions"
-								:isMenu="hasSubtypes(answer)"
-								class="question-menu__question"
-								@click="
-									hasSubtypes(answer)
-										? (activeQuestionType = type)
-										: addQuestion(type)
-								">
-								<template #icon>
-									<NcIconSvgWrapper :svg="answer.icon" />
-								</template>
-								{{ answer.label }}
-							</NcActionButton>
-						</template>
-
-						<template v-else>
-							<NcActionButton
-								:disabled="isLoadingQuestions"
-								class="question-menu__question"
-								@click="activeQuestionType = null">
-								<template #icon>
-									<NcIconSvgWrapper :svg="IconChevronLeft" />
-								</template>
-								{{ t('forms', 'Grid') }}
-							</NcActionButton>
-							<NcActionSeparator />
-
-							<NcActionButton
-								v-for="(answer, type) in answerTypesFilter[
-									activeQuestionType
-								].subtypes"
-								:key="'subtype-' + answer.label"
-								closeAfterClick
-								:disabled="isLoadingQuestions"
-								class="question-menu__question"
-								@click="addQuestion(activeQuestionType, type)">
-								<template #icon>
-									<NcIconSvgWrapper :svg="answer.icon" />
-								</template>
-								{{ answer.label }}
-							</NcActionButton>
-						</template>
-					</NcActions>
+						:isLoadingQuestions="isLoadingQuestions"
+						:answerTypesFilter="answerTypesFilter"
+						:hasSubtypes="hasSubtypes"
+						primary
+						@addQuestion="addQuestion" />
 				</div>
 			</section>
 		</template>
@@ -225,8 +220,6 @@
 </template>
 
 <script>
-import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
-import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -234,16 +227,15 @@ import { emit } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
+import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import AddQuestionMenu from '../components/AddQuestionMenu.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
@@ -264,9 +256,7 @@ export default {
 	components: {
 		Draggable,
 		NcIconSvgWrapper,
-		NcActionButton,
-		NcActionSeparator,
-		NcActions,
+		AddQuestionMenu,
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
@@ -282,9 +272,8 @@ export default {
 
 	setup() {
 		return {
-			IconChevronLeft,
 			IconLock,
-			IconPlus,
+			isMobile: useIsMobile(),
 		}
 	},
 
@@ -299,7 +288,12 @@ export default {
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
 			activeQuestionType: null,
-			questionRefs: [],
+			questionRefsMap: {},
+
+			// when set to a number, the next created question will be inserted at this index
+			insertMenuOpenedIndex: null,
+			// controls per-question insert menu visibility
+			insertMenuOpened: false,
 		}
 	},
 
@@ -395,19 +389,27 @@ export default {
 		},
 	},
 
-	beforeUpdate() {
-		this.questionRefs = []
-	},
-
 	mounted() {
 		this.fetchFullForm(this.form.id)
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
-		setQuestionRef(el) {
+		onDragStart() {
+			this.isDragging = true
+		},
+
+		onDragEnd() {
+			this.$nextTick(() => {
+				this.isDragging = false
+			})
+		},
+
+		setQuestionRef(el, question) {
 			if (el) {
-				this.questionRefs.push(el)
+				this.questionRefsMap[question.id] = el
+			} else {
+				delete this.questionRefsMap[question.id]
 			}
 		},
 
@@ -485,41 +487,30 @@ export default {
 		 *
 		 * @param {string} type the question type, see AnswerTypes
 		 * @param {string|null} subtype the question subtype, see AnswerTypes.subtypes
+		 * @param {number|null} position where the new question should be added
 		 */
-		async addQuestion(type, subtype = null) {
+		async addQuestion(type, subtype = null, position = null) {
 			this.activeQuestionType = null
 			const text = ''
 			this.isLoadingQuestions = true
 
 			try {
+				const body = { type, text, subtype }
+				if (position !== null) {
+					// position: current question position + 2 (0-based index: +1, next position: +1)
+					body.position = position + 2
+				}
+
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
 						id: this.form.id,
 					}),
-					{
-						type,
-						text,
-						subtype,
-					},
+					body,
 				)
 				const question = OcsResponse2Data(response)
 
-				// Add newly created question
-				this.form.questions.push({
-					text,
-					type,
-					answers: [],
-					...question,
-				})
-
-				// Focus newly added question
-				this.$nextTick(() => {
-					const lastQuestion =
-						this.questionRefs[this.questionRefs.length - 1]
-					lastQuestion?.focus()
-				})
-
-				emit('forms:last-updated:set', this.form.id)
+				// Delegate insertion & focus handling to helper
+				this.insertQuestion(question, { text, type, answers: [] }, position)
 			} catch (error) {
 				logger.error('Error while adding new question', { error })
 				showError(
@@ -565,36 +556,68 @@ export default {
 			}
 		},
 
+		insertQuestion(questionData, defaultFields = {}, position = null) {
+			const newQuestionObj = {
+				...defaultFields,
+				...questionData,
+			}
+
+			let insertAt = null
+			if (
+				questionData
+				&& questionData.order !== undefined
+				&& questionData.order !== null
+			) {
+				insertAt = Number(questionData.order) - 1
+			} else if (position !== null) {
+				insertAt = position
+			}
+
+			if (insertAt !== null && insertAt <= this.form.questions.length) {
+				this.form.questions.splice(insertAt, 0, newQuestionObj)
+				this.$nextTick(() => {
+					// Prefer ref by id when available, fallback to positional refs
+					this.questionRefsMap[newQuestionObj.id]?.focus()
+				})
+			} else {
+				this.form.questions.push(newQuestionObj)
+				this.$nextTick(() => {
+					this.questionRefsMap[newQuestionObj.id]?.focus()
+				})
+			}
+
+			emit('forms:last-updated:set', this.form.id)
+		},
+
 		/**
 		 * Clone a question
 		 *
 		 * @param {number} id the question id to clone in the current form
+		 * @param {number} position where the cloned question should be added
 		 */
-		async cloneQuestion({ id }) {
+		async cloneQuestion({ id }, position) {
 			this.isLoadingQuestions = true
 
 			try {
-				const response = await axios.post(
-					generateOcsUrl(
-						'apps/forms/api/v3/forms/{id}/questions?fromId={questionId}',
-						{
-							id: this.form.id,
-							questionId: id,
-						},
-					),
+				const url = generateOcsUrl(
+					'apps/forms/api/v3/forms/{id}/questions?fromId={questionId}',
+					{
+						id: this.form.id,
+						questionId: id,
+					},
 				)
+
+				const body = {}
+				if (position !== null) {
+					// position: current question position + 2 (0-based index: +1, next position: +1)
+					body.position = position + 2
+				}
+
+				const response = await axios.post(url, body)
 				const question = OcsResponse2Data(response)
 
-				this.form.questions.push({
-					answers: [],
-					...question,
-				})
-
-				this.$nextTick(() => {
-					const lastQuestion =
-						this.questionRefs[this.questionRefs.length - 1]
-					lastQuestion?.focus()
-				})
+				// Delegate insertion & focus handling to helper
+				this.insertQuestion(question, { answers: [] })
 			} catch (error) {
 				logger.error(`Error while duplicating question ${id}`, {
 					error,
@@ -632,12 +655,6 @@ export default {
 	},
 }
 </script>
-
-<style lang="scss">
-.question-list-move {
-	transition: all 0.2s ease;
-}
-</style>
 
 <style lang="scss" scoped>
 .emptycontent {
@@ -736,5 +753,46 @@ export default {
 			margin-inline-start: var(--default-clickable-area);
 		}
 	}
+}
+
+.question-list-move,
+.question-list-enter-active,
+.question-list-leave-active {
+	transition: all var(--animation-slow) ease;
+}
+
+.question-list-enter-from,
+.question-list-leave-to {
+	opacity: 0;
+	transform: translateX(var(--clickable-area-large));
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.question-list-leave-active {
+	position: absolute;
+}
+
+.question-insert {
+	/* closer to the question above */
+	position: relative;
+	margin-block-end: -34px;
+	inset-block-end: -16px;
+	margin-inline-start: -12px;
+	width: calc(100% - var(--default-clickable-area));
+	display: flex;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+.question-insert.is-mobile {
+	opacity: 0.3;
+}
+
+.question:hover > .question-insert,
+.question-insert:focus-within,
+.question-insert.is-open {
+	opacity: 1;
 }
 </style>

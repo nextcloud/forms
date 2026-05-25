@@ -485,6 +485,7 @@ class ApiController extends OCSController {
 	 * @param FormsQuestionGridCellType $subtype the new question subtype
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
+	 * @param ?int $position (optional) the position of the new question
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Invalid type
 	 * @throws OCSBadRequestException Datetime question type no longer supported
@@ -499,7 +500,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
-	public function newQuestion(int $formId, ?string $type = null, ?string $subtype = null, string $text = '', ?int $fromId = null): DataResponse {
+	public function newQuestion(int $formId, ?string $type = null, ?string $subtype = null, string $text = '', ?int $fromId = null, ?int $position = null): DataResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
 		$this->formsService->obtainFormLock($form);
 
@@ -526,13 +527,20 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
-			// Retrieve all active questions sorted by Order. Takes the order of the last array-element and adds one.
+			// Retrieve all active questions sorted by Order.
 			$questions = $this->questionMapper->findByForm($formId);
-			$lastQuestion = array_pop($questions);
-			if ($lastQuestion) {
-				$questionOrder = $lastQuestion->getOrder() + 1;
+
+			if ($position !== null) {
+				$position = $this->shiftQuestionsForInsert($questions, $position);
+				$questionOrder = $position;
 			} else {
-				$questionOrder = 1;
+				// Append at the end
+				$lastQuestion = array_pop($questions);
+				if ($lastQuestion) {
+					$questionOrder = $lastQuestion->getOrder() + 1;
+				} else {
+					$questionOrder = 1;
+				}
 			}
 
 			$question = new Question();
@@ -574,7 +582,13 @@ class ApiController extends OCSController {
 
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
-			$questionData['order'] = end($allQuestions)->getOrder() + 1;
+
+			if ($position !== null) {
+				$position = $this->shiftQuestionsForInsert($allQuestions, $position);
+				$questionData['order'] = $position;
+			} else {
+				$questionData['order'] = end($allQuestions)->getOrder() + 1;
+			}
 
 			$newQuestion = Question::fromParams($questionData);
 			$this->questionMapper->insert($newQuestion);
@@ -1999,5 +2013,37 @@ class ApiController extends OCSController {
 		$form->setLockedUntil(null);
 		$this->formMapper->update($form);
 		return new DataResponse($form->getOwnerId());
+	}
+
+	/**
+	 * Shift existing question orders to make room for an insertion at $position.
+	 * Normalizes the given $position to the valid range and updates all questions
+	 * with order >= $position by incrementing their order by one.
+	 *
+	 * @param Question[] $questions
+	 * @param int $position 1-based desired position
+	 * @return int normalized position
+	 */
+	private function shiftQuestionsForInsert(array $questions, int $position): int {
+		$maxOrder = 0;
+		if (count($questions) > 0) {
+			$maxOrder = end($questions)->getOrder();
+		}
+		if ($position < 1) {
+			$position = 1;
+		}
+		if ($position > $maxOrder + 1) {
+			$position = $maxOrder + 1;
+		}
+
+		for ($i = count($questions) - 1; $i >= 0; $i--) {
+			$q = $questions[$i];
+			if ($q->getOrder() >= $position) {
+				$q->setOrder($q->getOrder() + 1);
+				$this->questionMapper->update($q);
+			}
+		}
+
+		return $position;
 	}
 }
