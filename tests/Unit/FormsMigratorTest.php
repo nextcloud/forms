@@ -5,10 +5,10 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Forms\Tests\Unit;
 
 use OCA\Forms\Db\AnswerMapper;
-
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
@@ -24,7 +24,6 @@ use OCP\UserMigration\IExportDestination;
 use OCP\UserMigration\IImportSource;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Test\TestCase;
 
@@ -129,7 +128,6 @@ class FormsMigratorTest extends TestCase {
   }
 ]
 JSON
-
 			]
 		];
 	}

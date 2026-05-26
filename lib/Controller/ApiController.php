@@ -28,7 +28,6 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
-
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
@@ -53,7 +52,6 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -719,7 +717,6 @@ class ApiController extends OCSController {
 			'questionId' => $questionId,
 		]);
 
-
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
 		$this->formsService->obtainFormLock($form);
 
@@ -1244,7 +1241,6 @@ class ApiController extends OCSController {
 		foreach ($this->formsService->getQuestions($formId) as $question) {
 			$questions[$question['id']] = $question;
 		}
-
 
 		// Append Display Names
 		$submissions = array_map(function (array $submission) use ($questions) {

@@ -9,20 +9,17 @@ declare(strict_types=1);
 namespace OCA\Forms\Tests\Unit\BackgroundJob;
 
 use Exception;
-
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCP\AppFramework\Utility\ITimeFactory;
-
 use OCP\BackgroundJob\IJobList;
 use OCP\Files\NotFoundException;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 

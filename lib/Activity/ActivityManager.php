@@ -8,7 +8,6 @@
 namespace OCA\Forms\Activity;
 
 use OCA\Forms\Db\Form;
-
 use OCA\Forms\Service\CirclesService;
 use OCP\Activity\IManager;
 use OCP\IGroupManager;

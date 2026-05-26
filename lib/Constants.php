@@ -41,7 +41,6 @@ class Constants {
 		self::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT => 'int',
 	];
 
-
 	/**
 	 * Maximum String lengths, the database is set to store.
 	 */
