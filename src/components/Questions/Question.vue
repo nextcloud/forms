@@ -85,7 +85,7 @@
 					<template v-if="isRequired" #icon>
 						<IconOverlay>
 							<template #overlay>
-								<NcIconSvgWrapper :svg="IconAsterisk" />
+								<NcIconSvgWrapper :svg="IconAsterisk" inline />
 							</template>
 							<NcIconSvgWrapper :svg="IconDotsHorizontal" />
 						</IconOverlay>
