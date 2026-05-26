@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.2.8 - 2026-05-26
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.7...v5.2.8)
+
+### Fixed
+
+- [stable5.2] fix: only clone question from same form by @backportbot[bot] in [\#3362](https://github.com/nextcloud/forms/pull/3362)
+- [stable5.2] fix: only allow modifying of sharing to form owners by @backportbot[bot] in [\#3310](https://github.com/nextcloud/forms/pull/3310)
+
 ## v5.2.7 - 2026-04-14
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.6...v5.2.7)
