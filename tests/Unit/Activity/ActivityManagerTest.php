@@ -247,48 +247,38 @@ class ActivityManagerTest extends TestCase {
 		$form->setOwnerId('formOwner');
 		$submitterId = 'submittingUser';
 
-		if ($shareType === IShare::TYPE_CIRCLE) {
-			$this->circlesService->expects($this->once())
-				->method('getCircleUsers')
-				->with('sharedCircle')
-				->willReturn($sharedUsers);
-		} elseif ($shareType === IShare::TYPE_GROUP) {
-			$users = array_map(function ($name) {
-				$user = $this->createMock(IUser::class);
-				$user->expects($this->once())->method('getUID')->willReturn($name);
-				return $user;
-			}, $sharedUsers);
-			$group = $this->createMock(IGroup::class);
-			$group->expects($this->once())->method('getUsers')->willReturn($users);
-			$this->groupManager->expects($this->once())->method('get')->willReturn($group);
-		}
-
 		$event = $this->createMock(IEvent::class);
-		$this->manager->expects($this->exactly(count($expected)))
+		$expectedCount = count($sharedUsers ?? []);
+
+		$this->manager->expects($this->exactly($expectedCount))
 			->method('generateEvent')
 			->willReturn($event);
-		$event->expects($this->exactly(count($expected)))->method('setApp')->with('forms')->willReturn($event);
-		$event->expects($this->exactly(count($expected)))->method('setType')->with('forms_newsharedsubmission')->willReturn($event);
-		$event->expects($this->exactly(count($expected)))->method('setAuthor')->with('submittingUser')->willReturn($event);
-		$event->expects($this->exactly(count($expected)))->method('setObject')->with('form', 5)->willReturn($event);
-		$event->expects($this->exactly(count($expected)))->method('setSubject')->with('newsubmission', [
+		$event->expects($this->exactly($expectedCount))->method('setApp')->with('forms')->willReturn($event);
+		$event->expects($this->exactly($expectedCount))->method('setType')->with('forms_newsharedsubmission')->willReturn($event);
+		$event->expects($this->exactly($expectedCount))->method('setAuthor')->with('submittingUser')->willReturn($event);
+		$event->expects($this->exactly($expectedCount))->method('setObject')->with('form', 5)->willReturn($event);
+		$event->expects($this->exactly($expectedCount))->method('setSubject')->with('newsubmission', [
 			'userId' => 'submittingUser',
 			'formTitle' => 'TestForm-Title',
 			'formHash' => 'abcdefg12345'
 		])->willReturn($event);
 		$affectedUsers = [];
-		$event->expects($this->exactly(count($sharedUsers)))
+		$event->expects($this->exactly($expectedCount))
 			->method('setAffectedUser')
 			->willReturnCallback(function (string $userId) use (&$affectedUsers, &$event) {
 				$affectedUsers[] = $userId;
 				return $event;
 			});
 
-		$this->manager->expects($this->exactly(count($expected)))
+		$this->manager->expects($this->exactly($expectedCount))
 			->method('publish')
 			->with($event);
 
-		$this->activityManager->publishNewSharedSubmission($form, $shareType, $shareWith, $submitterId);
-		$this->assertEquals($sharedUsers, $affectedUsers);
+		// Call per-user publisher for each expected shared user (new API)
+		foreach ($sharedUsers ?? [] as $userId) {
+			$this->activityManager->publishNewSharedSubmission($form, $userId, $submitterId);
+		}
+
+		$this->assertEquals($sharedUsers ?? [], $affectedUsers);
 	}
 }
