@@ -8,7 +8,6 @@
 namespace OCA\Forms\Activity;
 
 use Exception;
-
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\CirclesService;
 use OCP\Activity\Exceptions\UnknownActivityException;
@@ -79,16 +78,12 @@ class Provider implements IProvider {
 		switch ($subject) {
 			case ActivityConstants::SUBJECT_NEWSHARE:
 				return $l10n->t('{user} has shared the form {formTitle} with you');
-
 			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
 				return $l10n->t('{user} has shared the form {formTitle} with group {group}');
-
 			case ActivityConstants::SUBJECT_NEWCIRCLESHARE:
 				return $l10n->t('{user} has shared the form {formTitle} with team {circle}');
-
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
 				return $l10n->t('Your form {formTitle} was answered by {user}');
-
 			default:
 				$this->logger->warning('Some unknown activity has been found: ' . $subject);
 				throw new UnknownActivityException();
@@ -269,10 +264,8 @@ class Provider implements IProvider {
 			case ActivityConstants::SUBJECT_NEWSHARE:
 			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
 				return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/shared.svg'));
-
 			case ActivityConstants::SUBJECT_NEWSUBMISSION:
 				return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/add.svg'));
-
 			default:
 				return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('forms', 'forms-dark.svg'));
 		}

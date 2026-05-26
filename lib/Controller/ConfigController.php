@@ -17,7 +17,6 @@ use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Services\IAppConfig;
 use OCP\IRequest;
-
 use Psr\Log\LoggerInterface;
 
 #[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]

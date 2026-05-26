@@ -5,11 +5,11 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Circles\Model\Circle;
 use OCA\Forms\Constants;
-
 use OCA\Forms\Controller\ShareApiController;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -38,10 +38,8 @@ use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
-
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 use Throwable;
 
@@ -447,7 +445,6 @@ class ShareApiControllerTest extends TestCase {
 		$this->circlesService->expects($this->once())
 			->method('isCirclesEnabled')
 			->willReturn(false);
-
 
 		$this->expectException(OCSBadRequestException::class);
 

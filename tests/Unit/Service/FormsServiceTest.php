@@ -30,7 +30,6 @@ namespace OCA\Forms\Tests\Unit\Service;
 
 use OCA\Circles\Model\Circle;
 use OCA\Forms\Activity\ActivityManager;
-
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -61,7 +60,6 @@ use OCP\Security\ISecureRandom;
 use OCP\Share\IShare;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
-
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 

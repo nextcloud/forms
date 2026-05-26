@@ -13,7 +13,6 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
-
 use OCP\Migration\SimpleMigrationStep;
 
 /**

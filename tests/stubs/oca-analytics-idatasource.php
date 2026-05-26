@@ -6,6 +6,7 @@
  */
 
 // reference for: use OCA\Analytics\Datasource\DatasourceEvent;
+
 namespace OCA\Analytics\Datasource {
 	use OCP\EventDispatcher\Event;
 

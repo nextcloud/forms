@@ -5,10 +5,10 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Forms\Tests\Unit\Listener;
 
 use OCA\Forms\BackgroundJob\UserDeletedJob;
-
 use OCA\Forms\Listener\UserDeletedListener;
 use OCP\BackgroundJob\IJobList;
 use OCP\IUser;
@@ -16,7 +16,6 @@ use OCP\User\Events\UserCreatedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 
 class UserDeletedListenerTest extends TestCase {
