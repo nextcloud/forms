@@ -562,6 +562,10 @@ class ApiController extends OCSController {
 
 			try {
 				$sourceQuestion = $this->questionMapper->findById($fromId);
+				// Only allow cloning questions that belong to the same form
+				if ($sourceQuestion->getFormId() !== $formId) {
+					throw new OCSBadRequestException('Question doesn\'t belong to given form');
+				}
 				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
 			} catch (IMapperException $e) {
 				$this->logger->debug('Could not find question');
