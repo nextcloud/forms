@@ -5,6 +5,17 @@
 
 # Changelog
 
+## v5.3.0-alpha.1 - 2026-05-26
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.0...v5.3.0-alpha.1)
+
+### Fixed
+
+- fix: overlay icon alignment by @Chartman123 in [\#3359](https://github.com/nextcloud/forms/pull/3359)
+- fix: replace icon components with NcIconSvgWrapper by @Chartman123 in [\#3352](https://github.com/nextcloud/forms/pull/3352)
+- fix: only clone question from same form by @Chartman123 in [\#3361](https://github.com/nextcloud/forms/pull/3361)
+- fix(a11y): announce form submission success to screen readers by @pringelmann in [\#3238](https://github.com/nextcloud/forms/pull/3238)
+
 ## v5.3.0-alpha.0 - 2026-05-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.0...v5.3.0-alpha.0)
@@ -26,7 +37,6 @@
 - fix: Prevent infinity loop on form deletion by @Koc in [\#3343](https://github.com/nextcloud/forms/pull/3343)
 - Fix copypasting from responses page resulting in wrong paragraph/newline placement by @jancborchardt in [\#3328](https://github.com/nextcloud/forms/pull/3328)
 - fix(settings): properly handle loading state by @susnux in [\#3316](https://github.com/nextcloud/forms/pull/3316)
-- fix: only allow modifying of sharing to form owners by @Chartman123 in [\#3308](https://github.com/nextcloud/forms/pull/3308)
 - fix(a11y): connect question inputs to heading and description via aria by @pringelmann in [\#3228](https://github.com/nextcloud/forms/pull/3228)
 - fix: dropdown and checkboxes fields are broken after grid type introduction by @Koc in [\#3134](https://github.com/nextcloud/forms/pull/3134)
 
@@ -45,6 +55,14 @@
 - Enh/e2e tests by @pringelmann in [\#3250](https://github.com/nextcloud/forms/pull/3250)
 - chore: Support NC34 by @nfebe in [\#3201](https://github.com/nextcloud/forms/pull/3201)
 
+## v5.2.8 - 2026-05-26
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.7...v5.2.8)
+
+### Fixed
+
+- fix: only clone question from same form by @Chartman123 in [\#3361](https://github.com/nextcloud/forms/pull/3361)
+- fix: only allow modifying of sharing to form owners by @Chartman123 in [\#3308](https://github.com/nextcloud/forms/pull/3308)
 
 ## v5.2.7 - 2026-04-17
 
@@ -55,7 +73,6 @@
 - fix: clean up file shares on collaborator removal by @pringelmann in [\#3291](https://github.com/nextcloud/forms/pull/3291)
 - fix: require explicit share permission for bulk submission endpoints by @pringelmann in [\#3290](https://github.com/nextcloud/forms/pull/3290)
 - fix: cap pagination limit for submissions endpoint by @pringelmann in [\#3276](https://github.com/nextcloud/forms/pull/3276)
-
 
 ## v5.2.6 - 2026-04-07
 
