@@ -1193,9 +1193,46 @@ class FormsServiceTest extends TestCase {
 						'shareWith' => 'user2',
 						'shareType' => IShare::TYPE_USER,
 						'permissions' => [ Constants::PERMISSION_RESULTS ]
-					]],
+					]
+				],
 				1
 			],
+			'group-share' => [
+				[[
+					'shareWith' => 'sharedGroup',
+					'shareType' => IShare::TYPE_GROUP,
+					'permissions' => [ Constants::PERMISSION_RESULTS ]
+				]],
+				2
+			],
+			'circle-share' => [
+				[[
+					'shareWith' => 'sharedCircle',
+					'shareType' => IShare::TYPE_CIRCLE,
+					'permissions' => [ Constants::PERMISSION_RESULTS ]
+				]],
+				2
+			],
+			'overlapping-share' => [
+				[
+					[
+						'shareWith' => 'user2',
+						'shareType' => IShare::TYPE_USER,
+						'permissions' => [ Constants::PERMISSION_RESULTS ]
+					],
+					[
+						'shareWith' => 'sharedGroup',
+						'shareType' => IShare::TYPE_GROUP,
+						'permissions' => [ Constants::PERMISSION_RESULTS ]
+					],
+					[
+						'shareWith' => 'sharedCircle',
+						'shareType' => IShare::TYPE_CIRCLE,
+						'permissions' => [ Constants::PERMISSION_RESULTS ]
+					]
+				],
+				2
+			]
 		];
 	}
 
@@ -1245,6 +1282,24 @@ class FormsServiceTest extends TestCase {
 		$this->activityManager->expects($this->once())
 			->method('publishNewSubmission')
 			->with($form, $submitter);
+
+		// If shares contain group or circle entries, mock resolution to user ids
+		foreach ($shares as $share) {
+			if (($share['shareType'] ?? null) === IShare::TYPE_GROUP) {
+				$sharedUsers = ['ownerUser', 'user1', 'user2'];
+				$users = array_map(function ($name) {
+					$user = $this->createMock(IUser::class);
+					$user->method('getUID')->willReturn($name);
+					return $user;
+				}, $sharedUsers);
+				$group = $this->createMock(IGroup::class);
+				$group->method('getUsers')->willReturn($users);
+				$this->groupManager->expects($this->once())->method('get')->with($share['shareWith'])->willReturn($group);
+			}
+			if (($share['shareType'] ?? null) === IShare::TYPE_CIRCLE) {
+				$this->circlesService->expects($this->once())->method('getCircleUsers')->with($share['shareWith'])->willReturn(['ownerUser', 'user1', 'user2']);
+			}
+		}
 
 		$this->activityManager->expects($this->exactly($shareNotifications))
 			->method('publishNewSharedSubmission');
