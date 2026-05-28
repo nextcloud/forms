@@ -1569,6 +1569,14 @@ class ApiController extends OCSController {
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/export')]
 	public function exportSubmissionsToCloud(int $formId, string $path, string $fileFormat = Constants::DEFAULT_FILE_FORMAT) {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS);
+
+		// canSeeResults() (used by getFormIfAllowed) also accepts submitters;
+		// exporting every submission needs the strict PERMISSION_RESULTS grant.
+		$permissions = $this->formsService->getPermissions($form);
+		if (!in_array(Constants::PERMISSION_RESULTS, $permissions, true)) {
+			throw new OCSForbiddenException('The current user has no permission to get the results for this form');
+		}
+
 		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
 
 		return new DataResponse($file->getName());
