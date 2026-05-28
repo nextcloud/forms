@@ -703,10 +703,9 @@ class FormsService {
 	 * Creates activities for new submissions on a form
 	 *
 	 * @param Form $form Related Form
-	 * @param string $submitter The ID of the user who submitted the form. Can also be our 'anon-user-'-ID
+	 * @param Submission $submission the current submission
 	 */
 	public function notifyNewSubmission(Form $form, Submission $submission): void {
-		$shares = $this->getShares($form->getId());
 		try {
 			$this->activityManager->publishNewSubmission($form, $submission->getUserId());
 		} catch (\Exception $e) {
@@ -718,12 +717,52 @@ class FormsService {
 			);
 		}
 
+		$shares = $this->getShares($form->getId());
+		$sharedUserIds = [];
 		foreach ($shares as $share) {
 			if (!in_array(Constants::PERMISSION_RESULTS, $share['permissions'])) {
 				continue;
 			}
 			try {
-				$this->activityManager->publishNewSharedSubmission($form, $share['shareType'], $share['shareWith'], $submission->getUserId());
+				switch ($share['shareType']) {
+					case IShare::TYPE_USER:
+						$sharedUserIds[] = $share['shareWith'];
+						break;
+					case IShare::TYPE_GROUP:
+						$group = $this->groupManager->get($share['shareWith']);
+						if ($group !== null) {
+							foreach ($group->getUsers() as $user) {
+								$sharedUserIds[] = $user->getUID();
+							}
+						}
+						break;
+					case IShare::TYPE_CIRCLE:
+						$users = $this->circlesService->getCircleUsers($share['shareWith']);
+						foreach ($users as $userId) {
+							$sharedUserIds[] = $userId;
+						}
+						break;
+					default:
+						// ignore other share types
+				}
+			} catch (\Exception $e) {
+				// Handle exceptions silently, as this is not critical.
+				// We don't want to break the submission process just because of an activity error.
+				$this->logger->error(
+					'Error while resolving users',
+					[$e]
+				);
+			}
+		}
+
+		// Deduplicate and exclude form owner to avoid duplicates
+		$sharedUserIds = array_unique(array_filter($sharedUserIds, function (string $userId) use ($form) {
+			return $userId !== $form->getOwnerId();
+		}));
+
+		foreach ($sharedUserIds as $userId) {
+			try {
+				$this->activityManager->publishNewSharedSubmission($form, $userId, $submission->getUserId());
 			} catch (\Exception $e) {
 				// Handle exceptions silently, as this is not critical.
 				// We don't want to break the submission process just because of an activity error.
