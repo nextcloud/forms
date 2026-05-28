@@ -5,6 +5,17 @@
 
 # Changelog
 
+## v5.2.9 - 2026-05-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.8...v5.2.9)
+
+### Fixed
+
+- [stable5.2] fix: only send a single submission notification per user by @Chartman123 in [\#3364](https://github.com/nextcloud/forms/pull/3364)
+- [stable5.2] fix(api): re-check result permission in submission export by @backportbot[bot] in [\#3367](https://github.com/nextcloud/forms/pull/3367)
+- [stable5.2] fix(l10n): Update translations from Transifex
+
+
 ## v5.2.8 - 2026-05-26
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.7...v5.2.8)
