@@ -55,6 +55,15 @@
 - Enh/e2e tests by @pringelmann in [\#3250](https://github.com/nextcloud/forms/pull/3250)
 - chore: Support NC34 by @nfebe in [\#3201](https://github.com/nextcloud/forms/pull/3201)
 
+## v5.2.9 - 2026-05-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.8...v5.2.9)
+
+### Enhancements
+
+- Re-check result permission in submission export by @pringelmann in [\#3365](https://github.com/nextcloud/forms/pull/3365)
+- fix: only send a single submission notification per user by @Chartman123 in [\#3363](https://github.com/nextcloud/forms/pull/3363)
+
 ## v5.2.8 - 2026-05-26
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.7...v5.2.8)
