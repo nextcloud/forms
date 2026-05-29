@@ -579,12 +579,8 @@ export default {
 		values: {
 			immediate: true,
 			handler(newValues) {
-				if (newValues && newValues.trigger) {
-					this.triggerValues = newValues.trigger
-				}
-				if (newValues && newValues.subQuestions) {
-					this.subQuestionValues = { ...newValues.subQuestions }
-				}
+				this.triggerValues = newValues.trigger
+				this.subQuestionValues = { ...newValues.subQuestions }
 			},
 		},
 	},
