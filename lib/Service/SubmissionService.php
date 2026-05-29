@@ -33,6 +33,7 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IMailer;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -697,15 +698,31 @@ class SubmissionService {
 	}
 
 	private function setCellValue(Worksheet $activeWorksheet, int $column, int $row, mixed $value, string $fileFormat): void {
-		// Explicitly set the type of the value to string for values that start with '=' to prevent it being interpreted as formulas
-		if (is_string($value)) {
-			$activeWorksheet->getCell([$column, $row])
-				->setValueExplicit($fileFormat === 'csv'
-					? $this->escapeCSV($value)
-					: $value,
-				);
-		} else {
+		if (!is_string($value)) {
 			$activeWorksheet->setCellValue([$column, $row], $value);
+			return;
 		}
+
+		// CSV is escaped (not typed) to neutralise formula-triggering values when opened in a spreadsheet app.
+		if ($fileFormat === 'csv') {
+			$activeWorksheet->getCell([$column, $row])
+				->setValueExplicit($this->escapeCSV($value), DataType::TYPE_STRING);
+			return;
+		}
+
+		// Store numeric-looking answers (e.g. Radio labels "1"–"5") as numbers so they can be aggregated.
+		// The round-trip check keeps values whose canonical numeric form would differ (leading-zero phone
+		// numbers, "1e5", oversized ids, ...) as text, and the leading-character check preserves the
+		// anti-formula protection for values starting with '=', '+', '-' or '@'.
+		if (is_numeric($value)
+			&& !in_array($value[0], ['=', '+', '-', '@'], true)
+			&& (string)(+$value) === $value) {
+			$activeWorksheet->setCellValue([$column, $row], +$value);
+			return;
+		}
+
+		// Explicitly type as string so values that start with '=' are not interpreted as formulas.
+		$activeWorksheet->getCell([$column, $row])
+			->setValueExplicit($value, DataType::TYPE_STRING);
 	}
 }
