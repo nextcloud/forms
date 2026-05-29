@@ -307,13 +307,6 @@
 </template>
 
 <script>
-import axios from '@nextcloud/axios'
-import { showError } from '@nextcloud/dialogs'
-import { generateOcsUrl } from '@nextcloud/router'
-import { VueDraggable as Draggable } from 'vue-draggable-plus'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcButton from '@nextcloud/vue/components/NcButton'
 // Icons
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
@@ -328,6 +321,14 @@ import IconRadioboxMarked from '@material-symbols/svg-400/outlined/radio_button_
 import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
 import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
+import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
+import axios from '@nextcloud/axios'
+import { showError } from '@nextcloud/dialogs'
+import { generateOcsUrl } from '@nextcloud/router'
+import { VueDraggable as Draggable } from 'vue-draggable-plus'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import BranchConditionEditor from './BranchConditionEditor.vue'
 import Question from './Question.vue'
@@ -339,6 +340,7 @@ import QuestionFile from './QuestionFile.vue'
 import QuestionLinearScale from './QuestionLinearScale.vue'
 import QuestionLong from './QuestionLong.vue'
 import QuestionMultiple from './QuestionMultiple.vue'
+import QuestionRanking from './QuestionRanking.vue'
 import QuestionShort from './QuestionShort.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
 import logger from '../../utils/Logger.js'
@@ -356,6 +358,7 @@ const QUESTION_COMPONENTS = {
 	linearscale: QuestionLinearScale,
 	color: QuestionColor,
 	file: QuestionFile,
+	ranking: QuestionRanking,
 }
 
 export default {
@@ -377,6 +380,7 @@ export default {
 		QuestionLong,
 		QuestionMultiple,
 		QuestionShort,
+		QuestionRanking,
 	},
 
 	mixins: [QuestionMixin],
@@ -482,6 +486,11 @@ export default {
 				},
 				{ type: 'color', label: t('forms', 'Color'), icon: IconPalette },
 				{ type: 'file', label: t('forms', 'File'), icon: IconFile },
+				{
+					type: 'ranking',
+					label: t('forms', 'Ranking'),
+					icon: IconSwapVertical,
+				},
 			]
 		},
 
@@ -588,6 +597,7 @@ export default {
 				linearscale: 'QuestionLinearScale',
 				color: 'QuestionColor',
 				file: 'QuestionFile',
+				ranking: 'QuestionRanking',
 			}
 			return componentMap[type] || null
 		},
@@ -711,6 +721,12 @@ export default {
 
 				file: {
 					titlePlaceholder: t('forms', 'File question title'),
+					warningInvalid: t('forms', 'This question needs a title!'),
+					validate: () => true,
+				},
+
+				ranking: {
+					titlePlaceholder: t('forms', 'Ranking question title'),
 					warningInvalid: t('forms', 'This question needs a title!'),
 					validate: () => true,
 				},
