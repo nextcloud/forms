@@ -282,24 +282,30 @@
 				</div>
 
 				<!-- Submit Mode: Show only the active branch's subquestions -->
-				<div v-else-if="activeBranch" class="active-subquestions">
-					<component
-						:is="getSubQuestionComponentName(subQuestion.type)"
-						v-for="(subQuestion, subIndex) in activeBranch.subQuestions"
-						:key="subQuestion.id"
-						ref="subQuestions"
-						v-bind="subQuestion"
-						:formId="formId"
-						:index="subIndex + index + 1"
-						:maxStringLengths="maxStringLengths"
-						:answerType="
-							getSubQuestionAnswerTypeConfig(subQuestion.type)
-						"
-						:readOnly="true"
-						:values="getSubQuestionValues(subQuestion.id)"
-						@update:values="
-							onSubQuestionValueChange(subQuestion.id, $event)
-						" />
+				<div v-else-if="activeBranches?.length" class="active-subquestions">
+					<div
+						v-for="activeBranch in activeBranches"
+						:key="activeBranch.id">
+						<component
+							:is="getSubQuestionComponentName(subQuestion.type)"
+							v-for="(
+								subQuestion, subIndex
+							) in activeBranch.subQuestions"
+							:key="subQuestion.id"
+							ref="subQuestions"
+							v-bind="subQuestion"
+							:formId="formId"
+							:index="subIndex + index + 1"
+							:maxStringLengths="maxStringLengths"
+							:answerType="
+								getSubQuestionAnswerTypeConfig(subQuestion.type)
+							"
+							:readOnly="true"
+							:values="getSubQuestionValues(subQuestion.id)"
+							@update:values="
+								onSubQuestionValueChange(subQuestion.id, $event)
+							" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -554,11 +560,11 @@ export default {
 			return this.extraSettings?.branches || []
 		},
 
-		activeBranch() {
+		activeBranches() {
 			if (!this.triggerValues || this.triggerValues.length === 0) {
 				return null
 			}
-			return this.branches.find((branch) =>
+			return this.branches.filter((branch) =>
 				this.evaluateBranchCondition(branch),
 			)
 		},
