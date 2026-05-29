@@ -91,7 +91,7 @@
 					:text="text"
 					description=""
 					:isRequired="false"
-					:index="0"
+					:index="index"
 					:options="options"
 					:extraSettings="triggerExtraSettings"
 					:maxStringLengths="maxStringLengths"
@@ -185,7 +185,7 @@
 											"
 											:canMoveUp="subIndex > 0"
 											:formId="formId"
-											:index="subIndex + 1"
+											:index="subIndex + index + 1"
 											:maxStringLengths="maxStringLengths"
 											:answerType="
 												getSubQuestionAnswerTypeConfig(
@@ -296,7 +296,7 @@
 							ref="subQuestions"
 							v-bind="subQuestion"
 							:formId="formId"
-							:index="subIndex + 1"
+							:index="subIndex + index + 1"
 							:maxStringLengths="maxStringLengths"
 							:answerType="
 								getSubQuestionAnswerTypeConfig(subQuestion.type)
