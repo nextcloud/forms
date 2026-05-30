@@ -9,10 +9,8 @@ namespace OCA\Forms\Service;
 
 use DateTime;
 use DateTimeZone;
-
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
-
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\Question;
@@ -26,7 +24,6 @@ use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
-
 use OCP\IL10N;
 use OCP\ITempManager;
 use OCP\IURLGenerator;
@@ -34,11 +31,9 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IMailer;
-
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
-
 use Psr\Log\LoggerInterface;
 
 /**

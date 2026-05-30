@@ -27,7 +27,6 @@ function is_uploaded_file(string|bool|null $filename) {
 	return $value;
 }
 
-
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
@@ -65,10 +64,8 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 
 class ApiControllerTest extends TestCase {
@@ -438,7 +435,6 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn([Constants::PERMISSION_SUBMIT]);
 
-
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1, fileFormat: 'csv');
 	}
@@ -753,7 +749,6 @@ class ApiControllerTest extends TestCase {
 			->method('getUserFolder')
 			->with('currentUser')
 			->willReturn($userFolder);
-
 
 		$this->apiController->uploadFiles(1, 10, '');
 	}

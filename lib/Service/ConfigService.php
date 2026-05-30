@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace OCA\Forms\Service;
 
 use OCA\Forms\Constants;
-
 use OCP\IConfig;
 use OCP\IGroup;
 use OCP\IGroupManager;

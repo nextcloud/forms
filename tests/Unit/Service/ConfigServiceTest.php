@@ -5,18 +5,16 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Forms\Tests\Unit\Service;
 
 use OCA\Forms\Service\ConfigService;
-
 use OCP\IConfig;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserSession;
-
 use PHPUnit\Framework\MockObject\MockObject;
-
 use Test\TestCase;
 
 class ConfigServiceTest extends TestCase {
@@ -105,7 +103,6 @@ class ConfigServiceTest extends TestCase {
 			->will($this->returnCallback(function ($appName, $configKey, $defaultVal) use ($strConfig) {
 				return $strConfig[$configKey];
 			}));
-
 
 		// Mock Group formatting
 		$this->groupManager->expects($this->any())
