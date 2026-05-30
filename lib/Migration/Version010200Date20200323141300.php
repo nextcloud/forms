@@ -14,7 +14,6 @@ use OCP\DB\Types;
 use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
-
 use OCP\Migration\SimpleMigrationStep;
 
 /**

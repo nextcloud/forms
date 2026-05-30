@@ -5,6 +5,7 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Forms\Tests\Unit\Service;
 
 use OCA\Forms\Constants;
@@ -34,7 +35,6 @@ use OCP\IUserSession;
 use OCP\Mail\IMailer;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-
 use Test\TestCase;
 
 class SubmissionServiceTest extends TestCase {

@@ -10,14 +10,12 @@ namespace OCA\Forms\BackgroundJob;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
-
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJobList;
 use OCP\BackgroundJob\QueuedJob;
 use OCP\Files\NotFoundException;
 use OCP\IUserManager;
 use OCP\IUserSession;
-
 use Psr\Log\LoggerInterface;
 use Throwable;
 

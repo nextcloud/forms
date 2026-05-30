@@ -5,11 +5,11 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+
 namespace OCA\Forms\Tests\Unit\Activity\Settings;
 
 use OCA\Forms\Activity\Settings\FormsActivitySettings;
 use OCP\IL10N;
-
 use PHPUnit\Framework\MockObject\MockClass;
 use Test\TestCase;
 
