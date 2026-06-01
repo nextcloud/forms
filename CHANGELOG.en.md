@@ -17,7 +17,6 @@
     Requires an email-validated short text question in the form.
 
     Supported placeholders in subject/body:
-
     - `{formTitle}`, `{formDescription}`
     - `{<fieldName>}` (question `name` or text, sanitized)
 
@@ -28,6 +27,10 @@
 - **Limit the number of submissions**
 
     Set a maximum number of submissions and your form will automatically close once the limit is reached.
+
+- **Insert questions where you need them**
+
+    You can now add questions anywhere you want. This is especially useful for forms with many questions. We also changed the behaviour when a question is copied: they will also be inserted below the existing one.
 
 ## v5.2.0 - 2025-09-25
 

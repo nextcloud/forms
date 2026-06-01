@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.3.0-alpha.2 - 2026-06-01
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.1...v5.3.0-alpha.2)
+
+### Enhancements
+
+- feat: add question at position by @Chartman123 in [\#3360](https://github.com/nextcloud/forms/pull/3360)
+- Re-check result permission in submission export by @pringelmann in [\#3365](https://github.com/nextcloud/forms/pull/3365)
+
 ## v5.3.0-alpha.1 - 2026-05-26
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.0...v5.3.0-alpha.1)
