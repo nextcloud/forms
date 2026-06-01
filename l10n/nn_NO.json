@@ -25,6 +25,7 @@
     "Date" : "Dato",
     "Time" : "Tid",
     "Color" : "Farge",
+    "Results" : "Resultat",
     "Uploading …" : "Lastar opp..."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

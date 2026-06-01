@@ -27,6 +27,7 @@ OC.L10N.register(
     "Date" : "Dato",
     "Time" : "Tid",
     "Color" : "Farge",
+    "Results" : "Resultat",
     "Uploading …" : "Lastar opp..."
 },
 "nplurals=2; plural=(n != 1);");
