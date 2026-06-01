@@ -98,6 +98,9 @@
 				rangeSeparator=" - "
 				@update:modelValue="onValueChange" />
 		</div>
+		<template #insert>
+			<slot name="insert" />
+		</template>
 	</Question>
 </template>
 

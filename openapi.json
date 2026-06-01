@@ -1686,6 +1686,13 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "(optional) id of the question that should be cloned"
+                                    },
+                                    "position": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "(optional) the position of the new question"
                                     }
                                 }
                             }

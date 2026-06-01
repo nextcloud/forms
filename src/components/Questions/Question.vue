@@ -157,6 +157,8 @@
 
 		<!-- Question content -->
 		<slot />
+		<!-- Insert question menu -->
+		<slot name="insert" />
 	</li>
 </template>
 

@@ -27,6 +27,9 @@
 				@keypress="autoSizeText"
 				@keydown.ctrl.enter="onKeydownCtrlEnter" />
 		</div>
+		<template #insert>
+			<slot name="insert" />
+		</template>
 	</Question>
 </template>
 

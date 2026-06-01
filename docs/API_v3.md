@@ -370,6 +370,7 @@ Returns the questions and options of the given form (without submissions).
   |-----------|---------|----------|-------------|
   | _type_ | [QuestionType](DataStructure.md#question-types) | | The question-type of the new question |
   | _text_ | String | yes | _Optional_ The text of the new question. |
+  | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
 - Response: The new question object.
 
 ```
@@ -506,6 +507,10 @@ Creates a clone of a question with all its options.
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form containing the question |
   | _questionId_ | Integer | ID of the question to clone |
+- Parameters:
+  | Parameter | Type | Optional | Description |
+  |-----------|---------|----------|-------------|
+  | _position_ | Integer | yes | _(optional)_ 1-based position to insert the cloned question. When omitted the clone is appended at the end. |
 - Response: Returns cloned question object with the new ID set.
 
 ```
