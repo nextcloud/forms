@@ -119,98 +119,107 @@
 					</p>
 
 					<!-- List of branches -->
-					<div
-						v-for="(branch, branchIndex) in branches"
-						:key="branch.id"
-						class="branch">
-						<div class="branch__header">
-							<span class="branch__label">
-								{{ getBranchLabel(branch, branchIndex) }}
-							</span>
-							<NcButton
-								variant="tertiary"
-								:aria-label="t('forms', 'Delete branch')"
-								@click="deleteBranch(branch.id)">
-								<template #icon>
-									<NcIconSvgWrapper
-										:svg="IconDelete"></NcIconSvgWrapper>
-								</template>
-							</NcButton>
-						</div>
-
-						<!-- Branch Conditions -->
-						<div class="branch__conditions">
-							<BranchConditionEditor
-								:branch="branch"
-								:triggerType="triggerType"
-								:options="options"
-								@update:branch="
-									onBranchUpdate(branchIndex, $event)
-								" />
-						</div>
-
-						<!-- Subquestions for this branch -->
-						<div class="branch__subquestions">
-							<QuestionList
-								v-model="branches[branchIndex].subQuestions"
-								:getComponent="getSubQuestionComponent"
-								:getAnswerType="getSubQuestionAnswerType"
-								:maxStringLengths="maxStringLengths"
-								:baseIndex="index"
-								:animation="200"
-								:formId="formId"
-								:showInsert="true"
-								:insertMenuName="t('forms', 'Insert subquestion')"
-								:answerTypesFilter="subQuestionAnswerTypesFilter"
-								:hasSubtypes="hasSubtypes"
-								:isLoadingQuestions="isLoadingQuestions"
-								@updateProperty="
-									(idx, prop, val) =>
-										updateSubQuestion(
-											branch.id,
-											branches[branchIndex].subQuestions[idx]
-												.id,
-											prop,
-											val,
-										)
-								"
-								@clone="
-									(question) =>
-										cloneSubQuestion(branch.id, question.id)
-								"
-								@delete="
-									(question) =>
-										deleteSubQuestion(branch.id, question.id)
-								"
-								@moveDown="(idx) => onMoveDown(idx, branchIndex)"
-								@moveUp="(idx) => onMoveUp(idx, branchIndex)"
-								@orderChange="onQuestionOrderChange(branchIndex)"
-								@dragStart="isDragging = true"
-								@dragEnd="isDragging = false"
-								@addQuestion="
-									(type, subtype, position) =>
-										addSubQuestion(branch.id, type, position)
-								" />
-
-							<!-- Add subquestion button -->
-							<NcActions :aria-label="t('forms', 'Add subquestion')">
-								<template #icon>
-									<NcIconSvgWrapper :svg="IconPlus" />
-								</template>
-								<NcActionButton
-									v-for="sqType in subQuestionTypesList"
-									:key="sqType.type"
-									:closeAfterClick="true"
-									@click="addSubQuestion(branch.id, sqType.type)">
+					<TransitionGroup
+						tag="div"
+						:name="isDragging ? undefined : 'branch-list'">
+						<div
+							v-for="(branch, branchIndex) in branches"
+							:key="branch.id"
+							class="branch">
+							<div class="branch__header">
+								<span class="branch__label">
+									{{ getBranchLabel(branch, branchIndex) }}
+								</span>
+								<NcButton
+									variant="tertiary"
+									:aria-label="t('forms', 'Delete branch')"
+									@click="deleteBranch(branch.id)">
 									<template #icon>
-										<NcIconSvgWrapper :svg="sqType.icon" />
+										<NcIconSvgWrapper
+											:svg="IconDelete"></NcIconSvgWrapper>
 									</template>
-									{{ sqType.label }}
-								</NcActionButton>
-							</NcActions>
-						</div>
-					</div>
+								</NcButton>
+							</div>
 
+							<!-- Branch Conditions -->
+							<div class="branch__conditions">
+								<BranchConditionEditor
+									:branch="branch"
+									:triggerType="triggerType"
+									:options="options"
+									@update:branch="
+										onBranchUpdate(branchIndex, $event)
+									" />
+							</div>
+
+							<!-- Subquestions for this branch -->
+							<div class="branch__subquestions">
+								<QuestionList
+									v-model="branches[branchIndex].subQuestions"
+									:getComponent="getSubQuestionComponent"
+									:getAnswerType="getSubQuestionAnswerType"
+									:maxStringLengths="maxStringLengths"
+									:baseIndex="index"
+									:animation="200"
+									:formId="formId"
+									:showInsert="true"
+									:insertMenuName="
+										t('forms', 'Insert subquestion')
+									"
+									:answerTypesFilter="subQuestionAnswerTypesFilter"
+									:hasSubtypes="hasSubtypes"
+									:isLoadingQuestions="isLoadingQuestions"
+									@updateProperty="
+										(idx, prop, val) =>
+											updateSubQuestion(
+												branch.id,
+												branches[branchIndex].subQuestions[
+													idx
+												].id,
+												prop,
+												val,
+											)
+									"
+									@clone="
+										(question) =>
+											cloneSubQuestion(branch.id, question.id)
+									"
+									@delete="
+										(question) =>
+											deleteSubQuestion(branch.id, question.id)
+									"
+									@moveDown="(idx) => onMoveDown(idx, branchIndex)"
+									@moveUp="(idx) => onMoveUp(idx, branchIndex)"
+									@orderChange="onQuestionOrderChange(branchIndex)"
+									@dragStart="isDragging = true"
+									@dragEnd="isDragging = false"
+									@addQuestion="
+										(type, subtype, position) =>
+											addSubQuestion(branch.id, type, position)
+									" />
+
+								<!-- Add subquestion button -->
+								<NcActions
+									:aria-label="t('forms', 'Add subquestion')">
+									<template #icon>
+										<NcIconSvgWrapper :svg="IconPlus" />
+									</template>
+									<NcActionButton
+										v-for="sqType in subQuestionTypesList"
+										:key="sqType.type"
+										:closeAfterClick="true"
+										@click="
+											addSubQuestion(branch.id, sqType.type)
+										">
+										<template #icon>
+											<NcIconSvgWrapper :svg="sqType.icon" />
+										</template>
+										{{ sqType.label }}
+									</NcActionButton>
+								</NcActions>
+							</div>
+						</div>
+					</TransitionGroup>
 					<!-- Add new branch button -->
 					<NcButton variant="secondary" @click="addBranch">
 						<template #icon>
@@ -221,30 +230,32 @@
 				</div>
 
 				<!-- Submit Mode: Show only the active branch's subquestions -->
-				<div v-else-if="activeBranches?.length" class="active-subquestions">
-					<div
-						v-for="activeBranch in activeBranches"
-						:key="activeBranch.id">
-						<component
-							:is="getSubQuestionComponentName(subQuestion.type)"
-							v-for="(
-								subQuestion, subIndex
-							) in activeBranch.subQuestions"
-							:key="subQuestion.id"
-							ref="subQuestions"
-							v-bind="subQuestion"
-							:formId="formId"
-							:index="subIndex + index + 1"
-							:maxStringLengths="maxStringLengths"
-							:answerType="
-								getSubQuestionAnswerTypeConfig(subQuestion.type)
-							"
-							:readOnly="true"
-							:values="getSubQuestionValues(subQuestion.id)"
-							@update:values="
-								onSubQuestionValueChange(subQuestion.id, $event)
-							" />
-					</div>
+				<div v-else class="active-subquestions">
+					<TransitionGroup tag="div" name="branch-list">
+						<div
+							v-for="activeBranch in activeBranches"
+							:key="activeBranch.id">
+							<component
+								:is="getSubQuestionComponentName(subQuestion.type)"
+								v-for="(
+									subQuestion, subIndex
+								) in activeBranch.subQuestions"
+								:key="subQuestion.id"
+								ref="subQuestions"
+								v-bind="subQuestion"
+								:formId="formId"
+								:index="subIndex + index + 1"
+								:maxStringLengths="maxStringLengths"
+								:answerType="
+									getSubQuestionAnswerTypeConfig(subQuestion.type)
+								"
+								:readOnly="true"
+								:values="getSubQuestionValues(subQuestion.id)"
+								@update:values="
+									onSubQuestionValueChange(subQuestion.id, $event)
+								" />
+						</div>
+					</TransitionGroup>
 				</div>
 			</div>
 		</div>
@@ -1222,5 +1233,21 @@ export default {
 	margin-top: 16px;
 	padding-left: 16px;
 	border-left: 3px solid var(--color-primary-element);
+}
+
+.branch-list-move,
+.branch-list-enter-active,
+.branch-list-leave-active {
+	transition: all var(--animation-slow) ease;
+}
+
+.branch-list-enter-from,
+.branch-list-leave-to {
+	opacity: 0;
+	transform: translateX(var(--clickable-area-large));
+}
+
+.branch-list-leave-active {
+	position: absolute;
 }
 </style>
