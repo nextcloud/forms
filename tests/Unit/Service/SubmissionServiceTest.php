@@ -35,6 +35,8 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IMailer;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -616,6 +618,53 @@ file2.txt"
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->submissionService->getSubmissionsData($form, 'invalid');
+	}
+
+	public static function dataSetCellValueType(): array {
+		return [
+			// Radio (and similar choice) answers are always strings, even when the option
+			// labels are pure numbers. For spreadsheet formats they must be stored as numbers
+			// so they can be aggregated (e.g. averaged) in the spreadsheet application.
+			'radio-numeric-label-xlsx' => ['xlsx', '3', DataType::TYPE_NUMERIC, 3],
+			'radio-numeric-label-ods' => ['ods', '5', DataType::TYPE_NUMERIC, 5],
+			'numeric-zero' => ['xlsx', '0', DataType::TYPE_NUMERIC, 0],
+			'numeric-decimal' => ['xlsx', '3.5', DataType::TYPE_NUMERIC, 3.5],
+			// Values starting with a formula-trigger character keep the string typing so they
+			// are never interpreted as formulas.
+			'formula' => ['xlsx', '=SUM(A1:A2)', DataType::TYPE_STRING, '=SUM(A1:A2)'],
+			'negative-number' => ['xlsx', '-5', DataType::TYPE_STRING, '-5'],
+			'plus-prefixed' => ['xlsx', '+5', DataType::TYPE_STRING, '+5'],
+			'at-prefixed' => ['xlsx', '@foo', DataType::TYPE_STRING, '@foo'],
+			// Strings whose canonical numeric form would differ must stay text to avoid data
+			// loss (leading-zero phone numbers, scientific notation, trailing decimal zeros, …).
+			'leading-zero' => ['xlsx', '0123456789', DataType::TYPE_STRING, '0123456789'],
+			'scientific' => ['xlsx', '1e5', DataType::TYPE_STRING, '1e5'],
+			'trailing-decimal-zero' => ['xlsx', '3.50', DataType::TYPE_STRING, '3.50'],
+			'text' => ['xlsx', 'Option A', DataType::TYPE_STRING, 'Option A'],
+			// CSV is always escaped and kept as string, even for pure numbers.
+			'csv-number' => ['csv', '3', DataType::TYPE_STRING, '3'],
+			'csv-formula' => ['csv', '=danger', DataType::TYPE_STRING, "'=danger"],
+		];
+	}
+
+	/**
+	 * @dataProvider dataSetCellValueType
+	 */
+	public function testSetCellValueDataType(string $fileFormat, string $value, string $expectedType, mixed $expectedValue): void {
+		$spreadsheet = new Spreadsheet();
+		$worksheet = $spreadsheet->getActiveSheet();
+
+		TestCase::invokePrivate($this->submissionService, 'setCellValue', [$worksheet, 1, 1, $value, $fileFormat]);
+
+		$cell = $worksheet->getCell([1, 1]);
+
+		$this->assertSame($expectedType, $cell->getDataType());
+		if ($expectedType === DataType::TYPE_NUMERIC) {
+			$this->assertEquals($expectedValue, $cell->getValue());
+		} else {
+			// assertSame guards against a numeric-looking string being silently coerced.
+			$this->assertSame($expectedValue, $cell->getValue());
+		}
 	}
 
 	/**
