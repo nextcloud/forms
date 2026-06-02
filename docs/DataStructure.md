@@ -238,7 +238,7 @@ Currently supported Question-Types are:
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                                                          |
 | `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                                                       |
 | `ranking`         | Using pre-defined options, the user ranks them from most to least preferred. Needs at least one option available. Answers are stored in ranked order (one answer row per option). |
-| `conditional`     | A conditional branching question with a trigger question and multiple branches containing subquestions                                     |
+| `conditional`     | A conditional branching question with a trigger question and multiple branches containing subquestions                                                                            |
 
 ## Extra Settings
 
@@ -281,8 +281,8 @@ Supported option types and their intended usage.
 | `column` | Represents a column header when rendering options in a grid-style question.                |
 
 `row` and `column` option types are primarily used together with `grid` question types to build a two-dimensional selection matrix. `choice` is the default for normal option lists.
-| `triggerType`           | `conditional`                         | string           | [See trigger types](#conditional-trigger-types) | The type of trigger question (dropdown, multiple_unique, etc.)          |
-| `branches`              | `conditional`                         | Array            | Array of [Branch objects](#branch-object)   | The branches with conditions and subquestions                               |
+| `triggerType` | `conditional` | string | [See trigger types](#conditional-trigger-types) | The type of trigger question (dropdown, multiple_unique, etc.) |
+| `branches` | `conditional` | Array | Array of [Branch objects](#branch-object) | The branches with conditions and subquestions |
 
 ## Conditional Questions
 
@@ -292,55 +292,53 @@ Conditional questions enable branching logic in forms. A trigger question determ
 
 Subquestions (questions belonging to a conditional question's branch) have additional properties:
 
-| Property         | Type    | Description                                              |
-| ---------------- | ------- | -------------------------------------------------------- |
+| Property         | Type    | Description                                                            |
+| ---------------- | ------- | ---------------------------------------------------------------------- |
 | parentQuestionId | Integer | The ID of the parent conditional question (null for regular questions) |
-| branchId         | String  | The ID of the branch this subquestion belongs to         |
+| branchId         | String  | The ID of the branch this subquestion belongs to                       |
 
 ### Conditional Trigger Types
 
 Supported trigger types for conditional questions:
 
-| Trigger Type      | Condition Type       | Description                                      |
-| ----------------- | -------------------- | ------------------------------------------------ |
-| `multiple_unique` | `option_selected`    | Radio buttons - single option selection          |
-| `dropdown`        | `option_selected`    | Dropdown - single option selection               |
-| `multiple`        | `options_combination`| Checkboxes - all specified options must be selected |
-| `short`           | `string_equals`, `string_contains`, `regex` | Short text with string/regex matching |
-| `long`            | `string_contains`, `regex` | Long text with string/regex matching    |
-| `linearscale`     | `value_equals`, `value_range` | Linear scale with value matching     |
-| `date`            | `date_range`         | Date with date range matching (YYYY-MM-DD)       |
-| `time`            | `time_range`         | Time with time range matching (HH:mm)            |
-| `color`           | `value_equals`       | Color with exact value matching                  |
-| `file`            | `file_uploaded`      | File with upload status matching                 |
+| Trigger Type      | Condition Type                                                                 | Description                                         |
+| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------------- |
+| `multiple_unique` | `option_selected`                                                              | Radio buttons - single option selection             |
+| `dropdown`        | `option_selected`                                                              | Dropdown - single option selection                  |
+| `multiple`        | `options_combination`                                                          | Checkboxes - all specified options must be selected |
+| `short`           | `string_equals`, `string_contains`, `regex`                                    | Short text with string/regex matching               |
+| `long`            | `string_contains`, `regex`                                                     | Long text with string/regex matching                |
+| `linearscale`     | `value_equals`, `value_not_equals`, `value_range`, `value_min`, `value_max` \* | Linear scale with value matching                    |
+| `date`            | `date_range`                                                                   | Date with date range matching (YYYY-MM-DD)          |
+| `time`            | `time_range`                                                                   | Time with time range matching (HH:mm)               |
+| `color`           | `value_equals`                                                                 | Color with exact value matching                     |
+| `file`            | `file_uploaded`                                                                | File with upload status matching                    |
 
 ### Branch Object
 
 A branch defines conditions and subquestions that appear when those conditions are met.
 
-| Property     | Type                                        | Description                                   |
-| ------------ | ------------------------------------------- | --------------------------------------------- |
-| id           | String                                      | Unique identifier for the branch              |
-| conditions   | Array of [Conditions](#condition-object)    | Conditions that must be met to show the branch|
-| subQuestions | Array of [Questions](#question)             | Questions shown when conditions are met       |
+| Property     | Type                                     | Description                                    |
+| ------------ | ---------------------------------------- | ---------------------------------------------- |
+| id           | String                                   | Unique identifier for the branch               |
+| conditions   | Array of [Conditions](#condition-object) | Conditions that must be met to show the branch |
+| subQuestions | Array of [Questions](#question)          | Questions shown when conditions are met        |
 
 ```json
 {
-  "id": "branch-1705587600000",
-  "conditions": [
-    { "type": "option_selected", "optionId": 42 }
-  ],
-  "subQuestions": [
-    {
-      "id": 101,
-      "formId": 3,
-      "order": 1,
-      "type": "short",
-      "text": "Please provide details",
-      "parentQuestionId": 100,
-      "branchId": "branch-1705587600000"
-    }
-  ]
+	"id": "branch-1705587600000",
+	"conditions": [{ "type": "option_selected", "optionId": 42 }],
+	"subQuestions": [
+		{
+			"id": 101,
+			"formId": 3,
+			"order": 1,
+			"type": "short",
+			"text": "Please provide details",
+			"parentQuestionId": 100,
+			"branchId": "branch-1705587600000"
+		}
+	]
 }
 ```
 
@@ -359,6 +357,7 @@ Conditions determine when a branch is activated. The structure depends on the tr
 ```json
 { "type": "options_combination", "optionIds": [42, 43] }
 ```
+
 All options in `optionIds` must be selected for the branch to activate (AND logic).
 
 #### string_equals (for short text)
@@ -415,36 +414,36 @@ A complete conditional question structure:
 
 ```json
 {
-  "id": 100,
-  "formId": 3,
-  "order": 1,
-  "type": "conditional",
-  "isRequired": true,
-  "text": "Do you have any dietary restrictions?",
-  "options": [
-    { "id": 42, "questionId": 100, "order": 1, "text": "Yes" },
-    { "id": 43, "questionId": 100, "order": 2, "text": "No" }
-  ],
-  "extraSettings": {
-    "triggerType": "dropdown",
-    "branches": [
-      {
-        "id": "branch-yes",
-        "conditions": [{ "type": "option_selected", "optionId": 42 }],
-        "subQuestions": [
-          {
-            "id": 101,
-            "formId": 3,
-            "order": 1,
-            "type": "long",
-            "text": "Please describe your dietary restrictions",
-            "parentQuestionId": 100,
-            "branchId": "branch-yes"
-          }
-        ]
-      }
-    ]
-  }
+	"id": 100,
+	"formId": 3,
+	"order": 1,
+	"type": "conditional",
+	"isRequired": true,
+	"text": "Do you have any dietary restrictions?",
+	"options": [
+		{ "id": 42, "questionId": 100, "order": 1, "text": "Yes" },
+		{ "id": 43, "questionId": 100, "order": 2, "text": "No" }
+	],
+	"extraSettings": {
+		"triggerType": "dropdown",
+		"branches": [
+			{
+				"id": "branch-yes",
+				"conditions": [{ "type": "option_selected", "optionId": 42 }],
+				"subQuestions": [
+					{
+						"id": 101,
+						"formId": 3,
+						"order": 1,
+						"type": "long",
+						"text": "Please describe your dietary restrictions",
+						"parentQuestionId": 100,
+						"branchId": "branch-yes"
+					}
+				]
+			}
+		]
+	}
 }
 ```
 
@@ -454,16 +453,16 @@ When submitting or storing conditional question answers, the structure differs f
 
 ```json
 {
-  "100": {
-    "trigger": ["42"],
-    "subQuestions": {
-      "101": ["Vegetarian, no nuts"]
-    }
-  }
+	"100": {
+		"trigger": ["42"],
+		"subQuestions": {
+			"101": ["Vegetarian, no nuts"]
+		}
+	}
 }
 ```
 
-| Property     | Type                        | Description                                           |
-| ------------ | --------------------------- | ----------------------------------------------------- |
-| trigger      | Array of strings            | Answer values for the trigger question                |
-| subQuestions | Object (questionId → Array) | Map of subquestion IDs to their answer value arrays   |
+| Property     | Type                        | Description                                         |
+| ------------ | --------------------------- | --------------------------------------------------- |
+| trigger      | Array of strings            | Answer values for the trigger question              |
+| subQuestions | Object (questionId → Array) | Map of subquestion IDs to their answer value arrays |
