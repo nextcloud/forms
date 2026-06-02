@@ -152,107 +152,47 @@
 
 						<!-- Subquestions for this branch -->
 						<div class="branch__subquestions">
-							<ul class="branch__subquestions-list">
-								<Draggable
-									v-model="branches[branchIndex].subQuestions"
-									:animation="200"
-									tag="transition-group"
-									:componentData="{
-										name: isDragging
-											? 'no-external-transition-on-drag'
-											: 'question-list',
-									}"
-									handle=".question__drag-handle"
-									@change="onQuestionOrderChange(branchIndex)"
-									@start="isDragging = true"
-									@end="isDragging = false">
-									<li
-										v-for="(
-											subQuestion, subIndex
-										) in branch.subQuestions"
-										:key="subQuestion.id"
-										class="subquestion">
-										<component
-											:is="
-												getSubQuestionComponentName(
-													subQuestion.type,
-												)
-											"
-											v-bind="subQuestion"
-											:canMoveDown="
-												subIndex
-												< branch.subQuestions.length - 1
-											"
-											:canMoveUp="subIndex > 0"
-											:formId="formId"
-											:index="subIndex + index + 1"
-											:maxStringLengths="maxStringLengths"
-											:answerType="
-												getSubQuestionAnswerTypeConfig(
-													subQuestion.type,
-												)
-											"
-											@update:text="
-												updateSubQuestion(
-													branch.id,
-													subQuestion.id,
-													'text',
-													$event,
-												)
-											"
-											@update:description="
-												updateSubQuestion(
-													branch.id,
-													subQuestion.id,
-													'description',
-													$event,
-												)
-											"
-											@update:isRequired="
-												updateSubQuestion(
-													branch.id,
-													subQuestion.id,
-													'isRequired',
-													$event,
-												)
-											"
-											@update:extraSettings="
-												updateSubQuestion(
-													branch.id,
-													subQuestion.id,
-													'extraSettings',
-													$event,
-												)
-											"
-											@update:options="
-												updateSubQuestion(
-													branch.id,
-													subQuestion.id,
-													'options',
-													$event,
-												)
-											"
-											@delete="
-												deleteSubQuestion(
-													branch.id,
-													subQuestion.id,
-												)
-											"
-											@clone="
-												cloneSubQuestion(
-													branch.id,
-													subQuestion.id,
-												)
-											"
-											@moveDown="
-												onMoveDown(subIndex, branchIndex)
-											"
-											@moveUp="
-												onMoveUp(subIndex, branchIndex)
-											" />
-									</li>
-								</Draggable>
-							</ul>
+							<QuestionList
+								:modelValue="branch.subQuestions"
+								:getComponent="getSubQuestionComponent"
+								:getAnswerType="getSubQuestionAnswerType"
+								:maxStringLengths="maxStringLengths"
+								:baseIndex="index"
+								:animation="200"
+								:formId="formId"
+								:showInsert="true"
+								:insertMenuName="t('forms', 'Insert subquestion')"
+								:answerTypesFilter="subQuestionAnswerTypesFilter"
+								:hasSubtypes="hasSubtypes"
+								:isLoadingQuestions="isLoadingQuestions"
+								@updateProperty="
+									(idx, prop, val) =>
+										updateSubQuestion(
+											branch.id,
+											branches[branchIndex].subQuestions[idx]
+												.id,
+											prop,
+											val,
+										)
+								"
+								@clone="
+									(question) =>
+										cloneSubQuestion(branch.id, question.id)
+								"
+								@delete="
+									(question) =>
+										deleteSubQuestion(branch.id, question.id)
+								"
+								@moveDown="(idx) => onMoveDown(idx, branchIndex)"
+								@moveUp="(idx) => onMoveUp(idx, branchIndex)"
+								@update:modelValue="
+									(questions) =>
+										onQuestionOrderChange(branchIndex, questions)
+								"
+								@addQuestion="
+									(type, subtype, position) =>
+										addSubQuestion(branch.id, type, position)
+								" />
 
 							<!-- Add subquestion button -->
 							<NcActions :aria-label="t('forms', 'Add subquestion')">
@@ -310,6 +250,7 @@
 				</div>
 			</div>
 		</div>
+		<slot name="insert" />
 	</Question>
 </template>
 
@@ -331,10 +272,10 @@ import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
 import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
+import { emit } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import { defineComponent, ref } from 'vue'
-import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -347,6 +288,7 @@ import QuestionDate from './QuestionDate.vue'
 import QuestionDropdown from './QuestionDropdown.vue'
 import QuestionFile from './QuestionFile.vue'
 import QuestionLinearScale from './QuestionLinearScale.vue'
+import QuestionList from './QuestionList.vue'
 import QuestionLong from './QuestionLong.vue'
 import QuestionMultiple from './QuestionMultiple.vue'
 import QuestionRanking from './QuestionRanking.vue'
@@ -376,11 +318,9 @@ const QUESTION_COMPONENTS = {
 
 export default defineComponent({
 	name: 'QuestionConditional',
-	inheritAttrs: false,
 
 	components: {
 		BranchConditionEditor,
-		Draggable,
 		NcActionButton,
 		NcActions,
 		NcButton,
@@ -391,12 +331,14 @@ export default defineComponent({
 		QuestionDropdown,
 		QuestionFile,
 		QuestionLinearScale,
+		QuestionList,
 		QuestionLong,
 		QuestionMultiple,
 		QuestionShort,
 		QuestionRanking,
 	},
 
+	inheritAttrs: false,
 	props: QUESTION_PROPS,
 	emits: [...QUESTION_EMITS, 'update:options', 'forms:last-updated:set'],
 
@@ -425,7 +367,7 @@ export default defineComponent({
 
 	data() {
 		return {
-			isDragging: false,
+			isLoadingQuestions: false,
 			triggerValues: [],
 			subQuestionValues: {},
 		}
@@ -571,6 +513,46 @@ export default defineComponent({
 
 		branches() {
 			return this.extraSettings?.branches || []
+		},
+
+		/**
+		 * Get component reference for subquestion (used with :is in QuestionList)
+		 * Returns the actual component object, not a string name,
+		 * so it works in QuestionList's scope.
+		 */
+		getSubQuestionComponent() {
+			return (question) => QUESTION_COMPONENTS[question.type]
+		},
+
+		/**
+		 * Get answer type config for subquestion (used with :answerType in QuestionList)
+		 * Takes a question object and returns the answer type config.
+		 */
+		getSubQuestionAnswerType() {
+			return (question) => this.buildAnswerTypeConfig(question.type)
+		},
+
+		/**
+		 * Build answerTypes filter for subquestion insert menu
+		 * Filters out 'conditional' to prevent recursion
+		 */
+		subQuestionAnswerTypesFilter() {
+			const filter = {}
+			for (const sqType of this.subQuestionTypesList) {
+				filter[sqType.type] = {
+					icon: sqType.icon,
+					label: sqType.label,
+				}
+			}
+			return filter
+		},
+
+		/**
+		 * Check if an answer type has subtypes
+		 */
+		hasSubtypes() {
+			return (answer) =>
+				answer && answer.subtypes && Object.keys(answer.subtypes).length > 0
 		},
 
 		activeBranches() {
@@ -834,7 +816,7 @@ export default defineComponent({
 			return t('forms', 'Branch {number}', { number: index + 1 })
 		},
 
-		async addSubQuestion(branchId, type) {
+		async addSubQuestion(branchId, type, position = null) {
 			const branch = this.branches.find((b) => b.id === branchId)
 			if (!branch) return
 
@@ -853,10 +835,16 @@ export default defineComponent({
 				const newQuestion = OcsResponse2Data(response)
 
 				const branchIndex = this.branches.findIndex((b) => b.id === branchId)
+				const newSubQuestions = [...(branch.subQuestions || [])]
+				if (position !== null) {
+					newSubQuestions.splice(position + 1, 0, newQuestion)
+				} else {
+					newSubQuestions.push(newQuestion)
+				}
 				const newBranches = [...this.branches]
 				newBranches[branchIndex] = {
 					...branch,
-					subQuestions: [...(branch.subQuestions || []), newQuestion],
+					subQuestions: newSubQuestions,
 				}
 				this.onExtraSettingsChange({ branches: newBranches })
 			} catch (error) {
@@ -866,7 +854,7 @@ export default defineComponent({
 		},
 
 		onMoveUp(index, branchIndex) {
-			const subQuestions = this.branches[branchIndex].subQuestions
+			const subQuestions = [...this.branches[branchIndex].subQuestions]
 
 			if (index > 0) {
 				;[subQuestions[index - 1], subQuestions[index]] = [
@@ -874,7 +862,7 @@ export default defineComponent({
 					subQuestions[index - 1],
 				]
 			}
-			this.onQuestionOrderChange(branchIndex)
+			this.onQuestionOrderChange(branchIndex, subQuestions)
 		},
 
 		onMoveDown(index, branchIndex) {
@@ -884,11 +872,16 @@ export default defineComponent({
 			}
 		},
 
-		async onQuestionOrderChange(branchIndex) {
+		async onQuestionOrderChange(branchIndex, subQuestions) {
 			this.isLoadingQuestions = true
-			const newOrder = this.branches[branchIndex].subQuestions.map(
-				(question) => question.id,
-			)
+			const branch = this.branches[branchIndex]
+			const newBranches = [...this.branches]
+			newBranches[branchIndex] = { ...branch, subQuestions }
+			this.$emit('update:extraSettings', {
+				...this.extraSettings,
+				branches: newBranches,
+			})
+			const newOrder = subQuestions.map((question) => question.id)
 			try {
 				await axios.patch(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/subquestions', {
@@ -896,7 +889,7 @@ export default defineComponent({
 					}),
 					{
 						newOrder,
-						branchId: this.branches[branchIndex].id,
+						branchId: branch.id,
 						parentQuestionId: this.id,
 					},
 				)
@@ -1241,16 +1234,6 @@ export default defineComponent({
 		padding-left: 16px;
 		border-left: 3px solid var(--color-primary-element-light);
 	}
-
-	&__subquestions-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-}
-
-.subquestion {
-	margin-bottom: 8px;
 }
 
 .active-subquestions {
