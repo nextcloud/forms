@@ -33,6 +33,8 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IMailer;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -563,6 +565,63 @@ file2.txt"
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->submissionService->getSubmissionsData($form, 'invalid');
+	}
+
+	public function dataExportNumericTyping() {
+		return [
+			// Radio (and similar choice) answers are always strings, even when the option labels are
+			// pure numbers. For spreadsheet formats they must be written as numbers so they can be
+			// aggregated (e.g. averaged) in the spreadsheet application.
+			'radio-numeric-label-xlsx' => ['3', 'xlsx', DataType::TYPE_NUMERIC, 3],
+			'radio-numeric-label-ods' => ['5', 'ods', DataType::TYPE_NUMERIC, 5],
+			'numeric-zero' => ['0', 'xlsx', DataType::TYPE_NUMERIC, 0],
+			'numeric-decimal' => ['3.5', 'xlsx', DataType::TYPE_NUMERIC, 3.5],
+			// Values starting with a formula-trigger character keep the string typing so they are
+			// never interpreted as formulas.
+			'formula' => ['=SUM(A1:A2)', 'xlsx', DataType::TYPE_STRING, '=SUM(A1:A2)'],
+			'negative-number' => ['-5', 'xlsx', DataType::TYPE_STRING, '-5'],
+			// Strings whose canonical numeric form would differ must stay text to avoid data loss
+			// (leading-zero phone numbers, scientific notation, ...).
+			'leading-zero' => ['0123456789', 'xlsx', DataType::TYPE_STRING, '0123456789'],
+			'scientific' => ['1e5', 'xlsx', DataType::TYPE_STRING, '1e5'],
+			'text' => ['Option A', 'xlsx', DataType::TYPE_STRING, 'Option A'],
+		];
+	}
+
+	/**
+	 * @dataProvider dataExportNumericTyping
+	 *
+	 * @param string $value the raw (string) answer as stored in the database
+	 * @param string $fileFormat spreadsheet format to export to
+	 * @param string $expectedType the expected PhpSpreadsheet cell data type
+	 * @param mixed $expectedValue the expected cell value after a write/read round-trip
+	 */
+	public function testExportNumericTyping(string $value, string $fileFormat, string $expectedType, mixed $expectedValue) {
+		// Hand out real temporary files so the spreadsheet can actually be written and reloaded.
+		$this->tempManager->expects($this->any())
+			->method('getTemporaryFile')
+			->willReturnCallback(fn () => tempnam(sys_get_temp_dir(), 'forms-export-'));
+
+		$content = self::invokePrivate(
+			$this->submissionService,
+			'exportData',
+			[['Question 1'], [[$value]], $fileFormat, null],
+		);
+
+		// Reload the produced file and inspect the actual data type of the answer cell.
+		$reloadPath = tempnam(sys_get_temp_dir(), 'forms-reload-');
+		file_put_contents($reloadPath, $content);
+		$cell = IOFactory::load($reloadPath)->getSheet(0)->getCell([1, 2]);
+
+		$this->assertSame($expectedType, $cell->getDataType());
+		if ($expectedType === DataType::TYPE_NUMERIC) {
+			$this->assertEquals($expectedValue, $cell->getValue());
+		} else {
+			// assertSame guards against a numeric-looking string being silently coerced.
+			$this->assertSame($expectedValue, $cell->getValue());
+		}
+
+		unlink($reloadPath);
 	}
 
 	/**
