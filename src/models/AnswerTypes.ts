@@ -307,7 +307,10 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		validate: (question) => {
 			// Must have a trigger type and at least one branch
 			const extraSettings = question.extraSettings || {}
-			return !!extraSettings.triggerType && extraSettings.branches?.length > 0
+			return (
+				!!extraSettings.triggerType
+				&& (extraSettings.branches?.length ?? 0) > 0
+			)
 		},
 
 		titlePlaceholder: t('forms', 'Conditional question title'),
