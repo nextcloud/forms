@@ -301,18 +301,18 @@ Subquestions (questions belonging to a conditional question's branch) have addit
 
 Supported trigger types for conditional questions:
 
-| Trigger Type      | Condition Type                                                                 | Description                                         |
-| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------------- |
-| `multiple_unique` | `option_selected`                                                              | Radio buttons - single option selection             |
-| `dropdown`        | `option_selected`                                                              | Dropdown - single option selection                  |
-| `multiple`        | `options_combination`                                                          | Checkboxes - all specified options must be selected |
-| `short`           | `string_equals`, `string_contains`, `regex`                                    | Short text with string/regex matching               |
-| `long`            | `string_contains`, `regex`                                                     | Long text with string/regex matching                |
-| `linearscale`     | `value_equals`, `value_not_equals`, `value_range`, `value_min`, `value_max` \* | Linear scale with value matching                    |
-| `date`            | `date_range`                                                                   | Date with date range matching (YYYY-MM-DD)          |
-| `time`            | `time_range`                                                                   | Time with time range matching (HH:mm)               |
-| `color`           | `value_equals`                                                                 | Color with exact value matching                     |
-| `file`            | `file_uploaded`                                                                | File with upload status matching                    |
+| Trigger Type      | Condition Type                                                                                 | Description                                   |
+| ----------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `multiple_unique` | `option_selected`, `option_not_selected`                                                       | Radio buttons - single option selection       |
+| `dropdown`        | `option_selected`, `option_not_selected`                                                       | Dropdown - single option selection            |
+| `multiple`        | `option_selected`, `option_not_selected`, `options_combination`                                | Checkbox - option or combination matching     |
+| `short`           | `string_equals`, `string_not_equals`, `string_contains`, `string_not_contains`, `regex`        | Short text - string or regex matching         |
+| `long`            | `string_contains`, `string_not_contains`, `regex`                                              | Long text - string or regex matching          |
+| `linearscale`     | `value_equals`, `value_not_equals`, `value_range`, `value_min`, `value_max`                    | Linear scale - numeric value matching         |
+| `date`            | `date_equals`, `date_before`, `date_after`, `date_range`                                       | Date - exact or range matching (`YYYY-MM-DD`) |
+| `time`            | `time_equals`, `time_before`, `time_after`, `time_range`                                       | Time - exact or range matching (`HH:mm`)      |
+| `color`           | `value_equals`                                                                                 | Color - exact value matching                  |
+| `file`            | `file_uploaded`, `file_not_uploaded`, `filename_contains`, `filename_equals`, `filename_regex` | File - upload status or filename matching     |
 
 ### Branch Object
 

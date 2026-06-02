@@ -902,10 +902,24 @@ class SubmissionService {
 						if ($numValue == (float)($condition['value'] ?? 0)) {
 							return true;
 						}
+					} elseif ($type === 'value_not_equals') {
+						if ($numValue != (float)($condition['value'] ?? 0)) {
+							return true;
+						}
 					} elseif ($type === 'value_range') {
 						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
 						$max = $condition['max'] ?? PHP_FLOAT_MAX;
 						if ($numValue >= $min && $numValue <= $max) {
+							return true;
+						}
+					} elseif ($type === 'value_min') {
+						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
+						if ($numValue >= $min) {
+							return true;
+						}
+					} elseif ($type === 'value_max') {
+						$max = $condition['max'] ?? PHP_FLOAT_MAX;
+						if ($numValue <= $max) {
 							return true;
 						}
 					}
