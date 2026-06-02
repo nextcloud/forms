@@ -61,7 +61,11 @@
 						label="label"
 						:reduce="(opt) => opt.value"
 						class="condition-type-select" />
-					<template v-if="conditionType === 'value_equals'">
+					<template
+						v-if="
+							conditionType === 'value_equals'
+							|| conditionType === 'value_not_equals'
+						">
 						<NcTextField
 							v-model.number="conditionValue"
 							type="number"
@@ -80,6 +84,20 @@
 							type="number"
 							:placeholder="t('forms', 'Max')"
 							class="condition-range-input" />
+					</template>
+					<template v-else-if="conditionType === 'value_min'">
+						<NcTextField
+							v-model.number="conditionMin"
+							type="number"
+							:placeholder="t('forms', 'Min')"
+							class="condition-value-input" />
+					</template>
+					<template v-else-if="conditionType === 'value_max'">
+						<NcTextField
+							v-model.number="conditionMax"
+							type="number"
+							:placeholder="t('forms', 'Max')"
+							class="condition-value-input" />
 					</template>
 				</template>
 				<template v-else-if="triggerType === 'color'">
@@ -280,7 +298,10 @@ export default {
 		valueConditionTypes() {
 			return [
 				{ value: 'value_equals', label: t('forms', 'Equals') },
+				{ value: 'value_not_equals', label: t('forms', 'Not Equals') },
 				{ value: 'value_range', label: t('forms', 'In range') },
+				{ value: 'value_min', label: t('forms', 'Higher than') },
+				{ value: 'value_max', label: t('forms', 'Lower than') },
 			]
 		},
 
@@ -325,7 +346,7 @@ export default {
 		 */
 		conditionMin: {
 			get() {
-				return this.branch.conditions?.[0]?.min || null
+				return this.branch.conditions?.[0]?.min || ''
 			},
 
 			set(value) {
@@ -338,7 +359,7 @@ export default {
 		 */
 		conditionMax: {
 			get() {
-				return this.branch.conditions?.[0]?.max || null
+				return this.branch.conditions?.[0]?.max || ''
 			},
 
 			set(value) {

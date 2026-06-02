@@ -1038,8 +1038,15 @@ export default {
 				return branch.conditions.some((c) => {
 					if (c.type === 'value_equals') {
 						return numValue === parseFloat(c.value)
-					}
-					if (c.type === 'value_range') {
+					} else if (c.type === 'value_not_equals') {
+						return numValue !== parseFloat(c.value)
+					} else if (c.type === 'value_min') {
+						const min = c.min ?? Number.MIN_SAFE_INTEGER
+						return numValue >= min
+					} else if (c.type === 'value_max') {
+						const max = c.max ?? Number.MAX_SAFE_INTEGER
+						return numValue <= max
+					} else if (c.type === 'value_range') {
 						const min = c.min ?? Number.MIN_SAFE_INTEGER
 						const max = c.max ?? Number.MAX_SAFE_INTEGER
 						return numValue >= min && numValue <= max
