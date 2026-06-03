@@ -269,6 +269,8 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Formulário '{title}' está trancado por {lockedBy} e não pode ser modificado. O trancamento termina em: {lockedUntil}",
     "Form title" : "Título do Formulário",
     "Description" : "Descrição",
+    "Insert question" : "Inserir pergunta",
+    "Insert question after question {index}" : "Insira uma pergunta após {index}",
     "Add a question" : "Adicionar uma pergunta",
     "Summary" : "Resumo",
     "Unlink spreadsheet" : "Desvincular planilha",

@@ -267,6 +267,8 @@
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "{lockedBy} 鎖定了表單「{title}」且無法修改。鎖定過期於：{lockedUntil}",
     "Form title" : "表單標題",
     "Description" : "描述",
+    "Insert question" : "插入問題",
+    "Insert question after question {index}" : "在問題 {index} 後插入問題",
     "Add a question" : "新增問題",
     "Summary" : "摘要",
     "Unlink spreadsheet" : "解除連結試算表",

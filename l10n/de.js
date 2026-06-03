@@ -269,6 +269,8 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Formular '{title}' wurde gesperrt von {lockedBy} und kann nicht bearbeitet werden. Die Sperrung läuft ab: {lockedUntil}",
     "Form title" : "Formulartitel",
     "Description" : "Beschreibung",
+    "Insert question" : "Frage einfügen",
+    "Insert question after question {index}" : "Frage nach der Frage {index} einfügen",
     "Add a question" : "Eine Frage hinzufügen",
     "Summary" : "Zusammenfassung",
     "Unlink spreadsheet" : "Verbindung mit Tabellendokument lösen",

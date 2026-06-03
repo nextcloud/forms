@@ -269,6 +269,8 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "'{title}' formu {lockedBy} tarafından kilitlenmiş olduğundan düzenlenemez. Kilidin açılacağı zaman: {lockedUntil}",
     "Form title" : "Form başlığı",
     "Description" : "Açıklama",
+    "Insert question" : "Soru ekle",
+    "Insert question after question {index}" : "{index}. sorudan sonra soru ekle",
     "Add a question" : "Bir soru ekle",
     "Summary" : "Özet",
     "Unlink spreadsheet" : "Elektronik tablo bağlantısını kaldır",
