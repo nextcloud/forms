@@ -2085,7 +2085,6 @@ class ApiController extends OCSController {
 	private function storeConditionalAnswer(Form $form, int $submissionId, array $question, array $answerData): void {
 		$extraSettings = $question['extraSettings'] ?? [];
 		$triggerType = $extraSettings['triggerType'] ?? null;
-		$branches = $extraSettings['branches'] ?? [];
 
 		// Handle the structure: could be {trigger: [...], subQuestions: {...}} or just trigger array
 		$triggerAnswers = $answerData['trigger'] ?? $answerData;
@@ -2128,8 +2127,9 @@ class ApiController extends OCSController {
 			}
 		}
 
-		// Store subquestion answers
-		// Find the active branch to get subquestion definitions
+		// Store subquestion answers only for the branch the trigger activated
+		$activeBranch = $this->submissionService->getActiveBranch($question, $triggerAnswers);
+		$branches = $activeBranch === null ? [] : [$activeBranch];
 		foreach ($branches as $branch) {
 			$branchSubQuestions = $branch['subQuestions'] ?? [];
 			foreach ($branchSubQuestions as $subQuestion) {

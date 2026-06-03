@@ -782,23 +782,27 @@ class SubmissionService {
 			return;
 		}
 
-		// If we have an active branch, validate its subquestions
+		// Validate the active branch's subquestions with the full per-question rules
 		if ($activeBranch !== null && isset($activeBranch['subQuestions'])) {
-			$subQuestions = $activeBranch['subQuestions'];
-
-			// Build a questions array from subquestions for validation
-			foreach ($subQuestions as $subQuestion) {
-				$subQuestionId = $subQuestion['id'];
-				$subQuestionAnswered = isset($subQuestionAnswers[$subQuestionId]);
-
-				// Check if required subquestions have an answer
-				if ($subQuestion['isRequired'] ?? false) {
-					if (!$subQuestionAnswered || !array_filter($subQuestionAnswers[$subQuestionId], fn ($v) => $v !== '' && $v !== null)) {
-						throw new \InvalidArgumentException(sprintf('Subquestion "%s" in conditional question "%s" is required.', $subQuestion['text'] ?? 'Unknown', $question['text']));
-					}
-				}
-			}
+			$this->validateSubmission($activeBranch['subQuestions'], $subQuestionAnswers, $formOwnerId);
 		}
+	}
+
+	/**
+	 * Resolve the branch a conditional question's trigger answer activates
+	 *
+	 * @param array $question The conditional question
+	 * @param array $triggerAnswer The trigger answer values
+	 * @return array|null The active branch or null if none matches
+	 */
+	public function getActiveBranch(array $question, array $triggerAnswer): ?array {
+		$extraSettings = $question['extraSettings'] ?? [];
+		return $this->findActiveBranch(
+			$extraSettings['triggerType'] ?? '',
+			$triggerAnswer,
+			$extraSettings['branches'] ?? [],
+			$question['options'] ?? [],
+		);
 	}
 
 	/**
@@ -899,7 +903,7 @@ class SubmissionService {
 							return true;
 						}
 					} elseif ($type === 'value_range') {
-						$min = $condition['min'] ?? PHP_FLOAT_MIN;
+						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
 						$max = $condition['max'] ?? PHP_FLOAT_MAX;
 						if ($numValue >= $min && $numValue <= $max) {
 							return true;
