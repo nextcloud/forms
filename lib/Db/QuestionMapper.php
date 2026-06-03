@@ -112,27 +112,6 @@ class QuestionMapper extends QBMapper {
 	}
 
 	/**
-	 * Delete all subquestions of a parent conditional question
-	 *
-	 * @param int $parentQuestionId The ID of the parent conditional question
-	 */
-	public function deleteByParentQuestion(int $parentQuestionId): void {
-		// First delete options for all subquestions
-		$subQuestions = $this->findByParentQuestion($parentQuestionId, true);
-		foreach ($subQuestions as $subQuestion) {
-			$this->optionMapper->deleteByQuestion($subQuestion->getId());
-		}
-
-		$qb = $this->db->getQueryBuilder();
-		$qb->delete($this->getTableName())
-			->where(
-				$qb->expr()->eq('parent_question_id', $qb->createNamedParameter($parentQuestionId, IQueryBuilder::PARAM_INT))
-			);
-
-		$qb->executeStatement();
-	}
-
-	/**
 	 * @param int $formId
 	 */
 	public function deleteByForm(int $formId): void {
