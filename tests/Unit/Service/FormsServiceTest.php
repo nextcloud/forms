@@ -41,6 +41,7 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
@@ -77,7 +78,8 @@ class FormsServiceTest extends TestCase {
 	private IUserManager|MockObject $userManager;
 	private ISecureRandom|MockObject $secureRandom;
 	private CirclesService|MockObject $circlesService;
-	private IRootFolder|MockObject $storage;
+	private FilePathHelper|MockObject $filePathHelper;
+	private IRootFolder|MockObject $rootFolder;
 	private IL10N|MockObject $l10n;
 	private LoggerInterface|MockObject $logger;
 
@@ -109,7 +111,8 @@ class FormsServiceTest extends TestCase {
 			->method('getUser')
 			->willReturn($user);
 
-		$this->storage = $this->createMock(IRootFolder::class);
+		$this->rootFolder = $this->createMock(IRootFolder::class);
+		$this->filePathHelper = new FilePathHelper($this->rootFolder);
 
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->l10n->expects($this->any())
@@ -129,7 +132,8 @@ class FormsServiceTest extends TestCase {
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
-			$this->storage,
+			$this->filePathHelper,
+			$this->rootFolder,
 			$this->l10n,
 			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
@@ -153,7 +157,8 @@ class FormsServiceTest extends TestCase {
 				$this->userManager,
 				$this->secureRandom,
 				$this->circlesService,
-				$this->storage,
+				$this->filePathHelper,
+				$this->rootFolder,
 				$this->l10n,
 				$this->logger,
 				$eventDispatcher,
@@ -645,7 +650,8 @@ class FormsServiceTest extends TestCase {
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
-			$this->storage,
+			$this->filePathHelper,
+			$this->rootFolder,
 			$this->l10n,
 			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
@@ -870,7 +876,8 @@ class FormsServiceTest extends TestCase {
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
-			$this->storage,
+			$this->filePathHelper,
+			$this->rootFolder,
 			$this->l10n,
 			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
@@ -978,7 +985,8 @@ class FormsServiceTest extends TestCase {
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
-			$this->storage,
+			$this->filePathHelper,
+			$this->rootFolder,
 			$this->l10n,
 			$this->logger,
 			\OCP\Server::get(IEventDispatcher::class),
@@ -1238,7 +1246,8 @@ class FormsServiceTest extends TestCase {
 				$this->userManager,
 				$this->secureRandom,
 				$this->circlesService,
-				$this->storage,
+				$this->filePathHelper,
+				$this->rootFolder,
 				$this->l10n,
 				$this->logger,
 				$eventDispatcher,
@@ -1530,7 +1539,7 @@ class FormsServiceTest extends TestCase {
 			->with(100)
 			->willReturn([]);
 
-		$this->storage->expects($this->once())
+		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('user1')
 			->willReturn($folder);

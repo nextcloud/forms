@@ -14,6 +14,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
+use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
@@ -62,6 +63,7 @@ class ShareApiController extends OCSController {
 		private ISecureRandom $secureRandom,
 		private CirclesService $circlesService,
 		private IRootFolder $rootFolder,
+		private FilePathHelper $filePathHelper,
 		private IManager $shareManager,
 	) {
 		parent::__construct($appName, $request);
@@ -273,7 +275,7 @@ class ShareApiController extends OCSController {
 		if (in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
 			if (in_array(Constants::PERMISSION_RESULTS, $keyValuePairs['permissions'], true)) {
 				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-				$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
+				$uploadedFilesFolderPath = $this->filePathHelper->getFormUploadedFilesFolderPath($form);
 				try {
 					/** @var \OCP\Files\Folder $folder */
 					$folder = $userFolder->get($uploadedFilesFolderPath);
@@ -358,7 +360,7 @@ class ShareApiController extends OCSController {
 		}
 
 		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-		$uploadedFilesFolderPath = $this->formsService->getFormUploadedFilesFolderPath($form);
+		$uploadedFilesFolderPath = $this->filePathHelper->getFormUploadedFilesFolderPath($form);
 		try {
 			$folder = $userFolder->get($uploadedFilesFolderPath);
 		} catch (NotFoundException $e) {

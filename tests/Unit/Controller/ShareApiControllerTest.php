@@ -16,6 +16,7 @@ use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Exception\NoSuchFormException;
+use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
@@ -59,7 +60,8 @@ class ShareApiControllerTest extends TestCase {
 	private IUserManager|MockObject $userManager;
 	private ISecureRandom|MockObject $secureRandom;
 	private CirclesService|MockObject $circlesService;
-	private IRootFolder|MockObject $storage;
+	private FilePathHelper $filePathHelper;
+	private IRootFolder|MockObject $rootFolder;
 	private IManager|MockObject $shareManager;
 
 	public function setUp(): void {
@@ -83,7 +85,8 @@ class ShareApiControllerTest extends TestCase {
 			->method('getUser')
 			->willReturn($user);
 
-		$this->storage = $this->createMock(IRootFolder::class);
+		$this->rootFolder = $this->createMock(IRootFolder::class);
+		$this->filePathHelper = new FilePathHelper($this->rootFolder);
 		$this->shareManager = $this->createMock(IManager::class);
 
 		$this->shareApiController = new ShareApiController(
@@ -99,7 +102,8 @@ class ShareApiControllerTest extends TestCase {
 			$this->userManager,
 			$this->secureRandom,
 			$this->circlesService,
-			$this->storage,
+			$this->rootFolder,
+			$this->filePathHelper,
 			$this->shareManager,
 		);
 	}
@@ -541,14 +545,12 @@ class ShareApiControllerTest extends TestCase {
 		$userFolder->expects($this->once())
 			->method('get')
 			->willReturn($folder);
-		$this->storage->expects($this->once())
+
+		// Set expectations on the rootFolder
+		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('currentUser')
 			->willReturn($userFolder);
-		$this->formsService->expects($this->once())
-			->method('getFormUploadedFilesFolderPath')
-			->with($form)
-			->willReturn('Forms/my-form');
 
 		// Mock finding and deleting the matching Files share
 		$fileShare = $this->createMock(IShare::class);
@@ -594,7 +596,6 @@ class ShareApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		// No file share interactions expected
-		$this->storage->expects($this->never())->method('getUserFolder');
 		$this->shareManager->expects($this->never())->method('getSharesBy');
 		$this->shareManager->expects($this->never())->method('deleteShare');
 
@@ -848,7 +849,8 @@ class ShareApiControllerTest extends TestCase {
 			->method('get')
 			->willReturn($folder);
 
-		$this->storage->expects($this->any())
+		// Set expectations on the rootFolder
+		$this->rootFolder->expects($this->any())
 			->method('getUserFolder')
 			->with('currentUser')
 			->willReturn($userFolder);

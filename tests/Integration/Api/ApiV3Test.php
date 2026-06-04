@@ -717,6 +717,64 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals(404, $resp->getStatusCode());
 	}
 
+	public function testDeleteFormWithSubmissions() {
+		// Create a new form with a file question
+		$resp = $this->http->request('POST', 'api/v3/forms');
+		$formData = $this->OcsResponse2Data($resp);
+		$formId = $formData['id'];
+
+		// Add a file question
+		$resp = $this->http->request('POST', "api/v3/forms/$formId/questions", [
+			'json' => [
+				'type' => 'file',
+				'text' => 'Upload a file',
+			]
+		]);
+		$questionData = $this->OcsResponse2Data($resp);
+		$questionId = $questionData['id'];
+
+		// Upload a file
+		$uploadedFileResponse = $this->http->request('POST',
+			"api/v3/forms/$formId/submissions/files/$questionId",
+			[
+				'multipart' => [
+					[
+						'name' => 'files[]',
+						'contents' => 'test file content for form deletion',
+						'filename' => 'test-form-delete.txt'
+					]
+				]
+			]);
+
+		$uploadedFileData = $this->OcsResponse2Data($uploadedFileResponse);
+		$uploadedFileId = $uploadedFileData[0]['uploadedFileId'];
+
+		// Create a submission with the file
+		$resp = $this->http->request('POST', "api/v3/forms/$formId/submissions", [
+			'json' => [
+				'answers' => [
+					$questionId => [['uploadedFileId' => $uploadedFileId]]
+				]
+			]
+		]);
+		$this->assertEquals(201, $resp->getStatusCode());
+
+		// Delete the form
+		$resp = $this->http->request('DELETE', "api/v3/forms/$formId");
+		$deletedId = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($formId, $deletedId);
+
+		// Verify form is deleted
+		try {
+			$this->http->request('GET', "api/v3/forms/$formId");
+		} catch (ClientException $e) {
+			$resp = $e->getResponse();
+		}
+		$this->assertEquals(404, $resp->getStatusCode());
+	}
+
 	public static function dataCreateNewQuestion() {
 		return [
 			'newQuestion' => [
@@ -892,6 +950,25 @@ class ApiV3Test extends IntegrationBase {
 		$fullFormExpected['lockedUntil'] = time() + 900;
 
 		$this->testGetFullForm($fullFormExpected);
+	}
+
+	public function testDeleteFileQuestion() {
+		// Get the file question (index 2 in testForms[0])
+		$fileQuestionId = $this->testForms[0]['questions'][2]['id'];
+
+		// Delete the file question
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/questions/$fileQuestionId");
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($fileQuestionId, $data);
+
+		// Verify the question is deleted from the form
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}");
+		$formData = $this->OcsResponse2Data($resp);
+
+		$questionIds = array_map(fn ($q) => $q['id'], $formData['questions']);
+		$this->assertNotContains($fileQuestionId, $questionIds);
 	}
 
 	public function testCloneQuestion() {
@@ -1252,6 +1329,81 @@ CSV
 		$arr_txt_expected = preg_split('/,/', str_replace(["\t", "\n"], '', $expected));
 		$arr_txt_data = preg_split('/,/', str_replace(["\t", "\n"], '', $data));
 		$this->assertEquals($arr_txt_expected, $arr_txt_data);
+	}
+
+	public function testDeleteSubmission() {
+		// Get submissions first to find a submission ID
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertNotEmpty($data['submissions']);
+		$submissionId = $data['submissions'][0]['id'];
+
+		// Delete the submission
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions/$submissionId");
+		$deletedId = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($submissionId, $deletedId);
+
+		// Verify submission is deleted
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
+		$data = $this->OcsResponse2Data($resp);
+
+		$this->assertCount(2, $data['submissions']); // Originally 3, now 2
+		$submissionIds = array_map(fn ($s) => $s['id'], $data['submissions']);
+		$this->assertNotContains($submissionId, $submissionIds);
+	}
+
+	public function testDeleteSubmissionWithFiles() {
+		// Upload a file for the file question
+		$uploadedFileResponse = $this->http->request('POST',
+			"api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}",
+			[
+				'multipart' => [
+					[
+						'name' => 'files[]',
+						'contents' => 'test file content',
+						'filename' => 'test-delete.txt'
+					]
+				]
+			]);
+
+		$uploadedFileData = $this->OcsResponse2Data($uploadedFileResponse);
+		$uploadedFileId = $uploadedFileData[0]['uploadedFileId'];
+
+		// Create a new submission with the file
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions", [
+			'json' => [
+				'answers' => [
+					$this->testForms[0]['questions'][0]['id'] => ['Test Answer'],
+					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId]]
+				]
+			]
+		]);
+
+		$this->assertEquals(201, $resp->getStatusCode());
+
+		// Get the submission ID from the submissions list (newest submission is first)
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
+		$data = $this->OcsResponse2Data($resp);
+		$this->assertNotEmpty($data['submissions']);
+		$newSubmissionId = $data['submissions'][0]['id'];
+		$this->assertNotEmpty($newSubmissionId);
+
+		// Delete the submission
+		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions/$newSubmissionId");
+		$deletedId = $this->OcsResponse2Data($resp);
+
+		$this->assertEquals(200, $resp->getStatusCode());
+		$this->assertEquals($newSubmissionId, $deletedId);
+
+		// Verify submission is deleted
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
+		$data = $this->OcsResponse2Data($resp);
+
+		$submissionIds = array_map(fn ($s) => $s['id'], $data['submissions']);
+		$this->assertNotContains($newSubmissionId, $submissionIds);
 	}
 
 	public function testLinkFile() {

@@ -121,7 +121,9 @@ class SubmissionMapperTest extends IntegrationBase {
 
 		$db = \OCP\Server::get(IDBConnection::class);
 		$answerMapper = \OCP\Server::get(\OCA\Forms\Db\AnswerMapper::class);
-		$this->submissionMapper = new SubmissionMapper($db, $answerMapper);
+		$filePathHelper = \OCP\Server::get(\OCA\Forms\Helper\FilePathHelper::class);
+		$logger = \OCP\Server::get(\Psr\Log\LoggerInterface::class);
+		$this->submissionMapper = new SubmissionMapper($db, $answerMapper, $filePathHelper, $logger);
 	}
 
 	public function testFindByFormBasic(): void {
@@ -182,5 +184,31 @@ class SubmissionMapperTest extends IntegrationBase {
 		$count = $this->submissionMapper->countSubmissions($this->testForms[1]['id']);
 
 		$this->assertEquals(0, $count);
+	}
+
+	public function testDeleteById(): void {
+		// Get the first submission from the form
+		$submissions = $this->submissionMapper->findByForm($this->testForms[0]['id']);
+		$this->assertCount(3, $submissions);
+
+		$submissionToDelete = $submissions[0];
+		$submissionId = $submissionToDelete->getId();
+
+		// Get the form
+		$form = \OCA\Forms\Db\Form::fromParams([
+			'id' => $this->testForms[0]['id'],
+			'ownerId' => 'test',
+		]);
+
+		// Delete the submission
+		$this->submissionMapper->deleteById($form, $submissionId);
+
+		// Verify the submission is deleted
+		$remainingSubmissions = $this->submissionMapper->findByForm($this->testForms[0]['id']);
+		$this->assertCount(2, $remainingSubmissions);
+
+		// Verify the deleted submission is not in the remaining list
+		$remainingIds = array_map(fn ($s) => $s->getId(), $remainingSubmissions);
+		$this->assertNotContains($submissionId, $remainingIds);
 	}
 }
