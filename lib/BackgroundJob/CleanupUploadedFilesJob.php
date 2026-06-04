@@ -10,6 +10,7 @@ namespace OCA\Forms\BackgroundJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\Files\Folder;
@@ -51,7 +52,16 @@ class CleanupUploadedFilesJob extends TimedJob {
 				'formId' => $uploadedFile->getFormId(),
 			]);
 
-			$form = $this->formMapper->findById($uploadedFile->getFormId());
+			try {
+				$form = $this->formMapper->findById($uploadedFile->getFormId());
+			} catch (DoesNotExistException) {
+				$this->logger->warning('Could not find form {formId} for uploaded file deletion.', [
+					'formId' => $uploadedFile->getFormId(),
+				]);
+				$this->uploadedFileMapper->delete($uploadedFile);
+				continue;
+			}
+
 			$usersToCleanup[$form->getOwnerId()] = true;
 			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
 
