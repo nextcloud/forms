@@ -1018,6 +1018,15 @@
                         }
                     },
                     {
+                        "name": "export",
+                        "in": "query",
+                        "description": "if the form should get exported",
+                        "schema": {
+                            "type": "boolean",
+                            "nullable": true
+                        }
+                    },
+                    {
                         "name": "OCS-APIRequest",
                         "in": "header",
                         "description": "Required to be true for the API request to pass",
@@ -1034,27 +1043,35 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "required": [
-                                        "ocs"
-                                    ],
-                                    "properties": {
-                                        "ocs": {
+                                    "anyOf": [
+                                        {
                                             "type": "object",
                                             "required": [
-                                                "meta",
-                                                "data"
+                                                "ocs"
                                             ],
                                             "properties": {
-                                                "meta": {
-                                                    "$ref": "#/components/schemas/OCSMeta"
-                                                },
-                                                "data": {
-                                                    "$ref": "#/components/schemas/Form"
+                                                "ocs": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "meta",
+                                                        "data"
+                                                    ],
+                                                    "properties": {
+                                                        "meta": {
+                                                            "$ref": "#/components/schemas/OCSMeta"
+                                                        },
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/Form"
+                                                        }
+                                                    }
                                                 }
                                             }
+                                        },
+                                        {
+                                            "type": "string",
+                                            "format": "binary"
                                         }
-                                    }
+                                    ]
                                 }
                             }
                         }

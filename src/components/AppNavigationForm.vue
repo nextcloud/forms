@@ -64,6 +64,12 @@
 				</template>
 				{{ t('forms', 'Copy form') }}
 			</NcActionButton>
+			<NcActionButton v-if="canEdit" closeAfterClick @click="onExportForm">
+				<template #icon>
+					<NcIconSvgWrapper :svg="IconDownload" />
+				</template>
+				{{ t('forms', 'Export form') }}
+			</NcActionButton>
 			<NcActionSeparator v-if="canEdit && !readOnly" />
 			<NcActionButton
 				v-if="canEdit && !readOnly"
@@ -106,10 +112,11 @@ import IconPoll from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconContentCopy from '@material-symbols/svg-400/outlined/content_copy.svg?raw'
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
+import IconDownload from '@material-symbols/svg-400/outlined/download.svg?raw'
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import IconArchiveOff from '@material-symbols/svg-400/outlined/unarchive.svg?raw'
-import { getCurrentUser } from '@nextcloud/auth'
+import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
@@ -275,6 +282,17 @@ export default defineComponent({
 			emit('clone', props.form.id)
 		}
 
+		const onExportForm = () => {
+			const downloadUrl =
+				generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+					id: props.form.id,
+				})
+				+ '?requesttoken='
+				+ encodeURIComponent(getRequestToken() ?? '')
+				+ '&export=true'
+			window.open(downloadUrl, '_self')
+		}
+
 		const onDeleteForm = async (): Promise<void> => {
 			loading.value = true
 			try {
@@ -349,6 +367,7 @@ export default defineComponent({
 			IconCheck,
 			IconContentCopy,
 			IconDelete,
+			IconDownload,
 			IconPencil,
 			IconPoll,
 			IconShareVariant,
@@ -364,6 +383,7 @@ export default defineComponent({
 			hasSubtitle,
 			routerTarget,
 			mobileCloseNavigation,
+			onExportForm,
 			onShareForm,
 			onCloneForm,
 			onConfirmDelete,
