@@ -15,6 +15,7 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\Comments\ICommentsManager;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Files\Folder;
+use OCP\Files\IRootFolder;
 use OCP\IDBConnection;
 use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
@@ -36,6 +37,8 @@ class FormMapper extends QBMapper {
 		private ConfigService $configService,
 		private ICommentsManager $commentsManager,
 		private FilePathHelper $filePathHelper,
+		private UploadedFileMapper $uploadedFileMapper,
+		private IRootFolder $rootFolder,
 		private LoggerInterface $logger,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
@@ -229,6 +232,7 @@ class FormMapper extends QBMapper {
 		$this->shareMapper->deleteByForm($formId);
 		$this->questionMapper->deleteByForm($formId);
 		$this->commentsManager->deleteCommentsAtObject('forms', (string)$formId);
+		$this->deleteUploadedFiles($form);
 		$this->deleteFormFolder($form);
 		$this->delete($form);
 	}
@@ -239,7 +243,7 @@ class FormMapper extends QBMapper {
 	 */
 	private function deleteFormFolder(Form $form): void {
 		try {
-            /** @var Folder $formsFolder */
+			/** @var Folder $formsFolder */
 			$formsFolder = $this->filePathHelper->getFormsFolder($form->getOwnerId());
 			if ($formsFolder === null) {
 				return;
@@ -254,6 +258,33 @@ class FormMapper extends QBMapper {
 			}
 		} catch (\Throwable $e) {
 			$this->logger->warning('Failed to delete form folder: {error}', [
+				'error' => $e->getMessage(),
+				'formId' => $form->getId(),
+			]);
+		}
+	}
+
+	/**
+	 * Delete uploaded files for a form from the file system and database
+	 * @param Form $form The form instance
+	 */
+	private function deleteUploadedFiles(Form $form): void {
+		try {
+			$uploadedFiles = $this->uploadedFileMapper->findByFormId($form->getId());
+			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+
+			foreach ($uploadedFiles as $uploadedFile) {
+				$nodes = $userFolder->getById($uploadedFile->getFileId());
+
+				if (!empty($nodes)) {
+					$node = $nodes[0];
+					$node->delete();
+				}
+			}
+
+			$this->uploadedFileMapper->deleteByFormId($form->getId());
+		} catch (\Throwable $e) {
+			$this->logger->warning('Failed to delete uploaded files for form: {error}', [
 				'error' => $e->getMessage(),
 				'formId' => $form->getId(),
 			]);

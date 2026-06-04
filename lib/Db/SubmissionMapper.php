@@ -228,7 +228,7 @@ class SubmissionMapper extends QBMapper {
 	 */
 	private function deleteSubmissionFolder(Form $form, int $submissionId): void {
 		try {
-            /** @var Folder $submissionFolder */
+			/** @var Folder $submissionFolder */
 			$submissionFolder = $this->filePathHelper->getSubmissionFolder($form, $submissionId);
 			if ($submissionFolder !== null) {
 				$submissionFolder->delete();
