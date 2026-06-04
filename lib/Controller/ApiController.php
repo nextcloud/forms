@@ -23,11 +23,13 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Exception\NoSuchFormException;
+use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
@@ -76,6 +78,7 @@ class ApiController extends OCSController {
 		IRequest $request,
 		IUserSession $userSession,
 		private readonly AnswerMapper $answerMapper,
+		private readonly FilePathHelper $filePathHelper,
 		private readonly FormMapper $formMapper,
 		private readonly OptionMapper $optionMapper,
 		private readonly QuestionMapper $questionMapper,
@@ -86,6 +89,7 @@ class ApiController extends OCSController {
 		private readonly SubmissionService $submissionService,
 		private readonly IL10N $l10n,
 		private readonly LoggerInterface $logger,
+		private readonly IAppManager $appManager,
 		private readonly IUserManager $userManager,
 		private readonly IRootFolder $rootFolder,
 		private readonly UploadedFileMapper $uploadedFileMapper,
@@ -251,7 +255,8 @@ class ApiController extends OCSController {
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers)
 	 *
 	 * @param int $formId Id of the form
-	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>
+	 * @param ?bool $download if the form should be downloaded
+	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>|DataDownloadResponse<Http::STATUS_OK, 'application/json', array{}>
 	 * @throws OCSBadRequestException Could not find form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 *
@@ -261,8 +266,39 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
-	public function getForm(int $formId): DataResponse {
+	public function getForm(int $formId, ?bool $download): DataResponse|DataDownloadResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_SUBMIT);
+
+		if ($download) {
+			$formData = $this->formsService->getPublicForm($form);
+			unset($formData['hash']);
+			unset($formData['created']);
+			unset($formData['lastUpdated']);
+			unset($formData['lockedBy']);
+			unset($formData['lockedUntil']);
+			unset($formData['permissions']);
+			unset($formData['canSubmit']);
+			unset($formData['isMaxSubmissionsReached']);
+			unset($formData['submissionCount']);
+			unset($formData['filePath']);
+			unset($formData['state']);
+			unset($formData['id']);
+
+			foreach ($formData['questions'] as &$question) {
+				unset($question['formId']);
+				unset($question['accept']);
+				foreach ($question['options'] as &$option) {
+					unset($option['questionId']);
+					unset($option['id']);
+				}
+			}
+
+			$downloadFile = ['form' => $formData,'appVersion' => $this->appManager->getAppVersion('forms')];
+			$fileName = $this->filePathHelper->normalizeFileName($form->getTitle() . '.json');
+
+			return new DataDownloadResponse(
+				json_encode($downloadFile), $fileName, 'application/json');
+		}
 
 		return new DataResponse($this->formsService->getForm($form));
 	}

@@ -170,6 +170,7 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import Sidebar from './views/Sidebar.vue'
 import FormsIcon from '../img/forms-dark.svg?raw'
+import { version } from '../package.json'
 import PermissionTypes from './mixins/PermissionTypes.ts'
 import { FormState } from './models/Constants.ts'
 import logger from './utils/Logger.ts'
@@ -487,6 +488,58 @@ export default {
 			}
 		}
 
+		const onDownloadForm = async (id) => {
+			try {
+				const response = await axios.get(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+						id,
+					}),
+				)
+				const form = OcsResponse2Data(response)
+
+				// download only required values
+				const download = {
+					appVersion: version,
+					form: {
+						...form,
+						// Remove unused values
+						...[
+							'hash',
+							'ownerId',
+							'created',
+							'access',
+							'lastUpdated',
+							'lockedBy',
+							'lockedUntil',
+							'shares',
+							'permissions',
+							'canSubmit',
+							'isMaxSubmissionsReached',
+							'submissionCount',
+						].reduce((prev, curr) => {
+							prev[curr] = undefined
+							return prev
+						}, {}),
+
+						id: undefined,
+						questions: form.questions,
+					},
+				}
+				// create blob and download
+				const blob = new Blob([JSON.stringify(download)])
+				const url = URL.createObjectURL(blob)
+				const a = document.createElement('a')
+				a.href = url
+				const formTitle = form.title ? form.title : t('forms', 'New form')
+				a.download = `${formTitle}.json`
+				a.click()
+				URL.revokeObjectURL(url)
+			} catch (error) {
+				logger.error(`Unable to download form ${id}`, { error })
+				showError(t('forms', 'Unable to download form'))
+			}
+		}
+
 		const onDeleteForm = async (id) => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)
 			const deletedHash = forms.value[formIndex].hash
@@ -572,6 +625,7 @@ export default {
 			fetchPartialForm,
 			onNewForm,
 			onCloneForm,
+			onDownloadForm,
 			onDeleteForm,
 			onLastUpdatedByEventBus,
 			IconPlus,
