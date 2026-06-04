@@ -872,21 +872,21 @@ class SubmissionService {
 				// Text-based: evaluate regex/string conditions
 				$text = $triggerAnswer[0] ?? '';
 				foreach ($conditions as $condition) {
-					$type = $condition['type'] ?? 'string_contains';
+					$type = $condition['type'] ?? Constants::CONDITION_TYPE_STRING_CONTAINS;
 					$value = $condition['value'] ?? '';
 
 					switch ($type) {
-						case 'string_equals':
+						case Constants::CONDITION_TYPE_STRING_EQUALS:
 							if ($text === $value) {
 								return true;
 							}
 							break;
-						case 'string_contains':
+						case Constants::CONDITION_TYPE_STRING_CONTAINS:
 							if (str_contains($text, $value)) {
 								return true;
 							}
 							break;
-						case 'regex':
+						case Constants::CONDITION_TYPE_REGEX:
 							if ($this->safeRegexMatch($value, $text)) {
 								return true;
 							}
@@ -897,27 +897,27 @@ class SubmissionService {
 			case Constants::ANSWER_TYPE_LINEARSCALE:
 				$numValue = (float)($triggerAnswer[0] ?? 0);
 				foreach ($conditions as $condition) {
-					$type = $condition['type'] ?? 'value_equals';
-					if ($type === 'value_equals') {
+					$type = $condition['type'] ?? Constants::CONDITION_TYPE_VALUE_EQUALS;
+					if ($type === Constants::CONDITION_TYPE_VALUE_EQUALS) {
 						if ($numValue == (float)($condition['value'] ?? 0)) {
 							return true;
 						}
-					} elseif ($type === 'value_not_equals') {
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_NOT_EQUALS) {
 						if ($numValue != (float)($condition['value'] ?? 0)) {
 							return true;
 						}
-					} elseif ($type === 'value_range') {
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_RANGE) {
 						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
 						$max = $condition['max'] ?? PHP_FLOAT_MAX;
 						if ($numValue >= $min && $numValue <= $max) {
 							return true;
 						}
-					} elseif ($type === 'value_min') {
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MIN) {
 						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
 						if ($numValue >= $min) {
 							return true;
 						}
-					} elseif ($type === 'value_max') {
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MAX) {
 						$max = $condition['max'] ?? PHP_FLOAT_MAX;
 						if ($numValue <= $max) {
 							return true;
