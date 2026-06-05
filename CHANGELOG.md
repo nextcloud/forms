@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.3.0-rc.0 - 2026-06-05
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.2...v5.3.0-rc.0)
+
+### Fixed
+
+- fix(export): type numeric answers as numbers in exports by @solracsf in [\#3368](https://github.com/nextcloud/forms/pull/3368)
+- fix: Delete files on submission/question/form deletion by @Koc in [\#3335](https://github.com/nextcloud/forms/pull/3335)
+
 ## v5.3.0-alpha.2 - 2026-06-01
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.1...v5.3.0-alpha.2)

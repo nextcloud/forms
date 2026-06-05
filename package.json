@@ -1,6 +1,6 @@
 {
   "name": "forms",
-  "version": "5.3.0-alpha.2",
+  "version": "5.3.0-rc.0",
   "private": true,
   "description": "Forms app for nextcloud",
   "homepage": "https://github.com/nextcloud/forms#readme",
