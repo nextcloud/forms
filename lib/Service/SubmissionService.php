@@ -485,9 +485,16 @@ class SubmissionService {
 			if ($question['isRequired']
 				&& (!$questionAnswered
 				|| !array_filter($answers[$questionId], static function (string|array $value): bool {
-					// file type
 					if (is_array($value)) {
-						return !empty($value['uploadedFileId']);
+						// file type
+						if (isset($value['uploadedFileId'])) {
+							return !empty($value['uploadedFileId']);
+						}
+
+						// Grid questions
+						return !empty(array_filter($value, static function ($subValue): bool {
+							return is_array($subValue) ? !empty(array_filter($subValue)) : $subValue !== '';
+						}));
 					}
 
 					return $value !== '';
@@ -557,16 +564,19 @@ class SubmissionService {
 					}
 					// Search corresponding option, return false if non-existent
 					else {
-						// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
-						$answerId = is_int($answer) ? $answer : (is_string($answer) ? intval(trim($answer)) : null);
+						$subAnswers = is_array($answer) ? $answer : [$answer];
+						foreach ($subAnswers as $subAnswer) {
+							// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
+							$answerId = is_int($subAnswer) ? $subAnswer : (is_string($subAnswer) ? intval(trim($subAnswer)) : null);
 
-						// Reject non-numeric / malformed values early
-						if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
-							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($answer) ? (string)$answer : gettype($answer), $question['text']));
-						}
+							// Reject non-numeric / malformed values early
+							if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
+								throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($subAnswer) ? (string)$subAnswer : gettype($subAnswer), $question['text']));
+							}
 
-						if (!in_array($answerId, $optionIds, true)) {
-							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
+							if (!in_array($answerId, $optionIds, true)) {
+								throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $subAnswer, $question['text']));
+							}
 						}
 					}
 				}

@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<div
 			class="question__content"
@@ -17,6 +18,7 @@
 			<NcColorPicker
 				:modelValue="pickedColor"
 				advancedFields
+				:aria-required="isRequired"
 				@update:modelValue="onUpdatePickedColor">
 				<NcButton :disabled="!readOnly">
 					{{ colorPickerPlaceholder }}
@@ -87,6 +89,16 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (this.isRequired && this.pickedColor === '') {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		onUpdatePickedColor(color) {
 			this.$emit('update:values', [color])
 		},

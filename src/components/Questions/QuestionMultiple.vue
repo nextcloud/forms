@@ -85,6 +85,7 @@
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
 					:required="checkRequired(answer.id)"
+					@invalid.prevent="validate"
 					@update:modelValue="onChange"
 					@keydown.enter.exact.prevent="onKeydownEnter">
 					{{ answer.text }}
@@ -99,6 +100,7 @@
 						:type="isUnique ? 'radio' : 'checkbox'"
 						:required="checkRequired('other-answer')"
 						class="question__label"
+						@invalid.prevent="validate"
 						@update:modelValue="onChangeOther"
 						@keydown.enter.exact.prevent="onKeydownEnter">
 						{{ t('forms', 'Other:') }}
@@ -361,6 +363,11 @@ export default {
 
 	methods: {
 		async validate() {
+			if (this.isRequired && this.areNoneChecked) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
 			if (!this.isUnique) {
 				// Validate limits
 				const max = this.extraSettings.optionsLimitMax ?? 0

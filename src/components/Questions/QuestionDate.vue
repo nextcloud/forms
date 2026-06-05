@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<template v-if="answerType.pickerType === 'date'" #actions>
 			<NcActionCheckbox
@@ -95,7 +96,8 @@
 				:type="dateTimePickerType"
 				:disabledDate="disabledDates"
 				:disabledTime="disabledTimes"
-				rangeSeparator=" - "
+				:aria-required="isRequired"
+				clearable
 				@update:modelValue="onValueChange" />
 		</div>
 		<template #insert>
@@ -146,25 +148,31 @@ export default {
 	},
 
 	computed: {
+		isRangeQuestion() {
+			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
+				? true
+				: false
+		},
+
 		datetimePickerPlaceholder() {
 			if (this.readOnly) {
-				return this.extraSettings?.dateRange || this.extraSettings?.timeRange
+				return this.isRangeQuestion
 					? this.answerType.submitPlaceholderRange
 					: this.answerType.submitPlaceholder
 			}
-			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
+			return this.isRangeQuestion
 				? this.answerType.createPlaceholderRange
 				: this.answerType.createPlaceholder
 		},
 
 		dateTimePickerType() {
-			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
+			return this.isRangeQuestion
 				? this.answerType.pickerType + '-range'
 				: this.answerType.pickerType
 		},
 
 		time() {
-			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
+			if (this.isRangeQuestion) {
 				return this.values?.[0]
 					? [this.parse(this.values[0]), this.parse(this.values[1])]
 					: null
@@ -224,14 +232,27 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (this.isRequired && this.time === null) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		/**
 		 * DateTimepicker show text in picker
 		 * Format depends on component-type date/datetime
 		 *
-		 * @param {Date} date the selected datepicker Date
+		 * @param {Date|Date[]} date the selected datepicker Date
 		 * @return {string}
 		 */
 		stringify(date) {
+			if (this.isRangeQuestion && Array.isArray(date)) {
+				return `${moment(date[0]).format(this.answerType.momentFormat)} - ${moment(date[1]).format(this.answerType.momentFormat)}`
+			}
 			return moment(date).format(this.answerType.momentFormat)
 		},
 
@@ -335,10 +356,15 @@ export default {
 		/**
 		 * Store Value
 		 *
-		 * @param {Date|Array<Date>} date The date or date range to store
+		 * @param {Date|Array<Date>|null} date The date or date range to store
 		 */
 		onValueChange(date) {
-			if (this.extraSettings?.dateRange || this.extraSettings?.timeRange) {
+			if (!date) {
+				this.$emit('update:values', [])
+				return
+			}
+
+			if (this.isRangeQuestion) {
 				this.$emit('update:values', [
 					moment(date[0]).format(this.answerType.storageFormat),
 					moment(date[1]).format(this.answerType.storageFormat),
