@@ -35,6 +35,7 @@ use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -43,10 +44,12 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Exception\NoSuchFormException;
+use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDownloadResponse;
@@ -73,6 +76,7 @@ use Test\TestCase;
 class ApiControllerTest extends TestCase {
 	private ApiController $apiController;
 	private AnswerMapper|MockObject $answerMapper;
+	private FilePathHelper|MockObject $filePathHelper;
 	private FormMapper|MockObject $formMapper;
 	private OptionMapper|MockObject $optionMapper;
 	private QuestionMapper|MockObject $questionMapper;
@@ -83,6 +87,7 @@ class ApiControllerTest extends TestCase {
 	private SubmissionService|MockObject $submissionService;
 	private LoggerInterface|MockObject $logger;
 	private IRequest|MockObject $request;
+	private IAppManager|MockObject $appManager;
 	private IUserManager|MockObject $userManager;
 	private IL10N|MockObject $l10n;
 	private IRootFolder|MockObject $storage;
@@ -93,6 +98,7 @@ class ApiControllerTest extends TestCase {
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
+		$this->filePathHelper = $this->createMock(FilePathHelper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
@@ -103,6 +109,7 @@ class ApiControllerTest extends TestCase {
 		$this->submissionService = $this->createMock(SubmissionService::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
+		$this->appManager = $this->createMock(IAppManager::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->l10n->expects($this->any())
@@ -120,6 +127,7 @@ class ApiControllerTest extends TestCase {
 			$this->request,
 			$this->createUserSession(),
 			$this->answerMapper,
+			$this->filePathHelper,
 			$this->formMapper,
 			$this->optionMapper,
 			$this->questionMapper,
@@ -130,6 +138,7 @@ class ApiControllerTest extends TestCase {
 			$this->submissionService,
 			$this->l10n,
 			$this->logger,
+			$this->appManager,
 			$this->userManager,
 			$this->storage,
 			$this->uploadedFileMapper,
@@ -540,6 +549,9 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('generateFormHash')
 			->willReturn('formHash');
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
 		$expected = $expectedForm;
 		$expected['id'] = null;
 		// TODO fix test, currently unset because behaviour has changed
@@ -646,8 +658,10 @@ class ApiControllerTest extends TestCase {
 			->method('generateFormHash')
 			->willReturn('new hash');
 
-		$read = $oldForm->read();
-		unset($read['id']);
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
+
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(function ($form) {
@@ -2293,5 +2307,187 @@ class ApiControllerTest extends TestCase {
 		// Should succeed - user has RESULTS_DELETE via share
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);
+	}
+
+	public static function dataImportForm_exceptions() {
+		return [
+			'disabled' => [
+				'canCreate' => false,
+				'exception' => OCSForbiddenException::class,
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataImportForm_exceptions
+	 */
+	public function testImportForm_exceptions(bool $canCreate, string $exception) {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn($canCreate);
+		$this->expectException($exception);
+		$this->apiController->newForm(null, true, []);
+	}
+
+	public function testImportForm() {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('generateFormHash')
+			->willReturn('importHash');
+
+		$formData = [
+			'title' => 'Imported Form',
+			'description' => 'Imported description',
+			'questions' => [],
+		];
+
+		$expected = [
+			'title' => 'Imported Form',
+			'description' => 'Imported description',
+			'hash' => 'importHash',
+			'ownerId' => 'currentUser',
+			'access' => [
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			],
+			'submitMultiple' => false,
+			'allowEditSubmissions' => false,
+			'showExpiration' => false,
+			'expires' => 0,
+			'isAnonymous' => false,
+			'submissionMessage' => null,
+			'fileId' => null,
+			'fileFormat' => null,
+			'lockedBy' => null,
+			'lockedUntil' => null,
+			'confirmationEmailEnabled' => false,
+			'confirmationEmailSubject' => null,
+			'confirmationEmailBody' => null,
+			'confirmationEmailQuestionId' => null,
+			'allowComments' => false,
+			'maxSubmissions' => null,
+			'lastUpdated' => 0,
+			'id' => null,
+			'state' => null
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(self::createFormValidator($expected)))
+			->willReturnCallback(function ($form) {
+				$form->setId(42);
+				return $form;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
+
+		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm(null, true, $formData));
+	}
+
+	public function testImportFormWithQuestions() {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('generateFormHash')
+			->willReturn('importHash');
+
+		$formData = [
+			'title' => 'Imported Form',
+			'questions' => [
+				[
+					'id' => 99,
+					'order' => 1,
+					'type' => 'short',
+					'text' => 'Question 1',
+					'options' => [
+						['text' => 'Option 1', 'order' => 1],
+					],
+				],
+			],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($form) {
+				$form->setId(42);
+				return $form;
+			});
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(function ($question) {
+				self::assertInstanceOf(Question::class, $question);
+				self::assertEquals(42, $question->getFormId());
+				self::assertEquals('Question 1', $question->getText());
+				$question->setId(100);
+				return true;
+			}));
+
+		$this->optionMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(function ($option) {
+				self::assertInstanceOf(Option::class, $option);
+				self::assertEquals(100, $option->getQuestionId());
+				self::assertEquals('Option 1', $option->getText());
+				return true;
+			}));
+
+		$this->formMapper->expects($this->once())
+			->method('update');
+
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
+
+		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm(null, true, $formData));
+	}
+
+	public function testImportFormWithConfirmationEmailQuestionId() {
+		$this->configService->method('canCreateForms')->willReturn(true);
+		$this->formsService->method('generateFormHash')->willReturn('new hash');
+
+		$formData = [
+			'title' => 'Imported Form',
+			'confirmationEmailQuestionId' => 50,
+			'questions' => [
+				[
+					'id' => 50,
+					'order' => 1,
+					'type' => 'short',
+					'text' => 'Email question',
+					'options' => [],
+				],
+			],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($form) {
+				$form->setId(42);
+				return $form;
+			});
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(100);
+				return $question;
+			});
+
+		$this->optionMapper->expects($this->never())
+			->method('insert');
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with(self::callback(fn ($form) => $form->getId() === 42 && $form->getConfirmationEmailQuestionId() === 100));
+
+		$this->formsService->method('getForm')->willReturn([]);
+
+		$this->apiController->newForm(null, true, $formData);
 	}
 }

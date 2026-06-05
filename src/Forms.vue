@@ -23,7 +23,16 @@
 					isHeading
 					class="forms-navigation__list-heading"
 					headingId="forms-navigation-your-forms"
-					:name="t('forms', 'Your forms')" />
+					:name="t('forms', 'Your forms')">
+					<template #actions>
+						<NcActionButton @click="onUploadForm()">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconUpload" />
+							</template>
+							{{ t('forms', 'Import form') }}
+						</NcActionButton>
+					</template>
+				</NcAppNavigationCaption>
 				<ul aria-labelledby="forms-navigation-your-forms">
 					<AppNavigationForm
 						v-for="form in ownedForms"
@@ -91,9 +100,14 @@
 					<NcIconSvgWrapper :svg="FormsIcon" :size="64" />
 				</template>
 				<template v-if="canCreateForms" #action>
-					<NcButton variant="primary" @click="onNewForm">
-						{{ t('forms', 'Create a form') }}
-					</NcButton>
+					<div class="form-buttons">
+						<NcButton variant="primary" @click="onNewForm">
+							{{ t('forms', 'Create a form') }}
+						</NcButton>
+						<NcButton variant="secondary" @click="onUploadForm">
+							{{ t('forms', 'Import a form') }}
+						</NcButton>
+					</div>
 				</template>
 			</NcEmptyContent>
 
@@ -109,9 +123,14 @@
 					<NcIconSvgWrapper :svg="FormsIcon" :size="64" />
 				</template>
 				<template v-if="canCreateForms" #action>
-					<NcButton variant="primary" @click="onNewForm">
-						{{ t('forms', 'Create new form') }}
-					</NcButton>
+					<div class="form-buttons">
+						<NcButton variant="primary" @click="onNewForm">
+							{{ t('forms', 'Create new form') }}
+						</NcButton>
+						<NcButton variant="secondary" @click="onUploadForm">
+							{{ t('forms', 'Import a form') }}
+						</NcButton>
+					</div>
 				</template>
 			</NcEmptyContent>
 		</NcAppContent>
@@ -138,6 +157,31 @@
 				@update:active="sidebarActive = $event" />
 		</template>
 
+		<!-- Import form modal -->
+		<NcDialog
+			v-model:open="showVersionMismatch"
+			contentClasses="modal-content"
+			:name="t('forms', 'Version mismatch')"
+			outTransition
+			@close="closeModal">
+			<template #default>
+				<!-- eslint-disable vue/no-v-html -->
+				<p>
+					{{
+						t(
+							'forms',
+							'The version of the uploaded form is newer than the installed app version. Do you still want to import the form?',
+						)
+					}}
+				</p>
+			</template>
+			<template #actions>
+				<NcButton variant="error" @click="onImportForm">
+					{{ t('forms', 'I understand, import this form') }}
+				</NcButton>
+			</template>
+		</NcDialog>
+
 		<!-- Archived forms modal -->
 		<ArchivedFormsModal
 			v-model:open="showArchivedForms"
@@ -151,6 +195,7 @@ import type { FormsForm } from './types/Entities.d.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
+import IconUpload from '@material-symbols/svg-400/outlined/upload.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
@@ -159,15 +204,18 @@ import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
+import semverCompare from 'semver/functions/compare'
 import { defineComponent } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
 import NcAppNavigationCaption from '@nextcloud/vue/components/NcAppNavigationCaption'
 import NcAppNavigationNew from '@nextcloud/vue/components/NcAppNavigationNew'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcContent from '@nextcloud/vue/components/NcContent'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
@@ -175,6 +223,7 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import Sidebar from './views/Sidebar.vue'
 import FormsIcon from '../img/forms-dark.svg?raw'
+import { version } from '../package.json'
 import { FormState } from './models/Constants.ts'
 import { PERMISSION_TYPES } from './models/Permissions.ts'
 import logger from './utils/Logger.ts'
@@ -197,6 +246,8 @@ export default defineComponent({
 		NcButton,
 		NcContent,
 		NcEmptyContent,
+		NcActionButton,
+		NcDialog,
 		NcLoadingIcon,
 		Sidebar,
 	},
@@ -212,6 +263,8 @@ export default defineComponent({
 		const forms = ref<FormsForm[]>([])
 		const allSharedForms = ref<FormsForm[]>([])
 		const showArchivedForms = ref(false)
+		const showVersionMismatch = ref(false)
+		let formForImport = undefined
 		const appConfig = loadState(formsAppName, 'appConfig') as {
 			canCreateForms?: boolean
 			allowComments?: boolean
@@ -511,6 +564,73 @@ export default defineComponent({
 			}
 		}
 
+		const onImportForm = async () => {
+			showVersionMismatch.value = false
+			try {
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v3/forms?import=1'),
+					{ formData: formForImport },
+				)
+				const newForm = OcsResponse2Data(response)
+				forms.value.unshift(newForm)
+				router.push({
+					name: 'edit',
+					params: { hash: newForm.hash },
+				})
+				mobileCloseNavigation()
+			} catch (error) {
+				logger.error(`Unable to import form`, { error })
+				showError(t('forms', 'Unable to import form'))
+			}
+		}
+
+		const onUploadForm = () => {
+			// Open file pickers
+			const fileInput = document.createElement('input')
+			fileInput.type = 'file'
+			fileInput.accept = 'application/json'
+			fileInput.click()
+
+			fileInput.addEventListener('change', () => {
+				const file = fileInput?.files?.[0]
+				if (!file) return
+				if (file?.type !== 'application/json' || file.size > 1000 * 1000) {
+					showError(t('forms', 'Invalid file type or file too large'))
+					return
+				}
+
+				const reader = new FileReader()
+				reader.addEventListener('load', async () => {
+					let formObject
+					try {
+						formObject = JSON.parse(
+							(reader.result as string | null) ?? '',
+						)
+					} catch (error) {
+						logger.error('Invalid JSON in uploaded file', { error })
+						showError(t('forms', 'Invalid JSON file'))
+						return
+					}
+					if (!formObject.appVersion || !formObject.form) {
+						showError(t('forms', 'Invalid form file format'))
+						return
+					}
+					formForImport = formObject.form
+					if (semverCompare(version, formObject.appVersion) === -1) {
+						showVersionMismatch.value = true
+					} else {
+						await onImportForm()
+					}
+				})
+				reader.readAsText(file)
+			})
+		}
+
+		const closeModal = () => {
+			showVersionMismatch.value = false
+			formForImport = undefined
+		}
+
 		const onDeleteForm = async (id: number): Promise<void> => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)
 			if (formIndex < 0) {
@@ -601,6 +721,7 @@ export default defineComponent({
 			forms,
 			allSharedForms,
 			showArchivedForms,
+			showVersionMismatch,
 			canCreateForms,
 			allowComments,
 			isMobile,
@@ -619,10 +740,14 @@ export default defineComponent({
 			fetchPartialForm,
 			onNewForm,
 			onCloneForm,
+			onUploadForm,
 			onDeleteForm,
+			onImportForm,
+			closeModal,
 			onLastUpdatedByEventBus,
 			IconPlus,
 			IconArchive,
+			IconUpload,
 			FormsIcon,
 		}
 	},
@@ -630,6 +755,12 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.form-buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 6px;
+}
+
 .forms-navigation-footer {
 	display: flex;
 	flex-direction: column;
