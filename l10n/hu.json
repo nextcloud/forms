@@ -267,6 +267,8 @@
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "A(z) „{title}” űrlapot {lockedBy} zárolta, és ezért nem módosítható. A zárolás ekkor jár le: {lockedUntil}",
     "Form title" : "Űrlap címe",
     "Description" : "Leírás",
+    "Insert question" : "Kérdés beszúrása",
+    "Insert question after question {index}" : "Kérdés beszúrása a(z) {index}. kérdés után ",
     "Add a question" : "Kérdés hozzáadása",
     "Summary" : "Összefoglalás",
     "Unlink spreadsheet" : "Munkafüzet lekapcsolása",
