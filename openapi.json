@@ -869,6 +869,21 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "(optional) Id of the form that should be cloned"
+                                    },
+                                    "import": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "default": false,
+                                        "description": "(optional) If it should import the form from post body"
+                                    },
+                                    "formData": {
+                                        "type": "object",
+                                        "nullable": true,
+                                        "default": {},
+                                        "description": "(optional) The formdata to import",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }

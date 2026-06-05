@@ -23,7 +23,16 @@
 					isHeading
 					class="forms-navigation__list-heading"
 					headingId="forms-navigation-your-forms"
-					:name="t('forms', 'Your forms')" />
+					:name="t('forms', 'Your forms')">
+					<template #actions>
+						<NcActionButton @click="onUploadForm()">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconUpload" />
+							</template>
+							{{ t('forms', 'Import form') }}
+						</NcActionButton>
+					</template>
+				</NcAppNavigationCaption>
 				<ul aria-labelledby="forms-navigation-your-forms">
 					<AppNavigationForm
 						v-for="form in ownedForms"
@@ -139,6 +148,31 @@
 				@update:active="sidebarActive = $event" />
 		</template>
 
+		<!-- Import form modal -->
+		<NcDialog
+			v-model:open="showVersionMismatch"
+			contentClasses="modal-content"
+			:name="t('forms', 'Version mismatch')"
+			outTransition
+			@close="closeModal">
+			<template #default>
+				<!-- eslint-disable vue/no-v-html -->
+				<p>
+					{{
+						t(
+							'forms',
+							'The version of the uploaded form is newer than the installed app version. Do you still want to import the form?',
+						)
+					}}
+				</p>
+			</template>
+			<template #actions>
+				<NcButton variant="error" @click="onImportForm">
+					{{ t('forms', 'I understand, import this form') }}
+				</NcButton>
+			</template>
+		</NcDialog>
+
 		<!-- Archived forms modal -->
 		<ArchivedFormsModal
 			v-model:open="showArchivedForms"
@@ -151,13 +185,15 @@
 <script>
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
+import IconUpload from '@material-symbols/svg-400/outlined/upload.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
-import { useIsMobile } from '@nextcloud/vue'
+import { NcActionButton, NcDialog, useIsMobile } from '@nextcloud/vue'
+import semverCompare from 'semver/functions/compare'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
@@ -196,6 +232,8 @@ export default {
 		NcButton,
 		NcContent,
 		NcEmptyContent,
+		NcActionButton,
+		NcDialog,
 		NcLoadingIcon,
 		Sidebar,
 	},
@@ -211,6 +249,8 @@ export default {
 		const forms = ref([])
 		const allSharedForms = ref([])
 		const showArchivedForms = ref(false)
+		const showVersionMismatch = ref(false)
+		let formForImport = undefined
 		const canCreateForms = ref(loadState(appName, 'appConfig').canCreateForms)
 		const allowComments = ref(loadState(appName, 'appConfig').allowComments)
 		const deletedFormHash = ref(null)
@@ -444,6 +484,69 @@ export default {
 			}
 		}
 
+		const onImportForm = async () => {
+			showVersionMismatch.value = false
+			try {
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v3/forms?import=1'),
+					{ formData: formForImport },
+				)
+				const newForm = OcsResponse2Data(response)
+				forms.value.unshift(newForm)
+				router.push({
+					name: 'edit',
+					params: { hash: newForm.hash },
+				})
+				mobileCloseNavigation()
+			} catch (error) {
+				logger.error(`Unable to import form`, { error })
+				showError(t('forms', 'Unable to import form'))
+			}
+		}
+
+		const onUploadForm = () => {
+			// Open file pickers
+			const fileInput = document.createElement('input')
+			fileInput.type = 'file'
+			fileInput.accept = 'application/json'
+			fileInput.click()
+
+			fileInput.addEventListener('change', () => {
+				const file = fileInput.files[0]
+				if (file.type !== 'application/json' || file.size > 1000 * 1000) {
+					showError(t('forms', 'Invalid file type or file too large'))
+					return
+				}
+
+				const reader = new FileReader()
+				reader.addEventListener('load', async () => {
+					let formObject
+					try {
+						formObject = JSON.parse(reader.result)
+					} catch (error) {
+						logger.error('Invalid JSON in uploaded file', { error })
+						showError(t('forms', 'Invalid JSON file'))
+						return
+					}
+					if (!formObject.appVersion || !formObject.form) {
+						showError(t('forms', 'Invalid form file format'))
+						return
+					}
+					formForImport = formObject.form
+					if (semverCompare(version, formObject.appVersion) === -1) {
+						showVersionMismatch.value = true
+					} else {
+						await onImportForm()
+					}
+				})
+				reader.readAsText(file)
+			})
+		}
+
+		const closeModal = () => {
+			showVersionMismatch.value = false
+			formForImport = undefined
+		}
 		const onDownloadForm = async (id) => {
 			try {
 				const response = await axios.get(
@@ -551,6 +654,7 @@ export default {
 			forms,
 			allSharedForms,
 			showArchivedForms,
+			showVersionMismatch,
 			canCreateForms,
 			allowComments,
 			isMobile,
@@ -570,10 +674,14 @@ export default {
 			onNewForm,
 			onCloneForm,
 			onDownloadForm,
+			onUploadForm,
 			onDeleteForm,
+			onImportForm,
+			closeModal,
 			onLastUpdatedByEventBus,
 			IconPlus,
 			IconArchive,
+			IconUpload,
 			FormsIcon,
 		}
 	},
