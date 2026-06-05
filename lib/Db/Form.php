@@ -215,7 +215,7 @@ class Form extends Entity {
 			'confirmationEmailSubject' => $this->getConfirmationEmailSubject(),
 			'confirmationEmailBody' => $this->getConfirmationEmailBody(),
 			'confirmationEmailQuestionId' => $this->getConfirmationEmailQuestionId(),
-			'allowComments' => $this->getAllowComments(),
+			'allowComments' => (bool)$this->getAllowComments(),
 		];
 	}
 }
