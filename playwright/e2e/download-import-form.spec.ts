@@ -131,3 +131,179 @@ test.describe('Download form', () => {
 		expect(json.form.questions[1].options).toHaveLength(3)
 	})
 })
+
+test.describe('Import form', () => {
+	test.beforeEach(async ({ page }) => {
+		await page.goto('apps/forms', { waitUntil: 'networkidle' })
+		await page.waitForURL(/apps\/forms\/$/)
+	})
+
+	test('Import a form from JSON file', async ({ page, appNavigation }) => {
+		// Prepare JSON data matching the export format
+		const formData = {
+			appVersion: '5.3.0-rc.0',
+			form: {
+				title: 'Imported test form',
+				description: 'Description',
+				questions: [
+					{
+						id: 52,
+						order: 1,
+						type: 'multiple',
+						isRequired: false,
+						text: 'Checkbox',
+						name: '',
+						description: '',
+						extraSettings: [],
+						options: [
+							{
+								order: 1,
+								text: 'A',
+								optionType: 'choice',
+							},
+							{
+								order: 2,
+								text: 'B',
+								optionType: 'choice',
+							},
+						],
+					},
+					{
+						id: 53,
+						order: 2,
+						type: 'short',
+						isRequired: false,
+						text: 'Text',
+						name: '',
+						description: '',
+						extraSettings: [],
+						options: [],
+					},
+				],
+			},
+		}
+
+		const jsonContent = JSON.stringify(formData)
+
+		// Set up file chooser handler before clicking import
+		const fileChooserPromise = page.waitForEvent('filechooser')
+
+		// Click the Import form button in the navigation
+		await page.getByRole('button', { name: 'Import a form' }).click()
+
+		const fileChooser = await fileChooserPromise
+		await fileChooser.setFiles({
+			name: 'imported-form.json',
+			mimeType: 'application/json',
+			buffer: Buffer.from(jsonContent),
+		})
+
+		// Wait for the imported form to appear in the navigation
+		await expect(appNavigation.getOwnForm('Imported test form')).toBeVisible({
+			timeout: 10000,
+		})
+
+		await expect(
+			page.getByRole('textbox', { name: 'Title of question number 1' }),
+		).toHaveValue('Checkbox')
+		await expect(
+			page.getByRole('textbox', { name: 'Description', exact: true }),
+		).toHaveValue('Description')
+		await expect(
+			page.getByRole('textbox', { name: 'The text of option 1' }),
+		).toHaveValue('A')
+		await expect(
+			page.getByRole('textbox', { name: 'The text of option 2' }),
+		).toHaveValue('B')
+		await expect(
+			page.getByRole('textbox', { name: 'Title of question number 2' }),
+		).toHaveValue('Text')
+	})
+
+	test('Import a form with a long text question', async ({
+		page,
+		appNavigation,
+	}) => {
+		const formData = {
+			appVersion: '5.3.0-rc.0',
+			form: {
+				title: 'Long answer form',
+				description: 'Testing long text import',
+				questions: [
+					{
+						id: 10,
+						order: 1,
+						type: 'long',
+						text: 'Your biography',
+						isRequired: true,
+						options: [],
+					},
+				],
+			},
+		}
+
+		const jsonContent = JSON.stringify(formData)
+
+		const fileChooserPromise = page.waitForEvent('filechooser')
+
+		// Click the Import form button in the navigation
+		await page.getByRole('button', { name: 'Import a form' }).click()
+
+		const fileChooser = await fileChooserPromise
+		await fileChooser.setFiles({
+			name: 'long-text.json',
+			mimeType: 'application/json',
+			buffer: Buffer.from(jsonContent),
+		})
+
+		await expect(appNavigation.getOwnForm('Long answer form')).toBeVisible()
+		await expect(
+			page.getByRole('textbox', { name: 'Title of question number 1' }),
+		).toHaveValue('Your biography')
+		await expect(
+			page.getByRole('textbox', { name: 'Description', exact: true }),
+		).toHaveValue('Testing long text import')
+	})
+
+	test('Import a form with confirmation email question remapping', async ({
+		page,
+		appNavigation,
+	}) => {
+		const formData = {
+			appVersion: '5.3.0-rc.0',
+			form: {
+				title: 'Email confirmation',
+				description: '',
+				confirmationEmailQuestionId: 99,
+				questions: [
+					{
+						id: 99,
+						order: 1,
+						type: 'short',
+						text: 'Your email',
+						options: [],
+					},
+				],
+			},
+		}
+
+		const jsonContent = JSON.stringify(formData)
+
+		const fileChooserPromise = page.waitForEvent('filechooser')
+
+		// Click the Import form button in the navigation
+		await page.getByRole('button', { name: 'Import a form' }).click()
+
+		const fileChooser = await fileChooserPromise
+		await fileChooser.setFiles({
+			name: 'email-confirm.json',
+			mimeType: 'application/json',
+			buffer: Buffer.from(jsonContent),
+		})
+
+		await expect(appNavigation.getOwnForm('Email confirmation')).toBeVisible()
+		await expect(
+			page.getByRole('textbox', { name: 'Title of question number 1' }),
+		).toHaveValue('Your email')
+	})
+})

@@ -873,6 +873,21 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "(optional) Id of the form that should be cloned"
+                                    },
+                                    "import": {
+                                        "type": "boolean",
+                                        "nullable": true,
+                                        "default": false,
+                                        "description": "(optional) If it should import the form from post body"
+                                    },
+                                    "formData": {
+                                        "type": "object",
+                                        "nullable": true,
+                                        "default": {},
+                                        "description": "(optional) The formdata to import",
+                                        "additionalProperties": {
+                                            "type": "object"
+                                        }
                                     }
                                 }
                             }
@@ -924,6 +939,34 @@
                     },
                     "403": {
                         "description": "The user is not allowed to create forms",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid option data: unknown properties",
                         "content": {
                             "application/json": {
                                 "schema": {
