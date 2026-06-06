@@ -1552,7 +1552,7 @@ file2.txt"
 					]
 				],
 				// Expected Result
-				'Subquestion "Sub Q1" in conditional question "Conditional Q" is required.',
+				'Question "Sub Q1" is required.',
 			],
 			'valid-conditional-linearscale-trigger' => [
 				// Questions - conditional with linearscale trigger
