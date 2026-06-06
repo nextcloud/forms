@@ -559,7 +559,7 @@ class SubmissionService {
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
 	 * @param int $formId Id of the form being submitted
-	 * @throw \InvalidArgumentException if validation failed
+	 * @throws \InvalidArgumentException if validation failed
 	 */
 	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
 		// Check by questions
@@ -576,7 +576,7 @@ class SubmissionService {
 
 				// If answered, validate the conditional structure
 				if ($questionAnswered) {
-					$this->validateConditionalQuestion($question, $answers[$questionId], $formOwnerId);
+					$this->validateConditionalQuestion($question, $answers[$questionId], $formOwnerId, $formId);
 				}
 				continue;
 			}
@@ -952,9 +952,10 @@ class SubmissionService {
 	 * @param array $question The conditional question
 	 * @param array $answerData The answer data for the conditional question
 	 * @param string $formOwnerId Owner of the form
+	 * @param int $formId Id of the form being submitted
 	 * @throws \InvalidArgumentException if validation failed
 	 */
-	private function validateConditionalQuestion(array $question, array $answerData, string $formOwnerId): void {
+	private function validateConditionalQuestion(array $question, array $answerData, string $formOwnerId, int $formId): void {
 		// Answer structure should have 'trigger' key
 		// For conditional questions, the answerData may be structured differently
 		// Check if this is a structured conditional answer or a flat array
@@ -969,10 +970,10 @@ class SubmissionService {
 			throw new \InvalidArgumentException(sprintf('Conditional question "%s" is missing trigger type configuration.', $question['text']));
 		}
 
-		// Find the active branch based on trigger answer
-		$activeBranch = $this->findActiveBranch($triggerType, $triggerAnswer, $branches, $question['options'] ?? []);
+		// Find the active branches based on trigger answer
+		$activeBranches = $this->findActiveBranches($triggerType, $triggerAnswer, $branches, $question['options'] ?? []);
 
-		if ($activeBranch === null && !empty($branches)) {
+		if (\count($activeBranches) === 0 && !empty($branches)) {
 			// No branch matched but branches are defined - this might be okay if trigger has no value yet
 			// Only throw if trigger has a value that doesn't match any branch
 			if (!empty($triggerAnswer)) {
@@ -985,8 +986,10 @@ class SubmissionService {
 		}
 
 		// Validate the active branch's subquestions with the full per-question rules
-		if ($activeBranch !== null && isset($activeBranch['subQuestions'])) {
-			$this->validateSubmission($activeBranch['subQuestions'], $subQuestionAnswers, $formOwnerId);
+		if (\count($activeBranches) > 0) {
+			// Merge subquestion of all active branches
+			$subQuestions = array_merge(...array_column($activeBranches, 'subQuestions'));
+			$this->validateSubmission($subQuestions, $subQuestionAnswers, $formOwnerId, $formId);
 		}
 	}
 
@@ -995,11 +998,11 @@ class SubmissionService {
 	 *
 	 * @param array $question The conditional question
 	 * @param array $triggerAnswer The trigger answer values
-	 * @return array|null The active branch or null if none matches
+	 * @return array The active branches or empty array if none matches
 	 */
-	public function getActiveBranch(array $question, array $triggerAnswer): ?array {
+	public function getActiveBranches(array $question, array $triggerAnswer): ?array {
 		$extraSettings = $question['extraSettings'] ?? [];
-		return $this->findActiveBranch(
+		return $this->findActiveBranches(
 			$extraSettings['triggerType'] ?? '',
 			$triggerAnswer,
 			$extraSettings['branches'] ?? [],
@@ -1008,30 +1011,22 @@ class SubmissionService {
 	}
 
 	/**
-	 * Find the active branch based on trigger answer
+	 * Find the active branches based on trigger answer
 	 *
 	 * @param string $triggerType The type of the trigger question
 	 * @param array $triggerAnswer The trigger answer values
 	 * @param array $branches The available branches
 	 * @param array $options The options for the trigger question
-	 * @return array|null The active branch or null if none matches
+	 * @return array The active branches or empty array if none matches
 	 */
-	private function findActiveBranch(string $triggerType, array $triggerAnswer, array $branches, array $options): ?array {
-		foreach ($branches as $branch) {
+	private function findActiveBranches(string $triggerType, array $triggerAnswer, array $branches, array $options): ?array {
+		return array_filter($branches, function ($branch) use ($triggerType, $triggerAnswer) {
 			$conditions = $branch['conditions'] ?? [];
-
 			if (empty($conditions)) {
-				continue;
+				return false;
 			}
-
-			$matches = $this->evaluateBranchConditions($triggerType, $triggerAnswer, $conditions);
-
-			if ($matches) {
-				return $branch;
-			}
-		}
-
-		return null;
+			return $this->evaluateBranchConditions($triggerType, $triggerAnswer, $conditions);
+		});
 	}
 
 	/**
