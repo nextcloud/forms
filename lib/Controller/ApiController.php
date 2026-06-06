@@ -2169,9 +2169,8 @@ class ApiController extends OCSController {
 			}
 		}
 
-		// Store subquestion answers only for the branch the trigger activated
-		$activeBranch = $this->submissionService->getActiveBranch($question, $triggerAnswers);
-		$branches = $activeBranch === null ? [] : [$activeBranch];
+		// Store subquestion answers only for the branches the trigger activated
+		$branches = $this->submissionService->getActiveBranches($question, $triggerAnswers);
 		foreach ($branches as $branch) {
 			$branchSubQuestions = $branch['subQuestions'] ?? [];
 			foreach ($branchSubQuestions as $subQuestion) {
