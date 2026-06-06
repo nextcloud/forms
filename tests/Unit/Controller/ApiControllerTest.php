@@ -936,6 +936,11 @@ class ApiControllerTest extends TestCase {
 				return true;
 			}));
 
+		$this->submissionService->expects($this->once())
+			->method('getActiveBranch')
+			->with($questions[0], $answers[100]['trigger'])
+			->willReturn($questions[0]['extraSettings']['branches'][0]);
+
 		// Trigger answer + subquestion answer = 2 inserts
 		$this->answerMapper->expects($this->exactly(2))
 			->method('insert');
