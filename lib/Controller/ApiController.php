@@ -224,6 +224,7 @@ class ApiController extends OCSController {
 				$questionData['formId'] = $form->getId();
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
+				$questionData['id'] = $newQuestion->getId();
 
 				if (isset($oldConfirmationEmailQuestionId) && $oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
 					$form->setConfirmationEmailQuestionId($newQuestion->getId());
@@ -231,13 +232,54 @@ class ApiController extends OCSController {
 
 				// Get Options, set new QuestionId, reinsert
 				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
+				// Array to map old option id to new id
+				$optionIdMapper = [];
 				foreach ($options as $oldOption) {
 					$optionData = $oldOption->read();
 
+					$oldOptionID = $optionData['id'];
 					unset($optionData['id']);
 					$optionData['questionId'] = $newQuestion->getId();
 					$newOption = Option::fromParams($optionData);
 					$this->optionMapper->insert($newOption);
+					$optionIdMapper[$oldOptionID] = $newOption->getId();
+				}
+				$branches = $questionData['extraSettings']['branches'] ?? null;
+				if (isset($branches) && \is_array($branches) > 0) {
+					foreach ($branches as $branchKey => $branch) {
+						if (isset($branch['conditions']) && \is_array($branch['conditions'])) {
+							foreach ($branch['conditions'] as $conditionKey => $cond) {
+								if (isset($cond['optionId']) && isset($optionIdMapper[$cond['optionId']])) {
+									$branches[$branchKey]['conditions'][$conditionKey]['optionId'] = $optionIdMapper[$cond['optionId']];
+								}
+							}
+						}
+						if (isset($branch['subQuestions']) && \is_array($branch['subQuestions'])) {
+							foreach ($branch['subQuestions'] as $questionKey => $subQuestion) {
+								$subQuestion['formId'] = $form->getId();
+								$subQuestion['parentQuestionId'] = $newQuestion->getId();
+								$oldOptions = $subQuestion['options'] ?? [];
+
+								unset($subQuestion['id']);
+								unset($subQuestion['options']);
+								unset($subQuestion['accept']);
+								$newSubQuestion = Question::fromParams($subQuestion);
+								$this->questionMapper->insert($newSubQuestion);
+								$branches[$branchKey]['subQuestions'][$questionKey] = $newSubQuestion->read();
+
+								foreach ($oldOptions as $optionData) {
+									unset($optionData['id']);
+									$optionData['questionId'] = $newSubQuestion->getId();
+									$newOption = Option::fromParams($optionData);
+									$this->optionMapper->insert($newOption);
+								}
+							}
+						}
+					}
+
+					$questionData['extraSettings']['branches'] = $branches;
+					$updatedQuestion = Question::fromParams($questionData);
+					$this->questionMapper->update($updatedQuestion);
 				}
 			}
 
