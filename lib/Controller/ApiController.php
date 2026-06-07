@@ -244,8 +244,8 @@ class ApiController extends OCSController {
 					$this->optionMapper->insert($newOption);
 					$optionIdMapper[$oldOptionID] = $newOption->getId();
 				}
-				$branches = $questionData['extraSettings']['branches'] ?? null;
-				if (isset($branches) && \is_array($branches) > 0) {
+				$branches = $questionData['extraSettings']['branches'] ?? [];
+				if (!empty($branches)) {
 					foreach ($branches as $branchKey => $branch) {
 						if (isset($branch['conditions']) && \is_array($branch['conditions'])) {
 							foreach ($branch['conditions'] as $conditionKey => $cond) {
