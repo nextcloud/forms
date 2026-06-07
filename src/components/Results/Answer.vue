@@ -74,6 +74,28 @@
 		<p v-else class="answer__text" dir="auto">
 			<NcHighlight :text="answerText" :search="highlight" />
 		</p>
+		<template v-if="question.conditional && question.answers">
+			<div
+				v-for="(branchAnswers, branchAnswersKey) in question.answers"
+				:key="branchAnswersKey"
+				class="branch__subquestions">
+				<div class="answer__subquestion">
+					<Answer
+						v-for="subquestion in branchAnswers"
+						:key="subquestion.id"
+						:question="subquestion"
+						:highlight="highlight"
+						:answerText="subquestion.squashedAnswers"
+						:answers="subquestion.answer"
+						:questionText="subquestion.text"
+						:gridCellType="subquestion.gridCellType"
+						:gridColumns="subquestion.gridColumns"
+						:gridRows="subquestion.gridRows"
+						:gridValue="subquestion.gridValue"
+						:questionType="subquestion.type" />
+				</div>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -93,6 +115,11 @@ export default {
 	},
 
 	props: {
+		question: {
+			type: Object,
+			required: true,
+		},
+
 		answers: {
 			type: Array,
 			required: false,
@@ -214,6 +241,12 @@ export default {
 			position: sticky;
 			left: 0;
 		}
+	}
+
+	&__subquestion {
+		margin-top: 16px;
+		padding-left: 16px;
+		border-left: 3px solid var(--color-primary-element);
 	}
 }
 </style>

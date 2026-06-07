@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -137,6 +137,11 @@ class FormsService {
 					$question['isRequired'] = true;
 				}
 
+				// Load subquestions for conditional questions and attach to branches
+				if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
+					$question = $this->loadConditionalSubQuestions($question);
+				}
+
 				$questionList[] = $question;
 			}
 		} catch (DoesNotExistException $e) {
@@ -144,6 +149,57 @@ class FormsService {
 		} finally {
 			return $questionList;
 		}
+	}
+
+	/**
+	 * Load subquestions for a conditional question and attach them to branches
+	 *
+	 * @param array $question The conditional question data
+	 * @return array The question with subquestions attached to branches
+	 */
+	private function loadConditionalSubQuestions(array $question): array {
+		$subQuestionEntities = $this->questionMapper->findByParentQuestion($question['id']);
+
+		// Group subquestions by branchId
+		$subQuestionsByBranch = [];
+		foreach ($subQuestionEntities as $subQuestionEntity) {
+			$subQuestion = $subQuestionEntity->read();
+			$subQuestion['options'] = $this->getOptions($subQuestion['id']);
+			$subQuestion['accept'] = [];
+
+			// Handle file type accept for subquestions
+			if ($subQuestion['type'] === Constants::ANSWER_TYPE_FILE) {
+				if ($subQuestion['extraSettings']['allowedFileTypes'] ?? null) {
+					$subQuestion['accept'] = array_map(function (string $fileType) {
+						return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
+					}, $subQuestion['extraSettings']['allowedFileTypes']);
+				}
+
+				if ($subQuestion['extraSettings']['allowedFileExtensions'] ?? null) {
+					foreach ($subQuestion['extraSettings']['allowedFileExtensions'] as $extension) {
+						$subQuestion['accept'][] = '.' . $extension;
+					}
+				}
+			}
+
+			$branchId = $subQuestion['branchId'] ?? null;
+			if ($branchId !== null) {
+				if (!isset($subQuestionsByBranch[$branchId])) {
+					$subQuestionsByBranch[$branchId] = [];
+				}
+				$subQuestionsByBranch[$branchId][] = $subQuestion;
+			}
+		}
+
+		// Attach subquestions to their respective branches in extraSettings
+		if (isset($question['extraSettings']['branches']) && is_array($question['extraSettings']['branches'])) {
+			foreach ($question['extraSettings']['branches'] as $index => $branch) {
+				$branchId = $branch['id'] ?? null;
+				$question['extraSettings']['branches'][$index]['subQuestions'] = $subQuestionsByBranch[$branchId] ?? [];
+			}
+		}
+
+		return $question;
 	}
 
 	/**
@@ -171,6 +227,12 @@ class FormsService {
 					}
 				}
 			}
+
+			// Load subquestions for conditional questions
+			if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
+				$question = $this->loadConditionalSubQuestions($question);
+			}
+
 			return $question;
 		} catch (DoesNotExistException $e) {
 			return null;
@@ -838,39 +900,28 @@ class FormsService {
 			return true;
 		}
 
-		// Ensure only allowed keys are set
-		switch ($questionType) {
-			case Constants::ANSWER_TYPE_DROPDOWN:
-				$allowed = Constants::EXTRA_SETTINGS_DROPDOWN;
-				break;
-			case Constants::ANSWER_TYPE_MULTIPLE:
-			case Constants::ANSWER_TYPE_MULTIPLEUNIQUE:
-				$allowed = Constants::EXTRA_SETTINGS_MULTIPLE;
-				break;
-			case Constants::ANSWER_TYPE_SHORT:
-				$allowed = Constants::EXTRA_SETTINGS_SHORT;
-				break;
-			case Constants::ANSWER_TYPE_FILE:
-				$allowed = Constants::EXTRA_SETTINGS_FILE;
-				break;
-			case Constants::ANSWER_TYPE_DATE:
-				$allowed = Constants::EXTRA_SETTINGS_DATE;
-				break;
-			case Constants::ANSWER_TYPE_GRID:
-				$allowed = Constants::EXTRA_SETTINGS_GRID;
-				break;
-			case Constants::ANSWER_TYPE_RANKING:
-				$allowed = Constants::EXTRA_SETTINGS_RANKING;
-				break;
-			case Constants::ANSWER_TYPE_TIME:
-				$allowed = Constants::EXTRA_SETTINGS_TIME;
-				break;
-			case Constants::ANSWER_TYPE_LINEARSCALE:
-				$allowed = Constants::EXTRA_SETTINGS_LINEARSCALE;
-				break;
-			default:
-				$allowed = [];
+		// Map allowed options to answer type
+		$extraSettingsMap = [
+			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
+			Constants::ANSWER_TYPE_MULTIPLE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
+			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
+			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
+			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
+			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_CONDITIONAL => Constants::EXTRA_SETTINGS_CONDITIONAL,
+		];
+
+		// Get triggertype if is conditional
+		$triggerType = $extraSettings['triggerType'] ?? null;
+		if (is_string($triggerType) && isset($extraSettingsMap[$triggerType])) {
+			$extraSettingsMap[Constants::ANSWER_TYPE_CONDITIONAL] += $extraSettingsMap[$triggerType];
 		}
+		// Ensure only allowed keys are set
+		$allowed = $extraSettingsMap[$questionType] ?? [];
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -978,6 +1029,46 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_CONDITIONAL) {
+			// Validate conditional question settings
+			if (!isset($extraSettings['triggerType']) || !is_string($extraSettings['triggerType'])) {
+				return false;
+			}
+
+			// Validate trigger type is a valid question type (and not nested conditional)
+			if (!array_key_exists($extraSettings['triggerType'], Constants::CONDITIONAL_TRIGGER_TYPES)) {
+				return false;
+			}
+
+			// Branches are required for conditional questions
+			if (!isset($extraSettings['branches']) || !is_array($extraSettings['branches'])) {
+				return false;
+			}
+
+			// Validate branches structure
+			foreach ($extraSettings['branches'] as $branch) {
+				// Each branch must have an id
+				if (!isset($branch['id']) || !is_string($branch['id'])) {
+					return false;
+				}
+
+				// Branches must have conditions array
+				if (!isset($branch['conditions']) || !is_array($branch['conditions'])) {
+					return false;
+				}
+			}
+
+			$diff = array_diff(array_keys($extraSettings), array_keys(Constants::EXTRA_SETTINGS_CONDITIONAL));
+			// Handle options of triggerQuestion
+			if (count($diff) > 0 && isset($triggerType) && $triggerType !== '') {
+				$diffDict = [];
+				foreach ($diff as $k) {
+					$diffDict[$k] = $extraSettings[$k];
+				}
+				$valid = self::areExtraSettingsValid($diffDict, $triggerType);
+				return $valid;
+			}
+
 		}
 		return true;
 	}

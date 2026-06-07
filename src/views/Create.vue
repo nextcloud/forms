@@ -114,93 +114,28 @@
 
 			<section>
 				<!-- Questions list -->
-				<Draggable
+				<QuestionList
+					ref="questionList"
 					v-model="form.questions"
-					:animation="300"
-					target=".sort-target"
-					direction="vertical"
-					invertSwap
-					handle=".question__drag-handle"
-					@change="onQuestionOrderChange"
-					@start="onDragStart"
-					@end="onDragEnd">
-					<TransitionGroup
-						tag="ul"
-						:name="isDragging ? undefined : 'question-list'"
-						class="sort-target">
-						<component
-							:is="answerTypes[question.type].component"
-							v-for="(question, index) in form.questions"
-							:key="question.id"
-							:ref="(el) => setQuestionRef(el, question)"
-							v-bind="form.questions[index]"
-							:canMoveDown="index < form.questions.length - 1"
-							:canMoveUp="index > 0"
-							:answerType="answerTypes[question.type]"
-							:index="index + 1"
-							:maxStringLengths="maxStringLengths"
-							@update:text="
-								(val) => (form.questions[index].text = val)
-							"
-							@update:description="
-								(val) => (form.questions[index].description = val)
-							"
-							@update:isRequired="
-								(val) => (form.questions[index].isRequired = val)
-							"
-							@update:name="
-								(val) => (form.questions[index].name = val)
-							"
-							@update:extraSettings="
-								(val) => (form.questions[index].extraSettings = val)
-							"
-							@update:options="
-								(val) => (form.questions[index].options = val)
-							"
-							@clone="cloneQuestion(question, index)"
-							@delete="deleteQuestion(question.id)"
-							@moveDown="onMoveDown(index)"
-							@moveUp="onMoveUp(index)">
-							<template
-								v-if="index < form.questions.length - 1"
-								#insert>
-								<div
-									class="question-insert"
-									:class="[
-										{
-											'is-open':
-												insertMenuOpenedIndex === index,
-										},
-										{
-											'is-mobile': isMobile,
-										},
-									]">
-									<AddQuestionMenu
-										:menuName="t('forms', 'Insert question')"
-										:aria-label="
-											t(
-												'forms',
-												'Insert question after question {index}',
-												{ index: index + 1 },
-											)
-										"
-										variant="tertiary"
-										:position="index"
-										:isLoadingQuestions="isLoadingQuestions"
-										:answerTypesFilter="answerTypesFilter"
-										:hasSubtypes="hasSubtypes"
-										@update:open="
-											(v) =>
-												(insertMenuOpenedIndex = v
-													? index
-													: null)
-										"
-										@addQuestion="addQuestion" />
-								</div>
-							</template>
-						</component>
-					</TransitionGroup>
-				</Draggable>
+					:getComponent="getQuestionComponent"
+					:getAnswerType="getQuestionAnswerType"
+					:maxStringLengths="maxStringLengths"
+					:formId="form.id"
+					:showInsert="true"
+					:insertMenuName="t('forms', 'Insert question')"
+					:answerTypesFilter="answerTypesFilter"
+					:hasSubtypes="hasSubtypes"
+					:isLoadingQuestions="isLoadingQuestions"
+					:isMobile="isMobile"
+					:insertMenuOpenedIndex="insertMenuOpenedIndex"
+					@update:insertMenuOpenedIndex="insertMenuOpenedIndex = $event"
+					@updateProperty="onUpdateProperty"
+					@clone="cloneQuestion"
+					@delete="(question) => deleteQuestion(question.id)"
+					@moveDown="onMoveDown"
+					@moveUp="onMoveUp"
+					@orderChange="onQuestionOrderChange"
+					@addQuestion="addQuestion" />
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
@@ -229,17 +164,12 @@ import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
-import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import AddQuestionMenu from '../components/AddQuestionMenu.vue'
-import Question from '../components/Questions/Question.vue'
-import QuestionLong from '../components/Questions/QuestionLong.vue'
-import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
-import QuestionShort from '../components/Questions/QuestionShort.vue'
+import QuestionList from '../components/Questions/QuestionList.vue'
 import TopBar from '../components/TopBar.vue'
 import ViewsMixin from '../mixins/ViewsMixin.js'
 import answerTypes from '../models/AnswerTypes.js'
@@ -254,17 +184,12 @@ export default {
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Create',
 	components: {
-		Draggable,
 		NcIconSvgWrapper,
 		AddQuestionMenu,
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
-		NcNoteCard,
-		Question,
-		QuestionLong,
-		QuestionShort,
-		QuestionMultiple,
+		QuestionList,
 		TopBar,
 	},
 
@@ -283,17 +208,13 @@ export default {
 
 			// Various states
 			isLoadingQuestions: false,
-			isDragging: false,
 
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			questionMenuOpened: false,
 			activeQuestionType: null,
-			questionRefsMap: {},
 
 			// when set to a number, the next created question will be inserted at this index
 			insertMenuOpenedIndex: null,
-			// controls per-question insert menu visibility
-			insertMenuOpened: false,
 		}
 	},
 
@@ -364,6 +285,14 @@ export default {
 				answer && answer.subtypes && Object.keys(answer.subtypes).length > 0
 		},
 
+		getQuestionComponent() {
+			return (question) => answerTypes[question.type]?.component
+		},
+
+		getQuestionAnswerType() {
+			return (question) => answerTypes[question.type]
+		},
+
 		lockedUntilFormatted() {
 			return moment(this.form.lockedUntil, 'X').fromNow()
 		},
@@ -395,22 +324,8 @@ export default {
 	},
 
 	methods: {
-		onDragStart() {
-			this.isDragging = true
-		},
-
-		onDragEnd() {
-			this.$nextTick(() => {
-				this.isDragging = false
-			})
-		},
-
-		setQuestionRef(el, question) {
-			if (el) {
-				this.questionRefsMap[question.id] = el
-			} else {
-				delete this.questionRefsMap[question.id]
-			}
+		onUpdateProperty(index, property, value) {
+			this.form.questions[index][property] = value
 		},
 
 		onMoveUp(index) {
@@ -576,13 +491,12 @@ export default {
 			if (insertAt !== null && insertAt <= this.form.questions.length) {
 				this.form.questions.splice(insertAt, 0, newQuestionObj)
 				this.$nextTick(() => {
-					// Prefer ref by id when available, fallback to positional refs
-					this.questionRefsMap[newQuestionObj.id]?.focus()
+					this.$refs.questionList?.focusQuestion(newQuestionObj.id)
 				})
 			} else {
 				this.form.questions.push(newQuestionObj)
 				this.$nextTick(() => {
-					this.questionRefsMap[newQuestionObj.id]?.focus()
+					this.$refs.questionList?.focusQuestion(newQuestionObj.id)
 				})
 			}
 
@@ -753,46 +667,5 @@ export default {
 			margin-inline-start: var(--default-clickable-area);
 		}
 	}
-}
-
-.question-list-move,
-.question-list-enter-active,
-.question-list-leave-active {
-	transition: all var(--animation-slow) ease;
-}
-
-.question-list-enter-from,
-.question-list-leave-to {
-	opacity: 0;
-	transform: translateX(var(--clickable-area-large));
-}
-
-/* ensure leaving items are taken out of layout flow so that moving
-   animations can be calculated correctly. */
-.question-list-leave-active {
-	position: absolute;
-}
-
-.question-insert {
-	/* closer to the question above */
-	position: relative;
-	margin-block-end: -34px;
-	inset-block-end: -16px;
-	margin-inline-start: -12px;
-	width: calc(100% - var(--default-clickable-area));
-	display: flex;
-	justify-content: center;
-	opacity: 0;
-	transition: opacity 0.12s ease;
-}
-
-.question-insert.is-mobile {
-	opacity: 0.3;
-}
-
-.question:hover > .question-insert,
-.question-insert:focus-within,
-.question-insert.is-open {
-	opacity: 1;
 }
 </style>
