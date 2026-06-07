@@ -1032,13 +1032,12 @@ class SubmissionService {
 	 * @param array $triggerAnswer The trigger answer values
 	 * @return array The active branches or empty array if none matches
 	 */
-	public function getActiveBranches(array $question, array $triggerAnswer): ?array {
+	public function getActiveBranches(array $question, array $triggerAnswer): array {
 		$extraSettings = $question['extraSettings'] ?? [];
 		return $this->findActiveBranches(
 			$extraSettings['triggerType'] ?? '',
 			$triggerAnswer,
 			$extraSettings['branches'] ?? [],
-			$question['options'] ?? [],
 		);
 	}
 
@@ -1048,10 +1047,9 @@ class SubmissionService {
 	 * @param string $triggerType The type of the trigger question
 	 * @param array $triggerAnswer The trigger answer values
 	 * @param array $branches The available branches
-	 * @param array $options The options for the trigger question
 	 * @return array The active branches or empty array if none matches
 	 */
-	private function findActiveBranches(string $triggerType, array $triggerAnswer, array $branches, array $options): ?array {
+	private function findActiveBranches(string $triggerType, array $triggerAnswer, array $branches): array {
 		return array_filter($branches, function ($branch) use ($triggerType, $triggerAnswer) {
 			$conditions = $branch['conditions'] ?? [];
 			if (empty($conditions)) {
