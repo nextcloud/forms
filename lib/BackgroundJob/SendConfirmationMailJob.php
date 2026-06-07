@@ -31,7 +31,9 @@ class SendConfirmationMailJob extends QueuedJob {
 	public function run($argument): void {
 		$recipient = $argument['recipient'];
 		$subject = $argument['subject'];
-		$body = $argument['body'];
+		$plainBody = $argument['body'];
+		#Escape html and add html line breaks
+		$htmlBody = nl2br(htmlspecialchars($plainBody));
 		$formId = $argument['formId'];
 		$submissionId = $argument['submissionId'];
 
@@ -40,7 +42,7 @@ class SendConfirmationMailJob extends QueuedJob {
 			$emailTemplate->setSubject($subject);
 			$emailTemplate->addHeader();
 			$emailTemplate->addHeading($subject);
-			$emailTemplate->addBodyText($body);
+			$emailTemplate->addBodyText($htmlBody, $plainBody);
 			$emailTemplate->addFooter();
 
 			$message = $this->mailer->createMessage();
