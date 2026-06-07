@@ -37,10 +37,9 @@ export class TopBarSection {
 		if (await radio.isChecked()) {
 			return
 		}
-		// NcCheckboxRadioSwitch hides the input inside a label; click the label
-		// to trigger Vue's event chain rather than force-checking the hidden input
-		// (which would fail because Vue resets the controlled input state before
-		// Playwright can verify it)
+		// The radio input is visually hidden and wrapped in a clickable button-like
+		// container. Click the parent container to follow the real user interaction
+		// path and let Vue update the controlled state.
 		await radio.locator('xpath=..').click()
 		await this.page.waitForURL(viewRoutes[view])
 	}
