@@ -582,6 +582,18 @@
                     },
                     "questionType": {
                         "type": "string"
+                    },
+                    "triggerType": {
+                        "type": "string"
+                    },
+                    "branches": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object"
+                            }
+                        }
                     }
                 }
             },
