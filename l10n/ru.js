@@ -269,6 +269,8 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Форма '{title}' заблокирована {lockedBy} и не может быть изменена. Срок действия блокировки истекает: {lockedUntil}",
     "Form title" : "Название формы",
     "Description" : "Описание",
+    "Insert question" : "Вставить вопрос",
+    "Insert question after question {index}" : "Вставляйте вопрос за вопросом {index}",
     "Add a question" : "Добавить вопрос",
     "Summary" : "Всего",
     "Unlink spreadsheet" : "Отключить электронную таблицу",
