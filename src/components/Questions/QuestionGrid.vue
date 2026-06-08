@@ -101,7 +101,7 @@
 					handle=".option__drag-handle"
 					invertSwap
 					target=".sort-target"
-					@update="saveOptionsOrder('column')"
+					@update="dirtyOptionsType = 'column'"
 					@start="onDragStart"
 					@end="onDragEnd">
 					<!-- Column input edit -->
@@ -139,7 +139,7 @@
 					handle=".option__drag-handle"
 					invertSwap
 					target=".sort-target"
-					@update="saveOptionsOrder('row')"
+					@update="dirtyOptionsType = 'row'"
 					@start="onDragStart"
 					@end="onDragEnd">
 					<TransitionGroup

@@ -55,7 +55,7 @@
 				handle=".option__drag-handle"
 				invertSwap
 				target=".sort-target"
-				@update="saveOptionsOrder('choice')"
+				@update="dirtyOptionsType = 'choice'"
 				@start="onDragStart"
 				@end="onDragEnd">
 				<TransitionGroup
