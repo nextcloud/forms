@@ -41,14 +41,23 @@
 					class="ranking-unranked__pool"
 					:animation="300"
 					:group="'ranking_' + id"
-					@end="emitValues">
-					<button
-						v-for="option in unrankedOptions"
-						:key="option.id"
-						class="ranking-unranked__item"
-						@click="rankOption(option)">
-						{{ option.text }}
-					</button>
+					target=".sort-target"
+					direction="horizontal"
+					@start="onRankingStart"
+					@end="onRankingEnd">
+					<TransitionGroup
+						tag="ul"
+						:name="isRanking ? undefined : 'options-list-transition'"
+						class="sort-target">
+						<li v-for="option in unrankedOptions" :key="option.id">
+							<button
+								type="button"
+								class="ranking-unranked__item"
+								@click="rankOption(option)">
+								{{ option.text }}
+							</button>
+						</li>
+					</TransitionGroup>
 				</Draggable>
 				<p v-else class="ranking-unranked__empty">
 					{{ t('forms', 'All options ranked') }}
@@ -68,10 +77,11 @@
 					target=".sort-target"
 					direction="vertical"
 					handle=".ranking-item__drag-handle"
+					@start="onRankingStart"
 					@end="onRankingEnd">
 					<TransitionGroup
 						tag="ul"
-						:name="isDragging ? undefined : 'options-list-transition'"
+						:name="isRanking ? undefined : 'options-list-transition'"
 						class="sort-target">
 						<li
 							v-for="(option, index) in rankedOptions"
@@ -235,6 +245,7 @@ export default {
 		return {
 			errorMessage: null,
 			isDragging: false,
+			isRanking: false,
 			isLoading: false,
 			isOptionDialogShown: false,
 			rankedOptions: [],
@@ -412,10 +423,17 @@ export default {
 			})
 		},
 
+		onRankingStart() {
+			this.isRanking = true
+		},
+
 		/**
 		 * Emit the current ranking after a drag reorder
 		 */
 		onRankingEnd() {
+			this.$nextTick(() => {
+				this.isRanking = false
+			})
 			this.emitValues()
 		},
 
@@ -481,6 +499,10 @@ export default {
 		color: var(--color-text-maxcontrast);
 		font-style: italic;
 		padding: var(--default-grid-baseline) 0;
+	}
+
+	li {
+		display: inline-block;
 	}
 }
 
