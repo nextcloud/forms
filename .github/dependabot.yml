@@ -51,7 +51,7 @@ updates:
       - dependencies
 
   - package-ecosystem: composer
-    target-branch: 'stable5.2'
+    target-branch: 'stable5.3'
     directories:
       - '/'
       - '/vendor-bin/*/'
@@ -68,7 +68,7 @@ updates:
       - dependencies
 
   - package-ecosystem: npm
-    target-branch: 'stable5.2'
+    target-branch: 'stable5.3'
     directory: '/'
     schedule:
       interval: weekly
