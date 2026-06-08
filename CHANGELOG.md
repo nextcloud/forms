@@ -5,44 +5,16 @@
 
 # Changelog
 
-## v5.3.0-rc.0 - 2026-06-05
+## v5.3.0 - 2026-06-08
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.2...v5.3.0-rc.0)
-
-### Fixed
-
-- fix(export): type numeric answers as numbers in exports by @solracsf in [\#3368](https://github.com/nextcloud/forms/pull/3368)
-- fix: Delete files on submission/question/form deletion by @Koc in [\#3335](https://github.com/nextcloud/forms/pull/3335)
-
-## v5.3.0-alpha.2 - 2026-06-01
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.1...v5.3.0-alpha.2)
-
-### Enhancements
-
-- feat: add question at position by @Chartman123 in [\#3360](https://github.com/nextcloud/forms/pull/3360)
-- Re-check result permission in submission export by @pringelmann in [\#3365](https://github.com/nextcloud/forms/pull/3365)
-
-## v5.3.0-alpha.1 - 2026-05-26
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0-alpha.0...v5.3.0-alpha.1)
-
-### Fixed
-
-- fix: overlay icon alignment by @Chartman123 in [\#3359](https://github.com/nextcloud/forms/pull/3359)
-- fix: replace icon components with NcIconSvgWrapper by @Chartman123 in [\#3352](https://github.com/nextcloud/forms/pull/3352)
-- fix: only clone question from same form by @Chartman123 in [\#3361](https://github.com/nextcloud/forms/pull/3361)
-- fix(a11y): announce form submission success to screen readers by @pringelmann in [\#3238](https://github.com/nextcloud/forms/pull/3238)
-
-## v5.3.0-alpha.0 - 2026-05-21
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.0...v5.3.0-alpha.0)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.9...v5.3.0)
 
 ### Enhancements
 
 - feat: ranking question type by @datapumpernickel in [\#3262](https://github.com/nextcloud/forms/pull/3262)
-- feat: improve handling of option limits by @Chartman123 in [\#3323](https://github.com/nextcloud/forms/pull/3323)
+- feat: add question at position by @Chartman123 in [\#3360](https://github.com/nextcloud/forms/pull/3360)
 - feat: add support for comments in forms by @Chartman123 in [\#3329](https://github.com/nextcloud/forms/pull/3329)
+- feat: improve handling of option limits by @Chartman123 in [\#3323](https://github.com/nextcloud/forms/pull/3323)
 - feat: Add confirmation email for form respondents by @dtretyakov in [\#3289](https://github.com/nextcloud/forms/pull/3289)
 - enh(l10n): Unify wording for form responses across multiple components by @Chartman123 in [\#3218](https://github.com/nextcloud/forms/pull/3218)
 - feat: add maximum submissions limit for forms by @LAfricain in [\#3199](https://github.com/nextcloud/forms/pull/3199)
@@ -51,15 +23,27 @@
 
 ### Fixed
 
+- fix: save question reorder on drop instead of during drag by @pringelmann in [\#3392](https://github.com/nextcloud/forms/pull/3392)
+- confirmation mail: preserve line breaks by @SnejPro in [\#3391](https://github.com/nextcloud/forms/pull/3391)
+- fix: add validation method and error message by @Chartman123 in [\#3382](https://github.com/nextcloud/forms/pull/3382)
+- fix: cast allowComments to boolean by @Chartman123 in [\#3381](https://github.com/nextcloud/forms/pull/3381)
+- fix(export): type numeric answers as numbers in exports by @solracsf in [\#3368](https://github.com/nextcloud/forms/pull/3368)
+- Re-check result permission in submission export by @pringelmann in [\#3365](https://github.com/nextcloud/forms/pull/3365)
+- fix: only clone question from same form by @Chartman123 in [\#3361](https://github.com/nextcloud/forms/pull/3361)
+- fix: overlay icon alignment by @Chartman123 in [\#3359](https://github.com/nextcloud/forms/pull/3359)
+- fix: replace icon components with NcIconSvgWrapper by @Chartman123 in [\#3352](https://github.com/nextcloud/forms/pull/3352)
 - fix: always show three dots menu in navigation by @Chartman123 in [\#3346](https://github.com/nextcloud/forms/pull/3346)
 - fix: Prevent infinity loop on form deletion by @Koc in [\#3343](https://github.com/nextcloud/forms/pull/3343)
+- fix: Delete files on submission/question/form deletion by @Koc in [\#3335](https://github.com/nextcloud/forms/pull/3335)
 - Fix copypasting from responses page resulting in wrong paragraph/newline placement by @jancborchardt in [\#3328](https://github.com/nextcloud/forms/pull/3328)
 - fix(settings): properly handle loading state by @susnux in [\#3316](https://github.com/nextcloud/forms/pull/3316)
+- fix(a11y): announce form submission success to screen readers by @pringelmann in [\#3238](https://github.com/nextcloud/forms/pull/3238)
 - fix(a11y): connect question inputs to heading and description via aria by @pringelmann in [\#3228](https://github.com/nextcloud/forms/pull/3228)
 - fix: dropdown and checkboxes fields are broken after grid type introduction by @Koc in [\#3134](https://github.com/nextcloud/forms/pull/3134)
 
 ### Merged
 
+- chore: replace NcCheckboxRadioSwitch with NcRadioGroup in PillMenu by @Chartman123 in [\#3390](https://github.com/nextcloud/forms/pull/3390)
 - fix(activity): throw UnknownActivityException for unknown events by @pringelmann in [\#3344](https://github.com/nextcloud/forms/pull/3344)
 - chore: fix documentation by @Chartman123 in [\#3334](https://github.com/nextcloud/forms/pull/3334)
 - refactor: replace material design icons with material symbols by @Chartman123 in [\#3330](https://github.com/nextcloud/forms/pull/3330)
