@@ -121,7 +121,7 @@
 					direction="vertical"
 					invertSwap
 					handle=".question__drag-handle"
-					@change="onQuestionOrderChange"
+					@update="onQuestionOrderChange"
 					@start="onDragStart"
 					@end="onDragEnd">
 					<TransitionGroup
