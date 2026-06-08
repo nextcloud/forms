@@ -141,7 +141,7 @@
 				handle=".option__drag-handle"
 				invertSwap
 				target=".sort-target"
-				@change="saveOptionsOrder('choice')"
+				@update="saveOptionsOrder('choice')"
 				@start="onDragStart"
 				@end="onDragEnd">
 				<TransitionGroup
