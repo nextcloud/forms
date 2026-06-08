@@ -45,6 +45,7 @@
 					v-model:active="activeResponseView"
 					:disabled="noSubmissions"
 					:options="responseViews"
+					:groupLabel="t('forms', 'View mode')"
 					class="response-actions__toggle"
 					@update:active="loadFormResults" />
 

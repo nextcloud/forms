@@ -5,38 +5,39 @@
 
 <template>
 	<div class="pill-menu">
-		<NcCheckboxRadioSwitch
-			v-for="option of options"
-			:key="option.id"
-			:aria-label="isMobile ? option.ariaLabel : null"
+		<NcRadioGroup
+			:label="groupLabel"
 			:modelValue="active.id"
-			:disabled="disabled || option.disabled"
-			class="pill-menu__toggle"
-			:class="{ 'pill-menu__toggle--icon-only': isMobile && option.icon }"
-			buttonVariant
-			buttonVariantGrouped="horizontal"
-			type="radio"
-			:value="option.id"
-			@update:modelValue="$emit('update:active', option)">
-			<template v-if="option.icon" #icon>
-				<NcIconSvgWrapper :svg="option.icon" />
-			</template>
-			{{ !isMobile || !option.icon ? option.title : null }}
-		</NcCheckboxRadioSwitch>
+			hideLabel
+			@update:modelValue="onUpdateActive">
+			<NcRadioGroupButton
+				v-for="option of options"
+				:key="option.id"
+				:value="option.id"
+				:aria-label="isMobile && option.icon ? option.ariaLabel : undefined"
+				:label="!isMobile || !option.icon ? option.title : undefined"
+				:disabled="disabled || option.disabled">
+				<template v-if="option.icon" #icon>
+					<NcIconSvgWrapper :svg="option.icon" />
+				</template>
+			</NcRadioGroupButton>
+		</NcRadioGroup>
 	</div>
 </template>
 
 <script>
 import { useIsSmallMobile } from '@nextcloud/vue'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import NcRadioGroup from '@nextcloud/vue/components/NcRadioGroup'
+import NcRadioGroupButton from '@nextcloud/vue/components/NcRadioGroupButton'
 
 export default {
 	name: 'PillMenu',
 
 	components: {
-		NcCheckboxRadioSwitch,
 		NcIconSvgWrapper,
+		NcRadioGroup,
+		NcRadioGroupButton,
 	},
 
 	props: {
@@ -57,6 +58,14 @@ export default {
 		},
 
 		/**
+		 * Accessible label for the radio group
+		 */
+		groupLabel: {
+			type: String,
+			required: true,
+		},
+
+		/**
 		 * List of available options
 		 * `option: {id: string, title: string, ariaLabel: string, icon?: string}`
 		 */
@@ -73,27 +82,17 @@ export default {
 			isMobile: useIsSmallMobile(),
 		}
 	},
+
+	methods: {
+		/**
+		 * Emit the full selected option to keep PillMenu API stable
+		 *
+		 * @param {string} optionId The selected option id
+		 */
+		onUpdateActive(optionId) {
+			const option = this.options.find((entry) => entry.id === optionId)
+			if (option) this.$emit('update:active', option)
+		},
+	},
 }
 </script>
-
-<style lang="scss" scoped>
-.pill-menu {
-	align-items: center;
-	align-self: flex-end;
-	display: flex;
-	justify-content: flex-end;
-
-	#{&} &__toggle {
-		// Make it a bit more condensed
-		:deep(.checkbox-radio-switch__content) {
-			flex-direction: row;
-			padding-block: 0;
-		}
-
-		// Make icon only toggle round intead of elipse
-		&--icon-only :deep(.checkbox-radio-switch__content) {
-			padding-inline: 0;
-		}
-	}
-}
-</style>

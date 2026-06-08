@@ -14,6 +14,7 @@
 			v-if="!canOnlySubmit && currentView"
 			:active="currentView"
 			:options="availableViews"
+			:groupLabel="t('forms', 'View mode')"
 			@update:active="onChangeView" />
 		<NcButton
 			v-if="canShare && !sidebarOpened"

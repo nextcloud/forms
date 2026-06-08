@@ -24,13 +24,19 @@ export class ResultsSection {
 	}
 
 	public async switchToSummary(): Promise<void> {
-		// NcCheckboxRadioSwitch renders a hidden <input type="radio"> with
-		// v-on="{ change: onToggle }". Dispatch the change event directly.
-		await this.summaryTab.dispatchEvent('change')
+		if (await this.summaryTab.isChecked()) {
+			return
+		}
+		// NcRadioGroupButton wraps the hidden radio input in a clickable container.
+		// Click the parent to trigger the same interaction path as a real user.
+		await this.summaryTab.locator('xpath=..').click()
 	}
 
 	public async switchToResponses(): Promise<void> {
-		await this.responsesTab.dispatchEvent('change')
+		if (await this.responsesTab.isChecked()) {
+			return
+		}
+		await this.responsesTab.locator('xpath=..').click()
 	}
 
 	/**
