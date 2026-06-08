@@ -267,6 +267,8 @@
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Tá foirm '{title}' faoi ghlas ag {lockedBy} agus ní féidir í a mhodhnú. Rachaidh an glas in éag: {lockedUntil}",
     "Form title" : "Teideal na foirme",
     "Description" : "Cur síos",
+    "Insert question" : "Cuir ceist isteach",
+    "Insert question after question {index}" : "Cuir ceist isteach i ndiaidh ceiste {index}",
     "Add a question" : "Cuir ceist leis",
     "Summary" : "Achoimre",
     "Unlink spreadsheet" : "Dínasc scarbhileog",
