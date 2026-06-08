@@ -270,7 +270,7 @@ OC.L10N.register(
     "Form title" : "Название формы",
     "Description" : "Описание",
     "Insert question" : "Вставить вопрос",
-    "Insert question after question {index}" : "Вставляйте вопрос за вопросом {index}",
+    "Insert question after question {index}" : "Вставить вопрос после вопроса {index}",
     "Add a question" : "Добавить вопрос",
     "Summary" : "Всего",
     "Unlink spreadsheet" : "Отключить электронную таблицу",
