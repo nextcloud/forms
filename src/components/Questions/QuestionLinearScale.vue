@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionInput
@@ -85,7 +86,8 @@
 						:value="option.toString()"
 						:name="`${id}-answer`"
 						type="radio"
-						:required="checkRequired(option)"
+						:required="isRequired"
+						@invalid.prevent="validate"
 						@update:modelValue="onChange"
 						@keydown.enter.exact.prevent="onKeydownEnter" />
 				</div>
@@ -203,6 +205,16 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (this.isRequired && this.values.length === 0) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		onChange(option) {
 			this.$emit('update:values', [option])
 		},
@@ -229,24 +241,6 @@ export default {
 				optionsLabelHighest:
 					value === t('forms', 'Strongly agree') ? null : value,
 			})
-		},
-
-		/**
-		 * Is the provided answer required ?
-		 * This is needed for checkboxes as html5
-		 * doesn't allow to require at least ONE checked.
-		 * So we require the one that are checked or all
-		 * if none are checked yet.
-		 *
-		 * @return {boolean}
-		 */
-		checkRequired() {
-			// false, if question not required
-			if (!this.isRequired) {
-				return false
-			}
-
-			return true
 		},
 
 		/**

@@ -10,6 +10,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
@@ -40,6 +41,7 @@
 				:searchable="false"
 				label="text"
 				:aria-label-combobox="selectOptionPlaceholder"
+				@invalid.prevent="validate"
 				@update:modelValue="onInput" />
 		</div>
 		<template v-else>
@@ -184,6 +186,16 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (this.isRequired && this.areNoneChecked) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		onDragStart() {
 			this.isDragging = true
 		},

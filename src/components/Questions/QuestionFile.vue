@@ -118,10 +118,12 @@
 								ref="fileInput"
 								class="hidden-visually"
 								type="file"
+								:required="isRequired && values.length === 0"
 								:disabled="!readOnly"
 								:multiple="maxAllowedFilesCount > 1"
 								:name="name || undefined"
 								:accept="accept.length ? accept.join(',') : null"
+								@invalid.prevent="validate"
 								@input="onFileInput" />
 						</label>
 						<NcButton
@@ -422,6 +424,12 @@ export default {
 				)
 				return false
 			}
+
+			if (this.isRequired && this.values.length === 0) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
 			this.errorMessage = null
 			return true
 		},

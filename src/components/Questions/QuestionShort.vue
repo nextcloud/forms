@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<div class="question__content">
 			<input
@@ -25,6 +26,7 @@
 				minlength="1"
 				:type="validationObject.inputType"
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
+				@invalid.prevent="validate"
 				@input="onInput"
 				@keydown.enter.exact.prevent="onKeydownEnter" />
 			<NcActions
@@ -156,6 +158,19 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (
+				this.isRequired
+				&& (this.values.length === 0 || this.values[0] === '')
+			) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		onInput() {
 			/** @type {HTMLObjectElement} */
 			const input = this.$refs.input

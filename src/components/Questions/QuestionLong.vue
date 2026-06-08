@@ -8,6 +8,7 @@
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
+		:errorMessage="errorMessage"
 		v-on="commonListeners">
 		<div class="question__content">
 			<textarea
@@ -23,6 +24,7 @@
 				:maxlength="maxStringLengths.answerText"
 				minlength="1"
 				:name="name || undefined"
+				@invalid.prevent="validate"
 				@input="onInput"
 				@keypress="autoSizeText"
 				@keydown.ctrl.enter="onKeydownCtrlEnter" />
@@ -75,6 +77,19 @@ export default {
 	},
 
 	methods: {
+		async validate() {
+			if (
+				this.isRequired
+				&& (this.values.length === 0 || this.values[0] === '')
+			) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			this.errorMessage = null
+			return true
+		},
+
 		onInput() {
 			const textarea = this.$refs.textarea
 			this.$emit('update:values', [textarea.value])

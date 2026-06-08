@@ -23,7 +23,7 @@
 							<th class="first-column"></th>
 
 							<th
-								v-for="column of columns"
+								v-for="column in columns"
 								:key="column.local ? 'option-local' : column.id">
 								{{ column.text }}
 							</th>
@@ -31,11 +31,11 @@
 					</thead>
 					<tbody>
 						<tr
-							v-for="row of rows"
+							v-for="row in rows"
 							:key="row.local ? 'option-local' : row.id">
 							<td class="first-column">{{ row.text }}</td>
 							<td
-								v-for="column of columns"
+								v-for="column in columns"
 								:key="column.local ? 'option-local' : column.id">
 								<template v-if="questionType === 'radio'">
 									<NcCheckboxRadioSwitch
@@ -264,6 +264,14 @@ export default {
 
 	methods: {
 		async validate() {
+			if (
+				this.isRequired
+				&& (this.values.length === 0 || this.values === null)
+			) {
+				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
 			if (!this.isUnique) {
 				// Validate limits
 				const max = this.extraSettings.optionsLimitMax ?? 0
@@ -314,30 +322,6 @@ export default {
 			values[rowId][columnId] = value
 
 			this.$emit('update:values', values)
-		},
-
-		/**
-		 * Is the provided answer required ?
-		 * This is needed for checkboxes as html5
-		 * doesn't allow to require at least ONE checked.
-		 * So we require the one that are checked or all
-		 * if none are checked yet.
-		 *
-		 * @return {boolean}
-		 */
-		checkRequired() {
-			// false, if question not required
-			if (!this.isRequired) {
-				return false
-			}
-
-			// true for Radiobuttons
-			if (this.isUnique) {
-				return true
-			}
-
-			// For checkboxes, only required if no other is checked
-			return this.areNoneChecked
 		},
 	},
 }
