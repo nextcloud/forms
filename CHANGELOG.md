@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.3.1 - 2026-06-09
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0...v5.3.1)
+
+### Fixed
+
+- fix(QuestionRanking): drag and drop while ranking options by @Chartman123 in [\#3401](https://github.com/nextcloud/forms/pull/3401)
+
 ## v5.3.0 - 2026-06-08
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.9...v5.3.0)
