@@ -175,22 +175,6 @@ OC.L10N.register(
     "Document" : "Документ",
     "Presentation" : "Презентация",
     "Phone number" : "Телефонен номер",
-    "Email address" : "Имейл адрес",
-    "Loading forms …" : "Зареждане на формуляри ...",
-    "This form has expired and is no longer taking answers" : "Този формуляр вече е изтекъл и не приема отговори",
-    "Results" : "Резултати",
-    "Uploading …" : "Качване …",
-    "A long answer for the question “{text}”" : "Дълъг отговор на въпроса „{text}“ 48",
-    "A short answer for the question “{text}”" : "Кратък отговор на въпроса „{text}“",
-    "Show results" : "Показване на резултати",
-    "Loading {title} …" : "Зареждане на {title} ...",
-    "There was an error while loading the results" : "Възникна грешка при зареждането на резултатите",
-    "There was an error while removing this response" : "Възникна грешка при премахването на този отговор",
-    "There was an error while removing responses" : "Възникна грешка при премахването на отговорите",
-    "Loading responses …" : "Зареждане на отговори …",
-    "No results found" : "Няма намерени резултати",
-    "Results of submitted forms will show up here" : "Резултатите от изпратените формуляри ще се покажат тук",
-    "Are you sure you want to delete all responses of {title}?" : "Сигурни ли сте, че искате да изтриете всички отговори на {title}?",
-    "Submitting form …" : "Изпращане на формуляр …"
+    "Email address" : "Имейл адрес"
 },
 "nplurals=2; plural=(n != 1);");

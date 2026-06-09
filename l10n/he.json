@@ -115,20 +115,6 @@
     "Presentation" : "מצגת",
     "Spreadsheet" : "גיליון נתונים",
     "Phone number" : "מספר טלפון",
-    "Email address" : "כתובת דוא״ל",
-    "Loading forms …" : "הטפסים נטענים…",
-    "This form has expired and is no longer taking answers" : "תוקפו של טופס זה פג ולא ניתן לענות עליו עוד",
-    "Uploading …" : "מתבצעת העלאה…",
-    "A long answer for the question “{text}”" : "תשובה ארוכה לשאלה „{text}”",
-    "A short answer for the question “{text}”" : "תשובה קצרה לשאלה „{text}”",
-    "Loading {title} …" : "{title} בטעינה…",
-    "There was an error while loading the results" : "אירעה שגיאה בטעינת התוצאות",
-    "There was an error while removing this response" : "אירעה שגיאה בהסרת התגובה הזאת",
-    "There was an error while removing responses" : "אירעה שגיאה בעת הסרת התגובות",
-    "Loading responses …" : "התגובות נטענות…",
-    "No results found" : "לא נמצאו תוצאות",
-    "Results of submitted forms will show up here" : "התוצאות לטפסים שהוגשו תופענה כאן",
-    "Are you sure you want to delete all responses of {title}?" : "למחוק את כל התגובות על {title}?",
-    "Submitting form …" : "הטופס מוגש…"
+    "Email address" : "כתובת דוא״ל"
 },"pluralForm" :"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;"
 }

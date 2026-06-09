@@ -56,9 +56,6 @@ OC.L10N.register(
     "Presentation" : "Buổi thuyết trình",
     "Spreadsheet" : "Bảng tính",
     "Phone number" : "Số điện thoại",
-    "Email address" : "Địa chỉ thư điện tử",
-    "Results" : "Kết quả",
-    "Uploading …" : "Đang tải lên …",
-    "No results found" : "Không tìm thấy kết quả"
+    "Email address" : "Địa chỉ thư điện tử"
 },
 "nplurals=1; plural=0;");

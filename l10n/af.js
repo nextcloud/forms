@@ -30,7 +30,6 @@ OC.L10N.register(
     "Time" : "Tyd",
     "Color" : "Kleur",
     "Phone number" : "Foonnommer",
-    "Email address" : "E-posadres",
-    "Uploading …" : "Laai tans op …"
+    "Email address" : "E-posadres"
 },
 "nplurals=2; plural=(n != 1);");

@@ -104,17 +104,6 @@ OC.L10N.register(
     "Presentation" : "Kynning",
     "Spreadsheet" : "Töflureiknisskjal",
     "Phone number" : "Símanúmer",
-    "Email address" : "Tölvupóstfang",
-    "Loading forms …" : "Hleð inn eyðuformum …",
-    "This form has expired and is no longer taking answers" : "Þetta eyðuform er útrunnið og tekur því ekki lengur við svörum",
-    "Results" : "Niðurstöður",
-    "Uploading …" : "Sendi inn …",
-    "A long answer for the question “{text}”" : "Langt svar við spurningunni “{text}”",
-    "A short answer for the question “{text}”" : "Stutt svar við spurningunni “{text}”",
-    "Loading {title} …" : "Hleð inn {title} …",
-    "There was an error while removing responses" : "Villa kom upp við að fjarlægja svör",
-    "Loading responses …" : "Hleð inn svörum …",
-    "Results of submitted forms will show up here" : "Niðurstöður innsendra eyðuforma munu birtast hér",
-    "Submitting form …" : "Sendi inn eyðuform …"
+    "Email address" : "Tölvupóstfang"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

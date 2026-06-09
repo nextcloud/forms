@@ -22,7 +22,6 @@ OC.L10N.register(
     "File" : "ගොනුව",
     "Date" : "දිනය",
     "Time" : "වේලාව",
-    "Phone number" : "දුරකථන අංකය",
-    "Uploading …" : "උඩුගත වෙමින්…"
+    "Phone number" : "දුරකථන අංකය"
 },
 "nplurals=2; plural=(n != 1);");

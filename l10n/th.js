@@ -88,12 +88,6 @@ OC.L10N.register(
     "Presentation" : "งานนำเสนอ",
     "Spreadsheet" : "สเปรดชีต",
     "Phone number" : "หมายเลขโทรศัพท์",
-    "Email address" : "ที่อยู่อีเมล",
-    "Loading forms …" : "กำลังโหลดฟอร์ม …",
-    "This form has expired and is no longer taking answers" : "ฟอร์มนี้หมดอายุแล้วและไม่รับคำตอบเพิ่มอีก",
-    "Results" : "ผลลัพธ์",
-    "Uploading …" : "กำลังอัปโหลด …",
-    "Loading {title} …" : "กำลังโหลด {title} …",
-    "Submitting form …" : "กำลังส่งฟอร์ม …"
+    "Email address" : "ที่อยู่อีเมล"
 },
 "nplurals=1; plural=0;");

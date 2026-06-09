@@ -1,0 +1,24 @@
+{ "translations": {
+    "No" : "না",
+    "Yes" : "হ্যাঁ",
+    "Shared with you" : "Shared with you",
+    "Select groups" : "গ্রুপ নির্ধারণ",
+    "Cancel" : "বাতিল করুন",
+    "Delete" : "মুছে",
+    "Other" : "অন্যান্য",
+    "never" : "কখনোই নয়",
+    "Set expiration date" : "মেয়াদোত্তীর্ণ হওয়ার তারিখ নির্ধারণ করুন",
+    "Group" : "গোষ্ঠীসমূহ",
+    "Share link" : "লিংক ভাগাভাগি করেন",
+    "Edit" : "সম্পাদনা",
+    "Share" : "ভাগাভাগি কর",
+    "Description" : "বিবরণ",
+    "Download" : "ডাউনলোড",
+    "Search" : "Search",
+    "Sharing" : "ভাগাভাগিরত",
+    "Settings" : "সেটিংস",
+    "Abort" : "বাতিল কর",
+    "Date" : "Date",
+    "Time" : "সময়"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

@@ -153,22 +153,6 @@
     "Presentation" : "Presentatie",
     "Spreadsheet" : "Werkblad",
     "Phone number" : "Telefoonnummer",
-    "Email address" : "E-mailadres",
-    "Loading forms …" : "Formulieren laden ...",
-    "This form has expired and is no longer taking answers" : "Dit formulier is verlopen en accepteert geen antwoorden meer.",
-    "Results" : "Resultaten",
-    "Uploading …" : "Uploaden ...",
-    "A long answer for the question “{text}”" : "Een lang antwoord voor vraag “{text}”",
-    "A short answer for the question “{text}”" : "Een kort antwoord voor vraag “{text}”",
-    "Show results" : "Toon resultaten",
-    "Loading {title} …" : "Laden {title} …",
-    "There was an error while loading the results" : "Er is een fout opgetreden bij het laden van de resultaten",
-    "There was an error while removing this response" : "Er trad een fout op bij het verwijderen van deze reactie",
-    "There was an error while removing responses" : "Er trad een fout op bij het verwijderen van reacties",
-    "Loading responses …" : "Laden reacties ...",
-    "No results found" : "Geen resultaten gevonden",
-    "Results of submitted forms will show up here" : "Resultaten van ingeleverde formulieren worden hier getoond",
-    "Are you sure you want to delete all responses of {title}?" : "Weet je zeker dat je alle reacties op {title} wilt verwijderen?",
-    "Submitting form …" : "Insturen formulier …"
+    "Email address" : "E-mailadres"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

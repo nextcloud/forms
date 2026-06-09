@@ -42,7 +42,6 @@ OC.L10N.register(
     "Time" : "Dato",
     "Color" : "Koloro",
     "Phone number" : "Telefonnumero",
-    "Email address" : "Retpoŝtadreso",
-    "Uploading …" : "Alŝutado…"
+    "Email address" : "Retpoŝtadreso"
 },
 "nplurals=2; plural=(n != 1);");

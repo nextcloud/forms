@@ -32,7 +32,6 @@
     "Date" : "თარიღი",
     "Time" : "დრო",
     "Color" : "ფერი",
-    "Phone number" : "ტელეფონის ნომერი",
-    "Uploading …" : "იტვირთება ..."
+    "Phone number" : "ტელეფონის ნომერი"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

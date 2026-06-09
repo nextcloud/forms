@@ -40,8 +40,6 @@
     "Document" : "Document",
     "Presentation" : "Presentacion",
     "Phone number" : "Numèro de telefòn",
-    "Email address" : "Adreça mail",
-    "Loading forms …" : "Cargament del formulari...",
-    "Uploading …" : "Mandadís…"
+    "Email address" : "Adreça mail"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }
