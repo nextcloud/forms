@@ -34,7 +34,6 @@ OC.L10N.register(
     "Date" : "თარიღი",
     "Time" : "დრო",
     "Color" : "ფერი",
-    "Phone number" : "ტელეფონის ნომერი",
-    "Uploading …" : "იტვირთება ..."
+    "Phone number" : "ტელეფონის ნომერი"
 },
 "nplurals=2; plural=(n!=1);");

@@ -62,10 +62,6 @@ OC.L10N.register(
     "Image" : "Gambar",
     "Presentation" : "Presentasi",
     "Phone number" : "Nomor telepon",
-    "Email address" : "Alamat email",
-    "Results" : "Hasil",
-    "Uploading …" : "Mengunggah …",
-    "Loading {title} …" : "Memuat {title} …",
-    "No results found" : "Tidak ada hasil ditemukan"
+    "Email address" : "Alamat email"
 },
 "nplurals=1; plural=0;");

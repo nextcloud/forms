@@ -48,9 +48,6 @@ OC.L10N.register(
     "Image" : "Image",
     "Presentation" : "Presentation",
     "Phone number" : "Phone number",
-    "Email address" : "Email address",
-    "Results" : "შედეგი",
-    "Uploading …" : "Uploading …",
-    "No results found" : "No results found"
+    "Email address" : "Email address"
 },
 "nplurals=2; plural=(n!=1);");

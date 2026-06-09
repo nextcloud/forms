@@ -164,21 +164,6 @@
     "Presentation" : "Presentación",
     "Spreadsheet" : "Hoja de cálculo",
     "Phone number" : "Número telefónico",
-    "Email address" : "Dirección de correo electrónico",
-    "Loading forms …" : "Cargando formularios …",
-    "This form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no recibe respuestas",
-    "Results" : "Resultados",
-    "Uploading …" : "Cargando...",
-    "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{text}\"",
-    "A short answer for the question “{text}”" : "Una respuesta corta para la pregunta \"{index}\"",
-    "Show results" : "Mostrar resultados",
-    "Loading {title} …" : "Cargando {title}…",
-    "There was an error while loading the results" : "Ha habido un error al cargar los resultados",
-    "There was an error while removing this response" : "Ha habido un error al eliminar esta respuesta",
-    "There was an error while removing responses" : "Ha habido un error al eliminar las respuestas",
-    "Loading responses …" : "Cargando respuestas ...",
-    "Results of submitted forms will show up here" : "Los resultados de los formularios enviados aparecerán aquí",
-    "Are you sure you want to delete all responses of {title}?" : "Estas seguro que deseas borrar todas las respuestas para {título}?",
-    "Submitting form …" : "Enviando formulario …"
+    "Email address" : "Dirección de correo electrónico"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

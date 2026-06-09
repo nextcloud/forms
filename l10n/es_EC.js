@@ -173,22 +173,6 @@ OC.L10N.register(
     "Document" : "Documento",
     "Presentation" : "Presentación",
     "Phone number" : "Número telefónico",
-    "Email address" : "Dirección de correo electrónico",
-    "Loading forms …" : "Cargando formularios...",
-    "This form has expired and is no longer taking answers" : "Este formulario ha caducado y ya no acepta respuestas",
-    "Results" : "Resultados",
-    "Uploading …" : "Cargando...",
-    "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{text}\"",
-    "A short answer for the question “{text}”" : "Una respuesta corta para la pregunta \"{text}\"",
-    "Show results" : "Ver resultados",
-    "Loading {title} …" : "Cargando {title}...",
-    "There was an error while loading the results" : "Hubo un error al cargar los resultados",
-    "There was an error while removing this response" : "Hubo un error al eliminar esta respuesta",
-    "There was an error while removing responses" : "Hubo un error al eliminar las respuestas",
-    "Loading responses …" : "Cargando respuestas...",
-    "No results found" : "No se encontraron resultados",
-    "Results of submitted forms will show up here" : "Los resultados de los formularios enviados aparecerán aquí",
-    "Are you sure you want to delete all responses of {title}?" : "¿Seguro que deseas eliminar todas las respuestas de {title}?",
-    "Submitting form …" : "Enviando formulario..."
+    "Email address" : "Dirección de correo electrónico"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

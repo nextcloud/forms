@@ -120,21 +120,6 @@ OC.L10N.register(
     "Document" : "Документ",
     "Presentation" : "Презентација",
     "Phone number" : "Телефонски број",
-    "Email address" : "Е-пошта адреса",
-    "Loading forms …" : "Вчитување форми ...",
-    "This form has expired and is no longer taking answers" : "Оваа форма е истечена и повеќе неможе да се внесуваат оговари",
-    "Results" : "Резултати",
-    "Uploading …" : "Прикачување …",
-    "A long answer for the question “{text}”" : "Долг одговор за прашањето {index}",
-    "A short answer for the question “{text}”" : "Краток одговор за прашањето {index}",
-    "Loading {title} …" : "Се вчитува {title} …",
-    "There was an error while loading the results" : "Настана грешка при вчитување на резултатите",
-    "There was an error while removing this response" : "Настана грешка при бришење на одговор",
-    "There was an error while removing responses" : "Настана грешка при бришење на одговори",
-    "Loading responses …" : "Вчитување на одговори ...",
-    "No results found" : "Нема пронајдено резултати",
-    "Results of submitted forms will show up here" : "Резултатите од испратените прашалници ќе се појават овде",
-    "Are you sure you want to delete all responses of {title}?" : "Дали сте сигурни дека сакате да ги избришете сите одговори на {title}?",
-    "Submitting form …" : "Испраќање форма ..."
+    "Email address" : "Е-пошта адреса"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

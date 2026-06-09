@@ -42,8 +42,6 @@ OC.L10N.register(
     "Document" : "Document",
     "Presentation" : "Presentacion",
     "Phone number" : "Numèro de telefòn",
-    "Email address" : "Adreça mail",
-    "Loading forms …" : "Cargament del formulari...",
-    "Uploading …" : "Mandadís…"
+    "Email address" : "Adreça mail"
 },
 "nplurals=2; plural=(n > 1);");

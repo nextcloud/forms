@@ -194,22 +194,6 @@
     "Presentation" : "Predstavitev",
     "Spreadsheet" : "Preglednica",
     "Phone number" : "Telefonska številka",
-    "Email address" : "Elektronski naslov",
-    "Loading forms …" : "Poteka nalaganje vprašalnikov …",
-    "This form has expired and is no longer taking answers" : "Vprašalnik je pretekel, zato odgovorov ni mogoče več pošiljati",
-    "Results" : "Zadetki",
-    "Uploading …" : "Poteka pošiljanje ...",
-    "A long answer for the question “{text}”" : "Dolg odgovor na vprašanje »{text}«",
-    "A short answer for the question “{text}”" : "Kratek odgovor na vprašanje »{text}«",
-    "Show results" : "Pokaži odzive",
-    "Loading {title} …" : "Poteka nalaganje {title} …",
-    "There was an error while loading the results" : "Prišlo je do napake med nalaganjem zadetkov",
-    "There was an error while removing this response" : "Prišlo je do napake med odstranjevanjem odziva",
-    "There was an error while removing responses" : "Prišlo je do napake med odstranjevanjem odzivov",
-    "Loading responses …" : "Poteka nalaganje odzivov ...",
-    "No results found" : "Ni najdenih zadetkov",
-    "Results of submitted forms will show up here" : "Rezultati poslanih anket bodo prikazani na tem mestu.",
-    "Are you sure you want to delete all responses of {title}?" : "Ali ste prepričani, da želite izbrisati vse odzive v anketi {title}?",
-    "Submitting form …" : "Poteka objavljanje obrazca ..."
+    "Email address" : "Elektronski naslov"
 },"pluralForm" :"nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);"
 }

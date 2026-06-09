@@ -103,10 +103,6 @@
     "Presentation" : "프레젠테이션",
     "Spreadsheet" : "스프레드시트",
     "Phone number" : "휴대폰 번호",
-    "Email address" : "이메일 주소",
-    "Loading forms …" : "형식 로딩중 ...",
-    "Results" : "결과들",
-    "Uploading …" : "업로드 중…",
-    "No results found" : "결과 없음"
+    "Email address" : "이메일 주소"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

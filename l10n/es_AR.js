@@ -84,18 +84,6 @@ OC.L10N.register(
     "Date" : "Fecha",
     "Time" : "Hora",
     "Color" : "Color",
-    "Phone number" : "Número telefónico",
-    "Loading forms …" : "Cargando formulario ...",
-    "This form has expired and is no longer taking answers" : "Este formulario ha expirado y ya no recibe respuestas",
-    "Uploading …" : "Actualizando...",
-    "A long answer for the question “{text}”" : "Una respuesta larga para la pregunta \"{texto}\"",
-    "A short answer for the question “{text}”" : "Una respuesta corta para la pregunta \"{texto}\"",
-    "Loading {title} …" : "Cargando {título}",
-    "There was an error while removing this response" : "Hubo un error mientras se eliminaba esta respuesta",
-    "There was an error while removing responses" : "Hubo un error mientras se eliminaban las respuestas",
-    "Loading responses …" : "Cargando respuestas",
-    "Results of submitted forms will show up here" : "Los resultados de los formularios cargados se mostraran aquí",
-    "Are you sure you want to delete all responses of {title}?" : "Estas seguro que deseas borrar todas las respuestas para {título}?",
-    "Submitting form …" : "Enviando formulario ..."
+    "Phone number" : "Número telefónico"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -333,24 +333,6 @@
     "People can enter a number" : "Хүмүүс тоо оруулж болно",
     "Enter a number" : "Тоо оруулна уу",
     "Custom regular expression" : "Тусгай regular expression",
-    "The input does not match the required pattern" : "Оруулсан утга шаардлагатай загварт таарахгүй байна",
-    "This form has expired and is no longer taking answers" : "Энэ маягтын хугацаа дуусч, хариулт авахаа больсон",
-    "Results" : "“Æ—Ä –¥“Ø–Ω",
-    "Uploading …" : "Байршуулж байна...",
-    "Closed forms do not accept new submissions." : "Хаалттай маягтууд шинэ илгээлт хүлээн авахгүй.",
-    "Archived forms do not accept new submissions and can not be modified." : "Архивлагдсан маягтууд шинэ илгээлт хүлээн авахгүй, өөрчлөх боломжгүй.",
-    "Show results" : "Үр дүн харуулах",
-    "Loading {title} …" : "{title} ачаалж байна …",
-    "Delete submissions" : "Илгээлтүүдийг устгах",
-    "There was an error while loading the results" : "Үр дүн ачаалахад алдаа гарлаа",
-    "Submission deleted" : "Илгээлт устгагдсан",
-    "There was an error while removing this response" : "Энэ хариултыг хасахад алдаа гарлаа",
-    "There was an error while removing responses" : "Хариултуудыг хасахад алдаа гарлаа",
-    "No results found" : "Үр дүн олдсонгүй",
-    "No results found for {submissionSearch}" : "{submissionSearch}-д үр дүн олдсонгүй",
-    "Results of submitted forms will show up here" : "Илгээсэн маягтуудын үр дүн энд харагдана",
-    "Are you sure you want to delete all responses of {title}?" : "Та {title}-н бүх хариултуудыг устгахдаа итгэлтэй байна уу?",
-    "There was an error while loading the submission" : "Илгээлт ачаалахад алдаа гарлаа",
-    "This form was closed and is no longer taking answers" : "Энэ маягт хаагдсан бөгөөд хариулт авахаа больсон"
+    "The input does not match the required pattern" : "Оруулсан утга шаардлагатай загварт таарахгүй байна"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

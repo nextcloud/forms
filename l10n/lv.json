@@ -56,12 +56,6 @@
     "Presentation" : "Prezentācija",
     "Spreadsheet" : "Izklājlapa",
     "Phone number" : "Tālruņa numurs",
-    "Email address" : "E-pasta adrese",
-    "Loading forms …" : "Ielādē veidlapas…",
-    "Results" : "Rezultāti",
-    "Uploading …" : "Augšupielādē…",
-    "Closed forms do not accept new submissions." : "Aizvērtās veidlapās netiek pieņemti jauni iesniegumi.",
-    "Archived forms do not accept new submissions and can not be modified." : "Aizvērtās formās netiek pieņemti jauni iesniegumi, un tās nevar mainīt.",
-    "Results of submitted forms will show up here" : "Šeit tiks parādīts iesniegto veidlapu apkopojums"
+    "Email address" : "E-pasta adrese"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);"
 }

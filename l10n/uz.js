@@ -44,9 +44,6 @@ OC.L10N.register(
     "Time" : "Vaqt",
     "Pick a time" : "Vaqtni tanlang",
     "Color" : "Rang",
-    "Email address" : "E-pochta manzili",
-    "Results" : "Natijalar",
-    "Uploading …" : "Yuklanmoqda...",
-    "No results found" : "Hech qanday natija topilmadi"
+    "Email address" : "E-pochta manzili"
 },
 "nplurals=1; plural=0;");

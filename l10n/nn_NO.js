@@ -26,8 +26,6 @@ OC.L10N.register(
     "File" : "Fil",
     "Date" : "Dato",
     "Time" : "Tid",
-    "Color" : "Farge",
-    "Results" : "Resultat",
-    "Uploading …" : "Lastar opp..."
+    "Color" : "Farge"
 },
 "nplurals=2; plural=(n != 1);");

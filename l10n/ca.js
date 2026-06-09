@@ -181,22 +181,6 @@ OC.L10N.register(
     "Document" : "Document",
     "Presentation" : "Presentació",
     "Phone number" : "Telèfon",
-    "Email address" : "Adreça electrònica",
-    "Loading forms …" : "Carregant els formularis …",
-    "This form has expired and is no longer taking answers" : "Aquest formulari s'ha tancat i ja no admet respostes",
-    "Results" : "Resultats",
-    "Uploading …" : "S'està pujant…",
-    "A long answer for the question “{text}”" : "Resposta llarga per a la pregunta «{text}»",
-    "A short answer for the question “{text}”" : "Resposta curta per a la pregunta «{text}»",
-    "Show results" : "Mostra els resultats",
-    "Loading {title} …" : "Carregant {title} …",
-    "There was an error while loading the results" : "S'ha produït un error en carregar els resultats",
-    "There was an error while removing this response" : "S'ha produït un error en suprimir aquesta resposta",
-    "There was an error while removing responses" : "S'ha produït un error en suprimir les respostes",
-    "Loading responses …" : "Carregant les respostes …",
-    "No results found" : "No s'ha trobat cap resultat",
-    "Results of submitted forms will show up here" : "Els resultats dels formularis enviats es mostraran aquí",
-    "Are you sure you want to delete all responses of {title}?" : "Segur que voleu suprimir totes les respostes de {title}?",
-    "Submitting form …" : "Enviant el formulari …"
+    "Email address" : "Adreça electrònica"
 },
 "nplurals=2; plural=(n != 1);");

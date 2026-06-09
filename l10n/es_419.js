@@ -32,7 +32,6 @@ OC.L10N.register(
     "Date" : "Fecha",
     "Time" : "Hora",
     "Color" : "Color",
-    "Phone number" : "Número telefónico",
-    "Uploading …" : "Cargando..."
+    "Phone number" : "Número telefónico"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

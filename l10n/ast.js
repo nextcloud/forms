@@ -142,21 +142,6 @@ OC.L10N.register(
     "People can enter a telephone number" : "La xente pue introducir un númberu de teléfonu",
     "Email address" : "Direición de corréu electrónicu",
     "People can enter an email address" : "La xente pue introducir una direición de corréu electrónicu",
-    "People can enter a number" : "La xente pue introducir un númberu",
-    "Loading forms …" : "Cargando los formularios…",
-    "Results" : "Resultaos",
-    "Uploading …" : "Xubiendo…",
-    "Show results" : "Amosar los resultaos",
-    "Loading {title} …" : "Cargando «{title}»…",
-    "Delete submissions" : "Desaniciar los unvios",
-    "There was an error while loading the results" : "Hebo un error mentanto se guardaben los resultaos",
-    "Submission deleted" : "Desaniciáronse los unvios",
-    "There was an error while removing this response" : "Hebo un error mentanto se quitaba esta rempuesta",
-    "There was an error while removing responses" : "Hebo un error mentanto se quitaben les rempuestes",
-    "Loading responses …" : "Cargando les rempuesta…",
-    "No results found" : "Nun s'atopó nengún resultáu",
-    "Results of submitted forms will show up here" : "Equí apaecen los resultaos de los formularios unviaos",
-    "Are you sure you want to delete all responses of {title}?" : "¿De xuru que quies desaniciar toles rempuestes de «{title}»?",
-    "Submitting form …" : "Unviando'l formulariu…"
+    "People can enter a number" : "La xente pue introducir un númberu"
 },
 "nplurals=2; plural=(n != 1);");
