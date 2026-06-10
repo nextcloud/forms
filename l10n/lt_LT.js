@@ -118,6 +118,7 @@ OC.L10N.register(
     "Copy question" : "Kopijuoti klausimą",
     "Delete question" : "Ištrinti klausimą",
     "Description (formatting using Markdown is supported)" : "Aprašymas (formatavimas naudojant „Markdown“ palaikomas)",
+    "You must answer this question" : "Privalote atsakyti į šį klausimą",
     "Clear selected color" : "Išvalyti pasirinktą spalvą",
     "Use date range" : "Naudoti datų intervalą",
     "Earliest date" : "Ankstyviausia data",
