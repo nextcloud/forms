@@ -551,7 +551,7 @@ class SubmissionService {
 			// Check if all answers are within the possible options
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 				// Normalize option IDs once for consistent comparison (DB may return ints, request may send strings)
-				$optionIds = array_map('intval', array_column($question['options'] ?? [], 'id'));
+				$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
 
 				foreach ($answers[$questionId] as $answer) {
 					// Handle linear scale questions
@@ -562,21 +562,22 @@ class SubmissionService {
 							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
 						}
 					}
+					// Check if all grid rows, columns and values match the configured grid subtype
+					elseif ($question['type'] === Constants::ANSWER_TYPE_GRID) {
+						$this->validateGridQuestion($question, $answers[$questionId]);
+					}
 					// Search corresponding option, return false if non-existent
 					else {
-						$subAnswers = is_array($answer) ? $answer : [$answer];
-						foreach ($subAnswers as $subAnswer) {
-							// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
-							$answerId = is_int($subAnswer) ? $subAnswer : (is_string($subAnswer) ? intval(trim($subAnswer)) : null);
+						// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
+						$answerId = is_int($answer) ? $answer : (is_string($answer) ? intval(trim($answer)) : null);
 
-							// Reject non-numeric / malformed values early
-							if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
-								throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($subAnswer) ? (string)$subAnswer : gettype($subAnswer), $question['text']));
-							}
+						// Reject non-numeric / malformed values early
+						if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
+							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($answer) ? (string)$answer : gettype($answer), $question['text']));
+						}
 
-							if (!in_array($answerId, $optionIds, true)) {
-								throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $subAnswer, $question['text']));
-							}
+						if (!in_array($answerId, $optionIds, true)) {
+							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
 						}
 					}
 				}
@@ -705,6 +706,84 @@ class SubmissionService {
 				// The result is just a non-validated text on the results, but not a fully declined submission. So no need to throw but simply return false here.
 				return false;
 		}
+	}
+
+	private function validateGridQuestion(array $question, array $answers): void {
+		$rowIds = $this->normalizeOptionIds($question['options'] ?? [], Option::OPTION_TYPE_ROW);
+		$columnIds = $this->normalizeOptionIds($question['options'] ?? [], Option::OPTION_TYPE_COLUMN);
+		$gridType = $question['extraSettings']['questionType'] ?? null;
+
+		foreach ($answers as $rowId => $rowAnswer) {
+			$normalizedRowId = $this->normalizeNumericOptionId($rowId);
+			if ($normalizedRowId === null || !in_array($normalizedRowId, $rowIds, true)) {
+				throw new \InvalidArgumentException(sprintf('Row "%s" for question "%s" is not a valid option.', $rowId, $question['text']));
+			}
+
+			if ($gridType === Constants::ANSWER_GRID_TYPE_RADIO) {
+				$selectedColumnIds = [$rowAnswer];
+			} elseif ($gridType === Constants::ANSWER_GRID_TYPE_CHECKBOX) {
+				$selectedColumnIds = is_array($rowAnswer) ? $rowAnswer : [];
+				if (!is_array($rowAnswer)) {
+					throw new \InvalidArgumentException(sprintf('Invalid answer for question "%s".', $question['text']));
+				}
+			} elseif ($gridType === Constants::ANSWER_GRID_TYPE_NUMBER) {
+				if (!is_array($rowAnswer)) {
+					throw new \InvalidArgumentException(sprintf('Invalid answer for question "%s".', $question['text']));
+				}
+
+				foreach ($rowAnswer as $columnId => $value) {
+					$normalizedColumnId = $this->normalizeNumericOptionId($columnId);
+					if ($normalizedColumnId === null || !in_array($normalizedColumnId, $columnIds, true)) {
+						throw new \InvalidArgumentException(sprintf('Column "%s" for question "%s" is not a valid option.', $columnId, $question['text']));
+					}
+					if ($value !== '' && !is_numeric($value)) {
+						throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" must be a number.', is_scalar($value) ? (string)$value : gettype($value), $question['text']));
+					}
+				}
+				continue;
+			} else {
+				throw new \InvalidArgumentException(sprintf('Invalid grid type for question "%s".', $question['text']));
+			}
+
+			foreach ($selectedColumnIds as $columnId) {
+				if ((!is_int($columnId) && (!is_string($columnId) || !ctype_digit($columnId))) || !in_array((int)$columnId, $columnIds, true)) {
+					throw new \InvalidArgumentException(sprintf('Column "%s" for question "%s" is not a valid option.', is_scalar($columnId) ? (string)$columnId : gettype($columnId), $question['text']));
+				}
+			}
+		}
+	}
+
+	private function normalizeNumericOptionId(mixed $value): ?int {
+		if (is_int($value)) {
+			return $value;
+		}
+
+		if (is_string($value) && ctype_digit($value)) {
+			return (int)$value;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<int, array{id?: mixed, optionType?: string}> $options
+	 * @return list<int>
+	 */
+	private function normalizeOptionIds(array $options, ?string $optionType = null): array {
+		$normalizedIds = [];
+
+		foreach ($options as $option) {
+			if ($optionType !== null && (($option['optionType'] ?? null) !== $optionType)) {
+				continue;
+			}
+
+			$normalizedId = $this->normalizeNumericOptionId($option['id'] ?? null);
+			if ($normalizedId !== null) {
+				$normalizedIds[] = $normalizedId;
+			}
+		}
+
+		return $normalizedIds;
 	}
 
 	private function setCellValue(Worksheet $activeWorksheet, int $column, int $row, mixed $value, string $fileFormat): void {
