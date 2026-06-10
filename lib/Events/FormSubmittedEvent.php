@@ -13,7 +13,7 @@ use OCA\Forms\Db\Submission;
 class FormSubmittedEvent extends AbstractFormEvent {
 	public function __construct(
 		Form $form,
-		private Submission $submission,
+		private readonly Submission $submission,
 	) {
 		parent::__construct($form);
 	}

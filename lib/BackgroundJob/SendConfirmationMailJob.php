@@ -18,9 +18,9 @@ use Psr\Log\LoggerInterface;
 class SendConfirmationMailJob extends QueuedJob {
 	public function __construct(
 		ITimeFactory $time,
-		private IMailer $mailer,
-		private LoggerInterface $logger,
-		private Defaults $defaults,
+		private readonly IMailer $mailer,
+		private readonly LoggerInterface $logger,
+		private readonly Defaults $defaults,
 	) {
 		parent::__construct($time);
 	}

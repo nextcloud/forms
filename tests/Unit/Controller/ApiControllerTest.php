@@ -38,7 +38,6 @@ use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
-use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
@@ -75,7 +74,6 @@ class ApiControllerTest extends TestCase {
 	private FormMapper|MockObject $formMapper;
 	private OptionMapper|MockObject $optionMapper;
 	private QuestionMapper|MockObject $questionMapper;
-	private ShareMapper|MockObject $shareMapper;
 	private SubmissionMapper|MockObject $submissionMapper;
 	private ConfirmationEmailService|MockObject $confirmationEmailService;
 	private ConfigService|MockObject $configService;
@@ -95,7 +93,6 @@ class ApiControllerTest extends TestCase {
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
 		$this->questionMapper = $this->createMock(QuestionMapper::class);
-		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
 		$this->confirmationEmailService = $this->createMock(ConfirmationEmailService::class);
 		$this->configService = $this->createMock(ConfigService::class);
@@ -107,9 +104,7 @@ class ApiControllerTest extends TestCase {
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->l10n->expects($this->any())
 			->method('t')
-			->willReturnCallback(function ($v) {
-				return $v;
-			});
+			->willReturnCallback(fn ($v) => $v);
 		$this->storage = $this->createMock(IRootFolder::class);
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
@@ -123,7 +118,6 @@ class ApiControllerTest extends TestCase {
 			$this->formMapper,
 			$this->optionMapper,
 			$this->questionMapper,
-			$this->shareMapper,
 			$this->submissionMapper,
 			$this->confirmationEmailService,
 			$this->configService,
@@ -1243,9 +1237,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($question);
 		$this->questionMapper->expects($this->once())
 			->method('update')
-			->with($this->callback(function (Question $updatedQuestion): bool {
-				return $updatedQuestion->getId() === 7;
-			}));
+			->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getId() === 7));
 
 		$this->formMapper->expects($this->once())
 			->method('update')
@@ -1287,9 +1279,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn([]);
 		$this->questionMapper->expects($this->once())
 			->method('update')
-			->with($this->callback(function (Question $updatedQuestion): bool {
-				return $updatedQuestion->getId() === 7 && $updatedQuestion->getOrder() === 0;
-			}));
+			->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getId() === 7 && $updatedQuestion->getOrder() === 0));
 
 		$this->formMapper->expects($this->once())
 			->method('update')
@@ -1334,9 +1324,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->formMapper->expects($this->once())
 			->method('update')
-			->with($this->callback(function (Form $form) {
-				return $form->getId() === 14 && $form->getConfirmationEmailQuestionId() === 11;
-			}));
+			->with($this->callback(fn (Form $form) => $form->getId() === 14 && $form->getConfirmationEmailQuestionId() === 11));
 
 		$this->apiController->newForm(7);
 		$this->assertEquals(11, $clonedForm->getConfirmationEmailQuestionId());

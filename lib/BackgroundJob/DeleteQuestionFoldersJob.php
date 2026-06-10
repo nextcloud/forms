@@ -17,8 +17,8 @@ use Psr\Log\LoggerInterface;
 class DeleteQuestionFoldersJob extends QueuedJob {
 	public function __construct(
 		ITimeFactory $time,
-		private FilePathHelper $filePathHelper,
-		private LoggerInterface $logger,
+		private readonly FilePathHelper $filePathHelper,
+		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct($time);
 	}
@@ -56,7 +56,7 @@ class DeleteQuestionFoldersJob extends QueuedJob {
 						continue;
 					}
 					foreach ($submissionFolder->getDirectoryListing() as $questionFolder) {
-						if (str_starts_with($questionFolder->getName(), $questionFolderPrefix)) {
+						if (str_starts_with((string)$questionFolder->getName(), $questionFolderPrefix)) {
 							$questionFolder->delete();
 							$deletedCount++;
 						}

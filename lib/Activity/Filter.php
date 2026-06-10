@@ -14,8 +14,8 @@ use OCP\IURLGenerator;
 class Filter implements IFilter {
 	public function __construct(
 		protected string $appName,
-		private IL10N $l10n,
-		private IURLGenerator $urlGenerator,
+		private readonly IL10N $l10n,
+		private readonly IURLGenerator $urlGenerator,
 	) {
 	}
 

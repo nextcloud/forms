@@ -35,12 +35,11 @@ class ProviderTest extends TestCase {
 	private FormMapper|MockObject $formMapper;
 	private IEventMerger|MockObject $eventMerger;
 	private IGroupManager|MockObject $groupManager;
-	private IL10N|MockObject $l10n;
 	private LoggerInterface|MockObject $logger;
 	private IURLGenerator|MockObject $urlGenerator;
 	private IUserManager|MockObject $userManager;
 	private IFactory|MockObject $l10nFactory;
-	private IValidator|MockObject $validator;
+	private readonly IValidator|MockObject $validator;
 	private CirclesService|MockObject $circlesService;
 
 	public function setUp(): void {
@@ -61,9 +60,7 @@ class ProviderTest extends TestCase {
 			->willReturn('http://localhost/apps/forms/');
 		$this->urlGenerator->expects($this->any())
 			->method('getAbsoluteUrl')
-			->will($this->returnCallback(function (string $path) {
-				return 'http://localhost' . $path;
-			}));
+			->will($this->returnCallback(fn (string $path) => 'http://localhost' . $path));
 		$this->urlGenerator->expects($this->any())
 			->method('imagePath')
 			->willReturnMap([
@@ -80,11 +77,7 @@ class ProviderTest extends TestCase {
 			$this->urlGenerator,
 			$this->userManager,
 			$this->l10nFactory,
-			$this->validator,
 			$this->circlesService);
-
-		// Only for the test, Provider creates it from Factory
-		$this->l10n = $this->createMock(IL10N::class);
 	}
 
 	// Wrong app-name should be blocked
@@ -103,9 +96,7 @@ class ProviderTest extends TestCase {
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->expects($this->once())
 			->method('t')
-			->will($this->returnCallback(function (string $identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn (string $identity) => $identity));
 		$this->l10nFactory->expects($this->once())
 			->method('get')
 			->willReturn($l10n);
@@ -188,9 +179,7 @@ class ProviderTest extends TestCase {
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->expects($this->once())
 			->method('t')
-			->will($this->returnCallback(function (string $identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn (string $identity) => $identity));
 
 		$this->assertEquals($expected, $this->provider->getSubjectString($l10n, $subject));
 	}
@@ -353,9 +342,7 @@ class ProviderTest extends TestCase {
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->expects($this->any())
 			->method('t')
-			->will($this->returnCallback(function (string $identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn (string $identity) => $identity));
 
 		$this->assertEquals([
 			'type' => 'highlight',

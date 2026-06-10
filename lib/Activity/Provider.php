@@ -20,21 +20,19 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
-use OCP\RichObjectStrings\IValidator;
 use Psr\Log\LoggerInterface;
 
 class Provider implements IProvider {
 	public function __construct(
 		protected string $appName,
-		private FormMapper $formMapper,
-		private IEventMerger $eventMerger,
-		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
-		private IURLGenerator $urlGenerator,
-		private IUserManager $userManager,
-		private IFactory $l10nFactory,
-		private IValidator $validator,
-		private CirclesService $circlesService,
+		private readonly FormMapper $formMapper,
+		private readonly IEventMerger $eventMerger,
+		private readonly IGroupManager $groupManager,
+		private readonly LoggerInterface $logger,
+		private readonly IURLGenerator $urlGenerator,
+		private readonly IUserManager $userManager,
+		private readonly IFactory $l10nFactory,
+		private readonly CirclesService $circlesService,
 	) {
 	}
 
@@ -113,32 +111,27 @@ class Provider implements IProvider {
 	 * @return array
 	 */
 	public function getRichParams(IL10N $l10n, string $subject, array $params): array {
-		switch ($subject) {
-			case ActivityConstants::SUBJECT_NEWSHARE:
-				return [
-					'user' => $this->getRichUser($l10n, $params['userId']),
-					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash'])
-				];
-			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
-				return [
-					'user' => $this->getRichUser($l10n, $params['userId']),
-					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
-					'group' => $this->getRichGroup($params['groupId'])
-				];
-			case ActivityConstants::SUBJECT_NEWCIRCLESHARE:
-				return [
-					'user' => $this->getRichUser($l10n, $params['userId']),
-					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
-					'circle' => $this->getRichCircle($params['circleId'])
-				];
-			case ActivityConstants::SUBJECT_NEWSUBMISSION:
-				return [
-					'user' => $this->getRichUser($l10n, $params['userId']),
-					'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash'], 'results')
-				];
-			default:
-				return [];
-		}
+		return match ($subject) {
+			ActivityConstants::SUBJECT_NEWSHARE => [
+				'user' => $this->getRichUser($l10n, $params['userId']),
+				'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash'])
+			],
+			ActivityConstants::SUBJECT_NEWGROUPSHARE => [
+				'user' => $this->getRichUser($l10n, $params['userId']),
+				'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
+				'group' => $this->getRichGroup($params['groupId'])
+			],
+			ActivityConstants::SUBJECT_NEWCIRCLESHARE => [
+				'user' => $this->getRichUser($l10n, $params['userId']),
+				'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash']),
+				'circle' => $this->getRichCircle($params['circleId'])
+			],
+			ActivityConstants::SUBJECT_NEWSUBMISSION => [
+				'user' => $this->getRichUser($l10n, $params['userId']),
+				'formTitle' => $this->getRichFormTitle($params['formTitle'], $params['formHash'], 'results')
+			],
+			default => [],
+		};
 	}
 
 	/**
@@ -148,7 +141,7 @@ class Provider implements IProvider {
 	 */
 	public function getRichUser(IL10N $l10n, string $userId): array {
 		// Special handling for anonyomous users
-		if (substr($userId, 0, 10) === 'anon-user-') {
+		if (str_starts_with($userId, 'anon-user-')) {
 			return [
 				'type' => 'highlight',
 				'id' => $userId,
@@ -198,7 +191,7 @@ class Provider implements IProvider {
 	/**
 	 * Turn a circleId into a rich-circle array.
 	 *
-	 * @param string $groupId
+	 * @param string $circleId
 	 * @return array
 	 */
 	public function getRichCircle(string $circleId): array {
@@ -240,7 +233,7 @@ class Provider implements IProvider {
 			if ($route !== '') {
 				$formLink .= '/' . $route;
 			}
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			// Ignore if not found, just use stored title
 		}
 
@@ -260,14 +253,10 @@ class Provider implements IProvider {
 	 * @return string
 	 */
 	public function getEventIcon(string $subject): string {
-		switch ($subject) {
-			case ActivityConstants::SUBJECT_NEWSHARE:
-			case ActivityConstants::SUBJECT_NEWGROUPSHARE:
-				return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/shared.svg'));
-			case ActivityConstants::SUBJECT_NEWSUBMISSION:
-				return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/add.svg'));
-			default:
-				return $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('forms', 'forms-dark.svg'));
-		}
+		return match ($subject) {
+			ActivityConstants::SUBJECT_NEWSHARE, ActivityConstants::SUBJECT_NEWGROUPSHARE => $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/shared.svg')),
+			ActivityConstants::SUBJECT_NEWSUBMISSION => $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/add.svg')),
+			default => $this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('forms', 'forms-dark.svg')),
+		};
 	}
 }

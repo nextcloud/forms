@@ -23,9 +23,9 @@ use Psr\Log\LoggerInterface;
 class ConfigController extends ApiController {
 	public function __construct(
 		protected $appName,
-		private ConfigService $configService,
-		private IAppConfig $appConfig,
-		private LoggerInterface $logger,
+		private readonly ConfigService $configService,
+		private readonly IAppConfig $appConfig,
+		private readonly LoggerInterface $logger,
 		IRequest $request,
 	) {
 		parent::__construct($appName, $request);
