@@ -1237,6 +1237,46 @@ file2.txt"
 				// Expected Result
 				null,
 			],
+			'valid-number-grid' => [
+				[
+					['id' => 458, 'type' => 'grid', 'text' => 'Number grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_NUMBER], 'options' => [
+						['id' => 2433, 'optionType' => 'column'],
+						['id' => 2434, 'optionType' => 'column'],
+						['id' => 2435, 'optionType' => 'column'],
+						['id' => 2436, 'optionType' => 'row'],
+						['id' => 2437, 'optionType' => 'row'],
+						['id' => 2438, 'optionType' => 'row'],
+					]],
+				],
+				[
+					'458' => [
+						'2436' => ['2433' => '1', '2434' => '', '2435' => ''],
+						'2437' => ['2433' => '', '2434' => '1', '2435' => ''],
+						'2438' => ['2433' => '', '2434' => '', '2435' => '1'],
+					],
+				],
+				null,
+			],
+			'invalid-number-grid-value' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Number grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_NUMBER], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => ['20' => 'not a number']]],
+				'Answer "not a number" for question "Number grid" must be a number.',
+			],
+			'invalid-number-grid-column' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Number grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_NUMBER], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => ['21' => '1']]],
+				'Column "21" for question "Number grid" is not a valid option.',
+			],
 			'invalid-ranking-missing-option' => [
 				// Questions
 				[
