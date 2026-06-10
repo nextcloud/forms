@@ -18,7 +18,6 @@ use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
-use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFile;
@@ -69,29 +68,28 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
  */
 class ApiController extends OCSController {
-	private ?IUser $currentUser;
+	private readonly ?IUser $currentUser;
 
 	public function __construct(
 		string $appName,
 		IRequest $request,
 		IUserSession $userSession,
-		private AnswerMapper $answerMapper,
-		private FormMapper $formMapper,
-		private OptionMapper $optionMapper,
-		private QuestionMapper $questionMapper,
-		private ShareMapper $shareMapper,
-		private SubmissionMapper $submissionMapper,
-		private ConfirmationEmailService $confirmationEmailService,
-		private ConfigService $configService,
-		private FormsService $formsService,
-		private SubmissionService $submissionService,
-		private IL10N $l10n,
-		private LoggerInterface $logger,
-		private IUserManager $userManager,
-		private IRootFolder $rootFolder,
-		private UploadedFileMapper $uploadedFileMapper,
-		private IMimeTypeDetector $mimeTypeDetector,
-		private IJobList $jobList,
+		private readonly AnswerMapper $answerMapper,
+		private readonly FormMapper $formMapper,
+		private readonly OptionMapper $optionMapper,
+		private readonly QuestionMapper $questionMapper,
+		private readonly SubmissionMapper $submissionMapper,
+		private readonly ConfirmationEmailService $confirmationEmailService,
+		private readonly ConfigService $configService,
+		private readonly FormsService $formsService,
+		private readonly SubmissionService $submissionService,
+		private readonly IL10N $l10n,
+		private readonly LoggerInterface $logger,
+		private readonly IUserManager $userManager,
+		private readonly IRootFolder $rootFolder,
+		private readonly UploadedFileMapper $uploadedFileMapper,
+		private readonly IMimeTypeDetector $mimeTypeDetector,
+		private readonly IJobList $jobList,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -135,7 +133,7 @@ class ApiController extends OCSController {
 			}
 		} elseif ($type === 'shared') {
 			$forms = $this->formsService->getSharedForms($this->currentUser);
-			$result = array_values(array_map(fn (Form $form): array => $this->formsService->getPartialFormArray($form), $forms));
+			$result = array_values(array_map($this->formsService->getPartialFormArray(...), $forms));
 		} else {
 			throw new OCSBadRequestException('wrong form type supplied');
 		}
@@ -335,7 +333,7 @@ class ApiController extends OCSController {
 		}
 
 		// Process file unlinking
-		if (key_exists('fileId', $keyValuePairs) && key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileFormat'])) {
+		if (array_key_exists('fileId', $keyValuePairs) && array_key_exists('fileFormat', $keyValuePairs) && !isset($keyValuePairs['fileFormat'])) {
 			$form->setFileId(null);
 			$form->setFileFormat(null);
 		}
@@ -347,7 +345,7 @@ class ApiController extends OCSController {
 		if (array_key_exists('confirmationEmailQuestionId', $keyValuePairs)) {
 			try {
 				$this->confirmationEmailService->validateRecipientQuestionId($form, $keyValuePairs['confirmationEmailQuestionId']);
-			} catch (\InvalidArgumentException $e) {
+			} catch (\InvalidArgumentException) {
 				throw new OCSBadRequestException('Invalid confirmationEmailQuestionId, will not update.');
 			}
 		}
@@ -414,7 +412,7 @@ class ApiController extends OCSController {
 	public function getQuestions(int $formId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find form');
 			throw new OCSNotFoundException('Could not find form');
 		}
@@ -453,7 +451,7 @@ class ApiController extends OCSController {
 	public function getQuestion(int $formId, int $questionId): DataResponse {
 		try {
 			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find form');
 			throw new OCSNotFoundException('Could not find form');
 		}
@@ -575,7 +573,7 @@ class ApiController extends OCSController {
 					throw new OCSBadRequestException('Question doesn\'t belong to given form');
 				}
 				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
-			} catch (IMapperException $e) {
+			} catch (IMapperException) {
 				$this->logger->debug('Could not find question');
 				throw new OCSNotFoundException('Could not find question');
 			}
@@ -663,7 +661,7 @@ class ApiController extends OCSController {
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find question');
 			throw new OCSNotFoundException('Could not find question');
 		}
@@ -673,24 +671,24 @@ class ApiController extends OCSController {
 		}
 
 		// Don't allow empty array
-		if (sizeof($keyValuePairs) === 0) {
+		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
 			throw new OCSBadRequestException('This form is archived and can not be modified');
 		}
 
 		//Don't allow to change id or formId
-		if (key_exists('id', $keyValuePairs) || key_exists('formId', $keyValuePairs)) {
+		if (array_key_exists('id', $keyValuePairs) || array_key_exists('formId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update \'id\' or \'formId\'');
 			throw new OCSForbiddenException('Not allowed to update \'id\' or \'formId\'');
 		}
 
 		// Don't allow to reorder here
-		if (key_exists('order', $keyValuePairs)) {
+		if (array_key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
 			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
 		}
 
-		if (key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
+		if (array_key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
@@ -743,7 +741,7 @@ class ApiController extends OCSController {
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find question');
 			throw new OCSNotFoundException('Could not find question');
 		}
@@ -829,7 +827,7 @@ class ApiController extends OCSController {
 
 		// Check if all questions are given in Array.
 		$questions = $this->questionMapper->findByForm($formId);
-		if (sizeof($questions) !== sizeof($newOrder)) {
+		if (count($questions) !== count($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored questions');
 			throw new OCSBadRequestException('The length of the given array does not match the number of stored questions');
 		}
@@ -841,7 +839,7 @@ class ApiController extends OCSController {
 		foreach ($newOrder as $arrayKey => $questionId) {
 			try {
 				$questions[$arrayKey] = $this->questionMapper->findById($questionId);
-			} catch (IMapperException $e) {
+			} catch (IMapperException) {
 				$this->logger->debug('Could not find question {questionId}', [
 					'questionId' => $questionId
 				]);
@@ -1012,7 +1010,7 @@ class ApiController extends OCSController {
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find option or question');
 			throw new OCSNotFoundException('Could not find option or question');
 		}
@@ -1023,13 +1021,13 @@ class ApiController extends OCSController {
 		}
 
 		// Don't allow empty array
-		if (sizeof($keyValuePairs) === 0) {
+		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update');
 			throw new OCSForbiddenException('Empty keyValuePairs, will not update');
 		}
 
 		//Don't allow to change id or questionId
-		if (key_exists('id', $keyValuePairs) || key_exists('questionId', $keyValuePairs)) {
+		if (array_key_exists('id', $keyValuePairs) || array_key_exists('questionId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update id or questionId');
 			throw new OCSForbiddenException('Not allowed to update id or questionId');
 		}
@@ -1081,7 +1079,7 @@ class ApiController extends OCSController {
 		try {
 			$option = $this->optionMapper->findById($optionId);
 			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find option or question');
 			throw new OCSBadRequestException('Could not find option or question');
 		}
@@ -1139,7 +1137,7 @@ class ApiController extends OCSController {
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find question');
 			throw new OCSNotFoundException('Could not find question');
 		}
@@ -1157,7 +1155,7 @@ class ApiController extends OCSController {
 
 		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 
-		if (sizeof($options) !== sizeof($newOrder)) {
+		if (count($options) !== count($newOrder)) {
 			$this->logger->debug('The length of the given array does not match the number of stored options');
 			throw new OCSBadRequestException('The length of the given array does not match the number of stored options');
 		}
@@ -1169,7 +1167,7 @@ class ApiController extends OCSController {
 		foreach ($newOrder as $arrayKey => $optionId) {
 			try {
 				$options[$arrayKey] = $this->optionMapper->findById($optionId);
-			} catch (IMapperException $e) {
+			} catch (IMapperException) {
 				$this->logger->debug('Could not find option. Id: {optionId}', [
 					'optionId' => $optionId
 				]);
@@ -1278,7 +1276,7 @@ class ApiController extends OCSController {
 				}, $submission['answers']);
 			}
 
-			if (substr($submission['userId'], 0, 10) === 'anon-user-') {
+			if (str_starts_with($submission['userId'], 'anon-user-')) {
 				// Anonymous User
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
 				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
@@ -1347,7 +1345,7 @@ class ApiController extends OCSController {
 		}
 
 		// Append Display Names
-		if (substr($submission['userId'], 0, 10) === 'anon-user-') {
+		if (str_starts_with($submission['userId'], 'anon-user-')) {
 			// Anonymous User
 			// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
 			$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
@@ -1442,7 +1440,7 @@ class ApiController extends OCSController {
 
 		// If not logged in, anonymous, or embedded use anonID
 		if (!$this->currentUser || $form->getIsAnonymous()) {
-			$anonID = 'anon-user-' . hash('md5', strval(time() + rand()));
+			$anonID = 'anon-user-' . hash('md5', strval(time() + random_int(0, mt_getrandmax())));
 			$submission->setUserId($anonID);
 		} else {
 			$submission->setUserId($this->currentUser->getUID());
@@ -1534,7 +1532,7 @@ class ApiController extends OCSController {
 		// get existing submission of this user
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			throw new OCSBadRequestException('Submission doesn\'t exist');
 		}
 
@@ -1595,7 +1593,7 @@ class ApiController extends OCSController {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_RESULTS_DELETE);
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find submission');
 			throw new OCSNotFoundException('Could not find submission');
 		}
@@ -1698,7 +1696,7 @@ class ApiController extends OCSController {
 
 		try {
 			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find question with id {questionId}', [
 				'questionId' => $questionId
 			]);
@@ -1835,7 +1833,7 @@ class ApiController extends OCSController {
 				$optionIndex = array_search($answer, array_column($question['options'], 'id'));
 				if ($optionIndex !== false) {
 					$answerText = $question['options'][$optionIndex]['text'];
-				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && strpos($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX) === 0) {
+				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && str_starts_with($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)) {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
 				}
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
@@ -1925,7 +1923,7 @@ class ApiController extends OCSController {
 		$isOwner = $currentUserId === $form->getOwnerId();
 
 		// If the request contains 'state' it must be the only key
-		if (sizeof($keyValuePairs) !== 1) {
+		if (count($keyValuePairs) !== 1) {
 			$this->logger->debug('State may only be changed on its own');
 			throw new OCSForbiddenException('State may only be changed on its own');
 		}
@@ -1944,19 +1942,19 @@ class ApiController extends OCSController {
 	}
 
 	private function isLockingRequest(array $keyValuePairs): bool {
-		return sizeof($keyValuePairs) === 1
+		return count($keyValuePairs) === 1
 			&& array_key_exists('lockedUntil', $keyValuePairs)
 			&& $keyValuePairs['lockedUntil'] === 0;
 	}
 
 	private function isUnlockingRequest(array $keyValuePairs): bool {
-		return sizeof($keyValuePairs) === 1
+		return count($keyValuePairs) === 1
 			&& array_key_exists('lockedUntil', $keyValuePairs)
 			&& is_null($keyValuePairs['lockedUntil']);
 	}
 
 	private function isOwnerTransferRequest(array $keyValuePairs): bool {
-		return sizeof($keyValuePairs) === 1 && key_exists('ownerId', $keyValuePairs);
+		return count($keyValuePairs) === 1 && array_key_exists('ownerId', $keyValuePairs);
 	}
 
 	/**

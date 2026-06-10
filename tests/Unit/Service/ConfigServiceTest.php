@@ -116,7 +116,7 @@ class ConfigServiceTest extends TestCase {
 				if (!array_key_exists($configKey, $strConfig)) {
 					return $defaultVal;
 				}
-				return json_decode($strConfig[$configKey], true);
+				return json_decode((string)$strConfig[$configKey], true);
 			}));
 
 		$this->config->expects($this->any())
@@ -181,15 +181,11 @@ class ConfigServiceTest extends TestCase {
 		// Default Values are set within getAppValue, thus returning this one.
 		$this->appConfig->expects($this->any())
 			->method('getAppValueBool')
-			->will($this->returnCallback(function ($configKey, $defaultVal) {
-				return $defaultVal;
-			}));
+			->will($this->returnCallback(fn ($configKey, $defaultVal) => $defaultVal));
 
 		$this->appConfig->expects($this->any())
 			->method('getAppValueArray')
-			->will($this->returnCallback(function ($configKey, $defaultVal) {
-				return $defaultVal;
-			}));
+			->will($this->returnCallback(fn ($configKey, $defaultVal) => $defaultVal));
 
 		$this->config->expects($this->any())
 			->method('getSystemValue')
@@ -240,15 +236,11 @@ class ConfigServiceTest extends TestCase {
 	public function testCanCreateForms(array $config, bool $expected) {
 		$this->appConfig->expects($this->any())
 			->method('getAppValueBool')
-			->will($this->returnCallback(function ($configKey, $defaultVal) use ($config) {
-				return $config[$configKey];
-			}));
+			->will($this->returnCallback(fn ($configKey, $defaultVal) => $config[$configKey]));
 
 		$this->appConfig->expects($this->any())
 			->method('getAppValueArray')
-			->will($this->returnCallback(function ($configKey, $defaultVal) use ($config) {
-				return isset($config[$configKey]) ? json_decode($config[$configKey], true) : $defaultVal;
-			}));
+			->will($this->returnCallback(fn ($configKey, $defaultVal) => isset($config[$configKey]) ? json_decode($config[$configKey], true) : $defaultVal));
 
 		$this->groupManager->expects($this->any())
 			->method('getUserGroupIds')

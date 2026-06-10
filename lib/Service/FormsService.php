@@ -49,27 +49,27 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsShare from ResponseDefinitions
  */
 class FormsService {
-	private ?IUser $currentUser;
+	private readonly ?IUser $currentUser;
 
 	public function __construct(
 		IUserSession $userSession,
-		private ActivityManager $activityManager,
-		private FormMapper $formMapper,
-		private OptionMapper $optionMapper,
-		private QuestionMapper $questionMapper,
-		private ShareMapper $shareMapper,
-		private SubmissionMapper $submissionMapper,
-		private ConfigService $configService,
-		private IGroupManager $groupManager,
-		private IUserManager $userManager,
-		private ISecureRandom $secureRandom,
-		private CirclesService $circlesService,
-		private FilePathHelper $filePathHelper,
-		private IRootFolder $rootFolder,
-		private IL10N $l10n,
-		private LoggerInterface $logger,
-		private IEventDispatcher $eventDispatcher,
-		private ConfirmationEmailService $confirmationEmailService,
+		private readonly ActivityManager $activityManager,
+		private readonly FormMapper $formMapper,
+		private readonly OptionMapper $optionMapper,
+		private readonly QuestionMapper $questionMapper,
+		private readonly ShareMapper $shareMapper,
+		private readonly SubmissionMapper $submissionMapper,
+		private readonly ConfigService $configService,
+		private readonly IGroupManager $groupManager,
+		private readonly IUserManager $userManager,
+		private readonly ISecureRandom $secureRandom,
+		private readonly CirclesService $circlesService,
+		private readonly FilePathHelper $filePathHelper,
+		private readonly IRootFolder $rootFolder,
+		private readonly IL10N $l10n,
+		private readonly LoggerInterface $logger,
+		private readonly IEventDispatcher $eventDispatcher,
+		private readonly ConfirmationEmailService $confirmationEmailService,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -97,7 +97,7 @@ class FormsService {
 			foreach ($optionEntities as $optionEntity) {
 				$optionList[] = $optionEntity->read();
 			}
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			//handle silently
 		} finally {
 			return $optionList;
@@ -120,9 +120,7 @@ class FormsService {
 				$question['accept'] = [];
 				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-						$question['accept'] = array_map(function (string $fileType) {
-							return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
-						}, $question['extraSettings']['allowedFileTypes']);
+						$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
 					}
 
 					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
@@ -139,7 +137,7 @@ class FormsService {
 
 				$questionList[] = $question;
 			}
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			//handle silently
 		} finally {
 			return $questionList;
@@ -160,9 +158,7 @@ class FormsService {
 			$question['accept'] = [];
 			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-					$question['accept'] = array_map(function (string $fileType) {
-						return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
-					}, $question['extraSettings']['allowedFileTypes']);
+					$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
 				}
 
 				if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
@@ -172,7 +168,7 @@ class FormsService {
 				}
 			}
 			return $question;
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			return null;
 		}
 	}
@@ -231,7 +227,7 @@ class FormsService {
 			try {
 				$result['filePath'] = $this->getFilePath($form);
 				// If file was deleted, set filePath to null
-			} catch (NotFoundException $e) {
+			} catch (NotFoundException) {
 				$result['filePath'] = null;
 			}
 		}
@@ -305,7 +301,7 @@ class FormsService {
 	public function getFormIfAllowed(int $formId, string $permissions = 'all'): Form {
 		try {
 			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find form');
 			throw new NoSuchFormException('Could not find form');
 		}
@@ -349,7 +345,7 @@ class FormsService {
 	public function loadFormForSubmission(int $formId, string $shareHash): Form {
 		try {
 			$form = $this->formMapper->findById($formId);
-		} catch (IMapperException $e) {
+		} catch (IMapperException) {
 			$this->logger->debug('Could not find form');
 			throw new NoSuchFormException('Could not find form');
 		}
@@ -366,7 +362,7 @@ class FormsService {
 					$isPublicShare = true;
 				}
 			}
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			// $isPublicShare already false.
 		} finally {
 			// Now forbid, if no public share and no direct share.
@@ -584,7 +580,7 @@ class FormsService {
 		);
 
 		// filter expired forms
-		$forms = array_filter($forms, fn (Form $form): bool => $this->isSharedFormShown($form));
+		$forms = array_filter($forms, $this->isSharedFormShown(...));
 		return $forms;
 	}
 
@@ -768,9 +764,7 @@ class FormsService {
 		}
 
 		// Deduplicate and exclude form owner to avoid duplicates
-		$sharedUserIds = array_unique(array_filter($sharedUserIds, function (string $userId) use ($form) {
-			return $userId !== $form->getOwnerId();
-		}));
+		$sharedUserIds = array_unique(array_filter($sharedUserIds, fn (string $userId) => $userId !== $form->getOwnerId()));
 
 		foreach ($sharedUserIds as $userId) {
 			try {
@@ -839,38 +833,18 @@ class FormsService {
 		}
 
 		// Ensure only allowed keys are set
-		switch ($questionType) {
-			case Constants::ANSWER_TYPE_DROPDOWN:
-				$allowed = Constants::EXTRA_SETTINGS_DROPDOWN;
-				break;
-			case Constants::ANSWER_TYPE_MULTIPLE:
-			case Constants::ANSWER_TYPE_MULTIPLEUNIQUE:
-				$allowed = Constants::EXTRA_SETTINGS_MULTIPLE;
-				break;
-			case Constants::ANSWER_TYPE_SHORT:
-				$allowed = Constants::EXTRA_SETTINGS_SHORT;
-				break;
-			case Constants::ANSWER_TYPE_FILE:
-				$allowed = Constants::EXTRA_SETTINGS_FILE;
-				break;
-			case Constants::ANSWER_TYPE_DATE:
-				$allowed = Constants::EXTRA_SETTINGS_DATE;
-				break;
-			case Constants::ANSWER_TYPE_GRID:
-				$allowed = Constants::EXTRA_SETTINGS_GRID;
-				break;
-			case Constants::ANSWER_TYPE_RANKING:
-				$allowed = Constants::EXTRA_SETTINGS_RANKING;
-				break;
-			case Constants::ANSWER_TYPE_TIME:
-				$allowed = Constants::EXTRA_SETTINGS_TIME;
-				break;
-			case Constants::ANSWER_TYPE_LINEARSCALE:
-				$allowed = Constants::EXTRA_SETTINGS_LINEARSCALE;
-				break;
-			default:
-				$allowed = [];
-		}
+		$allowed = match ($questionType) {
+			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
+			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
+			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
+			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
+			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			default => [],
+		};
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -1003,7 +977,7 @@ class FormsService {
 				$query->getTerm()
 			);
 			$formsList = array_merge($ownedForms, $sharedForms);
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			// silent catch
 		}
 		return $formsList;

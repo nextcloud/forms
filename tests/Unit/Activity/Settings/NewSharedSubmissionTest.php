@@ -29,9 +29,7 @@ class NewSharedSubmissionTest extends TestCase {
 	public function testGetGroupName() {
 		$this->l10n->expects($this->once())
 			->method('t')
-			->will($this->returnCallback(function ($identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn ($identity) => $identity));
 		$this->assertEquals('Forms', $this->newShare->getGroupName());
 	}
 
@@ -42,9 +40,7 @@ class NewSharedSubmissionTest extends TestCase {
 	public function testGetName() {
 		$this->l10n->expects($this->once())
 			->method('t')
-			->will($this->returnCallback(function ($identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn ($identity) => $identity));
 		$this->assertEquals('Someone <strong>answered</strong> a shared form', $this->newShare->getName());
 	}
 

@@ -46,9 +46,7 @@ class FilterTest extends TestCase {
 			->willReturn('apps/forms/img/forms-dark.svg');
 		$this->urlGenerator->expects($this->once())
 			->method('getAbsoluteUrl')
-			->will($this->returnCallback(function ($path) {
-				return 'http://localhost/' . $path;
-			}));
+			->will($this->returnCallback(fn ($path) => 'http://localhost/' . $path));
 		$this->assertEquals('http://localhost/apps/forms/img/forms-dark.svg', $this->filter->getIcon());
 	}
 

@@ -272,7 +272,7 @@ class ApiV3Test extends IntegrationBase {
 
 	// Small Wrapper for OCS-Response
 	private function OcsResponse2Data($resp) {
-		$arr = json_decode($resp->getBody()->getContents(), true);
+		$arr = json_decode((string)$resp->getBody()->getContents(), true);
 		return $arr['ocs']['data'];
 	}
 
@@ -827,7 +827,7 @@ class ApiV3Test extends IntegrationBase {
 		// Check formId & order
 		$this->assertEquals($this->testForms[0]['id'], $data['formId']);
 		unset($data['formId']);
-		$this->assertEquals(sizeof($this->testForms[0]['questions']), $data['order']);
+		$this->assertEquals(count($this->testForms[0]['questions']), $data['order']);
 		unset($data['order']);
 		unset($data['id']);
 
@@ -1321,7 +1321,7 @@ CSV
 	 */
 	public function testExportSubmissions(string $expected) {
 		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions?fileFormat=csv");
-		$data = substr($resp->getBody()->getContents(), 3); // Some strange Character removed at the beginning
+		$data = substr((string)$resp->getBody()->getContents(), 3); // Some strange Character removed at the beginning
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals('attachment; filename="Title of a Form (responses).csv"', $resp->getHeaders()['Content-Disposition'][0]);
@@ -1567,7 +1567,7 @@ CSV
 	 * @param array $submissionsExpected
 	 */
 	public function testDeleteSingleSubmission(array $submissionsExpected) {
-		$submissionsExpected['filteredSubmissionsCount'] = $submissionsExpected['filteredSubmissionsCount'] - 1;
+		$submissionsExpected['filteredSubmissionsCount'] -= 1;
 		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}/submissions/{$this->testForms[0]['submissions'][0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
 

@@ -34,7 +34,7 @@ use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-use OCP\Mail\IMailer;
+use OCP\Mail\IEmailValidator;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -53,7 +53,7 @@ class SubmissionServiceTest extends TestCase {
 	private IL10N|MockObject $l10n;
 	private LoggerInterface|MockObject $logger;
 	private IUserManager|MockObject $userManager;
-	private IMailer|MockObject $mailer;
+	private IEmailValidator|MockObject $emailValidator;
 	private ITempManager|MockObject $tempManager;
 	private FormsService|MockObject $formsService;
 	private IURLGenerator|MockObject $urlGenerator;
@@ -70,7 +70,7 @@ class SubmissionServiceTest extends TestCase {
 		$this->config = $this->createMock(IConfig::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
-		$this->mailer = $this->getMockBuilder(IMailer::class)->getMock();
+		$this->emailValidator = $this->getMockBuilder(IEmailValidator::class)->getMock();
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);
 		$this->tempManager = $this->createMock(ITempManager::class);
@@ -85,9 +85,7 @@ class SubmissionServiceTest extends TestCase {
 
 		$this->l10n->expects($this->any())
 			->method('t')
-			->will($this->returnCallback(function (string $identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn (string $identity) => $identity));
 
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
@@ -106,11 +104,11 @@ class SubmissionServiceTest extends TestCase {
 			$this->logger,
 			$this->userManager,
 			$userSession,
-			$this->mailer,
 			$this->tempManager,
 			$this->formsService,
 			$this->urlGenerator,
 			$this->optionMapper,
+			$this->emailValidator,
 		);
 	}
 
@@ -741,9 +739,7 @@ file2.txt"
 				->method('findByQuestion')
 				->with($questions[0]['id'])
 				->willReturnCallback(function (int $questionId) use ($questions) {
-					$optionsEntities = array_map(function ($option) {
-						return Option::fromParams($option);
-					}, $questions[0]['options']);
+					$optionsEntities = array_map(fn ($option) => Option::fromParams($option), $questions[0]['options']);
 
 					return $optionsEntities;
 				});
@@ -778,19 +774,15 @@ file2.txt"
 			->method('findBySubmission')
 		// Return AnswerObjects for corresponding submission
 			->will($this->returnCallback(function (int $submissionId) use ($submissions) {
-				$matchingSubmission = array_filter($submissions, function ($submission) use ($submissionId) {
-					return $submission['id'] === $submissionId;
-				});
+				$matchingSubmission = array_filter($submissions, fn ($submission) => $submission['id'] === $submissionId);
 
-				$answerEntities = array_map(function ($answer) {
-					return Answer::fromParams($answer);
-				}, current($matchingSubmission)['answers']);
+				$answerEntities = array_map(fn ($answer) => Answer::fromParams($answer), current($matchingSubmission)['answers']);
 
 				return $answerEntities;
 			}));
 
 		// Prepend BOM-Sequence as Writer does and remove formatting-artefacts of dataProvider.
-		$dataExpectation = chr(239) . chr(187) . chr(191) . ltrim(preg_replace('/\t+/', '', $csvText));
+		$dataExpectation = chr(239) . chr(187) . chr(191) . ltrim((string)preg_replace('/\t+/', '', $csvText));
 
 		return $dataExpectation;
 	}
@@ -1362,9 +1354,7 @@ file2.txt"
 	 * @param null|string $expected
 	 */
 	public function testValidateSubmission(array $questions, array $answers, ?string $expected) {
-		$this->mailer->method('validateMailAddress')->willReturnCallback(function ($mail) {
-			return $mail === 'some.name+context@example.com';
-		});
+		$this->emailValidator->method('isValid')->willReturnCallback(fn ($mail) => $mail === 'some.name+context@example.com');
 
 		if ($expected !== null) {
 			$this->expectException(\InvalidArgumentException::class);

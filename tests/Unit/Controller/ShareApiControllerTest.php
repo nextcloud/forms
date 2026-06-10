@@ -35,7 +35,6 @@ use OCP\IGroupManager;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
-use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
@@ -73,17 +72,8 @@ class ShareApiControllerTest extends TestCase {
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
 		$this->userManager = $this->createMock(IUserManager::class);
-		$userSession = $this->createMock(IUserSession::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->circlesService = $this->createMock(CirclesService::class);
-
-		$user = $this->createMock(IUser::class);
-		$user->expects($this->any())
-			->method('getUID')
-			->willReturn('currentUser');
-		$userSession->expects($this->once())
-			->method('getUser')
-			->willReturn($user);
 
 		$this->rootFolder = $this->createMock(IRootFolder::class);
 		$this->filePathHelper = new FilePathHelper($this->rootFolder);
@@ -92,7 +82,6 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareApiController = new ShareApiController(
 			'forms',
 			$this->request,
-			$userSession,
 			$this->formMapper,
 			$this->shareMapper,
 			$this->configService,
@@ -876,9 +865,7 @@ class ShareApiControllerTest extends TestCase {
 		$this->shareMapper->expects($exception === null ? $this->once() : $this->any())
 			->method('update')
 			->with($shareEntity)
-			->willReturnCallback(function ($arg) {
-				return $arg;
-			});
+			->willReturnCallback(fn ($arg) => $arg);
 
 		if ($exception === null) {
 			$expectedResponse = new DataResponse($expected);

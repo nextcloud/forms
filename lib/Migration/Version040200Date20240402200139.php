@@ -77,7 +77,7 @@ class Version040200Date20240402200139 extends SimpleMigrationStep {
 		// ... then handle each existing form and translate its sharing settings.
 		while ($row = $cursor->fetch()) {
 			// Decode access to array (param assoc=true)
-			$access = json_decode($row['access_json'], true);
+			$access = json_decode((string)$row['access_json'], true);
 
 			$value = Constants::FORM_ACCESS_NOPUBLICSHARE;
 
