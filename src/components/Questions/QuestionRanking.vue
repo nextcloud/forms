@@ -255,10 +255,6 @@ export default {
 	},
 
 	computed: {
-		contentValid() {
-			return this.answerType.validate(this)
-		},
-
 		shiftDragHandle() {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
