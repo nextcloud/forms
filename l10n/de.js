@@ -65,7 +65,7 @@ OC.L10N.register(
     "Allow showing form to all logged in accounts on sidebar" : "Anzeige des Formulars in der Seitenleiste für alle angemeldeten Konten zulassen",
     "Comments" : "Kommentare",
     "Allow comments" : "Kommentare erlauben",
-    "Grid" : "Gitter",
+    "Grid" : "Raster",
     "Form closed" : "Formular geschlossen",
     "Expired {relativeDate}" : "Abgelaufen {relativeDate}",
     "Expires {relativeDate}" : "Läuft ab {relativeDate}",

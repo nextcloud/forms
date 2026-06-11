@@ -118,6 +118,7 @@ OC.L10N.register(
     "Copy question" : "Cóipeáil ceist",
     "Delete question" : "Scrios an cheist",
     "Description (formatting using Markdown is supported)" : "Cur síos (tacaítear le formáidiú le Markdown)",
+    "You must answer this question" : "Ní mór duit an cheist seo a fhreagairt",
     "Clear selected color" : "Glan an dath roghnaithe",
     "Use date range" : "Úsáid raon dáta",
     "Earliest date" : "Dáta is luaithe",
