@@ -118,6 +118,7 @@ OC.L10N.register(
     "Copy question" : "Скопировать вопрос",
     "Delete question" : "Удалить вопрос",
     "Description (formatting using Markdown is supported)" : "Описание (поддерживается форматирование с использованием Markdown)",
+    "You must answer this question" : "Вы должны ответить на этот вопрос",
     "Clear selected color" : "Очистить выбранный цвет",
     "Use date range" : "Использовать диапазон дат",
     "Earliest date" : "Самая ранняя дата",

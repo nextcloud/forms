@@ -30,6 +30,7 @@ OC.L10N.register(
     "Search" : "Nadi",
     "Sharing" : "Beṭṭu",
     "Settings" : "Iɣewwaren",
+    "Submit" : "Azen",
     "Clear" : "Ṣfeḍ",
     "File" : "Afaylu",
     "Date" : "Azemz",
