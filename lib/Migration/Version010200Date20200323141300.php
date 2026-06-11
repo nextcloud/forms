@@ -235,9 +235,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$cursor = $qb_fetch->executeQuery();
 			while ($question = $cursor->fetch()) {
 				//In case the old Question would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if (strlen($question['form_question_text']) > 2048) {
+				if (strlen((string)$question['form_question_text']) > 2048) {
 					$output->warning("Question-text is too long for new Database: '" . $question['form_question_text'] . "'");
-					$question['form_question_text'] = mb_substr($question['form_question_text'], 0, 2048);
+					$question['form_question_text'] = mb_substr((string)$question['form_question_text'], 0, 2048);
 				}
 
 				$qb_restore->insert('forms_v2_questions')
@@ -261,9 +261,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 			$cursor = $qb_fetch->executeQuery();
 			while ($answer = $cursor->fetch()) {
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if (strlen($answer['text']) > 1024) {
+				if (strlen((string)$answer['text']) > 1024) {
 					$output->warning("Option-text is too long for new Database: '" . $answer['text'] . "'");
-					$answer['text'] = mb_substr($answer['text'], 0, 1024);
+					$answer['text'] = mb_substr((string)$answer['text'], 0, 1024);
 				}
 
 				$qb_restore->insert('forms_v2_options')
@@ -328,9 +328,9 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 				$last_vote = $vote;
 
 				//In case the old Answer would have been longer than current possible length, create a warning and shorten text to avoid Error on upgrade.
-				if (strlen($vote['vote_answer']) > 4096) {
+				if (strlen((string)$vote['vote_answer']) > 4096) {
 					$output->warning("Answer-text is too long for new Database: '" . $vote['vote_answer'] . "'");
-					$vote['vote_answer'] = mb_substr($vote['vote_answer'], 0, 4096);
+					$vote['vote_answer'] = mb_substr((string)$vote['vote_answer'], 0, 4096);
 				}
 
 				/* Due to the unconventional storing fo vote_option_ids, the vote_option_id needs to get mapped onto old question-id and from there to new question-id.
@@ -371,11 +371,11 @@ class Version010200Date20200323141300 extends SimpleMigrationStep {
 		$accessArray['users'] = [];
 		$accessArray['groups'] = [];
 
-		$stringExplode = explode(';', $accessString);
+		$stringExplode = explode(';', (string)$accessString);
 		foreach ($stringExplode as $string) {
-			if (strpos($string, 'user_') === 0) {
+			if (str_starts_with($string, 'user_')) {
 				$accessArray['users'][] = substr($string, 5);
-			} elseif (strpos($string, 'group_') === 0) {
+			} elseif (str_starts_with($string, 'group_')) {
 				$accessArray['groups'][] = substr($string, 6);
 			}
 		}

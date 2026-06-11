@@ -37,7 +37,6 @@ use OCP\IGroupManager;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
-use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
@@ -47,27 +46,24 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsShare from ResponseDefinitions
  */
 class ShareApiController extends OCSController {
-	private IUser $currentUser;
 
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		IUserSession $userSession,
-		private FormMapper $formMapper,
-		private ShareMapper $shareMapper,
-		private ConfigService $configService,
-		private FormsService $formsService,
-		private IGroupManager $groupManager,
-		private LoggerInterface $logger,
-		private IUserManager $userManager,
-		private ISecureRandom $secureRandom,
-		private CirclesService $circlesService,
-		private IRootFolder $rootFolder,
-		private FilePathHelper $filePathHelper,
-		private IManager $shareManager,
+		private readonly FormMapper $formMapper,
+		private readonly ShareMapper $shareMapper,
+		private readonly ConfigService $configService,
+		private readonly FormsService $formsService,
+		private readonly IGroupManager $groupManager,
+		private readonly LoggerInterface $logger,
+		private readonly IUserManager $userManager,
+		private readonly ISecureRandom $secureRandom,
+		private readonly CirclesService $circlesService,
+		private readonly IRootFolder $rootFolder,
+		private readonly FilePathHelper $filePathHelper,
+		private readonly IManager $shareManager,
 	) {
 		parent::__construct($appName, $request);
-		$this->currentUser = $userSession->getUser();
 	}
 
 	/**
@@ -162,7 +158,7 @@ class ShareApiController extends OCSController {
 					// If we come here, a share has been found --> The share hash already exists, thus aborting.
 					$this->logger->debug('Share hash already exists.');
 					throw new OCSBadRequestException('Share hash exists, please retry.');
-				} catch (DoesNotExistException $e) {
+				} catch (DoesNotExistException) {
 					// Just continue, this is what we expect to happen (share hash not existing yet).
 				}
 				break;
@@ -252,7 +248,7 @@ class ShareApiController extends OCSController {
 		}
 
 		// Don't allow empty array
-		if (sizeof($keyValuePairs) === 0) {
+		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
 			throw new OCSForbiddenException('Empty keyValuePairs, will not update');
 		}
@@ -279,7 +275,7 @@ class ShareApiController extends OCSController {
 				try {
 					/** @var \OCP\Files\Folder $folder */
 					$folder = $userFolder->get($uploadedFilesFolderPath);
-				} catch (NotFoundException $e) {
+				} catch (NotFoundException) {
 					$folder = $userFolder->newFolder($uploadedFilesFolderPath);
 				}
 
@@ -363,7 +359,7 @@ class ShareApiController extends OCSController {
 		$uploadedFilesFolderPath = $this->filePathHelper->getFormUploadedFilesFolderPath($form);
 		try {
 			$folder = $userFolder->get($uploadedFilesFolderPath);
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			return;
 		}
 		$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);

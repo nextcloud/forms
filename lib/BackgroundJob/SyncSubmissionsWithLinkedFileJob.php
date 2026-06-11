@@ -24,13 +24,13 @@ class SyncSubmissionsWithLinkedFileJob extends QueuedJob {
 
 	public function __construct(
 		ITimeFactory $time,
-		private FormMapper $formMapper,
-		private FormsService $formsService,
-		private SubmissionService $submissionService,
-		private LoggerInterface $logger,
-		private IUserManager $userManager,
-		private IUserSession $userSession,
-		private IJobList $jobList,
+		private readonly FormMapper $formMapper,
+		private readonly FormsService $formsService,
+		private readonly SubmissionService $submissionService,
+		private readonly LoggerInterface $logger,
+		private readonly IUserManager $userManager,
+		private readonly IUserSession $userSession,
+		private readonly IJobList $jobList,
 	) {
 		parent::__construct($time);
 	}
@@ -54,7 +54,7 @@ class SyncSubmissionsWithLinkedFileJob extends QueuedJob {
 			$filePath = $this->formsService->getFilePath($form);
 
 			$this->submissionService->writeFileToCloud($form, $filePath, $fileFormat, $ownerId);
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			$this->logger->notice('Form {formId} linked to a file that doesn\'t exist anymore', [
 				'formId' => $formId
 			]);
@@ -85,6 +85,6 @@ class SyncSubmissionsWithLinkedFileJob extends QueuedJob {
 	 * Calculates exponential delay (cubic growth) in seconds.
 	 */
 	private function nextAttempt(int $numberOfAttempt): int {
-		return $this->time->getTime() + pow($numberOfAttempt, 3) * 60;
+		return $this->time->getTime() + $numberOfAttempt ** 3 * 60;
 	}
 }

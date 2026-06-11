@@ -36,7 +36,7 @@ class CommentsEntityListener implements IEventListener {
 		$event->addEntityCollection('forms', function ($formId) {
 			try {
 				$form = $this->formMapper->findById((int)$formId);
-			} catch (DoesNotExistException $e) {
+			} catch (DoesNotExistException) {
 				return false;
 			}
 			return $this->formService->hasUserAccess($form) && $form->getAllowComments();

@@ -37,9 +37,7 @@ class FormsActivitySettingsTest extends TestCase {
 	public function testGetGroupName() {
 		$this->l10n->expects($this->once())
 			->method('t')
-			->will($this->returnCallback(function ($identity) {
-				return $identity;
-			}));
+			->will($this->returnCallback(fn ($identity) => $identity));
 		$this->assertEquals('Forms', $this->activitySettings->getGroupName());
 	}
 

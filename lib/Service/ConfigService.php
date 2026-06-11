@@ -17,13 +17,13 @@ use OCP\IUser;
 use OCP\IUserSession;
 
 class ConfigService {
-	private ?IUser $currentUser;
+	private readonly ?IUser $currentUser;
 
 	public function __construct(
 		protected string $appName,
-		private IConfig $config,
-		private IAppConfig $appConfig,
-		private IGroupManager $groupManager,
+		private readonly IConfig $config,
+		private readonly IAppConfig $appConfig,
+		private readonly IGroupManager $groupManager,
 		IUserSession $userSession,
 	) {
 		$this->currentUser = $userSession->getUser();
@@ -123,7 +123,7 @@ class ConfigService {
 
 		$userGroups = $this->groupManager->getUserGroupIds($this->currentUser);
 		// If array intersection is not empty, user is member of any allowed group.
-		if (sizeof(array_intersect($userGroups, $this->getUnformattedCreationAllowedGroups()))) {
+		if (count(array_intersect($userGroups, $this->getUnformattedCreationAllowedGroups()))) {
 			return true;
 		}
 

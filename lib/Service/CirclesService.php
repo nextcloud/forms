@@ -22,14 +22,14 @@ use Throwable;
  * having the app disabled is properly handled
  */
 class CirclesService {
-	private bool $circlesEnabled;
+	private readonly bool $circlesEnabled;
 
 	private $userCircleCache = [];
 
 	public function __construct(
 		IAppManager $appManager,
-		private ContainerInterface $container,
-		private LoggerInterface $logger,
+		private readonly ContainerInterface $container,
+		private readonly LoggerInterface $logger,
 	) {
 		$this->circlesEnabled = $appManager->isEnabledForUser('circles');
 	}
@@ -48,7 +48,7 @@ class CirclesService {
 			// Enforce current user condition since we always want the full list of members
 			$circlesManager->startSuperSession();
 			return $circlesManager->getCircle($circleId);
-		} catch (Throwable $e) {
+		} catch (Throwable) {
 		}
 		return null;
 	}
@@ -76,7 +76,7 @@ class CirclesService {
 			$this->userCircleCache[$circleId][$userId] = $isUserInCircle;
 
 			return $isUserInCircle;
-		} catch (Throwable $e) {
+		} catch (Throwable) {
 		}
 		return false;
 	}

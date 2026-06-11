@@ -44,18 +44,18 @@ class PageController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private FormMapper $formMapper,
-		private ShareMapper $shareMapper,
-		private SubmissionMapper $submissionMapper,
-		private ConfigService $configService,
-		private FormsService $formsService,
-		private IAccountManager $accountManager,
-		private IInitialState $initialState,
-		private ICommentsManager $commentsManager,
-		private IL10N $l10n,
-		private IUrlGenerator $urlGenerator,
-		private IUserManager $userManager,
-		private IUserSession $userSession,
+		private readonly FormMapper $formMapper,
+		private readonly ShareMapper $shareMapper,
+		private readonly SubmissionMapper $submissionMapper,
+		private readonly ConfigService $configService,
+		private readonly FormsService $formsService,
+		private readonly IAccountManager $accountManager,
+		private readonly IInitialState $initialState,
+		private readonly ICommentsManager $commentsManager,
+		private readonly IL10N $l10n,
+		private readonly IUrlGenerator $urlGenerator,
+		private readonly IUserManager $userManager,
+		private readonly IUserSession $userSession,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -80,7 +80,7 @@ class PageController extends Controller {
 			try {
 				$form = $this->formMapper->findByHash($hash);
 				$this->initialState->provideInitialState('formId', $form->id);
-			} catch (DoesNotExistException $e) {
+			} catch (DoesNotExistException) {
 				// Provide null to indicate no form was found
 				$this->initialState->provideInitialState('formId', 'invalid');
 			}
@@ -90,7 +90,7 @@ class PageController extends Controller {
 			try {
 				$submission = $this->submissionMapper->findById($submissionId);
 				$this->initialState->provideInitialState('submissionId', $submission->id);
-			} catch (DoesNotExistException $e) {
+			} catch (DoesNotExistException) {
 				// Ignore exception and just don't set the initialState value
 			}
 		}
@@ -153,7 +153,7 @@ class PageController extends Controller {
 		try {
 			$share = $this->shareMapper->findPublicShareByHash($hash);
 			$form = $this->formMapper->findById($share->getFormId());
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
 		}
 
@@ -177,7 +177,7 @@ class PageController extends Controller {
 			}
 
 			$form = $this->formMapper->findById($share->getFormId());
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			return $this->provideEmptyContent(Constants::EMPTY_NOTFOUND);
 			// We do not handle the MultipleObjectsReturnedException as this will automatically result in a 500 error as expected
 		}

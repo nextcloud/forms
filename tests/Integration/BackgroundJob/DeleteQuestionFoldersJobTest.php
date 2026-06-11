@@ -55,7 +55,7 @@ class DeleteQuestionFoldersJobTest extends IntegrationBase {
 			if ($formsFolder instanceof \OCP\Files\Folder) {
 				$formsFolder->delete();
 			}
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			// Folder doesn't exist, nothing to clean up
 		}
 	}

@@ -104,7 +104,7 @@ class Version030000Date20211206213004 extends SimpleMigrationStep {
 		// ... then handle each existing form and translate its sharing settings.
 		while ($row = $cursor->fetch()) {
 			// Decode access to array (param assoc=true)
-			$access = json_decode($row['access_json'], true);
+			$access = json_decode((string)$row['access_json'], true);
 
 			// In case there are already migrated forms, just skip.
 			if (array_key_exists('permitAllUsers', $access)) {

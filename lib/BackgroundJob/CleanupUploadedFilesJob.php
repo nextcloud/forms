@@ -21,10 +21,10 @@ class CleanupUploadedFilesJob extends TimedJob {
 	private const FILE_LIFETIME = '-1 hour';
 
 	public function __construct(
-		private IRootFolder $rootFolder,
-		private FormMapper $formMapper,
-		private UploadedFileMapper $uploadedFileMapper,
-		private LoggerInterface $logger,
+		private readonly IRootFolder $rootFolder,
+		private readonly FormMapper $formMapper,
+		private readonly UploadedFileMapper $uploadedFileMapper,
+		private readonly LoggerInterface $logger,
 		ITimeFactory $time,
 	) {
 		parent::__construct($time);

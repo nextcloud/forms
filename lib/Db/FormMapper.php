@@ -31,15 +31,15 @@ class FormMapper extends QBMapper {
 	 */
 	public function __construct(
 		IDBConnection $db,
-		private QuestionMapper $questionMapper,
-		private ShareMapper $shareMapper,
-		private SubmissionMapper $submissionMapper,
-		private ConfigService $configService,
-		private ICommentsManager $commentsManager,
-		private FilePathHelper $filePathHelper,
-		private UploadedFileMapper $uploadedFileMapper,
-		private IRootFolder $rootFolder,
-		private LoggerInterface $logger,
+		private readonly QuestionMapper $questionMapper,
+		private readonly ShareMapper $shareMapper,
+		private readonly SubmissionMapper $submissionMapper,
+		private readonly ConfigService $configService,
+		private readonly ICommentsManager $commentsManager,
+		private readonly FilePathHelper $filePathHelper,
+		private readonly UploadedFileMapper $uploadedFileMapper,
+		private readonly IRootFolder $rootFolder,
+		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
 	}
@@ -252,7 +252,7 @@ class FormMapper extends QBMapper {
 
 			// Iterate through form folders and delete matching folders
 			foreach ($formsFolder->getDirectoryListing() as $node) {
-				if (str_starts_with($node->getName(), $formFolderPrefix)) {
+				if (str_starts_with((string)$node->getName(), $formFolderPrefix)) {
 					$node->delete();
 				}
 			}
