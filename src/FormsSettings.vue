@@ -22,7 +22,7 @@
 				:placeholder="t('forms', 'Select groups')"
 				class="forms-settings__creation__multiselect"
 				label="displayName"
-				@input="onCreationAllowedGroupsChange" />
+				@update:modelValue="onCreationAllowedGroupsChange" />
 		</NcSettingsSection>
 		<NcSettingsSection
 			:name="t('forms', 'Confirmation emails')"

@@ -102,7 +102,7 @@
 						:labelOutside="false"
 						:showTrailingButton="false"
 						:modelValue="name"
-						@input="onNameChange">
+						@update:modelValue="onNameChange">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconIdentifier" />
 						</template>
@@ -374,8 +374,8 @@ export default {
 			this.$emit('update:description', target.value)
 		},
 
-		onNameChange({ target }) {
-			this.$emit('update:name', target.value)
+		onNameChange(name) {
+			this.$emit('update:name', name)
 		},
 
 		onRequiredChange(isRequired) {

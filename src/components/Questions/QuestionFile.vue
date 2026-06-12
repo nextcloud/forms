@@ -18,6 +18,31 @@
 					</template>
 					{{ allowedFileTypesLabel }}
 				</NcActionButton>
+
+				<NcActionInput
+					type="number"
+					:modelValue="maxAllowedFilesCount"
+					labelOutside
+					:label="t('forms', 'Maximum number of files')"
+					:showTrailingButton="false"
+					@update:modelValue="onMaxAllowedFilesCountInput" />
+
+				<NcActionInput
+					type="number"
+					:modelValue="maxFileSizeValue"
+					labelOutside
+					:showTrailingButton="false"
+					:label="t('forms', 'Maximum file size')"
+					@update:modelValue="onMaxFileSizeValueInput" />
+
+				<NcActionInput
+					type="multiselect"
+					:modelValue="maxFileSizeUnit"
+					:options="availableUnits"
+					required
+					:clearable="false"
+					:searchable="false"
+					@update:modelValue="onMaxFileSizeUnitInput" />
 			</template>
 
 			<template v-else>
@@ -41,41 +66,16 @@
 				</NcActionCheckbox>
 
 				<NcActionInput
+					key="allowed-file-extensions-multiselect"
 					:label="t('forms', 'Custom file extensions')"
 					type="multiselect"
 					multiple
 					taggable
-					:modelValue="extraSettings?.allowedFileExtensions || []"
+					:modelValue="allowedFileExtensions"
 					@option:created="onAllowedFileExtensionsAdded"
 					@option:deselected="onAllowedFileExtensionsDeleted" />
 
 				<NcActionSeparator />
-			</template>
-
-			<template v-if="!allowedFileTypesDialogOpened">
-				<NcActionInput
-					type="number"
-					:modelValue="maxAllowedFilesCount"
-					labelOutside
-					:label="t('forms', 'Maximum number of files')"
-					:showTrailingButton="false"
-					@input="onMaxAllowedFilesCountInput($event.target.value)" />
-
-				<NcActionInput
-					type="number"
-					:modelValue="maxFileSizeValue"
-					labelOutside
-					:showTrailingButton="false"
-					:label="t('forms', 'Maximum file size')"
-					@input="onMaxFileSizeValueInput($event.target.value)" />
-
-				<NcActionInput
-					type="multiselect"
-					:modelValue="maxFileSizeUnit"
-					:options="availableUnits"
-					required
-					:clearable="false"
-					@input="onMaxFileSizeUnitInput($event)" />
 			</template>
 		</template>
 
@@ -236,6 +236,10 @@ export default {
 
 		maxAllowedFilesCount() {
 			return this.extraSettings?.maxAllowedFilesCount || 1
+		},
+
+		allowedFileExtensions() {
+			return this.extraSettings?.allowedFileExtensions || []
 		},
 
 		allowedFileTypesLabel() {
