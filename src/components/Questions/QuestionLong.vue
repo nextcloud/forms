@@ -15,6 +15,8 @@
 				ref="textarea"
 				:aria-labelledby="titleId"
 				:aria-describedby="description ? descriptionId : undefined"
+				:aria-errormessage="hasError ? errorId : undefined"
+				:aria-invalid="hasError ? 'true' : undefined"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:required="isRequired"
