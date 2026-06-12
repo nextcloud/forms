@@ -32,7 +32,9 @@
 			class="question__content"
 			role="list"
 			:aria-labelledby="titleId"
-			:aria-describedby="description ? descriptionId : undefined">
+			:aria-describedby="description ? descriptionId : undefined"
+			:aria-errormessage="hasError ? errorId : undefined"
+			:aria-invalid="hasError ? 'true' : undefined">
 			<!-- Unranked pool -->
 			<div class="ranking-unranked">
 				<Draggable
