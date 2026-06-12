@@ -71,11 +71,11 @@
 									<NcInputField
 										type="number"
 										:modelValue="plainValues[row.id][column.id]"
-										@input="
+										@update:modelValue="
 											onChangeTextNumber(
 												row.id,
 												column.id,
-												$event.target.value,
+												$event,
 											)
 										" />
 								</template>
