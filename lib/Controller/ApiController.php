@@ -245,8 +245,8 @@ class ApiController extends OCSController {
 						throw new OCSBadRequestException('Invalid question data: missing id');
 					}
 					$questionData = $oldQuestion;
-					$oldQuestionId = $oldQuestion['id'] ?? [];
-					$options = $oldQuestion['options'];
+					$oldQuestionId = $oldQuestion['id'];
+					$options = $oldQuestion['options'] ?? [];
 				} else {
 					$questionData = $oldQuestion->read();
 					$oldQuestionId = $oldQuestion->getId();
