@@ -17,7 +17,6 @@
 				:form="form"
 				forceDisplayActions
 				@clone="onCloneForm(form.id)"
-				@download="onDownloadForm(form.id)"
 				@delete="onDelete(form)"
 				@mobileCloseNavigation="$emit('update:open', false)" />
 		</ul>
@@ -73,10 +72,6 @@ export default defineComponent({
 		onCloneForm(formId) {
 			this.$emit('clone', formId)
 			this.$emit('update:open', false)
-		},
-
-		onDownloadForm(formId) {
-			this.$emit('download', formId)
 		},
 
 		onDelete(form) {

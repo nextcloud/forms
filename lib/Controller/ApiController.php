@@ -286,7 +286,8 @@ class ApiController extends OCSController {
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers)
 	 *
 	 * @param int $formId Id of the form
-	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>
+	 * @param ?bool $download if the form should be downloaded
+	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>|DataDownloadResponse<Http::STATUS_OK, 'application/json', array{}>
 	 * @throws OCSBadRequestException Could not find form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 *
@@ -296,8 +297,24 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
-	public function getForm(int $formId): DataResponse {
+	public function getForm(int $formId, ?bool $download): DataResponse|DataDownloadResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_SUBMIT);
+
+		if ($download) {
+			$formData = $this->formsService->getPublicForm($form);
+			unset($formData['hash']);
+			unset($formData['created']);
+			unset($formData['lastUpdated']);
+			unset($formData['lockedBy']);
+			unset($formData['lockedUntil']);
+			unset($formData['permissions']);
+			unset($formData['canSubmit']);
+			unset($formData['isMaxSubmissionsReached']);
+			unset($formData['submissionCount']);
+			unset($formData['filePath']);
+			return new DataDownloadResponse(
+				json_encode($formData), $form->getTitle(), 'application/json');
+		}
 
 		return new DataResponse($this->formsService->getForm($form));
 	}

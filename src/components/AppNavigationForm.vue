@@ -113,7 +113,7 @@ import IconDownload from '@material-symbols/svg-400/outlined/download.svg?raw'
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import IconArchiveOff from '@material-symbols/svg-400/outlined/unarchive.svg?raw'
-import { getCurrentUser } from '@nextcloud/auth'
+import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import moment from '@nextcloud/moment'
@@ -301,7 +301,14 @@ export default {
 		},
 
 		onDownloadForm() {
-			this.$emit('download', this.form.id)
+			const downloadUrl =
+				generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+					id: this.form.id,
+				})
+				+ '?requesttoken='
+				+ encodeURIComponent(getRequestToken())
+				+ '&download=true'
+			window.open(downloadUrl, '_self')
 		},
 
 		async onConfirmDelete() {

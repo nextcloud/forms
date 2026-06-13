@@ -41,7 +41,6 @@
 						@openSharing="openSharing"
 						@mobileCloseNavigation="mobileCloseNavigation"
 						@clone="onCloneForm"
-						@download="onDownloadForm"
 						@delete="onDeleteForm" />
 				</ul>
 			</template>
@@ -61,7 +60,6 @@
 						readOnly
 						@openSharing="openSharing"
 						@clone="onCloneForm"
-						@download="onDownloadForm"
 						@mobileCloseNavigation="mobileCloseNavigation" />
 				</ul>
 			</template>
@@ -177,8 +175,7 @@
 		<ArchivedFormsModal
 			v-model:open="showArchivedForms"
 			:forms="archivedForms"
-			@clone="onCloneForm"
-			@download="onDownloadForm" />
+			@clone="onCloneForm" />
 	</NcContent>
 </template>
 
@@ -549,57 +546,6 @@ export default {
 			showVersionMismatch.value = false
 			formForImport = undefined
 		}
-		const onDownloadForm = async (id) => {
-			try {
-				const response = await axios.get(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-						id,
-					}),
-				)
-				const form = OcsResponse2Data(response)
-
-				// download only required values
-				const download = {
-					appVersion: version,
-					form: {
-						...form,
-						// Remove unused values
-						...[
-							'hash',
-							'ownerId',
-							'created',
-							'access',
-							'lastUpdated',
-							'lockedBy',
-							'lockedUntil',
-							'shares',
-							'permissions',
-							'canSubmit',
-							'isMaxSubmissionsReached',
-							'submissionCount',
-						].reduce((prev, curr) => {
-							prev[curr] = undefined
-							return prev
-						}, {}),
-
-						id: undefined,
-						questions: form.questions,
-					},
-				}
-				// create blob and download
-				const blob = new Blob([JSON.stringify(download)])
-				const url = URL.createObjectURL(blob)
-				const a = document.createElement('a')
-				a.href = url
-				const formTitle = form.title ? form.title : t('forms', 'New form')
-				a.download = `${formTitle}.json`
-				a.click()
-				URL.revokeObjectURL(url)
-			} catch (error) {
-				logger.error(`Unable to download form ${id}`, { error })
-				showError(t('forms', 'Unable to download form'))
-			}
-		}
 
 		const onDeleteForm = async (id) => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)
@@ -675,7 +621,6 @@ export default {
 			fetchPartialForm,
 			onNewForm,
 			onCloneForm,
-			onDownloadForm,
 			onUploadForm,
 			onDeleteForm,
 			onImportForm,
