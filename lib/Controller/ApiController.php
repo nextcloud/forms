@@ -152,6 +152,9 @@ class ApiController extends OCSController {
 	 * @param ?array<string, mixed> $formData (optional) The formdata to import
 	 * @return DataResponse<Http::STATUS_CREATED, FormsForm, array{}>
 	 * @throws OCSForbiddenException The user is not allowed to create forms
+	 * @throws OCSBadRequestException Cannot use both fromId and import parameters
+	 * @throws OCSBadRequestException Invalid form data: missing questions
+	 * @throws OCSBadRequestException Invalid question data: missing id
 	 *
 	 * 201: the created form
 	 */
