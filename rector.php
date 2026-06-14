@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Nextcloud\Rector\Set\NextcloudSets;
 use Rector\Config\RectorConfig;
+use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 
 return RectorConfig::configure()
 	->withPaths([
@@ -23,4 +24,7 @@ return RectorConfig::configure()
 	->withCodeQualityLevel(0)
 	->withSets([
 		NextcloudSets::NEXTCLOUD_32,
+	])
+	->withSkip([
+		NullToStrictStringFuncCallArgRector::class,
 	]);
