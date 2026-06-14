@@ -18,7 +18,7 @@ OC.L10N.register(
     "Question" : "Pregunta",
     "Answer" : "Resposta",
     "Count" : "Conta",
-    "Copy" : "Copiar",
+    "Copy" : "Copia",
     "Anonymous response" : "Resposta anónima",
     "Shared by %s" : "Compartido por %s",
     "Forms including questions and submissions" : "Formularios incluíndo preguntas e entregas",
