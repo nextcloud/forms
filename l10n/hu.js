@@ -118,6 +118,7 @@ OC.L10N.register(
     "Copy question" : "Kérdés másolása",
     "Delete question" : "Kérdés törlése",
     "Description (formatting using Markdown is supported)" : "Leírás (a Markdown-formázás is támogatott)",
+    "You must answer this question" : "Válaszolnia kell erre a kérdésre",
     "Clear selected color" : "Kiválasztott szín törlése",
     "Use date range" : "Dátumtartomány használata",
     "Earliest date" : "Legkorábbi dátum",
