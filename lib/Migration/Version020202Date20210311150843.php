@@ -49,7 +49,7 @@ class Version020202Date20210311150843 extends SimpleMigrationStep {
 
 		while ($row = $cursor->fetch()) {
 			// Decode access to array (param assoc=true)
-			$access = json_decode($row['access_json'], true);
+			$access = json_decode((string)$row['access_json'], true);
 			$update_necessary = false;
 
 			// Add empty Arrays, if they do not exist

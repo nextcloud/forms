@@ -32,7 +32,7 @@ use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
-use OCP\Mail\IMailer;
+use OCP\Mail\IEmailValidator;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -45,24 +45,24 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsAnswer from ResponseDefinitions
  */
 class SubmissionService {
-	private ?IUser $currentUser;
+	private readonly ?IUser $currentUser;
 
 	public function __construct(
-		private QuestionMapper $questionMapper,
-		private SubmissionMapper $submissionMapper,
-		private AnswerMapper $answerMapper,
-		private UploadedFileMapper $uploadedFileMapper,
-		private IRootFolder $rootFolder,
-		private IConfig $config,
-		private IL10N $l10n,
-		private LoggerInterface $logger,
-		private IUserManager $userManager,
+		private readonly QuestionMapper $questionMapper,
+		private readonly SubmissionMapper $submissionMapper,
+		private readonly AnswerMapper $answerMapper,
+		private readonly UploadedFileMapper $uploadedFileMapper,
+		private readonly IRootFolder $rootFolder,
+		private readonly IConfig $config,
+		private readonly IL10N $l10n,
+		private readonly LoggerInterface $logger,
+		private readonly IUserManager $userManager,
 		IUserSession $userSession,
-		private IMailer $mailer,
-		private ITempManager $tempManager,
-		private FormsService $formsService,
-		private IUrlGenerator $urlGenerator,
-		private OptionMapper $optionMapper,
+		private readonly ITempManager $tempManager,
+		private readonly FormsService $formsService,
+		private readonly IUrlGenerator $urlGenerator,
+		private readonly OptionMapper $optionMapper,
+		private readonly IEmailValidator $emailValidator,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -80,7 +80,7 @@ class SubmissionService {
 			foreach ($answerEntities as $answerEntity) {
 				$answerList[] = $answerEntity->read();
 			}
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			//Just ignore, if no Data. Returns empty Answers-Array
 		} finally {
 			return $answerList;
@@ -113,7 +113,7 @@ class SubmissionService {
 				$submission['answers'] = $this->getAnswers($submission['id']);
 				$submissionList[] = $submission;
 			}
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			// Just ignore, if no Data. Returns empty Submissions-Array
 		} finally {
 			return $submissionList;
@@ -138,7 +138,7 @@ class SubmissionService {
 			$submission = $submissionEntity->read();
 			$submission['answers'] = $this->getAnswers($submission['id']);
 			return $submission;
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			return null;
 		}
 	}
@@ -221,7 +221,7 @@ class SubmissionService {
 
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
-		} catch (DoesNotExistException $e) {
+		} catch (DoesNotExistException) {
 			// Just ignore, if no Data. Returns empty Submissions-Array
 		}
 
@@ -344,10 +344,7 @@ class SubmissionService {
 							if ($gridCellType === Constants::ANSWER_GRID_TYPE_RADIO) {
 								$columns[] = $optionPerOptionId[$answerText[$row]]->getText();
 							} elseif ($gridCellType === Constants::ANSWER_GRID_TYPE_CHECKBOX) {
-								$columns[] = implode('; ', array_map(function ($optionId) use ($optionPerOptionId) {
-									;
-									return $optionPerOptionId[$optionId]->getText();
-								}, $answerText[$row]));
+								$columns[] = implode('; ', array_map(fn ($optionId) => $optionPerOptionId[$optionId]->getText(), $answerText[$row]));
 							} elseif ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
 								// For number grids, we need to create a header for each cell in the grid
 								foreach ($gridColumnsPerQuestionId[$questionId] as $column) {
@@ -492,9 +489,7 @@ class SubmissionService {
 						}
 
 						// Grid questions
-						return !empty(array_filter($value, static function ($subValue): bool {
-							return is_array($subValue) ? !empty(array_filter($subValue)) : $subValue !== '';
-						}));
+						return !empty(array_filter($value, static fn ($subValue): bool => is_array($subValue) ? !empty(array_filter($subValue)) : $subValue !== ''));
 					}
 
 					return $value !== '';
@@ -558,7 +553,7 @@ class SubmissionService {
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
 						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
 						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-						if (!ctype_digit($answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
+						if (!ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
 							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
 						}
 					}
@@ -590,8 +585,8 @@ class SubmissionService {
 
 			// Handle ranking questions: answers must be a permutation of all option IDs
 			if ($question['type'] === Constants::ANSWER_TYPE_RANKING) {
-				$optionIds = array_map('intval', array_column($question['options'] ?? [], 'id'));
-				$rankedIds = array_map('intval', $answers[$questionId]);
+				$optionIds = array_map(intval(...), array_column($question['options'] ?? [], 'id'));
+				$rankedIds = array_map(intval(...), $answers[$questionId]);
 
 				sort($optionIds);
 				sort($rankedIds);
@@ -605,7 +600,7 @@ class SubmissionService {
 			if (
 				$question['type'] === Constants::ANSWER_TYPE_COLOR
 				&& $answers[$questionId][0] !== ''
-				&& !preg_match('/^#[a-f0-9]{6}$/i', $answers[$questionId][0])
+				&& !preg_match('/^#[a-f0-9]{6}$/i', (string)$answers[$questionId][0])
 			) {
 				throw new \InvalidArgumentException(sprintf('Invalid color string for question "%s".', $question['text']));
 			}
@@ -684,7 +679,7 @@ class SubmissionService {
 
 		switch ($question['extraSettings']['validationType']) {
 			case 'email':
-				return $this->mailer->validateMailAddress($data);
+				return $this->emailValidator->isValid($data);
 			case 'number':
 				return is_numeric($data);
 			case 'phone':

@@ -15,7 +15,7 @@ use OCP\Files\NotFoundException;
 
 class FilePathHelper {
 	public function __construct(
-		private IRootFolder $rootFolder,
+		private readonly IRootFolder $rootFolder,
 	) {
 	}
 
@@ -65,7 +65,7 @@ class FilePathHelper {
 
 		// Collect all folders matching the form ID prefix
 		foreach ($formsFolder->getDirectoryListing() as $node) {
-			if (str_starts_with($node->getName(), $formFolderPrefix) && $node instanceof Folder) {
+			if (str_starts_with((string)$node->getName(), $formFolderPrefix) && $node instanceof Folder) {
 				$matchingFolders[] = $node;
 			}
 		}

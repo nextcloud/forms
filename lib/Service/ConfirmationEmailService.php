@@ -26,17 +26,17 @@ use Psr\Log\LoggerInterface;
 class ConfirmationEmailService {
 	private const RATE_LIMIT_TTL = 86400; // 24 hours
 
-	private ICache $rateLimitCache;
+	private readonly ICache $rateLimitCache;
 
 	public function __construct(
-		private ConfigService $configService,
-		private AnswerMapper $answerMapper,
-		private QuestionMapper $questionMapper,
-		private IEmailValidator $emailValidator,
-		private IJobList $jobList,
+		private readonly ConfigService $configService,
+		private readonly AnswerMapper $answerMapper,
+		private readonly QuestionMapper $questionMapper,
+		private readonly IEmailValidator $emailValidator,
+		private readonly IJobList $jobList,
 		ICacheFactory $cacheFactory,
-		private IL10N $l10n,
-		private LoggerInterface $logger,
+		private readonly IL10N $l10n,
+		private readonly LoggerInterface $logger,
 	) {
 		$this->rateLimitCache = $cacheFactory->createDistributed('forms_confirmation_email');
 	}

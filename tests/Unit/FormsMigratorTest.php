@@ -235,7 +235,7 @@ JSON
 
 		$exportDestination->expects($this->once())
 			->method('addFileContents')
-			->will($this->returnCallback(function ($path, $jsonData) use ($expectedJson) {
+			->will($this->returnCallback(function ($path, $jsonData) use ($expectedJson): void {
 				$this->assertJsonStringEqualsJsonString($expectedJson, $jsonData);
 			}));
 		$this->formsMigrator->export($user, $exportDestination, $output);

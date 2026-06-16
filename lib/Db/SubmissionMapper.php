@@ -28,9 +28,9 @@ class SubmissionMapper extends QBMapper {
 	 */
 	public function __construct(
 		IDBConnection $db,
-		private AnswerMapper $answerMapper,
-		private FilePathHelper $filePathHelper,
-		private LoggerInterface $logger,
+		private readonly AnswerMapper $answerMapper,
+		private readonly FilePathHelper $filePathHelper,
+		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct($db, 'forms_v2_submissions', Submission::class);
 	}

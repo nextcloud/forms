@@ -16,10 +16,10 @@ class ActivityManager {
 
 	public function __construct(
 		protected string $appName,
-		private ?string $userId,
-		private IManager $manager,
-		private IGroupManager $groupManager,
-		private CirclesService $circlesService,
+		private readonly ?string $userId,
+		private readonly IManager $manager,
+		private readonly IGroupManager $groupManager,
+		private readonly CirclesService $circlesService,
 	) {
 	}
 

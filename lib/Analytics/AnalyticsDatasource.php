@@ -18,10 +18,10 @@ class AnalyticsDatasource implements IDatasource {
 
 	public function __construct(
 		protected ?string $userId,
-		private IL10N $l10n,
-		private FormMapper $formMapper,
-		private FormsService $formsService,
-		private SubmissionService $submissionService,
+		private readonly IL10N $l10n,
+		private readonly FormMapper $formMapper,
+		private readonly FormsService $formsService,
+		private readonly SubmissionService $submissionService,
 	) {
 	}
 

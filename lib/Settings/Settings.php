@@ -17,10 +17,10 @@ use OCP\Util;
 
 class Settings implements ISettings {
 	public function __construct(
-		private string $appName,
-		private ConfigService $configService,
-		private IGroupManager $groupManager,
-		private IInitialState $initialState,
+		private readonly string $appName,
+		private readonly ConfigService $configService,
+		private readonly IGroupManager $groupManager,
+		private readonly IInitialState $initialState,
 	) {
 	}
 

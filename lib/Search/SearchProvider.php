@@ -23,9 +23,9 @@ class SearchProvider implements IProvider {
 	 * @psalm-suppress PossiblyUnusedMethod
 	 */
 	public function __construct(
-		private IL10N $l10n,
-		private IURLGenerator $urlGenerator,
-		private FormsService $formsService,
+		private readonly IL10N $l10n,
+		private readonly IURLGenerator $urlGenerator,
+		private readonly FormsService $formsService,
 	) {
 	}
 
@@ -40,16 +40,12 @@ class SearchProvider implements IProvider {
 	public function search(IUser $user, ISearchQuery $query): SearchResult {
 		$forms = $this->formsService->search($query);
 
-		$results = array_map(function (Form $form) {
-			return [
-				'object' => $form,
-				'entry' => new FormsSearchResultEntry($form, $this->urlGenerator)
-			];
-		}, $forms);
+		$results = array_map(fn (Form $form) => [
+			'object' => $form,
+			'entry' => new FormsSearchResultEntry($form, $this->urlGenerator)
+		], $forms);
 
-		$resultEntries = array_map(function (array $result) {
-			return $result['entry'];
-		}, $results);
+		$resultEntries = array_map(fn (array $result) => $result['entry'], $results);
 
 		return SearchResult::complete(
 			$this->l10n->t('Forms'),

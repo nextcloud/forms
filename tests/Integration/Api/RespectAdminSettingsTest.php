@@ -187,7 +187,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 
 	// Small Wrapper for OCS-Response
 	private function OcsResponse2Data($resp) {
-		$arr = json_decode($resp->getBody()->getContents(), true);
+		$arr = json_decode((string)$resp->getBody()->getContents(), true);
 		return $arr['ocs']['data'];
 	}
 
