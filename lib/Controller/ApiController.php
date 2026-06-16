@@ -1875,7 +1875,7 @@ class ApiController extends OCSController {
 	 */
 	private function checkForbiddenKeys(array $keyValuePairs): void {
 		$forbiddenKeys = [
-			'id', 'hash', 'ownerId', 'created', 'lastUpdated', 'lockedBy', 'lockedUntil'
+			'id', 'hash', 'ownerId', 'created', 'lastUpdated', 'lockedBy', 'lockedUntil', 'accessEnum'
 		];
 		foreach ($forbiddenKeys as $key) {
 			if (array_key_exists($key, $keyValuePairs)) {

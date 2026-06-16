@@ -1174,6 +1174,38 @@ class ApiControllerTest extends TestCase {
 		$this->assertSame(7, $form->getConfirmationEmailQuestionId());
 	}
 
+	public static function dataUpdateFormRejectsForbiddenKeys(): array {
+		return [
+			'id' => [['id' => 2]],
+			'hash' => [['hash' => 'new-hash']],
+			'created' => [['created' => 123456]],
+			'lastUpdated' => [['lastUpdated' => 123456]],
+			'lockedBy' => [['lockedBy' => 'anotherUser']],
+			'lockedUntil' => [['lockedUntil' => 123456]],
+			'accessEnum' => [['accessEnum' => 2]],
+		];
+	}
+
+	/**
+	 * @dataProvider dataUpdateFormRejectsForbiddenKeys
+	 */
+	public function testUpdateFormRejectsForbiddenKeys(array $keyValuePairs): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$form->setHash('hash');
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->updateForm(1, $keyValuePairs);
+	}
+
 	public static function dataUpdateFormRejectsInvalidConfirmationEmailQuestionId(): array {
 		return [
 			'invalid-question-id' => ['Invalid question ID'],
