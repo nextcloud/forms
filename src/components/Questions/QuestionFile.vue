@@ -111,7 +111,9 @@
 						class="question__input-wrapper"
 						role="group"
 						:aria-labelledby="titleId"
-						:aria-describedby="description ? descriptionId : undefined">
+						:aria-describedby="description ? descriptionId : undefined"
+						:aria-errormessage="hasError ? errorId : undefined"
+						:aria-invalid="hasError ? 'true' : undefined">
 						<label>
 							{{ t('forms', 'Add new file as answer') }}
 							<input

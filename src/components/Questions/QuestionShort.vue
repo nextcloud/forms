@@ -15,6 +15,8 @@
 				ref="input"
 				:aria-labelledby="titleId"
 				:aria-describedby="description ? descriptionId : undefined"
+				:aria-errormessage="hasError ? errorId : undefined"
+				:aria-invalid="hasError ? 'true' : undefined"
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:name="name || undefined"
@@ -78,12 +80,14 @@
 
 <script>
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
+import debounce from 'debounce'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.js'
+import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import validationTypes from '../../models/ValidationTypes.js'
 import { splitRegex, validateExpression } from '../../utils/RegularExpression.js'
 
@@ -159,11 +163,28 @@ export default {
 
 	methods: {
 		async validate() {
-			if (
-				this.isRequired
-				&& (this.values.length === 0 || this.values[0] === '')
-			) {
+			/** @type {HTMLInputElement} */
+			const input = this.$refs.input
+			const value = input.value
+
+			// Clear the previous custom error before checking native validity.
+			input.setCustomValidity('')
+
+			if (this.isRequired && input.validity.valueMissing) {
 				this.errorMessage = t('forms', 'You must answer this question')
+				return false
+			}
+
+			const isCustomValid =
+				!value
+				|| this.validationObject.validate(
+					value,
+					splitRegex(this.validationRegex),
+				)
+
+			if (!input.validity.valid || !isCustomValid) {
+				input.setCustomValidity(this.validationObject.errorMessage)
+				this.errorMessage = this.validationObject.errorMessage
 				return false
 			}
 
@@ -171,31 +192,16 @@ export default {
 			return true
 		},
 
+		debounceValidate: debounce(async function () {
+			this.validate()
+		}, INPUT_DEBOUNCE_MS),
+
 		onInput() {
-			/** @type {HTMLObjectElement} */
+			/** @type {HTMLInputElement} */
 			const input = this.$refs.input
-			/** @type {string} */
 			const value = input.value
-
-			input.setCustomValidity('')
-
-			// Only check non empty values, this question might not be required, if not already invalid
-			if (value) {
-				// Then check native browser validation (might be better then our)
-				// If the browsers validation succeeds either the browser does not implement a validation
-				// or it is valid, so we double check by running our custom validation.
-				if (
-					!input.checkValidity()
-					|| !this.validationObject.validate(
-						value,
-						splitRegex(this.validationRegex),
-					)
-				) {
-					input.setCustomValidity(this.validationObject.errorMessage)
-				}
-			}
-
 			this.$emit('update:values', [value])
+			this.debounceValidate()
 		},
 
 		/**

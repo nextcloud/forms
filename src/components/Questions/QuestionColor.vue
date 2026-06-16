@@ -19,6 +19,8 @@
 				:modelValue="pickedColor"
 				advancedFields
 				:aria-required="isRequired"
+				:aria-errormessage="hasError ? errorId : undefined"
+				:aria-invalid="hasError ? 'true' : undefined"
 				@update:modelValue="onUpdatePickedColor">
 				<NcButton :disabled="!readOnly">
 					{{ colorPickerPlaceholder }}
