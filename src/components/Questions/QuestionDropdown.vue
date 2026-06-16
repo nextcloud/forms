@@ -41,6 +41,8 @@
 				:searchable="false"
 				label="text"
 				:aria-label-combobox="selectOptionPlaceholder"
+				:aria-errormessage="hasError ? errorId : undefined"
+				:aria-invalid="hasError ? 'true' : undefined"
 				@invalid.prevent="validate"
 				@update:modelValue="onInput" />
 		</div>

@@ -81,6 +81,8 @@
 					<NcCheckboxRadioSwitch
 						:id="`linear-scale-${id}-${option}`"
 						:aria-describedby="index === 0 ? labelId : undefined"
+						:aria-errormessage="hasError ? errorId : undefined"
+						:aria-invalid="hasError ? 'true' : undefined"
 						:disabled="!readOnly"
 						:modelValue="questionValues"
 						:value="option.toString()"

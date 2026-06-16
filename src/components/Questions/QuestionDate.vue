@@ -97,6 +97,8 @@
 				:disabledDate="disabledDates"
 				:disabledTime="disabledTimes"
 				:aria-required="isRequired"
+				:aria-errormessage="hasError ? errorId : undefined"
+				:aria-invalid="hasError ? 'true' : undefined"
 				clearable
 				@update:modelValue="onValueChange" />
 		</div>
