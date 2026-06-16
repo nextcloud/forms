@@ -701,6 +701,24 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($expected);
 	}
 
+	public function testUpdateFormRejectsForbiddenKeys(): void {
+		$before = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'id' => 999,
+				],
+			],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(403, $resp->getStatusCode());
+
+		$after = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals($before, $after);
+	}
+
 	public function testDeleteForm() {
 		$resp = $this->http->request('DELETE', "api/v3/forms/{$this->testForms[0]['id']}");
 		$data = $this->OcsResponse2Data($resp);
