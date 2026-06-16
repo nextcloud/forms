@@ -5,6 +5,23 @@
 
 # Changelog
 
+## v5.3.2 - 2026-06-16
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.1...v5.3.2)
+
+### Fixed
+
+- fix: disallow update accessEnum directly by @Chartman123 in [\#3426](https://github.com/nextcloud/forms/pull/3426)
+- fix: show validation error for QuestionShort in NcNoteCard by @Chartman123 in [\#3413](https://github.com/nextcloud/forms/pull/3413)
+- fix: Fix unit selection in file type by @Koc in [\#3410](https://github.com/nextcloud/forms/pull/3410)
+- fix(QuestionGrid): fix validation for all subtypes and add tests by @Chartman123 in [\#3403](https://github.com/nextcloud/forms/pull/3403)
+
+### Merged
+
+- Apply rector changes by @nextcloud-command in [\#3422](https://github.com/nextcloud/forms/pull/3422)
+- refactor: remove duplicate computed prop from Ranking by @Chartman123 in [\#3409](https://github.com/nextcloud/forms/pull/3409)
+- chore: install rector by @Chartman123 in [\#3405](https://github.com/nextcloud/forms/pull/3405)
+
 ## v5.3.1 - 2026-06-09
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0...v5.3.1)
