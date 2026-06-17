@@ -498,6 +498,7 @@ export default {
 		// Reload results when form changes
 		async hash() {
 			await this.fetchFullForm(this.form.id)
+			this.loadActiveResponseViewFromLocalStorage()
 			this.loadFormResults()
 			SetWindowTitle(this.formTitle)
 		},
@@ -521,15 +522,63 @@ export default {
 			})
 			this.loadFormResults()
 		}, INPUT_DEBOUNCE_MS),
+
+		// Persist active response view to localStorage when it changes
+		activeResponseView(newView) {
+			this.saveActiveResponseViewToLocalStorage(newView.id)
+		},
 	},
 
 	async beforeMount() {
 		await this.fetchFullForm(this.form.id)
+		this.loadActiveResponseViewFromLocalStorage()
 		this.loadFormResults()
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
+		/**
+		 * Load the active response view preference from localStorage for the current form.
+		 * Applies stored value if available and otherwise resets to default (summary)
+		 */
+		loadActiveResponseViewFromLocalStorage() {
+			try {
+				const storedViewId = localStorage.getItem(
+					`nextcloud_forms_${this.form.hash}_activeResponseView`,
+				)
+				if (storedViewId) {
+					const view = responseViews.find((v) => v.id === storedViewId)
+					if (view) {
+						this.activeResponseView = view
+					}
+				} else {
+					this.activeResponseView = responseViews[0]
+				}
+			} catch (err) {
+				logger.debug('Error loading activeResponseView from localStorage', {
+					error: err,
+				})
+			}
+		},
+
+		/**
+		 * Save the active response view preference to localStorage for the current form.
+		 *
+		 * @param {string} viewId - The ID of the view ('summary' or 'responses')
+		 */
+		saveActiveResponseViewToLocalStorage(viewId) {
+			try {
+				localStorage.setItem(
+					`nextcloud_forms_${this.form.hash}_activeResponseView`,
+					viewId,
+				)
+			} catch (err) {
+				logger.debug('Error saving activeResponseView to localStorage', {
+					error: err,
+				})
+			}
+		},
+
 		async onUnlinkFile() {
 			await axios.patch(
 				generateOcsUrl('apps/forms/api/v3/forms/{formId}', {
