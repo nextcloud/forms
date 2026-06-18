@@ -9,6 +9,7 @@ OC.L10N.register(
     "Allow comments" : "අදහස් දැක්වීමට ඉඩ දෙන්න",
     "Cancel" : "අවලංගු",
     "Responses" : "ප්‍රතිචාර",
+    "Delete" : "Delete",
     "Other" : "වෙනත්",
     "Group" : "සමූහය",
     "Edit" : "සංස්කරණය",
