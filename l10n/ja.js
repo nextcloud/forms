@@ -67,6 +67,7 @@ OC.L10N.register(
     "Options" : "オプション",
     "Go to first page" : "最初のページへ",
     "Go to previous page" : "前のページへ",
+    "{page} of {totalPages}" : "{totalPages}の{page}",
     "Go to next page" : "次のページへ",
     "Go to last page" : "最後のページへ",
     "Add a new column" : "列を追加",
