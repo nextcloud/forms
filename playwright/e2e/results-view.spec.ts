@@ -55,7 +55,7 @@ test.describe('Results view', () => {
 		// from submit → results after submission causes a brief redirect loop,
 		// so we use direct navigation instead of clicking the TopBar.
 		await page.goto(page.url().replace(/\/submit.*$/, '/results'))
-		await page.waitForURL(/\/results$/)
+		await page.waitForURL(/\/results(?:\?.*)?$/)
 	})
 
 	test('Summary tab shows submitted data', async ({ resultsView }) => {
@@ -80,20 +80,76 @@ test.describe('Results view', () => {
 		// Should show the individual submission with the answers
 		await expect(resultsView.responsesTab).toBeChecked()
 		await expect(resultsView.responseCount).toBeVisible()
+		await expect(resultsView.page).toHaveURL(/\/results\?responses$/)
 	})
 
-	test('Tab switching between Summary and Responses', async ({ resultsView }) => {
+	test('Tab switching between Summary and Responses updates the URL', async ({
+		resultsView,
+	}) => {
 		// Start on Summary
 		await expect(resultsView.summaryTab).toBeChecked()
+		await expect(resultsView.page).toHaveURL(/\/results\?summary$/)
 
 		// Switch to Responses
 		await resultsView.switchToResponses()
 		await expect(resultsView.responsesTab).toBeChecked()
 		await expect(resultsView.summaryTab).not.toBeChecked()
+		await expect(resultsView.page).toHaveURL(/\/results\?responses$/)
 
 		// Switch back to Summary
 		await resultsView.switchToSummary()
 		await expect(resultsView.summaryTab).toBeChecked()
 		await expect(resultsView.responsesTab).not.toBeChecked()
+		await expect(resultsView.page).toHaveURL(/\/results\?summary$/)
+	})
+
+	test('Explicit query route wins over remembered localStorage view', async ({
+		page,
+		resultsView,
+	}) => {
+		await page.evaluate(() => {
+			const match = window.location.pathname.match(
+				/\/apps\/forms\/([^/]+)\/results$/,
+			)
+			if (!match) {
+				throw new Error('Expected results route before setting localStorage')
+			}
+
+			localStorage.setItem(
+				`nextcloud_forms_${match[1]}_activeResponseView`,
+				'responses',
+			)
+		})
+
+		await page.goto(page.url().replace(/\/results$/, '/results?summary'))
+		await page.waitForURL(/\/results\?summary$/)
+
+		await expect(resultsView.summaryTab).toBeChecked()
+		await expect(resultsView.responsesTab).not.toBeChecked()
+	})
+
+	test('Query-less results route restores the remembered localStorage view', async ({
+		page,
+		resultsView,
+	}) => {
+		await page.evaluate(() => {
+			const match = window.location.pathname.match(
+				/\/apps\/forms\/([^/]+)\/results$/,
+			)
+			if (!match) {
+				throw new Error('Expected results route before setting localStorage')
+			}
+
+			localStorage.setItem(
+				`nextcloud_forms_${match[1]}_activeResponseView`,
+				'responses',
+			)
+		})
+
+		await page.goto(page.url().replace(/\/results\?summary$/, '/results'))
+		await page.waitForURL(/\/results\?responses$/)
+
+		await expect(resultsView.responsesTab).toBeChecked()
+		await expect(resultsView.summaryTab).not.toBeChecked()
 	})
 })
