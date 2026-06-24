@@ -42,6 +42,21 @@ class AnswerMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int $formId
+	 * @return Answer[]
+	 */
+	public function findByForm(int $formId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('a.*')
+			->from($this->getTableName(), 'a')
+			->join('a', 'forms_v2_submissions', 's', $qb->expr()->eq('a.submission_id', 's.id'))
+			->where($qb->expr()->eq('s.form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)));
+
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @param int $submissionId
 	 */
 	public function deleteBySubmission(int $submissionId): void {

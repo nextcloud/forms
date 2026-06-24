@@ -230,11 +230,29 @@ class SubmissionService {
 
 		$questions = $this->questionMapper->findByForm($form->getId());
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
+		$userTimezone = $this->currentUser
+			? $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone)
+			: $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
 
-		if (!$this->currentUser) {
-			$userTimezone = $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
-		} else {
-			$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
+		$allAnswers = $this->answerMapper->findByForm($form->getId());
+		$answersBySubmission = [];
+		foreach ($allAnswers as $answer) {
+			$answersBySubmission[$answer->getSubmissionId()][] = $answer;
+		}
+
+		$userIds = array_map(fn ($submission) => $submission->getUserId(), $submissionEntities);
+		$userDisplayNames = [];
+		foreach (array_unique($userIds) as $userId) {
+			$user = $this->userManager->get($userId);
+			if ($user !== null) {
+				$userDisplayNames[$user->getUID()] = $user->getDisplayName();
+			}
+		}
+
+		$allOptions = $this->optionMapper->findByForm($form->getId());
+		$optionsByQuestion = [];
+		foreach ($allOptions as $option) {
+			$optionsByQuestion[$option->getQuestionId()][] = $option;
 		}
 
 		// Process initial header
@@ -253,45 +271,50 @@ class SubmissionService {
 
 		$optionPerOptionId = [];
 		foreach ($questions as $question) {
+			$questionId = $question->getId();
+			$questionPerQuestionId[$questionId] = $question;
+			$questionOptions = $optionsByQuestion[$questionId] ?? [];
+
+			foreach ($questionOptions as $option) {
+				$optionPerOptionId[$option->getId()] = $option;
+			}
+
 			if ($question->getType() === Constants::ANSWER_TYPE_GRID) {
 				$gridCellType = $question->getExtraSettings()['questionType'];
-				$options = $this->optionMapper->findByQuestion($question->getId());
+				$gridRowsPerQuestionId[$questionId] = [];
+				$gridColumnsPerQuestionId[$questionId] = [];
 
-				foreach ($options as $option) {
-					$optionPerOptionId[$option->getId()] = $option;
+				foreach ($questionOptions as $option) {
 					if ($option->getOptionType() === Option::OPTION_TYPE_ROW) {
-						$gridRowsPerQuestionId[$question->getId()][] = $option->getId();
+						$gridRowsPerQuestionId[$questionId][] = $option->getId();
 					}
 					if ($option->getOptionType() === Option::OPTION_TYPE_COLUMN) {
-						$gridColumnsPerQuestionId[$question->getId()][] = $option->getId();
+						$gridColumnsPerQuestionId[$questionId][] = $option->getId();
 					}
 				}
 
-				foreach ($gridRowsPerQuestionId[$question->getId()] as $rowId) {
+				foreach ($gridRowsPerQuestionId[$questionId] as $rowId) {
 					if ($gridCellType === Constants::ANSWER_GRID_TYPE_CHECKBOX || $gridCellType === Constants::ANSWER_GRID_TYPE_RADIO) {
 						$header[] = $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ')';
 					}
 
 					if ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
-						foreach ($gridColumnsPerQuestionId[$question->getId()] as $columnId) {
+						foreach ($gridColumnsPerQuestionId[$questionId] as $columnId) {
 							$header[] = $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ' - ' . $optionPerOptionId[$columnId]->getText() . ')';
 						}
 					}
 				}
 			} elseif ($question->getType() === Constants::ANSWER_TYPE_RANKING) {
-				$options = $this->optionMapper->findByQuestion($question->getId());
-				foreach ($options as $option) {
-					$optionPerOptionId[$option->getId()] = $option;
-					$rankingOptionsPerQuestionId[$question->getId()][] = $option->getId();
+				$rankingOptionsPerQuestionId[$questionId] = [];
+				foreach ($questionOptions as $option) {
+					$rankingOptionsPerQuestionId[$questionId][] = $option->getId();
 				}
-				foreach ($rankingOptionsPerQuestionId[$question->getId()] as $optionId) {
+				foreach ($rankingOptionsPerQuestionId[$questionId] as $optionId) {
 					$header[] = $question->getText() . ' (' . $optionPerOptionId[$optionId]->getText() . ')';
 				}
 			} else {
 				$header[] = $question->getText();
 			}
-
-			$questionPerQuestionId[$question->getId()] = $question;
 		}
 
 		// Init dataset
@@ -300,27 +323,21 @@ class SubmissionService {
 		// Process each answers
 		foreach ($submissionEntities as $submission) {
 			$row = [];
+			$userId = $submission->getUserId();
 
 			// User
-			$user = $this->userManager->get($submission->getUserId());
-			if ($user === null) {
-				// Give empty userId
-				$row[] = '';
-				// TRANSLATORS Shown on export if no Display-Name is available.
-				$row[] = $this->l10n->t('Anonymous user');
-			} else {
-				$row[] = $user->getUID();
-				$row[] = $user->getDisplayName();
-			}
+			$row[] = $userId;
+			$row[] = $userDisplayNames[$userId] ?? $this->l10n->t('Anonymous user');
 
 			// Date
 			$row[] = date_format(date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone)), 'c');
 
 			// Answers, make sure we keep the question order
-			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()),
+			$submissionAnswers = $answersBySubmission[$submission->getId()] ?? [];
+			$answers = array_reduce($submissionAnswers,
 				function (array $carry, Answer $answer) use ($questionPerQuestionId, $gridRowsPerQuestionId, $gridColumnsPerQuestionId, $rankingOptionsPerQuestionId, $optionPerOptionId) {
 					$questionId = $answer->getQuestionId();
-					$questionType = isset($questionPerQuestionId[$questionId]) ? $questionPerQuestionId[$questionId]->getType() : null;
+					$questionType = $questionPerQuestionId[$questionId]->getType() ?? null;
 
 					if ($questionType === Constants::ANSWER_TYPE_FILE) {
 						if (array_key_exists($questionId, $carry)) {
@@ -332,12 +349,18 @@ class SubmissionService {
 							];
 						}
 					} elseif ($questionType === Constants::ANSWER_TYPE_GRID) {
-						$gridCellType = isset($questionPerQuestionId[$questionId]) ? $questionPerQuestionId[$questionId]->getExtraSettings()['questionType'] : null;
+						$gridCellType = $questionPerQuestionId[$questionId]->getExtraSettings()['questionType'] ?? null;
 						$answerText = json_decode($answer->getText(), true);
 						$columns = [];
 						foreach ($gridRowsPerQuestionId[$questionId] as $row) {
 							if (empty($answerText[$row])) {
-								$columns[] = '';
+								if ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
+									foreach ($gridColumnsPerQuestionId[$questionId] as $column) {
+										$columns[] = '';
+									}
+								} else {
+									$columns[] = '';
+								}
 								continue;
 							}
 

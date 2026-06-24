@@ -46,6 +46,22 @@ class OptionMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
+	/**
+	 * @param int $formId
+	 * @return Option[]
+	 */
+	public function findByForm(int $formId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('o.*')
+			->from($this->getTableName(), 'o')
+			->join('o', 'forms_v2_questions', 'q', $qb->expr()->eq('o.question_id', 'q.id'))
+			->where($qb->expr()->eq('q.form_id', $qb->createNamedParameter($formId)))
+			->orderBy('o.order');
+
+		return $this->findEntities($qb);
+	}
+
 	public function deleteByQuestion(int $questionId): void {
 		$qb = $this->db->getQueryBuilder();
 
