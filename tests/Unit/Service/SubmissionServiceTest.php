@@ -755,6 +755,16 @@ file2.txt"
 			->with('currentUser', 'core', 'timezone', 'Europe/Berlin')
 			->willReturn('Europe/Berlin');
 
+		$allAnswers = [];
+		foreach ($submissions as $submission) {
+			if (isset($submission['answers'])) {
+				foreach ($submission['answers'] as $answer) {
+					$allAnswers[] = Answer::fromParams($answer);
+				}
+			}
+		}
+		$this->answerMapper->method('findByForm')->with(5)->willReturn($allAnswers);
+
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->any())
 			->method('getUID')
@@ -769,17 +779,6 @@ file2.txt"
 				['user2', $user],
 				['unknown', null]
 			]);
-
-		$this->answerMapper->expects($this->any())
-			->method('findBySubmission')
-		// Return AnswerObjects for corresponding submission
-			->will($this->returnCallback(function (int $submissionId) use ($submissions) {
-				$matchingSubmission = array_filter($submissions, fn ($submission) => $submission['id'] === $submissionId);
-
-				$answerEntities = array_map(fn ($answer) => Answer::fromParams($answer), current($matchingSubmission)['answers']);
-
-				return $answerEntities;
-			}));
 
 		// Prepend BOM-Sequence as Writer does and remove formatting-artefacts of dataProvider.
 		$dataExpectation = chr(239) . chr(187) . chr(191) . ltrim((string)preg_replace('/\t+/', '', $csvText));
