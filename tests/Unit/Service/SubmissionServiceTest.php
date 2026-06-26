@@ -770,16 +770,16 @@ file2.txt"
 				['unknown', null]
 			]);
 
-		$this->answerMapper->expects($this->any())
-			->method('findBySubmission')
-		// Return AnswerObjects for corresponding submission
-			->will($this->returnCallback(function (int $submissionId) use ($submissions) {
-				$matchingSubmission = array_filter($submissions, fn ($submission) => $submission['id'] === $submissionId);
-
-				$answerEntities = array_map(fn ($answer) => Answer::fromParams($answer), current($matchingSubmission)['answers']);
-
-				return $answerEntities;
-			}));
+		$this->answerMapper->method('findByForm')
+			->with(5)
+			->willReturnCallback(function () use ($submissions) {
+				$allAnswers = [];
+				foreach ($submissions as $submission) {
+					$answers = array_map(fn ($answer) => Answer::fromParams($answer), $submission['answers']);
+					$allAnswers = array_merge($allAnswers, $answers);
+				}
+				return $allAnswers;
+			});
 
 		// Prepend BOM-Sequence as Writer does and remove formatting-artefacts of dataProvider.
 		$dataExpectation = chr(239) . chr(187) . chr(191) . ltrim((string)preg_replace('/\t+/', '', $csvText));
