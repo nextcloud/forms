@@ -31,6 +31,7 @@ OC.L10N.register(
     "Select groups" : "Selecionar grupos",
     "Comments" : "Comentários",
     "Allow comments" : "Permitir comentários",
+    "Expires {relativeDate}" : "Expira {relativeDate}",
     "Delete form" : "Apague formulário",
     "Are you sure you want to delete {title}?" : "Tem a certeza de querer apagar {title}?",
     "Cancel" : "Cancelar",
