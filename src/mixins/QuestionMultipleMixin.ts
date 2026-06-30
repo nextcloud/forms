@@ -13,41 +13,62 @@ import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
-import logger from '../utils/Logger.js'
+import logger from '../utils/Logger.ts'
+
+// Temporary augmentation to allow using `this.<prop>` in mixin methods
+declare module '@vue/runtime-core' {
+	interface ComponentCustomProperties {
+		options: FormsOption[]
+		values: unknown[]
+		answerType: { validate: (ctx: unknown) => boolean }
+		readOnly: boolean
+		extraSettings?: unknown
+		formId: number
+		id: number
+		shuffleArray: <T>(arr: T[]) => T[]
+		$refs: Record<string, unknown>
+	}
+}
 
 export default defineComponent({
 	emits: ['update:options'],
 
 	data() {
 		return {
-			dirtyOptionsType: null,
+			dirtyOptionsType: null as string | null,
 		}
 	},
 
 	computed: {
-		areNoneChecked() {
+		areNoneChecked(): boolean {
 			return this.values.length === 0
 		},
 
-		contentValid() {
+		contentValid(): boolean {
 			return this.answerType.validate(this)
 		},
 
-		isLastEmpty() {
-			const value = this.options[this.options.length - 1]
+		isLastEmpty(): boolean {
+			const value = this.options[this.options.length - 1] as
+				| FormsOption
+				| undefined
 			return value?.text?.trim?.().length === 0
 		},
 
-		expectedOptionTypes() {
+		expectedOptionTypes(): OptionType[] {
 			return [OptionType.Choice, OptionType.Row, OptionType.Column]
 		},
 
 		sortedOptionsPerType(): { [key: string]: FormsOption[] } {
-			const optionsPerType = Object.fromEntries(
-				this.expectedOptionTypes.map((optionType) => [optionType, []]),
-			)
+			const optionsPerType: { [key: string]: FormsOption[] } =
+				Object.fromEntries(
+					this.expectedOptionTypes.map((optionType) => [
+						optionType,
+						[] as FormsOption[],
+					]),
+				)
 
-			this.options.forEach((option) => {
+			this.options.forEach((option: FormsOption) => {
 				optionsPerType[option.optionType].push(option)
 			})
 
@@ -69,14 +90,15 @@ export default defineComponent({
 					})
 
 					if (!this.readOnly) {
-						// In edit mode append an empty option
+						// In edit mode append an empty option (cast as FormsOption temporarily)
 						optionsPerType[optionType].push({
+							id: 0,
 							local: true,
 							questionId: this.id,
 							text: '',
 							optionType,
 							order: optionsPerType[optionType].length,
-						})
+						} as FormsOption)
 					}
 				}
 			}
@@ -104,7 +126,7 @@ export default defineComponent({
 		 */
 		focusIndex(index: number, optionType: string) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
-			const item = this.$refs.input.find((instance) => {
+			const item = this.$refs.input.find((instance: unknown) => {
 				return (
 					instance.$props.optionType === optionType
 					&& instance.$props.index === index
@@ -143,12 +165,13 @@ export default defineComponent({
 				return [
 					...options,
 					{
+						id: 0,
 						local: true,
 						questionId: this.id,
 						text: '',
 						optionType,
 						order: options.length,
-					},
+					} as FormsOption,
 				]
 			}
 			return options
@@ -386,7 +409,7 @@ export default defineComponent({
 	},
 
 	watch: {
-		dirtyOptionsType: debounce(function () {
+		dirtyOptionsType: debounce(function (this: unknown) {
 			if (!this.dirtyOptionsType) {
 				return
 			}

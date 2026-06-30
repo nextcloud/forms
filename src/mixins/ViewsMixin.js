@@ -10,9 +10,9 @@ import { emit } from '@nextcloud/event-bus'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import MarkdownIt from 'markdown-it'
-import CancelableRequest from '../utils/CancelableRequest.js'
-import logger from '../utils/Logger.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import CancelableRequest from '../utils/CancelableRequest.ts'
+import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 
 export default {
 	provide() {
