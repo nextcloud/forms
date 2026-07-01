@@ -746,11 +746,15 @@ export default {
 		 *
 		 * @param {string} submissionUser - The ID of the user who created the submission.
 		 * @return {boolean} - Returns true if the submission can be edited, otherwise false.
+		 *                      A submission can be edited if:
+		 *                      - The user has the `canDeleteSubmissions` permission, or
+		 *                      - The form allows editing (`form.allowEditSubmissions`) and the current user is the owner of the submission.
 		 */
 		canEditSubmission(submissionUser) {
 			return (
-				this.form.allowEditSubmissions
-				&& getCurrentUser().uid === submissionUser
+				this.canDeleteSubmissions
+				|| (this.form.allowEditSubmissions
+					&& getCurrentUser().uid === submissionUser)
 			)
 		},
 

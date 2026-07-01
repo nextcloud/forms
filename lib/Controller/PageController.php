@@ -118,7 +118,10 @@ class PageController extends Controller {
 	#[NoCSRFRequired()]
 	#[FrontpageRoute(verb: 'GET', url: '/{hash}/submit/{submissionId}', requirements: ['hash' => '[a-zA-Z0-9]{16,}', 'submissionId' => '\d+'])]
 	public function submitViewWithSubmission(string $hash, int $submissionId): TemplateResponse {
-		return $this->formMapper->findByHash($hash)->getAllowEditSubmissions() ? $this->index($hash, $submissionId) : $this->index($hash);
+		$form = $this->formMapper->findByHash($hash);
+		$canUserEditSubmission = $this->formsService->canDeleteResults($form);
+
+		return $canUserEditSubmission ? $this->index($hash, $submissionId) : $this->index($hash);
 	}
 
 	/**
