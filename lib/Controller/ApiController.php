@@ -146,8 +146,13 @@ class ApiController extends OCSController {
 	 * Return a copy of the form if the parameter $fromId is set
 	 *
 	 * @param ?int $fromId (optional) Id of the form that should be cloned
+	 * @param ?bool $import (optional) If it should import the form from post body
+	 * @param ?array<string, mixed> $formData (optional) The formdata to import
 	 * @return DataResponse<Http::STATUS_CREATED, FormsForm, array{}>
 	 * @throws OCSForbiddenException The user is not allowed to create forms
+	 * @throws OCSBadRequestException Cannot use both fromId and import parameters
+	 * @throws OCSBadRequestException Invalid form data: missing questions
+	 * @throws OCSBadRequestException Invalid question data: missing id
 	 *
 	 * 201: the created form
 	 */
@@ -155,14 +160,19 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms')]
-	public function newForm(?int $fromId = null): DataResponse {
+	public function newForm(?int $fromId = null, ?bool $import = false, ?array $formData = []): DataResponse {
 		// Check if user is allowed
 		if (!$this->configService->canCreateForms()) {
 			$this->logger->debug('This user is not allowed to create Forms.');
 			throw new OCSForbiddenException('This user is not allowed to create Forms.');
 		}
 
-		if ($fromId === null) {
+		// Validate mutually exclusive parameters
+		if ($fromId !== null && $import === true) {
+			throw new OCSBadRequestException('Cannot use both fromId and import parameters');
+		}
+
+		if ($fromId === null && $import === false) {
 			// Create Form
 			$form = new Form();
 			$form->setOwnerId($this->currentUser->getUID());
@@ -181,10 +191,24 @@ class ApiController extends OCSController {
 
 			$this->formMapper->insert($form);
 		} else {
-			$oldForm = $this->formsService->getFormIfAllowed($fromId, Constants::PERMISSION_EDIT);
+			// Fill variables from json or database
+			if ($import) {
+				if (!isset($formData['questions']) || !\is_array($formData['questions'])) {
+					throw new OCSBadRequestException('Invalid form data: missing questions');
+				}
+				$questions = $formData['questions'];
+				$oldConfirmationEmailQuestionId = $formData['confirmationEmailQuestionId'] ?? null;
+				unset($formData['questions']);
+			} else {
+				$oldForm = $this->formsService->getFormIfAllowed($fromId, Constants::PERMISSION_EDIT);
 
-			// Read old form, (un)set new form specific data, extend title
-			$formData = $oldForm->read();
+				// Read old form, (un)set new form specific data, extend title
+				$formData = $oldForm->read();
+				// Get Questions, set new formId, reinsert
+				$questions = $this->questionMapper->findByForm($oldForm->getId());
+				$oldConfirmationEmailQuestionId = $oldForm->getConfirmationEmailQuestionId();
+			}
+			// Remove unused data
 			unset($formData['id']);
 			unset($formData['created']);
 			unset($formData['lastUpdated']);
@@ -197,7 +221,9 @@ class ApiController extends OCSController {
 			$formData['ownerId'] = $this->currentUser->getUID();
 			$formData['hash'] = $this->formsService->generateFormHash();
 			// TRANSLATORS Appendix to the form Title of a duplicated/copied form.
-			$formData['title'] .= ' - ' . $this->l10n->t('Copy');
+			if (!$import) {
+				$formData['title'] .= ' - ' . $this->l10n->t('Copy');
+			}
 			$formData['access'] = [
 				'permitAllUsers' => false,
 				'showToAllUsers' => false,
@@ -211,26 +237,35 @@ class ApiController extends OCSController {
 			$form = Form::fromParams($formData);
 			$this->formMapper->insert($form);
 
-			// Get Questions, set new formId, reinsert
-			$questions = $this->questionMapper->findByForm($oldForm->getId());
-			$oldConfirmationEmailQuestionId = $oldForm->getConfirmationEmailQuestionId();
-
 			foreach ($questions as $oldQuestion) {
-				$questionData = $oldQuestion->read();
+				if ($import) {
+					if (!isset($oldQuestion['id'])) {
+						throw new OCSBadRequestException('Invalid question data: missing id');
+					}
+					$questionData = $oldQuestion;
+					$oldQuestionId = $oldQuestion['id'];
+					$options = $oldQuestion['options'] ?? [];
+				} else {
+					$questionData = $oldQuestion->read();
+					$oldQuestionId = $oldQuestion->getId();
+					// Get Options, set new QuestionId, reinsert
+					$options = $this->optionMapper->findByQuestion($oldQuestionId);
+				}
 
 				unset($questionData['id']);
+				unset($questionData['options']);
+				unset($questionData['accept']);
+
 				$questionData['formId'] = $form->getId();
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
 
-				if (isset($oldConfirmationEmailQuestionId) && $oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
+				if (isset($oldConfirmationEmailQuestionId) && $oldConfirmationEmailQuestionId === $oldQuestionId) {
 					$form->setConfirmationEmailQuestionId($newQuestion->getId());
 				}
 
-				// Get Options, set new QuestionId, reinsert
-				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
 				foreach ($options as $oldOption) {
-					$optionData = $oldOption->read();
+					$optionData = $import ? $oldOption : $oldOption->read();
 
 					unset($optionData['id']);
 					$optionData['questionId'] = $newQuestion->getId();
@@ -249,7 +284,8 @@ class ApiController extends OCSController {
 	 * Read all information to edit a Form (form, questions, options, except submissions/answers)
 	 *
 	 * @param int $formId Id of the form
-	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>
+	 * @param ?bool $download if the form should be downloaded
+	 * @return DataResponse<Http::STATUS_OK, FormsForm, array{}>|DataDownloadResponse<Http::STATUS_OK, 'application/json', array{}>
 	 * @throws OCSBadRequestException Could not find form
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 *
@@ -259,8 +295,24 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms/{formId}')]
-	public function getForm(int $formId): DataResponse {
+	public function getForm(int $formId, ?bool $download): DataResponse|DataDownloadResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_SUBMIT);
+
+		if ($download) {
+			$formData = $this->formsService->getPublicForm($form);
+			unset($formData['hash']);
+			unset($formData['created']);
+			unset($formData['lastUpdated']);
+			unset($formData['lockedBy']);
+			unset($formData['lockedUntil']);
+			unset($formData['permissions']);
+			unset($formData['canSubmit']);
+			unset($formData['isMaxSubmissionsReached']);
+			unset($formData['submissionCount']);
+			unset($formData['filePath']);
+			return new DataDownloadResponse(
+				json_encode($formData), $form->getTitle(), 'application/json');
+		}
 
 		return new DataResponse($this->formsService->getForm($form));
 	}
@@ -692,8 +744,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
-		if ($form->getConfirmationEmailQuestionId() === $question->getId()
-			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)) {
+		if (
+			$form->getConfirmationEmailQuestionId() === $question->getId()
+			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)
+		) {
 			$form->setConfirmationEmailQuestionId(null);
 		}
 

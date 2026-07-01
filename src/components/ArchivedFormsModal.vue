@@ -49,7 +49,7 @@ export default defineComponent({
 		},
 	},
 
-	emits: ['update:open', 'clone'],
+	emits: ['update:open', 'clone', 'download'],
 
 	data() {
 		return {

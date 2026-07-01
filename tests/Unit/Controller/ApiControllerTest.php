@@ -35,6 +35,7 @@ use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -534,6 +535,9 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('generateFormHash')
 			->willReturn('formHash');
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
 		$expected = $expectedForm;
 		$expected['id'] = null;
 		// TODO fix test, currently unset because behaviour has changed
@@ -640,8 +644,10 @@ class ApiControllerTest extends TestCase {
 			->method('generateFormHash')
 			->willReturn('new hash');
 
-		$read = $oldForm->read();
-		unset($read['id']);
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
+
 		$this->formMapper->expects($this->once())
 			->method('insert')
 			->with(self::callback(function ($form) {
@@ -1881,5 +1887,191 @@ class ApiControllerTest extends TestCase {
 		$this->expectException(OCSForbiddenException::class);
 		$this->expectExceptionMessage('This form is no longer taking answers');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public static function dataImportForm_exceptions() {
+		return [
+			'disabled' => [
+				'canCreate' => false,
+				'exception' => OCSForbiddenException::class,
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataImportForm_exceptions
+	 */
+	public function testImportForm_exceptions(bool $canCreate, string $exception) {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn($canCreate);
+		$this->expectException($exception);
+		$this->apiController->newForm(null, true, []);
+	}
+
+	public function testImportForm() {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('generateFormHash')
+			->willReturn('importHash');
+
+		$formData = [
+			'title' => 'Imported Form',
+			'description' => 'Imported description',
+			'questions' => [],
+		];
+
+		$expected = [
+			'title' => 'Imported Form',
+			'description' => 'Imported description',
+			'hash' => 'importHash',
+			'ownerId' => 'currentUser',
+			'access' => [
+				'permitAllUsers' => false,
+				'showToAllUsers' => false,
+			],
+			'submitMultiple' => false,
+			'allowEditSubmissions' => false,
+			'showExpiration' => false,
+			'expires' => 0,
+			'isAnonymous' => false,
+			'submissionMessage' => null,
+			'fileId' => null,
+			'fileFormat' => null,
+			'lockedBy' => null,
+			'lockedUntil' => null,
+			'confirmationEmailEnabled' => false,
+			'confirmationEmailSubject' => null,
+			'confirmationEmailBody' => null,
+			'confirmationEmailQuestionId' => null,
+			'allowComments' => false,
+			'maxSubmissions' => null,
+			'lastUpdated' => 0,
+			'id' => null,
+			'state' => null
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(self::createFormValidator($expected)))
+			->willReturnCallback(function ($form) {
+				$form->setId(42);
+				return $form;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
+
+		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm(null, true, $formData));
+	}
+
+	public function testImportFormWithQuestions() {
+		$this->configService->expects($this->once())
+			->method('canCreateForms')
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('generateFormHash')
+			->willReturn('importHash');
+
+		$formData = [
+			'title' => 'Imported Form',
+			'questions' => [
+				[
+					'id' => 99,
+					'formId' => 1,
+					'order' => 1,
+					'type' => 'short',
+					'text' => 'Question 1',
+					'options' => [
+						['id' => 10, 'questionId' => 99, 'text' => 'Option 1', 'order' => 1],
+					],
+				],
+			],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($form) {
+				$form->setId(42);
+				return $form;
+			});
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(function ($question) {
+				self::assertInstanceOf(Question::class, $question);
+				self::assertEquals(42, $question->getFormId());
+				self::assertEquals('Question 1', $question->getText());
+				$question->setId(100);
+				return true;
+			}));
+
+		$this->optionMapper->expects($this->once())
+			->method('insert')
+			->with(self::callback(function ($option) {
+				self::assertInstanceOf(Option::class, $option);
+				self::assertEquals(100, $option->getQuestionId());
+				self::assertEquals('Option 1', $option->getText());
+				return true;
+			}));
+
+		$this->formMapper->expects($this->once())
+			->method('update');
+
+		$this->formsService->expects($this->once())
+			->method('getForm')
+			->willReturn([]);
+
+		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm(null, true, $formData));
+	}
+
+	public function testImportFormWithConfirmationEmailQuestionId() {
+		$this->configService->method('canCreateForms')->willReturn(true);
+		$this->formsService->method('generateFormHash')->willReturn('new hash');
+
+		$formData = [
+			'title' => 'Imported Form',
+			'confirmationEmailQuestionId' => 50,
+			'questions' => [
+				[
+					'id' => 50,
+					'formId' => 1,
+					'order' => 1,
+					'type' => 'short',
+					'text' => 'Email question',
+					'options' => [],
+				],
+			],
+		];
+
+		$this->formMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($form) {
+				$form->setId(42);
+				return $form;
+			});
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(100);
+				return $question;
+			});
+
+		$this->optionMapper->expects($this->never())
+			->method('insert');
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with(self::callback(function ($form) {
+				return $form->getId() === 42 && $form->getConfirmationEmailQuestionId() === 100;
+			}));
+
+		$this->formsService->method('getForm')->willReturn([]);
+
+		$this->apiController->newForm(null, true, $formData);
 	}
 }
