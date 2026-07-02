@@ -352,6 +352,53 @@ export default {
 		}
 
 		/**
+		 * Clean up stale localStorage entries for forms that are no longer available.
+		 * Removes localStorage keys matching the pattern `nextcloud_forms_*_activeResponseView`
+		 * where the form hash no longer exists in the current forms list.
+		 */
+		const cleanupStaleLocalStorageEntries = () => {
+			try {
+				// Get all current form hashes
+				const currentFormHashes = new Set(
+					[...forms.value, ...allSharedForms.value].map(
+						(form) => form.hash,
+					),
+				)
+
+				// Iterate through all localStorage keys
+				const keysToRemove = []
+				for (let i = 0; i < localStorage.length; i++) {
+					const key = localStorage.key(i)
+					if (
+						key
+						&& key.startsWith('nextcloud_forms_')
+						&& key.endsWith('_activeResponseView')
+					) {
+						// Extract hash from key: nextcloud_forms_<hash>_activeResponseView
+						const hash = key.substring(
+							'nextcloud_forms_'.length,
+							key.length - '_activeResponseView'.length,
+						)
+						// If form hash is not in current forms, mark for removal
+						if (!currentFormHashes.has(hash)) {
+							keysToRemove.push(key)
+						}
+					}
+				}
+
+				// Remove stale entries
+				keysToRemove.forEach((key) => {
+					localStorage.removeItem(key)
+					logger.debug(`Removed stale localStorage entry: ${key}`)
+				})
+			} catch (err) {
+				logger.debug('Error cleaning up stale localStorage entries', {
+					error: err,
+				})
+			}
+		}
+
+		/**
 		 * Fetch a partial form by its hash after initial load completes.
 		 *
 		 * @param {string} hash The hash of the form to fetch.
@@ -447,6 +494,17 @@ export default {
 			forms.value.splice(formIndex, 1)
 			deletedFormHash.value = deletedHash
 
+			// Remove localStorage entry for this form's active response view
+			try {
+				localStorage.removeItem(
+					`nextcloud_forms_${deletedHash}_activeResponseView`,
+				)
+			} catch (err) {
+				logger.debug('Error removing localStorage entry for deleted form', {
+					error: err,
+				})
+			}
+
 			if (deletedHash === routeHash.value && route.name !== 'root') {
 				// Navigate to root without triggering route guards
 				router.replace({ name: 'root' })
@@ -477,8 +535,9 @@ export default {
 			}
 		}
 
-		onMounted(() => {
-			loadForms()
+		onMounted(async () => {
+			await loadForms()
+			cleanupStaleLocalStorageEntries()
 			subscribe('forms:last-updated:set', onLastUpdatedByEventBus)
 			subscribe('forms:ownership-transfered', onDeleteForm)
 		})
