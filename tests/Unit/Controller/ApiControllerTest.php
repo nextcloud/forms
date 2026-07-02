@@ -1638,6 +1638,12 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
+		// Mock canDeleteResults to return true (form owner can edit)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
@@ -1671,23 +1677,29 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse($submissionId), $response);
 	}
 
-	public function testUpdateSubmission_formNotEditable() {
+	public function testUpdateSubmission_noPermission() {
 		$formId = 1;
 		$submissionId = 42;
 		$answers = ['q1' => ['answer1']];
 
 		$form = new Form();
 		$form->setId($formId);
-		$form->setOwnerId('formOwner');
-		$form->setAllowEditSubmissions(false); // Form does not allow edits
+		$form->setOwnerId('otherUser');
+		$form->setAllowEditSubmissions(false);
 
 		$this->formsService->expects($this->once())
 			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
 
-		$this->expectException(OCSBadRequestException::class);
-		$this->expectExceptionMessage('Can only update if allowEditSubmissions is set');
+		// Mock canDeleteResults to return false (user lacks permission)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
 	}
 
@@ -1705,6 +1717,12 @@ class ApiControllerTest extends TestCase {
 			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
+
+		// Mock canDeleteResults to return true (pass permission check)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
@@ -1735,6 +1753,12 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
+		// Mock canDeleteResults to return true (pass permission check)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
@@ -1742,7 +1766,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+			->with($this->anything(), $answers, 'formOwner');
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -1774,6 +1798,12 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
+		// Mock canDeleteResults to return true (pass permission check)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
@@ -1781,7 +1811,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+			->with($this->anything(), $answers, 'formOwner');
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -1793,7 +1823,8 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
 	}
 
-	public function testUpdateSubmission_notOwnSubmission() {
+	public function testUpdateSubmission_canEditOthers_withDeletePermission() {
+		// Test that users with RESULTS_DELETE permission can edit any submission
 		$formId = 1;
 		$submissionId = 42;
 		$answers = ['q1' => ['answer1']];
@@ -1813,6 +1844,12 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($form);
 
+		// Current user has RESULTS_DELETE permission (e.g., via share or ownership)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
@@ -1820,16 +1857,31 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+			->with($this->anything(), $answers, 'formOwner');
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
 			->with($submissionId)
 			->willReturn($submission);
 
-		$this->expectException(OCSForbiddenException::class);
-		$this->expectExceptionMessage('Can only update your own submissions');
-		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+		$this->submissionMapper->expects($this->once())
+			->method('update')
+			->with($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('deleteBySubmission')
+			->with($submissionId);
+
+		$this->answerMapper->expects($this->once())
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission')
+			->with($form, $submission);
+
+		// Should succeed - user has RESULTS_DELETE permission
+		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
+		$this->assertEquals(new DataResponse($submissionId), $response);
 	}
 
 	public function testUpdateSubmission_loadForm_notFound() {
@@ -1881,5 +1933,352 @@ class ApiControllerTest extends TestCase {
 		$this->expectException(OCSForbiddenException::class);
 		$this->expectExceptionMessage('This form is no longer taking answers');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_resultsPermissionOnlyDenied() {
+		// Test that user with RESULTS permission only (no RESULTS_DELETE) cannot edit others' submissions
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('otherUser');
+		$form->setAllowEditSubmissions(true);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return false (no RESULTS_DELETE share)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_submitPermissionOnlyDenied() {
+		// Test that user with SUBMIT permission only cannot edit submissions
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('otherUser');
+		$form->setAllowEditSubmissions(false);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return false (only SUBMIT permission)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_ownSubmissionWithAllowEditSubmissions() {
+		// Test backward compatibility: user can edit own submission when allowEditSubmissions=true
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+		$userId = 'currentUser';
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('otherUser');
+		$form->setAllowEditSubmissions(true);
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId($formId);
+		$submission->setUserId($userId);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// canDeleteResults returns true because user has submitted and allowEditSubmissions=true
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'otherUser');
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->submissionMapper->expects($this->once())
+			->method('update')
+			->with($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('deleteBySubmission')
+			->with($submissionId);
+
+		$this->answerMapper->expects($this->once())
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission')
+			->with($form, $submission);
+
+		// Should succeed - user is owner and allowEditSubmissions=true
+		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
+		$this->assertEquals(new DataResponse($submissionId), $response);
+	}
+
+	public function testUpdateSubmission_ownSubmissionWithoutAllowEditSubmissions() {
+		// Test that user cannot edit own submission if form disallows editing
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+		$userId = 'currentUser';
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('otherUser');
+		$form->setAllowEditSubmissions(false);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return false (allowEditSubmissions=false, no RESULTS_DELETE)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_otherSubmissionWithoutPermission() {
+		// Test that user without RESULTS_DELETE cannot edit others' submissions even if allowEditSubmissions=true
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('otherUser');
+		$form->setAllowEditSubmissions(true);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return false (not owner, no RESULTS_DELETE share)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_archivedFormDenied() {
+		// Test that cannot edit submission on archived form (regardless of permission)
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('currentUser');
+		$form->setAllowEditSubmissions(true);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return false (form is archived)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_anonymousUserDenied() {
+		// Test that unauthenticated user cannot edit submissions (even on public forms)
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('someUser');
+		$form->setAllowEditSubmissions(true);
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return false (no permissions)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(false);
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_formOwnerCanEditOthers() {
+		// Test that form owner can edit any submission
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('currentUser'); // Current user is form owner
+		$form->setAllowEditSubmissions(false); // Editing is not allowed for regular users
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId($formId);
+		$submission->setUserId('otherUser'); // But submission is from another user
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return true (form owner)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'currentUser');
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->submissionMapper->expects($this->once())
+			->method('update')
+			->with($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('deleteBySubmission')
+			->with($submissionId);
+
+		$this->answerMapper->expects($this->once())
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission')
+			->with($form, $submission);
+
+		// Should succeed - user is form owner
+		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
+		$this->assertEquals(new DataResponse($submissionId), $response);
+	}
+
+	public function testUpdateSubmission_resultsDeleteShareCanEditOthers() {
+		// Test that user with RESULTS_DELETE share permission can edit any submission
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(false); // Editing not allowed for regular users
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId($formId);
+		$submission->setUserId('submissionUser'); // Different from current user
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		// Mock canDeleteResults to return true (shared user with RESULTS_DELETE)
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), $answers, 'formOwner');
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->submissionMapper->expects($this->once())
+			->method('update')
+			->with($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('deleteBySubmission')
+			->with($submissionId);
+
+		$this->answerMapper->expects($this->once())
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission')
+			->with($form, $submission);
+
+		// Should succeed - user has RESULTS_DELETE via share
+		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
+		$this->assertEquals(new DataResponse($submissionId), $response);
 	}
 }

@@ -755,6 +755,47 @@ class FormsServiceTest extends TestCase {
 					'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS],
 				]],
 				'expected' => false
+			],
+			'disallowMultipleSharesMissingDelete' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [
+					[
+						'with' => 'currentUser',
+						'type' => 0,
+						'permissions' => [Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS],
+					],
+					[
+						'with' => 'otherUser',
+						'type' => 0,
+						'permissions' => [Constants::PERMISSION_RESULTS_DELETE],
+					]
+				],
+				'expected' => false
+			],
+			'allowMultipleSharesWithDelete' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [
+					[
+						'with' => 'currentUser',
+						'type' => 0,
+						'permissions' => [Constants::PERMISSION_SUBMIT],
+					],
+					[
+						'with' => 'currentUser',
+						'type' => 0,
+						'permissions' => [Constants::PERMISSION_RESULTS_DELETE],
+					]
+				],
+				'expected' => true
+			],
+			'disallowResultsDeleteOnlyWithoutOthers' => [
+				'ownerId' => 'someUser',
+				'sharesArray' => [[
+					'with' => 'otherUser',
+					'type' => 0,
+					'permissions' => [Constants::PERMISSION_RESULTS_DELETE],
+				]],
+				'expected' => false
 			]
 		];
 	}
@@ -786,6 +827,49 @@ class FormsServiceTest extends TestCase {
 			->willReturn($shares);
 
 		$this->assertEquals($expected, $this->formsService->canDeleteResults($form));
+	}
+
+	public function testCanDeleteResults_archivedFormDenied() {
+		// Test that archived forms deny deletion regardless of ownership or permissions
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ARCHIVED);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([]);
+
+		$this->assertEquals(false, $this->formsService->canDeleteResults($form));
+	}
+
+	public function testCanDeleteResults_archivedFormDeniedWithResultsDeleteShare() {
+		// Test that archived forms deny deletion even with RESULTS_DELETE permission
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('someUser');
+		$form->setState(Constants::FORM_STATE_ARCHIVED);
+		$form->setAccess([
+			'permitAllUsers' => false,
+			'showToAllUsers' => false,
+		]);
+
+		$share = new Share();
+		$share->setFormId(42);
+		$share->setShareWith('currentUser');
+		$share->setPermissions([Constants::PERMISSION_RESULTS_DELETE]);
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertEquals(false, $this->formsService->canDeleteResults($form));
 	}
 
 	public static function dataCanSubmit() {
