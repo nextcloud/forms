@@ -61,12 +61,14 @@ class ConfigControllerTest extends TestCase {
 			'booleanAllowPermitAll' => [
 				'configKey' => 'allowPermitAll',
 				'configValue' => true,
-				'strConfig' => 'true'
 			],
 			'booleanAllowShowToAll' => [
 				'configKey' => 'allowShowToAll',
 				'configValue' => true,
-				'strConfig' => 'true'
+			],
+			'booleanAllowCustomPublicShareTokens' => [
+				'configKey' => 'allowCustomPublicShareTokens',
+				'configValue' => true,
 			],
 			'arrayCreationAllowedGroups' => [
 				'configKey' => 'creationAllowedGroups',
@@ -74,7 +76,6 @@ class ConfigControllerTest extends TestCase {
 					'admin',
 					'group1'
 				],
-				'strConfig' => '["admin","group1"]'
 			]
 		];
 	}
@@ -83,9 +84,8 @@ class ConfigControllerTest extends TestCase {
 	 *
 	 * @param string $configKey
 	 * @param mixed $configValue
-	 * @param string $strConfig The configValue as json-string
 	 */
-	public function testUpdateAppConfig(string $configKey, $configValue, string $strConfig) {
+	public function testUpdateAppConfig(string $configKey, $configValue) {
 		$this->logger->expects($this->once())
 			->method('debug');
 

@@ -45,7 +45,7 @@
 		<TransitionGroup v-else tag="div">
 			<div
 				v-for="share in publicLinkShares"
-				:key="'share-' + share.shareType + '-' + share.shareWith"
+				:key="'share-' + share.id"
 				:set="void (isEmbeddable = isEmbeddingAllowed(share))"
 				class="share-div share-div--link"
 				:class="{ 'share-div--embeddable': isEmbeddingAllowed(share) }">
@@ -55,11 +55,42 @@
 						:svg="IconLinkBoxVariantOutline" />
 					<NcIconSvgWrapper v-else :svg="IconLinkVariant" />
 				</div>
-				<span class="share-div__desc">{{
-					isEmbeddable
-						? t('forms', 'Embeddable link')
-						: t('forms', 'Share link')
-				}}</span>
+				<div class="share-div__desc share-div__desc--tokenized">
+					<span v-if="!appConfig.allowCustomPublicShareTokens">{{
+						isEmbeddable
+							? t('forms', 'Embeddable link')
+							: t('forms', 'Share link')
+					}}</span>
+					<NcInputField
+						v-else
+						:modelValue="getShareTokenInput(share)"
+						:disabled="locked || !isCurrentUserOwner"
+						autocomplete="off"
+						:label="
+							isEmbeddable
+								? t('forms', 'Embeddable link token')
+								: t('forms', 'Share link token')
+						"
+						:helperText="
+							t(
+								'forms',
+								'Set the public share link token to something easy to remember or generate a new token.',
+							)
+						"
+						showTrailingButton
+						:trailingButtonLabel="
+							isShareTokenLoading(share)
+								? t('forms', 'Generating…')
+								: t('forms', 'Generate new token')
+						"
+						@trailingButtonClick="generateNewToken(share)"
+						@update:modelValue="setShareTokenInput(share, $event)">
+						<template #trailing-button-icon>
+							<NcLoadingIcon v-if="isShareTokenLoading(share)" />
+							<NcIconSvgWrapper v-else :svg="IconRefresh" />
+						</template>
+					</NcInputField>
+				</div>
 				<NcActions :inline="1">
 					<NcActionLink
 						:href="getPublicShareLink(share)"
@@ -193,7 +224,7 @@
 		<TransitionGroup tag="ul">
 			<SharingShareDiv
 				v-for="share in sortedShares"
-				:key="'share-' + share.shareType + '-' + share.shareWith"
+				:key="'share-' + share.id"
 				:share="share"
 				:locked="locked"
 				:isCurrentUserOwner="isCurrentUserOwner"
@@ -205,6 +236,7 @@
 
 <script>
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
+import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconCodeBrackets from '@material-symbols/svg-400/outlined/code.svg?raw'
 import IconCopyAll from '@material-symbols/svg-400/outlined/copy_all.svg?raw'
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
@@ -212,16 +244,20 @@ import IconAccountMultiple from '@material-symbols/svg-400/outlined/group.svg?ra
 import IconLinkBoxVariantOutline from '@material-symbols/svg-400/outlined/iframe.svg?raw'
 import IconLinkVariant from '@material-symbols/svg-400/outlined/link_2.svg?raw'
 import IconQr from '@material-symbols/svg-400/outlined/qr_code.svg?raw'
+import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { generateOcsUrl } from '@nextcloud/router'
+import debounce from 'debounce'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/components/NcActionLink'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import NcInputField from '@nextcloud/vue/components/NcInputField'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import QRDialog from '../QRDialog.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
@@ -230,6 +266,7 @@ import FormsIcon from '../../../img/forms-dark.svg?raw'
 import PermissionTypes from '../../mixins/PermissionTypes.js'
 import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
 import ShareTypes from '../../mixins/ShareTypes.js'
+import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.js'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
 
@@ -240,6 +277,8 @@ export default {
 		NcActionButton,
 		NcActionLink,
 		NcCheckboxRadioSwitch,
+		NcInputField,
+		NcLoadingIcon,
 		NcNoteCard,
 		QRDialog,
 		SharingSearchDiv,
@@ -270,6 +309,7 @@ export default {
 	setup() {
 		return {
 			FormsIcon,
+			IconCheck,
 			IconCopyAll,
 			IconPlus,
 			IconCodeBrackets,
@@ -278,6 +318,7 @@ export default {
 			IconLinkBoxVariantOutline,
 			IconAccountMultiple,
 			IconQr,
+			IconRefresh,
 		}
 	},
 
@@ -285,6 +326,9 @@ export default {
 		return {
 			isLoading: false,
 			appConfig: loadState(appName, 'appConfig'),
+			shareTokens: {},
+			savingShareTokens: {},
+			loadingShareTokenId: null,
 			qrDialogText: '',
 		}
 	},
@@ -315,6 +359,21 @@ export default {
 				this.isEmbeddingAllowed(a) ? 1 : this.isEmbeddingAllowed(b) ? -1 : 0,
 			)
 			return shares
+		},
+	},
+
+	watch: {
+		publicLinkShares: {
+			immediate: true,
+			handler(shares) {
+				const nextShareTokens = {}
+				for (const share of shares) {
+					nextShareTokens[share.id] =
+						this.shareTokens[share.id] ?? share.shareWith
+				}
+
+				this.shareTokens = nextShareTokens
+			},
 		},
 	},
 
@@ -488,6 +547,91 @@ export default {
 			newAccess.showToAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
+
+		getShareTokenInput(share) {
+			return this.shareTokens[share.id] ?? share.shareWith
+		},
+
+		isShareTokenSaving(share) {
+			return !!this.savingShareTokens[share.id]
+		},
+
+		isShareTokenLoading(share) {
+			return this.loadingShareTokenId === share.id
+		},
+
+		setShareTokenInput(share, token) {
+			this.shareTokens = {
+				...this.shareTokens,
+				[share.id]: token,
+			}
+			this.updateShareToken(share)
+		},
+
+		async generateNewToken(share) {
+			this.loadingShareTokenId = share.id
+
+			try {
+				const { data } = await axios.get(
+					generateOcsUrl('apps/forms/api/v3/token'),
+				)
+				this.setShareTokenInput(share, data.ocs.data.token)
+			} catch (error) {
+				logger.error('Error while generating share token', {
+					error,
+					share,
+				})
+				showError(
+					t('forms', 'There was an error while generating the link token'),
+				)
+			} finally {
+				this.loadingShareTokenId = null
+			}
+		},
+
+		updateShareToken: debounce(async function (share) {
+			const token = this.shareTokens[share.id] ?? share.shareWith
+			this.loadingShareTokenId = share.id
+			this.savingShareTokens = {
+				...this.savingShareTokens,
+				[share.id]: true,
+			}
+
+			try {
+				const response = await axios.patch(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares/{shareId}', {
+						id: this.form.id,
+						shareId: share.id,
+					}),
+					{
+						keyValuePairs: {
+							token,
+						},
+					},
+				)
+
+				this.$emit('updateShare', {
+					...share,
+					id: OcsResponse2Data(response),
+					shareWith: token,
+				})
+			} catch (error) {
+				logger.error('Error while updating share token', {
+					error,
+					share,
+					token,
+				})
+				showError(
+					t('forms', 'There was an error while updating the link token'),
+				)
+			} finally {
+				this.savingShareTokens = {
+					...this.savingShareTokens,
+					[share.id]: false,
+				}
+				this.loadingShareTokenId = null
+			}
+		}, INPUT_DEBOUNCE_MS),
 
 		openQrDialog(share) {
 			this.qrDialogText = this.getPublicShareLink(share)

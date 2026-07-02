@@ -15,6 +15,7 @@ class Constants {
 	 */
 	public const CONFIG_KEY_ALLOWPERMITALL = 'allowPermitAll';
 	public const CONFIG_KEY_ALLOWPUBLICLINK = 'allowPublicLink';
+	public const CONFIG_KEY_ALLOWCUSTOMPUBLICTOKEN = 'allowCustomPublicShareTokens';
 	public const CONFIG_KEY_ALLOWSHOWTOALL = 'allowShowToAll';
 	public const CONFIG_KEY_CREATIONALLOWEDGROUPS = 'creationAllowedGroups';
 	public const CONFIG_KEY_RESTRICTCREATION = 'restrictCreation';
@@ -24,6 +25,7 @@ class Constants {
 	public const CONFIG_KEYS = [
 		self::CONFIG_KEY_ALLOWPERMITALL,
 		self::CONFIG_KEY_ALLOWPUBLICLINK,
+		self::CONFIG_KEY_ALLOWCUSTOMPUBLICTOKEN,
 		self::CONFIG_KEY_ALLOWSHOWTOALL,
 		self::CONFIG_KEY_CREATIONALLOWEDGROUPS,
 		self::CONFIG_KEY_RESTRICTCREATION,
@@ -34,12 +36,17 @@ class Constants {
 	public const CONFIG_KEY_TYPES = [
 		self::CONFIG_KEY_ALLOWPERMITALL => 'bool',
 		self::CONFIG_KEY_ALLOWPUBLICLINK => 'bool',
+		self::CONFIG_KEY_ALLOWCUSTOMPUBLICTOKEN => 'bool',
 		self::CONFIG_KEY_ALLOWSHOWTOALL => 'bool',
 		self::CONFIG_KEY_RESTRICTCREATION => 'bool',
 		self::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL => 'bool',
 		self::CONFIG_KEY_CREATIONALLOWEDGROUPS => 'array',
 		self::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT => 'int',
 	];
+
+	public const PUBLIC_SHARE_TOKEN_MIN_LENGTH = 1;
+	public const PUBLIC_SHARE_TOKEN_MAX_LENGTH = 256;
+	public const PUBLIC_SHARE_HASH_REQUIREMENT = '[a-zA-Z0-9]{' . self::PUBLIC_SHARE_TOKEN_MIN_LENGTH . ',' . self::PUBLIC_SHARE_TOKEN_MAX_LENGTH . '}';
 
 	/**
 	 * Maximum String lengths, the database is set to store.
