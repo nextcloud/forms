@@ -136,6 +136,8 @@ OC.L10N.register(
     "Share link" : "Jaa linkki",
     "Add link" : "Lisää linkki",
     "Embeddable link" : "Upotettava linkki",
+    "Generating…" : "Luodaan…",
+    "Generate new token" : "Luo uusi poletti",
     "Copy to clipboard" : "Kopioi leikepöydälle",
     "Show QR code" : "Näytä QR-koodi",
     "Copy embedding code" : "Kopioi upotuskoodi",
