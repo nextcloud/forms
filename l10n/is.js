@@ -54,6 +54,8 @@ OC.L10N.register(
     "Permissions" : "Heimildir",
     "Share link" : "Deila tengli",
     "Add link" : "Bæta við tengli",
+    "Generating…" : "Útbý…",
+    "Generate new token" : "Búa til nýtt teikn",
     "Copy to clipboard" : "Afrita á klippispjald",
     "Copy embedding code" : "Afrita ívafningarkóða",
     "Remove link" : "Fjarlægja tengil",
