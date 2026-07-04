@@ -32,6 +32,8 @@ OC.L10N.register(
     "Team" : "Каманда",
     "Permissions" : "Дазволы",
     "Share link" : "Абагуліць спасылку",
+    "Share link token" : "Токен абагуленай спасылкі",
+    "Generate new token" : "Згенерыраваць новы токен",
     "Copy to clipboard" : "Капіяваць у буфер абмену",
     "Remove link" : "Выдаліць спасылку",
     "Internal link" : "Унутраная спасылка",
