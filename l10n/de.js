@@ -235,7 +235,7 @@ OC.L10N.register(
     "Embeddable link" : "Einbettbarer Link",
     "Embeddable link token" : "Einbettbarer Link-Token",
     "Share link token" : "Link-Token teilen",
-    "Set the public share link token to something easy to remember or generate a new token." : "Lege für den öffentlichen Freigabelink ein leicht zu merkendes Token fest oder generiere ein neues Token.",
+    "Set the public share link token to something easy to remember or generate a new token." : "Für den öffentlichen Freigabelink ein leicht zu merkendes Token festLegen oder ein neues Token generieren.",
     "Generating…" : "Generieren …",
     "Generate new token" : "Neues Token generieren",
     "Copy to clipboard" : "In die Zwischenablage kopieren",
