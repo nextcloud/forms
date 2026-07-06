@@ -24,6 +24,13 @@ export interface Sharee {
 	status?: unknown
 }
 
+export interface SearchResultsResponse {
+	exact: Sharee[]
+	users?: Sharee[]
+	groups?: Sharee[]
+	[key: string]: Sharee[] | undefined
+}
+
 export interface FormattedSharee {
 	shareWith: string
 	shareType: number
@@ -151,7 +158,7 @@ export default defineComponent({
 					},
 				)
 
-				const data = OcsResponse2Data(request) as any
+				const data = OcsResponse2Data<SearchResultsResponse>(request)
 				const exact = data.exact
 				delete data.exact // removing exact from general results
 
@@ -184,7 +191,7 @@ export default defineComponent({
 				)
 
 				this.recommendations = this.formatSearchResults(
-					(OcsResponse2Data(request) as any).exact,
+					OcsResponse2Data<SearchResultsResponse>(request).exact,
 				)
 			} catch (error) {
 				logger.error('Fetching recommendations failed.', { error })
@@ -199,7 +206,7 @@ export default defineComponent({
 		 * @param results Results as returned by search
 		 * @return results as we use them on storage
 		 */
-		formatSearchResults(results: Record<string, Sharee>): FormattedSharee[] {
+		formatSearchResults(results: Record<string, Sharee[]>): FormattedSharee[] {
 			// flatten array of arrays
 			const flatResults = Object.values(results).flat()
 

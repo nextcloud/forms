@@ -10,7 +10,6 @@ export default [
 	...recommended,
 	eslintPluginPrettierRecommended,
 	{
-		files: ['**/*.ts', '**/*.tsx'],
 		rules: {
 			'@stylistic/exp-list-style': 'off',
 		},

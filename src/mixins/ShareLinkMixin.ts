@@ -88,9 +88,10 @@ export default defineComponent({
 		/**
 		 * Copy code to embed public share inside external websites
 		 *
+		 * @param event Origin event of function call.
 		 * @param share Public link-share
 		 */
-		async copyEmbeddingCode(share: Share): Promise<void> {
+		async copyEmbeddingCode(event: Event, share: Share): Promise<void> {
 			const code = `<iframe src="${this.getPublicShareLink(share)}" width="750" height="900"></iframe>`
 			try {
 				await navigator.clipboard.writeText(code)
@@ -100,8 +101,7 @@ export default defineComponent({
 				logger.error('Copy embedding code failed', { error })
 			}
 			// Set back focus as clipboard removes focus
-
-			;(event as any).target.focus()
+			;(event.target as HTMLElement).focus()
 		},
 	},
 })

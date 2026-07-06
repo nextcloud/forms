@@ -125,7 +125,7 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwit
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
 export default {
 	name: 'QuestionLinearScale',
