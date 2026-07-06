@@ -100,7 +100,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import UserSearchMixin from '../../mixins/UserSearchMixin.js'
+import UserSearchMixin from '../../mixins/UserSearchMixin.ts'
 import logger from '../../utils/Logger.ts'
 
 export default {

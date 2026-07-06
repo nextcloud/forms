@@ -239,8 +239,8 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
-import ViewsMixin from '../mixins/ViewsMixin.js'
-import answerTypes from '../models/AnswerTypes.js'
+import ViewsMixin from '../mixins/ViewsMixin.ts'
+import answerTypes from '../models/AnswerTypes.ts'
 import {
 	FormState,
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,

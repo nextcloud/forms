@@ -41,7 +41,7 @@ import { useIsMobile } from '@nextcloud/vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PillMenu from './PillMenu.vue'
-import PermissionTypes from '../mixins/PermissionTypes.js'
+import PermissionTypes from '../mixins/PermissionTypes.ts'
 import logger from '../utils/Logger.ts'
 
 const submitView = {

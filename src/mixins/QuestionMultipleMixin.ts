@@ -50,8 +50,7 @@ export default defineComponent({
 
 		isLastEmpty(): boolean {
 			const value = this.options[this.options.length - 1] as
-				| FormsOption
-				| undefined
+				FormsOption | undefined
 			return value?.text?.trim?.().length === 0
 		},
 

@@ -19,8 +19,8 @@
     "dev:watch": "NODE_OPTIONS='--max-old-space-size=4096' npx vite --mode development build --watch",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint": "eslint --ext .js,.vue src",
-    "lint:fix": "eslint --ext .js,.vue src --fix",
+    "lint": "eslint --ext .js,.ts,.vue src",
+    "lint:fix": "eslint --ext .js,.ts,.vue src --fix",
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs",
     "stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
     "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"

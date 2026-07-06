@@ -23,7 +23,7 @@
 
 <script>
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
-import UserSearchMixin from '../../mixins/UserSearchMixin.js'
+import UserSearchMixin from '../../mixins/UserSearchMixin.ts'
 
 export default {
 	components: {

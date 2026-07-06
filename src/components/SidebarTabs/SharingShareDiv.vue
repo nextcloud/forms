@@ -54,8 +54,8 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAvatar from '@nextcloud/vue/components/NcAvatar'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
-import PermissionTypes from '../../mixins/PermissionTypes.js'
-import ShareTypes from '../../mixins/ShareTypes.js'
+import PermissionTypes from '../../mixins/PermissionTypes.ts'
+import ShareTypes from '../../mixins/ShareTypes.ts'
 
 export default {
 	components: {

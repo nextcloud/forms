@@ -183,7 +183,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
 

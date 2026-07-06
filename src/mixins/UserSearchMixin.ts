@@ -1,66 +1,108 @@
-import { getCurrentUser } from '@nextcloud/auth'
-import axios from '@nextcloud/axios'
 /**
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { getCurrentUser } from '@nextcloud/auth'
+import axios from '@nextcloud/axios'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
+import { defineComponent } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import ShareTypes from './ShareTypes.ts'
 
-export default {
+export interface Sharee {
+	label: string
+	shareWithDisplayNameUnique: string
+	value: {
+		shareType: number
+		shareWith: string
+	}
+	status?: unknown
+}
+
+export interface FormattedSharee {
+	shareWith: string
+	shareType: number
+	user: string
+	isNoUser: boolean
+	id: string
+	displayName: string
+	subname: string
+	iconSvg: string
+	key: string
+}
+
+export interface UserSearchMixinData {
+	loading: boolean
+	query: string
+	maxAutocompleteResults: number
+	minSearchStringLength: number
+	recommendations: FormattedSharee[]
+	suggestions: FormattedSharee[]
+}
+
+export default defineComponent({
+	name: 'UserSearchMixin',
+
 	mixins: [ShareTypes],
-	data() {
+
+	data(): UserSearchMixinData {
 		return {
 			loading: false,
 
 			query: '',
 			// TODO: have a global mixin for this, shared with server?
 			maxAutocompleteResults:
-				parseInt(OC.config['sharing.maxAutocompleteResults'], 10) || 200,
+				parseInt(
+					(window as any).OC.config['sharing.maxAutocompleteResults'],
+					10,
+				) || 200,
 			minSearchStringLength:
-				parseInt(OC.config['sharing.minSearchStringLength'], 10) || 0,
+				parseInt(
+					(window as any).OC.config['sharing.minSearchStringLength'],
+					10,
+				) || 0,
 			// Search Results
 			recommendations: [],
 			suggestions: [],
 		}
 	},
+
 	computed: {
 		/**
 		 * Is the search query valid ?
-		 *
-		 * @return {boolean}
 		 */
-		isValidQuery() {
+		isValidQuery(): boolean {
 			return (
 				this.query
 				&& this.query.trim() !== ''
 				&& this.query.length > this.minSearchStringLength
 			)
 		},
+
 		/**
 		 * Text when there is no Results to be shown
-		 *
-		 * @return {string}
 		 */
-		noResultText() {
+		noResultText(): string {
 			if (!this.query) {
 				return t('forms', 'No recommendations. Start typing.')
 			}
 			return t('forms', 'No elements found.')
 		},
 	},
+
 	methods: {
 		/**
 		 * Search for suggestions
 		 *
-		 * @param {string} query The search query to search for
-		 * @param {number[]|undefined} shareType The type of recipient to search.
+		 * @param query The search query to search for
+		 * @param shareType The type of recipient to search.
 		 */
-		async asyncSearch(query, shareType) {
+		async asyncSearch(query: string, shareType?: number[]): Promise<void> {
 			// save query to check if valid
 			this.query = query.trim()
 			if (this.isValidQuery) {
@@ -72,25 +114,27 @@ export default {
 
 		/**
 		 * Debounce getSuggestions
-		 *
-		 * @param {...*} args arguments to pass
 		 */
-		debounceGetSuggestions: debounce(function (...args) {
+		debounceGetSuggestions: debounce(function (
+			this: any,
+			...args: [string, number[] | undefined]
+		) {
 			this.getSuggestions(...args)
 		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Get suggestions
 		 *
-		 * @param {string} query the search query
-		 * @param {number[]|undefined} shareType The type of recipient to search.
+		 * @param query the search query
+		 * @param shareType The type of recipient to search.
 		 */
-		async getSuggestions(query, shareType) {
+		async getSuggestions(query: string, shareType?: number[]): Promise<void> {
 			this.loading = true
 
 			// Search for all used share-types, except public link.
-			shareType ??= this.SHARE_TYPES_USED.filter(
-				(type) => type !== this.SHARE_TYPES.SHARE_TYPE_LINK,
+
+			shareType ??= (this as any).SHARE_TYPES_USED.filter(
+				(type: number) => type !== (this as any).SHARE_TYPES.SHARE_TYPE_LINK,
 			)
 
 			try {
@@ -107,7 +151,7 @@ export default {
 					},
 				)
 
-				const data = OcsResponse2Data(request)
+				const data = OcsResponse2Data(request) as any
 				const exact = data.exact
 				delete data.exact // removing exact from general results
 
@@ -125,7 +169,7 @@ export default {
 		/**
 		 * Get the sharing recommendations
 		 */
-		async getRecommendations() {
+		async getRecommendations(): Promise<void> {
 			this.loading = true
 
 			try {
@@ -140,7 +184,7 @@ export default {
 				)
 
 				this.recommendations = this.formatSearchResults(
-					OcsResponse2Data(request).exact,
+					(OcsResponse2Data(request) as any).exact,
 				)
 			} catch (error) {
 				logger.error('Fetching recommendations failed.', { error })
@@ -148,19 +192,14 @@ export default {
 				this.loading = false
 			}
 		},
-		/**
-		 * A OCS Sharee response
-		 *
-		 * @typedef {{label: string, shareWithDisplayNameUnique: string, value: { shareType: number, shareWith: string }, status?: unknown }} Sharee
-		 */
 
 		/**
 		 * Format search results
 		 *
-		 * @param {Record<string, Sharee>} results Results as returned by search
-		 * @return {Sharee[]} results as we use them on storage
+		 * @param results Results as returned by search
+		 * @return results as we use them on storage
 		 */
-		formatSearchResults(results) {
+		formatSearchResults(results: Record<string, Sharee>): FormattedSharee[] {
 			// flatten array of arrays
 			const flatResults = Object.values(results).flat()
 
@@ -176,10 +215,10 @@ export default {
 		 * Remove static unwanted shares from search results
 		 * Existing shares must be done dynamically to account for new shares.
 		 *
-		 * @param {Sharee[]} shares the array of share objects
-		 * @return {Sharee[]}
+		 * @param shares the array of share objects
+		 * @return
 		 */
-		filterUnwantedShares(shares) {
+		filterUnwantedShares(shares: Sharee[]): Sharee[] {
 			return shares.filter((share) => {
 				// only use proper objects
 				if (typeof share !== 'object') {
@@ -188,8 +227,10 @@ export default {
 
 				try {
 					// filter out current user
+
 					if (
-						share.value.shareType === this.SHARE_TYPES.SHARE_TYPE_USER
+						share.value.shareType
+							=== (this as any).SHARE_TYPES.SHARE_TYPE_USER
 						&& share.value.shareWith === getCurrentUser().uid
 					) {
 						return false
@@ -206,22 +247,26 @@ export default {
 		/**
 		 * Format shares for the multiselect options
 		 *
-		 * @param {Sharee} share Share in search formatting
-		 * @return {object} Share in multiselect formatting
+		 * @param share Share in search formatting
+		 * @return Share in multiselect formatting
 		 */
-		formatForMultiselect(share) {
+		formatForMultiselect(share: Sharee): FormattedSharee {
 			return {
 				shareWith: share.value.shareWith,
 				shareType: share.value.shareType,
 				user: share.value.shareWith,
-				isNoUser: share.value.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER,
+
+				isNoUser:
+					share.value.shareType
+					!== (this as any).SHARE_TYPES.SHARE_TYPE_USER,
 				id: share.value.shareWith,
 				displayName: share.label,
 				subname: share.shareWithDisplayNameUnique,
-				iconSvg: this.shareTypeToIcon(share.value.shareType),
+
+				iconSvg: (this as any).shareTypeToIcon(share.value.shareType),
 				// Vue unique binding to render within Multiselect's AvatarSelectOption
 				key: share.value.shareWith + '-' + share.value.shareType,
 			}
 		},
 	},
-}
+})
