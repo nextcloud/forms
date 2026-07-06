@@ -37,6 +37,7 @@ OC.L10N.register(
     "Allow sharing to all logged in accounts" : "Sta delen met alle ingelogde accounts toe",
     "Comments" : "Reacties",
     "Allow comments" : "Reageren toestaan",
+    "Grid" : "Raster",
     "Delete form" : "Verwijderen formulier",
     "Are you sure you want to delete {title}?" : "Weet je zeker dat je {title} wilt verwijderen?",
     "Cancel" : "Annuleren",
