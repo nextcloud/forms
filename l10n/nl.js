@@ -57,6 +57,7 @@ OC.L10N.register(
     "Delete question" : "Verwijder vraag",
     "Maximum file size" : "Maximale bestandsgrootte",
     "Delete" : "Verwijder",
+    "Uploading …" : "Uploaden …",
     "Checkbox" : "Aanvinkvakje",
     "Number" : "Nummer",
     "Text" : "Tekst",
