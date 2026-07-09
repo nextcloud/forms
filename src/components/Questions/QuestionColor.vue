@@ -51,7 +51,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
 export default {
 	name: 'QuestionColor',

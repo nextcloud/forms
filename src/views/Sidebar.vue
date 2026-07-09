@@ -69,9 +69,9 @@ import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
 import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
-import PermissionTypes from '../mixins/PermissionTypes.js'
-import ViewsMixin from '../mixins/ViewsMixin.js'
-import logger from '../utils/Logger.js'
+import PermissionTypes from '../mixins/PermissionTypes.ts'
+import ViewsMixin from '../mixins/ViewsMixin.ts'
+import logger from '../utils/Logger.ts'
 
 export default {
 	// eslint-disable-next-line vue/multi-word-component-names

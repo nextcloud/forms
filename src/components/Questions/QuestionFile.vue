@@ -172,10 +172,10 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
-import fileTypes from '../../models/FileTypes.js'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
+import fileTypes from '../../models/FileTypes.ts'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
 /**
  * A constant object representing file size units in bytes.

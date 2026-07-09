@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getCurrentUser } from '@nextcloud/auth'
 import axios, { isCancel } from '@nextcloud/axios'
@@ -10,11 +11,74 @@ import { emit } from '@nextcloud/event-bus'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import MarkdownIt from 'markdown-it'
-import CancelableRequest from '../utils/CancelableRequest.js'
-import logger from '../utils/Logger.js'
-import OcsResponse2Data from '../utils/OcsResponse2Data.js'
+import { defineComponent } from 'vue'
+import CancelableRequest from '../utils/CancelableRequest.ts'
+import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 
-export default {
+/** Form share permission types */
+interface FormsShare {
+	shareType: number
+	permissions?: string[]
+	shareWith?: string
+}
+
+/** Form question structure */
+interface FormsQuestion {
+	id: number
+	text: string
+	type: string
+	order: number
+	options?: any[]
+	[key: string]: any
+}
+
+/** Complete form structure as returned from API */
+interface FormsForm {
+	id: number
+	hash: string
+	title: string
+	description: string
+	ownerId: string
+	created: number
+	access: any
+	expires: number
+	fileFormat?: string | null
+	fileId?: number | null
+	filePath?: string | null
+	isAnonymous: boolean
+	isMaxSubmissionsReached: boolean
+	lastUpdated: number
+	submitMultiple: boolean
+	allowEditSubmissions: boolean
+	showExpiration: boolean
+	canSubmit: boolean
+	permissions: string[]
+	questions: FormsQuestion[]
+	state: 0 | 1 | 2
+	lockedBy?: string | null
+	lockedUntil?: number | null
+	maxSubmissions?: number | null
+	shares: FormsShare[]
+	submissionCount?: number
+	submissionMessage?: string | null
+	confirmationEmailEnabled: boolean
+	confirmationEmailSubject?: string | null
+	confirmationEmailBody?: string | null
+	confirmationEmailQuestionId?: number | null
+	allowComments: boolean
+}
+
+/** ViewsMixin data interface */
+interface ViewsMixinData {
+	isLoadingForm: boolean
+	cancelFetchFullForm: (reason?: string) => void
+	markdownit: MarkdownIt
+}
+
+export default defineComponent({
+	name: 'ViewsMixin',
+
 	provide() {
 		return {
 			$markdownit: this.markdownit,
@@ -27,7 +91,7 @@ export default {
 			default: '',
 		},
 		form: {
-			type: Object,
+			type: Object as () => FormsForm,
 			required: true,
 		},
 		publicView: {
@@ -40,7 +104,7 @@ export default {
 		},
 	},
 
-	data() {
+	data(): ViewsMixinData {
 		return {
 			// State-Variable
 			isLoadingForm: true,
@@ -56,17 +120,15 @@ export default {
 	computed: {
 		/**
 		 * Return form title, or placeholder if not set
-		 *
-		 * @return {string}
 		 */
-		formTitle() {
+		formTitle(): string {
 			if (this.form.title) {
 				return this.form.title
 			}
 			return t('forms', 'New form')
 		},
 
-		formDescription() {
+		formDescription(): string {
 			// Remember the old renderer if overridden, or proxy to the default renderer.
 			const defaultRender =
 				this.markdownit.renderer.rules.link_open
@@ -94,35 +156,35 @@ export default {
 			)
 		},
 
-		isFormLocked() {
+		isFormLocked(): boolean {
 			return (
 				this.form.lockedUntil === 0
-				|| (this.form.lockedUntil > moment().unix()
+				|| (this.form.lockedUntil! > moment().unix()
 					&& this.form.lockedBy !== getCurrentUser().uid)
 			)
 		},
 	},
 
 	methods: {
-		onShareForm() {
+		onShareForm(): void {
 			this.$emit('open-sharing', this.form.hash)
 		},
 
 		/**
 		 * Focus title after form load
 		 */
-		focusTitle() {
+		focusTitle(): void {
 			this.$nextTick(() => {
-				this.$refs.title?.focus()
+				;(this.$refs.title as any)?.focus()
 			})
 		},
 
 		/**
 		 * Fetch the full form data and update parent
 		 *
-		 * @param {number} id the unique form hash
+		 * @param id the unique form hash
 		 */
-		async fetchFullForm(id) {
+		async fetchFullForm(id: number): Promise<void> {
 			this.isLoadingForm = true
 
 			// Cancel previous request
@@ -132,11 +194,12 @@ export default {
 			logger.debug(`Loading form ${id}`)
 
 			// Create new cancelable get request
-			const { request, cancel } = CancelableRequest(
-				async function (url, requestOptions) {
-					return axios.get(url, requestOptions)
-				},
-			)
+			const { request, cancel } = CancelableRequest(async function (
+				url: string,
+				requestOptions?: any,
+			) {
+				return axios.get(url, requestOptions)
+			})
 			// Store cancel-function
 			this.cancelFetchFullForm = cancel
 
@@ -162,7 +225,7 @@ export default {
 			}
 		},
 
-		async saveFormProperty(key) {
+		async saveFormProperty(key: string): Promise<void> {
 			try {
 				// TODO: add loading status feedback ?
 				await axios.patch(
@@ -171,7 +234,7 @@ export default {
 					}),
 					{
 						keyValuePairs: {
-							[key]: this.form[key],
+							[key]: this.form[key as keyof FormsForm],
 						},
 					},
 				)
@@ -182,4 +245,4 @@ export default {
 			}
 		},
 	},
-}
+})

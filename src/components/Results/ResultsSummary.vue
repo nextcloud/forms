@@ -159,7 +159,7 @@
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import { generateUrl } from '@nextcloud/router'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
-import answerTypes from '../../models/AnswerTypes.js'
+import answerTypes from '../../models/AnswerTypes.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
 
 export default {

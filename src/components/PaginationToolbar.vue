@@ -146,7 +146,7 @@ export default {
 }
 
 .selected-page {
-	padding-left: 5px;
+	padding-inline-start: 5px;
 
 	display: inline-flex;
 	align-items: center;

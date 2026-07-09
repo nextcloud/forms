@@ -2,6 +2,9 @@
  * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import type { Component } from 'vue'
 
 import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
 import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
@@ -29,44 +32,47 @@ import QuestionRanking from '../components/Questions/QuestionRanking.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import { OptionType } from './Constants.ts'
 
-/**
- * @typedef {object} AnswerTypes
- * @property {string} multiple Checkbox Answer
- * @property {string} multiple_unique Radio buttons Answer
- * @property {string} dropdown Dropdown Answer
- * @property {string} short Short Text Answer
- * @property {string} long Long Text Answer
- * @property {string} date Date Answer
- * @property {string} datetime Date and Time Answer
- * @property {string} time Time Answer
- * @property {string} linearscale Linear Scale Answer
- * @property {string} color Color Answer
- */
-export default {
-	/**
-	 * !! Keep in SYNC with lib/Constants.php for props that are necessary on php !!
-	 * Specifying Question-Models in a common place
-	 * Further type-specific parameters are possible.
-	 *
-	 * @property {object} component The vue-component this answer-type relies on
-	 * @property {string} icon The icon corresponding to this answer-type
-	 * @property {string} label The answer-type label, that users will see as answer-type.
-	 * @property {boolean} predefined SYNC This AnswerType has/needs predefined Options.
-	 * @property {Function} validate *optional* Define conditions where this question is not ok
-	 * @property {string} titlePlaceholder The placeholder users see as empty question-title in edit-mode
-	 * @property {string} createPlaceholder *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field
-	 * @property {string} createPlaceholderRange *optional* The placeholder that is visible in edit-mode, to indicate a submission form-input field for date fields that use a date range
-	 * @property {string} submitPlaceholder *optional* The placeholder that is visible in submit-mode, to indicate a form input-field
-	 * @property {string} submitPlaceholderRange *optional* The placeholder that is visible in submit-mode, to indicate a form input-field for date fields that use a date range
-	 * @property {string} warningInvalid The warning users see in edit mode, if the question is invalid.
-	 */
+export interface AnswerTypeSubtype {
+	icon: string
+	label: string
+	extraSettings: {
+		questionType: string
+	}
+}
 
+export interface AnswerTypeConfig {
+	component: Component
+	icon: string
+	label: string
+	predefined?: boolean
+	validate?: (question: unknown) => boolean
+	titlePlaceholder: string
+	createPlaceholder?: string
+	createPlaceholderRange?: string
+	submitPlaceholder?: string
+	submitPlaceholderRange?: string
+	warningInvalid: string
+	unique?: boolean
+	subtypes?: Record<string, AnswerTypeSubtype>
+	pickerType?: string
+	storageFormat?: string
+	momentFormat?: string
+}
+
+/**
+ * !! Keep in SYNC with lib/Constants.php for props that are necessary on php !!
+ * Specifying Question-Models in a common place
+ * Further type-specific parameters are possible.
+ */
+const answerTypes: Record<string, AnswerTypeConfig> = {
 	multiple: {
 		component: markRaw(QuestionMultiple),
 		icon: IconCheckboxOutline,
 		label: t('forms', 'Checkboxes'),
 		predefined: true,
-		validate: (question) => question.options.length > 0,
+		validate: (question: unknown) => {
+			return (question as any).options.length > 0
+		},
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
 		createPlaceholder: t('forms', 'People can submit a different answer'),
@@ -82,7 +88,9 @@ export default {
 		icon: IconRadioboxMarked,
 		label: t('forms', 'Radio buttons'),
 		predefined: true,
-		validate: (question) => question.options.length > 0,
+		validate: (question: unknown) => {
+			return (question as any).options.length > 0
+		},
 
 		titlePlaceholder: t('forms', 'Radio buttons question title'),
 		createPlaceholder: t('forms', 'People can submit a different answer'),
@@ -101,7 +109,9 @@ export default {
 		icon: IconArrowDownDropCircleOutline,
 		label: t('forms', 'Dropdown'),
 		predefined: true,
-		validate: (question) => question.options.length > 0,
+		validate: (question: unknown) => {
+			return (question as any).options.length > 0
+		},
 
 		titlePlaceholder: t('forms', 'Dropdown question title'),
 		createPlaceholder: t('forms', 'People can pick one option'),
@@ -152,13 +162,14 @@ export default {
 			},
 		},
 
-		validate: (question) => {
+		validate: (question: unknown) => {
+			const q = question as any
 			return (
-				question.options.filter(
-					(option) => option.optionType === OptionType.Column,
+				q.options.filter(
+					(option: any) => option.optionType === OptionType.Column,
 				).length > 0
-				&& question.options.filter(
-					(option) => option.optionType === OptionType.Row,
+				&& q.options.filter(
+					(option: any) => option.optionType === OptionType.Row,
 				).length > 0
 			)
 		},
@@ -272,7 +283,9 @@ export default {
 		icon: IconSwapVertical,
 		label: t('forms', 'Ranking'),
 		predefined: true,
-		validate: (question) => question.options.length > 0,
+		validate: (question: unknown) => {
+			return (question as any).options.length > 0
+		},
 
 		titlePlaceholder: t('forms', 'Ranking question title'),
 		createPlaceholder: t('forms', 'People can rank options'),
@@ -283,3 +296,5 @@ export default {
 		),
 	},
 }
+
+export default answerTypes

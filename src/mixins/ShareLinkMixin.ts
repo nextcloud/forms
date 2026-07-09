@@ -1,20 +1,31 @@
-import { showError, showSuccess } from '@nextcloud/dialogs'
 /**
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import { generateUrl } from '@nextcloud/router'
-import logger from '../utils/Logger.js'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-export default {
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { generateUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
+import logger from '../utils/Logger.ts'
+
+export interface Share {
+	shareType: number
+	permissions?: string[]
+	shareWith?: string
+}
+
+export default defineComponent({
+	name: 'ShareLinkMixin',
+
 	methods: {
 		/**
 		 * Get the internal link for sharing the form
 		 *
-		 * @param {string} formHash Internal form hash
-		 * @return {string} link
+		 * @param formHash Internal form hash
+		 * @return link
 		 */
-		getInternalShareLink(formHash) {
+		getInternalShareLink(formHash: string): string {
 			return (
 				window.location.protocol
 				+ '//'
@@ -26,12 +37,13 @@ export default {
 		/**
 		 * Get the publish share link for a given share
 		 *
-		 * @param {object} share The share
-		 * @return {string} link
+		 * @param share The share
+		 * @return link
 		 */
-		getPublicShareLink(share) {
+		getPublicShareLink(share: Share): string {
 			let url
-			if (this.isEmbeddingAllowed(share)) {
+
+			if ((this as any).isEmbeddingAllowed(share)) {
 				url = generateUrl(`/apps/forms/embed/${share.shareWith}`)
 			} else {
 				url = generateUrl(`/apps/forms/s/${share.shareWith}`)
@@ -42,13 +54,14 @@ export default {
 		/**
 		 * Check if a share can be used for embedding
 		 *
-		 * @param {{ shareType: number, permissions: string[] }} share The share to check
+		 * @param share The share to check
 		 */
-		isEmbeddingAllowed(share) {
+		isEmbeddingAllowed(share: Share): boolean {
+			const self = this as any
 			return (
-				share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK
+				share.shareType === self.SHARE_TYPES.SHARE_TYPE_LINK
 				&& share.permissions?.includes(
-					this.PERMISSION_TYPES.PERMISSION_EMBED,
+					self.PERMISSION_TYPES.PERMISSION_EMBED,
 				)
 			)
 		},
@@ -56,10 +69,10 @@ export default {
 		/**
 		 * Copy link to clipboard.
 		 *
-		 * @param {object} event Origin event of function call.
-		 * @param {string} link Link to copy
+		 * @param event Origin event of function call.
+		 * @param link Link to copy
 		 */
-		async copyLink(event, link) {
+		async copyLink(event: Event, link: string): Promise<void> {
 			// Copy link, boolean return indicates success or fail.
 			try {
 				await navigator.clipboard.writeText(link)
@@ -69,15 +82,16 @@ export default {
 				logger.error('Copy link failed', { error })
 			}
 			// Set back focus as clipboard removes focus
-			event.target.focus()
+			;(event.target as HTMLElement).focus()
 		},
 
 		/**
 		 * Copy code to embed public share inside external websites
 		 *
-		 * @param {object} share Public link-share
+		 * @param event Origin event of function call.
+		 * @param share Public link-share
 		 */
-		async copyEmbeddingCode(share) {
+		async copyEmbeddingCode(event: Event, share: Share): Promise<void> {
 			const code = `<iframe src="${this.getPublicShareLink(share)}" width="750" height="900"></iframe>`
 			try {
 				await navigator.clipboard.writeText(code)
@@ -87,7 +101,7 @@ export default {
 				logger.error('Copy embedding code failed', { error })
 			}
 			// Set back focus as clipboard removes focus
-			event.target.focus()
+			;(event.target as HTMLElement).focus()
 		},
 	},
-}
+})

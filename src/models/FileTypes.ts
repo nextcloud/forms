@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { translate as t } from '@nextcloud/l10n'
+export interface FileTypeConfig {
+	label: string
+}
+
 // !! Keep in SYNC with lib/Constants.php for supported file types \OCA\Forms\Constants::EXTRA_SETTINGS_ALLOWED_FILE_TYPES !!
-export default {
+const fileTypes: Record<string, FileTypeConfig> = {
 	image: {
 		label: t('forms', 'Image'),
 	},
@@ -19,3 +22,5 @@ export default {
 		label: t('forms', 'Spreadsheet'),
 	},
 }
+
+export default fileTypes

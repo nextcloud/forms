@@ -210,7 +210,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
 import { OptionType } from '../../models/Constants.ts'
 

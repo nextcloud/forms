@@ -170,10 +170,10 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import Sidebar from './views/Sidebar.vue'
 import FormsIcon from '../img/forms-dark.svg?raw'
-import PermissionTypes from './mixins/PermissionTypes.js'
+import PermissionTypes from './mixins/PermissionTypes.ts'
 import { FormState } from './models/Constants.ts'
-import logger from './utils/Logger.js'
-import OcsResponse2Data from './utils/OcsResponse2Data.js'
+import logger from './utils/Logger.ts'
+import OcsResponse2Data from './utils/OcsResponse2Data.ts'
 
 const appName = 'forms'
 

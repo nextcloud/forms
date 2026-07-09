@@ -288,7 +288,7 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
-import ShareTypes from '../../mixins/ShareTypes.js'
+import ShareTypes from '../../mixins/ShareTypes.ts'
 import { FormState } from '../../models/Constants.ts'
 
 export default {

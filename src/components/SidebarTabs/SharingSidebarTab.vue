@@ -108,7 +108,7 @@
 					</NcActionButton>
 					<NcActionButton
 						v-if="isEmbeddable"
-						@click="copyEmbeddingCode(share)">
+						@click="copyEmbeddingCode($event, share)">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconCodeBrackets" />
 						</template>
@@ -263,12 +263,12 @@ import QRDialog from '../QRDialog.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import FormsIcon from '../../../img/forms-dark.svg?raw'
-import PermissionTypes from '../../mixins/PermissionTypes.js'
-import ShareLinkMixin from '../../mixins/ShareLinkMixin.js'
-import ShareTypes from '../../mixins/ShareTypes.js'
+import PermissionTypes from '../../mixins/PermissionTypes.ts'
+import ShareLinkMixin from '../../mixins/ShareLinkMixin.ts'
+import ShareTypes from '../../mixins/ShareTypes.ts'
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
-import logger from '../../utils/Logger.js'
-import OcsResponse2Data from '../../utils/OcsResponse2Data.js'
+import logger from '../../utils/Logger.ts'
+import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
 export default {
 	components: {

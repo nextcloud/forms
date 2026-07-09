@@ -86,10 +86,10 @@ import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
-import validationTypes from '../../models/ValidationTypes.js'
-import { splitRegex, validateExpression } from '../../utils/RegularExpression.js'
+import validationTypes from '../../models/ValidationTypes.ts'
+import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
 
 export default {
 	name: 'QuestionShort',

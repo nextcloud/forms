@@ -39,7 +39,7 @@
 
 <script>
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
 export default {
 	name: 'QuestionLong',

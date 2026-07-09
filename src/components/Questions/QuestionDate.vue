@@ -119,7 +119,7 @@ import svgClockLoader20 from '../../../img/clock_loader_20.svg?raw'
 import svgClockLoader80 from '../../../img/clock_loader_80.svg?raw'
 import svgEventIcon from '../../../img/event.svg?raw'
 import svgTodayIcon from '../../../img/today.svg?raw'
-import QuestionMixin from '../../mixins/QuestionMixin.js'
+import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
 export default {
 	name: 'QuestionDate',
