@@ -30,6 +30,10 @@
 - **🔒 Data under your control!** Unlike in Google Forms, Typeform, Doodle and others, the survey info and responses are kept private on your instance.
 - **🙋 Get involved!** We have lots of stuff planned like more question types, collaboration on forms, [and much more](https://github.com/nextcloud/forms/milestones)!
 
+## Webhook support
+
+See the [Nextcloud Server Administration Guide](https://docs.nextcloud.com/server/stable/admin_manual/webhook_listeners/index.html#forms-app-events) to find information on which Forms events are available to be used with webhooks and how to configure them.
+
 ## 🏗 Development setup
 
 1. ☁ Clone this app into the `apps` folder of your Nextcloud: `git clone https://github.com/nextcloud/forms.git`
