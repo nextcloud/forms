@@ -239,6 +239,7 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
+import PermissionTypes from '../mixins/PermissionTypes.ts'
 import ViewsMixin from '../mixins/ViewsMixin.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import {
@@ -268,7 +269,7 @@ export default {
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	mixins: [PermissionTypes, ViewsMixin],
 
 	/*
 	 * This is used to confirm that the user wants to leave the page
@@ -551,7 +552,13 @@ export default {
 		}
 
 		if (this.isLoggedIn) {
-			if (this.submissionId && this.form.allowEditSubmissions) {
+			if (
+				this.submissionId
+				&& (this.form.allowEditSubmissions
+					|| this.form.permissions.includes(
+						this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+					))
+			) {
 				this.fetchSubmission()
 			} else {
 				this.initFromLocalStorage()

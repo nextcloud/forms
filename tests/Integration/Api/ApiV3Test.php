@@ -193,10 +193,22 @@ class ApiV3Test extends IntegrationBase {
 				'shares' => [
 					[
 						'shareType' => 0,
-						'shareWith' => 'user2',
+						'shareWith' => 'test',
+						'permissions' => ['results', 'results_delete'],
 					],
 				],
-				'submissions' => []
+				'submissions' => [
+					[
+						'userId' => 'someUser',
+						'timestamp' => 123456,
+						'answers' => [
+							[
+								'questionIndex' => 0,
+								'text' => 'Answer from form owner'
+							]
+						]
+					],
+				]
 			],
 			[
 				'hash' => 'zyxwvutsrq654321',
@@ -342,11 +354,13 @@ class ApiV3Test extends IntegrationBase {
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => [
-							'submit'
+							'results',
+							'results_delete',
 						],
 						'partial' => true,
 						'lockedBy' => null,
 						'lockedUntil' => null,
+						'submissionCount' => 1,
 					],
 				]
 			]
@@ -1612,5 +1626,97 @@ CSV
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals('user1', $data);
+	}
+
+	/**
+	 * Test editing submissions with RESULTS_DELETE permission
+	 */
+	public function testUpdateSubmission_formOwnerEditsOthersSubmission() {
+		// Test that a user with RESULTS_DELETE permission (but not owner) can edit another user's submission
+		// Form 1 is owned by 'someUser' but shared with 'test' (the auth user) with RESULTS_DELETE permission
+		$formId = $this->testForms[1]['id'];
+		$submissionId = $this->testForms[1]['submissions'][0]['id'];
+
+		// Update the submission as 'test' who has RESULTS_DELETE permission via share
+		$resp = $this->http->request('PUT', "api/v3/forms/{$formId}/submissions/{$submissionId}", [
+			'json' => [
+				'answers' => [
+					$this->testForms[1]['questions'][0]['id'] => ['Edited by RESULTS_DELETE user'],
+				]
+			]
+		]);
+
+		// Should succeed - 'test' has RESULTS_DELETE permission via share
+		$this->assertEquals(200, $resp->getStatusCode());
+		$data = $this->OcsResponse2Data($resp);
+		$this->assertEquals($submissionId, $data);
+	}
+
+	/**
+	 * Test that form owner can edit submissions when allowEditSubmissions is enabled
+	 */
+	public function testUpdateSubmission_userEditsOwnSubmission() {
+		// Form 0 is owned by 'test' - test form owner editing with allowEditSubmissions=true
+		$formId = $this->testForms[0]['id'];
+
+		// Enable allowEditSubmissions on the form
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$formId}", [
+			'json' => [
+				'keyValuePairs' => [
+					'allowEditSubmissions' => true,
+				]
+			]
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Form owner should be able to edit submission with allowEditSubmissions=true
+		$submissionId = $this->testForms[0]['submissions'][0]['id'];
+
+		$resp = $this->http->request('PUT', "api/v3/forms/{$formId}/submissions/{$submissionId}", [
+			'json' => [
+				'answers' => [
+					$this->testForms[0]['questions'][0]['id'] => ['Edited with allowEditSubmissions=true'],
+				]
+			]
+		]);
+
+		// Should succeed - form owner always has permission
+		$this->assertEquals(200, $resp->getStatusCode());
+		$data = $this->OcsResponse2Data($resp);
+		$this->assertEquals($submissionId, $data);
+	}
+
+	/**
+	 * Test that form owner can edit even when allowEditSubmissions is disabled
+	 */
+	public function testUpdateSubmission_userCannotEditWhenDisabled() {
+		// Form 0 is owned by 'test' - test form owner can always edit
+		$formId = $this->testForms[0]['id'];
+
+		// Disable allowEditSubmissions on the form
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$formId}", [
+			'json' => [
+				'keyValuePairs' => [
+					'allowEditSubmissions' => false,
+				]
+			]
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Form owner should still be able to edit even with allowEditSubmissions=false
+		$submissionId = $this->testForms[0]['submissions'][0]['id'];
+
+		$resp = $this->http->request('PUT', "api/v3/forms/{$formId}/submissions/{$submissionId}", [
+			'json' => [
+				'answers' => [
+					$this->testForms[0]['questions'][0]['id'] => ['Owner always can edit'],
+				]
+			]
+		]);
+
+		// Should succeed - form owner always has permission regardless of flag
+		$this->assertEquals(200, $resp->getStatusCode());
+		$data = $this->OcsResponse2Data($resp);
+		$this->assertEquals($submissionId, $data);
 	}
 };

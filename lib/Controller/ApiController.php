@@ -1517,8 +1517,8 @@ class ApiController extends OCSController {
 		// submissions can't be updated on public shares, so passing empty shareHash
 		$form = $this->formsService->loadFormForSubmission($formId, '');
 
-		if (!$form->getAllowEditSubmissions()) {
-			throw new OCSBadRequestException('Can only update if allowEditSubmissions is set');
+		if (!$this->formsService->canDeleteResults($form)) {
+			throw new OCSForbiddenException('You\'re not allowed to edit this submission');
 		}
 
 		$questions = $this->formsService->getQuestions($formId);
@@ -1538,10 +1538,6 @@ class ApiController extends OCSController {
 
 		if ($formId !== $submission->getFormId()) {
 			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
-		}
-
-		if ($this->currentUser->getUID() !== $submission->getUserId()) {
-			throw new OCSForbiddenException('Can only update your own submissions');
 		}
 
 		$submission->setTimestamp(time());
