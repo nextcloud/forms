@@ -19,6 +19,7 @@ use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
@@ -62,6 +63,7 @@ class ShareApiController extends OCSController {
 		private readonly IRootFolder $rootFolder,
 		private readonly FilePathHelper $filePathHelper,
 		private readonly IManager $shareManager,
+		private readonly UploadedFilesShareService $uploadedFilesShareService,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -289,7 +291,7 @@ class ShareApiController extends OCSController {
 
 				$this->shareManager->createShare($folderShare);
 			} else {
-				$this->removeUploadedFilesShare($form, $formShare);
+				$this->uploadedFilesShareService->removeForCollaborator($form, $formShare);
 			}
 		}
 
@@ -341,7 +343,7 @@ class ShareApiController extends OCSController {
 
 		// Revoke any linked Files share before deleting the Forms share
 		if (in_array(Constants::PERMISSION_RESULTS, $share->getPermissions(), true)) {
-			$this->removeUploadedFilesShare($form, $share);
+			$this->uploadedFilesShareService->removeForCollaborator($form, $share);
 		}
 
 		$this->shareMapper->delete($share);
