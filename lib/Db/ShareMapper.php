@@ -12,6 +12,7 @@ namespace OCA\Forms\Db;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Share\IShare;
@@ -85,6 +86,31 @@ class ShareMapper extends QBMapper {
 			);
 
 		return $this->findEntity($qb);
+	}
+
+	/**
+	 * Fetch all share rows with their form title, owner and timestamps for ShareReview.
+	 *
+	 * @return list<array<string, mixed>>
+	 * @throws Exception
+	 */
+	public function findAllForShareReview(): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('s.id', 's.form_id', 's.share_type', 's.share_with', 's.permissions_json')
+			->selectAlias('f.title', 'form_title')
+			->selectAlias('f.owner_id', 'form_owner')
+			->selectAlias('f.created', 'form_created')
+			->selectAlias('f.last_updated', 'form_last_updated')
+			->selectAlias('f.expires', 'form_expires')
+			->from($this->getTableName(), 's')
+			->leftJoin('s', 'forms_v2_forms', 'f', $qb->expr()->eq('s.form_id', 'f.id'))
+			->orderBy('s.id', 'ASC');
+
+		$result = $qb->executeQuery();
+		$rows = $result->fetchAll();
+		$result->closeCursor();
+		return $rows;
 	}
 
 	/**
