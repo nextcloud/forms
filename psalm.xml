@@ -48,5 +48,6 @@
 	<stubs>
 		<file name="tests/stubs/oc_hooks_emitter.php" />
 		<file name="tests/stubs/oca-analytics-idatasource.php" />
+		<file name="tests/stubs/ocp-share-sharereview.php" />
 	</stubs>
 </psalm>
