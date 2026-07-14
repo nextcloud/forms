@@ -29,6 +29,7 @@ use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\Files\File;
 use OCP\Files\Folder;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\IGroup;
 use OCP\IGroupManager;
@@ -61,6 +62,7 @@ class ShareApiControllerTest extends TestCase {
 	private CirclesService|MockObject $circlesService;
 	private FilePathHelper $filePathHelper;
 	private IRootFolder|MockObject $rootFolder;
+	private IFilenameValidator|MockObject $filenameValidator;
 	private IManager|MockObject $shareManager;
 
 	public function setUp(): void {
@@ -76,7 +78,10 @@ class ShareApiControllerTest extends TestCase {
 		$this->circlesService = $this->createMock(CirclesService::class);
 
 		$this->rootFolder = $this->createMock(IRootFolder::class);
-		$this->filePathHelper = new FilePathHelper($this->rootFolder);
+		$this->filenameValidator = $this->createMock(IFilenameValidator::class);
+		$this->filenameValidator->method('sanitizeFilename')
+			->willReturnCallback(static fn (string $fileName, string $replacement): string => str_replace(['/', '\\'], $replacement, trim($fileName)));
+		$this->filePathHelper = new FilePathHelper($this->rootFolder, $this->filenameValidator);
 		$this->shareManager = $this->createMock(IManager::class);
 
 		$this->shareApiController = new ShareApiController(

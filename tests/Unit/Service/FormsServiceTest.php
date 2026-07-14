@@ -49,6 +49,7 @@ use OCA\Forms\Service\FormsService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IGroup;
@@ -80,6 +81,7 @@ class FormsServiceTest extends TestCase {
 	private CirclesService|MockObject $circlesService;
 	private FilePathHelper|MockObject $filePathHelper;
 	private IRootFolder|MockObject $rootFolder;
+	private IFilenameValidator|MockObject $filenameValidator;
 	private IL10N|MockObject $l10n;
 	private LoggerInterface|MockObject $logger;
 
@@ -112,7 +114,10 @@ class FormsServiceTest extends TestCase {
 			->willReturn($user);
 
 		$this->rootFolder = $this->createMock(IRootFolder::class);
-		$this->filePathHelper = new FilePathHelper($this->rootFolder);
+		$this->filenameValidator = $this->createMock(IFilenameValidator::class);
+		$this->filenameValidator->method('sanitizeFilename')
+			->willReturnCallback(static fn (string $fileName, string $replacement): string => str_replace(['/', '\\', "\n"], $replacement, trim($fileName)));
+		$this->filePathHelper = new FilePathHelper($this->rootFolder, $this->filenameValidator);
 
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->l10n->expects($this->any())
