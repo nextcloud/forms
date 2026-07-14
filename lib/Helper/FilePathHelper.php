@@ -10,12 +10,14 @@ namespace OCA\Forms\Helper;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCP\Files\Folder;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 
 class FilePathHelper {
 	public function __construct(
 		private readonly IRootFolder $rootFolder,
+		private readonly IFilenameValidator $fileNameValidator,
 	) {
 	}
 
@@ -23,7 +25,7 @@ class FilePathHelper {
 	 * Normalize a filename by replacing invalid characters
 	 */
 	public function normalizeFileName(string $fileName): string {
-		return trim(str_replace(Constants::FILENAME_INVALID_CHARS, '-', $fileName));
+		return $this->fileNameValidator->sanitizeFilename($fileName, '-');
 	}
 
 	/**
