@@ -53,6 +53,7 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -90,6 +91,7 @@ class ApiController extends OCSController {
 		private readonly UploadedFileMapper $uploadedFileMapper,
 		private readonly IMimeTypeDetector $mimeTypeDetector,
 		private readonly IJobList $jobList,
+		private readonly ISecureRandom $secureRandom,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -1428,7 +1430,7 @@ class ApiController extends OCSController {
 		$questions = $this->formsService->getQuestions($formId);
 		try {
 			// Is the submission valid
-			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId(), $formId);
 		} catch (\InvalidArgumentException $e) {
 			throw new OCSBadRequestException($e->getMessage());
 		}
@@ -1524,7 +1526,7 @@ class ApiController extends OCSController {
 		$questions = $this->formsService->getQuestions($formId);
 		try {
 			// Is the submission valid
-			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId());
+			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId(), $formId);
 		} catch (\InvalidArgumentException $e) {
 			throw new OCSBadRequestException($e->getMessage());
 		}
@@ -1773,8 +1775,11 @@ class ApiController extends OCSController {
 			$fileName = $folder->getNonExistingName($uploadedFile['name']);
 			$file = $folder->newFile($fileName, file_get_contents($uploadedFile['tmp_name']));
 
+			$uploadToken = $this->secureRandom->generate(32, ISecureRandom::CHAR_ALPHANUMERIC);
 			$uploadedFileEntity = new UploadedFile();
 			$uploadedFileEntity->setFormId($formId);
+			$uploadedFileEntity->setQuestionId($questionId);
+			$uploadedFileEntity->setUploadToken($uploadToken);
 			$uploadedFileEntity->setOriginalFileName($fileName);
 			$uploadedFileEntity->setFileId($file->getId());
 			$uploadedFileEntity->setCreated(time());
@@ -1783,6 +1788,7 @@ class ApiController extends OCSController {
 			$response[] = [
 				'uploadedFileId' => $uploadedFileEntity->getId(),
 				'fileName' => $fileName,
+				'uploadToken' => $uploadToken,
 			];
 		}
 
@@ -1797,7 +1803,7 @@ class ApiController extends OCSController {
 	 * @param Form $form
 	 * @param int $submissionId
 	 * @param array $question
-	 * @param string[]|array<array{uploadedFileId: string, uploadedFileName: string}> $answerArray
+	 * @param string[]|array<array{uploadedFileId: string, fileName?: string, uploadToken: string}> $answerArray
 	 */
 	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
 		if ($question['type'] === Constants::ANSWER_TYPE_GRID || $question['type'] === Constants::ANSWER_TYPE_RANKING) {
@@ -1833,7 +1839,12 @@ class ApiController extends OCSController {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
 				}
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				$uploadedFile = $this->uploadedFileMapper->getByUploadedFileId($answer['uploadedFileId']);
+				$uploadedFile = $this->uploadedFileMapper->getForSubmission(
+					(int)$answer['uploadedFileId'],
+					$form->getId(),
+					$question['id'],
+					$answer['uploadToken'] ?? '',
+				);
 				$answerEntity->setFileId($uploadedFile->getFileId());
 
 				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());

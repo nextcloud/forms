@@ -40,6 +40,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Service\ConfigService;
@@ -64,6 +65,7 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Security\ISecureRandom;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -87,6 +89,7 @@ class ApiControllerTest extends TestCase {
 	private UploadedFileMapper|MockObject $uploadedFileMapper;
 	private IMimeTypeDetector|MockObject $mimeTypeDetector;
 	private IJobList|MockObject $jobList;
+	private ISecureRandom|MockObject $secureRandom;
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
@@ -109,6 +112,8 @@ class ApiControllerTest extends TestCase {
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
 		$this->mimeTypeDetector = $this->createMock(IMimeTypeDetector::class);
 		$this->jobList = $this->createMock(IJobList::class);
+		$this->secureRandom = $this->createMock(ISecureRandom::class);
+		$this->secureRandom->method('generate')->willReturn('abcdefghijklmnopqrstuvwxyz012345');
 
 		$this->apiController = new ApiController(
 			'forms',
@@ -130,6 +135,7 @@ class ApiControllerTest extends TestCase {
 			$this->uploadedFileMapper,
 			$this->mimeTypeDetector,
 			$this->jobList,
+			$this->secureRandom,
 		);
 	}
 
@@ -784,7 +790,7 @@ class ApiControllerTest extends TestCase {
 			1 => ['3'],
 			2 => ['2', '5', Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer'],
 			3 => ['short anwer'],
-			4 => [['uploadedFileId' => 100]],
+			4 => [['uploadedFileId' => 100, 'uploadToken' => 'valid-upload-token']],
 			5 => ['ignore unknown question'],
 		];
 
@@ -848,6 +854,13 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$file = $this->createMock(File::class);
+
+		$uploadedFile = new UploadedFile();
+		$uploadedFile->setFileId(100);
+		$this->uploadedFileMapper->expects($this->once())
+			->method('getForSubmission')
+			->with(100, 1, 4, 'valid-upload-token')
+			->willReturn($uploadedFile);
 
 		$userFolder->expects($this->once())
 			->method('getById')
