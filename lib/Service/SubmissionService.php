@@ -470,9 +470,10 @@ class SubmissionService {
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
+	 * @param int $formId Id of the form being submitted
 	 * @throw \InvalidArgumentException if validation failed
 	 */
-	public function validateSubmission(array $questions, array $answers, string $formOwnerId): void {
+	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -485,7 +486,7 @@ class SubmissionService {
 					if (is_array($value)) {
 						// file type
 						if (isset($value['uploadedFileId'])) {
-							return !empty($value['uploadedFileId']);
+							return !empty($value['uploadedFileId']) && !empty($value['uploadToken']);
 						}
 
 						// Grid questions
@@ -613,8 +614,14 @@ class SubmissionService {
 				}
 
 				foreach ($answers[$questionId] as $answer) {
-					$uploadedFile = $this->uploadedFileMapper->findByUploadedFileId($answer['uploadedFileId']);
-					if (!$uploadedFile) {
+					try {
+						$uploadedFile = $this->uploadedFileMapper->getForSubmission(
+							(int)$answer['uploadedFileId'],
+							$formId,
+							$questionId,
+							$answer['uploadToken'] ?? '',
+						);
+					} catch (DoesNotExistException) {
 						throw new \InvalidArgumentException(sprintf('File "%s" for question "%s" not exists anymore. Please delete and re-upload the file.', $answer['fileName'] ?? $answer['uploadedFileId'], $question['text']));
 					}
 

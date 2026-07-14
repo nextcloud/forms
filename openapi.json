@@ -703,7 +703,8 @@
                 "type": "object",
                 "required": [
                     "uploadedFileId",
-                    "fileName"
+                    "fileName",
+                    "uploadToken"
                 ],
                 "properties": {
                     "uploadedFileId": {
@@ -711,6 +712,9 @@
                         "format": "int64"
                     },
                     "fileName": {
+                        "type": "string"
+                    },
+                    "uploadToken": {
                         "type": "string"
                     }
                 }
