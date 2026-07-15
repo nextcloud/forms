@@ -22,8 +22,8 @@
     "lint": "eslint --ext .js,.ts,.vue src",
     "lint:fix": "eslint --ext .js,.ts,.vue src --fix",
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs",
-    "stylelint": "stylelint css/*.css css/*.scss src/**/*.vue",
-    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.vue --fix"
+    "stylelint": "stylelint \"src/**/*.scss\" \"src/**/*.vue\"",
+    "stylelint:fix": "stylelint \"src/**/*.scss\" \"src/**/*.vue\" --fix"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"

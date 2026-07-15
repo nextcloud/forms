@@ -718,7 +718,6 @@ export default {
 			color: var(--color-main-text);
 			line-height: 22px;
 			min-height: 47px; // one line (25px padding + 22px text height)
-			padding-block-start: 5px; // spacing border<>text
 			margin: 0px;
 			padding-block: 3px 18px; // 2px smaller because of border
 			padding-inline: 10px;

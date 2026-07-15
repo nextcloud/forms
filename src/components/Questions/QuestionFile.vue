@@ -445,8 +445,9 @@ export default {
 
 <style scoped lang="scss">
 .file-type-checkbox {
-	margin-left: 30px;
+	margin-inline-start: 30px;
 }
+
 .question {
 	&--editable {
 		.question__input-wrapper {
