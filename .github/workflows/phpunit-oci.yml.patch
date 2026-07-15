@@ -1,0 +1,37 @@
+diff --git a/.github/workflows/phpunit-oci.yml b/.github/workflows/phpunit-oci.yml
+index 4314399b..82c0f898 100644
+--- a/.github/workflows/phpunit-oci.yml
++++ b/.github/workflows/phpunit-oci.yml
+@@ -115,6 +115,14 @@ jobs:
+           persist-credentials: false
+           path: apps/${{ env.APP_NAME }}
+ 
++      - name: Checkout teams dependency
++        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
++        with:
++          persist-credentials: false
++          repository: nextcloud/circles
++          ref: ${{ matrix.server-versions }}
++          path: apps/circles
++
+       - name: Set up php ${{ matrix.php-versions }}
+         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+         with:
+@@ -165,7 +173,7 @@ jobs:
+         # Only run if phpunit config file exists
+         if: steps.check_phpunit.outcome == 'success'
+         working-directory: apps/${{ env.APP_NAME }}
+-        run: composer run test:unit
++        run: composer run test:unit -- --no-coverage
+ 
+       - name: Check PHPUnit integration script is defined
+         id: check_integration
+@@ -183,7 +191,7 @@ jobs:
+         # Only run if phpunit integration config file exists
+         if: steps.check_integration.outcome == 'success'
+         working-directory: apps/${{ env.APP_NAME }}
+-        run: composer run test:integration
++        run: composer run test:integration -- --no-coverage
+ 
+       - name: Print logs
+         if: always()
