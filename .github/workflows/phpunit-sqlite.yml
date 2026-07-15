@@ -25,7 +25,7 @@ jobs:
       server-max: ${{ steps.versions.outputs.branches-max-list }}
     steps:
       - name: Checkout app
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
@@ -67,6 +67,7 @@ jobs:
     if: needs.changes.outputs.src != 'false'
 
     strategy:
+      fail-fast: false
       matrix:
         php-versions: ${{ fromJson(needs.matrix.outputs.php-version) }}
         server-versions: ${{ fromJson(needs.matrix.outputs.server-max) }}
@@ -81,7 +82,7 @@ jobs:
           echo "APP_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
 
       - name: Checkout server
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           submodules: true
@@ -89,7 +90,7 @@ jobs:
           ref: ${{ matrix.server-versions }}
 
       - name: Checkout app
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           path: apps/${{ env.APP_NAME }}
@@ -111,7 +112,7 @@ jobs:
           path: apps/analytics
 
       - name: Set up php ${{ matrix.php-versions }}
-        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-versions }}
           # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
@@ -129,13 +130,17 @@ jobs:
         with:
           files: apps/${{ env.APP_NAME }}/composer.json
 
-      - name: Set up dependencies
+      - name: Remove nextcloud/ocp
         # Only run if phpunit config file exists
         if: steps.check_composer.outputs.files_exists == 'true'
         working-directory: apps/${{ env.APP_NAME }}
         run: |
           composer remove nextcloud/ocp --dev --no-scripts
-          composer i
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        with:
+          working-directory: apps/${{ env.APP_NAME }}
 
       - name: Set up Nextcloud
         env:
