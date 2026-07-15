@@ -780,12 +780,13 @@ class ApiV3Test extends IntegrationBase {
 
 		$uploadedFileData = $this->OcsResponse2Data($uploadedFileResponse);
 		$uploadedFileId = $uploadedFileData[0]['uploadedFileId'];
+		$uploadToken = $uploadedFileData[0]['uploadToken'];
 
 		// Create a submission with the file
 		$resp = $this->http->request('POST', "api/v3/forms/$formId/submissions", [
 			'json' => [
 				'answers' => [
-					$questionId => [['uploadedFileId' => $uploadedFileId]]
+					$questionId => [['uploadedFileId' => $uploadedFileId, 'uploadToken' => $uploadToken]]
 				]
 			]
 		]);
@@ -1403,13 +1404,14 @@ CSV
 
 		$uploadedFileData = $this->OcsResponse2Data($uploadedFileResponse);
 		$uploadedFileId = $uploadedFileData[0]['uploadedFileId'];
+		$uploadToken = $uploadedFileData[0]['uploadToken'];
 
 		// Create a new submission with the file
 		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions", [
 			'json' => [
 				'answers' => [
 					$this->testForms[0]['questions'][0]['id'] => ['Test Answer'],
-					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId]]
+					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId, 'uploadToken' => $uploadToken]]
 				]
 			]
 		]);
@@ -1518,6 +1520,7 @@ CSV
 
 		$data = $this->OcsResponse2Data($uploadedFileResponse);
 		$uploadedFileId = $data[0]['uploadedFileId'];
+		$uploadToken = $data[0]['uploadToken'];
 
 		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions", [
 			'json' => [
@@ -1526,7 +1529,7 @@ CSV
 					$this->testForms[0]['questions'][1]['id'] => [
 						$this->testForms[0]['questions'][1]['options'][0]['id']
 					],
-					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId]]
+					$this->testForms[0]['questions'][2]['id'] => [['uploadedFileId' => $uploadedFileId, 'uploadToken' => $uploadToken]]
 				]
 			]
 		]);

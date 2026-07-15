@@ -54,7 +54,7 @@ This file contains the API-Documentation. For more information on the returned D
     - `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
     - `POST /api/v3/forms/{formId}/questions/{questionId}/options` does now accept more options at once
     - `PATCH /api/v3/forms/{formId}/questions/{questionId}/options` to reorder the options (request body `newOrder`, optional `optionType`)
-    - `POST /api/v3/forms/{formId}/submissions/files/{questionId}` to upload a file to a file question before submitting the form
+    - `POST /api/v3/forms/{formId}/submissions/files/{questionId}` to upload a file to a file question before submitting the form (response includes `uploadToken`; submissions must include it with `uploadedFileId`)
     - `GET /api/v3/forms/{formId}/submissions/{submissionId}` to get a single submission
     - `PUT /api/v3/forms/{formId}/submissions/{submissionId}` to update an existing submission
 - In API version 2.5 the following endpoints were introduced:
@@ -858,7 +858,7 @@ Delete all Submissions to a form
 
 ### Upload a file
 
-Upload a file to an answer before form submission
+Upload a file to a file question before form submission. Each uploaded file is stored temporarily and bound to the given `formId` and `questionId`. The response includes an `uploadToken` that must be sent back when submitting the form, together with `uploadedFileId`.
 
 - Endpoint: `/api/v3/forms/{formId}/submissions/files/{questionId}`
 - Method: `POST`
@@ -866,16 +866,25 @@ Upload a file to an answer before form submission
   | Parameter | Type | Description |
   |--------------|----------------|-------------|
   | _formId_ | Integer | ID of the form to upload the file to |
-  | _questionId_ | Integer | ID of the question to upload the file to |
+  | _questionId_ | Integer | ID of the file question to upload the file to |
 - Parameters:
   | Parameter | Type | Description |
   |--------------|----------------|-------------|
   | _files_ | Array of files | Files to upload |
-- Response: **Status-Code OK**, as well as the id of the uploaded file and it's name.
+  | _shareHash_ | String | optional, only necessary for uploads on a public share link |
+- Response: **Status-Code OK**, as well as a list of uploaded files.
 
 ```
-"data": {"uploadedFileId": integer, "fileName": "string"}
+"data": [
+  {
+    "uploadedFileId": 42,
+    "fileName": "document.pdf",
+    "uploadToken": "a1b2c3d4e5f6..."
+  }
+]
 ```
+
+When submitting the form, each file answer must include both `uploadedFileId` and `uploadToken` from this response for the same `questionId`. Uploads from other forms, questions, or sessions are rejected.
 
 ### Get a specific submission
 
@@ -933,15 +942,15 @@ Store Submission to Database
     - QuestionID as key
     - An **array** of values as value --> Even for short Text Answers, wrapped into Array.
     - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs.
-    - For File-Uploads, the array contains the objects with key `uploadedFileId` (value from Upload a file endpoint).
+    - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
 
 ```
   {
     "1":[27,32],              // dropdown or multiple
     "2":["ShortTextAnswer"],  // All Text-Based Question-Types
     "3":[                     // File-Upload
-      {"uploadedFileId": integer},
-      {"uploadedFileId": integer}
+      {"uploadedFileId": 42, "uploadToken": "a1b2c3d4e5f6..."},
+      {"uploadedFileId": 43, "uploadToken": "f6e5d4c3b2a1..."}
   ],
 }
 ```
