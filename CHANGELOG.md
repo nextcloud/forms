@@ -5,6 +5,20 @@
 
 # Changelog
 
+## v5.3.3 - 2026-07-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.2...v5.3.3)
+
+### Fixed
+
+- fix: improve user validation on file question type by @samin-z in [\#3492](https://github.com/nextcloud/forms/pull/3492)
+- fix: remove invalid characters constant and use filename validator for sanitization by @Chartman123 in [\#3494](https://github.com/nextcloud/forms/pull/3494)
+- fix: handle undefined optionsLimitMin in multiple choice questions by @Chartman123 in [\#3490](https://github.com/nextcloud/forms/pull/3490)
+
+### Merged
+
+- docs: Add webhook support section to README by @Chartman123 in [\#3434](https://github.com/nextcloud/forms/pull/3434)
+
 ## v5.3.2 - 2026-06-16
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.1...v5.3.2)
