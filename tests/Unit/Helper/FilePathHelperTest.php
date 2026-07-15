@@ -11,6 +11,7 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Helper\FilePathHelper;
 use OCP\Files\Folder;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -18,12 +19,16 @@ use Test\TestCase;
 
 class FilePathHelperTest extends TestCase {
 	private FilePathHelper $filePathHelper;
+	private IFilenameValidator|MockObject $filenameValidator;
 	private IRootFolder|MockObject $rootFolder;
 
 	public function setUp(): void {
 		parent::setUp();
 		$this->rootFolder = $this->createMock(IRootFolder::class);
-		$this->filePathHelper = new FilePathHelper($this->rootFolder);
+		$this->filenameValidator = $this->createMock(IFilenameValidator::class);
+		$this->filenameValidator->method('sanitizeFilename')
+			->willReturnCallback(static fn (string $fileName, string $replacement): string => str_replace(['/', '\\'], $replacement, trim($fileName)));
+		$this->filePathHelper = new FilePathHelper($this->rootFolder, $this->filenameValidator);
 	}
 
 	public function testNormalizeFileName() {

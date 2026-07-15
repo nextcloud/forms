@@ -222,19 +222,6 @@ class Constants {
 		self::ANSWER_GRID_TYPE_RADIO,
 	];
 
-	public const FILENAME_INVALID_CHARS = [
-		"\n",
-		'/',
-		'\\',
-		':',
-		'*',
-		'?',
-		'"',
-		'<',
-		'>',
-		'|',
-	];
-
 	/**
 	 * !! Keep in sync with src/mixins/ShareTypes.js !!
 	 */
