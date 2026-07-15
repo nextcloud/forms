@@ -44,7 +44,7 @@ jobs:
       src: ${{ steps.changes.outputs.src}}
 
     steps:
-      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
         id: changes
         continue-on-error: true
         with:
@@ -68,6 +68,7 @@ jobs:
     if: needs.changes.outputs.src != 'false'
 
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.matrix.outputs.matrix) }}
 
     name: MySQL ${{ matrix.mysql-versions }} PHP ${{ matrix.php-versions }} Nextcloud ${{ matrix.server-versions }}
@@ -102,14 +103,6 @@ jobs:
           persist-credentials: false
           path: apps/${{ env.APP_NAME }}
 
-      - name: Checkout teams dependency
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-          repository: nextcloud/circles
-          ref: ${{ matrix.server-versions }}
-          path: apps/circles
-
       - name: Set up php ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
@@ -134,13 +127,17 @@ jobs:
         with:
           files: apps/${{ env.APP_NAME }}/composer.json
 
-      - name: Set up dependencies
+      - name: Remove nextcloud/ocp
         # Only run if phpunit config file exists
         if: steps.check_composer.outputs.files_exists == 'true'
         working-directory: apps/${{ env.APP_NAME }}
         run: |
           composer remove nextcloud/ocp --dev --no-scripts
-          composer i
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        with:
+          working-directory: apps/${{ env.APP_NAME }}
 
       - name: Set up Nextcloud
         env:
@@ -161,7 +158,7 @@ jobs:
         # Only run if phpunit config file exists
         if: steps.check_phpunit.outcome == 'success'
         working-directory: apps/${{ env.APP_NAME }}
-        run: composer run test:unit -- --no-coverage
+        run: composer run test:unit
 
       - name: Check PHPUnit integration script is defined
         id: check_integration
@@ -179,7 +176,7 @@ jobs:
         # Only run if phpunit integration config file exists
         if: steps.check_integration.outcome == 'success'
         working-directory: apps/${{ env.APP_NAME }}
-        run: composer run test:integration -- --no-coverage
+        run: composer run test:integration
 
       - name: Print logs
         if: always()
