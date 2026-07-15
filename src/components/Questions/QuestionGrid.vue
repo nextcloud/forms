@@ -442,9 +442,9 @@ export default {
 
 	.first-column {
 		min-width: 200px;
-		text-align: left;
+		text-align: start;
 		position: sticky;
-		left: 0;
+		inset-inline-start: 0;
 	}
 }
 </style>

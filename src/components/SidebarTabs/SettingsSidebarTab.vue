@@ -789,7 +789,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '../../scssmixins/markdownOutput' as *;
+@use '../../scssmixins/markdownOutput.scss' as *;
 
 #expiresDatetimePicker {
 	width: calc(100% - var(--default-clickable-area));
@@ -808,6 +808,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 }
+
 .submission-message {
 	&__description {
 		color: var(--color-text-maxcontrast);
@@ -823,7 +824,6 @@ export default {
 
 	&__output {
 		@include markdown-output;
-
 		padding: 12px;
 		margin-block: 3px;
 		border: 2px solid var(--color-border-maxcontrast);
