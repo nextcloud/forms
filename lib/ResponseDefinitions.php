@@ -151,7 +151,8 @@ namespace OCA\Forms;
  *
  * @psalm-type FormsUploadedFile = array{
  *   uploadedFileId: int,
- *   fileName: string
+ *   fileName: string,
+ *   uploadToken: string,
  * }
  */
 class ResponseDefinitions {

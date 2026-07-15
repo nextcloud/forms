@@ -1361,7 +1361,34 @@ file2.txt"
 			$this->expectExceptionMessage($expected);
 		}
 
-		$this->submissionService->validateSubmission($questions, $answers, 'admin');
+		$this->submissionService->validateSubmission($questions, $answers, 'admin', 1);
 		$this->assertTrue(true);
+	}
+
+	public function testValidateSubmission_rejectsForeignUploadToken(): void {
+		$questions = [[
+			'id' => 8,
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'text' => 'File question',
+			'isRequired' => false,
+			'extraSettings' => [],
+		]];
+		$answers = [
+			8 => [[
+				'uploadedFileId' => 10,
+				'fileName' => 'victim.rtf',
+				'uploadToken' => 'attacker-token',
+			]],
+		];
+
+		$this->uploadedFileMapper->expects($this->once())
+			->method('getForSubmission')
+			->with(10, 7, 8, 'attacker-token')
+			->willThrowException(new DoesNotExistException('Upload not found'));
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('File "victim.rtf" for question "File question" not exists anymore. Please delete and re-upload the file.');
+
+		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
 	}
 };

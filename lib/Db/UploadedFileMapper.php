@@ -56,6 +56,30 @@ class UploadedFileMapper extends QBMapper {
 	}
 
 	/**
+	 * find all uploaded files for a given form and question and compare with the given upload token.
+	 *
+	 * @throws DoesNotExistException
+	 */
+	public function getForSubmission(int $uploadedFileId, int $formId, int $questionId, string $uploadToken): UploadedFile {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($uploadedFileId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('question_id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT)));
+
+		$uploadedFile = $this->findEntities($qb)[0] ?? null;
+		if ($uploadedFile === null
+			|| $uploadedFile->getUploadToken() === null
+			|| !hash_equals($uploadedFile->getUploadToken(), $uploadToken)) {
+			throw new DoesNotExistException(sprintf('Uploaded file with id "%d" not found', $uploadedFileId));
+		}
+
+		return $uploadedFile;
+	}
+
+	/**
 	 * @param \DateTimeImmutable $dateTime
 	 * @return UploadedFile[]
 	 */
