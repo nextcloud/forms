@@ -6,6 +6,12 @@ SPDX-PackageSupplier = "Nextcloud <info@nextcloud.com>"
 SPDX-PackageDownloadLocation = "https://github.com/nextcloud/forms"
 
 [[annotations]]
+path = [".github/workflows/*.patch"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "none"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
 path = ["l10n/**.js", "l10n/**.json", "js/**.js.map", "js/**.js"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2019-2026 Nextcloud GmbH and Nextcloud contributors"
