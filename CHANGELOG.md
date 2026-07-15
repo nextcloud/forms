@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.3.3 - 2026-07-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.2...v5.3.3)
+
+### Fixed
+
+- [stable5.3] fix: improve user validation on file question type by @backportbot[bot] in [\#3496](https://github.com/nextcloud/forms/pull/3496)
+- [stable5.3] fix: remove invalid characters constant and use filename validator for sanitization by @backportbot[bot] in [\#3495](https://github.com/nextcloud/forms/pull/3495)
+- [stable5.3] fix: handle undefined optionsLimitMin in multiple choice questions by @backportbot[bot] in [\#3491](https://github.com/nextcloud/forms/pull/3491)
+
 ## v5.3.2 - 2026-06-16
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.1...v5.3.2)
