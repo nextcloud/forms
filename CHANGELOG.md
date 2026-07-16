@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.3.4 - 2026-07-16
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.3...v5.3.4)
+
+### Fixed
+
+- fix(api): default option type to choice for non-grid questions by @josefbehr in [\#3504](https://github.com/nextcloud/forms/pull/3504)
+- docs(api): complete truncated questionId description by @josefbehr in [\#3501](https://github.com/nextcloud/forms/pull/3501)
+- fix(api): correct misleading error message on empty keyValuePairs by @josefbehr in [\#3500](https://github.com/nextcloud/forms/pull/3500)
+
 ## v5.3.3 - 2026-07-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.2...v5.3.3)
