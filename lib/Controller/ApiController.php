@@ -894,7 +894,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param list<string> $optionTexts the new option text
-	 * @param string|null $optionType the new option type (e.g. 'row')
+	 * @param string|null $optionType the new option type (e.g. 'row'), defaults to 'choice'
 	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -908,7 +908,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
-	public function newOption(int $formId, int $questionId, array $optionTexts, ?string $optionType = null): DataResponse {
+	public function newOption(int $formId, int $questionId, array $optionTexts, ?string $optionType = 'choice'): DataResponse {
 		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}, optionType: {optionType}', [
 			'formId' => $formId,
 			'questionId' => $questionId,
