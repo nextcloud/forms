@@ -2702,8 +2702,8 @@
                                     "optionType": {
                                         "type": "string",
                                         "nullable": true,
-                                        "default": null,
-                                        "description": "the new option type (e.g. 'row')"
+                                        "default": "choice",
+                                        "description": "the new option type (e.g. 'row'), defaults to 'choice'"
                                     }
                                 }
                             }
