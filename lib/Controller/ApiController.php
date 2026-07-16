@@ -675,7 +675,7 @@ class ApiController extends OCSController {
 		// Don't allow empty array
 		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
-			throw new OCSBadRequestException('This form is archived and can not be modified');
+			throw new OCSBadRequestException('Empty keyValuePairs, will not update.');
 		}
 
 		//Don't allow to change id or formId
