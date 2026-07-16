@@ -497,17 +497,17 @@ class ApiV3Test extends IntegrationBase {
 								[
 									'text' => 'Option 1',
 									'order' => 1,
-									'optionType' => null,
+									'optionType' => 'choice',
 								],
 								[
 									'text' => 'Option 2',
 									'order' => 2,
-									'optionType' => null,
+									'optionType' => 'choice',
 								],
 								[
 									'text' => '',
 									'order' => 3,
-									'optionType' => null,
+									'optionType' => 'choice',
 								]
 							],
 							'accept' => [],

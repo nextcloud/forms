@@ -939,21 +939,12 @@ class ApiController extends OCSController {
 		}
 
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
-		// The lookup keeps the caller-provided $optionType (null means "all options of the question"),
-		// so the ordering is not affected by the default applied below.
 		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 		$lastOption = array_pop($options);
 		if ($lastOption) {
 			$optionOrder = $lastOption->getOrder() + 1;
 		} else {
 			$optionOrder = 1;
-		}
-
-		// Options of non-grid questions default to the 'choice' type, mirroring the
-		// value applied by the option_type migration. Without a type the stored
-		// option is not rendered by the frontend.
-		if ($optionType === null && $question->getType() !== Constants::ANSWER_TYPE_GRID) {
-			$optionType = Option::OPTION_TYPE_CHOICE;
 		}
 
 		$addedOptions = [];
@@ -963,12 +954,18 @@ class ApiController extends OCSController {
 			$option->setQuestionId($questionId);
 			$option->setText($text);
 			$option->setOrder($optionOrder++);
-			$option->setOptionType($optionType);
+			// Only set the type when the caller provides one, so the 'choice'
+			// column default applies for normal option lists. Setting a null
+			// here would override that default and leave the option unrendered.
+			if ($optionType !== null) {
+				$option->setOptionType($optionType);
+			}
 
 			try {
 				$option = $this->optionMapper->insert($option);
-				// Add the stored option to the collection of added options
-				$addedOptions[] = $option->read();
+				// Re-read so the response reflects the column default that was
+				// applied when no type was set explicitly.
+				$addedOptions[] = $this->optionMapper->findById($option->getId())->read();
 			} catch (IMapperException $e) {
 				$this->logger->error("Failed to add option: {$e->getMessage()}");
 				// Optionally handle the error, e.g., by continuing to the next iteration or returning an error response
