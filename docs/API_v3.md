@@ -438,7 +438,7 @@ Update a single or multiple properties of a question-object.
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to request |
-  | _questionId_ | Integer | Id of the
+  | _questionId_ | Integer | ID of the question to update |
 - Parameters:
   | Parameter | Type | Description |
   |-----------|---------|-------------|
