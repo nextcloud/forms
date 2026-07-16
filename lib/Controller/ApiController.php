@@ -938,6 +938,13 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('This question is not part ot the given form');
 		}
 
+		// Options of non-grid questions default to the 'choice' type, mirroring
+		// the column default applied by the option_type migration. Without this,
+		// options created through the API keep a null type and are not rendered.
+		if ($optionType === null && $question->getType() !== Constants::ANSWER_TYPE_GRID) {
+			$optionType = Option::OPTION_TYPE_CHOICE;
+		}
+
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
 		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 		$lastOption = array_pop($options);

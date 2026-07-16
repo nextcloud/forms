@@ -1027,7 +1027,9 @@ class ApiV3Test extends IntegrationBase {
 					// 'questionId' => Done dynamically below.
 					'text' => 'A new Option.',
 					'order' => 4,
-					'optionType' => null,
+					// Non-grid questions default to the 'choice' option type
+					// when none is provided.
+					'optionType' => 'choice',
 				]
 			]
 		];

@@ -31,6 +31,7 @@ class Option extends Entity {
 	protected ?int $order;
 	protected ?string $optionType;
 
+	public const OPTION_TYPE_CHOICE = 'choice';
 	public const OPTION_TYPE_ROW = 'row';
 	public const OPTION_TYPE_COLUMN = 'column';
 
