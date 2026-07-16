@@ -38,15 +38,17 @@ class Version050300Date20260716000000 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 		$table = $schema->getTable('forms_v2_options');
+		$changed = false;
 
 		if ($table->hasColumn('option_type')) {
 			$column = $table->getColumn('option_type');
 			if ($column->getDefault() === null) {
 				$column->setDefault('choice');
+				$changed = true;
 			}
 		}
 
-		return $schema;
+		return $changed ? $schema : null;
 	}
 
 	/**

@@ -894,7 +894,7 @@ class ApiController extends OCSController {
 	 * @param int $formId id of the form
 	 * @param int $questionId id of the question
 	 * @param list<string> $optionTexts the new option text
-	 * @param string|null $optionType the new option type (e.g. 'row')
+	 * @param string|null $optionType the new option type (e.g. 'row'), defaults to 'choice'
 	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -908,7 +908,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions/{questionId}/options')]
-	public function newOption(int $formId, int $questionId, array $optionTexts, ?string $optionType = null): DataResponse {
+	public function newOption(int $formId, int $questionId, array $optionTexts, ?string $optionType = 'choice'): DataResponse {
 		$this->logger->debug('Adding new options: formId: {formId}, questionId: {questionId}, text: {text}, optionType: {optionType}', [
 			'formId' => $formId,
 			'questionId' => $questionId,
@@ -954,18 +954,12 @@ class ApiController extends OCSController {
 			$option->setQuestionId($questionId);
 			$option->setText($text);
 			$option->setOrder($optionOrder++);
-			// Only set the type when the caller provides one, so the 'choice'
-			// column default applies for normal option lists. Setting a null
-			// here would override that default and leave the option unrendered.
-			if ($optionType !== null) {
-				$option->setOptionType($optionType);
-			}
+			$option->setOptionType($optionType);
 
 			try {
 				$option = $this->optionMapper->insert($option);
-				// Re-read so the response reflects the column default that was
-				// applied when no type was set explicitly.
-				$addedOptions[] = $this->optionMapper->findById($option->getId())->read();
+				// Add the stored option to the collection of added options
+				$addedOptions[] = $option->read();
 			} catch (IMapperException $e) {
 				$this->logger->error("Failed to add option: {$e->getMessage()}");
 				// Optionally handle the error, e.g., by continuing to the next iteration or returning an error response
