@@ -9,6 +9,7 @@ import type { FormsOption } from '../models/Entities.d.ts'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
@@ -169,7 +170,7 @@ export default defineComponent({
 
 	computed: {
 		questionProps(): any {
-			const props = { ...this.$props }
+			const props = { ...this.$props } as Record<string, unknown>
 			const allowedKeys = Object.keys(Question.props || {})
 			Object.keys(props).forEach((key) => {
 				if (!allowedKeys.includes(key)) {
@@ -272,7 +273,7 @@ export default defineComponent({
 		/**
 		 * Forward the required change to the parent and store to db
 		 *
-		 * @param shuffle
+		 * @param shuffle if options should be shuffled
 		 */
 		onShuffleOptionsChange(shuffle: boolean): void {
 			return (this.onExtraSettingsChange as any)({ shuffleOptions: shuffle })
@@ -281,7 +282,7 @@ export default defineComponent({
 		/**
 		 * Forward the answer(s) change to the parent
 		 *
-		 * @param values
+		 * @param values the changed values
 		 */
 		onValuesChange(values: any): void {
 			this.$emit('update:values', values)
@@ -302,10 +303,10 @@ export default defineComponent({
 		},
 
 		/**
-		 * Don't automatically submit form on Enter, parent will handle that
-		 * To be called with prevent: @keydown.enter.prevent="onKeydownEnter"
+		 * Don't automatically submit form on Enter, parent will handle that.
+		 * To be called with prevent: \@keydown.enter.prevent="onKeydownEnter"
 		 *
-		 * @param event
+		 * @param event the KeyboardEvent
 		 */
 		onKeydownEnter(event: KeyboardEvent): void {
 			this.$emit('keydown', event)
@@ -329,7 +330,7 @@ export default defineComponent({
 		/**
 		 * Shuffle an array using Fisher-Yates
 		 *
-		 * @param input
+		 * @param input the array to shuffle
 		 */
 		shuffleArray(input: any[]): any[] {
 			const shuffled = [...input]
@@ -371,7 +372,7 @@ export default defineComponent({
 		/**
 		 * Handles multiple options for a question.
 		 *
-		 * @param answers
+		 * @param answers the array of options
 		 */
 		async handleMultipleOptions(answers: string[]): Promise<void> {
 			const component = this as any
@@ -392,7 +393,7 @@ export default defineComponent({
 						optionType: OptionType.Choice,
 					},
 				)
-				const newServerOptions = OcsResponse2Data(response)
+				const newServerOptions = OcsResponse2Data<FormsOption[]>(response)
 				const options = this.options.slice()
 				newServerOptions.forEach((option: FormsOption) => {
 					options.push({

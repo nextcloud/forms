@@ -57,13 +57,16 @@
 	</NcAppSidebar>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsShare } from '../models/Entities.d.ts'
+
 import IconComment from '@material-symbols/svg-400/outlined/comment.svg?raw'
 import IconSettings from '@material-symbols/svg-400/outlined/settings.svg?raw'
 import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import { emit } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
+import { defineComponent } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -73,7 +76,14 @@ import PermissionTypes from '../mixins/PermissionTypes.ts'
 import ViewsMixin from '../mixins/ViewsMixin.ts'
 import logger from '../utils/Logger.ts'
 
-export default {
+interface CommentsViewLike {
+	update: (id: number) => Promise<void> | void
+	$mount: (el: Element) => void
+}
+
+type ShareWithId = FormsShare & { id: number }
+
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Sidebar',
 
@@ -98,6 +108,7 @@ export default {
 
 	setup() {
 		return {
+			t,
 			IconComment,
 			IconSettings,
 			IconShareVariant,
@@ -106,18 +117,18 @@ export default {
 
 	data() {
 		return {
-			commentsView: null,
+			commentsView: null as CommentsViewLike | null,
 		}
 	},
 
 	computed: {
-		canEdit() {
+		canEdit(): boolean {
 			return this.form?.permissions?.includes(
 				this.PERMISSION_TYPES.PERMISSION_EDIT,
 			)
 		},
 
-		lockedUntilFormatted() {
+		lockedUntilFormatted(): string {
 			if (this.form.lockedUntil === 0 || this.form.lockedUntil === null) {
 				return ''
 			}
@@ -126,7 +137,7 @@ export default {
 				.fromNow()
 		},
 
-		sidebarTitle() {
+		sidebarTitle(): string {
 			if (this.active === 'forms-comments') {
 				return t('forms', 'Form comments')
 			} else {
@@ -136,7 +147,7 @@ export default {
 	},
 
 	watch: {
-		'form.id': function (newId) {
+		'form.id': function (newId: number) {
 			// Only update comments when the Comments tab is active
 			if (this.active !== 'forms-comments') {
 				return
@@ -150,7 +161,7 @@ export default {
 			}
 		},
 
-		active(newVal) {
+		active(newVal: string) {
 			if (newVal === 'forms-comments') {
 				this.setupComments()
 			} else {
@@ -183,26 +194,44 @@ export default {
 	},
 
 	methods: {
-		onUpdateActive(active) {
+		onUpdateActive(active: string): void {
 			this.$emit('update:active', active)
 		},
 
 		// Mount or update the Comments view inside the sidebar
-		async setupComments() {
+		async setupComments(): Promise<void> {
 			// comments disabled for this form
 			if (!this.form.allowComments) {
 				return
 			}
 
 			// comments element missing
-			const el = this.$refs.commentsEl
+			const el = this.$refs.commentsEl as Element | undefined
 			if (!el) {
 				logger.debug('setupComments: no comments element found')
 				return
 			}
 
 			if (!this.commentsView) {
-				this.commentsView = new OCA.Comments.View('forms', {
+				const commentsCtor = (
+					window as unknown as {
+						OCA?: {
+							Comments?: {
+								View?: new (
+									scope: string,
+									options: { propsData: { resourceId: number } },
+								) => CommentsViewLike
+							}
+						}
+					}
+				).OCA?.Comments?.View
+
+				if (!commentsCtor) {
+					logger.debug('setupComments: comments constructor not available')
+					return
+				}
+
+				this.commentsView = new commentsCtor('forms', {
 					propsData: { resourceId: this.form.id },
 				})
 			}
@@ -210,48 +239,52 @@ export default {
 			this.commentsView.$mount(el)
 		},
 
-		teardownComments() {
+		teardownComments(): void {
 			this.commentsView = null
 		},
 
 		/**
 		 * Save Form-Properties
 		 *
-		 * @param {string} property The Name of the Property to update
-		 * @param {any} newVal The new Property value
+		 * @param property The Name of the Property to update
+		 * @param newVal The new Property value
 		 */
-		onPropertyChange(property, newVal) {
-			this.form[property] = newVal
+		onPropertyChange(property: string, newVal: unknown): void {
+			;(this.form as unknown as Record<string, unknown>)[property] = newVal
 			this.saveFormProperty(property)
 		},
 
 		/**
 		 * Adding/Removing Share from the reactive object. API-Request is done in sharing-tab.
 		 *
-		 * @param {object} share The respective share object
+		 * @param share The respective share object
 		 */
-		onAddShare(share) {
+		onAddShare(share: FormsShare): void {
 			this.form.shares.push(share)
 			emit('forms:last-updated:set', this.form.id)
 		},
 
-		onRemoveShare(share) {
+		onRemoveShare(share: ShareWithId): void {
 			const index = this.form.shares.findIndex(
-				(search) => search.id === share.id,
+				(search): boolean =>
+					'id' in (search as unknown as Record<string, unknown>)
+					&& (search as ShareWithId).id === share.id,
 			)
 			this.form.shares.splice(index, 1)
 			emit('forms:last-updated:set', this.form.id)
 		},
 
-		onUpdateShare(share) {
+		onUpdateShare(share: ShareWithId): void {
 			const index = this.form.shares.findIndex(
-				(search) => search.id === share.id,
+				(search): boolean =>
+					'id' in (search as unknown as Record<string, unknown>)
+					&& (search as ShareWithId).id === share.id,
 			)
 			this.form.shares.splice(index, 1, share)
 			emit('forms:last-updated:set', this.form.id)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

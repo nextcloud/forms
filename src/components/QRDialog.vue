@@ -23,12 +23,14 @@
 	</NcDialog>
 </template>
 
-<script>
+<script lang="ts">
+import { t } from '@nextcloud/l10n'
 import QRCode from 'qrcode'
+import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import logger from '../utils/Logger.ts'
 
-export default {
+export default defineComponent({
 	name: 'QRDialog',
 
 	components: {
@@ -49,24 +51,23 @@ export default {
 
 	emits: ['closed'],
 
+	setup() {
+		return {
+			t,
+		}
+	},
+
 	data() {
 		return {
-			uri: {
-				type: String,
-				default: '',
-			},
-
-			isOpen: {
-				type: Boolean,
-				default: false,
-			},
+			uri: '' as string,
+			isOpen: false as boolean,
 		}
 	},
 
 	watch: {
 		text: {
 			immediate: true,
-			handler() {
+			handler(): void {
 				this.generateQr()
 				this.isOpen = !!this.text
 			},
@@ -74,21 +75,21 @@ export default {
 	},
 
 	methods: {
-		async generateQr() {
+		async generateQr(): Promise<void> {
 			if (this.text) {
 				try {
 					this.uri = await QRCode.toDataURL(this.text, {
 						width: 256,
 					})
 				} catch (err) {
-					logger.error(err)
+					logger.error(err instanceof Error ? err : String(err))
 				}
 			} else {
-				this.uri = null
+				this.uri = ''
 			}
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss">

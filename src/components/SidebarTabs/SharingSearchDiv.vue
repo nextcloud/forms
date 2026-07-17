@@ -21,11 +21,24 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import { t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 import UserSearchMixin from '../../mixins/UserSearchMixin.ts'
 
-export default {
+interface CurrentShareLike {
+	shareWith: string
+	shareType: number
+}
+
+interface SearchShareLike {
+	shareWith: string
+	displayName: string
+	shareType: number
+}
+
+export default defineComponent({
 	components: {
 		NcSelectUsers,
 	},
@@ -56,19 +69,27 @@ export default {
 
 	emits: ['addShare'],
 
+	setup() {
+		return {
+			t,
+		}
+	},
+
 	computed: {
 		/**
 		 * Multiselect options. Recommendations by default, direct search when search query is valid.
 		 * Filter out existing shares
 		 *
-		 * @return {Array}
+		 * @return
 		 */
-		options() {
+		options(): SearchShareLike[] {
 			if (this.isValidQuery) {
 				// Suggestions without existing shares
-				return this.suggestions.filter(
+				const suggestions = this.suggestions as SearchShareLike[]
+				const currentShares = this.currentShares as CurrentShareLike[]
+				return suggestions.filter(
 					(item) =>
-						!this.currentShares.find(
+						!currentShares.find(
 							(share) =>
 								share.shareWith === item.shareWith
 								&& share.shareType === item.shareType,
@@ -76,9 +97,11 @@ export default {
 				)
 			}
 			// Recommendations without existing shares
-			return this.recommendations.filter(
+			const recommendations = this.recommendations as SearchShareLike[]
+			const currentShares = this.currentShares as CurrentShareLike[]
+			return recommendations.filter(
 				(item) =>
-					!this.currentShares.find(
+					!currentShares.find(
 						(share) =>
 							share.shareWith === item.shareWith
 							&& share.shareType === item.shareType,
@@ -89,7 +112,7 @@ export default {
 		/**
 		 * Show Loading if loading is either set by parent or by this module (search)
 		 */
-		showLoadingCircle() {
+		showLoadingCircle(): boolean {
 			return this.showLoading || this.loading
 		},
 	},
@@ -103,18 +126,22 @@ export default {
 		/**
 		 * Format share for form.shares and add it.
 		 *
-		 * @param {object} share New share to share with, format still for multiselect.
+		 * @param share New share to share with, format still for multiselect.
 		 */
-		addShare(share) {
+		addShare(share: SearchShareLike | SearchShareLike[] | null): void {
+			const selectedShare = Array.isArray(share) ? share[0] : share
+			if (!selectedShare) {
+				return
+			}
 			const newShare = {
-				shareWith: share.shareWith,
-				displayName: share.displayName,
-				shareType: share.shareType,
+				shareWith: selectedShare.shareWith,
+				displayName: selectedShare.displayName,
+				shareType: selectedShare.shareType,
 			}
 			this.$emit('addShare', newShare)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

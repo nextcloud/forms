@@ -91,11 +91,13 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
@@ -103,7 +105,13 @@ import NcTextField from '@nextcloud/vue/components/NcTextField'
 import UserSearchMixin from '../../mixins/UserSearchMixin.ts'
 import logger from '../../utils/Logger.ts'
 
-export default {
+interface SelectedUserLike {
+	id: string
+	shareWith: string
+	displayName: string
+}
+
+export default defineComponent({
 	components: {
 		NcButton,
 		NcDialog,
@@ -130,27 +138,33 @@ export default {
 		},
 	},
 
+	setup() {
+		return {
+			t,
+		}
+	},
+
 	data() {
 		return {
-			selected: null,
-			showModal: false,
-			confirmationInput: '',
-			loading: false,
+			selected: undefined as SelectedUserLike | undefined,
+			showModal: false as boolean,
+			confirmationInput: '' as string,
+			loading: false as boolean,
 		}
 	},
 
 	computed: {
-		canTransfer() {
+		canTransfer(): boolean {
 			return (
 				this.confirmationInput === this.confirmationString && !!this.selected
 			)
 		},
 
-		confirmationString() {
+		confirmationString(): string {
 			return `${this.form.ownerId}/${this.form.title.replace(/\s/g, ' ').trim()}`
 		},
 
-		options() {
+		options(): unknown[] {
 			if (this.isValidQuery) {
 				// Suggestions without existing shares
 				return this.suggestions
@@ -161,25 +175,25 @@ export default {
 	},
 
 	methods: {
-		clearText() {
+		clearText(): void {
 			this.confirmationInput = ''
 		},
 
-		closeModal() {
+		closeModal(): void {
 			this.showModal = false
 		},
 
-		escapedString(textToEscape) {
+		escapedString(textToEscape: string): string {
 			return '' + textToEscape.replace('<', '&lt;').replace('>', '&gt;')
 		},
 
-		openModal() {
+		openModal(): void {
 			this.showModal = true
 		},
 
-		async onOwnershipTransfer() {
+		async onOwnershipTransfer(): Promise<void> {
 			this.showModal = false
-			if (this.form.id && this.selected.shareWith) {
+			if (this.form.id && this.selected?.shareWith) {
 				try {
 					emit('forms:last-updated:set', this.form.id)
 					await axios.patch(
@@ -188,12 +202,12 @@ export default {
 						}),
 						{
 							keyValuePairs: {
-								ownerId: this.selected.shareWith,
+								ownerId: this.selected?.shareWith,
 							},
 						},
 					)
 					showSuccess(
-						`${t('forms', 'This form is now owned by')} ${this.selected.displayName}`,
+						`${t('forms', 'This form is now owned by')} ${this.selected?.displayName}`,
 					)
 					emit('forms:ownership-transfered', this.form.id)
 				} catch (error) {
@@ -214,7 +228,7 @@ export default {
 			}
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

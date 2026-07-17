@@ -4,7 +4,7 @@
  */
 
 {
-	"extends": "@vue/tsconfig",
+	"extends": "@vue/tsconfig/tsconfig.dom.json",
 	"include": ["src/**/*", "*.ts"],
 	"compilerOptions": {
 		"allowJs": true,
