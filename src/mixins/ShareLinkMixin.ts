@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { showError, showSuccess } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { defineComponent } from 'vue'
 import logger from '../utils/Logger.ts'
@@ -48,7 +49,7 @@ export default defineComponent({
 			} else {
 				url = generateUrl(`/apps/forms/s/${share.shareWith}`)
 			}
-			return new URL(url, window.location).href
+			return new URL(url, window.location.href).href
 		},
 
 		/**
@@ -60,8 +61,10 @@ export default defineComponent({
 			const self = this as any
 			return (
 				share.shareType === self.SHARE_TYPES.SHARE_TYPE_LINK
-				&& share.permissions?.includes(
-					self.PERMISSION_TYPES.PERMISSION_EMBED,
+				&& Boolean(
+					share.permissions?.includes(
+						self.PERMISSION_TYPES.PERMISSION_EMBED,
+					),
 				)
 			)
 		},

@@ -63,16 +63,18 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import IconChevronRight from '@material-symbols/svg-400/outlined/chevron_right.svg?raw'
 import PageFirstIcon from '@material-symbols/svg-400/outlined/first_page.svg?raw'
 import PageLastIcon from '@material-symbols/svg-400/outlined/last_page.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 
-export default {
+export default defineComponent({
 	name: 'PaginationToolbar',
 	components: {
 		NcIconSvgWrapper,
@@ -105,32 +107,33 @@ export default {
 			IconChevronRight,
 			PageFirstIcon,
 			PageLastIcon,
+			t,
 		}
 	},
 
 	computed: {
-		allPageNumbersArray() {
+		allPageNumbersArray(): number[] {
 			return Array.from(
 				{ length: this.totalPages },
 				(value, index) => 1 + index,
 			)
 		},
 
-		totalPages() {
+		totalPages(): number {
 			return Math.max(1, Math.ceil(this.totalItemsCount / this.limit))
 		},
 
 		pageNumber: {
-			get() {
+			get(): number {
 				return Math.floor(this.offset / this.limit) + 1
 			},
 
-			set(pageNumber) {
-				this.$emit('update:offset', (pageNumber - 1) * this.limit)
+			set(pageNumber: number) {
+				this.$emit('update:offset', (Number(pageNumber) - 1) * this.limit)
 			},
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

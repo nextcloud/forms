@@ -6,6 +6,7 @@
 
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
+import { translate as t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
@@ -85,7 +86,7 @@ export default defineComponent({
 		 */
 		isValidQuery(): boolean {
 			return (
-				this.query
+				Boolean(this.query)
 				&& this.query.trim() !== ''
 				&& this.query.length > this.minSearchStringLength
 			)
@@ -159,11 +160,10 @@ export default defineComponent({
 				)
 
 				const data = OcsResponse2Data<SearchResultsResponse>(request)
-				const exact = data.exact
-				delete data.exact // removing exact from general results
+				const { exact, ...rest } = data
 
 				const exactSuggestions = this.formatSearchResults(exact)
-				const suggestions = this.formatSearchResults(data)
+				const suggestions = this.formatSearchResults(rest)
 
 				this.suggestions = exactSuggestions.concat(suggestions)
 			} catch (error) {
@@ -206,9 +206,13 @@ export default defineComponent({
 		 * @param results Results as returned by search
 		 * @return results as we use them on storage
 		 */
-		formatSearchResults(results: Record<string, Sharee[]>): FormattedSharee[] {
+		formatSearchResults(
+			results: Sharee[] | Record<string, Sharee[] | undefined>,
+		): FormattedSharee[] {
 			// flatten array of arrays
-			const flatResults = Object.values(results).flat()
+			const flatResults = Array.isArray(results)
+				? results
+				: Object.values(results).flatMap((result) => result ?? [])
 
 			return (
 				this.filterUnwantedShares(flatResults)
@@ -238,7 +242,7 @@ export default defineComponent({
 					if (
 						share.value.shareType
 							=== (this as any).SHARE_TYPES.SHARE_TYPE_USER
-						&& share.value.shareWith === getCurrentUser().uid
+						&& share.value.shareWith === getCurrentUser()?.uid
 					) {
 						return false
 					}

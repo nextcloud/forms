@@ -19,6 +19,7 @@ import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?ra
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
 import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
 import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
 import { markRaw } from 'vue'
 import QuestionColor from '../components/Questions/QuestionColor.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'

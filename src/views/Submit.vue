@@ -73,7 +73,7 @@
 						? ''
 						: t('forms', 'Thank you for completing the form!')
 				"
-				:description="form.submissionMessage">
+				:description="form.submissionMessage ?? undefined">
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
 				</template>
@@ -93,7 +93,7 @@
 					)
 				">
 				<template #icon>
-					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
+					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
@@ -107,7 +107,7 @@
 					)
 				">
 				<template #icon>
-					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
+					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
 				</template>
 			</NcEmptyContent>
 			<NcEmptyContent
@@ -121,7 +121,7 @@
 					)
 				">
 				<template #icon>
-					<NcIconSvgWrapper :svg="IconCheckSvg" size="64" />
+					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
 				</template>
 			</NcEmptyContent>
 
@@ -141,7 +141,9 @@
 						:values="answers[question.id]"
 						@keydown.enter="onKeydownEnter"
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="(values) => onUpdate(question, values)" />
+						@update:values="
+							(values: unknown[]) => onUpdate(question, values)
+						" />
 				</ul>
 				<div class="form-buttons">
 					<NcButton
@@ -216,7 +218,10 @@
 	</NcAppContent>
 </template>
 
-<script>
+<script lang="ts">
+import type { NavigationGuardNext } from 'vue-router'
+import type { FormsQuestion } from '../models/Entities.d.ts'
+
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
@@ -225,8 +230,10 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
+import { translate as t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -250,7 +257,76 @@ import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
-export default {
+type AnswerValue = unknown[]
+type AnswersMap = Record<number, AnswerValue>
+
+interface StoredAnswerState {
+	value: AnswerValue
+	type: string
+}
+
+interface StoredAnswersMap {
+	[key: string]: StoredAnswerState
+}
+
+interface QuestionOption {
+	id: number
+	text: string
+	optionType?: string
+}
+
+interface SubmitQuestion extends FormsQuestion {
+	options?: QuestionOption[]
+	extraSettings?: Record<string, unknown> & {
+		allowOtherAnswer?: boolean
+	}
+	isRequired?: boolean
+}
+
+interface LoadedSubmissionAnswer {
+	id: number
+	questionId: number | string
+	text: string
+}
+
+interface LoadedSubmissionResponse {
+	answers: LoadedSubmissionAnswer[]
+}
+
+interface QuestionComponentRef {
+	validate: () => Promise<boolean>
+}
+
+interface DialogButton {
+	label: string
+	icon: string
+	variant?:
+		| 'primary'
+		| 'secondary'
+		| 'tertiary'
+		| 'tertiary-no-background'
+		| 'tertiary-on-primary'
+		| 'error'
+		| 'warning'
+		| 'success'
+	callback: () => void
+}
+
+interface SubmitViewData {
+	answerTypes: typeof answerTypes
+	answers: AnswersMap
+	loading: boolean
+	success: boolean
+	successAnnouncement: string
+	submitForm: boolean
+	showConfirmEmptyModal: boolean
+	showConfirmLeaveDialog: boolean
+	showClearFormDialog: boolean
+	showClearFormDueToChangeDialog: boolean
+	confirmButtonCallback: (value: boolean) => void
+}
+
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Submit',
 
@@ -275,7 +351,11 @@ export default {
 	 * This is used to confirm that the user wants to leave the page
 	 * if the form is unsubmitted.
 	 */
-	async beforeRouteUpdate(to, from, next) {
+	async beforeRouteUpdate(
+		_to: unknown,
+		_from: unknown,
+		next: NavigationGuardNext,
+	): Promise<void> {
 		// This navigation guard is called when the route parameters changed (e.g. form hash)
 		// continue with the navigation if there are no changes or the user confirms to leave the form
 		if (await this.confirmLeaveForm()) {
@@ -286,7 +366,11 @@ export default {
 		}
 	},
 
-	async beforeRouteLeave(to, from, next) {
+	async beforeRouteLeave(
+		_to: unknown,
+		_from: unknown,
+		next: NavigationGuardNext,
+	): Promise<void> {
 		// This navigation guard is called when the route changed and a new view should be shown
 		// continue with the navigation if there are no changes or the user confirms to leave the form
 		if (await this.confirmLeaveForm()) {
@@ -316,34 +400,33 @@ export default {
 			IconCheckSvg: IconCheck,
 			IconRefreshSvg: IconRefresh,
 			IconSendSvg: IconSend,
+			t,
 
-			maxStringLengths: loadState('forms', 'maxStringLengths'),
+			maxStringLengths: loadState('forms', 'maxStringLengths') as Record<
+				string,
+				number
+			>,
 		}
 	},
 
-	data() {
+	data(): SubmitViewData {
 		return {
 			answerTypes,
-			/**
-			 * Mapping of questionId => answers
-			 *
-			 * @type {Record<number, string[]>}
-			 */
 			answers: {},
 			loading: false,
 			success: false,
 			successAnnouncement: '',
-			/** Submit state of the form, true if changes are currently submitted */
 			submitForm: false,
 			showConfirmEmptyModal: false,
 			showConfirmLeaveDialog: false,
 			showClearFormDialog: false,
 			showClearFormDueToChangeDialog: false,
+			confirmButtonCallback: () => {},
 		}
 	},
 
 	computed: {
-		validQuestions() {
+		validQuestions(): SubmitQuestion[] {
 			return this.form.questions.filter((question) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
@@ -351,53 +434,53 @@ export default {
 				}
 
 				// If specific conditions provided, test against them
-				if ('validate' in answerTypes[question.type]) {
-					return answerTypes[question.type].validate(question)
+				const answerType = answerTypes[question.type]
+				if (typeof answerType.validate === 'function') {
+					return answerType.validate(question)
 				}
 				return true
-			})
+			}) as SubmitQuestion[]
 		},
 
-		validQuestionsIds() {
+		validQuestionsIds(): Set<number> {
 			return new Set(this.validQuestions.map((question) => question.id))
 		},
 
-		isRequiredUsed() {
-			return this.form.questions.reduce(
-				(isUsed, question) => isUsed || question.isRequired,
-				false,
+		isRequiredUsed(): boolean {
+			return this.form.questions.some((question) =>
+				Boolean(question.isRequired),
 			)
 		},
 
 		/**
 		 * Check if form is expired
 		 */
-		isExpired() {
-			return this.form.expires && moment().unix() > this.form.expires
+		isExpired(): boolean {
+			return this.form.expires > 0 && moment().unix() > this.form.expires
 		},
 
-		isArchived() {
+		isArchived(): boolean {
 			return this.form.state === FormState.FormArchived
 		},
 
-		isClosed() {
+		isClosed(): boolean {
 			return this.form.state === FormState.FormClosed
 		},
 
-		isMaxSubmissionsReached() {
+		isMaxSubmissionsReached(): boolean {
 			return this.form.isMaxSubmissionsReached === true
 		},
 
 		/**
 		 * Checks if the current state is active.
 		 *
-		 * @return {boolean} - Returns true if active, otherwise false.
+		 * @return - Returns true if active, otherwise false.
 		 */
-		isActive() {
+		isActive(): boolean {
 			return !this.isArchived && !this.isClosed && !this.isExpired
 		},
 
-		infoMessage() {
+		infoMessage(): string {
 			let message = ''
 			if (this.form.isAnonymous) {
 				message += t('forms', 'Responses are anonymous.')
@@ -417,7 +500,7 @@ export default {
 		/**
 		 * Rendered HTML of the custom submission message
 		 */
-		submissionMessageHTML() {
+		submissionMessageHTML(): string {
 			if (
 				this.form.submissionMessage
 				&& (this.success || !this.form.canSubmit)
@@ -427,7 +510,7 @@ export default {
 			return ''
 		},
 
-		expirationMessage() {
+		expirationMessage(): string {
 			const relativeDate = moment(this.form.expires, 'X')
 				.locale(window.OC.getLanguage())
 				.fromNow()
@@ -440,7 +523,7 @@ export default {
 		/**
 		 * Buttons for the "confirm submit empty form" dialog
 		 */
-		confirmEmptyModalButtons() {
+		confirmEmptyModalButtons(): DialogButton[] {
 			return [
 				{
 					label: t('forms', 'Abort'),
@@ -459,7 +542,7 @@ export default {
 		/**
 		 * Buttons for the "confirm leave unsubmitted form" dialog
 		 */
-		confirmLeaveFormButtons() {
+		confirmLeaveFormButtons(): DialogButton[] {
 			return [
 				{
 					label: t('forms', 'Abort'),
@@ -478,7 +561,7 @@ export default {
 		/**
 		 * Buttons for the "confirm clear form" dialog
 		 */
-		confirmClearFormButtons() {
+		confirmClearFormButtons(): DialogButton[] {
 			return [
 				{
 					label: t('forms', 'Abort'),
@@ -494,20 +577,20 @@ export default {
 			]
 		},
 
-		hasAnswers() {
+		hasAnswers(): boolean {
 			return Object.keys(this.answers).length > 0
 		},
 
-		submissionId() {
+		submissionId(): number | null {
 			const id =
 				this.$route?.params.submissionId
-				|| loadState(appName, 'submissionId', null)
-			return id ? parseInt(id) : null
+				|| loadState('forms', 'submissionId', null)
+			return id ? parseInt(String(id), 10) : null
 		},
 	},
 
 	watch: {
-		success(newVal) {
+		success(newVal: boolean): void {
 			if (newVal) {
 				// Delay populating the live region to avoid the announcement being
 				// swallowed by the simultaneous large DOM change (form replaced by
@@ -523,7 +606,7 @@ export default {
 			}
 		},
 
-		hash() {
+		hash(): void {
 			// If public view, abort. Should normally not occur.
 			if (this.publicView) {
 				logger.error('Hash changed on public view. Aborting.')
@@ -537,15 +620,15 @@ export default {
 		},
 	},
 
-	beforeUnmount() {
+	beforeUnmount(): void {
 		window.removeEventListener('beforeunload', this.beforeWindowUnload)
 	},
 
-	created() {
+	created(): void {
 		window.addEventListener('beforeunload', this.beforeWindowUnload)
 	},
 
-	async beforeMount() {
+	async beforeMount(): Promise<void> {
 		// Public Views get their form by initial-state from parent. No fetch necessary.
 		if (this.publicView) {
 			this.isLoadingForm = false
@@ -574,9 +657,9 @@ export default {
 		/**
 		 * Load saved values for current form from LocalStorage
 		 *
-		 * @return {Record<string,any>}
+		 * @return
 		 */
-		getFormValuesFromLocalStorage() {
+		getFormValuesFromLocalStorage(): StoredAnswersMap | null {
 			const fromLocalStorage = localStorage.getItem(
 				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
 			)
@@ -589,16 +672,16 @@ export default {
 		/**
 		 * Initialize answers from saved state in LocalStorage
 		 */
-		initFromLocalStorage() {
+		initFromLocalStorage(): void {
 			const savedState = this.getFormValuesFromLocalStorage()
 			if (!savedState) {
 				return
 			}
 
-			const answers = {}
+			const answers: AnswersMap = {}
 			for (const [questionId, answer] of Object.entries(savedState)) {
 				// Clean up answers for questions that do not exist anymore
-				if (!this.validQuestionsIds.has(parseInt(questionId))) {
+				if (!this.validQuestionsIds.has(parseInt(questionId, 10))) {
 					this.showClearFormDueToChangeDialog = true
 					logger.debug('Question does not exist anymore', {
 						questionId,
@@ -606,7 +689,7 @@ export default {
 					continue
 				}
 
-				answers[questionId] = [
+				answers[parseInt(questionId, 10)] = [
 					'QuestionMultiple',
 					'QuestionRanking',
 				].includes(answer.type)
@@ -619,9 +702,9 @@ export default {
 		/**
 		 * Save updated answers for question to LocalStorage in case of browser crash / closes / etc
 		 *
-		 * @param {*} question Question to update
+		 * @param question Question to update
 		 */
-		addFormFieldToLocalStorage(question) {
+		addFormFieldToLocalStorage(question: SubmitQuestion): void {
 			if (!this.isLoggedIn) {
 				return
 			}
@@ -640,7 +723,7 @@ export default {
 			)
 		},
 
-		deleteFormFieldFromLocalStorage() {
+		deleteFormFieldFromLocalStorage(): void {
 			if (!this.isLoggedIn) {
 				return
 			}
@@ -649,7 +732,7 @@ export default {
 			)
 		},
 
-		async fetchSubmission() {
+		async fetchSubmission(): Promise<void> {
 			logger.debug(`Loading response ${this.submissionId}`)
 
 			try {
@@ -663,10 +746,11 @@ export default {
 					),
 				)
 
-				const answers = {}
-				const loadedAnswers = OcsResponse2Data(response).answers
+				const answers: AnswersMap = {}
+				const loadedAnswers =
+					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
 				for (const answer of loadedAnswers) {
-					const questionId = answer.questionId
+					const questionId = Number(answer.questionId)
 					const text = answer.text
 
 					// Only initialize once, don't overwrite previous answers
@@ -676,7 +760,7 @@ export default {
 
 					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
-					if (!this.validQuestionsIds.has(parseInt(questionId))) {
+					if (!this.validQuestionsIds.has(questionId)) {
 						this.showClearFormDueToChangeDialog = true
 						logger.debug('Question does not exist anymore', {
 							questionId,
@@ -686,7 +770,10 @@ export default {
 
 					const question = this.form.questions.find(
 						(question) => question.id === questionId,
-					)
+					) as SubmitQuestion | undefined
+					if (!question) {
+						continue
+					}
 					if (question.type === 'ranking') {
 						try {
 							answers[questionId].push(...JSON.parse(text).map(String))
@@ -701,15 +788,15 @@ export default {
 							question.type,
 						)
 					) {
-						const option = question.options.filter(
+						const option = (question.options ?? []).filter(
 							(option) => option.text === text,
 						)
 						if (option.length > 0) {
 							answers[questionId].push(String(option[0].id))
 						} else if (
-							question.extraSettings.allowOtherAnswer
+							question.extraSettings?.allowOtherAnswer
 							&& !answers[questionId].some((answer) =>
-								answer.startsWith(
+								String(answer).startsWith(
 									QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 								),
 							)
@@ -748,42 +835,50 @@ export default {
 		/**
 		 * Update answers of a give value
 		 *
-		 * @param {{id: number}} question The question to answer
-		 * @param {unknown[]} values The new values
+		 * @param question The question to answer
+		 * @param values The new values
 		 */
-		onUpdate(question, values) {
+		onUpdate(question: SubmitQuestion, values: AnswerValue): void {
 			this.answers = { ...this.answers, [question.id]: values }
 			this.addFormFieldToLocalStorage(question)
+		},
+
+		updateQuestionValues(question: SubmitQuestion, values: AnswerValue): void {
+			this.onUpdate(question, values)
 		},
 
 		/**
 		 * On Enter, focus next form-element
 		 * Last form element is the submit button, the form submits on enter then
 		 *
-		 * @param {object} event The fired event.
+		 * @param event The fired event.
 		 */
-		onKeydownEnter(event) {
-			const formInputs = Array.from(this.$refs.form)
+		onKeydownEnter(
+			event: KeyboardEvent & { originalTarget?: EventTarget | null },
+		): void {
+			const formInputs = Array.from(
+				(this.$refs.form as HTMLFormElement).elements,
+			) as HTMLElement[]
 			const sourceInputIndex = formInputs.findIndex(
-				(input) => input === event.originalTarget,
+				(input) => input === (event.originalTarget ?? event.target),
 			)
 
 			// Focus next form element
-			formInputs[sourceInputIndex + 1].focus()
+			formInputs[sourceInputIndex + 1]?.focus()
 		},
 
 		/**
 		 * Ctrl+Enter typically fires submit on forms.
 		 * Some inputs do automatically, while some need explicit handling
 		 */
-		onKeydownCtrlEnter() {
-			this.$refs.form.requestSubmit()
+		onKeydownCtrlEnter(): void {
+			;(this.$refs.form as HTMLFormElement | undefined)?.requestSubmit()
 		},
 
 		/*
 		 * Methods for catching unwanted unload events
 		 */
-		beforeWindowUnload(e) {
+		beforeWindowUnload(e: BeforeUnloadEvent): void {
 			if (
 				this.isActive
 				&& !this.submitForm
@@ -807,10 +902,10 @@ export default {
 		 * If the conditions are met, a confirmation dialog is shown and a promise is returned.
 		 * The promise resolves with the value passed to the confirm button callback.
 		 *
-		 * @return {Promise<boolean>|boolean} - Returns a promise that resolves with the value
+		 * @return - Returns a promise that resolves with the value
 		 * passed to the confirm button callback if the dialog is shown, otherwise returns true.
 		 */
-		confirmLeaveForm() {
+		confirmLeaveForm(): Promise<boolean> | boolean {
 			if (
 				this.isActive
 				&& !this.submitForm
@@ -818,7 +913,7 @@ export default {
 			) {
 				this.showConfirmLeaveDialog = true
 				return new Promise((resolve) => {
-					this.confirmButtonCallback = (val) => {
+					this.confirmButtonCallback = (val: boolean) => {
 						this.showConfirmLeaveDialog = false
 						resolve(val)
 					}
@@ -831,8 +926,13 @@ export default {
 		/**
 		 * Submit the form after the browser validated it 🚀 or show confirmation modal if empty
 		 */
-		async onSubmit() {
-			const validation = (this.$refs.questions ?? []).map(
+		async onSubmit(): Promise<void> {
+			const questionRefs = (
+				Array.isArray(this.$refs.questions)
+					? this.$refs.questions
+					: [this.$refs.questions].filter(Boolean)
+			) as QuestionComponentRef[]
+			const validation = questionRefs.map(
 				async (question) => await question.validate(),
 			)
 
@@ -864,7 +964,7 @@ export default {
 		/**
 		 * Handle the real submit of the form, this is only called if the form is not empty or user confirmed to submit
 		 */
-		async onConfirmedSubmit() {
+		async onConfirmedSubmit(): Promise<void> {
 			this.showConfirmEmptyModal = false
 			this.loading = true
 
@@ -898,7 +998,13 @@ export default {
 				this.deleteFormFieldFromLocalStorage()
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
-				const errorMessage = error.response?.data?.ocs?.meta?.message
+				const errorMessage = (
+					error as {
+						response?: {
+							data?: { ocs?: { meta?: { message?: string } } }
+						}
+					}
+				).response?.data?.ocs?.meta?.message
 				logger.error('Error while submitting the form', { error })
 				if (errorMessage) {
 					showError(
@@ -921,7 +1027,7 @@ export default {
 			}
 		},
 
-		onResetSubmission() {
+		onResetSubmission(): void {
 			this.deleteFormFieldFromLocalStorage()
 			this.resetData()
 		},
@@ -929,7 +1035,7 @@ export default {
 		/**
 		 * Reset View-Data
 		 */
-		resetData() {
+		resetData(): void {
 			this.answers = {}
 			this.loading = false
 			this.showConfirmLeaveDialog = false
@@ -939,7 +1045,7 @@ export default {
 			this.submitForm = false
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

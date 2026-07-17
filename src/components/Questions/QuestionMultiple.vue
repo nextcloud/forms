@@ -29,24 +29,24 @@
 			<template v-if="!isUnique">
 				<!-- Allow setting a minimum of options to be checked -->
 				<NcActionCheckbox
-					:modelValue="!!extraSettings?.optionsLimitMin"
+					:modelValue="!!multipleSettings.optionsLimitMin"
 					@update:modelValue="
 						(checked) => onLimitOptionsMin(checked ? 1 : null)
 					">
 					{{ t('forms', 'Require a minimum of options to be checked') }}
 				</NcActionCheckbox>
 				<NcActionInput
-					v-if="extraSettings?.optionsLimitMin"
+					v-if="multipleSettings.optionsLimitMin"
 					type="number"
 					:label="t('forms', 'Minimum options to be checked')"
 					:labelOutside="false"
 					:showTrailingButton="false"
-					:modelValue="extraSettings.optionsLimitMin"
+					:modelValue="multipleSettings.optionsLimitMin"
 					@update:modelValue="onLimitOptionsMin" />
 
 				<!-- Allow setting a maximum -->
 				<NcActionCheckbox
-					:modelValue="!!extraSettings?.optionsLimitMax"
+					:modelValue="!!multipleSettings.optionsLimitMax"
 					@update:modelValue="
 						(checked) =>
 							onLimitOptionsMax(checked ? choices.length || 1 : null)
@@ -54,12 +54,12 @@
 					{{ t('forms', 'Require a maximum of options to be checked') }}
 				</NcActionCheckbox>
 				<NcActionInput
-					v-if="extraSettings?.optionsLimitMax"
+					v-if="multipleSettings.optionsLimitMax"
 					type="number"
 					:label="t('forms', 'Maximum options to be checked')"
 					:labelOutside="false"
 					:showTrailingButton="false"
-					:modelValue="extraSettings.optionsLimitMax"
+					:modelValue="multipleSettings.optionsLimitMax"
 					@update:modelValue="onLimitOptionsMax" />
 			</template>
 			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
@@ -84,7 +84,7 @@
 					:value="answer.id.toString()"
 					:name="`${id}-answer`"
 					:type="isUnique ? 'radio' : 'checkbox'"
-					:required="checkRequired(answer.id)"
+					:required="checkRequired"
 					@invalid.prevent="validate"
 					@update:modelValue="onChange"
 					@keydown.enter.exact.prevent="onKeydownEnter">
@@ -98,7 +98,7 @@
 						:value="otherAnswer ?? QUESTION_EXTRASETTINGS_OTHER_PREFIX"
 						:name="`${id}-answer`"
 						:type="isUnique ? 'radio' : 'checkbox'"
-						:required="checkRequired('other-answer')"
+						:required="checkRequired"
 						class="question__label"
 						@invalid.prevent="validate"
 						@update:modelValue="onChangeOther"
@@ -184,12 +184,15 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsOption } from '../../models/Entities.d.ts'
+
 import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
 import IconRadioboxBlank from '@material-symbols/svg-400/outlined/radio_button_unchecked.svg?raw'
 import { showError } from '@nextcloud/dialogs'
 import { translatePlural as n, translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -208,7 +211,23 @@ import {
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../../models/Constants.ts'
 
-export default {
+type QuestionMultipleExtraSettings = {
+	allowOtherAnswer?: boolean
+	optionsLimitMax?: number
+	optionsLimitMin?: number
+	shuffleOptions?: boolean
+}
+
+interface QuestionMultipleData {
+	cachedOtherAnswerText: string
+	QUESTION_EXTRASETTINGS_OTHER_PREFIX: typeof QUESTION_EXTRASETTINGS_OTHER_PREFIX
+	isDragging: boolean
+	isOptionDialogShown: boolean
+	isLoading: boolean
+	OptionType: typeof OptionType
+}
+
+export default defineComponent({
 	name: 'QuestionMultiple',
 
 	components: {
@@ -233,10 +252,11 @@ export default {
 			IconCheckboxBlankOutline,
 			IconContentPaste,
 			IconRadioboxBlank,
+			t,
 		}
 	},
 
-	data() {
+	data(): QuestionMultipleData {
 		return {
 			/**
 			 * This is used to cache the "other" answer, meaning if the user:
@@ -254,62 +274,71 @@ export default {
 	},
 
 	computed: {
-		isUnique() {
+		isUnique(): boolean {
 			return this.answerType.unique === true
 		},
 
-		shiftDragHandle() {
+		shiftDragHandle(): boolean {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
 
-		pseudoIcon() {
+		pseudoIcon(): string {
 			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
 		},
 
-		placeholderOtherAnswer() {
+		placeholderOtherAnswer(): string {
 			if (this.readOnly) {
 				return this.answerType.submitPlaceholder
 			}
 			return this.answerType.createPlaceholder
 		},
 
-		questionValues() {
-			return this.isUnique ? this.values?.[0] : this.values
+		questionValues(): string | string[] | undefined {
+			const values = this.values as string[]
+			return this.isUnique ? values?.[0] : values
 		},
 
-		allowOtherAnswer() {
-			return this.extraSettings?.allowOtherAnswer ?? false
+		multipleSettings(): QuestionMultipleExtraSettings {
+			return (
+				(this.extraSettings as QuestionMultipleExtraSettings | undefined)
+				?? {}
+			)
+		},
+
+		allowOtherAnswer(): boolean {
+			return this.multipleSettings.allowOtherAnswer ?? false
 		},
 
 		/**
 		 * The full "other" answer including prefix, undefined if no "other answer"
 		 */
-		otherAnswer() {
-			return this.values.find((v) =>
+		otherAnswer(): string | undefined {
+			const values = this.values as string[]
+			return values.find((v) =>
 				v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
 			)
 		},
 
 		choices: {
-			get() {
+			get(): FormsOption[] {
 				return this.sortOptionsOfType(this.options, OptionType.Choice)
 			},
 
-			set(value) {
+			set(value: FormsOption[]) {
 				this.updateOptionsOrder(value, OptionType.Choice)
 			},
 		},
 
-		availableOptions() {
+		availableOptions(): number {
 			return (
 				this.choices.filter(({ text }) => text.trim() !== '').length
 				+ (this.allowOtherAnswer ? 1 : 0)
 			)
 		},
 
-		infoMessage() {
-			const min = this.extraSettings?.optionsLimitMin ?? 0
-			const max = this.extraSettings?.optionsLimitMax ?? 0
+		infoMessage(): string | null {
+			const min = this.multipleSettings.optionsLimitMin ?? 0
+			const max = this.multipleSettings.optionsLimitMax ?? 0
 
 			if (!min && !max) {
 				return null
@@ -351,18 +380,19 @@ export default {
 
 	watch: {
 		// Ensure that the "other" answer is reset after toggling the checkbox
-		otherAnswer() {
+		otherAnswer(): void {
 			this.resetOtherAnswerText()
 		},
 	},
 
-	mounted() {
+	mounted(): void {
 		// Ensure the initial "other" answer is set
 		this.resetOtherAnswerText()
 	},
 
 	methods: {
-		async validate() {
+		async validate(): Promise<boolean> {
+			const values = this.values as string[]
 			if (this.isRequired && this.areNoneChecked) {
 				this.errorMessage = t('forms', 'You must answer this question')
 				return false
@@ -370,9 +400,9 @@ export default {
 
 			if (!this.isUnique) {
 				// Validate limits
-				const max = this.extraSettings.optionsLimitMax ?? 0
-				const min = this.extraSettings.optionsLimitMin ?? 0
-				if (max && this.values.length > max) {
+				const max = this.multipleSettings.optionsLimitMax ?? 0
+				const min = this.multipleSettings.optionsLimitMin ?? 0
+				if (max && values.length > max) {
 					this.errorMessage = n(
 						'forms',
 						'You must choose at most one option',
@@ -381,7 +411,7 @@ export default {
 					)
 					return false
 				}
-				if (min && this.values.length < min) {
+				if (min && values.length < min) {
 					this.errorMessage = n(
 						'forms',
 						'You must choose at least one option',
@@ -396,11 +426,11 @@ export default {
 			return true
 		},
 
-		onDragStart() {
+		onDragStart(): void {
 			this.isDragging = true
 		},
 
-		onDragEnd() {
+		onDragEnd(): void {
 			this.$nextTick(() => {
 				this.isDragging = false
 			})
@@ -409,7 +439,7 @@ export default {
 		/**
 		 * Resets the local "other" answer text to the one from the options if available
 		 */
-		resetOtherAnswerText() {
+		resetOtherAnswerText(): void {
 			if (this.otherAnswer) {
 				// make sure to use cached value if empty value is passed
 				this.cachedOtherAnswerText =
@@ -419,44 +449,49 @@ export default {
 			}
 		},
 
-		onChange(value) {
-			this.$emit('update:values', this.isUnique ? [value].flat() : value)
+		onChange(value: string | string[]): void {
+			const normalizedValue = Array.isArray(value) ? value : [value]
+			this.$emit(
+				'update:values',
+				this.isUnique ? normalizedValue.slice(0, 1) : normalizedValue,
+			)
 		},
 
 		/**
 		 * Handle toggling the "other"-answer checkbox / radio switch
 		 *
-		 * @param {string|string[]} value The new value of the answer(s)
+		 * @param value The new value of the answer(s)
 		 */
-		onChangeOther(value) {
-			value = [value].flat()
-			const pureValue = value.filter(
+		onChangeOther(value: string | string[]): void {
+			const normalizedValue = Array.isArray(value) ? value : [value]
+			const pureValue = normalizedValue.filter(
 				(v) => !v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
 			)
 
-			if (value.length > pureValue.length) {
+			if (normalizedValue.length > pureValue.length) {
 				// make sure to add the cached text on re-enable
 				this.onChange([
 					...pureValue,
 					`${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${this.cachedOtherAnswerText}`,
 				])
 			} else {
-				this.onChange(value)
+				this.onChange(normalizedValue)
 			}
 		},
 
 		/**
 		 * Updating the maximum number
 		 *
-		 * @param {number|null} max Maximum options
+		 * @param max Maximum options
 		 */
-		onLimitOptionsMax(max) {
-			max = max && Number.parseInt(max.toString(), 10)
+		onLimitOptionsMax(max: number | string | null): void {
+			const parsedMax =
+				max === null ? null : Number.parseInt(max.toString(), 10)
 			if (this.isUnique || max === null) {
 				// For unique (radio) options we cannot set limits, also if null is passed then we need to remove the limit
 				this.onExtraSettingsChange({ optionsLimitMax: undefined })
-			} else if (max) {
-				if (max > this.availableOptions) {
+			} else if (parsedMax) {
+				if (parsedMax > this.availableOptions) {
 					showError(
 						t(
 							'forms',
@@ -469,7 +504,7 @@ export default {
 					return
 				}
 
-				if ((this.extraSettings.optionsLimitMin ?? 0) > max) {
+				if ((this.multipleSettings.optionsLimitMin ?? 0) > parsedMax) {
 					showError(
 						t(
 							'forms',
@@ -479,21 +514,22 @@ export default {
 					return
 				}
 				// If a valid number was passed, update the backend
-				this.onExtraSettingsChange({ optionsLimitMax: max })
+				this.onExtraSettingsChange({ optionsLimitMax: parsedMax })
 			}
 		},
 
 		/**
 		 * Update the minimum of checked options
 		 *
-		 * @param {number|null} min Minimum of checked options
+		 * @param min Minimum of checked options
 		 */
-		onLimitOptionsMin(min) {
-			min = min && Number.parseInt(min.toString(), 10)
+		onLimitOptionsMin(min: number | string | null): void {
+			const parsedMin =
+				min === null ? null : Number.parseInt(min.toString(), 10)
 			if (this.isUnique || min === null) {
 				this.onExtraSettingsChange({ optionsLimitMin: undefined })
-			} else if (min) {
-				if (min > this.availableOptions - 1) {
+			} else if (parsedMin) {
+				if (parsedMin > this.availableOptions - 1) {
 					showError(
 						t(
 							'forms',
@@ -507,8 +543,8 @@ export default {
 				}
 
 				if (
-					this.extraSettings.optionsLimitMax
-					&& min > this.extraSettings.optionsLimitMax
+					this.multipleSettings.optionsLimitMax
+					&& parsedMin > this.multipleSettings.optionsLimitMax
 				) {
 					showError(
 						t(
@@ -518,8 +554,8 @@ export default {
 					)
 					return
 				}
-				this.onExtraSettingsChange({ optionsLimitMin: min })
-				if (min > 0) {
+				this.onExtraSettingsChange({ optionsLimitMin: parsedMin })
+				if (parsedMin > 0) {
 					this.$emit('update:isRequired', true)
 				}
 			}
@@ -532,9 +568,9 @@ export default {
 		 * So we require the one that are checked or all
 		 * if none are checked yet.
 		 *
-		 * @return {boolean}
+		 * @return
 		 */
-		checkRequired() {
+		checkRequired(): boolean {
 			// false, if question not required
 			if (!this.isRequired) {
 				return false
@@ -552,16 +588,16 @@ export default {
 		/**
 		 * Update status extra setting allowOtherAnswer and save on DB
 		 *
-		 * @param {boolean} allowOtherAnswer show/hide field for other answer
+		 * @param allowOtherAnswer show/hide field for other answer
 		 */
-		onAllowOtherAnswerChange(allowOtherAnswer) {
+		onAllowOtherAnswerChange(allowOtherAnswer: boolean): void {
 			return this.onExtraSettingsChange({ allowOtherAnswer })
 		},
 
 		/**
 		 * Handles the change event for the "Other" answer text input.
 		 *
-		 * @param {string} value - The new value entered for the "Other" answer.
+		 * @param value - The new value entered for the "Other" answer.
 		 *
 		 * This method performs the following actions:
 		 * 1. Updates the cached value of the "Other" answer text (`cachedOtherAnswerText`).
@@ -571,17 +607,17 @@ export default {
 		 *    - If `isUnique` is false, the emitted values will include all existing values
 		 *      (excluding any that start with the "Other" prefix) and the new prefixed "Other" answer.
 		 */
-		onOtherAnswerTextChange(value) {
-			this.cachedOtherAnswerText = value
+		onOtherAnswerTextChange(value: string | number): void {
+			this.cachedOtherAnswerText = String(value)
 			// Prefix the value
-			const prefixedValue = `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${value}`
+			const prefixedValue = `${QUESTION_EXTRASETTINGS_OTHER_PREFIX}${String(value)}`
 			// emit the values and add the "other" answer
 			this.$emit(
 				'update:values',
 				this.isUnique
 					? [prefixedValue]
 					: [
-							...this.values.filter(
+							...(this.values as string[]).filter(
 								(v) =>
 									!v.startsWith(
 										QUESTION_EXTRASETTINGS_OTHER_PREFIX,
@@ -592,7 +628,7 @@ export default {
 			)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

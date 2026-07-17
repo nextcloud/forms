@@ -108,8 +108,10 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
+import { translate as t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
+import { defineComponent } from 'vue'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
@@ -121,7 +123,19 @@ import svgEventIcon from '../../../img/event.svg?raw'
 import svgTodayIcon from '../../../img/today.svg?raw'
 import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
-export default {
+type PickerType =
+	'date' | 'datetime' | 'time' | 'date-range' | 'datetime-range' | 'time-range'
+
+type QuestionDateExtraSettings = {
+	dateRange?: boolean
+	dateMax?: number | null
+	dateMin?: number | null
+	timeRange?: boolean
+	timeMax?: string | null
+	timeMin?: string | null
+}
+
+export default defineComponent({
 	name: 'QuestionDate',
 
 	components: {
@@ -146,17 +160,20 @@ export default {
 			svgClockLoader20,
 			svgEventIcon,
 			svgTodayIcon,
+			t,
 		}
 	},
 
 	computed: {
-		isRangeQuestion() {
-			return this.extraSettings?.dateRange || this.extraSettings?.timeRange
+		isRangeQuestion(): boolean {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.dateRange || extraSettings?.timeRange
 				? true
 				: false
 		},
 
-		datetimePickerPlaceholder() {
+		datetimePickerPlaceholder(): string {
 			if (this.readOnly) {
 				return this.isRangeQuestion
 					? this.answerType.submitPlaceholderRange
@@ -167,74 +184,89 @@ export default {
 				: this.answerType.createPlaceholder
 		},
 
-		dateTimePickerType() {
+		dateTimePickerType(): PickerType {
 			return this.isRangeQuestion
-				? this.answerType.pickerType + '-range'
-				: this.answerType.pickerType
+				? (`${this.answerType.pickerType}-range` as PickerType)
+				: (this.answerType.pickerType as PickerType)
 		},
 
-		time() {
+		time(): Date | [Date, Date] | null {
 			if (this.isRangeQuestion) {
-				return this.values?.[0]
-					? [this.parse(this.values[0]), this.parse(this.values[1])]
+				const firstValue = this.values?.[0] as string | undefined
+				const secondValue = this.values?.[1] as string | undefined
+				return firstValue && secondValue
+					? [this.parse(firstValue), this.parse(secondValue)]
 					: null
 			}
-			return this.values?.[0] ? this.parse(this.values[0]) : null
+			const value = this.values?.[0] as string | undefined
+			return value ? this.parse(value) : null
 		},
 
 		/**
 		 * The maximum allowable date for the date input field
 		 */
-		dateMax() {
-			return this.extraSettings?.dateMax
-				? moment(this.extraSettings.dateMax, 'X').toDate()
-				: null
+		dateMax(): Date | undefined {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.dateMax
+				? moment(extraSettings.dateMax, 'X').toDate()
+				: undefined
 		},
 
 		/**
 		 * The minimum allowable date for the date input field
 		 */
-		dateMin() {
-			return this.extraSettings?.dateMin
-				? moment(this.extraSettings.dateMin, 'X').toDate()
-				: null
+		dateMin(): Date | undefined {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.dateMin
+				? moment(extraSettings.dateMin, 'X').toDate()
+				: undefined
 		},
 
-		dateRange() {
-			return this.extraSettings?.dateRange ?? false
+		dateRange(): boolean {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.dateRange ?? false
 		},
 
 		/**
 		 * The maximum allowable time for the time input field
 		 */
-		timeMax() {
-			return this.extraSettings?.timeMax
+		timeMax(): Date | undefined {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.timeMax
 				? moment(
-						this.extraSettings.timeMax,
+						extraSettings.timeMax,
 						this.answerType.storageFormat,
 					).toDate()
-				: new Date(new Date().setHours(24, 0, 0, 0))
+				: undefined
 		},
 
 		/**
 		 * The minimum allowable time for the time input field
 		 */
-		timeMin() {
-			return this.extraSettings?.timeMin
+		timeMin(): Date | undefined {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.timeMin
 				? moment(
-						this.extraSettings.timeMin,
+						extraSettings.timeMin,
 						this.answerType.storageFormat,
 					).toDate()
-				: new Date(new Date().setHours(0, 0, 0, 0))
+				: undefined
 		},
 
-		timeRange() {
-			return this.extraSettings?.timeRange ?? false
+		timeRange(): boolean {
+			const extraSettings = this.extraSettings as
+				QuestionDateExtraSettings | undefined
+			return extraSettings?.timeRange ?? false
 		},
 	},
 
 	methods: {
-		async validate() {
+		async validate(): Promise<boolean> {
 			if (this.isRequired && this.time === null) {
 				this.errorMessage = t('forms', 'You must answer this question')
 				return false
@@ -248,10 +280,10 @@ export default {
 		 * DateTimepicker show text in picker
 		 * Format depends on component-type date/datetime
 		 *
-		 * @param {Date|Date[]} date the selected datepicker Date
-		 * @return {string}
+		 * @param date the selected datepicker Date
+		 * @return
 		 */
-		stringify(date) {
+		stringify(date: Date | Date[]): string {
 			if (this.isRangeQuestion && Array.isArray(date)) {
 				return `${moment(date[0]).format(this.answerType.momentFormat)} - ${moment(date[1]).format(this.answerType.momentFormat)}`
 			}
@@ -261,10 +293,10 @@ export default {
 		/**
 		 * Reinterpret a stored date
 		 *
-		 * @param {string} dateString Stringified date
-		 * @return {Date}
+		 * @param dateString Stringified date
+		 * @return
 		 */
-		parse(dateString) {
+		parse(dateString: string): Date {
 			return moment(dateString, [
 				this.answerType.momentFormat,
 				this.answerType.storageFormat,
@@ -275,9 +307,9 @@ export default {
 		 * Handles the change event for the maximum date input.
 		 * Updates the maximum allowable date based on the provided value.
 		 *
-		 * @param {string | Date} value - The new maximum date value. Can be a string or a Date object.
+		 * @param value - The new maximum date value. Can be a string or a Date object.
 		 */
-		onDateMaxChange(value) {
+		onDateMaxChange(value: string | Date): void {
 			this.onExtraSettingsChange({
 				dateMax: parseInt(moment(value).format('X')),
 			})
@@ -287,9 +319,9 @@ export default {
 		 * Handles the change event for the minimum date input.
 		 * Updates the minimum allowable date based on the provided value.
 		 *
-		 * @param {string | Date} value - The new minimum date value. Can be a string or a Date object.
+		 * @param value - The new minimum date value. Can be a string or a Date object.
 		 */
-		onDateMinChange(value) {
+		onDateMinChange(value: string | Date): void {
 			this.onExtraSettingsChange({
 				dateMin: parseInt(moment(value).format('X')),
 			})
@@ -299,10 +331,10 @@ export default {
 		 * Handles the change event for the date range selection.
 		 * Updates the extra settings with the new date range value.
 		 *
-		 * @param {boolean} value - The new value of the date range selection.
+		 * @param value - The new value of the date range selection.
 		 *                          If true, the date range is enabled; otherwise, null.
 		 */
-		onDateRangeChange(value) {
+		onDateRangeChange(value: boolean): void {
 			this.onExtraSettingsChange({ dateRange: value === true ? true : null })
 		},
 
@@ -310,14 +342,13 @@ export default {
 		 * Handles the change event for the maximum time input.
 		 * Updates the maximum allowable date based on the provided value.
 		 *
-		 * @param {string | Date} value - The new maximum date value. Can be a string or a Date object.
+		 * @param value - The new maximum date value. Can be a string or a Date object.
 		 */
-		onTimeMaxChange(value) {
+		onTimeMaxChange(value: string | Date | null): void {
 			this.onExtraSettingsChange({
 				timeMax:
 					value === null
-					|| (value
-						&& value.getTime
+					|| (value instanceof Date
 						&& value.getTime()
 							=== new Date(new Date().setHours(24, 0, 0, 0)).getTime())
 						? null
@@ -329,14 +360,13 @@ export default {
 		 * Handles the change event for the minimum date input.
 		 * Updates the minimum allowable date based on the provided value.
 		 *
-		 * @param {string | Date} value - The new minimum date value. Can be a string or a Date object.
+		 * @param value - The new minimum date value. Can be a string or a Date object.
 		 */
-		onTimeMinChange(value) {
+		onTimeMinChange(value: string | Date | null): void {
 			this.onExtraSettingsChange({
 				timeMin:
 					value === null
-					|| (value
-						&& value.getTime
+					|| (value instanceof Date
 						&& value.getTime()
 							=== new Date(new Date().setHours(0, 0, 0, 0)).getTime())
 						? null
@@ -348,29 +378,30 @@ export default {
 		 * Handles the change event for the date range selection.
 		 * Updates the extra settings with the new date range value.
 		 *
-		 * @param {boolean} value - The new value of the date range selection.
+		 * @param value - The new value of the date range selection.
 		 *                          If true, the date range is enabled; otherwise, null.
 		 */
-		onTimeRangeChange(value) {
+		onTimeRangeChange(value: boolean): void {
 			this.onExtraSettingsChange({ timeRange: value === true ? true : null })
 		},
 
 		/**
 		 * Store Value
 		 *
-		 * @param {Date|Array<Date>|null} date The date or date range to store
+		 * @param date The date or date range to store
 		 */
-		onValueChange(date) {
+		onValueChange(date: Date | [Date, Date] | null): void {
 			if (!date) {
 				this.$emit('update:values', [])
 				return
 			}
 
-			if (this.isRangeQuestion) {
+			if (this.isRangeQuestion && Array.isArray(date)) {
 				this.$emit('update:values', [
 					moment(date[0]).format(this.answerType.storageFormat),
 					moment(date[1]).format(this.answerType.storageFormat),
 				])
+				return
 			} else {
 				this.$emit('update:values', [
 					moment(date).format(this.answerType.storageFormat),
@@ -381,50 +412,50 @@ export default {
 		/**
 		 * Determines if a given date should be disabled.
 		 *
-		 * @param {Date} date - The date to check.
-		 * @return {boolean} - Returns true if the date should be disabled, otherwise false.
+		 * @param date - The date to check.
+		 * @return - Returns true if the date should be disabled, otherwise false.
 		 */
-		disabledDates(date) {
-			return (
+		disabledDates(date: Date): boolean {
+			return Boolean(
 				(this.dateMin && date < this.dateMin)
-				|| (this.dateMax && date > this.dateMax)
+				|| (this.dateMax && date > this.dateMax),
 			)
 		},
 
 		/**
 		 * Determines if a given time should be disabled.
 		 *
-		 * @param {Date} time - The time to check.
-		 * @return {boolean} - Returns true if the time should be disabled, otherwise false.
+		 * @param time - The time to check.
+		 * @return - Returns true if the time should be disabled, otherwise false.
 		 */
-		disabledTimes(time) {
-			return (
+		disabledTimes(time: Date): boolean {
+			return Boolean(
 				(this.timeMin && time < this.timeMin)
-				|| (this.timeMax && time > this.timeMax)
+				|| (this.timeMax && time > this.timeMax),
 			)
 		},
 
 		/**
 		 * Datepicker timestamp to string
 		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {string}
+		 * @param datetime the datepicker Date
+		 * @return
 		 */
-		stringifyDate(datetime) {
+		stringifyDate(datetime: Date): string {
 			return moment(datetime).format('L')
 		},
 
 		/**
 		 * Form expires timestamp to Date of the datepicker
 		 *
-		 * @param {number} value the expires timestamp
-		 * @return {Date}
+		 * @param value the expires timestamp
+		 * @return
 		 */
-		parseTimestampToDate(value) {
+		parseTimestampToDate(value: number): Date {
 			return moment(value, 'X').toDate()
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

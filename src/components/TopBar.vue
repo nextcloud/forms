@@ -31,40 +31,51 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import IconBarChart from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
 import IconEdit from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import IconVisibility from '@material-symbols/svg-400/outlined/visibility.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
+import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PillMenu from './PillMenu.vue'
 import PermissionTypes from '../mixins/PermissionTypes.ts'
 import logger from '../utils/Logger.ts'
 
-const submitView = {
+type TopBarViewId = 'submit' | 'edit' | 'results'
+
+type TopBarViewOption = {
+	ariaLabel: string
+	icon: string
+	title: string
+	id: TopBarViewId
+	disabled?: boolean
+}
+
+const submitView: TopBarViewOption = {
 	ariaLabel: t('forms', 'View form'),
 	icon: IconVisibility,
 	title: t('forms', 'View'),
 	id: 'submit',
 }
-const editView = {
+const editView: TopBarViewOption = {
 	ariaLabel: t('forms', 'Edit form'),
 	icon: IconEdit,
 	title: t('forms', 'Edit'),
 	id: 'edit',
 	disabled: false,
 }
-const resultsView = {
+const resultsView: TopBarViewOption = {
 	ariaLabel: t('forms', 'Show responses'),
 	icon: IconBarChart,
 	title: t('forms', 'Responses'),
 	id: 'results',
 }
 
-export default {
+export default defineComponent({
 	name: 'TopBar',
 
 	components: {
@@ -92,7 +103,7 @@ export default {
 		},
 
 		permissions: {
-			type: Array,
+			type: Array as () => string[],
 			default: () => [],
 		},
 
@@ -114,12 +125,13 @@ export default {
 	},
 
 	computed: {
-		currentView() {
-			return this.availableViews.filter((v) => v.id === this.$route.name)[0]
+		currentView(): TopBarViewOption | undefined {
+			const routeName = String(this.$route.name ?? '')
+			return this.availableViews.find((v) => v.id === routeName)
 		},
 
-		availableViews() {
-			const views = []
+		availableViews(): TopBarViewOption[] {
+			const views: TopBarViewOption[] = []
 			if (this.canSubmit) {
 				views.push(submitView)
 			}
@@ -135,30 +147,30 @@ export default {
 			return views
 		},
 
-		canSubmit() {
+		canSubmit(): boolean {
 			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
 		},
 
-		canEdit() {
+		canEdit(): boolean {
 			return (
 				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
 				&& !this.archived
 			)
 		},
 
-		canSeeResults() {
+		canSeeResults(): boolean {
 			return (
 				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
 				|| this.submissionCount > 0
 			)
 		},
 
-		canShare() {
+		canShare(): boolean {
 			// This probably can get a permission of itself
 			return this.canEdit
 		},
 
-		canOnlySubmit() {
+		canOnlySubmit(): boolean {
 			return (
 				this.permissions.length === 1
 				&& this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
@@ -171,9 +183,9 @@ export default {
 		/**
 		 * Router methods
 		 *
-		 * @param {object} option The selected pill menu option
+		 * @param option The selected pill menu option
 		 */
-		async onChangeView(option) {
+		async onChangeView(option: TopBarViewOption): Promise<void> {
 			if (this.$route.name === option.id) {
 				return
 			}
@@ -190,11 +202,11 @@ export default {
 			}
 		},
 
-		onShareForm() {
+		onShareForm(): void {
 			this.$emit('shareForm')
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -8,6 +8,7 @@ import IconPhone from '@material-symbols/svg-400/outlined/call.svg?raw'
 import IconEMail from '@material-symbols/svg-400/outlined/mail.svg?raw'
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
 
 export type ValidationFunction = (
 	input: string,

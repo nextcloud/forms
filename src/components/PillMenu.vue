@@ -7,31 +7,44 @@
 	<div class="pill-menu">
 		<NcRadioGroup
 			:label="groupLabel"
-			:modelValue="active.id"
+			:modelValue="activeId"
 			hideLabel
 			@update:modelValue="onUpdateActive">
 			<NcRadioGroupButton
-				v-for="option of options"
-				:key="option.id"
-				:value="option.id"
-				:aria-label="isMobile && option.icon ? option.ariaLabel : undefined"
-				:label="!isMobile || !option.icon ? option.title : undefined"
-				:disabled="disabled || option.disabled">
-				<template v-if="option.icon" #icon>
-					<NcIconSvgWrapper :svg="option.icon" />
+				v-for="pillOption of pillOptions"
+				:key="pillOption.id"
+				:value="String(pillOption.id)"
+				:aria-label="
+					isMobile && pillOption.icon ? pillOption.ariaLabel : undefined
+				"
+				:label="!isMobile || !pillOption.icon ? pillOption.title : undefined"
+				:disabled="disabled || pillOption.disabled">
+				<template v-if="pillOption.icon" #icon>
+					<NcIconSvgWrapper :svg="pillOption.icon" />
 				</template>
 			</NcRadioGroupButton>
 		</NcRadioGroup>
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import type { PropType } from 'vue'
+
 import { useIsSmallMobile } from '@nextcloud/vue'
+import { defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcRadioGroup from '@nextcloud/vue/components/NcRadioGroup'
 import NcRadioGroupButton from '@nextcloud/vue/components/NcRadioGroupButton'
 
-export default {
+type PillOption = {
+	id: string | number
+	title: string
+	ariaLabel?: string
+	icon?: string
+	disabled?: boolean
+}
+
+export default defineComponent({
 	name: 'PillMenu',
 
 	components: {
@@ -45,7 +58,14 @@ export default {
 		 * The active option
 		 */
 		active: {
-			type: Object,
+			type: Object as PropType<{
+				id: string | number
+				title?: string
+				ariaLabel?: string
+				icon?: string
+				disabled?: boolean
+			}>,
+
 			required: true,
 		},
 
@@ -70,7 +90,16 @@ export default {
 		 * `option: {id: string, title: string, ariaLabel: string, icon?: string}`
 		 */
 		options: {
-			type: Array,
+			type: Array as PropType<
+				Array<{
+					id: string | number
+					title: string
+					ariaLabel?: string
+					icon?: string
+					disabled?: boolean
+				}>
+			>,
+
 			required: true,
 		},
 	},
@@ -83,16 +112,28 @@ export default {
 		}
 	},
 
+	computed: {
+		pillOptions(): PillOption[] {
+			return this.options as PillOption[]
+		},
+
+		activeId(): string {
+			return String(this.active.id)
+		},
+	},
+
 	methods: {
 		/**
 		 * Emit the full selected option to keep PillMenu API stable
 		 *
-		 * @param {string} optionId The selected option id
+		 * @param optionId The selected option id
 		 */
-		onUpdateActive(optionId) {
-			const option = this.options.find((entry) => entry.id === optionId)
+		onUpdateActive(optionId: string): void {
+			const option = this.pillOptions.find(
+				(entry) => String(entry.id) === optionId,
+			)
 			if (option) this.$emit('update:active', option)
 		},
 	},
-}
+})
 </script>

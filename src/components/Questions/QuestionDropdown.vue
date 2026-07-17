@@ -99,8 +99,12 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsOption } from '../../models/Entities.d.ts'
+
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -114,7 +118,7 @@ import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
 import { OptionType } from '../../models/Constants.ts'
 
-export default {
+export default defineComponent({
 	name: 'QuestionDropdown',
 
 	components: {
@@ -135,6 +139,7 @@ export default {
 	setup() {
 		return {
 			IconContentPaste,
+			t,
 		}
 	},
 
@@ -148,47 +153,47 @@ export default {
 	},
 
 	computed: {
-		selectOptionPlaceholder() {
+		selectOptionPlaceholder(): string {
 			if (this.readOnly) {
 				return this.answerType.submitPlaceholder
 			}
 			return this.answerType.createPlaceholder
 		},
 
-		isMultiple() {
+		isMultiple(): boolean {
 			// This can be extended if we want to include support for <select multiple>
 			return false
 		},
 
-		shiftDragHandle() {
+		shiftDragHandle(): boolean {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
 
-		selectedOption() {
+		selectedOption(): FormsOption | null {
 			if (!this.values) {
 				return null
 			}
 
-			const selected = this.values.map((id) =>
-				this.options.find((option) => option.id === parseInt(id)),
+			const selected = this.values.map((id: unknown) =>
+				this.options.find((option) => option.id === parseInt(String(id))),
 			)
 
 			return this.isMultiple ? selected : selected[0]
 		},
 
 		choices: {
-			get() {
+			get(): FormsOption[] {
 				return this.sortOptionsOfType(this.options, OptionType.Choice)
 			},
 
-			set(value) {
+			set(value: FormsOption[]): void {
 				this.updateOptionsOrder(value, OptionType.Choice)
 			},
 		},
 	},
 
 	methods: {
-		async validate() {
+		async validate(): Promise<boolean> {
 			if (this.isRequired && this.areNoneChecked) {
 				this.errorMessage = t('forms', 'You must answer this question')
 				return false
@@ -198,17 +203,17 @@ export default {
 			return true
 		},
 
-		onDragStart() {
+		onDragStart(): void {
 			this.isDragging = true
 		},
 
-		onDragEnd() {
+		onDragEnd(): void {
 			this.$nextTick(() => {
 				this.isDragging = false
 			})
 		},
 
-		onInput(option) {
+		onInput(option: FormsOption | FormsOption[] | null): void {
 			if (Array.isArray(option)) {
 				this.$emit('update:values', [
 					...new Set(option.map((opt) => opt.id)),
@@ -220,7 +225,7 @@ export default {
 			this.$emit('update:values', option ? [option.id] : [])
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>
