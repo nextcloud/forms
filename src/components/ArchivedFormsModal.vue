@@ -23,7 +23,10 @@
 	</NcDialog>
 </template>
 
-<script>
+<script lang="ts">
+import type { PropType } from 'vue'
+import type { FormsForm } from '../models/Entities.d.ts'
+
 import { translate as t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -44,14 +47,14 @@ export default defineComponent({
 		},
 
 		forms: {
-			type: Array,
+			type: Array as PropType<FormsForm[]>,
 			required: true,
 		},
 	},
 
 	emits: ['update:open', 'clone'],
 
-	data() {
+	data(): { shownForms: FormsForm[] } {
 		return {
 			shownForms: [],
 		}
@@ -69,12 +72,12 @@ export default defineComponent({
 	methods: {
 		t,
 
-		onCloneForm(formId) {
+		onCloneForm(formId: number): void {
 			this.$emit('clone', formId)
 			this.$emit('update:open', false)
 		},
 
-		onDelete(form) {
+		onDelete(form: FormsForm): void {
 			this.shownForms = this.shownForms.filter(({ id }) => id !== form.id)
 		},
 	},

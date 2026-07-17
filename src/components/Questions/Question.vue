@@ -162,7 +162,7 @@
 	</li>
 </template>
 
-<script>
+<script lang="ts">
 import IconAsterisk from '@material-symbols/svg-400/outlined/asterisk.svg?raw'
 import IconIdentifier from '@material-symbols/svg-400/outlined/badge.svg?raw'
 import IconContentCopy from '@material-symbols/svg-400/outlined/content_copy.svg?raw'
@@ -172,6 +172,8 @@ import IconAlertCircleOutline from '@material-symbols/svg-400/outlined/error.svg
 import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import IconDotsHorizontal from '@material-symbols/svg-400/outlined/more_horiz.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -181,7 +183,7 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
 
-export default {
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Question',
 
@@ -297,6 +299,7 @@ export default {
 			IconDotsHorizontal,
 			IconDragIndicator,
 			IconIdentifier,
+			t,
 		}
 	},
 
@@ -304,88 +307,99 @@ export default {
 		/**
 		 * Extend text with asterisk if question is required
 		 *
-		 * @return {boolean}
+		 * @return
 		 */
-		computedText() {
+		computedText(): string {
 			if (this.isRequired) {
 				return this.text + ' *'
 			}
 			return this.text
 		},
 
-		computedDescription() {
-			return this.$markdownit.render(this.description)
+		computedDescription(): string {
+			return (
+				this.$markdownit as { render: (value: string) => string }
+			).render(this.description)
 		},
 
 		/**
 		 * Question valid, if text not empty and content valid
 		 *
-		 * @return {boolean} true if question valid
+		 * @return true if question valid
 		 */
-		questionValid() {
-			return this.text && this.contentValid
+		questionValid(): boolean {
+			return !!this.text && this.contentValid
 		},
 
-		actionsId() {
+		actionsId(): string {
 			return 'q' + this.index + '_actions'
 		},
 
-		titleId() {
+		titleId(): string {
 			return 'q' + this.index + '_title'
 		},
 
-		descriptionId() {
+		descriptionId(): string {
 			return 'q' + this.index + '_desc'
 		},
 
-		hasDescription() {
+		hasDescription(): boolean {
 			return this.description !== ''
 		},
 
-		hasError() {
+		hasError(): boolean {
 			return !!this.errorMessage
 		},
 
-		hasInfo() {
+		hasInfo(): boolean {
 			return !!this.infoMessage
 		},
 
-		errorId() {
+		errorId(): string {
 			return `q${this.index}_error`
 		},
 
-		infoId() {
+		infoId(): string {
 			return `q${this.index}_info`
 		},
 	},
 
 	// Ensure description is sized correctly on initial render
-	mounted() {
+	mounted(): void {
 		this.$nextTick(() => this.resizeDescription())
 	},
 
 	methods: {
-		onTitleChange({ target }) {
+		onTitleChange(event: Event): void {
+			const target = event.target as HTMLInputElement | null
+			if (!target) {
+				return
+			}
 			this.$emit('update:text', target.value)
 		},
 
-		onDescriptionChange({ target }) {
+		onDescriptionChange(event: Event): void {
+			const target = event.target as HTMLTextAreaElement | null
+			if (!target) {
+				return
+			}
 			this.resizeDescription()
 			this.$emit('update:description', target.value)
 		},
 
-		onNameChange(name) {
+		onNameChange(name: string): void {
 			this.$emit('update:name', name)
 		},
 
-		onRequiredChange(isRequired) {
+		onRequiredChange(isRequired: boolean): void {
 			this.$emit('update:isRequired', isRequired)
 		},
 
-		resizeDescription() {
+		resizeDescription(): void {
 			// next tick ensures that the textarea is attached to DOM
 			this.$nextTick(() => {
-				const textarea = this.$refs.description
+				const textarea = this.$refs.description as
+					HTMLTextAreaElement | undefined
 				if (textarea) {
 					textarea.style.cssText = 'height: 0'
 					// include 2px border
@@ -397,31 +411,39 @@ export default {
 		/**
 		 * Reorder question but keep focus on the button
 		 */
-		onMoveDown() {
+		onMoveDown(): void {
 			this.$emit('moveDown')
-			this.$nextTick(() => this.$refs.buttonDown.$el.focus())
+			this.$nextTick(() => {
+				const buttonDown = this.$refs.buttonDown as
+					{ $el?: HTMLElement } | undefined
+				buttonDown?.$el?.focus()
+			})
 		},
 
-		onMoveUp() {
+		onMoveUp(): void {
 			this.$emit('moveUp')
-			this.$nextTick(() => this.$refs.buttonUp.$el.focus())
+			this.$nextTick(() => {
+				const buttonUp = this.$refs.buttonUp as
+					{ $el?: HTMLElement } | undefined
+				buttonUp?.$el?.focus()
+			})
 		},
 
 		/**
 		 * Delete this question
 		 */
-		onDelete() {
+		onDelete(): void {
 			this.$emit('delete')
 		},
 
 		/**
 		 * Clone this question
 		 */
-		onClone() {
+		onClone(): void {
 			this.$emit('clone')
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

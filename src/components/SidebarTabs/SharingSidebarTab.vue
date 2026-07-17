@@ -234,7 +234,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconCodeBrackets from '@material-symbols/svg-400/outlined/code.svg?raw'
@@ -249,8 +249,10 @@ import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
+import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/components/NcActionLink'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -270,7 +272,31 @@ import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
-export default {
+interface ShareLike {
+	id: number
+	shareType: number
+	shareWith: string
+	displayName: string
+	permissions: string[]
+}
+
+interface SharingSidebarAppConfig {
+	allowPublicLink: boolean
+	allowCustomPublicShareTokens: boolean
+	allowPermitAll: boolean
+	allowShowToAll: boolean
+	[key: string]: unknown
+}
+
+interface ShareTokenUpdateContext {
+	shareTokens: Record<number, string>
+	loadingShareTokenId: number | null
+	savingShareTokens: Record<number, boolean>
+	form: { id: number }
+	$emit: (event: string, ...args: unknown[]) => void
+}
+
+export default defineComponent({
 	components: {
 		NcIconSvgWrapper,
 		NcActions,
@@ -308,6 +334,7 @@ export default {
 
 	setup() {
 		return {
+			t,
 			FormsIcon,
 			IconCheck,
 			IconCopyAll,
@@ -322,40 +349,49 @@ export default {
 		}
 	},
 
-	data() {
+	data(): {
+		isLoading: boolean
+		appConfig: SharingSidebarAppConfig
+		shareTokens: Record<number, string>
+		savingShareTokens: Record<number, boolean>
+		loadingShareTokenId: number | null
+		qrDialogText: string
+		isEmbeddable: boolean
+	} {
 		return {
 			isLoading: false,
-			appConfig: loadState(appName, 'appConfig'),
+			appConfig: loadState('forms', 'appConfig') as SharingSidebarAppConfig,
 			shareTokens: {},
 			savingShareTokens: {},
 			loadingShareTokenId: null,
 			qrDialogText: '',
+			isEmbeddable: false,
 		}
 	},
 
 	computed: {
-		isCurrentUserOwner() {
-			return getCurrentUser().uid === this.form.ownerId
+		isCurrentUserOwner(): boolean {
+			return getCurrentUser()?.uid === this.form.ownerId
 		},
 
-		sortedShares() {
+		sortedShares(): ShareLike[] {
 			// Remove Link-Shares, which are handled separately, then sort
-			return this.form.shares
+			return (this.form.shares as ShareLike[])
 				.filter(
 					(share) => share.shareType !== this.SHARE_TYPES.SHARE_TYPE_LINK,
 				)
 				.sort(this.sortByTypeAndDisplayname)
 		},
 
-		hasPublicLink() {
+		hasPublicLink(): boolean {
 			return this.publicLinkShares.length !== 0
 		},
 
-		publicLinkShares() {
-			const shares = this.form.shares.filter(
+		publicLinkShares(): ShareLike[] {
+			const shares = (this.form.shares as ShareLike[]).filter(
 				(share) => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK,
 			)
-			shares.sort((a, b) =>
+			shares.sort((a: ShareLike, b: ShareLike) =>
 				this.isEmbeddingAllowed(a) ? 1 : this.isEmbeddingAllowed(b) ? -1 : 0,
 			)
 			return shares
@@ -365,8 +401,8 @@ export default {
 	watch: {
 		publicLinkShares: {
 			immediate: true,
-			handler(shares) {
-				const nextShareTokens = {}
+			handler(shares: ShareLike[]) {
+				const nextShareTokens: Record<number, string> = {}
 				for (const share of shares) {
 					nextShareTokens[share.id] =
 						this.shareTokens[share.id] ?? share.shareWith
@@ -381,9 +417,14 @@ export default {
 		/**
 		 * Add share
 		 *
-		 * @param {object} newShare the share object
+		 * @param newShare the share object
+		 * @param newShare.shareType
+		 * @param newShare.shareWith
 		 */
-		async addShare(newShare) {
+		async addShare(newShare: {
+			shareType: number
+			shareWith: string
+		}): Promise<void> {
 			this.isLoading = true
 
 			try {
@@ -411,7 +452,7 @@ export default {
 			}
 		},
 
-		async addPublicLink() {
+		async addPublicLink(): Promise<void> {
 			this.isLoading = true
 
 			try {
@@ -438,9 +479,9 @@ export default {
 		/**
 		 * Make a share embeddable into websites (sets the internal permission)
 		 *
-		 * @param {{ permissions: string[] }} share The public link share to make embeddable
+		 * @param share The public link share to make embeddable
 		 */
-		makeEmbeddable(share) {
+		makeEmbeddable(share: ShareLike): void {
 			this.updateShare({
 				...share,
 				permissions: [
@@ -453,9 +494,9 @@ export default {
 		/**
 		 * Update share
 		 *
-		 * @param {object} updatedShare the updated object
+		 * @param updatedShare the updated object
 		 */
-		async updateShare(updatedShare) {
+		async updateShare(updatedShare: ShareLike): Promise<void> {
 			this.isLoading = true
 
 			try {
@@ -490,9 +531,9 @@ export default {
 		/**
 		 * Remove share
 		 *
-		 * @param {object} share the share to delete
+		 * @param share the share to delete
 		 */
-		async removeShare(share) {
+		async removeShare(share: ShareLike): Promise<void> {
 			this.isLoading = true
 
 			try {
@@ -514,10 +555,12 @@ export default {
 		/**
 		 * Sort by shareType and DisplayName
 		 *
-		 * @param {object} a first share for comparison
-		 * @param {object} b second share for comparison
+		 * @param a first share for comparison
+		 * @param b second share for comparison
 		 */
-		sortByTypeAndDisplayname(a, b) {
+		sortByTypeAndDisplayname(a: ShareLike, b: ShareLike): number {
+			const aDisplayName = (a.displayName ?? '').toLowerCase()
+			const bDisplayName = (b.displayName ?? '').toLowerCase()
 			// First return, if ShareType does not match
 			if (a.shareType < b.shareType) {
 				return -1
@@ -527,48 +570,48 @@ export default {
 			}
 
 			// Otherwise sort by displayname
-			if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+			if (aDisplayName < bDisplayName) {
 				return -1
 			}
-			if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+			if (aDisplayName > bDisplayName) {
 				return 1
 			}
 			return 0
 		},
 
-		onPermitAllUsersChange(newVal) {
+		onPermitAllUsersChange(newVal: boolean): void {
 			const newAccess = { ...this.form.access }
 			newAccess.permitAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
 
-		onShowToAllUsersChange(newVal) {
+		onShowToAllUsersChange(newVal: boolean): void {
 			const newAccess = { ...this.form.access }
 			newAccess.showToAllUsers = newVal
 			this.$emit('update:formProp', 'access', newAccess)
 		},
 
-		getShareTokenInput(share) {
+		getShareTokenInput(share: ShareLike): string {
 			return this.shareTokens[share.id] ?? share.shareWith
 		},
 
-		isShareTokenSaving(share) {
+		isShareTokenSaving(share: ShareLike): boolean {
 			return !!this.savingShareTokens[share.id]
 		},
 
-		isShareTokenLoading(share) {
+		isShareTokenLoading(share: ShareLike): boolean {
 			return this.loadingShareTokenId === share.id
 		},
 
-		setShareTokenInput(share, token) {
+		setShareTokenInput(share: ShareLike, token: string | number): void {
 			this.shareTokens = {
 				...this.shareTokens,
-				[share.id]: token,
+				[share.id]: String(token),
 			}
 			this.updateShareToken(share)
 		},
 
-		async generateNewToken(share) {
+		async generateNewToken(share: ShareLike): Promise<void> {
 			this.loadingShareTokenId = share.id
 
 			try {
@@ -589,7 +632,10 @@ export default {
 			}
 		},
 
-		updateShareToken: debounce(async function (share) {
+		updateShareToken: debounce(async function (
+			this: ShareTokenUpdateContext,
+			share: ShareLike,
+		) {
 			const token = this.shareTokens[share.id] ?? share.shareWith
 			this.loadingShareTokenId = share.id
 			this.savingShareTokens = {
@@ -633,11 +679,11 @@ export default {
 			}
 		}, INPUT_DEBOUNCE_MS),
 
-		openQrDialog(share) {
+		openQrDialog(share: ShareLike): void {
 			this.qrDialogText = this.getPublicShareLink(share)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -79,7 +79,9 @@
 	</li>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsOption } from '../../models/Entities.d.ts'
+
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
@@ -91,10 +93,12 @@ import IconTableColumn from '@material-symbols/svg-400/outlined/view_column.svg?
 import IconTableRow from '@material-symbols/svg-400/outlined/view_stream.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import PQueue from 'p-queue'
 import { markRaw } from 'vue'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -103,7 +107,16 @@ import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
-export default {
+type AnswerInputData = {
+	queue: PQueue | null
+	debounceOnInput: ((event: InputEvent) => void) | undefined
+	isIMEComposing: boolean
+	localText: string
+}
+
+type AnswerInputOption = FormsOption
+
+export default defineComponent({
 	name: 'AnswerInput',
 
 	components: {
@@ -177,28 +190,30 @@ export default {
 			IconDelete,
 			IconDragIndicator,
 			IconPlus,
+			t,
 		}
 	},
 
-	data() {
+	data(): AnswerInputData {
 		return {
 			queue: null,
-			debounceOnInput: null,
+			debounceOnInput: undefined,
 			isIMEComposing: false,
-			localText: this.answer?.text ?? '',
+			localText: (this.answer as AnswerInputOption | undefined)?.text ?? '',
 		}
 	},
 
 	computed: {
-		canCreateLocalAnswer() {
-			if (this.answer.local) {
+		canCreateLocalAnswer(): boolean {
+			if ((this.answer as AnswerInputOption).local) {
 				return !!this.localText?.trim()
 			}
-			return !!this.answer.text?.trim()
+			return !!(this.answer as AnswerInputOption).text?.trim()
 		},
 
-		ariaLabel() {
-			if (this.answer.local) {
+		ariaLabel(): string {
+			const answer = this.answer as AnswerInputOption
+			if (answer.local) {
 				if (this.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
@@ -216,7 +231,9 @@ export default {
 			}
 
 			if (this.optionType === OptionType.Row) {
-				return t('forms', 'The text of row {index}', {})
+				return t('forms', 'The text of row {index}', {
+					index: this.index + 1,
+				})
 			}
 
 			return t('forms', 'The text of option {index}', {
@@ -224,12 +241,14 @@ export default {
 			})
 		},
 
-		optionDragMenuId() {
-			return `q${this.answer.questionId}o${this.answer.id}o${this.optionType}__drag_menu`
+		optionDragMenuId(): string {
+			const answer = this.answer as AnswerInputOption
+			return `q${answer.questionId}o${answer.id}o${this.optionType}__drag_menu`
 		},
 
-		placeholder() {
-			if (this.answer.local) {
+		placeholder(): string {
+			const answer = this.answer as AnswerInputOption
+			if (answer.local) {
 				if (this.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
@@ -252,8 +271,9 @@ export default {
 			return t('forms', 'Answer number {index}', { index: this.index + 1 })
 		},
 
-		pseudoIcon() {
-			if (this.answer.local) {
+		pseudoIcon(): string {
+			const answer = this.answer as AnswerInputOption
+			if (answer.local) {
 				return IconPlus
 			}
 
@@ -276,7 +296,7 @@ export default {
 	watch: {
 		// Keep localText in sync when the parent replaces/updates the answer prop
 		answer: {
-			handler(newVal) {
+			handler(newVal: AnswerInputOption) {
 				this.localText = newVal?.text ?? ''
 			},
 
@@ -284,59 +304,77 @@ export default {
 		},
 	},
 
-	created() {
+	created(): void {
 		this.queue = markRaw(new PQueue({ concurrency: 1 }))
 
 		// As data instead of method, to have a separate debounce per AnswerInput
-		this.debounceOnInput = debounce((event) => {
-			return this.queue.add(() => this.onInput(event))
+		this.debounceOnInput = debounce((event: InputEvent) => {
+			const queue = this.queue
+			if (!queue) {
+				return
+			}
+			return queue.add(() => this.onInput(event))
 		}, INPUT_DEBOUNCE_MS)
 	},
 
 	methods: {
-		handleTabbing() {
+		handleTabbing(): void {
 			this.$emit('tabbedOut', this.optionType)
 		},
 
 		/**
 		 * Focus the input
 		 */
-		focus() {
-			this.$refs.input?.focus()
+		focus(): void {
+			const input = this.$refs.input as unknown as HTMLInputElement | undefined
+			input?.focus()
 		},
 
 		/**
 		 * Option changed, processing the data
 		 *
-		 * @param {InputEvent} event The input event that triggered adding a new entry
+		 * @param event The input event that triggered adding a new entry
 		 */
-		async onInput({ target, isComposing }) {
-			if (this.answer.local) {
+		async onInput(
+			event: InputEvent | { target: HTMLInputElement; isComposing?: boolean },
+		): Promise<void> {
+			const target = event.target as HTMLInputElement | null
+			if (!target) {
+				return
+			}
+
+			const answer = this.answer as AnswerInputOption
+			if (answer.local) {
 				this.localText = target.value
 				return
 			}
 
-			if (!isComposing && !this.isIMEComposing && target.value !== '') {
+			if (!event.isComposing && !this.isIMEComposing && target.value !== '') {
 				// clone answer
-				const answer = { ...this.answer }
-				answer.text = this.$refs.input.value
+				const answerCopy = { ...answer }
+				const input = this.$refs.input as unknown as
+					HTMLInputElement | undefined
+				if (!input) {
+					return
+				}
+				answerCopy.text = input.value
 
-				await this.updateAnswer(answer)
+				await this.updateAnswer(answerCopy)
 
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while updating the answer
-				answer.text = this.$refs.input.value
-				this.$emit('update:answer', this.index, answer)
+				answerCopy.text = input.value
+				this.$emit('update:answer', this.index, answerCopy)
 			}
 		},
 
 		/**
 		 * Handle Enter key: create local answer or move focus
 		 *
-		 * @param {KeyboardEvent} e the keydown event
+		 * @param e the keydown event
 		 */
-		onEnter(e) {
-			if (this.answer.local) {
+		onEnter(e: KeyboardEvent): void {
+			if ((this.answer as AnswerInputOption).local) {
 				this.createLocalAnswer(e)
 				return
 			}
@@ -346,9 +384,11 @@ export default {
 		/**
 		 * Create a new local answer option from the current input
 		 *
-		 * @param {Event} e the triggering event
+		 * @param e the triggering event
 		 */
-		async createLocalAnswer(e) {
+		async createLocalAnswer(
+			e?: Event & { isComposing?: boolean },
+		): Promise<void> {
 			if (this.isIMEComposing || e?.isComposing) {
 				return
 			}
@@ -358,32 +398,45 @@ export default {
 				return
 			}
 
-			const answer = { ...this.answer, text: value, local: false }
+			const answer = {
+				...(this.answer as AnswerInputOption),
+				text: value,
+				local: false,
+			}
 
 			// Prevent any queued debounced PATCHes from running while creating
-			this.queue.pause()
+			const queue = this.queue
+			if (!queue) {
+				return
+			}
+			queue.pause()
 			try {
 				const newAnswer = await this.createAnswer(answer)
 
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while creating the answer
-				newAnswer.text = this.$refs.input.value
+				const input = this.$refs.input as unknown as
+					HTMLInputElement | undefined
+				if (!input) {
+					return
+				}
+				newAnswer.text = input.value
 				this.localText = ''
 
 				this.$emit('createAnswer', this.index, newAnswer)
 			} finally {
 				// Clear pending update tasks (stale PATCHes) before resuming processing
-				this.queue.clear()
-				this.queue.start()
+				queue.clear()
+				queue.start()
 			}
 		},
 
 		/**
 		 * Request a new answer
 		 *
-		 * @param {Event} e the triggering event
+		 * @param e the triggering event
 		 */
-		focusNextInput(e) {
+		focusNextInput(e: Event & { isComposing?: boolean }): void {
 			if (this.isIMEComposing || e?.isComposing) {
 				return
 			}
@@ -396,18 +449,21 @@ export default {
 		 * Emit a delete request for this answer
 		 * when pressing the delete key on an empty input
 		 *
-		 * @param {Event} e the event
+		 * @param e the event
 		 */
-		async deleteEntry(e) {
+		async deleteEntry(
+			e: Event & { isComposing?: boolean; type: string },
+		): Promise<void> {
 			if (this.isIMEComposing || e?.isComposing) {
 				return
 			}
 
-			if (this.answer.local) {
+			if ((this.answer as AnswerInputOption).local) {
 				return
 			}
 
-			if (e.type !== 'click' && this.$refs.input.value.length !== 0) {
+			const input = this.$refs.input as unknown as HTMLInputElement | undefined
+			if (e.type !== 'click' && (input?.value.length ?? 0) !== 0) {
 				return
 			}
 
@@ -415,21 +471,25 @@ export default {
 			e.preventDefault()
 
 			// do this in queue to prevent race conditions between PATCH and DELETE
-			this.queue.add(() => {
-				this.$emit('delete', this.answer)
+			const queue = this.queue
+			if (!queue) {
+				return
+			}
+			queue.add(() => {
+				this.$emit('delete', this.answer as AnswerInputOption)
 				// Prevent any patch requests
-				this.queue.pause()
-				this.queue.clear()
+				queue.pause()
+				queue.clear()
 			})
 		},
 
 		/**
 		 * Create an unsynced answer to the server
 		 *
-		 * @param {object} answer the answer to sync
-		 * @return {object} answer
+		 * @param answer the answer to sync
+		 * @return answer
 		 */
-		async createAnswer(answer) {
+		async createAnswer(answer: AnswerInputOption): Promise<AnswerInputOption> {
 			try {
 				const response = await axios.post(
 					generateOcsUrl(
@@ -448,7 +508,7 @@ export default {
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
-				return OcsResponse2Data(response)[0]
+				return (OcsResponse2Data(response) as AnswerInputOption[])[0]
 			} catch (error) {
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
@@ -461,9 +521,9 @@ export default {
 		 * Save to the server, only do it after 500ms
 		 * of no change
 		 *
-		 * @param {object} answer the answer to sync
+		 * @param answer the answer to sync
 		 */
-		async updateAnswer(answer) {
+		async updateAnswer(answer: AnswerInputOption): Promise<void> {
 			try {
 				await axios.patch(
 					generateOcsUrl(
@@ -490,7 +550,7 @@ export default {
 		/**
 		 * Reorder option but keep focus on the button
 		 */
-		onMoveDown() {
+		onMoveDown(): void {
 			this.$emit('moveDown')
 			this.focusButton(
 				this.index < this.maxIndex - 1
@@ -499,35 +559,40 @@ export default {
 			)
 		},
 
-		onMoveUp() {
+		onMoveUp(): void {
 			this.$emit('moveUp')
 			this.focusButton(this.index > 1 ? 'buttonOptionUp' : 'buttonOptionDown')
 		},
 
-		focusButton(refName) {
-			this.$nextTick(() => this.$refs[refName].$el.focus())
+		focusButton(refName: 'buttonOptionDown' | 'buttonOptionUp'): void {
+			this.$nextTick(() => {
+				const button = this.$refs[refName] as unknown as
+					{ $el?: HTMLElement } | undefined
+				button?.$el?.focus()
+			})
 		},
 
 		/**
 		 * Handle composition start event for IME inputs
 		 */
-		onCompositionStart() {
+		onCompositionStart(): void {
 			this.isIMEComposing = true
 		},
 
 		/**
 		 * Handle composition end event for IME inputs
 		 *
-		 * @param {CompositionEvent} event The input event that triggered adding a new entry
+		 * @param event The input event that triggered adding a new entry
 		 */
-		onCompositionEnd({ target, isComposing }) {
+		onCompositionEnd(event: CompositionEvent & { isComposing?: boolean }): void {
+			const target = event.target as HTMLInputElement | null
 			this.isIMEComposing = false
-			if (!isComposing) {
-				this.onInput({ target, isComposing })
+			if (!event.isComposing && target) {
+				this.onInput({ target, isComposing: event.isComposing })
 			}
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

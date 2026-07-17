@@ -45,8 +45,10 @@
 	</li>
 </template>
 
-<script>
+<script lang="ts">
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
+import { t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -57,7 +59,15 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PermissionTypes from '../../mixins/PermissionTypes.ts'
 import ShareTypes from '../../mixins/ShareTypes.ts'
 
-export default {
+interface ShareLike {
+	id: number
+	shareType: number
+	shareWith: string
+	displayName?: string
+	permissions: string[]
+}
+
+export default defineComponent({
 	components: {
 		NcIconSvgWrapper,
 		NcActions,
@@ -91,40 +101,41 @@ export default {
 
 	setup() {
 		return {
+			t,
 			IconClose,
 		}
 	},
 
 	computed: {
-		canAccessResults() {
+		canAccessResults(): boolean {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS,
 			)
 		},
 
-		canDeleteResults() {
+		canDeleteResults(): boolean {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 			)
 		},
 
-		canEditForm() {
+		canEditForm(): boolean {
 			return this.share.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_EDIT,
 			)
 		},
 
-		isNoUser() {
+		isNoUser(): boolean {
 			return this.share.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
 		},
 
-		displayName() {
+		displayName(): string {
 			return !this.share.displayName
 				? this.share.shareWith
 				: this.share.displayName
 		},
 
-		displayNameAppendix() {
+		displayNameAppendix(): string {
 			switch (this.share.shareType) {
 				case this.SHARE_TYPES.SHARE_TYPE_GROUP:
 					return `(${t('forms', 'Group')})`
@@ -137,14 +148,14 @@ export default {
 	},
 
 	methods: {
-		removeShare() {
+		removeShare(): void {
 			this.$emit('removeShare', this.share)
 		},
 
 		/**
-		 * @param {boolean} hasPermission If the results permission should be granted
+		 * @param hasPermission If the results permission should be granted
 		 */
-		updatePermissionResults(hasPermission) {
+		updatePermissionResults(hasPermission: boolean): void {
 			if (hasPermission === false) {
 				// ensure to remove the delete permission if results permission is dropped
 				this.updatePermission(
@@ -159,9 +170,9 @@ export default {
 		},
 
 		/**
-		 * @param {boolean} hasPermission If the results_delete permission should be granted
+		 * @param hasPermission If the results_delete permission should be granted
 		 */
-		updatePermissionDeleteResults(hasPermission) {
+		updatePermissionDeleteResults(hasPermission: boolean): void {
 			return this.updatePermission(
 				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 				hasPermission,
@@ -169,9 +180,9 @@ export default {
 		},
 
 		/**
-		 * @param {boolean} hasPermission If the results_delete permission should be granted
+		 * @param hasPermission If the results_delete permission should be granted
 		 */
-		updatePermissionEdit(hasPermission) {
+		updatePermissionEdit(hasPermission: boolean): void {
 			return this.updatePermission(
 				this.PERMISSION_TYPES.PERMISSION_EDIT,
 				hasPermission,
@@ -181,22 +192,22 @@ export default {
 		/**
 		 * Grant or remove permission from share
 		 *
-		 * @param {string} permission The permission to grant or remove
-		 * @param {boolean} hasPermission True if granted, False if removed
+		 * @param permission The permission to grant or remove
+		 * @param hasPermission True if granted, False if removed
 		 */
-		updatePermission(permission, hasPermission) {
-			const share = { ...this.share }
+		updatePermission(permission: string, hasPermission: boolean): void {
+			const share = { ...(this.share as ShareLike) }
 			if (hasPermission) {
 				share.permissions = [...new Set([...share.permissions, permission])]
 			} else {
 				share.permissions = share.permissions.filter(
-					(perm) => perm !== permission,
+					(perm: string) => perm !== permission,
 				)
 			}
 			this.$emit('update:share', share)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

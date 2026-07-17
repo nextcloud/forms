@@ -21,7 +21,7 @@
 				:disabled="!readOnly"
 				:name="name || undefined"
 				:required="isRequired"
-				:value="values[0]"
+				:value="inputValue"
 				class="question__input"
 				dir="auto"
 				:maxlength="maxStringLengths.answerText"
@@ -78,9 +78,11 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
 import debounce from 'debounce'
+import { defineComponent } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -91,7 +93,7 @@ import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import validationTypes from '../../models/ValidationTypes.ts'
 import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
 
-export default {
+export default defineComponent({
 	name: 'QuestionShort',
 
 	components: {
@@ -108,6 +110,7 @@ export default {
 	setup() {
 		return {
 			IconRegex,
+			t,
 		}
 	},
 
@@ -143,7 +146,10 @@ export default {
 		 * Name of the current validation type, fallsback to 'text'
 		 */
 		validationType() {
-			return this.extraSettings?.validationType || 'text'
+			return (
+				(this.extraSettings as { validationType?: string } | undefined)
+					?.validationType || 'text'
+			)
 		},
 
 		/**
@@ -157,14 +163,21 @@ export default {
 		 * The regular expression
 		 */
 		validationRegex() {
-			return this.extraSettings?.validationRegex || ''
+			return (
+				(this.extraSettings as { validationRegex?: string } | undefined)
+					?.validationRegex || ''
+			)
+		},
+
+		inputValue(): string | number | readonly string[] | null | undefined {
+			return this.values[0] as
+				string | number | readonly string[] | null | undefined
 		},
 	},
 
 	methods: {
-		async validate() {
-			/** @type {HTMLInputElement} */
-			const input = this.$refs.input
+		async validate(): Promise<boolean> {
+			const input = this.$refs.input as unknown as HTMLInputElement
 			const value = input.value
 
 			// Clear the previous custom error before checking native validity.
@@ -192,13 +205,14 @@ export default {
 			return true
 		},
 
-		debounceValidate: debounce(async function () {
+		debounceValidate: debounce(async function (this: {
+			validate: () => Promise<boolean>
+		}) {
 			this.validate()
 		}, INPUT_DEBOUNCE_MS),
 
-		onInput() {
-			/** @type {HTMLInputElement} */
-			const input = this.$refs.input
+		onInput(): void {
+			const input = this.$refs.input as unknown as HTMLInputElement
 			const value = input.value
 			this.$emit('update:values', [value])
 			this.debounceValidate()
@@ -207,9 +221,9 @@ export default {
 		/**
 		 * Change input type
 		 *
-		 * @param {string} validationType new input type
+		 * @param validationType new input type
 		 */
-		onChangeValidationType(validationType) {
+		onChangeValidationType(validationType: string): void {
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
 				this.onExtraSettingsChange({
@@ -232,15 +246,24 @@ export default {
 		 * Ensures the regex is enclosed with delimters, as required for PCRE,
 		 * and regex is only using modifiers supported by JS *and* PHP
 		 *
-		 * @param {InputEvent|SubmitEvent} event input event
-		 * @return {boolean} true if the regex is valid
+		 * @param event input event
+		 * @return true if the regex is valid
 		 */
-		onInputRegex(event) {
-			if (event?.isComposing) {
+		onInputRegex(event: InputEvent | SubmitEvent): boolean {
+			if ('isComposing' in event && event.isComposing) {
 				return false
 			}
 
-			const input = this.$refs.regexInput.$el.querySelector('input')
+			const input = (
+				this.$refs.regexInput as unknown as {
+					$el: {
+						querySelector: (selector: string) => HTMLInputElement | null
+					}
+				}
+			).$el.querySelector('input')
+			if (!input) {
+				return false
+			}
 			const validationRegex = input.value
 
 			// remove potential previous validity
@@ -258,15 +281,15 @@ export default {
 		/**
 		 * Same as `onInputRegex` but for convinience also closes the menu
 		 *
-		 * @param {SubmitEvent} event regex submit event
+		 * @param event regex submit event
 		 */
-		onSubmitRegex(event) {
+		onSubmitRegex(event: SubmitEvent): void {
 			if (this.onInputRegex(event)) {
 				this.isValidationTypeMenuOpen = false
 			}
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

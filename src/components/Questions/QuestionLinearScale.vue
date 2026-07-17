@@ -117,9 +117,10 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
-import { t } from '@nextcloud/l10n'
+import { translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -127,7 +128,14 @@ import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
-export default {
+type LinearScaleExtraSettings = {
+	optionsLowest?: number | null
+	optionsHighest?: number | null
+	optionsLabelLowest?: string | null
+	optionsLabelHighest?: string | null
+}
+
+export default defineComponent({
 	name: 'QuestionLinearScale',
 
 	components: {
@@ -144,6 +152,7 @@ export default {
 	setup() {
 		return {
 			IconPencil,
+			t,
 		}
 	},
 
@@ -154,48 +163,52 @@ export default {
 	},
 
 	computed: {
-		scaleOptions() {
+		scaleOptions(): number[] {
 			return Array.from(
 				{ length: this.optionsHighest - this.optionsLowest + 1 },
 				(_, i) => i + this.optionsLowest,
 			)
 		},
 
-		isUnique() {
+		isUnique(): boolean {
 			return this.answerType.unique === true
 		},
 
-		questionValues() {
+		questionValues(): unknown[] {
 			return this.values
 		},
 
 		/**
 		 * ID for the label for the lowest option
 		 */
-		labelId() {
+		labelId(): string {
 			return 'q' + this.index + '__label_lowest'
 		},
 
-		optionsLowest() {
-			return this.extraSettings?.optionsLowest ?? 1
+		optionsLowest(): number {
+			const extraSettings = this.extraSettings as
+				LinearScaleExtraSettings | undefined
+			return extraSettings?.optionsLowest ?? 1
 		},
 
-		optionsHighest() {
-			return this.extraSettings?.optionsHighest ?? 5
+		optionsHighest(): number {
+			const extraSettings = this.extraSettings as
+				LinearScaleExtraSettings | undefined
+			return extraSettings?.optionsHighest ?? 5
 		},
 
-		optionsLabelLowest() {
+		optionsLabelLowest(): string {
+			const extraSettings = this.extraSettings as
+				LinearScaleExtraSettings | undefined
 			return (
-				this.extraSettings?.optionsLabelLowest
-				?? t('forms', 'Strongly disagree')
+				extraSettings?.optionsLabelLowest ?? t('forms', 'Strongly disagree')
 			)
 		},
 
-		optionsLabelHighest() {
-			return (
-				this.extraSettings?.optionsLabelHighest
-				?? t('forms', 'Strongly agree')
-			)
+		optionsLabelHighest(): string {
+			const extraSettings = this.extraSettings as
+				LinearScaleExtraSettings | undefined
+			return extraSettings?.optionsLabelHighest ?? t('forms', 'Strongly agree')
 		},
 	},
 
@@ -207,7 +220,7 @@ export default {
 	},
 
 	methods: {
-		async validate() {
+		async validate(): Promise<boolean> {
 			if (this.isRequired && this.values.length === 0) {
 				this.errorMessage = t('forms', 'You must answer this question')
 				return false
@@ -217,28 +230,28 @@ export default {
 			return true
 		},
 
-		onChange(option) {
+		onChange(option: string): void {
 			this.$emit('update:values', [option])
 		},
 
-		onOptionsLowestChange(value) {
+		onOptionsLowestChange(value: number): void {
 			this.onExtraSettingsChange({ optionsLowest: value === 1 ? null : value })
 		},
 
-		onOptionsHighestChange(value) {
+		onOptionsHighestChange(value: number): void {
 			this.onExtraSettingsChange({
 				optionsHighest: value === 5 ? null : value,
 			})
 		},
 
-		onOptionsLabelLowestChange(value) {
+		onOptionsLabelLowestChange(value: string): void {
 			this.onExtraSettingsChange({
 				optionsLabelLowest:
 					value === t('forms', 'Strongly disagree') ? null : value,
 			})
 		},
 
-		onOptionsLabelHighestChange(value) {
+		onOptionsLabelHighestChange(value: string): void {
 			this.onExtraSettingsChange({
 				optionsLabelHighest:
 					value === t('forms', 'Strongly agree') ? null : value,
@@ -248,14 +261,22 @@ export default {
 		/**
 		 * Resizes the given label to fit within the specified constraints.
 		 *
-		 * @param {string} label - The label identifier, either 'lowest' or 'highest', indicating which label to resize.
+		 * @param label - The label identifier, either 'lowest' or 'highest', indicating which label to resize.
 		 */
-		resizeLabel(label) {
-			let textarea
+		resizeLabel(label: 'lowest' | 'highest'): void {
+			let textarea: HTMLTextAreaElement | undefined
 			if (label === 'lowest') {
-				textarea = this.$refs.lowest.$refs.input
+				textarea = (
+					this.$refs.lowest as {
+						$refs: { input: HTMLTextAreaElement }
+					}
+				).$refs.input
 			} else if (label === 'highest') {
-				textarea = this.$refs.highest.$refs.input
+				textarea = (
+					this.$refs.highest as {
+						$refs: { input: HTMLTextAreaElement }
+					}
+				).$refs.input
 			}
 			// next tick ensures that the textarea is attached to DOM
 			this.$nextTick(() => {
@@ -270,11 +291,11 @@ export default {
 		/**
 		 * Handles the blur event for a label input.
 		 *
-		 * @param {string} label - The label that is being blurred.
+		 * @param label - The label that is being blurred.
 		 *                         It can be either 'lowest' or 'highest' indicating
 		 *                         which label input (lowest value or highest value) triggered the blur event.
 		 */
-		onBlur(label) {
+		onBlur(label: 'lowest' | 'highest'): void {
 			if (label === 'lowest') {
 				this.optionsLabelLowest = this.optionsLabelLowest
 					.replace(/[\r\n]+/gm, ' ')
@@ -287,7 +308,7 @@ export default {
 			this.resizeLabel(label)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

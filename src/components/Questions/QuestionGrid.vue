@@ -175,8 +175,11 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsOption } from '../../models/Entities.d.ts'
+
 import { translatePlural as n, translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
@@ -187,7 +190,27 @@ import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
 
-export default {
+type GridQuestionType = GridCellType | 'text'
+
+type GridCellValue = string | number
+
+type GridMatrixValues = Record<number, Record<number, GridCellValue>>
+
+type GridQuestionValues = Record<number, unknown>
+
+type QuestionGridExtraSettings = {
+	optionsLimitMax?: number
+	optionsLimitMin?: number
+	questionType?: GridQuestionType
+}
+
+interface QuestionGridData {
+	isDragging: boolean
+	isLoading: boolean
+	questionTypes: Array<{ label: string; id: GridQuestionType }>
+}
+
+export default defineComponent({
 	name: 'QuestionGrid',
 
 	components: {
@@ -202,7 +225,13 @@ export default {
 	mixins: [QuestionMixin, QuestionMultipleMixin],
 	emits: ['update:values'],
 
-	data() {
+	setup() {
+		return {
+			t,
+		}
+	},
+
+	data(): QuestionGridData {
 		return {
 			isDragging: false,
 			isLoading: false,
@@ -210,51 +239,55 @@ export default {
 				{ label: t('forms', 'Radio'), id: GridCellType.Radio },
 				{ label: t('forms', 'Checkbox'), id: GridCellType.Checkbox },
 				{ label: t('forms', 'Number'), id: GridCellType.Number },
-				{ label: t('forms', 'Text'), id: GridCellType.Text },
+				{ label: t('forms', 'Text'), id: 'text' },
 			],
 		}
 	},
 
 	computed: {
-		isUnique() {
+		isUnique(): boolean {
 			return this.answerType.unique === true
 		},
 
-		shiftDragHandle() {
+		shiftDragHandle(): boolean {
 			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
 		},
 
-		questionType() {
-			return this.extraSettings?.questionType ?? GridCellType.Radio
+		questionType(): GridQuestionType {
+			const extraSettings = this.extraSettings as
+				QuestionGridExtraSettings | undefined
+			return extraSettings?.questionType ?? GridCellType.Radio
 		},
 
 		columns: {
-			get() {
+			get(): FormsOption[] {
 				return this.sortOptionsOfType(this.options, OptionType.Column)
 			},
 
-			set(value) {
+			set(value: FormsOption[]) {
 				this.updateOptionsOrder(value, OptionType.Column)
 			},
 		},
 
 		rows: {
-			get() {
+			get(): FormsOption[] {
 				return this.sortOptionsOfType(this.options, OptionType.Row)
 			},
 
-			set(value) {
+			set(value: FormsOption[]) {
 				this.updateOptionsOrder(value, OptionType.Row)
 			},
 		},
 
-		plainValues() {
-			const values = {}
+		plainValues(): GridMatrixValues {
+			const values: GridMatrixValues = {}
+			const questionValues = this.values as GridQuestionValues
 			for (const row of this.rows) {
 				for (const column of this.columns) {
 					values[row.id] = values[row.id] || {}
-					values[row.id][column.id] =
-						this.values[row.id]?.[column.id] ?? ''
+					const rowValues = questionValues[row.id] as
+						Record<number, GridCellValue> | undefined
+					values[row.id][column.id] = rowValues?.[column.id] ?? ''
 				}
 			}
 
@@ -263,20 +296,20 @@ export default {
 	},
 
 	methods: {
-		async validate() {
-			if (
-				this.isRequired
-				&& (this.values.length === 0 || this.values === null)
-			) {
+		async validate(): Promise<boolean> {
+			const extraSettings = this.extraSettings as
+				QuestionGridExtraSettings | undefined
+			const values = this.values as unknown[] & { length?: number }
+			if (this.isRequired && (values.length === 0 || this.values === null)) {
 				this.errorMessage = t('forms', 'You must answer this question')
 				return false
 			}
 
 			if (!this.isUnique) {
 				// Validate limits
-				const max = this.extraSettings.optionsLimitMax ?? 0
-				const min = this.extraSettings.optionsLimitMin ?? 0
-				if (max && this.values.length > max) {
+				const max = extraSettings?.optionsLimitMax ?? 0
+				const min = extraSettings?.optionsLimitMin ?? 0
+				if (max && (values.length ?? 0) > max) {
 					this.errorMessage = n(
 						'forms',
 						'You must choose at most one option',
@@ -285,7 +318,7 @@ export default {
 					)
 					return false
 				}
-				if (min && this.values.length < min) {
+				if (min && (values.length ?? 0) < min) {
 					this.errorMessage = n(
 						'forms',
 						'You must choose at least one option',
@@ -300,31 +333,35 @@ export default {
 			return true
 		},
 
-		onDragStart() {
+		onDragStart(): void {
 			this.isDragging = true
 		},
 
-		onDragEnd() {
+		onDragEnd(): void {
 			this.$nextTick(() => {
 				this.isDragging = false
 			})
 		},
 
-		onChangeCheckboxRadio(rowId, value) {
-			const values = { ...this.values }
+		onChangeCheckboxRadio(rowId: number, value: unknown): void {
+			const values = { ...(this.values as GridQuestionValues) }
 			values[rowId] = value
 
 			this.$emit('update:values', values)
 		},
 
-		onChangeTextNumber(rowId, columnId, value) {
+		onChangeTextNumber(
+			rowId: number,
+			columnId: number,
+			value: GridCellValue,
+		): void {
 			const values = { ...this.plainValues }
 			values[rowId][columnId] = value
 
 			this.$emit('update:values', values)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

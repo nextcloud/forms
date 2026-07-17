@@ -45,15 +45,17 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
+import { translate as t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
-export default {
+export default defineComponent({
 	name: 'QuestionColor',
 
 	components: {
@@ -69,6 +71,7 @@ export default {
 	setup() {
 		return {
 			IconClose,
+			t,
 		}
 	},
 
@@ -79,19 +82,19 @@ export default {
 	},
 
 	computed: {
-		colorPickerPlaceholder() {
+		colorPickerPlaceholder(): string {
 			return this.readOnly
 				? this.answerType.submitPlaceholder
 				: this.answerType.createPlaceholder
 		},
 
-		pickedColor() {
-			return this.values[0] ?? ''
+		pickedColor(): string {
+			return (this.values[0] as string | null | undefined) ?? ''
 		},
 	},
 
 	methods: {
-		async validate() {
+		async validate(): Promise<boolean> {
 			if (this.isRequired && this.pickedColor === '') {
 				this.errorMessage = t('forms', 'You must answer this question')
 				return false
@@ -101,11 +104,11 @@ export default {
 			return true
 		},
 
-		onUpdatePickedColor(color) {
-			this.$emit('update:values', [color])
+		onUpdatePickedColor(color: string | undefined): void {
+			this.$emit('update:values', [color ?? ''])
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -111,11 +111,13 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
+import { t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
@@ -123,7 +125,27 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
 import logger from './utils/Logger.ts'
 
-export default {
+const formsAppName = 'forms'
+
+interface AppConfig {
+	restrictCreation: boolean
+	creationAllowedGroups: GroupOption[]
+	allowConfirmationEmail: boolean
+	allowComments: boolean
+	allowCustomPublicShareTokens: boolean
+	allowPermitAll: boolean
+	allowPublicLink: boolean
+	allowShowToAll: boolean
+	isMailConfigured: boolean
+	confirmationEmailRateLimit?: number
+}
+
+interface GroupOption {
+	groupId: string
+	displayName?: string
+}
+
+export default defineComponent({
 	name: 'FormsSettings',
 
 	components: {
@@ -134,13 +156,28 @@ export default {
 		NcSettingsSection,
 	},
 
-	data() {
+	setup() {
 		return {
-			appConfig: loadState(appName, 'appConfig'),
-			availableGroups: loadState(appName, 'availableGroups'),
+			t,
+		}
+	},
+
+	data(): {
+		appConfig: AppConfig
+		availableGroups: GroupOption[]
+		confirmationEmailRateLimitInput: string
+		loading: Record<string, boolean>
+	} {
+		return {
+			appConfig: loadState(formsAppName, 'appConfig') as AppConfig,
+			availableGroups: loadState(
+				formsAppName,
+				'availableGroups',
+			) as GroupOption[],
 
 			confirmationEmailRateLimitInput: String(
-				loadState(appName, 'appConfig').confirmationEmailRateLimit ?? 3,
+				(loadState(formsAppName, 'appConfig') as AppConfig)
+					.confirmationEmailRateLimit ?? 3,
 			),
 
 			loading: {},
@@ -155,15 +192,15 @@ export default {
 		 * - Update value via api
 		 * - Only after everything is done (incl. possible reload on failure), unset loading.
 		 *
-		 * @param {boolean|Array} newVal The resp. new Value to store.
+		 * @param newVal The resp. new Value to store.
 		 */
-		async onRestrictCreationChange(newVal) {
+		async onRestrictCreationChange(newVal: boolean): Promise<void> {
 			this.loading.restrictCreation = true
 			await this.saveAppConfig('restrictCreation', newVal)
 			this.loading.restrictCreation = false
 		},
 
-		async onCreationAllowedGroupsChange(newVal) {
+		async onCreationAllowedGroupsChange(newVal: GroupOption[]): Promise<void> {
 			this.loading.creationAllowedGroups = true
 			await this.saveAppConfig(
 				'creationAllowedGroups',
@@ -172,37 +209,37 @@ export default {
 			this.loading.creationAllowedGroups = false
 		},
 
-		async onAllowPublicLinkChange(newVal) {
+		async onAllowPublicLinkChange(newVal: boolean): Promise<void> {
 			this.loading.allowPublicLink = true
 			await this.saveAppConfig('allowPublicLink', newVal)
 			this.loading.allowPublicLink = false
 		},
 
-		async onAllowCustomPublicShareTokensChange(newVal) {
+		async onAllowCustomPublicShareTokensChange(newVal: boolean): Promise<void> {
 			this.loading.allowCustomPublicShareTokens = true
 			await this.saveAppConfig('allowCustomPublicShareTokens', newVal)
 			this.loading.allowCustomPublicShareTokens = false
 		},
 
-		async onAllowPermitAllChange(newVal) {
+		async onAllowPermitAllChange(newVal: boolean): Promise<void> {
 			this.loading.allowPermitAll = true
 			await this.saveAppConfig('allowPermitAll', newVal)
 			this.loading.allowPermitAll = false
 		},
 
-		async onAllowShowToAllChange(newVal) {
+		async onAllowShowToAllChange(newVal: boolean): Promise<void> {
 			this.loading.allowShowToAll = true
 			await this.saveAppConfig('allowShowToAll', newVal)
 			this.loading.allowShowToAll = false
 		},
 
-		async onAllowConfirmationEmailChange(newVal) {
+		async onAllowConfirmationEmailChange(newVal: boolean): Promise<void> {
 			this.loading.allowConfirmationEmail = true
 			await this.saveAppConfig('allowConfirmationEmail', newVal)
 			this.loading.allowConfirmationEmail = false
 		},
 
-		async onConfirmationEmailRateLimitChange() {
+		async onConfirmationEmailRateLimitChange(): Promise<void> {
 			const value = Math.max(
 				1,
 				Math.min(
@@ -214,7 +251,7 @@ export default {
 			await this.saveAppConfig('confirmationEmailRateLimit', value)
 		},
 
-		async onAllowCommentsChange(newVal) {
+		async onAllowCommentsChange(newVal: boolean): Promise<void> {
 			this.loading.allowComments = true
 			await this.saveAppConfig('allowComments', newVal)
 			this.loading.allowComments = false
@@ -223,10 +260,10 @@ export default {
 		/**
 		 * Save a key-value pair to the appConfig.
 		 *
-		 * @param {string} configKey The key to store. Must be one of the used configKeys (See php-constants).
-		 * @param {boolean|Array} configValue The value to store.
+		 * @param configKey The key to store. Must be one of the used configKeys (See php-constants).
+		 * @param configValue The value to store.
 		 */
-		async saveAppConfig(configKey, configValue) {
+		async saveAppConfig(configKey: string, configValue: unknown): Promise<void> {
 			try {
 				await axios.patch(generateUrl('apps/forms/config'), {
 					configKey,
@@ -242,7 +279,7 @@ export default {
 		/**
 		 * Reload the current AppConfig. Used to restore in case of saving-failure.
 		 */
-		async reloadAppConfig() {
+		async reloadAppConfig(): Promise<void> {
 			try {
 				const resp = await axios.get(generateUrl('apps/forms/config'))
 				this.appConfig = resp.data
@@ -252,7 +289,7 @@ export default {
 			}
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

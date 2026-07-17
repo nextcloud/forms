@@ -9,6 +9,7 @@ import type { FormsOption } from '../models/Entities.d.ts'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { translate as t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
@@ -169,7 +170,7 @@ export default defineComponent({
 
 	computed: {
 		questionProps(): any {
-			const props = { ...this.$props }
+			const props = { ...this.$props } as Record<string, unknown>
 			const allowedKeys = Object.keys(Question.props || {})
 			Object.keys(props).forEach((key) => {
 				if (!allowedKeys.includes(key)) {
@@ -392,7 +393,7 @@ export default defineComponent({
 						optionType: OptionType.Choice,
 					},
 				)
-				const newServerOptions = OcsResponse2Data(response)
+				const newServerOptions = OcsResponse2Data<FormsOption[]>(response)
 				const options = this.options.slice()
 				newServerOptions.forEach((option: FormsOption) => {
 					options.push({

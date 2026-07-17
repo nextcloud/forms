@@ -61,16 +61,18 @@
 	</NcActions>
 </template>
 
-<script>
+<script lang="ts">
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
+import { t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 
-export default {
+export default defineComponent({
 	name: 'AddQuestionMenu',
 
 	components: {
@@ -98,12 +100,16 @@ export default {
 
 	setup() {
 		return {
+			t,
 			IconChevronLeft,
 			IconPlus,
 		}
 	},
 
-	data() {
+	data(): {
+		activeQuestionType: string | null
+		openLocal: boolean
+	} {
 		return {
 			activeQuestionType: null,
 			openLocal: this.open,
@@ -111,18 +117,18 @@ export default {
 	},
 
 	watch: {
-		open(v) {
+		open(v: boolean) {
 			this.openLocal = v
 		},
 
-		openLocal(v) {
+		openLocal(v: boolean) {
 			this.$emit('update:open', v)
 			if (!v) this.activeQuestionType = null
 		},
 	},
 
 	methods: {
-		onPrimaryClick(answer, type, position) {
+		onPrimaryClick(answer: unknown, type: string, position: number | null) {
 			if (this.hasSubtypes(answer)) {
 				this.activeQuestionType = type
 				return
@@ -131,12 +137,16 @@ export default {
 			this.openLocal = false
 		},
 
-		onSubtypeClick(type, subtype, position) {
+		onSubtypeClick(
+			type: string,
+			subtype: string | number,
+			position: number | null,
+		) {
 			this.$emit('addQuestion', type, subtype, position)
 			this.openLocal = false
 		},
 	},
-}
+})
 </script>
 
 <style scoped>

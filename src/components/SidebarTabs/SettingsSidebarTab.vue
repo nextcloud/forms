@@ -273,11 +273,15 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsQuestion } from '../../models/Entities.d.ts'
+
 import { getCurrentUser } from '@nextcloud/auth'
 import { loadState } from '@nextcloud/initial-state'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { vOnClickOutside as ClickOutside } from '@vueuse/components'
+import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
@@ -291,7 +295,22 @@ import svgLockOpen from '../../../img/lock_open.svg?raw'
 import ShareTypes from '../../mixins/ShareTypes.ts'
 import { FormState } from '../../models/Constants.ts'
 
-export default {
+type ConfirmationEmailQuestionOption = {
+	id: number
+	label: string
+}
+
+interface SettingsAppConfig {
+	allowComments: boolean
+	allowConfirmationEmail: boolean
+	[key: string]: unknown
+}
+
+interface MarkdownRenderer {
+	render: (input: string) => string
+}
+
+export default defineComponent({
 	components: {
 		NcButton,
 		NcInputField,
@@ -331,14 +350,37 @@ export default {
 
 	emits: ['update:formProp'],
 
-	data() {
+	setup() {
+		return {
+			t,
+		}
+	},
+
+	data(): {
+		formatter: {
+			stringify: (datetime: Date | [Date, Date] | null) => string
+			parse: (value: number) => Date
+		}
+		appConfig: SettingsAppConfig
+		maxStringLengths: Record<string, number>
+		editMessage: boolean
+		svgLockOpen: string
+		confirmationEmailSubject: string
+		confirmationEmailBody: string
+	} {
 		return {
 			formatter: {
-				stringify: this.stringifyDate,
+				stringify: (datetime: Date | [Date, Date] | null) => {
+					if (datetime instanceof Date) {
+						return this.stringifyDate(datetime)
+					}
+					return this.stringifyDate(new Date())
+				},
+
 				parse: this.parseTimestampToDate,
 			},
 
-			appConfig: loadState('forms', 'appConfig'),
+			appConfig: loadState('forms', 'appConfig') as SettingsAppConfig,
 			maxStringLengths: loadState('forms', 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
@@ -349,18 +391,18 @@ export default {
 	},
 
 	computed: {
-		isCurrentUserOwner() {
-			return getCurrentUser().uid === this.form.ownerId
+		isCurrentUserOwner(): boolean {
+			return getCurrentUser()?.uid === this.form.ownerId
 		},
 
-		isFormLockedPermanently() {
+		isFormLockedPermanently(): boolean {
 			return this.locked && this.form.lockedUntil === 0
 		},
 
 		/**
 		 * If the form has a custom submission message or the user wants to add one (settings switch)
 		 */
-		hasCustomSubmissionMessage() {
+		hasCustomSubmissionMessage(): boolean {
 			return (
 				this.form?.submissionMessage !== undefined
 				&& this.form?.submissionMessage !== null
@@ -370,11 +412,11 @@ export default {
 		/**
 		 * Submit Multiple is disabled, if it cannot be controlled.
 		 */
-		disableSubmitMultiple() {
+		disableSubmitMultiple(): boolean {
 			return this.hasPublicLink || this.form.isAnonymous
 		},
 
-		disableSubmitMultipleExplanation() {
+		disableSubmitMultipleExplanation(): string {
 			if (this.disableSubmitMultiple) {
 				return t(
 					'forms',
@@ -384,7 +426,7 @@ export default {
 			return ''
 		},
 
-		hasPublicLink() {
+		hasPublicLink(): boolean {
 			return (
 				this.form.shares.filter(
 					(share) => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK,
@@ -393,23 +435,23 @@ export default {
 		},
 
 		// If disabled, submitMultiple will be casted to true
-		submitMultiple() {
+		submitMultiple(): boolean {
 			return this.disableSubmitMultiple || this.form.submitMultiple
 		},
 
-		formExpires() {
+		formExpires(): boolean {
 			return this.form.expires !== 0
 		},
 
-		formArchived() {
+		formArchived(): boolean {
 			return this.form.state === FormState.FormArchived
 		},
 
-		formClosed() {
+		formClosed(): boolean {
 			return this.form.state !== FormState.FormActive
 		},
 
-		hasMaxSubmissions() {
+		hasMaxSubmissions(): boolean {
 			return (
 				this.form.maxSubmissions !== null
 				&& this.form.maxSubmissions !== undefined
@@ -417,53 +459,56 @@ export default {
 		},
 
 		maxSubmissionsValue: {
-			get() {
+			get(): number {
 				return this.form.maxSubmissions ?? 1
 			},
 
-			set(value) {
+			set(value: number): void {
 				this.$emit('update:formProp', 'maxSubmissions', value)
 			},
 		},
 
-		isExpired() {
+		isExpired(): boolean {
 			return this.form.expires && moment().unix() > this.form.expires
 		},
 
-		expirationDate() {
+		expirationDate(): Date {
 			return moment(this.form.expires, 'X').toDate()
 		},
 
 		/**
 		 * The submission message rendered as HTML
 		 */
-		submissionMessageHTML() {
-			return this.$markdownit.render(this.form.submissionMessage || '')
+		submissionMessageHTML(): string {
+			return (this.$markdownit as MarkdownRenderer).render(
+				this.form.submissionMessage || '',
+			)
 		},
 
-		emailBodyPlaceholder() {
+		emailBodyPlaceholder(): string {
 			return t(
 				'forms',
 				'Hello,\n\nThank you for submitting the form "{formTitle}".\n\nBest regards',
 			)
 		},
 
-		emailQuestionCount() {
+		emailQuestionCount(): number {
 			return this.confirmationEmailQuestions.length
 		},
 
-		confirmationEmailQuestions() {
+		confirmationEmailQuestions(): FormsQuestion[] {
 			const questions = this.form?.questions || []
 			return questions.filter(
-				(question) =>
+				(question: FormsQuestion) =>
 					question.type === 'short'
 					&& question.extraSettings?.validationType === 'email',
 			)
 		},
 
-		selectedConfirmationEmailQuestion() {
+		selectedConfirmationEmailQuestion(): FormsQuestion | null {
 			const selectedQuestion = this.confirmationEmailQuestions.find(
-				(question) => question.id === this.form.confirmationEmailQuestionId,
+				(question: FormsQuestion) =>
+					question.id === this.form.confirmationEmailQuestionId,
 			)
 			if (selectedQuestion) {
 				return selectedQuestion
@@ -479,7 +524,7 @@ export default {
 			return null
 		},
 
-		selectedConfirmationEmailQuestionId() {
+		selectedConfirmationEmailQuestionId(): number | string {
 			return (
 				this.form.confirmationEmailQuestionId
 				?? this.selectedConfirmationEmailQuestion?.id
@@ -487,14 +532,14 @@ export default {
 			)
 		},
 
-		confirmationEmailQuestionOptions() {
+		confirmationEmailQuestionOptions(): ConfirmationEmailQuestionOption[] {
 			return this.confirmationEmailQuestions.map((question) => ({
 				id: question.id,
 				label: this.confirmationEmailQuestionLabel(question),
 			}))
 		},
 
-		selectedConfirmationEmailQuestionOption() {
+		selectedConfirmationEmailQuestionOption(): ConfirmationEmailQuestionOption | null {
 			return (
 				this.confirmationEmailQuestionOptions.find(
 					(question) =>
@@ -503,7 +548,7 @@ export default {
 			)
 		},
 
-		confirmationEmailErrorText() {
+		confirmationEmailErrorText(): string {
 			if (this.emailQuestionCount === 0) {
 				return t(
 					'forms',
@@ -521,21 +566,21 @@ export default {
 			return ''
 		},
 
-		confirmationEmailNoteCardType() {
+		confirmationEmailNoteCardType(): 'warning' | 'info' {
 			if (this.requiresConfirmationEmailQuestionIdSelection) {
 				return 'warning'
 			}
 			return 'info'
 		},
 
-		requiresConfirmationEmailQuestionIdSelection() {
+		requiresConfirmationEmailQuestionIdSelection(): boolean {
 			return (
 				this.emailQuestionCount > 1
 				&& !this.selectedConfirmationEmailQuestion
 			)
 		},
 
-		isConfirmationEmailConfigurationBlocked() {
+		isConfirmationEmailConfigurationBlocked(): boolean {
 			return (
 				this.form.confirmationEmailEnabled
 				&& (this.emailQuestionCount === 0
@@ -545,11 +590,11 @@ export default {
 	},
 
 	watch: {
-		'form.confirmationEmailSubject': function (val) {
+		'form.confirmationEmailSubject': function (val: string | null | undefined) {
 			this.confirmationEmailSubject = val || ''
 		},
 
-		'form.confirmationEmailBody': function (val) {
+		'form.confirmationEmailBody': function (val: string | null | undefined) {
 			this.confirmationEmailBody = val || ''
 		},
 
@@ -589,32 +634,32 @@ export default {
 	},
 
 	methods: {
-		confirmationEmailQuestionLabel(question) {
+		confirmationEmailQuestionLabel(question: FormsQuestion): string {
 			return question.text || t('forms', 'Untitled question')
 		},
 
 		/**
 		 * Save Form-Properties
 		 *
-		 * @param {boolean} checked New Checkbox/Switch Value to use
+		 * @param checked New Checkbox/Switch Value to use
 		 */
-		onAnonChange(checked) {
+		onAnonChange(checked: boolean): void {
 			this.$emit('update:formProp', 'isAnonymous', checked)
 		},
 
-		onSubmitMultipleChange(checked) {
+		onSubmitMultipleChange(checked: boolean): void {
 			this.$emit('update:formProp', 'submitMultiple', checked)
 		},
 
-		onAllowEditSubmissionsChange(checked) {
+		onAllowEditSubmissionsChange(checked: boolean): void {
 			this.$emit('update:formProp', 'allowEditSubmissions', checked)
 		},
 
-		onAllowCommentsChange(checked) {
+		onAllowCommentsChange(checked: boolean): void {
 			this.$emit('update:formProp', 'allowComments', checked)
 		},
 
-		onFormExpiresChange(checked) {
+		onFormExpiresChange(checked: boolean): void {
 			if (checked) {
 				this.$emit(
 					'update:formProp',
@@ -626,16 +671,19 @@ export default {
 			}
 		},
 
-		onShowExpirationChange(checked) {
+		onShowExpirationChange(checked: boolean): void {
 			this.$emit('update:formProp', 'showExpiration', checked)
 		},
 
 		/**
 		 * On date picker change
 		 *
-		 * @param {Date} datetime the expiration Date
+		 * @param datetime the expiration Date
 		 */
-		onExpirationDateChange(datetime) {
+		onExpirationDateChange(datetime: Date | [Date, Date] | null): void {
+			if (!(datetime instanceof Date)) {
+				return
+			}
 			this.$emit(
 				'update:formProp',
 				'expires',
@@ -643,17 +691,18 @@ export default {
 			)
 		},
 
-		onMaxSubmissionsChange(checked) {
+		onMaxSubmissionsChange(checked: boolean): void {
 			this.$emit('update:formProp', 'maxSubmissions', checked ? 1 : null)
 		},
 
-		onMaxSubmissionsValueChange(value) {
-			if (value > 0) {
+		onMaxSubmissionsValueChange(value: string | number): void {
+			const parsedValue = Number(value)
+			if (parsedValue > 0) {
 				this.$emit('update:formProp', 'maxSubmissions', value)
 			}
 		},
 
-		onFormClosedChange(isClosed) {
+		onFormClosedChange(isClosed: boolean): void {
 			this.$emit(
 				'update:formProp',
 				'state',
@@ -661,11 +710,11 @@ export default {
 			)
 		},
 
-		onFormLockChange(locked) {
+		onFormLockChange(locked: boolean): void {
 			this.$emit('update:formProp', 'lockedUntil', locked ? 0 : null)
 		},
 
-		onFormArchivedChange(isArchived) {
+		onFormArchivedChange(isArchived: boolean): void {
 			this.$emit(
 				'update:formProp',
 				'state',
@@ -673,15 +722,19 @@ export default {
 			)
 		},
 
-		onSubmissionMessageChange({ target }) {
-			this.$emit('update:formProp', 'submissionMessage', target.value)
+		onSubmissionMessageChange(event: Event): void {
+			this.$emit(
+				'update:formProp',
+				'submissionMessage',
+				(event.target as HTMLTextAreaElement).value,
+			)
 		},
 
 		/**
 		 * Enable or disable the whole custom submission message
 		 * Disabled means the value is set to null.
 		 */
-		onUpdateHasCustomSubmissionMessage() {
+		onUpdateHasCustomSubmissionMessage(): void {
 			if (this.hasCustomSubmissionMessage) {
 				this.$emit('update:formProp', 'submissionMessage', null)
 			} else {
@@ -689,7 +742,7 @@ export default {
 			}
 		},
 
-		onConfirmationEmailEnabledChange(checked) {
+		onConfirmationEmailEnabledChange(checked: boolean): void {
 			if (
 				checked
 				&& this.form.confirmationEmailQuestionId === null
@@ -703,7 +756,7 @@ export default {
 			this.$emit('update:formProp', 'confirmationEmailEnabled', checked)
 		},
 
-		onConfirmationEmailSubjectChange() {
+		onConfirmationEmailSubjectChange(): void {
 			this.$emit(
 				'update:formProp',
 				'confirmationEmailSubject',
@@ -711,7 +764,7 @@ export default {
 			)
 		},
 
-		onConfirmationEmailBodyChange() {
+		onConfirmationEmailBodyChange(): void {
 			this.$emit(
 				'update:formProp',
 				'confirmationEmailBody',
@@ -719,7 +772,9 @@ export default {
 			)
 		},
 
-		onConfirmationEmailQuestionIdSelectionChange(option) {
+		onConfirmationEmailQuestionIdSelectionChange(
+			option: ConfirmationEmailQuestionOption | null,
+		): void {
 			const questionId = option?.id ?? null
 			if (questionId === null) {
 				return
@@ -728,7 +783,7 @@ export default {
 			this.saveConfirmationEmailQuestionId(questionId)
 		},
 
-		saveConfirmationEmailQuestionId(selectedQuestionId) {
+		saveConfirmationEmailQuestionId(selectedQuestionId: number | null): void {
 			if (this.form.confirmationEmailQuestionId === selectedQuestionId) {
 				return
 			}
@@ -743,10 +798,10 @@ export default {
 		/**
 		 * Datepicker timestamp to string
 		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {string}
+		 * @param datetime the datepicker Date
+		 * @return
 		 */
-		stringifyDate(datetime) {
+		stringifyDate(datetime: Date): string {
 			const date = moment(datetime).format('LLL')
 
 			if (this.isExpired) {
@@ -758,34 +813,34 @@ export default {
 		/**
 		 * Form expires timestamp to Date of the datepicker
 		 *
-		 * @param {number} value the expires timestamp
-		 * @return {Date}
+		 * @param value the expires timestamp
+		 * @return
 		 */
-		parseTimestampToDate(value) {
+		parseTimestampToDate(value: number): Date {
 			return moment(value, 'X').toDate()
 		},
 
 		/**
 		 * Prevent selecting a day before today
 		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {boolean}
+		 * @param datetime the datepicker Date
+		 * @return
 		 */
-		notBeforeToday(datetime) {
+		notBeforeToday(datetime: Date): boolean {
 			return datetime < moment().add(-1, 'day').toDate()
 		},
 
 		/**
 		 * Prevent selecting a time before the current one
 		 *
-		 * @param {Date} datetime the datepicker Date
-		 * @return {boolean}
+		 * @param datetime the datepicker Date
+		 * @return
 		 */
-		notBeforeNow(datetime) {
+		notBeforeNow(datetime: Date): boolean {
 			return datetime < moment().toDate()
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

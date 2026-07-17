@@ -5,6 +5,17 @@
 
 import { t } from '@nextcloud/l10n'
 
+declare global {
+	interface Window {
+		OC: {
+			getLanguage: () => string
+			theme: {
+				title: string
+			}
+		}
+	}
+}
+
 /**
  * Set the Window-Title to current FormTitle including suffix.
  *

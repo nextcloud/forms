@@ -17,16 +17,20 @@
 	</NcContent>
 </template>
 
-<script>
+<script lang="ts">
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import { loadState } from '@nextcloud/initial-state'
+import { t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import FormsIcon from '../img/forms-dark.svg?raw'
 
-export default {
+const formsAppName = 'forms'
+
+export default defineComponent({
 	name: 'FormsEmptyContent',
 
 	components: {
@@ -36,7 +40,13 @@ export default {
 		NcIconSvgWrapper,
 	},
 
-	data() {
+	data(): {
+		renderModels: Record<
+			string,
+			{ title: string; description: string; icon: string }
+		>
+		renderAs: string
+	} {
 		return {
 			/**
 			 * !! Keep Model-Names in sync with Constants EMTPY_... in lib/Constants.php !!
@@ -60,16 +70,16 @@ export default {
 				},
 			},
 
-			renderAs: loadState(appName, 'renderAs'),
+			renderAs: loadState(formsAppName, 'renderAs'),
 		}
 	},
 
 	computed: {
-		currentModel() {
+		currentModel(): { title: string; description: string; icon: string } {
 			return this.renderModels[this.renderAs]
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>
