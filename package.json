@@ -29,7 +29,7 @@
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
-    "@material-symbols/svg-400": "^0.45.5",
+    "@material-symbols/svg-400": "^0.45.7",
     "@nextcloud/auth": "^2.6.0",
     "@nextcloud/axios": "^2.6.0",
     "@nextcloud/dialogs": "^7.4.0",
