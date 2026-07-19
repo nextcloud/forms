@@ -54,6 +54,7 @@ OC.L10N.register(
     "Allow showing form to all logged in accounts on sidebar" : "Να επιτρέπεται η εμφάνιση φόρμας σε όλους τους λογαριασμούς χρηστών στην πλαϊνή γραμμή",
     "Comments" : "Σχόλια",
     "Allow comments" : "Να επιτρέπονται σχόλια",
+    "Grid" : "Πλέγμα",
     "Form closed" : "Η φόρμα έκλεισε",
     "Expired {relativeDate}" : "Έληξε {relativeDate}",
     "Expires {relativeDate}" : "Λήγει {relativeDate}",
