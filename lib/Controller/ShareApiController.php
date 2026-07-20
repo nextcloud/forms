@@ -352,26 +352,6 @@ class ShareApiController extends OCSController {
 		return new DataResponse($shareId);
 	}
 
-	private function removeUploadedFilesShare(Form $form, Share $formShare): void {
-		if (!in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
-			return;
-		}
-
-		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-		$uploadedFilesFolderPath = $this->filePathHelper->getFormUploadedFilesFolderPath($form);
-		try {
-			$folder = $userFolder->get($uploadedFilesFolderPath);
-		} catch (NotFoundException) {
-			return;
-		}
-		$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);
-		foreach ($folderShares as $folderShare) {
-			if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
-				$this->shareManager->deleteShare($folderShare);
-			}
-		}
-	}
-
 	/**
 	 * Validate user given permission array
 	 *

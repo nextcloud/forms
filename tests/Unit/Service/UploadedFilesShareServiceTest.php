@@ -16,6 +16,7 @@ use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\Files\Folder;
+use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
@@ -35,7 +36,12 @@ class UploadedFilesShareServiceTest extends TestCase {
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->rootFolder = $this->createMock(IRootFolder::class);
 		$this->shareManager = $this->createMock(IManager::class);
-		$filePathHelper = new FilePathHelper($this->rootFolder);
+		$fileNameValidator = $this->createMock(IFilenameValidator::class);
+		$fileNameValidator->method('sanitizeFilename')->willReturnArgument(0);
+		$filePathHelper = new FilePathHelper(
+			$this->rootFolder,
+			$fileNameValidator,
+		);
 
 		$this->service = new UploadedFilesShareService(
 			$this->rootFolder,

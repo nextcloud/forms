@@ -34,10 +34,10 @@ class UploadedFilesShareService {
 	 * remove all linked files shares (oc_share) for collaborators who have 'view responses' on the given form.
 	 */
 	public function removeAllForForm(Form $form): void {
-		$shares = $this->shareMapper->findByForm($form->getId());
-		foreach ($shares as $share) {
-			if (in_array(Constants::PERMISSION_RESULTS, $share->getPermissions(), true)) {
-				$this->removeForCollaborator($form, $share);
+		$formShares = $this->shareMapper->findByForm($form->getId());
+		foreach ($formShares as $formShare) {
+			if (in_array(Constants::PERMISSION_RESULTS, $formShare->getPermissions(), true)) {
+				$this->removeForCollaborator($form, $formShare);
 			}
 		}
 	}
