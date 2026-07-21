@@ -47,7 +47,7 @@
 					:options="responseViews"
 					:groupLabel="t('forms', 'View mode')"
 					class="response-actions__toggle"
-					@update:active="loadFormResults" />
+					@update:active="onChangeResponseView" />
 
 				<!-- Action menu for cloud export and deletion -->
 				<NcActions
@@ -328,6 +328,7 @@ const responseViews = [
 		id: 'responses',
 	},
 ]
+const responseViewIds = new Set(responseViews.map((view) => view.id))
 
 export default {
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -379,7 +380,7 @@ export default {
 
 	data() {
 		return {
-			activeResponseView: responseViews[0],
+			activeResponseView: null,
 
 			questions: [],
 			submissions: [],
@@ -498,8 +499,14 @@ export default {
 		// Reload results when form changes
 		async hash() {
 			await this.fetchFullForm(this.form.id)
-			this.loadFormResults()
+			await this.syncActiveResponseViewFromRoute()
 			SetWindowTitle(this.formTitle)
+		},
+
+		'$route.query': {
+			handler() {
+				this.syncActiveResponseViewFromRoute()
+			},
 		},
 
 		limit() {
@@ -521,15 +528,179 @@ export default {
 			})
 			this.loadFormResults()
 		}, INPUT_DEBOUNCE_MS),
+
+		// Persist active response view to localStorage when it changes
+		activeResponseView(newView) {
+			if (newView?.id) {
+				this.saveActiveResponseViewToLocalStorage(newView.id)
+			}
+		},
 	},
 
 	async beforeMount() {
 		await this.fetchFullForm(this.form.id)
-		this.loadFormResults()
+		await this.syncActiveResponseViewFromRoute()
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
+		/**
+		 * Resolve a response view object by its ID.
+		 *
+		 * @param {string} viewId The requested response view ID
+		 * @return {object}
+		 */
+		getResponseViewById(viewId) {
+			return (
+				responseViews.find((view) => view.id === viewId) ?? responseViews[0]
+			)
+		},
+
+		/**
+		 * Read the explicit response view from the current route query.
+		 *
+		 * @return {string|null}
+		 */
+		getRouteResponseViewId() {
+			return this.$route.query.view ?? null
+		},
+
+		/**
+		 * Load the stored response view preference from localStorage for the current form.
+		 *
+		 * @return {string}
+		 */
+		loadStoredActiveResponseViewId() {
+			try {
+				const storageKey = this.getActiveResponseViewStorageKey()
+				if (!storageKey) {
+					return responseViews[0].id
+				}
+
+				const storedViewId = localStorage.getItem(storageKey)
+				if (storedViewId && responseViewIds.has(storedViewId)) {
+					return storedViewId
+				}
+
+				return responseViews[0].id
+			} catch (err) {
+				logger.debug('Error loading activeResponseView from localStorage', {
+					error: err,
+				})
+				return responseViews[0].id
+			}
+		},
+
+		/**
+		 * Resolve the effective response view using route state first and localStorage second.
+		 *
+		 * @return {string}
+		 */
+		resolveActiveResponseViewId() {
+			return (
+				this.getRouteResponseViewId()
+				?? this.loadStoredActiveResponseViewId()
+			)
+		},
+
+		/**
+		 * Apply the effective route/localStorage view and refresh results when needed.
+		 */
+		async syncActiveResponseViewFromRoute() {
+			const routeViewId = this.getRouteResponseViewId()
+			const nextView = this.getResponseViewById(
+				routeViewId ?? this.loadStoredActiveResponseViewId(),
+			)
+			const currentViewId = this.activeResponseView?.id
+
+			if (currentViewId !== nextView.id) {
+				this.activeResponseView = nextView
+			}
+
+			if (!routeViewId) {
+				try {
+					await this.$router.replace({
+						name: 'results',
+						params: {
+							hash: this.form.hash,
+						},
+						query: {
+							...this.$route.query,
+							view: nextView.id,
+						},
+					})
+					return
+				} catch (error) {
+					logger.debug('Navigation cancelled', { error })
+				}
+			}
+
+			this.loadFormResults()
+		},
+
+		/**
+		 * Save the active response view preference to localStorage for the current form.
+		 *
+		 * @param {string} viewId - The ID of the view ('summary' or 'responses')
+		 */
+		saveActiveResponseViewToLocalStorage(viewId) {
+			try {
+				const storageKey = this.getActiveResponseViewStorageKey()
+				if (!storageKey) {
+					return
+				}
+
+				localStorage.setItem(storageKey, viewId)
+			} catch (err) {
+				logger.debug('Error saving activeResponseView to localStorage', {
+					error: err,
+				})
+			}
+		},
+
+		/**
+		 * Build the localStorage key for the active response view.
+		 *
+		 * @return {string|null}
+		 */
+		getActiveResponseViewStorageKey() {
+			const formHash = this.form?.hash
+			if (!formHash) {
+				return null
+			}
+
+			return `nextcloud_forms_${formHash}_activeResponseView`
+		},
+
+		/**
+		 * Navigate to an explicit route query for the selected response view.
+		 *
+		 * @param {object} view The selected response view object
+		 */
+		async onChangeResponseView(view) {
+			if (!view?.id) {
+				return
+			}
+			if (this.getRouteResponseViewId() === view.id) {
+				this.loadFormResults()
+				return
+			}
+
+			try {
+				await this.$router.push({
+					name: 'results',
+					params: {
+						hash: this.form.hash,
+					},
+					query: {
+						view: view.id,
+					},
+				})
+			} catch (error) {
+				logger.debug('Navigation cancelled', { error })
+			}
+		},
+
 		async onUnlinkFile() {
 			await axios.patch(
 				generateOcsUrl('apps/forms/api/v3/forms/{formId}', {
