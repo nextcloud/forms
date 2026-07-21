@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.3.5 - 2026-07-21
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.4...v5.3.5)
+
+### Fixed
+
+- fix: file share by @samin-z in [\#3522](https://github.com/nextcloud/forms/pull/3522)
+- fix: show selected language instead of locale for expire message by @samin-z in [\#3526](https://github.com/nextcloud/forms/pull/3526)
+
 ## v5.3.4 - 2026-07-16
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.3...v5.3.4)
