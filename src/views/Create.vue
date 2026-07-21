@@ -50,7 +50,7 @@
 					'Form \'{title}\' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}',
 					{
 						title: form.title,
-						lockedBy: form.lockedBy,
+						lockedBy: form.lockedBy ?? '',
 						lockedUntil:
 							form.lockedUntil === 0
 								? t('forms', 'never')
@@ -132,31 +132,25 @@
 							:is="answerTypes[question.type].component"
 							v-for="(question, index) in form.questions"
 							:key="question.id"
-							:ref="(el) => setQuestionRef(el, question)"
+							:ref="registerQuestionRef(question)"
 							v-bind="form.questions[index]"
 							:canMoveDown="index < form.questions.length - 1"
 							:canMoveUp="index > 0"
 							:answerType="answerTypes[question.type]"
 							:index="index + 1"
 							:maxStringLengths="maxStringLengths"
-							@update:text="
-								(val) => (form.questions[index].text = val)
-							"
+							@update:text="updateQuestionText(index, $event)"
 							@update:description="
-								(val) => (form.questions[index].description = val)
+								updateQuestionDescription(index, $event)
 							"
 							@update:isRequired="
-								(val) => (form.questions[index].isRequired = val)
+								updateQuestionIsRequired(index, $event)
 							"
-							@update:name="
-								(val) => (form.questions[index].name = val)
-							"
+							@update:name="updateQuestionName(index, $event)"
 							@update:extraSettings="
-								(val) => (form.questions[index].extraSettings = val)
+								updateQuestionExtraSettings(index, $event)
 							"
-							@update:options="
-								(val) => (form.questions[index].options = val)
-							"
+							@update:options="updateQuestionOptions(index, $event)"
 							@clone="cloneQuestion(question, index)"
 							@delete="deleteQuestion(question.id)"
 							@moveDown="onMoveDown(index)"
@@ -219,16 +213,21 @@
 	</NcAppContent>
 </template>
 
-<script>
+<script lang="ts">
+import type { ComponentPublicInstance } from 'vue'
+import type { FormsQuestion } from '../models/Entities.d.ts'
+
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
+import { translate as t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
+import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -248,9 +247,25 @@ import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
-window.axios = axios
+interface QuestionRefInstance extends ComponentPublicInstance {
+	focus?: () => void
+}
 
-export default {
+interface CreateViewData {
+	answerTypes: typeof answerTypes
+	isLoadingQuestions: boolean
+	isDragging: boolean
+	maxStringLengths: Record<string, number>
+	questionMenuOpened: boolean
+	activeQuestionType: string | null
+	questionRefsMap: Record<number, QuestionRefInstance>
+	insertMenuOpenedIndex: number | null
+	insertMenuOpened: boolean
+}
+
+;(window as Window & { axios?: typeof axios }).axios = axios
+
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Create',
 	components: {
@@ -274,10 +289,11 @@ export default {
 		return {
 			IconLock,
 			isMobile: useIsMobile(),
+			t,
 		}
 	},
 
-	data() {
+	data(): CreateViewData {
 		return {
 			answerTypes,
 
@@ -285,7 +301,11 @@ export default {
 			isLoadingQuestions: false,
 			isDragging: false,
 
-			maxStringLengths: loadState('forms', 'maxStringLengths'),
+			maxStringLengths: loadState('forms', 'maxStringLengths') as Record<
+				string,
+				number
+			>,
+
 			questionMenuOpened: false,
 			activeQuestionType: null,
 			questionRefsMap: {},
@@ -298,13 +318,14 @@ export default {
 	},
 
 	computed: {
-		hasQuestions() {
-			return this.form.questions && this.form.questions.length === 0
+		hasQuestions(): boolean {
+			return this.form.questions.length === 0
 		},
 
-		isRequiredUsed() {
+		isRequiredUsed(): boolean {
 			return this.form.questions.reduce(
-				(isUsed, question) => isUsed || question.isRequired,
+				(isUsed: boolean, question: FormsQuestion) =>
+					isUsed || Boolean(question.isRequired),
 				false,
 			)
 		},
@@ -312,18 +333,18 @@ export default {
 		/**
 		 * Check if form is expired
 		 */
-		isExpired() {
-			return this.form.expires && moment().unix() > this.form.expires
+		isExpired(): boolean {
+			return this.form.expires > 0 && moment().unix() > this.form.expires
 		},
 
 		/**
 		 * Check if the form was archived
 		 */
-		isFormArchived() {
+		isFormArchived(): boolean {
 			return this.form.state === FormState.FormArchived
 		},
 
-		infoMessage() {
+		infoMessage(): string {
 			let message = ''
 			if (this.form.isAnonymous) {
 				message += t('forms', 'Responses are anonymous.')
@@ -343,7 +364,7 @@ export default {
 			return message
 		},
 
-		expirationMessage() {
+		expirationMessage(): string {
 			const relativeDate = moment(this.form.expires, 'X')
 				.locale(window.OC.getLanguage())
 				.fromNow()
@@ -354,19 +375,22 @@ export default {
 		},
 
 		// Remove properties from answerTypes for create button
-		answerTypesFilter() {
+		answerTypesFilter(): Omit<typeof answerTypes, 'datetime'> {
 			// Remove 'datetime' from answerTypes for create button
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { datetime, ...filteredAnswerTypes } = answerTypes
 			return filteredAnswerTypes
 		},
 
-		hasSubtypes() {
+		hasSubtypes(): (
+			answer: { subtypes?: Record<string, unknown> } | null | undefined,
+		) => boolean {
 			return (answer) =>
-				answer && answer.subtypes && Object.keys(answer.subtypes).length > 0
+				Boolean(answer?.subtypes)
+				&& Object.keys(answer?.subtypes ?? {}).length > 0
 		},
 
-		lockedUntilFormatted() {
+		lockedUntilFormatted(): string {
 			return moment(this.form.lockedUntil, 'X').fromNow()
 		},
 	},
@@ -383,7 +407,7 @@ export default {
 		},
 
 		// resize description if form is loaded
-		isLoadingForm(value) {
+		isLoadingForm(value: boolean): void {
 			if (!value) {
 				this.resizeTitle()
 				this.resizeDescription()
@@ -397,17 +421,20 @@ export default {
 	},
 
 	methods: {
-		onDragStart() {
+		onDragStart(): void {
 			this.isDragging = true
 		},
 
-		onDragEnd() {
+		onDragEnd(): void {
 			this.$nextTick(() => {
 				this.isDragging = false
 			})
 		},
 
-		setQuestionRef(el, question) {
+		setQuestionRef(
+			el: QuestionRefInstance | null,
+			question: FormsQuestion,
+		): void {
 			if (el) {
 				this.questionRefsMap[question.id] = el
 			} else {
@@ -415,7 +442,42 @@ export default {
 			}
 		},
 
-		onMoveUp(index) {
+		registerQuestionRef(
+			question: FormsQuestion,
+		): (el: Element | ComponentPublicInstance | null) => void {
+			return (el) => {
+				this.setQuestionRef(el as QuestionRefInstance | null, question)
+			}
+		},
+
+		updateQuestionText(index: number, value: string): void {
+			this.form.questions[index].text = value
+		},
+
+		updateQuestionDescription(index: number, value: string): void {
+			this.form.questions[index].description = value
+		},
+
+		updateQuestionIsRequired(index: number, value: boolean): void {
+			this.form.questions[index].isRequired = value
+		},
+
+		updateQuestionName(index: number, value: string): void {
+			this.form.questions[index].name = value
+		},
+
+		updateQuestionExtraSettings(
+			index: number,
+			value: Record<string, unknown> | null,
+		): void {
+			this.form.questions[index].extraSettings = value
+		},
+
+		updateQuestionOptions(index: number, value: unknown[]): void {
+			this.form.questions[index].options = value
+		},
+
+		onMoveUp(index: number): void {
 			if (index > 0) {
 				;[this.form.questions[index - 1], this.form.questions[index]] = [
 					this.form.questions[index],
@@ -425,14 +487,14 @@ export default {
 			}
 		},
 
-		onMoveDown(index) {
+		onMoveDown(index: number): void {
 			// only if not the last one
 			if (index < this.form.questions.length - 1) {
 				this.onMoveUp(index + 1)
 			}
 		},
 
-		onTitleChange() {
+		onTitleChange(): void {
 			this.resizeTitle()
 			this.saveTitle()
 		},
@@ -440,9 +502,9 @@ export default {
 		/**
 		 * Auto adjust the title height based its scroll height
 		 */
-		resizeTitle() {
+		resizeTitle(): void {
 			this.$nextTick(() => {
-				const textarea = this.$refs.title
+				const textarea = this.$refs.title as HTMLTextAreaElement
 				textarea.style.cssText = 'height: 0'
 				// include 2px border
 				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
@@ -452,10 +514,10 @@ export default {
 		/**
 		 * Auto adjust the description height based on its scroll height
 		 */
-		resizeDescription() {
+		resizeDescription(): void {
 			// nextTick to ensure textarea is attached to DOM
 			this.$nextTick(() => {
-				const textarea = this.$refs.description
+				const textarea = this.$refs.description as HTMLTextAreaElement
 				textarea.style.cssText = 'height: 0'
 				// include 2px border
 				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
@@ -465,9 +527,13 @@ export default {
 		/**
 		 * Update the description
 		 *
-		 * @param {InputEvent} ev The input event of the textarea
+		 * @param event The input event of the textarea
 		 */
-		updateDescription({ target }) {
+		updateDescription(event: Event): void {
+			const target = event.target as HTMLTextAreaElement | null
+			if (!target) {
+				return
+			}
 			this.form.description = target.value
 			this.resizeDescription()
 			this.saveDescription()
@@ -476,28 +542,41 @@ export default {
 		/**
 		 * Title & description save methods
 		 */
-		saveTitle: debounce(async function () {
+		saveTitle: debounce(async function (this: {
+			saveFormProperty: (key: 'title') => void
+		}) {
 			this.saveFormProperty('title')
 		}, INPUT_DEBOUNCE_MS),
 
-		saveDescription: debounce(async function () {
+		saveDescription: debounce(async function (this: {
+			saveFormProperty: (key: 'description') => void
+		}) {
 			this.saveFormProperty('description')
 		}, INPUT_DEBOUNCE_MS),
 
 		/**
 		 * Add a new question to the current form
 		 *
-		 * @param {string} type the question type, see AnswerTypes
-		 * @param {string|null} subtype the question subtype, see AnswerTypes.subtypes
-		 * @param {number|null} position where the new question should be added
+		 * @param type the question type, see AnswerTypes
+		 * @param subtype the question subtype, see AnswerTypes.subtypes
+		 * @param position where the new question should be added
 		 */
-		async addQuestion(type, subtype = null, position = null) {
+		async addQuestion(
+			type: string,
+			subtype: string | null = null,
+			position: number | null = null,
+		): Promise<void> {
 			this.activeQuestionType = null
 			const text = ''
 			this.isLoadingQuestions = true
 
 			try {
-				const body = { type, text, subtype }
+				const body: {
+					type: string
+					text: string
+					subtype: string | null
+					position?: number
+				} = { type, text, subtype }
 				if (position !== null) {
 					// position: current question position + 2 (0-based index: +1, next position: +1)
 					body.position = position + 2
@@ -509,7 +588,7 @@ export default {
 					}),
 					body,
 				)
-				const question = OcsResponse2Data(response)
+				const question = OcsResponse2Data<FormsQuestion>(response)
 
 				// Delegate insertion & focus handling to helper
 				this.insertQuestion(question, { text, type, answers: [] }, position)
@@ -526,9 +605,9 @@ export default {
 		/**
 		 * Delete a question
 		 *
-		 * @param {number} questionId the question id to delete
+		 * @param questionId the question id to delete
 		 */
-		async deleteQuestion(questionId) {
+		async deleteQuestion(questionId: number): Promise<void> {
 			this.isLoadingQuestions = true
 
 			try {
@@ -542,7 +621,7 @@ export default {
 					),
 				)
 				const index = this.form.questions.findIndex(
-					(search) => search.id === questionId,
+					(search: FormsQuestion) => search.id === questionId,
 				)
 				this.form.questions.splice(index, 1)
 				emit('forms:last-updated:set', this.form.id)
@@ -558,7 +637,11 @@ export default {
 			}
 		},
 
-		insertQuestion(questionData, defaultFields = {}, position = null) {
+		insertQuestion(
+			questionData: FormsQuestion,
+			defaultFields: Partial<FormsQuestion> = {},
+			position: number | null = null,
+		): void {
 			const newQuestionObj = {
 				...defaultFields,
 				...questionData,
@@ -579,12 +662,12 @@ export default {
 				this.form.questions.splice(insertAt, 0, newQuestionObj)
 				this.$nextTick(() => {
 					// Prefer ref by id when available, fallback to positional refs
-					this.questionRefsMap[newQuestionObj.id]?.focus()
+					this.questionRefsMap[newQuestionObj.id]?.focus?.()
 				})
 			} else {
 				this.form.questions.push(newQuestionObj)
 				this.$nextTick(() => {
-					this.questionRefsMap[newQuestionObj.id]?.focus()
+					this.questionRefsMap[newQuestionObj.id]?.focus?.()
 				})
 			}
 
@@ -594,10 +677,14 @@ export default {
 		/**
 		 * Clone a question
 		 *
-		 * @param {number} id the question id to clone in the current form
-		 * @param {number} position where the cloned question should be added
+		 * @param question the question to clone in the current form
+		 * @param question.id the question id to clone in the current form
+		 * @param position where the cloned question should be added
 		 */
-		async cloneQuestion({ id }, position) {
+		async cloneQuestion(
+			question: Pick<FormsQuestion, 'id'>,
+			position: number | null,
+		): Promise<void> {
 			this.isLoadingQuestions = true
 
 			try {
@@ -605,23 +692,23 @@ export default {
 					'apps/forms/api/v3/forms/{id}/questions?fromId={questionId}',
 					{
 						id: this.form.id,
-						questionId: id,
+						questionId: question.id,
 					},
 				)
 
-				const body = {}
+				const body: { position?: number } = {}
 				if (position !== null) {
 					// position: current question position + 2 (0-based index: +1, next position: +1)
 					body.position = position + 2
 				}
 
 				const response = await axios.post(url, body)
-				const question = OcsResponse2Data(response)
+				const clonedQuestion = OcsResponse2Data<FormsQuestion>(response)
 
 				// Delegate insertion & focus handling to helper
-				this.insertQuestion(question, { answers: [] })
+				this.insertQuestion(clonedQuestion, { answers: [] })
 			} catch (error) {
-				logger.error(`Error while duplicating question ${id}`, {
+				logger.error(`Error while duplicating question ${question.id}`, {
 					error,
 				})
 				showError('There was an error while duplicating the question')
@@ -633,9 +720,11 @@ export default {
 		/**
 		 * Reorder questions on dragEnd
 		 */
-		async onQuestionOrderChange() {
+		async onQuestionOrderChange(): Promise<void> {
 			this.isLoadingQuestions = true
-			const newOrder = this.form.questions.map((question) => question.id)
+			const newOrder = this.form.questions.map(
+				(question: FormsQuestion) => question.id,
+			)
 
 			try {
 				await axios.patch(
@@ -655,7 +744,7 @@ export default {
 			}
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

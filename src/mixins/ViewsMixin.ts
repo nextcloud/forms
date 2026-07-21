@@ -4,10 +4,13 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { FormsForm } from '../models/Entities.d.ts'
+
 import { getCurrentUser } from '@nextcloud/auth'
 import axios, { isCancel } from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
+import { translate as t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import MarkdownIt from 'markdown-it'
@@ -15,59 +18,6 @@ import { defineComponent } from 'vue'
 import CancelableRequest from '../utils/CancelableRequest.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
-
-/** Form share permission types */
-interface FormsShare {
-	shareType: number
-	permissions?: string[]
-	shareWith?: string
-}
-
-/** Form question structure */
-interface FormsQuestion {
-	id: number
-	text: string
-	type: string
-	order: number
-	options?: any[]
-	[key: string]: any
-}
-
-/** Complete form structure as returned from API */
-interface FormsForm {
-	id: number
-	hash: string
-	title: string
-	description: string
-	ownerId: string
-	created: number
-	access: any
-	expires: number
-	fileFormat?: string | null
-	fileId?: number | null
-	filePath?: string | null
-	isAnonymous: boolean
-	isMaxSubmissionsReached: boolean
-	lastUpdated: number
-	submitMultiple: boolean
-	allowEditSubmissions: boolean
-	showExpiration: boolean
-	canSubmit: boolean
-	permissions: string[]
-	questions: FormsQuestion[]
-	state: 0 | 1 | 2
-	lockedBy?: string | null
-	lockedUntil?: number | null
-	maxSubmissions?: number | null
-	shares: FormsShare[]
-	submissionCount?: number
-	submissionMessage?: string | null
-	confirmationEmailEnabled: boolean
-	confirmationEmailSubject?: string | null
-	confirmationEmailBody?: string | null
-	confirmationEmailQuestionId?: number | null
-	allowComments: boolean
-}
 
 /** ViewsMixin data interface */
 interface ViewsMixinData {
@@ -132,16 +82,22 @@ export default defineComponent({
 			// Remember the old renderer if overridden, or proxy to the default renderer.
 			const defaultRender =
 				this.markdownit.renderer.rules.link_open
-				|| function (tokens, idx, options, env, self) {
+				|| function (
+					tokens: any,
+					idx: any,
+					options: any,
+					env: any,
+					self: any,
+				) {
 					return self.renderToken(tokens, idx, options)
 				}
 
 			this.markdownit.renderer.rules.link_open = function (
-				tokens,
-				idx,
-				options,
-				env,
-				self,
+				tokens: any,
+				idx: any,
+				options: any,
+				env: any,
+				self: any,
 			) {
 				// Add a new `target` attribute, or replace the value of the existing one.
 				tokens[idx].attrSet('target', '_blank')
@@ -157,10 +113,11 @@ export default defineComponent({
 		},
 
 		isFormLocked(): boolean {
+			const currentUser = getCurrentUser()
 			return (
 				this.form.lockedUntil === 0
 				|| (this.form.lockedUntil! > moment().unix()
-					&& this.form.lockedBy !== getCurrentUser().uid)
+					&& this.form.lockedBy !== currentUser?.uid)
 			)
 		},
 	},
@@ -207,7 +164,7 @@ export default defineComponent({
 				const response = await request(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}', { id }),
 				)
-				this.$emit('update:form', OcsResponse2Data(response))
+				this.$emit('update:form', OcsResponse2Data(response as any))
 				this.isLoadingForm = false
 			} catch (error) {
 				if (isCancel(error)) {

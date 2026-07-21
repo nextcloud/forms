@@ -97,7 +97,10 @@
 	</NcListItem>
 </template>
 
-<script>
+<script lang="ts">
+import type { PropType } from 'vue'
+import type { FormsForm } from '../models/Entities.d.ts'
+
 import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
 import IconPoll from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -109,8 +112,10 @@ import IconArchiveOff from '@material-symbols/svg-400/outlined/unarchive.svg?raw
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
@@ -122,7 +127,13 @@ import PermissionTypes from '../mixins/PermissionTypes.ts'
 import { FormState } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 
-export default {
+type NavigationTarget = 'submit' | 'formRoot'
+
+interface AppNavigationFormData {
+	loading: boolean
+}
+
+export default defineComponent({
 	name: 'AppNavigationForm',
 
 	components: {
@@ -138,7 +149,7 @@ export default {
 
 	props: {
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 
@@ -158,6 +169,7 @@ export default {
 
 	setup() {
 		return {
+			t,
 			FormsIcon,
 			IconArchive,
 			IconArchiveOff,
@@ -170,65 +182,67 @@ export default {
 		}
 	},
 
-	data() {
+	data(): AppNavigationFormData {
 		return {
 			loading: false,
 		}
 	},
 
 	computed: {
-		canEdit() {
+		canEdit(): boolean {
 			return this.form.permissions.includes(
 				this.PERMISSION_TYPES.PERMISSION_EDIT,
 			)
 		},
 
-		canSeeResults() {
+		canSeeResults(): boolean {
 			return (
 				this.form.permissions.includes(
 					this.PERMISSION_TYPES.PERMISSION_RESULTS,
-				) || this.form.submissionCount > 0
+				) || (this.form.submissionCount ?? 0) > 0
 			)
 		},
 
 		/**
 		 * Check if form is current form and set active
 		 */
-		isActive() {
-			return this.form.hash === this.$route.params.hash
+		isActive(): boolean {
+			return this.form.hash === String(this.$route.params.hash)
 		},
 
 		/**
 		 * Check if the form is archived
 		 */
-		isArchived() {
+		isArchived(): boolean {
 			return this.form.state === FormState.FormArchived
 		},
 
 		/**
 		 * Check if form is expired
 		 */
-		isExpired() {
-			return this.form.expires && moment().unix() > this.form.expires
+		isExpired(): boolean {
+			return Boolean(this.form.expires && moment().unix() > this.form.expires)
 		},
 
 		/**
 		 * Check if form is locked
 		 */
-		isFormLocked() {
+		isFormLocked(): boolean {
+			const currentUserUid = getCurrentUser()?.uid ?? ''
+			const lockedUntil = this.form.lockedUntil ?? -1
 			return (
-				this.form.lockedUntil === 0
-				|| (this.form.lockedUntil > moment().unix()
-					&& this.form.lockedBy !== getCurrentUser().uid)
+				lockedUntil === 0
+				|| (lockedUntil > moment().unix()
+					&& this.form.lockedBy !== currentUserUid)
 			)
 		},
 
 		/**
 		 * Return form title, or placeholder if not set
 		 *
-		 * @return {string}
+		 * @return
 		 */
-		formTitle() {
+		formTitle(): string {
 			if (this.form.title) {
 				return this.form.title
 			}
@@ -238,7 +252,7 @@ export default {
 		/**
 		 * Return expiration details for subtitle
 		 */
-		formSubtitle() {
+		formSubtitle(): string {
 			if (this.form.state === FormState.FormClosed) {
 				// TRANSLATORS: The form was closed manually so it does not take new submissions
 				return t('forms', 'Form closed')
@@ -260,16 +274,16 @@ export default {
 		/**
 		 * Return, if form has Subtitle
 		 */
-		hasSubtitle() {
+		hasSubtitle(): boolean {
 			return this.formSubtitle !== ''
 		},
 
 		/**
 		 * Route to use, depending on readOnly
 		 *
-		 * @return {string} Route to 'submit' or 'formRoot'
+		 * @return Route to 'submit' or 'formRoot'
 		 */
-		routerTarget() {
+		routerTarget(): NavigationTarget {
 			if (this.readOnly) {
 				return 'submit'
 			}
@@ -282,19 +296,19 @@ export default {
 		/**
 		 * Closes the App-Navigation on mobile-devices
 		 */
-		mobileCloseNavigation() {
+		mobileCloseNavigation(): void {
 			this.$emit('mobileCloseNavigation')
 		},
 
-		onShareForm() {
+		onShareForm(): void {
 			this.$emit('openSharing', this.form.hash)
 		},
 
-		onCloneForm() {
+		onCloneForm(): void {
 			this.$emit('clone', this.form.id)
 		},
 
-		async onConfirmDelete() {
+		async onConfirmDelete(): Promise<void> {
 			const shouldDelete = await showConfirmation({
 				name: t('forms', 'Delete form'),
 				text: t('forms', 'Are you sure you want to delete {title}?', {
@@ -309,7 +323,7 @@ export default {
 			}
 		},
 
-		async onToggleArchive() {
+		async onToggleArchive(): Promise<void> {
 			try {
 				// TODO: add loading status feedback ?
 				await axios.patch(
@@ -324,8 +338,8 @@ export default {
 						},
 					},
 				)
-				// eslint-disable-next-line vue/no-mutating-props
-				this.form.state = this.isArchived
+
+				;(this.form as FormsForm).state = this.isArchived
 					? FormState.FormClosed
 					: FormState.FormArchived
 			} catch (error) {
@@ -336,7 +350,7 @@ export default {
 			}
 		},
 
-		async onDeleteForm() {
+		async onDeleteForm(): Promise<void> {
 			this.loading = true
 			try {
 				await axios.delete(
@@ -346,8 +360,9 @@ export default {
 				)
 				this.$emit('delete', this.form.id)
 			} catch (error) {
+				const response = (error as { response?: unknown }).response
 				logger.error(`Error while deleting ${this.formTitle}`, {
-					error: error.response,
+					error: response,
 				})
 				showError(
 					t('forms', 'Error while deleting {title}', {
@@ -359,5 +374,5 @@ export default {
 			}
 		},
 	},
-}
+})
 </script>

@@ -22,11 +22,16 @@ declare module '@vue/runtime-core' {
 		values: unknown[]
 		answerType: { validate: (ctx: unknown) => boolean }
 		readOnly: boolean
-		extraSettings?: unknown
+		extraSettings?: { shuffleOptions?: boolean }
 		formId: number
 		id: number
 		shuffleArray: <T>(arr: T[]) => T[]
-		$refs: Record<string, unknown>
+		$refs: {
+			input: Array<{
+				$props: { optionType: string; index: number }
+				focus: () => void
+			}>
+		}
 	}
 }
 
@@ -126,9 +131,13 @@ export default defineComponent({
 		focusIndex(index: number, optionType: string) {
 			// refs are not guaranteed to be in correct order - we need to find the correct item
 			const item = this.$refs.input.find((instance: unknown) => {
+				const candidate = instance as {
+					$props: { optionType: string; index: number }
+					focus: () => void
+				}
 				return (
-					instance.$props.optionType === optionType
-					&& instance.$props.index === index
+					candidate.$props.optionType === optionType
+					&& candidate.$props.index === index
 				)
 			})
 			if (item) {
@@ -408,7 +417,10 @@ export default defineComponent({
 	},
 
 	watch: {
-		dirtyOptionsType: debounce(function (this: unknown) {
+		dirtyOptionsType: debounce(function (this: {
+			dirtyOptionsType: string | null
+			saveOptionsOrder: (optionType: string) => Promise<void>
+		}) {
 			if (!this.dirtyOptionsType) {
 				return
 			}
