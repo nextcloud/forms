@@ -10,6 +10,7 @@ namespace OCA\Forms\Db;
 use OCA\Forms\Constants;
 use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\ConfigService;
+use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\Comments\ICommentsManager;
@@ -39,6 +40,7 @@ class FormMapper extends QBMapper {
 		private readonly FilePathHelper $filePathHelper,
 		private readonly UploadedFileMapper $uploadedFileMapper,
 		private readonly IRootFolder $rootFolder,
+		private readonly UploadedFilesShareService $uploadedFilesShareService,
 		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct($db, 'forms_v2_forms', Form::class);
@@ -228,6 +230,7 @@ class FormMapper extends QBMapper {
 	public function deleteForm(Form $form): void {
 		// Delete Submissions(incl. Answers), Questions(incl. Options), Shares and Form.
 		$formId = $form->getId();
+		$this->uploadedFilesShareService->removeAllForForm($form);
 		$this->submissionMapper->deleteByForm($formId);
 		$this->shareMapper->deleteByForm($formId);
 		$this->questionMapper->deleteByForm($formId);

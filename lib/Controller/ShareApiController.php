@@ -19,6 +19,7 @@ use OCA\Forms\ResponseDefinitions;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
@@ -62,6 +63,7 @@ class ShareApiController extends OCSController {
 		private readonly IRootFolder $rootFolder,
 		private readonly FilePathHelper $filePathHelper,
 		private readonly IManager $shareManager,
+		private readonly UploadedFilesShareService $uploadedFilesShareService,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -289,7 +291,7 @@ class ShareApiController extends OCSController {
 
 				$this->shareManager->createShare($folderShare);
 			} else {
-				$this->removeUploadedFilesShare($form, $formShare);
+				$this->uploadedFilesShareService->removeForCollaborator($form, $formShare);
 			}
 		}
 
@@ -341,33 +343,13 @@ class ShareApiController extends OCSController {
 
 		// Revoke any linked Files share before deleting the Forms share
 		if (in_array(Constants::PERMISSION_RESULTS, $share->getPermissions(), true)) {
-			$this->removeUploadedFilesShare($form, $share);
+			$this->uploadedFilesShareService->removeForCollaborator($form, $share);
 		}
 
 		$this->shareMapper->delete($share);
 		$this->formMapper->update($form);
 
 		return new DataResponse($shareId);
-	}
-
-	private function removeUploadedFilesShare(Form $form, Share $formShare): void {
-		if (!in_array($formShare->getShareType(), [IShare::TYPE_USER, IShare::TYPE_GROUP, IShare::TYPE_USERGROUP, IShare::TYPE_CIRCLE], true)) {
-			return;
-		}
-
-		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-		$uploadedFilesFolderPath = $this->filePathHelper->getFormUploadedFilesFolderPath($form);
-		try {
-			$folder = $userFolder->get($uploadedFilesFolderPath);
-		} catch (NotFoundException) {
-			return;
-		}
-		$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);
-		foreach ($folderShares as $folderShare) {
-			if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
-				$this->shareManager->deleteShare($folderShare);
-			}
-		}
 	}
 
 	/**

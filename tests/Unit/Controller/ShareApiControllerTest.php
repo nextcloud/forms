@@ -20,6 +20,7 @@ use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
@@ -64,6 +65,7 @@ class ShareApiControllerTest extends TestCase {
 	private IRootFolder|MockObject $rootFolder;
 	private IFilenameValidator|MockObject $filenameValidator;
 	private IManager|MockObject $shareManager;
+	private UploadedFilesShareService $uploadedFilesShareService;
 
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -83,6 +85,13 @@ class ShareApiControllerTest extends TestCase {
 			->willReturnCallback(static fn (string $fileName, string $replacement): string => str_replace(['/', '\\'], $replacement, trim($fileName)));
 		$this->filePathHelper = new FilePathHelper($this->rootFolder, $this->filenameValidator);
 		$this->shareManager = $this->createMock(IManager::class);
+		$this->uploadedFilesShareService = new UploadedFilesShareService(
+			$this->rootFolder,
+			$this->filePathHelper,
+			$this->shareManager,
+			$this->shareMapper,
+			$this->logger,
+		);
 
 		$this->shareApiController = new ShareApiController(
 			'forms',
@@ -99,6 +108,7 @@ class ShareApiControllerTest extends TestCase {
 			$this->rootFolder,
 			$this->filePathHelper,
 			$this->shareManager,
+			$this->uploadedFilesShareService,
 		);
 	}
 
