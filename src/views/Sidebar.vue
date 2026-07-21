@@ -121,7 +121,9 @@ export default {
 			if (this.form.lockedUntil === 0 || this.form.lockedUntil === null) {
 				return ''
 			}
-			return moment(this.form.lockedUntil, 'X').fromNow()
+			return moment(this.form.lockedUntil, 'X')
+				.locale(window.OC.getLanguage())
+				.fromNow()
 		},
 
 		sidebarTitle() {

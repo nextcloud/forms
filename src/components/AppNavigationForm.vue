@@ -244,7 +244,9 @@ export default {
 				return t('forms', 'Form closed')
 			}
 			if (this.form.expires) {
-				const relativeDate = moment(this.form.expires, 'X').fromNow()
+				const relativeDate = moment(this.form.expires, 'X')
+					.locale(window.OC.getLanguage())
+					.fromNow()
 				if (this.isExpired) {
 					return t('forms', 'Expired {relativeDate}', {
 						relativeDate,
