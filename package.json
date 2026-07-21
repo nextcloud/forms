@@ -45,7 +45,7 @@
     "markdown-it": "^14.3.0",
     "p-queue": "^9.3.1",
     "qrcode": "^1.5.4",
-    "vue": "^3.5.39",
+    "vue": "^3.5.40",
     "vue-draggable-plus": "^0.6.1",
     "vue-router": "^5.2.0"
   },
