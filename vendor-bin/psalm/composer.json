@@ -7,7 +7,7 @@
 		}
 	},
 	"require-dev": {
-		"guzzlehttp/guzzle": "^7.8",
+		"guzzlehttp/guzzle": "^8.0",
 		"nextcloud/ocp": "dev-stable32",
 		"vimeo/psalm": "^5.16"
 	}
