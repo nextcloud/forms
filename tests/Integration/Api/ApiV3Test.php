@@ -19,6 +19,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
  */
 class ApiV3Test extends IntegrationBase {
 	private Client $http;
+	private ?\OCP\Files\IRootFolder $rootFolder = null;
+	private ?\OCP\Files\Folder $userFolder = null;
 
 	protected array $users = [
 		'test' => 'Test user',
@@ -266,6 +268,9 @@ class ApiV3Test extends IntegrationBase {
 		];
 
 		parent::setUp();
+
+		$this->rootFolder = \OCP\Server::get(\OCP\Files\IRootFolder::class);
+		$this->userFolder = $this->rootFolder->getUserFolder('test');
 
 		// Set up http Client
 		$this->http = new Client([
@@ -1337,35 +1342,6 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
-	public static function dataExportSubmissions() {
-		return [
-			'exportSubmissions' => [
-				'expected' => <<<'CSV'
-					"User ID","User display name","Timestamp","First Question?","Second Question?","File Question?"
-					"","Anonymous user","1970-01-01T00:20:34+00:00","","",""
-					"","Anonymous user","1970-01-01T03:25:45+00:00","This is another short answer.","Option 2",""
-					"user1","User No. 1","1970-01-02T10:17:36+00:00","This is a short answer.","Option 1",""
-CSV
-			]
-		];
-	}
-	/**
-	 * @dataProvider dataExportSubmissions
-	 *
-	 * @param array $expected
-	 */
-	public function testExportSubmissions(string $expected) {
-		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions?fileFormat=csv");
-		$data = substr((string)$resp->getBody()->getContents(), 3); // Some strange Character removed at the beginning
-
-		$this->assertEquals(200, $resp->getStatusCode());
-		$this->assertEquals('attachment; filename="Title of a Form (responses).csv"', $resp->getHeaders()['Content-Disposition'][0]);
-		$this->assertEquals('text/csv;charset=UTF-8', $resp->getHeaders()['Content-type'][0]);
-		$arr_txt_expected = preg_split('/,/', str_replace(["\t", "\n"], '', $expected));
-		$arr_txt_data = preg_split('/,/', str_replace(["\t", "\n"], '', $data));
-		$this->assertEquals($arr_txt_expected, $arr_txt_data);
-	}
-
 	public function testDeleteSubmission() {
 		// Get submissions first to find a submission ID
 		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}/submissions");
@@ -1482,6 +1458,97 @@ CSV
 
 		$this->assertEquals(200, $resp->getStatusCode());
 		$this->assertEquals('Title of a Form (responses).csv', $data);
+	}
+
+	public function testExportSubmissionsWithSync() {
+		$form = $this->testForms[0];
+		$formId = $form['id'];
+		$question1 = $form['questions'][0];
+		$question2 = $form['questions'][1];
+
+		// To be sure about IDs and order, let's fetch from API (newest first)
+		$resp = $this->http->request('GET', "api/v3/forms/{$formId}/submissions");
+		$submissionsData = $this->OcsResponse2Data($resp);
+		$submissions = $submissionsData['submissions'];
+		$this->assertCount(3, $submissions, 'Pre-condition: Form should have 3 submissions');
+
+		$submission1_id = $submissions[0]['id']; // newest, user1
+		$submission2_id = $submissions[1]['id']; // middle, user2
+		$submission3_id = $submissions[2]['id']; // oldest, user3
+
+		// 1. Initial Export
+		$exportPath = '/Title of a Form (responses).csv';
+		$this->http->request('POST', "api/v3/forms/{$formId}/submissions/export", ['json' => ['path' => '']]);
+
+		// 2. Verify Initial Export
+		$content = $this->userFolder->get($exportPath)->getContent();
+		$data = array_map('str_getcsv', explode("\n", trim($content)));
+
+		$this->assertCount(5, $data, 'Expected 5 rows: header, hidden-header, 3 data rows');
+		// Check headers
+		$this->assertStringContainsString('Submission ID', $data[0][0]);
+		$this->assertStringContainsString($question1['text'], $data[0][4]);
+		$this->assertStringContainsString($question2['text'], $data[0][5]);
+
+		// Check hidden headers for IDs
+		$this->assertEquals('submission_id', $data[1][0], 'Hidden header for submission ID is missing or incorrect');
+		$this->assertEquals('question-id-' . $question1['id'], $data[1][4]);
+		$this->assertEquals('question-id-' . $question2['id'], $data[1][5]);
+
+		// Check data rows (oldest first: user3, user2, user1)
+		$this->assertEquals($submission3_id, $data[2][0]);
+		$this->assertEquals('', $data[2][4]);
+		$this->assertTrue(!isset($data[2][5]) || $data[2][5] === '');
+
+		$this->assertEquals($submission2_id, $data[3][0]);
+		$this->assertEquals('This is another short answer.', $data[3][4]);
+		$this->assertEquals('Option 2', $data[3][5]);
+
+		$this->assertEquals($submission1_id, $data[4][0]);
+		$this->assertEquals('This is a short answer.', $data[4][4]);
+		$this->assertEquals('Option 1', $data[4][5]);
+
+		// 3. Delete a submission and a question
+		$this->http->request('DELETE', "api/v3/forms/{$formId}/submissions/{$submission1_id}");
+		$this->http->request('DELETE', "api/v3/forms/{$formId}/questions/{$question1['id']}");
+
+		// 4. Export again
+		$this->http->request('POST', "api/v3/forms/{$formId}/submissions/export", ['json' => ['path' => $exportPath, 'fileFormat' => 'csv']]);
+
+		// 5. Verify Export after deletions
+		$content = $this->userFolder->get($exportPath)->getContent();
+		$data = array_map('str_getcsv', explode("\n", trim($content)));
+
+		$this->assertCount(4, $data, 'Expected 4 rows after deletion: header, hidden-header, 2 data rows');
+		$this->assertStringNotContainsString($question1['text'], implode(',', $data[0]));
+		$this->assertStringContainsString($question2['text'], $data[0][4]);
+
+		$this->assertEquals('question-id-' . $question2['id'], $data[1][4]);
+		// Check data rows (oldest first: user3, user2)
+		$this->assertEquals($submission3_id, $data[2][0]);
+		$this->assertTrue(!isset($data[2][4]) || $data[2][4] === ''); // No answer for q2
+		$this->assertEquals($submission2_id, $data[3][0]);
+		$this->assertEquals('Option 2', $data[3][4]);
+
+		// 6. Update a submission
+		$this->http->request('PUT', "api/v3/forms/{$formId}/submissions/{$submission2_id}", ['json' => ['answers' => [$question2['id'] => [$question2['options'][0]['id']]]]]);
+
+		// 7. Export again
+		$this->http->request('POST', "api/v3/forms/{$formId}/submissions/export", ['json' => ['path' => $exportPath, 'fileFormat' => 'csv']]);
+
+		// 8. Verify export after update
+		$content = $this->userFolder->get($exportPath)->getContent();
+		$data = array_map('str_getcsv', explode("\n", trim($content)));
+
+		$updatedRow = null;
+		foreach (array_slice($data, 2) as $row) {
+			if ($row[0] == $submission2_id) {
+				$updatedRow = $row;
+				break;
+			}
+		}
+		$this->assertNotNull($updatedRow, 'Updated submission not found in export');
+		$this->assertEquals('Option 1', $updatedRow[4]);
 	}
 
 	public static function dataDeleteSubmissions() {
