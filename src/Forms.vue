@@ -238,9 +238,10 @@ export default {
 				return false
 			}
 
-			if (route.name === 'results') {
+			const resultRoutes = ['results', 'results.summary', 'results.responses']
+			if (resultRoutes.includes(route.name)) {
 				return (
-					form.permissions.includes(route.name) || form.submissionCount > 0
+					form.permissions.includes('results') || form.submissionCount > 0
 				)
 			}
 

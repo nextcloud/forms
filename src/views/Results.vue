@@ -42,12 +42,12 @@
 			<!-- View switcher between Summary and Responses -->
 			<div class="response-actions">
 				<PillMenu
-					v-model:active="activeResponseView"
+					:active="activeResponseView"
 					:disabled="noSubmissions"
 					:options="responseViews"
 					:groupLabel="t('forms', 'View mode')"
 					class="response-actions__toggle"
-					@update:active="onChangeResponseView" />
+					@update:active="onViewChange" />
 
 				<!-- Action menu for cloud export and deletion -->
 				<NcActions
@@ -163,7 +163,7 @@
 						(!noSubmissions
 							|| loadingResults
 							|| submissionSearch.length > 0)
-						&& activeResponseView.id !== 'summary'
+						&& !isSummaryView
 					"
 					class="search-wrapper">
 					<NcTextField
@@ -227,7 +227,7 @@
 		</NcEmptyContent>
 
 		<!-- Summary view for visualization -->
-		<section v-else-if="activeResponseView.id === 'summary'">
+		<section v-else-if="isSummaryView">
 			<ResultsSummary
 				v-for="question in questions"
 				:key="question.id"
@@ -328,7 +328,6 @@ const responseViews = [
 		id: 'responses',
 	},
 ]
-const responseViewIds = new Set(responseViews.map((view) => view.id))
 
 export default {
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -380,8 +379,6 @@ export default {
 
 	data() {
 		return {
-			activeResponseView: null,
-
 			questions: [],
 			submissions: [],
 			filteredSubmissionsCount: 0,
@@ -438,6 +435,15 @@ export default {
 	},
 
 	computed: {
+		isSummaryView() {
+			return this.$route.name === 'results.summary'
+		},
+
+		activeResponseView() {
+			const viewId = this.isSummaryView ? 'summary' : 'responses'
+			return responseViews.find((view) => view.id === viewId)
+		},
+
 		isFormArchived() {
 			return this.form.state === FormState.FormArchived
 		},
@@ -499,13 +505,14 @@ export default {
 		// Reload results when form changes
 		async hash() {
 			await this.fetchFullForm(this.form.id)
-			await this.syncActiveResponseViewFromRoute()
 			SetWindowTitle(this.formTitle)
 		},
 
-		'$route.query': {
+		'$route.name': {
 			handler() {
-				this.syncActiveResponseViewFromRoute()
+				const viewId = this.isSummaryView ? 'summary' : 'responses'
+				this.saveActiveResponseViewToLocalStorage(viewId)
+				this.loadFormResults()
 			},
 		},
 
@@ -528,116 +535,15 @@ export default {
 			})
 			this.loadFormResults()
 		}, INPUT_DEBOUNCE_MS),
-
-		// Persist active response view to localStorage when it changes
-		activeResponseView(newView) {
-			if (newView?.id) {
-				this.saveActiveResponseViewToLocalStorage(newView.id)
-			}
-		},
 	},
 
 	async beforeMount() {
 		await this.fetchFullForm(this.form.id)
-		await this.syncActiveResponseViewFromRoute()
+		this.loadFormResults()
 		SetWindowTitle(this.formTitle)
 	},
 
 	methods: {
-		/**
-		 * Resolve a response view object by its ID.
-		 *
-		 * @param {string} viewId The requested response view ID
-		 * @return {object}
-		 */
-		getResponseViewById(viewId) {
-			return (
-				responseViews.find((view) => view.id === viewId) ?? responseViews[0]
-			)
-		},
-
-		/**
-		 * Read the explicit response view from the current route query.
-		 *
-		 * @return {string|null}
-		 */
-		getRouteResponseViewId() {
-			return this.$route.query.view ?? null
-		},
-
-		/**
-		 * Load the stored response view preference from localStorage for the current form.
-		 *
-		 * @return {string}
-		 */
-		loadStoredActiveResponseViewId() {
-			try {
-				const storageKey = this.getActiveResponseViewStorageKey()
-				if (!storageKey) {
-					return responseViews[0].id
-				}
-
-				const storedViewId = localStorage.getItem(storageKey)
-				if (storedViewId && responseViewIds.has(storedViewId)) {
-					return storedViewId
-				}
-
-				return responseViews[0].id
-			} catch (err) {
-				logger.debug('Error loading activeResponseView from localStorage', {
-					error: err,
-				})
-				return responseViews[0].id
-			}
-		},
-
-		/**
-		 * Resolve the effective response view using route state first and localStorage second.
-		 *
-		 * @return {string}
-		 */
-		resolveActiveResponseViewId() {
-			return (
-				this.getRouteResponseViewId()
-				?? this.loadStoredActiveResponseViewId()
-			)
-		},
-
-		/**
-		 * Apply the effective route/localStorage view and refresh results when needed.
-		 */
-		async syncActiveResponseViewFromRoute() {
-			const routeViewId = this.getRouteResponseViewId()
-			const nextView = this.getResponseViewById(
-				routeViewId ?? this.loadStoredActiveResponseViewId(),
-			)
-			const currentViewId = this.activeResponseView?.id
-
-			if (currentViewId !== nextView.id) {
-				this.activeResponseView = nextView
-			}
-
-			if (!routeViewId) {
-				try {
-					await this.$router.replace({
-						name: 'results',
-						params: {
-							hash: this.form.hash,
-						},
-						query: {
-							...this.$route.query,
-							view: nextView.id,
-						},
-					})
-					return
-				} catch (error) {
-					logger.debug('Navigation cancelled', { error })
-				}
-			}
-
-			this.loadFormResults()
-		},
-
 		/**
 		 * Save the active response view preference to localStorage for the current form.
 		 *
@@ -673,27 +579,25 @@ export default {
 		},
 
 		/**
-		 * Navigate to an explicit route query for the selected response view.
+		 * Navigate to an explicit route for the selected response view.
 		 *
 		 * @param {object} view The selected response view object
 		 */
-		async onChangeResponseView(view) {
+		async onViewChange(view) {
 			if (!view?.id) {
 				return
 			}
-			if (this.getRouteResponseViewId() === view.id) {
+			const targetName = `results.${view.id}`
+			if (this.$route.name === targetName) {
 				this.loadFormResults()
 				return
 			}
 
 			try {
 				await this.$router.push({
-					name: 'results',
+					name: targetName,
 					params: {
 						hash: this.form.hash,
-					},
-					query: {
-						view: view.id,
 					},
 				})
 			} catch (error) {
@@ -730,7 +634,7 @@ export default {
 
 			try {
 				let response = null
-				if (this.activeResponseView.id === 'summary') {
+				if (this.isSummaryView) {
 					response = await axios.get(
 						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
 							id: this.form.id,
