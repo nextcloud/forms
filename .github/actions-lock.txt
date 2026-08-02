@@ -17,6 +17,6 @@ bbe9834ddb89207caf5e19d79ebb3672 phpunit-oci.yml
 4ca2c2c4b1a73182667bab908e57c185 phpunit-sqlite.yml
 d1821b8a816578070ed8fd018f321f6d pr-feedback.yml
 43878db2acac51746332618c9f731553 psalm-matrix.yml
-f1cca476c953f28e3eec6c11b5866634 rector-apply.yml
+6aa9eaa284ed1800168c96b97e90d582 rector-apply.yml
 2dbec18233063b42f4d8e03bbb43671c reuse.yml
 94c65e30a77686c079c6dfa54a008440 sync-workflow-templates.yml
