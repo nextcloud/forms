@@ -217,7 +217,7 @@ OC.L10N.register(
     "Thank you for your {formTitle} submission" : "{formTitle} formunu gönderdiğiniz için teşekkür ederiz",
     "Email subject" : "E-posta konusu",
     "Email body" : "E-posta içeriği",
-    "Search for user, group or team …" : "Kullanıcı, grup veya takım arama…",
+    "Search for user, group or team …" : "Kullanıcı, grup veya takım ara…",
     "Group" : "Grup",
     "Team" : "Takım",
     "Permissions" : "İzinler",
