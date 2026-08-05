@@ -33,9 +33,37 @@ const routes = [
 	},
 	{
 		path: '/:hash/results',
-		components: { default: Results },
-		name: 'results',
 		props: { default: true },
+		children: [
+			{
+				path: '',
+				name: 'results',
+				redirect: (to) => {
+					const validViews = ['summary', 'responses']
+					const storedView = localStorage.getItem(
+						`nextcloud_forms_${to.params.hash as string}_activeResponseView`,
+					)
+					const lastViewId =
+						storedView && validViews.includes(storedView)
+							? storedView
+							: 'summary'
+					return {
+						name: `results.${lastViewId}`,
+						params: { hash: to.params.hash },
+					}
+				},
+			},
+			{
+				path: 'summary',
+				name: 'results.summary',
+				components: { default: Results },
+			},
+			{
+				path: 'responses',
+				name: 'results.responses',
+				components: { default: Results },
+			},
+		],
 	},
 	{
 		path: '/:hash/submit/:submissionId?',

@@ -275,25 +275,25 @@ export default {
 	 * This is used to confirm that the user wants to leave the page
 	 * if the form is unsubmitted.
 	 */
-	async beforeRouteUpdate(to, from, next) {
+	async beforeRouteUpdate() {
 		// This navigation guard is called when the route parameters changed (e.g. form hash)
 		// continue with the navigation if there are no changes or the user confirms to leave the form
 		if (await this.confirmLeaveForm()) {
-			next()
+			return
 		} else {
 			// Otherwise cancel the navigation
-			next(false)
+			return false
 		}
 	},
 
-	async beforeRouteLeave(to, from, next) {
+	async beforeRouteLeave() {
 		// This navigation guard is called when the route changed and a new view should be shown
 		// continue with the navigation if there are no changes or the user confirms to leave the form
 		if (await this.confirmLeaveForm()) {
-			next()
+			return
 		} else {
 			// Otherwise cancel the navigation
-			next(false)
+			return false
 		}
 	},
 

@@ -115,7 +115,11 @@ export default {
 
 	computed: {
 		currentView() {
-			return this.availableViews.filter((v) => v.id === this.$route.name)[0]
+			return this.availableViews.find(
+				(v) =>
+					this.$route.name === v.id
+					|| this.$route.name.startsWith(v.id + '.'),
+			)
 		},
 
 		availableViews() {

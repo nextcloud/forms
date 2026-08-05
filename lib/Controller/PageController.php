@@ -117,6 +117,16 @@ class PageController extends Controller {
 	 */
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
+	#[FrontpageRoute(verb: 'GET', url: '/{hash}/results/{view}', requirements: ['hash' => '[a-zA-Z0-9]{16,}'])]
+	public function resultsViews(string $hash): TemplateResponse {
+		return $this->index($hash);
+	}
+
+	/**
+	 * @return TemplateResponse
+	 */
+	#[NoAdminRequired()]
+	#[NoCSRFRequired()]
 	#[FrontpageRoute(verb: 'GET', url: '/{hash}/submit/{submissionId}', requirements: ['hash' => '[a-zA-Z0-9]{16,}', 'submissionId' => '\d+'])]
 	public function submitViewWithSubmission(string $hash, int $submissionId): TemplateResponse {
 		$form = $this->formMapper->findByHash($hash);
