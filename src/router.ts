@@ -33,11 +33,11 @@ const routes = [
 	},
 	{
 		path: '/:hash/results',
-		props: { default: true },
 		children: [
 			{
 				path: '',
 				name: 'results',
+				props: { default: true },
 				redirect: (to) => {
 					const validViews = ['summary', 'responses']
 					const storedView = localStorage.getItem(
@@ -56,11 +56,13 @@ const routes = [
 			{
 				path: 'summary',
 				name: 'results.summary',
+				props: { default: true },
 				components: { default: Results },
 			},
 			{
 				path: 'responses',
 				name: 'results.responses',
+				props: { default: true },
 				components: { default: Results },
 			},
 		],

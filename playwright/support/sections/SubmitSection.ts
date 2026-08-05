@@ -13,9 +13,10 @@ export class SubmitSection {
 	constructor(public readonly page: Page) {
 		this.clearFormButton = this.page.getByRole('button', { name: 'Clear form' })
 		this.submitButton = this.page.getByRole('button', { name: 'Submit' })
-		this.successMessage = this.page.getByText(
-			'Thank you for completing the form!',
-		)
+		this.successMessage = this.page
+			.getByRole('main')
+			.locator('.forms-emptycontent')
+			.getByText('Thank you for completing the form!')
 	}
 
 	/**
