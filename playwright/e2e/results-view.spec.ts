@@ -101,15 +101,15 @@ test.describe('Results view', () => {
 		await expect(resultsView.page).toHaveURL(/\/results\/summary$/)
 	})
 
-	test('Navigating to /results redirects to /results/summary', async ({ page }) => {
+	test('Navigating to /results redirects to last viewed subview', async ({ page }) => {
 		// Start on the responses tab
 		await page.goto(page.url().replace(/\/summary$/, '/responses'))
 		await page.waitForURL(/\/results\/responses$/)
 
 		// Navigate to the parent results route
 		await page.goto(page.url().replace(/\/responses$/, ''))
-		await page.waitForURL(/\/results\/summary$/)
-		await expect(page).toHaveURL(/\/results\/summary$/)
+		await page.waitForURL(/\/results\/responses$/)
+		await expect(page).toHaveURL(/\/results\/responses$/)
 	})
 })
 

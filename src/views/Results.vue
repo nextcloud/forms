@@ -505,6 +505,7 @@ export default {
 		// Reload results when form changes
 		async hash() {
 			await this.fetchFullForm(this.form.id)
+			await this.loadFormResults()
 			SetWindowTitle(this.formTitle)
 		},
 
@@ -538,6 +539,10 @@ export default {
 	},
 
 	async beforeMount() {
+		// Determine the initial viewId based on the route
+		const viewId = this.isSummaryView ? 'summary' : 'responses'
+		this.saveActiveResponseViewToLocalStorage(viewId)
+
 		await this.fetchFullForm(this.form.id)
 		this.loadFormResults()
 		SetWindowTitle(this.formTitle)
