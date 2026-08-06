@@ -144,17 +144,12 @@ export default defineComponent({
 		}
 	},
 
-	data(): {
-		selected: SelectedUserLike | undefined
-		showModal: boolean
-		confirmationInput: string
-		loading: boolean
-	} {
+	data() {
 		return {
-			selected: undefined,
-			showModal: false,
-			confirmationInput: '',
-			loading: false,
+			selected: undefined as SelectedUserLike | undefined,
+			showModal: false as boolean,
+			confirmationInput: '' as string,
+			loading: false as boolean,
 		}
 	},
 

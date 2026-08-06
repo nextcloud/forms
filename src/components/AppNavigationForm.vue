@@ -112,7 +112,7 @@ import IconArchiveOff from '@material-symbols/svg-400/outlined/unarchive.svg?raw
 import { getCurrentUser } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { defineComponent } from 'vue'
@@ -128,10 +128,6 @@ import { FormState } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 
 type NavigationTarget = 'submit' | 'formRoot'
-
-interface AppNavigationFormData {
-	loading: boolean
-}
 
 export default defineComponent({
 	name: 'AppNavigationForm',
@@ -182,9 +178,9 @@ export default defineComponent({
 		}
 	},
 
-	data(): AppNavigationFormData {
+	data() {
 		return {
-			loading: false,
+			loading: false as boolean,
 		}
 	},
 

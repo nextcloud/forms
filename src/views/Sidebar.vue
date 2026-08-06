@@ -115,11 +115,9 @@ export default defineComponent({
 		}
 	},
 
-	data(): {
-		commentsView: CommentsViewLike | null
-	} {
+	data() {
 		return {
-			commentsView: null,
+			commentsView: null as CommentsViewLike | null,
 		}
 	},
 

@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.ts'
@@ -55,7 +55,7 @@ export default defineComponent({
 
 	data() {
 		return {
-			height: 1,
+			height: 1 as number,
 		}
 	},
 

@@ -109,7 +109,7 @@
 </template>
 
 <script lang="ts">
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { defineComponent } from 'vue'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'

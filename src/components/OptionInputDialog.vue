@@ -30,7 +30,7 @@
 <script lang="ts">
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import { showError } from '@nextcloud/dialogs'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
@@ -54,9 +54,9 @@ export default defineComponent({
 
 	emits: ['update:open', 'multipleAnswers'],
 
-	data(): { enteredOptions: string } {
+	data() {
 		return {
-			enteredOptions: '',
+			enteredOptions: '' as string,
 		}
 	},
 

@@ -191,7 +191,7 @@ import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_b
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
 import IconRadioboxBlank from '@material-symbols/svg-400/outlined/radio_button_unchecked.svg?raw'
 import { showError } from '@nextcloud/dialogs'
-import { translatePlural as n, translate as t } from '@nextcloud/l10n'
+import { n, t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -216,15 +216,6 @@ type QuestionMultipleExtraSettings = {
 	optionsLimitMax?: number
 	optionsLimitMin?: number
 	shuffleOptions?: boolean
-}
-
-interface QuestionMultipleData {
-	cachedOtherAnswerText: string
-	QUESTION_EXTRASETTINGS_OTHER_PREFIX: typeof QUESTION_EXTRASETTINGS_OTHER_PREFIX
-	isDragging: boolean
-	isOptionDialogShown: boolean
-	isLoading: boolean
-	OptionType: typeof OptionType
 }
 
 export default defineComponent({
@@ -256,18 +247,19 @@ export default defineComponent({
 		}
 	},
 
-	data(): QuestionMultipleData {
+	data() {
 		return {
 			/**
 			 * This is used to cache the "other" answer, meaning if the user:
 			 * checks "other" types text, unchecks "other" and then re-check "other" the typed text is preserved
 			 */
-			cachedOtherAnswerText: '',
-			QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+			cachedOtherAnswerText: '' as string,
+			QUESTION_EXTRASETTINGS_OTHER_PREFIX:
+				typeof QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 
-			isDragging: false,
-			isOptionDialogShown: false,
-			isLoading: false,
+			isDragging: false as boolean,
+			isOptionDialogShown: false as boolean,
+			isLoading: false as boolean,
 
 			OptionType,
 		}

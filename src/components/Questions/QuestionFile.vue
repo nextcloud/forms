@@ -164,7 +164,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { formatFileSize } from '@nextcloud/files'
 import { loadState } from '@nextcloud/initial-state'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -180,6 +180,8 @@ import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import fileTypes from '../../models/FileTypes.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
+
+const formsAppName = 'forms'
 
 /**
  * A constant object representing file size units in bytes.
@@ -211,14 +213,6 @@ type QuestionFileExtraSettings = {
 	maxFileSize?: number
 }
 
-interface QuestionFileData {
-	fileTypes: typeof fileTypes
-	fileLoading: boolean
-	maxFileSizeUnit: FileSizeUnit
-	maxFileSizeValue: number
-	allowedFileTypesDialogOpened: boolean
-}
-
 export default defineComponent({
 	name: 'QuestionFile',
 	components: {
@@ -248,13 +242,13 @@ export default defineComponent({
 		}
 	},
 
-	data(): QuestionFileData {
+	data() {
 		return {
 			fileTypes,
-			fileLoading: false,
+			fileLoading: false as boolean,
 			maxFileSizeUnit: Object.keys(FILE_SIZE_UNITS)[0] as FileSizeUnit,
-			maxFileSizeValue: 0,
-			allowedFileTypesDialogOpened: false,
+			maxFileSizeValue: 0 as number,
+			allowedFileTypesDialogOpened: false as boolean,
 		}
 	},
 
@@ -375,7 +369,7 @@ export default defineComponent({
 
 			formData.append(
 				'shareHash',
-				String(loadState('forms', 'shareHash', null) ?? ''),
+				String(loadState(formsAppName, 'shareHash', null) ?? ''),
 			)
 
 			const url = generateOcsUrl(

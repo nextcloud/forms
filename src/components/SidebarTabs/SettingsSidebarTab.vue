@@ -295,6 +295,8 @@ import svgLockOpen from '../../../img/lock_open.svg?raw'
 import ShareTypes from '../../mixins/ShareTypes.ts'
 import { FormState } from '../../models/Constants.ts'
 
+const formsAppName = 'forms'
+
 type ConfirmationEmailQuestionOption = {
 	id: number
 	label: string
@@ -380,8 +382,8 @@ export default defineComponent({
 				parse: this.parseTimestampToDate,
 			},
 
-			appConfig: loadState('forms', 'appConfig') as SettingsAppConfig,
-			maxStringLengths: loadState('forms', 'maxStringLengths'),
+			appConfig: loadState(formsAppName, 'appConfig') as SettingsAppConfig,
+			maxStringLengths: loadState(formsAppName, 'maxStringLengths'),
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
 			svgLockOpen,

@@ -103,7 +103,7 @@
 import type { FormsOption } from '../../models/Entities.d.ts'
 
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -145,9 +145,9 @@ export default defineComponent({
 
 	data() {
 		return {
-			isDragging: false,
-			isLoading: false,
-			isOptionDialogShown: false,
+			isDragging: false as boolean,
+			isLoading: false as boolean,
+			isOptionDialogShown: false as boolean,
 			OptionType,
 		}
 	},

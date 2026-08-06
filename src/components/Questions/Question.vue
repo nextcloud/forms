@@ -172,7 +172,7 @@ import IconAlertCircleOutline from '@material-symbols/svg-400/outlined/error.svg
 import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import IconDotsHorizontal from '@material-symbols/svg-400/outlined/more_horiz.svg?raw'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'

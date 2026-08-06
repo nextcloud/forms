@@ -38,7 +38,7 @@ import NcRadioGroupButton from '@nextcloud/vue/components/NcRadioGroupButton'
 
 type PillOption = {
 	id: string | number
-	title: string
+	title?: string
 	ariaLabel?: string
 	icon?: string
 	disabled?: boolean
@@ -58,14 +58,7 @@ export default defineComponent({
 		 * The active option
 		 */
 		active: {
-			type: Object as PropType<{
-				id: string | number
-				title?: string
-				ariaLabel?: string
-				icon?: string
-				disabled?: boolean
-			}>,
-
+			type: Object as PropType<PillOption>,
 			required: true,
 		},
 
@@ -90,16 +83,7 @@ export default defineComponent({
 		 * `option: {id: string, title: string, ariaLabel: string, icon?: string}`
 		 */
 		options: {
-			type: Array as PropType<
-				Array<{
-					id: string | number
-					title: string
-					ariaLabel?: string
-					icon?: string
-					disabled?: boolean
-				}>
-			>,
-
+			type: Array as PropType<PillOption[]>,
 			required: true,
 		},
 	},

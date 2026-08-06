@@ -80,7 +80,7 @@
 
 <script lang="ts">
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -117,7 +117,7 @@ export default defineComponent({
 	data() {
 		return {
 			validationTypes,
-			isValidationTypeMenuOpen: false,
+			isValidationTypeMenuOpen: false as boolean,
 		}
 	},
 

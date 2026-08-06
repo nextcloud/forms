@@ -272,6 +272,8 @@ import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
+const formsAppName = 'forms'
+
 interface ShareLike {
 	id: number
 	shareType: number
@@ -360,7 +362,11 @@ export default defineComponent({
 	} {
 		return {
 			isLoading: false,
-			appConfig: loadState('forms', 'appConfig') as SharingSidebarAppConfig,
+			appConfig: loadState(
+				formsAppName,
+				'appConfig',
+			) as SharingSidebarAppConfig,
+
 			shareTokens: {},
 			savingShareTokens: {},
 			loadingShareTokenId: null,

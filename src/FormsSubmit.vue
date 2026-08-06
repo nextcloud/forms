@@ -23,6 +23,8 @@ import { defineComponent } from 'vue'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import Submit from './views/Submit.vue'
 
+const formsAppName = 'forms'
+
 export default defineComponent({
 	name: 'FormsSubmit',
 
@@ -31,17 +33,12 @@ export default defineComponent({
 		Submit,
 	},
 
-	data(): {
-		form: FormsForm
-		isLoggedIn: boolean
-		isEmbedded: boolean
-		shareHash: string
-	} {
+	data() {
 		return {
-			form: loadState('forms', 'form'),
-			isLoggedIn: loadState('forms', 'isLoggedIn'),
-			isEmbedded: loadState('forms', 'isEmbedded', false),
-			shareHash: loadState('forms', 'shareHash'),
+			form: loadState(formsAppName, 'form') as FormsForm,
+			isLoggedIn: loadState(formsAppName, 'isLoggedIn') as boolean,
+			isEmbedded: loadState(formsAppName, 'isEmbedded', false) as boolean,
+			shareHash: loadState(formsAppName, 'shareHash') as string,
 		}
 	},
 

@@ -68,7 +68,7 @@ import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg
 import IconChevronRight from '@material-symbols/svg-400/outlined/chevron_right.svg?raw'
 import PageFirstIcon from '@material-symbols/svg-400/outlined/first_page.svg?raw'
 import PageLastIcon from '@material-symbols/svg-400/outlined/last_page.svg?raw'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'

@@ -27,7 +27,7 @@
 import type { PropType } from 'vue'
 import type { FormsForm } from '../models/Entities.d.ts'
 
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import AppNavigationForm from './AppNavigationForm.vue'
@@ -54,9 +54,9 @@ export default defineComponent({
 
 	emits: ['update:open', 'clone'],
 
-	data(): { shownForms: FormsForm[] } {
+	data() {
 		return {
-			shownForms: [],
+			shownForms: [] as FormsForm[],
 		}
 	},
 

@@ -222,7 +222,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
@@ -247,20 +247,10 @@ import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
+const formsAppName = 'forms'
+
 interface QuestionRefInstance extends ComponentPublicInstance {
 	focus?: () => void
-}
-
-interface CreateViewData {
-	answerTypes: typeof answerTypes
-	isLoadingQuestions: boolean
-	isDragging: boolean
-	maxStringLengths: Record<string, number>
-	questionMenuOpened: boolean
-	activeQuestionType: string | null
-	questionRefsMap: Record<number, QuestionRefInstance>
-	insertMenuOpenedIndex: number | null
-	insertMenuOpened: boolean
 }
 
 ;(window as Window & { axios?: typeof axios }).axios = axios
@@ -293,27 +283,27 @@ export default defineComponent({
 		}
 	},
 
-	data(): CreateViewData {
+	data() {
 		return {
 			answerTypes,
 
 			// Various states
-			isLoadingQuestions: false,
-			isDragging: false,
+			isLoadingQuestions: false as boolean,
+			isDragging: false as boolean,
 
-			maxStringLengths: loadState('forms', 'maxStringLengths') as Record<
+			maxStringLengths: loadState(formsAppName, 'maxStringLengths') as Record<
 				string,
 				number
 			>,
 
-			questionMenuOpened: false,
-			activeQuestionType: null,
-			questionRefsMap: {},
+			questionMenuOpened: false as boolean,
+			activeQuestionType: null as string | null,
+			questionRefsMap: {} as Record<number, QuestionRefInstance>,
 
 			// when set to a number, the next created question will be inserted at this index
-			insertMenuOpenedIndex: null,
+			insertMenuOpenedIndex: null as number | null,
 			// controls per-question insert menu visibility
-			insertMenuOpened: false,
+			insertMenuOpened: false as boolean,
 		}
 	},
 

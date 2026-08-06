@@ -24,16 +24,11 @@
 </template>
 
 <script lang="ts">
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import QRCode from 'qrcode'
 import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import logger from '../utils/Logger.ts'
-
-interface QRDialogData {
-	uri: string
-	isOpen: boolean
-}
 
 export default defineComponent({
 	name: 'QRDialog',
@@ -62,10 +57,10 @@ export default defineComponent({
 		}
 	},
 
-	data(): QRDialogData {
+	data() {
 		return {
-			uri: '',
-			isOpen: false,
+			uri: '' as string,
+			isOpen: false as boolean,
 		}
 	},
 

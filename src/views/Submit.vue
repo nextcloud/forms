@@ -229,7 +229,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { defineComponent } from 'vue'
@@ -256,7 +256,9 @@ import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
-type AnswerValue = unknown[]
+const formsAppName = 'forms'
+
+type AnswerValue = string[]
 type AnswersMap = Record<number, AnswerValue>
 
 interface StoredAnswerState {
@@ -309,20 +311,6 @@ interface DialogButton {
 		| 'warning'
 		| 'success'
 	callback: () => void
-}
-
-interface SubmitViewData {
-	answerTypes: typeof answerTypes
-	answers: AnswersMap
-	loading: boolean
-	success: boolean
-	successAnnouncement: string
-	submitForm: boolean
-	showConfirmEmptyModal: boolean
-	showConfirmLeaveDialog: boolean
-	showClearFormDialog: boolean
-	showClearFormDueToChangeDialog: boolean
-	confirmButtonCallback: (value: boolean) => void
 }
 
 export default defineComponent({
@@ -393,25 +381,25 @@ export default defineComponent({
 			IconSendSvg: IconSend,
 			t,
 
-			maxStringLengths: loadState('forms', 'maxStringLengths') as Record<
+			maxStringLengths: loadState(formsAppName, 'maxStringLengths') as Record<
 				string,
 				number
 			>,
 		}
 	},
 
-	data(): SubmitViewData {
+	data() {
 		return {
 			answerTypes,
-			answers: {},
-			loading: false,
-			success: false,
-			successAnnouncement: '',
-			submitForm: false,
-			showConfirmEmptyModal: false,
-			showConfirmLeaveDialog: false,
-			showClearFormDialog: false,
-			showClearFormDueToChangeDialog: false,
+			answers: {} as AnswersMap,
+			loading: false as boolean,
+			success: false as boolean,
+			successAnnouncement: '' as string,
+			submitForm: false as boolean,
+			showConfirmEmptyModal: false as boolean,
+			showConfirmLeaveDialog: false as boolean,
+			showClearFormDialog: false as boolean,
+			showClearFormDueToChangeDialog: false as boolean,
 			confirmButtonCallback: () => {},
 		}
 	},
@@ -575,7 +563,7 @@ export default defineComponent({
 		submissionId(): number | null {
 			const id =
 				this.$route?.params.submissionId
-				|| loadState('forms', 'submissionId', null)
+				|| loadState(formsAppName, 'submissionId', null)
 			return id ? parseInt(String(id), 10) : null
 		},
 	},

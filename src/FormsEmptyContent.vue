@@ -40,13 +40,7 @@ export default defineComponent({
 		NcIconSvgWrapper,
 	},
 
-	data(): {
-		renderModels: Record<
-			string,
-			{ title: string; description: string; icon: string }
-		>
-		renderAs: string
-	} {
+	data() {
 		return {
 			/**
 			 * !! Keep Model-Names in sync with Constants EMTPY_... in lib/Constants.php !!
@@ -68,9 +62,12 @@ export default defineComponent({
 
 					icon: IconCheck,
 				},
-			},
+			} as Record<
+				string,
+				{ title: string; description: string; icon: string }
+			>,
 
-			renderAs: loadState(formsAppName, 'renderAs'),
+			renderAs: loadState(formsAppName, 'renderAs') as string,
 		}
 	},
 

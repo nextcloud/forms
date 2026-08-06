@@ -287,7 +287,7 @@ import axios from '@nextcloud/axios'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { FileType } from '@nextcloud/files'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { useIsSmallMobile } from '@nextcloud/vue'
@@ -367,22 +367,6 @@ interface PickerLike {
 	pick: () => Promise<string>
 }
 
-interface ResultsViewData {
-	questions: FormsQuestion[]
-	submissions: SubmissionRecord[]
-	filteredSubmissionsCount: number
-	isDownloadActionOpened: boolean
-	loadingResults: boolean
-	skipReloadOnOffsetChange: boolean
-	picker: PickerLike | null
-	showConfirmDeleteDialog: boolean
-	submissionSearch: string
-	limit: number
-	offset: number
-	linkedFileNotAvailableButtons: DialogButton[]
-	confirmDeleteButtons: DialogButton[]
-}
-
 const SUPPORTED_FILE_FORMATS: Record<SupportedFileFormat, string> = {
 	ods: IconTable,
 	csv: IconFileDelimited,
@@ -441,17 +425,17 @@ export default defineComponent({
 
 	data(): ResultsViewData {
 		return {
-			questions: [],
-			submissions: [],
-			filteredSubmissionsCount: 0,
-			isDownloadActionOpened: false,
-			loadingResults: true,
-			skipReloadOnOffsetChange: false,
-			picker: null,
-			showConfirmDeleteDialog: false,
-			submissionSearch: '',
-			limit: 20,
-			offset: 0,
+			questions: [] as FormsQuestion[],
+			submissions: [] as SubmissionRecord[],
+			filteredSubmissionsCount: 0 as number,
+			isDownloadActionOpened: false as boolean,
+			loadingResults: true as boolean,
+			skipReloadOnOffsetChange: false as boolean,
+			picker: null as PickerLike | null,
+			showConfirmDeleteDialog: false as boolean,
+			submissionSearch: '' as string,
+			limit: 20 as number,
+			offset: 0 as number,
 			linkedFileNotAvailableButtons: [
 				{
 					label: t('forms', 'Unlink spreadsheet'),
@@ -469,7 +453,7 @@ export default defineComponent({
 						this.onLinkFile()
 					},
 				},
-			],
+			] as DialogButton[],
 
 			confirmDeleteButtons: [
 				{
@@ -488,7 +472,7 @@ export default defineComponent({
 						this.deleteAllSubmissionsConfirmed()
 					},
 				},
-			],
+			] as DialogButton[],
 		}
 	},
 

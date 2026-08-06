@@ -201,7 +201,7 @@ import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.s
 import IconDragIndicator from '@material-symbols/svg-400/outlined/drag_indicator.svg?raw'
 import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -216,19 +216,6 @@ import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.ts'
 import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
 import { OptionType } from '../../models/Constants.ts'
-
-type RankingOption = FormsOption
-
-interface QuestionRankingData {
-	errorMessage: string | null
-	isDragging: boolean
-	isRanking: boolean
-	isLoading: boolean
-	isOptionDialogShown: boolean
-	rankedOptions: RankingOption[]
-	unrankedOptions: RankingOption[]
-	OptionType: typeof OptionType
-}
 
 export default defineComponent({
 	name: 'QuestionRanking',
@@ -260,15 +247,15 @@ export default defineComponent({
 		}
 	},
 
-	data(): QuestionRankingData {
+	data() {
 		return {
-			errorMessage: null,
-			isDragging: false,
-			isRanking: false,
-			isLoading: false,
-			isOptionDialogShown: false,
-			rankedOptions: [] as RankingOption[],
-			unrankedOptions: [] as RankingOption[],
+			errorMessage: null as string | null,
+			isDragging: false as boolean,
+			isRanking: false as boolean,
+			isLoading: false as boolean,
+			isOptionDialogShown: false as boolean,
+			rankedOptions: [] as FormsOption[],
+			unrankedOptions: [] as FormsOption[],
 			OptionType,
 		}
 	},
@@ -279,11 +266,11 @@ export default defineComponent({
 		},
 
 		choices: {
-			get(): RankingOption[] {
+			get(): FormsOption[] {
 				return this.sortOptionsOfType(this.options, OptionType.Choice)
 			},
 
-			set(value: RankingOption[]): void {
+			set(value: FormsOption[]): void {
 				this.updateOptionsOrder(value, OptionType.Choice)
 			},
 		},
@@ -345,10 +332,10 @@ export default defineComponent({
 				// Restore order from saved values (array of option IDs)
 				const byId = Object.fromEntries(
 					sorted.map((o) => [o.id, o]),
-				) as Record<number, RankingOption>
+				) as Record<number, FormsOption>
 				this.rankedOptions = this.values
 					.map((id) => byId[parseInt(String(id), 10)])
-					.filter((option): option is RankingOption => Boolean(option))
+					.filter((option): option is FormsOption => Boolean(option))
 				this.unrankedOptions = sorted.filter(
 					(o) => !this.rankedOptions.some((r) => r.id === o.id),
 				)
@@ -368,7 +355,7 @@ export default defineComponent({
 		 *
 		 * @param option The option to rank
 		 */
-		rankOption(option: RankingOption): void {
+		rankOption(option: FormsOption): void {
 			this.unrankedOptions = this.unrankedOptions.filter(
 				(o) => o.id !== option.id,
 			)
@@ -381,7 +368,7 @@ export default defineComponent({
 		 *
 		 * @param option The option to unrank
 		 */
-		unrankOption(option: RankingOption): void {
+		unrankOption(option: FormsOption): void {
 			this.rankedOptions = this.rankedOptions.filter((o) => o.id !== option.id)
 			this.unrankedOptions.push(option)
 			this.emitValues()
@@ -394,7 +381,7 @@ export default defineComponent({
 		 */
 		onMoveUp(index: number): void {
 			if (index <= 0) return
-			const items = [...this.rankedOptions] as RankingOption[]
+			const items = [...this.rankedOptions] as FormsOption[]
 			;[items[index - 1], items[index]] = [items[index], items[index - 1]]
 			this.rankedOptions = items
 			this.emitValues()
@@ -412,7 +399,7 @@ export default defineComponent({
 		 */
 		onMoveDown(index: number): void {
 			if (index >= this.rankedOptions.length - 1) return
-			const items = [...this.rankedOptions] as RankingOption[]
+			const items = [...this.rankedOptions] as FormsOption[]
 			;[items[index], items[index + 1]] = [items[index + 1], items[index]]
 			this.rankedOptions = items
 			this.emitValues()

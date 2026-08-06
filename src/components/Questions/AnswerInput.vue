@@ -93,7 +93,7 @@ import IconTableColumn from '@material-symbols/svg-400/outlined/view_column.svg?
 import IconTableRow from '@material-symbols/svg-400/outlined/view_stream.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import PQueue from 'p-queue'
@@ -106,15 +106,6 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
-
-type AnswerInputData = {
-	queue: PQueue | null
-	debounceOnInput: ((event: InputEvent) => void) | undefined
-	isIMEComposing: boolean
-	localText: string
-}
-
-type AnswerInputOption = FormsOption
 
 export default defineComponent({
 	name: 'AnswerInput',
@@ -194,25 +185,25 @@ export default defineComponent({
 		}
 	},
 
-	data(): AnswerInputData {
+	data() {
 		return {
-			queue: null,
-			debounceOnInput: undefined,
-			isIMEComposing: false,
-			localText: (this.answer as AnswerInputOption | undefined)?.text ?? '',
+			queue: null as PQueue | null,
+			debounceOnInput: undefined as ((event: InputEvent) => void) | undefined,
+			isIMEComposing: false as boolean,
+			localText: (this.answer as FormsOption | undefined)?.text ?? '',
 		}
 	},
 
 	computed: {
 		canCreateLocalAnswer(): boolean {
-			if ((this.answer as AnswerInputOption).local) {
+			if ((this.answer as FormsOption).local) {
 				return !!this.localText?.trim()
 			}
-			return !!(this.answer as AnswerInputOption).text?.trim()
+			return !!(this.answer as FormsOption).text?.trim()
 		},
 
 		ariaLabel(): string {
-			const answer = this.answer as AnswerInputOption
+			const answer = this.answer as FormsOption
 			if (answer.local) {
 				if (this.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
@@ -242,12 +233,12 @@ export default defineComponent({
 		},
 
 		optionDragMenuId(): string {
-			const answer = this.answer as AnswerInputOption
+			const answer = this.answer as FormsOption
 			return `q${answer.questionId}o${answer.id}o${this.optionType}__drag_menu`
 		},
 
 		placeholder(): string {
-			const answer = this.answer as AnswerInputOption
+			const answer = this.answer as FormsOption
 			if (answer.local) {
 				if (this.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
@@ -272,7 +263,7 @@ export default defineComponent({
 		},
 
 		pseudoIcon(): string {
-			const answer = this.answer as AnswerInputOption
+			const answer = this.answer as FormsOption
 			if (answer.local) {
 				return IconPlus
 			}
@@ -296,7 +287,7 @@ export default defineComponent({
 	watch: {
 		// Keep localText in sync when the parent replaces/updates the answer prop
 		answer: {
-			handler(newVal: AnswerInputOption) {
+			handler(newVal: FormsOption) {
 				this.localText = newVal?.text ?? ''
 			},
 
@@ -343,7 +334,7 @@ export default defineComponent({
 				return
 			}
 
-			const answer = this.answer as AnswerInputOption
+			const answer = this.answer as FormsOption
 			if (answer.local) {
 				this.localText = target.value
 				return
@@ -374,7 +365,7 @@ export default defineComponent({
 		 * @param e the keydown event
 		 */
 		onEnter(e: KeyboardEvent): void {
-			if ((this.answer as AnswerInputOption).local) {
+			if ((this.answer as FormsOption).local) {
 				this.createLocalAnswer(e)
 				return
 			}
@@ -399,7 +390,7 @@ export default defineComponent({
 			}
 
 			const answer = {
-				...(this.answer as AnswerInputOption),
+				...(this.answer as FormsOption),
 				text: value,
 				local: false,
 			}
@@ -458,7 +449,7 @@ export default defineComponent({
 				return
 			}
 
-			if ((this.answer as AnswerInputOption).local) {
+			if ((this.answer as FormsOption).local) {
 				return
 			}
 
@@ -476,7 +467,7 @@ export default defineComponent({
 				return
 			}
 			queue.add(() => {
-				this.$emit('delete', this.answer as AnswerInputOption)
+				this.$emit('delete', this.answer as FormsOption)
 				// Prevent any patch requests
 				queue.pause()
 				queue.clear()
@@ -489,7 +480,7 @@ export default defineComponent({
 		 * @param answer the answer to sync
 		 * @return answer
 		 */
-		async createAnswer(answer: AnswerInputOption): Promise<AnswerInputOption> {
+		async createAnswer(answer: FormsOption): Promise<FormsOption> {
 			try {
 				const response = await axios.post(
 					generateOcsUrl(
@@ -508,7 +499,7 @@ export default defineComponent({
 
 				// Was synced once, this is now up to date with the server
 				delete answer.local
-				return (OcsResponse2Data(response) as AnswerInputOption[])[0]
+				return (OcsResponse2Data(response) as FormsOption[])[0]
 			} catch (error) {
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
@@ -523,7 +514,7 @@ export default defineComponent({
 		 *
 		 * @param answer the answer to sync
 		 */
-		async updateAnswer(answer: AnswerInputOption): Promise<void> {
+		async updateAnswer(answer: FormsOption): Promise<void> {
 			try {
 				await axios.patch(
 					generateOcsUrl(

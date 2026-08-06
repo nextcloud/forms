@@ -119,7 +119,7 @@
 
 <script lang="ts">
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -158,7 +158,7 @@ export default defineComponent({
 
 	data() {
 		return {
-			isLoading: false,
+			isLoading: false as boolean,
 		}
 	},
 

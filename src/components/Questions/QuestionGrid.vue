@@ -178,7 +178,7 @@
 <script lang="ts">
 import type { FormsOption } from '../../models/Entities.d.ts'
 
-import { translatePlural as n, translate as t } from '@nextcloud/l10n'
+import { n, t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -204,12 +204,6 @@ type QuestionGridExtraSettings = {
 	questionType?: GridQuestionType
 }
 
-interface QuestionGridData {
-	isDragging: boolean
-	isLoading: boolean
-	questionTypes: Array<{ label: string; id: GridQuestionType }>
-}
-
 export default defineComponent({
 	name: 'QuestionGrid',
 
@@ -231,16 +225,16 @@ export default defineComponent({
 		}
 	},
 
-	data(): QuestionGridData {
+	data() {
 		return {
-			isDragging: false,
-			isLoading: false,
+			isDragging: false as boolean,
+			isLoading: false as boolean,
 			questionTypes: [
 				{ label: t('forms', 'Radio'), id: GridCellType.Radio },
 				{ label: t('forms', 'Checkbox'), id: GridCellType.Checkbox },
 				{ label: t('forms', 'Number'), id: GridCellType.Number },
 				{ label: t('forms', 'Text'), id: 'text' },
-			],
+			] as Array<{ label: string; id: GridQuestionType }>,
 		}
 	},
 

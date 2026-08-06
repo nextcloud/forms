@@ -174,6 +174,7 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import Sidebar from './views/Sidebar.vue'
 import FormsIcon from '../img/forms-dark.svg?raw'
+import { PERMISSION_TYPES } from './mixins/PermissionTypes.ts'
 import { FormState } from './models/Constants.ts'
 import logger from './utils/Logger.ts'
 import OcsResponse2Data from './utils/OcsResponse2Data.ts'
@@ -217,11 +218,6 @@ export default defineComponent({
 		const canCreateForms = ref(Boolean(appConfig?.canCreateForms))
 		const allowComments = ref(Boolean(appConfig?.allowComments))
 		const deletedFormHash = ref<string | null>(null)
-
-		const PERMISSION_TYPES = {
-			PERMISSION_EDIT: 'edit',
-			PERMISSION_SUBMIT: 'submit',
-		}
 
 		const routeHash = computed<string | undefined>(() => {
 			const hash = route.params.hash

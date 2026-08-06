@@ -193,7 +193,7 @@ export default defineComponent({
 		}
 	},
 
-	data(): { answerTypes: typeof answerTypes } {
+	data() {
 		return {
 			answerTypes,
 		}

@@ -106,13 +106,10 @@ export default defineComponent({
 		}
 	},
 
-	data(): {
-		activeQuestionType: string | null
-		openLocal: boolean
-	} {
+	data() {
 		return {
-			activeQuestionType: null,
-			openLocal: this.open,
+			activeQuestionType: null as string | null,
+			openLocal: this.open as boolean,
 		}
 	},
 
