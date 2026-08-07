@@ -14,6 +14,7 @@ OC.L10N.register(
     "Set expiration date" : "Set utløpsdato",
     "Group" : "Gruppe",
     "Share link" : "Del lenkje",
+    "View" : "Vis",
     "Edit" : "Rediger",
     "Share" : "Del",
     "Description" : "Skildring",
@@ -26,6 +27,7 @@ OC.L10N.register(
     "File" : "Fil",
     "Date" : "Dato",
     "Time" : "Tid",
-    "Color" : "Farge"
+    "Color" : "Farge",
+    "Image" : "Bilete"
 },
 "nplurals=2; plural=(n != 1);");
