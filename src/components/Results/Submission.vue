@@ -48,11 +48,15 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import type { PropType } from 'vue'
+
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -60,7 +64,49 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Answer from './Answer.vue'
 import { OptionType } from '../../models/Constants.ts'
 
-export default {
+interface SubmissionAnswer {
+	id: number
+	questionId: number
+	text: string
+	fileId?: number
+}
+
+interface SubmissionModel {
+	id: number
+	userDisplayName: string
+	timestamp: string | number
+	answers: SubmissionAnswer[]
+}
+
+interface QuestionOption {
+	id: number
+	text: string
+	optionType: string
+}
+
+interface QuestionModel {
+	id: number
+	text: string
+	type: string
+	options: QuestionOption[]
+	extraSettings: {
+		questionType?: 'radio' | 'checkbox' | 'number'
+	}
+}
+
+interface AnsweredQuestion {
+	id: number
+	text: string
+	type: string
+	squashedAnswers?: string
+	answers?: Array<{ id: number; text: string; url?: string }>
+	gridValue?: Record<string, string | string[] | Record<string, string>> | null
+	gridCellType?: string
+	gridRows?: QuestionOption[]
+	gridColumns?: QuestionOption[]
+}
+
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Submission',
 
@@ -79,12 +125,12 @@ export default {
 		},
 
 		submission: {
-			type: Object,
+			type: Object as PropType<SubmissionModel>,
 			required: true,
 		},
 
 		questions: {
-			type: Array,
+			type: Array as PropType<QuestionModel[]>,
 			required: true,
 		},
 
@@ -110,12 +156,13 @@ export default {
 		return {
 			IconDelete,
 			IconPencil,
+			t,
 		}
 	},
 
 	computed: {
 		// Format submission-timestamp to DateTime
-		submissionDateTime() {
+		submissionDateTime(): string {
 			return moment(this.submission.timestamp, 'X').format('LLLL')
 		},
 
@@ -123,12 +170,12 @@ export default {
 		 * Join answered Questions with corresponding answers.
 		 * Multiple answers to a question are squashed into one string.
 		 *
-		 * @return {Array}
+		 * @return
 		 */
-		answeredQuestions() {
-			const answeredQuestionsArray = []
+		answeredQuestions(): AnsweredQuestion[] {
+			const answeredQuestionsArray: AnsweredQuestion[] = []
 
-			this.questions.forEach((question) => {
+			this.questions.forEach((question: QuestionModel) => {
 				const answers = this.submission.answers.filter(
 					(answer) => answer.questionId === question.id,
 				)
@@ -152,14 +199,17 @@ export default {
 						}),
 					})
 				} else if (question.type === 'grid') {
-					const optionsPerId = {}
+					const optionsPerId: Record<string, QuestionOption> = {}
 					question.options.forEach((option) => {
 						optionsPerId[option.id] = option
 					})
 					let squashedAnswers = ''
 
 					const gridValue = answers[0].text
-						? JSON.parse(answers[0].text)
+						? (JSON.parse(answers[0].text) as Record<
+								string,
+								string | string[] | Record<string, string>
+							>)
 						: null
 					// fixme: rename `questionType` to `gridCellType` everywhere in BE and FE
 					if (
@@ -172,7 +222,7 @@ export default {
 									optionsPerId[key]
 									&& optionsPerId[gridValue[key]],
 							)
-							.map((key) => {
+							.map((key: string) => {
 								return (
 									optionsPerId[key].text
 									+ ': '
@@ -190,14 +240,17 @@ export default {
 									optionsPerId[key]
 									&& Array.isArray(gridValue[key]),
 							)
-							.map((key) => {
+							.map((key: string) => {
 								return (
 									optionsPerId[key].text
 									+ ': '
 									+ gridValue[key]
-										.filter((optionId) => optionsPerId[optionId])
+										.filter(
+											(optionId: string) =>
+												optionsPerId[optionId],
+										)
 										.map(
-											(optionId) =>
+											(optionId: string) =>
 												optionsPerId[optionId].text,
 										)
 										.join(', ')
@@ -232,7 +285,7 @@ export default {
 						squashedAnswers,
 					})
 				} else if (question.type === 'ranking') {
-					const optionsPerId = {}
+					const optionsPerId: Record<string, QuestionOption> = {}
 					question.options.forEach((option) => {
 						optionsPerId[option.id] = option
 					})
@@ -240,7 +293,7 @@ export default {
 						? JSON.parse(answers[0].text)
 						: []
 					const squashedAnswers = rankedIds
-						.map((id, index) => {
+						.map((id: string, index: number) => {
 							const option = optionsPerId[id]
 							return option
 								? `${index + 1}. ${option.text}`
@@ -272,11 +325,11 @@ export default {
 	},
 
 	methods: {
-		onDelete() {
+		onDelete(): void {
 			this.$emit('delete')
 		},
 
-		onCopy(event) {
+		onCopy(event: ClipboardEvent): void {
 			if (!event.clipboardData) return
 
 			const selection = window.getSelection()
@@ -291,9 +344,9 @@ export default {
 			event.preventDefault()
 		},
 
-		serializeNode(node) {
+		serializeNode(node: Node): string {
 			if (node.nodeType === Node.TEXT_NODE) {
-				return node.textContent
+				return node.textContent ?? ''
 			}
 
 			if (
@@ -303,7 +356,7 @@ export default {
 				return ''
 			}
 
-			const tag = node.tagName?.toLowerCase()
+			const tag = (node as Element).tagName?.toLowerCase()
 
 			if (tag && ['svg', 'script', 'style'].includes(tag)) return ''
 			if (tag === 'br') return '\n'
@@ -313,7 +366,7 @@ export default {
 				.join('')
 
 			// Answer blocks get a blank line before them as visual separator
-			if (tag === 'div' && node.classList?.contains('answer')) {
+			if (tag === 'div' && (node as Element).classList?.contains('answer')) {
 				const trimmed = children.replace(/\s+$/, '')
 				return trimmed ? '\n' + trimmed + '\n' : ''
 			}
@@ -344,7 +397,7 @@ export default {
 			return children
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

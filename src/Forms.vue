@@ -145,16 +145,20 @@
 	</NcContent>
 </template>
 
-<script>
+<script lang="ts">
+import type { FormsForm } from './models/Entities.d.ts'
+
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
+import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
+import { defineComponent } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
@@ -170,14 +174,14 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import Sidebar from './views/Sidebar.vue'
 import FormsIcon from '../img/forms-dark.svg?raw'
-import PermissionTypes from './mixins/PermissionTypes.ts'
+import { PERMISSION_TYPES } from './mixins/PermissionTypes.ts'
 import { FormState } from './models/Constants.ts'
 import logger from './utils/Logger.ts'
 import OcsResponse2Data from './utils/OcsResponse2Data.ts'
 
-const appName = 'forms'
+const formsAppName = 'forms'
 
-export default {
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Forms',
 
@@ -204,19 +208,27 @@ export default {
 		const loading = ref(true)
 		const sidebarOpened = ref(false)
 		const sidebarActive = ref('forms-sharing')
-		const forms = ref([])
-		const allSharedForms = ref([])
+		const forms = ref<FormsForm[]>([])
+		const allSharedForms = ref<FormsForm[]>([])
 		const showArchivedForms = ref(false)
-		const canCreateForms = ref(loadState(appName, 'appConfig').canCreateForms)
-		const allowComments = ref(loadState(appName, 'appConfig').allowComments)
-		const deletedFormHash = ref(null)
+		const appConfig = loadState(formsAppName, 'appConfig') as {
+			canCreateForms?: boolean
+			allowComments?: boolean
+		}
+		const canCreateForms = ref(Boolean(appConfig?.canCreateForms))
+		const allowComments = ref(Boolean(appConfig?.allowComments))
+		const deletedFormHash = ref<string | null>(null)
 
-		const PERMISSION_TYPES = PermissionTypes.data().PERMISSION_TYPES
+		const routeHash = computed<string | undefined>(() => {
+			const hash = route.params.hash
+			if (Array.isArray(hash)) {
+				return hash[0]
+			}
+			return hash as string | undefined
+		})
 
-		const routeHash = computed(() => route.params.hash)
-
-		const routeAllowed = computed(() => {
-			if (loading.value && loadState(appName, 'formId') === 'invalid') {
+		const routeAllowed = computed<boolean>(() => {
+			if (loading.value && loadState(formsAppName, 'formId') === 'invalid') {
 				return false
 			}
 
@@ -239,16 +251,17 @@ export default {
 			}
 
 			const resultRoutes = ['results', 'results.summary', 'results.responses']
-			if (resultRoutes.includes(route.name)) {
+			if (resultRoutes.includes(String(route.name ?? ''))) {
 				return (
-					form.permissions.includes('results') || form.submissionCount > 0
+					form.permissions.includes('results')
+					|| (form.submissionCount ?? 0) > 0
 				)
 			}
 
-			return form?.permissions.includes(route.name)
+			return form?.permissions.includes(String(route.name ?? ''))
 		})
 
-		const selectedForm = computed(() => {
+		const selectedForm = computed<FormsForm | Record<string, never>>(() => {
 			if (routeAllowed.value) {
 				return (
 					[...forms.value, ...allSharedForms.value].find(
@@ -259,7 +272,7 @@ export default {
 			return {}
 		})
 
-		const updateSelectedForm = (form) => {
+		const updateSelectedForm = (form: FormsForm): void => {
 			sidebarOpened.value = false
 
 			const index = forms.value.findIndex((f) => f.hash === form.hash)
@@ -310,7 +323,7 @@ export default {
 			}
 		}
 
-		const openSharing = (hash) => {
+		const openSharing = (hash: string): void => {
 			if (hash !== routeHash.value) {
 				router.push({ name: 'edit', params: { hash } })
 			}
@@ -357,7 +370,7 @@ export default {
 		 * Removes localStorage keys matching the pattern `nextcloud_forms_*_activeResponseView`
 		 * where the form hash no longer exists in the current forms list.
 		 */
-		const cleanupStaleLocalStorageEntries = () => {
+		const cleanupStaleLocalStorageEntries = (): void => {
 			try {
 				// Get all current form hashes
 				const currentFormHashes = new Set(
@@ -402,10 +415,10 @@ export default {
 		/**
 		 * Fetch a partial form by its hash after initial load completes.
 		 *
-		 * @param {string} hash The hash of the form to fetch.
+		 * @param hash The hash of the form to fetch.
 		 */
-		async function fetchPartialForm(hash) {
-			await new Promise((resolve) => {
+		async function fetchPartialForm(hash: string): Promise<void> {
+			await new Promise<void>((resolve) => {
 				const wait = () => {
 					if (loading.value) {
 						window.setTimeout(wait, 250)
@@ -425,21 +438,29 @@ export default {
 				try {
 					const response = await axios.get(
 						generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-							id: loadState(appName, 'formId'),
+							id: loadState(formsAppName, 'formId'),
 						}),
 					)
-					const form = OcsResponse2Data(response)
+					const form = OcsResponse2Data<FormsForm>(response)
 
 					if (
 						form.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT)
 					) {
 						allSharedForms.value.push(form)
 					}
-				} catch (error) {
+				} catch (error: unknown) {
 					logger.error(`Form ${hash} not found`, { error })
 					showError(t('forms', 'Form not found'))
 
-					if ([403, 404].includes(error.response?.status)) {
+					if (
+						typeof error === 'object'
+						&& error !== null
+						&& 'response' in error
+						&& [403, 404].includes(
+							(error as { response?: { status?: number } }).response
+								?.status ?? 0,
+						)
+					) {
 						if (route.name !== 'root') {
 							router.push({ name: 'root' })
 						}
@@ -455,7 +476,7 @@ export default {
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms'),
 				)
-				const newForm = OcsResponse2Data(response)
+				const newForm = OcsResponse2Data<FormsForm>(response)
 				forms.value.unshift(newForm)
 				router.push({
 					name: 'edit',
@@ -468,14 +489,14 @@ export default {
 			}
 		}
 
-		const onCloneForm = async (id) => {
+		const onCloneForm = async (id: number): Promise<void> => {
 			try {
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms?fromId={id}', {
 						id,
 					}),
 				)
-				const newForm = OcsResponse2Data(response)
+				const newForm = OcsResponse2Data<FormsForm>(response)
 				forms.value.unshift(newForm)
 				router.push({
 					name: 'edit',
@@ -488,8 +509,11 @@ export default {
 			}
 		}
 
-		const onDeleteForm = async (id) => {
+		const onDeleteForm = async (id: number): Promise<void> => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)
+			if (formIndex < 0) {
+				return
+			}
 			const deletedHash = forms.value[formIndex].hash
 
 			forms.value.splice(formIndex, 1)
@@ -515,14 +539,14 @@ export default {
 		// Reset deletedFormHash when navigating away from the deleted form
 		watch(
 			() => route.name,
-			(newRouteName) => {
+			(newRouteName: string | symbol | null | undefined) => {
 				if (newRouteName === 'root') {
 					deletedFormHash.value = null
 				}
 			},
 		)
 
-		const onLastUpdatedByEventBus = (id) => {
+		const onLastUpdatedByEventBus = (id: number): void => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)
 			if (formIndex !== -1) {
 				forms.value[formIndex].lastUpdated = moment().unix()
@@ -536,19 +560,34 @@ export default {
 			}
 		}
 
+		const onLastUpdatedByEventBusEvent = (event: unknown): void => {
+			const id = Number(event)
+			if (Number.isFinite(id)) {
+				onLastUpdatedByEventBus(id)
+			}
+		}
+
+		const onOwnershipTransferredEvent = (event: unknown): void => {
+			const id = Number(event)
+			if (Number.isFinite(id)) {
+				void onDeleteForm(id)
+			}
+		}
+
 		onMounted(async () => {
 			await loadForms()
 			cleanupStaleLocalStorageEntries()
-			subscribe('forms:last-updated:set', onLastUpdatedByEventBus)
-			subscribe('forms:ownership-transfered', onDeleteForm)
+			subscribe('forms:last-updated:set', onLastUpdatedByEventBusEvent)
+			subscribe('forms:ownership-transfered', onOwnershipTransferredEvent)
 		})
 
 		onUnmounted(() => {
-			unsubscribe('forms:last-updated:set', onLastUpdatedByEventBus)
-			unsubscribe('forms:ownership-transfered', onDeleteForm)
+			unsubscribe('forms:last-updated:set', onLastUpdatedByEventBusEvent)
+			unsubscribe('forms:ownership-transfered', onOwnershipTransferredEvent)
 		})
 
 		return {
+			t,
 			loading,
 			sidebarOpened,
 			sidebarActive,
@@ -580,7 +619,7 @@ export default {
 			FormsIcon,
 		}
 	},
-}
+})
 </script>
 
 <style scoped lang="scss">

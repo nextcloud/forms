@@ -27,10 +27,10 @@
 	</NcDialog>
 </template>
 
-<script>
+<script lang="ts">
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import { showError } from '@nextcloud/dialogs'
-import { translate as t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
@@ -56,12 +56,17 @@ export default defineComponent({
 
 	data() {
 		return {
-			enteredOptions: '',
+			enteredOptions: '' as string,
 		}
 	},
 
 	computed: {
-		buttons() {
+		buttons(): Array<{
+			label: string
+			callback: () => void
+			type?: 'primary'
+			icon?: string
+		}> {
 			return [
 				{
 					label: t('forms', 'Cancel'),
@@ -80,9 +85,9 @@ export default defineComponent({
 			]
 		},
 
-		multipleOptions() {
+		multipleOptions(): string[] {
 			const allOptions = this.enteredOptions.split(/\r?\n/g)
-			return allOptions.filter((answer) => {
+			return allOptions.filter((answer: string) => {
 				return answer.trim().length > 0
 			})
 		},
@@ -91,7 +96,7 @@ export default defineComponent({
 	methods: {
 		t,
 
-		onMultipleOptions() {
+		onMultipleOptions(): void {
 			this.$emit('update:open', false)
 			if (this.multipleOptions.length > 1) {
 				// extract all options entries to parent
