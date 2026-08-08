@@ -239,9 +239,10 @@ class SubmissionService {
 
 		// Process initial header
 		$header = [];
-		$header[] = $this->l10n->t('User ID');
-		$header[] = $this->l10n->t('User display name');
-		$header[] = $this->l10n->t('Timestamp');
+		$header[] = ['id' => 'submission_id', 'title' => $this->l10n->t('Submission ID')];
+		$header[] = ['id' => 'user_id', 'title' => $this->l10n->t('User ID')];
+		$header[] = ['id' => 'user_display_name', 'title' => $this->l10n->t('User display name')];
+		$header[] = ['id' => 'timestamp', 'title' => $this->l10n->t('Timestamp')];
 		/** @var array<int, Question> $questionPerQuestionId */
 		$questionPerQuestionId = [];
 		/** @var array<int, array<int, string>> $gridRowsPerQuestionId */
@@ -269,12 +270,12 @@ class SubmissionService {
 
 				foreach ($gridRowsPerQuestionId[$question->getId()] as $rowId) {
 					if ($gridCellType === Constants::ANSWER_GRID_TYPE_CHECKBOX || $gridCellType === Constants::ANSWER_GRID_TYPE_RADIO) {
-						$header[] = $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ')';
+						$header[] = ['id' => 'question-id-' . $question->getId() . '-' . $rowId, 'title' => $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ')'];
 					}
 
 					if ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
 						foreach ($gridColumnsPerQuestionId[$question->getId()] as $columnId) {
-							$header[] = $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ' - ' . $optionPerOptionId[$columnId]->getText() . ')';
+							$header[] = ['id' => 'question-id-' . $question->getId() . '-' . $rowId . '-' . $columnId, 'title' => $question->getText() . ' (' . $optionPerOptionId[$rowId]->getText() . ' - ' . $optionPerOptionId[$columnId]->getText() . ')'];
 						}
 					}
 				}
@@ -285,10 +286,10 @@ class SubmissionService {
 					$rankingOptionsPerQuestionId[$question->getId()][] = $option->getId();
 				}
 				foreach ($rankingOptionsPerQuestionId[$question->getId()] as $optionId) {
-					$header[] = $question->getText() . ' (' . $optionPerOptionId[$optionId]->getText() . ')';
+					$header[] = ['id' => 'question-id-' . $question->getId() . '-' . $optionId, 'title' => $question->getText() . ' (' . $optionPerOptionId[$optionId]->getText() . ')'];
 				}
 			} else {
-				$header[] = $question->getText();
+				$header[] = ['id' => 'question-id-' . $question->getId(), 'title' => $question->getText()];
 			}
 
 			$questionPerQuestionId[$question->getId()] = $question;
@@ -300,6 +301,8 @@ class SubmissionService {
 		// Process each answers
 		foreach ($submissionEntities as $submission) {
 			$row = [];
+
+			$row[] = $submission->getId();
 
 			// User
 			$user = $this->userManager->get($submission->getUserId());
@@ -388,7 +391,7 @@ class SubmissionService {
 	}
 
 	/**
-	 * @param array<int, string> $header
+	 * @param array<int, array{id: string, title: string}> $header
 	 * @param list<non-empty-list<array{columns?: list<mixed|string>, label?: string, url?: string}|mixed|null|string>> $data
 	 */
 	private function exportData(array $header, array $data, string $fileFormat, ?File $file = null): string {
@@ -411,34 +414,120 @@ class SubmissionService {
 		}
 
 		$activeWorksheet = $spreadsheet->getSheet(0);
-		foreach ($header as $columnIndex => $value) {
-			$activeWorksheet->setCellValue([$columnIndex + 1, 1], $value);
+
+		// Set column IDs in a hidden row
+		$activeWorksheet->getRowDimension(2)->setVisible(false);
+
+		// Get existing header
+		$existingHeaderIds = [];
+		$highestColumn = $activeWorksheet->getHighestColumn();
+		$highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+		for ($col = 1; $col <= $highestColumnIndex; $col++) {
+			$id = $activeWorksheet->getCell([$col, 2])->getValue();
+			if ($id) {
+				$existingHeaderIds[$id] = $col;
+			}
 		}
-		foreach ($data as $rowIndex => $rowData) {
-			$column = 1;
-			foreach ($rowData as $value) {
-				$row = $rowIndex + 2;
+
+		$newHeaderIds = array_column($header, 'id');
+		$newHeaderTitles = array_column($header, 'title');
+
+		// Sync Columns
+		$colsToDelete = array_diff(array_keys($existingHeaderIds), $newHeaderIds);
+		// Sort columns to delete by index descending
+		$colsToDeleteIndices = [];
+		foreach ($colsToDelete as $colId) {
+			if (isset($existingHeaderIds[$colId])) {
+				$colsToDeleteIndices[] = $existingHeaderIds[$colId];
+			}
+		}
+		rsort($colsToDeleteIndices);
+
+		foreach ($colsToDeleteIndices as $colIndex) {
+			$activeWorksheet->removeColumnByIndex($colIndex, 1);
+		}
+
+		// Write header
+		foreach ($header as $columnIndex => $headerItem) {
+			$activeWorksheet->setCellValue([$columnIndex + 1, 2], $headerItem['id']);
+			$activeWorksheet->setCellValue([$columnIndex + 1, 1], $headerItem['title']);
+		}
+
+		// Get existing submissions
+		$existingSubmissionIds = [];
+		$highestRow = $activeWorksheet->getHighestRow();
+		$submissionIdColIndex = array_search('submission_id', $newHeaderIds);
+		$submissionIdCol = $submissionIdColIndex !== false ? $submissionIdColIndex + 1 : 0;
+
+		if ($submissionIdCol) {
+			for ($row = 3; $row <= $highestRow; $row++) {
+				$submissionId = $activeWorksheet->getCell([$submissionIdCol, $row])->getValue();
+				if ($submissionId) {
+					$existingSubmissionIds[(string)$submissionId] = $row;
+				}
+			}
+		}
+
+		$newSubmissionIds = [];
+		if ($submissionIdColIndex !== false) {
+			$newSubmissionIds = array_map('strval', array_column($data, $submissionIdColIndex));
+		}
+
+		// Sync Rows
+		$rowsToDelete = array_diff(array_keys($existingSubmissionIds), $newSubmissionIds);
+		$deletedCount = 0;
+		foreach ($rowsToDelete as $submissionId) {
+			$rowIndex = $existingSubmissionIds[$submissionId];
+			$activeWorksheet->removeRow($rowIndex - $deletedCount, 1);
+			$deletedCount++;
+		}
+
+		// Re-map existing submission rows after deletion
+		$existingSubmissionIds = [];
+		$highestRow = $activeWorksheet->getHighestRow();
+		if ($submissionIdCol) {
+			for ($row = 3; $row <= $highestRow; $row++) {
+				$submissionId = $activeWorksheet->getCell([$submissionIdCol, $row])->getValue();
+				if ($submissionId) {
+					$existingSubmissionIds[(string)$submissionId] = $row;
+				}
+			}
+		}
+
+		// Update/Append data
+		foreach ($data as $rowData) {
+			$submissionId = (string)$rowData[$submissionIdColIndex];
+			$row = $existingSubmissionIds[$submissionId] ?? null;
+
+			if ($row === null) {
+				// Append new row
+				$row = $activeWorksheet->getHighestRow() + 1;
+			}
+
+			$dataIndex = 0;
+			$columnIndex = 1;
+			while ($dataIndex < count($rowData)) {
+				$value = $rowData[$dataIndex];
 
 				if (is_array($value) && isset($value['label'])) { // file question type
-					$activeWorksheet->getCell([$column, $row])
+					$activeWorksheet->getCell([$columnIndex, $row])
 						->setValueExplicit($value['label'])
 						->getHyperlink()
 						->setUrl($value['url']);
-
-					$activeWorksheet->getStyle([$column, $row])
+					$activeWorksheet->getStyle([$columnIndex, $row])
 						->getAlignment()
 						->setWrapText(true);
+					$columnIndex++;
 				} elseif (is_array($value) && isset($value['columns'])) { // grid question type
 					foreach ($value['columns'] as $nestedValue) {
-						$this->setCellValue($activeWorksheet, $column, $row, $nestedValue, $fileFormat);
-						$column++;
+						$this->setCellValue($activeWorksheet, $columnIndex, $row, $nestedValue, $fileFormat);
+						$columnIndex++;
 					}
-					continue; // no need to increment the column one more time
 				} else {
-					$this->setCellValue($activeWorksheet, $column, $row, $value, $fileFormat);
+					$this->setCellValue($activeWorksheet, $columnIndex, $row, $value, $fileFormat);
+					$columnIndex++;
 				}
-
-				$column++;
+				$dataIndex++;
 			}
 		}
 
