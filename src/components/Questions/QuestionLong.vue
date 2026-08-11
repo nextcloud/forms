@@ -20,7 +20,7 @@
 				:placeholder="submissionInputPlaceholder"
 				:disabled="!readOnly"
 				:required="isRequired"
-				:value="values[0]"
+				:value="textareaValue"
 				dir="auto"
 				class="question__text"
 				:maxlength="maxStringLengths.answerText"
@@ -37,11 +37,13 @@
 	</Question>
 </template>
 
-<script>
+<script lang="ts">
+import { t } from '@nextcloud/l10n'
+import { defineComponent } from 'vue'
 import Question from './Question.vue'
 import QuestionMixin from '../../mixins/QuestionMixin.ts'
 
-export default {
+export default defineComponent({
 	name: 'QuestionLong',
 
 	components: {
@@ -53,7 +55,7 @@ export default {
 
 	data() {
 		return {
-			height: 1,
+			height: 1 as number,
 		}
 	},
 
@@ -63,6 +65,11 @@ export default {
 				return this.answerType.submitPlaceholder
 			}
 			return this.answerType.createPlaceholder
+		},
+
+		textareaValue(): string | number | readonly string[] | null | undefined {
+			return this.values[0] as
+				string | number | readonly string[] | null | undefined
 		},
 	},
 
@@ -79,7 +86,7 @@ export default {
 	},
 
 	methods: {
-		async validate() {
+		async validate(): Promise<boolean> {
 			if (
 				this.isRequired
 				&& (this.values.length === 0 || this.values[0] === '')
@@ -92,13 +99,13 @@ export default {
 			return true
 		},
 
-		onInput() {
-			const textarea = this.$refs.textarea
+		onInput(): void {
+			const textarea = this.$refs.textarea as HTMLTextAreaElement
 			this.$emit('update:values', [textarea.value])
 		},
 
-		autoSizeText() {
-			const textarea = this.$refs.textarea
+		autoSizeText(): void {
+			const textarea = this.$refs.textarea as HTMLTextAreaElement | undefined
 			if (!textarea) {
 				return
 			}
@@ -106,11 +113,11 @@ export default {
 			textarea.style.cssText = `height: ${textarea.scrollHeight + 28}px`
 		},
 
-		onKeydownCtrlEnter(event) {
+		onKeydownCtrlEnter(event: KeyboardEvent): void {
 			this.$emit('keydown', event)
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

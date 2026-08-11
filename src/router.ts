@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 
 import { generateUrl } from '@nextcloud/router'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -38,7 +38,7 @@ const routes = [
 				path: '',
 				name: 'results',
 				props: { default: true },
-				redirect: (to) => {
+				redirect: (to: RouteLocationNormalized) => {
 					const validViews = ['summary', 'responses']
 					const storedView = localStorage.getItem(
 						`nextcloud_forms_${to.params.hash as string}_activeResponseView`,

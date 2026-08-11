@@ -155,14 +155,19 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { PropType } from 'vue'
+
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
+import { t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
+import { defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
 
-export default {
+export default defineComponent({
 	name: 'ResultsSummary',
 
 	components: {
@@ -171,12 +176,12 @@ export default {
 
 	props: {
 		submissions: {
-			type: Array,
+			type: Array as PropType<any[]>,
 			required: true,
 		},
 
 		question: {
-			type: Object,
+			type: Object as PropType<any>,
 			required: true,
 		},
 	},
@@ -184,6 +189,7 @@ export default {
 	setup() {
 		return {
 			IconFile,
+			t,
 		}
 	},
 
@@ -247,7 +253,7 @@ export default {
 			// Build list of question options
 			let questionOptionsStats
 			if (this.question.type !== 'linearscale') {
-				questionOptionsStats = this.question.options.map((option) => ({
+				questionOptionsStats = this.question.options.map((option: any) => ({
 					...option,
 					count: 0,
 					percentage: 0,
@@ -290,7 +296,7 @@ export default {
 			// Go through submissions to check which options have how many responses
 			this.submissions.forEach((submission) => {
 				const answers = submission.answers.filter(
-					(answer) => answer.questionId === this.question.id,
+					(answer: any) => answer.questionId === this.question.id,
 				)
 				if (!answers.length) {
 					// Record 'No response'
@@ -298,9 +304,9 @@ export default {
 				}
 
 				// Check question options to find which needs to be increased
-				answers.forEach((answer) => {
+				answers.forEach((answer: any) => {
 					const optionsStatIndex = questionOptionsStats.findIndex(
-						(option) => option.text === answer.text,
+						(option: any) => option.text === answer.text,
 					)
 					if (optionsStatIndex < 0) {
 						if (this.question.extraSettings?.allowOtherAnswer) {
@@ -320,7 +326,7 @@ export default {
 
 			// Sort options by response count
 			if (this.question.type !== 'linearscale') {
-				questionOptionsStats.sort((object1, object2) => {
+				questionOptionsStats.sort((object1: any, object2: any) => {
 					return object2.count - object1.count
 				})
 			} else {
@@ -328,14 +334,14 @@ export default {
 				questionOptionsStats.push(questionOptionsStats.shift())
 			}
 
-			questionOptionsStats.forEach((questionOptionsStat) => {
+			questionOptionsStats.forEach((questionOptionsStat: any) => {
 				// Fill percentage values
 				questionOptionsStat.percentage = Math.round(
 					(100 * questionOptionsStat.count) / this.submissions.length,
 				)
 				// Mark all best results
 				const maxCount = Math.max(
-					...questionOptionsStats.map((option) => option.count),
+					...questionOptionsStats.map((option: any) => option.count),
 				)
 				questionOptionsStat.best = questionOptionsStat.count === maxCount
 			})
@@ -348,7 +354,7 @@ export default {
 		 */
 		rankingStats() {
 			const n = this.question.options.length
-			const stats = {}
+			const stats: Record<string | number, any> = {}
 
 			for (const opt of this.question.options) {
 				stats[opt.id] = {
@@ -362,11 +368,11 @@ export default {
 
 			for (const submission of this.submissions) {
 				const answer = submission.answers.find(
-					(a) => a.questionId === this.question.id,
+					(a: any) => a.questionId === this.question.id,
 				)
 				if (!answer) continue
 				const ranked = JSON.parse(answer.text)
-				ranked.forEach((optionId, index) => {
+				ranked.forEach((optionId: string | number, index: number) => {
 					if (stats[optionId]) {
 						stats[optionId].bordaTotal += n - index
 						stats[optionId].rankSum += index + 1
@@ -376,16 +382,16 @@ export default {
 			}
 
 			const result = Object.values(stats)
-				.map((s) => ({
+				.map((s: any) => ({
 					...s,
 					avgRank: s.count > 0 ? (s.rankSum / s.count).toFixed(1) : '-',
 				}))
-				.sort((a, b) => b.bordaTotal - a.bordaTotal)
+				.sort((a: any, b: any) => b.bordaTotal - a.bordaTotal)
 
 			// Mark best (highest Borda score)
 			if (result.length > 0 && result[0].bordaTotal > 0) {
 				const best = result[0].bordaTotal
-				result.forEach((o) => {
+				result.forEach((o: any) => {
 					o.best = o.bordaTotal === best
 				})
 			}
@@ -400,18 +406,18 @@ export default {
 
 		gridColumns() {
 			return this.question.options.filter(
-				(option) => option.optionType === OptionType.Column,
+				(option: any) => option.optionType === OptionType.Column,
 			)
 		},
 
 		gridRows() {
 			return this.question.options.filter(
-				(option) => option.optionType === OptionType.Row,
+				(option: any) => option.optionType === OptionType.Row,
 			)
 		},
 
 		gridValue() {
-			const matrix = {}
+			const matrix: Record<string, Record<string, any>> = {}
 			for (const row of this.gridRows) {
 				for (const column of this.gridColumns) {
 					matrix[row.id] = matrix[row.id] || {}
@@ -424,9 +430,9 @@ export default {
 				}
 			}
 
-			const answers = []
-			this.submissions.forEach((submission) => {
-				submission.answers.forEach((answer) => {
+			const answers: any[] = []
+			this.submissions.forEach((submission: any) => {
+				submission.answers.forEach((answer: any) => {
 					if (answer.questionId === this.question.id) {
 						answers.push(answer)
 					}
@@ -491,8 +497,8 @@ export default {
 						=== GridCellType.Checkbox
 					) {
 						totalAnswersCount = Object.entries(matrix[rowId])
-							.map(([, cell]) => cell.answersCount)
-							.reduce((a, b) => a + b, 0)
+							.map(([, cell]: [string, any]) => cell.answersCount)
+							.reduce((a: number, b: number) => a + b, 0)
 					}
 					if (totalAnswersCount === 0) {
 						totalAnswersCount = 1
@@ -524,15 +530,15 @@ export default {
 
 		// For text answers like short answer and long text
 		answers() {
-			const answersModels = []
+			const answersModels: any[] = []
 
 			// Also record 'No response'
 			let noResponseCount = 0
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach((submission) => {
+			this.submissions.forEach((submission: any) => {
 				const answers = submission.answers.filter(
-					(answer) => answer.questionId === this.question.id,
+					(answer: any) => answer.questionId === this.question.id,
 				)
 				if (!answers.length) {
 					// Record 'No response'
@@ -550,7 +556,7 @@ export default {
 						text: `${answers[0].text} - ${answers[1].text}`,
 					})
 				} else {
-					answers.forEach((answer) => {
+					answers.forEach((answer: any) => {
 						if (answer.fileId) {
 							answersModels.push({
 								id: answer.id,
@@ -586,7 +592,7 @@ export default {
 			return answersModels
 		},
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

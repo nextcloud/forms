@@ -77,13 +77,16 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+import type { PropType } from 'vue'
+
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
+import { defineComponent } from 'vue'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcHighlight from '@nextcloud/vue/components/NcHighlight'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 
-export default {
+export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Answer',
 	components: {
@@ -94,7 +97,10 @@ export default {
 
 	props: {
 		answers: {
-			type: Array,
+			type: Array as PropType<
+				Array<{ id: number; text: string; url?: string }>
+			>,
+
 			required: false,
 			default: () => [],
 		},
@@ -122,19 +128,22 @@ export default {
 		},
 
 		gridColumns: {
-			type: Array,
+			type: Array as PropType<Array<{ id: number; text: string }>>,
 			required: false,
 			default: () => [],
 		},
 
 		gridRows: {
-			type: Array,
+			type: Array as PropType<Array<{ id: number; text: string }>>,
 			required: false,
 			default: () => [],
 		},
 
 		gridValue: {
-			type: Object,
+			type: Object as PropType<
+				Record<string, string[] | string | Record<string, string | number>>
+			>,
+
 			required: false,
 			default: () => null,
 		},
@@ -151,7 +160,7 @@ export default {
 			IconFile,
 		}
 	},
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -4,13 +4,19 @@
  */
 
 {
-	"extends": "@vue/tsconfig",
-	"include": ["src/**/*", "*.ts"],
+	"extends": "@vue/tsconfig/tsconfig.dom.json",
 	"compilerOptions": {
-		"allowJs": true,
 		"target": "ESNext",
 		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"types": ["vite/client", "node"]
-	}
+		"moduleResolution": "bundler",
+		"strict": true,
+		"jsx": "preserve",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"types": ["@nextcloud/typings"]
+	},
+	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
+	"exclude": ["node_modules"]
 }
