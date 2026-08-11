@@ -265,10 +265,10 @@ import QRDialog from '../QRDialog.vue'
 import SharingSearchDiv from './SharingSearchDiv.vue'
 import SharingShareDiv from './SharingShareDiv.vue'
 import FormsIcon from '../../../img/forms-dark.svg?raw'
-import PermissionTypes from '../../mixins/PermissionTypes.ts'
-import ShareLinkMixin from '../../mixins/ShareLinkMixin.ts'
-import ShareTypes from '../../mixins/ShareTypes.ts'
+import { useShareLink } from '../../composables/useShareLink.ts'
+import { useShareTypes } from '../../composables/useShareTypes.ts'
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
+import { PERMISSION_TYPES } from '../../models/Permissions.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
@@ -313,8 +313,6 @@ export default defineComponent({
 		SharingShareDiv,
 	},
 
-	mixins: [ShareTypes, ShareLinkMixin, PermissionTypes],
-
 	props: {
 		form: {
 			type: Object,
@@ -335,6 +333,18 @@ export default defineComponent({
 	emits: ['addShare', 'updateShare', 'removeShare', 'update:formProp'],
 
 	setup() {
+		const { SHARE_TYPES } = useShareTypes()
+		const {
+			copyEmbeddingCode,
+			copyLink,
+			getInternalShareLink,
+			getPublicShareLink,
+			isEmbeddingAllowed,
+		} = useShareLink({
+			PERMISSION_TYPES,
+			SHARE_TYPES,
+		})
+
 		return {
 			t,
 			FormsIcon,
@@ -348,6 +358,12 @@ export default defineComponent({
 			IconAccountMultiple,
 			IconQr,
 			IconRefresh,
+			SHARE_TYPES,
+			copyEmbeddingCode,
+			copyLink,
+			getInternalShareLink,
+			getPublicShareLink,
+			isEmbeddingAllowed,
 		}
 	},
 
@@ -492,7 +508,7 @@ export default defineComponent({
 				...share,
 				permissions: [
 					...share.permissions,
-					this.PERMISSION_TYPES.PERMISSION_EMBED,
+					PERMISSION_TYPES.PERMISSION_EMBED,
 				],
 			})
 		},

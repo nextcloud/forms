@@ -232,6 +232,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
+import { ref } from 'vue'
 import { defineComponent } from 'vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -245,13 +246,13 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
-import PermissionTypes from '../mixins/PermissionTypes.ts'
-import ViewsMixin from '../mixins/ViewsMixin.ts'
+import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import {
 	FormState,
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
+import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -332,12 +333,6 @@ export default defineComponent({
 		TopBar,
 	},
 
-	mixins: [PermissionTypes, ViewsMixin],
-
-	/*
-	 * This is used to confirm that the user wants to leave the page
-	 * if the form is unsubmitted.
-	 */
 	async beforeRouteUpdate() {
 		// This navigation guard is called when the route parameters changed (e.g. form hash)
 		// continue with the navigation if there are no changes or the user confirms to leave the form
@@ -371,11 +366,42 @@ export default defineComponent({
 			type: String,
 			default: '',
 		},
+
+		hash: {
+			type: String,
+			default: '',
+		},
+
+		form: {
+			type: Object,
+			required: true,
+		},
+
+		publicView: {
+			type: Boolean,
+			default: false,
+		},
+
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
 	},
 
-	setup() {
+	emits: ['update:form', 'open-sharing'],
+
+	setup(props, { emit }) {
+		const title = ref(null)
+		const viewForm = useViewForm({
+			form: () => props.form,
+			emit,
+			titleRef: title,
+		})
+
 		// Non reactive properties
 		return {
+			...viewForm,
+			title,
 			IconCheckSvg: IconCheck,
 			IconRefreshSvg: IconRefresh,
 			IconSendSvg: IconSend,
@@ -620,7 +646,7 @@ export default defineComponent({
 				this.submissionId
 				&& (this.form.allowEditSubmissions
 					|| this.form.permissions.includes(
-						this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+						PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 					))
 			) {
 				this.fetchSubmission()

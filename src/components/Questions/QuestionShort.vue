@@ -88,7 +88,11 @@ import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.ts'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import validationTypes from '../../models/ValidationTypes.ts'
 import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
@@ -104,11 +108,14 @@ export default defineComponent({
 		Question,
 	},
 
-	mixins: [QuestionMixin],
-	emits: ['update:values'],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, 'update:values'],
 
-	setup() {
+	setup(props, { emit }) {
+		const question = useQuestion(props, { emit })
+
 		return {
+			...question,
 			IconRegex,
 			t,
 		}

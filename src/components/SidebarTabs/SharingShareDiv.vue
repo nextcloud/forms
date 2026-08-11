@@ -56,8 +56,8 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcAvatar from '@nextcloud/vue/components/NcAvatar'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
-import PermissionTypes from '../../mixins/PermissionTypes.ts'
-import ShareTypes from '../../mixins/ShareTypes.ts'
+import { useShareTypes } from '../../composables/useShareTypes.ts'
+import { PERMISSION_TYPES } from '../../models/Permissions.ts'
 
 interface ShareLike {
 	id: number
@@ -77,8 +77,6 @@ export default defineComponent({
 		NcActionSeparator,
 		NcAvatar,
 	},
-
-	mixins: [PermissionTypes, ShareTypes],
 
 	props: {
 		share: {
@@ -100,29 +98,30 @@ export default defineComponent({
 	emits: ['removeShare', 'update:share'],
 
 	setup() {
+		const { SHARE_TYPES } = useShareTypes()
+
 		return {
 			t,
 			IconClose,
+			SHARE_TYPES,
 		}
 	},
 
 	computed: {
 		canAccessResults(): boolean {
 			return this.share.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+				PERMISSION_TYPES.PERMISSION_RESULTS,
 			)
 		},
 
 		canDeleteResults(): boolean {
 			return this.share.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 			)
 		},
 
 		canEditForm(): boolean {
-			return this.share.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_EDIT,
-			)
+			return this.share.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
 		},
 
 		isNoUser(): boolean {
@@ -159,12 +158,12 @@ export default defineComponent({
 			if (hasPermission === false) {
 				// ensure to remove the delete permission if results permission is dropped
 				this.updatePermission(
-					this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+					PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 					false,
 				)
 			}
 			return this.updatePermission(
-				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+				PERMISSION_TYPES.PERMISSION_RESULTS,
 				hasPermission,
 			)
 		},
@@ -174,7 +173,7 @@ export default defineComponent({
 		 */
 		updatePermissionDeleteResults(hasPermission: boolean): void {
 			return this.updatePermission(
-				this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 				hasPermission,
 			)
 		},
@@ -184,7 +183,7 @@ export default defineComponent({
 		 */
 		updatePermissionEdit(hasPermission: boolean): void {
 			return this.updatePermission(
-				this.PERMISSION_TYPES.PERMISSION_EDIT,
+				PERMISSION_TYPES.PERMISSION_EDIT,
 				hasPermission,
 			)
 		},

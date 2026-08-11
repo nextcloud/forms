@@ -42,7 +42,7 @@ import { defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PillMenu from './PillMenu.vue'
-import PermissionTypes from '../mixins/PermissionTypes.ts'
+import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 
 type TopBarViewId = 'submit' | 'edit' | 'results'
@@ -83,8 +83,6 @@ export default defineComponent({
 		NcButton,
 		PillMenu,
 	},
-
-	mixins: [PermissionTypes],
 
 	props: {
 		archived: {
@@ -153,19 +151,19 @@ export default defineComponent({
 		},
 
 		canSubmit(): boolean {
-			return this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+			return this.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT)
 		},
 
 		canEdit(): boolean {
 			return (
-				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_EDIT)
+				this.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
 				&& !this.archived
 			)
 		},
 
 		canSeeResults(): boolean {
 			return (
-				this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_RESULTS)
+				this.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS)
 				|| this.submissionCount > 0
 			)
 		},
@@ -178,7 +176,7 @@ export default defineComponent({
 		canOnlySubmit(): boolean {
 			return (
 				this.permissions.length === 1
-				&& this.permissions.includes(this.PERMISSION_TYPES.PERMISSION_SUBMIT)
+				&& this.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT)
 				&& this.submissionCount === 0
 			)
 		},

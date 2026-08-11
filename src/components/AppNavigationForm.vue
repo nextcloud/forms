@@ -123,8 +123,8 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import FormsIcon from '../../img/forms-dark.svg?raw'
-import PermissionTypes from '../mixins/PermissionTypes.ts'
 import { FormState } from '../models/Constants.ts'
+import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 
 type NavigationTarget = 'submit' | 'formRoot'
@@ -140,8 +140,6 @@ export default defineComponent({
 		NcListItem,
 		NcLoadingIcon,
 	},
-
-	mixins: [PermissionTypes],
 
 	props: {
 		form: {
@@ -186,16 +184,13 @@ export default defineComponent({
 
 	computed: {
 		canEdit(): boolean {
-			return this.form.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_EDIT,
-			)
+			return this.form.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
 		},
 
 		canSeeResults(): boolean {
 			return (
-				this.form.permissions.includes(
-					this.PERMISSION_TYPES.PERMISSION_RESULTS,
-				) || (this.form.submissionCount ?? 0) > 0
+				this.form.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS)
+				|| (this.form.submissionCount ?? 0) > 0
 			)
 		},
 

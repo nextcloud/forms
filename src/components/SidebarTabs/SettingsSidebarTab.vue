@@ -97,7 +97,7 @@
 			v-show="hasMaxSubmissions && !formArchived"
 			class="settings-div--indent">
 			<NcInputField
-				v-model="maxSubmissionsValue"
+				:modelValue="maxSubmissionsValue"
 				type="number"
 				:min="1"
 				:disabled="locked"
@@ -292,7 +292,7 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
-import ShareTypes from '../../mixins/ShareTypes.ts'
+import { useShareTypes } from '../../composables/useShareTypes.ts'
 import { FormState } from '../../models/Constants.ts'
 
 const formsAppName = 'forms'
@@ -329,8 +329,6 @@ export default defineComponent({
 		ClickOutside,
 	},
 
-	mixins: [ShareTypes],
-
 	inject: ['$markdownit'],
 
 	props: {
@@ -353,8 +351,11 @@ export default defineComponent({
 	emits: ['update:formProp'],
 
 	setup() {
+		const { SHARE_TYPES } = useShareTypes()
+
 		return {
 			t,
+			SHARE_TYPES,
 		}
 	},
 
@@ -387,8 +388,8 @@ export default defineComponent({
 			/** If custom submission message is shown as input or rendered markdown */
 			editMessage: false,
 			svgLockOpen,
-			confirmationEmailSubject: this.form?.confirmationEmailSubject || '',
-			confirmationEmailBody: this.form?.confirmationEmailBody || '',
+			confirmationEmailSubject: '',
+			confirmationEmailBody: '',
 		}
 	},
 
@@ -460,14 +461,8 @@ export default defineComponent({
 			)
 		},
 
-		maxSubmissionsValue: {
-			get(): number {
-				return this.form.maxSubmissions ?? 1
-			},
-
-			set(value: number): void {
-				this.$emit('update:formProp', 'maxSubmissions', value)
-			},
+		maxSubmissionsValue(): number {
+			return this.form.maxSubmissions ?? 1
 		},
 
 		isExpired(): boolean {
@@ -592,12 +587,20 @@ export default defineComponent({
 	},
 
 	watch: {
-		'form.confirmationEmailSubject': function (val: string | null | undefined) {
-			this.confirmationEmailSubject = val || ''
+		'form.confirmationEmailSubject': {
+			handler(val: string | null | undefined) {
+				this.confirmationEmailSubject = val || ''
+			},
+
+			immediate: true,
 		},
 
-		'form.confirmationEmailBody': function (val: string | null | undefined) {
-			this.confirmationEmailBody = val || ''
+		'form.confirmationEmailBody': {
+			handler(val: string | null | undefined) {
+				this.confirmationEmailBody = val || ''
+			},
+
+			immediate: true,
 		},
 
 		confirmationEmailQuestions: {
@@ -700,7 +703,7 @@ export default defineComponent({
 		onMaxSubmissionsValueChange(value: string | number): void {
 			const parsedValue = Number(value)
 			if (parsedValue > 0) {
-				this.$emit('update:formProp', 'maxSubmissions', value)
+				this.$emit('update:formProp', 'maxSubmissions', parsedValue)
 			}
 		},
 

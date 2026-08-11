@@ -174,8 +174,8 @@ import AppNavigationForm from './components/AppNavigationForm.vue'
 import ArchivedFormsModal from './components/ArchivedFormsModal.vue'
 import Sidebar from './views/Sidebar.vue'
 import FormsIcon from '../img/forms-dark.svg?raw'
-import { PERMISSION_TYPES } from './mixins/PermissionTypes.ts'
 import { FormState } from './models/Constants.ts'
+import { PERMISSION_TYPES } from './models/Permissions.ts'
 import logger from './utils/Logger.ts'
 import OcsResponse2Data from './utils/OcsResponse2Data.ts'
 
@@ -228,7 +228,10 @@ export default defineComponent({
 		})
 
 		const routeAllowed = computed<boolean>(() => {
-			if (loading.value && loadState(formsAppName, 'formId') === 'invalid') {
+			if (
+				loading.value
+				&& loadState(formsAppName, 'formId', 'invalid') === 'invalid'
+			) {
 				return false
 			}
 
@@ -273,8 +276,6 @@ export default defineComponent({
 		})
 
 		const updateSelectedForm = (form: FormsForm): void => {
-			sidebarOpened.value = false
-
 			const index = forms.value.findIndex((f) => f.hash === form.hash)
 			if (index > -1) {
 				forms.value[index] = form
@@ -545,6 +546,11 @@ export default defineComponent({
 				}
 			},
 		)
+
+		// Close sidebar when a different form is selected
+		watch(routeHash, () => {
+			sidebarOpened.value = false
+		})
 
 		const onLastUpdatedByEventBus = (id: number): void => {
 			const formIndex = forms.value.findIndex((form) => form.id === id)

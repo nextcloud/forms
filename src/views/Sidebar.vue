@@ -19,8 +19,8 @@
 				<NcIconSvgWrapper :svg="IconShareVariant" />
 			</template>
 			<SharingSidebarTab
-				:form="form"
-				:locked="isFormLocked"
+				:form="sidebarForm"
+				:locked="isSidebarLocked"
 				:lockedUntil="lockedUntilFormatted"
 				@update:formProp="onPropertyChange"
 				@addShare="onAddShare"
@@ -37,14 +37,14 @@
 				<NcIconSvgWrapper :svg="IconSettings" />
 			</template>
 			<SettingsSidebarTab
-				:form="form"
-				:locked="isFormLocked"
+				:form="sidebarForm"
+				:locked="isSidebarLocked"
 				:lockedUntil="lockedUntilFormatted"
 				@update:formProp="onPropertyChange" />
 		</NcAppSidebarTab>
 
 		<NcAppSidebarTab
-			v-if="form.allowComments"
+			v-if="sidebarAllowComments"
 			id="forms-comments"
 			:order="2"
 			:name="t('forms', 'Comments')">
@@ -63,6 +63,7 @@ import type { FormsShare } from '../models/Entities.d.ts'
 import IconComment from '@material-symbols/svg-400/outlined/comment.svg?raw'
 import IconSettings from '@material-symbols/svg-400/outlined/settings.svg?raw'
 import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
+import { getCurrentUser } from '@nextcloud/auth'
 import { emit } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
@@ -72,8 +73,8 @@ import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import SettingsSidebarTab from '../components/SidebarTabs/SettingsSidebarTab.vue'
 import SharingSidebarTab from '../components/SidebarTabs/SharingSidebarTab.vue'
-import PermissionTypes from '../mixins/PermissionTypes.ts'
-import ViewsMixin from '../mixins/ViewsMixin.ts'
+import { useViewForm } from '../composables/useViewForm.ts'
+import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 
 interface CommentsViewLike {
@@ -95,19 +96,30 @@ export default defineComponent({
 		SettingsSidebarTab,
 	},
 
-	mixins: [ViewsMixin, PermissionTypes],
-
 	props: {
 		active: {
 			type: String,
 			default: 'forms-sharing',
 		},
+
+		form: {
+			type: Object,
+			required: true,
+		},
+
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
 	},
 
-	emits: ['update:sidebarOpened', 'update:active'],
+	emits: ['update:sidebarOpened', 'update:active', 'update:form', 'open-sharing'],
 
-	setup() {
+	setup(props, { emit }) {
+		const viewForm = useViewForm({ form: () => props.form, emit })
+
 		return {
+			...viewForm,
 			t,
 			IconComment,
 			IconSettings,
@@ -118,23 +130,44 @@ export default defineComponent({
 	data() {
 		return {
 			commentsView: null as CommentsViewLike | null,
+			localShares: [...this.form.shares] as FormsShare[],
+			localFormOverrides: {} as Record<string, unknown>,
 		}
 	},
 
 	computed: {
 		canEdit(): boolean {
-			return this.form?.permissions?.includes(
-				this.PERMISSION_TYPES.PERMISSION_EDIT,
+			return this.form?.permissions?.includes(PERMISSION_TYPES.PERMISSION_EDIT)
+		},
+
+		sidebarForm(): Record<string, unknown> {
+			return {
+				...this.form,
+				...this.localFormOverrides,
+				shares: this.localShares,
+			}
+		},
+
+		sidebarAllowComments(): boolean {
+			return Boolean(this.sidebarForm.allowComments)
+		},
+
+		isSidebarLocked(): boolean {
+			const lockedUntil = this.sidebarForm.lockedUntil
+			const lockedBy = this.sidebarForm.lockedBy
+			return (
+				lockedUntil === 0
+				|| (Number(lockedUntil || 0) > moment().unix()
+					&& lockedBy !== getCurrentUser().uid)
 			)
 		},
 
 		lockedUntilFormatted(): string {
-			if (this.form.lockedUntil === 0 || this.form.lockedUntil === null) {
+			const lockedUntil = this.sidebarForm.lockedUntil
+			if (lockedUntil === 0 || lockedUntil === null) {
 				return ''
 			}
-			return moment(this.form.lockedUntil, 'X')
-				.locale(window.OC.getLanguage())
-				.fromNow()
+			return moment(lockedUntil, 'X').locale(window.OC.getLanguage()).fromNow()
 		},
 
 		sidebarTitle(): string {
@@ -147,7 +180,23 @@ export default defineComponent({
 	},
 
 	watch: {
+		form: function (nextForm: Record<string, unknown>) {
+			const nextOverrides = Object.fromEntries(
+				Object.entries(this.localFormOverrides).filter(
+					([key, value]) => nextForm[key] !== value,
+				),
+			)
+			this.localFormOverrides = nextOverrides
+		},
+
+		'form.shares': function (shares: FormsShare[]) {
+			this.localShares = [...shares]
+		},
+
 		'form.id': function (newId: number) {
+			this.localShares = [...this.form.shares]
+			this.localFormOverrides = {}
+
 			// Only update comments when the Comments tab is active
 			if (this.active !== 'forms-comments') {
 				return
@@ -201,7 +250,7 @@ export default defineComponent({
 		// Mount or update the Comments view inside the sidebar
 		async setupComments(): Promise<void> {
 			// comments disabled for this form
-			if (!this.form.allowComments) {
+			if (!this.sidebarForm.allowComments) {
 				return
 			}
 
@@ -232,10 +281,10 @@ export default defineComponent({
 				}
 
 				this.commentsView = new commentsCtor('forms', {
-					propsData: { resourceId: this.form.id },
+					propsData: { resourceId: this.sidebarForm.id },
 				})
 			}
-			await this.commentsView.update(this.form.id)
+			await this.commentsView.update(this.sidebarForm.id)
 			this.commentsView.$mount(el)
 		},
 
@@ -250,8 +299,18 @@ export default defineComponent({
 		 * @param newVal The new Property value
 		 */
 		onPropertyChange(property: string, newVal: unknown): void {
-			;(this.form as unknown as Record<string, unknown>)[property] = newVal
-			this.saveFormProperty(property)
+			this.localFormOverrides = {
+				...this.localFormOverrides,
+				[property]: newVal,
+			}
+
+			this.$emit('update:form', {
+				...this.form,
+				...this.localFormOverrides,
+				shares: this.localShares,
+			})
+
+			this.saveFormPropertyValue(property, newVal)
 		},
 
 		/**
@@ -260,27 +319,32 @@ export default defineComponent({
 		 * @param share The respective share object
 		 */
 		onAddShare(share: FormsShare): void {
-			this.form.shares.push(share)
+			const newShares = [...this.localShares, share]
+			this.localShares = newShares
+			this.$emit('update:form', { ...this.form, shares: newShares })
 			emit('forms:last-updated:set', this.form.id)
 		},
 
 		onRemoveShare(share: ShareWithId): void {
-			const index = this.form.shares.findIndex(
+			const newShares = this.localShares.filter(
 				(search): boolean =>
-					'id' in (search as unknown as Record<string, unknown>)
-					&& (search as ShareWithId).id === share.id,
+					!('id' in (search as unknown as Record<string, unknown>))
+					|| (search as ShareWithId).id !== share.id,
 			)
-			this.form.shares.splice(index, 1)
+			this.localShares = newShares
+			this.$emit('update:form', { ...this.form, shares: newShares })
 			emit('forms:last-updated:set', this.form.id)
 		},
 
 		onUpdateShare(share: ShareWithId): void {
-			const index = this.form.shares.findIndex(
-				(search): boolean =>
-					'id' in (search as unknown as Record<string, unknown>)
-					&& (search as ShareWithId).id === share.id,
+			const newShares = this.localShares.map((s) =>
+				'id' in (s as unknown as Record<string, unknown>)
+				&& (s as ShareWithId).id === share.id
+					? share
+					: s,
 			)
-			this.form.shares.splice(index, 1, share)
+			this.localShares = newShares
+			this.$emit('update:form', { ...this.form, shares: newShares })
 			emit('forms:last-updated:set', this.form.id)
 		},
 	},

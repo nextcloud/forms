@@ -126,7 +126,11 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwit
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.ts'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
 
 type LinearScaleExtraSettings = {
 	optionsLowest?: number | null
@@ -146,11 +150,14 @@ export default defineComponent({
 		Question,
 	},
 
-	mixins: [QuestionMixin],
-	emits: ['update:values'],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, 'update:values'],
 
-	setup() {
+	setup(props, { emit }) {
+		const question = useQuestion(props, { emit })
+
 		return {
+			...question,
 			IconPencil,
 			t,
 		}

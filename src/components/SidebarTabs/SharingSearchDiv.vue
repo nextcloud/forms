@@ -23,18 +23,12 @@
 
 <script lang="ts">
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
-import UserSearchMixin from '../../mixins/UserSearchMixin.ts'
+import { useUserSearch } from '../../composables/useUserSearch.ts'
 
 interface CurrentShareLike {
 	shareWith: string
-	shareType: number
-}
-
-interface SearchShareLike {
-	shareWith: string
-	displayName: string
 	shareType: number
 }
 
@@ -42,8 +36,6 @@ export default defineComponent({
 	components: {
 		NcSelectUsers,
 	},
-
-	mixins: [UserSearchMixin],
 
 	props: {
 		currentShares: {
@@ -69,37 +61,15 @@ export default defineComponent({
 
 	emits: ['addShare'],
 
-	setup() {
-		return {
-			t,
-		}
-	},
+	setup(props) {
+		const userSearch = useUserSearch()
+		const options = computed(() => {
+			const currentShares = props.currentShares as CurrentShareLike[]
+			const source = userSearch.isValidQuery.value
+				? userSearch.suggestions.value
+				: userSearch.recommendations.value
 
-	computed: {
-		/**
-		 * Multiselect options. Recommendations by default, direct search when search query is valid.
-		 * Filter out existing shares
-		 *
-		 * @return
-		 */
-		options(): SearchShareLike[] {
-			if (this.isValidQuery) {
-				// Suggestions without existing shares
-				const suggestions = this.suggestions as SearchShareLike[]
-				const currentShares = this.currentShares as CurrentShareLike[]
-				return suggestions.filter(
-					(item) =>
-						!currentShares.find(
-							(share) =>
-								share.shareWith === item.shareWith
-								&& share.shareType === item.shareType,
-						),
-				)
-			}
-			// Recommendations without existing shares
-			const recommendations = this.recommendations as SearchShareLike[]
-			const currentShares = this.currentShares as CurrentShareLike[]
-			return recommendations.filter(
+			return source.filter(
 				(item) =>
 					!currentShares.find(
 						(share) =>
@@ -107,14 +77,17 @@ export default defineComponent({
 							&& share.shareType === item.shareType,
 					),
 			)
-		},
+		})
+		const showLoadingCircle = computed(
+			() => props.showLoading || userSearch.loading.value,
+		)
 
-		/**
-		 * Show Loading if loading is either set by parent or by this module (search)
-		 */
-		showLoadingCircle(): boolean {
-			return this.showLoading || this.loading
-		},
+		return {
+			...userSearch,
+			options,
+			showLoadingCircle,
+			t,
+		}
 	},
 
 	mounted() {
@@ -128,15 +101,24 @@ export default defineComponent({
 		 *
 		 * @param share New share to share with, format still for multiselect.
 		 */
-		addShare(share: SearchShareLike | SearchShareLike[] | null): void {
+		addShare(share: unknown): void {
 			const selectedShare = Array.isArray(share) ? share[0] : share
-			if (!selectedShare) {
+			if (!selectedShare || typeof selectedShare !== 'object') {
 				return
 			}
+			if (!('shareWith' in selectedShare) || !('shareType' in selectedShare)) {
+				return
+			}
+
 			const newShare = {
-				shareWith: selectedShare.shareWith,
-				displayName: selectedShare.displayName,
-				shareType: selectedShare.shareType,
+				shareWith: String(selectedShare.shareWith),
+
+				displayName:
+					'displayName' in selectedShare
+						? String(selectedShare.displayName)
+						: String(selectedShare.shareWith),
+
+				shareType: Number(selectedShare.shareType),
 			}
 			this.$emit('addShare', newShare)
 		},
