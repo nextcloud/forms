@@ -22,6 +22,7 @@ use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\OCS\OCSException;
+use OCP\Config\IUserConfig;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotPermittedException;
@@ -63,6 +64,7 @@ class SubmissionService {
 		private readonly IUrlGenerator $urlGenerator,
 		private readonly OptionMapper $optionMapper,
 		private readonly IEmailValidator $emailValidator,
+		private readonly IUserConfig $userConfig,
 	) {
 		$this->currentUser = $userSession->getUser();
 	}
@@ -232,9 +234,9 @@ class SubmissionService {
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
-			$userTimezone = $this->config->getUserValue($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
+			$userTimezone = $this->userConfig->getValueString($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
 		} else {
-			$userTimezone = $this->config->getUserValue($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
+			$userTimezone = $this->userConfig->getValueString($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
 		}
 
 		// Process initial header

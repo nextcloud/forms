@@ -23,6 +23,7 @@ use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\Config\IUserConfig;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -59,6 +60,7 @@ class SubmissionServiceTest extends TestCase {
 	private IURLGenerator|MockObject $urlGenerator;
 	private UploadedFileMapper|MockObject $uploadedFileMapper;
 	private OptionMapper|MockObject $optionMapper;
+	private IUserConfig|MockObject $userConfig;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -74,6 +76,7 @@ class SubmissionServiceTest extends TestCase {
 		$this->userManager = $this->createMock(IUserManager::class);
 		$userSession = $this->createMock(IUserSession::class);
 		$this->tempManager = $this->createMock(ITempManager::class);
+		$this->userConfig = $this->createMock(IUserConfig::class);
 
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->any())
@@ -109,6 +112,7 @@ class SubmissionServiceTest extends TestCase {
 			$this->urlGenerator,
 			$this->optionMapper,
 			$this->emailValidator,
+			$this->userConfig,
 		);
 	}
 
@@ -750,8 +754,8 @@ file2.txt"
 			->with('default_timezone', 'UTC')
 			->willReturn('Europe/Berlin');
 
-		$this->config->expects($this->once())
-			->method('getUserValue')
+		$this->userConfig->expects($this->once())
+			->method('getValueString')
 			->with('currentUser', 'core', 'timezone', 'Europe/Berlin')
 			->willReturn('Europe/Berlin');
 
