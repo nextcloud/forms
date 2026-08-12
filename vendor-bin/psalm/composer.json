@@ -3,12 +3,12 @@
 		"optimize-autoloader": true,
 		"sort-packages": true,
 		"platform": {
-			"php": "8.1"
+			"php": "8.2"
 		}
 	},
 	"require-dev": {
 		"guzzlehttp/guzzle": "^8.0",
-		"nextcloud/ocp": "dev-stable32",
+		"nextcloud/ocp": "dev-stable33",
 		"vimeo/psalm": "^5.16"
 	}
 }
