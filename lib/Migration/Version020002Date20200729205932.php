@@ -27,14 +27,14 @@ class Version020002Date20200729205932 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('forms_v2_forms')) {
 			$schema->getTable('forms_v2_forms')
-				->changeColumn('description', [
+				->modifyColumn('description', [
 					'length' => 8192,
 				]);
 		}
 
 		if ($schema->hasTable('forms_v2_answers')) {
 			$schema->getTable('forms_v2_answers')
-				->changeColumn('text', [
+				->modifyColumn('text', [
 					'length' => 4096,
 				]);
 		}
