@@ -1,0 +1,29 @@
+{
+	"image": "ghcr.io/juliusknorr/nextcloud-dev-php82:latest",
+	"forwardPorts": [80],
+	"containerEnv": {
+		"NEXTCLOUD_AUTOINSTALL_APPS": "forms",
+		"XDEBUG_MODE": "debug"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"felixfbecker.php-intellisense",
+				"octref.vetur"
+			],
+			"settings": {
+				"php.suggest.basic": false,
+				"git.alwaysSignOff": true
+			}
+		}
+	},
+	"workspaceMount": "source=${localWorkspaceFolder},target=/var/www/html/apps-extra/forms,type=bind",
+	"workspaceFolder": "/var/www/html/apps-extra/forms",
+	"overrideCommand": true,
+	"postAttachCommand": "bash ./.devcontainer/setup.sh",
+	"portsAttributes": {
+		"80": {
+			"label": "Webserver"
+		}
+	}
+}
