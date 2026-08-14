@@ -1054,6 +1054,7 @@ export default defineComponent({
 
 	// Title & description header
 	header {
+		width: calc(100% - var(--default-clickable-area));
 		margin-block-end: 24px;
 		margin-inline-start: var(--default-clickable-area);
 
