@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 use Nextcloud\Rector\Set\NextcloudSets;
 use Rector\Config\RectorConfig;
-use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 
 return RectorConfig::configure()
 	->withPaths([
@@ -18,13 +17,10 @@ return RectorConfig::configure()
 		__DIR__ . '/tests',
 	])
 	// uncomment to reach your current PHP version
-	->withPhpSets(php81: true)
+	->withPhpSets(php82: true)
 	->withTypeCoverageLevel(0)
 	->withDeadCodeLevel(0)
 	->withCodeQualityLevel(0)
 	->withSets([
-		NextcloudSets::NEXTCLOUD_32,
-	])
-	->withSkip([
-		NullToStrictStringFuncCallArgRector::class,
+		NextcloudSets::NEXTCLOUD_33,
 	]);
