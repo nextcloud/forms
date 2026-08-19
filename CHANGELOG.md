@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.2.10 - 2026-08-19
+
+[[Full Changelog]](https://github.com/nextcloud/forms/compare/v5.2.9...v5.2.10)
+
+### Fixed
+
+- [stable5.2] #1904: show selected language instead of locale for expire message by @samin-z in [#3588 ](https://github.com/nextcloud/forms/pull/3588)
+
 ## v5.2.9 - 2026-05-28
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.8...v5.2.9)
