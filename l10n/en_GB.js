@@ -120,7 +120,7 @@ OC.L10N.register(
     "Delete question" : "Delete question",
     "Description (formatting using Markdown is supported)" : "Description (formatting using Markdown is supported)",
     "You must answer this question" : "You must answer this question",
-    "Clear selected color" : "Clear selected color",
+    "Clear selected color" : "Clear selected colour",
     "Use date range" : "Use date range",
     "Earliest date" : "Earliest date",
     "Latest date" : "Latest date",
