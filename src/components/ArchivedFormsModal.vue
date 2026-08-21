@@ -28,7 +28,7 @@ import type { PropType } from 'vue'
 import type { FormsForm } from '../models/Entities.d.ts'
 
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import AppNavigationForm from './AppNavigationForm.vue'
 
@@ -54,32 +54,32 @@ export default defineComponent({
 
 	emits: ['update:open', 'clone'],
 
-	data() {
-		return {
-			shownForms: [] as FormsForm[],
-		}
-	},
+	setup(props, { emit }) {
+		const shownForms = ref<FormsForm[]>([])
 
-	watch: {
-		forms: {
-			immediate: true,
-			handler() {
-				this.shownForms = [...this.forms]
+		watch(
+			() => props.forms,
+			() => {
+				shownForms.value = [...props.forms]
 			},
-		},
-	},
+			{ immediate: true },
+		)
 
-	methods: {
-		t,
+		const onCloneForm = (formId: number): void => {
+			emit('clone', formId)
+			emit('update:open', false)
+		}
 
-		onCloneForm(formId: number): void {
-			this.$emit('clone', formId)
-			this.$emit('update:open', false)
-		},
+		const onDelete = (form: FormsForm): void => {
+			shownForms.value = shownForms.value.filter(({ id }) => id !== form.id)
+		}
 
-		onDelete(form: FormsForm): void {
-			this.shownForms = this.shownForms.filter(({ id }) => id !== form.id)
-		},
+		return {
+			shownForms,
+			onCloneForm,
+			onDelete,
+			t,
+		}
 	},
 })
 </script>

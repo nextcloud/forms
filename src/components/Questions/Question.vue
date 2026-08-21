@@ -127,7 +127,7 @@
 				class="question__header__description">
 				<textarea
 					v-if="!readOnly"
-					ref="description"
+					ref="descriptionField"
 					dir="auto"
 					:value="description"
 					:placeholder="
@@ -173,7 +173,7 @@ import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_dow
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import IconDotsHorizontal from '@material-symbols/svg-400/outlined/more_horiz.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, inject, nextTick, onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -197,8 +197,6 @@ export default defineComponent({
 		NcButton,
 		NcNoteCard,
 	},
-
-	inject: ['$markdownit'],
 
 	props: {
 		index: {
@@ -248,6 +246,7 @@ export default defineComponent({
 
 		contentValid: {
 			type: Boolean,
+			// eslint-disable-next-line vue/no-boolean-default
 			default: true,
 		},
 
@@ -288,8 +287,123 @@ export default defineComponent({
 		'clone',
 	],
 
-	setup() {
+	setup(props, { emit }) {
+		const markdownit = inject<{ render: (value: string) => string } | null>(
+			'$markdownit',
+			null,
+		)
+		const descriptionField = ref<HTMLTextAreaElement | null>(null)
+		const buttonUp = ref<{ $el?: HTMLElement } | undefined>(undefined)
+		const buttonDown = ref<{ $el?: HTMLElement } | undefined>(undefined)
+
+		/**
+		 * Extend text with asterisk if question is required
+		 */
+		const computedText = computed(() => {
+			if (props.isRequired) {
+				return props.text + ' *'
+			}
+			return props.text
+		})
+
+		const computedDescription = computed(() => {
+			if (!markdownit) {
+				return props.description
+			}
+			return markdownit.render(props.description)
+		})
+
+		/**
+		 * Question valid, if text not empty and content valid
+		 *
+		 * @return true if question valid
+		 */
+		const questionValid = computed(() => !!props.text && props.contentValid)
+		const actionsId = computed(() => 'q' + props.index + '_actions')
+		const titleId = computed(() => 'q' + props.index + '_title')
+		const descriptionId = computed(() => 'q' + props.index + '_desc')
+		const hasDescription = computed(() => props.description !== '')
+		const hasError = computed(() => !!props.errorMessage)
+		const hasInfo = computed(() => !!props.infoMessage)
+		const errorId = computed(() => `q${props.index}_error`)
+		const infoId = computed(() => `q${props.index}_info`)
+
+		const resizeDescription = (): void => {
+			// next tick ensures that the textarea is attached to DOM
+			nextTick(() => {
+				const textarea = descriptionField.value
+				if (textarea) {
+					textarea.style.cssText = 'height: 0'
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+				}
+			})
+		}
+
+		// Ensure description is sized correctly on initial render
+		onMounted(() => {
+			nextTick(() => resizeDescription())
+		})
+
+		const onTitleChange = (event: Event): void => {
+			const target = event.target as HTMLInputElement | null
+			if (!target) {
+				return
+			}
+			emit('update:text', target.value)
+		}
+
+		const onDescriptionChange = (event: Event): void => {
+			const target = event.target as HTMLTextAreaElement | null
+			if (!target) {
+				return
+			}
+			resizeDescription()
+			emit('update:description', target.value)
+		}
+
+		const onNameChange = (name: string): void => {
+			emit('update:name', name)
+		}
+
+		const onRequiredChange = (isRequired: boolean): void => {
+			emit('update:isRequired', isRequired)
+		}
+
+		/**
+		 * Reorder question but keep focus on the button
+		 */
+		const onMoveDown = (): void => {
+			emit('moveDown')
+			nextTick(() => {
+				buttonDown.value?.$el?.focus()
+			})
+		}
+
+		const onMoveUp = (): void => {
+			emit('moveUp')
+			nextTick(() => {
+				buttonUp.value?.$el?.focus()
+			})
+		}
+
+		/**
+		 * Delete this question
+		 */
+		const onDelete = (): void => {
+			emit('delete')
+		}
+
+		/**
+		 * Clone this question
+		 */
+		const onClone = (): void => {
+			emit('clone')
+		}
+
 		return {
+			buttonUp,
+			buttonDown,
+			descriptionField,
 			IconAsterisk,
 			IconAlertCircleOutline,
 			IconArrowDown,
@@ -300,146 +414,27 @@ export default defineComponent({
 			IconDragIndicator,
 			IconIdentifier,
 			t,
+			computedText,
+			computedDescription,
+			questionValid,
+			actionsId,
+			titleId,
+			descriptionId,
+			hasDescription,
+			hasError,
+			hasInfo,
+			errorId,
+			infoId,
+			resizeDescription,
+			onTitleChange,
+			onDescriptionChange,
+			onNameChange,
+			onRequiredChange,
+			onMoveDown,
+			onMoveUp,
+			onDelete,
+			onClone,
 		}
-	},
-
-	computed: {
-		/**
-		 * Extend text with asterisk if question is required
-		 */
-		computedText(): string {
-			if (this.isRequired) {
-				return this.text + ' *'
-			}
-			return this.text
-		},
-
-		computedDescription(): string {
-			return (
-				this.$markdownit as { render: (value: string) => string }
-			).render(this.description)
-		},
-
-		/**
-		 * Question valid, if text not empty and content valid
-		 *
-		 * @return true if question valid
-		 */
-		questionValid(): boolean {
-			return !!this.text && this.contentValid
-		},
-
-		actionsId(): string {
-			return 'q' + this.index + '_actions'
-		},
-
-		titleId(): string {
-			return 'q' + this.index + '_title'
-		},
-
-		descriptionId(): string {
-			return 'q' + this.index + '_desc'
-		},
-
-		hasDescription(): boolean {
-			return this.description !== ''
-		},
-
-		hasError(): boolean {
-			return !!this.errorMessage
-		},
-
-		hasInfo(): boolean {
-			return !!this.infoMessage
-		},
-
-		errorId(): string {
-			return `q${this.index}_error`
-		},
-
-		infoId(): string {
-			return `q${this.index}_info`
-		},
-	},
-
-	// Ensure description is sized correctly on initial render
-	mounted(): void {
-		this.$nextTick(() => this.resizeDescription())
-	},
-
-	methods: {
-		onTitleChange(event: Event): void {
-			const target = event.target as HTMLInputElement | null
-			if (!target) {
-				return
-			}
-			this.$emit('update:text', target.value)
-		},
-
-		onDescriptionChange(event: Event): void {
-			const target = event.target as HTMLTextAreaElement | null
-			if (!target) {
-				return
-			}
-			this.resizeDescription()
-			this.$emit('update:description', target.value)
-		},
-
-		onNameChange(name: string): void {
-			this.$emit('update:name', name)
-		},
-
-		onRequiredChange(isRequired: boolean): void {
-			this.$emit('update:isRequired', isRequired)
-		},
-
-		resizeDescription(): void {
-			// next tick ensures that the textarea is attached to DOM
-			this.$nextTick(() => {
-				const textarea = this.$refs.description as
-					HTMLTextAreaElement | undefined
-				if (textarea) {
-					textarea.style.cssText = 'height: 0'
-					// include 2px border
-					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
-				}
-			})
-		},
-
-		/**
-		 * Reorder question but keep focus on the button
-		 */
-		onMoveDown(): void {
-			this.$emit('moveDown')
-			this.$nextTick(() => {
-				const buttonDown = this.$refs.buttonDown as
-					{ $el?: HTMLElement } | undefined
-				buttonDown?.$el?.focus()
-			})
-		},
-
-		onMoveUp(): void {
-			this.$emit('moveUp')
-			this.$nextTick(() => {
-				const buttonUp = this.$refs.buttonUp as
-					{ $el?: HTMLElement } | undefined
-				buttonUp?.$el?.focus()
-			})
-		},
-
-		/**
-		 * Delete this question
-		 */
-		onDelete(): void {
-			this.$emit('delete')
-		},
-
-		/**
-		 * Clone this question
-		 */
-		onClone(): void {
-			this.$emit('clone')
-		},
 	},
 })
 </script>

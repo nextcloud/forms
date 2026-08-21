@@ -56,7 +56,7 @@ import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -81,7 +81,7 @@ interface SubmissionModel {
 interface QuestionOption {
 	id: number
 	text: string
-	optionType: string
+	optionType?: string
 }
 
 interface QuestionModel {
@@ -89,10 +89,15 @@ interface QuestionModel {
 	text: string
 	type: string
 	options: QuestionOption[]
-	extraSettings: {
+	extraSettings?: {
 		questionType?: 'radio' | 'checkbox' | 'number'
 	}
 }
+
+type GridValueMap = Record<
+	string,
+	string | string[] | Record<string, string | number>
+>
 
 interface AnsweredQuestion {
 	id: number
@@ -100,7 +105,7 @@ interface AnsweredQuestion {
 	type: string
 	squashedAnswers?: string
 	answers?: Array<{ id: number; text: string; url?: string }>
-	gridValue?: Record<string, string | string[] | Record<string, string>> | null
+	gridValue?: GridValueMap | null
 	gridCellType?: string
 	gridRows?: QuestionOption[]
 	gridColumns?: QuestionOption[]
@@ -152,203 +157,16 @@ export default defineComponent({
 
 	emits: ['delete'],
 
-	setup() {
-		return {
-			IconDelete,
-			IconPencil,
-			t,
-		}
-	},
-
-	computed: {
+	setup(props, { emit }) {
 		// Format submission-timestamp to DateTime
-		submissionDateTime(): string {
-			return moment(this.submission.timestamp, 'X').format('LLLL')
-		},
+		const submissionDateTime = computed(() => {
+			return moment(props.submission.timestamp, 'X').format('LLLL')
+		})
 
-		/**
-		 * Join answered Questions with corresponding answers.
-		 * Multiple answers to a question are squashed into one string.
-		 *
-		 * @return
-		 */
-		answeredQuestions(): AnsweredQuestion[] {
-			const answeredQuestionsArray: AnsweredQuestion[] = []
-
-			this.questions.forEach((question: QuestionModel) => {
-				const answers = this.submission.answers.filter(
-					(answer) => answer.questionId === question.id,
-				)
-				if (!answers.length) {
-					return // no answers, go to next question
-				}
-
-				if (question.type === 'file') {
-					answeredQuestionsArray.push({
-						id: question.id,
-						text: question.text,
-						type: question.type,
-						answers: answers.map((answer) => {
-							return {
-								id: answer.id,
-								text: answer.text,
-								url: generateUrl('/f/{fileId}', {
-									fileId: answer.fileId,
-								}),
-							}
-						}),
-					})
-				} else if (question.type === 'grid') {
-					const optionsPerId: Record<string, QuestionOption> = {}
-					question.options.forEach((option) => {
-						optionsPerId[option.id] = option
-					})
-					let squashedAnswers = ''
-
-					const gridValue = answers[0].text
-						? (JSON.parse(answers[0].text) as Record<
-								string,
-								string | string[] | Record<string, string>
-							>)
-						: null
-					// fixme: rename `questionType` to `gridCellType` everywhere in BE and FE
-					if (
-						gridValue
-						&& question.extraSettings.questionType === 'radio'
-					) {
-						squashedAnswers = Object.keys(gridValue)
-							.filter(
-								(key) =>
-									optionsPerId[key]
-									&& optionsPerId[gridValue[key]],
-							)
-							.map((key: string) => {
-								return (
-									optionsPerId[key].text
-									+ ': '
-									+ optionsPerId[gridValue[key]].text
-								)
-							})
-							.join('\n')
-					} else if (
-						gridValue
-						&& question.extraSettings.questionType === 'checkbox'
-					) {
-						squashedAnswers = Object.keys(gridValue)
-							.filter(
-								(key) =>
-									optionsPerId[key]
-									&& Array.isArray(gridValue[key]),
-							)
-							.map((key: string) => {
-								return (
-									optionsPerId[key].text
-									+ ': '
-									+ gridValue[key]
-										.filter(
-											(optionId: string) =>
-												optionsPerId[optionId],
-										)
-										.map(
-											(optionId: string) =>
-												optionsPerId[optionId].text,
-										)
-										.join(', ')
-								)
-							})
-							.join('\n')
-					}
-
-					answeredQuestionsArray.push({
-						id: question.id,
-						text: question.text,
-						type: question.type,
-						gridValue,
-						squashedAnswers,
-						gridCellType: question.extraSettings.questionType,
-						gridRows: question.options.filter(
-							(option) => option.optionType === OptionType.Row,
-						),
-						gridColumns: question.options.filter(
-							(option) => option.optionType === OptionType.Column,
-						),
-					})
-				} else if (['date', 'time'].includes(question.type)) {
-					const squashedAnswers = answers
-						.map((answer) => answer.text)
-						.join(' - ')
-
-					answeredQuestionsArray.push({
-						id: question.id,
-						text: question.text,
-						type: question.type,
-						squashedAnswers,
-					})
-				} else if (question.type === 'ranking') {
-					const optionsPerId: Record<string, QuestionOption> = {}
-					question.options.forEach((option) => {
-						optionsPerId[option.id] = option
-					})
-					const rankedIds = answers[0]?.text
-						? JSON.parse(answers[0].text)
-						: []
-					const squashedAnswers = rankedIds
-						.map((id: string, index: number) => {
-							const option = optionsPerId[id]
-							return option
-								? `${index + 1}. ${option.text}`
-								: `${index + 1}. ?`
-						})
-						.join('\n')
-
-					answeredQuestionsArray.push({
-						id: question.id,
-						text: question.text,
-						type: question.type,
-						squashedAnswers,
-					})
-				} else {
-					const squashedAnswers = answers
-						.map((answer) => answer.text)
-						.join('; ')
-
-					answeredQuestionsArray.push({
-						id: question.id,
-						text: question.text,
-						type: question.type,
-						squashedAnswers,
-					})
-				}
-			})
-			return answeredQuestionsArray
-		},
-	},
-
-	methods: {
-		onDelete(): void {
-			this.$emit('delete')
-		},
-
-		onCopy(event: ClipboardEvent): void {
-			if (!event.clipboardData) return
-
-			const selection = window.getSelection()
-			if (!selection || selection.isCollapsed) return
-
-			const fragment = selection.getRangeAt(0).cloneContents()
-			const text = this.serializeNode(fragment).trim()
-
-			if (!text) return
-
-			event.clipboardData.setData('text/plain', text)
-			event.preventDefault()
-		},
-
-		serializeNode(node: Node): string {
+		const serializeNode = (node: Node): string => {
 			if (node.nodeType === Node.TEXT_NODE) {
 				return node.textContent ?? ''
 			}
-
 			if (
 				node.nodeType !== Node.ELEMENT_NODE
 				&& node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
@@ -357,15 +175,17 @@ export default defineComponent({
 			}
 
 			const tag = (node as Element).tagName?.toLowerCase()
-
-			if (tag && ['svg', 'script', 'style'].includes(tag)) return ''
-			if (tag === 'br') return '\n'
+			if (tag && ['svg', 'script', 'style'].includes(tag)) {
+				return ''
+			}
+			if (tag === 'br') {
+				return '\n'
+			}
 
 			const children = Array.from(node.childNodes)
-				.map((child) => this.serializeNode(child))
+				.map((child) => serializeNode(child))
 				.join('')
 
-			// Answer blocks get a blank line before them as visual separator
 			if (tag === 'div' && (node as Element).classList?.contains('answer')) {
 				const trimmed = children.replace(/\s+$/, '')
 				return trimmed ? '\n' + trimmed + '\n' : ''
@@ -395,7 +215,198 @@ export default defineComponent({
 			}
 
 			return children
-		},
+		}
+
+		/**
+		 * Join answered Questions with corresponding answers.
+		 * Multiple answers to a question are squashed into one string.
+		 *
+		 * @return
+		 */
+		const answeredQuestions = computed<AnsweredQuestion[]>(() => {
+			const answeredQuestionsArray: AnsweredQuestion[] = []
+
+			props.questions.forEach((question: QuestionModel) => {
+				const answers = props.submission.answers.filter(
+					(answer) => answer.questionId === question.id,
+				)
+				if (!answers.length) {
+					return // no answers, go to next question
+				}
+
+				if (question.type === 'file') {
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						answers: answers.map((answer) => ({
+							id: answer.id,
+							text: answer.text,
+							url: answer.fileId
+								? generateUrl('/f/{fileId}', {
+										fileId: answer.fileId,
+									})
+								: undefined,
+						})),
+					})
+				} else if (question.type === 'grid') {
+					const optionsPerId: Record<string, QuestionOption> = {}
+					question.options.forEach((option) => {
+						optionsPerId[String(option.id)] = option
+					})
+					let squashedAnswers = ''
+					const gridValue = answers[0]?.text
+						? (JSON.parse(answers[0].text) as GridValueMap)
+						: null
+					// fixme: rename `questionType` to `gridCellType` everywhere in BE and FE
+					if (
+						gridValue
+						&& question.extraSettings?.questionType === 'radio'
+					) {
+						for (const key of Object.keys(gridValue)) {
+							const selectedValue = gridValue[key]
+							if (
+								typeof selectedValue !== 'string'
+								|| !optionsPerId[key]
+								|| !optionsPerId[selectedValue]
+							) {
+								continue
+							}
+							squashedAnswers += `${optionsPerId[key].text}: ${optionsPerId[selectedValue].text}\n`
+						}
+						squashedAnswers = squashedAnswers.trimEnd()
+					} else if (
+						gridValue
+						&& question.extraSettings?.questionType === 'checkbox'
+					) {
+						for (const key of Object.keys(gridValue)) {
+							const selectedValues = gridValue[key]
+							if (
+								!optionsPerId[key]
+								|| !Array.isArray(selectedValues)
+							) {
+								continue
+							}
+							const labels = selectedValues
+								.filter((optionId) => optionsPerId[String(optionId)])
+								.map(
+									(optionId) =>
+										optionsPerId[String(optionId)].text,
+								)
+							if (!labels.length) {
+								continue
+							}
+							squashedAnswers += `${optionsPerId[key].text}: ${labels.join(', ')}\n`
+						}
+						squashedAnswers = squashedAnswers.trimEnd()
+					} else if (
+						gridValue
+						&& question.extraSettings?.questionType === 'number'
+					) {
+						for (const key of Object.keys(gridValue)) {
+							if (!optionsPerId[key]) {
+								continue
+							}
+							const value = gridValue[key]
+							squashedAnswers += `${optionsPerId[key].text}: ${String(value)}\n`
+						}
+						squashedAnswers = squashedAnswers.trimEnd()
+					}
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						gridValue,
+						squashedAnswers,
+						gridCellType: question.extraSettings?.questionType,
+						gridRows: question.options.filter(
+							(option) => option.optionType === OptionType.Row,
+						),
+						gridColumns: question.options.filter(
+							(option) => option.optionType === OptionType.Column,
+						),
+					})
+				} else if (['date', 'time'].includes(question.type)) {
+					const squashedAnswers = answers
+						.map((answer) => answer.text)
+						.join(' - ')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						squashedAnswers,
+					})
+				} else if (question.type === 'ranking') {
+					const optionsPerId: Record<string, QuestionOption> = {}
+					question.options.forEach((option) => {
+						optionsPerId[String(option.id)] = option
+					})
+					const rankedIds = answers[0]?.text
+						? JSON.parse(answers[0].text)
+						: []
+					const squashedAnswers = rankedIds
+						.map((id: string, index: number) => {
+							const option = optionsPerId[String(id)]
+							return option
+								? `${index + 1}. ${option.text}`
+								: `${index + 1}. ?`
+						})
+						.join('\n')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						squashedAnswers,
+					})
+				} else {
+					const squashedAnswers = answers
+						.map((answer) => answer.text)
+						.join('; ')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						squashedAnswers,
+					})
+				}
+			})
+			return answeredQuestionsArray
+		})
+
+		const onDelete = (): void => {
+			emit('delete')
+		}
+
+		const onCopy = (event: ClipboardEvent): void => {
+			if (!event.clipboardData) {
+				return
+			}
+			const selection = window.getSelection()
+			if (!selection || selection.isCollapsed) {
+				return
+			}
+			const fragment = selection.getRangeAt(0).cloneContents()
+			const text = serializeNode(fragment).trim()
+			if (!text) {
+				return
+			}
+			event.clipboardData.setData('text/plain', text)
+			event.preventDefault()
+		}
+
+		return {
+			IconDelete,
+			IconPencil,
+			submissionDateTime,
+			answeredQuestions,
+			onDelete,
+			onCopy,
+			t,
+		}
 	},
 })
 </script>

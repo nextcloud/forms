@@ -117,7 +117,7 @@ import { showError } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
@@ -157,34 +157,55 @@ export default defineComponent({
 	},
 
 	setup() {
-		return {
-			t,
-		}
-	},
-
-	data(): {
-		appConfig: AppConfig
-		availableGroups: GroupOption[]
-		confirmationEmailRateLimitInput: string
-		loading: Record<string, boolean>
-	} {
-		return {
-			appConfig: loadState(formsAppName, 'appConfig') as AppConfig,
-			availableGroups: loadState(
-				formsAppName,
-				'availableGroups',
-			) as GroupOption[],
-
-			confirmationEmailRateLimitInput: String(
+		const appConfig = ref<AppConfig>(
+			loadState(formsAppName, 'appConfig') as AppConfig,
+		)
+		const availableGroups = ref<GroupOption[]>(
+			loadState(formsAppName, 'availableGroups') as GroupOption[],
+		)
+		const confirmationEmailRateLimitInput = ref(
+			String(
 				(loadState(formsAppName, 'appConfig') as AppConfig)
 					.confirmationEmailRateLimit ?? 3,
 			),
+		)
+		const loading = ref<Record<string, boolean>>({})
 
-			loading: {},
+		/**
+		 * Reload the current AppConfig. Used to restore in case of saving-failure.
+		 */
+		const reloadAppConfig = async (): Promise<void> => {
+			try {
+				const resp = await axios.get(generateUrl('apps/forms/config'))
+				appConfig.value = resp.data
+			} catch (error) {
+				logger.error('Error while reloading config', { error })
+				showError(t('forms', 'Error while reloading config'))
+			}
 		}
-	},
 
-	methods: {
+		/**
+		 * Save a key-value pair to the appConfig.
+		 *
+		 * @param configKey The key to store. Must be one of the used configKeys (See php-constants).
+		 * @param configValue The value to store.
+		 */
+		const saveAppConfig = async (
+			configKey: string,
+			configValue: unknown,
+		): Promise<void> => {
+			try {
+				await axios.patch(generateUrl('apps/forms/config'), {
+					configKey,
+					configValue,
+				})
+			} catch (error) {
+				logger.error('Error while saving configuration', { error })
+				showError(t('forms', 'Error while saving configuration'))
+				await reloadAppConfig()
+			}
+		}
+
 		/**
 		 * Similar procedures on**Change:
 		 *
@@ -194,100 +215,91 @@ export default defineComponent({
 		 *
 		 * @param newVal The resp. new Value to store.
 		 */
-		async onRestrictCreationChange(newVal: boolean): Promise<void> {
-			this.loading.restrictCreation = true
-			await this.saveAppConfig('restrictCreation', newVal)
-			this.loading.restrictCreation = false
-		},
+		const onRestrictCreationChange = async (newVal: boolean): Promise<void> => {
+			loading.value.restrictCreation = true
+			await saveAppConfig('restrictCreation', newVal)
+			loading.value.restrictCreation = false
+		}
 
-		async onCreationAllowedGroupsChange(newVal: GroupOption[]): Promise<void> {
-			this.loading.creationAllowedGroups = true
-			await this.saveAppConfig(
+		const onCreationAllowedGroupsChange = async (
+			newVal: GroupOption[],
+		): Promise<void> => {
+			loading.value.creationAllowedGroups = true
+			await saveAppConfig(
 				'creationAllowedGroups',
 				newVal.map((group) => group.groupId),
 			)
-			this.loading.creationAllowedGroups = false
-		},
+			loading.value.creationAllowedGroups = false
+		}
 
-		async onAllowPublicLinkChange(newVal: boolean): Promise<void> {
-			this.loading.allowPublicLink = true
-			await this.saveAppConfig('allowPublicLink', newVal)
-			this.loading.allowPublicLink = false
-		},
+		const onAllowPublicLinkChange = async (newVal: boolean): Promise<void> => {
+			loading.value.allowPublicLink = true
+			await saveAppConfig('allowPublicLink', newVal)
+			loading.value.allowPublicLink = false
+		}
 
-		async onAllowCustomPublicShareTokensChange(newVal: boolean): Promise<void> {
-			this.loading.allowCustomPublicShareTokens = true
-			await this.saveAppConfig('allowCustomPublicShareTokens', newVal)
-			this.loading.allowCustomPublicShareTokens = false
-		},
+		const onAllowCustomPublicShareTokensChange = async (
+			newVal: boolean,
+		): Promise<void> => {
+			loading.value.allowCustomPublicShareTokens = true
+			await saveAppConfig('allowCustomPublicShareTokens', newVal)
+			loading.value.allowCustomPublicShareTokens = false
+		}
 
-		async onAllowPermitAllChange(newVal: boolean): Promise<void> {
-			this.loading.allowPermitAll = true
-			await this.saveAppConfig('allowPermitAll', newVal)
-			this.loading.allowPermitAll = false
-		},
+		const onAllowPermitAllChange = async (newVal: boolean): Promise<void> => {
+			loading.value.allowPermitAll = true
+			await saveAppConfig('allowPermitAll', newVal)
+			loading.value.allowPermitAll = false
+		}
 
-		async onAllowShowToAllChange(newVal: boolean): Promise<void> {
-			this.loading.allowShowToAll = true
-			await this.saveAppConfig('allowShowToAll', newVal)
-			this.loading.allowShowToAll = false
-		},
+		const onAllowShowToAllChange = async (newVal: boolean): Promise<void> => {
+			loading.value.allowShowToAll = true
+			await saveAppConfig('allowShowToAll', newVal)
+			loading.value.allowShowToAll = false
+		}
 
-		async onAllowConfirmationEmailChange(newVal: boolean): Promise<void> {
-			this.loading.allowConfirmationEmail = true
-			await this.saveAppConfig('allowConfirmationEmail', newVal)
-			this.loading.allowConfirmationEmail = false
-		},
+		const onAllowConfirmationEmailChange = async (
+			newVal: boolean,
+		): Promise<void> => {
+			loading.value.allowConfirmationEmail = true
+			await saveAppConfig('allowConfirmationEmail', newVal)
+			loading.value.allowConfirmationEmail = false
+		}
 
-		async onConfirmationEmailRateLimitChange(): Promise<void> {
+		const onConfirmationEmailRateLimitChange = async (): Promise<void> => {
 			const value = Math.max(
 				1,
 				Math.min(
 					100,
-					parseInt(this.confirmationEmailRateLimitInput, 10) || 3,
+					parseInt(confirmationEmailRateLimitInput.value, 10) || 3,
 				),
 			)
-			this.confirmationEmailRateLimitInput = String(value)
-			await this.saveAppConfig('confirmationEmailRateLimit', value)
-		},
+			confirmationEmailRateLimitInput.value = String(value)
+			await saveAppConfig('confirmationEmailRateLimit', value)
+		}
 
-		async onAllowCommentsChange(newVal: boolean): Promise<void> {
-			this.loading.allowComments = true
-			await this.saveAppConfig('allowComments', newVal)
-			this.loading.allowComments = false
-		},
+		const onAllowCommentsChange = async (newVal: boolean): Promise<void> => {
+			loading.value.allowComments = true
+			await saveAppConfig('allowComments', newVal)
+			loading.value.allowComments = false
+		}
 
-		/**
-		 * Save a key-value pair to the appConfig.
-		 *
-		 * @param configKey The key to store. Must be one of the used configKeys (See php-constants).
-		 * @param configValue The value to store.
-		 */
-		async saveAppConfig(configKey: string, configValue: unknown): Promise<void> {
-			try {
-				await axios.patch(generateUrl('apps/forms/config'), {
-					configKey,
-					configValue,
-				})
-			} catch (error) {
-				logger.error('Error while saving configuration', { error })
-				showError(t('forms', 'Error while saving configuration'))
-				await this.reloadAppConfig()
-			}
-		},
-
-		/**
-		 * Reload the current AppConfig. Used to restore in case of saving-failure.
-		 */
-		async reloadAppConfig(): Promise<void> {
-			try {
-				const resp = await axios.get(generateUrl('apps/forms/config'))
-				this.appConfig = resp.data
-			} catch (error) {
-				logger.error('Error while reloading config', { error })
-				showError(t('forms', 'Error while reloading config'))
-			}
-		},
+		return {
+			appConfig,
+			availableGroups,
+			confirmationEmailRateLimitInput,
+			loading,
+			onRestrictCreationChange,
+			onCreationAllowedGroupsChange,
+			onAllowPublicLinkChange,
+			onAllowCustomPublicShareTokensChange,
+			onAllowPermitAllChange,
+			onAllowShowToAllChange,
+			onAllowConfirmationEmailChange,
+			onConfirmationEmailRateLimitChange,
+			onAllowCommentsChange,
+			t,
+		}
 	},
 })
 </script>

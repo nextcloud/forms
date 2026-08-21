@@ -166,7 +166,7 @@ import { formatFileSize } from '@nextcloud/files'
 import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -236,62 +236,46 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
+		const fileInput = ref<HTMLInputElement | null>(null)
+		const fileLoading = ref(false)
+		const maxFileSizeUnit = ref<FileSizeUnit>(
+			Object.keys(FILE_SIZE_UNITS)[0] as FileSizeUnit,
+		)
+		const maxFileSizeValue = ref(0)
+		const allowedFileTypesDialogOpened = ref(false)
 
-		return {
-			...question,
-			IconChevronLeft,
-			IconDelete,
-			IconFile,
-			IconFileDocumentAlert,
-			IconUpload,
-			IconUploadMultiple,
-			t,
-		}
-	},
-
-	data() {
-		return {
-			fileTypes,
-			fileLoading: false as boolean,
-			maxFileSizeUnit: Object.keys(FILE_SIZE_UNITS)[0] as FileSizeUnit,
-			maxFileSizeValue: 0 as number,
-			allowedFileTypesDialogOpened: false as boolean,
-		}
-	},
-
-	computed: {
-		availableUnits(): FileSizeUnit[] {
+		const availableUnits = computed<FileSizeUnit[]>(() => {
 			return Object.keys(FILE_SIZE_UNITS) as FileSizeUnit[]
-		},
+		})
 
-		uploadedFiles(): UploadedFileValue[] {
-			return this.values as UploadedFileValue[]
-		},
+		const uploadedFiles = computed<UploadedFileValue[]>(() => {
+			return props.values as UploadedFileValue[]
+		})
 
-		maxAllowedFilesCount(): number {
-			const extraSettings = this.extraSettings as
+		const maxAllowedFilesCount = computed<number>(() => {
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
 			return extraSettings?.maxAllowedFilesCount ?? 1
-		},
+		})
 
-		allowedFileExtensions(): string[] {
-			const extraSettings = this.extraSettings as
+		const allowedFileExtensions = computed<string[]>(() => {
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
 			return extraSettings?.allowedFileExtensions ?? []
-		},
+		})
 
-		allowedFileTypes(): string[] {
-			const extraSettings = this.extraSettings as
+		const allowedFileTypes = computed<string[]>(() => {
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
 			return extraSettings?.allowedFileTypes ?? []
-		},
+		})
 
-		allowedFileTypesLabel(): string {
-			const allowedFileTypes: string[] = []
-			const extraSettings = this.extraSettings as
+		const allowedFileTypesLabel = computed<string>(() => {
+			const allowedFileTypeLabels: string[] = []
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
 			if (extraSettings?.allowedFileTypes?.length) {
-				allowedFileTypes.push(
+				allowedFileTypeLabels.push(
 					...extraSettings.allowedFileTypes.map(
 						(type: string) => fileTypes[type].label,
 					),
@@ -299,53 +283,49 @@ export default defineComponent({
 			}
 
 			if (extraSettings?.allowedFileExtensions?.length) {
-				allowedFileTypes.push(...extraSettings.allowedFileExtensions)
+				allowedFileTypeLabels.push(...extraSettings.allowedFileExtensions)
 			}
-
-			if (allowedFileTypes.length) {
+			if (allowedFileTypeLabels.length) {
 				return t('forms', 'Allowed file types: {fileTypes}.', {
-					fileTypes: allowedFileTypes.join(', '),
+					fileTypes: allowedFileTypeLabels.join(', '),
 				})
 			}
 
 			return t('forms', 'All file types are allowed.')
-		},
-	},
+		})
 
-	mounted(): void {
-		const extraSettings = this.extraSettings as
-			QuestionFileExtraSettings | undefined
-		if (extraSettings?.maxFileSize) {
-			const maxFileSize = extraSettings.maxFileSize
-			Object.keys(FILE_SIZE_UNITS).forEach((unit) => {
-				const typedUnit = unit as FileSizeUnit
-				if (maxFileSize > FILE_SIZE_UNITS[typedUnit]) {
-					this.maxFileSizeUnit = typedUnit
-				}
-			})
+		onMounted(() => {
+			const extraSettings = props.extraSettings as
+				QuestionFileExtraSettings | undefined
+			if (extraSettings?.maxFileSize) {
+				const maxFileSize = extraSettings.maxFileSize
+				Object.keys(FILE_SIZE_UNITS).forEach((unit) => {
+					const typedUnit = unit as FileSizeUnit
+					if (maxFileSize > FILE_SIZE_UNITS[typedUnit]) {
+						maxFileSizeUnit.value = typedUnit
+					}
+				})
+				maxFileSizeValue.value =
+					maxFileSize / FILE_SIZE_UNITS[maxFileSizeUnit.value]
+			}
+		})
 
-			this.maxFileSizeValue =
-				maxFileSize / FILE_SIZE_UNITS[this.maxFileSizeUnit]
+		const toggleFileInput = (): void => {
+			;(fileInput.value as HTMLInputElement | undefined)?.click()
 		}
-	},
 
-	methods: {
-		toggleFileInput(): void {
-			;(this.$refs.fileInput as HTMLInputElement | undefined)?.click()
-		},
-
-		async onFileInput(): Promise<void> {
-			const fileInput = this.$refs.fileInput as HTMLInputElement | undefined
-			if (!fileInput?.files) {
+		const onFileInput = async (): Promise<void> => {
+			const currentInput = fileInput.value
+			if (!currentInput?.files) {
 				return
 			}
 
 			const formData = new FormData()
 			let fileInvalid = false
-			const extraSettings = this.extraSettings as
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
 
-			;[...fileInput.files].forEach((file) => {
+			;[...currentInput.files].forEach((file) => {
 				formData.append('files[]', file)
 
 				if (
@@ -382,14 +362,14 @@ export default defineComponent({
 			const url = generateOcsUrl(
 				'apps/forms/api/v3/forms/{id}/submissions/files/{questionId}',
 				{
-					id: this.formId,
-					questionId: this.id,
+					id: props.formId,
+					questionId: props.id,
 				},
 			)
 
 			let response
 			try {
-				this.fileLoading = true
+				fileLoading.value = true
 				response = await axios.post(url, formData, {
 					headers: { 'Content-Type': 'multipart/form-data' },
 				})
@@ -420,101 +400,154 @@ export default defineComponent({
 
 				return
 			} finally {
-				this.fileLoading = false
-				fileInput.value = ''
+				fileLoading.value = false
+				currentInput.value = ''
 			}
 
-			this.$emit('update:values', [
-				...(this.values as UploadedFileValue[]),
+			emit('update:values', [
+				...(props.values as UploadedFileValue[]),
 				...(OcsResponse2Data(response) as UploadedFileValue[]),
 			])
-		},
+		}
 
-		onMaxAllowedFilesCountInput(maxAllowedFilesCount: number | string): void {
-			return this.onExtraSettingsChange({
-				maxAllowedFilesCount: parseInt(String(maxAllowedFilesCount), 10),
+		const onMaxAllowedFilesCountInput = (
+			maxAllowedFilesCountValue: number | string,
+		): void => {
+			question.onExtraSettingsChange({
+				maxAllowedFilesCount: parseInt(
+					String(maxAllowedFilesCountValue),
+					10,
+				),
 			})
-		},
+		}
 
-		onMaxFileSizeValueInput(maxFileSizeValue: number | string): void {
-			this.maxFileSizeValue = Number(maxFileSizeValue)
+		const onMaxFileSizeValueInput = (
+			newMaxFileSizeValue: number | string,
+		): void => {
+			maxFileSizeValue.value = Number(newMaxFileSizeValue)
 			const maxFileSize = Math.round(
-				Number(maxFileSizeValue) * FILE_SIZE_UNITS[this.maxFileSizeUnit],
+				Number(newMaxFileSizeValue) * FILE_SIZE_UNITS[maxFileSizeUnit.value],
 			)
 
-			return this.onExtraSettingsChange({ maxFileSize })
-		},
+			question.onExtraSettingsChange({ maxFileSize })
+		}
 
-		onMaxFileSizeUnitInput(maxFileSizeUnit: FileSizeUnit): void {
-			this.maxFileSizeUnit = maxFileSizeUnit
+		const onMaxFileSizeUnitInput = (newMaxFileSizeUnit: FileSizeUnit): void => {
+			maxFileSizeUnit.value = newMaxFileSizeUnit
 			const maxFileSize = Math.round(
-				this.maxFileSizeValue * FILE_SIZE_UNITS[maxFileSizeUnit],
+				maxFileSizeValue.value * FILE_SIZE_UNITS[newMaxFileSizeUnit],
 			)
 
-			return this.onExtraSettingsChange({ maxFileSize })
-		},
+			question.onExtraSettingsChange({ maxFileSize })
+		}
 
-		onAllowedFileTypesChange(fileType: string, allowed: boolean): void {
-			const extraSettings = this.extraSettings as
+		const onAllowedFileTypesChange = (
+			fileType: string,
+			allowed: boolean,
+		): void => {
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
-			let allowedFileTypes = extraSettings?.allowedFileTypes ?? []
+			let allowedFileTypesList = extraSettings?.allowedFileTypes ?? []
 
 			if (allowed) {
-				allowedFileTypes.push(fileType)
+				allowedFileTypesList.push(fileType)
 			} else {
-				allowedFileTypes = allowedFileTypes.filter(
+				allowedFileTypesList = allowedFileTypesList.filter(
 					(type) => type !== fileType,
 				)
 			}
 
-			return this.onExtraSettingsChange({ allowedFileTypes })
-		},
+			question.onExtraSettingsChange({
+				allowedFileTypes: allowedFileTypesList,
+			})
+		}
 
-		onAllowedFileExtensionsAdded(fileExtension: string): void {
-			const extraSettings = this.extraSettings as
+		const onAllowedFileExtensionsAdded = (fileExtension: string): void => {
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
-			const allowedFileExtensions = extraSettings?.allowedFileExtensions ?? []
-			allowedFileExtensions.push(fileExtension)
+			const allowedFileExtensionsList =
+				extraSettings?.allowedFileExtensions ?? []
+			allowedFileExtensionsList.push(fileExtension)
+			question.onExtraSettingsChange({
+				allowedFileExtensions: allowedFileExtensionsList,
+			})
+		}
 
-			return this.onExtraSettingsChange({ allowedFileExtensions })
-		},
-
-		onAllowedFileExtensionsDeleted(fileExtension: string): void {
-			const extraSettings = this.extraSettings as
+		const onAllowedFileExtensionsDeleted = (fileExtension: string): void => {
+			const extraSettings = props.extraSettings as
 				QuestionFileExtraSettings | undefined
-			let allowedFileExtensions = extraSettings?.allowedFileExtensions ?? []
-			allowedFileExtensions = allowedFileExtensions.filter(
+			let allowedFileExtensionsList =
+				extraSettings?.allowedFileExtensions ?? []
+			allowedFileExtensionsList = allowedFileExtensionsList.filter(
 				(extension) => extension !== fileExtension,
 			)
 
-			return this.onExtraSettingsChange({ allowedFileExtensions })
-		},
+			question.onExtraSettingsChange({
+				allowedFileExtensions: allowedFileExtensionsList,
+			})
+		}
 
-		onDeleteUploadedFile(uploadedFileId: number | string): void {
-			const values = (this.values as UploadedFileValue[]).filter(
+		const onDeleteUploadedFile = (uploadedFileId: number | string): void => {
+			const values = (props.values as UploadedFileValue[]).filter(
 				(value) => value.uploadedFileId !== uploadedFileId,
 			)
 
-			this.$emit('update:values', values)
-		},
+			emit('update:values', values)
+		}
 
-		async validate(): Promise<boolean> {
-			if (this.fileLoading) {
-				this.errorMessage = t(
+		const validate = async (): Promise<boolean> => {
+			if (fileLoading.value) {
+				question.errorMessage.value = t(
 					'forms',
 					'Please wait until the file has been uploaded.',
 				)
 				return false
 			}
 
-			if (this.isRequired && this.uploadedFiles.length === 0) {
-				this.errorMessage = t('forms', 'You must answer this question')
+			if (props.isRequired && uploadedFiles.value.length === 0) {
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
 				return false
 			}
 
-			this.errorMessage = null
+			question.errorMessage.value = null
 			return true
-		},
+		}
+
+		return {
+			...question,
+			IconChevronLeft,
+			IconDelete,
+			IconFile,
+			IconFileDocumentAlert,
+			IconUpload,
+			IconUploadMultiple,
+			t,
+			fileInput,
+			fileTypes,
+			fileLoading,
+			maxFileSizeUnit,
+			maxFileSizeValue,
+			allowedFileTypesDialogOpened,
+			availableUnits,
+			uploadedFiles,
+			maxAllowedFilesCount,
+			allowedFileExtensions,
+			allowedFileTypes,
+			allowedFileTypesLabel,
+			toggleFileInput,
+			onFileInput,
+			onMaxAllowedFilesCountInput,
+			onMaxFileSizeValueInput,
+			onMaxFileSizeUnitInput,
+			onAllowedFileTypesChange,
+			onAllowedFileExtensionsAdded,
+			onAllowedFileExtensionsDeleted,
+			onDeleteUploadedFile,
+			validate,
+		}
 	},
 })
 </script>

@@ -120,7 +120,7 @@
 <script lang="ts">
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -155,145 +155,140 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
+		const lowest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
+		const highest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 
-		return {
-			...question,
-			IconPencil,
-			t,
-		}
-	},
+		const defaultLowestLabel = t('forms', 'Strongly disagree')
+		const defaultHighestLabel = t('forms', 'Strongly agree')
 
-	data() {
-		return {
-			isLoading: false as boolean,
-		}
-	},
+		const optionsLowest = computed<number>({
+			get: () => {
+				const extraSettings = props.extraSettings as
+					LinearScaleExtraSettings | undefined
+				return extraSettings?.optionsLowest ?? 1
+			},
+			set: (value: number) => {
+				question.onExtraSettingsChange({
+					optionsLowest: value === 1 ? null : value,
+				})
+			},
+		})
 
-	computed: {
-		scaleOptions(): number[] {
+		const optionsHighest = computed<number>({
+			get: () => {
+				const extraSettings = props.extraSettings as
+					LinearScaleExtraSettings | undefined
+				return extraSettings?.optionsHighest ?? 5
+			},
+			set: (value: number) => {
+				question.onExtraSettingsChange({
+					optionsHighest: value === 5 ? null : value,
+				})
+			},
+		})
+
+		const optionsLabelLowest = computed<string>({
+			get: () => {
+				const extraSettings = props.extraSettings as
+					LinearScaleExtraSettings | undefined
+				return extraSettings?.optionsLabelLowest ?? defaultLowestLabel
+			},
+			set: (value: string) => {
+				question.onExtraSettingsChange({
+					optionsLabelLowest: value === defaultLowestLabel ? null : value,
+				})
+			},
+		})
+
+		const optionsLabelHighest = computed<string>({
+			get: () => {
+				const extraSettings = props.extraSettings as
+					LinearScaleExtraSettings | undefined
+				return extraSettings?.optionsLabelHighest ?? defaultHighestLabel
+			},
+			set: (value: string) => {
+				question.onExtraSettingsChange({
+					optionsLabelHighest:
+						value === defaultHighestLabel ? null : value,
+				})
+			},
+		})
+
+		const scaleOptions = computed<number[]>(() => {
 			return Array.from(
-				{ length: this.optionsHighest - this.optionsLowest + 1 },
-				(_, i) => i + this.optionsLowest,
+				{ length: optionsHighest.value - optionsLowest.value + 1 },
+				(_, i) => i + optionsLowest.value,
 			)
-		},
+		})
 
-		isUnique(): boolean {
-			return this.answerType.unique === true
-		},
-
-		questionValues(): unknown[] {
-			return this.values
-		},
+		const questionValues = computed(() => props.values)
 
 		/**
 		 * ID for the label for the lowest option
 		 */
-		labelId(): string {
-			return 'q' + this.index + '__label_lowest'
-		},
-
-		optionsLowest(): number {
-			const extraSettings = this.extraSettings as
-				LinearScaleExtraSettings | undefined
-			return extraSettings?.optionsLowest ?? 1
-		},
-
-		optionsHighest(): number {
-			const extraSettings = this.extraSettings as
-				LinearScaleExtraSettings | undefined
-			return extraSettings?.optionsHighest ?? 5
-		},
-
-		optionsLabelLowest(): string {
-			const extraSettings = this.extraSettings as
-				LinearScaleExtraSettings | undefined
-			return (
-				extraSettings?.optionsLabelLowest ?? t('forms', 'Strongly disagree')
-			)
-		},
-
-		optionsLabelHighest(): string {
-			const extraSettings = this.extraSettings as
-				LinearScaleExtraSettings | undefined
-			return extraSettings?.optionsLabelHighest ?? t('forms', 'Strongly agree')
-		},
-	},
-
-	mounted() {
-		if (!this.readOnly) {
-			this.resizeLabel('lowest')
-			this.resizeLabel('highest')
-		}
-	},
-
-	methods: {
-		async validate(): Promise<boolean> {
-			if (this.isRequired && this.values.length === 0) {
-				this.errorMessage = t('forms', 'You must answer this question')
-				return false
-			}
-
-			this.errorMessage = null
-			return true
-		},
-
-		onChange(option: string): void {
-			this.$emit('update:values', [option])
-		},
-
-		onOptionsLowestChange(value: number): void {
-			this.onExtraSettingsChange({ optionsLowest: value === 1 ? null : value })
-		},
-
-		onOptionsHighestChange(value: number): void {
-			this.onExtraSettingsChange({
-				optionsHighest: value === 5 ? null : value,
-			})
-		},
-
-		onOptionsLabelLowestChange(value: string): void {
-			this.onExtraSettingsChange({
-				optionsLabelLowest:
-					value === t('forms', 'Strongly disagree') ? null : value,
-			})
-		},
-
-		onOptionsLabelHighestChange(value: string): void {
-			this.onExtraSettingsChange({
-				optionsLabelHighest:
-					value === t('forms', 'Strongly agree') ? null : value,
-			})
-		},
+		const labelId = computed(() => 'q' + props.index + '__label_lowest')
+		const isUnique = computed(() => props.answerType.unique === true)
 
 		/**
 		 * Resizes the given label to fit within the specified constraints.
 		 *
 		 * @param label - The label identifier, either 'lowest' or 'highest', indicating which label to resize.
 		 */
-		resizeLabel(label: 'lowest' | 'highest'): void {
+		const resizeLabel = (label: 'lowest' | 'highest'): void => {
 			let textarea: HTMLTextAreaElement | undefined
-			if (label === 'lowest') {
-				textarea = (
-					this.$refs.lowest as {
-						$refs: { input: HTMLTextAreaElement }
-					}
-				).$refs.input
-			} else if (label === 'highest') {
-				textarea = (
-					this.$refs.highest as {
-						$refs: { input: HTMLTextAreaElement }
-					}
-				).$refs.input
+			const refTarget = label === 'lowest' ? lowest.value : highest.value
+			if (refTarget) {
+				textarea = refTarget.$refs.input
 			}
 			// next tick ensures that the textarea is attached to DOM
-			this.$nextTick(() => {
+			nextTick(() => {
 				if (textarea) {
 					textarea.style.cssText = 'height: 0'
 					// include 2px border
 					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px; resize: none;`
 				}
 			})
-		},
+		}
+
+		onMounted(() => {
+			if (!props.readOnly) {
+				resizeLabel('lowest')
+				resizeLabel('highest')
+			}
+		})
+
+		const validate = async (): Promise<boolean> => {
+			if (props.isRequired && props.values.length === 0) {
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
+				return false
+			}
+
+			question.errorMessage.value = null
+			return true
+		}
+
+		const onChange = (option: string): void => {
+			emit('update:values', [option])
+		}
+
+		const onOptionsLowestChange = (value: number): void => {
+			optionsLowest.value = value
+		}
+
+		const onOptionsHighestChange = (value: number): void => {
+			optionsHighest.value = value
+		}
+
+		const onOptionsLabelLowestChange = (value: string): void => {
+			optionsLabelLowest.value = value
+		}
+
+		const onOptionsLabelHighestChange = (value: string): void => {
+			optionsLabelHighest.value = value
+		}
 
 		/**
 		 * Handles the blur event for a label input.
@@ -302,18 +297,42 @@ export default defineComponent({
 		 *                         It can be either 'lowest' or 'highest' indicating
 		 *                         which label input (lowest value or highest value) triggered the blur event.
 		 */
-		onBlur(label: 'lowest' | 'highest'): void {
+		const onBlur = (label: 'lowest' | 'highest'): void => {
 			if (label === 'lowest') {
-				this.optionsLabelLowest = this.optionsLabelLowest
+				optionsLabelLowest.value = optionsLabelLowest.value
 					.replace(/[\r\n]+/gm, ' ')
 					.trim()
 			} else if (label === 'highest') {
-				this.optionsLabelHighest = this.optionsLabelHighest
+				optionsLabelHighest.value = optionsLabelHighest.value
 					.replace(/[\r\n]+/gm, ' ')
 					.trim()
 			}
-			this.resizeLabel(label)
-		},
+			resizeLabel(label)
+		}
+
+		return {
+			...question,
+			IconPencil,
+			t,
+			lowest,
+			highest,
+			scaleOptions,
+			isUnique,
+			questionValues,
+			labelId,
+			optionsLowest,
+			optionsHighest,
+			optionsLabelLowest,
+			optionsLabelHighest,
+			validate,
+			onChange,
+			onOptionsLowestChange,
+			onOptionsHighestChange,
+			onOptionsLabelLowestChange,
+			onOptionsLabelHighestChange,
+			resizeLabel,
+			onBlur,
+		}
 	},
 })
 </script>

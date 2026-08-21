@@ -104,7 +104,7 @@ import type { FormsOption } from '../../models/Entities.d.ts'
 
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, nextTick, ref } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -146,100 +146,117 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
 		const questionMultiple = useQuestionMultiple(props, { emit })
+		const input = ref<
+			Array<{
+				focus?: () => void
+				$props?: { optionType?: string; index?: number }
+			} | null>
+		>([])
+		const isDragging = ref(false)
+		const isLoading = ref(false)
+		const isOptionDialogShown = ref(false)
 
-		return {
-			...question,
-			...questionMultiple,
-			IconContentPaste,
-			t,
-		}
-	},
-
-	data() {
-		return {
-			isDragging: false as boolean,
-			isLoading: false as boolean,
-			isOptionDialogShown: false as boolean,
-			OptionType,
-		}
-	},
-
-	computed: {
-		selectOptionPlaceholder(): string {
-			if (this.readOnly) {
-				return this.answerType.submitPlaceholder
+		const selectOptionPlaceholder = computed(() => {
+			if (props.readOnly) {
+				return props.answerType.submitPlaceholder
 			}
-			return this.answerType.createPlaceholder
-		},
+			return props.answerType.createPlaceholder
+		})
 
-		isMultiple(): boolean {
+		const isMultiple = computed(() => {
 			// This can be extended if we want to include support for <select multiple>
 			return false
-		},
+		})
 
-		shiftDragHandle(): boolean {
-			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
-		},
+		const shiftDragHandle = computed(() => {
+			return (
+				!props.readOnly
+				&& props.options.length !== 0
+				&& !questionMultiple.isLastEmpty.value
+			)
+		})
 
-		selectedOption(): FormsOption | FormsOption[] | null {
-			if (!this.values) {
+		const selectedOption = computed<FormsOption | FormsOption[] | null>(() => {
+			if (!props.values) {
 				return null
 			}
 
-			const selected = this.values
+			const selected = props.values
 				.map((id: unknown) =>
-					this.options.find(
-						(option) => option.id === parseInt(String(id)),
+					props.options.find(
+						(option) => option.id === parseInt(String(id), 10),
 					),
 				)
 				.filter((option): option is FormsOption => option !== undefined)
 
-			return this.isMultiple ? selected : selected[0]
-		},
+			return isMultiple.value ? selected : (selected[0] ?? null)
+		})
 
-		choices: {
-			get(): FormsOption[] {
-				return this.sortOptionsOfType(this.options, OptionType.Choice)
+		const choices = computed<FormsOption[]>({
+			get() {
+				return questionMultiple.sortOptionsOfType(
+					props.options,
+					OptionType.Choice,
+				)
 			},
-
-			set(value: FormsOption[]): void {
-				this.updateOptionsOrder(value, OptionType.Choice)
+			set(value: FormsOption[]) {
+				questionMultiple.updateOptionsOrder(value, OptionType.Choice)
 			},
-		},
-	},
+		})
 
-	methods: {
-		async validate(): Promise<boolean> {
-			if (this.isRequired && this.areNoneChecked) {
-				this.errorMessage = t('forms', 'You must answer this question')
+		const validate = async (): Promise<boolean> => {
+			if (props.isRequired && questionMultiple.areNoneChecked.value) {
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
 				return false
 			}
 
-			this.errorMessage = null
+			question.errorMessage.value = null
 			return true
-		},
+		}
 
-		onDragStart(): void {
-			this.isDragging = true
-		},
+		const onDragStart = (): void => {
+			isDragging.value = true
+		}
 
-		onDragEnd(): void {
-			this.$nextTick(() => {
-				this.isDragging = false
+		const onDragEnd = (): void => {
+			nextTick(() => {
+				isDragging.value = false
 			})
-		},
+		}
 
-		onInput(option: FormsOption | FormsOption[] | null): void {
+		const onInput = (option: FormsOption | FormsOption[] | null): void => {
 			if (Array.isArray(option)) {
-				this.$emit('update:values', [
-					...new Set(option.map((opt) => opt.id)),
-				])
+				emit('update:values', [...new Set(option.map((opt) => opt.id))])
 				return
 			}
 
 			// Simple select
-			this.$emit('update:values', option ? [option.id] : [])
-		},
+			emit('update:values', option ? [option.id] : [])
+		}
+
+		return {
+			...question,
+			...questionMultiple,
+			input,
+			choices,
+			isDragging,
+			isLoading,
+			isMultiple,
+			isOptionDialogShown,
+			IconContentPaste,
+			onDragEnd,
+			onDragStart,
+			onInput,
+			OptionType,
+			selectedOption,
+			selectOptionPlaceholder,
+			shiftDragHandle,
+			t,
+			validate,
+		}
 	},
 })
 </script>

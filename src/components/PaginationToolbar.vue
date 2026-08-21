@@ -69,7 +69,7 @@ import IconChevronRight from '@material-symbols/svg-400/outlined/chevron_right.s
 import PageFirstIcon from '@material-symbols/svg-400/outlined/first_page.svg?raw'
 import PageLastIcon from '@material-symbols/svg-400/outlined/last_page.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
@@ -101,37 +101,30 @@ export default defineComponent({
 
 	emits: ['update:offset'],
 
-	setup() {
+	setup(props, { emit }) {
+		const totalPages = computed(() => {
+			return Math.max(1, Math.ceil(props.totalItemsCount / props.limit))
+		})
+		const allPageNumbersArray = computed(() => {
+			return Array.from({ length: totalPages.value }, (_, index) => 1 + index)
+		})
+		const pageNumber = computed({
+			get: () => Math.floor(props.offset / props.limit) + 1,
+			set: (pageNumberValue: number) => {
+				emit('update:offset', (Number(pageNumberValue) - 1) * props.limit)
+			},
+		})
+
 		return {
 			IconChevronLeft,
 			IconChevronRight,
 			PageFirstIcon,
 			PageLastIcon,
+			allPageNumbersArray,
+			totalPages,
+			pageNumber,
 			t,
 		}
-	},
-
-	computed: {
-		allPageNumbersArray(): number[] {
-			return Array.from(
-				{ length: this.totalPages },
-				(value, index) => 1 + index,
-			)
-		},
-
-		totalPages(): number {
-			return Math.max(1, Math.ceil(this.totalItemsCount / this.limit))
-		},
-
-		pageNumber: {
-			get(): number {
-				return Math.floor(this.offset / this.limit) + 1
-			},
-
-			set(pageNumber: number) {
-				this.$emit('update:offset', (Number(pageNumber) - 1) * this.limit)
-			},
-		},
 	},
 })
 </script>
