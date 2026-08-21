@@ -17,11 +17,13 @@ use OCA\Forms\Listener\CommentsEntityListener;
 use OCA\Forms\Listener\UserDeletedListener;
 use OCA\Forms\Middleware\ThrottleFormAccessMiddleware;
 use OCA\Forms\Search\SearchProvider;
+use OCA\Forms\ShareReview\ShareReviewListener;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Comments\CommentsEntityEvent;
+use OCP\Share\ShareReview\RegisterShareReviewSourceEvent;
 use OCP\User\Events\UserDeletedEvent;
 
 class Application extends App implements IBootstrap {
@@ -47,6 +49,7 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(UserDeletedEvent::class, UserDeletedListener::class);
 		$context->registerEventListener(DatasourceEvent::class, AnalyticsDatasourceListener::class);
 		$context->registerEventListener(CommentsEntityEvent::class, CommentsEntityListener::class);
+		$context->registerEventListener(RegisterShareReviewSourceEvent::class, ShareReviewListener::class);
 		$context->registerMiddleware(ThrottleFormAccessMiddleware::class);
 		$context->registerSearchProvider(SearchProvider::class);
 		$context->registerUserMigrator(FormsMigrator::class);

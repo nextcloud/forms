@@ -18,6 +18,7 @@ use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\Files\Folder;
 use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -95,5 +96,40 @@ class UploadedFilesShareServiceTest extends TestCase {
 			->with($fileShare);
 
 		$this->service->removeAllForForm($form);
+	}
+
+	public function testRemoveForCollaboratorSkipsShareTypesWithoutFilesShare(): void {
+		$form = new Form();
+		$form->setId(2);
+		$form->setTitle('test');
+		$form->setOwnerId('alice');
+
+		$linkShare = new Share();
+		$linkShare->setShareType(IShare::TYPE_LINK);
+		$linkShare->setPermissions([Constants::PERMISSION_RESULTS]);
+
+		$this->rootFolder->expects($this->never())->method('getUserFolder');
+		$this->shareManager->expects($this->never())->method('getSharesBy');
+
+		$this->service->removeForCollaborator($form, $linkShare);
+	}
+
+	public function testRemoveForCollaboratorIgnoresMissingUploadedFilesFolder(): void {
+		$form = new Form();
+		$form->setId(2);
+		$form->setTitle('test');
+		$form->setOwnerId('alice');
+
+		$share = new Share();
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('bob');
+		$share->setPermissions([Constants::PERMISSION_RESULTS]);
+
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->method('get')->willThrowException(new NotFoundException());
+		$this->rootFolder->method('getUserFolder')->with('alice')->willReturn($userFolder);
+		$this->shareManager->expects($this->never())->method('getSharesBy');
+
+		$this->service->removeForCollaborator($form, $share);
 	}
 }
