@@ -73,7 +73,7 @@
 					<textarea
 						id="form-title"
 						ref="title"
-						v-model="form.title"
+						:value="form.title"
 						class="form-title"
 						rows="1"
 						dir="auto"
@@ -82,7 +82,7 @@
 						required
 						autofocus
 						@keydown.enter.prevent
-						@input="onTitleChange" />
+						@input="onTitleInput" />
 				</h2>
 				<label class="hidden-visually" for="form-desc">
 					{{ t('forms', 'Description') }}
@@ -115,13 +115,13 @@
 			<section>
 				<!-- Questions list -->
 				<Draggable
-					v-model="form.questions"
+					:modelValue="form.questions"
 					:animation="300"
 					target=".sort-target"
 					direction="vertical"
 					invertSwap
 					handle=".question__drag-handle"
-					@update="onQuestionOrderChange"
+					@update:modelValue="onUpdateQuestions"
 					@start="onDragStart"
 					@end="onDragEnd">
 					<TransitionGroup
@@ -227,6 +227,7 @@ import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
+import { ref } from 'vue'
 import { defineComponent } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
@@ -240,7 +241,7 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
-import ViewsMixin from '../mixins/ViewsMixin.ts'
+import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
@@ -273,10 +274,36 @@ export default defineComponent({
 		TopBar,
 	},
 
-	mixins: [ViewsMixin],
+	props: {
+		hash: {
+			type: String,
+			default: '',
+		},
 
-	setup() {
+		form: {
+			type: Object,
+			required: true,
+		},
+
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
+	},
+
+	emits: ['update:form', 'open-sharing'],
+
+	setup(props, { emit }) {
+		const title = ref(null)
+		const viewForm = useViewForm({
+			form: () => props.form,
+			emit,
+			titleRef: title,
+		})
+
 		return {
+			...viewForm,
+			title,
 			IconLock,
 			isMobile: useIsMobile(),
 			t,
@@ -440,40 +467,52 @@ export default defineComponent({
 			}
 		},
 
+		updateQuestionProperty<K extends keyof FormsQuestion>(
+			index: number,
+			property: K,
+			value: FormsQuestion[K],
+		): void {
+			const questions = [...this.form.questions]
+			questions[index] = { ...questions[index], [property]: value }
+			this.$emit('update:form', { ...this.form, questions })
+		},
+
 		updateQuestionText(index: number, value: string): void {
-			this.form.questions[index].text = value
+			this.updateQuestionProperty(index, 'text', value)
 		},
 
 		updateQuestionDescription(index: number, value: string): void {
-			this.form.questions[index].description = value
+			this.updateQuestionProperty(index, 'description', value)
 		},
 
 		updateQuestionIsRequired(index: number, value: boolean): void {
-			this.form.questions[index].isRequired = value
+			this.updateQuestionProperty(index, 'isRequired', value)
 		},
 
 		updateQuestionName(index: number, value: string): void {
-			this.form.questions[index].name = value
+			this.updateQuestionProperty(index, 'name', value)
 		},
 
 		updateQuestionExtraSettings(
 			index: number,
 			value: Record<string, unknown> | null,
 		): void {
-			this.form.questions[index].extraSettings = value
+			this.updateQuestionProperty(index, 'extraSettings', value)
 		},
 
 		updateQuestionOptions(index: number, value: unknown[]): void {
-			this.form.questions[index].options = value
+			this.updateQuestionProperty(index, 'options', value)
 		},
 
 		onMoveUp(index: number): void {
 			if (index > 0) {
-				;[this.form.questions[index - 1], this.form.questions[index]] = [
-					this.form.questions[index],
-					this.form.questions[index - 1],
+				const questions = [...this.form.questions]
+				;[questions[index - 1], questions[index]] = [
+					questions[index],
+					questions[index - 1],
 				]
-				this.onQuestionOrderChange()
+				this.$emit('update:form', { ...this.form, questions })
+				this.onQuestionOrderChange(questions)
 			}
 		},
 
@@ -514,6 +553,14 @@ export default defineComponent({
 			})
 		},
 
+		onTitleInput(event: Event): void {
+			this.$emit('update:form', {
+				...this.form,
+				title: (event.target as HTMLTextAreaElement).value,
+			})
+			this.onTitleChange()
+		},
+
 		/**
 		 * Update the description
 		 *
@@ -524,7 +571,7 @@ export default defineComponent({
 			if (!target) {
 				return
 			}
-			this.form.description = target.value
+			this.$emit('update:form', { ...this.form, description: target.value })
 			this.resizeDescription()
 			this.saveDescription()
 		},
@@ -610,10 +657,10 @@ export default defineComponent({
 						},
 					),
 				)
-				const index = this.form.questions.findIndex(
-					(search: FormsQuestion) => search.id === questionId,
+				const questions = this.form.questions.filter(
+					(search: FormsQuestion) => search.id !== questionId,
 				)
-				this.form.questions.splice(index, 1)
+				this.$emit('update:form', { ...this.form, questions })
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error(`Error while removing question ${questionId}`, {
@@ -648,14 +695,17 @@ export default defineComponent({
 				insertAt = position
 			}
 
-			if (insertAt !== null && insertAt <= this.form.questions.length) {
-				this.form.questions.splice(insertAt, 0, newQuestionObj)
+			const questions = [...this.form.questions]
+			if (insertAt !== null && insertAt <= questions.length) {
+				questions.splice(insertAt, 0, newQuestionObj)
+				this.$emit('update:form', { ...this.form, questions })
 				this.$nextTick(() => {
 					// Prefer ref by id when available, fallback to positional refs
 					this.questionRefsMap[newQuestionObj.id]?.focus?.()
 				})
 			} else {
-				this.form.questions.push(newQuestionObj)
+				questions.push(newQuestionObj)
+				this.$emit('update:form', { ...this.form, questions })
 				this.$nextTick(() => {
 					this.questionRefsMap[newQuestionObj.id]?.focus?.()
 				})
@@ -707,14 +757,19 @@ export default defineComponent({
 			}
 		},
 
+		onUpdateQuestions(questions: FormsQuestion[]): void {
+			this.$emit('update:form', { ...this.form, questions })
+			this.onQuestionOrderChange(questions)
+		},
+
 		/**
 		 * Reorder questions on dragEnd
+		 *
+		 * @param questions the freshly reordered questions (avoids reading the not-yet-updated `form` prop)
 		 */
-		async onQuestionOrderChange(): Promise<void> {
+		async onQuestionOrderChange(questions: FormsQuestion[]): Promise<void> {
 			this.isLoadingQuestions = true
-			const newOrder = this.form.questions.map(
-				(question: FormsQuestion) => question.id,
-			)
+			const newOrder = questions.map((question: FormsQuestion) => question.id)
 
 			try {
 				await axios.patch(

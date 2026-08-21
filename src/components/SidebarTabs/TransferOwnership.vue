@@ -102,7 +102,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import UserSearchMixin from '../../mixins/UserSearchMixin.ts'
+import { useUserSearch } from '../../composables/useUserSearch.ts'
 import logger from '../../utils/Logger.ts'
 
 interface SelectedUserLike {
@@ -118,8 +118,6 @@ export default defineComponent({
 		NcTextField,
 		NcSelectUsers,
 	},
-
-	mixins: [UserSearchMixin],
 
 	props: {
 		form: {
@@ -140,6 +138,7 @@ export default defineComponent({
 
 	setup() {
 		return {
+			...useUserSearch(),
 			t,
 		}
 	},

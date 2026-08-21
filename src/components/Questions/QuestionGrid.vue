@@ -186,8 +186,15 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import AnswerInput from './AnswerInput.vue'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.ts'
-import QuestionMultipleMixin from '../../mixins/QuestionMultipleMixin.ts'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
+import {
+	QUESTION_MULTIPLE_EMITS,
+	useQuestionMultiple,
+} from '../../composables/useQuestionMultiple.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
 
 type GridQuestionType = GridCellType | 'text'
@@ -216,11 +223,16 @@ export default defineComponent({
 		Question,
 	},
 
-	mixins: [QuestionMixin, QuestionMultipleMixin],
-	emits: ['update:values'],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, ...QUESTION_MULTIPLE_EMITS, 'update:values'],
 
-	setup() {
+	setup(props, { emit }) {
+		const question = useQuestion(props, { emit })
+		const questionMultiple = useQuestionMultiple(props, { emit })
+
 		return {
+			...question,
+			...questionMultiple,
 			t,
 		}
 	},

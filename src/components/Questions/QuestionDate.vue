@@ -121,7 +121,11 @@ import svgClockLoader20 from '../../../img/clock_loader_20.svg?raw'
 import svgClockLoader80 from '../../../img/clock_loader_80.svg?raw'
 import svgEventIcon from '../../../img/event.svg?raw'
 import svgTodayIcon from '../../../img/today.svg?raw'
-import QuestionMixin from '../../mixins/QuestionMixin.ts'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
 
 type PickerType =
 	'date' | 'datetime' | 'time' | 'date-range' | 'datetime-range' | 'time-range'
@@ -146,8 +150,12 @@ export default defineComponent({
 		Question,
 	},
 
-	mixins: [QuestionMixin],
-	emits: ['update:values'],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, 'update:values'],
+
+	setup(props, { emit }) {
+		return useQuestion(props, { emit })
+	},
 
 	data() {
 		return {

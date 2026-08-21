@@ -41,7 +41,11 @@
 import { t } from '@nextcloud/l10n'
 import { defineComponent } from 'vue'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.ts'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
 
 export default defineComponent({
 	name: 'QuestionLong',
@@ -50,8 +54,12 @@ export default defineComponent({
 		Question,
 	},
 
-	mixins: [QuestionMixin],
-	emits: ['update:values', 'keydown'],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, 'update:values', 'keydown'],
+
+	setup(props, { emit }) {
+		return useQuestion(props, { emit })
+	},
 
 	data() {
 		return {

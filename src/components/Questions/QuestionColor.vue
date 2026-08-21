@@ -53,7 +53,11 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
-import QuestionMixin from '../../mixins/QuestionMixin.ts'
+import {
+	QUESTION_EMITS,
+	QUESTION_PROPS,
+	useQuestion,
+} from '../../composables/useQuestion.ts'
 
 export default defineComponent({
 	name: 'QuestionColor',
@@ -65,11 +69,14 @@ export default defineComponent({
 		Question,
 	},
 
-	mixins: [QuestionMixin],
-	emits: ['update:values'],
+	props: QUESTION_PROPS,
+	emits: [...QUESTION_EMITS, 'update:values'],
 
-	setup() {
+	setup(props, { emit }) {
+		const question = useQuestion(props, { emit })
+
 		return {
+			...question,
 			IconClose,
 			t,
 		}

@@ -308,10 +308,10 @@ import PillMenu from '../components/PillMenu.vue'
 import ResultsSummary from '../components/Results/ResultsSummary.vue'
 import Submission from '../components/Results/Submission.vue'
 import TopBar from '../components/TopBar.vue'
-import PermissionTypes from '../mixins/PermissionTypes.ts'
-import ViewsMixin from '../mixins/ViewsMixin.ts'
+import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -399,11 +399,30 @@ export default defineComponent({
 		TopBar,
 	},
 
-	mixins: [PermissionTypes, ViewsMixin],
-	emits: ['update:form'],
+	props: {
+		hash: {
+			type: String,
+			default: '',
+		},
 
-	setup() {
+		form: {
+			type: Object,
+			required: true,
+		},
+
+		sidebarOpened: {
+			type: Boolean,
+			required: true,
+		},
+	},
+
+	emits: ['update:form', 'open-sharing'],
+
+	setup(props, { emit }) {
+		const viewForm = useViewForm({ form: () => props.form, emit })
+
 		return {
+			...viewForm,
 			isMobile: useIsSmallMobile(),
 			t,
 			responseViews,
@@ -491,22 +510,20 @@ export default defineComponent({
 
 		canExportSubmissions(): boolean {
 			return this.form.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_RESULTS,
+				PERMISSION_TYPES.PERMISSION_RESULTS,
 			)
 		},
 
 		canDeleteSubmissions(): boolean {
 			return (
 				this.form.permissions.includes(
-					this.PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+					PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
 				) && !this.isFormArchived
 			)
 		},
 
 		canEditForm(): boolean {
-			return this.form.permissions.includes(
-				this.PERMISSION_TYPES.PERMISSION_EDIT,
-			)
+			return this.form.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
 		},
 
 		noSubmissions(): boolean {
@@ -900,7 +917,8 @@ export default defineComponent({
 				)
 
 				this.submissions = []
-				this.form.submissionCount = 0
+				const updatedForm = { ...this.form, submissionCount: 0 }
+				this.$emit('update:form', updatedForm)
 				emit('forms:last-updated:set', this.form.id)
 			} catch (error) {
 				logger.error('Error while deleting responses', { error })
