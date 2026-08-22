@@ -386,9 +386,10 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1","Question 2"
-				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
-				"user2","User 2","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
+				"Submission ID","User ID","User display name","Timestamp","Question 1","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-2"
+				"2","user1","User 1","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
+				"1","user2","User 2","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
 				'
 			],
 			'checkbox-multi-answers' => [
@@ -411,8 +412,9 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1"
-				"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1; Q1A2; Q1A3"
+				"Submission ID","User ID","User display name","Timestamp","Question 1"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1; Q1A2; Q1A3"
 				'
 			],
 			'grid-checkbox-multi-answers' => [
@@ -438,8 +440,9 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1 (Option 2)","Question 1 (Option 3)"
-				"user1","User 1","1973-11-29T22:33:09+01:00","Option 55","Option 56"
+				"Submission ID","User ID","User display name","Timestamp","Question 1 (Option 2)","Question 1 (Option 3)"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-2","question-id-1-3"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Option 55","Option 56"
 				'
 			],
 			'file-multi-answers' => [
@@ -461,8 +464,9 @@ class SubmissionServiceTest extends TestCase {
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1"
-				"user1","User 1","1973-11-29T22:33:09+01:00","file1.txt; ' . '
+				"Submission ID","User ID","User display name","Timestamp","Question 1"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","file1.txt; ' . '
 file2.txt"
 				'
 			],
@@ -484,8 +488,9 @@ file2.txt"
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1"
-				"","Anonymous user","1973-11-29T22:33:09+01:00","Q1A1"
+				"Submission ID","User ID","User display name","Timestamp","Question 1"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1"
+				"1","","Anonymous user","1973-11-29T22:33:09+01:00","Q1A1"
 				'
 			],
 			'questions-not-answered' => [
@@ -508,8 +513,9 @@ file2.txt"
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1","Question 2","Question 3"
-				"user1","User 1","1973-11-29T22:33:09+01:00","","Q2A1",""
+				"Submission ID","User ID","User display name","Timestamp","Question 1","Question 2","Question 3"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-2","question-id-3"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","","Q2A1",""
 				'
 			],
 			/* No submissions, but request via api */
@@ -522,7 +528,8 @@ file2.txt"
 				[],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp","Question 1"
+				"Submission ID","User ID","User display name","Timestamp","Question 1"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1"
 				'
 			],
 			/* All Questions e.g. got deleted */
@@ -542,8 +549,9 @@ file2.txt"
 				],
 				// Expected CSV-Result
 				'
-				"User ID","User display name","Timestamp"
-				"","Anonymous user","1973-11-29T22:33:09+01:00"
+				"Submission ID","User ID","User display name","Timestamp"
+				"submission_id","user_id","user_display_name","timestamp"
+				"1","","Anonymous user","1973-11-29T22:33:09+01:00"
 				'
 			],
 			'ranking-submission' => [
@@ -568,8 +576,9 @@ file2.txt"
 				],
 				// Expected CSV-Result: one column per option with rank position
 				'
-				"User ID","User display name","Timestamp","Rank these (Option A)","Rank these (Option B)","Rank these (Option C)"
-				"user1","User 1","1973-11-29T22:33:09+01:00","2","1","3"
+				"Submission ID","User ID","User display name","Timestamp","Rank these (Option A)","Rank these (Option B)","Rank these (Option C)"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-10","question-id-1-11","question-id-1-12"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","2","1","3"
 				'
 			],
 			'ranking-unanswered' => [
@@ -591,8 +600,9 @@ file2.txt"
 				],
 				// Expected CSV-Result: columns exist but values are empty
 				'
-				"User ID","User display name","Timestamp","Rank these (Option A)","Rank these (Option B)"
-				"user1","User 1","1973-11-29T22:33:09+01:00","",""
+				"Submission ID","User ID","User display name","Timestamp","Rank these (Option A)","Rank these (Option B)"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-10","question-id-1-11"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","",""
 				'
 			],
 		];
@@ -691,8 +701,9 @@ file2.txt"
 			],
 			// Expected CSV-Result
 			'
-			"User ID","User display name","Timestamp","Question 1"
-			"user1","User 1","1973-11-29T22:33:09+01:00","Q1A1"
+			"Submission ID","User ID","User display name","Timestamp","Question 1"
+			"submission_id","user_id","user_display_name","timestamp","question-id-1"
+			"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1"
 			',
 			// Form title
 			$formTitle
