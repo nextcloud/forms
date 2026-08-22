@@ -46,18 +46,17 @@
 			<div
 				v-for="share in publicLinkShares"
 				:key="'share-' + share.id"
-				:set="void (isEmbeddable = isEmbeddingAllowed(share))"
 				class="share-div share-div--link"
 				:class="{ 'share-div--embeddable': isEmbeddingAllowed(share) }">
 				<div class="share-div__avatar">
 					<NcIconSvgWrapper
-						v-if="isEmbeddable"
+						v-if="isEmbeddingAllowed(share)"
 						:svg="IconLinkBoxVariantOutline" />
 					<NcIconSvgWrapper v-else :svg="IconLinkVariant" />
 				</div>
 				<div class="share-div__desc share-div__desc--tokenized">
 					<span v-if="!appConfig.allowCustomPublicShareTokens">{{
-						isEmbeddable
+						isEmbeddingAllowed(share)
 							? t('forms', 'Embeddable link')
 							: t('forms', 'Share link')
 					}}</span>
@@ -67,7 +66,7 @@
 						:disabled="locked || !isCurrentUserOwner"
 						autocomplete="off"
 						:label="
-							isEmbeddable
+							isEmbeddingAllowed(share)
 								? t('forms', 'Embeddable link token')
 								: t('forms', 'Share link token')
 						"
@@ -107,7 +106,7 @@
 						{{ t('forms', 'Show QR code') }}
 					</NcActionButton>
 					<NcActionButton
-						v-if="isEmbeddable"
+						v-if="isEmbeddingAllowed(share)"
 						@click="copyEmbeddingCode($event, share)">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconCodeBrackets" />
@@ -252,7 +251,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionLink from '@nextcloud/vue/components/NcActionLink'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -290,14 +289,6 @@ interface SharingSidebarAppConfig {
 	[key: string]: unknown
 }
 
-interface ShareTokenUpdateContext {
-	shareTokens: Record<number, string>
-	loadingShareTokenId: number | null
-	savingShareTokens: Record<number, boolean>
-	form: { id: number }
-	$emit: (event: string, ...args: unknown[]) => void
-}
-
 export default defineComponent({
 	components: {
 		NcIconSvgWrapper,
@@ -332,7 +323,7 @@ export default defineComponent({
 
 	emits: ['addShare', 'updateShare', 'removeShare', 'update:formProp'],
 
-	setup() {
+	setup(props, { emit }) {
 		const { SHARE_TYPES } = useShareTypes()
 		const {
 			copyEmbeddingCode,
@@ -344,98 +335,72 @@ export default defineComponent({
 			PERMISSION_TYPES,
 			SHARE_TYPES,
 		})
+		const isLoading = ref(false)
+		const appConfig = loadState(
+			formsAppName,
+			'appConfig',
+		) as SharingSidebarAppConfig
+		const shareTokens = ref<Record<number, string>>({})
+		const savingShareTokens = ref<Record<number, boolean>>({})
+		const loadingShareTokenId = ref<number | null>(null)
+		const qrDialogText = ref('')
 
-		return {
-			t,
-			FormsIcon,
-			IconCheck,
-			IconCopyAll,
-			IconPlus,
-			IconCodeBrackets,
-			IconDelete,
-			IconLinkVariant,
-			IconLinkBoxVariantOutline,
-			IconAccountMultiple,
-			IconQr,
-			IconRefresh,
-			SHARE_TYPES,
-			copyEmbeddingCode,
-			copyLink,
-			getInternalShareLink,
-			getPublicShareLink,
-			isEmbeddingAllowed,
+		/**
+		 * Sort by shareType and DisplayName
+		 *
+		 * @param a first share for comparison
+		 * @param b second share for comparison
+		 */
+		const sortByTypeAndDisplayname = (a: ShareLike, b: ShareLike): number => {
+			const aDisplayName = (a.displayName ?? '').toLowerCase()
+			const bDisplayName = (b.displayName ?? '').toLowerCase()
+			if (a.shareType < b.shareType) {
+				return -1
+			}
+			if (a.shareType > b.shareType) {
+				return 1
+			}
+			if (aDisplayName < bDisplayName) {
+				return -1
+			}
+			if (aDisplayName > bDisplayName) {
+				return 1
+			}
+			return 0
 		}
-	},
 
-	data(): {
-		isLoading: boolean
-		appConfig: SharingSidebarAppConfig
-		shareTokens: Record<number, string>
-		savingShareTokens: Record<number, boolean>
-		loadingShareTokenId: number | null
-		qrDialogText: string
-		isEmbeddable: boolean
-	} {
-		return {
-			isLoading: false,
-			appConfig: loadState(
-				formsAppName,
-				'appConfig',
-			) as SharingSidebarAppConfig,
-
-			shareTokens: {},
-			savingShareTokens: {},
-			loadingShareTokenId: null,
-			qrDialogText: '',
-			isEmbeddable: false,
-		}
-	},
-
-	computed: {
-		isCurrentUserOwner(): boolean {
-			return getCurrentUser()?.uid === this.form.ownerId
-		},
-
-		sortedShares(): ShareLike[] {
-			// Remove Link-Shares, which are handled separately, then sort
-			return (this.form.shares as ShareLike[])
-				.filter(
-					(share) => share.shareType !== this.SHARE_TYPES.SHARE_TYPE_LINK,
-				)
-				.sort(this.sortByTypeAndDisplayname)
-		},
-
-		hasPublicLink(): boolean {
-			return this.publicLinkShares.length !== 0
-		},
-
-		publicLinkShares(): ShareLike[] {
-			const shares = (this.form.shares as ShareLike[]).filter(
-				(share) => share.shareType === this.SHARE_TYPES.SHARE_TYPE_LINK,
+		const isCurrentUserOwner = computed(
+			() => getCurrentUser()?.uid === props.form.ownerId,
+		)
+		const sortedShares = computed<ShareLike[]>(() =>
+			(props.form.shares as ShareLike[])
+				.filter((share) => share.shareType !== SHARE_TYPES.SHARE_TYPE_LINK)
+				.sort(sortByTypeAndDisplayname),
+		)
+		const publicLinkShares = computed<ShareLike[]>(() => {
+			const shares = (props.form.shares as ShareLike[]).filter(
+				(share) => share.shareType === SHARE_TYPES.SHARE_TYPE_LINK,
 			)
 			shares.sort((a: ShareLike, b: ShareLike) =>
-				this.isEmbeddingAllowed(a) ? 1 : this.isEmbeddingAllowed(b) ? -1 : 0,
+				isEmbeddingAllowed(a) ? 1 : isEmbeddingAllowed(b) ? -1 : 0,
 			)
 			return shares
-		},
-	},
+		})
+		const hasPublicLink = computed(() => publicLinkShares.value.length !== 0)
 
-	watch: {
-		publicLinkShares: {
-			immediate: true,
-			handler(shares: ShareLike[]) {
+		watch(
+			publicLinkShares,
+			(shares: ShareLike[]) => {
 				const nextShareTokens: Record<number, string> = {}
 				for (const share of shares) {
 					nextShareTokens[share.id] =
-						this.shareTokens[share.id] ?? share.shareWith
+						shareTokens.value[share.id] ?? share.shareWith
 				}
-
-				this.shareTokens = nextShareTokens
+				shareTokens.value = nextShareTokens
 			},
-		},
-	},
+			{ immediate: true },
+		)
 
-	methods: {
 		/**
 		 * Add share
 		 *
@@ -443,16 +408,16 @@ export default defineComponent({
 		 * @param newShare.shareType type of the share
 		 * @param newShare.shareWith with whom it should be shared
 		 */
-		async addShare(newShare: {
+		const addShare = async (newShare: {
 			shareType: number
 			shareWith: string
-		}): Promise<void> {
-			this.isLoading = true
+		}): Promise<void> => {
+			isLoading.value = true
 
 			try {
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares', {
-						id: this.form.id,
+						id: props.form.id,
 					}),
 					{
 						shareType: newShare.shareType,
@@ -462,7 +427,7 @@ export default defineComponent({
 				const share = OcsResponse2Data(response)
 
 				// Add new share
-				this.$emit('addShare', share)
+				emit('addShare', share)
 			} catch (error) {
 				logger.error('Error while adding new share', {
 					error,
@@ -470,61 +435,46 @@ export default defineComponent({
 				})
 				showError(t('forms', 'There was an error while adding the share'))
 			} finally {
-				this.isLoading = false
+				isLoading.value = false
 			}
-		},
+		}
 
-		async addPublicLink(): Promise<void> {
-			this.isLoading = true
+		const addPublicLink = async (): Promise<void> => {
+			isLoading.value = true
 
 			try {
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares', {
-						id: this.form.id,
+						id: props.form.id,
 					}),
 					{
-						shareType: this.SHARE_TYPES.SHARE_TYPE_LINK,
+						shareType: SHARE_TYPES.SHARE_TYPE_LINK,
 					},
 				)
 				const share = OcsResponse2Data(response)
 
 				// Add new share
-				this.$emit('addShare', share)
+				emit('addShare', share)
 			} catch (error) {
 				logger.error('Error adding public link', { error })
 				showError(t('forms', 'There was an error while adding the link'))
 			} finally {
-				this.isLoading = false
+				isLoading.value = false
 			}
-		},
+		}
 
 		/**
-		 * Make a share embeddable into websites (sets the internal permission)
+		 * Update the permissions for a share through the API.
 		 *
-		 * @param share The public link share to make embeddable
+		 * @param updatedShare The share payload with the new permission set.
 		 */
-		makeEmbeddable(share: ShareLike): void {
-			this.updateShare({
-				...share,
-				permissions: [
-					...share.permissions,
-					PERMISSION_TYPES.PERMISSION_EMBED,
-				],
-			})
-		},
-
-		/**
-		 * Update share
-		 *
-		 * @param updatedShare the updated object
-		 */
-		async updateShare(updatedShare: ShareLike): Promise<void> {
-			this.isLoading = true
+		async function updateShare(updatedShare: ShareLike): Promise<void> {
+			isLoading.value = true
 
 			try {
 				const response = await axios.patch(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares/{shareId}', {
-						id: this.form.id,
+						id: props.form.id,
 						shareId: updatedShare.id,
 					}),
 					{
@@ -538,7 +488,7 @@ export default defineComponent({
 				})
 
 				// Add new share
-				this.$emit('updateShare', share)
+				emit('updateShare', share)
 			} catch (error) {
 				logger.error('Error while updating share', {
 					error,
@@ -546,129 +496,92 @@ export default defineComponent({
 				})
 				showError(t('forms', 'There was an error while updating the share'))
 			} finally {
-				this.isLoading = false
+				isLoading.value = false
 			}
-		},
+		}
+
+		/**
+		 * Update the permissions for a share through the API.
+		 *
+		 * @param share The share being updated.
+		 */
+		function makeEmbeddable(share: ShareLike): void {
+			updateShare({
+				...share,
+				permissions: [
+					...share.permissions,
+					PERMISSION_TYPES.PERMISSION_EMBED,
+				],
+			})
+		}
 
 		/**
 		 * Remove share
 		 *
 		 * @param share the share to delete
 		 */
-		async removeShare(share: ShareLike): Promise<void> {
-			this.isLoading = true
+		const removeShare = async (share: ShareLike): Promise<void> => {
+			isLoading.value = true
 
 			try {
 				await axios.delete(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares/{shareId}', {
-						id: this.form.id,
+						id: props.form.id,
 						shareId: share.id,
 					}),
 				)
-				this.$emit('removeShare', share)
+				emit('removeShare', share)
 			} catch (error) {
 				logger.error('Error while removing share', { error, share })
 				showError(t('forms', 'There was an error while removing the share'))
 			} finally {
-				this.isLoading = false
+				isLoading.value = false
 			}
-		},
+		}
 
 		/**
-		 * Sort by shareType and DisplayName
+		 * Update the permit-all-users access flag.
 		 *
-		 * @param a first share for comparison
-		 * @param b second share for comparison
+		 * @param newVal The next checkbox value.
 		 */
-		sortByTypeAndDisplayname(a: ShareLike, b: ShareLike): number {
-			const aDisplayName = (a.displayName ?? '').toLowerCase()
-			const bDisplayName = (b.displayName ?? '').toLowerCase()
-			// First return, if ShareType does not match
-			if (a.shareType < b.shareType) {
-				return -1
-			}
-			if (a.shareType > b.shareType) {
-				return 1
-			}
-
-			// Otherwise sort by displayname
-			if (aDisplayName < bDisplayName) {
-				return -1
-			}
-			if (aDisplayName > bDisplayName) {
-				return 1
-			}
-			return 0
-		},
-
-		onPermitAllUsersChange(newVal: boolean): void {
-			const newAccess = { ...this.form.access }
+		const onPermitAllUsersChange = (newVal: boolean): void => {
+			const newAccess = { ...props.form.access }
 			newAccess.permitAllUsers = newVal
-			this.$emit('update:formProp', 'access', newAccess)
-		},
+			emit('update:formProp', 'access', newAccess)
+		}
 
-		onShowToAllUsersChange(newVal: boolean): void {
-			const newAccess = { ...this.form.access }
+		/**
+		 * Update the show-to-all-users access flag.
+		 *
+		 * @param newVal The next checkbox value.
+		 */
+		const onShowToAllUsersChange = (newVal: boolean): void => {
+			const newAccess = { ...props.form.access }
 			newAccess.showToAllUsers = newVal
-			this.$emit('update:formProp', 'access', newAccess)
-		},
+			emit('update:formProp', 'access', newAccess)
+		}
 
-		getShareTokenInput(share: ShareLike): string {
-			return this.shareTokens[share.id] ?? share.shareWith
-		},
+		const getShareTokenInput = (share: ShareLike): string =>
+			shareTokens.value[share.id] ?? share.shareWith
 
-		isShareTokenSaving(share: ShareLike): boolean {
-			return !!this.savingShareTokens[share.id]
-		},
+		const isShareTokenSaving = (share: ShareLike): boolean =>
+			!!savingShareTokens.value[share.id]
 
-		isShareTokenLoading(share: ShareLike): boolean {
-			return this.loadingShareTokenId === share.id
-		},
+		const isShareTokenLoading = (share: ShareLike): boolean =>
+			loadingShareTokenId.value === share.id
 
-		setShareTokenInput(share: ShareLike, token: string | number): void {
-			this.shareTokens = {
-				...this.shareTokens,
-				[share.id]: String(token),
-			}
-			this.updateShareToken(share)
-		},
-
-		async generateNewToken(share: ShareLike): Promise<void> {
-			this.loadingShareTokenId = share.id
-
-			try {
-				const { data } = await axios.get(
-					generateOcsUrl('apps/forms/api/v3/token'),
-				)
-				this.setShareTokenInput(share, data.ocs.data.token)
-			} catch (error) {
-				logger.error('Error while generating share token', {
-					error,
-					share,
-				})
-				showError(
-					t('forms', 'There was an error while generating the link token'),
-				)
-			} finally {
-				this.loadingShareTokenId = null
-			}
-		},
-
-		updateShareToken: debounce(async function (
-			this: ShareTokenUpdateContext,
-			share: ShareLike,
-		) {
-			const token = this.shareTokens[share.id] ?? share.shareWith
-			this.loadingShareTokenId = share.id
-			this.savingShareTokens = {
-				...this.savingShareTokens,
+		const updateShareToken = debounce(async (share: ShareLike) => {
+			const token = shareTokens.value[share.id] ?? share.shareWith
+			loadingShareTokenId.value = share.id
+			savingShareTokens.value = {
+				...savingShareTokens.value,
 				[share.id]: true,
 			}
 
 			try {
 				const response = await axios.patch(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/shares/{shareId}', {
-						id: this.form.id,
+						id: props.form.id,
 						shareId: share.id,
 					}),
 					{
@@ -678,7 +591,7 @@ export default defineComponent({
 					},
 				)
 
-				this.$emit('updateShare', {
+				emit('updateShare', {
 					...share,
 					id: OcsResponse2Data(response),
 					shareWith: token,
@@ -693,17 +606,94 @@ export default defineComponent({
 					t('forms', 'There was an error while updating the link token'),
 				)
 			} finally {
-				this.savingShareTokens = {
-					...this.savingShareTokens,
+				savingShareTokens.value = {
+					...savingShareTokens.value,
 					[share.id]: false,
 				}
-				this.loadingShareTokenId = null
+				loadingShareTokenId.value = null
 			}
-		}, INPUT_DEBOUNCE_MS),
+		}, INPUT_DEBOUNCE_MS)
 
-		openQrDialog(share: ShareLike): void {
-			this.qrDialogText = this.getPublicShareLink(share)
-		},
+		const setShareTokenInput = (
+			share: ShareLike,
+			token: string | number,
+		): void => {
+			shareTokens.value = {
+				...shareTokens.value,
+				[share.id]: String(token),
+			}
+			void updateShareToken(share)
+		}
+
+		const generateNewToken = async (share: ShareLike): Promise<void> => {
+			loadingShareTokenId.value = share.id
+
+			try {
+				const { data } = await axios.get(
+					generateOcsUrl('apps/forms/api/v3/token'),
+				)
+				setShareTokenInput(share, data.ocs.data.token)
+			} catch (error) {
+				logger.error('Error while generating share token', {
+					error,
+					share,
+				})
+				showError(
+					t('forms', 'There was an error while generating the link token'),
+				)
+			} finally {
+				loadingShareTokenId.value = null
+			}
+		}
+
+		const openQrDialog = (share: ShareLike): void => {
+			qrDialogText.value = getPublicShareLink(share)
+		}
+
+		return {
+			appConfig,
+			copyEmbeddingCode,
+			copyLink,
+			getInternalShareLink,
+			getPublicShareLink,
+			isCurrentUserOwner,
+			isLoading,
+			loadingShareTokenId,
+			publicLinkShares,
+			hasPublicLink,
+			sortedShares,
+			shareTokens,
+			savingShareTokens,
+			qrDialogText,
+			SHARE_TYPES,
+			FormsIcon,
+			IconCheck,
+			IconCopyAll,
+			IconPlus,
+			IconCodeBrackets,
+			IconDelete,
+			IconLinkVariant,
+			IconLinkBoxVariantOutline,
+			IconAccountMultiple,
+			IconQr,
+			IconRefresh,
+			isEmbeddingAllowed,
+			t,
+			addShare,
+			addPublicLink,
+			makeEmbeddable,
+			updateShare,
+			removeShare,
+			sortByTypeAndDisplayname,
+			onPermitAllUsersChange,
+			onShowToAllUsersChange,
+			getShareTokenInput,
+			isShareTokenSaving,
+			isShareTokenLoading,
+			setShareTokenInput,
+			generateNewToken,
+			openQrDialog,
+		}
 	},
 })
 </script>

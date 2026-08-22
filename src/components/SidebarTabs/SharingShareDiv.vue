@@ -48,7 +48,7 @@
 <script lang="ts">
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -97,96 +97,41 @@ export default defineComponent({
 
 	emits: ['removeShare', 'update:share'],
 
-	setup() {
+	setup(props, { emit }) {
 		const { SHARE_TYPES } = useShareTypes()
-
-		return {
-			t,
-			IconClose,
-			SHARE_TYPES,
-		}
-	},
-
-	computed: {
-		canAccessResults(): boolean {
-			return this.share.permissions.includes(
-				PERMISSION_TYPES.PERMISSION_RESULTS,
-			)
-		},
-
-		canDeleteResults(): boolean {
-			return this.share.permissions.includes(
+		const canAccessResults = computed(() =>
+			props.share.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS),
+		)
+		const canDeleteResults = computed(() =>
+			props.share.permissions.includes(
 				PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
-			)
-		},
-
-		canEditForm(): boolean {
-			return this.share.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
-		},
-
-		isNoUser(): boolean {
-			return this.share.shareType !== this.SHARE_TYPES.SHARE_TYPE_USER
-		},
-
-		displayName(): string {
-			return !this.share.displayName
-				? this.share.shareWith
-				: this.share.displayName
-		},
-
-		displayNameAppendix(): string {
-			switch (this.share.shareType) {
-				case this.SHARE_TYPES.SHARE_TYPE_GROUP:
+			),
+		)
+		const canEditForm = computed(() =>
+			props.share.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT),
+		)
+		const isNoUser = computed(
+			() => props.share.shareType !== SHARE_TYPES.SHARE_TYPE_USER,
+		)
+		const displayName = computed(() =>
+			props.share.displayName
+				? props.share.displayName
+				: props.share.shareWith,
+		)
+		const displayNameAppendix = computed(() => {
+			switch (props.share.shareType) {
+				case SHARE_TYPES.SHARE_TYPE_GROUP:
 					return `(${t('forms', 'Group')})`
-				case this.SHARE_TYPES.SHARE_TYPE_CIRCLE:
+				case SHARE_TYPES.SHARE_TYPE_CIRCLE:
 					return `(${t('forms', 'Team')})`
 				default:
 					return ''
 			}
-		},
-	},
+		})
 
-	methods: {
-		removeShare(): void {
-			this.$emit('removeShare', this.share)
-		},
-
-		/**
-		 * @param hasPermission If the results permission should be granted
-		 */
-		updatePermissionResults(hasPermission: boolean): void {
-			if (hasPermission === false) {
-				// ensure to remove the delete permission if results permission is dropped
-				this.updatePermission(
-					PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
-					false,
-				)
-			}
-			return this.updatePermission(
-				PERMISSION_TYPES.PERMISSION_RESULTS,
-				hasPermission,
-			)
-		},
-
-		/**
-		 * @param hasPermission If the results_delete permission should be granted
-		 */
-		updatePermissionDeleteResults(hasPermission: boolean): void {
-			return this.updatePermission(
-				PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
-				hasPermission,
-			)
-		},
-
-		/**
-		 * @param hasPermission If the results_delete permission should be granted
-		 */
-		updatePermissionEdit(hasPermission: boolean): void {
-			return this.updatePermission(
-				PERMISSION_TYPES.PERMISSION_EDIT,
-				hasPermission,
-			)
-		},
+		const removeShare = (): void => {
+			emit('removeShare', props.share)
+		}
 
 		/**
 		 * Grant or remove permission from share
@@ -194,8 +139,11 @@ export default defineComponent({
 		 * @param permission The permission to grant or remove
 		 * @param hasPermission True if granted, False if removed
 		 */
-		updatePermission(permission: string, hasPermission: boolean): void {
-			const share = { ...(this.share as ShareLike) }
+		const updatePermission = (
+			permission: string,
+			hasPermission: boolean,
+		): void => {
+			const share = { ...(props.share as ShareLike) }
 			if (hasPermission) {
 				share.permissions = [...new Set([...share.permissions, permission])]
 			} else {
@@ -203,8 +151,51 @@ export default defineComponent({
 					(perm: string) => perm !== permission,
 				)
 			}
-			this.$emit('update:share', share)
-		},
+			emit('update:share', share)
+		}
+
+		/**
+		 * @param hasPermission If the results permission should be granted
+		 */
+		const updatePermissionResults = (hasPermission: boolean): void => {
+			if (hasPermission === false) {
+				updatePermission(PERMISSION_TYPES.PERMISSION_RESULTS_DELETE, false)
+			}
+			updatePermission(PERMISSION_TYPES.PERMISSION_RESULTS, hasPermission)
+		}
+
+		/**
+		 * @param hasPermission If the results_delete permission should be granted
+		 */
+		const updatePermissionDeleteResults = (hasPermission: boolean): void => {
+			updatePermission(
+				PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+				hasPermission,
+			)
+		}
+
+		/**
+		 * @param hasPermission If the results_delete permission should be granted
+		 */
+		const updatePermissionEdit = (hasPermission: boolean): void => {
+			updatePermission(PERMISSION_TYPES.PERMISSION_EDIT, hasPermission)
+		}
+
+		return {
+			t,
+			IconClose,
+			SHARE_TYPES,
+			canAccessResults,
+			canDeleteResults,
+			canEditForm,
+			isNoUser,
+			displayName,
+			displayNameAppendix,
+			removeShare,
+			updatePermissionResults,
+			updatePermissionDeleteResults,
+			updatePermissionEdit,
+		}
 	},
 })
 </script>

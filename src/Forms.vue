@@ -133,6 +133,7 @@
 				:form="selectedForm"
 				:sidebarOpened="sidebarOpened"
 				:active="sidebarActive"
+				@update:form="updateSelectedForm"
 				@update:sidebarOpened="sidebarOpened = $event"
 				@update:active="sidebarActive = $event" />
 		</template>

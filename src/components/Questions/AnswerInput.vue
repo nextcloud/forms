@@ -97,8 +97,7 @@ import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import PQueue from 'p-queue'
-import { markRaw } from 'vue'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, markRaw, nextTick, ref, watch } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -174,159 +173,136 @@ export default defineComponent({
 		'moveUp',
 	],
 
-	setup() {
-		return {
-			IconArrowDown,
-			IconArrowUp,
-			IconDelete,
-			IconDragIndicator,
-			IconPlus,
-			t,
-		}
-	},
+	setup(props, { emit }) {
+		// markRaw: PQueue relies on private class fields, which break when Vue wraps it in a reactive proxy
+		const queue = ref(markRaw(new PQueue({ concurrency: 1 })))
+		const input = ref<HTMLInputElement | null>(null)
+		const buttonOptionDown = ref<{ $el?: HTMLElement } | null>(null)
+		const buttonOptionUp = ref<{ $el?: HTMLElement } | null>(null)
+		const isIMEComposing = ref(false)
+		const localText = ref((props.answer as FormsOption | undefined)?.text ?? '')
 
-	data() {
-		return {
-			queue: null as PQueue | null,
-			debounceOnInput: undefined as ((event: InputEvent) => void) | undefined,
-			isIMEComposing: false as boolean,
-			localText: (this.answer as FormsOption | undefined)?.text ?? '',
-		}
-	},
-
-	computed: {
-		canCreateLocalAnswer(): boolean {
-			if ((this.answer as FormsOption).local) {
-				return !!this.localText?.trim()
+		const canCreateLocalAnswer = computed(() => {
+			if ((props.answer as FormsOption).local) {
+				return !!localText.value.trim()
 			}
-			return !!(this.answer as FormsOption).text?.trim()
-		},
+			return !!(props.answer as FormsOption).text?.trim()
+		})
 
-		ariaLabel(): string {
-			const answer = this.answer as FormsOption
+		const ariaLabel = computed(() => {
+			const answer = props.answer as FormsOption
 			if (answer.local) {
-				if (this.optionType === OptionType.Column) {
+				if (props.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
-				if (this.optionType === OptionType.Row) {
+				if (props.optionType === OptionType.Row) {
 					return t('forms', 'Add a new row')
 				}
 
 				return t('forms', 'Add a new answer option')
 			}
 
-			if (this.optionType === OptionType.Column) {
+			if (props.optionType === OptionType.Column) {
 				return t('forms', 'The text of column {index}', {
-					index: this.index + 1,
+					index: props.index + 1,
 				})
 			}
 
-			if (this.optionType === OptionType.Row) {
+			if (props.optionType === OptionType.Row) {
 				return t('forms', 'The text of row {index}', {
-					index: this.index + 1,
+					index: props.index + 1,
 				})
 			}
 
 			return t('forms', 'The text of option {index}', {
-				index: this.index + 1,
+				index: props.index + 1,
 			})
-		},
+		})
 
-		optionDragMenuId(): string {
-			const answer = this.answer as FormsOption
-			return `q${answer.questionId}o${answer.id}o${this.optionType}__drag_menu`
-		},
+		const optionDragMenuId = computed(() => {
+			const answer = props.answer as FormsOption
+			return `q${answer.questionId}o${answer.id}o${props.optionType}__drag_menu`
+		})
 
-		placeholder(): string {
-			const answer = this.answer as FormsOption
+		const placeholder = computed(() => {
+			const answer = props.answer as FormsOption
 			if (answer.local) {
-				if (this.optionType === OptionType.Column) {
+				if (props.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
 
-				if (this.optionType === OptionType.Row) {
+				if (props.optionType === OptionType.Row) {
 					return t('forms', 'Add a new row')
 				}
 
 				return t('forms', 'Add a new answer option')
 			}
 
-			if (this.optionType === OptionType.Column) {
-				return t('forms', 'Column number {index}', { index: this.index + 1 })
+			if (props.optionType === OptionType.Column) {
+				return t('forms', 'Column number {index}', {
+					index: props.index + 1,
+				})
 			}
 
-			if (this.optionType === OptionType.Row) {
-				return t('forms', 'Row number {index}', { index: this.index + 1 })
+			if (props.optionType === OptionType.Row) {
+				return t('forms', 'Row number {index}', { index: props.index + 1 })
 			}
 
-			return t('forms', 'Answer number {index}', { index: this.index + 1 })
-		},
+			return t('forms', 'Answer number {index}', { index: props.index + 1 })
+		})
 
-		pseudoIcon(): string {
-			const answer = this.answer as FormsOption
+		const pseudoIcon = computed(() => {
+			const answer = props.answer as FormsOption
 			if (answer.local) {
 				return IconPlus
 			}
 
-			if (this.optionType === OptionType.Column) {
+			if (props.optionType === OptionType.Column) {
 				return IconTableColumn
 			}
 
-			if (this.optionType === OptionType.Row) {
+			if (props.optionType === OptionType.Row) {
 				return IconTableRow
 			}
 
-			if (this.isRanking) {
+			if (props.isRanking) {
 				return IconDragIndicator
 			}
 
-			return this.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
-		},
-	},
+			return props.isUnique ? IconRadioboxBlank : IconCheckboxBlankOutline
+		})
 
-	watch: {
 		// Keep localText in sync when the parent replaces/updates the answer prop
-		answer: {
-			handler(newVal: FormsOption) {
-				this.localText = newVal?.text ?? ''
+		watch(
+			() => props.answer,
+			(newVal: FormsOption) => {
+				localText.value = newVal?.text ?? ''
 			},
-
-			deep: true,
-		},
-	},
-
-	created(): void {
-		this.queue = markRaw(new PQueue({ concurrency: 1 }))
+			{ deep: true },
+		)
 
 		// As data instead of method, to have a separate debounce per AnswerInput
-		this.debounceOnInput = debounce((event: InputEvent) => {
-			const queue = this.queue
-			if (!queue) {
-				return
-			}
-			return queue.add(() => this.onInput(event))
+		const debounceOnInput = debounce((event: InputEvent) => {
+			void queue.value.add(() => onInput(event))
 		}, INPUT_DEBOUNCE_MS)
-	},
 
-	methods: {
-		handleTabbing(): void {
-			this.$emit('tabbedOut', this.optionType)
-		},
+		const handleTabbing = (): void => {
+			emit('tabbedOut', props.optionType)
+		}
 
 		/**
-		 * Focus the input
+		 * Focus the current answer input.
 		 */
-		focus(): void {
-			const input = this.$refs.input as unknown as HTMLInputElement | undefined
-			input?.focus()
-		},
+		const focus = (): void => {
+			input.value?.focus()
+		}
 
 		/**
-		 * Option changed, processing the data
+		 * Handle text input change from the form field.
 		 *
-		 * @param event The input event that triggered adding a new entry
+		 * @param event The input event that triggered the save.
 		 */
-		async onInput(
+		async function onInput(
 			event: InputEvent | { target: HTMLInputElement; isComposing?: boolean },
 		): Promise<void> {
 			const target = event.target as HTMLInputElement | null
@@ -334,159 +310,139 @@ export default defineComponent({
 				return
 			}
 
-			const answer = this.answer as FormsOption
+			const answer = props.answer as FormsOption
 			if (answer.local) {
-				this.localText = target.value
+				localText.value = target.value
 				return
 			}
 
-			if (!event.isComposing && !this.isIMEComposing && target.value !== '') {
+			if (!event.isComposing && !isIMEComposing.value && target.value !== '') {
 				// clone answer
 				const answerCopy = { ...answer }
-				const input = this.$refs.input as unknown as
-					HTMLInputElement | undefined
-				if (!input) {
+				if (!input.value) {
 					return
 				}
-				answerCopy.text = input.value
+				answerCopy.text = input.value.value
 
-				await this.updateAnswer(answerCopy)
+				await updateAnswer(answerCopy)
 
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while updating the answer
-				answerCopy.text = input.value
-				this.$emit('update:answer', this.index, answerCopy)
+				answerCopy.text = input.value.value
+				emit('update:answer', props.index, answerCopy)
 			}
-		},
+		}
 
 		/**
 		 * Handle Enter key: create local answer or move focus
 		 *
-		 * @param e the keydown event
+		 * @param e The keyboard event.
 		 */
-		onEnter(e: KeyboardEvent): void {
-			if ((this.answer as FormsOption).local) {
-				this.createLocalAnswer(e)
+		const onEnter = (e: KeyboardEvent): void => {
+			if ((props.answer as FormsOption).local) {
+				void createLocalAnswer(e)
 				return
 			}
-			this.focusNextInput(e)
-		},
+			focusNextInput(e)
+		}
 
 		/**
-		 * Create a new local answer option from the current input
+		 * Create a new local answer option from the current input value.
 		 *
-		 * @param e the triggering event
+		 * @param e The triggering event, if any.
 		 */
-		async createLocalAnswer(
+		async function createLocalAnswer(
 			e?: Event & { isComposing?: boolean },
 		): Promise<void> {
-			if (this.isIMEComposing || e?.isComposing) {
+			if (isIMEComposing.value || e?.isComposing) {
 				return
 			}
 
-			const value = this.localText ?? ''
+			const value = localText.value ?? ''
 			if (!value.trim()) {
 				return
 			}
 
 			const answer = {
-				...(this.answer as FormsOption),
+				...(props.answer as FormsOption),
 				text: value,
 				local: false,
 			}
 
-			// Prevent any queued debounced PATCHes from running while creating
-			const queue = this.queue
-			if (!queue) {
-				return
-			}
-			queue.pause()
+			queue.value.pause()
 			try {
-				const newAnswer = await this.createAnswer(answer)
-
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while creating the answer
-				const input = this.$refs.input as unknown as
-					HTMLInputElement | undefined
-				if (!input) {
+				const newAnswer = await createAnswer(answer)
+				if (!input.value) {
 					return
 				}
-				newAnswer.text = input.value
-				this.localText = ''
-
-				this.$emit('createAnswer', this.index, newAnswer)
+				newAnswer.text = input.value.value
+				localText.value = ''
+				emit('createAnswer', props.index, newAnswer)
 			} finally {
 				// Clear pending update tasks (stale PATCHes) before resuming processing
-				queue.clear()
-				queue.start()
+				queue.value.clear()
+				queue.value.start()
 			}
-		},
+		}
 
 		/**
-		 * Request a new answer
+		 * Move focus to the next answer input when Enter is pressed.
 		 *
-		 * @param e the triggering event
+		 * @param e The keyboard event.
 		 */
-		focusNextInput(e: Event & { isComposing?: boolean }): void {
-			if (this.isIMEComposing || e?.isComposing) {
+		function focusNextInput(e: Event & { isComposing?: boolean }): void {
+			if (isIMEComposing.value || e?.isComposing) {
 				return
 			}
-			if (this.index <= this.maxIndex) {
-				this.$emit('focusNext', this.index, this.optionType)
+			if (props.index <= props.maxIndex) {
+				emit('focusNext', props.index, props.optionType)
 			}
-		},
+		}
 
 		/**
-		 * Emit a delete request for this answer
-		 * when pressing the delete key on an empty input
+		 * Remove the current option when the delete action is triggered.
 		 *
-		 * @param e the event
+		 * @param e The input or button event.
 		 */
-		async deleteEntry(
+		const deleteEntry = async (
 			e: Event & { isComposing?: boolean; type: string },
-		): Promise<void> {
-			if (this.isIMEComposing || e?.isComposing) {
+		): Promise<void> => {
+			if (isIMEComposing.value || e?.isComposing) {
 				return
 			}
 
-			if ((this.answer as FormsOption).local) {
+			if ((props.answer as FormsOption).local) {
 				return
 			}
 
-			const input = this.$refs.input as unknown as HTMLInputElement | undefined
-			if (e.type !== 'click' && (input?.value.length ?? 0) !== 0) {
+			if (e.type !== 'click' && (input.value?.value.length ?? 0) !== 0) {
 				return
 			}
 
 			// Dismiss delete key action
 			e.preventDefault()
-
-			// do this in queue to prevent race conditions between PATCH and DELETE
-			const queue = this.queue
-			if (!queue) {
-				return
-			}
-			queue.add(() => {
-				this.$emit('delete', this.answer as FormsOption)
-				// Prevent any patch requests
-				queue.pause()
-				queue.clear()
+			void queue.value.add(() => {
+				emit('delete', props.answer as FormsOption)
+				queue.value.pause()
+				queue.value.clear()
 			})
-		},
+		}
 
 		/**
-		 * Create an unsynced answer to the server
+		 * Save a newly created option to the server.
 		 *
-		 * @param answer the answer to sync
-		 * @return answer
+		 * @param answer The answer payload to create.
+		 * @return The saved server response item.
 		 */
-		async createAnswer(answer: FormsOption): Promise<FormsOption> {
+		async function createAnswer(answer: FormsOption): Promise<FormsOption> {
 			try {
 				const response = await axios.post(
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
 						{
-							id: this.formId,
+							id: props.formId,
 							questionId: answer.questionId,
 						},
 					),
@@ -506,21 +462,20 @@ export default defineComponent({
 			}
 
 			return answer
-		},
+		}
 
 		/**
-		 * Save to the server, only do it after 500ms
-		 * of no change
+		 * Persist a changed answer text to the server after debounce.
 		 *
-		 * @param answer the answer to sync
+		 * @param answer The updated answer payload.
 		 */
-		async updateAnswer(answer: FormsOption): Promise<void> {
+		async function updateAnswer(answer: FormsOption): Promise<void> {
 			try {
 				await axios.patch(
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
 						{
-							id: this.formId,
+							id: props.formId,
 							questionId: answer.questionId,
 							optionId: answer.id,
 						},
@@ -536,52 +491,93 @@ export default defineComponent({
 				logger.error('Error while saving answer', { answer, error })
 				showError(t('forms', 'Error while saving the answer'))
 			}
-		},
+		}
 
 		/**
-		 * Reorder option but keep focus on the button
+		 * Move the current answer down in the list.
 		 */
-		onMoveDown(): void {
-			this.$emit('moveDown')
-			this.focusButton(
-				this.index < this.maxIndex - 1
+		const onMoveDown = (): void => {
+			emit('moveDown')
+			focusButton(
+				props.index < props.maxIndex - 1
 					? 'buttonOptionDown'
 					: 'buttonOptionUp',
 			)
-		},
+		}
 
-		onMoveUp(): void {
-			this.$emit('moveUp')
-			this.focusButton(this.index > 1 ? 'buttonOptionUp' : 'buttonOptionDown')
-		},
+		/**
+		 * Move the current answer up in the list.
+		 */
+		const onMoveUp = (): void => {
+			emit('moveUp')
+			focusButton(props.index > 1 ? 'buttonOptionUp' : 'buttonOptionDown')
+		}
 
-		focusButton(refName: 'buttonOptionDown' | 'buttonOptionUp'): void {
-			this.$nextTick(() => {
-				const button = this.$refs[refName] as unknown as
-					{ $el?: HTMLElement } | undefined
+		/**
+		 * Restore focus to the move button after reordering.
+		 *
+		 * @param refName The target button reference name.
+		 */
+		function focusButton(refName: 'buttonOptionDown' | 'buttonOptionUp'): void {
+			nextTick(() => {
+				const button =
+					refName === 'buttonOptionDown'
+						? buttonOptionDown.value
+						: buttonOptionUp.value
 				button?.$el?.focus()
 			})
-		},
+		}
 
 		/**
-		 * Handle composition start event for IME inputs
+		 * Track the start of an IME composition sequence.
 		 */
-		onCompositionStart(): void {
-			this.isIMEComposing = true
-		},
+		const onCompositionStart = (): void => {
+			isIMEComposing.value = true
+		}
 
 		/**
-		 * Handle composition end event for IME inputs
+		 * Flush a pending input after IME composition ends.
 		 *
-		 * @param event The input event that triggered adding a new entry
+		 * @param event The composition event.
 		 */
-		onCompositionEnd(event: CompositionEvent & { isComposing?: boolean }): void {
+		const onCompositionEnd = (
+			event: CompositionEvent & { isComposing?: boolean },
+		): void => {
 			const target = event.target as HTMLInputElement | null
-			this.isIMEComposing = false
+			isIMEComposing.value = false
 			if (!event.isComposing && target) {
-				this.onInput({ target, isComposing: event.isComposing })
+				void onInput({ target, isComposing: event.isComposing })
 			}
-		},
+		}
+
+		return {
+			IconArrowDown,
+			IconArrowUp,
+			IconDelete,
+			IconDragIndicator,
+			IconPlus,
+			buttonOptionDown,
+			buttonOptionUp,
+			canCreateLocalAnswer,
+			ariaLabel,
+			optionDragMenuId,
+			placeholder,
+			pseudoIcon,
+			input,
+			localText,
+			isIMEComposing,
+			debounceOnInput,
+			handleTabbing,
+			focus,
+			onEnter,
+			createLocalAnswer,
+			deleteEntry,
+			onMoveDown,
+			onMoveUp,
+			onCompositionStart,
+			onCompositionEnd,
+			t,
+		}
 	},
 })
 </script>

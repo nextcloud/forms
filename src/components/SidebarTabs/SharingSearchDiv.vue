@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { t } from '@nextcloud/l10n'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, onMounted } from 'vue'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 import { useUserSearch } from '../../composables/useUserSearch.ts'
 
@@ -61,7 +61,7 @@ export default defineComponent({
 
 	emits: ['addShare'],
 
-	setup(props) {
+	setup(props, { emit }) {
 		const userSearch = useUserSearch()
 		const options = computed(() => {
 			const currentShares = props.currentShares as CurrentShareLike[]
@@ -82,26 +82,12 @@ export default defineComponent({
 			() => props.showLoading || userSearch.loading.value,
 		)
 
-		return {
-			...userSearch,
-			options,
-			showLoadingCircle,
-			t,
-		}
-	},
-
-	mounted() {
-		// Preloading recommendations
-		this.getRecommendations()
-	},
-
-	methods: {
 		/**
 		 * Format share for form.shares and add it.
 		 *
 		 * @param share New share to share with, format still for multiselect.
 		 */
-		addShare(share: unknown): void {
+		const addShare = (share: unknown): void => {
 			const selectedShare = Array.isArray(share) ? share[0] : share
 			if (!selectedShare || typeof selectedShare !== 'object') {
 				return
@@ -120,8 +106,21 @@ export default defineComponent({
 
 				shareType: Number(selectedShare.shareType),
 			}
-			this.$emit('addShare', newShare)
-		},
+			emit('addShare', newShare)
+		}
+
+		// Preloading recommendations
+		onMounted(() => {
+			void userSearch.getRecommendations()
+		})
+
+		return {
+			...userSearch,
+			addShare,
+			options,
+			showLoadingCircle,
+			t,
+		}
 	},
 })
 </script>

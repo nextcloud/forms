@@ -115,7 +115,8 @@ import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionRouter from '@nextcloud/vue/components/NcActionRouter'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
@@ -161,7 +162,185 @@ export default defineComponent({
 
 	emits: ['mobileCloseNavigation', 'openSharing', 'clone', 'delete'],
 
-	setup() {
+	setup(props, { emit }) {
+		const route = useRoute()
+		const loading = ref(false)
+
+		const canEdit = computed(() => {
+			return props.form.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
+		})
+		const canSeeResults = computed(
+			() =>
+				props.form.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS)
+				|| (props.form.submissionCount ?? 0) > 0,
+		)
+
+		/**
+		 * Check if form is current form and set active
+		 */
+		const isActive = computed(
+			() => props.form.hash === String(route.params.hash),
+		)
+
+		/**
+		 * Check if the form is archived
+		 */
+		const isArchived = computed(
+			() => props.form.state === FormState.FormArchived,
+		)
+
+		/**
+		 * Check if form is expired
+		 */
+		const isExpired = computed(() =>
+			Boolean(props.form.expires && moment().unix() > props.form.expires),
+		)
+
+		/**
+		 * Check if form is locked
+		 */
+		const isFormLocked = computed(() => {
+			const currentUserUid = getCurrentUser()?.uid ?? ''
+			const lockedUntil = props.form.lockedUntil ?? -1
+			return (
+				lockedUntil === 0
+				|| (lockedUntil > moment().unix()
+					&& props.form.lockedBy !== currentUserUid)
+			)
+		})
+
+		/**
+		 * Return form title, or placeholder if not set
+		 *
+		 * @return
+		 */
+		const formTitle = computed(() => {
+			if (props.form.title) {
+				return props.form.title
+			}
+			return t('forms', 'New form')
+		})
+
+		/**
+		 * Return expiration details for subtitle
+		 */
+		const formSubtitle = computed(() => {
+			if (props.form.state === FormState.FormClosed) {
+				return t('forms', 'Form closed')
+			}
+			if (props.form.expires) {
+				const relativeDate = moment(props.form.expires, 'X')
+					.locale(window.OC.getLanguage())
+					.fromNow()
+				if (isExpired.value) {
+					return t('forms', 'Expired {relativeDate}', {
+						relativeDate,
+					})
+				}
+				return t('forms', 'Expires {relativeDate}', { relativeDate })
+			}
+			return ''
+		})
+
+		/**
+		 * Return, if form has Subtitle
+		 */
+		const hasSubtitle = computed(() => formSubtitle.value !== '')
+
+		/**
+		 * Route to use, depending on readOnly
+		 *
+		 * @return Route to 'submit' or 'formRoot'
+		 */
+		const routerTarget = computed<NavigationTarget>(() => {
+			if (props.readOnly) {
+				return 'submit'
+			}
+
+			return 'formRoot'
+		})
+
+		/**
+		 * Closes the App-Navigation on mobile-devices
+		 */
+		const mobileCloseNavigation = (): void => {
+			emit('mobileCloseNavigation')
+		}
+
+		const onShareForm = (): void => {
+			emit('openSharing', props.form.hash)
+		}
+
+		const onCloneForm = (): void => {
+			emit('clone', props.form.id)
+		}
+
+		const onDeleteForm = async (): Promise<void> => {
+			loading.value = true
+			try {
+				await axios.delete(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+						id: props.form.id,
+					}),
+				)
+				emit('delete', props.form.id)
+			} catch (error) {
+				const response = (error as { response?: unknown }).response
+				logger.error(`Error while deleting ${formTitle.value}`, {
+					error: response,
+				})
+				showError(
+					t('forms', 'Error while deleting {title}', {
+						title: formTitle.value,
+					}),
+				)
+			} finally {
+				loading.value = false
+			}
+		}
+
+		const onConfirmDelete = async (): Promise<void> => {
+			const shouldDelete = await showConfirmation({
+				name: t('forms', 'Delete form'),
+				text: t('forms', 'Are you sure you want to delete {title}?', {
+					title: formTitle.value,
+				}),
+				labelConfirm: t('forms', 'Delete form'),
+				labelReject: t('forms', 'Cancel'),
+			})
+
+			if (shouldDelete) {
+				await onDeleteForm()
+			}
+		}
+
+		const onToggleArchive = async (): Promise<void> => {
+			try {
+				// TODO: add loading status feedback ?
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
+						id: props.form.id,
+					}),
+					{
+						keyValuePairs: {
+							state: isArchived.value
+								? FormState.FormClosed
+								: FormState.FormArchived,
+						},
+					},
+				)
+
+				;(props.form as FormsForm).state = isArchived.value
+					? FormState.FormClosed
+					: FormState.FormArchived
+			} catch (error) {
+				logger.error('Error changing archived state of form', {
+					error,
+				})
+				showError(t('forms', 'Error changing archived state of form'))
+			}
+		}
+
 		return {
 			t,
 			FormsIcon,
@@ -173,197 +352,24 @@ export default defineComponent({
 			IconPencil,
 			IconPoll,
 			IconShareVariant,
+			loading,
+			canEdit,
+			canSeeResults,
+			isActive,
+			isArchived,
+			isExpired,
+			isFormLocked,
+			formTitle,
+			formSubtitle,
+			hasSubtitle,
+			routerTarget,
+			mobileCloseNavigation,
+			onShareForm,
+			onCloneForm,
+			onConfirmDelete,
+			onToggleArchive,
+			onDeleteForm,
 		}
-	},
-
-	data() {
-		return {
-			loading: false as boolean,
-		}
-	},
-
-	computed: {
-		canEdit(): boolean {
-			return this.form.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
-		},
-
-		canSeeResults(): boolean {
-			return (
-				this.form.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS)
-				|| (this.form.submissionCount ?? 0) > 0
-			)
-		},
-
-		/**
-		 * Check if form is current form and set active
-		 */
-		isActive(): boolean {
-			return this.form.hash === String(this.$route.params.hash)
-		},
-
-		/**
-		 * Check if the form is archived
-		 */
-		isArchived(): boolean {
-			return this.form.state === FormState.FormArchived
-		},
-
-		/**
-		 * Check if form is expired
-		 */
-		isExpired(): boolean {
-			return Boolean(this.form.expires && moment().unix() > this.form.expires)
-		},
-
-		/**
-		 * Check if form is locked
-		 */
-		isFormLocked(): boolean {
-			const currentUserUid = getCurrentUser()?.uid ?? ''
-			const lockedUntil = this.form.lockedUntil ?? -1
-			return (
-				lockedUntil === 0
-				|| (lockedUntil > moment().unix()
-					&& this.form.lockedBy !== currentUserUid)
-			)
-		},
-
-		/**
-		 * Return form title, or placeholder if not set
-		 *
-		 * @return
-		 */
-		formTitle(): string {
-			if (this.form.title) {
-				return this.form.title
-			}
-			return t('forms', 'New form')
-		},
-
-		/**
-		 * Return expiration details for subtitle
-		 */
-		formSubtitle(): string {
-			if (this.form.state === FormState.FormClosed) {
-				// TRANSLATORS: The form was closed manually so it does not take new submissions
-				return t('forms', 'Form closed')
-			}
-			if (this.form.expires) {
-				const relativeDate = moment(this.form.expires, 'X')
-					.locale(window.OC.getLanguage())
-					.fromNow()
-				if (this.isExpired) {
-					return t('forms', 'Expired {relativeDate}', {
-						relativeDate,
-					})
-				}
-				return t('forms', 'Expires {relativeDate}', { relativeDate })
-			}
-			return ''
-		},
-
-		/**
-		 * Return, if form has Subtitle
-		 */
-		hasSubtitle(): boolean {
-			return this.formSubtitle !== ''
-		},
-
-		/**
-		 * Route to use, depending on readOnly
-		 *
-		 * @return Route to 'submit' or 'formRoot'
-		 */
-		routerTarget(): NavigationTarget {
-			if (this.readOnly) {
-				return 'submit'
-			}
-
-			return 'formRoot'
-		},
-	},
-
-	methods: {
-		/**
-		 * Closes the App-Navigation on mobile-devices
-		 */
-		mobileCloseNavigation(): void {
-			this.$emit('mobileCloseNavigation')
-		},
-
-		onShareForm(): void {
-			this.$emit('openSharing', this.form.hash)
-		},
-
-		onCloneForm(): void {
-			this.$emit('clone', this.form.id)
-		},
-
-		async onConfirmDelete(): Promise<void> {
-			const shouldDelete = await showConfirmation({
-				name: t('forms', 'Delete form'),
-				text: t('forms', 'Are you sure you want to delete {title}?', {
-					title: this.formTitle,
-				}),
-				labelConfirm: t('forms', 'Delete form'),
-				labelReject: t('forms', 'Cancel'),
-			})
-
-			if (shouldDelete) {
-				await this.onDeleteForm()
-			}
-		},
-
-		async onToggleArchive(): Promise<void> {
-			try {
-				// TODO: add loading status feedback ?
-				await axios.patch(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-						id: this.form.id,
-					}),
-					{
-						keyValuePairs: {
-							state: this.isArchived
-								? FormState.FormClosed
-								: FormState.FormArchived,
-						},
-					},
-				)
-
-				;(this.form as FormsForm).state = this.isArchived
-					? FormState.FormClosed
-					: FormState.FormArchived
-			} catch (error) {
-				logger.error('Error changing archived state of form', {
-					error,
-				})
-				showError(t('forms', 'Error changing archived state of form'))
-			}
-		},
-
-		async onDeleteForm(): Promise<void> {
-			this.loading = true
-			try {
-				await axios.delete(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-						id: this.form.id,
-					}),
-				)
-				this.$emit('delete', this.form.id)
-			} catch (error) {
-				const response = (error as { response?: unknown }).response
-				logger.error(`Error while deleting ${this.formTitle}`, {
-					error: response,
-				})
-				showError(
-					t('forms', 'Error while deleting {title}', {
-						title: this.formTitle,
-					}),
-				)
-			} finally {
-				this.loading = false
-			}
-		},
 	},
 })
 </script>
