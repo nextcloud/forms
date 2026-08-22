@@ -285,14 +285,15 @@ import IconTable from '@material-symbols/svg-400/outlined/table_chart.svg?raw'
 import { getCurrentUser, getRequestToken } from '@nextcloud/auth'
 import axios from '@nextcloud/axios'
 import { getFilePickerBuilder, showError, showSuccess } from '@nextcloud/dialogs'
-import { emit } from '@nextcloud/event-bus'
+import { emit as emitEvent } from '@nextcloud/event-bus'
 import { FileType } from '@nextcloud/files'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
 import { useIsSmallMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, nextTick, onBeforeMount, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
@@ -419,201 +420,120 @@ export default defineComponent({
 	emits: ['update:form', 'open-sharing'],
 
 	setup(props, { emit }) {
+		const route = useRoute()
+		const router = useRouter()
 		const viewForm = useViewForm({ form: () => props.form, emit })
 
-		return {
-			...viewForm,
-			isMobile: useIsSmallMobile(),
-			t,
-			responseViews,
-			IconChevronLeft,
-			IconDelete,
-			IconDownload,
-			IconFileDelimited,
-			IconFileExcelOutline,
-			IconFolder,
-			IconLink,
-			IconLinkVariantOff,
-			IconPoll,
-			IconRefresh,
-			IconShareVariant,
-			IconTable,
-			IconMagnify,
-		}
-	},
+		const questions = ref<FormsQuestion[]>([])
+		const submissions = ref<SubmissionRecord[]>([])
+		const filteredSubmissionsCount = ref(0)
+		const isDownloadActionOpened = ref(false)
+		const loadingResults = ref(true)
+		const skipReloadOnOffsetChange = ref(false)
+		const picker = ref<PickerLike | null>(null)
+		const showConfirmDeleteDialog = ref(false)
+		const submissionSearch = ref('')
+		const limit = ref(20)
+		const offset = ref(0)
+		const isMobile = useIsSmallMobile()
 
-	data(): ResultsViewData {
-		return {
-			questions: [] as FormsQuestion[],
-			submissions: [] as SubmissionRecord[],
-			filteredSubmissionsCount: 0 as number,
-			isDownloadActionOpened: false as boolean,
-			loadingResults: true as boolean,
-			skipReloadOnOffsetChange: false as boolean,
-			picker: null as PickerLike | null,
-			showConfirmDeleteDialog: false as boolean,
-			submissionSearch: '' as string,
-			limit: 20 as number,
-			offset: 0 as number,
-			linkedFileNotAvailableButtons: [
-				{
-					label: t('forms', 'Unlink spreadsheet'),
-					icon: IconLinkVariantOff,
-					variant: 'error',
-					callback: () => {
-						this.onUnlinkFile()
-					},
+		const linkedFileNotAvailableButtons = computed<DialogButton[]>(() => [
+			{
+				label: t('forms', 'Unlink spreadsheet'),
+				icon: IconLinkVariantOff,
+				variant: 'error',
+				callback: () => {
+					void onUnlinkFile()
 				},
-				{
-					label: t('forms', 'Create spreadsheet'),
-					icon: IconLink,
-					variant: 'primary',
-					callback: () => {
-						this.onLinkFile()
-					},
+			},
+			{
+				label: t('forms', 'Create spreadsheet'),
+				icon: IconLink,
+				variant: 'primary',
+				callback: () => {
+					void onLinkFile()
 				},
-			] as DialogButton[],
+			},
+		])
 
-			confirmDeleteButtons: [
-				{
-					label: t('forms', 'Cancel'),
-					icon: IconCancel,
-					variant: 'tertiary',
-					callback: () => {
-						this.closeDeleteConfirmation()
-					},
+		const confirmDeleteButtons = computed<DialogButton[]>(() => [
+			{
+				label: t('forms', 'Cancel'),
+				icon: IconCancel,
+				variant: 'tertiary',
+				callback: () => {
+					closeDeleteConfirmation()
 				},
-				{
-					label: t('forms', 'Delete responses'),
-					icon: IconDelete,
-					variant: 'error',
-					callback: () => {
-						this.deleteAllSubmissionsConfirmed()
-					},
+			},
+			{
+				label: t('forms', 'Delete responses'),
+				icon: IconDelete,
+				variant: 'error',
+				callback: () => {
+					void deleteAllSubmissionsConfirmed()
 				},
-			] as DialogButton[],
-		}
-	},
+			},
+		])
 
-	computed: {
-		isSummaryView(): boolean {
-			return this.$route.name === 'results.summary'
-		},
-
-		activeResponseView(): ResponseView {
-			return this.isSummaryView ? summaryResponseView : responsesResponseView
-		},
-
-		isFormArchived(): boolean {
-			return this.form.state === FormState.FormArchived
-		},
-
-		canExportSubmissions(): boolean {
-			return this.form.permissions.includes(
+		const isSummaryView = computed<boolean>(
+			() => route.name === 'results.summary',
+		)
+		const activeResponseView = computed<ResponseView>(() => {
+			return isSummaryView.value ? summaryResponseView : responsesResponseView
+		})
+		const isFormArchived = computed<boolean>(() => {
+			return props.form.state === FormState.FormArchived
+		})
+		const canExportSubmissions = computed<boolean>(() => {
+			return props.form.permissions.includes(
 				PERMISSION_TYPES.PERMISSION_RESULTS,
 			)
-		},
-
-		canDeleteSubmissions(): boolean {
+		})
+		const canDeleteSubmissions = computed<boolean>(() => {
 			return (
-				this.form.permissions.includes(
+				props.form.permissions.includes(
 					PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
-				) && !this.isFormArchived
+				) && !isFormArchived.value
 			)
-		},
-
-		canEditForm(): boolean {
-			return this.form.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
-		},
-
-		noSubmissions(): boolean {
-			return this.form.submissionCount === 0
-		},
-
-		noFilteredSubmissions(): boolean {
-			return this.submissions.length === 0
-		},
-
-		fileUrl(): string {
-			if (this.form.fileId) {
-				return generateUrl('/f/{fileId}', { fileId: this.form.fileId })
+		})
+		const canEditForm = computed<boolean>(() => {
+			return props.form.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
+		})
+		const noSubmissions = computed<boolean>(() => {
+			return props.form.submissionCount === 0
+		})
+		const noFilteredSubmissions = computed<boolean>(() => {
+			return submissions.value.length === 0
+		})
+		const fileUrl = computed<string>(() => {
+			if (props.form.fileId) {
+				return generateUrl('/f/{fileId}', { fileId: props.form.fileId })
 			}
 			return window.location.href
-		},
-
-		showLinkedFileNotAvailableDialog(): boolean {
-			if (this.form.partial) {
+		})
+		const showLinkedFileNotAvailableDialog = computed<boolean>(() => {
+			if (props.form.partial) {
 				return false
 			}
 
 			return (
-				this.canEditForm
-				&& Boolean(this.form.fileId)
-				&& !this.form.filePath
-				&& !this.isFormLocked
+				canEditForm.value
+				&& Boolean(props.form.fileId)
+				&& !props.form.filePath
+				&& !viewForm.isFormLocked.value
 			)
-		},
-	},
+		})
 
-	watch: {
-		async hash(): Promise<void> {
-			await this.fetchFullForm(this.form.id)
-			await this.loadFormResults()
-			SetWindowTitle(this.formTitle)
-		},
-
-		'$route.name': {
-			handler(): void {
-				const viewId = this.isSummaryView ? 'summary' : 'responses'
-				this.saveActiveResponseViewToLocalStorage(viewId)
-				this.loadFormResults()
-			},
-		},
-
-		limit(): void {
-			this.loadFormResults()
-		},
-
-		offset(): void {
-			if (!this.skipReloadOnOffsetChange) {
-				this.loadFormResults()
-			}
-		},
-
-		submissionSearch: debounce(function (
-			this: ResultsViewData & {
-				$nextTick: (callback: () => void) => void
-				loadFormResults: () => void
-			},
-		) {
-			this.skipReloadOnOffsetChange = true
-			this.offset = 0
-			this.$nextTick(() => {
-				this.skipReloadOnOffsetChange = false
-			})
-			this.loadFormResults()
-		}, INPUT_DEBOUNCE_MS),
-	},
-
-	async beforeMount(): Promise<void> {
-		// Determine the initial viewId based on the route
-		const viewId = this.isSummaryView ? 'summary' : 'responses'
-		this.saveActiveResponseViewToLocalStorage(viewId)
-
-		await this.fetchFullForm(this.form.id)
-		this.loadFormResults()
-		SetWindowTitle(this.formTitle)
-	},
-
-	methods: {
 		/**
 		 * Save the active response view preference to localStorage for the current form.
 		 *
 		 * @param viewId - The ID of the view ('summary' or 'responses')
 		 */
-		saveActiveResponseViewToLocalStorage(viewId: ResponseView['id']): void {
+		function saveActiveResponseViewToLocalStorage(
+			viewId: ResponseView['id'],
+		): void {
 			try {
-				const storageKey = this.getActiveResponseViewStorageKey()
+				const storageKey = getActiveResponseViewStorageKey()
 				if (!storageKey) {
 					return
 				}
@@ -624,48 +544,54 @@ export default defineComponent({
 					error: err,
 				})
 			}
-		},
+		}
 
-		getActiveResponseViewStorageKey(): string | null {
-			const formHash = this.form.hash
+		/**
+		 * Get storage key for active response view
+		 */
+		function getActiveResponseViewStorageKey(): string | null {
+			const formHash = props.form.hash
 			if (!formHash) {
 				return null
 			}
 
 			return `nextcloud_forms_${formHash}_activeResponseView`
-		},
+		}
 
 		/**
 		 * Navigate to an explicit route for the selected response view.
 		 *
 		 * @param view The selected response view object
 		 */
-		async onViewChange(view: ResponseView): Promise<void> {
+		async function onViewChange(view: ResponseView): Promise<void> {
 			if (!view?.id) {
 				return
 			}
 			const targetName = `results.${view.id}`
-			if (this.$route.name === targetName) {
-				this.loadFormResults()
+			if (route.name === targetName) {
+				await loadFormResults()
 				return
 			}
 
 			try {
-				await this.$router.push({
+				await router.push({
 					name: targetName,
 					params: {
-						hash: this.form.hash,
+						hash: props.form.hash,
 					},
 				})
 			} catch (error) {
 				logger.debug('Navigation cancelled', { error })
 			}
-		},
+		}
 
-		async onUnlinkFile(): Promise<void> {
+		/**
+		 * Unlink the results file
+		 */
+		async function onUnlinkFile(): Promise<void> {
 			await axios.patch(
 				generateOcsUrl('apps/forms/api/v3/forms/{formId}', {
-					formId: this.form.id,
+					formId: props.form.id,
 				}),
 				{
 					keyValuePairs: {
@@ -676,25 +602,28 @@ export default defineComponent({
 			)
 
 			const updatedForm = {
-				...this.form,
+				...props.form,
 				fileFormat: null,
 				fileId: null,
 				filePath: null,
 			}
-			this.$emit('update:form', updatedForm)
-			emit('forms:last-updated:set', this.form.id)
-		},
+			emit('update:form', updatedForm)
+			emitEvent('forms:last-updated:set', props.form.id)
+		}
 
-		async loadFormResults(): Promise<void> {
-			this.loadingResults = true
-			logger.debug(`Loading responses for form ${this.form.hash}`)
+		/**
+		 * Load form results
+		 */
+		async function loadFormResults(): Promise<void> {
+			loadingResults.value = true
+			logger.debug(`Loading responses for form ${props.form.hash}`)
 
 			try {
 				let response = null
-				if (this.isSummaryView) {
+				if (isSummaryView.value) {
 					response = await axios.get(
 						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-							id: this.form.id,
+							id: props.form.id,
 						}),
 					)
 				} else {
@@ -702,34 +631,41 @@ export default defineComponent({
 						generateOcsUrl(
 							'apps/forms/api/v3/forms/{id}/submissions?limit={limit}&offset={offset}&query={query}',
 							{
-								id: this.form.id,
-								limit: this.limit,
-								offset: this.offset,
-								query: this.submissionSearch,
+								id: props.form.id,
+								limit: limit.value,
+								offset: offset.value,
+								query: submissionSearch.value,
 							},
 						),
 					)
 				}
 				const data = OcsResponse2Data<ResultsResponse>(response)
 
-				this.submissions = this.formatDateAnswers(
+				submissions.value = formatDateAnswers(
 					data.submissions,
 					data.questions,
 				)
-				this.questions = data.questions
-				this.filteredSubmissionsCount = data.filteredSubmissionsCount
+				questions.value = data.questions
+				filteredSubmissionsCount.value = data.filteredSubmissionsCount
 			} catch (error) {
 				logger.error('Error while loading responses', { error })
 				showError(t('forms', 'An error occurred while loading responses'))
 			} finally {
-				this.loadingResults = false
+				loadingResults.value = false
 			}
-		},
+		}
 
-		async onDownloadFile(nextFileFormat: SupportedFileFormat): Promise<void> {
+		/**
+		 * Download the results file
+		 *
+		 * @param nextFileFormat the file format
+		 */
+		async function onDownloadFile(
+			nextFileFormat: SupportedFileFormat,
+		): Promise<void> {
 			const exportUrl =
 				generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-					id: this.form.id,
+					id: props.form.id,
 				})
 				+ '?requesttoken='
 				+ encodeURIComponent(getRequestToken() ?? '')
@@ -737,15 +673,18 @@ export default defineComponent({
 				+ nextFileFormat
 
 			window.open(exportUrl, '_self')
-		},
+		}
 
-		async onLinkFile(): Promise<void> {
+		/**
+		 * Link a file for exporting submissions
+		 */
+		async function onLinkFile(): Promise<void> {
 			try {
-				const path = await this.getPicker().pick()
+				const path = await getPicker().pick()
 				try {
 					await axios.patch(
 						generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-							id: this.form.id,
+							id: props.form.id,
 						}),
 						{
 							keyValuePairs: {
@@ -754,15 +693,15 @@ export default defineComponent({
 							},
 						},
 					)
-					await this.fetchFullForm(this.form.id)
-					await this.loadFormResults()
+					await viewForm.fetchFullForm(props.form.id)
+					await loadFormResults()
 
 					showSuccess(
 						t('forms', 'File {file} successfully linked', {
-							file: this.form.filePath?.split('/').pop() ?? '',
+							file: props.form.filePath?.split('/').pop() ?? '',
 						}),
 					)
-					emit('forms:last-updated:set', this.form.id)
+					emitEvent('forms:last-updated:set', props.form.id)
 				} catch (error) {
 					logger.error('Error while exporting to Files and linking', {
 						error,
@@ -774,17 +713,20 @@ export default defineComponent({
 			} catch (error) {
 				logger.debug('No file selected', { error })
 			}
-		},
+		}
 
-		async onStoreToFiles(): Promise<void> {
+		/**
+		 * Store results to files
+		 */
+		async function onStoreToFiles(): Promise<void> {
 			try {
-				const path = await this.getPicker().pick()
+				const path = await getPicker().pick()
 				try {
 					const response = await axios.post(
 						generateOcsUrl(
 							'apps/forms/api/v3/forms/{id}/submissions/export',
 							{
-								id: this.form.id,
+								id: props.form.id,
 							},
 						),
 						{
@@ -807,10 +749,13 @@ export default defineComponent({
 			} catch (error) {
 				logger.debug('No file selected', { error })
 			}
-		},
+		}
 
-		async onReExport(): Promise<void> {
-			if (!this.form.fileId) {
+		/**
+		 * Re-export the results
+		 */
+		async function onReExport(): Promise<void> {
+			if (!props.form.fileId) {
 				showError(t('forms', 'File is not linked'))
 				return
 			}
@@ -820,12 +765,12 @@ export default defineComponent({
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/submissions/export',
 						{
-							id: this.form.id,
+							id: props.form.id,
 						},
 					),
 					{
-						path: this.form.filePath,
-						fileFormat: this.form.fileFormat,
+						path: props.form.filePath,
+						fileFormat: props.form.fileFormat,
 					},
 				)
 
@@ -838,16 +783,21 @@ export default defineComponent({
 				logger.error('Error while exporting to Files', { error })
 				showError(t('forms', 'There was an error, while exporting to Files'))
 			}
-		},
+		}
 
-		canDeleteSubmission(submissionUser: string): boolean {
+		/**
+		 * If user can delete a submission
+		 *
+		 * @param submissionUser the user who submitted the response
+		 */
+		function canDeleteSubmission(submissionUser: string): boolean {
 			const currentUser = getCurrentUser()
 			return (
-				this.canDeleteSubmissions
-				|| (this.form.allowEditSubmissions
+				canDeleteSubmissions.value
+				|| (props.form.allowEditSubmissions
 					&& currentUser?.uid === submissionUser)
 			)
-		},
+		}
 
 		/**
 		 * Determines if a submission can be edited.
@@ -858,77 +808,99 @@ export default defineComponent({
 		 *                      - The user has the `canDeleteSubmissions` permission, or
 		 *                      - The form allows editing (`form.allowEditSubmissions`) and the current user is the owner of the submission.
 		 */
-		canEditSubmission(submissionUser: string): boolean {
+		function canEditSubmission(submissionUser: string): boolean {
 			const currentUser = getCurrentUser()
 			return (
-				this.canDeleteSubmissions
-				|| (this.form.allowEditSubmissions
+				canDeleteSubmissions.value
+				|| (props.form.allowEditSubmissions
 					&& currentUser?.uid === submissionUser)
 			)
-		},
+		}
 
-		async deleteSubmission(id: number): Promise<void> {
-			this.loadingResults = true
+		/**
+		 * Delete the submission
+		 *
+		 * @param id the id of the submission
+		 */
+		async function deleteSubmission(id: number): Promise<void> {
+			loadingResults.value = true
 
 			try {
 				await axios.delete(
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
 						{
-							id: this.form.id,
+							id: props.form.id,
 							submissionId: id,
 						},
 					),
 				)
 
 				showSuccess(t('forms', 'Response deleted'))
-				const index = this.submissions.findIndex(
+				const index = submissions.value.findIndex(
 					(search: SubmissionRecord) => search.id === id,
 				)
-				this.submissions.splice(index, 1)
-				emit('forms:last-updated:set', this.form.id)
+				if (index >= 0) {
+					submissions.value.splice(index, 1)
+				}
+				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
 				logger.error(`Error while deleting response ${id}`, { error })
 				showError(
 					t('forms', 'An error occurred while deleting this response'),
 				)
 			} finally {
-				this.loadingResults = false
+				loadingResults.value = false
 			}
-		},
+		}
 
-		deleteAllSubmissions(): void {
-			this.showConfirmDeleteDialog = true
-		},
+		/**
+		 * Show confirmation dialog for deletion
+		 */
+		function deleteAllSubmissions(): void {
+			showConfirmDeleteDialog.value = true
+		}
 
-		closeDeleteConfirmation(): void {
-			this.showConfirmDeleteDialog = false
-		},
+		/**
+		 * Close the confirmation dialog for deletion
+		 */
+		function closeDeleteConfirmation(): void {
+			showConfirmDeleteDialog.value = false
+		}
 
-		async deleteAllSubmissionsConfirmed(): Promise<void> {
-			this.showConfirmDeleteDialog = false
-			this.loadingResults = true
+		/**
+		 * Deletion confirmed, delete all submissions
+		 */
+		async function deleteAllSubmissionsConfirmed(): Promise<void> {
+			showConfirmDeleteDialog.value = false
+			loadingResults.value = true
 
 			try {
 				await axios.delete(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-						id: this.form.id,
+						id: props.form.id,
 					}),
 				)
 
-				this.submissions = []
-				const updatedForm = { ...this.form, submissionCount: 0 }
-				this.$emit('update:form', updatedForm)
-				emit('forms:last-updated:set', this.form.id)
+				submissions.value = []
+				const updatedForm = { ...props.form, submissionCount: 0 }
+				emit('update:form', updatedForm)
+				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
 				logger.error('Error while deleting responses', { error })
 				showError(t('forms', 'An error occurred while deleting responses'))
 			} finally {
-				this.loadingResults = false
+				loadingResults.value = false
 			}
-		},
+		}
 
-		formatDateAnswers(
+		/**
+		 * Format date answers
+		 *
+		 * @param submissions array of responses
+		 * @param questions array of questions
+		 */
+		function formatDateAnswers(
 			submissions: SubmissionRecord[],
 			questions: FormsQuestion[],
 		): SubmissionRecord[] {
@@ -958,14 +930,17 @@ export default defineComponent({
 			})
 
 			return submissions
-		},
+		}
 
-		getPicker(): PickerLike {
-			if (this.picker !== null) {
-				return this.picker
+		/**
+		 * Get a file picker
+		 */
+		function getPicker(): PickerLike {
+			if (picker.value !== null) {
+				return picker.value
 			}
 
-			this.picker = getFilePickerBuilder(
+			picker.value = getFilePickerBuilder(
 				t('forms', 'Choose spreadsheet location'),
 			)
 				.setMultiSelect(false)
@@ -1035,8 +1010,117 @@ export default defineComponent({
 				})
 				.build() as PickerLike
 
-			return this.picker
-		},
+			return picker.value
+		}
+
+		watch(
+			() => props.hash,
+			async () => {
+				await viewForm.fetchFullForm(props.form.id)
+				await loadFormResults()
+				SetWindowTitle(viewForm.formTitle.value)
+			},
+		)
+
+		watch(
+			() => route.name,
+			() => {
+				const viewId = isSummaryView.value ? 'summary' : 'responses'
+				saveActiveResponseViewToLocalStorage(viewId)
+				void loadFormResults()
+			},
+		)
+
+		watch(limit, () => {
+			void loadFormResults()
+		})
+
+		watch(offset, () => {
+			if (!skipReloadOnOffsetChange.value) {
+				void loadFormResults()
+			}
+		})
+
+		watch(
+			submissionSearch,
+			debounce(() => {
+				skipReloadOnOffsetChange.value = true
+				offset.value = 0
+				nextTick(() => {
+					skipReloadOnOffsetChange.value = false
+				})
+				void loadFormResults()
+			}, INPUT_DEBOUNCE_MS),
+		)
+
+		onBeforeMount(async (): Promise<void> => {
+			// Determine the initial viewId based on the route
+			const viewId = isSummaryView.value ? 'summary' : 'responses'
+			saveActiveResponseViewToLocalStorage(viewId)
+
+			await viewForm.fetchFullForm(props.form.id)
+			await loadFormResults()
+			SetWindowTitle(viewForm.formTitle.value)
+		})
+
+		return {
+			...viewForm,
+			isMobile,
+			t,
+			responseViews,
+			questions,
+			submissions,
+			filteredSubmissionsCount,
+			isDownloadActionOpened,
+			loadingResults,
+			skipReloadOnOffsetChange,
+			showConfirmDeleteDialog,
+			submissionSearch,
+			limit,
+			offset,
+			linkedFileNotAvailableButtons,
+			confirmDeleteButtons,
+			isSummaryView,
+			activeResponseView,
+			isFormArchived,
+			canExportSubmissions,
+			canDeleteSubmissions,
+			canEditForm,
+			noSubmissions,
+			noFilteredSubmissions,
+			fileUrl,
+			showLinkedFileNotAvailableDialog,
+			saveActiveResponseViewToLocalStorage,
+			getActiveResponseViewStorageKey,
+			onViewChange,
+			onUnlinkFile,
+			loadFormResults,
+			onDownloadFile,
+			onLinkFile,
+			onStoreToFiles,
+			onReExport,
+			canDeleteSubmission,
+			canEditSubmission,
+			deleteSubmission,
+			deleteAllSubmissions,
+			closeDeleteConfirmation,
+			deleteAllSubmissionsConfirmed,
+			formatDateAnswers,
+			getPicker,
+			IconChevronLeft,
+			IconDelete,
+			IconDownload,
+			IconFileDelimited,
+			IconFileExcelOutline,
+			IconFolder,
+			IconLink,
+			IconLinkVariantOff,
+			IconPoll,
+			IconRefresh,
+			IconShareVariant,
+			IconTable,
+			IconMagnify,
+		}
 	},
 })
 </script>

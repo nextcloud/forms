@@ -214,21 +214,20 @@
 </template>
 
 <script lang="ts">
-import type { ComponentPublicInstance } from 'vue'
-import type { FormsQuestion } from '../models/Entities.d.ts'
+import type { ComponentPublicInstance, PropType } from 'vue'
+import type { FormsForm, FormsQuestion } from '../models/Entities.d.ts'
 
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
-import { emit } from '@nextcloud/event-bus'
+import { emit as emitEvent } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
-import { ref } from 'vue'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -281,7 +280,7 @@ export default defineComponent({
 		},
 
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 
@@ -294,391 +293,271 @@ export default defineComponent({
 	emits: ['update:form', 'open-sharing'],
 
 	setup(props, { emit }) {
-		const title = ref(null)
+		const title = ref<HTMLTextAreaElement | null>(null)
+		const description = ref<HTMLTextAreaElement | null>(null)
 		const viewForm = useViewForm({
 			form: () => props.form,
 			emit,
 			titleRef: title,
 		})
 
-		return {
-			...viewForm,
-			title,
-			IconLock,
-			isMobile: useIsMobile(),
-			t,
+		// Various states
+		const isLoadingQuestions = ref<boolean>(false)
+		const isDragging = ref<boolean>(false)
+		const maxStringLengths = loadState(
+			formsAppName,
+			'maxStringLengths',
+		) as Record<string, number>
+		const questionMenuOpened = ref<boolean>(false)
+		const activeQuestionType = ref<string | null>(null)
+		const questionRefsMap = ref<Record<number, QuestionRefInstance>>({})
+		// when set to a number, the next created question will be inserted at this index
+		const insertMenuOpenedIndex = ref<number | null>(null)
+		// controls per-question insert menu visibility
+		const insertMenuOpened = ref<boolean>(false)
+
+		// Helper functions
+		const setQuestionRef = (
+			el: QuestionRefInstance | null,
+			question: FormsQuestion,
+		): void => {
+			if (el) {
+				questionRefsMap.value[question.id] = el
+			} else {
+				delete questionRefsMap.value[question.id]
+			}
 		}
-	},
 
-	data() {
-		return {
-			answerTypes,
-
-			// Various states
-			isLoadingQuestions: false as boolean,
-			isDragging: false as boolean,
-
-			maxStringLengths: loadState(formsAppName, 'maxStringLengths') as Record<
-				string,
-				number
-			>,
-
-			questionMenuOpened: false as boolean,
-			activeQuestionType: null as string | null,
-			questionRefsMap: {} as Record<number, QuestionRefInstance>,
-
-			// when set to a number, the next created question will be inserted at this index
-			insertMenuOpenedIndex: null as number | null,
-			// controls per-question insert menu visibility
-			insertMenuOpened: false as boolean,
+		const registerQuestionRef = (
+			question: FormsQuestion,
+		): ((el: Element | ComponentPublicInstance | null) => void) => {
+			return (el) => {
+				setQuestionRef(el as QuestionRefInstance | null, question)
+			}
 		}
-	},
 
-	computed: {
-		hasQuestions(): boolean {
-			return this.form.questions.length === 0
-		},
+		/**
+		 * Auto adjust the title height based its scroll height
+		 */
+		const resizeTitle = (): void => {
+			nextTick(() => {
+				const textarea = title.value
+				if (textarea) {
+					textarea.style.cssText = 'height: 0'
+					// include 2px border
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+				}
+			})
+		}
 
-		isRequiredUsed(): boolean {
-			return this.form.questions.reduce(
+		/**
+		 * Auto adjust the description height based on its scroll height
+		 */
+		const resizeDescription = (): void => {
+			// nextTick to ensure textarea is attached to DOM
+			nextTick(() => {
+				const textarea = description.value
+				if (textarea) {
+					textarea.style.cssText = 'height: 0'
+					// include 2px border
+					textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
+				}
+			})
+		}
+
+		/**
+		 * Title & description save methods
+		 */
+		const saveTitle = debounce(async () => {
+			await viewForm.saveFormProperty('title')
+		}, INPUT_DEBOUNCE_MS)
+
+		const saveDescription = debounce(async () => {
+			await viewForm.saveFormProperty('description')
+		}, INPUT_DEBOUNCE_MS)
+
+		// Computed properties
+		const hasQuestions = computed<boolean>(
+			() => props.form.questions.length === 0,
+		)
+
+		const isRequiredUsed = computed<boolean>(() =>
+			props.form.questions.reduce(
 				(isUsed: boolean, question: FormsQuestion) =>
 					isUsed || Boolean(question.isRequired),
 				false,
-			)
-		},
+			),
+		)
 
 		/**
 		 * Check if form is expired
 		 */
-		isExpired(): boolean {
-			return this.form.expires > 0 && moment().unix() > this.form.expires
-		},
+		const isExpired = computed<boolean>(
+			() => props.form.expires > 0 && moment().unix() > props.form.expires,
+		)
 
 		/**
 		 * Check if the form was archived
 		 */
-		isFormArchived(): boolean {
-			return this.form.state === FormState.FormArchived
-		},
+		const isFormArchived = computed<boolean>(
+			() => props.form.state === FormState.FormArchived,
+		)
 
-		infoMessage(): string {
+		const infoMessage = computed<string>(() => {
 			let message = ''
-			if (this.form.isAnonymous) {
+			if (props.form.isAnonymous) {
 				message += t('forms', 'Responses are anonymous.')
 			}
 
 			// On Submit, this is dependent on `isLoggedIn`. Create-view is always logged in and the variable isLoggedIn does not exist.
-			if (!this.form.isAnonymous && true) {
+			if (!props.form.isAnonymous && true) {
 				message += t('forms', 'Responses are connected to your account.')
 			}
 
-			if (this.isRequiredUsed) {
+			if (isRequiredUsed.value) {
 				message +=
 					' '
 					+ t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
 			return message
-		},
+		})
 
-		expirationMessage(): string {
-			const relativeDate = moment(this.form.expires, 'X')
+		const expirationMessage = computed<string>(() => {
+			const relativeDate = moment(props.form.expires, 'X')
 				.locale(window.OC.getLanguage())
 				.fromNow()
-			if (this.isExpired) {
+			if (isExpired.value) {
 				return t('forms', 'Expired {relativeDate}.', { relativeDate })
 			}
 			return t('forms', 'Expires {relativeDate}.', { relativeDate })
-		},
+		})
 
 		// Remove properties from answerTypes for create button
-		answerTypesFilter(): Omit<typeof answerTypes, 'datetime'> {
-			// Remove 'datetime' from answerTypes for create button
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { datetime, ...filteredAnswerTypes } = answerTypes
-			return filteredAnswerTypes
-		},
+		const answerTypesFilter = computed<Omit<typeof answerTypes, 'datetime'>>(
+			() => {
+				// Remove 'datetime' from answerTypes for create button
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { datetime, ...filteredAnswerTypes } = answerTypes
+				return filteredAnswerTypes
+			},
+		)
 
-		hasSubtypes(): (
-			answer: { subtypes?: Record<string, unknown> } | null | undefined,
-		) => boolean {
+		const hasSubtypes = computed<
+			(
+				answer: { subtypes?: Record<string, unknown> } | null | undefined,
+			) => boolean
+		>(() => {
 			return (answer) =>
 				Boolean(answer?.subtypes)
 				&& Object.keys(answer?.subtypes ?? {}).length > 0
-		},
+		})
 
-		lockedUntilFormatted(): string {
-			return moment(this.form.lockedUntil, 'X').fromNow()
-		},
-	},
+		const lockedUntilFormatted = computed<string>(() =>
+			moment(props.form.lockedUntil, 'X').fromNow(),
+		)
 
-	watch: {
-		// Fetch full form on change
-		hash() {
-			this.fetchFullForm(this.form.id)
-		},
+		// Event handlers
+		const onDragStart = (): void => {
+			isDragging.value = true
+		}
 
-		// Update Window-Title on title change
-		'form.title': function () {
-			SetWindowTitle(this.formTitle)
-		},
-
-		// resize description if form is loaded
-		isLoadingForm(value: boolean): void {
-			if (!value) {
-				this.resizeTitle()
-				this.resizeDescription()
-			}
-		},
-	},
-
-	mounted() {
-		this.fetchFullForm(this.form.id)
-		SetWindowTitle(this.formTitle)
-	},
-
-	methods: {
-		onDragStart(): void {
-			this.isDragging = true
-		},
-
-		onDragEnd(): void {
-			this.$nextTick(() => {
-				this.isDragging = false
+		const onDragEnd = (): void => {
+			nextTick(() => {
+				isDragging.value = false
 			})
-		},
+		}
 
-		setQuestionRef(
-			el: QuestionRefInstance | null,
-			question: FormsQuestion,
-		): void {
-			if (el) {
-				this.questionRefsMap[question.id] = el
-			} else {
-				delete this.questionRefsMap[question.id]
-			}
-		},
-
-		registerQuestionRef(
-			question: FormsQuestion,
-		): (el: Element | ComponentPublicInstance | null) => void {
-			return (el) => {
-				this.setQuestionRef(el as QuestionRefInstance | null, question)
-			}
-		},
-
-		updateQuestionProperty<K extends keyof FormsQuestion>(
+		const updateQuestionProperty = <K extends keyof FormsQuestion>(
 			index: number,
 			property: K,
 			value: FormsQuestion[K],
-		): void {
-			const questions = [...this.form.questions]
+		): void => {
+			const questions = [...props.form.questions]
 			questions[index] = { ...questions[index], [property]: value }
-			this.$emit('update:form', { ...this.form, questions })
-		},
+			emit('update:form', { ...props.form, questions })
+		}
 
-		updateQuestionText(index: number, value: string): void {
-			this.updateQuestionProperty(index, 'text', value)
-		},
+		const updateQuestionText = (index: number, value: string): void => {
+			updateQuestionProperty(index, 'text', value)
+		}
 
-		updateQuestionDescription(index: number, value: string): void {
-			this.updateQuestionProperty(index, 'description', value)
-		},
+		const updateQuestionDescription = (index: number, value: string): void => {
+			updateQuestionProperty(index, 'description', value)
+		}
 
-		updateQuestionIsRequired(index: number, value: boolean): void {
-			this.updateQuestionProperty(index, 'isRequired', value)
-		},
+		const updateQuestionIsRequired = (index: number, value: boolean): void => {
+			updateQuestionProperty(index, 'isRequired', value)
+		}
 
-		updateQuestionName(index: number, value: string): void {
-			this.updateQuestionProperty(index, 'name', value)
-		},
+		const updateQuestionName = (index: number, value: string): void => {
+			updateQuestionProperty(index, 'name', value)
+		}
 
-		updateQuestionExtraSettings(
+		const updateQuestionExtraSettings = (
 			index: number,
 			value: Record<string, unknown> | null,
-		): void {
-			this.updateQuestionProperty(index, 'extraSettings', value)
-		},
+		): void => {
+			updateQuestionProperty(index, 'extraSettings', value)
+		}
 
-		updateQuestionOptions(index: number, value: unknown[]): void {
-			this.updateQuestionProperty(index, 'options', value)
-		},
+		const updateQuestionOptions = (index: number, value: unknown[]): void => {
+			updateQuestionProperty(index, 'options', value)
+		}
 
-		onMoveUp(index: number): void {
+		/**
+		 * Reorder questions on dragEnd
+		 *
+		 * @param questions the freshly reordered questions (avoids reading the not-yet-updated `form` prop)
+		 */
+		const onQuestionOrderChange = async (
+			questions: FormsQuestion[],
+		): Promise<void> => {
+			isLoadingQuestions.value = true
+			const newOrder = questions.map((question: FormsQuestion) => question.id)
+
+			try {
+				await axios.patch(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
+						id: props.form.id,
+					}),
+					{
+						newOrder,
+					},
+				)
+				emitEvent('forms:last-updated:set', props.form.id)
+			} catch (error) {
+				logger.error('Error while saving form', { error })
+				showError(t('forms', 'Error while saving form'))
+			} finally {
+				isLoadingQuestions.value = false
+			}
+		}
+
+		const onMoveUp = (index: number): void => {
 			if (index > 0) {
-				const questions = [...this.form.questions]
+				const questions = [...props.form.questions]
 				;[questions[index - 1], questions[index]] = [
 					questions[index],
 					questions[index - 1],
 				]
-				this.$emit('update:form', { ...this.form, questions })
-				this.onQuestionOrderChange(questions)
+				emit('update:form', { ...props.form, questions })
+				onQuestionOrderChange(questions)
 			}
-		},
+		}
 
-		onMoveDown(index: number): void {
+		const onMoveDown = (index: number): void => {
 			// only if not the last one
-			if (index < this.form.questions.length - 1) {
-				this.onMoveUp(index + 1)
+			if (index < props.form.questions.length - 1) {
+				onMoveUp(index + 1)
 			}
-		},
+		}
 
-		onTitleChange(): void {
-			this.resizeTitle()
-			this.saveTitle()
-		},
-
-		/**
-		 * Auto adjust the title height based its scroll height
-		 */
-		resizeTitle(): void {
-			this.$nextTick(() => {
-				const textarea = this.$refs.title as HTMLTextAreaElement
-				textarea.style.cssText = 'height: 0'
-				// include 2px border
-				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
-			})
-		},
-
-		/**
-		 * Auto adjust the description height based on its scroll height
-		 */
-		resizeDescription(): void {
-			// nextTick to ensure textarea is attached to DOM
-			this.$nextTick(() => {
-				const textarea = this.$refs.description as HTMLTextAreaElement
-				textarea.style.cssText = 'height: 0'
-				// include 2px border
-				textarea.style.cssText = `height: ${textarea.scrollHeight + 4}px`
-			})
-		},
-
-		onTitleInput(event: Event): void {
-			this.$emit('update:form', {
-				...this.form,
-				title: (event.target as HTMLTextAreaElement).value,
-			})
-			this.onTitleChange()
-		},
-
-		/**
-		 * Update the description
-		 *
-		 * @param event The input event of the textarea
-		 */
-		updateDescription(event: Event): void {
-			const target = event.target as HTMLTextAreaElement | null
-			if (!target) {
-				return
-			}
-			this.$emit('update:form', { ...this.form, description: target.value })
-			this.resizeDescription()
-			this.saveDescription()
-		},
-
-		/**
-		 * Title & description save methods
-		 */
-		saveTitle: debounce(async function (this: {
-			saveFormProperty: (key: 'title') => void
-		}) {
-			this.saveFormProperty('title')
-		}, INPUT_DEBOUNCE_MS),
-
-		saveDescription: debounce(async function (this: {
-			saveFormProperty: (key: 'description') => void
-		}) {
-			this.saveFormProperty('description')
-		}, INPUT_DEBOUNCE_MS),
-
-		/**
-		 * Add a new question to the current form
-		 *
-		 * @param type the question type, see AnswerTypes
-		 * @param subtype the question subtype, see AnswerTypes.subtypes
-		 * @param position where the new question should be added
-		 */
-		async addQuestion(
-			type: string,
-			subtype: string | null = null,
-			position: number | null = null,
-		): Promise<void> {
-			this.activeQuestionType = null
-			const text = ''
-			this.isLoadingQuestions = true
-
-			try {
-				const body: {
-					type: string
-					text: string
-					subtype: string | null
-					position?: number
-				} = { type, text, subtype }
-				if (position !== null) {
-					// position: current question position + 2 (0-based index: +1, next position: +1)
-					body.position = position + 2
-				}
-
-				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
-						id: this.form.id,
-					}),
-					body,
-				)
-				const question = OcsResponse2Data<FormsQuestion>(response)
-
-				// Delegate insertion & focus handling to helper
-				this.insertQuestion(question, { text, type, answers: [] }, position)
-			} catch (error) {
-				logger.error('Error while adding new question', { error })
-				showError(
-					t('forms', 'There was an error while adding the new question'),
-				)
-			} finally {
-				this.isLoadingQuestions = false
-			}
-		},
-
-		/**
-		 * Delete a question
-		 *
-		 * @param questionId the question id to delete
-		 */
-		async deleteQuestion(questionId: number): Promise<void> {
-			this.isLoadingQuestions = true
-
-			try {
-				await axios.delete(
-					generateOcsUrl(
-						'apps/forms/api/v3/forms/{id}/questions/{questionId}',
-						{
-							id: this.form.id,
-							questionId,
-						},
-					),
-				)
-				const questions = this.form.questions.filter(
-					(search: FormsQuestion) => search.id !== questionId,
-				)
-				this.$emit('update:form', { ...this.form, questions })
-				emit('forms:last-updated:set', this.form.id)
-			} catch (error) {
-				logger.error(`Error while removing question ${questionId}`, {
-					error,
-				})
-				showError(
-					t('forms', 'There was an error while removing the question'),
-				)
-			} finally {
-				this.isLoadingQuestions = false
-			}
-		},
-
-		insertQuestion(
+		const insertQuestion = (
 			questionData: FormsQuestion,
 			defaultFields: Partial<FormsQuestion> = {},
 			position: number | null = null,
-		): void {
+		): void => {
 			const newQuestionObj = {
 				...defaultFields,
 				...questionData,
@@ -695,24 +574,135 @@ export default defineComponent({
 				insertAt = position
 			}
 
-			const questions = [...this.form.questions]
+			const questions = [...props.form.questions]
 			if (insertAt !== null && insertAt <= questions.length) {
 				questions.splice(insertAt, 0, newQuestionObj)
-				this.$emit('update:form', { ...this.form, questions })
-				this.$nextTick(() => {
+				emit('update:form', { ...props.form, questions })
+				nextTick(() => {
 					// Prefer ref by id when available, fallback to positional refs
-					this.questionRefsMap[newQuestionObj.id]?.focus?.()
+					questionRefsMap.value[newQuestionObj.id]?.focus?.()
 				})
 			} else {
 				questions.push(newQuestionObj)
-				this.$emit('update:form', { ...this.form, questions })
-				this.$nextTick(() => {
-					this.questionRefsMap[newQuestionObj.id]?.focus?.()
+				emit('update:form', { ...props.form, questions })
+				nextTick(() => {
+					questionRefsMap.value[newQuestionObj.id]?.focus?.()
 				})
 			}
 
-			emit('forms:last-updated:set', this.form.id)
-		},
+			emitEvent('forms:last-updated:set', props.form.id)
+		}
+
+		const onTitleChange = (): void => {
+			resizeTitle()
+			saveTitle()
+		}
+
+		const onTitleInput = (event: Event): void => {
+			emit('update:form', {
+				...props.form,
+				title: (event.target as HTMLTextAreaElement).value,
+			})
+			onTitleChange()
+		}
+
+		/**
+		 * Update the description
+		 *
+		 * @param event The input event of the textarea
+		 */
+		const updateDescription = (event: Event): void => {
+			const target = event.target as HTMLTextAreaElement | null
+			if (!target) {
+				return
+			}
+			emit('update:form', { ...props.form, description: target.value })
+			resizeDescription()
+			saveDescription()
+		}
+
+		/**
+		 * Add a new question to the current form
+		 *
+		 * @param type the question type, see AnswerTypes
+		 * @param subtype the question subtype, see AnswerTypes.subtypes
+		 * @param position where the new question should be added
+		 */
+		const addQuestion = async (
+			type: string,
+			subtype: string | null = null,
+			position: number | null = null,
+		): Promise<void> => {
+			activeQuestionType.value = null
+			const text = ''
+			isLoadingQuestions.value = true
+
+			try {
+				const body: {
+					type: string
+					text: string
+					subtype: string | null
+					position?: number
+				} = { type, text, subtype }
+				if (position !== null) {
+					// position: current question position + 2 (0-based index: +1, next position: +1)
+					body.position = position + 2
+				}
+
+				const response = await axios.post(
+					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
+						id: props.form.id,
+					}),
+					body,
+				)
+				const question = OcsResponse2Data<FormsQuestion>(response)
+
+				// Delegate insertion & focus handling to helper
+				insertQuestion(question, { text, type, answers: [] }, position)
+			} catch (error) {
+				logger.error('Error while adding new question', { error })
+				showError(
+					t('forms', 'There was an error while adding the new question'),
+				)
+			} finally {
+				isLoadingQuestions.value = false
+			}
+		}
+
+		/**
+		 * Delete a question
+		 *
+		 * @param questionId the question id to delete
+		 */
+		const deleteQuestion = async (questionId: number): Promise<void> => {
+			isLoadingQuestions.value = true
+
+			try {
+				await axios.delete(
+					generateOcsUrl(
+						'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+						{
+							id: props.form.id,
+							questionId,
+						},
+					),
+				)
+				const questions = props.form.questions.filter(
+					(search: FormsQuestion) => search.id !== questionId,
+				)
+				emit('update:form', { ...props.form, questions })
+				emitEvent('forms:last-updated:set', props.form.id)
+			} catch (error) {
+				logger.error(`Error while removing question ${questionId}`, {
+					error,
+				})
+				showError(
+					t('forms', 'There was an error while removing the question'),
+				)
+			} finally {
+				isLoadingQuestions.value = false
+			}
+		}
 
 		/**
 		 * Clone a question
@@ -721,17 +711,17 @@ export default defineComponent({
 		 * @param question.id the question id to clone in the current form
 		 * @param position where the cloned question should be added
 		 */
-		async cloneQuestion(
+		const cloneQuestion = async (
 			question: Pick<FormsQuestion, 'id'>,
 			position: number | null,
-		): Promise<void> {
-			this.isLoadingQuestions = true
+		): Promise<void> => {
+			isLoadingQuestions.value = true
 
 			try {
 				const url = generateOcsUrl(
 					'apps/forms/api/v3/forms/{id}/questions?fromId={questionId}',
 					{
-						id: this.form.id,
+						id: props.form.id,
 						questionId: question.id,
 					},
 				)
@@ -746,48 +736,104 @@ export default defineComponent({
 				const clonedQuestion = OcsResponse2Data<FormsQuestion>(response)
 
 				// Delegate insertion & focus handling to helper
-				this.insertQuestion(clonedQuestion, { answers: [] })
+				insertQuestion(clonedQuestion, { answers: [] })
 			} catch (error) {
 				logger.error(`Error while duplicating question ${question.id}`, {
 					error,
 				})
 				showError('There was an error while duplicating the question')
 			} finally {
-				this.isLoadingQuestions = false
+				isLoadingQuestions.value = false
 			}
-		},
+		}
 
-		onUpdateQuestions(questions: FormsQuestion[]): void {
-			this.$emit('update:form', { ...this.form, questions })
-			this.onQuestionOrderChange(questions)
-		},
+		const onUpdateQuestions = (questions: FormsQuestion[]): void => {
+			emit('update:form', { ...props.form, questions })
+			onQuestionOrderChange(questions)
+		}
 
-		/**
-		 * Reorder questions on dragEnd
-		 *
-		 * @param questions the freshly reordered questions (avoids reading the not-yet-updated `form` prop)
-		 */
-		async onQuestionOrderChange(questions: FormsQuestion[]): Promise<void> {
-			this.isLoadingQuestions = true
-			const newOrder = questions.map((question: FormsQuestion) => question.id)
+		// Watchers
+		// Fetch full form on change
+		watch(
+			() => props.hash,
+			() => {
+				viewForm.fetchFullForm(props.form.id)
+			},
+		)
 
-			try {
-				await axios.patch(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
-						id: this.form.id,
-					}),
-					{
-						newOrder,
-					},
-				)
-				emit('forms:last-updated:set', this.form.id)
-			} catch (error) {
-				logger.error('Error while saving form', { error })
-				showError(t('forms', 'Error while saving form'))
-			} finally {
-				this.isLoadingQuestions = false
-			}
-		},
+		// Update Window-Title on title change
+		watch(
+			() => props.form.title,
+			() => {
+				SetWindowTitle(viewForm.formTitle)
+			},
+		)
+
+		// resize description if form is loaded
+		watch(
+			() => viewForm.isLoadingForm.value,
+			(value: boolean) => {
+				if (!value) {
+					resizeTitle()
+					resizeDescription()
+				}
+			},
+		)
+
+		// Lifecycle
+		onMounted(() => {
+			viewForm.fetchFullForm(props.form.id)
+			SetWindowTitle(viewForm.formTitle)
+		})
+
+		return {
+			...viewForm,
+			answerTypes,
+			title,
+			description,
+			isLoadingQuestions,
+			isDragging,
+			maxStringLengths,
+			questionMenuOpened,
+			activeQuestionType,
+			questionRefsMap,
+			insertMenuOpenedIndex,
+			insertMenuOpened,
+			hasQuestions,
+			isRequiredUsed,
+			isExpired,
+			isFormArchived,
+			infoMessage,
+			expirationMessage,
+			answerTypesFilter,
+			hasSubtypes,
+			lockedUntilFormatted,
+			onDragStart,
+			onDragEnd,
+			setQuestionRef,
+			registerQuestionRef,
+			updateQuestionText,
+			updateQuestionDescription,
+			updateQuestionIsRequired,
+			updateQuestionName,
+			updateQuestionExtraSettings,
+			updateQuestionOptions,
+			onMoveUp,
+			onMoveDown,
+			onTitleInput,
+			updateDescription,
+			resizeTitle,
+			resizeDescription,
+			addQuestion,
+			deleteQuestion,
+			insertQuestion,
+			cloneQuestion,
+			onUpdateQuestions,
+			onQuestionOrderChange,
+			IconLock,
+			isMobile: useIsMobile(),
+			t,
+		}
 	},
 })
 </script>

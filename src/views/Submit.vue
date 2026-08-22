@@ -126,12 +126,12 @@
 			</NcEmptyContent>
 
 			<!-- Questions list -->
-			<form v-else ref="form" @submit.prevent="onSubmit">
+			<form v-else ref="formElement" @submit.prevent="onSubmit">
 				<ul>
 					<component
 						:is="answerTypes[question.type].component"
 						v-for="(question, index) in validQuestions"
-						ref="questions"
+						ref="questionRefs"
 						:key="question.id"
 						v-bind="question"
 						readOnly
@@ -227,13 +227,14 @@ import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
 import IconSend from '@material-symbols/svg-400/outlined/send.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
-import { emit } from '@nextcloud/event-bus'
+import { emit as emitEvent } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
-import { ref } from 'vue'
+import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { defineComponent } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -333,28 +334,6 @@ export default defineComponent({
 		TopBar,
 	},
 
-	async beforeRouteUpdate() {
-		// This navigation guard is called when the route parameters changed (e.g. form hash)
-		// continue with the navigation if there are no changes or the user confirms to leave the form
-		if (await this.confirmLeaveForm()) {
-			return
-		} else {
-			// Otherwise cancel the navigation
-			return false
-		}
-	},
-
-	async beforeRouteLeave() {
-		// This navigation guard is called when the route changed and a new view should be shown
-		// continue with the navigation if there are no changes or the user confirms to leave the form
-		if (await this.confirmLeaveForm()) {
-			return
-		} else {
-			// Otherwise cancel the navigation
-			return false
-		}
-	},
-
 	props: {
 		isLoggedIn: {
 			type: Boolean,
@@ -391,48 +370,31 @@ export default defineComponent({
 	emits: ['update:form', 'open-sharing'],
 
 	setup(props, { emit }) {
+		const route = useRoute()
 		const title = ref(null)
+		const formElement = ref<HTMLFormElement | null>(null)
+		const questionRefs = ref<
+			QuestionComponentRef[] | QuestionComponentRef | null
+		>(null)
 		const viewForm = useViewForm({
 			form: () => props.form,
 			emit,
 			titleRef: title,
 		})
 
-		// Non reactive properties
-		return {
-			...viewForm,
-			title,
-			IconCheckSvg: IconCheck,
-			IconRefreshSvg: IconRefresh,
-			IconSendSvg: IconSend,
-			t,
+		const answers = ref<AnswersMap>({})
+		const loading = ref(false)
+		const success = ref(false)
+		const successAnnouncement = ref('')
+		const submitForm = ref(false)
+		const showConfirmEmptyModal = ref(false)
+		const showConfirmLeaveDialog = ref(false)
+		const showClearFormDialog = ref(false)
+		const showClearFormDueToChangeDialog = ref(false)
+		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
-			maxStringLengths: loadState(formsAppName, 'maxStringLengths') as Record<
-				string,
-				number
-			>,
-		}
-	},
-
-	data() {
-		return {
-			answerTypes,
-			answers: {} as AnswersMap,
-			loading: false as boolean,
-			success: false as boolean,
-			successAnnouncement: '' as string,
-			submitForm: false as boolean,
-			showConfirmEmptyModal: false as boolean,
-			showConfirmLeaveDialog: false as boolean,
-			showClearFormDialog: false as boolean,
-			showClearFormDueToChangeDialog: false as boolean,
-			confirmButtonCallback: () => {},
-		}
-	},
-
-	computed: {
-		validQuestions(): SubmitQuestion[] {
-			return this.form.questions.filter((question) => {
+		const validQuestions = computed<SubmitQuestion[]>(() => {
+			return props.form.questions.filter((question) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
 					return false
@@ -445,90 +407,90 @@ export default defineComponent({
 				}
 				return true
 			}) as SubmitQuestion[]
-		},
+		})
 
-		validQuestionsIds(): Set<number> {
-			return new Set(this.validQuestions.map((question) => question.id))
-		},
+		const validQuestionsIds = computed<Set<number>>(() => {
+			return new Set(validQuestions.value.map((question) => question.id))
+		})
 
-		isRequiredUsed(): boolean {
-			return this.form.questions.some((question) =>
+		const isRequiredUsed = computed<boolean>(() => {
+			return props.form.questions.some((question) =>
 				Boolean(question.isRequired),
 			)
-		},
+		})
 
 		/**
 		 * Check if form is expired
 		 */
-		isExpired(): boolean {
-			return this.form.expires > 0 && moment().unix() > this.form.expires
-		},
+		const isExpired = computed<boolean>(() => {
+			return props.form.expires > 0 && moment().unix() > props.form.expires
+		})
 
-		isArchived(): boolean {
-			return this.form.state === FormState.FormArchived
-		},
+		const isArchived = computed<boolean>(() => {
+			return props.form.state === FormState.FormArchived
+		})
 
-		isClosed(): boolean {
-			return this.form.state === FormState.FormClosed
-		},
+		const isClosed = computed<boolean>(() => {
+			return props.form.state === FormState.FormClosed
+		})
 
-		isMaxSubmissionsReached(): boolean {
-			return this.form.isMaxSubmissionsReached === true
-		},
+		const isMaxSubmissionsReached = computed<boolean>(() => {
+			return props.form.isMaxSubmissionsReached === true
+		})
 
 		/**
 		 * Checks if the current state is active.
 		 *
 		 * @return - Returns true if active, otherwise false.
 		 */
-		isActive(): boolean {
-			return !this.isArchived && !this.isClosed && !this.isExpired
-		},
+		const isActive = computed<boolean>(() => {
+			return !isArchived.value && !isClosed.value && !isExpired.value
+		})
 
-		infoMessage(): string {
+		const infoMessage = computed<string>(() => {
 			let message = ''
-			if (this.form.isAnonymous) {
+			if (props.form.isAnonymous) {
 				message += t('forms', 'Responses are anonymous.')
 			}
-			if (!this.form.isAnonymous && this.isLoggedIn) {
+			if (!props.form.isAnonymous && props.isLoggedIn) {
 				message += t('forms', 'Responses are connected to your account.')
 			}
-			if (this.isRequiredUsed) {
+			if (isRequiredUsed.value) {
 				message +=
 					' '
 					+ t('forms', 'An asterisk (*) indicates mandatory questions.')
 			}
 
 			return message
-		},
+		})
 
 		/**
 		 * Rendered HTML of the custom submission message
 		 */
-		submissionMessageHTML(): string {
+		const submissionMessageHTML = computed<string>(() => {
 			if (
-				this.form.submissionMessage
-				&& (this.success || !this.form.canSubmit)
+				props.form.submissionMessage
+				&& (success.value || !props.form.canSubmit)
 			) {
-				return this.markdownit.render(this.form.submissionMessage)
+				return viewForm.markdownit.render(props.form.submissionMessage)
 			}
 			return ''
-		},
+		})
 
-		expirationMessage(): string {
-			const relativeDate = moment(this.form.expires, 'X')
+		const expirationMessage = computed<string>(() => {
+			const relativeDate = moment(props.form.expires, 'X')
 				.locale(window.OC.getLanguage())
 				.fromNow()
-			if (this.isExpired) {
+			if (isExpired.value) {
 				return t('forms', 'Expired {relativeDate}.', { relativeDate })
 			}
 			return t('forms', 'Expires {relativeDate}.', { relativeDate })
-		},
+		})
 
 		/**
 		 * Buttons for the "confirm submit empty form" dialog
 		 */
-		confirmEmptyModalButtons(): DialogButton[] {
+		const confirmEmptyModalButtons = computed<DialogButton[]>(() => {
 			return [
 				{
 					label: t('forms', 'Abort'),
@@ -539,34 +501,36 @@ export default defineComponent({
 					label: t('forms', 'Submit'),
 					icon: IconCheck,
 					variant: 'primary',
-					callback: () => this.onConfirmedSubmit(),
+					callback: () => {
+						void onConfirmedSubmit()
+					},
 				},
 			]
-		},
+		})
 
 		/**
 		 * Buttons for the "confirm leave unsubmitted form" dialog
 		 */
-		confirmLeaveFormButtons(): DialogButton[] {
+		const confirmLeaveFormButtons = computed<DialogButton[]>(() => {
 			return [
 				{
 					label: t('forms', 'Abort'),
 					icon: IconCancel,
-					callback: () => this.confirmButtonCallback(false),
+					callback: () => confirmButtonCallback.value(false),
 				},
 				{
 					label: t('forms', 'Leave'),
 					icon: IconCheck,
 					variant: 'primary',
-					callback: () => this.confirmButtonCallback(true),
+					callback: () => confirmButtonCallback.value(true),
 				},
 			]
-		},
+		})
 
 		/**
 		 * Buttons for the "confirm clear form" dialog
 		 */
-		confirmClearFormButtons(): DialogButton[] {
+		const confirmClearFormButtons = computed<DialogButton[]>(() => {
 			return [
 				{
 					label: t('forms', 'Abort'),
@@ -577,181 +541,123 @@ export default defineComponent({
 					label: t('forms', 'Clear'),
 					icon: IconCheck,
 					variant: 'primary',
-					callback: () => this.onResetSubmission(),
+					callback: () => onResetSubmission(),
 				},
 			]
-		},
+		})
 
-		hasAnswers(): boolean {
-			return Object.keys(this.answers).length > 0
-		},
+		const hasAnswers = computed<boolean>(() => {
+			return Object.keys(answers.value).length > 0
+		})
 
-		submissionId(): number | null {
+		const submissionId = computed<number | null>(() => {
+			const routeSubmissionId = Array.isArray(route.params.submissionId)
+				? route.params.submissionId[0]
+				: route.params.submissionId
 			const id =
-				this.$route?.params.submissionId
-				|| loadState(formsAppName, 'submissionId', null)
+				routeSubmissionId || loadState(formsAppName, 'submissionId', null)
 			return id ? parseInt(String(id), 10) : null
-		},
-	},
+		})
 
-	watch: {
-		success(newVal: boolean): void {
-			if (newVal) {
-				// Delay populating the live region to avoid the announcement being
-				// swallowed by the simultaneous large DOM change (form replaced by
-				// success view). Screen readers need a moment to process the new DOM
-				// before a polite live region update registers.
-				setTimeout(() => {
-					this.successAnnouncement =
-						this.form.submissionMessage
-						|| t('forms', 'Thank you for completing the form!')
-				}, 100)
-			} else {
-				this.successAnnouncement = ''
-			}
-		},
-
-		hash(): void {
-			// If public view, abort. Should normally not occur.
-			if (this.publicView) {
-				logger.error('Hash changed on public view. Aborting.')
-				return
-			}
-			this.resetData()
-			// Fetch full form on change
-			this.fetchFullForm(this.form.id)
-			this.initFromLocalStorage()
-			SetWindowTitle(this.formTitle)
-		},
-	},
-
-	beforeUnmount(): void {
-		window.removeEventListener('beforeunload', this.beforeWindowUnload)
-	},
-
-	created(): void {
-		window.addEventListener('beforeunload', this.beforeWindowUnload)
-	},
-
-	async beforeMount(): Promise<void> {
-		// Public Views get their form by initial-state from parent. No fetch necessary.
-		if (this.publicView) {
-			this.isLoadingForm = false
-		} else {
-			await this.fetchFullForm(this.form.id)
-		}
-
-		if (this.isLoggedIn) {
-			if (
-				this.submissionId
-				&& (this.form.allowEditSubmissions
-					|| this.form.permissions.includes(
-						PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
-					))
-			) {
-				this.fetchSubmission()
-			} else {
-				this.initFromLocalStorage()
-			}
-		}
-
-		SetWindowTitle(this.formTitle)
-	},
-
-	methods: {
 		/**
 		 * Load saved values for current form from LocalStorage
 		 *
 		 * @return
 		 */
-		getFormValuesFromLocalStorage(): StoredAnswersMap | null {
+		function getFormValuesFromLocalStorage(): StoredAnswersMap | null {
 			const fromLocalStorage = localStorage.getItem(
-				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
+				`nextcloud_forms_${props.publicView ? props.shareHash : props.hash}`,
 			)
 			if (fromLocalStorage) {
 				return JSON.parse(fromLocalStorage)
 			}
 			return null
-		},
+		}
 
 		/**
 		 * Initialize answers from saved state in LocalStorage
 		 */
-		initFromLocalStorage(): void {
-			const savedState = this.getFormValuesFromLocalStorage()
+		function initFromLocalStorage(): void {
+			const savedState = getFormValuesFromLocalStorage()
 			if (!savedState) {
 				return
 			}
 
-			const answers: AnswersMap = {}
+			const localAnswers: AnswersMap = {}
 			for (const [questionId, answer] of Object.entries(savedState)) {
 				// Clean up answers for questions that do not exist anymore
-				if (!this.validQuestionsIds.has(parseInt(questionId, 10))) {
-					this.showClearFormDueToChangeDialog = true
+				if (!validQuestionsIds.value.has(parseInt(questionId, 10))) {
+					showClearFormDueToChangeDialog.value = true
 					logger.debug('Question does not exist anymore', {
 						questionId,
 					})
 					continue
 				}
 
-				answers[parseInt(questionId, 10)] = [
+				localAnswers[parseInt(questionId, 10)] = [
 					'QuestionMultiple',
 					'QuestionRanking',
 				].includes(answer.type)
 					? answer.value.map(String)
 					: answer.value
 			}
-			this.answers = answers
-		},
+			answers.value = localAnswers
+		}
 
 		/**
 		 * Save updated answers for question to LocalStorage in case of browser crash / closes / etc
 		 *
 		 * @param question Question to update
 		 */
-		addFormFieldToLocalStorage(question: SubmitQuestion): void {
-			if (!this.isLoggedIn) {
+		function addFormFieldToLocalStorage(question: SubmitQuestion): void {
+			if (!props.isLoggedIn) {
 				return
 			}
 			// We make sure the values are updated by the `values.sync` handler
 			const state = {
-				...(this.getFormValuesFromLocalStorage() ?? {}),
+				...(getFormValuesFromLocalStorage() ?? {}),
 				[`${question.id}`]: {
-					value: this.answers[question.id],
+					value: answers.value[question.id],
 					type: answerTypes[question.type].component.name,
 				},
 			}
 			const stringified = JSON.stringify(state)
 			localStorage.setItem(
-				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
+				`nextcloud_forms_${props.publicView ? props.shareHash : props.hash}`,
 				stringified,
 			)
-		},
+		}
 
-		deleteFormFieldFromLocalStorage(): void {
-			if (!this.isLoggedIn) {
+		/**
+		 * Deletes a non-existing field from local storage
+		 */
+		function deleteFormFieldFromLocalStorage(): void {
+			if (!props.isLoggedIn) {
 				return
 			}
 			localStorage.removeItem(
-				`nextcloud_forms_${this.publicView ? this.shareHash : this.hash}`,
+				`nextcloud_forms_${props.publicView ? props.shareHash : props.hash}`,
 			)
-		},
+		}
 
-		async fetchSubmission(): Promise<void> {
-			logger.debug(`Loading response ${this.submissionId}`)
+		/**
+		 * Fetches the submission data for the given id from the server
+		 */
+		async function fetchSubmission(): Promise<void> {
+			logger.debug(`Loading response ${submissionId.value}`)
 
 			try {
 				const response = await axios.get(
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
 						{
-							id: this.form.id,
-							submissionId: this.submissionId,
+							id: props.form.id,
+							submissionId: submissionId.value,
 						},
 					),
 				)
 
-				const answers: AnswersMap = {}
+				const loaded: AnswersMap = {}
 				const loadedAnswers =
 					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
 				for (const answer of loadedAnswers) {
@@ -759,21 +665,21 @@ export default defineComponent({
 					const text = answer.text
 
 					// Only initialize once, don't overwrite previous answers
-					if (!answers[questionId]) {
-						answers[questionId] = []
+					if (!loaded[questionId]) {
+						loaded[questionId] = []
 					}
 
 					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
-					if (!this.validQuestionsIds.has(questionId)) {
-						this.showClearFormDueToChangeDialog = true
+					if (!validQuestionsIds.value.has(questionId)) {
+						showClearFormDueToChangeDialog.value = true
 						logger.debug('Question does not exist anymore', {
 							questionId,
 						})
 						continue
 					}
 
-					const question = this.form.questions.find(
+					const question = props.form.questions.find(
 						(question) => question.id === questionId,
 					) as SubmitQuestion | undefined
 					if (!question) {
@@ -781,7 +687,7 @@ export default defineComponent({
 					}
 					if (question.type === 'ranking') {
 						try {
-							answers[questionId].push(...JSON.parse(text).map(String))
+							loaded[questionId].push(...JSON.parse(text).map(String))
 						} catch (error) {
 							logger.debug(
 								`Could not parse ranking answer ${text} for question ${questionId}`,
@@ -797,16 +703,16 @@ export default defineComponent({
 							(option) => option.text === text,
 						)
 						if (option.length > 0) {
-							answers[questionId].push(String(option[0].id))
+							loaded[questionId].push(String(option[0].id))
 						} else if (
 							question.extraSettings?.allowOtherAnswer
-							&& !answers[questionId].some((answer) =>
-								String(answer).startsWith(
+							&& !loaded[questionId].some((localAnswer) =>
+								String(localAnswer).startsWith(
 									QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 								),
 							)
 						) {
-							answers[questionId].push(
+							loaded[questionId].push(
 								QUESTION_EXTRASETTINGS_OTHER_PREFIX + text,
 							)
 						} else {
@@ -824,18 +730,18 @@ export default defineComponent({
 							`Skipping file answer for question ${questionId} — cannot restore uploaded files`,
 						)
 					} else {
-						answers[questionId].push(text)
+						loaded[questionId].push(text)
 					}
 				}
 
-				this.answers = answers
+				answers.value = loaded
 			} catch (error) {
 				logger.error('Error while loading response', { error })
 				showError(
 					t('forms', 'There was an error while loading the response'),
 				)
 			}
-		},
+		}
 
 		/**
 		 * Update answers of a give value
@@ -843,14 +749,26 @@ export default defineComponent({
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
-		onUpdate(question: SubmitQuestion, values: AnswerValue): void {
-			this.answers = { ...this.answers, [question.id]: values }
-			this.addFormFieldToLocalStorage(question)
-		},
+		function onUpdate(question: SubmitQuestion, values: unknown[]): void {
+			answers.value = {
+				...answers.value,
+				[question.id]: values as AnswerValue,
+			}
+			addFormFieldToLocalStorage(question)
+		}
 
-		updateQuestionValues(question: SubmitQuestion, values: AnswerValue): void {
-			this.onUpdate(question, values)
-		},
+		/**
+		 * Proxy for update events emitted by question components.
+		 *
+		 * @param question The question being updated.
+		 * @param values The updated question values.
+		 */
+		function updateQuestionValues(
+			question: SubmitQuestion,
+			values: unknown[],
+		): void {
+			onUpdate(question, values)
+		}
 
 		/**
 		 * On Enter, focus next form-element
@@ -858,11 +776,11 @@ export default defineComponent({
 		 *
 		 * @param event The fired event.
 		 */
-		onKeydownEnter(
+		function onKeydownEnter(
 			event: KeyboardEvent & { originalTarget?: EventTarget | null },
 		): void {
 			const formInputs = Array.from(
-				(this.$refs.form as HTMLFormElement).elements,
+				formElement.value?.elements ?? [],
 			) as HTMLElement[]
 			const sourceInputIndex = formInputs.findIndex(
 				(input) => input === (event.originalTarget ?? event.target),
@@ -870,30 +788,35 @@ export default defineComponent({
 
 			// Focus next form element
 			formInputs[sourceInputIndex + 1]?.focus()
-		},
+		}
 
 		/**
 		 * Ctrl+Enter typically fires submit on forms.
 		 * Some inputs do automatically, while some need explicit handling
 		 */
-		onKeydownCtrlEnter(): void {
-			;(this.$refs.form as HTMLFormElement | undefined)?.requestSubmit()
-		},
+		function onKeydownCtrlEnter(): void {
+			formElement.value?.requestSubmit()
+		}
 
 		/*
 		 * Methods for catching unwanted unload events
 		 */
-		beforeWindowUnload(e: BeforeUnloadEvent): void {
+		/**
+		 * Block closing or reloading while there are unsaved answers.
+		 *
+		 * @param e The beforeunload browser event.
+		 */
+		function beforeWindowUnload(e: BeforeUnloadEvent): void {
 			if (
-				this.isActive
-				&& !this.submitForm
-				&& Object.keys(this.answers).length !== 0
+				isActive.value
+				&& !submitForm.value
+				&& Object.keys(answers.value).length !== 0
 			) {
 				// Cancel the window unload event
 				e.preventDefault()
 				e.returnValue = ''
 			}
-		},
+		}
 
 		/**
 		 * Checks if the user is attempting to leave the form under certain conditions
@@ -910,34 +833,32 @@ export default defineComponent({
 		 * @return - Returns a promise that resolves with the value
 		 * passed to the confirm button callback if the dialog is shown, otherwise returns true.
 		 */
-		confirmLeaveForm(): Promise<boolean> | boolean {
+		function confirmLeaveForm(): Promise<boolean> | boolean {
 			if (
-				this.isActive
-				&& !this.submitForm
-				&& Object.keys(this.answers).length !== 0
+				isActive.value
+				&& !submitForm.value
+				&& Object.keys(answers.value).length !== 0
 			) {
-				this.showConfirmLeaveDialog = true
+				showConfirmLeaveDialog.value = true
 				return new Promise((resolve) => {
-					this.confirmButtonCallback = (val: boolean) => {
-						this.showConfirmLeaveDialog = false
+					confirmButtonCallback.value = (val: boolean) => {
+						showConfirmLeaveDialog.value = false
 						resolve(val)
 					}
 				})
 			}
 
 			return true
-		},
+		}
 
 		/**
 		 * Submit the form after the browser validated it 🚀 or show confirmation modal if empty
 		 */
-		async onSubmit(): Promise<void> {
-			const questionRefs = (
-				Array.isArray(this.$refs.questions)
-					? this.$refs.questions
-					: [this.$refs.questions].filter(Boolean)
-			) as QuestionComponentRef[]
-			const validation = questionRefs.map(
+		async function onSubmit(): Promise<void> {
+			const rawQuestionRefs = Array.isArray(questionRefs.value)
+				? questionRefs.value
+				: [questionRefs.value].filter(Boolean)
+			const validation = (rawQuestionRefs as QuestionComponentRef[]).map(
 				async (question) => await question.validate(),
 			)
 
@@ -950,58 +871,58 @@ export default defineComponent({
 
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
-					Object.keys(this.answers).length === 0
-					|| Object.values(this.answers).every(
-						(answers) => answers.length === 0,
+					Object.keys(answers.value).length === 0
+					|| Object.values(answers.value).every(
+						(localAnswers) => localAnswers.length === 0,
 					)
 				) {
-					this.showConfirmEmptyModal = true
+					showConfirmEmptyModal.value = true
 				} else {
 					// otherwise do the real submit
-					this.onConfirmedSubmit()
+					await onConfirmedSubmit()
 				}
 			} catch (error) {
 				logger.debug('One question is not valid', { error })
 				showError(t('forms', 'Some answers are not valid'))
 			}
-		},
+		}
 
 		/**
 		 * Handle the real submit of the form, this is only called if the form is not empty or user confirmed to submit
 		 */
-		async onConfirmedSubmit(): Promise<void> {
-			this.showConfirmEmptyModal = false
-			this.loading = true
+		async function onConfirmedSubmit(): Promise<void> {
+			showConfirmEmptyModal.value = false
+			loading.value = true
 
 			try {
-				if (this.submissionId) {
+				if (submissionId.value) {
 					await axios.put(
 						generateOcsUrl(
 							'apps/forms/api/v3/forms/{id}/submissions/{submissionId}',
 							{
-								id: this.form.id,
-								submissionId: this.submissionId,
+								id: props.form.id,
+								submissionId: submissionId.value,
 							},
 						),
 						{
-							answers: this.answers,
+							answers: answers.value,
 						},
 					)
 				} else {
 					await axios.post(
 						generateOcsUrl('apps/forms/api/v3/forms/{id}/submissions', {
-							id: this.form.id,
+							id: props.form.id,
 						}),
 						{
-							answers: this.answers,
-							shareHash: this.shareHash,
+							answers: answers.value,
+							shareHash: props.shareHash,
 						},
 					)
 				}
-				this.submitForm = true
-				this.success = true
-				this.deleteFormFieldFromLocalStorage()
-				emit('forms:last-updated:set', this.form.id)
+				submitForm.value = true
+				success.value = true
+				deleteFormFieldFromLocalStorage()
+				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
 				const errorMessage = (
 					error as {
@@ -1025,30 +946,164 @@ export default defineComponent({
 					showError(t('forms', 'There was an error submitting the form'))
 				}
 			} finally {
-				this.loading = false
-				if (!this.publicView) {
-					this.fetchFullForm(this.form.id)
+				loading.value = false
+				if (!props.publicView) {
+					await viewForm.fetchFullForm(props.form.id)
 				}
 			}
-		},
+		}
 
-		onResetSubmission(): void {
-			this.deleteFormFieldFromLocalStorage()
-			this.resetData()
-		},
+		/**
+		 *
+		 */
+		function onResetSubmission(): void {
+			deleteFormFieldFromLocalStorage()
+			resetData()
+		}
 
 		/**
 		 * Reset View-Data
 		 */
-		resetData(): void {
-			this.answers = {}
-			this.loading = false
-			this.showConfirmLeaveDialog = false
-			this.showClearFormDialog = false
-			this.showClearFormDueToChangeDialog = false
-			this.success = false
-			this.submitForm = false
-		},
+		function resetData(): void {
+			answers.value = {}
+			loading.value = false
+			showConfirmLeaveDialog.value = false
+			showClearFormDialog.value = false
+			showClearFormDueToChangeDialog.value = false
+			success.value = false
+			submitForm.value = false
+		}
+
+		watch(success, (newVal: boolean): void => {
+			if (newVal) {
+				// Delay populating the live region to avoid the announcement being
+				// swallowed by the simultaneous large DOM change (form replaced by
+				// success view). Screen readers need a moment to process the new DOM
+				// before a polite live region update registers.
+				setTimeout(() => {
+					successAnnouncement.value =
+						props.form.submissionMessage
+						|| t('forms', 'Thank you for completing the form!')
+				}, 100)
+			} else {
+				successAnnouncement.value = ''
+			}
+		})
+
+		watch(
+			() => props.hash,
+			(): void => {
+				// If public view, abort. Should normally not occur.
+				if (props.publicView) {
+					logger.error('Hash changed on public view. Aborting.')
+					return
+				}
+				resetData()
+				// Fetch full form on change
+				void viewForm.fetchFullForm(props.form.id)
+				initFromLocalStorage()
+				SetWindowTitle(viewForm.formTitle.value)
+			},
+		)
+
+		onBeforeRouteUpdate(async () => {
+			// This navigation guard is called when the route parameters changed (e.g. form hash)
+			// continue with the navigation if there are no changes or the user confirms to leave the form
+			if (await confirmLeaveForm()) {
+				return
+			} else {
+				// Otherwise cancel the navigation
+				return false
+			}
+		})
+
+		onBeforeRouteLeave(async () => {
+			// This navigation guard is called when the route changed and a new view should be shown
+			// continue with the navigation if there are no changes or the user confirms to leave the form
+			if (await confirmLeaveForm()) {
+				return
+			} else {
+				// Otherwise cancel the navigation
+				return false
+			}
+		})
+
+		onMounted((): void => {
+			window.addEventListener('beforeunload', beforeWindowUnload)
+		})
+
+		onUnmounted((): void => {
+			window.removeEventListener('beforeunload', beforeWindowUnload)
+		})
+
+		onBeforeMount(async (): Promise<void> => {
+			// Public Views get their form by initial-state from parent. No fetch necessary.
+			if (props.publicView) {
+				viewForm.isLoadingForm.value = false
+			} else {
+				await viewForm.fetchFullForm(props.form.id)
+			}
+
+			if (props.isLoggedIn) {
+				if (
+					submissionId.value
+					&& (props.form.allowEditSubmissions
+						|| props.form.permissions.includes(
+							PERMISSION_TYPES.PERMISSION_RESULTS_DELETE,
+						))
+				) {
+					await fetchSubmission()
+				} else {
+					initFromLocalStorage()
+				}
+			}
+
+			SetWindowTitle(viewForm.formTitle.value)
+		})
+
+		// Non reactive properties
+		return {
+			...viewForm,
+			answerTypes,
+			answers,
+			confirmClearFormButtons,
+			confirmEmptyModalButtons,
+			confirmLeaveFormButtons,
+			expirationMessage,
+			formElement,
+			hasAnswers,
+			infoMessage,
+			isArchived,
+			isClosed,
+			isExpired,
+			isMaxSubmissionsReached,
+			loading,
+			onKeydownCtrlEnter,
+			onKeydownEnter,
+			onSubmit,
+			onUpdate,
+			questionRefs,
+			showClearFormDialog,
+			showClearFormDueToChangeDialog,
+			showConfirmEmptyModal,
+			showConfirmLeaveDialog,
+			submissionId,
+			submissionMessageHTML,
+			success,
+			successAnnouncement,
+			updateQuestionValues,
+			validQuestions,
+			title,
+			IconCheckSvg: IconCheck,
+			IconRefreshSvg: IconRefresh,
+			IconSendSvg: IconSend,
+			t,
+
+			maxStringLengths: loadState(formsAppName, 'maxStringLengths') as Record<
+				string,
+				number
+			>,
+		}
 	},
 })
 </script>

@@ -58,16 +58,17 @@
 </template>
 
 <script lang="ts">
-import type { FormsShare } from '../models/Entities.d.ts'
+import type { FormsForm, FormsShare } from '../models/Entities.d.ts'
 
 import IconComment from '@material-symbols/svg-400/outlined/comment.svg?raw'
 import IconSettings from '@material-symbols/svg-400/outlined/settings.svg?raw'
 import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import { getCurrentUser } from '@nextcloud/auth'
-import { emit } from '@nextcloud/event-bus'
+import { emit as emitEvent } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { defineComponent } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -117,151 +118,72 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const viewForm = useViewForm({ form: () => props.form, emit })
+		const commentsEl = ref<Element | null>(null)
+		const commentsView = ref<CommentsViewLike | null>(null)
+		const localShares = ref<FormsShare[]>([
+			...(props.form as unknown as FormsForm).shares,
+		])
+		const localFormOverrides = ref<Record<string, unknown>>({})
 
-		return {
-			...viewForm,
-			t,
-			IconComment,
-			IconSettings,
-			IconShareVariant,
-		}
-	},
+		const canEdit = computed<boolean>(() =>
+			(props.form as unknown as FormsForm)?.permissions?.includes(
+				PERMISSION_TYPES.PERMISSION_EDIT,
+			),
+		)
 
-	data() {
-		return {
-			commentsView: null as CommentsViewLike | null,
-			localShares: [...this.form.shares] as FormsShare[],
-			localFormOverrides: {} as Record<string, unknown>,
-		}
-	},
+		const sidebarForm = computed<Record<string, unknown>>(() => ({
+			...props.form,
+			...localFormOverrides.value,
+			shares: localShares.value,
+		}))
 
-	computed: {
-		canEdit(): boolean {
-			return this.form?.permissions?.includes(PERMISSION_TYPES.PERMISSION_EDIT)
-		},
+		const sidebarAllowComments = computed<boolean>(() =>
+			Boolean(sidebarForm.value.allowComments),
+		)
 
-		sidebarForm(): Record<string, unknown> {
-			return {
-				...this.form,
-				...this.localFormOverrides,
-				shares: this.localShares,
-			}
-		},
-
-		sidebarAllowComments(): boolean {
-			return Boolean(this.sidebarForm.allowComments)
-		},
-
-		isSidebarLocked(): boolean {
-			const lockedUntil = this.sidebarForm.lockedUntil
-			const lockedBy = this.sidebarForm.lockedBy
+		const isSidebarLocked = computed<boolean>(() => {
+			const lockedUntil = sidebarForm.value.lockedUntil
+			const lockedBy = sidebarForm.value.lockedBy
 			return (
 				lockedUntil === 0
 				|| (Number(lockedUntil || 0) > moment().unix()
-					&& lockedBy !== getCurrentUser().uid)
+					&& lockedBy !== getCurrentUser()?.uid)
 			)
-		},
+		})
 
-		lockedUntilFormatted(): string {
-			const lockedUntil = this.sidebarForm.lockedUntil
+		const lockedUntilFormatted = computed<string>(() => {
+			const lockedUntil = sidebarForm.value.lockedUntil
 			if (lockedUntil === 0 || lockedUntil === null) {
 				return ''
 			}
 			return moment(lockedUntil, 'X').locale(window.OC.getLanguage()).fromNow()
-		},
-
-		sidebarTitle(): string {
-			if (this.active === 'forms-comments') {
-				return t('forms', 'Form comments')
-			} else {
-				return t('forms', 'Form settings')
-			}
-		},
-	},
-
-	watch: {
-		form: function (nextForm: Record<string, unknown>) {
-			const nextOverrides = Object.fromEntries(
-				Object.entries(this.localFormOverrides).filter(
-					([key, value]) => nextForm[key] !== value,
-				),
-			)
-			this.localFormOverrides = nextOverrides
-		},
-
-		'form.shares': function (shares: FormsShare[]) {
-			this.localShares = [...shares]
-		},
-
-		'form.id': function (newId: number) {
-			this.localShares = [...this.form.shares]
-			this.localFormOverrides = {}
-
-			// Only update comments when the Comments tab is active
-			if (this.active !== 'forms-comments') {
-				return
-			}
-
-			// Only update comments when commentsView is instantiated, else setup commentsView
-			if (this.commentsView) {
-				this.commentsView.update(newId)
-			} else {
-				this.setupComments()
-			}
-		},
-
-		active(newVal: string) {
-			if (newVal === 'forms-comments') {
-				this.setupComments()
-			} else {
-				this.teardownComments()
-			}
-		},
-	},
-
-	mounted() {
-		this.$nextTick(() => {
-			if (this.active === 'forms-comments') {
-				this.setupComments()
-			}
-
-			// If the user cannot edit, prefer the comments tab when available
-			// Use the mounted comments element as the availability check rather than
-			// consulting `form.allowComments` (the tab is rendered with v-if).
-			if (
-				!this.canEdit
-				&& this.$refs.commentsEl
-				&& this.active !== 'forms-comments'
-			) {
-				this.onUpdateActive('forms-comments')
-			}
 		})
-	},
 
-	beforeUnmount() {
-		this.teardownComments()
-	},
+		const sidebarTitle = computed<string>(() =>
+			props.active === 'forms-comments'
+				? t('forms', 'Form comments')
+				: t('forms', 'Form settings'),
+		)
 
-	methods: {
-		onUpdateActive(active: string): void {
-			this.$emit('update:active', active)
-		},
+		const onUpdateActive = (active: string): void => {
+			emit('update:active', active)
+		}
 
 		// Mount or update the Comments view inside the sidebar
-		async setupComments(): Promise<void> {
+		const setupComments = async (): Promise<void> => {
 			// comments disabled for this form
-			if (!this.sidebarForm.allowComments) {
+			if (!sidebarForm.value.allowComments) {
 				return
 			}
 
 			// comments element missing
-			const el = this.$refs.commentsEl as Element | undefined
+			const el = commentsEl.value
 			if (!el) {
 				logger.debug('setupComments: no comments element found')
 				return
 			}
 
-			if (!this.commentsView) {
+			if (!commentsView.value) {
 				const commentsCtor = (
 					window as unknown as {
 						OCA?: {
@@ -280,17 +202,17 @@ export default defineComponent({
 					return
 				}
 
-				this.commentsView = new commentsCtor('forms', {
-					propsData: { resourceId: this.sidebarForm.id },
+				commentsView.value = new commentsCtor('forms', {
+					propsData: { resourceId: sidebarForm.value.id as number },
 				})
 			}
-			await this.commentsView.update(this.sidebarForm.id)
-			this.commentsView.$mount(el)
-		},
+			await commentsView.value.update(sidebarForm.value.id as number)
+			commentsView.value.$mount(el)
+		}
 
-		teardownComments(): void {
-			this.commentsView = null
-		},
+		const teardownComments = (): void => {
+			commentsView.value = null
+		}
 
 		/**
 		 * Save Form-Properties
@@ -298,55 +220,146 @@ export default defineComponent({
 		 * @param property The Name of the Property to update
 		 * @param newVal The new Property value
 		 */
-		onPropertyChange(property: string, newVal: unknown): void {
-			this.localFormOverrides = {
-				...this.localFormOverrides,
+		const onPropertyChange = (property: string, newVal: unknown): void => {
+			localFormOverrides.value = {
+				...localFormOverrides.value,
 				[property]: newVal,
 			}
 
-			this.$emit('update:form', {
-				...this.form,
-				...this.localFormOverrides,
-				shares: this.localShares,
+			emit('update:form', {
+				...props.form,
+				...localFormOverrides.value,
+				shares: localShares.value,
 			})
 
-			this.saveFormPropertyValue(property, newVal)
-		},
+			void viewForm.saveFormPropertyValue(property, newVal)
+		}
 
 		/**
 		 * Adding/Removing Share from the reactive object. API-Request is done in sharing-tab.
 		 *
 		 * @param share The respective share object
 		 */
-		onAddShare(share: FormsShare): void {
-			const newShares = [...this.localShares, share]
-			this.localShares = newShares
-			this.$emit('update:form', { ...this.form, shares: newShares })
-			emit('forms:last-updated:set', this.form.id)
-		},
+		const onAddShare = (share: FormsShare): void => {
+			const newShares = [...localShares.value, share]
+			localShares.value = newShares
+			emit('update:form', { ...props.form, shares: newShares })
+			emitEvent('forms:last-updated:set', props.form.id)
+		}
 
-		onRemoveShare(share: ShareWithId): void {
-			const newShares = this.localShares.filter(
+		const onRemoveShare = (share: ShareWithId): void => {
+			const newShares = localShares.value.filter(
 				(search): boolean =>
 					!('id' in (search as unknown as Record<string, unknown>))
 					|| (search as ShareWithId).id !== share.id,
 			)
-			this.localShares = newShares
-			this.$emit('update:form', { ...this.form, shares: newShares })
-			emit('forms:last-updated:set', this.form.id)
-		},
+			localShares.value = newShares
+			emit('update:form', { ...props.form, shares: newShares })
+			emitEvent('forms:last-updated:set', props.form.id)
+		}
 
-		onUpdateShare(share: ShareWithId): void {
-			const newShares = this.localShares.map((s) =>
-				'id' in (s as unknown as Record<string, unknown>)
-				&& (s as ShareWithId).id === share.id
+		const onUpdateShare = (share: ShareWithId): void => {
+			const newShares = localShares.value.map((currentShare) =>
+				'id' in (currentShare as unknown as Record<string, unknown>)
+				&& (currentShare as ShareWithId).id === share.id
 					? share
-					: s,
+					: currentShare,
 			)
-			this.localShares = newShares
-			this.$emit('update:form', { ...this.form, shares: newShares })
-			emit('forms:last-updated:set', this.form.id)
-		},
+			localShares.value = newShares
+			emit('update:form', { ...props.form, shares: newShares })
+			emitEvent('forms:last-updated:set', props.form.id)
+		}
+
+		watch(
+			() => props.form,
+			(nextForm) => {
+				const nextOverrides = Object.fromEntries(
+					Object.entries(localFormOverrides.value).filter(
+						([key, value]) => nextForm[key] !== value,
+					),
+				)
+				localFormOverrides.value = nextOverrides
+			},
+		)
+
+		watch(
+			() => (props.form as unknown as FormsForm).shares,
+			(shares) => {
+				localShares.value = [...shares]
+			},
+		)
+
+		watch(
+			() => (props.form as unknown as FormsForm).id,
+			(newId) => {
+				localShares.value = [...(props.form as unknown as FormsForm).shares]
+				localFormOverrides.value = {}
+
+				// Only update comments when the Comments tab is active
+				if (props.active !== 'forms-comments') {
+					return
+				}
+
+				// Only update comments when commentsView is instantiated, else setup commentsView
+				if (commentsView.value) {
+					void commentsView.value.update(newId)
+				} else {
+					void setupComments()
+				}
+			},
+		)
+
+		watch(
+			() => props.active,
+			(active) => {
+				if (active === 'forms-comments') {
+					void setupComments()
+				} else {
+					teardownComments()
+				}
+			},
+		)
+
+		onMounted(() => {
+			void nextTick(() => {
+				if (props.active === 'forms-comments') {
+					void setupComments()
+				}
+
+				// If the user cannot edit, prefer the comments tab when available
+				// Use the mounted comments element as the availability check rather than
+				// consulting `form.allowComments` (the tab is rendered with v-if).
+				if (
+					!canEdit.value
+					&& commentsEl.value
+					&& props.active !== 'forms-comments'
+				) {
+					onUpdateActive('forms-comments')
+				}
+			})
+		})
+
+		onUnmounted(teardownComments)
+
+		return {
+			...viewForm,
+			t,
+			IconComment,
+			IconSettings,
+			IconShareVariant,
+			commentsEl,
+			canEdit,
+			sidebarForm,
+			sidebarAllowComments,
+			isSidebarLocked,
+			lockedUntilFormatted,
+			sidebarTitle,
+			onUpdateActive,
+			onPropertyChange,
+			onAddShare,
+			onRemoveShare,
+			onUpdateShare,
+		}
 	},
 })
 </script>
