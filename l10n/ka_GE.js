@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Yes" : "დიახ",
     "Copy" : "კოპირება",
+    "Read" : "წაკითხვა",
+    "Submit" : "გაგზავნა",
+    "Embed" : "ჩართვა",
     "Shared with you" : "გაზიარებული თქვენთან",
     "Select groups" : "ჯგუფების არჩევა",
     "Comments" : "კომენტარები",
@@ -28,7 +31,6 @@ OC.L10N.register(
     "Sharing" : "გაზიარება",
     "Settings" : "პარამეტრები",
     "Abort" : "შეჩერება",
-    "Submit" : "გაგზავნა",
     "Clear" : "გასუფთავება",
     "File" : "ფაილი",
     "Date" : "თარიღი",

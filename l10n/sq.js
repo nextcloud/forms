@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Yes" : "Po",
     "Copy" : "Kopjo",
+    "Read" : "Lexoni",
+    "Submit" : "Dërgo",
+    "Embed" : "Ngulit",
     "Shared with you" : "E ndarë me ju",
     "Select groups" : "Përzgjidhni grupe",
     "Comments" : "Komentet",
@@ -30,7 +33,6 @@ OC.L10N.register(
     "Sharing" : "Ndarje",
     "Settings" : "Rregullimet",
     "Abort" : "Ndërprite",
-    "Submit" : "Dërgo",
     "Clear" : "Pastro",
     "File" : "Skedar ",
     "Date" : "Data",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "No" : "Na",
     "Yes" : "Ie",
     "Copy" : "Copïo",
+    "Embed" : "Mewnblannu",
     "Shared with you" : "Shared with you",
     "Cancel" : "Cancel",
     "Required" : "Angen",

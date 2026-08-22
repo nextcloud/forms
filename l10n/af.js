@@ -2,6 +2,7 @@ OC.L10N.register(
     "forms",
     {
     "Copy" : "Kopieer",
+    "Submit" : "Dien in",
     "Shared with you" : "Met u gedeel",
     "Comments" : "Kommentare",
     "Allow comments" : "Staan kommentare toe",
@@ -24,7 +25,6 @@ OC.L10N.register(
     "Download" : "Laai af",
     "Search" : "Soek",
     "Settings" : "Instellings",
-    "Submit" : "Dien in",
     "File" : "Lêer",
     "Date" : "Datum",
     "Time" : "Tyd",

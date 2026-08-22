@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "No" : "না",
     "Yes" : "হ্যাঁ",
+    "Read" : "পড়",
     "Shared with you" : "Shared with you",
     "Select groups" : "গ্রুপ নির্ধারণ",
     "Cancel" : "বাতিল করুন",

@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Yes" : "Si",
     "Copy" : "Copiar",
+    "Read" : "Leer",
+    "Submit" : "Enviar",
+    "Embed" : "Integrar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
     "Comments" : "Comentarios",
@@ -29,7 +32,6 @@ OC.L10N.register(
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Abort" : "Abortar",
-    "Submit" : "Enviar",
     "Clear" : "Limpiar",
     "File" : "Archivo",
     "Date" : "Fecha",

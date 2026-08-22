@@ -4,6 +4,7 @@ OC.L10N.register(
     "No" : "Ne",
     "Yes" : "Da",
     "Copy" : "Kopija",
+    "Read" : "Čitaj",
     "Shared with you" : "Shared with you",
     "Cancel" : "Poništi",
     "Delete" : "Obriši",
