@@ -1,6 +1,7 @@
 { "translations": {
     "No" : "Ket",
     "Copy" : "Eilañ",
+    "Submit" : "Kinnig",
     "Shared with you" : "Rannet ganeoc'h",
     "Select groups" : "Choaz ar strolladoù",
     "Cancel" : "Nullañ",
@@ -22,7 +23,6 @@
     "Search" : "Klask",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
-    "Submit" : "Kinnig",
     "Clear" : "Netaat",
     "File" : "Restr",
     "Date" : "Deiz",

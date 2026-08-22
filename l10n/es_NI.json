@@ -1,5 +1,8 @@
 { "translations": {
     "Copy" : "Copiar",
+    "Read" : "Leer",
+    "Submit" : "Enviar",
+    "Embed" : "Integrar",
     "Shared with you" : "Compartido con usted",
     "Select groups" : "Seleccionar grupos",
     "Comments" : "Comentarios",
@@ -24,7 +27,6 @@
     "Sharing" : "Compartiendo",
     "Settings" : "Configuraciones ",
     "Abort" : "Abortar",
-    "Submit" : "Enviar",
     "File" : "Archivo",
     "Date" : "Fecha",
     "Time" : "Hora",

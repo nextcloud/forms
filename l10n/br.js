@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "No" : "Ket",
     "Copy" : "Eilañ",
+    "Submit" : "Kinnig",
     "Shared with you" : "Rannet ganeoc'h",
     "Select groups" : "Choaz ar strolladoù",
     "Cancel" : "Nullañ",
@@ -24,7 +25,6 @@ OC.L10N.register(
     "Search" : "Klask",
     "Sharing" : "Rannan",
     "Settings" : "Arventennoù",
-    "Submit" : "Kinnig",
     "Clear" : "Netaat",
     "File" : "Restr",
     "Date" : "Deiz",
