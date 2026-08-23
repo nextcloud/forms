@@ -34,29 +34,29 @@ namespace OCP\Share\ShareReview {
 		}
 	}
 
-	final class ShareReviewPermission {
+	final readonly class ShareReviewPermission {
 		public function __construct(
-			public readonly string $id,
-			public readonly string $displayName,
-			public readonly ?string $hint = null,
-			public readonly int $priority = 50,
+			public string $id,
+			public string $displayName,
+			public ?string $hint = null,
+			public int $priority = 50,
 		) {
 		}
 	}
 
-	final class ShareReviewEntry {
+	final readonly class ShareReviewEntry {
 		public function __construct(
-			public readonly string $id,
-			public readonly string $object,
-			public readonly string $initiator,
-			public readonly int $type,
-			public readonly string $recipient,
-			public readonly int $lastModifiedTimestamp,
-			public readonly array $permissions = [],
-			public readonly string $action = '',
-			public readonly bool $hasPassword = false,
-			public readonly ?int $expirationTimestamp = null,
-			public readonly ?string $parent = null,
+			public string $id,
+			public string $object,
+			public string $initiator,
+			public int $type,
+			public string $recipient,
+			public int $lastModifiedTimestamp,
+			public array $permissions = [],
+			public string $action = '',
+			public bool $hasPassword = false,
+			public ?int $expirationTimestamp = null,
+			public ?string $parent = null,
 		) {
 		}
 	}

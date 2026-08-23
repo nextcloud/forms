@@ -19,7 +19,6 @@ final class ShareReviewListenerTest extends TestCase {
 	private ShareReviewListener $listener;
 
 	protected function setUp(): void {
-		parent::setUp();
 		$this->listener = new ShareReviewListener();
 	}
 

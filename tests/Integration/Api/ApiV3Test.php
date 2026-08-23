@@ -1482,7 +1482,7 @@ class ApiV3Test extends IntegrationBase {
 
 		// 2. Verify Initial Export
 		$content = $this->userFolder->get($exportPath)->getContent();
-		$data = array_map('str_getcsv', explode("\n", trim($content)));
+		$data = array_map(str_getcsv(...), explode("\n", trim($content)));
 
 		$this->assertCount(5, $data, 'Expected 5 rows: header, hidden-header, 3 data rows');
 		// Check headers
@@ -1517,7 +1517,7 @@ class ApiV3Test extends IntegrationBase {
 
 		// 5. Verify Export after deletions
 		$content = $this->userFolder->get($exportPath)->getContent();
-		$data = array_map('str_getcsv', explode("\n", trim($content)));
+		$data = array_map(str_getcsv(...), explode("\n", trim($content)));
 
 		$this->assertCount(4, $data, 'Expected 4 rows after deletion: header, hidden-header, 2 data rows');
 		$this->assertStringNotContainsString($question1['text'], implode(',', $data[0]));
@@ -1538,7 +1538,7 @@ class ApiV3Test extends IntegrationBase {
 
 		// 8. Verify export after update
 		$content = $this->userFolder->get($exportPath)->getContent();
-		$data = array_map('str_getcsv', explode("\n", trim($content)));
+		$data = array_map(str_getcsv(...), explode("\n", trim($content)));
 
 		$updatedRow = null;
 		foreach (array_slice($data, 2) as $row) {
