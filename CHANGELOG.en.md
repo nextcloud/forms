@@ -5,7 +5,21 @@
 
 # Changelog
 
-## v5.3.0 - tbd
+## v5.4.0 - tbd
+
+- **Custom share tokens**
+
+    You can now customize your public share links.
+
+- **Directly access the results views**
+
+    With this release it's now possible to directly access the two results sub-views: simply go to `results/summary` or `results/responses`. Forms will remember your last visited sub-view per form and automatically reload it on your next visit.
+
+- **Better sync for results files**
+
+    We improved the handling of linked files for automatically exported results. We added a real sync so that the file will also keep the currently available responses upon deletion.
+
+## v5.3.0 - 2026-06-08
 
 - **New question types**
 

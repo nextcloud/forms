@@ -5,6 +5,30 @@
 
 # Changelog
 
+## v5.4.0-alpha.0 - 2026-08-23
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0...v5.4.0-alpha.0)
+
+### Enhancements
+
+- 🕵️ Add sharereview support by @AndyScherzinger in [\#3589](https://github.com/nextcloud/forms/pull/3589)
+- feat: sync submissions to export file by @Chartman123 in [\#3546](https://github.com/nextcloud/forms/pull/3546)
+- feat: allow users with RESULTS_DELETE permission to edit all responses by @Chartman123 in [\#3456](https://github.com/nextcloud/forms/pull/3456)
+- feat(sharing): Allow custom share tokens for public links by @Chartman123 in [\#3435](https://github.com/nextcloud/forms/pull/3435)
+- feat: remember last results view in localStorage by @Chartman123 in [\#3432](https://github.com/nextcloud/forms/pull/3432)
+
+### Fixed
+
+- fix: enhance results view handling by @Chartman123 in [\#3563](https://github.com/nextcloud/forms/pull/3563)
+- fix: stylelint by @Chartman123 in [\#3497](https://github.com/nextcloud/forms/pull/3497)
+
+### Merged
+
+- chore: migrate mixins to composables by @Chartman123 in [\#3577](https://github.com/nextcloud/forms/pull/3577)
+- chore: continue ts migration by @Chartman123 in [\#3506](https://github.com/nextcloud/forms/pull/3506)
+- docs: Add webhook support section to README by @Chartman123 in [\#3434](https://github.com/nextcloud/forms/pull/3434)
+- chore: begin migration to TypeScript by @Chartman123 in [\#3327](https://github.com/nextcloud/forms/pull/3327)
+
 ## v5.3.5 - 2026-07-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.4...v5.3.5)
