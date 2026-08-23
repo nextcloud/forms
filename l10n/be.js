@@ -8,6 +8,7 @@ OC.L10N.register(
     "Copy" : "Капіяваць",
     "Shared by %s" : "Абагуліў(-ла) %s",
     "User display name" : "Імя карыстальніка для паказу",
+    "Read" : "Чытаць",
     "Submit" : "Адправіць",
     "Shared with you" : "Абагулена з вамі",
     "Loading forms …" : "Загрузка форм …",

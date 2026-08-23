@@ -23,6 +23,7 @@ OC.L10N.register(
     "Read" : "Прочитане",
     "Edit form" : "Редактиране на формуляр",
     "Submit" : "Изпращане",
+    "Embed" : "Вграден",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Опростени анкети и въпросници, хоствани самостоятелно",
     "An error occurred while loading the forms list" : "Възникна грешка при зареждане на списъка с формуляри",
     "Form not found" : "Формулярът не е намерен",
