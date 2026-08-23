@@ -4,6 +4,7 @@ OC.L10N.register(
     "No" : "Xeyir",
     "Yes" : "Bəli",
     "Copy" : "Kopyala",
+    "Read" : "Oxu",
     "Shared with you" : "Shared with you",
     "Select groups" : "Qrupları seç",
     "Comments" : "Şərhlər",

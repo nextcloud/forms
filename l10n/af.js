@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Copy" : "Kopieer",
     "Submit" : "Dien in",
+    "Embed" : "Bed in",
     "Shared with you" : "Met u gedeel",
     "Comments" : "Kommentare",
     "Allow comments" : "Staan kommentare toe",
