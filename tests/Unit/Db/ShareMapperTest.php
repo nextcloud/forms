@@ -23,8 +23,6 @@ class ShareMapperTest extends TestCase {
 	private ShareMapper $shareMapper;
 
 	protected function setUp(): void {
-		parent::setUp();
-
 		$this->qb = $this->createMock(IQueryBuilder::class);
 		$this->qb->method('select')->willReturnSelf();
 		$this->qb->method('selectAlias')->willReturnSelf();

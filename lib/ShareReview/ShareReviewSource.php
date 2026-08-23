@@ -61,7 +61,7 @@ class ShareReviewSource implements IShareReviewSource {
 			return [];
 		}
 		return array_map(
-			fn (array $share) => $this->buildEntry($share),
+			$this->buildEntry(...),
 			$rawShares,
 		);
 	}

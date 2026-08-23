@@ -472,7 +472,7 @@ class SubmissionService {
 
 		$newSubmissionIds = [];
 		if ($submissionIdColIndex !== false) {
-			$newSubmissionIds = array_map('strval', array_column($data, $submissionIdColIndex));
+			$newSubmissionIds = array_map(strval(...), array_column($data, $submissionIdColIndex));
 		}
 
 		// Sync Rows

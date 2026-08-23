@@ -20,6 +20,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 Server::get(IAppManager::class)->loadApp('forms');
 
-if (!interface_exists('OCP\Share\ShareReview\IShareReviewSource')) {
+if (!interface_exists(\OCP\Share\ShareReview\IShareReviewSource::class)) {
 	require_once __DIR__ . '/Unit/ShareReview/Stubs.php';
 }

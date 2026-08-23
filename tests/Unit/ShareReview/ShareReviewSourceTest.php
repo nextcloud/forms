@@ -28,16 +28,15 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 final class ShareReviewSourceTest extends TestCase {
-	private MockObject $shareMapper;
-	private MockObject $formMapper;
-	private MockObject $uploadedFilesShareService;
-	private MockObject $eventDispatcher;
-	private MockObject $logger;
-	private MockObject $l10n;
+	private ShareMapper|MockObject $shareMapper;
+	private FormMapper|MockObject $formMapper;
+	private UploadedFilesShareService|MockObject $uploadedFilesShareService;
+	private IEventDispatcher|MockObject $eventDispatcher;
+	private LoggerInterface|MockObject $logger;
+	private IL10N|MockObject $l10n;
 	private ShareReviewSource $source;
 
 	protected function setUp(): void {
-		parent::setUp();
 		$this->shareMapper = $this->createMock(ShareMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->uploadedFilesShareService = $this->createMock(UploadedFilesShareService::class);
@@ -45,9 +44,7 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->l10n = $this->createMock(IL10N::class);
 		$this->l10n->method('t')->willReturnCallback(
-			function (string $text, array $params = []): string {
-				return empty($params) ? $text : vsprintf($text, $params);
-			}
+			fn (string $text, array $params = []): string => empty($params) ? $text : vsprintf($text, $params)
 		);
 		$this->source = new ShareReviewSource(
 			$this->shareMapper,
