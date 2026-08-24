@@ -25,6 +25,7 @@ OC.L10N.register(
     "Thank you for your submission" : "Vielen Dank für Ihre Einreichung",
     "Thank you for submitting the form \"%s\"." : "Vielen Dank für das Absenden des Formulars \"%s\".",
     "responses" : "Ergebnisse",
+    "Submission ID" : "Einreichungs-ID",
     "User ID" : "Benutzer-ID",
     "User display name" : "Anzeigename des Nutzers",
     "Timestamp" : "Zeitstempel",
