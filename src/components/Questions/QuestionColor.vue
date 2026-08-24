@@ -74,6 +74,9 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
+		const values = computed(() => {
+			return props.values as Array<string | null | undefined>
+		})
 
 		const colorPickerPlaceholder = computed(() => {
 			return props.readOnly
@@ -82,7 +85,7 @@ export default defineComponent({
 		})
 
 		const pickedColor = computed(() => {
-			return (props.values[0] as string | null | undefined) ?? ''
+			return values.value[0] ?? ''
 		})
 
 		const validate = async (): Promise<boolean> => {

@@ -80,6 +80,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue'
 import type { FormsOption } from '../../models/Entities.d.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
@@ -118,7 +119,7 @@ export default defineComponent({
 
 	props: {
 		answer: {
-			type: Object,
+			type: Object as PropType<FormsOption>,
 			required: true,
 		},
 
@@ -180,18 +181,24 @@ export default defineComponent({
 		const buttonOptionDown = ref<{ $el?: HTMLElement } | null>(null)
 		const buttonOptionUp = ref<{ $el?: HTMLElement } | null>(null)
 		const isIMEComposing = ref(false)
-		const localText = ref((props.answer as FormsOption | undefined)?.text ?? '')
+		const answer = computed(() => props.answer)
+		const localText = ref(answer.value.text ?? '')
+
+		const getInputTarget = (
+			event: Event | { target: EventTarget | null },
+		): HTMLInputElement | null => {
+			return event.target instanceof HTMLInputElement ? event.target : null
+		}
 
 		const canCreateLocalAnswer = computed(() => {
-			if ((props.answer as FormsOption).local) {
+			if (answer.value.local) {
 				return !!localText.value.trim()
 			}
-			return !!(props.answer as FormsOption).text?.trim()
+			return !!answer.value.text?.trim()
 		})
 
 		const ariaLabel = computed(() => {
-			const answer = props.answer as FormsOption
-			if (answer.local) {
+			if (answer.value.local) {
 				if (props.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
@@ -220,13 +227,11 @@ export default defineComponent({
 		})
 
 		const optionDragMenuId = computed(() => {
-			const answer = props.answer as FormsOption
-			return `q${answer.questionId}o${answer.id}o${props.optionType}__drag_menu`
+			return `q${answer.value.questionId}o${answer.value.id}o${props.optionType}__drag_menu`
 		})
 
 		const placeholder = computed(() => {
-			const answer = props.answer as FormsOption
-			if (answer.local) {
+			if (answer.value.local) {
 				if (props.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
@@ -252,8 +257,7 @@ export default defineComponent({
 		})
 
 		const pseudoIcon = computed(() => {
-			const answer = props.answer as FormsOption
-			if (answer.local) {
+			if (answer.value.local) {
 				return IconPlus
 			}
 
@@ -305,20 +309,19 @@ export default defineComponent({
 		async function onInput(
 			event: InputEvent | { target: HTMLInputElement; isComposing?: boolean },
 		): Promise<void> {
-			const target = event.target as HTMLInputElement | null
+			const target = getInputTarget(event)
 			if (!target) {
 				return
 			}
 
-			const answer = props.answer as FormsOption
-			if (answer.local) {
+			if (answer.value.local) {
 				localText.value = target.value
 				return
 			}
 
 			if (!event.isComposing && !isIMEComposing.value && target.value !== '') {
 				// clone answer
-				const answerCopy = { ...answer }
+				const answerCopy = { ...answer.value }
 				if (!input.value) {
 					return
 				}
@@ -339,7 +342,7 @@ export default defineComponent({
 		 * @param e The keyboard event.
 		 */
 		const onEnter = (e: KeyboardEvent): void => {
-			if ((props.answer as FormsOption).local) {
+			if (answer.value.local) {
 				void createLocalAnswer(e)
 				return
 			}
@@ -363,8 +366,8 @@ export default defineComponent({
 				return
 			}
 
-			const answer = {
-				...(props.answer as FormsOption),
+			const answerValue = {
+				...answer.value,
 				text: value,
 				local: false,
 			}
@@ -373,7 +376,7 @@ export default defineComponent({
 			try {
 				// Forward changes, but use current answer.text to avoid erasing
 				// any in-between changes while creating the answer
-				const newAnswer = await createAnswer(answer)
+				const newAnswer = await createAnswer(answerValue)
 				if (!input.value) {
 					return
 				}
@@ -413,7 +416,7 @@ export default defineComponent({
 				return
 			}
 
-			if ((props.answer as FormsOption).local) {
+			if (answer.value.local) {
 				return
 			}
 
@@ -424,7 +427,7 @@ export default defineComponent({
 			// Dismiss delete key action
 			e.preventDefault()
 			void queue.value.add(() => {
-				emit('delete', props.answer as FormsOption)
+				emit('delete', props.answer)
 				queue.value.pause()
 				queue.value.clear()
 			})
@@ -543,7 +546,7 @@ export default defineComponent({
 		const onCompositionEnd = (
 			event: CompositionEvent & { isComposing?: boolean },
 		): void => {
-			const target = event.target as HTMLInputElement | null
+			const target = getInputTarget(event)
 			isIMEComposing.value = false
 			if (!event.isComposing && target) {
 				void onInput({ target, isComposing: event.isComposing })

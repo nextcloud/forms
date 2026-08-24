@@ -97,6 +97,11 @@ import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import validationTypes from '../../models/ValidationTypes.ts'
 import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
 
+type QuestionShortExtraSettings = {
+	validationRegex?: string
+	validationType?: string
+}
+
 export default defineComponent({
 	name: 'QuestionShort',
 
@@ -120,15 +125,22 @@ export default defineComponent({
 			}
 		} | null>(null)
 		const isValidationTypeMenuOpen = ref(false)
+		const values = computed(() => {
+			return props.values as Array<
+				string | number | readonly string[] | null | undefined
+			>
+		})
+		const extraSettings = computed(() => {
+			return (
+				(props.extraSettings as QuestionShortExtraSettings | undefined) ?? {}
+			)
+		})
 
 		/**
 		 * Name of the current validation type, fallsback to 'text'
 		 */
 		const validationType = computed(() => {
-			return (
-				(props.extraSettings as { validationType?: string } | undefined)
-					?.validationType || 'text'
-			)
+			return extraSettings.value.validationType || 'text'
 		})
 
 		/**
@@ -149,10 +161,7 @@ export default defineComponent({
 		 * The regular expression
 		 */
 		const validationRegex = computed(() => {
-			return (
-				(props.extraSettings as { validationRegex?: string } | undefined)
-					?.validationRegex || ''
-			)
+			return extraSettings.value.validationRegex || ''
 		})
 
 		const submissionInputPlaceholder = computed(() => {
@@ -169,7 +178,7 @@ export default defineComponent({
 		})
 
 		const inputValue = computed(() => {
-			return (props.values[0] ?? null) as
+			return (values.value[0] ?? null) as
 				string | number | readonly string[] | null | undefined
 		})
 

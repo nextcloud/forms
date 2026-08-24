@@ -202,14 +202,7 @@ import IconDragIndicator from '@material-symbols/svg-400/outlined/drag_indicator
 import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import { t } from '@nextcloud/l10n'
-import {
-	computed,
-	defineComponent,
-	getCurrentInstance,
-	nextTick,
-	ref,
-	watch,
-} from 'vue'
+import { computed, defineComponent, nextTick, ref, watch } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -252,17 +245,29 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
-		const questionMultiple = useQuestionMultiple(props, { emit })
-		const instance = getCurrentInstance()
+		const values = computed<Array<number | string>>(() => {
+			return Array.isArray(props.values) ? props.values : []
+		})
 		const input = ref<
 			Array<{
 				focus?: () => void
 				$props?: { optionType?: string; index?: number }
 			} | null>
 		>([])
+		const isLoading = ref(false)
+		const questionMultiple = useQuestionMultiple(props, {
+			emit,
+			input,
+			isLoading,
+		})
+		const buttonOptionUp = ref<Array<{ $el?: { focus?: () => void } } | null>>(
+			[],
+		)
+		const buttonOptionDown = ref<Array<{ $el?: { focus?: () => void } } | null>>(
+			[],
+		)
 		const isDragging = ref(false)
 		const isRanking = ref(false)
-		const isLoading = ref(false)
 		const isOptionDialogShown = ref(false)
 		const rankedOptions = ref<FormsOption[]>([])
 		const unrankedOptions = ref<FormsOption[]>([])
@@ -309,12 +314,12 @@ export default defineComponent({
 				OptionType.Choice,
 			)
 
-			if (props.values && props.values.length > 0) {
+			if (values.value.length > 0) {
 				// Restore order from saved values (array of option IDs)
 				const byId = Object.fromEntries(
 					sorted.map((option) => [option.id, option]),
 				) as Record<number, FormsOption>
-				rankedOptions.value = props.values
+				rankedOptions.value = values.value
 					.map((id) => byId[parseInt(String(id), 10)])
 					.filter((option): option is FormsOption => Boolean(option))
 				unrankedOptions.value = sorted.filter(
@@ -395,10 +400,15 @@ export default defineComponent({
 		 * @param refName The ref name ('buttonOptionUp' or 'buttonOptionDown')
 		 * @param index The index of the item in the v-for
 		 */
-		const focusButton = (refName: string, index: number): void => {
+		const focusButton = (
+			refName: 'buttonOptionUp' | 'buttonOptionDown',
+			index: number,
+		): void => {
 			nextTick(() => {
-				const refs = instance?.proxy?.$refs?.[refName] as
-					Array<{ $el?: { focus?: () => void } }> | undefined
+				const refs =
+					refName === 'buttonOptionUp'
+						? buttonOptionUp.value
+						: buttonOptionDown.value
 				if (Array.isArray(refs) && refs[index]) {
 					refs[index].$el?.focus?.()
 				}
@@ -476,6 +486,8 @@ export default defineComponent({
 		return {
 			...question,
 			...questionMultiple,
+			buttonOptionDown,
+			buttonOptionUp,
 			choices,
 			input,
 			initRankedOptions,
@@ -502,6 +514,7 @@ export default defineComponent({
 			unrankedOptions,
 			unrankOption,
 			validate,
+			values,
 		}
 	},
 })

@@ -4,6 +4,7 @@
  */
 /* eslint-disable jsdoc/require-jsdoc */
 
+import type { Ref } from 'vue'
 import type { FormsOption } from '../models/Entities.d.ts'
 
 import axios from '@nextcloud/axios'
@@ -12,7 +13,7 @@ import { emit as emitEvent } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { computed, getCurrentInstance, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
@@ -21,6 +22,13 @@ export const QUESTION_MULTIPLE_EMITS = ['update:options']
 
 interface UseQuestionMultipleOptions {
 	emit: (event: string, ...args: unknown[]) => void
+	input?: Ref<
+		Array<{
+			focus?: () => void
+			$props?: { optionType?: string; index?: number }
+		} | null>
+	>
+	isLoading?: Ref<boolean>
 }
 
 interface AnswerTypeLike {
@@ -48,7 +56,6 @@ export function useQuestionMultiple(
 	options: UseQuestionMultipleOptions,
 ) {
 	const typedProps = props as QuestionMultiplePropsLike
-	const instance = getCurrentInstance()
 	const dirtyOptionsType = ref<string | null>(null)
 
 	const areNoneChecked = computed(() => {
@@ -56,8 +63,7 @@ export function useQuestionMultiple(
 	})
 
 	const contentValid = computed(() => {
-		const proxy = instance?.proxy
-		return typedProps.answerType.validate(proxy)
+		return typedProps.answerType.validate(typedProps)
 	})
 
 	const isLastEmpty = computed(() => {
@@ -111,14 +117,8 @@ export function useQuestionMultiple(
 	})
 
 	const handleMultipleOptions = async (answers: string[]): Promise<void> => {
-		const component = instance?.proxy as {
-			isLoading?: boolean
-			updateOptions?: (options: FormsOption[]) => void
-			focusIndex?: (idx: number, optionType: string) => void
-		}
-
-		if (component?.isLoading !== undefined) {
-			component.isLoading = true
+		if (options.isLoading) {
+			options.isLoading.value = true
 		}
 
 		try {
@@ -126,8 +126,8 @@ export function useQuestionMultiple(
 				generateOcsUrl(
 					'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
 					{
-						id: props.formId,
-						questionId: props.id,
+						id: typedProps.formId,
+						questionId: typedProps.id,
 					},
 				),
 				{
@@ -137,7 +137,7 @@ export function useQuestionMultiple(
 			)
 
 			const newServerOptions = OcsResponse2Data(response) as FormsOption[]
-			const newOptions = props.options.slice()
+			const newOptions = typedProps.options.slice()
 			newServerOptions.forEach((option: FormsOption, index: number) => {
 				const order =
 					typeof option.order === 'number'
@@ -147,7 +147,7 @@ export function useQuestionMultiple(
 				newOptions.push({
 					...option,
 					id: option.id,
-					questionId: props.id,
+					questionId: typedProps.id,
 					text: option.text,
 					optionType: option.optionType ?? OptionType.Choice,
 					order,
@@ -155,22 +155,18 @@ export function useQuestionMultiple(
 				})
 			})
 
-			if (component?.updateOptions) {
-				component.updateOptions(newOptions)
-			}
+			updateOptions(newOptions)
 
 			nextTick(() => {
-				if (component?.focusIndex) {
-					component.focusIndex(newOptions.length - 1, OptionType.Choice)
-				}
+				focusIndex(newOptions.length - 1, OptionType.Choice)
 			})
 		} catch (error) {
 			logger.error('Error while saving question options', { error })
 			showError(t('forms', 'Error while saving question options'))
-		}
-
-		if (component?.isLoading !== undefined) {
-			component.isLoading = false
+		} finally {
+			if (options.isLoading) {
+				options.isLoading.value = false
+			}
 		}
 	}
 
@@ -189,25 +185,10 @@ export function useQuestionMultiple(
 	}
 
 	function focusIndex(index: number, optionType: string) {
-		const proxy = instance?.proxy as
-			| {
-					input?: Array<{
-						focus?: () => void
-						$props?: { optionType?: string; index?: number }
-					} | null>
-					$refs?: {
-						input?: Array<{
-							focus?: () => void
-							$props?: { optionType?: string; index?: number }
-						} | null>
-					}
-			  }
-			| undefined
-		const inputRefs = proxy?.input ?? proxy?.$refs?.input
-		const refsArray = Array.isArray(inputRefs)
-			? inputRefs
-			: inputRefs
-				? [inputRefs]
+		const refsArray = Array.isArray(options.input?.value)
+			? options.input.value
+			: options.input?.value
+				? [options.input.value]
 				: []
 
 		const item = refsArray.find((component) => {

@@ -228,15 +228,19 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
-		const questionMultiple = useQuestionMultiple(props, { emit })
 		const input = ref<
 			Array<{
 				focus?: () => void
 				$props?: { optionType?: string; index?: number }
 			} | null>
 		>([])
-		const isDragging = ref(false)
 		const isLoading = ref(false)
+		const questionMultiple = useQuestionMultiple(props, {
+			emit,
+			input,
+			isLoading,
+		})
+		const isDragging = ref(false)
 		const questionTypes = [
 			{ label: t('forms', 'Radio'), id: GridCellType.Radio },
 			{ label: t('forms', 'Checkbox'), id: GridCellType.Checkbox },
@@ -248,6 +252,16 @@ export default defineComponent({
 			return props.answerType.unique === true
 		})
 
+		const values = computed<GridQuestionValues>(() => {
+			return (props.values as GridQuestionValues | undefined) ?? {}
+		})
+
+		const extraSettings = computed<QuestionGridExtraSettings>(() => {
+			return (
+				(props.extraSettings as QuestionGridExtraSettings | undefined) ?? {}
+			)
+		})
+
 		const shiftDragHandle = computed(() => {
 			return (
 				!props.readOnly
@@ -257,9 +271,7 @@ export default defineComponent({
 		})
 
 		const questionType = computed<GridQuestionType>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionGridExtraSettings | undefined
-			return extraSettings?.questionType ?? GridCellType.Radio
+			return extraSettings.value.questionType ?? GridCellType.Radio
 		})
 
 		const columns = computed<FormsOption[]>({
@@ -289,25 +301,23 @@ export default defineComponent({
 		})
 
 		const plainValues = computed<GridMatrixValues>(() => {
-			const values: GridMatrixValues = {}
-			const questionValues = props.values as GridQuestionValues
+			const normalizedValues: GridMatrixValues = {}
 			for (const row of rows.value) {
 				for (const column of columns.value) {
-					values[row.id] = values[row.id] || {}
-					const rowValues = questionValues[row.id] as
+					normalizedValues[row.id] = normalizedValues[row.id] || {}
+					const rowValues = values.value[row.id] as
 						Record<number, GridCellValue> | undefined
-					values[row.id][column.id] = rowValues?.[column.id] ?? ''
+					normalizedValues[row.id][column.id] =
+						rowValues?.[column.id] ?? ''
 				}
 			}
 
-			return values
+			return normalizedValues
 		})
 
 		const validate = async (): Promise<boolean> => {
-			const extraSettings = props.extraSettings as
-				QuestionGridExtraSettings | undefined
-			const values = props.values as unknown[] & { length?: number }
-			if (props.isRequired && (values.length === 0 || props.values === null)) {
+			const valueCount = Object.keys(values.value).length
+			if (props.isRequired && (props.values === null || valueCount === 0)) {
 				question.errorMessage.value = t(
 					'forms',
 					'You must answer this question',
@@ -317,9 +327,9 @@ export default defineComponent({
 
 			if (!isUnique.value) {
 				// Validate limits
-				const max = extraSettings?.optionsLimitMax ?? 0
-				const min = extraSettings?.optionsLimitMin ?? 0
-				if (max && (values.length ?? 0) > max) {
+				const max = extraSettings.value.optionsLimitMax ?? 0
+				const min = extraSettings.value.optionsLimitMin ?? 0
+				if (max && valueCount > max) {
 					question.errorMessage.value = n(
 						'forms',
 						'You must choose at most one option',
@@ -328,7 +338,7 @@ export default defineComponent({
 					)
 					return false
 				}
-				if (min && (values.length ?? 0) < min) {
+				if (min && valueCount < min) {
 					question.errorMessage.value = n(
 						'forms',
 						'You must choose at least one option',
@@ -354,10 +364,10 @@ export default defineComponent({
 		}
 
 		const onChangeCheckboxRadio = (rowId: number, value: unknown): void => {
-			const values = { ...(props.values as GridQuestionValues) }
-			values[rowId] = value
+			const nextValues = { ...(values.value as GridQuestionValues) }
+			nextValues[rowId] = value
 
-			emit('update:values', values)
+			emit('update:values', nextValues)
 		}
 
 		const onChangeTextNumber = (
@@ -391,6 +401,8 @@ export default defineComponent({
 			shiftDragHandle,
 			t,
 			validate,
+			values,
+			extraSettings,
 		}
 	},
 })

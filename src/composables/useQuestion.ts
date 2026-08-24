@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import type { Ref } from 'vue'
 import type { FormsOption } from '../models/Entities.d.ts'
 
 import axios from '@nextcloud/axios'
@@ -11,8 +12,7 @@ import { emit as emitEvent } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { computed, getCurrentInstance, nextTick, ref } from 'vue'
-import Question from '../components/Questions/Question.vue'
+import { computed, nextTick, ref } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 
@@ -112,15 +112,37 @@ export const QUESTION_PROPS = {
 
 interface UseQuestionOptions {
 	emit: (event: string, ...args: unknown[]) => void
+	infoMessage?: Ref<string | null>
+	rootElement?: Ref<{ $el?: HTMLElement } | null>
 }
 
 interface QuestionPropsLike {
 	id: number
 	formId: number | null
 	index: number
+	text: string
+	description: string
+	isRequired: boolean
+	readOnly: boolean
+	name: string
+	maxStringLengths: Record<string, number>
+	canMoveUp: boolean
+	canMoveDown: boolean
 	extraSettings: Record<string, unknown>
 	options: FormsOption[]
 	[key: string]: unknown
+}
+
+interface QuestionForwardedProps {
+	index: number
+	text: string
+	description: string
+	isRequired: boolean
+	readOnly: boolean
+	maxStringLengths: Record<string, number>
+	name: string
+	canMoveUp: boolean
+	canMoveDown: boolean
 }
 
 /**
@@ -131,18 +153,18 @@ interface QuestionPropsLike {
  */
 export function useQuestion(props: QuestionPropsLike, options: UseQuestionOptions) {
 	const errorMessage = ref<string | null>(null)
-	const instance = getCurrentInstance()
 
-	const questionProps = computed(() => {
-		const filteredProps: Record<string, unknown> = { ...props }
-		const allowedKeys = Object.keys(Question.props || {})
-		Object.keys(filteredProps).forEach((key) => {
-			if (!allowedKeys.includes(key)) {
-				delete filteredProps[key]
-			}
-		})
-		return filteredProps
-	})
+	const questionProps = computed<QuestionForwardedProps>(() => ({
+		index: props.index,
+		text: props.text,
+		description: props.description,
+		isRequired: props.isRequired,
+		readOnly: props.readOnly,
+		maxStringLengths: props.maxStringLengths,
+		name: props.name,
+		canMoveUp: props.canMoveUp,
+		canMoveDown: props.canMoveDown,
+	}))
 
 	const titleId = computed(() => {
 		return 'q' + props.index + '_title'
@@ -157,8 +179,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	})
 
 	const hasInfo = computed(() => {
-		const infoMessage = instance?.proxy?.infoMessage
-		return !!infoMessage
+		return !!options.infoMessage?.value
 	})
 
 	const errorId = computed(() => {
@@ -218,7 +239,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	}
 
 	const focus = (): void => {
-		const element = instance?.proxy?.$el as HTMLElement | undefined
+		const element = options.rootElement?.value?.$el ?? options.rootElement?.value
 		element?.scrollIntoView({ behavior: 'smooth' })
 		nextTick(() => {
 			const title = element?.querySelector(

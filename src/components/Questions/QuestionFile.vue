@@ -236,6 +236,14 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
+		const values = computed<UploadedFileValue[]>(() => {
+			return props.values as UploadedFileValue[]
+		})
+		const extraSettings = computed<QuestionFileExtraSettings>(() => {
+			return (
+				(props.extraSettings as QuestionFileExtraSettings | undefined) ?? {}
+			)
+		})
 		const fileInput = ref<HTMLInputElement | null>(null)
 		const fileLoading = ref(false)
 		const maxFileSizeUnit = ref<FileSizeUnit>(
@@ -249,41 +257,35 @@ export default defineComponent({
 		})
 
 		const uploadedFiles = computed<UploadedFileValue[]>(() => {
-			return props.values as UploadedFileValue[]
+			return values.value
 		})
 
 		const maxAllowedFilesCount = computed<number>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
-			return extraSettings?.maxAllowedFilesCount ?? 1
+			return extraSettings.value.maxAllowedFilesCount ?? 1
 		})
 
 		const allowedFileExtensions = computed<string[]>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
-			return extraSettings?.allowedFileExtensions ?? []
+			return extraSettings.value.allowedFileExtensions ?? []
 		})
 
 		const allowedFileTypes = computed<string[]>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
-			return extraSettings?.allowedFileTypes ?? []
+			return extraSettings.value.allowedFileTypes ?? []
 		})
 
 		const allowedFileTypesLabel = computed<string>(() => {
 			const allowedFileTypeLabels: string[] = []
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
-			if (extraSettings?.allowedFileTypes?.length) {
+			if (extraSettings.value.allowedFileTypes?.length) {
 				allowedFileTypeLabels.push(
-					...extraSettings.allowedFileTypes.map(
+					...extraSettings.value.allowedFileTypes.map(
 						(type: string) => fileTypes[type].label,
 					),
 				)
 			}
 
-			if (extraSettings?.allowedFileExtensions?.length) {
-				allowedFileTypeLabels.push(...extraSettings.allowedFileExtensions)
+			if (extraSettings.value.allowedFileExtensions?.length) {
+				allowedFileTypeLabels.push(
+					...extraSettings.value.allowedFileExtensions,
+				)
 			}
 			if (allowedFileTypeLabels.length) {
 				return t('forms', 'Allowed file types: {fileTypes}.', {
@@ -295,10 +297,8 @@ export default defineComponent({
 		})
 
 		onMounted(() => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
-			if (extraSettings?.maxFileSize) {
-				const maxFileSize = extraSettings.maxFileSize
+			if (extraSettings.value.maxFileSize) {
+				const maxFileSize = extraSettings.value.maxFileSize
 				Object.keys(FILE_SIZE_UNITS).forEach((unit) => {
 					const typedUnit = unit as FileSizeUnit
 					if (maxFileSize > FILE_SIZE_UNITS[typedUnit]) {
@@ -322,16 +322,14 @@ export default defineComponent({
 
 			const formData = new FormData()
 			let fileInvalid = false
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
 
 			;[...currentInput.files].forEach((file) => {
 				formData.append('files[]', file)
 
 				if (
-					extraSettings?.maxFileSize
-					&& extraSettings.maxFileSize > 0
-					&& file.size > extraSettings.maxFileSize
+					extraSettings.value.maxFileSize
+					&& extraSettings.value.maxFileSize > 0
+					&& file.size > extraSettings.value.maxFileSize
 				) {
 					showError(
 						t(
@@ -340,7 +338,7 @@ export default defineComponent({
 							{
 								fileName: file.name,
 								maxFileSize: formatFileSize(
-									extraSettings.maxFileSize,
+									extraSettings.value.maxFileSize,
 								),
 							},
 						),
@@ -405,7 +403,7 @@ export default defineComponent({
 			}
 
 			emit('update:values', [
-				...(props.values as UploadedFileValue[]),
+				...values.value,
 				...(OcsResponse2Data(response) as UploadedFileValue[]),
 			])
 		}
@@ -445,9 +443,7 @@ export default defineComponent({
 			fileType: string,
 			allowed: boolean,
 		): void => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
-			let allowedFileTypesList = extraSettings?.allowedFileTypes ?? []
+			let allowedFileTypesList = extraSettings.value.allowedFileTypes ?? []
 
 			if (allowed) {
 				allowedFileTypesList.push(fileType)
@@ -463,10 +459,8 @@ export default defineComponent({
 		}
 
 		const onAllowedFileExtensionsAdded = (fileExtension: string): void => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
 			const allowedFileExtensionsList =
-				extraSettings?.allowedFileExtensions ?? []
+				extraSettings.value.allowedFileExtensions ?? []
 			allowedFileExtensionsList.push(fileExtension)
 			question.onExtraSettingsChange({
 				allowedFileExtensions: allowedFileExtensionsList,
@@ -474,10 +468,8 @@ export default defineComponent({
 		}
 
 		const onAllowedFileExtensionsDeleted = (fileExtension: string): void => {
-			const extraSettings = props.extraSettings as
-				QuestionFileExtraSettings | undefined
 			let allowedFileExtensionsList =
-				extraSettings?.allowedFileExtensions ?? []
+				extraSettings.value.allowedFileExtensions ?? []
 			allowedFileExtensionsList = allowedFileExtensionsList.filter(
 				(extension) => extension !== fileExtension,
 			)
@@ -488,11 +480,11 @@ export default defineComponent({
 		}
 
 		const onDeleteUploadedFile = (uploadedFileId: number | string): void => {
-			const values = (props.values as UploadedFileValue[]).filter(
+			const remainingValues = values.value.filter(
 				(value) => value.uploadedFileId !== uploadedFileId,
 			)
 
-			emit('update:values', values)
+			emit('update:values', remainingValues)
 		}
 
 		const validate = async (): Promise<boolean> => {
@@ -518,6 +510,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			values,
 			IconChevronLeft,
 			IconDelete,
 			IconFile,
