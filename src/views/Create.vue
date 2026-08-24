@@ -170,7 +170,6 @@
 										},
 									]">
 									<AddQuestionMenu
-										:menuName="t('forms', 'Insert question')"
 										:aria-label="
 											t(
 												'forms',
@@ -183,6 +182,7 @@
 										:isLoadingQuestions="isLoadingQuestions"
 										:answerTypesFilter="answerTypesFilter"
 										:hasSubtypes="hasSubtypes"
+										wide
 										@update:open="
 											(v) =>
 												(insertMenuOpenedIndex = v
