@@ -25,6 +25,7 @@ OC.L10N.register(
     "Thank you for your submission" : "Gönderiminiz için teşekkür ederiz",
     "Thank you for submitting the form \"%s\"." : "Formu gönderdiğiniz için teşekkürler! \"%s\"",
     "responses" : "yanıtlar",
+    "Submission ID" : "Gönderim kimliği",
     "User ID" : "Kullanıcı kimliği",
     "User display name" : "Görüntülenecek kullanıcı adı",
     "Timestamp" : "Zaman damgası",
