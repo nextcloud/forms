@@ -294,6 +294,7 @@ import TransferOwnership from './TransferOwnership.vue'
 import svgLockOpen from '../../../img/lock_open.svg?raw'
 import { useShareTypes } from '../../composables/useShareTypes.ts'
 import { FormState } from '../../models/Constants.ts'
+import { getCurrentServerTime } from '../../utils/ServerTime.ts'
 
 const formsAppName = 'forms'
 
@@ -466,7 +467,7 @@ export default defineComponent({
 		},
 
 		isExpired(): boolean {
-			return this.form.expires && moment().unix() > this.form.expires
+			return this.form.expires && getCurrentServerTime() > this.form.expires
 		},
 
 		expirationDate(): Date {

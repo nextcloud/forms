@@ -126,6 +126,7 @@ import FormsIcon from '../../img/forms-dark.svg?raw'
 import { FormState } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
+import { getCurrentServerTime } from '../utils/ServerTime.ts'
 
 type NavigationTarget = 'submit' | 'formRoot'
 
@@ -212,7 +213,9 @@ export default defineComponent({
 		 * Check if form is expired
 		 */
 		isExpired(): boolean {
-			return Boolean(this.form.expires && moment().unix() > this.form.expires)
+			return Boolean(
+				this.form.expires && getCurrentServerTime() > this.form.expires,
+			)
 		},
 
 		/**

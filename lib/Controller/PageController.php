@@ -29,6 +29,7 @@ use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\Template\PublicTemplateResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Comments\ICommentsManager;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -57,6 +58,7 @@ class PageController extends Controller {
 		private readonly IUrlGenerator $urlGenerator,
 		private readonly IUserManager $userManager,
 		private readonly IUserSession $userSession,
+		private readonly ITimeFactory $timeFactory,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -76,6 +78,7 @@ class PageController extends Controller {
 		$this->insertHeaderOnIos();
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
 		$this->initialState->provideInitialState('appConfig', $this->configService->getAppConfig());
+		$this->initialState->provideInitialState('serverTime', $this->timeFactory->getTime());
 
 		if (isset($hash)) {
 			try {
@@ -228,6 +231,7 @@ class PageController extends Controller {
 		$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialState->provideInitialState('shareHash', $hash);
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
+		$this->initialState->provideInitialState('serverTime', $this->timeFactory->getTime());
 		return $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
 	}
 

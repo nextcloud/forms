@@ -18,6 +18,7 @@ use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Comments\ICommentsManager;
 use OCP\IL10N;
 use OCP\IRequest;
@@ -43,6 +44,7 @@ class PageControllerTest extends TestCase {
 	private IURLGenerator|MockObject $urlGenerator;
 	private IUserManager|MockObject $userManager;
 	private IUserSession|MockObject $userSession;
+	private ITimeFactory|MockObject $timeFactory;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -60,6 +62,7 @@ class PageControllerTest extends TestCase {
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->userManager = $this->createMock(IUserManager::class);
 		$this->userSession = $this->createMock(IUserSession::class);
+		$this->timeFactory = $this->createMock(ITimeFactory::class);
 
 		$this->pageController = new PageController(
 			'forms',
@@ -75,8 +78,25 @@ class PageControllerTest extends TestCase {
 			$this->l10n,
 			$this->urlGenerator,
 			$this->userManager,
-			$this->userSession
+			$this->userSession,
+			$this->timeFactory
 		);
+	}
+
+	public function testIndexProvidesServerTime(): void {
+		$providedState = [];
+		$this->timeFactory->expects($this->once())
+			->method('getTime')
+			->willReturn(1234567890);
+		$this->initialState->expects($this->exactly(3))
+			->method('provideInitialState')
+			->willReturnCallback(function (string $key, mixed $value) use (&$providedState): void {
+				$providedState[$key] = $value;
+			});
+
+		$this->pageController->index();
+
+		$this->assertSame(1234567890, $providedState['serverTime']);
 	}
 
 	public function testSetEmbeddedCSP() {

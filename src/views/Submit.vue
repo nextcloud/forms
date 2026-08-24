@@ -255,6 +255,7 @@ import {
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { getCurrentServerTime } from '../utils/ServerTime.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
@@ -461,7 +462,9 @@ export default defineComponent({
 		 * Check if form is expired
 		 */
 		isExpired(): boolean {
-			return this.form.expires > 0 && moment().unix() > this.form.expires
+			return (
+				this.form.expires > 0 && getCurrentServerTime() > this.form.expires
+			)
 		},
 
 		isArchived(): boolean {
