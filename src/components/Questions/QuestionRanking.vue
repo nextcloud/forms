@@ -202,7 +202,14 @@ import IconDragIndicator from '@material-symbols/svg-400/outlined/drag_indicator
 import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import {
+	computed,
+	defineComponent,
+	getCurrentInstance,
+	nextTick,
+	ref,
+	watch,
+} from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
@@ -246,183 +253,141 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
 		const questionMultiple = useQuestionMultiple(props, { emit })
+		const instance = getCurrentInstance()
+		const input = ref<
+			Array<{
+				focus?: () => void
+				$props?: { optionType?: string; index?: number }
+			} | null>
+		>([])
+		const isDragging = ref(false)
+		const isRanking = ref(false)
+		const isLoading = ref(false)
+		const isOptionDialogShown = ref(false)
+		const rankedOptions = ref<FormsOption[]>([])
+		const unrankedOptions = ref<FormsOption[]>([])
 
-		return {
-			...question,
-			...questionMultiple,
-			IconArrowDown,
-			IconArrowUp,
-			IconClose,
-			IconContentPaste,
-			IconDragIndicator,
-			t,
-		}
-	},
+		const shiftDragHandle = computed(() => {
+			return (
+				!props.readOnly
+				&& props.options.length !== 0
+				&& !questionMultiple.isLastEmpty.value
+			)
+		})
 
-	data() {
-		return {
-			errorMessage: null as string | null,
-			isDragging: false as boolean,
-			isRanking: false as boolean,
-			isLoading: false as boolean,
-			isOptionDialogShown: false as boolean,
-			rankedOptions: [] as FormsOption[],
-			unrankedOptions: [] as FormsOption[],
-			OptionType,
-		}
-	},
-
-	computed: {
-		shiftDragHandle(): boolean {
-			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
-		},
-
-		choices: {
-			get(): FormsOption[] {
-				return this.sortOptionsOfType(this.options, OptionType.Choice)
+		const choices = computed<FormsOption[]>({
+			get() {
+				return questionMultiple.sortOptionsOfType(
+					props.options,
+					OptionType.Choice,
+				)
 			},
 
-			set(value: FormsOption[]): void {
-				this.updateOptionsOrder(value, OptionType.Choice)
+			set(value: FormsOption[]) {
+				questionMultiple.updateOptionsOrder(value, OptionType.Choice)
 			},
-		},
-	},
+		})
 
-	watch: {
-		options: {
-			immediate: true,
-			handler() {
-				this.initRankedOptions()
-			},
-		},
-
-		values: {
-			immediate: true,
-			handler() {
-				this.initRankedOptions()
-			},
-		},
-	},
-
-	methods: {
-		async validate(): Promise<boolean> {
-			const optionsCount = this.sortOptionsOfType(
-				this.options,
-				OptionType.Choice,
-			).length
-
-			if (
-				(this.isRequired && this.rankedOptions.length === 0)
-				|| (this.rankedOptions.length > 0
-					&& this.rankedOptions.length !== optionsCount)
-			) {
-				this.errorMessage = t('forms', 'You must rank all options')
-				return false
+		const emitValues = (): void => {
+			if (rankedOptions.value.length === 0) {
+				// Nothing ranked - emit empty to signal unanswered
+				emit('update:values', [])
+			} else {
+				emit(
+					'update:values',
+					rankedOptions.value.map((option) => option.id),
+				)
 			}
-
-			this.errorMessage = null
-			return true
-		},
-
-		onDragStart(): void {
-			this.isDragging = true
-		},
-
-		onDragEnd(): void {
-			this.$nextTick(() => {
-				this.isDragging = false
-			})
-		},
+		}
 
 		/**
 		 * Initialize ranked/unranked options from existing values or default order
 		 */
-		initRankedOptions(): void {
-			const sorted = this.sortOptionsOfType(this.options, OptionType.Choice)
+		const initRankedOptions = (): void => {
+			const sorted = questionMultiple.sortOptionsOfType(
+				props.options,
+				OptionType.Choice,
+			)
 
-			if (this.values && this.values.length > 0) {
+			if (props.values && props.values.length > 0) {
 				// Restore order from saved values (array of option IDs)
 				const byId = Object.fromEntries(
-					sorted.map((o) => [o.id, o]),
+					sorted.map((option) => [option.id, option]),
 				) as Record<number, FormsOption>
-				this.rankedOptions = this.values
+				rankedOptions.value = props.values
 					.map((id) => byId[parseInt(String(id), 10)])
 					.filter((option): option is FormsOption => Boolean(option))
-				this.unrankedOptions = sorted.filter(
-					(o) => !this.rankedOptions.some((r) => r.id === o.id),
+				unrankedOptions.value = sorted.filter(
+					(option) =>
+						!rankedOptions.value.some(
+							(ranked) => ranked.id === option.id,
+						),
 				)
-			} else if (this.readOnly) {
+			} else if (props.readOnly) {
 				// Submit mode: start with all options unranked
-				this.rankedOptions = []
-				this.unrankedOptions = [...sorted]
+				rankedOptions.value = []
+				unrankedOptions.value = [...sorted]
 			} else {
 				// Edit mode: show all options in default order
-				this.rankedOptions = [...sorted]
-				this.unrankedOptions = []
+				rankedOptions.value = [...sorted]
+				unrankedOptions.value = []
 			}
-		},
+		}
+
+		const validate = async (): Promise<boolean> => {
+			const optionsCount = questionMultiple.sortOptionsOfType(
+				props.options,
+				OptionType.Choice,
+			).length
+
+			if (
+				(props.isRequired && rankedOptions.value.length === 0)
+				|| (rankedOptions.value.length > 0
+					&& rankedOptions.value.length !== optionsCount)
+			) {
+				question.errorMessage.value = t('forms', 'You must rank all options')
+				return false
+			}
+
+			question.errorMessage.value = null
+			return true
+		}
+
+		const onDragStart = (): void => {
+			isDragging.value = true
+		}
+
+		const onDragEnd = (): void => {
+			nextTick(() => {
+				isDragging.value = false
+			})
+		}
 
 		/**
 		 * Move an option from the unranked pool to the ranked list
 		 *
 		 * @param option The option to rank
 		 */
-		rankOption(option: FormsOption): void {
-			this.unrankedOptions = this.unrankedOptions.filter(
-				(o) => o.id !== option.id,
+		const rankOption = (option: FormsOption): void => {
+			unrankedOptions.value = unrankedOptions.value.filter(
+				(unranked) => unranked.id !== option.id,
 			)
-			this.rankedOptions.push(option)
-			this.emitValues()
-		},
+			rankedOptions.value.push(option)
+			emitValues()
+		}
 
 		/**
 		 * Move an option from the ranked list back to the unranked pool
 		 *
 		 * @param option The option to unrank
 		 */
-		unrankOption(option: FormsOption): void {
-			this.rankedOptions = this.rankedOptions.filter((o) => o.id !== option.id)
-			this.unrankedOptions.push(option)
-			this.emitValues()
-		},
-
-		/**
-		 * Move the ranked option at index up by one position
-		 *
-		 * @param index Current index
-		 */
-		onMoveUp(index: number): void {
-			if (index <= 0) return
-			const items = [...this.rankedOptions] as FormsOption[]
-			;[items[index - 1], items[index]] = [items[index], items[index - 1]]
-			this.rankedOptions = items
-			this.emitValues()
-			const newIndex = index - 1
-			this.focusButton(
-				newIndex > 0 ? 'buttonOptionUp' : 'buttonOptionDown',
-				newIndex,
+		const unrankOption = (option: FormsOption): void => {
+			rankedOptions.value = rankedOptions.value.filter(
+				(ranked) => ranked.id !== option.id,
 			)
-		},
-
-		/**
-		 * Move the ranked option at index down by one position
-		 *
-		 * @param index Current index
-		 */
-		onMoveDown(index: number): void {
-			if (index >= this.rankedOptions.length - 1) return
-			const items = [...this.rankedOptions] as FormsOption[]
-			;[items[index], items[index + 1]] = [items[index + 1], items[index]]
-			this.rankedOptions = items
-			this.emitValues()
-			const newIndex = index + 1
-			this.focusButton(
-				newIndex < this.rankedOptions.length - 1
-					? 'buttonOptionDown'
-					: 'buttonOptionUp',
-				newIndex,
-			)
-		},
+			unrankedOptions.value.push(option)
+			emitValues()
+		}
 
 		/**
 		 * Re-focus a button ref inside a v-for after reorder
@@ -430,44 +395,114 @@ export default defineComponent({
 		 * @param refName The ref name ('buttonOptionUp' or 'buttonOptionDown')
 		 * @param index The index of the item in the v-for
 		 */
-		focusButton(refName: string, index: number): void {
-			this.$nextTick(() => {
-				const refs = this.$refs[refName] as
+		const focusButton = (refName: string, index: number): void => {
+			nextTick(() => {
+				const refs = instance?.proxy?.$refs?.[refName] as
 					Array<{ $el?: { focus?: () => void } }> | undefined
 				if (Array.isArray(refs) && refs[index]) {
 					refs[index].$el?.focus?.()
 				}
 			})
-		},
+		}
 
-		onRankingStart(): void {
-			this.isRanking = true
-		},
+		/**
+		 * Move the ranked option at index up by one position
+		 *
+		 * @param index Current index
+		 */
+		const onMoveUp = (index: number): void => {
+			if (index <= 0) return
+			const items = [...rankedOptions.value]
+			;[items[index - 1], items[index]] = [items[index], items[index - 1]]
+			rankedOptions.value = items
+			emitValues()
+			const newIndex = index - 1
+			focusButton(
+				newIndex > 0 ? 'buttonOptionUp' : 'buttonOptionDown',
+				newIndex,
+			)
+		}
+
+		/**
+		 * Move the ranked option at index down by one position
+		 *
+		 * @param index Current index
+		 */
+		const onMoveDown = (index: number): void => {
+			if (index >= rankedOptions.value.length - 1) return
+			const items = [...rankedOptions.value]
+			;[items[index], items[index + 1]] = [items[index + 1], items[index]]
+			rankedOptions.value = items
+			emitValues()
+			const newIndex = index + 1
+			focusButton(
+				newIndex < rankedOptions.value.length - 1
+					? 'buttonOptionDown'
+					: 'buttonOptionUp',
+				newIndex,
+			)
+		}
+
+		const onRankingStart = (): void => {
+			isRanking.value = true
+		}
 
 		/**
 		 * Emit the current ranking after a drag reorder
 		 */
-		onRankingEnd(): void {
-			this.$nextTick(() => {
-				this.isRanking = false
+		const onRankingEnd = (): void => {
+			nextTick(() => {
+				isRanking.value = false
 			})
-			this.emitValues()
-		},
+			emitValues()
+		}
 
-		/**
-		 * Emit the current values based on ranking state
-		 */
-		emitValues(): void {
-			if (this.rankedOptions.length === 0) {
-				// Nothing ranked — emit empty to signal unanswered
-				this.$emit('update:values', [])
-			} else {
-				this.$emit(
-					'update:values',
-					this.rankedOptions.map((o) => o.id),
-				)
-			}
-		},
+		watch(
+			() => props.options,
+			() => {
+				initRankedOptions()
+			},
+			{ immediate: true },
+		)
+
+		watch(
+			() => props.values,
+			() => {
+				initRankedOptions()
+			},
+			{ immediate: true },
+		)
+
+		return {
+			...question,
+			...questionMultiple,
+			choices,
+			input,
+			initRankedOptions,
+			isDragging,
+			isLoading,
+			isOptionDialogShown,
+			isRanking,
+			IconArrowDown,
+			IconArrowUp,
+			IconClose,
+			IconContentPaste,
+			IconDragIndicator,
+			onDragEnd,
+			onDragStart,
+			onMoveDown,
+			onMoveUp,
+			onRankingEnd,
+			onRankingStart,
+			OptionType,
+			rankedOptions,
+			rankOption,
+			shiftDragHandle,
+			t,
+			unrankedOptions,
+			unrankOption,
+			validate,
+		}
 	},
 })
 </script>

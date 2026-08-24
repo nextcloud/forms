@@ -189,7 +189,21 @@ export function useQuestionMultiple(
 	}
 
 	function focusIndex(index: number, optionType: string) {
-		const inputRefs = instance?.proxy?.$refs?.input
+		const proxy = instance?.proxy as
+			| {
+					input?: Array<{
+						focus?: () => void
+						$props?: { optionType?: string; index?: number }
+					} | null>
+					$refs?: {
+						input?: Array<{
+							focus?: () => void
+							$props?: { optionType?: string; index?: number }
+						} | null>
+					}
+			  }
+			| undefined
+		const inputRefs = proxy?.input ?? proxy?.$refs?.input
 		const refsArray = Array.isArray(inputRefs)
 			? inputRefs
 			: inputRefs
@@ -197,13 +211,13 @@ export function useQuestionMultiple(
 				: []
 
 		const item = refsArray.find((component) => {
-			return (
-				(component as { $props?: { optionType?: string; index?: number } })
-					?.$props?.optionType === optionType
-				&& (
-					component as { $props?: { optionType?: string; index?: number } }
-				)?.$props?.index === index
-			)
+			const props = (
+				component as {
+					$props?: { optionType?: string; index?: number }
+				}
+			)?.$props
+
+			return props?.optionType === optionType && props?.index === index
 		})
 
 		if (item?.focus) {
@@ -211,6 +225,7 @@ export function useQuestionMultiple(
 		} else {
 			logger.warn('Could not find option to focus', {
 				index,
+				optionType,
 				options: sortedOptionsPerType.value[optionType],
 			})
 		}

@@ -26,7 +26,7 @@
 <script lang="ts">
 import { t } from '@nextcloud/l10n'
 import QRCode from 'qrcode'
-import { defineComponent } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import logger from '../utils/Logger.ts'
 
@@ -51,43 +51,39 @@ export default defineComponent({
 
 	emits: ['closed'],
 
-	setup() {
-		return {
-			t,
-		}
-	},
+	setup(props) {
+		const uri = ref('')
+		const isOpen = ref(false)
 
-	data() {
-		return {
-			uri: '' as string,
-			isOpen: false as boolean,
-		}
-	},
-
-	watch: {
-		text: {
-			immediate: true,
-			handler(): void {
-				this.generateQr()
-				this.isOpen = !!this.text
-			},
-		},
-	},
-
-	methods: {
-		async generateQr(): Promise<void> {
-			if (this.text) {
+		const generateQr = async (): Promise<void> => {
+			if (props.text) {
 				try {
-					this.uri = await QRCode.toDataURL(this.text, {
+					uri.value = await QRCode.toDataURL(props.text, {
 						width: 256,
 					})
 				} catch (err) {
 					logger.error(err instanceof Error ? err : String(err))
 				}
 			} else {
-				this.uri = ''
+				uri.value = ''
 			}
-		},
+		}
+
+		watch(
+			() => props.text,
+			async () => {
+				await generateQr()
+				isOpen.value = !!props.text
+			},
+			{ immediate: true },
+		)
+
+		return {
+			isOpen,
+			uri,
+			t,
+			generateQr,
+		}
 	},
 })
 </script>

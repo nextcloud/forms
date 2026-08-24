@@ -31,7 +31,7 @@
 import type { PropType } from 'vue'
 
 import { useIsSmallMobile } from '@nextcloud/vue'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcRadioGroup from '@nextcloud/vue/components/NcRadioGroup'
 import NcRadioGroupButton from '@nextcloud/vue/components/NcRadioGroupButton'
@@ -90,34 +90,29 @@ export default defineComponent({
 
 	emits: ['update:active'],
 
-	setup() {
-		return {
-			isMobile: useIsSmallMobile(),
-		}
-	},
+	setup(props, { emit }) {
+		const isMobile = useIsSmallMobile()
+		const pillOptions = computed(() => props.options as PillOption[])
+		const activeId = computed(() => String(props.active.id))
 
-	computed: {
-		pillOptions(): PillOption[] {
-			return this.options as PillOption[]
-		},
-
-		activeId(): string {
-			return String(this.active.id)
-		},
-	},
-
-	methods: {
 		/**
 		 * Emit the full selected option to keep PillMenu API stable
 		 *
 		 * @param optionId The selected option id
 		 */
-		onUpdateActive(optionId: string): void {
-			const option = this.pillOptions.find(
+		const onUpdateActive = (optionId: string): void => {
+			const option = pillOptions.value.find(
 				(entry) => String(entry.id) === optionId,
 			)
-			if (option) this.$emit('update:active', option)
-		},
+			if (option) emit('update:active', option)
+		}
+
+		return {
+			activeId,
+			isMobile,
+			pillOptions,
+			onUpdateActive,
+		}
 	},
 })
 </script>

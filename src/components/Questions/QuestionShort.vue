@@ -82,7 +82,7 @@
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -113,139 +113,135 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
-
-		return {
-			...question,
-			IconRegex,
-			t,
-		}
-	},
-
-	data() {
-		return {
-			validationTypes,
-			isValidationTypeMenuOpen: false as boolean,
-		}
-	},
-
-	computed: {
-		submissionInputPlaceholder() {
-			if (!this.readOnly) {
-				return (
-					this.validationObject.createPlaceholder
-					|| this.answerType.createPlaceholder
-				)
+		const input = ref<HTMLInputElement | null>(null)
+		const regexInput = ref<{
+			$el: {
+				querySelector: (selector: string) => HTMLInputElement | null
 			}
-			return (
-				this.validationObject.submitPlaceholder
-				|| this.answerType.submitPlaceholder
-			)
-		},
-
-		/**
-		 * Current user input validation type
-		 */
-		validationObject() {
-			return validationTypes[this.validationType]
-		},
+		} | null>(null)
+		const isValidationTypeMenuOpen = ref(false)
 
 		/**
 		 * Name of the current validation type, fallsback to 'text'
 		 */
-		validationType() {
+		const validationType = computed(() => {
 			return (
-				(this.extraSettings as { validationType?: string } | undefined)
+				(props.extraSettings as { validationType?: string } | undefined)
 					?.validationType || 'text'
 			)
-		},
+		})
+
+		/**
+		 * Current user input validation type
+		 */
+		const validationObject = computed(
+			() => validationTypes[validationType.value],
+		)
 
 		/**
 		 * Id of the validation type menu
 		 */
-		validationTypeMenuId() {
-			return 'q' + this.index + '__validation_menu'
-		},
+		const validationTypeMenuId = computed(
+			() => 'q' + props.index + '__validation_menu',
+		)
 
 		/**
 		 * The regular expression
 		 */
-		validationRegex() {
+		const validationRegex = computed(() => {
 			return (
-				(this.extraSettings as { validationRegex?: string } | undefined)
+				(props.extraSettings as { validationRegex?: string } | undefined)
 					?.validationRegex || ''
 			)
-		},
+		})
 
-		inputValue(): string | number | readonly string[] | null | undefined {
-			return this.values[0] as
+		const submissionInputPlaceholder = computed(() => {
+			if (!props.readOnly) {
+				return (
+					validationObject.value.createPlaceholder
+					|| props.answerType.createPlaceholder
+				)
+			}
+			return (
+				validationObject.value.submitPlaceholder
+				|| props.answerType.submitPlaceholder
+			)
+		})
+
+		const inputValue = computed(() => {
+			return (props.values[0] ?? null) as
 				string | number | readonly string[] | null | undefined
-		},
-	},
+		})
 
-	methods: {
-		async validate(): Promise<boolean> {
-			const input = this.$refs.input as unknown as HTMLInputElement
-			const value = input.value
+		const validate = async (): Promise<boolean> => {
+			const field = input.value
+			if (!field) {
+				return true
+			}
+			const value = field.value
 
 			// Clear the previous custom error before checking native validity.
-			input.setCustomValidity('')
+			field.setCustomValidity('')
 
-			if (this.isRequired && input.validity.valueMissing) {
-				this.errorMessage = t('forms', 'You must answer this question')
+			if (props.isRequired && field.validity.valueMissing) {
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
 				return false
 			}
 
 			const isCustomValid =
 				!value
-				|| this.validationObject.validate(
+				|| validationObject.value.validate(
 					value,
-					splitRegex(this.validationRegex),
+					splitRegex(validationRegex.value),
 				)
 
-			if (!input.validity.valid || !isCustomValid) {
-				input.setCustomValidity(this.validationObject.errorMessage)
-				this.errorMessage = this.validationObject.errorMessage
+			if (!field.validity.valid || !isCustomValid) {
+				field.setCustomValidity(validationObject.value.errorMessage)
+				question.errorMessage.value = validationObject.value.errorMessage
 				return false
 			}
 
-			this.errorMessage = null
+			question.errorMessage.value = null
 			return true
-		},
+		}
 
-		debounceValidate: debounce(async function (this: {
-			validate: () => Promise<boolean>
-		}) {
-			this.validate()
-		}, INPUT_DEBOUNCE_MS),
+		const debounceValidate = debounce(async () => {
+			await validate()
+		}, INPUT_DEBOUNCE_MS)
 
-		onInput(): void {
-			const input = this.$refs.input as unknown as HTMLInputElement
-			const value = input.value
-			this.$emit('update:values', [value])
-			this.debounceValidate()
-		},
+		const onInput = (): void => {
+			const field = input.value
+			if (!field) {
+				return
+			}
+			emit('update:values', [field.value])
+			void debounceValidate()
+		}
 
 		/**
 		 * Change input type
 		 *
 		 * @param validationType new input type
 		 */
-		onChangeValidationType(validationType: string): void {
+		const onChangeValidationType = (validationType: string): void => {
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
-				this.onExtraSettingsChange({
+				question.onExtraSettingsChange({
 					validationType,
-					validationRegex: this.validationRegex,
+					validationRegex: validationRegex.value,
 				})
 			} else {
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
-				this.isValidationTypeMenuOpen = false
-				this.onExtraSettingsChange({
+				isValidationTypeMenuOpen.value = false
+				question.onExtraSettingsChange({
 					validationType:
 						validationType === 'text' ? undefined : validationType,
 				})
 			}
-		},
+		}
 
 		/**
 		 * Validate and save regex if valid
@@ -256,45 +252,62 @@ export default defineComponent({
 		 * @param event input event
 		 * @return true if the regex is valid
 		 */
-		onInputRegex(event: InputEvent | SubmitEvent): boolean {
+		const onInputRegex = (event: InputEvent | SubmitEvent): boolean => {
 			if ('isComposing' in event && event.isComposing) {
 				return false
 			}
 
-			const input = (
-				this.$refs.regexInput as unknown as {
-					$el: {
-						querySelector: (selector: string) => HTMLInputElement | null
-					}
-				}
-			).$el.querySelector('input')
-			if (!input) {
+			const regexField = regexInput.value?.$el.querySelector('input')
+			if (!regexField) {
 				return false
 			}
-			const validationRegex = input.value
+			const validationRegex = regexField.value
 
 			// remove potential previous validity
-			input.setCustomValidity('')
+			regexField.setCustomValidity('')
 
 			if (!validateExpression(validationRegex)) {
-				input.setCustomValidity(t('forms', 'Invalid regular expression'))
+				regexField.setCustomValidity(
+					t('forms', 'Invalid regular expression'),
+				)
 				return false
 			}
 
-			this.onExtraSettingsChange({ validationRegex })
+			question.onExtraSettingsChange({ validationRegex })
 			return true
-		},
+		}
 
 		/**
 		 * Same as `onInputRegex` but for convinience also closes the menu
 		 *
 		 * @param event regex submit event
 		 */
-		onSubmitRegex(event: SubmitEvent): void {
-			if (this.onInputRegex(event)) {
-				this.isValidationTypeMenuOpen = false
+		const onSubmitRegex = (event: SubmitEvent): void => {
+			if (onInputRegex(event)) {
+				isValidationTypeMenuOpen.value = false
 			}
-		},
+		}
+
+		return {
+			...question,
+			IconRegex,
+			t,
+			validationTypes,
+			isValidationTypeMenuOpen,
+			submissionInputPlaceholder,
+			validationObject,
+			validationType,
+			validationTypeMenuId,
+			validationRegex,
+			inputValue,
+			input,
+			regexInput,
+			validate,
+			onInput,
+			onChangeValidationType,
+			onInputRegex,
+			onSubmitRegex,
+		}
 	},
 })
 </script>

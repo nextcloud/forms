@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, nextTick, ref, watch } from 'vue'
 import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
@@ -58,72 +58,78 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values', 'keydown'],
 
 	setup(props, { emit }) {
-		return useQuestion(props, { emit })
-	},
+		const textarea = ref<HTMLTextAreaElement | null>(null)
+		const question = useQuestion(props, { emit })
 
-	data() {
-		return {
-			height: 1 as number,
-		}
-	},
-
-	computed: {
-		submissionInputPlaceholder() {
-			if (this.readOnly) {
-				return this.answerType.submitPlaceholder
+		const submissionInputPlaceholder = computed(() => {
+			if (props.readOnly) {
+				return props.answerType.submitPlaceholder
 			}
-			return this.answerType.createPlaceholder
-		},
+			return props.answerType.createPlaceholder
+		})
 
-		textareaValue(): string | number | readonly string[] | null | undefined {
-			return this.values[0] as
+		const textareaValue = computed(() => {
+			return (props.values[0] ?? null) as
 				string | number | readonly string[] | null | undefined
-		},
-	},
+		})
 
-	watch: {
-		values: {
-			handler() {
-				this.$nextTick(() => {
-					this.autoSizeText()
+		const autoSizeText = (): void => {
+			const field = textarea.value
+			if (!field) {
+				return
+			}
+			field.style.cssText = 'height:auto; padding:0'
+			field.style.cssText = `height: ${field.scrollHeight + 28}px`
+		}
+
+		watch(
+			() => props.values,
+			() => {
+				nextTick(() => {
+					autoSizeText()
 				})
 			},
+			{ immediate: true },
+		)
 
-			immediate: true,
-		},
-	},
-
-	methods: {
-		async validate(): Promise<boolean> {
+		const validate = async (): Promise<boolean> => {
 			if (
-				this.isRequired
-				&& (this.values.length === 0 || this.values[0] === '')
+				props.isRequired
+				&& (props.values.length === 0 || props.values[0] === '')
 			) {
-				this.errorMessage = t('forms', 'You must answer this question')
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
 				return false
 			}
 
-			this.errorMessage = null
+			question.errorMessage.value = null
 			return true
-		},
+		}
 
-		onInput(): void {
-			const textarea = this.$refs.textarea as HTMLTextAreaElement
-			this.$emit('update:values', [textarea.value])
-		},
-
-		autoSizeText(): void {
-			const textarea = this.$refs.textarea as HTMLTextAreaElement | undefined
-			if (!textarea) {
+		const onInput = (): void => {
+			const field = textarea.value
+			if (!field) {
 				return
 			}
-			textarea.style.cssText = 'height:auto; padding:0'
-			textarea.style.cssText = `height: ${textarea.scrollHeight + 28}px`
-		},
+			emit('update:values', [field.value])
+		}
 
-		onKeydownCtrlEnter(event: KeyboardEvent): void {
-			this.$emit('keydown', event)
-		},
+		const onKeydownCtrlEnter = (event: KeyboardEvent): void => {
+			emit('keydown', event)
+		}
+
+		return {
+			...question,
+			textarea,
+			submissionInputPlaceholder,
+			textareaValue,
+			autoSizeText,
+			validate,
+			onInput,
+			onKeydownCtrlEnter,
+		}
 	},
 })
 </script>

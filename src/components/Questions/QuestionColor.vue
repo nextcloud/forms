@@ -48,7 +48,7 @@
 <script lang="ts">
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -75,45 +75,42 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
 
+		const colorPickerPlaceholder = computed(() => {
+			return props.readOnly
+				? props.answerType.submitPlaceholder
+				: props.answerType.createPlaceholder
+		})
+
+		const pickedColor = computed(() => {
+			return (props.values[0] as string | null | undefined) ?? ''
+		})
+
+		const validate = async (): Promise<boolean> => {
+			if (props.isRequired && pickedColor.value === '') {
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
+				return false
+			}
+
+			question.errorMessage.value = null
+			return true
+		}
+
+		const onUpdatePickedColor = (color: string | undefined): void => {
+			emit('update:values', [color ?? ''])
+		}
+
 		return {
 			...question,
 			IconClose,
 			t,
+			colorPickerPlaceholder,
+			pickedColor,
+			validate,
+			onUpdatePickedColor,
 		}
-	},
-
-	data() {
-		return {
-			isLoading: false as boolean,
-		}
-	},
-
-	computed: {
-		colorPickerPlaceholder(): string {
-			return this.readOnly
-				? this.answerType.submitPlaceholder
-				: this.answerType.createPlaceholder
-		},
-
-		pickedColor(): string {
-			return (this.values[0] as string | null | undefined) ?? ''
-		},
-	},
-
-	methods: {
-		async validate(): Promise<boolean> {
-			if (this.isRequired && this.pickedColor === '') {
-				this.errorMessage = t('forms', 'You must answer this question')
-				return false
-			}
-
-			this.errorMessage = null
-			return true
-		},
-
-		onUpdatePickedColor(color: string | undefined): void {
-			this.$emit('update:values', [color ?? ''])
-		},
 	},
 })
 </script>

@@ -31,7 +31,7 @@
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
@@ -54,59 +54,54 @@ export default defineComponent({
 
 	emits: ['update:open', 'multipleAnswers'],
 
-	data() {
-		return {
-			enteredOptions: '' as string,
-		}
-	},
+	setup(props, { emit }) {
+		const enteredOptions = ref('')
 
-	computed: {
-		buttons(): Array<{
-			label: string
-			callback: () => void
-			type?: 'primary'
-			icon?: string
-		}> {
-			return [
-				{
-					label: t('forms', 'Cancel'),
-					callback: () => {
-						this.$emit('update:open', false)
-					},
-				},
-				{
-					label: t('forms', 'Add options'),
-					type: 'primary',
-					icon: IconCheck,
-					callback: () => {
-						this.onMultipleOptions()
-					},
-				},
-			]
-		},
-
-		multipleOptions(): string[] {
-			const allOptions = this.enteredOptions.split(/\r?\n/g)
+		const multipleOptions = computed(() => {
+			const allOptions = enteredOptions.value.split(/\r?\n/g)
 			return allOptions.filter((answer: string) => {
 				return answer.trim().length > 0
 			})
-		},
-	},
+		})
 
-	methods: {
-		t,
-
-		onMultipleOptions(): void {
-			this.$emit('update:open', false)
-			if (this.multipleOptions.length > 1) {
+		const onMultipleOptions = (): void => {
+			emit('update:open', false)
+			if (multipleOptions.value.length > 1) {
 				// extract all options entries to parent
-				this.$emit('multipleAnswers', this.multipleOptions)
-				this.enteredOptions = ''
+				emit('multipleAnswers', multipleOptions.value)
+				enteredOptions.value = ''
 				return
 			}
 			// in case of only one option, just show an error message because it is probably missuse of the feature
 			showError(t('forms', 'Options should be separated by new line!'))
-		},
+		}
+
+		const buttons = computed(() => {
+			return [
+				{
+					label: t('forms', 'Cancel'),
+					callback: () => {
+						emit('update:open', false)
+					},
+				},
+				{
+					label: t('forms', 'Add options'),
+					type: 'primary' as const,
+					icon: IconCheck,
+					callback: () => {
+						onMultipleOptions()
+					},
+				},
+			]
+		})
+
+		return {
+			enteredOptions,
+			buttons,
+			multipleOptions,
+			onMultipleOptions,
+			t,
+		}
 	},
 })
 </script>

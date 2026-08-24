@@ -179,7 +179,7 @@
 import type { FormsOption } from '../../models/Entities.d.ts'
 
 import { n, t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, nextTick, ref } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
@@ -229,67 +229,70 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
 		const questionMultiple = useQuestionMultiple(props, { emit })
+		const input = ref<
+			Array<{
+				focus?: () => void
+				$props?: { optionType?: string; index?: number }
+			} | null>
+		>([])
+		const isDragging = ref(false)
+		const isLoading = ref(false)
+		const questionTypes = [
+			{ label: t('forms', 'Radio'), id: GridCellType.Radio },
+			{ label: t('forms', 'Checkbox'), id: GridCellType.Checkbox },
+			{ label: t('forms', 'Number'), id: GridCellType.Number },
+			{ label: t('forms', 'Text'), id: 'text' },
+		] as Array<{ label: string; id: GridQuestionType }>
 
-		return {
-			...question,
-			...questionMultiple,
-			t,
-		}
-	},
+		const isUnique = computed(() => {
+			return props.answerType.unique === true
+		})
 
-	data() {
-		return {
-			isDragging: false as boolean,
-			isLoading: false as boolean,
-			questionTypes: [
-				{ label: t('forms', 'Radio'), id: GridCellType.Radio },
-				{ label: t('forms', 'Checkbox'), id: GridCellType.Checkbox },
-				{ label: t('forms', 'Number'), id: GridCellType.Number },
-				{ label: t('forms', 'Text'), id: 'text' },
-			] as Array<{ label: string; id: GridQuestionType }>,
-		}
-	},
+		const shiftDragHandle = computed(() => {
+			return (
+				!props.readOnly
+				&& props.options.length !== 0
+				&& !questionMultiple.isLastEmpty.value
+			)
+		})
 
-	computed: {
-		isUnique(): boolean {
-			return this.answerType.unique === true
-		},
-
-		shiftDragHandle(): boolean {
-			return !this.readOnly && this.options.length !== 0 && !this.isLastEmpty
-		},
-
-		questionType(): GridQuestionType {
-			const extraSettings = this.extraSettings as
+		const questionType = computed<GridQuestionType>(() => {
+			const extraSettings = props.extraSettings as
 				QuestionGridExtraSettings | undefined
 			return extraSettings?.questionType ?? GridCellType.Radio
-		},
+		})
 
-		columns: {
-			get(): FormsOption[] {
-				return this.sortOptionsOfType(this.options, OptionType.Column)
+		const columns = computed<FormsOption[]>({
+			get() {
+				return questionMultiple.sortOptionsOfType(
+					props.options,
+					OptionType.Column,
+				)
 			},
 
 			set(value: FormsOption[]) {
-				this.updateOptionsOrder(value, OptionType.Column)
+				questionMultiple.updateOptionsOrder(value, OptionType.Column)
 			},
-		},
+		})
 
-		rows: {
-			get(): FormsOption[] {
-				return this.sortOptionsOfType(this.options, OptionType.Row)
+		const rows = computed<FormsOption[]>({
+			get() {
+				return questionMultiple.sortOptionsOfType(
+					props.options,
+					OptionType.Row,
+				)
 			},
 
 			set(value: FormsOption[]) {
-				this.updateOptionsOrder(value, OptionType.Row)
+				questionMultiple.updateOptionsOrder(value, OptionType.Row)
 			},
-		},
+		})
 
-		plainValues(): GridMatrixValues {
+		const plainValues = computed<GridMatrixValues>(() => {
 			const values: GridMatrixValues = {}
-			const questionValues = this.values as GridQuestionValues
-			for (const row of this.rows) {
-				for (const column of this.columns) {
+			const questionValues = props.values as GridQuestionValues
+			for (const row of rows.value) {
+				for (const column of columns.value) {
 					values[row.id] = values[row.id] || {}
 					const rowValues = questionValues[row.id] as
 						Record<number, GridCellValue> | undefined
@@ -298,25 +301,26 @@ export default defineComponent({
 			}
 
 			return values
-		},
-	},
+		})
 
-	methods: {
-		async validate(): Promise<boolean> {
-			const extraSettings = this.extraSettings as
+		const validate = async (): Promise<boolean> => {
+			const extraSettings = props.extraSettings as
 				QuestionGridExtraSettings | undefined
-			const values = this.values as unknown[] & { length?: number }
-			if (this.isRequired && (values.length === 0 || this.values === null)) {
-				this.errorMessage = t('forms', 'You must answer this question')
+			const values = props.values as unknown[] & { length?: number }
+			if (props.isRequired && (values.length === 0 || props.values === null)) {
+				question.errorMessage.value = t(
+					'forms',
+					'You must answer this question',
+				)
 				return false
 			}
 
-			if (!this.isUnique) {
+			if (!isUnique.value) {
 				// Validate limits
 				const max = extraSettings?.optionsLimitMax ?? 0
 				const min = extraSettings?.optionsLimitMin ?? 0
 				if (max && (values.length ?? 0) > max) {
-					this.errorMessage = n(
+					question.errorMessage.value = n(
 						'forms',
 						'You must choose at most one option',
 						'You must choose a maximum of %n options',
@@ -325,7 +329,7 @@ export default defineComponent({
 					return false
 				}
 				if (min && (values.length ?? 0) < min) {
-					this.errorMessage = n(
+					question.errorMessage.value = n(
 						'forms',
 						'You must choose at least one option',
 						'You must choose at least %n options',
@@ -335,37 +339,59 @@ export default defineComponent({
 				}
 			}
 
-			this.errorMessage = null
+			question.errorMessage.value = null
 			return true
-		},
+		}
 
-		onDragStart(): void {
-			this.isDragging = true
-		},
+		const onDragStart = (): void => {
+			isDragging.value = true
+		}
 
-		onDragEnd(): void {
-			this.$nextTick(() => {
-				this.isDragging = false
+		const onDragEnd = (): void => {
+			nextTick(() => {
+				isDragging.value = false
 			})
-		},
+		}
 
-		onChangeCheckboxRadio(rowId: number, value: unknown): void {
-			const values = { ...(this.values as GridQuestionValues) }
+		const onChangeCheckboxRadio = (rowId: number, value: unknown): void => {
+			const values = { ...(props.values as GridQuestionValues) }
 			values[rowId] = value
 
-			this.$emit('update:values', values)
-		},
+			emit('update:values', values)
+		}
 
-		onChangeTextNumber(
+		const onChangeTextNumber = (
 			rowId: number,
 			columnId: number,
 			value: GridCellValue,
-		): void {
-			const values = { ...this.plainValues }
+		): void => {
+			const values = { ...plainValues.value }
 			values[rowId][columnId] = value
 
-			this.$emit('update:values', values)
-		},
+			emit('update:values', values)
+		}
+
+		return {
+			...question,
+			...questionMultiple,
+			columns,
+			input,
+			isDragging,
+			isLoading,
+			isUnique,
+			onChangeCheckboxRadio,
+			onChangeTextNumber,
+			onDragEnd,
+			onDragStart,
+			OptionType,
+			plainValues,
+			questionType,
+			questionTypes,
+			rows,
+			shiftDragHandle,
+			t,
+			validate,
+		}
 	},
 })
 </script>

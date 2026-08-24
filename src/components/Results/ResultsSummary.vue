@@ -162,7 +162,7 @@ import type { PropType } from 'vue'
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
@@ -186,74 +186,62 @@ export default defineComponent({
 		},
 	},
 
-	setup() {
-		return {
-			IconFile,
-			t,
-		}
-	},
+	setup(props) {
+		const questionTypeLabel = computed(() => {
+			const label = answerTypes[props.question.type]?.label ?? ''
 
-	data() {
-		return {
-			answerTypes,
-		}
-	},
-
-	computed: {
-		questionTypeLabel() {
-			const label = this.answerTypes[this.question.type].label
-
-			if (this.question.type === 'grid') {
+			if (props.question.type === 'grid') {
 				if (
-					this.question.extraSettings.questionType
+					props.question.extraSettings?.questionType
 					=== GridCellType.Checkbox
 				) {
-					return label + ' (' + t('forms', 'Checkbox') + ')'
+					return `${label} (${t('forms', 'Checkbox')})`
 				}
 				if (
-					this.question.extraSettings.questionType === GridCellType.Number
+					props.question.extraSettings?.questionType
+					=== GridCellType.Number
 				) {
-					return label + ' (' + t('forms', 'Number') + ')'
+					return `${label} (${t('forms', 'Number')})`
 				}
 				if (
-					this.question.extraSettings.questionType === GridCellType.Radio
+					props.question.extraSettings?.questionType === GridCellType.Radio
 				) {
-					return label + ' (' + t('forms', 'Radio') + ')'
+					return `${label} (${t('forms', 'Radio')})`
 				}
 			}
 
-			if (this.question.type === 'linearscale') {
+			if (props.question.type === 'linearscale') {
 				const labelLowest =
-					this.question.extraSettings?.optionsLabelLowest
+					props.question.extraSettings?.optionsLabelLowest
 					?? t('forms', 'Strongly disagree')
 				const labelHighest =
-					this.question.extraSettings?.optionsLabelHighest
+					props.question.extraSettings?.optionsLabelHighest
 					?? t('forms', 'Strongly agree')
 				const optionsLowest =
-					this.question.extraSettings?.optionsLowest?.toString() ?? '1'
+					props.question.extraSettings?.optionsLowest?.toString() ?? '1'
 				const optionsHighest =
-					this.question.extraSettings?.optionsHighest?.toString() ?? '5'
+					props.question.extraSettings?.optionsHighest?.toString() ?? '5'
+				const descriptionParts: string[] = []
 
-				const descriptionParts = []
 				if (labelLowest !== '') {
 					descriptionParts.push(`${optionsLowest}: ${labelLowest}`)
 				}
 				if (labelHighest !== '') {
 					descriptionParts.push(`${optionsHighest}: ${labelHighest}`)
 				}
-				const description = ` (${descriptionParts.join(', ')})`
-				return label + description
+
+				return `${label} (${descriptionParts.join(', ')})`
 			}
 
 			return label
-		},
+		})
 
 		// For countable questions like multiple choice and checkboxes
-		questionOptions() {
+		const questionOptions = computed(() => {
 			// Build list of question options
-			let questionOptionsStats
-			if (this.question.type !== 'linearscale') {
-				questionOptionsStats = this.question.options.map((option: any) => ({
+			let questionOptionsStats: any[]
+			if (props.question.type !== 'linearscale') {
+				questionOptionsStats = props.question.options.map((option: any) => ({
 					...option,
 					count: 0,
 					percentage: 0,
@@ -262,13 +250,13 @@ export default defineComponent({
 				questionOptionsStats = Array.from(
 					{
 						length:
-							(this.question.extraSettings?.optionsHighest ?? 5)
-							- (this.question.extraSettings?.optionsLowest ?? 1)
+							(props.question.extraSettings?.optionsHighest ?? 5)
+							- (props.question.extraSettings?.optionsLowest ?? 1)
 							+ 1,
 					},
 					(_, i) => ({
 						text: (
-							i + (this.question.extraSettings?.optionsLowest ?? 1)
+							i + (props.question.extraSettings?.optionsLowest ?? 1)
 						).toString(),
 						count: 0,
 						percentage: 0,
@@ -277,7 +265,7 @@ export default defineComponent({
 			}
 
 			// Also record 'Other'
-			if (this.question.extraSettings?.allowOtherAnswer) {
+			if (props.question.extraSettings?.allowOtherAnswer) {
 				questionOptionsStats.unshift({
 					text: t('forms', 'Other'),
 					count: 0,
@@ -294,13 +282,13 @@ export default defineComponent({
 			})
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach((submission) => {
+			props.submissions.forEach((submission: any) => {
 				const answers = submission.answers.filter(
-					(answer: any) => answer.questionId === this.question.id,
+					(answer: any) => answer.questionId === props.question.id,
 				)
 				if (!answers.length) {
-					// Record 'No response'
 					questionOptionsStats[0].count++
+					return
 				}
 
 				// Check question options to find which needs to be increased
@@ -309,7 +297,7 @@ export default defineComponent({
 						(option: any) => option.text === answer.text,
 					)
 					if (optionsStatIndex < 0) {
-						if (this.question.extraSettings?.allowOtherAnswer) {
+						if (props.question.extraSettings?.allowOtherAnswer) {
 							questionOptionsStats[1].count++
 						} else {
 							questionOptionsStats.push({
@@ -325,10 +313,10 @@ export default defineComponent({
 			})
 
 			// Sort options by response count
-			if (this.question.type !== 'linearscale') {
-				questionOptionsStats.sort((object1: any, object2: any) => {
-					return object2.count - object1.count
-				})
+			if (props.question.type !== 'linearscale') {
+				questionOptionsStats.sort(
+					(object1: any, object2: any) => object2.count - object1.count,
+				)
 			} else {
 				// for linear scale questions move the "No response" element to the end
 				questionOptionsStats.push(questionOptionsStats.shift())
@@ -337,7 +325,7 @@ export default defineComponent({
 			questionOptionsStats.forEach((questionOptionsStat: any) => {
 				// Fill percentage values
 				questionOptionsStat.percentage = Math.round(
-					(100 * questionOptionsStat.count) / this.submissions.length,
+					(100 * questionOptionsStat.count) / props.submissions.length,
 				)
 				// Mark all best results
 				const maxCount = Math.max(
@@ -347,16 +335,16 @@ export default defineComponent({
 			})
 
 			return questionOptionsStats
-		},
+		})
 
 		/**
 		 * Borda count ranking statistics
 		 */
-		rankingStats() {
-			const n = this.question.options.length
+		const rankingStats = computed(() => {
+			const n = props.question.options.length
 			const stats: Record<string | number, any> = {}
 
-			for (const opt of this.question.options) {
+			for (const opt of props.question.options) {
 				stats[opt.id] = {
 					id: opt.id,
 					text: opt.text,
@@ -366,9 +354,9 @@ export default defineComponent({
 				}
 			}
 
-			for (const submission of this.submissions) {
+			for (const submission of props.submissions) {
 				const answer = submission.answers.find(
-					(a: any) => a.questionId === this.question.id,
+					(a: any) => a.questionId === props.question.id,
 				)
 				if (!answer) continue
 				const ranked = JSON.parse(answer.text)
@@ -397,29 +385,28 @@ export default defineComponent({
 			}
 
 			return result
-		},
+		})
 
-		maxBordaScore() {
-			const n = this.question.options.length
-			return n * this.submissions.length
-		},
+		const maxBordaScore = computed(
+			() => props.question.options.length * props.submissions.length,
+		)
 
-		gridColumns() {
-			return this.question.options.filter(
+		const gridColumns = computed(() => {
+			return props.question.options.filter(
 				(option: any) => option.optionType === OptionType.Column,
 			)
-		},
+		})
 
-		gridRows() {
-			return this.question.options.filter(
+		const gridRows = computed(() => {
+			return props.question.options.filter(
 				(option: any) => option.optionType === OptionType.Row,
 			)
-		},
+		})
 
-		gridValue() {
+		const gridValue = computed(() => {
 			const matrix: Record<string, Record<string, any>> = {}
-			for (const row of this.gridRows) {
-				for (const column of this.gridColumns) {
+			for (const row of gridRows.value) {
+				for (const column of gridColumns.value) {
 					matrix[row.id] = matrix[row.id] || {}
 					matrix[row.id][column.id] = {
 						answersCount: 0,
@@ -430,20 +417,20 @@ export default defineComponent({
 				}
 			}
 
-			const answers: any[] = []
-			this.submissions.forEach((submission: any) => {
+			const answersList: any[] = []
+			props.submissions.forEach((submission: any) => {
 				submission.answers.forEach((answer: any) => {
-					if (answer.questionId === this.question.id) {
-						answers.push(answer)
+					if (answer.questionId === props.question.id) {
+						answersList.push(answer)
 					}
 				})
 			})
 
-			answers.forEach((answer) => {
+			answersList.forEach((answer) => {
 				const answerJson = JSON.parse(answer.text)
 
 				if (
-					this.question.extraSettings.questionType === GridCellType.Radio
+					props.question.extraSettings?.questionType === GridCellType.Radio
 				) {
 					for (const rowId of Object.keys(answerJson)) {
 						const columnId = answerJson[rowId]
@@ -453,7 +440,7 @@ export default defineComponent({
 						}
 					}
 				} else if (
-					this.question.extraSettings.questionType
+					props.question.extraSettings?.questionType
 					=== GridCellType.Checkbox
 				) {
 					for (const rowId of Object.keys(answerJson)) {
@@ -467,14 +454,15 @@ export default defineComponent({
 						}
 					}
 				} else if (
-					this.question.extraSettings.questionType === GridCellType.Number
+					props.question.extraSettings?.questionType
+					=== GridCellType.Number
 				) {
 					for (const rowId of Object.keys(answerJson)) {
 						if (!matrix[rowId]) {
 							continue
 						}
 						for (const columnId of Object.keys(answerJson[rowId])) {
-							if ('' === answerJson[rowId][columnId]) {
+							if (answerJson[rowId][columnId] === '') {
 								continue
 							}
 
@@ -491,9 +479,9 @@ export default defineComponent({
 
 			for (const rowId of Object.keys(matrix)) {
 				for (const columnId of Object.keys(matrix[rowId])) {
-					let totalAnswersCount = this.submissions.length
+					let totalAnswersCount = props.submissions.length
 					if (
-						this.question.extraSettings.questionType
+						props.question.extraSettings?.questionType
 						=== GridCellType.Checkbox
 					) {
 						totalAnswersCount = Object.entries(matrix[rowId])
@@ -514,49 +502,50 @@ export default defineComponent({
 					)
 
 					if (
-						this.question.extraSettings.questionType
+						props.question.extraSettings?.questionType
 							=== GridCellType.Number
 						&& matrix[rowId][columnId].answersCount > 0
 					) {
-						matrix[rowId][columnId].averageValue =
+						matrix[rowId][columnId].averageValue = (
 							matrix[rowId][columnId].totalValue
 							/ matrix[rowId][columnId].answersCount
+						).toFixed(1)
 					}
 				}
 			}
 
 			return matrix
-		},
+		})
 
 		// For text answers like short answer and long text
-		answers() {
+		const answers = computed(() => {
 			const answersModels: any[] = []
 
 			// Also record 'No response'
 			let noResponseCount = 0
 
 			// Go through submissions to check which options have how many responses
-			this.submissions.forEach((submission: any) => {
-				const answers = submission.answers.filter(
-					(answer: any) => answer.questionId === this.question.id,
+			props.submissions.forEach((submission: any) => {
+				const answersForQuestion = submission.answers.filter(
+					(answer: any) => answer.questionId === props.question.id,
 				)
-				if (!answers.length) {
+				if (!answersForQuestion.length) {
 					// Record 'No response'
 					noResponseCount++
 				}
 
 				// Add text answers
 				if (
-					['date', 'time'].includes(this.question.type)
-					&& answers.length === 2
+					['date', 'time'].includes(props.question.type)
+					&& answersForQuestion.length === 2
 				) {
 					// Combine the first two answers in order for date range questions
 					answersModels.push({
-						id: `${answers[0].id}-${answers[1].id}`,
-						text: `${answers[0].text} - ${answers[1].text}`,
+						id: `${answersForQuestion[0].id}-${answersForQuestion[1].id}`,
+						text: `${answersForQuestion[0].text} - ${answersForQuestion[1].text}`,
 					})
 				} else {
-					answers.forEach((answer: any) => {
+					answersForQuestion.forEach((answer: any) => {
 						if (answer.fileId) {
 							answersModels.push({
 								id: answer.id,
@@ -577,20 +566,29 @@ export default defineComponent({
 
 			// Calculate no response percentage
 			const noResponsePercentage = Math.round(
-				(100 * noResponseCount) / this.submissions.length,
+				(100 * noResponseCount) / props.submissions.length,
 			)
 			answersModels.unshift({
 				id: 0,
-				text:
-					noResponseCount
-					+ ' ('
-					+ noResponsePercentage
-					+ '%): '
-					+ t('forms', 'No response'),
+				text: `${noResponseCount} (${noResponsePercentage}%): ${t('forms', 'No response')}`,
 			})
 
 			return answersModels
-		},
+		})
+
+		return {
+			IconFile,
+			answerTypes,
+			questionTypeLabel,
+			questionOptions,
+			rankingStats,
+			maxBordaScore,
+			gridColumns,
+			gridRows,
+			gridValue,
+			answers,
+			t,
+		}
 	},
 })
 </script>

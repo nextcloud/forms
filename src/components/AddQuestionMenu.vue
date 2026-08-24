@@ -65,7 +65,7 @@
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent } from 'vue'
+import { defineComponent, ref, toRef, watch } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
@@ -98,50 +98,54 @@ export default defineComponent({
 
 	emits: ['update:open', 'addQuestion'],
 
-	setup() {
+	setup(props, { emit }) {
+		const activeQuestionType = ref<string | null>(null)
+		const openLocal = ref<boolean>(props.open)
+		const open = toRef(props, 'open')
+
+		watch(open, (value: boolean) => {
+			openLocal.value = value
+		})
+
+		watch(openLocal, (value: boolean) => {
+			emit('update:open', value)
+			if (!value) {
+				activeQuestionType.value = null
+			}
+		})
+
+		const onPrimaryClick = (
+			answer: unknown,
+			type: string,
+			position: number | null,
+		) => {
+			if (props.hasSubtypes(answer)) {
+				activeQuestionType.value = type
+				return
+			}
+
+			emit('addQuestion', type, null, position)
+			openLocal.value = false
+		}
+
+		const onSubtypeClick = (
+			type: string,
+			subtype: string | number,
+			position: number | null,
+		) => {
+			emit('addQuestion', type, subtype, position)
+			openLocal.value = false
+		}
+
 		return {
+			activeQuestionType,
+			openLocal,
+			onPrimaryClick,
+			onSubtypeClick,
 			t,
 			IconChevronLeft,
 			IconPlus,
 		}
-	},
-
-	data() {
-		return {
-			activeQuestionType: null as string | null,
-			openLocal: this.open as boolean,
-		}
-	},
-
-	watch: {
-		open(v: boolean) {
-			this.openLocal = v
-		},
-
-		openLocal(v: boolean) {
-			this.$emit('update:open', v)
-			if (!v) this.activeQuestionType = null
-		},
-	},
-
-	methods: {
-		onPrimaryClick(answer: unknown, type: string, position: number | null) {
-			if (this.hasSubtypes(answer)) {
-				this.activeQuestionType = type
-				return
-			}
-			this.$emit('addQuestion', type, null, position)
-			this.openLocal = false
-		},
-
-		onSubtypeClick(
-			type: string,
-			subtype: string | number,
-			position: number | null,
-		) {
-			this.$emit('addQuestion', type, subtype, position)
-			this.openLocal = false
-		},
 	},
 })
 </script>
