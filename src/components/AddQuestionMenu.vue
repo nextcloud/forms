@@ -10,7 +10,8 @@
 		:menuName="menuName"
 		:aria-label="ariaLabel"
 		:variant="variant"
-		:primary="primary">
+		:primary="primary"
+		:wide="wide">
 		<template #icon>
 			<NcLoadingIcon v-if="isLoadingQuestions" :size="20" />
 			<NcIconSvgWrapper v-else :svg="IconPlus" />
@@ -94,6 +95,7 @@ export default defineComponent({
 		isLoadingQuestions: { type: Boolean, default: false },
 		answerTypesFilter: { type: Object, required: true },
 		hasSubtypes: { type: Function, required: true },
+		wide: { type: Boolean, default: false },
 	},
 
 	emits: ['update:open', 'addQuestion'],
