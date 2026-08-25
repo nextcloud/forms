@@ -5,6 +5,14 @@
 
 # Changelog
 
+## v5.3.6 - 2026-08-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.5...v5.3.6)
+
+### Fixed
+
+- [stable5.3] fix(migration): make option_type migration self-sufficient by @backportbot[bot] in [\#3604](https://github.com/nextcloud/forms/pull/3604)
+
 ## v5.3.5 - 2026-07-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.4...v5.3.5)
