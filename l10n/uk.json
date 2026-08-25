@@ -49,8 +49,8 @@
     "This form does not exist" : "Такої форми не існує",
     "Form expired" : "Термін дії форми минув",
     "This form has expired and is no longer taking responses" : "Термін дії форми сплив, відповіді більше не приймаються",
-    "Error while saving configuration" : "Помилка при збереженні налаштувань",
     "Error while reloading config" : "Помилка при перезавантаженні налаштувань",
+    "Error while saving configuration" : "Помилка при збереженні налаштувань",
     "Form creation" : "Створення форм",
     "Restrict form creation to selected groups" : "Дозволити створювати форми тільки обраним групам",
     "Select groups" : "Виберіть групи",
@@ -81,8 +81,8 @@
     "Copy form" : "Копіювати форму",
     "Unarchive form" : "Розархівувати форму",
     "Archive form" : "Архівувати форму",
-    "Add options" : "Додати варіанти",
     "Options should be separated by new line!" : "Варіанти відповідей потрібно подавати поокремо з нового рядка!",
+    "Add options" : "Додати варіанти",
     "Add multiple options" : "Додати декілька варіантів",
     "Add multiple options (one per line)" : "Додати декілька варіантів (кожний в новому рядку)",
     "Options" : "Параметри",
@@ -267,7 +267,6 @@
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Форма «{title}» заблокована {lockedBy} і не може бути змінена. Термін дії блокування закінчується: {lockedUntil}",
     "Form title" : "Заголовок форми",
     "Description" : "Опис",
-    "Insert question" : "Вставити питання",
     "Insert question after question {index}" : "Вставити питання після питання {index}",
     "Add a question" : "Додати запитання",
     "Summary" : "Загалом",
@@ -400,6 +399,7 @@
     "People can enter a number" : "Респондент може ввести число",
     "Enter a number" : "Введіть число",
     "Custom regular expression" : "Регулярний вираз",
-    "The input does not match the required pattern" : "Поле не відповідає визначеному шаблону"
+    "The input does not match the required pattern" : "Поле не відповідає визначеному шаблону",
+    "Insert question" : "Вставити питання"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);"
 }

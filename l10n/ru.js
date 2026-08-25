@@ -53,8 +53,8 @@ OC.L10N.register(
     "This form does not exist" : "Такой формы не существует",
     "Form expired" : "Ответы больше не принимаются",
     "This form has expired and is no longer taking responses" : "Срок действия этой формы истёк, и она больше не принимает ответы",
-    "Error while saving configuration" : "Ошибка при сохранении конфигурации",
     "Error while reloading config" : "Ошибка при перезагрузке конфигурации",
+    "Error while saving configuration" : "Ошибка при сохранении конфигурации",
     "Form creation" : "Создание формы",
     "Restrict form creation to selected groups" : "Ограничить создание формы выбранными группами",
     "Select groups" : "Выберите группы",
@@ -85,8 +85,8 @@ OC.L10N.register(
     "Copy form" : "Скопировать форму",
     "Unarchive form" : "Разархивировать форму",
     "Archive form" : "Архивировать форму",
-    "Add options" : "Добавить варианты",
     "Options should be separated by new line!" : "Варианты должны быть разделены новой строкой!",
+    "Add options" : "Добавить варианты",
     "Add multiple options" : "Добавить несколько вариантов",
     "Add multiple options (one per line)" : "Добавить несколько вариантов (по одному в строке)",
     "Options" : "Варианты",
@@ -277,7 +277,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Форма '{title}' заблокирована {lockedBy} и не может быть изменена. Срок действия блокировки истекает: {lockedUntil}",
     "Form title" : "Название формы",
     "Description" : "Описание",
-    "Insert question" : "Вставить вопрос",
     "Insert question after question {index}" : "Вставить вопрос после вопроса {index}",
     "Add a question" : "Добавить вопрос",
     "Summary" : "Всего",
@@ -410,6 +409,7 @@ OC.L10N.register(
     "People can enter a number" : "Люди могут ввести номер",
     "Enter a number" : "Введите номер",
     "Custom regular expression" : "Пользовательское регулярное выражение",
-    "The input does not match the required pattern" : "Ввод не соответствует требуемому шаблону"
+    "The input does not match the required pattern" : "Ввод не соответствует требуемому шаблону",
+    "Insert question" : "Вставить вопрос"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

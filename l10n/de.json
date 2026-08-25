@@ -57,8 +57,8 @@
     "This form does not exist" : "Dieses Formular existiert nicht",
     "Form expired" : "Formular abgelaufen",
     "This form has expired and is no longer taking responses" : "Dieses Formular ist abgelaufen und nimmt keine Antworten mehr entgegen",
-    "Error while saving configuration" : "Fehler beim Speichern der Einstellungen",
     "Error while reloading config" : "Fehler beim Neuladen der Einstellungen",
+    "Error while saving configuration" : "Fehler beim Speichern der Einstellungen",
     "Form creation" : "Formularerstellung",
     "Restrict form creation to selected groups" : "Formularerstellung auf gewählte Gruppen beschränken",
     "Select groups" : "Gruppen auswählen",
@@ -90,8 +90,8 @@
     "Copy form" : "Formular kopieren",
     "Unarchive form" : "Formular dearchivieren",
     "Archive form" : "Formular archivieren",
-    "Add options" : "Optionen hinzufügen",
     "Options should be separated by new line!" : "Optionen sollten durch eine neue Zeile getrennt werden!",
+    "Add options" : "Optionen hinzufügen",
     "Add multiple options" : "Mehrere Optionen hinzufügen",
     "Add multiple options (one per line)" : "Mehrere Optionen hinzufügen (eine pro Zeile)",
     "Options" : "Optionen",
@@ -286,7 +286,6 @@
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Formular '{title}' wurde gesperrt von {lockedBy} und kann nicht bearbeitet werden. Die Sperrung läuft ab: {lockedUntil}",
     "Form title" : "Formulartitel",
     "Description" : "Beschreibung",
-    "Insert question" : "Frage einfügen",
     "Insert question after question {index}" : "Frage nach der Frage {index} einfügen",
     "Add a question" : "Eine Frage hinzufügen",
     "Summary" : "Zusammenfassung",
@@ -419,6 +418,7 @@
     "People can enter a number" : "Teilnehmer können eine Zahl eingeben",
     "Enter a number" : "Zahl eingeben",
     "Custom regular expression" : "Benutzerdefinierter regulärer Ausdruck",
-    "The input does not match the required pattern" : "Die Eingabe entspricht nicht dem erforderlichen Muster"
+    "The input does not match the required pattern" : "Die Eingabe entspricht nicht dem erforderlichen Muster",
+    "Insert question" : "Frage einfügen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

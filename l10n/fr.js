@@ -57,8 +57,8 @@ OC.L10N.register(
     "This form does not exist" : "Ce formulaire n’existe pas",
     "Form expired" : "Formulaire expiré",
     "This form has expired and is no longer taking responses" : "Ce formulaire a expiré et n'accepte plus de réponses",
-    "Error while saving configuration" : "Erreur lors de l'enregistrement de la configuration",
     "Error while reloading config" : "Erreur lors du rechargement de la configuration",
+    "Error while saving configuration" : "Erreur lors de l'enregistrement de la configuration",
     "Form creation" : "Création de formulaire",
     "Restrict form creation to selected groups" : "Restreindre la création de formulaires aux groupes sélectionnés",
     "Select groups" : "Sélectionnez les groupes",
@@ -90,8 +90,8 @@ OC.L10N.register(
     "Copy form" : "Copier le formulaire",
     "Unarchive form" : "Désarchiver le formulaire",
     "Archive form" : "Archiver le formulaire",
-    "Add options" : "Ajouter des options",
     "Options should be separated by new line!" : "Les options doivent être séparées par un saut de ligne !",
+    "Add options" : "Ajouter des options",
     "Add multiple options" : "Ajouter plusieurs options",
     "Add multiple options (one per line)" : "Ajouter plusieurs options (une par ligne)",
     "Options" : "Choix",
@@ -286,7 +286,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Le formulaire '{title}' est verrouillé par {lockedBy} et ne peut pas être modifié. Le verrouillage expire dans : {lockedUntil}",
     "Form title" : "Titre du formulaire",
     "Description" : "Description",
-    "Insert question" : "Insérer une question",
     "Insert question after question {index}" : "Insérer une question après la question {index}",
     "Add a question" : "Ajouter une question",
     "Summary" : "Résumé",
@@ -419,6 +418,7 @@ OC.L10N.register(
     "People can enter a number" : "Les utilisateurs peuvent saisir un nombre",
     "Enter a number" : "Saisir un nombre",
     "Custom regular expression" : "Expression régulière personnalisée",
-    "The input does not match the required pattern" : "La saisie ne correspond pas au motif exigé"
+    "The input does not match the required pattern" : "La saisie ne correspond pas au motif exigé",
+    "Insert question" : "Insérer une question"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

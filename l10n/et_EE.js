@@ -58,8 +58,8 @@ OC.L10N.register(
     "This form does not exist" : "Seda vormi pole olemas",
     "Form expired" : "Vorm on aegunud",
     "This form has expired and is no longer taking responses" : "See vorm on aegunud ja siia ei saa enam vastuseid lisada",
-    "Error while saving configuration" : "Viga seadistuste salvestamisel",
     "Error while reloading config" : "Viga seadistuste laadimisel",
+    "Error while saving configuration" : "Viga seadistuste salvestamisel",
     "Form creation" : "Vormide loomine",
     "Restrict form creation to selected groups" : "Piira vormide loomist vaid valitud gruppidega",
     "Select groups" : "Vali grupid",
@@ -91,8 +91,8 @@ OC.L10N.register(
     "Copy form" : "Kopeeri vorm",
     "Unarchive form" : "Eemalda vorm arhiivist",
     "Archive form" : "Arhiveeri vorm",
-    "Add options" : "Lisa valikuid",
     "Options should be separated by new line!" : "Valikute eraldajaks peaks olema reavahetus!",
+    "Add options" : "Lisa valikuid",
     "Add multiple options" : "Lisa mitu valikut",
     "Add multiple options (one per line)" : "Lisa mitu valikut (eraldi ridadel)",
     "Options" : "Valikud",
@@ -287,7 +287,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "„{title}“ vormi lukustas {lockedBy} ja teda pole võimalik muuta. Lukustus aegub {lockedUntil}",
     "Form title" : "Vormi pealkiri",
     "Description" : "Kirjeldus",
-    "Insert question" : "Lisa küsimus",
     "Insert question after question {index}" : "Lisa küsimus {index}. küsimuse järgi",
     "Add a question" : "Lisa küsimus",
     "Summary" : "Kokkuvõte",
@@ -420,6 +419,7 @@ OC.L10N.register(
     "People can enter a number" : "Vastajad saavad sisestada numbri",
     "Enter a number" : "Sisesta number",
     "Custom regular expression" : "Sinu loodud regulaaravaldis",
-    "The input does not match the required pattern" : "Sisend ei vasta etteantud nõutavale mustrlile"
+    "The input does not match the required pattern" : "Sisend ei vasta etteantud nõutavale mustrlile",
+    "Insert question" : "Lisa küsimus"
 },
 "nplurals=2; plural=(n != 1);");

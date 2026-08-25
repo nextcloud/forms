@@ -53,8 +53,8 @@ OC.L10N.register(
     "This form does not exist" : "This form does not exist",
     "Form expired" : "Form expired",
     "This form has expired and is no longer taking responses" : "This form has expired and is no longer taking responses",
-    "Error while saving configuration" : "Error while saving configuration",
     "Error while reloading config" : "Error while reloading config",
+    "Error while saving configuration" : "Error while saving configuration",
     "Form creation" : "Form creation",
     "Restrict form creation to selected groups" : "Restrict form creation to selected groups",
     "Select groups" : "Select groups",
@@ -86,8 +86,8 @@ OC.L10N.register(
     "Copy form" : "Copy form",
     "Unarchive form" : "Unarchive form",
     "Archive form" : "Archive form",
-    "Add options" : "Add options",
     "Options should be separated by new line!" : "Options should be separated by new line!",
+    "Add options" : "Add options",
     "Add multiple options" : "Add multiple options",
     "Add multiple options (one per line)" : "Add multiple options (one per line)",
     "Options" : "Options",
@@ -282,7 +282,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}",
     "Form title" : "Form title",
     "Description" : "Description",
-    "Insert question" : "Insert question",
     "Insert question after question {index}" : "Insert question after question {index}",
     "Add a question" : "Add a question",
     "Summary" : "Summary",
@@ -415,6 +414,7 @@ OC.L10N.register(
     "People can enter a number" : "People can enter a number",
     "Enter a number" : "Enter a number",
     "Custom regular expression" : "Custom regular expression",
-    "The input does not match the required pattern" : "The input does not match the required pattern"
+    "The input does not match the required pattern" : "The input does not match the required pattern",
+    "Insert question" : "Insert question"
 },
 "nplurals=2; plural=(n != 1);");

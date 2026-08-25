@@ -52,8 +52,8 @@ OC.L10N.register(
     "Create new form" : "Crie novo formulário",
     "This form does not exist" : "Este formulário não existe",
     "Form expired" : "Formulário expirou",
-    "Error while saving configuration" : "Erro ao salvar configuração",
     "Error while reloading config" : "Erro ao recarregar a configuração",
+    "Error while saving configuration" : "Erro ao salvar configuração",
     "Form creation" : "Criação de formulários",
     "Restrict form creation to selected groups" : "Restringir a criação de formulários aos grupos selecionados",
     "Select groups" : "Selecionar grupos",
@@ -83,8 +83,8 @@ OC.L10N.register(
     "Copy form" : "Copiar formulário",
     "Unarchive form" : "Desarquivar formulário",
     "Archive form" : "Arquivar formulário",
-    "Add options" : "Adicionar opções",
     "Options should be separated by new line!" : "As opções devem ser separadas por nova linha!",
+    "Add options" : "Adicionar opções",
     "Add multiple options" : "Adicionar várias opções",
     "Add multiple options (one per line)" : "Adicionar várias opções (uma por linha)",
     "Options" : "Opções",
@@ -259,7 +259,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Formulário '{title}' está trancado por {lockedBy} e não pode ser modificado. O trancamento termina em: {lockedUntil}",
     "Form title" : "Título do formulário",
     "Description" : "Descrição",
-    "Insert question" : "Inserir pergunta",
     "Insert question after question {index}" : "Insira uma pergunta após {index}",
     "Add a question" : "Acrescente uma pergunta",
     "Summary" : "Resumo",
@@ -387,6 +386,7 @@ OC.L10N.register(
     "People can enter a number" : "As pessoas podem inserir um número",
     "Enter a number" : "Insira um número",
     "Custom regular expression" : "Expressão regular personalizada",
-    "The input does not match the required pattern" : "A entrada não corresponde ao padrão exigido"
+    "The input does not match the required pattern" : "A entrada não corresponde ao padrão exigido",
+    "Insert question" : "Inserir pergunta"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

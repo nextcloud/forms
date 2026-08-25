@@ -52,8 +52,8 @@ OC.L10N.register(
     "This form does not exist" : "این فرم وجود ندارد",
     "Form expired" : "فرم منقضی شده است",
     "This form has expired and is no longer taking responses" : "این فرم منقضی شده است و دیگر پاسخ‌ها را دریافت نمی‌کند",
-    "Error while saving configuration" : "خطا در ذخیره تنظیمات",
     "Error while reloading config" : "خطا در بارگذاری مجدد تنظیمات",
+    "Error while saving configuration" : "خطا در ذخیره تنظیمات",
     "Form creation" : "ایجاد فرم",
     "Restrict form creation to selected groups" : "محدود کردن ایجاد فرم به گروه‌های انتخاب‌شده",
     "Select groups" : "انتخاب گروه‌ها",
@@ -84,8 +84,8 @@ OC.L10N.register(
     "Copy form" : "کپی فرم",
     "Unarchive form" : "خارج کردن فرم از بایگانی",
     "Archive form" : "بایگانی فرم",
-    "Add options" : "افزودن گزینه‌ها",
     "Options should be separated by new line!" : "گزینه‌ها باید با خط جدید جدا شوند!",
+    "Add options" : "افزودن گزینه‌ها",
     "Add multiple options" : "افزودن چند گزینه",
     "Add multiple options (one per line)" : "افزودن چند گزینه (یکی در هر خط)",
     "Options" : "گزینه‌ها",
@@ -276,7 +276,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "فرم '{title}' توسط {lockedBy} قفل شده و قابل تغییر نیست. قفل تا {lockedUntil} منقضی می‌شود",
     "Form title" : "عنوان فرم",
     "Description" : "توضیحات",
-    "Insert question" : "درج سوال",
     "Insert question after question {index}" : "درج سوال بعد از سوال {index}",
     "Add a question" : "افزودن سوال",
     "Summary" : "خلاصه",
@@ -409,6 +408,7 @@ OC.L10N.register(
     "People can enter a number" : "کاربران می‌توانند یک عدد وارد کنند",
     "Enter a number" : "یک عدد وارد کنید",
     "Custom regular expression" : "عبارت منظم سفارشی",
-    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد"
+    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد",
+    "Insert question" : "درج سوال"
 },
 "nplurals=2; plural=(n > 1);");

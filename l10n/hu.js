@@ -53,8 +53,8 @@ OC.L10N.register(
     "This form does not exist" : "Ez az űrlap nem létezik",
     "Form expired" : "Az űrlap lejárt",
     "This form has expired and is no longer taking responses" : "Ez az űrlap lejárt, és többé nem lehet beküldeni",
-    "Error while saving configuration" : "Hiba a konfiguráció mentése során",
     "Error while reloading config" : "Hiba a konfiguráció újratöltése során",
+    "Error while saving configuration" : "Hiba a konfiguráció mentése során",
     "Form creation" : "Űrlap létrehozása",
     "Restrict form creation to selected groups" : "Az űrlaplétrehozás bizonyos csoportokra korlátozása",
     "Select groups" : "Csoportok kiválasztása",
@@ -85,8 +85,8 @@ OC.L10N.register(
     "Copy form" : "Űrlap másolása",
     "Unarchive form" : "Űrlap archiválásának visszavonása",
     "Archive form" : "Űrlap archiválása",
-    "Add options" : "Lehetőségek hozzáadása",
     "Options should be separated by new line!" : "A lehetőségeket sortöréssel kell elválasztani!",
+    "Add options" : "Lehetőségek hozzáadása",
     "Add multiple options" : "Több lehetőség hozzáadása",
     "Add multiple options (one per line)" : "Több lehetőség hozzáadása (soronként egy)",
     "Options" : "Beállítások",
@@ -274,7 +274,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "A(z) „{title}” űrlapot {lockedBy} zárolta, és ezért nem módosítható. A zárolás ekkor jár le: {lockedUntil}",
     "Form title" : "Űrlap címe",
     "Description" : "Leírás",
-    "Insert question" : "Kérdés beszúrása",
     "Insert question after question {index}" : "Kérdés beszúrása a(z) {index}. kérdés után ",
     "Add a question" : "Kérdés hozzáadása",
     "Summary" : "Összefoglalás",
@@ -407,6 +406,7 @@ OC.L10N.register(
     "People can enter a number" : "Szám írható be",
     "Enter a number" : "Adjon meg egy számot",
     "Custom regular expression" : "Egyéni reguláris kifejezés",
-    "The input does not match the required pattern" : "A bemenet nem felel meg a kért mintának"
+    "The input does not match the required pattern" : "A bemenet nem felel meg a kért mintának",
+    "Insert question" : "Kérdés beszúrása"
 },
 "nplurals=2; plural=(n != 1);");

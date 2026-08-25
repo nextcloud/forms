@@ -59,8 +59,8 @@ OC.L10N.register(
     "This form does not exist" : "Šios anketos nėra",
     "Form expired" : "Anketa nebegalioja",
     "This form has expired and is no longer taking responses" : "Šios anketos galiojimo laikas pasibaigė ir atsakymų nebepriimama.",
-    "Error while saving configuration" : "Klaida įrašant konfigūraciją",
     "Error while reloading config" : "Klaida iš naujo įkeliant konfigūraciją",
+    "Error while saving configuration" : "Klaida įrašant konfigūraciją",
     "Form creation" : "Anketos kūrimas",
     "Restrict form creation to selected groups" : "Apriboti anketų kūrimą pasirinktoms grupėms",
     "Select groups" : "Pasirinkti grupes",
@@ -92,8 +92,8 @@ OC.L10N.register(
     "Copy form" : "Kopijuoti anketą",
     "Unarchive form" : "Išarchyvuoti anketą",
     "Archive form" : "Archyvuoti anketą",
-    "Add options" : "Pridėti parinktis",
     "Options should be separated by new line!" : "Parinktys turi būti atskirtos naujomis eilutėmis!",
+    "Add options" : "Pridėti parinktis",
     "Add multiple options" : "Pridėkite kelias parinktis",
     "Add multiple options (one per line)" : "Pridėti kelias parinktis (po vieną eilutėje)",
     "Options" : "Parinktys",
@@ -288,7 +288,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Anketą „{title}“ užrakino {lockedBy} ir ji negali būti modifikuota. Užrakinimas nustoja galioti: {lockedUntil}",
     "Form title" : "Anketos pavadinimas",
     "Description" : "Aprašas",
-    "Insert question" : "Įterpti klausimą",
     "Insert question after question {index}" : "Įterpti klausimą po klausimo {index}",
     "Add a question" : "Pridėti klausimą",
     "Summary" : "Santrauka",
@@ -421,6 +420,7 @@ OC.L10N.register(
     "People can enter a number" : "Žmonės gali įvesti skaičių",
     "Enter a number" : "Įvesti skaičių",
     "Custom regular expression" : "Pasirinktinė reguliarioji išraiška",
-    "The input does not match the required pattern" : "Įvestis neatitinka reikiamo šablono"
+    "The input does not match the required pattern" : "Įvestis neatitinka reikiamo šablono",
+    "Insert question" : "Įterpti klausimą"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");
