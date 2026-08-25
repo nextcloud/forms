@@ -53,8 +53,8 @@ OC.L10N.register(
     "This form does not exist" : "Detta formulär finns inte",
     "Form expired" : "Formuläret har gått ut",
     "This form has expired and is no longer taking responses" : "Formuläret har löpt ut och tar inte längre emot svar",
-    "Error while saving configuration" : "Fel när konfigurationen sparades",
     "Error while reloading config" : "Fel när konfigurationen lästes in på nytt",
+    "Error while saving configuration" : "Fel när konfigurationen sparades",
     "Form creation" : "Formulärskapande",
     "Restrict form creation to selected groups" : "Begränsa skapande av formulär till valda grupper",
     "Select groups" : "Välj grupper",
@@ -86,8 +86,8 @@ OC.L10N.register(
     "Copy form" : "Kopiera formulär",
     "Unarchive form" : "Ta bort formuläret från arkivet",
     "Archive form" : "Arkivera formulär",
-    "Add options" : "Lägg till alternativ",
     "Options should be separated by new line!" : "Alternativen måste stå på varsin rad!",
+    "Add options" : "Lägg till alternativ",
     "Add multiple options" : "Lägg till flera alternativ",
     "Add multiple options (one per line)" : "Lägg till flera alternativ (ett per rad)",
     "Options" : "Alternativ",
@@ -282,7 +282,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Formuläret ”{title}” är låst av {lockedBy} och kan inte ändras. Låset upphör: {lockedUntil}",
     "Form title" : "Formulärrubrik",
     "Description" : "Beskrivning",
-    "Insert question" : "Infoga fråga",
     "Insert question after question {index}" : "Infoga fråga efter fråga {index}",
     "Add a question" : "Lägg till en fråga",
     "Summary" : "Sammanfattning",
@@ -415,6 +414,7 @@ OC.L10N.register(
     "People can enter a number" : "Användare kan ange ett nummer",
     "Enter a number" : "Fyll i ett tal",
     "Custom regular expression" : "Anpassat reguljärt uttryck",
-    "The input does not match the required pattern" : "Inmatningen matchar inte det obligatoriska mönstret"
+    "The input does not match the required pattern" : "Inmatningen matchar inte det obligatoriska mönstret",
+    "Insert question" : "Infoga fråga"
 },
 "nplurals=2; plural=(n != 1);");

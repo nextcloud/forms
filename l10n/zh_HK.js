@@ -52,8 +52,8 @@ OC.L10N.register(
     "This form does not exist" : "此表格不存在",
     "Form expired" : "表格已過期",
     "This form has expired and is no longer taking responses" : "此表單已過期，不再接受回應",
-    "Error while saving configuration" : "儲存配置時發生錯誤",
     "Error while reloading config" : "重新加載配置時出錯",
+    "Error while saving configuration" : "儲存配置時發生錯誤",
     "Form creation" : "表格建立",
     "Restrict form creation to selected groups" : "將表格創建限制為選定的群組",
     "Select groups" : "選擇群組",
@@ -85,8 +85,8 @@ OC.L10N.register(
     "Copy form" : "複製表格",
     "Unarchive form" : "解除封存表格",
     "Archive form" : "封存表格",
-    "Add options" : "添加選項",
     "Options should be separated by new line!" : "選項應該用新行分隔！",
+    "Add options" : "添加選項",
     "Add multiple options" : "添加多個選項",
     "Add multiple options (one per line)" : "添加多個選項（每行一個）",
     "Options" : "設定",
@@ -281,7 +281,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "表格「{title}」已被 {lockedBy} 上鎖，無法修改。上鎖將於 {lockedUntil} 到期。",
     "Form title" : "表格標題",
     "Description" : "描述",
-    "Insert question" : "插入問題",
     "Insert question after question {index}" : "在問題 {index} 後插入問題",
     "Add a question" : "新增問題",
     "Summary" : "摘要",
@@ -414,6 +413,7 @@ OC.L10N.register(
     "People can enter a number" : "人們可以輸入數字",
     "Enter a number" : "輸入數字",
     "Custom regular expression" : "自訂正規表示式",
-    "The input does not match the required pattern" : "輸入與所需的模式不相符"
+    "The input does not match the required pattern" : "輸入與所需的模式不相符",
+    "Insert question" : "插入問題"
 },
 "nplurals=1; plural=0;");

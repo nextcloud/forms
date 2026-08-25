@@ -49,8 +49,8 @@
     "This form does not exist" : "Aquest formulari no existeix",
     "Form expired" : "S'ha tancat el formulari",
     "This form has expired and is no longer taking responses" : "Aquest formulari ha caducat i ja no admet respostes",
-    "Error while saving configuration" : "S'ha produït un error en desar la configuració",
     "Error while reloading config" : "Error en tornar a carregar la configuració",
+    "Error while saving configuration" : "S'ha produït un error en desar la configuració",
     "Form creation" : "Creació de formulari",
     "Restrict form creation to selected groups" : "Restringeix la creació de formularis als grups seleccionats",
     "Select groups" : "Selecciona els grups",
@@ -82,8 +82,8 @@
     "Copy form" : "Copia el formulari",
     "Unarchive form" : "Desarxiva el formulari",
     "Archive form" : "Arxiva el formulari",
-    "Add options" : "Afegeix opcions",
     "Options should be separated by new line!" : "Les opcions s'han de separar per una línia nova!",
+    "Add options" : "Afegeix opcions",
     "Add multiple options" : "Afegeix múltiples opcions",
     "Add multiple options (one per line)" : "Afegeix múltiples opcions (una per línia)",
     "Options" : "Opcions",
@@ -277,7 +277,6 @@
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "El formulari '{title}' està bloquejat per {lockedBy} i no es pot modificar. El bloqueig caduca: {lockedUntil}",
     "Form title" : "Títol del formulari",
     "Description" : "Descripció",
-    "Insert question" : "Insereix una pregunta",
     "Insert question after question {index}" : "Insereix una pregunta després de la pregunta {index}",
     "Add a question" : "Afegeix una pregunta",
     "Summary" : "Resum",
@@ -410,6 +409,7 @@
     "People can enter a number" : "Els usuaris podenintroduir un número",
     "Enter a number" : "Introduïu un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "L'entrada no coincideix amb el patró requerit"
+    "The input does not match the required pattern" : "L'entrada no coincideix amb el patró requerit",
+    "Insert question" : "Insereix una pregunta"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

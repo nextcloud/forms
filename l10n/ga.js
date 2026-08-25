@@ -58,8 +58,8 @@ OC.L10N.register(
     "This form does not exist" : "Níl an fhoirm seo ann",
     "Form expired" : "Chuaigh an fhoirm in éag",
     "This form has expired and is no longer taking responses" : "Tá an fhoirm seo imithe in éag agus nílimid ag glacadh le freagraí a thuilleadh",
-    "Error while saving configuration" : "Earráid agus cumraíocht á sábháil",
     "Error while reloading config" : "Earráid agus an chumraíocht á athlódáil",
+    "Error while saving configuration" : "Earráid agus cumraíocht á sábháil",
     "Form creation" : "Cruthú foirme",
     "Restrict form creation to selected groups" : "Srian a chur le cruthú foirmeacha do ghrúpaí roghnaithe",
     "Select groups" : "Roghnaigh grúpaí",
@@ -91,8 +91,8 @@ OC.L10N.register(
     "Copy form" : "Cóipeáil an fhoirm",
     "Unarchive form" : "Foirm unarchive",
     "Archive form" : "Foirm chartlainne",
-    "Add options" : "Cuir roghanna leis",
     "Options should be separated by new line!" : "Ba chóir roghanna a dheighilt le líne nua!",
+    "Add options" : "Cuir roghanna leis",
     "Add multiple options" : "Cuir roghanna iolracha leis",
     "Add multiple options (one per line)" : "Cuir roghanna iolracha leis (ceann in aghaidh an líne)",
     "Options" : "Roghanna",
@@ -287,7 +287,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Tá foirm '{title}' faoi ghlas ag {lockedBy} agus ní féidir í a mhodhnú. Rachaidh an glas in éag: {lockedUntil}",
     "Form title" : "Teideal na foirme",
     "Description" : "Cur síos",
-    "Insert question" : "Cuir ceist isteach",
     "Insert question after question {index}" : "Cuir ceist isteach i ndiaidh ceiste {index}",
     "Add a question" : "Cuir ceist leis",
     "Summary" : "Achoimre",
@@ -420,6 +419,7 @@ OC.L10N.register(
     "People can enter a number" : "Is féidir le daoine uimhir a chur isteach",
     "Enter a number" : "Cuir isteach uimhir",
     "Custom regular expression" : "Sloinneadh rialta saincheaptha",
-    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach"
+    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach",
+    "Insert question" : "Cuir ceist isteach"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

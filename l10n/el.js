@@ -53,8 +53,8 @@ OC.L10N.register(
     "This form does not exist" : "Η φόρμα δεν υπάρχει",
     "Form expired" : "Η φόρμα έληξε",
     "This form has expired and is no longer taking responses" : "Αυτή η φόρμα έχει λήξει και δεν δέχεται πλέον απαντήσεις",
-    "Error while saving configuration" : "Σφάλμα κατά την αποθήκευση της διαμόρφωσης",
     "Error while reloading config" : "Σφάλμα κατά την επαναφόρτωση της διαμόρφωσης",
+    "Error while saving configuration" : "Σφάλμα κατά την αποθήκευση της διαμόρφωσης",
     "Form creation" : "Δημιουργία φόρμας",
     "Restrict form creation to selected groups" : "Περιορίστε τη δημιουργία φορμών σε επιλεγμένες ομάδες",
     "Select groups" : "Επιλέξτε ομάδες",
@@ -86,8 +86,8 @@ OC.L10N.register(
     "Copy form" : "Αντιγραφή φόρμας",
     "Unarchive form" : "Αποαρχειοθέτηση φόρμας",
     "Archive form" : "Αρχειοθέτηση φόρμας",
-    "Add options" : "Προσθήκη επιλογών",
     "Options should be separated by new line!" : "Οι επιλογές πρέπει να διαχωρίζονται με νέα γραμμή!",
+    "Add options" : "Προσθήκη επιλογών",
     "Add multiple options" : "Προσθήκη πολλαπλών επιλογών",
     "Add multiple options (one per line)" : "Προσθήκη πολλαπλών επιλογών (μία ανά γραμμή)",
     "Options" : "Επιλογές",
@@ -282,7 +282,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "Η φόρμα '{title}' είναι κλειδωμένη από {lockedBy} και δεν μπορεί να τροποποιηθεί. Το κλείδωμα λήγει: {lockedUntil}",
     "Form title" : "Τίτλος φόρμας",
     "Description" : "Περιγραφή",
-    "Insert question" : "Εισαγωγή ερώτησης",
     "Insert question after question {index}" : "Εισαγωγή ερώτησης μετά την ερώτηση {index}",
     "Add a question" : "Προσθήκη ερώτησης",
     "Summary" : "Σύνοψη",
@@ -415,6 +414,7 @@ OC.L10N.register(
     "People can enter a number" : "Οι χρήστες μπορούν να εισαγάγουν έναν αριθμό",
     "Enter a number" : "Πληκτρολογήστε έναν αριθμό",
     "Custom regular expression" : "Προσαρμοσμένη κανονική έκφραση",
-    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με το απαιτούμενο μοτίβο"
+    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με το απαιτούμενο μοτίβο",
+    "Insert question" : "Εισαγωγή ερώτησης"
 },
 "nplurals=2; plural=(n != 1);");

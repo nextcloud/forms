@@ -59,8 +59,8 @@ OC.L10N.register(
     "This form does not exist" : "Bu form bulunamadı",
     "Form expired" : "Formun geçerlilik süresi dolmuş",
     "This form has expired and is no longer taking responses" : "Bu formun geçerlilik süresi dolmuş olduğundan artık yanıtları kabul etmiyor",
-    "Error while saving configuration" : "Yapılandırma kaydedilirken sorun çıktı",
     "Error while reloading config" : "Yapılandırma yeniden yüklenirken sorun çıktı",
+    "Error while saving configuration" : "Yapılandırma kaydedilirken sorun çıktı",
     "Form creation" : "Form oluşturma",
     "Restrict form creation to selected groups" : "Form oluşturma seçilmiş gruplarla kısıtlansın",
     "Select groups" : "Grupları seçin",
@@ -92,8 +92,8 @@ OC.L10N.register(
     "Copy form" : "Formu kopyala",
     "Unarchive form" : "Formu arşivden çıkar",
     "Archive form" : "Formu arşivle",
-    "Add options" : "Seçenek ekle",
     "Options should be separated by new line!" : "Her seçenek ayrı bir satıra yazılmalıdır!",
+    "Add options" : "Seçenek ekle",
     "Add multiple options" : "Birkaç seçenek ekle",
     "Add multiple options (one per line)" : "Birkaç seçenek ekleyin (her seçeneği ayrı satıra yazın)",
     "Options" : "Seçenekler",
@@ -288,7 +288,6 @@ OC.L10N.register(
     "Form '{title}' is locked by {lockedBy} and cannot be modified. The lock expires: {lockedUntil}" : "'{title}' formu {lockedBy} tarafından kilitlenmiş olduğundan düzenlenemez. Kilidin açılacağı zaman: {lockedUntil}",
     "Form title" : "Form başlığı",
     "Description" : "Açıklama",
-    "Insert question" : "Soru ekle",
     "Insert question after question {index}" : "{index}. sorudan sonra soru ekle",
     "Add a question" : "Bir soru ekle",
     "Summary" : "Özet",
@@ -421,6 +420,7 @@ OC.L10N.register(
     "People can enter a number" : "İnsanlar bir sayı yazabilir",
     "Enter a number" : "Bir sayı yazın",
     "Custom regular expression" : "Özel kurallı ifade",
-    "The input does not match the required pattern" : "Yazdığınız bilgi istenilen biçimde değil"
+    "The input does not match the required pattern" : "Yazdığınız bilgi istenilen biçimde değil",
+    "Insert question" : "Soru ekle"
 },
 "nplurals=2; plural=(n > 1);");
