@@ -38,6 +38,14 @@
 - docs: Add webhook support section to README by @Chartman123 in [\#3434](https://github.com/nextcloud/forms/pull/3434)
 - chore: begin migration to TypeScript by @Chartman123 in [\#3327](https://github.com/nextcloud/forms/pull/3327)
 
+## v5.3.6 - 2026-08-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.5...v5.3.6)
+
+### Merged
+
+- fix(migration): make option_type migration self-sufficient by @AndyScherzinger in [\#3603](https://github.com/nextcloud/forms/pull/3603)
+
 ## v5.3.5 - 2026-07-21
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.4...v5.3.5)
