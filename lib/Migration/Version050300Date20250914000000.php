@@ -34,9 +34,10 @@ class Version050300Date20250914000000 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 		$table = $schema->getTable('forms_v2_options');
 
-		if (!$table->hascolumn('option_type')) {
+		if (!$table->hasColumn('option_type')) {
 			$table->addColumn('option_type', Types::STRING, [
 				'notnull' => false,
+				'length' => 255,
 				'default' => null,
 			]);
 		}
@@ -50,6 +51,12 @@ class Version050300Date20250914000000 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		/** @var ISchemaWrapper $schema */
+		$schema = $schemaClosure();
+		if (!$schema->getTable('forms_v2_options')->hasColumn('option_type')) {
+			return;
+		}
+
 		$qbUpdate = $this->db->getQueryBuilder();
 
 		$qbUpdate->update('forms_v2_options')
