@@ -11,6 +11,7 @@ namespace OCA\Forms\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\Types;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -20,6 +21,11 @@ use OCP\Migration\SimpleMigrationStep;
  * rows that were stored without a type. Options created through the API
  * without an explicit optionType previously kept a null type, which the
  * frontend does not render.
+ *
+ * The column is normally created by Version050300Date20250914000000. That
+ * migration being recorded in oc_migrations is not a guarantee that its DDL
+ * was applied, so this step recreates the column when it is missing instead
+ * of failing the whole upgrade.
  */
 class Version050300Date20260716000000 extends SimpleMigrationStep {
 
@@ -38,17 +44,25 @@ class Version050300Date20260716000000 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 		$table = $schema->getTable('forms_v2_options');
-		$changed = false;
 
-		if ($table->hasColumn('option_type')) {
-			$column = $table->getColumn('option_type');
-			if ($column->getDefault() === null) {
-				$column->setDefault('choice');
-				$changed = true;
-			}
+		if (!$table->hasColumn('option_type')) {
+			$table->addColumn('option_type', Types::STRING, [
+				'notnull' => false,
+				'length' => 255,
+				'default' => 'choice',
+			]);
+
+			return $schema;
 		}
 
-		return $changed ? $schema : null;
+		$column = $table->getColumn('option_type');
+		if ($column->getDefault() === null) {
+			$column->setDefault('choice');
+
+			return $schema;
+		}
+
+		return null;
 	}
 
 	/**
@@ -57,6 +71,12 @@ class Version050300Date20260716000000 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		/** @var ISchemaWrapper $schema */
+		$schema = $schemaClosure();
+		if (!$schema->getTable('forms_v2_options')->hasColumn('option_type')) {
+			return;
+		}
+
 		$qbUpdate = $this->db->getQueryBuilder();
 
 		$qbUpdate->update('forms_v2_options')
