@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.4.0-alpha.1 - 2026-08-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0-alpha.0...v5.4.0-alpha.1)
+
+### Merged
+
+- enh: make insert question menu wide by @Chartman123 in [\#3600](https://github.com/nextcloud/forms/pull/3600)
+- chore: continue migration to Composition API (Part II) by @Chartman123 in [\#3590](https://github.com/nextcloud/forms/pull/3590)
+
 ## v5.4.0-alpha.0 - 2026-08-23
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0...v5.4.0-alpha.0)
