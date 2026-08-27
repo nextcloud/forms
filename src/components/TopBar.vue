@@ -38,7 +38,8 @@ import IconShareVariant from '@material-symbols/svg-400/outlined/share.svg?raw'
 import IconVisibility from '@material-symbols/svg-400/outlined/visibility.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import PillMenu from './PillMenu.vue'
@@ -113,101 +114,104 @@ export default defineComponent({
 
 	emits: ['shareForm'],
 
-	setup() {
-		return {
-			t,
+	setup(props, { emit }) {
+		const route = useRoute()
+		const router = useRouter()
+		const isMobile = useIsMobile()
 
-			isMobile: useIsMobile(),
-			IconShareVariant,
-		}
-	},
+		const canSubmit = computed(() =>
+			props.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT),
+		)
 
-	computed: {
-		currentView(): TopBarViewOption | undefined {
-			const routeName = this.$route.name
-			return this.availableViews.find(
+		const canEdit = computed(
+			() =>
+				props.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
+				&& !props.archived,
+		)
+
+		const canSeeResults = computed(
+			() =>
+				props.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS)
+				|| props.submissionCount > 0,
+		)
+
+		// This probably can get a permission of itself
+		const canShare = computed(() => canEdit.value)
+
+		const canOnlySubmit = computed(
+			() =>
+				props.permissions.length === 1
+				&& props.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT)
+				&& props.submissionCount === 0,
+		)
+
+		const availableViews = computed<TopBarViewOption[]>(() => {
+			const views: TopBarViewOption[] = []
+			if (canSubmit.value) {
+				views.push(submitView)
+			}
+			if (canEdit.value) {
+				views.push({
+					...editView,
+					disabled: props.locked,
+				})
+			}
+			if (canSeeResults.value) {
+				views.push(resultsView)
+			}
+			return views
+		})
+
+		const currentView = computed<TopBarViewOption | undefined>(() => {
+			const routeName = route.name
+			return availableViews.value.find(
 				(v) =>
 					routeName === v.id
 					|| (typeof routeName === 'string'
 						&& routeName.startsWith(v.id + '.')),
 			)
-		},
+		})
 
-		availableViews(): TopBarViewOption[] {
-			const views: TopBarViewOption[] = []
-			if (this.canSubmit) {
-				views.push(submitView)
-			}
-			if (this.canEdit) {
-				views.push({
-					...editView,
-					disabled: this.locked,
-				})
-			}
-			if (this.canSeeResults) {
-				views.push(resultsView)
-			}
-			return views
-		},
-
-		canSubmit(): boolean {
-			return this.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT)
-		},
-
-		canEdit(): boolean {
-			return (
-				this.permissions.includes(PERMISSION_TYPES.PERMISSION_EDIT)
-				&& !this.archived
-			)
-		},
-
-		canSeeResults(): boolean {
-			return (
-				this.permissions.includes(PERMISSION_TYPES.PERMISSION_RESULTS)
-				|| this.submissionCount > 0
-			)
-		},
-
-		canShare(): boolean {
-			// This probably can get a permission of itself
-			return this.canEdit
-		},
-
-		canOnlySubmit(): boolean {
-			return (
-				this.permissions.length === 1
-				&& this.permissions.includes(PERMISSION_TYPES.PERMISSION_SUBMIT)
-				&& this.submissionCount === 0
-			)
-		},
-	},
-
-	methods: {
 		/**
 		 * Router methods
 		 *
 		 * @param option The selected pill menu option
 		 */
-		async onChangeView(option: TopBarViewOption): Promise<void> {
-			if (this.$route.name === option.id) {
+		const onChangeView = async (option: TopBarViewOption): Promise<void> => {
+			if (route.name === option.id) {
 				return
 			}
 
 			try {
-				await this.$router.push({
+				const hash = Array.isArray(route.params.hash)
+					? route.params.hash[0]
+					: route.params.hash
+				await router.push({
 					name: option.id,
 					params: {
-						hash: this.$route.params.hash,
+						hash,
 					},
 				})
 			} catch (error) {
 				logger.debug('Navigation cancelled', { error })
 			}
-		},
+		}
 
-		onShareForm(): void {
-			this.$emit('shareForm')
-		},
+		const onShareForm = (): void => {
+			emit('shareForm')
+		}
+
+		return {
+			t,
+			isMobile,
+			IconShareVariant,
+			currentView,
+			availableViews,
+			canShare,
+			canOnlySubmit,
+			onChangeView,
+			onShareForm,
+		}
 	},
 })
 </script>

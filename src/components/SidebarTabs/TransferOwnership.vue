@@ -97,7 +97,7 @@ import { showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
@@ -136,79 +136,62 @@ export default defineComponent({
 		},
 	},
 
-	setup() {
-		return {
-			...useUserSearch(),
-			t,
-		}
-	},
+	setup(props) {
+		const userSearch = useUserSearch()
+		const { SHARE_TYPES } = userSearch
+		const selected = ref<SelectedUserLike | undefined>(undefined)
+		const showModal = ref(false)
+		const confirmationInput = ref('')
 
-	data() {
-		return {
-			selected: undefined as SelectedUserLike | undefined,
-			showModal: false as boolean,
-			confirmationInput: '' as string,
-			loading: false as boolean,
-		}
-	},
-
-	computed: {
-		canTransfer(): boolean {
-			return (
-				this.confirmationInput === this.confirmationString && !!this.selected
-			)
-		},
-
-		confirmationString(): string {
-			return `${this.form.ownerId}/${this.form.title.replace(/\s/g, ' ').trim()}`
-		},
-
-		options(): unknown[] {
-			if (this.isValidQuery) {
-				// Suggestions without existing shares
-				return this.suggestions
+		const confirmationString = computed(
+			() =>
+				`${props.form.ownerId}/${props.form.title.replace(/\s/g, ' ').trim()}`,
+		)
+		const canTransfer = computed(
+			() =>
+				confirmationInput.value === confirmationString.value
+				&& !!selected.value,
+		)
+		const options = computed(() => {
+			if (userSearch.isValidQuery.value) {
+				return userSearch.suggestions.value
 			}
-			// Recommendations without existing shares
-			return this.recommendations
-		},
-	},
+			return userSearch.recommendations.value
+		})
 
-	methods: {
-		clearText(): void {
-			this.confirmationInput = ''
-		},
-
-		closeModal(): void {
-			this.showModal = false
-		},
-
-		escapedString(textToEscape: string): string {
-			return '' + textToEscape.replace('<', '&lt;').replace('>', '&gt;')
-		},
-
-		openModal(): void {
-			this.showModal = true
-		},
-
-		async onOwnershipTransfer(): Promise<void> {
-			this.showModal = false
-			if (this.form.id && this.selected?.shareWith) {
+		const clearText = (): void => {
+			confirmationInput.value = ''
+		}
+		const closeModal = (): void => {
+			showModal.value = false
+		}
+		const escapedString = (textToEscape: string): string =>
+			'' + textToEscape.replace('<', '&lt;').replace('>', '&gt;')
+		const openModal = (): void => {
+			showModal.value = true
+		}
+		const onSearch = (query: string): void => {
+			void userSearch.asyncSearch(query, [SHARE_TYPES.SHARE_TYPE_USER])
+		}
+		const onOwnershipTransfer = async (): Promise<void> => {
+			showModal.value = false
+			if (props.form.id && selected.value?.shareWith) {
 				try {
-					emit('forms:last-updated:set', this.form.id)
+					emit('forms:last-updated:set', props.form.id)
 					await axios.patch(
 						generateOcsUrl('apps/forms/api/v3/forms/{id}', {
-							id: this.form.id,
+							id: props.form.id,
 						}),
 						{
 							keyValuePairs: {
-								ownerId: this.selected?.shareWith,
+								ownerId: selected.value?.shareWith,
 							},
 						},
 					)
 					showSuccess(
-						`${t('forms', 'This form is now owned by')} ${this.selected?.displayName}`,
+						`${t('forms', 'This form is now owned by')} ${selected.value?.displayName}`,
 					)
-					emit('forms:ownership-transfered', this.form.id)
+					emit('forms:ownership-transfered', props.form.id)
 				} catch (error) {
 					logger.error('Error while transfering form ownership', {
 						error,
@@ -219,13 +202,31 @@ export default defineComponent({
 				}
 			} else {
 				logger.error('Null parameters while transfering form ownership', {
-					selectedUser: this.selected,
+					selectedUser: selected.value,
 				})
 				showError(
 					t('forms', 'An error occurred while transfering ownership'),
 				)
 			}
-		},
+		}
+
+		return {
+			...userSearch,
+			SHARE_TYPES,
+			selected,
+			showModal,
+			confirmationInput,
+			canTransfer,
+			confirmationString,
+			options,
+			clearText,
+			closeModal,
+			escapedString,
+			openModal,
+			onSearch,
+			onOwnershipTransfer,
+			t,
+		}
 	},
 })
 </script>
