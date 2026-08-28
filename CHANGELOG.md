@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.4.0-rc.0 - 2026-08-28
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0-alpha.2...v5.4.0-rc.0)
+
+### Merged
+
+- chore: finish migration to Composition API (Part IV) by @Chartman123 in [\#3596](https://github.com/nextcloud/forms/pull/3596)
+- chore: cleanup code after Typescript/Composition API migrations by @Chartman123 in [\#3601](https://github.com/nextcloud/forms/pull/3601)
+
 ## v5.4.0-alpha.2 - 2026-08-27
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0-alpha.1...v5.4.0-alpha.2)
