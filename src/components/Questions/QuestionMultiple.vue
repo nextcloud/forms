@@ -186,7 +186,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption } from '../../models/Entities.d.ts'
+import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
@@ -273,7 +273,7 @@ export default defineComponent({
 		const isDragging = ref(false)
 		const isOptionDialogShown = ref(false)
 
-		const isUnique = computed(() => props.answerType.unique === true)
+		const isUnique = computed(() => props.answerType?.unique === true)
 		const values = computed(() => props.values as string[])
 		const extraSettings = computed<QuestionMultipleExtraSettings>(() => {
 			return (
@@ -285,7 +285,7 @@ export default defineComponent({
 		const shiftDragHandle = computed(() => {
 			return (
 				!props.readOnly
-				&& props.options.length !== 0
+				&& props.options?.length !== 0
 				&& !questionMultiple.isLastEmpty.value
 			)
 		})
@@ -296,9 +296,9 @@ export default defineComponent({
 
 		const placeholderOtherAnswer = computed(() => {
 			if (props.readOnly) {
-				return props.answerType.submitPlaceholder
+				return props.answerType?.submitPlaceholder
 			}
-			return props.answerType.createPlaceholder
+			return props.answerType?.createPlaceholder
 		})
 
 		const questionValues = computed<string | string[] | undefined>(() => {

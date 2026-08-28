@@ -2,8 +2,6 @@
  * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { ComputedRef, Ref } from 'vue'
 
 import { getCurrentUser } from '@nextcloud/auth'
@@ -24,11 +22,11 @@ export interface Sharee {
 		shareType: number
 		shareWith: string
 	}
-	status?: unknown
+	status?: string | number | boolean | null
 }
 
 export interface SearchResultsResponse {
-	exact: Sharee[]
+	exact?: Sharee[]
 	users?: Sharee[]
 	groups?: Sharee[]
 	[key: string]: Sharee[] | undefined
@@ -67,16 +65,21 @@ export function useUserSearch(): UseUserSearchResult {
 	const loading = ref(false)
 	const query = ref('')
 	const maxAutocompleteResults =
-		parseInt((window as any).OC.config['sharing.maxAutocompleteResults'], 10)
-		|| 200
+		parseInt(
+			String(window.OC?.config?.['sharing.maxAutocompleteResults'] ?? ''),
+			10,
+		) || 200
 	const minSearchStringLength =
-		parseInt((window as any).OC.config['sharing.minSearchStringLength'], 10) || 0
+		parseInt(
+			String(window.OC?.config?.['sharing.minSearchStringLength'] ?? ''),
+			10,
+		) || 0
 	const recommendations = ref<FormattedSharee[]>([])
 	const suggestions = ref<FormattedSharee[]>([])
 
-	const isValidQuery = computed(() => {
+	const isValidQuery = computed<boolean>(() => {
 		return (
-			query.value
+			Boolean(query.value)
 			&& query.value.trim() !== ''
 			&& query.value.length > minSearchStringLength
 		)
@@ -125,11 +128,12 @@ export function useUserSearch(): UseUserSearchResult {
 	}
 
 	const formatSearchResults = (
-		results: Record<string, Sharee[]> | Sharee[],
+		results:
+			SearchResultsResponse | Record<string, Sharee[] | undefined> | Sharee[],
 	): FormattedSharee[] => {
-		const flatResults = Array.isArray(results)
+		const flatResults: Sharee[] = Array.isArray(results)
 			? results
-			: Object.values(results).flat()
+			: (Object.values(results).filter(Boolean) as Sharee[][]).flat()
 
 		return filterUnwantedShares(flatResults)
 			.map((share) => formatForMultiselect(share))
@@ -161,7 +165,7 @@ export function useUserSearch(): UseUserSearchResult {
 			)
 
 			const data = OcsResponse2Data<SearchResultsResponse>(request)
-			const exact = data.exact
+			const exact = data.exact ?? []
 			delete data.exact
 
 			const exactSuggestions = formatSearchResults(exact)
@@ -208,7 +212,7 @@ export function useUserSearch(): UseUserSearchResult {
 			)
 
 			recommendations.value = formatSearchResults(
-				OcsResponse2Data<SearchResultsResponse>(request).exact,
+				OcsResponse2Data<SearchResultsResponse>(request).exact ?? [],
 			)
 		} catch (error) {
 			logger.error('Fetching recommendations failed.', { error })

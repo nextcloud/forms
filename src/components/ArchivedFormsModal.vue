@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
-import type { FormsForm } from '../models/Entities.d.ts'
+import type { FormsForm } from '../types/Entities.d.ts'
 
 import { t } from '@nextcloud/l10n'
 import { defineComponent, ref, watch } from 'vue'

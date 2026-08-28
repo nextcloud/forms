@@ -64,7 +64,7 @@
 							</template>
 
 							<template v-if="gridCellType === 'number'">
-								{{ gridValue[row.id][column.id] }}
+								{{ getGridNumberValue(row.id, column.id) }}
 							</template>
 						</td>
 					</tr>
@@ -79,6 +79,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
+import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import { defineComponent } from 'vue'
@@ -128,13 +129,13 @@ export default defineComponent({
 		},
 
 		gridColumns: {
-			type: Array as PropType<Array<{ id: number; text: string }>>,
+			type: Array as PropType<FormsOption[]>,
 			required: false,
 			default: () => [],
 		},
 
 		gridRows: {
-			type: Array as PropType<Array<{ id: number; text: string }>>,
+			type: Array as PropType<FormsOption[]>,
 			required: false,
 			default: () => [],
 		},
@@ -155,9 +156,28 @@ export default defineComponent({
 		},
 	},
 
-	setup() {
+	setup(props) {
+		/**
+		 * Get value from grid matrix for number cell type
+		 *
+		 * @param rowId - The row identifier
+		 * @param columnId - The column identifier
+		 * @return The grid value at the specified row and column
+		 */
+		const getGridNumberValue = (
+			rowId: string | number,
+			columnId: string | number,
+		): string | number => {
+			const row = props.gridValue?.[rowId]
+			if (typeof row === 'object' && row !== null) {
+				return (row as Record<string | number, string | number>)[columnId]
+			}
+			return row ?? ''
+		}
+
 		return {
 			IconFile,
+			getGridNumberValue,
 		}
 	},
 })

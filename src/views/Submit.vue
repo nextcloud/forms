@@ -142,7 +142,7 @@
 						@keydown.enter="onKeydownEnter"
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
 						@update:values="
-							(values: unknown[]) => onUpdate(question, values)
+							(values: AnswerValue) => onUpdate(question, values)
 						" />
 				</ul>
 				<div class="form-buttons">
@@ -219,7 +219,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsQuestion } from '../models/Entities.d.ts'
+import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -272,14 +272,8 @@ interface StoredAnswersMap {
 	[key: string]: StoredAnswerState
 }
 
-interface QuestionOption {
-	id: number
-	text: string
-	optionType?: string
-}
-
 interface SubmitQuestion extends FormsQuestion {
-	options?: QuestionOption[]
+	options?: FormsOption[]
 	extraSettings?: Record<string, unknown> & {
 		allowOtherAnswer?: boolean
 	}
@@ -394,7 +388,7 @@ export default defineComponent({
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
 		const validQuestions = computed<SubmitQuestion[]>(() => {
-			return props.form.questions.filter((question) => {
+			return props.form.questions.filter((question: FormsQuestion) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
 					return false
@@ -414,7 +408,7 @@ export default defineComponent({
 		})
 
 		const isRequiredUsed = computed<boolean>(() => {
-			return props.form.questions.some((question) =>
+			return props.form.questions.some((question: FormsQuestion) =>
 				Boolean(question.isRequired),
 			)
 		})
@@ -479,7 +473,7 @@ export default defineComponent({
 
 		const expirationMessage = computed<string>(() => {
 			const relativeDate = moment(props.form.expires, 'X')
-				.locale(window.OC.getLanguage())
+				.locale(window.OC?.getLanguage())
 				.fromNow()
 			if (isExpired.value) {
 				return t('forms', 'Expired {relativeDate}.', { relativeDate })
@@ -680,7 +674,7 @@ export default defineComponent({
 					}
 
 					const question = props.form.questions.find(
-						(question) => question.id === questionId,
+						(question: FormsQuestion) => question.id === questionId,
 					) as SubmitQuestion | undefined
 					if (!question) {
 						continue
@@ -749,10 +743,10 @@ export default defineComponent({
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
-		function onUpdate(question: SubmitQuestion, values: unknown[]): void {
+		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
 			answers.value = {
 				...answers.value,
-				[question.id]: values as AnswerValue,
+				[question.id]: values,
 			}
 			addFormFieldToLocalStorage(question)
 		}
@@ -765,7 +759,7 @@ export default defineComponent({
 		 */
 		function updateQuestionValues(
 			question: SubmitQuestion,
-			values: unknown[],
+			values: AnswerValue,
 		): void {
 			onUpdate(question, values)
 		}

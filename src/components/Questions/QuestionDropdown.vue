@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption } from '../../models/Entities.d.ts'
+import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
 import { t } from '@nextcloud/l10n'
@@ -165,9 +165,9 @@ export default defineComponent({
 
 		const selectOptionPlaceholder = computed(() => {
 			if (props.readOnly) {
-				return props.answerType.submitPlaceholder
+				return props.answerType?.submitPlaceholder
 			}
-			return props.answerType.createPlaceholder
+			return props.answerType?.createPlaceholder
 		})
 
 		const isMultiple = computed(() => {
@@ -190,7 +190,7 @@ export default defineComponent({
 
 			const selected = values.value
 				.map((id) =>
-					props.options.find(
+					props.options?.find(
 						(option) => option.id === parseInt(String(id), 10),
 					),
 				)

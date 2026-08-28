@@ -15,7 +15,8 @@
 		"isolatedModules": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"types": ["@nextcloud/typings"]
+		"types": ["@nextcloud/typings"],
+		"allowImportingTsExtensions": true
 	},
 	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
 	"exclude": ["node_modules"]

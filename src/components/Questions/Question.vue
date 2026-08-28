@@ -163,6 +163,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue'
+import type { MaxStringLengths } from '../../types/Entities.ts'
+
 import IconAsterisk from '@material-symbols/svg-400/outlined/asterisk.svg?raw'
 import IconIdentifier from '@material-symbols/svg-400/outlined/badge.svg?raw'
 import IconContentCopy from '@material-symbols/svg-400/outlined/content_copy.svg?raw'
@@ -235,7 +238,7 @@ export default defineComponent({
 		},
 
 		maxStringLengths: {
-			type: Object,
+			type: Object as PropType<MaxStringLengths>,
 			required: true,
 		},
 

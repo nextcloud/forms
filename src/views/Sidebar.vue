@@ -58,7 +58,8 @@
 </template>
 
 <script lang="ts">
-import type { FormsForm, FormsShare } from '../models/Entities.d.ts'
+import type { PropType } from 'vue'
+import type { FormsForm, FormsShare } from '../types/Entities.d.ts'
 
 import IconComment from '@material-symbols/svg-400/outlined/comment.svg?raw'
 import IconSettings from '@material-symbols/svg-400/outlined/settings.svg?raw'
@@ -104,7 +105,7 @@ export default defineComponent({
 		},
 
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 
@@ -120,30 +121,26 @@ export default defineComponent({
 		const viewForm = useViewForm({ form: () => props.form, emit })
 		const commentsEl = ref<Element | null>(null)
 		const commentsView = ref<CommentsViewLike | null>(null)
-		const localShares = ref<FormsShare[]>([
-			...(props.form as unknown as FormsForm).shares,
-		])
+		const localShares = ref<FormsShare[]>([...props.form.shares])
 		const localFormOverrides = ref<Record<string, unknown>>({})
 
 		const canEdit = computed<boolean>(() =>
-			(props.form as unknown as FormsForm)?.permissions?.includes(
-				PERMISSION_TYPES.PERMISSION_EDIT,
-			),
+			props.form?.permissions?.includes(PERMISSION_TYPES.PERMISSION_EDIT),
 		)
 
-		const sidebarForm = computed<Record<string, unknown>>(() => ({
+		const sidebarForm = computed<FormsForm>(() => ({
 			...props.form,
 			...localFormOverrides.value,
 			shares: localShares.value,
 		}))
 
 		const sidebarAllowComments = computed<boolean>(() =>
-			Boolean(sidebarForm.value.allowComments),
+			Boolean((sidebarForm.value as FormsForm).allowComments),
 		)
 
 		const isSidebarLocked = computed<boolean>(() => {
-			const lockedUntil = sidebarForm.value.lockedUntil
-			const lockedBy = sidebarForm.value.lockedBy
+			const lockedUntil = (sidebarForm.value as FormsForm).lockedUntil
+			const lockedBy = (sidebarForm.value as FormsForm).lockedBy
 			return (
 				lockedUntil === 0
 				|| (Number(lockedUntil || 0) > moment().unix()
@@ -152,11 +149,13 @@ export default defineComponent({
 		})
 
 		const lockedUntilFormatted = computed<string>(() => {
-			const lockedUntil = sidebarForm.value.lockedUntil
+			const lockedUntil = (sidebarForm.value as FormsForm).lockedUntil
 			if (lockedUntil === 0 || lockedUntil === null) {
 				return ''
 			}
-			return moment(lockedUntil, 'X').locale(window.OC.getLanguage()).fromNow()
+			return moment(lockedUntil, 'X')
+				.locale(window.OC?.getLanguage())
+				.fromNow()
 		})
 
 		const sidebarTitle = computed<string>(() =>
@@ -172,7 +171,7 @@ export default defineComponent({
 		// Mount or update the Comments view inside the sidebar
 		const setupComments = async (): Promise<void> => {
 			// comments disabled for this form
-			if (!sidebarForm.value.allowComments) {
+			if (!(sidebarForm.value as FormsForm).allowComments) {
 				return
 			}
 
@@ -203,10 +202,10 @@ export default defineComponent({
 				}
 
 				commentsView.value = new commentsCtor('forms', {
-					propsData: { resourceId: sidebarForm.value.id as number },
+					propsData: { resourceId: (sidebarForm.value as FormsForm).id },
 				})
 			}
-			await commentsView.value.update(sidebarForm.value.id as number)
+			await commentsView.value.update((sidebarForm.value as FormsForm).id)
 			commentsView.value.$mount(el)
 		}
 
@@ -275,7 +274,9 @@ export default defineComponent({
 			(nextForm) => {
 				const nextOverrides = Object.fromEntries(
 					Object.entries(localFormOverrides.value).filter(
-						([key, value]) => nextForm[key] !== value,
+						([key, value]) =>
+							(nextForm as unknown as Record<string, unknown>)[key]
+							!== value,
 					),
 				)
 				localFormOverrides.value = nextOverrides
@@ -283,16 +284,16 @@ export default defineComponent({
 		)
 
 		watch(
-			() => (props.form as unknown as FormsForm).shares,
+			() => props.form.shares,
 			(shares) => {
 				localShares.value = [...shares]
 			},
 		)
 
 		watch(
-			() => (props.form as unknown as FormsForm).id,
+			() => props.form.id,
 			(newId) => {
-				localShares.value = [...(props.form as unknown as FormsForm).shares]
+				localShares.value = [...props.form.shares]
 				localFormOverrides.value = {}
 
 				// Only update comments when the Comments tab is active

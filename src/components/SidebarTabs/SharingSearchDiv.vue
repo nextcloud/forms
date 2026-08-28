@@ -22,6 +22,8 @@
 </template>
 
 <script lang="ts">
+import type { FormsShare } from '../../types/Entities.d.ts'
+
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, onMounted } from 'vue'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
@@ -96,7 +98,7 @@ export default defineComponent({
 				return
 			}
 
-			const newShare = {
+			const newShare: Omit<FormsShare, 'id' | 'formId'> = {
 				shareWith: String(selectedShare.shareWith),
 
 				displayName:

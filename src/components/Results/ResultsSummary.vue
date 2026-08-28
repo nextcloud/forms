@@ -20,8 +20,8 @@
 						'forms',
 						'Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred.',
 						{
-							n: question.options.length,
-							n1: question.options.length - 1,
+							n: (question.options ?? []).length,
+							n1: (question.options ?? []).length - 1,
 						},
 					)
 				}}
@@ -94,7 +94,7 @@
 						<td v-for="column of gridColumns" :key="column.id">
 							<template
 								v-if="
-									question.extraSettings.questionType === 'radio'
+									question.extraSettings?.questionType === 'radio'
 								">
 								{{ gridValue[row.id][column.id].answersCount }} ({{
 									gridValue[row.id][column.id].percentage
@@ -103,7 +103,7 @@
 
 							<template
 								v-if="
-									question.extraSettings.questionType
+									question.extraSettings?.questionType
 									=== 'checkbox'
 								">
 								{{ gridValue[row.id][column.id].answersCount }} ({{
@@ -113,7 +113,7 @@
 
 							<template
 								v-if="
-									question.extraSettings.questionType === 'number'
+									question.extraSettings?.questionType === 'number'
 								">
 								{{ gridValue[row.id][column.id].averageValue }}
 							</template>
@@ -156,8 +156,15 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { PropType } from 'vue'
+import type {
+	BordaRankStats,
+	FormsAnswer,
+	FormsQuestion,
+	FormsSubmission,
+	GridMatrixCell,
+	OptionStats,
+} from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import { t } from '@nextcloud/l10n'
@@ -176,12 +183,12 @@ export default defineComponent({
 
 	props: {
 		submissions: {
-			type: Array as PropType<any[]>,
+			type: Array as PropType<FormsSubmission[]>,
 			required: true,
 		},
 
 		question: {
-			type: Object as PropType<any>,
+			type: Object as PropType<FormsQuestion>,
 			required: true,
 		},
 	},
@@ -237,15 +244,17 @@ export default defineComponent({
 		})
 
 		// For countable questions like multiple choice and checkboxes
-		const questionOptions = computed(() => {
+		const questionOptions = computed<OptionStats[]>(() => {
 			// Build list of question options
-			let questionOptionsStats: any[]
+			let questionOptionsStats: OptionStats[]
 			if (props.question.type !== 'linearscale') {
-				questionOptionsStats = props.question.options.map((option: any) => ({
-					...option,
-					count: 0,
-					percentage: 0,
-				}))
+				questionOptionsStats = (props.question.options ?? []).map(
+					(option) => ({
+						...option,
+						count: 0,
+						percentage: 0,
+					}),
+				)
 			} else {
 				questionOptionsStats = Array.from(
 					{
@@ -255,9 +264,14 @@ export default defineComponent({
 							+ 1,
 					},
 					(_, i) => ({
+						local: false,
+						id: i,
 						text: (
 							i + (props.question.extraSettings?.optionsLowest ?? 1)
 						).toString(),
+						order: 0,
+						questionId: props.question.id,
+						optionType: '',
 						count: 0,
 						percentage: 0,
 					}),
@@ -267,7 +281,12 @@ export default defineComponent({
 			// Also record 'Other'
 			if (props.question.extraSettings?.allowOtherAnswer) {
 				questionOptionsStats.unshift({
+					local: false,
+					id: -1,
 					text: t('forms', 'Other'),
+					order: 0,
+					questionId: props.question.id,
+					optionType: '',
 					count: 0,
 					percentage: 0,
 				})
@@ -276,15 +295,20 @@ export default defineComponent({
 			// Also record 'No response'
 			questionOptionsStats.unshift({
 				// TRANSLATORS Counts on Results-Summary, how many users did not respond to this question.
+				local: false,
+				id: -2,
 				text: t('forms', 'No response'),
+				order: 0,
+				questionId: props.question.id,
+				optionType: '',
 				count: 0,
 				percentage: 0,
 			})
 
 			// Go through submissions to check which options have how many responses
-			props.submissions.forEach((submission: any) => {
+			props.submissions.forEach((submission) => {
 				const answers = submission.answers.filter(
-					(answer: any) => answer.questionId === props.question.id,
+					(answer) => answer.questionId === props.question.id,
 				)
 				if (!answers.length) {
 					questionOptionsStats[0].count++
@@ -292,16 +316,21 @@ export default defineComponent({
 				}
 
 				// Check question options to find which needs to be increased
-				answers.forEach((answer: any) => {
+				answers.forEach((answer) => {
 					const optionsStatIndex = questionOptionsStats.findIndex(
-						(option: any) => option.text === answer.text,
+						(option) => option.text === answer.text,
 					)
 					if (optionsStatIndex < 0) {
 						if (props.question.extraSettings?.allowOtherAnswer) {
 							questionOptionsStats[1].count++
 						} else {
 							questionOptionsStats.push({
+								local: false,
+								id: -3,
 								text: answer.text,
+								order: 0,
+								questionId: props.question.id,
+								optionType: '',
 								count: 1,
 								percentage: 0,
 							})
@@ -315,21 +344,24 @@ export default defineComponent({
 			// Sort options by response count
 			if (props.question.type !== 'linearscale') {
 				questionOptionsStats.sort(
-					(object1: any, object2: any) => object2.count - object1.count,
+					(object1, object2) => object2.count - object1.count,
 				)
 			} else {
 				// for linear scale questions move the "No response" element to the end
-				questionOptionsStats.push(questionOptionsStats.shift())
+				const noResponse = questionOptionsStats.shift()
+				if (noResponse) {
+					questionOptionsStats.push(noResponse)
+				}
 			}
 
-			questionOptionsStats.forEach((questionOptionsStat: any) => {
+			questionOptionsStats.forEach((questionOptionsStat) => {
 				// Fill percentage values
 				questionOptionsStat.percentage = Math.round(
 					(100 * questionOptionsStat.count) / props.submissions.length,
 				)
 				// Mark all best results
 				const maxCount = Math.max(
-					...questionOptionsStats.map((option: any) => option.count),
+					...questionOptionsStats.map((option) => option.count),
 				)
 				questionOptionsStat.best = questionOptionsStat.count === maxCount
 			})
@@ -340,27 +372,28 @@ export default defineComponent({
 		/**
 		 * Borda count ranking statistics
 		 */
-		const rankingStats = computed(() => {
-			const n = props.question.options.length
-			const stats: Record<string | number, any> = {}
+		const rankingStats = computed<BordaRankStats[]>(() => {
+			const n = (props.question.options ?? []).length
+			const stats: Record<string | number, BordaRankStats> = {}
 
-			for (const opt of props.question.options) {
+			for (const opt of props.question.options ?? []) {
 				stats[opt.id] = {
 					id: opt.id,
 					text: opt.text,
 					bordaTotal: 0,
 					rankSum: 0,
 					count: 0,
+					avgRank: '-',
 				}
 			}
 
 			for (const submission of props.submissions) {
 				const answer = submission.answers.find(
-					(a: any) => a.questionId === props.question.id,
+					(a) => a.questionId === props.question.id,
 				)
 				if (!answer) continue
-				const ranked = JSON.parse(answer.text)
-				ranked.forEach((optionId: string | number, index: number) => {
+				const ranked = JSON.parse(answer.text) as (string | number)[]
+				ranked.forEach((optionId, index) => {
 					if (stats[optionId]) {
 						stats[optionId].bordaTotal += n - index
 						stats[optionId].rankSum += index + 1
@@ -370,16 +403,16 @@ export default defineComponent({
 			}
 
 			const result = Object.values(stats)
-				.map((s: any) => ({
+				.map((s) => ({
 					...s,
 					avgRank: s.count > 0 ? (s.rankSum / s.count).toFixed(1) : '-',
 				}))
-				.sort((a: any, b: any) => b.bordaTotal - a.bordaTotal)
+				.sort((a, b) => b.bordaTotal - a.bordaTotal)
 
 			// Mark best (highest Borda score)
 			if (result.length > 0 && result[0].bordaTotal > 0) {
 				const best = result[0].bordaTotal
-				result.forEach((o: any) => {
+				result.forEach((o) => {
 					o.best = o.bordaTotal === best
 				})
 			}
@@ -388,23 +421,28 @@ export default defineComponent({
 		})
 
 		const maxBordaScore = computed(
-			() => props.question.options.length * props.submissions.length,
+			() => (props.question.options ?? []).length * props.submissions.length,
 		)
 
 		const gridColumns = computed(() => {
-			return props.question.options.filter(
-				(option: any) => option.optionType === OptionType.Column,
+			return (props.question.options ?? []).filter(
+				(option) => option.optionType === OptionType.Column,
 			)
 		})
 
 		const gridRows = computed(() => {
-			return props.question.options.filter(
-				(option: any) => option.optionType === OptionType.Row,
+			return (props.question.options ?? []).filter(
+				(option) => option.optionType === OptionType.Row,
 			)
 		})
 
-		const gridValue = computed(() => {
-			const matrix: Record<string, Record<string, any>> = {}
+		const gridValue = computed<
+			Record<string | number, Record<string | number, GridMatrixCell>>
+		>(() => {
+			const matrix: Record<
+				string | number,
+				Record<string | number, GridMatrixCell>
+			> = {}
 			for (const row of gridRows.value) {
 				for (const column of gridColumns.value) {
 					matrix[row.id] = matrix[row.id] || {}
@@ -417,9 +455,9 @@ export default defineComponent({
 				}
 			}
 
-			const answersList: any[] = []
-			props.submissions.forEach((submission: any) => {
-				submission.answers.forEach((answer: any) => {
+			const answersList: FormsAnswer[] = []
+			props.submissions.forEach((submission) => {
+				submission.answers.forEach((answer) => {
 					if (answer.questionId === props.question.id) {
 						answersList.push(answer)
 					}
@@ -485,8 +523,8 @@ export default defineComponent({
 						=== GridCellType.Checkbox
 					) {
 						totalAnswersCount = Object.entries(matrix[rowId])
-							.map(([, cell]: [string, any]) => cell.answersCount)
-							.reduce((a: number, b: number) => a + b, 0)
+							.map(([, cell]) => cell.answersCount)
+							.reduce((a, b) => a + b, 0)
 					}
 					if (totalAnswersCount === 0) {
 						totalAnswersCount = 1
@@ -518,16 +556,17 @@ export default defineComponent({
 		})
 
 		// For text answers like short answer and long text
-		const answers = computed(() => {
-			const answersModels: any[] = []
+		const answers = computed<(FormsAnswer & { url?: string })[]>(() => {
+			const answersModels: (FormsAnswer & { url?: string })[] = []
 
 			// Also record 'No response'
 			let noResponseCount = 0
+			let combinedAnswerId = -1000 // Use negative IDs for combined answers
 
 			// Go through submissions to check which options have how many responses
-			props.submissions.forEach((submission: any) => {
+			props.submissions.forEach((submission) => {
 				const answersForQuestion = submission.answers.filter(
-					(answer: any) => answer.questionId === props.question.id,
+					(answer) => answer.questionId === props.question.id,
 				)
 				if (!answersForQuestion.length) {
 					// Record 'No response'
@@ -541,24 +580,21 @@ export default defineComponent({
 				) {
 					// Combine the first two answers in order for date range questions
 					answersModels.push({
-						id: `${answersForQuestion[0].id}-${answersForQuestion[1].id}`,
+						id: combinedAnswerId--,
+						questionId: props.question.id,
 						text: `${answersForQuestion[0].text} - ${answersForQuestion[1].text}`,
 					})
 				} else {
-					answersForQuestion.forEach((answer: any) => {
+					answersForQuestion.forEach((answer) => {
 						if (answer.fileId) {
 							answersModels.push({
-								id: answer.id,
-								text: answer.text,
+								...answer,
 								url: generateUrl('/f/{fileId}', {
 									fileId: answer.fileId,
 								}),
 							})
 						} else {
-							answersModels.push({
-								id: answer.id,
-								text: answer.text,
-							})
+							answersModels.push(answer)
 						}
 					})
 				}
@@ -569,7 +605,8 @@ export default defineComponent({
 				(100 * noResponseCount) / props.submissions.length,
 			)
 			answersModels.unshift({
-				id: 0,
+				id: -1,
+				questionId: props.question.id,
 				text: `${noResponseCount} (${noResponsePercentage}%): ${t('forms', 'No response')}`,
 			})
 

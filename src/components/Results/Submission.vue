@@ -50,6 +50,11 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
+import type {
+	FormsOption,
+	FormsQuestion,
+	FormsSubmission,
+} from '../../types/Entities.d.ts'
 
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
@@ -64,51 +69,16 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Answer from './Answer.vue'
 import { OptionType } from '../../models/Constants.ts'
 
-interface SubmissionAnswer {
-	id: number
-	questionId: number
-	text: string
-	fileId?: number
-}
-
-interface SubmissionModel {
-	id: number
-	userDisplayName: string
-	timestamp: string | number
-	answers: SubmissionAnswer[]
-}
-
-interface QuestionOption {
-	id: number
-	text: string
-	optionType?: string
-}
-
-interface QuestionModel {
-	id: number
-	text: string
-	type: string
-	options: QuestionOption[]
-	extraSettings?: {
-		questionType?: 'radio' | 'checkbox' | 'number'
-	}
-}
-
-type GridValueMap = Record<
-	string,
-	string | string[] | Record<string, string | number>
->
-
 interface AnsweredQuestion {
 	id: number
 	text: string
 	type: string
 	squashedAnswers?: string
 	answers?: Array<{ id: number; text: string; url?: string }>
-	gridValue?: GridValueMap | null
+	gridValue?: Record<string, string | string[] | Record<string, string | number>>
 	gridCellType?: string
-	gridRows?: QuestionOption[]
-	gridColumns?: QuestionOption[]
+	gridRows?: FormsOption[]
+	gridColumns?: FormsOption[]
 }
 
 export default defineComponent({
@@ -130,12 +100,12 @@ export default defineComponent({
 		},
 
 		submission: {
-			type: Object as PropType<SubmissionModel>,
+			type: Object as PropType<FormsSubmission>,
 			required: true,
 		},
 
 		questions: {
-			type: Array as PropType<QuestionModel[]>,
+			type: Array as PropType<FormsQuestion[]>,
 			required: true,
 		},
 
@@ -226,7 +196,7 @@ export default defineComponent({
 		const answeredQuestions = computed<AnsweredQuestion[]>(() => {
 			const answeredQuestionsArray: AnsweredQuestion[] = []
 
-			props.questions.forEach((question: QuestionModel) => {
+			props.questions.forEach((question) => {
 				const answers = props.submission.answers.filter(
 					(answer) => answer.questionId === question.id,
 				)
@@ -250,14 +220,17 @@ export default defineComponent({
 						})),
 					})
 				} else if (question.type === 'grid') {
-					const optionsPerId: Record<string, QuestionOption> = {}
-					question.options.forEach((option) => {
-						optionsPerId[String(option.id)] = option
+					const optionsPerId: Record<number | string, FormsOption> = {}
+					;(question.options ?? []).forEach((option) => {
+						optionsPerId[option.id] = option
 					})
 					let squashedAnswers = ''
 					const gridValue = answers[0]?.text
-						? (JSON.parse(answers[0].text) as GridValueMap)
-						: null
+						? (JSON.parse(answers[0].text) as Record<
+								string,
+								string | string[] | Record<string, string | number>
+							>)
+						: undefined
 					// fixme: rename `questionType` to `gridCellType` everywhere in BE and FE
 					if (
 						gridValue
@@ -320,10 +293,10 @@ export default defineComponent({
 						gridValue,
 						squashedAnswers,
 						gridCellType: question.extraSettings?.questionType,
-						gridRows: question.options.filter(
+						gridRows: (question.options ?? []).filter(
 							(option) => option.optionType === OptionType.Row,
 						),
-						gridColumns: question.options.filter(
+						gridColumns: (question.options ?? []).filter(
 							(option) => option.optionType === OptionType.Column,
 						),
 					})
@@ -339,15 +312,15 @@ export default defineComponent({
 						squashedAnswers,
 					})
 				} else if (question.type === 'ranking') {
-					const optionsPerId: Record<string, QuestionOption> = {}
-					question.options.forEach((option) => {
-						optionsPerId[String(option.id)] = option
+					const optionsPerId: Record<number | string, FormsOption> = {}
+					;(question.options ?? []).forEach((option) => {
+						optionsPerId[option.id] = option
 					})
 					const rankedIds = answers[0]?.text
-						? JSON.parse(answers[0].text)
+						? (JSON.parse(answers[0].text) as (string | number)[])
 						: []
 					const squashedAnswers = rankedIds
-						.map((id: string, index: number) => {
+						.map((id, index) => {
 							const option = optionsPerId[String(id)]
 							return option
 								? `${index + 1}. ${option.text}`

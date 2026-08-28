@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsForm } from './models/Entities.d.ts'
+import type { FormsForm } from './types/Entities.d.ts'
 
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'

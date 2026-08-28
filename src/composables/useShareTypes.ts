@@ -2,8 +2,6 @@
  * SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import IconChatSvg from '@material-symbols/svg-400/outlined/chat_bubble.svg?raw'
 import IconCircleSvg from '@material-symbols/svg-400/outlined/circle.svg?raw'
 import IconGroupSvg from '@material-symbols/svg-400/outlined/group.svg?raw'
@@ -27,7 +25,8 @@ const FALLBACK_SHARE_TYPES = {
  * when sharing globals are not initialized on the current page.
  */
 function resolveShareTypes() {
-	const share = (globalThis as any)?.OC?.Share
+	// const share = typeof window !== 'undefined' ? window.OC?.Share : undefined
+	const share = window.OC?.Share
 
 	return {
 		SHARE_TYPE_USER:

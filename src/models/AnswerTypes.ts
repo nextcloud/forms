@@ -2,9 +2,9 @@
  * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { Component } from 'vue'
+import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
 import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
@@ -46,7 +46,7 @@ export interface AnswerTypeConfig {
 	icon: string
 	label: string
 	predefined?: boolean
-	validate?: (question: unknown) => boolean
+	validate?: (question: FormsQuestion) => boolean
 	titlePlaceholder: string
 	createPlaceholder?: string
 	createPlaceholderRange?: string
@@ -71,8 +71,8 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconCheckboxOutline,
 		label: t('forms', 'Checkboxes'),
 		predefined: true,
-		validate: (question: unknown) => {
-			return (question as any).options.length > 0
+		validate: (question: FormsQuestion) => {
+			return (question.options?.length ?? 0) > 0
 		},
 
 		titlePlaceholder: t('forms', 'Checkbox question title'),
@@ -89,8 +89,8 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconRadioboxMarked,
 		label: t('forms', 'Radio buttons'),
 		predefined: true,
-		validate: (question: unknown) => {
-			return (question as any).options.length > 0
+		validate: (question: FormsQuestion) => {
+			return (question.options?.length ?? 0) > 0
 		},
 
 		titlePlaceholder: t('forms', 'Radio buttons question title'),
@@ -110,8 +110,8 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconArrowDownDropCircleOutline,
 		label: t('forms', 'Dropdown'),
 		predefined: true,
-		validate: (question: unknown) => {
-			return (question as any).options.length > 0
+		validate: (question: FormsQuestion) => {
+			return (question.options?.length ?? 0) > 0
 		},
 
 		titlePlaceholder: t('forms', 'Dropdown question title'),
@@ -163,14 +163,14 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 			},
 		},
 
-		validate: (question: unknown) => {
-			const q = question as any
+		validate: (question: FormsQuestion) => {
+			const options = question.options ?? []
 			return (
-				q.options.filter(
-					(option: any) => option.optionType === OptionType.Column,
+				options.filter(
+					(option: FormsOption) => option.optionType === OptionType.Column,
 				).length > 0
-				&& q.options.filter(
-					(option: any) => option.optionType === OptionType.Row,
+				&& options.filter(
+					(option: FormsOption) => option.optionType === OptionType.Row,
 				).length > 0
 			)
 		},
@@ -284,8 +284,8 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconSwapVertical,
 		label: t('forms', 'Ranking'),
 		predefined: true,
-		validate: (question: unknown) => {
-			return (question as any).options.length > 0
+		validate: (question: FormsQuestion) => {
+			return (question.options?.length ?? 0) > 0
 		},
 
 		titlePlaceholder: t('forms', 'Ranking question title'),

@@ -274,7 +274,8 @@
 </template>
 
 <script lang="ts">
-import type { FormsQuestion } from '../../models/Entities.d.ts'
+import type { PropType } from 'vue'
+import type { FormsForm, FormsQuestion } from '../../types/Entities.d.ts'
 
 import { getCurrentUser } from '@nextcloud/auth'
 import { loadState } from '@nextcloud/initial-state'
@@ -331,7 +332,7 @@ export default defineComponent({
 
 	props: {
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 

@@ -81,7 +81,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
-import type { FormsOption } from '../../models/Entities.d.ts'
+import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'

@@ -234,6 +234,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue'
+import type { FormsForm } from '../../types/Entities.d.ts'
+
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconCodeBrackets from '@material-symbols/svg-400/outlined/code.svg?raw'
@@ -306,7 +309,7 @@ export default defineComponent({
 
 	props: {
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 
