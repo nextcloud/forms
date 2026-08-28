@@ -60,6 +60,11 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const textarea = ref<HTMLTextAreaElement | null>(null)
 		const question = useQuestion(props, { emit })
+		const values = computed(() => {
+			return props.values as Array<
+				string | number | readonly string[] | null | undefined
+			>
+		})
 
 		const submissionInputPlaceholder = computed(() => {
 			if (props.readOnly) {
@@ -69,7 +74,7 @@ export default defineComponent({
 		})
 
 		const textareaValue = computed(() => {
-			return (props.values[0] ?? null) as
+			return (values.value[0] ?? null) as
 				string | number | readonly string[] | null | undefined
 		})
 
@@ -83,7 +88,7 @@ export default defineComponent({
 		}
 
 		watch(
-			() => props.values,
+			() => values.value,
 			() => {
 				nextTick(() => {
 					autoSizeText()
@@ -95,7 +100,7 @@ export default defineComponent({
 		const validate = async (): Promise<boolean> => {
 			if (
 				props.isRequired
-				&& (props.values.length === 0 || props.values[0] === '')
+				&& (values.value.length === 0 || values.value[0] === '')
 			) {
 				question.errorMessage.value = t(
 					'forms',

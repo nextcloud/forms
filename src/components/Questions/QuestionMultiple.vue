@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -29,24 +30,24 @@
 			<template v-if="!isUnique">
 				<!-- Allow setting a minimum of options to be checked -->
 				<NcActionCheckbox
-					:modelValue="!!multipleSettings.optionsLimitMin"
+					:modelValue="!!extraSettings.optionsLimitMin"
 					@update:modelValue="
 						(checked) => onLimitOptionsMin(checked ? 1 : null)
 					">
 					{{ t('forms', 'Require a minimum of options to be checked') }}
 				</NcActionCheckbox>
 				<NcActionInput
-					v-if="multipleSettings.optionsLimitMin"
+					v-if="extraSettings.optionsLimitMin"
 					type="number"
 					:label="t('forms', 'Minimum options to be checked')"
 					:labelOutside="false"
 					:showTrailingButton="false"
-					:modelValue="multipleSettings.optionsLimitMin"
+					:modelValue="extraSettings.optionsLimitMin"
 					@update:modelValue="onLimitOptionsMin" />
 
 				<!-- Allow setting a maximum -->
 				<NcActionCheckbox
-					:modelValue="!!multipleSettings.optionsLimitMax"
+					:modelValue="!!extraSettings.optionsLimitMax"
 					@update:modelValue="
 						(checked) =>
 							onLimitOptionsMax(checked ? choices.length || 1 : null)
@@ -54,12 +55,12 @@
 					{{ t('forms', 'Require a maximum of options to be checked') }}
 				</NcActionCheckbox>
 				<NcActionInput
-					v-if="multipleSettings.optionsLimitMax"
+					v-if="extraSettings.optionsLimitMax"
 					type="number"
 					:label="t('forms', 'Maximum options to be checked')"
 					:labelOutside="false"
 					:showTrailingButton="false"
-					:modelValue="multipleSettings.optionsLimitMax"
+					:modelValue="extraSettings.optionsLimitMax"
 					@update:modelValue="onLimitOptionsMax" />
 			</template>
 			<NcActionButton closeAfterClick @click="isOptionDialogShown = true">
@@ -251,14 +252,19 @@ export default defineComponent({
 	],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
-		const questionMultiple = useQuestionMultiple(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
 		const input = ref<
 			Array<{
 				focus?: () => void
 				$props?: { optionType?: string; index?: number }
 			} | null>
 		>([])
+		const isLoading = ref(false)
+		const questionMultiple = useQuestionMultiple(props, {
+			emit,
+			input,
+			isLoading,
+		})
 		/**
 		 * This is used to cache the "other" answer, meaning if the user:
 		 * checks "other" types text, unchecks "other" and then re-check "other" the typed text is preserved
@@ -266,9 +272,15 @@ export default defineComponent({
 		const cachedOtherAnswerText = ref('')
 		const isDragging = ref(false)
 		const isOptionDialogShown = ref(false)
-		const isLoading = ref(false)
 
 		const isUnique = computed(() => props.answerType.unique === true)
+		const values = computed(() => props.values as string[])
+		const extraSettings = computed<QuestionMultipleExtraSettings>(() => {
+			return (
+				(props.extraSettings as QuestionMultipleExtraSettings | undefined)
+				?? {}
+			)
+		})
 
 		const shiftDragHandle = computed(() => {
 			return (
@@ -290,27 +302,18 @@ export default defineComponent({
 		})
 
 		const questionValues = computed<string | string[] | undefined>(() => {
-			const values = props.values as string[]
-			return isUnique.value ? values?.[0] : values
-		})
-
-		const multipleSettings = computed<QuestionMultipleExtraSettings>(() => {
-			return (
-				(props.extraSettings as QuestionMultipleExtraSettings | undefined)
-				?? {}
-			)
+			return isUnique.value ? values.value?.[0] : values.value
 		})
 
 		const allowOtherAnswer = computed(() => {
-			return multipleSettings.value.allowOtherAnswer ?? false
+			return extraSettings.value.allowOtherAnswer ?? false
 		})
 
 		/**
 		 * The full "other" answer including prefix, undefined if no "other answer"
 		 */
 		const otherAnswer = computed<string | undefined>(() => {
-			const values = props.values as string[]
-			return values.find((v) =>
+			return values.value.find((v) =>
 				v.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX),
 			)
 		})
@@ -336,8 +339,8 @@ export default defineComponent({
 		})
 
 		const infoMessage = computed<string | null>(() => {
-			const min = multipleSettings.value.optionsLimitMin ?? 0
-			const max = multipleSettings.value.optionsLimitMax ?? 0
+			const min = extraSettings.value.optionsLimitMin ?? 0
+			const max = extraSettings.value.optionsLimitMax ?? 0
 
 			if (!min && !max) {
 				return null
@@ -375,6 +378,7 @@ export default defineComponent({
 				max,
 			)
 		})
+		const question = useQuestion(props, { emit, infoMessage, rootElement })
 
 		/**
 		 * Is the provided answer required ?
@@ -414,7 +418,6 @@ export default defineComponent({
 		}
 
 		const validate = async (): Promise<boolean> => {
-			const values = props.values as string[]
 			if (props.isRequired && questionMultiple.areNoneChecked.value) {
 				question.errorMessage.value = t(
 					'forms',
@@ -425,9 +428,9 @@ export default defineComponent({
 
 			if (!isUnique.value) {
 				// Validate limits
-				const max = multipleSettings.value.optionsLimitMax ?? 0
-				const min = multipleSettings.value.optionsLimitMin ?? 0
-				if (max && values.length > max) {
+				const max = extraSettings.value.optionsLimitMax ?? 0
+				const min = extraSettings.value.optionsLimitMin ?? 0
+				if (max && values.value.length > max) {
 					question.errorMessage.value = n(
 						'forms',
 						'You must choose at most one option',
@@ -436,7 +439,7 @@ export default defineComponent({
 					)
 					return false
 				}
-				if (min && values.length < min) {
+				if (min && values.value.length < min) {
 					question.errorMessage.value = n(
 						'forms',
 						'You must choose at least one option',
@@ -516,7 +519,7 @@ export default defineComponent({
 					return
 				}
 
-				if ((multipleSettings.value.optionsLimitMin ?? 0) > parsedMax) {
+				if ((extraSettings.value.optionsLimitMin ?? 0) > parsedMax) {
 					showError(
 						t(
 							'forms',
@@ -555,8 +558,8 @@ export default defineComponent({
 				}
 
 				if (
-					multipleSettings.value.optionsLimitMax
-					&& parsedMin > multipleSettings.value.optionsLimitMax
+					extraSettings.value.optionsLimitMax
+					&& parsedMin > extraSettings.value.optionsLimitMax
 				) {
 					showError(
 						t(
@@ -607,7 +610,7 @@ export default defineComponent({
 				isUnique.value
 					? [prefixedValue]
 					: [
-							...(props.values as string[]).filter(
+							...values.value.filter(
 								(v) =>
 									!v.startsWith(
 										QUESTION_EXTRASETTINGS_OTHER_PREFIX,
@@ -645,7 +648,6 @@ export default defineComponent({
 			IconCheckboxBlankOutline,
 			IconContentPaste,
 			IconRadioboxBlank,
-			multipleSettings,
 			onAllowOtherAnswerChange,
 			onChange,
 			onChangeOther,
@@ -661,6 +663,7 @@ export default defineComponent({
 			QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 			questionValues,
 			resetOtherAnswerText,
+			rootElement,
 			shiftDragHandle,
 			t,
 			validate,

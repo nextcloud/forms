@@ -145,15 +145,22 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
-		const questionMultiple = useQuestionMultiple(props, { emit })
+		const values = computed<Array<number | string>>(() => {
+			return Array.isArray(props.values) ? props.values : []
+		})
 		const input = ref<
 			Array<{
 				focus?: () => void
 				$props?: { optionType?: string; index?: number }
 			} | null>
 		>([])
-		const isDragging = ref(false)
 		const isLoading = ref(false)
+		const questionMultiple = useQuestionMultiple(props, {
+			emit,
+			input,
+			isLoading,
+		})
+		const isDragging = ref(false)
 		const isOptionDialogShown = ref(false)
 
 		const selectOptionPlaceholder = computed(() => {
@@ -177,12 +184,12 @@ export default defineComponent({
 		})
 
 		const selectedOption = computed<FormsOption | FormsOption[] | null>(() => {
-			if (!props.values) {
+			if (values.value.length === 0) {
 				return null
 			}
 
-			const selected = props.values
-				.map((id: unknown) =>
+			const selected = values.value
+				.map((id) =>
 					props.options.find(
 						(option) => option.id === parseInt(String(id), 10),
 					),
@@ -256,6 +263,7 @@ export default defineComponent({
 			shiftDragHandle,
 			t,
 			validate,
+			values,
 		}
 	},
 })

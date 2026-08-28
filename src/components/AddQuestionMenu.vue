@@ -66,7 +66,7 @@
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { defineComponent, ref, toRef, watch } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
@@ -103,11 +103,13 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const activeQuestionType = ref<string | null>(null)
 		const openLocal = ref<boolean>(props.open)
-		const open = toRef(props, 'open')
 
-		watch(open, (value: boolean) => {
-			openLocal.value = value
-		})
+		watch(
+			() => props.open,
+			(value: boolean) => {
+				openLocal.value = value
+			},
+		)
 
 		watch(openLocal, (value: boolean) => {
 			emit('update:open', value)

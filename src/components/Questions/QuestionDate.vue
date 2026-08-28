@@ -155,11 +155,17 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
+		const values = computed(() => {
+			return props.values as Array<string | undefined>
+		})
+		const extraSettings = computed(() => {
+			return (
+				(props.extraSettings as QuestionDateExtraSettings | undefined) ?? {}
+			)
+		})
 
 		const isRangeQuestion = computed(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.dateRange || extraSettings?.timeRange
+			return extraSettings.value.dateRange || extraSettings.value.timeRange
 				? true
 				: false
 		})
@@ -230,13 +236,13 @@ export default defineComponent({
 
 		const time = computed<Date | [Date, Date] | null>(() => {
 			if (isRangeQuestion.value) {
-				const firstValue = props.values?.[0] as string | undefined
-				const secondValue = props.values?.[1] as string | undefined
+				const firstValue = values.value[0]
+				const secondValue = values.value[1]
 				return firstValue && secondValue
 					? [parse(firstValue), parse(secondValue)]
 					: null
 			}
-			const value = props.values?.[0] as string | undefined
+			const value = values.value[0]
 			return value ? parse(value) : null
 		})
 
@@ -244,10 +250,8 @@ export default defineComponent({
 		 * The maximum allowable date for the date input field
 		 */
 		const dateMax = computed<Date | undefined>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.dateMax
-				? moment(extraSettings.dateMax, 'X').toDate()
+			return extraSettings.value.dateMax
+				? moment(extraSettings.value.dateMax, 'X').toDate()
 				: undefined
 		})
 
@@ -255,28 +259,22 @@ export default defineComponent({
 		 * The minimum allowable date for the date input field
 		 */
 		const dateMin = computed<Date | undefined>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.dateMin
-				? moment(extraSettings.dateMin, 'X').toDate()
+			return extraSettings.value.dateMin
+				? moment(extraSettings.value.dateMin, 'X').toDate()
 				: undefined
 		})
 
 		const dateRange = computed(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.dateRange ?? false
+			return extraSettings.value.dateRange ?? false
 		})
 
 		/**
 		 * The maximum allowable time for the time input field
 		 */
 		const timeMax = computed<Date | undefined>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.timeMax
+			return extraSettings.value.timeMax
 				? moment(
-						extraSettings.timeMax,
+						extraSettings.value.timeMax,
 						props.answerType.storageFormat,
 					).toDate()
 				: undefined
@@ -286,20 +284,16 @@ export default defineComponent({
 		 * The minimum allowable time for the time input field
 		 */
 		const timeMin = computed<Date | undefined>(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.timeMin
+			return extraSettings.value.timeMin
 				? moment(
-						extraSettings.timeMin,
+						extraSettings.value.timeMin,
 						props.answerType.storageFormat,
 					).toDate()
 				: undefined
 		})
 
 		const timeRange = computed(() => {
-			const extraSettings = props.extraSettings as
-				QuestionDateExtraSettings | undefined
-			return extraSettings?.timeRange ?? false
+			return extraSettings.value.timeRange ?? false
 		})
 
 		const validate = async (): Promise<boolean> => {

@@ -20,6 +20,7 @@ import type { FormsForm } from './models/Entities.d.ts'
 import { subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
 import { defineComponent } from 'vue'
+import { nextTick, onMounted, onUnmounted } from 'vue'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import Submit from './views/Submit.vue'
 
@@ -33,45 +34,14 @@ export default defineComponent({
 		Submit,
 	},
 
-	data() {
-		return {
-			form: loadState(formsAppName, 'form') as FormsForm,
-			isLoggedIn: loadState(formsAppName, 'isLoggedIn') as boolean,
-			isEmbedded: loadState(formsAppName, 'isEmbedded', false) as boolean,
-			shareHash: loadState(formsAppName, 'shareHash') as string,
-		}
-	},
+	setup() {
+		const form = loadState(formsAppName, 'form') as FormsForm
+		const isLoggedIn = loadState(formsAppName, 'isLoggedIn') as boolean
+		const isEmbedded = loadState(formsAppName, 'isEmbedded', false) as boolean
+		const shareHash = loadState(formsAppName, 'shareHash') as string
+		let resizeObserver: ResizeObserver | undefined
 
-	unmounted() {
-		unsubscribe('forms:last-updated:set', this.onSubmitMessageEvent)
-	},
-
-	mounted() {
-		if (this.isEmbedded) {
-			subscribe('forms:last-updated:set', this.onSubmitMessageEvent)
-
-			// Communicate window size to parent window in iframes
-			const resizeObserver = new ResizeObserver((entries) => {
-				this.emitResizeMessage(entries[0].target as HTMLElement)
-			})
-			this.$nextTick(() => {
-				const formEl = document.querySelector('.app-forms-embedded form')
-				if (formEl) {
-					resizeObserver.observe(formEl)
-				}
-			})
-		}
-	},
-
-	methods: {
-		onSubmitMessageEvent(event: unknown): void {
-			const id = Number(event)
-			if (Number.isFinite(id)) {
-				this.emitSubmitMessage(id)
-			}
-		},
-
-		emitSubmitMessage(id: number): void {
+		const emitSubmitMessage = (id: number): void => {
 			window.parent?.postMessage(
 				{
 					type: 'form-saved',
@@ -81,12 +51,19 @@ export default defineComponent({
 				},
 				'*',
 			)
-		},
+		}
+
+		const onSubmitMessageEvent = (event: unknown): void => {
+			const id = Number(event)
+			if (Number.isFinite(id)) {
+				emitSubmitMessage(id)
+			}
+		}
 
 		/**
 		 * @param target Target of which the size should be communicated
 		 */
-		emitResizeMessage(target: HTMLElement): void {
+		const emitResizeMessage = (target: HTMLElement): void => {
 			const rect = target.getBoundingClientRect()
 			let height = rect.top + target.scrollHeight
 			let width = target.scrollWidth
@@ -117,7 +94,38 @@ export default defineComponent({
 				},
 				'*',
 			)
-		},
+		}
+
+		onMounted(() => {
+			if (!isEmbedded) {
+				return
+			}
+
+			subscribe('forms:last-updated:set', onSubmitMessageEvent)
+
+			// Communicate window size to parent window in iframes
+			resizeObserver = new ResizeObserver((entries) => {
+				emitResizeMessage(entries[0].target as HTMLElement)
+			})
+			void nextTick(() => {
+				const formEl = document.querySelector('.app-forms-embedded form')
+				if (formEl) {
+					resizeObserver?.observe(formEl)
+				}
+			})
+		})
+
+		onUnmounted(() => {
+			unsubscribe('forms:last-updated:set', onSubmitMessageEvent)
+			resizeObserver?.disconnect()
+		})
+
+		return {
+			form,
+			isLoggedIn,
+			isEmbedded,
+			shareHash,
+		}
 	},
 })
 </script>

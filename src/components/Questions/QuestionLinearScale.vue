@@ -155,6 +155,14 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const question = useQuestion(props, { emit })
+		const values = computed<string[]>(() => {
+			return props.values as string[]
+		})
+		const extraSettings = computed<LinearScaleExtraSettings>(() => {
+			return (
+				(props.extraSettings as LinearScaleExtraSettings | undefined) ?? {}
+			)
+		})
 		const lowest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 		const highest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 
@@ -163,9 +171,7 @@ export default defineComponent({
 
 		const optionsLowest = computed<number>({
 			get: () => {
-				const extraSettings = props.extraSettings as
-					LinearScaleExtraSettings | undefined
-				return extraSettings?.optionsLowest ?? 1
+				return extraSettings.value.optionsLowest ?? 1
 			},
 			set: (value: number) => {
 				question.onExtraSettingsChange({
@@ -176,9 +182,7 @@ export default defineComponent({
 
 		const optionsHighest = computed<number>({
 			get: () => {
-				const extraSettings = props.extraSettings as
-					LinearScaleExtraSettings | undefined
-				return extraSettings?.optionsHighest ?? 5
+				return extraSettings.value.optionsHighest ?? 5
 			},
 			set: (value: number) => {
 				question.onExtraSettingsChange({
@@ -189,9 +193,7 @@ export default defineComponent({
 
 		const optionsLabelLowest = computed<string>({
 			get: () => {
-				const extraSettings = props.extraSettings as
-					LinearScaleExtraSettings | undefined
-				return extraSettings?.optionsLabelLowest ?? defaultLowestLabel
+				return extraSettings.value.optionsLabelLowest ?? defaultLowestLabel
 			},
 			set: (value: string) => {
 				question.onExtraSettingsChange({
@@ -202,9 +204,7 @@ export default defineComponent({
 
 		const optionsLabelHighest = computed<string>({
 			get: () => {
-				const extraSettings = props.extraSettings as
-					LinearScaleExtraSettings | undefined
-				return extraSettings?.optionsLabelHighest ?? defaultHighestLabel
+				return extraSettings.value.optionsLabelHighest ?? defaultHighestLabel
 			},
 			set: (value: string) => {
 				question.onExtraSettingsChange({
@@ -221,7 +221,7 @@ export default defineComponent({
 			)
 		})
 
-		const questionValues = computed(() => props.values)
+		const questionValues = computed(() => values.value)
 
 		/**
 		 * ID for the label for the lowest option
@@ -258,7 +258,7 @@ export default defineComponent({
 		})
 
 		const validate = async (): Promise<boolean> => {
-			if (props.isRequired && props.values.length === 0) {
+			if (props.isRequired && values.value.length === 0) {
 				question.errorMessage.value = t(
 					'forms',
 					'You must answer this question',
