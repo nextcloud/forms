@@ -765,7 +765,7 @@ export default defineComponent({
 		watch(
 			() => props.form.title,
 			() => {
-				SetWindowTitle(viewForm.formTitle)
+				SetWindowTitle(viewForm.formTitle.value)
 			},
 		)
 
@@ -783,7 +783,7 @@ export default defineComponent({
 		// Lifecycle
 		onMounted(() => {
 			viewForm.fetchFullForm(props.form.id)
-			SetWindowTitle(viewForm.formTitle)
+			SetWindowTitle(viewForm.formTitle.value)
 		})
 
 		return {
