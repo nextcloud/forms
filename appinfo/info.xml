@@ -61,7 +61,7 @@
 	<screenshot>https://raw.githubusercontent.com/nextcloud/forms/main/screenshots/forms3.png</screenshot>
 
 	<dependencies>
-		<nextcloud min-version="33" max-version="35" />
+		<nextcloud min-version="36" max-version="36" />
 	</dependencies>
 
 	<background-jobs>

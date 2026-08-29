@@ -19,12 +19,15 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
-use OCP\Share\ShareReview\IShareReviewSource;
+use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
+use OCP\Share\ShareReview\ShareReviewPage;
 use OCP\Share\ShareReview\ShareReviewPermission;
+use OCP\Share\ShareReview\ShareReviewQuery;
 use Psr\Log\LoggerInterface;
 
-class ShareReviewSource implements IShareReviewSource {
+class ShareReviewSource implements IPaginatedShareReviewSource {
 
 	public const PERMISSION_READ = 'forms:read';
 	public const PERMISSION_EDIT = 'forms:edit';
@@ -32,6 +35,18 @@ class ShareReviewSource implements IShareReviewSource {
 	public const PERMISSION_RESULTS = 'forms:results';
 	public const PERMISSION_RESULTS_DELETE = 'forms:results_delete';
 	public const PERMISSION_EMBED = 'forms:embed';
+
+	/**
+	 * Opaque share-review permission id to the native form permission that
+	 * grants it. Read is implied by any share and has no native counterpart.
+	 */
+	private const NATIVE_PERMISSIONS = [
+		self::PERMISSION_EDIT => Constants::PERMISSION_EDIT,
+		self::PERMISSION_SUBMIT => Constants::PERMISSION_SUBMIT,
+		self::PERMISSION_RESULTS => Constants::PERMISSION_RESULTS,
+		self::PERMISSION_RESULTS_DELETE => Constants::PERMISSION_RESULTS_DELETE,
+		self::PERMISSION_EMBED => Constants::PERMISSION_EMBED,
+	];
 
 	/** @var array<string, ShareReviewPermission>|null */
 	private ?array $permissionCatalog = null;
@@ -50,20 +65,78 @@ class ShareReviewSource implements IShareReviewSource {
 		return 'Forms';
 	}
 
+	public function getDisplayName(): string {
+		return $this->l10n->t('Forms');
+	}
+
 	/**
+	 * All shares, read page by page in a stable order so the list stays
+	 * memory-bounded per page even though the result is one array.
+	 *
 	 * @return list<ShareReviewEntry>
 	 */
 	public function getShares(): array {
+		// enumerated on the immutable id order, so concurrent edits (which
+		// move last_updated) can neither duplicate nor skip rows
+		$entries = [];
 		try {
-			$rawShares = $this->shareMapper->findAllForShareReview();
+			foreach ($this->shareMapper->findAllForShareReview() as $row) {
+				$entries[] = $this->buildEntry($row);
+			}
 		} catch (Exception $e) {
 			$this->logger->error('Forms ShareReview: failed to fetch shares: {message}', ['message' => $e->getMessage()]);
 			return [];
 		}
-		return array_map(
-			$this->buildEntry(...),
-			$rawShares,
-		);
+		return $entries;
+	}
+
+	public function queryShares(ShareReviewQuery $query): ShareReviewPage {
+		$formPermissions = $this->nativePermissions($query);
+		try {
+			$rows = $this->shareMapper->findPageForShareReview($query, $formPermissions);
+			$counts = $this->shareMapper->countForShareReview($query, $formPermissions);
+		} catch (Exception $e) {
+			$this->logger->error('Forms ShareReview: failed to fetch shares: {message}', ['message' => $e->getMessage()]);
+			return new ShareReviewPage([], new ShareReviewCounts(0, 0));
+		}
+		return new ShareReviewPage(array_map($this->buildEntry(...), $rows), $counts);
+	}
+
+	public function countShares(ShareReviewQuery $query): ShareReviewCounts {
+		try {
+			return $this->shareMapper->countForShareReview($query, $this->nativePermissions($query));
+		} catch (Exception $e) {
+			$this->logger->error('Forms ShareReview: failed to count shares: {message}', ['message' => $e->getMessage()]);
+			return new ShareReviewCounts(0, 0);
+		}
+	}
+
+	public function countSharesByType(ShareReviewQuery $query): array {
+		try {
+			$nativeCounts = $this->shareMapper->countByTypeForShareReview($query, $this->nativePermissions($query));
+		} catch (Exception $e) {
+			$this->logger->error('Forms ShareReview: failed to count shares by type: {message}', ['message' => $e->getMessage()]);
+			return [];
+		}
+		$counts = [];
+		foreach ($nativeCounts as $nativeType => $count) {
+			$type = $this->mapShareType($nativeType);
+			$counts[$type] = ($counts[$type] ?? 0) + $count;
+		}
+		return $counts;
+	}
+
+	public function getShare(string $shareId): ?ShareReviewEntry {
+		if (!ctype_digit($shareId)) {
+			return null;
+		}
+		try {
+			$row = $this->shareMapper->findByIdForShareReview((int)$shareId);
+		} catch (Exception $e) {
+			$this->logger->error('Forms ShareReview: failed to fetch share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
+			return null;
+		}
+		return $row === null ? null : $this->buildEntry($row);
 	}
 
 	public function deleteShare(string $shareId): bool {
@@ -103,6 +176,23 @@ class ShareReviewSource implements IShareReviewSource {
 		}
 	}
 
+	/**
+	 * Translate the query's opaque permission ids into the native form
+	 * permissions the mapper filters on. Read is granted by every share, so
+	 * asking for it disables the filter; ids of other apps match nothing.
+	 *
+	 * @return list<string>|null null = no permission filter
+	 */
+	private function nativePermissions(ShareReviewQuery $query): ?array {
+		if ($query->permissionIds === null || in_array(self::PERMISSION_READ, $query->permissionIds, true)) {
+			return null;
+		}
+		return array_values(array_map(
+			static fn (string $id): string => self::NATIVE_PERMISSIONS[$id],
+			array_filter($query->permissionIds, static fn (string $id): bool => isset(self::NATIVE_PERMISSIONS[$id])),
+		));
+	}
+
 	/** @param array<string, mixed> $share */
 	private function buildEntry(array $share): ShareReviewEntry {
 		// last_updated is bumped on every share change of the form, created is the lower bound
@@ -124,8 +214,7 @@ class ShareReviewSource implements IShareReviewSource {
 	/** @param array<string, mixed> $share */
 	private function resolveObjectName(array $share): string {
 		$title = (string)($share['form_title'] ?? '');
-		$formId = (int)($share['form_id'] ?? $share['id']);
-		$label = $title !== '' ? $title : $this->l10n->t('Form %d', [$formId]);
+		$label = $title !== '' ? $title : $this->l10n->t('Form %d', [(int)$share['form_id']]);
 		return $this->l10n->t('%s (Form)', [$label]);
 	}
 
@@ -154,13 +243,7 @@ class ShareReviewSource implements IShareReviewSource {
 		$catalog = $this->permissionCatalog();
 		// Any share grants seeing the form itself
 		$permissions = [$catalog[self::PERMISSION_READ]];
-		foreach ([
-			Constants::PERMISSION_EDIT => self::PERMISSION_EDIT,
-			Constants::PERMISSION_SUBMIT => self::PERMISSION_SUBMIT,
-			Constants::PERMISSION_RESULTS => self::PERMISSION_RESULTS,
-			Constants::PERMISSION_RESULTS_DELETE => self::PERMISSION_RESULTS_DELETE,
-			Constants::PERMISSION_EMBED => self::PERMISSION_EMBED,
-		] as $formPermission => $permissionId) {
+		foreach (self::NATIVE_PERMISSIONS as $permissionId => $formPermission) {
 			if (in_array($formPermission, $formPermissions, true)) {
 				$permissions[] = $catalog[$permissionId];
 			}
