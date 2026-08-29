@@ -21,8 +21,11 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
+use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
 use OCP\Share\ShareReview\ShareReviewPermission;
+use OCP\Share\ShareReview\ShareReviewQuery;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -93,14 +96,172 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->assertSame('Forms', $this->source->getName());
 	}
 
+	public function testGetDisplayNameIsTranslated(): void {
+		$this->assertInstanceOf(IPaginatedShareReviewSource::class, $this->source);
+		$this->assertSame('Forms', $this->source->getDisplayName());
+	}
+
+	public function testGetSharesStreamsTheFullIdOrderedList(): void {
+		$this->mockFindAllForShareReview(array_map(fn (int $id) => $this->makeShareRow(['id' => $id]), range(1, ShareReviewQuery::MAX_LIMIT + 1)));
+
+		$shares = $this->source->getShares();
+
+		$this->assertCount(ShareReviewQuery::MAX_LIMIT + 1, $shares);
+		$this->assertSame('501', $shares[ShareReviewQuery::MAX_LIMIT]->id);
+	}
+
+	/** @param list<array<string, mixed>> $rows */
+	private function mockFindAllForShareReview(array $rows): void {
+		$this->shareMapper->method('findAllForShareReview')->willReturnCallback(static function () use ($rows): \Generator {
+			yield from $rows;
+		});
+	}
+
+	public function testQuerySharesReturnsPageWithMapperCounts(): void {
+		$query = new ShareReviewQuery(limit: 2, offset: 4, search: 'form');
+		$counts = new ShareReviewCounts(10, 3);
+		$this->shareMapper->expects($this->once())
+			->method('findPageForShareReview')
+			->with($query, null)
+			->willReturn([$this->makeShareRow(['id' => 5]), $this->makeShareRow(['id' => 6])]);
+		$this->shareMapper->expects($this->once())
+			->method('countForShareReview')
+			->with($query, null)
+			->willReturn($counts);
+
+		$page = $this->source->queryShares($query);
+
+		$this->assertSame($counts, $page->counts);
+		$this->assertSame(['5', '6'], array_map(static fn (ShareReviewEntry $e) => $e->id, $page->entries));
+		$this->assertSame('My Form (Form)', $page->entries[0]->object);
+	}
+
+	public function testQuerySharesTranslatesPermissionIdsToNativePermissions(): void {
+		$query = new ShareReviewQuery(permissionIds: [ShareReviewSource::PERMISSION_RESULTS, 'deck:manage', ShareReviewSource::PERMISSION_EMBED]);
+		$this->shareMapper->expects($this->once())
+			->method('findPageForShareReview')
+			->with($query, ['results', 'embed'])
+			->willReturn([]);
+		$this->shareMapper->method('countForShareReview')->willReturn(new ShareReviewCounts(0, 0));
+
+		$this->source->queryShares($query);
+	}
+
+	public function testQuerySharesForeignPermissionIdsMatchNothing(): void {
+		$query = new ShareReviewQuery(permissionIds: ['deck:manage']);
+		$this->shareMapper->expects($this->once())
+			->method('countForShareReview')
+			->with($query, [])
+			->willReturn(new ShareReviewCounts(4, 0));
+
+		$this->assertSame(0, $this->source->countShares($query)->filteredCount);
+	}
+
+	public function testReadPermissionIsGrantedByEveryShareAndDisablesTheFilter(): void {
+		$query = new ShareReviewQuery(permissionIds: [ShareReviewSource::PERMISSION_READ, 'deck:manage']);
+		$this->shareMapper->expects($this->once())
+			->method('countForShareReview')
+			->with($query, null)
+			->willReturn(new ShareReviewCounts(4, 4));
+
+		$this->assertSame(4, $this->source->countShares($query)->filteredCount);
+	}
+
+	public function testQuerySharesReturnsEmptyPageOnDbException(): void {
+		$this->shareMapper->method('findPageForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->logger->expects($this->once())->method('error');
+
+		$page = $this->source->queryShares(new ShareReviewQuery());
+
+		$this->assertSame([], $page->entries);
+		$this->assertSame(0, $page->counts->totalCount);
+		$this->assertSame(0, $page->counts->filteredCount);
+	}
+
+	public function testCountSharesDelegatesToMapper(): void {
+		$query = new ShareReviewQuery(hasExpiration: true);
+		$counts = new ShareReviewCounts(12, 5);
+		$this->shareMapper->expects($this->once())->method('countForShareReview')->with($query, null)->willReturn($counts);
+		$this->shareMapper->expects($this->never())->method('findPageForShareReview');
+
+		$this->assertSame($counts, $this->source->countShares($query));
+	}
+
+	public function testCountSharesByTypeMapsUnknownNativeTypesToUser(): void {
+		$this->shareMapper->method('countByTypeForShareReview')->willReturn([
+			IShare::TYPE_LINK => 2,
+			IShare::TYPE_USER => 3,
+			99 => 1,
+		]);
+
+		$counts = $this->source->countSharesByType(new ShareReviewQuery());
+
+		$this->assertSame([IShare::TYPE_LINK => 2, IShare::TYPE_USER => 4], $counts);
+	}
+
+	public function testCountSharesByInitiatorDelegatesWithTheLimit(): void {
+		$this->shareMapper->expects($this->once())->method('countByInitiatorForShareReview')
+			->with($this->isInstanceOf(ShareReviewQuery::class), 10, null)
+			->willReturn(['alice' => 3, 'bob' => 1]);
+
+		$this->assertSame(['alice' => 3, 'bob' => 1], $this->source->countSharesByInitiator(new ShareReviewQuery(), 10));
+	}
+
+	public function testCountSharesByInitiatorRejectsAnOutOfRangeLimit(): void {
+		$this->shareMapper->expects($this->never())->method('countByInitiatorForShareReview');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->source->countSharesByInitiator(new ShareReviewQuery(), ShareReviewQuery::MAX_LIMIT + 1);
+	}
+
+	public function testCountSharesByInitiatorRejectsZero(): void {
+		$this->expectException(\InvalidArgumentException::class);
+		$this->source->countSharesByInitiator(new ShareReviewQuery(), 0);
+	}
+
+	public function testCountSharesByInitiatorDbErrorIsEmpty(): void {
+		$this->shareMapper->method('countByInitiatorForShareReview')->willThrowException($this->createMock(Exception::class));
+		$this->logger->expects($this->once())->method('error');
+
+		$this->assertSame([], $this->source->countSharesByInitiator(new ShareReviewQuery(), 5));
+	}
+
+	public function testGetShareReturnsEntry(): void {
+		$this->shareMapper->expects($this->once())
+			->method('findByIdForShareReview')
+			->with(7)
+			->willReturn($this->makeShareRow(['id' => 7, 'share_type' => IShare::TYPE_LINK, 'share_with' => 'hash']));
+
+		$entry = $this->source->getShare('7');
+
+		$this->assertNotNull($entry);
+		$this->assertSame('7', $entry->id);
+		$this->assertSame(IShare::TYPE_LINK, $entry->type);
+		$this->assertSame('hash', $entry->recipient);
+	}
+
+	public function testGetShareUnknownIdReturnsNull(): void {
+		$this->shareMapper->method('findByIdForShareReview')->willReturn(null);
+
+		$this->assertNull($this->source->getShare('7'));
+	}
+
+	public function testGetShareRejectsNonDigitIds(): void {
+		$this->shareMapper->expects($this->never())->method('findByIdForShareReview');
+
+		$this->assertNull($this->source->getShare('1e3'));
+		$this->assertNull($this->source->getShare('abc'));
+		$this->assertNull($this->source->getShare(''));
+	}
+
 	public function testGetSharesEmpty(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn([]);
+		$this->mockFindAllForShareReview([]);
 
 		$this->assertSame([], $this->source->getShares());
 	}
 
 	public function testGetSharesUserShare(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn([$this->makeShareRow()]);
+		$this->mockFindAllForShareReview([$this->makeShareRow()]);
 
 		$shares = $this->source->getShares();
 
@@ -120,7 +281,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesLinkShare(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['share_type' => IShare::TYPE_LINK, 'share_with' => 'publicHash123'])]
 		);
 
@@ -131,7 +292,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesGroupShare(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['share_type' => IShare::TYPE_GROUP, 'share_with' => 'developers'])]
 		);
 
@@ -142,7 +303,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesCircleShare(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['share_type' => IShare::TYPE_CIRCLE, 'share_with' => 'circle-uid'])]
 		);
 
@@ -150,7 +311,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesUnknownTypeLogsWarningAndFallsBackToUser(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['share_type' => 99])]
 		);
 		$this->logger->expects($this->once())->method('warning');
@@ -159,7 +320,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesMissingTitleFallback(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['form_id' => 42, 'form_title' => null, 'form_owner' => null])]
 		);
 
@@ -169,7 +330,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesExpirationFromForm(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['form_expires' => 1800000000])]
 		);
 
@@ -177,7 +338,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesUsesLastUpdatedWhenSet(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['form_created' => 1700000000, 'form_last_updated' => 1800000000])]
 		);
 
@@ -185,7 +346,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testGetSharesFallsBackToCreatedTime(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['form_created' => 1700000000, 'form_last_updated' => 0])]
 		);
 
@@ -200,7 +361,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testPermissionsDefaultToSubmit(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['permissions_json' => null])]
 		);
 
@@ -211,7 +372,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testPermissionsResultsEmitsOwnPermission(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['permissions_json' => json_encode(['results'])])]
 		);
 
@@ -224,7 +385,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testPermissionsEdit(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['permissions_json' => json_encode(['edit'])])]
 		);
 
@@ -235,7 +396,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testPermissionsResultsDelete(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['permissions_json' => json_encode(['results_delete'])])]
 		);
 
@@ -246,7 +407,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testPermissionsEmbed(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['permissions_json' => json_encode(['embed'])])]
 		);
 
@@ -257,7 +418,7 @@ final class ShareReviewSourceTest extends TestCase {
 	}
 
 	public function testPermissionsAllCapabilitiesMapOneToOne(): void {
-		$this->shareMapper->method('findAllForShareReview')->willReturn(
+		$this->mockFindAllForShareReview(
 			[$this->makeShareRow(['permissions_json' => json_encode(['edit', 'embed', 'results', 'results_delete', 'submit'])])]
 		);
 
