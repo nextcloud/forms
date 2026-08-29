@@ -192,7 +192,7 @@ export default defineComponent({
 		 */
 		const saveAppConfig = async (
 			configKey: string,
-			configValue: unknown,
+			configValue: string | number | boolean | string[],
 		): Promise<void> => {
 			try {
 				await axios.patch(generateUrl('apps/forms/config'), {

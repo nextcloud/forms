@@ -92,6 +92,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue'
+import type { FormsForm } from '../../types/Entities.d.ts'
+
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
@@ -121,7 +124,7 @@ export default defineComponent({
 
 	props: {
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 

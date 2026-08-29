@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import type { AxiosRequestConfig } from '@nextcloud/axios'
+import type { OCSResponse } from '@nextcloud/typings/ocs'
 import type { ComputedRef, Ref } from 'vue'
+import type { FormsForm } from '../types/Entities.d.ts'
 
 import { getCurrentUser } from '@nextcloud/auth'
 import axios, { isCancel } from '@nextcloud/axios'
@@ -18,6 +21,8 @@ import CancelableRequest from '../utils/CancelableRequest.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 
+export type MarkdownItInstance = InstanceType<typeof MarkdownIt>
+
 export interface ViewFormLike {
 	id: number
 	hash: string
@@ -29,15 +34,15 @@ export interface ViewFormLike {
 }
 
 export interface UseViewFormOptions {
-	form: () => ViewFormLike | Record<string, unknown>
+	form: () => FormsForm | ViewFormLike | Record<string, unknown>
 	emit: ((event: 'open-sharing', hash: string) => void)
-		& ((event: 'update:form', form: ViewFormLike) => void)
+		& ((event: 'update:form', form: FormsForm | ViewFormLike) => void)
 	titleRef?: { value: { focus?: () => void } | null }
 }
 
 export interface UseViewFormResult {
 	isLoadingForm: Ref<boolean>
-	markdownit: MarkdownIt
+	markdownit: MarkdownItInstance
 	formTitle: ComputedRef<string>
 	formDescription: ComputedRef<string>
 	isFormLocked: ComputedRef<boolean>
@@ -117,12 +122,11 @@ export function useViewForm(options: UseViewFormOptions): UseViewFormResult {
 
 		logger.debug(`Loading form ${id}`)
 
-		const { request, cancel } = CancelableRequest(function (
-			url: string,
-			requestOptions?: Record<string, unknown>,
-		) {
-			return axios.get(url, requestOptions)
-		})
+		const { request, cancel } = CancelableRequest<OCSResponse<FormsForm>>(
+			function (url: string, requestOptions?: AxiosRequestConfig) {
+				return axios.get<OCSResponse<FormsForm>>(url, requestOptions)
+			},
+		)
 		cancelFetchFullForm = cancel
 
 		try {

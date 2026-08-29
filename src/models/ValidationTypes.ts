@@ -10,9 +10,15 @@ import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
 import { t } from '@nextcloud/l10n'
 
+export interface ValidationOptions {
+	pattern?: string
+	modifiers?: string
+	[key: string]: unknown
+}
+
 export type ValidationFunction = (
 	input: string,
-	options?: Record<string, unknown>,
+	options?: ValidationOptions,
 ) => boolean
 
 export interface ValidationType {
@@ -88,10 +94,9 @@ const validationTypes: Record<string, ValidationType> = {
 		icon: IconRegex,
 		inputType: 'text',
 		label: t('forms', 'Custom regular expression'),
-		validate: (input: string, options?: Record<string, unknown>) => {
-			const opts = options || {}
-			const pattern = opts.pattern as string
-			const modifiers = opts.modifiers as string
+		validate: (input: string, options?: ValidationOptions) => {
+			const pattern = options?.pattern ?? ''
+			const modifiers = options?.modifiers
 			return new RegExp(pattern, modifiers).test(input)
 		},
 		errorMessage: t('forms', 'The input does not match the required pattern'),

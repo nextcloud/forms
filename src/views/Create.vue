@@ -215,7 +215,7 @@
 
 <script lang="ts">
 import type { ComponentPublicInstance, PropType } from 'vue'
-import type { FormsForm, FormsQuestion } from '../models/Entities.d.ts'
+import type { FormsForm, FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
@@ -425,7 +425,7 @@ export default defineComponent({
 
 		const expirationMessage = computed<string>(() => {
 			const relativeDate = moment(props.form.expires, 'X')
-				.locale(window.OC.getLanguage())
+				.locale(window.OC?.getLanguage())
 				.fromNow()
 			if (isExpired.value) {
 				return t('forms', 'Expired {relativeDate}.', { relativeDate })
@@ -501,7 +501,10 @@ export default defineComponent({
 			updateQuestionProperty(index, 'extraSettings', value)
 		}
 
-		const updateQuestionOptions = (index: number, value: unknown[]): void => {
+		const updateQuestionOptions = (
+			index: number,
+			value: FormsOption[],
+		): void => {
 			updateQuestionProperty(index, 'options', value)
 		}
 

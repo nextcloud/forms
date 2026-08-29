@@ -99,7 +99,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
-import type { FormsForm } from '../models/Entities.d.ts'
+import type { FormsForm } from '../types/Entities.d.ts'
 
 import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'
 import IconPoll from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
@@ -230,7 +230,7 @@ export default defineComponent({
 			}
 			if (props.form.expires) {
 				const relativeDate = moment(props.form.expires, 'X')
-					.locale(window.OC.getLanguage())
+					.locale(window.OC?.getLanguage())
 					.fromNow()
 				if (isExpired.value) {
 					return t('forms', 'Expired {relativeDate}', {

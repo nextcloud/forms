@@ -176,7 +176,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption } from '../../models/Entities.d.ts'
+import type { FormsOption, GridQuestionValues } from '../../types/Entities.d.ts'
 
 import { n, t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, ref } from 'vue'
@@ -202,8 +202,6 @@ type GridQuestionType = GridCellType | 'text'
 type GridCellValue = string | number
 
 type GridMatrixValues = Record<number, Record<number, GridCellValue>>
-
-type GridQuestionValues = Record<number, unknown>
 
 type QuestionGridExtraSettings = {
 	optionsLimitMax?: number
@@ -249,7 +247,7 @@ export default defineComponent({
 		] as Array<{ label: string; id: GridQuestionType }>
 
 		const isUnique = computed(() => {
-			return props.answerType.unique === true
+			return props.answerType?.unique === true
 		})
 
 		const values = computed<GridQuestionValues>(() => {
@@ -265,7 +263,7 @@ export default defineComponent({
 		const shiftDragHandle = computed(() => {
 			return (
 				!props.readOnly
-				&& props.options.length !== 0
+				&& props.options?.length !== 0
 				&& !questionMultiple.isLastEmpty.value
 			)
 		})
@@ -363,7 +361,10 @@ export default defineComponent({
 			})
 		}
 
-		const onChangeCheckboxRadio = (rowId: number, value: unknown): void => {
+		const onChangeCheckboxRadio = (
+			rowId: number,
+			value: number | number[],
+		): void => {
 			const nextValues = { ...(values.value as GridQuestionValues) }
 			nextValues[rowId] = value
 

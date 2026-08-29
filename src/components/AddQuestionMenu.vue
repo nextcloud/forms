@@ -63,6 +63,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue'
+import type { AnswerTypeConfig } from '../models/AnswerTypes.ts'
+
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import { t } from '@nextcloud/l10n'
@@ -93,8 +96,16 @@ export default defineComponent({
 		primary: { type: Boolean, default: false },
 		position: { type: Number, default: null },
 		isLoadingQuestions: { type: Boolean, default: false },
-		answerTypesFilter: { type: Object, required: true },
-		hasSubtypes: { type: Function, required: true },
+		answerTypesFilter: {
+			type: Object as PropType<Record<string, AnswerTypeConfig>>,
+			required: true,
+		},
+
+		hasSubtypes: {
+			type: Function as PropType<(answer: AnswerTypeConfig) => boolean>,
+			required: true,
+		},
+
 		wide: { type: Boolean, default: false },
 	},
 
@@ -119,7 +130,7 @@ export default defineComponent({
 		})
 
 		const onPrimaryClick = (
-			answer: unknown,
+			answer: AnswerTypeConfig,
 			type: string,
 			position: number | null,
 		) => {

@@ -4,7 +4,7 @@
  */
 
 import type { Ref } from 'vue'
-import type { FormsOption } from '../models/Entities.d.ts'
+import type { FormsOption } from '../types/Entities.d.ts'
 
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -110,10 +110,14 @@ export const QUESTION_PROPS = {
 	},
 }
 
+interface RootElementLike {
+	$el?: HTMLElement
+}
+
 interface UseQuestionOptions {
 	emit: (event: string, ...args: unknown[]) => void
 	infoMessage?: Ref<string | null>
-	rootElement?: Ref<{ $el?: HTMLElement } | null>
+	rootElement?: Ref<RootElementLike | HTMLElement | null>
 }
 
 interface QuestionPropsLike {
@@ -222,7 +226,16 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		onExtraSettingsChange({ shuffleOptions: shuffle })
 	}
 
-	const onValuesChange = (values: unknown): void => {
+	const onValuesChange = (
+		values:
+			| string
+			| number
+			| boolean
+			| Array<string | number | boolean | Record<string, unknown>>
+			| Record<string, unknown>
+			| null
+			| unknown,
+	): void => {
 		options.emit('update:values', values)
 	}
 
@@ -239,7 +252,9 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	}
 
 	const focus = (): void => {
-		const element = options.rootElement?.value?.$el ?? options.rootElement?.value
+		const raw = options.rootElement?.value
+		const element = (raw && '$el' in raw ? raw.$el : raw) as
+			HTMLElement | null | undefined
 		element?.scrollIntoView({ behavior: 'smooth' })
 		nextTick(() => {
 			const title = element?.querySelector(
@@ -251,7 +266,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		})
 	}
 
-	const shuffleArray = (input: unknown[]): unknown[] => {
+	const shuffleArray = <T>(input: T[]): T[] => {
 		const shuffled = [...input]
 		let idx = shuffled.length
 		while (--idx > 0) {
@@ -267,7 +282,17 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	 * @param key Question property name.
 	 * @param value Question property value.
 	 */
-	async function saveQuestionProperty(key: string, value: unknown): Promise<void> {
+	async function saveQuestionProperty(
+		key: string,
+		value:
+			| string
+			| number
+			| boolean
+			| Array<unknown>
+			| Record<string, unknown>
+			| null
+			| unknown,
+	): Promise<void> {
 		try {
 			await axios.patch(
 				generateOcsUrl(

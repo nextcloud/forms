@@ -266,7 +266,12 @@
 
 <script lang="ts">
 import type { INode } from '@nextcloud/files'
-import type { FormsQuestion } from '../models/Entities.d.ts'
+import type { PropType } from 'vue'
+import type {
+	FormsForm,
+	FormsQuestion,
+	FormsSubmission,
+} from '../types/Entities.d.ts'
 
 import IconPoll from '@material-symbols/svg-400/outlined/bar_chart.svg?raw'
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
@@ -407,7 +412,7 @@ export default defineComponent({
 		},
 
 		form: {
-			type: Object,
+			type: Object as PropType<FormsForm>,
 			required: true,
 		},
 
@@ -425,7 +430,7 @@ export default defineComponent({
 		const viewForm = useViewForm({ form: () => props.form, emit })
 
 		const questions = ref<FormsQuestion[]>([])
-		const submissions = ref<SubmissionRecord[]>([])
+		const submissions = ref<FormsSubmission[]>([])
 		const filteredSubmissionsCount = ref(0)
 		const isDownloadActionOpened = ref(false)
 		const loadingResults = ref(true)
@@ -644,7 +649,7 @@ export default defineComponent({
 				submissions.value = formatDateAnswers(
 					data.submissions,
 					data.questions,
-				)
+				) as FormsSubmission[]
 				questions.value = data.questions
 				filteredSubmissionsCount.value = data.filteredSubmissionsCount
 			} catch (error) {
@@ -838,7 +843,7 @@ export default defineComponent({
 
 				showSuccess(t('forms', 'Response deleted'))
 				const index = submissions.value.findIndex(
-					(search: SubmissionRecord) => search.id === id,
+					(search: FormsSubmission) => search.id === id,
 				)
 				if (index >= 0) {
 					submissions.value.splice(index, 1)

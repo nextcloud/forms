@@ -5,7 +5,7 @@
 /* eslint-disable jsdoc/require-jsdoc */
 
 import type { Ref } from 'vue'
-import type { FormsOption } from '../models/Entities.d.ts'
+import type { FormsOption } from '../types/Entities.d.ts'
 
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -33,16 +33,18 @@ interface UseQuestionMultipleOptions {
 
 interface AnswerTypeLike {
 	validate: (ctx: unknown) => boolean
+	[key: string]: unknown
 }
 
 export interface QuestionMultiplePropsLike {
 	options: FormsOption[]
-	values: unknown[]
-	answerType: AnswerTypeLike
-	readOnly: boolean
-	extraSettings?: Record<string, unknown>
-	formId: number
+	values?: unknown[] | Record<string, unknown> | null
+	answerType?: AnswerTypeLike | Record<string, unknown>
+	readOnly?: boolean
+	extraSettings?: Record<string, unknown> | null
+	formId?: number | null
 	id: number
+	[key: string]: unknown
 }
 
 /**
@@ -52,22 +54,27 @@ export interface QuestionMultiplePropsLike {
  * @param options Emits bridge for forwarding option updates.
  */
 export function useQuestionMultiple(
-	props: unknown,
+	props: QuestionMultiplePropsLike,
 	options: UseQuestionMultipleOptions,
 ) {
-	const typedProps = props as QuestionMultiplePropsLike
 	const dirtyOptionsType = ref<string | null>(null)
 
 	const areNoneChecked = computed(() => {
-		return typedProps.values.length === 0
+		return Array.isArray(props.values) ? props.values.length === 0 : true
 	})
 
 	const contentValid = computed(() => {
-		return typedProps.answerType.validate(typedProps)
+		if (
+			props.answerType
+			&& typeof (props.answerType as AnswerTypeLike).validate === 'function'
+		) {
+			return (props.answerType as AnswerTypeLike).validate(props)
+		}
+		return true
 	})
 
 	const isLastEmpty = computed(() => {
-		const value = typedProps.options[typedProps.options.length - 1] as
+		const value = props.options[props.options.length - 1] as
 			FormsOption | undefined
 		return value?.text?.trim?.().length === 0
 	})
@@ -81,14 +88,14 @@ export function useQuestionMultiple(
 			expectedOptionTypes.value.map((optionType) => [optionType, []]),
 		)
 
-		typedProps.options.forEach((option) => {
+		props.options.forEach((option) => {
 			if (optionsPerType[option.optionType]) {
 				optionsPerType[option.optionType].push(option)
 			}
 		})
 
 		for (const optionType of Object.keys(optionsPerType)) {
-			if (typedProps.readOnly && typedProps.extraSettings?.shuffleOptions) {
+			if (props.readOnly && props.extraSettings?.shuffleOptions) {
 				optionsPerType[optionType] = shuffleArray(optionsPerType[optionType])
 			} else {
 				optionsPerType[optionType] = [...optionsPerType[optionType]].sort(
@@ -100,11 +107,11 @@ export function useQuestionMultiple(
 					},
 				)
 
-				if (!typedProps.readOnly) {
+				if (!props.readOnly) {
 					optionsPerType[optionType].push({
 						id: 0,
 						local: true,
-						questionId: typedProps.id,
+						questionId: props.id,
 						text: '',
 						optionType,
 						order: optionsPerType[optionType].length,
@@ -126,8 +133,8 @@ export function useQuestionMultiple(
 				generateOcsUrl(
 					'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
 					{
-						id: typedProps.formId,
-						questionId: typedProps.id,
+						id: props.formId,
+						questionId: props.id,
 					},
 				),
 				{
@@ -137,7 +144,7 @@ export function useQuestionMultiple(
 			)
 
 			const newServerOptions = OcsResponse2Data(response) as FormsOption[]
-			const newOptions = typedProps.options.slice()
+			const newOptions = props.options.slice()
 			newServerOptions.forEach((option: FormsOption, index: number) => {
 				const order =
 					typeof option.order === 'number'
@@ -147,7 +154,7 @@ export function useQuestionMultiple(
 				newOptions.push({
 					...option,
 					id: option.id,
-					questionId: typedProps.id,
+					questionId: props.id,
 					text: option.text,
 					optionType: option.optionType ?? OptionType.Choice,
 					order,
@@ -216,7 +223,7 @@ export function useQuestionMultiple(
 		let filtered = optionsList.filter(
 			(option) => option.optionType === optionType,
 		)
-		if (typedProps.readOnly && typedProps.extraSettings?.shuffleOptions) {
+		if (props.readOnly && props.extraSettings?.shuffleOptions) {
 			return shuffleArray(filtered)
 		}
 
@@ -227,13 +234,13 @@ export function useQuestionMultiple(
 			return (a.order ?? 0) - (b.order ?? 0)
 		})
 
-		if (!typedProps.readOnly) {
+		if (!props.readOnly) {
 			return [
 				...filtered,
 				{
 					id: 0,
 					local: true,
-					questionId: typedProps.id,
+					questionId: props.id,
 					text: '',
 					optionType,
 					order: filtered.length,
@@ -262,14 +269,12 @@ export function useQuestionMultiple(
 		nextTick(() => {
 			nextTick(() => focusIndex(index + 1, answer.optionType))
 		})
-		updateOptions([...typedProps.options, answer])
+		updateOptions([...props.options, answer])
 	}
 
 	function replaceOptionsOfType(optionsList: FormsOption[], optionType: string) {
 		const updatedOptions = [
-			...typedProps.options.filter(
-				(option) => option.optionType !== optionType,
-			),
+			...props.options.filter((option) => option.optionType !== optionType),
 			...optionsList,
 		]
 
@@ -278,7 +283,7 @@ export function useQuestionMultiple(
 
 	function updateOptions(optionsList: FormsOption[]) {
 		options.emit('update:options', optionsList)
-		emitEvent('forms:last-updated:set', typedProps.formId)
+		emitEvent('forms:last-updated:set', props.formId)
 	}
 
 	function updateAnswer(index: number, answer: FormsOption) {
@@ -327,9 +332,7 @@ export function useQuestionMultiple(
 	}
 
 	function deleteOptionFromDatabase(option: FormsOption & { local?: boolean }) {
-		const optionIndex = typedProps.options.findIndex(
-			(opt) => opt.id === option.id,
-		)
+		const optionIndex = props.options.findIndex((opt) => opt.id === option.id)
 
 		if (!option.local) {
 			axios
@@ -337,8 +340,8 @@ export function useQuestionMultiple(
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
 						{
-							id: typedProps.formId,
-							questionId: typedProps.id,
+							id: props.formId,
+							questionId: props.id,
 							optionId: option.id,
 						},
 					),
@@ -355,7 +358,7 @@ export function useQuestionMultiple(
 	}
 
 	function restoreOption(option: FormsOption, index: number) {
-		const optionsList = typedProps.options.slice()
+		const optionsList = props.options.slice()
 		optionsList.splice(index, 0, option)
 
 		updateOptions(optionsList)
@@ -372,8 +375,8 @@ export function useQuestionMultiple(
 				generateOcsUrl(
 					'apps/forms/api/v3/forms/{id}/questions/{questionId}/options',
 					{
-						id: typedProps.formId,
-						questionId: typedProps.id,
+						id: props.formId,
+						questionId: props.id,
 					},
 				),
 				{
@@ -381,7 +384,7 @@ export function useQuestionMultiple(
 					optionType,
 				},
 			)
-			emitEvent('forms:last-updated:set', typedProps.formId)
+			emitEvent('forms:last-updated:set', props.formId)
 			dirtyOptionsType.value = null
 		} catch (error) {
 			logger.error('Could not reorder options', { error })

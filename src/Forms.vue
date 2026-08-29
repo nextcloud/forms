@@ -147,7 +147,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsForm } from './models/Entities.d.ts'
+import type { FormsForm } from './types/Entities.d.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconArchive from '@material-symbols/svg-400/outlined/archive.svg?raw'

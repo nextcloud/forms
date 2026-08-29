@@ -5,27 +5,22 @@
 
 import { t } from '@nextcloud/l10n'
 
-declare global {
-	interface Window {
-		OC: {
-			getLanguage: () => string
-			theme: {
-				title: string
-			}
-		}
-	}
-}
-
 /**
  * Set the Window-Title to current FormTitle including suffix.
  *
  * @param formTitle Title of current form to set on window.
  */
 export default function SetWindowTitle(formTitle: string): void {
+	const themeTitle = window.OC?.theme?.title ?? ''
 	if (formTitle === '') {
-		window.document.title = t('forms', 'Forms') + ' - ' + window.OC.theme.title
+		window.document.title =
+			themeTitle !== ''
+				? `${t('forms', 'Forms')} - ${themeTitle}`
+				: t('forms', 'Forms')
 	} else {
 		window.document.title =
-			formTitle + ' - ' + t('forms', 'Forms') + ' - ' + window.OC.theme.title
+			themeTitle !== ''
+				? `${formTitle} - ${t('forms', 'Forms')} - ${themeTitle}`
+				: `${formTitle} - ${t('forms', 'Forms')}`
 	}
 }

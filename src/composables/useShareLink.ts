@@ -40,11 +40,11 @@ export function useShareLink(
 	dependencies: ShareLinkDependencies,
 ): UseShareLinkResult {
 	const isEmbeddingAllowed = (share: Share): boolean => {
-		return (
+		return Boolean(
 			share.shareType === dependencies.SHARE_TYPES.SHARE_TYPE_LINK
 			&& share.permissions?.includes(
 				dependencies.PERMISSION_TYPES.PERMISSION_EMBED,
-			)
+			),
 		)
 	}
 
@@ -61,7 +61,7 @@ export function useShareLink(
 		const path = isEmbeddingAllowed(share)
 			? `/apps/forms/embed/${share.shareWith}`
 			: `/apps/forms/s/${share.shareWith}`
-		return new URL(generateUrl(path), window.location).href
+		return new URL(generateUrl(path), window.location.href).href
 	}
 
 	const copyLink = async (event: Event, link: string): Promise<void> => {

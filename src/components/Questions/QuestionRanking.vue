@@ -194,7 +194,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption } from '../../models/Entities.d.ts'
+import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import IconContentPaste from '@material-symbols/svg-400/outlined/content_paste.svg?raw'
@@ -275,7 +275,7 @@ export default defineComponent({
 		const shiftDragHandle = computed(() => {
 			return (
 				!props.readOnly
-				&& props.options.length !== 0
+				&& props.options?.length !== 0
 				&& !questionMultiple.isLastEmpty.value
 			)
 		})

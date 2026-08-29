@@ -3,9 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import type { AxiosRequestConfig, AxiosResponse, Canceler } from '@nextcloud/axios'
+
 import axios from '@nextcloud/axios'
 
-type RequestFn = (url: string, options?: unknown) => Promise<unknown>
+type RequestFn<T> = (
+	url: string,
+	options?: AxiosRequestConfig,
+) => Promise<AxiosResponse<T>>
+
+export interface CancelableRequestResult<T> {
+	request: (url: string, options?: AxiosRequestConfig) => Promise<AxiosResponse<T>>
+	cancel: Canceler
+}
 
 /**
  * Creates a cancelable axios 'request object'.
@@ -13,7 +23,9 @@ type RequestFn = (url: string, options?: unknown) => Promise<unknown>
  * @param request the axios promise request
  * @return
  */
-export default function CancelableRequest(request: RequestFn) {
+export default function CancelableRequest<T = unknown>(
+	request: RequestFn<T>,
+): CancelableRequestResult<T> {
 	/**
 	 * Generate an axios cancel token
 	 */
@@ -26,7 +38,10 @@ export default function CancelableRequest(request: RequestFn) {
 	 * @param url the url to send the request to
 	 * @param [options] optional config for the request
 	 */
-	const fetch = async function (url: string, options?: Array<unknown>) {
+	const fetch = async function (
+		url: string,
+		options?: AxiosRequestConfig,
+	): Promise<AxiosResponse<T>> {
 		return request(url, { cancelToken: source.token, ...options })
 	}
 	return {
