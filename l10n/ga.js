@@ -25,6 +25,7 @@ OC.L10N.register(
     "Thank you for your submission" : "Go raibh maith agat as d’aighneacht",
     "Thank you for submitting the form \"%s\"." : "Go raibh maith agat as an bhfoirm \"%s\" a chur isteach.",
     "responses" : "freagraí",
+    "Submission ID" : "Aitheantas Aighneachta",
     "User ID" : "ID Úsáideora",
     "User display name" : "Ainm úsáideora taispeána",
     "Timestamp" : "Stampa ama",
