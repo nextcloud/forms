@@ -29,6 +29,8 @@ OC.L10N.register(
     "User ID" : "Identifiant utilisateur",
     "User display name" : "Nom d'affichage de l'utilisateur",
     "Timestamp" : "Horodatage",
+    "Form %d" : "Formulaire %d",
+    "%s (Form)" : "%s (Formulaire)",
     "Read" : "Lire",
     "Edit form" : "Modifier le formulaire",
     "Submit" : "Envoyer",
