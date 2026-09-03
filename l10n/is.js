@@ -92,6 +92,7 @@ OC.L10N.register(
     "Dropdown" : "Fellilisti",
     "People can pick one option" : "Fólk má velja einn möguleika",
     "Pick an option" : "Veldu einn möguleika",
+    "File" : "Skrá",
     "Short answer" : "Stutt svar",
     "Short answer question title" : "Titill spurningar með stutt svar",
     "People can enter a short answer" : "Fólk getur sett inn stutt svar",
