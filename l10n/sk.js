@@ -81,6 +81,7 @@ OC.L10N.register(
     "Go to first page" : "Ísť na prvú stránku",
     "Go to previous page" : "Ísť na predchádzajúcu stránku",
     "Page number" : "Číslo stránky",
+    "{page} of {totalPages}" : "{page} z {totalPages}",
     "Go to next page" : "Ísť na ďaľšiu stránku",
     "Go to last page" : "Ísť na poslednú stránku",
     "QR code representation of {text}" : "Zobrazenie QR kódu {text}",
