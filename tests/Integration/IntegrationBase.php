@@ -43,9 +43,7 @@ class IntegrationBase extends TestCase {
 		$userManager = \OCP\Server::get(IUserManager::class);
 		foreach ($this->users as $userId => $displayName) {
 			$user = $userManager->get($userId);
-			if ($user === null) {
-				$user = $userManager->createUser($userId, $userId);
-			}
+			$user ??= $userManager->createUser($userId, $userId);
 			$user->setDisplayName($displayName);
 		}
 

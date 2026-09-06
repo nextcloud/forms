@@ -70,9 +70,7 @@ class CirclesService {
 			$member = $circle->getInitiator();
 			$isUserInCircle = $member !== null && $member->getLevel() >= Member::LEVEL_MEMBER;
 
-			if (!isset($this->userCircleCache[$circleId])) {
-				$this->userCircleCache[$circleId] = [];
-			}
+			$this->userCircleCache[$circleId] ??= [];
 			$this->userCircleCache[$circleId][$userId] = $isUserInCircle;
 
 			return $isUserInCircle;
