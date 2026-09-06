@@ -501,10 +501,7 @@ class SubmissionService {
 			$submissionId = (string)$rowData[$submissionIdColIndex];
 			$row = $existingSubmissionIds[$submissionId] ?? null;
 
-			if ($row === null) {
-				// Append new row
-				$row = $activeWorksheet->getHighestRow() + 1;
-			}
+			$row ??= $activeWorksheet->getHighestRow() + 1;
 
 			$dataIndex = 0;
 			$columnIndex = 1;
