@@ -81,6 +81,7 @@ OC.L10N.register(
     "Sharing" : "Deiling",
     "Settings" : "Stillingar",
     "Abort" : "Hætta við",
+    "Leave" : "Fara",
     "Clear" : "Hreinsa",
     "There was an error submitting the form" : "Það kom upp villa við að senda  eyðuformið inn",
     "Thank you for completing the form!" : "Takk fyrir að fylla út í eyðuformið!",
