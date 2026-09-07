@@ -15,11 +15,9 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\UploadedFilesShareService;
-use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\Files\Folder;
 use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
-use OCP\Files\NotFoundException;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -27,8 +25,6 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class UploadedFilesShareServiceTest extends TestCase {
-	use UserFolderMockTrait;
-
 	private UploadedFilesShareService $service;
 	private ShareMapper|MockObject $shareMapper;
 	private IRootFolder|MockObject $rootFolder;
@@ -48,12 +44,26 @@ class UploadedFilesShareServiceTest extends TestCase {
 		);
 
 		$this->service = new UploadedFilesShareService(
-			$this->rootFolder,
 			$filePathHelper,
 			$this->shareManager,
 			$this->shareMapper,
 			$this->createMock(LoggerInterface::class),
 		);
+	}
+
+	/**
+	 * @return array{0: Folder&MockObject, 1: Folder&MockObject}
+	 */
+	private function mockFormsFolderWithChildren(string $ownerId, array $children): array {
+		$formsFolder = $this->createMock(Folder::class);
+		$formsFolder->method('getDirectoryListing')->willReturn($children);
+
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->method('get')->with(Constants::FILES_FOLDER)->willReturn($formsFolder);
+
+		$this->rootFolder->method('getUserFolder')->with($ownerId)->willReturn($userFolder);
+
+		return [$userFolder, $formsFolder];
 	}
 
 	public function testRemoveAllForFormCleansUpResultsShares(): void {
@@ -78,15 +88,8 @@ class UploadedFilesShareServiceTest extends TestCase {
 			->willReturn([$resultsShare, $submitOnlyShare]);
 
 		$folder = $this->createMock(Folder::class);
-		$userFolder = $this->createUserFolderMock();
-		$userFolder->expects($this->once())
-			->method('get')
-			->with('Forms/2 - test')
-			->willReturn($folder);
-		$this->rootFolder->expects($this->once())
-			->method('getUserFolder')
-			->with('alice')
-			->willReturn($userFolder);
+		$folder->method('getName')->willReturn('2 - test');
+		$this->mockFormsFolderWithChildren('alice', [$folder]);
 
 		$fileShare = $this->createMock(IShare::class);
 		$fileShare->method('getSharedWith')->willReturn('bob');
@@ -99,6 +102,34 @@ class UploadedFilesShareServiceTest extends TestCase {
 			->with($fileShare);
 
 		$this->service->removeAllForForm($form);
+	}
+
+	public function testRemoveForCollaboratorRevokesSharesOnRenamedFormFolder(): void {
+		$form = new Form();
+		$form->setId(19);
+		$form->setTitle('T2');
+		$form->setOwnerId('alice');
+
+		$share = new Share();
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('carol');
+		$share->setPermissions([Constants::PERMISSION_RESULTS]);
+
+		$oldTitleFolder = $this->createMock(Folder::class);
+		$oldTitleFolder->method('getName')->willReturn('19 - T1');
+		$this->mockFormsFolderWithChildren('alice', [$oldTitleFolder]);
+
+		$fileShare = $this->createMock(IShare::class);
+		$fileShare->method('getSharedWith')->willReturn('carol');
+		$this->shareManager->expects($this->once())
+			->method('getSharesBy')
+			->with('alice', IShare::TYPE_USER, $oldTitleFolder, false, -1)
+			->willReturn([$fileShare]);
+		$this->shareManager->expects($this->once())
+			->method('deleteShare')
+			->with($fileShare);
+
+		$this->service->removeForCollaborator($form, $share);
 	}
 
 	public function testRemoveForCollaboratorSkipsShareTypesWithoutFilesShare(): void {
@@ -128,9 +159,7 @@ class UploadedFilesShareServiceTest extends TestCase {
 		$share->setShareWith('bob');
 		$share->setPermissions([Constants::PERMISSION_RESULTS]);
 
-		$userFolder = $this->createUserFolderMock();
-		$userFolder->method('get')->willThrowException(new NotFoundException());
-		$this->rootFolder->method('getUserFolder')->with('alice')->willReturn($userFolder);
+		$this->mockFormsFolderWithChildren('alice', []);
 		$this->shareManager->expects($this->never())->method('getSharesBy');
 
 		$this->service->removeForCollaborator($form, $share);

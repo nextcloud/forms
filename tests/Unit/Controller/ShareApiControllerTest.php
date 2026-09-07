@@ -96,7 +96,6 @@ class ShareApiControllerTest extends TestCase {
 		$this->filePathHelper = new FilePathHelper($this->rootFolder, $this->filenameValidator);
 		$this->shareManager = $this->createMock(IManager::class);
 		$this->uploadedFilesShareService = new UploadedFilesShareService(
-			$this->rootFolder,
 			$this->filePathHelper,
 			$this->shareManager,
 			$this->shareMapper,
@@ -607,14 +606,18 @@ class ShareApiControllerTest extends TestCase {
 			->with('5')
 			->willReturn($form);
 
-		// Mock the uploaded files folder lookup
+		// Mock the uploaded files folder lookup by form id
 		$folder = $this->createMock(Folder::class);
+		$folder->method('getName')->willReturn('5 - form');
+		$formsFolder = $this->createMock(Folder::class);
+		$formsFolder->method('getDirectoryListing')->willReturn([$folder]);
+
 		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('get')
-			->willReturn($folder);
+			->with(Constants::FILES_FOLDER)
+			->willReturn($formsFolder);
 
-		// Set expectations on the rootFolder
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('currentUser')

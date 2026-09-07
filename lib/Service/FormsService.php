@@ -1079,6 +1079,17 @@ class FormsService {
 		return $this->filePathHelper->getFormUploadedFilesFolderPath($form);
 	}
 
+	/**
+	 * Keep Forms upload folder name in sync with the form title.
+	 */
+	public function syncFormUploadFolderName(Form $form): void {
+		try {
+			$this->filePathHelper->syncFormUploadFolderName($form);
+		} catch (\Throwable $e) {
+			$this->logger->warning('Failed to sync form upload folder name', ['exception' => $e]);
+		}
+	}
+
 	public function getUploadedFilePath(Form $form, int $submissionId, int $questionId, ?string $questionName, string $questionText): string {
 		return $this->filePathHelper->getUploadedFilePath($form, $submissionId, $questionId, $questionName, $questionText);
 	}
