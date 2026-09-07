@@ -361,9 +361,14 @@ class ApiController extends OCSController {
 		}
 
 		// Create FormEntity with given Params & Id.
+		$titleChanged = array_key_exists('title', $keyValuePairs);
 		foreach ($keyValuePairs as $key => $value) {
 			$method = 'set' . ucfirst($key);
 			$form->$method($value);
+		}
+
+		if ($titleChanged) {
+			$this->formsService->syncFormUploadFolderName($form);
 		}
 
 		// Update changed Columns in Db.
