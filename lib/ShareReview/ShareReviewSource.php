@@ -17,6 +17,8 @@ use OCP\AppFramework\Db\IMapperException;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
+use OCP\IUserSession;
+use OCP\Log\Audit\CriticalActionPerformedEvent;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
@@ -59,6 +61,7 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 		private readonly IEventDispatcher $eventDispatcher,
 		private readonly LoggerInterface $logger,
 		private readonly IL10N $l10n,
+		private readonly IUserSession $userSession,
 	) {
 	}
 
@@ -170,6 +173,10 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 		$this->eventDispatcher->dispatchTyped($event);
 
 		if (!$event->isHandled() || !$event->isGranted()) {
+			$this->audit('Forms share deletion through share review denied: share "%1$s", user "%2$s"', [
+				(string)$numericShareId,
+				$this->actingUser($context),
+			]);
 			return false;
 		}
 
@@ -188,11 +195,28 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 			$this->shareMapper->delete($share);
 			// Bump the form's last_updated timestamp, matching the regular deletion flow
 			$this->formMapper->update($form);
-			return true;
 		} catch (\Exception $e) {
 			$this->logger->error('Forms ShareReview: failed to delete share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
 			return false;
 		}
+		$this->audit('Forms share deleted through share review: share "%1$s", form "%2$s", share type %3$d, shared with "%4$s", user "%5$s"', [
+			(string)$numericShareId,
+			(string)$form->getTitle(),
+			(int)$share->getShareType(),
+			(string)$share->getShareWith(),
+			$this->actingUser($context),
+		]);
+		return true;
+	}
+
+	/** @param list<string|int> $parameters */
+	private function audit(string $message, array $parameters): void {
+		$this->eventDispatcher->dispatchTyped(new CriticalActionPerformedEvent($message, $parameters));
+	}
+
+	/** The user the deletion is performed for, as named in the audit log */
+	private function actingUser(?ShareReviewActionContext $context): string {
+		return $context?->actingUserId ?? $this->userSession->getUser()?->getUID() ?? '';
 	}
 
 	/**
