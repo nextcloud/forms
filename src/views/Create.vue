@@ -641,12 +641,21 @@ export default defineComponent({
 			isLoadingQuestions.value = true
 
 			try {
+				// A preset is an ordinary question type created with its settings already
+				// filled in, so that an input type such as a phone number can be picked
+				// directly instead of being found inside an existing short-text question.
+				// Applied client-side, so presets need no new backend type.
+				const preset = answerTypes[type]?.preset
 				const body: {
 					type: string
 					text: string
 					subtype: string | null
 					position?: number
-				} = { type, text, subtype }
+				} = {
+					type: preset?.type ?? type,
+					text,
+					subtype: preset?.subtype ?? subtype,
+				}
 				if (position !== null) {
 					// position: current question position + 2 (0-based index: +1, next position: +1)
 					body.position = position + 2
@@ -660,8 +669,39 @@ export default defineComponent({
 				)
 				const question = OcsResponse2Data<FormsQuestion>(response)
 
+				// Apply the preset's settings, then carry them into the local copy so the
+				// question appears configured straight away rather than after a reload.
+				if (preset?.extraSettings) {
+					try {
+						await axios.patch(
+							generateOcsUrl(
+								'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+								{ id: props.form.id, questionId: question.id },
+							),
+							{
+								keyValuePairs: {
+									extraSettings: preset.extraSettings,
+								},
+							},
+						)
+						question.extraSettings = {
+							...(question.extraSettings ?? {}),
+							...preset.extraSettings,
+						}
+					} catch (error) {
+						// The question exists and is usable; only its preconfiguration failed.
+						logger.error('Error while applying question preset', {
+							error,
+						})
+					}
+				}
+
 				// Delegate insertion & focus handling to helper
-				insertQuestion(question, { text, type, answers: [] }, position)
+				insertQuestion(
+					question,
+					{ text, type: body.type, answers: [] },
+					position,
+				)
 			} catch (error) {
 				logger.error('Error while adding new question', { error })
 				showError(

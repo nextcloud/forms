@@ -7,12 +7,16 @@ import type { Component } from 'vue'
 import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
+import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
 import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
 import IconCalendar from '@material-symbols/svg-400/outlined/calendar_today.svg?raw'
+import IconPhone from '@material-symbols/svg-400/outlined/call.svg?raw'
 import IconCheckboxOutline from '@material-symbols/svg-400/outlined/check_box.svg?raw'
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import IconGrid from '@material-symbols/svg-400/outlined/grid_view.svg?raw'
 import IconLinearScale from '@material-symbols/svg-400/outlined/linear_scale.svg?raw'
+import IconLink from '@material-symbols/svg-400/outlined/link.svg?raw'
+import IconEMail from '@material-symbols/svg-400/outlined/mail.svg?raw'
 import IconPalette from '@material-symbols/svg-400/outlined/palette.svg?raw'
 import IconRadioboxMarked from '@material-symbols/svg-400/outlined/radio_button_checked.svg?raw'
 import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?raw'
@@ -55,6 +59,15 @@ export interface AnswerTypeConfig {
 	warningInvalid: string
 	unique?: boolean
 	subtypes?: Record<string, AnswerTypeSubtype>
+	/**
+	 * Creates an existing question type with its settings already filled in, so an input
+	 * type can be picked directly when adding a question.
+	 */
+	preset?: {
+		type: string
+		subtype?: string
+		extraSettings?: Record<string, unknown>
+	}
 	pickerType?: string
 	storageFormat?: string
 	momentFormat?: string
@@ -264,6 +277,65 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		predefined: true,
 
 		titlePlaceholder: t('forms', 'Linear scale question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	/**
+	 * The input types below are presets over short text. The validation they use already
+	 * exists, but could previously only be reached from the input-type menu inside an
+	 * existing short-text question, so it could not be picked when adding a question.
+	 *
+	 * Email is deliberately a preset rather than its own type: Question::checkEmailType()
+	 * recognises an email question only as short text carrying email validation, and the
+	 * confirmation-email recipient picker relies on that.
+	 */
+	number: {
+		component: markRaw(QuestionShort),
+		icon: IconNumeric,
+		label: t('forms', 'Number'),
+		predefined: false,
+		preset: { type: 'short', extraSettings: { validationType: 'number' } },
+
+		titlePlaceholder: t('forms', 'Number question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	phone: {
+		component: markRaw(QuestionShort),
+		icon: IconPhone,
+		label: t('forms', 'Phone number'),
+		predefined: false,
+		preset: { type: 'short', extraSettings: { validationType: 'phone' } },
+
+		titlePlaceholder: t('forms', 'Phone number question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	email: {
+		component: markRaw(QuestionShort),
+		icon: IconEMail,
+		label: t('forms', 'Email address'),
+		predefined: false,
+		preset: { type: 'short', extraSettings: { validationType: 'email' } },
+
+		titlePlaceholder: t('forms', 'Email question title'),
+		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	link: {
+		component: markRaw(QuestionShort),
+		icon: IconLink,
+		label: t('forms', 'Web address'),
+		predefined: false,
+		preset: {
+			type: 'short',
+			extraSettings: {
+				validationType: 'regex',
+				validationRegex: '/^https?:\\/\\/\\S+$/i',
+			},
+		},
+
+		titlePlaceholder: t('forms', 'Web address question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),
 	},
 
