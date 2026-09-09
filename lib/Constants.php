@@ -101,6 +101,7 @@ class Constants {
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
 	public const ANSWER_TYPE_RANKING = 'ranking';
+	public const ANSWER_TYPE_RATING = 'rating';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
 
@@ -121,6 +122,7 @@ class Constants {
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
 		self::ANSWER_TYPE_RANKING,
+		self::ANSWER_TYPE_RATING,
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
 	];
@@ -217,6 +219,15 @@ class Constants {
 		'columns' => ['array'],
 		'questionType' => ['string'],
 		'rows' => ['array'],
+	];
+
+	/**
+	 * How many icons a rating question offers, and which icon to draw.
+	 * ratingIcon is one of 'star' (default), 'heart' or 'thumb'.
+	 */
+	public const EXTRA_SETTINGS_RATING = [
+		'maxRating' => ['integer', 'NULL'],
+		'ratingIcon' => ['string', 'NULL'],
 	];
 
 	public const EXTRA_SETTINGS_RANKING = [

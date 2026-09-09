@@ -841,6 +841,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_RATING => Constants::EXTRA_SETTINGS_RATING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
 			default => [],

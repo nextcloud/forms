@@ -633,6 +633,19 @@ class SubmissionService {
 			}
 
 			// Check if all answers are within the possible options
+			// A rating carries no options, so it is validated on its own rather than as a
+			// predefined-option type: the answer is the number of icons chosen.
+			if ($question['type'] === Constants::ANSWER_TYPE_RATING) {
+				$maxRating = $question['extraSettings']['maxRating'] ?? 5;
+				foreach ($answers[$questionId] as $answer) {
+					if (!ctype_digit((string)$answer)
+						|| (int)$answer < 1
+						|| (int)$answer > $maxRating) {
+						throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a whole number between 1 and %d.', $question['text'], $maxRating));
+					}
+				}
+			}
+
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 				// Normalize option IDs once for consistent comparison (DB may return ints, request may send strings)
 				$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
