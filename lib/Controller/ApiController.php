@@ -570,9 +570,14 @@ class ApiController extends OCSController {
 
 			try {
 				$sourceQuestion = $this->questionMapper->findById($fromId);
-				// Only allow cloning questions that belong to the same form
+				// A question may be cloned from another form, but only from one the user is
+				// allowed to edit. Without that check any question could be read out of any
+				// form by guessing ids.
 				if ($sourceQuestion->getFormId() !== $formId) {
-					throw new OCSBadRequestException('Question doesn\'t belong to given form');
+					$this->formsService->getFormIfAllowed(
+						$sourceQuestion->getFormId(),
+						Constants::PERMISSION_EDIT,
+					);
 				}
 				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
 			} catch (IMapperException) {
@@ -584,6 +589,9 @@ class ApiController extends OCSController {
 
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
+			// read() carries the source question's formId, so a clone taken from another
+			// form would otherwise be created back in that form rather than this one.
+			$questionData['formId'] = $formId;
 
 			if ($position !== null) {
 				$position = $this->shiftQuestionsForInsert($allQuestions, $position);
