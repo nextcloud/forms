@@ -100,9 +100,11 @@ class Constants {
 	public const ANSWER_TYPE_LONG = 'long';
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
+	public const ANSWER_TYPE_IMAGE = 'image';
 	public const ANSWER_TYPE_RANKING = 'ranking';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
+	public const ANSWER_TYPE_VIDEO = 'video';
 
 	public const ANSWER_GRID_TYPE_CHECKBOX = 'checkbox';
 	public const ANSWER_GRID_TYPE_NUMBER = 'number';
@@ -120,9 +122,11 @@ class Constants {
 		self::ANSWER_TYPE_LONG,
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
+		self::ANSWER_TYPE_IMAGE,
 		self::ANSWER_TYPE_RANKING,
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
+		self::ANSWER_TYPE_VIDEO,
 	];
 
 	// AnswerTypes, that need/have predefined Options
@@ -217,6 +221,23 @@ class Constants {
 		'columns' => ['array'],
 		'questionType' => ['string'],
 		'rows' => ['array'],
+	];
+
+	/**
+	 * Display-only blocks carry no answer; they only reference something to show.
+	 */
+	public const EXTRA_SETTINGS_MEDIA = [
+		'url' => ['string', 'NULL'],
+		'alt' => ['string', 'NULL'],
+	];
+
+	/**
+	 * Question types that are shown but never answered, so they are skipped when
+	 * validating a submission and left out of exports.
+	 */
+	public const ANSWER_TYPES_DISPLAY_ONLY = [
+		self::ANSWER_TYPE_IMAGE,
+		self::ANSWER_TYPE_VIDEO,
 	];
 
 	public const EXTRA_SETTINGS_RANKING = [
