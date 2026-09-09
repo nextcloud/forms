@@ -269,6 +269,16 @@ class SubmissionService {
 		$submissionEntities = array_reverse($submissionEntities);
 
 		$questions = $this->questionMapper->findByForm($form->getId());
+		// Display-only blocks hold no answers; leaving them in would add an empty column
+		// per block to every export.
+		$questions = array_values(array_filter(
+			$questions,
+			static fn ($question): bool => !in_array(
+				$question->getType(),
+				Constants::ANSWER_TYPES_DISPLAY_ONLY,
+				true,
+			),
+		));
 
 		$activeQuestionIds = $this->getActiveQuestionIds($questions);
 
@@ -665,6 +675,12 @@ class SubmissionService {
 
 			if ($questionAnswered && !self::isListOfValues($question['type'], $answers[$questionId])) {
 				throw new \InvalidArgumentException(sprintf('Invalid answer for question "%s".', $question['text']));
+			}
+
+			// Display-only blocks are never answered, so they must not be treated as an
+			// unanswered mandatory question.
+			if (in_array($question['type'], Constants::ANSWER_TYPES_DISPLAY_ONLY, true)) {
+				continue;
 			}
 
 			// Check if all required questions have an answer
