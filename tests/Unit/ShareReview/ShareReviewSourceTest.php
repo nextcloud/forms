@@ -25,6 +25,7 @@ use OCP\Log\Audit\CriticalActionPerformedEvent;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\IShareReviewSourceSnapshot;
 use OCP\Share\ShareReview\ShareReviewActionContext;
 use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
@@ -206,6 +207,82 @@ final class ShareReviewSourceTest extends TestCase {
 		$counts = $this->source->countSharesByType(new ShareReviewQuery());
 
 		$this->assertSame([IShare::TYPE_LINK => 2, IShare::TYPE_USER => 4], $counts);
+	}
+
+	public function testSerializeAndRestoreRoundTripAShare(): void {
+		$this->assertInstanceOf(IShareReviewSourceSnapshot::class, $this->source);
+		$this->shareMapper->method('findById')->with(7)->willReturn($this->makeShare(7, ['submit', 'results']));
+
+		$snapshot = $this->source->serializeShare('7');
+
+		$this->assertIsString($snapshot);
+		$data = json_decode($snapshot, true);
+		$this->assertSame(1, $data['v']);
+		$this->assertSame(10, $data['formId']);
+		$this->assertSame('bob', $data['shareWith']);
+		$this->assertSame(['submit', 'results'], $data['permissions']);
+
+		$form = $this->makeForm();
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess());
+		$this->formMapper->method('findById')->with(10)->willReturn($form);
+		$restored = $this->makeShare(42, ['submit', 'results']);
+		$this->shareMapper->expects($this->once())->method('insert')
+			->with($this->callback(static fn (Share $s): bool => $s->getFormId() === 10 && $s->getPermissions() === ['submit', 'results']))
+			->willReturn($restored);
+		// the form timestamp is bumped, as on the regular share path
+		$this->formMapper->expects($this->once())->method('update')->with($form);
+
+		$this->assertTrue($this->source->restoreShare($snapshot));
+		[$message, $parameters] = $this->auditEntries()[0];
+		$this->assertStringContainsString('restored', $message);
+		$this->assertSame('42', $parameters[0]);
+	}
+
+	public function testSerializeOfAMissingOrNonCanonicalIdIsNull(): void {
+		$this->shareMapper->method('findById')->willThrowException(new DoesNotExistException('gone'));
+
+		$this->assertNull($this->source->serializeShare('7'));
+		$this->assertNull($this->source->serializeShare('1e3'));
+	}
+
+	public function testRestoreRejectsAForeignOrIncompleteSnapshot(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+
+		$this->assertFalse($this->source->restoreShare('not json'));
+		$this->assertFalse($this->source->restoreShare('{"v":99,"formId":10,"shareType":0,"permissions":[]}'));
+		$this->assertFalse($this->source->restoreShare('{"v":1,"formId":10}'));
+	}
+
+	public function testRestoreDeniedByTheAccessCheckIsAudited(): void {
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->denyAccess('not an operator'));
+		$this->shareMapper->expects($this->never())->method('insert');
+
+		$this->assertFalse($this->source->restoreShare('{"v":1,"formId":10,"shareType":0,"shareWith":"bob","permissions":["submit"]}'));
+		$this->assertStringContainsString('denied', $this->auditEntries()[0][0]);
+	}
+
+	public function testRestoreOfAShareWhoseFormIsGoneIsFalse(): void {
+		$this->decideAccessCheck(static fn (ShareReviewAccessCheckEvent $event) => $event->grantAccess());
+		$this->formMapper->method('findById')->willThrowException(new DoesNotExistException('gone'));
+		$this->shareMapper->expects($this->never())->method('insert');
+
+		$this->assertFalse($this->source->restoreShare('{"v":1,"formId":10,"shareType":0,"shareWith":"bob","permissions":["submit"]}'));
+	}
+
+	public function testRestoreForwardsTheActionContext(): void {
+		$captured = null;
+		$this->eventDispatcher->method('dispatchTyped')->willReturnCallback(function (object $event) use (&$captured): void {
+			if ($event instanceof ShareReviewAccessCheckEvent) {
+				$captured = $event;
+				$event->denyAccess('no');
+			}
+		});
+
+		$this->source->restoreShare('{"v":1,"formId":10,"shareType":0,"shareWith":"bob","permissions":["submit"]}', new ShareReviewActionContext('alice', ShareReviewAccessCheckEvent::SCOPE_SELF));
+
+		$this->assertSame(ShareReviewAccessCheckEvent::ACTION_RESTORE, $captured->getAction());
+		$this->assertSame('alice', $captured->getActingUserId());
+		$this->assertSame(ShareReviewAccessCheckEvent::SCOPE_SELF, $captured->getScope());
 	}
 
 	public function testCountSharesByInitiatorDelegatesWithTheLimit(): void {
