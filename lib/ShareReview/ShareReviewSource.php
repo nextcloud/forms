@@ -11,6 +11,7 @@ namespace OCA\Forms\ShareReview;
 
 use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\UploadedFilesShareService;
 use OCP\AppFramework\Db\IMapperException;
@@ -22,6 +23,7 @@ use OCP\Log\Audit\CriticalActionPerformedEvent;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\IPaginatedShareReviewSource;
+use OCP\Share\ShareReview\IShareReviewSourceSnapshot;
 use OCP\Share\ShareReview\ShareReviewActionContext;
 use OCP\Share\ShareReview\ShareReviewCounts;
 use OCP\Share\ShareReview\ShareReviewEntry;
@@ -30,7 +32,10 @@ use OCP\Share\ShareReview\ShareReviewPermission;
 use OCP\Share\ShareReview\ShareReviewQuery;
 use Psr\Log\LoggerInterface;
 
-class ShareReviewSource implements IPaginatedShareReviewSource {
+class ShareReviewSource implements IPaginatedShareReviewSource, IShareReviewSourceSnapshot {
+
+	/** Format version of the opaque snapshot this source writes and reads */
+	private const SNAPSHOT_VERSION = 1;
 
 	public const PERMISSION_READ = 'forms:read';
 	public const PERMISSION_EDIT = 'forms:edit';
@@ -204,6 +209,80 @@ class ShareReviewSource implements IPaginatedShareReviewSource {
 			(string)$form->getTitle(),
 			(int)$share->getShareType(),
 			(string)$share->getShareWith(),
+			$this->actingUser($context),
+		]);
+		return true;
+	}
+
+	public function serializeShare(string $shareId): ?string {
+		if (!ctype_digit($shareId)) {
+			return null;
+		}
+		try {
+			$share = $this->shareMapper->findById((int)$shareId);
+		} catch (IMapperException) {
+			return null;
+		} catch (Exception $e) {
+			$this->logger->error('Forms ShareReview: failed to fetch share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
+			return null;
+		}
+		$snapshot = json_encode([
+			'v' => self::SNAPSHOT_VERSION,
+			'formId' => (int)$share->getFormId(),
+			'shareType' => (int)$share->getShareType(),
+			'shareWith' => (string)$share->getShareWith(),
+			'permissions' => array_values($share->getPermissions()),
+		]);
+		return $snapshot === false ? null : $snapshot;
+	}
+
+	public function restoreShare(string $snapshot, ?ShareReviewActionContext $context = null): bool {
+		$data = json_decode($snapshot, true);
+		if (!is_array($data)
+			|| ($data['v'] ?? null) !== self::SNAPSHOT_VERSION
+			|| !isset($data['formId'], $data['shareType'], $data['permissions'])
+			|| !is_array($data['permissions'])) {
+			return false;
+		}
+		$event = new ShareReviewAccessCheckEvent(
+			'Forms',
+			'',
+			ShareReviewAccessCheckEvent::ACTION_RESTORE,
+			$context?->actingUserId,
+			$context?->scope ?? ShareReviewAccessCheckEvent::SCOPE_OPERATOR,
+		);
+		$this->eventDispatcher->dispatchTyped($event);
+		if (!$event->isHandled() || !$event->isGranted()) {
+			$this->audit('Forms share restore through share review denied: form "%1$s", shared with "%2$s", user "%3$s"', [
+				(string)$data['formId'],
+				(string)($data['shareWith'] ?? ''),
+				$this->actingUser($context),
+			]);
+			return false;
+		}
+		try {
+			// the form must still exist — a share of a deleted form has nothing to point at
+			$form = $this->formMapper->findById((int)$data['formId']);
+			$share = new Share();
+			$share->setFormId((int)$data['formId']);
+			$share->setShareType((int)$data['shareType']);
+			$share->setShareWith((string)($data['shareWith'] ?? ''));
+			$share->setPermissions(array_values(array_map('strval', $data['permissions'])));
+			/** @var Share $restored */
+			$restored = $this->shareMapper->insert($share);
+			// bump the form's timestamp, as the regular share flow does
+			$this->formMapper->update($form);
+		} catch (IMapperException) {
+			return false;
+		} catch (\Exception $e) {
+			$this->logger->error('Forms ShareReview: failed to restore a share: {message}', ['message' => $e->getMessage()]);
+			return false;
+		}
+		$this->audit('Forms share restored through share review: share "%1$s", form "%2$s", share type %3$d, shared with "%4$s", user "%5$s"', [
+			(string)$restored->getId(),
+			(string)$form->getTitle(),
+			(int)$data['shareType'],
+			(string)($data['shareWith'] ?? ''),
 			$this->actingUser($context),
 		]);
 		return true;
