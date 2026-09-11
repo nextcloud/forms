@@ -633,6 +633,15 @@ class SubmissionService {
 			}
 
 			// Check if all answers are within the possible options
+			// A rating carries no options, so it cannot go through the predefined-option
+			// branch below, but its answer is a point on a scale exactly as a linear scale's
+			// is, so it is held to the same rule.
+			if ($question['type'] === Constants::ANSWER_TYPE_RATING) {
+				foreach ($answers[$questionId] as $answer) {
+					$this->validateScaleAnswer($question, $answer);
+				}
+			}
+
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
 				// Normalize option IDs once for consistent comparison (DB may return ints, request may send strings)
 				$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
@@ -640,11 +649,7 @@ class SubmissionService {
 				foreach ($answers[$questionId] as $answer) {
 					// Handle linear scale questions
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
-						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
-						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-						if (!ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
-							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
-						}
+						$this->validateScaleAnswer($question, $answer);
 					}
 					// Check if all grid rows, columns and values match the configured grid subtype
 					elseif ($question['type'] === Constants::ANSWER_TYPE_GRID) {
@@ -727,6 +732,25 @@ class SubmissionService {
 			if (!in_array($id, array_column($questions, 'id'))) {
 				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %d.', $id));
 			}
+		}
+	}
+
+	/**
+	 * Check one answer to a question answered on a numbered scale.
+	 *
+	 * Shared by the linear scale and the rating, which differ only in how the scale is
+	 * drawn. The bounds and their defaults are the linear scale's; a rating does not
+	 * accept optionsLowest, so its lowest end always falls back to 1.
+	 *
+	 * @param array $question the question being answered
+	 * @param mixed $answer one submitted value
+	 * @throws \InvalidArgumentException if the answer is not a whole number within range
+	 */
+	private function validateScaleAnswer(array $question, mixed $answer): void {
+		$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
+		$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
+		if (!ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
 		}
 	}
 
