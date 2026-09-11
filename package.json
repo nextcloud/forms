@@ -21,6 +21,8 @@
     "format:fix": "prettier --write .",
     "lint": "eslint --ext .js,.ts,.vue src",
     "lint:fix": "eslint --ext .js,.ts,.vue src --fix",
+    "playwright": "playwright test",
+    "playwright:install-ci": "playwright install chromium --only-shell",
     "start:nextcloud": "node playwright/start-nextcloud-server.mjs",
     "stylelint": "stylelint \"src/**/*.scss\" \"src/**/*.vue\"",
     "stylelint:fix": "stylelint \"src/**/*.scss\" \"src/**/*.vue\" --fix",
