@@ -55,6 +55,7 @@ OC.L10N.register(
     "Form creation" : "Vytvoření formuláře",
     "Restrict form creation to selected groups" : "Umožnit vytváření formulářů pouze vybraným skupinám",
     "Select groups" : "Vybrat skupiny",
+    "Confirmation emails" : "Potvrzovací e-maily",
     "Form sharing" : "Sdílení formulářů",
     "Allow sharing by link" : "Umožnit sdílení odkazem",
     "Allow sharing to all logged in accounts" : "Umožnit sdílením všem přihlášeným účtům",
@@ -157,6 +158,7 @@ OC.L10N.register(
     "Maximum options to be checked" : "Maximum voleb, které jde zaškrtnout",
     "Other:" : "Ostatní:",
     "Other" : "Ostatní",
+    "Your ranking" : "Vaše hodnocení",
     "Invalid regular expression" : "Neplatný regulární výraz",
     "Input types (currently: {type})" : "Typy vstupu (nyní: {type})",
     "Regular expression for input validation" : "Regulární výraz pro ověření správnosti vstupu",
@@ -186,6 +188,8 @@ OC.L10N.register(
     "Custom submission message" : "Uživatelsky určená zpráva o odeslání",
     "Message to show after a user submitted the form (formatting using Markdown is supported)" : "Zpráva kterou zobrazit poté, co uživatel odešle formulář (je podporováno Markdown formátování)",
     "Message to show after a user submitted the form. Please note that the message will not be translated!" : "Zpráva kterou zobrazit poté, co uživatel odešle formulář. Prosím mějte na paměti, že nebude přeložena do ostatních jazyků!",
+    "Recipient field" : "Kolonka příjemce",
+    "Available placeholders:" : "Zástupné výplně k dispozici:",
     "Email subject" : "Předmět e-mailu",
     "Email body" : "Tělo e-mailu",
     "Search for user, group or team …" : "Hledat uživatele, skupinu nebo tým …",
@@ -278,6 +282,7 @@ OC.L10N.register(
     "No responses yet" : "Zatím žádné odpvědi",
     "Responses will show up here" : "Odpovědi se zobrazí zde",
     "Are you sure you want to delete all responses?" : "Opravdu chcete všechny odezvy smazat?",
+    "Form comments" : "Komentáře k formuláři",
     "Form settings" : "Nastavení formuláře",
     "Sharing" : "Sdílení",
     "Settings" : "Nastavení",
@@ -371,6 +376,7 @@ OC.L10N.register(
     "People can enter a number" : "Lidé mohou zadat číslo",
     "Enter a number" : "Zadat číslo",
     "Custom regular expression" : "Uživatelsky určený regulární výraz",
-    "The input does not match the required pattern" : "Zadání neodpovídá požadovanému vzoru"
+    "The input does not match the required pattern" : "Zadání neodpovídá požadovanému vzoru",
+    "Insert question" : "Vložit otázku"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");
