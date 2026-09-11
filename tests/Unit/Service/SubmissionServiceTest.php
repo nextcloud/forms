@@ -805,6 +805,54 @@ file2.txt"
 	// Data for validation of Submissions
 	public static function dataValidateSubmission() {
 		return [
+			'display-only-block-not-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'image', 'text' => 'picture', 'isRequired' => false],
+					['id' => 2, 'type' => 'short', 'text' => 'q2', 'isRequired' => true],
+				],
+				// Answers
+				[
+					'2' => ['answer'],
+				],
+				// Expected Result
+				null,
+			],
+			'display-only-block-marked-required' => [
+				// Questions -- a block can never be answered, so a stray required flag must
+				// not make the whole form impossible to submit.
+				[
+					['id' => 1, 'type' => 'video', 'text' => 'clip', 'isRequired' => true],
+				],
+				// Answers
+				[],
+				// Expected Result
+				null,
+			],
+			'display-only-image-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'image', 'text' => 'picture', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['anything'],
+				],
+				// Expected Result
+				'Question "picture" does not take an answer.',
+			],
+			'display-only-video-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'video', 'text' => 'clip', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['anything'],
+				],
+				// Expected Result
+				'Question "clip" does not take an answer.',
+			],
 			'required-not-answered' => [
 				// Questions
 				[

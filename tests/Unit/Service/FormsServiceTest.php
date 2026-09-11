@@ -1392,6 +1392,37 @@ class FormsServiceTest extends TestCase {
 
 	public static function dataAreExtraSettingsValid() {
 		return [
+			'valid-image-settings' => [
+				'extraSettings' => [
+					'url' => 'https://example.com/picture.png',
+					'alt' => 'A picture',
+				],
+				'questionType' => Constants::ANSWER_TYPE_IMAGE,
+				'expected' => true
+			],
+			'valid-video-settings' => [
+				'extraSettings' => [
+					'url' => 'https://example.com/clip',
+				],
+				'questionType' => Constants::ANSWER_TYPE_VIDEO,
+				'expected' => true
+			],
+			'invalid-image-key' => [
+				// A block has no answer, so the answer-shaping settings of other types
+				// must not be accepted on it.
+				'extraSettings' => [
+					'shuffleOptions' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_IMAGE,
+				'expected' => false
+			],
+			'invalid-video-type' => [
+				'extraSettings' => [
+					'url' => ['not', 'a', 'string'],
+				],
+				'questionType' => Constants::ANSWER_TYPE_VIDEO,
+				'expected' => false
+			],
 			'empty-extra-settings' => [
 				'extraSettings' => [],
 				'questionType' => Constants::ANSWER_TYPE_LONG,

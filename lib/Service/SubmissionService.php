@@ -577,9 +577,14 @@ class SubmissionService {
 			$questionId = $question['id'];
 			$questionAnswered = array_key_exists($questionId, $answers);
 
-			// Display-only blocks are never answered, so they must not be treated as an
-			// unanswered mandatory question.
+			// Display-only blocks take no answer. An absent answer is therefore expected and
+			// must not count as an unanswered mandatory question -- but a present one is
+			// refused outright rather than skipped, since nothing else would stop it being
+			// stored against a block that has nowhere to show it.
 			if (in_array($question['type'], Constants::ANSWER_TYPES_DISPLAY_ONLY, true)) {
+				if ($questionAnswered) {
+					throw new \InvalidArgumentException(sprintf('Question "%s" does not take an answer.', $question['text']));
+				}
 				continue;
 			}
 
