@@ -805,6 +805,78 @@ file2.txt"
 	// Data for validation of Submissions
 	public static function dataValidateSubmission() {
 		return [
+			'rating-within-configured-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['optionsHighest' => 10]],
+				],
+				// Answers
+				[
+					'1' => ['7'],
+				],
+				// Expected Result
+				null,
+			],
+			'rating-at-default-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['5'],
+				],
+				// Expected Result
+				null,
+			],
+			'rating-above-default-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['6'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
+			'rating-above-configured-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['optionsHighest' => 3]],
+				],
+				// Answers
+				[
+					'1' => ['4'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 3.',
+			],
+			'rating-zero' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['0'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
+			'rating-not-a-number' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['three'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
 			'required-not-answered' => [
 				// Questions
 				[

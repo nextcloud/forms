@@ -947,8 +947,10 @@ class FormsService {
 			}
 
 			// Special handling of linear scale validation
-		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
-			// Ensure limits are sane
+		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE
+			|| $questionType === Constants::ANSWER_TYPE_RATING) {
+			// Ensure limits are sane. A rating cannot set optionsLowest at all, so for it
+			// only the top end is checked.
 			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;

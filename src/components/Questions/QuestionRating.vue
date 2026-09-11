@@ -12,14 +12,14 @@
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionInput
-				:modelValue="maxRating"
+				:modelValue="optionsHighest"
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Number of icons')"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
-				@update:modelValue="onMaxRatingChange">
+				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
 					<NcIconSvgWrapper :svg="outlineIcon" />
 				</template>
@@ -40,7 +40,7 @@
 				{{ text || t('forms', 'Rating') }}
 			</legend>
 			<label
-				v-for="value in maxRating"
+				v-for="value in optionsHighest"
 				:key="value"
 				class="rating__icon"
 				:class="{ 'rating__icon--on': value <= currentValue }">
@@ -50,7 +50,7 @@
 					:name="`rating_${id}`"
 					:aria-label="
 						n('forms', '%n of {max}', '%n of {max}', value, {
-							max: maxRating,
+							max: optionsHighest,
 						})
 					"
 					:value="value"
@@ -90,8 +90,8 @@ import {
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 
-/** Matches the default assumed server-side when maxRating is unset. */
-const DEFAULT_MAX_RATING = 5
+/** Matches the linear scale default the server assumes when optionsHighest is unset. */
+const DEFAULT_OPTIONS_HIGHEST = 5
 
 export default defineComponent({
 	name: 'QuestionRating',
@@ -114,13 +114,13 @@ export default defineComponent({
 			() => (props.extraSettings as Record<string, unknown> | undefined) ?? {},
 		)
 
-		const maxRating = computed<number>(() => {
-			const configured = extraSettings.value.maxRating
+		const optionsHighest = computed<number>(() => {
+			const configured = extraSettings.value.optionsHighest
 			return typeof configured === 'number'
 				&& configured >= 2
 				&& configured <= 10
 				? configured
-				: DEFAULT_MAX_RATING
+				: DEFAULT_OPTIONS_HIGHEST
 		})
 
 		const ratingIcon = computed<string>(() => {
@@ -168,9 +168,9 @@ export default defineComponent({
 		/**
 		 * @param value how many icons to offer
 		 */
-		function onMaxRatingChange(value: number): void {
+		function onOptionsHighestChange(value: number): void {
 			question.onExtraSettingsChange({
-				maxRating: value === DEFAULT_MAX_RATING ? null : value,
+				optionsHighest: value === DEFAULT_OPTIONS_HIGHEST ? null : value,
 			})
 		}
 
@@ -204,9 +204,9 @@ export default defineComponent({
 			currentValue,
 			filledIcon,
 			iconChoices,
-			maxRating,
+			optionsHighest,
 			n,
-			onMaxRatingChange,
+			onOptionsHighestChange,
 			onPick,
 			onRatingIconChange,
 			outlineIcon,

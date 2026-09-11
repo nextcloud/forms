@@ -222,11 +222,13 @@ class Constants {
 	];
 
 	/**
-	 * How many icons a rating question offers, and which icon to draw.
-	 * ratingIcon is one of 'star' (default), 'heart' or 'thumb'.
+	 * A rating is a linear scale that always starts at 1 and is drawn as icons, so it
+	 * shares the linear scale's key for its top end (and that key's bounds) rather than
+	 * having one of its own. optionsLowest is deliberately absent: a rating's lowest end
+	 * is always 1. ratingIcon is one of 'star' (default), 'heart' or 'thumb'.
 	 */
 	public const EXTRA_SETTINGS_RATING = [
-		'maxRating' => ['integer', 'NULL'],
+		'optionsHighest' => ['integer', 'NULL'],
 		'ratingIcon' => ['string', 'NULL'],
 	];
 
