@@ -597,7 +597,11 @@ class ApiController extends OCSController {
 				$position = $this->shiftQuestionsForInsert($allQuestions, $position);
 				$questionData['order'] = $position;
 			} else {
-				$questionData['order'] = end($allQuestions)->getOrder() + 1;
+				// Append at the end. The target form may have no questions yet -- the usual
+				// case when copying into a new form -- and end() of an empty list is false,
+				// not a question.
+				$lastQuestion = end($allQuestions);
+				$questionData['order'] = $lastQuestion ? $lastQuestion->getOrder() + 1 : 1;
 			}
 
 			$newQuestion = Question::fromParams($questionData);
