@@ -840,6 +840,8 @@ class FormsService {
 			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
+			Constants::ANSWER_TYPE_IMAGE => Constants::EXTRA_SETTINGS_MEDIA,
+			Constants::ANSWER_TYPE_VIDEO => Constants::EXTRA_SETTINGS_MEDIA,
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,

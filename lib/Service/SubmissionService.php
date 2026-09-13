@@ -231,6 +231,16 @@ class SubmissionService {
 		$submissionEntities = array_reverse($submissionEntities);
 
 		$questions = $this->questionMapper->findByForm($form->getId());
+		// Display-only blocks hold no answers; leaving them in would add an empty column
+		// per block to every export.
+		$questions = array_values(array_filter(
+			$questions,
+			static fn ($question): bool => !in_array(
+				$question->getType(),
+				Constants::ANSWER_TYPES_DISPLAY_ONLY,
+				true,
+			),
+		));
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
@@ -566,6 +576,17 @@ class SubmissionService {
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
 			$questionAnswered = array_key_exists($questionId, $answers);
+
+			// Display-only blocks take no answer. An absent answer is therefore expected and
+			// must not count as an unanswered mandatory question -- but a present one is
+			// refused outright rather than skipped, since nothing else would stop it being
+			// stored against a block that has nowhere to show it.
+			if (in_array($question['type'], Constants::ANSWER_TYPES_DISPLAY_ONLY, true)) {
+				if ($questionAnswered) {
+					throw new \InvalidArgumentException(sprintf('Question "%s" does not take an answer.', $question['text']));
+				}
+				continue;
+			}
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']
