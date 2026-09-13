@@ -496,12 +496,26 @@
                         }
                     },
                     "dateMax": {
-                        "type": "integer",
-                        "format": "int64"
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        ]
                     },
                     "dateMin": {
-                        "type": "integer",
-                        "format": "int64"
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        ]
                     },
                     "dateRange": {
                         "type": "boolean"
@@ -555,12 +569,10 @@
                         "type": "boolean"
                     },
                     "timeMax": {
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string"
                     },
                     "timeMin": {
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string"
                     },
                     "timeRange": {
                         "type": "boolean"

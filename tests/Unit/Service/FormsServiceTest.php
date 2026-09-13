@@ -1306,6 +1306,20 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->areExtraSettingsValid($extraSettings, $questionType));
 	}
 
+	public function testAreExtraSettingsValidNormalizesLegacyDateLimitsAsUtcDates(): void {
+		$previousTimezone = date_default_timezone_get();
+		date_default_timezone_set('America/Los_Angeles');
+
+		try {
+			$this->assertTrue($this->formsService->areExtraSettingsValid([
+				'dateMin' => 1742860800,
+				'dateMax' => 1742860800,
+			], Constants::ANSWER_TYPE_DATE));
+		} finally {
+			date_default_timezone_set($previousTimezone);
+		}
+	}
+
 	public static function dataAreExtraSettingsValid() {
 		return [
 			'empty-extra-settings' => [
@@ -1444,10 +1458,26 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_DATE,
 				'expected' => true
 			],
+			'valid-date-settings-string' => [
+				'extraSettings' => [
+					'dateMin' => '2026-08-20',
+					'dateMax' => '2026-08-25',
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => true
+			],
 			'invalid-date-settings' => [
 				'extraSettings' => [
 					'dateMin' => 'today',
 					'dateMax2' => null,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => false
+			],
+			'invalid-date-settings-overlap' => [
+				'extraSettings' => [
+					'dateMin' => '2026-08-25',
+					'dateMax' => '2026-08-20',
 				],
 				'questionType' => Constants::ANSWER_TYPE_DATE,
 				'expected' => false

@@ -664,10 +664,33 @@ class SubmissionService {
 			$previousDate = $d;
 
 			if ($extraSettings) {
-				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin']))
-					|| (isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
-					|| (isset($extraSettings['timeMin']) && $d < DateTime::createFromFormat($format, $extraSettings['timeMin']))
-					|| (isset($extraSettings['timeMax']) && $d > DateTime::createFromFormat($format, $extraSettings['timeMax']))
+				$dateMin = isset($extraSettings['dateMin'])
+					? (is_numeric($extraSettings['dateMin'])
+						? DateTime::createFromFormat('!Y-m-d', (new DateTime('@' . (int)$extraSettings['dateMin']))
+							->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d'))
+						: DateTime::createFromFormat('!' . $format, $extraSettings['dateMin']))
+					: null;
+				$dateMax = isset($extraSettings['dateMax'])
+					? (is_numeric($extraSettings['dateMax'])
+						? DateTime::createFromFormat('!Y-m-d', (new DateTime('@' . (int)$extraSettings['dateMax']))
+							->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d'))
+						: DateTime::createFromFormat('!' . $format, $extraSettings['dateMax']))
+					: null;
+				$timeMin = isset($extraSettings['timeMin'])
+					? DateTime::createFromFormat($format, $extraSettings['timeMin'])
+					: null;
+				$timeMax = isset($extraSettings['timeMax'])
+					? DateTime::createFromFormat($format, $extraSettings['timeMax'])
+					: null;
+
+				$compareDate = ($dateMin !== null || $dateMax !== null)
+					? (DateTime::createFromFormat('!' . $format, $dateStr) ?: $d)
+					: $d;
+
+				if (($dateMin instanceof \DateTimeInterface && $compareDate < $dateMin)
+					|| ($dateMax instanceof \DateTimeInterface && $compareDate > $dateMax)
+					|| ($timeMin instanceof \DateTimeInterface && $d < $timeMin)
+					|| ($timeMax instanceof \DateTimeInterface && $d > $timeMax)
 				) {
 					throw new \InvalidArgumentException(sprintf('Date/time is not in the allowed range for question "%s".', $text));
 				}
