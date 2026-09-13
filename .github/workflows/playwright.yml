@@ -29,13 +29,15 @@ name: Playwright Tests
 on:
   pull_request:
     branches:
-      - main
-      - stable5.3
+      - master
+      - stable35
+      - stable34
+      - stable33
 
 permissions:
   contents: read
 concurrency:
-  group: node-${{ github.head_ref || github.run_id }}
+  group: playwright-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
