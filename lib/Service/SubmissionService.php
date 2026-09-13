@@ -664,10 +664,31 @@ class SubmissionService {
 			$previousDate = $d;
 
 			if ($extraSettings) {
-				if ((isset($extraSettings['dateMin']) && $d < (new DateTime())->setTimestamp($extraSettings['dateMin']))
-					|| (isset($extraSettings['dateMax']) && $d > (new DateTime())->setTimestamp($extraSettings['dateMax']))
-					|| (isset($extraSettings['timeMin']) && $d < DateTime::createFromFormat($format, $extraSettings['timeMin']))
-					|| (isset($extraSettings['timeMax']) && $d > DateTime::createFromFormat($format, $extraSettings['timeMax']))
+				$dateMin = isset($extraSettings['dateMin'])
+					? (is_int($extraSettings['dateMin'])
+						? (new DateTime())->setTimestamp($extraSettings['dateMin'])->setTime(0, 0, 0)
+						: DateTime::createFromFormat('!' . $format, $extraSettings['dateMin']))
+					: null;
+				$dateMax = isset($extraSettings['dateMax'])
+					? (is_int($extraSettings['dateMax'])
+						? (new DateTime())->setTimestamp($extraSettings['dateMax'])->setTime(0, 0, 0)
+						: DateTime::createFromFormat('!' . $format, $extraSettings['dateMax']))
+					: null;
+				$timeMin = isset($extraSettings['timeMin'])
+					? DateTime::createFromFormat($format, $extraSettings['timeMin'])
+					: null;
+				$timeMax = isset($extraSettings['timeMax'])
+					? DateTime::createFromFormat($format, $extraSettings['timeMax'])
+					: null;
+
+				$compareDate = ($dateMin !== null || $dateMax !== null)
+					? (DateTime::createFromFormat('!' . $format, $dateStr) ?: $d)
+					: $d;
+
+				if (($dateMin !== null && $compareDate < $dateMin)
+					|| ($dateMax !== null && $compareDate > $dateMax)
+					|| ($timeMin !== null && $d < $timeMin)
+					|| ($timeMax !== null && $d > $timeMax)
 				) {
 					throw new \InvalidArgumentException(sprintf('Date/time is not in the allowed range for question "%s".', $text));
 				}

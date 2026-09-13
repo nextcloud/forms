@@ -1444,10 +1444,26 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_DATE,
 				'expected' => true
 			],
+			'valid-date-settings-string' => [
+				'extraSettings' => [
+					'dateMin' => '2026-08-20',
+					'dateMax' => '2026-08-25',
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => true
+			],
 			'invalid-date-settings' => [
 				'extraSettings' => [
 					'dateMin' => 'today',
 					'dateMax2' => null,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => false
+			],
+			'invalid-date-settings-overlap' => [
+				'extraSettings' => [
+					'dateMin' => '2026-08-25',
+					'dateMax' => '2026-08-20',
 				],
 				'questionType' => Constants::ANSWER_TYPE_DATE,
 				'expected' => false

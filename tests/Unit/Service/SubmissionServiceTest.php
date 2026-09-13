@@ -994,6 +994,42 @@ file2.txt"
 				// Expected Result
 				'Date/time is not in the allowed range for question "q1".',
 			],
+			'date-exact-limits-question-string' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['dateMin' => '2026-08-20', 'dateMax' => '2026-08-24']]
+				],
+				// Answers
+				[
+					'1' => ['2026-08-24']
+				],
+				// Expected Result
+				null,
+			],
+			'date-below-min-question-string' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['dateMin' => '2026-08-20', 'dateMax' => '2026-08-24']]
+				],
+				// Answers
+				[
+					'1' => ['2026-08-19']
+				],
+				// Expected Result
+				'Date/time is not in the allowed range for question "q1".',
+			],
+			'date-above-max-question-string' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'date', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['dateMin' => '2026-08-20', 'dateMax' => '2026-08-24']]
+				],
+				// Answers
+				[
+					'1' => ['2026-08-25']
+				],
+				// Expected Result
+				'Date/time is not in the allowed range for question "q1".',
+			],
 			'valid-date-range' => [
 				// Questions
 				[
