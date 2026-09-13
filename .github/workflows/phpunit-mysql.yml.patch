@@ -7,7 +7,7 @@ index 596d91ea..d6e8bc33 100644
            path: apps/${{ env.APP_NAME }}
  
 +      - name: Checkout teams dependency
-+        uses: actions/checkout@@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
++        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 +        with:
 +          persist-credentials: false
 +          repository: nextcloud/circles
