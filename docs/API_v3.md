@@ -886,6 +886,56 @@ Upload a file to a file question before form submission. Each uploaded file is s
 
 When submitting the form, each file answer must include both `uploadedFileId` and `uploadToken` from this response for the same `questionId`. Uploads from other forms, questions, or sessions are rejected.
 
+### Create an upload share
+
+For large files it is recommended to upload via WebDAV instead of a multipart request, as this supports chunked uploads and is not limited by PHP upload limits. This endpoint creates a temporary folder inside the form owner's storage and shares it via a create-only (file drop) public link. Files can then be uploaded to `public.php/dav/files/{shareToken}` - including chunked uploads via `public.php/dav/uploads/{shareToken}` - and afterwards registered with the `register` endpoint.
+
+- Endpoint: `/api/v3/forms/{formId}/submissions/files/{questionId}/share`
+- Method: `POST`
+- Url-Parameters:
+  | Parameter | Type | Description |
+  |--------------|----------------|-------------|
+  | _formId_ | Integer | ID of the form to upload the file to |
+  | _questionId_ | Integer | ID of the file question to upload the file to |
+- Parameters:
+  | Parameter | Type | Description |
+  |--------------|----------------|-------------|
+  | _shareHash_ | String | optional, only necessary for uploads on a public share link |
+- Response: **Status-Code OK**, as well as the token of the created share.
+
+```
+"data": {
+  "shareToken": "dCP8yn3N86EK9sL"
+}
+```
+
+### Register an uploaded file
+
+Registers a file that was uploaded to an upload share (see above) and binds it to the form and question, just like a direct file upload. The response includes an `uploadToken` that must be sent back when submitting the form, together with `uploadedFileId`.
+
+- Endpoint: `/api/v3/forms/{formId}/submissions/files/{questionId}/register`
+- Method: `POST`
+- Url-Parameters:
+  | Parameter | Type | Description |
+  |--------------|----------------|-------------|
+  | _formId_ | Integer | ID of the form to upload the file to |
+  | _questionId_ | Integer | ID of the file question to upload the file to |
+- Parameters:
+  | Parameter | Type | Description |
+  |--------------|----------------|-------------|
+  | _shareToken_ | String | Token of the upload share the file was uploaded to |
+  | _fileName_ | String | Name of the uploaded file inside the share |
+  | _shareHash_ | String | optional, only necessary for uploads on a public share link |
+- Response: **Status-Code OK**, as well as the file id and name of the registered file.
+
+```
+"data": {
+  "uploadedFileId": 42,
+  "fileName": "document.pdf",
+  "uploadToken": "a1b2c3d4e5f6..."
+}
+```
+
 ### Get a specific submission
 
 Get a specific submission of a form. Viewing another user's submission requires the `results` permission; otherwise only the submission owner may view it.
