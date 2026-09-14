@@ -15,6 +15,8 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
+use OCP\Share\IManager;
+use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
 class CleanupUploadedFilesJob extends TimedJob {
@@ -24,6 +26,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 		private readonly IRootFolder $rootFolder,
 		private readonly FormMapper $formMapper,
 		private readonly UploadedFileMapper $uploadedFileMapper,
+		private readonly IManager $shareManager,
 		private readonly LoggerInterface $logger,
 		ITimeFactory $time,
 	) {
@@ -96,6 +99,9 @@ class CleanupUploadedFilesJob extends TimedJob {
 
 			foreach ($unsubmittedFilesFolder->getDirectoryListing() as $node) {
 				if ($node->getName() < $dateTime->getTimestamp()) {
+					if ($node instanceof Folder) {
+						$this->deleteUploadShares($node, $userId);
+					}
 					$node->delete();
 					$deleted++;
 				}
@@ -103,5 +109,20 @@ class CleanupUploadedFilesJob extends TimedJob {
 		}
 
 		$this->logger->info('Deleted {deleted} folders.', ['deleted' => $deleted]);
+	}
+
+	/**
+	 * Delete link shares created for file question uploads within a folder
+	 */
+	private function deleteUploadShares(Folder $folder, string $userId): void {
+		foreach ($this->shareManager->getSharesBy($userId, IShare::TYPE_LINK, $folder, false, -1) as $share) {
+			$this->shareManager->deleteShare($share);
+		}
+
+		foreach ($folder->getDirectoryListing() as $node) {
+			if ($node instanceof Folder) {
+				$this->deleteUploadShares($node, $userId);
+			}
+		}
 	}
 }

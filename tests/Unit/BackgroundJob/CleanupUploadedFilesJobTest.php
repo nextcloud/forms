@@ -15,6 +15,7 @@ use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Files\IRootFolder;
+use OCP\Share\IManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -24,6 +25,7 @@ class CleanupUploadedFilesJobTest extends TestCase {
 	private CleanupUploadedFilesJob $cleanupUploadedFilesJob;
 	private FormMapper|MockObject $formMapper;
 	private UploadedFileMapper|MockObject $uploadedFileMapper;
+	private IManager|MockObject $shareManager;
 	private LoggerInterface|MockObject $logger;
 
 	public function setUp(): void {
@@ -31,12 +33,14 @@ class CleanupUploadedFilesJobTest extends TestCase {
 		$this->rootFolder = $this->createMock(IRootFolder::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->uploadedFileMapper = $this->createMock(UploadedFileMapper::class);
+		$this->shareManager = $this->createMock(IManager::class);
 		$time = $this->createMock(ITimeFactory::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->cleanupUploadedFilesJob = new CleanupUploadedFilesJob(
 			$this->rootFolder,
 			$this->formMapper,
 			$this->uploadedFileMapper,
+			$this->shareManager,
 			$this->logger,
 			$time,
 		);
