@@ -1794,6 +1794,10 @@ class ApiController extends OCSController {
 		$share->setSharedBy($form->getOwnerId());
 		$share->setShareOwner($form->getOwnerId());
 		$share->setLabel($this->l10n->t('Forms file upload'));
+		// Temporary shares are cleaned up together with the upload folder after
+		// an hour; the expiration is only a safety net if cleanup never runs.
+		// Share expiration is day-granular, so one day is the shortest value.
+		$share->setExpirationDate(new \DateTime('+1 day'));
 
 		try {
 			$share = $this->shareManager->createShare($share);

@@ -15,8 +15,10 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
+use OCP\User\Exceptions\UserNotFoundException;
 use Psr\Log\LoggerInterface;
 
 class CleanupUploadedFilesJob extends TimedJob {
@@ -66,7 +68,15 @@ class CleanupUploadedFilesJob extends TimedJob {
 			}
 
 			$usersToCleanup[$form->getOwnerId()] = true;
-			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+			try {
+				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+			} catch (UserNotFoundException $e) {
+				$this->logger->warning('Could not find user {ownerId} for uploaded file deletion.', [
+					'ownerId' => $form->getOwnerId(),
+				]);
+				$this->uploadedFileMapper->delete($uploadedFile);
+				continue;
+			}
 
 			$nodes = $userFolder->getById($uploadedFile->getFileId());
 
@@ -86,16 +96,27 @@ class CleanupUploadedFilesJob extends TimedJob {
 
 		$this->logger->info('Deleted {deleted} uploaded files.', ['deleted' => $deleted]);
 
+		// Files uploaded to an upload share that were never registered leave no
+		// database record behind, so every form owner needs to be checked.
+		foreach ($this->formMapper->findAllOwnerIds() as $ownerId) {
+			$usersToCleanup[$ownerId] = true;
+		}
+
 		// now delete empty folders in user folders
 		$deleted = 0;
 		foreach (array_keys($usersToCleanup) as $userId) {
-			$this->logger->info('Cleaning up empty folders for user {userId}.', ['userId' => $userId]);
-			$userFolder = $this->rootFolder->getUserFolder($userId);
+			try {
+				$userFolder = $this->rootFolder->getUserFolder($userId);
+				$unsubmittedFilesFolder = $userFolder->get(Constants::UNSUBMITTED_FILES_FOLDER);
+			} catch (UserNotFoundException|NotFoundException $e) {
+				continue;
+			}
 
-			$unsubmittedFilesFolder = $userFolder->get(Constants::UNSUBMITTED_FILES_FOLDER);
 			if (!$unsubmittedFilesFolder instanceof Folder) {
 				continue;
 			}
+
+			$this->logger->info('Cleaning up empty folders for user {userId}.', ['userId' => $userId]);
 
 			foreach ($unsubmittedFilesFolder->getDirectoryListing() as $node) {
 				if ($node->getName() < $dateTime->getTimestamp()) {
