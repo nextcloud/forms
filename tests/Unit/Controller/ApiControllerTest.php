@@ -67,6 +67,7 @@ use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
+use OCP\Share\IManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -93,6 +94,7 @@ class ApiControllerTest extends TestCase {
 	private IMimeTypeDetector|MockObject $mimeTypeDetector;
 	private IJobList|MockObject $jobList;
 	private ISecureRandom|MockObject $secureRandom;
+	private IManager|MockObject $shareManager;
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
@@ -117,6 +119,7 @@ class ApiControllerTest extends TestCase {
 		$this->jobList = $this->createMock(IJobList::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->secureRandom->method('generate')->willReturn('abcdefghijklmnopqrstuvwxyz012345');
+		$this->shareManager = $this->createMock(IManager::class);
 
 		$this->apiController = new ApiController(
 			'forms',
@@ -139,6 +142,7 @@ class ApiControllerTest extends TestCase {
 			$this->mimeTypeDetector,
 			$this->jobList,
 			$this->secureRandom,
+			$this->shareManager,
 		);
 	}
 
@@ -688,7 +692,7 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
-		$question = Question::fromParams(['formId' => 1]);
+		$question = Question::fromParams(['formId' => 1, 'type' => Constants::ANSWER_TYPE_FILE]);
 
 		$this->formsService->expects($this->once())
 			->method('loadFormForSubmission')
