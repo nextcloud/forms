@@ -101,6 +101,7 @@ class Constants {
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
 	public const ANSWER_TYPE_RANKING = 'ranking';
+	public const ANSWER_TYPE_RATING = 'rating';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
 
@@ -121,6 +122,7 @@ class Constants {
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
 		self::ANSWER_TYPE_RANKING,
+		self::ANSWER_TYPE_RATING,
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
 	];
@@ -217,6 +219,17 @@ class Constants {
 		'columns' => ['array'],
 		'questionType' => ['string'],
 		'rows' => ['array'],
+	];
+
+	/**
+	 * A rating is a linear scale that always starts at 1 and is drawn as icons, so it
+	 * shares the linear scale's key for its top end (and that key's bounds) rather than
+	 * having one of its own. optionsLowest is deliberately absent: a rating's lowest end
+	 * is always 1. ratingIcon is one of 'star' (default), 'heart' or 'thumb'.
+	 */
+	public const EXTRA_SETTINGS_RATING = [
+		'optionsHighest' => ['integer', 'NULL'],
+		'ratingIcon' => ['string', 'NULL'],
 	];
 
 	public const EXTRA_SETTINGS_RANKING = [

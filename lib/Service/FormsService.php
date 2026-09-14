@@ -841,6 +841,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_RATING => Constants::EXTRA_SETTINGS_RATING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
 			default => [],
@@ -946,8 +947,10 @@ class FormsService {
 			}
 
 			// Special handling of linear scale validation
-		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
-			// Ensure limits are sane
+		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE
+			|| $questionType === Constants::ANSWER_TYPE_RATING) {
+			// Ensure limits are sane. A rating cannot set optionsLowest at all, so for it
+			// only the top end is checked.
 			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;

@@ -1392,6 +1392,36 @@ class FormsServiceTest extends TestCase {
 
 	public static function dataAreExtraSettingsValid() {
 		return [
+			'valid-rating-settings' => [
+				'extraSettings' => [
+					'optionsHighest' => 10,
+					'ratingIcon' => 'heart',
+				],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => true
+			],
+			'rating-top-above-scale-limit' => [
+				'extraSettings' => [
+					'optionsHighest' => 11,
+				],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => false
+			],
+			'rating-top-below-scale-limit' => [
+				'extraSettings' => [
+					'optionsHighest' => 1,
+				],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => false
+			],
+			'rating-has-no-lowest-end' => [
+				// A rating always starts at 1, so the linear scale's lower bound is refused.
+				'extraSettings' => [
+					'optionsLowest' => 0,
+				],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => false
+			],
 			'empty-extra-settings' => [
 				'extraSettings' => [],
 				'questionType' => Constants::ANSWER_TYPE_LONG,
