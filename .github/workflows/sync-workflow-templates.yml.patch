@@ -9,7 +9,7 @@ index 85090be9..cf08bd3e 100644
 -          - 'stable34'
 -          - 'stable33'
 -          - 'stable32'
-+          - 'stable5.3'
++          - 'stable5.4'
  
      name: Update workflows in ${{ matrix.branches }}
  
