@@ -5,6 +5,15 @@
 
 # Changelog
 
+## v5.3.7 - 2026-09-15
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.6...v5.3.7)
+
+### Fixed
+
+- [stable5.3] fix: update dateMin and dateMax to accept string or integer formats and enhance validation logic by @backportbot[bot] in [\#3667](https://github.com/nextcloud/forms/pull/3667)
+- [stable5.3] fix: define array key for "allowComments" by @backportbot[bot] in [\#3663](https://github.com/nextcloud/forms/pull/3663)
+
 ## v5.3.6 - 2026-08-25
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.5...v5.3.6)
