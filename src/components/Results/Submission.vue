@@ -54,7 +54,6 @@ import type { PropType } from 'vue'
 import type {
 	FormsOption,
 	FormsQuestion,
-	FormsQuestionExtraSettings,
 	FormsSubmission,
 } from '../../types/Entities.d.ts'
 import type { AnsweredQuestion } from './Answer.vue'
@@ -71,15 +70,6 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Answer from './Answer.vue'
 import { OptionType } from '../../models/Constants.ts'
-
-interface SubmissionQuestion extends FormsQuestion {
-	extraSettings?:
-		| (FormsQuestionExtraSettings & {
-				triggerType?: string
-				branches?: { subQuestions: SubmissionQuestion[] }[]
-		  })
-		| null
-}
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -105,7 +95,7 @@ export default defineComponent({
 		},
 
 		questions: {
-			type: Array as PropType<SubmissionQuestion[]>,
+			type: Array as PropType<FormsQuestion[]>,
 			required: true,
 		},
 
@@ -194,9 +184,7 @@ export default defineComponent({
 		 * @param questions - Questions to match with submission answers
 		 * @return Questions with their answers prepared for display
 		 */
-		const parseQuestions = (
-			questions: SubmissionQuestion[],
-		): AnsweredQuestion[] => {
+		const parseQuestions = (questions: FormsQuestion[]): AnsweredQuestion[] => {
 			const answeredQuestionsArray: AnsweredQuestion[] = []
 
 			questions.forEach((question) => {
