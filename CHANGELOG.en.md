@@ -5,7 +5,7 @@
 
 # Changelog
 
-## v5.4.0 - tbd
+## v5.4.0 - 2026-09-15
 
 - **Custom share tokens**
 
