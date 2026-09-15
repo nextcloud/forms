@@ -30,7 +30,7 @@ on:
   pull_request:
     branches:
       - main
-      - stable5.3
+      - stable5.4
 
 permissions:
   contents: read
