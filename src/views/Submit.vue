@@ -228,11 +228,7 @@
 </template>
 
 <script lang="ts">
-import type {
-	FormsOption,
-	FormsQuestion,
-	GridQuestionValues,
-} from '../types/Entities.d.ts'
+import type { FormsQuestion, GridQuestionValues } from '../types/Entities.d.ts'
 
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -302,16 +298,6 @@ interface StoredAnswerState {
 
 interface StoredAnswersMap {
 	[key: string]: StoredAnswerState
-}
-
-interface SubmitQuestion extends FormsQuestion {
-	options?: FormsOption[]
-	extraSettings?: Record<string, unknown> & {
-		allowOtherAnswer?: boolean
-		triggerType?: string
-		branches?: { subQuestions?: FormsQuestion[] }[]
-	}
-	isRequired?: boolean
 }
 
 interface LoadedSubmissionAnswer {
@@ -422,7 +408,7 @@ export default defineComponent({
 		const showClearFormDueToChangeDialog = ref(false)
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
-		const validQuestions = computed<SubmitQuestion[]>(() => {
+		const validQuestions = computed<FormsQuestion[]>(() => {
 			return props.form.questions.filter((question: FormsQuestion) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
@@ -435,7 +421,7 @@ export default defineComponent({
 					return answerType.validate(question)
 				}
 				return true
-			}) as SubmitQuestion[]
+			}) as FormsQuestion[]
 		})
 
 		const validQuestionsIds = computed<Set<number>>(() => {
@@ -680,7 +666,7 @@ export default defineComponent({
 		 *
 		 * @param question Question to update
 		 */
-		function addFormFieldToLocalStorage(question: SubmitQuestion): void {
+		function addFormFieldToLocalStorage(question: FormsQuestion): void {
 			if (!props.isLoggedIn) {
 				return
 			}
@@ -781,83 +767,23 @@ export default defineComponent({
 					return conditionalAnswer
 				}
 
-				// Build a map of subquestion ID → parent conditional question ID
-				const subQuestionToParent = new Map<number, number>()
-				for (const question of props.form.questions as SubmitQuestion[]) {
-					if (question.type === 'conditional') {
-						const branches = question.extraSettings?.branches || []
-						for (const branch of branches) {
-							for (const subQuestion of branch.subQuestions || []) {
-								subQuestionToParent.set(subQuestion.id, question.id)
-							}
-						}
-					}
-				}
-
-				for (const answer of loadedAnswers) {
-					const questionId = Number(answer.questionId)
-					const text = answer.text
-
-					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
-
-					// Check if this answer belongs to a subquestion of a conditional
-					const parentConditionalId = subQuestionToParent.get(questionId)
-					if (parentConditionalId !== undefined) {
-						const conditionalAnswer =
-							getConditionalAnswer(parentConditionalId)
-						conditionalAnswer.subQuestions[questionId] ??= []
-						conditionalAnswer.subQuestions[questionId].push(text)
-						continue
-					}
-
-					// Only initialize once, don't overwrite previous answers
-					if (!loaded[questionId]) {
-						loaded[questionId] = []
-					}
-					// Grid answers get replaced by a values-object below, all
+				/**
+				 * Restore a stored answer text to the values the question component expects
+				 *
+				 * @param question The question, the trigger of a conditional question with the trigger type
+				 * @param text The stored answer text
+				 * @param values The values restored so far for this question
+				 * @return The values of the question
+				 */
+				function restoreAnswer(
+					question: FormsQuestion,
+					text: string,
+					values: AnswerValue = [],
+				): AnswerValue {
+					const questionId = question.id
+					// Grid answers are returned as a values-object, all
 					// other question types collect their answers in this list
-					const questionAnswers = loaded[questionId] as string[]
-
-					// Clean up answers for questions that do not exist anymore
-					if (!validQuestionsIds.value.has(questionId)) {
-						showClearFormDueToChangeDialog.value = true
-						logger.debug('Question does not exist anymore', {
-							questionId,
-						})
-						continue
-					}
-
-					const question = props.form.questions.find(
-						(question: FormsQuestion) => question.id === questionId,
-					) as SubmitQuestion | undefined
-					if (!question) {
-						continue
-					}
-					if (question.type === 'conditional') {
-						// Handle conditional trigger answer
-						const conditionalAnswer = getConditionalAnswer(questionId)
-						// Map trigger answer to option ID for option-based trigger types
-						const triggerType = question.extraSettings?.triggerType
-						if (
-							['multiple', 'multiple_unique', 'dropdown'].includes(
-								triggerType ?? '',
-							)
-						) {
-							const option = (question.options ?? []).find(
-								(opt) => opt.text === text,
-							)
-							if (option) {
-								conditionalAnswer.trigger.push(String(option.id))
-							} else {
-								logger.debug(
-									`Trigger option ${text} could not be mapped for conditional question ${questionId}`,
-								)
-							}
-						} else {
-							conditionalAnswer.trigger.push(text)
-						}
-						continue
-					}
+					const questionAnswers = values as string[]
 
 					if (question.type === 'ranking') {
 						try {
@@ -918,7 +844,7 @@ export default defineComponent({
 									restoredValues[Number(rowId)] = rowValue
 								}
 							}
-							loaded[questionId] = restoredValues
+							return restoredValues
 						} catch (error) {
 							logger.debug(
 								`Could not parse grid answer ${text} for question ${questionId}`,
@@ -963,6 +889,83 @@ export default defineComponent({
 					} else {
 						questionAnswers.push(text)
 					}
+					return questionAnswers
+				}
+
+				// Build a map of subquestion ID → subquestion and its conditional question ID
+				const subQuestions = new Map<
+					number,
+					{ conditionalId: number; subQuestion: FormsQuestion }
+				>()
+				for (const question of props.form.questions as FormsQuestion[]) {
+					if (question.type === 'conditional') {
+						const branches = question.extraSettings?.branches || []
+						for (const branch of branches) {
+							for (const subQuestion of branch.subQuestions || []) {
+								subQuestions.set(subQuestion.id, {
+									conditionalId: question.id,
+									subQuestion,
+								})
+							}
+						}
+					}
+				}
+
+				for (const answer of loadedAnswers) {
+					const questionId = Number(answer.questionId)
+					const text = answer.text
+
+					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
+
+					// Answers of subquestions are part of the answer of their conditional question
+					const subQuestionEntry = subQuestions.get(questionId)
+					if (subQuestionEntry) {
+						const conditionalAnswer = getConditionalAnswer(
+							subQuestionEntry.conditionalId,
+						)
+						conditionalAnswer.subQuestions[questionId] = restoreAnswer(
+							subQuestionEntry.subQuestion,
+							text,
+							conditionalAnswer.subQuestions[questionId],
+						) as string[]
+						continue
+					}
+
+					// Clean up answers for questions that do not exist anymore
+					if (!validQuestionsIds.value.has(questionId)) {
+						showClearFormDueToChangeDialog.value = true
+						logger.debug('Question does not exist anymore', {
+							questionId,
+						})
+						continue
+					}
+
+					const question = props.form.questions.find(
+						(question: FormsQuestion) => question.id === questionId,
+					) as FormsQuestion | undefined
+					if (!question) {
+						continue
+					}
+
+					if (question.type === 'conditional') {
+						// The trigger is answered like a question of the trigger type
+						const conditionalAnswer = getConditionalAnswer(questionId)
+						conditionalAnswer.trigger = restoreAnswer(
+							{
+								...question,
+								type: question.extraSettings?.triggerType ?? '',
+							},
+							text,
+							conditionalAnswer.trigger,
+						) as string[]
+						continue
+					}
+
+					loaded[questionId] = restoreAnswer(
+						question,
+						text,
+						loaded[questionId],
+					)
 				}
 
 				answers.value = loaded
@@ -981,7 +984,7 @@ export default defineComponent({
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
-		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
+		function onUpdate(question: FormsQuestion, values: AnswerValue): void {
 			answers.value = {
 				...answers.value,
 				[question.id]: values,
@@ -996,7 +999,7 @@ export default defineComponent({
 		 * @param values The updated question values.
 		 */
 		function updateQuestionValues(
-			question: SubmitQuestion,
+			question: FormsQuestion,
 			values: AnswerValue,
 		): void {
 			onUpdate(question, values)
