@@ -207,7 +207,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'anon-user-1']
 				],
-				'questions' => [['id' => 1, 'name' => 'questions']],
+				'questions' => [['id' => 1, 'name' => 'questions', 'type' => Constants::ANSWER_TYPE_SHORT]],
 				'expected' => [
 					'submissions' => [
 						[
@@ -219,6 +219,7 @@ class ApiControllerTest extends TestCase {
 						[
 							'id' => 1,
 							'name' => 'questions',
+							'type' => Constants::ANSWER_TYPE_SHORT,
 							'extraSettings' => new \stdClass(),
 						],
 					],
@@ -229,7 +230,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'jdoe']
 				],
-				'questions' => [['id' => 1, 'name' => 'questions']],
+				'questions' => [['id' => 1, 'name' => 'questions', 'type' => Constants::ANSWER_TYPE_SHORT]],
 				'expected' => [
 					'submissions' => [
 						[
@@ -241,6 +242,33 @@ class ApiControllerTest extends TestCase {
 						[
 							'id' => 1,
 							'name' => 'questions',
+							'type' => Constants::ANSWER_TYPE_SHORT,
+							'extraSettings' => new \stdClass(),
+						],
+					],
+					'filteredSubmissionsCount' => 1,
+				]
+			],
+			'sections are filtered out' => [
+				'submissions' => [
+					['userId' => 'jdoe']
+				],
+				'questions' => [
+					['id' => 1, 'name' => 'questions', 'type' => Constants::ANSWER_TYPE_SHORT],
+					['id' => 2, 'name' => 'section', 'type' => Constants::ANSWER_TYPE_SECTION],
+				],
+				'expected' => [
+					'submissions' => [
+						[
+							'userId' => 'jdoe',
+							'userDisplayName' => 'jdoe',
+						]
+					],
+					'questions' => [
+						[
+							'id' => 1,
+							'name' => 'questions',
+							'type' => Constants::ANSWER_TYPE_SHORT,
 							'extraSettings' => new \stdClass(),
 						],
 					],
