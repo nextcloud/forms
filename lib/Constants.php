@@ -42,6 +42,7 @@ class Constants {
 		self::CONFIG_KEY_ALLOWCONFIRMATIONEMAIL => 'bool',
 		self::CONFIG_KEY_CREATIONALLOWEDGROUPS => 'array',
 		self::CONFIG_KEY_CONFIRMATIONEMAILRATELIMIT => 'int',
+		self::CONFIG_KEY_ALLOWCOMMENTS => 'bool',
 	];
 
 	public const PUBLIC_SHARE_TOKEN_MIN_LENGTH = 1;
