@@ -187,7 +187,10 @@ export default {
 		 */
 		dateMax() {
 			return this.extraSettings?.dateMax
-				? moment(this.extraSettings.dateMax, 'X').toDate()
+				? moment(this.extraSettings.dateMax, [
+						this.answerType.storageFormat,
+						'X',
+					]).toDate()
 				: null
 		},
 
@@ -196,7 +199,10 @@ export default {
 		 */
 		dateMin() {
 			return this.extraSettings?.dateMin
-				? moment(this.extraSettings.dateMin, 'X').toDate()
+				? moment(this.extraSettings.dateMin, [
+						this.answerType.storageFormat,
+						'X',
+					]).toDate()
 				: null
 		},
 
@@ -275,11 +281,14 @@ export default {
 		 * Handles the change event for the maximum date input.
 		 * Updates the maximum allowable date based on the provided value.
 		 *
-		 * @param {string | Date} value - The new maximum date value. Can be a string or a Date object.
+		 * @param {string | Date | null} value - The new maximum date value. Can be a string or a Date object.
 		 */
 		onDateMaxChange(value) {
 			this.onExtraSettingsChange({
-				dateMax: parseInt(moment(value).format('X')),
+				dateMax:
+					value === null || value === ''
+						? null
+						: moment(value).format(this.answerType.storageFormat),
 			})
 		},
 
@@ -287,11 +296,14 @@ export default {
 		 * Handles the change event for the minimum date input.
 		 * Updates the minimum allowable date based on the provided value.
 		 *
-		 * @param {string | Date} value - The new minimum date value. Can be a string or a Date object.
+		 * @param {string | Date | null} value - The new minimum date value. Can be a string or a Date object.
 		 */
 		onDateMinChange(value) {
 			this.onExtraSettingsChange({
-				dateMin: parseInt(moment(value).format('X')),
+				dateMin:
+					value === null || value === ''
+						? null
+						: moment(value).format(this.answerType.storageFormat),
 			})
 		},
 
@@ -417,11 +429,11 @@ export default {
 		/**
 		 * Form expires timestamp to Date of the datepicker
 		 *
-		 * @param {number} value the expires timestamp
+		 * @param {number|string} value the expires timestamp or formatted date string
 		 * @return {Date}
 		 */
 		parseTimestampToDate(value) {
-			return moment(value, 'X').toDate()
+			return moment(value, [this.answerType.storageFormat, 'X']).toDate()
 		},
 	},
 }
