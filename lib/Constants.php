@@ -188,8 +188,8 @@ class Constants {
 	];
 
 	public const EXTRA_SETTINGS_DATE = [
-		'dateMax' => ['integer', 'NULL'],
-		'dateMin' => ['integer', 'NULL'],
+		'dateMax' => ['string', 'integer', 'NULL'],
+		'dateMin' => ['string', 'integer', 'NULL'],
 		'dateRange' => ['boolean', 'NULL'],
 	];
 

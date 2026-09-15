@@ -132,8 +132,8 @@ type PickerType =
 
 type QuestionDateExtraSettings = {
 	dateRange?: boolean
-	dateMax?: number | null
-	dateMin?: number | null
+	dateMax?: string | number | null
+	dateMin?: string | number | null
 	timeRange?: boolean
 	timeMax?: string | null
 	timeMin?: string | null
@@ -183,11 +183,11 @@ export default defineComponent({
 		/**
 		 * Form expires timestamp to Date of the datepicker
 		 *
-		 * @param value the expires timestamp
+		 * @param value the expires timestamp or formatted date string
 		 * @return
 		 */
-		const parseTimestampToDate = (value: number): Date => {
-			return moment(value, 'X').toDate()
+		const parseTimestampToDate = (value: string | number): Date => {
+			return moment(value, [props.answerType.storageFormat, 'X']).toDate()
 		}
 
 		/**
@@ -251,7 +251,10 @@ export default defineComponent({
 		 */
 		const dateMax = computed<Date | undefined>(() => {
 			return extraSettings.value.dateMax
-				? moment(extraSettings.value.dateMax, 'X').toDate()
+				? moment(extraSettings.value.dateMax, [
+						props.answerType.storageFormat,
+						'X',
+					]).toDate()
 				: undefined
 		})
 
@@ -260,7 +263,10 @@ export default defineComponent({
 		 */
 		const dateMin = computed<Date | undefined>(() => {
 			return extraSettings.value.dateMin
-				? moment(extraSettings.value.dateMin, 'X').toDate()
+				? moment(extraSettings.value.dateMin, [
+						props.answerType.storageFormat,
+						'X',
+					]).toDate()
 				: undefined
 		})
 
@@ -315,9 +321,12 @@ export default defineComponent({
 		 *
 		 * @param value - The new maximum date value. Can be a string or a Date object.
 		 */
-		const onDateMaxChange = (value: string | Date): void => {
+		const onDateMaxChange = (value: string | Date | null): void => {
 			question.onExtraSettingsChange({
-				dateMax: parseInt(moment(value).format('X')),
+				dateMax:
+					value === null || value === ''
+						? null
+						: moment(value).format(props.answerType.storageFormat),
 			})
 		}
 
@@ -327,9 +336,12 @@ export default defineComponent({
 		 *
 		 * @param value - The new minimum date value. Can be a string or a Date object.
 		 */
-		const onDateMinChange = (value: string | Date): void => {
+		const onDateMinChange = (value: string | Date | null): void => {
 			question.onExtraSettingsChange({
-				dateMin: parseInt(moment(value).format('X')),
+				dateMin:
+					value === null || value === ''
+						? null
+						: moment(value).format(props.answerType.storageFormat),
 			})
 		}
 

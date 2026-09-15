@@ -861,9 +861,40 @@ class FormsService {
 
 		// Validate extraSettings for specific question types
 		if ($questionType === Constants::ANSWER_TYPE_DATE) {
+			$format = Constants::ANSWER_PHPDATETIME_FORMAT['date'];
+			$dateMinDate = null;
+			$dateMaxDate = null;
+
+			// Validate dateMin format
+			if (isset($extraSettings['dateMin'])) {
+				if (is_numeric($extraSettings['dateMin'])) {
+					$dateMinDate = \DateTime::createFromFormat('!Y-m-d', (new \DateTime('@' . (int)$extraSettings['dateMin']))
+						->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d'));
+				} else {
+					$dateMinString = $extraSettings['dateMin'];
+					$dateMinDate = \DateTime::createFromFormat('!' . $format, $dateMinString);
+					if (!$dateMinDate || $dateMinDate->format($format) !== $dateMinString) {
+						return false;
+					}
+				}
+			}
+
+			// Validate dateMax format
+			if (isset($extraSettings['dateMax'])) {
+				if (is_numeric($extraSettings['dateMax'])) {
+					$dateMaxDate = \DateTime::createFromFormat('!Y-m-d', (new \DateTime('@' . (int)$extraSettings['dateMax']))
+						->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d'));
+				} else {
+					$dateMaxString = $extraSettings['dateMax'];
+					$dateMaxDate = \DateTime::createFromFormat('!' . $format, $dateMaxString);
+					if (!$dateMaxDate || $dateMaxDate->format($format) !== $dateMaxString) {
+						return false;
+					}
+				}
+			}
+
 			// Ensure dateMin and dateMax don't overlap
-			if (isset($extraSettings['dateMin']) && isset($extraSettings['dateMax'])
-				&& $extraSettings['dateMin'] > $extraSettings['dateMax']) {
+			if ($dateMinDate !== null && $dateMaxDate !== null && $dateMinDate > $dateMaxDate) {
 				return false;
 			}
 		} elseif ($questionType === Constants::ANSWER_TYPE_TIME) {
