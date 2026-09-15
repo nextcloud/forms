@@ -700,7 +700,8 @@
                     "grid",
                     "linearscale",
                     "color",
-                    "ranking"
+                    "ranking",
+                    "section"
                 ]
             },
             "Share": {

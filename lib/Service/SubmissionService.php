@@ -268,7 +268,10 @@ class SubmissionService {
 		// Oldest first
 		$submissionEntities = array_reverse($submissionEntities);
 
-		$questions = $this->questionMapper->findByForm($form->getId());
+		$questions = array_filter(
+			$this->questionMapper->findByForm($form->getId()),
+			static fn (Question $question): bool => $question->getType() !== Constants::ANSWER_TYPE_SECTION,
+		);
 
 		$activeQuestionIds = $this->getActiveQuestionIds($questions);
 
@@ -689,6 +692,14 @@ class SubmissionService {
 
 			if ($questionAnswered && !self::isListOfValues($question['type'], $answers[$questionId])) {
 				throw new \InvalidArgumentException(sprintf('Invalid answer for question "%s".', $question['text']));
+			}
+
+			// Sections are structural elements and cannot have answers
+			if ($question['type'] === Constants::ANSWER_TYPE_SECTION) {
+				if ($questionAnswered && array_filter($answers[$questionId])) {
+					throw new \InvalidArgumentException(sprintf('Section "%s" cannot have answers.', $question['text']));
+				}
+				continue;
 			}
 
 			// Check if all required questions have an answer

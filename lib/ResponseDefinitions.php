@@ -52,7 +52,7 @@ namespace OCA\Forms;
  *   extraSettings?: FormsQuestionExtraSettings|\stdClass,
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"|"linearscale"|"color"|"ranking"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"|"linearscale"|"color"|"ranking"|"section"
  * @psalm-type FormsQuestionSubtype = "checkbox"|"number"|"radio"|"rating"|"promoter"
  *
  * @psalm-type FormsQuestion = array{

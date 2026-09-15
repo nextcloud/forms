@@ -165,6 +165,7 @@ interface QuestionPropsLike {
 	isRequired: boolean
 	readOnly: boolean
 	name: string
+	type: string | null
 	maxStringLengths: Record<string, number>
 	canMoveUp: boolean
 	canMoveDown: boolean
@@ -182,6 +183,7 @@ interface QuestionForwardedProps {
 	readOnly: boolean
 	maxStringLengths: Record<string, number>
 	name: string
+	type: string | null
 	canMoveUp: boolean
 	canMoveDown: boolean
 	jumps: Jumps
@@ -247,6 +249,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		readOnly: props.readOnly,
 		maxStringLengths: props.maxStringLengths,
 		name: props.name,
+		type: props.type,
 		canMoveUp: props.canMoveUp,
 		canMoveDown: props.canMoveDown,
 		jumps,

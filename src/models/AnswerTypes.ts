@@ -21,6 +21,7 @@ import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw
 import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
 import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
 import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
+import IconViewAgenda from '@material-symbols/svg-400/outlined/view_agenda.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { markRaw } from 'vue'
 import QuestionColor from '../components/Questions/QuestionColor.vue'
@@ -32,6 +33,7 @@ import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionRanking from '../components/Questions/QuestionRanking.vue'
+import QuestionSection from '../components/Questions/QuestionSection.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import { LinearScaleType, OptionType } from './Constants.ts'
 
@@ -320,6 +322,16 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 			'forms',
 			'This question needs a title and at least one answer!',
 		),
+	},
+
+	section: {
+		component: markRaw(QuestionSection),
+		icon: IconViewAgenda,
+		label: t('forms', 'Section'),
+		predefined: false,
+
+		titlePlaceholder: t('forms', 'Section title'),
+		warningInvalid: t('forms', 'This section needs a title!'),
 	},
 }
 

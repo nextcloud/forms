@@ -390,6 +390,16 @@ interface QuestionComponentRef {
 	validate: () => Promise<boolean>
 }
 
+interface IndexedQuestion {
+	question: SubmitQuestion
+	displayIndex: number
+}
+
+interface QuestionGroup {
+	section: IndexedQuestion | null
+	questions: IndexedQuestion[]
+}
+
 interface DialogButton {
 	label: string
 	icon: string
@@ -501,6 +511,42 @@ export default defineComponent({
 				}
 				return true
 			}) as SubmitQuestion[]
+		})
+
+		/**
+		 * Group questions by sections.
+		 * Each section contains its questions and the section itself.
+		 * This is needed for position:sticky to work when there are several
+		 * sections and allows to display groups on separate pages later on.
+		 */
+		const groupedQuestions = computed<QuestionGroup[]>(() => {
+			const groups: QuestionGroup[] = []
+			let currentGroup: QuestionGroup = { section: null, questions: [] }
+			let questionIndex = 1
+
+			for (const question of validQuestions.value) {
+				if (question.type === 'section') {
+					if (currentGroup.section || currentGroup.questions.length > 0) {
+						groups.push(currentGroup)
+					}
+					currentGroup = {
+						section: { question, displayIndex: questionIndex },
+						questions: [],
+					}
+				} else {
+					currentGroup.questions.push({
+						question,
+						displayIndex: questionIndex,
+					})
+				}
+				questionIndex++
+			}
+
+			if (currentGroup.section || currentGroup.questions.length > 0) {
+				groups.push(currentGroup)
+			}
+
+			return groups
 		})
 
 		const validQuestionsIds = computed<Set<number>>(() => {
@@ -1666,6 +1712,7 @@ export default defineComponent({
 			expirationMessage,
 			openingMessage,
 			formElement,
+			groupedQuestions,
 			hasAnswers,
 			infoMessage,
 			isArchived,
