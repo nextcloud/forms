@@ -45,15 +45,20 @@ use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\BackgroundJob\IJobList;
+use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Security\ISecureRandom;
+use OCP\Share\Exceptions\ShareNotFound;
+use OCP\Share\IManager;
+use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -67,6 +72,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsSubmission from ResponseDefinitions
  * @psalm-import-type FormsSubmissions from ResponseDefinitions
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
+ * @psalm-import-type FormsUploadShare from ResponseDefinitions
  */
 class ApiController extends OCSController {
 	private readonly ?IUser $currentUser;
@@ -92,6 +98,7 @@ class ApiController extends OCSController {
 		private readonly IMimeTypeDetector $mimeTypeDetector,
 		private readonly IJobList $jobList,
 		private readonly ISecureRandom $secureRandom,
+		private readonly IManager $shareManager,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -1686,25 +1693,7 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('No files provided');
 		}
 
-		$form = $this->formsService->loadFormForSubmission($formId, $shareHash);
-
-		if (!$this->formsService->canSubmit($form)) {
-			throw new OCSForbiddenException('Already submitted');
-		}
-
-		try {
-			$question = $this->questionMapper->findById($questionId);
-		} catch (IMapperException) {
-			$this->logger->debug('Could not find question with id {questionId}', [
-				'questionId' => $questionId
-			]);
-			throw new OCSNotFoundException('Could not find question');
-		}
-
-		if ($formId !== $question->getFormId()) {
-			$this->logger->debug('Question doesn\'t belong to the given form');
-			throw new OCSBadRequestException('Question doesn\'t belong to the given form');
-		}
+		[$form, $question] = $this->loadFileQuestionForUpload($formId, $questionId, $shareHash);
 
 		$path = $this->formsService->getTemporaryUploadedFilePath($form, $question);
 
@@ -1734,36 +1723,7 @@ class ApiController extends OCSController {
 
 			if (!empty($extraSettings['allowedFileTypes']) || !empty($extraSettings['allowedFileExtensions'])) {
 				$mimeType = $this->mimeTypeDetector->detectContent($uploadedFile['tmp_name']);
-				$aliases = $this->mimeTypeDetector->getAllAliases();
-
-				$valid = false;
-				foreach ($extraSettings['allowedFileTypes'] ?? [] as $allowedFileType) {
-					if (str_starts_with($mimeType, $allowedFileType) || str_starts_with($aliases[$mimeType] ?? '', $allowedFileType)) {
-						$valid = true;
-						break;
-					}
-				}
-
-				if (!$valid && !empty($extraSettings['allowedFileExtensions'])) {
-					$mimeTypesPerExtension = method_exists($this->mimeTypeDetector, 'getAllMappings')
-						? $this->mimeTypeDetector->getAllMappings() : [];
-					foreach ($extraSettings['allowedFileExtensions'] as $allowedFileExtension) {
-						if (
-							isset($mimeTypesPerExtension[$allowedFileExtension])
-							&& in_array($mimeType, $mimeTypesPerExtension[$allowedFileExtension])
-						) {
-							$valid = true;
-							break;
-						}
-					}
-				}
-
-				if (!$valid) {
-					throw new OCSBadRequestException(sprintf(
-						'File type is not allowed. Allowed file types: %s',
-						implode(', ', array_merge($extraSettings['allowedFileTypes'] ?? [], $extraSettings['allowedFileExtensions'] ?? []))
-					));
-				}
+				$this->assertFileTypeAllowed($question, $mimeType);
 			}
 
 			if ($userFolder->nodeExists($path)) {
@@ -1775,27 +1735,301 @@ class ApiController extends OCSController {
 			$fileName = $folder->getNonExistingName($uploadedFile['name']);
 			$file = $folder->newFile($fileName, file_get_contents($uploadedFile['tmp_name']));
 
-			$uploadToken = $this->secureRandom->generate(32, ISecureRandom::CHAR_ALPHANUMERIC);
-			$uploadedFileEntity = new UploadedFile();
-			$uploadedFileEntity->setFormId($formId);
-			$uploadedFileEntity->setQuestionId($questionId);
-			$uploadedFileEntity->setUploadToken($uploadToken);
-			$uploadedFileEntity->setOriginalFileName($fileName);
-			$uploadedFileEntity->setFileId($file->getId());
-			$uploadedFileEntity->setCreated(time());
-			$this->uploadedFileMapper->insert($uploadedFileEntity);
-
-			$response[] = [
-				'uploadedFileId' => $uploadedFileEntity->getId(),
-				'fileName' => $fileName,
-				'uploadToken' => $uploadToken,
-			];
+			$response[] = $this->createUploadedFileEntry($formId, $questionId, $fileName, $file->getId());
 		}
 
 		return new DataResponse($response);
 	}
 
+	/**
+	 * Create a temporary upload share for a file question
+	 *
+	 * Creates a temporary folder inside the form owner's storage and shares it
+	 * via a create-only (file drop) public link. This allows uploading files
+	 * over WebDAV - including chunked uploads - before the form is submitted.
+	 * Uploaded files have to be registered using the `register` endpoint.
+	 *
+	 * @param int $formId id of the form
+	 * @param int $questionId id of the question
+	 * @param string $shareHash hash of the form share
+	 * @return DataResponse<Http::STATUS_OK, FormsUploadShare, array{}>
+	 * @throws OCSBadRequestException Question doesn't belong to the given form
+	 * @throws OCSBadRequestException Question is not a file question
+	 * @throws OCSBadRequestException Could not create the upload share
+	 * @throws OCSForbiddenException Already submitted
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the token of the created upload share
+	 */
+	#[CORS()]
+	#[PublicPage()]
+	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/files/{questionId}/share')]
+	public function createUploadShare(int $formId, int $questionId, string $shareHash = ''): DataResponse {
+		$this->logger->debug('Creating upload share for formId: {formId}, questionId: {questionId}', [
+			'formId' => $formId,
+			'questionId' => $questionId
+		]);
+
+		[$form, $question] = $this->loadFileQuestionForUpload($formId, $questionId, $shareHash);
+
+		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+		$path = $this->formsService->getTemporaryUploadedFilePath($form, $question);
+		if ($userFolder->nodeExists($path)) {
+			$folder = $userFolder->get($path);
+		} else {
+			$folder = $userFolder->newFolder($path);
+		}
+		if (!$folder instanceof Folder) {
+			throw new OCSBadRequestException('Could not create upload folder');
+		}
+
+		$share = $this->shareManager->newShare();
+		$share->setNode($folder);
+		$share->setShareType(IShare::TYPE_LINK);
+		// create-only (file drop): uploads land in the folder but can neither
+		// be listed, read back nor deleted by the submitter
+		$share->setPermissions(\OCP\Constants::PERMISSION_CREATE);
+		$share->setSharedBy($form->getOwnerId());
+		$share->setShareOwner($form->getOwnerId());
+		$share->setLabel($this->l10n->t('Forms file upload'));
+		// Temporary shares are cleaned up together with the upload folder after
+		// an hour; the expiration is only a safety net if cleanup never runs.
+		// Share expiration is day-granular, so one day is the shortest value.
+		$share->setExpirationDate(new \DateTime('+1 day'));
+
+		try {
+			$share = $this->shareManager->createShare($share);
+		} catch (\Exception $e) {
+			$this->logger->warning('Could not create upload share for form {formId}', [
+				'formId' => $formId,
+				'exception' => $e,
+			]);
+			throw new OCSBadRequestException('Could not create upload share');
+		}
+
+		return new DataResponse(['shareToken' => $share->getToken()]);
+	}
+
+	/**
+	 * Register a file that was uploaded to an upload share
+	 *
+	 * Looks up the file inside the folder of the given upload share, validates
+	 * it against the question settings and binds it to the form and question.
+	 * The returned `uploadedFileId` and `uploadToken` can then be used as an
+	 * answer when submitting the form.
+	 *
+	 * @param int $formId id of the form
+	 * @param int $questionId id of the question
+	 * @param string $shareToken token of the upload share (see `share` endpoint)
+	 * @param string $fileName name of the uploaded file inside the share
+	 * @param string $shareHash hash of the form share
+	 * @return DataResponse<Http::STATUS_OK, FormsUploadedFile, array{}>
+	 * @throws OCSBadRequestException Question doesn't belong to the given form
+	 * @throws OCSBadRequestException Question is not a file question
+	 * @throws OCSBadRequestException Invalid upload share or file name
+	 * @throws OCSBadRequestException File size exceeds the maximum allowed size
+	 * @throws OCSBadRequestException File type is not allowed
+	 * @throws OCSForbiddenException Already submitted
+	 * @throws OCSNotFoundException Could not find question or uploaded file
+	 *
+	 * 200: the file id and name of the registered file
+	 */
+	#[CORS()]
+	#[PublicPage()]
+	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
+	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/files/{questionId}/register')]
+	public function registerUploadedFile(int $formId, int $questionId, string $shareToken, string $fileName, string $shareHash = ''): DataResponse {
+		$this->logger->debug('Registering uploaded file for formId: {formId}, questionId: {questionId}', [
+			'formId' => $formId,
+			'questionId' => $questionId
+		]);
+
+		[$form, $question] = $this->loadFileQuestionForUpload($formId, $questionId, $shareHash);
+
+		try {
+			$share = $this->shareManager->getShareByToken($shareToken);
+		} catch (ShareNotFound) {
+			throw new OCSBadRequestException('Invalid upload share');
+		}
+
+		if ($share->getShareType() !== IShare::TYPE_LINK || $share->getShareOwner() !== $form->getOwnerId()) {
+			throw new OCSBadRequestException('Invalid upload share');
+		}
+
+		try {
+			$node = $share->getNode();
+		} catch (NotFoundException) {
+			throw new OCSBadRequestException('Invalid upload share');
+		}
+
+		if (!$node instanceof Folder) {
+			throw new OCSBadRequestException('Invalid upload share');
+		}
+
+		// The share must point to the temporary upload folder of this form and question
+		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+		$relativePath = $userFolder->getRelativePath($node->getPath());
+		$expectedPath = '#^/' . preg_quote(Constants::UNSUBMITTED_FILES_FOLDER . '/', '#')
+			. '[^/]+/' . $formId . ' - [^/]+/' . $questionId . ' - [^/]+$#';
+		if ($relativePath === null || !preg_match($expectedPath, $relativePath)) {
+			throw new OCSBadRequestException('Invalid upload share');
+		}
+
+		if ($fileName === '' || str_contains($fileName, '/') || str_contains($fileName, '\\')) {
+			throw new OCSBadRequestException('Invalid file name');
+		}
+
+		$file = $this->resolveSharedFile($node, $fileName);
+		if ($file === null) {
+			throw new OCSNotFoundException('Could not find uploaded file');
+		}
+
+		$extraSettings = $question->getExtraSettings();
+		if (($extraSettings['maxFileSize'] ?? 0) > 0 && $file->getSize() > $extraSettings['maxFileSize']) {
+			throw new OCSBadRequestException(sprintf('File size exceeds the maximum allowed size of %s bytes.', $extraSettings['maxFileSize']));
+		}
+
+		if (!empty($extraSettings['allowedFileTypes']) || !empty($extraSettings['allowedFileExtensions'])) {
+			$this->assertFileTypeAllowed($question, $file->getMimeType());
+		}
+
+		return new DataResponse($this->createUploadedFileEntry($formId, $questionId, $file->getName(), $file->getId()));
+	}
+
 	// private functions
+
+	/**
+	 * Load a file question and check that the current request may submit to its form
+	 *
+	 * @return array{0: Form, 1: Question}
+	 * @throws OCSBadRequestException Question doesn't belong to the given form or is not a file question
+	 * @throws OCSForbiddenException Already submitted
+	 * @throws OCSNotFoundException Could not find question
+	 */
+	private function loadFileQuestionForUpload(int $formId, int $questionId, string $shareHash): array {
+		$form = $this->formsService->loadFormForSubmission($formId, $shareHash);
+
+		if (!$this->formsService->canSubmit($form)) {
+			throw new OCSForbiddenException('Already submitted');
+		}
+
+		try {
+			$question = $this->questionMapper->findById($questionId);
+		} catch (IMapperException) {
+			$this->logger->debug('Could not find question with id {questionId}', [
+				'questionId' => $questionId
+			]);
+			throw new OCSNotFoundException('Could not find question');
+		}
+
+		if ($formId !== $question->getFormId()) {
+			$this->logger->debug('Question doesn\'t belong to the given form');
+			throw new OCSBadRequestException('Question doesn\'t belong to the given form');
+		}
+
+		if ($question->getType() !== Constants::ANSWER_TYPE_FILE) {
+			throw new OCSBadRequestException('Question is not a file question');
+		}
+
+		return [$form, $question];
+	}
+
+	/**
+	 * Check that a mime type matches the allowed file types/extensions of a question
+	 *
+	 * @throws OCSBadRequestException File type is not allowed
+	 */
+	private function assertFileTypeAllowed(Question $question, string $mimeType): void {
+		$extraSettings = $question->getExtraSettings();
+		$aliases = $this->mimeTypeDetector->getAllAliases();
+
+		$valid = false;
+		foreach ($extraSettings['allowedFileTypes'] ?? [] as $allowedFileType) {
+			if (str_starts_with($mimeType, $allowedFileType) || str_starts_with($aliases[$mimeType] ?? '', $allowedFileType)) {
+				$valid = true;
+				break;
+			}
+		}
+
+		if (!$valid && !empty($extraSettings['allowedFileExtensions'])) {
+			$mimeTypesPerExtension = method_exists($this->mimeTypeDetector, 'getAllMappings')
+				? $this->mimeTypeDetector->getAllMappings() : [];
+			foreach ($extraSettings['allowedFileExtensions'] as $allowedFileExtension) {
+				if (
+					isset($mimeTypesPerExtension[$allowedFileExtension])
+					&& in_array($mimeType, $mimeTypesPerExtension[$allowedFileExtension])
+				) {
+					$valid = true;
+					break;
+				}
+			}
+		}
+
+		if (!$valid) {
+			throw new OCSBadRequestException(sprintf(
+				'File type is not allowed. Allowed file types: %s',
+				implode(', ', array_merge($extraSettings['allowedFileTypes'] ?? [], $extraSettings['allowedFileExtensions'] ?? []))
+			));
+		}
+	}
+
+	/**
+	 * Resolve an uploaded file inside an upload share folder
+	 *
+	 * File drop shares rename conflicting uploads to "name (2).ext" etc., so
+	 * suffixed variants are taken into account as well. Files that are already
+	 * registered are skipped.
+	 */
+	private function resolveSharedFile(Folder $folder, string $fileName): ?File {
+		$extensionPos = strrpos($fileName, '.');
+		for ($i = 0; $i <= 100; $i++) {
+			if ($i === 0) {
+				$candidate = $fileName;
+			} elseif ($extensionPos === false) {
+				$candidate = $fileName . ' (' . ($i + 1) . ')';
+			} else {
+				$candidate = substr($fileName, 0, $extensionPos) . ' (' . ($i + 1) . ')' . substr($fileName, $extensionPos);
+			}
+
+			try {
+				$node = $folder->get($candidate);
+			} catch (NotFoundException) {
+				break;
+			}
+
+			if ($node instanceof File && $this->uploadedFileMapper->findByFileId($node->getId()) === null) {
+				return $node;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Create an UploadedFile entity and return its API representation
+	 *
+	 * @return FormsUploadedFile
+	 */
+	private function createUploadedFileEntry(int $formId, int $questionId, string $fileName, int $fileId): array {
+		$uploadToken = $this->secureRandom->generate(32, ISecureRandom::CHAR_ALPHANUMERIC);
+		$uploadedFileEntity = new UploadedFile();
+		$uploadedFileEntity->setFormId($formId);
+		$uploadedFileEntity->setQuestionId($questionId);
+		$uploadedFileEntity->setUploadToken($uploadToken);
+		$uploadedFileEntity->setOriginalFileName($fileName);
+		$uploadedFileEntity->setFileId($fileId);
+		$uploadedFileEntity->setCreated(time());
+		$this->uploadedFileMapper->insert($uploadedFileEntity);
+
+		return [
+			'uploadedFileId' => $uploadedFileEntity->getId(),
+			'fileName' => $fileName,
+			'uploadToken' => $uploadToken,
+		];
+	}
 
 	/**
 	 * Insert answers for a question

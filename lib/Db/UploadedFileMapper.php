@@ -56,6 +56,22 @@ class UploadedFileMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int $fileId
+	 * @return UploadedFile|null
+	 */
+	public function findByFileId(int $fileId): ?UploadedFile {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('file_id', $qb->createNamedParameter($fileId, IQueryBuilder::PARAM_INT))
+			);
+
+		return $this->findEntities($qb)[0] ?? null;
+	}
+
+	/**
 	 * find all uploaded files for a given form and question and compare with the given upload token.
 	 *
 	 * @throws DoesNotExistException
