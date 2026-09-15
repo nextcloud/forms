@@ -18,8 +18,6 @@ updates:
     labels:
       - 3. to review
       - dependencies
-    ignore:
-      - dependency-name: "*" 
 
   - package-ecosystem: npm
     target-branch: 'main'
@@ -36,8 +34,6 @@ updates:
     labels:
       - 3. to review
       - dependencies
-    ignore:
-      - dependency-name: "*" 
 
   - package-ecosystem: github-actions
     target-branch: 'main'
