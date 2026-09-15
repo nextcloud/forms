@@ -232,9 +232,21 @@ import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
-import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+	computed,
+	inject,
+	onBeforeMount,
+	onMounted,
+	onUnmounted,
+	ref,
+	watch,
+} from 'vue'
 import { defineComponent } from 'vue'
-import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router'
+import {
+	onBeforeRouteLeave,
+	onBeforeRouteUpdate,
+	routeLocationKey,
+} from 'vue-router'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -364,7 +376,8 @@ export default defineComponent({
 	emits: ['update:form', 'open-sharing'],
 
 	setup(props, { emit }) {
-		const route = useRoute()
+		// Public submit app has no vue-router; inject returns null there.
+		const route = inject(routeLocationKey, null)
 		const title = ref(null)
 		const formElement = ref<HTMLFormElement | null>(null)
 		const questionRefs = ref<
@@ -545,9 +558,10 @@ export default defineComponent({
 		})
 
 		const submissionId = computed<number | null>(() => {
-			const routeSubmissionId = Array.isArray(route.params.submissionId)
-				? route.params.submissionId[0]
-				: route.params.submissionId
+			const rawSubmissionId = route?.params?.submissionId
+			const routeSubmissionId = Array.isArray(rawSubmissionId)
+				? rawSubmissionId[0]
+				: rawSubmissionId
 			const id =
 				routeSubmissionId || loadState(formsAppName, 'submissionId', null)
 			return id ? parseInt(String(id), 10) : null
@@ -1000,27 +1014,30 @@ export default defineComponent({
 			},
 		)
 
-		onBeforeRouteUpdate(async () => {
-			// This navigation guard is called when the route parameters changed (e.g. form hash)
-			// continue with the navigation if there are no changes or the user confirms to leave the form
-			if (await confirmLeaveForm()) {
-				return
-			} else {
-				// Otherwise cancel the navigation
-				return false
-			}
-		})
+		// Navigation guards only work inside the routed Forms app, not the public submit entry.
+		if (!props.publicView) {
+			onBeforeRouteUpdate(async () => {
+				// This navigation guard is called when the route parameters changed (e.g. form hash)
+				// continue with the navigation if there are no changes or the user confirms to leave the form
+				if (await confirmLeaveForm()) {
+					return
+				} else {
+					// Otherwise cancel the navigation
+					return false
+				}
+			})
 
-		onBeforeRouteLeave(async () => {
-			// This navigation guard is called when the route changed and a new view should be shown
-			// continue with the navigation if there are no changes or the user confirms to leave the form
-			if (await confirmLeaveForm()) {
-				return
-			} else {
-				// Otherwise cancel the navigation
-				return false
-			}
-		})
+			onBeforeRouteLeave(async () => {
+				// This navigation guard is called when the route changed and a new view should be shown
+				// continue with the navigation if there are no changes or the user confirms to leave the form
+				if (await confirmLeaveForm()) {
+					return
+				} else {
+					// Otherwise cancel the navigation
+					return false
+				}
+			})
+		}
 
 		onMounted((): void => {
 			window.addEventListener('beforeunload', beforeWindowUnload)
