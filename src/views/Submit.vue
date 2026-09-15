@@ -219,7 +219,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
+import type { FormsQuestion } from '../types/Entities.d.ts'
 
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -287,16 +287,6 @@ interface StoredAnswerState {
 
 interface StoredAnswersMap {
 	[key: string]: StoredAnswerState
-}
-
-interface SubmitQuestion extends FormsQuestion {
-	options?: FormsOption[]
-	extraSettings?: Record<string, unknown> & {
-		allowOtherAnswer?: boolean
-		triggerType?: string
-		branches?: { subQuestions?: FormsQuestion[] }[]
-	}
-	isRequired?: boolean
 }
 
 interface LoadedSubmissionAnswer {
@@ -407,7 +397,7 @@ export default defineComponent({
 		const showClearFormDueToChangeDialog = ref(false)
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
-		const validQuestions = computed<SubmitQuestion[]>(() => {
+		const validQuestions = computed<FormsQuestion[]>(() => {
 			return props.form.questions.filter((question: FormsQuestion) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
@@ -420,7 +410,7 @@ export default defineComponent({
 					return answerType.validate(question)
 				}
 				return true
-			}) as SubmitQuestion[]
+			}) as FormsQuestion[]
 		})
 
 		const validQuestionsIds = computed<Set<number>>(() => {
@@ -638,7 +628,7 @@ export default defineComponent({
 		 *
 		 * @param question Question to update
 		 */
-		function addFormFieldToLocalStorage(question: SubmitQuestion): void {
+		function addFormFieldToLocalStorage(question: FormsQuestion): void {
 			if (!props.isLoggedIn) {
 				return
 			}
@@ -712,7 +702,7 @@ export default defineComponent({
 
 				// Build a map of subquestion ID → parent conditional question ID
 				const subQuestionToParent = new Map<number, number>()
-				for (const question of props.form.questions as SubmitQuestion[]) {
+				for (const question of props.form.questions as FormsQuestion[]) {
 					if (question.type === 'conditional') {
 						const branches = question.extraSettings?.branches || []
 						for (const branch of branches) {
@@ -755,7 +745,7 @@ export default defineComponent({
 
 					const question = props.form.questions.find(
 						(question: FormsQuestion) => question.id === questionId,
-					) as SubmitQuestion | undefined
+					) as FormsQuestion | undefined
 					if (!question) {
 						continue
 					}
@@ -850,7 +840,7 @@ export default defineComponent({
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
-		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
+		function onUpdate(question: FormsQuestion, values: AnswerValue): void {
 			answers.value = {
 				...answers.value,
 				[question.id]: values,
@@ -865,7 +855,7 @@ export default defineComponent({
 		 * @param values The updated question values.
 		 */
 		function updateQuestionValues(
-			question: SubmitQuestion,
+			question: FormsQuestion,
 			values: AnswerValue,
 		): void {
 			onUpdate(question, values)
