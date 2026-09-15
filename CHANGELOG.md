@@ -5,35 +5,9 @@
 
 # Changelog
 
-## v5.4.0-rc.0 - 2026-08-28
+## v5.4.0 - 2026-09-15
 
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0-alpha.2...v5.4.0-rc.0)
-
-### Merged
-
-- chore: finish migration to Composition API (Part IV) by @Chartman123 in [\#3596](https://github.com/nextcloud/forms/pull/3596)
-- chore: cleanup code after Typescript/Composition API migrations by @Chartman123 in [\#3601](https://github.com/nextcloud/forms/pull/3601)
-
-## v5.4.0-alpha.2 - 2026-08-27
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0-alpha.1...v5.4.0-alpha.2)
-
-### Merged
-
-- chore: continue migration to Composition API (Part III) by @Chartman123 in [\#3595](https://github.com/nextcloud/forms/pull/3595)
-
-## v5.4.0-alpha.1 - 2026-08-25
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0-alpha.0...v5.4.0-alpha.1)
-
-### Merged
-
-- enh: make insert question menu wide by @Chartman123 in [\#3600](https://github.com/nextcloud/forms/pull/3600)
-- chore: continue migration to Composition API (Part II) by @Chartman123 in [\#3590](https://github.com/nextcloud/forms/pull/3590)
-
-## v5.4.0-alpha.0 - 2026-08-23
-
-[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.0...v5.4.0-alpha.0)
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.6...v5.4.0)
 
 ### Enhancements
 
@@ -45,11 +19,22 @@
 
 ### Fixed
 
+- fix: update dateMin and dateMax to accept string or integer formats and enhance validation logic by @Chartman123 in [\#3659](https://github.com/nextcloud/forms/pull/3659)
+- fix: submit form by @samin-z in [\#3666](https://github.com/nextcloud/forms/pull/3666)
+- fix: show correct window title in edit mode by @Chartman123 in [\#3606](https://github.com/nextcloud/forms/pull/3606)
 - fix: enhance results view handling by @Chartman123 in [\#3563](https://github.com/nextcloud/forms/pull/3563)
 - fix: stylelint by @Chartman123 in [\#3497](https://github.com/nextcloud/forms/pull/3497)
 
 ### Merged
 
+- fix: define array key for "allowComments" by @DmySyz in [\#3662](https://github.com/nextcloud/forms/pull/3662)
+- Apply rector changes by @nextcloud-command in [\#3634](https://github.com/nextcloud/forms/pull/3634)
+- chore: improve type safety by @Chartman123 in [\#3605](https://github.com/nextcloud/forms/pull/3605)
+- chore: cleanup code after Typescript/Composition API migrations by @Chartman123 in [\#3601](https://github.com/nextcloud/forms/pull/3601)
+- enh: make insert question menu wide by @Chartman123 in [\#3600](https://github.com/nextcloud/forms/pull/3600)
+- chore: finish migration to Composition API (Part IV) by @Chartman123 in [\#3596](https://github.com/nextcloud/forms/pull/3596)
+- chore: continue migration to Composition API (Part III) by @Chartman123 in [\#3595](https://github.com/nextcloud/forms/pull/3595)
+- chore: continue migration to Composition API (Part II) by @Chartman123 in [\#3590](https://github.com/nextcloud/forms/pull/3590)
 - chore: migrate mixins to composables by @Chartman123 in [\#3577](https://github.com/nextcloud/forms/pull/3577)
 - chore: continue ts migration by @Chartman123 in [\#3506](https://github.com/nextcloud/forms/pull/3506)
 - docs: Add webhook support section to README by @Chartman123 in [\#3434](https://github.com/nextcloud/forms/pull/3434)
@@ -59,7 +44,7 @@
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.5...v5.3.6)
 
-### Merged
+### Fixed
 
 - fix(migration): make option_type migration self-sufficient by @AndyScherzinger in [\#3603](https://github.com/nextcloud/forms/pull/3603)
 
