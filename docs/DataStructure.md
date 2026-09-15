@@ -238,6 +238,7 @@ Currently supported Question-Types are:
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                                                          |
 | `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                                                       |
 | `ranking`         | Using pre-defined options, the user ranks them from most to least preferred. Needs at least one option available. Answers are stored in ranked order (one answer row per option). |
+| `section`         | A structural element to group questions into sections. It cannot be answered and has no options.                                                                               |
 
 ## Extra Settings
 
