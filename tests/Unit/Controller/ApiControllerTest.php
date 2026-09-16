@@ -1375,6 +1375,101 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(11, $clonedForm->getConfirmationEmailQuestionId());
 	}
 
+	/**
+	 * @param int $formId the form a copied question comes from
+	 * @return Question the source question, with one text to recognise it by
+	 */
+	private function sourceQuestionInForm(int $formId): Question {
+		return Question::fromParams([
+			'id' => 10,
+			'formId' => $formId,
+			'order' => 1,
+			'type' => 'short',
+			'text' => 'Source question',
+			'description' => '',
+			'isRequired' => false,
+		]);
+	}
+
+	public function testCloneQuestionFromAnotherForm(): void {
+		$targetForm = Form::fromParams(['id' => 1, 'ownerId' => 'currentUser']);
+		$sourceForm = Form::fromParams(['id' => 2, 'ownerId' => 'currentUser']);
+
+		// Editing rights are checked on both forms: the one being added to, and the one
+		// the question is read out of.
+		$this->formsService->expects($this->exactly(2))
+			->method('getFormIfAllowed')
+			->willReturnCallback(fn (int $id, string $permission) => match ([$id, $permission]) {
+				[1, Constants::PERMISSION_EDIT] => $targetForm,
+				[2, Constants::PERMISSION_EDIT] => $sourceForm,
+			});
+
+		$this->questionMapper->method('findById')->with(10)->willReturn($this->sourceQuestionInForm(2));
+		$this->optionMapper->method('findByQuestion')->with(10)->willReturn([]);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([
+			Question::fromParams(['id' => 20, 'formId' => 1, 'order' => 3, 'type' => 'short']),
+		]);
+
+		$inserted = null;
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Question $question) use (&$inserted) {
+				$inserted = $question;
+				return true;
+			}));
+
+		$this->apiController->newQuestion(1, fromId: 10);
+
+		// Created in the form it was copied into, not back in the one it came from.
+		$this->assertEquals(1, $inserted->getFormId());
+		$this->assertEquals(4, $inserted->getOrder());
+		$this->assertEquals('Source question', $inserted->getText());
+	}
+
+	public function testCloneQuestionIntoEmptyForm(): void {
+		$targetForm = Form::fromParams(['id' => 1, 'ownerId' => 'currentUser']);
+		$sourceForm = Form::fromParams(['id' => 2, 'ownerId' => 'currentUser']);
+		$this->formsService->method('getFormIfAllowed')
+			->willReturnCallback(fn (int $id) => $id === 1 ? $targetForm : $sourceForm);
+
+		$this->questionMapper->method('findById')->with(10)->willReturn($this->sourceQuestionInForm(2));
+		$this->optionMapper->method('findByQuestion')->with(10)->willReturn([]);
+		// A new form with nothing in it yet: the usual target when copying questions over.
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([]);
+
+		$inserted = null;
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Question $question) use (&$inserted) {
+				$inserted = $question;
+				return true;
+			}));
+
+		$this->apiController->newQuestion(1, fromId: 10);
+
+		$this->assertEquals(1, $inserted->getFormId());
+		$this->assertEquals(1, $inserted->getOrder());
+	}
+
+	public function testCloneQuestionFromFormWithoutEditRights(): void {
+		$targetForm = Form::fromParams(['id' => 1, 'ownerId' => 'currentUser']);
+		$this->formsService->method('getFormIfAllowed')
+			->willReturnCallback(function (int $id) use ($targetForm) {
+				if ($id === 1) {
+					return $targetForm;
+				}
+				throw new NoSuchFormException('User has no permissions to get this form');
+			});
+
+		$this->questionMapper->method('findById')->with(10)->willReturn($this->sourceQuestionInForm(2));
+		// Nothing may be read out of a form the user cannot edit, let alone copied.
+		$this->optionMapper->expects($this->never())->method('findByQuestion');
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(NoSuchFormException::class);
+		$this->apiController->newQuestion(1, fromId: 10);
+	}
+
 	public function testTransferOwnerNotOwner() {
 		$form = new Form();
 		$form->setId(1);
