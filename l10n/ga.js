@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Is féidir le daoine uimhir a chur isteach",
     "Enter a number" : "Cuir isteach uimhir",
     "Custom regular expression" : "Sloinneadh rialta saincheaptha",
-    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach",
-    "Insert question" : "Cuir ceist isteach"
+    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

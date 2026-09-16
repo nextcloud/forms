@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Žmonės gali įvesti skaičių",
     "Enter a number" : "Įvesti skaičių",
     "Custom regular expression" : "Pasirinktinė reguliarioji išraiška",
-    "The input does not match the required pattern" : "Įvestis neatitinka reikiamo šablono",
-    "Insert question" : "Įterpti klausimą"
+    "The input does not match the required pattern" : "Įvestis neatitinka reikiamo šablono"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

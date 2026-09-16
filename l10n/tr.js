@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "İnsanlar bir sayı yazabilir",
     "Enter a number" : "Bir sayı yazın",
     "Custom regular expression" : "Özel kurallı ifade",
-    "The input does not match the required pattern" : "Yazdığınız bilgi istenilen biçimde değil",
-    "Insert question" : "Soru ekle"
+    "The input does not match the required pattern" : "Yazdığınız bilgi istenilen biçimde değil"
 },
 "nplurals=2; plural=(n > 1);");

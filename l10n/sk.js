@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Ľudia môžu zadať číslo",
     "Enter a number" : "Zadajte číslo",
     "Custom regular expression" : "Vlastný regulárny výraz",
-    "The input does not match the required pattern" : "Vstup nezodpovedá požadovanému vzoru",
-    "Insert question" : "Vložiť otázku"
+    "The input does not match the required pattern" : "Vstup nezodpovedá požadovanému vzoru"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

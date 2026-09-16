@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Vastajad saavad sisestada numbri",
     "Enter a number" : "Sisesta number",
     "Custom regular expression" : "Sinu loodud regulaaravaldis",
-    "The input does not match the required pattern" : "Sisend ei vasta etteantud nõutavale mustrlile",
-    "Insert question" : "Lisa küsimus"
+    "The input does not match the required pattern" : "Sisend ei vasta etteantud nõutavale mustrlile"
 },
 "nplurals=2; plural=(n != 1);");

@@ -411,7 +411,6 @@ OC.L10N.register(
     "People can enter a number" : "Els usuaris podenintroduir un número",
     "Enter a number" : "Introduïu un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "L'entrada no coincideix amb el patró requerit",
-    "Insert question" : "Insereix una pregunta"
+    "The input does not match the required pattern" : "L'entrada no coincideix amb el patró requerit"
 },
 "nplurals=2; plural=(n != 1);");

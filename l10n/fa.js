@@ -408,7 +408,6 @@ OC.L10N.register(
     "People can enter a number" : "کاربران می‌توانند یک عدد وارد کنند",
     "Enter a number" : "یک عدد وارد کنید",
     "Custom regular expression" : "عبارت منظم سفارشی",
-    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد",
-    "Insert question" : "درج سوال"
+    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد"
 },
 "nplurals=2; plural=(n > 1);");
