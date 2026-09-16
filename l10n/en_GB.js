@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "People can enter a number",
     "Enter a number" : "Enter a number",
     "Custom regular expression" : "Custom regular expression",
-    "The input does not match the required pattern" : "The input does not match the required pattern",
-    "Insert question" : "Insert question"
+    "The input does not match the required pattern" : "The input does not match the required pattern"
 },
 "nplurals=2; plural=(n != 1);");

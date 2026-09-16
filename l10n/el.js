@@ -414,7 +414,6 @@ OC.L10N.register(
     "People can enter a number" : "Οι χρήστες μπορούν να εισαγάγουν έναν αριθμό",
     "Enter a number" : "Πληκτρολογήστε έναν αριθμό",
     "Custom regular expression" : "Προσαρμοσμένη κανονική έκφραση",
-    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με το απαιτούμενο μοτίβο",
-    "Insert question" : "Εισαγωγή ερώτησης"
+    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με το απαιτούμενο μοτίβο"
 },
 "nplurals=2; plural=(n != 1);");

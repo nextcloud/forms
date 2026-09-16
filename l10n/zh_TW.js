@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "人們可以輸入數字",
     "Enter a number" : "輸入數字",
     "Custom regular expression" : "自訂正規表示式",
-    "The input does not match the required pattern" : "輸入與所需的模式不相符",
-    "Insert question" : "插入問題"
+    "The input does not match the required pattern" : "輸入與所需的模式不相符"
 },
 "nplurals=1; plural=0;");

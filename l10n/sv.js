@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Användare kan ange ett nummer",
     "Enter a number" : "Fyll i ett tal",
     "Custom regular expression" : "Anpassat reguljärt uttryck",
-    "The input does not match the required pattern" : "Inmatningen matchar inte det obligatoriska mönstret",
-    "Insert question" : "Infoga fråga"
+    "The input does not match the required pattern" : "Inmatningen matchar inte det obligatoriska mönstret"
 },
 "nplurals=2; plural=(n != 1);");

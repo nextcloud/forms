@@ -420,7 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Teilnehmer können eine Zahl eingeben",
     "Enter a number" : "Zahl eingeben",
     "Custom regular expression" : "Benutzerdefinierter regulärer Ausdruck",
-    "The input does not match the required pattern" : "Die Eingabe entspricht nicht dem erforderlichen Muster",
-    "Insert question" : "Frage einfügen"
+    "The input does not match the required pattern" : "Die Eingabe entspricht nicht dem erforderlichen Muster"
 },
 "nplurals=2; plural=(n != 1);");
