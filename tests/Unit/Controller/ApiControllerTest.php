@@ -32,6 +32,7 @@ namespace OCA\Forms\Tests\Unit\Controller;
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
+use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -92,6 +93,8 @@ class ApiControllerTest extends TestCase {
 	private ISecureRandom|MockObject $secureRandom;
 
 	public function setUp(): void {
+		parent::setUp();
+
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
@@ -815,7 +818,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->answerMapper->expects($this->exactly(5))
 			->method('insert')
-			->with($this->callback(function ($answer) {
+			->with($this->callback(function (Answer $answer) {
 				if ($answer->getSubmissionId() !== 12) {
 					return false;
 				}
@@ -833,6 +836,11 @@ class ApiControllerTest extends TestCase {
 						break;
 					case 3:
 						if ($answer->getText() !== 'short anwer') {
+							return false;
+						}
+						break;
+					case 4:
+						if ($answer->getFileId() !== 100 || $answer->getText() !== 'uploaded-file.txt') {
 							return false;
 						}
 						break;
@@ -854,6 +862,12 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$file = $this->createMock(File::class);
+		$file->expects($this->once())
+			->method('getName')
+			->willReturn('uploaded-file.txt');
+		$file->expects($this->once())
+			->method('move')
+			->with('/admin/files/submission-12/uploaded-file.txt');
 
 		$uploadedFile = new UploadedFile();
 		$uploadedFile->setFileId(100);
@@ -864,9 +878,17 @@ class ApiControllerTest extends TestCase {
 
 		$userFolder->expects($this->once())
 			->method('getById')
+			->with(100)
 			->willReturn([$file]);
 
 		$folder = $this->createMock(Folder::class);
+		$folder->expects($this->once())
+			->method('getNonExistingName')
+			->with('uploaded-file.txt')
+			->willReturn('uploaded-file.txt');
+		$folder->expects($this->once())
+			->method('getPath')
+			->willReturn('/admin/files/submission-12');
 
 		$userFolder->expects($this->once())
 			->method('get')
@@ -876,6 +898,242 @@ class ApiControllerTest extends TestCase {
 			->method('getUserFolder')
 			->with('admin')
 			->willReturn($userFolder);
+
+		$this->apiController->newSubmission(1, $answers, '');
+	}
+
+	public static function dataNewSubmission_fileUploadAuthorization(): array {
+		return [
+			'ordinary valid token' => [false, 'valid-upload-token', true],
+			'ordinary foreign token' => [false, 'foreign-upload-token', false],
+			'ordinary missing token' => [false, null, false],
+			'ordinary empty token' => [false, '', false],
+			'conditional valid token' => [true, 'valid-upload-token', true],
+			'conditional foreign token' => [true, 'foreign-upload-token', false],
+			'conditional missing token' => [true, null, false],
+			'conditional empty token' => [true, '', false],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewSubmission_fileUploadAuthorization
+	 */
+	public function testNewSubmission_fileUploadAuthorization(bool $conditional, ?string $uploadToken, bool $authorized): void {
+		$form = Form::fromParams(['id' => 7, 'hash' => 'hash', 'ownerId' => 'admin']);
+		$fileQuestion = [
+			'id' => 8,
+			'formId' => 7,
+			'name' => null,
+			'text' => 'File question',
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'options' => [],
+			'extraSettings' => ['maxAllowedFilesCount' => 1],
+		];
+		$branch = [
+			'id' => 'file-branch',
+			'conditions' => [['type' => 'option_selected', 'optionId' => 3]],
+			'subQuestions' => [$fileQuestion],
+		];
+		$question = $conditional ? [
+			'id' => 9,
+			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'text' => 'Conditional question',
+			'options' => [['id' => 3, 'text' => 'Attach a file']],
+			'extraSettings' => [
+				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'branches' => [$branch],
+			],
+		] : $fileQuestion;
+		$fileAnswer = ['uploadedFileId' => '10', 'fileName' => 'client-supplied.txt'];
+		if ($uploadToken !== null) {
+			$fileAnswer['uploadToken'] = $uploadToken;
+		}
+		$answers = $conditional
+			? [9 => ['trigger' => ['3'], 'subQuestions' => [8 => [$fileAnswer]]]]
+			: [8 => [$fileAnswer]];
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(7, '')
+			->willReturn($form);
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(7)
+			->willReturn([$question]);
+		$this->formAccess();
+
+		// Validation succeeds so storage must independently authorize the upload.
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with([$question], $answers, 'admin', 7);
+		$this->submissionService->expects($conditional ? $this->once() : $this->never())
+			->method('getActiveBranches')
+			->with($question, ['3'])
+			->willReturn([$branch]);
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function (Submission $submission): Submission {
+				$this->assertSame(7, $submission->getFormId());
+				$submission->setId(12);
+				return $submission;
+			});
+
+		$expectedAnswers = $conditional ? [[9, 12, null, 'Attach a file']] : [];
+		if ($authorized) {
+			$expectedAnswers[] = [8, 12, 99, 'real-file.txt'];
+		}
+		$this->answerMapper->expects($this->exactly(count($expectedAnswers)))
+			->method('insert')
+			->willReturnCallback(function (Answer $answer) use (&$expectedAnswers): Answer {
+				$this->assertSame(array_shift($expectedAnswers), [
+					$answer->getQuestionId(),
+					$answer->getSubmissionId(),
+					$answer->getFileId(),
+					$answer->getText(),
+				]);
+				return $answer;
+			});
+
+		$uploadedFile = UploadedFile::fromParams([
+			'id' => 10,
+			'formId' => 7,
+			'questionId' => 8,
+			'uploadToken' => 'valid-upload-token',
+			'fileId' => 99,
+		]);
+		$lookup = $this->uploadedFileMapper->expects($this->once())
+			->method('getForSubmission')
+			->with($this->identicalTo(10), 7, 8, $uploadToken ?? '');
+		$this->uploadedFileMapper->expects($this->never())->method('getByUploadedFileId');
+		$this->uploadedFileMapper->expects($this->never())->method('findByUploadedFileId');
+		$this->uploadedFileMapper->expects($authorized ? $this->once() : $this->never())
+			->method('delete')
+			->with($uploadedFile);
+
+		$file = $this->createMock(File::class);
+		$file->expects($authorized ? $this->once() : $this->never())
+			->method('getName')
+			->willReturn('real-file.txt');
+		$file->expects($authorized ? $this->once() : $this->never())
+			->method('move')
+			->with('/admin/files/Forms/submission-12/question-8/real-file.txt');
+		$folder = $this->createMock(Folder::class);
+		$folder->expects($authorized ? $this->once() : $this->never())
+			->method('getNonExistingName')
+			->with('real-file.txt')
+			->willReturn('real-file.txt');
+		$folder->expects($authorized ? $this->once() : $this->never())
+			->method('getPath')
+			->willReturn('/admin/files/Forms/submission-12/question-8');
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($authorized ? $this->once() : $this->never())
+			->method('nodeExists')
+			->with('Forms/submission-12/question-8')
+			->willReturn(true);
+		$userFolder->expects($authorized ? $this->once() : $this->never())
+			->method('get')
+			->with('Forms/submission-12/question-8')
+			->willReturn($folder);
+		$userFolder->expects($authorized ? $this->once() : $this->never())
+			->method('getById')
+			->with(99)
+			->willReturn([$file]);
+		$this->storage->expects($authorized ? $this->once() : $this->never())
+			->method('getUserFolder')
+			->with('admin')
+			->willReturn($userFolder);
+		$this->formsService->expects($authorized ? $this->once() : $this->never())
+			->method('getUploadedFilePath')
+			->with($form, 12, 8, null, 'File question')
+			->willReturn('Forms/submission-12/question-8');
+		$this->formsService->expects($authorized ? $this->once() : $this->never())
+			->method('notifyNewSubmission');
+
+		if ($authorized) {
+			$lookup->willReturn($uploadedFile);
+		} else {
+			$lookup->willThrowException(new DoesNotExistException('Upload authorization failed'));
+			$this->expectException(DoesNotExistException::class);
+			$this->expectExceptionMessage('Upload authorization failed');
+		}
+
+		$this->assertEquals(new DataResponse(null, Http::STATUS_CREATED), $this->apiController->newSubmission(7, $answers, ''));
+	}
+
+	public function testNewSubmission_conditionalQuestion() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('admin');
+
+		$questions = [
+			[
+				'id' => 100,
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional Q',
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [
+						[
+							'id' => 'branch-a',
+							'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+							'subQuestions' => [
+								[
+									'id' => 101,
+									'type' => 'short',
+									'text' => 'Sub Q',
+									'isRequired' => false,
+								]
+							]
+						]
+					]
+				],
+				'options' => [
+					['id' => 10, 'text' => 'Option A'],
+					['id' => 11, 'text' => 'Option B'],
+				],
+			],
+		];
+
+		$answers = [
+			100 => [
+				'trigger' => ['10'],
+				'subQuestions' => [
+					'101' => ['Sub answer']
+				]
+			],
+		];
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn($questions);
+
+		$this->formAccess();
+
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function ($submission) {
+				$submission->setId(12);
+				return true;
+			}));
+
+		$this->submissionService->expects($this->once())
+			->method('getActiveBranches')
+			->with($questions[0], $answers[100]['trigger'])
+			->willReturn([$questions[0]['extraSettings']['branches'][0]]);
+
+		// Trigger answer + subquestion answer = 2 inserts
+		$this->answerMapper->expects($this->exactly(2))
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission');
 
 		$this->apiController->newSubmission(1, $answers, '');
 	}
@@ -2293,5 +2551,338 @@ class ApiControllerTest extends TestCase {
 		// Should succeed - user has RESULTS_DELETE via share
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);
+	}
+
+	// Tests for new conditional question functionality
+
+	public function testNewQuestion_conditionalQuestion() {
+		$formId = 1;
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with($formId)
+			->willReturn([]);
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(100);
+				return $question;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(100)
+			->willReturn([
+				'id' => 100,
+				'formId' => $formId,
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional Q',
+				'order' => 1,
+				'isRequired' => false,
+				'name' => '',
+				'options' => [],
+				'accept' => [],
+				'description' => '',
+				'extraSettings' => [],
+				'parentQuestionId' => null,
+				'branchId' => null,
+			]);
+
+		$response = $this->apiController->newQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, null, 'Conditional Q');
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
+		$data = $response->getData();
+		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $data['type']);
+	}
+
+	public function testNewQuestion_subQuestion() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByBranch')
+			->with($parentQuestionId, $branchId)
+			->willReturn([]);
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(101);
+				return $question;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(101)
+			->willReturn([
+				'id' => 101,
+				'formId' => $formId,
+				'type' => 'short',
+				'text' => 'Sub Q',
+				'order' => 1,
+				'isRequired' => false,
+				'name' => '',
+				'options' => [],
+				'accept' => [],
+				'description' => '',
+				'extraSettings' => [],
+				'parentQuestionId' => $parentQuestionId,
+				'branchId' => $branchId,
+			]);
+
+		$response = $this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
+		$data = $response->getData();
+		$this->assertEquals($parentQuestionId, $data['parentQuestionId']);
+		$this->assertEquals($branchId, $data['branchId']);
+	}
+
+	public function testNewQuestion_nestedConditionalNotAllowed() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Nested conditional questions are not supported');
+		$this->apiController->newQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, null, 'Nested Conditional', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentNotFound() {
+		$formId = 1;
+		$parentQuestionId = 999;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willThrowException(new DoesNotExistException('Question not found'));
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->expectExceptionMessage('Could not find parent question');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentNotConditional() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType('short'); // Not conditional
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question must be a conditional question');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentDifferentForm() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId(999); // Different form
+		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question does not belong to this form');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_missingBranchId() {
+		$formId = 1;
+		$parentQuestionId = 100;
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('branchId is required when creating a subquestion');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, null);
+	}
+
+	public function testDeleteQuestion_conditionalWithSubquestions(): void {
+		$formId = 1;
+		$questionId = 100;
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$question = new Question();
+		$question->setId($questionId);
+		$question->setFormId($formId);
+		$question->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$question->setOrder(1);
+
+		$subQuestion1 = new Question();
+		$subQuestion1->setId(101);
+		$subQuestion1->setFormId($formId);
+		$subQuestion1->setType('short');
+		$subQuestion1->setOrder(1);
+		$subQuestion1->setParentQuestionId($questionId);
+
+		$subQuestion2 = new Question();
+		$subQuestion2->setId(102);
+		$subQuestion2->setFormId($formId);
+		$subQuestion2->setType('long');
+		$subQuestion2->setOrder(2);
+		$subQuestion2->setParentQuestionId($questionId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->formsService->expects($this->once())
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($questionId)
+			->willReturn($question);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByParentQuestion')
+			->with($questionId)
+			->willReturn([$subQuestion1, $subQuestion2]);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with($formId)
+			->willReturn([]);
+
+		// Expect updates for: subQuestion1, subQuestion2, main question
+		$this->questionMapper->expects($this->exactly(3))
+			->method('update');
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$response = $this->apiController->deleteQuestion($formId, $questionId);
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals($questionId, $response->getData());
 	}
 }

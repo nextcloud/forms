@@ -74,6 +74,28 @@
 		<p v-else class="answer__text" dir="auto">
 			<NcHighlight :text="answerText" :search="highlight" />
 		</p>
+		<template v-if="question.branchAnswers">
+			<div
+				v-for="(branchAnswers, branchAnswersKey) in question.branchAnswers"
+				:key="branchAnswersKey"
+				class="branch__subquestions">
+				<div class="answer__subquestion">
+					<Answer
+						v-for="subquestion in branchAnswers"
+						:key="subquestion.id"
+						:question="subquestion"
+						:highlight="highlight"
+						:answerText="subquestion.squashedAnswers"
+						:answers="subquestion.answers"
+						:questionText="subquestion.text"
+						:gridCellType="subquestion.gridCellType"
+						:gridColumns="subquestion.gridColumns"
+						:gridRows="subquestion.gridRows"
+						:gridValue="subquestion.gridValue"
+						:questionType="subquestion.type" />
+				</div>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -87,6 +109,19 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwit
 import NcHighlight from '@nextcloud/vue/components/NcHighlight'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 
+export interface AnsweredQuestion {
+	id: number
+	text: string
+	type: string
+	squashedAnswers?: string
+	answers?: Array<{ id: number; text: string; url?: string }>
+	branchAnswers?: AnsweredQuestion[][]
+	gridValue?: Record<string, string | string[] | Record<string, string | number>>
+	gridCellType?: string
+	gridRows?: FormsOption[]
+	gridColumns?: FormsOption[]
+}
+
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Answer',
@@ -97,6 +132,11 @@ export default defineComponent({
 	},
 
 	props: {
+		question: {
+			type: Object as PropType<AnsweredQuestion>,
+			required: true,
+		},
+
 		answers: {
 			type: Array as PropType<
 				Array<{ id: number; text: string; url?: string }>
@@ -243,6 +283,12 @@ export default defineComponent({
 			position: sticky;
 			inset-inline-start: 0;
 		}
+	}
+
+	&__subquestion {
+		margin-top: 16px;
+		padding-left: 16px;
+		border-left: 3px solid var(--color-primary-element);
 	}
 }
 </style>
