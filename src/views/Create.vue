@@ -207,7 +207,21 @@
 						:hasSubtypes="hasSubtypes"
 						primary
 						@addQuestion="addQuestion" />
+					<NcButton
+						:disabled="isLoadingQuestions"
+						variant="secondary"
+						@click="showImportDialog = true">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconImport" />
+						</template>
+						{{ t('forms', 'Import questions') }}
+					</NcButton>
 				</div>
+				<ImportQuestionsDialog
+					v-if="showImportDialog"
+					v-model:open="showImportDialog"
+					:formId="form.id"
+					@imported="onQuestionsImported" />
 			</section>
 		</template>
 	</NcAppContent>
@@ -217,6 +231,7 @@
 import type { ComponentPublicInstance, PropType } from 'vue'
 import type { FormsForm, FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
+import IconImport from '@material-symbols/svg-400/outlined/library_add.svg?raw'
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -230,11 +245,13 @@ import debounce from 'debounce'
 import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import AddQuestionMenu from '../components/AddQuestionMenu.vue'
+import ImportQuestionsDialog from '../components/ImportQuestionsDialog.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
@@ -260,9 +277,11 @@ export default defineComponent({
 	name: 'Create',
 	components: {
 		Draggable,
+		ImportQuestionsDialog,
 		NcIconSvgWrapper,
 		AddQuestionMenu,
 		NcAppContent,
+		NcButton,
 		NcEmptyContent,
 		NcLoadingIcon,
 		NcNoteCard,
@@ -631,6 +650,25 @@ export default defineComponent({
 		 * @param subtype the question subtype, see AnswerTypes.subtypes
 		 * @param position where the new question should be added
 		 */
+		const showImportDialog = ref(false)
+
+		/**
+		 * Append questions copied from another form.
+		 *
+		 * The server has already created them, so this only reflects them in the open
+		 * editor rather than refetching the whole form.
+		 *
+		 * @param created the questions the server returned
+		 */
+		const onQuestionsImported = (created: FormsQuestion[]): void => {
+			const questions = [
+				...props.form.questions,
+				...created.map((question) => ({ ...question, answers: [] })),
+			]
+			emit('update:form', { ...props.form, questions })
+			emitEvent('forms:last-updated:set', props.form.id)
+		}
+
 		const addQuestion = async (
 			type: string,
 			subtype: string | null = null,
@@ -828,6 +866,9 @@ export default defineComponent({
 			resizeTitle,
 			resizeDescription,
 			addQuestion,
+			showImportDialog,
+			onQuestionsImported,
+			IconImport,
 			deleteQuestion,
 			insertQuestion,
 			cloneQuestion,
