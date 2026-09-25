@@ -230,7 +230,10 @@ class SubmissionService {
 		// Oldest first
 		$submissionEntities = array_reverse($submissionEntities);
 
-		$questions = $this->questionMapper->findByForm($form->getId());
+		$questions = array_filter(
+			$this->questionMapper->findByForm($form->getId()),
+			static fn (Question $question): bool => $question->getType() !== Constants::ANSWER_TYPE_SECTION,
+		);
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
@@ -566,6 +569,14 @@ class SubmissionService {
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
 			$questionAnswered = array_key_exists($questionId, $answers);
+
+			// Sections are structural elements and cannot have answers
+			if ($question['type'] === Constants::ANSWER_TYPE_SECTION) {
+				if ($questionAnswered && array_filter($answers[$questionId])) {
+					throw new \InvalidArgumentException(sprintf('Section "%s" cannot have answers.', $question['text']));
+				}
+				continue;
+			}
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']

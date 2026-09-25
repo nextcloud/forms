@@ -8,6 +8,7 @@
 		class="question"
 		:class="{
 			'question--editable': !readOnly,
+			'question--section': readOnly && isSection,
 		}"
 		:aria-label="t('forms', 'Question number {index}', { index })">
 		<!-- Drag handle -->
@@ -91,6 +92,7 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
+						v-if="!isSection"
 						:modelValue="isRequired"
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -98,6 +100,7 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
+						v-if="!isSection"
 						:label="t('forms', 'Technical name of the question')"
 						:labelOutside="false"
 						:showTrailingButton="false"
@@ -247,6 +250,11 @@ export default defineComponent({
 			default: '',
 		},
 
+		type: {
+			type: String,
+			default: '',
+		},
+
 		contentValid: {
 			type: Boolean,
 			// eslint-disable-next-line vue/no-boolean-default
@@ -299,11 +307,13 @@ export default defineComponent({
 		const buttonUp = ref<{ $el?: HTMLElement } | undefined>(undefined)
 		const buttonDown = ref<{ $el?: HTMLElement } | undefined>(undefined)
 
+		const isSection = computed(() => props.type === 'section')
+
 		/**
 		 * Extend text with asterisk if question is required
 		 */
 		const computedText = computed(() => {
-			if (props.isRequired) {
+			if (props.isRequired && !isSection.value) {
 				return props.text + ' *'
 			}
 			return props.text
@@ -424,6 +434,7 @@ export default defineComponent({
 			titleId,
 			descriptionId,
 			hasDescription,
+			isSection,
 			hasError,
 			hasInfo,
 			errorId,
@@ -585,5 +596,31 @@ export default defineComponent({
 			}
 		}
 	}
+
+	&--section {
+		margin-block-end: 16px;
+		position: sticky;
+		top: 0;
+		z-index: 2;
+
+		h3 {
+			font-size: 24px !important;
+			border-block-end: 1px solid var(--color-border);
+		}
+	}
+
+	// Limit the description to two lines while the section is stuck to the top
+	&--section-stuck .question__header__description {
+		// two lines at 1.5em line-height plus the output padding
+		max-height: calc(2 * 1.5em + 12px);
+		overflow: hidden;
+	}
+}
+
+// In views with a sticky top bar, sections must stick below it
+.app-content:not(.app-content--public) .question--section {
+	top: calc(
+		var(--default-clickable-area) + 2 * var(--app-navigation-padding, 0px)
+	);
 }
 </style>
