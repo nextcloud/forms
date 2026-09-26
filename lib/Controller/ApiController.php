@@ -1394,6 +1394,8 @@ class ApiController extends OCSController {
 		$this->submissionMapper->deleteByForm($formId);
 		$this->formMapper->update($form);
 
+		$this->queueLinkedFileSync($form);
+
 		return new DataResponse($formId);
 	}
 
@@ -1486,9 +1488,7 @@ class ApiController extends OCSController {
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
-		if ($form->getFileId() !== null) {
-			$this->jobList->add(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $form->getId()]);
-		}
+		$this->queueLinkedFileSync($form);
 
 		return new DataResponse(null, Http::STATUS_CREATED);
 	}
@@ -1564,6 +1564,8 @@ class ApiController extends OCSController {
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
+		$this->queueLinkedFileSync($form);
+
 		return new DataResponse($submissionId);
 	}
 
@@ -1611,6 +1613,8 @@ class ApiController extends OCSController {
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->deleteById($form, $submissionId);
 		$this->formMapper->update($form);
+
+		$this->queueLinkedFileSync($form);
 
 		return new DataResponse($submissionId);
 	}
@@ -1874,6 +1878,16 @@ class ApiController extends OCSController {
 			if ($uploadedFile) {
 				$this->uploadedFileMapper->delete($uploadedFile);
 			}
+		}
+	}
+
+	/**
+	 * Schedule a background job to re-export submissions into the linked file,
+	 * if the form is linked to one.
+	 */
+	private function queueLinkedFileSync(Form $form): void {
+		if ($form->getFileId() !== null) {
+			$this->jobList->add(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $form->getId()]);
 		}
 	}
 
