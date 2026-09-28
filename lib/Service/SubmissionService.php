@@ -257,10 +257,10 @@ class SubmissionService {
 			$answersBySubmission[$answer->getSubmissionId()][] = $answer;
 		}
 
-		// Resolve each submitting user only once
-		$usersById = [];
+		// Resolve each submitting user's display name only once
+		$userDisplayNames = [];
 		foreach (array_unique(array_map(static fn (Submission $submission) => $submission->getUserId(), $submissionEntities)) as $userId) {
-			$usersById[$userId] = $this->userManager->get($userId);
+			$userDisplayNames[$userId] = $this->userManager->getDisplayName($userId);
 		}
 
 		// Fetch all options of the form's questions at once, grouped by question
@@ -338,15 +338,16 @@ class SubmissionService {
 			$row[] = $submission->getId();
 
 			// User
-			$user = $usersById[$submission->getUserId()] ?? null;
-			if ($user === null) {
+			$userId = $submission->getUserId();
+			$displayName = $userDisplayNames[$userId] ?? null;
+			if ($displayName === null) {
 				// Give empty userId
 				$row[] = '';
 				// TRANSLATORS Shown on export if no Display-Name is available.
 				$row[] = $this->l10n->t('Anonymous user');
 			} else {
-				$row[] = $user->getUID();
-				$row[] = $user->getDisplayName();
+				$row[] = $userId;
+				$row[] = $displayName;
 			}
 
 			// Date

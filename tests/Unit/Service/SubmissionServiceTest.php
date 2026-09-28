@@ -390,8 +390,8 @@ class SubmissionServiceTest extends TestCase {
 				'
 				"Submission ID","User ID","User display name","Timestamp","Question 1","Question 2"
 				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-2"
-				"2","user1","User 1","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
-				"1","user2","User 2","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
+				"2","user2","User 2","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
 				'
 			],
 			'checkbox-multi-answers' => [
@@ -777,18 +777,11 @@ file2.txt"
 			->with('currentUser', 'core', 'timezone', 'Europe/Berlin')
 			->willReturn('Europe/Berlin');
 
-		$user = $this->createMock(IUser::class);
-		$user->expects($this->any())
-			->method('getUID')
-			->will($this->onConsecutiveCalls('user1', 'user2'));
-		$user->expects($this->any())
-			->method('getDisplayName')
-			->will($this->onConsecutiveCalls('User 1', 'User 2'));
 		$this->userManager->expects($this->any())
-			->method('get')
+			->method('getDisplayName')
 			->willReturnMap([
-				['user1', $user],
-				['user2', $user],
+				['user1', 'User 1'],
+				['user2', 'User 2'],
 				['unknown', null]
 			]);
 
