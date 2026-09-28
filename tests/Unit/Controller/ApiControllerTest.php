@@ -1528,12 +1528,10 @@ class ApiControllerTest extends TestCase {
 			->with(42)
 			->willReturn($submissionDataFromService); // Service returns an array
 
-		$user = $this->createMock(IUser::class);
-		$user->method('getDisplayName')->willReturn('jdoe');
 		$this->userManager->expects($this->once())
-			->method('get')
+			->method('getDisplayName')
 			->with('jdoe')
-			->willReturn($user);
+			->willReturn('jdoe');
 
 		$expectedSubmissionInResponse = $submissionDataFromService;
 		$expectedSubmissionInResponse['userDisplayName'] = 'jdoe';
@@ -1635,7 +1633,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($submissionDataFromService); // Service returns an array
 
 		$this->userManager->expects($this->once())
-			->method('get')
+			->method('getDisplayName')
 			->with('nonExistentUser')
 			->willReturn(null);
 
