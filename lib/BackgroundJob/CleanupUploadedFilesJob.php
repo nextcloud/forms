@@ -15,10 +15,8 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
-use OCP\Files\NotFoundException;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
-use OCP\User\Exceptions\UserNotFoundException;
 use Psr\Log\LoggerInterface;
 
 class CleanupUploadedFilesJob extends TimedJob {
@@ -70,7 +68,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 			$usersToCleanup[$form->getOwnerId()] = true;
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-			} catch (UserNotFoundException $e) {
+			} catch (\Throwable) {
 				$this->logger->warning('Could not find user {ownerId} for uploaded file deletion.', [
 					'ownerId' => $form->getOwnerId(),
 				]);
@@ -108,7 +106,7 @@ class CleanupUploadedFilesJob extends TimedJob {
 			try {
 				$userFolder = $this->rootFolder->getUserFolder($userId);
 				$unsubmittedFilesFolder = $userFolder->get(Constants::UNSUBMITTED_FILES_FOLDER);
-			} catch (UserNotFoundException|NotFoundException $e) {
+			} catch (\Throwable) {
 				continue;
 			}
 

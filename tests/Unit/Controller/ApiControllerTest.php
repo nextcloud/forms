@@ -738,6 +738,10 @@ class ApiControllerTest extends TestCase {
 
 		$folder = $this->createMock(Folder::class);
 		$folder->expects($this->once())
+			->method('getNonExistingName')
+			->with('file.txt')
+			->willReturn('file.txt');
+		$folder->expects($this->once())
 			->method('newFile')
 			->willReturn($file);
 
