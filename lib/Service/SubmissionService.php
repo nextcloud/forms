@@ -17,6 +17,7 @@ use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
+use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\ResponseDefinitions;
@@ -110,9 +111,18 @@ class SubmissionService {
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($formId, $userId, $query, $limit, $offset);
 
+			$submissionIds = array_map(static fn (Submission $submission) => $submission->getId(), $submissionEntities);
+			$answersBySubmission = [];
+			foreach ($this->answerMapper->findBySubmissions($submissionIds) as $answer) {
+				$answersBySubmission[$answer->getSubmissionId()][] = $answer;
+			}
+
 			foreach ($submissionEntities as $submissionEntity) {
 				$submission = $submissionEntity->read();
-				$submission['answers'] = $this->getAnswers($submission['id']);
+				$submission['answers'] = array_map(
+					static fn (Answer $answer) => $answer->read(),
+					$answersBySubmission[$submission['id']] ?? []
+				);
 				$submissionList[] = $submission;
 			}
 		} catch (DoesNotExistException) {
@@ -221,6 +231,7 @@ class SubmissionService {
 			throw new \InvalidArgumentException('Invalid file format');
 		}
 
+		$submissionEntities = [];
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($form->getId());
 		} catch (DoesNotExistException) {
@@ -237,6 +248,26 @@ class SubmissionService {
 			$userTimezone = $this->userConfig->getValueString($form->getOwnerId(), 'core', 'timezone', $defaultTimeZone);
 		} else {
 			$userTimezone = $this->userConfig->getValueString($this->currentUser->getUID(), 'core', 'timezone', $defaultTimeZone);
+		}
+
+		// Fetch all answers of the loaded submissions at once, grouped by submission
+		$submissionIds = array_map(static fn (Submission $submission) => $submission->getId(), $submissionEntities);
+		$answersBySubmission = [];
+		foreach ($this->answerMapper->findBySubmissions($submissionIds) as $answer) {
+			$answersBySubmission[$answer->getSubmissionId()][] = $answer;
+		}
+
+		// Resolve each submitting user only once
+		$usersById = [];
+		foreach (array_unique(array_map(static fn (Submission $submission) => $submission->getUserId(), $submissionEntities)) as $userId) {
+			$usersById[$userId] = $this->userManager->get($userId);
+		}
+
+		// Fetch all options of the form's questions at once, grouped by question
+		$questionIds = array_map(static fn (Question $question) => $question->getId(), $questions);
+		$optionsByQuestion = [];
+		foreach ($this->optionMapper->findByQuestions($questionIds) as $option) {
+			$optionsByQuestion[$option->getQuestionId()][] = $option;
 		}
 
 		// Process initial header
@@ -258,7 +289,7 @@ class SubmissionService {
 		foreach ($questions as $question) {
 			if ($question->getType() === Constants::ANSWER_TYPE_GRID) {
 				$gridCellType = $question->getExtraSettings()['questionType'];
-				$options = $this->optionMapper->findByQuestion($question->getId());
+				$options = $optionsByQuestion[$question->getId()] ?? [];
 
 				foreach ($options as $option) {
 					$optionPerOptionId[$option->getId()] = $option;
@@ -282,7 +313,7 @@ class SubmissionService {
 					}
 				}
 			} elseif ($question->getType() === Constants::ANSWER_TYPE_RANKING) {
-				$options = $this->optionMapper->findByQuestion($question->getId());
+				$options = $optionsByQuestion[$question->getId()] ?? [];
 				foreach ($options as $option) {
 					$optionPerOptionId[$option->getId()] = $option;
 					$rankingOptionsPerQuestionId[$question->getId()][] = $option->getId();
@@ -307,7 +338,7 @@ class SubmissionService {
 			$row[] = $submission->getId();
 
 			// User
-			$user = $this->userManager->get($submission->getUserId());
+			$user = $usersById[$submission->getUserId()] ?? null;
 			if ($user === null) {
 				// Give empty userId
 				$row[] = '';
@@ -322,7 +353,7 @@ class SubmissionService {
 			$row[] = date_format(date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone)), 'c');
 
 			// Answers, make sure we keep the question order
-			$answers = array_reduce($this->answerMapper->findBySubmission($submission->getId()),
+			$answers = array_reduce($answersBySubmission[$submission->getId()] ?? [],
 				function (array $carry, Answer $answer) use ($questionPerQuestionId, $gridRowsPerQuestionId, $gridColumnsPerQuestionId, $rankingOptionsPerQuestionId, $optionPerOptionId) {
 					$questionId = $answer->getQuestionId();
 					$questionType = isset($questionPerQuestionId[$questionId]) ? $questionPerQuestionId[$questionId]->getType() : null;

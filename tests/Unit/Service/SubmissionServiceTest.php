@@ -150,11 +150,13 @@ class SubmissionServiceTest extends TestCase {
 			});
 
 		$this->answerMapper->expects($this->any())
-			->method('findBySubmission')
-			->willReturnMap([
-				[42, [$answer_1, $answer_2]],
-				[43, []]
-			]);
+			->method('findBySubmissions')
+			->willReturnCallback(function (array $submissionIds) use ($answer_1, $answer_2) {
+				if (in_array(42, $submissionIds, true)) {
+					return [$answer_1, $answer_2];
+				}
+				return [];
+			});
 
 		$expected = [
 			[
@@ -749,16 +751,21 @@ file2.txt"
 				return $questionEntities;
 			}));
 
-		if (!empty($questions[0]['options'])) {
-			$this->optionMapper->expects($this->once())
-				->method('findByQuestion')
-				->with($questions[0]['id'])
-				->willReturnCallback(function (int $questionId) use ($questions) {
-					$optionsEntities = array_map(fn ($option) => Option::fromParams($option), $questions[0]['options']);
+		$this->optionMapper->expects($this->any())
+			->method('findByQuestions')
+			->willReturnCallback(function (array $questionIds) use ($questions) {
+				$optionsEntities = [];
+				foreach ($questions as $question) {
+					if (!in_array($question['id'], $questionIds, true)) {
+						continue;
+					}
+					foreach ($question['options'] ?? [] as $option) {
+						$optionsEntities[] = Option::fromParams(array_merge($option, ['questionId' => $question['id']]));
+					}
+				}
 
-					return $optionsEntities;
-				});
-		}
+				return $optionsEntities;
+			});
 
 		$this->config->expects($this->once())
 			->method('getSystemValueString')
@@ -786,12 +793,18 @@ file2.txt"
 			]);
 
 		$this->answerMapper->expects($this->any())
-			->method('findBySubmission')
-		// Return AnswerObjects for corresponding submission
-			->will($this->returnCallback(function (int $submissionId) use ($submissions) {
-				$matchingSubmission = array_filter($submissions, fn ($submission) => $submission['id'] === $submissionId);
-
-				$answerEntities = array_map(fn ($answer) => Answer::fromParams($answer), current($matchingSubmission)['answers']);
+			->method('findBySubmissions')
+		// Return AnswerObjects for corresponding submissions
+			->will($this->returnCallback(function (array $submissionIds) use ($submissions) {
+				$answerEntities = [];
+				foreach ($submissions as $submission) {
+					if (!in_array($submission['id'], $submissionIds, true)) {
+						continue;
+					}
+					foreach ($submission['answers'] as $answer) {
+						$answerEntities[] = Answer::fromParams(array_merge($answer, ['submissionId' => $submission['id']]));
+					}
+				}
 
 				return $answerEntities;
 			}));

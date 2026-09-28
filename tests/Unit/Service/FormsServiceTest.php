@@ -342,8 +342,8 @@ class FormsServiceTest extends TestCase {
 		$option2->setQuestionId(1);
 		$option2->setText('Option 2');
 		$this->optionMapper->expects($this->any())
-			->method('findByQuestion')
-			->with(1)
+			->method('findByQuestions')
+			->with([1, 2])
 			->willReturn([$option1, $option2]);
 
 		$share = new Share();
