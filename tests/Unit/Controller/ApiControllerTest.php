@@ -1019,6 +1019,10 @@ class ApiControllerTest extends TestCase {
 			->method('deleteById')
 			->with($form, 42);
 
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => 1]);
+
 		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(1, 42));
 	}
 
@@ -1041,7 +1045,8 @@ class ApiControllerTest extends TestCase {
 					'expires' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
-					'showExpiration' => false
+					'showExpiration' => false,
+					'fileId' => 100,
 				],
 			]
 		];
@@ -1107,6 +1112,7 @@ class ApiControllerTest extends TestCase {
 			'isAnonymous' => false,
 			'submitMultiple' => false,
 			'showExpiration' => false,
+			'fileId' => 100,
 		]);
 
 		$this->formsService
@@ -1123,6 +1129,10 @@ class ApiControllerTest extends TestCase {
 			->expects($this->once())
 			->method('deleteByForm')
 			->with(1);
+
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => 1]);
 
 		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
 	}
@@ -1161,6 +1171,10 @@ class ApiControllerTest extends TestCase {
 			->expects($this->once())
 			->method('deleteByForm')
 			->with(1);
+
+		// Form is not linked to a file, so no sync job should be queued
+		$this->jobList->expects($this->never())
+			->method('add');
 
 		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
 	}
@@ -1640,6 +1654,7 @@ class ApiControllerTest extends TestCase {
 		$form->setId($formId);
 		$form->setOwnerId('formOwner');
 		$form->setAllowEditSubmissions(true);
+		$form->setFileId(100);
 
 		$submission = new Submission();
 		$submission->setId($submissionId);
@@ -1685,6 +1700,10 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('notifyNewSubmission')
 			->with($form, $submission);
+
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => $formId]);
 
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);
@@ -2058,6 +2077,10 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->expects($this->once())
 			->method('notifyNewSubmission')
 			->with($form, $submission);
+
+		// Form is not linked to a file, so no sync job should be queued
+		$this->jobList->expects($this->never())
+			->method('add');
 
 		// Should succeed - user is owner and allowEditSubmissions=true
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
