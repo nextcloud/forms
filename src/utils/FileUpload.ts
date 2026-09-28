@@ -4,6 +4,7 @@
  */
 
 import type { IUpload, Uploader } from '@nextcloud/files/upload'
+
 import axios from '@nextcloud/axios'
 import { loadState } from '@nextcloud/initial-state'
 import { generateOcsUrl, generateRemoteUrl } from '@nextcloud/router'
@@ -17,6 +18,9 @@ export type UploadedFileValue = {
 
 const formsAppName = 'forms'
 
+/**
+ * Get the public share hash of the form injected via initial state
+ */
 function getShareHash(): string {
 	return String(loadState(formsAppName, 'shareHash', null) ?? '')
 }
@@ -29,6 +33,8 @@ function getShareHash(): string {
  * initial state or matching hidden inputs. As the Forms app does not run
  * on a files_sharing public page, the hidden inputs are provided here for
  * the upload share that was created by the API.
+ *
+ * @param token token of the created upload share
  */
 function setPublicShareToken(token: string): void {
 	if (
@@ -84,9 +90,7 @@ export async function createUploadShare(
  *
  * @param shareToken token of the upload share created by `createUploadShare`
  */
-export async function createPublicUploader(
-	shareToken: string,
-): Promise<Uploader> {
+export async function createPublicUploader(shareToken: string): Promise<Uploader> {
 	setPublicShareToken(shareToken)
 
 	// The uploader resolves the public share token lazily, so importing the
@@ -98,10 +102,7 @@ export async function createPublicUploader(
 	])
 
 	const root = `/files/${shareToken}`
-	const remoteUrl = generateRemoteUrl('dav').replace(
-		'remote.php',
-		'public.php',
-	)
+	const remoteUrl = generateRemoteUrl('dav').replace('remote.php', 'public.php')
 	const destination = new Folder({
 		id: 0,
 		owner: 'anonymous',
@@ -123,9 +124,7 @@ export async function createPublicUploader(
  * @param upload the upload as returned by `Uploader.upload()`
  * @return `true` if the upload finished successfully
  */
-export async function waitForUploadFinished(
-	upload: IUpload,
-): Promise<boolean> {
+export async function waitForUploadFinished(upload: IUpload): Promise<boolean> {
 	const { UploadStatus } = await import('@nextcloud/files/upload')
 	const finalStates = [
 		UploadStatus.FINISHED,
@@ -173,11 +172,13 @@ export async function registerUploadedFile(
  * @param formId id of the form
  * @param questionId id of the question
  * @param files files to upload
+ * @param onUploadProgress callback for upload progress events
  */
 export async function uploadFilesLegacy(
 	formId: number | string,
 	questionId: number | string,
 	files: File[],
+	onUploadProgress?: (event: { loaded: number; total?: number }) => void,
 ): Promise<UploadedFileValue[]> {
 	const formData = new FormData()
 	files.forEach((file) => formData.append('files[]', file))
@@ -189,7 +190,10 @@ export async function uploadFilesLegacy(
 			{ formId, questionId },
 		),
 		formData,
-		{ headers: { 'Content-Type': 'multipart/form-data' } },
+		{
+			headers: { 'Content-Type': 'multipart/form-data' },
+			onUploadProgress,
+		},
 	)
 
 	return OcsResponse2Data<UploadedFileValue[]>(response)

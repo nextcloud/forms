@@ -79,7 +79,11 @@
 			</template>
 		</template>
 
-		<div class="question__content">
+		<div
+			class="question__content"
+			@dragover="onDragOver"
+			@dragleave="onDragLeave"
+			@drop="onDrop">
 			<ul>
 				<NcListItem
 					v-for="uploadedFile of uploadedFiles"
@@ -106,17 +110,37 @@
 					v-for="(activeUpload, index) of activeUploads"
 					:key="index"
 					:name="activeUpload.name"
+					forceDisplayActions
 					compact>
 					<template #icon>
 						<NcLoadingIcon />
 					</template>
 
 					<template #subname>
-						{{ activeUpload.progress }}%
+						<div v-if="activeUpload.assembling" class="upload-status">
+							<progress
+								:aria-label="
+									t('forms', 'Assembling file {fileName}', {
+										fileName: activeUpload.name,
+									})
+								" />
+							{{ t('forms', 'Assembling file …') }}
+						</div>
+						<NcProgressBar
+							v-else
+							:value="activeUpload.progress"
+							:aria-label="
+								t('forms', 'Upload progress for {fileName}', {
+									fileName: activeUpload.name,
+								})
+							"
+							showValue />
 					</template>
 
 					<template #actions>
-						<NcActionButton @click="onCancelUpload(activeUpload)">
+						<NcActionButton
+							v-if="activeUpload.upload"
+							@click="onCancelUpload(activeUpload)">
 							<template #icon>
 								<NcIconSvgWrapper :svg="IconClose" />
 							</template>
@@ -164,6 +188,13 @@
 					</div>
 				</li>
 			</ul>
+			<div v-show="isDragover" class="question__drop-area">
+				<NcIconSvgWrapper
+					v-if="maxAllowedFilesCount > 1"
+					:svg="IconUploadMultiple" />
+				<NcIconSvgWrapper v-else :svg="IconUpload" />
+				{{ t('forms', 'Drop files to upload') }}
+			</div>
 		</div>
 		<template #insert>
 			<slot name="insert" />
@@ -173,6 +204,8 @@
 
 <script lang="ts">
 import type { IUpload, Uploader } from '@nextcloud/files/upload'
+import type { UploadedFileValue } from '../../utils/FileUpload.ts'
+
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
@@ -192,6 +225,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import NcProgressBar from '@nextcloud/vue/components/NcProgressBar'
 import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
@@ -205,7 +239,6 @@ import {
 	registerUploadedFile,
 	uploadFilesLegacy,
 	waitForUploadFinished,
-	type UploadedFileValue,
 } from '../../utils/FileUpload.ts'
 import logger from '../../utils/Logger.ts'
 
@@ -230,6 +263,8 @@ type FileSizeUnit = keyof typeof FILE_SIZE_UNITS
 type ActiveUpload = {
 	name: string
 	progress: number
+	// server-side processing without measurable progress, e.g. chunk assembly
+	assembling: boolean
 	upload?: IUpload
 	cancelled: boolean
 }
@@ -252,6 +287,7 @@ export default defineComponent({
 		NcButton,
 		NcListItem,
 		NcLoadingIcon,
+		NcProgressBar,
 		Question,
 	},
 
@@ -270,6 +306,7 @@ export default defineComponent({
 		})
 		const fileInput = ref<HTMLInputElement | null>(null)
 		const activeUploads = ref<ActiveUpload[]>([])
+		const isDragover = ref(false)
 		const maxFileSizeUnit = ref<FileSizeUnit>(
 			Object.keys(FILE_SIZE_UNITS)[0] as FileSizeUnit,
 		)
@@ -286,6 +323,14 @@ export default defineComponent({
 
 		const maxAllowedFilesCount = computed<number>(() => {
 			return extraSettings.value.maxAllowedFilesCount ?? 1
+		})
+
+		const canUploadFiles = computed<boolean>(() => {
+			return (
+				props.readOnly
+				&& uploadedFiles.value.length + activeUploads.value.length
+					< maxAllowedFilesCount.value
+			)
 		})
 
 		const allowedFileExtensions = computed<string[]>(() => {
@@ -356,10 +401,57 @@ export default defineComponent({
 		}
 
 		/**
+		 * Update an active upload entry from a multipart progress event
+		 *
+		 * Once the request body was sent the server processes the files, so
+		 * the entry switches to the indeterminate assembling state.
+		 *
+		 * @param activeUpload the upload entry to update
+		 * @param event the progress event
+		 * @param event.loaded bytes transferred so far
+		 * @param event.total total bytes to transfer, if known
+		 */
+		const updateLegacyProgress = (
+			activeUpload: ActiveUpload,
+			event: { loaded: number; total?: number },
+		): void => {
+			if (!event.total) {
+				return
+			}
+			activeUpload.progress = Math.min(
+				100,
+				Math.round((event.loaded / event.total) * 100),
+			)
+			activeUpload.assembling = event.loaded >= event.total
+		}
+
+		// Prop updates are applied asynchronously, so the last emitted values
+		// are tracked to not drop files when multiple uploads finish in the
+		// same tick
+		let emittedValues: UploadedFileValue[] | null = null
+
+		/**
+		 * Append a finished upload to the question values
+		 *
+		 * @param uploadedFile the registered file or `null` for failed uploads
+		 */
+		const emitUploadedFile = (uploadedFile: UploadedFileValue | null): void => {
+			if (uploadedFile === null) {
+				return
+			}
+			emittedValues = [...(emittedValues ?? values.value), uploadedFile]
+			emit('update:values', emittedValues)
+		}
+
+		/**
 		 * Upload a single file to the upload share and register it
 		 *
 		 * Falls back to the legacy multipart endpoint if the WebDAV upload
 		 * fails. Returns `null` for cancelled or failed files.
+		 *
+		 * @param uploader uploader targeting the upload share
+		 * @param shareToken token of the upload share
+		 * @param file file to upload
 		 */
 		const uploadFile = async (
 			uploader: Uploader,
@@ -369,6 +461,7 @@ export default defineComponent({
 			const activeUpload = reactive<ActiveUpload>({
 				name: file.name,
 				progress: 0,
+				assembling: false,
 				cancelled: false,
 			})
 			activeUploads.value.push(activeUpload)
@@ -389,6 +482,9 @@ export default defineComponent({
 								(upload.uploadedBytes / upload.totalBytes) * 100,
 							),
 						)
+						// chunks are assembled once all bytes were sent
+						activeUpload.assembling =
+							upload.uploadedBytes >= upload.totalBytes
 					}
 				})
 
@@ -400,6 +496,7 @@ export default defineComponent({
 					)
 				}
 
+				activeUpload.assembling = true
 				return await registerUploadedFile(
 					props.formId,
 					props.id,
@@ -415,13 +512,16 @@ export default defineComponent({
 					'WebDAV upload failed, falling back to multipart upload',
 					{ error },
 				)
+				activeUpload.progress = 0
+				activeUpload.assembling = false
 				try {
 					const [uploadedFile] = await uploadFilesLegacy(
 						props.formId,
 						props.id,
 						[file],
+						(event) => updateLegacyProgress(activeUpload, event),
 					)
-					return uploadedFile ?? null
+					return activeUpload.cancelled ? null : (uploadedFile ?? null)
 				} catch (legacyError) {
 					logger.error('Error while uploading the file', {
 						error: legacyError,
@@ -443,14 +543,29 @@ export default defineComponent({
 			}
 		}
 
-		const onFileInput = async (): Promise<void> => {
-			const currentInput = fileInput.value
-			if (!currentInput?.files) {
-				return
+		/**
+		 * Validate and upload the given files
+		 *
+		 * @param files files to validate and upload
+		 */
+		const handleFiles = async (files: File[]): Promise<void> => {
+			const remainingCount =
+				maxAllowedFilesCount.value
+				- uploadedFiles.value.length
+				- activeUploads.value.length
+			if (files.length > remainingCount) {
+				showError(
+					t(
+						'forms',
+						'This question allows a maximum of {maxAllowedFilesCount} files.',
+						{ maxAllowedFilesCount: maxAllowedFilesCount.value },
+					),
+				)
+				files = files.slice(0, Math.max(remainingCount, 0))
+				if (files.length === 0) {
+					return
+				}
 			}
-
-			const files = [...currentInput.files]
-			currentInput.value = ''
 
 			let fileInvalid = false
 			files.forEach((file) => {
@@ -480,28 +595,51 @@ export default defineComponent({
 				return
 			}
 
-			let uploadedFiles: (UploadedFileValue | null)[] = []
+			// reset the emission base when no uploads are in flight, so a
+			// stale base does not carry over between batches
+			if (activeUploads.value.length === 0) {
+				emittedValues = null
+			}
 			try {
-				const shareToken = await createUploadShare(
-					props.formId,
-					props.id,
-				)
+				const shareToken = await createUploadShare(props.formId, props.id)
 				const uploader = await createPublicUploader(shareToken)
 
-				uploadedFiles = await Promise.all(
-					files.map((file) => uploadFile(uploader, shareToken, file)),
+				// emit each file as soon as its upload finished
+				await Promise.all(
+					files.map((file) =>
+						uploadFile(uploader, shareToken, file).then(
+							emitUploadedFile,
+						),
+					),
 				)
 			} catch (error) {
 				logger.warn(
 					'Could not create upload share, falling back to multipart upload',
 					{ error },
 				)
+				// the legacy endpoint uploads all files in a single request,
+				// so the entries share the same progress
+				const batchUploads = files.map((file) =>
+					reactive<ActiveUpload>({
+						name: file.name,
+						progress: 0,
+						assembling: false,
+						cancelled: false,
+					}),
+				)
+				activeUploads.value.push(...batchUploads)
 				try {
-					uploadedFiles = await uploadFilesLegacy(
-						props.formId,
-						props.id,
-						files,
-					)
+					;(
+						await uploadFilesLegacy(
+							props.formId,
+							props.id,
+							files,
+							(event) =>
+								batchUploads.forEach((batchUpload) =>
+									updateLegacyProgress(batchUpload, event),
+								),
+						)
+					).forEach(emitUploadedFile)
 				} catch (legacyError) {
 					logger.error('Error while uploading the files', {
 						error: legacyError,
@@ -513,15 +651,72 @@ export default defineComponent({
 							{ message: errorMessage(legacyError) },
 						),
 					)
+				} finally {
+					batchUploads.forEach((batchUpload) =>
+						activeUploads.value.splice(
+							activeUploads.value.indexOf(batchUpload),
+							1,
+						),
+					)
 				}
 			}
+		}
 
-			const newFiles = uploadedFiles.filter(
-				(file): file is UploadedFileValue => file !== null,
-			)
-			if (newFiles.length > 0) {
-				emit('update:values', [...values.value, ...newFiles])
+		const onFileInput = async (): Promise<void> => {
+			const currentInput = fileInput.value
+			if (!currentInput?.files) {
+				return
 			}
+
+			const files = [...currentInput.files]
+			currentInput.value = ''
+
+			await handleFiles(files)
+		}
+
+		let dragoverTimer: ReturnType<typeof setTimeout> | undefined
+
+		const onDragOver = (event: DragEvent): void => {
+			// needed to keep the drag/drop events chain working
+			event.preventDefault()
+
+			if (
+				canUploadFiles.value
+				&& event.dataTransfer?.types.includes('Files')
+			) {
+				isDragover.value = true
+
+				// Firefox may not emit a dragleave event, so the state is
+				// reset when the continuous dragover events stop
+				// https://bugzilla.mozilla.org/show_bug.cgi?id=656164
+				clearTimeout(dragoverTimer)
+				dragoverTimer = setTimeout(() => (isDragover.value = false), 1000)
+			}
+		}
+
+		const onDragLeave = (event: DragEvent): void => {
+			// only reset when leaving the drop zone, not when entering
+			// a child element, to avoid flickering
+			const currentTarget = event.currentTarget as HTMLElement
+			if (!currentTarget.contains(event.relatedTarget as Node | null)) {
+				isDragover.value = false
+			}
+		}
+
+		const onDrop = async (event: DragEvent): Promise<void> => {
+			isDragover.value = false
+			clearTimeout(dragoverTimer)
+
+			if (!event.dataTransfer?.types.includes('Files')) {
+				return
+			}
+			event.preventDefault()
+			event.stopPropagation()
+
+			if (!canUploadFiles.value) {
+				return
+			}
+			await handleFiles([...(event.dataTransfer.files ?? [])])
 		}
 
 		const onMaxAllowedFilesCountInput = (
@@ -596,9 +791,11 @@ export default defineComponent({
 		}
 
 		const onDeleteUploadedFile = (uploadedFileId: number | string): void => {
-			const remainingValues = values.value.filter(
+			// emittedValues may contain files not yet visible in props
+			const remainingValues = (emittedValues ?? values.value).filter(
 				(value) => value.uploadedFileId !== uploadedFileId,
 			)
+			emittedValues = remainingValues
 
 			emit('update:values', remainingValues)
 		}
@@ -638,6 +835,7 @@ export default defineComponent({
 			fileInput,
 			fileTypes,
 			activeUploads,
+			isDragover,
 			maxFileSizeUnit,
 			maxFileSizeValue,
 			allowedFileTypesDialogOpened,
@@ -650,6 +848,9 @@ export default defineComponent({
 			toggleFileInput,
 			onCancelUpload,
 			onFileInput,
+			onDragOver,
+			onDragLeave,
+			onDrop,
 			onMaxAllowedFilesCountInput,
 			onMaxFileSizeValueInput,
 			onMaxFileSizeUnitInput,
@@ -664,11 +865,45 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.upload-status {
+	display: flex;
+	align-items: center;
+	gap: calc(2 * var(--default-grid-baseline));
+
+	progress {
+		flex-grow: 1;
+		height: var(--default-grid-baseline);
+		border: none;
+		accent-color: var(--color-primary-element);
+	}
+}
+
 .file-type-checkbox {
 	margin-inline-start: 30px;
 }
 
 .question {
+	&__content {
+		position: relative;
+	}
+
+	&__drop-area {
+		position: absolute;
+		inset: 0;
+		z-index: 10;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: calc(2 * var(--default-grid-baseline));
+		color: var(--color-primary-element);
+		background: var(--color-primary-element-light);
+		border: 2px dashed var(--color-primary-element);
+		border-radius: var(--border-radius-element, var(--border-radius-large));
+		opacity: 0.9;
+		// keep the overlay from triggering dragleave flicker
+		pointer-events: none;
+	}
+
 	&--editable {
 		.question__input-wrapper {
 			margin-inline-start: -13px;
