@@ -47,6 +47,7 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDownloadResponse;
@@ -71,6 +72,8 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class ApiControllerTest extends TestCase {
+	use UserFolderMockTrait;
+
 	private ApiController $apiController;
 	private AnswerMapper|MockObject $answerMapper;
 	private FormMapper|MockObject $formMapper;
@@ -714,7 +717,7 @@ class ApiControllerTest extends TestCase {
 
 		\OCA\Forms\Controller\is_uploaded_file(true);
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('nodeExists')
 			->willReturn(true);
@@ -848,7 +851,7 @@ class ApiControllerTest extends TestCase {
 			->method('add')
 			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => 1]);
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('nodeExists')
 			->willReturn(true);

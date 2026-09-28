@@ -46,6 +46,7 @@ use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\Folder;
@@ -66,6 +67,7 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class FormsServiceTest extends TestCase {
+	use UserFolderMockTrait;
 
 	private FormsService $formsService;
 	private ActivityManager|MockObject $activityManager;
@@ -1652,7 +1654,7 @@ class FormsServiceTest extends TestCase {
 		$form->setFileId(100);
 		$form->setOwnerId('user1');
 
-		$folder = $this->createMock(Folder::class);
+		$folder = $this->createUserFolderMock();
 		$folder->expects($this->once())
 			->method('getById')
 			->with(100)
