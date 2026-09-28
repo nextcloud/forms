@@ -22,6 +22,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Config\IUserConfig;
 use OCP\Files\File;
@@ -43,6 +44,7 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class SubmissionServiceTest extends TestCase {
+	use UserFolderMockTrait;
 
 	private SubmissionService $submissionService;
 	private FormMapper|MockObject $formMapper;
@@ -325,7 +327,7 @@ class SubmissionServiceTest extends TestCase {
 			$pathNode = $folderNode;
 		}
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('get')
 			->with($path)

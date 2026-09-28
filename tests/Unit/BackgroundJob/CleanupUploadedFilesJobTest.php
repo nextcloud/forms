@@ -13,6 +13,7 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\Files\IRootFolder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -20,6 +21,8 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class CleanupUploadedFilesJobTest extends TestCase {
+	use UserFolderMockTrait;
+
 	private IRootFolder|MockObject $rootFolder;
 	private CleanupUploadedFilesJob $cleanupUploadedFilesJob;
 	private FormMapper|MockObject $formMapper;
@@ -60,9 +63,10 @@ class CleanupUploadedFilesJobTest extends TestCase {
 			->method('findUploadedEarlierThan')
 			->willReturn([$uploadedFile]);
 
+		$userFolder = $this->createUserFolderMock();
 		$this->rootFolder->expects($this->atLeastOnce())
 			->method('getUserFolder')
-			->willReturn($this->rootFolder);
+			->willReturn($userFolder);
 
 		$this->cleanupUploadedFilesJob->run([]);
 	}

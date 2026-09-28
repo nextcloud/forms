@@ -10,6 +10,7 @@ namespace OCA\Forms\Tests\Unit\Helper;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Helper\FilePathHelper;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\Files\Folder;
 use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 class FilePathHelperTest extends TestCase {
+	use UserFolderMockTrait;
+
 	private FilePathHelper $filePathHelper;
 	private IFilenameValidator|MockObject $filenameValidator;
 	private IRootFolder|MockObject $rootFolder;
@@ -86,7 +89,7 @@ class FilePathHelperTest extends TestCase {
 	}
 
 	public function testGetFormsFolderReturnsFolder() {
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$formsFolder = $this->createMock(Folder::class);
 
 		$this->rootFolder->expects($this->once())
@@ -104,7 +107,7 @@ class FilePathHelperTest extends TestCase {
 	}
 
 	public function testGetFormsFolderReturnsNullWhenNotFound() {
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
@@ -121,7 +124,7 @@ class FilePathHelperTest extends TestCase {
 	}
 
 	public function testGetFormsFolderReturnsNullWhenNotFolder() {
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$notAFolder = $this->createMock(\OCP\Files\File::class);
 
 		$this->rootFolder->expects($this->once())
@@ -155,7 +158,7 @@ class FilePathHelperTest extends TestCase {
 		]);
 
 		// Mock getFormsFolder to return our formsFolder
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('user1')
@@ -174,7 +177,7 @@ class FilePathHelperTest extends TestCase {
 	}
 
 	public function testGetAllFormFoldersByIdReturnsEmptyWhenFormsFolderNull() {
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('user1')
@@ -201,7 +204,7 @@ class FilePathHelperTest extends TestCase {
 		$formFolder->method('getName')->willReturn('42 - Form Title');
 		$formsFolder->method('getDirectoryListing')->willReturn([$formFolder]);
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('user1')
@@ -232,7 +235,7 @@ class FilePathHelperTest extends TestCase {
 		$formFolder->method('getName')->willReturn('42 - Form Title');
 		$formsFolder->method('getDirectoryListing')->willReturn([$formFolder]);
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('user1')
@@ -264,7 +267,7 @@ class FilePathHelperTest extends TestCase {
 		$formFolder->method('getName')->willReturn('42 - Form Title');
 		$formsFolder->method('getDirectoryListing')->willReturn([$formFolder]);
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$this->rootFolder->expects($this->once())
 			->method('getUserFolder')
 			->with('user1')
