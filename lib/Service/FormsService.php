@@ -11,6 +11,7 @@ use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -114,9 +115,19 @@ class FormsService {
 		$questionList = [];
 		try {
 			$questionEntities = $this->questionMapper->findByForm($formId);
+
+			$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
+			$optionsByQuestion = [];
+			foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
+				$optionsByQuestion[$optionEntity->getQuestionId()][] = $optionEntity;
+			}
+
 			foreach ($questionEntities as $questionEntity) {
 				$question = $questionEntity->read();
-				$question['options'] = $this->getOptions($question['id']);
+				$question['options'] = array_map(
+					static fn (Option $option) => $option->read(),
+					$optionsByQuestion[$question['id']] ?? []
+				);
 				$question['accept'] = [];
 				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
