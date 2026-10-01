@@ -137,7 +137,7 @@
     "Latest time" : "Najneskorší čas",
     "Shuffle options" : "Možnosti náhodného výberu",
     "Allowed file types: {fileTypes}." : "Povolené typy súborov: {fileTypes}.",
-    "All file types are allowed." : "Všetky typu súborov sú povolené.",
+    "All file types are allowed." : "Všetky typy súborov sú povolené.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Súbor {fileName} je príliš veľký. Maximálna veľkosť súboru je {maxFileSize}.",
     "There was an error during submitting the file: {message}." : "Pri odosielaní súboru došlo k chybe: {message}.",
     "Please wait until the file has been uploaded." : "Počkajte, kým sa súbor nahrá.",
