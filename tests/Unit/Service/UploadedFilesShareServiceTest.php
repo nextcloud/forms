@@ -15,6 +15,7 @@ use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Helper\FilePathHelper;
 use OCA\Forms\Service\UploadedFilesShareService;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\Files\Folder;
 use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
@@ -26,6 +27,8 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class UploadedFilesShareServiceTest extends TestCase {
+	use UserFolderMockTrait;
+
 	private UploadedFilesShareService $service;
 	private ShareMapper|MockObject $shareMapper;
 	private IRootFolder|MockObject $rootFolder;
@@ -75,7 +78,7 @@ class UploadedFilesShareServiceTest extends TestCase {
 			->willReturn([$resultsShare, $submitOnlyShare]);
 
 		$folder = $this->createMock(Folder::class);
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('get')
 			->with('Forms/2 - test')
@@ -125,7 +128,7 @@ class UploadedFilesShareServiceTest extends TestCase {
 		$share->setShareWith('bob');
 		$share->setPermissions([Constants::PERMISSION_RESULTS]);
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->method('get')->willThrowException(new NotFoundException());
 		$this->rootFolder->method('getUserFolder')->with('alice')->willReturn($userFolder);
 		$this->shareManager->expects($this->never())->method('getSharesBy');

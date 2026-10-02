@@ -1283,14 +1283,8 @@ class ApiController extends OCSController {
 				// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
 				$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 			} else {
-				$userEntity = $this->userManager->get($submission['userId']);
-
-				if ($userEntity instanceof IUser) {
-					$submission['userDisplayName'] = $userEntity->getDisplayName();
-				} else {
-					// Fallback, should not occur regularly.
-					$submission['userDisplayName'] = $submission['userId'];
-				}
+				// Fallback to the userId, should not occur regularly.
+				$submission['userDisplayName'] = $this->userManager->getDisplayName($submission['userId']) ?? $submission['userId'];
 			}
 			return $submission;
 		}, $submissions);
@@ -1352,14 +1346,8 @@ class ApiController extends OCSController {
 			// TRANSLATORS On Results when listing the single Responses to the form, this text is shown as heading of the Response.
 			$submission['userDisplayName'] = $this->l10n->t('Anonymous response');
 		} else {
-			$userEntity = $this->userManager->get($submission['userId']);
-
-			if ($userEntity instanceof IUser) {
-				$submission['userDisplayName'] = $userEntity->getDisplayName();
-			} else {
-				// Fallback, should not occur regularly.
-				$submission['userDisplayName'] = $submission['userId'];
-			}
+			// Fallback to the userId, should not occur regularly.
+			$submission['userDisplayName'] = $this->userManager->getDisplayName($submission['userId']) ?? $submission['userId'];
 		}
 
 		return new DataResponse($submission);
