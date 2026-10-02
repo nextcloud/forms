@@ -1394,6 +1394,41 @@ file2.txt"
 				// Expected Result – required question must be answered
 				'Question "Rank these" is required.',
 			],
+			'invalid-section-with-answer' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => false]
+				],
+				// Answers – sections cannot have answers
+				[
+					'1' => ['some answer']
+				],
+				// Expected Result
+				'Section "My section" cannot have answers.',
+			],
+			'valid-section-without-answer' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => false],
+					['id' => 2, 'type' => 'short', 'text' => 'A question', 'isRequired' => false]
+				],
+				// Answers
+				[
+					'2' => ['an answer']
+				],
+				// Expected Result – no error
+				null,
+			],
+			'valid-section-required-unanswered' => [
+				// Questions – a required section still cannot be answered and must not block submission
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => true]
+				],
+				// Answers
+				[],
+				// Expected Result – no error
+				null,
+			],
 		];
 	}
 

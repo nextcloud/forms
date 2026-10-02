@@ -125,26 +125,43 @@
 				</template>
 			</NcEmptyContent>
 
-			<!-- Questions list -->
+			<!-- Questions list, grouped by sections -->
 			<form v-else ref="formElement" @submit.prevent="onSubmit">
-				<ul>
-					<component
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in validQuestions"
-						ref="questionRefs"
-						:key="question.id"
-						v-bind="question"
-						readOnly
-						:answerType="answerTypes[question.type]"
-						:index="index + 1"
-						:maxStringLengths="maxStringLengths"
-						:values="answers[question.id]"
-						@keydown.enter="onKeydownEnter"
-						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="
-							(values: AnswerValue) => onUpdate(question, values)
-						" />
-				</ul>
+				<template
+					v-for="(group, groupIndex) in groupedQuestions"
+					:key="`group-${groupIndex}`">
+					<ul>
+						<component
+							:is="answerTypes[group.section.question.type].component"
+							v-if="group.section"
+							ref="questionRefs"
+							:key="group.section.question.id"
+							v-bind="group.section.question"
+							readOnly
+							:answerType="
+								answerTypes[group.section.question.type]
+							"
+							:index="group.section.displayIndex"
+							:maxStringLengths="maxStringLengths" />
+						<component
+							:is="answerTypes[item.question.type].component"
+							v-for="item in group.questions"
+							ref="questionRefs"
+							:key="item.question.id"
+							v-bind="item.question"
+							readOnly
+							:answerType="answerTypes[item.question.type]"
+							:index="item.displayIndex"
+							:maxStringLengths="maxStringLengths"
+							:values="answers[item.question.id]"
+							@keydown.enter="onKeydownEnter"
+							@keydown.ctrl.enter="onKeydownCtrlEnter"
+							@update:values="
+								(values: AnswerValue) =>
+									onUpdate(item.question, values)
+							" />
+					</ul>
+				</template>
 				<div class="form-buttons">
 					<NcButton
 						alignment="center-reverse"
@@ -306,6 +323,16 @@ interface QuestionComponentRef {
 	validate: () => Promise<boolean>
 }
 
+interface IndexedQuestion {
+	question: SubmitQuestion
+	displayIndex: number
+}
+
+interface QuestionGroup {
+	section: IndexedQuestion | null
+	questions: IndexedQuestion[]
+}
+
 interface DialogButton {
 	label: string
 	icon: string
@@ -414,6 +441,42 @@ export default defineComponent({
 				}
 				return true
 			}) as SubmitQuestion[]
+		})
+
+		/**
+		 * Group questions by sections.
+		 * Each section contains its questions and the section itself.
+		 * This is needed for position:sticky to work when there are several
+		 * sections and allows to display groups on separate pages later on.
+		 */
+		const groupedQuestions = computed<QuestionGroup[]>(() => {
+			const groups: QuestionGroup[] = []
+			let currentGroup: QuestionGroup = { section: null, questions: [] }
+			let questionIndex = 1
+
+			for (const question of validQuestions.value) {
+				if (question.type === 'section') {
+					if (currentGroup.section || currentGroup.questions.length > 0) {
+						groups.push(currentGroup)
+					}
+					currentGroup = {
+						section: { question, displayIndex: questionIndex },
+						questions: [],
+					}
+				} else {
+					currentGroup.questions.push({
+						question,
+						displayIndex: questionIndex,
+					})
+				}
+				questionIndex++
+			}
+
+			if (currentGroup.section || currentGroup.questions.length > 0) {
+				groups.push(currentGroup)
+			}
+
+			return groups
 		})
 
 		const validQuestionsIds = computed<Set<number>>(() => {
@@ -1082,6 +1145,7 @@ export default defineComponent({
 			confirmLeaveFormButtons,
 			expirationMessage,
 			formElement,
+			groupedQuestions,
 			hasAnswers,
 			infoMessage,
 			isArchived,
