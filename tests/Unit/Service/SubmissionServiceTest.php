@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -19,6 +19,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
@@ -1394,6 +1395,336 @@ file2.txt"
 				// Expected Result – required question must be answered
 				'Question "Rank these" is required.',
 			],
+			// Conditional question tests
+			'valid-conditional-with-trigger-and-subquestions' => [
+				// Questions - conditional with dropdown trigger and subquestions in branches
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Conditional Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [
+										[
+											'id' => 101,
+											'type' => 'short',
+											'text' => 'Sub Q1',
+											'isRequired' => true,
+										]
+									]
+								],
+								[
+									'id' => 'branch-2',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 11]],
+									'subQuestions' => [
+										[
+											'id' => 102,
+											'type' => 'short',
+											'text' => 'Sub Q2',
+											'isRequired' => true,
+										]
+									]
+								]
+							]
+						],
+						'options' => [
+							['id' => 10],
+							['id' => 11]
+						]
+					]
+				],
+				// Answers - trigger selects branch-1, so only subquestion 101 needs to be answered
+				[
+					'100' => [
+						'trigger' => ['10'],
+						'subQuestions' => [
+							'101' => ['Sub answer 1']
+						]
+					]
+				],
+				// Expected Result - valid
+				null,
+			],
+			'valid-conditional-optional-not-answered' => [
+				// Questions - optional conditional question
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Conditional Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => []
+								]
+							]
+						],
+						'options' => [
+							['id' => 10]
+						]
+					]
+				],
+				// Answers - not answered at all
+				[],
+				// Expected Result - valid since optional
+				null,
+			],
+			'invalid-conditional-required-trigger-not-answered' => [
+				// Questions - required conditional question
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Conditional Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => []
+								]
+							]
+						],
+						'options' => [
+							['id' => 10]
+						]
+					]
+				],
+				// Answers - not answered
+				[],
+				// Expected Result
+				'Question "Conditional Q" is required.',
+			],
+			'invalid-conditional-required-subquestion-not-answered' => [
+				// Questions - conditional with required subquestion in the branch
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Conditional Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [
+										[
+											'id' => 101,
+											'type' => 'short',
+											'text' => 'Sub Q1',
+											'isRequired' => true,
+										]
+									]
+								]
+							]
+						],
+						'options' => [
+							['id' => 10]
+						]
+					]
+				],
+				// Answers - trigger answered but subquestion not
+				[
+					'100' => [
+						'trigger' => ['10'],
+						'subQuestions' => []
+					]
+				],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'valid-conditional-linearscale-trigger' => [
+				// Questions - conditional with linearscale trigger
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Scale Conditional',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_LINEARSCALE,
+							'branches' => [
+								[
+									'id' => 'branch-low',
+									'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]],
+									'subQuestions' => [
+										[
+											'id' => 101,
+											'type' => 'long',
+											'text' => 'Why low?',
+											'isRequired' => true,
+										]
+									]
+								],
+								[
+									'id' => 'branch-high',
+									'conditions' => [['type' => 'value_range', 'min' => 4, 'max' => 5]],
+									'subQuestions' => [
+										[
+											'id' => 102,
+											'type' => 'long',
+											'text' => 'Why high?',
+											'isRequired' => true,
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				// Answers - trigger value 2 activates branch-low
+				[
+					'100' => [
+						'trigger' => ['2'],
+						'subQuestions' => [
+							'101' => ['Because reasons']
+						]
+					]
+				],
+				// Expected Result - valid
+				null,
+			],
+			'valid-conditional-short-text-trigger' => [
+				// Questions - conditional with short text trigger using string_equals
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Text Conditional',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_SHORT,
+							'branches' => [
+								[
+									'id' => 'branch-yes',
+									'conditions' => [['type' => 'string_equals', 'value' => 'yes']],
+									'subQuestions' => [
+										[
+											'id' => 101,
+											'type' => 'short',
+											'text' => 'Please elaborate',
+											'isRequired' => true,
+										]
+									]
+								],
+								[
+									'id' => 'branch-no',
+									'conditions' => [['type' => 'string_equals', 'value' => 'no']],
+									'subQuestions' => []
+								]
+							]
+						]
+					]
+				],
+				// Answers - trigger "yes" activates branch-yes
+				[
+					'100' => [
+						'trigger' => ['yes'],
+						'subQuestions' => [
+							'101' => ['More details here']
+						]
+					]
+				],
+				// Expected Result - valid
+				null,
+			],
+			'valid-conditional-checkbox-combination-trigger' => [
+				// Questions - conditional with multiple (checkbox) trigger
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Checkbox Conditional',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_MULTIPLE,
+							'branches' => [
+								[
+									'id' => 'branch-combo1',
+									'conditions' => [['type' => 'options_combination', 'optionIds' => [10, 11]]],
+									'subQuestions' => [
+										[
+											'id' => 101,
+											'type' => 'short',
+											'text' => 'Combo 1 question',
+											'isRequired' => true,
+										]
+									]
+								],
+								[
+									'id' => 'branch-combo2',
+									'conditions' => [['type' => 'options_combination', 'optionIds' => [10]]],
+									'subQuestions' => []
+								]
+							]
+						],
+						'options' => [
+							['id' => 10],
+							['id' => 11],
+							['id' => 12]
+						]
+					]
+				],
+				// Answers - selecting options 10 and 11 activates branch-combo1
+				[
+					'100' => [
+						'trigger' => ['10', '11'],
+						'subQuestions' => [
+							'101' => ['Combo answer']
+						]
+					]
+				],
+				// Expected Result - valid
+				null,
+			],
+			'valid-conditional-no-branch-matched' => [
+				// Questions - conditional where trigger value doesn't match any branch
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Conditional Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => []
+								]
+							]
+						],
+						'options' => [
+							['id' => 10],
+							['id' => 11]
+						]
+					]
+				],
+				// Answers - trigger value 11 doesn't match any branch (only branch-1 matches 10)
+				[
+					'100' => [
+						'trigger' => ['11'],
+						'subQuestions' => []
+					]
+				],
+				// Expected Result - valid (no branch matched, but that's okay)
+				null,
+			],
 		];
 	}
 
@@ -1459,6 +1790,113 @@ file2.txt"
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('File "victim.rtf" for question "File question" not exists anymore. Please delete and re-upload the file.');
+
+		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
+	}
+
+	public static function dataFileUploadAuthorization(): array {
+		$cases = [];
+		foreach ([false, true] as $conditional) {
+			foreach ([false, true] as $required) {
+				foreach ([
+					'valid' => 'valid-upload-token',
+					'foreign' => 'attacker-token',
+					'missing' => null,
+					'empty' => '',
+				] as $name => $token) {
+					$case = ($conditional ? 'conditional' : 'ordinary') . '-'
+						. ($required ? 'required' : 'optional') . '-' . $name;
+					$cases[$case] = [$conditional, $required, $token];
+				}
+			}
+		}
+		return $cases;
+	}
+
+	/**
+	 * @dataProvider dataFileUploadAuthorization
+	 */
+	public function testValidateSubmission_fileUploadAuthorization(bool $conditional, bool $required, ?string $uploadToken): void {
+		$fileQuestion = [
+			'id' => 8,
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'text' => 'File question',
+			'isRequired' => $required,
+			'extraSettings' => [],
+		];
+		$fileAnswer = [
+			'uploadedFileId' => '10',
+			'fileName' => 'attachment.rtf',
+		];
+		if ($uploadToken !== null) {
+			$fileAnswer['uploadToken'] = $uploadToken;
+		}
+		$questions = [$fileQuestion];
+		$answers = [8 => [$fileAnswer]];
+
+		if ($conditional) {
+			$questions = [[
+				'id' => 9,
+				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+				'text' => 'Conditional question',
+				'isRequired' => true,
+				'options' => [['id' => 11, 'text' => 'Yes']],
+				'extraSettings' => [
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+					'branches' => [[
+						'id' => 'file-branch',
+						'conditions' => [[
+							'type' => Constants::CONDITION_TYPE_OPTION_SELECTED,
+							'optionId' => 11,
+						]],
+						'subQuestions' => [$fileQuestion],
+					]],
+				],
+			]];
+			$answers = [9 => ['trigger' => ['11'], 'subQuestions' => $answers]];
+		}
+
+		$this->uploadedFileMapper->expects($this->never())
+			->method('getByUploadedFileId');
+		$this->uploadedFileMapper->expects($this->never())
+			->method('findByUploadedFileId');
+
+		$missingRequiredToken = $required && ($uploadToken === null || $uploadToken === '');
+		if ($missingRequiredToken) {
+			$this->uploadedFileMapper->expects($this->never())
+				->method('getForSubmission');
+		} else {
+			$lookup = $this->uploadedFileMapper->expects($this->once())
+				->method('getForSubmission')
+				->with($this->identicalTo(10), $this->identicalTo(7), $this->identicalTo(8), $uploadToken ?? '');
+			if ($uploadToken === 'valid-upload-token') {
+				$uploadedFile = new UploadedFile();
+				$uploadedFile->setId(10);
+				$uploadedFile->setFileId(99);
+				$lookup->willReturn($uploadedFile);
+			} else {
+				$lookup->willThrowException(new DoesNotExistException('Upload not found'));
+			}
+		}
+
+		if ($uploadToken === 'valid-upload-token') {
+			$folder = $this->createMock(Folder::class);
+			$folder->expects($this->once())
+				->method('getById')
+				->with(99)
+				->willReturn([$this->createMock(File::class)]);
+			$this->storage->expects($this->once())
+				->method('getUserFolder')
+				->with('alice')
+				->willReturn($folder);
+		} else {
+			$this->storage->expects($this->never())
+				->method('getUserFolder');
+			$this->expectException(\InvalidArgumentException::class);
+			$this->expectExceptionMessage($missingRequiredToken
+				? 'Question "File question" is required.'
+				: 'File "attachment.rtf" for question "File question" not exists anymore. Please delete and re-upload the file.');
+		}
 
 		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
 	}

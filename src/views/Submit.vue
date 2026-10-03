@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
@@ -219,7 +219,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
+import type { FormsQuestion } from '../types/Entities.d.ts'
 
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -272,7 +272,12 @@ import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-type AnswerValue = string[]
+interface ConditionalAnswerValue {
+	trigger: string[]
+	subQuestions: Record<number, string[]>
+}
+
+type AnswerValue = string[] | ConditionalAnswerValue
 type AnswersMap = Record<number, AnswerValue>
 
 interface StoredAnswerState {
@@ -282,14 +287,6 @@ interface StoredAnswerState {
 
 interface StoredAnswersMap {
 	[key: string]: StoredAnswerState
-}
-
-interface SubmitQuestion extends FormsQuestion {
-	options?: FormsOption[]
-	extraSettings?: Record<string, unknown> & {
-		allowOtherAnswer?: boolean
-	}
-	isRequired?: boolean
 }
 
 interface LoadedSubmissionAnswer {
@@ -400,7 +397,7 @@ export default defineComponent({
 		const showClearFormDueToChangeDialog = ref(false)
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
-		const validQuestions = computed<SubmitQuestion[]>(() => {
+		const validQuestions = computed<FormsQuestion[]>(() => {
 			return props.form.questions.filter((question: FormsQuestion) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
@@ -413,7 +410,7 @@ export default defineComponent({
 					return answerType.validate(question)
 				}
 				return true
-			}) as SubmitQuestion[]
+			}) as FormsQuestion[]
 		})
 
 		const validQuestionsIds = computed<Set<number>>(() => {
@@ -602,12 +599,26 @@ export default defineComponent({
 					continue
 				}
 
-				localAnswers[parseInt(questionId, 10)] = [
-					'QuestionMultiple',
-					'QuestionRanking',
-				].includes(answer.type)
-					? answer.value.map(String)
-					: answer.value
+				if (
+					['QuestionMultiple', 'QuestionRanking'].includes(answer.type)
+					&& Array.isArray(answer.value)
+				) {
+					localAnswers[parseInt(questionId, 10)] = answer.value.map(String)
+				} else if (answer.type === 'QuestionConditional') {
+					// Restore conditional answer structure with proper type conversions
+					const value = Array.isArray(answer.value)
+						? undefined
+						: answer.value
+					localAnswers[parseInt(questionId, 10)] = {
+						trigger: Array.isArray(value?.trigger)
+							? value.trigger.map(String)
+							: [],
+
+						subQuestions: value?.subQuestions || {},
+					}
+				} else {
+					localAnswers[parseInt(questionId, 10)] = answer.value
+				}
 			}
 			answers.value = localAnswers
 		}
@@ -617,7 +628,7 @@ export default defineComponent({
 		 *
 		 * @param question Question to update
 		 */
-		function addFormFieldToLocalStorage(question: SubmitQuestion): void {
+		function addFormFieldToLocalStorage(question: FormsQuestion): void {
 			if (!props.isLoggedIn) {
 				return
 			}
@@ -668,16 +679,61 @@ export default defineComponent({
 				const loaded: AnswersMap = {}
 				const loadedAnswers =
 					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
+
+				/**
+				 * Reuse conditional state regardless of trigger/subquestion answer order.
+				 *
+				 * @param questionId The conditional question ID.
+				 */
+				function getConditionalAnswer(
+					questionId: number,
+				): ConditionalAnswerValue {
+					const value = loaded[questionId]
+					if (value && !Array.isArray(value)) {
+						return value
+					}
+					const conditionalAnswer: ConditionalAnswerValue = {
+						trigger: [],
+						subQuestions: {},
+					}
+					loaded[questionId] = conditionalAnswer
+					return conditionalAnswer
+				}
+
+				// Build a map of subquestion ID → parent conditional question ID
+				const subQuestionToParent = new Map<number, number>()
+				for (const question of props.form.questions as FormsQuestion[]) {
+					if (question.type === 'conditional') {
+						const branches = question.extraSettings?.branches || []
+						for (const branch of branches) {
+							for (const subQuestion of branch.subQuestions || []) {
+								subQuestionToParent.set(subQuestion.id, question.id)
+							}
+						}
+					}
+				}
+
 				for (const answer of loadedAnswers) {
 					const questionId = Number(answer.questionId)
 					const text = answer.text
+
+					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
+
+					// Check if this answer belongs to a subquestion of a conditional
+					const parentConditionalId = subQuestionToParent.get(questionId)
+					if (parentConditionalId !== undefined) {
+						const conditionalAnswer =
+							getConditionalAnswer(parentConditionalId)
+						conditionalAnswer.subQuestions[questionId] ??= []
+						conditionalAnswer.subQuestions[questionId].push(text)
+						continue
+					}
 
 					// Only initialize once, don't overwrite previous answers
 					if (!loaded[questionId]) {
 						loaded[questionId] = []
 					}
 
-					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
 					if (!validQuestionsIds.value.has(questionId)) {
 						showClearFormDueToChangeDialog.value = true
@@ -689,13 +745,40 @@ export default defineComponent({
 
 					const question = props.form.questions.find(
 						(question: FormsQuestion) => question.id === questionId,
-					) as SubmitQuestion | undefined
+					) as FormsQuestion | undefined
 					if (!question) {
 						continue
 					}
+					if (question.type === 'conditional') {
+						// Handle conditional trigger answer
+						const conditionalAnswer = getConditionalAnswer(questionId)
+						// Map trigger answer to option ID for option-based trigger types
+						const triggerType = question.extraSettings?.triggerType
+						if (
+							['multiple', 'multiple_unique', 'dropdown'].includes(
+								triggerType ?? '',
+							)
+						) {
+							const option = (question.options ?? []).find(
+								(opt) => opt.text === text,
+							)
+							if (option) {
+								conditionalAnswer.trigger.push(String(option.id))
+							} else {
+								logger.debug(
+									`Trigger option ${text} could not be mapped for conditional question ${questionId}`,
+								)
+							}
+						} else {
+							conditionalAnswer.trigger.push(text)
+						}
+						continue
+					}
+
+					const questionAnswers = loaded[questionId] as string[]
 					if (question.type === 'ranking') {
 						try {
-							loaded[questionId].push(...JSON.parse(text).map(String))
+							questionAnswers.push(...JSON.parse(text).map(String))
 						} catch (error) {
 							logger.debug(
 								`Could not parse ranking answer ${text} for question ${questionId}`,
@@ -711,16 +794,16 @@ export default defineComponent({
 							(option) => option.text === text,
 						)
 						if (option.length > 0) {
-							loaded[questionId].push(String(option[0].id))
+							questionAnswers.push(String(option[0].id))
 						} else if (
 							question.extraSettings?.allowOtherAnswer
-							&& !loaded[questionId].some((localAnswer) =>
+							&& !questionAnswers.some((localAnswer) =>
 								String(localAnswer).startsWith(
 									QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 								),
 							)
 						) {
-							loaded[questionId].push(
+							questionAnswers.push(
 								QUESTION_EXTRASETTINGS_OTHER_PREFIX + text,
 							)
 						} else {
@@ -738,7 +821,7 @@ export default defineComponent({
 							`Skipping file answer for question ${questionId} — cannot restore uploaded files`,
 						)
 					} else {
-						loaded[questionId].push(text)
+						questionAnswers.push(text)
 					}
 				}
 
@@ -757,7 +840,7 @@ export default defineComponent({
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
-		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
+		function onUpdate(question: FormsQuestion, values: AnswerValue): void {
 			answers.value = {
 				...answers.value,
 				[question.id]: values,
@@ -772,7 +855,7 @@ export default defineComponent({
 		 * @param values The updated question values.
 		 */
 		function updateQuestionValues(
-			question: SubmitQuestion,
+			question: FormsQuestion,
 			values: AnswerValue,
 		): void {
 			onUpdate(question, values)
@@ -881,7 +964,8 @@ export default defineComponent({
 				if (
 					Object.keys(answers.value).length === 0
 					|| Object.values(answers.value).every(
-						(localAnswers) => localAnswers.length === 0,
+						(localAnswers) =>
+							Array.isArray(localAnswers) && localAnswers.length === 0,
 					)
 				) {
 					showConfirmEmptyModal.value = true
