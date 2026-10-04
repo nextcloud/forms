@@ -29,8 +29,6 @@ namespace OCP\Share\ShareReview {
 		public function countShares(ShareReviewQuery $query): ShareReviewCounts;
 
 		public function countSharesByType(ShareReviewQuery $query): array;
-		public function countSharesByInitiator(ShareReviewQuery $query, int $limit): array;
-
 		public function getShare(string $shareId): ?ShareReviewEntry;
 
 		public function deleteShare(string $shareId, ?ShareReviewActionContext $context = null): bool;

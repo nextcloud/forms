@@ -225,35 +225,6 @@ class ShareMapper extends QBMapper {
 	}
 
 	/**
-	 * Count the shares matching the query's search and filters per initiator
-	 * (the form owner), most shares first, in one grouped scan.
-	 *
-	 * @param int $limit at most this many initiators, ordered by count
-	 *                   descending, then owner id ascending
-	 * @param list<string>|null $formPermissions see findPageForShareReview()
-	 * @return array<string, int> owner id to count, zero counts omitted
-	 * @throws Exception
-	 */
-	public function countByInitiatorForShareReview(ShareReviewQuery $query, int $limit, ?array $formPermissions = null): array {
-		$qb = $this->shareReviewQuery();
-		$qb->select('f.owner_id')
-			->selectAlias($qb->func()->count('s.id'), 'share_count')
-			->groupBy('f.owner_id')
-			->orderBy('share_count', 'DESC')
-			->addOrderBy('f.owner_id', 'ASC')
-			->setMaxResults($limit);
-		$this->applyShareReviewFilters($qb, $query, $formPermissions);
-
-		$result = $qb->executeQuery();
-		$counts = [];
-		while (($row = $result->fetch()) !== false) {
-			$counts[(string)$row['owner_id']] = (int)$row['share_count'];
-		}
-		$result->closeCursor();
-		return $counts;
-	}
-
-	/**
 	 * Shares joined with their form, the base of every share-review query.
 	 */
 	private function shareReviewQuery(): IQueryBuilder {
