@@ -11,7 +11,7 @@ index c218bffb..1e0028ab 100644
 -      - stable34
 -      - stable33
 +      - main
-+      - stable5.3
++      - stable5.4
  
  permissions:
    contents: read
