@@ -1270,7 +1270,7 @@ class ApiController extends OCSController {
 		$submissions = array_map(function (array $submission) use ($questions) {
 			if (!empty($submission['answers'])) {
 				$submission['answers'] = array_map(function (array $answer) use ($questions) {
-					$name = $questions[$answer['questionId']]['name'];
+					$name = $questions[$answer['questionId']]['name'] ?? null;
 					if ($name) {
 						$answer['questionName'] = $name;
 					}
