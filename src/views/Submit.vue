@@ -219,7 +219,11 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
+import type {
+	FormsOption,
+	FormsQuestion,
+	GridQuestionValues,
+} from '../types/Entities.d.ts'
 
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -263,6 +267,7 @@ import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import {
 	FormState,
+	OptionType,
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
@@ -272,7 +277,7 @@ import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-type AnswerValue = string[]
+type AnswerValue = string[] | GridQuestionValues
 type AnswersMap = Record<number, AnswerValue>
 
 interface StoredAnswerState {
@@ -606,7 +611,7 @@ export default defineComponent({
 					'QuestionMultiple',
 					'QuestionRanking',
 				].includes(answer.type)
-					? answer.value.map(String)
+					? (answer.value as string[]).map(String)
 					: answer.value
 			}
 			answers.value = localAnswers
@@ -676,6 +681,9 @@ export default defineComponent({
 					if (!loaded[questionId]) {
 						loaded[questionId] = []
 					}
+					// Grid answers get replaced by a values-object below, all
+					// other question types collect their answers in this list
+					const questionAnswers = loaded[questionId] as string[]
 
 					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
@@ -695,10 +703,67 @@ export default defineComponent({
 					}
 					if (question.type === 'ranking') {
 						try {
-							loaded[questionId].push(...JSON.parse(text).map(String))
+							questionAnswers.push(...JSON.parse(text).map(String))
 						} catch (error) {
 							logger.debug(
 								`Could not parse ranking answer ${text} for question ${questionId}`,
+								{ error },
+							)
+						}
+					} else if (question.type === 'grid') {
+						try {
+							const gridValues = JSON.parse(text) as GridQuestionValues
+							const optionIdsByType = (optionType: OptionType) =>
+								new Set(
+									(question.options ?? [])
+										.filter(
+											(option) =>
+												option.optionType === optionType,
+										)
+										.map((option) => option.id),
+								)
+							const rowIds = optionIdsByType(OptionType.Row)
+							const columnIds = optionIdsByType(OptionType.Column)
+
+							// Drop answers for rows/columns that do not exist anymore
+							const restoredValues: GridQuestionValues = {}
+							for (const [rowId, rowValue] of Object.entries(
+								gridValues,
+							)) {
+								if (!rowIds.has(Number(rowId))) {
+									continue
+								}
+								if (Array.isArray(rowValue)) {
+									// Checkbox grid
+									const columns = rowValue.filter((columnId) =>
+										columnIds.has(Number(columnId)),
+									)
+									if (columns.length > 0) {
+										restoredValues[Number(rowId)] = columns
+									}
+								} else if (
+									typeof rowValue === 'object'
+									&& rowValue !== null
+								) {
+									// Number/text grid
+									const cells = Object.fromEntries(
+										Object.entries(rowValue).filter(
+											([columnId]) =>
+												columnIds.has(Number(columnId)),
+										),
+									)
+									if (Object.keys(cells).length > 0) {
+										restoredValues[Number(rowId)] = cells
+									}
+								} else if (columnIds.has(Number(rowValue))) {
+									// Radio grid
+									restoredValues[Number(rowId)] = rowValue
+								}
+							}
+							loaded[questionId] = restoredValues
+						} catch (error) {
+							logger.debug(
+								`Could not parse grid answer ${text} for question ${questionId}`,
 								{ error },
 							)
 						}
@@ -711,16 +776,16 @@ export default defineComponent({
 							(option) => option.text === text,
 						)
 						if (option.length > 0) {
-							loaded[questionId].push(String(option[0].id))
+							questionAnswers.push(String(option[0].id))
 						} else if (
 							question.extraSettings?.allowOtherAnswer
-							&& !loaded[questionId].some((localAnswer) =>
+							&& !questionAnswers.some((localAnswer) =>
 								String(localAnswer).startsWith(
 									QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 								),
 							)
 						) {
-							loaded[questionId].push(
+							questionAnswers.push(
 								QUESTION_EXTRASETTINGS_OTHER_PREFIX + text,
 							)
 						} else {
@@ -738,7 +803,7 @@ export default defineComponent({
 							`Skipping file answer for question ${questionId} — cannot restore uploaded files`,
 						)
 					} else {
-						loaded[questionId].push(text)
+						questionAnswers.push(text)
 					}
 				}
 
@@ -880,8 +945,10 @@ export default defineComponent({
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
 					Object.keys(answers.value).length === 0
-					|| Object.values(answers.value).every(
-						(localAnswers) => localAnswers.length === 0,
+					|| Object.values(answers.value).every((localAnswers) =>
+						Array.isArray(localAnswers)
+							? localAnswers.length === 0
+							: Object.keys(localAnswers).length === 0,
 					)
 				) {
 					showConfirmEmptyModal.value = true
