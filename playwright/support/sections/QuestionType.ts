@@ -9,9 +9,20 @@ export enum QuestionType {
 	Date = 'Date',
 	Dropdown = 'Dropdown',
 	File = 'File',
+	Grid = 'Grid',
 	LinearScale = 'Linear scale',
 	LongAnswer = 'Long text',
 	Ranking = 'Ranking',
 	RadioButtons = 'Radio buttons',
 	ShortAnswer = 'Short answer',
+}
+
+/**
+ * Cell type subtypes available for grid questions.
+ * Labels of the entries in the grid subtype menu.
+ */
+export enum GridSubtype {
+	Checkboxes = 'Checkboxes',
+	Number = 'Number',
+	RadioButtons = 'Radio buttons',
 }
