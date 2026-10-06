@@ -50,4 +50,17 @@ export class ResultsSection {
 			.getByRole('heading', { name })
 			.locator('..')
 	}
+
+	/**
+	 * Open the "Edit this response" action of a submission on the
+	 * responses tab and wait for the submission edit page.
+	 *
+	 * @param index index of the submission block, defaults to the first
+	 */
+	public async editSubmission(index = 0): Promise<void> {
+		const submission = this.page.locator('.submission').nth(index)
+		await submission.getByRole('button', { name: 'Actions' }).click()
+		await this.page.getByRole('menuitem', { name: 'Edit this response' }).click()
+		await this.page.waitForURL(/\/submit\/\d+$/)
+	}
 }

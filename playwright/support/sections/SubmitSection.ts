@@ -86,6 +86,52 @@ export class SubmitSection {
 	}
 
 	/**
+	 * Get the input element of a grid question cell.
+	 * QuestionGrid renders a table.answer-grid where the first column
+	 * contains the row labels and each following cell one input
+	 * (checkbox, radio or number input depending on the cell type).
+	 *
+	 * @param questionName the title of the question
+	 * @param rowName the label of the grid row
+	 * @param columnName the label of the grid column
+	 */
+	public async getGridCellInput(
+		questionName: string | RegExp,
+		rowName: string | RegExp,
+		columnName: string | RegExp,
+	): Promise<Locator> {
+		const grid = this.getQuestion(questionName).locator('table.answer-grid')
+		const columnIndex = await grid
+			.getByRole('columnheader', { name: columnName })
+			.evaluate((element) => (element as HTMLTableCellElement).cellIndex)
+		return grid
+			.getByRole('row', { name: rowName })
+			.getByRole('cell')
+			.nth(columnIndex)
+			.locator('input')
+	}
+
+	/**
+	 * Check a checkbox or radio cell of a grid question.
+	 *
+	 * @param questionName the title of the question
+	 * @param rowName the label of the grid row
+	 * @param columnName the label of the grid column
+	 */
+	public async checkGridCell(
+		questionName: string | RegExp,
+		rowName: string | RegExp,
+		columnName: string | RegExp,
+	): Promise<void> {
+		const cellInput = await this.getGridCellInput(
+			questionName,
+			rowName,
+			columnName,
+		)
+		await cellInput.check({ force: true })
+	}
+
+	/**
 	 * Select a dropdown option.
 	 * QuestionDropdown renders NcSelect which uses role="combobox".
 	 *
