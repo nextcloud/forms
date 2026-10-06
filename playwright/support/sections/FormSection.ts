@@ -4,7 +4,7 @@
  */
 
 import type { Locator, Page } from '@playwright/test'
-import type { QuestionType } from './QuestionType.ts'
+import type { GridSubtype, QuestionType } from './QuestionType.ts'
 
 import { waitForApiResponse } from '../helpers.ts'
 import { QuestionSection } from './QuestionSection.ts'
@@ -40,10 +40,16 @@ export class FormSection {
 		await update
 	}
 
-	public async addQuestion(type: QuestionType): Promise<void> {
+	public async addQuestion(
+		type: QuestionType,
+		subtype?: GridSubtype,
+	): Promise<void> {
 		const created = waitForApiResponse(this.page, 'POST')
 		await this.newQuestionButton.click()
 		await this.page.getByRole('menuitem', { name: type }).click()
+		if (subtype !== undefined) {
+			await this.page.getByRole('menuitem', { name: subtype }).click()
+		}
 		await created
 	}
 
