@@ -106,6 +106,25 @@ class FormMapper extends QBMapper {
 	}
 
 	/**
+	 * @return list<string> IDs of all users that own at least one form
+	 */
+	public function findAllOwnerIds(): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->selectDistinct('owner_id')
+			->from($this->getTableName());
+
+		$result = $qb->executeQuery();
+		$ownerIds = array_map(
+			static fn (array $row): string => (string)$row['owner_id'],
+			$result->fetchAll(),
+		);
+		$result->closeCursor();
+
+		return $ownerIds;
+	}
+
+	/**
 	 * Get forms shared with the user
 	 * @param string $userId The user ID
 	 * @param string[] $groups IDs of groups the user is memeber of
