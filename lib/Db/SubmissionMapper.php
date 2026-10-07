@@ -19,6 +19,8 @@ use Psr\Log\LoggerInterface;
  * @extends QBMapper<Submission>
  */
 class SubmissionMapper extends QBMapper {
+	private const CHUNK_SIZE = 1000;
+
 	/**
 	 * SubmissionMapper constructor.
 	 * @param IDBConnection $db
@@ -132,6 +134,39 @@ class SubmissionMapper extends QBMapper {
 	 */
 	public function countSubmissions(int $formId, ?string $userId = null, ?string $searchString = null): int {
 		return $this->countSubmissionsWithFilters($formId, $userId, -1, $searchString);
+	}
+
+	/**
+	 * Counts submissions for multiple forms in a single query.
+	 *
+	 * @param list<int> $formIds The IDs of the forms to count submissions for.
+	 * @param string|null $userId Optionally limit the counted submissions to the given user.
+	 * @return array<int, int> Map of form ID to submission count. Forms without submissions are not included.
+	 * @throws \Exception If an error occurs during the count operation.
+	 */
+	public function countSubmissionsByForms(array $formIds, ?string $userId = null): array {
+		$counts = [];
+
+		foreach (array_chunk(array_unique($formIds), self::CHUNK_SIZE) as $formIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+
+			$qb->select('submissions.form_id', $qb->func()->count('submissions.id', 'submission_count'))
+				->from($this->getTableName(), 'submissions')
+				->where($qb->expr()->in('submissions.form_id', $qb->createNamedParameter($formIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
+				->groupBy('submissions.form_id');
+
+			if ($userId !== null) {
+				$qb->andWhere($qb->expr()->eq('submissions.user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)));
+			}
+
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$counts[(int)$row['form_id']] = (int)$row['submission_count'];
+			}
+			$result->closeCursor();
+		}
+
+		return $counts;
 	}
 
 	/**

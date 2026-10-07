@@ -247,39 +247,59 @@ class FormsService {
 	}
 
 	/**
-	 * Create partial form, as returned by Forms-Lists.
+	 * Create partial forms, as returned by Forms-Lists.
+	 * Submission counts are counted with at most two queries for all given forms.
 	 *
-	 * @param Form $form
-	 * @return array
+	 * @param Form[] $forms
+	 * @return list<array>
 	 * @throws IMapperException
 	 */
-	public function getPartialFormArray(Form $form): array {
-		$result = [
-			'id' => $form->getId(),
-			'hash' => $form->getHash(),
-			'title' => $form->getTitle(),
-			'expires' => $form->getExpires(),
-			'lastUpdated' => $form->getLastUpdated(),
-			'permissions' => $this->getPermissions($form),
-			'partial' => true,
-			'state' => $form->getState(),
-			'lockedBy' => $form->getLockedBy(),
-			'lockedUntil' => $form->getLockedUntil(),
-		];
+	public function getPartialFormArrays(array $forms): array {
+		$results = [];
+		$formIdsWithResultsPermission = [];
+		$formIdsWithoutResultsPermission = [];
 
-		// Append submissionCount if currentUser has permissions to see results
-		if (in_array(Constants::PERMISSION_RESULTS, $result['permissions'])) {
-			$result['submissionCount'] = $this->submissionMapper->countSubmissions($form->getId());
-		} else {
-			$userSubmissionCount = $this->submissionMapper->countSubmissions($form->getId(), $this->currentUser->getUID());
-			if ($userSubmissionCount > 0) {
-				$result['submissionCount'] = $userSubmissionCount;
-				// Append `results` permission if user has submitted to the form
-				$result['permissions'][] = Constants::PERMISSION_RESULTS;
+		foreach ($forms as $key => $form) {
+			$permissions = $this->getPermissions($form);
+			$results[$key] = [
+				'id' => $form->getId(),
+				'hash' => $form->getHash(),
+				'title' => $form->getTitle(),
+				'expires' => $form->getExpires(),
+				'lastUpdated' => $form->getLastUpdated(),
+				'permissions' => $permissions,
+				'partial' => true,
+				'state' => $form->getState(),
+				'lockedBy' => $form->getLockedBy(),
+				'lockedUntil' => $form->getLockedUntil(),
+			];
+
+			if (in_array(Constants::PERMISSION_RESULTS, $permissions)) {
+				$formIdsWithResultsPermission[$key] = $form->getId();
+			} else {
+				$formIdsWithoutResultsPermission[$key] = $form->getId();
 			}
 		}
 
-		return $result;
+		// Append submissionCount if currentUser has permissions to see results
+		$submissionCounts = $this->submissionMapper->countSubmissionsByForms(array_values($formIdsWithResultsPermission));
+		foreach ($formIdsWithResultsPermission as $key => $formId) {
+			$results[$key]['submissionCount'] = $submissionCounts[$formId] ?? 0;
+		}
+
+		if ($formIdsWithoutResultsPermission !== [] && $this->currentUser !== null) {
+			$userSubmissionCounts = $this->submissionMapper->countSubmissionsByForms(array_values($formIdsWithoutResultsPermission), $this->currentUser->getUID());
+			foreach ($formIdsWithoutResultsPermission as $key => $formId) {
+				$userSubmissionCount = $userSubmissionCounts[$formId] ?? 0;
+				if ($userSubmissionCount > 0) {
+					$results[$key]['submissionCount'] = $userSubmissionCount;
+					// Append `results` permission if user has submitted to the form
+					$results[$key]['permissions'][] = Constants::PERMISSION_RESULTS;
+				}
+			}
+		}
+
+		return array_values($results);
 	}
 
 	/**

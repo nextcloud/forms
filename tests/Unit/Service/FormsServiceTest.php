@@ -401,12 +401,12 @@ class FormsServiceTest extends TestCase {
 		$form->setLastUpdated(123456789);
 
 		$this->submissionMapper->expects($this->once())
-			->method('countSubmissions')
-			->with(42)
-			->willReturn(123);
+			->method('countSubmissionsByForms')
+			->with([42])
+			->willReturn([42 => 123]);
 
 		// Run the test
-		$this->assertEquals($expected, $this->formsService->getPartialFormArray($form));
+		$this->assertEquals($expected, $this->formsService->getPartialFormArrays([$form])[0]);
 	}
 
 	public static function dataGetPartialFormShared() {
@@ -454,12 +454,143 @@ class FormsServiceTest extends TestCase {
 			->willReturn([$share]);
 
 		$this->submissionMapper->expects($this->once())
-			->method('countSubmissions')
-			->with(42)
-			->willReturn(123);
+			->method('countSubmissionsByForms')
+			->with([42])
+			->willReturn([42 => 123]);
 
 		// Run the test
-		$this->assertEquals($expected, $this->formsService->getPartialFormArray($form));
+		$this->assertEquals($expected, $this->formsService->getPartialFormArrays([$form])[0]);
+	}
+
+	/**
+	 * Shared users without results permission get the count of their own
+	 * submissions and the `results` permission appended once they submitted.
+	 */
+	public function testGetPartialFormSharedUserSubmissions() {
+		$expected = [
+			'id' => 42,
+			'hash' => 'abcdefg',
+			'title' => 'Form 1',
+			'expires' => 0,
+			'lastUpdated' => 123456789,
+			'permissions' => ['submit', 'results'],
+			'submissionCount' => 2,
+			'state' => 0,
+			'partial' => true,
+			'lockedBy' => null,
+			'lockedUntil' => null,
+		];
+
+		$form = new Form();
+		$form->setId(42);
+		$form->setState(0);
+		$form->setHash('abcdefg');
+		$form->setTitle('Form 1');
+		$form->setOwnerId('otherUser');
+		$form->setExpires(0);
+		$form->setLastUpdated(123456789);
+
+		$share = new Share();
+		$share->setFormId(42);
+		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('currentUser');
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->submissionMapper->expects($this->exactly(2))
+			->method('countSubmissionsByForms')
+			->willReturnCallback(function (array $formIds, ?string $userId = null): array {
+				if ($userId === null) {
+					$this->assertSame([], $formIds);
+					return [];
+				}
+				$this->assertSame([42], $formIds);
+				$this->assertSame('currentUser', $userId);
+				return [42 => 2];
+			});
+
+		$this->assertEquals($expected, $this->formsService->getPartialFormArrays([$form])[0]);
+	}
+
+	/**
+	 * Submission counts for multiple forms are fetched with a single query per
+	 * permission bucket instead of one query per form.
+	 */
+	public function testGetPartialFormArraysCountsInBulk() {
+		$ownedForm = new Form();
+		$ownedForm->setId(42);
+		$ownedForm->setState(0);
+		$ownedForm->setHash('abcdefg');
+		$ownedForm->setTitle('Form 1');
+		$ownedForm->setOwnerId('currentUser');
+		$ownedForm->setExpires(0);
+		$ownedForm->setLastUpdated(123456789);
+
+		$sharedForm = new Form();
+		$sharedForm->setId(43);
+		$sharedForm->setState(0);
+		$sharedForm->setHash('hijklmn');
+		$sharedForm->setTitle('Form 2');
+		$sharedForm->setOwnerId('otherUser');
+		$sharedForm->setExpires(0);
+		$sharedForm->setLastUpdated(123456789);
+
+		$share = new Share();
+		$share->setFormId(43);
+		$share->setPermissions([Constants::PERMISSION_SUBMIT]);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('currentUser');
+
+		$this->shareMapper->expects($this->any())
+			->method('findByForm')
+			->with(43)
+			->willReturn([$share]);
+
+		$this->submissionMapper->expects($this->exactly(2))
+			->method('countSubmissionsByForms')
+			->willReturnCallback(function (array $formIds, ?string $userId = null): array {
+				if ($userId === null) {
+					$this->assertSame([42], $formIds);
+					return [42 => 7];
+				}
+				$this->assertSame('currentUser', $userId);
+				$this->assertSame([43], $formIds);
+				return [];
+			});
+
+		$expected = [
+			[
+				'id' => 42,
+				'hash' => 'abcdefg',
+				'title' => 'Form 1',
+				'expires' => 0,
+				'lastUpdated' => 123456789,
+				'permissions' => Constants::PERMISSION_ALL,
+				'partial' => true,
+				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
+				'submissionCount' => 7,
+			],
+			[
+				'id' => 43,
+				'hash' => 'hijklmn',
+				'title' => 'Form 2',
+				'expires' => 0,
+				'lastUpdated' => 123456789,
+				'permissions' => ['submit'],
+				'partial' => true,
+				'state' => 0,
+				'lockedBy' => null,
+				'lockedUntil' => null,
+			],
+		];
+
+		$this->assertEquals($expected, $this->formsService->getPartialFormArrays([$ownedForm, $sharedForm]));
 	}
 
 	public static function dataGetPublicForm() {

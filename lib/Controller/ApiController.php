@@ -126,19 +126,15 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[ApiRoute(verb: 'GET', url: '/api/v3/forms')]
 	public function getForms(string $type = 'owned'): DataResponse {
-		$result = [];
-
 		if ($type === 'owned') {
 			$forms = $this->formMapper->findAllByOwnerId($this->currentUser->getUID());
-			foreach ($forms as $form) {
-				$result[] = $this->formsService->getPartialFormArray($form);
-			}
 		} elseif ($type === 'shared') {
 			$forms = $this->formsService->getSharedForms($this->currentUser);
-			$result = array_values(array_map($this->formsService->getPartialFormArray(...), $forms));
 		} else {
 			throw new OCSBadRequestException('wrong form type supplied');
 		}
+
+		$result = $this->formsService->getPartialFormArrays($forms);
 
 		return new DataResponse($result, Http::STATUS_OK);
 	}
