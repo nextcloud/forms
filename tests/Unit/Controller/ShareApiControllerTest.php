@@ -21,6 +21,7 @@ use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\UploadedFilesShareService;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
@@ -49,6 +50,7 @@ interface MapperException extends Throwable, IMapperException {
 };
 
 class ShareApiControllerTest extends TestCase {
+	use UserFolderMockTrait;
 
 	private ShareApiController $shareApiController;
 	private FormMapper|MockObject $formMapper;
@@ -545,7 +547,7 @@ class ShareApiControllerTest extends TestCase {
 
 		// Mock the uploaded files folder lookup
 		$folder = $this->createMock(Folder::class);
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('get')
 			->willReturn($folder);
@@ -837,7 +839,7 @@ class ShareApiControllerTest extends TestCase {
 			->with('otherUser')
 			->willReturn($this->createMock(IUser::class));
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 
 		$file = $this->createMock(File::class);
 		$file->expects($this->any())

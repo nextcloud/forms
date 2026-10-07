@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace OCA\Forms\Db;
 
 use OCP\AppFramework\Db\QBMapper;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /**
  * @extends QBMapper<Option>
  */
 class OptionMapper extends QBMapper {
+	private const CHUNK_SIZE = 1000;
 
 	/**
 	 * OptionMapper constructor.
@@ -44,6 +46,27 @@ class OptionMapper extends QBMapper {
 			->addOrderBy('id');
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @param list<int|float> $questionIds
+	 * @return Option[]
+	 */
+	public function findByQuestions(array $questionIds): array {
+		$options = [];
+		foreach (array_chunk(array_unique($questionIds), self::CHUNK_SIZE) as $questionIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+
+			$qb->select('*')
+				->from($this->getTableName())
+				->where($qb->expr()->in('question_id', $qb->createNamedParameter($questionIdsChunk, IQueryBuilder::PARAM_INT_ARRAY)))
+				->orderBy('order')
+				->addOrderBy('id');
+
+			$options[] = $this->findEntities($qb);
+		}
+
+		return array_merge([], ...$options);
 	}
 
 	public function deleteByQuestion(int $questionId): void {

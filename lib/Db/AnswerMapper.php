@@ -15,6 +15,7 @@ use OCP\IDBConnection;
  * @extends QBMapper<Answer>
  */
 class AnswerMapper extends QBMapper {
+	private const CHUNK_SIZE = 1000;
 
 	/**
 	 * AnswerMapper constructor.
@@ -39,6 +40,28 @@ class AnswerMapper extends QBMapper {
 			);
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @param list<int> $submissionIds
+	 * @return Answer[]
+	 */
+	public function findBySubmissions(array $submissionIds): array {
+		$answers = [];
+
+		foreach (array_chunk(array_unique($submissionIds), self::CHUNK_SIZE) as $submissionIdsChunk) {
+			$qb = $this->db->getQueryBuilder();
+
+			$qb->select('*')
+				->from($this->getTableName())
+				->where(
+					$qb->expr()->in('submission_id', $qb->createNamedParameter($submissionIdsChunk, IQueryBuilder::PARAM_INT_ARRAY))
+				);
+
+			$answers[] = $this->findEntities($qb);
+		}
+
+		return array_merge([], ...$answers);
 	}
 
 	/**

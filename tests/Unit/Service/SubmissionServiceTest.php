@@ -22,6 +22,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Config\IUserConfig;
 use OCP\Files\File;
@@ -43,6 +44,7 @@ use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class SubmissionServiceTest extends TestCase {
+	use UserFolderMockTrait;
 
 	private SubmissionService $submissionService;
 	private FormMapper|MockObject $formMapper;
@@ -150,11 +152,13 @@ class SubmissionServiceTest extends TestCase {
 			});
 
 		$this->answerMapper->expects($this->any())
-			->method('findBySubmission')
-			->willReturnMap([
-				[42, [$answer_1, $answer_2]],
-				[43, []]
-			]);
+			->method('findBySubmissions')
+			->willReturnCallback(function (array $submissionIds) use ($answer_1, $answer_2) {
+				if (in_array(42, $submissionIds, true)) {
+					return [$answer_1, $answer_2];
+				}
+				return [];
+			});
 
 		$expected = [
 			[
@@ -323,7 +327,7 @@ class SubmissionServiceTest extends TestCase {
 			$pathNode = $folderNode;
 		}
 
-		$userFolder = $this->createMock(Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->expects($this->once())
 			->method('get')
 			->with($path)
@@ -388,8 +392,8 @@ class SubmissionServiceTest extends TestCase {
 				'
 				"Submission ID","User ID","User display name","Timestamp","Question 1","Question 2"
 				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-2"
-				"2","user1","User 1","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
-				"1","user2","User 2","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
+				"2","user2","User 2","1973-11-29T22:33:09+01:00","Q1A2","Q2A2"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
 				'
 			],
 			'checkbox-multi-answers' => [
@@ -749,16 +753,21 @@ file2.txt"
 				return $questionEntities;
 			}));
 
-		if (!empty($questions[0]['options'])) {
-			$this->optionMapper->expects($this->once())
-				->method('findByQuestion')
-				->with($questions[0]['id'])
-				->willReturnCallback(function (int $questionId) use ($questions) {
-					$optionsEntities = array_map(fn ($option) => Option::fromParams($option), $questions[0]['options']);
+		$this->optionMapper->expects($this->any())
+			->method('findByQuestions')
+			->willReturnCallback(function (array $questionIds) use ($questions) {
+				$optionsEntities = [];
+				foreach ($questions as $question) {
+					if (!in_array($question['id'], $questionIds, true)) {
+						continue;
+					}
+					foreach ($question['options'] ?? [] as $option) {
+						$optionsEntities[] = Option::fromParams(array_merge($option, ['questionId' => $question['id']]));
+					}
+				}
 
-					return $optionsEntities;
-				});
-		}
+				return $optionsEntities;
+			});
 
 		$this->config->expects($this->once())
 			->method('getSystemValueString')
@@ -770,28 +779,27 @@ file2.txt"
 			->with('currentUser', 'core', 'timezone', 'Europe/Berlin')
 			->willReturn('Europe/Berlin');
 
-		$user = $this->createMock(IUser::class);
-		$user->expects($this->any())
-			->method('getUID')
-			->will($this->onConsecutiveCalls('user1', 'user2'));
-		$user->expects($this->any())
-			->method('getDisplayName')
-			->will($this->onConsecutiveCalls('User 1', 'User 2'));
 		$this->userManager->expects($this->any())
-			->method('get')
+			->method('getDisplayName')
 			->willReturnMap([
-				['user1', $user],
-				['user2', $user],
+				['user1', 'User 1'],
+				['user2', 'User 2'],
 				['unknown', null]
 			]);
 
 		$this->answerMapper->expects($this->any())
-			->method('findBySubmission')
-		// Return AnswerObjects for corresponding submission
-			->will($this->returnCallback(function (int $submissionId) use ($submissions) {
-				$matchingSubmission = array_filter($submissions, fn ($submission) => $submission['id'] === $submissionId);
-
-				$answerEntities = array_map(fn ($answer) => Answer::fromParams($answer), current($matchingSubmission)['answers']);
+			->method('findBySubmissions')
+		// Return AnswerObjects for corresponding submissions
+			->will($this->returnCallback(function (array $submissionIds) use ($submissions) {
+				$answerEntities = [];
+				foreach ($submissions as $submission) {
+					if (!in_array($submission['id'], $submissionIds, true)) {
+						continue;
+					}
+					foreach ($submission['answers'] as $answer) {
+						$answerEntities[] = Answer::fromParams(array_merge($answer, ['submissionId' => $submission['id']]));
+					}
+				}
 
 				return $answerEntities;
 			}));
