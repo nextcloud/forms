@@ -858,7 +858,10 @@ export default defineComponent({
 					...branch,
 					subQuestions: newSubQuestions,
 				}
-				this.onExtraSettingsChange({ branches: newBranches })
+				this.$emit('update:extraSettings', {
+					...this.extraSettings,
+					branches: newBranches,
+				})
 			} catch (error) {
 				logger.error('Error adding subquestion', { error })
 				showError(t('forms', 'Error adding subquestion'))
@@ -936,7 +939,10 @@ export default defineComponent({
 					...branch,
 					subQuestions: [...(branch.subQuestions || []), newQuestion],
 				}
-				this.onExtraSettingsChange({ branches: newBranches })
+				this.$emit('update:extraSettings', {
+					...this.extraSettings,
+					branches: newBranches,
+				})
 			} catch (error) {
 				logger.error('Error adding subquestion', { error })
 				showError(t('forms', 'Error adding subquestion'))
@@ -964,7 +970,10 @@ export default defineComponent({
 						(q) => q.id !== questionId,
 					),
 				}
-				this.onExtraSettingsChange({ branches: newBranches })
+				this.$emit('update:extraSettings', {
+					...this.extraSettings,
+					branches: newBranches,
+				})
 			} catch (error) {
 				logger.error('Error deleting subquestion', { error })
 				showError(t('forms', 'Error deleting subquestion'))
@@ -982,7 +991,10 @@ export default defineComponent({
 					q.id === questionId ? { ...q, [property]: value } : q,
 				),
 			}
-			this.onExtraSettingsChange({ branches: newBranches })
+			this.$emit('update:extraSettings', {
+				...this.extraSettings,
+				branches: newBranches,
+			})
 		},
 
 		getSubQuestionValues(questionId) {
