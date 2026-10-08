@@ -80,7 +80,7 @@ OC.L10N.register(
     "Grid" : "Izgara",
     "Form closed" : "Form kapatıldı",
     "Expired {relativeDate}" : "Geçerlilik süresi dolmuş {relativeDate}",
-    "Expires {relativeDate}" : "Geçerlilik süresi sonu {relativeDate}",
+    "Expires {relativeDate}" : "Geçerlilik sonu {relativeDate}",
     "Error while deleting {title}" : "{title} ögesi silinirken sorun çıktı",
     "Delete form" : "Formu sil",
     "Are you sure you want to delete {title}?" : "{title} ögesini silmek istediğinize emin misiniz?",
