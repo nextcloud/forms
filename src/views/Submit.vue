@@ -141,9 +141,7 @@
 						:values="answers[question.id]"
 						@keydown.enter="onKeydownEnter"
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="
-							(values: AnswerValue) => onUpdate(question, values)
-						" />
+						@update:values="onUpdate(question, $event)" />
 				</ul>
 				<div class="form-buttons">
 					<NcButton
