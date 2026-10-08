@@ -828,24 +828,32 @@ export default defineComponent({
 		},
 
 		async addSubQuestion(branchId, type, position = null) {
-			const branch = this.branches.find((b) => b.id === branchId)
-			if (!branch) return
+			if (!this.branches.some((b) => b.id === branchId)) return
+
+			const body = {
+				type,
+				text: '',
+				parentQuestionId: this.id,
+				branchId,
+			}
+			if (position !== null) {
+				// position: current question position + 2 (0-based index: +1, next position: +1)
+				body.position = position + 2
+			}
 
 			try {
 				const response = await axios.post(
 					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
 						id: this.formId,
 					}),
-					{
-						type,
-						text: '',
-						parentQuestionId: this.id,
-						branchId,
-					},
+					body,
 				)
 				const newQuestion = OcsResponse2Data(response)
 
+				// Use the branch as it is now, it may have changed during the request
 				const branchIndex = this.branches.findIndex((b) => b.id === branchId)
+				if (branchIndex === -1) return
+				const branch = this.branches[branchIndex]
 				const newSubQuestions = [...(branch.subQuestions || [])]
 				if (position !== null) {
 					newSubQuestions.splice(position + 1, 0, newQuestion)
@@ -857,7 +865,10 @@ export default defineComponent({
 					...branch,
 					subQuestions: newSubQuestions,
 				}
-				this.onExtraSettingsChange({ branches: newBranches })
+				this.$emit('update:extraSettings', {
+					...this.extraSettings,
+					branches: newBranches,
+				})
 			} catch (error) {
 				logger.error('Error adding subquestion', { error })
 				showError(t('forms', 'Error adding subquestion'))
@@ -917,8 +928,7 @@ export default defineComponent({
 		},
 
 		async cloneSubQuestion(branchId, questionId) {
-			const branch = this.branches.find((b) => b.id === branchId)
-			if (!branch) return
+			if (!this.branches.some((b) => b.id === branchId)) return
 
 			try {
 				const response = await axios.post(
@@ -932,13 +942,19 @@ export default defineComponent({
 				)
 				const newQuestion = OcsResponse2Data(response)
 
+				// Use the branch as it is now, it may have changed during the request
 				const branchIndex = this.branches.findIndex((b) => b.id === branchId)
+				if (branchIndex === -1) return
+				const branch = this.branches[branchIndex]
 				const newBranches = [...this.branches]
 				newBranches[branchIndex] = {
 					...branch,
 					subQuestions: [...(branch.subQuestions || []), newQuestion],
 				}
-				this.onExtraSettingsChange({ branches: newBranches })
+				this.$emit('update:extraSettings', {
+					...this.extraSettings,
+					branches: newBranches,
+				})
 			} catch (error) {
 				logger.error('Error adding subquestion', { error })
 				showError(t('forms', 'Error adding subquestion'))
@@ -958,6 +974,7 @@ export default defineComponent({
 				)
 
 				const branchIndex = this.branches.findIndex((b) => b.id === branchId)
+				if (branchIndex === -1) return
 				const branch = this.branches[branchIndex]
 				const newBranches = [...this.branches]
 				newBranches[branchIndex] = {
@@ -966,7 +983,10 @@ export default defineComponent({
 						(q) => q.id !== questionId,
 					),
 				}
-				this.onExtraSettingsChange({ branches: newBranches })
+				this.$emit('update:extraSettings', {
+					...this.extraSettings,
+					branches: newBranches,
+				})
 			} catch (error) {
 				logger.error('Error deleting subquestion', { error })
 				showError(t('forms', 'Error deleting subquestion'))
@@ -984,7 +1004,10 @@ export default defineComponent({
 					q.id === questionId ? { ...q, [property]: value } : q,
 				),
 			}
-			this.onExtraSettingsChange({ branches: newBranches })
+			this.$emit('update:extraSettings', {
+				...this.extraSettings,
+				branches: newBranches,
+			})
 		},
 
 		getSubQuestionValues(questionId) {
