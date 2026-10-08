@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -7,6 +7,7 @@ import type { Component } from 'vue'
 import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
+import IconSourceBranch from '@material-symbols/svg-400/outlined/account_tree.svg?raw'
 import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
 import IconCalendar from '@material-symbols/svg-400/outlined/calendar_today.svg?raw'
 import IconCheckboxOutline from '@material-symbols/svg-400/outlined/check_box.svg?raw'
@@ -22,6 +23,7 @@ import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?r
 import { t } from '@nextcloud/l10n'
 import { markRaw } from 'vue'
 import QuestionColor from '../components/Questions/QuestionColor.vue'
+import QuestionConditional from '../components/Questions/QuestionConditional.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
 import QuestionFile from '../components/Questions/QuestionFile.vue'
@@ -294,6 +296,28 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		warningInvalid: t(
 			'forms',
 			'This question needs a title and at least one answer!',
+		),
+	},
+
+	conditional: {
+		component: markRaw(QuestionConditional),
+		icon: IconSourceBranch,
+		label: t('forms', 'Conditional'),
+		predefined: true,
+		validate: (question) => {
+			// Must have a trigger type and at least one branch
+			const extraSettings = question.extraSettings || {}
+			return (
+				!!extraSettings.triggerType
+				&& (extraSettings.branches?.length ?? 0) > 0
+			)
+		},
+
+		titlePlaceholder: t('forms', 'Conditional question title'),
+		createPlaceholder: t('forms', 'Different questions based on the answer'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title, trigger type, and at least one branch!',
 		),
 	},
 }
