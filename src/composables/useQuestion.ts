@@ -225,9 +225,22 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	) {
 		const newExtraSettings = { ...props.extraSettings, ...newSettings }
 		options.emit('update:extraSettings', newExtraSettings)
+		const persistedExtraSettings =
+			props.type === 'conditional'
+				? {
+						...newExtraSettings,
+						branches: Array.isArray(newExtraSettings.branches)
+							? newExtraSettings.branches.map((branch) => {
+									const settings = { ...branch }
+									delete settings.subQuestions
+									return settings
+								})
+							: [],
+					}
+				: newExtraSettings
 		// Embedded triggers share their parent's ID; the parent owns persistence.
 		if (!props.isTriggerQuestion) {
-			saveQuestionProperty('extraSettings', newExtraSettings)
+			saveQuestionProperty('extraSettings', persistedExtraSettings)
 		}
 	}, INPUT_DEBOUNCE_MS)
 
