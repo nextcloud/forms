@@ -13,20 +13,6 @@
 		:shiftDragHandle="false"
 		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
-		<template #actions>
-			<!-- Trigger type selection in menu -->
-			<NcActionButton
-				v-for="tt in triggerTypesList"
-				:key="tt.type"
-				:closeAfterClick="true"
-				@click="setTriggerType(tt.type)">
-				<template #icon>
-					<NcIconSvgWrapper :svg="tt.icon" />
-				</template>
-				{{ tt.label }}
-			</NcActionButton>
-		</template>
-
 		<div class="question-conditional">
 			<!-- Trigger Type Selection (Edit Mode) -->
 			<div v-if="!readOnly && !triggerType" class="trigger-type-selector">
@@ -34,16 +20,26 @@
 					{{ t('forms', 'Select the trigger question type:') }}
 				</p>
 				<div class="trigger-type-selector__options">
-					<NcButton
-						v-for="tt in triggerTypesList"
-						:key="tt.type"
-						variant="secondary"
-						@click="setTriggerType(tt.type)">
-						<template #icon>
-							<NcIconSvgWrapper :svg="tt.icon" />
-						</template>
-						{{ tt.label }}
-					</NcButton>
+					<div
+						v-for="group in triggerTypeGroups"
+						:key="group.label"
+						class="trigger-type-selector__group">
+						<p class="trigger-type-selector__group-label">
+							{{ group.label }}
+						</p>
+						<div class="trigger-type-selector__group-options">
+							<NcButton
+								v-for="tt in group.types"
+								:key="tt.type"
+								variant="secondary"
+								@click="setTriggerType(tt.type)">
+								<template #icon>
+									<NcIconSvgWrapper :svg="tt.icon" />
+								</template>
+								{{ tt.label }}
+							</NcButton>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -386,42 +382,32 @@ export default defineComponent({
 	},
 
 	computed: {
-		/**
-		 * Trigger types available for conditional questions
-		 */
-		triggerTypesList() {
-			return [
+		triggerTypeGroups() {
+			const groups = [
 				{
-					type: 'multiple_unique',
-					label: t('forms', 'Radio buttons'),
-					icon: IconRadioboxMarked,
+					label: t('forms', 'Choice'),
+					types: ['multiple_unique', 'multiple', 'dropdown'],
 				},
 				{
-					type: 'dropdown',
-					label: t('forms', 'Dropdown'),
-					icon: IconArrowDownDropCircleOutline,
+					label: t('forms', 'Text'),
+					types: ['short', 'long'],
 				},
 				{
-					type: 'multiple',
-					label: t('forms', 'Checkboxes'),
-					icon: IconCheckboxOutline,
+					label: t('forms', 'Date and time'),
+					types: ['date', 'time'],
 				},
 				{
-					type: 'short',
-					label: t('forms', 'Short answer'),
-					icon: IconTextShort,
+					label: t('forms', 'Other'),
+					types: ['linearscale', 'color', 'file'],
 				},
-				{ type: 'long', label: t('forms', 'Long text'), icon: IconTextLong },
-				{
-					type: 'linearscale',
-					label: t('forms', 'Linear scale'),
-					icon: IconLinearScale,
-				},
-				{ type: 'date', label: t('forms', 'Date'), icon: IconCalendar },
-				{ type: 'time', label: t('forms', 'Time'), icon: IconClockOutline },
-				{ type: 'color', label: t('forms', 'Color'), icon: IconPalette },
-				{ type: 'file', label: t('forms', 'File'), icon: IconFile },
 			]
+
+			return groups.map((group) => ({
+				...group,
+				types: group.types.map((type) =>
+					this.subQuestionTypesList.find((item) => item.type === type),
+				),
+			}))
 		},
 
 		/**
@@ -472,7 +458,9 @@ export default defineComponent({
 		},
 
 		currentTriggerConfig() {
-			return this.triggerTypesList.find((t) => t.type === this.triggerType)
+			return this.triggerTypeGroups
+				.flatMap((group) => group.types)
+				.find((type) => type.type === this.triggerType)
 		},
 
 		currentTriggerIcon() {
@@ -1179,6 +1167,18 @@ export default defineComponent({
 	}
 
 	&__options {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	&__group-label {
+		margin-bottom: 4px;
+		color: var(--color-text-maxcontrast);
+		font-size: 0.9em;
+	}
+
+	&__group-options {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
