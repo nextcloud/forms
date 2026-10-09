@@ -136,7 +136,10 @@ export interface MaxStringLengths {
 	[key: string]: number
 }
 
-export type GridQuestionValues = Record<number, number | number[]>
+export type GridQuestionValues = Record<
+	number,
+	number | string | (number | string)[] | Record<number, number | string>
+>
 
 /** Statistics for a single option in a countable question (e.g., multiple choice, checkboxes) */
 export interface OptionStats extends FormsOption {
