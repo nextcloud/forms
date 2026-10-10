@@ -68,7 +68,7 @@
     "eslint-plugin-prettier": "^5.5.6",
     "prettier": "^3.9.9",
     "vite": "^7.3.6",
-    "vue-tsc": "^3.3.11"
+    "vue-tsc": "^3.3.12"
   },
   "engines": {
     "node": "^24.0.0",
