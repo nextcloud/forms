@@ -186,6 +186,28 @@ class SubmissionMapperTest extends IntegrationBase {
 		$this->assertEquals(0, $count);
 	}
 
+	public function testCountSubmissionsByForms(): void {
+		$counts = $this->submissionMapper->countSubmissionsByForms([
+			$this->testForms[0]['id'],
+			$this->testForms[1]['id'],
+		]);
+
+		$this->assertEquals([$this->testForms[0]['id'] => 3], $counts);
+	}
+
+	public function testCountSubmissionsByFormsWithUser(): void {
+		$counts = $this->submissionMapper->countSubmissionsByForms([
+			$this->testForms[0]['id'],
+			$this->testForms[1]['id'],
+		], 'user1');
+
+		$this->assertEquals([$this->testForms[0]['id'] => 2], $counts);
+	}
+
+	public function testCountSubmissionsByFormsEmptyList(): void {
+		$this->assertEquals([], $this->submissionMapper->countSubmissionsByForms([]));
+	}
+
 	public function testDeleteById(): void {
 		// Get the first submission from the form
 		$submissions = $this->submissionMapper->findByForm($this->testForms[0]['id']);
