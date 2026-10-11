@@ -114,87 +114,24 @@
 
 			<section>
 				<!-- Questions list -->
-				<Draggable
+				<QuestionList
+					ref="questionList"
 					:modelValue="form.questions"
-					:animation="300"
-					target=".sort-target"
-					direction="vertical"
-					invertSwap
-					handle=".question__drag-handle"
+					:getComponent="getQuestionComponent"
+					:getAnswerType="getQuestionAnswerType"
+					:maxStringLengths="maxStringLengths"
+					:formId="form.id"
+					:showInsert="true"
+					:answerTypesFilter="answerTypesFilter"
+					:hasSubtypes="hasSubtypes"
+					:isLoadingQuestions="isLoadingQuestions"
 					@update:modelValue="onUpdateQuestions"
-					@start="onDragStart"
-					@end="onDragEnd">
-					<TransitionGroup
-						tag="ul"
-						:name="isDragging ? undefined : 'question-list'"
-						class="sort-target">
-						<component
-							:is="answerTypes[question.type].component"
-							v-for="(question, index) in form.questions"
-							:key="question.id"
-							:ref="registerQuestionRef(question)"
-							v-bind="form.questions[index]"
-							:canMoveDown="index < form.questions.length - 1"
-							:canMoveUp="index > 0"
-							:answerType="answerTypes[question.type]"
-							:index="index + 1"
-							:maxStringLengths="maxStringLengths"
-							@update:text="updateQuestionText(index, $event)"
-							@update:description="
-								updateQuestionDescription(index, $event)
-							"
-							@update:isRequired="
-								updateQuestionIsRequired(index, $event)
-							"
-							@update:name="updateQuestionName(index, $event)"
-							@update:extraSettings="
-								updateQuestionExtraSettings(index, $event)
-							"
-							@update:options="updateQuestionOptions(index, $event)"
-							@clone="cloneQuestion(question, index)"
-							@delete="deleteQuestion(question.id)"
-							@moveDown="onMoveDown(index)"
-							@moveUp="onMoveUp(index)">
-							<template
-								v-if="index < form.questions.length - 1"
-								#insert>
-								<div
-									class="question-insert"
-									:class="[
-										{
-											'is-open':
-												insertMenuOpenedIndex === index,
-										},
-										{
-											'is-mobile': isMobile,
-										},
-									]">
-									<AddQuestionMenu
-										:aria-label="
-											t(
-												'forms',
-												'Insert question after question {index}',
-												{ index: index + 1 },
-											)
-										"
-										variant="tertiary"
-										:position="index"
-										:isLoadingQuestions="isLoadingQuestions"
-										:answerTypesFilter="answerTypesFilter"
-										:hasSubtypes="hasSubtypes"
-										wide
-										@update:open="
-											(v) =>
-												(insertMenuOpenedIndex = v
-													? index
-													: null)
-										"
-										@addQuestion="addQuestion" />
-								</div>
-							</template>
-						</component>
-					</TransitionGroup>
-				</Draggable>
+					@updateProperty="updateQuestionProperty"
+					@clone="cloneQuestion"
+					@delete="(question) => deleteQuestion(question.id)"
+					@moveDown="onMoveDown"
+					@moveUp="onMoveUp"
+					@addQuestion="addQuestion" />
 
 				<!-- Add new questions menu -->
 				<div class="question-menu">
@@ -214,8 +151,8 @@
 </template>
 
 <script lang="ts">
-import type { ComponentPublicInstance, PropType } from 'vue'
-import type { FormsForm, FormsOption, FormsQuestion } from '../types/Entities.d.ts'
+import type { PropType } from 'vue'
+import type { FormsForm, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
@@ -225,20 +162,14 @@ import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
-import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
 import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
-import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import AddQuestionMenu from '../components/AddQuestionMenu.vue'
-import Question from '../components/Questions/Question.vue'
-import QuestionLong from '../components/Questions/QuestionLong.vue'
-import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
-import QuestionShort from '../components/Questions/QuestionShort.vue'
+import QuestionList from '../components/Questions/QuestionList.vue'
 import TopBar from '../components/TopBar.vue'
 import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
@@ -249,27 +180,18 @@ import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-interface QuestionRefInstance extends ComponentPublicInstance {
-	focus?: () => void
-}
-
 ;(window as Window & { axios?: typeof axios }).axios = axios
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
 	name: 'Create',
 	components: {
-		Draggable,
 		NcIconSvgWrapper,
 		AddQuestionMenu,
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
-		NcNoteCard,
-		Question,
-		QuestionLong,
-		QuestionShort,
-		QuestionMultiple,
+		QuestionList,
 		TopBar,
 	},
 
@@ -295,6 +217,7 @@ export default defineComponent({
 	setup(props, { emit }) {
 		const title = ref<HTMLTextAreaElement | null>(null)
 		const description = ref<HTMLTextAreaElement | null>(null)
+		const questionList = ref<InstanceType<typeof QuestionList> | null>(null)
 		const viewForm = useViewForm({
 			form: () => props.form,
 			emit,
@@ -303,38 +226,11 @@ export default defineComponent({
 
 		// Various states
 		const isLoadingQuestions = ref<boolean>(false)
-		const isDragging = ref<boolean>(false)
 		const maxStringLengths = loadState(
 			formsAppName,
 			'maxStringLengths',
 		) as Record<string, number>
 		const questionMenuOpened = ref<boolean>(false)
-		const activeQuestionType = ref<string | null>(null)
-		const questionRefsMap = ref<Record<number, QuestionRefInstance>>({})
-		// when set to a number, the next created question will be inserted at this index
-		const insertMenuOpenedIndex = ref<number | null>(null)
-		// controls per-question insert menu visibility
-		const insertMenuOpened = ref<boolean>(false)
-
-		// Helper functions
-		const setQuestionRef = (
-			el: QuestionRefInstance | null,
-			question: FormsQuestion,
-		): void => {
-			if (el) {
-				questionRefsMap.value[question.id] = el
-			} else {
-				delete questionRefsMap.value[question.id]
-			}
-		}
-
-		const registerQuestionRef = (
-			question: FormsQuestion,
-		): ((el: Element | ComponentPublicInstance | null) => void) => {
-			return (el) => {
-				setQuestionRef(el as QuestionRefInstance | null, question)
-			}
-		}
 
 		/**
 		 * Auto adjust the title height based its scroll height
@@ -453,21 +349,17 @@ export default defineComponent({
 				&& Object.keys(answer?.subtypes ?? {}).length > 0
 		})
 
+		const getQuestionComponent = (question: FormsQuestion) =>
+			answerTypes[question.type].component
+
+		const getQuestionAnswerType = (question: FormsQuestion) =>
+			answerTypes[question.type]
+
 		const lockedUntilFormatted = computed<string>(() =>
 			moment(props.form.lockedUntil, 'X').fromNow(),
 		)
 
 		// Event handlers
-		const onDragStart = (): void => {
-			isDragging.value = true
-		}
-
-		const onDragEnd = (): void => {
-			nextTick(() => {
-				isDragging.value = false
-			})
-		}
-
 		const updateQuestionProperty = <K extends keyof FormsQuestion>(
 			index: number,
 			property: K,
@@ -476,36 +368,6 @@ export default defineComponent({
 			const questions = [...props.form.questions]
 			questions[index] = { ...questions[index], [property]: value }
 			emit('update:form', { ...props.form, questions })
-		}
-
-		const updateQuestionText = (index: number, value: string): void => {
-			updateQuestionProperty(index, 'text', value)
-		}
-
-		const updateQuestionDescription = (index: number, value: string): void => {
-			updateQuestionProperty(index, 'description', value)
-		}
-
-		const updateQuestionIsRequired = (index: number, value: boolean): void => {
-			updateQuestionProperty(index, 'isRequired', value)
-		}
-
-		const updateQuestionName = (index: number, value: string): void => {
-			updateQuestionProperty(index, 'name', value)
-		}
-
-		const updateQuestionExtraSettings = (
-			index: number,
-			value: Record<string, unknown> | null,
-		): void => {
-			updateQuestionProperty(index, 'extraSettings', value)
-		}
-
-		const updateQuestionOptions = (
-			index: number,
-			value: FormsOption[],
-		): void => {
-			updateQuestionProperty(index, 'options', value)
 		}
 
 		/**
@@ -580,18 +442,13 @@ export default defineComponent({
 			const questions = [...props.form.questions]
 			if (insertAt !== null && insertAt <= questions.length) {
 				questions.splice(insertAt, 0, newQuestionObj)
-				emit('update:form', { ...props.form, questions })
-				nextTick(() => {
-					// Prefer ref by id when available, fallback to positional refs
-					questionRefsMap.value[newQuestionObj.id]?.focus?.()
-				})
 			} else {
 				questions.push(newQuestionObj)
-				emit('update:form', { ...props.form, questions })
-				nextTick(() => {
-					questionRefsMap.value[newQuestionObj.id]?.focus?.()
-				})
 			}
+			emit('update:form', { ...props.form, questions })
+			nextTick(() => {
+				questionList.value?.focusQuestion(newQuestionObj.id)
+			})
 
 			emitEvent('forms:last-updated:set', props.form.id)
 		}
@@ -636,7 +493,6 @@ export default defineComponent({
 			subtype: string | null = null,
 			position: number | null = null,
 		): Promise<void> => {
-			activeQuestionType.value = null
 			const text = ''
 			isLoadingQuestions.value = true
 
@@ -791,17 +647,12 @@ export default defineComponent({
 
 		return {
 			...viewForm,
-			answerTypes,
 			title,
 			description,
+			questionList,
 			isLoadingQuestions,
-			isDragging,
 			maxStringLengths,
 			questionMenuOpened,
-			activeQuestionType,
-			questionRefsMap,
-			insertMenuOpenedIndex,
-			insertMenuOpened,
 			hasQuestions,
 			isRequiredUsed,
 			isExpired,
@@ -810,17 +661,10 @@ export default defineComponent({
 			expirationMessage,
 			answerTypesFilter,
 			hasSubtypes,
+			getQuestionComponent,
+			getQuestionAnswerType,
 			lockedUntilFormatted,
-			onDragStart,
-			onDragEnd,
-			setQuestionRef,
-			registerQuestionRef,
-			updateQuestionText,
-			updateQuestionDescription,
-			updateQuestionIsRequired,
-			updateQuestionName,
-			updateQuestionExtraSettings,
-			updateQuestionOptions,
+			updateQuestionProperty,
 			onMoveUp,
 			onMoveDown,
 			onTitleInput,
@@ -834,7 +678,6 @@ export default defineComponent({
 			onUpdateQuestions,
 			onQuestionOrderChange,
 			IconLock,
-			isMobile: useIsMobile(),
 			t,
 		}
 	},
@@ -937,46 +780,5 @@ export default defineComponent({
 			margin-inline-start: var(--default-clickable-area);
 		}
 	}
-}
-
-.question-list-move,
-.question-list-enter-active,
-.question-list-leave-active {
-	transition: all var(--animation-slow) ease;
-}
-
-.question-list-enter-from,
-.question-list-leave-to {
-	opacity: 0;
-	transform: translateX(var(--clickable-area-large));
-}
-
-/* ensure leaving items are taken out of layout flow so that moving
-   animations can be calculated correctly. */
-.question-list-leave-active {
-	position: absolute;
-}
-
-.question-insert {
-	/* closer to the question above */
-	position: relative;
-	margin-block-end: -34px;
-	inset-block-end: -16px;
-	margin-inline-start: -12px;
-	width: calc(100% - var(--default-clickable-area));
-	display: flex;
-	justify-content: center;
-	opacity: 0;
-	transition: opacity 0.12s ease;
-}
-
-.question-insert.is-mobile {
-	opacity: 0.3;
-}
-
-.question:hover > .question-insert,
-.question-insert:focus-within,
-.question-insert.is-open {
-	opacity: 1;
 }
 </style>

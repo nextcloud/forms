@@ -54,7 +54,9 @@ class SubmissionMapperTest extends IntegrationBase {
 						'options' => [],
 						'accept' => [],
 						'description' => 'Please answer this.',
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					]
 				],
 				'shares' => [],

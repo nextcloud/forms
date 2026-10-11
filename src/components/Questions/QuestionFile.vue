@@ -9,6 +9,7 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template #actions>
 			<template v-if="!allowedFileTypesDialogOpened">
