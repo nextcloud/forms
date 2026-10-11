@@ -1,11 +1,11 @@
 diff --git a/.github/workflows/playwright.yml b/.github/workflows/playwright.yml
-index c218bffb..1e0028ab 100644
+index 6156b86f..24f48f88 100644
 --- a/.github/workflows/playwright.yml
 +++ b/.github/workflows/playwright.yml
-@@ -29,10 +29,8 @@ name: Playwright Tests
- on:
+@@ -30,10 +30,7 @@ on:
    pull_request:
      branches:
+       - main
 -      - master
 -      - stable35
 -      - stable34
@@ -14,7 +14,7 @@ index c218bffb..1e0028ab 100644
  
  permissions:
    contents: read
-@@ -125,61 +125,6 @@ jobs:
+@@ -138,61 +135,6 @@ jobs:
          path: blob-report
          retention-days: 1
  
