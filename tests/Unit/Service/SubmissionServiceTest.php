@@ -38,7 +38,10 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\Mail\IEmailValidator;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -660,13 +663,20 @@ file2.txt"
 			// CSV is always escaped and kept as string, even for pure numbers.
 			'csv-number' => ['csv', '3', DataType::TYPE_STRING, '3'],
 			'csv-formula' => ['csv', '=danger', DataType::TYPE_STRING, "'=danger"],
+			// Typed values (numbers, dates, times) keep their numeric type for
+			// spreadsheet formats but fall back to their text form for CSV.
+			'typed-number-xlsx' => ['xlsx', ['typedValue' => 3.5, 'numberFormat' => null, 'stringValue' => '3.5'], DataType::TYPE_NUMERIC, 3.5],
+			'typed-number-ods' => ['ods', ['typedValue' => 3.5, 'numberFormat' => null, 'stringValue' => '3.5'], DataType::TYPE_NUMERIC, 3.5],
+			'typed-date-xlsx' => ['xlsx', ['typedValue' => 45356.0, 'numberFormat' => 14, 'stringValue' => '2024-03-05'], DataType::TYPE_NUMERIC, 45356.0],
+			'typed-number-csv' => ['csv', ['typedValue' => 3.5, 'numberFormat' => null, 'stringValue' => '3.5'], DataType::TYPE_STRING, '3.5'],
+			'typed-number-csv-escaped' => ['csv', ['typedValue' => -5, 'numberFormat' => null, 'stringValue' => '-5'], DataType::TYPE_STRING, "'-5"],
 		];
 	}
 
 	/**
 	 * @dataProvider dataSetCellValueType
 	 */
-	public function testSetCellValueDataType(string $fileFormat, string $value, string $expectedType, mixed $expectedValue): void {
+	public function testSetCellValueDataType(string $fileFormat, mixed $value, string $expectedType, mixed $expectedValue): void {
 		$spreadsheet = new Spreadsheet();
 		$worksheet = $spreadsheet->getActiveSheet();
 
@@ -681,6 +691,108 @@ file2.txt"
 			// assertSame guards against a numeric-looking string being silently coerced.
 			$this->assertSame($expectedValue, $cell->getValue());
 		}
+	}
+
+	public function testSetCellValueTypedNumberFormat(): void {
+		$spreadsheet = new Spreadsheet();
+		$worksheet = $spreadsheet->getActiveSheet();
+
+		TestCase::invokePrivate($this->submissionService, 'setCellValue', [$worksheet, 1, 1, ['typedValue' => 45356.0, 'numberFormat' => NumberFormat::SHORT_DATE_INDEX, 'stringValue' => '2024-03-05'], 'xlsx']);
+
+		$cell = $worksheet->getCell([1, 1]);
+		$this->assertSame(DataType::TYPE_NUMERIC, $cell->getDataType());
+		$this->assertSame(14, $cell->getStyle()->getNumberFormat()->getBuiltInFormatCode());
+		$this->assertTrue(ExcelDate::isDateTimeFormatCode($cell->getStyle()->getNumberFormat()->getFormatCode()));
+	}
+
+	public static function dataAnswerExportValue(): array {
+		return [
+			// A short answer with number validation becomes a numeric cell, even for
+			// values that the generic text check would preserve (leading zeros, …).
+			'number-short' => [['type' => 'short', 'extraSettings' => ['validationType' => 'number']], '100.45', ['typedValue' => 100.45, 'numberFormat' => null, 'stringValue' => '100.45']],
+			'number-short-leading-zero' => [['type' => 'short', 'extraSettings' => ['validationType' => 'number']], '007', ['typedValue' => 7, 'numberFormat' => null, 'stringValue' => '007']],
+			'number-short-not-numeric' => [['type' => 'short', 'extraSettings' => ['validationType' => 'number']], 'abc', 'abc'],
+			'short-without-validation' => [['type' => 'short'], '42', '42'],
+			'short-with-email-validation' => [['type' => 'short', 'extraSettings' => ['validationType' => 'email']], '42', '42'],
+			'date' => [['type' => 'date'], '2024-03-05', ['typedValue' => 45356.0, 'numberFormat' => NumberFormat::SHORT_DATE_INDEX, 'stringValue' => '2024-03-05']],
+			// Date ranges are stored as two dates joined by '; ' and stay text.
+			'date-range' => [['type' => 'date'], '2024-03-05; 2024-03-08', '2024-03-05; 2024-03-08'],
+			'invalid-date' => [['type' => 'date'], '05.03.2024', '05.03.2024'],
+			'time' => [['type' => 'time'], '17:45', ['typedValue' => 63900 / 86400, 'numberFormat' => 20, 'stringValue' => '17:45']],
+			'time-range' => [['type' => 'time'], '12:33; 12:34', '12:33; 12:34'],
+			// The deprecated datetime type is intentionally not converted.
+			'datetime-deprecated' => [['type' => 'datetime'], '2021-04-30 04:40', '2021-04-30 04:40'],
+			'long' => [['type' => 'long'], '2024-03-05', '2024-03-05'],
+			'empty-answer' => [['type' => 'date'], '', ''],
+			'null-answer' => [['type' => 'date'], null, null],
+		];
+	}
+
+	/**
+	 * @dataProvider dataAnswerExportValue
+	 */
+	public function testAnswerExportValue(array $questionParams, mixed $answer, mixed $expected): void {
+		$question = Question::fromParams($questionParams);
+		$this->assertEquals($expected, TestCase::invokePrivate($this->submissionService, 'answerExportValue', [$question, $answer]));
+	}
+
+	public function testGetSubmissionsDataXlsxTypedCells(): void {
+		$this->setUpCsvTest(
+			[
+				['id' => 1, 'type' => 'short', 'text' => 'Number', 'extraSettings' => ['validationType' => 'number']],
+				['id' => 2, 'type' => 'date', 'text' => 'Date'],
+				['id' => 3, 'type' => 'time', 'text' => 'Time'],
+			],
+			[
+				[
+					'id' => 1,
+					'userId' => 'user1',
+					'timestamp' => 123456789,
+					'answers' => [
+						['questionId' => 1, 'text' => '100.45'],
+						['questionId' => 2, 'text' => '2024-03-05'],
+						['questionId' => 3, 'text' => '17:45'],
+					]
+				]
+			],
+			'',
+			'Some nice Form Title',
+		);
+		$form = $this->formMapper->findByHash('abcdefg');
+
+		$exportFile = tempnam(sys_get_temp_dir(), 'forms-test') . '.xlsx';
+		$this->tempManager->expects($this->once())
+			->method('getTemporaryFile')
+			->willReturn($exportFile);
+
+		$this->submissionService->getSubmissionsData($form, 'xlsx');
+
+		$spreadsheet = IOFactory::load($exportFile);
+		$worksheet = $spreadsheet->getSheet(0);
+		unlink($exportFile);
+
+		// Timestamp column
+		$cell = $worksheet->getCell([4, 3]);
+		$this->assertSame(DataType::TYPE_NUMERIC, $cell->getDataType());
+		$this->assertSame(22, $cell->getStyle()->getNumberFormat()->getBuiltInFormatCode());
+		$this->assertSame(ExcelDate::dateTimeToExcel(new \DateTime('1973-11-29T22:33:09+01:00')), $cell->getValue());
+
+		// Number answer
+		$cell = $worksheet->getCell([5, 3]);
+		$this->assertSame(DataType::TYPE_NUMERIC, $cell->getDataType());
+		$this->assertSame(100.45, $cell->getValue());
+
+		// Date answer
+		$cell = $worksheet->getCell([6, 3]);
+		$this->assertSame(DataType::TYPE_NUMERIC, $cell->getDataType());
+		$this->assertSame(14, $cell->getStyle()->getNumberFormat()->getBuiltInFormatCode());
+		$this->assertSame(45356.0, $cell->getValue());
+
+		// Time answer
+		$cell = $worksheet->getCell([7, 3]);
+		$this->assertSame(DataType::TYPE_NUMERIC, $cell->getDataType());
+		$this->assertSame(20, $cell->getStyle()->getNumberFormat()->getBuiltInFormatCode());
+		$this->assertEqualsWithDelta(63900 / 86400, $cell->getValue(), 1e-9);
 	}
 
 	/**
