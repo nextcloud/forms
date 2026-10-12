@@ -11,6 +11,8 @@ export class QuestionSection {
 	public readonly titleInput: Locator
 	public readonly descriptionInput: Locator
 	public readonly newAnswerInput: Locator
+	public readonly newColumnInput: Locator
+	public readonly newRowInput: Locator
 	public readonly answerInputs: Locator
 
 	constructor(
@@ -25,6 +27,12 @@ export class QuestionSection {
 		)
 		this.newAnswerInput = this.section.getByRole('textbox', {
 			name: 'Add a new answer option',
+		})
+		this.newColumnInput = this.section.getByRole('textbox', {
+			name: 'Add a new column',
+		})
+		this.newRowInput = this.section.getByRole('textbox', {
+			name: 'Add a new row',
 		})
 		this.answerInputs = this.section.getByRole('textbox', {
 			name: /The text of option \d+/i,
@@ -47,6 +55,30 @@ export class QuestionSection {
 		const saved = waitForApiResponse(this.page, 'POST')
 		await this.newAnswerInput.fill(text)
 		await this.newAnswerInput.press('Enter')
+		await saved
+	}
+
+	/**
+	 * Add a column option to a grid question.
+	 *
+	 * @param text the text of the column
+	 */
+	async addColumn(text: string): Promise<void> {
+		const saved = waitForApiResponse(this.page, 'POST')
+		await this.newColumnInput.fill(text)
+		await this.newColumnInput.press('Enter')
+		await saved
+	}
+
+	/**
+	 * Add a row option to a grid question.
+	 *
+	 * @param text the text of the row
+	 */
+	async addRow(text: string): Promise<void> {
+		const saved = waitForApiResponse(this.page, 'POST')
+		await this.newRowInput.fill(text)
+		await this.newRowInput.press('Enter')
 		await saved
 	}
 
