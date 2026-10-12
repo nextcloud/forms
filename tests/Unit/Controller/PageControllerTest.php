@@ -11,7 +11,6 @@ namespace OCA\Forms\Tests\Unit\Controller;
 use OCA\Forms\Controller\PageController;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\ShareMapper;
-use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
@@ -33,7 +32,6 @@ class PageControllerTest extends TestCase {
 	private IRequest|MockObject $request;
 	private FormMapper|MockObject $formMapper;
 	private ShareMapper|MockObject $shareMapper;
-	private SubmissionMapper|MockObject $submissionMapper;
 	private ConfigService|MockObject $configService;
 	private FormsService|MockObject $formsService;
 	private IAccountManager|MockObject $accountManager;
@@ -50,7 +48,6 @@ class PageControllerTest extends TestCase {
 		$this->request = $this->createMock(IRequest::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->shareMapper = $this->createMock(ShareMapper::class);
-		$this->submissionMapper = $this->createMock(SubmissionMapper::class);
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->accountManager = $this->createMock(IAccountManager::class);
@@ -66,7 +63,6 @@ class PageControllerTest extends TestCase {
 			$this->request,
 			$this->formMapper,
 			$this->shareMapper,
-			$this->submissionMapper,
 			$this->configService,
 			$this->formsService,
 			$this->accountManager,

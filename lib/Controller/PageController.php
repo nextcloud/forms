@@ -11,7 +11,6 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\ShareMapper;
-use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCP\Accounts\IAccountManager;
@@ -47,7 +46,6 @@ class PageController extends Controller {
 		IRequest $request,
 		private readonly FormMapper $formMapper,
 		private readonly ShareMapper $shareMapper,
-		private readonly SubmissionMapper $submissionMapper,
 		private readonly ConfigService $configService,
 		private readonly FormsService $formsService,
 		private readonly IAccountManager $accountManager,
@@ -67,7 +65,7 @@ class PageController extends Controller {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[FrontpageRoute(verb: 'GET', url: '/')]
-	public function index(?string $hash = null, ?int $submissionId = null): TemplateResponse {
+	public function index(?string $hash = null): TemplateResponse {
 		// Ensure the Comments client is available and load comments resources
 		$this->commentsManager->load();
 		Util::addScript($this->appName, 'forms-main', 'comments');
@@ -84,15 +82,6 @@ class PageController extends Controller {
 			} catch (DoesNotExistException) {
 				// Provide null to indicate no form was found
 				$this->initialState->provideInitialState('formId', 'invalid');
-			}
-		}
-
-		if (isset($submissionId)) {
-			try {
-				$submission = $this->submissionMapper->findById($submissionId);
-				$this->initialState->provideInitialState('submissionId', $submission->id);
-			} catch (DoesNotExistException) {
-				// Ignore exception and just don't set the initialState value
 			}
 		}
 
@@ -129,10 +118,7 @@ class PageController extends Controller {
 	#[NoCSRFRequired()]
 	#[FrontpageRoute(verb: 'GET', url: '/{hash}/submit/{submissionId}', requirements: ['hash' => '[a-zA-Z0-9]{16,}', 'submissionId' => '\d+'])]
 	public function submitViewWithSubmission(string $hash, int $submissionId): TemplateResponse {
-		$form = $this->formMapper->findByHash($hash);
-		$canUserEditSubmission = $this->formsService->canDeleteResults($form);
-
-		return $canUserEditSubmission ? $this->index($hash, $submissionId) : $this->index($hash);
+		return $this->index($hash);
 	}
 
 	/**

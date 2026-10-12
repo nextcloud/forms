@@ -567,9 +567,7 @@ export default defineComponent({
 			const routeSubmissionId = Array.isArray(rawSubmissionId)
 				? rawSubmissionId[0]
 				: rawSubmissionId
-			const id =
-				routeSubmissionId || loadState(formsAppName, 'submissionId', null)
-			return id ? parseInt(String(id), 10) : null
+			return routeSubmissionId ? parseInt(String(routeSubmissionId), 10) : null
 		})
 
 		/**
@@ -638,6 +636,35 @@ export default defineComponent({
 			localStorage.setItem(
 				`nextcloud_forms_${props.publicView ? props.shareHash : props.hash}`,
 				stringified,
+			)
+		}
+
+		/**
+		 * Replace the stored draft with all current answers (e.g. after loading a submission)
+		 */
+		function saveAllAnswersToLocalStorage(): void {
+			if (!props.isLoggedIn) {
+				return
+			}
+			const state: StoredAnswersMap = {}
+			for (const question of validQuestions.value) {
+				const value = answers.value[question.id]
+				if (
+					value === undefined
+					|| (Array.isArray(value)
+						? value.length === 0
+						: Object.keys(value).length === 0)
+				) {
+					continue
+				}
+				state[`${question.id}`] = {
+					value,
+					type: answerTypes[question.type].component.name ?? '',
+				}
+			}
+			localStorage.setItem(
+				`nextcloud_forms_${props.publicView ? props.shareHash : props.hash}`,
+				JSON.stringify(state),
 			)
 		}
 
@@ -808,6 +835,7 @@ export default defineComponent({
 				}
 
 				answers.value = loaded
+				saveAllAnswersToLocalStorage()
 			} catch (error) {
 				logger.error('Error while loading response', { error })
 				showError(
@@ -1080,6 +1108,18 @@ export default defineComponent({
 				SetWindowTitle(viewForm.formTitle.value)
 			},
 		)
+
+		watch(submissionId, async (): Promise<void> => {
+			if (props.publicView || !props.isLoggedIn) {
+				return
+			}
+			resetData()
+			if (submissionId.value) {
+				await fetchSubmission()
+			} else {
+				initFromLocalStorage()
+			}
+		})
 
 		// Navigation guards only work inside the routed Forms app, not the public submit entry.
 		if (!props.publicView) {
