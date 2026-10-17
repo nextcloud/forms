@@ -33,6 +33,7 @@ OC.L10N.register(
     "Share form" : "Сподели форма",
     "Responses" : "Одговори",
     "Options" : "Опции",
+    "{page} of {totalPages}" : "{page} од {totalPages}",
     "Answer number {index}" : "Број на одговор {index}",
     "Error while saving the answer" : "Грешка при зачувување на одговор",
     "Delete answer" : "Избриши одговор",
