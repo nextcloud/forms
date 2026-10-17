@@ -1655,6 +1655,90 @@ class ApiV3Test extends IntegrationBase {
 		], $data['submissions'][0]);
 	}
 
+	public function testCreateUploadShare() {
+		$formId = $this->testForms[0]['id'];
+		$questionId = $this->testForms[0]['questions'][2]['id'];
+
+		$resp = $this->http->request('POST', "api/v3/forms/$formId/submissions/files/$questionId/share");
+		$this->assertEquals(200, $resp->getStatusCode());
+		$data = $this->OcsResponse2Data($resp);
+		$shareToken = $data['shareToken'] ?? '';
+		$this->assertNotEmpty($shareToken);
+
+		// The created share is a create-only (file drop) link share of the form owner
+		$shareManager = \OCP\Server::get(\OCP\Share\IManager::class);
+		$share = $shareManager->getShareByToken($shareToken);
+		$this->assertEquals(\OCP\Share\IShare::TYPE_LINK, $share->getShareType());
+		$this->assertEquals(\OCP\Constants::PERMISSION_CREATE, $share->getPermissions());
+		$this->assertEquals('test', $share->getSharedBy());
+		$this->assertEquals('test', $share->getShareOwner());
+
+		$uploadedFileId = null;
+		try {
+			// Upload a file to the share through the public WebDAV endpoint
+			$davClient = new Client([
+				'base_uri' => 'http://localhost:8080/public.php/webdav/',
+				'auth' => [$shareToken, ''],
+			]);
+			$resp = $davClient->request('PUT', 'dav-upload.txt', [
+				'body' => 'uploaded through the upload share'
+			]);
+			$this->assertEquals(201, $resp->getStatusCode());
+
+			// Register the uploaded file for the form
+			$resp = $this->http->request('POST', "api/v3/forms/$formId/submissions/files/$questionId/register", [
+				'json' => [
+					'shareToken' => $shareToken,
+					'fileName' => 'dav-upload.txt',
+				]
+			]);
+			$this->assertEquals(200, $resp->getStatusCode());
+			$data = $this->OcsResponse2Data($resp);
+			$uploadedFileId = $data['uploadedFileId'] ?? null;
+
+			$this->assertNotEmpty($uploadedFileId);
+			$this->assertEquals('dav-upload.txt', $data['fileName']);
+			$this->assertNotEmpty($data['uploadToken']);
+		} finally {
+			// Delete the share and the temporary upload folder
+			// "<unsubmitted>/<timestamp>/<form>/<question>" incl. its parents
+			$node = $share->getNode();
+			$shareManager->deleteShare($share);
+			$node->getParent()->getParent()->delete();
+
+			if ($uploadedFileId !== null) {
+				$uploadedFileMapper = \OCP\Server::get(\OCA\Forms\Db\UploadedFileMapper::class);
+				$uploadedFile = $uploadedFileMapper->findByUploadedFileId((string)$uploadedFileId);
+				if ($uploadedFile !== null) {
+					$uploadedFileMapper->delete($uploadedFile);
+				}
+			}
+		}
+	}
+
+	public function testCreateUploadShareRequiresFileQuestion() {
+		// The first question is not a file question
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][0]['id']}/share", [
+			'http_errors' => false
+		]);
+		$this->assertEquals(400, $resp->getStatusCode());
+	}
+
+	public function testCreateUploadShareQuestionNotFound() {
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions/files/999999/share", [
+			'http_errors' => false
+		]);
+		$this->assertEquals(404, $resp->getStatusCode());
+	}
+
+	public function testCreateUploadShareQuestionBelongsToOtherForm() {
+		// The file question belongs to the first form, not to the third one
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[2]['id']}/submissions/files/{$this->testForms[0]['questions'][2]['id']}/share", [
+			'http_errors' => false
+		]);
+		$this->assertEquals(400, $resp->getStatusCode());
+	}
+
 	public static function dataDeleteSingleSubmission() {
 		$submissionsExpected = self::dataGetSubmissions()['getSubmissions']['expected'];
 		array_splice($submissionsExpected['submissions'], 0, 1);
