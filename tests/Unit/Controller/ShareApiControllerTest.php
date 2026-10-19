@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace OCA\Forms\Tests\Unit\Controller;
 
 use OCA\Circles\Model\Circle;
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ShareApiController;
 use OCA\Forms\Db\Form;
@@ -21,6 +23,7 @@ use OCA\Forms\Service\CirclesService;
 use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\UploadedFilesShareService;
+use OCA\Forms\Tests\Unit\AuditLog\AuditEvents;
 use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
@@ -29,6 +32,7 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IFilenameValidator;
@@ -38,6 +42,7 @@ use OCP\IGroupManager;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
+use OCP\Log\Audit\CriticalActionPerformedEvent;
 use OCP\Security\ISecureRandom;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
@@ -68,6 +73,9 @@ class ShareApiControllerTest extends TestCase {
 	private IFilenameValidator|MockObject $filenameValidator;
 	private IManager|MockObject $shareManager;
 	private UploadedFilesShareService $uploadedFilesShareService;
+	private IEventDispatcher|MockObject $eventDispatcher;
+	/** @var list<object> */
+	private array $dispatchedEvents = [];
 
 	public function setUp(): void {
 		$this->formMapper = $this->createMock(FormMapper::class);
@@ -95,6 +103,13 @@ class ShareApiControllerTest extends TestCase {
 			$this->logger,
 		);
 
+		$this->dispatchedEvents = [];
+		$this->eventDispatcher = $this->createMock(IEventDispatcher::class);
+		$this->eventDispatcher->method('dispatchTyped')
+			->willReturnCallback(function (object $event): void {
+				$this->dispatchedEvents[] = $event;
+			});
+
 		$this->shareApiController = new ShareApiController(
 			'forms',
 			$this->request,
@@ -111,7 +126,26 @@ class ShareApiControllerTest extends TestCase {
 			$this->filePathHelper,
 			$this->shareManager,
 			$this->uploadedFilesShareService,
+			new AuditLogger($this->eventDispatcher),
 		);
+	}
+
+	private function expectNoAuditLog(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+	}
+
+	/**
+	 * @param list<array{Operation, string, array<string, mixed>}> $expected operation, message and parameters of each audit log entry, in order
+	 */
+	private function assertAuditLogged(array $expected): void {
+		$events = array_values(array_filter($this->dispatchedEvents, static fn (object $event): bool => $event instanceof CriticalActionPerformedEvent));
+		$this->assertSame(
+			array_map(static fn (array $entry): array => [$entry[1], $entry[2]], $expected),
+			array_map(static fn (CriticalActionPerformedEvent $event): array => [$event->getLogMessage(), $event->getParameters()], $events),
+		);
+		foreach ($events as $i => $event) {
+			$this->assertTrue(AuditEvents::hasOperation($event, $expected[$i][0]->value));
+		}
 	}
 
 	public static function dataValidNewShare() {
@@ -213,6 +247,15 @@ class ShareApiControllerTest extends TestCase {
 		// Share Form '5' to 'user1' of share-type 'user=0'
 		$expectedResponse = new DataResponse($expected, Http::STATUS_CREATED);
 		$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
+		$this->assertAuditLogged([
+			[Operation::ShareCreated, 'Share %s of form %s was created', [
+				'shareId' => 13,
+				'formId' => 5,
+				'shareType' => $shareType,
+				'shareWith' => $shareWith,
+				'permissions' => $permissions,
+			]],
+		]);
 	}
 
 	public static function dataNewLinkShare() {
@@ -296,7 +339,17 @@ class ShareApiControllerTest extends TestCase {
 			// Share the form.
 			$expectedResponse = new DataResponse($expected, Http::STATUS_CREATED);
 			$this->assertEquals($expectedResponse, $this->shareApiController->newShare(5, $shareType, $shareWith, $permissions));
+			$this->assertAuditLogged([
+				[Operation::ShareCreated, 'Share %s of form %s was created', [
+					'shareId' => 13,
+					'formId' => 5,
+					'shareType' => IShare::TYPE_LINK,
+					'shareWith' => null,
+					'permissions' => $permissions,
+				]],
+			]);
 		} else {
+			$this->expectNoAuditLog();
 			$this->expectException($exception);
 			$this->shareApiController->newShare(5, $shareType, $shareWith, $permissions);
 		}
@@ -519,6 +572,15 @@ class ShareApiControllerTest extends TestCase {
 
 		$response = new DataResponse(8);
 		$this->assertEquals($response, $this->shareApiController->deleteShare(5, 8));
+		$this->assertAuditLogged([
+			[Operation::ShareDeleted, 'Share %s of form %s was deleted', [
+				'shareId' => 8,
+				'formId' => 5,
+				'shareType' => null,
+				'shareWith' => null,
+				'permissions' => [Constants::PERMISSION_SUBMIT],
+			]],
+		]);
 	}
 
 	/**
@@ -644,6 +706,7 @@ class ShareApiControllerTest extends TestCase {
 			->with('5')
 			->willThrowException(new NoSuchFormException('This form is not owned by the current user'));
 
+		$this->expectNoAuditLog();
 		$this->expectException(NoSuchFormException::class);
 		$this->shareApiController->deleteShare(5, 8);
 	}
@@ -887,7 +950,18 @@ class ShareApiControllerTest extends TestCase {
 		if ($exception === null) {
 			$expectedResponse = new DataResponse($expected);
 			$this->assertEquals($expectedResponse, $this->shareApiController->updateShare($share['formId'], $share['id'], $keyValuePairs));
+			$this->assertAuditLogged([
+				[Operation::ShareUpdated, 'Share %s of form %s was updated', [
+					'shareId' => $share['id'],
+					'formId' => $share['formId'],
+					'shareType' => $share['shareType'],
+					'shareWith' => $share['shareType'] === IShare::TYPE_LINK ? null : $share['shareWith'],
+					'permissions' => $keyValuePairs['permissions'],
+					'tokenChanged' => false,
+				]],
+			]);
 		} else {
+			$this->expectNoAuditLog();
 			$this->expectException($exception);
 			$this->shareApiController->updateShare($share['formId'], $share['id'], $keyValuePairs);
 		}
@@ -970,6 +1044,16 @@ class ShareApiControllerTest extends TestCase {
 			});
 
 		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShare(5, 8, ['token' => 'tokenabcd']));
+		$this->assertAuditLogged([
+			[Operation::ShareUpdated, 'Share %s of form %s was updated', [
+				'shareId' => 8,
+				'formId' => 5,
+				'shareType' => IShare::TYPE_LINK,
+				'shareWith' => null,
+				'permissions' => [Constants::PERMISSION_SUBMIT],
+				'tokenChanged' => true,
+			]],
+		]);
 	}
 
 	public function testUpdateShareToken_CustomTokensDisabled() {
@@ -1197,6 +1281,7 @@ class ShareApiControllerTest extends TestCase {
 			->method('update');
 		$this->formsService->expects($this->never())
 			->method('obtainFormLock');
+		$this->expectNoAuditLog();
 
 		$this->assertEquals(new DataResponse(8), $this->shareApiController->updateShare(5, 8, ['token' => 'sameToken123']));
 	}

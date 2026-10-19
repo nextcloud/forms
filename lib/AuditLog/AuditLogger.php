@@ -8,8 +8,10 @@ declare(strict_types=1);
 
 namespace OCA\Forms\AuditLog;
 
+use OCA\Forms\Db\Share;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
+use OCP\Share\IShare;
 
 /**
  * Writes entries to the admin audit log
@@ -32,5 +34,21 @@ class AuditLogger {
 			$arguments[] = $operation->value;
 		}
 		$this->eventDispatcher->dispatchTyped(new CriticalActionPerformedEvent(...$arguments));
+	}
+
+	/**
+	 * Logs a share with its share ID and form ID as the first parameters.
+	 * The token of a link share is stored as its shareWith and is never logged.
+	 *
+	 * @param array<string, mixed> $extraParameters
+	 */
+	public function logShare(Operation $operation, string $message, Share $share, array $extraParameters = []): void {
+		$this->log($operation, $message, [
+			'shareId' => $share->getId(),
+			'formId' => $share->getFormId(),
+			'shareType' => $share->getShareType(),
+			'shareWith' => $share->getShareType() === IShare::TYPE_LINK ? null : $share->getShareWith(),
+			'permissions' => $share->getPermissions(),
+		] + $extraParameters);
 	}
 }

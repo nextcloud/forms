@@ -22,6 +22,9 @@ enum Operation: string {
 	case FormStateChanged = 'forms.form_state.changed';
 	case FormSettingsUpdated = 'forms.form_settings.updated';
 	case ResultsFileLinked = 'forms.results_file.linked';
+	case ShareCreated = 'forms.share.created';
+	case ShareUpdated = 'forms.share.updated';
+	case ShareDeleted = 'forms.share.deleted';
 
 	/**
 	 * Short description of when the operation is logged, used for the documentation
@@ -35,6 +38,9 @@ enum Operation: string {
 			self::FormStateChanged => 'A form was closed, archived or reopened',
 			self::FormSettingsUpdated => 'The response settings of a form (anonymity, multiple or editable submissions, expiration, submission limit) were changed',
 			self::ResultsFileLinked => 'The results of a form were linked to a spreadsheet file, which is then kept in sync with the submissions',
+			self::ShareCreated => 'A form was shared with a user, group or team or by public link, with its permissions',
+			self::ShareUpdated => 'The permissions or the custom public link token of a form share were changed',
+			self::ShareDeleted => 'A form share was deleted, by someone managing the form or through the share review',
 		};
 	}
 }
