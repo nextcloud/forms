@@ -30,6 +30,7 @@ enum Operation: string {
 	case SubmissionUpdated = 'forms.submission.updated';
 	case SubmissionDeleted = 'forms.submission.deleted';
 	case SubmissionsDeletedAll = 'forms.submissions.deleted_all';
+	case ConfigUpdated = 'forms.config.updated';
 
 	/**
 	 * Short description of when the operation is logged, used for the documentation
@@ -51,6 +52,7 @@ enum Operation: string {
 			self::SubmissionUpdated => 'The answers of a submission were replaced',
 			self::SubmissionDeleted => 'A submission was deleted',
 			self::SubmissionsDeletedAll => 'All submissions of a form were deleted',
+			self::ConfigUpdated => 'An admin setting of Forms (sharing, form creation, confirmation emails, comments) was changed',
 		};
 	}
 }
