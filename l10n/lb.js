@@ -4,6 +4,7 @@ OC.L10N.register(
     "No" : "Nee",
     "Yes" : "Jo",
     "Copy" : "Kopie",
+    "Shared by %s" : "Gedeelt vu(n) %s",
     "Timestamp" : "Zäitstempel",
     "Submit" : "Iwwermëttelen",
     "Shared with you" : "Mat dir gedeelt",
