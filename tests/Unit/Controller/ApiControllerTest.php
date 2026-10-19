@@ -29,6 +29,8 @@ function is_uploaded_file(string|bool|null $filename) {
 
 namespace OCA\Forms\Tests\Unit\Controller;
 
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
@@ -47,6 +49,7 @@ use OCA\Forms\Service\ConfigService;
 use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
+use OCA\Forms\Tests\Unit\AuditLog\AuditEvents;
 use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
@@ -56,6 +59,7 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\BackgroundJob\IJobList;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IMimeTypeDetector;
@@ -66,6 +70,7 @@ use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\IUserSession;
+use OCP\Log\Audit\CriticalActionPerformedEvent;
 use OCP\Security\ISecureRandom;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -93,6 +98,9 @@ class ApiControllerTest extends TestCase {
 	private IMimeTypeDetector|MockObject $mimeTypeDetector;
 	private IJobList|MockObject $jobList;
 	private ISecureRandom|MockObject $secureRandom;
+	private IEventDispatcher|MockObject $eventDispatcher;
+	/** @var list<object> */
+	private array $dispatchedEvents = [];
 
 	public function setUp(): void {
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
@@ -117,6 +125,12 @@ class ApiControllerTest extends TestCase {
 		$this->jobList = $this->createMock(IJobList::class);
 		$this->secureRandom = $this->createMock(ISecureRandom::class);
 		$this->secureRandom->method('generate')->willReturn('abcdefghijklmnopqrstuvwxyz012345');
+		$this->dispatchedEvents = [];
+		$this->eventDispatcher = $this->createMock(IEventDispatcher::class);
+		$this->eventDispatcher->method('dispatchTyped')
+			->willReturnCallback(function (object $event): void {
+				$this->dispatchedEvents[] = $event;
+			});
 
 		$this->apiController = new ApiController(
 			'forms',
@@ -139,7 +153,26 @@ class ApiControllerTest extends TestCase {
 			$this->mimeTypeDetector,
 			$this->jobList,
 			$this->secureRandom,
+			new AuditLogger($this->eventDispatcher),
 		);
+	}
+
+	private function expectNoAuditLog(): void {
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+	}
+
+	/**
+	 * @param list<array{Operation, string, array<string, mixed>}> $expected operation, message and parameters of each audit log entry, in order
+	 */
+	private function assertAuditLogged(array $expected): void {
+		$events = array_values(array_filter($this->dispatchedEvents, static fn (object $event): bool => $event instanceof CriticalActionPerformedEvent));
+		$this->assertSame(
+			array_map(static fn (array $entry): array => [$entry[1], $entry[2]], $expected),
+			array_map(static fn (CriticalActionPerformedEvent $event): array => [$event->getLogMessage(), $event->getParameters()], $events),
+		);
+		foreach ($events as $i => $event) {
+			$this->assertTrue(AuditEvents::hasOperation($event, $expected[$i][0]->value));
+		}
 	}
 
 	/**
@@ -556,6 +589,9 @@ class ApiControllerTest extends TestCase {
 				return $form;
 			});
 		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm());
+		$this->assertAuditLogged([
+			[Operation::FormCreated, 'Form %s was created by "%s"', ['formId' => 7, 'ownerId' => 'currentUser', 'sourceFormId' => null]],
+		]);
 	}
 
 	public static function dataCloneForm_exceptions() {
@@ -589,6 +625,7 @@ class ApiControllerTest extends TestCase {
 			->method('getFormIfAllowed')
 			->with(7, Constants::PERMISSION_EDIT)
 			->willReturnCallback($callback);
+		$this->expectNoAuditLog();
 		$this->expectException($exception);
 		$this->apiController->newForm(7);
 	}
@@ -667,6 +704,9 @@ class ApiControllerTest extends TestCase {
 			->willReturn([]);
 
 		$this->assertEquals(new DataResponse([], Http::STATUS_CREATED), $this->apiController->newForm(7));
+		$this->assertAuditLogged([
+			[Operation::FormCreated, 'Form %s was created by "%s" as a copy of form %s', ['formId' => 14, 'ownerId' => 'currentUser', 'sourceFormId' => 7]],
+		]);
 	}
 
 	private function formAccess(bool $hasUserAccess = true, bool $hasFormExpired = false, bool $canSubmit = true) {
@@ -1202,6 +1242,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->assertEquals(new DataResponse(1), $this->apiController->updateForm(1, ['confirmationEmailQuestionId' => 7]));
 		$this->assertSame(7, $form->getConfirmationEmailQuestionId());
+		$this->assertAuditLogged([]);
 	}
 
 	public static function dataUpdateFormRejectsForbiddenKeys(): array {
@@ -1231,6 +1272,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->formMapper->expects($this->never())->method('update');
+		$this->expectNoAuditLog();
 
 		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->updateForm(1, $keyValuePairs);
@@ -1403,6 +1445,7 @@ class ApiControllerTest extends TestCase {
 			->with(1, Constants::PERMISSION_EDIT)
 			->willReturn($form);
 
+		$this->expectNoAuditLog();
 		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->updateForm(1, ['ownerId' => 'newOwner']);
 	}
@@ -1428,6 +1471,7 @@ class ApiControllerTest extends TestCase {
 			->with('newOwner')
 			->willReturn(null);
 
+		$this->expectNoAuditLog();
 		$this->expectException(OCSBadRequestException::class);
 		$this->apiController->updateForm(1, ['ownerId' => 'newOwner']);
 	}
@@ -1456,6 +1500,143 @@ class ApiControllerTest extends TestCase {
 
 		$this->assertEquals(new DataResponse('newOwner'), $this->apiController->updateForm(1, ['ownerId' => 'newOwner']));
 		$this->assertEquals('newOwner', $form->getOwnerId());
+		$this->assertAuditLogged([
+			[Operation::FormOwnerTransferred, 'Ownership of form %s was transferred from "%s" to "%s"', ['formId' => 1, 'oldOwnerId' => 'currentUser', 'newOwnerId' => 'newOwner']],
+		]);
+	}
+
+	public function testDeleteForm(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('formOwner');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1)
+			->willReturn($form);
+		$this->formMapper->expects($this->once())
+			->method('deleteForm')
+			->with($form);
+
+		$this->assertEquals(new DataResponse(1), $this->apiController->deleteForm(1));
+		$this->assertAuditLogged([
+			[Operation::FormDeleted, 'Form %s of "%s" was deleted', ['formId' => 1, 'ownerId' => 'formOwner']],
+		]);
+	}
+
+	public function testDeleteFormNotAllowed(): void {
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1)
+			->willThrowException(new NoSuchFormException('This form is not owned by the current user', Http::STATUS_FORBIDDEN));
+		$this->formMapper->expects($this->never())
+			->method('deleteForm');
+		$this->expectNoAuditLog();
+
+		$this->expectException(NoSuchFormException::class);
+		$this->apiController->deleteForm(1);
+	}
+
+	private function createUpdatableForm(): Form {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setAccess(['permitAllUsers' => false, 'showToAllUsers' => false]);
+		$form->setIsAnonymous(false);
+		$form->setSubmitMultiple(false);
+		$form->setAllowEditSubmissions(false);
+		$form->setExpires(0);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		return $form;
+	}
+
+	public function testUpdateFormLogsAccessChange(): void {
+		$this->createUpdatableForm();
+		$this->configService->method('getAllowPermitAll')->willReturn(true);
+
+		$this->apiController->updateForm(1, ['access' => ['permitAllUsers' => true, 'showToAllUsers' => false]]);
+
+		$this->assertAuditLogged([
+			[Operation::FormAccessUpdated, 'Access to form %s was changed', ['formId' => 1, 'permitAllUsers' => true, 'showToAllUsers' => false]],
+		]);
+	}
+
+	public function testUpdateFormDoesNotLogUnchangedAccess(): void {
+		$this->createUpdatableForm();
+
+		$this->apiController->updateForm(1, ['access' => ['permitAllUsers' => false, 'showToAllUsers' => false]]);
+
+		$this->assertAuditLogged([]);
+	}
+
+	public function testUpdateFormNotAllowedAccessChangeIsNotLogged(): void {
+		$this->createUpdatableForm();
+		$this->configService->method('getAllowShowToAll')->willReturn(false);
+		$this->formMapper->expects($this->never())->method('update');
+		$this->expectNoAuditLog();
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->updateForm(1, ['access' => ['permitAllUsers' => true, 'showToAllUsers' => true]]);
+	}
+
+	public function testUpdateFormLogsStateChange(): void {
+		$this->createUpdatableForm();
+		$this->formsService->method('isFormArchived')->willReturn(false);
+
+		$this->apiController->updateForm(1, ['state' => Constants::FORM_STATE_ARCHIVED]);
+
+		$this->assertAuditLogged([
+			[Operation::FormStateChanged, 'State of form %s was changed to %s', ['formId' => 1, 'state' => 'archived', 'previousState' => 'active']],
+		]);
+	}
+
+	public function testUpdateFormLogsOnlyNamesOfChangedResponseSettings(): void {
+		$this->createUpdatableForm();
+
+		$this->apiController->updateForm(1, [
+			'title' => 'New title',
+			'isAnonymous' => true,
+			'expires' => 0,
+			'maxSubmissions' => 5,
+		]);
+
+		$this->assertAuditLogged([
+			[Operation::FormSettingsUpdated, 'Response settings of form %s were changed', ['formId' => 1, 'changedKeys' => ['isAnonymous', 'maxSubmissions']]],
+		]);
+	}
+
+	public function testUpdateFormLogsLinkedResultsFile(): void {
+		$form = $this->createUpdatableForm();
+		$file = $this->createMock(File::class);
+		$file->method('getId')->willReturn(42);
+		$this->submissionService->expects($this->once())
+			->method('writeFileToCloud')
+			->with($form, '/Results', 'csv')
+			->willReturn($file);
+
+		$this->apiController->updateForm(1, ['path' => '/Results', 'fileFormat' => 'csv']);
+
+		$this->assertAuditLogged([
+			[Operation::ResultsFileLinked, 'Results of form %s were linked to file %s', ['formId' => 1, 'fileId' => 42, 'fileFormat' => 'csv']],
+		]);
+	}
+
+	public function testUpdateFormDoesNotLogUnlinkedResultsFile(): void {
+		$form = $this->createUpdatableForm();
+		$form->setFileId(42);
+		$form->setFileFormat('csv');
+
+		$this->apiController->updateForm(1, ['fileId' => null, 'fileFormat' => null]);
+
+		$this->assertNull($form->getFileId());
+		$this->assertAuditLogged([]);
 	}
 
 	public function testGetSubmission_invalidForm() {
