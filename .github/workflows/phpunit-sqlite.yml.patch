@@ -1,8 +1,8 @@
 diff --git a/.github/workflows/phpunit-sqlite.yml b/.github/workflows/phpunit-sqlite.yml
-index 273400a4..9d11374f 100644
+index ccb41495..c969d871 100644
 --- a/.github/workflows/phpunit-sqlite.yml
 +++ b/.github/workflows/phpunit-sqlite.yml
-@@ -95,13 +95,29 @@ jobs:
+@@ -93,13 +93,29 @@ jobs:
            persist-credentials: false
            path: apps/${{ env.APP_NAME }}
  
@@ -23,7 +23,7 @@ index 273400a4..9d11374f 100644
 +          path: apps/analytics
 +
        - name: Set up php ${{ matrix.php-versions }}
-         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
          with:
            php-version: ${{ matrix.php-versions }}
            # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
@@ -38,7 +38,7 @@ index 273400a4..9d11374f 100644
          run: composer run test:unit
  
 +      - name: Upload Unit coverage
-+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
++        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 +        with:
 +          working-directory: apps/${{ env.APP_NAME }}
 +          disable_search: true
@@ -54,7 +54,7 @@ index 273400a4..9d11374f 100644
          run: composer run test:integration
  
 +      - name: Upload Integration coverage
-+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
++        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 +        with:
 +          working-directory: apps/${{ env.APP_NAME }}
 +          disable_search: true
