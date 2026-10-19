@@ -154,6 +154,10 @@ namespace OCA\Forms;
  *   fileName: string,
  *   uploadToken: string,
  * }
+ *
+ * @psalm-type FormsUploadShare = array{
+ *   shareToken: string,
+ * }
  */
 class ResponseDefinitions {
 }
