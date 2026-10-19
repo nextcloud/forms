@@ -25,6 +25,11 @@ enum Operation: string {
 	case ShareCreated = 'forms.share.created';
 	case ShareUpdated = 'forms.share.updated';
 	case ShareDeleted = 'forms.share.deleted';
+	case ResultsDownloaded = 'forms.results.downloaded';
+	case ResultsExported = 'forms.results.exported';
+	case SubmissionUpdated = 'forms.submission.updated';
+	case SubmissionDeleted = 'forms.submission.deleted';
+	case SubmissionsDeletedAll = 'forms.submissions.deleted_all';
 
 	/**
 	 * Short description of when the operation is logged, used for the documentation
@@ -41,6 +46,11 @@ enum Operation: string {
 			self::ShareCreated => 'A form was shared with a user, group or team or by public link, with its permissions',
 			self::ShareUpdated => 'The permissions or the custom public link token of a form share were changed',
 			self::ShareDeleted => 'A form share was deleted, by someone managing the form or through the share review',
+			self::ResultsDownloaded => 'All submissions of a form were downloaded as a CSV, ODS or XLSX file',
+			self::ResultsExported => 'All submissions of a form were exported to a file in the cloud',
+			self::SubmissionUpdated => 'The answers of a submission were replaced',
+			self::SubmissionDeleted => 'A submission was deleted',
+			self::SubmissionsDeletedAll => 'All submissions of a form were deleted',
 		};
 	}
 }

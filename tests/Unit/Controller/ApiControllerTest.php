@@ -458,6 +458,7 @@ class ApiControllerTest extends TestCase {
 			->with($form)
 			->willReturn([Constants::PERMISSION_SUBMIT]);
 
+		$this->expectNoAuditLog();
 		$this->expectException(NoSuchFormException::class);
 		$this->apiController->getSubmissions(1, fileFormat: 'csv');
 	}
@@ -490,6 +491,9 @@ class ApiControllerTest extends TestCase {
 			->willReturn($fileName);
 
 		$this->assertEquals(new DataDownloadResponse($csv, $fileName, 'text/csv'), $this->apiController->getSubmissions(1, fileFormat: 'csv'));
+		$this->assertAuditLogged([
+			[Operation::ResultsDownloaded, 'Results of form %s were downloaded as %s', ['formId' => 1, 'fileFormat' => 'csv']],
+		]);
 	}
 
 	public function testExportSubmissionsToCloud_invalidForm() {
@@ -518,9 +522,43 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->never())
 			->method('writeFileToCloud');
+		$this->expectNoAuditLog();
 
 		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->exportSubmissionsToCloud(1, '/', 'csv');
+	}
+
+	public function testExportSubmissionsToCloud(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_RESULTS)
+			->willReturn($form);
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_SUBMIT, Constants::PERMISSION_RESULTS]);
+
+		$file = $this->createMock(File::class);
+		$file->method('getId')->willReturn(42);
+		$file->method('getName')->willReturn('Form 1 (responses).xlsx');
+		$this->submissionService->expects($this->once())
+			->method('writeFileToCloud')
+			->with($form, '/Exports', 'xlsx')
+			->willReturn($file);
+
+		$this->assertEquals(new DataResponse('Form 1 (responses).xlsx'), $this->apiController->exportSubmissionsToCloud(1, '/Exports', 'xlsx'));
+		$this->assertAuditLogged([
+			[Operation::ResultsExported, 'Results of form %s were exported to file %s', [
+				'formId' => 1,
+				'fileId' => 42,
+				'fileName' => 'Form 1 (responses).xlsx',
+				'fileFormat' => 'xlsx',
+			]],
+		]);
 	}
 
 	public function testCreateNewForm_notAllowed() {
@@ -1030,6 +1068,10 @@ class ApiControllerTest extends TestCase {
 			->with(1, Constants::PERMISSION_RESULTS_DELETE)
 			->willReturn($form);
 
+		$this->submissionMapper->expects($this->never())
+			->method('deleteById');
+		$this->expectNoAuditLog();
+
 		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->deleteSubmission(1, 42);
 	}
@@ -1067,13 +1109,18 @@ class ApiControllerTest extends TestCase {
 			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => 1]);
 
 		$this->assertEquals(new DataResponse(42), $this->apiController->deleteSubmission(1, 42));
+		$this->assertAuditLogged([
+			[Operation::SubmissionDeleted, 'Submission %s of form %s by "%s" was deleted', ['submissionId' => 42, 'formId' => 1, 'submissionUserId' => 'respondent']],
+		]);
 	}
 
 	public static function dataTestDeletePermission() {
 		return [
 			[
 				[
+					'id' => 42,
 					'formId' => 1,
+					'userId' => 'respondent',
 				],
 				[
 					'id' => 1,
@@ -1132,6 +1179,7 @@ class ApiControllerTest extends TestCase {
 		$this->submissionMapper
 			->expects($this->never())
 			->method('deleteByForm');
+		$this->expectNoAuditLog();
 
 		$this->expectException(OCSForbiddenException::class);
 		$this->apiController->deleteAllSubmissions(1);
@@ -1178,6 +1226,9 @@ class ApiControllerTest extends TestCase {
 			->with(SyncSubmissionsWithLinkedFileJob::class, ['form_id' => 1]);
 
 		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
+		$this->assertAuditLogged([
+			[Operation::SubmissionsDeletedAll, 'All submissions of form %s were deleted', ['formId' => 1]],
+		]);
 	}
 
 	/**
@@ -1220,6 +1271,9 @@ class ApiControllerTest extends TestCase {
 			->method('add');
 
 		$this->assertEquals(new DataResponse(1), $this->apiController->deleteAllSubmissions(1));
+		$this->assertAuditLogged([
+			[Operation::SubmissionsDeletedAll, 'All submissions of form %s were deleted', ['formId' => 1]],
+		]);
 	}
 
 	public function testUpdateFormAllowsValidConfirmationEmailQuestionId(): void {
@@ -1889,6 +1943,9 @@ class ApiControllerTest extends TestCase {
 
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);
+		$this->assertAuditLogged([
+			[Operation::SubmissionUpdated, 'Submission %s of form %s by "%s" was updated', ['submissionId' => 42, 'formId' => 1, 'submissionUserId' => 'currentUser']],
+		]);
 	}
 
 	public function testUpdateSubmission_noPermission() {
@@ -1947,6 +2004,7 @@ class ApiControllerTest extends TestCase {
 			->method('validateSubmission')
 			->willThrowException(new \InvalidArgumentException('Invalid answers'));
 
+		$this->expectNoAuditLog();
 		$this->expectException(OCSBadRequestException::class);
 		$this->expectExceptionMessage('Invalid answers');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);

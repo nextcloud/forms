@@ -1264,6 +1264,10 @@ class ApiController extends OCSController {
 
 			$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
 			$fileName = $this->formsService->getFileName($form, $fileFormat);
+			$this->auditLogger->log(Operation::ResultsDownloaded, 'Results of form %s were downloaded as %s', [
+				'formId' => $form->getId(),
+				'fileFormat' => $fileFormat,
+			]);
 
 			return new DataDownloadResponse($submissionsData, $fileName, Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat]);
 		}
@@ -1402,6 +1406,9 @@ class ApiController extends OCSController {
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
 		$this->formMapper->update($form);
+		$this->auditLogger->log(Operation::SubmissionsDeletedAll, 'All submissions of form %s were deleted', [
+			'formId' => $form->getId(),
+		]);
 
 		$this->queueLinkedFileSync($form);
 
@@ -1570,6 +1577,12 @@ class ApiController extends OCSController {
 			$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray);
 		}
 
+		$this->auditLogger->log(Operation::SubmissionUpdated, 'Submission %s of form %s by "%s" was updated', [
+			'submissionId' => $submissionId,
+			'formId' => $form->getId(),
+			'submissionUserId' => $submission->getUserId(),
+		]);
+
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
@@ -1622,6 +1635,11 @@ class ApiController extends OCSController {
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->deleteById($form, $submissionId);
 		$this->formMapper->update($form);
+		$this->auditLogger->log(Operation::SubmissionDeleted, 'Submission %s of form %s by "%s" was deleted', [
+			'submissionId' => $submissionId,
+			'formId' => $form->getId(),
+			'submissionUserId' => $submission->getUserId(),
+		]);
 
 		$this->queueLinkedFileSync($form);
 
@@ -1655,6 +1673,12 @@ class ApiController extends OCSController {
 		}
 
 		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
+		$this->auditLogger->log(Operation::ResultsExported, 'Results of form %s were exported to file %s', [
+			'formId' => $form->getId(),
+			'fileId' => $file->getId(),
+			'fileName' => $file->getName(),
+			'fileFormat' => $fileFormat,
+		]);
 
 		return new DataResponse($file->getName());
 	}
