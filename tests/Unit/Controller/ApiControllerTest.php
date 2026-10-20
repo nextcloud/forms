@@ -1909,6 +1909,11 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([]);
+
+		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
 			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
@@ -2123,6 +2128,11 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS_DELETE]);
+
+		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
 			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
@@ -2290,6 +2300,11 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([]);
+
+		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
 			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
@@ -2352,6 +2367,60 @@ class ApiControllerTest extends TestCase {
 
 		$this->expectException(OCSForbiddenException::class);
 		$this->expectExceptionMessage('You\'re not allowed to edit this submission');
+		$this->apiController->updateSubmission($formId, $submissionId, $answers);
+	}
+
+	public function testUpdateSubmission_otherUsersSubmissionDeniedWhenAllowEditSubmissions() {
+		$formId = 1;
+		$submissionId = 42;
+		$answers = ['q1' => ['answer1']];
+
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$submission = new Submission();
+		$submission->setId($submissionId);
+		$submission->setFormId($formId);
+		$submission->setUserId('anotherUser');
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('canDeleteResults')
+			->with($form)
+			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_SUBMIT]);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with($formId)
+			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
+
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission');
+
+		$this->submissionMapper->expects($this->once())
+			->method('findById')
+			->with($submissionId)
+			->willReturn($submission);
+
+		$this->submissionMapper->expects($this->never())
+			->method('update');
+
+		$this->answerMapper->expects($this->never())
+			->method('deleteBySubmission');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('You can only update your own submission!');
 		$this->apiController->updateSubmission($formId, $submissionId, $answers);
 	}
 
@@ -2464,6 +2533,11 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS_DELETE]);
+
+		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
 			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
@@ -2523,6 +2597,11 @@ class ApiControllerTest extends TestCase {
 			->method('canDeleteResults')
 			->with($form)
 			->willReturn(true);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS_DELETE]);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
