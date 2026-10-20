@@ -1519,7 +1519,6 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException($e->getMessage());
 		}
 
-		// get existing submission of this user
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
 		} catch (DoesNotExistException) {
@@ -1528,6 +1527,13 @@ class ApiController extends OCSController {
 
 		if ($formId !== $submission->getFormId()) {
 			throw new OCSBadRequestException('Submission doesn\'t belong to given form');
+		}
+
+		if (
+			!in_array(Constants::PERMISSION_RESULTS_DELETE, $this->formsService->getPermissions($form))
+			&& $this->currentUser->getUID() !== $submission->getUserId()
+		) {
+			throw new OCSForbiddenException('You can only update your own submission!');
 		}
 
 		$submission->setTimestamp(time());
