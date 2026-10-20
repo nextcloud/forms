@@ -1531,7 +1531,6 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException($e->getMessage());
 		}
 
-		// get existing submission of this user
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
 		} catch (DoesNotExistException) {

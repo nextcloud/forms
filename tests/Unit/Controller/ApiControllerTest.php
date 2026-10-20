@@ -1652,6 +1652,11 @@ class ApiControllerTest extends TestCase {
 			->willReturn($form);
 
 		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([]);
+
+		$this->formsService->expects($this->once())
 			->method('getQuestions')
 			->with($formId)
 			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
@@ -1825,6 +1830,11 @@ class ApiControllerTest extends TestCase {
 			->method('loadFormForSubmission')
 			->with(1)
 			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getPermissions')
+			->with($form)
+			->willReturn([Constants::PERMISSION_RESULTS_DELETE]);
 
 		$this->formsService->expects($this->once())
 			->method('getQuestions')
