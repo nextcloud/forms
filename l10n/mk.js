@@ -10,6 +10,7 @@ OC.L10N.register(
     "Anonymous response" : "Анонимен одговор",
     "Shared by %s" : "Споделена од %s",
     "responses" : "одговори",
+    "User ID" : "Корисничко ID",
     "Read" : "Прочитана",
     "Submit" : "Испрати",
     "📝 Simple surveys and questionnaires, self-hosted" : "📝 Едноставни истражувања и прашалници, самостојно хостирани",
