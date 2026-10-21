@@ -76,6 +76,7 @@ OC.L10N.register(
     "Add multiple options" : "Adaugă opțiuni multiple",
     "Add multiple options (one per line)" : "Adaugă opțiuni multiple (câte una pe linie)",
     "Options" : "Opțiuni",
+    "Go to previous page" : "Mergi la pagina anterioară",
     "QR code representation of {text}" : "Reprezentare în cod QR a {text}",
     "Answer number {index}" : "Răspunsul numărul {index}",
     "Error while saving the answer" : "Eroare la salvarea răspunsului",
