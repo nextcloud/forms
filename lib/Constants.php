@@ -72,6 +72,15 @@ class Constants {
 	public const FORM_STATE_ARCHIVED = 2;
 
 	/**
+	 * Names of the form states, used in the audit log
+	 */
+	public const FORM_STATE_NAMES = [
+		self::FORM_STATE_ACTIVE => 'active',
+		self::FORM_STATE_CLOSED => 'closed',
+		self::FORM_STATE_ARCHIVED => 'archived',
+	];
+
+	/**
 	 * Access flags of a form
 	 */
 	public const FORM_ACCESS_NOPUBLICSHARE = 0;

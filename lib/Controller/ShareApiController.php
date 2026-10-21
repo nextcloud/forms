@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -64,6 +66,7 @@ class ShareApiController extends OCSController {
 		private readonly FilePathHelper $filePathHelper,
 		private readonly IManager $shareManager,
 		private readonly UploadedFilesShareService $uploadedFilesShareService,
+		private readonly AuditLogger $auditLogger,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -194,6 +197,7 @@ class ShareApiController extends OCSController {
 		/** @var Share */
 		$share = $this->shareMapper->insert($share);
 		$this->formMapper->update($form);
+		$this->auditLogger->logShare(Operation::ShareCreated, 'Share %s of form %s was created', $share);
 
 		// Create share-notifications (activity)
 		$this->formsService->notifyNewShares($form, $share);
@@ -270,6 +274,7 @@ class ShareApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid permission given');
 		}
 
+		$previousShareWith = $formShare->getShareWith();
 		if (array_key_exists('token', $keyValuePairs)) {
 			if (!$this->configService->getAllowCustomPublicToken()) {
 				$this->logger->debug('Custom public share tokens are not allowed.');
@@ -341,6 +346,9 @@ class ShareApiController extends OCSController {
 		}
 
 		$this->formMapper->update($form);
+		$this->auditLogger->logShare(Operation::ShareUpdated, 'Share %s of form %s was updated', $formShare, [
+			'tokenChanged' => $formShare->getShareType() === IShare::TYPE_LINK && $formShare->getShareWith() !== $previousShareWith,
+		]);
 
 		return new DataResponse($formShare->getId());
 	}
@@ -393,6 +401,7 @@ class ShareApiController extends OCSController {
 
 		$this->shareMapper->delete($share);
 		$this->formMapper->update($form);
+		$this->auditLogger->logShare(Operation::ShareDeleted, 'Share %s of form %s was deleted', $share);
 
 		return new DataResponse($shareId);
 	}

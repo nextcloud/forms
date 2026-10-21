@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\Constants;
 use OCA\Forms\Service\ConfigService;
 use OCP\AppFramework\ApiController;
@@ -27,6 +29,7 @@ class ConfigController extends ApiController {
 		private readonly IAppConfig $appConfig,
 		private readonly LoggerInterface $logger,
 		IRequest $request,
+		private readonly AuditLogger $auditLogger,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -82,6 +85,12 @@ class ConfigController extends ApiController {
 		} catch (\InvalidArgumentException) {
 			return new DataResponse('Invalid value for ' . $configKey, Http::STATUS_BAD_REQUEST);
 		}
+
+		// All settings are booleans, integers or group IDs
+		$this->auditLogger->log(Operation::ConfigUpdated, 'Forms setting %s was changed', [
+			'configKey' => $configKey,
+			'configValue' => $configValue,
+		]);
 
 		return new DataResponse();
 	}

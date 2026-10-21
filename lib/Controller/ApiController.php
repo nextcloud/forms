@@ -7,6 +7,8 @@
 
 namespace OCA\Forms\Controller;
 
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\BackgroundJob\DeleteQuestionFoldersJob;
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
@@ -92,6 +94,7 @@ class ApiController extends OCSController {
 		private readonly IMimeTypeDetector $mimeTypeDetector,
 		private readonly IJobList $jobList,
 		private readonly ISecureRandom $secureRandom,
+		private readonly AuditLogger $auditLogger,
 	) {
 		parent::__construct($appName, $request);
 		$this->currentUser = $userSession->getUser();
@@ -178,6 +181,11 @@ class ApiController extends OCSController {
 			$form->setIsAnonymous(false);
 
 			$this->formMapper->insert($form);
+			$this->auditLogger->log(Operation::FormCreated, 'Form %s was created by "%s"', [
+				'formId' => $form->getId(),
+				'ownerId' => $form->getOwnerId(),
+				'sourceFormId' => null,
+			]);
 		} else {
 			$oldForm = $this->formsService->getFormIfAllowed($fromId, Constants::PERMISSION_EDIT);
 
@@ -238,6 +246,11 @@ class ApiController extends OCSController {
 			}
 
 			$this->formMapper->update($form);
+			$this->auditLogger->log(Operation::FormCreated, 'Form %s was created by "%s" as a copy of form %s', [
+				'formId' => $form->getId(),
+				'ownerId' => $form->getOwnerId(),
+				'sourceFormId' => $oldForm->getId(),
+			]);
 		}
 
 		return new DataResponse($this->formsService->getForm($form), Http::STATUS_CREATED);
@@ -323,11 +336,17 @@ class ApiController extends OCSController {
 		// Do not allow changing showToAllUsers or permitAllUsers if disabled
 		$this->checkAccessUpdate($keyValuePairs);
 
+		$previousAccess = $form->getAccess();
+		$previousState = $form->getState();
+		$previousSettings = $this->getResponseSettings($form);
+
 		// Process file linking
+		$fileLinked = false;
 		if (isset($keyValuePairs['path']) && isset($keyValuePairs['fileFormat'])) {
 			$file = $this->submissionService->writeFileToCloud($form, $keyValuePairs['path'], $keyValuePairs['fileFormat']);
 			$form->setFileId($file->getId());
 			$form->setFileFormat($keyValuePairs['fileFormat']);
+			$fileLinked = true;
 		}
 
 		// Process file unlinking
@@ -365,6 +384,8 @@ class ApiController extends OCSController {
 		// Update changed Columns in Db.
 		$this->formMapper->update($form);
 
+		$this->logFormUpdate($form, $previousAccess, $previousState, $previousSettings, $fileLinked);
+
 		return new DataResponse($form->getId());
 	}
 
@@ -389,6 +410,10 @@ class ApiController extends OCSController {
 
 		$form = $this->formsService->getFormIfAllowed($formId);
 		$this->formMapper->deleteForm($form);
+		$this->auditLogger->log(Operation::FormDeleted, 'Form %s of "%s" was deleted', [
+			'formId' => $form->getId(),
+			'ownerId' => $form->getOwnerId(),
+		]);
 
 		return new DataResponse($formId);
 	}
@@ -1239,6 +1264,10 @@ class ApiController extends OCSController {
 
 			$submissionsData = $this->submissionService->getSubmissionsData($form, $fileFormat);
 			$fileName = $this->formsService->getFileName($form, $fileFormat);
+			$this->auditLogger->log(Operation::ResultsDownloaded, 'Results of form %s were downloaded as %s', [
+				'formId' => $form->getId(),
+				'fileFormat' => $fileFormat,
+			]);
 
 			return new DataDownloadResponse($submissionsData, $fileName, Constants::SUPPORTED_EXPORT_FORMATS[$fileFormat]);
 		}
@@ -1377,6 +1406,9 @@ class ApiController extends OCSController {
 		// Delete all submissions (incl. Answers)
 		$this->submissionMapper->deleteByForm($formId);
 		$this->formMapper->update($form);
+		$this->auditLogger->log(Operation::SubmissionsDeletedAll, 'All submissions of form %s were deleted', [
+			'formId' => $form->getId(),
+		]);
 
 		$this->queueLinkedFileSync($form);
 
@@ -1545,6 +1577,12 @@ class ApiController extends OCSController {
 			$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray);
 		}
 
+		$this->auditLogger->log(Operation::SubmissionUpdated, 'Submission %s of form %s by "%s" was updated', [
+			'submissionId' => $submissionId,
+			'formId' => $form->getId(),
+			'submissionUserId' => $submission->getUserId(),
+		]);
+
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
@@ -1597,6 +1635,11 @@ class ApiController extends OCSController {
 		// Delete submission (incl. Answers)
 		$this->submissionMapper->deleteById($form, $submissionId);
 		$this->formMapper->update($form);
+		$this->auditLogger->log(Operation::SubmissionDeleted, 'Submission %s of form %s by "%s" was deleted', [
+			'submissionId' => $submissionId,
+			'formId' => $form->getId(),
+			'submissionUserId' => $submission->getUserId(),
+		]);
 
 		$this->queueLinkedFileSync($form);
 
@@ -1630,6 +1673,12 @@ class ApiController extends OCSController {
 		}
 
 		$file = $this->submissionService->writeFileToCloud($form, $path, $fileFormat);
+		$this->auditLogger->log(Operation::ResultsExported, 'Results of form %s were exported to file %s', [
+			'formId' => $form->getId(),
+			'fileId' => $file->getId(),
+			'fileName' => $file->getName(),
+			'fileFormat' => $fileFormat,
+		]);
 
 		return new DataResponse($file->getName());
 	}
@@ -2019,11 +2068,77 @@ class ApiController extends OCSController {
 			$this->logger->debug('Could not find new form owner');
 			throw new OCSBadRequestException('Could not find new form owner');
 		}
+		$previousOwnerId = $form->getOwnerId();
 		$form->setOwnerId($keyValuePairs['ownerId']);
 		$form->setLockedBy(null);
 		$form->setLockedUntil(null);
 		$this->formMapper->update($form);
+		$this->auditLogger->log(Operation::FormOwnerTransferred, 'Ownership of form %s was transferred from "%s" to "%s"', [
+			'formId' => $form->getId(),
+			'oldOwnerId' => $previousOwnerId,
+			'newOwnerId' => $form->getOwnerId(),
+		]);
 		return new DataResponse($form->getOwnerId());
+	}
+
+	/**
+	 * Settings that decide how responses are collected and handled
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function getResponseSettings(Form $form): array {
+		return [
+			'isAnonymous' => $form->getIsAnonymous(),
+			'submitMultiple' => $form->getSubmitMultiple(),
+			'allowEditSubmissions' => $form->getAllowEditSubmissions(),
+			'expires' => $form->getExpires(),
+			'maxSubmissions' => $form->getMaxSubmissions(),
+		];
+	}
+
+	/**
+	 * Only the names of changed settings are logged, never texts like the title,
+	 * description or confirmation email
+	 *
+	 * @param array<string, mixed> $previousSettings
+	 */
+	private function logFormUpdate(Form $form, array $previousAccess, ?int $previousState, array $previousSettings, bool $fileLinked): void {
+		$access = $form->getAccess();
+		if ($access !== $previousAccess) {
+			$this->auditLogger->log(Operation::FormAccessUpdated, 'Access to form %s was changed', [
+				'formId' => $form->getId(),
+				'permitAllUsers' => $access['permitAllUsers'],
+				'showToAllUsers' => $access['showToAllUsers'],
+			]);
+		}
+
+		if ($form->getState() !== $previousState) {
+			$this->auditLogger->log(Operation::FormStateChanged, 'State of form %s was changed to %s', [
+				'formId' => $form->getId(),
+				'state' => Constants::FORM_STATE_NAMES[$form->getState()] ?? $form->getState(),
+				'previousState' => Constants::FORM_STATE_NAMES[$previousState] ?? $previousState,
+			]);
+		}
+
+		$changedKeys = array_keys(array_filter(
+			$this->getResponseSettings($form),
+			static fn (mixed $value, string $key): bool => $value !== $previousSettings[$key],
+			ARRAY_FILTER_USE_BOTH,
+		));
+		if ($changedKeys !== []) {
+			$this->auditLogger->log(Operation::FormSettingsUpdated, 'Response settings of form %s were changed', [
+				'formId' => $form->getId(),
+				'changedKeys' => $changedKeys,
+			]);
+		}
+
+		if ($fileLinked) {
+			$this->auditLogger->log(Operation::ResultsFileLinked, 'Results of form %s were linked to file %s', [
+				'formId' => $form->getId(),
+				'fileId' => $form->getFileId(),
+				'fileFormat' => $form->getFileFormat(),
+			]);
+		}
 	}
 
 	/**

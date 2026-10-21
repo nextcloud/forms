@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Forms\ShareReview;
 
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\ShareMapper;
@@ -43,6 +45,7 @@ class ShareReviewSource implements IShareReviewSource {
 		private readonly IEventDispatcher $eventDispatcher,
 		private readonly LoggerInterface $logger,
 		private readonly IL10N $l10n,
+		private readonly AuditLogger $auditLogger,
 	) {
 	}
 
@@ -96,11 +99,13 @@ class ShareReviewSource implements IShareReviewSource {
 			$this->shareMapper->delete($share);
 			// Bump the form's last_updated timestamp, matching the regular deletion flow
 			$this->formMapper->update($form);
-			return true;
 		} catch (\Exception $e) {
 			$this->logger->error('Forms ShareReview: failed to delete share {id}: {message}', ['id' => $shareId, 'message' => $e->getMessage()]);
 			return false;
 		}
+
+		$this->auditLogger->logShare(Operation::ShareDeleted, 'Share %s of form %s was deleted through the share review', $share);
+		return true;
 	}
 
 	/** @param array<string, mixed> $share */

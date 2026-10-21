@@ -9,16 +9,20 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Tests\Unit\ShareReview;
 
+use OCA\Forms\AuditLog\AuditLogger;
+use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\UploadedFilesShareService;
 use OCA\Forms\ShareReview\ShareReviewSource;
+use OCA\Forms\Tests\Unit\AuditLog\AuditEvents;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
+use OCP\Log\Audit\CriticalActionPerformedEvent;
 use OCP\Share\IShare;
 use OCP\Share\ShareReview\Events\ShareReviewAccessCheckEvent;
 use OCP\Share\ShareReview\ShareReviewEntry;
@@ -34,6 +38,7 @@ final class ShareReviewSourceTest extends TestCase {
 	private IEventDispatcher|MockObject $eventDispatcher;
 	private LoggerInterface|MockObject $logger;
 	private IL10N|MockObject $l10n;
+	private IEventDispatcher|MockObject $auditEventDispatcher;
 	private ShareReviewSource $source;
 
 	protected function setUp(): void {
@@ -43,6 +48,7 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->eventDispatcher = $this->createMock(IEventDispatcher::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->l10n = $this->createMock(IL10N::class);
+		$this->auditEventDispatcher = $this->createMock(IEventDispatcher::class);
 		$this->l10n->method('t')->willReturnCallback(
 			fn (string $text, array $params = []): string => empty($params) ? $text : vsprintf($text, $params)
 		);
@@ -53,6 +59,7 @@ final class ShareReviewSourceTest extends TestCase {
 			$this->eventDispatcher,
 			$this->logger,
 			$this->l10n,
+			new AuditLogger($this->auditEventDispatcher),
 		);
 	}
 
@@ -339,6 +346,7 @@ final class ShareReviewSourceTest extends TestCase {
 				$event->denyAccess('not in group');
 			});
 		$this->shareMapper->expects($this->never())->method('delete');
+		$this->auditEventDispatcher->expects($this->never())->method('dispatchTyped');
 
 		$this->assertFalse($this->source->deleteShare('7'));
 	}
@@ -369,6 +377,20 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->formMapper->expects($this->once())->method('update')->with($form);
 		// No results permission — the uploaded-files share must not be touched
 		$this->uploadedFilesShareService->expects($this->never())->method('removeForCollaborator');
+		$this->auditEventDispatcher->expects($this->once())
+			->method('dispatchTyped')
+			->with($this->callback(function (CriticalActionPerformedEvent $event): bool {
+				$this->assertTrue(AuditEvents::hasOperation($event, Operation::ShareDeleted->value));
+				$this->assertSame('Share %s of form %s was deleted through the share review', $event->getLogMessage());
+				$this->assertSame([
+					'shareId' => 7,
+					'formId' => 10,
+					'shareType' => IShare::TYPE_USER,
+					'shareWith' => 'bob',
+					'permissions' => ['submit'],
+				], $event->getParameters());
+				return true;
+			}));
 
 		$this->assertTrue($this->source->deleteShare('7'));
 	}
@@ -401,6 +423,7 @@ final class ShareReviewSourceTest extends TestCase {
 		$this->formMapper->method('findById')->willReturn($form);
 		$this->shareMapper->method('delete')->willThrowException($this->createMock(Exception::class));
 		$this->logger->expects($this->once())->method('error');
+		$this->auditEventDispatcher->expects($this->never())->method('dispatchTyped');
 
 		$this->assertFalse($this->source->deleteShare('7'));
 	}
