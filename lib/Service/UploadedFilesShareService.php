@@ -14,15 +14,12 @@ use OCA\Forms\Db\Form;
 use OCA\Forms\Db\Share;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Helper\FilePathHelper;
-use OCP\Files\IRootFolder;
-use OCP\Files\NotFoundException;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
 use Psr\Log\LoggerInterface;
 
 class UploadedFilesShareService {
 	public function __construct(
-		private readonly IRootFolder $rootFolder,
 		private readonly FilePathHelper $filePathHelper,
 		private readonly IManager $shareManager,
 		private readonly ShareMapper $shareMapper,
@@ -51,18 +48,13 @@ class UploadedFilesShareService {
 		}
 
 		try {
-			$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-			$uploadedFilesFolderPath = $this->filePathHelper->getFormUploadedFilesFolderPath($form);
-			try {
-				$folder = $userFolder->get($uploadedFilesFolderPath);
-			} catch (NotFoundException) {
-				return;
-			}
-
-			$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);
-			foreach ($folderShares as $folderShare) {
-				if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
-					$this->shareManager->deleteShare($folderShare);
+			$folders = $this->filePathHelper->getAllFormFoldersById($form->getId(), $form->getOwnerId());
+			foreach ($folders as $folder) {
+				$folderShares = $this->shareManager->getSharesBy($form->getOwnerId(), $formShare->getShareType(), $folder, false, -1);
+				foreach ($folderShares as $folderShare) {
+					if ($folderShare->getSharedWith() === $formShare->getShareWith()) {
+						$this->shareManager->deleteShare($folderShare);
+					}
 				}
 			}
 		} catch (\Throwable $e) {

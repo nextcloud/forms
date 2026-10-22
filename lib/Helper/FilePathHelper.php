@@ -76,6 +76,56 @@ class FilePathHelper {
 	}
 
 	/**
+	 * Rename the upload folder to the form's current title.
+	 * If that name already contains files, move the other folder's contents into it and delete the other folder.
+	 */
+	public function syncFormUploadFolderName(Form $form): void {
+		$formsFolder = $this->getFormsFolder($form->getOwnerId());
+		if ($formsFolder === null) {
+			return;
+		}
+
+		$newName = $this->normalizeFileName($form->getId() . ' - ' . $form->getTitle());
+		$folders = $this->getAllFormFoldersById($form->getId(), $form->getOwnerId());
+		if ($folders === []) {
+			return;
+		}
+
+		$source = $folders[0];
+		foreach ($folders as $candidate) {
+			if ($candidate->getDirectoryListing() !== []) {
+				$source = $candidate;
+				break;
+			}
+		}
+
+		if ($source->getName() !== $newName) {
+			if ($formsFolder->nodeExists($newName)) {
+				$existing = $formsFolder->get($newName);
+				if ($existing instanceof Folder && $existing->getId() !== $source->getId()) {
+					if ($existing->getDirectoryListing() === []) {
+						$existing->delete();
+					} else {
+						foreach ($source->getDirectoryListing() as $node) {
+							$node->move($existing->getPath() . '/' . $node->getName());
+						}
+						$source->delete();
+					}
+				}
+			}
+			if (!$formsFolder->nodeExists($newName)) {
+				$source->move($formsFolder->getPath() . '/' . $newName);
+			}
+		}
+
+		foreach ($this->getAllFormFoldersById($form->getId(), $form->getOwnerId()) as $leftover) {
+			if ($leftover->getName() !== $newName && $leftover->getDirectoryListing() === []) {
+				$leftover->delete();
+			}
+		}
+	}
+
+	/**
 	 * Get the forms folder for a user
 	 */
 	public function getFormsFolder(string $ownerId): ?Folder {
