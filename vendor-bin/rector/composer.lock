@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a161b87444bbfb4eb08901e001a473bb",
+    "content-hash": "f203ff35b40bfe823b787b6d0d77c7dc",
     "packages": [],
     "packages-dev": [
         {
             "name": "nextcloud/ocp",
-            "version": "v34.0.2",
+            "version": "v34.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "81cbb2c594afe0fa978885bf7accd0440199520a"
+                "reference": "4cca4dc853442cc7cd15d86cd1a78caf7661654f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/81cbb2c594afe0fa978885bf7accd0440199520a",
-                "reference": "81cbb2c594afe0fa978885bf7accd0440199520a",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/4cca4dc853442cc7cd15d86cd1a78caf7661654f",
+                "reference": "4cca4dc853442cc7cd15d86cd1a78caf7661654f",
                 "shasum": ""
             },
             "require": {
@@ -52,9 +52,9 @@
             "description": "Composer package containing Nextcloud's public OCP API and the unstable NCU API",
             "support": {
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
-                "source": "https://github.com/nextcloud-deps/ocp/tree/v34.0.2"
+                "source": "https://github.com/nextcloud-deps/ocp/tree/v34.0.5"
             },
-            "time": "2026-07-16T01:28:13+00:00"
+            "time": "2026-10-06T03:44:04+00:00"
         },
         {
             "name": "nextcloud/rector",
@@ -614,5 +614,8 @@
     "prefer-lowest": false,
     "platform": {},
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "8.2"
+    },
     "plugin-api-version": "2.9.0"
 }
