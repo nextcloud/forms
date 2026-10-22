@@ -5,6 +5,23 @@
 
 # Changelog
 
+## v5.4.1 - 2026-10-22
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0...v5.4.1)
+
+### Fixed
+
+- [stable5.4] Fix/shared file access by @backportbot[bot] in [\#3790](https://github.com/nextcloud/forms/pull/3790)
+- [stable5.4] fix: respondent check by @backportbot[bot] in [\#3786](https://github.com/nextcloud/forms/pull/3786)
+- [stable5.4] fix: remove submissionId from initial state by @backportbot[bot] in [\#3755](https://github.com/nextcloud/forms/pull/3755)
+- [stable5.4] fix(grid): Fix edit of grid answers by @backportbot[bot] in [\#3754](https://github.com/nextcloud/forms/pull/3754)
+- [stable5.4] fix: silence warning for answers to deleted questions by @backportbot[bot] in [\#3728](https://github.com/nextcloud/forms/pull/3728)
+- [stable5.4] fix(export): sync linked file on submission update and delete by @backportbot[bot] in [\#3711](https://github.com/nextcloud/forms/pull/3711)
+
+### Merged
+
+- [stable5.4] Perf: Replace N+1 queries with optimized `WHERE IN` by @backportbot[bot] in [\#3731](https://github.com/nextcloud/forms/pull/3731)
+
 ## v5.4.0 - 2026-09-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.6...v5.4.0)
