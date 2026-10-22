@@ -5,6 +5,23 @@
 
 # Changelog
 
+## v5.4.1 - 2026-10-23
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0...v5.4.1)
+
+### Fixed
+
+- fix: shared file access by @samin-z in [\#3789](https://github.com/nextcloud/forms/pull/3789)
+- fix: respondent check by @samin-z in [\#3785](https://github.com/nextcloud/forms/pull/3785)
+- fix: remove submissionId from initial state by @Chartman123 in [\#3751](https://github.com/nextcloud/forms/pull/3751)
+- fix(grid): Fix edit of grid answers by @Koc in [\#3730](https://github.com/nextcloud/forms/pull/3730)
+- fix: silence warning for answers to deleted questions by @Chartman123 in [\#3727](https://github.com/nextcloud/forms/pull/3727)
+- fix(export): sync linked file on submission update and delete by @Koc in [\#3708](https://github.com/nextcloud/forms/pull/3708)
+
+### Merged
+
+- Perf: Replace N+1 queries with optimized `WHERE IN` by @Koc in [\#3712](https://github.com/nextcloud/forms/pull/3712)
+
 ## v5.4.0 - 2026-09-15
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.3.6...v5.4.0)
