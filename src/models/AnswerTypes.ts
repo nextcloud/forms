@@ -12,11 +12,13 @@ import IconCalendar from '@material-symbols/svg-400/outlined/calendar_today.svg?
 import IconCheckboxOutline from '@material-symbols/svg-400/outlined/check_box.svg?raw'
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import IconGrid from '@material-symbols/svg-400/outlined/grid_view.svg?raw'
+import IconImage from '@material-symbols/svg-400/outlined/image.svg?raw'
 import IconLinearScale from '@material-symbols/svg-400/outlined/linear_scale.svg?raw'
 import IconPalette from '@material-symbols/svg-400/outlined/palette.svg?raw'
 import IconRadioboxMarked from '@material-symbols/svg-400/outlined/radio_button_checked.svg?raw'
 import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
+import IconVideo from '@material-symbols/svg-400/outlined/smart_display.svg?raw'
 import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
 import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
 import { t } from '@nextcloud/l10n'
@@ -28,6 +30,7 @@ import QuestionFile from '../components/Questions/QuestionFile.vue'
 import QuestionGrid from '../components/Questions/QuestionGrid.vue'
 import QuestionLinearScale from '../components/Questions/QuestionLinearScale.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
+import QuestionMedia from '../components/Questions/QuestionMedia.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionRanking from '../components/Questions/QuestionRanking.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
@@ -55,6 +58,8 @@ export interface AnswerTypeConfig {
 	warningInvalid: string
 	unique?: boolean
 	subtypes?: Record<string, AnswerTypeSubtype>
+	/** Which media a display-only block shows. */
+	mediaKind?: 'image' | 'video'
 	pickerType?: string
 	storageFormat?: string
 	momentFormat?: string
@@ -265,6 +270,28 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 
 		titlePlaceholder: t('forms', 'Linear scale question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	image: {
+		component: markRaw(QuestionMedia),
+		icon: IconImage,
+		label: t('forms', 'Image'),
+		predefined: false,
+		mediaKind: 'image',
+
+		titlePlaceholder: t('forms', 'Image caption'),
+		warningInvalid: t('forms', 'This block needs a caption!'),
+	},
+
+	video: {
+		component: markRaw(QuestionMedia),
+		icon: IconVideo,
+		label: t('forms', 'Video'),
+		predefined: false,
+		mediaKind: 'video',
+
+		titlePlaceholder: t('forms', 'Video caption'),
+		warningInvalid: t('forms', 'This block needs a caption!'),
 	},
 
 	color: {
