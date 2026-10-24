@@ -47,7 +47,7 @@
     "@nextcloud/vue": "^9.13.1",
     "debounce": "^3.0.0",
     "markdown-it": "^15.0.2",
-    "p-queue": "^9.3.5",
+    "p-queue": "^10.0.0",
     "qrcode": "^1.5.4",
     "vue": "^3.5.43",
     "vue-draggable-plus": "^0.6.1",
