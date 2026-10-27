@@ -14,6 +14,7 @@ OC.L10N.register(
     "Options" : "Variantlar",
     "Delete" : "O'chirish",
     "Checkbox" : "Belgilash katagi",
+    "Number" : "Raqam",
     "Text" : "Matn",
     "Columns" : "Ustunlar",
     "Rows" : "Qatorlar",
