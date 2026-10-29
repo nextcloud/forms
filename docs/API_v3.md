@@ -88,6 +88,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
     "hash": "yWeMwcwCwoqRs8T2",
     "title": "Form 2",
     "expires": 0,
+    "opens": 0,
     "permissions": [
       "edit",
       "results",
@@ -103,6 +104,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
     "hash": "em4djk8B9BpXnkYG",
     "title": "Form 1",
     "expires": 0,
+    "opens": 0,
     "permissions": [
       "edit",
       "results",
@@ -166,6 +168,7 @@ Returns the full-depth object of the requested form (without submissions).
     "showToAllUsers": false
   },
   "expires": 0,
+  "opens": 0,
   "fileFormat": "csv",
   "fileId": 157,
   "filePath": "foo/bar",
@@ -281,6 +284,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
     - To transfer the ownership of a form to another user, you must only send a single _keyValuePair_ containing the key `ownerId` and the user id of the new owner.
     - To link a file for submissions, the _keyValuePairs_ need to contain the keys `path` and `fileFormat`
     - To unlink a file for submissions, the _keyValuePairs_ need to contain the keys `fileId` and `fileFormat` need to contain the value `null`
+    - If both `opens` and `expires` are set (not `0`), `opens` must be before `expires`
 - Response: **Status-Code OK**, as well as the id of the updated form.
 
 ```

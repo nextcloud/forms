@@ -275,6 +275,7 @@ class Constants {
 	 */
 	public const EMPTY_EXPIRED = 'expired';
 	public const EMPTY_NOTFOUND = 'notfound';
+	public const EMPTY_NOTYETOPEN = 'notyetopen';
 
 	/**
 	 * Constants related to extra settings for questions
