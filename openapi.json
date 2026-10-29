@@ -103,6 +103,7 @@
                     "created",
                     "access",
                     "expires",
+                    "opens",
                     "fileFormat",
                     "fileId",
                     "isAnonymous",
@@ -151,6 +152,10 @@
                         "$ref": "#/components/schemas/Access"
                     },
                     "expires": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "opens": {
                         "type": "integer",
                         "format": "int64"
                     },
@@ -345,6 +350,7 @@
                     "hash",
                     "title",
                     "expires",
+                    "opens",
                     "permissions",
                     "partial",
                     "state",
@@ -364,6 +370,10 @@
                         "type": "string"
                     },
                     "expires": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "opens": {
                         "type": "integer",
                         "format": "int64"
                     },

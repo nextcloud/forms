@@ -203,6 +203,11 @@ class PageController extends Controller {
 			return $this->provideEmptyContent(Constants::EMPTY_EXPIRED, $form);
 		}
 
+		if (!$this->formsService->hasFormOpened($form)) {
+			$this->initialState->provideInitialState('opens', $form->getOpens());
+			return $this->provideEmptyContent(Constants::EMPTY_NOTYETOPEN, $form);
+		}
+
 		$this->insertHeaderOnIos();
 
 		// Inject style on all templates

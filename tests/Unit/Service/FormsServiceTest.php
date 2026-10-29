@@ -48,6 +48,7 @@ use OCA\Forms\Service\ConfirmationEmailService;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Tests\Unit\UserFolderMockTrait;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\OCS\OCSForbiddenException;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IFilenameValidator;
 use OCP\Files\IRootFolder;
@@ -198,6 +199,7 @@ class FormsServiceTest extends TestCase {
 					'showToAllUsers' => false,
 				],
 				'expires' => 0,
+				'opens' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
 				'showExpiration' => false,
@@ -291,6 +293,7 @@ class FormsServiceTest extends TestCase {
 			'showToAllUsers' => false,
 		]);
 		$form->setExpires(0);
+		$form->setOpens(0);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
 		$form->setShowExpiration(false);
@@ -376,6 +379,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
+				'opens' => 0,
 				'lastUpdated' => 123456789,
 				'permissions' => Constants::PERMISSION_ALL,
 				'submissionCount' => 123,
@@ -398,6 +402,7 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 		$form->setOwnerId('currentUser');
 		$form->setExpires(0);
+		$form->setOpens(0);
 		$form->setLastUpdated(123456789);
 
 		$this->submissionMapper->expects($this->once())
@@ -416,6 +421,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
+				'opens' => 0,
 				'lastUpdated' => 123456789,
 				'permissions' => ['results', 'submit'],
 				'submissionCount' => 123,
@@ -440,6 +446,7 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 		$form->setOwnerId('otherUser');
 		$form->setExpires(0);
+		$form->setOpens(0);
 		$form->setLastUpdated(123456789);
 
 		$share = new Share();
@@ -472,6 +479,7 @@ class FormsServiceTest extends TestCase {
 			'hash' => 'abcdefg',
 			'title' => 'Form 1',
 			'expires' => 0,
+			'opens' => 0,
 			'lastUpdated' => 123456789,
 			'permissions' => ['submit', 'results'],
 			'submissionCount' => 2,
@@ -488,6 +496,7 @@ class FormsServiceTest extends TestCase {
 		$form->setTitle('Form 1');
 		$form->setOwnerId('otherUser');
 		$form->setExpires(0);
+		$form->setOpens(0);
 		$form->setLastUpdated(123456789);
 
 		$share = new Share();
@@ -528,6 +537,7 @@ class FormsServiceTest extends TestCase {
 		$ownedForm->setTitle('Form 1');
 		$ownedForm->setOwnerId('currentUser');
 		$ownedForm->setExpires(0);
+		$ownedForm->setOpens(0);
 		$ownedForm->setLastUpdated(123456789);
 
 		$sharedForm = new Form();
@@ -537,6 +547,7 @@ class FormsServiceTest extends TestCase {
 		$sharedForm->setTitle('Form 2');
 		$sharedForm->setOwnerId('otherUser');
 		$sharedForm->setExpires(0);
+		$sharedForm->setOpens(0);
 		$sharedForm->setLastUpdated(123456789);
 
 		$share = new Share();
@@ -568,6 +579,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'abcdefg',
 				'title' => 'Form 1',
 				'expires' => 0,
+				'opens' => 0,
 				'lastUpdated' => 123456789,
 				'permissions' => Constants::PERMISSION_ALL,
 				'partial' => true,
@@ -581,6 +593,7 @@ class FormsServiceTest extends TestCase {
 				'hash' => 'hijklmn',
 				'title' => 'Form 2',
 				'expires' => 0,
+				'opens' => 0,
 				'lastUpdated' => 123456789,
 				'permissions' => ['submit'],
 				'partial' => true,
@@ -604,6 +617,7 @@ class FormsServiceTest extends TestCase {
 				'description' => 'Description Text',
 				'created' => 123456789,
 				'expires' => 0,
+				'opens' => 0,
 				'lastUpdated' => 123456789,
 				'isAnonymous' => false,
 				'submitMultiple' => true,
@@ -644,6 +658,7 @@ class FormsServiceTest extends TestCase {
 			'showToAllUsers' => false,
 		]);
 		$form->setExpires(0);
+		$form->setOpens(0);
 		$form->setLastUpdated(123456789);
 		$form->setIsAnonymous(false);
 		$form->setSubmitMultiple(true);
@@ -1242,6 +1257,52 @@ class FormsServiceTest extends TestCase {
 		$form->setExpires($expires);
 
 		$this->assertEquals($expected, $this->formsService->hasFormExpired($form));
+	}
+
+	public static function dataHasFormOpened() {
+		return [
+			'hasOpened' => [time() - 3600, true],
+			'hasNotOpened' => [time() + 3600, false],
+			'noOpeningDate' => [0, true],
+		];
+	}
+
+	#[DataProvider('dataHasFormOpened')]
+	public function testHasFormOpened(int $opens, bool $expected) {
+		$form = new Form();
+		$form->setOpens($opens);
+
+		$this->assertEquals($expected, $this->formsService->hasFormOpened($form));
+	}
+
+	public static function dataLoadFormForSubmission() {
+		return [
+			'hasOpened' => [time() - 3600, true],
+			'hasNotOpened' => [time() + 3600, false],
+			'noOpeningDate' => [0, true],
+		];
+	}
+
+	#[DataProvider('dataLoadFormForSubmission')]
+	public function testLoadFormForSubmissionOpeningDate(int $opens, bool $canSubmit) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('currentUser');
+		$form->setState(Constants::FORM_STATE_ACTIVE);
+		$form->setExpires(0);
+		$form->setOpens($opens);
+
+		$this->formMapper->expects($this->once())
+			->method('findById')
+			->with(42)
+			->willReturn($form);
+
+		if (!$canSubmit) {
+			$this->expectException(OCSForbiddenException::class);
+			$this->expectExceptionMessage('This form is not yet taking answers');
+		}
+
+		$this->assertSame($form, $this->formsService->loadFormForSubmission(42, ''));
 	}
 
 	public static function dataGetShareDisplayName() {

@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace OCA\Forms\Tests\Unit\Controller;
 
+use OCA\Forms\Constants;
 use OCA\Forms\Controller\PageController;
+use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
 use OCA\Forms\Db\ShareMapper;
 use OCA\Forms\Service\ConfigService;
@@ -83,5 +85,49 @@ class PageControllerTest extends TestCase {
 			->method('setContentSecurityPolicy')
 			->with(self::callback(fn (ContentSecurityPolicy $csp): bool => preg_match('/frame-ancestors[^;]* \*[ ;]/', $csp->buildPolicy()) !== false));
 		TestCase::invokePrivate($this->pageController, 'setEmbeddedCSP', [$response]);
+	}
+
+	public function testPublicSubmitViewOfNotYetOpenedForm() {
+		$form = new Form();
+		$form->setOpens(1700000000);
+		$this->formsService->method('hasFormExpired')->willReturn(false);
+		$this->formsService->method('hasFormOpened')->with($form)->willReturn(false);
+		$this->formsService->expects($this->never())->method('getPublicForm');
+		$this->userSession->method('isLoggedIn')->willReturn(true);
+
+		$initialStates = [];
+		$this->initialState->method('provideInitialState')
+			->willReturnCallback(function (string $key, $value) use (&$initialStates) {
+				$initialStates[$key] = $value;
+			});
+
+		TestCase::invokePrivate($this->pageController, 'createPublicSubmitView', [$form, 'hash']);
+
+		$this->assertSame([
+			'opens' => 1700000000,
+			'renderAs' => Constants::EMPTY_NOTYETOPEN,
+		], $initialStates);
+	}
+
+	public function testPublicSubmitViewOfOpenedForm() {
+		$form = new Form();
+		$this->formsService->method('hasFormExpired')->willReturn(false);
+		$this->formsService->method('hasFormOpened')->with($form)->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('getPublicForm')
+			->with($form)
+			->willReturn([]);
+		$this->userSession->method('isLoggedIn')->willReturn(true);
+
+		$initialStates = [];
+		$this->initialState->method('provideInitialState')
+			->willReturnCallback(function (string $key, $value) use (&$initialStates) {
+				$initialStates[$key] = $value;
+			});
+
+		TestCase::invokePrivate($this->pageController, 'createPublicSubmitView', [$form, 'hash']);
+
+		$this->assertArrayHasKey('form', $initialStates);
+		$this->assertArrayNotHasKey('renderAs', $initialStates);
 	}
 }

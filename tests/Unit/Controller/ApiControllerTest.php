@@ -584,6 +584,7 @@ class ApiControllerTest extends TestCase {
 					'showToAllUsers' => false,
 				],
 				'expires' => 0,
+				'opens' => 0,
 				'isAnonymous' => false,
 				'submitMultiple' => false,
 				'showExpiration' => false,
@@ -683,6 +684,7 @@ class ApiControllerTest extends TestCase {
 					'ownerId' => 'currentUser',
 					'description' => '',
 					'expires' => 0,
+					'opens' => 1700000000,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'showExpiration' => false
@@ -698,6 +700,7 @@ class ApiControllerTest extends TestCase {
 					'ownerId' => 'currentUser',
 					'description' => '',
 					'expires' => 0,
+					'opens' => 0,
 					'isAnonymous' => false,
 					'submitMultiple' => false,
 					'showExpiration' => false
@@ -732,6 +735,7 @@ class ApiControllerTest extends TestCase {
 				self::assertInstanceOf(Form::class, $form);
 				self::assertNull($form->getId());
 				self::assertEquals($form->getHash(), 'new hash');
+				self::assertSame(0, $form->getOpens());
 				$form->setId(14);
 				return true;
 			}));
@@ -1602,6 +1606,7 @@ class ApiControllerTest extends TestCase {
 		$form->setSubmitMultiple(false);
 		$form->setAllowEditSubmissions(false);
 		$form->setExpires(0);
+		$form->setOpens(0);
 
 		$this->formsService
 			->method('getFormIfAllowed')
@@ -1663,6 +1668,68 @@ class ApiControllerTest extends TestCase {
 
 		$this->assertAuditLogged([
 			[Operation::FormSettingsUpdated, 'Response settings of form %s were changed', ['formId' => 1, 'changedKeys' => ['isAnonymous', 'maxSubmissions']]],
+		]);
+	}
+
+	public static function dataUpdateFormRejectsInvalidOpeningDate(): array {
+		return [
+			'negative' => [0, 0, ['opens' => -1]],
+			'not an integer' => [0, 0, ['opens' => '1700000000']],
+			'after expiration' => [0, 1700000000, ['opens' => 1700003600]],
+			'equal to expiration' => [0, 0, ['opens' => 1700000000, 'expires' => 1700000000]],
+			'expiration before opening' => [1700003600, 0, ['expires' => 1700000000]],
+		];
+	}
+
+	/**
+	 * @dataProvider dataUpdateFormRejectsInvalidOpeningDate
+	 */
+	public function testUpdateFormRejectsInvalidOpeningDate(int $opens, int $expires, array $keyValuePairs): void {
+		$form = $this->createUpdatableForm();
+		$form->setOpens($opens);
+		$form->setExpires($expires);
+
+		$this->formMapper->expects($this->never())->method('update');
+		$this->expectNoAuditLog();
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateForm(1, $keyValuePairs);
+	}
+
+	public static function dataUpdateFormAcceptsValidOpeningDate(): array {
+		return [
+			'without expiration' => [0, 0, ['opens' => 1700000000], 1700000000, 0],
+			'before expiration' => [0, 1700003600, ['opens' => 1700000000], 1700000000, 1700003600],
+			'both at once' => [0, 0, ['opens' => 1700000000, 'expires' => 1700003600], 1700000000, 1700003600],
+			'removing expiration' => [1700003600, 1700007200, ['expires' => 0], 1700003600, 0],
+			'removing opening date' => [1700003600, 1700007200, ['opens' => 0], 0, 1700007200],
+		];
+	}
+
+	/**
+	 * @dataProvider dataUpdateFormAcceptsValidOpeningDate
+	 */
+	public function testUpdateFormAcceptsValidOpeningDate(int $opens, int $expires, array $keyValuePairs, int $expectedOpens, int $expectedExpires): void {
+		$form = $this->createUpdatableForm();
+		$form->setOpens($opens);
+		$form->setExpires($expires);
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$this->assertEquals(new DataResponse(1), $this->apiController->updateForm(1, $keyValuePairs));
+		$this->assertSame($expectedOpens, $form->getOpens());
+		$this->assertSame($expectedExpires, $form->getExpires());
+	}
+
+	public function testUpdateFormLogsOpeningDateChange(): void {
+		$this->createUpdatableForm();
+
+		$this->apiController->updateForm(1, ['opens' => 1700000000]);
+
+		$this->assertAuditLogged([
+			[Operation::FormSettingsUpdated, 'Response settings of form %s were changed', ['formId' => 1, 'changedKeys' => ['opens']]],
 		]);
 	}
 
