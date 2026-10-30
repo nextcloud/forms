@@ -10,7 +10,7 @@
 			:loading="showLoadingCircle"
 			:disabled="locked || !isCurrentUserOwner"
 			:options="options"
-			:placeholder="t('forms', 'Search for user, group or team …')"
+			:inputLabel="t('forms', 'Search for user, group or team …')"
 			:aria-label-listbox="t('forms', 'Search for user, group or team …')"
 			@search="asyncSearch"
 			@update:modelValue="addShare">

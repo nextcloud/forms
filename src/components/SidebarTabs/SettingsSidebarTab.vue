@@ -67,6 +67,7 @@
 		<div v-show="formExpires && !formArchived" class="settings-div--indent">
 			<NcDateTimePicker
 				id="expiresDatetimePicker"
+				:aria-label="t('forms', 'Expiration date')"
 				:clearable="false"
 				:disabled="locked"
 				:disabledDate="notBeforeToday"

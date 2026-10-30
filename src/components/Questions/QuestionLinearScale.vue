@@ -16,6 +16,7 @@
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Lowest value')"
+				:aria-label-combobox="t('forms', 'Lowest value')"
 				labelOutside
 				:options="[0, 1]"
 				required
@@ -29,6 +30,7 @@
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Highest value')"
+				:aria-label-combobox="t('forms', 'Highest value')"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
@@ -99,8 +101,8 @@
 				ref="highest"
 				:modelValue="optionsLabelHighest"
 				class="question-linear-scale__label-input"
-				:label="t('forms', 'Label (optional)')"
-				:aria-label="t('forms', 'Label for highest value')"
+				:label="t('forms', 'Label for highest value')"
+				:placeholder="t('forms', 'Label (optional)')"
 				resize="none"
 				@input="resizeLabel('highest')"
 				@blur="onBlur('highest')"

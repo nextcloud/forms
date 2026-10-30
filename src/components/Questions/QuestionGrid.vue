@@ -46,6 +46,7 @@
 										:modelValue="values[row.id]"
 										:value="column.id.toString()"
 										:name="`${row.id}-answer`"
+										:aria-label="`${row.text}, ${column.text}`"
 										type="radio"
 										@update:modelValue="
 											onChangeCheckboxRadio(row.id, $event)
@@ -61,6 +62,7 @@
 										:modelValue="values[row.id] || []"
 										:value="column.id.toString()"
 										:name="`${row.id}-answer`"
+										:aria-label="`${row.text}, ${column.text}`"
 										type="checkbox"
 										@update:modelValue="
 											onChangeCheckboxRadio(row.id, $event)
@@ -70,6 +72,8 @@
 								<template v-if="questionType === 'number'">
 									<NcInputField
 										type="number"
+										labelOutside
+										:aria-label="`${row.text}, ${column.text}`"
 										:modelValue="plainValues[row.id][column.id]"
 										@update:modelValue="
 											onChangeTextNumber(
