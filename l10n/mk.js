@@ -71,6 +71,7 @@ OC.L10N.register(
     "Copy to clipboard" : "Копирај во клипборд",
     "Copy embedding code" : "Копирај код за вградување",
     "Internal link" : "Внатрешен линк",
+    "Search for a user" : "Пребарај корисници",
     "View" : "Погледни",
     "Edit" : "Уреди",
     "Share" : "Сподели",
