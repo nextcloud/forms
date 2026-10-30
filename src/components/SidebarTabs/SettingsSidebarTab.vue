@@ -58,6 +58,28 @@
 			{{ t('forms', 'Allow comments') }}
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
+			:modelValue="formOpens"
+			:disabled="formArchived || locked"
+			type="switch"
+			@update:modelValue="onFormOpensChange">
+			{{ t('forms', 'Set opening date') }}
+		</NcCheckboxRadioSwitch>
+		<div v-show="formOpens && !formArchived" class="settings-div--indent">
+			<NcDateTimePicker
+				id="opensDatetimePicker"
+				:clearable="false"
+				:disabled="locked"
+				:disabledDate="isInvalidOpeningDay"
+				:disabledTime="isInvalidOpeningTime"
+				:editable="false"
+				:format="stringifyOpeningDate"
+				:minuteStep="5"
+				:showSecond="false"
+				:modelValue="openingDate"
+				type="datetime"
+				@update:modelValue="onOpeningDateChange" />
+		</div>
+		<NcCheckboxRadioSwitch
 			:modelValue="formExpires"
 			:disabled="formArchived || locked"
 			type="switch"
@@ -70,8 +92,8 @@
 				:aria-label="t('forms', 'Expiration date')"
 				:clearable="false"
 				:disabled="locked"
-				:disabledDate="notBeforeToday"
-				:disabledTime="notBeforeNow"
+				:disabledDate="isInvalidExpirationDay"
+				:disabledTime="isInvalidExpirationTime"
 				:editable="false"
 				:format="stringifyDate"
 				:minuteStep="5"
@@ -404,6 +426,7 @@ export default defineComponent({
 			() => disableSubmitMultiple.value || props.form.submitMultiple,
 		)
 		const formExpires = computed(() => props.form.expires !== 0)
+		const formOpens = computed(() => props.form.opens > 0)
 		const formArchived = computed(
 			() => props.form.state === FormState.FormArchived,
 		)
@@ -420,6 +443,8 @@ export default defineComponent({
 		const expirationDate = computed(() =>
 			moment(props.form.expires, 'X').toDate(),
 		)
+		const isOpened = computed(() => props.form.opens <= moment().unix())
+		const openingDate = computed(() => moment(props.form.opens, 'X').toDate())
 		const injectMarkdownit = (): MarkdownRenderer => {
 			return (
 				(inject('$markdownit', {
@@ -542,6 +567,19 @@ export default defineComponent({
 		}
 
 		/**
+		 * Opening datepicker timestamp to string
+		 *
+		 * @param datetime the datepicker Date
+		 */
+		const stringifyOpeningDate = (datetime: Date): string => {
+			const date = moment(datetime).format('LLL')
+			if (isOpened.value) {
+				return t('forms', 'Opened on {date}', { date })
+			}
+			return t('forms', 'Opens on {date}', { date })
+		}
+
+		/**
 		 * Form expires timestamp to Date of the datepicker
 		 *
 		 * @param value the expires timestamp
@@ -567,6 +605,46 @@ export default defineComponent({
 		 */
 		const notBeforeNow = (datetime: Date): boolean =>
 			datetime < moment().toDate()
+
+		/**
+		 * Prevent selecting an opening day in the past or after the expiration day
+		 *
+		 * @param datetime the datepicker Date
+		 */
+		const isInvalidOpeningDay = (datetime: Date): boolean =>
+			notBeforeToday(datetime)
+			|| (formExpires.value
+				&& datetime > moment(props.form.expires, 'X').endOf('day').toDate())
+
+		/**
+		 * Prevent selecting an opening time in the past or not before the expiration
+		 *
+		 * @param datetime the datepicker Date
+		 */
+		const isInvalidOpeningTime = (datetime: Date): boolean =>
+			notBeforeNow(datetime)
+			|| (formExpires.value
+				&& datetime >= moment(props.form.expires, 'X').toDate())
+
+		/**
+		 * Prevent selecting an expiration day in the past or before the opening day
+		 *
+		 * @param datetime the datepicker Date
+		 */
+		const isInvalidExpirationDay = (datetime: Date): boolean =>
+			notBeforeToday(datetime)
+			|| (formOpens.value
+				&& datetime < moment(props.form.opens, 'X').startOf('day').toDate())
+
+		/**
+		 * Prevent selecting an expiration time in the past or not after the opening
+		 *
+		 * @param datetime the datepicker Date
+		 */
+		const isInvalidExpirationTime = (datetime: Date): boolean =>
+			notBeforeNow(datetime)
+			|| (formOpens.value
+				&& datetime <= moment(props.form.opens, 'X').toDate())
 
 		const saveConfirmationEmailQuestionId = (
 			selectedQuestionId: number | null,
@@ -645,9 +723,38 @@ export default defineComponent({
 		const onAllowCommentsChange = (checked: boolean): void => {
 			emit('update:formProp', 'allowComments', checked)
 		}
+		const onFormOpensChange = (checked: boolean): void => {
+			if (!checked) {
+				emit('update:formProp', 'opens', 0)
+				return
+			}
+
+			const opens = moment().add(1, 'hour')
+			if (formExpires.value && opens.unix() >= props.form.expires) {
+				emit('update:formProp', 'opens', moment().unix())
+			} else {
+				emit('update:formProp', 'opens', opens.unix())
+			}
+		}
+
+		/**
+		 * On opening date picker change
+		 *
+		 * @param datetime the opening Date
+		 */
+		const onOpeningDateChange = (datetime: Date | [Date, Date] | null): void => {
+			if (!(datetime instanceof Date)) {
+				return
+			}
+			emit('update:formProp', 'opens', moment(datetime).unix())
+		}
+
 		const onFormExpiresChange = (checked: boolean): void => {
 			if (checked) {
-				emit('update:formProp', 'expires', moment().add(1, 'hour').unix())
+				const start = formOpens.value
+					? moment.max(moment(), moment(props.form.opens, 'X'))
+					: moment()
+				emit('update:formProp', 'expires', start.add(1, 'hour').unix())
 			} else {
 				emit('update:formProp', 'expires', 0)
 			}
@@ -771,12 +878,14 @@ export default defineComponent({
 			hasPublicLink,
 			submitMultiple,
 			formExpires,
+			formOpens,
 			formArchived,
 			formClosed,
 			hasMaxSubmissions,
 			maxSubmissionsValue,
 			isExpired,
 			expirationDate,
+			openingDate,
 			submissionMessageHTML,
 			emailBodyPlaceholder,
 			emailQuestionCount,
@@ -791,13 +900,18 @@ export default defineComponent({
 			isConfirmationEmailConfigurationBlocked,
 			confirmationEmailQuestionLabel,
 			stringifyDate,
+			stringifyOpeningDate,
 			parseTimestampToDate,
-			notBeforeToday,
-			notBeforeNow,
+			isInvalidOpeningDay,
+			isInvalidOpeningTime,
+			isInvalidExpirationDay,
+			isInvalidExpirationTime,
 			onAnonChange,
 			onSubmitMultipleChange,
 			onAllowEditSubmissionsChange,
 			onAllowCommentsChange,
+			onFormOpensChange,
+			onOpeningDateChange,
 			onFormExpiresChange,
 			onShowExpirationChange,
 			onExpirationDateChange,
@@ -821,6 +935,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 @use '../../scssmixins/markdownOutput.scss' as *;
 
+#opensDatetimePicker,
 #expiresDatetimePicker {
 	width: calc(100% - var(--default-clickable-area));
 }

@@ -19,8 +19,10 @@
 
 <script lang="ts">
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
+import IconSchedule from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
+import moment from '@nextcloud/moment'
 import { computed, defineComponent } from 'vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcContent from '@nextcloud/vue/components/NcContent'
@@ -51,6 +53,14 @@ const renderModels: Record<
 			'This form has expired and is no longer taking responses',
 		),
 		icon: IconCheck,
+	},
+
+	notyetopen: {
+		title: t('forms', 'Form not yet open'),
+		description: t('forms', 'This form will open on {date}', {
+			date: moment(loadState(formsAppName, 'opens', 0), 'X').format('LLL'),
+		}),
+		icon: IconSchedule,
 	},
 }
 

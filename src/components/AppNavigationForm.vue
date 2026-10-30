@@ -228,6 +228,12 @@ export default defineComponent({
 			if (props.form.state === FormState.FormClosed) {
 				return t('forms', 'Form closed')
 			}
+			if (props.form.opens > moment().unix()) {
+				const relativeDate = moment(props.form.opens, 'X')
+					.locale(window.OC?.getLanguage())
+					.fromNow()
+				return t('forms', 'Opens {relativeDate}', { relativeDate })
+			}
 			if (props.form.expires) {
 				const relativeDate = moment(props.form.expires, 'X')
 					.locale(window.OC?.getLanguage())
