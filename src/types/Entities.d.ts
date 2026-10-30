@@ -95,6 +95,7 @@ export interface FormsForm {
 	created: number
 	access: FormsAccess | Record<string, unknown>
 	expires: number
+	opens: number
 	fileFormat?: string | null
 	fileId?: number | null
 	filePath?: string | null
