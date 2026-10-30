@@ -15,7 +15,6 @@
 			<NcTextArea
 				v-model="enteredOptions"
 				:label="t('forms', 'Add multiple options (one per line)')"
-				:placeholder="t('forms', 'Add multiple options (one per line)')"
 				resize="vertical"
 				rows="10" />
 		</div>

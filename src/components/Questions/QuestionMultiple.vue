@@ -166,6 +166,7 @@
 					class="question__item__pseudoInput" />
 				<input
 					:placeholder="t('forms', 'Other')"
+					:aria-label="t('forms', 'Other')"
 					class="question__input"
 					:disabled="!readOnly"
 					:maxlength="maxStringLengths.optionText"

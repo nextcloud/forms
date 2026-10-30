@@ -8,7 +8,7 @@ import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
-import { QuestionType } from '../support/sections/QuestionType.ts'
+import { GridSubtype, QuestionType } from '../support/sections/QuestionType.ts'
 import { FormsView } from '../support/sections/TopBarSection.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest, topBarTest)
@@ -32,6 +32,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('My question')
 		await questions[0].fillDescription('Some context')
+		await expect(questions[0].descriptionInput).toHaveAccessibleName(
+			'Description of question number 1',
+		)
 
 		await topBar.toggleView(FormsView.View)
 
@@ -148,6 +151,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			page.getByRole('heading', { name: 'My dropdown question' }),
 		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Choose an option')
+		await expect(question.getByRole('combobox')).toHaveAccessibleName(
+			'My dropdown question',
+		)
 	})
 
 	test('Date question with description has aria-labelledby and aria-describedby', async ({
@@ -176,6 +182,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			page.getByRole('heading', { name: 'My date question' }),
 		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Pick a date')
+		await expect(question.getByRole('textbox')).toHaveAccessibleName(
+			'My date question',
+		)
 	})
 
 	test('Linear scale question with description has aria-labelledby and aria-describedby', async ({
@@ -260,5 +269,28 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			page.getByRole('heading', { name: 'My color question' }),
 		).toHaveId('q1_title')
 		await expect(page.locator('#q1_desc')).toContainText('Pick a color')
+	})
+
+	test('Grid cells are named by row and column', async ({
+		appNavigation,
+		form,
+		topBar,
+		page,
+	}) => {
+		await appNavigation.clickNewForm()
+		await form.fillTitle('Test form')
+
+		await form.addQuestion(QuestionType.Grid, GridSubtype.RadioButtons)
+		const questions = await form.getQuestions()
+		await questions[0].fillTitle('Satisfaction')
+		await questions[0].addColumn('Good')
+		await questions[0].addRow('Service')
+
+		await topBar.toggleView(FormsView.View)
+
+		const question = page.getByRole('listitem', { name: /Question number 1/ })
+		await expect(
+			question.getByRole('radio', { name: 'Service, Good' }),
+		).toBeAttached()
 	})
 })

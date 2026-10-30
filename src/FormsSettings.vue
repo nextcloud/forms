@@ -20,6 +20,7 @@
 				multiple
 				:options="availableGroups"
 				:placeholder="t('forms', 'Select groups')"
+				:aria-label-combobox="t('forms', 'Select groups')"
 				class="forms-settings__creation__multiselect"
 				label="displayName"
 				@update:modelValue="onCreationAllowedGroupsChange" />
