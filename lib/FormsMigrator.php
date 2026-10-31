@@ -144,6 +144,7 @@ class FormsMigrator implements IMigrator {
 				$form->setOwnerId($user->getUID());
 				$form->setAccess($formData['access']);
 				$form->setExpires($formData['expires']);
+				$form->setOpens($formData['opens'] ?? 0);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
 				$form->setAllowEditSubmissions($formData['allowEditSubmissions']);

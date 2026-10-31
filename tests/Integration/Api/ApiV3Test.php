@@ -309,6 +309,7 @@ class ApiV3Test extends IntegrationBase {
 						'hash' => '0123456789abcdef',
 						'title' => 'Title of a Form',
 						'expires' => 0,
+						'opens' => 0,
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => Constants::PERMISSION_ALL,
@@ -321,6 +322,7 @@ class ApiV3Test extends IntegrationBase {
 						'hash' => 'zyxwvutsrq654321',
 						'title' => 'Title of a third Form',
 						'expires' => 0,
+						'opens' => 0,
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => Constants::PERMISSION_ALL,
@@ -356,6 +358,7 @@ class ApiV3Test extends IntegrationBase {
 						'hash' => 'abcdefghij123456',
 						'title' => 'Title of a second Form',
 						'expires' => 0,
+						'opens' => 0,
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => [
@@ -400,6 +403,7 @@ class ApiV3Test extends IntegrationBase {
 						'showToAllUsers' => false
 					],
 					'expires' => 0,
+					'opens' => 0,
 					'state' => 0,
 					'lockedBy' => null,
 					'lockedUntil' => null,
@@ -469,6 +473,7 @@ class ApiV3Test extends IntegrationBase {
 						'showToAllUsers' => false
 					],
 					'expires' => 0,
+					'opens' => 0,
 					'state' => 0,
 					'lockedBy' => null,
 					'lockedUntil' => null,
@@ -736,6 +741,24 @@ class ApiV3Test extends IntegrationBase {
 
 		$after = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
 		$this->assertEquals($before, $after);
+	}
+
+	public function testUpdateFormRejectsOpeningDateAfterExpiration(): void {
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'expires' => time() + 3600,
+					'opens' => time() + 7200,
+				],
+			],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(400, $resp->getStatusCode());
+
+		$form = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals(0, $form['expires']);
+		$this->assertEquals(0, $form['opens']);
 	}
 
 	public function testDeleteForm() {
@@ -1653,6 +1676,32 @@ class ApiV3Test extends IntegrationBase {
 				],
 			]
 		], $data['submissions'][0]);
+	}
+
+	public function testNewSubmissionBeforeOpeningDate() {
+		$opens = time() + 3600;
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'opens' => $opens,
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$form = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals($opens, $form['opens']);
+
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions", [
+			'json' => [
+				'answers' => [
+					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer!'],
+				],
+			],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(403, $resp->getStatusCode());
 	}
 
 	public static function dataDeleteSingleSubmission() {

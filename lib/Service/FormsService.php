@@ -266,6 +266,7 @@ class FormsService {
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
 				'expires' => $form->getExpires(),
+				'opens' => $form->getOpens(),
 				'lastUpdated' => $form->getLastUpdated(),
 				'permissions' => $permissions,
 				'partial' => true,
@@ -405,6 +406,10 @@ class FormsService {
 		// Not allowed if form has expired.
 		if ($this->hasFormExpired($form)) {
 			throw new OCSForbiddenException('This form is no longer taking answers');
+		}
+
+		if (!$this->hasFormOpened($form)) {
+			throw new OCSForbiddenException('This form is not yet taking answers');
 		}
 
 		return $form;
@@ -669,6 +674,13 @@ class FormsService {
 			return true;
 		}
 		return ($form->getExpires() !== 0 && $form->getExpires() < time());
+	}
+
+	/**
+	 * Check if the opening date of the form has been reached.
+	 */
+	public function hasFormOpened(Form $form): bool {
+		return $form->getOpens() <= time();
 	}
 
 	/**

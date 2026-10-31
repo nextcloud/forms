@@ -28,6 +28,7 @@ This document describes the Object-Structure, that is used within the Forms App 
 | created                     | unix timestamp                       |                                         | When the form has been created                                                                                                   |
 | access                      | [Access-Object](#access-object)      |                                         | Describing access-settings of the form                                                                                           |
 | expires                     | unix-timestamp                       |                                         | When the form should expire. Timestamp `0` indicates _never_                                                                     |
+| opens                       | unix-timestamp                       |                                         | From when the form accepts responses. Timestamp `0` indicates _immediately_                                                      |
 | isAnonymous                 | Boolean                              |                                         | If Answers will be stored anonymously                                                                                            |
 | state                       | Integer                              | [Form state](#form-state)               | The state of the form                                                                                                            |
 | lockedBy                    | String                               |                                         | The user ID for who has exclusive edit access at the moment                                                                      |
@@ -57,6 +58,7 @@ This document describes the Object-Structure, that is used within the Forms App 
   "created": 1611240961,
   "access": {},
   "expires": 0,
+  "opens": 0,
   "isAnonymous": false,
   "submitMultiple": true,
   "allowEditSubmissions": false,
