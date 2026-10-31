@@ -27,7 +27,7 @@
 		"bamarni/composer-bin-plugin": "^1.8"
 	},
 	"require": {
-		"maennchen/zipstream-php": "^2.4",
+		"maennchen/zipstream-php": "^3.2",
 		"phpoffice/phpspreadsheet": "^5.0"
 	},
 	"extra": {
