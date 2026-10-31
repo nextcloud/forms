@@ -11,6 +11,7 @@
 		:contentValid="contentValid"
 		:shiftDragHandle="shiftDragHandle"
 		:errorMessage="errorMessage"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template v-if="readOnly">
 			<fieldset
