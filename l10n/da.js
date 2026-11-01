@@ -123,7 +123,7 @@ OC.L10N.register(
     "Move question up" : "Flyt spørgsmål op",
     "Move question down" : "Flyt spørgsmål ned",
     "Title of question number {index}" : "Titel på spørgsmål nummer {index}",
-    "Required" : "Påkrævet",
+    "Required" : "Obligatorisk",
     "Technical name of the question" : "Spørgsmålets tekniske navn",
     "Technical name" : "Teknisk navn",
     "Copy question" : "Kopiér spørgsmål",
@@ -420,6 +420,6 @@ OC.L10N.register(
     "People can enter a number" : "Brugere kan angive et tal",
     "Enter a number" : "Angiv et tal",
     "Custom regular expression" : "Brugerdefineret regulært udtryk",
-    "The input does not match the required pattern" : "Indtastningen matcher ikke det påkrævede mønster"
+    "The input does not match the required pattern" : "Indtastningen matcher ikke det krævede mønster"
 },
 "nplurals=2; plural=(n != 1);");
