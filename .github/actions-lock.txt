@@ -21,3 +21,4 @@ d1e7dba2e25a3921ba09a8357bcd47c5 psalm-matrix.yml
 2dbec18233063b42f4d8e03bbb43671c reuse.yml
 3688c8c5aa6a98dcd3b5019dcecccddd sync-workflow-templates.yml
 cc0602ed005f19639c69c0b975c9c84f playwright.yml
+bea8a43904976fa01f1e091046541b37 release-relay.yml
