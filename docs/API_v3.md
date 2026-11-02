@@ -1032,7 +1032,7 @@ This returns in case the Request is not properly set. This can e.g. include:
 This returns in case the authenticated user is not allowed to access this resource/endpoint. This can e.g. include:
 
 - The user has no write access to the form (only form owner is allowed to edit)
-- The user is not allowed to submit to the form (access-settings, form expired, already submitted)
+- The user is not allowed to submit to the form (access-settings, form not yet open or expired, already submitted)
 
 ```
 "ocs": {

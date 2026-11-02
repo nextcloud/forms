@@ -1447,6 +1447,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException At least one submitted answer is not valid
 	 * @throws OCSForbiddenException Already submitted
 	 * @throws OCSForbiddenException Not allowed to access this form
+	 * @throws OCSForbiddenException This form is not yet taking answers
 	 * @throws OCSForbiddenException This form is no longer taking answers
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
 	 * @throws OCSNotFoundException Could not find form
@@ -1539,6 +1540,7 @@ class ApiController extends OCSController {
 	 * @param array<string, list<string>> $answers [question_id => arrayOfString]
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Can only update submission if allowEditSubmissions is set and the answers are valid
+	 * @throws OCSForbiddenException This form is not yet taking answers
 	 * @throws OCSForbiddenException Can only update your own submission
 	 *
 	 * 200: the id of the updated submission
@@ -1724,6 +1726,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException Failed to upload the file
 	 * @throws OCSBadRequestException File size exceeds the maximum allowed size
 	 * @throws OCSBadRequestException File type is not allowed
+	 * @throws OCSForbiddenException This form is not yet taking answers
 	 * @throws OCSForbiddenException Already submitted
 	 * @throws OCSNotFoundException Could not find question
 	 *
