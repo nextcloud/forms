@@ -40,7 +40,7 @@
 				:options="choices"
 				:searchable="false"
 				label="text"
-				:aria-label-combobox="selectOptionPlaceholder"
+				:aria-label-combobox="text"
 				:aria-errormessage="hasError ? errorId : undefined"
 				:aria-invalid="hasError ? 'true' : undefined"
 				@invalid.prevent="validate"

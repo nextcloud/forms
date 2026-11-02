@@ -16,6 +16,7 @@
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Lowest value')"
+				:aria-label-combobox="t('forms', 'Lowest value')"
 				labelOutside
 				:options="[0, 1]"
 				required
@@ -29,6 +30,7 @@
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Highest value')"
+				:aria-label-combobox="t('forms', 'Highest value')"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
@@ -44,17 +46,24 @@
 			:class="{
 				question__content__edit: !readOnly,
 			}">
-			<NcTextArea
-				v-if="!readOnly"
-				ref="lowest"
-				:modelValue="optionsLabelLowest"
-				class="question-linear-scale__label-input"
-				:label="t('forms', 'Label for lowest value')"
-				:placeholder="t('forms', 'Label (optional)')"
-				resize="none"
-				@input="resizeLabel('lowest')"
-				@blur="onBlur('lowest')"
-				@update:modelValue="onOptionsLabelLowestChange" />
+			<template v-if="!readOnly">
+				<label
+					:for="`q${index}__label_lowest_input`"
+					class="question-linear-scale__label-title question-linear-scale__label-title-lowest">
+					{{ t('forms', 'Label for lowest value') }}
+				</label>
+				<NcTextArea
+					:id="`q${index}__label_lowest_input`"
+					ref="lowest"
+					:modelValue="optionsLabelLowest"
+					class="question-linear-scale__label-input question-linear-scale__label-input-lowest"
+					labelOutside
+					:placeholder="t('forms', 'Label (optional)')"
+					resize="none"
+					@input="resizeLabel('lowest')"
+					@blur="onBlur('lowest')"
+					@update:modelValue="onOptionsLabelLowestChange" />
+			</template>
 			<div
 				v-else-if="optionsLabelLowest !== ''"
 				:id="labelId"
@@ -94,17 +103,24 @@
 						@keydown.enter.exact.prevent="onKeydownEnter" />
 				</div>
 			</fieldset>
-			<NcTextArea
-				v-if="!readOnly"
-				ref="highest"
-				:modelValue="optionsLabelHighest"
-				class="question-linear-scale__label-input"
-				:label="t('forms', 'Label (optional)')"
-				:aria-label="t('forms', 'Label for highest value')"
-				resize="none"
-				@input="resizeLabel('highest')"
-				@blur="onBlur('highest')"
-				@update:modelValue="onOptionsLabelHighestChange" />
+			<template v-if="!readOnly">
+				<label
+					:for="`q${index}__label_highest_input`"
+					class="question-linear-scale__label-title question-linear-scale__label-title-highest">
+					{{ t('forms', 'Label for highest value') }}
+				</label>
+				<NcTextArea
+					:id="`q${index}__label_highest_input`"
+					ref="highest"
+					:modelValue="optionsLabelHighest"
+					class="question-linear-scale__label-input question-linear-scale__label-input-highest"
+					labelOutside
+					:placeholder="t('forms', 'Label (optional)')"
+					resize="none"
+					@input="resizeLabel('highest')"
+					@blur="onBlur('highest')"
+					@update:modelValue="onOptionsLabelHighestChange" />
+			</template>
 			<div
 				v-else-if="optionsLabelHighest !== ''"
 				class="question-linear-scale__label question-linear-scale__label-highest">
@@ -347,6 +363,17 @@ export default defineComponent({
 
 	&__edit {
 		margin-inline-start: -12px;
+		display: grid;
+		grid-template-columns: 120px 1fr 120px;
+		grid-template-areas:
+			'lowest-title . highest-title'
+			'lowest options highest';
+		align-items: center;
+
+		@media (max-width: 768px) {
+			grid-template-columns: 1fr;
+			grid-template-areas: 'lowest-title' 'lowest' 'options' 'highest-title' 'highest';
+		}
 
 		@media (max-width: 768px) {
 			margin-inline-end: calc(var(--clickable-area-large) - 2px);
@@ -383,13 +410,39 @@ export default defineComponent({
 			min-height: fit-content;
 			flex-shrink: 0;
 
+			&-lowest {
+				grid-area: lowest;
+			}
+
+			&-highest {
+				grid-area: highest;
+			}
+
 			@media (max-width: 768px) {
 				width: 100%; // Full width on smaller screens
 				padding-block: var(--default-grid-baseline);
 			}
 		}
 
+		&__label-title {
+			align-self: end;
+			margin-bottom: var(--default-grid-baseline);
+			padding-inline: calc(var(--border-width-input-focused, 2px) + 10px);
+			font-size: 13px;
+			font-weight: var(--font-weight-element, 500);
+			line-height: 1.5;
+
+			&-lowest {
+				grid-area: lowest-title;
+			}
+
+			&-highest {
+				grid-area: highest-title;
+			}
+		}
+
 		&__options {
+			grid-area: options;
 			width: 100%;
 			display: flex;
 			flex-direction: row;

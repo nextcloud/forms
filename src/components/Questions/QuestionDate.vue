@@ -92,6 +92,7 @@
 				:disabled="!readOnly"
 				:format="stringify"
 				:placeholder="datetimePickerPlaceholder"
+				:aria-label="text"
 				:showSecond="false"
 				:type="dateTimePickerType"
 				:disabledDate="disabledDates"

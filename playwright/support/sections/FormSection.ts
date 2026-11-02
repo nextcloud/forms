@@ -25,6 +25,7 @@ export class FormSection {
 		})
 		this.descriptionField = this.mainContent.getByRole('textbox', {
 			name: 'Description',
+			exact: true,
 		})
 	}
 
