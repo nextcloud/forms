@@ -87,6 +87,22 @@ class PageControllerTest extends TestCase {
 		TestCase::invokePrivate($this->pageController, 'setEmbeddedCSP', [$response]);
 	}
 
+	/**
+	 * Render the public submit view of the form
+	 *
+	 * @return array<string, mixed> the provided initial states
+	 */
+	private function createPublicSubmitView(Form $form): array {
+		$initialStates = [];
+		$this->initialState->method('provideInitialState')
+			->willReturnCallback(function (string $key, $value) use (&$initialStates) {
+				$initialStates[$key] = $value;
+			});
+
+		TestCase::invokePrivate($this->pageController, 'createPublicSubmitView', [$form, 'hash']);
+		return $initialStates;
+	}
+
 	public function testPublicSubmitViewOfNotYetOpenedForm() {
 		$form = new Form();
 		$form->setOpens(1700000000);
@@ -95,13 +111,7 @@ class PageControllerTest extends TestCase {
 		$this->formsService->expects($this->never())->method('getPublicForm');
 		$this->userSession->method('isLoggedIn')->willReturn(true);
 
-		$initialStates = [];
-		$this->initialState->method('provideInitialState')
-			->willReturnCallback(function (string $key, $value) use (&$initialStates) {
-				$initialStates[$key] = $value;
-			});
-
-		TestCase::invokePrivate($this->pageController, 'createPublicSubmitView', [$form, 'hash']);
+		$initialStates = $this->createPublicSubmitView($form);
 
 		$this->assertSame([
 			'opens' => 1700000000,
@@ -119,13 +129,7 @@ class PageControllerTest extends TestCase {
 			->willReturn([]);
 		$this->userSession->method('isLoggedIn')->willReturn(true);
 
-		$initialStates = [];
-		$this->initialState->method('provideInitialState')
-			->willReturnCallback(function (string $key, $value) use (&$initialStates) {
-				$initialStates[$key] = $value;
-			});
-
-		TestCase::invokePrivate($this->pageController, 'createPublicSubmitView', [$form, 'hash']);
+		$initialStates = $this->createPublicSubmitView($form);
 
 		$this->assertArrayHasKey('form', $initialStates);
 		$this->assertArrayNotHasKey('renderAs', $initialStates);
