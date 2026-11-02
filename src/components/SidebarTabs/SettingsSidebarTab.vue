@@ -59,11 +59,18 @@
 		</NcCheckboxRadioSwitch>
 		<NcCheckboxRadioSwitch
 			:modelValue="formOpens"
-			:disabled="formArchived || locked"
+			:disabled="formArchived || locked || (!formOpens && !canSetOpeningDate)"
+			aria-describedby="forms-settings__opening-date"
 			type="switch"
 			@update:modelValue="onFormOpensChange">
 			{{ t('forms', 'Set opening date') }}
 		</NcCheckboxRadioSwitch>
+		<p
+			v-if="!formOpens && !canSetOpeningDate && !formArchived"
+			id="forms-settings__opening-date"
+			class="settings-hint">
+			{{ t('forms', 'The form expires too soon to set an opening date.') }}
+		</p>
 		<div v-show="formOpens && !formArchived" class="settings-div--indent">
 			<NcDateTimePicker
 				v-if="!locked"
@@ -445,6 +452,12 @@ export default defineComponent({
 			moment(props.form.expires, 'X').toDate(),
 		)
 		const isOpened = computed(() => props.form.opens <= moment().unix())
+		// An opening date needs some time before the form expires
+		const canSetOpeningDate = computed(
+			() =>
+				!formExpires.value
+				|| props.form.expires > moment().add(10, 'minutes').unix(),
+		)
 		const openingDate = computed(() => moment(props.form.opens, 'X').toDate())
 		// The form has to open at least one picker step before it expires
 		const openingDateMin = computed(() => new Date())
@@ -679,24 +692,20 @@ export default defineComponent({
 			emit('update:formProp', 'allowComments', checked)
 		}
 		const onFormOpensChange = (checked: boolean): void => {
-			if (!checked) {
-				emit('update:formProp', 'opens', 0)
-				return
+			let opens = 0
+			if (checked) {
+				const inOneHour = moment().add(1, 'hour').unix()
+				const beforeExpiration = props.form.expires - 5 * 60
+				opens = formExpires.value
+					? Math.min(inOneHour, beforeExpiration)
+					: inOneHour
 			}
-
-			const opens = moment().add(1, 'hour')
-			if (formExpires.value && opens.unix() >= props.form.expires) {
-				emit('update:formProp', 'opens', moment().unix())
-			} else {
-				emit('update:formProp', 'opens', opens.unix())
-			}
+			emit('update:formProp', 'opens', opens)
 		}
 
 		const onFormExpiresChange = (checked: boolean): void => {
 			if (checked) {
-				const start = formOpens.value
-					? moment.max(moment(), moment(props.form.opens, 'X'))
-					: moment()
+				const start = moment.max(moment(), moment(props.form.opens, 'X'))
 				emit('update:formProp', 'expires', start.add(1, 'hour').unix())
 			} else {
 				emit('update:formProp', 'expires', 0)
@@ -820,6 +829,7 @@ export default defineComponent({
 			submitMultiple,
 			formExpires,
 			formOpens,
+			canSetOpeningDate,
 			formArchived,
 			formClosed,
 			hasMaxSubmissions,
