@@ -75,7 +75,7 @@
 				:minuteStep="5"
 				:modelValue="openingDate"
 				type="datetime"
-				@update:modelValue="onOpeningDateChange" />
+				@update:modelValue="onDateChange('opens', $event)" />
 		</div>
 		<NcCheckboxRadioSwitch
 			:modelValue="formExpires"
@@ -95,7 +95,7 @@
 				:minuteStep="5"
 				:modelValue="expirationDate"
 				type="datetime"
-				@update:modelValue="onExpirationDateChange" />
+				@update:modelValue="onDateChange('expires', $event)" />
 			<NcCheckboxRadioSwitch
 				:modelValue="form.showExpiration"
 				:disabled="locked"
@@ -686,18 +686,6 @@ export default defineComponent({
 			}
 		}
 
-		/**
-		 * On opening date picker change
-		 *
-		 * @param datetime the opening Date
-		 */
-		const onOpeningDateChange = (datetime: Date | [Date, Date] | null): void => {
-			if (!(datetime instanceof Date)) {
-				return
-			}
-			emit('update:formProp', 'opens', moment(datetime).unix())
-		}
-
 		const onFormExpiresChange = (checked: boolean): void => {
 			if (checked) {
 				const start = formOpens.value
@@ -715,19 +703,17 @@ export default defineComponent({
 		/**
 		 * On date picker change
 		 *
-		 * @param datetime the expiration Date
+		 * @param key the form property of the date
+		 * @param datetime the picked Date
 		 */
-		const onExpirationDateChange = (
+		const onDateChange = (
+			key: 'opens' | 'expires',
 			datetime: Date | [Date, Date] | null,
 		): void => {
 			if (!(datetime instanceof Date)) {
 				return
 			}
-			emit(
-				'update:formProp',
-				'expires',
-				parseInt(moment(datetime).format('X')),
-			)
+			emit('update:formProp', key, moment(datetime).unix())
 		}
 		const onMaxSubmissionsChange = (checked: boolean): void => {
 			emit('update:formProp', 'maxSubmissions', checked ? 1 : null)
@@ -859,10 +845,9 @@ export default defineComponent({
 			onAllowEditSubmissionsChange,
 			onAllowCommentsChange,
 			onFormOpensChange,
-			onOpeningDateChange,
 			onFormExpiresChange,
 			onShowExpirationChange,
-			onExpirationDateChange,
+			onDateChange,
 			onMaxSubmissionsChange,
 			onMaxSubmissionsValueChange,
 			onFormClosedChange,
