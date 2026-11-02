@@ -57,9 +57,14 @@ const renderModels: Record<
 
 	notyetopen: {
 		title: t('forms', 'Form not yet open'),
-		description: t('forms', 'This form will open on {date}', {
-			date: moment(loadState(formsAppName, 'opens', 0), 'X').format('LLL'),
-		}),
+		description: t(
+			'forms',
+			'This form will open on {date}',
+			{
+				date: moment(loadState(formsAppName, 'opens', 0), 'X').format('LLL'),
+			},
+			{ escape: false, sanitize: false },
+		),
 		icon: IconSchedule,
 	},
 }

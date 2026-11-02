@@ -232,18 +232,31 @@ export default defineComponent({
 				const relativeDate = moment(props.form.opens, 'X')
 					.locale(window.OC?.getLanguage())
 					.fromNow()
-				return t('forms', 'Opens {relativeDate}', { relativeDate })
+				return t(
+					'forms',
+					'Opens {relativeDate}',
+					{ relativeDate },
+					{ escape: false, sanitize: false },
+				)
 			}
 			if (props.form.expires) {
 				const relativeDate = moment(props.form.expires, 'X')
 					.locale(window.OC?.getLanguage())
 					.fromNow()
 				if (isExpired.value) {
-					return t('forms', 'Expired {relativeDate}', {
-						relativeDate,
-					})
+					return t(
+						'forms',
+						'Expired {relativeDate}',
+						{ relativeDate },
+						{ escape: false, sanitize: false },
+					)
 				}
-				return t('forms', 'Expires {relativeDate}', { relativeDate })
+				return t(
+					'forms',
+					'Expires {relativeDate}',
+					{ relativeDate },
+					{ escape: false, sanitize: false },
+				)
 			}
 			return ''
 		})

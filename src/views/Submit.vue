@@ -513,14 +513,29 @@ export default defineComponent({
 				.locale(window.OC?.getLanguage())
 				.fromNow()
 			if (isExpired.value) {
-				return t('forms', 'Expired {relativeDate}.', { relativeDate })
+				return t(
+					'forms',
+					'Expired {relativeDate}.',
+					{ relativeDate },
+					{ escape: false, sanitize: false },
+				)
 			}
-			return t('forms', 'Expires {relativeDate}.', { relativeDate })
+			return t(
+				'forms',
+				'Expires {relativeDate}.',
+				{ relativeDate },
+				{ escape: false, sanitize: false },
+			)
 		})
 
 		const openingMessage = computed<string>(() => {
 			const date = moment(props.form.opens, 'X').format('LLL')
-			return t('forms', 'This form will open on {date}', { date })
+			return t(
+				'forms',
+				'This form will open on {date}',
+				{ date },
+				{ escape: false, sanitize: false },
+			)
 		})
 
 		/**

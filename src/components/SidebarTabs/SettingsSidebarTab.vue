@@ -590,9 +590,19 @@ export default defineComponent({
 		const stringifyDate = (datetime: Date): string => {
 			const date = moment(datetime).format('LLL')
 			if (isExpired.value) {
-				return t('forms', 'Expired on {date}', { date })
+				return t(
+					'forms',
+					'Expired on {date}',
+					{ date },
+					{ escape: false, sanitize: false },
+				)
 			}
-			return t('forms', 'Expires on {date}', { date })
+			return t(
+				'forms',
+				'Expires on {date}',
+				{ date },
+				{ escape: false, sanitize: false },
+			)
 		}
 
 		/**
@@ -603,9 +613,19 @@ export default defineComponent({
 		const stringifyOpeningDate = (datetime: Date): string => {
 			const date = moment(datetime).format('LLL')
 			if (isOpened.value) {
-				return t('forms', 'Opened on {date}', { date })
+				return t(
+					'forms',
+					'Opened on {date}',
+					{ date },
+					{ escape: false, sanitize: false },
+				)
 			}
-			return t('forms', 'Opens on {date}', { date })
+			return t(
+				'forms',
+				'Opens on {date}',
+				{ date },
+				{ escape: false, sanitize: false },
+			)
 		}
 
 		/**

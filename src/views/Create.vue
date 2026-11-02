@@ -428,9 +428,19 @@ export default defineComponent({
 				.locale(window.OC?.getLanguage())
 				.fromNow()
 			if (isExpired.value) {
-				return t('forms', 'Expired {relativeDate}.', { relativeDate })
+				return t(
+					'forms',
+					'Expired {relativeDate}.',
+					{ relativeDate },
+					{ escape: false, sanitize: false },
+				)
 			}
-			return t('forms', 'Expires {relativeDate}.', { relativeDate })
+			return t(
+				'forms',
+				'Expires {relativeDate}.',
+				{ relativeDate },
+				{ escape: false, sanitize: false },
+			)
 		})
 
 		// Remove properties from answerTypes for create button
