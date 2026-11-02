@@ -153,6 +153,7 @@ Returns the full-depth object of the requested form (without submissions).
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to request |
 - Response: A full object of the form, including access, questions and options in full depth.
+  Before the opening date (`opens`) of the form, `questions` is empty for users who can neither edit the form nor see its results.
 
 ```
 "data": {
@@ -318,6 +319,7 @@ Returns the questions and options of the given form (without submissions).
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form |
 - Response: An array of all questions of the form including options.
+- Before the opening date (`opens`) of the form, users who can neither edit the form nor see its results get a **Forbidden** response.
 
 ```
 "data": [
@@ -402,6 +404,7 @@ Returns the requested question and options of the given form (without submission
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form |
   | _questionId_ | Integer | ID of the question |
+- Before the opening date (`opens`) of the form, users who can neither edit the form nor see its results get a **Forbidden** response.
 - Response: An object of the requested question including options.
 
 ```

@@ -1305,6 +1305,59 @@ class FormsServiceTest extends TestCase {
 		$this->assertSame($form, $this->formsService->loadFormForSubmission(42, ''));
 	}
 
+	public static function dataCanSeeQuestions() {
+		return [
+			'opened, submit permission' => [0, 'someOtherUser', ['submit'], true],
+			'not yet open, owner' => [time() + 3600, 'currentUser', [], true],
+			'not yet open, submit permission' => [time() + 3600, 'someOtherUser', ['submit'], false],
+			'not yet open, edit permission' => [time() + 3600, 'someOtherUser', ['submit', 'edit'], true],
+			'not yet open, results permission' => [time() + 3600, 'someOtherUser', ['submit', 'results'], true],
+		];
+	}
+
+	#[DataProvider('dataCanSeeQuestions')]
+	public function testCanSeeQuestions(int $opens, string $ownerId, array $permissions, bool $expected) {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId($ownerId);
+		$form->setAccess(['permitAllUsers' => false, 'showToAllUsers' => false]);
+		$form->setOpens($opens);
+
+		$share = new Share();
+		$share->setFormId(42);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('currentUser');
+		$share->setPermissions($permissions);
+		$this->shareMapper->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->assertSame($expected, $this->formsService->canSeeQuestions($form));
+	}
+
+	public function testGetFormHidesQuestionsBeforeOpening() {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('someOtherUser');
+		$form->setAccess(['permitAllUsers' => false, 'showToAllUsers' => false]);
+		$form->setExpires(0);
+		$form->setOpens(time() + 3600);
+		$form->setSubmitMultiple(true);
+
+		$share = new Share();
+		$share->setFormId(42);
+		$share->setShareType(IShare::TYPE_USER);
+		$share->setShareWith('currentUser');
+		$share->setPermissions(['submit']);
+		$this->shareMapper->method('findByForm')
+			->with(42)
+			->willReturn([$share]);
+
+		$this->questionMapper->expects($this->never())->method('findByForm');
+
+		$this->assertSame([], $this->formsService->getForm($form)['questions']);
+	}
+
 	public static function dataGetShareDisplayName() {
 		return [
 			'userShare' => [

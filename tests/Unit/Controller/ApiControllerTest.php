@@ -1733,6 +1733,59 @@ class ApiControllerTest extends TestCase {
 		]);
 	}
 
+	public static function dataGetQuestionsBeforeOpening(): array {
+		return [
+			'questions' => ['getQuestions', [1]],
+			'single question' => ['getQuestion', [1, 2]],
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetQuestionsBeforeOpening
+	 */
+	public function testGetQuestionsBeforeOpening(string $method, array $arguments): void {
+		$form = new Form();
+		$form->setId(1);
+		$this->formMapper->method('findById')
+			->with(1)
+			->willReturn($form);
+		$this->formsService->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->method('canSeeQuestions')
+			->with($form)
+			->willReturn(false);
+		$this->formsService->expects($this->never())->method('getQuestions');
+		$this->formsService->expects($this->never())->method('getQuestion');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->expectExceptionMessage('This form is not yet open');
+		$this->apiController->$method(...$arguments);
+	}
+
+	public function testGetQuestionsAfterOpening(): void {
+		$form = new Form();
+		$form->setId(1);
+		$this->formMapper->method('findById')
+			->with(1)
+			->willReturn($form);
+		$this->formsService->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->method('canSeeQuestions')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn([['id' => 2, 'extraSettings' => ['a' => 'b']]]);
+
+		$this->assertEquals(
+			new DataResponse([['id' => 2, 'extraSettings' => ['a' => 'b']]]),
+			$this->apiController->getQuestions(1),
+		);
+	}
+
 	public function testUpdateFormLogsLinkedResultsFile(): void {
 		$form = $this->createUpdatableForm();
 		$file = $this->createMock(File::class);

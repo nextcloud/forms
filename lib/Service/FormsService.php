@@ -212,7 +212,7 @@ class FormsService {
 	 */
 	public function getForm(Form $form): array {
 		$result = $form->read();
-		$result['questions'] = $this->getQuestions($form->getId());
+		$result['questions'] = $this->canSeeQuestions($form) ? $this->getQuestions($form->getId()) : [];
 		$result['shares'] = $this->getShares($form->getId());
 
 		// Append permissions for current user.
@@ -465,6 +465,20 @@ class FormsService {
 		}
 
 		return array_values(array_unique($permissions));
+	}
+
+	/**
+	 * Can the current user see the questions of a form.
+	 * Before the opening date only users who can edit the form or see its results can see them.
+	 */
+	public function canSeeQuestions(Form $form): bool {
+		if ($this->hasFormOpened($form)) {
+			return true;
+		}
+
+		$permissions = $this->getPermissions($form);
+		return in_array(Constants::PERMISSION_EDIT, $permissions, true)
+			|| in_array(Constants::PERMISSION_RESULTS, $permissions, true);
 	}
 
 	/**

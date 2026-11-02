@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use OCA\Forms\Constants;
 use OCA\Forms\Tests\Integration\IntegrationBase;
+use OCP\IUserManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -1676,6 +1677,48 @@ class ApiV3Test extends IntegrationBase {
 				],
 			]
 		], $data['submissions'][0]);
+	}
+
+	public function testQuestionsHiddenBeforeOpeningDate() {
+		$formId = $this->testForms[2]['id'];
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$formId}", [
+			'json' => [
+				'keyValuePairs' => [
+					'opens' => time() + 3600,
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$owner = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$formId}"));
+		$this->assertCount(1, $owner['questions']);
+
+		// user2 only has the default submit permission
+		$userManager = \OCP\Server::get(IUserManager::class);
+		$user2 = $userManager->get('user2') ?? $userManager->createUser('user2', 'user2');
+		try {
+			$respondent = new Client([
+				'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
+				'auth' => ['user2', 'user2'],
+				'headers' => [
+					'OCS-ApiRequest' => 'true',
+					'Accept' => 'application/json'
+				],
+				'http_errors' => false,
+			]);
+
+			$form = $this->OcsResponse2Data($respondent->request('GET', "api/v3/forms/{$formId}"));
+			$this->assertSame([], $form['questions']);
+
+			$resp = $respondent->request('GET', "api/v3/forms/{$formId}/questions");
+			$this->assertEquals(403, $resp->getStatusCode());
+
+			$questionId = $this->testForms[2]['questions'][0]['id'];
+			$resp = $respondent->request('GET', "api/v3/forms/{$formId}/questions/{$questionId}");
+			$this->assertEquals(403, $resp->getStatusCode());
+		} finally {
+			$user2->delete();
+		}
 	}
 
 	public function testNewSubmissionBeforeOpeningDate() {

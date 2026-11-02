@@ -434,6 +434,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @return DataResponse<Http::STATUS_OK, list<FormsQuestion>, array{}>
+	 * @throws OCSForbiddenException Form is not yet open
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 *
@@ -455,6 +456,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('User has no permissions to get this form');
 		}
 
+		if (!$this->formsService->canSeeQuestions($form)) {
+			$this->logger->debug('Form is not yet open');
+			throw new OCSForbiddenException('This form is not yet open');
+		}
+
 		$questionData = $this->formsService->getQuestions($formId);
 		$questionData = array_map(static function (array $question) {
 			if (empty($question['extraSettings'])) {
@@ -473,6 +479,7 @@ class ApiController extends OCSController {
 	 * @param int $questionId QuestionId
 	 * @return DataResponse<Http::STATUS_OK, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
+	 * @throws OCSForbiddenException Form is not yet open
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 *
@@ -492,6 +499,11 @@ class ApiController extends OCSController {
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
 			throw new OCSForbiddenException('User has no permissions to get this form');
+		}
+
+		if (!$this->formsService->canSeeQuestions($form)) {
+			$this->logger->debug('Form is not yet open');
+			throw new OCSForbiddenException('This form is not yet open');
 		}
 
 		$question = $this->formsService->getQuestion($questionId);
