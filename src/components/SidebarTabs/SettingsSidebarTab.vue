@@ -69,12 +69,10 @@
 				id="opensDatetimePicker"
 				:clearable="false"
 				:disabled="locked"
-				:disabledDate="isInvalidOpeningDay"
-				:disabledTime="isInvalidOpeningTime"
-				:editable="false"
 				:format="stringifyOpeningDate"
+				:min="openingDateMin"
+				:max="openingDateMax"
 				:minuteStep="5"
-				:showSecond="false"
 				:modelValue="openingDate"
 				type="datetime"
 				@update:modelValue="onOpeningDateChange" />
@@ -92,12 +90,9 @@
 				:aria-label="t('forms', 'Expiration date')"
 				:clearable="false"
 				:disabled="locked"
-				:disabledDate="isInvalidExpirationDay"
-				:disabledTime="isInvalidExpirationTime"
-				:editable="false"
 				:format="stringifyDate"
+				:min="expirationDateMin"
 				:minuteStep="5"
-				:showSecond="false"
 				:modelValue="expirationDate"
 				type="datetime"
 				@update:modelValue="onExpirationDateChange" />
@@ -445,6 +440,18 @@ export default defineComponent({
 		)
 		const isOpened = computed(() => props.form.opens <= moment().unix())
 		const openingDate = computed(() => moment(props.form.opens, 'X').toDate())
+		// The form has to open at least one picker step before it expires
+		const openingDateMin = computed(() => new Date())
+		const openingDateMax = computed(() =>
+			formExpires.value
+				? moment(props.form.expires, 'X').subtract(5, 'minutes').toDate()
+				: undefined,
+		)
+		const expirationDateMin = computed(() =>
+			moment
+				.max(moment(), moment(props.form.opens, 'X').add(5, 'minutes'))
+				.toDate(),
+		)
 		const injectMarkdownit = (): MarkdownRenderer => {
 			return (
 				(inject('$markdownit', {
@@ -587,64 +594,6 @@ export default defineComponent({
 		 */
 		const parseTimestampToDate = (value: number): Date =>
 			moment(value, 'X').toDate()
-
-		/**
-		 * Prevent selecting a day before today
-		 *
-		 * @param datetime the datepicker Date
-		 * @return
-		 */
-		const notBeforeToday = (datetime: Date): boolean =>
-			datetime < moment().add(-1, 'day').toDate()
-
-		/**
-		 * Prevent selecting a time before the current one
-		 *
-		 * @param datetime the datepicker Date
-		 * @return
-		 */
-		const notBeforeNow = (datetime: Date): boolean =>
-			datetime < moment().toDate()
-
-		/**
-		 * Prevent selecting an opening day in the past or after the expiration day
-		 *
-		 * @param datetime the datepicker Date
-		 */
-		const isInvalidOpeningDay = (datetime: Date): boolean =>
-			notBeforeToday(datetime)
-			|| (formExpires.value
-				&& datetime > moment(props.form.expires, 'X').endOf('day').toDate())
-
-		/**
-		 * Prevent selecting an opening time in the past or not before the expiration
-		 *
-		 * @param datetime the datepicker Date
-		 */
-		const isInvalidOpeningTime = (datetime: Date): boolean =>
-			notBeforeNow(datetime)
-			|| (formExpires.value
-				&& datetime >= moment(props.form.expires, 'X').toDate())
-
-		/**
-		 * Prevent selecting an expiration day in the past or before the opening day
-		 *
-		 * @param datetime the datepicker Date
-		 */
-		const isInvalidExpirationDay = (datetime: Date): boolean =>
-			notBeforeToday(datetime)
-			|| (formOpens.value
-				&& datetime < moment(props.form.opens, 'X').startOf('day').toDate())
-
-		/**
-		 * Prevent selecting an expiration time in the past or not after the opening
-		 *
-		 * @param datetime the datepicker Date
-		 */
-		const isInvalidExpirationTime = (datetime: Date): boolean =>
-			notBeforeNow(datetime)
-			|| (formOpens.value
-				&& datetime <= moment(props.form.opens, 'X').toDate())
 
 		const saveConfirmationEmailQuestionId = (
 			selectedQuestionId: number | null,
@@ -886,6 +835,9 @@ export default defineComponent({
 			isExpired,
 			expirationDate,
 			openingDate,
+			openingDateMin,
+			openingDateMax,
+			expirationDateMin,
 			submissionMessageHTML,
 			emailBodyPlaceholder,
 			emailQuestionCount,
@@ -902,10 +854,6 @@ export default defineComponent({
 			stringifyDate,
 			stringifyOpeningDate,
 			parseTimestampToDate,
-			isInvalidOpeningDay,
-			isInvalidOpeningTime,
-			isInvalidExpirationDay,
-			isInvalidExpirationTime,
 			onAnonChange,
 			onSubmitMultipleChange,
 			onAllowEditSubmissionsChange,
