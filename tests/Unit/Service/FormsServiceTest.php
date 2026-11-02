@@ -1293,15 +1293,7 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->hasFormOpened($form));
 	}
 
-	public static function dataLoadFormForSubmission() {
-		return [
-			'hasOpened' => [time() - 3600, true],
-			'hasNotOpened' => [time() + 3600, false],
-			'noOpeningDate' => [0, true],
-		];
-	}
-
-	#[DataProvider('dataLoadFormForSubmission')]
+	#[DataProvider('dataHasFormOpened')]
 	public function testLoadFormForSubmissionOpeningDate(int $opens, bool $canSubmit) {
 		$form = new Form();
 		$form->setId(42);
