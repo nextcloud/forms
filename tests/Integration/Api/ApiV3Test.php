@@ -1679,6 +1679,20 @@ class ApiV3Test extends IntegrationBase {
 		], $data['submissions'][0]);
 	}
 
+	public function testUpdateFormOpeningDateAfter2038(): void {
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'opens' => 2200000000,
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$form = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals(2200000000, $form['opens']);
+	}
+
 	public function testQuestionsHiddenBeforeOpeningDate() {
 		$formId = $this->testForms[2]['id'];
 		$resp = $this->http->request('PATCH', "api/v3/forms/{$formId}", [

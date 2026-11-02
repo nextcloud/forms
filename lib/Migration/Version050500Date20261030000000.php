@@ -18,7 +18,7 @@ use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 use Override;
 
-#[AddColumn(table: 'forms_v2_forms', name: 'opens', type: ColumnType::INTEGER, description: 'Timestamp from which a form accepts responses')]
+#[AddColumn(table: 'forms_v2_forms', name: 'opens', type: ColumnType::BIGINT, description: 'Timestamp from which a form accepts responses')]
 class Version050500Date20261030000000 extends SimpleMigrationStep {
 	#[Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
@@ -30,7 +30,7 @@ class Version050500Date20261030000000 extends SimpleMigrationStep {
 			return null;
 		}
 
-		$table->addColumn('opens', Types::INTEGER, [
+		$table->addColumn('opens', Types::BIGINT, [
 			'notnull' => true,
 			'default' => 0,
 			'comment' => 'Timestamp from which the form accepts responses, 0 means immediately',
