@@ -75,6 +75,8 @@
 			<NcDateTimePicker
 				v-if="!locked"
 				id="opensDatetimePicker"
+				:ariaLabel="t('forms', 'Opening date')"
+				:ariaLabelMenu="t('forms', 'Choose opening date')"
 				:clearable="false"
 				:format="stringifyOpeningDate"
 				:min="openingDateMin"
@@ -98,7 +100,8 @@
 			<NcDateTimePicker
 				v-if="!locked"
 				id="expiresDatetimePicker"
-				:aria-label="t('forms', 'Expiration date')"
+				:ariaLabel="t('forms', 'Expiration date')"
+				:ariaLabelMenu="t('forms', 'Choose expiration date')"
 				:clearable="false"
 				:format="stringifyDate"
 				:min="expirationDateMin"
