@@ -43,7 +43,7 @@
 					class="modal-content__select"
 					:loading="loading"
 					:options="options"
-					:placeholder="t('forms', 'Search for a user')"
+					:inputLabel="t('forms', 'Search for a user')"
 					@search="
 						(query) => asyncSearch(query, [SHARE_TYPES.SHARE_TYPE_USER])
 					">

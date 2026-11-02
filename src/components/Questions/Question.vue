@@ -130,6 +130,11 @@
 					ref="descriptionField"
 					dir="auto"
 					:value="description"
+					:aria-label="
+						t('forms', 'Description of question number {index}', {
+							index,
+						})
+					"
 					:placeholder="
 						t(
 							'forms',

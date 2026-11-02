@@ -39,6 +39,7 @@
 					type="multiselect"
 					:modelValue="maxFileSizeUnit"
 					:options="availableUnits"
+					:aria-label-combobox="t('forms', 'File size unit')"
 					required
 					:clearable="false"
 					:searchable="false"
@@ -68,6 +69,7 @@
 				<NcActionInput
 					key="allowed-file-extensions-multiselect"
 					:label="t('forms', 'Custom file extensions')"
+					:aria-label-combobox="t('forms', 'Custom file extensions')"
 					type="multiselect"
 					multiple
 					taggable
