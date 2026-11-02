@@ -243,15 +243,19 @@ JSON
 	}
 
 	public static function dataImport() {
+		$base = '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"confirmationEmailEnabled":true,"confirmationEmailSubject":"Thanks","confirmationEmailBody":"Body","confirmationEmailQuestionId":null,"allowComments":false,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]';
+		$withOpeningDate = json_decode($base, true);
+		$withOpeningDate[0]['opens'] = 1700000000;
+
 		return [
 			'exactlyOneOfEach' => [
-				'inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"confirmationEmailEnabled":true,"confirmationEmailSubject":"Thanks","confirmationEmailBody":"Body","confirmationEmailQuestionId":null,"allowComments":false,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]',
+				'inputJson' => $base,
 				'expectedOpens' => 0,
 			],
 			'withOpeningDate' => [
-				'inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"opens":1700000000,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"confirmationEmailEnabled":true,"confirmationEmailSubject":"Thanks","confirmationEmailBody":"Body","confirmationEmailQuestionId":null,"allowComments":false,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]',
+				'inputJson' => json_encode($withOpeningDate),
 				'expectedOpens' => 1700000000,
-			]
+			],
 		];
 	}
 
