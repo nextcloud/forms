@@ -66,9 +66,9 @@
 		</NcCheckboxRadioSwitch>
 		<div v-show="formOpens && !formArchived" class="settings-div--indent">
 			<NcDateTimePicker
+				v-if="!locked"
 				id="opensDatetimePicker"
 				:clearable="false"
-				:disabled="locked"
 				:format="stringifyOpeningDate"
 				:min="openingDateMin"
 				:max="openingDateMax"
@@ -76,6 +76,9 @@
 				:modelValue="openingDate"
 				type="datetime"
 				@update:modelValue="onDateChange('opens', $event)" />
+			<p v-else>
+				{{ stringifyOpeningDate(openingDate) }}
+			</p>
 		</div>
 		<NcCheckboxRadioSwitch
 			:modelValue="formExpires"
@@ -86,16 +89,19 @@
 		</NcCheckboxRadioSwitch>
 		<div v-show="formExpires && !formArchived" class="settings-div--indent">
 			<NcDateTimePicker
+				v-if="!locked"
 				id="expiresDatetimePicker"
 				:aria-label="t('forms', 'Expiration date')"
 				:clearable="false"
-				:disabled="locked"
 				:format="stringifyDate"
 				:min="expirationDateMin"
 				:minuteStep="5"
 				:modelValue="expirationDate"
 				type="datetime"
 				@update:modelValue="onDateChange('expires', $event)" />
+			<p v-else>
+				{{ stringifyDate(expirationDate) }}
+			</p>
 			<NcCheckboxRadioSwitch
 				:modelValue="form.showExpiration"
 				:disabled="locked"
@@ -710,7 +716,7 @@ export default defineComponent({
 			key: 'opens' | 'expires',
 			datetime: Date | [Date, Date] | null,
 		): void => {
-			if (!(datetime instanceof Date)) {
+			if (props.locked || !(datetime instanceof Date)) {
 				return
 			}
 			emit('update:formProp', key, moment(datetime).unix())
