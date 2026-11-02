@@ -285,6 +285,7 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
     - To transfer the ownership of a form to another user, you must only send a single _keyValuePair_ containing the key `ownerId` and the user id of the new owner.
     - To link a file for submissions, the _keyValuePairs_ need to contain the keys `path` and `fileFormat`
     - To unlink a file for submissions, the _keyValuePairs_ need to contain the keys `fileId` and `fileFormat` need to contain the value `null`
+    - `opens` and `expires` must be non-negative unix timestamps, `0` means not set
     - If both `opens` and `expires` are set (not `0`), `opens` must be before `expires`
 - Response: **Status-Code OK**, as well as the id of the updated form.
 

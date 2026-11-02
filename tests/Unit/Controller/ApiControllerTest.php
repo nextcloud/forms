@@ -1674,7 +1674,10 @@ class ApiControllerTest extends TestCase {
 	public static function dataUpdateFormRejectsInvalidOpeningDate(): array {
 		return [
 			'negative' => [0, 0, ['opens' => -1]],
-			'not an integer' => [0, 0, ['opens' => '1700000000']],
+			'not a number' => [0, 0, ['opens' => 'tomorrow']],
+			'null' => [0, 0, ['opens' => null]],
+			'negative expiration' => [0, 0, ['expires' => -5]],
+			'expiration not a number' => [0, 0, ['expires' => 'tomorrow']],
 			'after expiration' => [0, 1700000000, ['opens' => 1700003600]],
 			'equal to expiration' => [0, 0, ['opens' => 1700000000, 'expires' => 1700000000]],
 			'expiration before opening' => [1700003600, 0, ['expires' => 1700000000]],
@@ -1703,6 +1706,7 @@ class ApiControllerTest extends TestCase {
 			'both at once' => [0, 0, ['opens' => 1700000000, 'expires' => 1700003600], 1700000000, 1700003600],
 			'removing expiration' => [1700003600, 1700007200, ['expires' => 0], 1700003600, 0],
 			'removing opening date' => [1700003600, 1700007200, ['opens' => 0], 0, 1700007200],
+			'numeric strings' => [0, 0, ['opens' => '1700000000', 'expires' => '1700003600'], 1700000000, 1700003600],
 		];
 	}
 

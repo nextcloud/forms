@@ -1259,6 +1259,24 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->hasFormExpired($form));
 	}
 
+	public static function dataAreFormDatesValid() {
+		return [
+			'none set' => [0, 0, true],
+			'only opening date' => [1700000000, 0, true],
+			'only expiration date' => [0, 1700000000, true],
+			'opens before expiry' => [1700000000, 1700003600, true],
+			'opens at expiry' => [1700000000, 1700000000, false],
+			'opens after expiry' => [1700003600, 1700000000, false],
+			'negative opening date' => [-1, 0, false],
+			'negative expiration date' => [0, -1, false],
+		];
+	}
+
+	#[DataProvider('dataAreFormDatesValid')]
+	public function testAreFormDatesValid(int $opens, int $expires, bool $expected) {
+		$this->assertSame($expected, FormsService::areFormDatesValid($opens, $expires));
+	}
+
 	public static function dataHasFormOpened() {
 		return [
 			'hasOpened' => [time() - 3600, true],

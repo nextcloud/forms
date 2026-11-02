@@ -691,6 +691,17 @@ class FormsService {
 	}
 
 	/**
+	 * Check that the opening and expiration date are valid timestamps
+	 * and the form opens before it expires, `0` means not set.
+	 */
+	public static function areFormDatesValid(int $opens, int $expires): bool {
+		if ($opens < 0 || $expires < 0) {
+			return false;
+		}
+		return $opens === 0 || $expires === 0 || $opens < $expires;
+	}
+
+	/**
 	 * Check if the opening date of the form has been reached.
 	 */
 	public function hasFormOpened(Form $form): bool {

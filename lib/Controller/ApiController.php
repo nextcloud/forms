@@ -284,7 +284,7 @@ class ApiController extends OCSController {
 	 * @param int $formId FormId of form to update
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int|string, array{}>
-	 * @throws OCSBadRequestException Invalid opening date or opening date not before expiration date
+	 * @throws OCSBadRequestException Invalid opening or expiration date, or opening date not before expiration date
 	 * @throws OCSBadRequestException Could not find new form owner
 	 * @throws OCSForbiddenException Empty keyValuePairs provided
 	 * @throws OCSForbiddenException Not allowed to update id, hash, created, fileId or lastUpdated. OwnerId only allowed if no other key provided.
@@ -339,7 +339,7 @@ class ApiController extends OCSController {
 		// Do not allow changing showToAllUsers or permitAllUsers if disabled
 		$this->checkAccessUpdate($keyValuePairs);
 
-		$this->checkOpeningDateUpdate($form, $keyValuePairs);
+		$this->checkDatesUpdate($form, $keyValuePairs);
 
 		$previousAccess = $form->getAccess();
 		$previousState = $form->getState();
@@ -1968,22 +1968,35 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * Throws if the opening date is invalid or not before the expiration date
+	 * Throws if the opening or expiration date is not a timestamp or the form would not open before it expires.
+	 * Numeric strings are converted to integers.
+	 *
+	 * @param array<string, mixed> $keyValuePairs
 	 */
-	private function checkOpeningDateUpdate(Form $form, array $keyValuePairs): void {
+	private function checkDatesUpdate(Form $form, array &$keyValuePairs): void {
 		if (!array_key_exists('opens', $keyValuePairs) && !array_key_exists('expires', $keyValuePairs)) {
 			return;
 		}
 
-		if (array_key_exists('opens', $keyValuePairs)
-			&& (!is_int($keyValuePairs['opens']) || $keyValuePairs['opens'] < 0)) {
-			$this->logger->info('Invalid opening date');
-			throw new OCSBadRequestException('Invalid opening date');
+		foreach (['opens' => 'opening', 'expires' => 'expiration'] as $key => $name) {
+			if (!array_key_exists($key, $keyValuePairs)) {
+				continue;
+			}
+
+			$value = $keyValuePairs[$key];
+			if (is_string($value) && ctype_digit($value)) {
+				$value = (int)$value;
+			}
+			if (!is_int($value) || $value < 0) {
+				$this->logger->info("Invalid {$name} date");
+				throw new OCSBadRequestException("Invalid {$name} date");
+			}
+			$keyValuePairs[$key] = $value;
 		}
 
-		$opens = $keyValuePairs['opens'] ?? $form->getOpens();
-		$expires = $keyValuePairs['expires'] ?? $form->getExpires();
-		if ($opens > 0 && $expires > 0 && $opens >= $expires) {
+		$opens = $keyValuePairs['opens'] ?? (int)$form->getOpens();
+		$expires = $keyValuePairs['expires'] ?? (int)$form->getExpires();
+		if (!FormsService::areFormDatesValid($opens, $expires)) {
 			$this->logger->info('Opening date must be before expiration date');
 			throw new OCSBadRequestException('Opening date must be before expiration date');
 		}
