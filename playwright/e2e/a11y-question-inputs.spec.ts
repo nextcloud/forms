@@ -200,6 +200,18 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('Rate your experience')
 		await questions[0].fillDescription('From 1 to 5')
+		await expect(
+			questions[0].section.getByRole('textbox', {
+				name: 'Label for lowest value',
+				exact: true,
+			}),
+		).toBeVisible()
+		await expect(
+			questions[0].section.getByRole('textbox', {
+				name: 'Label for highest value',
+				exact: true,
+			}),
+		).toBeVisible()
 
 		await topBar.toggleView(FormsView.View)
 
