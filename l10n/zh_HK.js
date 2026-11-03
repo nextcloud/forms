@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "允許每個人有多個回應",
     "Allow editing own responses" : "允許編輯自己的回應",
     "Set expiration date" : "設定到期日",
+    "Expiration date" : "到期日",
     "Show expiration date on form" : "在表單上顯示屆滿日期",
     "Limit number of responses" : "限制回應數量",
     "Maximum number of responses" : "回應數量上限",

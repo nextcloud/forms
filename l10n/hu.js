@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Több válasz engedélyezése személyenként",
     "Allow editing own responses" : "Saját válaszok szerkesztésének engedélyezése",
     "Set expiration date" : "Lejárati idő beállítása",
+    "Expiration date" : "Lejárati idő",
     "Show expiration date on form" : "Lejárati dátum megjelenítése az űrlapon",
     "Limit number of responses" : "Válaszok számának korlátozása",
     "Maximum number of responses" : "Válaszok legnagyobb száma",

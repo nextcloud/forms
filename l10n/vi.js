@@ -24,6 +24,7 @@ OC.L10N.register(
     "Other" : "Khác",
     "never" : "không thay đổi",
     "Set expiration date" : "Đặt ngày hết hạn",
+    "Expiration date" : "Ngày kết thúc",
     "Group" : "N",
     "Team" : "Đội",
     "Share link" : "Chia sẻ liên kết",

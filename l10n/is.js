@@ -59,6 +59,7 @@ OC.L10N.register(
     "Expires on {date}" : "Rennur út {date}",
     "never" : "aldrei",
     "Set expiration date" : "Setja gildistíma",
+    "Expiration date" : "Gildir til",
     "Group" : "Hópur",
     "Team" : "Teymi",
     "Permissions" : "Heimildir",

@@ -166,6 +166,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Ruhusu majibu mengi kwa kila mtu",
     "Allow editing own responses" : "Ruhusu kuhariri majibu yako mwenyewe",
     "Set expiration date" : "Weka tarehe ya mwisho wa matumizi",
+    "Expiration date" : "Tarehe ya kumalizika muda wake",
     "Show expiration date on form" : "Onesha tarehe ya mwisho wa matumizi kwenye fomu",
     "Close form" : "Funga fomu",
     "Lock form permanently" : "Funga fomu moja kwa moja",

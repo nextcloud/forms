@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Leisti kiekvienam žmogui atsakinėti po keletą kartų",
     "Allow editing own responses" : "Leisti redaguoti savo atsakymus",
     "Set expiration date" : "Nustatyti galiojimo pabaigos datą",
+    "Expiration date" : "Galiojimo pabaigos data",
     "Show expiration date on form" : "Rodyti galiojimo datą anketoje",
     "Limit number of responses" : "Riboti atsakymų skaičių",
     "Maximum number of responses" : "Maksimalus atsakymų skaičius",

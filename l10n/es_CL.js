@@ -18,6 +18,7 @@ OC.L10N.register(
     "Other" : "Otro",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
+    "Expiration date" : "Fecha de expiración",
     "Group" : "Grupo",
     "Permissions" : "Permisos",
     "Share link" : "Compartir liga",

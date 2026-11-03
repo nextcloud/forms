@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Bir kişi birkaç kez yanıtlayabilirsin",
     "Allow editing own responses" : "Kendi yanıtlarını düzenleyebilsin",
     "Set expiration date" : "Geçerlilik sonu tarihini ayarla",
+    "Expiration date" : "Geçerlilik sonu tarihi",
     "Show expiration date on form" : "Form üzerinde geçerlilik sonu tarihi görüntülensin",
     "Limit number of responses" : "Yanıt sayısı sınırlansın",
     "Maximum number of responses" : "Verilebilecek en fazla yanıt",

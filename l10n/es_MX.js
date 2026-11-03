@@ -82,6 +82,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Almacenar las respuestas de forma anónima",
     "Allow multiple responses per person" : "Permitir múltiples respuestas por persona",
     "Set expiration date" : "Establece la fecha de expiración",
+    "Expiration date" : "Fecha de expiración",
     "Show expiration date on form" : "Establecer la fecha de expiración del enlace",
     "Group" : "Grupo",
     "Team" : "Equipo",

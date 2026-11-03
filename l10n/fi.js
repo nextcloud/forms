@@ -123,6 +123,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Salli useita vastauksia yhdeltä henkilöltä",
     "Allow editing own responses" : "Salli omien vastausten muokkaaminen",
     "Set expiration date" : "Aseta vanhenemispäivä",
+    "Expiration date" : "Vanhenemispäivä",
     "Show expiration date on form" : "Aseta vanhenemispäivä lomakkeessa",
     "Close form" : "Sulje lomake",
     "Lock form permanently" : "Lukitse lomake lopullisesti",

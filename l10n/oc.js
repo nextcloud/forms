@@ -18,6 +18,7 @@ OC.L10N.register(
     "Text" : "Tèxt",
     "never" : "pas jamai",
     "Set expiration date" : "Especificar una data d'expiracion",
+    "Expiration date" : "Data d'expiracion",
     "Group" : "Grop",
     "Permissions" : "Autorizacions",
     "Share link" : "Partejar lo ligam",

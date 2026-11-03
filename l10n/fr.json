@@ -207,6 +207,7 @@
     "Allow multiple responses per person" : "Autoriser plusieurs réponses par personne",
     "Allow editing own responses" : "Autoriser la modification de ses propres réponses",
     "Set expiration date" : "Définir une date d'expiration",
+    "Expiration date" : "Date d’expiration",
     "Show expiration date on form" : "Afficher la date d'expiration sur le formulaire",
     "Limit number of responses" : "Limiter le nombre de réponses",
     "Maximum number of responses" : "Nombre maximum de réponses",

@@ -166,6 +166,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Permitir múltiples respuestas por persona",
     "Allow editing own responses" : "Permitir editar las respuestas propias",
     "Set expiration date" : "Fijar fecha de caducidad",
+    "Expiration date" : "Fecha de caducidad",
     "Show expiration date on form" : "Establece la fecha de caducidad del enlace",
     "Close form" : "Cerrar formulario",
     "Lock form permanently" : "Bloquear formulario permanentemente",

@@ -165,6 +165,7 @@
     "Allow multiple responses per person" : "ອະນຸຍາດໃຫ້ຕອບໄດ້ຫຼາຍຄັ້ງຕໍ່ຄົນ",
     "Allow editing own responses" : "ອະນຸຍາດໃຫ້ແກ້ໄຂຄຳຕອບຂອງຕົນເອງ",
     "Set expiration date" : "ກໍານົດວັນໝົດອາຍຸ",
+    "Expiration date" : "ວັນໝົດອາຍຸ",
     "Show expiration date on form" : "ສະແດງວັນທີໝົດອາຍຸໃນແບບຟອມ",
     "Close form" : "ປິດແບບຟອມ",
     "Lock form permanently" : "ລັອກແບບຟອມຖາວອນ",

@@ -132,6 +132,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Gorde erantzunak modu anonimoan",
     "Allow multiple responses per person" : "Onartu erantzun ugari pertsonako",
     "Set expiration date" : "Ezarri iraungitze-data",
+    "Expiration date" : "Iraungitze-data",
     "Show expiration date on form" : "Erakutsi iraungitze data inprimakian",
     "Close form" : "Itxi galdetegia",
     "Custom submission message" : "Pertsonalizatu bidalketaren mezua",

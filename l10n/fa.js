@@ -201,6 +201,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "اجازه چند پاسخ از هر شخص",
     "Allow editing own responses" : "اجازه ویرایش پاسخ‌های خود",
     "Set expiration date" : "تنظیم تاریخ انقضا",
+    "Expiration date" : "تاریخ انقضا",
     "Show expiration date on form" : "نمایش تاریخ انقضا در فرم",
     "Limit number of responses" : "محدود کردن تعداد پاسخ‌ها",
     "Maximum number of responses" : "حداکثر تعداد پاسخ‌ها",

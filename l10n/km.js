@@ -10,6 +10,7 @@ OC.L10N.register(
     "Other" : "ផ្សេងៗ",
     "never" : "មិនដែរ",
     "Set expiration date" : "កំណត់​ពេល​ផុត​កំណត់",
+    "Expiration date" : "ពេល​ផុត​កំណត់",
     "Group" : "Group",
     "Share link" : "Share link",
     "Edit" : "កែប្រែ",

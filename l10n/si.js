@@ -12,6 +12,7 @@ OC.L10N.register(
     "Responses" : "ප්‍රතිචාර",
     "Delete" : "Delete",
     "Other" : "වෙනත්",
+    "Expiration date" : "Expiration date",
     "Group" : "සමූහය",
     "Edit" : "සංස්කරණය",
     "Share" : "බෙදාගන්න",

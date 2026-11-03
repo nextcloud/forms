@@ -49,6 +49,7 @@ OC.L10N.register(
     "Expires on {date}" : "Expira el {día}",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de caducidad",
+    "Expiration date" : "Fecha de expiración",
     "Group" : "Grupo",
     "Permissions" : "Permisos",
     "Share link" : "Compartir enlace",

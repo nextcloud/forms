@@ -31,6 +31,7 @@ OC.L10N.register(
     "Other" : "Cits",
     "never" : "nekad",
     "Set expiration date" : "Iestatīt derīguma beigu datumu",
+    "Expiration date" : "Derīguma beigu datums",
     "Group" : "Grupa",
     "Team" : "Komanda",
     "Permissions" : "Atļaujas",

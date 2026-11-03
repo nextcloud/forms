@@ -13,6 +13,7 @@ OC.L10N.register(
     "Other" : "Arall",
     "never" : "byth",
     "Set expiration date" : "Gosod dyddiad dod i ben",
+    "Expiration date" : "Dyddiad dod i ben",
     "Group" : "Grŵp",
     "Share link" : "Rhannu dolen",
     "Copy embedding code" : "Copïo cod mewnosod",

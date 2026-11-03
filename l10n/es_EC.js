@@ -84,6 +84,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Almacenar respuestas de forma anónima",
     "Allow multiple responses per person" : "Permitir múltiples respuestas por persona",
     "Set expiration date" : "Establecer fecha de expiración",
+    "Expiration date" : "Fecha de expiración",
     "Show expiration date on form" : "Mostrar fecha de caducidad en el formulario",
     "Group" : "Grupo",
     "Permissions" : "Permisos",
