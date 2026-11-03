@@ -18,6 +18,7 @@ OC.L10N.register(
     "Other" : "Aner",
     "never" : "Ni",
     "Set expiration date" : "Verfallsdatum setzen",
+    "Expiration date" : "Verfallsdatum",
     "Group" : "Grupp",
     "Team" : "Team",
     "Share link" : "Link deelen",

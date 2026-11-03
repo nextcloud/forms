@@ -101,6 +101,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Shrani odzive brezimno",
     "Allow multiple responses per person" : "Dovoli več odzivov vsakega uporabnika",
     "Set expiration date" : "Nastavi datum preteka",
+    "Expiration date" : "Datum preteka",
     "Show expiration date on form" : "Pokaži datum preteka na vprašalniku",
     "Group" : "Skupina",
     "Team" : "Skupina",

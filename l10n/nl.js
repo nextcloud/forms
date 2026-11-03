@@ -76,6 +76,7 @@ OC.L10N.register(
     "never" : "geen",
     "Allow multiple responses per person" : "Meerdere reacties per persoon toestaan",
     "Set expiration date" : "Stel vervaldatum in",
+    "Expiration date" : "Vervaldatum",
     "Group" : "Groep",
     "Team" : "Team",
     "Permissions" : "Rechten",

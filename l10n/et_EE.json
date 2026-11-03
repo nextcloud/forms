@@ -207,6 +207,7 @@
     "Allow multiple responses per person" : "Luba ühelt vastajalt mitu vastust",
     "Allow editing own responses" : "Luba omade vastuste muutmist",
     "Set expiration date" : "Määra aegumise kuupäev",
+    "Expiration date" : "Aegumise kuupäev",
     "Show expiration date on form" : "Näita vormil aegumise kuupäeva",
     "Limit number of responses" : "Piira vastuste arvu",
     "Maximum number of responses" : "Vastuste maksimumarv",

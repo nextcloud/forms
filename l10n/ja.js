@@ -119,6 +119,7 @@ OC.L10N.register(
     "Store responses anonymously" : "回答を匿名で保存する",
     "Allow multiple responses per person" : "ユーザーごとに複数の回答を許可",
     "Set expiration date" : "有効期限を設定",
+    "Expiration date" : "有効期限",
     "Close form" : "フォームを閉じる",
     "Group" : "グループ",
     "Team" : "チーム",

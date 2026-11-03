@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Erlaube mehrere Antworten pro Person",
     "Allow editing own responses" : "Bearbeiten der eigenen Antwort zulassen",
     "Set expiration date" : "Ablaufdatum setzen",
+    "Expiration date" : "Ablaufdatum",
     "Show expiration date on form" : "Ablaufdatum auf dem Formular anzeigen",
     "Limit number of responses" : "Anzahl der Antworten begrenzen",
     "Maximum number of responses" : "Maximale Anzahl von Antworten",

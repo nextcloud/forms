@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Tillåt flera svar per person",
     "Allow editing own responses" : "Tillåt redigering av egna svar",
     "Set expiration date" : "Ange utgångsdatum",
+    "Expiration date" : "Utgångsdatum",
     "Show expiration date on form" : "Visa utgångsdatum på formuläret",
     "Limit number of responses" : "Begränsa antalet svar",
     "Maximum number of responses" : "Högsta antal svar",

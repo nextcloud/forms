@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Povoliť viac odpovedí na osobu",
     "Allow editing own responses" : "Povoliť úpravu vlastných odpovedí",
     "Set expiration date" : "Nastaviť dátum expirácie",
+    "Expiration date" : "Dátum vypršania platnosti",
     "Show expiration date on form" : "Zobraziť dátum expirácie vo formulári",
     "Limit number of responses" : "Obmedziť počet odpovedí",
     "Maximum number of responses" : "Maximálny počet odpovedí",

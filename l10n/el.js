@@ -203,6 +203,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Να επιτρέπονται πολλές απαντήσεις ανά χρήστη",
     "Allow editing own responses" : "Να επιτρέπεται η επεξεργασία των δικών σας απαντήσεων",
     "Set expiration date" : "Ορισμός ημερομηνίας λήξης",
+    "Expiration date" : "Ημερομηνία λήξης",
     "Show expiration date on form" : "Εμφάνιση ημερομηνίας λήξης στη φόρμα",
     "Limit number of responses" : "Περιορισμός αριθμού απαντήσεων",
     "Maximum number of responses" : "Μέγιστος αριθμός απαντήσεων",

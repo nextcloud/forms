@@ -187,6 +187,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Permitir respostas múltiplas por pessoa",
     "Allow editing own responses" : "Permitir a edição das próprias respostas",
     "Set expiration date" : "Definir a data de expiração",
+    "Expiration date" : "Data de expiração",
     "Limit number of responses" : "Limitar número de respostas",
     "Maximum number of responses" : "Número máximo de respostas",
     "Form will be closed automatically when the limit is reached." : "O formulário será fechado automaticamente quando o limite for atingido.",

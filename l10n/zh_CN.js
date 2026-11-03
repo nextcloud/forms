@@ -176,6 +176,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "允许单人多次回应",
     "Allow editing own responses" : "允许编辑自己的回复",
     "Set expiration date" : "设置过期日期",
+    "Expiration date" : "过期日期",
     "Show expiration date on form" : "在表单中显示过期日期",
     "Limit number of responses" : "限制回应数量",
     "Maximum number of responses" : "最大回应数量",

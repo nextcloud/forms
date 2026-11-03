@@ -18,6 +18,7 @@ OC.L10N.register(
     "Other" : "სხვა",
     "never" : "არასდროს",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",
+    "Expiration date" : "გაუქმების თარიღი",
     "Group" : "ჯგუფი",
     "Permissions" : "უფლებები",
     "Share link" : "ბმულის გაზიარება",

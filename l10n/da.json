@@ -207,6 +207,7 @@
     "Allow multiple responses per person" : "Tillad flere svar pr. person",
     "Allow editing own responses" : "Tillad redigering af egne svar",
     "Set expiration date" : "Angiv udløbsdato",
+    "Expiration date" : "Udløbsdato",
     "Show expiration date on form" : "Vis udløbsdato på formularen",
     "Limit number of responses" : "Begræns antallet af svar",
     "Maximum number of responses" : "Maksimalt antal svar",

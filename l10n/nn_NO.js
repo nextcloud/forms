@@ -19,6 +19,7 @@ OC.L10N.register(
     "Other" : "Anna",
     "never" : "aldri",
     "Set expiration date" : "Set utløpsdato",
+    "Expiration date" : "Utløpsdato",
     "Group" : "Gruppe",
     "Share link" : "Del lenkje",
     "Copy to clipboard" : "Kopiert til utklippstavla",

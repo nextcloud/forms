@@ -46,6 +46,7 @@ OC.L10N.register(
     "No response" : "Tidak ada respons",
     "never" : "tidak pernah.",
     "Set expiration date" : "Atur tanggal kedaluwarsa",
+    "Expiration date" : "Tanggal kedaluwarsa",
     "Group" : "Grup",
     "Team" : "Tim",
     "Permissions" : "Izin",

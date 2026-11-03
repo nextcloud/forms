@@ -24,6 +24,7 @@ OC.L10N.register(
     "Other" : "Tjetër",
     "never" : "kurrë",
     "Set expiration date" : "Caktoni datë skadimi",
+    "Expiration date" : "Datë skadimi",
     "Group" : "Grup",
     "Permissions" : "Lejet",
     "Share link" : "Lidhje ndarjeje",

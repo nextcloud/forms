@@ -20,6 +20,7 @@ OC.L10N.register(
     "Other" : "Alia",
     "never" : "neniam",
     "Set expiration date" : "Uzi limdaton",
+    "Expiration date" : "Limdato",
     "Group" : "Grupo",
     "Share link" : "Kunhavigi ligilon",
     "Add link" : "Aldoni ligilon",

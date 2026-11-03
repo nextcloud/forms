@@ -209,6 +209,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Хүн бүрт олон хариулт зөвшөөрөх",
     "Allow editing own responses" : "Өөрийн хариултуудыг засахыг зөвшөөрөх",
     "Set expiration date" : "Дуусах хугацааг тохируулах",
+    "Expiration date" : "Дуусах огноо",
     "Show expiration date on form" : "Маягт дээр дуусах огноог харуулах",
     "Limit number of responses" : "Хариултын тоог хязгаарлах",
     "Maximum number of responses" : "Хариултын дээд тоо",

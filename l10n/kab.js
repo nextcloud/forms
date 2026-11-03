@@ -29,6 +29,7 @@ OC.L10N.register(
     "Other" : "Wayeḍ",
     "No response" : "No response",
     "never" : "werjin",
+    "Expiration date" : "Azemz n tagara",
     "Group" : "Agraw",
     "Team" : "Tarbaɛt",
     "Permissions" : "Tasirag",

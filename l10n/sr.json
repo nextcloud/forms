@@ -165,6 +165,7 @@
     "Allow multiple responses per person" : "Дозволи да једна особа пошаље више одговора",
     "Allow editing own responses" : "Дозволи уређивање сопствених одговора",
     "Set expiration date" : "Постави датум истека",
+    "Expiration date" : "Датум истека",
     "Show expiration date on form" : "Прикажи на упитнику датум истека",
     "Close form" : "Затвори формулар",
     "Lock form permanently" : "Трајно закључај формулар",

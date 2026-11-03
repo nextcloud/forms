@@ -19,6 +19,7 @@ OC.L10N.register(
     "Other" : "Ostali",
     "never" : "nikada",
     "Set expiration date" : "Postavi datum isteka",
+    "Expiration date" : "Datum isteka",
     "Group" : "Group",
     "Share link" : "Podeli vezu",
     "Edit" : "Izmeni",

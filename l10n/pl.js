@@ -116,6 +116,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Zachowuj odpowiedzi anonimowo",
     "Allow multiple responses per person" : "Zezwalaj na wiele odpowiedzi na osobę",
     "Set expiration date" : "Ustaw datę ważności",
+    "Expiration date" : "Data wygaśnięcia",
     "Show expiration date on form" : "Pokaż datę wygaśnięcia w formularzu",
     "Close form" : "Zamknij formularz",
     "Custom submission message" : "Niestandardowy komunikat po wypełnieniu formularza",

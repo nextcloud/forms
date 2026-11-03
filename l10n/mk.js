@@ -60,6 +60,7 @@ OC.L10N.register(
     "never" : "никогаш",
     "Allow multiple responses per person" : "Дозволи повеќе одговори од една личност",
     "Set expiration date" : "Постави рок на траење",
+    "Expiration date" : "Рок на траење",
     "Group" : "Група",
     "Team" : "Тим",
     "Permissions" : "Дозволи",

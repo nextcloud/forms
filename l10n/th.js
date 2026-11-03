@@ -54,6 +54,7 @@ OC.L10N.register(
     "Expires on {date}" : "หมดอายุตอน {date}",
     "never" : "ไม่เคย",
     "Set expiration date" : "กำหนดวันหมดอายุ",
+    "Expiration date" : "วันหมดอายุ",
     "Group" : "กลุ่ม",
     "Share link" : "แชร์ลิงก์",
     "Copy to clipboard" : "คัดลอกไปยังคลิปบอร์ด",

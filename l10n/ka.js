@@ -19,6 +19,7 @@ OC.L10N.register(
     "Other" : "Other",
     "never" : "never",
     "Set expiration date" : "Set expiration date",
+    "Expiration date" : "Expiration date",
     "Group" : "Group",
     "Permissions" : "Permissions",
     "Share link" : "Share link",

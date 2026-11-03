@@ -137,6 +137,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Lagre svar anonymt",
     "Allow multiple responses per person" : "Tillat flere besvarelser per person",
     "Set expiration date" : "Sett utløpsdato",
+    "Expiration date" : "Utløpsdato",
     "Show expiration date on form" : "Vis utløpelsesdato på skjema",
     "Close form" : "Lukk skjema",
     "Custom submission message" : "Tilpasset innsendingsmelding",

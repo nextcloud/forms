@@ -52,6 +52,7 @@ OC.L10N.register(
     "never" : "מעולם לא",
     "Allow multiple responses per person" : "לאפשר מספר תגובות למשתתף",
     "Set expiration date" : "הגדרת תאריך תפוגה",
+    "Expiration date" : "תאריך תפוגה",
     "Group" : "קבוצה",
     "Permissions" : "הרשאות",
     "Share link" : "קישור שיתוף",

@@ -21,6 +21,7 @@ OC.L10N.register(
     "Other" : "Boshqa",
     "never" : "hech qachon",
     "Set expiration date" : "Set expiration date",
+    "Expiration date" : "Tugash muddati",
     "Group" : "Guruh",
     "Team" : "Jamoa",
     "Permissions" : "Ruxsatnomalar",
