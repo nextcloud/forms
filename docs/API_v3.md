@@ -88,6 +88,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
     "hash": "yWeMwcwCwoqRs8T2",
     "title": "Form 2",
     "expires": 0,
+    "opens": 0,
     "permissions": [
       "edit",
       "results",
@@ -103,6 +104,7 @@ Returns condensed objects of all Forms beeing owned by the authenticated user.
     "hash": "em4djk8B9BpXnkYG",
     "title": "Form 1",
     "expires": 0,
+    "opens": 0,
     "permissions": [
       "edit",
       "results",
@@ -151,6 +153,7 @@ Returns the full-depth object of the requested form (without submissions).
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to request |
 - Response: A full object of the form, including access, questions and options in full depth.
+  Before the opening date (`opens`) of the form, `questions` is empty for users who can neither edit the form nor see its results.
 
 ```
 "data": {
@@ -166,6 +169,7 @@ Returns the full-depth object of the requested form (without submissions).
     "showToAllUsers": false
   },
   "expires": 0,
+  "opens": 0,
   "fileFormat": "csv",
   "fileId": 157,
   "filePath": "foo/bar",
@@ -281,6 +285,8 @@ Update a single or multiple properties of a form-object. Concerns **only** the F
     - To transfer the ownership of a form to another user, you must only send a single _keyValuePair_ containing the key `ownerId` and the user id of the new owner.
     - To link a file for submissions, the _keyValuePairs_ need to contain the keys `path` and `fileFormat`
     - To unlink a file for submissions, the _keyValuePairs_ need to contain the keys `fileId` and `fileFormat` need to contain the value `null`
+    - `opens` and `expires` must be non-negative unix timestamps, `0` means not set
+    - If both `opens` and `expires` are set (not `0`), `opens` must be before `expires`
 - Response: **Status-Code OK**, as well as the id of the updated form.
 
 ```
@@ -314,6 +320,7 @@ Returns the questions and options of the given form (without submissions).
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form |
 - Response: An array of all questions of the form including options.
+  Before the opening date (`opens`) of the form, users who can neither edit the form nor see its results get a **Forbidden** response.
 
 ```
 "data": [
@@ -398,7 +405,8 @@ Returns the requested question and options of the given form (without submission
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form |
   | _questionId_ | Integer | ID of the question |
-- Response: An object of the requested question including options.
+ - Response: An object of the requested question including options.
+   Before the opening date (`opens`) of the form, users who can neither edit the form nor see its results get a **Forbidden** response.
 
 ```
 "data": {
@@ -1024,7 +1032,7 @@ This returns in case the Request is not properly set. This can e.g. include:
 This returns in case the authenticated user is not allowed to access this resource/endpoint. This can e.g. include:
 
 - The user has no write access to the form (only form owner is allowed to edit)
-- The user is not allowed to submit to the form (access-settings, form expired, already submitted)
+- The user is not allowed to submit to the form (access-settings, form not yet open or expired, already submitted)
 
 ```
 "ocs": {

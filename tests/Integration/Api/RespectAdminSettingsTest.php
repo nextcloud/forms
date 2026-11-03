@@ -120,6 +120,7 @@ class RespectAdminSettingsTest extends IntegrationBase {
 				'description' => '',
 				'created' => 12345,
 				'expires' => 0,
+				'opens' => 0,
 				'state' => 0,
 				'lockedBy' => null,
 				'lockedUntil' => null,

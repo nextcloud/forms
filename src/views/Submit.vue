@@ -124,6 +124,15 @@
 					<NcIconSvgWrapper :svg="IconCheckSvg" :size="64" />
 				</template>
 			</NcEmptyContent>
+			<NcEmptyContent
+				v-else-if="isNotYetOpen"
+				class="forms-emptycontent"
+				:name="t('forms', 'Form not yet open')"
+				:description="openingMessage">
+				<template #icon>
+					<NcIconSvgWrapper :svg="IconScheduleSvg" :size="64" />
+				</template>
+			</NcEmptyContent>
 
 			<!-- Questions list -->
 			<form v-else ref="formElement" @submit.prevent="onSubmit">
@@ -228,6 +237,7 @@ import type {
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
+import IconSchedule from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import IconSend from '@material-symbols/svg-400/outlined/send.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -438,6 +448,10 @@ export default defineComponent({
 			return props.form.expires > 0 && moment().unix() > props.form.expires
 		})
 
+		const isNotYetOpen = computed<boolean>(() => {
+			return props.form.opens > moment().unix()
+		})
+
 		const isArchived = computed<boolean>(() => {
 			return props.form.state === FormState.FormArchived
 		})
@@ -456,7 +470,12 @@ export default defineComponent({
 		 * @return - Returns true if active, otherwise false.
 		 */
 		const isActive = computed<boolean>(() => {
-			return !isArchived.value && !isClosed.value && !isExpired.value
+			return (
+				!isArchived.value
+				&& !isClosed.value
+				&& !isExpired.value
+				&& !isNotYetOpen.value
+			)
 		})
 
 		const infoMessage = computed<string>(() => {
@@ -494,9 +513,29 @@ export default defineComponent({
 				.locale(window.OC?.getLanguage())
 				.fromNow()
 			if (isExpired.value) {
-				return t('forms', 'Expired {relativeDate}.', { relativeDate })
+				return t(
+					'forms',
+					'Expired {relativeDate}.',
+					{ relativeDate },
+					{ escape: false, sanitize: false },
+				)
 			}
-			return t('forms', 'Expires {relativeDate}.', { relativeDate })
+			return t(
+				'forms',
+				'Expires {relativeDate}.',
+				{ relativeDate },
+				{ escape: false, sanitize: false },
+			)
+		})
+
+		const openingMessage = computed<string>(() => {
+			const date = moment(props.form.opens, 'X').format('LLL')
+			return t(
+				'forms',
+				'This form will open on {date}',
+				{ date },
+				{ escape: false, sanitize: false },
+			)
 		})
 
 		/**
@@ -1188,12 +1227,14 @@ export default defineComponent({
 			confirmEmptyModalButtons,
 			confirmLeaveFormButtons,
 			expirationMessage,
+			openingMessage,
 			formElement,
 			hasAnswers,
 			infoMessage,
 			isArchived,
 			isClosed,
 			isExpired,
+			isNotYetOpen,
 			isMaxSubmissionsReached,
 			loading,
 			onKeydownCtrlEnter,
@@ -1213,6 +1254,7 @@ export default defineComponent({
 			validQuestions,
 			title,
 			IconCheckSvg: IconCheck,
+			IconScheduleSvg: IconSchedule,
 			IconRefreshSvg: IconRefresh,
 			IconSendSvg: IconSend,
 			t,

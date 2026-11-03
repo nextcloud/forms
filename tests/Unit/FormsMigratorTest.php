@@ -82,6 +82,7 @@ class FormsMigratorTest extends TestCase {
       "showToAllUsers": false
     },
     "expires": 0,
+    "opens": 0,
 	"state": 0,
 	"lockedBy": null,
 	"lockedUntil": null,
@@ -242,18 +243,35 @@ JSON
 	}
 
 	public static function dataImport() {
+		$base = '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"confirmationEmailEnabled":true,"confirmationEmailSubject":"Thanks","confirmationEmailBody":"Body","confirmationEmailQuestionId":null,"allowComments":false,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]';
+		$withOpeningDate = json_decode($base, true);
+		$withOpeningDate[0]['opens'] = 1700000000;
+		$withOpeningDateAfterExpiration = json_decode($base, true);
+		$withOpeningDateAfterExpiration[0]['opens'] = 1700003600;
+		$withOpeningDateAfterExpiration[0]['expires'] = 1700000000;
+
 		return [
 			'exactlyOneOfEach' => [
-				'inputJson' => '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"lockedBy":null,"lockedUntil":null,"maxSubmissions":null,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,"confirmationEmailEnabled":true,"confirmationEmailSubject":"Thanks","confirmationEmailBody":"Body","confirmationEmailQuestionId":null,"allowComments":false,"questions":[{"id":14,"order":2,"type":"multiple","isRequired":false,"text":"checkbox","description":"huhu","extraSettings":{},"options":[{"text":"ans1"}]}],"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"ans1"}]}]}]'
-			]
+				'inputJson' => $base,
+				'expectedOpens' => 0,
+			],
+			'withOpeningDate' => [
+				'inputJson' => json_encode($withOpeningDate),
+				'expectedOpens' => 1700000000,
+			],
+			'withOpeningDateAfterExpiration' => [
+				'inputJson' => json_encode($withOpeningDateAfterExpiration),
+				'expectedOpens' => 0,
+			],
 		];
 	}
 
 	/**
 	 * @param string $inputJson JsonString to input
+	 * @param int $expectedOpens Opening date the imported form is expected to have
 	 */
 	#[DataProvider('dataImport')]
-	public function testImport(string $inputJson) {
+	public function testImport(string $inputJson, int $expectedOpens) {
 		$user = $this->createMock(IUser::class);
 		$importSource = $this->createMock(IImportSource::class);
 		$output = $this->createMock(OutputInterface::class);
@@ -276,7 +294,8 @@ JSON
 
 		$this->formMapper->expects($this->once())
 			->method('insert')
-			->willReturnCallback(function (Form $form) {
+			->willReturnCallback(function (Form $form) use ($expectedOpens) {
+				$this->assertSame($expectedOpens, $form->getOpens());
 				$this->assertTrue($form->getConfirmationEmailEnabled());
 				$this->assertSame('Thanks', $form->getConfirmationEmailSubject());
 				$this->assertSame('Body', $form->getConfirmationEmailBody());

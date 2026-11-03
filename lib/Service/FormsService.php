@@ -212,7 +212,7 @@ class FormsService {
 	 */
 	public function getForm(Form $form): array {
 		$result = $form->read();
-		$result['questions'] = $this->getQuestions($form->getId());
+		$result['questions'] = $this->canSeeQuestions($form) ? $this->getQuestions($form->getId()) : [];
 		$result['shares'] = $this->getShares($form->getId());
 
 		// Append permissions for current user.
@@ -266,6 +266,7 @@ class FormsService {
 				'hash' => $form->getHash(),
 				'title' => $form->getTitle(),
 				'expires' => $form->getExpires(),
+				'opens' => $form->getOpens(),
 				'lastUpdated' => $form->getLastUpdated(),
 				'permissions' => $permissions,
 				'partial' => true,
@@ -407,6 +408,10 @@ class FormsService {
 			throw new OCSForbiddenException('This form is no longer taking answers');
 		}
 
+		if (!$this->hasFormOpened($form)) {
+			throw new OCSForbiddenException('This form is not yet taking answers');
+		}
+
 		return $form;
 	}
 
@@ -460,6 +465,20 @@ class FormsService {
 		}
 
 		return array_values(array_unique($permissions));
+	}
+
+	/**
+	 * Can the current user see the questions of a form.
+	 * Before the opening date only users who can edit the form or see its results can see them.
+	 */
+	public function canSeeQuestions(Form $form): bool {
+		if ($this->hasFormOpened($form)) {
+			return true;
+		}
+
+		$permissions = $this->getPermissions($form);
+		return in_array(Constants::PERMISSION_EDIT, $permissions, true)
+			|| in_array(Constants::PERMISSION_RESULTS, $permissions, true);
 	}
 
 	/**
@@ -669,6 +688,24 @@ class FormsService {
 			return true;
 		}
 		return ($form->getExpires() !== 0 && $form->getExpires() < time());
+	}
+
+	/**
+	 * Check that the opening and expiration date are valid timestamps
+	 * and the form opens before it expires, `0` means not set.
+	 */
+	public static function areFormDatesValid(int $opens, int $expires): bool {
+		if ($opens < 0 || $expires < 0) {
+			return false;
+		}
+		return $opens === 0 || $expires === 0 || $opens < $expires;
+	}
+
+	/**
+	 * Check if the opening date of the form has been reached.
+	 */
+	public function hasFormOpened(Form $form): bool {
+		return $form->getOpens() <= time();
 	}
 
 	/**

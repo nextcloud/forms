@@ -31,6 +31,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setCreated(int $value)
  * @method int getExpires()
  * @method void setExpires(int $value)
+ * @method int getOpens()
+ * @method void setOpens(int $value)
  * @method int getIsAnonymous()
  * @method void setIsAnonymous(bool $value)
  * @method int getSubmitMultiple()
@@ -74,6 +76,7 @@ class Form extends Entity {
 	protected $accessEnum;
 	protected $created;
 	protected $expires;
+	protected $opens;
 	protected $isAnonymous;
 	protected $submitMultiple;
 	protected $allowEditSubmissions;
@@ -96,6 +99,7 @@ class Form extends Entity {
 	public function __construct() {
 		$this->addType('created', 'integer');
 		$this->addType('expires', 'integer');
+		$this->addType('opens', 'integer');
 		$this->addType('isAnonymous', 'boolean');
 		$this->addType('submitMultiple', 'boolean');
 		$this->addType('allowEditSubmissions', 'boolean');
@@ -172,6 +176,7 @@ class Form extends Entity {
 	 *   created: int,
 	 *   access: FormsAccess,
 	 *   expires: int,
+	 *   opens: int,
 	 *   isAnonymous: bool,
 	 *   submitMultiple: bool,
 	 *   allowEditSubmissions: bool,
@@ -201,6 +206,7 @@ class Form extends Entity {
 			'created' => $this->getCreated(),
 			'access' => $this->getAccess(),
 			'expires' => (int)$this->getExpires(),
+			'opens' => (int)$this->getOpens(),
 			'isAnonymous' => (bool)$this->getIsAnonymous(),
 			'submitMultiple' => (bool)$this->getSubmitMultiple(),
 			'allowEditSubmissions' => (bool)$this->getAllowEditSubmissions(),

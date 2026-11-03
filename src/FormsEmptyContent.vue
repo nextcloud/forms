@@ -19,8 +19,9 @@
 
 <script lang="ts">
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
+import IconSchedule from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { getCanonicalLocale, t } from '@nextcloud/l10n'
 import { computed, defineComponent } from 'vue'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcContent from '@nextcloud/vue/components/NcContent'
@@ -52,6 +53,12 @@ const renderModels: Record<
 		),
 		icon: IconCheck,
 	},
+
+	notyetopen: {
+		title: t('forms', 'Form not yet open'),
+		description: '',
+		icon: IconSchedule,
+	},
 }
 
 export default defineComponent({
@@ -67,6 +74,22 @@ export default defineComponent({
 	setup() {
 		const renderAs = loadState(formsAppName, 'renderAs') as string
 		const currentModel = computed(() => {
+			if (renderAs === 'notyetopen') {
+				const opens = loadState(formsAppName, 'opens', 0) as number
+				const date = new Date(opens * 1000).toLocaleString(
+					getCanonicalLocale(),
+					{ dateStyle: 'long', timeStyle: 'short' },
+				)
+				return {
+					...renderModels.notyetopen,
+					description: t(
+						'forms',
+						'This form will open on {date}',
+						{ date },
+						{ escape: false, sanitize: false },
+					),
+				}
+			}
 			return renderModels[renderAs]
 		})
 

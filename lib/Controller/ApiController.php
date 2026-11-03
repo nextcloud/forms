@@ -178,6 +178,7 @@ class ApiController extends OCSController {
 			$form->setAllowEditSubmissions(false);
 			$form->setShowExpiration(false);
 			$form->setExpires(0);
+			$form->setOpens(0);
 			$form->setIsAnonymous(false);
 
 			$this->formMapper->insert($form);
@@ -212,6 +213,7 @@ class ApiController extends OCSController {
 			$formData['allowEditSubmissions'] = false;
 			$formData['showExpiration'] = false;
 			$formData['expires'] = 0;
+			$formData['opens'] = 0;
 			$formData['isAnonymous'] = false;
 
 			$form = Form::fromParams($formData);
@@ -282,6 +284,7 @@ class ApiController extends OCSController {
 	 * @param int $formId FormId of form to update
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int|string, array{}>
+	 * @throws OCSBadRequestException Invalid opening or expiration date, or opening date not before expiration date
 	 * @throws OCSBadRequestException Could not find new form owner
 	 * @throws OCSForbiddenException Empty keyValuePairs provided
 	 * @throws OCSForbiddenException Not allowed to update id, hash, created, fileId or lastUpdated. OwnerId only allowed if no other key provided.
@@ -335,6 +338,8 @@ class ApiController extends OCSController {
 
 		// Do not allow changing showToAllUsers or permitAllUsers if disabled
 		$this->checkAccessUpdate($keyValuePairs);
+
+		$this->checkDatesUpdate($form, $keyValuePairs);
 
 		$previousAccess = $form->getAccess();
 		$previousState = $form->getState();
@@ -429,6 +434,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @return DataResponse<Http::STATUS_OK, list<FormsQuestion>, array{}>
+	 * @throws OCSForbiddenException Form is not yet open
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 *
@@ -450,6 +456,11 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('User has no permissions to get this form');
 		}
 
+		if (!$this->formsService->canSeeQuestions($form)) {
+			$this->logger->debug('Form is not yet open');
+			throw new OCSForbiddenException('This form is not yet open');
+		}
+
 		$questionData = $this->formsService->getQuestions($formId);
 		$questionData = array_map(static function (array $question) {
 			if (empty($question['extraSettings'])) {
@@ -468,6 +479,7 @@ class ApiController extends OCSController {
 	 * @param int $questionId QuestionId
 	 * @return DataResponse<Http::STATUS_OK, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
+	 * @throws OCSForbiddenException Form is not yet open
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
 	 *
@@ -487,6 +499,11 @@ class ApiController extends OCSController {
 		if (!$this->formsService->hasUserAccess($form)) {
 			$this->logger->debug('User has no permissions to get this form');
 			throw new OCSForbiddenException('User has no permissions to get this form');
+		}
+
+		if (!$this->formsService->canSeeQuestions($form)) {
+			$this->logger->debug('Form is not yet open');
+			throw new OCSForbiddenException('This form is not yet open');
 		}
 
 		$question = $this->formsService->getQuestion($questionId);
@@ -1430,6 +1447,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException At least one submitted answer is not valid
 	 * @throws OCSForbiddenException Already submitted
 	 * @throws OCSForbiddenException Not allowed to access this form
+	 * @throws OCSForbiddenException This form is not yet taking answers
 	 * @throws OCSForbiddenException This form is no longer taking answers
 	 * @throws OCSForbiddenException This form is not owned by the current user and user has no `results_delete` permission
 	 * @throws OCSNotFoundException Could not find form
@@ -1522,6 +1540,7 @@ class ApiController extends OCSController {
 	 * @param array<string, list<string>> $answers [question_id => arrayOfString]
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Can only update submission if allowEditSubmissions is set and the answers are valid
+	 * @throws OCSForbiddenException This form is not yet taking answers
 	 * @throws OCSForbiddenException Can only update your own submission
 	 *
 	 * 200: the id of the updated submission
@@ -1707,6 +1726,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException Failed to upload the file
 	 * @throws OCSBadRequestException File size exceeds the maximum allowed size
 	 * @throws OCSBadRequestException File type is not allowed
+	 * @throws OCSForbiddenException This form is not yet taking answers
 	 * @throws OCSForbiddenException Already submitted
 	 * @throws OCSNotFoundException Could not find question
 	 *
@@ -1951,6 +1971,41 @@ class ApiController extends OCSController {
 	}
 
 	/**
+	 * Throws if the opening or expiration date is not a timestamp or the form would not open before it expires.
+	 * Numeric strings are converted to integers.
+	 *
+	 * @param array<string, mixed> $keyValuePairs
+	 */
+	private function checkDatesUpdate(Form $form, array &$keyValuePairs): void {
+		if (!array_key_exists('opens', $keyValuePairs) && !array_key_exists('expires', $keyValuePairs)) {
+			return;
+		}
+
+		foreach (['opens' => 'opening', 'expires' => 'expiration'] as $key => $name) {
+			if (!array_key_exists($key, $keyValuePairs)) {
+				continue;
+			}
+
+			$value = $keyValuePairs[$key];
+			if (is_string($value) && ctype_digit($value)) {
+				$value = (int)$value;
+			}
+			if (!is_int($value) || $value < 0) {
+				$this->logger->info("Invalid {$name} date");
+				throw new OCSBadRequestException("Invalid {$name} date");
+			}
+			$keyValuePairs[$key] = $value;
+		}
+
+		$opens = $keyValuePairs['opens'] ?? (int)$form->getOpens();
+		$expires = $keyValuePairs['expires'] ?? (int)$form->getExpires();
+		if (!FormsService::areFormDatesValid($opens, $expires)) {
+			$this->logger->info('Opening date must be before expiration date');
+			throw new OCSBadRequestException('Opening date must be before expiration date');
+		}
+	}
+
+	/**
 	 * Throws if fileId is present in update
 	 */
 	private function checkFileIdUpdate(array $keyValuePairs): void {
@@ -2103,6 +2158,7 @@ class ApiController extends OCSController {
 			'submitMultiple' => $form->getSubmitMultiple(),
 			'allowEditSubmissions' => $form->getAllowEditSubmissions(),
 			'expires' => $form->getExpires(),
+			'opens' => $form->getOpens(),
 			'maxSubmissions' => $form->getMaxSubmissions(),
 		];
 	}

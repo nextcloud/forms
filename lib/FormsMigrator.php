@@ -144,6 +144,12 @@ class FormsMigrator implements IMigrator {
 				$form->setOwnerId($user->getUID());
 				$form->setAccess($formData['access']);
 				$form->setExpires($formData['expires']);
+				$opens = (int)($formData['opens'] ?? 0);
+				if ($opens !== 0 && !FormsService::areFormDatesValid($opens, (int)$formData['expires'])) {
+					$output->writeln('Ignoring invalid opening date of form "' . $formData['title'] . '"');
+					$opens = 0;
+				}
+				$form->setOpens($opens);
 				$form->setIsAnonymous($formData['isAnonymous']);
 				$form->setSubmitMultiple($formData['submitMultiple']);
 				$form->setAllowEditSubmissions($formData['allowEditSubmissions']);

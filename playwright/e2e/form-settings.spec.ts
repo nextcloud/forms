@@ -77,6 +77,50 @@ test.describe('Form settings', () => {
 		await expect(submitView.submitButton).toBeVisible()
 	})
 
+	test('Opening date in the future blocks submissions', async ({
+		page,
+		topBar,
+		appNavigation,
+	}) => {
+		const saved = waitForApiResponse(page, 'PATCH')
+		await page
+			.getByRole('switch', { name: /Set opening date/ })
+			.click({ force: true })
+		await saved
+
+		await expect(appNavigation.getOwnForm(/Settings test form/)).toContainText(
+			/Opens in/,
+		)
+
+		await topBar.toggleView(FormsView.View)
+
+		const main = page.getByRole('main')
+		await expect(main.getByText('Form not yet open')).toBeVisible()
+		await expect(main.getByText(/This form will open on/)).toBeVisible()
+	})
+
+	test('Removing the opening date allows submissions', async ({
+		page,
+		topBar,
+		submitView,
+	}) => {
+		const set = waitForApiResponse(page, 'PATCH')
+		await page
+			.getByRole('switch', { name: /Set opening date/ })
+			.click({ force: true })
+		await set
+
+		const removed = waitForApiResponse(page, 'PATCH')
+		await page
+			.getByRole('switch', { name: /Set opening date/ })
+			.click({ force: true })
+		await removed
+
+		await topBar.toggleView(FormsView.View)
+
+		await expect(submitView.submitButton).toBeVisible()
+	})
+
 	test('Anonymous mode shows anonymous message on submit view', async ({
 		page,
 		topBar,

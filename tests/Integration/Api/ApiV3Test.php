@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use OCA\Forms\Constants;
 use OCA\Forms\Tests\Integration\IntegrationBase;
+use OCP\IUserManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -309,6 +310,7 @@ class ApiV3Test extends IntegrationBase {
 						'hash' => '0123456789abcdef',
 						'title' => 'Title of a Form',
 						'expires' => 0,
+						'opens' => 0,
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => Constants::PERMISSION_ALL,
@@ -321,6 +323,7 @@ class ApiV3Test extends IntegrationBase {
 						'hash' => 'zyxwvutsrq654321',
 						'title' => 'Title of a third Form',
 						'expires' => 0,
+						'opens' => 0,
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => Constants::PERMISSION_ALL,
@@ -356,6 +359,7 @@ class ApiV3Test extends IntegrationBase {
 						'hash' => 'abcdefghij123456',
 						'title' => 'Title of a second Form',
 						'expires' => 0,
+						'opens' => 0,
 						'state' => 0,
 						'lastUpdated' => 123456789,
 						'permissions' => [
@@ -400,6 +404,7 @@ class ApiV3Test extends IntegrationBase {
 						'showToAllUsers' => false
 					],
 					'expires' => 0,
+					'opens' => 0,
 					'state' => 0,
 					'lockedBy' => null,
 					'lockedUntil' => null,
@@ -469,6 +474,7 @@ class ApiV3Test extends IntegrationBase {
 						'showToAllUsers' => false
 					],
 					'expires' => 0,
+					'opens' => 0,
 					'state' => 0,
 					'lockedBy' => null,
 					'lockedUntil' => null,
@@ -736,6 +742,24 @@ class ApiV3Test extends IntegrationBase {
 
 		$after = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
 		$this->assertEquals($before, $after);
+	}
+
+	public function testUpdateFormRejectsOpeningDateAfterExpiration(): void {
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'expires' => time() + 3600,
+					'opens' => time() + 7200,
+				],
+			],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(400, $resp->getStatusCode());
+
+		$form = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals(0, $form['expires']);
+		$this->assertEquals(0, $form['opens']);
 	}
 
 	public function testDeleteForm() {
@@ -1653,6 +1677,88 @@ class ApiV3Test extends IntegrationBase {
 				],
 			]
 		], $data['submissions'][0]);
+	}
+
+	public function testUpdateFormOpeningDateAfter2038(): void {
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'opens' => 2200000000,
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$form = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals(2200000000, $form['opens']);
+	}
+
+	public function testQuestionsHiddenBeforeOpeningDate() {
+		$formId = $this->testForms[2]['id'];
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$formId}", [
+			'json' => [
+				'keyValuePairs' => [
+					'opens' => time() + 3600,
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$owner = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$formId}"));
+		$this->assertCount(1, $owner['questions']);
+
+		// user2 only has the default submit permission
+		$userManager = \OCP\Server::get(IUserManager::class);
+		$user2 = $userManager->get('user2') ?? $userManager->createUser('user2', 'user2');
+		try {
+			$respondent = new Client([
+				'base_uri' => 'http://localhost:8080/ocs/v2.php/apps/forms/',
+				'auth' => ['user2', 'user2'],
+				'headers' => [
+					'OCS-ApiRequest' => 'true',
+					'Accept' => 'application/json'
+				],
+				'http_errors' => false,
+			]);
+
+			$form = $this->OcsResponse2Data($respondent->request('GET', "api/v3/forms/{$formId}"));
+			$this->assertSame([], $form['questions']);
+
+			$resp = $respondent->request('GET', "api/v3/forms/{$formId}/questions");
+			$this->assertEquals(403, $resp->getStatusCode());
+
+			$questionId = $this->testForms[2]['questions'][0]['id'];
+			$resp = $respondent->request('GET', "api/v3/forms/{$formId}/questions/{$questionId}");
+			$this->assertEquals(403, $resp->getStatusCode());
+		} finally {
+			$user2->delete();
+		}
+	}
+
+	public function testNewSubmissionBeforeOpeningDate() {
+		$opens = time() + 3600;
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'opens' => $opens,
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$form = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}"));
+		$this->assertEquals($opens, $form['opens']);
+
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions", [
+			'json' => [
+				'answers' => [
+					$this->testForms[0]['questions'][0]['id'] => ['ShortAnswer!'],
+				],
+			],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(403, $resp->getStatusCode());
 	}
 
 	public static function dataDeleteSingleSubmission() {
