@@ -699,7 +699,7 @@ class SubmissionService {
 			}
 
 			// Check if all answers are within the possible options
-			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && empty($question['extraSettings']['allowOtherAnswer'])) {
+			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 				// Normalize option IDs once for consistent comparison (DB may return ints, request may send strings)
 				$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
 
@@ -717,17 +717,10 @@ class SubmissionService {
 						$this->validateGridQuestion($question, $answers[$questionId]);
 					}
 					// Search corresponding option, return false if non-existent
-					else {
-						// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
-						$answerId = is_int($answer) ? $answer : (is_string($answer) ? intval(trim($answer)) : null);
-
-						// Reject non-numeric / malformed values early
-						if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
+					elseif (!self::isOtherAnswer($question, $answer)) {
+						$answerId = $this->normalizeNumericOptionId($answer);
+						if ($answerId === null || !in_array($answerId, $optionIds, true)) {
 							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($answer) ? (string)$answer : gettype($answer), $question['text']));
-						}
-
-						if (!in_array($answerId, $optionIds, true)) {
-							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', $answer, $question['text']));
 						}
 					}
 				}
@@ -792,8 +785,8 @@ class SubmissionService {
 		// Check for excess answers
 		foreach ($answers as $id => $answerArray) {
 			// Search corresponding question, return false if not found
-			if (!in_array($id, array_column($questions, 'id'))) {
-				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %d.', $id));
+			if (!in_array($id, array_column($questions, 'id'), true)) {
+				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %s.', $id));
 			}
 		}
 	}
@@ -932,6 +925,18 @@ class SubmissionService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Whether the value is the answer "Other" of a question that allows it
+	 *
+	 * @param array $question the question
+	 * @param mixed $answer a value of the answer
+	 */
+	public static function isOtherAnswer(array $question, mixed $answer): bool {
+		return !empty($question['extraSettings']['allowOtherAnswer'])
+			&& is_string($answer)
+			&& str_starts_with($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX);
 	}
 
 	/**
