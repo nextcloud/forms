@@ -98,8 +98,8 @@
 
 				<!-- Render the appropriate trigger question component -->
 				<component
-					:is="triggerComponentName"
-					v-if="triggerComponentName"
+					:is="triggerComponent"
+					v-if="triggerComponent"
 					:id="id"
 					ref="triggerQuestion"
 					:formId="formId"
@@ -117,8 +117,7 @@
 					@update:values="onTriggerValueChange"
 					@keydown="$emit('keydown', $event)"
 					@update:options="onOptionsChange"
-					@update:extraSettings="updateExtraSettings"
-					@delete="clearTriggerType" />
+					@update:extraSettings="updateExtraSettings" />
 
 				<!-- Branch Management (Edit Mode) -->
 				<div v-if="!readOnly" class="branches-editor">
@@ -295,7 +294,7 @@
 					</div>
 					<TransitionGroup tag="ul" name="branch-list">
 						<component
-							:is="getSubQuestionComponentName(subQuestion.type)"
+							:is="getSubQuestionComponent(subQuestion)"
 							v-for="(subQuestion, subIndex) in activeSubQuestions"
 							:key="subQuestion.id"
 							ref="subQuestions"
@@ -304,9 +303,7 @@
 							:index="index"
 							:subIndex="subIndex + 1"
 							:maxStringLengths="maxStringLengths"
-							:answerType="
-								getSubQuestionAnswerTypeConfig(subQuestion.type)
-							"
+							:answerType="getSubQuestionAnswerType(subQuestion)"
 							:readOnly="true"
 							:values="getSubQuestionValues(subQuestion.id)"
 							@update:values="
@@ -324,19 +321,8 @@
 <script>
 // Icons
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
-import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
-import IconCalendar from '@material-symbols/svg-400/outlined/calendar_today.svg?raw'
-import IconCheckboxOutline from '@material-symbols/svg-400/outlined/check_box.svg?raw'
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
-import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
-import IconLinearScale from '@material-symbols/svg-400/outlined/linear_scale.svg?raw'
-import IconPalette from '@material-symbols/svg-400/outlined/palette.svg?raw'
-import IconRadioboxMarked from '@material-symbols/svg-400/outlined/radio_button_checked.svg?raw'
-import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?raw'
-import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
-import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
-import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
@@ -350,39 +336,33 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import BranchConditionEditor from '../Conditional/BranchConditionEditor.vue'
 import QuestionList from '../QuestionList.vue'
 import Question from './Question.vue'
-// Question components - imported directly to avoid circular dependency with AnswerTypes.ts
-import QuestionColor from './QuestionColor.vue'
-import QuestionDate from './QuestionDate.vue'
-import QuestionDropdown from './QuestionDropdown.vue'
-import QuestionFile from './QuestionFile.vue'
-import QuestionLinearScale from './QuestionLinearScale.vue'
-import QuestionLong from './QuestionLong.vue'
-import QuestionMultiple from './QuestionMultiple.vue'
-import QuestionRanking from './QuestionRanking.vue'
-import QuestionShort from './QuestionShort.vue'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
+// AnswerTypes.ts imports this component as well, so it is only read when rendering, not on import
+import answerTypes from '../../models/AnswerTypes.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
-import { splitRegex } from '../../utils/RegularExpression.ts'
 
-// Local mapping of question types - avoids circular dependency with AnswerTypes.ts
-const QUESTION_COMPONENTS = {
-	short: QuestionShort,
-	long: QuestionLong,
-	multiple: QuestionMultiple,
-	multiple_unique: QuestionMultiple,
-	dropdown: QuestionDropdown,
-	date: QuestionDate,
-	time: QuestionDate,
-	linearscale: QuestionLinearScale,
-	color: QuestionColor,
-	file: QuestionFile,
-	ranking: QuestionRanking,
-}
+// Types of subquestions, conditional questions can not be nested
+const SUBQUESTION_TYPES = [
+	'short',
+	'long',
+	'multiple',
+	'multiple_unique',
+	'dropdown',
+	'date',
+	'time',
+	'linearscale',
+	'color',
+	'file',
+	'ranking',
+]
+
+// Values of all unanswered subquestions, the same array does not render them again on every answer
+const NO_VALUES = Object.freeze([])
 
 export default defineComponent({
 	name: 'QuestionConditional',
@@ -394,21 +374,12 @@ export default defineComponent({
 		NcButton,
 		NcIconSvgWrapper,
 		Question,
-		QuestionColor,
-		QuestionDate,
-		QuestionDropdown,
-		QuestionFile,
-		QuestionLinearScale,
 		QuestionList,
-		QuestionLong,
-		QuestionMultiple,
-		QuestionShort,
-		QuestionRanking,
 	},
 
 	inheritAttrs: false,
 	props: QUESTION_PROPS,
-	emits: [...QUESTION_EMITS, 'update:options', 'forms:last-updated:set'],
+	emits: [...QUESTION_EMITS, 'update:options'],
 
 	setup(props, { emit }) {
 		const rootElement = ref(null)
@@ -418,18 +389,8 @@ export default defineComponent({
 			rootElement,
 			t,
 			IconPlus,
-			IconArrowDownDropCircleOutline,
-			IconCalendar,
-			IconCheckboxOutline,
-			IconClockOutline,
 			IconDelete,
-			IconFile,
-			IconLinearScale,
-			IconPalette,
 			IconPencil,
-			IconRadioboxMarked,
-			IconTextLong,
-			IconTextShort,
 		}
 	},
 
@@ -448,19 +409,7 @@ export default defineComponent({
 			const groups = [
 				{
 					label: t('forms', 'Choice'),
-					types: ['multiple_unique', 'multiple', 'dropdown'],
-				},
-				{
-					label: t('forms', 'Text'),
-					types: ['short', 'long'],
-				},
-				{
-					label: t('forms', 'Date and time'),
-					types: ['date', 'time'],
-				},
-				{
-					label: t('forms', 'Other'),
-					types: ['linearscale', 'color', 'file'],
+					types: ['multiple_unique', 'dropdown'],
 				},
 			]
 
@@ -476,95 +425,38 @@ export default defineComponent({
 		 * Subquestion types (excludes conditional to prevent recursion)
 		 */
 		subQuestionTypesList() {
-			return [
-				{
-					type: 'short',
-					label: t('forms', 'Short answer'),
-					icon: IconTextShort,
-				},
-				{ type: 'long', label: t('forms', 'Long text'), icon: IconTextLong },
-				{
-					type: 'multiple',
-					label: t('forms', 'Checkboxes'),
-					icon: IconCheckboxOutline,
-				},
-				{
-					type: 'multiple_unique',
-					label: t('forms', 'Radio buttons'),
-					icon: IconRadioboxMarked,
-				},
-				{
-					type: 'dropdown',
-					label: t('forms', 'Dropdown'),
-					icon: IconArrowDownDropCircleOutline,
-				},
-				{ type: 'date', label: t('forms', 'Date'), icon: IconCalendar },
-				{ type: 'time', label: t('forms', 'Time'), icon: IconClockOutline },
-				{
-					type: 'linearscale',
-					label: t('forms', 'Linear scale'),
-					icon: IconLinearScale,
-				},
-				{ type: 'color', label: t('forms', 'Color'), icon: IconPalette },
-				{ type: 'file', label: t('forms', 'File'), icon: IconFile },
-				{
-					type: 'ranking',
-					label: t('forms', 'Ranking'),
-					icon: IconSwapVertical,
-				},
-			]
+			return SUBQUESTION_TYPES.map((type) => ({
+				type,
+				icon: answerTypes[type].icon,
+				label: answerTypes[type].label,
+			}))
 		},
 
 		triggerType() {
 			return this.extraSettings?.triggerType || null
 		},
 
-		currentTriggerConfig() {
-			return this.triggerTypeGroups
-				.flatMap((group) => group.types)
-				.find((type) => type.type === this.triggerType)
-		},
-
 		currentTriggerIcon() {
-			return this.currentTriggerConfig?.icon || IconRadioboxMarked
+			return answerTypes[this.triggerType]?.icon ?? ''
 		},
 
 		currentTriggerLabel() {
-			return this.currentTriggerConfig?.label || ''
+			return answerTypes[this.triggerType]?.label ?? ''
 		},
 
 		/**
-		 * Check if trigger type uses predefined options (radio, dropdown, checkbox)
+		 * Check if trigger type uses predefined options (radio, dropdown)
 		 */
 		isOptionBasedTrigger() {
-			return ['multiple_unique', 'dropdown', 'multiple'].includes(
-				this.triggerType,
-			)
+			return ['multiple_unique', 'dropdown'].includes(this.triggerType)
 		},
 
-		/**
-		 * Ensure options is always an array for the trigger component
-		 */
-		triggerOptions() {
-			return Array.isArray(this.options) ? this.options : []
+		triggerComponent() {
+			return answerTypes[this.triggerType]?.component ?? null
 		},
 
-		/**
-		 * Get component name for trigger (used with :is)
-		 */
-		triggerComponentName() {
-			if (!this.triggerType) return null
-			return QUESTION_COMPONENTS[this.triggerType]
-				? this.getComponentNameForType(this.triggerType)
-				: null
-		},
-
-		/**
-		 * Answer type config for trigger question
-		 */
 		triggerAnswerTypeConfig() {
-			if (!this.triggerType) return null
-			return this.buildAnswerTypeConfig(this.triggerType)
+			return answerTypes[this.triggerType] ?? null
 		},
 
 		triggerExtraSettings() {
@@ -577,21 +469,12 @@ export default defineComponent({
 			return this.extraSettings?.branches || []
 		},
 
-		/**
-		 * Get component reference for subquestion (used with :is in QuestionList)
-		 * Returns the actual component object, not a string name,
-		 * so it works in QuestionList's scope.
-		 */
 		getSubQuestionComponent() {
-			return (question) => QUESTION_COMPONENTS[question.type]
+			return (question) => answerTypes[question.type]?.component
 		},
 
-		/**
-		 * Get answer type config for subquestion (used with :answerType in QuestionList)
-		 * Takes a question object and returns the answer type config.
-		 */
 		getSubQuestionAnswerType() {
-			return (question) => this.buildAnswerTypeConfig(question.type)
+			return (question) => answerTypes[question.type]
 		},
 
 		/**
@@ -618,11 +501,8 @@ export default defineComponent({
 		},
 
 		activeBranches() {
-			// An unanswered trigger activates no branch, except "no file uploaded" for file triggers
-			if (
-				(!this.triggerValues || this.triggerValues.length === 0)
-				&& this.triggerType !== 'file'
-			) {
+			// An unanswered trigger activates no branch
+			if (!this.triggerValues || this.triggerValues.length === 0) {
 				return null
 			}
 			return this.branches.filter((branch) =>
@@ -631,9 +511,13 @@ export default defineComponent({
 		},
 
 		activeSubQuestions() {
-			return (this.activeBranches ?? []).flatMap(
-				(branch) => branch.subQuestions ?? [],
-			)
+			// Like other questions, subquestions without a title or without options are not shown
+			const isShown = (question) =>
+				!!question.text?.trim()
+				&& (answerTypes[question.type]?.validate?.(question) ?? true)
+			return (this.activeBranches ?? [])
+				.flatMap((branch) => branch.subQuestions ?? [])
+				.filter(isShown)
 		},
 
 		/**
@@ -708,171 +592,6 @@ export default defineComponent({
 	},
 
 	methods: {
-		/**
-		 * Get Vue component name string for a question type
-		 *
-		 * @param {string} type The question type
-		 * @return {string|null} The component name or null
-		 */
-		getComponentNameForType(type) {
-			const componentMap = {
-				short: 'QuestionShort',
-				long: 'QuestionLong',
-				multiple: 'QuestionMultiple',
-				multiple_unique: 'QuestionMultiple',
-				dropdown: 'QuestionDropdown',
-				date: 'QuestionDate',
-				time: 'QuestionDate',
-				linearscale: 'QuestionLinearScale',
-				color: 'QuestionColor',
-				file: 'QuestionFile',
-				ranking: 'QuestionRanking',
-			}
-			return componentMap[type] || null
-		},
-
-		/**
-		 * Get component name for subquestion
-		 *
-		 * @param {string} type The question type
-		 * @return {string|null} The component name or null
-		 */
-		getSubQuestionComponentName(type) {
-			return this.getComponentNameForType(type)
-		},
-
-		/**
-		 * Build answerType config object for a question type
-		 *
-		 * @param {string} type The question type
-		 * @return {object} The answer type configuration
-		 */
-		buildAnswerTypeConfig(type) {
-			const configs = {
-				short: {
-					titlePlaceholder: t('forms', 'Short answer question title'),
-					createPlaceholder: t('forms', 'People can enter a short answer'),
-					submitPlaceholder: t('forms', 'Enter your answer'),
-					validate: () => true,
-				},
-
-				long: {
-					titlePlaceholder: t('forms', 'Long text question title'),
-					createPlaceholder: t('forms', 'People can enter a long text'),
-					submitPlaceholder: t('forms', 'Enter your answer'),
-					validate: () => true,
-				},
-
-				multiple: {
-					titlePlaceholder: t('forms', 'Checkbox question title'),
-					createPlaceholder: t(
-						'forms',
-						'People can submit a different answer',
-					),
-
-					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t(
-						'forms',
-						'This question needs at least one answer!',
-					),
-
-					predefined: true,
-					validate: (question) => question.options?.length > 0,
-				},
-
-				multiple_unique: {
-					titlePlaceholder: t('forms', 'Radio buttons question title'),
-					createPlaceholder: t(
-						'forms',
-						'People can submit a different answer',
-					),
-
-					submitPlaceholder: t('forms', 'Enter your answer'),
-					warningInvalid: t(
-						'forms',
-						'This question needs at least one answer!',
-					),
-
-					predefined: true,
-					unique: true,
-					validate: (question) => question.options?.length > 0,
-				},
-
-				dropdown: {
-					titlePlaceholder: t('forms', 'Dropdown question title'),
-					createPlaceholder: t('forms', 'People can pick one option'),
-					submitPlaceholder: t('forms', 'Pick an option'),
-					warningInvalid: t(
-						'forms',
-						'This question needs at least one answer!',
-					),
-
-					predefined: true,
-					validate: (question) => question.options?.length > 0,
-				},
-
-				date: {
-					titlePlaceholder: t('forms', 'Date question title'),
-					createPlaceholder: t('forms', 'People can pick a date'),
-					submitPlaceholder: t('forms', 'Pick a date'),
-					warningInvalid: t('forms', 'This question needs a title!'),
-					pickerType: 'date',
-					storageFormat: 'YYYY-MM-DD',
-					momentFormat: 'L',
-					validate: () => true,
-				},
-
-				time: {
-					titlePlaceholder: t('forms', 'Time question title'),
-					createPlaceholder: t('forms', 'People can pick a time'),
-					submitPlaceholder: t('forms', 'Pick a time'),
-					warningInvalid: t('forms', 'This question needs a title!'),
-					pickerType: 'time',
-					storageFormat: 'HH:mm',
-					momentFormat: 'LT',
-					validate: () => true,
-				},
-
-				linearscale: {
-					titlePlaceholder: t('forms', 'Linear scale question title'),
-					warningInvalid: t('forms', 'This question needs a title!'),
-					predefined: true,
-					validate: () => true,
-				},
-
-				color: {
-					titlePlaceholder: t('forms', 'Color question title'),
-					createPlaceholder: t('forms', 'People can pick a color'),
-					submitPlaceholder: t('forms', 'Pick a color'),
-					warningInvalid: t('forms', 'This question needs a title!'),
-					validate: () => true,
-				},
-
-				file: {
-					titlePlaceholder: t('forms', 'File question title'),
-					warningInvalid: t('forms', 'This question needs a title!'),
-					validate: () => true,
-				},
-
-				ranking: {
-					titlePlaceholder: t('forms', 'Ranking question title'),
-					warningInvalid: t('forms', 'This question needs a title!'),
-					validate: () => true,
-				},
-			}
-			return configs[type] || { validate: () => true }
-		},
-
-		/**
-		 * Get answer type config for subquestion
-		 *
-		 * @param {string} type The question type
-		 * @return {object} The answer type configuration
-		 */
-		getSubQuestionAnswerTypeConfig(type) {
-			return this.buildAnswerTypeConfig(type)
-		},
-
 		setTriggerType(type) {
 			const previousType = this.triggerType
 			this.isChangingTriggerType = false
@@ -975,11 +694,7 @@ export default defineComponent({
 				})
 			}
 
-			if (
-				['multiple_unique', 'dropdown', 'multiple'].includes(
-					this.triggerType,
-				)
-			) {
+			if (this.isOptionBasedTrigger) {
 				const optionIds = branch.conditions.map((c) => c.optionId)
 				const optionTexts = optionIds
 					.map((id) => this.options.find((o) => o.id === id)?.text)
@@ -1181,7 +896,7 @@ export default defineComponent({
 		},
 
 		getSubQuestionValues(questionId) {
-			return this.subQuestionValues[questionId] || []
+			return this.subQuestionValues[questionId] ?? NO_VALUES
 		},
 
 		onSubQuestionValueChange(questionId, values) {
@@ -1223,118 +938,7 @@ export default defineComponent({
 				)
 			}
 
-			if (this.triggerType === 'multiple') {
-				// Multi-select: all condition option IDs must be selected
-				for (const c of branch.conditions) {
-					const optionIds = c.optionIds
-					if (!Array.isArray(optionIds) || optionIds.length === 0) {
-						continue
-					}
-					const allSelected = optionIds.every((id) =>
-						triggerValuesAsStrings.includes(String(id)),
-					)
-					if (allSelected) {
-						return true
-					}
-				}
-				return false
-			}
-
-			if (['short', 'long'].includes(this.triggerType)) {
-				const text = this.triggerValues[0] || ''
-				return branch.conditions.some((c) => {
-					if (c.type === 'regex') {
-						return this.safeRegexMatch(c.value, text)
-					}
-					if (c.type === 'string_contains') {
-						return text.includes(c.value || '')
-					}
-					if (c.type === 'string_equals') {
-						return text === c.value
-					}
-					return false
-				})
-			}
-
-			if (this.triggerType === 'linearscale') {
-				const numValue = parseFloat(this.triggerValues[0]) || 0
-				return branch.conditions.some((c) => {
-					if (c.type === 'value_equals') {
-						return numValue === parseFloat(c.value)
-					} else if (c.type === 'value_not_equals') {
-						return numValue !== parseFloat(c.value)
-					} else if (c.type === 'value_min') {
-						const min = c.min ?? Number.MIN_SAFE_INTEGER
-						return numValue >= min
-					} else if (c.type === 'value_max') {
-						const max = c.max ?? Number.MAX_SAFE_INTEGER
-						return numValue <= max
-					} else if (c.type === 'value_range') {
-						const min = c.min ?? Number.MIN_SAFE_INTEGER
-						const max = c.max ?? Number.MAX_SAFE_INTEGER
-						return numValue >= min && numValue <= max
-					}
-					return false
-				})
-			}
-
-			if (this.triggerType === 'color') {
-				const colorValue = (this.triggerValues[0] || '').toLowerCase()
-				return branch.conditions.some(
-					(c) => colorValue === (c.value || '').toLowerCase(),
-				)
-			}
-
-			if (this.triggerType === 'file') {
-				const hasFile =
-					this.triggerValues.length > 0 && this.triggerValues[0] !== ''
-				return branch.conditions.some(
-					(c) => (c.fileUploaded ?? true) === hasFile,
-				)
-			}
-
-			if (['date', 'time'].includes(this.triggerType)) {
-				const dateValue = this.triggerValues[0] || ''
-				if (!dateValue) {
-					return false
-				}
-				return branch.conditions.some((c) => {
-					const min = c.min
-					const max = c.max
-					if (min && dateValue < min) {
-						return false
-					}
-					if (max && dateValue > max) {
-						return false
-					}
-					return true
-				})
-			}
-
 			return false
-		},
-
-		/**
-		 * Safely execute a regex match to prevent ReDoS attacks
-		 *
-		 * @param {string} pattern The regular expression with delimiters, e.g. `/^yes$/i`
-		 * @param {string} subject The string to match against
-		 * @return {boolean} True if pattern matches
-		 */
-		safeRegexMatch(pattern, subject) {
-			if (!pattern || subject.length > 10000) {
-				return false
-			}
-			// Same format as the server: `/pattern/modifiers`
-			const { pattern: source, modifiers } = splitRegex(pattern)
-			if (!source) {
-				return false
-			}
-			try {
-				return new RegExp(source, modifiers).test(subject)
-			} catch {
-				return false
-			}
 		},
 
 		async validate() {

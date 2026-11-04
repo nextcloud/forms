@@ -260,17 +260,6 @@ class Constants {
 	 * Condition types for conditional questions
 	 */
 	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
-	public const CONDITION_TYPE_OPTIONS_COMBINATION = 'options_combination';
-	public const CONDITION_TYPE_STRING_EQUALS = 'string_equals';
-	public const CONDITION_TYPE_STRING_CONTAINS = 'string_contains';
-	public const CONDITION_TYPE_REGEX = 'regex';
-	public const CONDITION_TYPE_VALUE_EQUALS = 'value_equals';
-	public const CONDITION_TYPE_VALUE_NOT_EQUALS = 'value_not_equals';
-	public const CONDITION_TYPE_VALUE_RANGE = 'value_range';
-	public const CONDITION_TYPE_VALUE_MIN = 'value_min';
-	public const CONDITION_TYPE_VALUE_MAX = 'value_max';
-	public const CONDITION_TYPE_DATE_RANGE = 'date_range';
-	public const CONDITION_TYPE_FILE_UPLOADED = 'file_uploaded';
 
 	/**
 	 * Trigger types allowed for conditional questions
@@ -279,15 +268,6 @@ class Constants {
 	public const CONDITIONAL_TRIGGER_TYPES = [
 		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::CONDITION_TYPE_OPTION_SELECTED],
 		self::ANSWER_TYPE_DROPDOWN => [self::CONDITION_TYPE_OPTION_SELECTED],
-		self::ANSWER_TYPE_MULTIPLE => [self::CONDITION_TYPE_OPTIONS_COMBINATION],
-		self::ANSWER_TYPE_SHORT => [self::CONDITION_TYPE_STRING_EQUALS, self::CONDITION_TYPE_STRING_CONTAINS, self::CONDITION_TYPE_REGEX],
-		self::ANSWER_TYPE_LONG => [self::CONDITION_TYPE_STRING_CONTAINS, self::CONDITION_TYPE_REGEX],
-		self::ANSWER_TYPE_LINEARSCALE => [self::CONDITION_TYPE_VALUE_EQUALS, self::CONDITION_TYPE_VALUE_NOT_EQUALS, self::CONDITION_TYPE_VALUE_RANGE, self::CONDITION_TYPE_VALUE_MIN, self::CONDITION_TYPE_VALUE_MAX],
-		self::ANSWER_TYPE_DATE => [self::CONDITION_TYPE_DATE_RANGE],
-		self::ANSWER_TYPE_DATETIME => [self::CONDITION_TYPE_DATE_RANGE],
-		self::ANSWER_TYPE_TIME => [self::CONDITION_TYPE_DATE_RANGE],
-		self::ANSWER_TYPE_COLOR => [self::CONDITION_TYPE_VALUE_EQUALS],
-		self::ANSWER_TYPE_FILE => [self::CONDITION_TYPE_FILE_UPLOADED],
 	];
 
 	/**

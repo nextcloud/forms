@@ -1130,8 +1130,8 @@ class SubmissionService {
 		// Option ids arrive as numbers or strings depending on the trigger component
 		$selectedOptionIds = array_map('strval', array_filter($triggerAnswer, 'is_scalar'));
 
-		// An unanswered trigger activates no branch, except "no file uploaded" for file triggers
-		if ($triggerType !== Constants::ANSWER_TYPE_FILE && ($triggerAnswer === [] || ($triggerAnswer[0] ?? '') === '')) {
+		// An unanswered trigger activates no branch
+		if ($triggerAnswer === [] || ($triggerAnswer[0] ?? '') === '') {
 			return false;
 		}
 
@@ -1146,153 +1146,8 @@ class SubmissionService {
 					}
 				}
 				return false;
-			case Constants::ANSWER_TYPE_MULTIPLE:
-				// Multi-select: the branch is active if all option ids of any of its conditions are selected
-				foreach ($conditions as $condition) {
-					$optionIds = $condition['optionIds'] ?? [];
-					if (empty($optionIds) || !is_array($optionIds)) {
-						continue;
-					}
-					if (array_diff(array_map('strval', $optionIds), $selectedOptionIds) === []) {
-						return true;
-					}
-				}
-				return false;
-			case Constants::ANSWER_TYPE_SHORT:
-			case Constants::ANSWER_TYPE_LONG:
-				// Text-based: evaluate regex/string conditions
-				$text = is_scalar($triggerAnswer[0] ?? null) ? (string)$triggerAnswer[0] : '';
-				foreach ($conditions as $condition) {
-					$type = $condition['type'] ?? Constants::CONDITION_TYPE_STRING_CONTAINS;
-					$value = $condition['value'] ?? '';
-
-					switch ($type) {
-						case Constants::CONDITION_TYPE_STRING_EQUALS:
-							if ($text === $value) {
-								return true;
-							}
-							break;
-						case Constants::CONDITION_TYPE_STRING_CONTAINS:
-							if (str_contains($text, $value)) {
-								return true;
-							}
-							break;
-						case Constants::CONDITION_TYPE_REGEX:
-							if ($this->safeRegexMatch($value, $text)) {
-								return true;
-							}
-							break;
-					}
-				}
-				return false;
-			case Constants::ANSWER_TYPE_LINEARSCALE:
-				$numValue = (float)($triggerAnswer[0] ?? 0);
-				foreach ($conditions as $condition) {
-					$type = $condition['type'] ?? Constants::CONDITION_TYPE_VALUE_EQUALS;
-					if ($type === Constants::CONDITION_TYPE_VALUE_EQUALS) {
-						if ($numValue == (float)($condition['value'] ?? 0)) {
-							return true;
-						}
-					} elseif ($type === Constants::CONDITION_TYPE_VALUE_NOT_EQUALS) {
-						if ($numValue != (float)($condition['value'] ?? 0)) {
-							return true;
-						}
-					} elseif ($type === Constants::CONDITION_TYPE_VALUE_RANGE) {
-						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
-						$max = $condition['max'] ?? PHP_FLOAT_MAX;
-						if ($numValue >= $min && $numValue <= $max) {
-							return true;
-						}
-					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MIN) {
-						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
-						if ($numValue >= $min) {
-							return true;
-						}
-					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MAX) {
-						$max = $condition['max'] ?? PHP_FLOAT_MAX;
-						if ($numValue <= $max) {
-							return true;
-						}
-					}
-				}
-				return false;
-			case Constants::ANSWER_TYPE_COLOR:
-				$colorValue = is_scalar($triggerAnswer[0] ?? null) ? (string)$triggerAnswer[0] : '';
-				foreach ($conditions as $condition) {
-					if (strcasecmp($colorValue, $condition['value'] ?? '') === 0) {
-						return true;
-					}
-				}
-				return false;
-			case Constants::ANSWER_TYPE_FILE:
-				$hasFile = !empty($triggerAnswer);
-				foreach ($conditions as $condition) {
-					if (($condition['fileUploaded'] ?? true) === $hasFile) {
-						return true;
-					}
-				}
-				return false;
-			case Constants::ANSWER_TYPE_DATE:
-			case Constants::ANSWER_TYPE_DATETIME:
-			case Constants::ANSWER_TYPE_TIME:
-				// Date range conditions
-				$dateValue = $triggerAnswer[0] ?? '';
-				if (empty($dateValue)) {
-					return false;
-				}
-				$format = Constants::ANSWER_PHPDATETIME_FORMAT[$triggerType] ?? 'Y-m-d';
-				$date = \DateTime::createFromFormat('!' . $format, $dateValue);
-				if (!$date) {
-					return false;
-				}
-
-				foreach ($conditions as $condition) {
-					$min = isset($condition['min']) ? \DateTime::createFromFormat('!' . $format, $condition['min']) : null;
-					$max = isset($condition['max']) ? \DateTime::createFromFormat('!' . $format, $condition['max']) : null;
-
-					$inRange = true;
-					if ($min && $date < $min) {
-						$inRange = false;
-					}
-					if ($max && $date > $max) {
-						$inRange = false;
-					}
-					if ($inRange) {
-						return true;
-					}
-				}
-				return false;
 			default:
 				return false;
-		}
-	}
-
-	/**
-	 * Safely execute a regex match with validation to prevent ReDoS attacks
-	 *
-	 * @param string $pattern The regex pattern to match
-	 * @param string $subject The string to match against
-	 * @return bool True if the pattern matches, false otherwise
-	 */
-	private function safeRegexMatch(string $pattern, string $subject): bool {
-		if (empty($pattern) || strlen($subject) > 10000) {
-			return false;
-		}
-
-		// Validate regex syntax
-		if (@preg_match($pattern, '') === false) {
-			return false;
-		}
-
-		// Set backtrack limit to prevent catastrophic backtracking
-		$previousLimit = ini_get('pcre.backtrack_limit');
-		ini_set('pcre.backtrack_limit', '10000');
-
-		try {
-			$result = @preg_match($pattern, $subject);
-			return $result === 1;
-		} finally {
-			ini_set('pcre.backtrack_limit', $previousLimit);
 		}
 	}
 }
