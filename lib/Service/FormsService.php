@@ -141,6 +141,30 @@ class FormsService {
 	}
 
 	/**
+	 * Point the branch conditions of a conditional question to other options, e.g. those of a copy
+	 *
+	 * Subquestions are rows of their own, any snapshot of them in the branches is dropped.
+	 *
+	 * @param array<string, mixed> $extraSettings the extra settings of the conditional question
+	 * @param array<int, int> $optionIdMap the new option ids, keyed by the old ones
+	 * @return array<string, mixed>
+	 */
+	public static function mapConditionOptionIds(array $extraSettings, array $optionIdMap): array {
+		foreach ($extraSettings['branches'] ?? [] as $branchIndex => $branch) {
+			unset($extraSettings['branches'][$branchIndex]['subQuestions']);
+			foreach ($branch['conditions'] ?? [] as $conditionIndex => $condition) {
+				if (isset($condition['optionId'])) {
+					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionId'] = $optionIdMap[$condition['optionId']] ?? $condition['optionId'];
+				}
+				if (isset($condition['optionIds']) && is_array($condition['optionIds'])) {
+					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionIds'] = array_map(static fn ($optionId) => $optionIdMap[$optionId] ?? $optionId, $condition['optionIds']);
+				}
+			}
+		}
+		return $extraSettings;
+	}
+
+	/**
 	 * Load the options of the given questions at once
 	 *
 	 * @param Question[] $questionEntities

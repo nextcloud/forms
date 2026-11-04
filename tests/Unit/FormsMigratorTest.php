@@ -109,6 +109,7 @@ class FormsMigratorTest extends TestCase {
         "extraSettings": {},
         "options": [
           {
+            "id": 35,
             "text": "ans1"
           }
         ]
@@ -307,6 +308,94 @@ JSON
 		$this->answerMapper->expects($this->once())->method('insert');
 
 		$this->formsMigrator->import($user, $importSource, $output);
+	}
+
+	public function testExportListsSubquestionsAsQuestions(): void {
+		$form = new Form();
+		$form->setId(42);
+		$form->setOwnerId('someUser');
+		$form->setAccess(['permitAllUsers' => false, 'showToAllUsers' => false]);
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('someUser');
+		$this->formMapper->method('findAllByOwnerId')->willReturn([$form]);
+		$this->submissionService->method('getSubmissions')->willReturn([]);
+		$this->formsService->method('getQuestions')->with(42)->willReturn([[
+			'id' => 14,
+			'formId' => 42,
+			'type' => 'conditional',
+			'extraSettings' => ['branches' => [[
+				'id' => 'branch-1',
+				'conditions' => [['optionId' => 35]],
+				'subQuestions' => [['id' => 15, 'formId' => 42, 'parentQuestionId' => 14, 'branchId' => 'branch-1', 'options' => []]],
+			]]],
+			'options' => [['id' => 35, 'questionId' => 14, 'text' => 'Yes']],
+		]]);
+
+		$exportDestination = $this->createMock(IExportDestination::class);
+		$exportDestination->expects($this->once())
+			->method('addFileContents')
+			->willReturnCallback(function ($path, $jsonData): void {
+				$questions = json_decode($jsonData, true)[0]['questions'];
+				$this->assertSame([14, 15], array_column($questions, 'id'));
+				$this->assertSame([['id' => 'branch-1', 'conditions' => [['optionId' => 35]]]], $questions[0]['extraSettings']['branches']);
+				$this->assertSame([['id' => 35, 'text' => 'Yes']], $questions[0]['options']);
+				$this->assertSame(14, $questions[1]['parentQuestionId']);
+				$this->assertSame('branch-1', $questions[1]['branchId']);
+			});
+
+		$this->formsMigrator->export($user, $exportDestination, $this->createMock(OutputInterface::class));
+	}
+
+	public function testImportConditionalQuestion(): void {
+		$inputJson = '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,'
+			. '"questions":['
+			. '{"id":14,"order":1,"type":"conditional","isRequired":false,"text":"Pets?","description":"","extraSettings":{"triggerType":"multiple_unique","branches":[{"id":"branch-1","conditions":[{"optionId":35}]}]},"options":[{"id":35,"text":"Yes"}]},'
+			. '{"id":15,"order":1,"type":"short","isRequired":false,"text":"Name?","description":"","extraSettings":{},"options":[],"parentQuestionId":14,"branchId":"branch-1"}'
+			. '],'
+			. '"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"Yes"},{"questionId":15,"text":"Rex"}]}]}]';
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('someUser');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getFileContents')->willReturn($inputJson);
+
+		$this->formMapper->method('insert')->willReturnCallback(function (Form $form) {
+			$form->setId(7);
+			return $form;
+		});
+		$questions = [];
+		$this->questionMapper->expects($this->exactly(2))
+			->method('insert')
+			->willReturnCallback(function ($question) use (&$questions) {
+				$question->setId(100 + count($questions));
+				$questions[] = $question;
+				return $question;
+			});
+		$this->optionMapper->method('insert')->willReturnCallback(function ($option) {
+			$option->setId(500);
+			return $option;
+		});
+		// The branch conditions are pointed to the imported option
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->willReturnCallback(function ($question) {
+				$this->assertSame(100, $question->getId());
+				$this->assertSame([['id' => 'branch-1', 'conditions' => [['optionId' => 500]]]], $question->getExtraSettings()['branches']);
+				return $question;
+			});
+		$answerQuestionIds = [];
+		$this->answerMapper->method('insert')->willReturnCallback(function ($answer) use (&$answerQuestionIds) {
+			$answerQuestionIds[] = $answer->getQuestionId();
+			return $answer;
+		});
+
+		$this->formsMigrator->import($user, $importSource, $this->createMock(OutputInterface::class));
+
+		$this->assertSame(100, $questions[1]->getParentQuestionId());
+		$this->assertSame('branch-1', $questions[1]->getBranchId());
+		$this->assertSame([100, 101], $answerQuestionIds);
 	}
 
 	public function testImport_NoVersion() {
