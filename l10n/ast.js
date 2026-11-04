@@ -55,6 +55,7 @@ OC.L10N.register(
     "never" : "enxamás",
     "Store responses anonymously" : "Atroxar anónimamente les rempuestes",
     "Set expiration date" : "Afitar la data de caducidá",
+    "Expiration date" : "Data de caducidá",
     "Show expiration date on form" : "Amosar la data de caducidá nel formulariu",
     "Group" : "Grupu",
     "Team" : "Equipu",

@@ -12,6 +12,7 @@ OC.L10N.register(
     "Delete" : "Sil",
     "Other" : "Digər",
     "never" : "heç vaxt",
+    "Expiration date" : "Expiration date",
     "Group" : "Qrup",
     "Share link" : "Linki yayımla",
     "Edit" : "Dəyişiklik et",

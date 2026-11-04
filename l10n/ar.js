@@ -145,6 +145,7 @@ OC.L10N.register(
     "Store responses anonymously" : "حفظ الإجابات غُفْلاً من أسماء أصحابها",
     "Allow multiple responses per person" : "السماح بردود متعددة لكل شخص ",
     "Set expiration date" : "تعيين تاريخ إنتهاء الصلاحية",
+    "Expiration date" : "تاريخ إنتهاء صلاحية المشاركة",
     "Show expiration date on form" : "عرض تاريخ انتهاء الصلاحية على النموذج",
     "Close form" : "غلق النموذج",
     "Custom submission message" : "رسالة إرسال مخصصة",

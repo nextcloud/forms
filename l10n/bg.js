@@ -87,6 +87,7 @@ OC.L10N.register(
     "Store responses anonymously" : "Анонимно съхраняване на отговорите",
     "Allow multiple responses per person" : "Разрешаване на няколко отговора на човек",
     "Set expiration date" : "Срок на валидност",
+    "Expiration date" : "Валидност",
     "Show expiration date on form" : "Показване на датата на изтичане на валидността на формуляра",
     "Group" : "Група",
     "Team" : "Екип",
