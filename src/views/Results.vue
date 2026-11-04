@@ -229,7 +229,7 @@
 		<!-- Summary view for visualization -->
 		<section v-else-if="isSummaryView">
 			<ResultsSummary
-				v-for="question in questions"
+				v-for="question in summaryQuestions"
 				:key="question.id"
 				:question="question"
 				:submissions="submissions" />
@@ -430,6 +430,33 @@ export default defineComponent({
 		const viewForm = useViewForm({ form: () => props.form, emit })
 
 		const questions = ref<FormsQuestion[]>([])
+
+		/**
+		 * List the trigger of a conditional question as a question of its trigger type,
+		 * followed by the subquestions of all its branches
+		 *
+		 * @param formQuestions The questions of the form
+		 */
+		const flattenQuestions = (formQuestions: FormsQuestion[]): FormsQuestion[] =>
+			formQuestions.flatMap((question) => {
+				const triggerType = question.extraSettings?.triggerType
+				if (question.type !== 'conditional' || !triggerType) {
+					return [question]
+				}
+				return [
+					{ ...question, type: triggerType },
+					...(question.extraSettings?.branches ?? []).flatMap(
+						(branch) => branch.subQuestions ?? [],
+					),
+				]
+			})
+
+		/**
+		 * Questions to summarize, subquestions and triggers like other questions
+		 */
+		const summaryQuestions = computed<FormsQuestion[]>(() =>
+			flattenQuestions(questions.value),
+		)
 		const submissions = ref<FormsSubmission[]>([])
 		const filteredSubmissionsCount = ref(0)
 		const isDownloadActionOpened = ref(false)
@@ -646,9 +673,10 @@ export default defineComponent({
 				}
 				const data = OcsResponse2Data<ResultsResponse>(response)
 
+				// Answers of subquestions and triggers are dates as well
 				submissions.value = formatDateAnswers(
 					data.submissions,
-					data.questions,
+					flattenQuestions(data.questions),
 				) as FormsSubmission[]
 				questions.value = data.questions
 				filteredSubmissionsCount.value = data.filteredSubmissionsCount
@@ -1074,6 +1102,7 @@ export default defineComponent({
 			t,
 			responseViews,
 			questions,
+			summaryQuestions,
 			submissions,
 			filteredSubmissionsCount,
 			isDownloadActionOpened,
