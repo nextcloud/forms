@@ -915,6 +915,64 @@ class FormsService {
 	}
 
 	/**
+	 * Check that a regular expression is enclosed in slashes, only uses modifiers supported by PHP *and* JS and compiles
+	 */
+	private function isValidRegex(string $regex): bool {
+		// general pattern of a valid regex
+		$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
+		// pattern to look for unescaped slashes
+		$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\\\]))(\\\\\\\\)*\\//';
+
+		$matches = [];
+		// only pattern with delimiters and supported modifiers (by PHP *and* JS)
+		if (@preg_match($VALID_REGEX, $regex, $matches) !== 1) {
+			return false;
+		}
+
+		// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
+		if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
+			return false;
+		}
+
+		// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
+		return @preg_match($regex, 'some string') !== false;
+	}
+
+	/**
+	 * Check the conditions of a conditional question branch against its trigger type
+	 *
+	 * @param string $triggerType the type of the trigger question
+	 * @param array $conditions the conditions of the branch
+	 */
+	private function areBranchConditionsValid(string $triggerType, array $conditions): bool {
+		$allowedTypes = Constants::CONDITIONAL_TRIGGER_TYPES[$triggerType] ?? [];
+		foreach ($conditions as $condition) {
+			if (!is_array($condition)) {
+				return false;
+			}
+			if (isset($condition['type']) && !in_array($condition['type'], $allowedTypes, true)) {
+				return false;
+			}
+			if (isset($condition['optionId']) && !is_int($condition['optionId'])) {
+				return false;
+			}
+			if (isset($condition['optionIds'])
+				&& (!is_array($condition['optionIds']) || array_filter($condition['optionIds'], static fn ($id) => !is_int($id)) !== [])) {
+				return false;
+			}
+			foreach (['value', 'min', 'max'] as $key) {
+				if (isset($condition[$key]) && !is_scalar($condition[$key])) {
+					return false;
+				}
+			}
+			if (($condition['type'] ?? null) === Constants::CONDITION_TYPE_REGEX && !$this->isValidRegex((string)($condition['value'] ?? ''))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Return shares of a form shared with given user
 	 *
 	 * @param int $formId The form to query shares for
@@ -1093,24 +1151,7 @@ class FormsService {
 					return true;
 				}
 
-				// general pattern of a valid regex
-				$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
-				// pattern to look for unescaped slashes
-				$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\\\]))(\\\\\\\\)*\\//';
-
-				$matches = [];
-				// only pattern with delimiters and supported modifiers (by PHP *and* JS)
-				if (@preg_match($VALID_REGEX, $extraSettings['validationRegex'], $matches) !== 1) {
-					return false;
-				}
-
-				// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
-				if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
-					return false;
-				}
-
-				// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
-				if (@preg_match($extraSettings['validationRegex'], 'some string') === false) {
+				if (!$this->isValidRegex($extraSettings['validationRegex'])) {
 					return false;
 				}
 			}
@@ -1139,14 +1180,21 @@ class FormsService {
 			}
 
 			// Validate branches structure
+			$branchIds = [];
 			foreach ($extraSettings['branches'] as $branch) {
-				// Each branch must have an id
-				if (!isset($branch['id']) || !is_string($branch['id'])) {
+				// Each branch must have a unique id that fits into the branch id of its subquestions
+				if (!isset($branch['id']) || !is_string($branch['id']) || $branch['id'] === ''
+					|| strlen($branch['id']) > 64 || isset($branchIds[$branch['id']])) {
 					return false;
 				}
+				$branchIds[$branch['id']] = true;
 
 				// Branches must have conditions array
 				if (!isset($branch['conditions']) || !is_array($branch['conditions'])) {
+					return false;
+				}
+
+				if (!$this->areBranchConditionsValid($extraSettings['triggerType'], $branch['conditions'])) {
 					return false;
 				}
 			}
