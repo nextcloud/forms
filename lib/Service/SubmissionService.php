@@ -1240,14 +1240,14 @@ class SubmissionService {
 					return false;
 				}
 				$format = Constants::ANSWER_PHPDATETIME_FORMAT[$triggerType] ?? 'Y-m-d';
-				$date = \DateTime::createFromFormat($format, $dateValue);
+				$date = \DateTime::createFromFormat('!' . $format, $dateValue);
 				if (!$date) {
 					return false;
 				}
 
 				foreach ($conditions as $condition) {
-					$min = isset($condition['min']) ? \DateTime::createFromFormat($format, $condition['min']) : null;
-					$max = isset($condition['max']) ? \DateTime::createFromFormat($format, $condition['max']) : null;
+					$min = isset($condition['min']) ? \DateTime::createFromFormat('!' . $format, $condition['min']) : null;
+					$max = isset($condition['max']) ? \DateTime::createFromFormat('!' . $format, $condition['max']) : null;
 
 					$inRange = true;
 					if ($min && $date < $min) {

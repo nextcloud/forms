@@ -15,9 +15,19 @@
 		v-on="commonListeners">
 		<div class="question-conditional">
 			<!-- Trigger Type Selection (Edit Mode) -->
-			<div v-if="!readOnly && !triggerType" class="trigger-type-selector">
+			<div
+				v-if="!readOnly && (!triggerType || isChangingTriggerType)"
+				class="trigger-type-selector">
 				<p class="trigger-type-selector__label">
 					{{ t('forms', 'Select the trigger question type:') }}
+				</p>
+				<p v-if="isChangingTriggerType" class="trigger-type-selector__hint">
+					{{
+						t(
+							'forms',
+							'The conditions of all branches are reset, the subquestions are kept.',
+						)
+					}}
 				</p>
 				<div class="trigger-type-selector__options">
 					<div
@@ -41,6 +51,13 @@
 						</div>
 					</div>
 				</div>
+				<NcButton
+					v-if="isChangingTriggerType"
+					class="trigger-type-selector__cancel"
+					variant="tertiary"
+					@click="isChangingTriggerType = false">
+					{{ t('forms', 'Keep the current trigger type') }}
+				</NcButton>
 			</div>
 
 			<!-- Trigger Question -->
@@ -337,6 +354,7 @@ import {
 } from '../../composables/useQuestion.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
+import { splitRegex } from '../../utils/RegularExpression.ts'
 
 // Local mapping of question types - avoids circular dependency with AnswerTypes.ts
 const QUESTION_COMPONENTS = {
@@ -587,7 +605,11 @@ export default defineComponent({
 		},
 
 		activeBranches() {
-			if (!this.triggerValues || this.triggerValues.length === 0) {
+			// An unanswered trigger activates no branch, except "no file uploaded" for file triggers
+			if (
+				(!this.triggerValues || this.triggerValues.length === 0)
+				&& this.triggerType !== 'file'
+			) {
 				return null
 			}
 			return this.branches.filter((branch) =>
@@ -813,20 +835,33 @@ export default defineComponent({
 		},
 
 		setTriggerType(type) {
-			const newExtraSettings = {
-				...this.extraSettings,
-				triggerType: type,
-				branches: this.branches.length > 0 ? this.branches : [],
+			const previousType = this.triggerType
+			this.isChangingTriggerType = false
+			if (type === previousType) {
+				return
 			}
-			this.onExtraSettingsChange(newExtraSettings)
+
+			// Settings of the previous trigger type would be invalid for the new one,
+			// undefined keys are left out when saving
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { triggerType, branches, ...previousSettings } =
+				this.extraSettings || {}
+			const clearedSettings = Object.fromEntries(
+				Object.keys(previousSettings).map((key) => [key, undefined]),
+			)
+
+			this.onExtraSettingsChange({
+				...clearedSettings,
+				triggerType: type,
+				// Conditions depend on the trigger type, the subquestions are kept
+				branches: previousType
+					? this.branches.map((branch) => ({ ...branch, conditions: [] }))
+					: this.branches,
+			})
 		},
 
 		clearTriggerType() {
-			const newExtraSettings = {
-				...this.extraSettings,
-				triggerType: null,
-			}
-			this.onExtraSettingsChange(newExtraSettings)
+			this.isChangingTriggerType = true
 		},
 
 		onTriggerValueChange(values) {
@@ -1065,9 +1100,18 @@ export default defineComponent({
 		},
 
 		emitValues() {
+			// Only send the answers of the subquestions that are shown, answers of other
+			// branches are kept here in case the trigger is changed back
+			const shownIds = new Set(
+				this.activeSubQuestions.map((question) => String(question.id)),
+			)
 			this.$emit('update:values', {
 				trigger: this.triggerValues,
-				subQuestions: this.subQuestionValues,
+				subQuestions: Object.fromEntries(
+					Object.entries(this.subQuestionValues).filter(([id]) =>
+						shownIds.has(id),
+					),
+				),
 			})
 		},
 
@@ -1179,7 +1223,7 @@ export default defineComponent({
 		/**
 		 * Safely execute a regex match to prevent ReDoS attacks
 		 *
-		 * @param {string} pattern The regex pattern
+		 * @param {string} pattern The regular expression with delimiters, e.g. `/^yes$/i`
 		 * @param {string} subject The string to match against
 		 * @return {boolean} True if pattern matches
 		 */
@@ -1187,9 +1231,13 @@ export default defineComponent({
 			if (!pattern || subject.length > 10000) {
 				return false
 			}
+			// Same format as the server: `/pattern/modifiers`
+			const { pattern: source, modifiers } = splitRegex(pattern)
+			if (!source) {
+				return false
+			}
 			try {
-				const regex = new RegExp(pattern)
-				return regex.test(subject)
+				return new RegExp(source, modifiers).test(subject)
 			} catch {
 				return false
 			}
