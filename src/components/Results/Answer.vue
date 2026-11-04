@@ -311,6 +311,11 @@ export default defineComponent({
 		margin-top: 16px;
 		padding-left: 16px;
 		border-left: 3px solid var(--color-primary-element);
+
+		// Phones have little width to spare, the border still shows the nesting
+		@media (max-width: 768px) {
+			padding-left: 8px;
+		}
 	}
 }
 </style>
