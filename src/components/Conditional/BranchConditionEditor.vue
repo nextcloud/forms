@@ -7,13 +7,11 @@
 	<div class="branch-condition-editor">
 		<!-- Option-based conditions (radio, dropdown, checkbox) -->
 		<template v-if="isOptionBasedTrigger">
-			<div class="condition-label">
-				{{ conditionLabel }}
-			</div>
 			<div class="condition-options">
 				<!-- Single select for radio/dropdown -->
 				<NcSelect
 					v-if="isSingleSelect"
+					:inputLabel="conditionLabel"
 					:modelValue="selectedOptions"
 					:options="optionsList"
 					:placeholder="t('forms', 'Select an option')"
@@ -24,6 +22,7 @@
 				<!-- Multi select for checkboxes -->
 				<NcSelect
 					v-else
+					:inputLabel="conditionLabel"
 					:modelValue="selectedOptions"
 					:options="optionsList"
 					:placeholder="t('forms', 'Select options combination')"
@@ -58,6 +57,7 @@
 						v-model="conditionType"
 						:options="valueConditionTypes"
 						:placeholder="t('forms', 'Condition type')"
+						:ariaLabelCombobox="t('forms', 'Condition type')"
 						label="label"
 						:reduce="(opt) => opt.value"
 						class="condition-type-select" />
@@ -69,48 +69,54 @@
 						<NcTextField
 							v-model.number="conditionValue"
 							type="number"
-							:placeholder="t('forms', 'Value')"
+							:label="t('forms', 'Value')"
 							class="condition-value-input" />
 					</template>
 					<template v-else-if="conditionType === 'value_range'">
 						<NcTextField
 							v-model.number="conditionMin"
 							type="number"
-							:placeholder="t('forms', 'Min')"
+							:label="t('forms', 'Minimum value')"
 							class="condition-range-input" />
 						<span class="condition-range-separator">-</span>
 						<NcTextField
 							v-model.number="conditionMax"
 							type="number"
-							:placeholder="t('forms', 'Max')"
+							:label="t('forms', 'Maximum value')"
 							class="condition-range-input" />
 					</template>
 					<template v-else-if="conditionType === 'value_min'">
 						<NcTextField
 							v-model.number="conditionMin"
 							type="number"
-							:placeholder="t('forms', 'Min')"
+							:label="t('forms', 'Minimum value')"
 							class="condition-value-input" />
 					</template>
 					<template v-else-if="conditionType === 'value_max'">
 						<NcTextField
 							v-model.number="conditionMax"
 							type="number"
-							:placeholder="t('forms', 'Max')"
+							:label="t('forms', 'Maximum value')"
 							class="condition-value-input" />
 					</template>
 				</template>
 				<template v-else-if="triggerType === 'color'">
 					<NcColorPicker v-model="conditionValue">
-						<NcButton>
+						<NcButton
+							:aria-label="
+								t('forms', 'Select color, current: {color}', {
+									color: conditionValue || t('forms', 'none'),
+								})
+							">
 							<template #icon>
 								<div
 									class="color-preview"
+									aria-hidden="true"
 									:style="{
 										backgroundColor: conditionValue || '#000000',
 									}" />
 							</template>
-							{{ t('forms', 'Select color') }}
+							{{ conditionValue || t('forms', 'Select color') }}
 						</NcButton>
 					</NcColorPicker>
 				</template>
@@ -462,12 +468,6 @@ export default {
 <style lang="scss" scoped>
 .branch-condition-editor {
 	padding: 8px 0;
-}
-
-.condition-label {
-	margin-bottom: 8px;
-	font-weight: 500;
-	color: var(--color-text-maxcontrast);
 }
 
 .condition-options {

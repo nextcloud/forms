@@ -27,7 +27,8 @@
 				:canMoveDown="index < modelValue.length - 1"
 				:canMoveUp="index > 0"
 				:answerType="getAnswerType(question)"
-				:index="baseIndex + index + 1"
+				:index="isSubQuestionList ? baseIndex : baseIndex + index + 1"
+				:subIndex="isSubQuestionList ? subIndexOffset + index + 1 : null"
 				:maxStringLengths="maxStringLengths"
 				:formId="formId ?? question.formId"
 				@update:text="$emit('updateProperty', index, 'text', $event)"
@@ -54,13 +55,20 @@
 							{ 'is-mobile': isMobile },
 						]">
 						<AddQuestionMenu
-							:menuName="insertMenuName"
 							:aria-label="
-								t(
-									'forms',
-									'Insert question after question {index}',
-									{ index: baseIndex + index + 1 },
-								)
+								isSubQuestionList
+									? t(
+											'forms',
+											'Insert subquestion after question {index}',
+											{
+												index: `${baseIndex}.${subIndexOffset + index + 1}`,
+											},
+										)
+									: t(
+											'forms',
+											'Insert question after question {index}',
+											{ index: baseIndex + index + 1 },
+										)
 							"
 							variant="tertiary"
 							:position="index"
@@ -132,6 +140,22 @@ export default defineComponent({
 			default: 0,
 		},
 
+		/**
+		 * The questions are subquestions of the question at `baseIndex`
+		 */
+		isSubQuestionList: {
+			type: Boolean,
+			default: false,
+		},
+
+		/**
+		 * Number of subquestions in the previous branches of the same question
+		 */
+		subIndexOffset: {
+			type: Number,
+			default: 0,
+		},
+
 		transitionName: {
 			type: String,
 			default: 'question-list',
@@ -145,11 +169,6 @@ export default defineComponent({
 		showInsert: {
 			type: Boolean,
 			default: false,
-		},
-
-		insertMenuName: {
-			type: String,
-			default: '',
 		},
 
 		answerTypesFilter: {
