@@ -83,13 +83,19 @@
 					tabindex="0">
 					<NcIconSvgWrapper :svg="IconAlertCircleOutline" />
 				</div>
+				<!-- A trigger only has the options of its type, the conditional question owns the rest -->
 				<NcActions
-					v-if="!readOnly"
+					v-if="!readOnly && (!isTriggerQuestion || $slots.actions)"
 					:id="actionsId"
+					:aria-label="
+						isTriggerQuestion
+							? t('forms', 'Trigger settings')
+							: undefined
+					"
 					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
-					<template v-if="isRequired" #icon>
+					<template v-if="isRequired && !isTriggerQuestion" #icon>
 						<IconOverlay>
 							<template #overlay>
 								<NcIconSvgWrapper :svg="IconAsterisk" inline />
@@ -98,6 +104,7 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
+						v-if="!isTriggerQuestion"
 						:modelValue="isRequired"
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -105,6 +112,7 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
+						v-if="!isTriggerQuestion"
 						:label="t('forms', 'Technical name of the question')"
 						:labelOutside="false"
 						:showTrailingButton="false"
@@ -124,7 +132,7 @@
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
-					<NcActionButton @click="onDelete">
+					<NcActionButton v-if="!isTriggerQuestion" @click="onDelete">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
@@ -169,6 +177,15 @@
 				{{ errorMessage }}
 			</NcNoteCard>
 		</div>
+		<!-- An answered trigger has no header of its own, but its messages are shown -->
+		<template v-else>
+			<NcNoteCard v-if="hasInfo" :id="infoId" type="info">
+				{{ infoMessage }}
+			</NcNoteCard>
+			<NcNoteCard v-if="hasError" :id="errorId" type="error">
+				{{ errorMessage }}
+			</NcNoteCard>
+		</template>
 
 		<!-- Question content -->
 		<slot />
