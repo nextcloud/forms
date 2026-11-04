@@ -18,7 +18,7 @@ use OCP\Migration\SimpleMigrationStep;
 /**
  * Add parent_question_id and branch_id columns for conditional questions
  */
-class Version050300Date20260118000000 extends SimpleMigrationStep {
+class Version050500Date20261104000000 extends SimpleMigrationStep {
 
 	/**
 	 * @param IOutput $output
