@@ -230,62 +230,15 @@ class ApiController extends OCSController {
 				$questionData['formId'] = $form->getId();
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
-				$questionData['id'] = $newQuestion->getId();
 
 				if (isset($oldConfirmationEmailQuestionId) && $oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
 					$form->setConfirmationEmailQuestionId($newQuestion->getId());
 				}
 
-				// Get Options, set new QuestionId, reinsert
-				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
-				// Array to map old option id to new id
-				$optionIdMapper = [];
-				foreach ($options as $oldOption) {
-					$optionData = $oldOption->read();
+				$copiedOptions = $this->copyOptions($oldQuestion->getId(), $newQuestion->getId());
 
-					$oldOptionID = $optionData['id'];
-					unset($optionData['id']);
-					$optionData['questionId'] = $newQuestion->getId();
-					$newOption = Option::fromParams($optionData);
-					$this->optionMapper->insert($newOption);
-					$optionIdMapper[$oldOptionID] = $newOption->getId();
-				}
-				$branches = $questionData['extraSettings']['branches'] ?? [];
-				if (!empty($branches)) {
-					foreach ($branches as $branchKey => $branch) {
-						if (isset($branch['conditions']) && \is_array($branch['conditions'])) {
-							foreach ($branch['conditions'] as $conditionKey => $cond) {
-								if (isset($cond['optionId']) && isset($optionIdMapper[$cond['optionId']])) {
-									$branches[$branchKey]['conditions'][$conditionKey]['optionId'] = $optionIdMapper[$cond['optionId']];
-								}
-							}
-						}
-						if (isset($branch['subQuestions']) && \is_array($branch['subQuestions'])) {
-							foreach ($branch['subQuestions'] as $questionKey => $subQuestion) {
-								$subQuestion['formId'] = $form->getId();
-								$subQuestion['parentQuestionId'] = $newQuestion->getId();
-								$oldOptions = $subQuestion['options'] ?? [];
-
-								unset($subQuestion['id']);
-								unset($subQuestion['options']);
-								unset($subQuestion['accept']);
-								$newSubQuestion = Question::fromParams($subQuestion);
-								$this->questionMapper->insert($newSubQuestion);
-								$branches[$branchKey]['subQuestions'][$questionKey] = $newSubQuestion->read();
-
-								foreach ($oldOptions as $optionData) {
-									unset($optionData['id']);
-									$optionData['questionId'] = $newSubQuestion->getId();
-									$newOption = Option::fromParams($optionData);
-									$this->optionMapper->insert($newOption);
-								}
-							}
-						}
-					}
-
-					$questionData['extraSettings']['branches'] = $branches;
-					$updatedQuestion = Question::fromParams($questionData);
-					$this->questionMapper->update($updatedQuestion);
+				if ($newQuestion->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
+					$this->copyConditionalBranches($oldQuestion, $newQuestion, $copiedOptions);
 				}
 			}
 
@@ -715,13 +668,16 @@ class ApiController extends OCSController {
 				if ($sourceQuestion->getFormId() !== $formId) {
 					throw new OCSBadRequestException('Question doesn\'t belong to given form');
 				}
-				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
 			} catch (IMapperException) {
 				$this->logger->debug('Could not find question');
 				throw new OCSNotFoundException('Could not find question');
 			}
 
-			$allQuestions = $this->questionMapper->findByForm($formId);
+			// Subquestions are ordered within their branch
+			$sourceParentId = $sourceQuestion->getParentQuestionId();
+			$allQuestions = $sourceParentId !== null
+				? $this->questionMapper->findByBranch($sourceParentId, (string)$sourceQuestion->getBranchId())
+				: $this->questionMapper->findByForm($formId);
 
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
@@ -736,19 +692,18 @@ class ApiController extends OCSController {
 			$newQuestion = Question::fromParams($questionData);
 			$this->questionMapper->insert($newQuestion);
 
-			$response = $newQuestion->read();
-			$response['options'] = [];
-			$response['accept'] = [];
+			$copiedOptions = $this->copyOptions($fromId, $newQuestion->getId());
 
-			foreach ($sourceOptions as $sourceOption) {
-				$optionData = $sourceOption->read();
-
-				unset($optionData['id']);
-				$optionData['questionId'] = $newQuestion->getId();
-				$newOption = Option::fromParams($optionData);
-				$insertedOption = $this->optionMapper->insert($newOption);
-
-				$response['options'][] = $insertedOption->read();
+			if ($newQuestion->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
+				$this->copyConditionalBranches($sourceQuestion, $newQuestion, $copiedOptions);
+				$response = $this->formsService->getQuestion($newQuestion->getId());
+				if ($response === null) {
+					throw new OCSException('Failed to copy question');
+				}
+			} else {
+				$response = $newQuestion->read();
+				$response['options'] = array_values(array_map(static fn (Option $option) => $option->read(), $copiedOptions));
+				$response['accept'] = [];
 			}
 		}
 
@@ -859,6 +814,10 @@ class ApiController extends OCSController {
 			$form->setConfirmationEmailQuestionId(null);
 		}
 
+		if ($question->getType() === Constants::ANSWER_TYPE_CONDITIONAL && isset($keyValuePairs['extraSettings']['branches'])) {
+			$keyValuePairs['extraSettings'] = $this->updateConditionalBranches($question, $keyValuePairs['extraSettings']);
+		}
+
 		// Create QuestionEntity with given Params & Id.
 		$question = Question::fromParams($keyValuePairs);
 		$question->setId($questionId);
@@ -936,8 +895,11 @@ class ApiController extends OCSController {
 			]);
 		}
 
-		// Update all question-order > deleted order.
-		$formQuestions = $this->questionMapper->findByForm($formId);
+		// Update all question-order > deleted order, subquestions are ordered within their branch
+		$parentQuestionId = $question->getParentQuestionId();
+		$formQuestions = $parentQuestionId !== null
+			? $this->questionMapper->findByBranch($parentQuestionId, (string)$question->getBranchId())
+			: $this->questionMapper->findByForm($formId);
 		foreach ($formQuestions as $question) {
 			$questionOrder = $question->getOrder();
 			if ($questionOrder > $deletedOrder) {
@@ -2109,6 +2071,83 @@ class ApiController extends OCSController {
 	}
 
 	// private functions
+
+	/**
+	 * Copy the options of a question to another question
+	 *
+	 * @return array<int, Option> the inserted options, keyed by the id of the option they were copied from
+	 */
+	private function copyOptions(int $fromQuestionId, int $toQuestionId): array {
+		$copiedOptions = [];
+		foreach ($this->optionMapper->findByQuestion($fromQuestionId) as $option) {
+			$optionData = $option->read();
+			unset($optionData['id']);
+			$optionData['questionId'] = $toQuestionId;
+			$copiedOptions[$option->getId()] = $this->optionMapper->insert(Option::fromParams($optionData));
+		}
+		return $copiedOptions;
+	}
+
+	/**
+	 * Copy the subquestions of a conditional question and point the branch conditions of the copy to its own options
+	 *
+	 * @param array<int, Option> $copiedOptions the options of the copy, keyed by the id of the option they were copied from
+	 */
+	private function copyConditionalBranches(Question $source, Question $copy, array $copiedOptions): void {
+		$mapOptionId = static fn ($optionId) => isset($copiedOptions[$optionId]) ? $copiedOptions[$optionId]->getId() : $optionId;
+
+		$extraSettings = $copy->getExtraSettings();
+		foreach ($extraSettings['branches'] ?? [] as $branchIndex => $branch) {
+			// Older versions stored a snapshot of the subquestions here, the rows are copied below
+			unset($extraSettings['branches'][$branchIndex]['subQuestions']);
+			foreach ($branch['conditions'] ?? [] as $conditionIndex => $condition) {
+				if (isset($condition['optionId'])) {
+					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionId'] = $mapOptionId($condition['optionId']);
+				}
+				if (isset($condition['optionIds']) && is_array($condition['optionIds'])) {
+					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionIds'] = array_map($mapOptionId, $condition['optionIds']);
+				}
+			}
+		}
+		$copy->setExtraSettings($extraSettings);
+		$this->questionMapper->update($copy);
+
+		foreach ($this->questionMapper->findByParentQuestion($source->getId()) as $subQuestion) {
+			if ($subQuestion->getFormId() !== $source->getFormId()) {
+				continue;
+			}
+			$subQuestionData = $subQuestion->read();
+			unset($subQuestionData['id']);
+			$subQuestionData['formId'] = $copy->getFormId();
+			$subQuestionData['parentQuestionId'] = $copy->getId();
+			$newSubQuestion = Question::fromParams($subQuestionData);
+			$this->questionMapper->insert($newSubQuestion);
+			$this->copyOptions($subQuestion->getId(), $newSubQuestion->getId());
+		}
+	}
+
+	/**
+	 * Drop subquestion snapshots from the branches and delete the subquestions of removed branches
+	 *
+	 * @param array<string, mixed> $extraSettings the new extra settings of the conditional question
+	 * @return array<string, mixed> the extra settings to store
+	 */
+	private function updateConditionalBranches(Question $question, array $extraSettings): array {
+		$branchIds = [];
+		foreach ($extraSettings['branches'] as $branchIndex => $branch) {
+			unset($extraSettings['branches'][$branchIndex]['subQuestions']);
+			$branchIds[] = $branch['id'] ?? null;
+		}
+
+		foreach ($this->questionMapper->findByParentQuestion($question->getId()) as $subQuestion) {
+			if (!in_array($subQuestion->getBranchId(), $branchIds, true)) {
+				$subQuestion->setOrder(0);
+				$this->questionMapper->update($subQuestion);
+			}
+		}
+
+		return $extraSettings;
+	}
 
 	/**
 	 * Insert answers for a question

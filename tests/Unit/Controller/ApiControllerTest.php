@@ -3429,4 +3429,96 @@ class ApiControllerTest extends TestCase {
 		$this->assertInstanceOf(DataResponse::class, $response);
 		$this->assertEquals($questionId, $response->getData());
 	}
+
+	public function testUpdateQuestionRemovedBranchDeletesSubquestions(): void {
+		$this->mockEditableForm();
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createConditionalQuestion());
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([
+			$this->createSubQuestion(101, 'branch-a', 1),
+			$this->createSubQuestion(102, 'branch-b', 1),
+		]);
+
+		$updated = [];
+		$this->questionMapper->expects($this->exactly(2))
+			->method('update')
+			->willReturnCallback(function (Question $question) use (&$updated) {
+				$updated[$question->getId()] = $question;
+				return $question;
+			});
+
+		$this->apiController->updateQuestion(1, 100, ['extraSettings' => [
+			'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+			'branches' => [
+				['id' => 'branch-a', 'conditions' => [['optionId' => 10]], 'subQuestions' => [['id' => 101]]],
+			],
+		]]);
+
+		// Only the subquestion of the removed branch is deleted
+		$this->assertSame([102, 100], array_keys($updated));
+		$this->assertSame(0, $updated[102]->getOrder());
+		// Subquestions are stored as rows, not as a copy in the branches
+		$this->assertSame(
+			[['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
+			$updated[100]->getExtraSettings()['branches'],
+		);
+	}
+
+	public function testDeleteSubQuestionRenumbersItsBranch(): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$sibling = $this->createSubQuestion(102, 'branch-a', 2);
+		$this->questionMapper->expects($this->once())
+			->method('findByBranch')
+			->with(100, 'branch-a')
+			->willReturn([$sibling]);
+		$this->questionMapper->expects($this->never())->method('findByForm');
+
+		$this->apiController->deleteQuestion(1, 101);
+		$this->assertSame(1, $sibling->getOrder());
+	}
+
+	public function testCloneConditionalQuestionCopiesSubquestionsAndOptions(): void {
+		$this->mockEditableForm();
+		$source = $this->createConditionalQuestion();
+		$subQuestion = $this->createSubQuestion(101, 'branch-a', 1);
+
+		$this->questionMapper->method('findById')->with(100)->willReturn($source);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([$source]);
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$subQuestion]);
+
+		$sourceOption = fn (int $id) => \OCA\Forms\Db\Option::fromParams(['id' => $id, 'questionId' => 100, 'text' => 'Option ' . $id, 'order' => $id]);
+		$this->optionMapper->method('findByQuestion')
+			->willReturnCallback(fn (int $questionId) => $questionId === 100 ? [$sourceOption(10), $sourceOption(11)] : []);
+		$nextOptionId = 20;
+		$this->optionMapper->method('insert')->willReturnCallback(function ($option) use (&$nextOptionId) {
+			$option->setId($nextOptionId++);
+			return $option;
+		});
+
+		$inserted = [];
+		$nextQuestionId = 200;
+		$this->questionMapper->expects($this->exactly(2))
+			->method('insert')
+			->willReturnCallback(function (Question $question) use (&$inserted, &$nextQuestionId) {
+				$question->setId($nextQuestionId++);
+				$inserted[] = $question;
+				return $question;
+			});
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(200)
+			->willReturn(['id' => 200, 'extraSettings' => ['branches' => []]]);
+
+		$this->apiController->newQuestion(1, null, null, '', 100);
+
+		[$copy, $subCopy] = $inserted;
+		// The branch conditions point to the options of the copy
+		$this->assertSame(
+			[['optionId' => 20]],
+			$copy->getExtraSettings()['branches'][0]['conditions'],
+		);
+		$this->assertSame(200, $subCopy->getParentQuestionId());
+		$this->assertSame('branch-a', $subCopy->getBranchId());
+	}
 }

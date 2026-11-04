@@ -241,7 +241,7 @@ class SubmissionService {
 		// Oldest first
 		$submissionEntities = array_reverse($submissionEntities);
 
-		$questions = $this->questionMapper->findByForm($form->getId(), false, true);
+		$questions = $this->orderQuestionsForExport($this->questionMapper->findByForm($form->getId(), false, true));
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
@@ -972,6 +972,36 @@ class SubmissionService {
 		// Explicitly type as string so values that start with '=' are not interpreted as formulas.
 		$activeWorksheet->getCell([$column, $row])
 			->setValueExplicit($value, DataType::TYPE_STRING);
+	}
+
+	/**
+	 * Put the subquestions of each conditional question right after it, in branch order,
+	 * and leave out subquestions of branches that no longer exist
+	 *
+	 * @param Question[] $questions top-level questions and subquestions, sorted by order
+	 * @return list<Question>
+	 */
+	private function orderQuestionsForExport(array $questions): array {
+		$subQuestions = [];
+		foreach ($questions as $question) {
+			if ($question->getParentQuestionId() !== null) {
+				$subQuestions[$question->getParentQuestionId()][(string)$question->getBranchId()][] = $question;
+			}
+		}
+
+		$ordered = [];
+		foreach ($questions as $question) {
+			if ($question->getParentQuestionId() !== null) {
+				continue;
+			}
+			$ordered[] = $question;
+			if ($question->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
+				foreach ($question->getExtraSettings()['branches'] ?? [] as $branch) {
+					array_push($ordered, ...($subQuestions[$question->getId()][(string)($branch['id'] ?? '')] ?? []));
+				}
+			}
+		}
+		return $ordered;
 	}
 
 	/**
