@@ -3684,4 +3684,74 @@ class ApiControllerTest extends TestCase {
 		$this->assertSame(200, $subCopy->getParentQuestionId());
 		$this->assertSame('branch-a', $subCopy->getBranchId());
 	}
+
+	public function testReorderSubQuestions(): void {
+		$form = $this->mockEditableForm();
+		$first = $this->createSubQuestion(101, 'branch-a', 1);
+		$second = $this->createSubQuestion(102, 'branch-a', 2);
+		$this->questionMapper->method('findByBranch')->with(100, 'branch-a')->willReturn([$first, $second]);
+		$this->questionMapper->method('findById')->willReturnMap([[100, $this->createConditionalQuestion()], [101, $first], [102, $second]]);
+		$this->questionMapper->expects($this->exactly(2))->method('update');
+		$this->formMapper->expects($this->once())->method('update')->with($form);
+
+		$response = $this->apiController->reorderSubQuestions(1, 'branch-a', 100, [102, 101]);
+
+		$this->assertSame(['102' => ['order' => 1], '101' => ['order' => 2]], $response->getData());
+		$this->assertSame(2, $first->getOrder());
+		$this->assertSame(1, $second->getOrder());
+	}
+
+	public static function dataReorderSubQuestionsRejects(): array {
+		return [
+			'duplicates' => [[101, 101], OCSBadRequestException::class, null],
+			'wrong length' => [[101], OCSBadRequestException::class, null],
+			'unknown question' => [[101, 999], OCSNotFoundException::class, null],
+			'other form' => [[101, 102], OCSBadRequestException::class, 'formId'],
+			'other parent' => [[101, 102], OCSBadRequestException::class, 'parentQuestionId'],
+			'other branch' => [[101, 102], OCSBadRequestException::class, 'branchId'],
+			'deleted' => [[101, 102], OCSBadRequestException::class, 'order'],
+			'parent of other form' => [[101, 102], OCSBadRequestException::class, 'parent'],
+		];
+	}
+
+	/**
+	 * @dataProvider dataReorderSubQuestionsRejects
+	 */
+	public function testReorderSubQuestionsRejects(array $newOrder, string $exception, ?string $foreignKey): void {
+		$this->mockEditableForm();
+		$parent = $this->createConditionalQuestion();
+		$first = $this->createSubQuestion(101, 'branch-a', 1);
+		$second = $this->createSubQuestion(102, 'branch-a', 2);
+		match ($foreignKey) {
+			'formId' => $second->setFormId(2),
+			'parentQuestionId' => $second->setParentQuestionId(200),
+			'branchId' => $second->setBranchId('branch-b'),
+			'order' => $second->setOrder(0),
+			// Nothing is told about the branches of other forms
+			'parent' => $parent->setFormId(2),
+			null => null,
+		};
+		$this->questionMapper->method('findByBranch')->willReturn([$first, $second]);
+		$this->questionMapper->method('findById')->willReturnCallback(fn (int $id) => match ($id) {
+			100 => $parent,
+			101 => $first,
+			102 => $second,
+			default => throw new DoesNotExistException('not found'),
+		});
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException($exception);
+		$this->apiController->reorderSubQuestions(1, 'branch-a', 100, $newOrder);
+	}
+
+	public function testReorderSubQuestionsArchivedForm(): void {
+		$form = new Form();
+		$form->setId(1);
+		$this->formsService->method('getFormIfAllowed')->willReturn($form);
+		$this->formsService->method('isFormArchived')->willReturn(true);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->reorderSubQuestions(1, 'branch-a', 100, [101]);
+	}
 }
