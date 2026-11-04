@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -48,7 +49,7 @@
 <script lang="ts">
 import IconClose from '@material-symbols/svg-400/outlined/close.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -73,7 +74,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const values = computed(() => {
 			return props.values as Array<string | null | undefined>
 		})
@@ -107,6 +109,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			IconClose,
 			t,
 			colorPickerPlaceholder,

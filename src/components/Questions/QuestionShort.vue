@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -117,7 +118,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const input = ref<HTMLInputElement | null>(null)
 		const regexInput = ref<{
 			$el: {
@@ -299,6 +301,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			IconRegex,
 			t,
 			validationTypes,
