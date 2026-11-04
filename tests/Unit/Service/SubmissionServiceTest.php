@@ -610,6 +610,38 @@ file2.txt"
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","",""
 				'
 			],
+			'conditional-subquestions-follow-their-question' => [
+				// Questions, sorted by order like the mapper returns them: subquestions are ordered within their branch
+				[
+					['id' => 1, 'type' => 'conditional', 'text' => 'Cond', 'order' => 1, 'extraSettings' => [
+						'triggerType' => 'short',
+						'branches' => [['id' => 'b1', 'conditions' => []], ['id' => 'b2', 'conditions' => []]],
+					]],
+					['id' => 3, 'type' => 'short', 'text' => 'Sub B', 'order' => 1, 'parentQuestionId' => 1, 'branchId' => 'b2'],
+					['id' => 4, 'type' => 'short', 'text' => 'Sub A', 'order' => 1, 'parentQuestionId' => 1, 'branchId' => 'b1'],
+					['id' => 2, 'type' => 'short', 'text' => 'Top 2', 'order' => 2],
+					['id' => 5, 'type' => 'short', 'text' => 'Removed branch', 'order' => 2, 'parentQuestionId' => 1, 'branchId' => 'b0'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'yes'],
+							['questionId' => 4, 'text' => 'A'],
+							['questionId' => 2, 'text' => 'T'],
+						]
+					],
+				],
+				// Expected CSV-Result: subquestions right after their question, in branch order
+				'
+				"Submission ID","User ID","User display name","Timestamp","Cond","Sub A","Sub B","Top 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-4","question-id-3","question-id-2"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","yes","A","","T"
+				'
+			],
 		];
 	}
 	/**

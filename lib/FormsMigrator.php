@@ -66,7 +66,8 @@ class FormsMigrator implements IMigrator {
 			$forms = $this->formMapper->findAllByOwnerId($user->getUID());
 			foreach ($forms as $form) {
 				$formData = $form->read();
-				$formData['questions'] = $this->formsService->getQuestions($formData['id']);
+				// Subquestions are exported as questions of their own, like they are stored
+				$formData['questions'] = FormsService::flattenQuestions($this->formsService->getQuestions($formData['id']));
 				$formData['submissions'] = $this->submissionService->getSubmissions($formData['id']);
 
 				// Unset ids and hash as we will anyways create new ones on import. UID is known through export.
@@ -77,7 +78,7 @@ class FormsMigrator implements IMigrator {
 					// Do NOT unset ID of question here, as it is necessary for answers.
 					unset($formData['questions'][$qKey]['formId']);
 					foreach ($question['options'] as $oKey => $option) {
-						unset($formData['questions'][$qKey]['options'][$oKey]['id']);
+						// Do NOT unset ID of option here, as it is necessary for the conditions of conditional questions.
 						unset($formData['questions'][$qKey]['options'][$oKey]['questionId']);
 					}
 				}
@@ -164,7 +165,15 @@ class FormsMigrator implements IMigrator {
 				$this->formMapper->insert($form);
 
 				$questionIdMap = [];
+				$optionIdMap = [];
+				$conditionalQuestions = [];
 				foreach ($formData['questions'] as $questionData) {
+					// Subquestions follow their conditional question
+					$parentQuestionId = $questionData['parentQuestionId'] ?? null;
+					if ($parentQuestionId !== null && !isset($questionIdMap[$parentQuestionId])) {
+						continue;
+					}
+
 					$question = new Question();
 					$question->setFormId($form->getId());
 					$question->setOrder($questionData['order']);
@@ -173,6 +182,10 @@ class FormsMigrator implements IMigrator {
 					$question->setText($questionData['text']);
 					$question->setDescription($questionData['description']);
 					$question->setExtraSettings($questionData['extraSettings']);
+					if ($parentQuestionId !== null) {
+						$question->setParentQuestionId($questionIdMap[$parentQuestionId]);
+						$question->setBranchId($questionData['branchId'] ?? null);
+					}
 
 					$this->questionMapper->insert($question);
 
@@ -185,7 +198,22 @@ class FormsMigrator implements IMigrator {
 						$option->setText($optionData['text']);
 
 						$this->optionMapper->insert($option);
+
+						// Store OptionId to map the conditions of conditional questions.
+						if (isset($optionData['id'])) {
+							$optionIdMap[$optionData['id']] = $option->getId();
+						}
 					}
+
+					if ($questionData['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
+						$conditionalQuestions[] = $question;
+					}
+				}
+
+				// The branch conditions refer to the imported options
+				foreach ($conditionalQuestions as $question) {
+					$question->setExtraSettings(FormsService::mapConditionOptionIds($question->getExtraSettings(), $optionIdMap));
+					$this->questionMapper->update($question);
 				}
 
 				if (($formData['confirmationEmailQuestionId'] ?? null) !== null
