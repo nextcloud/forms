@@ -48,12 +48,12 @@
 			}">
 			<template v-if="!readOnly">
 				<label
-					:for="`q${index}__label_lowest_input`"
+					:for="`${idPrefix}__label_lowest_input`"
 					class="question-linear-scale__label-title question-linear-scale__label-title-lowest">
 					{{ t('forms', 'Label for lowest value') }}
 				</label>
 				<NcTextArea
-					:id="`q${index}__label_lowest_input`"
+					:id="`${idPrefix}__label_lowest_input`"
 					ref="lowest"
 					:modelValue="optionsLabelLowest"
 					class="question-linear-scale__label-input question-linear-scale__label-input-lowest"
@@ -105,12 +105,12 @@
 			</fieldset>
 			<template v-if="!readOnly">
 				<label
-					:for="`q${index}__label_highest_input`"
+					:for="`${idPrefix}__label_highest_input`"
 					class="question-linear-scale__label-title question-linear-scale__label-title-highest">
 					{{ t('forms', 'Label for highest value') }}
 				</label>
 				<NcTextArea
-					:id="`q${index}__label_highest_input`"
+					:id="`${idPrefix}__label_highest_input`"
 					ref="highest"
 					:modelValue="optionsLabelHighest"
 					class="question-linear-scale__label-input question-linear-scale__label-input-highest"
@@ -145,6 +145,7 @@ import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
+	questionIdPrefix,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 
@@ -242,7 +243,8 @@ export default defineComponent({
 		/**
 		 * ID for the label for the lowest option
 		 */
-		const labelId = computed(() => 'q' + props.index + '__label_lowest')
+		const idPrefix = computed(() => questionIdPrefix(props))
+		const labelId = computed(() => idPrefix.value + '__label_lowest')
 		const isUnique = computed(() => props.answerType.unique === true)
 
 		/**
@@ -335,6 +337,7 @@ export default defineComponent({
 			scaleOptions,
 			isUnique,
 			questionValues,
+			idPrefix,
 			labelId,
 			optionsLowest,
 			optionsHighest,
