@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -171,7 +172,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const values = computed<string[]>(() => {
 			return props.values as string[]
 		})
@@ -330,6 +332,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			IconPencil,
 			t,
 			lowest,
