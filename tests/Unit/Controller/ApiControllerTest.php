@@ -1248,6 +1248,75 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newSubmission(1, $answers, '');
 	}
 
+	public function testNewSubmissionStoresSubquestionsLikeQuestions(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('admin');
+
+		$branch = [
+			'id' => 'branch-a',
+			'conditions' => [['optionId' => 10]],
+			'subQuestions' => [
+				[
+					'id' => 101,
+					'type' => Constants::ANSWER_TYPE_RANKING,
+					'text' => 'Rank',
+					'extraSettings' => [],
+					'options' => [['id' => 1, 'text' => 'R1'], ['id' => 2, 'text' => 'R2']],
+				],
+				[
+					'id' => 102,
+					'type' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+					'text' => 'Radio',
+					'extraSettings' => ['allowOtherAnswer' => true],
+					'options' => [['id' => 3, 'text' => 'Fixed']],
+				],
+			],
+		];
+		$question = [
+			'id' => 100,
+			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'text' => 'Conditional Q',
+			'extraSettings' => [
+				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'branches' => [$branch],
+			],
+			'options' => [['id' => 10, 'text' => 'Option A']],
+		];
+
+		$this->formsService->method('loadFormForSubmission')->willReturn($form);
+		$this->formsService->method('getQuestions')->willReturn([$question]);
+		$this->formAccess();
+		$this->submissionMapper->method('insert')->willReturnCallback(function ($submission) {
+			$submission->setId(12);
+			return $submission;
+		});
+		$this->submissionService->method('getActiveBranches')->willReturn([$branch]);
+
+		$stored = [];
+		$this->answerMapper->method('insert')->willReturnCallback(function (Answer $answer) use (&$stored) {
+			$stored[] = [$answer->getQuestionId(), $answer->getText()];
+			return $answer;
+		});
+
+		$this->apiController->newSubmission(1, [
+			100 => [
+				'trigger' => [10],
+				'subQuestions' => [
+					101 => ['2', '1'],
+					102 => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'typed'],
+				],
+			],
+		], '');
+
+		$this->assertSame([
+			[100, 'Option A'],
+			[101, '["2","1"]'],
+			[102, 'typed'],
+		], $stored);
+	}
+
 	public function testNewSubmission_formNotFound() {
 		$this->formsService->expects($this->once())
 			->method('loadFormForSubmission')
