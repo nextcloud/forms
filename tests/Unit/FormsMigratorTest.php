@@ -398,6 +398,31 @@ JSON
 		$this->assertSame([100, 101], $answerQuestionIds);
 	}
 
+	public function testImportSkipsAnswersOfQuestionsNotExported(): void {
+		$inputJson = '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,'
+			. '"questions":[{"id":14,"order":1,"type":"short","isRequired":false,"text":"Name?","description":"","extraSettings":{},"options":[]}],'
+			. '"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"Ann"},{"questionId":13,"text":"Answer of a deleted question"}]}]}]';
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('someUser');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getFileContents')->willReturn($inputJson);
+		$this->questionMapper->method('insert')->willReturnCallback(function ($question) {
+			$question->setId(100);
+			return $question;
+		});
+
+		$this->answerMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($answer) {
+				$this->assertSame(100, $answer->getQuestionId());
+				return $answer;
+			});
+
+		$this->formsMigrator->import($user, $importSource, $this->createMock(OutputInterface::class));
+	}
+
 	public function testImport_NoVersion() {
 		$user = $this->createMock(IUser::class);
 		$importSource = $this->createMock(IImportSource::class);
