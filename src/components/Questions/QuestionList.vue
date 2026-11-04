@@ -27,7 +27,8 @@
 				:canMoveDown="index < modelValue.length - 1"
 				:canMoveUp="index > 0"
 				:answerType="getAnswerType(question)"
-				:index="baseIndex + index + 1"
+				:index="isSubQuestionList ? baseIndex : baseIndex + index + 1"
+				:subIndex="isSubQuestionList ? subIndexOffset + index + 1 : null"
 				:maxStringLengths="maxStringLengths"
 				:formId="formId ?? question.formId"
 				@update:text="$emit('updateProperty', index, 'text', $event)"
@@ -59,7 +60,11 @@
 								t(
 									'forms',
 									'Insert question after question {index}',
-									{ index: baseIndex + index + 1 },
+									{
+										index: isSubQuestionList
+											? `${baseIndex}.${subIndexOffset + index + 1}`
+											: baseIndex + index + 1,
+									},
 								)
 							"
 							variant="tertiary"
@@ -128,6 +133,22 @@ export default defineComponent({
 
 		/** Offsets display numbering; emitted action indices remain list-local. */
 		baseIndex: {
+			type: Number,
+			default: 0,
+		},
+
+		/**
+		 * The questions are subquestions of the question at `baseIndex`
+		 */
+		isSubQuestionList: {
+			type: Boolean,
+			default: false,
+		},
+
+		/**
+		 * Number of subquestions in the previous branches of the same question
+		 */
+		subIndexOffset: {
 			type: Number,
 			default: 0,
 		},

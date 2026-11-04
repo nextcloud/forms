@@ -103,9 +103,15 @@
 
 				<!-- Branch Management (Edit Mode) -->
 				<div v-if="!readOnly" class="branches-editor">
-					<h4 class="branches-editor__title">
-						{{ t('forms', 'Conditional Branches') }}
-					</h4>
+					<h3 class="branches-editor__title">
+						{{
+							text
+								? t('forms', 'Branches of "{question}"', {
+										question: text,
+									})
+								: t('forms', 'Conditional Branches')
+						}}
+					</h3>
 					<p class="branches-editor__description">
 						{{
 							t(
@@ -120,14 +126,25 @@
 						<div
 							v-for="(branch, branchIndex) in branches"
 							:key="branch.id"
-							class="branch">
+							class="branch"
+							role="group"
+							:aria-labelledby="`${branchIdPrefix}${branch.id}`">
 							<div class="branch__header">
-								<span class="branch__label">
+								<span
+									:id="`${branchIdPrefix}${branch.id}`"
+									class="branch__label">
 									{{ getBranchLabel(branch, branchIndex) }}
 								</span>
 								<NcButton
 									variant="tertiary"
-									:aria-label="t('forms', 'Delete branch')"
+									:aria-label="
+										t('forms', 'Delete branch {label}', {
+											label: getBranchLabel(
+												branch,
+												branchIndex,
+											),
+										})
+									"
 									@click="deleteBranch(branch.id)">
 									<template #icon>
 										<NcIconSvgWrapper
@@ -155,6 +172,8 @@
 									:getAnswerType="getSubQuestionAnswerType"
 									:maxStringLengths="maxStringLengths"
 									:baseIndex="index"
+									isSubQuestionList
+									:subIndexOffset="subIndexOffsets[branchIndex]"
 									:animation="200"
 									:formId="formId"
 									:showInsert="true"
@@ -199,7 +218,18 @@
 
 								<!-- Add subquestion button -->
 								<NcActions
-									:aria-label="t('forms', 'Add subquestion')">
+									:aria-label="
+										t(
+											'forms',
+											'Add subquestion to branch {label}',
+											{
+												label: getBranchLabel(
+													branch,
+													branchIndex,
+												),
+											},
+										)
+									">
 									<template #icon>
 										<NcIconSvgWrapper :svg="IconPlus" />
 									</template>
@@ -230,30 +260,29 @@
 
 				<!-- Submit Mode: Show only the active branch's subquestions -->
 				<div v-else class="active-subquestions">
-					<TransitionGroup tag="div" name="branch-list">
-						<div
-							v-for="activeBranch in activeBranches"
-							:key="activeBranch.id">
-							<component
-								:is="getSubQuestionComponentName(subQuestion.type)"
-								v-for="(
-									subQuestion, subIndex
-								) in activeBranch.subQuestions"
-								:key="subQuestion.id"
-								ref="subQuestions"
-								v-bind="subQuestion"
-								:formId="formId"
-								:index="subIndex + index + 1"
-								:maxStringLengths="maxStringLengths"
-								:answerType="
-									getSubQuestionAnswerTypeConfig(subQuestion.type)
-								"
-								:readOnly="true"
-								:values="getSubQuestionValues(subQuestion.id)"
-								@update:values="
-									onSubQuestionValueChange(subQuestion.id, $event)
-								" />
-						</div>
+					<!-- Announce subquestions that appear or disappear on a trigger change -->
+					<div class="hidden-visually" aria-live="polite">
+						{{ subQuestionsStatus }}
+					</div>
+					<TransitionGroup tag="ul" name="branch-list">
+						<component
+							:is="getSubQuestionComponentName(subQuestion.type)"
+							v-for="(subQuestion, subIndex) in activeSubQuestions"
+							:key="subQuestion.id"
+							ref="subQuestions"
+							v-bind="subQuestion"
+							:formId="formId"
+							:index="index"
+							:subIndex="subIndex + 1"
+							:maxStringLengths="maxStringLengths"
+							:answerType="
+								getSubQuestionAnswerTypeConfig(subQuestion.type)
+							"
+							:readOnly="true"
+							:values="getSubQuestionValues(subQuestion.id)"
+							@update:values="
+								onSubQuestionValueChange(subQuestion.id, $event)
+							" />
 					</TransitionGroup>
 				</div>
 			</div>
@@ -281,7 +310,7 @@ import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?r
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
-import { t } from '@nextcloud/l10n'
+import { n, t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import { defineComponent, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -376,6 +405,8 @@ export default defineComponent({
 	data() {
 		return {
 			isLoadingQuestions: false,
+			isChangingTriggerType: false,
+			subQuestionsStatus: '',
 			triggerValues: [],
 			subQuestionValues: {},
 		}
@@ -564,12 +595,48 @@ export default defineComponent({
 			)
 		},
 
+		activeSubQuestions() {
+			return (this.activeBranches ?? []).flatMap(
+				(branch) => branch.subQuestions ?? [],
+			)
+		},
+
+		/**
+		 * Subquestions are numbered across the branches, so each branch starts after the previous ones
+		 */
+		subIndexOffsets() {
+			let offset = 0
+			return this.branches.map((branch) => {
+				const start = offset
+				offset += branch.subQuestions?.length ?? 0
+				return start
+			})
+		},
+
+		branchIdPrefix() {
+			return `conditional-${this.id}-branch-`
+		},
+
 		contentValid() {
 			return !!this.triggerType && this.branches.length > 0
 		},
 	},
 
 	watch: {
+		activeSubQuestions(newQuestions, oldQuestions) {
+			const count = newQuestions.length
+			if (count > 0) {
+				this.subQuestionsStatus = n(
+					'forms',
+					'%n follow-up question shown',
+					'%n follow-up questions shown',
+					count,
+				)
+			} else if (oldQuestions.length > 0) {
+				this.subQuestionsStatus = t('forms', 'Follow-up questions removed')
+			}
+		},
+
 		values: {
 			immediate: true,
 			handler(newValues) {
