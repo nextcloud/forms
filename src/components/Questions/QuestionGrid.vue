@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -229,7 +230,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, ...QUESTION_MULTIPLE_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const input = ref<
 			Array<{
 				focus?: () => void
@@ -388,6 +390,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			...questionMultiple,
 			columns,
 			input,
