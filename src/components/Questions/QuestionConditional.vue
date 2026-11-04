@@ -14,9 +14,20 @@
 		v-on="commonListeners">
 		<div class="question-conditional">
 			<!-- Trigger Type Selection (Edit Mode) -->
-			<div v-if="!readOnly && !triggerType" class="trigger-type-selector">
+			<div
+				v-if="!readOnly && (!triggerType || isChangingTriggerType)"
+				ref="triggerTypeSelector"
+				class="trigger-type-selector">
 				<p class="trigger-type-selector__label">
 					{{ t('forms', 'Select the trigger question type:') }}
+				</p>
+				<p v-if="isChangingTriggerType" class="trigger-type-selector__hint">
+					{{
+						t(
+							'forms',
+							'The conditions of all branches are reset, the subquestions are kept.',
+						)
+					}}
 				</p>
 				<div class="trigger-type-selector__options">
 					<div
@@ -40,6 +51,13 @@
 						</div>
 					</div>
 				</div>
+				<NcButton
+					v-if="isChangingTriggerType"
+					class="trigger-type-selector__cancel"
+					variant="tertiary"
+					@click="keepTriggerType">
+					{{ t('forms', 'Keep the current trigger type') }}
+				</NcButton>
 			</div>
 
 			<!-- Trigger Question -->
@@ -56,6 +74,7 @@
 						}}
 					</span>
 					<NcButton
+						ref="changeTriggerTypeButton"
 						variant="tertiary"
 						:aria-label="t('forms', 'Change trigger type')"
 						@click="clearTriggerType">
@@ -98,7 +117,7 @@
 					@update:values="onTriggerValueChange"
 					@keydown="$emit('keydown', $event)"
 					@update:options="onOptionsChange"
-					@update:extraSettings="onExtraSettingsChange"
+					@update:extraSettings="updateExtraSettings"
 					@delete="clearTriggerType" />
 
 				<!-- Branch Management (Edit Mode) -->
@@ -175,6 +194,7 @@
 							<!-- Subquestions for this branch -->
 							<div class="branch__subquestions">
 								<QuestionList
+									ref="subQuestionLists"
 									:modelValue="branch.subQuestions"
 									:getComponent="getSubQuestionComponent"
 									:getAnswerType="getSubQuestionAnswerType"
@@ -256,7 +276,10 @@
 						</div>
 					</TransitionGroup>
 					<!-- Add new branch button -->
-					<NcButton variant="secondary" @click="addBranch">
+					<NcButton
+						ref="addBranchButton"
+						variant="secondary"
+						@click="addBranch">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconPlus" />
 						</template>
@@ -319,7 +342,7 @@ import { showError } from '@nextcloud/dialogs'
 import { emit } from '@nextcloud/event-bus'
 import { n, t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, toRaw } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -344,6 +367,7 @@ import {
 } from '../../composables/useQuestion.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
+import { splitRegex } from '../../utils/RegularExpression.ts'
 
 // Local mapping of question types - avoids circular dependency with AnswerTypes.ts
 const QUESTION_COMPONENTS = {
@@ -594,7 +618,11 @@ export default defineComponent({
 		},
 
 		activeBranches() {
-			if (!this.triggerValues || this.triggerValues.length === 0) {
+			// An unanswered trigger activates no branch, except "no file uploaded" for file triggers
+			if (
+				(!this.triggerValues || this.triggerValues.length === 0)
+				&& this.triggerType !== 'file'
+			) {
 				return null
 			}
 			return this.branches.filter((branch) =>
@@ -656,8 +684,25 @@ export default defineComponent({
 		values: {
 			immediate: true,
 			handler(newValues) {
+				// The values emitted last leave out the answers of hidden branches, keep them
+				if (newValues && toRaw(newValues) === this.emittedValues) {
+					return
+				}
+
 				this.triggerValues = newValues?.trigger ?? []
 				this.subQuestionValues = { ...(newValues?.subQuestions ?? {}) }
+
+				// Restored answers can belong to subquestions that are not shown (anymore)
+				const shownIds = new Set(
+					this.activeSubQuestions.map((question) => String(question.id)),
+				)
+				if (
+					Object.keys(this.subQuestionValues).some(
+						(id) => !shownIds.has(id),
+					)
+				) {
+					this.emitValues()
+				}
 			},
 		},
 	},
@@ -829,20 +874,64 @@ export default defineComponent({
 		},
 
 		setTriggerType(type) {
-			const newExtraSettings = {
-				...this.extraSettings,
-				triggerType: type,
-				branches: this.branches.length > 0 ? this.branches : [],
+			const previousType = this.triggerType
+			this.isChangingTriggerType = false
+			// The type selection is replaced by the trigger
+			this.focusChangeTriggerType()
+			if (type === previousType) {
+				return
 			}
-			this.onExtraSettingsChange(newExtraSettings)
+
+			// Settings of the previous trigger type would be invalid for the new one,
+			// undefined keys are left out when saving
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { triggerType, branches, ...previousSettings } =
+				this.extraSettings || {}
+			const clearedSettings = Object.fromEntries(
+				Object.keys(previousSettings).map((key) => [key, undefined]),
+			)
+
+			this.updateExtraSettings({
+				...clearedSettings,
+				triggerType: type,
+				// Conditions depend on the trigger type, the subquestions are kept
+				branches: previousType
+					? this.branches.map((branch) => ({ ...branch, conditions: [] }))
+					: this.branches,
+			})
 		},
 
 		clearTriggerType() {
-			const newExtraSettings = {
+			this.isChangingTriggerType = true
+			this.$nextTick(() => {
+				this.$refs.triggerTypeSelector?.querySelector('button')?.focus()
+			})
+		},
+
+		keepTriggerType() {
+			this.isChangingTriggerType = false
+			this.focusChangeTriggerType()
+		},
+
+		focusChangeTriggerType() {
+			this.$nextTick(() => {
+				this.$refs.changeTriggerTypeButton?.$el.focus()
+			})
+		},
+
+		/**
+		 * Change the extra settings right away and save them debounced
+		 *
+		 * Saving stores the settings as they are by then, so a change made meanwhile is not lost.
+		 *
+		 * @param {object} settings The changed extra settings
+		 */
+		updateExtraSettings(settings) {
+			this.$emit('update:extraSettings', {
 				...this.extraSettings,
-				triggerType: null,
-			}
-			this.onExtraSettingsChange(newExtraSettings)
+				...settings,
+			})
+			this.onExtraSettingsChange({})
 		},
 
 		onTriggerValueChange(values) {
@@ -861,18 +950,22 @@ export default defineComponent({
 				subQuestions: [],
 			}
 			const newBranches = [...this.branches, newBranch]
-			this.onExtraSettingsChange({ branches: newBranches })
+			this.updateExtraSettings({ branches: newBranches })
 		},
 
 		deleteBranch(branchId) {
 			const newBranches = this.branches.filter((b) => b.id !== branchId)
-			this.onExtraSettingsChange({ branches: newBranches })
+			this.updateExtraSettings({ branches: newBranches })
+			// The focused delete button is gone with its branch
+			this.$nextTick(() => {
+				this.$refs.addBranchButton?.$el.focus()
+			})
 		},
 
 		onBranchUpdate(index, branch) {
 			const newBranches = [...this.branches]
 			newBranches[index] = branch
-			this.onExtraSettingsChange({ branches: newBranches })
+			this.updateExtraSettings({ branches: newBranches })
 		},
 
 		getBranchLabel(branch, index) {
@@ -940,6 +1033,11 @@ export default defineComponent({
 				this.$emit('update:extraSettings', {
 					...this.extraSettings,
 					branches: newBranches,
+				})
+				this.$nextTick(() => {
+					this.$refs.subQuestionLists?.forEach((list) =>
+						list.focusQuestion(newQuestion.id),
+					)
 				})
 			} catch (error) {
 				logger.error('Error adding subquestion', { error })
@@ -1095,10 +1193,20 @@ export default defineComponent({
 		},
 
 		emitValues() {
-			this.$emit('update:values', {
+			// Only send the answers of the subquestions that are shown, answers of other
+			// branches are kept here in case the trigger is changed back
+			const shownIds = new Set(
+				this.activeSubQuestions.map((question) => String(question.id)),
+			)
+			this.emittedValues = {
 				trigger: this.triggerValues,
-				subQuestions: this.subQuestionValues,
-			})
+				subQuestions: Object.fromEntries(
+					Object.entries(this.subQuestionValues).filter(([id]) =>
+						shownIds.has(id),
+					),
+				),
+			}
+			this.$emit('update:values', this.emittedValues)
 		},
 
 		evaluateBranchCondition(branch) {
@@ -1209,7 +1317,7 @@ export default defineComponent({
 		/**
 		 * Safely execute a regex match to prevent ReDoS attacks
 		 *
-		 * @param {string} pattern The regex pattern
+		 * @param {string} pattern The regular expression with delimiters, e.g. `/^yes$/i`
 		 * @param {string} subject The string to match against
 		 * @return {boolean} True if pattern matches
 		 */
@@ -1217,9 +1325,13 @@ export default defineComponent({
 			if (!pattern || subject.length > 10000) {
 				return false
 			}
+			// Same format as the server: `/pattern/modifiers`
+			const { pattern: source, modifiers } = splitRegex(pattern)
+			if (!source) {
+				return false
+			}
 			try {
-				const regex = new RegExp(pattern)
-				return regex.test(subject)
+				return new RegExp(source, modifiers).test(subject)
 			} catch {
 				return false
 			}

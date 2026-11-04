@@ -39,12 +39,22 @@
 					v-model="conditionType"
 					:options="textConditionTypes"
 					:placeholder="t('forms', 'Condition type')"
+					:ariaLabelCombobox="t('forms', 'Condition type')"
 					label="label"
 					:reduce="(opt) => opt.value"
 					class="condition-type-select" />
 				<NcTextField
-					v-model="conditionValue"
-					:placeholder="conditionValuePlaceholder"
+					v-model="textConditionValue"
+					:label="conditionValuePlaceholder"
+					:error="isRegexInvalid"
+					:helperText="
+						isRegexInvalid
+							? t(
+									'forms',
+									'Invalid regular expression, use the format /pattern/',
+								)
+							: ''
+					"
 					class="condition-value-input" />
 			</div>
 		</template>
@@ -127,15 +137,17 @@
 		<template v-else-if="isDateBasedTrigger">
 			<div class="condition-row">
 				<NcDateTimePicker
-					v-model="conditionMin"
+					v-model="conditionDateMin"
 					:type="datePickerType"
 					:placeholder="t('forms', 'From')"
+					:ariaLabel="t('forms', 'From')"
 					class="condition-date-input" />
 				<span class="condition-range-separator">-</span>
 				<NcDateTimePicker
-					v-model="conditionMax"
+					v-model="conditionDateMax"
 					:type="datePickerType"
 					:placeholder="t('forms', 'To')"
+					:ariaLabel="t('forms', 'To')"
 					class="condition-date-input" />
 			</div>
 		</template>
@@ -154,12 +166,14 @@
 </template>
 
 <script>
+import moment from '@nextcloud/moment'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import { validateExpression } from '../../utils/RegularExpression.ts'
 
 export default {
 	name: 'BranchConditionEditor',
@@ -200,6 +214,13 @@ export default {
 	},
 
 	emits: ['update:branch'],
+
+	data() {
+		return {
+			// Text being typed, an invalid regular expression is not saved
+			textDraft: null,
+		}
+	},
 
 	computed: {
 		/**
@@ -348,6 +369,56 @@ export default {
 		},
 
 		/**
+		 * Value of a text condition, regular expressions are only saved when valid
+		 */
+		textConditionValue: {
+			get() {
+				return this.textDraft ?? this.conditionValue
+			},
+
+			set(value) {
+				this.textDraft = value
+				if (this.conditionType !== 'regex' || validateExpression(value)) {
+					this.conditionValue = value
+				}
+			},
+		},
+
+		isRegexInvalid() {
+			return (
+				this.conditionType === 'regex'
+				&& !validateExpression(this.textConditionValue)
+			)
+		},
+
+		/**
+		 * Storage format of date and time conditions, the same as for answers
+		 */
+		dateStorageFormat() {
+			return this.triggerType === 'time' ? 'HH:mm' : 'YYYY-MM-DD'
+		},
+
+		conditionDateMin: {
+			get() {
+				return this.parseDate(this.conditionMin)
+			},
+
+			set(value) {
+				this.conditionMin = this.formatDate(value)
+			},
+		},
+
+		conditionDateMax: {
+			get() {
+				return this.parseDate(this.conditionMax)
+			},
+
+			set(value) {
+				this.conditionMax = this.formatDate(value)
+			},
+		},
+
+		/**
 		 * Condition min value (for ranges)
 		 */
 		conditionMin: {
@@ -385,7 +456,7 @@ export default {
 		 */
 		conditionValuePlaceholder() {
 			if (this.conditionType === 'regex') {
-				return t('forms', 'Regular expression pattern')
+				return t('forms', 'Regular expression, e.g. /^yes$/i')
 			}
 			if (this.conditionType === 'string_equals') {
 				return t('forms', 'Exact text to match')
@@ -404,6 +475,26 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * @param {string} value stored date or time
+		 * @return {Date|null} the date for the picker
+		 */
+		parseDate(value) {
+			if (!value) {
+				return null
+			}
+			const date = moment(value, this.dateStorageFormat, true)
+			return date.isValid() ? date.toDate() : null
+		},
+
+		/**
+		 * @param {Date|null} value date from the picker
+		 * @return {string} the date in the storage format of answers
+		 */
+		formatDate(value) {
+			return value ? moment(value).format(this.dateStorageFormat) : ''
+		},
+
 		/**
 		 * Handle single option selection (radio/dropdown)
 		 *
