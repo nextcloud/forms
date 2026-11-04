@@ -12,6 +12,7 @@ OC.L10N.register(
     "Text" : "Testenn",
     "never" : "james",
     "Set expiration date" : "Lakaat un deizat termen",
+    "Expiration date" : "Deizat termen",
     "Group" : "Stollad",
     "Share link" : "Lodañ al liamm",
     "Add link" : "Ouzhpnna ul liamm",

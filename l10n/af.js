@@ -13,6 +13,7 @@ OC.L10N.register(
     "Text" : "Teks",
     "Other" : "Ander",
     "Set expiration date" : "Stel vervaldatum",
+    "Expiration date" : "Vervaldatum",
     "Group" : "Groep",
     "Share link" : "Deel skakel",
     "Add link" : "Voeg skakel toe",

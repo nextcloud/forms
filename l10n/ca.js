@@ -200,6 +200,7 @@ OC.L10N.register(
     "Allow multiple responses per person" : "Permet diverses respostes per persona",
     "Allow editing own responses" : "Permet editar les pròpies respostes",
     "Set expiration date" : "Defineix una data de tancament",
+    "Expiration date" : "Data de venciment",
     "Show expiration date on form" : "Mostra la data d'expiració al formulari",
     "Limit number of responses" : "Limita el nombre de respostes",
     "Maximum number of responses" : "Nombre màxim de respostes",

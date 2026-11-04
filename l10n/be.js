@@ -32,6 +32,7 @@ OC.L10N.register(
     "Rows" : "Радкі",
     "Other" : "Іншае",
     "never" : "ніколі",
+    "Expiration date" : "Expiration date",
     "Search for user, group or team …" : "Пошук карыстальніка, групы або каманды …",
     "Group" : "Група",
     "Team" : "Каманда",
