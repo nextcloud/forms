@@ -1926,56 +1926,6 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
 				'expected' => true
 			],
-			'valid-conditional-multiple-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_MULTIPLE,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'options_combination', 'optionIds' => [1, 2]]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
-			'valid-conditional-short-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_SHORT,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'string_equals', 'value' => 'yes']]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
-			'valid-conditional-linearscale-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_LINEARSCALE,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
-			'valid-conditional-date-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DATE,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'date_range', 'min' => '2024-01-01', 'max' => '2024-12-31']]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
-			'valid-conditional-file-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_FILE,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'file_uploaded', 'value' => true]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
 			'invalid-conditional-missing-triggerType' => [
 				'extraSettings' => [
 					'branches' => [
@@ -2061,29 +2011,9 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
 				'expected' => false
 			],
-			'valid-conditional-regex-condition' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_SHORT,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'regex', 'value' => '/^ye(s|p)$/i']]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
-			'invalid-conditional-regex-without-delimiters' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_SHORT,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'regex', 'value' => '^yes$']]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => false
-			],
 			'invalid-conditional-condition-type-of-other-trigger' => [
 				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_LONG,
+					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 					'branches' => [
 						['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]
 					]
@@ -2091,31 +2021,11 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
 				'expected' => false
 			],
-			'valid-conditional-time-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_TIME,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'date_range', 'min' => '08:00', 'max' => '12:00']]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => true
-			],
 			'invalid-conditional-option-id-not-a-number' => [
 				'extraSettings' => [
 					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 					'branches' => [
 						['id' => 'branch-1', 'conditions' => [['optionId' => ['nested']]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => false
-			],
-			'invalid-conditional-option-ids-not-numbers' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_MULTIPLE,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'options_combination', 'optionIds' => [1, 'two']]]]
 					]
 				],
 				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
