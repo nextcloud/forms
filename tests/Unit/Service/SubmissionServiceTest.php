@@ -834,6 +834,50 @@ file2.txt"
 				// Expected Result
 				'Answer for non-existent question with ID 2.',
 			],
+			'question-id-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'email']]
+				],
+				[
+					'1.0' => ['not an email']
+				],
+				'Answer for non-existent question with ID 1.0.',
+			],
+			'option-id-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				[
+					'1' => ['03']
+				],
+				'Answer "03" for question "q1" is not a valid option.',
+			],
+			'option-id-in-other-notation-with-other-answer' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				[
+					'1' => ['05']
+				],
+				'Answer "05" for question "q1" is not a valid option.',
+			],
+			'unknown-option-with-other-answer' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+						['id' => 3]
+					]],
+				],
+				[
+					'1' => ['not an option']
+				],
+				'Answer "not an option" for question "q1" is not a valid option.',
+			],
 			'invalid-multiple-too-many-answers' => [
 				// Questions
 				[
