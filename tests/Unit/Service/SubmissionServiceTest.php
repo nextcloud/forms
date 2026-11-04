@@ -1924,6 +1924,31 @@ file2.txt"
 				// Expected Result
 				'Question "Please elaborate" is required.',
 			],
+			'invalid-conditional-date-range-includes-its-bounds' => [
+				// Questions - date range of a single day
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+						'text' => 'Date Conditional',
+						'isRequired' => false,
+						'extraSettings' => [
+							'triggerType' => Constants::ANSWER_TYPE_DATE,
+							'branches' => [
+								[
+									'id' => 'branch-day',
+									'conditions' => [['type' => 'date_range', 'min' => '2026-11-04', 'max' => '2026-11-04']],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'On that day', 'isRequired' => true]],
+								],
+							],
+						],
+					],
+				],
+				// Answers - the day itself, required subquestion not answered
+				['100' => ['trigger' => ['2026-11-04'], 'subQuestions' => []]],
+				// Expected Result
+				'Question "On that day" is required.',
+			],
 			'invalid-conditional-trigger-not-a-list' => [
 				// Questions - the trigger option opens a branch with a required subquestion
 				[
