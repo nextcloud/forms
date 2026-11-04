@@ -83,8 +83,9 @@
 					tabindex="0">
 					<NcIconSvgWrapper :svg="IconAlertCircleOutline" />
 				</div>
+				<!-- A trigger only has the options of its type, the conditional question owns the rest -->
 				<NcActions
-					v-if="!readOnly"
+					v-if="!readOnly && (!isTriggerQuestion || $slots.actions)"
 					:id="actionsId"
 					forceMenu
 					placement="bottom-end"
@@ -98,6 +99,7 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
+						v-if="!isTriggerQuestion"
 						:modelValue="isRequired"
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -105,6 +107,7 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
+						v-if="!isTriggerQuestion"
 						:label="t('forms', 'Technical name of the question')"
 						:labelOutside="false"
 						:showTrailingButton="false"
@@ -124,7 +127,7 @@
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
-					<NcActionButton @click="onDelete">
+					<NcActionButton v-if="!isTriggerQuestion" @click="onDelete">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
