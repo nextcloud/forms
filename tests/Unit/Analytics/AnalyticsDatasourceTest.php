@@ -86,7 +86,9 @@ class AnalyticsDatasourceTest extends TestCase {
 		// Mock questions
 		$questions = [
 			['id' => 1, 'text' => 'Question 1'],
-			['id' => 2, 'text' => 'Question 2']
+			['id' => 2, 'text' => 'Question 2', 'extraSettings' => ['branches' => [
+				['id' => 'branch-1', 'subQuestions' => [['id' => 3, 'text' => 'Question 2.1']]],
+			]]],
 		];
 		$this->formsService->method('getQuestions')->willReturn($questions);
 
@@ -97,7 +99,8 @@ class AnalyticsDatasourceTest extends TestCase {
 				['questionId' => 2, 'text' => 'Answer 2']
 			]],
 			['answers' => [
-				['questionId' => 1, 'text' => 'Answer 1']
+				['questionId' => 1, 'text' => 'Answer 1'],
+				['questionId' => 3, 'text' => 'Answer 3']
 			]]
 		];
 		$this->submissionService->method('getSubmissions')->willReturn($submissions);
@@ -116,7 +119,8 @@ class AnalyticsDatasourceTest extends TestCase {
 			'dimensions' => ['Question', 'Answer'],
 			'data' => [
 				['Question 1', 'Answer 1', 2],
-				['Question 2', 'Answer 2', 1]
+				['Question 2', 'Answer 2', 1],
+				['Question 2.1', 'Answer 3', 1]
 			],
 			'error' => 0
 		];

@@ -101,8 +101,8 @@ class AnalyticsDatasource implements IDatasource {
 
 		$formId = $option['formId'];
 
-		$questions = $this->formsService->getQuestions($formId);
-		foreach ($questions as $question) {
+		// Answers of subquestions are counted with the text of their subquestion
+		foreach (FormsService::flattenQuestions($this->formsService->getQuestions($formId)) as $question) {
 			$questionMap[$question['id']] = $question['text'];
 		}
 

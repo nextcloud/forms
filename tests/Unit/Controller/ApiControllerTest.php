@@ -285,7 +285,32 @@ class ApiControllerTest extends TestCase {
 					],
 					'filteredSubmissionsCount' => 1,
 				]
-			]
+			],
+			'subquestion' => [
+				'submissions' => [
+					['userId' => 'jdoe', 'answers' => [['questionId' => 2, 'text' => 'Rex']]]
+				],
+				'questions' => [[
+					'id' => 1,
+					'name' => '',
+					'extraSettings' => ['branches' => [['id' => 'branch-1', 'subQuestions' => [['id' => 2, 'name' => 'pet']]]]],
+				]],
+				'expected' => [
+					'submissions' => [
+						[
+							'userId' => 'jdoe',
+							'answers' => [['questionId' => 2, 'text' => 'Rex', 'questionName' => 'pet']],
+							'userDisplayName' => 'jdoe',
+						]
+					],
+					'questions' => [[
+						'id' => 1,
+						'name' => '',
+						'extraSettings' => ['branches' => [['id' => 'branch-1', 'subQuestions' => [['id' => 2, 'name' => 'pet']]]]],
+					]],
+					'filteredSubmissionsCount' => 1,
+				]
+			],
 		];
 	}
 
@@ -1667,6 +1692,94 @@ class ApiControllerTest extends TestCase {
 			'extraSettings' => ['validationType' => 'text'],
 		]));
 		$this->assertNull($form->getConfirmationEmailQuestionId());
+	}
+
+	private function mockEditableForm(int $formId = 1): Form {
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService->method('isFormArchived')->willReturn(false);
+
+		return $form;
+	}
+
+	private function createConditionalQuestion(): Question {
+		$question = new Question();
+		$question->setId(100);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$question->setExtraSettings([
+			'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+			'branches' => [
+				['id' => 'branch-a', 'conditions' => [['optionId' => 10]]],
+				['id' => 'branch-b', 'conditions' => [['optionId' => 11]]],
+			],
+		]);
+		return $question;
+	}
+
+	private function createSubQuestion(int $id, string $branchId, int $order): Question {
+		$question = new Question();
+		$question->setId($id);
+		$question->setFormId(1);
+		$question->setOrder($order);
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+		$question->setParentQuestionId(100);
+		$question->setBranchId($branchId);
+		return $question;
+	}
+
+	public function testReorderQuestionsRejectsSubquestion(): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([$this->createConditionalQuestion()]);
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Subquestions can only be reordered within their branch');
+		$this->apiController->reorderQuestions(1, [101]);
+	}
+
+	public static function dataUpdateQuestionRejectsKeys(): array {
+		return [
+			'parentQuestionId' => [['parentQuestionId' => 200]],
+			'branchId' => [['branchId' => 'branch-x']],
+			'options' => [['options' => []]],
+			'accept' => [['accept' => []]],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionRejectsKeys')]
+	public function testUpdateQuestionRejectsKeys(array $keyValuePairs): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->updateQuestion(1, 101, $keyValuePairs);
+	}
+
+	public static function dataUpdateQuestionConditionalTypeChange(): array {
+		return [
+			'subquestion into conditional' => [false, Constants::ANSWER_TYPE_CONDITIONAL],
+			'conditional into short' => [true, Constants::ANSWER_TYPE_SHORT],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionConditionalTypeChange')]
+	public function testUpdateQuestionConditionalTypeChange(bool $isConditional, string $newType): void {
+		$this->mockEditableForm();
+		$question = $isConditional ? $this->createConditionalQuestion() : $this->createSubQuestion(101, 'branch-a', 1);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateQuestion(1, $question->getId(), ['type' => $newType]);
 	}
 
 	public function testDeleteQuestionClearsConfirmationEmailQuestionIdWhenDeletingSelectedQuestion(): void {
@@ -3085,6 +3198,7 @@ class ApiControllerTest extends TestCase {
 		$parentQuestion->setId($parentQuestionId);
 		$parentQuestion->setFormId($formId);
 		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$parentQuestion->setExtraSettings(['triggerType' => 'short', 'branches' => [['id' => $branchId, 'conditions' => []]]]);
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
@@ -3250,6 +3364,24 @@ class ApiControllerTest extends TestCase {
 		$this->expectException(OCSBadRequestException::class);
 		$this->expectExceptionMessage('Parent question does not belong to this form');
 		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentOfOtherFormIsNotDescribed() {
+		$form = new Form();
+		$form->setId(1);
+
+		// The type of a question of another form is not told
+		$parentQuestion = new Question();
+		$parentQuestion->setId(100);
+		$parentQuestion->setFormId(999);
+		$parentQuestion->setType('short');
+
+		$this->formsService->method('getFormIfAllowed')->willReturn($form);
+		$this->questionMapper->method('findById')->with(100)->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question does not belong to this form');
+		$this->apiController->newQuestion(1, 'short', null, 'Sub Q', null, 100, 'branch-1');
 	}
 
 	public function testNewQuestion_missingBranchId() {
