@@ -650,6 +650,13 @@ class ApiController extends OCSController {
 					$this->logger->debug('branchId is required when creating a subquestion');
 					throw new OCSBadRequestException('branchId is required when creating a subquestion');
 				}
+
+				// The branch must exist on the parent question
+				$branchIds = array_column($parentQuestion->getExtraSettings()['branches'] ?? [], 'id');
+				if (!in_array($branchId, $branchIds, true)) {
+					$this->logger->debug('Branch does not exist on the parent question');
+					throw new OCSBadRequestException('Branch does not exist on the parent question');
+				}
 			}
 
 			// Retrieve all active questions sorted by Order.
@@ -764,7 +771,9 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
+	 * @throws OCSBadRequestException Not allowed to change the type of or into a conditional question
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
+	 * @throws OCSForbiddenException Not allowed to update `parentQuestionId`, `branchId`, `options` or `accept`
 	 * @throws OCSForbiddenException Not allowed to update `id` or `formId`
 	 * @throws OCSForbiddenException Please use reorderQuestions() to change order
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -816,6 +825,23 @@ class ApiController extends OCSController {
 		if (array_key_exists('id', $keyValuePairs) || array_key_exists('formId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update \'id\' or \'formId\'');
 			throw new OCSForbiddenException('Not allowed to update \'id\' or \'formId\'');
+		}
+
+		// The place of a subquestion is fixed on creation, options and accept have their own handling
+		foreach (['parentQuestionId', 'branchId', 'options', 'accept'] as $key) {
+			if (array_key_exists($key, $keyValuePairs)) {
+				$this->logger->debug('Not allowed to update \'{key}\'', ['key' => $key]);
+				throw new OCSForbiddenException('Not allowed to update \'' . $key . '\'');
+			}
+		}
+
+		// Conditional questions can not be changed into another type and vice versa,
+		// the subquestions would be lost or end up nested
+		if (array_key_exists('type', $keyValuePairs)
+			&& $keyValuePairs['type'] !== $question->getType()
+			&& ($keyValuePairs['type'] === Constants::ANSWER_TYPE_CONDITIONAL || $question->getType() === Constants::ANSWER_TYPE_CONDITIONAL)) {
+			$this->logger->debug('Not allowed to change the type of or into a conditional question');
+			throw new OCSBadRequestException('Not allowed to change the type of or into a conditional question');
 		}
 
 		// Don't allow to reorder here

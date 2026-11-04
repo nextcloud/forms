@@ -1669,6 +1669,83 @@ class ApiControllerTest extends TestCase {
 		$this->assertNull($form->getConfirmationEmailQuestionId());
 	}
 
+	private function mockEditableForm(int $formId = 1): Form {
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService->method('isFormArchived')->willReturn(false);
+
+		return $form;
+	}
+
+	private function createConditionalQuestion(): Question {
+		$question = new Question();
+		$question->setId(100);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$question->setExtraSettings([
+			'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+			'branches' => [
+				['id' => 'branch-a', 'conditions' => [['optionId' => 10]]],
+				['id' => 'branch-b', 'conditions' => [['optionId' => 11]]],
+			],
+		]);
+		return $question;
+	}
+
+	private function createSubQuestion(int $id, string $branchId, int $order): Question {
+		$question = new Question();
+		$question->setId($id);
+		$question->setFormId(1);
+		$question->setOrder($order);
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+		$question->setParentQuestionId(100);
+		$question->setBranchId($branchId);
+		return $question;
+	}
+
+	public static function dataUpdateQuestionRejectsKeys(): array {
+		return [
+			'parentQuestionId' => [['parentQuestionId' => 200]],
+			'branchId' => [['branchId' => 'branch-x']],
+			'options' => [['options' => []]],
+			'accept' => [['accept' => []]],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionRejectsKeys')]
+	public function testUpdateQuestionRejectsKeys(array $keyValuePairs): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->updateQuestion(1, 101, $keyValuePairs);
+	}
+
+	public static function dataUpdateQuestionConditionalTypeChange(): array {
+		return [
+			'subquestion into conditional' => [false, Constants::ANSWER_TYPE_CONDITIONAL],
+			'conditional into short' => [true, Constants::ANSWER_TYPE_SHORT],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionConditionalTypeChange')]
+	public function testUpdateQuestionConditionalTypeChange(bool $isConditional, string $newType): void {
+		$this->mockEditableForm();
+		$question = $isConditional ? $this->createConditionalQuestion() : $this->createSubQuestion(101, 'branch-a', 1);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateQuestion(1, $question->getId(), ['type' => $newType]);
+	}
+
 	public function testDeleteQuestionClearsConfirmationEmailQuestionIdWhenDeletingSelectedQuestion(): void {
 		$form = new Form();
 		$form->setId(1);
@@ -3085,6 +3162,7 @@ class ApiControllerTest extends TestCase {
 		$parentQuestion->setId($parentQuestionId);
 		$parentQuestion->setFormId($formId);
 		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$parentQuestion->setExtraSettings(['triggerType' => 'short', 'branches' => [['id' => $branchId, 'conditions' => []]]]);
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')

@@ -11,7 +11,6 @@ use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -86,125 +85,90 @@ class FormsService {
 	}
 
 	/**
-	 * Load options corresponding to question
-	 *
-	 * @param integer $questionId
-	 * @return list<FormsOption>
-	 */
-	private function getOptions(int $questionId): array {
-		$optionList = [];
-		try {
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-		} catch (DoesNotExistException) {
-			//handle silently
-		} finally {
-			return $optionList;
-		}
-	}
-
-	/**
 	 * Load questions corresponding to form
 	 *
 	 * @param integer $formId
 	 * @return list<FormsQuestion>
 	 */
 	public function getQuestions(int $formId): array {
-		$questionList = [];
 		try {
-			$questionEntities = $this->questionMapper->findByForm($formId);
-
-			$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
-			$optionsByQuestion = [];
-			foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
-				$optionsByQuestion[$optionEntity->getQuestionId()][] = $optionEntity;
-			}
-
-			foreach ($questionEntities as $questionEntity) {
-				$question = $questionEntity->read();
-				$question['options'] = array_map(
-					static fn (Option $option) => $option->read(),
-					$optionsByQuestion[$question['id']] ?? []
-				);
-				$question['accept'] = [];
-				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-						$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
-					}
-
-					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
-						foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
-							$question['accept'][] = '.' . $extension;
-						}
-					}
-				}
-
-				// Set `isRequired` if minimum options limit is set
-				if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && ($question['extraSettings']['optionsLimitMin'] ?? 0) > 0) {
-					$question['isRequired'] = true;
-				}
-
-				// Load subquestions for conditional questions and attach to branches
-				if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
-					$question = $this->loadConditionalSubQuestions($question);
-				}
-
-				$questionList[] = $question;
-			}
+			// Top-level questions and subquestions are loaded at once and sorted by order
+			$questionEntities = $this->questionMapper->findByForm($formId, false, true);
 		} catch (DoesNotExistException) {
-			//handle silently
-		} finally {
-			return $questionList;
+			return [];
 		}
+
+		$optionsByQuestion = $this->getOptionsByQuestion($questionEntities);
+		$subQuestionsByParent = [];
+		foreach ($questionEntities as $questionEntity) {
+			if ($questionEntity->getParentQuestionId() !== null) {
+				$subQuestionsByParent[$questionEntity->getParentQuestionId()][] = $questionEntity;
+			}
+		}
+
+		$questionList = [];
+		foreach ($questionEntities as $questionEntity) {
+			if ($questionEntity->getParentQuestionId() === null) {
+				$questionList[] = $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionsByParent[$questionEntity->getId()] ?? []);
+			}
+		}
+		return $questionList;
 	}
 
 	/**
-	 * Load subquestions for a conditional question and attach them to branches
+	 * Load the options of the given questions at once
 	 *
-	 * @param array $question The conditional question data
-	 * @return array The question with subquestions attached to branches
+	 * @param Question[] $questionEntities
+	 * @return array<int, list<FormsOption>> the options keyed by question id
 	 */
-	private function loadConditionalSubQuestions(array $question): array {
-		$subQuestionEntities = $this->questionMapper->findByParentQuestion($question['id']);
+	private function getOptionsByQuestion(array $questionEntities): array {
+		$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
+		$optionsByQuestion = [];
+		foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
+			$optionsByQuestion[$optionEntity->getQuestionId()][] = $optionEntity->read();
+		}
+		return $optionsByQuestion;
+	}
 
-		// Group subquestions by branchId
-		$subQuestionsByBranch = [];
-		foreach ($subQuestionEntities as $subQuestionEntity) {
-			$subQuestion = $subQuestionEntity->read();
-			$subQuestion['options'] = $this->getOptions($subQuestion['id']);
-			$subQuestion['accept'] = [];
-
-			// Handle file type accept for subquestions
-			if ($subQuestion['type'] === Constants::ANSWER_TYPE_FILE) {
-				if ($subQuestion['extraSettings']['allowedFileTypes'] ?? null) {
-					$subQuestion['accept'] = array_map(function (string $fileType) {
-						return str_contains($fileType, '/') ? $fileType : $fileType . '/*';
-					}, $subQuestion['extraSettings']['allowedFileTypes']);
-				}
-
-				if ($subQuestion['extraSettings']['allowedFileExtensions'] ?? null) {
-					foreach ($subQuestion['extraSettings']['allowedFileExtensions'] as $extension) {
-						$subQuestion['accept'][] = '.' . $extension;
-					}
-				}
+	/**
+	 * Build the API representation of a question
+	 *
+	 * @param array<int, list<FormsOption>> $optionsByQuestion the options keyed by question id
+	 * @param Question[] $subQuestionEntities the subquestions, if the question is a conditional question
+	 * @return FormsQuestion
+	 */
+	private function formatQuestion(Question $questionEntity, array $optionsByQuestion, array $subQuestionEntities = []): array {
+		$question = $questionEntity->read();
+		$question['options'] = $optionsByQuestion[$question['id']] ?? [];
+		$question['accept'] = [];
+		if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+			if ($question['extraSettings']['allowedFileTypes'] ?? null) {
+				$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
 			}
 
-			$branchId = $subQuestion['branchId'] ?? null;
-			if ($branchId !== null) {
-				if (!isset($subQuestionsByBranch[$branchId])) {
-					$subQuestionsByBranch[$branchId] = [];
+			if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
+				foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
+					$question['accept'][] = '.' . $extension;
 				}
-				$subQuestionsByBranch[$branchId][] = $subQuestion;
 			}
 		}
 
-		// Attach subquestions to their respective branches in extraSettings
-		if (isset($question['extraSettings']['branches']) && is_array($question['extraSettings']['branches'])) {
+		// Set `isRequired` if minimum options limit is set
+		if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && ($question['extraSettings']['optionsLimitMin'] ?? 0) > 0) {
+			$question['isRequired'] = true;
+		}
+
+		// Attach the subquestions of conditional questions to their branches
+		if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL && is_array($question['extraSettings']['branches'] ?? null)) {
+			$subQuestionsByBranch = [];
+			foreach ($subQuestionEntities as $subQuestionEntity) {
+				// Subquestions always belong to the form of their parent
+				if ($subQuestionEntity->getFormId() === $questionEntity->getFormId()) {
+					$subQuestionsByBranch[$subQuestionEntity->getBranchId()][] = $this->formatQuestion($subQuestionEntity, $optionsByQuestion);
+				}
+			}
 			foreach ($question['extraSettings']['branches'] as $index => $branch) {
-				$branchId = $branch['id'] ?? null;
-				$question['extraSettings']['branches'][$index]['subQuestions'] = $subQuestionsByBranch[$branchId] ?? [];
+				$question['extraSettings']['branches'][$index]['subQuestions'] = $subQuestionsByBranch[$branch['id'] ?? ''] ?? [];
 			}
 		}
 
@@ -220,30 +184,16 @@ class FormsService {
 	public function getQuestion(int $questionId): ?array {
 		try {
 			$questionEntity = $this->questionMapper->findById($questionId);
-			$question = $questionEntity->read();
-			$question['options'] = $this->getOptions($question['id']);
-			$question['accept'] = [];
-			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-					$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
-				}
-
-				if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
-					foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
-						$question['accept'][] = '.' . $extension;
-					}
-				}
-			}
-
-			// Load subquestions for conditional questions
-			if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
-				$question = $this->loadConditionalSubQuestions($question);
-			}
-
-			return $question;
 		} catch (DoesNotExistException) {
 			return null;
 		}
+
+		$subQuestionEntities = $questionEntity->getType() === Constants::ANSWER_TYPE_CONDITIONAL
+			? $this->questionMapper->findByParentQuestion($questionId)
+			: [];
+		$optionsByQuestion = $this->getOptionsByQuestion(array_merge([$questionEntity], $subQuestionEntities));
+
+		return $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionEntities);
 	}
 
 	/**
