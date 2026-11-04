@@ -701,8 +701,8 @@ class SubmissionService {
 						// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
 						$answerId = is_int($answer) ? $answer : (is_string($answer) ? intval(trim($answer)) : null);
 
-						// Reject non-numeric / malformed values early
-						if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
+						// Reject non-numeric / malformed values early, other notations of an option id like "05" as well
+						if ($answerId === null || (string)$answerId !== (string)$answer) {
 							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($answer) ? (string)$answer : gettype($answer), $question['text']));
 						}
 
@@ -769,8 +769,9 @@ class SubmissionService {
 
 		// Check for excess answers
 		foreach ($answers as $id => $answerArray) {
-			// Search corresponding question, return false if not found
-			if (!in_array($id, array_column($questions, 'id'))) {
+			// Search corresponding question, return false if not found. Other notations of a question id like "1.0"
+			// would be stored for that question, but skip its validation.
+			if (!in_array($id, array_column($questions, 'id'), true)) {
 				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %d.', $id));
 			}
 		}
