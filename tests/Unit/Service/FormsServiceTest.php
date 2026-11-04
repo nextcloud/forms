@@ -2202,9 +2202,9 @@ class FormsServiceTest extends TestCase {
 		$conditionalQuestion = $this->createQuestionEntity($conditionalQuestionData);
 		$subQuestion = $this->createQuestionEntity($subQuestionData);
 
-		$this->questionMapper->method('findByForm')->willReturn([$conditionalQuestion]);
-		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$subQuestion]);
-		$this->optionMapper->method('findByQuestion')->willReturn([]);
+		// Top-level questions and subquestions come from one query
+		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$conditionalQuestion, $subQuestion]);
+		$this->optionMapper->method('findByQuestions')->willReturn([]);
 
 		$result = $this->formsService->getQuestions(1);
 
@@ -2279,9 +2279,9 @@ class FormsServiceTest extends TestCase {
 		$conditionalQuestion = $this->createQuestionEntity($conditionalQuestionData);
 		$fileSubQuestion = $this->createQuestionEntity($fileSubQuestionData);
 
-		$this->questionMapper->method('findByForm')->willReturn([$conditionalQuestion]);
-		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$fileSubQuestion]);
-		$this->optionMapper->method('findByQuestion')->willReturn([]);
+		// Top-level questions and subquestions come from one query
+		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$conditionalQuestion, $fileSubQuestion]);
+		$this->optionMapper->method('findByQuestions')->willReturn([]);
 
 		$result = $this->formsService->getQuestions(1);
 
@@ -2299,10 +2299,33 @@ class FormsServiceTest extends TestCase {
 		$this->assertContains('.doc', $fileQuestion['accept']);
 	}
 
-	private function createQuestionEntity(array $data): MockObject {
-		$questionEntity = $this->createMock(Question::class);
-		$questionEntity->method('read')->willReturn($data);
+	private function createQuestionEntity(array $data): Question {
+		$questionEntity = Question::fromParams($data);
+		$questionEntity->setId($data['id']);
 		return $questionEntity;
 	}
 
+	public function testGetQuestionSkipsSubquestionsOfOtherForms(): void {
+		$conditionalQuestion = $this->createQuestionEntity([
+			'id' => 100,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'text' => 'Conditional Q',
+			'order' => 1,
+			'extraSettings' => [
+				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'branches' => [['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
+			],
+		]);
+		$ownSubQuestion = $this->createQuestionEntity(['id' => 101, 'formId' => 1, 'type' => 'short', 'text' => 'Own', 'order' => 1, 'parentQuestionId' => 100, 'branchId' => 'branch-a']);
+		$otherSubQuestion = $this->createQuestionEntity(['id' => 201, 'formId' => 2, 'type' => 'short', 'text' => 'Other form', 'order' => 2, 'parentQuestionId' => 100, 'branchId' => 'branch-a']);
+
+		$this->questionMapper->method('findById')->with(100)->willReturn($conditionalQuestion);
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$ownSubQuestion, $otherSubQuestion]);
+		$this->optionMapper->method('findByQuestions')->willReturn([]);
+
+		$question = $this->formsService->getQuestion(100);
+
+		$this->assertSame(['Own'], array_column($question['extraSettings']['branches'][0]['subQuestions'], 'text'));
+	}
 }

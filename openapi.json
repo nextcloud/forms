@@ -2423,7 +2423,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid extraSettings, will not update.",
+                        "description": "Invalid extraSettings, or a type change to or from a conditional question, will not update",
                         "content": {
                             "application/json": {
                                 "schema": {

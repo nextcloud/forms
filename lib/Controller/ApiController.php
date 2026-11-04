@@ -633,22 +633,29 @@ class ApiController extends OCSController {
 					throw new OCSNotFoundException('Could not find parent question');
 				}
 
+				// Parent must belong to the same form, checked first to not tell anything about questions of other forms
+				if ($parentQuestion->getFormId() !== $formId) {
+					$this->logger->debug('Parent question does not belong to this form');
+					throw new OCSBadRequestException('Parent question does not belong to this form');
+				}
+
 				// Parent must be a conditional question
 				if ($parentQuestion->getType() !== Constants::ANSWER_TYPE_CONDITIONAL) {
 					$this->logger->debug('Parent question must be a conditional question');
 					throw new OCSBadRequestException('Parent question must be a conditional question');
 				}
 
-				// Parent must belong to the same form
-				if ($parentQuestion->getFormId() !== $formId) {
-					$this->logger->debug('Parent question does not belong to this form');
-					throw new OCSBadRequestException('Parent question does not belong to this form');
-				}
-
 				// branchId is required when parentQuestionId is set
 				if (empty($branchId)) {
 					$this->logger->debug('branchId is required when creating a subquestion');
 					throw new OCSBadRequestException('branchId is required when creating a subquestion');
+				}
+
+				// The branch must exist on the parent question
+				$branchIds = array_column($parentQuestion->getExtraSettings()['branches'] ?? [], 'id');
+				if (!in_array($branchId, $branchIds, true)) {
+					$this->logger->debug('Branch does not exist on the parent question');
+					throw new OCSBadRequestException('Branch does not exist on the parent question');
 				}
 			}
 
@@ -763,8 +770,9 @@ class ApiController extends OCSController {
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
-	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
+	 * @throws OCSBadRequestException Invalid extraSettings, or a type change to or from a conditional question, will not update
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
+	 * @throws OCSForbiddenException Not allowed to update `parentQuestionId`, `branchId`, `options` or `accept`
 	 * @throws OCSForbiddenException Not allowed to update `id` or `formId`
 	 * @throws OCSForbiddenException Please use reorderQuestions() to change order
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -816,6 +824,23 @@ class ApiController extends OCSController {
 		if (array_key_exists('id', $keyValuePairs) || array_key_exists('formId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update \'id\' or \'formId\'');
 			throw new OCSForbiddenException('Not allowed to update \'id\' or \'formId\'');
+		}
+
+		// The place of a subquestion is fixed on creation, options and accept have their own handling
+		foreach (['parentQuestionId', 'branchId', 'options', 'accept'] as $key) {
+			if (array_key_exists($key, $keyValuePairs)) {
+				$this->logger->debug('Not allowed to update \'{key}\'', ['key' => $key]);
+				throw new OCSForbiddenException('Not allowed to update \'' . $key . '\'');
+			}
+		}
+
+		// Conditional questions can not be changed into another type and vice versa,
+		// the subquestions would be lost or end up nested
+		if (array_key_exists('type', $keyValuePairs)
+			&& $keyValuePairs['type'] !== $question->getType()
+			&& ($keyValuePairs['type'] === Constants::ANSWER_TYPE_CONDITIONAL || $question->getType() === Constants::ANSWER_TYPE_CONDITIONAL)) {
+			$this->logger->debug('Not allowed to change the type of or into a conditional question');
+			throw new OCSBadRequestException('Not allowed to change the type of or into a conditional question');
 		}
 
 		// Don't allow to reorder here
@@ -938,6 +963,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
 	 * @throws OCSBadRequestException Question doesn't belong to given Form
+	 * @throws OCSBadRequestException Subquestions can only be reordered within their branch
 	 * @throws OCSBadRequestException One question has already been marked as deleted
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -997,6 +1023,14 @@ class ApiController extends OCSController {
 					'questionId' => $questionId
 				]);
 				throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+			}
+
+			// Subquestions are ordered within their branch, not among the questions of the form
+			if ($questions[$arrayKey]->getParentQuestionId() !== null) {
+				$this->logger->debug('This question is a subquestion: {questionId}', [
+					'questionId' => $questionId
+				]);
+				throw new OCSBadRequestException('Subquestions can only be reordered within their branch');
 			}
 
 			// Abort if a question is already marked as deleted (order==0)
@@ -1072,6 +1106,22 @@ class ApiController extends OCSController {
 		if (array_unique($newOrder) !== $newOrder) {
 			$this->logger->debug('The given array contains duplicates');
 			throw new OCSBadRequestException('The given array contains duplicates');
+		}
+
+		// The parent question must belong to the form, so nothing is told about questions of other forms
+		try {
+			$parentQuestion = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question {questionId}', [
+				'questionId' => $questionId
+			]);
+			throw new OCSNotFoundException('Could not find question');
+		}
+		if ($parentQuestion->getFormId() !== $formId) {
+			$this->logger->debug('This Question is not part of the given form: {questionId}', [
+				'questionId' => $questionId
+			]);
+			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
 		}
 
 		// Check if all questions are given in Array.
@@ -1531,12 +1581,14 @@ class ApiController extends OCSController {
 		foreach ($this->formsService->getQuestions($formId) as $question) {
 			$questions[$question['id']] = $question;
 		}
+		// Answers of subquestions get the name of their subquestion
+		$questionNames = array_column(FormsService::flattenQuestions(array_values($questions)), 'name', 'id');
 
 		// Append Display Names
-		$submissions = array_map(function (array $submission) use ($questions) {
+		$submissions = array_map(function (array $submission) use ($questionNames) {
 			if (!empty($submission['answers'])) {
-				$submission['answers'] = array_map(function (array $answer) use ($questions) {
-					$name = $questions[$answer['questionId']]['name'] ?? null;
+				$submission['answers'] = array_map(function (array $answer) use ($questionNames) {
+					$name = $questionNames[$answer['questionId']] ?? null;
 					if ($name) {
 						$answer['questionName'] = $name;
 					}
