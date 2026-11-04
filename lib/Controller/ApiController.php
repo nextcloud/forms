@@ -2260,101 +2260,17 @@ class ApiController extends OCSController {
 	 * @param array $answerData The conditional answer data
 	 */
 	private function storeConditionalAnswer(Form $form, int $submissionId, array $question, array $answerData): void {
-		$extraSettings = $question['extraSettings'] ?? [];
-		$triggerType = $extraSettings['triggerType'] ?? null;
+		[$triggerAnswers, $subQuestionAnswers] = SubmissionService::splitConditionalAnswer($answerData);
 
-		// Handle the structure: could be {trigger: [...], subQuestions: {...}} or just trigger array
-		$triggerAnswers = $answerData['trigger'] ?? $answerData;
-		$subQuestionAnswers = $answerData['subQuestions'] ?? [];
-
-		// Ensure triggerAnswers is an array
-		if (!is_array($triggerAnswers)) {
-			$triggerAnswers = [$triggerAnswers];
-		}
-
-		// Store trigger answers
-		foreach ($triggerAnswers as $answer) {
-			if ($answer === '' || $answer === null) {
-				continue;
-			}
-
-			$answerEntity = new Answer();
-			$answerEntity->setSubmissionId($submissionId);
-			$answerEntity->setQuestionId($question['id']);
-
-			$answerText = '';
-
-			// For predefined trigger types, convert option ID to text
-			if (in_array($triggerType, [Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE, Constants::ANSWER_TYPE_DROPDOWN])) {
-				$optionIndex = array_search($answer, array_column($question['options'] ?? [], 'id'));
-				if ($optionIndex !== false) {
-					$answerText = $question['options'][$optionIndex]['text'];
-				} else {
-					// Could be an "other" answer or direct text
-					$answerText = is_string($answer) ? $answer : '';
-				}
-			} else {
-				// For text-based triggers, use the answer directly
-				$answerText = is_string($answer) ? $answer : '';
-			}
-
-			if ($answerText !== '') {
-				$answerEntity->setText($answerText);
-				$this->answerMapper->insert($answerEntity);
-			}
-		}
+		// The trigger is stored like a regular question of the trigger type
+		$this->storeAnswersForQuestion($form, $submissionId, SubmissionService::getTriggerQuestion($question), $triggerAnswers);
 
 		// Store subquestion answers only for the branches the trigger activated
-		$branches = $this->submissionService->getActiveBranches($question, $triggerAnswers);
-		foreach ($branches as $branch) {
-			$branchSubQuestions = $branch['subQuestions'] ?? [];
-			foreach ($branchSubQuestions as $subQuestion) {
-				$subQuestionId = $subQuestion['id'] ?? null;
-				if ($subQuestionId === null) {
-					continue;
-				}
-
-				$subAnswers = $subQuestionAnswers[$subQuestionId] ?? [];
-				if (empty($subAnswers)) {
-					continue;
-				}
-
-				// Ensure subAnswers is an array
-				if (!is_array($subAnswers)) {
-					$subAnswers = [$subAnswers];
-				}
-
-				// Store each subquestion answer
-				foreach ($subAnswers as $subAnswer) {
-					if ($subAnswer === '' || $subAnswer === null) {
-						continue;
-					}
-
-					$answerEntity = new Answer();
-					$answerEntity->setSubmissionId($submissionId);
-					$answerEntity->setQuestionId($subQuestionId);
-
-					$answerText = '';
-					$subQuestionType = $subQuestion['type'] ?? Constants::ANSWER_TYPE_SHORT;
-
-					// For predefined types, convert option ID to text
-					if (in_array($subQuestionType, Constants::ANSWER_TYPES_PREDEFINED) && $subQuestionType !== Constants::ANSWER_TYPE_LINEARSCALE) {
-						$optionIndex = array_search($subAnswer, array_column($subQuestion['options'] ?? [], 'id'));
-						if ($optionIndex !== false) {
-							$answerText = $subQuestion['options'][$optionIndex]['text'];
-						} else {
-							$answerText = is_string($subAnswer) ? $subAnswer : '';
-						}
-					} elseif ($subQuestionType === Constants::ANSWER_TYPE_FILE) {
-						$answerText = $this->storeFileAnswer($form, $submissionId, $subQuestion, $subAnswer, $answerEntity);
-					} else {
-						$answerText = is_string($subAnswer) ? $subAnswer : '';
-					}
-
-					if ($answerText !== '') {
-						$answerEntity->setText($answerText);
-						$this->answerMapper->insert($answerEntity);
-					}
+		foreach ($this->submissionService->getActiveBranches($question, $triggerAnswers) as $branch) {
+			foreach ($branch['subQuestions'] ?? [] as $subQuestion) {
+				$subAnswers = $subQuestionAnswers[$subQuestion['id']] ?? [];
+				if (!empty($subAnswers)) {
+					$this->storeAnswersForQuestion($form, $submissionId, $subQuestion, (array)$subAnswers);
 				}
 			}
 		}
