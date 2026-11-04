@@ -303,18 +303,21 @@ Subquestions (questions belonging to a conditional question's branch) have addit
 
 Supported trigger types for conditional questions:
 
-| Trigger Type      | Condition Type                                                                                 | Description                                   |
-| ----------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `multiple_unique` | `option_selected`, `option_not_selected`                                                       | Radio buttons - single option selection       |
-| `dropdown`        | `option_selected`, `option_not_selected`                                                       | Dropdown - single option selection            |
-| `multiple`        | `option_selected`, `option_not_selected`, `options_combination`                                | Checkbox - option or combination matching     |
-| `short`           | `string_equals`, `string_not_equals`, `string_contains`, `string_not_contains`, `regex`        | Short text - string or regex matching         |
-| `long`            | `string_contains`, `string_not_contains`, `regex`                                              | Long text - string or regex matching          |
-| `linearscale`     | `value_equals`, `value_not_equals`, `value_range`, `value_min`, `value_max`                    | Linear scale - numeric value matching         |
-| `date`            | `date_equals`, `date_before`, `date_after`, `date_range`                                       | Date - exact or range matching (`YYYY-MM-DD`) |
-| `time`            | `time_equals`, `time_before`, `time_after`, `time_range`                                       | Time - exact or range matching (`HH:mm`)      |
-| `color`           | `value_equals`                                                                                 | Color - exact value matching                  |
-| `file`            | `file_uploaded`, `file_not_uploaded`, `filename_contains`, `filename_equals`, `filename_regex` | File - upload status or filename matching     |
+| Trigger Type      | Condition Types                                                             | Description                                       |
+| ----------------- | --------------------------------------------------------------------------- | ------------------------------------------------- |
+| `multiple_unique` | `option_selected`                                                           | Radio buttons - the selected option               |
+| `dropdown`        | `option_selected`                                                           | Dropdown - the selected option                    |
+| `multiple`        | `options_combination`                                                       | Checkboxes - all options of a combination         |
+| `short`           | `string_equals`, `string_contains`, `regex`                                 | Short text - string or regex matching             |
+| `long`            | `string_contains`, `regex`                                                  | Long text - string or regex matching              |
+| `linearscale`     | `value_equals`, `value_not_equals`, `value_range`, `value_min`, `value_max` | Linear scale - numeric value matching             |
+| `date`            | `date_range`                                                                | Date - range including its bounds (`YYYY-MM-DD`)  |
+| `datetime`        | `date_range`                                                                | Deprecated date and time (`YYYY-MM-DD HH:mm`)     |
+| `time`            | `date_range`                                                                | Time - range including its bounds (`HH:mm`)       |
+| `color`           | `value_equals`                                                              | Color - exact value, ignoring case                |
+| `file`            | `file_uploaded`                                                             | File - whether a file was uploaded                |
+
+A branch is shown when any of its conditions matches. Several branches can be shown at once.
 
 ### Branch Object
 
@@ -354,61 +357,71 @@ Conditions determine when a branch is activated. The structure depends on the tr
 { "type": "option_selected", "optionId": 42 }
 ```
 
-#### options_combination (for multiple/checkboxes)
+#### options_combination (for multiple)
 
 ```json
 { "type": "options_combination", "optionIds": [42, 43] }
 ```
 
-All options in `optionIds` must be selected for the branch to activate (AND logic).
+All options in `optionIds` must be selected for the condition to match.
 
-#### string_equals (for short text)
+#### string_equals (for short)
 
 ```json
 { "type": "string_equals", "value": "yes" }
 ```
 
-#### string_contains (for short, long text)
+#### string_contains (for short, long)
 
 ```json
 { "type": "string_contains", "value": "keyword" }
 ```
 
-#### regex (for short, long text)
+#### regex (for short, long)
 
 ```json
-{ "type": "regex", "value": "^yes.*" }
+{ "type": "regex", "value": "/^yes/i" }
 ```
 
-#### value_equals (for color)
+The expression uses the same format as `validationRegex`: enclosed in slashes, with the optional modifiers `i`, `m` and `s`.
+
+#### value_equals, value_not_equals (for linearscale), value_equals (for color)
+
+```json
+{ "type": "value_equals", "value": 3 }
+```
 
 ```json
 { "type": "value_equals", "value": "#ff0000" }
 ```
 
-#### value_range (for linearscale, time)
+#### value_range, value_min, value_max (for linearscale)
 
 ```json
 { "type": "value_range", "min": 3, "max": 5 }
 ```
 
-#### date_range (for date)
+`value_min` only uses `min`, `value_max` only uses `max`.
+
+#### date_range (for date, datetime, time)
 
 ```json
 { "type": "date_range", "min": "2024-01-01", "max": "2024-12-31" }
 ```
 
-#### time_range (for time)
-
 ```json
-{ "type": "time_range", "min": "09:00", "max": "17:00" }
+{ "type": "date_range", "min": "09:00", "max": "17:00" }
 ```
+
+`min` and `max` use the answer format of the trigger type and are optional.
 
 #### file_uploaded (for file)
 
 ```json
 { "type": "file_uploaded", "fileUploaded": true }
 ```
+
+`"fileUploaded": false` matches when no file was uploaded.
 
 ### Conditional Question Example
 
