@@ -30,7 +30,7 @@
 		<div
 			v-if="readOnly"
 			class="question__content"
-			role="list"
+			role="group"
 			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined"
 			:aria-errormessage="hasError ? errorId : undefined"
@@ -50,7 +50,8 @@
 					<TransitionGroup
 						tag="ul"
 						:name="isRanking ? undefined : 'options-list-transition'"
-						class="sort-target">
+						class="sort-target"
+						:aria-label="t('forms', 'Unranked options')">
 						<li v-for="option in unrankedOptions" :key="option.id">
 							<button
 								type="button"
@@ -68,7 +69,7 @@
 
 			<!-- Ranked list -->
 			<div class="ranking-ranked">
-				<p class="ranking-section__label">
+				<p :id="`ranking-ranked-label-${id}`" class="ranking-section__label">
 					{{ t('forms', 'Your ranking') }}
 				</p>
 				<Draggable
@@ -84,12 +85,12 @@
 					<TransitionGroup
 						tag="ul"
 						:name="isRanking ? undefined : 'options-list-transition'"
-						class="sort-target">
+						class="sort-target"
+						:aria-labelledby="`ranking-ranked-label-${id}`">
 						<li
 							v-for="(option, index) in rankedOptions"
 							:key="option.id"
-							class="ranking-item"
-							role="listitem">
+							class="ranking-item">
 							<NcActions
 								:id="`ranking-${option.id}-drag`"
 								:container="`#ranking-${option.id}-drag`"

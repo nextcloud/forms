@@ -305,4 +305,30 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			question.getByRole('radio', { name: 'Service, Good' }),
 		).toBeAttached()
 	})
+
+	test('Ranking question groups two named lists instead of a list of non-items', async ({
+		appNavigation,
+		form,
+		topBar,
+		page,
+	}) => {
+		await appNavigation.clickNewForm()
+		await form.fillTitle('Test form')
+
+		await form.addQuestion(QuestionType.Ranking)
+		const questions = await form.getQuestions()
+		await questions[0].fillTitle('Rank snacks')
+		await questions[0].addAnswer('Pretzels')
+		await questions[0].addAnswer('Popcorn')
+
+		await topBar.toggleView(FormsView.View)
+
+		const question = page.getByRole('listitem', { name: /Question number 1/ })
+		const group = question.getByRole('group', { name: /Rank snacks/ })
+
+		await expect(
+			group.getByRole('list', { name: 'Unranked options' }),
+		).toBeVisible()
+		await expect(group.getByRole('list', { name: 'Your ranking' })).toBeVisible()
+	})
 })
