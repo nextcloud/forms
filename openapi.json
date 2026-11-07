@@ -618,7 +618,8 @@
                     "long",
                     "file",
                     "datetime",
-                    "grid"
+                    "grid",
+                    "section"
                 ]
             },
             "Share": {

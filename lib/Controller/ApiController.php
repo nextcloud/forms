@@ -1310,6 +1310,11 @@ class ApiController extends OCSController {
 		}
 		$questions = [];
 		foreach ($this->formsService->getQuestions($formId) as $question) {
+			// Sections are structural elements and cannot be answered
+			if ($question['type'] === Constants::ANSWER_TYPE_SECTION) {
+				continue;
+			}
+
 			$questions[$question['id']] = $question;
 		}
 
