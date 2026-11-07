@@ -1835,6 +1835,53 @@ file2.txt"
 				// Expected Result
 				'Question "Why red?" is required.',
 			],
+			'valid-branch-short-text-equals' => [
+				// Questions - the answer "yes" opens branch-yes
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_SHORT,
+						'text' => 'Text Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-yes',
+									'conditions' => [['type' => 'string_equals', 'value' => 'yes']],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Please elaborate', 'isRequired' => true]],
+								],
+								['id' => 'branch-no', 'conditions' => [['type' => 'string_equals', 'value' => 'no']], 'subQuestions' => []],
+							],
+						],
+					],
+				],
+				// Answers
+				['100' => ['yes'], '101' => ['More details here']],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-regex' => [
+				// Questions - regex conditions use the same delimited format as validationRegex
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_SHORT,
+						'text' => 'Text Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [[
+								'id' => 'branch-yes',
+								'conditions' => [['type' => 'regex', 'value' => '/^ye(s|p)$/i']],
+								'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Please elaborate', 'isRequired' => true]],
+							]],
+						],
+					],
+				],
+				// Answers - matches the regex, required subquestion not answered
+				['100' => ['Yep']],
+				// Expected Result
+				'Question "Please elaborate" is required.',
+			],
 			'invalid-branch-unknown-option' => [
 				// Questions - The question is validated like any other question
 				[

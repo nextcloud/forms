@@ -33,6 +33,7 @@
 				@keydown.ctrl.enter="onKeydownCtrlEnter" />
 		</div>
 		<template #insert>
+			<slot name="branches" />
 			<slot name="insert" />
 		</template>
 	</Question>

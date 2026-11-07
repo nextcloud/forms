@@ -32,6 +32,33 @@
 			</div>
 		</template>
 
+		<!-- Text-based conditions (short, long) -->
+		<template v-else-if="isTextBasedTrigger">
+			<div class="condition-row">
+				<NcSelect
+					v-model="conditionType"
+					:options="textConditionTypes"
+					:placeholder="t('forms', 'Condition type')"
+					:ariaLabelCombobox="t('forms', 'Condition type')"
+					label="label"
+					:reduce="(opt) => opt.value"
+					class="condition-type-select" />
+				<NcTextField
+					v-model="textConditionValue"
+					:label="conditionValuePlaceholder"
+					:error="isRegexInvalid"
+					:helperText="
+						isRegexInvalid
+							? t(
+									'forms',
+									'Invalid regular expression, use the format /pattern/',
+								)
+							: ''
+					"
+					class="condition-value-input" />
+			</div>
+		</template>
+
 		<!-- Value-based conditions (linearscale, color) -->
 		<template v-else-if="isValueBasedTrigger">
 			<div class="condition-row">
@@ -147,6 +174,7 @@ import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import { validateExpression } from '../../utils/RegularExpression.ts'
 
 export default {
 	name: 'BranchConditionEditor',
@@ -188,6 +216,13 @@ export default {
 
 	emits: ['update:branch'],
 
+	data() {
+		return {
+			// Text being typed, an invalid regular expression is not saved
+			textDraft: null,
+		}
+	},
+
 	computed: {
 		/**
 		 * Check if trigger is option-based (radio, dropdown, checkbox)
@@ -203,6 +238,13 @@ export default {
 		 */
 		isSingleSelect() {
 			return ['multiple_unique', 'dropdown'].includes(this.triggerType)
+		},
+
+		/**
+		 * Check if trigger is text-based (short, long)
+		 */
+		isTextBasedTrigger() {
+			return ['short', 'long'].includes(this.triggerType)
 		},
 
 		/**
@@ -263,6 +305,22 @@ export default {
 		},
 
 		/**
+		 * Text condition type options
+		 */
+		textConditionTypes() {
+			const types = [
+				{ value: 'string_equals', label: t('forms', 'Equals') },
+				{ value: 'string_contains', label: t('forms', 'Contains') },
+				{ value: 'regex', label: t('forms', 'Matches regex') },
+			]
+			// Long text doesn't support string_equals
+			if (this.triggerType === 'long') {
+				return types.filter((t) => t.value !== 'string_equals')
+			}
+			return types
+		},
+
+		/**
 		 * Value condition type options (for linear scale)
 		 */
 		valueConditionTypes() {
@@ -292,6 +350,7 @@ export default {
 		 * Default condition type based on trigger
 		 */
 		defaultConditionType() {
+			if (this.isTextBasedTrigger) return 'string_contains'
 			if (this.triggerType === 'linearscale') return 'value_equals'
 			if (this.isDateBasedTrigger) return 'date_range'
 			return null
@@ -308,6 +367,29 @@ export default {
 			set(value) {
 				this.updateCondition({ value })
 			},
+		},
+
+		/**
+		 * Value of a text condition, regular expressions are only saved when valid
+		 */
+		textConditionValue: {
+			get() {
+				return this.textDraft ?? this.conditionValue
+			},
+
+			set(value) {
+				this.textDraft = value
+				if (this.conditionType !== 'regex' || validateExpression(value)) {
+					this.conditionValue = value
+				}
+			},
+		},
+
+		isRegexInvalid() {
+			return (
+				this.conditionType === 'regex'
+				&& !validateExpression(this.textConditionValue)
+			)
 		},
 
 		/**
@@ -368,6 +450,19 @@ export default {
 		 */
 		fileUploadedCondition() {
 			return this.branch.conditions?.[0]?.fileUploaded ?? true
+		},
+
+		/**
+		 * Placeholder for condition value input
+		 */
+		conditionValuePlaceholder() {
+			if (this.conditionType === 'regex') {
+				return t('forms', 'Regular expression, e.g. /^yes$/i')
+			}
+			if (this.conditionType === 'string_equals') {
+				return t('forms', 'Exact text to match')
+			}
+			return t('forms', 'Text to search for')
 		},
 
 		/**
