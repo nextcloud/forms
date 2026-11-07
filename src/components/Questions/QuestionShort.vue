@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -91,6 +92,7 @@ import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
+	questionIdPrefix,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
@@ -117,7 +119,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const input = ref<HTMLInputElement | null>(null)
 		const regexInput = ref<{
 			$el: {
@@ -154,7 +157,7 @@ export default defineComponent({
 		 * Id of the validation type menu
 		 */
 		const validationTypeMenuId = computed(
-			() => 'q' + props.index + '__validation_menu',
+			() => questionIdPrefix(props) + '__validation_menu',
 		)
 
 		/**
@@ -299,6 +302,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			IconRegex,
 			t,
 			validationTypes,

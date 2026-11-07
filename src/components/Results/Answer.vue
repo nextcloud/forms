@@ -5,9 +5,13 @@
 
 <template>
 	<div class="answer">
-		<h4 class="answer__question-text" dir="auto">
+		<!-- Subquestions are below the heading of their parent question -->
+		<component
+			:is="isSubQuestion ? 'h5' : 'h4'"
+			class="answer__question-text"
+			dir="auto">
 			{{ questionText }}
-		</h4>
+		</component>
 		<!-- Do not wrap the following line between tags! `white-space:pre-line` respects `\n` but would produce additional empty first line -->
 		<!-- eslint-disable-next-line -->
 		<template v-if="questionType === 'file' && answers.length">
@@ -74,6 +78,33 @@
 		<p v-else class="answer__text" dir="auto">
 			<NcHighlight :text="answerText" :search="highlight" />
 		</p>
+		<div
+			v-if="subQuestionAnswers.length > 0"
+			class="answer__subquestion"
+			role="group"
+			:aria-label="
+				t(
+					'forms',
+					'Follow-up questions of {question}',
+					{ question: questionText },
+					{ escape: false, sanitize: false },
+				)
+			">
+			<Answer
+				v-for="subquestion in subQuestionAnswers"
+				:key="subquestion.id"
+				:question="subquestion"
+				isSubQuestion
+				:highlight="highlight"
+				:answerText="subquestion.squashedAnswers"
+				:answers="subquestion.answers"
+				:questionText="subquestion.text"
+				:gridCellType="subquestion.gridCellType"
+				:gridColumns="subquestion.gridColumns"
+				:gridRows="subquestion.gridRows"
+				:gridValue="subquestion.gridValue"
+				:questionType="subquestion.type" />
+		</div>
 	</div>
 </template>
 
@@ -82,10 +113,24 @@ import type { PropType } from 'vue'
 import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
-import { defineComponent } from 'vue'
+import { t } from '@nextcloud/l10n'
+import { computed, defineComponent } from 'vue'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcHighlight from '@nextcloud/vue/components/NcHighlight'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+
+export interface AnsweredQuestion {
+	id: number
+	text: string
+	type: string
+	squashedAnswers?: string
+	answers?: Array<{ id: number; text: string; url?: string }>
+	branchAnswers?: AnsweredQuestion[][]
+	gridValue?: Record<string, string | string[] | Record<string, string | number>>
+	gridCellType?: string
+	gridRows?: FormsOption[]
+	gridColumns?: FormsOption[]
+}
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -97,6 +142,16 @@ export default defineComponent({
 	},
 
 	props: {
+		question: {
+			type: Object as PropType<AnsweredQuestion>,
+			required: true,
+		},
+
+		isSubQuestion: {
+			type: Boolean,
+			default: false,
+		},
+
 		answers: {
 			type: Array as PropType<
 				Array<{ id: number; text: string; url?: string }>
@@ -175,9 +230,16 @@ export default defineComponent({
 			return row ?? ''
 		}
 
+		// The answered subquestions of all branches
+		const subQuestionAnswers = computed(() =>
+			(props.question.branchAnswers ?? []).flat(),
+		)
+
 		return {
 			IconFile,
 			getGridNumberValue,
+			subQuestionAnswers,
+			t,
 		}
 	},
 })
@@ -242,6 +304,17 @@ export default defineComponent({
 			text-align: start;
 			position: sticky;
 			inset-inline-start: 0;
+		}
+	}
+
+	&__subquestion {
+		margin-top: 16px;
+		padding-left: 16px;
+		border-left: 3px solid var(--color-primary-element);
+
+		// Phones have little width to spare, the border still shows the nesting
+		@media (max-width: 768px) {
+			padding-left: 8px;
 		}
 	}
 }

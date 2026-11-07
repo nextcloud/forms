@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -237,6 +237,22 @@ class Constants {
 		self::ANSWER_GRID_TYPE_CHECKBOX,
 		self::ANSWER_GRID_TYPE_NUMBER,
 		self::ANSWER_GRID_TYPE_RADIO,
+	];
+
+	/**
+	 * Condition types of branches
+	 */
+	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
+
+	/**
+	 * Question types that can have branches with follow-up questions in `extraSettings.branches`,
+	 * mapped to the condition types their branches support
+	 *
+	 * Each branch has a unique `id` and `conditions`, e.g. `[{optionId: 1}]` for choice questions.
+	 */
+	public const QUESTION_TYPES_WITH_BRANCHES = [
+		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::CONDITION_TYPE_OPTION_SELECTED],
+		self::ANSWER_TYPE_DROPDOWN => [self::CONDITION_TYPE_OPTION_SELECTED],
 	];
 
 	/**

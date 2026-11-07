@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2017 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2017-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -235,15 +235,10 @@ class ApiController extends OCSController {
 					$form->setConfirmationEmailQuestionId($newQuestion->getId());
 				}
 
-				// Get Options, set new QuestionId, reinsert
-				$options = $this->optionMapper->findByQuestion($oldQuestion->getId());
-				foreach ($options as $oldOption) {
-					$optionData = $oldOption->read();
+				$copiedOptions = $this->copyOptions($oldQuestion->getId(), $newQuestion->getId());
 
-					unset($optionData['id']);
-					$optionData['questionId'] = $newQuestion->getId();
-					$newOption = Option::fromParams($optionData);
-					$this->optionMapper->insert($newOption);
+				if (!empty($newQuestion->getExtraSettings()['branches'])) {
+					$this->copyBranches($oldQuestion, $newQuestion, $copiedOptions);
 				}
 			}
 
@@ -530,6 +525,8 @@ class ApiController extends OCSController {
 	 * @param FormsQuestionGridCellType $subtype the new question subtype
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
+	 * @param ?int $parentQuestionId (optional) id of the question this follow-up question belongs to
+	 * @param ?string $branchId (optional) id of the branch of the parent question
 	 * @param ?int $position (optional) the position of the new question
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Invalid type
@@ -545,7 +542,7 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/questions')]
-	public function newQuestion(int $formId, ?string $type = null, ?string $subtype = null, string $text = '', ?int $fromId = null, ?int $position = null): DataResponse {
+	public function newQuestion(int $formId, ?string $type = null, ?string $subtype = null, string $text = '', ?int $fromId = null, ?int $parentQuestionId = null, ?string $branchId = null, ?int $position = null): DataResponse {
 		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
 		$this->formsService->obtainFormLock($form);
 
@@ -555,10 +552,12 @@ class ApiController extends OCSController {
 		}
 
 		if ($fromId === null) {
-			$this->logger->debug('Adding new question: formId: {formId}, type: {type}, text: {text}', [
+			$this->logger->debug('Adding new question: formId: {formId}, type: {type}, text: {text}, parentQuestionId: {parentQuestionId}, branchId: {branchId}', [
 				'formId' => $formId,
 				'type' => $type,
 				'text' => $text,
+				'parentQuestionId' => $parentQuestionId,
+				'branchId' => $branchId,
 			]);
 
 			if (array_search($type, Constants::ANSWER_TYPES) === false) {
@@ -572,8 +571,52 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
+			// Validate parent question if creating a subquestion
+			if ($parentQuestionId !== null) {
+				try {
+					$parentQuestion = $this->questionMapper->findById($parentQuestionId);
+				} catch (IMapperException $e) {
+					$this->logger->debug('Could not find parent question');
+					throw new OCSNotFoundException('Could not find parent question');
+				}
+
+				// Parent must belong to the same form, checked first to not tell anything about questions of other forms
+				if ($parentQuestion->getFormId() !== $formId) {
+					$this->logger->debug('Parent question does not belong to this form');
+					throw new OCSBadRequestException('Parent question does not belong to this form');
+				}
+
+				// Follow-up questions are one level deep and only possible for some question types
+				if ($parentQuestion->getParentQuestionId() !== null) {
+					$this->logger->debug('Nested follow-up questions are not supported');
+					throw new OCSBadRequestException('Nested follow-up questions are not supported');
+				}
+				if (!array_key_exists($parentQuestion->getType(), Constants::QUESTION_TYPES_WITH_BRANCHES)) {
+					$this->logger->debug('Parent question can not have follow-up questions');
+					throw new OCSBadRequestException('Parent question can not have follow-up questions');
+				}
+
+				// branchId is required when parentQuestionId is set
+				if (empty($branchId)) {
+					$this->logger->debug('branchId is required when creating a subquestion');
+					throw new OCSBadRequestException('branchId is required when creating a subquestion');
+				}
+
+				// The branch must exist on the parent question
+				$branchIds = array_column($parentQuestion->getExtraSettings()['branches'] ?? [], 'id');
+				if (!in_array($branchId, $branchIds, true)) {
+					$this->logger->debug('Branch does not exist on the parent question');
+					throw new OCSBadRequestException('Branch does not exist on the parent question');
+				}
+			}
+
 			// Retrieve all active questions sorted by Order.
-			$questions = $this->questionMapper->findByForm($formId);
+			// For subquestions, get order within the branch
+			if ($parentQuestionId !== null) {
+				$questions = $this->questionMapper->findByBranch($parentQuestionId, $branchId);
+			} else {
+				$questions = $this->questionMapper->findByForm($formId);
+			}
 
 			if ($position !== null) {
 				$position = $this->shiftQuestionsForInsert($questions, $position);
@@ -598,6 +641,12 @@ class ApiController extends OCSController {
 			$question->setIsRequired(false);
 			$question->setExtraSettings($subtype ? ['questionType' => $subtype] : []);
 
+			// Set parent question and branch for subquestions
+			if ($parentQuestionId !== null) {
+				$question->setParentQuestionId($parentQuestionId);
+				$question->setBranchId($branchId);
+			}
+
 			$question = $this->questionMapper->insert($question);
 
 			$response = $this->formsService->getQuestion($question->getId());
@@ -617,13 +666,16 @@ class ApiController extends OCSController {
 				if ($sourceQuestion->getFormId() !== $formId) {
 					throw new OCSBadRequestException('Question doesn\'t belong to given form');
 				}
-				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
 			} catch (IMapperException) {
 				$this->logger->debug('Could not find question');
 				throw new OCSNotFoundException('Could not find question');
 			}
 
-			$allQuestions = $this->questionMapper->findByForm($formId);
+			// Subquestions are ordered within their branch
+			$sourceParentId = $sourceQuestion->getParentQuestionId();
+			$allQuestions = $sourceParentId !== null
+				? $this->questionMapper->findByBranch($sourceParentId, (string)$sourceQuestion->getBranchId())
+				: $this->questionMapper->findByForm($formId);
 
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
@@ -638,19 +690,18 @@ class ApiController extends OCSController {
 			$newQuestion = Question::fromParams($questionData);
 			$this->questionMapper->insert($newQuestion);
 
-			$response = $newQuestion->read();
-			$response['options'] = [];
-			$response['accept'] = [];
+			$copiedOptions = $this->copyOptions($fromId, $newQuestion->getId());
 
-			foreach ($sourceOptions as $sourceOption) {
-				$optionData = $sourceOption->read();
-
-				unset($optionData['id']);
-				$optionData['questionId'] = $newQuestion->getId();
-				$newOption = Option::fromParams($optionData);
-				$insertedOption = $this->optionMapper->insert($newOption);
-
-				$response['options'][] = $insertedOption->read();
+			if (!empty($newQuestion->getExtraSettings()['branches'])) {
+				$this->copyBranches($sourceQuestion, $newQuestion, $copiedOptions);
+				$response = $this->formsService->getQuestion($newQuestion->getId());
+				if ($response === null) {
+					throw new OCSException('Failed to copy question');
+				}
+			} else {
+				$response = $newQuestion->read();
+				$response['options'] = array_values(array_map(static fn (Option $option) => $option->read(), $copiedOptions));
+				$response['accept'] = [];
 			}
 		}
 
@@ -672,8 +723,9 @@ class ApiController extends OCSController {
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
-	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
+	 * @throws OCSBadRequestException Invalid extraSettings, nested follow-up questions, or a type change of a question with follow-up questions, will not update
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
+	 * @throws OCSForbiddenException Not allowed to update `parentQuestionId`, `branchId`, `options` or `accept`
 	 * @throws OCSForbiddenException Not allowed to update `id` or `formId`
 	 * @throws OCSForbiddenException Please use reorderQuestions() to change order
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -727,6 +779,28 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Not allowed to update \'id\' or \'formId\'');
 		}
 
+		// The place of a subquestion is fixed on creation, options and accept have their own handling
+		foreach (['parentQuestionId', 'branchId', 'options', 'accept'] as $key) {
+			if (array_key_exists($key, $keyValuePairs)) {
+				$this->logger->debug('Not allowed to update \'{key}\'', ['key' => $key]);
+				throw new OCSForbiddenException('Not allowed to update \'' . $key . '\'');
+			}
+		}
+
+		// The conditions of the branches depend on the type, the follow-up questions would be lost
+		if (array_key_exists('type', $keyValuePairs)
+			&& $keyValuePairs['type'] !== $question->getType()
+			&& !empty($question->getExtraSettings()['branches'])) {
+			$this->logger->debug('Not allowed to change the type of a question with follow-up questions');
+			throw new OCSBadRequestException('Not allowed to change the type of a question with follow-up questions');
+		}
+
+		// Follow-up questions are one level deep
+		if ($question->getParentQuestionId() !== null && !empty($keyValuePairs['extraSettings']['branches'])) {
+			$this->logger->debug('Nested follow-up questions are not supported');
+			throw new OCSBadRequestException('Nested follow-up questions are not supported');
+		}
+
 		// Don't allow to reorder here
 		if (array_key_exists('order', $keyValuePairs)) {
 			$this->logger->debug('Key \'order\' is not allowed on updateQuestion. Please use reorderQuestions() to change order.');
@@ -740,6 +814,10 @@ class ApiController extends OCSController {
 		if ($form->getConfirmationEmailQuestionId() === $question->getId()
 			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)) {
 			$form->setConfirmationEmailQuestionId(null);
+		}
+
+		if (is_array($keyValuePairs['extraSettings'] ?? null) && $question->getParentQuestionId() === null) {
+			$keyValuePairs['extraSettings'] = $this->updateBranches($form, $question, $keyValuePairs['extraSettings']);
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -798,6 +876,11 @@ class ApiController extends OCSController {
 		// Store Order of deleted Question
 		$deletedOrder = $question->getOrder();
 
+		// Its follow-up questions are deleted as well
+		foreach ($this->questionMapper->findByParentQuestion($questionId) as $subQuestion) {
+			$this->deleteSubQuestion($form, $subQuestion);
+		}
+
 		// Mark question as deleted
 		$question->setOrder(0);
 		$this->questionMapper->update($question);
@@ -810,8 +893,11 @@ class ApiController extends OCSController {
 			]);
 		}
 
-		// Update all question-order > deleted order.
-		$formQuestions = $this->questionMapper->findByForm($formId);
+		// Update all question-order > deleted order, subquestions are ordered within their branch
+		$parentQuestionId = $question->getParentQuestionId();
+		$formQuestions = $parentQuestionId !== null
+			? $this->questionMapper->findByBranch($parentQuestionId, (string)$question->getBranchId())
+			: $this->questionMapper->findByForm($formId);
 		foreach ($formQuestions as $question) {
 			$questionOrder = $question->getOrder();
 			if ($questionOrder > $deletedOrder) {
@@ -838,6 +924,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
 	 * @throws OCSBadRequestException Question doesn't belong to given Form
+	 * @throws OCSBadRequestException Subquestions can only be reordered within their branch
 	 * @throws OCSBadRequestException One question has already been marked as deleted
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -897,6 +984,149 @@ class ApiController extends OCSController {
 					'questionId' => $questionId
 				]);
 				throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+			}
+
+			// Subquestions are ordered within their branch, not among the questions of the form
+			if ($questions[$arrayKey]->getParentQuestionId() !== null) {
+				$this->logger->debug('This question is a subquestion: {questionId}', [
+					'questionId' => $questionId
+				]);
+				throw new OCSBadRequestException('Subquestions can only be reordered within their branch');
+			}
+
+			// Abort if a question is already marked as deleted (order==0)
+			$oldOrder = $questions[$arrayKey]->getOrder();
+			if ($oldOrder === 0) {
+				$this->logger->debug('This question has already been marked as deleted: Id: {questionId}', [
+					'questionId' => $questions[$arrayKey]->getId()
+				]);
+				throw new OCSBadRequestException('One question has already been marked as deleted');
+			}
+
+			// Only set order, if it changed.
+			if ($oldOrder !== $arrayKey + 1) {
+				// Set Order. ArrayKey counts from zero, order counts from 1.
+				$questions[$arrayKey]->setOrder($arrayKey + 1);
+			}
+		}
+
+		// Write to Database
+		foreach ($questions as $question) {
+			$this->questionMapper->update($question);
+
+			$response[(string)$question->getId()] = [
+				'order' => $question->getOrder()
+			];
+		}
+
+		$this->formMapper->update($form);
+
+		return new DataResponse($response);
+	}
+
+	/**
+	 * Updates the order of the follow-up questions in a branch of a question
+	 *
+	 * @param int $formId Id of the form to reorder
+	 * @param string $branchId Id of the branch.
+	 * @param int $questionId Id of the question the branch belongs to.
+	 * @param list<int> $newOrder Array of Question-Ids in new order.
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
+	 * @throws OCSBadRequestException The given array contains duplicates
+	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
+	 * @throws OCSBadRequestException Question doesn't belong to given Form
+	 * @throws OCSBadRequestException One question has already been marked as deleted
+	 * @throws OCSForbiddenException This form is archived and can not be modified
+	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Could not find form
+	 * @throws OCSNotFoundException Could not find question
+	 *
+	 * 200: the question ids of the given form in the new order
+	 */
+	#[CORS()]
+	#[NoAdminRequired()]
+	#[BruteForceProtection(action: 'form')]
+	#[ApiRoute(verb: 'PATCH', url: '/api/v3/forms/{formId}/questions/{questionId}/subquestions')]
+	public function reorderSubQuestions(int $formId, string $branchId, int $questionId, array $newOrder): DataResponse {
+		$this->logger->debug('Reordering Sub-Questions on Form {formId}, Parent-Question {parentQuestionId}, Branch {branchId} as Question-Ids {newOrder}', [
+			'formId' => $formId,
+			'parentQuestionId' => $questionId,
+			'branchId' => $branchId,
+			'newOrder' => $newOrder
+		]);
+
+		$form = $this->formsService->getFormIfAllowed($formId, Constants::PERMISSION_EDIT);
+		$this->formsService->obtainFormLock($form);
+
+		if ($this->formsService->isFormArchived($form)) {
+			$this->logger->debug('This form is archived and can not be modified');
+			throw new OCSForbiddenException('This form is archived and can not be modified');
+		}
+
+		// Check if array contains duplicates
+		if (array_unique($newOrder) !== $newOrder) {
+			$this->logger->debug('The given array contains duplicates');
+			throw new OCSBadRequestException('The given array contains duplicates');
+		}
+
+		// The parent question must belong to the form, so nothing is told about questions of other forms
+		try {
+			$parentQuestion = $this->questionMapper->findById($questionId);
+		} catch (IMapperException $e) {
+			$this->logger->debug('Could not find question {questionId}', [
+				'questionId' => $questionId
+			]);
+			throw new OCSNotFoundException('Could not find question');
+		}
+		if ($parentQuestion->getFormId() !== $formId) {
+			$this->logger->debug('This Question is not part of the given form: {questionId}', [
+				'questionId' => $questionId
+			]);
+			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+		}
+
+		// Check if all questions are given in Array.
+		$questions = $this->questionMapper->findByBranch($questionId, $branchId);
+		if (sizeof($questions) !== sizeof($newOrder)) {
+			$this->logger->debug('The length of the given array does not match the number of stored questions');
+			throw new OCSBadRequestException('The length of the given array does not match the number of stored questions');
+		}
+
+		$questions = []; // Clear Array of Entities
+		$response = []; // Array of ['questionId' => ['order' => newOrder]]
+
+		// Store array of Question-Entities and check the Questions FormId & old Order.
+		foreach ($newOrder as $arrayKey => $subQuestionId) {
+			try {
+				$questions[$arrayKey] = $this->questionMapper->findById($subQuestionId);
+			} catch (IMapperException $e) {
+				$this->logger->debug('Could not find question {questionId}', [
+					'questionId' => $subQuestionId
+				]);
+				throw new OCSNotFoundException('Could not find question');
+			}
+
+			// Abort if a question is not part of the Form.
+			if ($questions[$arrayKey]->getFormId() !== $formId) {
+				$this->logger->debug('This Question is not part of the given form: {questionId}', [
+					'questionId' => $subQuestionId
+				]);
+				throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+			}
+			// Abort if a question is not part of the Parent Question.
+			if ($questions[$arrayKey]->getParentQuestionId() !== $questionId) {
+				$this->logger->debug('This Question is not part of the given parent question: {parentQuestionId}', [
+					'parentQuestionId' => $questionId
+				]);
+				throw new OCSBadRequestException('Question doesn\'t belong to given Parent Question');
+			}
+
+			// Abort if a question is not part of the Branch.
+			if ($questions[$arrayKey]->getBranchId() !== $branchId) {
+				$this->logger->debug('This Question is not part of the given branch: {branchId}', [
+					'branchId' => $branchId
+				]);
+				throw new OCSBadRequestException('Question doesn\'t belong to given Branch');
 			}
 
 			// Abort if a question is already marked as deleted (order==0)
@@ -1312,12 +1542,14 @@ class ApiController extends OCSController {
 		foreach ($this->formsService->getQuestions($formId) as $question) {
 			$questions[$question['id']] = $question;
 		}
+		// Answers of subquestions get the name of their subquestion
+		$questionNames = array_column(FormsService::flattenQuestions(array_values($questions)), 'name', 'id');
 
 		// Append Display Names
-		$submissions = array_map(function (array $submission) use ($questions) {
+		$submissions = array_map(function (array $submission) use ($questionNames) {
 			if (!empty($submission['answers'])) {
-				$submission['answers'] = array_map(function (array $answer) use ($questions) {
-					$name = $questions[$answer['questionId']]['name'] ?? null;
+				$submission['answers'] = array_map(function (array $answer) use ($questionNames) {
+					$name = $questionNames[$answer['questionId']] ?? null;
 					if ($name) {
 						$answer['questionName'] = $name;
 					}
@@ -1511,7 +1743,8 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Already submitted');
 		}
 
-		// Process Answers
+		// Process Answers, follow-up questions are answered only when their branch is active
+		$questions = $this->submissionService->getVisibleQuestions($questions, $answers);
 		foreach ($answers as $questionId => $answerArray) {
 			// Search corresponding Question, skip processing if not found
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
@@ -1594,7 +1827,8 @@ class ApiController extends OCSController {
 		// Delete current answers
 		$this->answerMapper->deleteBySubmission($submissionId);
 
-		// Process Answers
+		// Process Answers, follow-up questions are answered only when their branch is active
+		$questions = $this->submissionService->getVisibleQuestions($questions, $answers);
 		foreach ($answers as $questionId => $answerArray) {
 			// Search corresponding Question, skip processing if not found
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
@@ -1866,6 +2100,88 @@ class ApiController extends OCSController {
 	// private functions
 
 	/**
+	 * Copy the options of a question to another question
+	 *
+	 * @return array<int, Option> the inserted options, keyed by the id of the option they were copied from
+	 */
+	private function copyOptions(int $fromQuestionId, int $toQuestionId): array {
+		$copiedOptions = [];
+		foreach ($this->optionMapper->findByQuestion($fromQuestionId) as $option) {
+			$optionData = $option->read();
+			unset($optionData['id']);
+			$optionData['questionId'] = $toQuestionId;
+			$copiedOptions[$option->getId()] = $this->optionMapper->insert(Option::fromParams($optionData));
+		}
+		return $copiedOptions;
+	}
+
+	/**
+	 * Copy the subquestions of a question and point the branch conditions of the copy to its own options
+	 *
+	 * @param array<int, Option> $copiedOptions the options of the copy, keyed by the id of the option they were copied from
+	 */
+	private function copyBranches(Question $source, Question $copy, array $copiedOptions): void {
+		$optionIdMap = array_map(static fn (Option $option) => $option->getId(), $copiedOptions);
+		$copy->setExtraSettings(FormsService::mapConditionOptionIds($copy->getExtraSettings(), $optionIdMap));
+		$this->questionMapper->update($copy);
+
+		foreach ($this->questionMapper->findByParentQuestion($source->getId()) as $subQuestion) {
+			if ($subQuestion->getFormId() !== $source->getFormId()) {
+				continue;
+			}
+			$subQuestionData = $subQuestion->read();
+			unset($subQuestionData['id']);
+			$subQuestionData['formId'] = $copy->getFormId();
+			$subQuestionData['parentQuestionId'] = $copy->getId();
+			$newSubQuestion = Question::fromParams($subQuestionData);
+			$this->questionMapper->insert($newSubQuestion);
+			$this->copyOptions($subQuestion->getId(), $newSubQuestion->getId());
+		}
+	}
+
+	/**
+	 * Drop subquestion snapshots from the branches and delete the subquestions of removed branches
+	 *
+	 * @param array<string, mixed> $extraSettings the new extra settings of the question
+	 * @return array<string, mixed> the extra settings to store
+	 */
+	private function updateBranches(Form $form, Question $question, array $extraSettings): array {
+		$branchIds = [];
+		foreach ($extraSettings['branches'] ?? [] as $branchIndex => $branch) {
+			unset($extraSettings['branches'][$branchIndex]['subQuestions']);
+			$branchIds[] = $branch['id'] ?? null;
+		}
+
+		foreach ($this->questionMapper->findByParentQuestion($question->getId()) as $subQuestion) {
+			if (!in_array($subQuestion->getBranchId(), $branchIds, true)) {
+				$this->deleteSubQuestion($form, $subQuestion);
+			}
+		}
+
+		return $extraSettings;
+	}
+
+	/**
+	 * Soft-delete a subquestion whose question or branch is deleted, like a deleted question
+	 */
+	private function deleteSubQuestion(Form $form, Question $subQuestion): void {
+		$subQuestion->setOrder(0);
+		$this->questionMapper->update($subQuestion);
+
+		if ($subQuestion->getType() === Constants::ANSWER_TYPE_FILE) {
+			$this->jobList->add(DeleteQuestionFoldersJob::class, [
+				'formId' => $form->getId(),
+				'questionId' => $subQuestion->getId(),
+				'ownerId' => $form->getOwnerId(),
+			]);
+		}
+
+		if ($form->getConfirmationEmailQuestionId() === $subQuestion->getId()) {
+			$form->setConfirmationEmailQuestionId(null);
+		}
+	}
+
+	/**
 	 * Insert answers for a question
 	 *
 	 * @param Form $form
@@ -1896,7 +2212,6 @@ class ApiController extends OCSController {
 			$answerEntity->setQuestionId($question['id']);
 
 			$answerText = '';
-			$uploadedFile = null;
 			// Are we using answer ids as values
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED) && $question['type'] !== Constants::ANSWER_TYPE_LINEARSCALE) {
 				// Search corresponding option, skip processing if not found
@@ -1907,28 +2222,7 @@ class ApiController extends OCSController {
 					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
 				}
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				$uploadedFile = $this->uploadedFileMapper->getForSubmission(
-					(int)$answer['uploadedFileId'],
-					$form->getId(),
-					$question['id'],
-					$answer['uploadToken'] ?? '',
-				);
-				$answerEntity->setFileId($uploadedFile->getFileId());
-
-				$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
-				$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
-
-				if ($userFolder->nodeExists($path)) {
-					$folder = $userFolder->get($path);
-				} else {
-					$folder = $userFolder->newFolder($path);
-				}
-				/** @var Folder $folder */
-				$file = $userFolder->getById($uploadedFile->getFileId())[0];
-				$name = $folder->getNonExistingName($file->getName());
-				$file->move($folder->getPath() . '/' . $name);
-
-				$answerText = $name;
+				$answerText = $this->storeFileAnswer($form, $submissionId, $question, $answer, $answerEntity);
 			} else {
 				$answerText = $answer; // Not a multiple-question, answerText is given answer
 			}
@@ -1939,10 +2233,44 @@ class ApiController extends OCSController {
 
 			$answerEntity->setText($answerText);
 			$this->answerMapper->insert($answerEntity);
-			if ($uploadedFile) {
-				$this->uploadedFileMapper->delete($uploadedFile);
-			}
 		}
+	}
+
+	/**
+	 * Store a file answer by moving the uploaded file to the submission folder.
+	 *
+	 * @param array $question The file question
+	 * @param array{uploadedFileId: int|string, fileName?: string, uploadToken?: string} $answer The uploaded file answer
+	 */
+	private function storeFileAnswer(Form $form, int $submissionId, array $question, array $answer, Answer $answerEntity): string {
+		$uploadedFile = $this->uploadedFileMapper->getForSubmission(
+			(int)$answer['uploadedFileId'],
+			$form->getId(),
+			$question['id'],
+			$answer['uploadToken'] ?? '',
+		);
+		$answerEntity->setFileId($uploadedFile->getFileId());
+
+		$userFolder = $this->rootFolder->getUserFolder($form->getOwnerId());
+		$path = $this->formsService->getUploadedFilePath($form, $submissionId, $question['id'], $question['name'], $question['text']);
+
+		if ($userFolder->nodeExists($path)) {
+			$folder = $userFolder->get($path);
+		} else {
+			$folder = $userFolder->newFolder($path);
+		}
+		/** @var Folder $folder */
+
+		$files = $userFolder->getById($uploadedFile->getFileId());
+		if (empty($files)) {
+			throw new OCSBadRequestException('Uploaded file not found in storage.');
+		}
+		$file = $files[0];
+		$name = $folder->getNonExistingName($file->getName());
+		$file->move($folder->getPath() . '/' . $name);
+		$this->uploadedFileMapper->delete($uploadedFile);
+
+		return $name;
 	}
 
 	/**

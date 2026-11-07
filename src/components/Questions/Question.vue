@@ -9,7 +9,7 @@
 		:class="{
 			'question--editable': !readOnly,
 		}"
-		:aria-label="t('forms', 'Question number {index}', { index })">
+		:aria-label="t('forms', 'Question number {index}', { index: number })">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
@@ -51,7 +51,7 @@
 					:placeholder="titlePlaceholder"
 					:aria-label="
 						t('forms', 'Title of question number {index}', {
-							index,
+							index: number,
 						})
 					"
 					:value="text"
@@ -132,7 +132,7 @@
 					:value="description"
 					:aria-label="
 						t('forms', 'Description of question number {index}', {
-							index,
+							index: number,
 						})
 					"
 					:placeholder="
@@ -190,6 +190,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
+import { questionIdPrefix, questionNumber } from '../../composables/useQuestion.ts'
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -210,6 +211,11 @@ export default defineComponent({
 		index: {
 			type: Number,
 			required: true,
+		},
+
+		subIndex: {
+			type: Number,
+			default: null,
 		},
 
 		text: {
@@ -327,14 +333,20 @@ export default defineComponent({
 		 * @return true if question valid
 		 */
 		const questionValid = computed(() => !!props.text && props.contentValid)
-		const actionsId = computed(() => 'q' + props.index + '_actions')
-		const titleId = computed(() => 'q' + props.index + '_title')
-		const descriptionId = computed(() => 'q' + props.index + '_desc')
+		const number = computed(() =>
+			questionNumber({ index: props.index, subIndex: props.subIndex }),
+		)
+		const idPrefix = computed(() =>
+			questionIdPrefix({ index: props.index, subIndex: props.subIndex }),
+		)
+		const actionsId = computed(() => idPrefix.value + '_actions')
+		const titleId = computed(() => idPrefix.value + '_title')
+		const descriptionId = computed(() => idPrefix.value + '_desc')
 		const hasDescription = computed(() => props.description !== '')
 		const hasError = computed(() => !!props.errorMessage)
 		const hasInfo = computed(() => !!props.infoMessage)
-		const errorId = computed(() => `q${props.index}_error`)
-		const infoId = computed(() => `q${props.index}_info`)
+		const errorId = computed(() => `${idPrefix.value}_error`)
+		const infoId = computed(() => `${idPrefix.value}_info`)
 
 		const resizeDescription = (): void => {
 			// next tick ensures that the textarea is attached to DOM
@@ -425,6 +437,7 @@ export default defineComponent({
 			computedText,
 			computedDescription,
 			questionValid,
+			number,
 			actionsId,
 			titleId,
 			descriptionId,

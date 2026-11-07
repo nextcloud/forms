@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -86,73 +86,140 @@ class FormsService {
 	}
 
 	/**
-	 * Load options corresponding to question
-	 *
-	 * @param integer $questionId
-	 * @return list<FormsOption>
-	 */
-	private function getOptions(int $questionId): array {
-		$optionList = [];
-		try {
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-		} catch (DoesNotExistException) {
-			//handle silently
-		} finally {
-			return $optionList;
-		}
-	}
-
-	/**
 	 * Load questions corresponding to form
 	 *
 	 * @param integer $formId
 	 * @return list<FormsQuestion>
 	 */
 	public function getQuestions(int $formId): array {
-		$questionList = [];
 		try {
-			$questionEntities = $this->questionMapper->findByForm($formId);
-
-			$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
-			$optionsByQuestion = [];
-			foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
-				$optionsByQuestion[$optionEntity->getQuestionId()][] = $optionEntity;
-			}
-
-			foreach ($questionEntities as $questionEntity) {
-				$question = $questionEntity->read();
-				$question['options'] = array_map(
-					static fn (Option $option) => $option->read(),
-					$optionsByQuestion[$question['id']] ?? []
-				);
-				$question['accept'] = [];
-				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-						$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
-					}
-
-					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
-						foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
-							$question['accept'][] = '.' . $extension;
-						}
-					}
-				}
-
-				// Set `isRequired` if minimum options limit is set
-				if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && ($question['extraSettings']['optionsLimitMin'] ?? 0) > 0) {
-					$question['isRequired'] = true;
-				}
-
-				$questionList[] = $question;
-			}
+			// Top-level questions and subquestions are loaded at once and sorted by order
+			$questionEntities = $this->questionMapper->findByForm($formId, false, true);
 		} catch (DoesNotExistException) {
-			//handle silently
-		} finally {
-			return $questionList;
+			return [];
 		}
+
+		$optionsByQuestion = $this->getOptionsByQuestion($questionEntities);
+		$subQuestionsByParent = [];
+		foreach ($questionEntities as $questionEntity) {
+			if ($questionEntity->getParentQuestionId() !== null) {
+				$subQuestionsByParent[$questionEntity->getParentQuestionId()][] = $questionEntity;
+			}
+		}
+
+		$questionList = [];
+		foreach ($questionEntities as $questionEntity) {
+			if ($questionEntity->getParentQuestionId() === null) {
+				$questionList[] = $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionsByParent[$questionEntity->getId()] ?? []);
+			}
+		}
+		return $questionList;
+	}
+
+	/**
+	 * List the subquestions of a question after it instead of within its branches
+	 *
+	 * @param list<array<string, mixed>> $questions questions as returned by getQuestions()
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function flattenQuestions(array $questions): array {
+		$flattened = [];
+		foreach ($questions as $question) {
+			$subQuestions = [];
+			// Empty extra settings can be an object
+			if (is_array($question['extraSettings'] ?? null)) {
+				foreach ($question['extraSettings']['branches'] ?? [] as $branchIndex => $branch) {
+					/** @var list<array<string, mixed>> $branchSubQuestions */
+					$branchSubQuestions = $branch['subQuestions'] ?? [];
+					array_push($subQuestions, ...$branchSubQuestions);
+					unset($question['extraSettings']['branches'][$branchIndex]['subQuestions']);
+				}
+			}
+			array_push($flattened, $question, ...$subQuestions);
+		}
+		return $flattened;
+	}
+
+	/**
+	 * Point the branch conditions of a question to other options, e.g. those of a copy
+	 *
+	 * Subquestions are rows of their own, any snapshot of them in the branches is dropped.
+	 *
+	 * @param array<string, mixed> $extraSettings the extra settings of the question
+	 * @param array<int, int> $optionIdMap the new option ids, keyed by the old ones
+	 * @return array<string, mixed>
+	 */
+	public static function mapConditionOptionIds(array $extraSettings, array $optionIdMap): array {
+		foreach ($extraSettings['branches'] ?? [] as $branchIndex => $branch) {
+			unset($extraSettings['branches'][$branchIndex]['subQuestions']);
+			foreach ($branch['conditions'] ?? [] as $conditionIndex => $condition) {
+				if (isset($condition['optionId'])) {
+					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionId'] = $optionIdMap[$condition['optionId']] ?? $condition['optionId'];
+				}
+			}
+		}
+		return $extraSettings;
+	}
+
+	/**
+	 * Load the options of the given questions at once
+	 *
+	 * @param Question[] $questionEntities
+	 * @return array<int, list<Option>> the options keyed by question id
+	 */
+	private function getOptionsByQuestion(array $questionEntities): array {
+		$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
+		$optionsByQuestion = [];
+		foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
+			$optionsByQuestion[(int)$optionEntity->getQuestionId()][] = $optionEntity;
+		}
+		return $optionsByQuestion;
+	}
+
+	/**
+	 * Build the API representation of a question
+	 *
+	 * @param array<int, list<Option>> $optionsByQuestion the options keyed by question id
+	 * @param Question[] $subQuestionEntities the subquestions of the question's branches
+	 * @return FormsQuestion
+	 */
+	private function formatQuestion(Question $questionEntity, array $optionsByQuestion, array $subQuestionEntities = []): array {
+		$question = $questionEntity->read();
+		$question['options'] = array_map(static fn (Option $option) => $option->read(), $optionsByQuestion[$question['id']] ?? []);
+		$question['accept'] = [];
+		if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+			if ($question['extraSettings']['allowedFileTypes'] ?? null) {
+				$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
+			}
+
+			if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
+				foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
+					$question['accept'][] = '.' . $extension;
+				}
+			}
+		}
+
+		// Set `isRequired` if minimum options limit is set
+		if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && ($question['extraSettings']['optionsLimitMin'] ?? 0) > 0) {
+			$question['isRequired'] = true;
+		}
+
+		// Attach the subquestions to their branches
+		if (is_array($question['extraSettings']['branches'] ?? null)) {
+			$subQuestionsByBranch = [];
+			foreach ($subQuestionEntities as $subQuestionEntity) {
+				// Subquestions always belong to the form of their parent
+				if ($subQuestionEntity->getFormId() === $questionEntity->getFormId()) {
+					$subQuestionsByBranch[$subQuestionEntity->getBranchId()][] = $this->formatQuestion($subQuestionEntity, $optionsByQuestion);
+				}
+			}
+			$question['extraSettings']['branches'] = array_map(
+				static fn (array $branch) => [...$branch, 'subQuestions' => $subQuestionsByBranch[$branch['id'] ?? ''] ?? []],
+				$question['extraSettings']['branches'],
+			);
+		}
+
+		return $question;
 	}
 
 	/**
@@ -164,24 +231,16 @@ class FormsService {
 	public function getQuestion(int $questionId): ?array {
 		try {
 			$questionEntity = $this->questionMapper->findById($questionId);
-			$question = $questionEntity->read();
-			$question['options'] = $this->getOptions($question['id']);
-			$question['accept'] = [];
-			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-					$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
-				}
-
-				if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
-					foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
-						$question['accept'][] = '.' . $extension;
-					}
-				}
-			}
-			return $question;
 		} catch (DoesNotExistException) {
 			return null;
 		}
+
+		$subQuestionEntities = empty($questionEntity->getExtraSettings()['branches'])
+			? []
+			: $this->questionMapper->findByParentQuestion($questionId);
+		$optionsByQuestion = $this->getOptionsByQuestion(array_merge([$questionEntity], $subQuestionEntities));
+
+		return $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionEntities);
 	}
 
 	/**
@@ -853,6 +912,85 @@ class FormsService {
 	}
 
 	/**
+	 * Check that a regular expression is enclosed in slashes, only uses modifiers supported by PHP *and* JS and compiles
+	 */
+	private function isValidRegex(string $regex): bool {
+		// general pattern of a valid regex
+		$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
+		// pattern to look for unescaped slashes
+		$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\\\]))(\\\\\\\\)*\\//';
+
+		$matches = [];
+		// only pattern with delimiters and supported modifiers (by PHP *and* JS)
+		if (@preg_match($VALID_REGEX, $regex, $matches) !== 1) {
+			return false;
+		}
+
+		// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
+		if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
+			return false;
+		}
+
+		// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
+		return @preg_match($regex, 'some string') !== false;
+	}
+
+	/**
+	 * Check the branches of a question against its type
+	 *
+	 * @param mixed $branches the branches from the extra settings
+	 * @param string $questionType the type of the question
+	 */
+	private function areBranchesValid(mixed $branches, string $questionType): bool {
+		if (!is_array($branches) || !array_key_exists($questionType, Constants::QUESTION_TYPES_WITH_BRANCHES)) {
+			return false;
+		}
+
+		$branchIds = [];
+		foreach ($branches as $branch) {
+			// Each branch must have a unique id that fits into the branch id of its subquestions
+			if (!is_array($branch) || !isset($branch['id']) || !is_string($branch['id']) || $branch['id'] === ''
+				|| strlen($branch['id']) > 64 || isset($branchIds[$branch['id']])) {
+				return false;
+			}
+			$branchIds[$branch['id']] = true;
+
+			if (!isset($branch['conditions']) || !is_array($branch['conditions'])
+				|| !$this->areBranchConditionsValid($questionType, $branch['conditions'])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Check the conditions of a branch against the type of its question
+	 *
+	 * @param string $questionType the type of the question
+	 * @param array $conditions the conditions of the branch
+	 */
+	private function areBranchConditionsValid(string $questionType, array $conditions): bool {
+		$allowedTypes = Constants::QUESTION_TYPES_WITH_BRANCHES[$questionType];
+		foreach ($conditions as $condition) {
+			if (!is_array($condition)) {
+				return false;
+			}
+			if (isset($condition['type']) && !in_array($condition['type'], $allowedTypes, true)) {
+				return false;
+			}
+			if (isset($condition['optionId']) && !is_int($condition['optionId'])) {
+				return false;
+			}
+			foreach (['value', 'min', 'max'] as $key) {
+				if (isset($condition[$key]) && !is_scalar($condition[$key])) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Return shares of a form shared with given user
 	 *
 	 * @param int $formId The form to query shares for
@@ -900,19 +1038,30 @@ class FormsService {
 			return true;
 		}
 
-		// Ensure only allowed keys are set
-		$allowed = match ($questionType) {
+		// Map allowed options to answer type
+		$extraSettingsMap = [
 			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
-			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
 			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
 			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
-			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
-			default => [],
-		};
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+		];
+
+		// Branches with follow-up questions are possible for some types, in addition to their own settings
+		if (array_key_exists('branches', $extraSettings)) {
+			if (!$this->areBranchesValid($extraSettings['branches'], $questionType)) {
+				return false;
+			}
+			unset($extraSettings['branches']);
+		}
+
+		// Ensure only allowed keys are set
+		$allowed = $extraSettingsMap[$questionType] ?? [];
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -1022,24 +1171,7 @@ class FormsService {
 					return true;
 				}
 
-				// general pattern of a valid regex
-				$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
-				// pattern to look for unescaped slashes
-				$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\\\]))(\\\\\\\\)*\\//';
-
-				$matches = [];
-				// only pattern with delimiters and supported modifiers (by PHP *and* JS)
-				if (@preg_match($VALID_REGEX, $extraSettings['validationRegex'], $matches) !== 1) {
-					return false;
-				}
-
-				// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
-				if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
-					return false;
-				}
-
-				// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
-				if (@preg_match($extraSettings['validationRegex'], 'some string') === false) {
+				if (!$this->isValidRegex($extraSettings['validationRegex'])) {
 					return false;
 				}
 			}

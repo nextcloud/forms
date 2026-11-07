@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -234,6 +234,8 @@ class FormsServiceTest extends TestCase {
 							]
 						],
 						'accept' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 					[
 						'id' => 2,
@@ -247,6 +249,8 @@ class FormsServiceTest extends TestCase {
 						'name' => 'city',
 						'options' => [],
 						'accept' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					]
 				],
 				'shares' => [
@@ -1900,6 +1904,92 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
+			// Branches with follow-up questions
+			'valid-branches-dropdown' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]], ['id' => 'branch-2', 'conditions' => [['optionId' => 2]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'valid-branches-multiple-unique' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => true
+			],
+			'valid-branches-with-own-settings' => [
+				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'valid-branches-empty' => [
+				'extraSettings' => ['branches' => []],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'valid-branch-without-conditions' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'invalid-branches-on-other-type' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-branches-own-settings-invalid' => [
+				'extraSettings' => ['invalidKey' => 'value', 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branches-trigger-type-key' => [
+				'extraSettings' => ['triggerType' => 'dropdown', 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branches-not-array' => [
+				'extraSettings' => ['branches' => 'not-an-array'],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-not-array' => [
+				'extraSettings' => ['branches' => ['branch-1']],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-missing-id' => [
+				'extraSettings' => ['branches' => [['conditions' => [['optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-missing-conditions' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1']]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-condition-type-of-other-question-type' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-option-id-not-a-number' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['optionId' => ['nested']]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-empty-id' => [
+				'extraSettings' => ['branches' => [['id' => '', 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-id-too-long' => [
+				'extraSettings' => ['branches' => [['id' => str_repeat('b', 65), 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
+			'invalid-branch-duplicate-ids' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => []], ['id' => 'branch-1', 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false
+			],
 		];
 	}
 
@@ -2003,10 +2093,165 @@ class FormsServiceTest extends TestCase {
 		$this->assertEmpty($result);
 	}
 
-	private function createQuestionEntity(array $data): MockObject {
-		$questionEntity = $this->createMock(Question::class);
-		$questionEntity->method('read')->willReturn($data);
+	public function testGetQuestionsWithBranches(): void {
+		$triggerQuestionData = [
+			'id' => 100,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
+			'order' => 1,
+			'isRequired' => true,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [
+				'branches' => [
+					['id' => 'branch-a', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]]],
+					['id' => 'branch-b', 'conditions' => [['type' => 'option_selected', 'optionId' => 11]]]
+				]
+			],
+			'parentQuestionId' => null,
+			'branchId' => null,
+		];
+
+		$subQuestionData = [
+			'id' => 101,
+			'formId' => 1,
+			'type' => 'short',
+			'text' => 'Sub Q in branch A',
+			'order' => 1,
+			'isRequired' => false,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [],
+			'parentQuestionId' => 100,
+			'branchId' => 'branch-a',
+		];
+
+		$triggerQuestion = $this->createQuestionEntity($triggerQuestionData);
+		$subQuestion = $this->createQuestionEntity($subQuestionData);
+
+		// Top-level questions and subquestions come from one query
+		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$triggerQuestion, $subQuestion]);
+		$this->optionMapper->method('findByQuestions')->willReturn([]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertCount(1, $result);
+		$this->assertEquals(Constants::ANSWER_TYPE_DROPDOWN, $result[0]['type']);
+		$this->assertArrayHasKey('extraSettings', $result[0]);
+		$this->assertArrayHasKey('branches', $result[0]['extraSettings']);
+
+		// Verify subquestion is attached to branch-a
+		$branchA = null;
+		foreach ($result[0]['extraSettings']['branches'] as $branch) {
+			if ($branch['id'] === 'branch-a') {
+				$branchA = $branch;
+				break;
+			}
+		}
+		$this->assertNotNull($branchA);
+		$this->assertArrayHasKey('subQuestions', $branchA);
+		$this->assertCount(1, $branchA['subQuestions']);
+		$this->assertEquals('Sub Q in branch A', $branchA['subQuestions'][0]['text']);
+
+		// Branch-b should have empty subQuestions
+		$branchB = null;
+		foreach ($result[0]['extraSettings']['branches'] as $branch) {
+			if ($branch['id'] === 'branch-b') {
+				$branchB = $branch;
+				break;
+			}
+		}
+		$this->assertNotNull($branchB);
+		$this->assertArrayHasKey('subQuestions', $branchB);
+		$this->assertEmpty($branchB['subQuestions']);
+	}
+
+	public function testGetQuestionsWithFileSubQuestion(): void {
+		$triggerQuestionData = [
+			'id' => 100,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
+			'order' => 1,
+			'isRequired' => true,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [
+				'branches' => [
+					['id' => 'branch-a', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]]]
+				]
+			],
+			'parentQuestionId' => null,
+			'branchId' => null,
+		];
+
+		$fileSubQuestionData = [
+			'id' => 101,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'text' => 'Upload file',
+			'order' => 1,
+			'isRequired' => false,
+			'name' => '',
+			'description' => '',
+			'extraSettings' => [
+				'allowedFileTypes' => ['image', 'application/pdf'],
+				'allowedFileExtensions' => ['txt', 'doc'],
+			],
+			'parentQuestionId' => 100,
+			'branchId' => 'branch-a',
+		];
+
+		$triggerQuestion = $this->createQuestionEntity($triggerQuestionData);
+		$fileSubQuestion = $this->createQuestionEntity($fileSubQuestionData);
+
+		// Top-level questions and subquestions come from one query
+		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$triggerQuestion, $fileSubQuestion]);
+		$this->optionMapper->method('findByQuestions')->willReturn([]);
+
+		$result = $this->formsService->getQuestions(1);
+
+		$this->assertCount(1, $result);
+		$branchA = $result[0]['extraSettings']['branches'][0];
+		$this->assertCount(1, $branchA['subQuestions']);
+
+		$fileQuestion = $branchA['subQuestions'][0];
+		$this->assertEquals(Constants::ANSWER_TYPE_FILE, $fileQuestion['type']);
+		$this->assertArrayHasKey('accept', $fileQuestion);
+		// Should have image/*, application/pdf, .txt, .doc
+		$this->assertContains('image/*', $fileQuestion['accept']);
+		$this->assertContains('application/pdf', $fileQuestion['accept']);
+		$this->assertContains('.txt', $fileQuestion['accept']);
+		$this->assertContains('.doc', $fileQuestion['accept']);
+	}
+
+	private function createQuestionEntity(array $data): Question {
+		$questionEntity = Question::fromParams($data);
+		$questionEntity->setId($data['id']);
 		return $questionEntity;
 	}
 
+	public function testGetQuestionSkipsSubquestionsOfOtherForms(): void {
+		$triggerQuestion = $this->createQuestionEntity([
+			'id' => 100,
+			'formId' => 1,
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
+			'order' => 1,
+			'extraSettings' => [
+				'branches' => [['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
+			],
+		]);
+		$ownSubQuestion = $this->createQuestionEntity(['id' => 101, 'formId' => 1, 'type' => 'short', 'text' => 'Own', 'order' => 1, 'parentQuestionId' => 100, 'branchId' => 'branch-a']);
+		$otherSubQuestion = $this->createQuestionEntity(['id' => 201, 'formId' => 2, 'type' => 'short', 'text' => 'Other form', 'order' => 2, 'parentQuestionId' => 100, 'branchId' => 'branch-a']);
+
+		$this->questionMapper->method('findById')->with(100)->willReturn($triggerQuestion);
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$ownSubQuestion, $otherSubQuestion]);
+		$this->optionMapper->method('findByQuestions')->willReturn([]);
+
+		$question = $this->formsService->getQuestion(100);
+
+		$this->assertSame(['Own'], array_column($question['extraSettings']['branches'][0]['subQuestions'], 'text'));
+	}
 }

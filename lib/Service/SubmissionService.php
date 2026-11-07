@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -241,7 +241,7 @@ class SubmissionService {
 		// Oldest first
 		$submissionEntities = array_reverse($submissionEntities);
 
-		$questions = $this->questionMapper->findByForm($form->getId());
+		$questions = $this->orderQuestionsForExport($this->questionMapper->findByForm($form->getId(), false, true));
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
@@ -587,13 +587,18 @@ class SubmissionService {
 
 	/**
 	 * Validate all answers against the questions
-	 * @param array $questions Array of the questions of the form
+	 *
+	 * Follow-up questions are validated, and can be answered, only when their branch is active.
+	 *
+	 * @param array $questions Array of the questions of the form, as returned by FormsService::getQuestions()
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
 	 * @param int $formId Id of the form being submitted
-	 * @throw \InvalidArgumentException if validation failed
+	 * @throws \InvalidArgumentException if validation failed
 	 */
 	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
+		$questions = $this->getVisibleQuestions($questions, $answers);
+
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -687,8 +692,8 @@ class SubmissionService {
 						// Accept numeric strings like "46" from JSON payloads reliably (e.g. with hardening extensions enabled)
 						$answerId = is_int($answer) ? $answer : (is_string($answer) ? intval(trim($answer)) : null);
 
-						// Reject non-numeric / malformed values early
-						if ($answerId === null || (string)$answerId !== (string)intval($answerId)) {
+						// Reject non-numeric / malformed values early, other notations of an option id like "05" as well
+						if ($answerId === null || (string)$answerId !== (string)$answer) {
 							throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($answer) ? (string)$answer : gettype($answer), $question['text']));
 						}
 
@@ -755,8 +760,9 @@ class SubmissionService {
 
 		// Check for excess answers
 		foreach ($answers as $id => $answerArray) {
-			// Search corresponding question, return false if not found
-			if (!in_array($id, array_column($questions, 'id'))) {
+			// Search corresponding question, return false if not found. Other notations of a question id like "1.0"
+			// would be stored for that question, but skip its validation.
+			if (!in_array($id, array_column($questions, 'id'), true)) {
 				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %d.', $id));
 			}
 		}
@@ -958,5 +964,109 @@ class SubmissionService {
 		// Explicitly type as string so values that start with '=' are not interpreted as formulas.
 		$activeWorksheet->getCell([$column, $row])
 			->setValueExplicit($value, DataType::TYPE_STRING);
+	}
+
+	/**
+	 * Put the subquestions of each question right after it, in branch order,
+	 * and leave out subquestions of branches that no longer exist
+	 *
+	 * @param Question[] $questions top-level questions and subquestions, sorted by order
+	 * @return list<Question>
+	 */
+	private function orderQuestionsForExport(array $questions): array {
+		$subQuestions = [];
+		foreach ($questions as $question) {
+			if ($question->getParentQuestionId() !== null) {
+				$subQuestions[$question->getParentQuestionId()][(string)$question->getBranchId()][] = $question;
+			}
+		}
+
+		$ordered = [];
+		foreach ($questions as $question) {
+			if ($question->getParentQuestionId() !== null) {
+				continue;
+			}
+			$ordered[] = $question;
+			foreach ($question->getExtraSettings()['branches'] ?? [] as $branch) {
+				array_push($ordered, ...($subQuestions[$question->getId()][(string)($branch['id'] ?? '')] ?? []));
+			}
+		}
+		return $ordered;
+	}
+
+	/**
+	 * List the questions shown for the given answers: the top-level questions,
+	 * each followed by the subquestions of its active branches
+	 *
+	 * @param list<array> $questions The questions of the form, as returned by FormsService::getQuestions()
+	 * @param array $answers The submitted answers, keyed by question id
+	 * @return list<array> The shown questions
+	 */
+	public function getVisibleQuestions(array $questions, array $answers): array {
+		$visible = [];
+		foreach ($questions as $question) {
+			$visible[] = $question;
+			// Empty extra settings can be an object
+			$branches = is_array($question['extraSettings'] ?? null) ? ($question['extraSettings']['branches'] ?? []) : [];
+			// Keys of the answer values do not matter, like for storing them
+			$answer = $answers[$question['id']] ?? [];
+			foreach ($this->findActiveBranches($question['type'], is_array($answer) ? array_values($answer) : [], $branches) as $branch) {
+				/** @var list<array> $subQuestions */
+				$subQuestions = $branch['subQuestions'] ?? [];
+				array_push($visible, ...$subQuestions);
+			}
+		}
+		return $visible;
+	}
+
+	/**
+	 * Find the active branches based on the answer of their question
+	 *
+	 * @param string $triggerType The type of the question
+	 * @param array $triggerAnswer The trigger answer values
+	 * @param array $branches The available branches
+	 * @return array The active branches or empty array if none matches
+	 */
+	private function findActiveBranches(string $triggerType, array $triggerAnswer, array $branches): array {
+		return array_filter($branches, function ($branch) use ($triggerType, $triggerAnswer) {
+			$conditions = $branch['conditions'] ?? [];
+			if (empty($conditions)) {
+				return false;
+			}
+			return $this->evaluateBranchConditions($triggerType, $triggerAnswer, $conditions);
+		});
+	}
+
+	/**
+	 * Evaluate if branch conditions match the trigger answer
+	 *
+	 * @param string $triggerType The type of the question
+	 * @param array $triggerAnswer The answer values of the question
+	 * @param array $conditions The conditions to evaluate
+	 * @return bool True if conditions match
+	 */
+	private function evaluateBranchConditions(string $triggerType, array $triggerAnswer, array $conditions): bool {
+		// Option ids arrive as numbers or strings depending on the trigger component
+		$selectedOptionIds = array_map('strval', array_filter($triggerAnswer, 'is_scalar'));
+
+		// An unanswered trigger activates no branch
+		if ($triggerAnswer === [] || ($triggerAnswer[0] ?? '') === '') {
+			return false;
+		}
+
+		switch ($triggerType) {
+			case Constants::ANSWER_TYPE_MULTIPLEUNIQUE:
+			case Constants::ANSWER_TYPE_DROPDOWN:
+				// Single select: check if selected option matches any condition
+				foreach ($conditions as $condition) {
+					$optionId = $condition['optionId'] ?? null;
+					if (is_scalar($optionId) && in_array((string)$optionId, $selectedOptionIds, true)) {
+						return true;
+					}
+				}
+				return false;
+			default:
+				return false;
+		}
 	}
 }

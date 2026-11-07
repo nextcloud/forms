@@ -34,6 +34,7 @@ use OCA\Forms\AuditLog\Operation;
 use OCA\Forms\BackgroundJob\SyncSubmissionsWithLinkedFileJob;
 use OCA\Forms\Constants;
 use OCA\Forms\Controller\ApiController;
+use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
@@ -103,6 +104,8 @@ class ApiControllerTest extends TestCase {
 	private array $dispatchedEvents = [];
 
 	public function setUp(): void {
+		parent::setUp();
+
 		$this->answerMapper = $this->createMock(AnswerMapper::class);
 		$this->formMapper = $this->createMock(FormMapper::class);
 		$this->optionMapper = $this->createMock(OptionMapper::class);
@@ -112,6 +115,9 @@ class ApiControllerTest extends TestCase {
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->submissionService = $this->createMock(SubmissionService::class);
+		// Branches are evaluated by the service, here all follow-up questions are shown
+		$this->submissionService->method('getVisibleQuestions')
+			->willReturnCallback(static fn (array $questions): array => FormsService::flattenQuestions($questions));
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
 		$this->userManager = $this->createMock(IUserManager::class);
@@ -282,7 +288,32 @@ class ApiControllerTest extends TestCase {
 					],
 					'filteredSubmissionsCount' => 1,
 				]
-			]
+			],
+			'subquestion' => [
+				'submissions' => [
+					['userId' => 'jdoe', 'answers' => [['questionId' => 2, 'text' => 'Rex']]]
+				],
+				'questions' => [[
+					'id' => 1,
+					'name' => '',
+					'extraSettings' => ['branches' => [['id' => 'branch-1', 'subQuestions' => [['id' => 2, 'name' => 'pet']]]]],
+				]],
+				'expected' => [
+					'submissions' => [
+						[
+							'userId' => 'jdoe',
+							'answers' => [['questionId' => 2, 'text' => 'Rex', 'questionName' => 'pet']],
+							'userDisplayName' => 'jdoe',
+						]
+					],
+					'questions' => [[
+						'id' => 1,
+						'name' => '',
+						'extraSettings' => ['branches' => [['id' => 'branch-1', 'subQuestions' => [['id' => 2, 'name' => 'pet']]]]],
+					]],
+					'filteredSubmissionsCount' => 1,
+				]
+			],
 		];
 	}
 
@@ -900,7 +931,7 @@ class ApiControllerTest extends TestCase {
 
 		$this->answerMapper->expects($this->exactly(5))
 			->method('insert')
-			->with($this->callback(function ($answer) {
+			->with($this->callback(function (Answer $answer) {
 				if ($answer->getSubmissionId() !== 12) {
 					return false;
 				}
@@ -918,6 +949,11 @@ class ApiControllerTest extends TestCase {
 						break;
 					case 3:
 						if ($answer->getText() !== 'short anwer') {
+							return false;
+						}
+						break;
+					case 4:
+						if ($answer->getFileId() !== 100 || $answer->getText() !== 'uploaded-file.txt') {
 							return false;
 						}
 						break;
@@ -939,6 +975,12 @@ class ApiControllerTest extends TestCase {
 			->willReturn(true);
 
 		$file = $this->createMock(File::class);
+		$file->expects($this->once())
+			->method('getName')
+			->willReturn('uploaded-file.txt');
+		$file->expects($this->once())
+			->method('move')
+			->with('/admin/files/submission-12/uploaded-file.txt');
 
 		$uploadedFile = new UploadedFile();
 		$uploadedFile->setFileId(100);
@@ -949,9 +991,17 @@ class ApiControllerTest extends TestCase {
 
 		$userFolder->expects($this->once())
 			->method('getById')
+			->with(100)
 			->willReturn([$file]);
 
 		$folder = $this->createMock(Folder::class);
+		$folder->expects($this->once())
+			->method('getNonExistingName')
+			->with('uploaded-file.txt')
+			->willReturn('uploaded-file.txt');
+		$folder->expects($this->once())
+			->method('getPath')
+			->willReturn('/admin/files/submission-12');
 
 		$userFolder->expects($this->once())
 			->method('get')
@@ -963,6 +1013,290 @@ class ApiControllerTest extends TestCase {
 			->willReturn($userFolder);
 
 		$this->apiController->newSubmission(1, $answers, '');
+	}
+
+	public static function dataNewSubmission_fileUploadAuthorization(): array {
+		return [
+			'ordinary valid token' => [false, 'valid-upload-token', true],
+			'ordinary foreign token' => [false, 'foreign-upload-token', false],
+			'ordinary missing token' => [false, null, false],
+			'ordinary empty token' => [false, '', false],
+			'follow-up valid token' => [true, 'valid-upload-token', true],
+			'follow-up foreign token' => [true, 'foreign-upload-token', false],
+			'follow-up missing token' => [true, null, false],
+			'follow-up empty token' => [true, '', false],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewSubmission_fileUploadAuthorization
+	 */
+	public function testNewSubmission_fileUploadAuthorization(bool $followUp, ?string $uploadToken, bool $authorized): void {
+		$form = Form::fromParams(['id' => 7, 'hash' => 'hash', 'ownerId' => 'admin']);
+		$fileQuestion = [
+			'id' => 8,
+			'formId' => 7,
+			'name' => null,
+			'text' => 'File question',
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'options' => [],
+			'extraSettings' => ['maxAllowedFilesCount' => 1],
+		];
+		$branch = [
+			'id' => 'file-branch',
+			'conditions' => [['type' => 'option_selected', 'optionId' => 3]],
+			'subQuestions' => [$fileQuestion],
+		];
+		$question = $followUp ? [
+			'id' => 9,
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Question with branches',
+			'options' => [['id' => 3, 'text' => 'Attach a file']],
+			'extraSettings' => [
+				'branches' => [$branch],
+			],
+		] : $fileQuestion;
+		$fileAnswer = ['uploadedFileId' => '10', 'fileName' => 'client-supplied.txt'];
+		if ($uploadToken !== null) {
+			$fileAnswer['uploadToken'] = $uploadToken;
+		}
+		$answers = $followUp
+			? [9 => ['3'], 8 => [$fileAnswer]]
+			: [8 => [$fileAnswer]];
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(7, '')
+			->willReturn($form);
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(7)
+			->willReturn([$question]);
+		$this->formAccess();
+
+		// Validation succeeds so storage must independently authorize the upload.
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with([$question], $answers, 'admin', 7);
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function (Submission $submission): Submission {
+				$this->assertSame(7, $submission->getFormId());
+				$submission->setId(12);
+				return $submission;
+			});
+
+		$expectedAnswers = $followUp ? [[9, 12, null, 'Attach a file']] : [];
+		if ($authorized) {
+			$expectedAnswers[] = [8, 12, 99, 'real-file.txt'];
+		}
+		$this->answerMapper->expects($this->exactly(count($expectedAnswers)))
+			->method('insert')
+			->willReturnCallback(function (Answer $answer) use (&$expectedAnswers): Answer {
+				$this->assertSame(array_shift($expectedAnswers), [
+					$answer->getQuestionId(),
+					$answer->getSubmissionId(),
+					$answer->getFileId(),
+					$answer->getText(),
+				]);
+				return $answer;
+			});
+
+		$uploadedFile = UploadedFile::fromParams([
+			'id' => 10,
+			'formId' => 7,
+			'questionId' => 8,
+			'uploadToken' => 'valid-upload-token',
+			'fileId' => 99,
+		]);
+		$lookup = $this->uploadedFileMapper->expects($this->once())
+			->method('getForSubmission')
+			->with($this->identicalTo(10), 7, 8, $uploadToken ?? '');
+		$this->uploadedFileMapper->expects($this->never())->method('getByUploadedFileId');
+		$this->uploadedFileMapper->expects($this->never())->method('findByUploadedFileId');
+		$this->uploadedFileMapper->expects($authorized ? $this->once() : $this->never())
+			->method('delete')
+			->with($uploadedFile);
+
+		$file = $this->createMock(File::class);
+		$file->expects($authorized ? $this->once() : $this->never())
+			->method('getName')
+			->willReturn('real-file.txt');
+		$file->expects($authorized ? $this->once() : $this->never())
+			->method('move')
+			->with('/admin/files/Forms/submission-12/question-8/real-file.txt');
+		$folder = $this->createMock(Folder::class);
+		$folder->expects($authorized ? $this->once() : $this->never())
+			->method('getNonExistingName')
+			->with('real-file.txt')
+			->willReturn('real-file.txt');
+		$folder->expects($authorized ? $this->once() : $this->never())
+			->method('getPath')
+			->willReturn('/admin/files/Forms/submission-12/question-8');
+		$userFolder = $this->createMock(Folder::class);
+		$userFolder->expects($authorized ? $this->once() : $this->never())
+			->method('nodeExists')
+			->with('Forms/submission-12/question-8')
+			->willReturn(true);
+		$userFolder->expects($authorized ? $this->once() : $this->never())
+			->method('get')
+			->with('Forms/submission-12/question-8')
+			->willReturn($folder);
+		$userFolder->expects($authorized ? $this->once() : $this->never())
+			->method('getById')
+			->with(99)
+			->willReturn([$file]);
+		$this->storage->expects($authorized ? $this->once() : $this->never())
+			->method('getUserFolder')
+			->with('admin')
+			->willReturn($userFolder);
+		$this->formsService->expects($authorized ? $this->once() : $this->never())
+			->method('getUploadedFilePath')
+			->with($form, 12, 8, null, 'File question')
+			->willReturn('Forms/submission-12/question-8');
+		$this->formsService->expects($authorized ? $this->once() : $this->never())
+			->method('notifyNewSubmission');
+
+		if ($authorized) {
+			$lookup->willReturn($uploadedFile);
+		} else {
+			$lookup->willThrowException(new DoesNotExistException('Upload authorization failed'));
+			$this->expectException(DoesNotExistException::class);
+			$this->expectExceptionMessage('Upload authorization failed');
+		}
+
+		$this->assertEquals(new DataResponse(null, Http::STATUS_CREATED), $this->apiController->newSubmission(7, $answers, ''));
+	}
+
+	public function testNewSubmission_questionWithBranches() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('admin');
+
+		$questions = [
+			[
+				'id' => 100,
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Trigger Q',
+				'extraSettings' => [
+					'branches' => [
+						[
+							'id' => 'branch-a',
+							'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+							'subQuestions' => [
+								[
+									'id' => 101,
+									'type' => 'short',
+									'text' => 'Sub Q',
+									'isRequired' => false,
+								]
+							]
+						]
+					]
+				],
+				'options' => [
+					['id' => 10, 'text' => 'Option A'],
+					['id' => 11, 'text' => 'Option B'],
+				],
+			],
+		];
+
+		$answers = [
+			100 => ['10'],
+			101 => ['Sub answer'],
+		];
+
+		$this->formsService->expects($this->once())
+			->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('getQuestions')
+			->with(1)
+			->willReturn($questions);
+
+		$this->formAccess();
+
+		$this->submissionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function ($submission) {
+				$submission->setId(12);
+				return true;
+			}));
+
+		// Answer of the question + answer of the follow-up question = 2 inserts
+		$this->answerMapper->expects($this->exactly(2))
+			->method('insert');
+
+		$this->formsService->expects($this->once())
+			->method('notifyNewSubmission');
+
+		$this->apiController->newSubmission(1, $answers, '');
+	}
+
+	public function testNewSubmissionStoresSubquestionsLikeQuestions(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('admin');
+
+		$branch = [
+			'id' => 'branch-a',
+			'conditions' => [['optionId' => 10]],
+			'subQuestions' => [
+				[
+					'id' => 101,
+					'type' => Constants::ANSWER_TYPE_RANKING,
+					'text' => 'Rank',
+					'extraSettings' => [],
+					'options' => [['id' => 1, 'text' => 'R1'], ['id' => 2, 'text' => 'R2']],
+				],
+				[
+					'id' => 102,
+					'type' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+					'text' => 'Radio',
+					'extraSettings' => ['allowOtherAnswer' => true],
+					'options' => [['id' => 3, 'text' => 'Fixed']],
+				],
+			],
+		];
+		$question = [
+			'id' => 100,
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
+			'extraSettings' => [
+				'branches' => [$branch],
+			],
+			'options' => [['id' => 10, 'text' => 'Option A']],
+		];
+
+		$this->formsService->method('loadFormForSubmission')->willReturn($form);
+		$this->formsService->method('getQuestions')->willReturn([$question]);
+		$this->formAccess();
+		$this->submissionMapper->method('insert')->willReturnCallback(function ($submission) {
+			$submission->setId(12);
+			return $submission;
+		});
+
+		$stored = [];
+		$this->answerMapper->method('insert')->willReturnCallback(function (Answer $answer) use (&$stored) {
+			$stored[] = [$answer->getQuestionId(), $answer->getText()];
+			return $answer;
+		});
+
+		$this->apiController->newSubmission(1, [
+			100 => [10],
+			101 => ['2', '1'],
+			102 => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'typed'],
+		], '');
+
+		$this->assertSame([
+			[100, 'Option A'],
+			[101, '["2","1"]'],
+			[102, 'typed'],
+		], $stored);
 	}
 
 	public function testNewSubmission_formNotFound() {
@@ -1409,6 +1743,94 @@ class ApiControllerTest extends TestCase {
 			'extraSettings' => ['validationType' => 'text'],
 		]));
 		$this->assertNull($form->getConfirmationEmailQuestionId());
+	}
+
+	private function mockEditableForm(int $formId = 1): Form {
+		$form = new Form();
+		$form->setId($formId);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService->method('isFormArchived')->willReturn(false);
+
+		return $form;
+	}
+
+	private function createQuestionWithBranches(): Question {
+		$question = new Question();
+		$question->setId(100);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+		$question->setExtraSettings([
+			'branches' => [
+				['id' => 'branch-a', 'conditions' => [['optionId' => 10]]],
+				['id' => 'branch-b', 'conditions' => [['optionId' => 11]]],
+			],
+		]);
+		return $question;
+	}
+
+	private function createSubQuestion(int $id, string $branchId, int $order): Question {
+		$question = new Question();
+		$question->setId($id);
+		$question->setFormId(1);
+		$question->setOrder($order);
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+		$question->setParentQuestionId(100);
+		$question->setBranchId($branchId);
+		return $question;
+	}
+
+	public function testReorderQuestionsRejectsSubquestion(): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([$this->createQuestionWithBranches()]);
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Subquestions can only be reordered within their branch');
+		$this->apiController->reorderQuestions(1, [101]);
+	}
+
+	public static function dataUpdateQuestionRejectsKeys(): array {
+		return [
+			'parentQuestionId' => [['parentQuestionId' => 200]],
+			'branchId' => [['branchId' => 'branch-x']],
+			'options' => [['options' => []]],
+			'accept' => [['accept' => []]],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionRejectsKeys')]
+	public function testUpdateQuestionRejectsKeys(array $keyValuePairs): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->updateQuestion(1, 101, $keyValuePairs);
+	}
+
+	public static function dataUpdateQuestionRejectsBranchChanges(): array {
+		return [
+			'type of a question with branches' => [true, ['type' => Constants::ANSWER_TYPE_DROPDOWN], 'Not allowed to change the type of a question with follow-up questions'],
+			'branches of a subquestion' => [false, ['extraSettings' => ['branches' => [['id' => 'nested', 'conditions' => []]]]], 'Nested follow-up questions are not supported'],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionRejectsBranchChanges')]
+	public function testUpdateQuestionRejectsBranchChanges(bool $withBranches, array $keyValuePairs, string $message): void {
+		$this->mockEditableForm();
+		$question = $withBranches ? $this->createQuestionWithBranches() : $this->createSubQuestion(101, 'branch-a', 1);
+		$this->questionMapper->method('findById')->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage($message);
+		$this->apiController->updateQuestion(1, $question->getId(), $keyValuePairs);
 	}
 
 	public function testDeleteQuestionClearsConfirmationEmailQuestionIdWhenDeletingSelectedQuestion(): void {
@@ -2759,5 +3181,520 @@ class ApiControllerTest extends TestCase {
 		// Should succeed - user has RESULTS_DELETE via share
 		$response = $this->apiController->updateSubmission($formId, $submissionId, $answers);
 		$this->assertEquals(new DataResponse($submissionId), $response);
+	}
+
+	// Follow-up questions in branches
+
+	public function testNewQuestion_conditionalTypeIsGone() {
+		$form = new Form();
+		$form->setId(1);
+		$this->formsService->method('getFormIfAllowed')->willReturn($form);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		// Branches are part of normal questions, there is no type of its own for them
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Invalid type');
+		$this->apiController->newQuestion(1, 'conditional', null, 'Q');
+	}
+
+	public function testNewQuestion_subQuestion() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_DROPDOWN);
+		$parentQuestion->setExtraSettings(['branches' => [['id' => $branchId, 'conditions' => []]]]);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByBranch')
+			->with($parentQuestionId, $branchId)
+			->willReturn([]);
+
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function ($question) {
+				$question->setId(101);
+				return $question;
+			});
+
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(101)
+			->willReturn([
+				'id' => 101,
+				'formId' => $formId,
+				'type' => 'short',
+				'text' => 'Sub Q',
+				'order' => 1,
+				'isRequired' => false,
+				'name' => '',
+				'options' => [],
+				'accept' => [],
+				'description' => '',
+				'extraSettings' => [],
+				'parentQuestionId' => $parentQuestionId,
+				'branchId' => $branchId,
+			]);
+
+		$response = $this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
+		$data = $response->getData();
+		$this->assertEquals($parentQuestionId, $data['parentQuestionId']);
+		$this->assertEquals($branchId, $data['branchId']);
+	}
+
+	public function testNewQuestion_nestedFollowUpQuestionNotAllowed() {
+		$formId = 1;
+		$parentQuestionId = 101;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		// The parent is a follow-up question itself
+		$this->questionMapper->method('findById')->with($parentQuestionId)->willReturn($this->createSubQuestion($parentQuestionId, $branchId, 1));
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Nested follow-up questions are not supported');
+		$this->apiController->newQuestion($formId, 'short', null, 'Nested', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentNotFound() {
+		$formId = 1;
+		$parentQuestionId = 999;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willThrowException(new DoesNotExistException('Question not found'));
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->expectExceptionMessage('Could not find parent question');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentTypeWithoutBranches() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_GRID); // Can not have branches
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question can not have follow-up questions');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentDifferentForm() {
+		$formId = 1;
+		$parentQuestionId = 100;
+		$branchId = 'branch-1';
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId(999); // Different form
+		$parentQuestion->setType(Constants::ANSWER_TYPE_DROPDOWN);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question does not belong to this form');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
+	}
+
+	public function testNewQuestion_parentOfOtherFormIsNotDescribed() {
+		$form = new Form();
+		$form->setId(1);
+
+		// The type of a question of another form is not told
+		$parentQuestion = new Question();
+		$parentQuestion->setId(100);
+		$parentQuestion->setFormId(999);
+		$parentQuestion->setType('short');
+
+		$this->formsService->method('getFormIfAllowed')->willReturn($form);
+		$this->questionMapper->method('findById')->with(100)->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Parent question does not belong to this form');
+		$this->apiController->newQuestion(1, 'short', null, 'Sub Q', null, 100, 'branch-1');
+	}
+
+	public function testNewQuestion_missingBranchId() {
+		$formId = 1;
+		$parentQuestionId = 100;
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$parentQuestion = new Question();
+		$parentQuestion->setId($parentQuestionId);
+		$parentQuestion->setFormId($formId);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_DROPDOWN);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($parentQuestionId)
+			->willReturn($parentQuestion);
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('branchId is required when creating a subquestion');
+		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, null);
+	}
+
+	public function testDeleteQuestion_withSubquestions(): void {
+		$formId = 1;
+		$questionId = 100;
+
+		$form = new Form();
+		$form->setId($formId);
+
+		$question = new Question();
+		$question->setId($questionId);
+		$question->setFormId($formId);
+		$question->setType(Constants::ANSWER_TYPE_DROPDOWN);
+		$question->setOrder(1);
+
+		$subQuestion1 = new Question();
+		$subQuestion1->setId(101);
+		$subQuestion1->setFormId($formId);
+		$subQuestion1->setType('short');
+		$subQuestion1->setOrder(1);
+		$subQuestion1->setParentQuestionId($questionId);
+
+		$subQuestion2 = new Question();
+		$subQuestion2->setId(102);
+		$subQuestion2->setFormId($formId);
+		$subQuestion2->setType('long');
+		$subQuestion2->setOrder(2);
+		$subQuestion2->setParentQuestionId($questionId);
+
+		$this->formsService->expects($this->once())
+			->method('getFormIfAllowed')
+			->with($formId, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+
+		$this->formsService->expects($this->once())
+			->method('obtainFormLock')
+			->with($form);
+
+		$this->formsService->expects($this->once())
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with($questionId)
+			->willReturn($question);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByParentQuestion')
+			->with($questionId)
+			->willReturn([$subQuestion1, $subQuestion2]);
+
+		$this->questionMapper->expects($this->once())
+			->method('findByForm')
+			->with($formId)
+			->willReturn([]);
+
+		// Expect updates for: subQuestion1, subQuestion2, main question
+		$this->questionMapper->expects($this->exactly(3))
+			->method('update');
+
+		$this->formMapper->expects($this->once())
+			->method('update')
+			->with($form);
+
+		$response = $this->apiController->deleteQuestion($formId, $questionId);
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals($questionId, $response->getData());
+	}
+
+	public function testUpdateQuestionRemovedBranchDeletesSubquestions(): void {
+		$this->mockEditableForm();
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createQuestionWithBranches());
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([
+			$this->createSubQuestion(101, 'branch-a', 1),
+			$this->createSubQuestion(102, 'branch-b', 1),
+		]);
+
+		$updated = [];
+		$this->questionMapper->expects($this->exactly(2))
+			->method('update')
+			->willReturnCallback(function (Question $question) use (&$updated) {
+				$updated[$question->getId()] = $question;
+				return $question;
+			});
+
+		$this->apiController->updateQuestion(1, 100, ['extraSettings' => [
+			'branches' => [
+				['id' => 'branch-a', 'conditions' => [['optionId' => 10]], 'subQuestions' => [['id' => 101]]],
+			],
+		]]);
+
+		// Only the subquestion of the removed branch is deleted
+		$this->assertSame([102, 100], array_keys($updated));
+		$this->assertSame(0, $updated[102]->getOrder());
+		// Subquestions are stored as rows, not as a copy in the branches
+		$this->assertSame(
+			[['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
+			$updated[100]->getExtraSettings()['branches'],
+		);
+	}
+
+	public function testUpdateQuestionRemovedBranchDeletesFilesOfSubquestions(): void {
+		$this->mockEditableForm();
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$fileSubQuestion = $this->createSubQuestion(102, 'branch-b', 1);
+		$fileSubQuestion->setType(Constants::ANSWER_TYPE_FILE);
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createQuestionWithBranches());
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$fileSubQuestion]);
+
+		// Like for a deleted file question, the uploaded files are deleted
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(\OCA\Forms\BackgroundJob\DeleteQuestionFoldersJob::class, ['formId' => 1, 'questionId' => 102, 'ownerId' => 'currentUser']);
+
+		$this->apiController->updateQuestion(1, 100, ['extraSettings' => [
+			'branches' => [['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
+		]]);
+	}
+
+	public function testDeleteQuestionDeletesFilesOfSubquestions(): void {
+		$form = $this->mockEditableForm();
+		$form->setConfirmationEmailQuestionId(102);
+		$fileSubQuestion = $this->createSubQuestion(101, 'branch-a', 1);
+		$fileSubQuestion->setType(Constants::ANSWER_TYPE_FILE);
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createQuestionWithBranches());
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([
+			$fileSubQuestion,
+			$this->createSubQuestion(102, 'branch-b', 1),
+		]);
+		$this->questionMapper->method('findByForm')->willReturn([]);
+
+		$this->jobList->expects($this->once())
+			->method('add')
+			->with(\OCA\Forms\BackgroundJob\DeleteQuestionFoldersJob::class, ['formId' => 1, 'questionId' => 101, 'ownerId' => 'currentUser']);
+
+		$this->apiController->deleteQuestion(1, 100);
+		// A deleted subquestion can not be the recipient of the confirmation email
+		$this->assertNull($form->getConfirmationEmailQuestionId());
+	}
+
+	public function testDeleteSubQuestionRenumbersItsBranch(): void {
+		$this->mockEditableForm();
+		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
+		$sibling = $this->createSubQuestion(102, 'branch-a', 2);
+		$this->questionMapper->expects($this->once())
+			->method('findByBranch')
+			->with(100, 'branch-a')
+			->willReturn([$sibling]);
+		$this->questionMapper->expects($this->never())->method('findByForm');
+
+		$this->apiController->deleteQuestion(1, 101);
+		$this->assertSame(1, $sibling->getOrder());
+	}
+
+	public function testCloneQuestionCopiesSubquestionsAndOptions(): void {
+		$this->mockEditableForm();
+		$source = $this->createQuestionWithBranches();
+		$subQuestion = $this->createSubQuestion(101, 'branch-a', 1);
+
+		$this->questionMapper->method('findById')->with(100)->willReturn($source);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([$source]);
+		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$subQuestion]);
+
+		$sourceOption = fn (int $id) => \OCA\Forms\Db\Option::fromParams(['id' => $id, 'questionId' => 100, 'text' => 'Option ' . $id, 'order' => $id]);
+		$this->optionMapper->method('findByQuestion')
+			->willReturnCallback(fn (int $questionId) => $questionId === 100 ? [$sourceOption(10), $sourceOption(11)] : []);
+		$nextOptionId = 20;
+		$this->optionMapper->method('insert')->willReturnCallback(function ($option) use (&$nextOptionId) {
+			$option->setId($nextOptionId++);
+			return $option;
+		});
+
+		$inserted = [];
+		$nextQuestionId = 200;
+		$this->questionMapper->expects($this->exactly(2))
+			->method('insert')
+			->willReturnCallback(function (Question $question) use (&$inserted, &$nextQuestionId) {
+				$question->setId($nextQuestionId++);
+				$inserted[] = $question;
+				return $question;
+			});
+		$this->formsService->expects($this->once())
+			->method('getQuestion')
+			->with(200)
+			->willReturn(['id' => 200, 'extraSettings' => ['branches' => []]]);
+
+		$this->apiController->newQuestion(1, null, null, '', 100);
+
+		[$copy, $subCopy] = $inserted;
+		// The branch conditions point to the options of the copy
+		$this->assertSame(
+			[['optionId' => 20]],
+			$copy->getExtraSettings()['branches'][0]['conditions'],
+		);
+		$this->assertSame(200, $subCopy->getParentQuestionId());
+		$this->assertSame('branch-a', $subCopy->getBranchId());
+	}
+
+	public function testReorderSubQuestions(): void {
+		$form = $this->mockEditableForm();
+		$first = $this->createSubQuestion(101, 'branch-a', 1);
+		$second = $this->createSubQuestion(102, 'branch-a', 2);
+		$this->questionMapper->method('findByBranch')->with(100, 'branch-a')->willReturn([$first, $second]);
+		$this->questionMapper->method('findById')->willReturnMap([[100, $this->createQuestionWithBranches()], [101, $first], [102, $second]]);
+		$this->questionMapper->expects($this->exactly(2))->method('update');
+		$this->formMapper->expects($this->once())->method('update')->with($form);
+
+		$response = $this->apiController->reorderSubQuestions(1, 'branch-a', 100, [102, 101]);
+
+		$this->assertSame(['102' => ['order' => 1], '101' => ['order' => 2]], $response->getData());
+		$this->assertSame(2, $first->getOrder());
+		$this->assertSame(1, $second->getOrder());
+	}
+
+	public static function dataReorderSubQuestionsRejects(): array {
+		return [
+			'duplicates' => [[101, 101], OCSBadRequestException::class, null],
+			'wrong length' => [[101], OCSBadRequestException::class, null],
+			'unknown question' => [[101, 999], OCSNotFoundException::class, null],
+			'other form' => [[101, 102], OCSBadRequestException::class, 'formId'],
+			'other parent' => [[101, 102], OCSBadRequestException::class, 'parentQuestionId'],
+			'other branch' => [[101, 102], OCSBadRequestException::class, 'branchId'],
+			'deleted' => [[101, 102], OCSBadRequestException::class, 'order'],
+			'parent of other form' => [[101, 102], OCSBadRequestException::class, 'parent'],
+		];
+	}
+
+	/**
+	 * @dataProvider dataReorderSubQuestionsRejects
+	 */
+	public function testReorderSubQuestionsRejects(array $newOrder, string $exception, ?string $foreignKey): void {
+		$this->mockEditableForm();
+		$parent = $this->createQuestionWithBranches();
+		$first = $this->createSubQuestion(101, 'branch-a', 1);
+		$second = $this->createSubQuestion(102, 'branch-a', 2);
+		match ($foreignKey) {
+			'formId' => $second->setFormId(2),
+			'parentQuestionId' => $second->setParentQuestionId(200),
+			'branchId' => $second->setBranchId('branch-b'),
+			'order' => $second->setOrder(0),
+			// Nothing is told about the branches of other forms
+			'parent' => $parent->setFormId(2),
+			null => null,
+		};
+		$this->questionMapper->method('findByBranch')->willReturn([$first, $second]);
+		$this->questionMapper->method('findById')->willReturnCallback(fn (int $id) => match ($id) {
+			100 => $parent,
+			101 => $first,
+			102 => $second,
+			default => throw new DoesNotExistException('not found'),
+		});
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException($exception);
+		$this->apiController->reorderSubQuestions(1, 'branch-a', 100, $newOrder);
+	}
+
+	public function testReorderSubQuestionsArchivedForm(): void {
+		$form = new Form();
+		$form->setId(1);
+		$this->formsService->method('getFormIfAllowed')->willReturn($form);
+		$this->formsService->method('isFormArchived')->willReturn(true);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->reorderSubQuestions(1, 'branch-a', 100, [101]);
 	}
 }

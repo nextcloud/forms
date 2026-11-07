@@ -229,7 +229,7 @@
 		<!-- Summary view for visualization -->
 		<section v-else-if="isSummaryView">
 			<ResultsSummary
-				v-for="question in questions"
+				v-for="question in summaryQuestions"
 				:key="question.id"
 				:question="question"
 				:submissions="submissions" />
@@ -318,6 +318,7 @@ import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import { getBranches } from '../utils/Branches.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -430,6 +431,26 @@ export default defineComponent({
 		const viewForm = useViewForm({ form: () => props.form, emit })
 
 		const questions = ref<FormsQuestion[]>([])
+
+		/**
+		 * List the questions followed by the subquestions of all their branches
+		 *
+		 * @param formQuestions The questions of the form
+		 */
+		const flattenQuestions = (formQuestions: FormsQuestion[]): FormsQuestion[] =>
+			formQuestions.flatMap((question) => [
+				question,
+				...getBranches(question).flatMap(
+					(branch) => branch.subQuestions ?? [],
+				),
+			])
+
+		/**
+		 * Questions to summarize, subquestions like other questions
+		 */
+		const summaryQuestions = computed<FormsQuestion[]>(() =>
+			flattenQuestions(questions.value),
+		)
 		const submissions = ref<FormsSubmission[]>([])
 		const filteredSubmissionsCount = ref(0)
 		const isDownloadActionOpened = ref(false)
@@ -646,9 +667,10 @@ export default defineComponent({
 				}
 				const data = OcsResponse2Data<ResultsResponse>(response)
 
+				// Answers of subquestions are dates as well
 				submissions.value = formatDateAnswers(
 					data.submissions,
-					data.questions,
+					flattenQuestions(data.questions),
 				) as FormsSubmission[]
 				questions.value = data.questions
 				filteredSubmissionsCount.value = data.filteredSubmissionsCount
@@ -1074,6 +1096,7 @@ export default defineComponent({
 			t,
 			responseViews,
 			questions,
+			summaryQuestions,
 			submissions,
 			filteredSubmissionsCount,
 			isDownloadActionOpened,

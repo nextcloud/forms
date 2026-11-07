@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-only
 -->
 
@@ -270,6 +270,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
+| `branches`              | `dropdown`, `multiple_unique`                  | Array            | Array of [Branch objects](#branch-object)   | Branches with follow-up questions, see [Follow-up Questions](#follow-up-questions) |
 
 ### Option Types
 
@@ -282,3 +283,114 @@ Supported option types and their intended usage.
 | `column` | Represents a column header when rendering options in a grid-style question.                |
 
 `row` and `column` option types are primarily used together with `grid` question types to build a two-dimensional selection matrix. `choice` is the default for normal option lists.
+
+## Follow-up Questions
+
+Some question types can have branches of follow-up questions in `extraSettings.branches`. A branch is shown when the answer of its question matches one of the branch's conditions, and its follow-up questions are shown right below that question. Follow-up questions can not have branches themselves.
+
+### Question Properties for Subquestions
+
+Follow-up questions (subquestions) are questions of their own with additional properties:
+
+| Property         | Type    | Description                                                           |
+| ---------------- | ------- | --------------------------------------------------------------------- |
+| parentQuestionId | Integer | The ID of the question the branch belongs to (null for other questions) |
+| branchId         | String  | The ID of the branch this subquestion belongs to                      |
+
+### Question Types With Branches
+
+| Question Type     | Condition Types   | Description                         |
+| ----------------- | ----------------- | ----------------------------------- |
+| `multiple_unique` | `option_selected` | Radio buttons - the selected option |
+| `dropdown`        | `option_selected` | Dropdown - the selected option      |
+
+A branch is shown when any of its conditions matches. Several branches can be shown at once.
+
+### Branch Object
+
+A branch defines conditions and the subquestions that appear when those conditions are met. The subquestions are only part of a branch when reading a question, they are created, changed and deleted like other questions.
+
+| Property     | Type                                     | Description                                    |
+| ------------ | ---------------------------------------- | ---------------------------------------------- |
+| id           | String                                   | Unique identifier for the branch, at most 64 characters |
+| conditions   | Array of [Conditions](#condition-object) | Conditions that must be met to show the branch |
+| subQuestions | Array of [Questions](#question)          | Questions shown when conditions are met        |
+
+```json
+{
+	"id": "branch-1705587600000",
+	"conditions": [{ "type": "option_selected", "optionId": 42 }],
+	"subQuestions": [
+		{
+			"id": 101,
+			"formId": 3,
+			"order": 1,
+			"type": "short",
+			"text": "Please provide details",
+			"parentQuestionId": 100,
+			"branchId": "branch-1705587600000"
+		}
+	]
+}
+```
+
+### Condition Object
+
+Conditions determine when a branch is activated. The structure depends on the type of the question.
+
+#### option_selected (for dropdown, multiple_unique)
+
+```json
+{ "type": "option_selected", "optionId": 42 }
+```
+
+### Example
+
+A dropdown question with a branch of follow-up questions:
+
+```json
+{
+	"id": 100,
+	"formId": 3,
+	"order": 1,
+	"type": "dropdown",
+	"isRequired": true,
+	"text": "Do you have any dietary restrictions?",
+	"options": [
+		{ "id": 42, "questionId": 100, "order": 1, "text": "Yes" },
+		{ "id": 43, "questionId": 100, "order": 2, "text": "No" }
+	],
+	"extraSettings": {
+		"branches": [
+			{
+				"id": "branch-yes",
+				"conditions": [{ "type": "option_selected", "optionId": 42 }],
+				"subQuestions": [
+					{
+						"id": 101,
+						"formId": 3,
+						"order": 1,
+						"type": "long",
+						"text": "Please describe your dietary restrictions",
+						"parentQuestionId": 100,
+						"branchId": "branch-yes"
+					}
+				]
+			}
+		]
+	}
+}
+```
+
+### Answers
+
+Follow-up questions are answered like any other question, keyed by their own id:
+
+```json
+{
+	"100": ["42"],
+	"101": ["Vegetarian, no nuts"]
+}
+```
+
+Only the follow-up questions of the branches the answers open can be answered, and only those are required.

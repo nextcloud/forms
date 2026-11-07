@@ -1,5 +1,5 @@
 <!--
-  - SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
@@ -150,9 +150,20 @@
 						:values="answers[question.id]"
 						@keydown.enter="onKeydownEnter"
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="
-							(values: AnswerValue) => onUpdate(question, values)
-						" />
+						@update:values="onUpdate(question, $event)">
+						<template v-if="canHaveBranches(question.type)" #branches>
+							<ActiveSubQuestions
+								ref="subQuestionRefs"
+								:subQuestions="visibleSubQuestions(question)"
+								:index="index + 1"
+								:formId="form.id"
+								:answers="answers"
+								:maxStringLengths="maxStringLengths"
+								@keydown.enter="onKeydownEnter"
+								@keydown.ctrl.enter="onKeydownCtrlEnter"
+								@update:values="onUpdate" />
+						</template>
+					</component>
 				</ul>
 				<div class="form-buttons">
 					<NcButton
@@ -228,11 +239,7 @@
 </template>
 
 <script lang="ts">
-import type {
-	FormsOption,
-	FormsQuestion,
-	GridQuestionValues,
-} from '../types/Entities.d.ts'
+import type { FormsQuestion, GridQuestionValues } from '../types/Entities.d.ts'
 
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
@@ -268,6 +275,7 @@ import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import ActiveSubQuestions from '../components/Conditional/ActiveSubQuestions.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
@@ -281,6 +289,11 @@ import {
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import {
+	canHaveBranches,
+	getBranches,
+	getVisibleSubQuestions,
+} from '../utils/Branches.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -297,14 +310,6 @@ interface StoredAnswerState {
 
 interface StoredAnswersMap {
 	[key: string]: StoredAnswerState
-}
-
-interface SubmitQuestion extends FormsQuestion {
-	options?: FormsOption[]
-	extraSettings?: Record<string, unknown> & {
-		allowOtherAnswer?: boolean
-	}
-	isRequired?: boolean
 }
 
 interface LoadedSubmissionAnswer {
@@ -341,6 +346,7 @@ export default defineComponent({
 	name: 'Submit',
 
 	components: {
+		ActiveSubQuestions,
 		NcAppContent,
 		NcButton,
 		NcDialog,
@@ -398,6 +404,9 @@ export default defineComponent({
 		const questionRefs = ref<
 			QuestionComponentRef[] | QuestionComponentRef | null
 		>(null)
+		const subQuestionRefs = ref<
+			QuestionComponentRef[] | QuestionComponentRef | null
+		>(null)
 		const viewForm = useViewForm({
 			form: () => props.form,
 			emit,
@@ -415,28 +424,62 @@ export default defineComponent({
 		const showClearFormDueToChangeDialog = ref(false)
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
-		const validQuestions = computed<SubmitQuestion[]>(() => {
-			return props.form.questions.filter((question: FormsQuestion) => {
-				// All questions must have a valid title
-				if (question.text?.trim() === '') {
-					return false
-				}
+		/**
+		 * Questions are only shown with a title and valid content
+		 *
+		 * @param question the question
+		 */
+		function isShownQuestion(question: FormsQuestion): boolean {
+			if (!question.text?.trim()) {
+				return false
+			}
+			return answerTypes[question.type]?.validate?.(question) ?? true
+		}
 
-				// If specific conditions provided, test against them
-				const answerType = answerTypes[question.type]
-				if (typeof answerType.validate === 'function') {
-					return answerType.validate(question)
-				}
-				return true
-			}) as SubmitQuestion[]
-		})
+		const validQuestions = computed<FormsQuestion[]>(() =>
+			props.form.questions.filter(isShownQuestion),
+		)
+
+		// Questions that can be answered, with the subquestions of all branches
+		const answerableQuestions = computed<FormsQuestion[]>(() =>
+			validQuestions.value.flatMap((question) => [
+				question,
+				...getBranches(question)
+					.flatMap((branch) => branch.subQuestions ?? [])
+					.filter(isShownQuestion),
+			]),
+		)
 
 		const validQuestionsIds = computed<Set<number>>(() => {
-			return new Set(validQuestions.value.map((question) => question.id))
+			return new Set(answerableQuestions.value.map((question) => question.id))
+		})
+
+		/**
+		 * @param question a question with branches
+		 */
+		function visibleSubQuestions(question: FormsQuestion): FormsQuestion[] {
+			return getVisibleSubQuestions(
+				question,
+				answers.value[question.id],
+				isShownQuestion,
+			)
+		}
+
+		// The answers to send, answers of hidden subquestions are kept for when they are shown again
+		const visibleAnswers = computed<AnswersMap>(() => {
+			const visible: AnswersMap = {}
+			for (const question of validQuestions.value) {
+				for (const { id } of [question, ...visibleSubQuestions(question)]) {
+					if (answers.value[id] !== undefined) {
+						visible[id] = answers.value[id]
+					}
+				}
+			}
+			return visible
 		})
 
 		const isRequiredUsed = computed<boolean>(() => {
-			return props.form.questions.some((question: FormsQuestion) =>
+			return answerableQuestions.value.some((question) =>
 				Boolean(question.isRequired),
 			)
 		})
@@ -598,7 +641,7 @@ export default defineComponent({
 		})
 
 		const hasAnswers = computed<boolean>(() => {
-			return Object.keys(answers.value).length > 0
+			return Object.keys(visibleAnswers.value).length > 0
 		})
 
 		const submissionId = computed<number | null>(() => {
@@ -644,12 +687,14 @@ export default defineComponent({
 					continue
 				}
 
-				localAnswers[parseInt(questionId, 10)] = [
-					'QuestionMultiple',
-					'QuestionRanking',
-				].includes(answer.type)
-					? (answer.value as string[]).map(String)
-					: answer.value
+				if (
+					['QuestionMultiple', 'QuestionRanking'].includes(answer.type)
+					&& Array.isArray(answer.value)
+				) {
+					localAnswers[parseInt(questionId, 10)] = answer.value.map(String)
+				} else {
+					localAnswers[parseInt(questionId, 10)] = answer.value
+				}
 			}
 			answers.value = localAnswers
 		}
@@ -659,7 +704,7 @@ export default defineComponent({
 		 *
 		 * @param question Question to update
 		 */
-		function addFormFieldToLocalStorage(question: SubmitQuestion): void {
+		function addFormFieldToLocalStorage(question: FormsQuestion): void {
 			if (!props.isLoggedIn) {
 				return
 			}
@@ -686,7 +731,7 @@ export default defineComponent({
 				return
 			}
 			const state: StoredAnswersMap = {}
-			for (const question of validQuestions.value) {
+			for (const question of answerableQuestions.value) {
 				const value = answers.value[question.id]
 				if (
 					value === undefined
@@ -739,34 +784,25 @@ export default defineComponent({
 				const loaded: AnswersMap = {}
 				const loadedAnswers =
 					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
-				for (const answer of loadedAnswers) {
-					const questionId = Number(answer.questionId)
-					const text = answer.text
 
-					// Only initialize once, don't overwrite previous answers
-					if (!loaded[questionId]) {
-						loaded[questionId] = []
-					}
-					// Grid answers get replaced by a values-object below, all
+				/**
+				 * Restore a stored answer text to the values the question component expects
+				 *
+				 * @param question The question
+				 * @param text The stored answer text
+				 * @param values The values restored so far for this question
+				 * @return The values of the question
+				 */
+				function restoreAnswer(
+					question: FormsQuestion,
+					text: string,
+					values: AnswerValue = [],
+				): AnswerValue {
+					const questionId = question.id
+					// Grid answers are returned as a values-object, all
 					// other question types collect their answers in this list
-					const questionAnswers = loaded[questionId] as string[]
+					const questionAnswers = values as string[]
 
-					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
-					// Clean up answers for questions that do not exist anymore
-					if (!validQuestionsIds.value.has(questionId)) {
-						showClearFormDueToChangeDialog.value = true
-						logger.debug('Question does not exist anymore', {
-							questionId,
-						})
-						continue
-					}
-
-					const question = props.form.questions.find(
-						(question: FormsQuestion) => question.id === questionId,
-					) as SubmitQuestion | undefined
-					if (!question) {
-						continue
-					}
 					if (question.type === 'ranking') {
 						try {
 							questionAnswers.push(...JSON.parse(text).map(String))
@@ -826,7 +862,7 @@ export default defineComponent({
 									restoredValues[Number(rowId)] = rowValue
 								}
 							}
-							loaded[questionId] = restoredValues
+							return restoredValues
 						} catch (error) {
 							logger.debug(
 								`Could not parse grid answer ${text} for question ${questionId}`,
@@ -871,6 +907,36 @@ export default defineComponent({
 					} else {
 						questionAnswers.push(text)
 					}
+					return questionAnswers
+				}
+
+				for (const answer of loadedAnswers) {
+					const questionId = Number(answer.questionId)
+					const text = answer.text
+
+					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
+
+					// Clean up answers for questions that do not exist anymore
+					if (!validQuestionsIds.value.has(questionId)) {
+						showClearFormDueToChangeDialog.value = true
+						logger.debug('Question does not exist anymore', {
+							questionId,
+						})
+						continue
+					}
+
+					const question = answerableQuestions.value.find(
+						(question) => question.id === questionId,
+					)
+					if (!question) {
+						continue
+					}
+
+					loaded[questionId] = restoreAnswer(
+						question,
+						text,
+						loaded[questionId],
+					)
 				}
 
 				answers.value = loaded
@@ -889,7 +955,7 @@ export default defineComponent({
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
-		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
+		function onUpdate(question: FormsQuestion, values: AnswerValue): void {
 			answers.value = {
 				...answers.value,
 				[question.id]: values,
@@ -904,7 +970,7 @@ export default defineComponent({
 		 * @param values The updated question values.
 		 */
 		function updateQuestionValues(
-			question: SubmitQuestion,
+			question: FormsQuestion,
 			values: AnswerValue,
 		): void {
 			onUpdate(question, values)
@@ -998,9 +1064,12 @@ export default defineComponent({
 			const rawQuestionRefs = Array.isArray(questionRefs.value)
 				? questionRefs.value
 				: [questionRefs.value].filter(Boolean)
-			const validation = (rawQuestionRefs as QuestionComponentRef[]).map(
-				async (question) => await question.validate(),
-			)
+			const rawSubQuestionRefs = Array.isArray(subQuestionRefs.value)
+				? subQuestionRefs.value
+				: [subQuestionRefs.value].filter(Boolean)
+			const validation = (
+				[...rawQuestionRefs, ...rawSubQuestionRefs] as QuestionComponentRef[]
+			).map(async (question) => await question.validate())
 
 			try {
 				// wait for all to be validated
@@ -1011,8 +1080,8 @@ export default defineComponent({
 
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
-					Object.keys(answers.value).length === 0
-					|| Object.values(answers.value).every((localAnswers) =>
+					Object.keys(visibleAnswers.value).length === 0
+					|| Object.values(visibleAnswers.value).every((localAnswers) =>
 						Array.isArray(localAnswers)
 							? localAnswers.length === 0
 							: Object.keys(localAnswers).length === 0,
@@ -1047,7 +1116,7 @@ export default defineComponent({
 							},
 						),
 						{
-							answers: answers.value,
+							answers: visibleAnswers.value,
 						},
 					)
 				} else {
@@ -1056,7 +1125,7 @@ export default defineComponent({
 							id: props.form.id,
 						}),
 						{
-							answers: answers.value,
+							answers: visibleAnswers.value,
 							shareHash: props.shareHash,
 						},
 					)
@@ -1242,6 +1311,9 @@ export default defineComponent({
 			onSubmit,
 			onUpdate,
 			questionRefs,
+			subQuestionRefs,
+			canHaveBranches,
+			visibleSubQuestions,
 			showClearFormDialog,
 			showClearFormDueToChangeDialog,
 			showConfirmEmptyModal,

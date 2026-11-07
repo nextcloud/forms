@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2019-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -28,7 +28,7 @@ class QuestionMapper extends QBMapper {
 	 * @throws DoesNotExistException if not found
 	 * @return Question[]
 	 */
-	public function findByForm(int $formId, bool $loadDeleted = false): array {
+	public function findByForm(int $formId, bool $loadDeleted = false, bool $loadSubquestions = false): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('*')
@@ -36,6 +36,13 @@ class QuestionMapper extends QBMapper {
 			->where(
 				$qb->expr()->eq('form_id', $qb->createNamedParameter($formId, IQueryBuilder::PARAM_INT))
 			);
+
+		if (!$loadSubquestions) {
+			// Only load top-level questions (not follow-up questions in branches)
+			$qb->andWhere(
+				$qb->expr()->isNull('parent_question_id')
+			);
+		}
 
 		if (!$loadDeleted) {
 			// Don't load questions, that are marked as deleted (marked by order==0).
@@ -51,13 +58,67 @@ class QuestionMapper extends QBMapper {
 	}
 
 	/**
+	 * Find the subquestions of a question
+	 *
+	 * @param int $parentQuestionId The ID of the parent question
+	 * @param bool $loadDeleted Whether to include soft-deleted questions
+	 * @return Question[]
+	 */
+	public function findByParentQuestion(int $parentQuestionId, bool $loadDeleted = false): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('parent_question_id', $qb->createNamedParameter($parentQuestionId, IQueryBuilder::PARAM_INT))
+			);
+
+		if (!$loadDeleted) {
+			$qb->andWhere(
+				$qb->expr()->neq('order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT))
+			);
+		}
+
+		// Sort by order within the parent question
+		$qb->orderBy('order');
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Find the subquestions of a specific branch of a question
+	 *
+	 * @param int $parentQuestionId The ID of the parent question
+	 * @param string $branchId The branch identifier
+	 * @return Question[]
+	 */
+	public function findByBranch(int $parentQuestionId, string $branchId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('parent_question_id', $qb->createNamedParameter($parentQuestionId, IQueryBuilder::PARAM_INT))
+			)
+			->andWhere(
+				$qb->expr()->eq('branch_id', $qb->createNamedParameter($branchId))
+			)
+			->andWhere(
+				$qb->expr()->neq('order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT))
+			)
+			->orderBy('order');
+
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @param int $formId
 	 */
 	public function deleteByForm(int $formId): void {
 		$qb = $this->db->getQueryBuilder();
 
-		// First delete corresponding options.
-		$questionEntities = $this->findByForm($formId, true); // findByForm - loadDeleted=true
+		// First delete corresponding options, of subquestions as well.
+		$questionEntities = $this->findByForm($formId, true, true); // findByForm - loadDeleted=true, loadSubquestions=true
 		foreach ($questionEntities as $questionEntity) {
 			$this->optionMapper->deleteByQuestion($questionEntity->id);
 		}

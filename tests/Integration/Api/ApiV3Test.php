@@ -63,7 +63,9 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 1,
 						'options' => [],
 						'accept' => [],
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 					[
 						'type' => 'multiple_unique',
@@ -89,7 +91,9 @@ class ApiV3Test extends IntegrationBase {
 						'accept' => [],
 						'extraSettings' => [
 							'shuffleOptions' => true
-						]
+						],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 					[
 						'type' => 'file',
@@ -105,6 +109,8 @@ class ApiV3Test extends IntegrationBase {
 							'maxAllowedFilesCount' => 1,
 							'maxFileSize' => 1024,
 						],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 				],
 				'shares' => [
@@ -190,7 +196,9 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 1,
 						'options' => [],
 						'accept' => [],
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 				],
 				'shares' => [
@@ -243,7 +251,9 @@ class ApiV3Test extends IntegrationBase {
 						'order' => 1,
 						'options' => [],
 						'accept' => [],
-						'extraSettings' => []
+						'extraSettings' => [],
+						'parentQuestionId' => null,
+						'branchId' => null,
 					],
 				],
 				'shares' => [
@@ -496,7 +506,9 @@ class ApiV3Test extends IntegrationBase {
 							'options' => [],
 							'accept' => [],
 							'description' => 'Please answer this.',
-							'extraSettings' => []
+							'extraSettings' => [],
+							'parentQuestionId' => null,
+							'branchId' => null,
 						],
 						[
 							'type' => 'multiple_unique',
@@ -525,7 +537,9 @@ class ApiV3Test extends IntegrationBase {
 							'description' => '',
 							'extraSettings' => [
 								'shuffleOptions' => true,
-							]
+							],
+							'parentQuestionId' => null,
+							'branchId' => null,
 						],
 						[
 							'type' => 'file',
@@ -541,6 +555,8 @@ class ApiV3Test extends IntegrationBase {
 								'maxAllowedFilesCount' => 1,
 								'maxFileSize' => 1024,
 							],
+							'parentQuestionId' => null,
+							'branchId' => null,
 						],
 					],
 					'shares' => [
@@ -851,6 +867,8 @@ class ApiV3Test extends IntegrationBase {
 					'accept' => [],
 					'description' => '',
 					'extraSettings' => [],
+					'parentQuestionId' => null,
+					'branchId' => null,
 				]
 			],
 			'emptyQuestion' => [
@@ -865,6 +883,8 @@ class ApiV3Test extends IntegrationBase {
 					'accept' => [],
 					'description' => '',
 					'extraSettings' => [],
+					'parentQuestionId' => null,
+					'branchId' => null,
 				]
 			]
 		];
@@ -1047,6 +1067,191 @@ class ApiV3Test extends IntegrationBase {
 		foreach ($copy as $key => $value) {
 			$this->assertEquals($value, $data[$key]);
 		}
+	}
+
+	/**
+	 * Test creating a question with branches of follow-up questions
+	 */
+	public function testCreateQuestionWithBranches(): void {
+		// First create the question
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Question with branches'
+			]
+		]);
+		$triggerQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $triggerQuestion;
+
+		$this->assertEquals(201, $resp->getStatusCode());
+		$this->assertEquals(Constants::ANSWER_TYPE_DROPDOWN, $triggerQuestion['type']);
+		$this->assertEquals('Question with branches', $triggerQuestion['text']);
+		$this->assertNull($triggerQuestion['parentQuestionId']);
+		$this->assertNull($triggerQuestion['branchId']);
+
+		// Add options for the trigger
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$triggerQuestion['id']}/options", [
+			'json' => [
+				'optionTexts' => ['Option A', 'Option B']
+			]
+		]);
+		$options = $this->OcsResponse2Data($resp);
+		$this->assertEquals(201, $resp->getStatusCode());
+		$this->assertCount(2, $options);
+
+		// Add the branches
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$triggerQuestion['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'extraSettings' => [
+						'branches' => [
+							[
+								'id' => 'branch-a',
+								'conditions' => [['type' => 'option_selected', 'optionId' => $options[0]['id']]]
+							],
+							[
+								'id' => 'branch-b',
+								'conditions' => [['type' => 'option_selected', 'optionId' => $options[1]['id']]]
+							]
+						]
+					]
+				]
+			]
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Now create a subquestion in branch-a
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => 'short',
+				'text' => 'Subquestion for Option A',
+				'parentQuestionId' => $triggerQuestion['id'],
+				'branchId' => 'branch-a'
+			]
+		]);
+		$subQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $subQuestion;
+
+		$this->assertEquals(201, $resp->getStatusCode());
+		$this->assertEquals('short', $subQuestion['type']);
+		$this->assertEquals('Subquestion for Option A', $subQuestion['text']);
+		$this->assertEquals($triggerQuestion['id'], $subQuestion['parentQuestionId']);
+		$this->assertEquals('branch-a', $subQuestion['branchId']);
+
+		// Fetch the form and verify the structure
+		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}");
+		$form = $this->OcsResponse2Data($resp);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		// Find the question in the form
+		$foundQuestion = null;
+		foreach ($form['questions'] as $question) {
+			if ($question['id'] === $triggerQuestion['id']) {
+				$foundQuestion = $question;
+				break;
+			}
+		}
+
+		$this->assertNotNull($foundQuestion);
+		$this->assertEquals(Constants::ANSWER_TYPE_DROPDOWN, $foundQuestion['type']);
+		$this->assertArrayHasKey('extraSettings', $foundQuestion);
+		$this->assertArrayHasKey('branches', $foundQuestion['extraSettings']);
+
+		// Verify subquestion is attached to the correct branch
+		$branchA = null;
+		foreach ($foundQuestion['extraSettings']['branches'] as $branch) {
+			if ($branch['id'] === 'branch-a') {
+				$branchA = $branch;
+				break;
+			}
+		}
+
+		$this->assertNotNull($branchA);
+		$this->assertArrayHasKey('subQuestions', $branchA);
+		$this->assertCount(1, $branchA['subQuestions']);
+		$this->assertEquals('Subquestion for Option A', $branchA['subQuestions'][0]['text']);
+	}
+
+	/**
+	 * Test that follow-up questions can not have follow-up questions themselves
+	 */
+	public function testNestedFollowUpQuestionsNotAllowed(): void {
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Parent question'
+			]
+		]);
+		$parentQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $parentQuestion;
+		$this->assertEquals(201, $resp->getStatusCode());
+
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentQuestion['id']}/options", [
+			'json' => [
+				'optionTexts' => ['Trigger Option']
+			]
+		]);
+		$options = $this->OcsResponse2Data($resp);
+
+		$this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentQuestion['id']}", [
+			'json' => [
+				'keyValuePairs' => [
+					'extraSettings' => [
+						'branches' => [
+							['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => $options[0]['id']]]]
+						]
+					]
+				]
+			]
+		]);
+
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Follow-up question',
+				'parentQuestionId' => $parentQuestion['id'],
+				'branchId' => 'branch-1'
+			]
+		]);
+		$subQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $subQuestion;
+		$this->assertEquals(201, $resp->getStatusCode());
+
+		// A follow-up question of the follow-up question fails
+		$this->expectException(ClientException::class);
+		$this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => 'short',
+				'text' => 'Nested follow-up question',
+				'parentQuestionId' => $subQuestion['id'],
+				'branchId' => 'branch-1'
+			]
+		]);
+	}
+
+	/**
+	 * Test that subquestion requires branchId
+	 */
+	public function testSubquestionRequiresBranchId(): void {
+		// First create a question that can have branches
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Question for branch test'
+			]
+		]);
+		$triggerQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $triggerQuestion;
+
+		// Try to create a subquestion without branchId (should fail)
+		$this->expectException(ClientException::class);
+		$this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => 'short',
+				'text' => 'Subquestion without branch',
+				'parentQuestionId' => $triggerQuestion['id']
+			]
+		]);
 	}
 
 	public static function dataCreateNewOption() {

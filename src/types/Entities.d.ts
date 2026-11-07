@@ -39,7 +39,14 @@ export interface FormsSubmission {
 	userDisplayName: string
 }
 
+export interface FormsConditionalBranch {
+	id: string
+	conditions: Record<string, unknown>[]
+	subQuestions: FormsQuestion[]
+}
+
 export interface FormsQuestionExtraSettings {
+	branches?: FormsConditionalBranch[]
 	allowOtherAnswer?: boolean
 	shuffleOptions?: boolean
 	optionsLimitMax?: number
@@ -67,6 +74,8 @@ export interface FormsQuestionExtraSettings {
 export interface FormsQuestion {
 	id: number
 	formId?: number | null
+	parentQuestionId?: number | null
+	branchId?: string | null
 	text: string
 	type: string
 	order?: number | null

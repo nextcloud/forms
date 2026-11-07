@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -19,6 +19,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Db\UploadedFile;
 use OCA\Forms\Db\UploadedFileMapper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
@@ -609,6 +610,37 @@ file2.txt"
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","",""
 				'
 			],
+			'subquestions-follow-their-question' => [
+				// Questions, sorted by order like the mapper returns them: subquestions are ordered within their branch
+				[
+					['id' => 1, 'type' => 'dropdown', 'text' => 'Cond', 'order' => 1, 'extraSettings' => [
+						'branches' => [['id' => 'b1', 'conditions' => []], ['id' => 'b2', 'conditions' => []]],
+					]],
+					['id' => 3, 'type' => 'short', 'text' => 'Sub B', 'order' => 1, 'parentQuestionId' => 1, 'branchId' => 'b2'],
+					['id' => 4, 'type' => 'short', 'text' => 'Sub A', 'order' => 1, 'parentQuestionId' => 1, 'branchId' => 'b1'],
+					['id' => 2, 'type' => 'short', 'text' => 'Top 2', 'order' => 2],
+					['id' => 5, 'type' => 'short', 'text' => 'Removed branch', 'order' => 2, 'parentQuestionId' => 1, 'branchId' => 'b0'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'yes'],
+							['questionId' => 4, 'text' => 'A'],
+							['questionId' => 2, 'text' => 'T'],
+						]
+					],
+				],
+				// Expected CSV-Result: subquestions right after their question, in branch order
+				'
+				"Submission ID","User ID","User display name","Timestamp","Cond","Sub A","Sub B","Top 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-4","question-id-3","question-id-2"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","yes","A","","T"
+				'
+			],
 		];
 	}
 	/**
@@ -905,6 +937,33 @@ file2.txt"
 				],
 				// Expected Result
 				'Answer for non-existent question with ID 2.',
+			],
+			'question-id-in-other-notation' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'email']]
+				],
+				// Answers - the key is not the question id
+				[
+					'1.0' => ['not an email']
+				],
+				// Expected Result
+				'Answer for non-existent question with ID 1.',
+			],
+			'option-id-in-other-notation' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				// Answers
+				[
+					'1' => ['03']
+				],
+				// Expected Result
+				'Answer "03" for question "q1" is not a valid option.',
 			],
 			'invalid-multiple-too-many-answers' => [
 				// Questions
@@ -1402,6 +1461,255 @@ file2.txt"
 				// Expected Result – required question must be answered
 				'Question "Rank these" is required.',
 			],
+			// Questions with branches of follow-up questions
+			'valid-branch-subquestion-answered' => [
+				// Questions - The answer of the question opens branch-1, so only subquestion 101 needs to be answered
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+								[
+									'id' => 'branch-2',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 11]],
+									'subQuestions' => [['id' => 102, 'type' => 'short', 'text' => 'Sub Q2', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['10'], '101' => ['Sub answer 1']],
+				// Expected Result
+				null,
+			],
+			'valid-branch-optional-not-answered' => [
+				// Questions - Neither the question nor its follow-up questions are required without an answer
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				[],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-required-question-not-answered' => [
+				// Questions - A required question with branches is required as usual
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				[],
+				// Expected Result
+				'Question "Trigger Q" is required.',
+			],
+			'invalid-branch-required-subquestion-not-answered' => [
+				// Questions - Required follow-up questions of an active branch must be answered
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['10']],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'valid-branch-no-branch-matched' => [
+				// Questions - Follow-up questions of inactive branches are not required
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['11']],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-number-answer-activates-branch' => [
+				// Questions - Dropdowns send option ids as numbers, the branch must still be active
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => [10]],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'invalid-branch-answer-with-keys-activates-branch' => [
+				// Questions - Keys of the answer values do not keep the branch closed
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['1' => '10']],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'invalid-branch-unknown-option' => [
+				// Questions - The question is validated like any other question
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
+							],
+						],
+						'options' => [['id' => 10]],
+					],
+				],
+				// Answers
+				['100' => ['totally-not-an-option']],
+				// Expected Result
+				'Answer "totally-not-an-option" for question "Trigger Q" is not a valid option.',
+			],
+			'invalid-branch-answer-for-inactive-branch' => [
+				// Questions - Follow-up questions of inactive branches can not be answered
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+								[
+									'id' => 'branch-2',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 11]],
+									'subQuestions' => [['id' => 102, 'type' => 'short', 'text' => 'Sub Q2', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['10'], '101' => ['shown'], '102' => ['left over']],
+				// Expected Result
+				'Answer for non-existent question with ID 102.',
+			],
+			'invalid-branch-subquestion-without-question-answer' => [
+				// Questions - Follow-up questions can not be answered without the answer opening their branch
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['101' => ['left over']],
+				// Expected Result
+				'Answer for non-existent question with ID 101.',
+			],
 		];
 	}
 
@@ -1467,6 +1775,113 @@ file2.txt"
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('File "victim.rtf" for question "File question" not exists anymore. Please delete and re-upload the file.');
+
+		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
+	}
+
+	public static function dataFileUploadAuthorization(): array {
+		$cases = [];
+		foreach ([false, true] as $followUp) {
+			foreach ([false, true] as $required) {
+				foreach ([
+					'valid' => 'valid-upload-token',
+					'foreign' => 'attacker-token',
+					'missing' => null,
+					'empty' => '',
+				] as $name => $token) {
+					$case = ($followUp ? 'follow-up' : 'ordinary') . '-'
+						. ($required ? 'required' : 'optional') . '-' . $name;
+					$cases[$case] = [$followUp, $required, $token];
+				}
+			}
+		}
+		return $cases;
+	}
+
+	/**
+	 * @dataProvider dataFileUploadAuthorization
+	 */
+	public function testValidateSubmission_fileUploadAuthorization(bool $followUp, bool $required, ?string $uploadToken): void {
+		$fileQuestion = [
+			'id' => 8,
+			'type' => Constants::ANSWER_TYPE_FILE,
+			'text' => 'File question',
+			'isRequired' => $required,
+			'extraSettings' => [],
+		];
+		$fileAnswer = [
+			'uploadedFileId' => '10',
+			'fileName' => 'attachment.rtf',
+		];
+		if ($uploadToken !== null) {
+			$fileAnswer['uploadToken'] = $uploadToken;
+		}
+		$questions = [$fileQuestion];
+		$answers = [8 => [$fileAnswer]];
+
+		if ($followUp) {
+			// The file question is a follow-up question of an active branch
+			$questions = [[
+				'id' => 9,
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Question with branches',
+				'isRequired' => true,
+				'options' => [['id' => 11, 'text' => 'Yes']],
+				'extraSettings' => [
+					'branches' => [[
+						'id' => 'file-branch',
+						'conditions' => [[
+							'type' => Constants::CONDITION_TYPE_OPTION_SELECTED,
+							'optionId' => 11,
+						]],
+						'subQuestions' => [$fileQuestion],
+					]],
+				],
+			]];
+			$answers = [9 => ['11']] + $answers;
+		}
+
+		$this->uploadedFileMapper->expects($this->never())
+			->method('getByUploadedFileId');
+		$this->uploadedFileMapper->expects($this->never())
+			->method('findByUploadedFileId');
+
+		$missingRequiredToken = $required && ($uploadToken === null || $uploadToken === '');
+		if ($missingRequiredToken) {
+			$this->uploadedFileMapper->expects($this->never())
+				->method('getForSubmission');
+		} else {
+			$lookup = $this->uploadedFileMapper->expects($this->once())
+				->method('getForSubmission')
+				->with($this->identicalTo(10), $this->identicalTo(7), $this->identicalTo(8), $uploadToken ?? '');
+			if ($uploadToken === 'valid-upload-token') {
+				$uploadedFile = new UploadedFile();
+				$uploadedFile->setId(10);
+				$uploadedFile->setFileId(99);
+				$lookup->willReturn($uploadedFile);
+			} else {
+				$lookup->willThrowException(new DoesNotExistException('Upload not found'));
+			}
+		}
+
+		if ($uploadToken === 'valid-upload-token') {
+			$folder = $this->createMock(Folder::class);
+			$folder->expects($this->once())
+				->method('getById')
+				->with(99)
+				->willReturn([$this->createMock(File::class)]);
+			$this->storage->expects($this->once())
+				->method('getUserFolder')
+				->with('alice')
+				->willReturn($folder);
+		} else {
+			$this->storage->expects($this->never())
+				->method('getUserFolder');
+			$this->expectException(\InvalidArgumentException::class);
+			$this->expectExceptionMessage($missingRequiredToken
+				? 'Question "File question" is required.'
+				: 'File "attachment.rtf" for question "File question" not exists anymore. Please delete and re-upload the file.');
+		}
 
 		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
 	}
