@@ -1065,6 +1065,18 @@ class SubmissionService {
 					}
 				}
 				return false;
+			case Constants::ANSWER_TYPE_MULTIPLE:
+				// Multi-select: the branch is active if all option ids of any of its conditions are selected
+				foreach ($conditions as $condition) {
+					$optionIds = $condition['optionIds'] ?? [];
+					if (empty($optionIds) || !is_array($optionIds)) {
+						continue;
+					}
+					if (array_diff(array_map('strval', $optionIds), $selectedOptionIds) === []) {
+						return true;
+					}
+				}
+				return false;
 			default:
 				return false;
 		}

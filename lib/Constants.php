@@ -243,6 +243,7 @@ class Constants {
 	 * Condition types of branches
 	 */
 	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
+	public const CONDITION_TYPE_OPTIONS_COMBINATION = 'options_combination';
 
 	/**
 	 * Question types that can have branches with follow-up questions in `extraSettings.branches`,
@@ -253,6 +254,7 @@ class Constants {
 	public const QUESTION_TYPES_WITH_BRANCHES = [
 		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::CONDITION_TYPE_OPTION_SELECTED],
 		self::ANSWER_TYPE_DROPDOWN => [self::CONDITION_TYPE_OPTION_SELECTED],
+		self::ANSWER_TYPE_MULTIPLE => [self::CONDITION_TYPE_OPTIONS_COMBINATION],
 	];
 
 	/**

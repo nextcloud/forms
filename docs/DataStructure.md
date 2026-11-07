@@ -270,7 +270,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
-| `branches`              | `dropdown`, `multiple_unique`                  | Array            | Array of [Branch objects](#branch-object)   | Branches with follow-up questions, see [Follow-up Questions](#follow-up-questions) |
+| `branches`              | `dropdown`, `multiple`, `multiple_unique`      | Array            | Array of [Branch objects](#branch-object)   | Branches with follow-up questions, see [Follow-up Questions](#follow-up-questions) |
 
 ### Option Types
 
@@ -303,6 +303,7 @@ Follow-up questions (subquestions) are questions of their own with additional pr
 | ----------------- | ----------------- | ----------------------------------- |
 | `multiple_unique` | `option_selected` | Radio buttons - the selected option |
 | `dropdown`        | `option_selected` | Dropdown - the selected option      |
+| `multiple`        | `options_combination` | Checkboxes - all options of a combination |
 
 A branch is shown when any of its conditions matches. Several branches can be shown at once.
 
@@ -343,6 +344,14 @@ Conditions determine when a branch is activated. The structure depends on the ty
 ```json
 { "type": "option_selected", "optionId": 42 }
 ```
+
+#### options_combination (for multiple)
+
+```json
+{ "type": "options_combination", "optionIds": [42, 43] }
+```
+
+All options in `optionIds` must be selected for the condition to match.
 
 ### Example
 
