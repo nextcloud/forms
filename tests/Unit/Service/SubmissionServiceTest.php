@@ -1784,6 +1784,57 @@ file2.txt"
 				// Expected Result
 				'Question "Why no file?" is required.',
 			],
+			'valid-branch-linearscale-range' => [
+				// Questions - value 2 opens the branch of the range 1 to 3
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_LINEARSCALE,
+						'text' => 'Scale Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-low',
+									'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]],
+									'subQuestions' => [['id' => 101, 'type' => 'long', 'text' => 'Why low?', 'isRequired' => true]],
+								],
+								[
+									'id' => 'branch-high',
+									'conditions' => [['type' => 'value_range', 'min' => 4, 'max' => 5]],
+									'subQuestions' => [['id' => 102, 'type' => 'long', 'text' => 'Why high?', 'isRequired' => true]],
+								],
+							],
+						],
+					],
+				],
+				// Answers
+				['100' => ['2'], '101' => ['Because reasons']],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-color-ignores-case' => [
+				// Questions - colors match regardless of case
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_COLOR,
+						'text' => 'Color Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [[
+								'id' => 'branch-red',
+								'conditions' => [['type' => 'value_equals', 'value' => '#FF0000']],
+								'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Why red?', 'isRequired' => true]],
+							]],
+						],
+					],
+				],
+				// Answers
+				['100' => ['#ff0000']],
+				// Expected Result
+				'Question "Why red?" is required.',
+			],
 			'invalid-branch-unknown-option' => [
 				// Questions - The question is validated like any other question
 				[
@@ -2034,5 +2085,35 @@ file2.txt"
 		}
 
 		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
+	}
+
+	public static function dataGetVisibleQuestionsLinearScale(): array {
+		return [
+			'equals-match' => [['type' => 'value_equals', 'value' => 3], '3', true],
+			'equals-no-match' => [['type' => 'value_equals', 'value' => 3], '2', false],
+			'not-equals-match' => [['type' => 'value_not_equals', 'value' => 3], '2', true],
+			'not-equals-no-match' => [['type' => 'value_not_equals', 'value' => 3], '3', false],
+			'min-match' => [['type' => 'value_min', 'min' => 4], '4', true],
+			'min-no-match' => [['type' => 'value_min', 'min' => 4], '3', false],
+			'max-match' => [['type' => 'value_max', 'max' => 2], '2', true],
+			'max-no-match' => [['type' => 'value_max', 'max' => 2], '3', false],
+			'range-open-max' => [['type' => 'value_range', 'min' => 2], '5', true],
+			'unanswered' => [['type' => 'value_equals', 'value' => 3], null, false],
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetVisibleQuestionsLinearScale
+	 */
+	public function testGetVisibleQuestionsLinearScale(array $condition, ?string $answer, bool $visible): void {
+		$subQuestion = ['id' => 101, 'type' => Constants::ANSWER_TYPE_SHORT, 'text' => 'Why?'];
+		$question = [
+			'id' => 100,
+			'type' => Constants::ANSWER_TYPE_LINEARSCALE,
+			'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [$condition], 'subQuestions' => [$subQuestion]]]],
+		];
+		$answers = $answer === null ? [] : ['100' => [$answer]];
+
+		$this->assertEquals($visible ? [$question, $subQuestion] : [$question], $this->submissionService->getVisibleQuestions([$question], $answers));
 	}
 };

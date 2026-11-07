@@ -1940,6 +1940,16 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_FILE,
 				'expected' => true
 			],
+			'valid-branches-linearscale-range' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'valid-branches-color' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'value_equals', 'value' => '#ff0000']]]]],
+				'questionType' => Constants::ANSWER_TYPE_COLOR,
+				'expected' => true
+			],
 			'valid-branches-with-own-settings' => [
 				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
 				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,

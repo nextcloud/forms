@@ -41,6 +41,7 @@
 			</div>
 		</div>
 		<template #insert>
+			<slot name="branches" />
 			<slot name="insert" />
 		</template>
 	</Question>

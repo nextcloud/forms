@@ -32,6 +32,80 @@
 			</div>
 		</template>
 
+		<!-- Value-based conditions (linearscale, color) -->
+		<template v-else-if="isValueBasedTrigger">
+			<div class="condition-row">
+				<template v-if="triggerType === 'linearscale'">
+					<NcSelect
+						v-model="conditionType"
+						:options="valueConditionTypes"
+						:placeholder="t('forms', 'Condition type')"
+						:ariaLabelCombobox="t('forms', 'Condition type')"
+						label="label"
+						:reduce="(opt) => opt.value"
+						class="condition-type-select" />
+					<template
+						v-if="
+							conditionType === 'value_equals'
+							|| conditionType === 'value_not_equals'
+						">
+						<NcTextField
+							v-model.number="conditionValue"
+							type="number"
+							:label="t('forms', 'Value')"
+							class="condition-value-input" />
+					</template>
+					<template v-else-if="conditionType === 'value_range'">
+						<NcTextField
+							v-model.number="conditionMin"
+							type="number"
+							:label="t('forms', 'Minimum value')"
+							class="condition-range-input" />
+						<span class="condition-range-separator">-</span>
+						<NcTextField
+							v-model.number="conditionMax"
+							type="number"
+							:label="t('forms', 'Maximum value')"
+							class="condition-range-input" />
+					</template>
+					<template v-else-if="conditionType === 'value_min'">
+						<NcTextField
+							v-model.number="conditionMin"
+							type="number"
+							:label="t('forms', 'Minimum value')"
+							class="condition-value-input" />
+					</template>
+					<template v-else-if="conditionType === 'value_max'">
+						<NcTextField
+							v-model.number="conditionMax"
+							type="number"
+							:label="t('forms', 'Maximum value')"
+							class="condition-value-input" />
+					</template>
+				</template>
+				<template v-else-if="triggerType === 'color'">
+					<NcColorPicker v-model="conditionValue">
+						<NcButton
+							:aria-label="
+								t('forms', 'Select color, current: {color}', {
+									color: conditionValue || t('forms', 'none'),
+								})
+							">
+							<template #icon>
+								<div
+									class="color-preview"
+									aria-hidden="true"
+									:style="{
+										backgroundColor: conditionValue || '#000000',
+									}" />
+							</template>
+							{{ conditionValue || t('forms', 'Select color') }}
+						</NcButton>
+					</NcColorPicker>
+				</template>
+			</div>
+		</template>
+
 		<!-- Date/time-based conditions -->
 		<template v-else-if="isDateBasedTrigger">
 			<div class="condition-row">
@@ -67,17 +141,23 @@
 <script>
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 
 export default {
 	name: 'BranchConditionEditor',
 
 	components: {
+		NcButton,
 		NcCheckboxRadioSwitch,
+		NcColorPicker,
 		NcDateTimePicker,
 		NcSelect,
+		NcTextField,
 	},
 
 	props: {
@@ -123,6 +203,13 @@ export default {
 		 */
 		isSingleSelect() {
 			return ['multiple_unique', 'dropdown'].includes(this.triggerType)
+		},
+
+		/**
+		 * Check if trigger is value-based (linearscale, color)
+		 */
+		isValueBasedTrigger() {
+			return ['linearscale', 'color'].includes(this.triggerType)
 		},
 
 		/**
@@ -176,6 +263,19 @@ export default {
 		},
 
 		/**
+		 * Value condition type options (for linear scale)
+		 */
+		valueConditionTypes() {
+			return [
+				{ value: 'value_equals', label: t('forms', 'Equals') },
+				{ value: 'value_not_equals', label: t('forms', 'Not Equals') },
+				{ value: 'value_range', label: t('forms', 'In range') },
+				{ value: 'value_min', label: t('forms', 'Higher than') },
+				{ value: 'value_max', label: t('forms', 'Lower than') },
+			]
+		},
+
+		/**
 		 * Current condition type from branch
 		 */
 		conditionType: {
@@ -192,8 +292,22 @@ export default {
 		 * Default condition type based on trigger
 		 */
 		defaultConditionType() {
+			if (this.triggerType === 'linearscale') return 'value_equals'
 			if (this.isDateBasedTrigger) return 'date_range'
 			return null
+		},
+
+		/**
+		 * Current condition value
+		 */
+		conditionValue: {
+			get() {
+				return this.branch.conditions?.[0]?.value || ''
+			},
+
+			set(value) {
+				this.updateCondition({ value })
+			},
 		},
 
 		/**
@@ -364,11 +478,31 @@ export default {
 	flex-wrap: wrap;
 }
 
+.condition-type-select {
+	min-width: 150px;
+}
+
+.condition-value-input {
+	flex: 1;
+	min-width: 200px;
+}
+
+.condition-range-input {
+	width: 100px;
+}
+
 .condition-range-separator {
 	color: var(--color-text-maxcontrast);
 }
 
 .condition-date-input {
 	flex: 1;
+}
+
+.color-preview {
+	width: 24px;
+	height: 24px;
+	border-radius: var(--border-radius);
+	border: 1px solid var(--color-border-dark);
 }
 </style>
