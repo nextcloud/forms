@@ -31,17 +31,39 @@
 					@update:modelValue="onMultipleOptionsSelect" />
 			</div>
 		</template>
+
+		<!-- Date/time-based conditions -->
+		<template v-else-if="isDateBasedTrigger">
+			<div class="condition-row">
+				<NcDateTimePicker
+					v-model="conditionDateMin"
+					:type="datePickerType"
+					:placeholder="t('forms', 'From')"
+					:ariaLabel="t('forms', 'From')"
+					class="condition-date-input" />
+				<span class="condition-range-separator">-</span>
+				<NcDateTimePicker
+					v-model="conditionDateMax"
+					:type="datePickerType"
+					:placeholder="t('forms', 'To')"
+					:ariaLabel="t('forms', 'To')"
+					class="condition-date-input" />
+			</div>
+		</template>
 	</div>
 </template>
 
 <script>
 import { t } from '@nextcloud/l10n'
+import moment from '@nextcloud/moment'
+import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 
 export default {
 	name: 'BranchConditionEditor',
 
 	components: {
+		NcDateTimePicker,
 		NcSelect,
 	},
 
@@ -91,6 +113,13 @@ export default {
 		},
 
 		/**
+		 * Check if trigger is date-based (date, datetime, time)
+		 */
+		isDateBasedTrigger() {
+			return ['date', 'datetime', 'time'].includes(this.triggerType)
+		},
+
+		/**
 		 * Label for option-based conditions
 		 */
 		conditionLabel() {
@@ -132,9 +161,112 @@ export default {
 
 			return this.isSingleSelect ? selected[0] || null : selected
 		},
+
+		/**
+		 * Current condition type from branch
+		 */
+		conditionType: {
+			get() {
+				return this.branch.conditions?.[0]?.type || this.defaultConditionType
+			},
+
+			set(value) {
+				this.updateCondition({ type: value })
+			},
+		},
+
+		/**
+		 * Default condition type based on trigger
+		 */
+		defaultConditionType() {
+			if (this.isDateBasedTrigger) return 'date_range'
+			return null
+		},
+
+		/**
+		 * Storage format of date and time conditions, the same as for answers
+		 */
+		dateStorageFormat() {
+			return this.triggerType === 'time' ? 'HH:mm' : 'YYYY-MM-DD'
+		},
+
+		conditionDateMin: {
+			get() {
+				return this.parseDate(this.conditionMin)
+			},
+
+			set(value) {
+				this.conditionMin = this.formatDate(value)
+			},
+		},
+
+		conditionDateMax: {
+			get() {
+				return this.parseDate(this.conditionMax)
+			},
+
+			set(value) {
+				this.conditionMax = this.formatDate(value)
+			},
+		},
+
+		/**
+		 * Condition min value (for ranges)
+		 */
+		conditionMin: {
+			get() {
+				return this.branch.conditions?.[0]?.min || ''
+			},
+
+			set(value) {
+				this.updateCondition({ min: value })
+			},
+		},
+
+		/**
+		 * Condition max value (for ranges)
+		 */
+		conditionMax: {
+			get() {
+				return this.branch.conditions?.[0]?.max || ''
+			},
+
+			set(value) {
+				this.updateCondition({ max: value })
+			},
+		},
+
+		/**
+		 * Date picker type based on trigger type
+		 */
+		datePickerType() {
+			if (this.triggerType === 'time') return 'time'
+			if (this.triggerType === 'datetime') return 'datetime'
+			return 'date'
+		},
 	},
 
 	methods: {
+		/**
+		 * @param {string} value stored date or time
+		 * @return {Date|null} the date for the picker
+		 */
+		parseDate(value) {
+			if (!value) {
+				return null
+			}
+			const date = moment(value, this.dateStorageFormat, true)
+			return date.isValid() ? date.toDate() : null
+		},
+
+		/**
+		 * @param {Date|null} value date from the picker
+		 * @return {string} the date in the storage format of answers
+		 */
+		formatDate(value) {
+			return value ? moment(value).format(this.dateStorageFormat) : ''
+		},
+
 		/**
 		 * Handle single option selection (radio/dropdown)
 		 *
@@ -154,6 +286,21 @@ export default {
 			const optionIds = options.map((opt) => opt.id)
 			const conditions = optionIds.length > 0 ? [{ optionIds }] : []
 			this.emitUpdate({ conditions })
+		},
+
+		/**
+		 * Update a condition property
+		 *
+		 * @param {object} updates The condition properties to update
+		 */
+		updateCondition(updates) {
+			const currentCondition = this.branch.conditions?.[0] || {}
+			const newCondition = {
+				...currentCondition,
+				type: this.conditionType,
+				...updates,
+			}
+			this.emitUpdate({ conditions: [newCondition] })
 		},
 
 		/**
@@ -178,5 +325,20 @@ export default {
 
 .condition-options {
 	max-width: 400px;
+}
+
+.condition-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.condition-range-separator {
+	color: var(--color-text-maxcontrast);
+}
+
+.condition-date-input {
+	flex: 1;
 }
 </style>

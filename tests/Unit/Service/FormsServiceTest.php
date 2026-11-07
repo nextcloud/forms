@@ -1925,6 +1925,16 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => false
 			],
+			'valid-branches-date-range' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'date_range', 'min' => '2024-01-01', 'max' => '2024-12-31']]]]],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => true
+			],
+			'valid-branches-time-range' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'date_range', 'min' => '08:00', 'max' => '12:00']]]]],
+				'questionType' => Constants::ANSWER_TYPE_TIME,
+				'expected' => true
+			],
 			'valid-branches-with-own-settings' => [
 				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
 				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,

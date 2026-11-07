@@ -270,7 +270,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
-| `branches`              | `dropdown`, `multiple`, `multiple_unique`      | Array            | Array of [Branch objects](#branch-object)   | Branches with follow-up questions, see [Follow-up Questions](#follow-up-questions) |
+| `branches`              | see [Follow-up Questions](#follow-up-questions) | Array            | Array of [Branch objects](#branch-object)   | Branches with follow-up questions, see [Follow-up Questions](#follow-up-questions) |
 
 ### Option Types
 
@@ -304,6 +304,9 @@ Follow-up questions (subquestions) are questions of their own with additional pr
 | `multiple_unique` | `option_selected` | Radio buttons - the selected option |
 | `dropdown`        | `option_selected` | Dropdown - the selected option      |
 | `multiple`        | `options_combination` | Checkboxes - all options of a combination |
+| `date`            | `date_range`      | Date - range including its bounds (`YYYY-MM-DD`) |
+| `datetime`        | `date_range`      | Deprecated date and time (`YYYY-MM-DD HH:mm`) |
+| `time`            | `date_range`      | Time - range including its bounds (`HH:mm`) |
 
 A branch is shown when any of its conditions matches. Several branches can be shown at once.
 
@@ -352,6 +355,18 @@ Conditions determine when a branch is activated. The structure depends on the ty
 ```
 
 All options in `optionIds` must be selected for the condition to match.
+
+#### date_range (for date, datetime, time)
+
+```json
+{ "type": "date_range", "min": "2024-01-01", "max": "2024-12-31" }
+```
+
+```json
+{ "type": "date_range", "min": "09:00", "max": "17:00" }
+```
+
+`min` and `max` use the answer format of the question type and are optional.
 
 ### Example
 

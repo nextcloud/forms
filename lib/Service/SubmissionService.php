@@ -1077,6 +1077,36 @@ class SubmissionService {
 					}
 				}
 				return false;
+			case Constants::ANSWER_TYPE_DATE:
+			case Constants::ANSWER_TYPE_DATETIME:
+			case Constants::ANSWER_TYPE_TIME:
+				// Date range conditions
+				$dateValue = $triggerAnswer[0] ?? '';
+				if (empty($dateValue)) {
+					return false;
+				}
+				$format = Constants::ANSWER_PHPDATETIME_FORMAT[$triggerType] ?? 'Y-m-d';
+				$date = \DateTime::createFromFormat('!' . $format, $dateValue);
+				if (!$date) {
+					return false;
+				}
+
+				foreach ($conditions as $condition) {
+					$min = isset($condition['min']) ? \DateTime::createFromFormat('!' . $format, $condition['min']) : null;
+					$max = isset($condition['max']) ? \DateTime::createFromFormat('!' . $format, $condition['max']) : null;
+
+					$inRange = true;
+					if ($min && $date < $min) {
+						$inRange = false;
+					}
+					if ($max && $date > $max) {
+						$inRange = false;
+					}
+					if ($inRange) {
+						return true;
+					}
+				}
+				return false;
 			default:
 				return false;
 		}

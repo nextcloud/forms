@@ -244,6 +244,7 @@ class Constants {
 	 */
 	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
 	public const CONDITION_TYPE_OPTIONS_COMBINATION = 'options_combination';
+	public const CONDITION_TYPE_DATE_RANGE = 'date_range';
 
 	/**
 	 * Question types that can have branches with follow-up questions in `extraSettings.branches`,
@@ -255,6 +256,9 @@ class Constants {
 		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::CONDITION_TYPE_OPTION_SELECTED],
 		self::ANSWER_TYPE_DROPDOWN => [self::CONDITION_TYPE_OPTION_SELECTED],
 		self::ANSWER_TYPE_MULTIPLE => [self::CONDITION_TYPE_OPTIONS_COMBINATION],
+		self::ANSWER_TYPE_DATE => [self::CONDITION_TYPE_DATE_RANGE],
+		self::ANSWER_TYPE_DATETIME => [self::CONDITION_TYPE_DATE_RANGE],
+		self::ANSWER_TYPE_TIME => [self::CONDITION_TYPE_DATE_RANGE],
 	];
 
 	/**
