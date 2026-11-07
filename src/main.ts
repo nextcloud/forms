@@ -9,7 +9,6 @@ import Forms from './Forms.vue'
 import router from './router.ts'
 
 import 'vite/modulepreload-polyfill'
-import '@nextcloud/dialogs/style.css'
 
 const app = createApp(Forms)
 
